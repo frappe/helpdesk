@@ -1,4 +1,4 @@
-# DocType, Maintenance Visit Detail
+# DocType, Maintenance Visit Purpose
 [
 
 	# These values are common in all dictionaries
@@ -27,15 +27,15 @@
 	{
 		'doctype': u'DocField',
 		'name': '__common__',
-		'parent': u'Maintenance Visit Detail',
+		'parent': u'Maintenance Visit Purpose',
 		'parentfield': u'fields',
 		'parenttype': u'DocType'
 	},
 
-	# DocType, Maintenance Visit Detail
+	# DocType, Maintenance Visit Purpose
 	{
 		'doctype': 'DocType',
-		'name': u'Maintenance Visit Detail'
+		'name': u'Maintenance Visit Purpose'
 	},
 
 	# DocField
