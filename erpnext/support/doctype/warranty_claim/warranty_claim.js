@@ -1,18 +1,20 @@
-// Copyright (c) 2013, Web Notes Technologies Pvt. Ltd. and Contributors
+// Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
 frappe.provide("erpnext.support");
+frappe.require("assets/erpnext/js/utils.js");
 
-frappe.ui.form.on_change("Customer Issue", "customer", function(frm) {
+frappe.ui.form.on_change("Warranty Claim", "customer", function(frm) {
 	erpnext.utils.get_party_details(frm) });
-frappe.ui.form.on_change("Customer Issue", "customer_address",
+frappe.ui.form.on_change("Warranty Claim", "customer_address",
 	erpnext.utils.get_address_display);
-frappe.ui.form.on_change("Customer Issue", "contact_person",
+frappe.ui.form.on_change("Warranty Claim", "contact_person",
 	erpnext.utils.get_contact_details);
 
-erpnext.support.CustomerIssue = frappe.ui.form.Controller.extend({
+erpnext.support.WarrantyClaim = frappe.ui.form.Controller.extend({
 	refresh: function() {
-		if((cur_frm.doc.status=='Open' || cur_frm.doc.status == 'Work In Progress')) {
+		if(!cur_frm.doc.__islocal &&
+			(cur_frm.doc.status=='Open' || cur_frm.doc.status == 'Work In Progress')) {
 			cur_frm.add_custom_button(__('Make Maintenance Visit'),
 				this.make_maintenance_visit, frappe.boot.doctype_icons["Maintenance Visit"], "btn-default")
 		}
@@ -20,13 +22,13 @@ erpnext.support.CustomerIssue = frappe.ui.form.Controller.extend({
 
 	make_maintenance_visit: function() {
 		frappe.model.open_mapped_doc({
-			method: "erpnext.support.doctype.customer_issue.customer_issue.make_maintenance_visit",
+			method: "erpnext.support.doctype.warranty_claim.warranty_claim.make_maintenance_visit",
 			frm: cur_frm
 		})
 	}
 });
 
-$.extend(cur_frm.cscript, new erpnext.support.CustomerIssue({frm: cur_frm}));
+$.extend(cur_frm.cscript, new erpnext.support.WarrantyClaim({frm: cur_frm}));
 
 cur_frm.cscript.onload = function(doc,cdt,cdn){
 	if(!doc.status)
@@ -94,3 +96,11 @@ cur_frm.fields_dict['item_code'].get_query = function(doc, cdt, cdn) {
 
 cur_frm.fields_dict.customer.get_query = function(doc,cdt,cdn) {
 	return{	query: "erpnext.controllers.queries.customer_query" } }
+
+cur_frm.cscript.company = function(doc, cdt, cdn) {
+	erpnext.get_fiscal_year(doc.company, doc.complaint_date);
+}
+
+cur_frm.cscript.complaint_date = function(doc, cdt, cdn){
+	erpnext.get_fiscal_year(doc.company, doc.complaint_date);
+}
