@@ -20,7 +20,9 @@ def execute(filters=None):
 
 	data = frappe.db.sql('''select date(creation) as creation_date,
 		avg(mins_to_first_response) as mins
-		from tabIssue where date(creation) between %s and %s
+		from tabIssue
+			where date(creation) between %s and %s
+			and mins_to_first_response > 0
 		group by creation_date order by creation_date desc''', (filters.from_date, filters.to_date))
 
 	return columns, data
