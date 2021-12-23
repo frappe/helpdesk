@@ -9,7 +9,7 @@ import frappe
 from frappe.core.doctype.user_permission.test_user_permission import create_user
 from frappe.utils import flt, get_datetime
 
-from erpnext.support.doctype.service_level_agreement.test_service_level_agreement import (
+from helpdesk.helpdesk.doctype.service_level_agreement.test_service_level_agreement import (
 	create_service_level_agreements_for_issues,
 )
 

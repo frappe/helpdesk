@@ -174,10 +174,13 @@ def auto_close_tickets():
 		doc.save()
 
 def has_website_permission(doc, ptype, user, verbose=False):
-	from erpnext.controllers.website_list_for_contact import has_website_permission
-	permission_based_on_customer = has_website_permission(doc, ptype, user, verbose)
+	# TODO: the commented code was used earilier, we dont need customers so just commented these out for now.
+	# but will need to see if some more logic needs to be added here.
+	# from erpnext.controllers.website_list_for_contact import has_website_permission
+	# permission_based_on_customer = has_website_permission(doc, ptype, user, verbose)
 
-	return permission_based_on_customer or doc.raised_by==user
+	# return permission_based_on_customer or doc.raised_by==user
+	return doc.raised_by==user
 
 def update_issue(contact, method):
 	"""Called when Contact is deleted"""

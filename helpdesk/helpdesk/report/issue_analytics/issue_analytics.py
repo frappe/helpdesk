@@ -10,8 +10,11 @@ from frappe import _, scrub
 from frappe.utils import add_days, add_to_date, flt, getdate
 from six import iteritems
 
-from erpnext.accounts.utils import get_fiscal_year
+# from erpnext.accounts.utils import get_fiscal_year
 
+def get_fiscal_year():
+	# TODO: handle this function properly
+	pass
 
 def execute(filters=None):
 	return IssueAnalytics(filters).run()

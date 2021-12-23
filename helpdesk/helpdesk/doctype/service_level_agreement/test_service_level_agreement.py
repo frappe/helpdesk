@@ -9,8 +9,8 @@ import unittest
 import frappe
 from frappe.utils import flt
 
-from erpnext.support.doctype.issue_priority.test_issue_priority import make_priorities
-from erpnext.support.doctype.service_level_agreement.service_level_agreement import (
+from helpdesk.helpdesk.doctype.issue_priority.test_issue_priority import make_priorities
+from helpdesk.helpdesk.doctype.service_level_agreement.service_level_agreement import (
 	get_service_level_agreement_fields,
 )
 
