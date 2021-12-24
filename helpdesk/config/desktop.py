@@ -1,5 +1,6 @@
 from frappe import _
 
+
 def get_data():
 	return [
 		{
@@ -7,6 +8,6 @@ def get_data():
 			"color": "grey",
 			"icon": "octicon octicon-file-directory",
 			"type": "module",
-			"label": _("HelpDesk")
+			"label": _("HelpDesk"),
 		}
 	]

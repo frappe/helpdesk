@@ -13,23 +13,21 @@ has_website_permission = {
 }
 
 doc_events = {
-    "*": {
+	"*": {
 		"validate": "helpdesk.helpdesk.doctype.service_level_agreement.service_level_agreement.apply",
-    },
-    "Communication": {
+	},
+	"Communication": {
 		"on_update": [
 			"helpdesk.helpdesk.doctype.service_level_agreement.service_level_agreement.on_communication_update",
-			"helpdesk.helpdesk.doctype.issue.issue.set_first_response_time"
+			"helpdesk.helpdesk.doctype.issue.issue.set_first_response_time",
 		]
 	},
-    "Contact": {
-		"on_trash": "helpdesk.helpdesk.doctype.issue.issue.update_issue",
-	},
+	"Contact": {"on_trash": "helpdesk.helpdesk.doctype.issue.issue.update_issue",},
 }
 
 scheduler_events = {
-    "daily": [
+	"daily": [
 		"helpdesk.helpdesk.doctype.issue.issue.auto_close_tickets",
 		"helpdesk.helpdesk.doctype.service_level_agreement.service_level_agreement.check_agreement_status",
-    ]
+	]
 }

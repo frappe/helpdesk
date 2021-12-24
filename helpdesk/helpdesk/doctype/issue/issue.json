@@ -190,7 +190,7 @@
    "fieldname": "agreement_status",
    "fieldtype": "Select",
    "label": "Service Level Agreement Status",
-   "options": "Ongoing\nFulfilled\nFailed",
+   "options": "First Response Due\nResolution Due\nFulfilled\nFailed",
    "read_only": 1
   },
   {
@@ -367,7 +367,7 @@
  "idx": 7,
  "links": [],
  "migration_hash": "178fa2fb365b1fc3dc98aa711d46dcbe",
- "modified": "2021-10-21 14:27:07.527606",
+ "modified": "2021-11-21 14:27:07.527606",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Issue",
