@@ -32,6 +32,7 @@
   "sla_fulfilled_on",
   "pause_sla_on",
   "support_and_resolution_section_break",
+  "holiday_list",
   "support_and_resolution"
  ],
  "fields": [
@@ -192,11 +193,17 @@
    "fieldtype": "Table",
    "options": "Service Day",
    "reqd": 1
+  },
+  {
+   "fieldname": "holiday_list",
+   "fieldtype": "Link",
+   "label": "Holiday List",
+   "options": "Holiday List"
   }
  ],
  "links": [],
- "migration_hash": "b866a0502f6c9850b58f82a23132110c",
- "modified": "2021-10-21 14:27:07.096208",
+ "migration_hash": "f5f831b38d665f1b7383d8b66acd100c",
+ "modified": "2021-12-24 05:30:26.825762",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Service Level Agreement",
