@@ -29,33 +29,6 @@ class TestIssue(TestSetUp):
 	def test_response_time_and_resolution_time_based_on_different_sla(self):
 		creation = get_datetime("2019-03-04 12:00")
 
-		# make issue with customer specific SLA
-		customer = create_customer(
-			"_Test Customer", "__Test SLA Customer Group", "__Test SLA Territory"
-		)
-		issue = make_issue(creation, "_Test Customer", 1)
-
-		self.assertEqual(issue.response_by, get_datetime("2019-03-04 14:00"))
-		self.assertEqual(issue.resolution_by, get_datetime("2019-03-04 15:00"))
-
-		# make issue with customer_group specific SLA
-		customer = create_customer(
-			"__Test Customer", "_Test SLA Customer Group", "__Test SLA Territory"
-		)
-		issue = make_issue(creation, "__Test Customer", 2)
-
-		self.assertEqual(issue.response_by, get_datetime("2019-03-04 14:00"))
-		self.assertEqual(issue.resolution_by, get_datetime("2019-03-04 15:00"))
-
-		# make issue with territory specific SLA
-		customer = create_customer(
-			"___Test Customer", "__Test SLA Customer Group", "_Test SLA Territory"
-		)
-		issue = make_issue(creation, "___Test Customer", 3)
-
-		self.assertEqual(issue.response_by, get_datetime("2019-03-04 14:00"))
-		self.assertEqual(issue.resolution_by, get_datetime("2019-03-04 15:00"))
-
 		# make issue with default SLA
 		issue = make_issue(creation=creation, index=4)
 
@@ -428,12 +401,12 @@ def create_issue_and_communication(issue_creation, first_responded_on):
 	return issue
 
 
-def make_issue(creation=None, customer=None, index=0, priority=None, issue_type=None):
+def make_issue(creation=None, contact=None, index=0, priority=None, issue_type=None):
 	issue = frappe.get_doc(
 		{
 			"doctype": "Issue",
 			"subject": "Service Level Agreement Issue {0}".format(index),
-			"customer": customer,
+			"contact": contact,
 			"raised_by": "test@example.com",
 			"description": "Service Level Agreement Issue",
 			"issue_type": issue_type,
@@ -446,38 +419,6 @@ def make_issue(creation=None, customer=None, index=0, priority=None, issue_type=
 	).insert(ignore_permissions=True)
 
 	return issue
-
-
-def create_customer(name, customer_group, territory):
-
-	create_customer_group(customer_group)
-	create_territory(territory)
-
-	if not frappe.db.exists("Customer", {"customer_name": name}):
-		frappe.get_doc(
-			{
-				"doctype": "Customer",
-				"customer_name": name,
-				"customer_group": customer_group,
-				"territory": territory,
-			}
-		).insert(ignore_permissions=True)
-
-
-def create_customer_group(customer_group):
-
-	if not frappe.db.exists("Customer Group", {"customer_group_name": customer_group}):
-		frappe.get_doc(
-			{"doctype": "Customer Group", "customer_group_name": customer_group}
-		).insert(ignore_permissions=True)
-
-
-def create_territory(territory):
-
-	if not frappe.db.exists("Territory", {"territory_name": territory}):
-		frappe.get_doc({"doctype": "Territory", "territory_name": territory,}).insert(
-			ignore_permissions=True
-		)
 
 
 def create_communication(reference_name, sender, sent_or_received, creation):
