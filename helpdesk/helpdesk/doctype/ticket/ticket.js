@@ -1,4 +1,4 @@
-frappe.ui.form.on("Issue", {
+frappe.ui.form.on("Ticket", {
 	onload: function(frm) {
 		frm.email_field = "raised_by";
 
@@ -21,7 +21,7 @@ frappe.ui.form.on("Issue", {
 
 			frm.add_custom_button(__("Task"), function() {
 				frappe.model.open_mapped_doc({
-					method: "erpnext.support.doctype.issue.issue.make_task",
+					method: "erpnext.support.doctype.ticket.ticket.make_task",
 					frm: frm
 				});
 			}, __("Create"));
@@ -72,36 +72,36 @@ frappe.ui.form.on("Issue", {
 
 
 	timeline_refresh: function(frm) {
-		if (!frm.timeline.wrapper.find(".btn-split-issue").length) {
-			let split_issue_btn = $(`
-				<a class="action-btn btn-split-issue" title="${__("Split Issue")}">
+		if (!frm.timeline.wrapper.find(".btn-split-ticket").length) {
+			let split_ticket_btn = $(`
+				<a class="action-btn btn-split-ticket" title="${__("Split Ticket")}">
 					${frappe.utils.icon('branch', 'sm')}
 				</a>
 			`);
 
 			let communication_box = frm.timeline.wrapper.find('.timeline-item[data-doctype="Communication"]');
-			communication_box.find('.actions').prepend(split_issue_btn);
+			communication_box.find('.actions').prepend(split_ticket_btn);
 
-			if (!frm.timeline.wrapper.data("split-issue-event-attached")) {
-				frm.timeline.wrapper.on('click', '.btn-split-issue', (e) => {
+			if (!frm.timeline.wrapper.data("split-ticket-event-attached")) {
+				frm.timeline.wrapper.on('click', '.btn-split-ticket', (e) => {
 					var dialog = new frappe.ui.Dialog({
-						title: __("Split Issue"),
+						title: __("Split Ticket"),
 						fields: [
 							{
 								fieldname: "subject",
 								fieldtype: "Data",
 								reqd: 1,
 								label: __("Subject"),
-								description: __("All communications including and above this shall be moved into the new Issue")
+								description: __("All communications including and above this shall be moved into the new Ticket")
 							}
 						],
 						primary_action_label: __("Split"),
 						primary_action: () => {
-							frm.call("split_issue", {
+							frm.call("split_ticket", {
 								subject: dialog.fields_dict.subject.value,
 								communication_id: e.currentTarget.closest(".timeline-item").getAttribute("data-name")
 							}, (r) => {
-								frappe.msgprint(`New issue created: <a href="/app/issue/${r.message}">${r.message}</a>`);
+								frappe.msgprint(`New ticket created: <a href="/app/ticket/${r.message}">${r.message}</a>`);
 								frm.reload_doc();
 								dialog.hide();
 							});
@@ -109,7 +109,7 @@ frappe.ui.form.on("Issue", {
 					});
 					dialog.show();
 				});
-				frm.timeline.wrapper.data("split-issue-event-attached", true);
+				frm.timeline.wrapper.data("split-ticket-event-attached", true);
 			}
 		}
 

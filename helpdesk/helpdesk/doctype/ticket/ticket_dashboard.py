@@ -5,6 +5,6 @@ from frappe import _
 
 def get_data():
 	return {
-		"fieldname": "issue",
+		"fieldname": "ticket",
 		"transactions": [{"label": _("Activity"), "items": ["Task"]}],
 	}

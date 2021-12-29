@@ -16,8 +16,8 @@
   "cb00",
   "status",
   "priority",
-  "issue_type",
-  "issue_split_from",
+  "ticket_type",
+  "ticket_split_from",
   "sb_details",
   "description",
   "service_level_section",
@@ -113,19 +113,19 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Priority",
-   "options": "Issue Priority"
+   "options": "Ticket Priority"
   },
   {
-   "fieldname": "issue_type",
+   "fieldname": "ticket_type",
    "fieldtype": "Link",
-   "label": "Issue Type",
-   "options": "Issue Type"
+   "label": "Ticket Type",
+   "options": "Ticket Type"
   },
   {
-   "fieldname": "issue_split_from",
+   "fieldname": "ticket_split_from",
    "fieldtype": "Link",
-   "label": "Issue Split From",
-   "options": "Issue",
+   "label": "Ticket Split From",
+   "options": "Ticket",
    "read_only": 1
   },
   {
@@ -363,14 +363,14 @@
    "label": "Content Type"
   }
  ],
- "icon": "fa fa-ticket",
+ "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
  "migration_hash": "178fa2fb365b1fc3dc98aa711d46dcbe",
  "modified": "2021-11-21 14:27:07.527606",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "Issue",
+ "name": "Ticket",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [

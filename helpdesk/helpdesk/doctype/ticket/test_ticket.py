@@ -7,7 +7,7 @@ import unittest
 class TestSetUp(unittest.TestCase):
 	pass
 
-class TestIssue(TestSetUp):
+class TestTicket(TestSetUp):
 	pass
 
 class TestFirstResponseTime(TestSetUp):

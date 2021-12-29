@@ -6,7 +6,7 @@ import frappe
 from frappe.desk.form.assign_to import add as add_assignment
 from frappe.utils import add_months, getdate
 
-from helpdesk.helpdesk.doctype.issue.test_issue import make_issue
+from helpdesk.helpdesk.doctype.ticket.test_ticket import make_issue
 from helpdesk.helpdesk.doctype.service_level_agreement.test_service_level_agreement import (
 	create_service_level_agreements_for_issues,
 )

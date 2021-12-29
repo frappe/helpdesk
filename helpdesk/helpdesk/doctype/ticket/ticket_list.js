@@ -1,4 +1,4 @@
-frappe.listview_settings['Issue'] = {
+frappe.listview_settings['Ticket'] = {
 	colwidths: {"subject": 6},
 	add_fields: ['priority'],
 	onload: function(listview) {
@@ -6,7 +6,7 @@ frappe.listview_settings['Issue'] = {
 			"status": "Open"
 		};
 
-		var method = "erpnext.support.doctype.issue.issue.set_multiple_status";
+		var method = "erpnext.support.doctype.ticket.ticket.set_multiple_status";
 
 		listview.page.add_action_item(__("Set as Open"), function() {
 			listview.call_for_selected_items(method, {"status": "Open"});

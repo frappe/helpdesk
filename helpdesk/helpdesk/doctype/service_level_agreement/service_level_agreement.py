@@ -23,7 +23,7 @@ from frappe.utils import (
 )
 from frappe.utils.safe_exec import get_safe_globals
 
-from helpdesk.helpdesk.doctype.issue.issue import get_holidays
+from helpdesk.helpdesk.doctype.ticket.ticket import get_holidays
 
 
 class ServiceLevelAgreement(Document):
