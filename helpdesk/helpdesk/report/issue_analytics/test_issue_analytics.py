@@ -6,7 +6,7 @@ import frappe
 from frappe.desk.form.assign_to import add as add_assignment
 from frappe.utils import add_months, getdate
 
-from helpdesk.helpdesk.doctype.issue.test_issue import create_customer, make_issue
+from helpdesk.helpdesk.doctype.issue.test_issue import make_issue
 from helpdesk.helpdesk.doctype.service_level_agreement.test_service_level_agreement import (
 	create_service_level_agreements_for_issues,
 )
@@ -174,35 +174,25 @@ def create_issue_types():
 
 
 def create_records():
-	create_customer("__Test Customer", "_Test SLA Customer Group", "__Test SLA Territory")
-	create_customer(
-		"__Test Customer 1", "_Test SLA Customer Group", "__Test SLA Territory"
-	)
-	create_customer(
-		"__Test Customer 2", "_Test SLA Customer Group", "__Test SLA Territory"
-	)
-
 	current_month_date = getdate()
 	last_month_date = add_months(current_month_date, -1)
 
-	issue = make_issue(current_month_date, "__Test Customer", 2, "High", "Bug")
+	issue = make_issue(current_month_date, 2, "High", "Bug")
 	add_assignment(
 		{"assign_to": ["test@example.com"], "doctype": "Issue", "name": issue.name}
 	)
 
-	issue = make_issue(last_month_date, "__Test Customer", 2, "Low", "Bug")
+	issue = make_issue(last_month_date, 2, "Low", "Bug")
 	add_assignment(
 		{"assign_to": ["test1@example.com"], "doctype": "Issue", "name": issue.name}
 	)
 
-	issue = make_issue(
-		current_month_date, "__Test Customer 1", 2, "Medium", "Service Request"
-	)
+	issue = make_issue(current_month_date, 2, "Medium", "Service Request")
 	add_assignment(
 		{"assign_to": ["test1@example.com"], "doctype": "Issue", "name": issue.name}
 	)
 
-	issue = make_issue(last_month_date, "__Test Customer 2", 2, "Medium", "Discomfort")
+	issue = make_issue(last_month_date, 2, "Medium", "Discomfort")
 	add_assignment(
 		{
 			"assign_to": ["test@example.com", "test1@example.com"],
