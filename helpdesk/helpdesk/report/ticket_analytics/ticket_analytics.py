@@ -19,12 +19,12 @@ def get_fiscal_year():
 
 
 def execute(filters=None):
-	return IssueAnalytics(filters).run()
+	return TicketAnalytics(filters).run()
 
 
-class IssueAnalytics(object):
+class TicketAnalytics(object):
 	def __init__(self, filters=None):
-		"""Issue Analytics Report"""
+		"""Ticket Analytics Report"""
 		self.filters = frappe._dict(filters or {})
 		self.get_period_date_ranges()
 
@@ -60,24 +60,24 @@ class IssueAnalytics(object):
 				}
 			)
 
-		elif self.filters.based_on == "Issue Type":
+		elif self.filters.based_on == "Ticket Type":
 			self.columns.append(
 				{
-					"label": _("Issue Type"),
-					"fieldname": "issue_type",
+					"label": _("Ticket Type"),
+					"fieldname": "ticket_type",
 					"fieldtype": "Link",
-					"options": "Issue Type",
+					"options": "Ticket Type",
 					"width": 200,
 				}
 			)
 
-		elif self.filters.based_on == "Issue Priority":
+		elif self.filters.based_on == "Ticket Priority":
 			self.columns.append(
 				{
-					"label": _("Issue Priority"),
+					"label": _("Ticket Priority"),
 					"fieldname": "priority",
 					"fieldtype": "Link",
-					"options": "Issue Priority",
+					"options": "Ticket Priority",
 					"width": 200,
 				}
 			)
@@ -93,7 +93,7 @@ class IssueAnalytics(object):
 		)
 
 	def get_data(self):
-		self.get_issues()
+		self.get_tickets()
 		self.get_rows()
 
 	def get_period(self, date):
@@ -162,17 +162,17 @@ class IssueAnalytics(object):
 			if period_end_date == to_date:
 				break
 
-	def get_issues(self):
+	def get_tickets(self):
 		filters = self.get_common_filters()
 		self.field_map = {
 			"Customer": "customer",
-			"Issue Type": "issue_type",
-			"Issue Priority": "priority",
+			"Ticket Type": "ticket_type",
+			"Ticket Priority": "priority",
 			"Assigned To": "_assign",
 		}
 
 		self.entries = frappe.db.get_all(
-			"Issue",
+			"Ticket",
 			fields=[self.field_map.get(self.filters.based_on), "name", "opening_date"],
 			filters=filters,
 		)
@@ -194,14 +194,14 @@ class IssueAnalytics(object):
 		self.data = []
 		self.get_periodic_data()
 
-		for entity, period_data in iteritems(self.issue_periodic_data):
+		for entity, period_data in iteritems(self.ticket_periodic_data):
 			if self.filters.based_on == "Customer":
 				row = {"customer": entity}
 			elif self.filters.based_on == "Assigned To":
 				row = {"user": entity}
-			elif self.filters.based_on == "Issue Type":
-				row = {"issue_type": entity}
-			elif self.filters.based_on == "Issue Priority":
+			elif self.filters.based_on == "Ticket Type":
+				row = {"ticket_type": entity}
+			elif self.filters.based_on == "Ticket Priority":
 				row = {"priority": entity}
 
 			total = 0
@@ -216,7 +216,7 @@ class IssueAnalytics(object):
 			self.data.append(row)
 
 	def get_periodic_data(self):
-		self.issue_periodic_data = frappe._dict()
+		self.ticket_periodic_data = frappe._dict()
 
 		for d in self.entries:
 			period = self.get_period(d.get("opening_date"))
@@ -224,8 +224,8 @@ class IssueAnalytics(object):
 			if self.filters.based_on == "Assigned To":
 				if d._assign:
 					for entry in json.loads(d._assign):
-						self.issue_periodic_data.setdefault(entry, frappe._dict()).setdefault(period, 0.0)
-						self.issue_periodic_data[entry][period] += 1
+						self.ticket_periodic_data.setdefault(entry, frappe._dict()).setdefault(period, 0.0)
+						self.ticket_periodic_data[entry][period] += 1
 
 			else:
 				field = self.field_map.get(self.filters.based_on)
@@ -233,8 +233,8 @@ class IssueAnalytics(object):
 				if not value:
 					value = _("Not Specified")
 
-				self.issue_periodic_data.setdefault(value, frappe._dict()).setdefault(period, 0.0)
-				self.issue_periodic_data[value][period] += 1
+				self.ticket_periodic_data.setdefault(value, frappe._dict()).setdefault(period, 0.0)
+				self.ticket_periodic_data[value][period] += 1
 
 	def get_chart_data(self):
 		length = len(self.columns)

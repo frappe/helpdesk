@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Issue Analytics"] = {
+frappe.query_reports["Ticket Analytics"] = {
 	"filters": [
 		{
 			fieldname: "company",
@@ -16,7 +16,7 @@ frappe.query_reports["Issue Analytics"] = {
 			fieldname: "based_on",
 			label: __("Based On"),
 			fieldtype: "Select",
-			options: ["Customer", "Issue Type", "Issue Priority", "Assigned To"],
+			options: ["Customer", "Ticket Type", "Ticket Priority", "Assigned To"],
 			default: "Customer",
 			reqd: 1
 		},
@@ -61,9 +61,9 @@ frappe.query_reports["Issue Analytics"] = {
 		},
 		{
 			fieldname: "priority",
-			label: __("Issue Priority"),
+			label: __("Ticket Priority"),
 			fieldtype: "Link",
-			options: "Issue Priority"
+			options: "Ticket Priority"
 		},
 		{
 			fieldname: "customer",

@@ -22,7 +22,7 @@ def execute(filters=None):
 		SELECT
 			date(creation) as creation_date,
 			avg(first_response_time) as avg_response_time
-		FROM tabIssue
+		FROM tabTicket
 		WHERE
 			date(creation) between %s and %s
 			and first_response_time > 0

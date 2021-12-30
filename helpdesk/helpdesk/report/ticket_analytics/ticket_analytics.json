@@ -12,11 +12,11 @@
  "modified": "2021-10-21 14:31:29.591583",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "Issue Analytics",
+ "name": "Ticket Analytics",
  "owner": "Administrator",
  "prepared_report": 0,
- "ref_doctype": "Issue",
- "report_name": "Issue Analytics",
+ "ref_doctype": "Ticket",
+ "report_name": "Ticket Analytics",
  "report_type": "Script Report",
  "roles": [
   {

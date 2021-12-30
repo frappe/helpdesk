@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["First Response Time for Issues"] = {
+frappe.query_reports["First Response Time for Tickets"] = {
 	"filters": [
 		{
 			"fieldname": "from_date",

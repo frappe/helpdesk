@@ -13,12 +13,12 @@
  "modified": "2021-10-21 14:31:29.437910",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "First Response Time for Issues",
+ "name": "First Response Time for Tickets",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "select date(creation) as creation_date, avg(mins_to_first_response) from tabIssue where creation > '2016-05-01' group by date(creation) order by creation_date;",
- "ref_doctype": "Issue",
- "report_name": "First Response Time for Issues",
+ "query": "select date(creation) as creation_date, avg(mins_to_first_response) from tabTicket where creation > '2016-05-01' group by date(creation) order by creation_date;",
+ "ref_doctype": "Ticket",
+ "report_name": "First Response Time for Tickets",
  "report_type": "Script Report",
  "roles": [
   {
