@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"type\": \"header\", \"data\": {\"text\": \"Your Shortcuts\", \"level\": 4, \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Issue\", \"col\": 4}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Maintenance Visit\", \"col\": 4}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Service Level Agreement\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"Reports & Masters\", \"level\": 4, \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Issues\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Maintenance\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Service Level Agreement\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Warranty\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Settings\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}]",
+ "content": "[{\"type\": \"header\", \"data\": {\"text\": \"Your Shortcuts\", \"level\": 4, \"col\": 12}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Ticket\", \"col\": 4}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Maintenance Visit\", \"col\": 4}}, {\"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Service Level Agreement\", \"col\": 4}}, {\"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"type\": \"header\", \"data\": {\"text\": \"Reports & Masters\", \"level\": 4, \"col\": 12}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Tickets\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Maintenance\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Service Level Agreement\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Warranty\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Settings\", \"col\": 4}}, {\"type\": \"card\", \"data\": {\"card_name\": \"Reports\", \"col\": 4}}]",
  "creation": "2020-03-02 15:48:23.224699",
  "docstatus": 0,
  "doctype": "Workspace",
@@ -13,7 +13,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Issues",
+   "label": "Tickets",
    "link_count": 0,
    "onboard": 0,
    "type": "Card Break"
@@ -22,9 +22,9 @@
    "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Issue",
+   "label": "Ticket",
    "link_count": 0,
-   "link_to": "Issue",
+   "link_to": "Ticket",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Link"
@@ -33,9 +33,9 @@
    "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Issue Type",
+   "label": "Ticket Type",
    "link_count": 0,
-   "link_to": "Issue Type",
+   "link_to": "Ticket Type",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -44,9 +44,9 @@
    "dependencies": "",
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Issue Priority",
+   "label": "Ticket Priority",
    "link_count": 0,
-   "link_to": "Issue Priority",
+   "link_to": "Ticket Priority",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -106,12 +106,12 @@
    "type": "Card Break"
   },
   {
-   "dependencies": "Issue",
+   "dependencies": "Ticket",
    "hidden": 0,
    "is_query_report": 1,
-   "label": "First Response Time for Issues",
+   "label": "First Response Time for Tickets",
    "link_count": 0,
-   "link_to": "First Response Time for Issues",
+   "link_to": "First Response Time for Tickets",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -131,8 +131,8 @@
   {
    "color": "Yellow",
    "format": "{} Assigned",
-   "label": "Issue",
-   "link_to": "Issue",
+   "label": "Ticket",
+   "link_to": "Ticket",
    "stats_filter": "{\n    \"_assign\": [\"like\", '%' + frappe.session.user + '%'],\n    \"status\": \"Open\"\n}",
    "type": "DocType"
   },
