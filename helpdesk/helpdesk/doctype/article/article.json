@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:title",
+ "autoname": "format:{category} | {title}",
  "creation": "2021-12-30 19:23:43.318867",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -16,8 +16,7 @@
   {
    "fieldname": "title",
    "fieldtype": "Data",
-   "label": "Title",
-   "unique": 1
+   "label": "Title"
   },
   {
    "fieldname": "content",
@@ -41,11 +40,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-30 19:29:00.422239",
+ "modified": "2021-12-30 20:13:50.246539",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
- "naming_rule": "By fieldname",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
