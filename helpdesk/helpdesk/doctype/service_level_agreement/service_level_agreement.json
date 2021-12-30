@@ -125,7 +125,7 @@
 		"fieldname": "default_priority",
 		"fieldtype": "Link",
 		"label": "Default Priority",
-		"options": "Issue Priority",
+		"options": "Ticket Priority",
 		"read_only": 1
 		},
 		{
@@ -179,7 +179,7 @@
 		},
 		{
 		"depends_on": "eval: !doc.default_service_level_agreement",
-		"description": "Simple Python Expression, Example: doc.status == 'Open' and doc.issue_type == 'Bug'",
+		"description": "Simple Python Expression, Example: doc.status == 'Open' and doc.ticket_type == 'Bug'",
 		"fieldname": "condition",
 		"fieldtype": "Code",
 		"label": "Condition",

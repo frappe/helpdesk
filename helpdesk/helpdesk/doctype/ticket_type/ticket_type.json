@@ -23,7 +23,7 @@
  "modified": "2021-10-21 14:27:07.964506",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "Issue Type",
+ "name": "Ticket Type",
  "name_case": "Title Case",
  "owner": "Administrator",
  "permissions": [

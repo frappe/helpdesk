@@ -19,7 +19,7 @@
  "modified": "2021-10-21 14:27:08.451002",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "Issue Priority",
+ "name": "Ticket Priority",
  "owner": "Administrator",
  "permissions": [
   {

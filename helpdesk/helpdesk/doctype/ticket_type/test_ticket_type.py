@@ -6,5 +6,5 @@ from __future__ import unicode_literals
 import unittest
 
 
-class TestIssueType(unittest.TestCase):
+class TestTicketType(unittest.TestCase):
 	pass

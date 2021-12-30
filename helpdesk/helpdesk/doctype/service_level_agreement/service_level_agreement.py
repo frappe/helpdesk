@@ -104,7 +104,7 @@ class ServiceLevelAgreement(Document):
 	def validate_doc(self):
 		if (
 			self.enabled
-			and self.document_type == "Issue"
+			and self.document_type == "Ticket"
 			and not frappe.db.get_single_value(
 				"Support Settings", "track_service_level_agreement"
 			)
@@ -179,8 +179,8 @@ class ServiceLevelAgreement(Document):
 		)
 
 	def before_insert(self):
-		# no need to set up SLA fields for Issue dt as they are standard fields in Issue
-		if self.document_type == "Issue":
+		# no need to set up SLA fields for Ticket dt as they are standard fields in Ticket
+		if self.document_type == "Ticket":
 			return
 
 		service_level_agreement_fields = get_service_level_agreement_fields()
@@ -460,7 +460,7 @@ def handle_status_change(doc, apply_sla_for_resolution):
 				record_assigned_users_on_failure(doc)
 
 	def calculate_hold_hours():
-		# In case issue was closed and after few days it has been opened
+		# In case ticket was closed and after few days it has been opened
 		# The hold time should be calculated from resolution_date
 
 		on_hold_since = doc.resolution_date or doc.on_hold_since
@@ -476,43 +476,43 @@ def handle_status_change(doc, apply_sla_for_resolution):
 
 	# Open to Replied
 	if is_open_status(prev_status) and is_hold_status(doc.status):
-		# Issue is on hold -> Set on_hold_since
+		# Ticket is on hold -> Set on_hold_since
 		doc.on_hold_since = now_time
 		reset_expected_response_and_resolution(doc)
 
 	# Replied to Open
 	if is_hold_status(prev_status) and is_open_status(doc.status):
-		# Issue was on hold -> Calculate Total Hold Time
+		# Ticket was on hold -> Calculate Total Hold Time
 		calculate_hold_hours()
-		# Issue is open -> reset resolution_date
+		# Ticket is open -> reset resolution_date
 		reset_resolution_metrics(doc)
 
 	# Open to Closed
 	if is_open_status(prev_status) and is_fulfilled_status(doc.status):
-		# Issue is closed -> Set resolution_date
+		# Ticket is closed -> Set resolution_date
 		doc.resolution_date = now_time
 		set_resolution_time(doc)
 
 	# Closed to Open
 	if is_fulfilled_status(prev_status) and is_open_status(doc.status):
-		# Issue was closed -> Calculate Total Hold Time from resolution_date
+		# Ticket was closed -> Calculate Total Hold Time from resolution_date
 		calculate_hold_hours()
-		# Issue is open -> reset resolution_date
+		# Ticket is open -> reset resolution_date
 		reset_resolution_metrics(doc)
 
 	# Closed to Replied
 	if is_fulfilled_status(prev_status) and is_hold_status(doc.status):
-		# Issue was closed -> Calculate Total Hold Time from resolution_date
+		# Ticket was closed -> Calculate Total Hold Time from resolution_date
 		calculate_hold_hours()
-		# Issue is on hold -> Set on_hold_since
+		# Ticket is on hold -> Set on_hold_since
 		doc.on_hold_since = now_time
 		reset_expected_response_and_resolution(doc)
 
 	# Replied to Closed
 	if is_hold_status(prev_status) and is_fulfilled_status(doc.status):
-		# Issue was on hold -> Calculate Total Hold Time
+		# Ticket was on hold -> Calculate Total Hold Time
 		calculate_hold_hours()
-		# Issue is closed -> Set resolution_date
+		# Ticket is closed -> Set resolution_date
 		if apply_sla_for_resolution:
 			doc.resolution_date = now_time
 			set_resolution_time(doc)
@@ -629,7 +629,7 @@ def set_resolution_time(doc):
 	if doc.meta.has_field("resolution_time"):
 		doc.resolution_time = time_diff_in_seconds(doc.resolution_date, start_date_time)
 
-	# total time taken by a user to close the issue apart from wait_time
+	# total time taken by a user to close the ticket apart from wait_time
 	if not doc.meta.has_field("user_resolution_time"):
 		return
 
@@ -660,18 +660,18 @@ def set_resolution_time(doc):
 def change_service_level_agreement_and_priority(self):
 	if (
 		self.service_level_agreement
-		and frappe.db.exists("Issue", self.name)
+		and frappe.db.exists("Ticket", self.name)
 		and frappe.db.get_single_value("Support Settings", "track_service_level_agreement")
 	):
 
-		if not self.priority == frappe.db.get_value("Issue", self.name, "priority"):
+		if not self.priority == frappe.db.get_value("Ticket", self.name, "priority"):
 			self.set_response_and_resolution_time(
 				priority=self.priority, service_level_agreement=self.service_level_agreement
 			)
 			frappe.msgprint(_("Priority has been changed to {0}.").format(self.priority))
 
 		if not self.service_level_agreement == frappe.db.get_value(
-			"Issue", self.name, "service_level_agreement"
+			"Ticket", self.name, "service_level_agreement"
 		):
 			self.set_response_and_resolution_time(
 				priority=self.priority, service_level_agreement=self.service_level_agreement
@@ -742,7 +742,7 @@ def on_communication_update(doc, status):
 	if (
 		doc.sent_or_received == "Received"  # a reply is received
 		and parent.get("status")
-		== "Open"  # issue status is set as open from communication.py
+		== "Open"  # ticket status is set as open from communication.py
 		and parent.get_doc_before_save()
 		and parent.get("status") != parent._doc_before_save.get("status")  # status changed
 	):
@@ -845,7 +845,7 @@ def get_service_level_agreement_fields():
 			"fieldname": "priority",
 			"fieldtype": "Link",
 			"label": "Priority",
-			"options": "Issue Priority",
+			"options": "Ticket Priority",
 		},
 		{
 			"fieldname": "response_by",

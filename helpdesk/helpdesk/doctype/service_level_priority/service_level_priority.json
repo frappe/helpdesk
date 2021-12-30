@@ -20,7 +20,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Priority",
-   "options": "Issue Priority",
+   "options": "Ticket Priority",
    "reqd": 1
   },
   {
