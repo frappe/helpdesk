@@ -1,22 +1,24 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{category} | {title}",
+ "autoname": "field:title",
  "creation": "2021-12-30 19:23:43.318867",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "content",
   "category",
+  "content",
   "is_published"
  ],
  "fields": [
   {
    "fieldname": "title",
    "fieldtype": "Data",
-   "label": "Title"
+   "label": "Title",
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "content",
@@ -29,7 +31,8 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Category",
-   "options": "Category"
+   "options": "Category",
+   "reqd": 1
   },
   {
    "default": "0",
@@ -40,11 +43,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-30 20:13:50.246539",
+ "modified": "2022-01-03 07:40:25.747527",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
- "naming_rule": "Expression",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
