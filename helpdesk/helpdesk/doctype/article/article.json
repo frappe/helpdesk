@@ -55,6 +55,7 @@
    "default": "0",
    "fieldname": "views",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Views"
   },
   {
@@ -76,7 +77,7 @@
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-01-05 05:07:41.119132",
+ "modified": "2022-01-05 05:16:38.045956",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
