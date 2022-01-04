@@ -10,7 +10,8 @@
   "title",
   "category",
   "content",
-  "is_published"
+  "published",
+  "linked_web_page"
  ],
  "fields": [
   {
@@ -36,14 +37,20 @@
   },
   {
    "default": "0",
-   "fieldname": "is_published",
+   "fieldname": "published",
    "fieldtype": "Check",
-   "label": "Is Published"
+   "label": "Published"
+  },
+  {
+   "fieldname": "linked_web_page",
+   "fieldtype": "Link",
+   "label": "Linked Web Page",
+   "options": "Web Page"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-03 07:40:25.747527",
+ "modified": "2022-01-04 07:09:49.312301",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
