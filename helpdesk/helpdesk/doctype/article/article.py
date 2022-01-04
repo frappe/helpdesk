@@ -4,7 +4,6 @@
 import frappe
 from frappe.model.document import Document
 from frappe import _, throw
-from frappe.model.meta import get_parent_dt
 
 class Article(Document):
 	def validate(self):
@@ -12,20 +11,18 @@ class Article(Document):
 		if category_doc.is_group:
 			frappe.throw(_('Article category should not be a group'))
 
-	def before_insert(self):
-		web_page = frappe.new_doc('Web Page')
-		self.sync_web_page_details(web_page)
-		web_page.insert()
-		
-		self.linked_web_page = web_page.name
-
 	def before_save(self):
 		if self.linked_web_page:	
 			web_page = frappe.get_doc('Web Page', self.linked_web_page)
 			self.sync_web_page_details(web_page)
 			web_page.save()
 		else:
-			throw(_('Web page was not created on insert, need to handle this case'))
+			web_page = frappe.new_doc('Web Page')
+			self.sync_web_page_details(web_page)
+			web_page.insert()
+			
+			self.linked_web_page = web_page.name
+			self.route = web_page.route
 
 	def sync_web_page_details(self, web_page):
 			web_page.title = self.title

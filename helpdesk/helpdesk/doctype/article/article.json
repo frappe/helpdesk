@@ -11,7 +11,8 @@
   "category",
   "content",
   "published",
-  "linked_web_page"
+  "linked_web_page",
+  "route"
  ],
  "fields": [
   {
@@ -44,13 +45,20 @@
   {
    "fieldname": "linked_web_page",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Linked Web Page",
    "options": "Web Page"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Route"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-04 07:09:49.312301",
+ "modified": "2022-01-04 08:27:01.512443",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
