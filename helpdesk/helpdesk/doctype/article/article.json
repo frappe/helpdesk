@@ -13,7 +13,9 @@
   "content",
   "published",
   "route",
-  "views"
+  "views",
+  "helpful",
+  "not_helpful"
  ],
  "fields": [
   {
@@ -54,13 +56,27 @@
    "fieldname": "views",
    "fieldtype": "Data",
    "label": "Views"
+  },
+  {
+   "default": "0",
+   "fieldname": "helpful",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Helpful"
+  },
+  {
+   "default": "0",
+   "fieldname": "not_helpful",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Not Helpful"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-01-05 04:54:07.546171",
+ "modified": "2022-01-05 05:07:41.119132",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",

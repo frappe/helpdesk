@@ -1,0 +1,46 @@
+{% extends "templates/web.html" %}
+
+{% block header %}
+<h1 itemprop="headline">{{ title }}</h1>
+{% endblock %}
+
+{% block page_content %}
+<article itemscope itemtype="http://schema.org/BlogPost">
+	<div class="from-markdown my-4" itemprop="articleBody">
+		{{ content }}
+	</div>
+
+</article>
+<div class="article-feedback mb-6">
+	<hr />
+	<div class="feedback-view ">
+		<div class="text-muted small mr-2 mb-2">{{ _("Was this article helpful?") }}</div>
+		<button class="feedback btn btn-outline-primary btn-sm" data-value="Yes" style="width: 50px;">{{ _("Yes") }}</button>
+		<button class="feedback btn btn-outline-primary btn-sm" data-value="No" style="width: 50px;">{{ _("No") }}</button>
+		<span class="feedback-msg small hidden">{{ _("Thank you for your feedback!") }}</span>
+	</div>
+</div>
+
+<script>
+frappe.ready(function() {
+	frappe.set_search_path("/kb");
+	$(".feedback").click(function() {
+		let args = {
+			article: "{{ reference_name or name }}",
+			helpful: this.getAttribute("data-value"),
+		}
+
+		frappe.call({
+			btn: this,
+			method: "helpdesk.helpdesk.doctype.article.article.add_feedback",
+			args: args,
+			callback: function(r) {
+				$(".feedback")[0].classList.add("hidden");
+				$(".feedback")[1].classList.add("hidden");
+				$(".feedback-msg")[0].classList.remove("hidden");
+			}
+		})
+	});
+});
+</script>
+{% endblock %}

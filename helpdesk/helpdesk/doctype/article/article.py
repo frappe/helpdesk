@@ -4,6 +4,7 @@
 import frappe
 from frappe.website.website_generator import WebsiteGenerator
 from frappe import _
+from frappe.utils import cint
 
 class Article(WebsiteGenerator):
 	def validate(self):
@@ -38,3 +39,12 @@ class Article(WebsiteGenerator):
 			return self.get_page_route(route, category_doc.parent_category)
 		else:
 			return f'{route}{change_case(self.name)}'
+
+@frappe.whitelist(allow_guest=True)
+def add_feedback(article, helpful):
+	field = "helpful"
+	if helpful == "No":
+		field = "not_helpful"
+
+	value = cint(frappe.db.get_value("Article", article, field))
+	frappe.db.set_value("Article", article, field, value+1, update_modified=False)
