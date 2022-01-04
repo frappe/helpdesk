@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_guest_to_view": 1,
  "allow_rename": 1,
  "autoname": "field:title",
  "creation": "2021-12-30 19:23:43.318867",
@@ -11,8 +12,8 @@
   "category",
   "content",
   "published",
-  "linked_web_page",
-  "route"
+  "route",
+  "views"
  ],
  "fields": [
   {
@@ -43,22 +44,23 @@
    "label": "Published"
   },
   {
-   "fieldname": "linked_web_page",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Linked Web Page",
-   "options": "Web Page"
-  },
-  {
    "fieldname": "route",
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Route"
+  },
+  {
+   "default": "0",
+   "fieldname": "views",
+   "fieldtype": "Data",
+   "label": "Views"
   }
  ],
+ "has_web_view": 1,
  "index_web_pages_for_search": 1,
+ "is_published_field": "published",
  "links": [],
- "modified": "2022-01-04 08:27:01.512443",
+ "modified": "2022-01-05 04:54:07.546171",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
