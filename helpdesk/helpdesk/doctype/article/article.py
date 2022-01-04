@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe import _, throw
+from frappe.model.meta import get_parent_dt
 
 class Article(Document):
 	def validate(self):
@@ -32,5 +33,30 @@ class Article(Document):
 			web_page.main_section_html = self.content
 			web_page.published = self.published
 			web_page.show_title = True
-			# TODO: create dynamic route with help of category
-			web_page.route = 'temp_category/temp_article'
+
+			web_page.route = self.get_page_route()
+
+	def get_page_route(self, route='', category=None):
+		def change_case(str):
+			res = [str[0].lower()]
+			for c in str[1:]:
+				if c in ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+					res.append('_')
+					res.append(c.lower())
+				elif c in (' '):
+					continue
+				else:
+					res.append(c)
+			
+			return ''.join(res)
+
+		if not category:
+			category = self.category
+		
+		category_doc = frappe.get_doc('Category', category)
+		route = f'{change_case(category_doc.name)}/{route}'
+		
+		if category_doc.parent_category:
+			return self.get_page_route(route, category_doc.parent_category)
+		else:
+			return f'{route}{change_case(self.name)}'
