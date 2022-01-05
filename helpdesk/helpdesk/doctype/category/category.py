@@ -28,7 +28,7 @@ class Category(NestedSet):
 			web_page.main_section_html = web_template_file.read()
 		
 		categories = frappe.get_all('Category', fields=['name', 'description', 'thumbnail', 'parent_category', 'is_group'], filters={'parent_category': ['=', self.name]})
-		web_page.context_script = f'context.curr_categories = {categories}'
+		web_page.context_script = f'context.categories = {categories}'
 		
 		web_page.published = True
 

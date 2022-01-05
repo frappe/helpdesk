@@ -1,7 +1,7 @@
 import frappe
 
 def get_context(context):
-    context.curr_categories = frappe.get_all('Category', fields=['name', 'description', 'thumbnail', 'parent_category', 'is_group'], filters={'parent_category': ['=', '']})
+    context.categories = frappe.get_all('Category', fields=['name', 'description', 'thumbnail', 'parent_category', 'is_group'], filters={'parent_category': ['=', '']})
     context.articles = frappe.get_all('Article')
     return context
 
