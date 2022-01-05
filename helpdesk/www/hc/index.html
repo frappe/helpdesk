@@ -1,0 +1,37 @@
+{%  extends "templates/web.html" %}
+
+{% block title %}{{ _("Help Center") }}{% endblock %}
+
+{% block page_content %}
+<div class="my-40 d-flex justify-content-center">
+    <div>
+        <h2>{{ _("Hello, May I help you?") }}</h2>
+        <input class="form-control input-lg" type="text" placeholder="Type your question...">
+    </div>
+</div>
+
+<div class="d-flex flex-nowrap">
+    {% for category in categories %}
+    <div class="card m-4" style="width: 18rem;">
+        <img class="card-img-top" src="{{category.thumbnail}}">
+        <div class="card-body">
+          <h5 class="card-title">{{category.name}}</h5>
+          <p class="card-text">{{category.description}}</p>
+        </div>
+      </div>
+    {% endfor %}
+</div>
+
+<style>
+    .card{
+        box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
+        transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+        cursor: pointer;
+    }
+    .card:hover{
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+   }
+</style>
+
+{% endblock %}
