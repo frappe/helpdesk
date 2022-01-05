@@ -21,7 +21,15 @@ class Category(NestedSet):
 		web_page.title = self.name
 		web_page.route = self.route
 		web_page.content_type = 'HTML'
-		web_page.main_section_html = '<div> <h1>Hello</h1> </div>'
+		web_page.full_width = False
+		
+		import os
+		with open(os.path.join(os.path.dirname(__file__), 'templates/category.html'), 'r') as web_template_file:
+			web_page.main_section_html = web_template_file.read()
+		
+		categories = frappe.get_all('Category', fields=['name', 'description', 'thumbnail', 'parent_category', 'is_group'], filters={'parent_category': ['=', self.name]})
+		web_page.context_script = f'context.curr_categories = {categories}'
+		
 		web_page.published = True
 
 	def get_page_route(self, route='', category=None):
