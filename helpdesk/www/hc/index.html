@@ -41,12 +41,13 @@
             
             frappe.call({
                 btn: this,
-                method: "helpdesk.www.hc.index.get_child_categories",
+                method: "helpdesk.www.hc.index.get_category_website_route",
                 args: {
                     category: category
                 },
                 callback: function(r) {
                     console.log(r);
+                    window.open(`/${r.message.route}`, '_self')
                 }
             })
         });
