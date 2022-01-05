@@ -5,15 +5,16 @@ import frappe
 from frappe.utils.nestedset import NestedSet
 from frappe import _
 
+
 class Category(NestedSet):
 	def validate(self):
 		if self.parent_category:
-			parent_category_doc = frappe.get_doc('Category', self.parent_category)
+			parent_category_doc = frappe.get_doc("Category", self.parent_category)
 			if not parent_category_doc.is_group:
-				frappe.throw(_('Parent category should be a group category'))
+				frappe.throw(_("Parent category should be a group category"))
 		if self.is_group:
 			if self.parent_category:
-				frappe.throw(_('Can only create category with atmost a single nesting'))
+				frappe.throw(_("Can only create category with atmost a single nesting"))
 
 	def before_save(self):
 		self.route = self.get_page_route()

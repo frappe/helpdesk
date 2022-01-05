@@ -25,13 +25,20 @@
 frappe.ready(function() {
 	frappe.set_search_path("/kb");
     let article = "{{ reference_name or name }}"
+    
+    if(localStorage[`${article}_feedback_done`]) {
+        $(".feedback")[0].classList.add("hidden");
+        $(".feedback")[1].classList.add("hidden");
+        $(".feedback-msg")[0].classList.remove("hidden");
+    } else {
+        frappe.call({
+            method: "helpdesk.helpdesk.doctype.article.article.increment_view",
+            args: {
+                article: article
+            }
+        });
+    }
 
-    frappe.call({
-        method: "helpdesk.helpdesk.doctype.article.article.increment_view",
-        args: {
-            article: article
-        }
-    });
 	$(".feedback").click(function() {
 		let args = {
 			article: article,
@@ -46,6 +53,8 @@ frappe.ready(function() {
 				$(".feedback")[0].classList.add("hidden");
 				$(".feedback")[1].classList.add("hidden");
 				$(".feedback-msg")[0].classList.remove("hidden");
+
+                localStorage[`${article}_feedback_done`] = true;
 			}
 		})
 	});
