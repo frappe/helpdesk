@@ -8,14 +8,17 @@ class Category(NestedSet):
 	def before_save(self):
 		self.route = self.get_page_route()
 		if self.linked_web_page:
-			web_page = frappe.get_doc('Web Page', self.linked_web_page)
-			self.sync_web_page_details(web_page)
-			web_page.save()
+			self.update_web_page()
 		else:
 			web_page = frappe.new_doc('Web Page')
 			self.sync_web_page_details(web_page)
 			web_page.insert()
 			self.linked_web_page = web_page.name
+
+	def update_web_page(self):
+		web_page = frappe.get_doc('Web Page', self.linked_web_page)
+		self.sync_web_page_details(web_page)
+		web_page.save()
 
 	def sync_web_page_details(self, web_page):
 		web_page.title = self.name
@@ -27,8 +30,7 @@ class Category(NestedSet):
 		with open(os.path.join(os.path.dirname(__file__), 'templates/category.html'), 'r') as web_template_file:
 			web_page.main_section_html = web_template_file.read()
 		
-		categories = frappe.get_all('Category', fields=['name', 'description', 'thumbnail', 'parent_category', 'is_group'], filters={'parent_category': ['=', self.name]})
-		web_page.context_script = f'context.categories = {categories}'
+		web_page.context_script = "context.categories = frappe.get_all('Category', fields=['name', 'description', 'thumbnail', 'parent_category', 'is_group'], filters={'parent_category': ['=', '" + self.name + "']})"
 		
 		web_page.published = True
 
