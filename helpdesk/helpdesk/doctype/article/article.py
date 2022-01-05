@@ -15,7 +15,7 @@ class Article(WebsiteGenerator):
 	def before_save(self):
 		self.route = self.get_page_route()
 
-	def get_page_route(self, route='', category=None):
+	def get_page_route(self):
 		def change_case(str):
 			res = [str[0].lower()]
 			for c in str[1:]:
@@ -29,16 +29,8 @@ class Article(WebsiteGenerator):
 			
 			return ''.join(res)
 
-		if not category:
-			category = self.category
-		
-		category_doc = frappe.get_doc('Category', category)
-		route = f'{change_case(category_doc.name)}/{route}'
-		
-		if category_doc.parent_category:
-			return self.get_page_route(route, category_doc.parent_category)
-		else:
-			return f'{route}{change_case(self.name)}'
+		category_doc = frappe.get_doc('Category', self.category)
+		return f'{category_doc.route}{change_case(self.name)}'
 
 @frappe.whitelist(allow_guest=True)
 def add_feedback(article, helpful):
