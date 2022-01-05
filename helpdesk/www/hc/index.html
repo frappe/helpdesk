@@ -11,8 +11,8 @@
 </div>
 
 <div class="d-flex flex-nowrap">
-    {% for category in categories %}
-    <div class="card m-4" style="width: 18rem;">
+    {% for category in curr_categories %}
+    <div class="category_card card m-4" style="width: 18rem;" data-value="{{category.name}}">
         <img class="card-img-top" src="{{category.thumbnail}}">
         <div class="card-body">
           <h5 class="card-title">{{category.name}}</h5>
@@ -29,9 +29,28 @@
         cursor: pointer;
     }
     .card:hover{
-        transform: scale(1.05);
+        transform: scale(1.005);
         box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
-   }
+    }
 </style>
+
+<script>
+    frappe.ready(function() {
+        $(".category_card").click(function() {
+            let category = this.getAttribute("data-value");
+            
+            frappe.call({
+                btn: this,
+                method: "helpdesk.www.hc.index.get_child_categories",
+                args: {
+                    category: category
+                },
+                callback: function(r) {
+                    console.log(r);
+                }
+            })
+        });
+    })
+</script>
 
 {% endblock %}
