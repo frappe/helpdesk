@@ -15,7 +15,7 @@ def get_context(context):
 def get_child_categories(category):
 	child_categories = frappe.get_all(
 		"Category",
-		fields=["name", "description", "thumbnail", "parent_category", "is_group"],
+		fields=["name", "description", "parent_category", "is_group"],
 		filters={"parent_category": ["=", category]},
 	)
 	return child_categories

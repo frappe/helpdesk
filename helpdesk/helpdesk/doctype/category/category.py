@@ -45,7 +45,7 @@ class Category(NestedSet):
 
 		web_page.context_script = (
 			"context.categories = frappe.get_all('Category', fields=['name',"
-			" 'description', 'thumbnail', 'parent_category', 'is_group'],"
+			" 'description', 'parent_category', 'is_group'],"
 			" filters={'parent_category': ['=', '"
 			+ self.name
 			+ "']})"
