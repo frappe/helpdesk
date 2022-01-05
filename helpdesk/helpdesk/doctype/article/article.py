@@ -48,3 +48,8 @@ def add_feedback(article, helpful):
 
 	value = cint(frappe.db.get_value("Article", article, field))
 	frappe.db.set_value("Article", article, field, value+1, update_modified=False)
+
+@frappe.whitelist(allow_guest=True)
+def increment_view(article):	
+	value = cint(frappe.db.get_value("Article", article, 'views'))
+	frappe.db.set_value("Article", article, 'views', value+1, update_modified=False)

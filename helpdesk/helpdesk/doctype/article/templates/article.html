@@ -24,9 +24,17 @@
 <script>
 frappe.ready(function() {
 	frappe.set_search_path("/kb");
+    let article = "{{ reference_name or name }}"
+
+    frappe.call({
+        method: "helpdesk.helpdesk.doctype.article.article.increment_view",
+        args: {
+            article: article
+        }
+    });
 	$(".feedback").click(function() {
 		let args = {
-			article: "{{ reference_name or name }}",
+			article: article,
 			helpful: this.getAttribute("data-value"),
 		}
 
