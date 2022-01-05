@@ -217,7 +217,9 @@ def update_ticket(contact, method):
 
 @frappe.whitelist()
 def make_task(source_name, target_doc=None):
-	return get_mapped_doc("Ticket", source_name, {"Ticket": {"doctype": "Task"}}, target_doc)
+	return get_mapped_doc(
+		"Ticket", source_name, {"Ticket": {"doctype": "Task"}}, target_doc
+	)
 
 
 @frappe.whitelist()

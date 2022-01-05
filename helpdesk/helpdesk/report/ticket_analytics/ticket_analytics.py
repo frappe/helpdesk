@@ -224,7 +224,9 @@ class TicketAnalytics(object):
 			if self.filters.based_on == "Assigned To":
 				if d._assign:
 					for entry in json.loads(d._assign):
-						self.ticket_periodic_data.setdefault(entry, frappe._dict()).setdefault(period, 0.0)
+						self.ticket_periodic_data.setdefault(entry, frappe._dict()).setdefault(
+							period, 0.0
+						)
 						self.ticket_periodic_data[entry][period] += 1
 
 			else:

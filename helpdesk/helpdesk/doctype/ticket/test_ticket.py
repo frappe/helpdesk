@@ -4,11 +4,14 @@ from __future__ import unicode_literals
 
 import unittest
 
+
 class TestSetUp(unittest.TestCase):
 	pass
 
+
 class TestTicket(TestSetUp):
 	pass
+
 
 class TestFirstResponseTime(TestSetUp):
 	pass
