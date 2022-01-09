@@ -9,10 +9,7 @@
  "field_order": [
   "category_name",
   "description",
-  "lft",
-  "rgt",
   "is_group",
-  "old_parent",
   "parent_category",
   "articles",
   "route",
@@ -31,33 +28,10 @@
    "label": "Description"
   },
   {
-   "fieldname": "lft",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Left",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "rgt",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Right",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
    "default": "0",
    "fieldname": "is_group",
    "fieldtype": "Check",
    "label": "Is Group"
-  },
-  {
-   "fieldname": "old_parent",
-   "fieldtype": "Link",
-   "hidden": 1,
-   "label": "Old Parent",
-   "options": "Category"
   },
   {
    "fieldname": "parent_category",
@@ -87,7 +61,6 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "is_tree": 1,
  "links": [
   {
    "link_doctype": "Article",
@@ -95,7 +68,7 @@
   }
  ],
  "migration_hash": "35bd4fd68a32aa1d62f4a6911e3dd6f9",
- "modified": "2022-01-05 16:07:03.776289",
+ "modified": "2022-01-09 21:26:19.147679",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Category",
