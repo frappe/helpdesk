@@ -15,8 +15,9 @@
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
     <div class="col-sm-6 col-12">
-        <h3>{{ sub_category.name }}</h3>
         {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}) %}
+        <h3>{{ sub_category.name }} ({{ articles|length }})</h3>
+        <hr>
         {% for article in articles %}
         {% if loop.index < max_articles %}
         <div class="article-list">
