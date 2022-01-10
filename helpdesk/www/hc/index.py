@@ -11,7 +11,7 @@ def get_context(context):
 	return context
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_child_categories(category):
 	child_categories = frappe.get_all(
 		"Category",
@@ -21,6 +21,6 @@ def get_child_categories(category):
 	return child_categories
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_category_website_route(category):
 	return frappe.get_doc("Category", category)

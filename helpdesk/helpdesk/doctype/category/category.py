@@ -3,9 +3,9 @@
 
 import frappe
 from frappe import _
-from frappe.model.document import Document
+from frappe.website.website_generator import WebsiteGenerator
 
-class Category(Document):
+class Category(WebsiteGenerator):
 	def validate(self):
 		self.validate_tree()
 		
@@ -21,41 +21,6 @@ class Category(Document):
 
 	def before_save(self):
 		self.route = self.get_page_route()
-		if self.linked_web_page:
-			self.update_web_page()
-		else:
-			web_page = frappe.new_doc("Web Page")
-			self.sync_web_page_details(web_page)
-			web_page.insert()
-			self.linked_web_page = web_page.name
-
-	def update_web_page(self):
-		web_page = frappe.get_doc("Web Page", self.linked_web_page)
-		self.sync_web_page_details(web_page)
-		web_page.save()
-
-	def sync_web_page_details(self, web_page):
-		web_page.title = self.name
-		web_page.route = self.route
-		web_page.content_type = "HTML"
-		web_page.full_width = False
-
-		import os
-
-		with open(
-			os.path.join(os.path.dirname(__file__), "templates/category.html"), "r"
-		) as web_template_file:
-			web_page.main_section_html = web_template_file.read()
-
-		web_page.context_script = (
-			"context.categories = frappe.get_all('Category', fields=['name',"
-			" 'description', 'parent_category', 'is_group'],"
-			" filters={'parent_category': ['=', '"
-			+ self.name
-			+ "']})"
-		)
-
-		web_page.published = True
 
 	def get_page_route(self, route="", category=None):
 		def change_case(str):

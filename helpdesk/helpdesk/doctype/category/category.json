@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_guest_to_view": 1,
  "allow_rename": 1,
  "autoname": "field:category_name",
  "creation": "2021-12-30 19:20:15.934034",
@@ -60,6 +61,7 @@
    "options": "Web Page"
   }
  ],
+ "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "links": [
   {
@@ -68,7 +70,7 @@
   }
  ],
  "migration_hash": "35bd4fd68a32aa1d62f4a6911e3dd6f9",
- "modified": "2022-01-09 21:26:19.147679",
+ "modified": "2022-01-09 22:49:33.616748",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Category",

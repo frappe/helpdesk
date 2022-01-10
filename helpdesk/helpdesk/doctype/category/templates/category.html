@@ -1,52 +1,34 @@
-{% block page_content %}
-<div class="my-40 d-flex justify-content-center">
-    <div>
-        <h2>{{ _("Hello, May I help you?") }}</h2>
-        <input class="form-control input-lg" type="text" placeholder="Type your question...">
-    </div>
-</div>
+{% extends "templates/web.html" %}
 
-<div class="d-flex flex-nowrap">
-    {% for category in categories %}
-    <div class="category_card card m-4" style="width: 18rem;" data-value="{{category.name}}">
-        <div class="card-body">
-          <h5 class="card-title">{{category.name}}</h5>
-          <p class="card-text">{{category.description}}</p>
+{% block page_content %}
+{% if is_group %}
+<div class="container d-flex flex-wrap">
+    {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}) %}
+    {% set max_articles = 6 %}
+    {% for sub_category in sub_categories %}
+    <div class="col-sm-6 col-12">
+        <h3>{{ sub_category.name }}</h3>
+        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}) %}
+        {% for article in articles %}
+        {% if loop.index < max_articles %}
+        <div class="article-list">
+            <span>- {{ article.name }}</span>
         </div>
-      </div>
+        {% elif loop.index == max_articles %}
+        <span>~ See all {{ articles|length }} articles</span>
+        {% endif %}
+        {% endfor %}
+    </div>
     {% endfor %}
 </div>
+{% else %}
+<div>
 
-<style>
-    .card{
-        box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
-        transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
-        cursor: pointer;
-    }
-    .card:hover{
-        transform: scale(1.005);
-        box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
-    }
-</style>
-
-<script>
-    frappe.ready(function() {
-        $(".category_card").click(function() {
-            let category = this.getAttribute("data-value");
-            
-            frappe.call({
-                btn: this,
-                method: "helpdesk.www.hc.index.get_category_website_route",
-                args: {
-                    category: category
-                },
-                callback: function(r) {
-                    console.log(r);
-                    window.open(`/${r.message.route}`, '_self')
-                }
-            })
-        });
-    })
-</script>
+</div>
+{% endif %}
 
 {% endblock %}
+
+<style>
+</style>
+<!-- this is a sample default web page template -->
