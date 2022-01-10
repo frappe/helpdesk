@@ -22,25 +22,40 @@
     {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
-    <div class="col-sm-6 col-12">
+    <div class="col-sm-6 col-12 my-4">
         {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['name', 'route']) %}
-        <h3 role="button" onclick="window.location = '/{{ sub_category.route }}'">{{ sub_category.name }} ({{ articles|length }})</h3>
+        <h3 role="button" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }} ({{ articles|length }})</h3>
         <hr>
         {% for article in articles %}
         {% if loop.index < max_articles %}
         <div class="article-list">
-            <span>- {{ article.name }}</span>
+            <li role="button" onclick="window.location='/{{ article.route }}'">{{ article.name }}</li>
         </div>
         {% elif loop.index == max_articles %}
-        <a href='/{{ sub_category.route }}'>~ See all {{ articles|length }} articles</a>
+        <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
         {% endif %}
         {% endfor %}
     </div>
     {% endfor %}
 </div>
 {% else %}
-<div>
-
+<div class="container mb-5">
+    {% set articles = frappe.get_all("Article", filters={"category": ['=', name]}, fields=['name', 'route', 'creation']) %}
+    <h2>{{ name }} ({{ articles|length }})</h2>
+    <hr>
+    <table class="table table-borderless table-hover">
+        <tbody>
+            {% for article in articles %}
+            <tr role="button" onclick="window.location='/{{ article.route }}'">
+                <td>
+                    <img class="wx-10 wy-10" src=""/>
+                </td>
+                <td scope="col">{{ article.name }}</td>
+                <td class="text-right" scope="col">{{ frappe.format_date(article.creation) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endif %}
 
