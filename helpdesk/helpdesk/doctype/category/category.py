@@ -5,10 +5,11 @@ import frappe
 from frappe import _
 from frappe.website.website_generator import WebsiteGenerator
 
+
 class Category(WebsiteGenerator):
 	def validate(self):
 		self.validate_tree()
-		
+
 	def validate_tree(self):
 		if self.parent_category:
 			parent_category_doc = frappe.get_doc("Category", self.parent_category)

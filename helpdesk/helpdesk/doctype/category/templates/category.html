@@ -19,12 +19,12 @@
 </div>
 {% if is_group %}
 <div class="container d-flex flex-wrap">
-    {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}) %}
+    {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
     <div class="col-sm-6 col-12">
-        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}) %}
-        <h3>{{ sub_category.name }} ({{ articles|length }})</h3>
+        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['name', 'route']) %}
+        <h3 role="button" onclick="window.location = '/{{ sub_category.route }}'">{{ sub_category.name }} ({{ articles|length }})</h3>
         <hr>
         {% for article in articles %}
         {% if loop.index < max_articles %}
@@ -32,7 +32,7 @@
             <span>- {{ article.name }}</span>
         </div>
         {% elif loop.index == max_articles %}
-        <span>~ See all {{ articles|length }} articles</span>
+        <a href='/{{ sub_category.route }}'>~ See all {{ articles|length }} articles</a>
         {% endif %}
         {% endfor %}
     </div>
@@ -51,4 +51,3 @@
         
     })
 </script>
-<!-- this is a sample default web page template -->
