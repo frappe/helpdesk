@@ -1,6 +1,14 @@
 {% extends "templates/web.html" %}
 
 {% block page_content %}
+<div class="">
+    <div class="container d-flex mb-10">
+        <h2 class="">Knowledge Base</h2>
+        <div class="col-xs-4 ml-5">
+            <input class="form-control input-lg" type="text" placeholder="Search the docs">
+          </div>
+    </div>
+</div>
 {% if is_group %}
 <div class="container d-flex flex-wrap">
     {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}) %}
