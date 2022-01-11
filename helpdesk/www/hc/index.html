@@ -6,7 +6,7 @@
 <div class="my-40 d-flex justify-content-center">
     <div>
         <h2>{{ _("Hello, May I help you?") }}</h2>
-        <input class="form-control input-lg" type="text" placeholder="Type your question...">
+        <input id="propSearchBar" class="form-control input-lg" type="text" placeholder="Type your question...">
     </div>
 </div>
 
@@ -20,6 +20,8 @@
       </div>
     {% endfor %}
 </div>
+
+{{ frappe.render_template('templates/components/search/search.html', {}) }}
 
 <style>
     .card{
@@ -50,6 +52,10 @@
                 }
             })
         });
+
+        $("#propSearchBar").click(function() {
+            showSearchBar();
+        })
     })
 </script>
 
