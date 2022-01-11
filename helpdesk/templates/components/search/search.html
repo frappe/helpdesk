@@ -1,14 +1,75 @@
 <div class="modal fade" id="searchContainerModal" tabindex="-1" role="dialog" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered" role="document">
+	<div class="modal-dialog modal-dialog-scrollable" role="document">
 		<div class="modal-content">
-			<input id="searchBar" class="form-control input-lg" type="text" placeholder="Type your question...">
+			<div class="modal-header">
+				<input id="searchBarInput" class="form-control" type="text" placeholder="Type your question...">
+			</div>
+			<div id="results" class="modal-body">
+			</div>
 		</div>
 	</div>
 </div>
 
 <script>
+	frappe.ready(function() {
+		let resultsBlock = $("#results");
+
+		resultsBlock.hide();
+		resultsBlock.empty();
+	})
+
 	function showSearchBar() {
 		$('#searchContainerModal').modal('show');
-		document.getElementById("searchBar").focus();
+		document.getElementById("searchBarInput").focus();
+		
+		$('#searchBarInput').on('input', function() { 
+			search(this.value);
+		});
+	}
+
+	function search(text) {
+		if(text == "") {
+			let resultsBlock = $("#results");
+
+			resultsBlock.hide();
+			resultsBlock.empty();
+			return;
+		}
+		frappe.call({
+			method: "helpdesk.templates.components.search.search.search_text",
+			args: {
+				text: text
+			},
+			callback: function(r) {
+				console.log(r.message);
+				showResults(r.message);
+			}
+		})
+	}
+
+	function showResults(results) {
+		let resultsBlock = $("#results");
+
+		resultsBlock.show();
+		resultsBlock.empty();
+		for(var i = 0; i < results.length; i++) {
+			console.log(results[i]);
+			resultsBlock.append(getRenderedResultElement(results[i], index=i, last=(i == (results.length - 1))))
+			$('#result-item-' + index).click(function() {
+				window.open(`/${results[index].route}`, '_self');
+			});
+		}
+	}
+
+	function getRenderedResultElement(result, index, last) {
+		let a = `
+			<div id=${'result-item-' + index} role='button'>
+				<span>${result.title}</span>
+				<p>${result.description}</p>
+			</div>
+			${last ? '' : '<hr>'}
+		`;
+		console.log(a);
+		return a;
 	}
 </script>
