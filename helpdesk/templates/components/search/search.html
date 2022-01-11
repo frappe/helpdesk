@@ -2,7 +2,7 @@
 	<div class="modal-dialog modal-dialog-scrollable" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<input id="searchBarInput" class="form-control" type="text" placeholder="Type your question...">
+				<input id="searchBarInput" class="form-control" type="text" placeholder="Type your question..." autofocus>
 			</div>
 			<div id="results" class="modal-body">
 			</div>
@@ -16,15 +16,19 @@
 
 		resultsBlock.hide();
 		resultsBlock.empty();
+		
+		$('.modal').on('shown.bs.modal', function() {
+			$(this).find('[autofocus]').focus();
+
+			$('#searchBarInput').on('input', function() { 
+				search(this.value);
+			});
+		});
 	})
+
 
 	function showSearchBar() {
 		$('#searchContainerModal').modal('show');
-		document.getElementById("searchBarInput").focus();
-		
-		$('#searchBarInput').on('input', function() { 
-			search(this.value);
-		});
 	}
 
 	function search(text) {
