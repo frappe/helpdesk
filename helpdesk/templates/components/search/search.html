@@ -55,8 +55,11 @@
 		for(var i = 0; i < results.length; i++) {
 			console.log(results[i]);
 			resultsBlock.append(getRenderedResultElement(results[i], index=i, last=(i == (results.length - 1))))
-			$('#result-item-' + index).click(function() {
-				window.open(`/${results[index].route}`, '_self');
+			
+			let resultItemBlock = $('#result-item-' + i); 
+			resultItemBlock.attr('redirectRoute', results[i].route)
+			resultItemBlock.click(function() {
+				window.open(`/${this.getAttribute('redirectRoute')}`, '_self');
 			});
 		}
 	}
