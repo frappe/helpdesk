@@ -1,25 +1,34 @@
 {% extends "templates/web.html" %}
 
-{% block header %}
-<h1 itemprop="headline">{{ title }}</h1>
-{% endblock %}
-
 {% block page_content %}
-<article itemscope itemtype="http://schema.org/BlogPost">
+<div>
+	<div class="container d-flex mb-5">
+		<h2 class="">Knowledge Base</h2>
+        <div class="col-xs-4 ml-5">
+			<input id="propSearchBar" class="form-control input-lg" type="text" placeholder="Search the docs">
+		</div>
+    </div>
+</div>
+
+<div class="container">
+	<h2>{{ title }}</h2>
 	<div class="from-markdown my-4" itemprop="articleBody">
 		{{ content }}
 	</div>
-</article>
 
-<div class="article-feedback mb-6">
-	<hr />
-	<div class="feedback-view ">
-		<div class="text-muted small mr-2 mb-2">{{ _("Was this article helpful?") }}</div>
-		<button class="feedback btn btn-outline-primary btn-sm" data-value="Yes" style="width: 50px;">{{ _("Yes") }}</button>
-		<button class="feedback btn btn-outline-primary btn-sm" data-value="No" style="width: 50px;">{{ _("No") }}</button>
-		<span class="feedback-msg small hidden">{{ _("Thank you for your feedback!") }}</span>
+	<div class="article-feedback mb-6">
+		<hr />
+		<div class="feedback-view ">
+			<div class="text-muted small mr-2 mb-2">{{ _("Was this article helpful?") }}</div>
+			<button class="feedback btn btn-outline-primary btn-sm" data-value="Yes" style="width: 50px;">{{ _("Yes") }}</button>
+			<button class="feedback btn btn-outline-primary btn-sm" data-value="No" style="width: 50px;">{{ _("No") }}</button>
+			<span class="feedback-msg small hidden">{{ _("Thank you for your feedback!") }}</span>
+		</div>
 	</div>
 </div>
+
+
+{{ frappe.render_template('templates/components/search/search.html', {}) }}
 
 <script>
 frappe.ready(function() {
@@ -58,6 +67,10 @@ frappe.ready(function() {
 			}
 		})
 	});
+
+	$("#propSearchBar").click(function() {
+		showSearchBar();
+	})
 });
 </script>
 {% endblock %}
