@@ -51,7 +51,9 @@
   "column_break_16",
   "via_customer_portal",
   "attachment",
-  "content_type"
+  "content_type",
+  "route",
+  "is_published"
  ],
  "fields": [
   {
@@ -361,13 +363,28 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Content Type"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Web Page Route"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_published",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Web Page Is Published"
   }
  ],
+ "has_web_view": 1,
  "icon": "fa fa-issue",
  "idx": 7,
+ "is_published_field": "is_published",
  "links": [],
- "migration_hash": "54d409fa52e015b4c26c81f449626b85",
- "modified": "2022-01-12 18:03:53.133705",
+ "migration_hash": "3272d8b17b61ee05ad03e66f820e7a84",
+ "modified": "2022-01-12 19:52:44.473652",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",

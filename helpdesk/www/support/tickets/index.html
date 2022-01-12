@@ -8,13 +8,13 @@
     </div>
     <div class="tickets-container">
         {% set user_email = frappe.session.user %}
-        {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['subject', 'status', 'creation']) %}
+        {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['subject', 'status', 'creation', 'route']) %}
         <h2>Your Tickets ({{ tickets|length }})</h2>
         <hr>
         <table class="table table-borderless table-hover">
             <tbody>
                 {% for ticket in tickets %}
-                <tr role="button" onclick="">
+                <tr role="button" onclick="window.location='/{{ ticket.route }}'">
                     <td class="col-md-7">{{ ticket.subject }}</td>
                     <td class="col-md-1">{{ ticket.status }}</td>
                     <td class="col-md-3 text-right w-30">{{ frappe.format_date(ticket.creation) }}</td>

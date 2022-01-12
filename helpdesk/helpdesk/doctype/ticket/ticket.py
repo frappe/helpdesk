@@ -10,13 +10,13 @@ import frappe
 from frappe import _
 from frappe.core.utils import get_parent_doc
 from frappe.email.inbox import link_communication_to_document
-from frappe.model.document import Document
+from frappe.website.website_generator import WebsiteGenerator
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
 
-class Ticket(Document):
+class Ticket(WebsiteGenerator):
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
@@ -29,6 +29,9 @@ class Ticket(Document):
 
 		self.set_contact(self.raised_by)
 
+	def before_save(self):
+		self.route = f'support/tickets/{self.name}'
+ 
 	def on_update(self):
 		# Add a communication in the ticket timeline
 		if self.flags.create_communication and self.via_customer_portal:
