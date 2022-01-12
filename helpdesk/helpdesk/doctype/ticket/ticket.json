@@ -185,7 +185,7 @@
    "read_only": 1
   },
   {
-   "default": "Ongoing",
+   "default": "First Response Due",
    "depends_on": "eval: doc.service_level_agreement",
    "fieldname": "agreement_status",
    "fieldtype": "Select",
@@ -366,8 +366,8 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "migration_hash": "178fa2fb365b1fc3dc98aa711d46dcbe",
- "modified": "2021-11-21 14:27:07.527606",
+ "migration_hash": "54d409fa52e015b4c26c81f449626b85",
+ "modified": "2022-01-12 18:03:53.133705",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
