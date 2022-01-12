@@ -4,7 +4,7 @@
 {% if frappe.session.user != "Guest" %}
 <div class="main-container">
     <div class="top-portion d-flex flex-row-reverse">
-        <button class="btn btn-primary">Create New</button>
+        <button class="btn btn-primary" onclick="window.location='/support/tickets/new'">Create New</button>
     </div>
     <div class="tickets-container">
         {% set user_email = frappe.session.user %}

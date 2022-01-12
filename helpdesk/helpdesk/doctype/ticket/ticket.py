@@ -30,8 +30,8 @@ class Ticket(WebsiteGenerator):
 		self.set_contact(self.raised_by)
 
 	def before_save(self):
-		self.route = f'support/tickets/{self.name}'
- 
+		self.route = f"support/tickets/{self.name}"
+
 	def on_update(self):
 		# Add a communication in the ticket timeline
 		if self.flags.create_communication and self.via_customer_portal:
