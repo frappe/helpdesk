@@ -128,6 +128,31 @@ class Ticket(WebsiteGenerator):
 		self.db_set("user_resolution_time", None)
 
 
+
+@frappe.whitelist()
+def create_communication_via_contact(ticket, message):
+	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	communication = frappe.new_doc("Communication")
+	communication.update(
+		{
+			"communication_type": "Communication",
+			"communication_medium": "Email",
+			"sent_or_received": "Received",
+			"email_status": "Open",
+			"subject": "Re: " + ticket_doc.subject,
+			"sender": ticket_doc.raised_by,
+			"content": message,
+			"status": "Linked",
+			"reference_doctype": "Ticket",
+			"reference_name": ticket_doc.name,
+		}
+	)
+	communication.ignore_permissions = True
+	communication.ignore_mandatory = True
+	communication.save(ignore_permissions=True)
+
+
 def get_list_context(context=None):
 	return {
 		"title": _("Tickets"),
