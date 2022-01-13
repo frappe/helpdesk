@@ -4,14 +4,7 @@
 {% if owner == frappe.session.user %}
 <div class="main-container">
     {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", name]}, fields=["name", "content"]) %}
-    <div class="conversation-container mb-10">
-        {% for conversation in conversations|reverse %}
-        <div class="card my-2">
-            <div class="card-body">
-                {{ conversation.content }}
-            </div>
-        </div>
-        {% endfor %}
+    <div id="conversationContainer" class="conversation-container mb-10">
     </div>
     <form>
         <textarea class="form-control" id="messageInput" rows="3" placeholder="Enter message"></textarea>
@@ -28,6 +21,8 @@
 
 <script>
     frappe.ready(function() {
+        setInterval(refreshConversations, 5000);
+
         $("#submitButton").click(function() {
             frappe.call({
 				btn: this,
@@ -38,11 +33,34 @@
 				},
 				callback: function(r) {
                     $("#messageInput").val('')
-
+                    refreshConversations();
 				}
 			})
         })
     })
+
+    function refreshConversations() {
+        frappe.call({
+            method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_conversations",
+            args: {
+                ticket: "{{ name }}",
+            },
+            callback: function(r) {
+                let conversations = r.message;
+                let conversationContainer = $("#conversationContainer");
+                conversationContainer.empty();
+                for(var i = conversations.length - 1; i >= 0; i--) {
+                    conversationContainer.append(`
+                        <div class="card my-2">
+                            <div class="card-body">
+                                ${conversations[i].content}
+                            </div>
+                        </div>    
+                    `);
+                }
+            }
+        })
+    }
 
 </script>
 
