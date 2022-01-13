@@ -21,6 +21,7 @@
 
 <script>
     frappe.ready(function() {
+        refreshConversations();
         setInterval(refreshConversations, 5000);
 
         $("#submitButton").click(function() {
