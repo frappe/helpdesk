@@ -64,7 +64,7 @@ class Ticket(WebsiteGenerator):
 		)
 		communication.ignore_permissions = True
 		communication.ignore_mandatory = True
-		communication.save()
+		communication.save(ignore_permissions=True)
 
 	@frappe.whitelist()
 	def split_ticket(self, subject, communication_id):

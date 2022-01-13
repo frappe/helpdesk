@@ -384,7 +384,7 @@
  "is_published_field": "is_published",
  "links": [],
  "migration_hash": "3272d8b17b61ee05ad03e66f820e7a84",
- "modified": "2022-01-12 19:52:44.473652",
+ "modified": "2022-01-13 12:27:16.964975",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
@@ -401,6 +401,17 @@
    "role": "Support Team",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Helpdesk Contact",
+   "share": 1
   }
  ],
  "quick_entry": 1,
