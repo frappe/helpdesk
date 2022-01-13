@@ -1,0 +1,67 @@
+{% extends 'templates/web.html'%}
+
+{% block title %}{{ _("New Ticket") }}{% endblock %}
+
+{% block page_content %}
+{% if frappe.session.user != "Guest" %}
+<div>
+	<h2>{{ _("New Ticket") }}</h2>
+	<form>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				<label for="subjectInput">{{ _("Subject")}}</label>
+				<input type="text" class="form-control" id="subjectInput" placeholder="">
+			</div>
+			<div class="form-group col-md-6">
+				<label for="typeInput">{{ _("Type") }}</label>
+				<select id="typeInput" class="form-control">
+					{% set types = frappe.get_all("Ticket Type", pluck="name") %}
+					{% for type in types %}
+					{% if loop.counter == 0 %}
+					<option selected>{{ type }}</option>
+					{% else %}
+					<option>{{ type }}</option>
+					{% endif %}
+					{% endfor %}
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="descriptionInput">{{ _("Description") }}</label>
+			<textarea class="form-control" id="descriptionInput" rows="5" required></textarea>
+		</div>
+		<button id="submitButton" class="btn btn-primary">{{ _("Create") }}</button>
+	</form>
+</div>
+{% else %}
+<div class="alert alert-warning">
+	<p>
+		Please login to be able to create tickets.
+	</p>
+	<p>
+		If you don't already have an account, you can <a href="/login#signup">sign up for a new account</a>.
+	</p>
+	<a class="btn btn-primary" href="/login">Login to continue</a>
+</div>
+{% endif %}
+
+<script>
+	frappe.ready(function() {
+		$("#submitButton").click(function() {
+			frappe.call({
+				btn: this,
+				method: "helpdesk.www.support.tickets.new.index.create_ticket",
+				args: {
+					subject: $("#subjectInput").val(),
+					type: $("#typeInput").val(),
+					description: $("#descriptionInput").val()
+				},
+				callback: function(r) {
+					window.location=`/${r.message.route}`;
+				}
+			})
+		});
+	});
+</script>
+
+{% endblock %}

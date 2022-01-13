@@ -10,13 +10,13 @@ import frappe
 from frappe import _
 from frappe.core.utils import get_parent_doc
 from frappe.email.inbox import link_communication_to_document
-from frappe.model.document import Document
+from frappe.website.website_generator import WebsiteGenerator
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
 
-class Ticket(Document):
+class Ticket(WebsiteGenerator):
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
@@ -28,6 +28,9 @@ class Ticket(Document):
 			self.raised_by = frappe.session.user
 
 		self.set_contact(self.raised_by)
+
+	def before_save(self):
+		self.route = f"support/tickets/{self.name}"
 
 	def on_update(self):
 		# Add a communication in the ticket timeline
@@ -61,7 +64,7 @@ class Ticket(Document):
 		)
 		communication.ignore_permissions = True
 		communication.ignore_mandatory = True
-		communication.save()
+		communication.save(ignore_permissions=True)
 
 	@frappe.whitelist()
 	def split_ticket(self, subject, communication_id):
@@ -124,6 +127,35 @@ class Ticket(Document):
 		self.db_set("resolution_time", None)
 		self.db_set("user_resolution_time", None)
 
+
+
+@frappe.whitelist()
+def create_communication_via_contact(ticket, message):
+	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	communication = frappe.new_doc("Communication")
+	communication.update(
+		{
+			"communication_type": "Communication",
+			"communication_medium": "Email",
+			"sent_or_received": "Received",
+			"email_status": "Open",
+			"subject": "Re: " + ticket_doc.subject,
+			"sender": ticket_doc.raised_by,
+			"content": message,
+			"status": "Linked",
+			"reference_doctype": "Ticket",
+			"reference_name": ticket_doc.name,
+		}
+	)
+	communication.ignore_permissions = True
+	communication.ignore_mandatory = True
+	communication.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def get_all_conversations(ticket):
+	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, fields=["name", "content"])
+	return conversations
 
 def get_list_context(context=None):
 	return {

@@ -1,0 +1,68 @@
+{% extends 'templates/web.html'%}
+
+{% block page_content %}
+{% if owner == frappe.session.user %}
+<div class="main-container">
+    {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", name]}, fields=["name", "content"]) %}
+    <div id="conversationContainer" class="conversation-container mb-10">
+    </div>
+    <form>
+        <textarea class="form-control" id="messageInput" rows="3" placeholder="Enter message"></textarea>
+        <button id="submitButton" class="submit btn btn-primary float-right mt-2">Send</button>
+    </form>
+</div>
+{% else %}
+<div class="alert alert-warning">
+    <p>
+        You don't have access to this ticket.
+    </p>
+</div>
+{% endif %}
+
+<script>
+    frappe.ready(function() {
+        refreshConversations();
+        setInterval(refreshConversations, 5000);
+
+        $("#submitButton").click(function() {
+            frappe.call({
+				btn: this,
+				method: "helpdesk.helpdesk.doctype.ticket.ticket.create_communication_via_contact",
+				args: {
+                    ticket: "{{ name }}",
+					message: $("#messageInput").val()
+				},
+				callback: function(r) {
+                    $("#messageInput").val('')
+                    refreshConversations();
+				}
+			})
+        })
+    })
+
+    function refreshConversations() {
+        frappe.call({
+            method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_conversations",
+            args: {
+                ticket: "{{ name }}",
+            },
+            callback: function(r) {
+                let conversations = r.message;
+                let conversationContainer = $("#conversationContainer");
+                conversationContainer.empty();
+                for(var i = conversations.length - 1; i >= 0; i--) {
+                    conversationContainer.append(`
+                        <div class="card my-2">
+                            <div class="card-body">
+                                ${conversations[i].content}
+                            </div>
+                        </div>    
+                    `);
+                }
+            }
+        })
+    }
+
+</script>
+
+{% endblock %}
