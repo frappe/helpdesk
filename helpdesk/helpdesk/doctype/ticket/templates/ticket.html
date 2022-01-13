@@ -2,15 +2,35 @@
 
 {% block page_content %}
 {% if owner == frappe.session.user %}
-<div class="main-container">
-    {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", name]}, fields=["name", "content"]) %}
-    <div id="conversationContainer" class="conversation-container mb-10">
-    </div>
-    <form>
-        <textarea class="form-control" id="messageInput" rows="3" placeholder="Enter message"></textarea>
-        <button id="submitButton" class="submit btn btn-primary float-right mt-2">Send</button>
-    </form>
-</div>
+<main class="content">
+    <div class="container p-0">
+		<div class="">
+			<div class="row g-0">
+				<div class="col-12 col-lg-5 col-xl-3 border-right">
+                    <div>
+                        {{ name }}
+                    </div>
+                    <div>
+                        {{ status }}
+                    </div>
+                </div>
+				<div class="chat-container col-12 col-lg-7 col-xl-9">
+					<div class="position-relative">
+                        {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", name]}, fields=["name", "content"]) %}
+                        <div id="conversationContainer" class="chat-messages p-4">
+						</div>
+					</div>
+					<div class="flex-grow-0 py-3 px-4">
+						<div class="input-group">
+							<input id="messageInput" type="text" class="form-control" placeholder="Type your message">
+							<button id="submitButton" class="btn btn-primary">Send</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
 {% else %}
 <div class="alert alert-warning">
     <p>
@@ -19,6 +39,34 @@
 </div>
 {% endif %}
 
+<style>
+.chat-container {
+    height: 550px;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    height: 550px;
+    overflow-y: scroll
+}
+
+.chat-message-left,
+.chat-message-right {
+    display: flex;
+    flex-shrink: 0
+}
+
+.chat-message-left {
+    margin-right: auto
+}
+
+.chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto
+}
+
+</style>
 <script>
     frappe.ready(function() {
         refreshConversations();
@@ -50,13 +98,27 @@
                 let conversations = r.message;
                 let conversationContainer = $("#conversationContainer");
                 conversationContainer.empty();
+                conversationContainer.append(`
+                    <div class="p-4 mb-4">
+                        <div>
+                            Created on {{ frappe.format_date(creation) }}
+                        </div>
+                        <div class="font-weight-bold">
+                            {{ subject }}
+                        </div>
+                    </div>
+                `)
                 for(var i = conversations.length - 1; i >= 0; i--) {
+                    let is_received = conversations[i].sent_or_received == "Received";
                     conversationContainer.append(`
-                        <div class="card my-2">
-                            <div class="card-body">
+                        <div class="${is_received ? 'chat-message-right' : 'chat-message-left'} pb-4">
+                            <div>
+                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
+                            </div>
+                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
                                 ${conversations[i].content}
                             </div>
-                        </div>    
+                        </div>
                     `);
                 }
             }
