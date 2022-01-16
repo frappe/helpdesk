@@ -1,27 +1,54 @@
 {% extends 'templates/web.html'%}
 
 {% block page_content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 {% if frappe.session.user != "Guest" %}
 <div class="main-container">
-    <div class="top-portion d-flex flex-row-reverse">
-        <button class="btn btn-primary" onclick="window.location='/support/tickets/new'">Create New</button>
+    <div class="d-flex mb-4">
+        <div class="mr-auto">
+            <h3>Your Tickets</h3>
+        </div>
+        <div class="d-flex">
+            <div class="dropdown mr-2">
+                <a class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Show All
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item">Show All</a>
+                    <a class="dropdown-item">Show Open</a>
+                    <a class="dropdown-item">Show Resolved</a>
+                </div>
+            </div>
+            <a class="btn btn-primary btn-sm" onclick="window.location='/support/tickets/new'">New Ticket</a>
+        </div>
     </div>
     <div class="tickets-container">
         {% set user_email = frappe.session.user %}
-        {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['subject', 'status', 'creation', 'route']) %}
-        <h2>Your Tickets ({{ tickets|length }})</h2>
-        <hr>
-        <table class="table table-borderless table-hover">
-            <tbody>
-                {% for ticket in tickets %}
-                <tr role="button" onclick="window.location='/{{ ticket.route }}'">
-                    <td class="col-md-7">{{ ticket.subject }}</td>
-                    <td class="col-md-1">{{ ticket.status }}</td>
-                    <td class="col-md-3 text-right w-30">{{ frappe.format_date(ticket.creation) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['name', 'subject', 'description', 'status', 'creation', 'route']) %}
+        {% for ticket in tickets %}
+        <div role="button" class="card border-0 bg-light p-4 my-2" onclick="window.location='/{{ ticket.route}}'">
+            <div class="ticket-card-top-section mb-3">
+                <i class="bi bi-journal mr-2"></i>
+                <strong>Ticket #{{ ticket.name }}</strong>
+                {% if ticket.status == "Resolved" %}
+                <span class="ml-2 badge badge-success">Resolved</span>
+                {% else %}
+                <span class="ml-2 badge badge-warning">Open</span>
+                {% endif %}
+                <span class="float-right">{{ frappe.format(ticket.creation) }}</span>
+            </div>
+            <div class="ticket-card-main">
+                <h3>{{ ticket.subject }}</h3>
+                <p>{{ ticket.description }}</p>
+            </div>
+            <div class="ticket-card-footer">
+                {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket.name]}) %}
+                <div class="float-right">
+                    <i class="bi bi-chat-left"></i> {{ conversations|length }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% else %}
