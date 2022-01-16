@@ -6,17 +6,16 @@
     <div class="container p-0">
 		<div class="">
 			<div class="row g-0">
-				<div class="col-12 col-lg-5 col-xl-3 border-right">
-                    <div>
-                        {{ subject }}
-                    </div>
-                    <div>
-                        {{ status }}
-                    </div>
+				<div class="col-12 col-lg-5 col-xl-3 border-right mb-4">
+                    <strong>Ticket #{{ name }}</strong>
+                    {% if status == "Resolved" %}
+                    <span class="ml-2 badge badge-success">Resolved</span>
+                    {% else %}
+                    <span class="ml-2 badge badge-warning">Open</span>
+                    {% endif %}
                 </div>
 				<div class="chat-container col-12 col-lg-7 col-xl-9">
 					<div class="position-relative">
-                        {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", name]}, fields=["name", "content"]) %}
                         <div id="conversationContainer" class="chat-messages p-4">
 						</div>
 					</div>
@@ -69,20 +68,27 @@
 </style>
 <script>
     frappe.ready(function() {
-        refreshConversations();
-        setInterval(refreshConversations, 5000);
-
-        $("#submitButton").click(function() {
-            frappe.call({
-				btn: this,
-				method: "helpdesk.helpdesk.doctype.ticket.ticket.create_communication_via_contact",
-				args: {
-                    ticket: "{{ name }}",
-					message: $("#messageInput").val()
-				},
-				callback: function(r) {
+        refreshConversations(false);
+        setInterval(refreshConversations, 5000, true);
+        
+        $("#submit").click(function() {
+            var data = $("#btn-input").val();
+                //console.log(data);
+                $('chat_log').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div><div class="row msg_container base_receive"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div>');
+                clearInput();
+            });
+            
+            $("#submitButton").click(function() {
+                frappe.call({
+                    btn: this,
+                    method: "helpdesk.helpdesk.doctype.ticket.ticket.create_communication_via_contact",
+                    args: {
+                        ticket: "{{ name }}",
+                        message: $("#messageInput").val()
+                    },
+                    callback: function(r) {
                     $("#messageInput").val('')
-                    refreshConversations();
+                    refreshConversations(true);
 				}
 			})
         })
@@ -108,18 +114,23 @@
                         </div>
                     </div>
                 `)
-                for(var i = conversations.length - 1; i >= 0; i--) {
+                for(var i = 0; i < conversations.length; i++) {
                     let is_received = conversations[i].sent_or_received == "Received";
+                    let agent_img = "https://cdn-icons.flaticon.com/png/512/2993/premium/2993151.png?token=exp=1642374990~hmac=7651e44832fd0866663523c8f51faf77"
+                    let person_img = "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
                     conversationContainer.append(`
                         <div class="${is_received ? 'chat-message-right' : 'chat-message-left'} pb-4">
                             <div>
-                                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
+                                <img src="${is_received ? person_img : agent_img}" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
                             </div>
                             <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
                                 ${conversations[i].content}
                             </div>
                         </div>
                     `);
+                }
+                if(scroll) {
+                    $("#conversationContainer").stop().animate({ scrollTop: $("#conversationContainer")[0].scrollHeight}, 1000);
                 }
             }
         })

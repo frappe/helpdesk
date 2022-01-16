@@ -154,7 +154,7 @@ def create_communication_via_contact(ticket, message):
 
 @frappe.whitelist()
 def get_all_conversations(ticket):
-	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, fields=["name", "content", "creation", "sent_or_received"])
+	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received"])
 	return conversations
 
 def get_list_context(context=None):
