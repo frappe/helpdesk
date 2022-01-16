@@ -1,35 +1,35 @@
 {% extends "templates/web.html" %}
 
 {% block page_content %}
-<div>
-    <div class="container d-flex mb-5">
-        <h2 class="">Knowledge Base</h2>
-        <div class="col-xs-4 ml-5">
-            <input id="propSearchBar" class="form-control input-lg" type="text" placeholder="Search the docs"  maxlength="0">
-          </div>
-    </div>
-</div>
-<div class="container d-flex mb-5">
-    <a href='/hc/'>Home</a><span class="pl-2"> > </span>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<div class="d-flex mb-10">
+    <a href='/support/kb/'>Home</a><span class="pl-2"> > </span>
     {% if parent_category %}
     {% set parent_category_route = frappe.db.get_value("Category", parent_category, ['route'])%}
     <a href="/{{ parent_category_route }}" class="pl-2"> {{ parent_category }} </a><span class="pl-2"> > </span>
     {% endif %}
     <span class="pl-2"> {{ name }}</span>
 </div>
+<div>
+    <div class="mb-20">
+        <h2 class="">Knowledge Base</h2>
+        <div class="w-50">
+            <input id="propSearchBar" class="form-control" type="text" placeholder="Search the docs"  maxlength="0">
+        </div>
+    </div>
+</div>
 {% if is_group %}
-<div class="container d-flex flex-wrap">
+<div class="d-flex flex-wrap">
     {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
-    <div class="col-sm-6 col-12 my-4">
-        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['name', 'route']) %}
-        <h3 role="button" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }} ({{ articles|length }})</h3>
-        <hr>
+    <div class="col-sm-6 col-12 my-4 p-0">
+        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['title', 'route']) %}
+        <h3 role="button" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }}</h3>
         {% for article in articles %}
         {% if loop.index < max_articles %}
         <div class="article-list">
-            <li role="button" onclick="window.location='/{{ article.route }}'">{{ article.name }}</li>
+            <span style="color: #2490EF;" role="button" onclick="window.location='/{{ article.route }}'">{{ article.title }}</span>
         </div>
         {% elif loop.index == max_articles %}
         <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
@@ -39,25 +39,33 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="container mb-5">
-    {% set articles = frappe.get_all("Article", filters={"category": ['=', name]}, fields=['name', 'route', 'creation']) %}
+<div class="mb-5">
+    {% set articles = frappe.get_all("Article", filters={"category": ['=', name]}, fields=['title', 'route', 'creation']) %}
     <h2>{{ name }} ({{ articles|length }})</h2>
-    <hr>
     <table class="table table-borderless table-hover">
         <tbody>
             {% for article in articles %}
             <tr role="button" onclick="window.location='/{{ article.route }}'">
                 <td>
-                    <img class="wx-10 wy-10" src=""/>
+                    <i class="bi bi-journals mr-2"></i>
+                    <span>{{ article.title }}</span>
                 </td>
-                <td scope="col">{{ article.name }}</td>
-                <td class="text-right" scope="col">{{ frappe.format_date(article.creation) }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endif %}
+
+<hr>
+<div class="mt-20">
+    <div class="my-1 d-flex justify-content-center">
+        <p>{{ _("Still got questions? We're here to assist you.") }}</p>
+    </div>
+    <div class="d-flex justify-content-center">
+        <button class="btn btn-primary">{{ _("Contact with us") }}</button>
+    </div>
+</div>
 
 {{ frappe.render_template('templates/components/search/search.html', {}) }}
 
