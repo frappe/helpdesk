@@ -26,12 +26,12 @@
 		</div>
 		<div class="col-5">
 			<h2 class="mb-8">{{ _("Related") }}</h2>
-			{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["name", "route"]) %}
+			{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["title", "route"]) %}
 			{% set max_related_articles = 5 %}
 			{% for related_article in related_articles %}
 			{% if loop.index < max_related_articles %}
 			<div class="article-list mb-3">
-				<span style="color: #2490EF;" role="button" onclick="window.location='/{{ related_article.route }}'">{{ related_article.name }}</span>
+				<span style="color: #2490EF;" role="button" onclick="window.location='/{{ related_article.route }}'">{{ related_article.title }}</span>
 			</div>
 			{% endif %}
 			{% endfor %}

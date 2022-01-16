@@ -1,6 +1,7 @@
 {% extends "templates/web.html" %}
 
 {% block page_content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 <div class="d-flex mb-10">
     <a href='/support/kb/'>Home</a><span class="pl-2"> > </span>
     {% if parent_category %}
@@ -23,12 +24,12 @@
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
     <div class="col-sm-6 col-12 my-4 p-0">
-        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['name', 'route']) %}
+        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['title', 'route']) %}
         <h3 role="button" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }}</h3>
         {% for article in articles %}
         {% if loop.index < max_articles %}
         <div class="article-list">
-            <span style="color: #2490EF;" role="button" onclick="window.location='/{{ article.route }}'">{{ article.name }}</span>
+            <span style="color: #2490EF;" role="button" onclick="window.location='/{{ article.route }}'">{{ article.title }}</span>
         </div>
         {% elif loop.index == max_articles %}
         <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
@@ -39,18 +40,16 @@
 </div>
 {% else %}
 <div class="mb-5">
-    {% set articles = frappe.get_all("Article", filters={"category": ['=', name]}, fields=['name', 'route', 'creation']) %}
+    {% set articles = frappe.get_all("Article", filters={"category": ['=', name]}, fields=['title', 'route', 'creation']) %}
     <h2>{{ name }} ({{ articles|length }})</h2>
-    <hr>
     <table class="table table-borderless table-hover">
         <tbody>
             {% for article in articles %}
             <tr role="button" onclick="window.location='/{{ article.route }}'">
-                <td class="col-1">
-                    <img class="wx-10 wy-10" src=""/>
+                <td>
+                    <i class="bi bi-journals mr-2"></i>
+                    <span>{{ article.title }}</span>
                 </td>
-                <td class="col-8">{{ article.name }}</td>
-                <td class="text-right col-3">{{ frappe.format_date(article.creation) }}</td>
             </tr>
             {% endfor %}
         </tbody>
