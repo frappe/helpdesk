@@ -68,8 +68,8 @@
 </style>
 <script>
     frappe.ready(function() {
-        refreshConversations(false);
-        setInterval(refreshConversations, 5000, true);
+        refreshConversations(true);
+        setInterval(refreshConversations, 5000, false);
         
         $("#submit").click(function() {
             var data = $("#btn-input").val();
@@ -94,7 +94,7 @@
         })
     })
 
-    function refreshConversations() {
+    function refreshConversations(scroll) {
         frappe.call({
             method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_conversations",
             args: {
