@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "naming_series:",
+ "autoname": "format:TKT-{YYYY}-{#####}",
  "creation": "2013-02-01 10:36:25",
  "doctype": "DocType",
  "document_type": "Setup",
@@ -384,11 +384,11 @@
  "is_published_field": "is_published",
  "links": [],
  "migration_hash": "3272d8b17b61ee05ad03e66f820e7a84",
- "modified": "2022-01-13 12:27:16.964975",
+ "modified": "2022-01-17 03:56:34.105111",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
