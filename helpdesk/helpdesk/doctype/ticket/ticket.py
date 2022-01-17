@@ -155,13 +155,23 @@ def create_communication_via_contact(ticket, message):
 @frappe.whitelist()
 def get_all_conversations(ticket):
 	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received"])
+	
+	for conversation in conversations:
+		attachments = frappe.get_all(
+			"File", 
+			["file_name", "file_url"],
+			{"attached_to_name": conversation.name, "attached_to_doctype": "Communication"}
+		)
+
+		conversation.attachments = attachments
+
 	return conversations
 
 @frappe.whitelist()
 def get_all_attachments(ticket):
 	attachments = frappe.get_all(
-		"File", 
-		["name", "file_name", "file_url", "is_private"],
+		"File",
+		["file_name", "file_url"],
 		{"attached_to_name": ticket, "attached_to_doctype": "Ticket"}
 	)
 	return attachments

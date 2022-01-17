@@ -85,6 +85,12 @@
     margin-left: auto
 }
 
+.attachment {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 </style>
 <script>
     frappe.ready(function() {
@@ -95,7 +101,6 @@
 
         $("#submit").click(function() {
             var data = $("#btn-input").val();
-                //console.log(data);
                 $('chat_log').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div><div class="row msg_container base_receive"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div>');
                 clearInput();
             });
@@ -124,7 +129,6 @@
             },
             callback: function(r) {
                 let attachments = r.message;
-                console.log(attachments)
                 let attachmentContainer = $("#attachmentContainer");
                 attachmentContainer.empty();
                 if(attachments.length > 0) {
@@ -136,7 +140,7 @@
                     for(var i = 0; i < attachments.length; i++) {
                         attachmentContainer.append(`
                             <div class="pb-2">
-                                <div class="flex-shrink-1 bg-light rounded py-2 px-3">
+                                <div role="button" class="attachment flex-shrink-1 bg-light rounded py-2 px-3" onclick="window.open('${attachments[i].file_url}', '_blank')">
                                     ${attachments[i].file_name}
                                 </div>
                             </div>
@@ -158,26 +162,39 @@
                 let conversationContainer = $("#conversationContainer");
                 conversationContainer.empty();
                 for(var i = 0; i < conversations.length; i++) {
+                    let conversationElement = jQuery('<div>').appendTo(conversationContainer);
+                        
                     let is_received = conversations[i].sent_or_received == "Received";
-                    conversationContainer.append(`
-                        <div class="pb-4">
-                            <div class="flex-shrink-1 bg-light rounded p-5 mr-3">
-                                <div class="top-section d-flex justify-content-between mb-4">
-                                    <strong>
-                                        ${is_received ? "You" : "Agent"}
-                                    </strong>
-                                    <p>
-                                        ${conversations[i].creation}
-                                    </p>
-                                </div>
-                                <div class="message">
-                                    <p>
-                                        ${conversations[i].content}
-                                    </p>
-                                </div>
+                    conversationElement.append(`
+                        <div class="flex-shrink-1 bg-light rounded p-5 mr-3 mb-4">
+                            <div class="top-section d-flex justify-content-between mb-4">
+                                <strong>
+                                    ${is_received ? "You" : "Agent"}
+                                </strong>
+                                <p>
+                                    ${conversations[i].creation}
+                                </p>
+                            </div>
+                            <div class="message">
+                                <p>
+                                    ${conversations[i].content}
+                                </p>
+                            </div>
+                            <div class="attachments">
                             </div>
                         </div>
-                    `);
+                    `)
+
+                    let attachmentContainer = conversationElement.find(".attachments");
+                    
+                    for(var j = 0; j < conversations[i].attachments.length; j++) {
+                        let attachment = conversations[i].attachments[j]
+                        attachmentContainer.append(`
+                            <div role="button" class="attachment bg-secondary text-white rounded my-2 p-2" onclick="window.open('${attachment.file_url}', '_blank')">
+                                ${attachment.file_name}
+                            </div>
+                        `)
+                    }
                 }
                 if(scroll) {
                     $("#conversationContainer").stop().animate({ scrollTop: $("#conversationContainer")[0].scrollHeight}, 1000);
