@@ -157,6 +157,15 @@ def get_all_conversations(ticket):
 	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received"])
 	return conversations
 
+@frappe.whitelist()
+def get_all_attachments(ticket):
+	attachments = frappe.get_all(
+		"File", 
+		["name", "file_name", "file_url", "is_private"],
+		{"attached_to_name": ticket, "attached_to_doctype": "Ticket"}
+	)
+	return attachments
+
 def get_list_context(context=None):
 	return {
 		"title": _("Tickets"),

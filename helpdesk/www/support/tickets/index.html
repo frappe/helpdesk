@@ -42,9 +42,17 @@
                 <p>{{ ticket.description }}</p>
             </div>
             <div class="ticket-card-footer">
+                {% set attachments = frappe.db.get_all("File", ["name"], {"attached_to_name": ticket.name, "attached_to_doctype": "Ticket"})%}
                 {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket.name]}) %}
-                <div class="float-right">
-                    <i class="bi bi-chat-left"></i> {{ conversations|length }}
+                <div class="float-right d-flex">
+                    {% if attachments|length > 0 %}
+                    <div class="mr-3">
+                        <i class="bi bi-paperclip"></i> {{ attachments|length }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <i class="bi bi-chat-left"></i> {{ conversations|length }}
+                    </div>
                 </div>
             </div>
         </div>
