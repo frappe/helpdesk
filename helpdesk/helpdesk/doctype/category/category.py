@@ -48,4 +48,4 @@ class Category(WebsiteGenerator):
 		if category_doc.parent_category:
 			return self.get_page_route(route, category_doc.parent_category)
 		else:
-			return f"hc/{route}"
+			return f"support/kb/{route}"
