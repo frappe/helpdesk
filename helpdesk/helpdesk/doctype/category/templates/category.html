@@ -2,14 +2,7 @@
 
 {% block page_content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-<div class="d-flex mb-10">
-    <a href='/support/kb/'>Home</a><span class="pl-2"> > </span>
-    {% if parent_category %}
-    {% set parent_category_route = frappe.db.get_value("Category", parent_category, ['route'])%}
-    <a href="/{{ parent_category_route }}" class="pl-2"> {{ parent_category }} </a><span class="pl-2"> > </span>
-    {% endif %}
-    <span class="pl-2"> {{ name }}</span>
-</div>
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
 <div>
     <div class="mb-20">
         <h2 class="">Knowledge Base</h2>
