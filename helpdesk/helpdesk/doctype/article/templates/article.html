@@ -1,44 +1,41 @@
 {% extends "templates/web.html" %}
 
 {% block page_content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 {{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
-<div>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-	<div class="d-flex">
-		<div class="col-7 pr-20">
-			<h2>{{ title }}</h2>
-			<div>
-				<i class="bi bi-clock smile mr-1"></i>
-				<span class="text-secondary">Last updated on {{ frappe.format_date(modified) }}</span>
-			</div>
-			<div class="from-markdown my-8" itemprop="articleBody">
-				{{ content }}
-			</div>
-			<div class="card border-0 p-0 bg-light" style="width: min-content;">
-				<div class="card-body feedback-view bg-gray-500">
-					<div class="article-feedback d-flex flex-nowrap">
-						<div style="white-space: nowrap;">{{ _("Did you find this useful?") }}</div>
-						<i class="feedback bi bi-emoji-smile mx-1 ml-3" data-value="Yes"></i>
-						<i class="feedback bi bi-emoji-frown mx-1" data-value="No"></i>
-					</div>
-					<span class="feedback-msg small hidden" style="white-space: nowrap;">{{ _("Thank you for your feedback!") }}</span>
+<div class="d-flex">
+	<div class="col-7 pr-20 pl-0">
+		<h2>{{ title }}</h2>
+		<div>
+			<i class="bi bi-clock smile mr-1"></i>
+			<span class="text-secondary">Last updated on {{ frappe.format_date(modified) }}</span>
+		</div>
+		<div class="from-markdown my-8" itemprop="articleBody">
+			{{ content }}
+		</div>
+		<div class="card border-0 p-0 bg-light" style="width: min-content;">
+			<div class="card-body feedback-view bg-gray-500">
+				<div class="article-feedback d-flex flex-nowrap">
+					<div style="white-space: nowrap;">{{ _("Did you find this useful?") }}</div>
+					<i class="feedback bi bi-emoji-smile mx-1 ml-3" data-value="Yes"></i>
+					<i class="feedback bi bi-emoji-frown mx-1" data-value="No"></i>
 				</div>
-			  </div>
-		</div>
-		<div class="col-5">
-			<h2 class="mb-8">{{ _("Related") }}</h2>
-			{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["title", "route"]) %}
-			{% set max_related_articles = 5 %}
-			{% for related_article in related_articles %}
-			{% if loop.index < max_related_articles %}
-			<div class="article-list mb-3">
-				<span style="color: #2490EF;" role="button" onclick="window.location='/{{ related_article.route }}'">{{ related_article.title }}</span>
+				<span class="feedback-msg small hidden" style="white-space: nowrap;">{{ _("Thank you for your feedback!") }}</span>
 			</div>
-			{% endif %}
-			{% endfor %}
-		</div>
+		  </div>
 	</div>
-
+	<div class="col-5">
+		<h2 class="mb-8">{{ _("Related") }}</h2>
+		{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["title", "route"]) %}
+		{% set max_related_articles = 5 %}
+		{% for related_article in related_articles %}
+		{% if loop.index < max_related_articles %}
+		<div class="article-list mb-3">
+			<span style="color: #2490EF;" role="button" onclick="window.location='/{{ related_article.route }}'">{{ related_article.title }}</span>
+		</div>
+		{% endif %}
+		{% endfor %}
+	</div>
 </div>
 
 <hr>

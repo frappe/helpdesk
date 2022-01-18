@@ -23,6 +23,6 @@ def get_breadcrumbs(route):
             for doctype in allowed_doctypes:
                 label = frappe.get_all(doctype["name"], filters=[["route", "=", full_route[1:]]], pluck=doctype["title_field"])
                 if label:
-                    parents.append({"route": "/" + full_route, "label": label[0]})
+                    parents.append({"route": full_route, "label": label[0]})
                     break
         return parents

@@ -1,8 +1,9 @@
-<div class="breadcrumb-container">
-	
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<div class="breadcrumb-container d-flex mb-10">
 </div>
 
 <script>
+	// TODO: use server side rendering instead
 	frappe.ready(function() {
 		frappe.call({
 			method: "helpdesk.templates.components.breadcrumbs.breadcrumbs.get_breadcrumbs",
@@ -11,11 +12,20 @@
 			},
 			callback: function(r) {
 				let parents = r.message
+				let breadcrumbContainer = $(".breadcrumb-container");
+				breadcrumbContainer.append(`
+					<a href='/support/kb/'>Home</a>
+				`);
 				if(parents) {
-					let breadcrumbContainer = $(".breadcrumb-container");
 					for(var i = 0; i < parents.length; i++) {
+						console.log(parents[i]["route"])
 						breadcrumbContainer.append(`
-							<span>${parents[i]["label"]} > </span>
+							<i class="px-2 bi bi-chevron-right"></i>
+							${
+								i < parents.length - 1 ? 
+								`<a href='${parents[i]["route"]}'>${parents[i]["label"]}</a>`:
+								`<span>${parents[i]["label"]}</span>`
+							}
 						`)
 					}
 				}
