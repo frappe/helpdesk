@@ -31,7 +31,7 @@ class Article(WebsiteGenerator):
 			return "".join(res)
 
 		category_doc = frappe.get_doc("Category", self.category)
-		return f"{category_doc.route}{change_case(self.name)}"
+		return f"{category_doc.route}/{change_case(self.name)}"
 
 
 @frappe.whitelist(allow_guest=True)
