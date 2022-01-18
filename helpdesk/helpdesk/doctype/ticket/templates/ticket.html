@@ -2,7 +2,7 @@
 
 {% block page_content %}
 {% if owner == frappe.session.user %}
-<main class="content">
+<main class="content pb-4">
     <div class="container p-0">
 		<div class="">
 			<div class="row g-0">
@@ -15,27 +15,35 @@
                     {% endif %}
                     <div class="position-relative mt-5">
                         <div id="attachmentContainer">
-						</div>
-					</div>
+                        </div>
+                    </div>
                 </div>
 				<div class="chat-container col-12 col-lg-7 col-xl-9">
-					<div class="position-relative">
+                    <div class="position-relative">
+                        <div class="px-4 pb-3 mb-1">
+                            <div>
+                                Created on {{ frappe.format_date(creation) }}
+                            </div>
+                            <div class="font-weight-bold">
+                                {{ subject }}
+                            </div>
+                        </div>
                         <div id="conversationContainer" class="chat-messages p-4">
 						</div>
 					</div>
                     {% if status != "Resolved" %}
-					<div class="flex-grow-0 py-3 px-4">
-						<div class="input-group">
-							<input id="messageInput" type="text" class="form-control" placeholder="Type your message">
+                    <div class="flex-grow-0 py-3 px-4">
+                        <div class="input-group">
+                            <input id="messageInput" type="text" class="form-control" placeholder="Type your message">
                             <button id="attachButton" class="btn btn-secondary mx-2">Attach</button>
                             <button id="submitButton" class="btn btn-primary">Send</button>
-						</div>
-					</div>
+                        </div>
+                    </div>
                     {% else %}
                     <div class="card border-0 d-flex flex-row justify-content-between mt-3 p-4 bg-light">
                         <span class="mt-1">This ticket has been marked as resolved</span>
                         <button id="reOpenButton" class="btn btn-sm btn-primary mx-2">REOPEN</button>
-					</div>
+                    </div>
                     {% endif %}
 				</div>
 			</div>
@@ -77,6 +85,12 @@
     margin-left: auto
 }
 
+.attachment {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 </style>
 <script>
     frappe.ready(function() {
@@ -87,7 +101,6 @@
 
         $("#submit").click(function() {
             var data = $("#btn-input").val();
-                //console.log(data);
                 $('chat_log').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div><div class="row msg_container base_receive"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div>');
                 clearInput();
             });
@@ -116,7 +129,6 @@
             },
             callback: function(r) {
                 let attachments = r.message;
-                console.log(attachments)
                 let attachmentContainer = $("#attachmentContainer");
                 attachmentContainer.empty();
                 if(attachments.length > 0) {
@@ -128,7 +140,7 @@
                     for(var i = 0; i < attachments.length; i++) {
                         attachmentContainer.append(`
                             <div class="pb-2">
-                                <div class="flex-shrink-1 bg-light rounded py-2 px-3">
+                                <div role="button" class="attachment flex-shrink-1 bg-light rounded py-2 px-3" onclick="window.open('${attachments[i].file_url}', '_blank')">
                                     ${attachments[i].file_name}
                                 </div>
                             </div>
@@ -149,30 +161,40 @@
                 let conversations = r.message;
                 let conversationContainer = $("#conversationContainer");
                 conversationContainer.empty();
-                conversationContainer.append(`
-                    <div class="p-4 mb-4">
-                        <div>
-                            Created on {{ frappe.format_date(creation) }}
-                        </div>
-                        <div class="font-weight-bold">
-                            {{ subject }}
-                        </div>
-                    </div>
-                `)
                 for(var i = 0; i < conversations.length; i++) {
+                    let conversationElement = jQuery('<div>').appendTo(conversationContainer);
+                        
                     let is_received = conversations[i].sent_or_received == "Received";
-                    let agent_img = "https://cdn-icons.flaticon.com/png/512/2993/premium/2993151.png?token=exp=1642374990~hmac=7651e44832fd0866663523c8f51faf77"
-                    let person_img = "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
-                    conversationContainer.append(`
-                        <div class="${is_received ? 'chat-message-right' : 'chat-message-left'} pb-4">
-                            <div>
-                                <img src="${is_received ? person_img : agent_img}" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
+                    conversationElement.append(`
+                        <div class="flex-shrink-1 bg-light rounded p-5 mr-3 mb-4">
+                            <div class="top-section d-flex justify-content-between mb-4">
+                                <strong>
+                                    ${is_received ? "You" : "Agent"}
+                                </strong>
+                                <p>
+                                    ${conversations[i].creation}
+                                </p>
                             </div>
-                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
-                                ${conversations[i].content}
+                            <div class="message">
+                                <p>
+                                    ${conversations[i].content}
+                                </p>
+                            </div>
+                            <div class="attachments">
                             </div>
                         </div>
-                    `);
+                    `)
+
+                    let attachmentContainer = conversationElement.find(".attachments");
+                    
+                    for(var j = 0; j < conversations[i].attachments.length; j++) {
+                        let attachment = conversations[i].attachments[j]
+                        attachmentContainer.append(`
+                            <div role="button" class="attachment bg-secondary text-white rounded my-2 p-2" onclick="window.open('${attachment.file_url}', '_blank')">
+                                ${attachment.file_name}
+                            </div>
+                        `)
+                    }
                 }
                 if(scroll) {
                     $("#conversationContainer").stop().animate({ scrollTop: $("#conversationContainer")[0].scrollHeight}, 1000);
