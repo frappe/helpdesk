@@ -1,0 +1,25 @@
+<div class="breadcrumb-container">
+	
+</div>
+
+<script>
+	frappe.ready(function() {
+		frappe.call({
+			method: "helpdesk.templates.components.breadcrumbs.breadcrumbs.get_breadcrumbs",
+			args: {
+				route: window.location.href.toString().split(window.location.host)[1] 
+			},
+			callback: function(r) {
+				let parents = r.message
+				if(parents) {
+					let breadcrumbContainer = $(".breadcrumb-container");
+					for(var i = 0; i < parents.length; i++) {
+						breadcrumbContainer.append(`
+							<span>${parents[i]["label"]} > </span>
+						`)
+					}
+				}
+			}
+		})
+	})
+</script>
