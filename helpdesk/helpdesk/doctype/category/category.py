@@ -19,6 +19,9 @@ class Category(WebsiteGenerator):
 		if self.is_group:
 			if self.parent_category:
 				frappe.throw(_("Can only create category with atmost a single nesting"))
+		else:
+			if not self.parent_category:
+				frappe.throw(_("Can only create leaf nodes within a parent category"))
 
 	def before_save(self):
 		self.route = self.get_page_route()
