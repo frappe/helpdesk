@@ -29,7 +29,7 @@
             {% set user_email = frappe.session.user %}
             {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['name', 'subject', 'description', 'status', 'creation', 'route']) %}
             {% for ticket in tickets %}
-            <div class="list-group-item" onclick="window.location='/{{ ticket.route}}'">
+            <a href="/{{ ticket.route}}" class="list-group-item list-group-item-action rounded">
                 <div class="float-right">
                     {% if ticket.status == "Resolved" %}
                     <span class="indicator-pill green filterable ellipsis">Resolved</span>
@@ -41,7 +41,7 @@
                     <h3>{{ ticket.subject }}</h3>
                     <span class="">{{ frappe.format(ticket.creation) }}</span>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     </div>
