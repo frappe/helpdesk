@@ -4,9 +4,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 {% if frappe.session.user != "Guest" %}
 <div class="main-container">
-    <div class="d-flex mb-4">
+    <div class="d-flex mb-2">
         <div class="mr-auto">
-            <h3>Your Tickets</h3>
+            <h2>Your Tickets</h2>
         </div>
         <div class="d-flex">
             <div class="dropdown mr-2">
@@ -19,44 +19,31 @@
                     <a class="dropdown-item">Show Resolved</a>
                 </div>
             </div>
-            <a class="btn btn-primary btn-sm" onclick="window.location='/support/tickets/new'">New Ticket</a>
+            <div>
+                <button class="btn btn-sm btn-primary" onclick="window.location='/support/tickets/new'">New Ticket</button>
+            </div>
         </div>
     </div>
-    <div class="tickets-container">
-        {% set user_email = frappe.session.user %}
-        {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['name', 'subject', 'description', 'status', 'creation', 'route']) %}
-        {% for ticket in tickets %}
-        <div role="button" class="card border-0 bg-light p-4 my-2" onclick="window.location='/{{ ticket.route}}'">
-            <div class="ticket-card-top-section mb-3">
-                <i class="bi bi-journal mr-2"></i>
-                <strong>Ticket #{{ ticket.name }}</strong>
-                {% if ticket.status == "Resolved" %}
-                <span class="ml-2 badge badge-success">Resolved</span>
-                {% else %}
-                <span class="ml-2 badge badge-warning">Open</span>
-                {% endif %}
-                <span class="float-right">{{ frappe.format(ticket.creation) }}</span>
-            </div>
-            <div class="ticket-card-main">
-                <h3>{{ ticket.subject }}</h3>
-                <p>{{ ticket.description }}</p>
-            </div>
-            <div class="ticket-card-footer">
-                {% set attachments = frappe.db.get_all("File", ["name"], {"attached_to_name": ticket.name, "attached_to_doctype": "Ticket"})%}
-                {% set conversations = frappe.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket.name]}) %}
-                <div class="float-right d-flex">
-                    {% if attachments|length > 0 %}
-                    <div class="mr-3">
-                        <i class="bi bi-paperclip"></i> {{ attachments|length }}
-                    </div>
+    <div class="frappe-card bg-white">
+        <div class="list-group-flush tickets-container">
+            {% set user_email = frappe.session.user %}
+            {% set tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', user_email]}, fields=['name', 'subject', 'description', 'status', 'creation', 'route']) %}
+            {% for ticket in tickets %}
+            <div class="list-group-item" onclick="window.location='/{{ ticket.route}}'">
+                <div class="float-right">
+                    {% if ticket.status == "Resolved" %}
+                    <span class="indicator-pill green filterable ellipsis">Resolved</span>
+                    {% else %}
+                    <span class="indicator-pill orange filterable ellipsis">Open</span>
                     {% endif %}
-                    <div>
-                        <i class="bi bi-chat-left"></i> {{ conversations|length }}
-                    </div>
+                </div>
+                <div class="ticket-card-main">
+                    <h3>{{ ticket.subject }}</h3>
+                    <span class="">{{ frappe.format(ticket.creation) }}</span>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 {% else %}
