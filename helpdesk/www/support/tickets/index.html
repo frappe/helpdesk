@@ -44,28 +44,29 @@
     let allTickets = [];
 
     frappe.ready(function() {
-        frappe.call({
-            btn: this,
-            method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_user_tickets",
-            callback: function(r) {
-                allTickets = r.message;
-                showTickets();
-            }
-        })
-
-        $(".dropdown-menu a").click(function(){
-            var selText = $(this).text();
-            showTickets(filter=selText);
-            let selectedOption = ""
-            if(selText == "Show Resolved") {
-                selectedOption = "Show Resolved";
-            } else if(selText == "Show Open") {
-                selectedOption = "Show Open";
-            } else {
-                selectedOption = "Show All";
-            }
-            $("#dropdownTitle").html(selectedOption);
-        });
+        if(frappe.session.user != "Guest") {
+            frappe.call({
+                btn: this,
+                method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_user_tickets",
+                callback: function(r) {
+                    allTickets = r.message;
+                    showTickets();
+                }
+            })
+            $(".dropdown-menu a").click(function(){
+                var selText = $(this).text();
+                showTickets(filter=selText);
+                let selectedOption = ""
+                if(selText == "Show Resolved") {
+                    selectedOption = "Show Resolved";
+                } else if(selText == "Show Open") {
+                    selectedOption = "Show Open";
+                } else {
+                    selectedOption = "Show All";
+                }
+                $("#dropdownTitle").html(selectedOption);
+            });
+        }
     })
 
     function showTickets(filter="Show All") {
