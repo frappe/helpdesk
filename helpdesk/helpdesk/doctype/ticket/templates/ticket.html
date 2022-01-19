@@ -1,19 +1,20 @@
 {% extends 'templates/web.html'%}
 
 {% block page_content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 {% if owner == frappe.session.user %}
 <main class="content pb-4">
     <div class="container p-0">
 		<div class="">
 			<div class="row g-0">
 				<div class="col-12 col-lg-5 col-xl-3 mb-4">
-                    <strong>Ticket #{{ name }}</strong>
+                    <span class="h5 mr-2">Ticket #{{ name }}</span>
                     {% if status == "Resolved" %}
-                    <span class="ml-2 d-inline-block rounded badge badge-success">Resolved</span>
+                    <span class="indicator-pill orange">Resolved</span>
                     {% else %}
-                    <span class="ml-2 d-inline-block rounded badge badge-warning align-center">Open</span>
+                    <span class="indicator-pill orange">Open</span>
                     {% endif %}
-                    <div class="position-relative mt-5">
+                    <div class="position-relative mt-5 d-none d-lg-block">
                         <div id="attachmentContainer">
                         </div>
                     </div>
@@ -22,10 +23,14 @@
                     <div class="position-relative">
                         <div class="px-4 pb-3 mb-1">
                             <div>
-                                Created on {{ frappe.format_date(creation) }}
+                                <span class="h7">
+                                    Created on {{ frappe.format_date(creation) }}
+                                </span>
                             </div>
-                            <div class="font-weight-bold">
-                                {{ subject }}
+                            <div>
+                                <span class="h5">
+                                    {{ subject }}
+                                </span>
                             </div>
                         </div>
                         <div id="conversationContainer" class="chat-messages p-4">
@@ -57,43 +62,9 @@
     </p>
 </div>
 {% endif %}
-
-<style>
-.chat-container {
-    height: 550px;
-}
-
-.chat-messages {
-    display: flex;
-    flex-direction: column;
-    height: 550px;
-    overflow-y: scroll
-}
-
-.chat-message-left,
-.chat-message-right {
-    display: flex;
-    flex-shrink: 0
-}
-
-.chat-message-left {
-    margin-right: auto
-}
-
-.chat-message-right {
-    flex-direction: row-reverse;
-    margin-left: auto
-}
-
-.attachment {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-</style>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
-    frappe.ready(function() {
+    frappe.ready(function() {        
         refreshConversations(true);
         refreshAttachments();
         setInterval(refreshConversations, 5000, false);
@@ -101,23 +72,23 @@
 
         $("#submit").click(function() {
             var data = $("#btn-input").val();
-                $('chat_log').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div><div class="row msg_container base_receive"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div>');
-                clearInput();
-            });
+            $('chat_log').append('<div class="row msg_container base_sent"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div><div class="row msg_container base_receive"><div class="col-md-10 col-xs-10"><div class="messages msg_receive"><p>'+data+'</p></div></div></div>');
+            clearInput();
+        });
             
-            $("#submitButton").click(function() {
-                frappe.call({
-                    btn: this,
-                    method: "helpdesk.helpdesk.doctype.ticket.ticket.create_communication_via_contact",
-                    args: {
-                        ticket: "{{ name }}",
-                        message: $("#messageInput").val()
-                    },
-                    callback: function(r) {
+        $("#submitButton").click(function() {
+            frappe.call({
+                btn: this,
+                method: "helpdesk.helpdesk.doctype.ticket.ticket.create_communication_via_contact",
+                args: {
+                    ticket: "{{ name }}",
+                    message: $("#messageInput").val()
+                },
+                callback: function(r) {
                     $("#messageInput").val('')
                     refreshConversations(true);
-				}
-			})
+                }
+            })
         })
     })
 
@@ -133,15 +104,16 @@
                 attachmentContainer.empty();
                 if(attachments.length > 0) {
                     attachmentContainer.append(`
-                        <div>
-                            <span class="mb-2">Attachments</span>
+                        <div class="mb-3">
+                            <span>Attachments</span>
                         </div>
                     `)
                     for(var i = 0; i < attachments.length; i++) {
                         attachmentContainer.append(`
-                            <div class="pb-2">
-                                <div role="button" class="attachment flex-shrink-1 bg-light rounded py-2 px-3" onclick="window.open('${attachments[i].file_url}', '_blank')">
-                                    ${attachments[i].file_name}
+                        <div class="pb-2">
+                            <div role="button" class="frappe-card attachment flex-shrink-1 rounded py-2 px-3" onclick="window.open('${attachments[i].file_url}', '_blank')">
+                                    <i class="bi bi-paperclip"></i>
+                                    <span>${attachments[i].file_name}</span>
                                 </div>
                             </div>
                         `);
@@ -166,14 +138,14 @@
                         
                     let is_received = conversations[i].sent_or_received == "Received";
                     conversationElement.append(`
-                        <div class="flex-shrink-1 bg-light rounded p-5 mr-3 mb-4">
+                        <div class="flex-shrink-1 bg-white frappe-card rounded p-5 mr-3 mb-4">
                             <div class="top-section d-flex justify-content-between mb-4">
-                                <strong>
+                                <span class="h6">
                                     ${is_received ? "You" : "Agent"}
-                                </strong>
-                                <p>
+                                </span>
+                                <span class="h7">
                                     ${conversations[i].creation}
-                                </p>
+                                </span>
                             </div>
                             <div class="message">
                                 <p>
@@ -186,12 +158,13 @@
                     `)
 
                     let attachmentContainer = conversationElement.find(".attachments");
-                    
+
                     for(var j = 0; j < conversations[i].attachments.length; j++) {
                         let attachment = conversations[i].attachments[j]
                         attachmentContainer.append(`
-                            <div role="button" class="attachment bg-secondary text-white rounded my-2 p-2" onclick="window.open('${attachment.file_url}', '_blank')">
-                                ${attachment.file_name}
+                            <div role="button" class="attachment text-secondary rounded my-2" onclick="window.open('${attachment.file_url}', '_blank')">
+                                <i class="bi bi-paperclip"></i>
+                                <span class="h7">${attachment.file_name}</span>
                             </div>
                         `)
                     }
@@ -202,7 +175,38 @@
             }
         })
     }
-
 </script>
-
+<style>
+    .chat-container {
+        height: 550px;
+    }
+    
+    .chat-messages {
+        display: flex;
+        flex-direction: column;
+        height: 550px;
+        overflow-y: scroll
+    }
+    
+    .chat-message-left,
+    .chat-message-right {
+        display: flex;
+        flex-shrink: 0
+    }
+    
+    .chat-message-left {
+        margin-right: auto
+    }
+    
+    .chat-message-right {
+        flex-direction: row-reverse;
+        margin-left: auto
+    }
+    
+    .attachment {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
 {% endblock %}
