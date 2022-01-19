@@ -30,7 +30,7 @@ class Category(WebsiteGenerator):
 		def change_case(str):
 			res = [str[0].lower()]
 			for c in str[1:]:
-				if c in ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+				if c in ("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"):
 					res.append("_")
 					res.append(c.lower())
 				elif c in (" "):
@@ -46,7 +46,7 @@ class Category(WebsiteGenerator):
 		else:
 			category_doc = frappe.get_doc("Category", category)
 
-		route = f'{change_case(category_doc.name)}{f"/{route}" if route else ""}'
+		route = f'{change_case(category_doc.category_name)}{f"/{route}" if route else ""}'
 
 		if category_doc.parent_category:
 			return self.get_page_route(route, category_doc.parent_category)
