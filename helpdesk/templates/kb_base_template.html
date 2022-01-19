@@ -1,0 +1,33 @@
+{% extends "templates/web.html" %}
+
+{% block navbar %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<nav class="navbar navbar-light navbar-expand-lg">
+    <div class="container">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="ml-auto navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/support/tickets">Submit a Ticket</a>
+                </li>
+            </ul>
+        </div>
+        <div class="form-group mb-0 hide" id="language-switcher">
+            <select class="form-control"></select>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+{% block footer %}
+<footer class="web-footer">
+    <div class="container">
+        <div class="footer-info">
+            <div class="row">
+                <div class="footer-col-left col-sm-6 col-12"></div>
+                <div class="footer-col-right col-sm-6 col-12 footer-powered">
+                    <a class="text-muted" href="https://frappeframework.com?source=website_footer" target="_blank">Powered by Frappe Helpdesk</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}

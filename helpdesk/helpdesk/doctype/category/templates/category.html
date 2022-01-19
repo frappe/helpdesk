@@ -1,16 +1,8 @@
-{% extends "templates/web.html" %}
+{% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
-<div>
-    <div class="mb-20">
-        <h2 class="">Knowledge Base</h2>
-        <div class="w-50">
-            <input id="propSearchBar" class="form-control" type="text" placeholder="Search the docs"  maxlength="0">
-        </div>
-    </div>
-</div>
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {}) }}
+{{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
 {% if is_group %}
 <div class="d-flex flex-wrap">
     {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
@@ -22,10 +14,14 @@
         {% for article in articles %}
         {% if loop.index < max_articles %}
         <div class="article-list">
+            <i class="bi bi-journals mr-1"></i>
             <span style="color: #2490EF;" role="button" onclick="window.location='/{{ article.route }}'">{{ article.title }}</span>
         </div>
         {% elif loop.index == max_articles %}
-        <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
+        <div class="mt-2 d-flex">
+            <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
+            <i class="pl-2 bi bi-chevron-right"></i>
+        </div>
         {% endif %}
         {% endfor %}
     </div>
@@ -50,25 +46,9 @@
 </div>
 {% endif %}
 
-<hr>
-<div class="mt-20">
-    <div class="my-1 d-flex justify-content-center">
-        <p>{{ _("Still got questions? We're here to assist you.") }}</p>
-    </div>
-    <div class="d-flex justify-content-center">
-        <button class="btn btn-primary">{{ _("Contact with us") }}</button>
-    </div>
-</div>
+{{ frappe.render_template('templates/components/contact_with_us.html', {'hr_tag': true}) }}
 
 {{ frappe.render_template('templates/components/search/search.html', {}) }}
-
-<script>
-    frappe.ready(function() {
-        $("#propSearchBar").click(function() {
-            showSearchBar();
-        })
-    });
-</script>
 
 {% endblock %}
 
