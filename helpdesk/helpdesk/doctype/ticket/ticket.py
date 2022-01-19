@@ -186,6 +186,10 @@ def get_list_context(context=None):
 		"no_breadcrumbs": True,
 	}
 
+@frappe.whitelist()
+def get_all_user_tickets():
+	tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', frappe.session.user]}, fields=['name', 'subject', 'description', 'status', 'creation', 'route'])
+	return tickets
 
 def get_ticket_list(
 	doctype, txt, filters, limit_start, limit_page_length=20, order_by=None
