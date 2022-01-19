@@ -2,15 +2,8 @@
 
 {% block page_content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
-<div>
-    <div class="mb-20">
-        <h2 class="">Knowledge Base</h2>
-        <div class="w-50">
-            <input id="propSearchBar" class="form-control" type="text" placeholder="Search the docs"  maxlength="0">
-        </div>
-    </div>
-</div>
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {}) }}
+{{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
 {% if is_group %}
 <div class="d-flex flex-wrap">
     {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
@@ -53,14 +46,6 @@
 {{ frappe.render_template('templates/components/contact_with_us.html', {'hr_tag': true}) }}
 
 {{ frappe.render_template('templates/components/search/search.html', {}) }}
-
-<script>
-    frappe.ready(function() {
-        $("#propSearchBar").click(function() {
-            showSearchBar();
-        })
-    });
-</script>
 
 {% endblock %}
 
