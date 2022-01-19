@@ -1,7 +1,6 @@
 {% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 {{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {}) }}
 {{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
 {% if is_group %}
@@ -15,10 +14,14 @@
         {% for article in articles %}
         {% if loop.index < max_articles %}
         <div class="article-list">
+            <i class="bi bi-journals mr-1"></i>
             <span style="color: #2490EF;" role="button" onclick="window.location='/{{ article.route }}'">{{ article.title }}</span>
         </div>
         {% elif loop.index == max_articles %}
-        <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
+        <div class="mt-2 d-flex">
+            <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
+            <i class="pl-2 bi bi-chevron-right"></i>
+        </div>
         {% endif %}
         {% endfor %}
     </div>

@@ -20,8 +20,11 @@
         {% for category in categories %}
         <div class="category_card card m-4 px-3 py-4" data-value="{{category.name}}">
             <div class="card-body">
-              <h5 class="card-title text-center" style="color:#2490EF;">{{category.name}}</h5>
-              <p class="card-text text-center">{{category.description}}</p>
+                <div class="d-flex">
+                    <h5 class="card-title" style="color:#2490EF;">{{category.name}}</h5>
+                    <i class="pl-2 bi bi-chevron-right"></i>
+                </div>
+                <p class="card-text">{{category.description}}</p>
             </div>
           </div>
         {% endfor %}
