@@ -16,12 +16,12 @@
 		</div>
 		<div class="card border-0 p-0 bg-light" style="width: min-content;">
 			<div class="card-body feedback-view bg-gray-500">
-				<div class="article-feedback d-flex flex-nowrap">
+				<div id="feedbackQustion" class="article-feedback d-flex flex-nowrap">
 					<div style="white-space: nowrap;">{{ _("Did you find this useful?") }}</div>
-					<i class="feedback bi bi-emoji-smile mx-1 ml-3" data-value="Yes"></i>
-					<i class="feedback bi bi-emoji-frown mx-1" data-value="No"></i>
+					<i class="happy-face feedback bi bi-emoji-smile mx-1 ml-3" data-value="Yes"></i>
+					<i class="sad-face feedback bi bi-emoji-frown mx-1" data-value="No"></i>
 				</div>
-				<span class="feedback-msg small hidden" style="white-space: nowrap;">{{ _("Thank you for your feedback!") }}</span>
+				<span class="feedback-msg hidden" style="white-space: nowrap;">{{ _("Thank you for your feedback!") }}</span>
 			</div>
 		  </div>
 	</div>
@@ -37,8 +37,7 @@ frappe.ready(function() {
     let article = "{{ reference_name or name }}"
     
     if(localStorage[`${article}_feedback_done`]) {
-        $(".feedback")[0].classList.add("hidden");
-        $(".feedback")[1].classList.add("hidden");
+		$("#feedbackQustion").empty();
         $(".feedback-msg")[0].classList.remove("hidden");
     } else {
         frappe.call({
@@ -60,14 +59,21 @@ frappe.ready(function() {
 			method: "helpdesk.helpdesk.doctype.article.article.add_feedback",
 			args: args,
 			callback: function(r) {
-				$(".feedback")[0].classList.add("hidden");
-				$(".feedback")[1].classList.add("hidden");
+				$("#feedbackQustion").empty();
 				$(".feedback-msg")[0].classList.remove("hidden");
-
                 localStorage[`${article}_feedback_done`] = true;
 			}
 		})
 	});
 });
 </script>
+
+<style>
+	.happy-face:hover {
+		color: #48BB74;
+	}
+	.sad-face:hover {
+		color: #E24C4C;
+	}
+</style>
 {% endblock %}
