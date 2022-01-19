@@ -2,7 +2,6 @@
  "actions": [],
  "allow_guest_to_view": 1,
  "allow_rename": 1,
- "autoname": "field:title",
  "creation": "2021-12-30 19:23:43.318867",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -10,8 +9,8 @@
  "field_order": [
   "title",
   "category",
-  "content",
   "published",
+  "content",
   "route",
   "views",
   "helpful",
@@ -21,6 +20,8 @@
   {
    "fieldname": "title",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Title",
    "reqd": 1,
    "unique": 1
@@ -77,11 +78,11 @@
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-01-05 05:16:38.045956",
+ "migration_hash": "5efa644fe03ec03710e05d7de7188451",
+ "modified": "2022-01-20 00:48:16.242127",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
