@@ -4,7 +4,7 @@
 {{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
 {{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
 <div class="d-flex">
-	<div class="pl-0">
+	<div class="col-7 pr-20 pl-0">
 		<h2>{{ title }}</h2>
 		<div>
 			<i class="bi bi-clock smile mr-1"></i>
@@ -23,6 +23,18 @@
 				<span class="feedback-msg hidden" style="white-space: nowrap;">{{ _("Thank you for your feedback!") }}</span>
 			</div>
 		  </div>
+	</div>
+	<div class="col-5 hidden">
+		<h2 class="mb-8">{{ _("Related") }}</h2>
+		{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["title", "route"]) %}
+		{% set max_related_articles = 5 %}
+		{% for related_article in related_articles %}
+		{% if loop.index < max_related_articles %}
+		<div class="article-list mb-3">
+			<span style="color: #2490EF;" role="button" onclick="window.location='/{{ related_article.route }}'">{{ related_article.title }}</span>
+		</div>
+		{% endif %}
+		{% endfor %}
 	</div>
 </div>
 
