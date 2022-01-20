@@ -9,7 +9,7 @@
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
     <div class="col-sm-6 col-12 my-4 p-0">
-        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name]}, fields=['title', 'route']) %}
+        {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name], "published": ['=', '1']}, fields=['title', 'route']) %}
         <h3 role="button" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }}</h3>
         {% for article in articles %}
         {% if loop.index < max_articles %}
@@ -29,7 +29,7 @@
 </div>
 {% else %}
 <div class="mb-5">
-    {% set articles = frappe.get_all("Article", filters={"category": ['=', name]}, fields=['title', 'route', 'creation']) %}
+    {% set articles = frappe.get_all("Article", filters={"category": ['=', name], "published": ['=', '1']}, fields=['title', 'route', 'creation']) %}
     <h2>{{ name }} ({{ articles|length }})</h2>
     <table class="table table-borderless table-hover">
         <tbody>
