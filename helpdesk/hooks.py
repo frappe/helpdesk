@@ -7,7 +7,8 @@ app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
 
-before_install = "helpdesk.setup.install.initial_setup"
+before_install = "helpdesk.setup.install.before_install"
+after_install = "helpdesk.setup.install.after_install"
 
 # TODO: the logic for has_website_permission is minimised a little for now, will need to re-check
 has_website_permission = {
