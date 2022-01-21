@@ -14,10 +14,6 @@
                     {% else %}
                     <span class="indicator-pill orange">Open</span>
                     {% endif %}
-                    <div class="position-relative mt-5 d-none d-lg-block">
-                        <div id="attachmentContainer">
-                        </div>
-                    </div>
                 </div>
 				<div class="chat-container col-12 col-lg-7 col-xl-9">
                     <div class="position-relative">
@@ -66,9 +62,7 @@
 <script>
     frappe.ready(function() {        
         refreshConversations(true);
-        refreshAttachments();
         setInterval(refreshConversations, 5000, false);
-        setInterval(refreshAttachments, 10000)
 
         $("#submit").click(function() {
             var data = $("#btn-input").val();
@@ -91,37 +85,6 @@
             })
         })
     })
-
-    function refreshAttachments() {
-        frappe.call({
-            method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_attachments",
-            args: {
-                ticket: "{{ name }}",
-            },
-            callback: function(r) {
-                let attachments = r.message;
-                let attachmentContainer = $("#attachmentContainer");
-                attachmentContainer.empty();
-                if(attachments.length > 0) {
-                    attachmentContainer.append(`
-                        <div class="mb-3">
-                            <span>Attachments</span>
-                        </div>
-                    `)
-                    for(var i = 0; i < attachments.length; i++) {
-                        attachmentContainer.append(`
-                        <div class="pb-2">
-                            <div role="button" class="frappe-card attachment flex-shrink-1 rounded py-2 px-3" onclick="window.open('${attachments[i].file_url}', '_blank')">
-                                    <i class="bi bi-paperclip"></i>
-                                    <span>${attachments[i].file_name}</span>
-                                </div>
-                            </div>
-                        `);
-                    }
-                }
-            }
-        })
-    }
 
     function refreshConversations(scroll) {
         frappe.call({
