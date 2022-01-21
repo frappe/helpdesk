@@ -1,8 +1,8 @@
 {% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-<div class="my-40 d-flex justify-content-center">
-    <div class="w-50">
+<div class="container my-40 d-flex justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
         <div class="justify-content-center d-flex">
             <h2>{{ _("How can we help you?") }}</h2>
         </div>
@@ -16,9 +16,9 @@
             <h3>{{ _("Explore the Knowledge Base") }}</h3>
         </div>
     </div>
-    <div class="d-flex flex-nowrap">
+    <div class="category-card-container">
         {% for category in categories %}
-        <div class="category_card card m-4 px-3 py-4" data-value="{{category.name}}">
+        <div class="category-card card" data-value="{{category.name}}">
             <div class="card-body">
                 <div class="d-flex">
                     <h5 class="card-title" style="color:#2490EF;">{{category.name}}</h5>
@@ -44,6 +44,23 @@
     .card:hover{
         transform: scale(1.005);
         box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+    }
+
+    .category-card-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .category-card {
+        box-sizing: border-box;
+        flex: 250px;
+        margin: 1rem;
+        padding: 1rem;
+        border-radius: 5px;
+        flex-basis: 30%;
+        max-width: 30%;
+        min-width: 300px;
     }
 </style>
 
