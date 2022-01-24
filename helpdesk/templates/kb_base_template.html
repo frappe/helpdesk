@@ -5,9 +5,11 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 <nav class="navbar navbar-light navbar-expand-lg">
     <div class="container">
+        {% if company.logo %}
         <div class="nav-brand">
             <img src="{{ company.logo }}" style="max-width: 80px; margin-top: -5px">
         </div>
+        {% endif %}
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="ml-auto navbar-nav">
                 <li class="nav-item">
@@ -37,9 +39,11 @@
     <div class="container">
         <div class="footer-info">
             <div class="row">
+                {% if company.company_name %}
                 <div class="footer-col-left col-sm-6 col-12">
                     <div class="ql-editor read-mode"><p>© {{ company.company_name }}. 2022</p></div>
                 </div>
+                {% endif %}
                 <div class="footer-col-right col-sm-6 col-12 footer-powered">
                     <a class="text-muted" href="https://frappeframework.com?source=website_footer" target="_blank">Powered by Frappe Helpdesk</a>
                 </div>
