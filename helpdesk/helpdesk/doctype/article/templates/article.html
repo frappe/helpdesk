@@ -1,14 +1,14 @@
 {% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
 {{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
-<div class="d-flex">
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
+<div class="container d-flex">
 	<div class="col-7 pr-20 pl-0">
 		<h2>{{ title }}</h2>
 		<div>
 			<i class="bi bi-clock smile mr-1"></i>
-			<span class="text-secondary">Last updated on {{ frappe.format_date(modified) }}</span>
+			<span class="text-secondary" style="color: #A6B1B9;">Last updated on {{ frappe.format_date(modified) }}</span>
 		</div>
 		<div class="from-markdown my-8" itemprop="articleBody">
 			{{ content }}
@@ -37,8 +37,6 @@
 		{% endfor %}
 	</div>
 </div>
-
-{{ frappe.render_template('templates/components/contact_with_us.html', {'hr_tag': true}) }}
 
 {{ frappe.render_template('templates/components/search/search.html', {}) }}
 

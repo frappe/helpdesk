@@ -1,25 +1,28 @@
 {% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {}) }}
 {{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {}) }}
 {% if is_group %}
-<div class="d-flex flex-wrap">
+<div class="container d-flex flex-wrap">
     {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
-    <div class="col-sm-6 col-12 my-4 p-0">
+    <div class="col-sm-6 col-12 mb-8 p-0">
         {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name], "published": ['=', '1']}, fields=['title', 'route']) %}
-        <h3 role="button" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }}</h3>
+        <div class="d-flex">
+            <h3 role="button font-weight-bold" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }}</h3>
+            <h3 class="font-weight-light ml-1">({{ articles|length }})</h3>
+        </div>
         {% for article in articles %}
         {% if loop.index < max_articles %}
-        <div class="article-list">
+        <div class="article-list py-1">
             <i class="bi bi-journals mr-1"></i>
-            <span style="color: #2490EF;" role="button" onclick="window.location='/{{ article.route }}'">{{ article.title }}</span>
+            <a href="/{{ article.route }}">{{ article.title }}</a>
         </div>
         {% elif loop.index == max_articles %}
         <div class="mt-2 d-flex">
-            <a href='/{{ sub_category.route }}'>See all {{ articles|length }} articles</a>
+            <a class="font-weight-bold" href='/{{ sub_category.route }}'>View all articles</a>
             <i class="pl-2 bi bi-chevron-right"></i>
         </div>
         {% endif %}
@@ -28,25 +31,36 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="mb-5">
+<div class="container mb-5">
     {% set articles = frappe.get_all("Article", filters={"category": ['=', name], "published": ['=', '1']}, fields=['title', 'route', 'creation']) %}
-    <h2>{{ name }} ({{ articles|length }})</h2>
-    <table class="table table-borderless table-hover">
-        <tbody>
+    <div class="d-flex">
+        <h3 role="button font-weight-bold" onclick="window.location='/{{ route }}'">{{ name }}</h3>
+        <h3 class="font-weight-light ml-1">({{ articles|length }})</h3>
+    </div>
+    <div class="d-flex flex-wrap">
+        <div class="col-sm-6 col-12 p-0">
             {% for article in articles %}
-            <tr role="button" onclick="window.location='/{{ article.route }}'">
-                <td>
-                    <i class="bi bi-journals mr-2"></i>
-                    <span>{{ article.title }}</span>
-                </td>
-            </tr>
+            {% if loop.index <= (articles|length)/2 + 1 %}
+            <div class="article-list py-1">
+                <i class="bi bi-journals mr-1"></i>
+                <a href="/{{ article.route }}">{{ article.title }}</a>
+            </div>
+            {% endif %}
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+        <div class="col-sm-6 col-12 p-0">
+            {% for article in articles %}
+            {% if loop.index > (articles|length)/2 + 1 %}
+            <div class="article-list py-1">
+                <i class="bi bi-journals mr-1"></i>
+                <a href="/{{ article.route }}">{{ article.title }}</a>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endif %}
-
-{{ frappe.render_template('templates/components/contact_with_us.html', {'hr_tag': true}) }}
 
 {{ frappe.render_template('templates/components/search/search.html', {}) }}
 

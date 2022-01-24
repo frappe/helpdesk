@@ -10,32 +10,35 @@
     </div>
 </div>
 
-<div class="w-100 pt-20 pb-20">
+<div class="explore-kb-container w-100 pt-10 pb-8">
     <div class="justify-content-center d-flex mb-5">
         <div>
-            <h3>{{ _("Explore the Knowledge Base") }}</h3>
+            <h3 class="font-weight-bold">{{ _("Explore the Knowledge Base") }}</h3>
         </div>
     </div>
-    <div class="category-card-container">
-        {% for category in categories %}
-        <div class="category-card card" data-value="{{category.name}}">
-            <div class="card-body">
-                <div class="d-flex">
-                    <h5 class="card-title" style="color:#2490EF;">{{category.name}}</h5>
-                    <i class="pl-2 bi bi-chevron-right"></i>
+    <div class="category-card-container container">
+        <div class="row">
+            {% for category in categories %}
+            <div class="category-card card col-sm-4" data-value="{{category.name}}">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <h5 class="card-title" style="color:#4C5A67;">{{category.name}}</h5>
+                        <i class="pl-2 bi bi-chevron-right"></i>
+                    </div>
+                    <p class="card-text">{{category.description}}</p>
                 </div>
-                <p class="card-text">{{category.description}}</p>
             </div>
-          </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 </div>
-
-{{ frappe.render_template('templates/components/contact_with_us.html', {}) }}
 
 {{ frappe.render_template('templates/components/search/search.html', {}) }}
 
 <style>
+    .explore-kb-container {
+        background-color: #F4F5F6;
+    }
     .card{
         box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
         transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
@@ -46,28 +49,19 @@
         box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
     }
 
-    .category-card-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
     .category-card {
         box-sizing: border-box;
         flex: 250px;
         margin: 1rem;
         padding: 1rem;
-        border-radius: 5px;
-        flex-basis: 30%;
-        max-width: 30%;
-        min-width: 300px;
     }
 </style>
 
 <script>
     frappe.ready(function() {
-        $(".category_card").click(function() {
+        $(".category-card").click(function() {
             let category = this.getAttribute("data-value");
+            console.log('button clicked');
             
             frappe.call({
                 btn: this,

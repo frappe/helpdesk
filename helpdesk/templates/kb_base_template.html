@@ -17,7 +17,15 @@
     </div>
 </nav>
 {% endblock %}
+{% block content %}
+<div>
+    {%- block page_content -%}{%- endblock -%}
+</div>
+{% endblock %}
 {% block footer %}
+<div class="contact-us-container hidden">
+    {{ frappe.render_template('templates/components/contact_with_us.html', {}) }}
+</div>
 <footer class="web-footer">
     <div class="container">
         <div class="footer-info">
