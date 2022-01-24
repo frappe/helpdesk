@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-<div class="breadcrumb-container container d-flex mb-8">
+<div class="breadcrumb-container container d-flex mb-8 flex-wrap">
 </div>
 
 <script>
@@ -23,8 +23,8 @@
 							<i class="px-2 bi bi-chevron-right"></i>
 							${
 								i < parents.length - 1 ? 
-								`<a href='${parents[i]["route"]}'>${parents[i]["label"]}</a>`:
-								`<span>${parents[i]["label"]}</span>`
+								`<a style="white-space: nowrap;" href='${parents[i]["route"]}'>${parents[i]["label"]}</a>`:
+								`<span style="white-space: nowrap;">${parents[i]["label"]}</span>`
 							}
 						`)
 					}
