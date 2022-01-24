@@ -1,11 +1,17 @@
 {% extends "templates/web.html" %}
+{% set company = frappe.get_doc("Company") %}
 
 {% block navbar %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 <nav class="navbar navbar-light navbar-expand-lg">
     <div class="container">
+        <div class="nav-brand">
+            <img src="{{ company.logo }}" style="max-width: 80px; margin-top: -5px">
+        </div>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="ml-auto navbar-nav">
+                <li class="nav-item">
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/support/tickets">Submit a Ticket</a>
                 </li>
@@ -16,13 +22,24 @@
         </div>
     </div>
 </nav>
+{{ frappe.render_template('templates/components/search/search.html', {}) }}
+{% endblock %}
+{% block content %}
+<div>
+    {%- block page_content -%}{%- endblock -%}
+</div>
 {% endblock %}
 {% block footer %}
+<div class="contact-us-container hidden">
+    {{ frappe.render_template('templates/components/contact_with_us.html', {}) }}
+</div>
 <footer class="web-footer">
     <div class="container">
         <div class="footer-info">
             <div class="row">
-                <div class="footer-col-left col-sm-6 col-12"></div>
+                <div class="footer-col-left col-sm-6 col-12">
+                    <div class="ql-editor read-mode"><p>© {{ company.company_name }}. 2022</p></div>
+                </div>
                 <div class="footer-col-right col-sm-6 col-12 footer-powered">
                     <a class="text-muted" href="https://frappeframework.com?source=website_footer" target="_blank">Powered by Frappe Helpdesk</a>
                 </div>

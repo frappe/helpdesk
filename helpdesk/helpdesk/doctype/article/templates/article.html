@@ -1,14 +1,14 @@
 {% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
 {{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
-<div class="d-flex">
-	<div class="col-7 pr-20 pl-0">
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
+<div class="container d-flex">
+	<div class="col-12 col-sm-10 col-md-7 pr-20 pl-0">
 		<h2>{{ title }}</h2>
 		<div>
 			<i class="bi bi-clock smile mr-1"></i>
-			<span class="text-secondary">Last updated on {{ frappe.format_date(modified) }}</span>
+			<span class="text-secondary" style="color: #A6B1B9;">Last updated on {{ frappe.format_date(modified) }}</span>
 		</div>
 		<div class="from-markdown my-8" itemprop="articleBody">
 			{{ content }}
@@ -24,7 +24,7 @@
 			</div>
 		  </div>
 	</div>
-	<div class="col-5 hidden">
+	<div class="col-sm-0 col-md-5 hidden">
 		<h2 class="mb-8">{{ _("Related") }}</h2>
 		{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["title", "route"]) %}
 		{% set max_related_articles = 5 %}
@@ -37,10 +37,6 @@
 		{% endfor %}
 	</div>
 </div>
-
-{{ frappe.render_template('templates/components/contact_with_us.html', {'hr_tag': true}) }}
-
-{{ frappe.render_template('templates/components/search/search.html', {}) }}
 
 <script>
 frappe.ready(function() {
