@@ -11,12 +11,12 @@
     "icon": "support",
     "idx": 0,
     "is_standard": 1,
-    "label": "Support",
+    "label": "HelpDesk",
     "links": [
      {
       "hidden": 0,
       "is_query_report": 0,
-      "label": "Issues",
+      "label": "Tickets",
       "onboard": 0,
       "type": "Card Break"
      },
@@ -158,8 +158,8 @@
     ],
     "modified": "2020-12-01 13:38:37.073482",
     "modified_by": "Administrator",
-    "module": "Support",
-    "name": "Support",
+    "module": "HelpDesk",
+    "name": "HelpDesk",
     "owner": "Administrator",
     "pin_to_bottom": 0,
     "pin_to_top": 0,
