@@ -1,8 +1,8 @@
 <div class="modal fade" id="searchContainerModal" tabindex="-1" role="dialog" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-scrollable" role="document">
-		<div class="modal-content">
+		<div class="modal-content my-40">
 			<div class="modal-header">
-				<input id="searchBarInput" class="form-control" type="text" placeholder="Type your question..." autofocus>
+				<input id="searchBarInput" autocomplete="off" class="form-control" type="text" placeholder="Type your question..." autofocus>
 			</div>
 			<div id="results" class="modal-body">
 			</div>
@@ -79,3 +79,13 @@
 		return a;
 	}
 </script>
+
+<style>
+	.blur-container{
+		-webkit-filter: blur(1px);
+		-moz-filter: blur(1px);
+		-o-filter: blur(1px);
+		-ms-filter: blur(1px);
+		filter: blur(1px);
+	}
+</style>
