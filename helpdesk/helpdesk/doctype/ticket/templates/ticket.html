@@ -70,15 +70,9 @@
 </div>
 {% endif %}
 
-{{ include_script('desk.bundle.js') }}
-{{ include_script("helpdesk.bundle.js") }}
-
 <script type="text/javascript" src="/assets/frappe/node_modules/vue/dist/vue.js"></script>
 
 <script>
-    Vue.prototype.__ = window.__;
-	Vue.prototype.frappe = window.frappe;
-
     let curTicketStatus = '{{ status }}';
     if(['Resolved', 'Closed'].includes(curTicketStatus)) {
         curTicketStatus = 'Closed';
@@ -89,8 +83,6 @@
     let tempCurTicketStatus = curTicketStatus;
 
     frappe.ready(function() {        
-        let fileAttachmentHandler = new window.FileAttachmentHandler();
-        
         refreshConversations(true);
         setInterval(refreshConversations, 5000, false);
 
@@ -107,12 +99,11 @@
                 args: {
                     ticket: "{{ name }}",
                     message: $("#messageInput").val(),
-                    attachments: fileAttachmentHandler.attachments || ''
+                    attachments: ''
                 },
                 callback: function(r) {
                     $("#messageInput").val('')
                     $(".helpdesk-attachment").empty();
-                    fileAttachmentHandler.attachments = [];
                     
                     refreshConversations(true);
                 }
