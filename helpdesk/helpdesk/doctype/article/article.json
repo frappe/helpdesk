@@ -21,8 +21,6 @@
   {
    "fieldname": "title",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Title",
    "reqd": 1,
    "unique": 1
@@ -80,7 +78,7 @@
  "is_published_field": "published",
  "links": [],
  "migration_hash": "effd79e6100ca85ff18d85dcd95a407f",
- "modified": "2022-01-25 13:01:42.065036",
+ "modified": "2022-01-25 13:12:47.349167",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",

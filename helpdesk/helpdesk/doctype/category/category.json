@@ -37,6 +37,8 @@
   {
    "fieldname": "parent_category",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Parent Category",
    "options": "Category"
   },
@@ -70,7 +72,7 @@
   }
  ],
  "migration_hash": "79533656d34db65dcaeb3a543e4e6b99",
- "modified": "2022-01-25 12:53:10.709051",
+ "modified": "2022-01-25 13:08:54.171328",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Category",
