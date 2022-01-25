@@ -6,8 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "company_name",
-  "logo"
+  "company_name"
  ],
  "fields": [
   {
@@ -16,17 +15,13 @@
    "in_list_view": 1,
    "label": "Company Name",
    "reqd": 1
-  },
-  {
-   "fieldname": "logo",
-   "fieldtype": "Attach Image",
-   "label": "Logo"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-01-24 12:57:51.699086",
+ "migration_hash": "b25aad8f46a944b1248080afed4e65a4",
+ "modified": "2022-01-25 10:20:43.414878",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Company",
