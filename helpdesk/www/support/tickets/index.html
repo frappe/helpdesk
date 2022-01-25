@@ -148,19 +148,34 @@
                     let ticket = tickets[i];
                     let isClosed = ['Resolved', 'Closed'].includes(ticket.status);
                     listContainer.append(`
-                    <a href="/${ticket.route}" class="list-group-item list-group-item-action rounded">
-                        <div class="float-right">
-                            <span class="indicator-pill ${isClosed ? "green" : "orange"} filterable ellipsis">${isClosed ? "Closed" : "Open"}</span>
-                        </div>
-                        <div class="ticket-card-main">
-                            <div class="d-flex">
-                                <h3>${ticket.subject}</h3>
-                                <h3 class="ml-2 d-none d-lg-block">#${ticket.name}</h3>
+                        <a href="/${ticket.route}" class="list-group-item list-group-item-action rounded">
+                            <div class="float-right">
+                                <span class="indicator-pill ${isClosed ? "green" : "orange"} filterable ellipsis">${isClosed ? "Closed" : "Open"}</span>
                             </div>
-                            <span class="">Created ${ticket.creation} ago</span>
+                            <div class="ticket-card-main">
+                                <div class="d-flex">
+                                    <h3>${ticket.subject}</h3>
+                                    <h3 class="ml-2 d-none d-lg-block">#${ticket.name}</h3>
+                                </div>
+                                <span class="">Created ${ticket.creation} ago</span>
+                            </div>
+                        </a>    
+                    `);
+                }
+
+                if (tickets.length == 0) {
+                    listContainer.append(`
+                        <div class="no-result text-muted d-flex justify-center align-center" style="">
+                            <div class="no-result text-muted flex justify-center align-center">
+                                <div class="msg-box no-border py-40 justify-center align-center">
+                                    <div>
+                                        <img src="/assets/frappe/images/ui-states/list-empty-state.svg" alt="Generic Empty State" class="null-state">
+                                    </div>
+                                    <p> No Ticket found </p>
+                                </div>
+                            </div>
                         </div>
-                    </a>    
-                `);    
+                    `);
                 }
             }
         })
