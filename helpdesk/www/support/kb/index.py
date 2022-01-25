@@ -4,7 +4,7 @@ import frappe
 def get_context(context):
 	context.categories = frappe.get_all(
 		"Category",
-		fields=["name", "description", "parent_category", "is_group"],
+		fields=["name", "description", "parent_category", "is_group", "category_name"],
 		filters={"parent_category": ["=", ""]},
 	)
 	context.articles = frappe.get_all("Article")

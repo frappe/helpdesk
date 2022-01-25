@@ -5,13 +5,13 @@
 {{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {}) }}
 {% if is_group %}
 <div class="container d-flex flex-wrap">
-    {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route']) %}
+    {% set sub_categories = frappe.get_all("Category", filters={"parent_category": ['=', name]}, fields=['name', 'route', 'category_name']) %}
     {% set max_articles = 6 %}
     {% for sub_category in sub_categories %}
     <div class="col-sm-6 col-12 mb-8 p-0">
         {% set articles = frappe.get_all("Article", filters={"category": ['=', sub_category.name], "published": ['=', '1']}, fields=['title', 'route']) %}
         <div class="d-flex">
-            <h3 role="button" class="font-weight-bold" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.name }}</h3>
+            <h3 role="button" class="font-weight-bold" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.category_name }}</h3>
             <h3 class="font-weight-light ml-1">({{ articles|length }})</h3>
         </div>
         {% for article in articles %}
@@ -36,7 +36,7 @@
 <div class="container mb-5">
     {% set articles = frappe.get_all("Article", filters={"category": ['=', name], "published": ['=', '1']}, fields=['title', 'route', 'creation']) %}
     <div class="d-flex">
-        <h3 class="font-weight-bold">{{ name }}</h3>
+        <h3 class="font-weight-bold">{{ category_name }}</h3>
         <h3 class="font-weight-light ml-1">({{ articles|length }})</h3>
     </div>
     {% set max_articles = 6 %}

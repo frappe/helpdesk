@@ -3,7 +3,7 @@ from frappe import _
 
 @frappe.whitelist(allow_guest=True)
 def get_breadcrumbs(route):
-    print(route)
+    print(f"ROUTE: {route}")
     allowed_doctypes = [
         {
             "name": "Article",
