@@ -48,7 +48,15 @@
 {% block content %}
 <div style="margin-top: 4.3rem;">
     {%- block page_content -%}{%- endblock -%}
-</main>
+	{{ frappe.render_template('templates/components/search/search.html', {}) }}
+	<script>
+		frappe.ready(function() {
+			$("#propSearchBar").click(function() {
+				showSearchBar();
+			})
+		});
+	</script>
+</div>
 {% endblock %}
 {% block footer %}
 <div class="contact-us-container hidden">
