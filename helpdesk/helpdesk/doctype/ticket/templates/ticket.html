@@ -41,7 +41,7 @@
                         </div>
                         <div class="dropdown">
                             {% set is_closed = (status in ['Resolved', 'Closed'])%}
-                            <a id="filterDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="filterDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a id="ticketStatusDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="filterDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {% if is_closed %}
                                 <span class="ellipsis">Closed</span>
                                 {% else %}
@@ -49,12 +49,12 @@
                                 {% endif %}
                             </a>
                             <div class="dropdown-menu" aria-labelledby="filterDropdownMenuButton">
-                                <a class="filter-menu-item dropdown-item">Open</a>
-                                <a class="filter-menu-item dropdown-item">Closed</a>
+                                <a class="status-menu-item dropdown-item">Open</a>
+                                <a class="status-menu-item dropdown-item">Closed</a>
                             </div>
                         </div>
                     </div>
-                    <button class="mt-4 btn btn-primary btn-sm w-100">
+                    <button id="ticketStatusSaveButton" class="mt-4 btn btn-primary btn-sm w-100" disabled="true">
                         Save
                     </button>
                 </div>
@@ -78,6 +78,15 @@
 <script>
     Vue.prototype.__ = window.__;
 	Vue.prototype.frappe = window.frappe;
+
+    let curTicketStatus = '{{ status }}';
+    if(['Resolved', 'Closed'].includes(curTicketStatus)) {
+        curTicketStatus = 'Closed';
+    } else {
+        curTicketStatus = 'Open';
+    }
+
+    let tempCurTicketStatus = curTicketStatus;
 
     frappe.ready(function() {        
         let fileAttachmentHandler = new window.FileAttachmentHandler();
@@ -110,7 +119,40 @@
             })
         })
 
-    })
+        $(".status-menu-item").click(function() {
+            selText = $(this).text();
+            let newStatus = "Open"
+            if (selText == "Open") {
+                newStatus = "Open"
+            } else {
+                newStatus = "Closed"
+            }
+
+            tempCurTicketStatus = newStatus;
+            $("#ticketStatusDropdownTitle").html(selText);
+            $('#ticketStatusSaveButton').prop('disabled', (curTicketStatus == newStatus));
+        })
+
+        $("#ticketStatusSaveButton").click(function() {
+            frappe.call({
+                btn: this,
+                method: "helpdesk.helpdesk.doctype.ticket.ticket.update_ticket_status_via_customer_portal",
+                args: {
+                    ticket: "{{ name }}",
+                    new_status: tempCurTicketStatus
+                },
+                callback: function(r) {
+                    curTicketStatus = r.message;
+                    $('#ticketStatusSaveButton').prop('disabled', true);
+
+                    frappe.show_alert({
+                        message:__('Ticket status set to ' + curTicketStatus),
+                        indicator:'green'
+                    });
+                }
+            })
+        })
+    });
 
     function refreshConversations(scroll) {
         frappe.call({

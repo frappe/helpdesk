@@ -161,6 +161,15 @@ def create_communication_via_contact(ticket, message, attachments):
 			file_doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
+def update_ticket_status_via_customer_portal(ticket, new_status):
+	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	ticket_doc.status = new_status
+	ticket_doc.save(ignore_permissions=True)
+
+	return ticket_doc.status
+
+@frappe.whitelist()
 def get_all_conversations(ticket):
 	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received"])
 	
