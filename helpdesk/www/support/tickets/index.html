@@ -5,28 +5,57 @@
 {{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {'no_container': true})}}
 {% if frappe.session.user != "Guest" %}
 <div class="main-container">
-    <div class="d-flex mb-2">
+    <div class="col-12 col-md-8 d-flex p-0">
         <div class="mr-auto">
             <h2>Your Tickets</h2>
         </div>
-        <div class="d-flex">
-            <div class="dropdown mr-2">
-                <a id="dropdownTitle"class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Show All
-                </a>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item">Show All</a>
-                    <a class="dropdown-item">Show Open</a>
-                    <a class="dropdown-item">Show Resolved</a>
-                </div>
-            </div>
-            <div>
-                <button class="btn btn-sm btn-primary" onclick="window.location='/support/tickets/new'">New Ticket</button>
-            </div>
+        <div>
+            <button class="btn btn-sm btn-primary mb-4" onclick="window.location='/support/tickets/new'">
+                <i class="bi bi-plus"></i>
+                <span>Create Ticket</span>
+            </button>
         </div>
     </div>
-    <div class="frappe-card bg-white">
-        <div id="ticketListContainer" class="list-group-flush tickets-container">
+    <div class="d-flex">
+        <div class="col-12 col-md-8 px-0">
+            <div class="frappe-card bg-white">
+                <div id="ticketListContainer" class="list-group-flush tickets-container">
+                </div>
+            </div>
+        </div>
+        <div class="ml-5 d-none d-sm-none d-md-block col-md-3">
+            <div class="frappe-card container p-5">
+                <div class="mb-3">
+                    <div class="mb-2">
+                        <span>Filter By</span>
+                    </div>
+                    <div class="dropdown">
+                        <a id="filterDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="filterDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="ellipsis">All Tickets</span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="filterDropdownMenuButton">
+                            <a class="filter-menu-item dropdown-item">All Tickets</a>
+                            <a class="filter-menu-item dropdown-item">Open</a>
+                            <a class="filter-menu-item dropdown-item">Closed</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="mb-2">
+                        <span>Sort By</span>
+                    </div>
+                    <div class="dropdown">
+                        <a id="sortDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="sortByDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="ellipsis">Last Modified</span>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="sortByDropdownMenuButton">
+                            <a class="sort-menu-item dropdown-item">Last Modified</a>
+                            <a class="sort-menu-item dropdown-item">Date Created</a>
+                            <a class="sort-menu-item dropdown-item">Status</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -41,58 +70,100 @@
     <a class="btn btn-primary" href="/login">Login to continue</a>
 </div>
 {% endif %}
-<script>
-    let allTickets = [];
+<script>    
+    let filter = "All";
+    let sortBy = "Last Modified";
 
     frappe.ready(function() {
         if(frappe.session.user != "Guest") {
-            frappe.call({
-                btn: this,
-                method: "helpdesk.helpdesk.doctype.ticket.ticket.get_all_user_tickets",
-                callback: function(r) {
-                    allTickets = r.message;
-                    showTickets();
-                }
-            })
-            $(".dropdown-menu a").click(function(){
-                var selText = $(this).text();
-                showTickets(filter=selText);
+            showTickets();
+
+            $(".filter-menu-item").click(function(){
+                selText = $(this).text();
+                filter = selText;
+
+                showTickets();
                 let selectedOption = ""
-                if(selText == "Show Resolved") {
-                    selectedOption = "Show Resolved";
-                } else if(selText == "Show Open") {
-                    selectedOption = "Show Open";
+                if(selText == "Closed") {
+                    selectedOption = "Closed";
+                } else if(selText == "Open") {
+                    selectedOption = "Open";
                 } else {
-                    selectedOption = "Show All";
+                    selectedOption = "All";
                 }
-                $("#dropdownTitle").html(selectedOption);
+                $("#filterDropdownTitle").html(selectedOption);
+            });
+
+            $(".sort-menu-item").click(function(){
+                selText = $(this).text();
+                sortBy = selText;
+                
+                showTickets();
+                let selectedOption = ""
+                if(selText == "Date Created") {
+                    selectedOption = "Date Created";
+                } else if(selText == "Last Modified") {
+                    selectedOption = "Last Modified";
+                } else {
+                    selectedOption = "Status";
+                }
+                $("#sortDropdownTitle").html(selectedOption);
             });
         }
     })
 
-    function showTickets(filter="Show All") {
+    function showTickets() {
+        let filters = {};
+
+        if (filter == "Open") {
+            filters['status'] = ['not in', ['Resolved', 'Closed']]
+        } else if(filter == "Closed") {
+            filters['status'] = ['in', ['Resolved', 'Closed']]
+        }
+
+        let orderBy = 'creation'
+
+        if (sortBy == 'Date Created') {
+            orderBy = 'creation desc'
+        } else if (sortBy == 'Last Modified') {
+            orderBy = 'modified desc'
+        } else if (sortBy == 'Status') {
+            orderBy = 'status'
+        }
+
         let listContainer = $("#ticketListContainer");
         listContainer.empty();
 
-        for(var i = 0; i < allTickets.length; i++) {
-            let ticket = allTickets[i];
-            let isResolved = (ticket.status == "Resolved");
-            
-            if(filter == "Show Open" && isResolved) continue;
-            if(filter == "Show Resolved" && !isResolved) continue;
-
-            listContainer.append(`
-                <a href="/${ticket.route}" class="list-group-item list-group-item-action rounded">
-                    <div class="float-right">
-                        <span class="indicator-pill ${isResolved ? "green" : "orange"} filterable ellipsis">${isResolved ? "Resolved" : "Open"}</span>
-                    </div>
-                    <div class="ticket-card-main">
-                        <h3>${ticket.subject} #${ticket.name}</h3>
-                        <span class="">Created ${ticket.creation} ago</span>
-                    </div>
-                </a>    
-            `);
-        }
+        frappe.call({
+            btn: this,
+            method: "helpdesk.helpdesk.doctype.ticket.ticket.get_user_tickets",
+            args: {
+                filters: filters,
+                order_by: orderBy
+            },
+            callback: function(r) {
+                let tickets = r.message
+                
+                for(var i = 0; i < tickets.length; i++) {
+                    let ticket = tickets[i];
+                    let isClosed = ['Resolved', 'Closed'].includes(ticket.status);
+                    listContainer.append(`
+                    <a href="/${ticket.route}" class="list-group-item list-group-item-action rounded">
+                        <div class="float-right">
+                            <span class="indicator-pill ${isClosed ? "green" : "orange"} filterable ellipsis">${isClosed ? "Closed" : "Open"}</span>
+                        </div>
+                        <div class="ticket-card-main">
+                            <div class="d-flex">
+                                <h3>${ticket.subject}</h3>
+                                <h3 class="ml-2 d-none d-lg-block">#${ticket.name}</h3>
+                            </div>
+                            <span class="">Created ${ticket.creation} ago</span>
+                        </div>
+                    </a>    
+                `);    
+                }
+            }
+        })
     }
 
 </script>
