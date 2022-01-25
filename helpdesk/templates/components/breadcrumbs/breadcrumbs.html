@@ -18,20 +18,23 @@
 			callback: function(r) {
 				let parents = r.message
 				let breadcrumbContainer = $(".breadcrumb-container");
-				breadcrumbContainer.append(`
-					<a href='/support/kb/'>Home</a>
-				`);
 				if(parents) {
 					for(var i = 0; i < parents.length; i++) {
 						console.log(parents[i]["route"])
-						breadcrumbContainer.append(`
-							<i class="px-2 bi bi-chevron-right"></i>
-							${
-								i < parents.length - 1 ? 
-								`<a style="white-space: nowrap;" href='${parents[i]["route"]}'>${parents[i]["label"]}</a>`:
-								`<span style="white-space: nowrap;">${parents[i]["label"]}</span>`
-							}
-						`)
+						breadcrumbContainer.append(
+							i < parents.length - 1 ? 
+							`
+								<a style="white-space: nowrap;" href='${parents[i]["route"]}'>
+									${parents[i]["label"]}
+								</a>
+								<i class="px-2 bi bi-chevron-right"></i>
+							`:
+							`
+								<span style="white-space: nowrap;">
+									${parents[i]["label"]}
+								</span>
+							`
+						)
 					}
 				}
 			}

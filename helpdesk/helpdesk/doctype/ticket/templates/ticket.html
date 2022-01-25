@@ -2,6 +2,7 @@
 
 {% block page_content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {'no_container': true})}}
 {% if owner == frappe.session.user %}
 <main class="content pb-4">
     <div class="container p-0">

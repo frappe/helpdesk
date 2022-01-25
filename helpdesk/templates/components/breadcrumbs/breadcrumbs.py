@@ -3,8 +3,12 @@ from frappe import _
 
 @frappe.whitelist(allow_guest=True)
 def get_breadcrumbs(route):
-    if route == '/support/tickets':
-        return [{'label': 'Tickets'}]
+    parents = []
+
+    parents.append({'label': 'Home', 'route': '/support/kb'})
+
+    if '/support/tickets' in route:
+        parents.append({'label': 'Tickets', 'route': '/support/tickets'})
     
     allowed_doctypes = [
         {
@@ -14,10 +18,13 @@ def get_breadcrumbs(route):
         {
             "name": "Category",
             "title_field": "category_name"
+        },
+        {
+            "name": "Ticket",
+            "title_field": "subject"
         }
     ]
     
-    parents = []
     splits = route.split("/")
     if splits:
         for index, route in enumerate(splits, start=1):
