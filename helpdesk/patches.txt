@@ -1,2 +1,2 @@
 helpdesk.patches.refactor_rout_path_for_articles_and_categories
-helpdesk.patches.add_base_route_redirect_to_website_settings
+helpdesk.patches.remove_base_route_redirect_and_set_home_page_to_kb
