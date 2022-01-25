@@ -130,7 +130,7 @@ class Ticket(WebsiteGenerator):
 
 
 @frappe.whitelist()
-def create_communication_via_contact(ticket, message):
+def create_communication_via_contact(ticket, message, attachments):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
 	communication = frappe.new_doc("Communication")
@@ -151,6 +151,23 @@ def create_communication_via_contact(ticket, message):
 	communication.ignore_permissions = True
 	communication.ignore_mandatory = True
 	communication.save(ignore_permissions=True)
+
+	if attachments:
+		attachments = json.loads(attachments)
+		for attachment in attachments:
+			file_doc = frappe.get_doc("File", attachment["name"])
+			file_doc.attached_to_name = communication.name
+			file_doc.attached_to_doctype = "Communication"
+			file_doc.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def update_ticket_status_via_customer_portal(ticket, new_status):
+	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	ticket_doc.status = new_status
+	ticket_doc.save(ignore_permissions=True)
+
+	return ticket_doc.status
 
 @frappe.whitelist()
 def get_all_conversations(ticket):
@@ -187,8 +204,10 @@ def get_list_context(context=None):
 	}
 
 @frappe.whitelist()
-def get_all_user_tickets():
-	tickets = frappe.get_all("Ticket", filters={"raised_by": ['=', frappe.session.user]}, fields=['name', 'subject', 'description', 'status', 'creation', 'route'])
+def get_user_tickets(filters={}, order_by='creation desc'):
+	filters = json.loads(filters)
+	filters['raised_by'] = ['=', frappe.session.user]
+	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'route'])
 	return tickets
 
 def get_ticket_list(
