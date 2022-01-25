@@ -1,35 +1,54 @@
 {% extends "templates/web.html" %}
-{% set company = frappe.get_doc("Company") %}
+{%- from "templates/includes/navbar/navbar_items.html" import render_item -%}
 
-{% block navbar %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-<nav class="navbar navbar-light navbar-expand-lg">
-    <div class="container">
-        {% if company.logo %}
-        <div class="nav-brand">
-            <img src="{{ company.logo }}" style="max-width: 80px; margin-top: -5px">
-        </div>
-        {% endif %}
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="ml-auto navbar-nav">
-                <li class="nav-item">
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/support/tickets">Submit a Ticket</a>
-                </li>
-            </ul>
-        </div>
-        <div class="form-group mb-0 hide" id="language-switcher">
-            <select class="form-control"></select>
-        </div>
-    </div>
+{%- block head_include %}
+<link rel="stylesheet" href="/assets/frappe/css/hljs-night-owl.css">
+{% endblock -%}
+
+{%- block navbar -%}
+<nav class="navbar navbar-light navbar-expand-lg doc-navbar fixed-top">
+	<div class="container-fluid doc-container">
+		<div class="row no-gutters w-100">
+			<div class="col-8 col-lg-2">
+				<a class="navbar-brand" href="{{ url_prefix }}{{ home_page or '/' }}">
+					{%- if brand_html -%}
+					{{ brand_html }}
+					{%- elif banner_image -%}
+					<img src='{{ banner_image }}'>
+					{%- else -%}
+					<span>{{ (frappe.get_hooks("brand_html") or [_("Home")])[0] }}</span>
+					{%- endif -%}
+				</a>
+			</div>
+            <div class="col-4 col-lg-8 d-flex justify-content-end">
+				<div class="d-flex">
+					<button class="navbar-toggler" type="button"
+						data-toggle="collapse"
+						data-target="#navbarSupportedContent"
+						aria-controls="navbarSupportedContent"
+						aria-expanded="false"
+						aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				</div>
+			</div>
+			<div class="col-12 col-lg-2 d-flex justify-content-end">
+                <ul class="navbar-nav d-flex">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        {{ render_item({'label': 'Submit a Ticket', 'url': '/support/tickets'}, parent=True) }}
+                    </div>
+                </ul>
+			</div>
+		</div>
+	</div>
 </nav>
-{{ frappe.render_template('templates/components/search/search.html', {}) }}
-{% endblock %}
+{%- endblock -%}
+
+
 {% block content %}
-<div>
+<div style="margin-top: 4.3rem;">
     {%- block page_content -%}{%- endblock -%}
-</div>
+</main>
 {% endblock %}
 {% block footer %}
 <div class="contact-us-container hidden">
@@ -40,6 +59,7 @@
         <div class="footer-info">
             <div class="row">
                 <div class="footer-col-left col-sm-6 col-12">
+                    {% set company = frappe.get_doc("Company") %}
                     {% if company.company_name %}
                     <div class="ql-editor read-mode"><p>© {{ company.company_name }}. 2022</p></div>
                     {% endif %}
