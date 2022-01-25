@@ -69,8 +69,8 @@
    "link_fieldname": "category"
   }
  ],
- "migration_hash": "35bd4fd68a32aa1d62f4a6911e3dd6f9",
- "modified": "2022-01-09 22:49:33.616748",
+ "migration_hash": "79533656d34db65dcaeb3a543e4e6b99",
+ "modified": "2022-01-25 12:53:10.709051",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Category",

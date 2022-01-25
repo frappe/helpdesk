@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from frappe.website.website_generator import WebsiteGenerator
+from frappe.website.utils import cleanup_page_name
 
 
 class Category(WebsiteGenerator):
@@ -27,30 +28,19 @@ class Category(WebsiteGenerator):
 			if not self.parent_category:
 				frappe.throw(_("Can only create leaf nodes within a parent category"))
 
+	#TODO: when renamed, website route should be updated
 	def before_save(self):
 		self.route = self.get_page_route()
 
 	def get_page_route(self, route="", category=None):
-		def change_case(str):
-			res = [str[0].lower()]
-			for c in str[1:]:
-				if c in ("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"):
-					res.append("_")
-					res.append(c.lower())
-				elif c in (" "):
-					continue
-				else:
-					res.append(c)
-
-			return "".join(res)
-
 		if not category:
 			category = self.name
 			category_doc = self
 		else:
 			category_doc = frappe.get_doc("Category", category)
 
-		route = f'{change_case(category_doc.category_name)}{f"/{route}" if route else ""}'
+		scrubbed_title = cleanup_page_name(category_doc.category_name)
+		route = f'{scrubbed_title}{f"/{route}" if route else ""}'
 
 		if category_doc.parent_category:
 			return self.get_page_route(route, category_doc.parent_category)

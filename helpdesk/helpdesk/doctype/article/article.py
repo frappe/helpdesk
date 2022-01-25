@@ -5,6 +5,7 @@ import frappe
 from frappe.website.website_generator import WebsiteGenerator
 from frappe import _
 from frappe.utils import cint
+from frappe.website.utils import cleanup_page_name
 
 
 class Article(WebsiteGenerator):
@@ -16,26 +17,14 @@ class Article(WebsiteGenerator):
 		if not category_doc.parent_category:
 			frappe.throw(_("Article category should be a child to a parent category"))
 
+	#TODO: when renamed, website route should be updated
 	def before_save(self):
 		self.route = self.get_page_route()
 
 	def get_page_route(self):
-		def change_case(str):
-			res = [str[0].lower()]
-			for c in str[1:]:
-				if c in ("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"):
-					res.append("_")
-					res.append(c.lower())
-				elif c in (" "):
-					continue
-				else:
-					res.append(c)
-
-			return "".join(res)
-
 		category_doc = frappe.get_doc("Category", self.category)
-		return f"{category_doc.route}/{change_case(self.title)}"
-
+		scrubbed_title = cleanup_page_name(self.title)
+		return f"{category_doc.route}/{scrubbed_title}"
 
 @frappe.whitelist(allow_guest=True)
 def add_feedback(article, helpful):
