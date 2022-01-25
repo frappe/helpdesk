@@ -3,7 +3,9 @@ from frappe import _
 
 @frappe.whitelist(allow_guest=True)
 def get_breadcrumbs(route):
-    print(f"ROUTE: {route}")
+    if route == '/support/tickets':
+        return [{'label': 'Tickets'}]
+    
     allowed_doctypes = [
         {
             "name": "Article",

@@ -2,6 +2,7 @@
 
 {% block page_content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {'no_container': true})}}
 {% if frappe.session.user != "Guest" %}
 <div class="main-container">
     <div class="d-flex mb-2">
@@ -86,8 +87,8 @@
                         <span class="indicator-pill ${isResolved ? "green" : "orange"} filterable ellipsis">${isResolved ? "Resolved" : "Open"}</span>
                     </div>
                     <div class="ticket-card-main">
-                        <h3>${ticket.subject}</h3>
-                        <span class="">${ticket.creation}</span>
+                        <h3>${ticket.subject} #${ticket.name}</h3>
+                        <span class="">Created ${ticket.creation} ago</span>
                     </div>
                 </a>    
             `);
