@@ -21,7 +21,7 @@ def get_breadcrumbs(route):
         },
         {
             "name": "Ticket",
-            "title_field": "subject"
+            "title_field": "name"
         }
     ]
     

@@ -4,55 +4,64 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 {{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {'no_container': true})}}
 {% if owner == frappe.session.user %}
-<main class="content pb-4">
-    <div class="container p-0">
-		<div class="">
-			<div class="row g-0">
-				<div class="col-12 col-lg-5 col-xl-3 mb-4">
-                    <span class="h5 mr-2">Ticket #{{ name }}</span>
-                    {% if status == "Resolved" %}
-                    <span class="indicator-pill orange">Resolved</span>
-                    {% else %}
-                    <span class="indicator-pill orange">Open</span>
-                    {% endif %}
+<div class="main-container pb-4">
+    <div class="">
+        <div class="row g-0">
+            <div class="col-12 col-md-8 d-flex p-0">
+                <div class="px-4 mb-4">
+                    <div class="d-flex">
+                        <h3 class="mr-2 d-none d-sm-block">#{{ name }}</h3>
+                        <h3>{{ subject }}</h3>
+                    </div>
                 </div>
-				<div class="chat-container col-12 col-lg-7 col-xl-9">
-                    <div class="px-4 pb-3 mb-1">
-                        <div>
-                            <span class="h7">
-                                Created on {{ frappe.format_date(creation) }}
-                            </span>
-                        </div>
-                        <div>
-                            <span class="h5">
-                                {{ subject }}
-                            </span>
-                        </div>
-                    </div>
-                    <div id="conversationContainer" class="chat-messages p-4">
-                    </div>
-                    {% if status != "Resolved" %}
-                    <div class="helpdesk-attachment">
-
-                    </div>
-                    <div class="flex-grow-0 py-3 px-4">
-                        <div class="input-group">
-                            <input id="messageInput" type="text" class="form-control" placeholder="Type your message">
-                            <button id="attachButton" class="add-attachment-helpdesk btn btn-secondary mx-2">Attach</button>
-                            <button id="submitButton" class="btn btn-primary">Send</button>
+            </div>
+            <div class="chat-container col-12 col-md-8 p-0">
+                <div id="conversationContainer" class="chat-messages px-4 pt-4">
+                </div>
+                <hr class="m-0">
+                <div class="flex-grow-0 px-4">
+                    <div class="input-group">
+                        <textarea id="messageInput" rows="5" style="height: 50px; resize: none;" class="form-control bg-white m-2" placeholder="Type your message"></textarea>
+                        <div class="mt-3">
+                            <button id="attachButton" class="add-attachment-helpdesk btn btn-secondary btn-sm mx-2">Attach</button>
+                            <button id="submitButton" class="btn btn-primary btn-sm">Send</button>
                         </div>
                     </div>
-                    {% else %}
-                    <div class="card border-0 d-flex flex-row justify-content-between mt-3 p-4 bg-light">
-                        <span class="mt-1">This ticket has been marked as resolved</span>
-                        <button id="reOpenButton" class="btn btn-sm btn-primary mx-2">REOPEN</button>
+                </div>
+            </div>
+            <div class="ml-3 d-none d-sm-none d-md-block col-md-3">
+                <div class="frappe-card container p-5">
+                    <div class="mb-2">
+                        <span>Ticket Details</span>
                     </div>
-                    {% endif %}
-				</div>
-			</div>
-		</div>
-	</div>
-</main>
+                    <hr>
+                    <div class="mb-3">
+                        <div class="mb-2">
+                            <span>Status</span>
+                        </div>
+                        <div class="dropdown">
+                            {% set is_closed = (status in ['Resolved', 'Closed'])%}
+                            <a id="filterDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="filterDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {% if is_closed %}
+                                <span class="ellipsis">Closed</span>
+                                {% else %}
+                                <span class="ellipsis">Open</span>
+                                {% endif %}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="filterDropdownMenuButton">
+                                <a class="filter-menu-item dropdown-item">Open</a>
+                                <a class="filter-menu-item dropdown-item">Closed</a>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mt-4 btn btn-primary btn-sm w-100">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% else %}
 <div class="alert alert-warning">
     <p>
@@ -89,7 +98,7 @@
                 args: {
                     ticket: "{{ name }}",
                     message: $("#messageInput").val(),
-                    attachments: fileAttachmentHandler.attachments
+                    attachments: fileAttachmentHandler.attachments || ''
                 },
                 callback: function(r) {
                     $("#messageInput").val('')
@@ -119,13 +128,22 @@
                     let is_received = conversations[i].sent_or_received == "Received";
                     conversationElement.append(`
                         <div class="flex-shrink-1 bg-white frappe-card rounded p-5 mr-3 mb-4">
-                            <div class="top-section d-flex justify-content-between mb-4">
-                                <span class="h6">
-                                    ${is_received ? "You" : "Agent"}
-                                </span>
-                                <span class="h7">
-                                    ${conversations[i].creation}
-                                </span>
+                            <div class="d-flex">
+                                <div>
+                                    <img class="mr-2" src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-Images.png" style="height: 50px; width: 50px;">
+                                </div>
+                                <div class="top-section">
+                                    <div>
+                                        <span class="h6">
+                                            ${is_received ? "You" : "Agent"}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h7>
+                                            ${conversations[i].creation}
+                                        </h7>
+                                    </div>
+                                </div>
                             </div>
                             <div class="message">
                                 <p>
