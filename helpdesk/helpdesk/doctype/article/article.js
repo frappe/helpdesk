@@ -3,6 +3,8 @@
 
 frappe.ui.form.on('Article', {
 	refresh: function(frm) {
+		show_content_wrt_type(frm);
+		
 		frm.dashboard.clear_headline();
 
 		frm.dashboard.set_headline_alert(`
@@ -24,5 +26,14 @@ frappe.ui.form.on('Article', {
 				</div>
 			</div>
 		`);
+	},
+
+	content_type: function(frm) {
+		show_content_wrt_type(frm);
 	}
 });
+
+function show_content_wrt_type(frm) {
+	frm.toggle_display('content_md', (frm.doc.content_type === "Markdown"));
+	frm.toggle_display('content', (frm.doc.content_type === "Rich Text"));
+}
