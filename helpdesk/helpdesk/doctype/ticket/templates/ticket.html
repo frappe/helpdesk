@@ -7,56 +7,58 @@
 <div class="main-container pb-4">
     <div class="">
         <div class="row g-0">
-            <div class="col-12 col-md-8 d-flex p-0">
-                <div class="px-4 mb-4">
+            <div class="col-12 d-flex p-0 mb-2">
+                <div class="px-4">
                     <div class="d-flex">
                         <h3 class="mr-2 d-none d-sm-block">#{{ name }}</h3>
                         <h3>{{ subject }}</h3>
                     </div>
                 </div>
             </div>
-            <div class="chat-container col-12 col-md-8 p-0">
-                <div id="conversationContainer" class="chat-messages px-4 pt-4">
-                </div>
-                <hr class="m-0">
-                <div class="flex-grow-0 px-4">
-                    <div class="input-group">
-                        <textarea id="messageInput" rows="5" style="height: 50px; resize: none;" class="form-control bg-white m-2" placeholder="Type your message"></textarea>
-                        <div class="mt-3">
-                            <button id="attachButton" class="add-attachment-helpdesk btn btn-secondary btn-sm mx-2">Attach</button>
-                            <button id="submitButton" class="btn btn-primary btn-sm">Send</button>
-                        </div>
+            <div class="d-flex col-12 p-0 mt-0">
+                <div class="col-12 col-md-8 p-0">
+                    <div id="conversationContainer" class="chat-messages px-4 pt-2">
                     </div>
-                </div>
-            </div>
-            <div class="ml-3 d-none d-sm-none d-md-block col-md-3">
-                <div class="frappe-card container p-5">
-                    <div class="mb-2">
-                        <span>Ticket Details</span>
-                    </div>
-                    <hr>
-                    <div class="mb-3">
-                        <div class="mb-2">
-                            <span>Status</span>
-                        </div>
-                        <div class="dropdown">
-                            {% set is_closed = (status in ['Resolved', 'Closed'])%}
-                            <a id="ticketStatusDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="filterDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {% if is_closed %}
-                                <span class="ellipsis">Closed</span>
-                                {% else %}
-                                <span class="ellipsis">Open</span>
-                                {% endif %}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="filterDropdownMenuButton">
-                                <a class="status-menu-item dropdown-item">Open</a>
-                                <a class="status-menu-item dropdown-item">Closed</a>
+                    <hr class="m-0">
+                    <div class="flex-grow-0 px-4">
+                        <div class="input-group">
+                            <textarea id="messageInput" rows="5" style="height: 50px; resize: none;" class="form-control bg-white m-2" placeholder="Type your message"></textarea>
+                            <div class="mt-3">
+                                <button id="attachButton" class="add-attachment-helpdesk btn btn-secondary btn-sm mx-2">Attach</button>
+                                <button id="submitButton" class="btn btn-primary btn-sm">Send</button>
                             </div>
                         </div>
                     </div>
-                    <button id="ticketStatusSaveButton" class="mt-4 btn btn-primary btn-sm w-100" disabled="true">
-                        Save
-                    </button>
+                </div>
+                <div class="ml-3 d-none d-sm-none d-md-block col-md-3 pt-2">
+                    <div class="frappe-card container p-5">
+                        <div class="mb-2">
+                            <span>Ticket Details</span>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <div class="mb-2">
+                                <span>Status</span>
+                            </div>
+                            <div class="dropdown">
+                                {% set is_closed = (status in ['Resolved', 'Closed'])%}
+                                <a id="ticketStatusDropdownTitle"class="btn btn-default btn-sm list-sidebar-button dropdown-toggle w-100" type="button" id="filterDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% if is_closed %}
+                                    <span class="ellipsis">Closed</span>
+                                    {% else %}
+                                    <span class="ellipsis">Open</span>
+                                    {% endif %}
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="filterDropdownMenuButton">
+                                    <a class="status-menu-item dropdown-item">Open</a>
+                                    <a class="status-menu-item dropdown-item">Closed</a>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="ticketStatusSaveButton" class="mt-4 btn btn-primary btn-sm w-100" disabled="true">
+                            Save
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
