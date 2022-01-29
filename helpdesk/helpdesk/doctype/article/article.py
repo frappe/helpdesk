@@ -5,8 +5,7 @@ import frappe
 from frappe.website.website_generator import WebsiteGenerator
 from frappe import _
 from frappe.utils import cint
-from frappe.website.utils import cleanup_page_name
-
+from frappe.website.utils import (cleanup_page_name, get_html_content_based_on_type)
 
 class Article(WebsiteGenerator):
 	def validate(self):
@@ -25,6 +24,11 @@ class Article(WebsiteGenerator):
 		category_doc = frappe.get_doc("Category", self.category)
 		scrubbed_title = cleanup_page_name(self.title)
 		return f"{category_doc.route}/{scrubbed_title}"
+
+	def get_context(self, context):
+		context.content = get_html_content_based_on_type(self, 'content', self.content_type)
+
+		return context
 
 @frappe.whitelist(allow_guest=True)
 def add_feedback(article, helpful):

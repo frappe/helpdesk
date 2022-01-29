@@ -11,7 +11,10 @@
   "title",
   "category",
   "published",
+  "content_section",
+  "content_type",
   "content",
+  "content_md",
   "route",
   "views",
   "helpful",
@@ -21,14 +24,11 @@
   {
    "fieldname": "title",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Title",
    "reqd": 1,
    "unique": 1
-  },
-  {
-   "fieldname": "content",
-   "fieldtype": "Text Editor",
-   "label": "Content"
   },
   {
    "fieldname": "category",
@@ -71,14 +71,36 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Not Helpful"
+  },
+  {
+   "default": "Rich Text",
+   "fieldname": "content_type",
+   "fieldtype": "Select",
+   "label": "Content Type",
+   "options": "Rich Text\nMarkdown"
+  },
+  {
+   "fieldname": "content_section",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "fieldname": "content_md",
+   "fieldtype": "Markdown Editor",
+   "label": "Content (Markdown)"
+  },
+  {
+   "fieldname": "content",
+   "fieldtype": "Text Editor",
+   "label": "Content"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "migration_hash": "effd79e6100ca85ff18d85dcd95a407f",
- "modified": "2022-01-25 13:12:47.349167",
+ "migration_hash": "00174fc228adf8e2ab03fef8a45e9058",
+ "modified": "2022-01-29 19:00:24.551371",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
