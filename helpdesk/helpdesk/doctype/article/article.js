@@ -3,6 +3,14 @@
 
 frappe.ui.form.on('Article', {
 	refresh: function(frm) {
+		frm.set_query("category", function() {
+			return {
+				"filters": {
+					"is_group": "0",
+				}
+			};
+		});
+
 		show_content_wrt_type(frm);
 		
 		frm.dashboard.clear_headline();
