@@ -18,15 +18,16 @@ class Category(WebsiteGenerator):
 				frappe.throw(_("Parent category should be a group category"))
 		# Limit the tree depth to 2
 		if self.is_group:
-			all_group_categories = frappe.get_all("Category", filters={"is_group": ["=", "1"]}, pluck="name")
-			if(len(all_group_categories) >= 6):
-				frappe.throw(_("Can only create a maximum of 6 groups categories"))
-
 			if self.parent_category:
 				frappe.throw(_("Can only create category with atmost a single nesting"))
 		else:
 			if not self.parent_category:
 				frappe.throw(_("Can only create leaf nodes within a parent category"))
+
+	def before_insert(self):
+		all_group_categories = frappe.get_all("Category", filters={"is_group": ["=", "1"]}, pluck="name")
+		if(len(all_group_categories) >= 6):
+			frappe.throw(_("Can only create a maximum of 6 groups categories"))
 
 	#TODO: when renamed, website route should be updated
 	def before_save(self):
