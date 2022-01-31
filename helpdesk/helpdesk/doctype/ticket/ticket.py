@@ -19,7 +19,7 @@ from frappe.website.utils import cleanup_page_name
 
 class Ticket(WebsiteGenerator):
 	def autoname(self):
-		return cleanup_page_name(self.name)
+		return self.name
 
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)
@@ -34,7 +34,7 @@ class Ticket(WebsiteGenerator):
 		self.set_contact(self.raised_by)
 
 	def before_save(self):
-		self.route = f"support/tickets/{self.name}"
+		self.route = f"support/tickets/{cleanup_page_name(self.name)}"
 
 	def on_update(self):
 		# Add a communication in the ticket timeline
