@@ -14,9 +14,13 @@ from frappe.website.website_generator import WebsiteGenerator
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
+from frappe.website.utils import cleanup_page_name
 
 
 class Ticket(WebsiteGenerator):
+	def autoname(self):
+		return cleanup_page_name(self.name)
+
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
