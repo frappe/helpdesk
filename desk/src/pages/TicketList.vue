@@ -25,7 +25,7 @@
 			</div>
 			<div 
 				class="w-full block overflow-auto"
-        		:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10rem)' : null }"
+        		:style="{ height: viewportWidth > 768 ? 'calc(100vh - 15rem)' : null }"
 			>
 				<div class="flex-auto" v-for="ticket in tickets" :key="ticket.name">
 					<div class="block rounded-md sm:px-2">

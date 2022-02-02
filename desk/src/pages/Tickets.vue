@@ -1,37 +1,34 @@
 <template>
-	<div 
-        class="flex mx-4 py-4"
-        :style="{ height: viewportWidth > 768 ? 'calc(100vh - 1rem)' : null }"
-    >
-        <div class="sm:w-1/12 bg-slate-100 mr-4">
-
-        </div>
-        <div class="sm:w-11/12">
-            <div class="mb-4">
-                <Button type="primary">Add Ticket</Button>
-            </div>
-            <div class="w-full">
-                <TicketList v-bind:tickets="$resources.allTickets.data"/>
-            </div>
-        </div>
-    </div>
+	<div>
+		<div>
+			<div class="flow-root mb-2">
+				<p class="float-left text-6xl font-bold"> Tickets </p>
+				<div class="float-right mb-4">
+					<div class="flex space-x-3">
+						<Button icon-left="filter">Add Filter</Button>
+						<Button icon-left="plus">Last Modified</Button>
+						<Button icon-left="plus" type="primary">Add Ticket</Button>
+					</div>
+				</div>
+			</div>
+			<TicketList :tickets="$resources.tickets.data"/>
+		</div>
+	</div>
 </template>
 <script>
 import TicketList from './TicketList.vue'
 
 export default {
 	name: 'Tickets',
-    inject: ['viewportWidth'],
-    resources: {
-		allTickets: {
-		method: 'helpdesk.api.ticket.get_tickets',
+	inject: ['viewportWidth'],
+	resources: {
+		tickets: {
+			method: 'helpdesk.api.ticket.get_tickets',
+			auto: true
 		},
 	},
 	components: {
-        TicketList
-	},
-	mounted() {
-		this.$resources.allTickets.fetch()
+		TicketList
 	}
 }
 </script>
