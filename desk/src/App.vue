@@ -8,9 +8,7 @@
 				<SideBarMenu/>
 			</div>
 			<div class="w-screen pt-4 ml-5 mr-10">
-				<keep-alive>
-					<router-view />
-				</keep-alive>
+				<router-view />
 			</div>
 		</div>
 	</div>
@@ -30,10 +28,9 @@ export default {
     provide: {
         viewportWidth: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     },
-    componsnets: {
+    components: {
         NavBar,
         SideBarMenu
-	},
-    components: { NavBar, SideBarMenu }
+	}
 }
 </script>

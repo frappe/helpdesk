@@ -35,7 +35,7 @@
 			>
 				<div class="flex-auto" v-for="ticket in tickets" :key="ticket.name">
 					<div class="block py-1 rounded-md sm:px-2">
-						<a :href="ticket.name" class="block rounded-md sm:px-2 hover:bg-gray-50">
+						<a :href="'ticket/' + ticket.name" class="block rounded-md sm:px-2 hover:bg-gray-50">
 							<div class="flex items-center justify-between sm:justify-start font-light">
 								<div class="mr-4">
 									<Input type="checkbox" value="" />

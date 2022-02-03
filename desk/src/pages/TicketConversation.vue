@@ -1,5 +1,11 @@
 <template>
     <div>
-        <div>Ticket Conversations Here</div>
+        <div>{{ ticketId }}</div>
     </div>
 </template>
+<script>
+export default {
+    name: 'TicketConversation',
+    props: ['ticketId'],
+}
+</script>
