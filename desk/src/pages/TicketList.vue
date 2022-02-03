@@ -50,9 +50,7 @@
 									{{ ticket.status }}
 								</div> 
 								<div class="text-base sm:w-2/12">
-									<span class="inline-block px-3 py-1 text-xs font-medium rounded-md cursor-default pointer-events-none text-gray-700 bg-gray-50">
-										{{ ticket.status }}
-									</span>
+									<Badge>{{ ticket.status }}</Badge>
 								</div> 
 								<div class="text-base sm:w-3/12">
 									{{ ticket.contact }}
@@ -72,13 +70,15 @@
 
 <script>
 import { Input } from 'frappe-ui'
+import { Badge } from 'frappe-ui'
 
 export default {
 	name: 'TicketList',
 	props: ['tickets'],
 	inject: ['viewportWidth'],
 	components: {
-		Input
+		Input,
+		Badge
 	},
 }
 </script>

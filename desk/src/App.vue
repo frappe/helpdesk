@@ -8,7 +8,11 @@
 				<SideBarMenu/>
 			</div>
 			<div class="w-screen pt-4 ml-5 mr-10">
-				<router-view />
+				<router-view v-slot="{ Component }">
+					<keep-alive>
+						<component :is="Component" />
+					</keep-alive>
+				</router-view>
 			</div>
 		</div>
 	</div>

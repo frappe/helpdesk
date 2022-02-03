@@ -18,3 +18,9 @@ def get_tickets():
     """, as_dict=1)
     
     return all_tickets
+
+@frappe.whitelist(allow_guest=True)
+def get_ticket(ticket_id):
+    print('!!! FETCHING TICKET DETAILS !!!')
+    ticket_doc = frappe.get_doc("Ticket", ticket_id)
+    return ticket_doc
