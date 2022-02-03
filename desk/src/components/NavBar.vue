@@ -9,8 +9,8 @@
             </div>
         </div>
         <div class="float-right flex space-x-3">
-            <div class="border-r-2 pr-4">
-                <Button>Notifications</Button>
+            <div class="border-r-2 pr-2">
+                <div>Notifications</div>
             </div>
             <Avatar label="John Doe" imageURL="https://picsum.photos/200" />
         </div>
