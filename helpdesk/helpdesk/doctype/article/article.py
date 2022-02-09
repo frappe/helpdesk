@@ -16,6 +16,9 @@ class Article(WebsiteGenerator):
 		if not category_doc.parent_category:
 			frappe.throw(_("Article category should be a child to a parent category"))
 
+	def before_insert(self):
+		self.author = frappe.session.user
+
 	#TODO: when renamed, website route should be updated
 	def before_save(self):
 		self.route = self.get_page_route()
