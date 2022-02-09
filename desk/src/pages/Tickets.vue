@@ -11,7 +11,7 @@
 					</div>
 				</div>
 			</div>
-			<TicketList v-if="tickets" :tickets="$resources.tickets.data"/>
+			<TicketList />
 		</div>
 	</div>
 </template>
@@ -21,19 +21,8 @@ import TicketList from './TicketList.vue'
 export default {
 	name: 'Tickets',
 	inject: ['viewportWidth'],
-	resources: {
-		tickets: {
-			method: 'helpdesk.api.ticket.get_tickets',
-			auto: true
-		},
-	},
 	components: {
 		TicketList
-	},
-	computed: {
-		tickets() {
-			return this.$resources.tickets.data ? this.$resources.tickets.data : null
-		}
 	}
 }
 </script>

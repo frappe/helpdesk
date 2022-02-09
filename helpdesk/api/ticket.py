@@ -17,13 +17,19 @@ def get_tickets():
         ON ticket.contact = contact.name
         LEFT JOIN `tabAgent` agent
         ON ticket.agent = agent.name
-        ORDER BY ticket.modified desc
+        ORDER BY ticket.creation desc
     """, as_dict=1)
     
     return all_tickets
 
 @frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):
-    print('!!! FETCHING TICKET DETAILS !!!')
     ticket_doc = frappe.get_doc("Ticket", ticket_id)
     return ticket_doc
+
+@frappe.whitelist(allow_guest=True)
+def assign_ticket_to_agent(ticket_id, agent_id=None):
+    if ticket_id:
+        ticket_doc = frappe.get_doc("Ticket", ticket_id)
+        ticket_doc.agent = agent_id
+        ticket_doc.save()
