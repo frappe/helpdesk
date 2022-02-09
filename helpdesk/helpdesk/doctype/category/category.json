@@ -3,7 +3,7 @@
  "allow_guest_to_view": 1,
  "allow_rename": 1,
  "autoname": "field:category_name",
- "creation": "2021-12-30 19:20:15.934034",
+ "creation": "2022-02-08 18:13:42.039744",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -35,6 +35,7 @@
    "label": "Is Group"
   },
   {
+   "depends_on": "eval:!doc.is_group",
    "fieldname": "parent_category",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -43,7 +44,7 @@
    "options": "Category"
   },
   {
-   "depends_on": "is_group",
+   "depends_on": "eval:!doc.is_group",
    "fieldname": "articles",
    "fieldtype": "Table",
    "label": "Articles",
@@ -65,14 +66,8 @@
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
- "links": [
-  {
-   "link_doctype": "Article",
-   "link_fieldname": "category"
-  }
- ],
- "migration_hash": "79533656d34db65dcaeb3a543e4e6b99",
- "modified": "2022-01-25 13:08:54.171328",
+ "links": [],
+ "modified": "2022-02-09 11:36:49.064986",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Category",
@@ -95,5 +90,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }
