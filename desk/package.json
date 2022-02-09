@@ -10,7 +10,7 @@
   "dependencies": {
     "@headlessui/vue": "^1.4.3",
     "feather-icons": "^4.28.0",
-    "frappe-ui": "0.0.4",
+    "frappe-ui": "0.0.8",
     "luxon": "^2.3.0",
     "vue": "^3.2.29",
     "vue-router": "^4.0.12"
