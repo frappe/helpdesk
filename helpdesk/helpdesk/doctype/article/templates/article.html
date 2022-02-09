@@ -1,8 +1,9 @@
 {% extends "templates/kb_base_template.html" %}
 
 {% block page_content %}
-{{ frappe.render_template('templates/components/knowledge_base_title_with_search_bar.html', {}) }}
-{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
+<div class="pt-4">
+	{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
+</div>
 <div class="container d-flex">
 	<div class="col-sm-12 col-md-7 pl-0">
 		<h2>{{ title }}</h2>
