@@ -13,17 +13,20 @@
   "is_group",
   "parent_category",
   "articles",
+  "sub_categories",
   "route",
   "linked_web_page"
  ],
  "fields": [
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "category_name",
    "fieldtype": "Data",
    "label": "Name",
    "unique": 1
   },
   {
+   "allow_in_quick_entry": 1,
    "fieldname": "description",
    "fieldtype": "Text",
    "label": "Description"
@@ -62,12 +65,19 @@
    "hidden": 1,
    "label": "Linked Web Page",
    "options": "Web Page"
+  },
+  {
+   "depends_on": "is_group",
+   "fieldname": "sub_categories",
+   "fieldtype": "Table",
+   "label": "Sub Categories",
+   "options": "Sub Category Item"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-09 11:36:49.064986",
+ "modified": "2022-02-09 12:00:09.927137",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Category",
