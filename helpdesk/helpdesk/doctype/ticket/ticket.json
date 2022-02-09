@@ -1,8 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "allow_rename": 1,
- "autoname": "format:TKT-{YYYY}-{#####}",
+ "autoname": "format:{#####}",
  "creation": "2013-02-01 10:36:25",
  "doctype": "DocType",
  "document_type": "Setup",
@@ -10,7 +9,6 @@
  "engine": "InnoDB",
  "field_order": [
   "subject_section",
-  "naming_series",
   "subject",
   "raised_by",
   "cb00",
@@ -60,15 +58,6 @@
    "fieldname": "subject_section",
    "fieldtype": "Section Break",
    "options": "fa fa-flag"
-  },
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
-   "label": "Series",
-   "no_copy": 1,
-   "options": "ISS-.YYYY.-",
-   "print_hide": 1,
-   "set_only_once": 1
   },
   {
    "bold": 1,
@@ -383,11 +372,12 @@
  "idx": 7,
  "is_published_field": "is_published",
  "links": [],
- "migration_hash": "3272d8b17b61ee05ad03e66f820e7a84",
- "modified": "2022-01-17 03:56:34.105111",
+ "migration_hash": "a1f42c51af35387c3ee0c65c9147253f",
+ "modified": "2022-02-04 08:09:16.580531",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
+ "name_case": "UPPER CASE",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
