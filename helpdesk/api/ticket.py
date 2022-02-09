@@ -10,10 +10,13 @@ def get_tickets():
             ticket.status,
             ticket.name,
             ticket.ticket_type,
+            agent.agent_name as assignee,
             contact.name as contact
         FROM `tabTicket` ticket
-            LEFT JOIN `tabContact` contact
-            ON ticket.contact = contact.name
+        LEFT JOIN `tabContact` contact
+        ON ticket.contact = contact.name
+        LEFT JOIN `tabAgent` agent
+        ON ticket.agent = agent.name
         ORDER BY ticket.modified desc
     """, as_dict=1)
     

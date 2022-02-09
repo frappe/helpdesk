@@ -11,7 +11,7 @@
 					</div>
 				</div>
 			</div>
-			<TicketList :tickets="$resources.tickets.data"/>
+			<TicketList v-if="tickets" :tickets="$resources.tickets.data"/>
 		</div>
 	</div>
 </template>
@@ -29,6 +29,11 @@ export default {
 	},
 	components: {
 		TicketList
+	},
+	computed: {
+		tickets() {
+			return this.$resources.tickets.data ? this.$resources.tickets.data : null
+		}
 	}
 }
 </script>

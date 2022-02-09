@@ -53,7 +53,7 @@
 									<Badge>{{ ticket.status }}</Badge>
 								</div> 
 								<div class="text-base sm:w-3/12">
-									{{ ticket.contact }}
+									{{ ticket.assignee }}
 								</div>
 								<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
 									{{ ticket.modified }}
