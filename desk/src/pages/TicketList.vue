@@ -47,10 +47,10 @@
 									{{ ticket.contact }}
 								</div>
 								<div class="text-base sm:w-2/12">
-									{{ ticket.status }}
+									{{ ticket.ticket_type }}
 								</div> 
 								<div class="text-base sm:w-2/12">
-									<Badge>{{ ticket.status }}</Badge>
+									<Badge :color="getBadgeColorBasedOnStatus(ticket.status)">{{ ticket.status }}</Badge>
 								</div> 
 								<div class="text-base sm:w-3/12">
 									{{ ticket.assignee }}
@@ -80,5 +80,18 @@ export default {
 		Input,
 		Badge
 	},
+	methods: {
+		getBadgeColorBasedOnStatus(status) {
+			if (['Open'].includes(status)) {
+				return 'green'
+			}
+			if (['Closed', 'Resolved'].includes(status)) {
+				return 'red'
+			}
+			if (['Replied'].includes(status)) {
+				return 'orange'
+			}
+		}
+	}
 }
 </script>
