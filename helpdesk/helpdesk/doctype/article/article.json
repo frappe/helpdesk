@@ -11,6 +11,8 @@
   "title",
   "category",
   "published",
+  "column_break_4",
+  "author",
   "content_section",
   "content_type",
   "content",
@@ -98,13 +100,25 @@
    "fieldname": "content",
    "fieldtype": "Text Editor",
    "label": "Content"
+  },
+  {
+   "depends_on": "author",
+   "fieldname": "author",
+   "fieldtype": "Link",
+   "label": "Author",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-02-09 12:03:29.260632",
+ "modified": "2022-02-09 12:43:54.780234",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
