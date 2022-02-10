@@ -11,7 +11,9 @@
 					</div>
 				</div>
 			</div>
-			<TicketList />
+			<div v-if="tickets">
+				<TicketList :ticketList="tickets" :agents="agents"/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -23,6 +25,28 @@ export default {
 	inject: ['viewportWidth'],
 	components: {
 		TicketList
-	}
+	},
+	resources: {
+		tickets() {
+			return {
+				method: 'helpdesk.api.ticket.get_tickets',
+				auto: true
+			}
+		},
+		agents() {
+			return {
+				method: 'helpdesk.api.agent.get_all',
+				auto: true
+			}
+		}
+	},
+	computed: {
+		tickets() {
+			return this.$resources.tickets.data ? this.$resources.tickets.data : null
+		},
+		agents() {
+			return this.$resources.agents.data ? this.$resources.agents.data : null;
+		}
+	},
 }
 </script>
