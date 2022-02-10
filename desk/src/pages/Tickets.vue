@@ -12,7 +12,12 @@
 				</div>
 			</div>
 			<div v-if="tickets">
-				<TicketList :ticketList="tickets" :agents="agents"/>
+				<TicketList 
+					:ticketList="tickets" 
+					:agents="agents"
+					:types="types"
+					:statuses="statuses"
+				/>
 			</div>
 		</div>
 	</div>
@@ -38,6 +43,18 @@ export default {
 				method: 'helpdesk.api.agent.get_all',
 				auto: true
 			}
+		},
+		types() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_types',
+				auto: true
+			}
+		},
+		statuses() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
+				auto: true
+			}
 		}
 	},
 	computed: {
@@ -46,6 +63,12 @@ export default {
 		},
 		agents() {
 			return this.$resources.agents.data ? this.$resources.agents.data : null;
+		},
+		types() {
+			return this.$resources.types.data ? this.$resources.types.data : null
+		},
+		statuses() {
+			return this.$resources.statuses.data ? this.$resources.statuses.data : null;
 		}
 	},
 }

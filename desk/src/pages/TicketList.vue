@@ -36,7 +36,12 @@
 			>
 				<div class="flex-auto" v-for="ticket in this.ticketList" :key="ticket">
 					<div class="block py-1 rounded-md sm:px-2">
-						<TicketListItem :ticketName="ticket" :agents="this.agents"/>
+						<TicketListItem 
+							:ticketName="ticket" 
+							:agents="this.agents"
+							:types="this.types"
+							:statuses="this.statuses"
+						/>
 					</div>
 				</div>
 			</div>
@@ -51,7 +56,7 @@ import TicketListItem from '../components/TicketListItem.vue'
 export default {
 	name: 'TicketList',
 	inject: ['viewportWidth'],
-	props: ['ticketList', 'agents'],
+	props: ['ticketList', 'agents', 'types', 'statuses'],
 	components: {
 		Input,
 		TicketListItem
