@@ -12,10 +12,10 @@ class Category(WebsiteGenerator):
 		self.validate_tree()
 
 	def validate_tree(self):
-		if self.parent_category:
-			parent_category_doc = frappe.get_doc("Category", self.parent_category)
-			if not parent_category_doc.is_group:
-				frappe.throw(_("Parent category should be a group category"))
+		# if self.parent_category:
+		# 	parent_category_doc = frappe.get_doc("Category", self.parent_category)
+		# 	if not parent_category_doc.is_group:
+		# 		frappe.throw(_("Parent category should be a group category"))
 		# Limit the tree depth to 2
 		if self.is_group:
 			if self.parent_category:
