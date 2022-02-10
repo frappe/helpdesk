@@ -12,17 +12,9 @@ class Category(WebsiteGenerator):
 		self.validate_tree()
 
 	def validate_tree(self):
-		# if self.parent_category:
-		# 	parent_category_doc = frappe.get_doc("Category", self.parent_category)
-		# 	if not parent_category_doc.is_group:
-		# 		frappe.throw(_("Parent category should be a group category"))
-		# Limit the tree depth to 2
 		if self.is_group:
 			if self.parent_category:
 				frappe.throw(_("Can only create category with atmost a single nesting"))
-		else:
-			if not self.parent_category:
-				frappe.throw(_("Can only create leaf nodes within a parent category"))
 
 	def before_insert(self):
 		if self.is_group:
@@ -33,6 +25,29 @@ class Category(WebsiteGenerator):
 	#TODO: when renamed, website route should be updated
 	def before_save(self):
 		self.route = self.get_page_route()
+		
+		if self.is_group:
+			# reset previous sub categories to null
+			all_previous_sub_categories = frappe.get_all("Category", filters={"parent_category": ["=", self.name]}, pluck="name")
+			for category in all_previous_sub_categories:
+				category_doc = frappe.get_doc("Category", category)
+				category_doc.parent_category = ""
+				category_doc.save()
+
+			# set parent_category fields for all the sub_cateogries
+			for category in self.sub_categories:
+				category_doc = frappe.get_doc("Category", category.sub_category)
+				if category_doc:
+					if not category_doc.is_group:
+						if not category_doc.parent_category or category_doc.parent_category == self.name:
+							category_doc.parent_category = self.name
+							category_doc.save()
+						else:
+							frappe.throw(_(f"{category_doc.category_name} is already a child category of {category_doc.parent_category}, please remove it and try again"))
+					else:
+						frappe.throw(_(f"{category_doc.category_name} is a group category, and cannot be added as a sub category"))
+				else:
+					frappe.throw(_(f"No category named {category.sub_category} found"))
 
 	def get_page_route(self, route="", category=None):
 		if not category:
