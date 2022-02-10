@@ -21,12 +21,19 @@ class Category(WebsiteGenerator):
 			all_group_categories = frappe.get_all("Category", filters={"is_group": ["=", "1"]}, pluck="name")
 			if(len(all_group_categories) >= 6):
 				frappe.throw(_("Can only create a maximum of 6 groups categories"))
+		
+	def after_insert(self):
+		self.update_article_and_sub_category_ordering()
 
 	#TODO: when renamed, website route should be updated
 	def before_save(self):
 		if self.is_group or self.parent_category:
 			self.route = self.get_page_route()
-		
+
+	def on_update(self):
+		self.update_article_and_sub_category_ordering()
+
+	def update_article_and_sub_category_ordering(self):
 		if self.is_group:
 			# reset previous sub categories to null
 			all_previous_sub_categories = frappe.get_all("Category", filters={"parent_category": ["=", self.name]}, pluck="name")
@@ -70,7 +77,6 @@ class Category(WebsiteGenerator):
 						frappe.throw(_(f"{article_doc.title} is already a child category of {article_doc.category}, please remove it and try again"))
 				else:
 					frappe.throw(_(f"No article named {article.article} found"))
-				
 
 	def set_page_route(self):
 		self.route = self.get_page_route()
