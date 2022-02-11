@@ -1,14 +1,26 @@
 <template>
 	<div class="flex">
-		<div class="sm:w-3/12 px-4 space-y-5">
-			<div>
-				<Card title="Contact details">
-					<div>
-						<hr class="mb-4">
-						<div class="text-base">Card content</div>
-					</div>
-				</Card>
+		<div class="sm:w-3/12 px-4">
+			<Card title="Contact details">
+				<div>
+					<hr class="mb-4">
+					<div class="text-base">Card content</div>
+				</div>
+			</Card>
+		</div>
+		<div
+			v-if="ticket"
+			class="sm:w-9/12 px-4"
+			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 8rem)' : null }"
+		>
+			<div class="flex">
+				<div class="text-6xl">
+					{{ ticket.name }} - {{ ticket.subject }}
+				</div>
+				<Badge color="green" class="my-2 ml-3">{{ ticket.status }}</Badge>
 			</div>
+		</div>
+		<div class="sm:w-3/12">
 			<div v-if="ticket">
 				<Card :title="'Ticket #' + ticket.name">
 					<div>
@@ -49,24 +61,10 @@
 				</Card>
 			</div>
 		</div>
-		<div 
-			v-if="ticket"
-			class="sm:w-9/12 px-4"
-			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 8rem)' : null }"
-		>
-			<div class="flex">
-				<div class="text-6xl">
-					{{ ticket.name }} - {{ ticket.subject }}
-				</div>
-				<Badge color="green" class="my-2 ml-3">{{ ticket.status }}</Badge>
-			</div>
-		</div>
 	</div>
 </template>
 <script>
-import { Badge } from 'frappe-ui'
-import { Card } from 'frappe-ui'
-import { Dropdown } from 'frappe-ui'
+import { Badge, Card, Dropdown } from 'frappe-ui'
 
 export default {
 	name: 'TicketConversation',

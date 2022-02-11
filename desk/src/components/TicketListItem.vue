@@ -35,7 +35,7 @@
 							{{ ticket.ticket_type }}
 						</div>
 						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-500"> Set Type </span>
+							<span class="text-sm text-gray-500"> set type </span>
 						</div>
 					</div>
 				</template>
@@ -48,22 +48,20 @@
 				class="text-base sm:w-2/12"
 			>
 				<template v-slot="{ toggleStatuses }">
-					<div  
-						class="w-full cursor-pointer"
-					>
+					<div class="w-full cursor-pointer">
 						<div 
 							v-if="ticket.status"
 							@click="toggleStatuses"	
 						>
 							<Badge 
-								class="cursor-pointer" 
+								class="cursor-pointer"
 								:color="getBadgeColorBasedOnStatus(ticket.status)"
 							>
 								{{ ticket.status }}
 							</Badge>
 						</div>
 						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-500"> Set status </span>
+							<span class="text-sm text-gray-500"> set status </span>
 						</div>
 					</div>
 				</template>
@@ -84,7 +82,7 @@
 							{{ ticket.assignee }}
 						</div>
 						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-500"> Assign an agent </span>
+							<span class="text-sm text-gray-500"> assign agent </span>
 						</div>
 					</div>
 				</template>
@@ -227,7 +225,6 @@ export default {
 			let statusItems = [];
 			if (this.statuses) {
 				this.statuses.forEach(status => {
-					console.log(status)
 					statusItems.push({
 						label: status,
 						handler: () => {
