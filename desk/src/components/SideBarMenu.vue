@@ -1,7 +1,7 @@
 <template>
 	<div class="space-y-5 px-3">
 		<div class="group p-2 hover:bg-blue-50 rounded-md cursor-pointer">
-			<CustomIcons name="ticket" class="hover:stroke-blue-600" width="34" height="34"/>
+			<CustomIcons name="ticket" class="group-hover:stroke-blue-600" width="34" height="34"/>
 		</div>
 		<div class="group p-2 hover:bg-blue-50 rounded-md cursor-pointer">
 			<CustomIcons name="knowledge-base" class="group-hover:stroke-blue-600" width="30" height="30"/>

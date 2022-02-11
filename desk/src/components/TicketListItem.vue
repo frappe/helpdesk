@@ -1,23 +1,23 @@
 <template>
 	<div class="block rounded-md sm:px-2 hover:bg-gray-50">
 		<div 
-			v-if="ticket"
+			v-if="ticketDetails"
 			class="group flex items-center justify-between sm:justify-start font-light"
 		>
 			<div 
-				:href="'ticket/' + ticket.name"
+				:href="'ticket/' + ticketDetails.name"
 				class="mr-4"
 			>
 				<Input type="checkbox" value="" />
 			</div>
 			<a 
-				:href="'ticket/' + ticket.name"
+				:href="'ticket/' + ticketDetails.name"
 				class="text-base sm:w-5/12"
 			>
-				{{ ticket.subject }}
+				{{ ticketDetails.subject }}
 			</a>
 			<div class="text-base sm:w-3/12">
-				{{ ticket.contact }}
+				{{ ticketDetails.contact }}
 			</div>
 			<Dropdown 
 				v-if="this.types"
@@ -31,8 +31,8 @@
 						class="w-full"
 						@click="toggleTypes"
 					>
-						<div v-if="ticket.ticket_type">
-							{{ ticket.ticket_type }}
+						<div v-if="ticketDetails.ticket_type">
+							{{ ticketDetails.ticket_type }}
 						</div>
 						<div v-else class="hidden group-hover:block">
 							<span class="text-sm text-gray-500"> set type </span>
@@ -55,9 +55,9 @@
 						>
 							<Badge 
 								class="cursor-pointer"
-								:color="getBadgeColorBasedOnStatus(ticket.status)"
+								:color="getBadgeColorBasedOnStatus(ticketDetails.status)"
 							>
-								{{ ticket.status }}
+								{{ ticketDetails.status }}
 							</Badge>
 						</div>
 						<div v-else class="hidden group-hover:block">
@@ -78,8 +78,8 @@
 						class="w-full"
 						@click="toggleAssignees"
 					>
-						<div v-if="ticket.assignee">
-							{{ ticket.assignee }}
+						<div v-if="ticketDetails.assignee">
+							{{ ticketDetails.assignee }}
 						</div>
 						<div v-else class="hidden group-hover:block">
 							<span class="text-sm text-gray-500"> assign agent </span>
@@ -88,7 +88,7 @@
 				</template>
 			</Dropdown>
 			<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
-				{{ ticket.modified }}
+				{{ ticketDetails.modified }}
 			</div> 
 		</div>
 		<div class="transform translate-y-2 border-b"/>
@@ -100,20 +100,28 @@ import { Badge, Dropdown, Input } from 'frappe-ui'
 
 export default {
 	name: 'TicketListItem',
-	props: ['ticketName', 'agents', 'types', 'statuses'],
+	props: ['ticket', 'agents', 'types', 'statuses'],
 	components: {
 		Input,
 		Badge,
 		Dropdown
+	},
+	data() {
+		return {
+			ticketDetailsRefreshed: false,
+			localTicket: null,
+		}
 	},
 	resources: {
 		ticket() {
 			return {
 				method: 'helpdesk.api.ticket.get_ticket',
 				params: {
-					ticket_id: this.ticketName
+					ticket_id: this.ticketDetails.name
 				},
-				auto: true
+				onSuccess: () => {
+					this.ticketDetailsRefreshed = true;
+				}
 			}
 		},
 		assignTicketToAgent() {
@@ -145,8 +153,14 @@ export default {
 		},
 	},
 	computed: {
-		ticket() {
-			return this.$resources.ticket.data ? this.$resources.ticket.data : null
+		ticketDetails() {
+			if (this.ticketDetailsRefreshed) {
+				this.ticketDetailsRefreshed = false;
+				this.localTicket = this.$resources.ticket.data ? this.$resources.ticket.data : this.ticket;
+			} else {
+				this.localTicket = this.ticket;
+			}
+			return this.localTicket;
 		},
 	},
 	methods: {
@@ -172,7 +186,7 @@ export default {
 						label: agent.agent_name,
 						handler: () => {
 							this.$resources.assignTicketToAgent.submit({
-								ticket_id: this.ticketName,
+								ticket_id: this.ticketDetails.name,
 								agent_id: agent.name
 							});
 						},
@@ -187,7 +201,7 @@ export default {
 								label: 'Assign to me',
 								handler: () => {
 									this.$resources.assignTicketToAgent.submit({
-										ticket_id: this.ticketName
+										ticket_id: this.ticketDetails.name
 									});
 								}
 							},
@@ -210,7 +224,7 @@ export default {
 						label: type,
 						handler: () => {
 							this.$resources.assignTicketType.submit({
-								ticket_id: this.ticketName,
+								ticket_id: this.ticketDetails.name,
 								type: type
 							});
 						},
@@ -229,7 +243,7 @@ export default {
 						label: status,
 						handler: () => {
 							this.$resources.assignTicketStatus.submit({
-								ticket_id: this.ticketName,
+								ticket_id: this.ticketDetails.name,
 								status: status
 							});
 						},
