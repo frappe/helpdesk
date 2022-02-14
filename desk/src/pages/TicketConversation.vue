@@ -134,6 +134,15 @@ export default {
 				},
 				auto: true
 			}
+		},
+		conversations() {
+			return {
+				method: 'helpdesk.api.ticket.get_conversations',
+				params: {
+					ticket_id: this.ticketId
+				},
+				auto: true
+			}
 		}
 	},
 	computed: {
@@ -142,12 +151,20 @@ export default {
 		},
 		contact() {
 			return this.$resources.contact.data ? this.$resources.contact.data : null;
+		},
+		conversations() {
+			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
 		}
 	},
 	methods: {
-		toggleDropdown() {
-			
-		}
-	}
+		
+	},
+	activated() {
+		// 
+		this.$socket.on('new_message', this.$resources.conversations.fetch());
+	},
+	deactivated() {
+		this.$socket.off('new_message', this.$resources.conversations.fetch());
+	},
 }
 </script>

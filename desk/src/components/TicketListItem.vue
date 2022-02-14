@@ -4,14 +4,13 @@
 			v-if="ticketDetails"
 			class="group flex items-center justify-between sm:justify-start font-light"
 		>
-			<div 
-				:href="'ticket/' + ticketDetails.name"
+			<div
 				class="mr-4"
 			>
 				<Input type="checkbox" value="" />
 			</div>
 			<a 
-				:href="ticketDetails.name"
+				:href="'ticket/' + ticketDetails.name"
 				class="text-base sm:w-5/12"
 			>
 				{{ ticketDetails.subject }}
