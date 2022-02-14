@@ -1,10 +1,31 @@
 <template>
 	<div class="flex">
-		<div class="sm:w-3/12 px-4">
+		<div v-if="ticket" class="sm:w-3/12 px-4">
 			<Card title="Contact details">
-				<div>
+				<div v-if="contact">
 					<hr class="mb-4">
-					<div class="text-base">Card content</div>
+					<div class="text-base space-y-2">
+						<div class="flex space-x-2">
+							<Avatar class="h-4 w-4" label="John Doe" :imageURL="contact.image" />
+							<span class="pt-1">{{ contact.first_name + ' ' + contact.last_name}}</span>
+						</div>
+						<div class="flex space-x-2">
+							<FeatherIcon class="w-6 h-6 mx-1" name="mail" />
+							<span class="text-slate-500">{{ contact.email_id }}</span>
+						</div>
+						<div class="flex space-x-2">
+							<FeatherIcon class="w-6 h-6 mx-1" name="phone" />
+							<span class="text-slate-500">{{ contact.phone }}</span>
+						</div>
+					</div>
+					<hr class="my-3">
+					<div class="text-base space-y-3">
+						<span class="text-green-500">Open Tickets (2)</span>
+						<div class="space-y-1 text-slate-700">
+							<p class="text-slate-500">How to clear payment schedule?</p>
+							<p class="text-slate-500">How to bring Helpdesk to FC?</p>
+						</div>
+					</div>
 				</div>
 			</Card>
 		</div>
@@ -64,7 +85,7 @@
 	</div>
 </template>
 <script>
-import { Badge, Card, Dropdown } from 'frappe-ui'
+import { Badge, Card, Dropdown, Avatar, FeatherIcon, ListItem} from 'frappe-ui'
 
 export default {
 	name: 'TicketConversation',
@@ -73,7 +94,10 @@ export default {
 	components: {
 		Badge,
 		Card,
-		Dropdown
+		Dropdown,
+		Avatar,
+		FeatherIcon,
+		ListItem
 	},
 	resources: {
 		ticket() {
@@ -85,10 +109,22 @@ export default {
 				auto: true
 			}
 		},
+		contact() {
+			return {
+				method: 'helpdesk.api.ticket.get_contact',
+				params: {
+					ticket_id: this.ticketId
+				},
+				auto: true
+			}
+		}
 	},
 	computed: {
 		ticket() {
-			return this.$resources.ticket.data;
+			return this.$resources.ticket.data ? this.$resources.ticket.data : null;
+		},
+		contact() {
+			return this.$resources.contact.data ? this.$resources.contact.data : null;
 		}
 	},
 	methods: {

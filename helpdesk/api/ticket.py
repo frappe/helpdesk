@@ -65,3 +65,10 @@ def get_all_ticket_statuses():
         if doc_field.label == "Status":
             statuses = doc_field.options.split("\n")
     return statuses
+
+@frappe.whitelist(allow_guest=True)
+def get_contact(ticket_id):
+    contact_id = frappe.get_value("Ticket", ticket_id, "contact")
+    contact_doc = frappe.get_doc("Contact", contact_id)
+
+    return contact_doc
