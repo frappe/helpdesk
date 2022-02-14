@@ -5,6 +5,12 @@ const routes = [
     path: '/ticket',
     name: 'Tickets',
     component: () => import('@/pages/Tickets.vue'),
+  },
+  {
+    path: '/ticket/:ticketId',
+    name: 'TicketConversation',
+    component: () => import('@/pages/TicketConversation.vue'),
+    props: true
   }
 ]
 

@@ -17,7 +17,7 @@ export default defineConfig({
 		},
 	},
 	build: {
-		outDir: `../${path.basename(path.resolve('..'))}/public/frontend`,
+		outDir: `../${path.basename(path.resolve('..'))}/public/desk`,
 		emptyOutDir: true,
 		target: "es2015",
 	},
