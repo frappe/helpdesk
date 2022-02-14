@@ -14,8 +14,49 @@
 				</div>
 				<Badge color="green" class="my-2 ml-3">{{ ticket.status }}</Badge>
 			</div>
+			<div class="flex flex-col h-full space-y-2">
+				<div class="overflow-auto grow">
+					<div
+						v-for="i in [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]" :key="i" 
+						class="flex flex-col space-y-4 mt-4 pr-3"
+					>
+						<ConversationCard 
+							userName="Kamal Johnson" 
+							profilePicUrl="https://picsum.photos/200" 
+							time="5 hrs ago (Feb 2, 2022 11:12 AM)" 
+							message="Hey There"
+						/>
+					</div>
+				</div>
+				<div class="flex flex-col pr-3">
+					<div class="flex">
+						<div>
+							<Avatar label="John Doe" imageURL="https://picsum.photos/200" />
+						</div>
+						<div class="grow ml-3">
+							<div class="flex justify-between">
+								<div class="flex">
+									<span class="pt-1">Aditya Hase</span>
+								</div>
+								<span class="text-slate-500">5 hrs ago (Feb 2, 2022 11:12 AM)</span>
+							</div>
+							<div class="mt-2">
+								<textarea
+									class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-slate-50 bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+									id="exampleFormControlTextarea1"
+									rows="4"
+									placeholder="Your message"
+								></textarea>
+								<div class="my-2">
+									<Button>Submit</Button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="sm:w-3/12">
+		<div class="sm:w-3/12 pl-3">
 			<div v-if="ticket">
 				<Card :title="'Ticket #' + ticket.name">
 					<div>
@@ -59,8 +100,9 @@
 	</div>
 </template>
 <script>
-import { Badge, Card, Dropdown} from 'frappe-ui'
+import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
 import ContactCard from '../components/ContactCard.vue';
+import ConversationCard from '../components/ConversationCard.vue';
 
 export default {
 	name: 'TicketConversation',
@@ -70,7 +112,9 @@ export default {
     Badge,
     Card,
     Dropdown,
-    ContactCard
+    ContactCard,
+    Avatar,
+    ConversationCard
 },
 	resources: {
 		ticket() {
