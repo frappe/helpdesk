@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col" :style="{ height: viewportWidth > 768 ? 'calc(100vh - 8rem)' : null }">
+	<div class="flex flex-col" :style="{ height: viewportWidth > 768 ? 'calc(100vh - 6rem)' : null }">
 		<div class="space-y-5 px-3 mb-auto">
 			<div class="group p-2 hover:bg-blue-50 rounded-md cursor-pointer">
 				<CustomIcons name="ticket" class="group-hover:stroke-blue-600" width="34" height="34"/>

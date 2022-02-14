@@ -32,7 +32,7 @@
 			<div
 				v-if="this.ticketList"
 				class="w-full block overflow-auto"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 15rem)' : null }"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 13rem)' : null }"
 			>
 				<div class="flex-auto" v-for="ticket in this.ticketList" :key="ticket.name">
 					<div class="block py-1 rounded-md sm:px-2">
