@@ -4,6 +4,7 @@
   "description": "Customer Service Software",
   "main": "index.js",
   "scripts": {
+    "postinstall": "cd desk && yarn install",
     "dev": "cd desk && yarn dev",
     "build": "cd desk && yarn build"
   },
