@@ -1,4 +1,5 @@
 import frappe
+from helpdesk.helpdesk.doctype.ticket.ticket import get_all_conversations
 
 @frappe.whitelist(allow_guest=True)
 def get_tickets():
@@ -72,3 +73,7 @@ def get_contact(ticket_id):
     contact_doc = frappe.get_doc("Contact", contact_id)
 
     return contact_doc
+
+@frappe.whitelist(allow_guest=True)
+def get_conversations(ticket_id):
+    return get_all_conversations(ticket_id)

@@ -17,14 +17,15 @@
 			<div class="flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
 					<div
-						v-for="i in [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]" :key="i" 
+						:v-if="conversations"
+						v-for="conversation in conversations" :key="conversation.name" 
 						class="flex flex-col space-y-4 mt-4 pr-3"
 					>
 						<ConversationCard 
 							userName="Kamal Johnson" 
 							profilePicUrl="https://picsum.photos/200" 
-							time="5 hrs ago (Feb 2, 2022 11:12 AM)" 
-							message="Hey There"
+							:time="conversation.creation" 
+							:message="conversation.content"
 						/>
 					</div>
 				</div>
@@ -156,15 +157,15 @@ export default {
 			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
 		}
 	},
-	methods: {
-		
-	},
 	activated() {
-		// 
-		this.$socket.on('new_message', this.$resources.conversations.fetch());
+		this.$socket.on('list_update', (data) => {
+			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
+				this.$resources.conversations.fetch()
+			}
+		});
 	},
 	deactivated() {
-		this.$socket.off('new_message', this.$resources.conversations.fetch());
+		this.$socket.off('list_update');
 	},
 }
 </script>

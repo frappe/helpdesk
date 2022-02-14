@@ -12,7 +12,7 @@
             </div>
             <div class="mt-2">
                 <div class="p-5 bg-slate-50 rounded-md">
-                    <p>{{ message }}</p>
+                    <div v-html="message"></div>
                 </div>
             </div>
         </div>
