@@ -11,7 +11,7 @@
 				<Input type="checkbox" value="" />
 			</div>
 			<a 
-				:href="'ticket/' + ticketDetails.name"
+				:href="ticketDetails.name"
 				class="text-base sm:w-5/12"
 			>
 				{{ ticketDetails.subject }}
