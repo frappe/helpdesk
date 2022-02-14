@@ -34,3 +34,7 @@ scheduler_events = {
 		"helpdesk.helpdesk.doctype.service_level_agreement.service_level_agreement.check_agreement_status",
 	]
 }
+
+website_route_rules = [
+	{"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
+]
