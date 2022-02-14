@@ -60,29 +60,41 @@
 		<div class="sm:w-3/12 pl-3">
 			<div v-if="ticket">
 				<Card :title="'Ticket #' + ticket.name">
-					<div>
+					<div class="px-1">
 						<hr class="mb-4">
 						<div class="mb-4">
-							<h3 class="mb-2">Assignee</h3>
-							<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
+							<h3 class="mb-2" v-if="agents">Assignee</h3>
+							<Dropdown 
+								:options="agentsAsDropdownOptions()" 
+								:dropdown-width-full="true" 
+								placement="left"
+							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Twinkle Damania</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.assignee }}</Button>
 								</template>
 							</Dropdown>
 						</div>
 						<div class="mb-4">
 							<h3 class="mb-2">Type</h3>
-							<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
+							<Dropdown 
+								:options="typesAsDropdownOptions()" 
+								:dropdown-width-full="true"
+								placement="left"	
+							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Button</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.ticket_type }}</Button>
 								</template>
 							</Dropdown>
 						</div>
 						<div class="mb-4">
 							<h3 class="mb-2">Status</h3>
-							<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
+							<Dropdown 
+								:options="statusesAsDropdownOptions()" 
+								:dropdown-width-full="true"
+								placement="left"
+							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Open</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.status }}</Button>
 								</template>
 							</Dropdown>
 						</div>
@@ -110,13 +122,13 @@ export default {
 	inject: ['viewportWidth'],
 	props: ['ticketId'],
 	components: {
-    Badge,
-    Card,
-    Dropdown,
-    ContactCard,
-    Avatar,
-    ConversationCard
-},
+		Badge,
+		Card,
+		Dropdown,
+		ContactCard,
+		Avatar,
+		ConversationCard
+	},
 	resources: {
 		ticket() {
 			return {
@@ -144,6 +156,51 @@ export default {
 				},
 				auto: true
 			}
+		},
+		agents() {
+			return {
+				method: 'helpdesk.api.agent.get_all',
+				auto: true
+			}
+		},
+		assignTicketToAgent() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		},
+		assignTicketType() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_type',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		},
+		assignTicketStatus() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_status',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		},
+		types() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_types',
+				auto: true
+			}
+		},
+		statuses() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
+				auto: true
+			}
 		}
 	},
 	computed: {
@@ -155,6 +212,15 @@ export default {
 		},
 		conversations() {
 			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
+		},
+		agents() {
+			return this.$resources.agents.data ? this.$resources.agents.data : null;
+		},
+		types() {
+			return this.$resources.types.data ? this.$resources.types.data : null
+		},
+		statuses() {
+			return this.$resources.statuses.data ? this.$resources.statuses.data : null;
 		}
 	},
 	activated() {
@@ -167,5 +233,84 @@ export default {
 	deactivated() {
 		this.$socket.off('list_update');
 	},
+	methods: {
+		agentsAsDropdownOptions() {
+			let agentItems = [];
+			if (this.agents) {
+				this.agents.forEach(agent => {
+					agentItems.push({
+						label: agent.agent_name,
+						handler: () => {
+							this.$resources.assignTicketToAgent.submit({
+								ticket_id: this.ticket.name,
+								agent_id: agent.name
+							});
+						},
+					});
+				});
+				let options = [
+					{
+						group: 'Actions',
+						hideLabel: true,
+						items: [
+							{
+								label: 'Assign to me',
+								handler: () => {
+									this.$resources.assignTicketToAgent.submit({
+										ticket_id: this.ticket.name
+									});
+								}
+							},
+						],
+					},
+					{
+						items: agentItems,
+					}
+				];
+				console.log(options);
+				return options;
+			} else {
+				return null;
+			}
+		},
+		typesAsDropdownOptions() {
+			let typeItems = [];
+			if (this.types) {
+				this.types.forEach(type => {
+					typeItems.push({
+						label: type,
+						handler: () => {
+							this.$resources.assignTicketType.submit({
+								ticket_id: this.ticket.name,
+								type: type
+							});
+						},
+					});
+				});
+				return typeItems;
+			} else {
+				return null;
+			}
+		},
+		statusesAsDropdownOptions() {
+			let statusItems = [];
+			if (this.statuses) {
+				this.statuses.forEach(status => {
+					statusItems.push({
+						label: status,
+						handler: () => {
+							this.$resources.assignTicketStatus.submit({
+								ticket_id: this.ticket.name,
+								status: status
+							});
+						},
+					});
+				});
+				return statusItems;
+			} else {
+				return null;
+			}
+		}
+	}
 }
 </script>
