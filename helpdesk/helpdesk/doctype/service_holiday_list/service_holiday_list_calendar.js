@@ -1,7 +1,7 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
-frappe.views.calendar["Holiday List"] = {
+frappe.views.calendar["Service Holiday List"] = {
 	field_map: {
 		"start": "holiday_date",
 		"end": "holiday_date",
@@ -15,8 +15,8 @@ frappe.views.calendar["Holiday List"] = {
 		{
 			'fieldtype': 'Link',
 			'fieldname': 'holiday_list',
-			'options': 'Holiday List',
-			'label': __('Holiday List')
+			'options': 'Service Holiday List',
+			'label': __('Service Holiday List')
 		}
 	]
 }

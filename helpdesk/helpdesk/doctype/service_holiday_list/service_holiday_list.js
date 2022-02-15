@@ -1,7 +1,7 @@
 // Copyright (c) 2016, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("Holiday List", {
+frappe.ui.form.on("Service Holiday List", {
 	refresh: function(frm) {
 		if (frm.doc.holidays) {
 			frm.set_value("total_holidays", frm.doc.holidays.length);
@@ -15,11 +15,11 @@ frappe.ui.form.on("Holiday List", {
 	}
 });
 
-frappe.tour["Holiday List"] = [
+frappe.tour["Service Holiday List"] = [
 	{
 		fieldname: "holiday_list_name",
-		title: "Holiday List Name",
-		description: __("Enter a name for this Holiday List."),
+		title: "Service Holiday List Name",
+		description: __("Enter a name for this Service Holiday List."),
 	},
 	{
 		fieldname: "from_date",
