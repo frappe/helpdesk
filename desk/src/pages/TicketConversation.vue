@@ -22,8 +22,8 @@
 						class="flex flex-col space-y-4 mt-4 pr-3"
 					>
 						<ConversationCard 
-							:userName="conversation.sender.full_name" 
-							:profilePicUrl="conversation.sender.user_image ? conversation.sender.user_image : ''" 
+							:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
+							:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
 							:time="conversation.creation" 
 							:message="conversation.content"
 						/>

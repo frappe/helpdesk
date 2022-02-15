@@ -379,7 +379,7 @@
  "idx": 7,
  "is_published_field": "is_published",
  "links": [],
- "modified": "2022-02-09 17:59:30.538426",
+ "modified": "2022-02-15 10:04:52.686438",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
@@ -408,6 +408,18 @@
    "report": 1,
    "role": "Helpdesk Contact",
    "share": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
   }
  ],
  "quick_entry": 1,

@@ -164,7 +164,7 @@ def create_communication_via_contact(ticket, message, attachments):
 			file_doc.attached_to_doctype = "Communication"
 			file_doc.save(ignore_permissions=True)
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def create_communication_via_agent(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
@@ -224,7 +224,7 @@ def get_all_conversations(ticket):
 	
 	for conversation in conversations:
 
-		sender = frappe.get_last_doc("User", filters={"email": conversation.sender})
+		sender = frappe.get_last_doc("Contact", filters={"email_id": conversation.sender})
 
 		attachments = frappe.get_all(
 			"File", 
