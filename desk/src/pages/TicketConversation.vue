@@ -47,9 +47,10 @@
 									id="exampleFormControlTextarea1"
 									rows="4"
 									placeholder="Your message"
+									v-model="this.currentConversationText"
 								></textarea>
 								<div class="my-2">
-									<Button>Submit</Button>
+									<Button @click="this.submitConversation">Submit</Button>
 								</div>
 							</div>
 						</div>
@@ -129,6 +130,11 @@ export default {
 		Avatar,
 		ConversationCard
 	},
+	data() {
+		return {
+			currentConversationText: '',
+		}
+	},
 	resources: {
 		ticket() {
 			return {
@@ -201,6 +207,15 @@ export default {
 				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
 				auto: true
 			}
+		},
+		submitConversation() {
+			return {
+				method: 'helpdesk.api.ticket.submit_conversation',
+				debounce: 300,
+				onSuccess: () => {
+
+				}
+			}
 		}
 	},
 	computed: {
@@ -267,7 +282,6 @@ export default {
 						items: agentItems,
 					}
 				];
-				console.log(options);
 				return options;
 			} else {
 				return null;
@@ -310,6 +324,12 @@ export default {
 			} else {
 				return null;
 			}
+		},
+		submitConversation() {
+			this.$resources.submitConversation.submit({
+				ticket_id: this.ticketId,
+				message: this.currentConversationText
+			})
 		}
 	}
 }

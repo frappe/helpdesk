@@ -165,6 +165,50 @@ def create_communication_via_contact(ticket, message, attachments):
 			file_doc.save(ignore_permissions=True)
 
 @frappe.whitelist()
+def create_communication_via_agent(ticket, message, attachments=None):
+	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	communication = frappe.new_doc("Communication")
+	communication.update(
+		{
+			"communication_type": "Communication",
+			"communication_medium": "Email",
+			"sent_or_received": "Sent",
+			"email_status": "Open",
+			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
+			"sender": frappe.session.user,
+			"content": message,
+			"status": "Linked",
+			"reference_doctype": "Ticket",
+			"reference_name": ticket_doc.name,
+		}
+	)
+	communication.ignore_permissions = True
+	communication.ignore_mandatory = True
+	communication.save(ignore_permissions=True)
+	
+	# TODO
+	# if attachments:
+	# 	attachments = json.loads(attachments)
+	# 	for attachment in attachments:
+	# 		file_doc = frappe.get_doc("File", attachment["name"])
+	# 		file_doc.attached_to_name = communication.name
+	# 		file_doc.attached_to_doctype = "Communication"
+	# 		file_doc.save(ignore_permissions=True)
+
+	frappe.sendmail(
+		subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
+		sender=frappe.session.user,
+		message=message,
+		recipients=[ticket_doc.raised_by],
+		reference_doctype='Ticket',
+		reference_name=ticket_doc.name,
+		communication=communication.name,
+		now=True,
+	)
+
+
+@frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 

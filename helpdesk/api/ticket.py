@@ -1,5 +1,5 @@
 import frappe
-from helpdesk.helpdesk.doctype.ticket.ticket import get_all_conversations
+from helpdesk.helpdesk.doctype.ticket.ticket import get_all_conversations, create_communication_via_agent
 
 @frappe.whitelist(allow_guest=True)
 def get_tickets():
@@ -77,3 +77,7 @@ def get_contact(ticket_id):
 @frappe.whitelist(allow_guest=True)
 def get_conversations(ticket_id):
     return get_all_conversations(ticket_id)
+
+@frappe.whitelist(allow_guest=True)
+def submit_conversation(ticket_id, message):
+    return create_communication_via_agent(ticket_id, message)
