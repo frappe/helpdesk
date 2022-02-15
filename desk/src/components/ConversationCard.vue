@@ -8,7 +8,7 @@
 				<div class="flex">
 					<span class="pt-1">{{ userName }}</span>
 				</div>
-				<span class="text-slate-500">{{ time }}</span>
+				<span class="text-slate-500">{{ $dayjs(time).fromNow() }}</span>
 			</div>
 			<div class="mt-2">
 				<div class="p-5 bg-slate-50 rounded-md">

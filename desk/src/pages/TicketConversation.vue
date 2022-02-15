@@ -39,7 +39,6 @@
 								<div class="flex">
 									<span class="pt-1">Aditya Hase</span>
 								</div>
-								<span class="text-slate-500">5 hrs ago (Feb 2, 2022 11:12 AM)</span>
 							</div>
 							<div class="mt-2">
 								<textarea
