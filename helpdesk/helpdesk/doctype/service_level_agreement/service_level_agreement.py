@@ -192,6 +192,8 @@ class ServiceLevelAgreement(Document):
 			self.create_custom_fields(meta, service_level_agreement_fields)
 
 	def on_trash(self):
+		if self.service_level == "Default":
+			frappe.throw("The Default SLA cannot be deleted")
 		set_documents_with_active_service_level_agreement()
 
 	def after_insert(self):

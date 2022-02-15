@@ -1,6 +1,6 @@
 {
 	"actions": [],
-	"autoname": "format:SLA-{document_type}-{service_level}",
+	"autoname": "field:service_level",
 	"creation": "2018-12-26 21:08:15.448812",
 	"doctype": "DocType",
 	"editable_grid": 1,
@@ -40,7 +40,8 @@
 		"in_standard_filter": 1,
 		"label": "Service Level Name",
 		"reqd": 1,
-		"set_only_once": 1
+		"set_only_once": 1,
+		"unique": 1
 		},
 		{
 		"fieldname": "holiday_list",
@@ -192,11 +193,11 @@
 		}
 	],
 	"links": [],
-	"modified": "2021-12-24 2:45:33.289911",
+	"modified": "2022-02-15 17:36:00.410951",
 	"modified_by": "Administrator",
 	"module": "Helpdesk",
 	"name": "Service Level Agreement",
-	"naming_rule": "Expression",
+	"naming_rule": "By fieldname",
 	"owner": "Administrator",
 	"permissions": [
 		{
@@ -226,5 +227,6 @@
 	],
 	"sort_field": "modified",
 	"sort_order": "DESC",
-	"track_changes": 1
+	"track_changes": 1,
+	"states": []
 }
