@@ -1,7 +1,7 @@
 {
 	"actions": [],
 	"autoname": "field:service_level",
-	"creation": "2018-12-26 21:08:15.448812",
+	"creation": "2022-02-08 18:13:42.690854",
 	"doctype": "DocType",
 	"editable_grid": 1,
 	"engine": "InnoDB",
@@ -47,7 +47,7 @@
 		"fieldname": "holiday_list",
 		"fieldtype": "Link",
 		"label": "Holiday List",
-		"options": "Holiday List",
+		"options": "Service Holiday List",
 		"reqd": 1
 		},
 		{
@@ -193,9 +193,9 @@
 		}
 	],
 	"links": [],
-	"modified": "2022-02-15 17:36:00.410951",
+	"modified": "2022-02-15 18:38:07.856876",
 	"modified_by": "Administrator",
-	"module": "Helpdesk",
+	"module": "HelpDesk",
 	"name": "Service Level Agreement",
 	"naming_rule": "By fieldname",
 	"owner": "Administrator",
@@ -227,6 +227,6 @@
 	],
 	"sort_field": "modified",
 	"sort_order": "DESC",
-	"track_changes": 1,
-	"states": []
-}
+	"states": [],
+	"track_changes": 1
+   }

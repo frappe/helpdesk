@@ -445,7 +445,7 @@
  "modified": "2021-12-24 00:22:46.474096",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "Holiday List",
+ "name": "Service Holiday List",
  "owner": "Administrator",
  "permissions": [
   {

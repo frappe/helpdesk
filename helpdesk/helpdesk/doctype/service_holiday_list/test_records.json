@@ -1,6 +1,6 @@
 [
  {
-  "doctype": "Holiday List",
+  "doctype": "Service Holiday List",
   "from_date": "2013-01-01",
   "to_date":"2013-12-31",
   "holidays": [
