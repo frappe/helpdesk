@@ -177,6 +177,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			"email_status": "Open",
 			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
 			"sender": frappe.session.user,
+			"recipients": ticket_doc.raised_by,
 			"content": message,
 			"status": "Linked",
 			"reference_doctype": "Ticket",
@@ -219,9 +220,12 @@ def update_ticket_status_via_customer_portal(ticket, new_status):
 
 @frappe.whitelist()
 def get_all_conversations(ticket):
-	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received"])
+	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received", "sender"])
 	
 	for conversation in conversations:
+
+		sender = frappe.get_last_doc("User", filters={"email": conversation.sender})
+
 		attachments = frappe.get_all(
 			"File", 
 			["file_name", "file_url"],
@@ -229,6 +233,7 @@ def get_all_conversations(ticket):
 		)
 
 		conversation.attachments = attachments
+		conversation.sender = sender
 
 	return conversations
 

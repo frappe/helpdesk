@@ -22,8 +22,8 @@
 						class="flex flex-col space-y-4 mt-4 pr-3"
 					>
 						<ConversationCard 
-							userName="Kamal Johnson" 
-							profilePicUrl="https://picsum.photos/200" 
+							:userName="conversation.sender.full_name" 
+							:profilePicUrl="conversation.sender.user_image ? conversation.sender.user_image : ''" 
 							:time="conversation.creation" 
 							:message="conversation.content"
 						/>
