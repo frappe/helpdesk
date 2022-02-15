@@ -17,14 +17,15 @@
 			<div class="flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
 					<div
-						v-for="i in [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]" :key="i" 
+						:v-if="conversations"
+						v-for="conversation in conversations" :key="conversation.name" 
 						class="flex flex-col space-y-4 mt-4 pr-3"
 					>
 						<ConversationCard 
-							userName="Kamal Johnson" 
-							profilePicUrl="https://picsum.photos/200" 
-							time="5 hrs ago (Feb 2, 2022 11:12 AM)" 
-							message="Hey There"
+							:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
+							:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
+							:time="conversation.creation" 
+							:message="conversation.content"
 						/>
 					</div>
 				</div>
@@ -46,9 +47,10 @@
 									id="exampleFormControlTextarea1"
 									rows="4"
 									placeholder="Your message"
+									v-model="this.currentConversationText"
 								></textarea>
 								<div class="my-2">
-									<Button>Submit</Button>
+									<Button @click="this.submitConversation">Submit</Button>
 								</div>
 							</div>
 						</div>
@@ -59,29 +61,41 @@
 		<div class="sm:w-3/12 pl-3">
 			<div v-if="ticket">
 				<Card :title="'Ticket #' + ticket.name">
-					<div>
+					<div class="px-1">
 						<hr class="mb-4">
 						<div class="mb-4">
-							<h3 class="mb-2">Assignee</h3>
-							<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
+							<h3 class="mb-2" v-if="agents">Assignee</h3>
+							<Dropdown 
+								:options="agentsAsDropdownOptions()" 
+								:dropdown-width-full="true" 
+								placement="left"
+							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Twinkle Damania</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.assignee }}</Button>
 								</template>
 							</Dropdown>
 						</div>
 						<div class="mb-4">
 							<h3 class="mb-2">Type</h3>
-							<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
+							<Dropdown 
+								:options="typesAsDropdownOptions()" 
+								:dropdown-width-full="true"
+								placement="left"	
+							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Button</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.ticket_type }}</Button>
 								</template>
 							</Dropdown>
 						</div>
 						<div class="mb-4">
 							<h3 class="mb-2">Status</h3>
-							<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
+							<Dropdown 
+								:options="statusesAsDropdownOptions()" 
+								:dropdown-width-full="true"
+								placement="left"
+							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Open</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.status }}</Button>
 								</template>
 							</Dropdown>
 						</div>
@@ -109,13 +123,18 @@ export default {
 	inject: ['viewportWidth'],
 	props: ['ticketId'],
 	components: {
-    Badge,
-    Card,
-    Dropdown,
-    ContactCard,
-    Avatar,
-    ConversationCard
-},
+		Badge,
+		Card,
+		Dropdown,
+		ContactCard,
+		Avatar,
+		ConversationCard
+	},
+	data() {
+		return {
+			currentConversationText: '',
+		}
+	},
 	resources: {
 		ticket() {
 			return {
@@ -143,6 +162,60 @@ export default {
 				},
 				auto: true
 			}
+		},
+		agents() {
+			return {
+				method: 'helpdesk.api.agent.get_all',
+				auto: true
+			}
+		},
+		assignTicketToAgent() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		},
+		assignTicketType() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_type',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		},
+		assignTicketStatus() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_status',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		},
+		types() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_types',
+				auto: true
+			}
+		},
+		statuses() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
+				auto: true
+			}
+		},
+		submitConversation() {
+			return {
+				method: 'helpdesk.api.ticket.submit_conversation',
+				debounce: 300,
+				onSuccess: () => {
+
+				}
+			}
 		}
 	},
 	computed: {
@@ -154,17 +227,110 @@ export default {
 		},
 		conversations() {
 			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
+		},
+		agents() {
+			return this.$resources.agents.data ? this.$resources.agents.data : null;
+		},
+		types() {
+			return this.$resources.types.data ? this.$resources.types.data : null
+		},
+		statuses() {
+			return this.$resources.statuses.data ? this.$resources.statuses.data : null;
 		}
 	},
-	methods: {
-		
-	},
 	activated() {
-		// 
-		this.$socket.on('new_message', this.$resources.conversations.fetch());
+		this.$socket.on('list_update', (data) => {
+			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
+				this.$resources.conversations.fetch()
+			}
+		});
 	},
 	deactivated() {
-		this.$socket.off('new_message', this.$resources.conversations.fetch());
+		this.$socket.off('list_update');
 	},
+	methods: {
+		agentsAsDropdownOptions() {
+			let agentItems = [];
+			if (this.agents) {
+				this.agents.forEach(agent => {
+					agentItems.push({
+						label: agent.agent_name,
+						handler: () => {
+							this.$resources.assignTicketToAgent.submit({
+								ticket_id: this.ticket.name,
+								agent_id: agent.name
+							});
+						},
+					});
+				});
+				let options = [
+					{
+						group: 'Actions',
+						hideLabel: true,
+						items: [
+							{
+								label: 'Assign to me',
+								handler: () => {
+									this.$resources.assignTicketToAgent.submit({
+										ticket_id: this.ticket.name
+									});
+								}
+							},
+						],
+					},
+					{
+						items: agentItems,
+					}
+				];
+				return options;
+			} else {
+				return null;
+			}
+		},
+		typesAsDropdownOptions() {
+			let typeItems = [];
+			if (this.types) {
+				this.types.forEach(type => {
+					typeItems.push({
+						label: type,
+						handler: () => {
+							this.$resources.assignTicketType.submit({
+								ticket_id: this.ticket.name,
+								type: type
+							});
+						},
+					});
+				});
+				return typeItems;
+			} else {
+				return null;
+			}
+		},
+		statusesAsDropdownOptions() {
+			let statusItems = [];
+			if (this.statuses) {
+				this.statuses.forEach(status => {
+					statusItems.push({
+						label: status,
+						handler: () => {
+							this.$resources.assignTicketStatus.submit({
+								ticket_id: this.ticket.name,
+								status: status
+							});
+						},
+					});
+				});
+				return statusItems;
+			} else {
+				return null;
+			}
+		},
+		submitConversation() {
+			this.$resources.submitConversation.submit({
+				ticket_id: this.ticketId,
+				message: this.currentConversationText
+			})
+		}
+	}
 }
 </script>

@@ -164,6 +164,51 @@ def create_communication_via_contact(ticket, message, attachments):
 			file_doc.attached_to_doctype = "Communication"
 			file_doc.save(ignore_permissions=True)
 
+@frappe.whitelist(allow_guest=True)
+def create_communication_via_agent(ticket, message, attachments=None):
+	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	communication = frappe.new_doc("Communication")
+	communication.update(
+		{
+			"communication_type": "Communication",
+			"communication_medium": "Email",
+			"sent_or_received": "Sent",
+			"email_status": "Open",
+			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
+			"sender": frappe.session.user,
+			"recipients": ticket_doc.raised_by,
+			"content": message,
+			"status": "Linked",
+			"reference_doctype": "Ticket",
+			"reference_name": ticket_doc.name,
+		}
+	)
+	communication.ignore_permissions = True
+	communication.ignore_mandatory = True
+	communication.save(ignore_permissions=True)
+	
+	# TODO
+	# if attachments:
+	# 	attachments = json.loads(attachments)
+	# 	for attachment in attachments:
+	# 		file_doc = frappe.get_doc("File", attachment["name"])
+	# 		file_doc.attached_to_name = communication.name
+	# 		file_doc.attached_to_doctype = "Communication"
+	# 		file_doc.save(ignore_permissions=True)
+
+	frappe.sendmail(
+		subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
+		sender=frappe.session.user,
+		message=message,
+		recipients=[ticket_doc.raised_by],
+		reference_doctype='Ticket',
+		reference_name=ticket_doc.name,
+		communication=communication.name,
+		now=True,
+	)
+
+
 @frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
@@ -175,9 +220,12 @@ def update_ticket_status_via_customer_portal(ticket, new_status):
 
 @frappe.whitelist()
 def get_all_conversations(ticket):
-	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received"])
+	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received", "sender"])
 	
 	for conversation in conversations:
+
+		sender = frappe.get_last_doc("Contact", filters={"email_id": conversation.sender})
+
 		attachments = frappe.get_all(
 			"File", 
 			["file_name", "file_url"],
@@ -185,6 +233,7 @@ def get_all_conversations(ticket):
 		)
 
 		conversation.attachments = attachments
+		conversation.sender = sender
 
 	return conversations
 
