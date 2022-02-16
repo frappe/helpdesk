@@ -11,7 +11,7 @@
 			</div>
 			<a 
 				:href="'ticket/' + ticketDetails.name"
-				class="sm:w-6/12"
+				class="sm:w-7/12"
 			>
 				<div class="flex flex-col space-y-1">
 					<div class="flex items-center">
