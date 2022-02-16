@@ -15,6 +15,7 @@ from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 from frappe.website.utils import cleanup_page_name
+from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
 
 
 class Ticket(WebsiteGenerator):
@@ -131,7 +132,14 @@ class Ticket(WebsiteGenerator):
 		self.db_set("resolution_time", None)
 		self.db_set("user_resolution_time", None)
 
-
+	def assign_agent(self, agent):
+		clear_all_assignments("Ticket", self.name)
+		assign({
+			"assign_to": [agent],
+			"doctype": "Ticket",
+			"name": self.name
+		})
+		frappe.db.commit()
 
 @frappe.whitelist()
 def create_communication_via_contact(ticket, message, attachments):
