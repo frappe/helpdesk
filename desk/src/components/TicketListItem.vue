@@ -107,8 +107,10 @@
 						class="w-full"
 						@click="toggleAssignees"
 					>
-						<div v-if="ticketDetails.assignee">
-							<Avatar class="w-4 h-4" label="John Doe" :imageURL="ticketDetails.assingee_image" />
+						<div v-if="ticketDetails.assignees">
+							<div v-for="assignee in ticketDetails.assignees" :key="assignee">
+								<Avatar class="w-4 h-4" :label="assignee.agent_name" :imageURL="assignee.image" />
+							</div>
 						</div>
 						<div v-else class="hidden group-hover:block">
 							<span class="text-sm text-gray-400"> assign agent </span>
@@ -186,6 +188,7 @@ export default {
 				this.ticketDetailsRefreshed = false;
 				this.localTicket = this.$resources.ticket.data ? this.$resources.ticket.data : this.ticket;
 			} else {
+				console.log(this.ticket);
 				this.localTicket = this.ticket;
 			}
 			return this.localTicket;

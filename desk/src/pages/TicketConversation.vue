@@ -70,7 +70,10 @@
 								placement="left"
 							>
 								<template v-slot="{ toggleDropdown }">
-									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.assignee }}</Button>
+									<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">
+										<div v-if="ticket.assignees">{{ ticket.assignees[0].agent_name }}</div>
+										<div v-else></div>
+									</Button>
 								</template>
 							</Dropdown>
 						</div>

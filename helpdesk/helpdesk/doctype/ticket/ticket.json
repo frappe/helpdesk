@@ -11,7 +11,6 @@
   "subject_section",
   "subject",
   "raised_by",
-  "agent",
   "cb00",
   "status",
   "priority",
@@ -182,7 +181,7 @@
    "fieldname": "agreement_status",
    "fieldtype": "Select",
    "label": "Service Level Agreement Status",
-   "options": "First Response Due\nResolution Due\nFulfilled\nOverdue",
+   "options": "First Response Due\nResolution Due\nFulfilled\nFailed",
    "read_only": 1
   },
   {
@@ -366,12 +365,6 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Web Page Is Published"
-  },
-  {
-   "fieldname": "agent",
-   "fieldtype": "Link",
-   "label": "Assignee To",
-   "options": "Agent"
   }
  ],
  "has_web_view": 1,
@@ -379,7 +372,7 @@
  "idx": 7,
  "is_published_field": "is_published",
  "links": [],
- "modified": "2022-02-16 10:04:52.686438",
+ "modified": "2022-02-16 16:33:03.211667",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
