@@ -825,7 +825,7 @@ def record_assigned_users_on_failure(doc):
 		from frappe.utils import get_fullname
 
 		assigned_users = ", ".join((get_fullname(user) for user in assigned_users))
-		message = _("First Response SLA Failed by {}").format(assigned_users)
+		message = _("First Response SLA Overdue by {}").format(assigned_users)
 		doc.add_comment(comment_type="Assigned", text=message)
 
 
@@ -881,7 +881,7 @@ def get_service_level_agreement_fields():
 			"fieldname": "agreement_status",
 			"fieldtype": "Select",
 			"label": "Service Level Agreement Status",
-			"options": "First Response Due\nResolution Due\nFulfilled\nFailed",
+			"options": "First Response Due\nResolution Due\nFulfilled\nOverdue",
 			"read_only": 1,
 		},
 		{
@@ -926,7 +926,7 @@ def update_agreement_status(doc, apply_sla_for_resolution):
 			):
 				doc.agreement_status = "Fulfilled"
 			else:
-				doc.agreement_status = "Failed"
+				doc.agreement_status = "Overdue"
 		else:
 			if doc.meta.has_field("first_responded_on") and not doc.get("first_responded_on"):
 				doc.agreement_status = "First Response Due"
@@ -935,7 +935,7 @@ def update_agreement_status(doc, apply_sla_for_resolution):
 			):
 				doc.agreement_status = "Fulfilled"
 			else:
-				doc.agreement_status = "Failed"
+				doc.agreement_status = "Overdue"
 
 
 def is_holiday(date, holidays):
