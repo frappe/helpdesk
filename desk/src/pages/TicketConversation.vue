@@ -1,7 +1,7 @@
 <template>
 	<div class="flex">
 		<div v-if="ticket" class="sm:w-3/12 px-4">
-			<ContactCard v-if="contact" :contact="contact" />
+			<ContactCard v-if="contact" :contact="contact" :ticketId="ticket.name" />
 		</div>
 		<div
 			v-if="ticket"

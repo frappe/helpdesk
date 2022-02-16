@@ -21,8 +21,6 @@ def get_tickets():
 	for ticket in all_tickets:
 		ticket['assignees'] = get_agent_assigned_to_ticket(ticket['name'])
 
-	print(f"{all_tickets}")
-
 	return all_tickets
 
 @frappe.whitelist(allow_guest=True)
@@ -94,3 +92,9 @@ def get_conversations(ticket_id):
 @frappe.whitelist(allow_guest=True)
 def submit_conversation(ticket_id, message):
 	return create_communication_via_agent(ticket_id, message)
+
+@frappe.whitelist(allow_guest=True)
+def get_other_tickets_of_contact(ticket_id):
+	contact = frappe.get_value("Ticket", ticket_id, "raised_by")
+	tickets = frappe.get_all("Ticket", filters={"raised_by": contact, "name": ["!=", ticket_id]}, fields=['name', 'subject'])
+	return tickets

@@ -18,11 +18,10 @@
                     </div>
                 </div>
                 <hr class="my-3">
-                <div class="text-base space-y-3">
-                    <span class="text-green-500">Open Tickets (2)</span>
-                    <div class="space-y-1 text-slate-700">
-                        <p class="text-slate-500">How to clear payment schedule?</p>
-                        <p class="text-slate-500">How to bring Helpdesk to FC?</p>
+                <div class="text-base space-y-3" v-if="otherTicketsOfContact">
+                    <span class="text-green-500">{{ 'Open Tickets (' +  otherTicketsOfContact.length + ')' }}</span>
+                    <div class="space-y-1 text-slate-700" v-for="ticket in otherTicketsOfContact" :key="ticket.name">
+                        <a :href="'ticket/' + ticket.name" class="text-slate-500">{{ ticket.subject }}</a>
                     </div>
                 </div>
             </div>
@@ -35,11 +34,27 @@ import { Card, Avatar, FeatherIcon } from 'frappe-ui'
 
 export default {
     name: 'ContactCard',
-    props: ['contact'],
+    props: ['contact', 'ticketId'],
     components: {
         Card,
         Avatar,
         FeatherIcon
+    },
+    resources: {
+        otherTicketsOfContact() {
+			return {
+				method: 'helpdesk.api.ticket.get_other_tickets_of_contact',
+				params: {
+					ticket_id: this.ticketId,
+				},
+				auto: true
+			}
+		},
+    },
+    computed: {
+		otherTicketsOfContact() {
+			return this.$resources.otherTicketsOfContact.data ? this.$resources.otherTicketsOfContact.data : null;
+		},
     }
 }
 </script>
