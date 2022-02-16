@@ -50,7 +50,7 @@
 									:disabled="!sessionAgent"
 								></textarea>
 								<div class="my-2">
-									<Button @click="this.submitConversation" :disabled="!sessionAgent">Submit</Button>
+									<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" :disabled="!sessionAgent">Submit</Button>
 								</div>
 							</div>
 						</div>
@@ -181,7 +181,7 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				debounce: 300,
+				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -190,7 +190,7 @@ export default {
 		assignTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
-				debounce: 300,
+				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -199,7 +199,7 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
-				debounce: 300,
+				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -220,9 +220,8 @@ export default {
 		submitConversation() {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
-				debounce: 300,
 				onSuccess: () => {
-
+					this.$resources.conversations.fetch();
 				}
 			}
 		}
@@ -342,6 +341,7 @@ export default {
 				ticket_id: this.ticketId,
 				message: this.currentConversationText
 			})
+			this.currentConversationText = ""
 		}
 	}
 }
