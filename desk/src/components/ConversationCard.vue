@@ -1,5 +1,5 @@
 <template>
-	<div class="flex px-1">
+	<div class="flex">
 		<div>
 			<Avatar :label="userName" :imageURL="profilePicUrl" />
 		</div>

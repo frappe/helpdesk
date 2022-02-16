@@ -8,25 +8,28 @@
 			class="sm:w-9/12 px-4"
 			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 8rem)' : null }"
 		>
-			<div class="flex">
-				<div class="text-6xl">
+			<div class="flex items-center">
+				<span class="text-6xl">
 					{{ ticket.name }} - {{ ticket.subject }}
-				</div>
-				<Badge color="green" class="my-2 ml-3">{{ ticket.status }}</Badge>
+				</span>
+				<Badge color="green" class="ml-3 align-middle">{{ ticket.status }}</Badge>
 			</div>
 			<div class="flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
 					<div
 						:v-if="conversations"
-						v-for="conversation in conversations" :key="conversation.name" 
+						v-for="(conversation, index) in conversations" :key="conversation.name" 
 						class="flex flex-col space-y-4 mt-4 pr-3"
+						ref="conversationContainer"
 					>
-						<ConversationCard 
-							:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
-							:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
-							:time="conversation.creation" 
-							:message="conversation.content"
-						/>
+						<div :ref="`conversation-${index}`">
+							<ConversationCard 
+								:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
+								:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
+								:time="conversation.creation" 
+								:message="conversation.content"
+							/>
+						</div>
 					</div>
 				</div>
 				<div class="flex flex-col pr-3">
@@ -237,6 +240,9 @@ export default {
 			return this.$resources.contact.data ? this.$resources.contact.data : null;
 		},
 		conversations() {
+			this.$nextTick(() => {
+				this.autoScrollToBottom();
+			})
 			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
 		},
 		agents() {
@@ -342,6 +348,14 @@ export default {
 				message: this.currentConversationText
 			})
 			this.currentConversationText = ""
+		},
+		autoScrollToBottom() {
+			if (this.conversations) {
+				const [el] = this.$refs["conversation-" + (this.conversations.length - 1)];
+				if (el) {
+					el.scrollIntoView();
+				}
+			}
 		}
 	}
 }
