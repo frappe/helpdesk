@@ -1,8 +1,8 @@
 <template>
-	<div class="block rounded-md sm:px-2 hover:bg-gray-50">
+	<div class="block py-4 hover:bg-gray-50 border-b">
 		<div 
 			v-if="ticketDetails"
-			class="group flex items-center justify-between sm:justify-start font-light"
+			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8"
 		>
 			<div
 				class="mr-4"
@@ -11,12 +11,53 @@
 			</div>
 			<a 
 				:href="'ticket/' + ticketDetails.name"
-				class="text-base sm:w-5/12"
+				class="sm:w-7/12"
 			>
-				{{ ticketDetails.subject }}
+				<div class="flex flex-col space-y-1">
+					<div class="flex items-center">
+						<div class="text-xl font-medium">{{ ticketDetails.subject }}</div>
+						<div class="ml-1 text-base text-slate-400">#{{ ticketDetails.name }}</div>
+					</div>
+					<div class="flex items-center">
+						<div class="flex">
+							<FeatherIcon class="w-4 h-4 stroke-slate-400" name="user" />
+							<div class="ml-1 text-base">{{ ticketDetails.contact }}</div>
+						</div>
+					</div>
+				</div>
 			</a>
-			<div class="text-base sm:w-3/12">
-				{{ ticketDetails.contact }}
+			<Dropdown
+				v-if="this.statuses"
+				placement="left" 
+				:options="statusesAsDropdownOptions()" 
+				:dropdown-width-full="true"
+				class="text-base sm:w-1/12"
+			>
+				<template v-slot="{ toggleStatuses }">
+					<div class="w-full cursor-pointer">
+						<div 
+							v-if="ticket.status"
+							@click="toggleStatuses"	
+							class="flex items-center"
+						>
+							<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticketDetails.status)" name="circle"/>
+							<div class="ml-1 text-gray-500">{{ ticketDetails.status }}</div>
+						</div>
+						<div v-else class="hidden group-hover:block">
+							<span class="text-sm text-gray-400"> set status </span>
+						</div>
+					</div>
+				</template>
+			</Dropdown>
+			<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
+				<div class="flex items-center">
+					<div>
+						<FeatherIcon class="w-3 h-3 stroke-slate-400" name="edit-2"/>
+					</div>
+					<div class="ml-1">
+						{{ $dayjs(ticketDetails.modified).fromNow() }}
+					</div>
+				</div>
 			</div>
 			<Dropdown 
 				v-if="this.types"
@@ -30,47 +71,36 @@
 						class="w-full"
 						@click="toggleTypes"
 					>
-						<div v-if="ticketDetails.ticket_type">
-							{{ ticketDetails.ticket_type }}
+						<div v-if="ticketDetails.ticket_type" class="flex items-center">
+							<div>
+								<FeatherIcon class="w-3 h-3 stroke-slate-400" name="tag" />
+							</div>
+							<div class="ml-1 text-gray-500">
+								{{ ticketDetails.ticket_type }}
+							</div>
 						</div>
 						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-500"> set type </span>
+							<span class="text-sm text-gray-400"> set type </span>
 						</div>
 					</div>
 				</template>
 			</Dropdown>
-			<Dropdown
-				v-if="this.statuses"
-				placement="left" 
-				:options="statusesAsDropdownOptions()" 
-				:dropdown-width-full="true"
-				class="text-base sm:w-2/12"
-			>
-				<template v-slot="{ toggleStatuses }">
-					<div class="w-full cursor-pointer">
-						<div 
-							v-if="ticket.status"
-							@click="toggleStatuses"	
-						>
-							<Badge 
-								class="cursor-pointer"
-								:color="getBadgeColorBasedOnStatus(ticketDetails.status)"
-							>
-								{{ ticketDetails.status }}
-							</Badge>
-						</div>
-						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-500"> set status </span>
-						</div>
+			<div class="hidden sm:w-1/12 text-sm text-gray-600 sm:block">
+				<div class="flex items-center">
+					<div>
+						<FeatherIcon class="w-3 h-3 stroke-slate-400" name="shield"/>
 					</div>
-				</template>
-			</Dropdown>
+					<div class="ml-1">
+						Due in 3h
+					</div>
+				</div>
+			</div> 
 			<Dropdown
 				v-if="this.agents"
-				placement="left" 
+				placement="right" 
 				:options="agentsAsDropdownOptions()" 
 				:dropdown-width-full="true"
-				class="text-base sm:w-3/12"
+				class="text-base sm:w-1/12 flex flex-row-reverse"
 			>
 				<template v-slot="{ toggleAssignees }">
 					<div  
@@ -78,24 +108,21 @@
 						@click="toggleAssignees"
 					>
 						<div v-if="ticketDetails.assignee">
-							{{ ticketDetails.assignee }}
+							<Avatar class="w-4 h-4" label="John Doe" :imageURL="ticketDetails.assingee_image" />
 						</div>
 						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-500"> assign agent </span>
+							<span class="text-sm text-gray-400"> assign agent </span>
 						</div>
 					</div>
 				</template>
 			</Dropdown>
-			<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
-				{{ $dayjs(ticketDetails.modified).fromNow()}}
-			</div> 
 		</div>
-		<div class="transform translate-y-2 border-b"/>
+		<div class="transform translate-y-2"/>
 	</div>
 </template>
 
 <script>
-import { Badge, Dropdown, Input } from 'frappe-ui'
+import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
 
 export default {
 	name: 'TicketListItem',
@@ -103,7 +130,9 @@ export default {
 	components: {
 		Input,
 		Badge,
-		Dropdown
+		Dropdown,
+		FeatherIcon,
+		Avatar
 	},
 	data() {
 		return {
@@ -165,16 +194,16 @@ export default {
 	methods: {
 		getBadgeColorBasedOnStatus(status) {
 			if (['Open'].includes(status)) {
-				return 'green'
+				return 'fill-green-500'
 			}
 			if (['Closed', 'Resolved'].includes(status)) {
-				return 'red'
+				return 'fill-red-500'
 			}
 			if (['Replied'].includes(status)) {
-				return 'yellow'
+				return 'fill-yellow-500'
 			}
 			if (['On Hold'].includes(status)) {
-				return 'blue'
+				return 'fill-blue-500'
 			}
 		},
 		agentsAsDropdownOptions() {

@@ -1,14 +1,15 @@
 <template>
 	<div>
 		<div>
-			<div class="flow-root mb-2">
-				<p class="float-left text-6xl font-bold"> Tickets </p>
-				<div class="float-right mb-4">
-					<div class="flex space-x-3">
-						<Button icon-left="filter">Add Filter</Button>
-						<Button icon-left="plus">Last Modified</Button>
+			<div class="flow-root border-b pt-2 pb-3 pr-8">
+				<div class="float-left ml-4">
+					<div class="flex items-center space-x-4">
+						<Input type="checkbox" value="" />
 						<Button icon-left="plus" type="primary">Add Ticket</Button>
 					</div>
+				</div>
+				<div class="float-right">
+					<Button icon-left="filter" type="white">Filter</Button>
 				</div>
 			</div>
 			<div v-if="tickets">
@@ -24,12 +25,14 @@
 </template>
 <script>
 import TicketList from './TicketList.vue'
+import { Input } from 'frappe-ui'
 
 export default {
 	name: 'Tickets',
 	inject: ['viewportWidth'],
 	components: {
-		TicketList
+		TicketList,
+		Input
 	},
 	resources: {
 		tickets() {
