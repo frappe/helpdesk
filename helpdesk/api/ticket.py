@@ -46,6 +46,11 @@ def get_agent_assigned_to_ticket(ticket_id):
 def assign_ticket_to_agent(ticket_id, agent_id=None):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		if agent_id is None:
+			# assign to self
+			agent_id = frappe.session.user
+			if not frappe.db.exists("Agent", agent_id):
+				frappe.throw('Tickets can only assigned to agents')
 		ticket_doc.assign_agent(agent_id)
 		frappe.db.commit()
 
