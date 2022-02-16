@@ -31,25 +31,26 @@
 				</div>
 				<div class="flex flex-col pr-3">
 					<div class="flex">
-						<div>
-							<Avatar label="John Doe" imageURL="https://picsum.photos/200" />
+						<div v-if="sessionAgent">
+							<Avatar label="John Doe" :imageURL="sessionAgent.image" />
 						</div>
 						<div class="grow ml-3">
 							<div class="flex justify-between">
-								<div class="flex">
-									<span class="pt-1">Aditya Hase</span>
+								<div class="flex" v-if="sessionAgent">
+									<span class="pt-1">{{ sessionAgent.agent_name }}</span>
 								</div>
 							</div>
-							<div class="mt-2">
+							<div class="mt-2" v-if="contact">
 								<textarea
 									class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-slate-50 bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
 									id="exampleFormControlTextarea1"
 									rows="4"
-									placeholder="Your message"
+									:placeholder="sessionAgent ? 'Reply to ' + contact.first_name : 'Only agents can reply to tickets'"
 									v-model="this.currentConversationText"
+									:disabled="!sessionAgent"
 								></textarea>
 								<div class="my-2">
-									<Button @click="this.submitConversation">Submit</Button>
+									<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" :disabled="!sessionAgent">Submit</Button>
 								</div>
 							</div>
 						</div>
@@ -147,6 +148,12 @@ export default {
 				auto: true
 			}
 		},
+		sessionAgent() {
+			return {
+				method: 'helpdesk.api.agent.get_session_agent',
+				auto: true
+			}
+		},
 		contact() {
 			return {
 				method: 'helpdesk.api.ticket.get_contact',
@@ -174,7 +181,7 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				debounce: 300,
+				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -183,7 +190,7 @@ export default {
 		assignTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
-				debounce: 300,
+				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -192,7 +199,7 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
-				debounce: 300,
+				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -213,9 +220,8 @@ export default {
 		submitConversation() {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
-				debounce: 300,
 				onSuccess: () => {
-
+					this.$resources.conversations.fetch();
 				}
 			}
 		}
@@ -223,6 +229,9 @@ export default {
 	computed: {
 		ticket() {
 			return this.$resources.ticket.data ? this.$resources.ticket.data : null;
+		},
+		sessionAgent() {
+			return this.$resources.sessionAgent.data ? this.$resources.sessionAgent.data : null;
 		},
 		contact() {
 			return this.$resources.contact.data ? this.$resources.contact.data : null;
@@ -332,6 +341,7 @@ export default {
 				ticket_id: this.ticketId,
 				message: this.currentConversationText
 			})
+			this.currentConversationText = ""
 		}
 	}
 }
