@@ -7,7 +7,7 @@
 			<div class="w-20 pt-4">
 				<SideBarMenu />
 			</div>
-			<div class="w-screen pt-4 mr-10">
+			<div class="w-screen pt-1">
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />

@@ -2,7 +2,7 @@
 	<div class="block py-4 hover:bg-gray-50 border-b">
 		<div 
 			v-if="ticketDetails"
-			class="group flex items-center justify-between sm:justify-start font-light px-4"
+			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8"
 		>
 			<div
 				class="mr-4"

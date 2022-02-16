@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="sm:py-1">
+		<div>
 			<div
 				v-if="this.ticketList"
 				class="w-full block overflow-auto"
