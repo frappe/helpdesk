@@ -10,15 +10,21 @@ def get_tickets():
             ticket.status,
             ticket.name,
             ticket.ticket_type,
+            user.user_image as assingee_image,
             agent.agent_name as assignee,
             contact.name as contact
         FROM `tabTicket` ticket
         LEFT JOIN `tabContact` contact
         ON ticket.contact = contact.name
+        LEFT JOIN `tabUser` user
+        ON ticket.agent = user.name
         LEFT JOIN `tabAgent` agent
         ON ticket.agent = agent.name
         ORDER BY ticket.creation desc
     """, as_dict=1)
+
+    for ticket in all_tickets:
+        print(f"\n\n{ticket}")
     
     return all_tickets
 
