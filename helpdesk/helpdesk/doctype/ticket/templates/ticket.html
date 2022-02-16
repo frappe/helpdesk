@@ -72,6 +72,7 @@
 </div>
 {% endif %}
 
+<script src=" https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script type="text/javascript" src="/assets/frappe/node_modules/vue/dist/vue.js"></script>
 
 <script>
@@ -175,7 +176,7 @@
                                     </div>
                                     <div>
                                         <h7>
-                                            ${conversations[i].creation}
+                                            ${moment(conversations[i].creation).fromNow()}
                                         </h7>
                                     </div>
                                 </div>

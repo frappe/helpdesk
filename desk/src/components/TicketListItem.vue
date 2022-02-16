@@ -87,7 +87,7 @@
 				</template>
 			</Dropdown>
 			<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
-				{{ ticketDetails.modified }}
+				{{ $dayjs(ticketDetails.modified).fromNow()}}
 			</div> 
 		</div>
 		<div class="transform translate-y-2 border-b"/>
