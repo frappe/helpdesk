@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div>
-			<div class="flow-root border-b pb-3 pr-8">
+			<div class="flow-root border-b pt-2 pb-3 pr-8">
 				<div class="float-left ml-4">
 					<div class="flex items-center space-x-4">
 						<Input type="checkbox" value="" />

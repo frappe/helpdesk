@@ -1,13 +1,13 @@
 <template>
-	<div>
-		<div class="h-15">
-			<NavBar/>
+	<div class="w-screen flex">
+		<div class="w-15">
+			<SideBarMenu />
 		</div>
-		<div class="flex">
-			<div class="w-20 pt-4">
-				<SideBarMenu />
+		<div class="flex-col w-full">
+			<div class="h-15">
+				<NavBar/>
 			</div>
-			<div class="w-screen pt-1">
+			<div class="pt-1">
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />
