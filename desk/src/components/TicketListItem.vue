@@ -51,6 +51,7 @@
 								<div class="ml-1 text-gray-500">
 									{{ ticketDetails.ticket_type }}
 								</div>
+								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
 							<div v-else class="hidden group-hover:block">
 								<span class="text-sm text-gray-400"> set type </span>
@@ -78,6 +79,7 @@
 									:name="getIconBasedOnPriority(ticketDetails.priority)"
 								/>
 								<div class="ml-1" :class="'text-' + getColorBasedOnPriority(ticketDetails.priority)">{{ ticketDetails.priority }}</div>
+								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
 							<div v-else class="hidden group-hover:block">
 								<span class="text-sm text-gray-400"> set priority </span>
@@ -101,6 +103,8 @@
 							>
 								<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticketDetails.status)" name="circle"/>
 								<div class="ml-1 text-gray-500">{{ ticketDetails.status }}</div>
+								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
+
 							</div>
 							<div v-else class="hidden group-hover:block">
 								<span class="text-sm text-gray-400"> set status </span>
