@@ -13,6 +13,7 @@
 							:agents="this.agents"
 							:types="this.types"
 							:statuses="this.statuses"
+							:priorities="this.priorities"
 						/>
 					</div>
 				</div>
@@ -28,7 +29,7 @@ import TicketListItem from '../components/TicketListItem.vue'
 export default {
 	name: 'TicketList',
 	inject: ['viewportWidth'],
-	props: ['ticketList', 'agents', 'types', 'statuses'],
+	props: ['ticketList', 'agents', 'types', 'statuses', 'priorities'],
 	components: {
 		Input,
 		TicketListItem

@@ -18,6 +18,7 @@
 					:agents="agents"
 					:types="types"
 					:statuses="statuses"
+					:priorities="priorities"
 				/>
 			</div>
 		</div>
@@ -58,6 +59,12 @@ export default {
 				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
 				auto: true
 			}
+		},
+		priorities() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_priorities',
+				auto: true
+			}
 		}
 	},
 	computed: {
@@ -72,6 +79,9 @@ export default {
 		},
 		statuses() {
 			return this.$resources.statuses.data ? this.$resources.statuses.data : null;
+		},
+		priorities() {
+			return this.$resources.priorities.data ? this.$resources.priorities.data : null;
 		}
 	},
 }

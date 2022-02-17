@@ -11,12 +11,17 @@
 			</div>
 			<a 
 				:href="'ticket/' + ticketDetails.name"
-				class="sm:w-7/12"
+				class="sm:w-8/12"
 			>
 				<div class="flex flex-col space-y-1">
 					<div class="flex items-center">
 						<div class="text-xl font-medium">{{ ticketDetails.subject }}</div>
 						<div class="ml-1 text-base text-slate-400">#{{ ticketDetails.name }}</div>
+						<div class="ml-1">
+							<Badge>
+								Due in 3h
+							</Badge>
+						</div>
 					</div>
 					<div class="flex items-center">
 						<div class="flex">
@@ -26,98 +31,118 @@
 					</div>
 				</div>
 			</a>
-			<Dropdown
-				v-if="this.statuses"
-				placement="left" 
-				:options="statusesAsDropdownOptions()" 
-				:dropdown-width-full="true"
-				class="text-base sm:w-1/12"
-			>
-				<template v-slot="{ toggleStatuses }">
-					<div class="w-full cursor-pointer">
-						<div 
-							v-if="ticket.status"
-							@click="toggleStatuses"	
-							class="flex items-center"
+			<div class="flex items-center justify-between sm:justify-start font-light sm:w-6/12">
+				<Dropdown 
+					v-if="this.types"
+					placement="left" 
+					:options="typesAsDropdownOptions()" 
+					:dropdown-width-full="true"
+					class="text-base sm:w-4/12"
+				>
+					<template v-slot="{ toggleTypes }">
+						<div  
+							class="w-full"
+							@click="toggleTypes"
 						>
-							<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticketDetails.status)" name="circle"/>
-							<div class="ml-1 text-gray-500">{{ ticketDetails.status }}</div>
+							<div v-if="ticketDetails.ticket_type" class="flex items-center">
+								<div>
+									<FeatherIcon class="w-3 h-3 stroke-slate-400" name="tag" />
+								</div>
+								<div class="ml-1 text-gray-500">
+									{{ ticketDetails.ticket_type }}
+								</div>
+							</div>
+							<div v-else class="hidden group-hover:block">
+								<span class="text-sm text-gray-400"> set type </span>
+							</div>
 						</div>
-						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-400"> set status </span>
+					</template>
+				</Dropdown>
+				<Dropdown
+					v-if="this.priorities"
+					placement="left" 
+					:options="prioritiesAsDropdownOptions()" 
+					:dropdown-width-full="true"
+					class="text-base sm:w-3/12"
+				>
+					<template v-slot="{ togglePriority }">
+						<div class="w-full cursor-pointer">
+							<div 
+								v-if="ticket.priority"
+								@click="togglePriority"	
+								class="flex items-center"
+							>
+								<FeatherIcon 
+									class="w-2 h-2 stroke-transparent" 
+									:class="'fill-' + getColorBasedOnPriority(ticketDetails.priority)" 
+									:name="getIconBasedOnPriority(ticketDetails.priority)"
+								/>
+								<div class="ml-1" :class="'text-' + getColorBasedOnPriority(ticketDetails.priority)">{{ ticketDetails.priority }}</div>
+							</div>
+							<div v-else class="hidden group-hover:block">
+								<span class="text-sm text-gray-400"> set priority </span>
+							</div>
 						</div>
-					</div>
-				</template>
-			</Dropdown>
-			<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
-				<div class="flex items-center">
-					<div>
-						<FeatherIcon class="w-3 h-3 stroke-slate-400" name="edit-2"/>
-					</div>
-					<div class="ml-1">
-						{{ $dayjs(ticketDetails.modified).fromNow() }}
+					</template>
+				</Dropdown> 
+				<Dropdown
+					v-if="this.statuses"
+					placement="left" 
+					:options="statusesAsDropdownOptions()" 
+					:dropdown-width-full="true"
+					class="text-base sm:w-3/12"
+				>
+					<template v-slot="{ toggleStatuses }">
+						<div class="w-full cursor-pointer">
+							<div 
+								v-if="ticket.status"
+								@click="toggleStatuses"	
+								class="flex items-center"
+							>
+								<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticketDetails.status)" name="circle"/>
+								<div class="ml-1 text-gray-500">{{ ticketDetails.status }}</div>
+							</div>
+							<div v-else class="hidden group-hover:block">
+								<span class="text-sm text-gray-400"> set status </span>
+							</div>
+						</div>
+					</template>
+				</Dropdown>
+				<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
+					<div class="flex items-center">
+						<div>
+							<FeatherIcon class="w-3 h-3 stroke-slate-400" name="edit-2"/>
+						</div>
+						<div class="ml-1">
+							{{ $dayjs(ticketDetails.modified).fromNow() }}
+						</div>
 					</div>
 				</div>
 			</div>
-			<Dropdown 
-				v-if="this.types"
-				placement="left" 
-				:options="typesAsDropdownOptions()" 
-				:dropdown-width-full="true"
-				class="text-base sm:w-2/12"
-			>
-				<template v-slot="{ toggleTypes }">
-					<div  
-						class="w-full"
-						@click="toggleTypes"
-					>
-						<div v-if="ticketDetails.ticket_type" class="flex items-center">
-							<div>
-								<FeatherIcon class="w-3 h-3 stroke-slate-400" name="tag" />
+			<div class="sm:w-1/12">
+				<Dropdown
+					v-if="this.agents"
+					placement="right" 
+					:options="agentsAsDropdownOptions()" 
+					:dropdown-width-full="true"
+					class="text-base flex flex-row-reverse"
+				>
+					<template v-slot="{ toggleAssignees }">
+						<div  
+							@click="toggleAssignees"
+						>
+							<div v-if="ticketDetails.assignees.length > 0">
+								<div v-for="assignee in ticketDetails.assignees" :key="assignee">
+									<Avatar class="w-4 h-4" :label="assignee.agent_name" :imageURL="assignee.image" />
+								</div>
 							</div>
-							<div class="ml-1 text-gray-500">
-								{{ ticketDetails.ticket_type }}
-							</div>
-						</div>
-						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-400"> set type </span>
-						</div>
-					</div>
-				</template>
-			</Dropdown>
-			<div class="hidden sm:w-1/12 text-sm text-gray-600 sm:block">
-				<div class="flex items-center">
-					<div>
-						<FeatherIcon class="w-3 h-3 stroke-slate-400" name="shield"/>
-					</div>
-					<div class="ml-1">
-						Due in 3h
-					</div>
-				</div>
-			</div> 
-			<Dropdown
-				v-if="this.agents"
-				placement="right" 
-				:options="agentsAsDropdownOptions()" 
-				:dropdown-width-full="true"
-				class="text-base sm:w-1/12 flex flex-row-reverse"
-			>
-				<template v-slot="{ toggleAssignees }">
-					<div  
-						class="w-full"
-						@click="toggleAssignees"
-					>
-						<div v-if="ticketDetails.assignees">
-							<div v-for="assignee in ticketDetails.assignees" :key="assignee">
-								<Avatar class="w-4 h-4" :label="assignee.agent_name" :imageURL="assignee.image" />
+							<div v-else class="hidden group-hover:block">
+								<span class="text-sm text-gray-400"> assign agent </span>
 							</div>
 						</div>
-						<div v-else class="hidden group-hover:block">
-							<span class="text-sm text-gray-400"> assign agent </span>
-						</div>
-					</div>
-				</template>
-			</Dropdown>
+					</template>
+				</Dropdown>
+			</div>
 		</div>
 		<div class="transform translate-y-2"/>
 	</div>
@@ -128,7 +153,7 @@ import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
 
 export default {
 	name: 'TicketListItem',
-	props: ['ticket', 'agents', 'types', 'statuses'],
+	props: ['ticket', 'agents', 'types', 'statuses', 'priorities'],
 	components: {
 		Input,
 		Badge,
@@ -181,6 +206,15 @@ export default {
 				}
 			}
 		},
+		assignTicketPriority() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_priority',
+				debounce: 300,
+				onSuccess: () => {
+					this.$resources.ticket.fetch();
+				}
+			}
+		}
 	},
 	computed: {
 		ticketDetails() {
@@ -207,6 +241,28 @@ export default {
 			}
 			if (['On Hold'].includes(status)) {
 				return 'fill-blue-500'
+			}
+		},
+		getColorBasedOnPriority(priority) {
+			if (priority == 'High') {
+				return 'red-500'
+			}
+			if (priority == 'Medium') {
+				return 'yellow-500'
+			}
+			if (priority == "Low") {
+				return 'green-500'
+			}
+		},
+		getIconBasedOnPriority(priority) {
+			if (priority == 'High') {
+				return 'arrow-up'
+			}
+			if (priority == 'Medium') {
+				return 'arrow-up'
+			}
+			if (priority == "Low") {
+				return 'arrow-down'
 			}
 		},
 		agentsAsDropdownOptions() {
@@ -284,7 +340,26 @@ export default {
 			} else {
 				return null;
 			}
-		}
+		},
+		prioritiesAsDropdownOptions() {
+			let typeItems = [];
+			if (this.priorities) {
+				this.priorities.forEach(priority => {
+					typeItems.push({
+						label: priority,
+						handler: () => {
+							this.$resources.assignTicketPriority.submit({
+								ticket_id: this.ticketDetails.name,
+								priority: priority
+							});
+						},
+					});
+				});
+				return typeItems;
+			} else {
+				return null;
+			}
+		},
 	}
 }
 </script>
