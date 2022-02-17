@@ -3,7 +3,7 @@ from helpdesk.helpdesk.doctype.ticket.ticket import get_all_conversations, creat
 import json
 
 @frappe.whitelist(allow_guest=True)
-def get_tickets():
+def get_tickets(filter=None):
 	all_tickets = frappe.db.sql("""
 		SELECT
 			ticket.subject,
@@ -21,10 +21,19 @@ def get_tickets():
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
 
-	for ticket in all_tickets:
-		ticket['assignees'] = get_agent_assigned_to_ticket(ticket['name'])
+	filtered_tickets = []
 
-	return all_tickets
+	# TODO: optimize this (try using sql query)
+	for ticket in all_tickets:
+		assignees = get_agent_assigned_to_ticket(ticket['name'])
+		if filter == "Assigned to me":
+			if len([(assignee) for assignee in assignees if assignee['name'] == frappe.session.user]) > 0:
+				filtered_tickets.append(ticket)
+		else:
+			filtered_tickets.append(ticket)
+
+		ticket['assignees'] = get_agent_assigned_to_ticket(ticket['name'])
+	return filtered_tickets
 
 @frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):

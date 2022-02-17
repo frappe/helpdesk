@@ -226,7 +226,6 @@ export default {
 				this.ticketDetailsRefreshed = false;
 				this.localTicket = this.$resources.ticket.data ? this.$resources.ticket.data : this.ticket;
 			} else {
-				console.log(this.ticket);
 				this.localTicket = this.ticket;
 			}
 			return this.localTicket;
