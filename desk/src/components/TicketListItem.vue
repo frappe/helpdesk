@@ -18,8 +18,8 @@
 						<div class="text-xl font-medium">{{ ticketDetails.subject }}</div>
 						<div class="ml-1 text-base text-slate-400">#{{ ticketDetails.name }}</div>
 						<div class="ml-1">
-							<Badge>
-								Due in 3h
+							<Badge :color="getResolutionBadgeColor(ticketDetails.resolution_by, ticketDetails.agreement_status)">
+								{{ getResolutionDueIn(ticketDetails.resolution_by, ticketDetails.agreement_status) }}
 							</Badge>
 						</div>
 					</div>
@@ -360,6 +360,17 @@ export default {
 				return null;
 			}
 		},
+		getResolutionDueIn(resolutionBy, agreementStatus) {
+			if (["Fulfilled", "Overdue"].includes(agreementStatus)) {
+				return agreementStatus;
+			}
+			let resolutionString = this.$dayjs().to(resolutionBy);
+			return resolutionString.includes("ago") ? "Overdue" : "Due " + resolutionString;
+		},
+		getResolutionBadgeColor(resolutionBy, agreementStatus) {
+			let resolutionString = this.$dayjs().to(resolutionBy);
+			return resolutionString.includes("ago") ? "red" : (agreementStatus == "Fulfilled" ? "green" : "");
+		}
 	}
 }
 </script>

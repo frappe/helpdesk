@@ -12,6 +12,8 @@ def get_tickets():
 			ticket.name,
 			ticket.ticket_type,
 			ticket.priority,
+			ticket.resolution_by,
+			ticket.agreement_status,
 			contact.name as contact
 		FROM `tabTicket` ticket
 		LEFT JOIN `tabContact` contact
