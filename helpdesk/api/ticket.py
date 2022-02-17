@@ -11,6 +11,9 @@ def get_tickets():
 			ticket.status,
 			ticket.name,
 			ticket.ticket_type,
+			ticket.priority,
+			ticket.resolution_by,
+			ticket.agreement_status,
 			contact.name as contact
 		FROM `tabTicket` ticket
 		LEFT JOIN `tabContact` contact
@@ -69,6 +72,13 @@ def assign_ticket_status(ticket_id, status):
 		ticket_doc.save()
 
 @frappe.whitelist(allow_guest=True)
+def assign_ticket_priority(ticket_id, priority):
+	if ticket_id:
+		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc.priority = priority
+		ticket_doc.save()
+
+@frappe.whitelist(allow_guest=True)
 def get_all_ticket_types():
 	return frappe.get_all("Ticket Type", pluck="name")
 
@@ -82,6 +92,10 @@ def get_all_ticket_statuses():
 		if doc_field.label == "Status":
 			statuses = doc_field.options.split("\n")
 	return statuses
+
+@frappe.whitelist(allow_guest=True)
+def get_all_ticket_priorities():
+	return frappe.get_all("Ticket Priority", pluck="name")
 
 @frappe.whitelist(allow_guest=True)
 def get_contact(ticket_id):
