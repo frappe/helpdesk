@@ -39,6 +39,9 @@ export default {
 		tickets() {
 			return {
 				method: 'helpdesk.api.ticket.get_tickets',
+				params: {
+					filter: this.$ticketFilter.get()
+				},
 				auto: true
 			}
 		},
