@@ -4,7 +4,7 @@
 			<div
 				v-if="this.ticketList"
 				class="w-full block overflow-auto"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 13rem)' : null }"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9rem)' : null }"
 			>
 				<div class="flex-auto" v-for="ticket in this.ticketList" :key="ticket.name">
 					<div class="block px-0">
