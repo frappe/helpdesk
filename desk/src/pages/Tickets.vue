@@ -87,5 +87,15 @@ export default {
 			return this.$resources.priorities.data ? this.$resources.priorities.data : null;
 		}
 	},
+	activated() {
+		this.$socket.on('list_update', (data) => {
+			if (data['doctype'] == 'Ticket') {
+				this.$resources.tickets.fetch()
+			}
+		});
+	},
+	deactivated() {
+		this.$socket.off('list_update');
+	},
 }
 </script>
