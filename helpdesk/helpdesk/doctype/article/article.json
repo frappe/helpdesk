@@ -119,7 +119,7 @@
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-02-10 10:38:39.087696",
+ "modified": "2022-02-17 18:00:29.892591",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Article",
@@ -135,6 +135,18 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
    "share": 1,
    "write": 1
   }

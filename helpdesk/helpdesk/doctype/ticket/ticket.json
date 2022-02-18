@@ -372,7 +372,7 @@
  "idx": 7,
  "is_published_field": "is_published",
  "links": [],
- "modified": "2022-02-16 16:33:03.211667",
+ "modified": "2022-02-17 17:56:21.998313",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
@@ -393,6 +393,7 @@
   },
   {
    "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "if_owner": 1,
@@ -400,7 +401,9 @@
    "read": 1,
    "report": 1,
    "role": "Helpdesk Contact",
-   "share": 1
+   "select": 1,
+   "share": 1,
+   "write": 1
   },
   {
    "create": 1,
@@ -411,6 +414,19 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "select": 1,
    "share": 1,
    "write": 1
   }
