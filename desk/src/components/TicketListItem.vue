@@ -282,9 +282,10 @@ export default {
 						},
 					});
 				});
-				let options = [
-					{
-						group: 'Actions',
+				let options = [];
+				if (this.$user.get().agent) {
+					options.push({
+						group: 'Myself',
 						hideLabel: true,
 						items: [
 							{
@@ -296,11 +297,13 @@ export default {
 								}
 							},
 						],
-					},
-					{
-						items: agentItems,
-					}
-				];
+					})
+				}
+				options.push({
+					group: 'All Agents',
+					hideLabel: true,
+					items: agentItems,
+				})
 				return options;
 			} else {
 				return null;

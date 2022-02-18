@@ -21,7 +21,7 @@
 			<div class="border-r-2 pr-2 pt-1">
 				<FeatherIcon class="w-5 h-5" name="bell" />
 			</div>
-			<Avatar label="John Doe" imageURL="https://picsum.photos/200" />
+			<Avatar v-if="$user.get()" :imageURL="$user.get().profile_image" />
 		</div>
 	</div>
 </template>
@@ -44,6 +44,7 @@ export default {
 				items.push({
 					label: filter,
 					handler: () => {
+						console.log(this.$user);
 						this.$ticketFilter.set(filter);
 					}
 				});

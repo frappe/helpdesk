@@ -10,10 +10,18 @@ app.use(router)
 app.use(FrappeUI)
 app.component('Button', Button)
 
-app.config.globalProperties.$foo = () => {
-	console.log("This is working fine")
-}
 app.config.globalProperties.$dayjs = dayjs
+
+const user = ref();
+
+app.config.globalProperties.$user = {
+	set(userDetails) {
+		user.value = userDetails;
+	},
+	get() {
+		return user.value;
+	}
+};
 
 const ticketFilter = ref('All Tickets');
 app.config.globalProperties.$ticketFilter = {
@@ -21,7 +29,7 @@ app.config.globalProperties.$ticketFilter = {
 		ticketFilter.value = newValue;
 	},
 	get() {
-    return ticketFilter.value;
+		return ticketFilter.value;
 	}
 };
 

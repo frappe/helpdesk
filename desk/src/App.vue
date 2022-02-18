@@ -5,7 +5,7 @@
 		</div>
 		<div class="flex-col w-full">
 			<div class="h-15">
-				<NavBar/>
+				<NavBar />
 			</div>
 			<div class="pt-1">
 				<router-view v-slot="{ Component }">
@@ -23,18 +23,29 @@ import NavBar from "./components/NavBar.vue";
 import SideBarMenu from "./components/SideBarMenu.vue";
 
 export default {
-    name: "App",
-    data() {
-        return {
-            viewportWidth: 0
-        };
-    },
-    provide: {
-        viewportWidth: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-    },
-    components: {
-        NavBar,
-        SideBarMenu
-	}
+	name: "App",
+	data() {
+		return {
+			viewportWidth: 0
+		};
+	},
+	resources: {
+		user() {
+			return {
+				'method': 'helpdesk.api.agent.get_user',
+				auto: true,
+				onSuccess: () => {
+					this.$user.set(this.$resources.user.data);
+				}
+			}
+		}
+	},
+	provide: {
+		viewportWidth: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+	},
+	components: {
+		NavBar,
+		SideBarMenu,
+	},
 }
 </script>
