@@ -27,7 +27,7 @@
 </template>
 <script>
 import { Avatar, FeatherIcon, Dropdown } from 'frappe-ui'
-import CustomIcons from './CustomIcons.vue'
+import CustomIcons from './global/CustomIcons.vue'
 
 export default {
 	name: 'NavBar',

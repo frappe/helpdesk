@@ -2,14 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/ticket',
+    path: '/tickets',
     name: 'Tickets',
     component: () => import('@/pages/Tickets.vue'),
   },
   {
-    path: '/ticket/:ticketId',
-    name: 'TicketConversation',
-    component: () => import('@/pages/TicketConversation.vue'),
+    path: '/tickets/:ticketId',
+    name: 'Ticket',
+    component: () => import('@/pages/Ticket.vue'),
     props: true
   }
 ]
