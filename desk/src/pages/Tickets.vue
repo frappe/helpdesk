@@ -5,7 +5,7 @@
 				<div class="float-left ml-4">
 					<div class="flex items-center space-x-4">
 						<Input type="checkbox" value="" />
-						<Button icon-left="plus" type="primary">Add Ticket</Button>
+						<Button icon-left="plus" appearance="primary">Add Ticket</Button>
 					</div>
 				</div>
 				<div class="float-right">
