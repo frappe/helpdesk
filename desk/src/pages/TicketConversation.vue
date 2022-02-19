@@ -184,7 +184,6 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -193,7 +192,6 @@ export default {
 		assignTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
-				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -202,7 +200,6 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
-				debounce: 100,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -356,7 +353,7 @@ export default {
 			if (this.conversations) {
 				const [el] = this.$refs["conversation-" + (this.conversations.length - 1)];
 				if (el) {
-					el.scrollIntoView();
+					el.scrollIntoView({behavior: 'smooth'});
 				}
 			}
 		}

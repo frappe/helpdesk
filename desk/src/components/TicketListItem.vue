@@ -11,11 +11,11 @@
 			</div>
 			<a 
 				:href="'ticket/' + ticketDetails.name"
-				class="sm:w-8/12"
+				class="sm:w-9/12"
 			>
 				<div class="flex flex-col space-y-1">
 					<div class="flex items-center">
-						<div class="text-xl font-medium">{{ ticketDetails.subject }}</div>
+						<div class="text-base font-medium">{{ ticketDetails.subject }}</div>
 						<div class="ml-1 text-base text-slate-400">#{{ ticketDetails.name }}</div>
 						<div class="ml-1">
 							<Badge :color="getResolutionBadgeColor(ticketDetails.resolution_by, ticketDetails.agreement_status)">
@@ -33,7 +33,7 @@
 			</a>
 			<div class="flex items-center justify-between sm:justify-start font-light sm:w-6/12">
 				<Dropdown 
-					v-if="this.types"
+					v-if="types"
 					placement="left" 
 					:options="typesAsDropdownOptions()" 
 					:dropdown-width-full="true"
@@ -54,17 +54,17 @@
 								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
 							<div v-else class="hidden group-hover:block">
-								<span class="text-sm text-gray-400"> set type </span>
+								<span class="text-base text-gray-400"> set type </span>
 							</div>
 						</div>
 					</template>
 				</Dropdown>
 				<Dropdown
-					v-if="this.priorities"
+					v-if="priorities"
 					placement="left" 
 					:options="prioritiesAsDropdownOptions()" 
 					:dropdown-width-full="true"
-					class="text-base sm:w-3/12"
+					class="text-base sm:w-4/12"
 				>
 					<template v-slot="{ togglePriority }">
 						<div class="w-full cursor-pointer">
@@ -73,16 +73,17 @@
 								@click="togglePriority"	
 								class="flex items-center"
 							>
+								<div class="text-red-500 text-yellow-500 text-green-500 hidden"/>
 								<FeatherIcon 
 									class="w-2 h-2 stroke-transparent" 
-									:class="'fill-' + getColorBasedOnPriority(ticketDetails.priority)" 
+									:class="getColorBasedOnPriority(ticketDetails.priority, 'icon')" 
 									:name="getIconBasedOnPriority(ticketDetails.priority)"
 								/>
-								<div class="ml-1" :class="'text-' + getColorBasedOnPriority(ticketDetails.priority)">{{ ticketDetails.priority }}</div>
+								<div class="ml-1" :class="getColorBasedOnPriority(ticketDetails.priority, 'text')">{{ ticketDetails.priority }}</div>
 								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
 							<div v-else class="hidden group-hover:block">
-								<span class="text-sm text-gray-400"> set priority </span>
+								<span class="text-base text-gray-400"> set priority </span>
 							</div>
 						</div>
 					</template>
@@ -92,7 +93,7 @@
 					placement="left" 
 					:options="statusesAsDropdownOptions()" 
 					:dropdown-width-full="true"
-					class="text-base sm:w-3/12"
+					class="text-base sm:w-4/12"
 				>
 					<template v-slot="{ toggleStatuses }">
 						<div class="w-full cursor-pointer">
@@ -107,12 +108,12 @@
 
 							</div>
 							<div v-else class="hidden group-hover:block">
-								<span class="text-sm text-gray-400"> set status </span>
+								<span class="text-base text-gray-400"> set status </span>
 							</div>
 						</div>
 					</template>
 				</Dropdown>
-				<div class="hidden sm:w-2/12 text-sm text-gray-600 sm:block">
+				<div class="hidden sm:w-1/12 text-base text-gray-600 sm:block">
 					<div class="flex items-center">
 						<div>
 							<FeatherIcon class="w-3 h-3 stroke-slate-400" name="edit-2"/>
@@ -141,7 +142,7 @@
 								</div>
 							</div>
 							<div v-else class="hidden group-hover:block">
-								<span class="text-sm text-gray-400"> assign agent </span>
+								<span class="text-base text-gray-400"> assign agent </span>
 							</div>
 						</div>
 					</template>
@@ -186,7 +187,6 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				debounce: 300,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -195,7 +195,6 @@ export default {
 		assignTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
-				debounce: 300,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -204,7 +203,6 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
-				debounce: 300,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -213,7 +211,6 @@ export default {
 		assignTicketPriority() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_priority',
-				debounce: 300,
 				onSuccess: () => {
 					this.$resources.ticket.fetch();
 				}
@@ -246,16 +243,25 @@ export default {
 				return 'fill-blue-500'
 			}
 		},
-		getColorBasedOnPriority(priority) {
+		getColorBasedOnPriority(priority, type) {
+			let sufix = '';
+			if (type == 'icon') { 
+				sufix = 'fill';
+			} else if (type == 'text') {
+				sufix = 'text';
+			}
+			let color = '';
 			if (priority == 'High') {
-				return 'red-500'
+				color = 'red-500'
+			} else if (priority == 'Medium') {
+				color = 'yellow-500'
+			} else if (priority == "Low") {
+				color = 'green-500'
 			}
-			if (priority == 'Medium') {
-				return 'yellow-500'
-			}
-			if (priority == "Low") {
-				return 'green-500'
-			}
+
+			let value = sufix ? sufix + '-' + color : color;
+			console.log(`HERE ${value}`);
+			return sufix ? sufix + '-' + color : color;
 		},
 		getIconBasedOnPriority(priority) {
 			if (priority == 'High') {
@@ -371,11 +377,11 @@ export default {
 				return agreementStatus;
 			}
 			let resolutionString = this.$dayjs().to(resolutionBy);
-			return resolutionString.includes("ago") ? "Overdue" : "Due " + resolutionString;
+			return !resolutionString.includes("in") ? "Overdue" : "Due " + resolutionString;
 		},
 		getResolutionBadgeColor(resolutionBy, agreementStatus) {
 			let resolutionString = this.$dayjs().to(resolutionBy);
-			return resolutionString.includes("ago") ? "red" : (agreementStatus == "Fulfilled" ? "green" : "");
+			return !resolutionString.includes("in") ? "red" : (agreementStatus == "Fulfilled" ? "green" : "");
 		}
 	}
 }
