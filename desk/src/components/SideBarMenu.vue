@@ -4,29 +4,49 @@
 			<div class="group p-1 rounded-md pb-5">
 				<CustomIcons name="helpdesk" width="40" height="40"/>
 			</div>
-			<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-				<CustomIcons name="ticket" class="group-hover:stroke-blue-600" width="25" height="25"/>
+			<div>
+				<router-link to="/tickets">
+					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
+						<CustomIcons name="ticket" class="group-hover:stroke-blue-600" width="25" height="25"/>
+					</div>
+				</router-link>
 			</div>
-			<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-				<CustomIcons name="knowledge-base" class="group-hover:stroke-blue-600" width="25" height="25"/>
+			<div>
+				<router-link to="/knowledge-base">
+					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
+						<CustomIcons name="knowledge-base" class="group-hover:stroke-blue-600" width="25" height="25"/>
+					</div>
+				</router-link>
 			</div>
-			<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-				<CustomIcons name="customers" class="group-hover:stroke-blue-600" width="25" height="25"/>
+			<div>
+				<router-link to="/customers">
+					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
+						<CustomIcons name="customers" class="group-hover:stroke-blue-600" width="25" height="25"/>
+					</div>
+				</router-link>
 			</div>
-			<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-				<CustomIcons name="reports" class="group-hover:stroke-blue-600" width="25" height="25"/>
+			<div>
+				<router-link to="/reports">
+					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
+						<CustomIcons name="reports" class="group-hover:stroke-blue-600" width="25" height="25"/>
+					</div>
+				</router-link>
 			</div>
 		</div>
-		<div class="space-y-5 mt-auto">
-			<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-				<CustomIcons name="settings" class="group-hover:stroke-blue-600" width="25" height="25"/>
+		<div class="space-y-5 mt-auto mb-2">
+			<div>
+				<router-link to="/settings">
+					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
+						<CustomIcons name="settings" class="group-hover:stroke-blue-600" width="25" height="25"/>
+					</div>
+				</router-link>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import CustomIcons from "./CustomIcons.vue"
+import CustomIcons from "./global/CustomIcons.vue"
 
 export default {
 	name: 'SideBarMenu',

@@ -24,7 +24,7 @@
 
 <script>
 import { Input } from 'frappe-ui'
-import TicketListItem from '../components/TicketListItem.vue'
+import TicketListItem from './TicketListItem.vue'
 
 export default {
 	name: 'TicketList',

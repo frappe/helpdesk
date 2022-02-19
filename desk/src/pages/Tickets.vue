@@ -25,7 +25,7 @@
 	</div>
 </template>
 <script>
-import TicketList from './TicketList.vue'
+import TicketList from '../components/tickets/TicketList.vue'
 import { Input } from 'frappe-ui'
 
 export default {

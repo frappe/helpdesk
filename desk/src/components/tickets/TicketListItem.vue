@@ -9,8 +9,8 @@
 			>
 				<Input type="checkbox" value="" />
 			</div>
-			<a 
-				:href="'ticket/' + ticketDetails.name"
+			<router-link 
+				:to="`/tickets/${ticketDetails.name}`"
 				class="sm:w-9/12"
 			>
 				<div class="flex flex-col space-y-1">
@@ -30,7 +30,7 @@
 						</div>
 					</div>
 				</div>
-			</a>
+			</router-link>
 			<div class="flex items-center justify-between sm:justify-start font-light sm:w-6/12">
 				<Dropdown 
 					v-if="types"
@@ -259,8 +259,6 @@ export default {
 				color = 'green-500'
 			}
 
-			let value = sufix ? sufix + '-' + color : color;
-			console.log(`HERE ${value}`);
 			return sufix ? sufix + '-' + color : color;
 		},
 		getIconBasedOnPriority(priority) {

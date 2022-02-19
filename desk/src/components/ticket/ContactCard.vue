@@ -21,7 +21,7 @@
                 <div class="text-base space-y-3" v-if="otherTicketsOfContact">
                     <span class="text-green-500">{{ 'Open Tickets (' +  otherTicketsOfContact.length + ')' }}</span>
                     <div class="space-y-1 text-slate-700" v-for="ticket in otherTicketsOfContact" :key="ticket.name">
-                        <a :href="'ticket/' + ticket.name" class="text-slate-500">{{ ticket.subject }}</a>
+                        <router-link :to="`/tickets/${ticket.name}`" class="text-slate-500">{{ ticket.subject }}</router-link>
                     </div>
                 </div>
             </div>
