@@ -32,7 +32,6 @@ export default {
 		tickets() {
 			let tickets = this.$tickets().get()
 			let filter = this.$ticketFilter.get()
-			console.log(this.$user.get().agent)
 
 			let filteredTickets = []
 
