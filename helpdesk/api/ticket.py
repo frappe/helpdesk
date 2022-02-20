@@ -14,10 +14,8 @@ def get_tickets(filter=None):
 			ticket.priority,
 			ticket.resolution_by,
 			ticket.agreement_status,
-			contact.name as contact
+			ticket.contact
 		FROM `tabTicket` ticket
-		LEFT JOIN `tabContact` contact
-		ON ticket.contact = contact.name
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
 
@@ -65,6 +63,7 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 				frappe.throw('Tickets can only assigned to agents')
 		ticket_doc.assign_agent(agent_id)
 		frappe.db.commit()
+		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
 def assign_ticket_type(ticket_id, type):
@@ -72,6 +71,7 @@ def assign_ticket_type(ticket_id, type):
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		ticket_doc.ticket_type = type
 		ticket_doc.save()
+		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
 def assign_ticket_status(ticket_id, status):
@@ -79,6 +79,7 @@ def assign_ticket_status(ticket_id, status):
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		ticket_doc.status = status
 		ticket_doc.save()
+		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
 def assign_ticket_priority(ticket_id, priority):
@@ -86,6 +87,7 @@ def assign_ticket_priority(ticket_id, priority):
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		ticket_doc.priority = priority
 		ticket_doc.save()
+		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
 def get_all_ticket_types():

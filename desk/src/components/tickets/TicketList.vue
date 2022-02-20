@@ -2,19 +2,13 @@
 	<div>
 		<div>
 			<div
-				v-if="this.ticketList"
+				v-if="this.tickets"
 				class="w-full block overflow-auto"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.3rem)' : null }"
 			>
-				<div class="flex-auto" v-for="ticket in this.ticketList" :key="ticket.name">
+				<div class="flex-auto" v-for="ticket in tickets" :key="ticket.name">
 					<div class="block px-0">
-						<TicketListItem 
-							:ticket="ticket"
-							:agents="this.agents"
-							:types="this.types"
-							:statuses="this.statuses"
-							:priorities="this.priorities"
-						/>
+						<TicketListItem :ticket="ticket" />
 					</div>
 				</div>
 			</div>
@@ -29,10 +23,34 @@ import TicketListItem from './TicketListItem.vue'
 export default {
 	name: 'TicketList',
 	inject: ['viewportWidth'],
-	props: ['ticketList', 'agents', 'types', 'statuses', 'priorities'],
+	props: ['tickets'],
 	components: {
 		Input,
 		TicketListItem
 	},
+	computed: {
+		tickets() {
+			let tickets = this.$tickets().get()
+			let filter = this.$ticketFilter.get()
+
+			let filteredTickets = []
+
+			if (filter == "Assigned to me") {
+				for (let i in tickets) {
+					if (tickets[i].assignees.length > 0) {
+						for (let j = 0; j < tickets[i].assignees.length; j++) {
+							if (tickets[i].assignees[j].name == this.$user.get().agent.name) {
+								filteredTickets.push(tickets[i])
+							}
+						}
+					}
+				}
+			} else {
+				filteredTickets = tickets
+			}
+
+			return filteredTickets;
+		}
+	}
 }
 </script>

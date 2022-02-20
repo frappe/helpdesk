@@ -1,7 +1,7 @@
 <template>
 	<div class="block py-4 hover:bg-gray-50 border-b">
 		<div 
-			v-if="ticketDetails"
+			v-if="ticket"
 			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8"
 		>
 			<div
@@ -10,23 +10,23 @@
 				<Input type="checkbox" value="" />
 			</div>
 			<router-link 
-				:to="`/tickets/${ticketDetails.name}`"
+				:to="`/tickets/${ticket.name}`"
 				class="sm:w-9/12"
 			>
 				<div class="flex flex-col space-y-1">
 					<div class="flex items-center">
-						<div class="text-base font-medium">{{ ticketDetails.subject }}</div>
-						<div class="ml-1 text-base text-slate-400">#{{ ticketDetails.name }}</div>
+						<div class="text-base font-medium">{{ ticket.subject }}</div>
+						<div class="ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
 						<div class="ml-1">
-							<Badge :color="getResolutionBadgeColor(ticketDetails.resolution_by, ticketDetails.agreement_status)">
-								{{ getResolutionDueIn(ticketDetails.resolution_by, ticketDetails.agreement_status) }}
+							<Badge :color="getResolutionBadgeColor(ticket.resolution_by, ticket.agreement_status)">
+								{{ getResolutionDueIn(ticket.resolution_by, ticket.agreement_status) }}
 							</Badge>
 						</div>
 					</div>
 					<div class="flex items-center">
 						<div class="flex">
 							<FeatherIcon class="w-4 h-4 stroke-slate-400" name="user" />
-							<div class="ml-1 text-base">{{ ticketDetails.contact }}</div>
+							<div class="ml-1 text-base">{{ ticket.contact }}</div>
 						</div>
 					</div>
 				</div>
@@ -44,12 +44,12 @@
 							class="w-full"
 							@click="toggleTypes"
 						>
-							<div v-if="ticketDetails.ticket_type" class="flex items-center">
+							<div v-if="ticket.ticket_type" class="flex items-center">
 								<div>
 									<FeatherIcon class="w-3 h-3 stroke-slate-400" name="tag" />
 								</div>
 								<div class="ml-1 text-gray-500">
-									{{ ticketDetails.ticket_type }}
+									{{ ticket.ticket_type }}
 								</div>
 								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
@@ -76,10 +76,10 @@
 								<div class="text-red-500 text-yellow-500 text-green-500 hidden"/>
 								<FeatherIcon 
 									class="w-2 h-2 stroke-transparent" 
-									:class="getColorBasedOnPriority(ticketDetails.priority, 'icon')" 
-									:name="getIconBasedOnPriority(ticketDetails.priority)"
+									:class="getColorBasedOnPriority(ticket.priority, 'icon')" 
+									:name="getIconBasedOnPriority(ticket.priority)"
 								/>
-								<div class="ml-1" :class="getColorBasedOnPriority(ticketDetails.priority, 'text')">{{ ticketDetails.priority }}</div>
+								<div class="ml-1" :class="getColorBasedOnPriority(ticket.priority, 'text')">{{ ticket.priority }}</div>
 								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
 							<div v-else class="hidden group-hover:block">
@@ -102,8 +102,8 @@
 								@click="toggleStatuses"	
 								class="flex items-center"
 							>
-								<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticketDetails.status)" name="circle"/>
-								<div class="ml-1 text-gray-500">{{ ticketDetails.status }}</div>
+								<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticket.status)" name="circle"/>
+								<div class="ml-1 text-gray-500">{{ ticket.status }}</div>
 								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 
 							</div>
@@ -119,7 +119,7 @@
 							<FeatherIcon class="w-3 h-3 stroke-slate-400" name="edit-2"/>
 						</div>
 						<div class="ml-1">
-							{{ $dayjs(ticketDetails.modified).fromNow() }}
+							{{ $dayjs(ticket.modified).fromNow() }}
 						</div>
 					</div>
 				</div>
@@ -136,8 +136,8 @@
 						<div  
 							@click="toggleAssignees"
 						>
-							<div v-if="ticketDetails.assignees.length > 0">
-								<div v-for="assignee in ticketDetails.assignees" :key="assignee">
+							<div v-if="ticket.assignees.length > 0">
+								<div v-for="assignee in ticket.assignees" :key="assignee">
 									<Avatar class="w-4 h-4" :label="assignee.agent_name" :imageURL="assignee.image" />
 								</div>
 							</div>
@@ -158,7 +158,8 @@ import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
 
 export default {
 	name: 'TicketListItem',
-	props: ['ticket', 'agents', 'types', 'statuses', 'priorities'],
+	props: ['ticket'],
+	inject: ['agents', 'types', 'statuses', 'priorities'],
 	components: {
 		Input,
 		Badge,
@@ -168,65 +169,9 @@ export default {
 	},
 	data() {
 		return {
-			ticketDetailsRefreshed: false,
+			ticketRefreshed: false,
 			localTicket: null,
 		}
-	},
-	resources: {
-		ticket() {
-			return {
-				method: 'helpdesk.api.ticket.get_ticket',
-				params: {
-					ticket_id: this.ticketDetails.name
-				},
-				onSuccess: () => {
-					this.ticketDetailsRefreshed = true;
-				}
-			}
-		},
-		assignTicketToAgent() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		},
-		assignTicketType() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_type',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		},
-		assignTicketStatus() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_status',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		},
-		assignTicketPriority() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_priority',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		}
-	},
-	computed: {
-		ticketDetails() {
-			if (this.ticketDetailsRefreshed) {
-				this.ticketDetailsRefreshed = false;
-				this.localTicket = this.$resources.ticket.data ? this.$resources.ticket.data : this.ticket;
-			} else {
-				this.localTicket = this.ticket;
-			}
-			return this.localTicket;
-		},
 	},
 	methods: {
 		getBadgeColorBasedOnStatus(status) {
@@ -275,14 +220,11 @@ export default {
 		agentsAsDropdownOptions() {
 			let agentItems = [];
 			if (this.agents) {
-				this.agents.forEach(agent => {
+				this.$agents.get().forEach(agent => {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.$resources.assignTicketToAgent.submit({
-								ticket_id: this.ticketDetails.name,
-								agent_id: agent.name
-							});
+							this.$tickets(this.ticket.name).assignAgent(agent.name)
 						},
 					});
 				});
@@ -295,9 +237,7 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.$resources.assignTicketToAgent.submit({
-										ticket_id: this.ticketDetails.name
-									});
+									this.$tickets(this.ticket.name).assignAgent()
 								}
 							},
 						],
@@ -315,13 +255,13 @@ export default {
 		},
 		typesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.types) {
-				this.types.forEach(type => {
+			if (this.$tickets().get("types")) {
+				this.$tickets().get("types").forEach(type => {
 					typeItems.push({
 						label: type,
 						handler: () => {
 							this.$resources.assignTicketType.submit({
-								ticket_id: this.ticketDetails.name,
+								ticket_id: this.ticket.name,
 								type: type
 							});
 						},
@@ -334,15 +274,12 @@ export default {
 		},
 		statusesAsDropdownOptions() {
 			let statusItems = [];
-			if (this.statuses) {
-				this.statuses.forEach(status => {
+			if (this.$tickets().get("statuses")) {
+				this.$tickets().get("statuses").forEach(status => {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.$resources.assignTicketStatus.submit({
-								ticket_id: this.ticketDetails.name,
-								status: status
-							});
+							this.$tickets(this.ticket.name).assignStatus(status)
 						},
 					});
 				});
@@ -353,15 +290,12 @@ export default {
 		},
 		prioritiesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.priorities) {
-				this.priorities.forEach(priority => {
+			if (this.$tickets().get("priorities")) {
+				this.$tickets().get("priorities").forEach(priority => {
 					typeItems.push({
 						label: priority,
 						handler: () => {
-							this.$resources.assignTicketPriority.submit({
-								ticket_id: this.ticketDetails.name,
-								priority: priority
-							});
+							this.$tickets(this.ticket.name).assignPriority(priority)
 						},
 					});
 				});

@@ -147,15 +147,6 @@ export default {
 		}
 	},
 	resources: {
-		ticket() {
-			return {
-				method: 'helpdesk.api.ticket.get_ticket',
-				params: {
-					ticket_id: this.ticketId
-				},
-				auto: true
-			}
-		},
 		sessionAgent() {
 			return {
 				method: 'helpdesk.api.agent.get_session_agent',
@@ -180,48 +171,6 @@ export default {
 				auto: true
 			}
 		},
-		agents() {
-			return {
-				method: 'helpdesk.api.agent.get_all',
-				auto: true
-			}
-		},
-		assignTicketToAgent() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		},
-		assignTicketType() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_type',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		},
-		assignTicketStatus() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_status',
-				onSuccess: () => {
-					this.$resources.ticket.fetch();
-				}
-			}
-		},
-		types() {
-			return {
-				method: 'helpdesk.api.ticket.get_all_ticket_types',
-				auto: true
-			}
-		},
-		statuses() {
-			return {
-				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
-				auto: true
-			}
-		},
 		submitConversation() {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
@@ -233,28 +182,19 @@ export default {
 	},
 	computed: {
 		ticket() {
-			return this.$resources.ticket.data ? this.$resources.ticket.data : null;
+			return this.$tickets(this.ticketId).get()
 		},
 		sessionAgent() {
-			return this.$resources.sessionAgent.data ? this.$resources.sessionAgent.data : null;
+			return this.$resources.sessionAgent.data || null;
 		},
 		contact() {
-			return this.$resources.contact.data ? this.$resources.contact.data : null;
+			return this.$resources.contact.data || null;
 		},
 		conversations() {
 			this.$nextTick(() => {
 				this.autoScrollToBottom();
 			})
-			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
-		},
-		agents() {
-			return this.$resources.agents.data ? this.$resources.agents.data : null;
-		},
-		types() {
-			return this.$resources.types.data ? this.$resources.types.data : null
-		},
-		statuses() {
-			return this.$resources.statuses.data ? this.$resources.statuses.data : null;
+			return this.$resources.conversations.data || null;
 		}
 	},
 	activated() {
@@ -270,15 +210,12 @@ export default {
 	methods: {
 		agentsAsDropdownOptions() {
 			let agentItems = [];
-			if (this.agents) {
-				this.agents.forEach(agent => {
+			if (this.$agents.get()) {
+				this.$agents.get().forEach(agent => {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.$resources.assignTicketToAgent.submit({
-								ticket_id: this.ticketDetails.name,
-								agent_id: agent.name
-							});
+							this.$tickets(this.ticket.name).assignAgent(agent.name)
 						},
 					});
 				});
@@ -291,9 +228,7 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.$resources.assignTicketToAgent.submit({
-										ticket_id: this.ticketDetails.name
-									});
+									this.$tickets(this.ticket.name).assignAgent()
 								}
 							},
 						],
@@ -311,15 +246,12 @@ export default {
 		},
 		typesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.types) {
-				this.types.forEach(type => {
+			if (this.$tickets().get("types")) {
+				this.$tickets().get("types").forEach(type => {
 					typeItems.push({
 						label: type,
 						handler: () => {
-							this.$resources.assignTicketType.submit({
-								ticket_id: this.ticket.name,
-								type: type
-							});
+							this.$tickets(this.ticket.name).assignType(type)
 						},
 					});
 				});
@@ -330,15 +262,12 @@ export default {
 		},
 		statusesAsDropdownOptions() {
 			let statusItems = [];
-			if (this.statuses) {
-				this.statuses.forEach(status => {
+			if (this.$tickets().get("statuses")) {
+				this.$tickets().get("statuses").forEach(status => {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.$resources.assignTicketStatus.submit({
-								ticket_id: this.ticket.name,
-								status: status
-							});
+							this.$tickets(this.ticket.name).assignStatus(status)
 						},
 					});
 				});
