@@ -20,7 +20,11 @@ const globalVariables = ref({
 	ticketPriorities: null,
 	ticketStatuses: null,
 	updateTickets: () => {},
-	updateTicket: () => {},
+	updateTicket: (ticketId) => {},
+	assignAgent: (ticketId, agentName) => {},
+	assignType: (ticketId, type) => {},
+	assignStatus: (ticketId, status) => {},
+	assignPriority: (ticketId, priority) => {},
 
 	ticketFilter: "All Tickets",
 
@@ -47,7 +51,6 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		},
 		set: (value) => {
 			if (ticketId) {
-				console.log(value);
 				globalVariables.value.tickets[ticketId] = value;
 			} else {
 				if ("types" in value) {
@@ -68,7 +71,7 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		},
 		get: (valueType=null) => {
 			if (ticketId) {
-				return (ticketId in tickets) ? tickets[ticketId] : null
+				return (ticketId in globalVariables.value.tickets) ? globalVariables.value.tickets[ticketId] : null
 			}
 			switch(valueType) {
 				case "types":
@@ -81,11 +84,35 @@ app.config.globalProperties.$tickets = (ticketId) => {
 					return globalVariables.value.tickets
 			}
 		},
+		assignAgent: (agentName) => {
+			globalVariables.value.assignAgent(ticketId, agentName)
+		},
+		assignType: (type) => {
+			globalVariables.value.assignType(ticketId, type)
+		},
+		assignStatus: (status) => {
+			globalVariables.value.assignStatus(ticketId, status)
+		},
+		assignPriority: (priority) => {
+			globalVariables.value.assignPriority(ticketId, priority)
+		},
 		setUpdateTicket: (foo) => {
 			globalVariables.value.updateTicket = foo
 		},
 		setUpdateTickets: (foo) => {
 			globalVariables.value.updateTickets = foo
+		},
+		setAssignAgent: (foo) => {
+			globalVariables.value.assignAgent = foo
+		},
+		setAssignType: (foo) => {
+			globalVariables.value.assignType = foo
+		},
+		setAssignStatus: (foo) => {
+			globalVariables.value.assignStatus = foo
+		},
+		setAssignPriority: (foo) => {
+			globalVariables.value.assignPriority = foo
 		}
 	}
 }

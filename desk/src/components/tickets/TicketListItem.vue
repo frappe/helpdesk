@@ -173,40 +173,6 @@ export default {
 			localTicket: null,
 		}
 	},
-	resources: {
-		assignTicketToAgent() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: () => {
-					this.$tickets(this.ticket.name).update()
-				}
-			}
-		},
-		assignTicketType() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_type',
-				onSuccess: () => {
-					this.$tickets(this.ticket.name).update()
-				}
-			}
-		},
-		assignTicketStatus() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_status',
-				onSuccess: () => {
-					this.$tickets(this.ticket.name).update()
-				}
-			}
-		},
-		assignTicketPriority() {
-			return {
-				method: 'helpdesk.api.ticket.assign_ticket_priority',
-				onSuccess: () => {
-					this.$tickets(this.ticket.name).update()
-				}
-			}
-		}
-	},
 	methods: {
 		getBadgeColorBasedOnStatus(status) {
 			if (['Open'].includes(status)) {
@@ -258,10 +224,7 @@ export default {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.$resources.assignTicketToAgent.submit({
-								ticket_id: this.ticket.name,
-								agent_id: agent.name
-							});
+							this.$tickets(this.ticket.name).assignAgent(agent.name)
 						},
 					});
 				});
@@ -274,9 +237,7 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.$resources.assignTicketToAgent.submit({
-										ticket_id: this.ticket.name
-									});
+									this.$tickets(this.ticket.name).assignAgent()
 								}
 							},
 						],
@@ -318,10 +279,7 @@ export default {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.$resources.assignTicketStatus.submit({
-								ticket_id: this.ticket.name,
-								status: status
-							});
+							this.$tickets(this.ticket.name).assignStatus(status)
 						},
 					});
 				});
@@ -337,10 +295,7 @@ export default {
 					typeItems.push({
 						label: priority,
 						handler: () => {
-							this.$resources.assignTicketPriority.submit({
-								ticket_id: this.ticket.name,
-								priority: priority
-							});
+							this.$tickets(this.ticket.name).assignPriority(priority)
 						},
 					});
 				});

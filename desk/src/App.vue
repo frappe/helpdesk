@@ -52,7 +52,6 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.get_ticket',
 				onSuccess: () => {
-					console.log("fetched ticket!!")
 					this.$tickets(this.$resources.ticket.data.name).set(this.$resources.ticket.data)
 				}
 			}
@@ -102,6 +101,38 @@ export default {
 					this.$agents.set(this.$resources.agents.data)
 				}
 			}
+		},
+		assignTicketToAgent() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
+				onSuccess: (data) => {
+					this.$tickets(data.name).update();
+				}
+			}
+		},
+		assignTicketType() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_type',
+				onSuccess: (data) => {
+					this.$tickets(data.name).update();
+				}
+			}
+		},
+		assignTicketStatus() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_status',
+				onSuccess: (data) => {
+					this.$tickets(data.name).update();
+				}
+			}
+		},
+		assignTicketPriority() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_priority',
+				onSuccess: (data) => {
+					this.$tickets(data.name).update()
+				}
+			}
 		}
 	},
 	provide: {
@@ -118,6 +149,30 @@ export default {
 		this.$tickets().setUpdateTicket((ticketId) => {
 			this.$resources.ticket.fetch({
 				ticket_id: ticketId,
+			})
+		})
+		this.$tickets().setAssignAgent((ticketId, agentName) => {
+			this.$resources.assignTicketToAgent.submit({
+				ticket_id: ticketId,
+				agent_id: agentName
+			})
+		})
+		this.$tickets().setAssignType((ticketId, type) => {
+			this.$resources.assignTicketType.submit({
+				ticket_id: ticketId,
+				type
+			})
+		})
+		this.$tickets().setAssignStatus((ticketId, status) => {
+			this.$resources.assignTicketStatus.submit({
+				ticket_id: ticketId,
+				status
+			})
+		})
+		this.$tickets().setAssignPriority((ticketId, priority) => {
+			this.$resources.assignTicketPriority.submit({
+				ticket_id: ticketId,
+				priority
 			})
 		})
 		this.$socket.on("list_update", (data) => {
