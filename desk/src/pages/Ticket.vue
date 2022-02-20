@@ -233,28 +233,28 @@ export default {
 	},
 	computed: {
 		ticket() {
-			return this.$resources.ticket.data ? this.$resources.ticket.data : null;
+			return this.$resources.ticket.data || null;
 		},
 		sessionAgent() {
-			return this.$resources.sessionAgent.data ? this.$resources.sessionAgent.data : null;
+			return this.$resources.sessionAgent.data || null;
 		},
 		contact() {
-			return this.$resources.contact.data ? this.$resources.contact.data : null;
+			return this.$resources.contact.data || null;
 		},
 		conversations() {
 			this.$nextTick(() => {
 				this.autoScrollToBottom();
 			})
-			return this.$resources.conversations.data ? this.$resources.conversations.data : null;
+			return this.$resources.conversations.data || null;
 		},
 		agents() {
-			return this.$resources.agents.data ? this.$resources.agents.data : null;
+			return this.$resources.agents.data || null;
 		},
 		types() {
-			return this.$resources.types.data ? this.$resources.types.data : null
+			return this.$resources.types.data || null
 		},
 		statuses() {
-			return this.$resources.statuses.data ? this.$resources.statuses.data : null;
+			return this.$resources.statuses.data || null;
 		}
 	},
 	activated() {
@@ -276,7 +276,7 @@ export default {
 						label: agent.agent_name,
 						handler: () => {
 							this.$resources.assignTicketToAgent.submit({
-								ticket_id: this.ticketDetails.name,
+								ticket_id: this.ticket.name,
 								agent_id: agent.name
 							});
 						},
@@ -292,7 +292,7 @@ export default {
 								label: 'Assign to me',
 								handler: () => {
 									this.$resources.assignTicketToAgent.submit({
-										ticket_id: this.ticketDetails.name
+										ticket_id: this.ticket.name
 									});
 								}
 							},

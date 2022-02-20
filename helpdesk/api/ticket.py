@@ -14,10 +14,8 @@ def get_tickets(filter=None):
 			ticket.priority,
 			ticket.resolution_by,
 			ticket.agreement_status,
-			contact.name as contact
+			ticket.contact
 		FROM `tabTicket` ticket
-		LEFT JOIN `tabContact` contact
-		ON ticket.contact = contact.name
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
 

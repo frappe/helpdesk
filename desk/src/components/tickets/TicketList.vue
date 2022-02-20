@@ -2,19 +2,13 @@
 	<div>
 		<div>
 			<div
-				v-if="this.ticketList"
+				v-if="this.tickets"
 				class="w-full block overflow-auto"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.3rem)' : null }"
 			>
-				<div class="flex-auto" v-for="ticket in this.ticketList" :key="ticket.name">
+				<div class="flex-auto" v-for="ticket in tickets" :key="ticket.name">
 					<div class="block px-0">
-						<TicketListItem 
-							:ticket="ticket"
-							:agents="this.agents"
-							:types="this.types"
-							:statuses="this.statuses"
-							:priorities="this.priorities"
-						/>
+						<TicketListItem :ticket="ticket" />
 					</div>
 				</div>
 			</div>
@@ -29,10 +23,15 @@ import TicketListItem from './TicketListItem.vue'
 export default {
 	name: 'TicketList',
 	inject: ['viewportWidth'],
-	props: ['ticketList', 'agents', 'types', 'statuses', 'priorities'],
+	props: ['tickets'],
 	components: {
 		Input,
 		TicketListItem
 	},
+	computed: {
+		tickets() {
+			return this.$tickets().get({filter: this.$ticketFilter.get()});
+		}
+	}
 }
 </script>
