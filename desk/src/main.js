@@ -113,7 +113,7 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		},
 		setAssignPriority: (foo) => {
 			globalVariables.value.assignPriority = foo
-		}
+		},
 	}
 }
 

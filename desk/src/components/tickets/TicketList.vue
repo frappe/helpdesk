@@ -30,7 +30,27 @@ export default {
 	},
 	computed: {
 		tickets() {
-			return this.$tickets().get({filter: this.$ticketFilter.get()});
+			let tickets = this.$tickets().get()
+			let filter = this.$ticketFilter.get()
+			console.log(this.$user.get().agent)
+
+			let filteredTickets = []
+
+			if (filter == "Assigned to me") {
+				for (let i in tickets) {
+					if (tickets[i].assignees.length > 0) {
+						for (let j = 0; j < tickets[i].assignees.length; j++) {
+							if (tickets[i].assignees[j].name == this.$user.get().agent.name) {
+								filteredTickets.push(tickets[i])
+							}
+						}
+					}
+				}
+			} else {
+				filteredTickets = tickets
+			}
+
+			return filteredTickets;
 		}
 	}
 }
