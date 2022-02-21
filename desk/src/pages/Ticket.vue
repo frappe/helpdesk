@@ -54,7 +54,7 @@
 				class="w-1/5 border-l"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
-				<ActionPanel :ticket="ticket" />
+				<ActionPanel :ticket="ticket" :contact="contact" />
 			</div>
 		</div>
 	</div>

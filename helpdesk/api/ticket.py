@@ -13,6 +13,7 @@ def get_tickets(filter=None):
 			ticket.ticket_type,
 			ticket.priority,
 			ticket.resolution_by,
+			ticket.response_by,
 			ticket.agreement_status,
 			ticket.contact
 		FROM `tabTicket` ticket
