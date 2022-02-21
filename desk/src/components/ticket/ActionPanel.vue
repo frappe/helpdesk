@@ -26,11 +26,11 @@
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
 							<div v-if="ticket.assignees.length > 0" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow">{{ ticket.assignees[0].agent_name }}</div>
+								<div class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400"> assign agent </span>
+								<span class="text-base grow w-52 text-left text-gray-400"> assign agent </span>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 						</template>
@@ -47,11 +47,11 @@
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
 							<div v-if="ticket.status" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow">{{ ticket.status }}</div>
+								<div class="grow w-52 text-left">{{ ticket.status }}</div>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400">set status</span>
+								<span class="text-base text-gray-400 grow w-52 text-left">set status</span>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 						</template>
@@ -72,11 +72,11 @@
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
 							<div v-if="ticket.priority" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow">{{ ticket.priority }}</div>
+								<div class="grow w-52 text-left">{{ ticket.priority }}</div>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400">set priority</span>
+								<span class="text-base text-gray-400 grow w-52 text-left">set priority</span>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 						</template>
@@ -93,11 +93,11 @@
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
 							<div v-if="ticket.ticket_type" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow">{{ ticket.ticket_type }}</div>
+								<div class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400">set type</span>
+								<span class="text-base text-gray-400 grow w-52 text-left">set type</span>
 								<FeatherIcon name="chevron-down" class="w-4 h-4" />
 							</div>
 						</template>
