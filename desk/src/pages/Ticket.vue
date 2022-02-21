@@ -21,7 +21,7 @@
 					<div class="overflow-auto grow">
 						<Conversations :ticket="ticket" :scrollToBottom="scrollConversationsToBottom"/>
 					</div>
-					<div class="flex flex-col pr-3">
+					<div class="flex flex-col pr-3 pb-10">
 						<div class="flex" v-if="editing">
 							<div v-if="sessionAgent">
 								<Avatar label="John Doe" :imageURL="sessionAgent.image" />
@@ -41,20 +41,16 @@
 										v-model="this.currentConversationText"
 										:disabled="!sessionAgent"
 									></textarea>
-									<div class="my-2 space-x-2">
+									<div class="mt-2 space-x-2">
 										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Submit</Button>
 										<Button appearance="secondary" @click="cancelEditing()">Cancel</Button>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="flex space-x-2 pt-3 pb-10" v-else>
-							<div>
-								<Button appearance="primary" @click="startEditing()">Reply</Button>
-							</div>
-							<div>
-								<Button appearance="secondary">Comment</Button>
-							</div>
+						<div class="flex space-x-2 pt-3" v-else>
+							<Button appearance="primary" @click="startEditing()">Reply</Button>
+							<Button appearance="secondary">Comment</Button>
 						</div>
 					</div>
 				</div>
@@ -118,7 +114,6 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
 				onSuccess: () => {
-					this.editing = false;
 					// this.$resources.conversations.fetch();
 				}
 			}
