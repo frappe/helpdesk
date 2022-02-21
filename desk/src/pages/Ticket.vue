@@ -33,14 +33,7 @@
 									</div>
 								</div>
 								<div class="mt-2" v-if="contact">
-									<textarea
-										class="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-slate-50 bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-										id="exampleFormControlTextarea1"
-										rows="4"
-										:placeholder="sessionAgent ? 'Reply to ' + contact.first_name : 'Only agents can reply to tickets'"
-										v-model="this.currentConversationText"
-										:disabled="!sessionAgent"
-									></textarea>
+									<Editor v-model="content" />
 									<div class="mt-2 space-x-2">
 										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Submit</Button>
 										<Button appearance="secondary" @click="cancelEditing()">Cancel</Button>
@@ -71,6 +64,7 @@ import Conversations from '../components/ticket/Conversations.vue';
 import TopControlPanel from '../components/ticket/TopControlPanel.vue'
 import InfoPanel from '../components/ticket/InfoPanel.vue';
 import ActionPanel from '../components/ticket/ActionPanel.vue';
+import Editor from '../components/global/Editor.vue'
 
 export default {
 	name: 'Ticket',
@@ -85,13 +79,14 @@ export default {
 	Conversations,
     TopControlPanel,
     InfoPanel,
-    ActionPanel
+    ActionPanel,
+	Editor
 },
 	data() {
 		return {
-			currentConversationText: '',
 			editing: false,
-			scrollConversationsToBottom: false
+			scrollConversationsToBottom: false,
+			content: ''
 		}
 	},
 	resources: {
@@ -147,11 +142,11 @@ export default {
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		submitConversation() {
+			console.log(`content: ${this.content}`);
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
-				message: this.currentConversationText
+				message: this.content
 			})
-			this.currentConversationText = ""
 		},
 		getNextTicket() {
 
