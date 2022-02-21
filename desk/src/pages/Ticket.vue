@@ -1,14 +1,16 @@
 <template>
-	<div>
-		<TopControlPanel @next="getNextTicket" @previous="getPreviousTicket"/>
+	<div v-if="ticket">
+		<TopControlPanel :ticket="ticket" @next="getNextTicket" @previous="getPreviousTicket"/>
 		<div class="flex">
-			<div v-if="ticket" class="sm:w-3/12 px-4">
-				<ContactCard v-if="contact" :contact="contact" :ticketId="ticket.name" />
+			<div 
+				class="w-60 border-r"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
+			>
+				<InfoPanel :ticket="ticket" :contact="contact" />
 			</div>
 			<div
-				v-if="ticket"
-				class="sm:w-9/12 px-4"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 8rem)' : null }"
+				class="grow pt-4 px-4"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10rem)' : null }"
 			>
 				<div class="flex items-center">
 					<span class="text-6xl">
@@ -63,61 +65,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="sm:w-3/12 pl-3">
-				<div v-if="ticket">
-					<Card :title="'Ticket #' + ticket.name">
-						<div class="px-1">
-							<hr class="mb-4">
-							<div class="mb-4">
-								<h3 class="mb-2" v-if="agents">Assignee</h3>
-								<Dropdown 
-									:options="agentsAsDropdownOptions()" 
-									:dropdown-width-full="true" 
-									placement="left"
-								>
-									<template v-slot="{ toggleDropdown }">
-										<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">
-											<div v-if="ticket.assignees">{{ ticket.assignees[0].agent_name }}</div>
-											<div v-else></div>
-										</Button>
-									</template>
-								</Dropdown>
-							</div>
-							<div class="mb-4">
-								<h3 class="mb-2">Type</h3>
-								<Dropdown 
-									:options="typesAsDropdownOptions()" 
-									:dropdown-width-full="true"
-									placement="left"	
-								>
-									<template v-slot="{ toggleDropdown }">
-										<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.ticket_type }}</Button>
-									</template>
-								</Dropdown>
-							</div>
-							<div class="mb-4">
-								<h3 class="mb-2">Status</h3>
-								<Dropdown 
-									:options="statusesAsDropdownOptions()" 
-									:dropdown-width-full="true"
-									placement="left"
-								>
-									<template v-slot="{ toggleDropdown }">
-										<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown">{{ ticket.status }}</Button>
-									</template>
-								</Dropdown>
-							</div>
-							<div class="mb-4">
-								<h3 class="mb-2">Team</h3>
-								<Dropdown :items="[{ label: 'Option 1' }, { label: 'Option 2' }]" :dropdown-width-full="true">
-									<template v-slot="{ toggleDropdown }">
-										<Button icon-right="chevron-down" :button-full-width="true" @click="toggleDropdown()">Functional</Button>
-									</template>
-								</Dropdown>
-							</div>
-						</div>
-					</Card>
-				</div>
+			<div 
+				class="w-60 border-l"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
+			>
+				<ActionPanel :ticket="ticket" />
 			</div>
 		</div>
 	</div>
@@ -127,20 +79,24 @@ import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
 import ContactCard from '../components/ticket/ContactCard.vue';
 import ConversationCard from '../components/ticket/ConversationCard.vue';
 import TopControlPanel from '../components/ticket/TopControlPanel.vue'
+import InfoPanel from '../components/ticket/InfoPanel.vue';
+import ActionPanel from '../components/ticket/ActionPanel.vue';
 
 export default {
 	name: 'Ticket',
 	inject: ['viewportWidth'],
 	props: ['ticketId'],
 	components: {
-		Badge,
-		Card,
-		Dropdown,
-		ContactCard,
-		Avatar,
-		ConversationCard,
-		TopControlPanel
-	},
+    Badge,
+    Card,
+    Dropdown,
+    ContactCard,
+    Avatar,
+    ConversationCard,
+    TopControlPanel,
+    InfoPanel,
+    ActionPanel
+},
 	data() {
 		return {
 			currentConversationText: '',
