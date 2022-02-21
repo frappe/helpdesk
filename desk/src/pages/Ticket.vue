@@ -3,13 +3,13 @@
 		<TopControlPanel :ticket="ticket" @next="getNextTicket" @previous="getPreviousTicket"/>
 		<div class="flex">
 			<div 
-				class="w-60 border-r"
+				class="w-1/5 border-r"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<InfoPanel :ticket="ticket" :contact="contact" />
 			</div>
 			<div
-				class="grow pt-4 px-4"
+				class="w-3/5 pt-4 px-4"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10rem)' : null }"
 			>
 				<div class="flex items-center">
@@ -66,7 +66,7 @@
 				</div>
 			</div>
 			<div 
-				class="w-60 border-l"
+				class="w-1/5 border-l"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<ActionPanel :ticket="ticket" />
@@ -76,7 +76,6 @@
 </template>
 <script>
 import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
-import ContactCard from '../components/ticket/ContactCard.vue';
 import ConversationCard from '../components/ticket/ConversationCard.vue';
 import TopControlPanel from '../components/ticket/TopControlPanel.vue'
 import InfoPanel from '../components/ticket/InfoPanel.vue';
@@ -90,7 +89,6 @@ export default {
     Badge,
     Card,
     Dropdown,
-    ContactCard,
     Avatar,
     ConversationCard,
     TopControlPanel,
