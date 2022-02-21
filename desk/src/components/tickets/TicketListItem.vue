@@ -260,10 +260,7 @@ export default {
 					typeItems.push({
 						label: type,
 						handler: () => {
-							this.$resources.assignTicketType.submit({
-								ticket_id: this.ticket.name,
-								type: type
-							});
+							this.$tickets(this.ticket.name).assignType(type)
 						},
 					});
 				});
