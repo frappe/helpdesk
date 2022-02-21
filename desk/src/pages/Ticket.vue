@@ -33,7 +33,7 @@
 									</div>
 								</div>
 								<div class="mt-2" v-if="contact">
-									<Editor v-model="content" />
+									<QuillEditor v-model:content="content" theme="snow" toolbar="full" contentType="html"/>
 									<div class="mt-2 space-x-2">
 										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Submit</Button>
 										<Button appearance="secondary" @click="cancelEditing()">Cancel</Button>
@@ -64,7 +64,8 @@ import Conversations from '../components/ticket/Conversations.vue';
 import TopControlPanel from '../components/ticket/TopControlPanel.vue'
 import InfoPanel from '../components/ticket/InfoPanel.vue';
 import ActionPanel from '../components/ticket/ActionPanel.vue';
-import Editor from '../components/global/Editor.vue'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 export default {
 	name: 'Ticket',
@@ -80,13 +81,13 @@ export default {
     TopControlPanel,
     InfoPanel,
     ActionPanel,
-	Editor
+	QuillEditor
 },
 	data() {
 		return {
 			editing: false,
 			scrollConversationsToBottom: false,
-			content: ''
+			content: ""
 		}
 	},
 	resources: {
