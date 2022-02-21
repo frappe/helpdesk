@@ -23,7 +23,7 @@ import ConversationCard from "./ConversationCard.vue"
 
 export default {
 	name: "Conversations",
-	props: ["ticket"],
+	props: ["ticket", "scrollToBottom"],
 	components: {
 		ConversationCard
 	},
@@ -44,6 +44,13 @@ export default {
 				this.autoScrollToBottom();
 			})
 			return this.$resources.conversations.data || null;
+		}
+	},
+	watch: {
+		scrollToBottom(scroll) {
+			if (scroll) {
+				this.autoScrollToBottom()
+			}
 		}
 	},
 	mounted() {

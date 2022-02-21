@@ -19,10 +19,10 @@
 				</div>
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
-						<Conversations :ticket="ticket" />
+						<Conversations :ticket="ticket" :scrollToBottom="scrollConversationsToBottom"/>
 					</div>
 					<div class="flex flex-col pr-3">
-						<div class="flex">
+						<div class="flex" v-if="editing">
 							<div v-if="sessionAgent">
 								<Avatar label="John Doe" :imageURL="sessionAgent.image" />
 							</div>
@@ -41,10 +41,19 @@
 										v-model="this.currentConversationText"
 										:disabled="!sessionAgent"
 									></textarea>
-									<div class="my-2">
-										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" :disabled="!sessionAgent">Submit</Button>
+									<div class="my-2 space-x-2">
+										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Submit</Button>
+										<Button appearance="secondary" @click="cancelEditing()">Cancel</Button>
 									</div>
 								</div>
+							</div>
+						</div>
+						<div class="flex space-x-2 pt-3 pb-10" v-else>
+							<div>
+								<Button appearance="primary" @click="startEditing()">Reply</Button>
+							</div>
+							<div>
+								<Button appearance="secondary">Comment</Button>
 							</div>
 						</div>
 					</div>
@@ -85,6 +94,8 @@ export default {
 	data() {
 		return {
 			currentConversationText: '',
+			editing: false,
+			scrollConversationsToBottom: false
 		}
 	},
 	resources: {
@@ -107,6 +118,7 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
 				onSuccess: () => {
+					this.editing = false;
 					// this.$resources.conversations.fetch();
 				}
 			}
@@ -124,73 +136,20 @@ export default {
 		},
 	},
 	methods: {
-		agentsAsDropdownOptions() {
-			let agentItems = [];
-			if (this.$agents.get()) {
-				this.$agents.get().forEach(agent => {
-					agentItems.push({
-						label: agent.agent_name,
-						handler: () => {
-							this.$tickets(this.ticket.name).assignAgent(agent.name)
-						},
-					});
-				});
-				let options = [];
-				if (this.$user.get().agent) {
-					options.push({
-						group: 'Myself',
-						hideLabel: true,
-						items: [
-							{
-								label: 'Assign to me',
-								handler: () => {
-									this.$tickets(this.ticket.name).assignAgent()
-								}
-							},
-						],
-					})
-				}
-				options.push({
-					group: 'All Agents',
-					hideLabel: true,
-					items: agentItems,
-				})
-				return options;
-			} else {
-				return null;
-			}
+		startEditing() {
+			this.editing = true
+			this.delayedConversationScroll()
 		},
-		typesAsDropdownOptions() {
-			let typeItems = [];
-			if (this.$tickets().get("types")) {
-				this.$tickets().get("types").forEach(type => {
-					typeItems.push({
-						label: type,
-						handler: () => {
-							this.$tickets(this.ticket.name).assignType(type)
-						},
-					});
-				});
-				return typeItems;
-			} else {
-				return null;
-			}
+		cancelEditing() {
+			this.editing = false
 		},
-		statusesAsDropdownOptions() {
-			let statusItems = [];
-			if (this.$tickets().get("statuses")) {
-				this.$tickets().get("statuses").forEach(status => {
-					statusItems.push({
-						label: status,
-						handler: () => {
-							this.$tickets(this.ticket.name).assignStatus(status)
-						},
-					});
-				});
-				return statusItems;
-			} else {
-				return null;
+		delayedConversationScroll() {
+			function delay(time) {
+				return new Promise(resolve => setTimeout(resolve, time));
 			}
+
+			delay(400).then(() => this.scrollConversationsToBottom = true)
+			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		submitConversation() {
 			this.$resources.submitConversation.submit({
