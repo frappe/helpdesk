@@ -5,11 +5,11 @@
 			<div class="text-base space-y-2">
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">First Response Due</div>
-					<div>{{ ticket.response_by }}</div>
+					<div>{{ $dayjs(ticket.response_by).format('ddd, MMM DD, YYYY H:m') }}</div>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Resolution Due</div>
-					<div>{{ ticket.resolution_by }}</div>
+					<div>{{ $dayjs(ticket.resolution_by).format('ddd, MMM DD, YYYY H:m') }}</div>
 				</div>
 			</div>
 		</div>

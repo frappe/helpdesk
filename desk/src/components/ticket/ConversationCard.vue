@@ -4,7 +4,7 @@
 			<Avatar :label="userName" :imageURL="profilePicUrl" class="w-9 h-9" />
 			<div class="space-y-1">
 				<div class="text-lg">{{ userName }}</div>
-				<div class="text-sm text-slate-500">{{ $dayjs(time).fromNow() }}</div>
+				<div class="text-sm text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
 			</div>
 		</div>
 		<div class="grow">
