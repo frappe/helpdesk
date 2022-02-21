@@ -1,20 +1,14 @@
 <template>
-	<div class="flex">
-		<div>
-			<Avatar :label="userName" :imageURL="profilePicUrl" />
+	<div class="py-5 border-b space-y-2">
+		<div class="flex space-x-2">
+			<Avatar :label="userName" :imageURL="profilePicUrl" class="w-9 h-9" />
+			<div class="space-y-1">
+				<div class="text-lg">{{ userName }}</div>
+				<div class="text-sm text-slate-500">{{ $dayjs(time).fromNow() }}</div>
+			</div>
 		</div>
-		<div class="grow ml-3">
-			<div class="flex justify-between">
-				<div class="flex">
-					<span class="pt-1">{{ userName }}</span>
-				</div>
-				<span class="text-slate-500">{{ $dayjs(time).fromNow() }}</span>
-			</div>
-			<div class="mt-2">
-				<div class="p-5 bg-slate-50 rounded-md">
-					<div v-html="message"></div>
-				</div>
-			</div>
+		<div class="grow">
+			<div v-html="message"></div>
 		</div>
 	</div>
 </template>

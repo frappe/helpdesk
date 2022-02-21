@@ -9,32 +9,17 @@
 				<InfoPanel :ticket="ticket" :contact="contact" />
 			</div>
 			<div
-				class="w-3/5 pt-4 px-4"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10rem)' : null }"
+				class="w-3/5 pt-3 px-4"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10.5rem)' : null }"
 			>
-				<div class="flex items-center">
-					<span class="text-6xl">
+				<div class="flex items-center pb-4">
+					<span class="text-4xl">
 						{{ ticket.name }} - {{ ticket.subject }}
 					</span>
-					<Badge color="green" class="ml-3 align-middle">{{ ticket.status }}</Badge>
 				</div>
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
-						<div
-							:v-if="conversations"
-							v-for="(conversation, index) in conversations" :key="conversation.name" 
-							class="flex flex-col space-y-4 mt-4 pr-3"
-							ref="conversationContainer"
-						>
-							<div :ref="`conversation-${index}`">
-								<ConversationCard 
-									:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
-									:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
-									:time="conversation.creation" 
-									:message="conversation.content"
-								/>
-							</div>
-						</div>
+						<Conversations :ticket="ticket" />
 					</div>
 					<div class="flex flex-col pr-3">
 						<div class="flex">
@@ -77,6 +62,7 @@
 <script>
 import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
 import ConversationCard from '../components/ticket/ConversationCard.vue';
+import Conversations from '../components/ticket/Conversations.vue';
 import TopControlPanel from '../components/ticket/TopControlPanel.vue'
 import InfoPanel from '../components/ticket/InfoPanel.vue';
 import ActionPanel from '../components/ticket/ActionPanel.vue';
@@ -91,6 +77,7 @@ export default {
     Dropdown,
     Avatar,
     ConversationCard,
+	Conversations,
     TopControlPanel,
     InfoPanel,
     ActionPanel
@@ -116,20 +103,11 @@ export default {
 				auto: true
 			}
 		},
-		conversations() {
-			return {
-				method: 'helpdesk.api.ticket.get_conversations',
-				params: {
-					ticket_id: this.ticketId
-				},
-				auto: true
-			}
-		},
 		submitConversation() {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
 				onSuccess: () => {
-					this.$resources.conversations.fetch();
+					// this.$resources.conversations.fetch();
 				}
 			}
 		}
@@ -144,22 +122,6 @@ export default {
 		contact() {
 			return this.$resources.contact.data || null;
 		},
-		conversations() {
-			this.$nextTick(() => {
-				this.autoScrollToBottom();
-			})
-			return this.$resources.conversations.data || null;
-		}
-	},
-	activated() {
-		this.$socket.on('list_update', (data) => {
-			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
-				this.$resources.conversations.fetch()
-			}
-		});
-	},
-	deactivated() {
-		this.$socket.off('list_update');
 	},
 	methods: {
 		agentsAsDropdownOptions() {
@@ -236,14 +198,6 @@ export default {
 				message: this.currentConversationText
 			})
 			this.currentConversationText = ""
-		},
-		autoScrollToBottom() {
-			if (this.conversations) {
-				const [el] = this.$refs["conversation-" + (this.conversations.length - 1)];
-				if (el) {
-					el.scrollIntoView({behavior: 'smooth'});
-				}
-			}
 		},
 		getNextTicket() {
 
