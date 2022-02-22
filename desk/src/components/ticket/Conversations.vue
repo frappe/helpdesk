@@ -8,7 +8,7 @@
 		>
 			<div :ref="`conversation-${index}`">
 				<ConversationCard 
-					:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
+					:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
 					:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
 					:time="conversation.creation" 
 					:message="conversation.content"
