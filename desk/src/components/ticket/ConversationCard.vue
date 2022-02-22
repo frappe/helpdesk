@@ -1,8 +1,8 @@
 <template>
 	<div class="py-5 border-b space-y-2">
-		<div class="flex space-x-2">
-			<Avatar :label="userName" :imageURL="profilePicUrl" class="w-9 h-9" />
-			<div class="space-y-1">
+		<div class="flex space-x-2 items-center">
+			<Avatar :label="userName" :imageURL="profilePicUrl" size="md" />
+			<div>
 				<div class="text-lg">{{ userName }}</div>
 				<div class="text-sm text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
 			</div>
