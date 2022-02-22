@@ -87,13 +87,12 @@
 				</div>
 			</div>
 		</div>
-		<Dialog :options="{title: 'Create New'}" v-model="openCreateNewTicketTypeDialog">
+		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
 			<template #body-content>
 				<div class="space-y-4">
-					<Input label="Tag" type="text" v-model="newType" placeholder="eg: Bug" />
-					<Input label="Description" type="textarea" v-model="newTypeDescription" placeholder="Description" />
+					<Input type="text" v-model="newType" placeholder="eg: Bug" />
 					<div class="flex float-right space-x-2">
-						<Button @click="createAndAssignTicketTypeFromDialog()">Create and assign</Button>
+						<Button @click="createAndAssignTicketTypeFromDialog()">Create and Assign</Button>
 						<Button @click="createTicketFromDialog()" appearance="primary">Create</Button>
 					</div>
 				</div>
@@ -120,7 +119,6 @@ export default {
 		return {
 			openCreateNewTicketTypeDialog: false,
 			newType: "",
-			newTypeDescription: ""
 		}
 	},
 	methods: {
@@ -138,7 +136,6 @@ export default {
 		},
 		closeCreateNewTicketTypeDialog() {
 			this.newType = ""
-			this.newTypeDescription = ""
 			this.openCreateNewTicketTypeDialog = false
 		},
 		agentsAsDropdownOptions() {
