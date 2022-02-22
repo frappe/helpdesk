@@ -17,45 +17,45 @@
 			<div class="text-base space-y-2">
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Assignee</div>
-					<Dropdown
-						v-if="this.$agents.get()"
-						placement="left" 
+					<CustomDropdown
+						v-if="$tickets().get('statuses')"
 						:options="agentsAsDropdownOptions()" 
-						:dropdown-width-full="true"
-						class="text-base w-full flex"
+						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div v-if="ticket.assignees.length > 0" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
-							</div>
-							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base grow w-52 text-left text-gray-400"> assign agent </span>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
+							<div class="w-full">
+								<div v-if="ticket.assignees.length > 0" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+									<div class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
+								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
+									<span class="text-base grow w-52 text-left text-gray-400"> assign agent </span>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
 							</div>
 						</template>
-					</Dropdown>
+					</CustomDropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Status</div>
-					<Dropdown
+					<CustomDropdown
 						v-if="$tickets().get('statuses')"
-						placement="left" 
 						:options="statusesAsDropdownOptions()" 
-						:dropdown-width-full="true"
-						class="text-base w-full flex"
+						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div v-if="ticket.status" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow w-52 text-left">{{ ticket.status }}</div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
-							</div>
-							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400 grow w-52 text-left">set status</span>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
+							<div class="w-full">
+								<div v-if="ticket.status" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+									<div class="grow w-52 text-left">{{ ticket.status }}</div>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
+								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
+									<span class="text-base grow w-52 text-left text-gray-400"> set status </span>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
 							</div>
 						</template>
-					</Dropdown>
+					</CustomDropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Team</div>
@@ -63,45 +63,45 @@
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Priority</div>
-					<Dropdown
+					<CustomDropdown
 						v-if="$tickets().get('priorities')"
-						placement="left" 
 						:options="prioritiesAsDropdownOptions()" 
-						:dropdown-width-full="true"
-						class="text-base w-full flex"
+						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div v-if="ticket.priority" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow w-52 text-left">{{ ticket.priority }}</div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
-							</div>
-							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400 grow w-52 text-left">set priority</span>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
+							<div class="w-full">
+								<div v-if="ticket.priority" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+									<div class="grow w-52 text-left">{{ ticket.priority }}</div>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
+								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
+									<span class="text-base grow w-52 text-left text-gray-400"> set priority </span>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
 							</div>
 						</template>
-					</Dropdown>
+					</CustomDropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Type</div>
-					<Dropdown
+					<CustomDropdown
 						v-if="$tickets().get('types')"
-						placement="left" 
 						:options="typesAsDropdownOptions()" 
-						:dropdown-width-full="true"
-						class="text-base w-full flex"
+						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div v-if="ticket.ticket_type" class="flex pr-1 py-1 hover:bg-slate-50">
-								<div class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
-							</div>
-							<div v-else class="flex pr-1 py-1 hover:bg-slate-50">
-								<span class="text-base text-gray-400 grow w-52 text-left">set type</span>
-								<FeatherIcon name="chevron-down" class="w-4 h-4" />
+							<div class="w-full">
+								<div v-if="ticket.ticket_type" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+									<div class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
+								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
+									<span class="text-base grow w-52 text-left text-gray-400"> set type </span>
+									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								</div>
 							</div>
 						</template>
-					</Dropdown>
+					</CustomDropdown>
 				</div>
 			</div>
 		</div>
@@ -110,13 +110,15 @@
 
 <script>
 import { FeatherIcon, Dropdown } from 'frappe-ui'
+import CustomDropdown from '../global/CustomDropdown.vue'
 
 export default {
 	name: "ActionPanel",
 	props: ["ticket", "contact"],
 	components: {
 		FeatherIcon,
-		Dropdown
+		Dropdown,
+		CustomDropdown
 	},
 	methods: {
 		agentsAsDropdownOptions() {
