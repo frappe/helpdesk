@@ -23,15 +23,10 @@
 						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div class="w-full">
-								<div v-if="ticket.assignees.length > 0" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
-								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
-									<span class="text-base grow w-52 text-left text-gray-400"> assign agent </span>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
+							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+								<div v-if="ticket.assignees.length > 0" class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
+								<div v-else class="text-base grow w-52 text-left text-gray-400"> assign agent </div>
+								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -45,14 +40,11 @@
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
 							<div class="w-full">
-								<div v-if="ticket.status" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div class="grow w-52 text-left">{{ ticket.status }}</div>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
-								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
-									<span class="text-base grow w-52 text-left text-gray-400"> set status </span>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
+								<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+									<div v-if="ticket.status" class="grow w-52 text-left">{{ ticket.status }}</div>
+									<div v-else class="text-base grow w-52 text-left text-gray-400"> set status </div>
+								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+							</div>
 							</div>
 						</template>
 					</CustomDropdown>
@@ -69,15 +61,10 @@
 						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div class="w-full">
-								<div v-if="ticket.priority" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div class="grow w-52 text-left">{{ ticket.priority }}</div>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
-								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
-									<span class="text-base grow w-52 text-left text-gray-400"> set priority </span>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
+							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+								<div v-if="ticket.priority" class="grow w-52 text-left">{{ ticket.priority }}</div>
+								<div v-else class="text-base grow w-52 text-left text-gray-400"> set priority </div>
+								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -90,37 +77,70 @@
 						class="text-base w-56"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div class="w-full">
-								<div v-if="ticket.ticket_type" class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
-								<div v-else class="flex pr-1 py-1 hover:bg-slate-50 w-56 space-x-1">
-									<span class="text-base grow w-52 text-left text-gray-400"> set type </span>
-									<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
-								</div>
+							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1 items-center">
+								<div v-if="ticket.ticket_type" class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
+								<div v-else class="text-base grow w-52 text-left text-gray-400"> set type </div>
+								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
 				</div>
 			</div>
 		</div>
+		<Dialog :options="{title: 'Create New'}" v-model="openCreateNewTicketTypeDialog">
+			<template #body-content>
+				<div class="space-y-4">
+					<Input label="Tag" type="text" v-model="newType" placeholder="eg: Bug" />
+					<Input label="Description" type="textarea" v-model="newTypeDescription" placeholder="Description" />
+					<div class="flex float-right space-x-2">
+						<Button @click="createAndAssignTicketTypeFromDialog()">Create and assign</Button>
+						<Button @click="createTicketFromDialog()" appearance="primary">Create</Button>
+					</div>
+				</div>
+			</template>
+		</Dialog>
 	</div>
 </template>
 
 <script>
-import { FeatherIcon, Dropdown } from 'frappe-ui'
+import { FeatherIcon, Dropdown, Input, Dialog } from 'frappe-ui'
 import CustomDropdown from '../global/CustomDropdown.vue'
 
 export default {
 	name: "ActionPanel",
 	props: ["ticket", "contact"],
 	components: {
-		FeatherIcon,
-		Dropdown,
-		CustomDropdown
+    FeatherIcon,
+    Dropdown,
+    CustomDropdown,
+	Input,
+	Dialog
+},
+	data() {
+		return {
+			openCreateNewTicketTypeDialog: false,
+			newType: "",
+			newTypeDescription: ""
+		}
 	},
 	methods: {
+		createAndAssignTicketTypeFromDialog() {
+			if (this.newType) {
+				this.$tickets(this.ticket.name).assignType(this.newType)
+				this.closeCreateNewTicketTypeDialog();
+			}
+		},
+		createTicketFromDialog() {
+			if (this.newType) {
+				this.$tickets().createType(this.newType)
+				this.closeCreateNewTicketTypeDialog();
+			}
+		},
+		closeCreateNewTicketTypeDialog() {
+			this.newType = ""
+			this.newTypeDescription = ""
+			this.openCreateNewTicketTypeDialog = false
+		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
 			if (this.$agents.get()) {
@@ -168,7 +188,25 @@ export default {
 						},
 					});
 				});
-				return typeItems;
+				let options = [];
+				options.push({
+					group: 'Create New',
+					hideLabel: true,
+					items: [
+						{
+							label: 'Create New',
+							handler: () => {
+								this.openCreateNewTicketTypeDialog = true
+							}
+						},
+					],
+				})
+				options.push({
+					group: 'All Types',
+					hideLabel: true,
+					items: typeItems,
+				})
+				return options;
 			} else {
 				return null;
 			}
