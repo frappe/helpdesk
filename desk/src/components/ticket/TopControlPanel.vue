@@ -4,7 +4,6 @@
             <div class="flex items-center space-x-4">
                 <Button appearance="secondary">Close</Button>
                 <Button appearance="secondary">Delete</Button>
-                <Button appearance="secondary">Update</Button>
             </div>
         </div>
         <div class="float-right">
