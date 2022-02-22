@@ -68,10 +68,18 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 
 @frappe.whitelist(allow_guest=True)
 def assign_ticket_type(ticket_id, type):
+	type = 'Temp'
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		if not frappe.db.exists("Ticket Type", type):
+			ticket_type_doc = frappe.new_doc("Ticket Type")
+			ticket_type_doc.name = ticket_type_doc.description = type
+			ticket_type_doc.insert()
 		ticket_doc.ticket_type = type
 		ticket_doc.save()
+		
+		frappe.db.commit()
+
 		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
