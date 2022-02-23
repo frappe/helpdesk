@@ -63,6 +63,9 @@ export default {
 		return {
 			subject: "",
 			description: "",
+
+			contactEmailId: "",
+			contactFullName: "",
 			
 			createNewContact: false,
 
@@ -102,7 +105,12 @@ export default {
 		createTicket() {
 			this.$tickets().createTicket({
 				subject: this.subject,
-				description: this.descriptionContent
+				description: this.descriptionContent,
+				contact: {
+					is_new: this.createNewContact,
+					email_id: this.contactEmailId,
+					full_name: this.contactFullName
+				}
 			})
 			this.$emit('ticketCreated')
 		}

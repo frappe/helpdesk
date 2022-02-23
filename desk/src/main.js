@@ -19,6 +19,7 @@ const globalVariables = ref({
 	ticketTypes: null,
 	ticketPriorities: null,
 	ticketStatuses: null,
+	contacts: {},
 	updateTickets: () => {},
 	updateTicket: (ticketId) => {},
 	assignAgent: (ticketId, agentName) => {},
@@ -71,6 +72,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 						globalVariables.value.tickets[value.tickets[i].name] = value.tickets[i];
 					}
 				}
+				if ("contacts" in value) {
+					globalVariables.value.contacts = value.contacts.map(x => x.name)
+				}
 			}
 		},
 		get: (valueType=null) => {
@@ -84,6 +88,8 @@ app.config.globalProperties.$tickets = (ticketId) => {
 					return globalVariables.value.ticketPriorities
 				case "statuses":
 					return globalVariables.value.ticketStatuses
+				case "contacts":
+					return globalVariables.value.contacts
 				default:
 					return globalVariables.value.tickets
 			}

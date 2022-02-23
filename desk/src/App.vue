@@ -90,6 +90,19 @@ export default {
 				}
 			}
 		},
+		contacts() {
+			return {
+				'method': 'frappe.client.get_list',
+				params: {
+					doctype: 'Contact',
+				},
+				auto: true,
+				onSuccess: () => {
+					console.log(this.$resources.contacts.data)
+					this.$tickets().set({contacts: this.$resources.contacts.data})
+				}
+			}
+		},
 		statuses() {
 			return {
 				'method': 'helpdesk.api.ticket.get_all_ticket_statuses',
