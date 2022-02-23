@@ -93,12 +93,16 @@ export default {
 			return this.$resources.priorities.data || null;
 		}
 	},
+	mounted() {
+		},
 	activated() {
 		this.$socket.on('list_update', (data) => {
 			if (data['doctype'] == 'Ticket') {
 				this.$resources.tickets.fetch()
 			}
 		});
+		this.$currentPage.set('Tickets')
+        console.log('tickets activated')
 	},
 	deactivated() {
 		this.$socket.off('list_update');

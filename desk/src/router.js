@@ -17,12 +17,21 @@ const routes = [
 		name: 'Ticket',
 		component: () => import('@/pages/Ticket.vue'),
 		props: true
+	},
+	{
+		path: '/contacts',
+		name: 'Contacts',
+		component: () => import('@/pages/Contacts.vue')
 	}
 ]
 
 let router = createRouter({
 	history: createWebHistory('/helpdesk'),
 	routes,
+})
+
+router.beforeEach(async (to, from, next) => {
+	next()
 })
 
 export default router

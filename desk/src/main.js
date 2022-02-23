@@ -34,8 +34,11 @@ const globalVariables = ref({
 	createType: (type) => {},
 
 	ticketFilter: "All Tickets",
+	contactFilter: "All Contacts",
 
-	agents: null
+	agents: null,
+
+	currentPage: "Tickets"	// Tickets, Ticket, Contacts, ...
 })
 
 app.config.globalProperties.$user = {
@@ -163,6 +166,24 @@ app.config.globalProperties.$ticketFilter = {
 	},
 	get() {
 		return globalVariables.value.ticketFilter;
+	}
+};
+
+app.config.globalProperties.$contactFilter = {
+	set(newValue) { 
+		globalVariables.value.contactFilter= newValue;
+	},
+	get() {
+		return globalVariables.value.contactFilter;
+	}
+};
+
+app.config.globalProperties.$currentPage = {
+	set(newValue) { 
+		globalVariables.value.currentPage= newValue;
+	},
+	get() {
+		return globalVariables.value.currentPage;
 	}
 };
 
