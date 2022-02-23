@@ -56,6 +56,16 @@ export default {
 				}
 			}
 		},
+		createTicket() {
+			return {
+				method: 'helpdesk.api.ticket.create_new',
+				onSuccess: () => {
+					// TODO: fix auto refresh list
+					window.location.reload()
+					this.$tickets().update()
+				}
+			}
+		},
 		types() {
 			return {
 				'method': 'frappe.client.get_list',
@@ -158,6 +168,12 @@ export default {
 		this.$tickets().setUpdateTicket((ticketId) => {
 			this.$resources.ticket.fetch({
 				ticket_id: ticketId,
+			})
+		})
+		this.$tickets().setCreateTicket((values) => {
+			this.$resources.createTicket.submit({
+				subject: values.subject,
+				description: values.description
 			})
 		})
 		this.$tickets().setAssignAgent((ticketId, agentName) => {

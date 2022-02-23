@@ -41,6 +41,14 @@ def get_ticket(ticket_id):
 	ticket_doc["assignees"] = get_agent_assigned_to_ticket(ticket_id)
 	return ticket_doc
 
+@frappe.whitelist(allow_guest=True)
+def create_new(subject, description):
+	print("Creating New Ticket")
+	ticket_doc = frappe.new_doc("Ticket")
+	ticket_doc.subject = subject
+	ticket_doc.description = description
+	ticket_doc.insert(ignore_permissions=True)
+
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)

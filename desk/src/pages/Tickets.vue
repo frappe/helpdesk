@@ -4,7 +4,7 @@
 			<div class="float-left ml-4">
 				<div class="flex items-center space-x-4">
 					<Input type="checkbox" value="" />
-					<Button icon-left="plus" appearance="primary">Add Ticket</Button>
+					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
 				</div>
 			</div>
 			<div class="float-right">
@@ -14,24 +14,32 @@
 		<div v-if="tickets">
 			<TicketList :tickets="tickets" />
 		</div>
+		<NewTicketDialog :show="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog=false}"/>
 	</div>
 </template>
 <script>
-import TicketList from '../components/tickets/TicketList.vue'
 import { Input } from 'frappe-ui'
+import TicketList from '../components/tickets/TicketList.vue'
+import NewTicketDialog from '../components/tickets/NewTicketDialog.vue'
 
 export default {
 	name: 'Tickets',
 	inject: ['viewportWidth'],
 	components: {
 		TicketList,
-		Input
+		Input,
+		NewTicketDialog
 	},
 	provide: {
 		types: [],
 		priorities: [],
 		statuses: [],
 		agents: []
+	},
+	data() {
+		return {
+			showNewTicketDialog: false
+		}
 	},
 	resources: {
 		tickets() {

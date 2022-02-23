@@ -26,6 +26,8 @@ const globalVariables = ref({
 	assignStatus: (ticketId, status) => {},
 	assignPriority: (ticketId, priority) => {},
 
+	createTicket: (values) => {},
+
 	createType: (type) => {},
 
 	ticketFilter: "All Tickets",
@@ -86,6 +88,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 					return globalVariables.value.tickets
 			}
 		},
+		createTicket: (values) => {
+			globalVariables.value.createTicket(values)
+		},
 		assignAgent: (agentName) => {
 			globalVariables.value.assignAgent(ticketId, agentName)
 		},
@@ -106,6 +111,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		},
 		setUpdateTickets: (foo) => {
 			globalVariables.value.updateTickets = foo
+		},
+		setCreateTicket: (foo) => {
+			globalVariables.value.createTicket = foo
 		},
 		setAssignAgent: (foo) => {
 			globalVariables.value.assignAgent = foo
