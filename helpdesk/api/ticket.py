@@ -70,8 +70,11 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 def assign_ticket_type(ticket_id, type):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
-		ticket_doc.ticket_type = type
+		ticket_doc.ticket_type = check_and_create_ticket_type(type).name
 		ticket_doc.save()
+		
+		frappe.db.commit()
+
 		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
@@ -129,3 +132,14 @@ def get_other_tickets_of_contact(ticket_id):
 	contact = frappe.get_value("Ticket", ticket_id, "raised_by")
 	tickets = frappe.get_all("Ticket", filters={"raised_by": contact, "name": ["!=", ticket_id]}, fields=['name', 'subject'])
 	return tickets
+
+@frappe.whitelist(allow_guest=True)
+def check_and_create_ticket_type(type):
+	if not frappe.db.exists("Ticket Type", type):
+		ticket_type_doc = frappe.new_doc("Ticket Type")
+		ticket_type_doc.name = ticket_type_doc.description = type
+		ticket_type_doc.insert()
+	else:
+		ticket_type_doc = frappe.get_doc("Ticket Type", type)
+
+	return ticket_type_doc

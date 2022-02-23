@@ -10,7 +10,7 @@
     "copy-html-entry": "cp ../helpdesk/public/desk/index.html ../helpdesk/www/helpdesk.html"
   },
   "dependencies": {
-    "@headlessui/vue": "^1.4.3",
+    "@headlessui/vue": "^1.5.0",
     "@tiptap/starter-kit": "^2.0.0-beta.183",
     "@tiptap/vue-3": "^2.0.0-beta.90",
     "@vueup/vue-quill": "^1.0.0-beta.8",

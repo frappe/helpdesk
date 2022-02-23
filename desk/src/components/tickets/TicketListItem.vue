@@ -73,13 +73,11 @@
 								@click="togglePriority"	
 								class="flex items-center"
 							>
-								<div class="text-red-500 text-yellow-500 text-green-500 hidden"/>
 								<FeatherIcon 
-									class="w-2 h-2 stroke-transparent" 
-									:class="getColorBasedOnPriority(ticket.priority, 'icon')" 
+									class="w-3 h-3" 
 									:name="getIconBasedOnPriority(ticket.priority)"
 								/>
-								<div class="ml-1" :class="getColorBasedOnPriority(ticket.priority, 'text')">{{ ticket.priority }}</div>
+								<div class="ml-1 text-gray-500">{{ ticket.priority }}</div>
 								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
 							</div>
 							<div v-else class="hidden group-hover:block">
@@ -191,7 +189,7 @@ export default {
 		getColorBasedOnPriority(priority, type) {
 			let sufix = '';
 			if (type == 'icon') { 
-				sufix = 'fill';
+				sufix = 'stroke';
 			} else if (type == 'text') {
 				sufix = 'text';
 			}

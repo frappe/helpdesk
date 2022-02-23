@@ -14,34 +14,35 @@
 			>
 				<div class="flex items-center pb-4">
 					<span class="text-4xl">
-						{{ ticket.name }} - {{ ticket.subject }}
+						{{ ticket.subject }}
 					</span>
 				</div>
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
 						<Conversations :ticket="ticket" :scrollToBottom="scrollConversationsToBottom"/>
 					</div>
-					<div class="flex flex-col pr-3 pb-10">
+					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="sessionAgent">
-								<Avatar label="John Doe" :imageURL="sessionAgent.image" />
+								<Avatar label="John Doe" :imageURL="sessionAgent.image" size="md" />
 							</div>
 							<div class="grow ml-3">
-								<div class="flex justify-between">
-									<div class="flex" v-if="sessionAgent">
-										<span class="pt-1">{{ sessionAgent.agent_name }}</span>
-									</div>
-								</div>
-								<div class="mt-2" v-if="contact">
-									<QuillEditor v-model:content="content" theme="snow" toolbar="full" contentType="html"/>
+								<div v-if="contact">
+									<quill-editor 
+										:ref="editor"
+										v-model:content="content" 
+										contentType="html" 
+										:options="editorOptions"
+										style="min-height:150px; max-height:200px; overflow-y: auto;"
+									/>
 									<div class="mt-2 space-x-2">
-										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Submit</Button>
+										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Send</Button>
 										<Button appearance="secondary" @click="cancelEditing()">Cancel</Button>
 									</div>
 								</div>
 							</div>
 						</div>
-						<div class="flex space-x-2 pt-3" v-else>
+						<div class="flex space-x-2" v-else>
 							<Button appearance="primary" @click="startEditing()">Reply</Button>
 							<Button appearance="secondary">Comment</Button>
 						</div>
@@ -66,6 +67,7 @@ import InfoPanel from '../components/ticket/InfoPanel.vue';
 import ActionPanel from '../components/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import { ref } from 'vue'
 
 export default {
 	name: 'Ticket',
@@ -87,8 +89,37 @@ export default {
 		return {
 			editing: false,
 			scrollConversationsToBottom: false,
-			content: ""
+			content: "",
+			editorOptions: {
+				modules: {
+					toolbar: [
+						['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+						['blockquote', 'code-block'],
+
+						[{ 'header': 1 }, { 'header': 2 }],               // custom button values
+						[{ 'list': 'ordered'}, { 'list': 'bullet' }],
+
+						[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+						[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+						
+						['image'],
+						
+						[{ 'align': [] }],
+
+						['clean']                                         // remove formatting button
+					]
+				},
+				placeholder: 'Compose your reply...',
+				theme: 'snow',
+				bounds: 7,
+			}
 		}
+	},
+	setup() {
+		const editor = ref(null);
+
+		return { editor }
 	},
 	resources: {
 		sessionAgent() {
@@ -128,6 +159,7 @@ export default {
 	},
 	methods: {
 		startEditing() {
+			console.log(this.editor);
 			this.editing = true
 			this.delayedConversationScroll()
 		},

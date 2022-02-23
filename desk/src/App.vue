@@ -115,6 +115,7 @@ export default {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
 				onSuccess: (data) => {
 					this.$tickets(data.name).update();
+					this.$resources.types.fetch();
 				}
 			}
 		},
@@ -131,6 +132,14 @@ export default {
 				method: 'helpdesk.api.ticket.assign_ticket_priority',
 				onSuccess: (data) => {
 					this.$tickets(data.name).update()
+				}
+			}
+		},
+		createTicketType() {
+			return {
+				method: 'helpdesk.api.ticket.check_and_create_ticket_type',
+				onSuccess: (data) => {
+					this.$resources.types.fetch();
 				}
 			}
 		}
@@ -173,6 +182,11 @@ export default {
 			this.$resources.assignTicketPriority.submit({
 				ticket_id: ticketId,
 				priority
+			})
+		})
+		this.$tickets().setCreateType((type) => {
+			this.$resources.createTicketType.submit({
+				type
 			})
 		})
 		this.$socket.on("list_update", (data) => {
