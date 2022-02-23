@@ -66,6 +66,14 @@ export default {
 				}
 			}
 		},
+		updateTicketContact() {
+			return {
+				method: 'helpdesk.api.ticket.update_contact',
+				onSuccess: (data) => {
+					window.location.reload()
+				}
+			}
+		},
 		types() {
 			return {
 				'method': 'frappe.client.get_list',
@@ -216,6 +224,12 @@ export default {
 		this.$tickets().setCreateType((type) => {
 			this.$resources.createTicketType.submit({
 				type
+			})
+		})
+		this.$tickets().setUpdateContact((ticketId, contact) => {
+			this.$resources.updateTicketContact.submit({
+				ticket_id: ticketId,
+				contact
 			})
 		})
 		this.$socket.on("list_update", (data) => {

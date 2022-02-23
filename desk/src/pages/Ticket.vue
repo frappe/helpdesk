@@ -128,6 +128,7 @@ export default {
 				auto: true
 			}
 		},
+		// TODO: set contact inside ticket fetch it self
 		contact() {
 			return {
 				method: 'helpdesk.api.ticket.get_contact',

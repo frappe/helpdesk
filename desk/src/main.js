@@ -28,6 +28,8 @@ const globalVariables = ref({
 	assignPriority: (ticketId, priority) => {},
 
 	createTicket: (values) => {},
+	updateContact: (contactId) => {},
+	createContact: (emailId, fullName) => {},
 
 	createType: (type) => {},
 
@@ -112,6 +114,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		createType: (type) => {
 			globalVariables.value.createType(type)
 		},
+		updateContact: (contactId) => {
+			globalVariables.value.updateContact(ticketId, contactId)
+		},
 		setUpdateTicket: (foo) => {
 			globalVariables.value.updateTicket = foo
 		},
@@ -135,6 +140,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		},
 		setCreateType: (foo) => {
 			globalVariables.value.createType = foo
+		},
+		setUpdateContact: (foo) => {
+			globalVariables.value.updateContact = foo
 		}
 	}
 }
