@@ -1,6 +1,6 @@
 <template>
 	<div class="px-3" v-if="contact && ticket">
-		<div class="py-4 border-b space-y-3 text-base">
+		<div class="py-4 space-y-3 text-base">
 			<div class="flex items-center">
 				<div class="grow text-lg font-medium">{{ `Contact Information ${editing ? "(editing)" : ""}` }}</div>
 				<FeatherIcon 
@@ -16,11 +16,19 @@
 				</div>
 				<div class="flex space-x-2">
 					<FeatherIcon name="mail" class="w-4 h-4" />
-					<span class="text-slate-500 truncate">{{ contact.email_id }}</span>
+					<div>
+						<div class="space-y-1" v-for="email_id in contact.email_ids" :key="email_id">
+							<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+						</div>
+					</div>
 				</div>
-				<div class="flex space-x-2">
+				<div v-if="contact.phone_nos.length > 0" class="flex space-x-2">
 					<FeatherIcon name="phone" class="w-4 h-4" />
-					<span class="text-slate-500 truncate">{{ contact.phone }}</span>
+					<div>
+						<div class="space-y-1" v-for="phone_no in contact.phone_nos" :key="phone_no">
+							<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div v-else class="space-y-2 w-56">
@@ -65,7 +73,7 @@
 				</div>
 			</div>
 		</div>
-		<div>
+		<div v-if="false">
 			<div class="py-4 border-b space-y-3" v-if="otherTicketsOfContact && !editing">
 				<div class="text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
 				<div class="space-y-1 " v-for="ticket in otherTicketsOfContact" :key="ticket.name">
