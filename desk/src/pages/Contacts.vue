@@ -43,9 +43,14 @@ export default {
             }
         }
     },
+    activated() {
+        this.$currentPage.set('Contacts')
+    },
+    deactivated() {
+
+    },
     computed: {
         contacts() {
-            console.log(this.$resources.contacts.data)
             return this.$resources.contacts.data || null
         }
     }

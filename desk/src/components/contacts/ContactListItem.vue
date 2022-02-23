@@ -39,7 +39,6 @@ export default {
 	},
 	resources: {
 		contact() {
-			console.log(this.contactId)
 			return {
 				method: 'frappe.client.get',
 				params: {
@@ -47,9 +46,6 @@ export default {
 					name: this.contactId
 				},
 				auto: true,
-				onSuccess(data) {
-					console.log(data)
-				}
 			}
 		}
 	},
@@ -59,7 +55,6 @@ export default {
 		},
 		fullName() {
 			if (this.contact) {
-				console.log(this.contact.email_ids)
 				return (this.contact.first_name || "") + " " + (this.contact.last_name || "")
 			}
 		},

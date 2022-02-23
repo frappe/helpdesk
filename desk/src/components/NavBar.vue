@@ -1,15 +1,30 @@
 <template>
 	<div class="flow-root pb-3 pt-4 pl-5 pr-8 border-b">
 		<div class="float-left">
-			<div>
+			<div v-if="$currentPage.get() == 'Tickets'">
 				<Dropdown
 					placement="left"
 					:options="ticketFilterDropdownOptions()"
 				>
-					<template v-slot="{ toggleDropdown }">
+					<template v-slot="{ toggleDropdown }"> 
 						<div class="flex items-center" @click="toggleDropdown">
 							<div class="text-2xl">
 								{{ this.$ticketFilter.get() }}
+							</div>
+							<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
+						</div>
+					</template>
+				</Dropdown>
+			</div>
+			<div v-else-if="$currentPage.get() == 'Contacts'">
+				<Dropdown
+					placement="left"
+					:options="contactFilterDropdownOptions()"
+				>
+					<template v-slot="{ toggleDropdown }"> 
+						<div class="flex items-center" @click="toggleDropdown">
+							<div class="text-2xl">
+								{{ this.$contactFilter.get() }}
 							</div>
 							<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
 						</div>
@@ -46,6 +61,19 @@ export default {
 					handler: () => {
 						console.log(this.$user);
 						this.$ticketFilter.set(filter);
+					}
+				});
+			});
+			return items;
+		},
+		contactFilterDropdownOptions() {
+			let items = [];
+			["All Contacts"].forEach(filter => {
+				items.push({
+					label: filter,
+					handler: () => {
+						console.log(this.$user);
+						this.$contactFilter.set(filter);
 					}
 				});
 			});
