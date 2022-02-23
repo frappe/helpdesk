@@ -19,7 +19,7 @@
 				</router-link>
 			</div>
 			<div>
-				<router-link to="/customers">
+				<router-link to="/contacts">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="customers" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>

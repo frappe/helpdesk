@@ -106,7 +106,6 @@ export default {
 				},
 				auto: true,
 				onSuccess: () => {
-					console.log(this.$resources.contacts.data)
 					this.$tickets().set({contacts: this.$resources.contacts.data})
 				}
 			}
