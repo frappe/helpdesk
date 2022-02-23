@@ -61,8 +61,8 @@ export default {
 				method: 'helpdesk.api.ticket.create_new',
 				onSuccess: () => {
 					// TODO: fix auto refresh list
-					window.location.reload()
 					this.$tickets().update()
+					window.location.reload()
 				}
 			}
 		},

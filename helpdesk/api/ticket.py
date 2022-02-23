@@ -49,6 +49,8 @@ def create_new(subject, description):
 	ticket_doc.description = description
 	ticket_doc.insert(ignore_permissions=True)
 
+	ticket_doc.create_communication()
+
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)
