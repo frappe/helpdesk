@@ -26,7 +26,7 @@
 							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
 								<div v-if="ticket.assignees.length > 0" class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
 								<div v-else class="text-base grow w-52 text-left text-gray-400"> assign agent </div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								<CustomIcons name="select" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -43,7 +43,7 @@
 								<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
 									<div v-if="ticket.status" class="grow w-52 text-left">{{ ticket.status }}</div>
 									<div v-else class="text-base grow w-52 text-left text-gray-400"> set status </div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								<CustomIcons name="select" class="w-4 h-4 float-right" />
 							</div>
 							</div>
 						</template>
@@ -64,7 +64,7 @@
 							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
 								<div v-if="ticket.priority" class="grow w-52 text-left">{{ ticket.priority }}</div>
 								<div v-else class="text-base grow w-52 text-left text-gray-400"> set priority </div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								<CustomIcons name="select" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -80,7 +80,7 @@
 							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1 items-center">
 								<div v-if="ticket.ticket_type" class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
 								<div v-else class="text-base grow w-52 text-left text-gray-400"> set type </div>
-								<FeatherIcon name="chevron-down" class="w-4 h-4 float-right" />
+								<CustomIcons name="select" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -104,6 +104,7 @@
 <script>
 import { FeatherIcon, Dropdown, Input, Dialog } from 'frappe-ui'
 import CustomDropdown from '../global/CustomDropdown.vue'
+import CustomIcons from '../global/CustomIcons.vue'
 
 export default {
 	name: "ActionPanel",
@@ -113,7 +114,8 @@ export default {
     Dropdown,
     CustomDropdown,
 	Input,
-	Dialog
+	Dialog,
+	CustomIcons
 },
 	data() {
 		return {

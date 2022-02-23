@@ -51,6 +51,10 @@
 			<path d="M4 8H12" stroke="#1F272E" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 			<path d="M6.5 12H9.5" stroke="#1F272E" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
+		<svg v-if="this.name=='select'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M4.5 3.63636L6.13636 2L7.77273 3.63636M4.5 8.36364L6.13636 10L7.77273 8.36364" stroke="#404040" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+
 	</div>
 </template>
 
