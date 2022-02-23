@@ -56,6 +56,24 @@ export default {
 				}
 			}
 		},
+		createTicket() {
+			return {
+				method: 'helpdesk.api.ticket.create_new',
+				onSuccess: () => {
+					// TODO: fix auto refresh list
+					this.$tickets().update()
+					window.location.reload()
+				}
+			}
+		},
+		updateTicketContact() {
+			return {
+				method: 'helpdesk.api.ticket.update_contact',
+				onSuccess: (data) => {
+					window.location.reload()
+				}
+			}
+		},
 		types() {
 			return {
 				'method': 'frappe.client.get_list',
@@ -77,6 +95,19 @@ export default {
 				auto: true,
 				onSuccess: () => {
 					this.$tickets().set({priorities: this.$resources.priorities.data})
+				}
+			}
+		},
+		contacts() {
+			return {
+				'method': 'frappe.client.get_list',
+				params: {
+					doctype: 'Contact',
+				},
+				auto: true,
+				onSuccess: () => {
+					console.log(this.$resources.contacts.data)
+					this.$tickets().set({contacts: this.$resources.contacts.data})
 				}
 			}
 		},
@@ -160,6 +191,12 @@ export default {
 				ticket_id: ticketId,
 			})
 		})
+		this.$tickets().setCreateTicket((values) => {
+			this.$resources.createTicket.submit({
+				subject: values.subject,
+				description: values.description
+			})
+		})
 		this.$tickets().setAssignAgent((ticketId, agentName) => {
 			this.$resources.assignTicketToAgent.submit({
 				ticket_id: ticketId,
@@ -187,6 +224,12 @@ export default {
 		this.$tickets().setCreateType((type) => {
 			this.$resources.createTicketType.submit({
 				type
+			})
+		})
+		this.$tickets().setUpdateContact((ticketId, contact) => {
+			this.$resources.updateTicketContact.submit({
+				ticket_id: ticketId,
+				contact
 			})
 		})
 		this.$socket.on("list_update", (data) => {

@@ -41,6 +41,27 @@ def get_ticket(ticket_id):
 	ticket_doc["assignees"] = get_agent_assigned_to_ticket(ticket_id)
 	return ticket_doc
 
+@frappe.whitelist(allow_guest=True)
+def create_new(subject, description):
+	ticket_doc = frappe.new_doc("Ticket")
+	ticket_doc.subject = subject
+	ticket_doc.description = description
+	ticket_doc.insert(ignore_permissions=True)
+
+	ticket_doc.create_communication()
+
+@frappe.whitelist(allow_guest=True)
+def update_contact(ticket_id, contact):
+	if ticket_id:
+		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		contact_doc = frappe.get_doc("Contact", contact)
+		ticket_doc.contact = contact_doc.name
+		ticket_doc.raised_by = contact_doc.email_id
+		ticket_doc.save()
+		
+		frappe.db.commit()
+		return ticket_doc
+
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)

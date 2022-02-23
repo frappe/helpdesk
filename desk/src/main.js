@@ -19,12 +19,17 @@ const globalVariables = ref({
 	ticketTypes: null,
 	ticketPriorities: null,
 	ticketStatuses: null,
+	contacts: {},
 	updateTickets: () => {},
 	updateTicket: (ticketId) => {},
 	assignAgent: (ticketId, agentName) => {},
 	assignType: (ticketId, type) => {},
 	assignStatus: (ticketId, status) => {},
 	assignPriority: (ticketId, priority) => {},
+
+	createTicket: (values) => {},
+	updateContact: (contactId) => {},
+	createContact: (emailId, fullName) => {},
 
 	createType: (type) => {},
 
@@ -69,6 +74,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 						globalVariables.value.tickets[value.tickets[i].name] = value.tickets[i];
 					}
 				}
+				if ("contacts" in value) {
+					globalVariables.value.contacts = value.contacts.map(x => x.name)
+				}
 			}
 		},
 		get: (valueType=null) => {
@@ -82,9 +90,14 @@ app.config.globalProperties.$tickets = (ticketId) => {
 					return globalVariables.value.ticketPriorities
 				case "statuses":
 					return globalVariables.value.ticketStatuses
+				case "contacts":
+					return globalVariables.value.contacts
 				default:
 					return globalVariables.value.tickets
 			}
+		},
+		createTicket: (values) => {
+			globalVariables.value.createTicket(values)
 		},
 		assignAgent: (agentName) => {
 			globalVariables.value.assignAgent(ticketId, agentName)
@@ -101,11 +114,17 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		createType: (type) => {
 			globalVariables.value.createType(type)
 		},
+		updateContact: (contactId) => {
+			globalVariables.value.updateContact(ticketId, contactId)
+		},
 		setUpdateTicket: (foo) => {
 			globalVariables.value.updateTicket = foo
 		},
 		setUpdateTickets: (foo) => {
 			globalVariables.value.updateTickets = foo
+		},
+		setCreateTicket: (foo) => {
+			globalVariables.value.createTicket = foo
 		},
 		setAssignAgent: (foo) => {
 			globalVariables.value.assignAgent = foo
@@ -121,6 +140,9 @@ app.config.globalProperties.$tickets = (ticketId) => {
 		},
 		setCreateType: (foo) => {
 			globalVariables.value.createType = foo
+		},
+		setUpdateContact: (foo) => {
+			globalVariables.value.updateContact = foo
 		}
 	}
 }
