@@ -8,7 +8,7 @@
 					<Input label="Email Id" type="email" v-model="emailId" />
 					<Input label="Phone" type="email" v-model="phone" />
 					<div class="flex float-right space-x-2">
-						<Button appearance="primary" @click="createContact()">Create</Button>
+						<Button :loading="this.$resources.createContact.loading" appearance="primary" @click="createContact()">Create</Button>
 					</div>
 				</div>
 			</template>
@@ -54,7 +54,8 @@ export default {
 			return {
 				method: 'frappe.client.insert',
 				onSuccess(data) {
-					this.$emit('contactCreated', {contact: data})
+					console.log(data)
+					this.$emit('contactCreated', data)
 				}
 			}
 		}

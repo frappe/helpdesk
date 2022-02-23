@@ -44,7 +44,7 @@
 						<div
 							v-if="filterdContacts.length === 0 && query !== ''"
 							class="select-none relative py-2 px-4 text-gray-700 cursor-pointer"
-							@click="createNewContact()"
+							@click="() => {showNewContactDialog = true}"
 						>
 							Create new
 						</div>
@@ -89,6 +89,7 @@
 				<div class="text-lg font-medium">Activity</div>
 			</div>
 		</div>
+		<NewContactDialog v-model="showNewContactDialog" @contact-created="(contact) => {contactCreated(contact)}"/>
 	</div>
 </template>
 
@@ -100,6 +101,7 @@ import {
 	ComboboxOptions,
 	ComboboxOption,
 } from '@headlessui/vue'
+import NewContactDialog from '../global/NewContactDialog.vue'
 
 export default {
 	name: "InfoPanel",
@@ -110,14 +112,17 @@ export default {
 		Combobox,
 		ComboboxInput,
 		ComboboxOption,
-		ComboboxOptions
+		ComboboxOptions,
+		NewContactDialog
 	},
 	data() {
 		return {
 			editing: false,
 			contactName: '',
 			selectedContact:  '',
-			query: ''
+			query: '',
+
+			showNewContactDialog: false
 		}
 	},
 	resources: {
@@ -154,8 +159,11 @@ export default {
 			console.log(`contact: ${this.selectedContact}`)
 			this.$tickets(this.ticket.name).updateContact(this.selectedContact)
 		},
-		createNewContact() {
-
+		contactCreated(contact) {
+			this.showNewContactDialog = false
+			// TODO: use a global fetcher for contacts and use it or refetch contacts
+			console.log(contact)
+			this.$tickets(this.ticket.name).updateContact(contact.name)
 		}
 	}
 }
