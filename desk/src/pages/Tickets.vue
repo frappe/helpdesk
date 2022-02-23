@@ -14,7 +14,7 @@
 		<div v-if="tickets">
 			<TicketList :tickets="tickets" />
 		</div>
-		<NewTicketDialog :show="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog=false}"/>
+		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog=false}"/>
 	</div>
 </template>
 <script>

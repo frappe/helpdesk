@@ -1,27 +1,9 @@
 <template>
   <div>
-		<Dialog :options="{title: 'Create New Ticket'}" v-model="show">
+		<Dialog :options="{title: 'Create New Ticket'}" v-model="open">
 			<template #body-content>
 				<div class="space-y-4">
 					<Input label="Subject" type="text" v-model="subject" />
-					<div class="space-y-2">
-						<div class="flex justify-between items-center">
-							<div 
-								class="block mt-3 text-sm leading-4 text-gray-700"
-							>
-								Raised By
-							</div>
-							<Button v-if="!createNewContact" appearance="secondary" @click="() => {createNewContact = true}">New Contact</Button>
-							<Button v-else appearance="secondary" @click="() => {createNewContact = false}">Use Exsisting</Button>
-						</div>
-						<div v-if="!createNewContact">
-							<Input class="grow" type="text" v-model="subject" />
-						</div>
-						<div v-else class="space-y-4">
-							<Input class="grow" type="text" v-model="subject" placeholder="Full Name"/>
-							<Input class="grow" type="text" v-model="subject" placeholder="Email Id"/>
-						</div>
-					</div>
 					<div>
 						<span 
 							class="block mb-2 text-sm leading-4 text-gray-700"
@@ -49,25 +31,34 @@
 import { Input, Dialog } from 'frappe-ui'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 export default {
 	name: 'NewTicketDialog',
-	props: ['show'],
-	setup() {
+	props: {
+		modelValue: {
+			type: Boolean,
+			required: true,
+		},
+	},
+	setup(props, { emit }) {
 		const editor = ref(null);
+		let open = computed({
+			get: () => props.modelValue,
+			set: (val) => {
+				emit('update:modelValue', val)
+				if (!val) {
+					emit('close')
+				}
+			},
+		})
 
-		return { editor }
+		return { editor, open }
 	},
 	data() {
 		return {
 			subject: "",
 			description: "",
-
-			contactEmailId: "",
-			contactFullName: "",
-			
-			createNewContact: false,
 
 			descriptionContent: "",
 			editorOptions: {
@@ -97,20 +88,15 @@ export default {
 		}
 	},
 	components: {
-		Input,
-		QuillEditor,
-		Dialog
-	},
+    Input,
+    QuillEditor,
+    Dialog,
+},
 	methods: {
 		createTicket() {
 			this.$tickets().createTicket({
 				subject: this.subject,
-				description: this.descriptionContent,
-				contact: {
-					is_new: this.createNewContact,
-					email_id: this.contactEmailId,
-					full_name: this.contactFullName
-				}
+				description: this.descriptionContent
 			})
 			this.$emit('ticketCreated')
 		}
