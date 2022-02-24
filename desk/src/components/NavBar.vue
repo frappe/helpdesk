@@ -36,12 +36,19 @@
 			<div class="border-r-2 pr-2 pt-1">
 				<FeatherIcon class="w-5 h-5" name="bell" />
 			</div>
-			<Avatar v-if="$user.get()" :imageURL="$user.get().profile_image" />
+			<Dropdown
+				v-if="$tickets().get('types')"
+				:options="getAvatarClickOptions()" 
+			>
+				<template v-slot="{ toggleAssignees }" @click="toggleAssignees">
+					<Avatar class="cursor-pointer" v-if="$user.get()" :imageURL="$user.get().profile_image" />
+				</template>
+			</Dropdown>
 		</div>
 	</div>
 </template>
 <script>
-import { Avatar, FeatherIcon, Dropdown } from 'frappe-ui'
+import { Avatar, FeatherIcon, Dropdown, call } from 'frappe-ui'
 import CustomIcons from './global/CustomIcons.vue'
 
 export default {
@@ -78,6 +85,22 @@ export default {
 				});
 			});
 			return items;
+		},
+		getAvatarClickOptions() {
+			let items = [];
+			["Logout"].forEach(item => {
+				items.push({
+				label: item,
+					handler: () => {
+						this.logout()
+					},
+				});
+			});
+			return items;
+		},
+		async logout() {
+			await call('logout')
+			window.location.replace("/login");
 		}
 	}
 }
