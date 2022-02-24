@@ -19,6 +19,9 @@
 			<div class="sm:w-4/12 truncate">
                 {{ agentRoles }}
 			</div>
+			<div class="sm:w-4/12 truncate">
+                {{ agent.team.name }}
+			</div>
 		</router-link>
 	</div>
 </template>
