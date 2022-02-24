@@ -33,16 +33,19 @@ export default {
 		user() {
 			return {
 				'method': 'helpdesk.api.agent.get_user',
-				auto: true,
 				onSuccess: () => {
 					this.$user.set(this.$resources.user.data);
+					this.$resources.tickets.fetch()
+				},
+				onFailure: () => {
+					// TODO: use frappe build in login redirect with redirect to helpdesk once logged in
+					window.location.replace("/login");
 				}
 			}
 		},
 		tickets() {
 			return {
 				'method': 'helpdesk.api.ticket.get_tickets',
-				auto: true,
 				onSuccess: () => {
 					this.$tickets().set({tickets: this.$resources.tickets.data})
 				}
@@ -180,6 +183,22 @@ export default {
 	components: {
 		NavBar,
 		SideBarMenu,
+	},
+	created() {
+		const cookie = Object.fromEntries(
+			document.cookie
+				.split('; ')
+				.map(part => part.split('='))
+				.map(d => [d[0], decodeURIComponent(d[1])])
+		);
+
+		const isLoggedIn = cookie.user_id && cookie.user_id !== 'Guest';
+
+		if (isLoggedIn) {
+			this.$resources.user.fetch()
+		} else {
+			p
+		}
 	},
 	mounted() {
 		this.$tickets().setUpdateTickets(() => {
