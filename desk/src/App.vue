@@ -197,7 +197,7 @@ export default {
 		if (isLoggedIn) {
 			this.$resources.user.fetch()
 		} else {
-			p
+			window.location.replace("/login");
 		}
 	},
 	mounted() {
