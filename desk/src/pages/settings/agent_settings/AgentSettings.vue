@@ -45,7 +45,7 @@ export default {
 		}
 	},
 	activated() {
-		this.$currentPage.set('AgentsSettings')
+		this.$currentPage.set('AgentSettings')
 	},
 	deactivated() {
 
