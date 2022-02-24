@@ -2,13 +2,13 @@
 	<div>
 		<div>
 			<div
-				v-if="contacts"
+				v-if="agents"
 				class="w-full block overflow-auto"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.3rem)' : null }"
 			>
-				<div class="flex-auto" v-for="contact in contacts" :key="contact.name">
+				<div class="flex-auto" v-for="agent in agents" :key="agent.name">
 					<div class="block px-0">
-						<ContactListItem :contactId="contact.name" />
+						<AgentListItem :agent="agent" />
 					</div>
 				</div>
 			</div>
@@ -18,15 +18,17 @@
 
 <script>
 import { Input } from 'frappe-ui'
-import ContactListItem from './ContactListItem.vue'
+import AgentListItem from './AgentListItem.vue'
 
 export default {
-	name: 'ContactList',
+	name: 'AgentList',
 	inject: ['viewportWidth'],
-	props: ['contacts'],
+	props: ['agents'],
 	components: {
 		Input,
-		ContactListItem
+		AgentListItem
 	},
+	computed: {
+	}
 }
 </script>

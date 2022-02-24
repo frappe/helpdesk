@@ -1,16 +1,8 @@
 <template>
   <div>
-		<Dialog :options="{title: 'Create New Contact'}" v-model="open">
+		<Dialog :options="{title: 'Create New Agent'}" v-model="open">
 			<template #body-content>
-				<div class="space-y-4">
-					<Input label="First Name" type="text" v-model="firstName" />
-					<Input label="Last Name" type="text" v-model="lastName" />
-					<Input label="Email Id" type="email" v-model="emailId" />
-					<Input label="Phone" type="email" v-model="phone" />
-					<div class="flex float-right space-x-2">
-						<Button :loading="this.$resources.createContact.loading" appearance="primary" @click="createContact()">Create</Button>
-					</div>
-				</div>
+				<a href="/app/agent/new" class="text-base hover:underline text-slate-500 hover:text-slate-700"> Create Agent from frappe desk </a>
 			</template>
 		</Dialog>
   </div>
@@ -21,7 +13,7 @@ import { Input, Dialog } from 'frappe-ui'
 import { computed } from 'vue'
 
 export default {
-	name: 'NewContactDialog',
+	name: 'NewAgentDialog',
 	props: {
 		modelValue: {
 			type: Boolean,

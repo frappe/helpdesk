@@ -7,7 +7,7 @@
 			<div class="h-15">
 				<NavBar />
 			</div>
-			<div class="pt-1">
+			<div>
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />

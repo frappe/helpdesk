@@ -22,6 +22,23 @@ const routes = [
 		path: '/contacts',
 		name: 'Contacts',
 		component: () => import('@/pages/Contacts.vue')
+	},
+	{
+		path: '/settings',
+		name: 'Settings',
+		component: () => import('@/pages/settings/Settings.vue'),
+		children: [
+			{
+				path: 'agents',
+				name: 'AgentSettings',
+				component: () => import('@/pages/settings/AgentSettings.vue')
+			},
+			{
+				path: 'sla',
+				name: 'SlaSettings',
+				component: () => import('@/pages/settings/SlaSettings.vue')
+			}
+		]
 	}
 ]
 
