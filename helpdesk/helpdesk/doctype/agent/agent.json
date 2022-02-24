@@ -1,13 +1,14 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-01-29 21:35:50.281215",
+ "creation": "2022-02-24 22:45:45.019915",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "user",
-  "agent_name"
+  "agent_name",
+  "team"
  ],
  "fields": [
   {
@@ -24,11 +25,17 @@
    "in_global_search": 1,
    "in_standard_filter": 1,
    "label": "Agent Name"
+  },
+  {
+   "fieldname": "team",
+   "fieldtype": "Link",
+   "label": "Team",
+   "options": "Team"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-17 19:17:25.978702",
+ "modified": "2022-02-24 22:56:22.278762",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Agent",

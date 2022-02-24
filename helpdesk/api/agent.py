@@ -2,11 +2,14 @@ import frappe
 
 @frappe.whitelist(allow_guest=True)
 def get_all():
-	all_agents = frappe.get_all("Agent", fields=['agent_name', 'name'])
+	all_agents = frappe.get_all("Agent", fields=['agent_name', 'name', 'team'])
 
 	for agent in all_agents:
 		user = frappe.get_doc("User", agent['name'])
+		team = frappe.get_doc("Team", agent['team'])
 		agent['user'] = user.__dict__
+		agent['team'] = team.__dict__
+		
 		agent['roles'] = []
 		for role in user.roles:
 			agent['roles'].append(role.role)
