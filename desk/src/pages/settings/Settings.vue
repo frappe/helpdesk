@@ -22,6 +22,12 @@ export default {
         SettingsSideBarMenu
     },
     inject: ['viewportWidth'],
+	activated() {
+		this.$currentPage.set('Settings')
+	},
+	deactivated() {
+
+	},
 }
 </script>
 
