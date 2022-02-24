@@ -29,7 +29,7 @@ export default {
 					route: '/settings/agents'
 				},
 				{
-					label: 'SLA',
+					label: 'SLA Policies',
 					route: '/settings/sla'
 				}
 			]

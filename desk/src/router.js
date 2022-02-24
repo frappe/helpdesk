@@ -36,7 +36,7 @@ const routes = [
 			{
 				path: 'sla',
 				name: 'SlaSettings',
-				component: () => import('@/pages/settings/SlaSettings.vue')
+				component: () => import('@/pages/settings/SlaPolicySettings.vue')
 			}
 		]
 	}
