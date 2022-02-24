@@ -54,7 +54,6 @@ export default {
 			return {
 				method: 'frappe.client.insert',
 				onSuccess(data) {
-					console.log(data)
 					this.$emit('contactCreated', data)
 				}
 			}
