@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import SettingsSideBarMenu from "../../components/settings/SettingsSideBarMenu.vue"
+import SettingsSideBarMenu from "@/components/settings/SettingsSideBarMenu.vue"
 
 export default {
     name: 'Settings',

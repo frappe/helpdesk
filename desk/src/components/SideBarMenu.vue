@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import CustomIcons from "./global/CustomIcons.vue"
+import CustomIcons from "@/components/global/CustomIcons.vue"
 
 export default {
 	name: 'SideBarMenu',
