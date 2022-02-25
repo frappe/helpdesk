@@ -19,8 +19,8 @@
 </template>
 <script>
 import { Input } from 'frappe-ui'
-import TicketList from '../components/tickets/TicketList.vue'
-import NewTicketDialog from '../components/tickets/NewTicketDialog.vue'
+import TicketList from '@/components/tickets/TicketList.vue'
+import NewTicketDialog from '@/components/tickets/NewTicketDialog.vue'
 
 export default {
 	name: 'Tickets',

@@ -2,7 +2,7 @@
 	<div class="border-r h-full pt-1 space-y-2">
 		<div class="border-b pb-3 px-3 mx-2">Settings</div>
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
-			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1">
+			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="$currentPage.get() == setting.pageName ? 'bg-slate-50' : ''">
 				<router-link 
 					:to="setting.route"
 				>
@@ -26,10 +26,12 @@ export default {
 			settings: [
 				{
 					label: 'Agents',
+					pageName: 'AgentSettings',
 					route: '/settings/agents'
 				},
 				{
-					label: 'SLA',
+					label: 'SLA Policies',
+					pageName: 'SlaPolicySettings',
 					route: '/settings/sla'
 				}
 			]

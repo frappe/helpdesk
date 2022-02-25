@@ -31,12 +31,12 @@ const routes = [
 			{
 				path: 'agents',
 				name: 'AgentSettings',
-				component: () => import('@/pages/settings/AgentSettings.vue')
+				component: () => import('@/pages/settings/agent_settings/AgentSettings.vue')
 			},
 			{
 				path: 'sla',
 				name: 'SlaSettings',
-				component: () => import('@/pages/settings/SlaSettings.vue')
+				component: () => import('@/pages/settings/sla_policy_settings/SlaPolicySettings.vue')
 			}
 		]
 	}

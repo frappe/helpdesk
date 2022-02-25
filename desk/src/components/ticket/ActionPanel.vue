@@ -103,8 +103,8 @@
 
 <script>
 import { FeatherIcon, Dropdown, Input, Dialog } from 'frappe-ui'
-import CustomDropdown from '../global/CustomDropdown.vue'
-import CustomIcons from '../global/CustomIcons.vue'
+import CustomDropdown from '@/components/global/CustomDropdown.vue'
+import CustomIcons from '@/components/global/CustomIcons.vue'
 
 export default {
 	name: "ActionPanel",

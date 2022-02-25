@@ -19,8 +19,8 @@
 </template>
 <script>
 import { Input } from 'frappe-ui'
-import ContactList from '../components/contacts/ContactList.vue'
-import NewContactDialog from '../components/global/NewContactDialog.vue'
+import ContactList from '@/components/contacts/ContactList.vue'
+import NewContactDialog from '@/components/global/NewContactDialog.vue'
 
 export default {
 	name: 'Contacts',

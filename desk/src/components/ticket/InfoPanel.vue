@@ -101,7 +101,7 @@ import {
 	ComboboxOptions,
 	ComboboxOption,
 } from '@headlessui/vue'
-import NewContactDialog from '../global/NewContactDialog.vue'
+import NewContactDialog from '@/components/global/NewContactDialog.vue'
 
 export default {
 	name: "InfoPanel",

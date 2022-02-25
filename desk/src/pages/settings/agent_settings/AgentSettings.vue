@@ -19,8 +19,8 @@
 </template>
 <script>
 import { Input } from 'frappe-ui'
-import AgentList from '../../components/settings/agents/AgentList.vue'
-import NewAgentDialog from '../../components/global/NewAgenDialog.vue'
+import AgentList from '@/components/settings/agents/AgentList.vue'
+import NewAgentDialog from '@/components/global/NewAgenDialog.vue'
 
 export default {
 	name: 'AgentSettings',
@@ -45,7 +45,7 @@ export default {
 		}
 	},
 	activated() {
-		this.$currentPage.set('AgentsSettings')
+		this.$currentPage.set('AgentSettings')
 	},
 	deactivated() {
 
