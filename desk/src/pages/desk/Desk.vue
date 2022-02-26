@@ -255,9 +255,6 @@ export default {
 			}
 			// TODO: handle other doctype events too
 		})
-	},
-	mounted() {
-		console.log('desk mounted!!')
 	}
 }
 </script>
