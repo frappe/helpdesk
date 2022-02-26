@@ -5,28 +5,28 @@
 				<CustomIcons name="helpdesk" width="40" height="40"/>
 			</div>
 			<div>
-				<router-link to="/tickets">
+				<router-link to="/helpdesk/tickets">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="ticket" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>
 				</router-link>
 			</div>
 			<div>
-				<router-link to="/knowledge-base">
+				<router-link to="/helpdesk/knowledge-base">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="knowledge-base" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>
 				</router-link>
 			</div>
 			<div>
-				<router-link to="/contacts">
+				<router-link to="/helpdesk/contacts">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="customers" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>
 				</router-link>
 			</div>
 			<div>
-				<router-link to="/reports">
+				<router-link to="/helpdesk/reports">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="reports" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>
@@ -35,7 +35,7 @@
 		</div>
 		<div class="space-y-5 mt-auto mb-2">
 			<div>
-				<router-link to="/settings">
+				<router-link to="/helpdesk/settings">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="settings" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import CustomIcons from "@/components/global/CustomIcons.vue"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
 	name: 'SideBarMenu',

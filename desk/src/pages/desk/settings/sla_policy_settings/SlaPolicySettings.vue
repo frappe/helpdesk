@@ -18,7 +18,7 @@
 </template>
 <script>
 import { Input } from 'frappe-ui'
-import SlaPolicyList from '@/components/settings/policies/SlaPolicyList.vue'
+import SlaPolicyList from '@/components/desk/settings/policies/SlaPolicyList.vue'
 
 export default {
 	name: 'SlaPolicySettings',

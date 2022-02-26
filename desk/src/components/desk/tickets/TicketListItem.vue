@@ -10,7 +10,7 @@
 				<Input type="checkbox" value="" />
 			</div>
 			<router-link 
-				:to="`/tickets/${ticket.name}`"
+				:to="`/helpdesk/tickets/${ticket.name}`"
 				class="sm:w-9/12"
 			>
 				<div class="flex flex-col space-y-1">
