@@ -1,0 +1,1 @@
+import{_ as e,o as t,k as o}from"./vendor.1fecb205.js";const r={name:"Tickets"};function c(s,a,n,_,i,p){return t(),o("div",null," Customer Portal Ticket ")}var l=e(r,[["render",c]]);export{l as default};
