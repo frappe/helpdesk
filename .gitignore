@@ -28,3 +28,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+helpdesk/public/desk
+helpdesk/www/helpdesk/index.html
