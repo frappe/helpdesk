@@ -30,3 +30,4 @@ share/python-wheels/
 MANIFEST
 
 helpdesk/public/desk
+helpdesk/www/helpdesk/index.html
