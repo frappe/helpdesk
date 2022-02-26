@@ -8,25 +8,31 @@
  "engine": "InnoDB",
  "field_order": [
   "template_name",
-  "fields"
+  "about",
+  "custom_fields"
  ],
  "fields": [
   {
    "fieldname": "template_name",
    "fieldtype": "Data",
-   "label": "Name",
+   "label": "Template Name",
    "unique": 1
   },
   {
-   "fieldname": "fields",
+   "fieldname": "about",
+   "fieldtype": "Small Text",
+   "label": "About"
+  },
+  {
+   "fieldname": "custom_fields",
    "fieldtype": "Table",
-   "label": "Fields",
+   "label": "Custom Fields",
    "options": "DocField"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-25 15:25:35.690200",
+ "modified": "2022-02-25 15:44:07.603513",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket Template",

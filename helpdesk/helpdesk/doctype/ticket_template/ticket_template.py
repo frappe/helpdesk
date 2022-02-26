@@ -8,7 +8,6 @@ class TicketTemplate(Document):
 	def validate(self):
 		allowed_field_types = ['Data', 'Link']
 
-		for field in self.fields:
-			if field.fieldtype not in allowed_field_types:
-				frappe.throw(f'Type {field.fieldtype} not allowed, should be in {allowed_field_types}')
-
+		for custom_field in self.custom_fields:
+			if custom_field.fieldtype not in allowed_field_types:
+				frappe.throw(f'Type {custom_field.fieldtype} not allowed, should be in {allowed_field_types}')
