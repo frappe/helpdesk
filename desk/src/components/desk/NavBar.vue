@@ -49,7 +49,7 @@
 </template>
 <script>
 import { Avatar, FeatherIcon, Dropdown, call } from 'frappe-ui'
-import CustomIcons from '@/components/global/CustomIcons.vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'NavBar',

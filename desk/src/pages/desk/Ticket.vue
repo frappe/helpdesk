@@ -60,11 +60,11 @@
 </template>
 <script>
 import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
-import ConversationCard from '@/components/ticket/ConversationCard.vue';
-import Conversations from '@/components/ticket/Conversations.vue';
-import TopControlPanel from '@/components/ticket/TopControlPanel.vue'
-import InfoPanel from '@/components/ticket/InfoPanel.vue';
-import ActionPanel from '@/components/ticket/ActionPanel.vue';
+import ConversationCard from '@/components/desk/ticket/ConversationCard.vue';
+import Conversations from '@/components/desk/ticket/Conversations.vue';
+import TopControlPanel from '@/components/desk/ticket/TopControlPanel.vue'
+import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
+import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { ref } from 'vue'
