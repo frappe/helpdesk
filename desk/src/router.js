@@ -7,13 +7,19 @@ const routes = [
 		component: () => import('@/pages/desk/Desk.vue'),
 		children: [
 			{
+				path: '',
+				redirect: () => {
+					return { path: '/helpdesk/tickets'}
+				},
+			},
+			{
 				path: 'tickets',
-				name: 'Tickets',
+				name: 'DeskTickets',
 				component: () => import('@/pages/desk/Tickets.vue'),
 			},
 			{
 				path: 'tickets/:ticketId',
-				name: 'Ticket',
+				name: 'DeskTicket',
 				component: () => import('@/pages/desk/Ticket.vue'),
 				props: true
 			},
@@ -47,14 +53,8 @@ const routes = [
 		component: () => import('@/pages/portal/Portal.vue'),
 		children: [
 			{
-				path: '',
-				redirect: () => {
-					return { path: '/support/tickets'}
-				},
-			},
-			{
 				path: 'tickets',
-				name: 'PortalTickets',
+				name: 'ProtalTickets',
 				component: () => import('@/pages/portal/Tickets.vue'),
 			},
 			{
