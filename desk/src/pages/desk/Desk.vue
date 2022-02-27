@@ -20,7 +20,7 @@
 <script>
 import NavBar from "@/components/desk/NavBar.vue"
 import SideBarMenu from "@/components/desk/SideBarMenu.vue"
-import { inject, onUnmounted, provide, ref } from 'vue'
+import { inject, provide, ref } from 'vue'
 
 export default {
 	name: "Desk",
@@ -170,8 +170,8 @@ export default {
 		createTicket() {
 			return {
 				method: 'helpdesk.api.ticket.create_new',
-				onSuccess: (ticket) => {
-					this.tickets[ticket.name] = ticket
+				onSuccess: () => {
+					this.ticketController.update()
 				},
 				onFailure: () => {
 					// TODO:

@@ -31,7 +31,7 @@
 import { Input, Dialog } from 'frappe-ui'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { ref, computed } from 'vue'
+import { inject, ref, computed } from 'vue'
 
 export default {
 	name: 'NewTicketDialog',
@@ -53,7 +53,9 @@ export default {
 			},
 		})
 
-		return { editor, open }
+		const ticketController = inject('ticketController')
+
+		return { editor, open, ticketController }
 	},
 	data() {
 		return {
@@ -94,7 +96,7 @@ export default {
 },
 	methods: {
 		createTicket() {
-			this.$tickets().createTicket({
+			this.ticketController.new('ticket', {
 				subject: this.subject,
 				description: this.descriptionContent
 			})
