@@ -23,7 +23,7 @@ import ConversationCard from "./ConversationCard.vue"
 
 export default {
 	name: "Conversations",
-	props: ["ticket", "scrollToBottom"],
+	props: ["ticketId", "scrollToBottom"],
 	components: {
 		ConversationCard
 	},
@@ -32,7 +32,7 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.get_conversations',
 				params: {
-					ticket_id: this.ticket.name
+					ticket_id: this.ticketId
 				},
 				auto: true
 			}
@@ -55,7 +55,7 @@ export default {
 	},
 	mounted() {
 		this.$socket.on('list_update', (data) => {
-			if (data['doctype'] == 'Ticket' && data['name'] == this.ticket.name) {
+			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
 				this.$resources.conversations.fetch()
 			}
 		});

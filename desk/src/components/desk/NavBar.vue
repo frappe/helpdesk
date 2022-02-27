@@ -37,11 +37,10 @@
 				<FeatherIcon class="w-5 h-5" name="bell" />
 			</div>
 			<Dropdown
-				v-if="$tickets().get('types')"
 				:options="getAvatarClickOptions()" 
 			>
 				<template v-slot="{ toggleAssignees }" @click="toggleAssignees">
-					<Avatar class="cursor-pointer" v-if="$user.get()" :imageURL="$user.get().profile_image" />
+					<Avatar class="cursor-pointer" v-if="user" :imageURL="user.profile_image" />
 				</template>
 			</Dropdown>
 		</div>
@@ -50,6 +49,7 @@
 <script>
 import { Avatar, FeatherIcon, Dropdown, call } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import { inject } from 'vue'
 
 export default {
 	name: 'NavBar',
@@ -58,6 +58,11 @@ export default {
 		FeatherIcon,
 		CustomIcons,
 		Dropdown
+	},
+	setup() {
+		const user = inject('user')
+
+		return { user }
 	},
 	methods: {
 		ticketFilterDropdownOptions() {

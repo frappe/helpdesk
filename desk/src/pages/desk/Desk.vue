@@ -1,5 +1,5 @@
 <template>
-	<div class="w-screen flex">
+	<div v-if="user.isLoggedIn()" class="w-screen flex">
 		<div class="w-15">
 			<SideBarMenu />
 		</div>
@@ -18,43 +18,166 @@
 	</div>
 </template>
 <script>
-import NavBar from "@/components/desk/NavBar.vue";
-import SideBarMenu from "@/components/desk/SideBarMenu.vue";
+import NavBar from "@/components/desk/NavBar.vue"
+import SideBarMenu from "@/components/desk/SideBarMenu.vue"
+import { inject, provide, ref } from 'vue'
 
 export default {
 	name: "Desk",
-	data() {
-		return {
-			viewportWidth: 0
-		};
+	components: {
+		NavBar,
+		SideBarMenu,
 	},
-	resources: {
-		user() {
-			return {
-				'method': 'helpdesk.api.agent.get_user',
-				onSuccess: () => {
-					this.$user.set(this.$resources.user.data);
-					this.$resources.tickets.fetch()
-				},
-				onFailure: () => {
-					// TODO: use frappe build in login redirect with redirect to helpdesk once logged in
-					window.location.replace("/login");
-				}
+	setup() {
+		const user = inject('user')
+
+		const tickets = ref({})
+		const ticketTypes = ref([])
+		const ticketPriorities = ref([])
+		const ticketStatuses = ref([])
+
+		const ticketController = ref({})
+
+		const contacts = ref([])
+		const contactController = ref({})
+		
+		const agents = ref([])
+		const agentController = ref({})
+		
+		provide('tickets', tickets)
+		provide('ticketTypes', ticketTypes)
+		provide('ticketPriorities', ticketPriorities)
+		provide('ticketStatuses', ticketStatuses)
+
+		provide('ticketController', ticketController)
+
+		provide('contacts', contacts)
+		provide('contactController', contactController)
+
+		provide('agents', agents)
+		provide('agentController', agentController)
+
+		return {
+			user,
+
+			tickets,
+			ticketTypes,
+			ticketPriorities,
+			ticketStatuses,
+
+			ticketController,
+
+			contacts,
+			contactController,
+
+			agents,
+			agentController
+		}
+	},
+	mounted() {
+		this.ticketController.update = (ticketId) => {
+			if (ticketId) {
+				this.$resources.ticket.fetch({
+					ticket_id: ticketId
+				})
+			} else {
+				this.$resources.tickets.fetch()
 			}
 		},
+		this.ticketController.set = (ticketId, type, ref=null) => {
+			switch (type) {
+				case 'type':
+					this.$resources.assignTicketType.submit({
+						ticket_id: ticketId,
+						type: ref
+					})
+					break
+				case 'status':
+					this.$resources.assignTicketStatus.submit({
+						ticket_id: ticketId,
+						status: ref
+					})
+					break
+				case 'priority':
+					this.$resources.assignTicketPriority.submit({
+						ticket_id: ticketId,
+						priority: ref
+					})
+					break
+				case 'contact':
+					if (ticketId) {
+						this.$resources.updateTicketContact.submit({
+							ticket_id: ticketId,
+							contact: ref
+						})
+					}
+					break
+				case 'agent':
+					this.$resources.assignTicketToAgent.submit({
+						ticket_id: ticketId,
+						agent_id: ref
+					})
+					break
+			}
+		},
+		this.ticketController.new = (type, value) => {
+			switch (type) {
+				case 'ticket':
+					this.$resources.createTicket.submit({
+						subject: value.subject,
+						description: value.description
+					})
+					break
+				case 'type':
+					this.$resources.createTicketType.subject({
+						type: value
+					})
+					break
+			}
+		}
+		this.$socket.on("list_update", (data) => {
+			switch (data.doctype) {
+				case 'Ticket':
+					this.ticketController.update()
+					break
+				case 'Ticket Type':
+					this.$resources.type.fetch()
+					break
+				case 'Contact':
+					this.$resources.contacts.fetch()
+				case 'Agent':
+					this.$resources.agents.fetch()
+			}
+		})
+	},
+	unmounted() {
+		this.$socket.off('list_update')
+	},
+	resources: {
 		tickets() {
 			return {
-				'method': 'helpdesk.api.ticket.get_tickets',
-				onSuccess: () => {
-					this.$tickets().set({tickets: this.$resources.tickets.data})
+				method: 'helpdesk.api.ticket.get_tickets',
+				auto: true,
+				onSuccess: (data) => {
+					// TODO: do this using an inline method
+					this.tickets = {}
+					for (var i = 0; i < data.length; i++) {
+						this.tickets[data[i].name] = data[i]
+					}
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		ticket() {
 			return {
 				method: 'helpdesk.api.ticket.get_ticket',
-				onSuccess: () => {
-					this.$tickets(this.$resources.ticket.data.name).set(this.$resources.ticket.data)
+				onSuccess: (ticket) => {
+					this.tickets[ticket.name] = ticket
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
@@ -62,199 +185,150 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.create_new',
 				onSuccess: () => {
-					// TODO: fix auto refresh list
-					this.$tickets().update()
-					window.location.reload()
+					this.ticketController.update()
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		updateTicketContact() {
 			return {
 				method: 'helpdesk.api.ticket.update_contact',
-				onSuccess: (data) => {
-					window.location.reload()
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		types() {
 			return {
-				'method': 'frappe.client.get_list',
+				method: 'frappe.client.get_list',
 				params: {
 					doctype: 'Ticket Type',
+					pluck: 'name'
 				},
 				auto: true,
-				onSuccess: () => {
-					this.$tickets().set({types: this.$resources.types.data})
+				onSuccess: (data) => {
+					this.ticketTypes = data
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		priorities() {
 			return {
-				'method': 'frappe.client.get_list',
+				method: 'frappe.client.get_list',
 				params: {
 					doctype: 'Ticket Priority',
 				},
 				auto: true,
-				onSuccess: () => {
-					this.$tickets().set({priorities: this.$resources.priorities.data})
-				}
-			}
-		},
-		contacts() {
-			return {
-				'method': 'frappe.client.get_list',
-				params: {
-					doctype: 'Contact',
+				onSuccess: (data) => {
+					this.ticketPriorities = data
 				},
-				auto: true,
-				onSuccess: () => {
-					this.$tickets().set({contacts: this.$resources.contacts.data})
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		statuses() {
 			return {
-				'method': 'helpdesk.api.ticket.get_all_ticket_statuses',
+				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
 				auto: true,
-				onSuccess: () => {
-					this.$tickets().set({statuses: this.$resources.statuses.data})
+				onSuccess: (data) => {
+					this.ticketStatuses = data
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		contacts() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_contacts',
+				auto: true,
+				onSuccess: (data) => {
+					this.contacts = data
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		agents() {
 			return {
-				'method': 'frappe.client.get_list',
+				method: 'frappe.client.get_list',
 				params: {
 					doctype: 'Agent',
 					fields: ['*']
 				},
 				auto: true,
-				onSuccess: () => {
-					this.$agents.set(this.$resources.agents.data)
+				onSuccess: (data) => {
+					this.agents = data
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		assignTicketToAgent() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: (data) => {
-					this.$tickets(data.name).update();
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		assignTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
-				onSuccess: (data) => {
-					this.$tickets(data.name).update();
-					this.$resources.types.fetch();
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		assignTicketStatus() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
-				onSuccess: (data) => {
-					this.$tickets(data.name).update();
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		assignTicketPriority() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_priority',
-				onSuccess: (data) => {
-					this.$tickets(data.name).update()
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		},
 		createTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.check_and_create_ticket_type',
-				onSuccess: (data) => {
+				onSuccess: () => {
 					this.$resources.types.fetch();
+				},
+				onFailure: () => {
+					// TODO:
 				}
 			}
 		}
-	},
-	provide: {
-		viewportWidth: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-	},
-	components: {
-		NavBar,
-		SideBarMenu,
-	},
-	created() {
-		const cookie = Object.fromEntries(
-			document.cookie
-				.split('; ')
-				.map(part => part.split('='))
-				.map(d => [d[0], decodeURIComponent(d[1])])
-		);
-
-		const isLoggedIn = cookie.user_id && cookie.user_id !== 'Guest';
-
-		if (isLoggedIn) {
-			this.$resources.user.fetch()
-		} else {
-			window.location.replace("/login");
-		}
-	},
-	mounted() {
-		this.$tickets().setUpdateTickets(() => {
-			this.$resources.tickets.fetch()
-		})
-		this.$tickets().setUpdateTicket((ticketId) => {
-			this.$resources.ticket.fetch({
-				ticket_id: ticketId,
-			})
-		})
-		this.$tickets().setCreateTicket((values) => {
-			this.$resources.createTicket.submit({
-				subject: values.subject,
-				description: values.description
-			})
-		})
-		this.$tickets().setAssignAgent((ticketId, agentName) => {
-			this.$resources.assignTicketToAgent.submit({
-				ticket_id: ticketId,
-				agent_id: agentName
-			})
-		})
-		this.$tickets().setAssignType((ticketId, type) => {
-			this.$resources.assignTicketType.submit({
-				ticket_id: ticketId,
-				type
-			})
-		})
-		this.$tickets().setAssignStatus((ticketId, status) => {
-			this.$resources.assignTicketStatus.submit({
-				ticket_id: ticketId,
-				status
-			})
-		})
-		this.$tickets().setAssignPriority((ticketId, priority) => {
-			this.$resources.assignTicketPriority.submit({
-				ticket_id: ticketId,
-				priority
-			})
-		})
-		this.$tickets().setCreateType((type) => {
-			this.$resources.createTicketType.submit({
-				type
-			})
-		})
-		this.$tickets().setUpdateContact((ticketId, contact) => {
-			this.$resources.updateTicketContact.submit({
-				ticket_id: ticketId,
-				contact
-			})
-		})
-		this.$socket.on("list_update", (data) => {
-			if (data.doctype == "Ticket") {
-				this.$tickets(data.name).update();
-			}
-			// TODO: handle other doctype events too
-		})
 	}
 }
 </script>

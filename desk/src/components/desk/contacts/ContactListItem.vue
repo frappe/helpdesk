@@ -32,27 +32,12 @@ import { Input, FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'ContactListItem',
-	props: ['contactId'],
+	props: ['contact'],
 	components: {
 		Input,
 		FeatherIcon,
 	},
-	resources: {
-		contact() {
-			return {
-				method: 'frappe.client.get',
-				params: {
-					doctype: "Contact",
-					name: this.contactId
-				},
-				auto: true,
-			}
-		}
-	},
 	computed: {
-		contact() {
-			return this.$resources.contact.data || null
-		},
 		fullName() {
 			if (this.contact) {
 				return (this.contact.first_name || "") + " " + (this.contact.last_name || "")
