@@ -146,6 +146,14 @@ def get_contact(ticket_id):
 		return None
 
 @frappe.whitelist(allow_guest=True)
+def get_all_contacts():
+	contacts = frappe.get_all("Contact")
+	for i in range(len(contacts)):
+		contacts[i] = frappe.get_doc("Contact", contacts[i])
+
+	return contacts
+
+@frappe.whitelist(allow_guest=True)
 def get_conversations(ticket_id):
 	return get_all_conversations(ticket_id)
 

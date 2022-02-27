@@ -12,54 +12,41 @@
 			</div>
 		</div>
 		<div v-if="contacts">
-			<ContactList :contacts="contacts" />
+			<ContactList />
 		</div>
-		<NewContactDialog v-model="showNewContactDialog" @contact-created="(contact) => {contactCreated(contact)}"/>
+		<NewContactDialog v-model="showNewContactDialog" />
 	</div>
 </template>
 <script>
 import { Input } from 'frappe-ui'
 import ContactList from '@/components/desk/contacts/ContactList.vue'
 import NewContactDialog from '@/components/desk/global/NewContactDialog.vue'
+import { inject, ref } from '@vue/runtime-core'
 
 export default {
 	name: 'Contacts',
-	inject: ['viewportWidth'],
 	components: {
 		ContactList,
 		Input,
 		NewContactDialog
 	},
-	data() {
-		return {
-			showNewContactDialog: false
+	setup() {
+		const showNewContactDialog = ref(false)
+		const viewportWidth = inject('viewportWidth')
+		const contacts = inject('contacts')
+
+		return { showNewContactDialog, viewportWidth, contacts}
+	},
+	computed: {
+		contacts() {
+			return this.contacts || null
 		}
 	},
-    resources: {
-        contacts() {
-            return {
-                method: 'helpdesk.api.contact.get_all',
-                auto: true,
-                fields: ['name']
-            }
-        }
-    },
     activated() {
         this.$currentPage.set('Contacts')
     },
     deactivated() {
 
     },
-    computed: {
-        contacts() {
-            return this.$resources.contacts.data || null
-        }
-    },
-	methods: {
-		contactCreated(contact) {
-			this.$resources.contacts.fetch();
-			this.showNewContactDialog = false
-		}
-	}
 }
 </script>

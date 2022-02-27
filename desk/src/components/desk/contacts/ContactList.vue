@@ -8,7 +8,7 @@
 			>
 				<div class="flex-auto" v-for="contact in contacts" :key="contact.name">
 					<div class="block px-0">
-						<ContactListItem :contactId="contact.name" />
+						<ContactListItem :contact="contact" />
 					</div>
 				</div>
 			</div>
@@ -19,14 +19,24 @@
 <script>
 import { Input } from 'frappe-ui'
 import ContactListItem from './ContactListItem.vue'
+import { inject } from '@vue/runtime-core'
 
 export default {
 	name: 'ContactList',
-	inject: ['viewportWidth'],
-	props: ['contacts'],
 	components: {
 		Input,
 		ContactListItem
 	},
+	setup() {
+		const viewportWidth = inject('viewportWidth')
+		const contacts = inject('contacts')
+
+		return { viewportWidth, contacts }
+	},
+	computed: {
+		contacts() {
+			return this.contacts || null
+		}
+	}
 }
 </script>

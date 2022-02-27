@@ -248,10 +248,7 @@ export default {
 		},
 		contacts() {
 			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: 'Contact',
-				},
+				method: 'helpdesk.api.ticket.get_all_contacts',
 				auto: true,
 				onSuccess: (data) => {
 					this.contacts = data
