@@ -31,14 +31,18 @@ def get_tickets(filter=None):
 		else:
 			filtered_tickets.append(ticket)
 
-		ticket['assignees'] = get_agent_assigned_to_ticket(ticket['name'])
+		ticket['assignees'] = assignees
+		ticket['contact'] = get_contact(ticket['name'])
+	
 	return filtered_tickets
 
 @frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)
 	ticket_doc = ticket_doc.__dict__
-	ticket_doc["assignees"] = get_agent_assigned_to_ticket(ticket_id)
+	ticket_doc['assignees'] = get_agent_assigned_to_ticket(ticket_id)
+	ticket_doc['contact'] = get_contact(ticket_id)
+	
 	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
@@ -133,12 +137,13 @@ def get_all_ticket_statuses():
 def get_all_ticket_priorities():
 	return frappe.get_all("Ticket Priority", pluck="name")
 
-@frappe.whitelist(allow_guest=True)
 def get_contact(ticket_id):
 	contact_id = frappe.get_value("Ticket", ticket_id, "contact")
-	contact_doc = frappe.get_doc("Contact", contact_id)
-
-	return contact_doc
+	if contact_id:
+		contact_doc = frappe.get_doc("Contact", contact_id)
+		return contact_doc
+	else:
+		return None
 
 @frappe.whitelist(allow_guest=True)
 def get_conversations(ticket_id):

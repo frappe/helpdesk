@@ -23,10 +23,10 @@
 							</Badge>
 						</div>
 					</div>
-					<div class="flex items-center">
+					<div class="flex items-center" v-if="ticket.contact">
 						<div class="flex">
 							<FeatherIcon class="w-4 h-4 stroke-slate-400" name="user" />
-							<div class="ml-1 text-base">{{ ticket.contact }}</div>
+							<div class="ml-1 text-base">{{ ticket.contact.name }}</div>
 						</div>
 					</div>
 				</div>
@@ -140,7 +140,7 @@
 								</div>
 							</div>
 							<div v-else class="hidden group-hover:block">
-								<span class="text-base text-gray-400"> assign agent </span>
+								<span class="text-base text-gray-400"> assign to </span>
 							</div>
 						</div>
 					</template>

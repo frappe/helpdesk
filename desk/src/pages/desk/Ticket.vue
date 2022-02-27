@@ -6,7 +6,7 @@
 				class="w-1/5 border-r"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
-				<InfoPanel :ticket="ticket" :contact="contact" />
+				<InfoPanel :ticket="ticket" :contact="ticket.contact" />
 			</div>
 			<div
 				class="w-3/5 pt-3 px-4"
@@ -23,8 +23,8 @@
 					</div>
 					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
-							<div v-if="sessionAgent">
-								<Avatar label="John Doe" :imageURL="sessionAgent.image" size="md" />
+							<div v-if="user.agent">
+								<Avatar label="John Doe" :imageURL="user.profile_image" size="md" />
 							</div>
 							<div class="grow ml-3">
 								<div v-if="contact">
@@ -36,8 +36,20 @@
 										style="min-height:150px; max-height:200px; overflow-y: auto;"
 									/>
 									<div class="mt-2 space-x-2">
-										<Button :loading="this.$resources.submitConversation.loading" @click="this.submitConversation" appearance="primary" :disabled="!sessionAgent">Send</Button>
-										<Button appearance="secondary" @click="cancelEditing()">Cancel</Button>
+										<Button 
+											:loading="this.$resources.submitConversation.loading" 
+											@click="this.submitConversation" 
+											appearance="primary" 
+											:disabled="!user.agent"
+										>
+											Send
+										</Button>
+										<Button 
+											appearance="secondary" 
+											@click="cancelEditing()"
+										>
+											Cancel
+										</Button>
 									</div>
 								</div>
 							</div>
@@ -53,7 +65,7 @@
 				class="w-1/5 border-l"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
-				<ActionPanel :ticket="ticket" :contact="contact" />
+				<ActionPanel :ticketId="ticket.name" :contact="ticket.contact" />
 			</div>
 		</div>
 	</div>
@@ -67,24 +79,23 @@ import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'Ticket',
-	inject: ['viewportWidth'],
 	props: ['ticketId'],
 	components: {
-    Badge,
-    Card,
-    Dropdown,
-    Avatar,
-    ConversationCard,
-	Conversations,
-    TopControlPanel,
-    InfoPanel,
-    ActionPanel,
-	QuillEditor
-},
+		Badge,
+		Card,
+		Dropdown,
+		Avatar,
+		ConversationCard,
+		Conversations,
+		TopControlPanel,
+		InfoPanel,
+		ActionPanel,
+		QuillEditor
+	},
 	data() {
 		return {
 			editing: false,
@@ -118,26 +129,20 @@ export default {
 	},
 	setup() {
 		const editor = ref(null);
+		const viewportWidth = inject('viewportWidth')
+		const user = inject('user')
+		const tickets = inject('tickets')
+		const ticketController = inject('ticketController')
 
-		return { editor }
+		return { 
+			editor,
+			viewportWidth,
+			user,
+			tickets,
+			ticketController
+		}
 	},
 	resources: {
-		sessionAgent() {
-			return {
-				method: 'helpdesk.api.agent.get_session_agent',
-				auto: true
-			}
-		},
-		// TODO: set contact inside ticket fetch it self
-		contact() {
-			return {
-				method: 'helpdesk.api.ticket.get_contact',
-				params: {
-					ticket_id: this.ticketId
-				},
-				auto: true
-			}
-		},
 		submitConversation() {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation',
@@ -149,14 +154,8 @@ export default {
 	},
 	computed: {
 		ticket() {
-			return this.$tickets(this.ticketId).get()
-		},
-		sessionAgent() {
-			return this.$resources.sessionAgent.data || null;
-		},
-		contact() {
-			return this.$resources.contact.data || null;
-		},
+			return this.tickets[this.ticketId] || null
+		}
 	},
 	methods: {
 		startEditing() {
