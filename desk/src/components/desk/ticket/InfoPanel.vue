@@ -1,5 +1,5 @@
 <template>
-	<div class="px-3" v-if="contact && ticket">
+	<div class="px-3" v-if="ticket">
 		<div class="py-4 space-y-3 text-base">
 			<div class="flex items-center">
 				<div class="grow text-lg font-medium">{{ `Contact Information ${editing ? "(editing)" : ""}` }}</div>
@@ -14,18 +14,18 @@
 					<FeatherIcon name="user" class="w-4 h-4" />
 					<div class="text-slate-500 truncate">{{ contactFullName }}</div>
 				</div>
-				<div class="flex space-x-2">
+				<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
 					<FeatherIcon name="mail" class="w-4 h-4" />
 					<div>
-						<div class="space-y-1" v-for="email_id in contact.email_ids" :key="email_id">
+						<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
 							<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
 						</div>
 					</div>
 				</div>
-				<div v-if="contact.phone_nos.length > 0" class="flex space-x-2">
+				<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
 					<FeatherIcon name="phone" class="w-4 h-4" />
 					<div>
-						<div class="space-y-1" v-for="phone_no in contact.phone_nos" :key="phone_no">
+						<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
 							<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
 						</div>
 					</div>
@@ -51,7 +51,7 @@
 						<ComboboxOption
 							v-slot="{ selected, active }"
 							v-for="contactItem in filterdContacts" :key="contactItem"
-							:value="contactItem"
+							:value="contactItem.name"
 						>
 							<li
 								class="cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
@@ -61,7 +61,7 @@
 									class="block truncate"
 									:class="{ 'font-medium': selected, 'font-normal': !selected }"
 									>
-									{{ contactItem }}
+									{{ contactItem.name }}
 								</span>
 							</li>
 						</ComboboxOption>
@@ -102,10 +102,11 @@ import {
 	ComboboxOption,
 } from '@headlessui/vue'
 import NewContactDialog from '@/components/desk/global/NewContactDialog.vue'
+import { inject, ref } from 'vue'
 
 export default {
 	name: "InfoPanel",
-	props: ["ticket", "contact"],
+	props: ["ticketId"],
 	components: {
 		FeatherIcon,
 		Input,
@@ -115,55 +116,55 @@ export default {
 		ComboboxOptions,
 		NewContactDialog
 	},
-	data() {
-		return {
-			editing: false,
-			contactName: '',
-			selectedContact:  '',
-			query: '',
+	setup() {
+		const editing = ref(false)
+		const contactName = ref('')
+		const selectedContact = ref('')
+		const query = ref('')
 
-			showNewContactDialog: false
+		const showNewContactDialog = ref(false)
+
+		const tickets = inject('tickets')
+		const contacts = inject('contacts')
+		const ticketController = inject('ticketController')
+
+		return {
+			editing,
+			contactName,
+			selectedContact,
+			query,
+			showNewContactDialog,
+			tickets,
+			contacts,
+			ticketController
 		}
 	},
-	resources: {
-		otherTicketsOfContact() {
-			return {
-				method: 'helpdesk.api.ticket.get_other_tickets_of_contact',
-				params: {
-					ticket_id: this.ticket.name,
-				},
-				auto: true
-			}
-		},
-	},
 	computed: {
-		contactFullName() {
-			if (this.contact) {
-				return (this.contact.first_name || "") + " " + (this.contact.last_name || "")
-			}
+		ticket() {
+			return this.tickets[this.ticketId] || null
 		},
-		otherTicketsOfContact() {
-			return this.$resources.otherTicketsOfContact.data || null;
+		contactFullName() {
+			if (this.ticket.contact) {
+				return (this.ticket.contact.first_name || "") + " " + (this.ticket.contact.last_name || "")
+			}
 		},
 		filterdContacts() {
 			return this.query === ''
-				? this.$tickets().get('contacts')
-				: this.$tickets().get('contacts').filter((contactItem) => {
-					return contactItem.toLowerCase().includes(this.query.toLowerCase())
+				? this.contacts
+				: this.contacts.filter((contactItem) => {
+					return contactItem.name.toLowerCase().includes(this.query.toLowerCase())
 				})
 		}
 	},
 	methods: {
 		updateContact() {
 			this.editing = false
-			console.log(`contact: ${this.selectedContact}`)
-			this.$tickets(this.ticket.name).updateContact(this.selectedContact)
+			this.ticketController.set(this.ticketId, 'contact', this.selectedContact)
 		},
 		contactCreated(contact) {
 			this.showNewContactDialog = false
-			// TODO: use a global fetcher for contacts and use it or refetch contacts
-			console.log(contact)
-			this.$tickets(this.ticket.name).updateContact(contact.name)
+			this.editing = false
+			this.ticketController.set(this.ticketId, 'contact', contact.name)
 		}
 	}
 }

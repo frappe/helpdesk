@@ -23,17 +23,17 @@
 							</Badge>
 						</div>
 					</div>
-					<div class="flex items-center">
+					<div class="flex items-center" v-if="ticket.contact">
 						<div class="flex">
 							<FeatherIcon class="w-4 h-4 stroke-slate-400" name="user" />
-							<div class="ml-1 text-base">{{ ticket.contact }}</div>
+							<div class="ml-1 text-base">{{ ticket.contact.name }}</div>
 						</div>
 					</div>
 				</div>
 			</router-link>
 			<div class="flex items-center justify-between sm:justify-start font-light sm:w-6/12">
 				<Dropdown 
-					v-if="types"
+					v-if="ticketTypes"
 					placement="left" 
 					:options="typesAsDropdownOptions()" 
 					:dropdown-width-full="true"
@@ -60,7 +60,7 @@
 					</template>
 				</Dropdown>
 				<Dropdown
-					v-if="priorities"
+					v-if="ticketPriorities"
 					placement="left" 
 					:options="prioritiesAsDropdownOptions()" 
 					:dropdown-width-full="true"
@@ -87,7 +87,7 @@
 					</template>
 				</Dropdown> 
 				<Dropdown
-					v-if="this.statuses"
+					v-if="ticketStatuses"
 					placement="left" 
 					:options="statusesAsDropdownOptions()" 
 					:dropdown-width-full="true"
@@ -124,7 +124,7 @@
 			</div>
 			<div class="sm:w-1/12">
 				<Dropdown
-					v-if="this.agents"
+					v-if="agents"
 					placement="right" 
 					:options="agentsAsDropdownOptions()" 
 					:dropdown-width-full="true"
@@ -140,7 +140,7 @@
 								</div>
 							</div>
 							<div v-else class="hidden group-hover:block">
-								<span class="text-base text-gray-400"> assign agent </span>
+								<span class="text-base text-gray-400"> assign to </span>
 							</div>
 						</div>
 					</template>
@@ -153,11 +153,11 @@
 
 <script>
 import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
+import { inject, onMounted } from '@vue/runtime-core'
 
 export default {
 	name: 'TicketListItem',
-	props: ['ticket'],
-	inject: ['agents', 'types', 'statuses', 'priorities'],
+	props: ['ticketId'],
 	components: {
 		Input,
 		Badge,
@@ -165,10 +165,36 @@ export default {
 		FeatherIcon,
 		Avatar
 	},
-	data() {
+	setup() {
+		// values
+		const user = inject('user')
+
+		const tickets = inject('tickets')
+		const ticketTypes = inject('ticketTypes')
+		const ticketPriorities = inject('ticketPriorities')
+		const ticketStatuses = inject('ticketStatuses')
+
+		const agents = inject('agents')
+
+		// controllers
+		const ticketController = inject('ticketController')
+
 		return {
-			ticketRefreshed: false,
-			localTicket: null,
+			user,
+			
+			tickets,
+			ticketTypes,
+			ticketPriorities,
+			ticketStatuses,
+
+			agents,
+
+			ticketController
+		 }
+	},
+	computed: {
+		ticket() {
+			return this.tickets[this.ticketId] || null
 		}
 	},
 	methods: {
@@ -218,16 +244,16 @@ export default {
 		agentsAsDropdownOptions() {
 			let agentItems = [];
 			if (this.agents) {
-				this.$agents.get().forEach(agent => {
+				this.agents.forEach(agent => {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignAgent(agent.name)
+							this.ticketController.set(this.ticketId, 'agent', agent.name)
 						},
 					});
 				});
 				let options = [];
-				if (this.$user.get().agent) {
+				if (this.user.agent) {
 					options.push({
 						group: 'Myself',
 						hideLabel: true,
@@ -235,7 +261,7 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.$tickets(this.ticket.name).assignAgent()
+									this.ticketController.set(this.ticketId, 'agent')
 								}
 							},
 						],
@@ -253,12 +279,12 @@ export default {
 		},
 		typesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.$tickets().get("types")) {
-				this.$tickets().get("types").forEach(type => {
+			if (this.ticketTypes) {
+				this.ticketTypes.forEach(type => {
 					typeItems.push({
-						label: type,
+						label: type.name,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignType(type)
+							this.ticketController.set(this.ticketId, 'type', type.name)
 						},
 					});
 				});
@@ -269,12 +295,12 @@ export default {
 		},
 		statusesAsDropdownOptions() {
 			let statusItems = [];
-			if (this.$tickets().get("statuses")) {
-				this.$tickets().get("statuses").forEach(status => {
+			if (this.ticketStatuses) {
+				this.ticketStatuses.forEach(status => {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignStatus(status)
+							this.ticketController.set(this.ticketId, 'status', status)
 						},
 					});
 				});
@@ -285,12 +311,12 @@ export default {
 		},
 		prioritiesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.$tickets().get("priorities")) {
-				this.$tickets().get("priorities").forEach(priority => {
+			if (this.ticketPriorities) {
+				this.ticketPriorities.forEach(priority => {
 					typeItems.push({
-						label: priority,
+						label: priority.name,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignPriority(priority)
+							this.ticketController.set(this.ticketId, 'priority', priority.name)
 						},
 					});
 				});

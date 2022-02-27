@@ -2,13 +2,13 @@
 	<div>
 		<div>
 			<div
-				v-if="this.tickets"
+				v-if="filteredTickets"
 				class="w-full block overflow-auto"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.3rem)' : null }"
 			>
-				<div class="flex-auto" v-for="ticket in tickets" :key="ticket.name">
+				<div class="flex-auto" v-for="ticket in filteredTickets" :key="ticket.name">
 					<div class="block px-0">
-						<TicketListItem :ticket="ticket" />
+						<TicketListItem :ticketId="ticket.name" />
 					</div>
 				</div>
 			</div>
@@ -19,18 +19,23 @@
 <script>
 import { Input } from 'frappe-ui'
 import TicketListItem from './TicketListItem.vue'
+import { inject } from 'vue'
 
 export default {
 	name: 'TicketList',
-	inject: ['viewportWidth'],
-	props: ['tickets'],
 	components: {
 		Input,
 		TicketListItem
 	},
+	setup() {
+		const viewportWidth = inject('viewportWidth')
+		const tickets = inject('tickets')
+
+		return { viewportWidth, tickets }
+	},
 	computed: {
-		tickets() {
-			let tickets = this.$tickets().get()
+		filteredTickets() {
+			let tickets = this.tickets
 			let filter = this.$ticketFilter.get()
 
 			let filteredTickets = []

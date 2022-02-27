@@ -11,7 +11,7 @@
 					</div>
 				</router-link>
 			</div>
-			<div>
+			<div v-if="false">
 				<router-link to="/helpdesk/knowledge-base">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="knowledge-base" class="group-hover:stroke-blue-600" width="25" height="25"/>
@@ -25,7 +25,7 @@
 					</div>
 				</router-link>
 			</div>
-			<div>
+			<div v-if="false">
 				<router-link to="/helpdesk/reports">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="reports" class="group-hover:stroke-blue-600" width="25" height="25"/>
@@ -47,19 +47,21 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
-	inject: ['viewportWidth'],
-	props: ['selectedMenuItem'],
-	data() {
-		return {
-			iconHeight: 30,
-			iconWidth: 30
-		}
-	},
 	components: {
 		CustomIcons
+	},
+	setup() {
+		const viewportWidth = inject('viewportWidth')
+
+		const iconHeight = ref(30)
+		const iconWidth = ref(30)
+
+		return { viewportWidth, iconHeight, iconWidth }
 	}
 }
+
 </script>

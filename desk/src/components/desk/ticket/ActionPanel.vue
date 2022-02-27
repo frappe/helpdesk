@@ -1,5 +1,5 @@
 <template>
-	<div class="px-3" v-if="contact && ticket">
+	<div class="px-3" v-if="ticket">
 		<div class="py-4 border-b space-y-3">
 			<div class="text-lg font-medium">{{ `Ticket #${ticket.name}` }}</div>
 			<div class="text-base space-y-2">
@@ -18,7 +18,7 @@
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Assignee</div>
 					<CustomDropdown
-						v-if="$tickets().get('statuses')"
+						v-if="agents"
 						:options="agentsAsDropdownOptions()" 
 						class="text-base w-56"
 					>
@@ -34,7 +34,7 @@
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Status</div>
 					<CustomDropdown
-						v-if="$tickets().get('statuses')"
+						v-if="ticketStatuses"
 						:options="statusesAsDropdownOptions()" 
 						class="text-base w-56"
 					>
@@ -56,7 +56,7 @@
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Priority</div>
 					<CustomDropdown
-						v-if="$tickets().get('priorities')"
+						v-if="ticketPriorities"
 						:options="prioritiesAsDropdownOptions()" 
 						class="text-base w-56"
 					>
@@ -72,7 +72,7 @@
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Type</div>
 					<CustomDropdown
-						v-if="$tickets().get('types')"
+						v-if="ticketTypes"
 						:options="typesAsDropdownOptions()" 
 						class="text-base w-56"
 					>
@@ -105,28 +105,53 @@
 import { FeatherIcon, Dropdown, Input, Dialog } from 'frappe-ui'
 import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import { inject } from '@vue/runtime-core'
 
 export default {
 	name: "ActionPanel",
-	props: ["ticket", "contact"],
+	props: ["ticketId"],
 	components: {
-    FeatherIcon,
-    Dropdown,
-    CustomDropdown,
-	Input,
-	Dialog,
-	CustomIcons
-},
+		FeatherIcon,
+		Dropdown,
+		CustomDropdown,
+		Input,
+		Dialog,
+		CustomIcons
+	},
 	data() {
 		return {
 			openCreateNewTicketTypeDialog: false,
 			newType: "",
 		}
 	},
+	setup() {
+		const user = inject('user')
+		const tickets = inject('tickets')
+		const ticketTypes = inject('ticketTypes')
+		const ticketPriorities = inject('ticketPriorities')
+		const ticketStatuses = inject('ticketStatuses')
+		const ticketController = inject('ticketController')
+		const agents = inject('agents')
+
+		return {
+			user,
+			tickets,
+			ticketTypes,
+			ticketPriorities,
+			ticketStatuses,
+			ticketController,
+			agents,
+		}
+	},
+	computed: {
+		ticket() {
+			return this.tickets[this.ticketId] || null
+		}
+	},
 	methods: {
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
-				this.$tickets(this.ticket.name).assignType(this.newType)
+				this.ticketController.set(this.ticketId, 'type', this.newType)
 				this.closeCreateNewTicketTypeDialog();
 			}
 		},
@@ -142,17 +167,17 @@ export default {
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
-			if (this.$agents.get()) {
-				this.$agents.get().forEach(agent => {
+			if (this.agents) {
+				this.agents.forEach(agent => {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignAgent(agent.name)
+							this.ticketController.set(this.ticketId, 'agent', agent.name)
 						},
 					});
 				});
 				let options = [];
-				if (this.$user.get().agent) {
+				if (this.user.agent) {
 					options.push({
 						group: 'Myself',
 						hideLabel: true,
@@ -160,7 +185,7 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.$tickets(this.ticket.name).assignAgent()
+									this.ticketController.set(this.ticketId, 'agent')
 								}
 							},
 						],
@@ -178,12 +203,12 @@ export default {
 		},
 		typesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.$tickets().get("types")) {
-				this.$tickets().get("types").forEach(type => {
+			if (this.ticketTypes) {
+				this.ticketTypes.forEach(type => {
 					typeItems.push({
-						label: type,
+						label: type.name,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignType(type)
+							this.ticketController.set(this.ticketId, 'type', type.name)
 						},
 					});
 				});
@@ -212,12 +237,12 @@ export default {
 		},
 		statusesAsDropdownOptions() {
 			let statusItems = [];
-			if (this.$tickets().get("statuses")) {
-				this.$tickets().get("statuses").forEach(status => {
+			if (this.ticketStatuses) {
+				this.ticketStatuses.forEach(status => {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignStatus(status)
+							this.ticketController.set(this.ticketId, 'status', status)
 						},
 					});
 				});
@@ -228,12 +253,12 @@ export default {
 		},
 		prioritiesAsDropdownOptions() {
 			let typeItems = [];
-			if (this.$tickets().get("priorities")) {
-				this.$tickets().get("priorities").forEach(priority => {
+			if (this.ticketPriorities) {
+				this.ticketPriorities.forEach(priority => {
 					typeItems.push({
-						label: priority,
+						label: priority.name,
 						handler: () => {
-							this.$tickets(this.ticket.name).assignPriority(priority)
+							this.ticketController.set(this.ticketId, 'priority', priority.name)
 						},
 					});
 				});
