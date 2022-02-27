@@ -19,7 +19,7 @@
 				</div>
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
-						<Conversations :ticket="ticket" :scrollToBottom="scrollConversationsToBottom"/>
+						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 					</div>
 					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
@@ -27,7 +27,7 @@
 								<Avatar label="John Doe" :imageURL="user.profile_image" size="md" />
 							</div>
 							<div class="grow ml-3">
-								<div v-if="contact">
+								<div v-if="editing">
 									<quill-editor 
 										:ref="editor"
 										v-model:content="content" 
@@ -159,7 +159,6 @@ export default {
 	},
 	methods: {
 		startEditing() {
-			console.log(this.editor);
 			this.editing = true
 			this.delayedConversationScroll()
 		},
@@ -175,7 +174,6 @@ export default {
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		submitConversation() {
-			console.log(`content: ${this.content}`);
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: this.content
