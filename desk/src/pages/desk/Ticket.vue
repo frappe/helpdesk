@@ -6,7 +6,7 @@
 				class="w-1/5 border-r"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
-				<InfoPanel :ticket="ticket" :contact="ticket.contact" />
+				<InfoPanel :ticketId="ticket.name" />
 			</div>
 			<div
 				class="w-3/5 pt-3 px-4"
@@ -65,7 +65,7 @@
 				class="w-1/5 border-l"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
-				<ActionPanel :ticketId="ticket.name" :contact="ticket.contact" />
+				<ActionPanel :ticketId="ticket.name" />
 			</div>
 		</div>
 	</div>

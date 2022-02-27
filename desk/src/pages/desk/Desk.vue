@@ -104,6 +104,14 @@ export default {
 						priority: ref
 					})
 					break
+				case 'contact':
+					if (ticketId) {
+						this.$resources.updateTicketContact.submit({
+							ticket_id: ticketId,
+							contact: ref
+						})
+					}
+					break
 				case 'agent':
 					this.$resources.assignTicketToAgent.submit({
 						ticket_id: ticketId,

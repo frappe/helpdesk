@@ -13,11 +13,6 @@ app.component('Button', Button)
 app.config.globalProperties.$dayjs = dayjs
 
 const globalVariables = ref({
-	updateContact: (contactId) => {},
-	createContact: (emailId, fullName) => {},
-
-	createType: (type) => {},
-
 	ticketFilter: "All Tickets",
 	contactFilter: "All Contacts",
 
