@@ -12,100 +12,34 @@
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList :tickets="tickets" />
+			<TicketList />
 		</div>
-		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog=false}"/>
+		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
 </template>
 <script>
 import { Input } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'Tickets',
-	inject: ['viewportWidth'],
 	components: {
 		TicketList,
 		Input,
 		NewTicketDialog
 	},
-	provide: {
-		types: [],
-		priorities: [],
-		statuses: [],
-		agents: []
+	setup() {
+		const tickets = inject('tickets')
+		const showNewTicketDialog = ref(false)
+
+		return { tickets, showNewTicketDialog }
 	},
-	data() {
-		return {
-			showNewTicketDialog: false
-		}
-	},
-	resources: {
-		tickets() {
-			return {
-				method: 'helpdesk.api.ticket.get_tickets',
-				params: {
-					filter: this.$ticketFilter.get()
-				},
-				auto: true
-			}
-		},
-		agents() {
-			return {
-				method: 'helpdesk.api.agent.get_all',
-				auto: true
-			}
-		},
-		types() {
-			return {
-				method: 'helpdesk.api.ticket.get_all_ticket_types',
-				auto: true
-			}
-		},
-		statuses() {
-			return {
-				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
-				auto: true
-			}
-		},
-		priorities() {
-			return {
-				method: 'helpdesk.api.ticket.get_all_ticket_priorities',
-				auto: true
-			}
-		}
-	},
-	computed: {
-		tickets() {
-			return this.$resources.tickets.data || null
-		},
-		agents() {
-			return this.$resources.agents.data || null;
-		},
-		types() {
-			return this.$resources.types.data || null
-		},
-		statuses() {
-			return this.$resources.statuses.data || null;
-		},
-		priorities() {
-			return this.$resources.priorities.data || null;
-		}
-	},
-	mounted() {
-		},
 	activated() {
-		this.$socket.on('list_update', (data) => {
-			if (data['doctype'] == 'Ticket') {
-				this.$resources.tickets.fetch()
-			}
-		});
 		this.$currentPage.set('Tickets')
-        console.log('tickets activated')
-	},
-	deactivated() {
-		this.$socket.off('list_update');
-	},
+	}
 }
+
+// TODO: transfer the tickets controllers to desk.vue file
 </script>

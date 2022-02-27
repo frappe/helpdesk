@@ -10,7 +10,6 @@ import { provide, ref } from 'vue'
 export default {
 	name: "App",
 	setup() {
-		console.log('App setup')
 		const user = ref({
 			signup: (fullName, email) => {
 				console.log('signup page')
@@ -41,7 +40,7 @@ export default {
 		
 		const viewportWidth = ref(Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0))
 		
-		provide(viewportWidth)
+		provide('viewportWidth', viewportWidth)
 		
 		return { user }
 	},

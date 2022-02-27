@@ -47,19 +47,21 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
-	inject: ['viewportWidth'],
-	props: ['selectedMenuItem'],
-	data() {
-		return {
-			iconHeight: 30,
-			iconWidth: 30
-		}
-	},
 	components: {
 		CustomIcons
+	},
+	setup() {
+		const viewportWidth = inject('viewportWidth')
+
+		const iconHeight = ref(30)
+		const iconWidth = ref(30)
+
+		return { viewportWidth, iconHeight, iconWidth }
 	}
 }
+
 </script>
