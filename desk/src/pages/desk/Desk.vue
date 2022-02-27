@@ -92,6 +92,12 @@ export default {
 						type: ref
 					})
 					break
+				case 'status':
+					this.$resources.assignTicketStatus.submit({
+						ticket_id: ticketId,
+						status: ref
+					})
+					break
 				case 'priority':
 					this.$resources.assignTicketPriority.submit({
 						ticket_id: ticketId,
