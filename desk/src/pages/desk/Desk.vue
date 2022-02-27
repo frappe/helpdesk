@@ -130,7 +130,7 @@ export default {
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case 'Ticket':
-					this.ticketController.update(data.name)
+					this.ticketController.update()
 					break
 				case 'Ticket Type':
 					this.$resources.type.fetch()
