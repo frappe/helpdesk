@@ -75,6 +75,10 @@ export default {
 		}
 	},
 	mounted() {
+		if (!this.user.isLoggedIn()) {
+			this.user.showLoginPage()
+		}
+
 		this.ticketController.update = (ticketId) => {
 			if (ticketId) {
 				this.$resources.ticket.fetch({
