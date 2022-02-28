@@ -36,7 +36,10 @@ export default {
 				method: 'helpdesk.helpdesk.doctype.ticket.ticket.get_user_tickets',
 				auto: true,
 				onSuccess: (data) => {
-					this.tickets = data
+					this.tickets = {}
+					for (var i = 0; i < data.length; i++) {
+						this.tickets[data[i].name] = data[i]
+					}
 				},
 				onFailure: () => {
 					console.log('error occured!!')

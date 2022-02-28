@@ -153,7 +153,7 @@
 
 <script>
 import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
-import { inject, onMounted } from '@vue/runtime-core'
+import { inject } from '@vue/runtime-core'
 
 export default {
 	name: 'TicketListItem',

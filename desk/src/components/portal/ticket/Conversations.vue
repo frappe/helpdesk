@@ -1,25 +1,21 @@
 <template>
-	<div v-if="ticket">
-        {{ ticket }}
-    </div>
+
 </template>
 
 <script>
-import { inject } from "vue"
-
+import { inject } from '@vue/runtime-core'
 export default {
-	name: "Tickets",
+    name: 'Conversation',
     props: ['ticketId'],
     setup() {
         const tickets = inject('tickets')
         const ticketController = inject('ticketController')
 
         return { tickets, ticketController }
-    },
-    computed: {
-        ticket() {
-			return this.tickets[this.ticketId] || null
-		}
     }
 }
 </script>
+
+<style>
+
+</style>
