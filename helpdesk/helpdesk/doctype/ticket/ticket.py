@@ -265,7 +265,7 @@ def get_list_context(context=None):
 	}
 
 @frappe.whitelist()
-def get_user_tickets(filters={}, order_by='creation desc'):
+def get_user_tickets(filters='{}', order_by='creation desc'):
 	filters = json.loads(filters)
 	filters['raised_by'] = ['=', frappe.session.user]
 	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'route'])

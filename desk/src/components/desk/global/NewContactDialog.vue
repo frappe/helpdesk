@@ -70,16 +70,8 @@ export default {
 					doctype: 'Contact',
 					first_name: this.firstName,
 					last_name: this.lastName,
-					email_ids: [
-						{
-							email_id: this.emailId
-						}
-					],
-					phone_nos: [
-						{
-							phone: this.phone
-						}
-					]
+					email_ids: [{ email_id: this.emailId, is_primary: true }],
+					phone_nos: [{ phone: this.phone }]
 				},
 			})
 		}

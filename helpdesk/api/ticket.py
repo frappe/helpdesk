@@ -59,8 +59,9 @@ def update_contact(ticket_id, contact):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		contact_doc = frappe.get_doc("Contact", contact)
-		ticket_doc.contact = contact_doc.name
-		ticket_doc.raised_by = contact_doc.email_id
+		if contact_doc.email_ids and len(contact_doc.email_ids) > 0:
+			ticket_doc.raised_by = contact_doc.email_ids[0]
+		print(f'ticket_doc : {ticket_doc}')
 		ticket_doc.save()
 		
 		frappe.db.commit()
