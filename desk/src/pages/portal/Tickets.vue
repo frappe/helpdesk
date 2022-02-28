@@ -1,30 +1,30 @@
 <template>
 	<div class="my-20">
-        <div class="mx-auto max-w-2xl">
-            <div class="flex justify-between items-center mb-2">
-                <div class="mb-2">
-                    <p class="text-4xl font-semibold">Your Tickets</p>
-                </div>
-                <Button icon-left="plus" appearance="primary">Create New</Button>
-            </div>
-            <div class="pt-4 px-4 pb-2 bg-white border rounded-lg shadow">
-                <div v-for="(ticket, index) in tickets" :key="ticket.name" class="space-y-4">
-                    <router-link :to="`/support/tickets/${ticket.name}`">
-                        <div class="px-2 pt-2 hover:bg-slate-50 rounded-lg items-center cursor-pointer mb-2">
-                            <div class="flex justify-between">
-                                <div class="font-semibold">{{ ticket.subject }}</div>
-                                <Badge color="green">{{ ticket.status }}</Badge>
-                            </div>
-                            <div class="pb-2">
-                                <div class="text-slate-500">{{ `${$dayjs(ticket.creation).fromNow()} ago` }}</div>
-                            </div>
-                            <hr v-if="index != tickets.length - 1"/>
-                        </div>
-                    </router-link>
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="mx-auto max-w-4xl">
+			<div class="flex justify-between items-center mb-2">
+				<div class="mb-2">
+					<p class="text-4xl font-semibold">Your Tickets</p>
+				</div>
+				<Button icon-left="plus" appearance="primary">Create New</Button>
+			</div>
+			<div class="pt-4 px-4 pb-2 bg-white border rounded-lg shadow">
+				<div v-for="(ticket, index) in tickets" :key="ticket.name" class="space-y-4">
+					<router-link :to="`/support/tickets/${ticket.name}`">
+						<div class="px-2 pt-2 hover:bg-slate-50 rounded-lg items-center cursor-pointer mb-2">
+							<div class="flex justify-between">
+								<div class="font-semibold">{{ ticket.subject }}</div>
+								<Badge :color="getStatusBadgeColor(ticket.status)">{{ getStatus(ticket.status) }}</Badge>
+							</div>
+							<div class="pb-2">
+								<div class="text-slate-500">{{ `${$dayjs(ticket.creation).fromNow()} ago` }}</div>
+							</div>
+							<hr v-if="index != tickets.length - 1"/>
+						</div>
+					</router-link>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -33,19 +33,45 @@ import { Badge } from 'frappe-ui'
 
 export default {
 	name: "Tickets",
-    components: {
-        Badge
-    },
-    setup() {
-        const tickets = inject('tickets')
-        const ticketController = inject('ticketController')
+	components: {
+		Badge
+	},
+	setup() {
+		const tickets = inject('tickets')
+		const ticketController = inject('ticketController')
 
-        return { tickets, ticketController }
-    },
-    computed: {
-        tickets() {
-            return this.tickets || null
-        }
-    }
+		return { tickets, ticketController }
+	},
+	computed: {
+		tickets() {
+			return this.tickets || null
+		}
+	},
+	methods: {
+		getStatus(status) {
+			switch(status) {
+				case 'Replied':
+					return 'Waiting For Reply'
+				case 'Resolved':
+					return 'Closed'
+				default:
+					return status
+			}
+		},
+		getStatusBadgeColor(status) {
+			switch(status) {
+				case 'Replied':
+					return 'yellow'
+				case 'Resolved':
+					return 'green'
+				case 'On Hold':
+					return 'blue'
+				case 'Closed':
+					return 'green'
+				case 'Open':
+					return 'red'
+			}
+		}
+	}
 }
 </script>

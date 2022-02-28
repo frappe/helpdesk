@@ -26,19 +26,44 @@ export default {
 		const user = inject('user')
 
 		const tickets = ref()
+		const ticketStatuses = ref([])
 		const ticketController = ref({})
 
 		provide('tickets', tickets)
+		provide('ticketStatuses', ticketStatuses)
 		provide('ticketController', ticketController)
 
-		return { user, tickets, ticketController }
+		return { user, tickets, ticketStatuses, ticketController }
 	},
 	mounted() {
 		this.ticketController.createTicket = ((template='Default') => {
 			console.log('create ticket')
 		})
-		this.ticketController.set = ((ticketId, type, ref) => {
-
+		this.ticketController.update = (ticketId) => {
+			if (ticketId) {
+				this.$resources.ticket.fetch({
+					ticket_id: ticketId
+				})
+			} else {
+				this.$resources.tickets.fetch()
+			}
+		}
+		this.ticketController.set = (ticketId, type, ref=null) => {
+			switch (type) {
+				case 'status':
+					this.$resources.assignTicketStatus.submit({
+						ticket_id: ticketId,
+						status: ref
+					})
+					break
+			}
+		}
+		this.$socket.on("list_update", (data) => {
+			switch (data.doctype) {
+				case 'Ticket':
+					this.ticketController.update()
+					break
+			}
 		})
 	},
 	resources: {
@@ -56,7 +81,41 @@ export default {
 					console.log('error occured!!')
 				}
 			}
-		}
+		},
+		ticket() {
+			return {
+				method: 'helpdesk.api.ticket.get_ticket',
+				onSuccess: (ticket) => {
+					this.tickets[ticket.name] = ticket
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		statuses() {
+			return {
+				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
+				auto: true,
+				onSuccess: (data) => {
+					this.ticketStatuses = data
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		assignTicketStatus() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_status',
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
 	}
 }
 </script>
