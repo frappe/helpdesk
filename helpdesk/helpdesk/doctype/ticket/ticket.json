@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "autoname": "format:{#####}",
- "creation": "2022-02-08 18:13:42.493324",
+ "creation": "2022-02-24 22:45:45.469857",
  "doctype": "DocType",
  "document_type": "Setup",
  "email_append_to": 1,
@@ -18,6 +18,8 @@
   "ticket_split_from",
   "sb_details",
   "description",
+  "template",
+  "custom_fields",
   "service_level_section",
   "service_level_agreement",
   "response_by",
@@ -365,6 +367,18 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Web Page Is Published"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "Template",
+   "options": "Ticket Template"
+  },
+  {
+   "fieldname": "custom_fields",
+   "fieldtype": "Table",
+   "label": "Custom Fields",
+   "options": "Ticket Custom Field"
   }
  ],
  "has_web_view": 1,
@@ -372,7 +386,7 @@
  "idx": 7,
  "is_published_field": "is_published",
  "links": [],
- "modified": "2022-02-17 17:56:21.998313",
+ "modified": "2022-03-01 20:52:23.836975",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
