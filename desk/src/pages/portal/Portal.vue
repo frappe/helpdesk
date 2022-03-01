@@ -50,6 +50,13 @@ export default {
 				this.$resources.tickets.fetch()
 			}
 		}
+		this.ticketController.new = (type, values) => {
+			switch (type) {
+				case 'ticket':
+					this.$resources.createTicket.submit(values)
+					break
+			}
+		}
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
 				case 'status':
@@ -109,11 +116,7 @@ export default {
 		},
 		templates() {
 			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: 'Ticket Template',
-					fields: ['*']
-				},
+				method: 'helpdesk.api.ticket.get_all_ticket_templates',
 				auto: true,
 				onSuccess: (data) => {
 					this.ticketTemplates = data
@@ -128,6 +131,17 @@ export default {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		createTicket() {
+			return {
+				method: 'helpdesk.api.ticket.create_new',
+				onSuccess: () => {
+					this.ticketController.update()
 				},
 				onFailure: () => {
 					// TODO:

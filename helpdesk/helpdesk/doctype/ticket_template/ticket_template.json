@@ -9,7 +9,7 @@
  "field_order": [
   "template_name",
   "about",
-  "custom_fields",
+  "fields",
   "template_route"
  ],
  "fields": [
@@ -25,21 +25,21 @@
    "label": "About"
   },
   {
-   "fieldname": "custom_fields",
-   "fieldtype": "Table",
-   "label": "Custom Fields",
-   "options": "DocField"
-  },
-  {
    "fieldname": "template_route",
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Template Route"
+  },
+  {
+   "fieldname": "fields",
+   "fieldtype": "Table",
+   "label": "Custom Fields",
+   "options": "DocField"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-01 12:19:36.298554",
+ "modified": "2022-03-01 14:43:39.936758",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket Template",

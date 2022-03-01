@@ -46,10 +46,12 @@ def get_ticket(ticket_id):
 	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
-def create_new(subject, description):
+def create_new(values):
 	ticket_doc = frappe.new_doc("Ticket")
-	ticket_doc.subject = subject
-	ticket_doc.description = description
+
+	ticket_doc.subject = values['subject']
+	ticket_doc.description = values['description']
+	
 	ticket_doc.insert(ignore_permissions=True)
 
 	ticket_doc.create_communication()
@@ -178,3 +180,12 @@ def check_and_create_ticket_type(type):
 		ticket_type_doc = frappe.get_doc("Ticket Type", type)
 
 	return ticket_type_doc
+
+@frappe.whitelist(allow_guest=True)
+def get_all_ticket_templates():
+	templates = frappe.get_all("Ticket Template")
+	for index, template in enumerate(templates):
+		templates[index] = frappe.get_doc("Ticket Template", template.name).__dict__
+	
+	print(templates)
+	return templates
