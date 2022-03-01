@@ -15,7 +15,8 @@ def get_tickets(filter=None):
 			ticket.resolution_by,
 			ticket.response_by,
 			ticket.agreement_status,
-			ticket.contact
+			ticket.contact,
+			ticket.template
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
@@ -31,6 +32,7 @@ def get_tickets(filter=None):
 		else:
 			filtered_tickets.append(ticket)
 
+		ticket['custom_fields'] = frappe.get_doc("Ticket", ticket.name, fields=['custom_fields']).custom_fields
 		ticket['assignees'] = assignees
 		ticket['contact'] = get_contact(ticket['name'])
 	
