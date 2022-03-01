@@ -112,11 +112,11 @@ export default {
 				method: 'frappe.client.get_list',
 				params: {
 					doctype: 'Ticket Template',
+					fields: ['*']
 				},
 				auto: true,
 				onSuccess: (data) => {
 					this.ticketTemplates = data
-					console.log(data)
 				},
 				onFailure: () => {
 					// TODO:

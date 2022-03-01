@@ -13,7 +13,7 @@
 					<template v-slot="{ toggleTemplates }">
 						<div>
 							<Button 
-								@click="ticketTemplates ? toggleTemplates : () => {}" 
+								@click="toggleTemplates" 
 								icon-left="plus" 
 								appearance="primary"
 							>
@@ -93,11 +93,17 @@ export default {
 		ticketTemplateOptions() {
 			let templateItems = [];
 			if (this.ticketTemplates) {
-				this.ticketTemplates.forEach(type => {
+				this.ticketTemplates.forEach(template => {
 					templateItems.push({
-						label: type.name,
+						label: template.name,
 						handler: () => {
-							// TODO: redirect to new ticket page 
+							console.log(template)
+							this.$router.push({
+								name: 'TemplatedNewTicket',
+								params: {
+									templateId: template.template_route
+								}
+							})
 						},
 					});
 				});
@@ -105,7 +111,7 @@ export default {
 			} else {
 				return null;
 			}
-		}
+		},
 	}
 }
 </script>

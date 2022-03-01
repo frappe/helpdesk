@@ -63,6 +63,17 @@ const routes = [
 				component: () => import('@/pages/portal/Ticket.vue'),
 				props: true
 			},
+			{
+				path: 'tickets/new/:templateId',
+				name: 'TemplatedNewTicket',
+				component: () => import('@/pages/portal/NewTicket.vue'),
+				props: true
+			},
+			{
+				path: 'tickets/new',
+				name: 'DefaultNewTicket',
+				component: () => import('@/pages/portal/NewTicket.vue'),
+			}
 		]
 	},
 ]
