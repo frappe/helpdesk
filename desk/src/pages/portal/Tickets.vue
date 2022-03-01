@@ -5,7 +5,23 @@
 				<div class="mb-2">
 					<p class="text-4xl font-semibold">Your Tickets</p>
 				</div>
-				<Button icon-left="plus" appearance="primary">Create New</Button>
+				<Dropdown
+					placement="right"
+					:options="ticketTemplateOptions()"
+					:dropdown-width-full="true"
+				>
+					<template v-slot="{ toggleTemplates }">
+						<div>
+							<Button 
+								@click="ticketTemplates ? toggleTemplates : () => {}" 
+								icon-left="plus" 
+								appearance="primary"
+							>
+								Create New
+							</Button>
+						</div>
+					</template>
+				</Dropdown>
 			</div>
 			<div class="pt-4 px-4 pb-2 bg-white border rounded-lg shadow">
 				<div v-for="(ticket, index) in tickets" :key="ticket.name" class="space-y-4">
@@ -29,18 +45,20 @@
 
 <script>
 import { inject } from 'vue'
-import { Badge } from 'frappe-ui'
+import { Badge, Dropdown } from 'frappe-ui'
 
 export default {
 	name: "Tickets",
 	components: {
-		Badge
+		Badge,
+		Dropdown
 	},
 	setup() {
 		const tickets = inject('tickets')
+		const ticketTemplates = inject('ticketTemplates')
 		const ticketController = inject('ticketController')
 
-		return { tickets, ticketController }
+		return { tickets, ticketTemplates, ticketController }
 	},
 	computed: {
 		tickets() {
@@ -70,6 +88,22 @@ export default {
 					return 'green'
 				case 'Open':
 					return 'red'
+			}
+		},
+		ticketTemplateOptions() {
+			let templateItems = [];
+			if (this.ticketTemplates) {
+				this.ticketTemplates.forEach(type => {
+					templateItems.push({
+						label: type.name,
+						handler: () => {
+							// TODO: redirect to new ticket page 
+						},
+					});
+				});
+				return templateItems;
+			} else {
+				return null;
 			}
 		}
 	}

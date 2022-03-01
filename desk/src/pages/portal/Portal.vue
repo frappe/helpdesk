@@ -27,13 +27,15 @@ export default {
 
 		const tickets = ref()
 		const ticketStatuses = ref([])
+		const ticketTemplates = ref([])
 		const ticketController = ref({})
 
 		provide('tickets', tickets)
 		provide('ticketStatuses', ticketStatuses)
+		provide('ticketTemplates', ticketTemplates)
 		provide('ticketController', ticketController)
 
-		return { user, tickets, ticketStatuses, ticketController }
+		return { user, tickets, ticketStatuses, ticketTemplates, ticketController }
 	},
 	mounted() {
 		this.ticketController.createTicket = ((template='Default') => {
@@ -99,6 +101,22 @@ export default {
 				auto: true,
 				onSuccess: (data) => {
 					this.ticketStatuses = data
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		templates() {
+			return {
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Ticket Template',
+				},
+				auto: true,
+				onSuccess: (data) => {
+					this.ticketTemplates = data
+					console.log(data)
 				},
 				onFailure: () => {
 					// TODO:

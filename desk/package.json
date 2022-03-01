@@ -1,32 +1,32 @@
-	{
-		"name": "frappe-ui-frontend",
-		"private": true,
-		"version": "0.0.0",
-		"scripts": {
-			"dev": "vite",
-			"preview": "vite preview",
-			"build": "vite build --base=/assets/helpdesk/desk/ && yarn copy-html-entry",
-			"serve": "vite preview",
-			"copy-html-entry": "cp ../helpdesk/public/desk/index.html ../helpdesk/www/helpdesk/index.html"
-		},
-		"dependencies": {
-			"@headlessui/vue": "^1.5.0",
-			"@tiptap/starter-kit": "^2.0.0-beta.183",
-			"@tiptap/vue-3": "^2.0.0-beta.90",
-			"@vueup/vue-quill": "^1.0.0-beta.8",
-			"dayjs": "^1.10.7",
-			"feather-icons": "^4.28.0",
-			"frappe-ui": "0.0.8",
-			"luxon": "^2.3.0",
-			"sass": "^1.49.8",
-			"vue": "^3.2.29",
-			"vue-router": "^4.0.12"
-		},
-		"devDependencies": {
-			"@vitejs/plugin-vue": "^2.1.0",
-			"autoprefixer": "^10.4.2",
-			"postcss": "^8.4.6",
-			"tailwindcss": "^3.0.18",
-			"vite": "^2.7.13"
-		}
+{
+	"name": "frappe-ui-frontend",
+	"private": true,
+	"version": "0.0.0",
+	"scripts": {
+		"dev": "vite",
+		"preview": "vite preview",
+		"build": "vite build --base=/assets/helpdesk/desk/ && yarn copy-html-entry",
+		"serve": "vite preview",
+		"copy-html-entry": "cp ../helpdesk/public/desk/index.html ../helpdesk/www/helpdesk/index.html"
+	},
+	"dependencies": {
+		"@headlessui/vue": "^1.5.0",
+		"@tiptap/starter-kit": "^2.0.0-beta.183",
+		"@tiptap/vue-3": "^2.0.0-beta.90",
+		"@vueup/vue-quill": "^1.0.0-beta.8",
+		"dayjs": "^1.10.7",
+		"feather-icons": "^4.28.0",
+		"frappe-ui": "0.0.11",
+		"luxon": "^2.3.0",
+		"sass": "^1.49.8",
+		"vue": "^3.2.29",
+		"vue-router": "^4.0.12"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^2.1.0",
+		"autoprefixer": "^10.4.2",
+		"postcss": "^8.4.6",
+		"tailwindcss": "^3.0.18",
+		"vite": "^2.7.13"
 	}
+}
