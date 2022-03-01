@@ -185,7 +185,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			"email_status": "Open",
 			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
 			"sender": frappe.session.user,
-			"recipients": ticket_doc.raised_by,
+			"recipients": frappe.get_value("User", "Administrator", "email") if ticket_doc.raised_by == 'Administrator' else ticket_doc.raised_by,
 			"content": message,
 			"status": "Linked",
 			"reference_doctype": "Ticket",
