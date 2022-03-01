@@ -15,13 +15,13 @@
                         <div v-else-if="field.fieldtype == 'Text Editor'">
                             <div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
                             <div>
-                                <TextEditor showMenu="true" style="min-height:150px; max-height:200px; overflow-y: auto;" />
+                                <TextEditor v-model="formData[field.fieldname]" showMenu="true" style="min-height:150px; max-height:200px; overflow-y: auto;" />
                             </div>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <Button appearance="primary">Submit</Button>
+                    <Button :loading="newTicketSubmitLoading" appearance="primary" @click="submitTicket()">Submit</Button>
                 </div>
                 {{ formData }}
             </Card>
@@ -45,8 +45,9 @@ export default {
         const ticketController = inject('ticketController')
 
         const formData = ref({})
+        const newTicketSubmitLoading = ref(false)
 
-        return { ticketTemplates, ticketController, formData }
+        return { ticketTemplates, ticketController, formData, newTicketSubmitLoading }
     },
     computed: {
         template() {
@@ -65,12 +66,13 @@ export default {
     },
     methods: {
         submitTicket() {
-            if (validateTicketForm()) {
-                this.ticketController.new('ticket', this.formData)
+            if (this.validateTicketForm()) {
+                this.newTicketSubmitLoading = this.ticketController.newTicket(this.formData, this.template.name)
             }
         },
         validateTicketForm() {
-
+            // TODO: check for mandatory fields
+            return true
         }
     }
 }

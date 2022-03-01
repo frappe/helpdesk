@@ -46,15 +46,27 @@ def get_ticket(ticket_id):
 	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
-def create_new(values):
+def create_new(values, template='Default'):
 	ticket_doc = frappe.new_doc("Ticket")
 
 	ticket_doc.subject = values['subject']
 	ticket_doc.description = values['description']
-	
-	ticket_doc.insert(ignore_permissions=True)
 
+	ticket_doc.template = template
+	template_fields = frappe.get_doc("Ticket Template", template).fields
+	for field in template_fields:
+		if field.fieldname in ['subject', 'description']:
+			continue
+
+		ticket_doc.append('custom_fields', {
+			'fieldname': field.fieldname,
+			'value': values[field.fieldname]
+		})
+
+	ticket_doc.insert(ignore_permissions=True)
 	ticket_doc.create_communication()
+
+	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
 def update_contact(ticket_id, contact):
@@ -63,7 +75,7 @@ def update_contact(ticket_id, contact):
 		contact_doc = frappe.get_doc("Contact", contact)
 		if contact_doc.email_ids and len(contact_doc.email_ids) > 0:
 			ticket_doc.raised_by = contact_doc.email_ids[0]
-		print(f'ticket_doc : {ticket_doc}')
+
 		ticket_doc.save()
 		
 		frappe.db.commit()
@@ -187,5 +199,4 @@ def get_all_ticket_templates():
 	for index, template in enumerate(templates):
 		templates[index] = frappe.get_doc("Ticket Template", template.name).__dict__
 	
-	print(templates)
 	return templates

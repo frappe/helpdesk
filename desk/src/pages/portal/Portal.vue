@@ -50,12 +50,9 @@ export default {
 				this.$resources.tickets.fetch()
 			}
 		}
-		this.ticketController.new = (type, values) => {
-			switch (type) {
-				case 'ticket':
-					this.$resources.createTicket.submit(values)
-					break
-			}
+		this.ticketController.newTicket = (values, template) => {
+			this.$resources.createTicket.submit({values, template})
+			return this.$resources.createTicket.loading
 		}
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
@@ -97,7 +94,7 @@ export default {
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket
 				},
-				onFailure: () => {
+				onFailure: (ticket) => {
 					// TODO:
 				}
 			}
@@ -140,8 +137,14 @@ export default {
 		createTicket() {
 			return {
 				method: 'helpdesk.api.ticket.create_new',
-				onSuccess: () => {
+				onSuccess: (ticket) => {
 					this.ticketController.update()
+					this.$router.push({ 
+						name: "PortalTicket",
+						params: {
+							ticketId: ticket.name
+						}
+					})
 				},
 				onFailure: () => {
 					// TODO:

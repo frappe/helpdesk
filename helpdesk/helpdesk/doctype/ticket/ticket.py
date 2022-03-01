@@ -231,8 +231,13 @@ def get_all_conversations(ticket):
 	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received", "sender"])
 	
 	for conversation in conversations:
+		contacts = frappe.get_all('Contact Email', filters=[['email_id', 'like', '%{0}'.format(conversation.sender)]], fields=["parent"], limit=1)
+		if len(contacts) > 0:
+			sender = frappe.get_doc("Contact", contacts[0].parent)
+		else:
+			sender = frappe.get_last_doc("User", filters={'email': conversation.sender})
 
-		sender = frappe.get_last_doc("Contact", filters={"email_id": conversation.sender})
+		conversation.sender = sender
 
 		attachments = frappe.get_all(
 			"File", 
@@ -241,7 +246,7 @@ def get_all_conversations(ticket):
 		)
 
 		conversation.attachments = attachments
-		conversation.sender = sender
+		
 
 	return conversations
 
