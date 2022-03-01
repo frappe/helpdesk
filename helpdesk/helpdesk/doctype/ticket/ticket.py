@@ -231,11 +231,16 @@ def get_all_conversations(ticket):
 	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received", "sender"])
 	
 	for conversation in conversations:
-		contacts = frappe.get_all('Contact Email', filters=[['email_id', 'like', '%{0}'.format(conversation.sender)]], fields=["parent"], limit=1)
-		if len(contacts) > 0:
-			sender = frappe.get_doc("Contact", contacts[0].parent)
+		if frappe.db.exists("Agent", conversation.sender):
+			# user User details instead of Contact if the sender is an agent
+			sender = frappe.get_doc("User", conversation.sender).__dict__
+			sender['image'] = sender['user_image']
 		else:
-			sender = frappe.get_last_doc("User", filters={'email': conversation.sender})
+			contacts = frappe.get_all('Contact Email', filters=[['email_id', 'like', '%{0}'.format(conversation.sender)]], fields=["parent"], limit=1)
+			if len(contacts) > 0:
+				sender = frappe.get_doc("Contact", contacts[0].parent)
+			else:
+				sender = frappe.get_last_doc("User", filters={'email': conversation.sender})
 
 		conversation.sender = sender
 
