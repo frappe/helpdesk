@@ -111,17 +111,11 @@ def add_default_sla():
 	sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_resolved)
 	sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_closed)
 
-	sla_paused_on_hold = frappe.get_doc({
-		"doctype": "Pause SLA On Status",
-		"status": "On Hold"
-	})
-
 	sla_paused_on_replied = frappe.get_doc({
 		"doctype": "Pause SLA On Status",
 		"status": "Replied"
 	})
 
-	sla_doc.append("pause_sla_on", sla_paused_on_hold)
 	sla_doc.append("pause_sla_on", sla_paused_on_replied)
 
 	sla_doc.holiday_list = "Default"
@@ -191,5 +185,3 @@ def add_default_ticket_priorities():
 			priority_doc = frappe.new_doc("Ticket Priority")
 			priority_doc.name = priority
 			priority_doc.insert()
-
-# Low, Medium, High, Urgent
