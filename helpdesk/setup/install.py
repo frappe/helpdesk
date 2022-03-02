@@ -5,10 +5,10 @@ def before_install():
 
 def after_install():
 	add_default_categories()
-	add_default_sla()
-	add_default_ticket_template()
 	add_default_ticket_types()
 	add_default_ticket_priorities()
+	add_default_sla()
+	add_default_ticket_template()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
@@ -85,9 +85,18 @@ def add_default_sla():
 		"resolution_time": 60 * 60 * 4,
 	})
 
+	urgent_priority = frappe.get_doc({
+		"doctype": "Service Level Priority",
+		"default_priority": 0,
+		"priority": "Urgent",
+		"response_time": 60 * 30,
+		"resolution_time": 60 * 60 * 2,
+	})
+
 	sla_doc.append("priorities", low_priority)
 	sla_doc.append("priorities", medium_priority)
 	sla_doc.append("priorities", high_priority)
+	sla_doc.append("priorities", urgent_priority)
 
 	sla_fullfilled_on_resolved = frappe.get_doc({
 		"doctype": "SLA Fulfilled On Status",
@@ -127,22 +136,6 @@ def add_default_sla():
 		sla_doc.append("support_and_resolution", service_day)
 
 	sla_doc.insert()
-
-def add_default_ticket_priorities():
-	frappe.get_doc({
-		"doctype": "Ticket Priority",
-		"name": "Low"
-	}).insert()
-
-	frappe.get_doc({
-		"doctype": "Ticket Priority",
-		"name": "Medium"
-	}).insert()
-
-	frappe.get_doc({
-		"doctype": "Ticket Priority",
-		"name": "High"
-	}).insert()
 
 def add_default_holidy_list():
 	from datetime import datetime
