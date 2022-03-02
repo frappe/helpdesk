@@ -7,6 +7,8 @@ def after_install():
 	add_default_categories()
 	add_default_sla()
 	add_default_ticket_template()
+	add_default_ticket_types()
+	add_default_ticket_priorities()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
@@ -187,3 +189,14 @@ def add_default_ticket_types():
 			type_doc = frappe.new_doc("Ticket Type")
 			type_doc.name = type
 			type_doc.insert()
+
+def add_default_ticket_priorities():
+	ticket_priorities = ["Low", "Medium", "High", "Urgent"]
+
+	for priority in ticket_priorities:
+		if not frappe.db.exists("Ticket Priority", priority):
+			priority_doc = frappe.new_doc("Ticket Priority")
+			priority_doc.name = priority
+			priority_doc.insert()
+
+# Low, Medium, High, Urgent

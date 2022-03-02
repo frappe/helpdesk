@@ -3,3 +3,4 @@ helpdesk.patches.remove_base_route_redirect_and_set_home_page_to_kb
 helpdesk.patches.add_support_redirect_to_tickets
 helpdesk.patches.add_default_ticket_template
 helpdesk.patches.add_default_ticket_types
+helpdesk.patches.add_default_ticket_priorities
