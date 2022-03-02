@@ -10,7 +10,7 @@ import frappe
 from frappe import _
 from frappe.core.utils import get_parent_doc
 from frappe.email.inbox import link_communication_to_document
-from frappe.website.website_generator import WebsiteGenerator
+from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
@@ -18,7 +18,7 @@ from frappe.website.utils import cleanup_page_name
 from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
 
 
-class Ticket(WebsiteGenerator):
+class Ticket(Document):
 	def autoname(self):
 		return self.name
 
@@ -33,9 +33,6 @@ class Ticket(WebsiteGenerator):
 			self.raised_by = frappe.session.user
 
 		self.set_contact(self.raised_by)
-
-	def before_save(self):
-		self.route = f"support/tickets/{cleanup_page_name(self.name)}"
 
 	def on_update(self):
 		# Add a communication in the ticket timeline
@@ -141,9 +138,13 @@ class Ticket(WebsiteGenerator):
 		})
 		frappe.db.commit()
 
-@frappe.whitelist()
-def create_communication_via_contact(ticket, message, attachments):
+@frappe.whitelist(allow_guest=True)
+def create_communication_via_contact(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
+
+	if ticket_doc.status == 'Replied':
+		ticket_doc.status = 'Open'
+		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")
 	communication.update(
@@ -278,7 +279,7 @@ def get_list_context(context=None):
 def get_user_tickets(filters='{}', order_by='creation desc'):
 	filters = json.loads(filters)
 	filters['raised_by'] = ['=', frappe.session.user]
-	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'route'])
+	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation'])
 	return tickets
 
 def get_ticket_list(

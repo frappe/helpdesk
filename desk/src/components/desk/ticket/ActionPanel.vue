@@ -5,7 +5,7 @@
 			<div class="text-base space-y-2">
 				<div class="flex flex-col space-y-2">
 					<div class="flex space-x-2 items-center">
-						<div class="text-slate-500">First Response Due</div>
+						<div class="text-slate-500">{{`First Response ${firstResponseStatus() ? '' : 'Due'}`}}</div>
 						<div v-if="firstResponseStatus()">
 							<FeatherIcon v-if="firstResponseStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
 							<FeatherIcon v-if="firstResponseStatus() == 'Success'" name="check" class="stroke-green-500 w-5 h-5"/>
@@ -13,9 +13,16 @@
 					</div>
 					<div v-if="!firstResponseStatus()">{{ getFormatedDate(ticket.response_by, 'ddd, MMM DD, YYYY HH:mm')}}</div>
 				</div>
-				<div class="flex flex-col space-y-2" v-if="ticket.resolution_by">
-					<div class="text-slate-500">Resolution Due</div>
-					<div>{{ getFormatedDate(ticket.resolution_by, 'ddd, MMM DD, YYYY HH:mm') }}</div>
+				<div class="flex flex-col space-y-2">
+					<div class="flex space-x-2 items-center">
+						<div class="text-slate-500">{{`Resolution ${resolutionStatus() ? '' : 'Due'}`}}</div>
+						<div v-if="resolutionStatus()">
+							<FeatherIcon v-if="resolutionStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
+							<FeatherIcon v-else-if="resolutionStatus() == 'Success'" name="check" class="stroke-green-500 w-5 h-5"/>
+							<Badge v-else-if="resolutionStatus() == 'Paused'" color="blue">Paused</Badge>
+						</div>
+					</div>
+					<div v-if="!resolutionStatus()">{{ getFormatedDate(ticket.resolution_by, 'ddd, MMM DD, YYYY HH:mm') }}</div>
 				</div>
 			</div>
 		</div>
@@ -294,6 +301,20 @@ export default {
 				return this.ticket.response_by > this.ticket.first_responded_on ? 'Success' : 'Failed'
 			} else {
 				return null
+			}
+		},
+		resolutionStatus() {
+			switch(this.ticket.agreement_status) {
+				case 'Resolution Due':
+					return this.ticket.resolution_by ? '' : 'Paused'
+				case 'Fulfilled':
+					return 'Success'
+				case 'Overdue':
+					return 'Failed'
+				default:
+					return ''
+
+
 			}
 		}
 	}
