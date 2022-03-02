@@ -17,7 +17,8 @@ def get_tickets(filter=None):
 			ticket.response_by,
 			ticket.agreement_status,
 			ticket.contact,
-			ticket.template
+			ticket.template,
+			ticket.first_responded_on
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)

@@ -4,12 +4,18 @@
 			<div class="text-lg font-medium">{{ `Ticket #${ticket.name}` }}</div>
 			<div class="text-base space-y-2">
 				<div class="flex flex-col space-y-2">
-					<div class="text-slate-500">First Response Due</div>
-					<div>{{ $dayjs(ticket.response_by).format('ddd, MMM DD, YYYY H:m') }}</div>
+					<div class="flex space-x-2 items-center">
+						<div class="text-slate-500">First Response Due</div>
+						<div v-if="firstResponseStatus()">
+							<FeatherIcon v-if="firstResponseStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
+							<FeatherIcon v-if="firstResponseStatus() == 'Success'" name="check" class="stroke-green-500 w-5 h-5"/>
+						</div>
+					</div>
+					<div v-if="!firstResponseStatus()">{{ getFormatedDate(ticket.response_by, 'ddd, MMM DD, YYYY HH:mm')}}</div>
 				</div>
-				<div class="flex flex-col space-y-2">
+				<div class="flex flex-col space-y-2" v-if="ticket.resolution_by">
 					<div class="text-slate-500">Resolution Due</div>
-					<div>{{ $dayjs(ticket.resolution_by).format('ddd, MMM DD, YYYY H:m') }}</div>
+					<div>{{ getFormatedDate(ticket.resolution_by, 'ddd, MMM DD, YYYY HH:mm') }}</div>
 				</div>
 			</div>
 		</div>
@@ -111,7 +117,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown, Input, Dialog } from 'frappe-ui'
+import { FeatherIcon, Dropdown, Input, Dialog, Badge } from 'frappe-ui'
 import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { inject } from '@vue/runtime-core'
@@ -120,6 +126,7 @@ export default {
 	name: "ActionPanel",
 	props: ["ticketId"],
 	components: {
+		Badge,
 		FeatherIcon,
 		Dropdown,
 		CustomDropdown,
@@ -278,6 +285,16 @@ export default {
 		},
 		redirectToRoute(route) {
 			window.location.href = route
+		},
+		getFormatedDate(date, format) {
+			return date ? this.$dayjs(date).format(format) : ''
+		},
+		firstResponseStatus() {
+			if (this.ticket.first_responded_on) {
+				return this.ticket.response_by > this.ticket.first_responded_on ? 'Success' : 'Failed'
+			} else {
+				return null
+			}
 		}
 	}
 }
