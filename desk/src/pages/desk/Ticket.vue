@@ -145,7 +145,7 @@ export default {
 	resources: {
 		submitConversation() {
 			return {
-				method: 'helpdesk.api.ticket.submit_conversation',
+				method: 'helpdesk.api.ticket.submit_conversation_via_agent',
 				onSuccess: () => {
 					// this.$resources.conversations.fetch();
 				}

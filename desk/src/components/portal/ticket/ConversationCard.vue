@@ -1,5 +1,5 @@
 <template>
-	<div class="space-y-2 mx-2 mb-5 rounded-md shadow p-4 ">
+	<div class="space-y-2 mx-2 mt-5 rounded-md shadow p-4 ">
 		<div class="flex space-x-2 items-center">
 			<Avatar :label="userName" :imageURL="profilePicUrl" size="md" />
 			<div>
