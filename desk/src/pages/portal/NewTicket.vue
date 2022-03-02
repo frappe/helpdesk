@@ -38,7 +38,6 @@
 				<div>
 					<Button :loading="newTicketSubmitLoading" appearance="primary" @click="submitTicket()">Submit</Button>
 				</div>
-				{{ formData }}
 			</Card>
 		</div>
 	</div>
