@@ -1,6 +1,6 @@
 <template>
-	<div v-if="template" class="mx-auto max-w-5xl pt-20">
-		<div class="sm:w-8/12">
+	<div v-if="template" class="mx-auto max-w-4xl pt-20">
+		<div>
 			<Card 
 				:title="`New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}`" class="space-y-6"
 			>
@@ -28,7 +28,7 @@
 							>
 								<template v-slot="{ toggleDropdown }">
 									<div>
-										<Button @click="toggleDropdown">{{ field.label }}</Button>
+										<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Choose' }}</Button>
 									</div>
 								</template>
 							</Dropdown>

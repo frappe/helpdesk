@@ -1,13 +1,16 @@
 <template>
-	<div v-if="ticket" class="flex max-w-4xl mx-auto pt-20">
+	<div v-if="ticket" class="max-w-4xl mx-auto pt-20">
 		<div 
-			class="sm:w-8/12"
 			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9rem)' : null }"
 		>
-			<div class="flex items-center pb-2 border-b">
-				<span class="text-4xl">
+			<div class="flex items-center pb-2 border-b justify-between">
+				<div class="text-4xl">
 					{{ ticket.subject }}
-				</span>
+				</div>
+				<div>
+					<Button @click="reopenTicket()" appearance="primary" v-if="['Closed', 'Resolved'].includes(ticket.status)">Reopen</Button>
+					<Button @click="closeTicket()" appearance="primary" v-else>Close</Button>
+				</div>
 			</div>
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
@@ -39,9 +42,9 @@
 				</div>
 			</div>
 		</div>
-		<div class="sm:w-4/12">
+		<!-- <div class="sm:w-4/12">
 			<ActionPanel :ticketId="ticket.name" />
-		</div>
+		</div> -->
 	</div>
 </template>
 
@@ -109,7 +112,7 @@ export default {
 	resources: {
 		submitConversation() {
 			return {
-				method: 'helpdesk.api.ticket.submit_conversation',
+				method: 'helpdesk.api.ticket.submit_conversation_via_contact',
 				onSuccess: () => {
 					// this.$resources.conversations.fetch();
 				}
@@ -131,6 +134,12 @@ export default {
 				message: this.content
 			})
 		},
+		closeTicket() {
+			this.ticketController.set(this.ticketId, 'status', 'Closed')
+		},
+		reopenTicket() {
+			this.ticketController.set(this.ticketId, 'status', 'Open')
+		}
 	}
 }
 </script>
