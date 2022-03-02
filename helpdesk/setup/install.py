@@ -6,6 +6,7 @@ def before_install():
 def after_install():
 	add_default_categories()
 	add_default_sla()
+	add_default_ticket_template()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
@@ -177,3 +178,12 @@ def add_default_ticket_template():
 	})
 
 	template.insert()
+
+def add_default_ticket_types():
+	ticket_types = ["Question", "Bug", "Incident"]
+
+	for type in ticket_types:
+		if not frappe.db.exists("Ticket Type", type):
+			type_doc = frappe.new_doc("Ticket Type")
+			type_doc.name = type
+			type_doc.insert()
