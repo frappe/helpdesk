@@ -157,3 +157,20 @@ def enable_track_service_level_agreement_in_support_settings():
 	support_settings.track_service_level_agreement = True
 	support_settings.save()
 	frappe.db.commit()
+
+def add_default_ticket_template():
+	template = frappe.new_doc("Ticket Template")
+	
+	template.template_name = "Default"
+	template.append("fields", {
+		'label': 'Subject',
+		'fieldname': 'subject',
+		'fieldtype': 'Data',
+	})
+	template.append("fields", {
+		'label': 'Description',
+		'fieldname': 'description',
+		'fieldtype': 'Long Text',
+	})
+
+	template.insert()

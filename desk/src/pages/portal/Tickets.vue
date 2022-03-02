@@ -13,7 +13,7 @@
 					<template v-slot="{ toggleTemplates }">
 						<div>
 							<Button 
-								@click="toggleTemplates" 
+								@click="ticketTemplateOptions().length > 1 ? toggleTemplates : openDefaultTicketTemplate()"
 								icon-left="plus" 
 								appearance="primary"
 							>
@@ -97,7 +97,6 @@ export default {
 					templateItems.push({
 						label: template.name,
 						handler: () => {
-							console.log(template)
 							this.$router.push({
 								name: 'TemplatedNewTicket',
 								params: {
@@ -112,6 +111,11 @@ export default {
 				return null;
 			}
 		},
+		openDefaultTicketTemplate() {
+			this.$router.push({
+				name: 'DefaultNewTicket'
+			})
+		}
 	}
 }
 </script>
