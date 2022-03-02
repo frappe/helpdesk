@@ -18,8 +18,8 @@
 						<div class="text-base font-medium">{{ ticket.subject }}</div>
 						<div class="ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
 						<div class="ml-1">
-							<Badge :color="getResolutionBadgeColor(ticket.resolution_by, ticket.agreement_status)">
-								{{ getResolutionDueIn(ticket.resolution_by, ticket.agreement_status) }}
+							<Badge v-if="getResolutionDueIn()" :color="getResolutionBadgeColor()">
+								{{ getResolutionDueIn() }}
 							</Badge>
 						</div>
 					</div>
@@ -325,16 +325,29 @@ export default {
 				return null;
 			}
 		},
-		getResolutionDueIn(resolutionBy, agreementStatus) {
+		getResolutionDueIn() {
+			let resolutionBy = this.ticket.resolution_by
+			let agreementStatus = this.ticket.agreement_status
+
 			if (["Fulfilled", "Overdue"].includes(agreementStatus)) {
 				return agreementStatus;
 			}
 			let resolutionString = this.$dayjs().to(resolutionBy);
+			if (["Resolution Due"].includes(agreementStatus)) {
+				return this.ticket.resolution_by ? "Due " + resolutionString : ''
+			}
 			return !resolutionString.includes("in") ? "Overdue" : "Due " + resolutionString;
 		},
-		getResolutionBadgeColor(resolutionBy, agreementStatus) {
-			let resolutionString = this.$dayjs().to(resolutionBy);
-			return !resolutionString.includes("in") ? "red" : (agreementStatus == "Fulfilled" ? "green" : "");
+		getResolutionBadgeColor() {
+			let resolutionDueIn = this.getResolutionDueIn()
+			switch (resolutionDueIn) {
+				case "Fulfilled":
+					return "green"
+				case "Overdue":
+					return "red"
+				default:
+					return ""
+			}
 		}
 	}
 }

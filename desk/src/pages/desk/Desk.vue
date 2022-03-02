@@ -144,7 +144,7 @@ export default {
 					this.ticketController.update()
 					break
 				case 'Ticket Type':
-					this.$resources.type.fetch()
+					this.$resources.types.fetch()
 					break
 				case 'Contact':
 					this.$resources.contacts.fetch()
