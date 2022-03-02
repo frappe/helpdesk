@@ -1,5 +1,6 @@
 import frappe
 from helpdesk.helpdesk.doctype.ticket.ticket import get_all_conversations, create_communication_via_agent
+from frappe.website.utils import cleanup_page_name
 import json
 
 @frappe.whitelist(allow_guest=True)
@@ -62,7 +63,8 @@ def create_new(values, template='Default'):
 
 		ticket_doc.append('custom_fields', {
 			'fieldname': field.fieldname,
-			'value': values[field.fieldname]
+			'value': values[field.fieldname],
+			'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''
 		})
 
 	ticket_doc.insert(ignore_permissions=True)
