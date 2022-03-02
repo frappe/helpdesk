@@ -185,7 +185,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			"email_status": "Open",
 			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
 			"sender": frappe.session.user,
-			"recipients": ticket_doc.raised_by,
+			"recipients": frappe.get_value("User", "Administrator", "email") if ticket_doc.raised_by == 'Administrator' else ticket_doc.raised_by,
 			"content": message,
 			"status": "Linked",
 			"reference_doctype": "Ticket",
@@ -231,8 +231,18 @@ def get_all_conversations(ticket):
 	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received", "sender"])
 	
 	for conversation in conversations:
+		if frappe.db.exists("Agent", conversation.sender):
+			# user User details instead of Contact if the sender is an agent
+			sender = frappe.get_doc("User", conversation.sender).__dict__
+			sender['image'] = sender['user_image']
+		else:
+			contacts = frappe.get_all('Contact Email', filters=[['email_id', 'like', '%{0}'.format(conversation.sender)]], fields=["parent"], limit=1)
+			if len(contacts) > 0:
+				sender = frappe.get_doc("Contact", contacts[0].parent)
+			else:
+				sender = frappe.get_last_doc("User", filters={'email': conversation.sender})
 
-		sender = frappe.get_last_doc("Contact", filters={"email_id": conversation.sender})
+		conversation.sender = sender
 
 		attachments = frappe.get_all(
 			"File", 
@@ -241,7 +251,7 @@ def get_all_conversations(ticket):
 		)
 
 		conversation.attachments = attachments
-		conversation.sender = sender
+		
 
 	return conversations
 
@@ -265,7 +275,7 @@ def get_list_context(context=None):
 	}
 
 @frappe.whitelist()
-def get_user_tickets(filters={}, order_by='creation desc'):
+def get_user_tickets(filters='{}', order_by='creation desc'):
 	filters = json.loads(filters)
 	filters['raised_by'] = ['=', frappe.session.user]
 	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'route'])

@@ -47,8 +47,6 @@ export default {
 	mounted() {
 		if (this.user.isLoggedIn()) {
 			this.$resources.user.fetch()
-		} else {
-			this.user.showLoginPage()
 		}
 	},
 	resources: {

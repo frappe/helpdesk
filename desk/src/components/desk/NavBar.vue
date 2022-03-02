@@ -40,7 +40,7 @@
 				:options="getAvatarClickOptions()" 
 			>
 				<template v-slot="{ toggleAssignees }" @click="toggleAssignees">
-					<Avatar class="cursor-pointer" v-if="user" :imageURL="user.profile_image" />
+					<Avatar :label="user.username" class="cursor-pointer" v-if="user" :imageURL="user.profile_image" />
 				</template>
 			</Dropdown>
 		</div>

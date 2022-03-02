@@ -24,7 +24,7 @@
 					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="user.agent">
-								<Avatar label="John Doe" :imageURL="user.profile_image" size="md" />
+								<Avatar :imageURL="user.profile_image" size="md" />
 							</div>
 							<div class="grow ml-3">
 								<div v-if="editing">
@@ -40,7 +40,7 @@
 											:loading="this.$resources.submitConversation.loading" 
 											@click="this.submitConversation" 
 											appearance="primary" 
-											:disabled="!user.agent"
+											:disabled="!user.agent && !user.isAdmin"
 										>
 											Send
 										</Button>

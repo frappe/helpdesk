@@ -75,6 +75,10 @@ export default {
 		}
 	},
 	mounted() {
+		if (!this.user.isLoggedIn()) {
+			this.user.showLoginPage()
+		}
+
 		this.ticketController.update = (ticketId) => {
 			if (ticketId) {
 				this.$resources.ticket.fetch({
@@ -120,17 +124,16 @@ export default {
 					break
 			}
 		},
-		this.ticketController.new = (type, value) => {
+		this.ticketController.new = (type, values) => {
 			switch (type) {
 				case 'ticket':
 					this.$resources.createTicket.submit({
-						subject: value.subject,
-						description: value.description
+						values
 					})
 					break
 				case 'type':
 					this.$resources.createTicketType.subject({
-						type: value
+						type: values
 					})
 					break
 			}

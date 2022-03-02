@@ -10,23 +10,25 @@
 				/>
 			</div>
 			<div v-if="!editing" class="space-y-2">
-				<div class="flex space-x-2">
-					<FeatherIcon name="user" class="w-4 h-4" />
-					<div class="text-slate-500 truncate">{{ contactFullName }}</div>
-				</div>
-				<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
-					<FeatherIcon name="mail" class="w-4 h-4" />
-					<div>
-						<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-							<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+				<div v-if="ticket.contact">
+					<div class="flex space-x-2">
+						<FeatherIcon name="user" class="w-4 h-4" />
+						<div class="text-slate-500 truncate">{{ contactFullName }}</div>
+					</div>
+					<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
+						<FeatherIcon name="mail" class="w-4 h-4" />
+						<div>
+							<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
+								<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
-					<FeatherIcon name="phone" class="w-4 h-4" />
-					<div>
-						<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-							<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+					<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
+						<FeatherIcon name="phone" class="w-4 h-4" />
+						<div>
+							<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
+								<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+							</div>
 						</div>
 					</div>
 				</div>

@@ -1,5 +1,6 @@
 import frappe
 from helpdesk.helpdesk.doctype.ticket.ticket import get_all_conversations, create_communication_via_agent
+from frappe.website.utils import cleanup_page_name
 import json
 
 @frappe.whitelist(allow_guest=True)
@@ -15,7 +16,8 @@ def get_tickets(filter=None):
 			ticket.resolution_by,
 			ticket.response_by,
 			ticket.agreement_status,
-			ticket.contact
+			ticket.contact,
+			ticket.template
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
@@ -31,6 +33,7 @@ def get_tickets(filter=None):
 		else:
 			filtered_tickets.append(ticket)
 
+		ticket['custom_fields'] = frappe.get_doc("Ticket", ticket.name, fields=['custom_fields']).custom_fields
 		ticket['assignees'] = assignees
 		ticket['contact'] = get_contact(ticket['name'])
 	
@@ -46,21 +49,38 @@ def get_ticket(ticket_id):
 	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
-def create_new(subject, description):
+def create_new(values, template='Default'):
 	ticket_doc = frappe.new_doc("Ticket")
-	ticket_doc.subject = subject
-	ticket_doc.description = description
-	ticket_doc.insert(ignore_permissions=True)
 
+	ticket_doc.subject = values['subject']
+	ticket_doc.description = values['description']
+
+	ticket_doc.template = template
+	template_fields = frappe.get_doc("Ticket Template", template).fields
+	for field in template_fields:
+		if field.fieldname in ['subject', 'description']:
+			continue
+
+		ticket_doc.append('custom_fields', {
+			'label': field.label,
+			'fieldname': field.fieldname,
+			'value': values[field.fieldname],
+			'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''
+		})
+
+	ticket_doc.insert(ignore_permissions=True)
 	ticket_doc.create_communication()
+
+	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
 def update_contact(ticket_id, contact):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		contact_doc = frappe.get_doc("Contact", contact)
-		ticket_doc.contact = contact_doc.name
-		ticket_doc.raised_by = contact_doc.email_id
+		if contact_doc.email_ids and len(contact_doc.email_ids) > 0:
+			ticket_doc.raised_by = contact_doc.email_ids[0].email_id
+
 		ticket_doc.save()
 		
 		frappe.db.commit()
@@ -177,3 +197,11 @@ def check_and_create_ticket_type(type):
 		ticket_type_doc = frappe.get_doc("Ticket Type", type)
 
 	return ticket_type_doc
+
+@frappe.whitelist(allow_guest=True)
+def get_all_ticket_templates():
+	templates = frappe.get_all("Ticket Template")
+	for index, template in enumerate(templates):
+		templates[index] = frappe.get_doc("Ticket Template", template.name).__dict__
+	
+	return templates

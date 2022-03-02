@@ -13,7 +13,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="py-4 space-y-3">
+		<div class="py-4 space-y-3" :class="ticket.custom_fields.length > 0 ? 'border-b' : ''">
 			<div class="text-base space-y-2">
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Assignee</div>
@@ -85,6 +85,15 @@
 						</template>
 					</CustomDropdown>
 				</div>
+			</div>
+		</div>
+		<div class="py-4 border-b space-y-3" v-if="ticket.custom_fields.length > 0">
+			<div class="text-lg font-medium">{{ `Custom Fields (${ticket.template})` }}</div>
+			<div class="text-base space-y-2">
+					<div class="flex flex-col space-y-2" v-for="field in ticket.custom_fields" :key="field">
+						<div class="text-slate-500">{{ field.label }}</div>
+						<div :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
+					</div>
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -267,6 +276,9 @@ export default {
 				return null;
 			}
 		},
+		redirectToRoute(route) {
+			window.location.href = route
+		}
 	}
 }
 </script>
