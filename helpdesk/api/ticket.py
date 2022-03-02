@@ -62,6 +62,7 @@ def create_new(values, template='Default'):
 			continue
 
 		ticket_doc.append('custom_fields', {
+			'label': field.label,
 			'fieldname': field.fieldname,
 			'value': values[field.fieldname],
 			'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''

@@ -6,6 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "label",
   "fieldname",
   "value",
   "route"
@@ -27,12 +28,17 @@
    "fieldname": "route",
    "fieldtype": "Data",
    "label": "Route"
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "Label"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-02 09:09:43.571256",
+ "modified": "2022-03-02 09:29:15.645493",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket Custom Field",

@@ -91,7 +91,7 @@
 			<div class="text-lg font-medium">{{ `Custom Fields (${ticket.template})` }}</div>
 			<div class="text-base space-y-2">
 					<div class="flex flex-col space-y-2" v-for="field in ticket.custom_fields" :key="field">
-						<div class="text-slate-500">{{ field.fieldname }}</div>
+						<div class="text-slate-500">{{ field.label }}</div>
 						<div :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
 					</div>
 			</div>
