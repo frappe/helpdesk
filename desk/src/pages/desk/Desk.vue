@@ -1,13 +1,13 @@
 <template>
-	<div v-if="user.isLoggedIn()" class="w-screen flex">
-		<div class="w-15">
-			<SideBarMenu />
+	<div v-if="user.isLoggedIn()" class="w-screen flex-col">
+		<div class="h-15">
+			<NavBar />
 		</div>
-		<div class="flex-col w-full">
-			<div class="h-15">
-				<NavBar />
+		<div class="flex w-screen">
+			<div class="w-15">
+				<SideBarMenu />
 			</div>
-			<div>
+			<div class="grow">
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />
