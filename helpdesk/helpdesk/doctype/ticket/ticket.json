@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "autoname": "format:{#####}",
- "creation": "2022-02-24 22:45:45.469857",
+ "creation": "2022-03-02 03:10:19.254460",
  "doctype": "DocType",
  "document_type": "Setup",
  "email_append_to": 1,
@@ -51,9 +51,7 @@
   "column_break_16",
   "via_customer_portal",
   "attachment",
-  "content_type",
-  "route",
-  "is_published"
+  "content_type"
  ],
  "fields": [
   {
@@ -96,7 +94,7 @@
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "Open\nReplied\nOn Hold\nResolved\nClosed",
+   "options": "Open\nReplied\nResolved\nClosed",
    "search_index": 1
   },
   {
@@ -356,19 +354,6 @@
    "label": "Content Type"
   },
   {
-   "fieldname": "route",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Web Page Route"
-  },
-  {
-   "default": "1",
-   "fieldname": "is_published",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Web Page Is Published"
-  },
-  {
    "fieldname": "template",
    "fieldtype": "Link",
    "label": "Template",
@@ -381,12 +366,10 @@
    "options": "Ticket Custom Field"
   }
  ],
- "has_web_view": 1,
  "icon": "fa fa-issue",
  "idx": 7,
- "is_published_field": "is_published",
  "links": [],
- "modified": "2022-03-01 20:52:23.836975",
+ "modified": "2022-03-02 22:08:28.463985",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
