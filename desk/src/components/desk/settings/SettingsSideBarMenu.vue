@@ -1,5 +1,5 @@
 <template>
-	<div class="border-r h-full pt-1 space-y-2">
+	<div class="h-full pt-1 space-y-2">
 		<div class="border-b pb-3 px-3 mx-2">Settings</div>
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
 			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="$currentPage.get() == setting.pageName ? 'bg-slate-50' : ''">
@@ -27,12 +27,12 @@ export default {
 				{
 					label: 'Agents',
 					pageName: 'AgentSettings',
-					route: '/settings/agents'
+					route: '/helpdesk/settings/agents'
 				},
 				{
 					label: 'SLA Policies',
 					pageName: 'SlaPolicySettings',
-					route: '/settings/sla'
+					route: '/helpdesk/settings/sla'
 				}
 			]
 		}

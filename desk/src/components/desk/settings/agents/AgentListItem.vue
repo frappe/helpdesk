@@ -10,16 +10,16 @@
 			>
 				<Input type="checkbox" value="" />
 			</div>
-			<div class="sm:w-4/12">
+			<div class="sm:w-3/12">
 				{{ agent.agent_name }}
 			</div>
-			<div class="sm:w-4/12">
+			<div class="sm:w-3/12">
                 {{ agent.name }}
 			</div>
-			<div class="sm:w-4/12 truncate">
-                {{ agentRoles }}
+			<div class="sm:w-3/12">
+				{{ agentRoles }}
 			</div>
-			<div class="sm:w-4/12 truncate">
+			<div class="sm:w-3/12">
                 {{ agent.team.name }}
 			</div>
 		</router-link>
@@ -39,7 +39,7 @@ export default {
     computed: {
         agentRoles() {
             if (this.agent) {
-                return this.agent.roles ? this.agent.roles.join(', ') : ''
+                return this.agent.roles ? this.agent.roles.slice(0, 2).join(', ') : ''
             }
             return ''
         }
