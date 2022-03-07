@@ -5,13 +5,13 @@
 			class="group flex items-center text-base h-10"
 		>
 			<router-link 
-				:to="'/'"
+				:to="`/helpdesk/tickets/${ticket.name}`"
 				class="mr-4 sm:w-6/12 flex items-center space-x-2"
 			>
 				<Input type="checkbox" value="" />
 				<div class="flex items-center grow space-x-1">
-					<div class="font-medium truncate max-w-sm">{{ ticket.subject }}</div>
-					<div class="ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
+					<div class="font-medium truncate max-w-fit lg:w-96 md:w-64 sm:w-40">{{ ticket.subject }}</div>
+					<div class="hidden md:block ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
 					<div>
 						<FeatherIcon 
 							v-if="ticket.priority"
@@ -21,10 +21,10 @@
 					</div>
 				</div>
 			</router-link>
-			<div class="sm:w-2/12">
+			<div class="hidden md:block lg:w-2/12">
 				<div class="truncate w-40" v-if="ticket.contact">{{ ticket.contact.name }}</div>
 			</div>
-			<div class="sm:w-2/12">
+			<div class="hidden md:block lg:w-2/12">
 				<Dropdown 
 					v-if="ticketTypes"
 					placement="left" 
@@ -81,7 +81,7 @@
 				</Dropdown>
 			</div>
 			<div class="sm:w-1/12">
-				<div class="flex pl-3 items-center">
+				<div class="flex sm:pl-0 md:pl-3 items-center">
 					<div class="sm:w-4/12">
 						<div class="hidden text-gray-600 sm:block">
 							<div>
