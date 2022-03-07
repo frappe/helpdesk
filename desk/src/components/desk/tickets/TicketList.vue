@@ -10,8 +10,8 @@
 						<Input type="checkbox" value="" />
 						<div class="grow">Subject</div>
 					</div>
-					<div class="sm:w-2/12">Raised By</div>
-					<div class="sm:w-2/12">Type</div>
+					<div class="hidden md:block lg:w-2/12">Raised By</div>
+					<div class="hidden md:block lg:w-2/12">Type</div>
 					<div class="sm:w-2/12">Due</div>
 					<div class="sm:w-2/12">Status</div>
 					<div class="sm:w-1/12"></div>
