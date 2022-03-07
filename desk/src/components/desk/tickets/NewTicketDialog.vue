@@ -19,7 +19,13 @@
 						/>
 					</div>
 					<div class="flex float-right space-x-2">
-						<Button appearance="primary" @click="createTicket()">Create</Button>
+						<Button 
+							appearance="primary" 
+							@click="createTicket()" 
+							:loading="isCreating"
+						>
+							Create
+						</Button>
 					</div>
 				</div>
 			</template>
@@ -43,6 +49,8 @@ export default {
 	},
 	setup(props, { emit }) {
 		const editor = ref(null);
+		const isCreating = ref(false);
+
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
@@ -55,7 +63,7 @@ export default {
 
 		const ticketController = inject('ticketController')
 
-		return { editor, open, ticketController }
+		return { editor, isCreating, open, ticketController }
 	},
 	data() {
 		return {
@@ -96,11 +104,15 @@ export default {
 },
 	methods: {
 		createTicket() {
+			// TODO: do validation
+			this.isCreating = true
 			this.ticketController.new('ticket', {
 				subject: this.subject,
 				description: this.descriptionContent
+			}).then(() => {
+				this.isCreating = false
+				this.$emit('ticketCreated')
 			})
-			this.$emit('ticketCreated')
 		}
 	}
 }
