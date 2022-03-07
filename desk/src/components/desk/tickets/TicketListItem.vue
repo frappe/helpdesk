@@ -1,10 +1,120 @@
-<template>
-	<div class="block py-4 hover:bg-gray-50 border-b">
+––<template>
+	<div class="block hover:bg-gray-50 border-b">
 		<div 
 			v-if="ticket"
-			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8"
+			class="group flex items-center text-base h-10"
 		>
-			<div
+			<router-link 
+				:to="`/helpdesk/tickets/${ticket.name}`"
+				class="mr-4 sm:w-6/12 flex items-center space-x-2"
+			>
+				<Input type="checkbox" value="" />
+				<div class="flex items-center grow space-x-1">
+					<div class="font-medium truncate max-w-fit lg:w-96 md:w-64 sm:w-40">{{ ticket.subject }}</div>
+					<div class="hidden md:block ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
+					<div>
+						<FeatherIcon 
+							v-if="ticket.priority"
+							class="w-3 h-3" 
+							:name="getIconBasedOnPriority(ticket.priority)"
+						/>
+					</div>
+				</div>
+			</router-link>
+			<div class="hidden md:block lg:w-2/12">
+				<div class="truncate w-40" v-if="ticket.contact">{{ ticket.contact.name }}</div>
+			</div>
+			<div class="hidden md:block lg:w-2/12">
+				<Dropdown 
+					v-if="ticketTypes"
+					placement="left" 
+					:options="typesAsDropdownOptions()" 
+					:dropdown-width-full="true"
+				>
+					<template v-slot="{ toggleTypes }">
+						<div  
+							class="w-full cursor-pointer"
+							@click="toggleTypes"
+						>
+							<div v-if="ticket.ticket_type" class="flex items-center w-40">
+								<div class="text-gray-500 truncate"> {{ ticket.ticket_type }} </div>
+								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
+							</div>
+							<div v-else class="hidden group-hover:block">
+								<span class="text-base text-gray-400"> set type </span>
+							</div>
+						</div>
+					</template>
+				</Dropdown>
+			</div>
+			<div class="sm:w-2/12">
+				<div 
+					v-if="getResolutionDueIn()" 
+					:color="getResolutionBadgeColor()"
+				>
+					{{ getResolutionDueIn() }}
+				</div>
+			</div>
+			<div class="sm:w-2/12">
+			<Dropdown
+					v-if="ticketStatuses"
+					placement="left" 
+					:options="statusesAsDropdownOptions()" 
+					:dropdown-width-full="true"
+				>
+					<template v-slot="{ toggleStatuses }">
+						<div class="w-full">
+							<div 
+								v-if="ticket.status"
+								@click="toggleStatuses"	
+								class="flex items-center"
+							>
+								<Badge :color="getBadgeColorBasedOnStatus(ticket.status)">
+									<div class="cursor-pointer">{{ ticket.status }}</div>
+								</Badge>
+							</div>
+							<div v-else class="hidden group-hover:block">
+								<span class="text-base text-gray-400"> set status </span>
+							</div>
+						</div>
+					</template>
+				</Dropdown>
+			</div>
+			<div class="sm:w-1/12">
+				<div class="flex sm:pl-0 md:pl-3 items-center">
+					<div class="sm:w-4/12">
+						<div class="hidden text-gray-600 sm:block">
+							<div>
+								{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
+							</div>
+						</div>
+					</div>
+					<div class="sm:w-8/12">
+						<Dropdown
+							v-if="agents"
+							placement="right" 
+							:options="agentsAsDropdownOptions()" 
+							:dropdown-width-full="true"
+							class="text-base flex flex-row-reverse"
+						>
+							<template v-slot="{ toggleAssignees }">
+								<div @click="toggleAssignees" class="cursor-pointer">
+									<div v-if="ticket.assignees.length > 0">
+										<div v-for="assignee in ticket.assignees" :key="assignee">
+											<Avatar class="sm" :label="assignee.agent_name" :imageURL="assignee.image" />
+										</div>
+									</div>
+									<div v-else class="hidden group-hover:block">
+										<span class="text-base text-gray-400"> assign </span>
+									</div>
+								</div>
+							</template>
+						</Dropdown>
+					</div>
+				</div>
+			</div>
+			
+			<!-- <div
 				class="mr-4"
 			>
 				<Input type="checkbox" value="" />
@@ -15,13 +125,6 @@
 			>
 				<div class="flex flex-col space-y-1">
 					<div class="flex items-center">
-						<div class="text-base font-medium">{{ ticket.subject }}</div>
-						<div class="ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
-						<div class="ml-1">
-							<Badge v-if="getResolutionDueIn()" :color="getResolutionBadgeColor()">
-								{{ getResolutionDueIn() }}
-							</Badge>
-						</div>
 					</div>
 					<div class="flex items-center" v-if="ticket.contact">
 						<div class="flex">
@@ -32,85 +135,6 @@
 				</div>
 			</router-link>
 			<div class="flex items-center justify-between sm:justify-start font-light sm:w-6/12">
-				<Dropdown 
-					v-if="ticketTypes"
-					placement="left" 
-					:options="typesAsDropdownOptions()" 
-					:dropdown-width-full="true"
-					class="text-base sm:w-4/12"
-				>
-					<template v-slot="{ toggleTypes }">
-						<div  
-							class="w-full"
-							@click="toggleTypes"
-						>
-							<div v-if="ticket.ticket_type" class="flex items-center">
-								<div>
-									<FeatherIcon class="w-3 h-3 stroke-slate-400" name="tag" />
-								</div>
-								<div class="ml-1 text-gray-500">
-									{{ ticket.ticket_type }}
-								</div>
-								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
-							</div>
-							<div v-else class="hidden group-hover:block">
-								<span class="text-base text-gray-400"> set type </span>
-							</div>
-						</div>
-					</template>
-				</Dropdown>
-				<Dropdown
-					v-if="ticketPriorities"
-					placement="left" 
-					:options="prioritiesAsDropdownOptions()" 
-					:dropdown-width-full="true"
-					class="text-base sm:w-4/12"
-				>
-					<template v-slot="{ togglePriority }">
-						<div class="w-full cursor-pointer">
-							<div 
-								v-if="ticket.priority"
-								@click="togglePriority"	
-								class="flex items-center"
-							>
-								<FeatherIcon 
-									class="w-3 h-3" 
-									:name="getIconBasedOnPriority(ticket.priority)"
-								/>
-								<div class="ml-1 text-gray-500">{{ ticket.priority }}</div>
-								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
-							</div>
-							<div v-else class="hidden group-hover:block">
-								<span class="text-base text-gray-400"> set priority </span>
-							</div>
-						</div>
-					</template>
-				</Dropdown> 
-				<Dropdown
-					v-if="ticketStatuses"
-					placement="left" 
-					:options="statusesAsDropdownOptions()" 
-					:dropdown-width-full="true"
-					class="text-base sm:w-4/12"
-				>
-					<template v-slot="{ toggleStatuses }">
-						<div class="w-full cursor-pointer">
-							<div 
-								v-if="ticket.status"
-								@click="toggleStatuses"	
-								class="flex items-center"
-							>
-								<FeatherIcon class="w-2 h-2 stroke-transparent" :class="getBadgeColorBasedOnStatus(ticket.status)" name="circle"/>
-								<div class="ml-1 text-gray-500">{{ ticket.status }}</div>
-								<FeatherIcon class="w-2 h-2  ml-1 hidden group-hover:block" name="chevron-down"/>
-
-							</div>
-							<div v-else class="hidden group-hover:block">
-								<span class="text-base text-gray-400"> set status </span>
-							</div>
-						</div>
-					</template>
-				</Dropdown>
 				<div class="hidden sm:w-1/12 text-base text-gray-600 sm:block">
 					<div class="flex items-center">
 						<div>
@@ -123,29 +147,7 @@
 				</div>
 			</div>
 			<div class="sm:w-1/12">
-				<Dropdown
-					v-if="agents"
-					placement="right" 
-					:options="agentsAsDropdownOptions()" 
-					:dropdown-width-full="true"
-					class="text-base flex flex-row-reverse"
-				>
-					<template v-slot="{ toggleAssignees }">
-						<div  
-							@click="toggleAssignees"
-						>
-							<div v-if="ticket.assignees.length > 0">
-								<div v-for="assignee in ticket.assignees" :key="assignee">
-									<Avatar class="w-4 h-4" :label="assignee.agent_name" :imageURL="assignee.image" />
-								</div>
-							</div>
-							<div v-else class="hidden group-hover:block">
-								<span class="text-base text-gray-400"> assign to </span>
-							</div>
-						</div>
-					</template>
-				</Dropdown>
-			</div>
+			</div> -->
 		</div>
 		<div class="transform translate-y-2"/>
 	</div>
@@ -200,16 +202,16 @@ export default {
 	methods: {
 		getBadgeColorBasedOnStatus(status) {
 			if (['Open'].includes(status)) {
-				return 'fill-green-500'
+				return 'green'
 			}
 			if (['Closed', 'Resolved'].includes(status)) {
-				return 'fill-red-500'
+				return 'red'
 			}
 			if (['Replied'].includes(status)) {
-				return 'fill-yellow-500'
+				return 'yellow'
 			}
 			if (['On Hold'].includes(status)) {
-				return 'fill-blue-500'
+				return 'blue'
 			}
 		},
 		getColorBasedOnPriority(priority, type) {
@@ -334,9 +336,9 @@ export default {
 			}
 			let resolutionString = this.$dayjs().to(resolutionBy);
 			if (["Resolution Due"].includes(agreementStatus)) {
-				return this.ticket.resolution_by ? "Due " + resolutionString : ''
+				return this.ticket.resolution_by ? resolutionString : ''
 			}
-			return !resolutionString.includes("in") ? "Overdue" : "Due " + resolutionString;
+			return resolutionString;
 		},
 		getResolutionBadgeColor() {
 			let resolutionDueIn = this.getResolutionDueIn()
