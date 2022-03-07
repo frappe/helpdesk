@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="flow-root border-b pt-2 pb-3 pr-8">
+		<div class="flow-root pt-2 pb-5 pr-8">
 			<div class="float-right flex space-x-3">
 				<Button type="white">
 					<div class="flex items-center space-x-2">
