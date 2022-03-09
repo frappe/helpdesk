@@ -140,7 +140,11 @@ export default {
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case 'Ticket':
-					this.ticketController.update()
+					if (data.name) {
+						this.ticketController.update(data.name)
+					} else {
+						this.ticketController.update()
+					}
 					break
 				case 'Ticket Type':
 					this.$resources.types.fetch()
@@ -250,7 +254,12 @@ export default {
 		},
 		contacts() {
 			return {
-				method: 'helpdesk.api.ticket.get_all_contacts',
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Contact',
+					fields: ['*'],
+					limit_page_length: 0
+				},
 				auto: true,
 				onSuccess: (data) => {
 					this.contacts = data

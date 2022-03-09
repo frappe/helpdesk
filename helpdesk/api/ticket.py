@@ -1,3 +1,4 @@
+from dataclasses import fields
 import frappe
 from helpdesk.helpdesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
 from frappe.website.utils import cleanup_page_name
@@ -171,15 +172,16 @@ def get_contact(ticket_id):
 		contact_doc = frappe.get_doc("Contact", contact_id)
 		return contact_doc
 	else:
-		return None
-
-@frappe.whitelist(allow_guest=True)
-def get_all_contacts():
-	contacts = frappe.get_all("Contact")
-	for i in range(len(contacts)):
-		contacts[i] = frappe.get_doc("Contact", contacts[i])
-
-	return contacts
+		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		if (ticket_doc.raised_by):
+			ticket_doc.set_contact(ticket_doc.raised_by)
+			ticket_doc.save()
+			frappe.db.commit()
+			contact_id = frappe.get_value("Ticket", ticket_id, "contact")
+			if (contact_id):
+				contact_doc = frappe.get_doc("Contact", contact_id)
+				return contact_doc
+	return None
 
 @frappe.whitelist(allow_guest=True)
 def get_conversations(ticket_id):
