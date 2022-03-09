@@ -2,10 +2,17 @@
 	<div class="px-3" v-if="ticket">
 		<div class="py-4 space-y-3 text-base">
 			<div class="flex items-center">
-				<div class="grow text-lg font-medium">{{ `Contact Information ${editing ? "(editing)" : ""}` }}</div>
+				<div class="grow text-lg font-medium">{{ `Contact Information ${editing ? '(editing)' : ''}` }}</div>
+				<FeatherIcon
+					v-if="editing" 
+					name="check"
+					class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-green-500" 
+					@click="updateContact()"
+				/>
 				<FeatherIcon 
 					:name="editing ? 'x' : 'edit-2'" 
-					class="stroke-slate-400 w-4 h-4 cursor-pointer" 
+					class="stroke-slate-400 w-4 h-4 cursor-pointer"
+					:class="editing ? 'hover:stroke-red-500': 'hover:stroke-blue-500'" 
 					@click="() => {editing=!editing}"
 				/>
 			</div>
@@ -33,7 +40,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="space-y-2 w-56">
+			<div v-else class="w-full">
 				<Combobox v-model="selectedContact">
 					<ComboboxInput 
 						class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
@@ -41,7 +48,7 @@
 						@change="query = $event.target.value" 
 					/>
 					<ComboboxOptions
-						class="w-56 absolute py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+						class="w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
 					>
 						<div
 							v-if="filterdContacts.length === 0 && query !== ''"
@@ -69,10 +76,6 @@
 						</ComboboxOption>
 					</ComboboxOptions>
 				</Combobox>
-				<div class="flex space-x-2">
-					<div class="grow"></div>
-					<Button appearance="primary" @click="updateContact()">Save</Button>
-				</div>
 			</div>
 		</div>
 		<div v-if="false">

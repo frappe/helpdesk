@@ -127,12 +127,11 @@ export default {
 		this.ticketController.new = (type, values) => {
 			switch (type) {
 				case 'ticket':
-					this.$resources.createTicket.submit({
+					return this.$resources.createTicket.submit({
 						values
 					})
-					break
 				case 'type':
-					this.$resources.createTicketType.subject({
+					this.$resources.createTicketType.submit({
 						type: values
 					})
 					break
