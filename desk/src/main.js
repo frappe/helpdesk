@@ -13,20 +13,10 @@ app.component('Button', Button)
 app.config.globalProperties.$dayjs = dayjs
 
 const globalVariables = ref({
-	ticketFilter: "All Tickets",
 	contactFilter: "All Contacts",
 
 	currentPage: "Tickets"	// Tickets, Ticket, Contacts, ...
 })
-
-app.config.globalProperties.$ticketFilter = {
-	set(newValue) { 
-		globalVariables.value.ticketFilter= newValue;
-	},
-	get() {
-		return globalVariables.value.ticketFilter;
-	}
-};
 
 app.config.globalProperties.$contactFilter = {
 	set(newValue) { 

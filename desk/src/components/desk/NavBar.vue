@@ -6,19 +6,7 @@
 					<CustomIcons name="helpdesk" width="60" height="20"/>
 				</div>
 				<div v-if="$currentPage.get() == 'Tickets'">
-					<Dropdown
-						placement="left"
-						:options="ticketFilterDropdownOptions()"
-					>
-						<template v-slot="{ toggleDropdown }"> 
-							<div class="flex items-center" @click="toggleDropdown">
-								<div class="text-2xl">
-									{{ this.$ticketFilter.get() }}
-								</div>
-								<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
-							</div>
-						</template>
-					</Dropdown>
+					
 				</div>
 				<div v-else-if="$currentPage.get() == 'Contacts'">
 					<Dropdown
@@ -70,19 +58,6 @@ export default {
 		return { user }
 	},
 	methods: {
-		ticketFilterDropdownOptions() {
-			let items = [];
-			["All Tickets", "Assigned to me"].forEach(filter => {
-				items.push({
-					label: filter,
-					handler: () => {
-						console.log(this.$user);
-						this.$ticketFilter.set(filter);
-					}
-				});
-			});
-			return items;
-		},
 		contactFilterDropdownOptions() {
 			let items = [];
 			["All Contacts"].forEach(filter => {
