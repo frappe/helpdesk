@@ -79,7 +79,7 @@
 		</div>
 		<div>
 			<div class="py-4 space-y-3" v-if="otherTicketsOfContact && !editingContact">
-				<div class="flex cursor-pointer" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
+				<div v-if="otherTicketsOfContact.length > 0" class="flex cursor-pointer" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
 					<div class="grow text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
 					<FeatherIcon 
 						:name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'" 
