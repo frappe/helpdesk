@@ -3,10 +3,22 @@
 		<Dialog :options="{title: 'Create New Contact'}" v-model="open">
 			<template #body-content>
 				<div class="space-y-4">
-					<Input label="First Name" type="text" v-model="firstName" />
-					<Input label="Last Name" type="text" v-model="lastName" />
-					<Input label="Email Id" type="email" v-model="emailId" />
-					<Input label="Phone" type="email" v-model="phone" />
+					<div class="space-y-1">
+						<Input label="Email Id" type="email" v-model="emailId" />
+						<ErrorMessage :message="emailValidationError" />
+					</div>
+					<div class="space-y-1">
+						<Input label="First Name" type="text" v-model="firstName" />
+						<ErrorMessage :message="firstNameValidationError" />
+					</div>
+					<div class="space-y-1">
+						<Input label="Last Name (optional)" type="text" v-model="lastName" />
+						<ErrorMessage :message="lastNameValidationError" />
+					</div>
+					<div class="space-y-1">
+						<Input label="Phone (optional)" type="text" v-model="phone" />
+						<ErrorMessage :message="phoneValidationError" />
+					</div>
 					<div class="flex float-right space-x-2">
 						<Button :loading="this.$resources.createContact.loading" appearance="primary" @click="createContact()">Create</Button>
 					</div>
@@ -17,8 +29,8 @@
 </template>
 
 <script>
-import { Input, Dialog } from 'frappe-ui'
-import { computed } from 'vue'
+import { Input, Dialog, ErrorMessage } from 'frappe-ui'
+import { computed, ref } from 'vue'
 
 export default {
 	name: 'NewContactDialog',
@@ -29,6 +41,11 @@ export default {
 		},
 	},
 	setup(props, { emit }) {
+		const emailValidationError = ref('')
+		const firstNameValidationError = ref('')
+		const lastNameValidationError = ref('')
+		const phoneValidationError = ref('')
+
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
@@ -39,7 +56,7 @@ export default {
 			},
 		})
 
-		return { open }
+		return { open, emailValidationError, firstNameValidationError, lastNameValidationError, phoneValidationError }
 	},
 	data() {
 		return {
@@ -47,6 +64,17 @@ export default {
 			lastName: "",
 			emailId: "",
 			phone: "",
+		}
+	},
+	watch: {
+		emailId(newValue) {
+			this.validateEmailInput(newValue)
+		},
+		firstName(newValue) {
+			this.validateFirstName(newValue)
+		},
+		phone(newValue) {
+			this.validatePhone(newValue)
 		}
 	},
 	resources: {
@@ -62,9 +90,13 @@ export default {
 	components: {
 		Input,
 		Dialog,
+		ErrorMessage
 	},
 	methods: {
 		createContact() {
+			if (this.validateInputs()) {
+				return
+			}
 			this.$resources.createContact.submit({
 				doc: {
 					doctype: 'Contact',
@@ -74,6 +106,42 @@ export default {
 					phone_nos: [{ phone: this.phone }]
 				},
 			})
+		},
+		validateInputs() {
+			let error = this.validateEmailInput(this.emailId)
+			error += this.validateFirstName(this.firstName)
+			error += this.validatePhone(this.phone)
+			return error
+		},
+		validateEmailInput(value) {
+			this.emailValidationError = ''
+			const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+			if (!value) {
+				this.emailValidationError = 'Email should not be empty'
+			} else if (!reg.test(value)) {
+				this.emailValidationError = 'Enter a valid email'
+			}
+			return this.emailValidationError
+			// TOOD: check if contact with email exsists
+		},
+		validateFirstName(value) {
+			this.firstNameValidationError = ''
+			if (!value) {
+				this.firstNameValidationError = 'First name should not be empty'
+			} else if (value.trim() == '') {
+				this.firstNameValidationError = 'First name should not be empty'
+			}
+			return this.firstNameValidationError
+		},
+		validatePhone(value) {
+			this.phoneValidationError = ''
+			const reg = /[0-9]+/
+			if (!value) {
+				this.phoneValidationError = ''
+			} else if (!reg.test(value) || value.length < 10) {
+				this.phoneValidationError = 'Enter a valid phone number'
+			}
+			return this.phoneValidationError
 		}
 	}
 }
