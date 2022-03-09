@@ -2,84 +2,89 @@
 	<div class="px-3" v-if="ticket">
 		<div class="py-4 space-y-3 text-base">
 			<div class="flex items-center">
-				<div class="grow text-lg font-medium">{{ `Contact Information ${editing ? '(editing)' : ''}` }}</div>
-				<FeatherIcon
-					v-if="editing" 
-					name="check"
-					class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-green-500" 
-					@click="updateContact()"
-				/>
-				<FeatherIcon 
-					:name="editing ? 'x' : 'edit-2'" 
-					class="stroke-slate-400 w-4 h-4 cursor-pointer"
-					:class="editing ? 'hover:stroke-red-500': 'hover:stroke-blue-500'" 
-					@click="() => {editing=!editing}"
-				/>
+				<div class="grow text-lg font-medium">{{ `Contact Information ${editingContact ? '(editing)' : ''}` }}</div>
+				<div v-if="!updatingContact" class="flex">
+					<FeatherIcon
+						v-if="editingContact" 
+						name="check"
+						class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-green-500" 
+						@click="updateContact()"
+					/>
+					<FeatherIcon 
+						:name="editingContact ? 'x' : 'edit-2'" 
+						class="stroke-slate-400 w-4 h-4 cursor-pointer"
+						:class="editingContact ? 'hover:stroke-red-500': 'hover:stroke-blue-500'" 
+						@click="() => {editingContact=!editingContact}"
+					/>
+				</div>
 			</div>
-			<div v-if="!editing" class="space-y-2">
-				<div v-if="ticket.contact">
-					<div class="flex space-x-2">
-						<FeatherIcon name="user" class="w-4 h-4" />
-						<div class="text-slate-500 truncate">{{ contactFullName }}</div>
-					</div>
-					<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
-						<FeatherIcon name="mail" class="w-4 h-4" />
-						<div>
-							<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-								<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+			<LoadingText v-if="updatingContact"/>
+			<div v-else>
+				<div v-if="!editingContact" class="space-y-2">
+					<div v-if="ticket.contact">
+						<div class="flex space-x-2">
+							<FeatherIcon name="user" class="w-4 h-4" />
+							<div class="text-slate-500 truncate">{{ contactFullName }}</div>
+						</div>
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
+							<FeatherIcon name="mail" class="w-4 h-4" />
+							<div>
+								<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
+									<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+								</div>
 							</div>
 						</div>
-					</div>
-					<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
-						<FeatherIcon name="phone" class="w-4 h-4" />
-						<div>
-							<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-								<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
+							<FeatherIcon name="phone" class="w-4 h-4" />
+							<div>
+								<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
+									<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div v-else class="w-full">
-				<Combobox v-model="selectedContact">
-					<ComboboxInput 
-						class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
-						autocomplete="off"
-						@change="query = $event.target.value" 
-					/>
-					<ComboboxOptions
-						class="w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-					>
-						<div
-							v-if="filterdContacts.length === 0 && query !== ''"
-							class="select-none relative py-2 px-4 text-gray-700 cursor-pointer"
-							@click="() => {showNewContactDialog = true}"
+				<div v-else class="w-full">
+					<Combobox v-model="selectedContact">
+						<ComboboxInput 
+							class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
+							autocomplete="off"
+							@change="query = $event.target.value" 
+						/>
+						<ComboboxOptions
+							class="w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
 						>
-							Create new
-						</div>
-						<ComboboxOption
-							v-slot="{ selected, active }"
-							v-for="contactItem in filterdContacts" :key="contactItem"
-							:value="contactItem.name"
-						>
-							<li
-								class="cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
-								:class="{'bg-slate-50': active}"
+							<div
+								v-if="filterdContacts.length === 0 && query !== ''"
+								class="select-none relative py-2 px-4 text-gray-700 cursor-pointer"
+								@click="() => {showNewContactDialog = true}"
 							>
-								<span
-									class="block truncate"
-									:class="{ 'font-medium': selected, 'font-normal': !selected }"
-									>
-									{{ contactItem.name }}
-								</span>
-							</li>
-						</ComboboxOption>
-					</ComboboxOptions>
-				</Combobox>
+								Create new
+							</div>
+							<ComboboxOption
+								v-slot="{ selected, active }"
+								v-for="contactItem in filterdContacts" :key="contactItem"
+								:value="contactItem.name"
+							>
+								<li
+									class="cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
+									:class="{'bg-slate-50': active}"
+								>
+									<span
+										class="block truncate"
+										:class="{ 'font-medium': selected, 'font-normal': !selected }"
+										>
+										{{ contactItem.name }}
+									</span>
+								</li>
+							</ComboboxOption>
+						</ComboboxOptions>
+					</Combobox>
+				</div>
 			</div>
 		</div>
 		<div v-if="false">
-			<div class="py-4 border-b space-y-3" v-if="otherTicketsOfContact && !editing">
+			<div class="py-4 border-b space-y-3" v-if="otherTicketsOfContact && !editingContact">
 				<div class="text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
 				<div class="space-y-1 " v-for="ticket in otherTicketsOfContact" :key="ticket.name">
 					<router-link :to="`/tickets/${ticket.name}`" class="text-slate-500 text-base">
@@ -99,7 +104,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Input } from 'frappe-ui'
+import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
 import {
 	Combobox,
 	ComboboxInput,
@@ -115,6 +120,7 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
+		LoadingText,
 		Combobox,
 		ComboboxInput,
 		ComboboxOption,
@@ -122,7 +128,8 @@ export default {
 		NewContactDialog
 	},
 	setup() {
-		const editing = ref(false)
+		const editingContact = ref(false)
+		const updatingContact = ref(false)
 		const contactName = ref('')
 		const selectedContact = ref('')
 		const query = ref('')
@@ -134,7 +141,7 @@ export default {
 		const ticketController = inject('ticketController')
 
 		return {
-			editing,
+			editingContact,
 			contactName,
 			selectedContact,
 			query,
@@ -163,12 +170,15 @@ export default {
 	},
 	methods: {
 		updateContact() {
-			this.editing = false
-			this.ticketController.set(this.ticketId, 'contact', this.selectedContact)
+			this.editingContact = false
+			this.updatingContact = true
+			this.ticketController.set(this.ticketId, 'contact', this.selectedContact).then(() => {
+				this.updatingContact = false
+			})
 		},
 		contactCreated(contact) {
 			this.showNewContactDialog = false
-			this.editing = false
+			this.editingContact = false
 			this.ticketController.set(this.ticketId, 'contact', contact.name)
 		}
 	}
