@@ -175,6 +175,8 @@ export default {
 			this.editingContact = false
 			this.updatingContact = true
 			this.ticketController.set(this.ticketId, 'contact', this.selectedContact).then(() => {
+				this.selectedContact = ''
+				this.query = ''
 				this.updatingContact = false
 			})
 		},
