@@ -198,7 +198,7 @@ def submit_conversation_via_contact(ticket_id, message):
 @frappe.whitelist(allow_guest=True)
 def get_other_tickets_of_contact(ticket_id):
 	contact = frappe.get_value("Ticket", ticket_id, "raised_by")
-	tickets = frappe.get_all("Ticket", filters={"raised_by": contact, "name": ["!=", ticket_id]}, fields=['name', 'subject'])
+	tickets = frappe.get_all("Ticket", filters={"raised_by": contact, "name": ["!=", ticket_id], "status": ["not in", ["Closed", "Resolved"]]}, fields=['name', 'subject'])
 	return tickets
 
 @frappe.whitelist(allow_guest=True)

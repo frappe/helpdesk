@@ -13,7 +13,7 @@
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10.5rem)' : null }"
 			>
 				<div class="flex items-center pb-4">
-					<span class="text-4xl">
+					<span class="text-4xl truncate">
 						{{ ticket.subject }}
 					</span>
 				</div>
