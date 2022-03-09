@@ -43,15 +43,18 @@ export default {
 		TicketListItem
 	},
 	setup() {
+		const user = inject('user')
+
 		const viewportWidth = inject('viewportWidth')
 		const tickets = inject('tickets')
+		const ticketFilter = inject('ticketFilter')
 
-		return { viewportWidth, tickets }
+		return { user, viewportWidth, tickets, ticketFilter }
 	},
 	computed: {
 		filteredTickets() {
 			let tickets = this.tickets
-			let filter = this.$ticketFilter.get()
+			let filter = this.ticketFilter
 
 			let filteredTickets = []
 
@@ -59,7 +62,7 @@ export default {
 				for (let i in tickets) {
 					if (tickets[i].assignees.length > 0) {
 						for (let j = 0; j < tickets[i].assignees.length; j++) {
-							if (tickets[i].assignees[j].name == this.$user.get().agent.name) {
+							if (tickets[i].assignees[j].name == this.user.agent.name) {
 								filteredTickets.push(tickets[i])
 							}
 						}

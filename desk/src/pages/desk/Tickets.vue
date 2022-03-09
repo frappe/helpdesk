@@ -1,6 +1,21 @@
 <template>
 	<div>
-		<div class="flow-root pt-2 pb-5 pr-8">
+		<div class="flow-root pt-2 pb-5 pr-8 pl-4">
+			<div class="float-left">
+				<Dropdown
+						placement="left"
+						:options="ticketFilterDropdownOptions()"
+					>
+					<template v-slot="{ toggleDropdown }"> 
+						<div class="flex items-center cursor-pointer" @click="toggleDropdown">
+							<div class="text-2xl">
+								{{ this.ticketFilter }}
+							</div>
+							<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
+						</div>
+					</template>
+				</Dropdown>
+			</div>
 			<div class="float-right flex space-x-3">
 				<Button type="white">
 					<div class="flex items-center space-x-2">
@@ -24,7 +39,7 @@
 	</div>
 </template>
 <script>
-import { Input } from 'frappe-ui'
+import { Input, Dropdown, FeatherIcon } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
@@ -36,16 +51,34 @@ export default {
 		TicketList,
 		Input,
 		NewTicketDialog,
-		CustomIcons
+		CustomIcons,
+		Dropdown,
+		FeatherIcon
 	},
 	setup() {
 		const tickets = inject('tickets')
+		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
-		return { tickets, showNewTicketDialog }
+		return { tickets, ticketFilter, showNewTicketDialog }
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
+	},
+	methods: {
+		ticketFilterDropdownOptions() {
+			let items = [];
+			["All Tickets", "Assigned to me"].forEach(filter => {
+				items.push({
+					label: filter,
+					handler: () => {
+						console.log(this.$user);
+						this.ticketFilter = filter;
+					}
+				});
+			});
+			return items;
+		},
 	}
 }
 

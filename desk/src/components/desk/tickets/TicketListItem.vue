@@ -12,11 +12,11 @@
 				<div class="flex items-center grow space-x-1">
 					<div class="font-medium truncate max-w-fit lg:w-96 md:w-64 sm:w-40">{{ ticket.subject }}</div>
 					<div class="hidden md:block ml-1 text-base text-slate-400">#{{ ticket.name }}</div>
-					<div>
+					<div v-if="ticket.priority">
 						<FeatherIcon 
-							v-if="ticket.priority"
-							class="w-3 h-3" 
-							:name="getIconBasedOnPriority(ticket.priority)"
+							v-if="ticket.priority == 'Urgent'"
+							class="w-4 h-4 stroke-red-500 stroke-2" 
+							name="arrow-up"
 						/>
 					</div>
 				</div>
