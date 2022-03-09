@@ -1,9 +1,15 @@
 <template>
-	<div class="flow-root pb-3 pt-4 pl-5 pr-8 border-b">
-		<div class="float-left">
-			<div class="flex items-center space-x-5">
-				<div class="group py-2">
-					<CustomIcons name="helpdesk" width="60" height="20"/>
+	<div class="flow-root pl-5 pr-8 border-b py-2">
+		<div class="float-left py-1.5">
+			<div class="flex space-x-1">
+				<CustomIcons name="helpdesk" width="60" height="18"/>
+				<div v-if="$currentPage.breadcrumbs()" class="flex items-center space-x-1">
+					<div v-for="(breadcrumb, index) in $currentPage.breadcrumbs()" :key="breadcrumb">
+						<div class="flex space-x-1 items-center text-base">
+							<FeatherIcon v-if="index < $currentPage.breadcrumbs().length" name="chevron-right" class="h-4 w-4" />
+							<span>{{ breadcrumb }}</span>
+						</div>
+					</div>
 				</div>
 				<div v-if="$currentPage.get() == 'Contacts'">
 					<Dropdown
@@ -22,8 +28,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="float-right flex space-x-3">
-			<div class="border-r-2 pr-2 pt-1">
+		<div class="float-right flex space-x-3 items-center">
+			<div class="border-r-2 pr-2">
 				<FeatherIcon class="w-5 h-5" name="bell" />
 			</div>
 			<Dropdown

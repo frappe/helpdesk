@@ -15,7 +15,8 @@ app.config.globalProperties.$dayjs = dayjs
 const globalVariables = ref({
 	contactFilter: "All Contacts",
 
-	currentPage: "Tickets"	// Tickets, Ticket, Contacts, ...
+	currentPage: "Tickets",	// Tickets, Ticket, Contacts, ...
+	breadcrumbs: ""
 })
 
 app.config.globalProperties.$contactFilter = {
@@ -28,11 +29,15 @@ app.config.globalProperties.$contactFilter = {
 };
 
 app.config.globalProperties.$currentPage = {
-	set(newValue) { 
-		globalVariables.value.currentPage= newValue;
+	set(newValue, breadcrumbs) { 
+		globalVariables.value.breadcrumbs = breadcrumbs ? breadcrumbs : null
+		globalVariables.value.currentPage = newValue;
 	},
 	get() {
 		return globalVariables.value.currentPage;
+	},
+	breadcrumbs() {
+		return globalVariables.value.breadcrumbs;
 	}
 };
 
