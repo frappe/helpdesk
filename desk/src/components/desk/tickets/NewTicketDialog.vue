@@ -3,6 +3,48 @@
 		<Dialog :options="{title: 'Create New Ticket'}" v-model="open">
 			<template #body-content>
 				<div class="space-y-4">
+					<div class="w-full">
+						<span 
+							class="block mb-2 text-sm leading-4 text-gray-700"
+						>
+							Raised By
+						</span>
+						<Combobox v-model="selectedContact">
+							<ComboboxInput 
+								class="rounded-md w-full py-1 border-none focus:ring-0 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-100"
+								autocomplete="off"
+								@change="query = $event.target.value" 
+							/>
+							<ComboboxOptions
+								class="absolute z-50 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+							>
+								<div
+									v-if="filterdContacts.length === 0 && query !== ''"
+									class="select-none py-2 relative px-4 text-gray-700 cursor-pointer"
+									@click="() => {showNewContactDialog = true}"
+								>
+									Create new
+								</div>
+								<ComboboxOption
+									v-slot="{ selected, active }"
+									v-for="contactItem in filterdContacts" :key="contactItem"
+									:value="contactItem.name"
+								>
+									<li
+										class="cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
+										:class="{'bg-slate-50': active}"
+									>
+										<span
+											class="block truncate"
+											:class="{ 'font-medium': selected, 'font-normal': !selected }"
+											>
+											{{ contactItem.name }}
+										</span>
+									</li>
+								</ComboboxOption>
+							</ComboboxOptions>
+						</Combobox>
+					</div>
 					<Input label="Subject" type="text" v-model="subject" />
 					<div>
 						<span 
@@ -38,6 +80,12 @@ import { Input, Dialog } from 'frappe-ui'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref, computed } from 'vue'
+import {
+	Combobox,
+	ComboboxInput,
+	ComboboxOptions,
+	ComboboxOption,
+} from '@headlessui/vue'
 
 export default {
 	name: 'NewTicketDialog',
@@ -51,6 +99,12 @@ export default {
 		const editor = ref(null);
 		const isCreating = ref(false);
 
+		const contactName = ref('')
+		const selectedContact = ref('')
+		const query = ref('')
+
+		const contacts = inject('contacts')
+
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
@@ -63,7 +117,7 @@ export default {
 
 		const ticketController = inject('ticketController')
 
-		return { editor, isCreating, open, ticketController }
+		return { editor, isCreating, contactName, selectedContact, query, contacts, open, ticketController }
 	},
 	data() {
 		return {
@@ -97,16 +151,30 @@ export default {
 			}
 		}
 	},
+	computed: {
+		filterdContacts() {
+			return this.query === ''
+				? this.contacts
+				: this.contacts.filter((contactItem) => {
+					return contactItem.name.toLowerCase().includes(this.query.toLowerCase())
+				})
+		}
+	},
 	components: {
-    Input,
-    QuillEditor,
-    Dialog,
-},
+		Input,
+		QuillEditor,
+		Dialog,
+		Combobox,
+		ComboboxInput,
+		ComboboxOption,
+		ComboboxOptions,
+	},
 	methods: {
 		createTicket() {
 			// TODO: do validation
 			this.isCreating = true
 			this.ticketController.new('ticket', {
+				contact: this.selectedContact,
 				subject: this.subject,
 				description: this.descriptionContent
 			}).then(() => {

@@ -40,7 +40,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="space-y-2 w-full">
+			<div v-else class="w-full">
 				<Combobox v-model="selectedContact">
 					<ComboboxInput 
 						class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
