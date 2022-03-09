@@ -14,7 +14,7 @@
 		<div v-if="contacts">
 			<ContactList />
 		</div>
-		<NewContactDialog v-model="showNewContactDialog" />
+		<NewContactDialog v-model="showNewContactDialog" @contact-created="() => {showNewContactDialog = false}" />
 	</div>
 </template>
 <script>

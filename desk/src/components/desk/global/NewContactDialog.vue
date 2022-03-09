@@ -30,7 +30,7 @@
 
 <script>
 import { Input, Dialog, ErrorMessage } from 'frappe-ui'
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 
 export default {
 	name: 'NewContactDialog',
@@ -46,6 +46,8 @@ export default {
 		const lastNameValidationError = ref('')
 		const phoneValidationError = ref('')
 
+		const contacts = inject('contacts')
+
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
@@ -56,7 +58,7 @@ export default {
 			},
 		})
 
-		return { open, emailValidationError, firstNameValidationError, lastNameValidationError, phoneValidationError }
+		return { open, contacts, emailValidationError, firstNameValidationError, lastNameValidationError, phoneValidationError }
 	},
 	data() {
 		return {
@@ -124,15 +126,24 @@ export default {
 			return error
 		},
 		validateEmailInput(value) {
+			function existingContactEmails(contacts) {
+				let list = []
+				for (let index in contacts) {
+					list.push(contacts[index].email_id)
+				}
+				return list
+			}
+
 			this.emailValidationError = ''
 			const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
 			if (!value) {
 				this.emailValidationError = 'Email should not be empty'
 			} else if (!reg.test(value)) {
 				this.emailValidationError = 'Enter a valid email'
+			} else if (existingContactEmails(this.contacts).includes(value)) {
+				this.emailValidationError = 'Contact with email already exists'
 			}
 			return this.emailValidationError
-			// TOOD: check if contact with email exsists
 		},
 		validateFirstName(value) {
 			this.firstNameValidationError = ''
