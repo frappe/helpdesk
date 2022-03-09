@@ -7,7 +7,7 @@
 					<FeatherIcon 
 						:name="editingContact ? 'x' : 'edit-2'" 
 						class="stroke-slate-400 w-4 h-4 cursor-pointer"
-						:class="editingContact ? 'hover:stroke-red-500': 'hover:stroke-blue-500'" 
+						:class="editingContact ? 'hover:stroke-red-500': ''" 
 						@click="() => {editingContact=!editingContact}"
 					/>
 				</div>
@@ -77,16 +77,26 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="false">
+		<div>
 			<div class="py-4 border-b space-y-3" v-if="otherTicketsOfContact && !editingContact">
-				<div class="text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
-				<div class="space-y-1 " v-for="ticket in otherTicketsOfContact" :key="ticket.name">
-					<router-link :to="`/tickets/${ticket.name}`" class="text-slate-500 text-base">
-						<div class="flex">
-							<FeatherIcon name="link" class="w-4 h-4"/>
-							<span class="text-slate-500 ml-2">{{ ticket.subject }}</span>
-						</div>
-					</router-link>
+				<div class="flex cursor-pointer" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
+					<div class="grow text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
+					<FeatherIcon 
+						:name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'" 
+						class="stroke-slate-400 w-4 h-4"
+					/>
+				</div>
+				<div v-if="showOtherTicketsOfContacts" class="max-h-40 overflow-scroll">
+					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
+						<router-link :to="`/helpdesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
+							<div class="flex py-1 hover:bg-slate-50 rounded">
+								<div>
+									<FeatherIcon name="link" class="w-4 h-4"/>
+								</div>
+								<div class="text-slate-500 ml-2 grow truncate">{{ ticket.subject }}</div>
+							</div>
+						</router-link>
+					</div>
 				</div>
 			</div>
 			<div class="py-4">
@@ -134,6 +144,8 @@ export default {
 		const contacts = inject('contacts')
 		const ticketController = inject('ticketController')
 
+		const showOtherTicketsOfContacts = ref(false)
+
 		return {
 			editingContact,
 			updatingContact,
@@ -143,7 +155,8 @@ export default {
 			showNewContactDialog,
 			tickets,
 			contacts,
-			ticketController
+			ticketController,
+			showOtherTicketsOfContacts
 		}
 	},
 	computed: {
@@ -161,6 +174,9 @@ export default {
 				: this.contacts.filter((contactItem) => {
 					return contactItem.name.toLowerCase().includes(this.query.toLowerCase())
 				})
+		},
+		otherTicketsOfContact() {
+			return this.$resources.otherTicketsOfContact.data || null
 		}
 	},
 	watch: {
@@ -178,12 +194,24 @@ export default {
 				this.selectedContact = ''
 				this.query = ''
 				this.updatingContact = false
+				this.$resources.otherTicketsOfContact.fetch()
 			})
 		},
 		contactCreated(contact) {
 			this.showNewContactDialog = false
 			this.editingContact = false
 			this.ticketController.set(this.ticketId, 'contact', contact.name)
+		}
+	},
+	resources: {
+		otherTicketsOfContact() {
+			return {
+				method: 'helpdesk.api.ticket.get_other_tickets_of_contact',
+				params: {
+					ticket_id: this.ticketId
+				},
+				auto: true
+			}
 		}
 	}
 }
