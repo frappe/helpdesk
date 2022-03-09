@@ -91,7 +91,7 @@
 import { Input, Dialog, ErrorMessage } from 'frappe-ui'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { inject, ref, computed, watch } from 'vue'
+import { inject, ref, computed } from 'vue'
 import {
 	Combobox,
 	ComboboxInput,

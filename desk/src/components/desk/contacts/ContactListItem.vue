@@ -14,13 +14,19 @@
 				{{ fullName }}
 			</div>
 			<div class="sm:w-4/12">
-				<div v-if="contact.email_ids.length > 0">
+				<div v-if="contact.email_ids && contact.email_ids.length > 0">
 					{{ contact.email_ids[0].email_id }}
+				</div>
+				<div v-else-if="contact.email_id">
+					{{ contact.email_id }}
 				</div>
 			</div>
 			<div class="sm:w-4/12">
-				<div v-if="contact.phone_nos.length > 0">
+				<div v-if="contact.phone_nos && contact.phone_nos.length > 0">
 					{{ contact.phone_nos[0].phone }}
+				</div>
+				<div v-if="contact.phone">
+					{{ contact.phone }}
 				</div>
 			</div>
 		</router-link>

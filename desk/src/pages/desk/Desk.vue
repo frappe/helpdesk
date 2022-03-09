@@ -81,43 +81,43 @@ export default {
 
 		this.ticketController.update = (ticketId) => {
 			if (ticketId) {
-				this.$resources.ticket.fetch({
+				return this.$resources.ticket.fetch({
 					ticket_id: ticketId
 				})
 			} else {
-				this.$resources.tickets.fetch()
+				return this.$resources.tickets.fetch()
 			}
 		},
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
 				case 'type':
-					this.$resources.assignTicketType.submit({
+					return this.$resources.assignTicketType.submit({
 						ticket_id: ticketId,
 						type: ref
 					})
 					break
 				case 'status':
-					this.$resources.assignTicketStatus.submit({
+					return this.$resources.assignTicketStatus.submit({
 						ticket_id: ticketId,
 						status: ref
 					})
 					break
 				case 'priority':
-					this.$resources.assignTicketPriority.submit({
+					return this.$resources.assignTicketPriority.submit({
 						ticket_id: ticketId,
 						priority: ref
 					})
 					break
 				case 'contact':
 					if (ticketId) {
-						this.$resources.updateTicketContact.submit({
+						return this.$resources.updateTicketContact.submit({
 							ticket_id: ticketId,
 							contact: ref
 						})
 					}
 					break
 				case 'agent':
-					this.$resources.assignTicketToAgent.submit({
+					return this.$resources.assignTicketToAgent.submit({
 						ticket_id: ticketId,
 						agent_id: ref
 					})
@@ -140,7 +140,11 @@ export default {
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case 'Ticket':
-					this.ticketController.update()
+					if (data.name) {
+						this.ticketController.update(data.name)
+					} else {
+						this.ticketController.update()
+					}
 					break
 				case 'Ticket Type':
 					this.$resources.types.fetch()
@@ -250,7 +254,12 @@ export default {
 		},
 		contacts() {
 			return {
-				method: 'helpdesk.api.ticket.get_all_contacts',
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Contact',
+					fields: ['*'],
+					limit_page_length: 0
+				},
 				auto: true,
 				onSuccess: (data) => {
 					this.contacts = data

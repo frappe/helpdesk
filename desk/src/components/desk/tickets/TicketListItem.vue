@@ -22,7 +22,7 @@
 				</div>
 			</router-link>
 			<div class="hidden md:block lg:w-2/12">
-				<div class="truncate w-40" v-if="ticket.contact">{{ ticket.contact.name }}</div>
+				<div class="truncate w-40 text-gray-500" v-if="ticket.contact">{{ ticket.contact.name }}</div>
 			</div>
 			<div class="hidden md:block lg:w-2/12">
 				<Dropdown 
@@ -50,7 +50,7 @@
 			<div class="sm:w-2/12">
 				<div 
 					v-if="getResolutionDueIn()" 
-					:color="getResolutionBadgeColor()"
+					:class="getResolutionBadgeColor()"
 				>
 					{{ getResolutionDueIn() }}
 				</div>
@@ -83,10 +83,8 @@
 			<div class="sm:w-1/12">
 				<div class="flex sm:pl-0 md:pl-3 items-center">
 					<div class="sm:w-4/12">
-						<div class="hidden text-gray-600 sm:block">
-							<div>
-								{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
-							</div>
+						<div class="hidden text-gray-500 sm:block">
+							{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
 						</div>
 					</div>
 					<div class="sm:w-8/12">
@@ -113,41 +111,6 @@
 					</div>
 				</div>
 			</div>
-			
-			<!-- <div
-				class="mr-4"
-			>
-				<Input type="checkbox" value="" />
-			</div>
-			<router-link 
-				:to="`/helpdesk/tickets/${ticket.name}`"
-				class="sm:w-9/12"
-			>
-				<div class="flex flex-col space-y-1">
-					<div class="flex items-center">
-					</div>
-					<div class="flex items-center" v-if="ticket.contact">
-						<div class="flex">
-							<FeatherIcon class="w-4 h-4 stroke-slate-400" name="user" />
-							<div class="ml-1 text-base">{{ ticket.contact.name }}</div>
-						</div>
-					</div>
-				</div>
-			</router-link>
-			<div class="flex items-center justify-between sm:justify-start font-light sm:w-6/12">
-				<div class="hidden sm:w-1/12 text-base text-gray-600 sm:block">
-					<div class="flex items-center">
-						<div>
-							<FeatherIcon class="w-3 h-3 stroke-slate-400" name="edit-2"/>
-						</div>
-						<div class="ml-1">
-							{{ $dayjs(ticket.modified).fromNow() }}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="sm:w-1/12">
-			</div> -->
 		</div>
 		<div class="transform translate-y-2"/>
 	</div>
@@ -344,11 +307,11 @@ export default {
 			let resolutionDueIn = this.getResolutionDueIn()
 			switch (resolutionDueIn) {
 				case "Fulfilled":
-					return "green"
+					return "text-gray-500"
 				case "Overdue":
-					return "red"
+					return "text-red-500"
 				default:
-					return ""
+					return "text-gray-500"
 			}
 		}
 	}
