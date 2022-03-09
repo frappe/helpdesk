@@ -78,7 +78,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="py-4 border-b space-y-3" v-if="otherTicketsOfContact && !editingContact">
+			<div class="py-4 space-y-3" v-if="otherTicketsOfContact && !editingContact">
 				<div class="flex cursor-pointer" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
 					<div class="grow text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
 					<FeatherIcon 
@@ -99,7 +99,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="py-4">
+			<div v-if="false" class="py-4">
 				<div class="text-lg font-medium">Activity</div>
 			</div>
 		</div>
