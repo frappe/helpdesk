@@ -82,6 +82,11 @@ export default {
 			return {
 				method: 'frappe.client.insert',
 				onSuccess(data) {
+					this.emailId = ''
+					this.firstName = ''
+					this.lastName = ''
+					this.phone = ''
+
 					this.$emit('contactCreated', data)
 				}
 			}
@@ -97,14 +102,19 @@ export default {
 			if (this.validateInputs()) {
 				return
 			}
+			
+			let doc = {
+				doctype: 'Contact',
+				first_name: this.firstName,
+				last_name: this.lastName,
+				email_ids: [{ email_id: this.emailId, is_primary: true }]
+			}
+			if (this.phone) {
+				doc.phone_nos = [{ phone: this.phone }] 
+			}
+
 			this.$resources.createContact.submit({
-				doc: {
-					doctype: 'Contact',
-					first_name: this.firstName,
-					last_name: this.lastName,
-					email_ids: [{ email_id: this.emailId, is_primary: true }],
-					phone_nos: [{ phone: this.phone }]
-				},
+				doc
 			})
 		},
 		validateInputs() {
