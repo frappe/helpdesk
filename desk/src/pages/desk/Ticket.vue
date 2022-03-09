@@ -185,6 +185,9 @@ export default {
 		getPreviousTicket() {
 
 		}
-	}
+	},
+	updated() {
+		this.$currentPage.set('Ticket', ['Tickets', this.ticketId])
+	},
 }
 </script>
