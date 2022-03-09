@@ -2,13 +2,10 @@
 	<div class="flow-root pb-3 pt-4 pl-5 pr-8 border-b">
 		<div class="float-left">
 			<div class="flex items-center space-x-5">
-				<div class="group rounded-md">
+				<div class="group py-2">
 					<CustomIcons name="helpdesk" width="60" height="20"/>
 				</div>
-				<div v-if="$currentPage.get() == 'Tickets'">
-					
-				</div>
-				<div v-else-if="$currentPage.get() == 'Contacts'">
+				<div v-if="$currentPage.get() == 'Contacts'">
 					<Dropdown
 						placement="left"
 						:options="contactFilterDropdownOptions()"
