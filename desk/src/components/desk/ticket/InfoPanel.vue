@@ -4,12 +4,6 @@
 			<div class="flex items-center">
 				<div class="grow text-lg font-medium">{{ `Contact Information ${editingContact ? '(editing)' : ''}` }}</div>
 				<div v-if="!updatingContact" class="flex">
-					<FeatherIcon
-						v-if="editingContact" 
-						name="check"
-						class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-green-500" 
-						@click="updateContact()"
-					/>
 					<FeatherIcon 
 						:name="editingContact ? 'x' : 'edit-2'" 
 						class="stroke-slate-400 w-4 h-4 cursor-pointer"
@@ -142,6 +136,7 @@ export default {
 
 		return {
 			editingContact,
+			updatingContact,
 			contactName,
 			selectedContact,
 			query,
@@ -166,6 +161,13 @@ export default {
 				: this.contacts.filter((contactItem) => {
 					return contactItem.name.toLowerCase().includes(this.query.toLowerCase())
 				})
+		}
+	},
+	watch: {
+		selectedContact(newValue) {
+			if (newValue) {
+				this.updateContact()
+			}
 		}
 	},
 	methods: {
