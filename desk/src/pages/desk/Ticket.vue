@@ -13,7 +13,7 @@
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10.5rem)' : null }"
 			>
 				<div class="flex items-center pb-4">
-					<span class="text-4xl truncate">
+					<span class="text-4xl">
 						{{ ticket.subject }}
 					</span>
 				</div>
@@ -24,7 +24,7 @@
 					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="user.agent">
-								<Avatar :imageURL="user.profile_image" size="md" />
+								<Avatar :label="user.username" class="cursor-pointer" v-if="user" :imageURL="user.profile_image" size="md" />
 							</div>
 							<div class="grow ml-3">
 								<div v-if="editing">
