@@ -22,7 +22,7 @@
  "modified": "2022-02-24 21:08:12.358398",
  "modified_by": "Administrator",
  "module": "HelpDesk",
- "name": "Team",
+ "name": "Agent Group",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [

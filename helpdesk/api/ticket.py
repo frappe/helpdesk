@@ -19,6 +19,7 @@ def get_tickets(filter=None):
 			ticket.agreement_status,
 			ticket.contact,
 			ticket.template,
+			ticket.agent_group,
 			ticket.first_responded_on
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
@@ -144,6 +145,14 @@ def assign_ticket_priority(ticket_id, priority):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		ticket_doc.priority = priority
+		ticket_doc.save()
+		return ticket_doc
+
+@frappe.whitelist(allow_guest=True)
+def assign_ticket_group(ticket_id, agent_group):
+	if ticket_id:
+		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc.agent_group = agent_group
 		ticket_doc.save()
 		return ticket_doc
 

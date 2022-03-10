@@ -37,9 +37,12 @@
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
 							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-								<div v-if="ticket.assignees.length > 0" class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
-								<div v-else class="text-base grow w-52 text-left text-gray-400"> assign agent </div>
-								<CustomIcons name="select" class="w-4 h-4 float-right" />
+								<div v-if="ticket.assignees.length > 0 && !updatingAssignee" class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
+								<div v-else class="flex items-center">
+									<LoadingText v-if="updatingAssignee" />
+									<div v-else class="text-base grow w-52 text-left text-gray-400"> assign agent </div>
+								</div>
+								<CustomIcons v-if="!updatingAssignee" name="select" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -51,12 +54,15 @@
 						:options="statusesAsDropdownOptions()" 
 						class="text-base w-56"
 					>
-						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
+						<template v-slot="{ toggleStatuses }" @click="toggleStatuses" class="w-full">
 							<div class="w-full">
 								<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div v-if="ticket.status" class="grow w-52 text-left">{{ ticket.status }}</div>
-									<div v-else class="text-base grow w-52 text-left text-gray-400"> set status </div>
-								<CustomIcons name="select" class="w-4 h-4 float-right" />
+									<div v-if="ticket.status && !updatingStatus" class="grow w-52 text-left">{{ ticket.status }}</div>
+									<div v-else class="flex items-center">
+										<LoadingText v-if="updatingStatus" />
+										<div v-else class="text-base grow w-52 text-left text-gray-400"> set status </div>
+									</div>
+								<CustomIcons v-if="!updatingStatus" name="select" class="w-4 h-4 float-right" />
 							</div>
 							</div>
 						</template>
@@ -64,7 +70,22 @@
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Team</div>
-					<div>Functional</div>
+					<CustomDropdown
+						v-if="agentGroups"
+						:options="agentGroupsAsDropdownOptions()" 
+						class="text-base w-56"
+					>
+						<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
+							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
+								<div v-if="ticket.agent_group && !updatingTeam" class="grow w-52 text-left">{{ ticket.agent_group }}</div>
+								<div v-else class="flex items-center">
+									<LoadingText v-if="updatingTeam" />
+									<div v-else class="text-base grow w-52 text-left text-gray-400"> set team </div>
+								</div>
+								<CustomIcons v-if="!updatingTeam" name="select" class="w-4 h-4 float-right" />
+							</div>
+						</template>
+					</CustomDropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Priority</div>
@@ -73,11 +94,14 @@
 						:options="prioritiesAsDropdownOptions()" 
 						class="text-base w-56"
 					>
-						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
+						<template v-slot="{ togglePriority }" @click="togglePriority" class="w-full">
 							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-								<div v-if="ticket.priority" class="grow w-52 text-left">{{ ticket.priority }}</div>
-								<div v-else class="text-base grow w-52 text-left text-gray-400"> set priority </div>
-								<CustomIcons name="select" class="w-4 h-4 float-right" />
+								<div v-if="ticket.priority && !updatingPriority" class="grow w-52 text-left">{{ ticket.priority }}</div>
+								<div v-else class="flex items-center">
+									<LoadingText v-if="updatingPriority" />
+									<div v-else class="text-base grow w-52 text-left text-gray-400"> set priority </div>
+								</div>
+								<CustomIcons v-if="!updatingPriority" name="select" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -89,11 +113,14 @@
 						:options="typesAsDropdownOptions()" 
 						class="text-base w-56"
 					>
-						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
+						<template v-slot="{ toggleTicketTypes }" @click="toggleTicketTypes" class="w-full">
 							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1 items-center">
-								<div v-if="ticket.ticket_type" class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
-								<div v-else class="text-base grow w-52 text-left text-gray-400"> set type </div>
-								<CustomIcons name="select" class="w-4 h-4 float-right" />
+								<div v-if="ticket.ticket_type && !updatingTicketType" class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
+								<div v-else class="flex items-center">
+									<LoadingText v-if="updatingTicketType" />
+									<div v-else class="text-base grow w-52 text-left text-gray-400"> set type </div>
+								</div>
+								<CustomIcons v-if="!updatingTicketType" name="select" class="w-4 h-4 float-right" />
 							</div>
 						</template>
 					</CustomDropdown>
@@ -124,10 +151,10 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown, Input, Dialog, Badge } from 'frappe-ui'
+import { FeatherIcon, Dropdown, Input, Dialog, Badge, LoadingText } from 'frappe-ui'
 import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import { inject } from '@vue/runtime-core'
+import { inject, ref } from '@vue/runtime-core'
 
 export default {
 	name: "ActionPanel",
@@ -139,7 +166,8 @@ export default {
 		CustomDropdown,
 		Input,
 		Dialog,
-		CustomIcons
+		CustomIcons,
+		LoadingText
 	},
 	data() {
 		return {
@@ -154,7 +182,15 @@ export default {
 		const ticketPriorities = inject('ticketPriorities')
 		const ticketStatuses = inject('ticketStatuses')
 		const ticketController = inject('ticketController')
+		
 		const agents = inject('agents')
+		const agentGroups = inject('agentGroups')
+
+		const updatingTicketType = ref(false)
+		const updatingAssignee = ref(false)
+		const updatingPriority = ref(false)
+		const updatingStatus = ref(false)
+		const updatingTeam = ref(false)
 
 		return {
 			user,
@@ -163,7 +199,15 @@ export default {
 			ticketPriorities,
 			ticketStatuses,
 			ticketController,
+		
 			agents,
+			agentGroups,
+
+			updatingTicketType,
+			updatingAssignee,
+			updatingPriority,
+			updatingStatus,
+			updatingTeam
 		}
 	},
 	computed: {
@@ -174,7 +218,10 @@ export default {
 	methods: {
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
-				this.ticketController.set(this.ticketId, 'type', this.newType)
+				this.updatingTicketType = true
+				this.ticketController.set(this.ticketId, 'type', this.newType).then(() => {
+					this.updatingTicketType = false
+				})
 				this.closeCreateNewTicketTypeDialog();
 			}
 		},
@@ -195,7 +242,10 @@ export default {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'agent', agent.name)
+							this.updatingAssignee = true;
+							this.ticketController.set(this.ticketId, 'agent', agent.name).then(() => {
+								this.updatingAssignee = false
+							})
 						},
 					});
 				});
@@ -208,7 +258,10 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.ticketController.set(this.ticketId, 'agent')
+									this.updatingAssignee = true;
+									this.ticketController.set(this.ticketId, 'agent').then(() => {
+										this.updatingAssignee = false
+									})
 								}
 							},
 						],
@@ -231,7 +284,10 @@ export default {
 					typeItems.push({
 						label: type.name,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'type', type.name)
+							this.updatingTicketType = true;
+							this.ticketController.set(this.ticketId, 'type', type.name).then(() => {
+								this.updatingTicketType = false
+							})
 						},
 					});
 				});
@@ -265,7 +321,10 @@ export default {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'status', status)
+							this.updatingStatus = true
+							this.ticketController.set(this.ticketId, 'status', status).then(() => {
+								this.updatingStatus = false
+							})
 						},
 					});
 				});
@@ -281,11 +340,33 @@ export default {
 					typeItems.push({
 						label: priority.name,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'priority', priority.name)
+							this.updatingPriority = true
+							this.ticketController.set(this.ticketId, 'priority', priority.name).then(() => {
+								this.updatingPriority = false
+							})
 						},
 					});
 				});
 				return typeItems;
+			} else {
+				return null;
+			}
+		},
+		agentGroupsAsDropdownOptions() {
+			let groupItems = [];
+			if (this.agentGroups) {
+				this.agentGroups.forEach(group => {
+					groupItems.push({
+						label: group.name,
+						handler: () => {
+							this.updatingTeam = true
+							this.ticketController.set(this.ticketId, 'group', group.name).then(() => {
+								this.updatingTeam = false
+							})
+						},
+					});
+				});
+				return groupItems;
 			} else {
 				return null;
 			}

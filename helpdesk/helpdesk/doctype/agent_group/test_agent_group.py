@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestTeam(unittest.TestCase):
+class TestAgentGroup(unittest.TestCase):
 	pass

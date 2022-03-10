@@ -11,10 +11,11 @@
   "subject_section",
   "subject",
   "raised_by",
-  "cb00",
   "status",
   "priority",
+  "cb00",
   "ticket_type",
+  "agent_group",
   "ticket_split_from",
   "sb_details",
   "description",
@@ -364,12 +365,18 @@
    "fieldtype": "Table",
    "label": "Custom Fields",
    "options": "Ticket Custom Field"
+  },
+  {
+   "fieldname": "agent_group",
+   "fieldtype": "Link",
+   "label": "Agent Group",
+   "options": "Agent Group"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-03-02 22:08:28.463985",
+ "modified": "2022-03-10 15:13:50.048003",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",
