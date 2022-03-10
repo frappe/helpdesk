@@ -43,6 +43,7 @@ export default {
 		const contactController = ref({})
 		
 		const agents = ref([])
+		const agentGroups = ref([])
 		const agentController = ref({})
 
 		
@@ -58,6 +59,7 @@ export default {
 		provide('contactController', contactController)
 
 		provide('agents', agents)
+		provide('agentGroups', agentGroups)
 		provide('agentController', agentController)
 
 		return {
@@ -74,6 +76,7 @@ export default {
 			contactController,
 
 			agents,
+			agentGroups,
 			agentController
 		}
 	},
@@ -98,33 +101,31 @@ export default {
 						ticket_id: ticketId,
 						type: ref
 					})
-					break
 				case 'status':
 					return this.$resources.assignTicketStatus.submit({
 						ticket_id: ticketId,
 						status: ref
 					})
-					break
 				case 'priority':
 					return this.$resources.assignTicketPriority.submit({
 						ticket_id: ticketId,
 						priority: ref
 					})
-					break
 				case 'contact':
-					if (ticketId) {
-						return this.$resources.updateTicketContact.submit({
-							ticket_id: ticketId,
-							contact: ref
-						})
-					}
-					break
+					return this.$resources.updateTicketContact.submit({
+						ticket_id: ticketId,
+						contact: ref
+					})
 				case 'agent':
 					return this.$resources.assignTicketToAgent.submit({
 						ticket_id: ticketId,
 						agent_id: ref
 					})
-					break
+				case 'group':
+					return this.$resources.assignTicketGroup.submit({
+						ticket_id: ticketId,
+						agent_group: ref
+					})
 			}
 		},
 		this.ticketController.new = (type, values) => {
@@ -288,6 +289,21 @@ export default {
 				}
 			}
 		},
+		agentGroups() {
+			return {
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Agent Group'
+				},
+				auto: true,
+				onSuccess: (data) => {
+					this.agentGroups = data
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
 		assignTicketToAgent() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
@@ -324,6 +340,17 @@ export default {
 		assignTicketPriority() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_priority',
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		assignTicketGroup() {
+			return {
+				method: 'helpdesk.api.ticket.assign_ticket_group',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
