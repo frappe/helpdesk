@@ -53,9 +53,8 @@ export default {
 	setup() {
 		const tickets = inject('tickets')
 		const ticketTemplates = inject('ticketTemplates')
-		const ticketController = inject('ticketController')
 
-		return { tickets, ticketTemplates, ticketController }
+		return { tickets, ticketTemplates }
 	},
 	computed: {
 		tickets() {
