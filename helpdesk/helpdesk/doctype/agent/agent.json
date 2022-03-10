@@ -8,7 +8,7 @@
  "field_order": [
   "user",
   "agent_name",
-  "team"
+  "group"
  ],
  "fields": [
   {
@@ -27,15 +27,15 @@
    "label": "Agent Name"
   },
   {
-   "fieldname": "team",
+   "fieldname": "group",
    "fieldtype": "Link",
-   "label": "Team",
-   "options": "Team"
+   "label": "Group",
+   "options": "Agent Group"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-24 22:56:22.278762",
+ "modified": "2022-03-10 14:48:07.929519",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Agent",

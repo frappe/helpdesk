@@ -20,7 +20,7 @@
 				{{ agentRoles }}
 			</div>
 			<div class="sm:w-3/12">
-                {{ agent.team.name }}
+                {{ agent.group.name }}
 			</div>
 		</router-link>
 	</div>
