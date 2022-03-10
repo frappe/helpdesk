@@ -5,23 +5,31 @@
 				<div class="mb-2">
 					<p class="text-4xl font-semibold">Your Tickets</p>
 				</div>
-				<Dropdown
-					placement="right"
-					:options="ticketTemplateOptions()"
-					:dropdown-width-full="true"
-				>
-					<template v-slot="{ toggleTemplates }">
-						<div>
-							<Button 
-								@click="ticketTemplateOptions().length > 1 ? toggleTemplates : openDefaultTicketTemplate()"
-								icon-left="plus" 
-								appearance="primary"
-							>
-								Create New
-							</Button>
+				<div class="space-x-3 items-center flex">
+					<Button type="white">
+						<div class="flex items-center space-x-2">
+							<CustomIcons height="18" width="18" name="sort-ascending" />
+							<div>Sort by created</div>
 						</div>
-					</template>
-				</Dropdown>
+					</Button>
+					<Dropdown
+						placement="right"
+						:options="ticketTemplateOptions()"
+						:dropdown-width-full="true"
+					>
+						<template v-slot="{ toggleTemplates }">
+							<div>
+								<Button 
+									@click="ticketTemplateOptions().length > 1 ? toggleTemplates : openDefaultTicketTemplate()"
+									icon-left="plus" 
+									appearance="primary"
+								>
+									Create New
+								</Button>
+							</div>
+						</template>
+					</Dropdown>
+				</div>
 			</div>
 			<TicketList />
 		</div>
@@ -32,13 +40,15 @@
 import { inject } from 'vue'
 import { Badge, Dropdown } from 'frappe-ui'
 import TicketList from '@/components/portal/tickets/TicketList.vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: "Tickets",
 	components: {
 		Badge,
 		Dropdown,
-		TicketList
+		TicketList,
+		CustomIcons
 	},
 	setup() {
 		const tickets = inject('tickets')
