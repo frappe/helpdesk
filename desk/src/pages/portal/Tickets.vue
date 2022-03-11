@@ -8,8 +8,8 @@
 				<div class="space-x-3 items-center flex">
 					<Button type="white">
 						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="sort-ascending" />
-							<div>Sort by created</div>
+							<CustomIcons height="18" width="18" name="filter" />
+							<div>Filter</div>
 						</div>
 					</Button>
 					<Dropdown

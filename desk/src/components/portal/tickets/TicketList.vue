@@ -2,10 +2,29 @@
 	<div class="px-3 bg-white border rounded-lg shadow">
 		<div class="px-1">
 			<div class="flex items-center border-b py-4 text-gray-500">
-				<div class="sm:w-8/12">Subject</div>
-				<div class="sm:w-2/12">Status</div>
+				<div class="sm:w-8/12">
+					<div class="cursor-pointer w-fit hover:text-gray-700" @click="changeSortBy('subject')">
+						<div class="flex items-center space-x-1">
+							<div> Subject </div>
+							<FeatherIcon v-if="sortBy == 'subject'" :name="sortAscending ? 'arrow-up' : 'arrow-down'" class="w-4 h-4"/>
+						</div>
+					</div>
+				</div>
+				<div class="sm:w-2/12">
+					<div class="cursor-pointer w-fit hover:text-gray-700" @click="changeSortBy('status')">
+						<div class="flex items-center space-x-1">
+							<div> Status </div>
+							<FeatherIcon v-if="sortBy == 'status'" :name="sortAscending ? 'arrow-up' : 'arrow-down'" class="w-4 h-4"/>
+						</div>
+					</div>
+				</div>
 				<div class="sm:w-2/12 flow-root">
-					<div class="float-right">Created</div>
+					<div class="float-right cursor-pointer w-fit hover:text-gray-700" @click="changeSortBy('creation')">
+						<div class="flex items-center space-x-1">
+							<FeatherIcon v-if="sortBy == 'creation'" :name="sortAscending ? 'arrow-up' : 'arrow-down'" class="w-4 h-4"/>
+							<div> Created </div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -31,22 +50,32 @@
 </template>
 
 <script>
-import { inject  } from "vue"
-import { Badge } from 'frappe-ui'
+import { inject, ref  } from "vue"
+import { Badge, FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'TicketList',
 	components: {
-		Badge
+		Badge,
+		FeatherIcon
 	},
 	setup() {
 		const tickets = inject('tickets')
+		const sortBy = ref('creation')
+		const sortAscending = ref(false)
 
-		return { tickets }
+		return { tickets, sortBy, sortAscending }
 	},
 	computed: {
 		tickets() {
-			return this.tickets || null
+			if (this.tickets) {
+				this.tickets = Object.values(this.tickets).sort((a,b) => (a[this.sortBy] > b[this.sortBy]) ? 1 : ((b[this.sortBy] > a[this.sortBy]) ? -1 : 0))
+				if (this.sortAscending) {
+					this.tickets.reverse()
+				}
+				return this.tickets;
+			}
+			return null
 		}
 	},
 	methods: {
@@ -77,6 +106,14 @@ export default {
 		formatedCreationTime(time) {
 			let formatedTime = this.$dayjs(time).fromNow()
 			return formatedTime === 'Now' ? 'Just now' : formatedTime + ' ago'
+		},
+		changeSortBy(fieldname) {
+			if (this.sortBy == fieldname) {
+				this.sortAscending = !this.sortAscending
+			} else {
+				this.sortBy = fieldname 
+				this.sortAscending = true
+			}
 		}
 	}
 }
