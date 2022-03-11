@@ -61,18 +61,45 @@
 			<path d="M14.25 7.75L12.25 5.75L10.25 7.75" stroke="#505A62" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 			<path d="M12.25 11.75L12.25 5.75" stroke="#505A62" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-
 		<svg v-if="this.name=='select'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M4.5 3.63636L6.13636 2L7.77273 3.63636M4.5 8.36364L6.13636 10L7.77273 8.36364" stroke="#404040" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-
+		<div v-if="this.name=='company'" :class="this.class">
+			<div v-if="this.$resources.websiteSettings.data">
+				<img :src="this.$resources.websiteSettings.data.banner_image" />
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 export default {
 	name: 'CustomIcons',
-	props: ['name', 'height', 'width', 'class']
+	props: ['name', 'height', 'width', 'class'],
+	mounted() {
+		console.log(this.name)
+		if (this.name == 'company') {
+			// TODO: fetch company details
+			this.$resources.websiteSettings.fetch()
+		}
+	},
+	resources: {
+		websiteSettings() {
+			return {
+				method: 'frappe.client.get',
+				params: {
+					doctype: "Website Settings",
+					fields: ['*']
+				},
+				onSuccess(data) {
+					console.log(data)
+				},
+				onFailure() {
+					// TODO: 
+				}
+			}
+		}
+	}
 }
 </script>
 

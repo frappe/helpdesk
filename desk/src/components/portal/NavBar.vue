@@ -1,8 +1,8 @@
 <template>
 	<div class="flow-root pl-5 pr-8 border-b py-4">
-		<div class="float-left py-1.5">
+		<div class="float-left">
 			<div class="flex space-x-1">
-				<CustomIcons name="helpdesk" width="60" height="18"/>
+				<CustomIcons name="company" class="h-7 w-7"/>
 				<div v-if="$currentPage.breadcrumbs()" class="flex items-center space-x-1">
 					<div v-for="(breadcrumb, index) in $currentPage.breadcrumbs()" :key="breadcrumb">
 						<div class="flex space-x-1 items-center text-base">
@@ -13,7 +13,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="float-right flex space-x-3 items-center">
+		<div class="float-right flex space-x-3">
 			<Dropdown
                 v-if="ticketTemplateOptions().length > 1"
                 placement="right"
