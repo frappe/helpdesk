@@ -24,9 +24,9 @@
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
-					<div v-if="showReplyButton" class="mt-5 ml-9">
-						<Button @click="() => {showReplyButton = false; delayedConversationScroll()}" appearance="primary">Reply</Button>
-					</div>
+				</div>
+				<div v-if="showReplyButton" class="mt-5 ml-9">
+					<Button @click="() => {showReplyButton = false; delayedConversationScroll()}" appearance="primary">Reply</Button>
 				</div>
 				<div
 					v-if="!showReplyButton"
@@ -56,9 +56,6 @@
 				</div>
 			</div>
 		</div>
-		<!-- <div class="sm:w-4/12">
-			<ActionPanel :ticketId="ticket.name" />
-		</div> -->
 	</div>
 </template>
 
@@ -123,6 +120,8 @@ export default {
         ticket() {
 			if (this.tickets) {
 				return this.tickets[this.ticketId] || null
+			} else {
+				return null
 			}
         }
     },

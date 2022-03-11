@@ -69,11 +69,11 @@ export default {
 	computed: {
 		tickets() {
 			if (this.tickets) {
-				this.tickets = Object.values(this.tickets).sort((a,b) => (a[this.sortBy] > b[this.sortBy]) ? 1 : ((b[this.sortBy] > a[this.sortBy]) ? -1 : 0))
+				let sortedTickets = Object.values(this.tickets).sort((a,b) => (a[this.sortBy] > b[this.sortBy]) ? 1 : ((b[this.sortBy] > a[this.sortBy]) ? -1 : 0))
 				if (!this.sortAscending) {
-					this.tickets.reverse()
+					sortedTickets.reverse()
 				}
-				return this.tickets;
+				return sortedTickets;
 			}
 			return null
 		}

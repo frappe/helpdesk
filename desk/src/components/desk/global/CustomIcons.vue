@@ -88,12 +88,6 @@ export default {
 				params: {
 					doctype: "Website Settings",
 					fields: ['*']
-				},
-				onSuccess(data) {
-					console.log(data)
-				},
-				onFailure() {
-					// TODO: 
 				}
 			}
 		}
