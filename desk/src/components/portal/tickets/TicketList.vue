@@ -70,7 +70,7 @@ export default {
 		tickets() {
 			if (this.tickets) {
 				this.tickets = Object.values(this.tickets).sort((a,b) => (a[this.sortBy] > b[this.sortBy]) ? 1 : ((b[this.sortBy] > a[this.sortBy]) ? -1 : 0))
-				if (this.sortAscending) {
+				if (!this.sortAscending) {
 					this.tickets.reverse()
 				}
 				return this.tickets;
