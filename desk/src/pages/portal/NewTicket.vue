@@ -1,5 +1,5 @@
 <template>
-	<div v-if="template" class="mx-auto max-w-4xl pt-20">
+	<div v-if="template" class="mx-auto max-w-2xl pt-4">
 		<div>
 			<Card 
 				:title="`New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}`" class="space-y-6"
@@ -35,7 +35,9 @@
 						</div>
 					</div>
 				</div>
-				<div>
+				<div class="flex space-x-2 mb-1">
+					<div class="grow"></div>
+					<Button :class="newTicketSubmitLoading ? 'cursor-not-allowed disabled' : ''" @click="cancel()">Cancel</Button>
 					<Button :loading="newTicketSubmitLoading" appearance="primary" @click="submitTicket()">Submit</Button>
 				</div>
 			</Card>
@@ -120,6 +122,11 @@ export default {
 				this.linkedFieldOptions[doctype] = items
 			}
 			return null
+		},
+		cancel() {
+			this.$router.push({
+				name: 'ProtalTickets',
+			})
 		}
 	}
 }

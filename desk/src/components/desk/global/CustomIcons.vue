@@ -61,18 +61,47 @@
 			<path d="M14.25 7.75L12.25 5.75L10.25 7.75" stroke="#505A62" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 			<path d="M12.25 11.75L12.25 5.75" stroke="#505A62" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-
 		<svg v-if="this.name=='select'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M4.5 3.63636L6.13636 2L7.77273 3.63636M4.5 8.36364L6.13636 10L7.77273 8.36364" stroke="#404040" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-
+		<svg v-if="this.name=='empty-list'" :class="this.class" :width="this.width" :height="this.heigth"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 85" fill="none">
+			<rect x="13" y="12" width="64" height="72" rx="7" stroke="#A6B1B9" stroke-width="2"/>
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M8 2H58C61.3137 2 64 4.68629 64 8V9H66V8C66 3.58172 62.4183 0 58 0H8C3.58172 0 0 3.58172 0 8V66C0 70.4183 3.58172 74 8 74H10V72H8C4.68629 72 2 69.3137 2 66V8C2 4.68629 4.68629 2 8 2Z" fill="#A6B1B9"/>
+			<path d="M42 31H66" stroke="#A6B1B9" stroke-width="2" stroke-linecap="round"/>
+			<path d="M42 51H66" stroke="#A6B1B9" stroke-width="2" stroke-linecap="round"/>
+			<path d="M42 25H55" stroke="#A6B1B9" stroke-width="2" stroke-linecap="round"/>
+			<path d="M42 45H55" stroke="#A6B1B9" stroke-width="2" stroke-linecap="round"/>
+			<rect x="24" y="23" width="10" height="10" rx="2" stroke="#2D95F0" stroke-width="2"/>
+			<rect x="24" y="43" width="10" height="10" rx="2" stroke="#2D95F0" stroke-width="2"/>
+		</svg>
+		<div v-if="this.name=='company'" :class="this.class">
+			<div v-if="this.$resources.websiteSettings.data">
+				<img :src="this.$resources.websiteSettings.data.banner_image" />
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 export default {
 	name: 'CustomIcons',
-	props: ['name', 'height', 'width', 'class']
+	props: ['name', 'height', 'width', 'class'],
+	mounted() {
+		if (this.name == 'company') {
+			this.$resources.websiteSettings.fetch()
+		}
+	},
+	resources: {
+		websiteSettings() {
+			return {
+				method: 'frappe.client.get',
+				params: {
+					doctype: "Website Settings",
+					fields: ['*']
+				}
+			}
+		}
+	}
 }
 </script>
 
