@@ -17,7 +17,7 @@ class TicketTemplate(Document):
 
 		required_fields_not_added = []
 		for fieldname in ['subject', 'description']:
-			if not next((field for field in self.fields if field.fieldname == fieldname), None):
+			if not next((field for field in self.fields if field.fieldname == fieldname and field.reqd == True), None):
 				required_fields_not_added.append(fieldname)
 
 		if len(required_fields_not_added) > 0:

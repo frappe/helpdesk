@@ -7,15 +7,21 @@
 				<div class="space-y-4 mb-4">
 					<div v-for="field in template.fields" :key="field">
 						<div v-if="field.fieldtype == 'Data'">
-							<Input :label="field.label" type="text" v-model="formData[field.fieldname]" />
+							<Input :label="field.label" type="text" v-model="formData[field.fieldname]" @change="(data) => {validateField(field, data)}"/>
 						</div>
 						<div v-else-if="field.fieldtype == 'Long Text'">
-							<Input :label="field.label" type="textarea" v-model="formData[field.fieldname]" />
+							<Input :label="field.label" type="textarea" v-model="formData[field.fieldname]" @change="(data) => {validateField(field, data)}"/>
 						</div>
 						<div v-else-if="field.fieldtype == 'Text Editor'">
 							<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
 							<div>
-								<TextEditor v-model="formData[field.fieldname]" showMenu="true" style="min-height:150px; max-height:200px; overflow-y: auto;" />
+								<quill-editor  
+									content=""
+									contentType="html" 
+									:options="editorOptions"
+									style="min-height:150px; max-height:200px; overflow-y: auto;"
+									@update:content="(data) => {validateField(field, data)}"
+								/>
 							</div>
 						</div>
 						<div v-else-if="field.fieldtype == 'Link'">
@@ -25,6 +31,7 @@
 								:options="linkedFieldOptions[field.options]"
 								placement="left" 
 								:dropdown-width-full="true"
+								@change="(data) => {validateField(field, data)}"
 							>
 								<template v-slot="{ toggleDropdown }">
 									<div>
@@ -33,6 +40,7 @@
 								</template>
 							</Dropdown>
 						</div>
+						<ErrorMessage v-if="validationErrors[field.fieldname]" class="mt-1" :message="validationErrors[field.fieldname]" />
 					</div>
 				</div>
 				<div class="flex space-x-2 mb-1">
@@ -46,8 +54,10 @@
 </template>
 <script>
 import { inject, ref } from 'vue'
-import { Input, TextEditor, Card, Dropdown } from 'frappe-ui'
+import { Input, TextEditor, Card, Dropdown, ErrorMessage } from 'frappe-ui'
 import { call } from 'frappe-ui'
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import { QuillEditor } from '@vueup/vue-quill'
 
 export default {
 	name: 'NewTicket',
@@ -56,7 +66,9 @@ export default {
 		Input,
 		TextEditor,
 		Card,
-		Dropdown
+		Dropdown,
+		ErrorMessage,
+		QuillEditor
 	},
 	setup() {
 		const ticketTemplates = inject('ticketTemplates')
@@ -66,7 +78,34 @@ export default {
 		const linkedFieldOptions = ref({})
 		const newTicketSubmitLoading = ref(false)
 
-		return { ticketTemplates, ticketController, formData, linkedFieldOptions, newTicketSubmitLoading }
+		const validationErrors = ref({})
+
+		const editorOptions = ref({
+			modules: {
+				toolbar: [
+					['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+					['blockquote', 'code-block'],
+
+					[{ 'header': 1 }, { 'header': 2 }],               // custom button values
+					[{ 'list': 'ordered'}, { 'list': 'bullet' }],
+
+					[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+					[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+					
+					['image'],
+					
+					[{ 'align': [] }],
+
+					['clean']                                         // remove formatting button
+				]
+			},
+			placeholder: 'Compose your reply...',
+			theme: 'snow',
+			bounds: 7,
+		})
+
+		return { ticketTemplates, ticketController, formData, linkedFieldOptions, newTicketSubmitLoading, validationErrors, editorOptions }
 	},
 	computed: {
 		template() {
@@ -95,8 +134,36 @@ export default {
 			}
 		},
 		validateTicketForm() {
-			// TODO: check for mandatory fields
+			let errors = []
+			for (let index in this.template.fields) {
+				let field = this.template.fields[index]
+				this.validateField(field, this.formData[field.fieldname] || null)
+				if (this.validationErrors[field.fieldname]) {
+					errors.push(this.validationErrors[field.fieldname])
+				}
+			}
+			if (errors.length > 0) {
+				return false
+			}
 			return true
+		},
+		validateField(field, data) {
+			let fieldname = field.fieldname
+			let label = field.label
+
+			this.validationErrors[fieldname] = null
+			if (field.reqd) {
+				if (!data) {
+					this.validationErrors[fieldname] = `${label} is a mandatory field`
+				} else if (field.fieldtype == 'Text Editor') {
+					if (['<p><br></p>', '<p></p>'].includes(data.replaceAll(' ', ''))) {
+						this.validationErrors[fieldname] = `${label} is a mandatory field`
+					}
+				}
+			}
+			if (!this.validationErrors[fieldname]) {
+				this.formData[fieldname] = data
+			}
 		},
 		setLinkedFieldOptions(template) {
 			for (let index in template.fields) {
