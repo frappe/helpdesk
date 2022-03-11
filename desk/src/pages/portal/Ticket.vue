@@ -24,12 +24,12 @@
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
-				</div>
-				<div v-if="showReplyButton">
-					<Button @click="() => {showReplyButton = false; delayedConversationScroll()}" appearance="primary">Reply</Button>
+					<div v-if="showReplyButton" class="mt-5 ml-9">
+						<Button @click="() => {showReplyButton = false; delayedConversationScroll()}" appearance="primary">Reply</Button>
+					</div>
 				</div>
 				<div
-					v-else
+					v-if="!showReplyButton"
 					class="flex flex-col pr-3 pb-3 pt-1" 
 				>
 					<div class="grow ml-3">
