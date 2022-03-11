@@ -1,15 +1,24 @@
 <template>
 	<div v-if="ticket" class="max-w-4xl mx-auto">
 		<div 
-			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9rem)' : null }"
+			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 14rem)' : null }"
 		>
-			<div class="flex items-center pb-2 border-b justify-between">
-				<div class="text-4xl">
-					{{ ticket.subject }}
+			<div class="flex justify-between mb-4">
+				<div class="flex items-center space-x-2">
+					<a href="/support/kb">Home</a>
+					<FeatherIcon name="chevron-right" class="h-3 w-3"/>
+					<router-link :to="{name: 'ProtalTickets'}">Tickets</router-link>
+					<FeatherIcon name="chevron-right" class="h-3 w-3"/>
+					<div class="text-gray-400">{{ ticket.name }}</div>
 				</div>
 				<div>
-					<Button @click="reopenTicket()" appearance="primary" v-if="['Closed', 'Resolved'].includes(ticket.status)">Reopen</Button>
-					<Button @click="closeTicket()" appearance="primary" v-else>Close</Button>
+					<Button @click="reopenTicket()" appearance="minimal" v-if="['Closed', 'Resolved'].includes(ticket.status)">Reopen</Button>
+					<Button @click="closeTicket()" appearance="danger" v-else>Close</Button>
+				</div>
+			</div>
+			<div class="flex items-center pb-2 justify-between">
+				<div class="text-5xl font-bold">
+					{{ ticket.subject }}
 				</div>
 			</div>
 			<div class="grow flex flex-col h-full space-y-2">
@@ -54,6 +63,7 @@ import Conversations from "@/components/portal/ticket/Conversations.vue"
 import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
+import { FeatherIcon } from 'frappe-ui'
 
 export default {
     name: "Tickets",
@@ -61,7 +71,8 @@ export default {
 	components: {
 		Conversations,
 		ActionPanel,
-		QuillEditor
+		QuillEditor,
+		FeatherIcon
 	},
 	data() {
 		return {
