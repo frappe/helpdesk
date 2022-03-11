@@ -12,7 +12,9 @@
 					:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
 					:time="conversation.creation" 
 					:message="conversation.content"
+					color="gray" 
 				/>
+				<!-- TODO: dynamically set color based on user -->
 			</div>
 		</div>
 	</div>

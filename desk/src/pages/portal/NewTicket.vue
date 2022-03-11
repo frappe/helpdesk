@@ -1,5 +1,5 @@
 <template>
-	<div v-if="template" class="mx-auto max-w-4xl pt-4">
+	<div v-if="template" class="mx-auto max-w-2xl pt-4">
 		<div>
 			<Card 
 				:title="`New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}`" class="space-y-6"

@@ -3,14 +3,6 @@
 		<div class="float-left">
 			<div class="flex space-x-1">
 				<CustomIcons name="company" class="h-7 w-7"/>
-				<div v-if="$currentPage.breadcrumbs()" class="flex items-center space-x-1">
-					<div v-for="(breadcrumb, index) in $currentPage.breadcrumbs()" :key="breadcrumb">
-						<div class="flex space-x-1 items-center text-base">
-							<FeatherIcon v-if="index < $currentPage.breadcrumbs().length" name="chevron-right" class="h-4 w-4" />
-							<span>{{ breadcrumb }}</span>
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
 		<div class="float-right flex space-x-3">

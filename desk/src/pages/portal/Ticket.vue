@@ -4,7 +4,7 @@
 			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 14rem)' : null }"
 		>
 			<div class="flex justify-between mb-4">
-				<div class="flex items-center space-x-2">
+				<div class="flex items-center space-x-2 text-lg">
 					<a href="/support/kb">Home</a>
 					<FeatherIcon name="chevron-right" class="h-3 w-3"/>
 					<router-link :to="{name: 'ProtalTickets'}">Tickets</router-link>
@@ -25,8 +25,12 @@
 				<div class="overflow-auto grow">
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 				</div>
-				<div 
-					class="flex flex-col pr-3 pb-3 pt-3" 
+				<div v-if="showReplyButton">
+					<Button @click="() => {showReplyButton = false; delayedConversationScroll()}" appearance="primary">Reply</Button>
+				</div>
+				<div
+					v-else
+					class="flex flex-col pr-3 pb-3 pt-1" 
 				>
 					<div class="grow ml-3">
 						<div v-if="!(['Closed', 'Resolved'].includes(ticket.status))">
@@ -37,7 +41,7 @@
 								:options="editorOptions"
 								style="min-height:150px; max-height:200px; overflow-y: auto;"
 							/>
-							<div class="mt-2 space-x-2">
+							<div class="mt-2 space-x-2 flex">
 								<Button 
 									:loading="this.$resources.submitConversation.loading" 
 									@click="this.submitConversation" 
@@ -45,6 +49,7 @@
 								>
 									Send
 								</Button>
+								<Button @click="() => {showReplyButton = true}">Cancel</Button>
 							</div>
 						</div>
 					</div>
@@ -110,8 +115,9 @@ export default {
 		const viewportWidth = inject("viewportWidth")
         const tickets = inject("tickets")
         const ticketController = inject("ticketController")
+		const showReplyButton = ref(true)
         
-		return { editor, viewportWidth, tickets, ticketController }
+		return { editor, viewportWidth, tickets, ticketController, showReplyButton }
     },
     computed: {
         ticket() {
