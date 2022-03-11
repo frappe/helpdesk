@@ -3,15 +3,9 @@
 		<div class="mx-auto max-w-4xl">
 			<div class="flex justify-between items-center mb-2">
 				<div class="mb-2">
-					<p class="text-4xl font-semibold">Your Tickets</p>
+					<p class="text-4xl font-semibold">All Tickets</p>
 				</div>
 				<div class="space-x-3 items-center flex">
-					<Button type="white">
-						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="filter" />
-							<div>Filter</div>
-						</div>
-					</Button>
 					<Dropdown
 						placement="right"
 						:options="ticketTemplateOptions()"
