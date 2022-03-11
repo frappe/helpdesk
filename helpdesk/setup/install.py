@@ -159,11 +159,13 @@ def add_default_ticket_template():
 		'label': 'Subject',
 		'fieldname': 'subject',
 		'fieldtype': 'Data',
+		'reqd': True
 	})
 	template.append("fields", {
 		'label': 'Description',
 		'fieldname': 'description',
 		'fieldtype': 'Long Text',
+		'reqd': True
 	})
 
 	template.insert()
