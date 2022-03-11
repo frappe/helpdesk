@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="h-15">
+		<div class="h-15 mb-5">
 			<NavBar />
 		</div>
 		<div v-if="user.isLoggedIn()">

@@ -77,9 +77,7 @@ export default {
 	name: 'CustomIcons',
 	props: ['name', 'height', 'width', 'class'],
 	mounted() {
-		console.log(this.name)
 		if (this.name == 'company') {
-			// TODO: fetch company details
 			this.$resources.websiteSettings.fetch()
 		}
 	},

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="ticket" class="max-w-4xl mx-auto pt-20">
+	<div v-if="ticket" class="max-w-4xl mx-auto">
 		<div 
 			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9rem)' : null }"
 		>

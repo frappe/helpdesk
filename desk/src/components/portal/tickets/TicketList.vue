@@ -1,30 +1,30 @@
 <template>
-    <div class="px-3 bg-white border rounded-lg shadow">
-        <div class="px-1">
-            <div class="flex items-center border-b py-4 text-gray-500">
-                <div class="sm:w-8/12">Subject</div>
-                <div class="sm:w-2/12">Status</div>
-                <div class="sm:w-2/12 flow-root">
-                    <div class="float-right">Created</div>
-                </div>
-            </div>
-        </div>
-        <div v-for="(ticket, key, index) in tickets" :key="ticket.name" class="space-y-4">
-            <router-link :to="`/support/tickets/${ticket.name}`">
-                <div class="px-1 rounded hover:bg-slate-50 cursor-pointer">
-                    <div class="flex items-center py-4" :class="index < Object.keys(tickets).length - 1 ? 'border-b' : ''">
-                        <div class="sm:w-8/12">{{ ticket.subject }}</div>
-                        <div class="sm:w-2/12">
-                            <Badge :color="getStatusBadgeColor(ticket.status)">{{ getStatus(ticket.status) }}</Badge>
-                        </div>
-                        <div class="sm:w-2/12 flow-root">
-                            <div class="float-right text-slate-500">{{ `${$dayjs(ticket.creation).fromNow()} ago` }}</div>
-                        </div>
-                    </div>
-                </div>
-            </router-link>
-        </div>
-    </div>
+	<div class="px-3 bg-white border rounded-lg shadow">
+		<div class="px-1">
+			<div class="flex items-center border-b py-4 text-gray-500">
+				<div class="sm:w-8/12">Subject</div>
+				<div class="sm:w-2/12">Status</div>
+				<div class="sm:w-2/12 flow-root">
+					<div class="float-right">Created</div>
+				</div>
+			</div>
+		</div>
+		<div v-for="(ticket, key, index) in tickets" :key="ticket.name" class="space-y-4">
+			<router-link :to="`/support/tickets/${ticket.name}`">
+				<div class="px-1 rounded hover:bg-slate-50 cursor-pointer">
+					<div class="flex items-center py-4" :class="index < Object.keys(tickets).length - 1 ? 'border-b' : ''">
+						<div class="sm:w-8/12">{{ ticket.subject }}</div>
+						<div class="sm:w-2/12">
+							<Badge :color="getStatusBadgeColor(ticket.status)">{{ getStatus(ticket.status) }}</Badge>
+						</div>
+						<div class="sm:w-2/12 flow-root">
+							<div class="float-right text-slate-500">{{ formatedCreationTime(ticket.creation) }}</div>
+						</div>
+					</div>
+				</div>
+			</router-link>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -32,22 +32,22 @@ import { inject  } from "vue"
 import { Badge } from 'frappe-ui'
 
 export default {
-    name: 'TicketList',
-    components: {
-        Badge
-    },
-    setup() {
-        const tickets = inject('tickets')
+	name: 'TicketList',
+	components: {
+		Badge
+	},
+	setup() {
+		const tickets = inject('tickets')
 
-        return { tickets }
-    },
-    computed: {
-        tickets() {
-            return this.tickets || null
-        }
-    },
-    methods: {
-        getStatus(status) {
+		return { tickets }
+	},
+	computed: {
+		tickets() {
+			return this.tickets || null
+		}
+	},
+	methods: {
+		getStatus(status) {
 			switch(status) {
 				case 'Replied':
 					return 'Waiting For Reply'
@@ -71,7 +71,11 @@ export default {
 					return 'red'
 			}
 		},
-    }
+		formatedCreationTime(time) {
+			let formatedTime = this.$dayjs(time).fromNow()
+			return formatedTime === 'Now' ? 'Just now' : formatedTime + ' ago'
+		}
+	}
 }
 </script>
 
