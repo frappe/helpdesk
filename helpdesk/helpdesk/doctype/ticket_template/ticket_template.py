@@ -12,6 +12,8 @@ class TicketTemplate(Document):
 		for field in self.fields:
 			if field.fieldtype not in allowed_field_types:
 				frappe.throw(f'Type {field.fieldtype} not allowed, should be in {allowed_field_types}')
+			if not field.fieldname:
+				field.fieldname = cleanup_page_name(field.label)
 
 		required_fields_not_added = []
 		for fieldname in ['subject', 'description']:
