@@ -68,11 +68,12 @@ import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'TicketList',
+	props: ['filter'],
 	components: {
-    Badge,
-    FeatherIcon,
-    CustomIcons
-},
+		Badge,
+		FeatherIcon,
+		CustomIcons
+	},
 	setup() {
 		const tickets = inject('tickets')
 		const sortBy = ref('creation')
@@ -87,7 +88,19 @@ export default {
 				if (!this.sortAscending) {
 					sortedTickets.reverse()
 				}
-				return sortedTickets;
+				let filterdTickets = []
+				switch (this.filter) {
+					case 'Open Tickets':
+						filterdTickets = sortedTickets.filter(ticket => !['Closed', 'Resolved'].includes(ticket.status))
+						break
+					case 'Closed Tickets':
+						filterdTickets = sortedTickets.filter(ticket => ['Closed', 'Resolved'].includes(ticket.status))
+						break
+					default:
+						filterdTickets = sortedTickets
+						break
+				}
+				return filterdTickets;
 			}
 			return null
 		}

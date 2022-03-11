@@ -3,7 +3,14 @@
 		<div class="mx-auto max-w-4xl">
 			<div class="flex justify-between items-center mb-2">
 				<div class="mb-2">
-					<p class="text-4xl font-semibold">All Tickets</p>
+					<Dropdown :options="getTicketFilterOptions()">
+						<template v-slot="{ toggleTicketFilters }" @click="toggleTicketFilters">
+							<div class="flex space-x-2 items-center cursor-pointer">
+								<p class="text-4xl font-semibold">{{ this.ticketFilter }}</p>
+								<FeatherIcon name="chevron-down" class="w-5 h-5" />
+							</div>
+						</template>
+					</Dropdown>
 				</div>
 				<div class="space-x-3 items-center flex">
 					<Dropdown
@@ -25,14 +32,14 @@
 					</Dropdown>
 				</div>
 			</div>
-			<TicketList />
+			<TicketList :filter="ticketFilter" />
 		</div>
 	</div>
 </template>
 
 <script>
-import { inject } from 'vue'
-import { Badge, Dropdown } from 'frappe-ui'
+import { inject, ref } from 'vue'
+import { Badge, Dropdown, FeatherIcon } from 'frappe-ui'
 import TicketList from '@/components/portal/tickets/TicketList.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
@@ -42,13 +49,15 @@ export default {
 		Badge,
 		Dropdown,
 		TicketList,
-		CustomIcons
+		CustomIcons,
+		FeatherIcon
 	},
 	setup() {
 		const tickets = inject('tickets')
 		const ticketTemplates = inject('ticketTemplates')
+		const ticketFilter = ref('All Tickets')
 
-		return { tickets, ticketTemplates }
+		return { tickets, ticketTemplates, ticketFilter }
 	},
 	computed: {
 		tickets() {
@@ -81,7 +90,19 @@ export default {
 			this.$router.push({
 				name: 'DefaultNewTicket'
 			})
-		}
+		},
+		getTicketFilterOptions() {
+			let items = [];
+			["All Tickets", "Open Tickets", "Closed Tickets"].forEach(item => {
+				items.push({
+				label: item,
+					handler: () => {
+						this.ticketFilter = item
+					},
+				});
+			});
+			return items;
+		},
 	}
 }
 </script>
