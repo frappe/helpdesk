@@ -1,6 +1,5 @@
 <template>
 	<div v-if="ticket">
-		<TopControlPanel :ticket="ticket" @next="getNextTicket" @previous="getPreviousTicket"/>
 		<div class="flex">
 			<div 
 				class="w-1/5 border-r"
@@ -74,7 +73,6 @@
 import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
 import ConversationCard from '@/components/desk/ticket/ConversationCard.vue';
 import Conversations from '@/components/desk/ticket/Conversations.vue';
-import TopControlPanel from '@/components/desk/ticket/TopControlPanel.vue'
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
