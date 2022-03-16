@@ -2,13 +2,13 @@
 	<div v-if="ticket">
 		<div class="flex">
 			<div 
-				class="w-1/5 border-r"
+				class="sm:w-1/5"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<InfoPanel :ticketId="ticket.name" />
 			</div>
 			<div
-				class="w-3/5 pt-3 px-4"
+				class="sm:w-3/5 pt-3 px-4"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10.5rem)' : null }"
 			>
 				<div class="flex items-center pb-4">
@@ -61,7 +61,7 @@
 				</div>
 			</div>
 			<div 
-				class="w-1/5 border-l"
+				class="sm:w-1/5 border-l"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<ActionPanel :ticketId="ticket.name" />
@@ -89,7 +89,6 @@ export default {
 		Avatar,
 		ConversationCard,
 		Conversations,
-		TopControlPanel,
 		InfoPanel,
 		ActionPanel,
 		QuillEditor

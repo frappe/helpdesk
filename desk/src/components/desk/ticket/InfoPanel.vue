@@ -1,8 +1,7 @@
 <template>
-	<div class="px-3" v-if="ticket">
-		<div class="py-4 space-y-3 text-base">
-			<div class="flex items-center">
-				<div class="grow text-lg font-medium">{{ `Contact Information ${editingContact ? '(editing)' : ''}` }}</div>
+	<div class="m-6 p-3 px-4 rounded shadow" v-if="ticket">
+		<div class="pt-2 pb-4 space-y-3 text-base border-b">
+			<!-- <div class="flex items-center">
 				<div v-if="!updatingContact" class="flex">
 					<FeatherIcon 
 						:name="editingContact ? 'x' : 'edit-2'" 
@@ -11,28 +10,28 @@
 						@click="() => {editingContact=!editingContact}"
 					/>
 				</div>
-			</div>
+			</div> -->
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
-				<div v-if="!editingContact" class="space-y-2">
-					<div v-if="ticket.contact">
-						<div class="flex space-x-2">
-							<FeatherIcon name="user" class="w-4 h-4" />
-							<div class="text-slate-500 truncate">{{ contactFullName }}</div>
+				<div v-if="!editingContact">
+					<div v-if="ticket.contact" class="space-y-1">
+						<div class="flex space-x-2 items-center">
+							<Avatar :label="contactFullName" :imageURL="ticket.contact.image" style="width: 20px; height: 20px" />
+							<div class="">{{ contactFullName }}</div>
 						</div>
-						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
-							<FeatherIcon name="mail" class="w-4 h-4" />
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2 items-center">
+							<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px; margin-left: 2.5px" />
 							<div>
 								<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-									<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+									<div class="text-slate-500">{{ email_id.email_id }}</div>
 								</div>
 							</div>
 						</div>
-						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
+						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2 items-center">
 							<FeatherIcon name="phone" class="w-4 h-4" />
 							<div>
 								<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-									<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+									<div class="text-slate-500">{{ phone_no.phone }}</div>
 								</div>
 							</div>
 						</div>
@@ -78,10 +77,11 @@
 			</div>
 		</div>
 		<div>
-			<div class="py-4 space-y-3" v-if="otherTicketsOfContact && !editingContact">
-				<div v-if="otherTicketsOfContact.length > 0" class="flex cursor-pointer" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
-					<div class="grow text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
+			<div class="pt-4 pb-1 space-y-3" v-if="otherTicketsOfContact && !editingContact">
+				<div class="flex" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
+					<div class="grow text-lg font-medium">{{ `${otherTicketsOfContact.length > 0 ? '' : 'No'} Open Tickets ${otherTicketsOfContact.length > 0 ? '(' + otherTicketsOfContact.length + ')' : ''}` }}</div>
 					<FeatherIcon 
+						v-if="otherTicketsOfContact.length > 0"
 						:name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'" 
 						class="stroke-slate-400 w-4 h-4"
 					/>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
+import { FeatherIcon, Input, LoadingText, Avatar } from 'frappe-ui'
 import {
 	Combobox,
 	ComboboxInput,
@@ -125,6 +125,7 @@ export default {
 		FeatherIcon,
 		Input,
 		LoadingText,
+		Avatar,
 		Combobox,
 		ComboboxInput,
 		ComboboxOption,
