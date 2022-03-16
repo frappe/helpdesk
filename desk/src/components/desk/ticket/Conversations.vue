@@ -12,6 +12,7 @@
 						:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
 						:time="conversation.creation" 
 						:message="conversation.content"
+						:isLast="index == conversations.length - 1"
 					/>
 				</div>
 			</div>
