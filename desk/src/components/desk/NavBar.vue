@@ -5,9 +5,9 @@
 				<CustomIcons name="helpdesk" width="60" height="18"/>
 				<div v-if="$currentPage.breadcrumbs()" class="flex items-center space-x-1">
 					<div v-for="(breadcrumb, index) in $currentPage.breadcrumbs()" :key="breadcrumb">
-						<div class="flex space-x-1 items-center text-base">
+						<div class="flex space-x-1 items-center text-base" :class="breadcrumb.action ? 'cursor-pointer' : ''" @click="() => {breadcrumb.action ? breadcrumb.action() : {}}">
 							<FeatherIcon v-if="index < $currentPage.breadcrumbs().length" name="chevron-right" class="h-4 w-4" />
-							<span>{{ breadcrumb }}</span>
+							<span :class="index == $currentPage.breadcrumbs().length - 1 ? 'text-gray-500' : ''">{{ breadcrumb.label }}</span>
 						</div>
 					</div>
 				</div>
