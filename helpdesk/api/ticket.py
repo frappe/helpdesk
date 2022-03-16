@@ -93,7 +93,6 @@ def update_contact(ticket_id, contact):
 
 		ticket_doc.save()
 		
-		frappe.db.commit()
 		return ticket_doc
 
 def get_agent_assigned_to_ticket(ticket_id):
@@ -118,7 +117,6 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 			if not frappe.db.exists("Agent", agent_id):
 				frappe.throw('Tickets can only assigned to agents')
 		ticket_doc.assign_agent(agent_id)
-		frappe.db.commit()
 		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
@@ -127,8 +125,6 @@ def assign_ticket_type(ticket_id, type):
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		ticket_doc.ticket_type = check_and_create_ticket_type(type).name
 		ticket_doc.save()
-		
-		frappe.db.commit()
 
 		return ticket_doc
 
@@ -185,7 +181,6 @@ def get_contact(ticket_id):
 		if (ticket_doc.raised_by):
 			ticket_doc.set_contact(ticket_doc.raised_by)
 			ticket_doc.save()
-			frappe.db.commit()
 			contact_id = frappe.get_value("Ticket", ticket_id, "contact")
 			if (contact_id):
 				contact_doc = frappe.get_doc("Contact", contact_id)

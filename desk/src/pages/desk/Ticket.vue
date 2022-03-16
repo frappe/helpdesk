@@ -2,17 +2,17 @@
 	<div v-if="ticket">
 		<div class="flex">
 			<div 
-				class="sm:w-1/5"
+				class="sm:w-1/5 m-1 mt-2"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<InfoPanel :ticketId="ticket.name" />
 			</div>
 			<div
 				class="sm:w-3/5 pt-3 px-4"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10.5rem)' : null }"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
-				<div class="flex items-center pb-4">
-					<span class="text-4xl">
+				<div class="flex items-center pb-4 mt-3">
+					<span class="text-4xl text-ellipsis">
 						{{ ticket.subject }}
 					</span>
 				</div>
@@ -61,7 +61,7 @@
 				</div>
 			</div>
 			<div 
-				class="sm:w-1/5 border-l"
+				class="sm:w-1/5 m-1 mt-2"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<ActionPanel :ticketId="ticket.name" />

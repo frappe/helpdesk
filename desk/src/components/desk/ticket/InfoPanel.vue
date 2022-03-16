@@ -1,23 +1,21 @@
 <template>
-	<div class="m-6 p-3 px-4 rounded shadow" v-if="ticket">
-		<div class="pt-2 pb-4 space-y-3 text-base border-b">
-			<!-- <div class="flex items-center">
-				<div v-if="!updatingContact" class="flex">
-					<FeatherIcon 
-						:name="editingContact ? 'x' : 'edit-2'" 
-						class="stroke-slate-400 w-4 h-4 cursor-pointer"
-						:class="editingContact ? 'hover:stroke-red-500': ''" 
-						@click="() => {editingContact=!editingContact}"
-					/>
-				</div>
-			</div> -->
+	<div class="m-4 px-4 rounded shadow" v-if="ticket">
+		<div class="py-4 space-y-3 text-base border-b">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
 				<div v-if="!editingContact">
 					<div v-if="ticket.contact" class="space-y-1">
 						<div class="flex space-x-2 items-center">
 							<Avatar :label="contactFullName" :imageURL="ticket.contact.image" style="width: 20px; height: 20px" />
-							<div class="">{{ contactFullName }}</div>
+							<div class="grow">{{ contactFullName }}</div>
+							<div v-if="!updatingContact" class="flex">
+								<FeatherIcon 
+									:name="editingContact ? 'x' : 'edit-2'" 
+									class="stroke-slate-400 w-4 h-4 cursor-pointer"
+									:class="editingContact ? 'hover:stroke-red-500': ''" 
+									@click="() => {editingContact=!editingContact}"
+								/>
+							</div>
 						</div>
 						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2 items-center">
 							<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px; margin-left: 2.5px" />
@@ -77,7 +75,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="pt-4 pb-1 space-y-3" v-if="otherTicketsOfContact && !editingContact">
+			<div class="py-4 space-y-3" v-if="otherTicketsOfContact && !editingContact">
 				<div class="flex" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
 					<div class="grow text-lg font-medium">{{ `${otherTicketsOfContact.length > 0 ? '' : 'No'} Open Tickets ${otherTicketsOfContact.length > 0 ? '(' + otherTicketsOfContact.length + ')' : ''}` }}</div>
 					<FeatherIcon 
@@ -93,7 +91,7 @@
 								<div>
 									<FeatherIcon name="link" class="w-4 h-4"/>
 								</div>
-								<div class="text-slate-500 ml-2 grow truncate">{{ ticket.subject }}</div>
+								<div class="text-slate-500 ml-2 overflow-hidden h-5 text-ellipsis">{{ ticket.subject }}</div>
 							</div>
 						</router-link>
 					</div>

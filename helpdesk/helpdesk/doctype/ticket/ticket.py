@@ -136,7 +136,6 @@ class Ticket(Document):
 			"doctype": "Ticket",
 			"name": self.name
 		})
-		frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_contact(ticket, message, attachments=None):
