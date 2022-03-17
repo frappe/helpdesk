@@ -97,6 +97,7 @@ export default {
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
 				case 'type':
+					console.log('calling resource manager for setting ticket type')
 					return this.$resources.assignTicketType.submit({
 						ticket_id: ticketId,
 						type: ref
@@ -145,7 +146,10 @@ export default {
 			switch (data.doctype) {
 				case 'Ticket':
 					if (data.name) {
-						this.ticketController.update(data.name)
+						if (data.user != this.user.user) {
+							// only update the ticket if changes not made by current user
+							this.ticketController.update(data.name)
+						}
 					} else {
 						this.ticketController.update()
 					}

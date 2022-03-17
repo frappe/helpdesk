@@ -36,6 +36,7 @@ def get_user():
 		'agent': session_agent,
 		'profile_image': frappe.get_value("User", session_user, "user_image"),
 		'username': username,
-		'isAdmin': username == "administrator"
+		'isAdmin': username == "administrator",
+		'user': frappe.session.user
 	}
 	
