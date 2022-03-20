@@ -245,7 +245,6 @@ def get_all_ticket_templates():
 
 @frappe.whitelist(allow_guest=True)
 def activities(name):
-	print('fetching activities')
 	activities = frappe.db.sql(
 		"""
 		SELECT action, creation, owner

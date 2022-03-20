@@ -5,7 +5,7 @@
 				<div 
 					v-for="(item, index) in items" :key="item.name"
 					ref="itemContainer"
-				>	
+				>
 					<div :ref="`item-${index}`">
 						<div v-if="item.action">
 							<ActivityCard 
@@ -17,7 +17,7 @@
 						</div>
 						<div v-else-if="item.sender">
 							<ConversationCard 
-								:userName="(item.sender.first_name ? item.sender.first_name : '') + ' ' + (item.sender.last_name ? conversation.sender.last_name : '')" 
+								:userName="(item.sender.first_name ? item.sender.first_name : '') + ' ' + (item.sender.last_name ? item.sender.last_name : '')" 
 								:profilePicUrl="item.sender.image ? item.sender.image : ''" 
 								:time="item.creation" 
 								:message="item.content"
@@ -70,27 +70,21 @@ export default {
 	},
 	computed: {
 		conversations() {
-			this.$nextTick(() => {
-				this.autoScrollToBottom();
-			})
 			return this.$resources.conversations.data || null;
 		},
 		activities() {
-			this.$nextTick(() => {
-				this.autoScrollToBottom();
-			})
 			return this.$resources.activities.data || null;
 		},
 		items() {
+			this.$nextTick(() => {
+				this.autoScrollToBottom();
+			})
 			switch(this.show) {
 				case 'Conversations':
-					console.log('conversation')
 					return this.conversations
 				case 'Activities':
-					console.log('activities')
 					return this.activities
 				case 'All':
-					console.log('all')
 					let items = []
 					items = this.activities ? [...items, ...this.activities]: items
 					items = this.conversations ? [...items, ...this.conversations]: items
