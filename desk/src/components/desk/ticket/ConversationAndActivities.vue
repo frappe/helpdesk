@@ -1,41 +1,36 @@
 <template>
 	<div>
-		<div v-if="show === 'Conversations'">
-			<div v-if="conversations">
-				<div
-					v-for="(conversation, index) in conversations" :key="conversation.name" 
-					class="flex flex-col pr-3"
-					ref="conversationContainer"
-				>
-					<div :ref="`conversation-${index}`">
-						<ConversationCard 
-							:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
-							:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
-							:time="conversation.creation" 
-							:message="conversation.content"
-							:isLast="index == conversations.length - 1"
-						/>
+		<div v-if="items">
+			<div v-if="items.length > 0">
+				<div 
+					v-for="(item, index) in items" :key="item.name"
+					ref="itemContainer"
+				>	
+					<div :ref="`item-${index}`">
+						<div v-if="item.action">
+							<ActivityCard 
+								:action="item.action"
+								:owner="item.owner"
+								:creation="item.creation"
+								:isLast="index == items.length - 1"
+							/>
+						</div>
+						<div v-else-if="item.sender">
+							<ConversationCard 
+								:userName="(item.sender.first_name ? item.sender.first_name : '') + ' ' + (item.sender.last_name ? conversation.sender.last_name : '')" 
+								:profilePicUrl="item.sender.image ? item.sender.image : ''" 
+								:time="item.creation" 
+								:message="item.content"
+								:isLast="index == items.length - 1"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div v-else>
-				<LoadingText />
-			</div>
-		</div>
-		<div v-else-if="show === 'Activities'">
-			<div v-if="activities">
-				<div v-for="(activity, index) in activities" :key="activity.name">
-					<ActivityCard
-						:action="activity.action"
-						:owner="activity.owner"
-						:creation="activity.creation"
-						:isLast="index == activities.length - 1"
-					/>
-				</div>
-			</div>
+			<div v-else class="text-slate-500 m-4 text-base">Nothing to show</div>
 		</div>
 		<div v-else>
-			Activities and Conversations
+			<LoadingText />
 		</div>
 	</div>
 </template>
@@ -81,7 +76,27 @@ export default {
 			return this.$resources.conversations.data || null;
 		},
 		activities() {
+			this.$nextTick(() => {
+				this.autoScrollToBottom();
+			})
 			return this.$resources.activities.data || null;
+		},
+		items() {
+			switch(this.show) {
+				case 'Conversations':
+					console.log('conversation')
+					return this.conversations
+				case 'Activities':
+					console.log('activities')
+					return this.activities
+				case 'All':
+					console.log('all')
+					let items = []
+					items = this.activities ? [...items, ...this.activities]: items
+					items = this.conversations ? [...items, ...this.conversations]: items
+					items.sort((item1, item2) =>  new Date(item1.creation) - new Date(item2.creation))
+					return items
+			}
 		}
 	},
 	watch: {
@@ -106,8 +121,8 @@ export default {
 	},
 	methods: {
 		autoScrollToBottom() {
-			if (this.conversations) {
-				const [el] = this.$refs["conversation-" + (this.conversations.length - 1)];
+			if (this.items) {
+				const [el] = this.$refs["item-" + (this.items.length - 1)];
 				if (el) {
 					el.scrollIntoView({behavior: 'smooth'});
 				}

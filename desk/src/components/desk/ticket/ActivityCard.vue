@@ -1,7 +1,7 @@
 <template>
-	<div class="space-x-2 flex">
-		<div class="h-10">
-			<FeatherIcon class="stroke-slate-500 mx-2 h-4 w-4" name="disc" />
+	<div class="py-2 space-x-2 flex">
+		<div>
+			<FeatherIcon class="fill-white stroke-slate-500 mx-2 h-4 w-4" name="disc" />
 			<div v-if="!isLast" class="h-full border-l mx-4" />
 		</div>
 		<div class="grow space-y-2">

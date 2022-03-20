@@ -25,7 +25,7 @@
 					<div class="overflow-auto grow">
 						<ConversationAndActivities :show="show" :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 					</div>
-					<div class="flex flex-col pr-3 pb-10 pt-3">
+					<div v-if="show != 'Activities'" class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="user.agent">
 								<Avatar :label="user.username" class="cursor-pointer" v-if="user" :imageURL="user.profile_image" size="md" />
