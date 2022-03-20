@@ -34,6 +34,16 @@
 							</div>
 						</div>
 					</div>
+					<div v-else>
+						<div v-if="!updatingContact" class="flex flex-row-reverse">
+							<FeatherIcon 
+								:name="editingContact ? 'x' : 'edit-2'" 
+								class="stroke-slate-400 w-4 h-4 cursor-pointer"
+								:class="editingContact ? 'hover:stroke-red-500': ''" 
+								@click="() => {editingContact=!editingContact}"
+							/>
+						</div>
+					</div>
 				</div>
 				<div v-else class="w-full">
 					<Combobox v-model="selectedContact">
