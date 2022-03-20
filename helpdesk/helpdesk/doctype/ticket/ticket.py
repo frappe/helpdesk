@@ -133,6 +133,12 @@ class Ticket(Document):
 		self.db_set("user_resolution_time", None)
 
 	def assign_agent(self, agent):
+		assignees = json.loads(self._assign)
+		for assignee in assignees:
+			if agent == assignee:
+				# the agent is already set as an assignee
+				return
+
 		clear_all_assignments("Ticket", self.name)
 		assign({
 			"assign_to": [agent],

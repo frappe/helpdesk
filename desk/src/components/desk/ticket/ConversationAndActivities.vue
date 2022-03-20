@@ -23,7 +23,11 @@
 			</div>
 		</div>
 		<div v-else-if="show === 'Activities'">
-			Activities
+			<div v-if="activities">
+				<div v-for="activity in activities" :key="activity.name">
+					{{ activity.action }} by {{ activity.owner }}
+				</div>
+			</div>
 		</div>
 		<div v-else>
 			Activities and Conversations
@@ -52,6 +56,15 @@ export default {
 				auto: true
 			}
 		},
+		activities() {
+			return {
+				method: 'helpdesk.api.ticket.activities',
+				params: {
+					name: this.ticketId
+				},
+				auto: true
+			}
+		}
 	},
 	computed: {
 		conversations() {
@@ -59,6 +72,9 @@ export default {
 				this.autoScrollToBottom();
 			})
 			return this.$resources.conversations.data || null;
+		},
+		activities() {
+			return this.$resources.activities.data || null;
 		}
 	},
 	watch: {
@@ -72,6 +88,9 @@ export default {
 		this.$socket.on('list_update', (data) => {
 			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
 				this.$resources.conversations.fetch()
+			}
+			if (data['doctype'] == 'Ticket Activity' && data['name'].split('-')[1] == this.ticketId) {
+				this.$resources.activities.fetch()
 			}
 		});
 	},

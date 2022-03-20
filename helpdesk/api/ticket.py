@@ -131,7 +131,7 @@ def assign_ticket_type(ticket_id, type):
 		if ticket_doc.ticket_type != type:
 			ticket_doc.ticket_type = check_and_create_ticket_type(type).name
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Type changed to {type}")
+			log_ticket_activity(ticket_id, f"Type set to {type}")
 
 		return ticket_doc
 
@@ -143,7 +143,7 @@ def assign_ticket_status(ticket_id, status):
 		if ticket_doc.status != status:
 			ticket_doc.status = status
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Status changed to {status}")
+			log_ticket_activity(ticket_id, f"Status set to {status}")
 
 		return ticket_doc
 
@@ -155,7 +155,7 @@ def assign_ticket_priority(ticket_id, priority):
 		if ticket_doc.priority != priority:
 			ticket_doc.priority = priority
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Priority changed to {priority}")
+			log_ticket_activity(ticket_id, f"Priority set to {priority}")
 
 		return ticket_doc
 
@@ -166,7 +166,7 @@ def assign_ticket_group(ticket_id, agent_group):
 		
 		if ticket_doc.agent_group != agent_group:
 			ticket_doc.agent_group = agent_group
-			log_ticket_activity(ticket_id, f"Team switched to {agent_group}")
+			log_ticket_activity(ticket_id, f"Team set to {agent_group}")
 			ticket_doc.save()
 		
 		return ticket_doc
@@ -245,6 +245,7 @@ def get_all_ticket_templates():
 
 @frappe.whitelist(allow_guest=True)
 def activities(name):
+	print('fetching activities')
 	activities = frappe.db.sql(
 		"""
 		SELECT action, creation, owner
