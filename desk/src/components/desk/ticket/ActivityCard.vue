@@ -1,30 +1,27 @@
 <template>
-	<div class="py-3 space-x-2 flex">
-		<div>
-			<Avatar :label="userName" :imageURL="profilePicUrl" size="md" />
+	<div class="space-x-2 flex">
+		<div class="h-10">
+			<FeatherIcon class="stroke-slate-500 mx-2 h-4 w-4" name="disc" />
 			<div v-if="!isLast" class="h-full border-l mx-4" />
 		</div>
 		<div class="grow space-y-2">
 			<div class="flex space-x-2 items-center text-base">
-				<div>{{ userName }}</div>
-				<div class="text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
-			</div>
-			<div class="rounded shadow p-3 bg-gray-100">
-				<div v-html="message"></div>
+				<div>{{ action }} by {{ owner }}</div>
+				<div class="text-slate-500">{{ $dayjs(creation).fromNow() }}</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { Avatar } from 'frappe-ui'
+import { FeatherIcon } from 'frappe-ui'
 
 export default {
-	name: 'ConversationCard',
-	props: ['userName', 'profilePicUrl', 'time', 'message', 'isLast'],
+	name: 'ActivityCard',
 	components: {
-		Avatar
-	}
+		FeatherIcon
+	},
+	props: ['action', 'owner', 'creation', 'isLast'],
 }
 </script>
 

@@ -24,8 +24,13 @@
 		</div>
 		<div v-else-if="show === 'Activities'">
 			<div v-if="activities">
-				<div v-for="activity in activities" :key="activity.name">
-					{{ activity.action }} by {{ activity.owner }}
+				<div v-for="(activity, index) in activities" :key="activity.name">
+					<ActivityCard
+						:action="activity.action"
+						:owner="activity.owner"
+						:creation="activity.creation"
+						:isLast="index == activities.length - 1"
+					/>
 				</div>
 			</div>
 		</div>
@@ -37,15 +42,17 @@
 
 <script>
 import ConversationCard from "./ConversationCard.vue"
+import ActivityCard from "./ActivityCard.vue"
 import { LoadingText } from 'frappe-ui'
 
 export default {
 	name: "Conversations",
 	props: ["show", "ticketId", "scrollToBottom"],
 	components: {
-		ConversationCard,
-		LoadingText
-	},
+    ConversationCard,
+    LoadingText,
+    ActivityCard
+},
 	resources: {
 		conversations() {
 			return {
