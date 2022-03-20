@@ -24,7 +24,7 @@
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
 						<ConversationAndActivities :show="show" :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
-					</div>``
+					</div>
 					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="user.agent">
