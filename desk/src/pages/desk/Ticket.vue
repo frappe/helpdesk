@@ -9,17 +9,22 @@
 			</div>
 			<div
 				class="sm:w-3/5 pt-3 px-4"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9rem)' : null }"
 			>
-				<div class="flex items-center pb-4 mt-3">
-					<span class="text-4xl text-ellipsis">
+				<div class="flex items-center pb-3 mt-3">
+					<span class="text-4xl truncate">
 						{{ ticket.subject }}
 					</span>
 				</div>
+				<div class="flex space-x-2 mb-2">
+					<div class="" v-for="item in ['Conversations', 'Activities', 'All']" :key="item">
+						<div class="cursor-pointer px-3 py-1 rounded text-base" :class="show == item ? 'bg-blue-50 text-blue-600' :'hover:bg-gray-100'" @click="() => {show = item}">{{ item }}</div>
+					</div>
+				</div>
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
-						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
-					</div>
+						<ConversationAndActivities :show="show" :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
+					</div>``
 					<div class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="user.agent">
@@ -71,8 +76,7 @@
 </template>
 <script>
 import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
-import ConversationCard from '@/components/desk/ticket/ConversationCard.vue';
-import Conversations from '@/components/desk/ticket/Conversations.vue';
+import ConversationAndActivities from '@/components/desk/ticket/ConversationAndActivities.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
@@ -88,8 +92,7 @@ export default {
 		Card,
 		Dropdown,
 		Avatar,
-		ConversationCard,
-		Conversations,
+		ConversationAndActivities,
 		InfoPanel,
 		ActionPanel,
 		QuillEditor
@@ -131,13 +134,15 @@ export default {
 		const user = inject('user')
 		const tickets = inject('tickets')
 		const ticketController = inject('ticketController')
+		const show = ref('Conversations') // Conversations, Activities, All
 
 		return { 
 			editor,
 			viewportWidth,
 			user,
 			tickets,
-			ticketController
+			ticketController,
+			show
 		}
 	},
 	resources: {

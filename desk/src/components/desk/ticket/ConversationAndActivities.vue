@@ -1,24 +1,32 @@
 <template>
 	<div>
-		<div v-if="conversations">
-			<div
-				v-for="(conversation, index) in conversations" :key="conversation.name" 
-				class="flex flex-col pr-3"
-				ref="conversationContainer"
-			>
-				<div :ref="`conversation-${index}`">
-					<ConversationCard 
-						:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
-						:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
-						:time="conversation.creation" 
-						:message="conversation.content"
-						:isLast="index == conversations.length - 1"
-					/>
+		<div v-if="show === 'Conversations'">
+			<div v-if="conversations">
+				<div
+					v-for="(conversation, index) in conversations" :key="conversation.name" 
+					class="flex flex-col pr-3"
+					ref="conversationContainer"
+				>
+					<div :ref="`conversation-${index}`">
+						<ConversationCard 
+							:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
+							:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
+							:time="conversation.creation" 
+							:message="conversation.content"
+							:isLast="index == conversations.length - 1"
+						/>
+					</div>
 				</div>
 			</div>
+			<div v-else>
+				<LoadingText />
+			</div>
+		</div>
+		<div v-else-if="show === 'Activities'">
+			Activities
 		</div>
 		<div v-else>
-			<LoadingText />
+			Activities and Conversations
 		</div>
 	</div>
 </template>
@@ -29,7 +37,7 @@ import { LoadingText } from 'frappe-ui'
 
 export default {
 	name: "Conversations",
-	props: ["ticketId", "scrollToBottom"],
+	props: ["show", "ticketId", "scrollToBottom"],
 	components: {
 		ConversationCard,
 		LoadingText
