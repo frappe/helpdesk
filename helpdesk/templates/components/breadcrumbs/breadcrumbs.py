@@ -7,9 +7,6 @@ def get_breadcrumbs(route):
 
     parents.append({'label': 'Home', 'route': '/support/kb'})
 
-    if '/support/tickets' in route:
-        parents.append({'label': 'Tickets', 'route': '/support/tickets'})
-    
     allowed_doctypes = [
         {
             "name": "Article",
@@ -18,10 +15,6 @@ def get_breadcrumbs(route):
         {
             "name": "Category",
             "title_field": "category_name"
-        },
-        {
-            "name": "Ticket",
-            "title_field": "name"
         }
     ]
     
