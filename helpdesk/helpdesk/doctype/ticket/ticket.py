@@ -43,13 +43,17 @@ class Ticket(Document):
 			self.create_communication()
 			self.flags.communication_created = None
 
-	def set_contact(self, email_id):
+	def set_contact(self, email_id, save=False):
 		import email.utils
 
 		email_id = email.utils.parseaddr(email_id)[1]
 		if email_id:
 			if not self.contact:
-				self.contact = frappe.db.get_value("Contact", {"email_id": email_id})
+				contact = frappe.db.get_value("Contact", {"email_id": email_id})
+				if contact:
+					self.contact = contact
+					if save:
+						self.save()
 
 	def create_communication(self):
 		communication = frappe.new_doc("Communication")
