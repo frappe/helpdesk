@@ -10,7 +10,7 @@
 				<div class="text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
 			</div>
 			<div class="rounded shadow p-3 bg-gray-100">
-				<span v-html="cleanedMessage"></span>
+				<div class="ql-container" v-html="cleanedMessage"></div>
 			</div>
 		</div>
 	</div>
