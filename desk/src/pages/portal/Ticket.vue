@@ -13,7 +13,7 @@
 				</div>
 				<div>
 					<Button @click="reopenTicket()" appearance="minimal" v-if="['Closed', 'Resolved'].includes(ticket.status)">Reopen</Button>
-					<Button @click="closeTicket()" class="bg-gray-100 text-red-600" v-else>Close</Button>
+					<Button @click="closeTicket()" class="bg-gray-100 text-red-500" v-else>Close</Button>
 				</div>
 			</div>
 			<div class="flex items-center pb-2 justify-between">
