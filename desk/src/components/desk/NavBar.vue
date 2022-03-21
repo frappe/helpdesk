@@ -76,7 +76,7 @@ export default {
 		},
 		getAvatarClickOptions() {
 			let items = [];
-			["Logout"].forEach(item => {
+			["Log out"].forEach(item => {
 				items.push({
 				label: item,
 					handler: () => {
