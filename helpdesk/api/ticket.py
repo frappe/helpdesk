@@ -250,7 +250,6 @@ def activities(name):
 		SELECT action, creation, owner
 		FROM `tabTicket Activity`
 		WHERE ticket = %(ticket)s
-		ORDER BY creation desc
 	""",
 		values={"ticket": name},
 		as_dict=1,
