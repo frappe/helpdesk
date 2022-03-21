@@ -121,13 +121,13 @@ export default {
 				case 'Replied':
 					return 'yellow'
 				case 'Resolved':
-					return 'green'
+					return 'red'
 				case 'On Hold':
 					return 'blue'
 				case 'Closed':
-					return 'green'
-				case 'Open':
 					return 'red'
+				case 'Open':
+					return 'green'
 			}
 		},
 		formatedCreationTime(time) {
