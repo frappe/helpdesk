@@ -279,11 +279,18 @@ export default {
 						],
 					})
 				}
-				options.push({
-					group: 'All Agents',
-					hideLabel: true,
-					items: agentItems,
-				})
+				if (agentItems.length > 0) {
+					options.push({
+						group: 'All Agents',
+						hideLabel: true,
+						items: agentItems,
+					})
+				}
+				if (options.length == 0) {
+					options.push({
+						label: 'No agents found'
+					})
+				}
 				return options;
 			} else {
 				return null;
@@ -316,11 +323,13 @@ export default {
 						},
 					],
 				})
-				options.push({
-					group: 'All Types',
-					hideLabel: true,
-					items: typeItems,
-				})
+				if (typeItems.length > 0) {
+					options.push({
+						group: 'All Types',
+						hideLabel: true,
+						items: typeItems,
+					})
+				}
 				return options;
 			} else {
 				return null;
@@ -340,6 +349,11 @@ export default {
 						},
 					});
 				});
+				if (statusItems.length == 0) {
+					statusItems.push({
+						label: 'No statuses found'
+					})
+				}
 				return statusItems;
 			} else {
 				return null;
@@ -359,6 +373,11 @@ export default {
 						},
 					});
 				});
+				if (typeItems.length == 0) {
+					typeItems.push({
+						label: 'No priorities found'
+					})
+				}
 				return typeItems;
 			} else {
 				return null;
@@ -378,6 +397,11 @@ export default {
 						},
 					});
 				});
+				if (groupItems.length == 0) {
+					typeItems.push({
+						label: 'No team found'
+					})
+				}
 				return groupItems;
 			} else {
 				return null;
