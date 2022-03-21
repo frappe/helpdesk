@@ -17,10 +17,11 @@
 						</div>
 						<div v-else-if="item.sender">
 							<ConversationCard 
-								:userName="(item.sender.first_name ? item.sender.first_name : '') + ' ' + (item.sender.last_name ? item.sender.last_name : '')" 
+								:userName="getUserName(item)" 
 								:profilePicUrl="item.sender.image ? item.sender.image : ''" 
 								:time="item.creation" 
 								:message="item.content"
+								:color="getConversationCardColor(getUserName(item))"
 								:isLast="index == items.length - 1"
 							/>
 						</div>
@@ -39,15 +40,22 @@
 import ConversationCard from "./ConversationCard.vue"
 import ActivityCard from "./ActivityCard.vue"
 import { LoadingText } from 'frappe-ui'
+import { ref } from 'vue'
 
 export default {
 	name: "Conversations",
 	props: ["show", "ticketId", "scrollToBottom"],
 	components: {
-    ConversationCard,
-    LoadingText,
-    ActivityCard
-},
+		ConversationCard,
+		LoadingText,
+		ActivityCard
+	},
+	setup() {
+		const userColors = ref({})
+		const lastColorIndex = ref(-1)
+
+		return { userColors, lastColorIndex }
+	},
 	resources: {
 		conversations() {
 			return {
@@ -101,6 +109,7 @@ export default {
 		}
 	},
 	mounted() {
+		console.log('here')
 		this.$socket.on('list_update', (data) => {
 			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
 				this.$resources.conversations.fetch()
@@ -113,7 +122,14 @@ export default {
 	unmounted() {
 		this.$socket.off('list_update');
 	},
+	updated() {
+		this.userColors = {}
+		this.lastColorIndex = -1
+	},
 	methods: {
+		getUserName(item) {
+			return (item.sender.first_name ? item.sender.first_name : '') + ' ' + (item.sender.last_name ? item.sender.last_name : '')
+		},
 		autoScrollToBottom() {
 			if (this.items) {
 				const [el] = this.$refs["item-" + (this.items.length - 1)];
@@ -122,6 +138,19 @@ export default {
 				}
 			}
 		},
+		getConversationCardColor(userName) {
+			let cardColors = ['blue', 'gray', 'green', 'red']
+			
+			if (this.userColors[userName] === undefined) {
+				if (this.lastColorIndex == cardColors.length - 1) {
+					this.lastColorIndex = 0
+				} else {
+					this.lastColorIndex++
+				}
+				this.userColors[userName] = cardColors[this.lastColorIndex]
+			}
+			return this.userColors[userName]
+		}
 	}
 }
 </script>

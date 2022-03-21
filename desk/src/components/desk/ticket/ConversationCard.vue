@@ -9,7 +9,7 @@
 				<div>{{ userName }}</div>
 				<div class="text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
 			</div>
-			<div class="rounded shadow p-3 bg-gray-100">
+			<div class="rounded shadow p-3" :class="`bg-${color}-50`">
 				<div class="ql-container" v-html="cleanedMessage"></div>
 			</div>
 		</div>
@@ -22,7 +22,7 @@ import { remove_script_and_style } from '@/utils'
 
 export default {
 	name: 'ConversationCard',
-	props: ['userName', 'profilePicUrl', 'time', 'message', 'isLast'],
+	props: ['userName', 'profilePicUrl', 'time', 'message', 'isLast', 'color'],
 	components: {
 		Avatar
 	},
