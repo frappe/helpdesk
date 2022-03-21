@@ -10,7 +10,7 @@
 				<div class="text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
 			</div>
 			<div class="rounded shadow p-3 bg-gray-100">
-				<div v-html="message"></div>
+				<span v-html="cleanedMessage"></span>
 			</div>
 		</div>
 	</div>
@@ -18,12 +18,21 @@
 
 <script>
 import { Avatar } from 'frappe-ui'
+import { remove_script_and_style } from '@/utils'
 
 export default {
 	name: 'ConversationCard',
 	props: ['userName', 'profilePicUrl', 'time', 'message', 'isLast'],
 	components: {
 		Avatar
+	},
+	computed: {
+		cleanedMessage() {
+			if (this.message) {
+				return remove_script_and_style(this.message)
+			}
+			return ''
+		}
 	}
 }
 </script>

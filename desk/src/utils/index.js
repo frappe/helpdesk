@@ -72,4 +72,41 @@ _dayjs.shortFormating = (s) => {
     return `${prefix}${newPostfix}`
 }
 
+export function remove_script_and_style(txt) {
+    const evil_tags = ["script", "style", "noscript", "title", "meta", "base", "head"];
+    const regex = new RegExp(evil_tags.map(tag => `<${tag}>.*<\\/${tag}>`).join('|'), 's');
+    if (!regex.test(txt)) {
+        // no evil tags found, skip the DOM method entirely!
+        return txt;
+    }
+
+    var div = document.createElement('div');
+    div.innerHTML = txt;
+    var found = false;
+    evil_tags.forEach(function(e) {
+        var elements = div.getElementsByTagName(e);
+        i = elements.length;
+        while (i--) {
+            found = true;
+            elements[i].parentNode.removeChild(elements[i]);
+        }
+    });
+
+    // remove links with rel="stylesheet"
+    var elements = div.getElementsByTagName('link');
+    var i = elements.length;
+    while (i--) {
+        if (elements[i].getAttribute("rel")=="stylesheet"){
+            found = true;
+            elements[i].parentNode.removeChild(elements[i]);
+        }
+    }
+    if(found) {
+        return div.innerHTML;
+    } else {
+        // don't disturb
+        return txt;
+    }
+}
+
 export let dayjs = _dayjs
