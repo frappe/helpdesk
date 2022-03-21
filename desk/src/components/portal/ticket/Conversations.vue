@@ -8,11 +8,11 @@
 			>
 				<div :ref="`conversation-${index}`">
 					<ConversationCard 
-						:userName="(conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')" 
+						:userName="getUserName(conversation)" 
 						:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
 						:time="conversation.creation" 
 						:message="conversation.content"
-						color="gray" 
+						:color="getConversationCardColor(getUserName(conversation))"
 					/>
 					<!-- TODO: dynamically set color based on user -->
 				</div>
@@ -27,6 +27,7 @@
 <script>
 import ConversationCard from "./ConversationCard.vue"
 import { LoadingText } from 'frappe-ui'
+import { ref } from 'vue'
 
 export default {
 	name: "Conversations",
@@ -34,6 +35,12 @@ export default {
 	components: {
 		ConversationCard,
 		LoadingText
+	},
+	setup() {
+		const userColors = ref({})
+		const lastColorIndex = ref(-1)
+
+		return { userColors, lastColorIndex }
 	},
 	resources: {
 		conversations() {
@@ -71,7 +78,14 @@ export default {
 	unmounted() {
 		this.$socket.off('list_update');
 	},
+	updated() {
+		this.userColors = {}
+		this.lastColorIndex = -1
+	},
 	methods: {
+		getUserName(conversation) {
+			return (conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')
+		},
 		autoScrollToBottom() {
 			if (this.conversations) {
 				const [el] = this.$refs["conversation-" + (this.conversations.length - 1)];
@@ -80,6 +94,19 @@ export default {
 				}
 			}
 		},
+		getConversationCardColor(userName) {
+			let cardColors = ['blue', 'gray', 'green', 'red']
+			
+			if (this.userColors[userName] === undefined) {
+				if (this.lastColorIndex == cardColors.length - 1) {
+					this.lastColorIndex = 0
+				} else {
+					this.lastColorIndex++
+				}
+				this.userColors[userName] = cardColors[this.lastColorIndex]
+			}
+			return this.userColors[userName]
+		}
 	}
 }
 </script>
