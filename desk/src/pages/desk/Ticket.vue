@@ -60,7 +60,6 @@
 						</div>
 						<div class="flex space-x-2" v-else>
 							<Button appearance="primary" @click="startEditing()">Reply</Button>
-							<Button appearance="secondary">Comment</Button>
 						</div>
 					</div>
 				</div>
