@@ -2,19 +2,22 @@
 	<div>
 		<div class="flow-root pt-2 pb-5 pr-8 pl-4">
 			<div class="float-left">
-				<Dropdown
-						placement="left"
-						:options="ticketFilterDropdownOptions()"
-					>
-					<template v-slot="{ toggleDropdown }"> 
-						<div class="flex items-center cursor-pointer" @click="toggleDropdown">
-							<div class="text-2xl">
-								{{ this.ticketFilter }}
+				<div v-if="ticketFilterDropdownOptions().length > 0">
+					<Dropdown
+							placement="left"
+							:options="ticketFilterDropdownOptions()"
+						>
+						<template v-slot="{ toggleDropdown }"> 
+							<div class="flex items-center cursor-pointer" @click="toggleDropdown">
+								<div class="text-2xl">
+									{{ this.ticketFilter }}
+								</div>
+								<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
 							</div>
-							<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
-						</div>
-					</template>
-				</Dropdown>
+						</template>
+					</Dropdown>
+				</div>
+				<div v-else class="text-2xl">All Tickets</div>
 			</div>
 			<div class="float-right flex space-x-3">
 				<Button type="white">
@@ -56,11 +59,12 @@ export default {
 		FeatherIcon
 	},
 	setup() {
+		const user = inject('user')
 		const tickets = inject('tickets')
 		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
-		return { tickets, ticketFilter, showNewTicketDialog }
+		return { user, tickets, ticketFilter, showNewTicketDialog }
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
@@ -68,11 +72,10 @@ export default {
 	methods: {
 		ticketFilterDropdownOptions() {
 			let items = [];
-			["All Tickets", "Assigned to me"].forEach(filter => {
+			(this.user.agent ? ["All Tickets", "Assigned to me"] : []).forEach(filter => {
 				items.push({
 					label: filter,
 					handler: () => {
-						console.log(this.$user);
 						this.ticketFilter = filter;
 					}
 				});
