@@ -16,7 +16,7 @@ from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_sec
 from frappe.utils.user import is_website_user
 from frappe.website.utils import cleanup_page_name
 from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
-
+from helpdesk.helpdesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
 
 class Ticket(Document):
 	def autoname(self):
@@ -33,6 +33,9 @@ class Ticket(Document):
 			self.raised_by = frappe.session.user
 
 		self.set_contact(self.raised_by)
+
+	def after_insert(self):
+		log_ticket_activity(self.name, "Create")
 
 	def on_update(self):
 		# Add a communication in the ticket timeline
@@ -130,13 +133,21 @@ class Ticket(Document):
 		self.db_set("user_resolution_time", None)
 
 	def assign_agent(self, agent):
+		if self._assign:
+			assignees = json.loads(self._assign)
+			for assignee in assignees:
+				if agent == assignee:
+					# the agent is already set as an assignee
+					return
+
 		clear_all_assignments("Ticket", self.name)
 		assign({
 			"assign_to": [agent],
 			"doctype": "Ticket",
 			"name": self.name
 		})
-		frappe.db.commit()
+		agent_name = frappe.get_value("Agent", agent, "agent_name")
+		log_ticket_activity(self.name, f"Assigned to {agent_name}")
 
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_contact(ticket, message, attachments=None):
@@ -252,8 +263,6 @@ def get_all_conversations(ticket):
 		)
 
 		conversation.attachments = attachments
-		
-
 	return conversations
 
 @frappe.whitelist()

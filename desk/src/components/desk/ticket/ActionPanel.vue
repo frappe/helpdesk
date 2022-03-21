@@ -1,5 +1,5 @@
 <template>
-	<div class="px-3" v-if="ticket">
+	<div class="m-4 px-4 rounded shadow" v-if="ticket">
 		<div class="py-4 border-b space-y-3">
 			<div class="text-lg font-medium">{{ `Ticket #${ticket.name}` }}</div>
 			<div class="text-base space-y-2">
@@ -30,100 +30,112 @@
 			<div class="text-base space-y-2">
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Assignee</div>
-					<CustomDropdown
+					<Dropdown
 						v-if="agents"
 						:options="agentsAsDropdownOptions()" 
-						class="text-base w-56"
+						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-								<div v-if="ticket.assignees.length > 0 && !updatingAssignee" class="grow w-52 text-left">{{ ticket.assignees[0].agent_name }}</div>
-								<div v-else class="flex items-center">
-									<LoadingText v-if="updatingAssignee" />
-									<div v-else class="text-base grow w-52 text-left text-gray-400"> assign agent </div>
+							<div class="flex py-1 space-x-1 w-full items-center">
+								<div class="grow">
+									<div v-if="ticket.assignees.length > 0 && !updatingAssignee" class="text-left">{{ ticket.assignees[0].agent_name }}</div>
+									<div v-else>
+										<LoadingText v-if="updatingAssignee" />
+										<div v-else class="text-base text-left text-gray-400"> assign agent </div>
+									</div>
 								</div>
-								<CustomIcons v-if="!updatingAssignee" name="select" class="w-4 h-4 float-right" />
+								<div>
+									<CustomIcons v-if="!updatingAssignee" name="select" class="w-4 h-4" />
+								</div>
 							</div>
 						</template>
-					</CustomDropdown>
+					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Status</div>
-					<CustomDropdown
+					<Dropdown
 						v-if="ticketStatuses"
 						:options="statusesAsDropdownOptions()" 
-						class="text-base w-56"
+						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
 					>
 						<template v-slot="{ toggleStatuses }" @click="toggleStatuses" class="w-full">
-							<div class="w-full">
-								<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div v-if="ticket.status && !updatingStatus" class="grow w-52 text-left">{{ ticket.status }}</div>
-									<div v-else class="flex items-center">
+							<div class="flex py-1 space-x-1 w-full items-center">
+								<div class="grow">
+									<div v-if="ticket.status && !updatingStatus" class="text-left">{{ ticket.status }}</div>
+									<div v-else>
 										<LoadingText v-if="updatingStatus" />
-										<div v-else class="text-base grow w-52 text-left text-gray-400"> set status </div>
+										<div v-else class="text-base text-left text-gray-400"> set status </div>
 									</div>
-								<CustomIcons v-if="!updatingStatus" name="select" class="w-4 h-4 float-right" />
-							</div>
+								</div>
+								<div>
+									<CustomIcons v-if="!updatingStatus" name="select" class="w-4 h-4" />
+								</div>
 							</div>
 						</template>
-					</CustomDropdown>
+					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Team</div>
-					<CustomDropdown
+					<Dropdown
 						v-if="agentGroups"
 						:options="agentGroupsAsDropdownOptions()" 
-						class="text-base w-56"
+						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
 					>
 						<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
-							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-								<div v-if="ticket.agent_group && !updatingTeam" class="grow w-52 text-left">{{ ticket.agent_group }}</div>
-								<div v-else class="flex items-center">
-									<LoadingText v-if="updatingTeam" />
-									<div v-else class="text-base grow w-52 text-left text-gray-400"> set team </div>
+							<div class="flex py-1 space-x-1 w-full items-center">
+								<div class="grow">
+									<div v-if="ticket.agent_group && !updatingTeam" class="text-left">{{ ticket.agent_group }}</div>
+									<div v-else>
+										<LoadingText v-if="updatingTeam" />
+										<div v-else class="text-base text-left text-gray-400"> set team </div>
+									</div>
 								</div>
-								<CustomIcons v-if="!updatingTeam" name="select" class="w-4 h-4 float-right" />
+								<CustomIcons v-if="!updatingTeam" name="select" class="w-4 h-4" />
 							</div>
 						</template>
-					</CustomDropdown>
+					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Priority</div>
-					<CustomDropdown
+					<Dropdown
 						v-if="ticketPriorities"
 						:options="prioritiesAsDropdownOptions()" 
-						class="text-base w-56"
+						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
 					>
 						<template v-slot="{ togglePriority }" @click="togglePriority" class="w-full">
-							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-								<div v-if="ticket.priority && !updatingPriority" class="grow w-52 text-left">{{ ticket.priority }}</div>
-								<div v-else class="flex items-center">
-									<LoadingText v-if="updatingPriority" />
-									<div v-else class="text-base grow w-52 text-left text-gray-400"> set priority </div>
+							<div class="flex py-1 space-x-1 w-full items-center">
+								<div class="grow">
+									<div v-if="ticket.priority && !updatingPriority" class="text-left">{{ ticket.priority }}</div>
+									<div v-else>
+										<LoadingText v-if="updatingPriority" />
+										<div v-else class="text-base text-left text-gray-400"> set priority </div>
+									</div>
 								</div>
-								<CustomIcons v-if="!updatingPriority" name="select" class="w-4 h-4 float-right" />
+								<CustomIcons v-if="!updatingPriority" name="select" class="w-4 h-4" />
 							</div>
 						</template>
-					</CustomDropdown>
+					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-2">
 					<div class="text-slate-500">Type</div>
-					<CustomDropdown
+					<Dropdown
 						v-if="ticketTypes"
 						:options="typesAsDropdownOptions()" 
-						class="text-base w-56"
+						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
 					>
 						<template v-slot="{ toggleTicketTypes }" @click="toggleTicketTypes" class="w-full">
-							<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1 items-center">
-								<div v-if="ticket.ticket_type && !updatingTicketType" class="grow w-52 text-left">{{ ticket.ticket_type }}</div>
-								<div v-else class="flex items-center">
-									<LoadingText v-if="updatingTicketType" />
-									<div v-else class="text-base grow w-52 text-left text-gray-400"> set type </div>
+							<div class="flex py-1 space-x-1 w-full items-center">
+								<div class="grow">
+									<div v-if="ticket.ticket_type && !updatingTicketType" class="text-left">{{ ticket.ticket_type }}</div>
+									<div v-else>
+										<LoadingText v-if="updatingTicketType" />
+										<div v-else class="text-base text-left text-gray-400"> set type </div>
+									</div>
 								</div>
-								<CustomIcons v-if="!updatingTicketType" name="select" class="w-4 h-4 float-right" />
+								<CustomIcons v-if="!updatingTicketType" name="select" class="w-4 h-4" />
 							</div>
 						</template>
-					</CustomDropdown>
+					</Dropdown>
 				</div>
 			</div>
 		</div>
@@ -267,11 +279,18 @@ export default {
 						],
 					})
 				}
-				options.push({
-					group: 'All Agents',
-					hideLabel: true,
-					items: agentItems,
-				})
+				if (agentItems.length > 0) {
+					options.push({
+						group: 'All Agents',
+						hideLabel: true,
+						items: agentItems,
+					})
+				}
+				if (options.length == 0) {
+					options.push({
+						label: 'No agents found'
+					})
+				}
 				return options;
 			} else {
 				return null;
@@ -304,11 +323,13 @@ export default {
 						},
 					],
 				})
-				options.push({
-					group: 'All Types',
-					hideLabel: true,
-					items: typeItems,
-				})
+				if (typeItems.length > 0) {
+					options.push({
+						group: 'All Types',
+						hideLabel: true,
+						items: typeItems,
+					})
+				}
 				return options;
 			} else {
 				return null;
@@ -328,6 +349,11 @@ export default {
 						},
 					});
 				});
+				if (statusItems.length == 0) {
+					statusItems.push({
+						label: 'No statuses found'
+					})
+				}
 				return statusItems;
 			} else {
 				return null;
@@ -347,6 +373,11 @@ export default {
 						},
 					});
 				});
+				if (typeItems.length == 0) {
+					typeItems.push({
+						label: 'No priorities found'
+					})
+				}
 				return typeItems;
 			} else {
 				return null;
@@ -366,6 +397,11 @@ export default {
 						},
 					});
 				});
+				if (groupItems.length == 0) {
+					typeItems.push({
+						label: 'No team found'
+					})
+				}
 				return groupItems;
 			} else {
 				return null;

@@ -1,44 +1,57 @@
 <template>
-	<div class="px-3" v-if="ticket">
-		<div class="py-4 space-y-3 text-base">
-			<div class="flex items-center">
-				<div class="grow text-lg font-medium">{{ `Contact Information ${editingContact ? '(editing)' : ''}` }}</div>
-				<div v-if="!updatingContact" class="flex">
-					<FeatherIcon 
-						:name="editingContact ? 'x' : 'edit-2'" 
-						class="stroke-slate-400 w-4 h-4 cursor-pointer"
-						:class="editingContact ? 'hover:stroke-red-500': ''" 
-						@click="() => {editingContact=!editingContact}"
-					/>
-				</div>
-			</div>
+	<div class="m-4 px-4 rounded shadow" v-if="ticket">
+		<div class="py-4 space-y-3 text-base border-b">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
-				<div v-if="!editingContact" class="space-y-2">
-					<div v-if="ticket.contact">
-						<div class="flex space-x-2">
-							<FeatherIcon name="user" class="w-4 h-4" />
-							<div class="text-slate-500 truncate">{{ contactFullName }}</div>
+				<div v-if="!editingContact">
+					<div v-if="ticket.contact" class="space-y-1">
+						<div class="flex space-x-2 items-center">
+							<Avatar :label="contactFullName" :imageURL="ticket.contact.image" style="width: 20px; height: 20px" />
+							<div class="grow">{{ contactFullName }}</div>
+							<div v-if="!updatingContact" class="flex">
+								<FeatherIcon 
+									name="edit-2" 
+									class="stroke-slate-400 w-4 h-4 cursor-pointer"
+									@click="() => {editingContact=!editingContact}"
+								/>
+							</div>
 						</div>
-						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2">
-							<FeatherIcon name="mail" class="w-4 h-4" />
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2 items-center">
+							<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px; margin-left: 2.5px" />
 							<div>
 								<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-									<div class="text-slate-500 truncate">{{ email_id.email_id }}</div>
+									<div class="text-slate-500">{{ email_id.email_id }}</div>
 								</div>
 							</div>
 						</div>
-						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2">
+						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2 items-center">
 							<FeatherIcon name="phone" class="w-4 h-4" />
 							<div>
 								<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-									<div class="text-slate-500 truncate">{{ phone_no.phone }}</div>
+									<div class="text-slate-500">{{ phone_no.phone }}</div>
 								</div>
 							</div>
 						</div>
 					</div>
+					<div v-else>
+						<div v-if="!updatingContact" class="flex flex-row-reverse">
+							<FeatherIcon 
+								name="edit-2" 
+								class="stroke-slate-400 w-4 h-4 cursor-pointer"
+								@click="() => {editingContact=!editingContact}"
+							/>
+						</div>
+					</div>
 				</div>
 				<div v-else class="w-full">
+					<div class="flex space-x-2 mb-2">
+						<div class="grow">Select Contact</div>
+						<FeatherIcon 
+							name="x" 
+							class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-red-500"
+							@click="() => {editingContact=!editingContact}"
+						/>
+					</div>
 					<Combobox v-model="selectedContact">
 						<ComboboxInput 
 							class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
@@ -79,9 +92,10 @@
 		</div>
 		<div>
 			<div class="py-4 space-y-3" v-if="otherTicketsOfContact && !editingContact">
-				<div v-if="otherTicketsOfContact.length > 0" class="flex cursor-pointer" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
-					<div class="grow text-lg font-medium">{{ `Open Tickets (${otherTicketsOfContact.length})` }}</div>
+				<div class="flex" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
+					<div class="grow text-lg font-medium">{{ `${otherTicketsOfContact.length > 0 ? '' : 'No'} Open Tickets ${otherTicketsOfContact.length > 0 ? '(' + otherTicketsOfContact.length + ')' : ''}` }}</div>
 					<FeatherIcon 
+						v-if="otherTicketsOfContact.length > 0"
 						:name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'" 
 						class="stroke-slate-400 w-4 h-4"
 					/>
@@ -93,7 +107,7 @@
 								<div>
 									<FeatherIcon name="link" class="w-4 h-4"/>
 								</div>
-								<div class="text-slate-500 ml-2 grow truncate">{{ ticket.subject }}</div>
+								<div class="text-slate-500 ml-2 overflow-hidden h-5 text-ellipsis">{{ ticket.subject }}</div>
 							</div>
 						</router-link>
 					</div>
@@ -108,7 +122,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
+import { FeatherIcon, Input, LoadingText, Avatar } from 'frappe-ui'
 import {
 	Combobox,
 	ComboboxInput,
@@ -125,6 +139,7 @@ export default {
 		FeatherIcon,
 		Input,
 		LoadingText,
+		Avatar,
 		Combobox,
 		ComboboxInput,
 		ComboboxOption,

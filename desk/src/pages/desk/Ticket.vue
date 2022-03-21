@@ -1,27 +1,31 @@
 <template>
 	<div v-if="ticket">
-		<TopControlPanel :ticket="ticket" @next="getNextTicket" @previous="getPreviousTicket"/>
 		<div class="flex">
 			<div 
-				class="w-1/5 border-r"
+				class="sm:w-1/5 m-1 mt-2"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<InfoPanel :ticketId="ticket.name" />
 			</div>
 			<div
-				class="w-3/5 pt-3 px-4"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 10.5rem)' : null }"
+				class="sm:w-3/5 pt-3 px-4"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9rem)' : null }"
 			>
-				<div class="flex items-center pb-4">
+				<div class="flex items-center pb-3 mt-3">
 					<span class="text-4xl">
 						{{ ticket.subject }}
 					</span>
 				</div>
+				<div class="flex space-x-2 mb-2">
+					<div class="" v-for="item in ['Conversations', 'Activities', 'All']" :key="item">
+						<div class="cursor-pointer px-3 py-1 rounded text-base" :class="show == item ? 'bg-blue-50 text-blue-600' :'hover:bg-gray-100'" @click="() => {show = item}">{{ item }}</div>
+					</div>
+				</div>
 				<div class="flex flex-col h-full space-y-2">
 					<div class="overflow-auto grow">
-						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
+						<ConversationAndActivities :show="show" :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 					</div>
-					<div class="flex flex-col pr-3 pb-10 pt-3">
+					<div v-if="show != 'Activities'" class="flex flex-col pr-3 pb-10 pt-3">
 						<div class="flex" v-if="editing">
 							<div v-if="user.agent">
 								<Avatar :label="user.username" class="cursor-pointer" v-if="user" :imageURL="user.profile_image" size="md" />
@@ -62,7 +66,7 @@
 				</div>
 			</div>
 			<div 
-				class="w-1/5 border-l"
+				class="sm:w-1/5 m-1 mt-2"
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7.5rem)' : null }"
 			>
 				<ActionPanel :ticketId="ticket.name" />
@@ -72,14 +76,13 @@
 </template>
 <script>
 import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
-import ConversationCard from '@/components/desk/ticket/ConversationCard.vue';
-import Conversations from '@/components/desk/ticket/Conversations.vue';
-import TopControlPanel from '@/components/desk/ticket/TopControlPanel.vue'
+import ConversationAndActivities from '@/components/desk/ticket/ConversationAndActivities.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
+import router from '../../router';
 
 export default {
 	name: 'Ticket',
@@ -89,9 +92,7 @@ export default {
 		Card,
 		Dropdown,
 		Avatar,
-		ConversationCard,
-		Conversations,
-		TopControlPanel,
+		ConversationAndActivities,
 		InfoPanel,
 		ActionPanel,
 		QuillEditor
@@ -133,13 +134,15 @@ export default {
 		const user = inject('user')
 		const tickets = inject('tickets')
 		const ticketController = inject('ticketController')
+		const show = ref('Conversations') // Conversations, Activities, All
 
 		return { 
 			editor,
 			viewportWidth,
 			user,
 			tickets,
-			ticketController
+			ticketController,
+			show
 		}
 	},
 	resources: {
@@ -187,7 +190,15 @@ export default {
 		}
 	},
 	updated() {
-		this.$currentPage.set('Ticket', ['Tickets', this.ticketId])
+		this.$currentPage.set('Ticket', [
+			{
+				label: 'Tickets', 
+				action: () => {router.push({name: 'DeskTickets'})}
+			}, 
+			{
+				label: this.ticketId
+			}
+		])
 	},
 }
 </script>
