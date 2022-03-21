@@ -198,8 +198,7 @@ def get_contact(ticket_id):
 	else:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		if (ticket_doc.raised_by):
-			ticket_doc.set_contact(ticket_doc.raised_by)
-			ticket_doc.save()
+			ticket_doc.set_contact(ticket_doc.raised_by, True)
 			contact_id = frappe.get_value("Ticket", ticket_id, "contact")
 			if (contact_id):
 				contact_doc = frappe.get_doc("Contact", contact_id)
