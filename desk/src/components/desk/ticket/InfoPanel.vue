@@ -10,9 +10,8 @@
 							<div class="grow">{{ contactFullName }}</div>
 							<div v-if="!updatingContact" class="flex">
 								<FeatherIcon 
-									:name="editingContact ? 'x' : 'edit-2'" 
+									name="edit-2" 
 									class="stroke-slate-400 w-4 h-4 cursor-pointer"
-									:class="editingContact ? 'hover:stroke-red-500': ''" 
 									@click="() => {editingContact=!editingContact}"
 								/>
 							</div>
@@ -37,15 +36,22 @@
 					<div v-else>
 						<div v-if="!updatingContact" class="flex flex-row-reverse">
 							<FeatherIcon 
-								:name="editingContact ? 'x' : 'edit-2'" 
+								name="edit-2" 
 								class="stroke-slate-400 w-4 h-4 cursor-pointer"
-								:class="editingContact ? 'hover:stroke-red-500': ''" 
 								@click="() => {editingContact=!editingContact}"
 							/>
 						</div>
 					</div>
 				</div>
 				<div v-else class="w-full">
+					<div class="flex space-x-2 mb-2">
+						<div class="grow">Select Contact</div>
+						<FeatherIcon 
+							name="x" 
+							class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-red-500"
+							@click="() => {editingContact=!editingContact}"
+						/>
+					</div>
 					<Combobox v-model="selectedContact">
 						<ComboboxInput 
 							class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
