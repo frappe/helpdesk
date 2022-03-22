@@ -100,6 +100,20 @@ export default {
 	activated() {
 		this.$currentPage.set('Tickets')
 	},
+	watch: {
+		filters(newValue) {
+			let filter = newValue.find(x => Object.keys(x)[0] === 'assignee')
+			if (filter && this.user.agent) {
+				if (Object.values(filter)[0] === this.user.agent.name) {
+					this.ticketFilter = "Assigned to me"
+				} else {
+					this.ticketFilter = "All Tickets"
+				}
+			} else {
+				this.ticketFilter = "All Tickets"
+			}
+		}
+	},
 	methods: {
 		ticketFilterDropdownOptions() {
 			let items = [];
@@ -108,11 +122,9 @@ export default {
 					label: filter,
 					handler: () => {
 						this.ticketFilter = filter;
-						
+						this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
 						if (filter == 'Assigned to me') {
-							this.filters.assignee = this.user.agent.name
-						} else {
-							delete this.filters.assignee
+							this.filters.push({assignee: this.user.agent.name})
 						}
 					}
 				});
