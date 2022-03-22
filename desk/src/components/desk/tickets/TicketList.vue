@@ -20,7 +20,7 @@
 					class="block overflow-auto"
 					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9.4rem)' : null }"
 				>
-					<div v-for="ticket in sortedTickets" :key="ticket.name">
+					<div v-for="ticket in sortedTickets(filteredTickets)" :key="ticket.name">
 						<div>
 							<TicketListItem :ticketId="ticket.name" />
 						</div>
@@ -38,7 +38,7 @@ import { inject } from 'vue'
 
 export default {
 	name: 'TicketList',
-	props: ['lastModifiedSort'],
+	props: ['sortby', 'sortDirection', 'filters'],
 	components: {
 		Input,
 		TicketListItem
@@ -76,25 +76,20 @@ export default {
 			console.log(Object.keys(filteredTickets).length)
 
 			return filteredTickets;
-		},
-		sortedTickets() {
-			if (this.filteredTickets && Object.keys(this.filteredTickets).length > 0) {
-				let sortedTickets = this.filteredTickets
-				switch(this.lastModifiedSort) {
-					case 'assending':
-						return Object.values(this.filteredTickets).sort((a, b) => {
-							return new Date(a.modified) - new Date(b.modified)
-						})
-					case 'dessending':
-						return Object.values(this.filteredTickets).sort((a, b) => {
-							return new Date(b.modified) - new Date(a.modified)
+		}
+	},
+	methods: {
+		sortedTickets(tickets) {
+			if (tickets && Object.keys(tickets).length > 0) {
+				switch(this.sortby) {
+					case 'last modified':
+						return Object.values(tickets).sort((a, b) => {
+							return new Date(a.modified) - new Date(b.modified) * (this.sortDirection == 'assending' ? 1 : -1)
 						})
 					default:
-						return sortedTickets
+						return tickets
 				}
 			} else {
-				console.log(this.filteredTickets)
-				console.log('here')
 				return null
 			}
 		}

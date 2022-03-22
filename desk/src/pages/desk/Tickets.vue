@@ -26,7 +26,7 @@
 						<div>Add filter</div>
 					</div>
 				</Button>
-				<Button type="white" @click="() => { lastModifiedSort = (lastModifiedSort == 'assending' ? 'dessending' : 'assending') }">
+				<Button type="white" @click="() => { toggleSort('last modified') }">
 					<div class="flex items-center space-x-2">
 						<CustomIcons height="18" width="18" name="sort-ascending" />
 						<div>Last Modified On</div>
@@ -36,7 +36,7 @@
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList :lastModifiedSort="lastModifiedSort" />
+			<TicketList :sortby="sortby" :sortDirection="sortDirection" />
 		</div>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
@@ -64,9 +64,10 @@ export default {
 		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
-		const lastModifiedSort = ref('assending') // assending, dessending, none
+		const sortby = ref('last modified')
+		const sortDirection = ref('dessending')
 
-		return { user, tickets, ticketFilter, showNewTicketDialog, lastModifiedSort }
+		return { user, tickets, ticketFilter, showNewTicketDialog, sortby, sortDirection }
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
@@ -83,6 +84,14 @@ export default {
 				});
 			});
 			return items;
+		},
+		toggleSort(sortby) {
+			if (this.sortby != sortby) {
+				this.sortDirection = 'assending'
+				this.sortby = sortby
+			} else {
+				this.sortDirection = (this.sortDirection == 'assending' ? 'dessending' : 'assending')
+			}
 		}
 	}
 }
