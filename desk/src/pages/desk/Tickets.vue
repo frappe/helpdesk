@@ -26,7 +26,7 @@
 						<div>Add filter</div>
 					</div>
 				</Button>
-				<Button type="white">
+				<Button type="white" @click="() => { lastModifiedSort = (lastModifiedSort == 'assending' ? 'dessending' : 'assending') }">
 					<div class="flex items-center space-x-2">
 						<CustomIcons height="18" width="18" name="sort-ascending" />
 						<div>Last Modified On</div>
@@ -36,7 +36,7 @@
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList />
+			<TicketList :lastModifiedSort="lastModifiedSort" />
 		</div>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
@@ -64,7 +64,9 @@ export default {
 		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
-		return { user, tickets, ticketFilter, showNewTicketDialog }
+		const lastModifiedSort = ref('assending') // assending, dessending, none
+
+		return { user, tickets, ticketFilter, showNewTicketDialog, lastModifiedSort }
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
@@ -81,7 +83,7 @@ export default {
 				});
 			});
 			return items;
-		},
+		}
 	}
 }
 
