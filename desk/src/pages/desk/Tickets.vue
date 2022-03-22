@@ -20,7 +20,9 @@
 				<div v-else class="text-2xl">All Tickets</div>
 			</div>
 			<div class="float-right flex space-x-3 stroke-blue-600">
-				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'">
+				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
+				<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters" />
+				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
 					<div class="flex items-center space-x-2">
 						<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
 						<div>Add Filters</div>
@@ -47,6 +49,7 @@ import { Input, Dropdown, FeatherIcon } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import FilterBox from '@/components/desk/global/FilterBox.vue'
 import { inject, ref } from 'vue'
 
 export default {
@@ -57,7 +60,8 @@ export default {
 		NewTicketDialog,
 		CustomIcons,
 		Dropdown,
-		FeatherIcon
+		FeatherIcon,
+		FilterBox
 	},
 	setup() {
 		const user = inject('user')
@@ -65,11 +69,32 @@ export default {
 		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
-		const filters = ref({})
+		const filters = ref([])
+		const toggleFilters = ref(false)
+
+		const ticketTypes = inject('ticketTypes')
+		const ticketPriorities = inject('ticketPriorities')
+		const ticketStatuses = inject('ticketStatuses')
+
+		const agents = inject('agents')
+		
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
-		return { user, tickets, ticketFilter, showNewTicketDialog, filters, sortby, sortDirection }
+		return {
+			user, 
+			tickets, 
+			ticketFilter, 
+			showNewTicketDialog, 
+			filters, 
+			sortby, 
+			sortDirection, 
+			toggleFilters,
+			ticketTypes,
+			ticketPriorities,
+			ticketStatuses,
+			agents,
+		}
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
@@ -100,6 +125,16 @@ export default {
 			} else {
 				this.sortDirection = (this.sortDirection == 'assending' ? 'dessending' : 'assending')
 			}
+		},
+		getFilterBoxOptions() {
+			return [
+				{label: "Type", name: "ticket_type", items: ['Bug', 'Question', 'Incident']},
+				{label: "Contact", name: "raised_by", items: []},
+				{label: "Status", name: "status", items: []},
+				{label: "Assignee", name: "assignee", items: []},
+				{label: "Priority", name: "priority", items: []},
+				// TODO: {label: "Created On", name: "creation", type: 'calander'}
+			]
 		}
 	}
 }

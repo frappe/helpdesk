@@ -58,15 +58,18 @@ export default {
 
 			if (tickets) {
 				filteredTickets = tickets
-				for (let key in this.filters) {
+				for (let index in this.filters) {
+					let filter = this.filters[index] 
 					filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-						switch(key) {
+						let filterFieldName = Object.keys(filter)[0]
+						let filterValue = Object.values(filter)[0]
+						switch(filterFieldName) {
 							case 'assignee':
 								return Object.values(ticket.assignees).find((assignee) => { 
-									return (assignee.name == this.filters[key])
+									return (assignee.name == filterValue)
 								})
 							default:
-								return ticket[key] == this.filters[key]
+								return ticket[filterFieldName] == filterValue
 						}
 						return true
 					})
