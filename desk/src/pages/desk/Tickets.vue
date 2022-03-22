@@ -21,7 +21,7 @@
 			</div>
 			<div class="float-right flex space-x-3 stroke-blue-600">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
-				<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters" />
+				<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
 				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
 					<div class="flex items-center space-x-2">
 						<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
@@ -75,8 +75,8 @@ export default {
 		const ticketTypes = inject('ticketTypes')
 		const ticketPriorities = inject('ticketPriorities')
 		const ticketStatuses = inject('ticketStatuses')
-
 		const agents = inject('agents')
+		const contacts = inject('contacts')
 		
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
@@ -94,6 +94,7 @@ export default {
 			ticketPriorities,
 			ticketStatuses,
 			agents,
+			contacts
 		}
 	},
 	activated() {
@@ -128,11 +129,11 @@ export default {
 		},
 		getFilterBoxOptions() {
 			return [
-				{label: "Type", name: "ticket_type", items: ['Bug', 'Question', 'Incident']},
-				{label: "Contact", name: "raised_by", items: []},
-				{label: "Status", name: "status", items: []},
-				{label: "Assignee", name: "assignee", items: []},
-				{label: "Priority", name: "priority", items: []},
+				{label: "Type", name: "ticket_type", items: this.ticketTypes.map((item) => item.name)},
+				{label: "Contact", name: "raised_by", items: this.contacts.map((item) => item.name)},
+				{label: "Status", name: "status", items: this.ticketStatuses},
+				{label: "Assignee", name: "assignee", items: this.agents.map((item) => item.name)},
+				{label: "Priority", name: "priority", items: this.ticketPriorities.map((item) => item.name)},
 				// TODO: {label: "Created On", name: "creation", type: 'calander'}
 			]
 		}

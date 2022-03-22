@@ -68,6 +68,11 @@ export default {
 								return Object.values(ticket.assignees).find((assignee) => { 
 									return (assignee.name == filterValue)
 								})
+							case 'raised_by':
+								if (ticket.contact) {
+									return ticket.contact.name == filterValue
+								}
+								return false
 							default:
 								return ticket[filterFieldName] == filterValue
 						}

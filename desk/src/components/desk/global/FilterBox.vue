@@ -30,7 +30,11 @@ import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headl
 
 export default {
 	name: 'FilterBox',
-	props: ['options', 'modelValue'],
+	props: {
+		options: {type: [Array]},
+		modelValue: {type: [Array]},
+		prevFilters: {type: [Array]}
+	},
 	components: {
 		FeatherIcon,
 		Dropdown,
@@ -47,6 +51,8 @@ export default {
 		const query = ref({})
 
 		return { ticketFilter, tempFilters, query }
+	},
+	mounted() {
 	},
 	methods: {
 		addFilter() {
