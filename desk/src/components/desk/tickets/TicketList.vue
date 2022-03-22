@@ -48,9 +48,8 @@ export default {
 
 		const viewportWidth = inject('viewportWidth')
 		const tickets = inject('tickets')
-		const ticketFilter = inject('ticketFilter')
 
-		return { user, viewportWidth, tickets, ticketFilter }
+		return { user, viewportWidth, tickets }
 	},
 	computed: {
 		filteredTickets() {
@@ -79,13 +78,12 @@ export default {
 	methods: {
 		sortedTickets(tickets) {
 			if (tickets && Object.keys(tickets).length > 0) {
-				switch(this.sortby) {
-					case 'last modified':
-						return Object.values(tickets).sort((a, b) => {
-							return new Date(a.modified) - new Date(b.modified) * (this.sortDirection == 'assending' ? 1 : -1)
-						})
-					default:
-						return tickets
+				if (this.sortby) {
+					return Object.values(tickets).sort((a, b) => {
+						return new Date(a[this.sortby]) - new Date(b[this.sortby]) * (this.sortDirection == 'assending' ? 1 : -1)
+					})
+				} else {
+					return tickets
 				}
 			} else {
 				return null
