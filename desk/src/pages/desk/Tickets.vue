@@ -19,11 +19,12 @@
 				</div>
 				<div v-else class="text-2xl">All Tickets</div>
 			</div>
-			<div class="float-right flex space-x-3">
-				<Button type="white">
+			<div class="float-right flex space-x-3 stroke-blue-600">
+				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'">
 					<div class="flex items-center space-x-2">
-						<CustomIcons height="18" width="18" name="filter" />
-						<div>Add filter</div>
+						<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
+						<div>Add Filters</div>
+						<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
 					</div>
 				</Button>
 				<Button type="white" @click="() => { toggleSort('last modified') }">
@@ -36,7 +37,7 @@
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList :sortby="sortby" :sortDirection="sortDirection" />
+			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" />
 		</div>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
@@ -64,10 +65,11 @@ export default {
 		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
+		const filters = ref({})
 		const sortby = ref('last modified')
 		const sortDirection = ref('dessending')
 
-		return { user, tickets, ticketFilter, showNewTicketDialog, sortby, sortDirection }
+		return { user, tickets, ticketFilter, showNewTicketDialog, filters, sortby, sortDirection }
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
@@ -80,6 +82,12 @@ export default {
 					label: filter,
 					handler: () => {
 						this.ticketFilter = filter;
+						
+						if (filter == 'Assigned to me') {
+							this.filters.assignee = this.user.agent.name
+						} else {
+							delete this.filters.assignee
+						}
 					}
 				});
 			});

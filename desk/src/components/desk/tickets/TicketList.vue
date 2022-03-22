@@ -55,27 +55,25 @@ export default {
 	computed: {
 		filteredTickets() {
 			let tickets = this.tickets
-			let filter = this.ticketFilter
-
 			let filteredTickets = []
 
-			if (filter == "Assigned to me") {
-				for (let i in tickets) {
-					if (tickets[i].assignees.length > 0) {
-						for (let j = 0; j < tickets[i].assignees.length; j++) {
-							if (tickets[i].assignees[j].name == this.user.agent.name) {
-								filteredTickets.push(tickets[i])
-							}
-						}
-					}
-				}
-			} else {
+			if (tickets) {
 				filteredTickets = tickets
+				for (let key in this.filters) {
+					filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+						switch(key) {
+							case 'assignee':
+								return Object.values(ticket.assignees).find((assignee) => { 
+									return (assignee.name == this.filters[key])
+								})
+							default:
+								return ticket[key] == this.filters[key]
+						}
+						return true
+					})
+				}
 			}
-
-			console.log(Object.keys(filteredTickets).length)
-
-			return filteredTickets;
+			return filteredTickets
 		}
 	},
 	methods: {
