@@ -19,14 +19,17 @@
 				</div>
 				<div v-else class="text-2xl">All Tickets</div>
 			</div>
-			<div class="float-right flex space-x-3">
-				<Button type="white">
+			<div class="float-right flex space-x-3 stroke-blue-600">
+				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
+				<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
+				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
 					<div class="flex items-center space-x-2">
-						<CustomIcons height="18" width="18" name="filter" />
-						<div>Add filter</div>
+						<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
+						<div>Add Filters</div>
+						<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
 					</div>
 				</Button>
-				<Button type="white" @click="() => { lastModifiedSort = (lastModifiedSort == 'assending' ? 'dessending' : 'assending') }">
+				<Button type="white" @click="() => { toggleSort('modified') }">
 					<div class="flex items-center space-x-2">
 						<CustomIcons height="18" width="18" name="sort-ascending" />
 						<div>Last Modified On</div>
@@ -36,7 +39,7 @@
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList :lastModifiedSort="lastModifiedSort" />
+			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" />
 		</div>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
@@ -46,6 +49,7 @@ import { Input, Dropdown, FeatherIcon } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import FilterBox from '@/components/desk/global/FilterBox.vue'
 import { inject, ref } from 'vue'
 
 export default {
@@ -56,7 +60,8 @@ export default {
 		NewTicketDialog,
 		CustomIcons,
 		Dropdown,
-		FeatherIcon
+		FeatherIcon,
+		FilterBox
 	},
 	setup() {
 		const user = inject('user')
@@ -64,12 +69,50 @@ export default {
 		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
-		const lastModifiedSort = ref('assending') // assending, dessending, none
+		const filters = ref([])
+		const toggleFilters = ref(false)
 
-		return { user, tickets, ticketFilter, showNewTicketDialog, lastModifiedSort }
+		const ticketTypes = inject('ticketTypes')
+		const ticketPriorities = inject('ticketPriorities')
+		const ticketStatuses = inject('ticketStatuses')
+		const agents = inject('agents')
+		const contacts = inject('contacts')
+		
+		const sortby = ref('modified')
+		const sortDirection = ref('dessending')
+
+		return {
+			user, 
+			tickets, 
+			ticketFilter, 
+			showNewTicketDialog, 
+			filters, 
+			sortby, 
+			sortDirection, 
+			toggleFilters,
+			ticketTypes,
+			ticketPriorities,
+			ticketStatuses,
+			agents,
+			contacts
+		}
 	},
 	activated() {
 		this.$currentPage.set('Tickets')
+	},
+	watch: {
+		filters(newValue) {
+			let filter = newValue.find(x => Object.keys(x)[0] === 'assignee')
+			if (filter && this.user.agent) {
+				if (Object.values(filter)[0] === this.user.agent.name) {
+					this.ticketFilter = "Assigned to me"
+				} else {
+					this.ticketFilter = "All Tickets"
+				}
+			} else {
+				this.ticketFilter = "All Tickets"
+			}
+		}
 	},
 	methods: {
 		ticketFilterDropdownOptions() {
@@ -79,10 +122,32 @@ export default {
 					label: filter,
 					handler: () => {
 						this.ticketFilter = filter;
+						this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
+						if (filter == 'Assigned to me') {
+							this.filters.push({assignee: this.user.agent.name})
+						}
 					}
 				});
 			});
 			return items;
+		},
+		toggleSort(sortby) {
+			if (this.sortby != sortby) {
+				this.sortDirection = 'assending'
+				this.sortby = sortby
+			} else {
+				this.sortDirection = (this.sortDirection == 'assending' ? 'dessending' : 'assending')
+			}
+		},
+		getFilterBoxOptions() {
+			return [
+				{label: "Type", name: "ticket_type", items: this.ticketTypes.map((item) => item.name)},
+				{label: "Contact", name: "raised_by", items: this.contacts.map((item) => item.name)},
+				{label: "Status", name: "status", items: this.ticketStatuses},
+				{label: "Assignee", name: "assignee", items: this.agents.map((item) => item.name)},
+				{label: "Priority", name: "priority", items: this.ticketPriorities.map((item) => item.name)},
+				// TODO: {label: "Created On", name: "creation", type: 'calander'}
+			]
 		}
 	}
 }

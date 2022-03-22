@@ -20,7 +20,7 @@
 					class="block overflow-auto"
 					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9.4rem)' : null }"
 				>
-					<div v-for="ticket in sortedTickets" :key="ticket.name">
+					<div v-for="ticket in sortedTickets(filteredTickets)" :key="ticket.name">
 						<div>
 							<TicketListItem :ticketId="ticket.name" />
 						</div>
@@ -38,7 +38,7 @@ import { inject } from 'vue'
 
 export default {
 	name: 'TicketList',
-	props: ['lastModifiedSort'],
+	props: ['sortby', 'sortDirection', 'filters'],
 	components: {
 		Input,
 		TicketListItem
@@ -48,53 +48,52 @@ export default {
 
 		const viewportWidth = inject('viewportWidth')
 		const tickets = inject('tickets')
-		const ticketFilter = inject('ticketFilter')
 
-		return { user, viewportWidth, tickets, ticketFilter }
+		return { user, viewportWidth, tickets }
 	},
 	computed: {
 		filteredTickets() {
 			let tickets = this.tickets
-			let filter = this.ticketFilter
-
 			let filteredTickets = []
 
-			if (filter == "Assigned to me") {
-				for (let i in tickets) {
-					if (tickets[i].assignees.length > 0) {
-						for (let j = 0; j < tickets[i].assignees.length; j++) {
-							if (tickets[i].assignees[j].name == this.user.agent.name) {
-								filteredTickets.push(tickets[i])
-							}
-						}
-					}
-				}
-			} else {
+			if (tickets) {
 				filteredTickets = tickets
+				for (let index in this.filters) {
+					let filter = this.filters[index] 
+					filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+						let filterFieldName = Object.keys(filter)[0]
+						let filterValue = Object.values(filter)[0]
+						switch(filterFieldName) {
+							case 'assignee':
+								return Object.values(ticket.assignees).find((assignee) => { 
+									return (assignee.name == filterValue)
+								})
+							case 'raised_by':
+								if (ticket.contact) {
+									return ticket.contact.name == filterValue
+								}
+								return false
+							default:
+								return ticket[filterFieldName] == filterValue
+						}
+						return true
+					})
+				}
 			}
-
-			console.log(Object.keys(filteredTickets).length)
-
-			return filteredTickets;
-		},
-		sortedTickets() {
-			if (this.filteredTickets && Object.keys(this.filteredTickets).length > 0) {
-				let sortedTickets = this.filteredTickets
-				switch(this.lastModifiedSort) {
-					case 'assending':
-						return Object.values(this.filteredTickets).sort((a, b) => {
-							return new Date(a.modified) - new Date(b.modified)
-						})
-					case 'dessending':
-						return Object.values(this.filteredTickets).sort((a, b) => {
-							return new Date(b.modified) - new Date(a.modified)
-						})
-					default:
-						return sortedTickets
+			return filteredTickets
+		}
+	},
+	methods: {
+		sortedTickets(tickets) {
+			if (tickets && Object.keys(tickets).length > 0) {
+				if (this.sortby) {
+					return Object.values(tickets).sort((a, b) => {
+						return new Date(a[this.sortby]) - new Date(b[this.sortby]) * (this.sortDirection == 'assending' ? 1 : -1)
+					})
+				} else {
+					return tickets
 				}
 			} else {
-				console.log(this.filteredTickets)
-				console.log('here')
 				return null
 			}
 		}
