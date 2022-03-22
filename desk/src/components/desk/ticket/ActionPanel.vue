@@ -398,7 +398,7 @@ export default {
 					});
 				});
 				if (groupItems.length == 0) {
-					typeItems.push({
+					groupItems.push({
 						label: 'No team found'
 					})
 				}
