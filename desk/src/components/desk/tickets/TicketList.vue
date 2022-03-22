@@ -90,6 +90,11 @@ export default {
 			return this.selectedTickets.length == Object.keys(this.sortedTickets).length
 		}
 	},
+	watch: {
+		selectedTickets(newValue) {
+			this.$emit('selectedTicketsOnChange', newValue)
+		}
+	},
 	methods: {
 		getSortedTickets(tickets) {
 			if (tickets && Object.keys(tickets).length > 0) {
@@ -98,7 +103,6 @@ export default {
 						return new Date(a[this.sortby]) - new Date(b[this.sortby]) * (this.sortDirection == 'assending' ? 1 : -1)
 					})
 					// update selected tickets
-					console.log('here')
 					this.selectedTickets = this.selectedTickets.filter((item1) => {
 						return tickets.find((item2) => item2.name === item1)
 					})

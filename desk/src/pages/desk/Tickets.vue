@@ -39,7 +39,7 @@
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" />
+			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
 		</div>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
@@ -81,6 +81,8 @@ export default {
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
+		const selectedTickets = ref([])
+
 		return {
 			user, 
 			tickets, 
@@ -94,7 +96,8 @@ export default {
 			ticketPriorities,
 			ticketStatuses,
 			agents,
-			contacts
+			contacts,
+			selectedTickets
 		}
 	},
 	activated() {
@@ -112,6 +115,11 @@ export default {
 			} else {
 				this.ticketFilter = "All Tickets"
 			}
+		}
+	},
+	computed: {
+		toggleBulkTicketActionPanel() {
+			return this.selectedTickets.length > 0
 		}
 	},
 	methods: {
@@ -148,6 +156,10 @@ export default {
 				{label: "Priority", name: "priority", items: this.ticketPriorities.map((item) => item.name)},
 				// TODO: {label: "Created On", name: "creation", type: 'calander'}
 			]
+		},
+		triggerSelectedTickets(selectedTickets) {
+			console.log('ticket selected')
+			this.selectedTickets = selectedTickets
 		}
 	}
 }
