@@ -97,7 +97,6 @@ export default {
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
 				case 'type':
-					console.log('calling resource manager for setting ticket type')
 					return this.$resources.assignTicketType.submit({
 						ticket_id: ticketId,
 						type: ref
@@ -126,6 +125,20 @@ export default {
 					return this.$resources.assignTicketGroup.submit({
 						ticket_id: ticketId,
 						agent_group: ref
+					})
+			}
+		},
+		this.ticketController.bulkSet = (ticketIds, type, ref=null) => {
+			switch (type) {
+				case 'status':
+					return this.$resources.bulkAssignTicketStatus.submit({
+						ticket_ids: ticketIds,
+						status: ref
+					})
+				case 'agent':
+					return this.$resources.bulkAssignTicketToAgent.submit({
+						ticket_ids: ticketIds,
+						agent_id: ref
 					})
 			}
 		},
@@ -319,6 +332,18 @@ export default {
 				}
 			}
 		},
+		bulkAssignTicketToAgent() {
+			return {
+				method: 'helpdesk.api.ticket.bulk_assign_ticket_to_agent',
+				onSuccess: (ticket) => {
+					// TODO: do bulk update
+					this.ticketController.update()
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
 		assignTicketType() {
 			return {
 				method: 'helpdesk.api.ticket.assign_ticket_type',
@@ -335,6 +360,18 @@ export default {
 				method: 'helpdesk.api.ticket.assign_ticket_status',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		bulkAssignTicketStatus() {
+			return {
+				method: 'helpdesk.api.ticket.bulk_assign_ticket_status',
+				onSuccess: (tickets) => {
+					// TODO: do bulk update for tickets
+					this.ticketController.update()
 				},
 				onFailure: () => {
 					// TODO:

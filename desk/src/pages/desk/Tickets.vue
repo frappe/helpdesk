@@ -22,13 +22,25 @@
 			<div class="float-right">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
 				<div v-if="showTicketBluckUpdatePanel" class="flex space-x-3">
-					<Button>Mark as Closed</Button>
-					<Button appearance="secondary">
-						<div class="flex items-center space-x-2">
-							<div>Assign</div>
-							<CustomIcons class="h-4" name="select" />
-						</div>
-					</Button>
+					<Button @click="markSelectedTicketsAsClosed()">Mark as Closed</Button>
+					<Dropdown
+						v-if="agents"
+						placement="right" 
+						:options="agentsAsDropdownOptions()" 
+						:dropdown-width-full="true"
+						class="text-base flex flex-row-reverse"
+					>
+						<template v-slot="{ toggleAssignees }">
+							<div @click="toggleAssignees" class="cursor-pointer">
+								<Button appearance="secondary">
+									<div class="flex items-center space-x-2">
+										<div>Assign</div>
+										<CustomIcons class="h-4" name="select" />
+									</div>
+								</Button>
+							</div>
+						</template>
+					</Dropdown>
 				</div>
 				<div v-else class="flex space-x-3">
 					<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
@@ -94,6 +106,8 @@ export default {
 
 		const selectedTickets = ref([])
 
+		const ticketController = inject('ticketController')
+
 		return {
 			user, 
 			tickets, 
@@ -108,7 +122,8 @@ export default {
 			ticketStatuses,
 			agents,
 			contacts,
-			selectedTickets
+			selectedTickets,
+			ticketController
 		}
 	},
 	activated() {
@@ -169,9 +184,53 @@ export default {
 			]
 		},
 		triggerSelectedTickets(selectedTickets) {
-			console.log('ticket selected')
 			this.selectedTickets = selectedTickets
-		}
+		},
+		markSelectedTicketsAsClosed() {
+			if (this.selectedTickets) {
+				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed')
+			}
+		},
+		agentsAsDropdownOptions() {
+			let agentItems = [];
+			if (this.agents) {
+				this.agents.forEach(agent => {
+					agentItems.push({
+						label: agent.agent_name,
+						handler: () => {
+							if (this.selectedTickets) {
+								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name)
+							}
+						},
+					});
+				});
+				let options = [];
+				if (this.user.agent) {
+					options.push({
+						group: 'Myself',
+						hideLabel: true,
+						items: [
+							{
+								label: 'Assign to me',
+								handler: () => {
+									if (this.selectedTickets) {
+										this.ticketController.bulkSet(this.selectedTickets, 'agent')
+									}
+								}
+							},
+						],
+					})
+				}
+				options.push({
+					group: 'All Agents',
+					hideLabel: true,
+					items: agentItems,
+				})
+				return options;
+			} else {
+				return null;
+			}
+		},
 	}
 }
 

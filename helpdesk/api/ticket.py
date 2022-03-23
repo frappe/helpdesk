@@ -124,6 +124,15 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 		return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
+def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
+	if ticket_ids:
+		ticket_docs = []
+		for ticket_id in ticket_ids:
+			ticket_doc = assign_ticket_to_agent(ticket_id, agent_id)
+			ticket_docs.append(ticket_doc)
+		return ticket_docs
+
+@frappe.whitelist(allow_guest=True)
 def assign_ticket_type(ticket_id, type):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
@@ -146,6 +155,15 @@ def assign_ticket_status(ticket_id, status):
 			log_ticket_activity(ticket_id, f"Status set to {status}")
 
 		return ticket_doc
+
+@frappe.whitelist(allow_guest=True)
+def bulk_assign_ticket_status(ticket_ids, status):
+	if ticket_ids:
+		ticket_docs = []
+		for ticket_id in ticket_ids:
+			ticket_doc = assign_ticket_status(ticket_id, status)
+			ticket_docs.append(ticket_doc)
+		return ticket_docs
 
 @frappe.whitelist(allow_guest=True)
 def assign_ticket_priority(ticket_id, priority):
