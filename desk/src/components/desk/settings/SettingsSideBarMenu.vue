@@ -1,13 +1,10 @@
 <template>
 	<div class="h-full pt-1 space-y-2">
-		<div class="border-b pb-3 px-3 mx-2">Settings</div>
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
 			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="$currentPage.get() == setting.pageName ? 'bg-slate-50' : ''">
-				<router-link 
-					:to="setting.route"
-				>
+				<div @click="changeSelectedSettingItem(setting)">
 					<ListItem  :title="setting.label" />
-				</router-link>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -18,6 +15,7 @@ import { ListItem } from 'frappe-ui'
 
 export default {
 	name: 'SettingsSideBarMenu',
+	props: ['modelValue'],
 	components: {
 		ListItem
 	},
@@ -31,10 +29,18 @@ export default {
 				},
 				{
 					label: 'SLA Policies',
-					pageName: 'SlaPolicySettings',
+					pageName: 'SlaSettings',
 					route: '/helpdesk/settings/sla'
 				}
 			]
+		}
+	},
+	methods: {
+		changeSelectedSettingItem(setting) {
+			this.$emit('update:modelValue', setting.label)
+			this.$router.push({
+				name: setting.pageName,
+			})
 		}
 	}
 }

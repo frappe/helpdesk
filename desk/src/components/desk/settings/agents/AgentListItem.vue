@@ -14,9 +14,6 @@
 				{{ agent.agent_name }}
 			</div>
 			<div class="sm:w-3/12">
-                {{ agent.name }}
-			</div>
-			<div class="sm:w-3/12">
 				{{ agentRoles }}
 			</div>
 			<div class="sm:w-3/12">

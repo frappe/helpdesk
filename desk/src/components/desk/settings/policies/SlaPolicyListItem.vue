@@ -1,5 +1,5 @@
 <template>
-	<div class="block py-4 hover:bg-gray-50 border-b text-base">
+	<div class="block py-3 hover:bg-gray-50 border-b text-base">
 		<router-link 
 			v-if="policy"
 			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8 space-x-2"

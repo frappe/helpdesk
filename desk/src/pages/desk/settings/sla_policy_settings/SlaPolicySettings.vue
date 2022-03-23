@@ -1,16 +1,5 @@
 <template>
 	<div>
-		<div class="flow-root border-b pt-2 pb-3 pr-8">
-			<div class="float-left ml-4">
-				<div class="flex items-center space-x-4">
-					<Input type="checkbox" value="" />
-					<Button icon-left="plus" appearance="primary" @click="() => {}">Add Policy</Button>
-				</div>
-			</div>
-			<div class="float-right">
-				<Button icon-left="filter" type="white">Filter</Button>
-			</div>
-		</div>
 		<div v-if="policies">
 			<SlaPolicyList :policies="policies" />
 		</div>
