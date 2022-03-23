@@ -19,23 +19,34 @@
 				</div>
 				<div v-else class="text-2xl">All Tickets</div>
 			</div>
-			<div class="float-right flex space-x-3 stroke-blue-600">
+			<div class="float-right">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
-				<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
-				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
-					<div class="flex items-center space-x-2">
-						<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
-						<div>Add Filters</div>
-						<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
-					</div>
-				</Button>
-				<Button type="white" @click="() => { toggleSort('modified') }">
-					<div class="flex items-center space-x-2">
-						<CustomIcons height="18" width="18" name="sort-ascending" />
-						<div>Last Modified On</div>
-					</div>
-				</Button>
-				<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
+				<div v-if="showTicketBluckUpdatePanel" class="flex space-x-3">
+					<Button>Mark as Closed</Button>
+					<Button appearance="secondary">
+						<div class="flex items-center space-x-2">
+							<div>Assign</div>
+							<CustomIcons class="h-4" name="select" />
+						</div>
+					</Button>
+				</div>
+				<div v-else class="flex space-x-3">
+					<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
+					<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
+						<div class="flex items-center space-x-2">
+							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
+							<div>Add Filters</div>
+							<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
+						</div>
+					</Button>
+					<Button type="white" @click="() => { toggleSort('modified') }">
+						<div class="flex items-center space-x-2">
+							<CustomIcons height="18" width="18" name="sort-ascending" />
+							<div>Last Modified On</div>
+						</div>
+					</Button>
+					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
+				</div>
 			</div>
 		</div>
 		<div v-if="tickets">
@@ -118,7 +129,7 @@ export default {
 		}
 	},
 	computed: {
-		toggleBulkTicketActionPanel() {
+		showTicketBluckUpdatePanel() {
 			return this.selectedTickets.length > 0
 		}
 	},
