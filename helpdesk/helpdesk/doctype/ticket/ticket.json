@@ -182,7 +182,7 @@
    "fieldname": "agreement_status",
    "fieldtype": "Select",
    "label": "Service Level Agreement Status",
-   "options": "First Response Due\nResolution Due\nFulfilled\nFailed",
+   "options": "First Response Due\nResolution Due\nFulfilled\nOverdue",
    "read_only": 1
   },
   {
@@ -376,7 +376,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-03-10 15:13:50.048003",
+ "modified": "2022-03-23 10:08:29.119101",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket",

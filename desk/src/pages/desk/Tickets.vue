@@ -19,27 +19,50 @@
 				</div>
 				<div v-else class="text-2xl">All Tickets</div>
 			</div>
-			<div class="float-right flex space-x-3 stroke-blue-600">
+			<div class="float-right">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
-				<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
-				<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
-					<div class="flex items-center space-x-2">
-						<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
-						<div>Add Filters</div>
-						<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
-					</div>
-				</Button>
-				<Button type="white" @click="() => { toggleSort('modified') }">
-					<div class="flex items-center space-x-2">
-						<CustomIcons height="18" width="18" name="sort-ascending" />
-						<div>Last Modified On</div>
-					</div>
-				</Button>
-				<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
+				<div v-if="showTicketBluckUpdatePanel" class="flex space-x-3">
+					<Button @click="markSelectedTicketsAsClosed()">Mark as Closed</Button>
+					<Dropdown
+						v-if="agents"
+						placement="right" 
+						:options="agentsAsDropdownOptions()" 
+						:dropdown-width-full="true"
+						class="text-base flex flex-row-reverse"
+					>
+						<template v-slot="{ toggleAssignees }">
+							<div @click="toggleAssignees" class="cursor-pointer">
+								<Button appearance="secondary">
+									<div class="flex items-center space-x-2">
+										<div>Assign</div>
+										<CustomIcons class="h-4" name="select" />
+									</div>
+								</Button>
+							</div>
+						</template>
+					</Dropdown>
+				</div>
+				<div v-else class="flex space-x-3">
+					<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
+					<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-200'" @click="() => { toggleFilters = !toggleFilters }">
+						<div class="flex items-center space-x-2">
+							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
+							<div>Add Filters</div>
+							<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
+						</div>
+					</Button>
+					<Button type="white" @click="() => { toggleSort('modified') }">
+						<div class="flex items-center space-x-2">
+							<CustomIcons height="18" width="18" name="sort-ascending" />
+							<div>Last Modified On</div>
+						</div>
+					</Button>
+					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
+				</div>
 			</div>
 		</div>
 		<div v-if="tickets">
-			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" />
+			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
 		</div>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
@@ -81,6 +104,10 @@ export default {
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
+		const selectedTickets = ref([])
+
+		const ticketController = inject('ticketController')
+
 		return {
 			user, 
 			tickets, 
@@ -94,7 +121,9 @@ export default {
 			ticketPriorities,
 			ticketStatuses,
 			agents,
-			contacts
+			contacts,
+			selectedTickets,
+			ticketController
 		}
 	},
 	activated() {
@@ -112,6 +141,11 @@ export default {
 			} else {
 				this.ticketFilter = "All Tickets"
 			}
+		}
+	},
+	computed: {
+		showTicketBluckUpdatePanel() {
+			return this.selectedTickets.length > 0
 		}
 	},
 	methods: {
@@ -148,7 +182,55 @@ export default {
 				{label: "Priority", name: "priority", items: this.ticketPriorities.map((item) => item.name)},
 				// TODO: {label: "Created On", name: "creation", type: 'calander'}
 			]
-		}
+		},
+		triggerSelectedTickets(selectedTickets) {
+			this.selectedTickets = selectedTickets
+		},
+		markSelectedTicketsAsClosed() {
+			if (this.selectedTickets) {
+				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed')
+			}
+		},
+		agentsAsDropdownOptions() {
+			let agentItems = [];
+			if (this.agents) {
+				this.agents.forEach(agent => {
+					agentItems.push({
+						label: agent.agent_name,
+						handler: () => {
+							if (this.selectedTickets) {
+								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name)
+							}
+						},
+					});
+				});
+				let options = [];
+				if (this.user.agent) {
+					options.push({
+						group: 'Myself',
+						hideLabel: true,
+						items: [
+							{
+								label: 'Assign to me',
+								handler: () => {
+									if (this.selectedTickets) {
+										this.ticketController.bulkSet(this.selectedTickets, 'agent')
+									}
+								}
+							},
+						],
+					})
+				}
+				options.push({
+					group: 'All Agents',
+					hideLabel: true,
+					items: agentItems,
+				})
+				return options;
+			} else {
+				return null;
+			}
+		},
 	}
 }
 
