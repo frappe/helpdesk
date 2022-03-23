@@ -9,6 +9,7 @@ def after_install():
 	add_default_ticket_priorities()
 	add_default_sla()
 	add_default_ticket_template()
+	add_default_agent_groups()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
@@ -187,3 +188,12 @@ def add_default_ticket_priorities():
 			priority_doc = frappe.new_doc("Ticket Priority")
 			priority_doc.name = priority
 			priority_doc.insert()
+
+def add_default_agent_groups():
+	agent_groups = ["Billing", "Product Experts"]
+
+	for agent_group in agent_groups:
+		if not frappe.db.exists("Agent Groups", agent_group):
+			agent_group_doc = frappe.new_doc("Agent Group")
+			agent_group_doc.team_name = agent_group
+			agent_group_doc.insert()
