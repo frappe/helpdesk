@@ -5,7 +5,7 @@
 			<div class="sm:w-2/12 border-r">
 				<SettingsSideBarMenu />
 			</div>
-			<div class="sm:w-10/12 h-full">
+			<div class="sm:w-11/12 h-full">
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />

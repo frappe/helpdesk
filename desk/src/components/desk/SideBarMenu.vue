@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col px-1 border-r pt-4" :style="{ height: viewportWidth > 768 ? 'calc(100vh - 3.9rem)' : null }">
+	<div class="flex flex-col px-1 border-r pt-4" :style="{ height: viewportWidth > 768 ? 'calc(100vh - 3.2rem)' : null }">
 		<div class="space-y-5 mb-auto">
 			<div>
 				<router-link to="/helpdesk/tickets">
