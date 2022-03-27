@@ -109,7 +109,6 @@ export default {
 		}
 	},
 	mounted() {
-		console.log('here')
 		this.$socket.on('list_update', (data) => {
 			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
 				this.$resources.conversations.fetch()

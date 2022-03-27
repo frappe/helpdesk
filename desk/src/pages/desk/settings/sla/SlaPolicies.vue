@@ -8,28 +8,34 @@
 <script>
 import { Input } from 'frappe-ui'
 import SlaPolicyList from '@/components/desk/settings/policies/SlaPolicyList.vue'
+import { inject } from 'vue'
 
 export default {
-	name: 'SlaPolicySettings',
-	inject: ['viewportWidth'],
+	name: 'SlaPolicies',
 	components: {
 		SlaPolicyList,
 		Input,
+	},
+	setup() {
+		const viewportWidth = inject('viewportWidth')
+		const selectedSetting = inject('selectedSetting')
+		
+		return { viewportWidth, selectedSetting }
 	},
 	resources: {
 		policies() {
 			return {
 				method: 'frappe.client.get_list',
 				params: {
-                    doctype: "Service Level Agreement",
-                    fields: ["*"]
-                },
+					doctype: "Service Level Agreement",
+					fields: ["*"]
+				},
 				auto: true,
 			}
 		}
 	},
 	activated() {
-		this.$currentPage.set('SlaPolicySettings')
+		this.selectedSetting = 'Support Policies'
 	},
 	deactivated() {
 

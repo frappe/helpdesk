@@ -32,7 +32,7 @@
 		</div>
 		<div class="space-y-5 mt-auto mb-2">
 			<div>
-				<router-link to="/helpdesk/settings">
+				<router-link to="/helpdesk/settings/agents">
 					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
 						<CustomIcons name="settings" class="group-hover:stroke-blue-600" width="25" height="25"/>
 					</div>

@@ -1,7 +1,7 @@
 <template>
 	<div class="h-full pt-1 space-y-2">
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
-			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="modelValue === setting.label ? 'bg-slate-50' : ''">
+			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="selectedSetting === setting.label ? 'bg-slate-50' : ''">
 				<div @click="changeSelectedSettingItem(setting)">
 					<ListItem  :title="setting.label" />
 				</div>
@@ -12,24 +12,29 @@
 
 <script>
 import { ListItem } from 'frappe-ui'
+import { inject } from 'vue'
 
 export default {
 	name: 'SettingsSideBarMenu',
-	props: ['modelValue'],
 	components: {
 		ListItem
+	},
+	setup() {
+		const selectedSetting = inject('selectedSetting')
+
+		return { selectedSetting }
 	},
 	data() {
 		return {
 			settings: [
 				{
 					label: 'Agents',
-					pageName: 'AgentSettings',
+					pageName: 'Agents',
 					route: '/helpdesk/settings/agents'
 				},
 				{
 					label: 'Support Policies',
-					pageName: 'SlaSettings',
+					pageName: 'SlaPolicies',
 					route: '/helpdesk/settings/sla'
 				}
 			]
@@ -37,7 +42,7 @@ export default {
 	},
 	methods: {
 		changeSelectedSettingItem(setting) {
-			this.$emit('update:modelValue', setting.label)
+			this.selectedSetting = setting.label
 			this.$router.push({
 				name: setting.pageName,
 			})
