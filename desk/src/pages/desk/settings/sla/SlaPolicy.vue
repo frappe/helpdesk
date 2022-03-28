@@ -41,9 +41,9 @@
 								<div class="w-2/12">{{ rule.priority }}</div>
 								<div class="w-1/12">
 									<Switch
-										v-model="rule.default"
 										:class="rule.default ? 'bg-blue-500' : 'bg-slate-300'"
 										class="relative inline-flex items-center h-6 rounded-full w-11"
+										@click="changeDefaultPriority(index)"
 									>
 										<span
 											:class="rule.default ? 'translate-x-6' : 'translate-x-1'"
@@ -251,6 +251,15 @@ export default {
 		editPolicyName() {
 			this.tempSlaPolicyName = this.slaPolicyName
 			this.editingName = true
+		},
+		changeDefaultPriority(index) {
+			this.rules.forEach((rule, i) => {
+				if (i == index) {
+					rule.default = !rule.default
+				} else {
+					rule.default = false
+				}
+			})
 		},
 		save() {
 			let priorities = this.rules.map(rule => {
