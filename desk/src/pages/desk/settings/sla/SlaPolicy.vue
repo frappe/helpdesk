@@ -37,7 +37,7 @@
 				</div>
 				<div v-if="expandRules">
 					<div class="text-base">
-						<div class="flex text-gray-600 py-2 border-b">
+						<div class="flex text-gray-600 py-4 border-b">
 							<div class="w-2/12">Priority</div>
 							<div class="w-1/12">Default</div>
 							<div class="w-3/12 text-right">First Response Time</div>
@@ -45,8 +45,21 @@
 							<div class="w-2/12 text-right">Marker</div>
 						</div>
 						<div v-for="(rule, index) in rules" :key="rule.priority">
-							<div class="flex text-gray-900 py-2" :class="index < rules.length - 1 ? 'border-b' : ''">
-								<div class="w-2/12">{{ rule.priority }}</div>
+							<div class="flex text-gray-900 py-2 items-center" :class="index < rules.length - 1 ? 'border-b' : ''">
+								<div class="w-2/12">
+									<Dropdown
+										v-if="ticketPriorities"
+										:options="prioritiesAsDropdownOptions(index)" 
+										class="text-base w-full cursor-pointer"
+									>
+										<template v-slot="{ togglePriority }" @click="togglePriority" class="w-full">
+											<div class="flex items-center space-x-2">
+												<div class="text-left">{{ rule.priority }}</div>
+												<!-- <FeatherIcon name="chevron-down" class="h-4 w-4" /> -->
+											</div>
+										</template>
+									</Dropdown>
+								</div>
 								<div class="w-1/12">
 									<Switch
 										:class="rule.default ? 'bg-blue-500' : 'bg-slate-300'"
@@ -66,11 +79,14 @@
 									<TimeDurationInput v-model="rule.resolutionTime"/>
 								</div>
 								<div class="w-2/12 text-right">{{ rule.marker }}</div>
+								<div class="w-1/12 flex flex-row-reverse" v-if="rules.length > 1">
+									<FeatherIcon name="trash" class="cursor-pointer h-5 w-5 stroke-red-500 hover:stroke-red-600" @click="removeRule(index)"/>
+								</div>
 							</div>
 						</div>
 					</div>
-					<div class="mb-3"></div>
-					<Button>Add Target</Button>
+					<div class="mb-2"></div>
+					<Button @click="addRule()">Add Rule</Button>
 				</div>
 			</div>
 			<div>
@@ -125,10 +141,10 @@
 </template>
 
 <script>
-import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
+import { FeatherIcon, Input, LoadingText, Dropdown } from 'frappe-ui'
 import TimeDurationInput from '@/components/desk/global/TimeDurationInput.vue'
 import { Switch } from '@headlessui/vue'
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'SlaPolicy',
@@ -137,6 +153,7 @@ export default {
 		FeatherIcon,
 		Input,
 		LoadingText,
+		Dropdown,
 		TimeDurationInput,
 		Switch
 	},
@@ -153,12 +170,14 @@ export default {
 		const expandRules = ref(true)
 		const expandWorkingHours = ref(true)
 
+		const ticketPriorities = inject('ticketPriorities')
+
 		if (isNew) {
 			slaPolicyName.value = 'New Service Policy'
 			rules.value = [
-				{priority: 'Urgent', default: false, firstResponseTime: 1, resolutionTime: 2, marker: null},
-				{priority: 'High', default: false, firstResponseTime: 2, resolutionTime: 4, marker: 'up-arrow'},
-				{priority: 'Low', default: true, firstResponseTime: 12, resolutionTime: 24, marker: 'down-arrow'}
+				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600, marker: null},
+				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600, marker: 'up-arrow'},
+				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600, marker: 'down-arrow'}
 			]
 			workingHours.value = [
 				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
@@ -179,7 +198,8 @@ export default {
 			rules, 
 			workingHours, 
 			expandWorkingHours, 
-			expandRules 
+			expandRules,
+			ticketPriorities
 		}
 	},
 	resources: {
@@ -277,6 +297,22 @@ export default {
 				}
 			})
 		},
+		addRule() {
+			this.rules.push({priority: 'Low', default: false, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600, marker: 'down-arrow'})
+		},
+		removeRule(index) {
+			if (this.rules.length > 1) {
+				if (this.rules[index].default) {
+					if(index == 0) {
+						this.rules[this.rules.length - 1].default = true
+					} else {
+						this.rules[index - 1].default = true
+					}
+				}
+
+				this.rules.splice(index, 1)
+			}
+		},
 		rename() {
 			// TODO: once Service level agreement is renamable uncomment this block
 			// return this.$resources.renameServicePolicy.submit({
@@ -326,8 +362,28 @@ export default {
 			})
 		},
 		cancel() {
-			this.$resources.getSlaPolicy.fetch()
-		}
+			if (!this.isNew) {
+				this.$resources.getSlaPolicy.fetch()
+			} else {
+				this.$router.go()
+			}
+		},
+		prioritiesAsDropdownOptions(index) {
+			let priorityItems = [];
+			if (this.ticketPriorities) {
+				this.ticketPriorities.forEach(priority => {
+					priorityItems.push({
+						label: priority.name,
+						handler: () => {
+							this.rules[index].priority = priority.name
+						},
+					});
+				});
+				return priorityItems;
+			} else {
+				return null;
+			}
+		},
 	}
 }
 </script>

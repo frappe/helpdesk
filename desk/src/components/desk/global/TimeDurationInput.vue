@@ -1,12 +1,12 @@
 <template>
 	<div>
-		<div class="mb-2">
+		<div>
 			<div class="cursor-pointer w-24 text-right p-1.5 bg-gray-100 rounded" @click="() => { editing=!editing }">
 				{{ convertSecondsToTimeStr(modelValue) }}
 			</div>
 		</div>
 		<div v-if="editing" class="relative">
-			<div class="absolute z-10 rounded shadow bg-white p-3">
+			<div class="absolute z-10 rounded shadow bg-white p-3 mt-2">
 				<div class="flex space-x-2">
 					<div class="space-y-1">
 						<Input class="w-16" v-model="hours" type="number" />
@@ -76,7 +76,7 @@ export default {
 			let hStr = h > 0 ? `${h}h` : ''
 			let mStr = m > 0 ? `${m}m` : ''
 
-			return `${hStr} ${mStr}`.trim()
+			return `${hStr} ${mStr}`.trim() || '0h 0m'
 		},
 		convertTimeStToSeconds(strTime) {
 			let timeList = strTime.split(' ')

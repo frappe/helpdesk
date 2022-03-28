@@ -56,7 +56,7 @@
 				</div>
 			</div>
 			<div class="sm:w-2/12">
-			<Dropdown
+				<Dropdown
 					v-if="ticketStatuses"
 					placement="left" 
 					:options="statusesAsDropdownOptions()" 
@@ -275,17 +275,17 @@ export default {
 			}
 		},
 		prioritiesAsDropdownOptions() {
-			let typeItems = [];
+			let priorityItems = [];
 			if (this.ticketPriorities) {
 				this.ticketPriorities.forEach(priority => {
-					typeItems.push({
+					priorityItems.push({
 						label: priority.name,
 						handler: () => {
 							this.ticketController.set(this.ticketId, 'priority', priority.name)
 						},
 					});
 				});
-				return typeItems;
+				return priorityItems;
 			} else {
 				return null;
 			}
