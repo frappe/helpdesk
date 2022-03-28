@@ -34,14 +34,31 @@ const routes = [
 				component: () => import('@/pages/desk/settings/Settings.vue'),
 				children: [
 					{
+						path: '',
+						redirect: () => {
+							return { path: '/helpdesk/settings/agents'}
+						},
+					},
+					{
 						path: 'agents',
-						name: 'AgentSettings',
-						component: () => import('@/pages/desk/settings/agent_settings/AgentSettings.vue')
+						name: 'Agents',
+						component: () => import('@/pages/desk/settings/agent/Agents.vue')
 					},
 					{
 						path: 'sla',
-						name: 'SlaSettings',
-						component: () => import('@/pages/desk/settings/sla_policy_settings/SlaPolicySettings.vue')
+						name: 'SlaPolicies',
+						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue')
+					},
+					{
+						path: 'sla/new',
+						name: 'SlaPolicy',
+						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue')
+					},
+					{
+						path: 'sla/:slaId',
+						name: 'SlaPolicy',
+						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
+						props: true
 					}
 				]
 			}

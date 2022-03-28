@@ -1,16 +1,5 @@
 <template>
 	<div>
-		<div class="flow-root border-b pt-2 pb-3 pr-8">
-			<div class="float-left ml-4">
-				<div class="flex items-center space-x-4">
-					<Input type="checkbox" value="" />
-					<Button icon-left="plus" appearance="primary" @click="() => {}">Add Policy</Button>
-				</div>
-			</div>
-			<div class="float-right">
-				<Button icon-left="filter" type="white">Filter</Button>
-			</div>
-		</div>
 		<div v-if="policies">
 			<SlaPolicyList :policies="policies" />
 		</div>
@@ -19,28 +8,34 @@
 <script>
 import { Input } from 'frappe-ui'
 import SlaPolicyList from '@/components/desk/settings/policies/SlaPolicyList.vue'
+import { inject } from 'vue'
 
 export default {
-	name: 'SlaPolicySettings',
-	inject: ['viewportWidth'],
+	name: 'SlaPolicies',
 	components: {
 		SlaPolicyList,
 		Input,
+	},
+	setup() {
+		const viewportWidth = inject('viewportWidth')
+		const selectedSetting = inject('selectedSetting')
+		
+		return { viewportWidth, selectedSetting }
 	},
 	resources: {
 		policies() {
 			return {
 				method: 'frappe.client.get_list',
 				params: {
-                    doctype: "Service Level Agreement",
-                    fields: ["*"]
-                },
+					doctype: "Service Level Agreement",
+					fields: ["*"]
+				},
 				auto: true,
 			}
 		}
 	},
 	activated() {
-		this.$currentPage.set('SlaPolicySettings')
+		this.selectedSetting = 'Support Policies'
 	},
 	deactivated() {
 

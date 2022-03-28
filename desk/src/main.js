@@ -21,7 +21,7 @@ const globalVariables = ref({
 
 app.config.globalProperties.$contactFilter = {
 	set(newValue) { 
-		globalVariables.value.contactFilter= newValue;
+		globalVariables.value.contactFilter = newValue;
 	},
 	get() {
 		return globalVariables.value.contactFilter;

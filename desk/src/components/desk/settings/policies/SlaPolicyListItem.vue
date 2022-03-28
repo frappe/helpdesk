@@ -1,19 +1,17 @@
 <template>
-	<div class="block py-4 hover:bg-gray-50 border-b text-base">
+	<div class="block py-3 hover:bg-gray-50 border-b text-base">
 		<router-link 
 			v-if="policy"
 			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8 space-x-2"
-			:to="`/policys/${policy.name}`"
+			:to="`/helpdesk/settings/sla/${policy.name}`"
 		>
-			<div
-				class="mr-4"
-			>
+			<div>
 				<Input type="checkbox" value="" />
 			</div>
-			<div class="sm:w-6/12">
+			<div class="sm:w-3/12">
 				{{ policy.name }}
 			</div>
-			<div class="sm:w-5/12">
+			<div class="sm:w-3/12">
 				{{ policy.default_service_level_agreement ? "Default" : ""}}
 			</div>
 			<div class="sm:w-1/12">

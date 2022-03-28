@@ -43,7 +43,6 @@ export default {
 		}
 	},
     activated() {
-        this.$currentPage.set('Contacts')
     },
     deactivated() {
 

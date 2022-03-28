@@ -1,40 +1,47 @@
 <template>
 	<div class="h-full pt-1 space-y-2">
-		<div class="border-b pb-3 px-3 mx-2">Settings</div>
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
-			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="$currentPage.get() == setting.pageName ? 'bg-slate-50' : ''">
-				<router-link 
-					:to="setting.route"
-				>
-					<ListItem  :title="setting.label" />
-				</router-link>
+			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="selectedSetting === setting.label ? 'bg-slate-50' : ''">
+				<div class="p-2 text-base" @click="changeSelectedSettingItem(setting)">
+					{{ setting.label }}
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { ListItem } from 'frappe-ui'
+import { inject } from 'vue'
 
 export default {
 	name: 'SettingsSideBarMenu',
-	components: {
-		ListItem
+	setup() {
+		const selectedSetting = inject('selectedSetting')
+
+		return { selectedSetting }
 	},
 	data() {
 		return {
 			settings: [
 				{
 					label: 'Agents',
-					pageName: 'AgentSettings',
+					pageName: 'Agents',
 					route: '/helpdesk/settings/agents'
 				},
 				{
-					label: 'SLA Policies',
-					pageName: 'SlaPolicySettings',
+					label: 'Support Policies',
+					pageName: 'SlaPolicies',
 					route: '/helpdesk/settings/sla'
 				}
 			]
+		}
+	},
+	methods: {
+		changeSelectedSettingItem(setting) {
+			this.selectedSetting = setting.label
+			this.$router.push({
+				name: setting.pageName,
+			})
 		}
 	}
 }
