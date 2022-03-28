@@ -31,18 +31,18 @@
 					<div class="text-base">
 						<div class="flex text-gray-600 py-2 border-b">
 							<div class="w-2/12">Priority</div>
-							<div class="w-3/12 text-right">First Response Time (hrs)</div>
-							<div class="w-3/12 text-right">Resolution Time (hrs)</div>
+							<div class="w-3/12 text-right">First Response Time</div>
+							<div class="w-3/12 text-right">Resolution Time</div>
 							<div class="w-2/12 text-right">Marker</div>
 						</div>
 						<div v-for="(rule, index) in rules" :key="rule.priority">
 							<div class="flex text-gray-900 py-2" :class="index < rules.length - 1 ? 'border-b' : ''">
 								<div class="w-2/12">{{ rule.priority }}</div>
 								<div class="w-3/12 flex flex-row-reverse">
-									<Input class="w-14" v-model="rule.firstResponseTime" type="number" />
+									<TimeDurationInput v-model="rule.firstResponseTime"/>
 								</div>
 								<div class="w-3/12 flex flex-row-reverse">
-									<Input class="w-14" v-model="rule.resolutionTime" type="number" />
+									<TimeDurationInput v-model="rule.resolutionTime"/>
 								</div>
 								<div class="w-2/12 text-right">{{ rule.marker }}</div>
 							</div>
@@ -78,15 +78,9 @@
 									<div>{{ workingHour.enabled ? 'Open' : 'Closed' }}</div>
 								</div>
 								<div v-if="workingHour.enabled" class="w-6/12 flex space-x-4 items-center">
-									<div class="space-x-2 px-2 py-1 bg-gray-100 flex rounded items-center text-gray-900">
-										<div>{{ workingHour.from }}</div>
-										<FeatherIcon name="clock" class="w-4 h-4" />
-									</div>
+									<input class="rounded py-1 bg-gray-200 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.from">
 									<div class="text-gray-600">TO</div>
-									<div class="space-x-2 px-2 py-1 bg-gray-100 flex rounded items-center text-gray-900">
-										<div>{{ workingHour.to }}</div>
-										<FeatherIcon name="clock" class="w-4 h-4" />
-									</div>
+									<input class="rounded py-1 bg-gray-200 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.to">
 								</div>
 							</div>
 						</div>
@@ -111,6 +105,7 @@
 
 <script>
 import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
+import TimeDurationInput from '@/components/desk/global/TimeDurationInput.vue'
 import { Switch } from '@headlessui/vue'
 import { ref } from 'vue'
 
@@ -121,6 +116,7 @@ export default {
 		FeatherIcon,
 		Input,
 		LoadingText,
+		TimeDurationInput,
 		Switch
 	},
 	setup(props) {
@@ -144,13 +140,13 @@ export default {
 				{priority: 'Low', firstResponseTime: 12, resolutionTime: 24, marker: 'down-arrow'}
 			]
 			workingHours.value = [
-				{workday: 'Monday', enabled: true, from: '9:00 AM', to: '5:00 PM'},
-				{workday: 'Tuesday', enabled: true, from: '9:00 AM', to: '5:00 PM'},
-				{workday: 'Wednesday',enabled: true, from: '9:00 AM', to: '5:00 PM'},
-				{workday: 'Thursday', enabled: true, from: '9:00 AM', to: '5:00 PM'},
-				{workday: 'Friday', enabled: true, from: '9:00 AM', to: '5:00 PM'},
-				{workday: 'Saturday', enabled: false, from: '9:00 AM', to: '5:00 PM'},
-				{workday: 'Sunday', enabled: false, from: '9:00 AM', to: '5:00 PM'},
+				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Tuesday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Wednesday',enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Thursday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Friday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Saturday', enabled: false, from: '09:00', to: '17:00'},
+				{workday: 'Sunday', enabled: false, from: '09:00', to: '17:00'},
 			]
 		}
 
@@ -167,7 +163,7 @@ export default {
 	},
 	resources: {
 		getSlaPolicy() {
-			if (this.slaId != 'new') {
+			if (!this.isNew) {
 				return {
 					method: 'frappe.client.get',
 					params: {
@@ -177,9 +173,10 @@ export default {
 					},
 					auto: true,
 					onSuccess: (data) => {
+						this.slaPolicyName = data.name
 						this.rules = data.priorities.map(priority => {
 							return {
-								priority: priority.priorities,
+								priority: priority.priority,
 								firstResponseTime: priority.response_time,
 								resolutionTime: priority.resolution_time,
 								marker: null // TODO:
@@ -195,7 +192,7 @@ export default {
 						})
 
 						let weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-						weekdays.forEach((day, index) => {
+						weekdays.forEach(day => {
 							if (!this.workingHours.find(x => x.workday == day)) {
 								this.workingHours.push({
 									workday: day,
