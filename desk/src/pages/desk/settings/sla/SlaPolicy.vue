@@ -1,18 +1,26 @@
 <template>
 	<div class="p-5 overflow-auto h-full">
-		<div v-if="!isNew && $resources.getSlaPolicy.loading">
+		<div v-if="!isNew && ($resources.getSlaPolicy.loading || $resources.setServicePolicy.loading)">
 			<LoadingText text="Fetching policy..." />
 		</div>
 		<div v-else>
 			<div class="flow-root mb-4">
 				<div class="float-left">
-					<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer" @click="editPolicyName()">
-						<div class="font-semibold">{{ slaPolicyName }}</div>
-						<FeatherIcon class="w-3 h-3" name="edit-2" />
+					<div v-if="!$resources.renameServicePolicy.loading">
+						<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer" @click="editPolicyName()">
+							<div class="font-semibold">{{ slaPolicyName }}</div>
+							<FeatherIcon class="w-3 h-3" name="edit-2" />
+						</div>
+						<div v-else class="flex space-x-2 items-center">
+							<Input v-model="tempSlaPolicyName" type="text" placeholder="Enter Policy Name" />
+							<FeatherIcon class="w-4 h-4 cursor-pointer" name="x" @click="() => {
+								editingName = false
+								tempSlaPolicyName = slaPolicyName
+							}" />
+						</div>
 					</div>
-					<div v-else class="flex space-x-2 items-center">
-						<Input v-model="tempSlaPolicyName" type="text" placeholder="Enter Policy Name" />
-						<FeatherIcon class="w-4 h-4 cursor-pointer" name="x" @click="() => {editingName = false}" />
+					<div v-else>
+						<LoadingText text="Renaming..." />
 					</div>
 				</div>
 				<div class="float-right">
@@ -211,8 +219,8 @@ export default {
 								this.workingHours.push({
 									workday: day,
 									enabled: false,
-									from: '',
-									to: '' 
+									from: '00:00:00',
+									to: '00:00:00' 
 								})
 							}
 						})
@@ -245,6 +253,14 @@ export default {
 					}
 				}
 			}
+		},
+		renameServicePolicy() {
+			return {
+				method: 'frappe.client.rename_doc',
+				onSuccess: (data) => {
+					console.log(data)
+				}
+			}
 		}
 	},
 	methods: {
@@ -260,6 +276,14 @@ export default {
 					rule.default = false
 				}
 			})
+		},
+		rename() {
+			// TODO: once Service level agreement is renamable uncomment this block
+			// return this.$resources.renameServicePolicy.submit({
+			// 	doctype: "Service Level Agreement",
+			// 	old_name: this.slaPolicyName,
+			// 	new_name: this.tempSlaPolicyName
+			// })
 		},
 		save() {
 			let priorities = this.rules.map(rule => {
@@ -293,9 +317,12 @@ export default {
 				}
 			}
 
-			console.log(doc)
 			this.$resources.setServicePolicy.submit({
 				...doc
+			}).then(() => {
+				if (this.slaPolicyName != this.tempSlaPolicyName) {
+					this.rename()
+				}
 			})
 		},
 		cancel() {
