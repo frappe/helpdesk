@@ -17,8 +17,8 @@
 				</div>
 				<div class="float-right">
 					<div class="flex space-x-2 items-center">
-						<Button appearance="secondary">Cancel</Button>
-						<Button appearance="primary">Save</Button>
+						<Button appearance="secondary" @click="cancel()">Cancel</Button>
+						<Button appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -31,6 +31,7 @@
 					<div class="text-base">
 						<div class="flex text-gray-600 py-2 border-b">
 							<div class="w-2/12">Priority</div>
+							<div class="w-1/12">Default</div>
 							<div class="w-3/12 text-right">First Response Time</div>
 							<div class="w-3/12 text-right">Resolution Time</div>
 							<div class="w-2/12 text-right">Marker</div>
@@ -38,6 +39,18 @@
 						<div v-for="(rule, index) in rules" :key="rule.priority">
 							<div class="flex text-gray-900 py-2" :class="index < rules.length - 1 ? 'border-b' : ''">
 								<div class="w-2/12">{{ rule.priority }}</div>
+								<div class="w-1/12">
+									<Switch
+										v-model="rule.default"
+										:class="rule.default ? 'bg-blue-500' : 'bg-slate-300'"
+										class="relative inline-flex items-center h-6 rounded-full w-11"
+									>
+										<span
+											:class="rule.default ? 'translate-x-6' : 'translate-x-1'"
+											class="inline-block w-4 h-4 transform bg-white rounded-full"
+										/>
+									</Switch>
+								</div>
 								<div class="w-3/12 flex flex-row-reverse">
 									<TimeDurationInput v-model="rule.firstResponseTime"/>
 								</div>
@@ -92,10 +105,10 @@
 				</div>
 				<div class="mt-5 flow-root" v-if="expandWorkingHours || expandRules">
 					<div class="float-left">
-						<Button appearance="secondary">Cancel</Button>
+						<Button appearance="secondary" @click="cancel()">Cancel</Button>
 					</div>
 					<div class="float-right">
-						<Button appearance="primary">Save</Button>
+						<Button appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -135,9 +148,9 @@ export default {
 		if (isNew) {
 			slaPolicyName.value = 'New Service Policy'
 			rules.value = [
-				{priority: 'Urgent', firstResponseTime: 1, resolutionTime: 2, marker: null},
-				{priority: 'High', firstResponseTime: 2, resolutionTime: 4, marker: 'up-arrow'},
-				{priority: 'Low', firstResponseTime: 12, resolutionTime: 24, marker: 'down-arrow'}
+				{priority: 'Urgent', default: false, firstResponseTime: 1, resolutionTime: 2, marker: null},
+				{priority: 'High', default: false, firstResponseTime: 2, resolutionTime: 4, marker: 'up-arrow'},
+				{priority: 'Low', default: true, firstResponseTime: 12, resolutionTime: 24, marker: 'down-arrow'}
 			]
 			workingHours.value = [
 				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
@@ -177,6 +190,7 @@ export default {
 						this.rules = data.priorities.map(priority => {
 							return {
 								priority: priority.priority,
+								default: priority.default_priority,
 								firstResponseTime: priority.response_time,
 								resolutionTime: priority.resolution_time,
 								marker: null // TODO:
@@ -214,6 +228,23 @@ export default {
 			} else {
 				return {}
 			}
+		},
+		setServicePolicy() {
+			if (this.isNew) {
+				return {
+					method: 'frappe.client.insert',
+					onSuccess(data) {
+						console.log(data)
+					}
+				}
+			} else {
+				return {
+					method: 'frappe.client.set_value',
+					onSuccess(data) {
+						console.log(data)
+					}
+				}
+			}
 		}
 	},
 	methods: {
@@ -221,6 +252,46 @@ export default {
 			this.tempSlaPolicyName = this.slaPolicyName
 			this.editingName = true
 		},
+		save() {
+			let priorities = this.rules.map(rule => {
+				return {
+					priority: rule.priority,
+					default_priority: rule.default,
+					response_time: rule.firstResponseTime,
+					resolution_time: rule.resolutionTime,
+				}
+			})
+
+			let support_and_resolution = this.workingHours.map(workingHour => {
+				if (workingHour.enabled) {
+					return {
+						workday: workingHour.workday,
+						start_time: workingHour.from,
+						end_time: workingHour.to
+					}
+				}
+			}).filter(x => x)
+
+			let doc = {}
+			if (!this.isNew) {
+				doc = {
+					doctype: 'Service Level Agreement',
+					name: this.slaPolicyName,
+					fieldname: {
+						priorities,
+						support_and_resolution
+					}
+				}
+			}
+
+			console.log(doc)
+			this.$resources.setServicePolicy.submit({
+				...doc
+			})
+		},
+		cancel() {
+			this.$resources.getSlaPolicy.fetch()
+		}
 	}
 }
 </script>
