@@ -46,5 +46,8 @@ export default {
 			return this.$resources.policies.data || null
 		}
 	},
+	updated() {
+		this.$currentPage.set('Support Policies', [])
+	},
 }
 </script>

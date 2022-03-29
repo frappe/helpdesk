@@ -53,6 +53,9 @@ export default {
 			this.$resources.agents.fetch();
 			this.showNewAgentDialog = false
 		}
-	}
+	},
+	updated() {
+		this.$currentPage.set('Agents', [])
+	},
 }
 </script>
