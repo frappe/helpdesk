@@ -41,7 +41,6 @@
 							<div class="w-1/12">Default</div>
 							<div class="w-3/12 text-right">First Response Time</div>
 							<div class="w-3/12 text-right">Resolution Time</div>
-							<div class="w-2/12 text-right">Marker</div>
 						</div>
 						<div v-for="(rule, index) in rules" :key="rule.priority">
 							<div class="flex text-gray-900 py-2 items-center" :class="index < rules.length - 1 ? 'border-b' : ''">
@@ -77,7 +76,6 @@
 								<div class="w-3/12 flex flex-row-reverse">
 									<TimeDurationInput v-model="rule.resolutionTime"/>
 								</div>
-								<div class="w-2/12 text-right">{{ rule.marker }}</div>
 								<div class="w-1/12 flex flex-row-reverse" v-if="rules.length > 1">
 									<FeatherIcon name="trash" class="cursor-pointer h-5 w-5 stroke-red-500 hover:stroke-red-600" @click="removeRule(index)"/>
 								</div>
@@ -170,9 +168,9 @@ export default {
 		if (isNew) {
 			slaPolicyName.value = 'New Service Policy'
 			rules.value = [
-				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600, marker: null},
-				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600, marker: 'up-arrow'},
-				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600, marker: 'down-arrow'}
+				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600},
+				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600},
+				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600}
 			]
 			workingHours.value = [
 				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
@@ -213,8 +211,7 @@ export default {
 								priority: priority.priority,
 								default: priority.default_priority,
 								firstResponseTime: priority.response_time,
-								resolutionTime: priority.resolution_time,
-								marker: null // TODO:
+								resolutionTime: priority.resolution_time
 							}
 						})
 						this.workingHours = data.support_and_resolution.map(workingHour => {
@@ -291,7 +288,7 @@ export default {
 			})
 		},
 		addRule() {
-			this.rules.push({priority: 'Low', default: false, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600, marker: 'down-arrow'})
+			this.rules.push({priority: 'Low', default: false, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600})
 		},
 		removeRule(index) {
 			if (this.rules.length > 1) {
