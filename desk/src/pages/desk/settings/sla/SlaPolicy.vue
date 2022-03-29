@@ -31,11 +31,10 @@
 				</div>
 			</div>
 			<div class="mb-5">
-				<div class="flex space-x-2 items-center mb-3 cursor-pointer" @click="() => {expandRules = !expandRules}">
+				<div class="flex space-x-2 items-center">
 					<div class="text-base font-semibold">Rules</div>
-					<FeatherIcon :name="expandRules ? 'chevron-up' : 'chevron-down'" class="h-4 w-4" />
 				</div>
-				<div v-if="expandRules">
+				<div>
 					<div class="text-base">
 						<div class="flex text-gray-600 py-4 border-b">
 							<div class="w-2/12">Priority</div>
@@ -90,11 +89,10 @@
 				</div>
 			</div>
 			<div>
-				<div class="flex space-x-2 items-center mb-3 cursor-pointer" @click="() => {expandWorkingHours = !expandWorkingHours}">
+				<div class="flex space-x-2 items-center mb-3">
 					<div class="text-base font-semibold">Working Hours</div>
-					<FeatherIcon :name="expandWorkingHours ? 'chevron-up' : 'chevron-down'" class="h-4 w-4" />
 				</div>
-				<div v-if="expandWorkingHours">
+				<div>
 					<p class="text-base text-gray-700">Choose the days in a week, and start and end times to set as working hours. </p>
 					<div class="py-4 space-y-3 text-gray-900">
 						<div v-for="workingHour in workingHours" :key="workingHour.workday">
@@ -165,10 +163,7 @@ export default {
 		const tempSlaPolicyName = ref('')
 
 		const rules = ref([])
-		const workingHours = ref({})
-
-		const expandRules = ref(true)
-		const expandWorkingHours = ref(true)
+		const workingHours = ref([])
 
 		const ticketPriorities = inject('ticketPriorities')
 
@@ -197,8 +192,6 @@ export default {
 			editingName, 
 			rules, 
 			workingHours, 
-			expandWorkingHours, 
-			expandRules,
 			ticketPriorities
 		}
 	},
