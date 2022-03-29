@@ -165,6 +165,8 @@ export default {
 
 		const ticketPriorities = inject('ticketPriorities')
 
+		const selectedSetting = inject('selectedSetting')
+
 		if (isNew) {
 			slaPolicyName.value = 'New Service Policy'
 			rules.value = [
@@ -190,8 +192,15 @@ export default {
 			editingName, 
 			rules, 
 			workingHours, 
-			ticketPriorities
+			ticketPriorities,
+			selectedSetting
 		}
+	},
+	activated() {
+		this.selectedSetting = 'Support Policies' // TODO: use a better logic for this
+	},
+	deactivated() {
+
 	},
 	resources: {
 		getSlaPolicy() {
