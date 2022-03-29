@@ -1,6 +1,6 @@
 <template>
 	<div class="absolute border rounded shadow-md p-5 bg-white z-50 w-[386px] ml-[10px] text-base">
-		<div class="border-b pb-4 mb-4 space-y-2">
+		<div v-if="tempFilters.length > 0" class="border-b pb-4 mb-4 space-y-2">
 			<div v-for="(filter, index) in tempFilters" :key="index">
 				<FilterBoxItem v-if="filter" click="w-full" :options="options" v-model="tempFilters" :filterIndex="index" :removable="tempFilters.filter((item) => item != null).length > 1"/>
 			</div>
@@ -53,6 +53,10 @@ export default {
 		return { ticketFilter, tempFilters, query }
 	},
 	mounted() {
+		this.tempFilters = []
+		this.modelValue.forEach(filter => {
+			this.tempFilters.push(filter)
+		})
 	},
 	methods: {
 		addFilter() {
@@ -66,7 +70,6 @@ export default {
 		clearAllFilters() {
 			this.tempFilters = []
 			this.applyFilters()
-			this.addFilter()
 		}
 	}
 }
