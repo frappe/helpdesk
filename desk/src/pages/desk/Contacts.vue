@@ -1,14 +1,15 @@
 <template>
 	<div>
-		<div class="flow-root border-b pt-2 pb-3 pr-8">
-			<div class="float-left ml-4">
-				<div class="flex items-center space-x-4">
-					<Input type="checkbox" value="" />
-					<Button icon-left="plus" appearance="primary" @click="() => {showNewContactDialog = true}">Add Contact</Button>
+		<div class="flow-root pt-3 pb-5 pr-8 pl-4">
+			<div class="float-left">
+				<div class="flex items-center">
+					<div class="font-semibold text-xl">Contacts</div>
 				</div>
 			</div>
 			<div class="float-right">
-				<Button icon-left="filter" type="white">Filter</Button>
+				<div class="flex items-center space-x-4">
+					<Button icon-left="plus" appearance="primary" @click="() => {showNewContactDialog = true}">Add Contact</Button>
+				</div>
 			</div>
 		</div>
 		<div v-if="contacts">

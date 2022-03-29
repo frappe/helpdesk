@@ -1,19 +1,17 @@
 <template>
-	<div class="block py-4 hover:bg-gray-50 border-b text-base">
+	<div class="block hover:bg-gray-50 border-b text-base">
 		<router-link 
 			v-if="contact"
-			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8"
+			class="group flex items-center justify-between sm:justify-start font-light h-10"
 			:to="`/contacts/${contact.name}`"
 		>
-			<div
-				class="mr-4"
-			>
+			<div class="mr-2">
 				<Input type="checkbox" value="" />
 			</div>
-			<div class="sm:w-4/12">
+			<div class="sm:w-3/12 truncate pr-10">
 				{{ fullName }}
 			</div>
-			<div class="sm:w-4/12">
+			<div class="sm:w-3/12 truncate pr-10">
 				<div v-if="contact.email_ids && contact.email_ids.length > 0">
 					{{ contact.email_ids[0].email_id }}
 				</div>
@@ -21,7 +19,7 @@
 					{{ contact.email_id }}
 				</div>
 			</div>
-			<div class="sm:w-4/12">
+			<div class="sm:w-3/12 truncate pr-10">
 				<div v-if="contact.phone_nos && contact.phone_nos.length > 0">
 					{{ contact.phone_nos[0].phone }}
 				</div>
@@ -29,6 +27,7 @@
 					{{ contact.phone }}
 				</div>
 			</div>
+			<div class="sm:w-3/12 truncate pr-10">Temp Org</div>
 		</router-link>
 	</div>
 </template>

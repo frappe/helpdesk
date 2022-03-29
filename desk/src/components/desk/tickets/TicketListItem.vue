@@ -4,10 +4,10 @@
 			v-if="ticket"
 			class="group flex items-center text-base h-10"
 		>
-			<Input type="checkbox" @click="$emit('toggleSelect')" :checked="selected" class="cursor-pointer"/>
+			<Input type="checkbox" @click="$emit('toggleSelect')" :checked="selected" class="cursor-pointer mr-2"/>
 			<router-link 
 				:to="`/helpdesk/tickets/${ticket.name}`"
-				class="mr-4 sm:w-6/12 flex items-center ml-2"
+				class="sm:w-6/12 flex items-center"
 			>
 				<div class="flex items-center grow space-x-1">
 					<div class="font-medium truncate max-w-fit lg:w-96 md:w-64 sm:w-40">{{ ticket.subject }}</div>

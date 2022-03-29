@@ -6,8 +6,8 @@
 				class="w-full pl-4 pr-8"
 			>
 				<div class="border-b pb-3 group flex items-center font-light text-base text-slate-500">
-					<div class="mr-4 sm:w-6/12 flex space-x-2">
-						<Input type="checkbox" @click="toggleSelectAllTickets()" :checked="allTicketsSelected" class="cursor-pointer" />
+					<Input type="checkbox" @click="toggleSelectAllTickets()" :checked="allTicketsSelected" class="cursor-pointer mr-2" />
+					<div class="sm:w-6/12 flex space-x-2 items-center">
 						<div class="grow">Subject</div>
 					</div>
 					<div class="hidden md:block lg:w-2/12">Raised By</div>
