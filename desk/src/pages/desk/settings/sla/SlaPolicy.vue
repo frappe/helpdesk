@@ -7,9 +7,9 @@
 			<div class="flow-root mb-4">
 				<div class="float-left">
 					<div v-if="!$resources.renameServicePolicy.loading">
-						<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer" @click="editPolicyName()">
+						<div v-if="!editingName" class="flex space-x-2 items-center" :class="slaPolicyName != 'Default' ? 'cursor-pointer' : ''" @click="editPolicyName()">
 							<div class="font-semibold">{{ slaPolicyName }}</div>
-							<FeatherIcon class="w-3 h-3" name="edit-2" />
+							<FeatherIcon v-if="slaPolicyName != 'Default'" class="w-3 h-3" name="edit-2" />
 						</div>
 						<div v-else class="flex space-x-2 items-center">
 							<Input v-model="tempSlaPolicyName" type="text" placeholder="Enter Policy Name" />
@@ -275,8 +275,10 @@ export default {
 	},
 	methods: {
 		editPolicyName() {
-			this.tempSlaPolicyName = this.slaPolicyName
-			this.editingName = true
+			if (this.slaPolicyName != 'Default') {
+				this.tempSlaPolicyName = this.slaPolicyName
+				this.editingName = true
+			}
 		},
 		changeDefaultPriority(index) {
 			this.rules.forEach((rule, i) => {
