@@ -7,9 +7,9 @@
 			<div class="flow-root mb-4">
 				<div class="float-left">
 					<div v-if="!$resources.renameServicePolicy.loading">
-						<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer" @click="editPolicyName()">
+						<div v-if="!editingName" class="flex space-x-2 items-center" :class="slaPolicyName != 'Default' ? 'cursor-pointer' : ''" @click="editPolicyName()">
 							<div class="font-semibold">{{ slaPolicyName }}</div>
-							<FeatherIcon class="w-3 h-3" name="edit-2" />
+							<FeatherIcon v-if="slaPolicyName != 'Default'" class="w-3 h-3" name="edit-2" />
 						</div>
 						<div v-else class="flex space-x-2 items-center">
 							<Input v-model="tempSlaPolicyName" type="text" placeholder="Enter Policy Name" />
@@ -31,18 +31,16 @@
 				</div>
 			</div>
 			<div class="mb-5">
-				<div class="flex space-x-2 items-center mb-3 cursor-pointer" @click="() => {expandRules = !expandRules}">
+				<div class="flex space-x-2 items-center">
 					<div class="text-base font-semibold">Rules</div>
-					<FeatherIcon :name="expandRules ? 'chevron-up' : 'chevron-down'" class="h-4 w-4" />
 				</div>
-				<div v-if="expandRules">
+				<div>
 					<div class="text-base">
 						<div class="flex text-gray-600 py-4 border-b">
 							<div class="w-2/12">Priority</div>
 							<div class="w-1/12">Default</div>
 							<div class="w-3/12 text-right">First Response Time</div>
 							<div class="w-3/12 text-right">Resolution Time</div>
-							<div class="w-2/12 text-right">Marker</div>
 						</div>
 						<div v-for="(rule, index) in rules" :key="rule.priority">
 							<div class="flex text-gray-900 py-2 items-center" :class="index < rules.length - 1 ? 'border-b' : ''">
@@ -78,7 +76,6 @@
 								<div class="w-3/12 flex flex-row-reverse">
 									<TimeDurationInput v-model="rule.resolutionTime"/>
 								</div>
-								<div class="w-2/12 text-right">{{ rule.marker }}</div>
 								<div class="w-1/12 flex flex-row-reverse" v-if="rules.length > 1">
 									<FeatherIcon name="trash" class="cursor-pointer h-5 w-5 stroke-red-500 hover:stroke-red-600" @click="removeRule(index)"/>
 								</div>
@@ -90,11 +87,10 @@
 				</div>
 			</div>
 			<div>
-				<div class="flex space-x-2 items-center mb-3 cursor-pointer" @click="() => {expandWorkingHours = !expandWorkingHours}">
+				<div class="flex space-x-2 items-center mb-3">
 					<div class="text-base font-semibold">Working Hours</div>
-					<FeatherIcon :name="expandWorkingHours ? 'chevron-up' : 'chevron-down'" class="h-4 w-4" />
 				</div>
-				<div v-if="expandWorkingHours">
+				<div>
 					<p class="text-base text-gray-700">Choose the days in a week, and start and end times to set as working hours. </p>
 					<div class="py-4 space-y-3 text-gray-900">
 						<div v-for="workingHour in workingHours" :key="workingHour.workday">
@@ -165,19 +161,18 @@ export default {
 		const tempSlaPolicyName = ref('')
 
 		const rules = ref([])
-		const workingHours = ref({})
-
-		const expandRules = ref(true)
-		const expandWorkingHours = ref(true)
+		const workingHours = ref([])
 
 		const ticketPriorities = inject('ticketPriorities')
+
+		const selectedSetting = inject('selectedSetting')
 
 		if (isNew) {
 			slaPolicyName.value = 'New Service Policy'
 			rules.value = [
-				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600, marker: null},
-				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600, marker: 'up-arrow'},
-				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600, marker: 'down-arrow'}
+				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600},
+				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600},
+				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600}
 			]
 			workingHours.value = [
 				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
@@ -197,10 +192,15 @@ export default {
 			editingName, 
 			rules, 
 			workingHours, 
-			expandWorkingHours, 
-			expandRules,
-			ticketPriorities
+			ticketPriorities,
+			selectedSetting
 		}
+	},
+	activated() {
+		this.selectedSetting = 'Support Policies' // TODO: use a better logic for this
+	},
+	deactivated() {
+
 	},
 	resources: {
 		getSlaPolicy() {
@@ -220,8 +220,7 @@ export default {
 								priority: priority.priority,
 								default: priority.default_priority,
 								firstResponseTime: priority.response_time,
-								resolutionTime: priority.resolution_time,
-								marker: null // TODO:
+								resolutionTime: priority.resolution_time
 							}
 						})
 						this.workingHours = data.support_and_resolution.map(workingHour => {
@@ -285,8 +284,10 @@ export default {
 	},
 	methods: {
 		editPolicyName() {
-			this.tempSlaPolicyName = this.slaPolicyName
-			this.editingName = true
+			if (this.slaPolicyName != 'Default') {
+				this.tempSlaPolicyName = this.slaPolicyName
+				this.editingName = true
+			}
 		},
 		changeDefaultPriority(index) {
 			this.rules.forEach((rule, i) => {
@@ -298,7 +299,7 @@ export default {
 			})
 		},
 		addRule() {
-			this.rules.push({priority: 'Low', default: false, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600, marker: 'down-arrow'})
+			this.rules.push({priority: 'Low', default: false, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600})
 		},
 		removeRule(index) {
 			if (this.rules.length > 1) {
