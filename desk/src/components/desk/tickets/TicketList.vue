@@ -20,19 +20,33 @@
 					class="block overflow-auto"
 					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9.4rem)' : null }"
 				>
-					<div v-for="ticket in sortedTickets" :key="ticket.name">
-						<div>
-							<TicketListItem :ticketId="ticket.name" @toggle-select="toggleTicketSelect(ticket.name)" :selected="selectedTickets.find(item => item == ticket.name)"/>
+					<div v-if="sortedTickets.length > 0">
+						<div v-for="ticket in sortedTickets" :key="ticket.name">
+							<div>
+								<TicketListItem :ticketId="ticket.name" @toggle-select="toggleTicketSelect(ticket.name)" :selected="selectedTickets.find(item => item == ticket.name)"/>
+							</div>
+						</div>
+					</div>
+					<div v-else>
+						<div class="grid place-content-center h-48 w-full">
+							<div>
+								<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
+								<div class="text-gray-500 mb-2">No tickets found</div>
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div v-else>
+				<LoadingText text="Fetching tickets..." />
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { Input } from 'frappe-ui'
+import { Input, LoadingText } from 'frappe-ui'
+import CustomIcons from '../global/CustomIcons.vue'
 import TicketListItem from './TicketListItem.vue'
 import { inject, ref } from 'vue'
 
@@ -41,6 +55,8 @@ export default {
 	props: ['sortby', 'sortDirection', 'filters'],
 	components: {
 		Input,
+		LoadingText,
+		CustomIcons,
 		TicketListItem
 	},
 	setup() {
@@ -87,7 +103,7 @@ export default {
 			return this.getSortedTickets(this.filteredTickets)
 		},
 		allTicketsSelected() {
-			return this.selectedTickets.length == Object.keys(this.sortedTickets).length
+			return (this.selectedTickets.length == Object.keys(this.sortedTickets).length) && (Object.keys(this.sortedTickets).length > 0)
 		}
 	},
 	watch: {
@@ -97,17 +113,21 @@ export default {
 	},
 	methods: {
 		getSortedTickets(tickets) {
-			if (tickets && Object.keys(tickets).length > 0) {
-				if (this.sortby) {
-					tickets = Object.values(tickets).sort((a, b) => {
-						return new Date(a[this.sortby]) - new Date(b[this.sortby]) * (this.sortDirection == 'assending' ? 1 : -1)
-					})
-					// update selected tickets
-					this.selectedTickets = this.selectedTickets.filter((item1) => {
-						return tickets.find((item2) => item2.name === item1)
-					})
+			if (tickets) {
+				if (Object.keys(tickets).length > 0) {
+					if (this.sortby) {
+						tickets = Object.values(tickets).sort((a, b) => {
+							return new Date(a[this.sortby]) - new Date(b[this.sortby]) * (this.sortDirection == 'assending' ? 1 : -1)
+						})
+						// update selected tickets
+						this.selectedTickets = this.selectedTickets.filter((item1) => {
+							return tickets.find((item2) => item2.name === item1)
+						})
+					}
+					return tickets
+				} else {
+					return []
 				}
-				return tickets
 			} else {
 				return null
 			}
