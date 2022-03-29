@@ -29,6 +29,12 @@ const routes = [
 				component: () => import('@/pages/desk/Contacts.vue')
 			},
 			{
+				path: 'contacts/:contactId',
+				name: 'Contact',
+				component: () => import('@/pages/desk/Contact.vue'),
+				props: true
+			},
+			{
 				path: 'settings',
 				name: 'Settings',
 				component: () => import('@/pages/desk/settings/Settings.vue'),

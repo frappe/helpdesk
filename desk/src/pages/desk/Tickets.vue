@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="flow-root pt-2 pb-5 pr-8 pl-4">
+		<div class="flow-root pt-3 pb-5 pr-8 pl-4">
 			<div class="float-left">
 				<div v-if="ticketFilterDropdownOptions().length > 0">
 					<Dropdown
@@ -9,7 +9,7 @@
 						>
 						<template v-slot="{ toggleDropdown }"> 
 							<div class="flex items-center cursor-pointer" @click="toggleDropdown">
-								<div class="text-2xl">
+								<div class="text-xl font-semibold">
 									{{ this.ticketFilter }}
 								</div>
 								<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
@@ -17,7 +17,7 @@
 						</template>
 					</Dropdown>
 				</div>
-				<div v-else class="text-2xl">All Tickets</div>
+				<div v-else class="text-xl font-semibold">All Tickets</div>
 			</div>
 			<div class="float-right">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
