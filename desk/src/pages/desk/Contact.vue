@@ -44,6 +44,7 @@
 import TicketList from "@/components/desk/tickets/TicketList.vue"
 import { LoadingText, FeatherIcon } from 'frappe-ui'
 import { ref } from 'vue'
+import router from '@/router';
 
 export default {
 	name: 'Contact',
@@ -107,7 +108,18 @@ export default {
 				}
 			}
 		}
-	}
+	},
+	updated() {
+		this.$currentPage.set('Contact', [
+			{
+				label: 'Contacts',
+				action: () => {router.push({name: 'Contacts'})}
+			},
+			{
+				label: this.contactId
+			}
+		])
+	},
 }
 </script>
 

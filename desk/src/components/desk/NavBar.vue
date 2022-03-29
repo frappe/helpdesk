@@ -11,21 +11,6 @@
 						</div>
 					</div>
 				</div>
-				<div v-if="$currentPage.get() == 'Contacts'">
-					<Dropdown
-						placement="left"
-						:options="contactFilterDropdownOptions()"
-					>
-						<template v-slot="{ toggleDropdown }"> 
-							<div class="flex items-center" @click="toggleDropdown">
-								<div class="text-2xl">
-									{{ this.$contactFilter.get() }}
-								</div>
-								<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
-							</div>
-						</template>
-					</Dropdown>
-				</div>
 			</div>
 		</div>
 		<div class="float-right flex space-x-3 items-center">
@@ -61,19 +46,6 @@ export default {
 		return { user }
 	},
 	methods: {
-		contactFilterDropdownOptions() {
-			let items = [];
-			["All Contacts"].forEach(filter => {
-				items.push({
-					label: filter,
-					handler: () => {
-						console.log(this.$user);
-						this.$contactFilter.set(filter);
-					}
-				});
-			});
-			return items;
-		},
 		getAvatarClickOptions() {
 			let items = [];
 			["Log out"].forEach(item => {

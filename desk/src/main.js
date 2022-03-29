@@ -13,24 +13,13 @@ app.component('Button', Button)
 app.config.globalProperties.$dayjs = dayjs
 
 const globalVariables = ref({
-	contactFilter: "All Contacts",
-
 	currentPage: "Tickets",	// Tickets, Ticket, Contacts, ...
-	breadcrumbs: ""
+	breadcrumbs: []
 })
-
-app.config.globalProperties.$contactFilter = {
-	set(newValue) { 
-		globalVariables.value.contactFilter = newValue;
-	},
-	get() {
-		return globalVariables.value.contactFilter;
-	}
-};
 
 app.config.globalProperties.$currentPage = {
 	set(newValue, breadcrumbs) { 
-		globalVariables.value.breadcrumbs = breadcrumbs ? breadcrumbs : null
+		globalVariables.value.breadcrumbs = breadcrumbs ? breadcrumbs : []
 		globalVariables.value.currentPage = newValue;
 	},
 	get() {

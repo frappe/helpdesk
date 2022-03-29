@@ -57,7 +57,7 @@ const routes = [
 					},
 					{
 						path: 'sla/new',
-						name: 'SlaPolicy',
+						name: 'NewSlaPolicy',
 						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue')
 					},
 					{

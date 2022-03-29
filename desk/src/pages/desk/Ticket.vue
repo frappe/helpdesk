@@ -81,7 +81,7 @@ import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
-import router from '../../router';
+import router from '@/router';
 
 export default {
 	name: 'Ticket',
