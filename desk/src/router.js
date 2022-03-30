@@ -21,7 +21,20 @@ const routes = [
 				path: 'tickets/:ticketId',
 				name: 'DeskTicket',
 				component: () => import('@/pages/desk/Ticket.vue'),
-				props: true
+				props: true,
+				meta: {
+					breadcrumbs(route) {
+						return [
+							{
+								label: 'Tickets',
+								path: '/helpdesk/tickets'
+							},
+							{
+								label: route.params.ticketId
+							}
+						]
+					}
+				}
 			},
 			{
 				path: 'contacts',
@@ -32,7 +45,20 @@ const routes = [
 				path: 'contacts/:contactId',
 				name: 'Contact',
 				component: () => import('@/pages/desk/Contact.vue'),
-				props: true
+				props: true,
+				meta: {
+					breadcrumbs(route) {
+						return [
+							{
+								label: 'Contacts',
+								path: '/helpdesk/contacts'
+							},
+							{
+								label: route.params.contactId
+							}
+						]
+					}
+				}
 			},
 			{
 				path: 'settings',
@@ -48,23 +74,83 @@ const routes = [
 					{
 						path: 'agents',
 						name: 'Agents',
-						component: () => import('@/pages/desk/settings/agent/Agents.vue')
+						component: () => import('@/pages/desk/settings/agent/Agents.vue'),
+						meta: {
+							breadcrumbs() {
+								return [
+									{
+										label: 'Settings',
+										path: '/helpdesk/settings'
+									},
+									{
+										label: 'Agents'
+									}
+								]
+							}
+						}
 					},
 					{
 						path: 'sla',
 						name: 'SlaPolicies',
-						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue')
+						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue'),
+						meta: {
+							breadcrumbs() {
+								return [
+									{
+										label: 'Settings',
+										path: '/helpdesk/settings'
+									},
+									{
+										label: 'Support Policies'
+									}
+								]
+							}
+						}
 					},
 					{
 						path: 'sla/new',
 						name: 'NewSlaPolicy',
-						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue')
+						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
+						meta: {
+							breadcrumbs() {
+								return [
+									{
+										label: 'Settings',
+										path: '/helpdesk/settings'
+									},
+									{
+										label: 'Support Policies',
+										path: '/helpdesk/settings/sla'
+									},
+									{
+										label: 'New Support Policy'
+									}
+								]
+							}
+						}
 					},
 					{
 						path: 'sla/:slaId',
 						name: 'SlaPolicy',
 						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
-						props: true
+						props: true,
+						meta: {
+							breadcrumbs(route) {
+								return [
+									{
+										label: 'Settings',
+										path: '/helpdesk/settings'
+									},
+									{
+										label: 'Support Policies',
+										path: '/helpdesk/settings/sla'
+									},
+									{
+										label: route.params.slaId
+									}
+								]
+							}
+						}
 					}
 				]
 			}

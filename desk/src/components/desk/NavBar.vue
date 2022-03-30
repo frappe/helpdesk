@@ -3,11 +3,11 @@
 		<div class="float-left py-1.5">
 			<div class="flex space-x-1">
 				<CustomIcons name="helpdesk" width="60" height="18"/>
-				<div v-if="$currentPage.breadcrumbs()" class="flex items-center space-x-1">
-					<div v-for="(breadcrumb, index) in $currentPage.breadcrumbs()" :key="breadcrumb">
-						<div class="flex space-x-1 items-center text-base" :class="breadcrumb.action ? 'cursor-pointer' : ''" @click="() => {breadcrumb.action ? breadcrumb.action() : {}}">
-							<FeatherIcon v-if="index < $currentPage.breadcrumbs().length" name="chevron-right" class="h-4 w-4" />
-							<span :class="index == $currentPage.breadcrumbs().length - 1 ? 'text-gray-500' : ''">{{ breadcrumb.label }}</span>
+				<div v-if="breadcrumbs" class="flex items-center space-x-1">
+					<div v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb">
+						<div class="flex space-x-1 items-center text-base" :class="breadcrumb.path ? 'cursor-pointer' : ''" @click="() => {breadcrumb.path ? routeTo(breadcrumb.path) : {}}">
+							<FeatherIcon v-if="index < breadcrumbs.length" name="chevron-right" class="h-4 w-4" />
+							<span :class="index == breadcrumbs.length - 1 ? 'text-gray-500' : ''">{{ breadcrumb.label }}</span>
 						</div>
 					</div>
 				</div>
@@ -58,10 +58,22 @@ export default {
 			});
 			return items;
 		},
+		routeTo(path) {
+			this.$router.push({path})
+		},
 		async logout() {
 			await call('logout')
 			window.location.replace("/login");
 		}
-	}
+	},
+	computed: {
+		breadcrumbs() {
+			if (this.$route.meta.breadcrumbs) {
+				return this.$route.meta.breadcrumbs(this.$route)
+			} else {
+				return []
+			}
+		},
+	},
 }
 </script>

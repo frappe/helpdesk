@@ -386,9 +386,6 @@ export default {
 			}
 		},
 	},
-	updated() {
-		this.$currentPage.set('Support Policy', [])
-	},
 }
 </script>
 

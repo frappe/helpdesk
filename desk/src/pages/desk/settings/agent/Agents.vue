@@ -54,8 +54,5 @@ export default {
 			this.showNewAgentDialog = false
 		}
 	},
-	updated() {
-		this.$currentPage.set('Agents', [])
-	},
 }
 </script>

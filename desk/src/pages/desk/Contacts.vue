@@ -48,8 +48,5 @@ export default {
     deactivated() {
 
     },
-	updated() {
-		this.$currentPage.set('Contacts', [])
-	},
 }
 </script>
