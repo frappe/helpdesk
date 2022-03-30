@@ -10,4 +10,4 @@ class TicketActivity(Document):
 def log_ticket_activity(ticket, action):
 	return frappe.get_doc(
 		{"doctype": "Ticket Activity", "ticket": ticket, "action": action}
-	).insert()
+	).insert(ignore_permissions=True)
