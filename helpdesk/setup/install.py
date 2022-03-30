@@ -150,10 +150,10 @@ def enable_track_service_level_agreement_in_support_settings():
 	frappe.db.commit()
 
 def add_default_ticket_template():
-	template = frappe.new_doc("Ticket Template")
-
 	if (frappe.db.exists("Ticket Template", "Default")): 
 		return
+
+	template = frappe.new_doc("Ticket Template")
 	
 	template.template_name = "Default"
 	template.append("fields", {
@@ -165,7 +165,7 @@ def add_default_ticket_template():
 	template.append("fields", {
 		'label': 'Description',
 		'fieldname': 'description',
-		'fieldtype': 'Long Text',
+		'fieldtype': 'Text Editor',
 		'reqd': True
 	})
 
