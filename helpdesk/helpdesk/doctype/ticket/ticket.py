@@ -73,6 +73,7 @@ class Ticket(Document):
 		)
 		communication.ignore_permissions = True
 		communication.ignore_mandatory = True
+		print("CREATING COMMUNICATION !!!")
 		communication.save(ignore_permissions=True)
 
 	@frappe.whitelist()
