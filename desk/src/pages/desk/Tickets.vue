@@ -126,9 +126,6 @@ export default {
 			ticketController
 		}
 	},
-	activated() {
-		this.$currentPage.set('Tickets')
-	},
 	watch: {
 		filters(newValue) {
 			let filter = newValue.find(x => Object.keys(x)[0] === 'assignee')

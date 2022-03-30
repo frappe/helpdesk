@@ -109,17 +109,6 @@ export default {
 			}
 		}
 	},
-	updated() {
-		this.$currentPage.set('Contact', [
-			{
-				label: 'Contacts',
-				action: () => {router.push({name: 'Contacts'})}
-			},
-			{
-				label: this.contactId
-			}
-		])
-	},
 }
 </script>
 

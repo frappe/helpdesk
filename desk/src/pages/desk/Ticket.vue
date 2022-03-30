@@ -188,16 +188,5 @@ export default {
 
 		}
 	},
-	updated() {
-		this.$currentPage.set('Ticket', [
-			{
-				label: 'Tickets', 
-				action: () => {router.push({name: 'DeskTickets'})}
-			}, 
-			{
-				label: this.ticketId
-			}
-		])
-	},
 }
 </script>

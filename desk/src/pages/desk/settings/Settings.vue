@@ -35,12 +35,6 @@ export default {
 
 		return { viewportWidth, selectedSetting }
 	},
-	activated() {
-		this.$currentPage.set('Settings')
-	},
-	deactivated() {
-
-	},
 }
 </script>
 
