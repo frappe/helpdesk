@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import json
 from datetime import timedelta
+from typing_extensions import Self
 
 import frappe
 from frappe import _
@@ -160,6 +161,7 @@ def create_communication_via_contact(ticket, message, attachments=None):
 
 	if ticket_doc.status == 'Replied':
 		ticket_doc.status = 'Open'
+		log_ticket_activity(ticket, f"Status set to Open")
 		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")
