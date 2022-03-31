@@ -81,7 +81,6 @@ import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
-import router from '@/router';
 
 export default {
 	name: 'Ticket',
@@ -149,7 +148,8 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation_via_agent',
 				onSuccess: () => {
-					// this.$resources.conversations.fetch();
+					var element = document.getElementsByClassName("ql-editor");
+					element[0].innerHTML = "";
 				}
 			}
 		}
