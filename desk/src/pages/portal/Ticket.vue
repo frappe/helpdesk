@@ -130,7 +130,8 @@ export default {
 			return {
 				method: 'helpdesk.api.ticket.submit_conversation_via_contact',
 				onSuccess: () => {
-					// this.$resources.conversations.fetch();
+					var element = document.getElementsByClassName("ql-editor");
+					element[0].innerHTML = "";
 				}
 			}
 		}
