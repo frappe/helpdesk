@@ -29,7 +29,7 @@ export default {
 	setup() {
 		const user = inject('user')
 
-		const tickets = ref({})
+		const tickets = ref('')
 		const ticketTypes = ref([])
 		const ticketPriorities = ref([])
 		const ticketStatuses = ref([])

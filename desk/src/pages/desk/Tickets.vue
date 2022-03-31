@@ -61,9 +61,7 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="tickets">
-			<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
-		</div>
+		<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
 </template>

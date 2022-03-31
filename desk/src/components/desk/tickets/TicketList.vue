@@ -1,22 +1,20 @@
 <template>
 	<div>
-		<div>
-			<div
-				v-if="sortedTickets"
-				class="w-full pl-4 pr-8"
-			>
-				<div class="border-b pb-3 group flex items-center font-light text-base text-slate-500">
-					<Input type="checkbox" @click="toggleSelectAllTickets()" :checked="allTicketsSelected" class="cursor-pointer mr-2" />
-					<div class="sm:w-6/12 flex space-x-2 items-center">
-						<div class="grow">Subject</div>
-					</div>
-					<div class="hidden md:block lg:w-2/12">Raised By</div>
-					<div class="hidden md:block lg:w-2/12">Type</div>
-					<div class="sm:w-2/12">Due</div>
-					<div class="sm:w-2/12">Status</div>
-					<div class="sm:w-1/12"></div>
+		<div class="w-full pl-4 pr-8">
+			<div class="border-b pb-3 group flex items-center font-light text-base text-slate-500">
+				<Input type="checkbox" @click="toggleSelectAllTickets()" :checked="allTicketsSelected" class="cursor-pointer mr-2" />
+				<div class="sm:w-6/12 flex space-x-2 items-center">
+					<div class="grow">Subject</div>
 				</div>
+				<div class="hidden md:block lg:w-2/12">Raised By</div>
+				<div class="hidden md:block lg:w-2/12">Type</div>
+				<div class="sm:w-2/12">Due</div>
+				<div class="sm:w-2/12">Status</div>
+				<div class="sm:w-1/12"></div>
+			</div>
+			<div v-if="tickets">
 				<div 
+					v-if="sortedTickets"
 					class="block overflow-auto"
 					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9.4rem)' : null }"
 				>
@@ -37,7 +35,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-else>
+			<div v-else class="py-5">
 				<LoadingText text="Fetching tickets..." />
 			</div>
 		</div>
