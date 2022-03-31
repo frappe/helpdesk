@@ -76,17 +76,17 @@ const routes = [
 						name: 'Agents',
 						component: () => import('@/pages/desk/settings/agent/Agents.vue'),
 						meta: {
-							breadcrumbs() {
-								return [
-									{
-										label: 'Settings',
-										path: '/helpdesk/settings'
-									},
-									{
-										label: 'Agents'
-									}
-								]
-							}
+							// breadcrumbs() {
+							// 	return [
+							// 		{
+							// 			label: 'Settings',
+							// 			path: '/helpdesk/settings'
+							// 		},
+							// 		{
+							// 			label: 'Agents'
+							// 		}
+							// 	]
+							// }
 						}
 					},
 					{
@@ -94,17 +94,17 @@ const routes = [
 						name: 'SlaPolicies',
 						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue'),
 						meta: {
-							breadcrumbs() {
-								return [
-									{
-										label: 'Settings',
-										path: '/helpdesk/settings'
-									},
-									{
-										label: 'Support Policies'
-									}
-								]
-							}
+							// breadcrumbs() {
+							// 	return [
+							// 		{
+							// 			label: 'Settings',
+							// 			path: '/helpdesk/settings'
+							// 		},
+							// 		{
+							// 			label: 'Support Policies'
+							// 		}
+							// 	]
+							// }
 						}
 					},
 					{
@@ -112,21 +112,21 @@ const routes = [
 						name: 'NewSlaPolicy',
 						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
 						meta: {
-							breadcrumbs() {
-								return [
-									{
-										label: 'Settings',
-										path: '/helpdesk/settings'
-									},
-									{
-										label: 'Support Policies',
-										path: '/helpdesk/settings/sla'
-									},
-									{
-										label: 'New Support Policy'
-									}
-								]
-							}
+							// breadcrumbs() {
+							// 	return [
+							// 		{
+							// 			label: 'Settings',
+							// 			path: '/helpdesk/settings'
+							// 		},
+							// 		{
+							// 			label: 'Support Policies',
+							// 			path: '/helpdesk/settings/sla'
+							// 		},
+							// 		{
+							// 			label: 'New Support Policy'
+							// 		}
+							// 	]
+							// }
 						}
 					},
 					{
@@ -135,21 +135,21 @@ const routes = [
 						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
 						props: true,
 						meta: {
-							breadcrumbs(route) {
-								return [
-									{
-										label: 'Settings',
-										path: '/helpdesk/settings'
-									},
-									{
-										label: 'Support Policies',
-										path: '/helpdesk/settings/sla'
-									},
-									{
-										label: route.params.slaId
-									}
-								]
-							}
+							// breadcrumbs(route) {
+							// 	return [
+							// 		{
+							// 			label: 'Settings',
+							// 			path: '/helpdesk/settings'
+							// 		},
+							// 		{
+							// 			label: 'Support Policies',
+							// 			path: '/helpdesk/settings/sla'
+							// 		},
+							// 		{
+							// 			label: route.params.slaId
+							// 		}
+							// 	]
+							// }
 						}
 					}
 				]
