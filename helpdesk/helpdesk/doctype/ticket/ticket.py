@@ -74,7 +74,6 @@ class Ticket(Document):
 		)
 		communication.ignore_permissions = True
 		communication.ignore_mandatory = True
-		print("CREATING COMMUNICATION !!!")
 		communication.save(ignore_permissions=True)
 
 	@frappe.whitelist()
@@ -195,6 +194,10 @@ def create_communication_via_contact(ticket, message, attachments=None):
 def create_communication_via_agent(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
+	if not ticket_doc.via_customer_portal and frappe.db.exists("Email Account", {"default_outgoing", "1"}):
+		# TODO: rasie exception
+		pass
+
 	communication = frappe.new_doc("Communication")
 	communication.update(
 		{
@@ -224,16 +227,17 @@ def create_communication_via_agent(ticket, message, attachments=None):
 	# 		file_doc.attached_to_doctype = "Communication"
 	# 		file_doc.save(ignore_permissions=True)
 
-	frappe.sendmail(
-		subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
-		sender=frappe.session.user,
-		message=message,
-		recipients=[ticket_doc.raised_by],
-		reference_doctype='Ticket',
-		reference_name=ticket_doc.name,
-		communication=communication.name,
-		now=True,
-	)
+	if frappe.db.exists("Email Account", {"default_outgoing", "1"}):
+		frappe.sendmail(
+			subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
+			sender=frappe.session.user,
+			message=message,
+			recipients=[ticket_doc.raised_by],
+			reference_doctype='Ticket',
+			reference_name=ticket_doc.name,
+			communication=communication.name,
+			now=True,
+		)
 
 
 @frappe.whitelist()
