@@ -226,12 +226,23 @@ export default {
 							resolutionTime: priority.resolution_time
 						}
 					})
+					let sanitizerTimeStr = (timeStr) => {
+						let timeList = timeStr.split(':')
+						let newTimeStr = ''
+						timeList.forEach((t, index) => {
+							newTimeStr += t.length == 2 ? t : '0'.concat(t)
+							if (index < timeList.length - 1) {
+								newTimeStr += ':'
+							}
+						})
+						return newTimeStr
+					}
 					this.workingHours = data.support_and_resolution.map(workingHour => {
 						return {
 							workday: workingHour.workday,
 							enabled: true,
-							from: workingHour.start_time,
-							to: workingHour.end_time 
+							from: sanitizerTimeStr(workingHour.start_time),
+							to: sanitizerTimeStr(workingHour.end_time) 
 						}
 					})
 
