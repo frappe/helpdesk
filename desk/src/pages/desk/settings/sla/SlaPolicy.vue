@@ -26,8 +26,8 @@
 				<div class="float-right">
 					<div class="flex space-x-2 items-center">
 						<Button appearance="secondary" @click="cancel()">Cancel</Button>
-						<Button v-if="isNew" appearance="primary" @click="create()">Create</Button>
-						<Button v-else appearance="primary" @click="save()">Save</Button>
+						<Button :loading="this.$resources.createNewServicePolicy.loading" v-if="isNew" appearance="primary" @click="create()">Create</Button>
+						<Button :loading="this.$resources.updateServicePolicy.loading" v-else appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -112,15 +112,26 @@
 									<div>{{ workingHour.enabled ? 'Open' : 'Closed' }}</div>
 								</div>
 								<div v-if="workingHour.enabled" class="w-6/12 flex space-x-4 items-center">
-									<input class="rounded py-1 bg-gray-200 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.from">
+									<input class="rounded py-1 bg-gray-100 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.from">
 									<div class="text-gray-600">TO</div>
-									<input class="rounded py-1 bg-gray-200 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.to">
+									<input class="rounded py-1 bg-gray-100 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.to">
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="space-y-4">
-						<Input class="w-6/12" label="Holidays on" type="text" value="" placeholder="" />
+						<Dropdown
+							v-if="serviceHolidayList"
+							:options="serviceHolidayListDropdownOptions()" 
+							class="text-base w-53 cursor-pointer"
+							placement="left"
+						>
+							<template v-slot="{ toggleHolidayList }" @click="toggleHolidayList" class="w-full">
+								<div class="flex items-center space-x-2">
+									<Input class="w-52" label="Holidays on" type="text" v-model="selectedHolidayList" placeholder="" />
+								</div>
+							</template>
+						</Dropdown>
 						<Input label="Conditions" type="textarea" value="" placeholder="" />
 					</div>
 				</div>
@@ -129,8 +140,8 @@
 						<Button appearance="secondary" @click="cancel()">Cancel</Button>
 					</div>
 					<div class="float-right">
-						<Button v-if="isNew" appearance="primary" @click="create()">Create</Button>
-						<Button v-else appearance="primary" @click="save()">Save</Button>
+						<Button :loading="this.$resources.createNewServicePolicy.loading" v-if="isNew" appearance="primary" @click="create()">Create</Button>
+						<Button :loading="this.$resources.updateServicePolicy.loading" v-else appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -161,6 +172,7 @@ export default {
 		const slaPolicyName = ref('')
 		const editingName = ref(false)
 		const tempSlaPolicyName = ref('')
+		const selectedHolidayList = ref('')
 
 		const rules = ref([])
 		const workingHours = ref([])
@@ -177,7 +189,8 @@ export default {
 			rules, 
 			workingHours, 
 			ticketPriorities,
-			selectedSetting
+			selectedSetting,
+			selectedHolidayList
 		}
 	},
 	activated() {
@@ -204,6 +217,7 @@ export default {
 				},
 				onSuccess: (data) => {
 					this.slaPolicyName = data.name
+					this.selectedHolidayList = data.holiday_list
 					this.rules = data.priorities.map(priority => {
 						return {
 							priority: priority.priority,
@@ -270,6 +284,21 @@ export default {
 					console.log(data)
 				}
 			}
+		},
+		getServiceHolidayList() {
+			return {
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: "Service Holiday List",
+					fields: ["*"]
+				},
+				auto: true,
+				onSuccess: (data) => {
+					if (data.length > 0) {
+						this.selectedHolidayList = data[0].holiday_list_name
+					}
+				}
+			}
 		}
 	},
 	computed: {
@@ -294,6 +323,9 @@ export default {
 				}
 			}).filter(x => x)
 		},
+		serviceHolidayList() {
+			return this.$resources.getServiceHolidayList.data || null
+		}
 	},
 	methods: {
 		setDefaultValues() {
@@ -355,6 +387,7 @@ export default {
 			// })
 		},
 		create() {
+			// TODO: validate inputs
 			this.$resources.createNewServicePolicy.submit({
 				doc: {
 					doctype: 'Service Level Agreement',
@@ -362,7 +395,7 @@ export default {
 					priorities: this.priorities,
 					support_and_resolution: this.supportAndResolution,
 					document_type: 'Ticket',
-					holiday_list: 'Default',	// TODO: use the one from inputs
+					holiday_list: this.selectedHolidayList,
 					sla_fulfilled_on: [
 						{status: 'Resolved'},
 						{status: 'Closed'}
@@ -375,6 +408,7 @@ export default {
 			})
 		},
 		save() {
+			// TODO: validate inputs
 			this.$resources.updateServicePolicy.submit({
 				doctype: 'Service Level Agreement',
 				name: this.slaPolicyName,
@@ -414,6 +448,23 @@ export default {
 				return null;
 			}
 		},
+		serviceHolidayListDropdownOptions() {
+			let serviceHolidayListItems = []
+			if (this.serviceHolidayList) {
+				this.serviceHolidayList.forEach(holiday => {
+					serviceHolidayListItems.push({
+						label: holiday.name,
+						handler: () => {
+							// TODO: selecte the service holiday list
+							this.selectedHolidayList = holiday.name
+						},
+					});
+				});
+				return serviceHolidayListItems;
+			} else {
+				return null;
+			}
+		}
 	},
 }
 </script>
