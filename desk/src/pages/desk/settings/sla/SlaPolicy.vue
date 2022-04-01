@@ -1,6 +1,6 @@
 <template>
 	<div class="p-5 overflow-auto h-full">
-		<div v-if="!isNew && ($resources.getSlaPolicy.loading || $resources.setServicePolicy.loading)">
+		<div v-if="!isNew && ($resources.getSlaPolicy.loading || $resources.updateServicePolicy.loading)">
 			<LoadingText text="Fetching policy..." />
 		</div>
 		<div v-else>
@@ -26,7 +26,8 @@
 				<div class="float-right">
 					<div class="flex space-x-2 items-center">
 						<Button appearance="secondary" @click="cancel()">Cancel</Button>
-						<Button appearance="primary" @click="save()">Save</Button>
+						<Button :loading="this.$resources.createNewServicePolicy.loading" v-if="isNew" appearance="primary" @click="create()">Create</Button>
+						<Button :loading="this.$resources.updateServicePolicy.loading" v-else appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -111,24 +112,36 @@
 									<div>{{ workingHour.enabled ? 'Open' : 'Closed' }}</div>
 								</div>
 								<div v-if="workingHour.enabled" class="w-6/12 flex space-x-4 items-center">
-									<input class="rounded py-1 bg-gray-200 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.from">
+									<input class="rounded py-1 bg-gray-100 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.from">
 									<div class="text-gray-600">TO</div>
-									<input class="rounded py-1 bg-gray-200 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.to">
+									<input class="rounded py-1 bg-gray-100 border-0 text-base w-[6.4rem] px-1" type="time" v-model="workingHour.to">
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="space-y-4">
-						<Input class="w-6/12" label="Holidays on" type="text" value="" placeholder="" />
+						<Dropdown
+							v-if="serviceHolidayList"
+							:options="serviceHolidayListDropdownOptions()" 
+							class="text-base w-53 cursor-pointer"
+							placement="left"
+						>
+							<template v-slot="{ toggleHolidayList }" @click="toggleHolidayList" class="w-full">
+								<div class="flex items-center space-x-2">
+									<Input class="w-52" label="Holidays on" type="text" v-model="selectedHolidayList" placeholder="" />
+								</div>
+							</template>
+						</Dropdown>
 						<Input label="Conditions" type="textarea" value="" placeholder="" />
 					</div>
 				</div>
-				<div class="mt-5 flow-root" v-if="expandWorkingHours || expandRules">
+				<div class="mt-5 flow-root">
 					<div class="float-left">
 						<Button appearance="secondary" @click="cancel()">Cancel</Button>
 					</div>
 					<div class="float-right">
-						<Button appearance="primary" @click="save()">Save</Button>
+						<Button :loading="this.$resources.createNewServicePolicy.loading" v-if="isNew" appearance="primary" @click="create()">Create</Button>
+						<Button :loading="this.$resources.updateServicePolicy.loading" v-else appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -153,12 +166,13 @@ export default {
 		TimeDurationInput,
 		Switch
 	},
-	setup(props) {
-		const isNew = props.slaId === 'new' // TODO: this is a hacky solution, will need to change in the future
-		// TODO: fetch the sla policy if slaId != new
+	setup() {
+		const isNew = ref(false)
+
 		const slaPolicyName = ref('')
 		const editingName = ref(false)
 		const tempSlaPolicyName = ref('')
+		const selectedHolidayList = ref('')
 
 		const rules = ref([])
 		const workingHours = ref([])
@@ -166,24 +180,6 @@ export default {
 		const ticketPriorities = inject('ticketPriorities')
 
 		const selectedSetting = inject('selectedSetting')
-
-		if (isNew) {
-			slaPolicyName.value = 'New Service Policy'
-			rules.value = [
-				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600},
-				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600},
-				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600}
-			]
-			workingHours.value = [
-				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
-				{workday: 'Tuesday', enabled: true, from: '09:00', to: '17:00'},
-				{workday: 'Wednesday',enabled: true, from: '09:00', to: '17:00'},
-				{workday: 'Thursday', enabled: true, from: '09:00', to: '17:00'},
-				{workday: 'Friday', enabled: true, from: '09:00', to: '17:00'},
-				{workday: 'Saturday', enabled: false, from: '09:00', to: '17:00'},
-				{workday: 'Sunday', enabled: false, from: '09:00', to: '17:00'},
-			]
-		}
 
 		return {
 			isNew, 
@@ -193,83 +189,102 @@ export default {
 			rules, 
 			workingHours, 
 			ticketPriorities,
-			selectedSetting
+			selectedSetting,
+			selectedHolidayList
 		}
 	},
 	activated() {
 		this.selectedSetting = 'Support Policies' // TODO: use a better logic for this
+		this.isNew = (this.$route.name === 'NewSlaPolicy')
+		this.editingName = false
+		if (this.isNew) {
+			this.setDefaultValues()
+		} else {
+			this.$resources.getSlaPolicy.fetch()
+		}
 	},
 	deactivated() {
 
 	},
 	resources: {
 		getSlaPolicy() {
-			if (!this.isNew) {
-				return {
-					method: 'frappe.client.get',
-					params: {
-						doctype: 'Service Level Agreement',
-						name: this.slaId,
-						fields: ["*"]
-					},
-					auto: true,
-					onSuccess: (data) => {
-						this.slaPolicyName = data.name
-						this.rules = data.priorities.map(priority => {
-							return {
-								priority: priority.priority,
-								default: priority.default_priority,
-								firstResponseTime: priority.response_time,
-								resolutionTime: priority.resolution_time
+			return {
+				method: 'frappe.client.get',
+				params: {
+					doctype: 'Service Level Agreement',
+					name: this.slaId,
+					fields: ["*"]
+				},
+				onSuccess: (data) => {
+					this.slaPolicyName = data.name
+					this.selectedHolidayList = data.holiday_list
+					this.rules = data.priorities.map(priority => {
+						return {
+							priority: priority.priority,
+							default: priority.default_priority,
+							firstResponseTime: priority.response_time,
+							resolutionTime: priority.resolution_time
+						}
+					})
+					let sanitizerTimeStr = (timeStr) => {
+						let timeList = timeStr.split(':')
+						let newTimeStr = ''
+						timeList.forEach((t, index) => {
+							newTimeStr += t.length == 2 ? t : '0'.concat(t)
+							if (index < timeList.length - 1) {
+								newTimeStr += ':'
 							}
 						})
-						this.workingHours = data.support_and_resolution.map(workingHour => {
-							return {
-								workday: workingHour.workday,
-								enabled: true,
-								from: workingHour.start_time,
-								to: workingHour.end_time 
-							}
-						})
-
-						let weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-						weekdays.forEach(day => {
-							if (!this.workingHours.find(x => x.workday == day)) {
-								this.workingHours.push({
-									workday: day,
-									enabled: false,
-									from: '00:00:00',
-									to: '00:00:00' 
-								})
-							}
-						})
-
-						this.workingHours = this.workingHours.sort((a, b) => {
-							return weekdays.findIndex(x => x == a.workday) - weekdays.findIndex(x => x == b.workday)
-						})
-					},
-					onFailure: (error) => {
-						console.log(error)
+						return newTimeStr
 					}
+					this.workingHours = data.support_and_resolution.map(workingHour => {
+						return {
+							workday: workingHour.workday,
+							enabled: true,
+							from: sanitizerTimeStr(workingHour.start_time),
+							to: sanitizerTimeStr(workingHour.end_time) 
+						}
+					})
+
+					let weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+					weekdays.forEach(day => {
+						if (!this.workingHours.find(x => x.workday == day)) {
+							this.workingHours.push({
+								workday: day,
+								enabled: false,
+								from: '00:00:00',
+								to: '00:00:00' 
+							})
+						}
+					})
+
+					this.workingHours = this.workingHours.sort((a, b) => {
+						return weekdays.findIndex(x => x == a.workday) - weekdays.findIndex(x => x == b.workday)
+					})
+				},
+				onFailure: (error) => {
+					console.log(error)
 				}
-			} else {
-				return {}
 			}
 		},
-		setServicePolicy() {
-			if (this.isNew) {
-				return {
-					method: 'frappe.client.insert',
-					onSuccess(data) {
-						console.log(data)
-					}
+		updateServicePolicy() {
+			return {
+				method: 'frappe.client.set_value',
+				onSuccess: () => {
+					console.log('here 2 -')
+				},
+				onFailure: (error) => {
+					console.log(error)
 				}
-			} else {
-				return {
-					method: 'frappe.client.set_value',
-					onSuccess(data) {
-						console.log(data)
-					}
+			}
+		},
+		createNewServicePolicy() {
+			return {
+				method: 'frappe.client.insert',
+				onSuccess: () => {
+					this.$router.push({
+						name: 'SlaPolicies'
+					})
 				}
 			}
 		},
@@ -280,9 +295,69 @@ export default {
 					console.log(data)
 				}
 			}
+		},
+		getServiceHolidayList() {
+			return {
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: "Service Holiday List",
+					fields: ["*"]
+				},
+				auto: true,
+				onSuccess: (data) => {
+					if (data.length > 0) {
+						this.selectedHolidayList = data[0].holiday_list_name
+					}
+				}
+			}
+		}
+	},
+	computed: {
+		priorities() {
+			return this.rules.map(rule => {
+				return {
+					priority: rule.priority,
+					default_priority: rule.default,
+					response_time: rule.firstResponseTime,
+					resolution_time: rule.resolutionTime,
+				}
+			})
+		},
+		supportAndResolution() {
+			return this.workingHours.map(workingHour => {
+				if (workingHour.enabled) {
+					return {
+						workday: workingHour.workday,
+						start_time: workingHour.from,
+						end_time: workingHour.to
+					}
+				}
+			}).filter(x => x)
+		},
+		serviceHolidayList() {
+			return this.$resources.getServiceHolidayList.data || null
 		}
 	},
 	methods: {
+		setDefaultValues() {
+			this.slaPolicyName = 'New Service Policy'
+			this.tempSlaPolicyName = this.slaPolicyName
+
+			this.rules = [
+				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600},
+				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600},
+				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600}
+			]
+			this.workingHours = [
+				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Tuesday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Wednesday',enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Thursday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Friday', enabled: true, from: '09:00', to: '17:00'},
+				{workday: 'Saturday', enabled: false, from: '09:00', to: '17:00'},
+				{workday: 'Sunday', enabled: false, from: '09:00', to: '17:00'},
+			]
+		},
 		editPolicyName() {
 			if (this.slaPolicyName != 'Default') {
 				this.tempSlaPolicyName = this.slaPolicyName
@@ -322,40 +397,36 @@ export default {
 			// 	new_name: this.tempSlaPolicyName
 			// })
 		},
-		save() {
-			let priorities = this.rules.map(rule => {
-				return {
-					priority: rule.priority,
-					default_priority: rule.default,
-					response_time: rule.firstResponseTime,
-					resolution_time: rule.resolutionTime,
-				}
-			})
-
-			let support_and_resolution = this.workingHours.map(workingHour => {
-				if (workingHour.enabled) {
-					return {
-						workday: workingHour.workday,
-						start_time: workingHour.from,
-						end_time: workingHour.to
-					}
-				}
-			}).filter(x => x)
-
-			let doc = {}
-			if (!this.isNew) {
-				doc = {
+		create() {
+			// TODO: validate inputs
+			this.$resources.createNewServicePolicy.submit({
+				doc: {
 					doctype: 'Service Level Agreement',
-					name: this.slaPolicyName,
-					fieldname: {
-						priorities,
-						support_and_resolution
-					}
+					service_level: this.tempSlaPolicyName,
+					priorities: this.priorities,
+					support_and_resolution: this.supportAndResolution,
+					document_type: 'Ticket',
+					holiday_list: this.selectedHolidayList,
+					sla_fulfilled_on: [
+						{status: 'Resolved'},
+						{status: 'Closed'}
+					],
+					pause_sla_on: [
+						{status: 'Replied'},
+					],
+					enabled: true
+				},
+			})
+		},
+		save() {
+			// TODO: validate inputs
+			this.$resources.updateServicePolicy.submit({
+				doctype: 'Service Level Agreement',
+				name: this.slaPolicyName,
+				fieldname: {
+					priorities: this.priorities,
+					support_and_resolution: this.supportAndResolution,
 				}
-			}
-
-			this.$resources.setServicePolicy.submit({
-				...doc
 			}).then(() => {
 				if (this.slaPolicyName != this.tempSlaPolicyName) {
 					this.rename()
@@ -364,9 +435,12 @@ export default {
 		},
 		cancel() {
 			if (!this.isNew) {
+				this.editingName = false
 				this.$resources.getSlaPolicy.fetch()
 			} else {
-				this.$router.go()
+				this.$router.push({
+					name: 'SlaPolicies'
+				})
 			}
 		},
 		prioritiesAsDropdownOptions(index) {
@@ -385,6 +459,23 @@ export default {
 				return null;
 			}
 		},
+		serviceHolidayListDropdownOptions() {
+			let serviceHolidayListItems = []
+			if (this.serviceHolidayList) {
+				this.serviceHolidayList.forEach(holiday => {
+					serviceHolidayListItems.push({
+						label: holiday.name,
+						handler: () => {
+							// TODO: selecte the service holiday list
+							this.selectedHolidayList = holiday.name
+						},
+					});
+				});
+				return serviceHolidayListItems;
+			} else {
+				return null;
+			}
+		}
 	},
 }
 </script>
