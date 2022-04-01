@@ -9,7 +9,9 @@
 						</div>
 						<div class="sm:w-3/12">
 							<div v-if="email" class="flex items-center space-x-2">
-								<FeatherIcon name="mail" class="w-4 h-4" />
+								<div class="w-[1.1rem]">
+									<FeatherIcon name="mail" class="w-4 h-4" />
+								</div>
 								<div class="truncate pr-10">
 									{{ email }}
 								</div>
@@ -17,7 +19,9 @@
 						</div>
 						<div class="sm:w-3/12">
 							<div v-if="phone" class="flex items-center space-x-2">
-								<FeatherIcon name="phone" class="w-4 h-4" />
+								<div class="w-[1.1rem]">
+									<FeatherIcon name="phone" class="w-4 h-4" />
+								</div>
 								<div class="truncate pr-10">
 									{{ phone }}
 								</div>

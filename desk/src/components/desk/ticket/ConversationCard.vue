@@ -6,7 +6,7 @@
 		</div>
 		<div class="grow space-y-2">
 			<div class="flex space-x-2 items-center text-base">
-				<div>{{ userName }}</div>
+				<div class="truncate max-w-[200px]">{{ userName }}</div>
 				<div class="text-slate-500">{{ `${$dayjs(time).fromNow()} (${$dayjs(time).format('ddd, MMM DD, YYYY H:m')})` }}</div>
 			</div>
 			<div class="rounded shadow p-3" :class="`bg-${color}-50`">
