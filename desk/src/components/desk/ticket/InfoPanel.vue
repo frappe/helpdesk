@@ -6,8 +6,10 @@
 				<div v-if="!editingContact">
 					<div v-if="ticket.contact" class="space-y-1">
 						<div class="flex space-x-2 items-center">
-							<Avatar :label="contactFullName" :imageURL="ticket.contact.image" style="width: 20px; height: 20px" />
-							<div class="grow">{{ contactFullName }}</div>
+							<div class="w-[1.1rem]">
+								<Avatar :label="contactFullName" :imageURL="ticket.contact.image" style="width: 20px; height: 20px" />
+							</div>
+							<div class="grow truncate">{{ contactFullName }}</div>
 							<div v-if="!updatingContact" class="flex">
 								<FeatherIcon 
 									name="edit-2" 
@@ -16,20 +18,20 @@
 								/>
 							</div>
 						</div>
-						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2 items-center">
-							<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px; margin-left: 2.5px" />
-							<div>
-								<div class="space-y-1" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-									<div class="text-slate-500">{{ email_id.email_id }}</div>
-								</div>
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2 items-center max-w-[200px] pr-[2.2rem]">
+							<div class="w-[1.1rem]">
+								<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px; margin-left: 2.5px" />
+							</div>
+							<div class="space-y-1 max-w-full" v-for="email_id in ticket.contact.email_ids" :key="email_id">
+								<div class="truncate text-slate-500">{{ email_id.email_id }}</div>
 							</div>
 						</div>
 						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2 items-center">
-							<FeatherIcon name="phone" class="w-4 h-4" />
-							<div>
-								<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-									<div class="text-slate-500">{{ phone_no.phone }}</div>
-								</div>
+							<div class="w-[1.1rem]">
+								<FeatherIcon name="phone" class="w-4 h-4" />
+							</div>
+							<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
+								<div class="text-slate-500">{{ phone_no.phone }}</div>
 							</div>
 						</div>
 					</div>
@@ -103,11 +105,11 @@
 				<div v-if="showOtherTicketsOfContacts" class="max-h-40 overflow-scroll">
 					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
 						<router-link :to="`/helpdesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
-							<div class="flex py-1 hover:bg-slate-50 rounded">
-								<div>
+							<div class="flex py-1 hover:bg-slate-50 rounded max-w-[200px]">
+								<div class="w-[1.1rem]">
 									<FeatherIcon name="link" class="w-4 h-4"/>
 								</div>
-								<div class="text-slate-500 ml-2 overflow-hidden h-5 text-ellipsis">{{ ticket.subject }}</div>
+								<div class="text-slate-500 ml-2 truncate">{{ ticket.subject }}</div>
 							</div>
 						</router-link>
 					</div>
