@@ -60,16 +60,7 @@
 									</Dropdown>
 								</div>
 								<div class="w-1/12">
-									<Switch
-										:class="rule.default ? 'bg-blue-500' : 'bg-slate-300'"
-										class="relative inline-flex items-center h-6 rounded-full w-11"
-										@click="changeDefaultPriority(index)"
-									>
-										<span
-											:class="rule.default ? 'translate-x-6' : 'translate-x-1'"
-											class="inline-block w-4 h-4 transform bg-white rounded-full"
-										/>
-									</Switch>
+									<CustomSwitch v-model="rule.default" @click="changeDefaultPriority(index)" />
 								</div>
 								<div class="w-3/12 flex flex-row-reverse">
 									<TimeDurationInput v-model="rule.firstResponseTime"/>
@@ -94,17 +85,8 @@
 							<div class="flex text-base items-center h-7">
 								<div class="w-2/12">{{ workingHour.workday }}</div>
 								<div class="w-2/12 flex space-x-2 items-center">
-									<Switch
-										v-model="workingHour.enabled"
-										:class="workingHour.enabled ? 'bg-blue-500' : 'bg-slate-300'"
-										class="relative inline-flex items-center h-6 rounded-full w-11"
-									>
-										<span
-											:class="workingHour.enabled ? 'translate-x-6' : 'translate-x-1'"
-											class="inline-block w-4 h-4 transform bg-white rounded-full"
-										/>
-										<span class="sr-only">{{ `${workingHour.enabled ? 'Open' : 'Closed' }`}}</span>
-									</Switch>
+									<CustomSwitch v-model="workingHour.enabled" />
+									<span class="sr-only">{{ `${workingHour.enabled ? 'Open' : 'Closed' }`}}</span>
 									<div>{{ workingHour.enabled ? 'Open' : 'Closed' }}</div>
 								</div>
 								<div v-if="workingHour.enabled" class="w-6/12 flex space-x-4 items-center">
@@ -153,7 +135,7 @@
 <script>
 import { FeatherIcon, Input, LoadingText, Dropdown, ErrorMessage } from 'frappe-ui'
 import TimeDurationInput from '@/components/desk/global/TimeDurationInput.vue'
-import { Switch } from '@headlessui/vue'
+import CustomSwitch from '../../../../components/global/CustomSwitch.vue'
 import { inject, ref } from 'vue'
 
 export default {
@@ -166,7 +148,7 @@ export default {
 		Dropdown,
 		ErrorMessage,
 		TimeDurationInput,
-		Switch
+		CustomSwitch,
 	},
 	setup() {
 		const isNew = ref(false)
