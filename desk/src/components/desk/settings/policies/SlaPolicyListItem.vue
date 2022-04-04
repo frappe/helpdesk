@@ -11,21 +11,11 @@
 			<div class="sm:w-3/12">
 				{{ policy.name }}
 			</div>
-			<div class="sm:w-3/12">
+			<div class="sm:w-2/12">
 				{{ policy.default_service_level_agreement ? "Default" : ""}}
 			</div>
-			<div class="sm:w-1/12">
-				<Switch
-					v-model="enabled"
-					:class="policy.enabled ? 'bg-blue-500' : 'bg-slate-300'"
-					class="relative inline-flex items-center h-6 rounded-full w-11"
-				>
-					<span class="sr-only">Enable notifications</span>
-					<span
-						:class="policy.enabled ? 'translate-x-6' : 'translate-x-1'"
-						class="inline-block w-4 h-4 transform bg-white rounded-full"
-					/>
-				</Switch>
+			<div class="sm:w-2/12">
+				<CustomSwitch v-model="policy.enabled" />
 			</div>
 		</router-link>
 	</div>
@@ -33,7 +23,7 @@
 
 <script>
 import { Input, FeatherIcon } from 'frappe-ui'
-import { Switch } from '@headlessui/vue'
+import CustomSwitch from '@/components/global/CustomSwitch.vue'
 import { onMounted, ref, watch } from 'vue'
 
 export default {
@@ -42,7 +32,7 @@ export default {
 	components: {
 		Input,
 		FeatherIcon,
-		Switch
+		CustomSwitch
 	},
 	setup(props) {
 		const enabled = ref(false)
