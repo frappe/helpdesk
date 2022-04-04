@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import json
 from datetime import timedelta
-from typing_extensions import Self
 
 import frappe
 from frappe import _
