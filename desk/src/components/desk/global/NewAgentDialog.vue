@@ -15,6 +15,27 @@
 						<Input label="Last Name (optional)" type="text" v-model="lastName" />
 						<ErrorMessage :message="lastNameValidationError" />
 					</div>
+					<!-- team combobox / dropdown -->
+					<div>
+						<div class="block mb-2 text-sm leading-4 text-gray-700">Team</div>
+						<Dropdown
+							placement="left"
+							:options="agentGroupsAsDropdownOptions()" 
+							class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
+						>
+							<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
+								<div class="flex py-1 space-x-1 w-full items-center">
+									<div class="grow">
+										<div class="text-left">{{ team }}</div>
+									</div>
+								</div>
+							</template>
+						</Dropdown>
+					</div>
+					<div class="space-y-1">
+						<Input label="Signature" type="textarea" v-model="signature" />
+						<ErrorMessage :message="signatureValidationError" />
+					</div>
 					<div class="flex float-right space-x-2">
 						<Button :loading="this.$resources.createAgent.loading" appearance="primary" @click="createAgent()">Create</Button>
 					</div>
@@ -25,7 +46,7 @@
 </template>
 
 <script>
-import { Input, Dialog, ErrorMessage } from 'frappe-ui'
+import { Input, Dialog, ErrorMessage, Dropdown } from 'frappe-ui'
 import { computed, ref, inject } from 'vue'
 
 export default {
@@ -40,8 +61,10 @@ export default {
 		const emailValidationError = ref('')
 		const firstNameValidationError = ref('')
 		const lastNameValidationError = ref('')
+		const signatureValidationError = ref('')
+		const agentGroups = inject('agentGroups')
 
-		const contacts = inject('contacts')
+		const contacts = inject('contacts')	// TODO: use user instead of contacts
 
 		let open = computed({
 			get: () => props.modelValue,
@@ -53,13 +76,15 @@ export default {
 			},
 		})
 
-		return { open, contacts, emailValidationError, firstNameValidationError, lastNameValidationError }
+		return { open, contacts, emailValidationError, firstNameValidationError, lastNameValidationError, signatureValidationError, agentGroups }
 	},
 	data() {
 		return {
 			firstName: "",
 			lastName: "",
 			emailId: "",
+			signature: "",
+			team: "",
 		}
 	},
 	watch: {
@@ -78,6 +103,8 @@ export default {
 					this.emailId = ''
 					this.firstName = ''
 					this.lastName = ''
+					this.signature = ''
+					this.team = ''
 
 					this.$emit('agentCreated', data)
 				}
@@ -87,7 +114,8 @@ export default {
 	components: {
 		Input,
 		Dialog,
-		ErrorMessage
+		ErrorMessage,
+		Dropdown,
 	},
 	methods: {
 		createAgent() {
@@ -99,8 +127,8 @@ export default {
 				email:this.emailId,
 				first_name:this.firstName,
 				last_name:this.lastName,
-				signature:'',
-				team:'L1' 
+				signature:this.signature,
+				team:'L1'
 			})
 		},
 		validateInputs() {
@@ -109,13 +137,13 @@ export default {
 			return error
 		},
 		validateEmailInput(value) {
-			function existingContactEmails(contacts) {
-				let list = []
-				for (let index in contacts) {
-					list.push(contacts[index].email_id)
-				}
-				return list
-			}
+			// function existingContactEmails(contacts) {
+			// 	let list = []
+			// 	for (let index in contacts) {
+			// 		list.push(contacts[index].email_id)
+			// 	}
+			// 	return list
+			// }
 
 			this.emailValidationError = ''
 			const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
@@ -123,9 +151,10 @@ export default {
 				this.emailValidationError = 'Email should not be empty'
 			} else if (!reg.test(value)) {
 				this.emailValidationError = 'Enter a valid email'
-			} else if (existingContactEmails(this.contacts).includes(value)) {
-				this.emailValidationError = 'Contact with email already exists'
-			}
+			} 
+			// else if (existingContactEmails(this.contacts).includes(value)) {
+			// 	this.emailValidationError = 'Contact with email already exists'
+			// }
 			return this.emailValidationError
 		},
 		validateFirstName(value) {
@@ -136,6 +165,29 @@ export default {
 				this.firstNameValidationError = 'First name should not be empty'
 			}
 			return this.firstNameValidationError
+		},
+		agentGroupsAsDropdownOptions() {
+			let groupItems = [];
+			if (this.agentGroups) {
+				this.agentGroups.forEach(group => {
+					groupItems.push({
+						label: group.name,
+						handler: () => {
+							this.team = group.name
+						},
+					});
+				});
+				if (groupItems.length == 0) {
+					groupItems.push({
+						label: 'No team found'
+					})
+				} else {
+					this.team = this.agentGroups[0].name
+				}
+				return groupItems;
+			} else {
+				return null;
+			}
 		},
 	}
 }

@@ -3,7 +3,7 @@
 		<router-link 
 			v-if="agent"
 			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8 space-x-2"
-            :to="`/agents/${agent.name}`"
+            :to="`/helpdesk/settings/agents/${agent.name}`"
 		>
 			<div
 				class="mr-4"
