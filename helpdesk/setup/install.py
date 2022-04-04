@@ -4,6 +4,7 @@ def before_install():
 	set_home_page_to_kb()
 
 def after_install():
+	add_default_role_profiles()
 	add_default_categories()
 	add_default_ticket_types()
 	add_default_ticket_priorities()
@@ -33,6 +34,16 @@ def add_support_redirect_to_tickets():
 
     website_settings.append('route_redirects', base_route)
     website_settings.save()
+
+def add_default_role_profiles():
+	if not frappe.db.exists("Role Profile", "Agent"):
+		frappe.get_doc({
+			"doctype": "Role Profile",
+			"role_profile": "Agent",
+			"roles": [
+				{"role": "Agent"}
+			]
+		}).insert()
 
 def add_default_categories():
 	frappe.get_doc({

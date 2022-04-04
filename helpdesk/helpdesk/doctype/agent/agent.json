@@ -52,12 +52,13 @@
    "fieldname": "role",
    "fieldtype": "Link",
    "label": "Role",
-   "options": "Role Profile"
+   "options": "Role Profile",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-04 12:27:42.750784",
+ "modified": "2022-04-04 14:08:33.467097",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Agent",

@@ -9,11 +9,15 @@ class Agent(Document):
 		user = frappe.get_doc("User", self.user)
 		self.name = user.name
 
-		# add Agent role to user roles
-		agent_role = frappe.get_doc({
-			"doctype": "Has Role",
-			"role": "Agent"
+		role_profile = frappe.get_doc({
+			"doctype": "Role Profile",
+			"role_profile": "Agent"
 		})
+		user.append("role_profile", role_profile)
 
-		user.append("roles", agent_role)
+		if self.email != user.email:
+			user.email = self.email
+		if self.signature != user.email_signature:
+			user.email_signature = self.signature
+
 		user.save()
