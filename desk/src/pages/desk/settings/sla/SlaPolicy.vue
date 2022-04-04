@@ -77,14 +77,9 @@
 								<div class="w-3/12 flex flex-row-reverse">
 									<TimeDurationInput v-model="rule.resolutionTime"/>
 								</div>
-								<div class="w-1/12 flex flex-row-reverse" v-if="rules.length > 1">
-									<FeatherIcon name="trash" class="cursor-pointer h-5 w-5 stroke-red-500 hover:stroke-red-600" @click="removeRule(index)"/>
-								</div>
 							</div>
 						</div>
 					</div>
-					<div class="mb-2"></div>
-					<Button @click="addRule()">Add Rule</Button>
 				</div>
 			</div>
 			<div>
@@ -344,9 +339,10 @@ export default {
 			this.tempSlaPolicyName = this.slaPolicyName
 
 			this.rules = [
-				{priority: 'Urgent', default: false, firstResponseTime: 1 * 3600, resolutionTime: 2 * 3600},
-				{priority: 'High', default: false, firstResponseTime: 2 * 3600, resolutionTime: 4 * 3600},
-				{priority: 'Low', default: true, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600}
+				{priority: 'Urgent', default: false, firstResponseTime: 30 * 60, resolutionTime: 2 * 3600},
+				{priority: 'High', default: false, firstResponseTime: 1 * 3600, resolutionTime: 4 * 3600},
+				{priority: 'Medium', default: true, firstResponseTime: 8 * 3600, resolutionTime: 24 * 3600},
+				{priority: 'Low', default: false, firstResponseTime: 24 * 3600, resolutionTime: 72 * 3600}
 			]
 			this.workingHours = [
 				{workday: 'Monday', enabled: true, from: '09:00', to: '17:00'},
@@ -372,22 +368,6 @@ export default {
 					rule.default = false
 				}
 			})
-		},
-		addRule() {
-			this.rules.push({priority: 'Low', default: false, firstResponseTime: 12 * 3600, resolutionTime: 24 * 3600})
-		},
-		removeRule(index) {
-			if (this.rules.length > 1) {
-				if (this.rules[index].default) {
-					if(index == 0) {
-						this.rules[this.rules.length - 1].default = true
-					} else {
-						this.rules[index - 1].default = true
-					}
-				}
-
-				this.rules.splice(index, 1)
-			}
 		},
 		rename() {
 			// TODO: once Service level agreement is renamable uncomment this block
