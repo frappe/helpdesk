@@ -9,11 +9,26 @@ class Agent(Document):
 		user = frappe.get_doc("User", self.user)
 		self.name = user.name
 
-		# add Agent role to user roles
-		agent_role = frappe.get_doc({
-			"doctype": "Has Role",
-			"role": "Agent"
-		})
-
-		user.append("roles", agent_role)
+		user.role_profile_name = "Agent"
 		user.save()
+
+@frappe.whitelist()
+def create_agent(first_name, last_name, email, signature, team):
+	user = frappe.get_doc({
+		"doctype": "User",
+		"first_name": first_name,
+		"last_name": last_name,
+		"email": email,
+		"email_signature": signature
+	}).insert()
+
+	user.send_welcome_mail_to_user()
+
+	return frappe.get_doc({
+		"doctype": "Agent",
+		"user": user.name,
+		"group": team
+	}).insert()
+
+	
+	return agent

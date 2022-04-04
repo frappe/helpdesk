@@ -5,3 +5,4 @@ helpdesk.patches.add_default_ticket_template
 helpdesk.patches.add_default_ticket_types
 helpdesk.patches.add_default_ticket_priorities
 helpdesk.patches.add_default_agent_groups
+helpdesk.patches.add_default_role_profiles

@@ -3,21 +3,18 @@
 		<div v-if="agents">
 			<AgentList :agents="agents" />
 		</div>
-		<NewAgentDialog v-model="showNewAgentDialog" @agent-created="(agent) => {agentCreated(agent)}"/>
 	</div>
 </template>
 <script>
 import { Input } from 'frappe-ui'
 import AgentList from '@/components/desk/settings/agents/AgentList.vue'
-import NewAgentDialog from '@/components/desk/global/NewAgenDialog.vue'
 import { inject, ref } from 'vue'
 
 export default {
 	name: 'Agents',
 	components: {
 		AgentList,
-		Input,
-		NewAgentDialog
+		Input
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
