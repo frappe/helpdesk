@@ -14,10 +14,22 @@ class Agent(Document):
 			"role_profile": "Agent"
 		})
 		user.append("role_profile", role_profile)
-
-		if self.email != user.email:
-			user.email = self.email
-		if self.signature != user.email_signature:
-			user.email_signature = self.signature
-
 		user.save()
+
+@frappe.whitelist()
+def create_agent(name, email, signature, team):
+	user = frappe.new_doc({
+		"doctype": "User",
+		"first_name": name,
+		"email": email,
+		"email_signature": signature
+	}).insert()
+
+	user.send_welcome_mail_to_user()
+
+	return frappe.new_doc({
+		"doctype": "Agent",
+		"user": user.name,
+		"group": team
+	}).insert()
+

@@ -8,10 +8,7 @@
  "field_order": [
   "user",
   "agent_name",
-  "group",
-  "email",
-  "signature",
-  "role"
+  "group"
  ],
  "fields": [
   {
@@ -34,31 +31,11 @@
    "fieldtype": "Link",
    "label": "Group",
    "options": "Agent Group"
-  },
-  {
-   "fetch_from": "user.email",
-   "fieldname": "email",
-   "fieldtype": "Data",
-   "label": "Email"
-  },
-  {
-   "fetch_from": "user.email_signature",
-   "fieldname": "signature",
-   "fieldtype": "Small Text",
-   "label": "Signature"
-  },
-  {
-   "fetch_from": "user.role_profile_name",
-   "fieldname": "role",
-   "fieldtype": "Link",
-   "label": "Role",
-   "options": "Role Profile",
-   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-04 14:08:33.467097",
+ "modified": "2022-04-04 16:39:13.214711",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Agent",
