@@ -81,6 +81,7 @@
 						</div>
 					</div>
 				</div>
+				<ErrorMessage :message="rulesValidationError" />
 			</div>
 			<div>
 				<div class="flex space-x-2 items-center mb-3">
@@ -113,6 +114,7 @@
 								</div>
 							</div>
 						</div>
+						<ErrorMessage :message="workingHoursValidationError" />
 					</div>
 					<div class="space-y-4">
 						<Dropdown
@@ -123,10 +125,14 @@
 						>
 							<template v-slot="{ toggleHolidayList }" @click="toggleHolidayList" class="w-full">
 								<div class="flex items-center space-x-2">
-									<Input class="w-52" label="Holidays on" type="text" v-model="selectedHolidayList" placeholder="" />
+									<div>
+										<span class="block mb-2 text-sm leading-4 text-gray-700">Holidays on</span>
+										<div class="px-3 w-52 placeholder-gray-500 block form-input">{{ selectedHolidayList }}</div>
+									</div>
 								</div>
 							</template>
 						</Dropdown>
+						<ErrorMessage :message="holidayListValidationError" />
 						<Input label="Conditions" type="textarea" value="" placeholder="" />
 					</div>
 				</div>
@@ -145,7 +151,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Input, LoadingText, Dropdown } from 'frappe-ui'
+import { FeatherIcon, Input, LoadingText, Dropdown, ErrorMessage } from 'frappe-ui'
 import TimeDurationInput from '@/components/desk/global/TimeDurationInput.vue'
 import { Switch } from '@headlessui/vue'
 import { inject, ref } from 'vue'
@@ -158,6 +164,7 @@ export default {
 		Input,
 		LoadingText,
 		Dropdown,
+		ErrorMessage,
 		TimeDurationInput,
 		Switch
 	},
@@ -169,12 +176,17 @@ export default {
 		const tempSlaPolicyName = ref('')
 		const selectedHolidayList = ref('')
 
+		const rulesValidationError = ref('')
+		const workingHoursValidationError = ref('')
+		const holidayListValidationError = ref('')
+
 		const rules = ref([])
 		const workingHours = ref([])
 
 		const ticketPriorities = inject('ticketPriorities')
 
 		const selectedSetting = inject('selectedSetting')
+
 
 		return {
 			isNew, 
@@ -185,7 +197,10 @@ export default {
 			workingHours, 
 			ticketPriorities,
 			selectedSetting,
-			selectedHolidayList
+			selectedHolidayList,
+			rulesValidationError,
+			workingHoursValidationError,
+			holidayListValidationError
 		}
 	},
 	activated() {
@@ -265,9 +280,6 @@ export default {
 		updateServicePolicy() {
 			return {
 				method: 'frappe.client.set_value',
-				onSuccess: () => {
-					console.log('here 2 -')
-				},
 				onFailure: (error) => {
 					console.log(error)
 				}
@@ -379,39 +391,87 @@ export default {
 		},
 		create() {
 			// TODO: validate inputs
-			this.$resources.createNewServicePolicy.submit({
-				doc: {
-					doctype: 'Service Level Agreement',
-					service_level: this.tempSlaPolicyName,
-					priorities: this.priorities,
-					support_and_resolution: this.supportAndResolution,
-					document_type: 'Ticket',
-					holiday_list: this.selectedHolidayList,
-					sla_fulfilled_on: [
-						{status: 'Resolved'},
-						{status: 'Closed'}
-					],
-					pause_sla_on: [
-						{status: 'Replied'},
-					],
-					enabled: true
-				},
-			})
+			if (this.validateInputs()) {
+				this.$resources.createNewServicePolicy.submit({
+					doc: {
+						doctype: 'Service Level Agreement',
+						service_level: this.tempSlaPolicyName,
+						priorities: this.priorities,
+						support_and_resolution: this.supportAndResolution,
+						document_type: 'Ticket',
+						holiday_list: this.selectedHolidayList,
+						sla_fulfilled_on: [
+							{status: 'Resolved'},
+							{status: 'Closed'}
+						],
+						pause_sla_on: [
+							{status: 'Replied'},
+						],
+						enabled: true
+					},
+				})
+			}
 		},
 		save() {
-			// TODO: validate inputs
-			this.$resources.updateServicePolicy.submit({
-				doctype: 'Service Level Agreement',
-				name: this.slaPolicyName,
-				fieldname: {
-					priorities: this.priorities,
-					support_and_resolution: this.supportAndResolution,
-				}
-			}).then(() => {
-				if (this.slaPolicyName != this.tempSlaPolicyName) {
-					this.rename()
+			if (this.validateInputs()) {
+				this.$resources.updateServicePolicy.submit({
+					doctype: 'Service Level Agreement',
+					name: this.slaPolicyName,
+					fieldname: {
+						priorities: this.priorities,
+						support_and_resolution: this.supportAndResolution,
+					}
+				}).then(() => {
+					if (this.slaPolicyName != this.tempSlaPolicyName) {
+						this.rename()
+					}
+				})
+			}
+		},
+		validateInputs() {
+			this.rulesValidationError = ''
+			this.workingHoursValidationError = ''
+			this.holidayListValidationError = ''
+
+			let errors = []
+
+			if (!this.selectedHolidayList) {
+				this.holidayListValidationError = 'A holiday list should be selected'
+				errors.push(this.holidayListValidationError)
+			} 
+
+			let startTimeAfterEndTime = false
+			this.supportAndResolution.forEach((workingHour) => {
+				if (workingHour.start_time > workingHour.end_time) {
+					startTimeAfterEndTime = true
 				}
 			})
+			
+			if(startTimeAfterEndTime) {
+				this.workingHoursValidationError = 'Start time should not be after end time'
+				errors.push(this.workingHoursValidationError)
+			}
+
+			let defaultPrioritySelected = false
+			let timeDurationIsZero = false
+			this.priorities.forEach((priority) => {
+				if (priority.default_priority) {
+					defaultPrioritySelected = true
+				}
+				if (priority.resolution_time == 0 || priority.response_time == 0) {
+					timeDurationIsZero = true
+				}
+			})
+			if (!defaultPrioritySelected) {
+				this.rulesValidationError = 'Default rule needs to be selected'
+				errors.push(this.rulesValidationError)
+			}
+			if (timeDurationIsZero) {
+				this.rulesValidationError = 'Response and resolution time should not be 0'
+				errors.push(this.rulesValidationError)
+			}
+			return errors.length == 0
+
 		},
 		cancel() {
 			if (!this.isNew) {
