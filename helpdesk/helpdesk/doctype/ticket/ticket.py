@@ -193,9 +193,8 @@ def create_communication_via_contact(ticket, message, attachments=None):
 def create_communication_via_agent(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
-	if not ticket_doc.via_customer_portal and frappe.db.exists("Email Account", {"default_outgoing", "1"}):
-		# TODO: rasie exception
-		pass
+	if not (ticket_doc.via_customer_portal and frappe.db.exists("Email Account", {"default_outgoing": "1"})):
+		frappe.throw("Default outgoing email account needs to be setup to reply to this ticket")
 
 	communication = frappe.new_doc("Communication")
 	communication.update(
