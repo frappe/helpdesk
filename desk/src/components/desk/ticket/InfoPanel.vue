@@ -105,11 +105,8 @@
 				<div v-if="showOtherTicketsOfContacts" class="max-h-40 overflow-scroll">
 					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
 						<router-link :to="`/helpdesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
-							<div class="flex py-1 hover:bg-slate-50 rounded max-w-[200px]">
-								<div class="w-[1.1rem]">
-									<FeatherIcon name="link" class="w-4 h-4"/>
-								</div>
-								<div class="text-slate-500 ml-2 truncate">{{ ticket.subject }}</div>
+							<div class="py-1 hover:bg-slate-50 rounded max-w-[200px]">
+								<div class="text-slate-500 truncate">{{ ticket.subject }}</div>
 							</div>
 						</router-link>
 					</div>
