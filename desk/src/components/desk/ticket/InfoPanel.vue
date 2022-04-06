@@ -1,5 +1,5 @@
 <template>
-	<div class="m-4 px-4 rounded shadow" v-if="ticket">
+	<div class="m-4 px-4 rounded shadow border" v-if="ticket">
 		<div class="py-4 space-y-3 text-base border-b">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
@@ -179,7 +179,7 @@ export default {
 		},
 		contactFullName() {
 			if (this.ticket.contact) {
-				return (this.ticket.contact.first_name || "") + " " + (this.ticket.contact.last_name || "")
+				return ((this.ticket.contact.first_name || "") + " " + (this.ticket.contact.last_name || "")).slice(0, 40)
 			}
 		},
 		filterdContacts() {
