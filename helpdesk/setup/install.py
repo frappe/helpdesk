@@ -41,7 +41,8 @@ def add_default_role_profiles():
 			"doctype": "Role Profile",
 			"role_profile": "Agent",
 			"roles": [
-				{"role": "Agent"}
+				{"role": "Agent"},
+				{"role": "System Manager"}
 			]
 		}).insert()
 
