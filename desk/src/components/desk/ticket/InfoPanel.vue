@@ -1,5 +1,5 @@
 <template>
-	<div class="m-4 px-4 rounded shadow" v-if="ticket">
+	<div class="m-4 px-4 rounded shadow border" v-if="ticket">
 		<div class="py-4 space-y-3 text-base border-b">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
@@ -93,7 +93,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="py-4 space-y-3" v-if="otherTicketsOfContact && !editingContact">
+			<div class="py-4 space-y-1" v-if="otherTicketsOfContact && !editingContact">
 				<div class="flex" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
 					<div class="grow text-lg font-medium">{{ `${otherTicketsOfContact.length > 0 ? '' : 'No'} Open Tickets ${otherTicketsOfContact.length > 0 ? '(' + otherTicketsOfContact.length + ')' : ''}` }}</div>
 					<FeatherIcon 
@@ -105,11 +105,8 @@
 				<div v-if="showOtherTicketsOfContacts" class="max-h-40 overflow-scroll">
 					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
 						<router-link :to="`/helpdesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
-							<div class="flex py-1 hover:bg-slate-50 rounded max-w-[200px]">
-								<div class="w-[1.1rem]">
-									<FeatherIcon name="link" class="w-4 h-4"/>
-								</div>
-								<div class="text-slate-500 ml-2 truncate">{{ ticket.subject }}</div>
+							<div class="py-1 hover:bg-slate-50 rounded max-w-[200px]">
+								<div class="text-slate-500 truncate">{{ ticket.subject }}</div>
 							</div>
 						</router-link>
 					</div>
@@ -182,7 +179,7 @@ export default {
 		},
 		contactFullName() {
 			if (this.ticket.contact) {
-				return (this.ticket.contact.first_name || "") + " " + (this.ticket.contact.last_name || "")
+				return ((this.ticket.contact.first_name || "") + " " + (this.ticket.contact.last_name || "")).slice(0, 40)
 			}
 		},
 		filterdContacts() {

@@ -1,5 +1,5 @@
 <template>
-	<div class="m-4 px-4 rounded shadow" v-if="ticket">
+	<div class="m-4 px-4 rounded shadow border" v-if="ticket">
 		<div class="py-4 border-b space-y-3">
 			<div class="text-lg font-medium">{{ `Ticket #${ticket.name}` }}</div>
 			<div class="text-base space-y-2">
