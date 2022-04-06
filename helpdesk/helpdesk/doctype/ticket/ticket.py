@@ -153,6 +153,11 @@ class Ticket(Document):
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"Assigned to {agent_name}")
 
+	def on_trash(self):
+		activities = frappe.db.get_all("Ticket Activity", {"Ticket": self.name})
+		for activity in activities:
+			frappe.db.delete("Ticket Activity", activity)
+
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_contact(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
