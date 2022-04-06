@@ -239,7 +239,7 @@ export default {
 		},
 		createTicketFromDialog() {
 			if (this.newType) {
-				this.$tickets().createType(this.newType)
+				this.ticketController.new('type', this.newType)
 				this.closeCreateNewTicketTypeDialog();
 			}
 		},
