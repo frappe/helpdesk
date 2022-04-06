@@ -156,14 +156,7 @@ export default {
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case 'Ticket':
-					if (data.name) {
-						if (data.user != this.user.user) {
-							// only update the ticket if changes not made by current user
-							this.ticketController.update(data.name)
-						}
-					} else {
-						this.ticketController.update()
-					}
+					this.ticketController.update()
 					break
 				case 'Ticket Type':
 					this.$resources.types.fetch()
