@@ -81,7 +81,6 @@ export default {
 				onSuccess: (res) => {
 					if (res) {
 						this.$resources.user.fetch()
-						return res;
 					}
 				},
 				onFailure: (error) => {

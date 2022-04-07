@@ -3,7 +3,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
 	{
 		path: '/helpdesk/login',
-		name: 'Login',
+		name: 'DeskLogin',
+		component: () => import('@/pages/Login.vue'),
+	},
+	{
+		path: '/support/login',
+		name: 'PortalLogin',
 		component: () => import('@/pages/Login.vue'),
 	},
 	{

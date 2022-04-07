@@ -4,8 +4,23 @@
 		:title="!forgot ? 'Log in to your account' : 'Reset your password'"
 	>
 		<form class="space-y-4" @submit.prevent="login">
-			<Input label="Username" type="text" v-model="email" placeholder="johndeo@gmail.com" />
-			<Input label="Password" type="password" v-model="password" placeholder="" />
+			<Input 
+				required 
+				label="Username"
+				:type="email !== 'Administrator' ? 'email' : 'text'"
+				v-model="email" 
+				placeholder="johndeo@gmail.com" 
+			/>
+			<Input 
+				v-if="!forgot"
+				label="Password"
+				type="password"
+				placeholder="•••••"
+				v-model="password"
+				name="password"
+				autocomplete="current-password"
+				required 
+			/>
 			<div class="mt-2 text-sm">
 				<router-link v-if="forgot" to="/login">
 					I remember my password
@@ -89,17 +104,18 @@ export default {
 			this.redirect_route = this.$route.query.route;
 			this.$router.replace({ query: null });
 		}
+		if (this.user.isLoggedIn()) {
+			this.redirect()
+		}
 	},
 	methods: {
 		async loginOrResetPassword() {
-			console.log('submit button clicked!!!')
 			try {
 				this.errorMessage = null;
 				this.state = 'RequestStarted';
 				if (!this.forgot) {
 					await this.login();
 				} else {
-					console.log('here')
 					await this.resetPassword();
 				}
 			} catch (error) {
@@ -110,17 +126,25 @@ export default {
 			}
 		},
 		async login() {
-			console.log(this.email, this.password)
 			if (this.email && this.password) {
-				let res = await this.user.login(this.email, this.password);
-				if (res) {
-					this.$router.push(this.redirect_route || res.dashboard_route || '/');
-				}
+				await this.user.login(this.email, this.password);
+				this.redirect()
 			}
 		},
 		async resetPassword() {
 			await this.user.resetPassword(this.email);
 			this.successMessage = true;
+		},
+		redirect() {
+			if (this.redirect_route) {
+				this.$router.push(this.redirect_route)
+			} else {
+				if (this.$route.name == 'DeskLogin') {
+					this.$router.push({ path: '/helpdesk/tickets' })
+				} else if (this.$route.name == 'PortalLogin') {
+					this.$router.push({ path: '/support/tickets' })
+				}
+			}
 		}
 	}
 }
