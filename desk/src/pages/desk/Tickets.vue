@@ -43,7 +43,7 @@
 					</Dropdown>
 				</div>
 				<div v-else class="flex space-x-3">
-					<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
+					<FilterBox class="mt-10" v-if="toggleFilters" @close="() => { toggleFilters = false }" :options="getFilterBoxOptions()" v-model="filters"/>
 					<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-300'" @click="() => { toggleFilters = !toggleFilters }">
 						<div class="flex items-center space-x-2">
 							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-on-outside-click="() => { editing = false }">
 		<div>
 			<div class="cursor-pointer w-24 text-right p-1.5 bg-gray-100 rounded" @click="() => { editing=!editing }">
 				{{ convertSecondsToTimeStr(modelValue) }}
