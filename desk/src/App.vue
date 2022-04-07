@@ -6,23 +6,42 @@
 
 <script>
 import { provide, ref } from 'vue'
+import { call } from 'frappe-ui'
 
 export default {
 	name: "App",
 	setup() {
-		const user = ref({
+		const user = ref({})
+		
+		provide('user', user)
+		
+		const viewportWidth = ref(Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0))
+		
+		provide('viewportWidth', viewportWidth)
+		
+		return { user }
+	},
+	mounted() {
+		this.user = {
 			signup: (fullName, email) => {
 				console.log('signup page')
 			},
-			login: (email, password) => {
-				console.log('signup page')
+			login: async (email, password) => {
+				return await this.$resources.login.submit({
+					usr: email,
+					pwd: password
+				})
 			},
-			logout: () => {
-				console.log('logout user')
+			logout: async () => {
+				await call('logout')
+				window.location.replace("/helpdesk/login");
+			},
+			resetPassword: async (email) => {
+				console.log('reset password')
 			},
 			showLoginPage: () => {
 				// TODO: use frappe build in login redirect with redirect to helpdesk once logged in
-				window.location.replace("/login")
+				window.location.replace("/helpdesk/login")
 			},
 			isLoggedIn: () => {
 				const cookie = Object.fromEntries(
@@ -34,17 +53,8 @@ export default {
 
 				return cookie.user_id && cookie.user_id !== 'Guest'
 			}
-		})
-		
-		provide('user', user)
-		
-		const viewportWidth = ref(Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0))
-		
-		provide('viewportWidth', viewportWidth)
-		
-		return { user }
-	},
-	mounted() {
+		}
+
 		if (this.user.isLoggedIn()) {
 			this.$resources.user.fetch()
 		}
@@ -65,6 +75,20 @@ export default {
 				}
 			}
 		},
+		login() {
+			return {
+				method: 'login',
+				onSuccess: (res) => {
+					if (res) {
+						this.$resources.user.fetch()
+						return res;
+					}
+				},
+				onFailure: (error) => {
+					console.log(error)
+				}
+			};
+		}
 	}
 }
 </script>
