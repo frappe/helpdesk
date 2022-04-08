@@ -7,7 +7,7 @@ import json
 from helpdesk.helpdesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
 
 @frappe.whitelist(allow_guest=True)
-def get_tickets(filter=None):
+def get_tickets():
 	all_tickets = frappe.db.sql("""
 		SELECT
 			ticket.subject,
@@ -27,22 +27,15 @@ def get_tickets(filter=None):
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
 
-	filtered_tickets = []
-
 	# TODO: optimize this (try using sql query)
 	for ticket in all_tickets:
 		assignees = get_agent_assigned_to_ticket(ticket['name'])
-		if filter == "Assigned to me":
-			if len([(assignee) for assignee in assignees if assignee['name'] == frappe.session.user]) > 0:
-				filtered_tickets.append(ticket)
-		else:
-			filtered_tickets.append(ticket)
 
 		ticket['custom_fields'] = frappe.get_doc("Ticket", ticket.name, fields=['custom_fields']).custom_fields
 		ticket['assignees'] = assignees
 		ticket['contact'] = get_contact(ticket['name'])
 	
-	return filtered_tickets
+	return all_tickets
 
 @frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):
@@ -103,10 +96,11 @@ def get_agent_assigned_to_ticket(ticket_id):
 	if ticket_doc._assign:
 		assignees = json.loads(ticket_doc._assign)
 		for assignee in assignees:
-			agent = frappe.get_doc("Agent", assignee)
-			agent = agent.__dict__
-			agent['image'] = frappe.get_value("User", agent["name"], "user_image")
-			agents.append(agent)
+			if (frappe.db.exists("Agent", assignee)):
+				agent = frappe.get_doc("Agent", assignee)
+				agent = agent.__dict__
+				agent['image'] = frappe.get_value("User", agent["name"], "user_image")
+				agents.append(agent)
 	return agents
 
 @frappe.whitelist(allow_guest=True)

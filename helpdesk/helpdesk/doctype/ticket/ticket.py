@@ -230,7 +230,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 	# 		file_doc.attached_to_doctype = "Communication"
 	# 		file_doc.save(ignore_permissions=True)
 
-	if frappe.db.exists("Email Account", {"default_outgoing", "1"}):
+	if frappe.db.exists("Email Account", {"default_outgoing": "1"}):
 		frappe.sendmail(
 			subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
 			sender=frappe.session.user,
