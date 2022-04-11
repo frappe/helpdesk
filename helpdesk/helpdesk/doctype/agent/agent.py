@@ -14,15 +14,18 @@ class Agent(Document):
 
 @frappe.whitelist()
 def create_agent(first_name, last_name, email, signature, team):
-	user = frappe.get_doc({
-		"doctype": "User",
-		"first_name": first_name,
-		"last_name": last_name,
-		"email": email,
-		"email_signature": signature
-	}).insert()
-
-	user.send_welcome_mail_to_user()
+	if frappe.db.exists("User", email):
+		user = frappe.get_doc("User", email)
+	else:
+		user = frappe.get_doc({
+			"doctype": "User",
+			"first_name": first_name,
+			"last_name": last_name,
+			"email": email,
+			"email_signature": signature
+		}).insert()
+		
+		user.send_welcome_mail_to_user()
 
 	return frappe.get_doc({
 		"doctype": "Agent",
@@ -30,5 +33,4 @@ def create_agent(first_name, last_name, email, signature, team):
 		"group": team
 	}).insert()
 
-	
 	return agent
