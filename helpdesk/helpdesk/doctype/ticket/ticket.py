@@ -219,14 +219,11 @@ def create_communication_via_agent(ticket, message, attachments=None):
 	communication.ignore_mandatory = True
 	communication.save(ignore_permissions=True)
 	
-	# TODO
-	# if attachments:
-	# 	attachments = json.loads(attachments)
-	# 	for attachment in attachments:
-	# 		file_doc = frappe.get_doc("File", attachment["name"])
-	# 		file_doc.attached_to_name = communication.name
-	# 		file_doc.attached_to_doctype = "Communication"
-	# 		file_doc.save(ignore_permissions=True)
+	for attachment in attachments:
+		file_doc = frappe.get_doc("File", attachment)
+		file_doc.attached_to_name = communication.name
+		file_doc.attached_to_doctype = "Communication"
+		file_doc.save(ignore_permissions=True)
 
 	if frappe.db.exists("Email Account", {"default_outgoing": "1"}):
 		frappe.sendmail(
