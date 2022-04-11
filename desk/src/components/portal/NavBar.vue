@@ -6,28 +6,6 @@
 			</div>
 		</div>
 		<div class="float-right flex space-x-3">
-			<Dropdown
-                v-if="ticketTemplateOptions().length > 1"
-                placement="right"
-                :options="ticketTemplateOptions()"
-                :dropdown-width-full="true"
-            >
-                <template v-slot="{ toggleTemplates }">
-                    <div>
-                        <div 
-                            class="cursor-pointer"
-                            @click="toggleTemplates"
-                            icon-left="plus" 
-                            appearance="primary"
-                        >
-                            Submit a ticket
-                        </div>
-                    </div>
-                </template>
-            </Dropdown>
-            <router-link v-else  :to="{name: 'DefaultNewTicket'}" class="cursor-pointer">
-                <div class="hover:text-gray-900 text-gray-600">Submit a ticket</div>
-            </router-link>
 		</div>
 	</div>
 </template>
