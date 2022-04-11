@@ -12,6 +12,7 @@
 						:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
 						:time="conversation.creation" 
 						:message="conversation.content"
+						:attachments="conversation.attachments"
 						:color="getConversationCardColor(getUserName(conversation))"
 					/>
 					<!-- TODO: dynamically set color based on user -->
@@ -49,7 +50,10 @@ export default {
 				params: {
 					ticket_id: this.ticketId
 				},
-				auto: true
+				auto: true,
+				onSuccess: (data) => {
+					console.log(data)
+				}
 			}
 		},
 	},
