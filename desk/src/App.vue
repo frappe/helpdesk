@@ -1,40 +1,19 @@
 <template>
-	<router-view v-slot="{ Component }">
-		<component :is="Component" />
-	</router-view>
+	<div v-if="!user.loading">
+		<router-view v-slot="{ Component }">
+			<component :is="Component" />
+		</router-view>
+	</div>
 </template>
 
 <script>
 import { provide, ref } from 'vue'
+import { call } from 'frappe-ui'
 
 export default {
 	name: "App",
 	setup() {
-		const user = ref({
-			signup: (fullName, email) => {
-				console.log('signup page')
-			},
-			login: (email, password) => {
-				console.log('signup page')
-			},
-			logout: () => {
-				console.log('logout user')
-			},
-			showLoginPage: () => {
-				// TODO: use frappe build in login redirect with redirect to helpdesk once logged in
-				window.location.replace("/login")
-			},
-			isLoggedIn: () => {
-				const cookie = Object.fromEntries(
-					document.cookie
-						.split('; ')
-						.map(part => part.split('='))
-						.map(d => [d[0], decodeURIComponent(d[1])])
-				)
-
-				return cookie.user_id && cookie.user_id !== 'Guest'
-			}
-		})
+		const user = ref({})
 		
 		provide('user', user)
 		
@@ -45,8 +24,50 @@ export default {
 		return { user }
 	},
 	mounted() {
+		this.user = {
+			signup: async (email, firstName, lastName, password) => {
+				return await this.$resources.signup.submit({
+					email: email,
+					first_name: firstName,
+					last_name: lastName,
+					password: password
+				})
+			},
+			login: async (email, password) => {
+				return await this.$resources.login.submit({
+					usr: email,
+					pwd: password
+				})
+			},
+			logout: async () => {
+				await call('logout')
+				this.$router.push({path: "/helpdesk/login"})
+			},
+			resetPassword: async (email) => {
+				console.log('reset password')
+			},
+			isLoggedIn: () => {
+				const cookie = Object.fromEntries(
+					document.cookie
+						.split('; ')
+						.map(part => part.split('='))
+						.map(d => [d[0], decodeURIComponent(d[1])])
+				)
+
+				return cookie.user_id && cookie.user_id !== 'Guest'
+			},
+			refetch: async (onRefetch = () => {}) => {
+				this.user.loading = true
+				await this.$resources.user.fetch()
+				onRefetch()
+			},
+			loading: true
+		}
+
 		if (this.user.isLoggedIn()) {
 			this.$resources.user.fetch()
+		} else {
+			this.user.loading = false
 		}
 	},
 	resources: {
@@ -57,14 +78,40 @@ export default {
 					const userData = this.$resources.user.data
 					if (userData) {
 						this.user = {...this.user, ...userData}
+						this.user.loading = false
 					}
 				},
 				onFailure: () => {
 					// TODO: check if error occured due to not logged in else handle the error
-					this.user.showLoginPage()
+					this.user.loading = false
+					this.$router.push({name: "PortalLogin"})
 				}
 			}
 		},
+		login() {
+			return {
+				method: 'login',
+				onSuccess: (res) => {
+					if (res) {
+						this.$resources.user.fetch()
+					}
+				},
+				onFailure: (error) => {
+					console.error(error)
+				}
+			};
+		},
+		signup() {
+			return {
+				method: 'helpdesk.api.account.signup',
+				onSuccess: (res) => {
+
+				},
+				onFailure: (error) => {
+					console.error(error)
+				}
+			}
+		}
 	}
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-	<div v-if="user.isLoggedIn()" class="w-screen flex-col">
+	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen flex-col">
 		<div class="h-15">
 			<NavBar />
 		</div>
@@ -80,7 +80,12 @@ export default {
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
-			this.user.showLoginPage()
+			this.$router.push({name: "DeskLogin"})
+			return
+		}
+		if (!this.user.has_desk_access) {
+			this.$router.push({path: "/support/tickets"})
+			return
 		}
 
 		this.ticketController.update = (ticketId) => {
@@ -175,7 +180,7 @@ export default {
 		tickets() {
 			return {
 				method: 'helpdesk.api.ticket.get_tickets',
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					// TODO: do this using an inline method
 					this.tickets = {}
@@ -228,7 +233,7 @@ export default {
 					doctype: 'Ticket Type',
 					pluck: 'name'
 				},
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.ticketTypes = data
 				},
@@ -243,7 +248,7 @@ export default {
 				params: {
 					doctype: 'Ticket Priority',
 				},
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.ticketPriorities = data
 				},
@@ -255,7 +260,7 @@ export default {
 		statuses() {
 			return {
 				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.ticketStatuses = data
 				},
@@ -272,7 +277,7 @@ export default {
 					fields: ['*'],
 					limit_page_length: 0
 				},
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.contacts = data
 				},
@@ -288,7 +293,7 @@ export default {
 					doctype: 'Agent',
 					fields: ['*']
 				},
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.agents = data
 				},
@@ -303,7 +308,7 @@ export default {
 				params: {
 					doctype: 'Agent Group'
 				},
-				auto: true,
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.agentGroups = data
 				},
@@ -402,6 +407,9 @@ export default {
 				}
 			}
 		}
+	},
+	directivs: {
+		
 	}
 }
 </script>

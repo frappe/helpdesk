@@ -14,7 +14,7 @@
 					<div class="p-6 bg-orange-50 border rounded-lg shadow space-y-4">
 						<p class="font-bold text-amber-700">Please login to be able to create tickets</p>
 						<p class="text-amber-700">If you don't already have an account, you can sign up for a new account.</p>
-						<Button appearance="primary" @click="user.showLoginPage()">Login to continue</Button>
+						<Button appearance="primary" @click="this.$router.push({name: 'PortalLogin'})">Login to continue</Button>
 					</div>
 				</div>
 			</div>

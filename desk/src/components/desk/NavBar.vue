@@ -28,7 +28,7 @@
 	</div>
 </template>
 <script>
-import { Avatar, FeatherIcon, Dropdown, call } from 'frappe-ui'
+import { Avatar, FeatherIcon, Dropdown } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { inject } from 'vue'
 
@@ -52,7 +52,7 @@ export default {
 				items.push({
 				label: item,
 					handler: () => {
-						this.logout()
+						this.user.logout()
 					},
 				});
 			});
@@ -61,10 +61,6 @@ export default {
 		routeTo(path) {
 			this.$router.push({path})
 		},
-		async logout() {
-			await call('logout')
-			window.location.replace("/login");
-		}
 	},
 	computed: {
 		breadcrumbs() {

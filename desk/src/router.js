@@ -2,6 +2,35 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
 	{
+		path: '/helpdesk/login',
+		name: 'DeskLogin',
+		component: () => import('@/pages/auth/Login.vue'),
+	},
+	{
+		path: '/support/login',
+		name: 'PortalLogin',
+		component: () => import('@/pages/auth/Login.vue'),
+	},
+	{
+		path: '/helpdesk/signup',
+		name: 'DeskSignup',
+		component: () => import('@/pages/auth/Signup.vue')
+	},
+	{
+		path: '/support/signup',
+		name: 'PortalSignup',
+		component: () => import('@/pages/auth/Signup.vue')
+	},
+	{
+		path: '/support/verify/:requestKey',
+		name: 'Verify Account',
+		component: () =>
+			import(
+				/* webpackChunkName: "setup-account" */ '@/pages/auth/VerifyAccount.vue'
+			),
+		props: true,
+	},
+	{
 		path: '/helpdesk',
 		name: 'Desk',
 		component: () => import('@/pages/desk/Desk.vue'),
