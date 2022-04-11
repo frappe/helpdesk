@@ -45,7 +45,9 @@
 																	{{ file.file_name }}
 																</div>
 																<div>
-																	<FeatherIcon name="x" class="h-3 w-3"/>
+																	<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
+																		attachments = attachments.filter(x => x.name != file.name)
+																	}"/>
 																</div>
 															</div>
 														</div>
@@ -103,7 +105,7 @@
 	</div>
 </template>
 <script>
-import { Badge, Card, Dropdown, Avatar, FileUploader } from 'frappe-ui'
+import { Badge, Card, Dropdown, Avatar, FileUploader, FeatherIcon } from 'frappe-ui'
 import ConversationAndActivities from '@/components/desk/ticket/ConversationAndActivities.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
@@ -120,6 +122,7 @@ export default {
 		Dropdown,
 		Avatar,
 		FileUploader,
+		FeatherIcon,
 		ConversationAndActivities,
 		InfoPanel,
 		ActionPanel,
