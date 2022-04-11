@@ -23,8 +23,13 @@ export default {
 	},
 	mounted() {
 		this.user = {
-			signup: (fullName, email) => {
-				console.log('signup page')
+			signup: async (email, firstName, lastName, password) => {
+			return await this.$resources.signup.submit({
+					email: email,
+					first_name: firstName,
+					last_name: lastName,
+					password: password
+				})
 			},
 			login: async (email, password) => {
 				return await this.$resources.login.submit({
@@ -38,10 +43,6 @@ export default {
 			},
 			resetPassword: async (email) => {
 				console.log('reset password')
-			},
-			showLoginPage: () => {
-				// TODO: use frappe build in login redirect with redirect to helpdesk once logged in
-				window.location.replace("/helpdesk/login")
 			},
 			isLoggedIn: () => {
 				const cookie = Object.fromEntries(
@@ -71,7 +72,7 @@ export default {
 				},
 				onFailure: () => {
 					// TODO: check if error occured due to not logged in else handle the error
-					this.user.showLoginPage()
+					this.$router.push({name: "PortalLogin"})
 				}
 			}
 		},
@@ -84,9 +85,20 @@ export default {
 					}
 				},
 				onFailure: (error) => {
-					console.log(error)
+					console.error(error)
 				}
 			};
+		},
+		signup() {
+			return {
+				method: 'helpdesk.api.account.signup',
+				onSuccess: (res) => {
+
+				},
+				onFailure: (error) => {
+					console.error(error)
+				}
+			}
 		}
 	}
 }

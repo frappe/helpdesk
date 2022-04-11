@@ -80,7 +80,7 @@ export default {
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
-			this.user.showLoginPage()
+			this.$router.push({name: "DeskLogin"})
 		}
 
 		this.ticketController.update = (ticketId) => {
@@ -402,6 +402,9 @@ export default {
 				}
 			}
 		}
+	},
+	directivs: {
+		
 	}
 }
 </script>

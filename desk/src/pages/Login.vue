@@ -6,7 +6,7 @@
 		<form class="space-y-4" @submit.prevent="login">
 			<Input 
 				required 
-				label="Username"
+				label="Email"
 				:type="email !== 'Administrator' ? 'email' : 'text'"
 				v-model="email" 
 				placeholder="johndeo@gmail.com" 
@@ -48,8 +48,11 @@
 							</span>
 						</div>
 					</div>
-					<router-link to="/signup">
-						<div class="text-center text-base">
+					<router-link 
+						class="text-center text-base"
+						:to="`${this.$route.name === 'DeskLogin' ? '/helpdesk' : '/support'}/signup`"
+					>
+						<div>
 							Sign up for a new account
 						</div>
 					</router-link>
