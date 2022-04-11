@@ -19,14 +19,6 @@ class DeskAccountRequest(Document):
 		url = get_url(f"/support/verify/{self.request_key}")
 
 		subject = "Verify your account"
-		# message = f'''
-		# 	Hello Sewe,
-		# 	The verification was successful,
-		# 	Click on this link to create you support ticket
-		# 	<a href="{url}" />
-		# '''
-		
-		print("Sending verification email !!!")
 
 		frappe.sendmail(
 			recipients=self.email,

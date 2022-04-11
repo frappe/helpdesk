@@ -29,15 +29,6 @@
 					class="mb-4"
 					required
 				/>
-				<Input 
-					label="Password"
-					type="password"
-					placeholder="•••••"
-					v-model="password"
-					name="passwordEntry1"
-					autocomplete="current-password"
-					required 
-				/>
 				<ErrorMessage class="mt-4" error="" />
 				<div>
 					<Button appearance="primary" class="w-full mt-4" :loading="false" type="primary"> 
@@ -105,12 +96,11 @@ export default {
 		const email = ref(null)
 		const firstName = ref(null)
 		const lastName = ref(null)
-		const password = ref(null)
 		const emailSent = ref(false)
 
 		const user = inject('user')
 
-		return { email, firstName, lastName, password, emailSent, user }
+		return { email, firstName, lastName, emailSent, user }
 	},
 	async mounted() {
 		if (this.user.isLoggedIn()) {
@@ -123,7 +113,7 @@ export default {
 	},
 	methods: {
 		async signup() {
-			await this.user.signup(this.email, this.firstName, this.lastName, this.password) // TODO: handle error, success and loading responeses
+			await this.user.signup(this.email, this.firstName, this.lastName) // TODO: handle error, success and loading responeses
 			this.emailSent = true
 		}
 	}

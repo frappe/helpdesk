@@ -4,22 +4,31 @@ const routes = [
 	{
 		path: '/helpdesk/login',
 		name: 'DeskLogin',
-		component: () => import('@/pages/Login.vue'),
+		component: () => import('@/pages/auth/Login.vue'),
 	},
 	{
 		path: '/support/login',
 		name: 'PortalLogin',
-		component: () => import('@/pages/Login.vue'),
+		component: () => import('@/pages/auth/Login.vue'),
 	},
 	{
 		path: '/helpdesk/signup',
 		name: 'DeskSignup',
-		component: () => import('@/pages/Signup.vue')
+		component: () => import('@/pages/auth/Signup.vue')
 	},
 	{
 		path: '/support/signup',
 		name: 'PortalSignup',
-		component: () => import('@/pages/Signup.vue')
+		component: () => import('@/pages/auth/Signup.vue')
+	},
+	{
+		path: '/support/verify/:requestKey',
+		name: 'Verify Account',
+		component: () =>
+			import(
+				/* webpackChunkName: "setup-account" */ '@/pages/auth/VerifyAccount.vue'
+			),
+		props: true,
 	},
 	{
 		path: '/helpdesk',
