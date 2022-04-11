@@ -1,7 +1,9 @@
 <template>
-	<router-view v-slot="{ Component }">
-		<component :is="Component" />
-	</router-view>
+	<div v-if="!user.loading">
+		<router-view v-slot="{ Component }">
+			<component :is="Component" />
+		</router-view>
+	</div>
 </template>
 
 <script>
@@ -24,7 +26,7 @@ export default {
 	mounted() {
 		this.user = {
 			signup: async (email, firstName, lastName, password) => {
-			return await this.$resources.signup.submit({
+				return await this.$resources.signup.submit({
 					email: email,
 					first_name: firstName,
 					last_name: lastName,
@@ -39,7 +41,7 @@ export default {
 			},
 			logout: async () => {
 				await call('logout')
-				window.location.replace("/helpdesk/login");
+				this.$router.push({path: "/helpdesk/login"})
 			},
 			resetPassword: async (email) => {
 				console.log('reset password')
@@ -53,11 +55,19 @@ export default {
 				)
 
 				return cookie.user_id && cookie.user_id !== 'Guest'
-			}
+			},
+			refetch: async (onRefetch = () => {}) => {
+				this.user.loading = true
+				await this.$resources.user.fetch()
+				onRefetch()
+			},
+			loading: true
 		}
 
 		if (this.user.isLoggedIn()) {
 			this.$resources.user.fetch()
+		} else {
+			this.user.loading = false
 		}
 	},
 	resources: {
@@ -68,10 +78,12 @@ export default {
 					const userData = this.$resources.user.data
 					if (userData) {
 						this.user = {...this.user, ...userData}
+						this.user.loading = false
 					}
 				},
 				onFailure: () => {
 					// TODO: check if error occured due to not logged in else handle the error
+					this.user.loading = false
 					this.$router.push({name: "PortalLogin"})
 				}
 			}

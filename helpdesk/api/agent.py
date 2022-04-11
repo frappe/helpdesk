@@ -32,11 +32,13 @@ def get_user():
 	session_user = frappe.session.user
 	session_agent = get_session_agent()
 	username = frappe.get_value("User", frappe.session.user, "username")
+	is_admin = username == "administrator"
 	return {
 		'agent': session_agent,
 		'profile_image': frappe.get_value("User", session_user, "user_image"),
 		'username': username,
-		'isAdmin': username == "administrator",
-		'user': frappe.session.user
+		'isAdmin': is_admin,
+		'user': frappe.session.user,
+		'has_desk_access': (session_agent or is_admin)
 	}
 	

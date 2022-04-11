@@ -140,12 +140,18 @@ export default {
 		},
 		redirect() {
 			if (this.redirect_route) {
-				this.$router.push(this.redirect_route)
+				this.user.refetch(() => {
+					this.$router.push(this.redirect_route)
+				})
 			} else {
 				if (this.$route.name == 'DeskLogin') {
-					this.$router.push({ path: '/helpdesk/tickets' })
+					this.user.refetch(() => {
+						this.$router.push({ path: '/helpdesk/tickets' })
+					})
 				} else if (this.$route.name == 'PortalLogin') {
-					this.$router.push({ path: '/support/tickets' })
+					this.user.refetch(() => {
+						this.$router.push({ path: '/support/tickets' })
+					})
 				}
 			}
 		}
