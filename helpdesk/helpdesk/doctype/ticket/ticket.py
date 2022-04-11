@@ -159,7 +159,7 @@ class Ticket(Document):
 			frappe.db.delete("Ticket Activity", activity)
 
 @frappe.whitelist(allow_guest=True)
-def create_communication_via_contact(ticket, message, attachments=None):
+def create_communication_via_contact(ticket, message, attachments=[]):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
 	if ticket_doc.status == 'Replied':
@@ -186,13 +186,11 @@ def create_communication_via_contact(ticket, message, attachments=None):
 	communication.ignore_mandatory = True
 	communication.save(ignore_permissions=True)
 
-	if attachments:
-		attachments = json.loads(attachments)
-		for attachment in attachments:
-			file_doc = frappe.get_doc("File", attachment["name"])
-			file_doc.attached_to_name = communication.name
-			file_doc.attached_to_doctype = "Communication"
-			file_doc.save(ignore_permissions=True)
+	for attachment in attachments:
+		file_doc = frappe.get_doc("File", attachment)
+		file_doc.attached_to_name = communication.name
+		file_doc.attached_to_doctype = "Communication"
+		file_doc.save(ignore_permissions=True)
 
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_agent(ticket, message, attachments=None):
