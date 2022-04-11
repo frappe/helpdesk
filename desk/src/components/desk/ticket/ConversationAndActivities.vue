@@ -22,6 +22,7 @@
 								:time="item.creation" 
 								:message="item.content"
 								:color="getConversationCardColor(getUserName(item))"
+								:attachments="item.attachments"
 								:isLast="index == items.length - 1"
 							/>
 						</div>

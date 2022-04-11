@@ -31,6 +31,35 @@
 								<Avatar :label="user.username" class="cursor-pointer" v-if="user" :imageURL="user.profile_image" size="md" />
 							</div>
 							<div class="grow ml-3">
+								<div class="bg-gray-200 rounded-t-md p-2">
+									<div class="flex flex-row-reverse">
+										<FileUploader @success="(file) => attachments.push(file)">
+											<template
+												v-slot="{ progress, uploading, openFileSelector }"
+											>
+												<div class="flex space-x-2 items-center">
+													<div class="flex space-x-2">
+														<div v-for="file in attachments" :key="file.name">
+															<div class="flex space-x-2 items-center text-base bg-white rounded-md px-3 py-1">
+																<div class="inline-block">
+																	{{ file.file_name }}
+																</div>
+																<div>
+																	<FeatherIcon name="x" class="h-3 w-3"/>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div>
+														<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
+															{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
+														</Button>
+													</div>
+												</div>
+											</template>
+										</FileUploader>
+									</div>
+								</div>
 								<div v-if="editing">
 									<quill-editor 
 										:ref="editor"
@@ -74,7 +103,7 @@
 	</div>
 </template>
 <script>
-import { Badge, Card, Dropdown, Avatar } from 'frappe-ui'
+import { Badge, Card, Dropdown, Avatar, FileUploader } from 'frappe-ui'
 import ConversationAndActivities from '@/components/desk/ticket/ConversationAndActivities.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
@@ -90,6 +119,7 @@ export default {
 		Card,
 		Dropdown,
 		Avatar,
+		FileUploader,
 		ConversationAndActivities,
 		InfoPanel,
 		ActionPanel,
@@ -133,14 +163,16 @@ export default {
 		const tickets = inject('tickets')
 		const ticketController = inject('ticketController')
 		const show = ref('Conversations') // Conversations, Activities, All
-
+		const attachments = ref([])
+		
 		return { 
 			editor,
 			viewportWidth,
 			user,
 			tickets,
 			ticketController,
-			show
+			show,
+			attachments
 		}
 	},
 	resources: {
@@ -150,6 +182,7 @@ export default {
 				onSuccess: () => {
 					var element = document.getElementsByClassName("ql-editor");
 					element[0].innerHTML = "";
+					this.attachments = []
 				}
 			}
 		}
@@ -178,7 +211,8 @@ export default {
 		submitConversation() {
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
-				message: this.content
+				message: this.content,
+				attachments: this.attachments.map(x => x.name)
 			})
 		},
 		getNextTicket() {

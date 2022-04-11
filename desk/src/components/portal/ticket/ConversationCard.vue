@@ -8,20 +8,29 @@
 			</div>
 			<div class="grow rounded p-2 text-base mt-2" :class="`bg-${color}-50`">
 				<span v-html="cleanedMessage"></span>
+				<div v-if="attachments.length > 0" class="flex space-x-2 flex-wrap mt-3">
+					<div v-for="attachment in attachments" :key="attachment">
+						<a :href="attachment.file_url" class="py-1 rounded-sm text-gray-900 hover:underline flex items-center space-x-1">
+							<FeatherIcon name="file" class="h-3 w-3" />
+							<span>{{ attachment.file_name }}</span>
+						</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { Avatar } from 'frappe-ui'
+import { Avatar, FeatherIcon } from 'frappe-ui'
 import { remove_script_and_style } from '@/utils'
 
 export default {
 	name: 'ConversationCard',
-	props: ['userName', 'profilePicUrl', 'time', 'message', 'color'],
+	props: ['userName', 'profilePicUrl', 'time', 'message', 'color', 'attachments'],
 	components: {
-		Avatar
+		Avatar,
+		FeatherIcon
 	},
 	computed: {
 		cleanedMessage() {

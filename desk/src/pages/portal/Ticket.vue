@@ -30,9 +30,38 @@
 				</div>
 				<div
 					v-if="!showReplyButton"
-					class="flex flex-col pr-3 pb-3 pt-1" 
+					class="flex flex-col pr-3 pb-3" 
 				>
 					<div class="grow ml-3">
+						<div class="bg-gray-200 rounded-t-md p-2">
+							<div class="flex flex-row-reverse">
+								<FileUploader @success="(file) => attachments.push(file)">
+									<template
+										v-slot="{ progress, uploading, openFileSelector }"
+									>
+										<div class="flex space-x-2 items-center">
+											<div class="flex space-x-2">
+												<div v-for="file in attachments" :key="file.name">
+													<div class="flex space-x-2 items-center text-base bg-white rounded-md px-3 py-1">
+														<div class="inline-block">
+															{{ file.file_name }}
+														</div>
+														<div>
+															<FeatherIcon name="x" class="h-3 w-3"/>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div>
+												<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
+													{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
+												</Button>
+											</div>
+										</div>
+									</template>
+								</FileUploader>
+							</div>
+						</div>
 						<div v-if="!(['Closed', 'Resolved'].includes(ticket.status))">
 							<quill-editor 
 								:ref="editor"
@@ -65,7 +94,7 @@ import Conversations from "@/components/portal/ticket/Conversations.vue"
 import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
-import { FeatherIcon } from 'frappe-ui'
+import { FeatherIcon, FileUploader } from 'frappe-ui'
 
 export default {
     name: "Tickets",
@@ -74,7 +103,8 @@ export default {
 		Conversations,
 		ActionPanel,
 		QuillEditor,
-		FeatherIcon
+		FeatherIcon,
+		FileUploader
 	},
 	data() {
 		return {
@@ -113,8 +143,9 @@ export default {
         const tickets = inject("tickets")
         const ticketController = inject("ticketController")
 		const showReplyButton = ref(true)
+		const attachments = ref([])
         
-		return { editor, viewportWidth, tickets, ticketController, showReplyButton }
+		return { editor, viewportWidth, tickets, ticketController, showReplyButton, attachments }
     },
     computed: {
         ticket() {
@@ -132,6 +163,7 @@ export default {
 				onSuccess: () => {
 					var element = document.getElementsByClassName("ql-editor");
 					element[0].innerHTML = "";
+					this.attachments = []
 				}
 			}
 		}
@@ -148,7 +180,8 @@ export default {
 		submitConversation() {
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
-				message: this.content
+				message: this.content,
+				attachments: this.attachments.map(x => x.name)
 			})
 		},
 		closeTicket() {
