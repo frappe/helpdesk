@@ -64,13 +64,13 @@ def create_new(values, template='Default'):
 	for field in template_fields:
 		if field.fieldname in ['subject', 'description']:
 			continue
-
-		ticket_doc.append('custom_fields', {
-			'label': field.label,
-			'fieldname': field.fieldname,
-			'value': values[field.fieldname],
-			'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''
-		})
+		if not field.auto_set:
+			ticket_doc.append('custom_fields', {
+				'label': field.label,
+				'fieldname': field.fieldname,
+				'value': values[field.fieldname],
+				'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''
+			})
 
 	ticket_doc.insert(ignore_permissions=True)
 	ticket_doc.create_communication()

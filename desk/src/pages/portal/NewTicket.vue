@@ -6,41 +6,43 @@
 			>
 				<div class="space-y-4 mb-4">
 					<div v-for="field in template.fields" :key="field">
-						<div v-if="field.fieldtype == 'Data'">
-							<Input :label="field.label" type="text" v-model="formData[field.fieldname]" @change="(data) => {validateField(field, data)}"/>
-						</div>
-						<div v-else-if="field.fieldtype == 'Long Text'">
-							<Input :label="field.label" type="textarea" v-model="formData[field.fieldname]" @change="(data) => {validateField(field, data)}"/>
-						</div>
-						<div v-else-if="field.fieldtype == 'Text Editor'">
-							<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
-							<div>
-								<quill-editor  
-									content=""
-									contentType="html" 
-									:options="editorOptions"
-									style="min-height:150px; max-height:200px; overflow-y: auto;"
-									@update:content="(data) => {validateField(field, data)}"
-								/>
+						<div v-if="!field.auto_set">
+							<div v-if="field.fieldtype == 'Data'">
+								<Input :label="field.label" type="text" v-model="formData[field.fieldname]" @change="(data) => {validateField(field, data)}"/>
 							</div>
+							<div v-else-if="field.fieldtype == 'Long Text'">
+								<Input :label="field.label" type="textarea" v-model="formData[field.fieldname]" @change="(data) => {validateField(field, data)}"/>
+							</div>
+							<div v-else-if="field.fieldtype == 'Text Editor'">
+								<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
+								<div>
+									<quill-editor  
+										content=""
+										contentType="html" 
+										:options="editorOptions"
+										style="min-height:150px; max-height:200px; overflow-y: auto;"
+										@update:content="(data) => {validateField(field, data)}"
+									/>
+								</div>
+							</div>
+							<div v-else-if="field.fieldtype == 'Link'">
+								<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
+								<Dropdown
+									v-if="linkedFieldOptions[field.options]"
+									:options="linkedFieldOptions[field.options]"
+									placement="left" 
+									:dropdown-width-full="true"
+									@change="(data) => {validateField(field, data)}"
+								>
+									<template v-slot="{ toggleDropdown }">
+										<div>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Choose' }}</Button>
+										</div>
+									</template>
+								</Dropdown>
+							</div>
+							<ErrorMessage v-if="validationErrors[field.fieldname]" class="mt-1" :message="validationErrors[field.fieldname]" />
 						</div>
-						<div v-else-if="field.fieldtype == 'Link'">
-							<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
-							<Dropdown
-								v-if="linkedFieldOptions[field.options]"
-								:options="linkedFieldOptions[field.options]"
-								placement="left" 
-								:dropdown-width-full="true"
-								@change="(data) => {validateField(field, data)}"
-							>
-								<template v-slot="{ toggleDropdown }">
-									<div>
-										<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Choose' }}</Button>
-									</div>
-								</template>
-							</Dropdown>
-						</div>
-						<ErrorMessage v-if="validationErrors[field.fieldname]" class="mt-1" :message="validationErrors[field.fieldname]" />
 					</div>
 				</div>
 				<div class="flex space-x-2 mb-1">
