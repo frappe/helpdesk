@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe.website.utils import cleanup_page_name
+from frappe.utils.safe_exec import safe_exec
 
 class TicketTemplate(Document):
 	def validate(self):
@@ -26,3 +27,25 @@ class TicketTemplate(Document):
 
 	def before_save(self):
 		self.template_route = cleanup_page_name(self.template_name)
+
+	def on_change(self):
+		refresh_server_script()
+
+def refresh_server_script():
+	all_ticket_templates = frappe.get_all("Ticket Template")
+
+	snippets = []
+	for template in all_ticket_templates:
+		template_doc = frappe.get_doc("Ticket Template", template)
+		flag = False
+		for field in template_doc.fields:
+			if field.auto_set:
+				if not flag:
+					snippets.append(f"if doc.template == '{template.name}':")
+					flag = True
+				snippets.append("\tdoc.append('custom_fields', {'label': '%s', 'fieldname': '%s', 'value': %s})" % (field.label, field.fieldname, f"{field.value}"))
+
+	server_script = frappe.get_doc("Server Script", "Ticket Auto Set Custom Fields")
+	server_script.script = '\n'.join(snippets) if len(snippets) > 0 else '# Do Nothing'
+	server_script.save()
+

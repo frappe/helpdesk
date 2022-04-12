@@ -34,12 +34,12 @@
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Custom Fields",
-   "options": "DocField"
+   "options": "Ticket Template DocField"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-29 22:10:38.907126",
+ "modified": "2022-04-11 23:31:51.523691",
  "modified_by": "Administrator",
  "module": "HelpDesk",
  "name": "Ticket Template",
