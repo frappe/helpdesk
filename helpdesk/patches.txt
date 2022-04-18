@@ -7,3 +7,4 @@ helpdesk.patches.add_default_ticket_priorities
 helpdesk.patches.add_default_agent_groups
 helpdesk.patches.add_default_role_profiles
 helpdesk.patches.add_system_manager_role_in_agent_profile
+helpdesk.patches.add_on_ticket_create_script
