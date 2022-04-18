@@ -11,6 +11,7 @@ def after_install():
 	add_default_sla()
 	add_default_ticket_template()
 	add_default_agent_groups()
+	add_on_ticket_create_script()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
@@ -209,3 +210,14 @@ def add_default_agent_groups():
 			agent_group_doc = frappe.new_doc("Agent Group")
 			agent_group_doc.team_name = agent_group
 			agent_group_doc.insert()
+
+def add_on_ticket_create_script():
+	if not frappe.db.exists("Server Script", "Ticket Auto Set Custom Fields"):
+		script_doc = frappe.new_doc("Server Script")
+		script_doc.name = "Ticket Auto Set Custom Fields"
+		script_doc.script_type = "DocType Event"
+		script_doc.module = "HelpDesk"
+		script_doc.reference_doctype = "Ticket"
+		script_doc.doctype_event = "Before Insert"
+		script_doc.script = "# Do Nothing"
+		script_doc.insert()
