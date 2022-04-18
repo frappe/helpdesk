@@ -408,7 +408,9 @@ export default {
 			}
 		},
 		redirectToRoute(route) {
-			window.location.href = route
+			if (route) {
+				window.location.href = route
+			}
 		},
 		getFormatedDate(date, format) {
 			return date ? this.$dayjs(date).format(format) : ''
