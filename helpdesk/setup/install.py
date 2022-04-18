@@ -9,9 +9,9 @@ def after_install():
 	add_default_ticket_types()
 	add_default_ticket_priorities()
 	add_default_sla()
+	add_on_ticket_create_script()
 	add_default_ticket_template()
 	add_default_agent_groups()
-	add_on_ticket_create_script()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
