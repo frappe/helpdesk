@@ -229,12 +229,12 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		
 		_attachments.append({'file_url': file_doc.file_url})
 
-	print(_attachments)
-
 	if frappe.db.exists("Email Account", {"default_outgoing": "1"}):
+		reply_to_email = frappe.get_value("Email Account", {"default_outgoing": "1"}, "email_id")
 		frappe.sendmail(
 			subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
-			sender=frappe.session.user,
+			sender=f"{frappe.session.user} <{reply_to_email}>",
+			reply_to=reply_to_email,
 			message=message,
 			recipients=[ticket_doc.raised_by],
 			reference_doctype='Ticket',
