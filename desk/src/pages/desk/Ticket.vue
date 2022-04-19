@@ -31,38 +31,38 @@
 								<Avatar :label="user.username" class="cursor-pointer" v-if="user" :imageURL="user.profile_image" size="md" />
 							</div>
 							<div class="grow ml-3">
-								<div class="bg-gray-200 rounded-t-md p-2">
-									<div class="flex flex-row-reverse">
-										<FileUploader @success="(file) => attachments.push(file)">
-											<template
-												v-slot="{ progress, uploading, openFileSelector }"
-											>
-												<div class="flex space-x-2 items-center">
-													<div class="flex space-x-2">
-														<div v-for="file in attachments" :key="file.name">
-															<div class="flex space-x-2 items-center text-base bg-white rounded-md px-3 py-1">
-																<div class="inline-block">
-																	{{ file.file_name }}
-																</div>
-																<div>
-																	<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
-																		attachments = attachments.filter(x => x.name != file.name)
-																	}"/>
+								<div v-if="editing">
+									<div class="bg-gray-200 rounded-t-md p-2">
+										<div class="flex flex-row-reverse">
+											<FileUploader @success="(file) => attachments.push(file)">
+												<template
+													v-slot="{ progress, uploading, openFileSelector }"
+												>
+													<div class="flex space-x-2 items-center">
+														<div class="flex space-x-2">
+															<div v-for="file in attachments" :key="file.name">
+																<div class="flex space-x-2 items-center text-base bg-white rounded-md px-3 py-1">
+																	<div class="inline-block">
+																		{{ file.file_name }}
+																	</div>
+																	<div>
+																		<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
+																			attachments = attachments.filter(x => x.name != file.name)
+																		}"/>
+																	</div>
 																</div>
 															</div>
 														</div>
+														<div>
+															<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
+																{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
+															</Button>
+														</div>
 													</div>
-													<div>
-														<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
-															{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
-														</Button>
-													</div>
-												</div>
-											</template>
-										</FileUploader>
+												</template>
+											</FileUploader>
+										</div>
 									</div>
-								</div>
-								<div v-if="editing">
 									<quill-editor 
 										:ref="editor"
 										v-model:content="content" 
@@ -75,7 +75,7 @@
 											:loading="this.$resources.submitConversation.loading" 
 											@click="this.submitConversation" 
 											appearance="primary" 
-											:disabled="!user.agent && !user.isAdmin"
+											:disabled="(!user.agent && !user.isAdmin) || sendButtonDissabled"
 										>
 											Send
 										</Button>
@@ -193,6 +193,10 @@ export default {
 	computed: {
 		ticket() {
 			return this.tickets[this.ticketId] || null
+		},
+		sendButtonDissabled() {
+			let content = this.content.trim()
+			return (content == "" || content == "<p><br></p>") && this.attachments.length == 0
 		}
 	},
 	methods: {
