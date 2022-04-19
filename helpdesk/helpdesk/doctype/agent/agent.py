@@ -6,8 +6,9 @@ from frappe.model.document import Document
 
 class Agent(Document):
 	def before_save(self):
+		self.name = self.user
 		self.set_user_roles()
-	
+
 	def set_user_roles(self):
 		user = frappe.get_doc("User", self.user)
 		for role in ["Agent", "System Manager"]:
