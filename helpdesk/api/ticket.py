@@ -133,6 +133,7 @@ def assign_ticket_type(ticket_id, type):
 		
 		if ticket_doc.ticket_type != type:
 			ticket_doc.ticket_type = check_and_create_ticket_type(type).name
+			ticket_doc.update_priority_based_on_ticket_type()
 			ticket_doc.save()
 			log_ticket_activity(ticket_id, f"Type set to {type}")
 
