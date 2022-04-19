@@ -8,7 +8,7 @@ from frappe.utils.safe_exec import safe_exec
 
 class TicketTemplate(Document):
 	def validate(self):
-		allowed_field_types = ['Data', 'Link', 'Long Text', 'Text Editor']
+		allowed_field_types = ['Data', 'Link', 'Long Text', 'Text Editor', 'Select']
 
 		for field in self.fields:
 			if field.fieldtype not in allowed_field_types:
