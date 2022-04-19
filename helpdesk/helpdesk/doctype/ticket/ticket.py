@@ -14,7 +14,6 @@ from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
-from frappe.website.utils import cleanup_page_name
 from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
 from helpdesk.helpdesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
 
@@ -34,6 +33,9 @@ class Ticket(Document):
 
 		self.set_contact(self.raised_by)
 
+	def before_insert(self):
+		self.update_priority_based_on_ticket_type()
+
 	def after_insert(self):
 		log_ticket_activity(self.name, "Create")
 
@@ -42,6 +44,13 @@ class Ticket(Document):
 		if self.flags.create_communication and self.via_customer_portal:
 			self.create_communication()
 			self.flags.communication_created = None
+
+	def update_priority_based_on_ticket_type(self):
+		if (self.ticket_type):
+			ticket_type_doc = frappe.get_doc("Ticket Type", self.ticket_type)
+			if (ticket_type_doc.priority):
+				self.priority = ticket_type_doc.priority
+				self.save()
 
 	def set_contact(self, email_id, save=False):
 		import email.utils
