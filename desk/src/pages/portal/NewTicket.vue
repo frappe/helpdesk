@@ -41,6 +41,22 @@
 									</template>
 								</Dropdown>
 							</div>
+							<div v-else-if="field.fieldtype == 'Select'">
+								<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
+								<Dropdown
+									v-if="getSelectFieldOptions(field)"
+									:options="getSelectFieldOptions(field)"
+									placement="left" 
+									:dropdown-width-full="true"
+									@change="(data) => {validateField(field, data)}"
+								>
+									<template v-slot="{ toggleDropdown }">
+										<div>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Choose' }}</Button>
+										</div>
+									</template>
+								</Dropdown>
+							</div>
 							<ErrorMessage v-if="validationErrors[field.fieldname]" class="mt-1" :message="validationErrors[field.fieldname]" />
 						</div>
 					</div>
@@ -174,6 +190,18 @@ export default {
 					this.setLinkOptions(field)
 				}
 			}
+		},
+		getSelectFieldOptions(field) {
+			let items = []
+			field.options.split('\n').forEach((option) => {
+				items.push({
+					label: option,
+					handler: () => {
+						this.formData[field.fieldname] = option
+					}
+				})
+			})
+			return items
 		},
 		async setLinkOptions(field) {
 			let doctype = field.options
