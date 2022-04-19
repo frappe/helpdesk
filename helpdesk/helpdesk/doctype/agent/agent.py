@@ -6,10 +6,14 @@ from frappe.model.document import Document
 
 class Agent(Document):
 	def before_save(self):
+		self.set_user_roles()
+	
+	def set_user_roles(self):
 		user = frappe.get_doc("User", self.user)
-		self.name = user.name
-
-		user.role_profile_name = "Agent"
+		for role in ["Agent", "System Manager"]:
+			user.append("roles", {
+				"role": role
+			})
 		user.save()
 
 @frappe.whitelist()
@@ -32,5 +36,3 @@ def create_agent(first_name, last_name, email, signature, team):
 		"user": user.name,
 		"group": team
 	}).insert()
-
-	return agent
