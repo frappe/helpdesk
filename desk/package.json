@@ -14,19 +14,19 @@
 		"@tiptap/starter-kit": "^2.0.0-beta.183",
 		"@tiptap/vue-3": "^2.0.0-beta.90",
 		"@vueup/vue-quill": "^1.0.0-beta.8",
-		"dayjs": "^1.11.0",
-		"feather-icons": "^4.28.0",
+		"dayjs": "^1.11.1",
+		"feather-icons": "^4.29.0",
 		"frappe-ui": "0.0.11",
-		"luxon": "^2.3.1",
-		"sass": "^1.49.9",
-		"vue": "^3.2.31",
+		"luxon": "^2.3.2",
+		"sass": "^1.50.1",
+		"vue": "^3.2.33",
 		"vue-router": "^4.0.14"
 	},
 	"devDependencies": {
-		"@vitejs/plugin-vue": "^2.2.4",
+		"@vitejs/plugin-vue": "^2.3.1",
 		"autoprefixer": "^10.4.4",
 		"postcss": "^8.4.12",
-		"tailwindcss": "^3.0.23",
-		"vite": "^2.8.6"
+		"tailwindcss": "^3.0.24",
+		"vite": "^2.9.5"
 	}
 }
