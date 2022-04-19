@@ -12,6 +12,7 @@ def after_install():
 	add_on_ticket_create_script()
 	add_default_ticket_template()
 	add_default_agent_groups()
+	update_agent_role_permissions()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
@@ -221,3 +222,18 @@ def add_on_ticket_create_script():
 		script_doc.doctype_event = "Before Insert"
 		script_doc.script = "# Do Nothing"
 		script_doc.insert()
+
+def update_agent_role_permissions():
+	if (frappe.db.exists("Role", "Agent")):
+		agent_role_doc = frappe.get_doc("Role", "Agent")
+		agent_role_doc.search_bar = True
+		agent_role_doc.notifications = True
+		agent_role_doc.list_sidebar = True
+		agent_role_doc.bulk_actions = True
+		agent_role_doc.view_switcher = True
+		agent_role_doc.form_sidebar = True
+		agent_role_doc.form_sidebar = True
+		agent_role_doc.timeline = True
+		agent_role_doc.dashboard = True
+		agent_role_doc.save()
+
