@@ -166,7 +166,7 @@ export default {
 	resources: {
 		submitConversation() {
 			return {
-				method: 'helpdesk.api.ticket.submit_conversation_via_contact',
+				method: 'frappedesk.api.ticket.submit_conversation_via_contact',
 				onSuccess: () => {
 					var element = document.getElementsByClassName("ql-editor");
 					element[0].innerHTML = "";

@@ -73,7 +73,7 @@ export default {
 	resources: {
 		user() {
 			return {
-				method: 'helpdesk.api.agent.get_user',
+				method: 'frappedesk.api.agent.get_user',
 				onSuccess: () => {
 					const userData = this.$resources.user.data
 					if (userData) {
@@ -103,7 +103,7 @@ export default {
 		},
 		signup() {
 			return {
-				method: 'helpdesk.api.account.signup',
+				method: 'frappedesk.api.account.signup',
 				onSuccess: (res) => {
 
 				},

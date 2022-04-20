@@ -2,7 +2,7 @@
 	<div class="p-5">
 		<div class="flex">
 			<div>
-				Please login to access the helpdesk
+				Please login to access frappedesk
 			</div>
 			<div class="ml-2">
 				<Button @click="login">Login</Button>

@@ -80,7 +80,7 @@ export default {
 	resources: {
 		tickets() {
 			return {
-				method: "helpdesk.helpdesk.doctype.ticket.ticket.get_user_tickets",
+				method: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
 				auto: true,
 				onSuccess: (data) => {
 					this.tickets = {};
@@ -95,7 +95,7 @@ export default {
 		},
 		ticket() {
 			return {
-				method: "helpdesk.api.ticket.get_ticket",
+				method: "frappedesk.api.ticket.get_ticket",
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket;
 				},
@@ -106,7 +106,7 @@ export default {
 		},
 		statuses() {
 			return {
-				method: "helpdesk.api.ticket.get_all_ticket_statuses",
+				method: "frappedesk.api.ticket.get_all_ticket_statuses",
 				auto: true,
 				onSuccess: (data) => {
 					this.ticketStatuses = data;
@@ -118,7 +118,7 @@ export default {
 		},
 		templates() {
 			return {
-				method: "helpdesk.api.ticket.get_all_ticket_templates",
+				method: "frappedesk.api.ticket.get_all_ticket_templates",
 				auto: true,
 				onSuccess: (data) => {
 					this.ticketTemplates = data;
@@ -130,7 +130,7 @@ export default {
 		},
 		assignTicketStatus() {
 			return {
-				method: "helpdesk.api.ticket.assign_ticket_status",
+				method: "frappedesk.api.ticket.assign_ticket_status",
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name);
 				},
@@ -141,7 +141,7 @@ export default {
 		},
 		createTicket() {
 			return {
-				method: "helpdesk.api.ticket.create_new",
+				method: "frappedesk.api.ticket.create_new",
 				onSuccess: (ticket) => {
 					this.ticketController.update();
 					this.$router.push({

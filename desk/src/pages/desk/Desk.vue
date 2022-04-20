@@ -179,7 +179,7 @@ export default {
 	resources: {
 		tickets() {
 			return {
-				method: 'helpdesk.api.ticket.get_tickets',
+				method: 'frappedesk.api.ticket.get_tickets',
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					// TODO: do this using an inline method
@@ -195,7 +195,7 @@ export default {
 		},
 		ticket() {
 			return {
-				method: 'helpdesk.api.ticket.get_ticket',
+				method: 'frappedesk.api.ticket.get_ticket',
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket
 				},
@@ -206,7 +206,7 @@ export default {
 		},
 		createTicket() {
 			return {
-				method: 'helpdesk.api.ticket.create_new',
+				method: 'frappedesk.api.ticket.create_new',
 				onSuccess: () => {
 					this.ticketController.update()
 				},
@@ -217,7 +217,7 @@ export default {
 		},
 		updateTicketContact() {
 			return {
-				method: 'helpdesk.api.ticket.update_contact',
+				method: 'frappedesk.api.ticket.update_contact',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -259,7 +259,7 @@ export default {
 		},
 		statuses() {
 			return {
-				method: 'helpdesk.api.ticket.get_all_ticket_statuses',
+				method: 'frappedesk.api.ticket.get_all_ticket_statuses',
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.ticketStatuses = data
@@ -319,7 +319,7 @@ export default {
 		},
 		assignTicketToAgent() {
 			return {
-				method: 'helpdesk.api.ticket.assign_ticket_to_agent',
+				method: 'frappedesk.api.ticket.assign_ticket_to_agent',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -330,7 +330,7 @@ export default {
 		},
 		bulkAssignTicketToAgent() {
 			return {
-				method: 'helpdesk.api.ticket.bulk_assign_ticket_to_agent',
+				method: 'frappedesk.api.ticket.bulk_assign_ticket_to_agent',
 				onSuccess: (ticket) => {
 					// TODO: do bulk update
 					this.ticketController.update()
@@ -342,7 +342,7 @@ export default {
 		},
 		assignTicketType() {
 			return {
-				method: 'helpdesk.api.ticket.assign_ticket_type',
+				method: 'frappedesk.api.ticket.assign_ticket_type',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -353,7 +353,7 @@ export default {
 		},
 		assignTicketStatus() {
 			return {
-				method: 'helpdesk.api.ticket.assign_ticket_status',
+				method: 'frappedesk.api.ticket.assign_ticket_status',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -364,7 +364,7 @@ export default {
 		},
 		bulkAssignTicketStatus() {
 			return {
-				method: 'helpdesk.api.ticket.bulk_assign_ticket_status',
+				method: 'frappedesk.api.ticket.bulk_assign_ticket_status',
 				onSuccess: (tickets) => {
 					// TODO: do bulk update for tickets
 					this.ticketController.update()
@@ -376,7 +376,7 @@ export default {
 		},
 		assignTicketPriority() {
 			return {
-				method: 'helpdesk.api.ticket.assign_ticket_priority',
+				method: 'frappedesk.api.ticket.assign_ticket_priority',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -387,7 +387,7 @@ export default {
 		},
 		assignTicketGroup() {
 			return {
-				method: 'helpdesk.api.ticket.assign_ticket_group',
+				method: 'frappedesk.api.ticket.assign_ticket_group',
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -398,7 +398,7 @@ export default {
 		},
 		createTicketType() {
 			return {
-				method: 'helpdesk.api.ticket.check_and_create_ticket_type',
+				method: 'frappedesk.api.ticket.check_and_create_ticket_type',
 				onSuccess: () => {
 					this.$resources.types.fetch();
 				},

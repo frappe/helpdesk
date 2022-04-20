@@ -98,7 +98,7 @@ export default {
 	resources: {
 		createAgent() {
 			return {
-				method: 'helpdesk.helpdesk.doctype.agent.agent.create_agent',
+				method: 'frappedesk.frappedesk.doctype.agent.agent.create_agent',
 				onSuccess(data) {
 					this.emailId = ''
 					this.firstName = ''

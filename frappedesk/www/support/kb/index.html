@@ -1,0 +1,78 @@
+{% extends "templates/kb_base_template.html" %}
+
+{% block page_content %}
+<div class="container my-40 d-flex justify-content-center">
+	<div class="col-12 col-sm-10 col-md-8 col-lg-6">
+		<div class="justify-content-center d-flex">
+			<h1 class="title">{{ _("How can we help you?") }}</h1>
+		</div>
+		<input style="height:50px" id="propSearchBar" autocomplete="off" class="form-control rounded-pill px-6" type="text" placeholder="Search support articles" maxlength="0">
+	</div>
+</div>
+
+<div class="explore-kb-container w-100 pt-10 pb-8">
+	<div class="justify-content-center d-flex mb-5">
+		<div>
+			<h2 class="">{{ _("Explore the Knowledge Base") }}</h2>
+		</div>
+	</div>
+	<div class="category-card-container container">
+		<div class="d-flex flex-wrap mx-sm-0 mx-md-5 mx-lg-20">
+			{% for category in categories %}
+			<div class="category-card card col-12 col-sm-12 col-md-6 col-lg-4" data-value="{{category.name}}">
+				<div class="card-body">
+					<div class="d-flex">
+						<h3 class="card-title">{{ category.category_name }}</h3>
+						<i class="pl-2 bi bi-chevron-right"></i>
+					</div>
+					<p class="card-text">{{ category.description or '' }}</p>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</div>
+
+<style>
+	.explore-kb-container {
+		background-color: #F4F5F6;
+	}
+	.card{
+		box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 0 2px rgba(0,0,0,.03);
+		transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s box-shadow,.3s -webkit-transform cubic-bezier(.155,1.105,.295,1.12);
+		cursor: pointer;
+	}
+	.card:hover{
+		box-shadow: 0 2px 5px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05);
+	}
+
+	.category-card {
+		box-sizing: border-box;
+		flex: 250px;
+		margin: 1rem;
+		padding: 1rem;
+	}
+</style>
+
+<script>
+	frappe.ready(function() {
+		$(".category-card").click(function() {
+			let category = this.getAttribute("data-value");
+			console.log('button clicked');
+			
+			frappe.call({
+				btn: this,
+				method: "frappedesk.www.support.kb.index.get_category_website_route",
+				args: {
+					category: category
+				},
+				callback: function(r) {
+					console.log(r);
+					window.open(`/${r.message.route}`, '_self')
+				}
+			})
+		});
+	})
+</script>
+
+{% endblock %}
