@@ -25,11 +25,11 @@
 				<div class="overflow-auto grow">
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 				</div>
-				<div v-if="showReplyButton" class="mt-5 ml-9">
-					<Button @click="() => {showReplyButton = false; delayedConversationScroll()}" appearance="primary">Reply</Button>
+				<div v-if="!editing" class="mt-5 ml-9">
+					<Button @click="startEditing()" appearance="primary">Reply</Button>
 				</div>
 				<div
-					v-if="!showReplyButton"
+					v-if="editing"
 					class="flex flex-col pr-3 pb-3" 
 				>
 					<div class="grow ml-3">
@@ -71,6 +71,7 @@
 								contentType="html" 
 								:options="editorOptions"
 								style="min-height:150px; max-height:200px; overflow-y: auto;"
+								@click="focusEditor()"
 							/>
 							<div class="mt-2 space-x-2 flex">
 								<Button 
@@ -81,7 +82,7 @@
 								>
 									Send
 								</Button>
-								<Button @click="() => {showReplyButton = true}">Cancel</Button>
+								<Button @click="() => {editing = false}">Cancel</Button>
 							</div>
 						</div>
 					</div>
@@ -145,10 +146,9 @@ export default {
 		const viewportWidth = inject("viewportWidth")
         const tickets = inject("tickets")
         const ticketController = inject("ticketController")
-		const showReplyButton = ref(true)
 		const attachments = ref([])
         
-		return { editor, viewportWidth, tickets, ticketController, showReplyButton, attachments }
+		return { editor, viewportWidth, tickets, ticketController, attachments }
     },
     computed: {
         ticket() {
@@ -176,6 +176,17 @@ export default {
 		}
 	},
 	methods: {
+		startEditing() {
+			this.editing = true
+			this.delayedConversationScroll()
+			this.$nextTick(() => {
+				this.focusEditor()
+			})
+		},
+		focusEditor() {
+			var element = document.getElementsByClassName("ql-editor");
+			element[0].focus() // TODO: focus the cursor to the end of the text
+		},
 		delayedConversationScroll() {
 			function delay(time) {
 				return new Promise(resolve => setTimeout(resolve, time));

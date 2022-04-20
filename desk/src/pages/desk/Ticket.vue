@@ -69,6 +69,7 @@
 										contentType="html" 
 										:options="editorOptions"
 										style="min-height:150px; max-height:200px; overflow-y: auto;"
+										@click="focusEditor()"
 									/>
 									<div class="mt-2 space-x-2">
 										<Button 
@@ -203,6 +204,13 @@ export default {
 		startEditing() {
 			this.editing = true
 			this.delayedConversationScroll()
+			this.$nextTick(() => {
+				this.focusEditor()
+			})
+		},
+		focusEditor() {
+			var element = document.getElementsByClassName("ql-editor");
+			element[0].focus() // TODO: focus the cursor to the end of the text
 		},
 		cancelEditing() {
 			this.editing = false
