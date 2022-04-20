@@ -22,6 +22,8 @@
 										:options="editorOptions"
 										style="min-height:150px; max-height:200px; overflow-y: auto;"
 										@update:content="(data) => {validateField(field, data)}"
+										@click="focusEditor(field)"
+										:class="`text-editor-${field.fieldname}`"
 									/>
 								</div>
 							</div>
@@ -146,6 +148,10 @@ export default {
 
 	},
 	methods: {
+		focusEditor(field) {
+			const element = document.getElementsByClassName(`text-editor-${field.fieldname}`)
+			element[0].getElementsByClassName("ql-editor")[0].focus()
+		},
 		submitTicket() {
 			if (this.validateTicketForm()) {
 				this.newTicketSubmitLoading = this.ticketController.newTicket(this.formData, this.template.name)
