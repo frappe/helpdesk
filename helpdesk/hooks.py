@@ -32,7 +32,12 @@ scheduler_events = {
 	"daily": [
 		"helpdesk.helpdesk.doctype.ticket.ticket.auto_close_tickets",
 		"helpdesk.helpdesk.doctype.service_level_agreement.service_level_agreement.check_agreement_status",
-	]
+	],
+	"cron": {
+		"* * * * * 0/5": [
+			"helpdesk.overrides.pull_support_emails"
+		]
+	}
 }
 
 website_route_rules = [
