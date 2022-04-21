@@ -52,7 +52,7 @@
 				<div>
 					<Avatar :label="user.username" class="cursor-pointer h-[31px] w-[31px]" v-if="user" :imageURL="user.profile_image" />
 				</div>
-				<span class="truncate">{{ user.user }}</span>
+				<span class="truncate">{{ user.agent ? user.agent.agent_name : user.user }}</span>
 			</div>
 		</div>
 	</div>
