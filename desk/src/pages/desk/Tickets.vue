@@ -2,22 +2,6 @@
 	<div>
 		<div class="flow-root pt-3 pb-5 pr-8 pl-4">
 			<div class="float-left">
-				<div v-if="ticketFilterDropdownOptions().length > 0">
-					<Dropdown
-							placement="left"
-							:options="ticketFilterDropdownOptions()"
-						>
-						<template v-slot="{ toggleDropdown }"> 
-							<div class="flex items-center cursor-pointer" @click="toggleDropdown">
-								<div class="text-xl font-semibold">
-									{{ this.ticketFilter }}
-								</div>
-								<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
-							</div>
-						</template>
-					</Dropdown>
-				</div>
-				<div v-else class="text-xl font-semibold">All Tickets</div>
 			</div>
 			<div class="float-right">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
@@ -124,12 +108,23 @@ export default {
 			ticketController
 		}
 	},
+	mounted() {
+		this.syncFilterBasedOnTicketFilter(this.ticketFilter)
+	},
+	computed: {
+		showTicketBluckUpdatePanel() {
+			return this.selectedTickets.length > 0
+		}
+	},
 	watch: {
+		ticketFilter(newValue) {
+			this.syncFilterBasedOnTicketFilter(newValue)
+		},
 		filters(newValue) {
 			let filter = newValue.find(x => Object.keys(x)[0] === 'assignee')
 			if (filter && this.user.agent) {
 				if (Object.values(filter)[0] === this.user.agent.name) {
-					this.ticketFilter = "Assigned to me"
+					this.ticketFilter = "Assigned Tickets"
 				} else {
 					this.ticketFilter = "All Tickets"
 				}
@@ -138,27 +133,14 @@ export default {
 			}
 		}
 	},
-	computed: {
-		showTicketBluckUpdatePanel() {
-			return this.selectedTickets.length > 0
-		}
-	},
 	methods: {
-		ticketFilterDropdownOptions() {
-			let items = [];
-			(this.user.agent ? ["All Tickets", "Assigned to me"] : []).forEach(filter => {
-				items.push({
-					label: filter,
-					handler: () => {
-						this.ticketFilter = filter;
-						this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
-						if (filter == 'Assigned to me') {
-							this.filters.push({assignee: this.user.agent.name})
-						}
-					}
-				});
-			});
-			return items;
+		syncFilterBasedOnTicketFilter(newTicketFilterValue) {
+			this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
+			switch(newTicketFilterValue) {
+				case 'Assigned Tickets':
+					this.filters.push({assignee: this.user.agent.name})
+					break;
+			}
 		},
 		toggleSort(sortby) {
 			if (this.sortby != sortby) {

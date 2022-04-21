@@ -73,14 +73,17 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
+		
 		const user = inject('user')
+
+		const ticketFilter = inject('ticketFilter')
 
 		const iconHeight = ref(30)
 		const iconWidth = ref(30)
 
 		const options = ref()
 
-		return { viewportWidth, user, iconHeight, iconWidth, options }
+		return { viewportWidth, user, ticketFilter, iconHeight, iconWidth, options }
 	},
 	mounted() {
 		this.options = [
@@ -94,22 +97,9 @@ export default {
 						action: () => {
 							this.select('All Tickets')
 							this.$router.push({path: '/frappedesk/tickets'})
+							this.ticketFilter = 'All Tickets'
 						}
 					},	// TODO: only add assigned and unassigend tickets if the user is a agent
-					{
-						label: 'Assigned Tickets',
-						action: () => {
-							this.select('Assigned Tickets')
-							this.$router.push({path: '/frappedesk/tickets'})
-						}
-					},
-					{
-						label: 'Unassigned Tickets',
-						action: () => {
-							this.select('Unassigned Tickets')
-							this.$router.push({path: '/frappedesk/tickets'})
-						}
-					}
 				]
 			},
 			{
@@ -158,6 +148,27 @@ export default {
 			}
 		]
 
+		if (this.user.agent) {
+			this.options.find(option => option.label == 'Ticketing').children.push(...[
+				{
+					label: 'Assigned Tickets',
+					action: () => {
+						this.select('Assigned Tickets')
+						this.$router.push({path: '/frappedesk/tickets'})
+						this.ticketFilter = 'Assigned Tickets'
+					}
+				},
+				{
+					label: 'Unassigned Tickets',
+					action: () => {
+						this.select('Unassigned Tickets')
+						this.$router.push({path: '/frappedesk/tickets'})
+						this.ticketFilter = 'Unassigned Tickets'
+					}
+				}
+			])
+		}
+
 
 		// When the page is refreshed / opened the selected side bar option will  be set 
 		if (this.$route.path.includes('frappedesk/tickets')) {
@@ -170,6 +181,11 @@ export default {
 			this.select('Contacts')
 		} else if (this.$route.path.includes('frappedesk/settings')) {
 			this.select('Settings')
+		}
+	},
+	watch: {
+		ticketFilter(newValue) {
+			this.select(newValue)
 		}
 	},
 	methods: {

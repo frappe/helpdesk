@@ -49,11 +49,10 @@ export default {
 		ComboboxOption
 	},
 	setup() {
-		const ticketFilter = inject('ticketFilter')
 		const tempFilters = ref([])	//TODO: use this list to create the final filters when apply is triggered
 		const query = ref({})
 
-		return { ticketFilter, tempFilters, query }
+		return { tempFilters, query }
 	},
 	mounted() {
 		this.tempFilters = []
