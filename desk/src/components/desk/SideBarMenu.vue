@@ -24,7 +24,7 @@
 						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
 						<span class="grow">{{ option.label }}</span>
 						<div v-if="option.children" class="pr-[17.81px]">
-							<FeatherIcon class="w-4 fill-gray-400 stroke-transparent" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
+							<CustomIcons class="h-[6px] fill-gray-400 stroke-transparent" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
 						</div>
 					</div>
 				</div>
@@ -60,14 +60,13 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { FeatherIcon, Dropdown, Avatar } from 'frappe-ui'
+import { Dropdown, Avatar } from 'frappe-ui'
 import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
 	components: {
 		CustomIcons,
-		FeatherIcon,
 		Dropdown,
 		Avatar
 	},

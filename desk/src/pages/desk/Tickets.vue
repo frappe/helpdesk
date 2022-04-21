@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="flow-root pt-3 pb-5 pr-[26.14px] pl-[18px]">
+		<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px]">
 			<div class="float-left">
 			</div>
 			<div class="float-right">
@@ -42,7 +42,7 @@
 				</div>
 			</div>
 		</div>
-		<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
+		<TicketList class="pl-[18px] pr-[24px]" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
 </template>
@@ -79,9 +79,6 @@ export default {
 		const ticketStatuses = inject('ticketStatuses')
 		const agents = inject('agents')
 		const contacts = inject('contacts')
-		
-		const sortby = ref('modified')
-		const sortDirection = ref('dessending')
 
 		const selectedTickets = ref([])
 
@@ -93,8 +90,6 @@ export default {
 			ticketFilter, 
 			showNewTicketDialog, 
 			filters, 
-			sortby, 
-			sortDirection, 
 			toggleFilters,
 			ticketTypes,
 			ticketPriorities,
@@ -137,14 +132,6 @@ export default {
 				case 'Assigned Tickets':
 					this.filters.push({assignee: this.user.agent.name})
 					break;
-			}
-		},
-		toggleSort(sortby) {
-			if (this.sortby != sortby) {
-				this.sortDirection = 'assending'
-				this.sortby = sortby
-			} else {
-				this.sortDirection = (this.sortDirection == 'assending' ? 'dessending' : 'assending')
 			}
 		},
 		getFilterBoxOptions() {
