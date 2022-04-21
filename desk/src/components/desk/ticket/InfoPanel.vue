@@ -104,7 +104,7 @@
 				</div>
 				<div v-if="showOtherTicketsOfContacts">
 					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
-						<router-link :to="`/helpdesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
+						<router-link :to="`/frappedesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
 							<div class="py-1 hover:bg-slate-50 rounded max-w-[200px]">
 								<div class="text-slate-500 truncate">{{ ticket.subject }}</div>
 							</div>

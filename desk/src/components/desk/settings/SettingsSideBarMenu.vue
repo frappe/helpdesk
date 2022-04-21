@@ -26,12 +26,12 @@ export default {
 				{
 					label: 'Agents',
 					pageName: 'Agents',
-					route: '/helpdesk/settings/agents'
+					route: '/frappedesk/settings/agents'
 				},
 				{
 					label: 'Support Policies',
 					pageName: 'SlaPolicies',
-					route: '/helpdesk/settings/sla'
+					route: '/frappedesk/settings/sla'
 				}
 			]
 		}

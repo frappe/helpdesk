@@ -3,7 +3,7 @@
 		<router-link 
 			v-if="policy"
 			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8 space-x-2"
-			:to="`/helpdesk/settings/sla/${policy.name}`"
+			:to="`/frappedesk/settings/sla/${policy.name}`"
 		>
 			<div>
 				<Input type="checkbox" value="" />

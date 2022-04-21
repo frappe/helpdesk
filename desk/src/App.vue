@@ -41,7 +41,7 @@ export default {
 			},
 			logout: async () => {
 				await call('logout')
-				this.$router.push({path: "/helpdesk/login"})
+				this.$router.push({path: "/frappedesk/login"})
 			},
 			resetPassword: async (email) => {
 				console.log('reset password')

@@ -7,7 +7,7 @@
 		"preview": "vite preview",
 		"build": "vite build --base=/assets/frappedesk/desk/ && yarn copy-html-entry",
 		"serve": "vite preview",
-		"copy-html-entry": "cp ../frappedesk/public/desk/index.html ../frappedesk/www/helpdesk/index.html"
+		"copy-html-entry": "cp ../frappedesk/public/desk/index.html ../frappedesk/www/frappedesk/index.html"
 	},
 	"dependencies": {
 		"@headlessui/vue": "^1.5.0",

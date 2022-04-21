@@ -41,7 +41,7 @@ scheduler_events = {
 }
 
 website_route_rules = [
-	{"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
-	{"from_route": "/support/tickets", "to_route": "helpdesk"},
-	{"from_route": "/support/tickets/<path:app_path>", "to_route": "helpdesk"},
+	{"from_route": "/helpdesk/<path:app_path>", "to_route": "frappedesk"},
+	{"from_route": "/support/tickets", "to_route": "frappedesk"},
+	{"from_route": "/support/tickets/<path:app_path>", "to_route": "frappedesk"},
 ]

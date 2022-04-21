@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
 	{
-		path: '/helpdesk/login',
+		path: '/frappedesk/login',
 		name: 'DeskLogin',
 		component: () => import('@/pages/auth/Login.vue'),
 	},
@@ -12,7 +12,7 @@ const routes = [
 		component: () => import('@/pages/auth/Login.vue'),
 	},
 	{
-		path: '/helpdesk/signup',
+		path: '/frappedesk/signup',
 		name: 'DeskSignup',
 		component: () => import('@/pages/auth/Signup.vue')
 	},
@@ -31,14 +31,14 @@ const routes = [
 		props: true,
 	},
 	{
-		path: '/helpdesk',
+		path: '/frappedesk',
 		name: 'Desk',
 		component: () => import('@/pages/desk/Desk.vue'),
 		children: [
 			{
 				path: '',
 				redirect: () => {
-					return { path: '/helpdesk/tickets'}
+					return { path: '/frappedesk/tickets'}
 				},
 			},
 			{
@@ -56,7 +56,7 @@ const routes = [
 						return [
 							{
 								label: 'Tickets',
-								path: '/helpdesk/tickets'
+								path: '/frappedesk/tickets'
 							},
 							{
 								label: route.params.ticketId
@@ -80,7 +80,7 @@ const routes = [
 						return [
 							{
 								label: 'Contacts',
-								path: '/helpdesk/contacts'
+								path: '/frappedesk/contacts'
 							},
 							{
 								label: route.params.contactId
@@ -97,7 +97,7 @@ const routes = [
 					{
 						path: '',
 						redirect: () => {
-							return { path: '/helpdesk/settings/agents'}
+							return { path: '/frappedesk/settings/agents'}
 						},
 					},
 					{
@@ -109,7 +109,7 @@ const routes = [
 							// 	return [
 							// 		{
 							// 			label: 'Settings',
-							// 			path: '/helpdesk/settings'
+							// 			path: '/frappedesk/settings'
 							// 		},
 							// 		{
 							// 			label: 'Agents'
@@ -127,7 +127,7 @@ const routes = [
 							// 	return [
 							// 		{
 							// 			label: 'Settings',
-							// 			path: '/helpdesk/settings'
+							// 			path: '/frappedesk/settings'
 							// 		},
 							// 		{
 							// 			label: 'Support Policies'
@@ -145,11 +145,11 @@ const routes = [
 							// 	return [
 							// 		{
 							// 			label: 'Settings',
-							// 			path: '/helpdesk/settings'
+							// 			path: '/frappedesk/settings'
 							// 		},
 							// 		{
 							// 			label: 'Support Policies',
-							// 			path: '/helpdesk/settings/sla'
+							// 			path: '/frappedesk/settings/sla'
 							// 		},
 							// 		{
 							// 			label: 'New Support Policy'
@@ -168,11 +168,11 @@ const routes = [
 							// 	return [
 							// 		{
 							// 			label: 'Settings',
-							// 			path: '/helpdesk/settings'
+							// 			path: '/frappedesk/settings'
 							// 		},
 							// 		{
 							// 			label: 'Support Policies',
-							// 			path: '/helpdesk/settings/sla'
+							// 			path: '/frappedesk/settings/sla'
 							// 		},
 							// 		{
 							// 			label: route.params.slaId

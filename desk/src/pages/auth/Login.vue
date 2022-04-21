@@ -50,7 +50,7 @@
 					</div>
 					<router-link 
 						class="text-center text-base"
-						:to="`${this.$route.name === 'DeskLogin' ? '/helpdesk' : '/support'}/signup`"
+						:to="`${this.$route.name === 'DeskLogin' ? '/frappedesk' : '/support'}/signup`"
 					>
 						<div>
 							Sign up for a new account
@@ -146,7 +146,7 @@ export default {
 			} else {
 				if (this.$route.name == 'DeskLogin') {
 					this.user.refetch(() => {
-						this.$router.push({ path: '/helpdesk/tickets' })
+						this.$router.push({ path: '/frappedesk/tickets' })
 					})
 				} else if (this.$route.name == 'PortalLogin') {
 					this.user.refetch(() => {
