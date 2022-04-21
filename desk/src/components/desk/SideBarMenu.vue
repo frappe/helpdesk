@@ -39,29 +39,40 @@
 				</div>
 			</div>
 		</div>
+		<div>
+			<div class="flex items-center text-base pl-[15px] pb-[22px] space-x-[7px] text-gray-700 font-normal cursor-pointer">
+				<div>
+					<Avatar :label="user.username" class="cursor-pointer h-[31px] w-[31px]" v-if="user" :imageURL="user.profile_image" />
+				</div>
+				<span class="truncate">{{ user.user }}</span>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { FeatherIcon } from 'frappe-ui'
+import { FeatherIcon, Dropdown, Avatar } from 'frappe-ui'
 import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
 	components: {
 		CustomIcons,
-		FeatherIcon
+		FeatherIcon,
+		Dropdown,
+		Avatar
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
+		const user = inject('user')
 
 		const iconHeight = ref(30)
 		const iconWidth = ref(30)
 
 		const options = ref()
 
-		return { viewportWidth, iconHeight, iconWidth, options }
+		return { viewportWidth, user, iconHeight, iconWidth, options }
 	},
 	mounted() {
 		this.options = [
@@ -171,7 +182,19 @@ export default {
 					option.selected = false
 				}
 			});
-		}
+		},
+		avatarOptions() {
+			let items = [];
+			["Log out"].forEach(item => {
+				items.push({
+				label: item,
+					handler: () => {
+						this.user.logout()
+					},
+				});
+			});
+			return items;
+		},
 	}
 }
 
