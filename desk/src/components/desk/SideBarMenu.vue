@@ -7,7 +7,15 @@
 			<div v-for="option in options" :key="option.label">
 				<div 
 					class="group  cursor-pointer hover:bg-gray-200 hover:stroke-2 hover:stroke-gray-700 hover:text-gray-800 hover:font-medium" 
-					:class="option.selected ? 'stroke-2 bg-gray-200 stroke-gray-700 text-gray-800 font-medium' : 'font-normal text-gray-600 stroke-gray-600 stroke-1'"
+					:class="
+						option.selected ? 
+						'stroke-2 bg-gray-200 stroke-gray-700 text-gray-800 font-medium' : 
+						(
+							option.children && option.children.find(element => element.selected) ? 
+							'font-medium text-gray-800 stroke-gray-700 stroke-2' : 
+							'font-normal text-gray-600 stroke-gray-600 stroke-1'
+						)
+						"
 					@click="() => {
 						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
 					}"
