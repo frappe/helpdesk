@@ -47,8 +47,9 @@ def get_ticket(ticket_id):
 	return ticket_doc
 
 @frappe.whitelist(allow_guest=True)
-def create_new(values, template='Default'):
+def create_new(values, template='Default', via_customer_portal=False):
 	ticket_doc = frappe.new_doc("Ticket")
+	ticket_doc.via_customer_portal = via_customer_portal
 
 	if 'contact' in values:
 		contact_doc = frappe.get_doc("Contact", values['contact'])
@@ -73,7 +74,9 @@ def create_new(values, template='Default'):
 			})
 
 	ticket_doc.insert(ignore_permissions=True)
-	ticket_doc.create_communication()
+	# TODO: remove this if condition after refactoring doctype/ticket.py logic regarding this
+	if not via_customer_portal:
+		ticket_doc.create_communication()
 
 	return ticket_doc
 

@@ -56,7 +56,7 @@ export default {
 			}
 		};
 		this.ticketController.newTicket = (values, template) => {
-			this.$resources.createTicket.submit({ values, template });
+			this.$resources.createTicket.submit({ values, template, via_customer_portal: true });
 			return this.$resources.createTicket.loading;
 		};
 		this.ticketController.set = (ticketId, type, ref = null) => {
