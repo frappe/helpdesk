@@ -30,4 +30,5 @@ share/python-wheels/
 MANIFEST
 
 frappedesk/public/desk
+frappedesk/public/node_modules
 frappedesk/www/frappedesk/index.html
