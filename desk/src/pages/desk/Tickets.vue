@@ -35,12 +35,6 @@
 							<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
 						</div>
 					</Button>
-					<Button type="white" @click="() => { toggleSort('modified') }">
-						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="sort-ascending" />
-							<div>Last Modified On</div>
-						</div>
-					</Button>
 					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
 				</div>
 			</div>
