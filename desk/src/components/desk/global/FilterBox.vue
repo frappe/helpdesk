@@ -1,9 +1,9 @@
 <template>
 	<div 
-		class="absolute border rounded shadow-md p-5 bg-white z-50 w-[386px] ml-[10px] text-base"
+		class="absolute border rounded shadow-md p-2 bg-white z-50 w-[286px] ml-[10px] text-base"
 		v-on-outside-click="() => {}"
 	>
-		<div v-if="tempFilters.length > 0" class="border-b pb-4 mb-4 space-y-2">
+		<div v-if="tempFilters.length > 0" class="border-b pb-2 mb-2 space-y-2">
 			<div v-for="(filter, index) in tempFilters" :key="index">
 				<FilterBoxItem v-if="filter" click="w-full" :options="options" v-model="tempFilters" :filterIndex="index" :removable="tempFilters.filter((item) => item != null).length > 1"/>
 			</div>
@@ -11,7 +11,7 @@
 		<div class="flex items-center text-gray-500">
 			<div class="flex items-center space-x-2 hover:text-gray-600 cursor-pointer">
 				<FeatherIcon name="plus" class="w-4 h-4" />
-				<div @click="addFilter()">Add a Filter</div>
+				<div @click="addFilter()">Filter</div>
 			</div>
 			<div class="grow"></div>
 			<div>
