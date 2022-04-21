@@ -60,7 +60,7 @@ export default {
 	resources: {
 		conversations() {
 			return {
-				method: 'helpdesk.api.ticket.get_conversations',
+				method: 'frappedesk.api.ticket.get_conversations',
 				params: {
 					ticket_id: this.ticketId
 				},
@@ -69,7 +69,7 @@ export default {
 		},
 		activities() {
 			return {
-				method: 'helpdesk.api.ticket.activities',
+				method: 'frappedesk.api.ticket.activities',
 				params: {
 					name: this.ticketId
 				},

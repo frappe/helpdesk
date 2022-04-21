@@ -27,7 +27,7 @@ export default {
 	resources: {
 		agents() {
 			return {
-				method: 'helpdesk.api.agent.get_all',
+				method: 'frappedesk.api.agent.get_all',
 				auto: true,
 				fields: ['name']
 			}

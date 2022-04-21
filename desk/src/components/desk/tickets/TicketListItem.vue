@@ -6,7 +6,7 @@
 		>
 			<Input type="checkbox" @click="$emit('toggleSelect')" :checked="selected" class="cursor-pointer mr-2"/>
 			<router-link 
-				:to="`/helpdesk/tickets/${ticket.name}`"
+				:to="`/frappedesk/tickets/${ticket.name}`"
 				class="sm:w-6/12 flex items-center"
 			>
 				<div class="flex items-center grow space-x-1">

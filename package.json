@@ -1,5 +1,5 @@
 {
-  "name": "helpdesk",
+  "name": "frappedesk",
   "version": "1.0.0",
   "description": "Customer Service Software",
   "main": "index.js",
@@ -10,13 +10,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kamaljohnson/helpdesk.git"
+    "url": "git+https://github.com/frappe/desk.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kamaljohnson/helpdesk/issues"
+    "url": "https://github.com/frappe/desk/issues"
   },
-  "homepage": "https://github.com/kamaljohnson/helpdesk#readme"
+  "homepage": "https://github.com/frappe/desk#readme"
 }

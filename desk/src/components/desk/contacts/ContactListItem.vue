@@ -3,7 +3,7 @@
 		<router-link 
 			v-if="contact"
 			class="group flex items-center justify-between sm:justify-start font-light h-10"
-			:to="`/helpdesk/contacts/${contact.name}`"
+			:to="`/frappedesk/contacts/${contact.name}`"
 		>
 			<div class="mr-2">
 				<Input type="checkbox" value="" />

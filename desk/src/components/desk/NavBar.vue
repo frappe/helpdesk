@@ -2,7 +2,7 @@
 	<div class="flow-root pl-5 pr-8 border-b py-2">
 		<div class="float-left py-1.5">
 			<div class="flex space-x-1">
-				<CustomIcons name="helpdesk" width="60" height="18"/>
+				<CustomIcons name="frappedesk" width="60" height="18"/>
 				<div v-if="breadcrumbs" class="flex items-center space-x-1">
 					<div v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb">
 						<div class="flex space-x-1 items-center text-base" :class="breadcrumb.path ? 'cursor-pointer' : ''" @click="() => {breadcrumb.path ? routeTo(breadcrumb.path) : {}}">

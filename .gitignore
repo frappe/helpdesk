@@ -6,7 +6,7 @@ __pycache__/
 *.egg-info
 *.swp
 tags
-helpdesk/docs/current
+frappedesk/docs/current
 
 # Distribution / packaging
 .Python
@@ -29,5 +29,5 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-helpdesk/public/desk
-helpdesk/www/helpdesk/index.html
+frappedesk/public/desk
+frappedesk/www/frappedesk/index.html
