@@ -1,10 +1,7 @@
 <template>
 	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen flex-col">
-		<div class="h-15">
-			<NavBar />
-		</div>
 		<div class="flex w-screen">
-			<div class="w-15">
+			<div class="w-[182px] bg-gray-50">
 				<SideBarMenu />
 			</div>
 			<div class="grow">

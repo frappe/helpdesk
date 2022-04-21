@@ -1,42 +1,42 @@
 <template>
-	<div class="flex flex-col px-1 border-r pt-4" :style="{ height: viewportWidth > 768 ? 'calc(100vh - 3.2rem)' : null }">
-		<div class="space-y-5 mb-auto">
-			<div>
-				<router-link to="/frappedesk/tickets">
-					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-						<CustomIcons name="ticket" class="group-hover:stroke-blue-600" width="25" height="25"/>
-					</div>
-				</router-link>
-			</div>
-			<div v-if="false">
-				<router-link to="/frappedesk/knowledge-base">
-					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-						<CustomIcons name="knowledge-base" class="group-hover:stroke-blue-600" width="25" height="25"/>
-					</div>
-				</router-link>
-			</div>
-			<div>
-				<router-link to="/frappedesk/contacts">
-					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-						<CustomIcons name="customers" class="group-hover:stroke-blue-600" width="25" height="25"/>
-					</div>
-				</router-link>
-			</div>
-			<div v-if="false">
-				<router-link to="/frappedesk/reports">
-					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-						<CustomIcons name="reports" class="group-hover:stroke-blue-600" width="25" height="25"/>
-					</div>
-				</router-link>
-			</div>
+	<div class="flex flex-col border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
+		<div class="mb-[38.4px] pl-[22px]">
+			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]"/>
 		</div>
-		<div class="space-y-5 mt-auto mb-2">
-			<div>
-				<router-link to="/frappedesk/settings/agents">
-					<div class="group p-3 hover:bg-blue-50 rounded-md cursor-pointer">
-						<CustomIcons name="settings" class="group-hover:stroke-blue-600" width="25" height="25"/>
+		<div class="mb-auto space-y-[6px] text-base select-none">
+			<div v-for="option in options" :key="option.label">
+				<div 
+					class="group  cursor-pointer hover:bg-gray-200 hover:stroke-2 hover:stroke-gray-700 hover:text-gray-800 hover:font-medium" 
+					:class="option.selected ? 'stroke-2 bg-gray-200 stroke-gray-700 text-gray-800 font-medium' : 'font-normal text-gray-600 stroke-gray-600 stroke-1'"
+					@click="() => {
+						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
+					}"
+				>
+					<div class="pl-[22px] h-[30px] flex items-center space-x-[8px]">
+						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
+						<span class="grow">{{ option.label }}</span>
+						<div v-if="option.children" class="pr-[17.81px]">
+							<FeatherIcon class="w-4 fill-gray-400 stroke-transparent" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
+						</div>
 					</div>
-				</router-link>
+				</div>
+				<div v-if="option.children && option.expanded">
+					<div>
+						<div v-for="childOption in option.children" :key="childOption.label">
+							<div 
+								class="group h-[30px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800 hover:font-medium"
+								:class="childOption.selected ? 'bg-gray-200 text-gray-800 font-medium' : 'font-normal text-gray-600 '"
+								@click="() => { childOption.action ? childOption.action() : {} }"
+							>
+								<div class="pl-[46px]">
+									<span>
+										{{ childOption.label }}
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -44,12 +44,14 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { FeatherIcon } from 'frappe-ui'
 import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
 	components: {
-		CustomIcons
+		CustomIcons,
+		FeatherIcon
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
@@ -57,7 +59,119 @@ export default {
 		const iconHeight = ref(30)
 		const iconWidth = ref(30)
 
-		return { viewportWidth, iconHeight, iconWidth }
+		const options = ref()
+
+		return { viewportWidth, iconHeight, iconWidth, options }
+	},
+	mounted() {
+		this.options = [
+			{
+				label: 'Ticketing',
+				icon: 'ticket',
+				expanded: true,
+				children: [
+					{
+						label: 'All Tickets',
+						action: () => {
+							this.select('All Tickets')
+							this.$router.push({path: '/frappedesk/tickets'})
+						}
+					},	// TODO: only add assigned and unassigend tickets if the user is a agent
+					{
+						label: 'Assigned Tickets',
+						action: () => {
+							this.select('Assigned Tickets')
+							this.$router.push({path: '/frappedesk/tickets'})
+						}
+					},
+					{
+						label: 'Unassigned Tickets',
+						action: () => {
+							this.select('Unassigned Tickets')
+							this.$router.push({path: '/frappedesk/tickets'})
+						}
+					}
+				]
+			},
+			{
+				label: 'Knowledge Base',
+				icon: 'knowledge-base',
+				action: () => {
+					this.select('Knowledge Base')
+					this.$router.push({path: '/frappedesk/knowledge-base'})
+				}
+			},
+			{
+				label: 'Reports',
+				icon: 'reports',
+				action: () => {
+					this.select('Reports')
+					this.$router.push({path: '/frappedesk/reports'})
+				}
+			},
+			{
+				label: 'Contacts',
+				icon: 'customers',
+				children: [
+					{
+						label: 'Contacts',
+						action: () => {
+							this.select('Contacts')
+							this.$router.push({path: '/frappedesk/contacts'})
+						}
+					},
+					{
+						label: 'Organisations',
+						action: () => {
+							this.select('Organisations')
+							this.$router.push({path: '/frappedesk/organisations'})
+						}
+					}
+				]
+			},
+			{
+				label: 'Settings',
+				icon: 'settings',
+				action: () => {
+					this.select('Settings')
+					this.$router.push({path: '/frappedesk/settings'})
+				}
+			}
+		]
+
+
+		// When the page is refreshed / opened the selected side bar option will  be set 
+		if (this.$route.path.includes('frappedesk/tickets')) {
+			this.select('Ticketing')
+		} else if (this.$route.path.includes('frappedesk/knowledge-base')) {
+			this.select('Knowledge Base')
+		} else if (this.$route.path.includes('frappedesk/reports')) {
+			this.select('Reports')
+		} else if (this.$route.path.includes('frappedesk/contacts')) {
+			this.select('Contacts')
+		} else if (this.$route.path.includes('frappedesk/settings')) {
+			this.select('Settings')
+		}
+	},
+	methods: {
+		select(label) {
+			this.options.forEach(option => {
+				if (option.children) {
+					option.children.forEach(childOption => {
+						childOption.selected = (childOption.label == label)
+					})
+				}
+				if (option.label == label) {
+					if (option.children && option.children.length > 0) {
+						option.children[0].selected = true
+					} else {
+						option.selected = true
+					}
+				} else {
+					option.selected = false
+				}
+			});
+		}
 	}
 }
 
