@@ -8,10 +8,10 @@
 			<path d="M5.24121 5.24133H10.3906" stroke="#38A160" stroke-miterlimit="10" stroke-linecap="round"/>
 			<path d="M5.24121 7.08044H8.18374" stroke="#38A160" stroke-miterlimit="10" stroke-linecap="round"/>
 		</svg>
-		<svg v-if="this.name=='chevron-up'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg v-if="this.name=='chevron-up'" class="stroke-0" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M8.61989 6H0.573855C0.0648106 6 -0.192865 5.38126 0.169471 5.02149L4.20831 0.169836C4.43412 -0.0559751 4.79005 -0.0572481 5.01586 0.169836L9.02422 5.02149C9.38528 5.38255 9.1288 6 8.61983 6H8.61989Z" fill="#C8CFD5"/>
 		</svg>
-		<svg v-if="this.name=='chevron-down'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg v-if="this.name=='chevron-down'" class="stroke-0" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M8.73049 0H0.684451C0.175406 0 -0.0822696 0.618739 0.280066 0.978509L4.3189 5.83016C4.54471 6.05598 4.90064 6.05725 5.12646 5.83016L9.13481 0.978509C9.49588 0.617446 9.2394 0 8.73043 0H8.73049Z" fill="#C8CFD5"/>
 		</svg>
 		<svg v-if="this.name=='customers'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
