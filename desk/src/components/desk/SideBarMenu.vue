@@ -24,7 +24,7 @@
 						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
 						<span class="grow">{{ option.label }}</span>
 						<div v-if="option.children" class="pr-[17.81px]">
-							<CustomIcons class="h-[6px] fill-gray-400 stroke-transparent" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
+							<CustomIcons class="h-[6px] fill-gray-400" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
 						</div>
 					</div>
 				</div>
