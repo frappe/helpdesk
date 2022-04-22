@@ -1,27 +1,63 @@
 <template>
 	<div>
-		<div class="w-full pl-4 pr-8">
-			<div class="border-b pb-3 group flex items-center font-light text-base text-slate-500">
-				<Input type="checkbox" @click="toggleSelectAllTickets()" :checked="allTicketsSelected" class="cursor-pointer mr-2" />
-				<div class="sm:w-6/12 flex space-x-2 items-center">
-					<div class="grow">Subject</div>
+		<div class="w-full select-none">
+			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.80px] rounded-[6px]">
+				<Input 
+					type="checkbox" 
+					@click="toggleSelectAllTickets()" 
+					:checked="allTicketsSelected" 
+					class="cursor-pointer mr-2 hover:visible" 
+					:class="allTicketsSelected ? 'visible' : 'invisible'" 
+				/>
+				<div class="sm:w-1/12 flex items-baseline space-x-[7px] cursor-pointer" @click="toggleSort('name')">
+					<span>#</span>
+					<CustomIcons 
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
 				</div>
-				<div class="hidden md:block lg:w-2/12">Raised By</div>
-				<div class="hidden md:block lg:w-2/12">Type</div>
-				<div class="sm:w-2/12">Due</div>
-				<div class="sm:w-2/12">Status</div>
-				<div class="sm:w-1/12"></div>
+				<div class="sm:w-8/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('subject')">
+					<span>Subject</span>
+					<CustomIcons 
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
+				</div>
+				<div class="sm:w-2/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('status')">
+					<span>Status</span>
+					<CustomIcons 
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
+				</div>
+				<div class="sm:w-3/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('contact')">
+					<span>Created By</span>
+					<CustomIcons 
+						class="h-[6px] fill-gray-400 stroke-transparent"
+					/>
+				</div>
+				<div class="sm:w-2/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('resolution_by')">
+					<span>Due In</span>
+					<CustomIcons 
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
+				</div>
+				<div class="sm:w-1/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('modified')">
+					<span>Modified</span>
+					<CustomIcons 
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
+				</div>
 			</div>
 			<div v-if="tickets">
 				<div 
 					v-if="sortedTickets"
 					class="block overflow-auto"
-					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9.4rem)' : null }"
+					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7rem)' : null }"
 				>
 					<div v-if="sortedTickets.length > 0">
-						<div v-for="ticket in sortedTickets" :key="ticket.name">
-							<div>
-								<TicketListItem :ticketId="ticket.name" @toggle-select="toggleTicketSelect(ticket.name)" :selected="selectedTickets.find(item => item == ticket.name)"/>
+						<div class="space-y-[2px]">
+							<div v-for="ticket in sortedTickets" :key="ticket.name">
+								<div>
+									<TicketListItem :ticketId="ticket.name" @toggle-select="toggleTicketSelect(ticket.name)" :selected="selectedTickets.find(item => item == ticket.name)"/>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -50,7 +86,7 @@ import { inject, ref } from 'vue'
 
 export default {
 	name: 'TicketList',
-	props: ['sortby', 'sortDirection', 'filters'],
+	props: ['filters'],
 	components: {
 		Input,
 		LoadingText,
@@ -65,7 +101,10 @@ export default {
 
 		const selectedTickets = ref([])
 
-		return { user, viewportWidth, tickets, selectedTickets }
+		const sortby = ref('modified')
+		const sortDirection = ref('dessending')
+
+		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection }
 	},
 	computed: {
 		filteredTickets() {
@@ -110,6 +149,16 @@ export default {
 		}
 	},
 	methods: {
+		toggleSort(sortby) {
+			// TODO: once sorting is fixed remove the return
+			return
+			if (this.sortby != sortby) {
+				this.sortDirection = 'assending'
+				this.sortby = sortby
+			} else {
+				this.sortDirection = (this.sortDirection == 'assending' ? 'dessending' : 'assending')
+			}
+		},
 		getSortedTickets(tickets) {
 			if (tickets) {
 				if (Object.keys(tickets).length > 0) {

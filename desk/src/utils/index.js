@@ -7,19 +7,19 @@ _dayjs.extend(updateLocale)
 
 _dayjs.updateLocale('en', {
 	relativeTime: {
-		future: "in %s",
+		future: "%s",
 		past: "%s",
 		s: 'Now',
-		m: "1 minute",
-		mm: "%d minutes",
-		h: "1 hour",
-		hh: "%d hours",
-		d: "1 day",
-		dd: "%d days",
-		M: "1 month",
-		MM: "%d months",
-		y: "1 year",
-		yy: "%d years"
+		m: "1m",
+		mm: "%dm",
+		h: "1h",
+		hh: "%dh",
+		d: "1d",
+		dd: "%dd",
+		M: "1M",
+		MM: "%dM",
+		y: "1Y",
+		yy: "%dY"
 	}
 })
 

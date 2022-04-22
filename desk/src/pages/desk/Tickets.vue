@@ -1,23 +1,7 @@
 <template>
 	<div>
-		<div class="flow-root pt-3 pb-5 pr-8 pl-4">
+		<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px]">
 			<div class="float-left">
-				<div v-if="ticketFilterDropdownOptions().length > 0">
-					<Dropdown
-							placement="left"
-							:options="ticketFilterDropdownOptions()"
-						>
-						<template v-slot="{ toggleDropdown }"> 
-							<div class="flex items-center cursor-pointer" @click="toggleDropdown">
-								<div class="text-xl font-semibold">
-									{{ this.ticketFilter }}
-								</div>
-								<FeatherIcon class="ml-2 stroke-slate-600 h-5 w-5" name="chevron-down"/>
-							</div>
-						</template>
-					</Dropdown>
-				</div>
-				<div v-else class="text-xl font-semibold">All Tickets</div>
 			</div>
 			<div class="float-right">
 				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
@@ -42,26 +26,23 @@
 						</template>
 					</Dropdown>
 				</div>
-				<div v-else class="flex space-x-3">
-					<FilterBox class="mt-10" v-if="toggleFilters" @close="() => { toggleFilters = false }" :options="getFilterBoxOptions()" v-model="filters"/>
+				<div v-else class="flex items-center space-x-3">
+					<div>
+						<FilterBox class="mt-6" v-if="toggleFilters" @close="() => { toggleFilters = false }" :options="getFilterBoxOptions()" v-model="filters"/>
+					</div>
+					<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
 					<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-300'" @click="() => { toggleFilters = !toggleFilters }">
 						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-600' : 'stroke-black'" />
+							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-500 fill-blue-500' : 'stroke-black'" />
 							<div>Add Filters</div>
 							<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
-						</div>
-					</Button>
-					<Button type="white" @click="() => { toggleSort('modified') }">
-						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="sort-ascending" />
-							<div>Last Modified On</div>
 						</div>
 					</Button>
 					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
 				</div>
 			</div>
 		</div>
-		<TicketList :sortby="sortby" :sortDirection="sortDirection" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
+		<TicketList class="pl-[18px] pr-[24px]" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
 </template>
@@ -98,9 +79,6 @@ export default {
 		const ticketStatuses = inject('ticketStatuses')
 		const agents = inject('agents')
 		const contacts = inject('contacts')
-		
-		const sortby = ref('modified')
-		const sortDirection = ref('dessending')
 
 		const selectedTickets = ref([])
 
@@ -112,8 +90,6 @@ export default {
 			ticketFilter, 
 			showNewTicketDialog, 
 			filters, 
-			sortby, 
-			sortDirection, 
 			toggleFilters,
 			ticketTypes,
 			ticketPriorities,
@@ -124,12 +100,23 @@ export default {
 			ticketController
 		}
 	},
+	mounted() {
+		this.syncFilterBasedOnTicketFilter(this.ticketFilter)
+	},
+	computed: {
+		showTicketBluckUpdatePanel() {
+			return this.selectedTickets.length > 0
+		}
+	},
 	watch: {
+		ticketFilter(newValue) {
+			this.syncFilterBasedOnTicketFilter(newValue)
+		},
 		filters(newValue) {
 			let filter = newValue.find(x => Object.keys(x)[0] === 'assignee')
 			if (filter && this.user.agent) {
 				if (Object.values(filter)[0] === this.user.agent.name) {
-					this.ticketFilter = "Assigned to me"
+					this.ticketFilter = "Assigned Tickets"
 				} else {
 					this.ticketFilter = "All Tickets"
 				}
@@ -138,34 +125,13 @@ export default {
 			}
 		}
 	},
-	computed: {
-		showTicketBluckUpdatePanel() {
-			return this.selectedTickets.length > 0
-		}
-	},
 	methods: {
-		ticketFilterDropdownOptions() {
-			let items = [];
-			(this.user.agent ? ["All Tickets", "Assigned to me"] : []).forEach(filter => {
-				items.push({
-					label: filter,
-					handler: () => {
-						this.ticketFilter = filter;
-						this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
-						if (filter == 'Assigned to me') {
-							this.filters.push({assignee: this.user.agent.name})
-						}
-					}
-				});
-			});
-			return items;
-		},
-		toggleSort(sortby) {
-			if (this.sortby != sortby) {
-				this.sortDirection = 'assending'
-				this.sortby = sortby
-			} else {
-				this.sortDirection = (this.sortDirection == 'assending' ? 'dessending' : 'assending')
+		syncFilterBasedOnTicketFilter(newTicketFilterValue) {
+			this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
+			switch(newTicketFilterValue) {
+				case 'Assigned Tickets':
+					this.filters.push({assignee: this.user.agent.name})
+					break;
 			}
 		},
 		getFilterBoxOptions() {
