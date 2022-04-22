@@ -1,5 +1,5 @@
 ––<template>
-	<div class="block select-none rounded-[6px] py-[10px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
+	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
 		<div 
 			v-if="ticket"
 			class="group flex items-center text-base"

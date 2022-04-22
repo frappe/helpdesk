@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<div class="w-full">
-			<div class="bg-[#F7F7F7] group flex items-baseline font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.80px] rounded-[6px]">
+		<div class="w-full select-none">
+			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.80px] rounded-[6px]">
 				<Input 
 					type="checkbox" 
 					@click="toggleSelectAllTickets()" 
@@ -13,42 +13,36 @@
 					<span>#</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
- 						:name="sortby == 'name' && sortDirection == 'dessending' ? 'chevron-down' : 'chevron-up'" 
 					/>
 				</div>
 				<div class="sm:w-8/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('subject')">
 					<span>Subject</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
-						:name="sortby == 'subject' && sortDirection == 'assending' ? 'chevron-down' : 'chevron-up'"  
 					/>
 				</div>
 				<div class="sm:w-2/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('status')">
 					<span>Status</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
-						:name="sortby == 'status' && sortDirection == 'assending' ? 'chevron-down' : 'chevron-up'" 
 					/>
 				</div>
 				<div class="sm:w-3/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('contact')">
 					<span>Created By</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent"
-						:name="sortby == 'contact' && sortDirection == 'assending' ? 'chevron-down' : 'chevron-up'" 
 					/>
 				</div>
 				<div class="sm:w-2/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('resolution_by')">
 					<span>Due In</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
-						:name="sortby == 'resolution_by' && sortDirection == 'assending' ? 'chevron-down' : 'chevron-up'" 
 					/>
 				</div>
 				<div class="sm:w-1/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('modified')">
 					<span>Modified</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
-						:name="sortby == 'modified' && sortDirection == 'assending' ? 'chevron-down' : 'chevron-up'" 
 					/>
 				</div>
 			</div>
@@ -156,6 +150,8 @@ export default {
 	},
 	methods: {
 		toggleSort(sortby) {
+			// TODO: once sorting is fixed remove the return
+			return
 			if (this.sortby != sortby) {
 				this.sortDirection = 'assending'
 				this.sortby = sortby
