@@ -94,6 +94,11 @@ export default {
 				return this.$resources.tickets.fetch()
 			}
 		},
+		this.ticketController.markAsSeen = (ticketId) => {
+			this.$resources.markTicketAsSeen.submit({
+				ticket_id: ticketId
+			})
+		}
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
 				case 'type':
@@ -198,6 +203,17 @@ export default {
 				},
 				onFailure: () => {
 					// TODO:
+				}
+			}
+		},
+		markTicketAsSeen() {
+			return {
+				method: 'frappedesk.api.ticket.mark_ticket_as_seen',
+				onSuccess: () => {
+					this.ticketController.update()
+				},
+				onFailure: () => {
+
 				}
 			}
 		},

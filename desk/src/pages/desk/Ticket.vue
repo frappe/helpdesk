@@ -179,6 +179,9 @@ export default {
 			attachments
 		}
 	},
+	mounted() {
+		this.ticketController.markAsSeen(this.ticketId)
+	},
 	resources: {
 		submitConversation() {
 			return {
