@@ -1,8 +1,9 @@
 <template>
 	<div>
 		<div class="w-full">
-			<div class="bg-[#F7F7F7] pb-3 group flex items-baseline font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.81px] rounded-[6px]">
-				<Input type="checkbox" 
+			<div class="bg-[#F7F7F7] group flex items-baseline font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.80px] rounded-[6px]">
+				<Input 
+					type="checkbox" 
 					@click="toggleSelectAllTickets()" 
 					:checked="allTicketsSelected" 
 					class="cursor-pointer mr-2 hover:visible" 
@@ -55,12 +56,14 @@
 				<div 
 					v-if="sortedTickets"
 					class="block overflow-auto"
-					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 9.4rem)' : null }"
+					:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7rem)' : null }"
 				>
 					<div v-if="sortedTickets.length > 0">
-						<div v-for="ticket in sortedTickets" :key="ticket.name">
-							<div>
-								<TicketListItem :ticketId="ticket.name" @toggle-select="toggleTicketSelect(ticket.name)" :selected="selectedTickets.find(item => item == ticket.name)"/>
+						<div class="space-y-[2px]">
+							<div v-for="ticket in sortedTickets" :key="ticket.name">
+								<div>
+									<TicketListItem :ticketId="ticket.name" @toggle-select="toggleTicketSelect(ticket.name)" :selected="selectedTickets.find(item => item == ticket.name)"/>
+								</div>
 							</div>
 						</div>
 					</div>
