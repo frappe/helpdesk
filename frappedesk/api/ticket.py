@@ -30,7 +30,8 @@ def get_tickets():
 	# TODO: optimize this (try using sql query)
 	for ticket in all_tickets:
 		assignees = get_agent_assigned_to_ticket(ticket['name'])
-
+		
+		ticket['seen'] = frappe.session.user in (frappe.get_value("Ticket", ticket['name'], '_seen') or [])
 		ticket['custom_fields'] = frappe.get_doc("Ticket", ticket.name, fields=['custom_fields']).custom_fields
 		ticket['assignees'] = assignees
 		ticket['contact'] = get_contact(ticket['name'])
@@ -105,6 +106,11 @@ def get_agent_assigned_to_ticket(ticket_id):
 				agent['image'] = frappe.get_value("User", agent["name"], "user_image")
 				agents.append(agent)
 	return agents
+
+@frappe.whitelist()
+def mark_ticket_as_seen(ticket_id):
+	if ticket_id:
+		return frappe.get_doc("Ticket", ticket_id).add_seen()
 
 @frappe.whitelist(allow_guest=True)
 def assign_ticket_to_agent(ticket_id, agent_id=None):

@@ -29,7 +29,12 @@
 				:to="`/frappedesk/tickets/${ticket.name}`"
 				class="sm:w-8/12 flex items-center space-x-[8px]"
 			>
-				<div class="font-semibold text-gray-800 truncate max-w-fit lg:w-80 md:w-52 sm:w-40">{{ ticket.subject }}</div>
+				<div 
+					class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
+					:class="ticket.seen ? 'font-normal text-gray-600' : 'font-semibold text-gray-800'"
+				>
+					{{ ticket.subject }}
+				</div>
 				<div v-if="ticket.ticket_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ ticket.ticket_type }}</div>
 			</router-link>
 			<div class="sm:w-2/12">
