@@ -42,7 +42,7 @@
 							:value="item"
 						>
 							<li
-								class="w-56 cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
+								class="w-[158px] cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
 								:class="{'bg-slate-50': active}"
 							>
 								<span
