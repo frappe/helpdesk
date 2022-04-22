@@ -6,7 +6,7 @@
 		<div class="mb-auto space-y-[6px] text-base select-none">
 			<div v-for="option in options" :key="option.label">
 				<div 
-					class="group  cursor-pointer hover:bg-gray-200 hover:stroke-2 hover:stroke-gray-700 hover:text-gray-800 hover:font-medium" 
+					class="group  cursor-pointer hover:bg-gray-200 hover:stroke-2 hover:stroke-gray-700 hover:text-gray-800" 
 					:class="
 						option.selected ? 
 						'stroke-2 bg-gray-200 stroke-gray-700 text-gray-800 font-medium' : 
@@ -32,7 +32,7 @@
 					<div>
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<div 
-								class="group h-[30px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800 hover:font-medium"
+								class="group h-[30px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
 								:class="childOption.selected ? 'bg-gray-200 text-gray-800 font-medium' : 'font-normal text-gray-600 '"
 								@click="() => { childOption.action ? childOption.action() : {} }"
 							>
