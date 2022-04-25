@@ -179,9 +179,6 @@ export default {
 			attachments
 		}
 	},
-	mounted() {
-		this.ticketController.markAsSeen(this.ticketId)
-	},
 	resources: {
 		submitConversation() {
 			return {
@@ -196,6 +193,9 @@ export default {
 	},
 	computed: {
 		ticket() {
+			if (this.ticketController.markAsSeen) {
+				this.ticketController.markAsSeen(this.ticketId)
+			}
 			return this.tickets[this.ticketId] || null
 		},
 		sendButtonDissabled() {
