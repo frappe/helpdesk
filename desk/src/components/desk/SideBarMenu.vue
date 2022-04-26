@@ -1,19 +1,19 @@
 <template>
-	<div class="flex flex-col border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
+	<div class="flex flex-col w-full border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
 		<div class="mb-[38.4px] pl-[22px]">
 			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]"/>
 		</div>
 		<div class="mb-auto space-y-[6px] text-base select-none">
 			<div v-for="option in options" :key="option.label">
 				<div 
-					class="group  cursor-pointer hover:bg-gray-200 hover:stroke-2 hover:stroke-gray-700 hover:text-gray-800" 
+					class="group stroke-gray-600 stroke-1 cursor-pointer hover:bg-gray-200 hover:text-gray-800" 
 					:class="
 						option.selected ? 
-						'stroke-2 bg-gray-200 stroke-gray-700 text-gray-800 font-medium' : 
+						'bg-gray-200 text-gray-800 font-medium' : 
 						(
 							option.children && option.children.find(element => element.selected) ? 
-							'font-medium text-gray-800 stroke-gray-700 stroke-2' : 
-							'font-normal text-gray-600 stroke-gray-600 stroke-1'
+							'font-medium text-gray-800' : 
+							'font-normal text-gray-600'
 						)
 						"
 					@click="() => {
