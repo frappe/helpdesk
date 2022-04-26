@@ -50,7 +50,7 @@
 		<div>
 			<div class="flex items-center text-base pl-[15px] pb-[22px] space-x-[7px] text-gray-700 font-normal cursor-pointer">
 				<div>
-					<Avatar :label="user.username" class="cursor-pointer h-[31px] w-[31px]" v-if="user" :imageURL="user.profile_image" />
+					<CustomAvatar :label="user.username" class="cursor-pointer" size="md" v-if="user" :imageURL="user.profile_image" />
 				</div>
 				<span class="truncate">{{ user.agent ? user.agent.agent_name : user.user }}</span>
 			</div>
@@ -60,7 +60,8 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { Dropdown, Avatar } from 'frappe-ui'
+import { Dropdown } from 'frappe-ui'
+import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import { inject, ref } from 'vue'
 
 export default {
@@ -68,7 +69,7 @@ export default {
 	components: {
 		CustomIcons,
 		Dropdown,
-		Avatar
+		CustomAvatar
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')

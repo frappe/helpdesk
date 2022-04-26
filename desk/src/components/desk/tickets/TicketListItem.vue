@@ -77,7 +77,7 @@
 				</div>
 			</div>
 			<div class="sm:w-1/12 text-gray-600 font-normal">
-				{{ $dayjs(ticket.modified).fromNow() }}
+				{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
 			</div>
 			<div class="pt-[-3px] w-[50.37px]">
 				<div>
@@ -294,7 +294,7 @@ export default {
 			if (["Fulfilled", "Overdue"].includes(agreementStatus)) {
 				return agreementStatus;
 			}
-			let resolutionString = this.$dayjs().to(resolutionBy);
+			let resolutionString = this.$dayjs.shortFormating(this.$dayjs().to(resolutionBy));
 			if (["Resolution Due"].includes(agreementStatus)) {
 				return this.ticket.resolution_by ? resolutionString : ''
 			}

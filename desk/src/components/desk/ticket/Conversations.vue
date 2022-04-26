@@ -9,7 +9,7 @@
 					<div :ref="`conversation-${index}`">
 						<ConversationCard 
 							:userName="getUserName(conversation)" 
-							:profilePicUrl="conversation.sender.image ? conversation.sender.image : ''" 
+							:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
 							:time="conversation.creation" 
 							:message="conversation.content"
 							:color="getConversationCardColor(getUserName(conversation))"

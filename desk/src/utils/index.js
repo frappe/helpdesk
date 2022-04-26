@@ -8,36 +8,37 @@ _dayjs.extend(updateLocale)
 _dayjs.updateLocale('en', {
 	relativeTime: {
 		future: "%s",
-		past: "%s",
+		past: "%s ago",
 		s: 'Now',
-		m: "1m",
-		mm: "%dm",
-		h: "1h",
-		hh: "%dh",
-		d: "1d",
-		dd: "%dd",
-		M: "1M",
-		MM: "%dM",
-		y: "1Y",
-		yy: "%dY"
+		m: "1 minute",
+		mm: "%d minutes",
+		h: "1 hour",
+		hh: "%d hours",
+		d: "1 day",
+		dd: "%d days",
+		M: "1 month",
+		MM: "%d months",
+		y: "1 year",
+		yy: "%d years"
 	}
 })
 
+_dayjs.longFormating = (s) => {
+    if (s === 'Now' || s === 'Now ago') { 
+        return 'Just now'
+    }
+    return s
+}
+
 _dayjs.shortFormating = (s) => {
-    if (s === 'Now') { 
-        return s
+    if (s === 'Now' || s === 'Now ago') { 
+        return 'Now'
     }
 
     const prefix = s.split(' ')[0]
     const posfix = s.split(' ')[1]
     let newPostfix = ''
     switch(posfix) {
-        case 'second':
-            newPostfix = 's'
-            break
-        case 'seconds':
-            newPostfix = 's'
-            break
         case 'minute':
             newPostfix = 'm'
             break

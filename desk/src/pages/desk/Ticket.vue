@@ -31,7 +31,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="grow overflow-scroll">
+					<div class="grow overflow-scroll px-[18px]">
 						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" />
 					</div>
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
