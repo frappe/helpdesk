@@ -50,7 +50,7 @@
 		<div>
 			<div class="flex items-center text-base pl-[15px] pb-[22px] space-x-[7px] text-gray-700 font-normal cursor-pointer">
 				<div>
-					<CustomAvatar :label="user.username" class="cursor-pointer" size="md" v-if="user" :imageURL="user.profile_image" />
+					<CustomAvatar :label="user.username" class="cursor-pointer" size="lg" v-if="user" :imageURL="user.profile_image" />
 				</div>
 				<span class="truncate">{{ user.agent ? user.agent.agent_name : user.user }}</span>
 			</div>

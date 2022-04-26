@@ -72,7 +72,7 @@
 					</div>
 				</div>
 				<div class="border-l bg-gray-50 w-[252px] shrink-0">
-
+					<InfoPanel :ticketId="ticket.name" />
 				</div>
 			</div>
 		</div>
