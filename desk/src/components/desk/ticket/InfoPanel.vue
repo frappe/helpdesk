@@ -98,10 +98,10 @@
 					<div class="grow text-base font-semibold"> Open Tickets </div>
 					<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
 				</div>
-				<div v-if="showOtherTicketsOfContacts" class="max-h-[200px] overflow-scroll pt-[7px]">
+				<div v-if="showOtherTicketsOfContacts" class="max-h-[200px] overflow-scroll pt-[4px]">
 					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
-						<router-link :to="`/frappedesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
-							<div class="py-1 hover:bg-slate-50 rounded max-w-[200px]">
+						<router-link :to="`/frappedesk/tickets/${ticket.name}`" class="text-gray-700 text-[12px]">
+							<div class="hover:bg-gray-100 rounded max-w-[200px]">
 								<div class="text-slate-500 truncate">{{ ticket.subject }}</div>
 							</div>
 						</router-link>
@@ -113,7 +113,7 @@
 					<div class="grow text-base font-semibold"> Ticket History </div>
 					<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
 				</div>
-				<div v-if="showTicketHistory" class="max-h-[200px] overflow-scroll pt-[7px]">
+				<div v-if="showTicketHistory" class="max-h-[200px] overflow-scroll pt-[8px]">
 					<div v-for="(activity, index) in activities" :key="activity.name">
 						<ActivityCard :activity="activity" :isLast="index == activities.length - 1" />
 					</div>

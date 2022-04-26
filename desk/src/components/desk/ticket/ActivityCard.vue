@@ -1,13 +1,14 @@
 <template>
-	<div v-if="activity" class="py-[5px] space-x-[17.78px] flex select-none text-[12px]">
+	<div v-if="activity" class="pb-[20px] space-x-[17.78px] flex flex-row select-none text-[12px]">
 		<div>
 			<CustomIcons class="h-4 w-4" name="disc" />
 			<div v-if="!isLast" class="h-full border-l mx-2" />
+			<div v-if="!isLast" class="h-[20px] border-l mx-2" />
 		</div>
-		<div class="grow space-y-2 pr-[6px]">
+		<div class="grow pr-[6px]">
 			<div class="flex flex-col">
-				<div><span class="font-medium">{{ activity.owner }}</span> <span class="font-normal text-gray-700">{{ activity.action }}</span></div>
-				<div class="text-gray-500">{{ $dayjs(activity.creation).fromNow() }}</div>
+				<div><span class="font-medium text-gray-900">{{ activity.owner }}</span> <span class="font-normal text-gray-700">{{ activity.action }}</span></div>
+				<div class="text-gray-600 text-[11px]">{{ $dayjs(activity.creation).fromNow() }}</div>
 			</div>
 		</div>
 	</div>
