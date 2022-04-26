@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="ticket">
+		<div v-if="ticket" class="flex flex-col h-screen">
 			<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px] h-[64px]">
 			</div>
 			<div
@@ -11,25 +11,62 @@
 				<div class="border-r w-[252px] shrink-0">
 
 				</div>
-				<div class="grow">
+				<div class="grow flex flex-col h-full">
 					<div class="border-b py-[14px] px-[18.5px]">
-						<div class="flow-root">
-							<div class="float-left">
+						<div class="flex flex-row justify-between">
+							<div>
 								<div class="flex items-center space-x-[13.5px]">
 									<div>
 										<CustomIcons name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
 									</div>
 									<div>
-										<span class="font-semibold text-normal truncate">{{ ticket.subject }}</span>
+										<span class="font-semibold text-normal">{{ ticket.subject }}</span>
 									</div>
 								</div>
 							</div>
-							<div class="float-right">
-								<div class="flex items-center space-x-[8px]">
-									<Button icon="chevron-left" appearance="minimal"/>
-									<Button icon="chevron-right" appearance="minimal"/>
-									<Button icon="more-horizontal" appearance="minimal"/>
+							<div class="flex flex-row items-center space-x-[8px]">
+								<Button icon="chevron-left" appearance="minimal"/>
+								<Button icon="chevron-right" appearance="minimal"/>
+								<Button icon="more-horizontal" appearance="minimal"/>
+							</div>
+						</div>
+					</div>
+					<div class="grow overflow-scroll">
+						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" />
+					</div>
+					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
+						<div>
+							<div v-if="editing">
+								<quill-editor 
+									:ref="editor"
+									v-model:content="content" 
+									contentType="html" 
+									:options="editorOptions"
+									style="min-height:150px; max-height:200px; overflow-y: auto;"
+									@click="focusEditor()"
+								/>
+							</div>
+						</div>
+						<div>
+							<div v-if="editing">
+								<div class="flex flex-row space-x-[14px]">
+									<Button 
+										:loading="this.$resources.submitConversation.loading" 
+										@click="this.submitConversation" 
+										appearance="primary" 
+										:disabled="(!user.agent && !user.isAdmin) || sendButtonDissabled"
+									>
+										Send
+									</Button>
+									<Button appearance="secondary" @click="cancelEditing()">
+										Cancel
+									</Button>
 								</div>
+							</div>
+							<div v-else>
+								<Button appearance="primary" @click="startEditing()">
+									Reply 
+								</Button>
 							</div>
 						</div>
 					</div>
@@ -43,7 +80,7 @@
 </template>
 <script>
 import { Badge, Card, Dropdown, Avatar, FileUploader, FeatherIcon } from 'frappe-ui'
-import ConversationAndActivities from '@/components/desk/ticket/ConversationAndActivities.vue';
+import Conversations from '@/components/desk/ticket/Conversations.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
@@ -61,7 +98,7 @@ export default {
 		Avatar,
 		FileUploader,
 		FeatherIcon,
-		ConversationAndActivities,
+		Conversations,
 		InfoPanel,
 		ActionPanel,
 		CustomIcons,
@@ -104,7 +141,6 @@ export default {
 		const user = inject('user')
 		const tickets = inject('tickets')
 		const ticketController = inject('ticketController')
-		const show = ref('Conversations') // Conversations, Activities, All
 		const attachments = ref([])
 		
 		return { 
@@ -113,7 +149,6 @@ export default {
 			user,
 			tickets,
 			ticketController,
-			show,
 			attachments
 		}
 	},
