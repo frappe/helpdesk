@@ -121,15 +121,19 @@ export default {
 			this.syncFilterBasedOnTicketFilter(newValue)
 		},
 		filters(newValue) {
-			let filter = newValue.find(x => Object.keys(x)[0] === 'assignee')
-			if (filter && this.user.agent) {
-				if (Object.values(filter)[0] === this.user.agent.name) {
+			let assigneeFilter = newValue.find(x => Object.keys(x)[0] === 'assignee')
+			if (assigneeFilter && this.user.agent) {
+				if (Object.values(assigneeFilter)[0] === this.user.agent.name) {
 					this.ticketFilter = "Assigned Tickets"
 				} else {
-					this.ticketFilter = "All Tickets"
+					if (this.ticketFilter == 'Assigned Tickets') {
+						this.ticketFilter = "All Tickets"
+					}
 				}
 			} else {
-				this.ticketFilter = "All Tickets"
+				if (this.ticketFilter == 'Assigned Tickets') {
+					this.ticketFilter = "All Tickets"
+				}
 			}
 		}
 	},

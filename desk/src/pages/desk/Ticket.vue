@@ -20,10 +20,10 @@
 										<CustomIcons name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
 									</div>
 									<div class="group select-none">
-										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer">
-											<span class="font-semibold">{{ ticket.subject }}</span>
+										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
+											{{ ticket.subject }}
 										</div>
-										<div class="max-w-[500px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded mt-1 group-hover:block">
+										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded mt-1 group-hover:block">
 											<p>{{ ticket.subject }}</p>
 										</div>
 									</div>
