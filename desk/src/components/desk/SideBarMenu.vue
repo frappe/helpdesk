@@ -95,7 +95,6 @@ export default {
 					{
 						label: 'All Tickets',
 						action: () => {
-							this.select('All Tickets')
 							this.$router.push({path: '/frappedesk/tickets'})
 							this.ticketFilter = 'All Tickets'
 						}
@@ -133,7 +132,7 @@ export default {
 						label: 'Organisations',
 						action: () => {
 							this.select('Organisations')
-							this.$router.push({path: '/frappedesk/organisations'})
+							// this.$router.push({path: '/frappedesk/organisations'})
 						}
 					}
 				]
@@ -153,7 +152,6 @@ export default {
 				{
 					label: 'Assigned Tickets',
 					action: () => {
-						this.select('Assigned Tickets')
 						this.$router.push({path: '/frappedesk/tickets'})
 						this.ticketFilter = 'Assigned Tickets'
 					}
@@ -169,10 +167,9 @@ export default {
 			])
 		}
 
-
 		// When the page is refreshed / opened the selected side bar option will  be set 
 		if (this.$route.path.includes('frappedesk/tickets')) {
-			this.select('Ticketing')
+			this.select('All Tickets')
 		} else if (this.$route.path.includes('frappedesk/knowledge-base')) {
 			this.select('Knowledge Base')
 		} else if (this.$route.path.includes('frappedesk/reports')) {
@@ -193,14 +190,17 @@ export default {
 			this.options.forEach(option => {
 				if (option.children) {
 					option.children.forEach(childOption => {
+						if (childOption.label == label) {
+							console.log(label)
+						}
 						childOption.selected = (childOption.label == label)
 					})
 				}
 				if (option.label == label) {
-					if (option.children && option.children.length > 0) {
-						option.children[0].selected = true
-					} else {
+					if (!option.children) {
 						option.selected = true
+					} else {
+						option.selected = false
 					}
 				} else {
 					option.selected = false

@@ -80,7 +80,7 @@
 
 <script>
 import { Input, LoadingText } from 'frappe-ui'
-import CustomIcons from '../global/CustomIcons.vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import TicketListItem from './TicketListItem.vue'
 import { inject, ref } from 'vue'
 
@@ -100,11 +100,12 @@ export default {
 		const tickets = inject('tickets')
 
 		const selectedTickets = ref([])
+		const ticketFilter = inject('ticketFilter')
 
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
-		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection }
+		return { user, viewportWidth, tickets, selectedTickets, ticketFilter, sortby, sortDirection }
 	},
 	computed: {
 		filteredTickets() {
@@ -130,6 +131,17 @@ export default {
 								return false
 							default:
 								return ticket[filterFieldName] == filterValue
+						}
+					})
+				}
+				if (this.ticketFilter == 'Unassigned Tickets' && this.user.agent) {
+					filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+						if (Object.keys(ticket.assignees).length > 0) {
+							return Object.values(ticket.assignees).find((assignee) => { 
+								return (assignee.name != this.user.agent.name)
+							})
+						} else {
+							return true
 						}
 					})
 				}
