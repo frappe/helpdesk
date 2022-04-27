@@ -1,16 +1,16 @@
 <template>
-	<div class="m-4 px-4 rounded shadow border" v-if="ticket">
-		<div class="py-4 space-y-3 text-base border-b">
+	<div class="pt-[15px] h-full flex flex-col" v-if="ticket">
+		<div class="shrink-0 text-base pl-[15px] pr-[25.33px] pb-[14px]" :class="editingContact ? '' : 'border-b'">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
 				<div v-if="!editingContact">
-					<div v-if="ticket.contact" class="space-y-1">
-						<div class="flex space-x-2 items-center">
-							<div class="w-[1.1rem]">
-								<Avatar :label="contactFullName" :imageURL="ticket.contact.image" style="width: 20px; height: 20px" />
+					<div v-if="ticket.contact" class="space-y-[12px]">
+						<div class="flex flex-row items-center space-x-[6px]">
+							<div class="w-7">
+								<CustomAvatar :label="contactFullName" :imageURL="ticket.contact.image" size="md" />
 							</div>
-							<div class="grow truncate">{{ contactFullName }}</div>
-							<div v-if="!updatingContact" class="flex">
+							<div class="grow truncate font-semibold text-base">{{ contactFullName }}</div>
+							<div class="flex">
 								<FeatherIcon 
 									name="edit-2" 
 									class="stroke-slate-400 w-4 h-4 cursor-pointer"
@@ -18,20 +18,20 @@
 								/>
 							</div>
 						</div>
-						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-2 items-center max-w-[200px] pr-[2.2rem]">
-							<div class="w-[1.1rem]">
-								<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px; margin-left: 2.5px" />
-							</div>
-							<div class="space-y-1 max-w-full" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-								<div class="truncate text-slate-500">{{ email_id.email_id }}</div>
-							</div>
-						</div>
-						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-2 items-center">
-							<div class="w-[1.1rem]">
-								<FeatherIcon name="phone" class="w-4 h-4" />
+						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-[6px] items-center">
+							<div class="w-7 px-[6.5px]">
+								<FeatherIcon name="phone" class="stroke-gray-500" style="width: 15px;" />
 							</div>
 							<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-								<div class="text-slate-500">{{ phone_no.phone }}</div>
+								<div class="text-gray-700 text-base">{{ phone_no.phone }}</div>
+							</div>
+						</div>
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-[6px] items-center">
+							<div class="w-7 px-[6.5px]">
+								<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px;" />
+							</div>
+							<div class="space-y-1 max-w-[153px]" v-for="email_id in ticket.contact.email_ids" :key="email_id">
+								<div class="truncate text-gray-700 text-base">{{ email_id.email_id }}</div>
 							</div>
 						</div>
 					</div>
@@ -92,28 +92,43 @@
 				</div>
 			</div>
 		</div>
-		<div>
-			<div class="py-4 space-y-1" v-if="otherTicketsOfContact && !editingContact">
-				<div class="flex" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
-					<div class="grow text-lg font-medium">{{ `${otherTicketsOfContact.length > 0 ? '' : 'No'} Open Tickets ${otherTicketsOfContact.length > 0 ? '(' + otherTicketsOfContact.length + ')' : ''}` }}</div>
-					<FeatherIcon 
-						v-if="otherTicketsOfContact.length > 0"
-						:name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'" 
-						class="stroke-slate-400 w-4 h-4"
-					/>
-				</div>
-				<div v-if="showOtherTicketsOfContacts">
-					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
-						<router-link :to="`/frappedesk/tickets/${ticket.name}`" class="text-slate-500 text-base">
-							<div class="py-1 hover:bg-slate-50 rounded max-w-[200px]">
-								<div class="text-slate-500 truncate">{{ ticket.subject }}</div>
-							</div>
-						</router-link>
+		<div class="grow" v-if="!editingContact">
+			<div class="h-full flex flex-col">
+				<div class="shrink-0 border-b py-[14px] pl-[19px] pr-[27.81px] space-y-1 select-none" v-if="otherTicketsOfContact">
+					<div class="flex flex-row items-center" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
+						<div class="grow text-base font-semibold"> Open Tickets ({{ otherTicketsOfContact.length }}) </div>
+						<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
+					</div>
+					<div v-if="showOtherTicketsOfContacts && otherTicketsOfContact.length > 0" class="max-h-[200px] overflow-scroll pt-[4px] space-y-[4px]">
+						<div v-for="(_ticket, index) in otherTicketsOfContact" :key="_ticket.name" :set="maxCount = 5">
+							<router-link 
+								v-if="index <= maxCount" 
+								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?contact={${ticket.contact.name}}`" 
+								class="text-[12px] rounded max-w-[200px]"
+							>
+								<div v-if="index < maxCount">
+									<div class="truncate text-gray-700 hover:bg-gray-100">{{ ticket.subject }}</div>
+								</div>
+								<div v-else class="text-gray-500 hover:bg-gray-100">Show more</div>
+							</router-link>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div v-if="false" class="py-4">
-				<div class="text-lg font-medium">Activity</div>
+				<div class="h-full">
+					<div class="flex flex-col py-[14px] pl-[19px] pr-[27.81px] select-none" :class="showTicketHistory ? '' : 'border-b'">
+						<div class="shrink-0 flex flex-row items-center cursor-pointer" @click="() => {showTicketHistory = !showTicketHistory}">
+							<div class="grow text-base font-semibold"> Ticket History </div>
+							<CustomIcons class="h-[6px] fill-gray-400" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
+						</div>
+						<div 
+							v-if="showTicketHistory"
+							class="overflow-y-scroll"
+							:style="{ height: viewportWidth > 768 ? `calc(100vh - ${getOffsetHeight}px)` : null }"
+						>
+							<Activities :ticketId="ticket.name" />
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<NewContactDialog v-model="showNewContactDialog" @contact-created="(contact) => {contactCreated(contact)}"/>
@@ -121,7 +136,10 @@
 </template>
 
 <script>
-import { FeatherIcon, Input, LoadingText, Avatar } from 'frappe-ui'
+import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
+import CustomAvatar from '@/components/global/CustomAvatar.vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import Activities from '@/components/desk/ticket/Activities.vue'
 import {
 	Combobox,
 	ComboboxInput,
@@ -138,7 +156,9 @@ export default {
 		FeatherIcon,
 		Input,
 		LoadingText,
-		Avatar,
+		CustomAvatar,
+		CustomIcons,
+		Activities,
 		Combobox,
 		ComboboxInput,
 		ComboboxOption,
@@ -146,6 +166,7 @@ export default {
 		NewContactDialog
 	},
 	setup() {
+		const viewportWidth = inject('viewportWidth')
 		const editingContact = ref(false)
 		const updatingContact = ref(false)
 		const contactName = ref('')
@@ -153,6 +174,7 @@ export default {
 		const query = ref('')
 
 		const showNewContactDialog = ref(false)
+		const showTicketHistory = ref(false)
 
 		const tickets = inject('tickets')
 		const contacts = inject('contacts')
@@ -161,12 +183,14 @@ export default {
 		const showOtherTicketsOfContacts = ref(false)
 
 		return {
+			viewportWidth,
 			editingContact,
 			updatingContact,
 			contactName,
 			selectedContact,
 			query,
 			showNewContactDialog,
+			showTicketHistory,
 			tickets,
 			contacts,
 			ticketController,
@@ -191,7 +215,13 @@ export default {
 		},
 		otherTicketsOfContact() {
 			return this.$resources.otherTicketsOfContact.data || null
-		}
+		},
+		getOffsetHeight() {
+			const offset = 285
+			const multiplier = 23
+			const maxCount = 5
+			return offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 ))
+		},
 	},
 	watch: {
 		selectedContact(newValue) {
@@ -226,7 +256,7 @@ export default {
 				},
 				auto: true
 			}
-		}
+		},
 	}
 }
 </script>

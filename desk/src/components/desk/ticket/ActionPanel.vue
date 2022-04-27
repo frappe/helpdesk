@@ -1,130 +1,105 @@
 <template>
-	<div class="m-4 px-4 rounded shadow border" v-if="ticket">
-		<div class="py-4 border-b space-y-3">
-			<div class="text-lg font-medium">{{ `Ticket #${ticket.name}` }}</div>
-			<div class="text-base space-y-2">
-				<div class="flex flex-col space-y-2">
-					<div class="flex space-x-2 items-center">
-						<div class="text-slate-500">{{`First Response ${firstResponseStatus() ? '' : 'Due'}`}}</div>
-						<div v-if="firstResponseStatus()">
-							<FeatherIcon v-if="firstResponseStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
-							<FeatherIcon v-if="firstResponseStatus() == 'Success'" name="check" class="stroke-green-500 w-5 h-5"/>
+	<div v-if="ticket">
+		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] border-b border-dashed">
+			<div class="flex flex-row pb-[15px]">
+				<div class="grow"><span class="text-[16px] font-normal text-gray-500">Ticket</span> <span class="text-[15px] font-semibold">{{ `#${ticket.name}` }}</span></div>
+				<div class="w-[88.54px] select-none">
+					<div v-if="false" class="fixed border-[#38A160] border-[#FF7C36] border-[#E24C4C] text-[#38A160] text-[#FF7C36] text-[#E24C4C]"></div>
+					<div class="fixed">
+						<div 
+							class="bg-white border px-[8px] rounded-[10px] h-fit cursor-pointer"
+							:class="getStatusStyle(ticket.status)" 
+							@click="toggleStatuese = !toggleStatuese"
+							v-on-outside-click="() => { toggleStatuese = false }"
+						>
+							<div v-if="!updatingStatus" class="flex flex-row items-center h-[20px] space-x-[7px]">
+								<div class="text-[10px] uppercase grow">{{ ticket.status }}</div>
+								<div>
+									<FeatherIcon name="chevron-down" class="h-3 stroke-gray-500" />
+								</div>
+							</div>
+							<div v-else>
+								<div class="text-[10px] h-[20px] flex flex-row items-center text-gray-500">Updating...</div>
+							</div>
+						</div>
+						<div v-if="toggleStatuese">
+							<div class="rounded-[10px] shadow bg-white py-[8px] space-y-[4px] mt-[3px]">
+								<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
+									<div 
+										class="pl-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-[10px] text-gray-600 uppercase"
+										@click="updateStatus(status)"
+									> 
+										{{ status }} 
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
-					<div v-if="!firstResponseStatus()">{{ getFormatedDate(ticket.response_by, 'ddd, MMM DD, YYYY HH:mm')}}</div>
 				</div>
-				<div class="flex flex-col space-y-2">
-					<div class="flex space-x-2 items-center">
-						<div class="text-slate-500">{{`Resolution ${resolutionStatus() ? '' : 'Due'}`}}</div>
+			</div>
+			<div class="text-base space-y-[11px]">
+				<div class="flex flex-col space-y-[2px]">
+					<div class="flex flex-row space-x-[5.33px] items-center">
+						<div class="text-gray-600 text-[12px]"> First Response Due </div>
+						<div v-if="firstResponseStatus()">
+							<CustomIcons v-if="firstResponseStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
+							<CustomIcons v-if="firstResponseStatus() == 'Success'" name="check" class="w-[16px] h-[16px]"/>
+						</div>
+					</div>
+					<div class="font-normal text-gray-900">{{ getFormatedDate(ticket.response_by, 'ddd, MMM DD, YYYY HH:mm')}}</div>
+				</div>
+				<div class="flex flex-col space-y-[2px]">
+					<div class="flex flex-row space-x-[5.33px] items-center">
+						<div class="text-gray-600 text-[12px]"> Resolution Due </div>
 						<div v-if="resolutionStatus()">
-							<FeatherIcon v-if="resolutionStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
-							<FeatherIcon v-else-if="resolutionStatus() == 'Success'" name="check" class="stroke-green-500 w-5 h-5"/>
+							<CustomIcons v-if="resolutionStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
+							<CustomIcons v-else-if="resolutionStatus() == 'Success'" name="check" class="w-[16px] h-[16px]"/>
 							<Badge v-else-if="resolutionStatus() == 'Paused'" color="blue">Paused</Badge>
 						</div>
 					</div>
-					<div v-if="!resolutionStatus()">{{ getFormatedDate(ticket.resolution_by, 'ddd, MMM DD, YYYY HH:mm') }}</div>
+					<div class="font-normal text-gray-900">{{ getFormatedDate(ticket.resolution_by, 'ddd, MMM DD, YYYY HH:mm') }}</div>
 				</div>
 			</div>
 		</div>
-		<div class="py-4 space-y-3" :class="ticket.custom_fields.length > 0 ? 'border-b' : ''">
-			<div class="text-base space-y-2">
-				<div class="flex flex-col space-y-2">
-					<div class="text-slate-500">Assignee</div>
+		<span class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"></span>
+		<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
+		<div class="px-[19px] py-[28px]">
+			<div class="text-base space-y-[12px]">
+				<div class="flex flex-col space-y-[8px]">
+					<div class="text-gray-600 font-normal text-[12px]">Assignee</div>
 					<Dropdown
 						v-if="agents"
 						:options="agentsAsDropdownOptions()" 
-						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
+						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
 					>
 						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
-							<div class="flex py-1 space-x-1 w-full items-center">
+							<div class="flex flex-row py-1 space-x-1 items-center w-full">
 								<div class="grow">
-									<div v-if="ticket.assignees.length > 0 && !updatingAssignee" class="text-left">{{ ticket.assignees[0].agent_name }}</div>
+									<div v-if="ticket.assignees.length > 0 && !updatingAssignee" class="flex flex-row text-left space-x-2">
+										<CustomAvatar :label="ticket.assignees[0].agent_name" :imageURL="ticket.assignees[0].image" size="xs" />
+										<div>{{ ticket.assignees[0].agent_name }}</div>
+									</div>
 									<div v-else>
 										<LoadingText v-if="updatingAssignee" />
 										<div v-else class="text-base text-left text-gray-400"> assign agent </div>
 									</div>
 								</div>
 								<div>
-									<CustomIcons v-if="!updatingAssignee" name="select" class="w-4 h-4" />
+									<CustomIcons v-if="!updatingAssignee" name="select" class="w-[12px] h-[12px] stroke-gray-500" />
 								</div>
 							</div>
 						</template>
 					</Dropdown>
 				</div>
-				<div class="flex flex-col space-y-2">
-					<div class="text-slate-500">Status</div>
-					<Dropdown
-						v-if="ticketStatuses"
-						:options="statusesAsDropdownOptions()" 
-						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
-					>
-						<template v-slot="{ toggleStatuses }" @click="toggleStatuses" class="w-full">
-							<div class="flex py-1 space-x-1 w-full items-center">
-								<div class="grow">
-									<div v-if="ticket.status && !updatingStatus" class="text-left">{{ ticket.status }}</div>
-									<div v-else>
-										<LoadingText v-if="updatingStatus" />
-										<div v-else class="text-base text-left text-gray-400"> set status </div>
-									</div>
-								</div>
-								<div>
-									<CustomIcons v-if="!updatingStatus" name="select" class="w-4 h-4" />
-								</div>
-							</div>
-						</template>
-					</Dropdown>
-				</div>
-				<div class="flex flex-col space-y-2">
-					<div class="text-slate-500">Team</div>
-					<Dropdown
-						v-if="agentGroups"
-						:options="agentGroupsAsDropdownOptions()" 
-						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
-					>
-						<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
-							<div class="flex py-1 space-x-1 w-full items-center">
-								<div class="grow">
-									<div v-if="ticket.agent_group && !updatingTeam" class="text-left">{{ ticket.agent_group }}</div>
-									<div v-else>
-										<LoadingText v-if="updatingTeam" />
-										<div v-else class="text-base text-left text-gray-400"> set team </div>
-									</div>
-								</div>
-								<CustomIcons v-if="!updatingTeam" name="select" class="w-4 h-4" />
-							</div>
-						</template>
-					</Dropdown>
-				</div>
-				<div class="flex flex-col space-y-2">
-					<div class="text-slate-500">Priority</div>
-					<Dropdown
-						v-if="ticketPriorities"
-						:options="prioritiesAsDropdownOptions()" 
-						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
-					>
-						<template v-slot="{ togglePriority }" @click="togglePriority" class="w-full">
-							<div class="flex py-1 space-x-1 w-full items-center">
-								<div class="grow">
-									<div v-if="ticket.priority && !updatingPriority" class="text-left">{{ ticket.priority }}</div>
-									<div v-else>
-										<LoadingText v-if="updatingPriority" />
-										<div v-else class="text-base text-left text-gray-400"> set priority </div>
-									</div>
-								</div>
-								<CustomIcons v-if="!updatingPriority" name="select" class="w-4 h-4" />
-							</div>
-						</template>
-					</Dropdown>
-				</div>
-				<div class="flex flex-col space-y-2">
-					<div class="text-slate-500">Type</div>
+				<div class="flex flex-col space-y-[8px]">
+					<div class="text-gray-600 font-normal text-[12px]">Type</div>
 					<Dropdown
 						v-if="ticketTypes"
 						:options="typesAsDropdownOptions()" 
-						class="text-base w-full bg-gray-100 hover:bg-gray-200 px-2 cursor-pointer rounded mr-1"
+						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
 					>
 						<template v-slot="{ toggleTicketTypes }" @click="toggleTicketTypes" class="w-full">
-							<div class="flex py-1 space-x-1 w-full items-center">
+							<div class="flex flex-row py-1 space-x-1 items-center w-full">
 								<div class="grow">
 									<div v-if="ticket.ticket_type && !updatingTicketType" class="text-left">{{ ticket.ticket_type }}</div>
 									<div v-else>
@@ -132,17 +107,65 @@
 										<div v-else class="text-base text-left text-gray-400"> set type </div>
 									</div>
 								</div>
-								<CustomIcons v-if="!updatingTicketType" name="select" class="w-4 h-4" />
+								<div>
+									<CustomIcons v-if="!updatingTicketType" name="select" class="w-[12px] h-[12px] stroke-gray-500" />
+								</div>
+							</div>
+						</template>
+					</Dropdown>
+				</div>
+				<div class="flex flex-col space-y-[8px]">
+					<div class="text-gray-600 font-normal text-[12px]">Team</div>
+					<Dropdown
+						v-if="agentGroups"
+						:options="agentGroupsAsDropdownOptions()" 
+						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
+					>
+						<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
+							<div class="flex flex-row py-1 space-x-1 items-center w-full">
+								<div class="grow">
+									<div v-if="ticket.agent_group && !updatingTeam" class="text-left">{{ ticket.agent_group }}</div>
+									<div v-else>
+										<LoadingText v-if="updatingTeam" />
+										<div v-else class="text-base text-left text-gray-400"> set team </div>
+									</div>
+								</div>
+								<div>
+									<CustomIcons v-if="!updatingTeam" name="select" class="w-[12px] h-[12px] stroke-gray-500" />
+								</div>
+							</div>
+						</template>
+					</Dropdown>
+				</div>
+				<div class="flex flex-col space-y-[8px]">
+					<div class="text-gray-600 font-normal text-[12px]">Priority</div>
+					<Dropdown
+						v-if="ticketPriorities"
+						:options="prioritiesAsDropdownOptions()" 
+						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
+					>
+						<template v-slot="{ togglePriority }" @click="togglePriority" class="w-full">
+							<div class="flex flex-row py-1 space-x-1 items-center w-full">
+								<div class="grow">
+									<div v-if="ticket.priority && !updatingPriority" class="text-left">{{ ticket.priority }}</div>
+									<div v-else>
+										<LoadingText v-if="updatingPriority" />
+										<div v-else class="text-base text-left text-gray-400"> set priority </div>
+									</div>
+								</div>
+								<div>
+									<CustomIcons v-if="!updatingPriority" name="select" class="w-[12px] h-[12px] stroke-gray-500" />
+								</div>
 							</div>
 						</template>
 					</Dropdown>
 				</div>
 			</div>
 		</div>
-		<div class="py-4 border-b space-y-3" v-if="ticket.custom_fields.length > 0">
+		<div class="px-[19px] py-4 border-t space-y-[15px]" v-if="ticket.custom_fields.length > 0">
 			<div class="text-lg font-medium">{{ `Custom Fields (${ticket.template})` }}</div>
-			<div class="text-base space-y-2">
-					<div class="flex flex-col space-y-2" v-for="field in ticket.custom_fields" :key="field">
+			<div class="text-base space-y-[12px]">
+					<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
 						<div class="text-slate-500">{{ field.label }}</div>
 						<div :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
 					</div>
@@ -166,6 +189,7 @@
 import { FeatherIcon, Dropdown, Input, Dialog, Badge, LoadingText } from 'frappe-ui'
 import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import CustomAvatar from '@/components/global/CustomAvatar.vue'
 import { inject, ref } from '@vue/runtime-core'
 
 export default {
@@ -179,6 +203,7 @@ export default {
 		Input,
 		Dialog,
 		CustomIcons,
+		CustomAvatar,
 		LoadingText
 	},
 	data() {
@@ -204,6 +229,8 @@ export default {
 		const updatingStatus = ref(false)
 		const updatingTeam = ref(false)
 
+		const toggleStatuese = ref(false)
+
 		return {
 			user,
 			tickets,
@@ -219,7 +246,8 @@ export default {
 			updatingAssignee,
 			updatingPriority,
 			updatingStatus,
-			updatingTeam
+			updatingTeam,
+			toggleStatuese
 		}
 	},
 	computed: {
@@ -246,6 +274,16 @@ export default {
 		closeCreateNewTicketTypeDialog() {
 			this.newType = ""
 			this.openCreateNewTicketTypeDialog = false
+		},
+		updateStatus(status) {
+			this.updatingStatus = true
+			this.ticketController.set(this.ticketId, 'status', status).then(() => {
+				this.updatingStatus = false
+			})
+		},
+		getStatusStyle(status) {
+			const color = {Open: '#38A160', Replied: '#FF7C36', Resolved: '#E24C4C', Closed: '#E24C4C'}[status]
+			return `border-[${color}] text-[${color}]`
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
@@ -335,30 +373,6 @@ export default {
 				return null;
 			}
 		},
-		statusesAsDropdownOptions() {
-			let statusItems = [];
-			if (this.ticketStatuses) {
-				this.ticketStatuses.forEach(status => {
-					statusItems.push({
-						label: status,
-						handler: () => {
-							this.updatingStatus = true
-							this.ticketController.set(this.ticketId, 'status', status).then(() => {
-								this.updatingStatus = false
-							})
-						},
-					});
-				});
-				if (statusItems.length == 0) {
-					statusItems.push({
-						label: 'No statuses found'
-					})
-				}
-				return statusItems;
-			} else {
-				return null;
-			}
-		},
 		prioritiesAsDropdownOptions() {
 			let typeItems = [];
 			if (this.ticketPriorities) {
@@ -441,5 +455,10 @@ export default {
 </script>
 
 <style>
-
+	.dot {
+		height: 21px;
+		width: 10.5px;
+		border-radius: 0 10.5px 10.5px 0;
+		display: inline-block;
+	}
 </style>
