@@ -1,6 +1,6 @@
 <template>
-	<div class="pt-[15px]" v-if="ticket">
-		<div class="text-base pl-[15px] pr-[25.33px] pb-[14px]" :class="editingContact ? '' : 'border-b'">
+	<div class="pt-[15px] h-full flex flex-col" v-if="ticket">
+		<div class="shrink-0 text-base pl-[15px] pr-[25.33px] pb-[14px]" :class="editingContact ? '' : 'border-b'">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
 				<div v-if="!editingContact">
@@ -92,30 +92,41 @@
 				</div>
 			</div>
 		</div>
-		<div>
-			<div class="border-b py-[14px] pl-[19px] pr-[27.81px] space-y-1 select-none" v-if="otherTicketsOfContact && !editingContact">
-				<div class="flex flex-row items-center" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
-					<div class="grow text-base font-semibold"> Open Tickets </div>
-					<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
-				</div>
-				<div v-if="showOtherTicketsOfContacts" class="max-h-[200px] overflow-scroll pt-[4px]">
-					<div v-for="ticket in otherTicketsOfContact" :key="ticket.name">
-						<router-link :to="`/frappedesk/tickets/${ticket.name}`" class="text-gray-700 text-[12px]">
-							<div class="hover:bg-gray-100 rounded max-w-[200px]">
-								<div class="text-slate-500 truncate">{{ ticket.subject }}</div>
-							</div>
-						</router-link>
+		<div class="grow" v-if="!editingContact">
+			<div class="h-full flex flex-col">
+				<div class="shrink-0 border-b py-[14px] pl-[19px] pr-[27.81px] space-y-1 select-none" v-if="otherTicketsOfContact">
+					<div class="flex flex-row items-center" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
+						<div class="grow text-base font-semibold"> Open Tickets ({{ otherTicketsOfContact.length }}) </div>
+						<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
+					</div>
+					<div v-if="showOtherTicketsOfContacts && otherTicketsOfContact.length > 0" class="max-h-[200px] overflow-scroll pt-[4px] space-y-[4px]">
+						<div v-for="(_ticket, index) in otherTicketsOfContact" :key="_ticket.name" :set="maxCount = 5">
+							<router-link 
+								v-if="index <= maxCount" 
+								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?contact={${ticket.contact.name}}`" 
+								class="text-[12px] rounded max-w-[200px]"
+							>
+								<div v-if="index < maxCount">
+									<div class="truncate text-gray-700 hover:bg-gray-100">{{ ticket.subject }}</div>
+								</div>
+								<div v-else class="text-gray-500 hover:bg-gray-100">Show more</div>
+							</router-link>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="border-b py-[14px] pl-[19px] pr-[27.81px] space-y-1 select-none" v-if="otherTicketsOfContact && !editingContact">
-				<div class="flex flex-row items-center" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showTicketHistory = !showTicketHistory}">
-					<div class="grow text-base font-semibold"> Ticket History </div>
-					<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
-				</div>
-				<div v-if="showTicketHistory" class="max-h-[200px] overflow-scroll pt-[8px]">
-					<div v-for="(activity, index) in activities" :key="activity.name">
-						<ActivityCard :activity="activity" :isLast="index == activities.length - 1" />
+				<div class="h-full">
+					<div class="flex flex-col py-[14px] pl-[19px] pr-[27.81px] select-none" :class="showTicketHistory ? '' : 'border-b'">
+						<div class="shrink-0 flex flex-row items-center cursor-pointer" @click="() => {showTicketHistory = !showTicketHistory}">
+							<div class="grow text-base font-semibold"> Ticket History </div>
+							<CustomIcons class="h-[6px] fill-gray-400" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
+						</div>
+						<div 
+							v-if="showTicketHistory"
+							class="overflow-y-scroll"
+							:style="{ height: viewportWidth > 768 ? `calc(100vh - ${getOffsetHeight}px)` : null }"
+						>
+							<Activities :ticketId="ticket.name" />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -128,7 +139,7 @@
 import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
 import CustomAvatar from '@/components/global/CustomAvatar.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import ActivityCard from '@/components/desk/ticket/ActivityCard.vue'
+import Activities from '@/components/desk/ticket/Activities.vue'
 import {
 	Combobox,
 	ComboboxInput,
@@ -147,7 +158,7 @@ export default {
 		LoadingText,
 		CustomAvatar,
 		CustomIcons,
-		ActivityCard,
+		Activities,
 		Combobox,
 		ComboboxInput,
 		ComboboxOption,
@@ -155,6 +166,7 @@ export default {
 		NewContactDialog
 	},
 	setup() {
+		const viewportWidth = inject('viewportWidth')
 		const editingContact = ref(false)
 		const updatingContact = ref(false)
 		const contactName = ref('')
@@ -171,6 +183,7 @@ export default {
 		const showOtherTicketsOfContacts = ref(false)
 
 		return {
+			viewportWidth,
 			editingContact,
 			updatingContact,
 			contactName,
@@ -203,8 +216,11 @@ export default {
 		otherTicketsOfContact() {
 			return this.$resources.otherTicketsOfContact.data || null
 		},
-		activities() {
-			return this.$resources.activities.data || null;
+		getOffsetHeight() {
+			const offset = 285
+			const multiplier = 23
+			const maxCount = 5
+			return offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 ))
 		},
 	},
 	watch: {
@@ -213,13 +229,6 @@ export default {
 				this.updateContact()
 			}
 		}
-	},
-	mounted() {
-		this.$socket.on('list_update', (data) => {
-			if (data['doctype'] == 'Ticket Activity' && data['name'].split('-')[1] == this.ticketId) {
-				this.$resources.activities.fetch()
-			}
-		});
 	},
 	methods: {
 		updateContact() {
@@ -248,15 +257,6 @@ export default {
 				auto: true
 			}
 		},
-		activities() {
-			return {
-				method: 'frappedesk.api.ticket.activities',
-				params: {
-					name: this.ticketId
-				},
-				auto: true
-			}
-		}
 	}
 }
 </script>

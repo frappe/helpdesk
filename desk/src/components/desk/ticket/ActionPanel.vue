@@ -2,7 +2,7 @@
 	<div v-if="ticket">
 		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] border-b border-dashed">
 			<div class="flex flex-row pb-[15px]">
-				<div class="grow"><span class="text-[16px] font-semibold">Ticket</span> <span class="text-[15px] font-normal">{{ `#${ticket.name}` }}</span></div>
+				<div class="grow"><span class="text-[16px] font-normal text-gray-500">Ticket</span> <span class="text-[15px] font-semibold">{{ `#${ticket.name}` }}</span></div>
 				<div class="w-[88.54px] select-none">
 					<div v-if="false" class="fixed border-[#38A160] border-[#FF7C36] border-[#E24C4C] text-[#38A160] text-[#FF7C36] text-[#E24C4C]"></div>
 					<div class="fixed">
