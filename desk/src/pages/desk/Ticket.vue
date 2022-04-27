@@ -14,13 +14,18 @@
 				<div class="grow flex flex-col h-full">
 					<div class="border-b py-[14px] px-[18.5px]">
 						<div class="flex flex-row justify-between">
-							<div>
-								<div class="flex items-center space-x-[13.5px]">
+							<div class="grow">
+								<div class="grow flex flex-row items-center space-x-[13.5px]">
 									<div>
 										<CustomIcons name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
 									</div>
-									<div>
-										<span class="font-semibold text-normal">{{ ticket.subject }}</span>
+									<div class="group select-none">
+										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer">
+											<span class="font-semibold">{{ ticket.subject }}</span>
+										</div>
+										<div class="w-[500px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded mt-1 group-hover:block">
+											<p>{{ ticket.subject }}</p>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -37,13 +42,21 @@
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
 						<div>
 							<div v-if="editing">
-								<div class="border-t border-l border-r border-gray-400 rounded-t-md p-2 select-none">
-									<div class="flex flex-row-reverse w-full">
+								<quill-editor 
+									:ref="editor"
+									v-model:content="content" 
+									contentType="html" 
+									:options="editorOptions"
+									style="min-height:150px; max-height:200px; overflow-y: auto;"
+									@click="focusEditor()"
+								/>
+								<div class="border-b border-l border-r border-gray-400 p-2 select-none">
+									<div class="w-full">
 										<FileUploader @success="(file) => attachments.push(file)">
 											<template
 												v-slot="{ progress, uploading, openFileSelector }"
 											>
-												<div class="flex space-x-2 items-center">
+												<div class="flex flex-row justify-between space-x-2 items-center">
 													<div class="flex flex-row space-x-2">
 														<div v-for="file in attachments" :key="file.name">
 															<div class="flex space-x-2 items-center text-base bg-white border border-gray-400 rounded-md px-3 py-1">
@@ -68,14 +81,6 @@
 										</FileUploader>
 									</div>
 								</div>
-								<quill-editor 
-									:ref="editor"
-									v-model:content="content" 
-									contentType="html" 
-									:options="editorOptions"
-									style="min-height:150px; max-height:200px; overflow-y: auto;"
-									@click="focusEditor()"
-								/>
 							</div>
 						</div>
 						<div>
