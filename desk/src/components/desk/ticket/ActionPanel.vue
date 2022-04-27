@@ -63,7 +63,7 @@
 		</div>
 		<span class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"></span>
 		<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
-		<div class="px-[19px] pt-[28px]" :class="ticket.custom_fields.length > 0 ? 'border-b' : ''">
+		<div class="px-[19px] py-[28px]">
 			<div class="text-base space-y-[12px]">
 				<div class="flex flex-col space-y-[8px]">
 					<div class="text-gray-600 font-normal text-[12px]">Assignee</div>
@@ -101,7 +101,7 @@
 						<template v-slot="{ toggleTicketTypes }" @click="toggleTicketTypes" class="w-full">
 							<div class="flex flex-row py-1 space-x-1 items-center w-full">
 								<div class="grow">
-									<div v-if="ticket.ticket_type && !updatingTicketType" class="text-left">{{ ticket.assignees[0].agent_name }}</div>
+									<div v-if="ticket.ticket_type && !updatingTicketType" class="text-left">{{ ticket.ticket_type }}</div>
 									<div v-else>
 										<LoadingText v-if="updatingTicketType" />
 										<div v-else class="text-base text-left text-gray-400"> set type </div>
@@ -162,10 +162,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="py-4 border-b space-y-3" v-if="ticket.custom_fields.length > 0">
+		<div class="px-[19px] py-4 border-t space-y-[15px]" v-if="ticket.custom_fields.length > 0">
 			<div class="text-lg font-medium">{{ `Custom Fields (${ticket.template})` }}</div>
-			<div class="text-base space-y-2">
-					<div class="flex flex-col space-y-2" v-for="field in ticket.custom_fields" :key="field">
+			<div class="text-base space-y-[12px]">
+					<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
 						<div class="text-slate-500">{{ field.label }}</div>
 						<div :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
 					</div>
