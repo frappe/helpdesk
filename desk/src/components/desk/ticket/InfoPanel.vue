@@ -103,7 +103,7 @@
 						<div v-for="(_ticket, index) in otherTicketsOfContact" :key="_ticket.name" :set="maxCount = 5">
 							<router-link 
 								v-if="index <= maxCount" 
-								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?contact={${ticket.contact.name}}`" 
+								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?raised_by=${ticket.contact.name}`" 
 								class="text-[12px] rounded max-w-[200px]"
 							>
 								<div v-if="index < maxCount">

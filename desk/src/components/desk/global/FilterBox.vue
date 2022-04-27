@@ -26,7 +26,7 @@
 
 <script>
 import { FeatherIcon, Dropdown } from 'frappe-ui'
-import { inject, ref } from 'vue'
+import { ref } from 'vue'
 import CustomIcons from './CustomIcons.vue'
 import FilterBoxItem from './FilterBoxItem.vue'
 import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/vue'
