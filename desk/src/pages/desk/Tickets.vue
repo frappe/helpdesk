@@ -101,7 +101,15 @@ export default {
 		}
 	},
 	mounted() {
-		this.syncFilterBasedOnTicketFilter(this.ticketFilter)
+		if (this.$route.query) {
+			for (const [key, value] of Object.entries(this.$route.query)) {
+				if (['ticket_type', 'raised_by', 'status', 'priority', 'assignee'].includes(key)) {
+					const filter = {}
+					filter[key] = value
+					this.filters.push(filter)
+				}
+			} 
+		}
 	},
 	computed: {
 		showTicketBluckUpdatePanel() {
