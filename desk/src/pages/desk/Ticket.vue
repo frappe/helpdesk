@@ -37,6 +37,37 @@
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
 						<div>
 							<div v-if="editing">
+								<div class="border-t border-l border-r border-gray-400 rounded-t-md p-2 select-none">
+									<div class="flex flex-row-reverse w-full">
+										<FileUploader @success="(file) => attachments.push(file)">
+											<template
+												v-slot="{ progress, uploading, openFileSelector }"
+											>
+												<div class="flex space-x-2 items-center">
+													<div class="flex flex-row space-x-2">
+														<div v-for="file in attachments" :key="file.name">
+															<div class="flex space-x-2 items-center text-base bg-white border border-gray-400 rounded-md px-3 py-1">
+																<div class="inline-block max-w-[100px] truncate">
+																	{{ file.file_name }}
+																</div>
+																<div>
+																	<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
+																		attachments = attachments.filter(x => x.name != file.name)
+																	}"/>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div>
+														<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
+															{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
+														</Button>
+													</div>
+												</div>
+											</template>
+										</FileUploader>
+									</div>
+								</div>
 								<quill-editor 
 									:ref="editor"
 									v-model:content="content" 
