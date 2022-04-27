@@ -1,6 +1,6 @@
 <template>
 	<div class="pt-[15px]" v-if="ticket">
-		<div class="text-base border-b pl-[15px] pr-[25.33px] pb-[14px]">
+		<div class="text-base pl-[15px] pr-[25.33px] pb-[14px]" :class="editingContact ? '' : 'border-b'">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
 				<div v-if="!editingContact">
@@ -213,6 +213,13 @@ export default {
 				this.updateContact()
 			}
 		}
+	},
+	mounted() {
+		this.$socket.on('list_update', (data) => {
+			if (data['doctype'] == 'Ticket Activity' && data['name'].split('-')[1] == this.ticketId) {
+				this.$resources.activities.fetch()
+			}
+		});
 	},
 	methods: {
 		updateContact() {

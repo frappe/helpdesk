@@ -9,7 +9,7 @@
 				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 4rem)' : null }"
 			>
 				<div class="border-r w-[252px] shrink-0">
-
+					<ActionPanel :ticketId="ticket.name" />
 				</div>
 				<div class="grow flex flex-col h-full">
 					<div class="border-b py-[14px] px-[18.5px]">

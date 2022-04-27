@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<svg v-if="this.name=='check'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M14.6668 8.00001C14.6668 11.6819 11.6821 14.6667 8.00016 14.6667C4.31826 14.6667 1.3335 11.6819 1.3335 8.00001C1.3335 4.31811 4.31826 1.33334 8.00016 1.33334C11.6821 1.33334 14.6668 4.31811 14.6668 8.00001ZM11.4848 5.58164C11.0943 5.19112 10.4611 5.19112 10.0706 5.58164L9.51506 6.1372L8.40395 7.24831L6.88883 8.76342L6.48483 8.35942L5.92928 7.80386C5.53875 7.41334 4.90559 7.41334 4.51506 7.80386C4.12454 8.19439 4.12454 8.82755 4.51506 9.21808L5.07062 9.77363L6.18173 10.8847C6.36926 11.0723 6.62362 11.1776 6.88883 11.1776C7.15405 11.1776 7.4084 11.0723 7.59594 10.8847L9.81816 8.66252L10.9293 7.55141L11.4848 6.99585C11.8754 6.60533 11.8754 5.97217 11.4848 5.58164Z" fill="#2490EF"/>
+		</svg>
 		<svg v-if="this.name=='disc'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<rect width="16" height="16" rx="8" fill="#F9FAFA"/>
 			<rect x="1.27734" y="1.27759" width="13.4444" height="13.4444" rx="6.72222" fill="white" stroke="#DCE0E3"/>
@@ -80,8 +83,8 @@
 			<path d="M14.25 7.75L12.25 5.75L10.25 7.75" stroke="#505A62" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 			<path d="M12.25 11.75L12.25 5.75" stroke="#505A62" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-		<svg v-if="this.name=='select'" class="stroke-black" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M4.5 3.63636L6.13636 2L7.77273 3.63636M4.5 8.36364L6.13636 10L7.77273 8.36364" stroke="#404040" stroke-linecap="round" stroke-linejoin="round"/>
+		<svg v-if="this.name=='select'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M4.5 3.63636L6.13636 2L7.77273 3.63636M4.5 8.36364L6.13636 10L7.77273 8.36364" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
 		<svg v-if="this.name=='empty-list'" :class="this.class" :width="this.width" :height="this.heigth"  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 85" fill="none">
 			<rect x="13" y="12" width="64" height="72" rx="7" stroke="#A6B1B9" stroke-width="2"/>
