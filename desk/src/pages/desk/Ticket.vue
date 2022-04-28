@@ -202,6 +202,7 @@ export default {
 	},
 	computed: {
 		ticket() {
+			// TODO: do a better implementation for this
 			if (this.ticketController.markAsSeen) {
 				this.ticketController.markAsSeen(this.ticketId)
 			}
