@@ -1,5 +1,15 @@
 <template>
 	<div>
+		<svg v-if="this.name=='external-link'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M16.2504 13.0556V14.5001C16.2504 16.1569 14.9072 17.5001 13.2504 17.5001H5.917C4.26014 17.5001 2.91699 16.1569 2.91699 14.5001V7.16674C2.91699 5.50991 4.25988 4.16677 5.91671 4.16675C6.39175 4.16675 6.88395 4.16675 7.36149 4.16675" stroke="#505A62" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M11.25 2.5H17.0833V7.5" stroke="#505A62" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M11.25 8.33325L16.25 3.33325" stroke="#505A62" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		<svg v-if="this.name=='log-out'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M3 10L4.89662 10.0054L7.79323 10.0107L9.24154 10.0134L10.9657 10.0147" stroke="#E24C4C" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M8.5 7L11.5 10L8.5 13" stroke="#E24C4C" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M3.12402 13C4.28136 15.6489 6.92448 17.5 9.99996 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 9.99996 2.5C6.92448 2.5 4.28136 4.35114 3.12402 7" stroke="#E24C4C" stroke-linecap="round"/>
+		</svg>
 		<svg v-if="this.name=='priority-urgent'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 0)" fill="#E24C4C"/>
 			<rect width="2" height="2" rx="1" transform="matrix(-1 0 0 1 5.5 7)" fill="#E24C4C"/>
