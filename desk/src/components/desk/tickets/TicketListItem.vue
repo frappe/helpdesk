@@ -9,11 +9,7 @@
 				@mouseleave="() => {toggleSelectBox = false}"
 				class="w-[37px] h-[14px] flex items-center"
 			>
-				<FeatherIcon 
-					v-if="ticket.priority && ticket.priority == 'Urgent' && !toggleSelectBox && !selected"
-					class="w-4 h-4 stroke-red-500 stroke-2" 
-					name="arrow-up"
-				/>
+				<CustomIcons v-if="!toggleSelectBox && !selected" :name="`priority-${ticket.priority.toLowerCase()}`" class="h-3 w-3" />
 				<Input
 					v-if="toggleSelectBox || selected"
 					type="checkbox" 
@@ -50,16 +46,11 @@
 							<div 
 								v-if="ticket.status"
 								@click="toggleStatuses"	
-								class="flex items-center space-x-1"
+								class="flex flex-row items-center space-x-1"
 							>
-								<CustomIcons 
-									:name="
-										ticket.status == 'Open' ? 'comment' :
-										['Closed', 'Resolved'].includes(ticket.status) ? 'lock' : 'comment'
-									"
-									class="w-[16px] h-[16px]" :class="`${['Closed', 'Resolved'].includes(ticket.status) ? 'fill-gray-600' : ''} stroke-${getBadgeColorBasedOnStatus(ticket.status)}-600`" 
-								/>
-								<div class="cursor-pointer text-base font-normal" :class="`text-${getBadgeColorBasedOnStatus(ticket.status)}-600`">{{ ticket.status }}</div>
+								<FeatherIcon v-if="ticket.status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[ticket.status]" class="stroke-gray-600 w-[12px] h-[12px]" />
+								<CustomIcons v-else name="comment" class="w-[16px] h-[16px] stroke-green-600" />
+								<div class="cursor-pointer text-base font-normal" :class="`text-${getColorBasedOnStatus(ticket.status)}-600`">{{ ticket.status }}</div>
 							</div>
 						</div>
 					</template>
@@ -96,7 +87,9 @@
 									</div>
 								</div>
 								<div v-else class="invisible group-hover:visible">
-									<Avatar class="bg-blue-50 h-[26px] w-[26px]" />
+									<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
+										<CustomIcons name="user-plus" />
+									</div>
 								</div>
 							</div>
 						</template>
@@ -112,18 +105,20 @@
 import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { inject, ref } from 'vue'
+import CustomIcons1 from '../global/CustomIcons.vue'
 
 export default {
 	name: 'TicketListItem',
 	props: ['ticketId', 'selected'],
 	components: {
-		Input,
-		Badge,
-		Dropdown,
-		FeatherIcon,
-		Avatar,
-		CustomIcons
-	},
+    Input,
+    Badge,
+    Dropdown,
+    FeatherIcon,
+    Avatar,
+    CustomIcons,
+    CustomIcons1
+},
 	setup() {
 		// values
 		const user = inject('user')
@@ -160,19 +155,8 @@ export default {
 		}
 	},
 	methods: {
-		getBadgeColorBasedOnStatus(status) {
-			if (['Open'].includes(status)) {
-				return 'green'
-			}
-			if (['Closed', 'Resolved'].includes(status)) {
-				return 'gray'
-			}
-			if (['Replied'].includes(status)) {
-				return 'yellow'
-			}
-			if (['On Hold'].includes(status)) {
-				return 'blue'
-			}
+		getColorBasedOnStatus(status) {
+			return (status == 'Open') ? 'green' : 'gray'
 		},
 		getColorBasedOnPriority(priority, type) {
 			let sufix = '';
@@ -191,17 +175,6 @@ export default {
 			}
 
 			return sufix ? sufix + '-' + color : color;
-		},
-		getIconBasedOnPriority(priority) {
-			if (priority == 'High') {
-				return 'arrow-up'
-			}
-			if (priority == 'Medium') {
-				return 'arrow-up'
-			}
-			if (priority == "Low") {
-				return 'arrow-down'
-			}
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];

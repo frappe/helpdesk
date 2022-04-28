@@ -4,7 +4,7 @@
 			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]"/>
 		</div>
 		<div class="mb-auto space-y-[6px] text-base select-none">
-			<div v-for="option in options" :key="option.label">
+			<div v-for="option in menuOptions" :key="option.label">
 				<div 
 					class="group stroke-gray-600 stroke-1 cursor-pointer hover:bg-gray-200 hover:text-gray-800" 
 					:class="
@@ -48,11 +48,33 @@
 			</div>
 		</div>
 		<div>
-			<div class="flex items-center text-base pl-[15px] pb-[22px] space-x-[7px] text-gray-700 font-normal cursor-pointer">
-				<div>
-					<CustomAvatar :label="user.username" class="cursor-pointer" size="lg" v-if="user" :imageURL="user.profile_image" />
+			<div class="mx-[8px] mb-[17px] flex flex-col">
+				<div v-if="showProfileSettings" class="rounded-[6px] bg-white h-50 shadow-md z-50 px-[7px] py-[6px]">
+					<div v-for="item in profileSettings" :key="item.label">
+						<div 
+							class="flex flex-row items-center text-base font-normal hover:bg-gray-100 cursor-pointer px-[13px] py-[5px] rounded-[8px] space-x-[10px]" 
+							:class="item.style"
+							@click="item.action()"
+						>
+							<CustomIcons class="h-[16px] w-[16px]" :name="item.icon" />
+							<span>{{ item.label }}</span>
+						</div>
+					</div>
 				</div>
-				<span class="truncate">{{ user.agent ? user.agent.agent_name : user.user }}</span>
+				<div
+					@click="() => { showProfileSettings = !showProfileSettings }" 
+					v-on-outside-click="() => { showProfileSettings = false }"
+					class="flex flex-row items-center px-[14px] space-x-[7px] cursor-pointer hover:bg-gray-100 py-[12px] rounded-[6px]" 
+					:class="showProfileSettings ? 'bg-gray-100' : ''"
+				>
+					<div>
+						<CustomAvatar :label="user.username" class="cursor-pointer" size="lg" v-if="user" :imageURL="user.profile_image" />
+					</div>
+					<div class="flex flex-col text-gray-700">
+						<span class="truncate text-base font-medium">{{ user.agent ? user.agent.agent_name : user.user }}</span>
+						<span class="truncate text-[11px] font-normal">{{ user.user }}</span>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -81,12 +103,14 @@ export default {
 		const iconHeight = ref(30)
 		const iconWidth = ref(30)
 
-		const options = ref()
+		const menuOptions = ref()
+		const profileSettings = ref()
+		const showProfileSettings = ref(false)
 
-		return { viewportWidth, user, ticketFilter, iconHeight, iconWidth, options }
+		return { viewportWidth, user, ticketFilter, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings }
 	},
 	mounted() {
-		this.options = [
+		this.menuOptions = [
 			{
 				label: 'Ticketing',
 				icon: 'ticket',
@@ -148,7 +172,7 @@ export default {
 		]
 
 		if (this.user.agent) {
-			this.options.find(option => option.label == 'Ticketing').children.push(...[
+			this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
 				{
 					label: 'Assigned Tickets',
 					action: () => {
@@ -166,6 +190,25 @@ export default {
 				}
 			])
 		}
+
+		this.profileSettings = [
+			{
+				label: 'View Website',
+				icon: 'external-link',
+				style: 'text-gray-800',
+				action: () => {
+					window.location.replace('/')
+				}
+			},
+			{
+				label: 'Log out',
+				icon: 'log-out',
+				style: 'text-red-600',
+				action: () => {
+					this.user.logout()
+				}
+			}
+		]
 
 		// When the page is refreshed / opened the selected side bar option will  be set 
 		if (this.$route.path.includes('frappedesk/tickets')) {
@@ -187,12 +230,9 @@ export default {
 	},
 	methods: {
 		select(label) {
-			this.options.forEach(option => {
+			this.menuOptions.forEach(option => {
 				if (option.children) {
 					option.children.forEach(childOption => {
-						if (childOption.label == label) {
-							console.log(label)
-						}
 						childOption.selected = (childOption.label == label)
 					})
 				}
@@ -206,18 +246,6 @@ export default {
 					option.selected = false
 				}
 			});
-		},
-		avatarOptions() {
-			let items = [];
-			["Log out"].forEach(item => {
-				items.push({
-				label: item,
-					handler: () => {
-						this.user.logout()
-					},
-				});
-			});
-			return items;
 		},
 	}
 }

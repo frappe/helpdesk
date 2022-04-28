@@ -1,6 +1,47 @@
 <template>
 	<div>
-		<svg v-if="this.name=='check'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg v-if="this.name=='external-link'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M16.2504 13.0556V14.5001C16.2504 16.1569 14.9072 17.5001 13.2504 17.5001H5.917C4.26014 17.5001 2.91699 16.1569 2.91699 14.5001V7.16674C2.91699 5.50991 4.25988 4.16677 5.91671 4.16675C6.39175 4.16675 6.88395 4.16675 7.36149 4.16675" stroke="#505A62" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M11.25 2.5H17.0833V7.5" stroke="#505A62" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M11.25 8.33325L16.25 3.33325" stroke="#505A62" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		<svg v-if="this.name=='log-out'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M3 10L4.89662 10.0054L7.79323 10.0107L9.24154 10.0134L10.9657 10.0147" stroke="#E24C4C" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M8.5 7L11.5 10L8.5 13" stroke="#E24C4C" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M3.12402 13C4.28136 15.6489 6.92448 17.5 9.99996 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 9.99996 2.5C6.92448 2.5 4.28136 4.35114 3.12402 7" stroke="#E24C4C" stroke-linecap="round"/>
+		</svg>
+		<svg v-if="this.name=='priority-urgent'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 0)" fill="#E24C4C"/>
+			<rect width="2" height="2" rx="1" transform="matrix(-1 0 0 1 5.5 7)" fill="#E24C4C"/>
+		</svg>
+		<svg v-if="this.name=='priority-medium'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="3" rx="1" transform="matrix(-1 0 0 1 2.5 6)" fill="#A6B1B9"/>
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 3)" fill="#A6B1B9"/>
+			<rect width="2" height="9" rx="1" transform="matrix(-1 0 0 1 8.5 0)" fill="#EBEEF0"/>
+		</svg>
+		<svg v-if="this.name=='priority-low'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="3" rx="1" transform="matrix(-1 0 0 1 2.5 6)" fill="#A6B1B9"/>
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 3)" fill="#EBEEF0"/>
+			<rect width="2" height="9" rx="1" transform="matrix(-1 0 0 1 8.5 0)" fill="#EBEEF0"/>
+		</svg>
+		<svg v-if="this.name=='priority-high'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="3" rx="1" transform="matrix(-1 0 0 1 2.5 6)" fill="#A6B1B9"/>
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 3)" fill="#A6B1B9"/>
+			<rect width="2" height="9" rx="1" transform="matrix(-1 0 0 1 8.5 0)" fill="#A6B1B9"/>
+		</svg>
+		<svg v-if="this.name=='user-plus'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M7.25 8.375H5C4.00544 8.375 3.05161 8.77009 2.34835 9.47335C1.64509 10.1766 1.25 11.1304 1.25 12.125H8" stroke="#74808B" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M6.125 6.125C7.57475 6.125 8.75 4.94975 8.75 3.5C8.75 2.05025 7.57475 0.875 6.125 0.875C4.67525 0.875 3.5 2.05025 3.5 3.5C3.5 4.94975 4.67525 6.125 6.125 6.125Z" stroke="#74808B" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M10.25 8.375V11.375" stroke="#74808B" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M8.75 9.875H11.75" stroke="#74808B" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		<svg v-if="this.name=='corner-up-left'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M10.9999 7.51503C10.9999 7.68835 10.9052 7.84845 10.7511 7.93505C10.5971 8.02165 10.4075 8.02165 10.2534 7.93505C10.0994 7.84845 10.0045 7.68834 10.0045 7.51503C10.003 6.35143 9.52785 5.23588 8.68346 4.41315C7.83907 3.59041 6.69417 3.12753 5.49998 3.12614H1.86175L3.44892 4.42778C3.55079 4.51038 3.61477 4.62913 3.62655 4.75773C3.63822 4.88644 3.59689 5.01429 3.51146 5.11312C3.42614 5.21184 3.30394 5.27344 3.17187 5.28405C3.03978 5.29477 2.90881 5.25363 2.80793 5.16984L0.177079 3.01171C0.0647672 2.91948 0 2.78373 0 2.64072C0 2.49761 0.0647644 2.36188 0.177079 2.26962L2.80782 0.111938L2.80793 0.112046C2.94402 0.00173586 3.13009 -0.0297653 3.29651 0.0293403C3.46282 0.088446 3.58446 0.229174 3.6158 0.399028C3.64724 0.568768 3.5837 0.742084 3.44894 0.854015L1.86235 2.15618H5.5C6.95808 2.1578 8.35587 2.72299 9.38707 3.72758C10.4181 4.73216 10.9982 6.0943 11 7.51507L10.9999 7.51503Z" fill="#74808B"/>
+		</svg>
+		<svg v-if="this.name=='check'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 13 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M1 7.66667L4 10.5L12 1" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		<svg v-if="this.name=='blue_check'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M14.6668 8.00001C14.6668 11.6819 11.6821 14.6667 8.00016 14.6667C4.31826 14.6667 1.3335 11.6819 1.3335 8.00001C1.3335 4.31811 4.31826 1.33334 8.00016 1.33334C11.6821 1.33334 14.6668 4.31811 14.6668 8.00001ZM11.4848 5.58164C11.0943 5.19112 10.4611 5.19112 10.0706 5.58164L9.51506 6.1372L8.40395 7.24831L6.88883 8.76342L6.48483 8.35942L5.92928 7.80386C5.53875 7.41334 4.90559 7.41334 4.51506 7.80386C4.12454 8.19439 4.12454 8.82755 4.51506 9.21808L5.07062 9.77363L6.18173 10.8847C6.36926 11.0723 6.62362 11.1776 6.88883 11.1776C7.15405 11.1776 7.4084 11.0723 7.59594 10.8847L9.81816 8.66252L10.9293 7.55141L11.4848 6.99585C11.8754 6.60533 11.8754 5.97217 11.4848 5.58164Z" fill="#2490EF"/>
 		</svg>
 		<svg v-if="this.name=='disc'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
