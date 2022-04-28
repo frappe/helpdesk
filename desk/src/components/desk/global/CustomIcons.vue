@@ -1,5 +1,24 @@
 <template>
 	<div>
+		<svg v-if="this.name=='priority-urgent'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 0)" fill="#E24C4C"/>
+			<rect width="2" height="2" rx="1" transform="matrix(-1 0 0 1 5.5 7)" fill="#E24C4C"/>
+		</svg>
+		<svg v-if="this.name=='priority-medium'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="3" rx="1" transform="matrix(-1 0 0 1 2.5 6)" fill="#A6B1B9"/>
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 3)" fill="#A6B1B9"/>
+			<rect width="2" height="9" rx="1" transform="matrix(-1 0 0 1 8.5 0)" fill="#EBEEF0"/>
+		</svg>
+		<svg v-if="this.name=='priority-low'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="3" rx="1" transform="matrix(-1 0 0 1 2.5 6)" fill="#A6B1B9"/>
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 3)" fill="#EBEEF0"/>
+			<rect width="2" height="9" rx="1" transform="matrix(-1 0 0 1 8.5 0)" fill="#EBEEF0"/>
+		</svg>
+		<svg v-if="this.name=='priority-high'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<rect width="2" height="3" rx="1" transform="matrix(-1 0 0 1 2.5 6)" fill="#A6B1B9"/>
+			<rect width="2" height="6" rx="1" transform="matrix(-1 0 0 1 5.5 3)" fill="#A6B1B9"/>
+			<rect width="2" height="9" rx="1" transform="matrix(-1 0 0 1 8.5 0)" fill="#A6B1B9"/>
+		</svg>
 		<svg v-if="this.name=='user-plus'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M7.25 8.375H5C4.00544 8.375 3.05161 8.77009 2.34835 9.47335C1.64509 10.1766 1.25 11.1304 1.25 12.125H8" stroke="#74808B" stroke-linecap="round" stroke-linejoin="round"/>
 			<path d="M6.125 6.125C7.57475 6.125 8.75 4.94975 8.75 3.5C8.75 2.05025 7.57475 0.875 6.125 0.875C4.67525 0.875 3.5 2.05025 3.5 3.5C3.5 4.94975 4.67525 6.125 6.125 6.125Z" stroke="#74808B" stroke-linecap="round" stroke-linejoin="round"/>

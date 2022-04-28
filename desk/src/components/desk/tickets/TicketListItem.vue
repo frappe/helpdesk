@@ -9,11 +9,7 @@
 				@mouseleave="() => {toggleSelectBox = false}"
 				class="w-[37px] h-[14px] flex items-center"
 			>
-				<FeatherIcon 
-					v-if="ticket.priority && ticket.priority == 'Urgent' && !toggleSelectBox && !selected"
-					class="w-4 h-4 stroke-red-500 stroke-2" 
-					name="arrow-up"
-				/>
+				<CustomIcons v-if="!toggleSelectBox && !selected" :name="`priority-${ticket.priority.toLowerCase()}`" class="h-3 w-3" />
 				<Input
 					v-if="toggleSelectBox || selected"
 					type="checkbox" 
@@ -179,17 +175,6 @@ export default {
 			}
 
 			return sufix ? sufix + '-' + color : color;
-		},
-		getIconBasedOnPriority(priority) {
-			if (priority == 'High') {
-				return 'arrow-up'
-			}
-			if (priority == 'Medium') {
-				return 'arrow-up'
-			}
-			if (priority == "Low") {
-				return 'arrow-down'
-			}
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
