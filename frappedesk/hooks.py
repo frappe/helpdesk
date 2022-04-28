@@ -41,7 +41,14 @@ scheduler_events = {
 }
 
 website_route_rules = [
+	# Desk
 	{"from_route": "/frappedesk/<path:app_path>", "to_route": "frappedesk"},
+	# Customer Portal
 	{"from_route": "/support/tickets", "to_route": "frappedesk"},
 	{"from_route": "/support/tickets/<path:app_path>", "to_route": "frappedesk"},
+	# Customer Portal Login/Signup/Verigication
+	{"from_route": "/support/login", "to_route": "frappedesk"},
+	{"from_route": "/support/signup", "to_route": "frappedesk"},
+	{"from_route": "/support/verify", "to_route": "frappedesk"},
+	{"from_route": "/support/verify/<path:app_path>", "to_route": "frappedesk"},
 ]
