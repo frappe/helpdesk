@@ -41,8 +41,11 @@
 		<svg v-if="this.name=='check'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 13 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M1 7.66667L4 10.5L12 1" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
-		<svg v-if="this.name=='blue_check'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg v-if="this.name=='sla-pass'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M14.6668 8.00001C14.6668 11.6819 11.6821 14.6667 8.00016 14.6667C4.31826 14.6667 1.3335 11.6819 1.3335 8.00001C1.3335 4.31811 4.31826 1.33334 8.00016 1.33334C11.6821 1.33334 14.6668 4.31811 14.6668 8.00001ZM11.4848 5.58164C11.0943 5.19112 10.4611 5.19112 10.0706 5.58164L9.51506 6.1372L8.40395 7.24831L6.88883 8.76342L6.48483 8.35942L5.92928 7.80386C5.53875 7.41334 4.90559 7.41334 4.51506 7.80386C4.12454 8.19439 4.12454 8.82755 4.51506 9.21808L5.07062 9.77363L6.18173 10.8847C6.36926 11.0723 6.62362 11.1776 6.88883 11.1776C7.15405 11.1776 7.4084 11.0723 7.59594 10.8847L9.81816 8.66252L10.9293 7.55141L11.4848 6.99585C11.8754 6.60533 11.8754 5.97217 11.4848 5.58164Z" fill="#2490EF"/>
+		</svg>
+		<svg v-if="this.name=='sla-fail'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M8.00016 14.6666C11.6821 14.6666 14.6668 11.6819 14.6668 7.99998C14.6668 4.31808 11.6821 1.33331 8.00016 1.33331C4.31826 1.33331 1.3335 4.31808 1.3335 7.99998C1.3335 11.6819 4.31826 14.6666 8.00016 14.6666ZM5.30317 5.30298C5.59606 5.01009 6.07094 5.01009 6.36383 5.30298L8.00092 6.94008L9.63799 5.30302C9.93088 5.01012 10.4058 5.01012 10.6986 5.30302C10.9915 5.59591 10.9915 6.07078 10.6986 6.36368L9.06159 8.00074L10.6986 9.6378C10.9915 9.93069 10.9915 10.4056 10.6986 10.6985C10.4058 10.9914 9.93088 10.9914 9.63799 10.6985L8.00093 9.0614L6.36383 10.6985C6.07094 10.9914 5.59606 10.9914 5.30317 10.6985C5.01028 10.4056 5.01027 9.93073 5.30317 9.63784L6.94026 8.00074L5.30317 6.36364C5.01028 6.07075 5.01028 5.59588 5.30317 5.30298Z" fill="#F56B6B"/>
 		</svg>
 		<svg v-if="this.name=='disc'" :class="this.class" :width="this.width" :height="this.heigth" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<rect width="16" height="16" rx="8" fill="#F9FAFA"/>
