@@ -34,17 +34,25 @@
 				>
 					<div class="grow ml-3">
 						<div v-if="!(['Closed', 'Resolved'].includes(ticket.status))">
-							<div class="bg-gray-200 rounded-t-md p-2">
-								<div class="flex flex-row-reverse">
+							<quill-editor 
+								:ref="editor"
+								v-model:content="content" 
+								contentType="html" 
+								:options="editorOptions"
+								style="min-height:150px; max-height:200px; overflow-y: auto;"
+								@click="focusEditor()"
+							/>
+							<div class="border-b border-l border-r border-gray-400 p-2 select-none">
+								<div class="w-full">
 									<FileUploader @success="(file) => attachments.push(file)">
 										<template
 											v-slot="{ progress, uploading, openFileSelector }"
 										>
-											<div class="flex space-x-2 items-center">
-												<div class="flex space-x-2">
+											<div class="flex flex-row justify-between space-x-2 items-center">
+												<div class="flex flex-row space-x-2">
 													<div v-for="file in attachments" :key="file.name">
-														<div class="flex space-x-2 items-center text-base bg-white rounded-md px-3 py-1">
-															<div class="inline-block">
+														<div class="flex space-x-2 items-center text-base bg-white border border-gray-400 rounded-md px-3 py-1">
+															<div class="inline-block max-w-[100px] truncate">
 																{{ file.file_name }}
 															</div>
 															<div>
@@ -65,14 +73,6 @@
 									</FileUploader>
 								</div>
 							</div>
-							<quill-editor 
-								:ref="editor"
-								v-model:content="content" 
-								contentType="html" 
-								:options="editorOptions"
-								style="min-height:150px; max-height:200px; overflow-y: auto;"
-								@click="focusEditor()"
-							/>
 							<div class="mt-2 space-x-2 flex">
 								<Button 
 									:disabled="sendButtonDissabled"
