@@ -160,6 +160,7 @@
 						</template>
 					</Dropdown>
 				</div>
+				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="(newValue) => { ticketController.set(this.ticketId, 'notes', newValue) }" />
 			</div>
 		</div>
 		<div class="px-[19px] py-4 border-t space-y-[15px]" v-if="ticket.custom_fields.length > 0">
@@ -231,6 +232,8 @@ export default {
 
 		const toggleStatuese = ref(false)
 
+		const notes = ref('')
+
 		return {
 			user,
 			tickets,
@@ -247,7 +250,9 @@ export default {
 			updatingPriority,
 			updatingStatus,
 			updatingTeam,
-			toggleStatuese
+			toggleStatuese,
+
+			notes
 		}
 	},
 	computed: {
@@ -256,6 +261,9 @@ export default {
 		}
 	},
 	methods: {
+		updateNotes(value) {
+			this.ticketController.set(this.ticketId, 'notes', value)
+		},
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
 				this.updatingTicketType = true
