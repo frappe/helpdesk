@@ -163,7 +163,10 @@
 		</div>
 		<div class="px-[19px] py-4 border-t space-y-[15px]" v-if="ticket.custom_fields.length > 0">
 			<div class="text-lg font-medium">{{ `Custom Fields (${ticket.template})` }}</div>
-			<div class="text-base space-y-[12px]">
+			<div 
+				class="text-base space-y-[12px] overflow-y-scroll"
+				:style="{ height: viewportWidth > 768 ? `calc(100vh - 720px)` : null }"
+			>
 					<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
 						<div class="text-slate-500">{{ field.label }}</div>
 						<div :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
@@ -212,6 +215,8 @@ export default {
 		}
 	},
 	setup() {
+		const viewportWidth = inject('viewportWidth')
+
 		const user = inject('user')
 		const tickets = inject('tickets')
 		const ticketTypes = inject('ticketTypes')
@@ -233,6 +238,8 @@ export default {
 		const notes = ref('')
 
 		return {
+			viewportWidth,
+
 			user,
 			tickets,
 			ticketTypes,
