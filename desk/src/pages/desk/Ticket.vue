@@ -12,7 +12,7 @@
 					<ActionPanel :ticketId="ticket.name" />
 				</div>
 				<div class="grow flex flex-col h-full">
-					<div class="border-b py-[14px] px-[18.5px]">
+					<div class="border-b py-[14px] px-[18px]">
 						<div class="flex flex-row justify-between">
 							<div class="grow">
 								<div class="grow flex flex-row items-center space-x-[13.5px]">
