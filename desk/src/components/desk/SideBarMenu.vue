@@ -190,9 +190,6 @@ export default {
 			this.options.forEach(option => {
 				if (option.children) {
 					option.children.forEach(childOption => {
-						if (childOption.label == label) {
-							console.log(label)
-						}
 						childOption.selected = (childOption.label == label)
 					})
 				}
