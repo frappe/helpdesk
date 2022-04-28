@@ -50,16 +50,11 @@
 							<div 
 								v-if="ticket.status"
 								@click="toggleStatuses"	
-								class="flex items-center space-x-1"
+								class="flex flex-row items-center space-x-1"
 							>
-								<CustomIcons 
-									:name="
-										ticket.status == 'Open' ? 'comment' :
-										['Closed', 'Resolved'].includes(ticket.status) ? 'lock' : 'comment'
-									"
-									class="w-[16px] h-[16px]" :class="`${['Closed', 'Resolved'].includes(ticket.status) ? 'fill-gray-600' : ''} stroke-${getBadgeColorBasedOnStatus(ticket.status)}-600`" 
-								/>
-								<div class="cursor-pointer text-base font-normal" :class="`text-${getBadgeColorBasedOnStatus(ticket.status)}-600`">{{ ticket.status }}</div>
+								<FeatherIcon v-if="ticket.status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[ticket.status]" class="stroke-gray-600 w-[12px] h-[12px]" />
+								<CustomIcons v-else name="comment" class="w-[16px] h-[16px] stroke-green-600" />
+								<div class="cursor-pointer text-base font-normal" :class="`text-${getColorBasedOnStatus(ticket.status)}-600`">{{ ticket.status }}</div>
 							</div>
 						</div>
 					</template>
@@ -160,19 +155,8 @@ export default {
 		}
 	},
 	methods: {
-		getBadgeColorBasedOnStatus(status) {
-			if (['Open'].includes(status)) {
-				return 'green'
-			}
-			if (['Closed', 'Resolved'].includes(status)) {
-				return 'gray'
-			}
-			if (['Replied'].includes(status)) {
-				return 'yellow'
-			}
-			if (['On Hold'].includes(status)) {
-				return 'blue'
-			}
+		getColorBasedOnStatus(status) {
+			return (status == 'Open') ? 'green' : 'gray'
 		},
 		getColorBasedOnPriority(priority, type) {
 			let sufix = '';

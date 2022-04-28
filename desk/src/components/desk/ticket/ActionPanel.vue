@@ -43,7 +43,7 @@
 						<div class="text-gray-600 text-[12px]"> First Response Due </div>
 						<div v-if="firstResponseStatus()">
 							<CustomIcons v-if="firstResponseStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
-							<CustomIcons v-if="firstResponseStatus() == 'Success'" name="check" class="w-[16px] h-[16px]"/>
+							<CustomIcons v-if="firstResponseStatus() == 'Success'" name="blue_check" class="w-[16px] h-[16px]"/>
 						</div>
 					</div>
 					<div class="font-normal text-gray-900">{{ getFormatedDate(ticket.response_by, 'ddd, MMM DD, YYYY HH:mm')}}</div>
@@ -53,7 +53,7 @@
 						<div class="text-gray-600 text-[12px]"> Resolution Due </div>
 						<div v-if="resolutionStatus()">
 							<CustomIcons v-if="resolutionStatus() == 'Failed'" name="x" class="stroke-red-500 w-5 h-5"/>
-							<CustomIcons v-else-if="resolutionStatus() == 'Success'" name="check" class="w-[16px] h-[16px]"/>
+							<CustomIcons v-else-if="resolutionStatus() == 'Success'" name="blue_check" class="w-[16px] h-[16px]"/>
 							<Badge v-else-if="resolutionStatus() == 'Paused'" color="blue">Paused</Badge>
 						</div>
 					</div>
