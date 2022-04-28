@@ -52,8 +52,8 @@
 				<div class="flex flex-col space-y-[2px]">
 					<div class="flex flex-row space-x-[5.33px] items-center">
 						<div class="text-gray-600 text-[12px]"> Resolution Due </div>
-						<CustomIcons v-if="firstResponseStatus()" :name="{Success: 'sla-pass', Failed: 'sla-fail'}[firstResponseStatus()]" class="w-[16px] h-[16px]"/>
-						<Badge v-if="resolutionStatus() == 'Paused'" color="blue">Paused</Badge>
+						<CustomIcons v-if="resolutionStatus() != 'Paused'" :name="{Success: 'sla-pass', Failed: 'sla-fail'}[resolutionStatus()]" class="w-[16px] h-[16px]"/>
+						<Badge v-else color="blue">Paused</Badge>
 					</div>
 					<div class="font-normal text-gray-900">{{ getFormatedDate(ticket.resolution_by, 'ddd, MMM DD, YYYY HH:mm') }}</div>
 				</div>
