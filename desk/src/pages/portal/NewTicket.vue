@@ -1,9 +1,9 @@
 <template>
 	<div v-if="template" class="mx-auto max-w-2xl pt-4">
 		<div>
-			<Card 
-				:title="`New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}`" class="space-y-6"
-			>
+			<div class="rounded-lg shadow-md border p-8">
+				<div class="font-medium mb-3">{{ `New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}` }}</div>
+				<div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div>
 				<div class="space-y-4 mb-4">
 					<div v-for="field in template.fields" :key="field">
 						<div v-if="!field.auto_set">
@@ -38,7 +38,7 @@
 								>
 									<template v-slot="{ toggleDropdown }">
 										<div>
-											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Choose' }}</Button>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || `Select ${field.label}` }}</Button>
 										</div>
 									</template>
 								</Dropdown>
@@ -54,7 +54,7 @@
 								>
 									<template v-slot="{ toggleDropdown }">
 										<div>
-											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Choose' }}</Button>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || `Select ${field.label}` }}</Button>
 										</div>
 									</template>
 								</Dropdown>
@@ -68,7 +68,12 @@
 					<Button :class="newTicketSubmitLoading ? 'cursor-not-allowed disabled' : ''" @click="cancel()">Cancel</Button>
 					<Button :loading="newTicketSubmitLoading" appearance="primary" @click="submitTicket()">Submit</Button>
 				</div>
-			</Card>
+			</div>
+			<!-- <Card 
+				:title="`New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}`" class="space-y-6"
+			>
+				
+			</Card> -->
 		</div>
 	</div>
 </template>
@@ -91,6 +96,7 @@ export default {
 		QuillEditor
 	},
 	setup() {
+		const user = inject('user')
 		const ticketTemplates = inject('ticketTemplates')
 		const ticketController = inject('ticketController')
 
@@ -125,7 +131,7 @@ export default {
 			bounds: 7,
 		})
 
-		return { ticketTemplates, ticketController, formData, linkedFieldOptions, newTicketSubmitLoading, validationErrors, editorOptions }
+		return { user, ticketTemplates, ticketController, formData, linkedFieldOptions, newTicketSubmitLoading, validationErrors, editorOptions }
 	},
 	computed: {
 		template() {
@@ -218,6 +224,7 @@ export default {
 					items.push({
 						label: doc,
 						handler: () => {
+							console.log(doc)
 							this.formData[field.fieldname] = doc
 						},
 					});
