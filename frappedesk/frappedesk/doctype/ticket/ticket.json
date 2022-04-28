@@ -52,7 +52,8 @@
   "column_break_16",
   "via_customer_portal",
   "attachment",
-  "content_type"
+  "content_type",
+  "notes"
  ],
  "fields": [
   {
@@ -371,12 +372,17 @@
    "fieldtype": "Link",
    "label": "Agent Group",
    "options": "Agent Group"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Long Text",
+   "label": "Notes"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-04-22 14:49:13.554639",
+ "modified": "2022-04-28 10:26:39.908032",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",

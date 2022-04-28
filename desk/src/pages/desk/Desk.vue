@@ -95,11 +95,13 @@ export default {
 			}
 		},
 		this.ticketController.markAsSeen = (ticketId) => {
+			console.log(`marking ${ticketId} as seen!!`)
 			this.$resources.markTicketAsSeen.submit({
 				ticket_id: ticketId
 			})
 		}
 		this.ticketController.set = (ticketId, type, ref=null) => {
+			this.ticketController.markAsSeen(ticketId)
 			switch (type) {
 				case 'type':
 					return this.$resources.assignTicketType.submit({
@@ -130,6 +132,11 @@ export default {
 					return this.$resources.assignTicketGroup.submit({
 						ticket_id: ticketId,
 						agent_group: ref
+					})
+				case 'notes':
+					return this.$resources.setTicketNotes.submit({
+						ticket_id: ticketId,
+						notes: ref
 					})
 			}
 		},
@@ -417,6 +424,17 @@ export default {
 				},
 				onFailure: () => {
 					// TODO:
+				}
+			}
+		},
+		setTicketNotes() {
+			return {
+				method: 'frappedesk.api.ticket.set_ticket_notes',
+				onSuccess: (ticket) => {
+					this.ticketController.update(ticket.name)
+				},
+				onFailure: () => {
+
 				}
 			}
 		}

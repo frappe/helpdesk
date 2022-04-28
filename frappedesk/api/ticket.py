@@ -22,7 +22,8 @@ def get_tickets():
 			ticket.contact,
 			ticket.template,
 			ticket.agent_group,
-			ticket.first_responded_on
+			ticket.first_responded_on,
+			ticket.notes
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
@@ -159,6 +160,19 @@ def assign_ticket_status(ticket_id, status):
 			log_ticket_activity(ticket_id, f"Status set to {status}")
 
 		return ticket_doc
+
+@frappe.whitelist(allow_guest=True)
+def set_ticket_notes(ticket_id, notes):
+	if ticket_id:
+		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		
+		if ticket_doc.notes != notes:
+			ticket_doc.notes = notes
+			ticket_doc.save()
+			log_ticket_activity(ticket_id, f"Updated notes")
+
+		return ticket_doc
+
 
 @frappe.whitelist(allow_guest=True)
 def bulk_assign_ticket_status(ticket_ids, status):

@@ -200,12 +200,13 @@ export default {
 			}
 		}
 	},
+	mounted() {
+		if (this.ticketController.markAsSeen) {
+			this.ticketController.markAsSeen(this.ticketId)
+		}
+	},
 	computed: {
 		ticket() {
-			// TODO: do a better implementation for this
-			if (this.ticketController.markAsSeen) {
-				this.ticketController.markAsSeen(this.ticketId)
-			}
 			return this.tickets[this.ticketId] || null
 		},
 		sendButtonDissabled() {
