@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col w-full border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
-		<div class="mb-[38.4px] pl-[22px]">
-			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]"/>
+		<div class="mb-[38.4px] pl-[22px] cursor-pointer">
+			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]" @click="() => {$router.push({path: '/frappedesk/tickets'})}"/>
 		</div>
 		<div class="mb-auto space-y-[6px] text-base select-none">
 			<div v-for="option in menuOptions" :key="option.label">
