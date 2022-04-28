@@ -42,13 +42,13 @@
 				>
 					<template v-slot="{ toggleStatuses }">
 						<div class="w-full">
-							<div class="stroke-green-600 stroke-red-600 stroke-yellow-600 w-0 h-0 block"></div>
+							<div v-if="false" class="stroke-green-600 stroke-red-600 stroke-yellow-600 w-0 h-0"></div>
 							<div 
 								v-if="ticket.status"
 								@click="toggleStatuses"	
 								class="flex flex-row items-center space-x-1"
 							>
-								<FeatherIcon v-if="ticket.status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[ticket.status]" class="stroke-gray-600 w-[12px] h-[12px]" />
+								<FeatherIcon v-if="ticket.status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[ticket.status]" class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]" />
 								<CustomIcons v-else name="comment" class="w-[16px] h-[16px] stroke-green-600" />
 								<div class="cursor-pointer text-base font-normal" :class="`text-${getColorBasedOnStatus(ticket.status)}-600`">{{ ticket.status }}</div>
 							</div>
