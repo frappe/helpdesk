@@ -5,36 +5,40 @@
 				<div class="grow"><span class="text-[16px] font-normal text-gray-500">Ticket</span> <span class="text-[15px] font-semibold">{{ `#${ticket.name}` }}</span></div>
 				<div class="w-[88.54px] select-none">
 					<div v-if="false" class="fixed border-[#38A160] border-[#FF7C36] border-[#E24C4C] text-[#38A160] text-[#FF7C36] text-[#E24C4C]"></div>
-					<div class="fixed">
-						<div 
-							class="bg-white border px-[8px] rounded-[10px] h-fit cursor-pointer"
-							:class="getStatusStyle(ticket.status)" 
-							@click="toggleStatuese = !toggleStatuese"
-							v-on-outside-click="() => { toggleStatuese = false }"
-						>
-							<div v-if="!updatingStatus" class="flex flex-row items-center h-[20px] space-x-[7px]">
-								<div class="text-[10px] uppercase grow">{{ ticket.status }}</div>
-								<div>
-									<FeatherIcon name="chevron-down" class="h-3 stroke-gray-500" />
+					<div class="absolute w-[88.54px] flex flex-row">
+						<div class="grow"></div>
+						<div class="shrink-0">
+							<div 
+								class="bg-white border px-[8px] rounded-[10px] h-fit cursor-pointer"
+								:class="getStatusStyle(ticket.status)" 
+								@click="toggleStatuese = !toggleStatuese"
+								v-on-outside-click="() => { toggleStatuese = false }"
+							>
+								<div v-if="!updatingStatus" class="flex flex-row items-center h-[20px] space-x-[7px]">
+									<div class="text-[10px] uppercase grow">{{ ticket.status }}</div>
+									<div>
+										<FeatherIcon name="chevron-down" class="h-3 stroke-gray-500" />
+									</div>
+								</div>
+								<div v-else>
+									<div class="text-[10px] h-[20px] flex flex-row items-center text-gray-500">Updating...</div>
 								</div>
 							</div>
-							<div v-else>
-								<div class="text-[10px] h-[20px] flex flex-row items-center text-gray-500">Updating...</div>
-							</div>
-						</div>
-						<div v-if="toggleStatuese">
-							<div class="rounded-[10px] shadow bg-white py-[8px] space-y-[4px] mt-[3px]">
-								<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
-									<div 
-										class="pl-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-[10px] text-gray-600 uppercase"
-										@click="updateStatus(status)"
-									> 
-										{{ status }} 
+							<div v-if="toggleStatuese">
+								<div class="rounded-[10px] shadow bg-white py-[8px] space-y-[4px] mt-[3px]">
+									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
+										<div 
+											class="pl-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-[10px] text-gray-600 uppercase"
+											@click="updateStatus(status)"
+										> 
+											{{ status }} 
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+
+						</div>
 				</div>
 			</div>
 			<div class="text-base space-y-[11px]">
