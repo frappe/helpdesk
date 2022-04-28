@@ -91,7 +91,9 @@
 									</div>
 								</div>
 								<div v-else class="invisible group-hover:visible">
-									<Avatar class="bg-blue-50 h-[26px] w-[26px]" />
+									<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
+										<CustomIcons name="user-plus" />
+									</div>
 								</div>
 							</div>
 						</template>
@@ -107,18 +109,20 @@
 import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { inject, ref } from 'vue'
+import CustomIcons1 from '../global/CustomIcons.vue'
 
 export default {
 	name: 'TicketListItem',
 	props: ['ticketId', 'selected'],
 	components: {
-		Input,
-		Badge,
-		Dropdown,
-		FeatherIcon,
-		Avatar,
-		CustomIcons
-	},
+    Input,
+    Badge,
+    Dropdown,
+    FeatherIcon,
+    Avatar,
+    CustomIcons,
+    CustomIcons1
+},
 	setup() {
 		// values
 		const user = inject('user')
