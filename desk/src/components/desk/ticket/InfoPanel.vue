@@ -9,7 +9,7 @@
 							<div class="w-7">
 								<CustomAvatar :label="contactFullName" :imageURL="ticket.contact.image" size="md" />
 							</div>
-							<div class="grow truncate font-semibold text-base">{{ contactFullName }}</div>
+							<div class="grow truncate font-normal text-base">{{ contactFullName }}</div>
 							<div class="flex">
 								<FeatherIcon 
 									name="edit-2" 
@@ -94,9 +94,18 @@
 		</div>
 		<div class="grow" v-if="!editingContact">
 			<div class="h-full flex flex-col">
+				<div class="px-[19px] py-[17px] border-t border-b" v-if="ticket.custom_fields.length > 0">
+					<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
+					<div class="text-base space-y-[12px]">
+							<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
+								<div class="text-gray-700 text-base">{{ field.label }}</div>
+								<div class="text-gray-900 text-base" :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
+							</div>
+					</div>
+				</div>
 				<div class="shrink-0 border-b py-[14px] pl-[19px] pr-[27.81px] space-y-1 select-none" v-if="otherTicketsOfContact">
 					<div class="flex flex-row items-center" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
-						<div class="grow text-base font-semibold"> Open Tickets ({{ otherTicketsOfContact.length }}) </div>
+						<div class="grow font-normal text-base"> Open Tickets ({{ otherTicketsOfContact.length }}) </div>
 						<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
 					</div>
 					<div v-if="showOtherTicketsOfContacts && otherTicketsOfContact.length > 0" class="max-h-[200px] overflow-scroll pt-[4px] space-y-[4px]">
@@ -107,7 +116,7 @@
 								class="text-[12px] rounded max-w-[200px]"
 							>
 								<div v-if="index < maxCount">
-									<div class="truncate text-gray-700 hover:bg-gray-100">{{ ticket.subject }}</div>
+									<div class="truncate text-base text-gray-700 hover:bg-gray-100">{{ ticket.subject }}</div>
 								</div>
 								<div v-else class="text-gray-500 hover:bg-gray-100">Show more</div>
 							</router-link>
@@ -117,7 +126,7 @@
 				<div class="h-full">
 					<div class="flex flex-col py-[14px] pl-[19px] pr-[27.81px] select-none" :class="showTicketHistory ? '' : 'border-b'">
 						<div class="shrink-0 flex flex-row items-center cursor-pointer" @click="() => {showTicketHistory = !showTicketHistory}">
-							<div class="grow text-base font-semibold"> Ticket History </div>
+							<div class="grow font-normal text-base"> Ticket History </div>
 							<CustomIcons class="h-[6px] fill-gray-400" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
 						</div>
 						<div 
@@ -220,7 +229,15 @@ export default {
 			const offset = 285
 			const multiplier = 23
 			const maxCount = 5
-			return offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 ))
+			
+			const customFiledWidth = 34
+			const customFieldPadding = this.ticket.custom_fields.length == 1 ? 30 : 55
+
+			console.log((customFieldPadding * 2 + customFiledWidth * this.ticket.custom_fields.length))
+
+			const a = offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 )) + (this.ticket.custom_fields.length > 0 ? (customFieldPadding * 2 + customFiledWidth * this.ticket.custom_fields.length) : 0)
+			console.log(a)
+			return a
 		},
 	},
 	watch: {

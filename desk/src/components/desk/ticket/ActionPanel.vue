@@ -9,7 +9,7 @@
 						<div class="grow"></div>
 						<div class="shrink-0">
 							<div 
-								class="bg-white border px-[8px] rounded-[10px] h-fit cursor-pointer"
+								class="bg-white border px-[8px] rounded-[10px] h-fit cursor-pointer w-fit"
 								:class="getStatusStyle(ticket.status)" 
 								@click="toggleStatuese = !toggleStatuese"
 								v-on-outside-click="() => { toggleStatuese = false }"
@@ -25,10 +25,10 @@
 								</div>
 							</div>
 							<div v-if="toggleStatuese">
-								<div class="rounded-[10px] shadow bg-white py-[8px] space-y-[4px] mt-[3px]">
+								<div class="rounded-[10px] shadow bg-white py-[4px] space-y-[4px] mt-[3px] absolute z-50">
 									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
 										<div 
-											class="pl-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-[10px] text-gray-600 uppercase"
+											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-[10px] text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
 											@click="updateStatus(status)"
 										> 
 											{{ status }} 
@@ -159,18 +159,6 @@
 					</Dropdown>
 				</div>
 				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="(newValue) => { ticketController.set(this.ticketId, 'notes', newValue) }" />
-			</div>
-		</div>
-		<div class="px-[19px] py-4 border-t space-y-[15px]" v-if="ticket.custom_fields.length > 0">
-			<div class="text-lg font-medium">{{ `Custom Fields (${ticket.template})` }}</div>
-			<div 
-				class="text-base space-y-[12px] overflow-y-scroll"
-				:style="{ height: viewportWidth > 768 ? `calc(100vh - 720px)` : null }"
-			>
-					<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
-						<div class="text-slate-500">{{ field.label }}</div>
-						<div :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
-					</div>
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
