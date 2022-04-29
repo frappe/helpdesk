@@ -8,6 +8,10 @@
  "field_order": [
   "label",
   "fieldtype",
+  "filter_using",
+  "filters",
+  "pluck",
+  "api_method",
   "reqd",
   "options",
   "auto_set",
@@ -66,11 +70,38 @@
    "in_preview": 1,
    "label": "Value",
    "options": "Python"
+  },
+  {
+   "default": "{}",
+   "depends_on": "eval:(doc.fieldtype=='Link' && doc.filter_using!='API Response' && !doc.auto_set)",
+   "fieldname": "filters",
+   "fieldtype": "Data",
+   "label": "Filters"
+  },
+  {
+   "default": "name",
+   "depends_on": "eval:(doc.fieldtype=='Link' && doc.filter_using!='API Response' && !doc.auto_set)",
+   "fieldname": "pluck",
+   "fieldtype": "Data",
+   "label": "Pluck"
+  },
+  {
+   "depends_on": "eval:(doc.fieldtype=='Link' && !doc.auto_set)",
+   "fieldname": "filter_using",
+   "fieldtype": "Select",
+   "label": "Filter List Using",
+   "options": "frappe.get_list()\nAPI Response"
+  },
+  {
+   "depends_on": "eval:(doc.fieldtype=='Link' && doc.filter_using=='API Response' && !doc.auto_set)",
+   "fieldname": "api_method",
+   "fieldtype": "Data",
+   "label": "API Method"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2022-04-19 14:16:53.186653",
+ "modified": "2022-04-29 14:27:25.423702",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket Template DocField",
