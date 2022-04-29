@@ -9,15 +9,6 @@
 					<component :is="Component" />
 				</router-view>
 			</div>
-			<div v-else>
-				<div class="mx-auto max-w-3xl mt-20">
-					<div class="p-6 bg-orange-50 border rounded-lg shadow space-y-4">
-						<p class="font-bold text-amber-700">Please login to be able to create tickets</p>
-						<p class="text-amber-700">If you don't already have an account, you can sign up for a new account.</p>
-						<Button appearance="primary" @click="this.$router.push({name: 'PortalLogin'})">Login to continue</Button>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </template>
@@ -42,6 +33,9 @@ export default {
 		return { user, tickets, ticketStatuses, ticketTemplates, ticketController };
 	},
 	mounted() {
+		if (!this.user.isLoggedIn()) {
+			this.$router.push({path: '/support/login'})
+		}
 		this.ticketController.createTicket = ((template = "Default") => {
 			console.log("create ticket");
 		});
@@ -81,7 +75,7 @@ export default {
 		tickets() {
 			return {
 				method: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
-				auto: true,
+				auto: this.user.isLoggedIn(),
 				onSuccess: (data) => {
 					this.tickets = {};
 					for (var i = 0; i < data.length; i++) {
@@ -107,7 +101,7 @@ export default {
 		statuses() {
 			return {
 				method: "frappedesk.api.ticket.get_all_ticket_statuses",
-				auto: true,
+				auto: this.user.isLoggedIn(),
 				onSuccess: (data) => {
 					this.ticketStatuses = data;
 				},
@@ -119,7 +113,7 @@ export default {
 		templates() {
 			return {
 				method: "frappedesk.api.ticket.get_all_ticket_templates",
-				auto: true,
+				auto: this.user.isLoggedIn(),
 				onSuccess: (data) => {
 					this.ticketTemplates = data;
 				},
