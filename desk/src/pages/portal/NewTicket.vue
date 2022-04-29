@@ -2,8 +2,9 @@
 	<div v-if="template" class="mx-auto max-w-2xl pt-4">
 		<div>
 			<div class="rounded-lg shadow-md border p-8">
-				<div class="font-medium mb-3">{{ `New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}` }}</div>
-				<div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div>
+				<div class="font-medium">{{ `New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}` }}</div>
+				<!-- <div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div> -->
+				<div class="text-[13px] text-gray-700" v-html="template.about"></div>
 				<div class="space-y-4 mb-4">
 					<div v-for="field in template.fields" :key="field">
 						<div v-if="!field.auto_set">
@@ -38,7 +39,7 @@
 								>
 									<template v-slot="{ toggleDropdown }">
 										<div>
-											<Button @click="toggleDropdown">{{ formData[field.fieldname] || `Select ${field.label}` }}</Button>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Select' }}</Button>
 										</div>
 									</template>
 								</Dropdown>
@@ -54,7 +55,7 @@
 								>
 									<template v-slot="{ toggleDropdown }">
 										<div>
-											<Button @click="toggleDropdown">{{ formData[field.fieldname] || `Select ${field.label}` }}</Button>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Select' }}</Button>
 										</div>
 									</template>
 								</Dropdown>
@@ -249,4 +250,7 @@ export default {
 }
 </script>
 <style>
+	.ql-editor.read-mode {
+		padding: 0px;
+	}
 </style>

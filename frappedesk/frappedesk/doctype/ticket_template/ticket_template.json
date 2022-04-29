@@ -21,7 +21,7 @@
   },
   {
    "fieldname": "about",
-   "fieldtype": "Long Text",
+   "fieldtype": "Text Editor",
    "label": "About"
   },
   {
@@ -39,7 +39,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-28 16:27:14.870072",
+ "modified": "2022-04-29 18:51:55.495881",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket Template",
