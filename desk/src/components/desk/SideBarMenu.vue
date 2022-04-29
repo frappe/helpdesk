@@ -119,28 +119,29 @@ export default {
 					{
 						label: 'All Tickets',
 						action: () => {
-							this.$router.push({path: '/frappedesk/tickets'})
+							this.select('All Tickets')
 							this.ticketFilter = 'All Tickets'
+							this.$router.push({path: '/frappedesk/tickets'})
 						}
 					},	// TODO: only add assigned and unassigend tickets if the user is a agent
 				]
 			},
-			{
-				label: 'Knowledge Base',
-				icon: 'knowledge-base',
-				action: () => {
-					this.select('Knowledge Base')
-					this.$router.push({path: '/frappedesk/knowledge-base'})
-				}
-			},
-			{
-				label: 'Reports',
-				icon: 'reports',
-				action: () => {
-					this.select('Reports')
-					this.$router.push({path: '/frappedesk/reports'})
-				}
-			},
+			// {
+			// 	label: 'Knowledge Base',
+			// 	icon: 'knowledge-base',
+			// 	action: () => {
+			// 		this.select('Knowledge Base')
+			// 		this.$router.push({path: '/frappedesk/knowledge-base'})
+			// 	}
+			// },
+			// {
+			// 	label: 'Reports',
+			// 	icon: 'reports',
+			// 	action: () => {
+			// 		this.select('Reports')
+			// 		this.$router.push({path: '/frappedesk/reports'})
+			// 	}
+			// },
 			{
 				label: 'Contacts',
 				icon: 'customers',
@@ -152,13 +153,13 @@ export default {
 							this.$router.push({path: '/frappedesk/contacts'})
 						}
 					},
-					{
-						label: 'Organisations',
-						action: () => {
-							this.select('Organisations')
-							// this.$router.push({path: '/frappedesk/organisations'})
-						}
-					}
+					// {
+					// 	label: 'Organisations',
+					// 	action: () => {
+					// 		this.select('Organisations')
+					// 		// this.$router.push({path: '/frappedesk/organisations'})
+					// 	}
+					// }
 				]
 			},
 			{
