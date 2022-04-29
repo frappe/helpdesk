@@ -27,7 +27,7 @@
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
 				</div>
-				<div class="sm:w-3/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('contact')">
+				<div class="sm:w-3/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('rasied_by')">
 					<span>Created By</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent"
@@ -176,7 +176,7 @@ export default {
 				if (Object.keys(tickets).length > 0) {
 					if (this.sortby) {
 						tickets = Object.values(tickets).sort((a, b) => {
-							return new Date(a[this.sortby]) - new Date(b[this.sortby]) * (this.sortDirection == 'assending' ? 1 : -1)
+							return (new Date(a[this.sortby]) - new Date(b[this.sortby])) * (this.sortDirection == 'assending' ? 1 : -1)
 						})
 						// update selected tickets
 						this.selectedTickets = this.selectedTickets.filter((item1) => {
