@@ -42,7 +42,7 @@
 									<Badge :color="getStatusBadgeColor(ticket.status)">{{ getStatus(ticket.status) }}</Badge>
 								</div>
 								<div class="sm:w-2/12 flow-root">
-									<div class="float-right text-slate-500">{{ formatedCreationTime(ticket.creation) }}</div>
+									<div class="float-right text-slate-500">{{ $dayjs.longFormating($dayjs(ticket.creation).fromNow()) }}</div>
 								</div>
 							</div>
 						</div>
@@ -129,10 +129,6 @@ export default {
 				case 'Open':
 					return 'green'
 			}
-		},
-		formatedCreationTime(time) {
-			let formatedTime = this.$dayjs(time).fromNow()
-			return formatedTime === 'Now' ? 'Just now' : formatedTime + ' ago'
 		},
 		changeSortBy(fieldname) {
 			if (this.sortBy == fieldname) {
