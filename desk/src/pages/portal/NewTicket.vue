@@ -39,7 +39,7 @@
 								>
 									<template v-slot="{ toggleDropdown }">
 										<div>
-											<Button @click="toggleDropdown">{{ formData[field.fieldname] || `Select ${field.label}` }}</Button>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Select' }}</Button>
 										</div>
 									</template>
 								</Dropdown>
@@ -55,7 +55,7 @@
 								>
 									<template v-slot="{ toggleDropdown }">
 										<div>
-											<Button @click="toggleDropdown">{{ formData[field.fieldname] || `Select ${field.label}` }}</Button>
+											<Button @click="toggleDropdown">{{ formData[field.fieldname] || 'Select' }}</Button>
 										</div>
 									</template>
 								</Dropdown>
