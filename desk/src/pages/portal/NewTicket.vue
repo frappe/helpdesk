@@ -225,7 +225,8 @@ export default {
 						list = await call(field.api_method)
 						break;
 					case 'frappe.get_list()':
-						list = (await call('frappe.client.get_list', { doctype, filters: field.filters, pluck: field.pluck })).map(x => x.name)
+						list = [...new Set((await call('frappe.client.get_list', { doctype, filters: field.filters, fields: [field.pluck] })).map(x => x[field.pluck]))]
+						console.log(list)
 						break;
 				}
 				list.forEach(doc => {
