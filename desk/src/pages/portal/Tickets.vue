@@ -15,7 +15,7 @@
 				<div class="space-x-3 items-center flex">
 					<Dropdown
 						placement="right"
-						:options="ticketTemplateOptions()"
+						:options="ticketTemplateOptions().length > 1 ? ticketTemplateOptions() : []"
 						:dropdown-width-full="true"
 					>
 						<template v-slot="{ toggleTemplates }">

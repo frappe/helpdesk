@@ -219,12 +219,19 @@ export default {
 			let doctype = field.options
 			if (doctype) {
 				let items = [];
-				let list = (await call('frappe.client.get_list', { doctype })).map(x => x.name)
+				let list = []
+				switch(field.filter_using) {
+					case 'API Response':
+						list = await call(field.api_method)
+						break;
+					case 'frappe.get_list()':
+						list = (await call('frappe.client.get_list', { doctype, filters: field.filters, pluck: field.pluck })).map(x => x.name)
+						break;
+				}
 				list.forEach(doc => {
 					items.push({
 						label: doc,
 						handler: () => {
-							console.log(doc)
 							this.formData[field.fieldname] = doc
 						},
 					});
