@@ -116,7 +116,7 @@
 								class="text-[12px] rounded max-w-[200px]"
 							>
 								<div v-if="index < maxCount">
-									<div class="truncate text-base text-gray-700 hover:bg-gray-100">{{ ticket.subject }}</div>
+									<div class="truncate text-base text-gray-700 hover:bg-gray-100">{{ _ticket.subject }}</div>
 								</div>
 								<div v-else class="text-gray-500 hover:bg-gray-100">Show more</div>
 							</router-link>
