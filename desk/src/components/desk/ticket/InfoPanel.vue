@@ -262,7 +262,12 @@ export default {
 			this.showNewContactDialog = false
 			this.editingContact = false
 			this.ticketController.set(this.ticketId, 'contact', contact.name)
-		}
+		},
+		redirectToRoute(route) {
+			if (route) {
+				window.location.href = route
+			}
+		},
 	},
 	resources: {
 		otherTicketsOfContact() {
