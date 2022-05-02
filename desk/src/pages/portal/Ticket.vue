@@ -137,7 +137,7 @@ export default {
 				},
 				placeholder: 'Compose your reply...',
 				theme: 'snow',
-				bounds: 7,
+				bounds: document.body,
 			}
 		}
 	},
