@@ -111,7 +111,7 @@
 </template>
 <script>
 import { inject, ref } from 'vue'
-import { Input, TextEditor, Card, Dropdown, ErrorMessage, FileUploader } from 'frappe-ui'
+import { Input, TextEditor, Card, Dropdown, ErrorMessage, FileUploader, FeatherIcon } from 'frappe-ui'
 import { call } from 'frappe-ui'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
@@ -126,7 +126,8 @@ export default {
 		Dropdown,
 		ErrorMessage,
 		QuillEditor,
-		FileUploader
+		FileUploader,
+		FeatherIcon
 	},
 	setup() {
 		const user = inject('user')
