@@ -95,13 +95,11 @@ export default {
 			}
 		},
 		this.ticketController.markAsSeen = (ticketId) => {
-			console.log(`marking ${ticketId} as seen!!`)
 			this.$resources.markTicketAsSeen.submit({
 				ticket_id: ticketId
 			})
 		}
 		this.ticketController.set = (ticketId, type, ref=null) => {
-			this.ticketController.markAsSeen(ticketId)
 			switch (type) {
 				case 'type':
 					return this.$resources.assignTicketType.submit({
@@ -238,8 +236,8 @@ export default {
 		updateTicketContact() {
 			return {
 				method: 'frappedesk.api.ticket.update_contact',
-				onSuccess: (ticket) => {
-					this.ticketController.update(ticket.name)
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 				},
 				onFailure: () => {
 					// TODO:
@@ -340,7 +338,8 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: (ticket) => {
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
 				},
 				onFailure: () => {
@@ -363,7 +362,8 @@ export default {
 		assignTicketType() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_type',
-				onSuccess: (ticket) => {
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
 				},
 				onFailure: () => {
@@ -374,7 +374,8 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_status',
-				onSuccess: (ticket) => {
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
 				},
 				onFailure: () => {
@@ -397,7 +398,8 @@ export default {
 		assignTicketPriority() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_priority',
-				onSuccess: (ticket) => {
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
 				},
 				onFailure: () => {
@@ -408,7 +410,8 @@ export default {
 		assignTicketGroup() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_group',
-				onSuccess: (ticket) => {
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
 				},
 				onFailure: () => {
@@ -430,7 +433,8 @@ export default {
 		setTicketNotes() {
 			return {
 				method: 'frappedesk.api.ticket.set_ticket_notes',
-				onSuccess: (ticket) => {
+				onSuccess: async (ticket) => {
+					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
 				},
 				onFailure: () => {

@@ -25,8 +25,8 @@ class Ticket(Document):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
 	def validate(self):
-		if self.is_new() and self.via_customer_portal:
-			self.flags.create_communication = True
+		# if self.is_new() and self.via_customer_portal:
+		# 	self.flags.create_communication = True
 
 		if not self.raised_by:
 			self.raised_by = frappe.session.user
@@ -40,10 +40,11 @@ class Ticket(Document):
 		log_ticket_activity(self.name, "Create")
 
 	def on_update(self):
+		pass
 		# Add a communication in the ticket timeline
-		if self.flags.create_communication and self.via_customer_portal:
-			self.create_communication()
-			self.flags.communication_created = None
+		# if self.flags.create_communication and self.via_customer_portal:
+		# 	self.create_communication()
+		# 	self.flags.communication_created = None
 
 	def update_priority_based_on_ticket_type(self):
 		if (self.ticket_type):
@@ -196,6 +197,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 	communication.save(ignore_permissions=True)
 
 	for attachment in attachments:
+		print(f'\nATTACHMENT: {attachment}')
 		file_doc = frappe.get_doc("File", attachment)
 		file_doc.attached_to_name = communication.name
 		file_doc.attached_to_doctype = "Communication"
