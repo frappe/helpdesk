@@ -15,6 +15,8 @@ class TicketTemplate(Document):
 				frappe.throw(f'Type {field.fieldtype} not allowed, should be in {allowed_field_types}')
 			if not field.fieldname:
 				field.fieldname = cleanup_page_name(field.label)
+			if field.fieldname == 'description' and field.fieldtype != 'Text Editor':
+				frappe.throw(f'field type for description field should be Text Editor')
 
 		required_fields_not_added = []
 		for fieldname in ['subject', 'description']:

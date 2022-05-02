@@ -26,6 +26,37 @@
 										@click="focusEditor(field)"
 										:class="`text-editor-${field.fieldname}`"
 									/>
+									<div v-if="field.fieldname == 'description'" class="border-b border-l border-r border-gray-400 p-2 select-none">
+										<div class="w-full">
+											<FileUploader @success="(file) => attachments.push(file)">
+												<template
+													v-slot="{ progress, uploading, openFileSelector }"
+												>
+													<div class="flex flex-row justify-between space-x-2 items-center">
+														<div class="flex flex-row space-x-2">
+															<div v-for="file in attachments" :key="file.name">
+																<div class="flex space-x-2 items-center text-base bg-white border border-gray-400 rounded-md px-3 py-1">
+																	<div class="inline-block max-w-[100px] truncate">
+																		{{ file.file_name }}
+																	</div>
+																	<div>
+																		<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
+																			attachments = attachments.filter(x => x.name != file.name)
+																		}"/>
+																	</div>
+																</div>
+															</div>
+														</div>
+														<div>
+															<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
+																{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
+															</Button>
+														</div>
+													</div>
+												</template>
+											</FileUploader>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div v-else-if="field.fieldtype == 'Link'">
@@ -80,7 +111,7 @@
 </template>
 <script>
 import { inject, ref } from 'vue'
-import { Input, TextEditor, Card, Dropdown, ErrorMessage } from 'frappe-ui'
+import { Input, TextEditor, Card, Dropdown, ErrorMessage, FileUploader } from 'frappe-ui'
 import { call } from 'frappe-ui'
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
@@ -94,7 +125,8 @@ export default {
 		Card,
 		Dropdown,
 		ErrorMessage,
-		QuillEditor
+		QuillEditor,
+		FileUploader
 	},
 	setup() {
 		const user = inject('user')
@@ -131,8 +163,10 @@ export default {
 			theme: 'snow',
 			bounds: 7,
 		})
+		
+		const attachments = ref([])
 
-		return { user, ticketTemplates, ticketController, formData, linkedFieldOptions, newTicketSubmitLoading, validationErrors, editorOptions }
+		return { user, ticketTemplates, ticketController, formData, linkedFieldOptions, newTicketSubmitLoading, validationErrors, editorOptions, attachments }
 	},
 	computed: {
 		template() {
@@ -161,7 +195,7 @@ export default {
 		},
 		submitTicket() {
 			if (this.validateTicketForm()) {
-				this.newTicketSubmitLoading = this.ticketController.newTicket(this.formData, this.template.name)
+				this.newTicketSubmitLoading = this.ticketController.newTicket(this.formData, this.template.name, this.attachments.map(x => x.name))
 			}
 		},
 		validateTicketForm() {
