@@ -11,7 +11,7 @@
 				<div v-if="attachments.length > 0" class="flex space-x-2 flex-wrap mt-3">
 					<div v-for="attachment in attachments" :key="attachment">
 						<a :href="attachment.file_url" class="py-1 rounded-sm text-gray-900 hover:underline flex items-center space-x-1">
-							<FeatherIcon name="file" class="h-3 w-3" />
+							<FeatherIcon name="paperclip" class="h-[12px] w-[12px]" />
 							<span>{{ attachment.file_name }}</span>
 						</a>
 					</div>
