@@ -12,8 +12,7 @@
 					<div class="text-gray-400">{{ ticket.name }}</div>
 				</div>
 				<div>
-					<Button @click="reopenTicket()" appearance="minimal" v-if="['Closed', 'Resolved'].includes(ticket.status)">Reopen</Button>
-					<Button @click="closeTicket()" class="bg-gray-100 text-red-500" v-else>Close</Button>
+					<Button v-if="['Open', 'Replied'].includes(ticket.status)" @click="closeTicket()" class="bg-gray-100 text-red-500">Close</Button>
 				</div>
 			</div>
 			<div class="flex items-center pb-2 justify-between">
@@ -25,7 +24,7 @@
 				<div class="overflow-auto grow">
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 				</div>
-				<div v-if="!editing" class="mt-5 ml-9">
+				<div v-if="!editing && ['Open', 'Replied'].includes(ticket.status)" class="mt-5 ml-9">
 					<Button @click="startEditing()" appearance="primary">Reply</Button>
 				</div>
 				<div

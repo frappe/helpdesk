@@ -99,7 +99,7 @@
 					<div class="text-base space-y-[12px]">
 							<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
 								<div class="text-gray-700 text-base">{{ field.label }}</div>
-								<div class="text-gray-900 text-base" :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" @click="() => redirectToRoute(field.route)">{{ field.value }}</div>
+								<a class="text-gray-900 text-base" :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" :href="field.route">{{ field.value }}</a>
 							</div>
 					</div>
 				</div>
@@ -262,11 +262,6 @@ export default {
 			this.showNewContactDialog = false
 			this.editingContact = false
 			this.ticketController.set(this.ticketId, 'contact', contact.name)
-		},
-		redirectToRoute(route) {
-			if (route) {
-				window.location.href = route
-			}
 		},
 	},
 	resources: {
