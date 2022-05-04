@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="w-full select-none">
-			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.80px] rounded-[6px]">
+			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px]">
 				<Input 
 					type="checkbox" 
 					@click="toggleSelectAllTickets()" 
