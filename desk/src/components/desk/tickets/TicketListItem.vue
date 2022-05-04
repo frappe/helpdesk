@@ -77,10 +77,9 @@
 						placement="right" 
 						:options="agentsAsDropdownOptions()" 
 						:dropdown-width-full="true"
-						class="text-base flex flex-row-reverse"
 					>
 						<template v-slot="{ toggleAssignees }">
-							<div @click="toggleAssignees" class="cursor-pointer">
+							<div @click="toggleAssignees" class="cursor-pointer text-base flex flex-row-reverse">
 								<div v-if="ticket.assignees.length > 0">
 									<div v-for="assignee in ticket.assignees" :key="assignee">
 										<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
