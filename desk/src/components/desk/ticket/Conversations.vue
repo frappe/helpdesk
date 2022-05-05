@@ -12,7 +12,6 @@
 							:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
 							:time="conversation.creation" 
 							:message="conversation.content"
-							:color="getConversationCardColor(getUserName(conversation))"
 							:attachments="conversation.attachments"
 							:isLast="index == conversation.length - 1"
 						/>
@@ -90,25 +89,12 @@ export default {
 			return (conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')
 		},
 		autoScrollToBottom() {
-			if (this.conversations) {
+			if (this.conversations && this.conversations.length > 0) {
 				const [el] = this.$refs["conversation-" + (this.conversations.length - 1)];
 				if (el) {
 					el.scrollIntoView({behavior: 'smooth'});
 				}
 			}
-		},
-		getConversationCardColor(userName) {
-			let cardColors = ['blue', 'gray', 'green', 'red']
-			
-			if (this.userColors[userName] === undefined) {
-				if (this.lastColorIndex == cardColors.length - 1) {
-					this.lastColorIndex = 0
-				} else {
-					this.lastColorIndex++
-				}
-				this.userColors[userName] = cardColors[this.lastColorIndex]
-			}
-			return this.userColors[userName]
 		}
 	}
 }
