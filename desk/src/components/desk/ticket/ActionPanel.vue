@@ -63,6 +63,9 @@
 		<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
 		<div class="px-[19px] py-[28px]">
 			<div class="text-base space-y-[12px]">
+				<div>
+					<router-link class="hover:underline" :to="{ path: '/support/impersonate', query: {contact: ticket.raised_by, ticketId: ticket.name}}" target="_blank">View in Customer Portal</router-link>
+				</div>
 				<div class="flex flex-col space-y-[8px]">
 					<div class="text-gray-600 font-normal text-[12px]">Assignee</div>
 					<Dropdown

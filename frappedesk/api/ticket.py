@@ -23,7 +23,8 @@ def get_tickets():
 			ticket.template,
 			ticket.agent_group,
 			ticket.first_responded_on,
-			ticket.notes
+			ticket.notes,
+			ticket.raised_by
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
