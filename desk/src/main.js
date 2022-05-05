@@ -11,7 +11,6 @@ app.directive('on-outside-click', onOutsideClickDirective)
 app.use(router)
 app.use(FrappeUI)
 app.component('Button', Button)
-app.directive('on-outside-click', onOutsideClickDirective)
 
 app.config.globalProperties.$dayjs = dayjs
 

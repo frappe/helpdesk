@@ -191,6 +191,7 @@ export default {
 				}
 			}
 		]
+
 		this.syncSelectedMenuItemBasedOnRoute()
 	},
 	methods: {
