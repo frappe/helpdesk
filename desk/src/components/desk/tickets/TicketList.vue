@@ -100,11 +100,12 @@ export default {
 		const tickets = inject('tickets')
 
 		const selectedTickets = ref([])
+		const ticketFilter = inject('ticketFilter')
 
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
-		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection }
+		return { user, viewportWidth, tickets, selectedTickets, ticketFilter, sortby, sortDirection }
 	},
 	computed: {
 		filteredTickets() {
@@ -133,29 +134,16 @@ export default {
 						}
 					})
 				}
-				if (this.user.agent) {
-					switch(this.$route.query.menu_filter) {
-						case 'unassigned':
-							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								if (Object.keys(ticket.assignees).length > 0) {
-									return Object.values(ticket.assignees).find((assignee) => { 
-										return (assignee.name != this.user.agent.name)
-									})
-								} else {
-									return true
-								}
+				if (this.ticketFilter == 'Unassigned Tickets' && this.user.agent) {
+					filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+						if (Object.keys(ticket.assignees).length > 0) {
+							return Object.values(ticket.assignees).find((assignee) => { 
+								return (assignee.name != this.user.agent.name)
 							})
-							break
-						case 'assigned-to-me':
-							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								return Object.values(ticket.assignees).find((assignee) => { 
-									return (assignee.name == this.user.agent.name)
-								})
-							})
-							break
-					}
-				}
-				if (this.$route.query.menu_filter == 'unassigned' && this.user.agent) {
+						} else {
+							return true
+						}
+					})
 				}
 			}
 			return filteredTickets
