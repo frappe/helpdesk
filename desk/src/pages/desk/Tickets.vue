@@ -12,14 +12,13 @@
 						placement="right" 
 						:options="agentsAsDropdownOptions()" 
 						:dropdown-width-full="true"
-						class="text-base flex flex-row-reverse"
 					>
 						<template v-slot="{ toggleAssignees }">
-							<div @click="toggleAssignees" class="cursor-pointer">
+							<div @click="toggleAssignees" class="cursor-pointer text-base flex flex-row-reverse">
 								<Button appearance="secondary">
 									<div class="flex items-center space-x-2">
 										<div>Assign</div>
-										<CustomIcons class="h-4" name="select" />
+										<CustomIcons name="select" class="w-[12px] h-[12px] stroke-gray-500" />
 									</div>
 								</Button>
 							</div>

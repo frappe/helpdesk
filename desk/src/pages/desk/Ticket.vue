@@ -23,7 +23,7 @@
 										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
 											{{ ticket.subject }}
 										</div>
-										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded mt-1 group-hover:block">
+										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded shadow mt-[9px] group-hover:block">
 											<p>{{ ticket.subject }}</p>
 										</div>
 									</div>
@@ -253,3 +253,9 @@ export default {
 	},
 }
 </script>
+<style scoped>
+*::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+}
+</style>
