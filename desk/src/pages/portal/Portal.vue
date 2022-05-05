@@ -26,15 +26,26 @@ export default {
 		const ticketStatuses = ref([]);
 		const ticketTemplates = ref([]);
 		const ticketController = ref({});
+
+		const impersonateContact = ref()
+		provide('impersonateContact', impersonateContact)
+
 		provide("tickets", tickets);
 		provide("ticketStatuses", ticketStatuses);
 		provide("ticketTemplates", ticketTemplates);
 		provide("ticketController", ticketController);
-		return { user, tickets, ticketStatuses, ticketTemplates, ticketController };
+		return { user, tickets, ticketStatuses, ticketTemplates, ticketController, impersonateContact };
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
 			this.$router.push({path: '/support/login'})
+		}
+		if (this.user.isAdmin || this.user.agent) {
+			this.impersonateContact = async (contact) => {
+				let tickets = await this.$resources.tickets.fetch({
+					impersonate: contact 
+				})
+			}
 		}
 		this.ticketController.createTicket = ((template = "Default") => {
 			console.log("create ticket");

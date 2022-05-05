@@ -211,6 +211,11 @@ const routes = [
 				path: 'tickets/new',
 				name: 'DefaultNewTicket',
 				component: () => import('@/pages/portal/NewTicket.vue'),
+			},
+			{
+				path: 'impersonate',
+				name: 'Impersonate',
+				component: () => import('@/pages/portal/Impersonate.vue')
 			}
 		]
 	},
