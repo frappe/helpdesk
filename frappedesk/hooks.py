@@ -51,4 +51,5 @@ website_route_rules = [
 	{"from_route": "/support/signup", "to_route": "frappedesk"},
 	{"from_route": "/support/verify", "to_route": "frappedesk"},
 	{"from_route": "/support/verify/<path:app_path>", "to_route": "frappedesk"},
+	{"from_route": "/support/impersonate", "to_route": "frappedesk"},
 ]
