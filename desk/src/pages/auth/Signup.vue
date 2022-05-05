@@ -31,7 +31,7 @@
 				/>
 				<ErrorMessage class="mt-4" error="" />
 				<div>
-					<Button appearance="primary" class="w-full mt-4" :loading="false" type="primary"> 
+					<Button appearance="primary" class="w-full mt-4" :loading="submitting" type="primary"> 
 						Submit
 					</Button>
 				</div>
@@ -100,7 +100,9 @@ export default {
 
 		const user = inject('user')
 
-		return { email, firstName, lastName, emailSent, user }
+		const submitting = ref(false)
+
+		return { email, firstName, lastName, emailSent, user, submitting }
 	},
 	async mounted() {
 		if (this.user.isLoggedIn()) {
@@ -113,8 +115,10 @@ export default {
 	},
 	methods: {
 		async signup() {
+			this.submitting = true
 			await this.user.signup(this.email, this.firstName, this.lastName) // TODO: handle error, success and loading responeses
 			this.emailSent = true
+			this.submitting = false
 		}
 	}
 };
