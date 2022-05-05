@@ -67,7 +67,6 @@ export default {
 	setup() {
 		const user = inject('user')
 		const tickets = inject('tickets')
-		const ticketFilter = inject('ticketFilter')
 		const showNewTicketDialog = ref(false)
 
 		const filters = ref([])
@@ -86,7 +85,6 @@ export default {
 		return {
 			user, 
 			tickets, 
-			ticketFilter, 
 			showNewTicketDialog, 
 			filters, 
 			toggleFilters,
@@ -100,7 +98,6 @@ export default {
 		}
 	},
 	mounted() {
-		this.syncFilterBasedOnTicketFilter(this.ticketFilter)
 		if (this.$route.query) {
 			for (const [key, value] of Object.entries(this.$route.query)) {
 				if (['ticket_type', 'raised_by', 'status', 'priority', 'assignee'].includes(key)) {
@@ -111,41 +108,28 @@ export default {
 			} 
 		}
 	},
+	watch: {
+		filters(newValue) {
+			let query = this.$route.query.menu_filter ? {menu_filter: this.$route.query.menu_filter} : {}
+			newValue.forEach(filter => {
+				for (const [key, value] of Object.entries(filter)) {
+					if (['ticket_type', 'raised_by', 'status', 'priority', 'assignee'].includes(key)) {
+						if (key == 'assignee') {
+							query.menu_filter = 'all'
+						}
+						query[key] = value
+					}
+				}
+			})
+			this.$router.push({path: this.$route.path, query})
+		}
+	},
 	computed: {
 		showTicketBluckUpdatePanel() {
 			return this.selectedTickets.length > 0
 		}
 	},
-	watch: {
-		ticketFilter(newValue) {
-			this.syncFilterBasedOnTicketFilter(newValue)
-		},
-		filters(newValue) {
-			let assigneeFilter = newValue.find(x => Object.keys(x)[0] === 'assignee')
-			if (assigneeFilter && this.user.agent) {
-				if (Object.values(assigneeFilter)[0] === this.user.agent.name) {
-					this.ticketFilter = "Assigned Tickets"
-				} else {
-					if (this.ticketFilter == 'Assigned Tickets') {
-						this.ticketFilter = "All Tickets"
-					}
-				}
-			} else {
-				if (this.ticketFilter == 'Assigned Tickets') {
-					this.ticketFilter = "All Tickets"
-				}
-			}
-		}
-	},
 	methods: {
-		syncFilterBasedOnTicketFilter(newTicketFilterValue) {
-			this.filters = this.filters.filter(x => Object.keys(x)[0] != 'assignee')
-			switch(newTicketFilterValue) {
-				case 'Assigned Tickets':
-					this.filters.push({assignee: this.user.agent.name})
-					break;
-			}
-		},
 		getFilterBoxOptions() {
 			return [
 				{label: "Type", name: "ticket_type", items: this.ticketTypes.map((item) => item.name)},
