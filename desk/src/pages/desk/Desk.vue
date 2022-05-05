@@ -31,7 +31,6 @@ export default {
 		const ticketPriorities = ref([])
 		const ticketStatuses = ref([])
 
-		const ticketFilter = ref('All Tickets')
 		const ticketController = ref({})
 
 		const contacts = ref([])
@@ -47,7 +46,6 @@ export default {
 		provide('ticketPriorities', ticketPriorities)
 		provide('ticketStatuses', ticketStatuses)
 
-		provide('ticketFilter', ticketFilter)
 		provide('ticketController', ticketController)
 
 		provide('contacts', contacts)
