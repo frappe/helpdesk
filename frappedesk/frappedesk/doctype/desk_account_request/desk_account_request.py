@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
+from genericpath import exists
 import frappe
 from frappe.model.document import Document
 from frappe.utils import random_string, get_url
@@ -20,12 +21,20 @@ class DeskAccountRequest(Document):
 
 		subject = "Verify your account"
 
-		frappe.sendmail(
-			recipients=self.email,
-			subject=subject,
-			template="email_verification",
-			args=dict(
-				link=url
-			),
-			now=True,
-		)
+		sender = None
+		if frappe.db.exists("Email Account", {"name": "Support", "enable_outgoing": True}):
+			sender=frappe.get_doc("Email Account", "Support").email_id
+
+		try:
+			frappe.sendmail(
+				recipients=self.email,
+				sender=sender,
+				subject=subject,
+				template="email_verification",
+				args=dict(
+					link=url
+				),
+				now=True,
+			)
+		except:
+			frappe.throw("Either setup up Support email account or there should be a default outgoing email account")
