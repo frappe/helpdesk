@@ -240,11 +240,11 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		
 		_attachments.append({'file_url': file_doc.file_url})
 
-	if frappe.db.exists("Email Account", {"default_outgoing": "1"}) and not ticket_doc.via_customer_portal:
+	if frappe.db.exists("Email Account", {"default_outgoing": "1"}):
 		reply_to_email = frappe.get_value("Email Account", {"default_outgoing": "1"}, "email_id")
 		frappe.sendmail(
-			subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
-			sender=f"{frappe.session.user} <{reply_to_email}>",
+			subject=f"Re: {ticket_doc.subject}",
+			sender=reply_to_email,
 			reply_to=reply_to_email,
 			message=message,
 			recipients=[ticket_doc.raised_by],
