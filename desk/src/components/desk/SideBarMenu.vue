@@ -212,17 +212,7 @@ export default {
 		]
 
 		// When the page is refreshed / opened the selected side bar option will  be set 
-		if (this.$route.path.includes('frappedesk/tickets')) {
-			this.select('All Tickets')
-		} else if (this.$route.path.includes('frappedesk/knowledge-base')) {
-			this.select('Knowledge Base')
-		} else if (this.$route.path.includes('frappedesk/reports')) {
-			this.select('Reports')
-		} else if (this.$route.path.includes('frappedesk/contacts')) {
-			this.select('Contacts')
-		} else if (this.$route.path.includes('frappedesk/settings')) {
-			this.select('Settings')
-		}
+		this.syncSelectedMenuItemBasedOnRoute()
 	},
 	watch: {
 		ticketFilter(newValue) {
@@ -230,6 +220,38 @@ export default {
 		}
 	},
 	methods: {
+		syncSelectedMenuItemBasedOnRoute() {
+			const handleTicketFilterQueries = () => {
+				const ticketFilterMap = {
+					'assigned-to-me': 'Assigned Tickets',
+					'unassigned': 'Unassigned Tickets'
+				}
+				if (ticketFilterMap[this.$route.query['menu-filter']]) {
+					return ticketFilterMap[this.$route.query['menu-filter']]
+				} else {
+					// TODO: remove menu-filter parameter from router query
+					return 'All Tickets'
+				}
+			}
+
+			const routeMenuItemMap = {
+				'frappedesk/tickets': 'All Tickets',
+				'frappedesk/knowledge-base': 'Knowledge Base',
+				'frappedesk/reports': 'Reports',
+				'frappedesk/contacts': 'Contacts',
+				'frappedesk/settings': 'Settings'
+			}
+			Object.keys(routeMenuItemMap).forEach(route => {
+				if (this.$route.path.includes(route)) {
+					let selectedMenuItem = routeMenuItemMap[route]
+					if (routeMenuItemMap[route] == 'All Tickets' && this.$route.query['menu-filter']) {
+						selectedMenuItem = handleTicketFilterQueries()
+					}
+					this.select(selectedMenuItem)
+					return
+				}
+			})
+		},
 		select(label) {
 			this.menuOptions.forEach(option => {
 				if (option.children) {
