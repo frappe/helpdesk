@@ -41,10 +41,15 @@ export default {
 			this.$router.push({path: '/support/login'})
 		}
 		if (this.user.isAdmin || this.user.agent) {
-			this.impersonateContact = async (contact) => {
-				let tickets = await this.$resources.tickets.fetch({
+			this.impersonateContact = (contact) => {
+				return this.$resources.tickets.fetch({
 					impersonate: contact 
 				})
+			}
+		} else {
+			this.impersonateContact = () => {
+				this.$router.push({path: '/support/tickets'})
+				this.$resources.tickets.fetch();
 			}
 		}
 		this.ticketController.createTicket = ((template = "Default") => {

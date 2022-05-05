@@ -16,9 +16,10 @@ export default {
 	setup() {
 		const contact = ref('')
 		const ticketId = ref('')
+		const user = inject('user')
 		const impersonateContact = inject('impersonateContact')
 
-		return {contact, ticketId, impersonateContact}
+		return {contact, ticketId, impersonateContact, user}
 	},
 	watch: {
 		async impersonateContact(impersonateContact) {
