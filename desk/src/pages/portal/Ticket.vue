@@ -132,7 +132,19 @@ export default {
 						[{ 'align': [] }],
 
 						['clean']                                         // remove formatting button
-					]
+					],
+					keyboard: {
+						bindings: {
+							// Cmd+Enter to send reply
+							cmdEnter: {
+								key: 13,
+								ctrlKey: true,
+								handler: () => {
+									this.submitConversation();
+								}
+							}
+						}
+					}
 				},
 				placeholder: 'Compose your reply...',
 				theme: 'snow',
