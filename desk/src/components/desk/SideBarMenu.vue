@@ -20,7 +20,7 @@
 						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
 					}"
 				>
-					<div class="pl-[22px] h-[30px] flex items-center space-x-[8px]">
+					<div class="pl-[22px] py-[5px] flex items-center space-x-[8px]">
 						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
 						<span class="grow">{{ option.label }}</span>
 						<div v-if="option.children" class="pr-[17.81px]">
@@ -32,7 +32,7 @@
 					<div>
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<div 
-								class="group h-[30px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
+								class="group py-[5px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
 								:class="childOption.selected ? 'bg-gray-200 text-gray-800 font-medium' : 'font-normal text-gray-600 '"
 								@click="() => { childOption.action ? childOption.action() : {} }"
 							>
@@ -84,7 +84,7 @@
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import { Dropdown } from 'frappe-ui'
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
-import { inject, ref } from 'vue'
+import { inject, provide, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
@@ -98,8 +98,6 @@ export default {
 		
 		const user = inject('user')
 
-		const ticketFilter = inject('ticketFilter')
-
 		const iconHeight = ref(30)
 		const iconWidth = ref(30)
 
@@ -107,7 +105,9 @@ export default {
 		const profileSettings = ref()
 		const showProfileSettings = ref(false)
 
-		return { viewportWidth, user, ticketFilter, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings }
+		const updateSidebarFilter = inject('updateSidebarFilter')
+
+		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings, updateSidebarFilter }
 	},
 	mounted() {
 		this.menuOptions = [
@@ -119,29 +119,14 @@ export default {
 					{
 						label: 'All Tickets',
 						action: () => {
-							this.select('All Tickets')
-							this.ticketFilter = 'All Tickets'
-							this.$router.push({path: '/frappedesk/tickets'})
+							let query = Object.assign({}, this.$route.query)
+							query.menu_filter = 'all'
+							this.$router.push({path: '/frappedesk/tickets', query})
+							this.select("All Tickets")
 						}
-					},	// TODO: only add assigned and unassigend tickets if the user is a agent
+					},
 				]
 			},
-			// {
-			// 	label: 'Knowledge Base',
-			// 	icon: 'knowledge-base',
-			// 	action: () => {
-			// 		this.select('Knowledge Base')
-			// 		this.$router.push({path: '/frappedesk/knowledge-base'})
-			// 	}
-			// },
-			// {
-			// 	label: 'Reports',
-			// 	icon: 'reports',
-			// 	action: () => {
-			// 		this.select('Reports')
-			// 		this.$router.push({path: '/frappedesk/reports'})
-			// 	}
-			// },
 			{
 				label: 'Contacts',
 				icon: 'customers',
@@ -153,13 +138,6 @@ export default {
 							this.$router.push({path: '/frappedesk/contacts'})
 						}
 					},
-					// {
-					// 	label: 'Organisations',
-					// 	action: () => {
-					// 		this.select('Organisations')
-					// 		// this.$router.push({path: '/frappedesk/organisations'})
-					// 	}
-					// }
 				]
 			},
 			{
@@ -175,20 +153,35 @@ export default {
 		if (this.user.agent) {
 			this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
 				{
-					label: 'Assigned Tickets',
+					label: 'My Open Tickets',
 					action: () => {
-						this.$router.push({path: '/frappedesk/tickets'})
-						this.ticketFilter = 'Assigned Tickets'
+						let query = Object.assign({}, this.$route.query)
+						delete query.assignee
+						query.menu_filter = 'my-open-tickets'
+						this.$router.push({path: '/frappedesk/tickets', query})
+						this.select("My Open Tickets")
 					}
 				},
 				{
-					label: 'Unassigned Tickets',
+					label: 'My Replied Tickets',
 					action: () => {
-						this.select('Unassigned Tickets')
-						this.$router.push({path: '/frappedesk/tickets'})
-						this.ticketFilter = 'Unassigned Tickets'
+						let query = Object.assign({}, this.$route.query)
+						delete query.assignee
+						query.menu_filter = 'my-replied-tickets'
+						this.$router.push({path: '/frappedesk/tickets', query})
+						this.select("My Replied Tickets")
 					}
-				}
+				},
+				{
+					label: 'My Resolved and Closed Tickets',
+					action: () => {
+						let query = Object.assign({}, this.$route.query)
+						delete query.assignee
+						query.menu_filter = 'my-resolved-and-closed-tickets'
+						this.$router.push({path: '/frappedesk/tickets', query})
+						this.select("My Resolved and Closed Tickets")
+					}
+				},
 			])
 		}
 
@@ -211,25 +204,47 @@ export default {
 			}
 		]
 
-		// When the page is refreshed / opened the selected side bar option will  be set 
-		if (this.$route.path.includes('frappedesk/tickets')) {
-			this.select('All Tickets')
-		} else if (this.$route.path.includes('frappedesk/knowledge-base')) {
-			this.select('Knowledge Base')
-		} else if (this.$route.path.includes('frappedesk/reports')) {
-			this.select('Reports')
-		} else if (this.$route.path.includes('frappedesk/contacts')) {
-			this.select('Contacts')
-		} else if (this.$route.path.includes('frappedesk/settings')) {
-			this.select('Settings')
-		}
-	},
-	watch: {
-		ticketFilter(newValue) {
-			this.select(newValue)
-		}
+		this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
+		this.updateSidebarFilter()
 	},
 	methods: {
+		syncSelectedMenuItemBasedOnRoute() {
+			const handleTicketFilterQueries = () => {
+				const ticketFilterMap = {
+					'all': 'All Tickets',
+					'my-open-tickets': 'My Open Tickets',
+					'my-replied-tickets': 'My Replied Tickets',
+					'my-resolved-and-closed-tickets': 'My Resolved and Closed Tickets',
+				}
+				if (ticketFilterMap[this.$route.query.menu_filter]) {
+					return ticketFilterMap[this.$route.query.menu_filter]
+				} else {
+					let query = Object.assign({}, this.$route.query)
+					delete query.menu_filter
+					query.menu_filter = 'all'
+					this.$router.push({path: '/frappedesk/tickets', query})
+					return 'All Tickets'
+				}
+			}
+
+			const routeMenuItemMap = {
+				'frappedesk/tickets': 'All Tickets',
+				'frappedesk/knowledge-base': 'Knowledge Base',
+				'frappedesk/reports': 'Reports',
+				'frappedesk/contacts': 'Contacts',
+				'frappedesk/settings': 'Settings'
+			}
+			Object.keys(routeMenuItemMap).forEach(route => {
+				if (this.$route.path.includes(route)) {
+					let selectedMenuItem = routeMenuItemMap[route]
+					if (routeMenuItemMap[route] == 'All Tickets') {
+						selectedMenuItem = handleTicketFilterQueries()
+					}
+					this.select(selectedMenuItem)
+					return
+				}
+			})
+		},
 		select(label) {
 			this.menuOptions.forEach(option => {
 				if (option.children) {
