@@ -40,6 +40,8 @@ export default {
 		const agentGroups = ref([])
 		const agentController = ref({})
 
+		const updateSidebarFilter = ref(() => {})
+
 		
 		provide('tickets', tickets)
 		provide('ticketTypes', ticketTypes)
@@ -54,6 +56,8 @@ export default {
 		provide('agents', agents)
 		provide('agentGroups', agentGroups)
 		provide('agentController', agentController)
+
+		provide('updateSidebarFilter', updateSidebarFilter)
 
 		return {
 			user,

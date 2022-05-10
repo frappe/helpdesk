@@ -84,7 +84,7 @@
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import { Dropdown } from 'frappe-ui'
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
-import { inject, ref } from 'vue'
+import { inject, provide, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
@@ -105,7 +105,9 @@ export default {
 		const profileSettings = ref()
 		const showProfileSettings = ref(false)
 
-		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings }
+		const updateSidebarFilter = inject('updateSidebarFilter')
+
+		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings, updateSidebarFilter }
 	},
 	mounted() {
 		this.menuOptions = [
@@ -192,10 +194,14 @@ export default {
 			}
 		]
 
-		this.syncSelectedMenuItemBasedOnRoute()
+		this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
+		this.updateSidebarFilter()
 	},
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
+			console.log('Updating sidebar filters..')
+			console.log(this.$route.query)
+
 			const handleTicketFilterQueries = () => {
 				const ticketFilterMap = {
 					'all': 'All Tickets',

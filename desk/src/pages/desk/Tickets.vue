@@ -81,6 +81,7 @@ export default {
 		const selectedTickets = ref([])
 
 		const ticketController = inject('ticketController')
+		const updateSidebarFilter = inject('updateSidebarFilter')
 
 		return {
 			user, 
@@ -94,7 +95,8 @@ export default {
 			agents,
 			contacts,
 			selectedTickets,
-			ticketController
+			ticketController,
+			updateSidebarFilter
 		}
 	},
 	mounted() {
@@ -121,7 +123,7 @@ export default {
 					}
 				}
 			})
-			this.$router.push({path: this.$route.path, query})
+			this.$router.push({path: this.$route.path, query}).then(() => this.updateSidebarFilter())
 		}
 	},
 	computed: {
