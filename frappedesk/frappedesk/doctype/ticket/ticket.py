@@ -239,12 +239,15 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		file_doc.save(ignore_permissions=True)
 		
 		_attachments.append({'file_url': file_doc.file_url})
+	
+	reply_to_email = None
+	if frappe.db.exists("Email Account", {"name": "Support", "enable_outgoing": True}):
+		reply_to_email=frappe.get_doc("Email Account", "Support").email_id
 
-	if frappe.db.exists("Email Account", {"default_outgoing": "1"}) and not ticket_doc.via_customer_portal:
-		reply_to_email = frappe.get_value("Email Account", {"default_outgoing": "1"}, "email_id")
+	try:
 		frappe.sendmail(
-			subject="Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
-			sender=f"{frappe.session.user} <{reply_to_email}>",
+			subject=f"Re: {ticket_doc.subject}",
+			sender=reply_to_email,
 			reply_to=reply_to_email,
 			message=message,
 			recipients=[ticket_doc.raised_by],
@@ -254,7 +257,8 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			attachments=_attachments if len(_attachments) > 0 else None,
 			now=True,
 		)
-
+	except:
+		frappe.throw("Either setup up Support email account or there should be a default outgoing email account")
 
 @frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):

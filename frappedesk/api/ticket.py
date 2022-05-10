@@ -157,7 +157,7 @@ def assign_ticket_status(ticket_id, status):
 		
 		if ticket_doc.status != status:
 			ticket_doc.status = status
-			ticket_doc.save()
+			ticket_doc.save(ignore_permissions=True)
 			log_ticket_activity(ticket_id, f"Status set to {status}")
 
 		return ticket_doc

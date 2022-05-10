@@ -13,7 +13,7 @@
 						:time="conversation.creation" 
 						:message="conversation.content"
 						:attachments="conversation.attachments"
-						:color="getConversationCardColor(getUserName(conversation))"
+						:color="getConversationCardColor(conversation)"
 					/>
 					<!-- TODO: dynamically set color based on user -->
 				</div>
@@ -50,10 +50,7 @@ export default {
 				params: {
 					ticket_id: this.ticketId
 				},
-				auto: true,
-				onSuccess: (data) => {
-					console.log(data)
-				}
+				auto: true
 			}
 		},
 	},
@@ -82,10 +79,6 @@ export default {
 	unmounted() {
 		this.$socket.off('list_update');
 	},
-	updated() {
-		this.userColors = {}
-		this.lastColorIndex = -1
-	},
 	methods: {
 		getUserName(conversation) {
 			return (conversation.sender.first_name ? conversation.sender.first_name : '') + ' ' + (conversation.sender.last_name ? conversation.sender.last_name : '')
@@ -98,10 +91,11 @@ export default {
 				}
 			}
 		},
-		getConversationCardColor(userName) {
+		getConversationCardColor(conversation) {
+			const userName = this.getUserName(conversation)
 			let cardColors = ['blue', 'gray', 'green', 'red']
 			
-			if (this.userColors[userName] === undefined) {
+			if (!this.userColors[userName]) {
 				if (this.lastColorIndex == cardColors.length - 1) {
 					this.lastColorIndex = 0
 				} else {

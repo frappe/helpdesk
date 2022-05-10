@@ -178,6 +178,8 @@ export default {
 		const tickets = inject('tickets')
 		const ticketController = inject('ticketController')
 		const attachments = ref([])
+
+		const tempTextEditorData = ref({})
 		
 		return { 
 			editor,
@@ -185,7 +187,8 @@ export default {
 			user,
 			tickets,
 			ticketController,
-			attachments
+			attachments,
+			tempTextEditorData
 		}
 	},
 	resources: {
@@ -193,9 +196,12 @@ export default {
 			return {
 				method: 'frappedesk.api.ticket.submit_conversation_via_agent',
 				onSuccess: () => {
+					this.tempTextEditorData = {}
+				},
+				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
-					element[0].innerHTML = "";
-					this.attachments = []
+					element[0].innerHTML = this.tempTextEditorData.innerHTML;
+					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
 		}
@@ -238,11 +244,19 @@ export default {
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		submitConversation() {
+			var element = document.getElementsByClassName("ql-editor");
+
+			this.tempTextEditorData.attachments = this.attachments
+			this.tempTextEditorData.innerHTML = element[0].innerHTML
+
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: this.content,
 				attachments: this.attachments.map(x => x.name)
 			})
+
+			element[0].innerHTML = "";
+			this.attachments = []
 		},
 		getNextTicket() {
 

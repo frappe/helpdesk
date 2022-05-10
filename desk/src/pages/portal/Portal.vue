@@ -93,7 +93,6 @@ export default {
 				method: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
 				auto: this.user.isLoggedIn() && this.$route.name != 'Impersonate',
 				onSuccess: (data) => {
-					console.log(data)
 					this.tickets = {};
 					for (var i = 0; i < data.length; i++) {
 						this.tickets[data[i].name] = data[i];
