@@ -52,9 +52,6 @@ export default {
 				this.$resources.tickets.fetch();
 			}
 		}
-		this.ticketController.createTicket = ((template = "Default") => {
-			console.log("create ticket");
-		});
 		this.ticketController.update = (ticketId) => {
 			if (ticketId) {
 				this.$resources.ticket.fetch({
