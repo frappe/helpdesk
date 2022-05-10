@@ -112,7 +112,9 @@ export default {
 	},
 	watch: {
 		filters(newValue) {
+			console.log('hererwr')
 			let query = this.$route.query.menu_filter ? {menu_filter: this.$route.query.menu_filter} : {}
+			console.log(query)
 			newValue.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
 					if (['ticket_type', 'raised_by', 'status', 'priority', 'assignee'].includes(key)) {

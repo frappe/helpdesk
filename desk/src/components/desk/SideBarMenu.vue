@@ -20,7 +20,7 @@
 						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
 					}"
 				>
-					<div class="pl-[22px] h-[30px] flex items-center space-x-[8px]">
+					<div class="pl-[22px] py-[5px] flex items-center space-x-[8px]">
 						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
 						<span class="grow">{{ option.label }}</span>
 						<div v-if="option.children" class="pr-[17.81px]">
@@ -32,7 +32,7 @@
 					<div>
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<div 
-								class="group h-[30px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
+								class="group py-[5px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
 								:class="childOption.selected ? 'bg-gray-200 text-gray-800 font-medium' : 'font-normal text-gray-600 '"
 								@click="() => { childOption.action ? childOption.action() : {} }"
 							>
@@ -153,25 +153,35 @@ export default {
 		if (this.user.agent) {
 			this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
 				{
-					label: 'Assigned Tickets',
+					label: 'My Open Tickets',
 					action: () => {
 						let query = Object.assign({}, this.$route.query)
 						delete query.assignee
-						query.menu_filter = 'assigned-to-me'
+						query.menu_filter = 'my-open-tickets'
 						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("Assigned Tickets")
+						this.select("My Open Tickets")
 					}
 				},
 				{
-					label: 'Unassigned Tickets',
+					label: 'My Replied Tickets',
 					action: () => {
 						let query = Object.assign({}, this.$route.query)
 						delete query.assignee
-						query.menu_filter = 'unassigned'
+						query.menu_filter = 'my-replied-tickets'
 						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("Unassigned Tickets")
+						this.select("My Replied Tickets")
 					}
-				}
+				},
+				{
+					label: 'My Resolved and Closed Tickets',
+					action: () => {
+						let query = Object.assign({}, this.$route.query)
+						delete query.assignee
+						query.menu_filter = 'my-resolved-and-closed-tickets'
+						this.$router.push({path: '/frappedesk/tickets', query})
+						this.select("My Resolved and Closed Tickets")
+					}
+				},
 			])
 		}
 
@@ -199,14 +209,12 @@ export default {
 	},
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
-			console.log('Updating sidebar filters..')
-			console.log(this.$route.query)
-
 			const handleTicketFilterQueries = () => {
 				const ticketFilterMap = {
 					'all': 'All Tickets',
-					'assigned-to-me': 'Assigned Tickets',
-					'unassigned': 'Unassigned Tickets'
+					'my-open-tickets': 'My Open Tickets',
+					'my-replied-tickets': 'My Replied Tickets',
+					'my-resolved-and-closed-tickets': 'My Resolved and Closed Tickets',
 				}
 				if (ticketFilterMap[this.$route.query.menu_filter]) {
 					return ticketFilterMap[this.$route.query.menu_filter]

@@ -134,6 +134,12 @@ export default {
 					})
 				}
 				if (this.user.agent) {
+					const checkIfTicketAssignedToMe = (ticket) => {
+						return Object.values(ticket.assignees).find((assignee) => { 
+							return (assignee.name == this.user.agent.name)
+						})
+					}
+
 					switch(this.$route.query.menu_filter) {
 						case 'unassigned':
 							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
@@ -141,21 +147,35 @@ export default {
 									return Object.values(ticket.assignees).find((assignee) => { 
 										return (assignee.name != this.user.agent.name)
 									})
-								} else {
-									return true
 								}
+								return true
 							})
 							break
-						case 'assigned-to-me':
+						case 'my-open-tickets':
 							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								return Object.values(ticket.assignees).find((assignee) => { 
-									return (assignee.name == this.user.agent.name)
-								})
+								if (ticket.status == 'Open') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+						case 'my-replied-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Replied') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+						case 'my-resolved-and-closed-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Resolved' || ticket.status == 'Closed') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
 							})
 							break
 					}
-				}
-				if (this.$route.query.menu_filter == 'unassigned' && this.user.agent) {
 				}
 			}
 			return filteredTickets
