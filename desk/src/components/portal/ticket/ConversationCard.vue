@@ -10,7 +10,7 @@
 				<span v-html="cleanedMessage"></span>
 				<div v-if="attachments.length > 0" class="flex space-x-2 flex-wrap mt-3">
 					<div v-for="attachment in attachments" :key="attachment">
-						<a :href="attachment.file_url" class="py-1 rounded-sm text-gray-900 hover:underline flex items-center space-x-1">
+						<a :href="attachment.file_url" target="_blank" class="py-1 rounded-sm text-gray-900 hover:underline flex items-center space-x-1">
 							<FeatherIcon name="paperclip" class="h-[12px] w-[12px]" />
 							<span>{{ attachment.file_name }}</span>
 						</a>
