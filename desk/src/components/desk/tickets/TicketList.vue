@@ -106,7 +106,7 @@ export default {
 
 		const resetSelections = inject('resetSelections')
 
-		return { user, viewportWidth, tickets, selectedTickets, ticketFilter, sortby, sortDirection, resetSelections }
+		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection, resetSelections }
 	},
 	computed: {
 		filteredTickets() {
