@@ -105,7 +105,9 @@ export default {
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
-		return { user, viewportWidth, tickets, selectedTickets, ticketFilter, sortby, sortDirection }
+		const resetSelections = inject('resetSelections')
+
+		return { user, viewportWidth, tickets, selectedTickets, ticketFilter, sortby, sortDirection, resetSelections }
 	},
 	computed: {
 		filteredTickets() {
@@ -158,6 +160,12 @@ export default {
 	watch: {
 		selectedTickets(newValue) {
 			this.$emit('selectedTicketsOnChange', newValue)
+		},
+		resetSelections(newValue) {
+			if (newValue) {
+				this.selectedTickets = []
+				this.resetSelections = false
+			}
 		}
 	},
 	methods: {

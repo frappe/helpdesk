@@ -52,7 +52,7 @@ import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
-import { inject, ref } from 'vue'
+import { inject, ref, provide } from 'vue'
 
 export default {
 	name: 'Tickets',
@@ -81,6 +81,8 @@ export default {
 		const contacts = inject('contacts')
 
 		const selectedTickets = ref([])
+		const resetSelections = ref(false)
+		provide('resetSelections', resetSelections)
 
 		const ticketController = inject('ticketController')
 
@@ -97,7 +99,8 @@ export default {
 			agents,
 			contacts,
 			selectedTickets,
-			ticketController
+			ticketController,
+			resetSelections
 		}
 	},
 	mounted() {
@@ -162,7 +165,9 @@ export default {
 		},
 		markSelectedTicketsAsClosed() {
 			if (this.selectedTickets) {
-				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed')
+				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed').then(() => {
+					this.resetSelections = true
+				})
 			}
 		},
 		agentsAsDropdownOptions() {
@@ -173,7 +178,9 @@ export default {
 						label: agent.agent_name,
 						handler: () => {
 							if (this.selectedTickets) {
-								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name)
+								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name).then(() => {
+									this.resetSelections = true
+								})
 							}
 						},
 					});
@@ -188,7 +195,9 @@ export default {
 								label: 'Assign to me',
 								handler: () => {
 									if (this.selectedTickets) {
-										this.ticketController.bulkSet(this.selectedTickets, 'agent')
+										this.ticketController.bulkSet(this.selectedTickets, 'agent').then(() => {
+											this.resetSelections = true
+										})
 									}
 								}
 							},
