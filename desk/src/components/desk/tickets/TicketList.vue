@@ -9,37 +9,37 @@
 					class="cursor-pointer mr-2 hover:visible" 
 					:class="allTicketsSelected ? 'visible' : 'invisible'" 
 				/>
-				<div class="sm:w-1/12 flex items-baseline space-x-[7px] cursor-pointer" @click="toggleSort('name')">
+				<div class="sm:w-1/12 flex items-baseline space-x-[7px]">
 					<span>#</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
 				</div>
-				<div class="sm:w-8/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('subject')">
+				<div class="sm:w-8/12 flex items-baseline space-x-[6px]">
 					<span>Subject</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
 				</div>
-				<div class="sm:w-2/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('status')">
+				<div class="sm:w-2/12 flex items-baseline space-x-[6px]">
 					<span>Status</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
 				</div>
-				<div class="sm:w-3/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('rasied_by')">
+				<div class="sm:w-3/12 flex items-baseline space-x-[6px]">
 					<span>Created By</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent"
 					/>
 				</div>
-				<div class="sm:w-2/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('resolution_by')">
+				<div class="sm:w-2/12 flex items-baseline space-x-[6px]">
 					<span>Due In</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
 				</div>
-				<div class="sm:w-1/12 flex items-baseline space-x-[6px] cursor-pointer" @click="toggleSort('modified')">
+				<div class="sm:w-1/12 flex items-baseline space-x-[6px]">
 					<span>Modified</span>
 					<CustomIcons 
 						class="h-[6px] fill-gray-400 stroke-transparent" 
