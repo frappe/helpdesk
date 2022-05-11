@@ -77,18 +77,19 @@
 						placement="right" 
 						:options="agentsAsDropdownOptions()" 
 						:dropdown-width-full="true"
-						class="text-base flex flex-row-reverse"
 					>
 						<template v-slot="{ toggleAssignees }">
-							<div @click="toggleAssignees" class="cursor-pointer">
-								<div v-if="ticket.assignees.length > 0">
-									<div v-for="assignee in ticket.assignees" :key="assignee">
-										<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
+							<div class="text-base flex flex-row-reverse">
+								<div @click="toggleAssignees" class="cursor-pointer">
+									<div v-if="ticket.assignees.length > 0">
+										<div v-for="assignee in ticket.assignees" :key="assignee">
+											<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
+										</div>
 									</div>
-								</div>
-								<div v-else class="invisible group-hover:visible">
-									<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
-										<CustomIcons name="user-plus" />
+									<div v-else class="invisible group-hover:visible">
+										<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
+											<CustomIcons name="user-plus" />
+										</div>
 									</div>
 								</div>
 							</div>
