@@ -115,17 +115,7 @@ export default {
 				label: 'Ticketing',
 				icon: 'ticket',
 				expanded: true,
-				children: [
-					{
-						label: 'All Tickets',
-						action: () => {
-							let query = Object.assign({}, this.$route.query)
-							query.menu_filter = 'all'
-							this.$router.push({path: '/frappedesk/tickets', query})
-							this.select("All Tickets")
-						}
-					},
-				]
+				children: []
 			},
 			{
 				label: 'Contacts',
@@ -185,6 +175,18 @@ export default {
 			])
 		}
 
+		this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+			{
+				label: 'All Tickets',
+				action: () => {
+					let query = Object.assign({}, this.$route.query)
+					query.menu_filter = 'all'
+					this.$router.push({path: '/frappedesk/tickets', query})
+					this.select("All Tickets")
+				}
+			},
+		])
+
 		this.profileSettings = [
 			{
 				label: 'View Website',
@@ -219,10 +221,6 @@ export default {
 				if (ticketFilterMap[this.$route.query.menu_filter]) {
 					return ticketFilterMap[this.$route.query.menu_filter]
 				} else {
-					let query = Object.assign({}, this.$route.query)
-					delete query.menu_filter
-					query.menu_filter = 'all'
-					this.$router.push({path: '/frappedesk/tickets', query})
 					return 'All Tickets'
 				}
 			}

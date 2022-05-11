@@ -14,11 +14,10 @@
 						:dropdown-width-full="true"
 					>
 						<template v-slot="{ toggleAssignees }">
-							<div @click="toggleAssignees" class="cursor-pointer text-base flex flex-row-reverse">
-								<Button appearance="secondary">
+							<div class="flex flex-col">
+								<Button @click="toggleAssignees" class="cursor-pointer">
 									<div class="flex items-center space-x-2">
 										<div>Assign</div>
-										<CustomIcons name="select" class="w-[12px] h-[12px] stroke-gray-500" />
 									</div>
 								</Button>
 							</div>
@@ -51,7 +50,7 @@ import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
-import { inject, ref } from 'vue'
+import { inject, ref, provide } from 'vue'
 
 export default {
 	name: 'Tickets',
@@ -79,6 +78,8 @@ export default {
 		const contacts = inject('contacts')
 
 		const selectedTickets = ref([])
+		const resetSelections = ref(false)
+		provide('resetSelections', resetSelections)
 
 		const ticketController = inject('ticketController')
 		const updateSidebarFilter = inject('updateSidebarFilter')
@@ -96,6 +97,7 @@ export default {
 			contacts,
 			selectedTickets,
 			ticketController,
+			resetSelections,
 			updateSidebarFilter
 		}
 	},
@@ -147,7 +149,9 @@ export default {
 		},
 		markSelectedTicketsAsClosed() {
 			if (this.selectedTickets) {
-				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed')
+				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed').then(() => {
+					this.resetSelections = true
+				})
 			}
 		},
 		agentsAsDropdownOptions() {
@@ -158,7 +162,9 @@ export default {
 						label: agent.agent_name,
 						handler: () => {
 							if (this.selectedTickets) {
-								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name)
+								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name).then(() => {
+									this.resetSelections = true
+								})
 							}
 						},
 					});
@@ -173,7 +179,9 @@ export default {
 								label: 'Assign to me',
 								handler: () => {
 									if (this.selectedTickets) {
-										this.ticketController.bulkSet(this.selectedTickets, 'agent')
+										this.ticketController.bulkSet(this.selectedTickets, 'agent').then(() => {
+											this.resetSelections = true
+										})
 									}
 								}
 							},

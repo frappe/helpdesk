@@ -12,7 +12,7 @@
 				<div class="ql-container text-[13px] text-gray-700" v-html="cleanedMessage"></div>
 				<div v-if="attachments.length > 0" class="flex flex-wrap space-x-[10px] text-base mt-[8px]">
 					<div v-for="attachment in attachments" :key="attachment">
-						<a :href="attachment.file_url" class="py-[4px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-[12px] hover:underline flex items-center space-x-[8px] border-gray-200">
+						<a :href="attachment.file_url" target="_blank" class="py-[4px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-[12px] hover:underline flex items-center space-x-[8px] border-gray-200">
 							<FeatherIcon name="paperclip" class="h-[12px] w-[12px]" />
 							<span>{{ attachment.file_name }}</span>
 						</a>

@@ -28,7 +28,7 @@
 								<div class="rounded-[10px] shadow bg-white py-[4px] space-y-[4px] mt-[3px] absolute z-50">
 									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
 										<div 
-											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-[10px] text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
+											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
 											@click="updateStatus(status)"
 										> 
 											{{ status }} 
