@@ -221,10 +221,6 @@ export default {
 				if (ticketFilterMap[this.$route.query.menu_filter]) {
 					return ticketFilterMap[this.$route.query.menu_filter]
 				} else {
-					let query = Object.assign({}, this.$route.query)
-					delete query.menu_filter
-					query.menu_filter = 'all'
-					this.$router.push({path: '/frappedesk/tickets', query})
 					return 'All Tickets'
 				}
 			}
