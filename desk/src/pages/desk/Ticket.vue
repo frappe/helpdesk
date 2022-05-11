@@ -23,7 +23,7 @@
 										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
 											{{ ticket.subject }}
 										</div>
-										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded mt-1 group-hover:block">
+										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded shadow mt-[9px] group-hover:block">
 											<p>{{ ticket.subject }}</p>
 										</div>
 									</div>
@@ -163,7 +163,19 @@ export default {
 						[{ 'align': [] }],
 
 						['clean']                                         // remove formatting button
-					]
+					],
+					keyboard: {
+						bindings: {
+							// Ctrl+Enter to send reply
+							cmdEnter: {
+								key: 13,
+								ctrlKey: true,
+								handler: () => {
+									this.submitConversation();
+								}
+							}
+						}
+					}
 				},
 				placeholder: 'Compose your reply...',
 				theme: 'snow',
@@ -178,6 +190,8 @@ export default {
 		const tickets = inject('tickets')
 		const ticketController = inject('ticketController')
 		const attachments = ref([])
+
+		const tempTextEditorData = ref({})
 		
 		return { 
 			editor,
@@ -185,7 +199,8 @@ export default {
 			user,
 			tickets,
 			ticketController,
-			attachments
+			attachments,
+			tempTextEditorData
 		}
 	},
 	resources: {
@@ -193,9 +208,12 @@ export default {
 			return {
 				method: 'frappedesk.api.ticket.submit_conversation_via_agent',
 				onSuccess: () => {
+					this.tempTextEditorData = {}
+				},
+				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
-					element[0].innerHTML = "";
-					this.attachments = []
+					element[0].innerHTML = this.tempTextEditorData.innerHTML;
+					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
 		}
@@ -238,11 +256,19 @@ export default {
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		submitConversation() {
+			var element = document.getElementsByClassName("ql-editor");
+
+			this.tempTextEditorData.attachments = this.attachments
+			this.tempTextEditorData.innerHTML = element[0].innerHTML
+
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: this.content,
 				attachments: this.attachments.map(x => x.name)
 			})
+
+			element[0].innerHTML = "";
+			this.attachments = []
 		},
 		getNextTicket() {
 
@@ -253,3 +279,9 @@ export default {
 	},
 }
 </script>
+<style scoped>
+*::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+}
+</style>

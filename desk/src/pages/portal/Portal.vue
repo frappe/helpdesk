@@ -26,19 +26,32 @@ export default {
 		const ticketStatuses = ref([]);
 		const ticketTemplates = ref([]);
 		const ticketController = ref({});
+
+		const impersonateContact = ref()
+		provide('impersonateContact', impersonateContact)
+
 		provide("tickets", tickets);
 		provide("ticketStatuses", ticketStatuses);
 		provide("ticketTemplates", ticketTemplates);
 		provide("ticketController", ticketController);
-		return { user, tickets, ticketStatuses, ticketTemplates, ticketController };
+		return { user, tickets, ticketStatuses, ticketTemplates, ticketController, impersonateContact };
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
 			this.$router.push({path: '/support/login'})
 		}
-		this.ticketController.createTicket = ((template = "Default") => {
-			console.log("create ticket");
-		});
+		if (this.user.isAdmin || this.user.agent) {
+			this.impersonateContact = (contact) => {
+				return this.$resources.tickets.fetch({
+					impersonate: contact 
+				})
+			}
+		} else {
+			this.impersonateContact = () => {
+				this.$router.push({path: '/support/tickets'})
+				this.$resources.tickets.fetch();
+			}
+		}
 		this.ticketController.update = (ticketId) => {
 			if (ticketId) {
 				this.$resources.ticket.fetch({
@@ -75,7 +88,7 @@ export default {
 		tickets() {
 			return {
 				method: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
-				auto: this.user.isLoggedIn(),
+				auto: this.user.isLoggedIn() && this.$route.name != 'Impersonate',
 				onSuccess: (data) => {
 					this.tickets = {};
 					for (var i = 0; i < data.length; i++) {

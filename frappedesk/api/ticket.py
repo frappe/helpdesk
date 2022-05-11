@@ -23,7 +23,8 @@ def get_tickets():
 			ticket.template,
 			ticket.agent_group,
 			ticket.first_responded_on,
-			ticket.notes
+			ticket.notes,
+			ticket.raised_by
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
@@ -156,7 +157,7 @@ def assign_ticket_status(ticket_id, status):
 		
 		if ticket_doc.status != status:
 			ticket_doc.status = status
-			ticket_doc.save()
+			ticket_doc.save(ignore_permissions=True)
 			log_ticket_activity(ticket_id, f"Status set to {status}")
 
 		return ticket_doc

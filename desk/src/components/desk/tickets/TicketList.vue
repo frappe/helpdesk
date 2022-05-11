@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="w-full select-none">
-			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[43.80px] rounded-[6px]">
+			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px]">
 				<Input 
 					type="checkbox" 
 					@click="toggleSelectAllTickets()" 
@@ -100,7 +100,6 @@ export default {
 		const tickets = inject('tickets')
 
 		const selectedTickets = ref([])
-		const ticketFilter = inject('ticketFilter')
 
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
@@ -136,16 +135,49 @@ export default {
 						}
 					})
 				}
-				if (this.ticketFilter == 'Unassigned Tickets' && this.user.agent) {
-					filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-						if (Object.keys(ticket.assignees).length > 0) {
-							return Object.values(ticket.assignees).find((assignee) => { 
-								return (assignee.name != this.user.agent.name)
+				if (this.user.agent) {
+					const checkIfTicketAssignedToMe = (ticket) => {
+						return Object.values(ticket.assignees).find((assignee) => { 
+							return (assignee.name == this.user.agent.name)
+						})
+					}
+
+					switch(this.$route.query.menu_filter) {
+						case 'unassigned':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (Object.keys(ticket.assignees).length > 0) {
+									return Object.values(ticket.assignees).find((assignee) => { 
+										return (assignee.name != this.user.agent.name)
+									})
+								}
+								return true
 							})
-						} else {
-							return true
-						}
-					})
+							break
+						case 'my-open-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Open') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+						case 'my-replied-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Replied') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+						case 'my-resolved-and-closed-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Resolved' || ticket.status == 'Closed') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+					}
 				}
 			}
 			return filteredTickets

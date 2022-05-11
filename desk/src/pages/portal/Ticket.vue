@@ -132,7 +132,19 @@ export default {
 						[{ 'align': [] }],
 
 						['clean']                                         // remove formatting button
-					]
+					],
+					keyboard: {
+						bindings: {
+							// Cmd+Enter to send reply
+							cmdEnter: {
+								key: 13,
+								ctrlKey: true,
+								handler: () => {
+									this.submitConversation();
+								}
+							}
+						}
+					}
 				},
 				placeholder: 'Compose your reply...',
 				theme: 'snow',
@@ -146,8 +158,9 @@ export default {
         const tickets = inject("tickets")
         const ticketController = inject("ticketController")
 		const attachments = ref([])
+		const tempTextEditorData = ref({})
         
-		return { editor, viewportWidth, tickets, ticketController, attachments }
+		return { editor, viewportWidth, tickets, ticketController, attachments, tempTextEditorData }
     },
     computed: {
         ticket() {
@@ -167,9 +180,12 @@ export default {
 			return {
 				method: 'frappedesk.api.ticket.submit_conversation_via_contact',
 				onSuccess: () => {
+					this.tempTextEditorData = {}
+				},
+				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
-					element[0].innerHTML = "";
-					this.attachments = []
+					element[0].innerHTML = this.tempTextEditorData.innerHTML;
+					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
 		}
@@ -195,11 +211,19 @@ export default {
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		submitConversation() {
+			var element = document.getElementsByClassName("ql-editor");
+
+			this.tempTextEditorData.attachments = this.attachments
+			this.tempTextEditorData.innerHTML = element[0].innerHTML
+
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: this.content,
 				attachments: this.attachments.map(x => x.name)
 			})
+
+			element[0].innerHTML = "";
+			this.attachments = []
 		},
 		closeTicket() {
 			this.ticketController.set(this.ticketId, 'status', 'Closed')
