@@ -197,7 +197,6 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 	communication.save(ignore_permissions=True)
 
 	for attachment in attachments:
-		print(f'\nATTACHMENT: {attachment}')
 		file_doc = frappe.get_doc("File", attachment)
 		file_doc.attached_to_name = communication.name
 		file_doc.attached_to_doctype = "Communication"
