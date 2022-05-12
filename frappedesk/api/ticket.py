@@ -60,6 +60,21 @@ def create_new(values, template='Default', attachments=[], via_customer_portal=F
 			ticket_doc.raised_by = contact_doc.email_ids[0].email_id
 			ticket_doc.contact = contact_doc.name
 
+	if via_customer_portal:
+		if not frappe.db.exists({"doctype": "Contact", "email_id": frappe.session.user}):
+			user_doc = frappe.get_doc("User", frappe.session.user)
+			new_contact_doc = frappe.get_doc(
+				doctype="Contact", 
+				email_id=user_doc.email,
+				full_name=user_doc.full_name,
+				first_name=user_doc.first_name,
+				last_name=user_doc.last_name,
+				user=user_doc.name
+			)
+			new_contact_doc.append("email_ids", {"email_id": user_doc.email, "is_primary": True})
+			new_contact_doc.insert(ignore_permissions=True)
+			ticket_doc.contact = new_contact_doc.name
+
 	ticket_doc.subject = values['subject']
 	ticket_doc.description = values['description']
 

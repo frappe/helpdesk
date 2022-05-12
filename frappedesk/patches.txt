@@ -10,3 +10,4 @@ frappedesk.patches.add_on_ticket_create_script
 frappedesk.patches.update_agent_role_permissions
 frappedesk.patches.remove_agent_role_profile
 frappedesk.patches.add_roles_to_agent_user
+frappedesk.patches.create_and_set_contact_using_user_who_created_the_ticket
