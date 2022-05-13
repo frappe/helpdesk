@@ -99,7 +99,13 @@
 					<div class="text-base space-y-[12px]">
 							<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
 								<div class="text-gray-700 text-base">{{ field.label }}</div>
-								<a class="text-gray-900 text-base" :class="field.route ? 'hover:underline hover:text-blue-500 cursor-pointer' : ''" :href="field.route">{{ field.value }}</a>
+								<div v-if="field.route" class="w-fit flex flex-row items-center space-x-1 cursor-pointer hover:underline">
+									<a class="text-gray-900 text-base" :href="field.route" target="_blank">{{ field.value }}</a>
+									<FeatherIcon name="external-link" class="w-[14px] h-[17px] pb-[3px]" />
+								</div>
+								<div v-else>
+									<span class="text-gray-900 text-base">{{ field.value }}</span>
+								</div>
 							</div>
 					</div>
 				</div>
