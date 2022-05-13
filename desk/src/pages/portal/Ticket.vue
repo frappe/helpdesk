@@ -135,10 +135,10 @@ export default {
 					],
 					keyboard: {
 						bindings: {
-							// Cmd+Enter to send reply
-							cmdEnter: {
+							// Ctrl+Enter to send reply
+							ctrlEnter: {
 								key: 13,
-								ctrlKey: true,
+								shortKey: true,
 								handler: () => {
 									this.submitConversation();
 								}

@@ -167,9 +167,9 @@ export default {
 					keyboard: {
 						bindings: {
 							// Ctrl+Enter to send reply
-							cmdEnter: {
+							ctrlEnter: {
 								key: 13,
-								ctrlKey: true,
+								shortKey: true,
 								handler: () => {
 									this.submitConversation();
 								}
