@@ -3,6 +3,7 @@
 		<div 
 			v-if="ticket"
 			class="group flex items-center text-base"
+			:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 		>
 			<div 
 				@mouseover="() => {toggleSelectBox = true}" 
@@ -27,7 +28,7 @@
 			>
 				<div 
 					class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
-					:class="ticket.seen ? 'font-normal text-gray-600' : 'font-semibold text-gray-800'"
+					:class="!ticket.seen ? 'font-semibold text-gray-800' : (ticket.status == 'Closed' ? 'font-normal text-gray-600' : 'font-normal text-gray-900')"
 				>
 					{{ ticket.subject }}
 				</div>

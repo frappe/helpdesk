@@ -29,7 +29,7 @@
 					</div>
 				</div>
 				<div v-if="option.children && option.expanded">
-					<div>
+					<div class="space-y-[6px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<div 
 								class="group py-[5px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
