@@ -9,7 +9,7 @@ _dayjs.updateLocale('en', {
 	relativeTime: {
 		future: "%s",
 		past: "%s ago",
-		s: 'Now',
+		s: 'now',
 		m: "1 minute",
 		mm: "%d minutes",
 		h: "1 hour",
@@ -25,14 +25,14 @@ _dayjs.updateLocale('en', {
 
 _dayjs.longFormating = (s) => {
     if (s === 'Now' || s === 'Now ago') { 
-        return 'Just now'
+        return 'just now'
     }
     return s
 }
 
 _dayjs.shortFormating = (s) => {
     if (s === 'Now' || s === 'Now ago') { 
-        return 'Now'
+        return 'now'
     }
 
     const prefix = s.split(' ')[0]
