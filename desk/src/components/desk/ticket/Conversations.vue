@@ -16,9 +16,10 @@
 							:attachments="conversation.attachments"
 							:isLast="index == conversation.length - 1"
 						/>
-						<div v-else>
-							{{ conversation }}
-						</div>
+						<CommentCard 
+							v-else
+							:comment="conversation"
+						/>
 					</div>
 				</div>
 			</div>
@@ -34,6 +35,7 @@
 import ConversationCard from "./ConversationCard.vue"
 import { LoadingText } from 'frappe-ui'
 import { ref } from 'vue'
+import CommentCard from './CommentCard.vue'
 
 export default {
 	name: "Conversations",
@@ -41,6 +43,7 @@ export default {
 	components: {
 		ConversationCard,
 		LoadingText,
+		CommentCard
 	},
 	setup() {
 		const userColors = ref({})
@@ -87,7 +90,9 @@ export default {
 				x.type = 'Comment'
 				return x
 			})
-			return [...communications, ...comments].sort((a, b) => a.creation < b.creation) || []
+			const conversations = [...communications, ...comments].sort((a, b) => (new Date(a.creation) - new Date(b.creation))) || []
+			console.log(conversations)
+			return conversations
 		},
 		communications() {
 			return this.$resources.communications.data || []
@@ -104,10 +109,9 @@ export default {
 		}
 	},
 	mounted() {
-		console.log('mounted')
 		this.$socket.on('list_update', (data) => {
 			if (data['doctype'] === 'Ticket' && data['name'] == this.ticketId) {
-				this.$resources.conversations.fetch()
+				this.$resources.communications.fetch()
 			}
 			if (data['doctype'] === 'Comment') {
 				this.$resources.comments.fetch()
