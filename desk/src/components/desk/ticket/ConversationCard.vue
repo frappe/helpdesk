@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col my-[24px]">
+	<div class="flex flex-col my-[24px] px-[10px]">
 		<div class="flex flex-row justify-between">
 			<div class="flex flex-row items-center space-x-[8px]">
 				<CustomAvatar :label="userName" :imageURL="profilePicUrl" size="sm" />
