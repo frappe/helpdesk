@@ -8,6 +8,7 @@
 				>
 					<div :ref="`conversation-${index}`">
 						<ConversationCard 
+							v-if="conversation.type == 'Communication'"
 							:userName="getUserName(conversation)" 
 							:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
 							:time="conversation.creation" 
@@ -15,6 +16,9 @@
 							:attachments="conversation.attachments"
 							:isLast="index == conversation.length - 1"
 						/>
+						<div v-else>
+							{{ conversation }}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -45,7 +49,7 @@ export default {
 		return { userColors, lastColorIndex }
 	},
 	resources: {
-		conversations() {
+		communications() {
 			return {
 				method: 'frappedesk.api.ticket.get_conversations',
 				params: {
@@ -54,14 +58,43 @@ export default {
 				auto: true
 			}
 		},
+		comments() {
+			return {
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Comment',
+					fields: ['*'],
+					filters: {
+						comment_type: 'Comment',
+						reference_name: this.ticketId
+					},
+					order_by: 'creation asc',
+				},
+				auto: true,
+			}
+		}
 	},
 	computed: {
 		conversations() {
 			this.$nextTick(() => {
 				this.autoScrollToBottom();
 			})
-			return this.$resources.conversations.data || null;
+			const communications = this.communications.map((x) => {
+				x.type = 'Communication'
+				return x
+			}) 
+			const comments = this.comments.map((x) =>  {
+				x.type = 'Comment'
+				return x
+			})
+			return [...communications, ...comments].sort((a, b) => a.creation < b.creation) || []
 		},
+		communications() {
+			return this.$resources.communications.data || []
+		},
+		comments() {
+			return this.$resources.comments.data || []
+		}
 	},
 	watch: {
 		scrollToBottom(scroll) {
@@ -71,9 +104,13 @@ export default {
 		}
 	},
 	mounted() {
+		console.log('mounted')
 		this.$socket.on('list_update', (data) => {
-			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
+			if (data['doctype'] === 'Ticket' && data['name'] == this.ticketId) {
 				this.$resources.conversations.fetch()
+			}
+			if (data['doctype'] === 'Comment') {
+				this.$resources.comments.fetch()
 			}
 		});
 	},

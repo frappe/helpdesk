@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/frappe/desk/issues"
   },
-  "homepage": "https://github.com/frappe/desk#readme"
+  "homepage": "https://github.com/frappe/desk#readme",
+  "dependencies": {
+    "frappe-ui": "0.0.19"
+  }
 }
