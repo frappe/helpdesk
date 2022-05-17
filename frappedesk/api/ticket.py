@@ -161,7 +161,7 @@ def assign_ticket_type(ticket_id, type):
 			ticket_doc.ticket_type = check_and_create_ticket_type(type).name
 			ticket_doc.update_priority_based_on_ticket_type()
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Type set to {type}")
+			log_ticket_activity(ticket_id, f"type set to {type}")
 
 		return ticket_doc
 
@@ -173,7 +173,7 @@ def assign_ticket_status(ticket_id, status):
 		if ticket_doc.status != status:
 			ticket_doc.status = status
 			ticket_doc.save(ignore_permissions=True)
-			log_ticket_activity(ticket_id, f"Status set to {status}")
+			log_ticket_activity(ticket_id, f"status set to {status}")
 
 		return ticket_doc
 
@@ -185,7 +185,7 @@ def set_ticket_notes(ticket_id, notes):
 		if ticket_doc.notes != notes:
 			ticket_doc.notes = notes
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Updated notes")
+			log_ticket_activity(ticket_id, f"updated notes")
 
 		return ticket_doc
 
@@ -207,7 +207,7 @@ def assign_ticket_priority(ticket_id, priority):
 		if ticket_doc.priority != priority:
 			ticket_doc.priority = priority
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Priority set to {priority}")
+			log_ticket_activity(ticket_id, f"priority set to {priority}")
 
 		return ticket_doc
 
@@ -218,7 +218,7 @@ def assign_ticket_group(ticket_id, agent_group):
 		
 		if ticket_doc.agent_group != agent_group:
 			ticket_doc.agent_group = agent_group
-			log_ticket_activity(ticket_id, f"Team set to {agent_group}")
+			log_ticket_activity(ticket_id, f"team set to {agent_group}")
 			ticket_doc.save()
 		
 		return ticket_doc
