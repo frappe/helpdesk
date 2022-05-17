@@ -1,32 +1,33 @@
 <template>
-	<div class="py-6">
+	<div class="py-4">
 		<div class="container mx-auto">
-			<div class="flow-root">
-				<div class="float-left">
+			<div class="flex flex-row justify-between items-center">
+				<div class="flex flex-row">
 					<div class="flex space-x-1">
 						<CustomIcons name="company" class="h-7 w-7"/>
 					</div>
 				</div>
-				<div class="float-right flex space-x-8 text-[14px] text-[#4C5A67]">
+				<div class="flex space-x-8 text-[14px] text-[#4C5A67] items-center">
 					<div v-for="item in navbarItems" :key="item.label">
 						<a :href="item.url" class="hover:text-[#2490ef]">{{ item.label }}</a>
 					</div>
+					<CustomAvatar :label="user.username" class="cursor-pointer" size="xl" v-if="user" :imageURL="user.profile_image" />
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script>
-import { Avatar, FeatherIcon, Dropdown, call } from 'frappe-ui'
+import { Dropdown, call } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import CustomAvatar from '../global/CustomAvatar.vue'
 import { inject } from 'vue'
 
 export default {
 	name: 'NavBar',
 	components: {
-		Avatar,
-		FeatherIcon,
 		CustomIcons,
+		CustomAvatar,
 		Dropdown
 	},
 	setup() {
