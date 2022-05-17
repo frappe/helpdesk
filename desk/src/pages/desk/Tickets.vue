@@ -25,17 +25,19 @@
 					</Dropdown>
 				</div>
 				<div v-else class="flex items-center space-x-3">
-					<div>
-						<FilterBox class="mt-6" v-if="toggleFilters" @close="() => { toggleFilters = false }" :options="getFilterBoxOptions()" v-model="filters"/>
-					</div>
-					<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
-					<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-300'" @click="() => { toggleFilters = !toggleFilters }">
-						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-500 fill-blue-500' : 'stroke-black'" />
-							<div>Add Filters</div>
-							<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
+					<div v-on-outside-click="() => { toggleFilters = false }" class="bg-blue-100">
+						<div>
+							<FilterBox class="mt-10" v-if="toggleFilters" :options="getFilterBoxOptions()" v-model="filters"/>
 						</div>
-					</Button>
+						<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
+						<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-300'" @click="() => { toggleFilters = !toggleFilters }">
+							<div class="flex items-center space-x-2">
+								<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-500 fill-blue-500' : 'stroke-black'" />
+								<div>Add Filters</div>
+								<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
+							</div>
+						</Button>
+					</div>
 					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
 				</div>
 			</div>
