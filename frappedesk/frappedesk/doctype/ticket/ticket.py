@@ -37,7 +37,7 @@ class Ticket(Document):
 		self.update_priority_based_on_ticket_type()
 
 	def after_insert(self):
-		log_ticket_activity(self.name, "Create")
+		log_ticket_activity(self.name, "created")
 
 	def on_update(self):
 		pass
@@ -161,7 +161,7 @@ class Ticket(Document):
 			"name": self.name
 		})
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
-		log_ticket_activity(self.name, f"Assigned to {agent_name}")
+		log_ticket_activity(self.name, f"assigned to {agent_name}")
 
 	def on_trash(self):
 		activities = frappe.db.get_all("Ticket Activity", {"Ticket": self.name})
@@ -174,7 +174,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 	if ticket_doc.status == 'Replied':
 		ticket_doc.status = 'Open'
-		log_ticket_activity(ticket, f"Status set to Open")
+		log_ticket_activity(ticket, f"status set to Open")
 		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")
