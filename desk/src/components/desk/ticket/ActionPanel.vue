@@ -25,14 +25,20 @@
 								</div>
 							</div>
 							<div v-if="toggleStatuese">
-								<div class="rounded-[10px] shadow bg-white py-[4px] space-y-[4px] mt-[3px] absolute z-50">
-									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
-										<div 
-											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
-											@click="updateStatus(status)"
-										> 
-											{{ status }} 
+								<div class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50" :class="ticket.ticket_type ? 'bg-white' : 'bg-orange-50'">
+									<div v-if="ticket.ticket_type">
+										<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
+											<div 
+												class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
+												@click="updateStatus(status)"
+											> 
+												{{ status }} 
+											</div>
 										</div>
+									</div>
+									<div v-else class="w-[200px] mx-[4px] p-[4px] text-base flex flex-row items-center space-x-2">
+										<FeatherIcon name="alert-triangle" class="w-3 h-3 stroke-orange-500" />
+										<span class="text-gray-600">Please set ticket type first</span>
 									</div>
 								</div>
 							</div>
