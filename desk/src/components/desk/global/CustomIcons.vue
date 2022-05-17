@@ -141,9 +141,7 @@
 			<rect x="24" y="43" width="10" height="10" rx="2" stroke="#2D95F0" stroke-width="2"/>
 		</svg>
 		<div v-if="this.name=='company'" :class="this.class">
-			<!-- <div v-if="this.$resources.websiteSettings.data">
-				<img :src="this.$resources.websiteSettings.data.banner_image" />
-			</div> -->
+			<div v-html="this.$resources.brandHtml.data"></div>
 		</div>
 	</div>
 </template>
@@ -154,19 +152,15 @@ export default {
 	props: ['name', 'height', 'width', 'class'],
 	mounted() {
 		if (this.name == 'company') {
-			// this.$resources.websiteSettings.fetch()
+			this.$resources.brandHtml.fetch()
 		}
 	},
 	resources: {
-		// websiteSettings() {
-		// 	return {
-		// 		method: 'frappe.client.get',
-		// 		params: {
-		// 			doctype: "Website Settings",
-		// 			fields: ['*']
-		// 		}
-		// 	}
-		// }
+		brandHtml() {
+			return {
+				method: 'frappedesk.api.website.brand_html'
+			}
+		}
 	}
 }
 </script>
