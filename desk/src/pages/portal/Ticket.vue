@@ -19,6 +19,12 @@
 				<div class="text-5xl font-bold">
 					{{ ticket.subject }}
 				</div>
+				<div v-if="['Closed', 'Resolved'].includes(ticket.status)" class="flex flex-row space-x-[4px] text-[12px] text-[#1B984B] font-semibold items-center">
+					<span>RESOLVED</span>
+					<div>
+						<CustomIcons name="circle-check" class="fill-[#48BB74] w-[16px] h-[16px]"/>
+					</div>
+				</div>
 			</div>
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
@@ -26,6 +32,13 @@
 				</div>
 				<div v-if="!editing && ['Open', 'Replied'].includes(ticket.status)" class="mt-5 ml-9">
 					<Button @click="startEditing()" appearance="primary">Reply</Button>
+				</div>
+				<div v-else class="flex flex-row justify-between">
+					<div class="flex flex-row items-center text-[12px] text-gray-500 space-x-[15.24px]">
+						<FeatherIcon name="lock" class="w-[18px] h-[18px] stroke-gray-500" />
+						<span>This ticket has been closed.</span>
+					</div>
+					<Button appearance="secondary" @click="reopenTicket()">Reopen Ticket</Button>
 				</div>
 				<div
 					v-if="editing"
@@ -98,17 +111,19 @@ import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
 import { FeatherIcon, FileUploader } from 'frappe-ui'
+import CustomIcons from "../../components/desk/global/CustomIcons.vue";
 
 export default {
     name: "Tickets",
     props: ["ticketId"],
 	components: {
-		Conversations,
-		ActionPanel,
-		QuillEditor,
-		FeatherIcon,
-		FileUploader
-	},
+    Conversations,
+    ActionPanel,
+    QuillEditor,
+    FeatherIcon,
+    FileUploader,
+    CustomIcons
+},
 	data() {
 		return {
 			editing: false,

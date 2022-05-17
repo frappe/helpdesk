@@ -1,7 +1,7 @@
 <template>
 	<div class="py-4">
 		<div class="container mx-auto">
-			<div class="flex flex-row justify-between items-center">
+			<div class="flex flex-wrap justify-between items-center">
 				<div class="flex flex-row">
 					<div class="flex space-x-1">
 						<a href="/"><CustomIcons name="company" class="h-7 w-7"/></a>
