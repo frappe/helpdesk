@@ -233,17 +233,13 @@ export default {
 		},
 		getOffsetHeight() {
 			const offset = 285
-			const multiplier = 23
+			const multiplier = 22
 			const maxCount = 5
 			
 			const customFiledWidth = 34
-			const customFieldPadding = this.ticket.custom_fields.length == 1 ? 30 : 55
+			const customFieldPadding = this.ticket.custom_fields.length == 1 ? 30 : 60
 
-			console.log((customFieldPadding * 2 + customFiledWidth * this.ticket.custom_fields.length))
-
-			const a = offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 )) + (this.ticket.custom_fields.length > 0 ? (customFieldPadding * 2 + customFiledWidth * this.ticket.custom_fields.length) : 0)
-			console.log(a)
-			return a
+			return offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 )) + (this.ticket.custom_fields.length > 0 ? (customFieldPadding * 2 + customFiledWidth * this.ticket.custom_fields.length) : 0)
 		},
 	},
 	watch: {
