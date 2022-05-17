@@ -4,7 +4,7 @@
 			<div class="flex flex-row justify-between items-center">
 				<div class="flex flex-row">
 					<div class="flex space-x-1">
-						<CustomIcons name="company" class="h-7 w-7"/>
+						<a href="/"><CustomIcons name="company" class="h-7 w-7"/></a>
 					</div>
 				</div>
 				<div class="flex space-x-8 text-[14px] text-[#4C5A67] items-center">
