@@ -6,6 +6,9 @@
 			</div>
 		</div>
 		<div class="float-right flex space-x-3">
+			<div v-for="item in navbarItems" :key="item.label">
+				{{ item.label }}
+			</div>
 		</div>
 	</div>
 </template>
@@ -27,6 +30,19 @@ export default {
         const ticketTemplates = inject('ticketTemplates')
 
 		return { user, ticketTemplates }
+	},
+	resources: {
+		navbarItems() {
+			return {
+				method: 'frappedesk.api.website.navbar_items',
+				auto: true,
+			}
+		}
+	},
+	computed: {
+		navbarItems() {
+			return this.$resources.navbarItems.data || []
+		}
 	},
 	methods: {
 		async logout() {
