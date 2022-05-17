@@ -1,13 +1,17 @@
 <template>
-	<div class="flow-root pl-5 pr-8 border-b py-4">
-		<div class="float-left">
-			<div class="flex space-x-1">
-				<CustomIcons name="company" class="h-7 w-7"/>
-			</div>
-		</div>
-		<div class="float-right flex space-x-3">
-			<div v-for="item in navbarItems" :key="item.label">
-				{{ item.label }}
+	<div class="py-6">
+		<div class="container mx-auto">
+			<div class="flow-root">
+				<div class="float-left">
+					<div class="flex space-x-1">
+						<CustomIcons name="company" class="h-7 w-7"/>
+					</div>
+				</div>
+				<div class="float-right flex space-x-8 text-[14px] text-[#4C5A67]">
+					<div v-for="item in navbarItems" :key="item.label">
+						<a :href="item.url" class="hover:text-[#2490ef]">{{ item.label }}</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
