@@ -11,14 +11,29 @@
 					<div v-for="item in navbarItems" :key="item.label">
 						<a :href="item.url" class="hover:text-[#2490ef]">{{ item.label }}</a>
 					</div>
-					<CustomAvatar :label="user.username" class="cursor-pointer" size="xl" v-if="user" :imageURL="user.profile_image" />
+					<Dropdown
+						placement="right"
+						:options="profileOptions"
+						:dropdown-width-full="true"
+					>
+						<template v-slot="{ toggleDropdown }">
+							<CustomAvatar 
+								v-if="user" 
+								@click="toggleDropdown" 
+								:label="user.username" 
+								class="cursor-pointer" 
+								size="xl" 
+								:imageURL="user.profile_image" 
+							/>
+						</template>
+					</Dropdown>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script>
-import { Dropdown, call } from 'frappe-ui'
+import { Dropdown } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import CustomAvatar from '../global/CustomAvatar.vue'
 import { inject } from 'vue'
@@ -32,7 +47,7 @@ export default {
 	},
 	setup() {
 		const user = inject('user')
-        const ticketTemplates = inject('ticketTemplates')
+		const ticketTemplates = inject('ticketTemplates')
 
 		return { user, ticketTemplates }
 	},
@@ -47,39 +62,16 @@ export default {
 	computed: {
 		navbarItems() {
 			return this.$resources.navbarItems.data || []
+		},
+		profileOptions() {
+			return [
+				{label: "My Account", handler: () => { window.location.href = '/me'} }, 
+				{label: "Logout", handler: () => {
+					this.user?.logout()
+					window.location.href = '/support/login'
+				}}
+			];
 		}
 	},
-	methods: {
-		async logout() {
-			await call('logout')
-			window.location.replace("/login");
-		},
-        ticketTemplateOptions() {
-			let templateItems = [];
-			if (this.ticketTemplates) {
-				this.ticketTemplates.forEach(template => {
-					templateItems.push({
-						label: template.name,
-						handler: () => {
-							this.$router.push({
-								name: 'TemplatedNewTicket',
-								params: {
-									templateId: template.template_route
-								}
-							})
-						},
-					});
-				});
-				return templateItems.length > 1 ? templateItems : [];
-			} else {
-				return null;
-			}
-		},
-		openDefaultTicketTemplate() {
-			this.$router.push({
-				name: 'DefaultNewTicket'
-			})
-		}
-	}
 }
 </script>
