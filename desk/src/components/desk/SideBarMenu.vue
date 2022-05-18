@@ -3,7 +3,7 @@
 		<div class="mb-[38.4px] pl-[22px] cursor-pointer">
 			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]" @click="() => {$router.push({path: '/frappedesk/tickets'})}"/>
 		</div>
-		<div class="mb-auto space-y-[6px] select-none mx-[8px] text-gray-800">
+		<div class="mb-auto space-y-[4px] select-none mx-[8px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div 
 					class="group stroke-gray-600 rounded-[8px] cursor-pointer hover:bg-gray-200"
@@ -21,8 +21,8 @@
 						<span class="grow ml-[6px] text-[14px]">{{ option.label }}</span>
 					</div>
 				</div>
-				<div v-if="option.children && option.expanded" class="mt-[6px]">
-					<div class="space-y-[6px]">
+				<div v-if="option.children && option.expanded" class="mt-[4px]">
+					<div class="space-y-[4px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<div 
 								class="group py-[6px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
