@@ -1,7 +1,7 @@
 <template>
 	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen">
 		<div class="flex w-screen">
-			<div class="bg-gray-50 w-[182px] shrink-0">
+			<div class="bg-gray-50 w-[240px] shrink-0">
 				<SideBarMenu />
 			</div>
 			<div class="grow">

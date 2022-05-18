@@ -3,41 +3,34 @@
 		<div class="mb-[38.4px] pl-[22px] cursor-pointer">
 			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]" @click="() => {$router.push({path: '/frappedesk/tickets'})}"/>
 		</div>
-		<div class="mb-auto space-y-[6px] text-base select-none">
+		<div class="mb-auto space-y-[4px] select-none mx-[8px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div 
-					class="group stroke-gray-600 stroke-1 cursor-pointer hover:bg-gray-200 hover:text-gray-800" 
-					:class="
-						option.selected ? 
-						'bg-gray-200 text-gray-800 font-medium' : 
-						(
-							option.children && option.children.find(element => element.selected) ? 
-							'font-medium text-gray-800' : 
-							'font-normal text-gray-600'
-						)
-						"
+					class="group stroke-gray-600 rounded-[8px] cursor-pointer hover:bg-gray-200"
 					@click="() => {
 						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
 					}"
 				>
-					<div class="pl-[22px] py-[5px] flex items-center space-x-[8px]">
-						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
-						<span class="grow">{{ option.label }}</span>
-						<div v-if="option.children" class="pr-[17.81px]">
-							<CustomIcons class="h-[6px] fill-gray-400" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
+					<div class="pl-[8px] py-[6px] flex items-center">
+						<div class="w-[14px]">
+							<FeatherIcon v-if="option.children" class="h-[14px] w-[14px] stroke-gray-600" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
 						</div>
+						<div class="w-[24px]">
+							<CustomIcons :name="option.icon" class="ml-[8px] h-[14px] w-[14px]"/>
+						</div>
+						<span class="grow ml-[6px] text-[14px]">{{ option.label }}</span>
 					</div>
 				</div>
-				<div v-if="option.children && option.expanded">
-					<div class="space-y-[6px]">
+				<div v-if="option.children && option.expanded" class="mt-[4px]">
+					<div class="space-y-[4px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<div 
-								class="group py-[5px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
-								:class="childOption.selected ? 'bg-gray-200 text-gray-800 font-medium' : 'font-normal text-gray-600 '"
+								class="group py-[6px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
+								:class="childOption.selected ? 'bg-gray-200' : ''"
 								@click="() => { childOption.action ? childOption.action() : {} }"
 							>
-								<div class="pl-[46px]">
-									<span>
+								<div class="pl-[52px]">
+									<span class="text-base">
 										{{ childOption.label }}
 									</span>
 								</div>
@@ -82,16 +75,17 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { Dropdown } from 'frappe-ui'
+import { Dropdown, FeatherIcon } from 'frappe-ui'
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
-import { inject, provide, ref } from 'vue'
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
 	components: {
 		CustomIcons,
 		Dropdown,
-		CustomAvatar
+		CustomAvatar,
+		FeatherIcon
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
@@ -112,7 +106,7 @@ export default {
 	mounted() {
 		this.menuOptions = [
 			{
-				label: 'Ticketing',
+				label: 'Tickets',
 				icon: 'ticket',
 				expanded: true,
 				children: []
@@ -141,7 +135,7 @@ export default {
 		]
 
 		if (this.user.agent) {
-			this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+			this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 				{
 					label: 'My Open Tickets',
 					action: () => {
@@ -163,19 +157,29 @@ export default {
 					}
 				},
 				{
-					label: 'My Resolved and Closed Tickets',
+					label: 'My Resolved Tickets',
 					action: () => {
 						let query = Object.assign({}, this.$route.query)
 						delete query.assignee
-						query.menu_filter = 'my-resolved-and-closed-tickets'
+						query.menu_filter = 'my-resolved-tickets'
 						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Resolved and Closed Tickets")
+						this.select("My Resolved Tickets")
+					}
+				},
+				{
+					label: 'My Closed Tickets',
+					action: () => {
+						let query = Object.assign({}, this.$route.query)
+						delete query.assignee
+						query.menu_filter = 'my-closed-tickets'
+						this.$router.push({path: '/frappedesk/tickets', query})
+						this.select("My Closed Tickets")
 					}
 				},
 			])
 		}
 
-		this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+		this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 			{
 				label: 'All Tickets',
 				action: () => {
@@ -216,7 +220,8 @@ export default {
 					'all': 'All Tickets',
 					'my-open-tickets': 'My Open Tickets',
 					'my-replied-tickets': 'My Replied Tickets',
-					'my-resolved-and-closed-tickets': 'My Resolved and Closed Tickets',
+					'my-resolved-tickets': 'My Resolved Tickets',
+					'my-closed-tickets': 'My Closed Tickets',
 				}
 				if (ticketFilterMap[this.$route.query.menu_filter]) {
 					return ticketFilterMap[this.$route.query.menu_filter]

@@ -169,9 +169,17 @@ export default {
 								return false
 							})
 							break
-						case 'my-resolved-and-closed-tickets':
+						case 'my-resolved-tickets':
 							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								if (ticket.status == 'Resolved' || ticket.status == 'Closed') {
+								if (ticket.status == 'Resolved') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+						case 'my-closed-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Closed') {
 									return checkIfTicketAssignedToMe(ticket)
 								}
 								return false
