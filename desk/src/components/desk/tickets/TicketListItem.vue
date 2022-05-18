@@ -2,12 +2,12 @@
 	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
 		<div 
 			v-if="ticket"
+			@pointerover="() => {toggleSelectBox = true}"
+			@pointerleave="() => {toggleSelectBox = false}"
 			class="group flex items-center text-base"
 			:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 		>
 			<div 
-				@mouseover="() => {toggleSelectBox = true}" 
-				@mouseleave="() => {toggleSelectBox = false}"
 				class="w-[37px] h-[14px] flex items-center"
 			>
 				<CustomIcons v-if="!toggleSelectBox && !selected" :name="`priority-${ticket.priority.toLowerCase()}`" class="h-3 w-3" />
@@ -16,7 +16,7 @@
 					type="checkbox" 
 					@click="$emit('toggleSelect')" 
 					:checked="selected" 
-					class="cursor-pointer mr-2" 
+					class="cursor-pointer" 
 				/>
 			</div>
 			<div class="sm:w-1/12 text-gray-600 font-normal">
