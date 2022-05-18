@@ -61,16 +61,17 @@
 				<div class="truncate w-40 text-gray-600 font-normal" v-if="ticket.contact">{{ ticket.contact.name }}</div>
 			</div>
 			<div class="sm:w-2/12 font-normal">
-				<div 
+				<a 
 					v-if="getResolutionDueIn()" 
+					:title="$dayjs(ticket.resolution_by)"
 					:class="getResolutionBadgeColor()"
 				>
 					{{ getResolutionDueIn() }}
-				</div>
+				</a>
 			</div>
-			<div class="sm:w-1/12 text-gray-600 font-normal">
+			<a :title="$dayjs(ticket.modified)" class="sm:w-1/12 text-gray-600 font-normal">
 				{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
-			</div>
+			</a>
 			<div class="pt-[-3px] w-[50.37px]">
 				<div>
 					<Dropdown

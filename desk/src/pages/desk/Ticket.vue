@@ -19,14 +19,9 @@
 									<div>
 										<CustomIcons name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
 									</div>
-									<div class="group select-none">
-										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
-											{{ ticket.subject }}
-										</div>
-										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded shadow mt-[9px] group-hover:block">
-											<p>{{ ticket.subject }}</p>
-										</div>
-									</div>
+									<a :title="ticket.subject" class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
+										{{ ticket.subject }}
+									</a>
 								</div>
 							</div>
 							<div class="flex flex-row items-center space-x-[8px]">
