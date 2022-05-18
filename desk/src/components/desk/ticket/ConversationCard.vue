@@ -5,7 +5,7 @@
 				<CustomAvatar :label="userName" :imageURL="profilePicUrl" size="sm" />
 				<div class="truncate text-[14px] font-normal max-w-[200px]">{{ userName }}</div>
 			</div>
-			<div class="text-gray-500 text-[12px]">{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</div>
+			<a :title="$dayjs(time)" class="text-gray-500 text-[12px] select-none">{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a>
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">

@@ -9,7 +9,7 @@
 							<div class="w-7">
 								<CustomAvatar :label="contactFullName" :imageURL="ticket.contact.image" size="md" />
 							</div>
-							<div class="grow truncate font-normal text-base">{{ contactFullName }}</div>
+							<a :title="contactFullName" class="grow truncate font-normal text-base">{{ contactFullName }}</a>
 							<div class="flex">
 								<FeatherIcon 
 									name="edit-2" 
@@ -23,15 +23,17 @@
 								<FeatherIcon name="phone" class="stroke-gray-500" style="width: 15px;" />
 							</div>
 							<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
-								<div class="text-gray-700 text-base">{{ phone_no.phone }}</div>
+								<a :title="phone_no.phone" class="text-gray-700 text-base">{{ phone_no.phone }}</a>
 							</div>
 						</div>
 						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-[6px] items-center">
 							<div class="w-7 px-[6.5px]">
 								<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px;" />
 							</div>
-							<div class="space-y-1 max-w-[153px]" v-for="email_id in ticket.contact.email_ids" :key="email_id">
-								<div class="truncate text-gray-700 text-base">{{ email_id.email_id }}</div>
+							<div class="space-y-1 max-w-[153px]" v-for="email in ticket.contact.email_ids" :key="email">
+								<div :title="email.email_id" class="truncate text-gray-700 text-base">
+									<a :title="email.email_id">{{ email.email_id }}</a>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -122,7 +124,9 @@
 								class="text-[12px] rounded max-w-[200px]"
 							>
 								<div v-if="index < maxCount">
-									<div class="truncate text-base text-gray-700 hover:bg-gray-100">{{ _ticket.subject }}</div>
+									<div class="truncate text-base text-gray-700 hover:bg-gray-100">
+										<a :title="_ticket.subject">{{ _ticket.subject }}</a>
+									</div>
 								</div>
 								<div v-else class="text-gray-500 hover:bg-gray-100">Show more</div>
 							</router-link>
