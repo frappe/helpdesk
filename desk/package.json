@@ -12,7 +12,7 @@
 	"dependencies": {
 		"@vueup/vue-quill": "^1.0.0-beta.8",
 		"dayjs": "^1.11.1",
-		"frappe-ui": "0.0.22",
+		"frappe-ui": "0.0.24",
 		"luxon": "^2.3.2",
 		"sass": "^1.50.1",
 		"vue": "^3.2.33",
