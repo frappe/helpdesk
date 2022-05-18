@@ -112,7 +112,7 @@ export default {
 	mounted() {
 		this.menuOptions = [
 			{
-				label: 'Ticketing',
+				label: 'Tickets',
 				icon: 'ticket',
 				expanded: true,
 				children: []
@@ -141,7 +141,7 @@ export default {
 		]
 
 		if (this.user.agent) {
-			this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+			this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 				{
 					label: 'My Open Tickets',
 					action: () => {
@@ -163,19 +163,29 @@ export default {
 					}
 				},
 				{
-					label: 'My Resolved and Closed Tickets',
+					label: 'My Resolved Tickets',
 					action: () => {
 						let query = Object.assign({}, this.$route.query)
 						delete query.assignee
-						query.menu_filter = 'my-resolved-and-closed-tickets'
+						query.menu_filter = 'my-resolved-tickets'
 						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Resolved and Closed Tickets")
+						this.select("My Resolved Tickets")
+					}
+				},
+				{
+					label: 'My Closed Tickets',
+					action: () => {
+						let query = Object.assign({}, this.$route.query)
+						delete query.assignee
+						query.menu_filter = 'my-closed-tickets'
+						this.$router.push({path: '/frappedesk/tickets', query})
+						this.select("My Closed Tickets")
 					}
 				},
 			])
 		}
 
-		this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+		this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 			{
 				label: 'All Tickets',
 				action: () => {
@@ -216,7 +226,8 @@ export default {
 					'all': 'All Tickets',
 					'my-open-tickets': 'My Open Tickets',
 					'my-replied-tickets': 'My Replied Tickets',
-					'my-resolved-and-closed-tickets': 'My Resolved and Closed Tickets',
+					'my-resolved-tickets': 'My Resolved Tickets',
+					'my-closed-tickets': 'My Closed Tickets',
 				}
 				if (ticketFilterMap[this.$route.query.menu_filter]) {
 					return ticketFilterMap[this.$route.query.menu_filter]
