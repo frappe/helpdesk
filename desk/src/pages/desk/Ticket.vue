@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="ticket" class="flex flex-col h-screen">
+		<div v-if="ticket" class="flex flex-col h-screen grow-0">
 			<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px] h-[64px]">
 			</div>
 			<div
@@ -11,7 +11,7 @@
 				<div class="border-r w-[252px] shrink-0">
 					<ActionPanel :ticketId="ticket.name" />
 				</div>
-				<div class="grow flex flex-col h-full">
+				<div class="grow flex flex-col h-full overflow-x-scroll" :style="{ width: 'calc(100vh - 252px - 240px - 252px)' }">
 					<div class="border-b py-[14px] px-[18px]">
 						<div class="flex flex-row justify-between">
 							<div class="grow">
