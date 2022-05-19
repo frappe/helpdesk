@@ -223,9 +223,7 @@ export default {
 				}
 			}
 		]
-
-		// this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
-		// this.updateSidebarFilter()
+		this.syncSelectedMenuItemBasedOnRoute()
 	},
 	watch: {
 		$route() {
@@ -234,6 +232,7 @@ export default {
 	},
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
+			console.log('HERE')
 			const handleTicketFilterQueries = () => {
 				const ticketFilterMap = {
 					'all': 'All Tickets',
