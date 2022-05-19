@@ -1,0 +1,22 @@
+{
+    "name": "@types/orderedmap",
+    "version": "1.0.0",
+    "description": "TypeScript definitions for orderedmap",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Bradley Ayers",
+            "url": "https://github.com/bradleyayers"
+        }
+    ],
+    "main": "",
+    "repository": {
+        "type": "git",
+        "url": "https://www.github.com/DefinitelyTyped/DefinitelyTyped.git"
+    },
+    "scripts": {},
+    "dependencies": {},
+    "peerDependencies": {},
+    "typesPublisherContentHash": "134c0275869bccd376ac25cc80ebefe20f4e86aa8e5032f6813704e55c2a0bdb",
+    "typeScriptVersion": "2.1"
+}

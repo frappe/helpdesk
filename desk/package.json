@@ -10,19 +10,19 @@
 		"copy-html-entry": "cp ../frappedesk/public/desk/index.html ../frappedesk/www/frappedesk/index.html"
 	},
 	"dependencies": {
+		"@vitejs/plugin-vue": "^2.3.3",
 		"@vueup/vue-quill": "^1.0.0-beta.8",
 		"dayjs": "^1.11.1",
 		"frappe-ui": "0.0.24",
 		"luxon": "^2.3.2",
 		"sass": "^1.50.1",
-		"vue": "^3.2.33",
+		"vite": "^2.9.9",
+		"vue": "^3.2.25",
 		"vue-router": "^4.0.14"
 	},
 	"devDependencies": {
-		"@vitejs/plugin-vue": "^2.3.1",
 		"autoprefixer": "^10.4.4",
 		"postcss": "^8.4.12",
-		"tailwindcss": "^3.0.24",
-		"vite": "^2.9.5"
+		"tailwindcss": "^3.0.24"
 	}
 }
