@@ -1,5 +1,8 @@
 <template>
-	<div class="absolute border rounded shadow-md p-2 bg-white z-50 w-[286px] ml-[-31px] text-base">
+	<div 
+		class="absolute border rounded shadow-md p-2 bg-white z-50 w-[286px] ml-[-31px] text-base"
+		v-on-outside-click="() => {}"
+	>
 		<div v-if="tempFilters.length > 0" class="border-b pb-2 mb-2 space-y-2">
 			<div v-for="(filter, index) in tempFilters" :key="index">
 				<FilterBoxItem v-if="filter" click="w-full" :options="options" v-model="tempFilters" :filterIndex="index" :removable="tempFilters.filter((item) => item != null).length > 1"/>
@@ -69,7 +72,7 @@ export default {
 		clearAllFilters() {
 			this.tempFilters = []
 			this.applyFilters()
-		},
+		}
 	}
 }
 </script>
