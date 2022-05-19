@@ -110,8 +110,9 @@ export default {
 		const sortDirection = ref('dessending')
 
 		const resetSelections = inject('resetSelections')
+		const updateSidebarFilter = inject('updateSidebarFilter')
 
-		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection, resetSelections, showSelectAllCheckbox }
+		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection, resetSelections, showSelectAllCheckbox, updateSidebarFilter }
 	},
 	computed: {
 		filteredTickets() {
@@ -148,16 +149,6 @@ export default {
 					}
 
 					switch(this.$route.query.menu_filter) {
-						case 'unassigned':
-							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								if (Object.keys(ticket.assignees).length > 0) {
-									return Object.values(ticket.assignees).find((assignee) => { 
-										return (assignee.name != this.user.agent.name)
-									})
-								}
-								return true
-							})
-							break
 						case 'my-open-tickets':
 							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
 								if (ticket.status == 'Open') {
@@ -193,6 +184,7 @@ export default {
 					}
 				}
 			}
+			this.updateSidebarFilter()
 			return filteredTickets
 		},
 		sortedTickets() {
