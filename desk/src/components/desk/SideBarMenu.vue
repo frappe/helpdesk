@@ -223,9 +223,7 @@ export default {
 				}
 			}
 		]
-
-		// this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
-		// this.updateSidebarFilter()
+		this.syncSelectedMenuItemBasedOnRoute()
 	},
 	watch: {
 		$route() {
