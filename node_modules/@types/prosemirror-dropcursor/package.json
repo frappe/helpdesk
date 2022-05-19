@@ -1,0 +1,37 @@
+{
+    "name": "@types/prosemirror-dropcursor",
+    "version": "1.0.3",
+    "description": "TypeScript definitions for prosemirror-dropcursor",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/prosemirror-dropcursor",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Bradley Ayers",
+            "url": "https://github.com/bradleyayers",
+            "githubUsername": "bradleyayers"
+        },
+        {
+            "name": "David Hahn",
+            "url": "https://github.com/davidka",
+            "githubUsername": "davidka"
+        },
+        {
+            "name": "Daniil Dotsev",
+            "url": "https://github.com/dddotsev",
+            "githubUsername": "dddotsev"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/prosemirror-dropcursor"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/prosemirror-state": "*"
+    },
+    "typesPublisherContentHash": "32f564ccd7721d97ffab2d1572071d77a4e6dd1902b118b29189f7c896d7166b",
+    "typeScriptVersion": "3.7"
+}

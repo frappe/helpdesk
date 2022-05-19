@@ -1,0 +1,40 @@
+{
+  "name": "linkifyjs",
+  "version": "3.0.5",
+  "description": "Find URLs, email addresses, #hashtags and @mentions in plain-text strings, then convert them into HTML <a> links.",
+  "main": "index.js",
+  "module": "dist/linkify.module.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "clean": "rm -rf lib dist *.tgz *.d.ts",
+    "prepack": "run-s clean build tsc",
+    "tsc": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hypercontext/linkifyjs.git",
+    "directory": "packages/linkifyjs"
+  },
+  "keywords": [
+    "autolink",
+    "email",
+    "hashtag",
+    "html",
+    "jquery",
+    "link",
+    "mention",
+    "react",
+    "twitter",
+    "url"
+  ],
+  "author": "Hypercontext",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hypercontext/linkifyjs/issues"
+  },
+  "homepage": "https://github.com/Hypercontext/linkifyjs#readme",
+  "devDependencies": {
+    "@nfrasser/simple-html-tokenizer": "==0.5.11-1"
+  }
+}
