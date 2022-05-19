@@ -5,10 +5,15 @@
 		</div>
 		<div class="mb-auto space-y-[4px] select-none mx-[8px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
-				<div 
+				<div
 					class="group stroke-gray-600 rounded-[8px] cursor-pointer hover:bg-gray-200"
+					:class="option.selected ? 'bg-gray-200' : ''"
 					@click="() => {
-						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
+						if (option.children) {
+							option.children ? option.expanded = !option.expanded : {}
+						} else if(option.to) {
+							$router.push(option.to)
+						}
 					}"
 				>
 					<div class="pl-[8px] py-[6px] flex items-center">
@@ -24,17 +29,17 @@
 				<div v-if="option.children && option.expanded" class="mt-[4px]">
 					<div class="space-y-[4px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
-							<div 
+							<router-link 
 								class="group py-[6px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
 								:class="childOption.selected ? 'bg-gray-200' : ''"
-								@click="() => { childOption.action ? childOption.action() : {} }"
+								:to="childOption.to ? {path: childOption.to.path, query: childOption.to.query ? childOption.to.query() : {}}: {}"
 							>
 								<div class="pl-[52px]">
 									<span class="text-base">
 										{{ childOption.label }}
 									</span>
 								</div>
-							</div>
+							</router-link>
 						</div>
 					</div>
 				</div>
@@ -117,9 +122,8 @@ export default {
 				children: [
 					{
 						label: 'Contacts',
-						action: () => {
-							this.select('Contacts')
-							this.$router.push({path: '/frappedesk/contacts'})
+						to: {
+							path: '/frappedesk/contacts',
 						}
 					},
 				]
@@ -127,10 +131,9 @@ export default {
 			{
 				label: 'Settings',
 				icon: 'settings',
-				action: () => {
-					this.select('Settings')
-					this.$router.push({path: '/frappedesk/settings'})
-				}
+				to: {
+					path: '/frappedesk/settings',
+				},
 			}
 		]
 
@@ -138,43 +141,51 @@ export default {
 			this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 				{
 					label: 'My Open Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-open-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Open Tickets")
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-open-tickets'
+							}
+						}
 					}
 				},
 				{
 					label: 'My Replied Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-replied-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Replied Tickets")
-					}
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-replied-tickets'
+							}
+						}
+					},
 				},
 				{
 					label: 'My Resolved Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-resolved-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Resolved Tickets")
-					}
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-resolved-tickets'
+							}
+						}
+					},
 				},
 				{
 					label: 'My Closed Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-closed-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Closed Tickets")
-					}
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-closed-tickets'
+							}
+						}
+					},
 				},
 			])
 		}
@@ -182,12 +193,15 @@ export default {
 		this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 			{
 				label: 'All Tickets',
-				action: () => {
-					let query = Object.assign({}, this.$route.query)
-					query.menu_filter = 'all'
-					this.$router.push({path: '/frappedesk/tickets', query})
-					this.select("All Tickets")
-				}
+				to: {
+					path: '/frappedesk/tickets',
+					query: () => {
+						return {
+							...this.$route.query,
+							menu_filter: 'all'
+						}
+					}
+				},
 			},
 		])
 
@@ -210,8 +224,13 @@ export default {
 			}
 		]
 
-		this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
-		this.updateSidebarFilter()
+		// this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
+		// this.updateSidebarFilter()
+	},
+	watch: {
+		$route() {
+			this.syncSelectedMenuItemBasedOnRoute()
+		}
 	},
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
@@ -231,7 +250,7 @@ export default {
 			}
 
 			const routeMenuItemMap = {
-				'frappedesk/tickets': 'All Tickets',
+				'frappedesk/tickets': 'Tickets',
 				'frappedesk/knowledge-base': 'Knowledge Base',
 				'frappedesk/reports': 'Reports',
 				'frappedesk/contacts': 'Contacts',
@@ -240,7 +259,7 @@ export default {
 			Object.keys(routeMenuItemMap).forEach(route => {
 				if (this.$route.path.includes(route)) {
 					let selectedMenuItem = routeMenuItemMap[route]
-					if (routeMenuItemMap[route] == 'All Tickets') {
+					if (routeMenuItemMap[route] == 'Tickets') {
 						selectedMenuItem = handleTicketFilterQueries()
 					}
 					this.select(selectedMenuItem)
