@@ -1,14 +1,14 @@
-from dataclasses import fields
-import frappe
-from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
-from frappe.website.utils import cleanup_page_name
 import json
+import frappe
 
+from frappe.website.utils import cleanup_page_name
 from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
+from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
 
 @frappe.whitelist(allow_guest=True)
 def get_tickets():
-	all_tickets = frappe.db.sql("""
+	all_tickets = frappe.db.sql(
+		"""
 		SELECT
 			ticket.subject,
 			ticket.modified,
@@ -24,21 +24,34 @@ def get_tickets():
 			ticket.agent_group,
 			ticket.first_responded_on,
 			ticket.notes,
-			ticket.raised_by
+			ticket.raised_by,
+			ticket._seen
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
-	""", as_dict=1)
+	""",
+		as_dict=1,
+	)
 
 	# TODO: optimize this (try using sql query)
 	for ticket in all_tickets:
-		assignees = get_agent_assigned_to_ticket(ticket['name'])
-		
-		ticket['seen'] = frappe.session.user in (frappe.get_value("Ticket", ticket['name'], '_seen') or [])
-		ticket['custom_fields'] = frappe.get_doc("Ticket", ticket.name, fields=['custom_fields']).custom_fields
-		ticket['assignees'] = assignees
-		ticket['contact'] = get_contact(ticket['name'])
-	
+		seen = ticket._seen
+		if seen:
+			seen = json.loads(seen)
+		ticket["seen"] = frappe.session.user in (seen or [])
+
+		ticket_custom_field = frappe.qb.DocType("Ticket Custom Field")
+		ticket["custom_fields"] = (
+			frappe.qb.from_(ticket_custom_field)
+			.select("*")
+			.where(ticket_custom_field.parent == ticket.name)
+			.run(as_dict=True)
+		)
+
+		ticket["assignees"] = get_agent_assigned_to_ticket(ticket["name"])
+		ticket["contact"] = get_contact(ticket["name"])
+
 	return all_tickets
+
 
 @frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):
@@ -113,15 +126,21 @@ def update_contact(ticket_id, contact):
 
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
-	ticket_doc = frappe.get_doc("Ticket", ticket_id)
-	if ticket_doc._assign:
-		assignees = json.loads(ticket_doc._assign)
-		for assignee in assignees:
-			if (frappe.db.exists("Agent", assignee)):
-				agent = frappe.get_doc("Agent", assignee)
-				agent = agent.__dict__
-				agent['image'] = frappe.get_value("User", agent["name"], "user_image")
-				agents.append(agent)
+	assignee_list = frappe.db.get_value("Ticket", ticket_id, "_assign")
+	if assignee_list:
+		assignees = json.loads(assignee_list)
+
+		agent = frappe.qb.DocType("Agent")
+		user = frappe.qb.DocType("User")
+		query = (
+			frappe.qb.from_(agent)
+			.join(user)
+			.on(agent.name == user.name)
+			.select(agent.name, agent.agent_name, agent.group, user.user_image.as_("image"))
+			.where(agent.name.isin(assignees))
+		)
+		agents = query.run(as_dict=True)
+
 	return agents
 
 @frappe.whitelist()
