@@ -113,15 +113,21 @@ def update_contact(ticket_id, contact):
 
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
-	ticket_doc = frappe.get_doc("Ticket", ticket_id)
-	if ticket_doc._assign:
-		assignees = json.loads(ticket_doc._assign)
-		for assignee in assignees:
-			if (frappe.db.exists("Agent", assignee)):
-				agent = frappe.get_doc("Agent", assignee)
-				agent = agent.__dict__
-				agent['image'] = frappe.get_value("User", agent["name"], "user_image")
-				agents.append(agent)
+	assignee_list = frappe.db.get_value("Ticket", ticket_id, "_assign")
+	if assignee_list:
+		assignees = json.loads(assignee_list)
+
+		agent = frappe.qb.DocType("Agent")
+		user = frappe.qb.DocType("User")
+		query = (
+			frappe.qb.from_(agent)
+			.join(user)
+			.on(agent.name == user.name)
+			.select(agent.name, agent.agent_name, agent.group, user.user_image.as_("image"))
+			.where(agent.name.isin(assignees))
+		)
+		agents = query.run(as_dict=True)
+
 	return agents
 
 @frappe.whitelist()
