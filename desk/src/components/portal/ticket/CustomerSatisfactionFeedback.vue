@@ -1,5 +1,5 @@
 <template>
-	<div class="p-[10px] rounded-[6px]" :class="submitted ? 'bg-gray-50' : 'bg-white shadow-lg border-blue-500 border-2'">
+	<div class="p-[10px] rounded-[6px] text-gray-900" :class="submitted ? 'bg-gray-50' : 'bg-white shadow-lg border-blue-500 border-2'">
 		<div class="text-[14px] font-medium pb-[8px]">{{ submitted ? 'This ticket was rated as:' : 'How did we do?' }}</div>
 		<div v-if="!submitted" class="flex flex-col space-y-[8px]">
 			<div class="flex flex-row items-center space-x-[8px] font-normal text-[12px]">
@@ -28,7 +28,7 @@
 				</Button>
 			</div>
 		</div>
-		<div v-else class="flex flex-col space-y-[8px] text-[12px] font-normal">
+		<div v-else class="flex flex-col space-y-[8px] text-[12px] font-normal text-gray-700">
 			<div>{{ ticket.satisfied ? 'Good, I’m satisfied.' : 'Bad, I’m not satisfied.' }}</div>
 			<div class="flex flex-col space-y-[2px]">
 				<div>Review:</div>
@@ -44,7 +44,7 @@ import { Input } from 'frappe-ui'
 
 export default {
 	name: 'CustomerSatiscationFeedback',
-	props: ['ticket'],
+	props: ['ticket', 'editable'],
 	components: {
 		Input
 	},
@@ -70,7 +70,6 @@ export default {
 		}
 	},
 	mounted() {
-		console.log(this.ticket)
 		this.submitted = this.ticket.feedback_submitted
 	},
 }
