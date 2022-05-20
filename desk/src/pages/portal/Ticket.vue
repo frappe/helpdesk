@@ -28,6 +28,7 @@
 			</div>
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
+					<CustomerSatisfactionFeedback :ticket="ticket" v-if="['Closed', 'Resolved'].includes(ticket.status)" />
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 				</div>
 				<div v-if="!editing && ['Open', 'Replied'].includes(ticket.status)" class="mt-5 ml-9">
@@ -111,7 +112,8 @@ import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
 import { FeatherIcon, FileUploader } from 'frappe-ui'
-import CustomIcons from "../../components/desk/global/CustomIcons.vue";
+import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue";
 
 export default {
     name: "Tickets",
@@ -122,7 +124,8 @@ export default {
     QuillEditor,
     FeatherIcon,
     FileUploader,
-    CustomIcons
+    CustomIcons,
+	CustomerSatisfactionFeedback
 },
 	data() {
 		return {

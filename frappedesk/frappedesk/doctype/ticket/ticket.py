@@ -323,7 +323,7 @@ def get_user_tickets(filters='{}', order_by='creation desc', impersonate=None):
 	if impersonate and frappe.db.exists("Agent", frappe.session.user):
 		filters['raised_by'] = ['=', impersonate]
 
-	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation'])
+	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'feedback_submitted', 'satisfied', 'customer_feedback'])
 	return tickets
 
 def get_ticket_list(

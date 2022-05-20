@@ -32,7 +32,8 @@
 						</div>
 					</div>
 					<div class="grow overflow-scroll px-[18px]">
-						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" />
+						<CustomerSatisfactionFeedback v-if="ticket.feedback_submitted && ['Closed', 'Resolved'].includes(ticket.status)" class="mt-[10px]" :editable="false" :ticket="ticket"/>
+						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" :autoScroll="['Open', 'Replied'].includes(ticket.status)" />
 					</div>
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
 						<div>
@@ -116,6 +117,7 @@ import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
 import { QuillEditor } from '@vueup/vue-quill'
+import CustomerSatisfactionFeedback from '@/components/portal/ticket/CustomerSatisfactionFeedback.vue';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
 
@@ -133,7 +135,8 @@ export default {
 		InfoPanel,
 		ActionPanel,
 		CustomIcons,
-		QuillEditor
+		QuillEditor,
+		CustomerSatisfactionFeedback
 	},
 	data() {
 		return {

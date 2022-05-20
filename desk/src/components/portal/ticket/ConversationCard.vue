@@ -1,7 +1,7 @@
 <template>
 	<div class="flex mt-5">
 		<Avatar :label="userName" :imageURL="profilePicUrl" size="md" />
-		<div class="w-full mx-2 pt-1">
+		<div class="w-full ml-2 pt-1">
 			<div class="flex justify-between">
 				<div class="text-lg">{{ userName }}</div>
 				<div class="text-sm text-slate-500">{{ $dayjs(time).fromNow() }}</div>
