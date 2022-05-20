@@ -17,6 +17,7 @@
 				<Button 
 					v-if="feedbackText != '' && satisfaction != 'Not Set'" 
 					appearance="primary" 
+					:loading="$resources.submitFeedback.loading"
 					@click="$resources.submitFeedback.submit({
 						ticket_id: ticket.name,
 						satisfied: (this.satisfaction === 'Satisfied'),
@@ -27,8 +28,12 @@
 				</Button>
 			</div>
 		</div>
-		<div v-else>
-			Your Feedback is submitted !!
+		<div v-else class="flex flex-col space-y-[8px] text-[12px] font-normal">
+			<div>{{ ticket.satisfied ? 'Good, I’m satisfied.' : 'Bad, I’m not satisfied.' }}</div>
+			<div class="flex flex-col space-y-[2px]">
+				<div>Review:</div>
+				<div>‘{{ ticket.customer_feedback }}’</div>
+			</div>
 		</div>
 	</div>
 </template>
