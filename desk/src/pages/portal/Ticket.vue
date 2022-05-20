@@ -199,6 +199,7 @@ export default {
 				method: 'frappedesk.api.ticket.submit_conversation_via_contact',
 				onSuccess: () => {
 					this.tempTextEditorData = {}
+					this.editing = false
 				},
 				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
