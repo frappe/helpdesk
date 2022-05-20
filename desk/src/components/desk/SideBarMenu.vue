@@ -30,14 +30,15 @@
 					<div class="space-y-[4px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<router-link 
-								class="group py-[4px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
+								class="group py-[6.25px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
 								:class="childOption.selected ? 'bg-gray-200' : ''"
 								:to="childOption.to ? {path: childOption.to.path, query: childOption.to.query ? childOption.to.query() : {}}: {}"
 							>
-								<div class="pl-[52px]">
-									<span class="text-base">
+								<div class="pl-[52px] w-full flex flex-row items-center justify-between">
+									<div class="text-base">
 										{{ childOption.label }}
-									</span>
+									</div>
+									<div class="text-[11px] font-normal mr-[10px] text-gray-500">{{ childOption.extra }}</div>
 								</div>
 							</router-link>
 						</div>
@@ -80,7 +81,7 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { Dropdown, FeatherIcon } from 'frappe-ui'
+import { Dropdown, FeatherIcon, call } from 'frappe-ui'
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import { inject, ref } from 'vue'
 
@@ -114,7 +115,7 @@ export default {
 				label: 'Tickets',
 				icon: 'ticket',
 				expanded: true,
-				children: []
+				children: [],
 			},
 			{
 				label: 'Contacts',
@@ -126,7 +127,7 @@ export default {
 							path: '/frappedesk/contacts',
 						}
 					},
-				]
+				],
 			},
 			{
 				label: 'Settings',
@@ -224,6 +225,12 @@ export default {
 			}
 		]
 		this.syncSelectedMenuItemBasedOnRoute()
+		this.updateTicketsCount()
+		this.$socket.on("list_update", (data) => {
+			if (data.doctype === "Ticket") {
+				this.updateTicketsCount()
+			}
+		})
 	},
 	watch: {
 		$route() {
@@ -231,6 +238,44 @@ export default {
 		}
 	},
 	methods: {
+		async updateTicketsCount() {
+			let filterLabelMap = {
+				// 'All Tickets': {
+				// 	status: ['in', ['Open', 'Replied']]
+				// }
+			}
+			if (this.user.agent) {
+				let assigneeFilter = {_assign: ['like', '%' + this.user.agent.name + '%']}
+				filterLabelMap = {...filterLabelMap, 
+					'My Open Tickets': {
+						...assigneeFilter,
+						status: 'Open'
+					},
+					'My Replied Tickets': {
+						...assigneeFilter,
+						status: 'Replied'
+					},
+					// 'My Resolved Tickets': {
+					// 	...assigneeFilter,
+					// 	status: 'Resolved',
+					// },
+					// 'My Closed Tickets': {
+					// 	...assigneeFilter,
+					// 	status: 'Closed',
+					// },
+				}
+			}
+			for(let index in Object.values(this.menuOptions.find(option => option.label == 'Tickets').children)) {
+				let option = this.menuOptions.find(option => option.label == 'Tickets').children[index]
+				if (filterLabelMap[option.label]) {
+					let count = await call('frappe.client.get_count', {
+						doctype: "Ticket",
+						filters: filterLabelMap[option.label],
+					})
+					this.menuOptions.find(option => option.label == 'Tickets').children[index].extra = count
+				}
+			}
+		},
 		syncSelectedMenuItemBasedOnRoute() {
 			const handleTicketFilterQueries = () => {
 				const ticketFilterMap = {
