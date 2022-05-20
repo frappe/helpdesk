@@ -53,7 +53,12 @@
   "via_customer_portal",
   "attachment",
   "content_type",
-  "notes"
+  "notes",
+  "customer_feedback_section",
+  "feedback_submitted",
+  "satisfied",
+  "customer_feedback",
+  "agent_remark"
  ],
  "fields": [
   {
@@ -377,12 +382,44 @@
    "fieldname": "notes",
    "fieldtype": "Long Text",
    "label": "Notes"
+  },
+  {
+   "depends_on": "eval:doc.feedback_submitted",
+   "fieldname": "customer_feedback_section",
+   "fieldtype": "Section Break",
+   "label": "Customer Feedback"
+  },
+  {
+   "default": "0",
+   "depends_on": "feedback_submitted",
+   "fieldname": "feedback_submitted",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Feedback Submitted"
+  },
+  {
+   "default": "0",
+   "fieldname": "satisfied",
+   "fieldtype": "Check",
+   "label": "Satisfied"
+  },
+  {
+   "fieldname": "customer_feedback",
+   "fieldtype": "Long Text",
+   "label": "Feedback"
+  },
+  {
+   "depends_on": "eval:!doc.satisfied",
+   "fieldname": "agent_remark",
+   "fieldtype": "Select",
+   "label": "Agent Remark",
+   "options": "Argent\nPoor Knowledge"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-04-28 10:26:39.908032",
+ "modified": "2022-05-19 22:18:01.474617",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",
