@@ -24,7 +24,10 @@ def get_tickets():
 			ticket.agent_group,
 			ticket.first_responded_on,
 			ticket.notes,
-			ticket.raised_by
+			ticket.raised_by,
+			ticket.feedback_submitted,
+			ticket.satisfied,
+			ticket.customer_feedback
 		FROM `tabTicket` ticket
 		ORDER BY ticket.creation desc
 	""", as_dict=1)
@@ -307,3 +310,12 @@ def activities(name):
 	)
 
 	return activities
+
+@frappe.whitelist(allow_guest=True)
+def submit_customer_feedback(ticket_id, satisfied, feedback_text):
+	ticket_doc = frappe.get_doc("Ticket", ticket_id)
+	ticket_doc.satisfied = satisfied
+	ticket_doc.customer_feedback = feedback_text
+	ticket_doc.feedback_submitted = True
+	ticket_doc.save(ignore_permissions=True)
+	return ticket_doc
