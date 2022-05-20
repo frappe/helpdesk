@@ -34,7 +34,7 @@
 				<div v-if="!editing && ['Open', 'Replied'].includes(ticket.status)" class="mt-5 ml-9">
 					<Button @click="startEditing()" appearance="primary">Reply</Button>
 				</div>
-				<div v-else class="flex flex-row justify-between">
+				<div v-if="['Closed', 'Resolved'].includes(ticket.status)" class="flex flex-row justify-between">
 					<div class="flex flex-row items-center text-[12px] text-gray-500 space-x-[15.24px]">
 						<FeatherIcon name="lock" class="w-[18px] h-[18px] stroke-gray-500" />
 						<span>This ticket has been closed.</span>
