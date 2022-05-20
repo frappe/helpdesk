@@ -1,14 +1,10 @@
 <template>
 	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen">
-		<div class="flex w-screen">
-			<div class="bg-gray-50 w-[240px] shrink-0">
-				<SideBarMenu />
-			</div>
-			<div class="grow">
-				<router-view v-slot="{ Component }">
-					<component :is="Component" />
-				</router-view>
-			</div>
+		<div class="flex flex-row w-screen">
+			<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
+			<router-view class="grow" v-slot="{ Component }">
+				<component :is="Component" />
+			</router-view>
 		</div>
 	</div>
 </template>

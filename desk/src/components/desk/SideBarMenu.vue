@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col w-full border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
+	<div class="flex flex-col border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
 		<div class="mb-[38.4px] pl-[22px] cursor-pointer">
 			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]" @click="() => {$router.push({path: '/frappedesk/tickets'})}"/>
 		</div>
@@ -16,7 +16,7 @@
 						}
 					}"
 				>
-					<div class="pl-[8px] py-[6px] flex items-center">
+					<div class="pl-[8px] py-[5.5px] flex items-center">
 						<div class="w-[14px]">
 							<FeatherIcon v-if="option.children" class="h-[14px] w-[14px] stroke-gray-600" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
 						</div>
@@ -30,7 +30,7 @@
 					<div class="space-y-[4px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
 							<router-link 
-								class="group py-[6px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
+								class="group py-[4px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
 								:class="childOption.selected ? 'bg-gray-200' : ''"
 								:to="childOption.to ? {path: childOption.to.path, query: childOption.to.query ? childOption.to.query() : {}}: {}"
 							>
