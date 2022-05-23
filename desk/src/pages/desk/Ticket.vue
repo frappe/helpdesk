@@ -24,11 +24,6 @@
 									</a>
 								</div>
 							</div>
-							<div class="flex flex-row items-center space-x-[8px]">
-								<Button icon="chevron-left" appearance="minimal"/>
-								<Button icon="chevron-right" appearance="minimal"/>
-								<Button icon="more-horizontal" appearance="minimal"/>
-							</div>
 						</div>
 					</div>
 					<div class="grow overflow-scroll px-[18px]">
