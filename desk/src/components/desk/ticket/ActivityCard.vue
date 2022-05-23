@@ -6,8 +6,8 @@
 			<div v-if="!isLast" class="h-[20px] border-l mx-2" />
 		</div>
 		<div class="grow pr-[6px]">
-			<div class="flex flex-col">
-				<div><span class="font-medium text-gray-900">{{ activity.owner }}</span> <span class="font-normal text-gray-700">{{ activity.action }}</span></div>
+			<div class="flex flex-col text-gray-700">
+				<div><span class="font-medium">{{ activity.owner }}</span> <span class="font-normal">{{ activity.action }}</span></div>
 				<a class="text-gray-600 text-[11px]" :title="$dayjs(activity.creation)">{{ $dayjs.longFormating($dayjs(activity.creation).fromNow()) }}</a>
 			</div>
 		</div>

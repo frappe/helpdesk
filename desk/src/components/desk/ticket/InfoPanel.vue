@@ -92,17 +92,20 @@
 		</div>
 		<div class="grow" v-if="!editingContact">
 			<div class="h-full flex flex-col">
-				<div class="px-[19px] py-[16px] border-t border-b" v-if="ticket.custom_fields.length > 0">
+				<div class="p-[16px] border-t border-b" v-if="ticket.custom_fields.length > 0">
 					<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
-					<div class="text-base space-y-[12px]">
-							<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
-								<div class="text-gray-700 text-base">{{ field.label }}</div>
-								<div v-if="field.route" class="w-fit flex flex-row items-center space-x-1 cursor-pointer hover:underline">
+					<div class="space-y-[12px]">
+							<div class="flex flex-col space-y-[8px] font-normal text-[12px]" v-for="field in ticket.custom_fields" :key="field">
+								<div class="text-gray-600 text-base">{{ field.label }}</div>
+								<div v-if="field.route" class="w-fit flex flex-row items-center space-x-[12px] cursor-pointer hover:underline">
+									<FeatherIcon name="external-link" class="w-[14px] h-[14px] stroke-gray-500" />
 									<a class="text-gray-900 text-base" :href="field.route" target="_blank">{{ field.value }}</a>
-									<FeatherIcon name="external-link" class="w-[14px] h-[17px] pb-[3px]" />
 								</div>
 								<div v-else>
-									<span class="text-gray-900 text-base">{{ field.value }}</span>
+									<div class="flex flex-row items-center space-x-[12px]">
+										<FeatherIcon name="info" class="w-[14px] h-[14px] stroke-gray-500" />
+										<div class="text-gray-900 text-base">{{ field.value }}</div>
+									</div>
 								</div>
 							</div>
 					</div>
