@@ -22,7 +22,7 @@
 			</div>
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
-					<div v-if="['Closed', 'Resolved'].includes(ticket.status)" class="w-full bg-gray-100 rounded-[8px] py-[10px] px-[15px] flex flex-row items-center justify-between mb-[6px]">
+					<div v-if="['Closed', 'Resolved'].includes(ticket.status)" class="w-full bg-gray-100 rounded-[8px] py-[10px] px-[15px] flex flex-row items-center justify-between mb-[12px]">
 						<div class="flex flex-row items-center space-x-[9px]">
 							<CustomIcons name="circle-check" class="w-[18px] h-[18px]" />
 							<div class="text-base">This ticket has been closed.</div>
