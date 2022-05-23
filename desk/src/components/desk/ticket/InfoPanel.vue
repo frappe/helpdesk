@@ -1,11 +1,11 @@
 <template>
-	<div class="pt-[15px] h-full flex flex-col" v-if="ticket">
-		<div class="shrink-0 text-base pl-[15px] pr-[25.33px] pb-[14px]" :class="editingContact ? '' : 'border-b'">
+	<div class="pt-[20px] h-full flex flex-col" v-if="ticket">
+		<div class="shrink-0 text-base px-[16px] pb-[17px]" :class="editingContact ? '' : 'border-b'">
 			<LoadingText v-if="updatingContact"/>
 			<div v-else>
 				<div v-if="!editingContact">
 					<div v-if="ticket.contact" class="space-y-[12px]">
-						<div class="flex flex-row items-center space-x-[6px]">
+						<div class="flex flex-row items-center space-x-[12px]">
 							<div class="w-7">
 								<CustomAvatar :label="contactFullName" :imageURL="ticket.contact.image" size="md" />
 							</div>
@@ -18,19 +18,15 @@
 								/>
 							</div>
 						</div>
-						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-[6px] items-center">
-							<div class="w-7 px-[6.5px]">
-								<FeatherIcon name="phone" class="stroke-gray-500" style="width: 15px;" />
-							</div>
+						<div v-if="ticket.contact.phone_nos.length > 0" class="flex space-x-[12px] items-center">
+							<FeatherIcon name="phone" class="stroke-gray-500" style="width: 15px;" />
 							<div class="space-y-1" v-for="phone_no in ticket.contact.phone_nos" :key="phone_no">
 								<a :title="phone_no.phone" class="text-gray-700 text-base">{{ phone_no.phone }}</a>
 							</div>
 						</div>
-						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-[6px] items-center">
-							<div class="w-7 px-[6.5px]">
-								<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px;" />
-							</div>
-							<div class="space-y-1 max-w-[153px]" v-for="email in ticket.contact.email_ids" :key="email">
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-[12px] items-center">
+							<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px;" />
+							<div class="space-y-1 max-w-[173px]" v-for="email in ticket.contact.email_ids" :key="email">
 								<div :title="email.email_id" class="truncate text-gray-700 text-base">
 									<a :title="email.email_id">{{ email.email_id }}</a>
 								</div>
@@ -96,7 +92,7 @@
 		</div>
 		<div class="grow" v-if="!editingContact">
 			<div class="h-full flex flex-col">
-				<div class="px-[19px] py-[17px] border-t border-b" v-if="ticket.custom_fields.length > 0">
+				<div class="px-[19px] py-[16px] border-t border-b" v-if="ticket.custom_fields.length > 0">
 					<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
 					<div class="text-base space-y-[12px]">
 							<div class="flex flex-col space-y-[8px]" v-for="field in ticket.custom_fields" :key="field">
@@ -111,33 +107,38 @@
 							</div>
 					</div>
 				</div>
-				<div class="shrink-0 border-b py-[14px] pl-[19px] pr-[27.81px] space-y-1 select-none" v-if="otherTicketsOfContact">
+				<div class="shrink-0 border-b p-[16px] space-y-1 select-none" v-if="otherTicketsOfContact">
 					<div class="flex flex-row items-center" :class="otherTicketsOfContact.length > 0 ? 'cursor-pointer' : ''" @click="() => {showOtherTicketsOfContacts = !showOtherTicketsOfContacts}">
-						<div class="grow font-normal text-base"> Open Tickets ({{ otherTicketsOfContact.length }}) </div>
-						<CustomIcons v-if="otherTicketsOfContact.length > 0" class="h-[6px] fill-gray-400" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
+						<div class="grow text-gray-600 text-[11px] font-semibold"> OPEN TICKETS ({{ otherTicketsOfContact.length }}) </div>
+						<FeatherIcon v-if="otherTicketsOfContact.length > 0" class="h-[15px] w-[15px] stroke-gray-500" :name="showOtherTicketsOfContacts ? 'chevron-up' : 'chevron-down'"  />
 					</div>
-					<div v-if="showOtherTicketsOfContacts && otherTicketsOfContact.length > 0" class="max-h-[200px] overflow-scroll pt-[4px] space-y-[4px]">
+					<div v-if="showOtherTicketsOfContacts && otherTicketsOfContact.length > 0" class="overflow-scroll pt-[4px] space-y-[4px] text-gray-700 font-normal">
 						<div v-for="(_ticket, index) in otherTicketsOfContact" :key="_ticket.name" :set="maxCount = 5">
 							<router-link 
 								v-if="index <= maxCount" 
 								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?raised_by=${ticket.contact.name}`" 
-								class="text-[12px] rounded max-w-[200px]"
+								class="text-[12px] rounded"
 							>
-								<div v-if="index < maxCount">
-									<div class="truncate text-base text-gray-700 hover:bg-gray-100">
-										<a :title="_ticket.subject">{{ _ticket.subject }}</a>
+								<div class="py-[1px]">
+									<div v-if="index < maxCount" class="flex flex-row space-x-[12px] items-center hover:bg-gray-100">
+										<div class="w-[15px] h-[15px]">
+											<FeatherIcon name="arrow-up-right" class="w-[15px] h-[15px] stroke-gray-500" />
+										</div>
+										<div class="max-w-[180px]">
+											<div class="truncate"><a class="text-[12px]" :title="_ticket.subject">{{ _ticket.subject }}</a></div>
+										</div>
 									</div>
+									<div v-else class="hover:text-gray-600 flex flex-row-reverse text-[11px]">View all</div>
 								</div>
-								<div v-else class="text-gray-500 hover:bg-gray-100">Show more</div>
 							</router-link>
 						</div>
 					</div>
 				</div>
 				<div class="h-full">
-					<div class="flex flex-col py-[14px] pl-[19px] pr-[27.81px] select-none" :class="showTicketHistory ? '' : 'border-b'">
+					<div class="flex flex-col p-[16px] select-none" :class="showTicketHistory ? '' : 'border-b'">
 						<div class="shrink-0 flex flex-row items-center cursor-pointer" @click="() => {showTicketHistory = !showTicketHistory}">
-							<div class="grow font-normal text-base"> Ticket History </div>
-							<CustomIcons class="h-[6px] fill-gray-400" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
+							<div class="grow text-gray-600 text-[11px] font-semibold"> TICKET HISTORY </div>
+							<FeatherIcon class="h-[15px] w-[15px] stroke-gray-500" :name="showTicketHistory ? 'chevron-up' : 'chevron-down'"  />
 						</div>
 						<div 
 							v-if="showTicketHistory"
@@ -236,8 +237,8 @@ export default {
 			return this.$resources.otherTicketsOfContact.data || null
 		},
 		getOffsetHeight() {
-			const offset = 285
-			const multiplier = 22
+			const offset = 290
+			const multiplier = 30
 			const maxCount = 5
 			
 			const customFiledWidth = 34
@@ -285,5 +286,8 @@ export default {
 </script>
 
 <style>
+.title {
+	
+}
 
 </style>
