@@ -90,7 +90,6 @@
 			</a>
 			<div 
 				class="pt-[-3px] w-[50.37px]"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 			>
 				<div>
 					<Dropdown
