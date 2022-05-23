@@ -8,7 +8,7 @@
 		<div class="grow pr-[6px]">
 			<div class="flex flex-col">
 				<div><span class="font-medium text-gray-900">{{ activity.owner }}</span> <span class="font-normal text-gray-700">{{ activity.action }}</span></div>
-				<div class="text-gray-600 text-[11px]">{{ $dayjs.longFormating($dayjs(activity.creation).fromNow()) }}</div>
+				<a class="text-gray-600 text-[11px]" :title="$dayjs(activity.creation)">{{ $dayjs.longFormating($dayjs(activity.creation).fromNow()) }}</a>
 			</div>
 		</div>
 	</div>
