@@ -37,6 +37,12 @@ def refresh_server_script():
 	all_ticket_templates = frappe.get_all("Ticket Template")
 
 	snippets = []
+	
+	snippets.append('temp_custom_fields=doc.custom_fields')
+	snippets.append('custom_fields={}')
+	snippets.append('for f in temp_custom_fields:')
+	snippets.append('\tcustom_fields[f.fieldname]=f.value')
+
 	for template in all_ticket_templates:
 		template_doc = frappe.get_doc("Ticket Template", template)
 		flag = False
