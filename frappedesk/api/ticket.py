@@ -99,12 +99,15 @@ def create_new(values, template='Default', attachments=[], via_customer_portal=F
 	for field in template_fields:
 		if field.fieldname in ['subject', 'description']:
 			continue
-		if not field.auto_set:
+		if field.auto_set and field.auto_set_via == 'Backend (Python)':
+			continue
+		else:
 			ticket_doc.append('custom_fields', {
 				'label': field.label,
 				'fieldname': field.fieldname,
 				'value': values[field.fieldname],
-				'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''
+				'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else '',
+				'is_action_field': field.is_action_field
 			})
 
 	ticket_doc.insert(ignore_permissions=True)
