@@ -41,11 +41,11 @@ def refresh_server_script():
 		template_doc = frappe.get_doc("Ticket Template", template)
 		flag = False
 		for field in template_doc.fields:
-			if field.auto_set:
+			if field.auto_set and field.auto_set_via == "Backend (Python)":
 				if not flag:
 					snippets.append(f"if doc.template == '{template.name}':")
 					flag = True
-				snippets.append("\tdoc.append('custom_fields', {'label': '%s', 'fieldname': '%s', 'value': %s, 'route': %s})" % (field.label, field.fieldname, f"{field.value}", f'"/app/{cleanup_page_name(field.options)}/" + {field.value}' if field.fieldtype == 'Link' else '""'))
+				snippets.append("\tdoc.append('custom_fields', {'label': '%s', 'fieldname': '%s', 'value': %s, 'route': %s})" % (field.label, field.fieldname, f"{field.value_backend}", f'"/app/{cleanup_page_name(field.options)}/" + {field.value_backend}' if field.fieldtype == 'Link' else '""'))
 
 	server_script = frappe.get_doc("Server Script", "Ticket Auto Set Custom Fields")
 	server_script.script = '\n'.join(snippets) if len(snippets) > 0 else '# Do Nothing'
