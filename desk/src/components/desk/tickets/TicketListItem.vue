@@ -2,29 +2,32 @@
 	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
 		<div 
 			v-if="ticket"
+			@pointerover="() => {toggleSelectBox = true}"
+			@pointerleave="() => {toggleSelectBox = false}"
 			class="group flex items-center text-base"
-			:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 		>
 			<div 
-				@mouseover="() => {toggleSelectBox = true}" 
-				@mouseleave="() => {toggleSelectBox = false}"
 				class="w-[37px] h-[14px] flex items-center"
 			>
-				<CustomIcons v-if="!toggleSelectBox && !selected" :name="`priority-${ticket.priority.toLowerCase()}`" class="h-3 w-3" />
+				<CustomIcons v-if="!toggleSelectBox && !selected" :name="`priority-${ticket.priority.toLowerCase()}`" class="h-3 w-3" :style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''" />
 				<Input
 					v-if="toggleSelectBox || selected"
 					type="checkbox" 
 					@click="$emit('toggleSelect')" 
 					:checked="selected" 
-					class="cursor-pointer mr-2" 
+					class="cursor-pointer"
 				/>
 			</div>
-			<div class="sm:w-1/12 text-gray-600 font-normal">
+			<div 
+				class="sm:w-1/12 text-gray-600 font-normal"
+				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+			>
 				{{ ticket.name }}
 			</div>
 			<router-link 
 				:to="`/frappedesk/tickets/${ticket.name}`"
 				class="sm:w-8/12 flex items-center space-x-[8px]"
+				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 			>
 				<div 
 					class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
@@ -34,7 +37,10 @@
 				</div>
 				<div v-if="ticket.ticket_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ ticket.ticket_type }}</div>
 			</router-link>
-			<div class="sm:w-2/12">
+			<div 
+				class="sm:w-2/12"
+				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+			>
 				<Dropdown
 					v-if="ticketStatuses"
 					placement="left" 
@@ -57,21 +63,34 @@
 					</template>
 				</Dropdown>
 			</div>
-			<div class="sm:w-3/12">
+			<div 
+				class="sm:w-3/12"
+				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+			>
 				<div class="truncate w-40 text-gray-600 font-normal" v-if="ticket.contact">{{ ticket.contact.name }}</div>
 			</div>
-			<div class="sm:w-2/12 font-normal">
-				<div 
+			<div 
+				class="sm:w-2/12 font-normal"
+				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+			>
+				<a 
 					v-if="getResolutionDueIn()" 
+					:title="$dayjs(ticket.resolution_by)"
 					:class="getResolutionBadgeColor()"
 				>
 					{{ getResolutionDueIn() }}
-				</div>
+				</a>
 			</div>
-			<div class="sm:w-1/12 text-gray-600 font-normal">
+			<a 
+				:title="$dayjs(ticket.modified)"
+				class="sm:w-1/12 text-gray-600 font-normal"
+				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+			>
 				{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
-			</div>
-			<div class="pt-[-3px] w-[50.37px]">
+			</a>
+			<div 
+				class="pt-[-3px] w-[50.37px]"
+			>
 				<div>
 					<Dropdown
 						v-if="agents"

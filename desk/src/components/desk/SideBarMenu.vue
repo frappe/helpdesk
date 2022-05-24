@@ -1,47 +1,46 @@
 <template>
-	<div class="flex flex-col w-full border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
+	<div class="flex flex-col border-r pt-[23px]" :style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }">
 		<div class="mb-[38.4px] pl-[22px] cursor-pointer">
 			<CustomIcons name="frappedesk" class="w-[67.84px] h-[16.6px]" @click="() => {$router.push({path: '/frappedesk/tickets'})}"/>
 		</div>
-		<div class="mb-auto space-y-[6px] text-base select-none">
+		<div class="mb-auto space-y-[4px] select-none mx-[8px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
-				<div 
-					class="group stroke-gray-600 stroke-1 cursor-pointer hover:bg-gray-200 hover:text-gray-800" 
-					:class="
-						option.selected ? 
-						'bg-gray-200 text-gray-800 font-medium' : 
-						(
-							option.children && option.children.find(element => element.selected) ? 
-							'font-medium text-gray-800' : 
-							'font-normal text-gray-600'
-						)
-						"
+				<div
+					class="group stroke-gray-600 rounded-[8px] cursor-pointer hover:bg-gray-200"
+					:class="option.selected ? 'bg-gray-200' : ''"
 					@click="() => {
-						option.action ? option.action() : ( option.children ? option.expanded = !option.expanded : {} )  
+						if (option.children) {
+							option.children ? option.expanded = !option.expanded : {}
+						} else if(option.to) {
+							$router.push(option.to)
+						}
 					}"
 				>
-					<div class="pl-[22px] py-[5px] flex items-center space-x-[8px]">
-						<CustomIcons :name="option.icon" class=" h-[14px] w-[14px]"/>
-						<span class="grow">{{ option.label }}</span>
-						<div v-if="option.children" class="pr-[17.81px]">
-							<CustomIcons class="h-[6px] fill-gray-400" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
+					<div class="pl-[8px] py-[5.5px] flex items-center">
+						<div class="w-[14px]">
+							<FeatherIcon v-if="option.children" class="h-[14px] w-[14px] stroke-gray-600" :name="option.expanded ? 'chevron-up' : 'chevron-down'" />
 						</div>
+						<div class="w-[24px]">
+							<CustomIcons :name="option.icon" class="ml-[8px] h-[14px] w-[14px]"/>
+						</div>
+						<span class="grow ml-[6px] text-[14px]">{{ option.label }}</span>
 					</div>
 				</div>
-				<div v-if="option.children && option.expanded">
-					<div class="space-y-[6px]">
+				<div v-if="option.children && option.expanded" class="mt-[4px]">
+					<div class="space-y-[4px]">
 						<div v-for="childOption in option.children" :key="childOption.label">
-							<div 
-								class="group py-[5px] flex items-center cursor-pointer hover:bg-gray-200 hover:text-gray-800"
-								:class="childOption.selected ? 'bg-gray-200 text-gray-800 font-medium' : 'font-normal text-gray-600 '"
-								@click="() => { childOption.action ? childOption.action() : {} }"
+							<router-link 
+								class="group py-[6.25px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
+								:class="childOption.selected ? 'bg-gray-200' : ''"
+								:to="childOption.to ? {path: childOption.to.path, query: childOption.to.query ? childOption.to.query() : {}}: {}"
 							>
-								<div class="pl-[46px]">
-									<span>
+								<div class="pl-[52px] w-full flex flex-row items-center justify-between">
+									<div class="text-base">
 										{{ childOption.label }}
-									</span>
+									</div>
+									<div class="text-[11px] font-normal mr-[10px] text-gray-500">{{ childOption.extra }}</div>
 								</div>
-							</div>
+							</router-link>
 						</div>
 					</div>
 				</div>
@@ -82,16 +81,17 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { Dropdown } from 'frappe-ui'
+import { Dropdown, FeatherIcon, call } from 'frappe-ui'
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
-import { inject, provide, ref } from 'vue'
+import { inject, ref } from 'vue'
 
 export default {
 	name: 'SideBarMenu',
 	components: {
 		CustomIcons,
 		Dropdown,
-		CustomAvatar
+		CustomAvatar,
+		FeatherIcon
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
@@ -112,10 +112,10 @@ export default {
 	mounted() {
 		this.menuOptions = [
 			{
-				label: 'Ticketing',
+				label: 'Tickets',
 				icon: 'ticket',
 				expanded: true,
-				children: []
+				children: [],
 			},
 			{
 				label: 'Contacts',
@@ -123,67 +123,86 @@ export default {
 				children: [
 					{
 						label: 'Contacts',
-						action: () => {
-							this.select('Contacts')
-							this.$router.push({path: '/frappedesk/contacts'})
+						to: {
+							path: '/frappedesk/contacts',
 						}
 					},
-				]
+				],
 			},
 			{
 				label: 'Settings',
 				icon: 'settings',
-				action: () => {
-					this.select('Settings')
-					this.$router.push({path: '/frappedesk/settings'})
-				}
+				to: {
+					path: '/frappedesk/settings',
+				},
 			}
 		]
 
 		if (this.user.agent) {
-			this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+			this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 				{
 					label: 'My Open Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-open-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Open Tickets")
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-open-tickets'
+							}
+						}
 					}
 				},
 				{
 					label: 'My Replied Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-replied-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Replied Tickets")
-					}
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-replied-tickets'
+							}
+						}
+					},
 				},
 				{
-					label: 'My Resolved and Closed Tickets',
-					action: () => {
-						let query = Object.assign({}, this.$route.query)
-						delete query.assignee
-						query.menu_filter = 'my-resolved-and-closed-tickets'
-						this.$router.push({path: '/frappedesk/tickets', query})
-						this.select("My Resolved and Closed Tickets")
-					}
+					label: 'My Resolved Tickets',
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-resolved-tickets'
+							}
+						}
+					},
+				},
+				{
+					label: 'My Closed Tickets',
+					to: {
+						path: '/frappedesk/tickets',
+						query: () => {
+							return {
+								...this.$route.query,
+								menu_filter: 'my-closed-tickets'
+							}
+						}
+					},
 				},
 			])
 		}
 
-		this.menuOptions.find(option => option.label == 'Ticketing').children.push(...[
+		this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 			{
 				label: 'All Tickets',
-				action: () => {
-					let query = Object.assign({}, this.$route.query)
-					query.menu_filter = 'all'
-					this.$router.push({path: '/frappedesk/tickets', query})
-					this.select("All Tickets")
-				}
+				to: {
+					path: '/frappedesk/tickets',
+					query: () => {
+						return {
+							...this.$route.query,
+							menu_filter: 'all'
+						}
+					}
+				},
 			},
 		])
 
@@ -205,18 +224,66 @@ export default {
 				}
 			}
 		]
-
-		this.updateSidebarFilter = this.syncSelectedMenuItemBasedOnRoute
-		this.updateSidebarFilter()
+		this.syncSelectedMenuItemBasedOnRoute()
+		this.updateTicketsCount()
+		this.$socket.on("list_update", (data) => {
+			if (data.doctype === "Ticket") {
+				this.updateTicketsCount()
+			}
+		})
+	},
+	watch: {
+		$route() {
+			this.syncSelectedMenuItemBasedOnRoute()
+		}
 	},
 	methods: {
+		async updateTicketsCount() {
+			let filterLabelMap = {
+				// 'All Tickets': {
+				// 	status: ['in', ['Open', 'Replied']]
+				// }
+			}
+			if (this.user.agent) {
+				let assigneeFilter = {_assign: ['like', '%' + this.user.agent.name + '%']}
+				filterLabelMap = {...filterLabelMap, 
+					'My Open Tickets': {
+						...assigneeFilter,
+						status: 'Open'
+					},
+					'My Replied Tickets': {
+						...assigneeFilter,
+						status: 'Replied'
+					},
+					// 'My Resolved Tickets': {
+					// 	...assigneeFilter,
+					// 	status: 'Resolved',
+					// },
+					// 'My Closed Tickets': {
+					// 	...assigneeFilter,
+					// 	status: 'Closed',
+					// },
+				}
+			}
+			for(let index in Object.values(this.menuOptions.find(option => option.label == 'Tickets').children)) {
+				let option = this.menuOptions.find(option => option.label == 'Tickets').children[index]
+				if (filterLabelMap[option.label]) {
+					let count = await call('frappe.client.get_count', {
+						doctype: "Ticket",
+						filters: filterLabelMap[option.label],
+					})
+					this.menuOptions.find(option => option.label == 'Tickets').children[index].extra = count
+				}
+			}
+		},
 		syncSelectedMenuItemBasedOnRoute() {
 			const handleTicketFilterQueries = () => {
 				const ticketFilterMap = {
 					'all': 'All Tickets',
 					'my-open-tickets': 'My Open Tickets',
 					'my-replied-tickets': 'My Replied Tickets',
-					'my-resolved-and-closed-tickets': 'My Resolved and Closed Tickets',
+					'my-resolved-tickets': 'My Resolved Tickets',
+					'my-closed-tickets': 'My Closed Tickets',
 				}
 				if (ticketFilterMap[this.$route.query.menu_filter]) {
 					return ticketFilterMap[this.$route.query.menu_filter]
@@ -226,7 +293,7 @@ export default {
 			}
 
 			const routeMenuItemMap = {
-				'frappedesk/tickets': 'All Tickets',
+				'frappedesk/tickets': 'Tickets',
 				'frappedesk/knowledge-base': 'Knowledge Base',
 				'frappedesk/reports': 'Reports',
 				'frappedesk/contacts': 'Contacts',
@@ -235,7 +302,7 @@ export default {
 			Object.keys(routeMenuItemMap).forEach(route => {
 				if (this.$route.path.includes(route)) {
 					let selectedMenuItem = routeMenuItemMap[route]
-					if (routeMenuItemMap[route] == 'All Tickets') {
+					if (routeMenuItemMap[route] == 'Tickets') {
 						selectedMenuItem = handleTicketFilterQueries()
 					}
 					this.select(selectedMenuItem)

@@ -3,7 +3,7 @@
 		<div v-if="conversations">
 			<div
 				v-for="(conversation, index) in conversations" :key="conversation.name" 
-				class="flex flex-col pr-3"
+				class="flex flex-col"
 				ref="conversationContainer"
 			>
 				<div :ref="`conversation-${index}`">

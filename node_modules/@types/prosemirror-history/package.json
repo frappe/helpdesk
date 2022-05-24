@@ -1,0 +1,43 @@
+{
+    "name": "@types/prosemirror-history",
+    "version": "1.0.3",
+    "description": "TypeScript definitions for prosemirror-history",
+    "homepage": "https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/prosemirror-history",
+    "license": "MIT",
+    "contributors": [
+        {
+            "name": "Bradley Ayers",
+            "url": "https://github.com/bradleyayers",
+            "githubUsername": "bradleyayers"
+        },
+        {
+            "name": "David Hahn",
+            "url": "https://github.com/davidka",
+            "githubUsername": "davidka"
+        },
+        {
+            "name": "Tim Baumann",
+            "url": "https://github.com/timjb",
+            "githubUsername": "timjb"
+        },
+        {
+            "name": "Patrick Simmelbauer",
+            "url": "https://github.com/patsimm",
+            "githubUsername": "patsimm"
+        }
+    ],
+    "main": "",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "directory": "types/prosemirror-history"
+    },
+    "scripts": {},
+    "dependencies": {
+        "@types/prosemirror-model": "*",
+        "@types/prosemirror-state": "*"
+    },
+    "typesPublisherContentHash": "30c693fba86517e88e201633823c4505f12caea481f0d5285bc398354dba037c",
+    "typeScriptVersion": "3.6"
+}

@@ -1,13 +1,17 @@
 <template>
 	<div>
 		<div class="w-full select-none">
-			<div class="bg-[#F7F7F7] group flex items-center font-light text-base text-slate-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px]">
+			<div 
+				@pointerenter="() => { showSelectAllCheckbox = true}"
+				@pointerleave="() => { showSelectAllCheckbox = false}"
+				class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px]"
+			>
 				<Input 
 					type="checkbox" 
 					@click="toggleSelectAllTickets()" 
 					:checked="allTicketsSelected" 
 					class="cursor-pointer mr-2 hover:visible" 
-					:class="allTicketsSelected ? 'visible' : 'invisible'" 
+					:class="allTicketsSelected || showSelectAllCheckbox ? 'visible' : 'invisible'" 
 				/>
 				<div class="sm:w-1/12 flex items-baseline space-x-[7px]">
 					<span>#</span>
@@ -100,13 +104,15 @@ export default {
 		const tickets = inject('tickets')
 
 		const selectedTickets = ref([])
+		const showSelectAllCheckbox = ref(false)
 
 		const sortby = ref('modified')
 		const sortDirection = ref('dessending')
 
 		const resetSelections = inject('resetSelections')
+		const updateSidebarFilter = inject('updateSidebarFilter')
 
-		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection, resetSelections }
+		return { user, viewportWidth, tickets, selectedTickets, sortby, sortDirection, resetSelections, showSelectAllCheckbox, updateSidebarFilter }
 	},
 	computed: {
 		filteredTickets() {
@@ -143,16 +149,6 @@ export default {
 					}
 
 					switch(this.$route.query.menu_filter) {
-						case 'unassigned':
-							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								if (Object.keys(ticket.assignees).length > 0) {
-									return Object.values(ticket.assignees).find((assignee) => { 
-										return (assignee.name != this.user.agent.name)
-									})
-								}
-								return true
-							})
-							break
 						case 'my-open-tickets':
 							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
 								if (ticket.status == 'Open') {
@@ -169,9 +165,17 @@ export default {
 								return false
 							})
 							break
-						case 'my-resolved-and-closed-tickets':
+						case 'my-resolved-tickets':
 							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
-								if (ticket.status == 'Resolved' || ticket.status == 'Closed') {
+								if (ticket.status == 'Resolved') {
+									return checkIfTicketAssignedToMe(ticket)
+								}
+								return false
+							})
+							break
+						case 'my-closed-tickets':
+							filteredTickets = Object.values(filteredTickets).filter((ticket) => {
+								if (ticket.status == 'Closed') {
 									return checkIfTicketAssignedToMe(ticket)
 								}
 								return false
@@ -180,6 +184,7 @@ export default {
 					}
 				}
 			}
+			this.updateSidebarFilter()
 			return filteredTickets
 		},
 		sortedTickets() {

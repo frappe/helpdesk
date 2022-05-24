@@ -1,0 +1,81 @@
+{
+  "name": "quill-delta",
+  "version": "4.2.2",
+  "description": "Format for representing rich text documents and changes.",
+  "author": "Jason Chen <jhchen7@gmail.com>",
+  "homepage": "https://github.com/quilljs/delta",
+  "main": "dist/Delta.js",
+  "dependencies": {
+    "fast-diff": "1.2.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.isequal": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/lodash.clonedeep": "^4.5.0",
+    "@types/lodash.isequal": "^4.5.0",
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
+    "coveralls": "^3.0.11",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "istanbul": "~0.4.5",
+    "jasmine": "^3.5.0",
+    "prettier": "^2.0.4",
+    "typescript": "^3.8.3"
+  },
+  "files": [
+    "tsconfig.json",
+    "dist",
+    "src"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "lint": "eslint 'src/**/*.ts'",
+    "test": "npm run build; jasmine test/*.js test/**/*.js",
+    "test:coverage": "istanbul cover jasmine test/*.js test/**/*.js",
+    "test:coverage:report": "cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "plugin:@typescript-eslint/recommended",
+      "prettier/@typescript-eslint",
+      "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module"
+    },
+    "rules": {
+      "@typescript-eslint/ban-ts-ignore": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-namespace": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_"
+        }
+      ]
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quilljs/delta"
+  },
+  "bugs": {
+    "url": "https://github.com/quilljs/delta/issues"
+  },
+  "keywords": [
+    "rich text",
+    "ot",
+    "operational transform",
+    "delta"
+  ]
+}

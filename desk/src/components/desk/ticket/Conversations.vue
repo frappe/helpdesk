@@ -33,7 +33,7 @@ import { ref } from 'vue'
 
 export default {
 	name: "Conversations",
-	props: ["ticketId", "scrollToBottom"],
+	props: ["ticketId", "scrollToBottom", "autoScroll"],
 	components: {
 		ConversationCard,
 		LoadingText,
@@ -57,9 +57,11 @@ export default {
 	},
 	computed: {
 		conversations() {
-			this.$nextTick(() => {
-				this.autoScrollToBottom();
-			})
+			if (this.autoScroll) {
+				this.$nextTick(() => {
+					this.autoScrollToBottom();
+				})
+			}
 			return this.$resources.conversations.data || null;
 		},
 	},

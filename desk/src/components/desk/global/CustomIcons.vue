@@ -41,6 +41,10 @@
 		<svg v-if="this.name=='check'" :class="this.class" :width="this.width" :height="this.height" viewBox="0 0 13 11" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M1 7.66667L4 10.5L12 1" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 		</svg>
+		<svg v-if="this.name=='circle-check'" :class="this.class" :width="this.width" :height="this.height" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M9 16.5C13.4183 16.5 17 12.9183 17 8.5C17 4.08172 13.4183 0.5 9 0.5C4.58172 0.5 1 4.08172 1 8.5C1 12.9183 4.58172 16.5 9 16.5Z" fill="#48BB74"/>
+			<path d="M5.6665 9.11357L7.6665 11.1136L12.3332 6.4469M17 8.5C17 12.9183 13.4183 16.5 9 16.5C4.58172 16.5 1 12.9183 1 8.5C1 4.08172 4.58172 0.5 9 0.5C13.4183 0.5 17 4.08172 17 8.5Z" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
 		<svg v-if="this.name=='sla-pass'" :class="this.class" :width="this.width" :height="this.height" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path fill-rule="evenodd" clip-rule="evenodd" d="M14.6668 8.00001C14.6668 11.6819 11.6821 14.6667 8.00016 14.6667C4.31826 14.6667 1.3335 11.6819 1.3335 8.00001C1.3335 4.31811 4.31826 1.33334 8.00016 1.33334C11.6821 1.33334 14.6668 4.31811 14.6668 8.00001ZM11.4848 5.58164C11.0943 5.19112 10.4611 5.19112 10.0706 5.58164L9.51506 6.1372L8.40395 7.24831L6.88883 8.76342L6.48483 8.35942L5.92928 7.80386C5.53875 7.41334 4.90559 7.41334 4.51506 7.80386C4.12454 8.19439 4.12454 8.82755 4.51506 9.21808L5.07062 9.77363L6.18173 10.8847C6.36926 11.0723 6.62362 11.1776 6.88883 11.1776C7.15405 11.1776 7.4084 11.0723 7.59594 10.8847L9.81816 8.66252L10.9293 7.55141L11.4848 6.99585C11.8754 6.60533 11.8754 5.97217 11.4848 5.58164Z" fill="#2490EF"/>
 		</svg>
@@ -141,9 +145,7 @@
 			<rect x="24" y="43" width="10" height="10" rx="2" stroke="#2D95F0" stroke-width="2"/>
 		</svg>
 		<div v-if="this.name=='company'" :class="this.class">
-			<!-- <div v-if="this.$resources.websiteSettings.data">
-				<img :src="this.$resources.websiteSettings.data.banner_image" />
-			</div> -->
+			<div v-html="this.$resources.brandHtml.data"></div>
 		</div>
 	</div>
 </template>
@@ -154,19 +156,15 @@ export default {
 	props: ['name', 'height', 'width', 'class'],
 	mounted() {
 		if (this.name == 'company') {
-			// this.$resources.websiteSettings.fetch()
+			this.$resources.brandHtml.fetch()
 		}
 	},
 	resources: {
-		// websiteSettings() {
-		// 	return {
-		// 		method: 'frappe.client.get',
-		// 		params: {
-		// 			doctype: "Website Settings",
-		// 			fields: ['*']
-		// 		}
-		// 	}
-		// }
+		brandHtml() {
+			return {
+				method: 'frappedesk.api.website.brand_html'
+			}
+		}
 	}
 }
 </script>
