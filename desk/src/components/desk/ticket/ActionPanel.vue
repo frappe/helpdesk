@@ -1,5 +1,5 @@
 <template>
-	<div v-if="ticket">
+	<div v-if="ticket" class="flex flex-col h-full">
 		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] border-b border-dashed">
 			<div class="flex flex-row pb-[15px]">
 				<div class="grow"><span class="text-[16px] font-normal text-gray-500">Ticket</span> <span class="text-[15px] font-semibold">{{ `#${ticket.name}` }}</span></div>
@@ -65,9 +65,11 @@
 				</div>
 			</div>
 		</div>
-		<span class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"></span>
-		<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
-		<div class="px-[19px] py-[28px]">
+		<div>
+			<span class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"></span>
+			<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
+		</div>
+		<div class="px-[19px] py-[28px] h-full overflow-y-auto">
 			<div class="text-base space-y-[12px]">
 				<div v-if="this.user.agent">
 					<router-link class="hover:underline" :to="{ path: '/support/impersonate', query: {contact: ticket.raised_by, ticketId: ticket.name}}" target="_blank">See On Support Portal</router-link>

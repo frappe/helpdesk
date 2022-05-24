@@ -47,7 +47,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="mx-[8px] mb-[17px] flex flex-col">
+			<div class="mx-[8px] pb-[17px] flex flex-col">
 				<div v-if="showProfileSettings" class="rounded-[6px] bg-white h-50 shadow-md z-50 px-[7px] py-[6px]">
 					<div v-for="item in profileSettings" :key="item.label">
 						<div 
