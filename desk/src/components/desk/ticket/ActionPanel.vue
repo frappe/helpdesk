@@ -94,7 +94,7 @@
 						</template>
 					</Dropdown>
 				</div>
-				<div class="flex flex-col space-y-[8px]">
+				<div class="flex flex-col space-y-[8px]" :class="mandatoryFieldsNotSet && !ticket.ticket_type ? 'error-animation' : ''">
 					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
 						<div>Type</div>
 						<div v-if="mandatoryFieldsNotSet && !ticket.ticket_type" class="text-red-600">Select Type</div>
@@ -121,10 +121,10 @@
 						</template>
 					</Dropdown>
 				</div>
-				<div class="flex flex-col space-y-[8px]">
+				<div class="flex flex-col space-y-[8px]" :class="mandatoryFieldsNotSet && !ticket.agent_group ? 'error-animation' : ''">
 					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
 						<div>Team</div>
-						<div v-if="mandatoryFieldsNotSet && !ticket.agent_group" class="text-red-600">Select Type</div>
+						<div v-if="mandatoryFieldsNotSet && !ticket.agent_group" class="text-red-600">Select Team</div>
 					</div>
 					<Dropdown
 						v-if="agentGroups"
@@ -266,6 +266,14 @@ export default {
 			mandatoryFields,
 			mandatoryFieldsNotSet
 		}
+	},
+	updated() {
+		var elems = document.querySelectorAll(".error-animation");
+		setTimeout(function() {
+			[].forEach.call(elems, function(el) {
+				el.classList.remove("error-animation");
+			});
+		}, 820)
 	},
 	computed: {
 		ticket() {
@@ -483,5 +491,29 @@ export default {
 		width: 10.5px;
 		border-radius: 0 10.5px 10.5px 0;
 		display: inline-block;
+	}
+	.error-animation {
+		animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+		transform: translate3d(0, 0, 0);
+		backface-visibility: hidden;
+		perspective: 1000px;
+	}
+
+	@keyframes shake {
+		10%, 90% {
+			transform: translate3d(-1px, 0, 0);
+		}
+
+		20%, 80% {
+			transform: translate3d(2px, 0, 0);
+		}
+
+		30%, 50%, 70% {
+			transform: translate3d(-4px, 0, 0);
+		}
+
+		40%, 60% {
+			transform: translate3d(4px, 0, 0);
+		}
 	}
 </style>
