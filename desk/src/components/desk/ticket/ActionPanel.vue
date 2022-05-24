@@ -25,20 +25,14 @@
 								</div>
 							</div>
 							<div v-if="toggleStatuese">
-								<div class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50" :class="ticket.ticket_type ? 'bg-white' : 'bg-orange-50'">
-									<div v-if="ticket.ticket_type">
-										<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
-											<div 
-												class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
-												@click="updateStatus(status)"
-											> 
-												{{ status }} 
-											</div>
+								<div class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50 bg-white">
+									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
+										<div 
+											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[85px]"
+											@click="updateStatus(status)"
+										> 
+											{{ status }} 
 										</div>
-									</div>
-									<div v-else class="w-[200px] mx-[4px] p-[4px] text-base flex flex-row items-center space-x-2">
-										<FeatherIcon name="alert-triangle" class="w-3 h-3 stroke-orange-500" />
-										<span class="text-gray-600">Please set ticket type first</span>
 									</div>
 								</div>
 							</div>
@@ -101,11 +95,15 @@
 					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-[8px]">
-					<div class="text-gray-600 font-normal text-[12px]">Type</div>
+					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
+						<div>Type</div>
+						<div v-if="mandatoryFieldsNotSet && !ticket.ticket_type" class="text-red-600">Select Type</div>
+					</div>
 					<Dropdown
 						v-if="ticketTypes"
 						:options="typesAsDropdownOptions()" 
 						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
+						:class="mandatoryFieldsNotSet && !ticket.ticket_type ? 'border border-red-500' : ''"
 					>
 						<template v-slot="{ toggleTicketTypes }" @click="toggleTicketTypes" class="w-full">
 							<div class="flex flex-row py-1 space-x-1 items-center w-full">
@@ -124,11 +122,15 @@
 					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-[8px]">
-					<div class="text-gray-600 font-normal text-[12px]">Team</div>
+					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
+						<div>Team</div>
+						<div v-if="mandatoryFieldsNotSet && !ticket.agent_group" class="text-red-600">Select Type</div>
+					</div>
 					<Dropdown
 						v-if="agentGroups"
 						:options="agentGroupsAsDropdownOptions()" 
 						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
+						:class="mandatoryFieldsNotSet && !ticket.agent_group ? 'border border-red-500' : ''"
 					>
 						<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
 							<div class="flex flex-row py-1 space-x-1 items-center w-full">
@@ -236,6 +238,9 @@ export default {
 
 		const notes = ref('')
 
+		const mandatoryFields = ref(['ticket_type', 'agent_group'])
+		const mandatoryFieldsNotSet = ref(false)
+
 		return {
 			viewportWidth,
 
@@ -256,7 +261,10 @@ export default {
 			updatingTeam,
 			toggleStatuese,
 
-			notes
+			notes,
+
+			mandatoryFields,
+			mandatoryFieldsNotSet
 		}
 	},
 	computed: {
@@ -288,10 +296,18 @@ export default {
 			this.openCreateNewTicketTypeDialog = false
 		},
 		updateStatus(status) {
-			this.updatingStatus = true
-			this.ticketController.set(this.ticketId, 'status', status).then(() => {
-				this.updatingStatus = false
+			this.mandatoryFieldsNotSet = false
+			this.mandatoryFields.forEach(fieldname => {
+				if (!this.ticket[fieldname]) {
+					this.mandatoryFieldsNotSet = true
+				}
 			})
+			if (!this.mandatoryFieldsNotSet) {
+				this.updatingStatus = true
+				this.ticketController.set(this.ticketId, 'status', status).then(() => {
+					this.updatingStatus = false
+				})
+			}
 		},
 		getStatusStyle(status) {
 			const color = {Open: '#38A160', Replied: '#FF7C36', Resolved: '#E24C4C', Closed: '#E24C4C'}[status]
