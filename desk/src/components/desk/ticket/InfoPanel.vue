@@ -99,12 +99,16 @@
 								<div class="text-gray-600 text-base">{{ field.label }}</div>
 								<div v-if="field.route" class="w-fit flex flex-row items-center space-x-[12px] cursor-pointer hover:underline">
 									<FeatherIcon name="external-link" class="w-[14px] h-[14px] stroke-gray-500" />
-									<a class="text-gray-900 text-base" :href="field.route" target="_blank">{{ field.value }}</a>
+									<div class="w-[200px] truncate">
+										<a title="{{ field.value }}" class="text-gray-900 text-base" :href="field.route" target="_blank">{{ field.value }}</a>
+									</div>
 								</div>
 								<div v-else>
 									<div class="flex flex-row items-center space-x-[12px]">
 										<FeatherIcon name="info" class="w-[14px] h-[14px] stroke-gray-500" />
-										<div class="text-gray-900 text-base">{{ field.value }}</div>
+										<div class="w-[200px] truncate">
+											<a :title="field.value" class="text-gray-900 text-base w-[200px]">{{ field.value }}</a>
+										</div>
 									</div>
 								</div>
 							</div>
