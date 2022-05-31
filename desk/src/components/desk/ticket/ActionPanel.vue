@@ -96,8 +96,7 @@
 				</div>
 				<div class="flex flex-col space-y-[8px]" :class="mandatoryFieldsNotSet && !ticket.ticket_type ? 'error-animation' : ''">
 					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
-						<div>Type</div>
-						<div v-if="mandatoryFieldsNotSet && !ticket.ticket_type" class="text-red-600">Select Type</div>
+						<div :class="(mandatoryFieldsNotSet && !ticket.ticket_type) ? 'text-red-600' : 'text-gray-600'">Type*</div>
 					</div>
 					<Dropdown
 						v-if="ticketTypes"
@@ -121,16 +120,14 @@
 						</template>
 					</Dropdown>
 				</div>
-				<div class="flex flex-col space-y-[8px]" :class="mandatoryFieldsNotSet && !ticket.agent_group ? 'error-animation' : ''">
+				<div class="flex flex-col space-y-[8px]">
 					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
 						<div>Team</div>
-						<div v-if="mandatoryFieldsNotSet && !ticket.agent_group" class="text-red-600">Select Team</div>
 					</div>
 					<Dropdown
 						v-if="agentGroups"
 						:options="agentGroupsAsDropdownOptions()" 
 						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
-						:class="mandatoryFieldsNotSet && !ticket.agent_group ? 'border border-red-500' : ''"
 					>
 						<template v-slot="{ toggleAgentGroups }" @click="toggleAgentGroups" class="w-full">
 							<div class="flex flex-row py-1 space-x-1 items-center w-full">
@@ -238,7 +235,7 @@ export default {
 
 		const notes = ref('')
 
-		const mandatoryFields = ref(['ticket_type', 'agent_group'])
+		const mandatoryFields = ref(['ticket_type'])
 		const mandatoryFieldsNotSet = ref(false)
 
 		return {
