@@ -41,11 +41,12 @@
 			</div>
 		</div>
 		<TicketList class="pl-[18px] pr-[24px]" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
+		<ListManager ref="ticketList" />
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
 </template>
 <script>
-import { Input, Dropdown, FeatherIcon } from 'frappe-ui'
+import { Input, Dropdown, FeatherIcon, ListManager } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
@@ -55,14 +56,15 @@ import { inject, ref, provide } from 'vue'
 export default {
 	name: 'Tickets',
 	components: {
-		TicketList,
-		Input,
-		NewTicketDialog,
-		CustomIcons,
-		Dropdown,
-		FeatherIcon,
-		FilterBox
-	},
+    TicketList,
+    Input,
+    NewTicketDialog,
+    CustomIcons,
+    Dropdown,
+    FeatherIcon,
+    FilterBox,
+    ListManager
+},
 	setup() {
 		const user = inject('user')
 		const tickets = inject('tickets')
@@ -111,6 +113,7 @@ export default {
 				}
 			} 
 		}
+		this.$refs.ticketList.manager.loadMore()
 	},
 	watch: {
 		filters(newValue) {
