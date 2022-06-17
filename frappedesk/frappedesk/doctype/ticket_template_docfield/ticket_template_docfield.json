@@ -13,9 +13,15 @@
   "api_method",
   "reqd",
   "options",
+  "section_break_10",
   "auto_set",
-  "value",
-  "fieldname"
+  "auto_set_via",
+  "column_break_11",
+  "value_frontend",
+  "value_backend",
+  "section_break_13",
+  "fieldname",
+  "is_action_field"
  ],
  "fields": [
   {
@@ -51,7 +57,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "Link\nData\nLong Text\nText Editor\nSelect",
+   "options": "Custom Link\nLink\nData\nLong Text\nText Editor\nSelect",
    "reqd": 1
   },
   {
@@ -61,14 +67,6 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Mandatory"
-  },
-  {
-   "depends_on": "auto_set",
-   "fieldname": "value",
-   "fieldtype": "Code",
-   "in_preview": 1,
-   "label": "Value",
-   "options": "Python"
   },
   {
    "default": "{}",
@@ -89,11 +87,54 @@
    "fieldname": "api_method",
    "fieldtype": "Data",
    "label": "API Method"
+  },
+  {
+   "depends_on": "eval:(doc.auto_set && doc.auto_set_via===\"Backend (Python)\")",
+   "description": "Use custom_fields['fieldname'] to access other fields in the template",
+   "fieldname": "value_backend",
+   "fieldtype": "Code",
+   "in_preview": 1,
+   "label": "Value (Python)",
+   "max_height": "3rem",
+   "options": "Python"
+  },
+  {
+   "depends_on": "eval:(doc.auto_set && doc.auto_set_via===\"Frontend (JS)\")",
+   "fieldname": "value_frontend",
+   "fieldtype": "Code",
+   "label": "Value (JS)",
+   "max_height": "3rem",
+   "options": "Javascript"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "auto_set",
+   "fieldname": "auto_set_via",
+   "fieldtype": "Select",
+   "label": "Auto Set Via",
+   "options": "Frontend (JS)\nBackend (Python)"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_action_field",
+   "fieldtype": "Check",
+   "label": "Is Action Field"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2022-04-29 14:51:18.176251",
+ "modified": "2022-05-24 20:03:47.300282",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket Template DocField",

@@ -12,17 +12,20 @@
 	"dependencies": {
 		"@vitejs/plugin-vue": "^2.3.3",
 		"@vueup/vue-quill": "^1.0.0-beta.8",
-		"dayjs": "^1.11.1",
-		"frappe-ui": "0.0.24",
 		"luxon": "^2.3.2",
-		"sass": "^1.50.1",
-		"vite": "^2.9.9",
-		"vue": "^3.2.25",
-		"vue-router": "^4.0.14"
+		"@headlessui/vue": "^1.5.0",
+		"dayjs": "^1.10.7",
+		"frappe-ui": "^0.0.30",
+		"vue": "^3.2.26",
+		"vue-router": "^4.0.12",
+		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {
-		"autoprefixer": "^10.4.4",
-		"postcss": "^8.4.12",
-		"tailwindcss": "^3.0.24"
+		"@vitejs/plugin-vue": "^2.0.1",
+		"autoprefixer": "^10.4.2",
+		"postcss": "^8.4.5",
+		"tailwindcss": "^3.0.12",
+		"vite": "^2.0.5",
+		"vue-template-compiler": "^2.6.14"
 	}
 }

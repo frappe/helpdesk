@@ -24,21 +24,23 @@
 			>
 				{{ ticket.name }}
 			</div>
-			<router-link 
-				:to="`/frappedesk/tickets/${ticket.name}`"
-				class="sm:w-8/12 flex items-center space-x-[8px]"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
-			>
-				<div 
-					class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
-					:class="!ticket.seen ? 'font-semibold text-gray-800' : (ticket.status == 'Closed' ? 'font-normal text-gray-600' : 'font-normal text-gray-900')"
+			<div class="sm:w-8/12">
+				<router-link 
+					:to="`/frappedesk/tickets/${ticket.name}`"
+					class="flex items-center space-x-[8px]"
+					:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 				>
-					{{ ticket.subject }}
-				</div>
-				<div v-if="ticket.ticket_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ ticket.ticket_type }}</div>
-			</router-link>
+					<div 
+						class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
+					>
+						<!-- :class="!ticket.seen ? 'font-semibold text-gray-800' : (ticket.status == 'Closed' ? 'font-normal text-gray-600' : 'font-normal text-gray-900')" -->
+						{{ ticket.subject }}
+					</div>
+					<div v-if="ticket.ticket_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ ticket.ticket_type }}</div>
+				</router-link>
+			</div>
 			<div 
-				class="sm:w-2/12"
+				class="sm:w-3/12"
 				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 			>
 				<div class="w-full">
@@ -58,7 +60,7 @@
 				class="sm:w-3/12"
 				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
 			>
-				<div class="truncate w-40 text-gray-600 font-normal" v-if="ticket.contact">{{ ticket.contact.name }}</div>
+				<div class="truncate w-40 text-gray-600 font-normal" v-if="ticket.contact">{{ ticket.contact }}</div>
 			</div>
 			<div 
 				class="sm:w-2/12 font-normal"
@@ -72,13 +74,15 @@
 					{{ getResolutionDueIn() }}
 				</a>
 			</div>
-			<a 
-				:title="$dayjs(ticket.modified)"
-				class="sm:w-1/12 text-gray-600 font-normal"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
-			>
-				{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
-			</a>
+			<div class="sm:w-1/12">
+				<a 
+					:title="$dayjs(ticket.modified)"
+					class="text-gray-600 font-normal"
+					:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+				>
+					{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
+				</a>
+			</div>
 			<div 
 				class="pt-[-3px] w-[50.37px]"
 			>
@@ -92,8 +96,8 @@
 						<template v-slot="{ toggleAssignees }">
 							<div class="text-base flex flex-row-reverse">
 								<div @click="toggleAssignees" class="cursor-pointer">
-									<div v-if="ticket.assignees.length > 0">
-										<div v-for="assignee in ticket.assignees" :key="assignee">
+									<div v-if="assignees.length > 0">
+										<div v-for="assignee in assignees" :key="assignee">
 											<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
 										</div>
 									</div>
@@ -121,49 +125,47 @@ import CustomIcons1 from '../global/CustomIcons.vue'
 
 export default {
 	name: 'TicketListItem',
-	props: ['ticketId', 'selected'],
+	props: ['ticket', 'selected'],
 	components: {
-    Input,
-    Badge,
-    Dropdown,
-    FeatherIcon,
-    Avatar,
-    CustomIcons,
-    CustomIcons1
-},
+		Input,
+		Badge,
+		Dropdown,
+		FeatherIcon,
+		Avatar,
+		CustomIcons,
+		CustomIcons1
+	},
 	setup() {
 		// values
 		const user = inject('user')
 
-		const tickets = inject('tickets')
 		const ticketTypes = inject('ticketTypes')
 		const ticketPriorities = inject('ticketPriorities')
 		const ticketStatuses = inject('ticketStatuses')
 
 		const agents = inject('agents')
 
-		// controllers
-		const ticketController = inject('ticketController')
-
 		const toggleSelectBox = ref(false)
 
 		return {
 			user,
 			
-			tickets,
 			ticketTypes,
 			ticketPriorities,
 			ticketStatuses,
 
 			agents,
 
-			ticketController,
 			toggleSelectBox
 		 }
 	},
 	computed: {
-		ticket() {
-			return this.tickets[this.ticketId] || null
+		assignees() {
+			if (this.ticket._assign) {
+				return JSON.parse(this.ticket._assign)
+			} else {
+				return []
+			}
 		}
 	},
 	methods: {
@@ -195,7 +197,7 @@ export default {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'agent', agent.name)
+							// this.ticketController.set(this.ticketId, 'agent', agent.name)
 						},
 					});
 				});
@@ -208,7 +210,7 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									this.ticketController.set(this.ticketId, 'agent')
+									// this.ticketController.set(this.ticketId, 'agent')
 								}
 							},
 						],
@@ -231,7 +233,7 @@ export default {
 					typeItems.push({
 						label: type.name,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'type', type.name)
+							// this.ticketController.set(this.ticketId, 'type', type.name)
 						},
 					});
 				});
@@ -247,7 +249,7 @@ export default {
 					statusItems.push({
 						label: status,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'status', status)
+							// this.ticketController.set(this.ticketId, 'status', status)
 						},
 					});
 				});
@@ -263,7 +265,7 @@ export default {
 					priorityItems.push({
 						label: priority.name,
 						handler: () => {
-							this.ticketController.set(this.ticketId, 'priority', priority.name)
+							// this.ticketController.set(this.ticketId, 'priority', priority.name)
 						},
 					});
 				});

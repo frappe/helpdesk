@@ -8,7 +8,7 @@ from frappe.utils.safe_exec import safe_exec
 
 class TicketTemplate(Document):
 	def validate(self):
-		allowed_field_types = ['Data', 'Link', 'Long Text', 'Text Editor', 'Select']
+		allowed_field_types = ['Data', 'Custom Link', 'Link', 'Long Text', 'Text Editor', 'Select']
 
 		for field in self.fields:
 			if field.fieldtype not in allowed_field_types:
@@ -37,15 +37,27 @@ def refresh_server_script():
 	all_ticket_templates = frappe.get_all("Ticket Template")
 
 	snippets = []
+	
+	snippets.append('temp_custom_fields=doc.custom_fields')
+	snippets.append('custom_fields={}')
+	snippets.append('for f in temp_custom_fields:')
+	snippets.append('\tcustom_fields[f.fieldname]=f.value')
+
 	for template in all_ticket_templates:
 		template_doc = frappe.get_doc("Ticket Template", template)
 		flag = False
 		for field in template_doc.fields:
-			if field.auto_set:
+			if field.auto_set and field.auto_set_via == "Backend (Python)":
 				if not flag:
 					snippets.append(f"if doc.template == '{template.name}':")
 					flag = True
-				snippets.append("\tdoc.append('custom_fields', {'label': '%s', 'fieldname': '%s', 'value': %s, 'route': %s})" % (field.label, field.fieldname, f"{field.value}", f'"/app/{cleanup_page_name(field.options)}/" + {field.value}' if field.fieldtype == 'Link' else '""'))
+
+				route = ''
+				if field.fieldtype == 'Link':
+					route = f'"/app/{cleanup_page_name(field.options)}/" + {field.value_backend}'
+				elif field.fieldtype == 'Custom Link':
+					route = field.value_backend
+				snippets.append("\tdoc.append('custom_fields', {'label': '%s', 'fieldname': '%s', 'value': %s, 'route': %s, 'is_action_field': %s})" % (field.label, field.fieldname, f"{field.value_backend}", route, field.is_action_field))
 
 	server_script = frappe.get_doc("Server Script", "Ticket Auto Set Custom Fields")
 	server_script.script = '\n'.join(snippets) if len(snippets) > 0 else '# Do Nothing'
