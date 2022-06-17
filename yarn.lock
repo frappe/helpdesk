@@ -902,6 +902,26 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
+frappe-ui@0.0.24:
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.24.tgz#a3f44433cbdc18ced77e255487c4a16405127bed"
+  integrity sha512-Y3xyj172DYKcSxQoyxJHYPP9qjoa5iJCeoSvQJeD1PVbEj4BHEmt9gSF0tOFtcGXVOa0Ot7I8BCnMu757EX10Q==
+  dependencies:
+    "@headlessui/vue" "^1.5.0"
+    "@popperjs/core" "^2.11.2"
+    "@tailwindcss/forms" "^0.4.0"
+    "@tailwindcss/typography" "^0.5.0"
+    "@tiptap/extension-image" "^2.0.0-beta.27"
+    "@tiptap/extension-link" "^2.0.0-beta.37"
+    "@tiptap/extension-placeholder" "^2.0.0-beta.48"
+    "@tiptap/starter-kit" "^2.0.0-beta.183"
+    "@tiptap/vue-3" "^2.0.0-beta.90"
+    autoprefixer "^10.4.2"
+    feather-icons "^4.28.0"
+    postcss "^8.4.5"
+    socket.io-client "^2.4.0"
+    tailwindcss "^3.0.12"
+
 fsevents@~2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.2.tgz#8a526f78b8fdf4623b709e0b975c52c24c02fd1a"

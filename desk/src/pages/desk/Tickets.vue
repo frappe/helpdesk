@@ -1,5 +1,6 @@
 <template>
 	<div>
+
 		<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px]">
 			<div class="float-left">
 			</div>
@@ -40,28 +41,152 @@
 				</div>
 			</div>
 		</div>
-		<TicketList class="pl-[18px] pr-[24px]" :filters="filters" @selected-tickets-on-change="triggerSelectedTickets" />
+		<ListManager
+			class="pl-[18px] pr-[24px]"
+			ref="ticketList"
+			:options="ticketListManagerOptions"
+		>
+			<template #body="{ manager }">
+				<div>
+					<div
+						@pointerenter="() => { showSelectAllCheckbox = true}"
+						@pointerleave="() => { showSelectAllCheckbox = false}"
+						class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px] select-none"
+					>
+						<div class="w-[37px] h-[14px]">
+							<Input 
+								type="checkbox" 
+								@click="manager.selectAll()" 
+								:checked="manager.allItemsSelected" 
+								class="cursor-pointer mr-1 hover:visible" 
+								:class="manager.allItemsSelected || showSelectAllCheckbox ? 'visible' : 'invisible'" 
+							/>
+						</div>
+						<div 
+							class="sm:w-1/12 flex flex-row items-center space-x-[7px] cursor-pointer"
+							@click="manager.toggleOrderBy('name')"
+						>
+							<span>#</span>
+							<div class="w-[10px]">
+								<CustomIcons 
+									v-if="manager.options.order_by.split(' ')[0] === 'name'"
+									:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+									class="h-[6px] fill-gray-400 stroke-transparent" 
+								/>
+							</div>
+						</div>
+						<div 
+							class="sm:w-8/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+							@click="manager.toggleOrderBy('subject')"
+						>
+							<span>Subject</span>
+							<div class="w-[10px]">
+								<CustomIcons 
+									v-if="manager.options.order_by.split(' ')[0] === 'subject'"
+									:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+									class="h-[6px] fill-gray-400 stroke-transparent" 
+								/>
+							</div>
+						</div>
+						<div 
+							class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+							@click="manager.toggleOrderBy('status')"
+						>
+							<span>Status</span>
+							<div class="w-[10px]">
+								<CustomIcons 
+									v-if="manager.options.order_by.split(' ')[0] === 'status'"
+									:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+									class="h-[6px] fill-gray-400 stroke-transparent" 
+								/>
+							</div>
+						</div>
+						<div 
+							class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+							@click="manager.toggleOrderBy('contact')"
+						>
+							<span>Created By</span>
+							<div class="w-[10px]">
+								<CustomIcons 
+									v-if="manager.options.order_by.split(' ')[0] === 'contact'"
+									:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+									class="h-[6px] fill-gray-400 stroke-transparent" 
+								/>
+							</div>
+						</div>
+						<div 
+							class="sm:w-2/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+							@click="manager.toggleOrderBy('resolution_by')"
+						>
+							<span>Due In</span>
+							<div class="w-[10px]">
+								<CustomIcons 
+									v-if="manager.options.order_by.split(' ')[0] === 'resolution_by'"
+									:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+									class="h-[6px] fill-gray-400 stroke-transparent" 
+								/>
+							</div>
+						</div>
+						<div
+							class="sm:w-1/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+							@click="manager.toggleOrderBy('modified')"
+						>
+							<span>Modified</span>
+							<div class="w-[10px]">
+								<CustomIcons 
+									v-if="manager.options.order_by.split(' ')[0] === 'modified'"
+									:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+									class="h-[6px] fill-gray-400 stroke-transparent" 
+								/>
+							</div>
+						</div>
+					</div>
+					<div 
+						id="rows" 
+						class="flex flex-col space-y-2 overflow-scroll"
+						:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7rem)' : null }"
+					>
+						<div v-for="ticket in manager.list" :key="ticket.name">
+							<TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
+						</div>
+						<div class="flex justify-center">
+							<div class="flex flex-row space-x-2">
+								<Button appearance="minimal" icon-left="chevron-left" @click="manager.previousPage()">Previous</Button>
+								<Button appearance="primary"> {{ manager.currPage }} </Button>
+								<Button appearance="minimal" @click="manager.getPage(manager.currPage + 1)"> {{ manager.currPage + 1 }} </Button>
+								<Button appearance="minimal" @click="manager.getPage(manager.currPage + 2)"> {{ manager.currPage + 2 }}</Button>
+								<Button appearance="minimal" icon-right="chevron-right" @click="manager.nextPage()">Next</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+		</ListManager>
 		<NewTicketDialog v-model="showNewTicketDialog" @ticket-created="() => {showNewTicketDialog = false}"/>
 	</div>
 </template>
 <script>
-import { Input, Dropdown, FeatherIcon } from 'frappe-ui'
+import { Input, Dropdown, FeatherIcon, ListManager, Dialog } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
 import { inject, ref, provide } from 'vue'
+import TicketListItem from '@/components/desk/tickets/TicketListItem.vue'
 
 export default {
 	name: 'Tickets',
 	components: {
 		TicketList,
 		Input,
+		Dialog,
 		NewTicketDialog,
 		CustomIcons,
 		Dropdown,
 		FeatherIcon,
-		FilterBox
+		FilterBox,
+		ListManager,
+		TicketListItem
 	},
 	setup() {
 		const user = inject('user')
@@ -83,8 +208,34 @@ export default {
 
 		const ticketController = inject('ticketController')
 		const updateSidebarFilter = inject('updateSidebarFilter')
+		const viewportWidth = inject('viewportWidth')
+
+		const ticketListManagerOptions = ref({
+			cache: ['Ticket', 'Desk'],
+			doctype: 'Ticket',
+			fields: [
+				'priority', 
+				'name', 
+				'subject', 
+				'ticket_type', 
+				'status', 
+				'contact', 
+				'response_by', 
+				'resolution_by', 
+				'agreement_status', 
+				'modified', 
+				'_assign', 
+				'_seen'
+			],
+			limit: 20,
+			order_by: 'modified desc',
+		})
+
+		const showSelectAllCheckbox = ref(false)
 
 		return {
+			showSelectAllCheckbox,
+			ticketListManagerOptions,
 			user, 
 			tickets, 
 			showNewTicketDialog, 
@@ -98,7 +249,8 @@ export default {
 			selectedTickets,
 			ticketController,
 			resetSelections,
-			updateSidebarFilter
+			updateSidebarFilter,
+			viewportWidth
 		}
 	},
 	mounted() {
@@ -111,6 +263,11 @@ export default {
 				}
 			} 
 		}
+
+		// this.$refs.ticketList.manager.options.handle_row_click = (rowData) => {
+		// 	console.log(`${rowData.name} clicked !!!`)
+		// 	this.$router.push({path: `/frappedesk/tickets/${rowData.name}`})
+		// }
 	},
 	watch: {
 		filters(newValue) {
