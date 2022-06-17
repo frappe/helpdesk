@@ -23,8 +23,5 @@
   "workspaces": [
     "desk",
     "frappe-ui"
-  ],
-  "dependencies": {
-    "vite": "^2.9.9"
-  }
+  ]
 }

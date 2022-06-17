@@ -1,3 +1,13 @@
+## 1.4.0 (2022-05-30)
+
+### Bug fixes
+
+Creating a `TextSelection` with endpoints that don't point at inline positions now emits a warning. (It is technically an error, but crashing on it might be too disruptive for some existing setups.)
+
+### New features
+
+Include TypeScript type declarations.
+
 ## 1.3.4 (2021-01-20)
 
 ### Bug fixes

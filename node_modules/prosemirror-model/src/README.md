@@ -11,6 +11,7 @@ describes the type of the content, and holds a
 @Fragment
 @Mark
 @Slice
+@Attrs
 @ReplaceError
 
 ### Resolved Positions

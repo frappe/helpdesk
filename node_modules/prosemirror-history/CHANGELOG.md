@@ -1,3 +1,13 @@
+## 1.3.0 (2022-05-30)
+
+### Bug fixes
+
+Fix an issue where the default behavior of history beforeInput events could still go through when the undo history is empty.
+
+### New features
+
+Include TypeScript type declarations.
+
 ## 1.2.0 (2021-08-18)
 
 ### Bug fixes

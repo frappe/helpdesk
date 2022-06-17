@@ -1,5 +1,5 @@
 import { u } from '../localizedFormat/utils';
-var formattingTokens = /(\[[^[]*\])|([-:/.()\s]+)|(A|a|YYYY|YY?|MM?M?M?|Do|DD?|hh?|HH?|mm?|ss?|S{1,3}|z|ZZ?)/g;
+var formattingTokens = /(\[[^[]*\])|([-_:/.,()\s]+)|(A|a|YYYY|YY?|MM?M?M?|Do|DD?|hh?|HH?|mm?|ss?|S{1,3}|z|ZZ?)/g;
 var match1 = /\d/; // 0 - 9
 
 var match2 = /\d\d/; // 00 - 99
@@ -14,7 +14,7 @@ var matchSigned = /[+-]?\d+/; // -inf - inf
 
 var matchOffset = /[+-]\d\d:?(\d\d)?|Z/; // +00:00 -00:00 +0000 or -0000 +00 or Z
 
-var matchWord = /\d*[^\s\d-_:/()]+/; // Word
+var matchWord = /\d*[^-_:/,()\s\d]+/; // Word
 
 var locale = {};
 

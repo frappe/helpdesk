@@ -1,14 +1,14 @@
-declare const flagSymbol: unique symbol;
-
 declare function arg<T extends arg.Spec>(
 	spec: T,
 	options?: arg.Options
 ): arg.Result<T>;
 
 declare namespace arg {
-	export function flag<T>(fn: T): T & { [flagSymbol]: true };
+	export const flagSymbol: unique symbol;
 
-	export const COUNT: Handler<number> & { [flagSymbol]: true };
+	export function flag<T>(fn: T): T & { [arg.flagSymbol]: true };
+
+	export const COUNT: Handler<number> & { [arg.flagSymbol]: true };
 
 	export type Handler<T = any> = (
 		value: string,

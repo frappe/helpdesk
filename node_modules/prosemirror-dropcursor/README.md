@@ -28,15 +28,23 @@ to communication around the project.
 
 ## Documentation
 
-**`dropCursor`**`(options: ?Object) → Plugin`
+* **`dropCursor`**`(options?: interface = {}) → Plugin`\
+   Create a plugin that, when added to a ProseMirror instance,
+   causes a decoration to show up at the drop position when something
+   is dragged over the editor.
 
-Create a plugin that, when added to a ProseMirror instance, causes a
-decoration to show up at the drop position when something is dragged
-over the editor.
+   Nodes may add a `disableDropCursor` property to their spec to
+   control the showing of a drop cursor inside them. This may be a
+   boolean or a function, which will be called with a view and a
+   position, and should return a boolean.
 
- - **`options`**`: ?Object`
-   - **`color`**`: ?string (default: black)`
-   - **`width`**`: ?number (default: 1)`
-   - **`class`**`: ?string`\
-   Adds a class to the cursor.\
-   *Layout overrides such as `width` are not recommended*
+    * **`options`**
+
+       * **`color`**`?: string`\
+         The color of the cursor. Defaults to `black`.
+
+       * **`width`**`?: number`\
+         The precise width of the cursor in pixels. Defaults to 1.
+
+       * **`class`**`?: string`\
+         A CSS class name to add to the cursor element.

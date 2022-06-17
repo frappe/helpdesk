@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.2](https://github.com/ljharb/get-intrinsic/compare/v1.1.1...v1.1.2) - 2022-06-08
+
+### Fixed
+
+- [Fix] properly validate against extra % signs [`#16`](https://github.com/ljharb/get-intrinsic/issues/16)
+
+### Commits
+
+- [actions] reuse common workflows [`0972547`](https://github.com/ljharb/get-intrinsic/commit/0972547efd0abc863fe4c445a6ca7eb4f8c6901d)
+- [meta] use `npmignore` to autogenerate an npmignore file [`5ba0b51`](https://github.com/ljharb/get-intrinsic/commit/5ba0b51d8d8d4f1c31d426d74abc0770fd106bad)
+- [actions] use `node/install` instead of `node/run`; use `codecov` action [`c364492`](https://github.com/ljharb/get-intrinsic/commit/c364492af4af51333e6f81c0bf21fd3d602c3661)
+- [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `aud`, `auto-changelog`, `es-abstract`, `object-inspect`, `tape` [`dc04dad`](https://github.com/ljharb/get-intrinsic/commit/dc04dad86f6e5608775a2640cb0db5927ae29ed9)
+- [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `es-abstract`, `object-inspect`, `safe-publish-latest`, `tape` [`1c14059`](https://github.com/ljharb/get-intrinsic/commit/1c1405984e86dd2dc9366c15d8a0294a96a146a5)
+- [Tests] use `mock-property` [`b396ef0`](https://github.com/ljharb/get-intrinsic/commit/b396ef05bb73b1d699811abd64b0d9b97997fdda)
+- [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `aud`, `auto-changelog`, `object-inspect`, `tape` [`c2c758d`](https://github.com/ljharb/get-intrinsic/commit/c2c758d3b90af4fef0a76910d8d3c292ec8d1d3e)
+- [Dev Deps] update `eslint`, `@ljharb/eslint-config`, `aud`, `es-abstract`, `es-value-fixtures`, `object-inspect`, `tape` [`29e3c09`](https://github.com/ljharb/get-intrinsic/commit/29e3c091c2bf3e17099969847e8729d0e46896de)
+- [actions] update codecov uploader [`8cbc141`](https://github.com/ljharb/get-intrinsic/commit/8cbc1418940d7a8941f3a7985cbc4ac095c5e13d)
+- [Dev Deps] update `@ljharb/eslint-config`, `es-abstract`, `es-value-fixtures`, `object-inspect`, `tape` [`10b6f5c`](https://github.com/ljharb/get-intrinsic/commit/10b6f5c02593fb3680c581d696ac124e30652932)
+- [readme] add github actions/codecov badges [`4e25400`](https://github.com/ljharb/get-intrinsic/commit/4e25400d9f51ae9eb059cbe22d9144e70ea214e8)
+- [Tests] use `for-each` instead of `foreach` [`c05b957`](https://github.com/ljharb/get-intrinsic/commit/c05b957ad9a7bc7721af7cc9e9be1edbfe057496)
+- [Dev Deps] update `es-abstract` [`29b05ae`](https://github.com/ljharb/get-intrinsic/commit/29b05aec3e7330e9ad0b8e0f685a9112c20cdd97)
+- [meta] use `prepublishOnly` script for npm 7+ [`95c285d`](https://github.com/ljharb/get-intrinsic/commit/95c285da810516057d3bbfa871176031af38f05d)
+- [Deps] update `has-symbols` [`593cb4f`](https://github.com/ljharb/get-intrinsic/commit/593cb4fb38e7922e40e42c183f45274b636424cd)
+- [readme] fix repo URLs [`1c8305b`](https://github.com/ljharb/get-intrinsic/commit/1c8305b5365827c9b6fc785434aac0e1328ff2f5)
+- [Deps] update `has-symbols` [`c7138b6`](https://github.com/ljharb/get-intrinsic/commit/c7138b6c6d73132d859471fb8c13304e1e7c8b20)
+- [Dev Deps] remove unused `has-bigints` [`bd63aff`](https://github.com/ljharb/get-intrinsic/commit/bd63aff6ad8f3a986c557fcda2914187bdaab359)
+
 ## [v1.1.1](https://github.com/ljharb/get-intrinsic/compare/v1.1.0...v1.1.1) - 2021-02-03
 
 ### Fixed

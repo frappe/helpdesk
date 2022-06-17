@@ -166,13 +166,14 @@
 	</div>
 </template>
 <script>
-import { Input, Dropdown, FeatherIcon, ListManager, Dialog } from 'frappe-ui'
+import { Input, Dropdown, FeatherIcon, Dialog } from 'frappe-ui'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
 import { inject, ref, provide } from 'vue'
 import TicketListItem from '@/components/desk/tickets/TicketListItem.vue'
+import ListManager from '@/components/global/ListManager.vue'
 
 export default {
 	name: 'Tickets',

@@ -9,7 +9,9 @@ be required to create an editor just like the current one) in a single
 state) by applying [transactions](#state.Transaction) to it.
 
 @EditorState
+@EditorStateConfig
 @Transaction
+@Command
 
 ### Selection
 
@@ -35,5 +37,6 @@ ProseMirror has a plugin system.
 
 @PluginSpec
 @StateField
+@PluginView
 @Plugin
 @PluginKey

@@ -1,6 +1,6 @@
 {
   "name": "arg",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Unopinionated, no-frills CLI argument parser",
   "main": "index.js",
   "types": "index.d.ts",

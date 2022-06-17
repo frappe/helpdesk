@@ -1,3 +1,9 @@
+## 1.5.0 (2022-05-30)
+
+### New features
+
+Include TypeScript type declarations.
+
 ## 1.4.0 (2021-11-11)
 
 ### New features
