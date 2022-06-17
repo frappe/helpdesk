@@ -262,7 +262,6 @@ export default {
 					this.filters.push(filter)
 				}
 			} 
-			this.applyFiltersToList()
 		}
 	},
 	watch: {
@@ -279,6 +278,8 @@ export default {
 				}
 			})
 			this.$router.push({path: this.$route.path, query}).then(() => this.updateSidebarFilter())
+		},
+		$route() {
 			this.applyFiltersToList()
 		}
 	},
@@ -289,13 +290,35 @@ export default {
 	},
 	methods: {
 		applyFiltersToList() {
-			const f = {}
+			const finalFilters = {}
+			if (this.user.agent) {
+				switch(this.$route.query.menu_filter) {
+					case 'my-open-tickets':
+						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+						finalFilters['status'] = ['like', '%Open%']
+						break;
+					case 'my-replied-tickets':
+						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+						finalFilters['status'] = ['like', '%Replied%']
+						break;
+					case 'my-resolved-tickets':
+						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+						finalFilters['status'] = ['like', '%Resolved%']
+						break;
+					case 'my-closed-tickets':
+						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+						finalFilters['status'] = ['like', '%Closed%']
+						break;
+				}
+			}
+			console.log('applying filters')
+			console.log(finalFilters)
 			this.filters.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
-					f[key] = ['like', `%${value}%`]
+					finalFilters[key] = ['like', `%${value}%`]
 				}
 			})
-			this.$refs.ticketList.manager.update({filters: f})
+			this.$refs.ticketList.manager.update({filters: finalFilters})
 		},
 		getFilterBoxOptions() {
 			return [
