@@ -100,7 +100,7 @@
 								<div v-if="field.route" class="w-fit flex flex-row items-center space-x-[12px] cursor-pointer hover:underline">
 									<FeatherIcon name="external-link" class="w-[14px] h-[14px] stroke-gray-500" />
 									<div class="w-[200px] truncate">
-										<a title="{{ field.value }}" class="text-gray-900 text-base" :href="field.route" target="_blank">{{ field.value }}</a>
+										<a :title="field.value" class="text-gray-900 text-base" :href="field.route" target="_blank">{{ field.value }}</a>
 									</div>
 								</div>
 								<div v-else>
