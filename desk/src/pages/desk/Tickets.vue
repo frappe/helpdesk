@@ -1,7 +1,7 @@
 <template>
 	<div>
 
-		<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px]">
+		<div class="flow-root pt-4 pb-6 px-[16px]">
 			<div class="float-left">
 			</div>
 			<div class="float-right">
@@ -42,7 +42,7 @@
 			</div>
 		</div>
 		<ListManager
-			class="pl-[18px] pr-[24px]"
+			class="px-[16px]"
 			ref="ticketList"
 			:options="ticketListManagerOptions"
 		>
@@ -256,26 +256,22 @@ export default {
 	mounted() {
 		if (this.$route.query) {
 			for (const [key, value] of Object.entries(this.$route.query)) {
-				if (['ticket_type', 'raised_by', 'status', 'priority', 'assignee'].includes(key)) {
+				if (['ticket_type', 'raised_by', 'status', 'priority', '_assign'].includes(key)) {
 					const filter = {}
 					filter[key] = value
 					this.filters.push(filter)
 				}
 			} 
+			this.applyFiltersToList()
 		}
-
-		// this.$refs.ticketList.manager.options.handle_row_click = (rowData) => {
-		// 	console.log(`${rowData.name} clicked !!!`)
-		// 	this.$router.push({path: `/frappedesk/tickets/${rowData.name}`})
-		// }
 	},
 	watch: {
 		filters(newValue) {
 			let query = this.$route.query.menu_filter ? {menu_filter: this.$route.query.menu_filter} : {}
 			newValue.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
-					if (['ticket_type', 'raised_by', 'status', 'priority', 'assignee'].includes(key)) {
-						if (key == 'assignee') {
+					if (['ticket_type', 'raised_by', 'status', 'priority', '_assign'].includes(key)) {
+						if (key == '_assign') {
 							query.menu_filter = 'all'
 						}
 						query[key] = value
@@ -283,6 +279,7 @@ export default {
 				}
 			})
 			this.$router.push({path: this.$route.path, query}).then(() => this.updateSidebarFilter())
+			this.applyFiltersToList()
 		}
 	},
 	computed: {
@@ -291,12 +288,21 @@ export default {
 		}
 	},
 	methods: {
+		applyFiltersToList() {
+			const f = {}
+			this.filters.forEach(filter => {
+				for (const [key, value] of Object.entries(filter)) {
+					f[key] = ['like', `%${value}%`]
+				}
+			})
+			this.$refs.ticketList.manager.update({filters: f})
+		},
 		getFilterBoxOptions() {
 			return [
 				{label: "Type", name: "ticket_type", items: this.ticketTypes.map((item) => item.name)},
 				{label: "Contact", name: "raised_by", items: this.contacts.map((item) => item.name)},
 				{label: "Status", name: "status", items: this.ticketStatuses},
-				{label: "Assignee", name: "assignee", items: this.agents.map((item) => item.name)},
+				{label: "Assignee", name: "_assign", items: this.agents.map((item) => item.name)},
 				{label: "Priority", name: "priority", items: this.ticketPriorities.map((item) => item.name)},
 				// TODO: {label: "Created On", name: "creation", type: 'calander'}
 			]
