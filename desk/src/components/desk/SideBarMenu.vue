@@ -105,9 +105,7 @@ export default {
 		const profileSettings = ref()
 		const showProfileSettings = ref(false)
 
-		const updateSidebarFilter = inject('updateSidebarFilter')
-
-		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings, updateSidebarFilter }
+		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings }
 	},
 	mounted() {
 		this.menuOptions = [

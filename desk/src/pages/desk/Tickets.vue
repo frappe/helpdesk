@@ -1,53 +1,74 @@
 <template>
 	<div>
-
-		<div class="flow-root pt-4 pb-6 px-[16px]">
-			<div class="float-left">
-			</div>
-			<div class="float-right">
-				<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
-				<div v-if="showTicketBluckUpdatePanel" class="flex space-x-3">
-					<Button @click="markSelectedTicketsAsClosed()">Mark as Closed</Button>
-					<Dropdown
-						v-if="agents"
-						placement="right" 
-						:options="agentsAsDropdownOptions()" 
-						:dropdown-width-full="true"
-					>
-						<template v-slot="{ toggleAssignees }">
-							<div class="flex flex-col">
-								<Button @click="toggleAssignees" class="cursor-pointer">
-									<div class="flex items-center space-x-2">
-										<div>Assign</div>
-									</div>
-								</Button>
-							</div>
-						</template>
-					</Dropdown>
-				</div>
-				<div v-else class="flex items-center space-x-3">
-					<div>
-						<FilterBox class="mt-6" v-if="toggleFilters" @close="() => { toggleFilters = false }" :options="getFilterBoxOptions()" v-model="filters"/>
-					</div>
-					<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
-					<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-300'" @click="() => { toggleFilters = !toggleFilters }">
-						<div class="flex items-center space-x-2">
-							<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-500 fill-blue-500' : 'stroke-black'" />
-							<div>Add Filters</div>
-							<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
-						</div>
-					</Button>
-					<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
-				</div>
-			</div>
-		</div>
 		<ListManager
 			class="px-[16px]"
 			ref="ticketList"
-			:options="ticketListManagerOptions"
+			:options="{
+				cache: ['Ticket', 'Desk'],
+				doctype: 'Ticket',
+				fields: [
+					'priority', 
+					'name', 
+					'subject', 
+					'ticket_type', 
+					'status', 
+					'contact', 
+					'response_by', 
+					'resolution_by', 
+					'agreement_status', 
+					'modified', 
+					'_assign', 
+					'_seen'
+				],
+				limit: 20,
+				order_by: 'modified desc',
+			}"
 		>
 			<template #body="{ manager }">
 				<div>
+					<div class="flow-root py-4 px-[16px]">
+						<div class="float-left">
+						</div>
+						<div class="float-right">
+							<!-- TODO: add v-on-outside-click="() => { toggleFilters = false }" -->
+							<div 
+								v-if="Object.keys(manager.selectedItems).length > 0"
+								class="flex space-x-3"
+							>
+								<Button @click="markSelectedTicketsAsClosed()">Mark as Closed</Button>
+								<Dropdown
+									v-if="agents"
+									placement="right" 
+									:options="agentsAsDropdownOptions()" 
+									:dropdown-width-full="true"
+								>
+									<template v-slot="{ toggleAssignees }">
+										<div class="flex flex-col">
+											<Button @click="toggleAssignees" class="cursor-pointer">
+												<div class="flex items-center space-x-2">
+													<div>Assign</div>
+												</div>
+											</Button>
+										</div>
+									</template>
+								</Dropdown>
+							</div>
+							<div v-else class="flex items-center space-x-3">
+								<div>
+									<FilterBox class="mt-6" v-if="toggleFilters" @close="() => { toggleFilters = false }" :options="filterBoxOptions()" v-model="filters"/>
+								</div>
+								<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
+								<Button :class="Object.keys(filters).length == 0 ? 'bg-gray-100 text-gray-600' : 'bg-blue-100 text-blue-500 hover:bg-blue-300'" @click="() => { toggleFilters = !toggleFilters }">
+									<div class="flex items-center space-x-2">
+										<CustomIcons height="18" width="18" name="filter" :class="Object.keys(filters).length > 0 ? 'stroke-blue-500 fill-blue-500' : 'stroke-black'" />
+										<div>Add Filters</div>
+										<div class="bg-blue-500 text-white px-1.5 rounded" v-if="Object.keys(filters).length > 0">{{ Object.keys(this.filters).length }}</div>
+									</div>
+								</Button>
+								<Button icon-left="plus" appearance="primary" @click="() => {showNewTicketDialog = true}">Add Ticket</Button>
+							</div>
+						</div>
+					</div>
 					<div
 						@pointerenter="() => { showSelectAllCheckbox = true}"
 						@pointerleave="() => { showSelectAllCheckbox = false}"
@@ -144,7 +165,7 @@
 					<div 
 						id="rows" 
 						class="flex flex-col space-y-2 overflow-scroll"
-						:style="{ height: viewportWidth > 768 ? 'calc(100vh - 7rem)' : null }"
+						:style="{ height: viewportWidth > 768 ? 'calc(100vh - 6.4rem)' : null }"
 					>
 						<div v-for="ticket in manager.list" :key="ticket.name">
 							<TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
@@ -167,18 +188,16 @@
 </template>
 <script>
 import { Input, Dropdown, FeatherIcon, Dialog } from 'frappe-ui'
-import TicketList from '@/components/desk/tickets/TicketList.vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
-import { inject, ref, provide } from 'vue'
+import { inject, ref } from 'vue'
 import TicketListItem from '@/components/desk/tickets/TicketListItem.vue'
 import ListManager from '@/components/global/ListManager.vue'
 
 export default {
 	name: 'Tickets',
 	components: {
-		TicketList,
 		Input,
 		Dialog,
 		NewTicketDialog,
@@ -203,40 +222,12 @@ export default {
 		const agents = inject('agents')
 		const contacts = inject('contacts')
 
-		const selectedTickets = ref([])
-		const resetSelections = ref(false)
-		provide('resetSelections', resetSelections)
-
-		const ticketController = inject('ticketController')
-		const updateSidebarFilter = inject('updateSidebarFilter')
 		const viewportWidth = inject('viewportWidth')
-
-		const ticketListManagerOptions = ref({
-			cache: ['Ticket', 'Desk'],
-			doctype: 'Ticket',
-			fields: [
-				'priority', 
-				'name', 
-				'subject', 
-				'ticket_type', 
-				'status', 
-				'contact', 
-				'response_by', 
-				'resolution_by', 
-				'agreement_status', 
-				'modified', 
-				'_assign', 
-				'_seen'
-			],
-			limit: 20,
-			order_by: 'modified desc',
-		})
 
 		const showSelectAllCheckbox = ref(false)
 
 		return {
 			showSelectAllCheckbox,
-			ticketListManagerOptions,
 			user, 
 			tickets, 
 			showNewTicketDialog, 
@@ -247,10 +238,6 @@ export default {
 			ticketStatuses,
 			agents,
 			contacts,
-			selectedTickets,
-			ticketController,
-			resetSelections,
-			updateSidebarFilter,
 			viewportWidth
 		}
 	},
@@ -264,6 +251,7 @@ export default {
 				}
 			} 
 		}
+		this.applyFiltersToList()
 	},
 	watch: {
 		filters(newValue) {
@@ -278,42 +266,41 @@ export default {
 					}
 				}
 			})
-			this.$router.push({path: this.$route.path, query}).then(() => this.updateSidebarFilter())
+			this.$router.push({path: this.$route.path, query})
 		},
 		$route() {
 			this.applyFiltersToList()
 		}
 	},
-	computed: {
-		showTicketBluckUpdatePanel() {
-			return this.selectedTickets.length > 0
-		}
-	},
 	methods: {
 		applyFiltersToList() {
 			const finalFilters = {}
+			const menuFilter = this.$route.query.menu_filter
 			if (this.user.agent) {
-				switch(this.$route.query.menu_filter) {
-					case 'my-open-tickets':
-						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+				const sideBarFilters = {
+					myOpenTickets: 'my-open-tickets',
+					myRepliedTickets: 'my-replied-tickets',
+					myResolecedTickets: 'my-resolved-tickets',
+					myClosedTickets: 'my-closed-tickets'
+				}
+				if (Object.values(sideBarFilters).includes(menuFilter)) {
+					finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+				}
+				switch(menuFilter) {
+					case sideBarFilters['myOpenTickets']:
 						finalFilters['status'] = ['like', '%Open%']
 						break;
-					case 'my-replied-tickets':
-						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+					case sideBarFilters['myRepliedTickets']:
 						finalFilters['status'] = ['like', '%Replied%']
 						break;
-					case 'my-resolved-tickets':
-						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+					case sideBarFilters['myResolecedTickets']:
 						finalFilters['status'] = ['like', '%Resolved%']
 						break;
-					case 'my-closed-tickets':
-						finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+					case sideBarFilters['myClosedTickets']:
 						finalFilters['status'] = ['like', '%Closed%']
 						break;
 				}
 			}
-			console.log('applying filters')
-			console.log(finalFilters)
 			this.filters.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
 					finalFilters[key] = ['like', `%${value}%`]
@@ -321,7 +308,7 @@ export default {
 			})
 			this.$refs.ticketList.manager.update({filters: finalFilters})
 		},
-		getFilterBoxOptions() {
+		filterBoxOptions() {
 			return [
 				{label: "Type", name: "ticket_type", items: this.ticketTypes.map((item) => item.name)},
 				{label: "Contact", name: "raised_by", items: this.contacts.map((item) => item.name)},
@@ -331,15 +318,11 @@ export default {
 				// TODO: {label: "Created On", name: "creation", type: 'calander'}
 			]
 		},
-		triggerSelectedTickets(selectedTickets) {
-			this.selectedTickets = selectedTickets
-		},
 		markSelectedTicketsAsClosed() {
-			if (this.selectedTickets) {
-				this.ticketController.bulkSet(this.selectedTickets, 'status', 'Closed').then(() => {
-					this.resetSelections = true
-				})
-			}
+			this.$resources.bulkAssignTicketStatus.submit({
+				ticket_ids: Object.keys(this.$refs.ticketList.selectedItems),
+				status: 'Closed'
+			})
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
@@ -348,11 +331,10 @@ export default {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							if (this.selectedTickets) {
-								this.ticketController.bulkSet(this.selectedTickets, 'agent', agent.name).then(() => {
-									this.resetSelections = true
-								})
-							}
+							this.$resources.bulkAssignTicketToAgent.submit({
+								ticket_ids: Object.keys(this.$refs.ticketList.selectedItems),
+								agent_id: agent.name
+							})
 						},
 					});
 				});
@@ -365,11 +347,10 @@ export default {
 							{
 								label: 'Assign to me',
 								handler: () => {
-									if (this.selectedTickets) {
-										this.ticketController.bulkSet(this.selectedTickets, 'agent').then(() => {
-											this.resetSelections = true
-										})
-									}
+									this.$resources.bulkAssignTicketToAgent.submit({
+										ticket_ids: Object.keys(this.$refs.ticketList.selectedItems),
+										agent_id: this.user.agent.name
+									})
 								}
 							},
 						],
@@ -385,8 +366,30 @@ export default {
 				return null;
 			}
 		},
+	},
+	resources: {
+		bulkAssignTicketStatus() {
+			return {
+				method: 'frappedesk.api.ticket.bulk_assign_ticket_status',
+				onSuccess: () => {
+					this.$refs.ticketList.selectedItems = []
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
+		bulkAssignTicketToAgent() {
+			return {
+				method: 'frappedesk.api.ticket.bulk_assign_ticket_to_agent',
+				onSuccess: () => {
+					this.$refs.ticketList.selectedItems = []
+				},
+				onFailure: () => {
+					// TODO:
+				}
+			}
+		},
 	}
 }
-
-// TODO: transfer the tickets controllers to desk.vue file
 </script>

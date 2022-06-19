@@ -10,7 +10,7 @@ import { ref, computed } from 'vue'
 export default {
   name: 'ListManager',
   props: ['options'],
-  setup(props, context) {
+  setup(props) {
     const options = {
       handle_row_click: () => {},
       ...props.options
@@ -24,7 +24,10 @@ export default {
       if (manager.value.loading) {
         return false
       } else {
-        return Object.keys(selectedItems.value).length == manager.value.list.length
+        if (manager.value.list.length > 0) {
+          return Object.keys(selectedItems.value).length == manager.value.list.length
+        }
+        return false
       }
     })
 
@@ -128,8 +131,6 @@ export default {
       return manager.value?.resource?.data || []
     })
 
-    context.expose({ manager })
-
     return {
       manager,
       newItems,
@@ -159,7 +160,7 @@ export default {
           /**
            * Remove all the duplicates which might have been added to the
            * current list when new entry was added via socket list_update
-           */
+           */2
           var newItems = this.newItems
           data = data.filter(function(i) {
             return !newItems.find(j => {

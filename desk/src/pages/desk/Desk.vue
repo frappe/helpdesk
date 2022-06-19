@@ -35,9 +35,6 @@ export default {
 		const agents = ref([])
 		const agentGroups = ref([])
 		const agentController = ref({})
-
-		const updateSidebarFilter = ref(() => {})
-
 		
 		provide('tickets', tickets)
 		provide('ticketTypes', ticketTypes)
@@ -52,8 +49,6 @@ export default {
 		provide('agents', agents)
 		provide('agentGroups', agentGroups)
 		provide('agentController', agentController)
-
-		provide('updateSidebarFilter', updateSidebarFilter)
 
 		return {
 			user,
@@ -133,20 +128,6 @@ export default {
 					return this.$resources.setTicketNotes.submit({
 						ticket_id: ticketId,
 						notes: ref
-					})
-			}
-		},
-		this.ticketController.bulkSet = (ticketIds, type, ref=null) => {
-			switch (type) {
-				case 'status':
-					return this.$resources.bulkAssignTicketStatus.submit({
-						ticket_ids: ticketIds,
-						status: ref
-					})
-				case 'agent':
-					return this.$resources.bulkAssignTicketToAgent.submit({
-						ticket_ids: ticketIds,
-						agent_id: ref
 					})
 			}
 		},
@@ -345,18 +326,6 @@ export default {
 				}
 			}
 		},
-		bulkAssignTicketToAgent() {
-			return {
-				method: 'frappedesk.api.ticket.bulk_assign_ticket_to_agent',
-				onSuccess: (ticket) => {
-					// TODO: do bulk update
-					this.ticketController.update()
-				},
-				onFailure: () => {
-					// TODO:
-				}
-			}
-		},
 		assignTicketType() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_type',
@@ -375,18 +344,6 @@ export default {
 				onSuccess: async (ticket) => {
 					await this.ticketController.markAsSeen(ticket.name)
 					this.ticketController.update(ticket.name)
-				},
-				onFailure: () => {
-					// TODO:
-				}
-			}
-		},
-		bulkAssignTicketStatus() {
-			return {
-				method: 'frappedesk.api.ticket.bulk_assign_ticket_status',
-				onSuccess: (tickets) => {
-					// TODO: do bulk update for tickets
-					this.ticketController.update()
 				},
 				onFailure: () => {
 					// TODO:

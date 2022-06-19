@@ -52,7 +52,7 @@
 					>
 						<FeatherIcon v-if="ticket.status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[ticket.status]" class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]" />
 						<CustomIcons v-else name="comment" class="w-[16px] h-[16px] stroke-green-600" />
-						<div class="text-base font-normal" :class="`text-${getColorBasedOnStatus(ticket.status)}-600`">{{ ticket.status }}</div>
+						<div class="text-base font-normal" :class="getColorBasedOnStatus(ticket.status)">{{ ticket.status }}</div>
 					</div>
 				</div>
 			</div>
@@ -87,29 +87,20 @@
 				class="pt-[-3px] w-[50.37px]"
 			>
 				<div>
-					<Dropdown
-						v-if="agents"
-						placement="right" 
-						:options="agentsAsDropdownOptions()" 
-						:dropdown-width-full="true"
-					>
-						<template v-slot="{ toggleAssignees }">
-							<div class="text-base flex flex-row-reverse">
-								<div @click="toggleAssignees" class="cursor-pointer">
-									<div v-if="assignees.length > 0">
-										<div v-for="assignee in assignees" :key="assignee">
-											<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
-										</div>
-									</div>
-									<div v-else class="invisible group-hover:visible">
-										<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
-											<CustomIcons name="user-plus" />
-										</div>
-									</div>
+					<div class="text-base flex flex-row-reverse">
+						<div class="cursor-pointer">
+							<div v-if="assignees.length > 0">
+								<div v-for="assignee in assignees" :key="assignee">
+									<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
 								</div>
 							</div>
-						</template>
-					</Dropdown>
+							<div v-else class="invisible group-hover:visible">
+								<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
+									<CustomIcons name="user-plus" />
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -121,7 +112,6 @@
 import { Badge, Dropdown, Input, FeatherIcon, Avatar } from 'frappe-ui'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { inject, ref } from 'vue'
-import CustomIcons1 from '../global/CustomIcons.vue'
 
 export default {
 	name: 'TicketListItem',
@@ -132,30 +122,14 @@ export default {
 		Dropdown,
 		FeatherIcon,
 		Avatar,
-		CustomIcons,
-		CustomIcons1
+		CustomIcons
 	},
 	setup() {
-		// values
 		const user = inject('user')
-
-		const ticketTypes = inject('ticketTypes')
-		const ticketPriorities = inject('ticketPriorities')
-		const ticketStatuses = inject('ticketStatuses')
-
-		const agents = inject('agents')
-
 		const toggleSelectBox = ref(false)
 
 		return {
 			user,
-			
-			ticketTypes,
-			ticketPriorities,
-			ticketStatuses,
-
-			agents,
-
 			toggleSelectBox
 		 }
 	},
@@ -170,7 +144,7 @@ export default {
 	},
 	methods: {
 		getColorBasedOnStatus(status) {
-			return (status == 'Open') ? 'green' : 'gray'
+			return (status == 'Open') ? 'text-green-600' : 'text-gray-600'
 		},
 		getColorBasedOnPriority(priority, type) {
 			let sufix = '';
@@ -189,90 +163,6 @@ export default {
 			}
 
 			return sufix ? sufix + '-' + color : color;
-		},
-		agentsAsDropdownOptions() {
-			let agentItems = [];
-			if (this.agents) {
-				this.agents.forEach(agent => {
-					agentItems.push({
-						label: agent.agent_name,
-						handler: () => {
-							// this.ticketController.set(this.ticketId, 'agent', agent.name)
-						},
-					});
-				});
-				let options = [];
-				if (this.user.agent) {
-					options.push({
-						group: 'Myself',
-						hideLabel: true,
-						items: [
-							{
-								label: 'Assign to me',
-								handler: () => {
-									// this.ticketController.set(this.ticketId, 'agent')
-								}
-							},
-						],
-					})
-				}
-				options.push({
-					group: 'All Agents',
-					hideLabel: true,
-					items: agentItems,
-				})
-				return options;
-			} else {
-				return null;
-			}
-		},
-		typesAsDropdownOptions() {
-			let typeItems = [];
-			if (this.ticketTypes) {
-				this.ticketTypes.forEach(type => {
-					typeItems.push({
-						label: type.name,
-						handler: () => {
-							// this.ticketController.set(this.ticketId, 'type', type.name)
-						},
-					});
-				});
-				return typeItems;
-			} else {
-				return null;
-			}
-		},
-		statusesAsDropdownOptions() {
-			let statusItems = [];
-			if (this.ticketStatuses) {
-				this.ticketStatuses.forEach(status => {
-					statusItems.push({
-						label: status,
-						handler: () => {
-							// this.ticketController.set(this.ticketId, 'status', status)
-						},
-					});
-				});
-				return statusItems;
-			} else {
-				return null;
-			}
-		},
-		prioritiesAsDropdownOptions() {
-			let priorityItems = [];
-			if (this.ticketPriorities) {
-				this.ticketPriorities.forEach(priority => {
-					priorityItems.push({
-						label: priority.name,
-						handler: () => {
-							// this.ticketController.set(this.ticketId, 'priority', priority.name)
-						},
-					});
-				});
-				return priorityItems;
-			} else {
-				return null;
-			}
 		},
 		getResolutionDueIn() {
 			let resolutionBy = this.ticket.resolution_by
