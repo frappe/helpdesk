@@ -285,12 +285,14 @@ export default {
 		},
 		agents() {
 			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: 'Agent',
-					fields: ['*']
-				},
-				auto: this.user.has_desk_access,
+				type: 'list',
+				doctype: 'Agent',
+				cache: ['Desk', 'Agents'],
+				fields: [
+					'name',
+					'agent_name',
+					// TODO: 'user.user_image'
+				],
 				onSuccess: (data) => {
 					this.agents = data
 				},

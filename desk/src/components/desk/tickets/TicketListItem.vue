@@ -91,7 +91,7 @@
 						<div class="cursor-pointer">
 							<div v-if="assignees.length > 0">
 								<div v-for="assignee in assignees" :key="assignee">
-									<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" :imageURL="assignee.image" />
+									<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" />
 								</div>
 							</div>
 							<div v-else class="invisible group-hover:visible">
@@ -126,20 +126,25 @@ export default {
 	},
 	setup() {
 		const user = inject('user')
+		const agents = inject('agents')
 		const toggleSelectBox = ref(false)
 
 		return {
 			user,
+			agents,
 			toggleSelectBox
 		 }
 	},
 	computed: {
 		assignees() {
 			if (this.ticket._assign) {
-				return JSON.parse(this.ticket._assign)
-			} else {
-				return []
+				const result = []
+				JSON.parse(this.ticket._assign).forEach(assignee => {
+					result.push(this.agents.find(x => x.name === assignee))
+				})
+				return result
 			}
+			return []
 		}
 	},
 	methods: {
