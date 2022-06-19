@@ -66,6 +66,13 @@ export default {
           limit: options.limit
         })
       },
+      reload: () => {
+        resource.value.update({
+          ...options,
+          start: 0,
+          limit: options.limit
+        })
+      },
       update: (newOptions) => {
         clearList()
         if (newOptions.filters) options.filters = newOptions.filters

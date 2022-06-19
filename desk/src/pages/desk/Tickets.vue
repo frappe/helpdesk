@@ -35,7 +35,7 @@
 								v-if="Object.keys(manager.selectedItems).length > 0"
 								class="flex space-x-3"
 							>
-								<Button @click="markSelectedTicketsAsClosed()">Mark as Closed</Button>
+								<Button :loading="$resources.bulkAssignTicketStatus.loading" @click="markSelectedTicketsAsClosed()">Mark as Closed</Button>
 								<Dropdown
 									v-if="agents"
 									placement="right" 
@@ -44,7 +44,7 @@
 								>
 									<template v-slot="{ toggleAssignees }">
 										<div class="flex flex-col">
-											<Button @click="toggleAssignees" class="cursor-pointer">
+											<Button :loading="$resources.bulkAssignTicketToAgent.loading" @click="toggleAssignees" class="cursor-pointer">
 												<div class="flex items-center space-x-2">
 													<div>Assign</div>
 												</div>
@@ -373,6 +373,7 @@ export default {
 				method: 'frappedesk.api.ticket.bulk_assign_ticket_status',
 				onSuccess: () => {
 					this.$refs.ticketList.selectedItems = []
+					this.$refs.ticketList.manager.reload()
 				},
 				onFailure: () => {
 					// TODO:
@@ -384,6 +385,7 @@ export default {
 				method: 'frappedesk.api.ticket.bulk_assign_ticket_to_agent',
 				onSuccess: () => {
 					this.$refs.ticketList.selectedItems = []
+					this.$refs.ticketList.manager.reload()
 				},
 				onFailure: () => {
 					// TODO:
