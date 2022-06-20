@@ -225,7 +225,7 @@ export default {
 		this.syncSelectedMenuItemBasedOnRoute()
 		this.updateTicketsCount()
 		this.$socket.on("list_update", (data) => {
-			if (data.doctype === "Ticket") {
+			if (data.doctype === "Ticket Activity") {
 				this.updateTicketsCount()
 			}
 		})
