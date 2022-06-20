@@ -244,7 +244,7 @@ export default {
 	mounted() {
 		if (this.$route.query) {
 			for (const [key, value] of Object.entries(this.$route.query)) {
-				if (['ticket_type', 'raised_by', 'status', 'priority', '_assign'].includes(key)) {
+				if (['ticket_type', 'contact', 'status', 'priority', '_assign'].includes(key)) {
 					const filter = {}
 					filter[key] = value
 					this.filters.push(filter)
@@ -258,7 +258,7 @@ export default {
 			let query = this.$route.query.menu_filter ? {menu_filter: this.$route.query.menu_filter} : {}
 			newValue.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
-					if (['ticket_type', 'raised_by', 'status', 'priority', '_assign'].includes(key)) {
+					if (['ticket_type', 'contact', 'status', 'priority', '_assign'].includes(key)) {
 						if (key == '_assign') {
 							query.menu_filter = 'all'
 						}
@@ -303,7 +303,7 @@ export default {
 			}
 			this.filters.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
-					finalFilters[key] = ['like', `%${value}%`]
+					finalFilters[key] = (key === '_assign') ?  ['like', `%${value}%`] : ['=', value]
 				}
 			})
 			this.$refs.ticketList.manager.update({filters: finalFilters})
@@ -311,7 +311,7 @@ export default {
 		filterBoxOptions() {
 			return [
 				{label: "Type", name: "ticket_type", items: this.ticketTypes.map((item) => item.name)},
-				{label: "Contact", name: "raised_by", items: this.contacts.map((item) => item.name)},
+				{label: "Contact", name: "contact", items: this.contacts.map((item) => item.name)},
 				{label: "Status", name: "status", items: this.ticketStatuses},
 				{label: "Assignee", name: "_assign", items: this.agents.map((item) => item.name)},
 				{label: "Priority", name: "priority", items: this.ticketPriorities.map((item) => item.name)},
