@@ -32,7 +32,7 @@ export default {
     })
 
     const manager = ref({
-      loading: true,
+      loading: false,
       resource,
       options,
       selectedItems,
@@ -59,7 +59,6 @@ export default {
         clearList()
         manager.value.start = start
         manager.value.currPage = Math.floor(manager.value.start / options.limit) + 1
-        manager.value.loading = true
         resource.value.update({
           ...options,
           start: manager.value.start,
@@ -138,6 +137,10 @@ export default {
       return manager.value?.resource?.data || []
     })
 
+    manager.value.loading = computed(() => {
+      return manager.value.resource?.list.loading
+    })
+
     return {
       manager,
       newItems,
@@ -174,7 +177,6 @@ export default {
               return j === i.name
             });
           });
-          this.manager.loading = false
         }
       }
     },
@@ -190,7 +192,6 @@ export default {
               this.manager.list.unshift(data[0])
               this.newItems.push(data[0].name)
             }
-            this.manager.loading = false
           }
         }
       }

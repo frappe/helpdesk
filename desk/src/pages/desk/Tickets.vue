@@ -172,10 +172,22 @@
 								<TicketListItemSkeleton />
 							</div>
 						</div>
-						<div v-else v-for="ticket in manager.list" :key="ticket.name">
-							<TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
+						<div v-else>
+							<div v-if="manager.list.length > 0">
+								<div v-for="ticket in manager.list" :key="ticket.name">
+									<TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
+								</div>
+							</div>
+							<div v-else>
+								<div class="grid place-content-center h-48 w-full">
+									<div>
+										<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
+										<div class="text-gray-500 mb-2">No tickets found</div>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div v-if="!manager.loading" class="flex justify-center">
+						<div v-if="!manager.loading && !(manager.list.length == 0 && manager.start == 0)" class="flex justify-center">
 							<div class="flex flex-row space-x-2">
 								<Button appearance="minimal" icon-left="chevron-left" @click="manager.previousPage()">Previous</Button>
 								<Button appearance="primary"> {{ manager.currPage }} </Button>
