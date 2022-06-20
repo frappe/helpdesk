@@ -66,6 +66,7 @@ export default {
         })
       },
       reload: () => {
+        manager.value.currPage = 1
         resource.value.update({
           ...options,
           start: 0,
@@ -74,6 +75,7 @@ export default {
       },
       update: (newOptions) => {
         clearList()
+        manager.value.currPage = 1
         if (newOptions.filters) options.filters = newOptions.filters
         if (newOptions.order_by) options.order_by = newOptions.order_by
         resource.value.update({
