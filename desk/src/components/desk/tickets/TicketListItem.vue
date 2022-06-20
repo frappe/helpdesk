@@ -88,15 +88,10 @@
 			>
 				<div>
 					<div class="text-base flex flex-row-reverse">
-						<div class="cursor-pointer">
+						<div class="cursor-pointer h-[26px] w-[26px]">
 							<div v-if="assignees.length > 0">
 								<div v-for="assignee in assignees" :key="assignee">
 									<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" />
-								</div>
-							</div>
-							<div v-else class="invisible group-hover:visible">
-								<div class="h-[26px] w-[26px] bg-blue-50 rounded-[26px] p-[6px]">
-									<CustomIcons name="user-plus" />
 								</div>
 							</div>
 						</div>
