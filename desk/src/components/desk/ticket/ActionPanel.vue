@@ -280,6 +280,7 @@ export default {
 	resources: {
 		ticket() {
 			return {
+				cache: ['Ticket', 'Action Panel', this.ticketId],
 				method: 'frappedesk.api.ticket.get_ticket',
 				params: {
 					ticket_id: this.ticketId,
