@@ -167,10 +167,15 @@
 						class="flex flex-col space-y-2 overflow-scroll"
 						:style="{ height: viewportWidth > 768 ? 'calc(100vh - 6.4rem)' : null }"
 					>
-						<div v-for="ticket in manager.list" :key="ticket.name">
+						<div v-if="manager.loading">
+							<div v-for="n in 3" :key="n">
+								<TicketListItemSkeleton />
+							</div>
+						</div>
+						<div v-else v-for="ticket in manager.list" :key="ticket.name">
 							<TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
 						</div>
-						<div class="flex justify-center">
+						<div v-if="!manager.loading" class="flex justify-center">
 							<div class="flex flex-row space-x-2">
 								<Button appearance="minimal" icon-left="chevron-left" @click="manager.previousPage()">Previous</Button>
 								<Button appearance="primary"> {{ manager.currPage }} </Button>
@@ -193,21 +198,25 @@ import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
 import { inject, ref } from 'vue'
 import TicketListItem from '@/components/desk/tickets/TicketListItem.vue'
+import TicketListItemSkeleton from '@/components/desk/tickets/TicketListItemSkeleton.vue'
 import ListManager from '@/components/global/ListManager.vue'
+import LoadingText from 'frappe-ui/src/components/LoadingText.vue'
 
 export default {
 	name: 'Tickets',
 	components: {
-		Input,
-		Dialog,
-		NewTicketDialog,
-		CustomIcons,
-		Dropdown,
-		FeatherIcon,
-		FilterBox,
-		ListManager,
-		TicketListItem
-	},
+    Input,
+    Dialog,
+    NewTicketDialog,
+    CustomIcons,
+    Dropdown,
+    FeatherIcon,
+    FilterBox,
+    ListManager,
+    TicketListItem,
+	TicketListItemSkeleton,
+    LoadingText
+},
 	setup() {
 		const user = inject('user')
 		const tickets = inject('tickets')
