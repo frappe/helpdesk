@@ -181,7 +181,6 @@ export default {
 		const viewportWidth = inject('viewportWidth')
 		const user = inject('user')
 		const tickets = inject('tickets')
-		const ticketController = inject('ticketController')
 		const attachments = ref([])
 
 		const tempTextEditorData = ref({})
@@ -191,7 +190,6 @@ export default {
 			viewportWidth,
 			user,
 			tickets,
-			ticketController,
 			attachments,
 			tempTextEditorData
 		}
@@ -210,16 +208,28 @@ export default {
 					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
+		},
+		markTicketAsSeen() {
+			return {
+				method: 'frappedesk.api.ticket.mark_ticket_as_seen'
+			}
+		},
+		ticket() {
+			return {
+				type: 'document',
+				doctype: 'Ticket',
+				name: this.ticketId
+			}
 		}
 	},
 	mounted() {
-		if (this.ticketController.markAsSeen) {
-			this.ticketController.markAsSeen(this.ticketId)
-		}
+		this.$resources.markTicketAsSeen.submit({
+			ticket_id: this.ticketId
+		})
 	},
 	computed: {
 		ticket() {
-			return this.tickets[this.ticketId] || null
+			return this.$resources.ticket.doc || null
 		},
 		sendButtonDissabled() {
 			let content = this.content.trim()

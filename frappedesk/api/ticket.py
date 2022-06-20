@@ -6,57 +6,6 @@ from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import log_ti
 from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
 
 @frappe.whitelist(allow_guest=True)
-def get_tickets():
-	all_tickets = frappe.db.sql(
-		"""
-		SELECT
-			ticket.subject,
-			ticket.modified,
-			ticket.status,
-			ticket.name,
-			ticket.ticket_type,
-			ticket.priority,
-			ticket.resolution_by,
-			ticket.response_by,
-			ticket.agreement_status,
-			ticket.contact,
-			ticket.template,
-			ticket.agent_group,
-			ticket.first_responded_on,
-			ticket.notes,
-			ticket.raised_by,
-			ticket.feedback_submitted,
-			ticket.satisfied,
-			ticket.customer_feedback,
-			ticket._seen
-		FROM `tabTicket` ticket
-		ORDER BY ticket.creation desc
-	""",
-		as_dict=1,
-	)
-
-	# TODO: optimize this (try using sql query)
-	for ticket in all_tickets:
-		seen = ticket._seen
-		if seen:
-			seen = json.loads(seen)
-		ticket["seen"] = frappe.session.user in (seen or [])
-
-		ticket_custom_field = frappe.qb.DocType("Ticket Custom Field")
-		ticket["custom_fields"] = (
-			frappe.qb.from_(ticket_custom_field)
-			.select("*")
-			.where(ticket_custom_field.parent == ticket.name)
-			.run(as_dict=True)
-		)
-
-		ticket["assignees"] = get_agent_assigned_to_ticket(ticket["name"])
-		ticket["contact"] = get_contact(ticket["name"])
-
-	return all_tickets
-
-
-@frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)
 	ticket_doc = ticket_doc.__dict__

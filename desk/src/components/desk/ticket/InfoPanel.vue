@@ -233,7 +233,7 @@ export default {
 	},
 	computed: {
 		ticket() {
-			return this.tickets[this.ticketId] || null
+			return this.$resources.ticket.data || null
 		},
 		contactFullName() {
 			if (this.ticket.contact) {
@@ -277,6 +277,8 @@ export default {
 				this.query = ''
 				this.updatingContact = false
 				this.$resources.otherTicketsOfContact.fetch()
+
+				this.$resources.ticket.fetch()
 			})
 		},
 		contactCreated(contact) {
@@ -295,6 +297,15 @@ export default {
 				auto: true
 			}
 		},
+		ticket() {
+			return {
+				method: 'frappedesk.api.ticket.get_ticket',
+				params: {
+					ticket_id: this.ticketId
+				},
+				auto: true
+			}
+		}
 	}
 }
 </script>

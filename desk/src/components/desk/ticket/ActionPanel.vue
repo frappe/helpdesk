@@ -177,7 +177,7 @@
 					<Input type="text" v-model="newType" placeholder="eg: Bug" />
 					<div class="flex float-right space-x-2">
 						<Button @click="createAndAssignTicketTypeFromDialog()">Create and Assign</Button>
-						<Button @click="createTicketFromDialog()" appearance="primary">Create</Button>
+						<Button @click="createTicketTypeFromDialog()" appearance="primary">Create</Button>
 					</div>
 				</div>
 			</template>
@@ -274,8 +274,19 @@ export default {
 	},
 	computed: {
 		ticket() {
-			return this.tickets[this.ticketId] || null
+			return this.$resources.ticket.data || null
 		}
+	},
+	resources: {
+		ticket() {
+			return {
+				method: 'frappedesk.api.ticket.get_ticket',
+				params: {
+					ticket_id: this.ticketId,
+				},
+				auto: true
+			}
+		},
 	},
 	methods: {
 		updateNotes(value) {
@@ -286,11 +297,12 @@ export default {
 				this.updatingTicketType = true
 				this.ticketController.set(this.ticketId, 'type', this.newType).then(() => {
 					this.updatingTicketType = false
+					this.$resources.ticket.fetch()
 				})
 				this.closeCreateNewTicketTypeDialog();
 			}
 		},
-		createTicketFromDialog() {
+		createTicketTypeFromDialog() {
 			if (this.newType) {
 				this.ticketController.new('type', this.newType)
 				this.closeCreateNewTicketTypeDialog();
@@ -311,6 +323,7 @@ export default {
 				this.updatingStatus = true
 				this.ticketController.set(this.ticketId, 'status', status).then(() => {
 					this.updatingStatus = false
+					this.$resources.ticket.fetch()
 				})
 			}
 		},
@@ -328,6 +341,7 @@ export default {
 							this.updatingAssignee = true;
 							this.ticketController.set(this.ticketId, 'agent', agent.name).then(() => {
 								this.updatingAssignee = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -344,6 +358,7 @@ export default {
 									this.updatingAssignee = true;
 									this.ticketController.set(this.ticketId, 'agent').then(() => {
 										this.updatingAssignee = false
+										this.$resources.ticket.fetch()
 									})
 								}
 							},
@@ -377,6 +392,7 @@ export default {
 							this.updatingTicketType = true;
 							this.ticketController.set(this.ticketId, 'type', type.name).then(() => {
 								this.updatingTicketType = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -416,6 +432,7 @@ export default {
 							this.updatingPriority = true
 							this.ticketController.set(this.ticketId, 'priority', priority.name).then(() => {
 								this.updatingPriority = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -440,6 +457,7 @@ export default {
 							this.updatingTeam = true
 							this.ticketController.set(this.ticketId, 'group', group.name).then(() => {
 								this.updatingTeam = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -474,8 +492,6 @@ export default {
 					return 'Failed'
 				default:
 					return ''
-
-
 			}
 		}
 	}
