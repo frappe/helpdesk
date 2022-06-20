@@ -88,7 +88,7 @@
 			>
 				<div>
 					<div class="text-base flex flex-row-reverse">
-						<div class="cursor-pointer h-[26px] w-[26px]">
+						<div class="h-[26px] w-[26px]">
 							<div v-if="assignees.length > 0">
 								<div v-for="assignee in assignees" :key="assignee">
 									<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" />
