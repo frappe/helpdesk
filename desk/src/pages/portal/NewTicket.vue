@@ -195,8 +195,20 @@ export default {
 			element[0].getElementsByClassName("ql-editor")[0].focus()
 		},
 		submitTicket() {
+			this.setAutoSetFields()
 			if (this.validateTicketForm()) {
 				this.newTicketSubmitLoading = this.ticketController.newTicket(this.formData, this.template.name, this.attachments.map(x => x.name))
+			}
+		},
+		setAutoSetFields() {
+			if (this.template.fields) {
+				this.template.fields.forEach((field) => {
+					if (field.auto_set && field.auto_set_via === "Frontend (JS)") {
+						const foo = new Function(field.value_frontend)
+						const value = foo()
+						this.formData[field.fieldname] = value || "None"
+					}
+				})
 			}
 		},
 		validateTicketForm() {

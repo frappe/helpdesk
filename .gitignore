@@ -32,3 +32,5 @@ MANIFEST
 frappedesk/public/desk
 frappedesk/public/node_modules
 frappedesk/www/frappedesk/index.html
+
+node_modules/

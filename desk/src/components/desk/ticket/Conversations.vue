@@ -47,6 +47,7 @@ export default {
 	resources: {
 		conversations() {
 			return {
+				cache: ['Ticket', 'Conversations', this.ticketId],
 				method: 'frappedesk.api.ticket.get_conversations',
 				params: {
 					ticket_id: this.ticketId

@@ -94,9 +94,15 @@
 			<div class="h-full flex flex-col">
 				<div class="p-[16px] border-t border-b" v-if="ticket.custom_fields.length > 0">
 					<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
-					<div class="space-y-[12px]">
-							<div class="flex flex-col space-y-[8px] font-normal text-[12px]" v-for="field in ticket.custom_fields" :key="field">
-								<div class="text-gray-600 text-base">{{ field.label }}</div>
+					<div class="space-y-[12px] text-[12px]">
+						<div class="space-y-[12px]">
+							<div class="flex flex-col space-y-[8px] font-normal hover:underline" v-for="field in ticket.custom_fields.filter((field) => {return (field.is_action_field == '1')})" :key="field.fieldname">
+								<a :title="field.value" :href="field.route" target="_blank" >{{ field.label }}</a>
+							</div>
+						</div>
+						<div class="space-y-[12px]">
+							<div class="flex flex-col space-y-[8px] font-normal" v-for="field in ticket.custom_fields.filter((field) => {return (field.is_action_field != '1')})" :key="field.fieldname">
+								<div class="text-gray-600">{{ field.label }}</div>
 								<div v-if="field.route" class="w-fit flex flex-row items-center space-x-[12px] cursor-pointer hover:underline">
 									<FeatherIcon name="external-link" class="w-[14px] h-[14px] stroke-gray-500" />
 									<div class="w-[200px] truncate">
@@ -112,6 +118,7 @@
 									</div>
 								</div>
 							</div>
+						</div>
 					</div>
 				</div>
 				<div class="shrink-0 border-b p-[16px] space-y-1 select-none" v-if="otherTicketsOfContact">
@@ -123,7 +130,7 @@
 						<div v-for="(_ticket, index) in otherTicketsOfContact" :key="_ticket.name" :set="maxCount = 5">
 							<router-link 
 								v-if="index <= maxCount" 
-								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?raised_by=${ticket.contact.name}`" 
+								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?contact=${ticket.contact.name}`" 
 								class="text-[12px] rounded"
 							>
 								<div class="py-[1px]">
@@ -226,7 +233,7 @@ export default {
 	},
 	computed: {
 		ticket() {
-			return this.tickets[this.ticketId] || null
+			return this.$resources.ticket.data || null
 		},
 		contactFullName() {
 			if (this.ticket.contact) {
@@ -270,6 +277,8 @@ export default {
 				this.query = ''
 				this.updatingContact = false
 				this.$resources.otherTicketsOfContact.fetch()
+
+				this.$resources.ticket.fetch()
 			})
 		},
 		contactCreated(contact) {
@@ -288,13 +297,16 @@ export default {
 				auto: true
 			}
 		},
+		ticket() {
+			return {
+				cache: ['Ticket', 'Action Panel', this.ticketId],
+				method: 'frappedesk.api.ticket.get_ticket',
+				params: {
+					ticket_id: this.ticketId
+				},
+				auto: true
+			}
+		}
 	}
 }
 </script>
-
-<style>
-.title {
-	
-}
-
-</style>

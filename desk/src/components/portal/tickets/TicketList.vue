@@ -4,7 +4,7 @@
 			<div class="flex items-center border-b py-4 text-gray-500">
 				<div class="sm:w-8/12">
 					<div class="cursor-pointer w-fit hover:text-gray-700" @click="changeSortBy('subject')">
-						<div class="flex items-center space-x-1">
+						<div class="flex text-base items-center space-x-1">
 							<div> Subject </div>
 							<FeatherIcon v-if="sortBy == 'subject'" :name="sortAscending ? 'arrow-up' : 'arrow-down'" class="w-4 h-4"/>
 						</div>
@@ -12,7 +12,7 @@
 				</div>
 				<div class="sm:w-2/12">
 					<div class="cursor-pointer w-fit hover:text-gray-700" @click="changeSortBy('status')">
-						<div class="flex items-center space-x-1">
+						<div class="flex text-base items-center space-x-1">
 							<div> Status </div>
 							<FeatherIcon v-if="sortBy == 'status'" :name="sortAscending ? 'arrow-up' : 'arrow-down'" class="w-4 h-4"/>
 						</div>
@@ -20,7 +20,7 @@
 				</div>
 				<div class="sm:w-2/12 flow-root">
 					<div class="float-right cursor-pointer w-fit hover:text-gray-700" @click="changeSortBy('creation')">
-						<div class="flex items-center space-x-1">
+						<div class="flex items-center space-x-1 text-base">
 							<FeatherIcon v-if="sortBy == 'creation'" :name="sortAscending ? 'arrow-up' : 'arrow-down'" class="w-4 h-4"/>
 							<div> Created </div>
 						</div>
@@ -34,14 +34,14 @@
 					<router-link :to="`/support/tickets/${ticket.name}`">
 						<div class="px-1 rounded hover:bg-slate-50 cursor-pointer">
 							<div class="flex items-center py-4" :class="index < Object.keys(tickets).length - 1 ? 'border-b' : ''">
-								<div class="sm:w-8/12 flex space-x-2 pr-2">
+								<div class="sm:w-8/12 flex space-x-2 pr-2 text-base">
 									<div class="truncate">{{ ticket.subject }}</div>
 									<div>{{ `#${ticket.name}` }}</div>
 								</div>
 								<div class="sm:w-2/12">
-									<Badge :color="getStatusBadgeColor(ticket.status)">{{ getStatus(ticket.status) }}</Badge>
+									<Badge class="text-[12px]" :color="getStatusBadgeColor(ticket.status)">{{ getStatus(ticket.status) }}</Badge>
 								</div>
-								<div class="sm:w-2/12 flow-root">
+								<div class="sm:w-2/12 flow-root text-base">
 									<div class="float-right text-slate-500">{{ $dayjs.longFormating($dayjs(ticket.creation).fromNow()) }}</div>
 								</div>
 							</div>
