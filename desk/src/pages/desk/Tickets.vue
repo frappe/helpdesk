@@ -251,9 +251,19 @@ export default {
 				onSuccess: () => {
 					this.$refs.ticketList.selectedItems = []
 					this.$refs.ticketList.manager.reload()
+
+					this.$toast({
+						title: 'Tickets marked as closed.',
+						customIcon: 'circle-check',
+						appearance: 'success',
+					})
 				},
 				onFailure: () => {
-					// TODO:
+					this.$toast({
+						title: 'Unable to mark tickets as closed.',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
 				}
 			}
 		},
@@ -263,9 +273,19 @@ export default {
 				onSuccess: () => {
 					this.$refs.ticketList.selectedItems = []
 					this.$refs.ticketList.manager.reload()
+
+					this.$toast({
+						title: 'Tickets assigned to agent.',
+						customIcon: 'circle-check',
+						appearance: 'success',
+					})
 				},
 				onFailure: () => {
-					// TODO:
+					this.$toast({
+						title: 'Unable to assign tickets to agent.',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
 				}
 			}
 		},

@@ -168,7 +168,15 @@
 						</template>
 					</Dropdown>
 				</div>
-				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="(newValue) => { ticketController.set(this.ticketId, 'notes', newValue) }" />
+				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="(newValue) => { 
+					ticketController.set(this.ticketId, 'notes', newValue).then(() => {
+						$toast({
+							title: 'Ticket updated successfully.',
+							customIcon: 'circle-check',
+							appearance: 'success',
+						})
+					})
+				}" />
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -299,6 +307,12 @@ export default {
 				this.ticketController.set(this.ticketId, 'type', this.newType).then(() => {
 					this.updatingTicketType = false
 					this.$resources.ticket.fetch()
+
+					this.$toast({
+						title: 'Ticket updated successfully.',
+						customIcon: 'circle-check',
+						appearance: 'success',
+					})
 				})
 				this.closeCreateNewTicketTypeDialog();
 			}
@@ -325,6 +339,12 @@ export default {
 				this.ticketController.set(this.ticketId, 'status', status).then(() => {
 					this.updatingStatus = false
 					this.$resources.ticket.fetch()
+
+					this.$toast({
+						title: 'Ticket updated successfully.',
+						customIcon: 'circle-check',
+						appearance: 'success',
+					})
 				})
 			}
 		},
@@ -343,6 +363,12 @@ export default {
 							this.ticketController.set(this.ticketId, 'agent', agent.name).then(() => {
 								this.updatingAssignee = false
 								this.$resources.ticket.fetch()
+
+								this.$toast({
+									title: 'Ticket updated successfully.',
+									customIcon: 'circle-check',
+									appearance: 'success',
+								})
 							})
 						},
 					});
@@ -360,6 +386,12 @@ export default {
 									this.ticketController.set(this.ticketId, 'agent').then(() => {
 										this.updatingAssignee = false
 										this.$resources.ticket.fetch()
+					
+										this.$toast({
+											title: 'Ticket updated successfully.',
+											customIcon: 'circle-check',
+											appearance: 'success',
+										})
 									})
 								}
 							},
@@ -394,6 +426,12 @@ export default {
 							this.ticketController.set(this.ticketId, 'type', type.name).then(() => {
 								this.updatingTicketType = false
 								this.$resources.ticket.fetch()
+
+								this.$toast({
+									title: 'Ticket updated successfully.',
+									customIcon: 'circle-check',
+									appearance: 'success',
+								})
 							})
 						},
 					});
@@ -434,6 +472,12 @@ export default {
 							this.ticketController.set(this.ticketId, 'priority', priority.name).then(() => {
 								this.updatingPriority = false
 								this.$resources.ticket.fetch()
+
+								this.$toast({
+									title: 'Ticket updated successfully.',
+									customIcon: 'circle-check',
+									appearance: 'success',
+								})
 							})
 						},
 					});
@@ -459,6 +503,12 @@ export default {
 							this.ticketController.set(this.ticketId, 'group', group.name).then(() => {
 								this.updatingTeam = false
 								this.$resources.ticket.fetch()
+
+								this.$toast({
+									title: 'Ticket updated successfully.',
+									customIcon: 'circle-check',
+									appearance: 'success',
+								})
 							})
 						},
 					});
