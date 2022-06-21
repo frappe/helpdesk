@@ -77,29 +77,24 @@
 	</div>
 </template>
 <script>
-import { Dropdown, FeatherIcon, Dialog } from 'frappe-ui'
+import { Dropdown } from 'frappe-ui'
 import { inject, ref } from 'vue'
 import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import ListManager from '@/components/global/ListManager.vue'
-import LoadingText from 'frappe-ui/src/components/LoadingText.vue'
 
 export default {
 	name: 'Tickets',
 	components: {
-		Dialog,
 		NewTicketDialog,
 		Dropdown,
-		FeatherIcon,
 		FilterBox,
 		ListManager,
-		TicketList,
-		LoadingText
+		TicketList
 	},
 	setup() {
 		const user = inject('user')
-		const tickets = inject('tickets')
 		const showNewTicketDialog = ref(false)
 
 		const filters = ref([])
@@ -111,14 +106,8 @@ export default {
 		const agents = inject('agents')
 		const contacts = inject('contacts')
 
-		const viewportWidth = inject('viewportWidth')
-
-		const showSelectAllCheckbox = ref(false)
-
 		return {
-			showSelectAllCheckbox,
 			user, 
-			tickets, 
 			showNewTicketDialog, 
 			filters, 
 			toggleFilters,
@@ -126,8 +115,7 @@ export default {
 			ticketPriorities,
 			ticketStatuses,
 			agents,
-			contacts,
-			viewportWidth
+			contacts
 		}
 	},
 	mounted() {
