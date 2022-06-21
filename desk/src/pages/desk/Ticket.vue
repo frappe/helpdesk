@@ -78,12 +78,19 @@
 							<div v-if="editing">
 								<div class="flex flex-row space-x-[14px]">
 									<Button 
-										:loading="this.$resources.submitConversation.loading" 
-										@click="this.submitConversation" 
+										:loading="$resources.submitConversation.loading" 
+										@click="submitConversation()" 
 										appearance="primary" 
-										:disabled="(!user.agent && !user.isAdmin) || sendButtonDissabled"
+										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
 									>
 										Send
+									</Button>
+									<Button 
+										@click="submitComment()"
+										appearance="secondary" 
+										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
+									>
+										Add Comment
 									</Button>
 									<Button appearance="secondary" @click="cancelEditing()">
 										Cancel
@@ -209,6 +216,19 @@ export default {
 				}
 			}
 		},
+		submitComment() {
+			return {
+				method: 'frappe.client.insert',
+				onSuccess: () => {
+					this.tempTextEditorData = {}
+				},
+				onError: () => {
+					var element = document.getElementsByClassName("ql-editor");
+					element[0].innerHTML = this.tempTextEditorData.innerHTML;
+					this.attachments = this.tempTextEditorData.attachments
+				}
+			}
+		},
 		markTicketAsSeen() {
 			return {
 				method: 'frappedesk.api.ticket.mark_ticket_as_seen'
@@ -231,7 +251,7 @@ export default {
 		ticket() {
 			return this.$resources.ticket.doc || null
 		},
-		sendButtonDissabled() {
+		sendingDeissabled() {
 			let content = this.content.trim()
 			return (content == "" || content == "<p><br></p>") && this.attachments.length == 0
 		}
@@ -269,6 +289,25 @@ export default {
 				ticket_id: this.ticketId,
 				message: this.content,
 				attachments: this.attachments.map(x => x.name)
+			})
+
+			element[0].innerHTML = "";
+			this.attachments = []
+		},
+		submitComment() {
+			var element = document.getElementsByClassName("ql-editor");
+
+			this.tempTextEditorData.attachments = this.attachments
+			this.tempTextEditorData.innerHTML = element[0].innerHTML
+
+			this.$resources.submitComment.submit({
+				doc: {
+					doctype: 'Comment',
+					comment_type: 'Comment',
+					reference_doctype: 'Ticket',
+					reference_name: this.ticketId,
+					content: this.content
+				}
 			})
 
 			element[0].innerHTML = "";

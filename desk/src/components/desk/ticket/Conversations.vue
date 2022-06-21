@@ -7,13 +7,25 @@
 					ref="conversationContainer"
 				>
 					<div :ref="`conversation-${index}`">
-						<ConversationCard 
-							:userName="getUserName(conversation)" 
-							:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
-							:time="conversation.creation" 
-							:message="conversation.content"
-							:attachments="conversation.attachments"
-							:isLast="index == conversation.length - 1"
+						<div 
+							v-if="conversation.type == 'Communication'" 
+							class="border-gray-100" 
+							:class="`
+								${(index != 0) && conversations[index - 1].type === 'Comment' ? 'border-t' : ''} 
+								${(index != conversations.length - 1) ? 'border-b' : ''}
+							`"
+						>
+							<ConversationCard 
+								:userName="getUserName(conversation)" 
+								:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
+								:time="conversation.creation" 
+								:message="conversation.content"
+								:attachments="conversation.attachments"
+							/>
+						</div>
+						<CommentCard 
+							v-else
+							:comment="conversation"
 						/>
 					</div>
 				</div>
@@ -30,6 +42,7 @@
 import ConversationCard from "./ConversationCard.vue"
 import { LoadingText } from 'frappe-ui'
 import { ref } from 'vue'
+import CommentCard from './CommentCard.vue'
 
 export default {
 	name: "Conversations",
@@ -37,6 +50,7 @@ export default {
 	components: {
 		ConversationCard,
 		LoadingText,
+		CommentCard
 	},
 	setup() {
 		const userColors = ref({})
@@ -45,7 +59,7 @@ export default {
 		return { userColors, lastColorIndex }
 	},
 	resources: {
-		conversations() {
+		communications() {
 			return {
 				cache: ['Ticket', 'Conversations', this.ticketId],
 				method: 'frappedesk.api.ticket.get_conversations',
@@ -55,16 +69,47 @@ export default {
 				auto: true
 			}
 		},
+		comments() {
+			return {
+				cache: ['Ticket', 'Comments', this.ticketId],
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Comment',
+					fields: ['*'],
+					filters: {
+						comment_type: 'Comment',
+						reference_name: this.ticketId
+					},
+					order_by: 'creation asc',
+				},
+				auto: true,
+			}
+		}
 	},
 	computed: {
 		conversations() {
-			if (this.autoScroll) {
-				this.$nextTick(() => {
-					this.autoScrollToBottom();
-				})
-			}
-			return this.$resources.conversations.data || null;
+			this.$nextTick(() => {
+				this.autoScrollToBottom();
+			})
+			const communications = this.communications.map((x) => {
+				x.type = 'Communication'
+				return x
+			}) 
+			const comments = this.comments.map((x) =>  {
+				x.type = 'Comment'
+				return x
+			})
+			const conversations = [...communications, ...comments].sort((a, b) => (new Date(a.creation) - new Date(b.creation))) || []
+			console.log(conversations)
+			return conversations
 		},
+		communications() {
+			return this.$resources.communications.data || []
+
+		},
+		comments() {
+			return this.$resources.comments.data || []
+		}
 	},
 	watch: {
 		scrollToBottom(scroll) {
@@ -75,8 +120,11 @@ export default {
 	},
 	mounted() {
 		this.$socket.on('list_update', (data) => {
-			if (data['doctype'] == 'Ticket' && data['name'] == this.ticketId) {
-				this.$resources.conversations.fetch()
+			if (data['doctype'] === 'Ticket' && data['name'] == this.ticketId) {
+				this.$resources.communications.fetch()
+			}
+			if (data['doctype'] === 'Comment') {
+				this.$resources.comments.fetch()
 			}
 		});
 	},
