@@ -15,6 +15,10 @@ export let Toasts = {
 	)
   },
 }
+export function clearToasts() {
+	const root = document.getElementById('frappeui-toast-root')
+	root.innerHTML = ''
+}
 
 export function createToast(options) {
 	let toast = reactive({

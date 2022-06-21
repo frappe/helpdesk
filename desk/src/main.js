@@ -4,7 +4,7 @@ import router from './router'
 import App from './App.vue'
 import './index.css'
 import { dayjs } from '@/utils'
-import { createToast } from '@/utils/toasts'
+import { createToast, clearToasts } from '@/utils/toasts'
 
 let app = createApp(App)
 
@@ -15,5 +15,6 @@ app.component('Button', Button)
 
 app.config.globalProperties.$dayjs = dayjs
 app.config.globalProperties.$toast = createToast
+app.config.globalProperties.$clearToasts = clearToasts
 
 app.mount('#app')
