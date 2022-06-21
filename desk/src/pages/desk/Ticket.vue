@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="ticket" class="flex flex-col h-screen">
+		<div v-if="ticket" class="flex flex-col h-screen grow-0">
 			<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px] h-[64px]">
 			</div>
 			<div
@@ -11,7 +11,7 @@
 				<div class="border-r w-[252px] shrink-0">
 					<ActionPanel :ticketId="ticket.name" />
 				</div>
-				<div class="grow flex flex-col h-full">
+				<div class="grow flex flex-col h-full overflow-x-scroll" :style="{ width: 'calc(100vh - 252px - 240px - 252px)' }">
 					<div class="border-b py-[14px] px-[18px]">
 						<div class="flex flex-row justify-between">
 							<div class="grow">
@@ -19,25 +19,16 @@
 									<div>
 										<CustomIcons name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
 									</div>
-									<div class="group select-none">
-										<div class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
-											{{ ticket.subject }}
-										</div>
-										<div class="lg:max-w-[500px] sm:max-w-[200px] text-base hidden py-[8px] px-[12px] absolute z-50 bg-white border rounded shadow mt-[9px] group-hover:block">
-											<p>{{ ticket.subject }}</p>
-										</div>
-									</div>
+									<a :title="ticket.subject" class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
+										{{ ticket.subject }}
+									</a>
 								</div>
-							</div>
-							<div class="flex flex-row items-center space-x-[8px]">
-								<Button icon="chevron-left" appearance="minimal"/>
-								<Button icon="chevron-right" appearance="minimal"/>
-								<Button icon="more-horizontal" appearance="minimal"/>
 							</div>
 						</div>
 					</div>
 					<div class="grow overflow-scroll px-[18px]">
-						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" />
+						<CustomerSatisfactionFeedback :fromDesk="true" v-if="ticket.feedback_submitted && ['Closed', 'Resolved'].includes(ticket.status)" class="mt-[10px]" :editable="false" :ticket="ticket"/>
+						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" :autoScroll="['Open', 'Replied'].includes(ticket.status)" />
 					</div>
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
 						<div>
@@ -128,6 +119,7 @@ import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
 import { QuillEditor } from '@vueup/vue-quill'
+import CustomerSatisfactionFeedback from '@/components/portal/ticket/CustomerSatisfactionFeedback.vue';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
 
@@ -145,7 +137,8 @@ export default {
 		InfoPanel,
 		ActionPanel,
 		CustomIcons,
-		QuillEditor
+		QuillEditor,
+		CustomerSatisfactionFeedback
 	},
 	data() {
 		return {
@@ -195,7 +188,6 @@ export default {
 		const viewportWidth = inject('viewportWidth')
 		const user = inject('user')
 		const tickets = inject('tickets')
-		const ticketController = inject('ticketController')
 		const attachments = ref([])
 
 		const tempTextEditorData = ref({})
@@ -205,7 +197,6 @@ export default {
 			viewportWidth,
 			user,
 			tickets,
-			ticketController,
 			attachments,
 			tempTextEditorData
 		}
@@ -216,6 +207,7 @@ export default {
 				method: 'frappedesk.api.ticket.submit_conversation_via_agent',
 				onSuccess: () => {
 					this.tempTextEditorData = {}
+					this.editing = false
 				},
 				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
@@ -236,16 +228,28 @@ export default {
 					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
+		},
+		markTicketAsSeen() {
+			return {
+				method: 'frappedesk.api.ticket.mark_ticket_as_seen'
+			}
+		},
+		ticket() {
+			return {
+				type: 'document',
+				doctype: 'Ticket',
+				name: this.ticketId
+			}
 		}
 	},
 	mounted() {
-		if (this.ticketController.markAsSeen) {
-			this.ticketController.markAsSeen(this.ticketId)
-		}
+		this.$resources.markTicketAsSeen.submit({
+			ticket_id: this.ticketId
+		})
 	},
 	computed: {
 		ticket() {
-			return this.tickets[this.ticketId] || null
+			return this.$resources.ticket.doc || null
 		},
 		sendingDeissabled() {
 			let content = this.content.trim()

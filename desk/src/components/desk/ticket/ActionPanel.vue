@@ -1,5 +1,5 @@
 <template>
-	<div v-if="ticket">
+	<div v-if="ticket" class="flex flex-col h-full">
 		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] border-b border-dashed">
 			<div class="flex flex-row pb-[15px]">
 				<div class="grow"><span class="text-[16px] font-normal text-gray-500">Ticket</span> <span class="text-[15px] font-semibold">{{ `#${ticket.name}` }}</span></div>
@@ -25,10 +25,10 @@
 								</div>
 							</div>
 							<div v-if="toggleStatuese">
-								<div class="rounded-[10px] shadow bg-white py-[4px] space-y-[4px] mt-[3px] absolute z-50">
+								<div class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50 bg-white">
 									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
 										<div 
-											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
+											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[85px]"
 											@click="updateStatus(status)"
 										> 
 											{{ status }} 
@@ -59,9 +59,11 @@
 				</div>
 			</div>
 		</div>
-		<span class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"></span>
-		<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
-		<div class="px-[19px] py-[28px]">
+		<div>
+			<span class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"></span>
+			<span class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"></span>
+		</div>
+		<div class="px-[19px] py-[28px] h-full overflow-y-auto">
 			<div class="text-base space-y-[12px]">
 				<div v-if="this.user.agent">
 					<router-link class="hover:underline" :to="{ path: '/support/impersonate', query: {contact: ticket.raised_by, ticketId: ticket.name}}" target="_blank">See On Support Portal</router-link>
@@ -92,12 +94,15 @@
 						</template>
 					</Dropdown>
 				</div>
-				<div class="flex flex-col space-y-[8px]">
-					<div class="text-gray-600 font-normal text-[12px]">Type</div>
+				<div class="flex flex-col space-y-[8px]" :class="mandatoryFieldsNotSet && !ticket.ticket_type ? 'error-animation' : ''">
+					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
+						<div :class="(mandatoryFieldsNotSet && !ticket.ticket_type) ? 'text-red-600' : 'text-gray-600'">Type*</div>
+					</div>
 					<Dropdown
 						v-if="ticketTypes"
 						:options="typesAsDropdownOptions()" 
 						class="text-base font-normal w-[213px] bg-gray-50 hover:bg-gray-100 pl-[9px] pr-[9.3px] cursor-pointer rounded-[6px]"
+						:class="mandatoryFieldsNotSet && !ticket.ticket_type ? 'border border-red-500' : ''"
 					>
 						<template v-slot="{ toggleTicketTypes }" @click="toggleTicketTypes" class="w-full">
 							<div class="flex flex-row py-1 space-x-1 items-center w-full">
@@ -116,7 +121,9 @@
 					</Dropdown>
 				</div>
 				<div class="flex flex-col space-y-[8px]">
-					<div class="text-gray-600 font-normal text-[12px]">Team</div>
+					<div class="flex flex-row justify-between text-gray-600 font-normal text-[12px]">
+						<div>Team</div>
+					</div>
 					<Dropdown
 						v-if="agentGroups"
 						:options="agentGroupsAsDropdownOptions()" 
@@ -170,7 +177,7 @@
 					<Input type="text" v-model="newType" placeholder="eg: Bug" />
 					<div class="flex float-right space-x-2">
 						<Button @click="createAndAssignTicketTypeFromDialog()">Create and Assign</Button>
-						<Button @click="createTicketFromDialog()" appearance="primary">Create</Button>
+						<Button @click="createTicketTypeFromDialog()" appearance="primary">Create</Button>
 					</div>
 				</div>
 			</template>
@@ -228,6 +235,9 @@ export default {
 
 		const notes = ref('')
 
+		const mandatoryFields = ref(['ticket_type'])
+		const mandatoryFieldsNotSet = ref(false)
+
 		return {
 			viewportWidth,
 
@@ -248,13 +258,36 @@ export default {
 			updatingTeam,
 			toggleStatuese,
 
-			notes
+			notes,
+
+			mandatoryFields,
+			mandatoryFieldsNotSet
 		}
+	},
+	updated() {
+		var elems = document.querySelectorAll(".error-animation");
+		setTimeout(function() {
+			[].forEach.call(elems, function(el) {
+				el.classList.remove("error-animation");
+			});
+		}, 820)
 	},
 	computed: {
 		ticket() {
-			return this.tickets[this.ticketId] || null
+			return this.$resources.ticket.data || null
 		}
+	},
+	resources: {
+		ticket() {
+			return {
+				cache: ['Ticket', 'Action Panel', this.ticketId],
+				method: 'frappedesk.api.ticket.get_ticket',
+				params: {
+					ticket_id: this.ticketId,
+				},
+				auto: true
+			}
+		},
 	},
 	methods: {
 		updateNotes(value) {
@@ -265,11 +298,12 @@ export default {
 				this.updatingTicketType = true
 				this.ticketController.set(this.ticketId, 'type', this.newType).then(() => {
 					this.updatingTicketType = false
+					this.$resources.ticket.fetch()
 				})
 				this.closeCreateNewTicketTypeDialog();
 			}
 		},
-		createTicketFromDialog() {
+		createTicketTypeFromDialog() {
 			if (this.newType) {
 				this.ticketController.new('type', this.newType)
 				this.closeCreateNewTicketTypeDialog();
@@ -280,10 +314,19 @@ export default {
 			this.openCreateNewTicketTypeDialog = false
 		},
 		updateStatus(status) {
-			this.updatingStatus = true
-			this.ticketController.set(this.ticketId, 'status', status).then(() => {
-				this.updatingStatus = false
+			this.mandatoryFieldsNotSet = false
+			this.mandatoryFields.forEach(fieldname => {
+				if (!this.ticket[fieldname]) {
+					this.mandatoryFieldsNotSet = true
+				}
 			})
+			if (!this.mandatoryFieldsNotSet) {
+				this.updatingStatus = true
+				this.ticketController.set(this.ticketId, 'status', status).then(() => {
+					this.updatingStatus = false
+					this.$resources.ticket.fetch()
+				})
+			}
 		},
 		getStatusStyle(status) {
 			const color = {Open: '#38A160', Replied: '#FF7C36', Resolved: '#E24C4C', Closed: '#E24C4C'}[status]
@@ -299,6 +342,7 @@ export default {
 							this.updatingAssignee = true;
 							this.ticketController.set(this.ticketId, 'agent', agent.name).then(() => {
 								this.updatingAssignee = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -315,6 +359,7 @@ export default {
 									this.updatingAssignee = true;
 									this.ticketController.set(this.ticketId, 'agent').then(() => {
 										this.updatingAssignee = false
+										this.$resources.ticket.fetch()
 									})
 								}
 							},
@@ -348,6 +393,7 @@ export default {
 							this.updatingTicketType = true;
 							this.ticketController.set(this.ticketId, 'type', type.name).then(() => {
 								this.updatingTicketType = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -387,6 +433,7 @@ export default {
 							this.updatingPriority = true
 							this.ticketController.set(this.ticketId, 'priority', priority.name).then(() => {
 								this.updatingPriority = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -411,6 +458,7 @@ export default {
 							this.updatingTeam = true
 							this.ticketController.set(this.ticketId, 'group', group.name).then(() => {
 								this.updatingTeam = false
+								this.$resources.ticket.fetch()
 							})
 						},
 					});
@@ -445,8 +493,6 @@ export default {
 					return 'Failed'
 				default:
 					return ''
-
-
 			}
 		}
 	}
@@ -459,5 +505,29 @@ export default {
 		width: 10.5px;
 		border-radius: 0 10.5px 10.5px 0;
 		display: inline-block;
+	}
+	.error-animation {
+		animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+		transform: translate3d(0, 0, 0);
+		backface-visibility: hidden;
+		perspective: 1000px;
+	}
+
+	@keyframes shake {
+		10%, 90% {
+			transform: translate3d(-1px, 0, 0);
+		}
+
+		20%, 80% {
+			transform: translate3d(2px, 0, 0);
+		}
+
+		30%, 50%, 70% {
+			transform: translate3d(-4px, 0, 0);
+		}
+
+		40%, 60% {
+			transform: translate3d(4px, 0, 0);
+		}
 	}
 </style>

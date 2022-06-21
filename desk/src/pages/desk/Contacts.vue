@@ -19,7 +19,6 @@
 	</div>
 </template>
 <script>
-import { Input } from 'frappe-ui'
 import ContactList from '@/components/desk/contacts/ContactList.vue'
 import NewContactDialog from '@/components/desk/global/NewContactDialog.vue'
 import { inject, ref } from '@vue/runtime-core'
@@ -28,15 +27,13 @@ export default {
 	name: 'Contacts',
 	components: {
 		ContactList,
-		Input,
 		NewContactDialog
 	},
 	setup() {
 		const showNewContactDialog = ref(false)
-		const viewportWidth = inject('viewportWidth')
 		const contacts = inject('contacts')
 
-		return { showNewContactDialog, viewportWidth, contacts}
+		return { showNewContactDialog, contacts}
 	},
 	computed: {
 		contacts() {

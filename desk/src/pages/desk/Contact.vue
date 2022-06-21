@@ -35,7 +35,35 @@
 			</div>
 			<div class="pt-4">
 				<div class="mb-4 ml-4 font-semibold text-xl"> Tickets </div>
-				<TicketList :sortby="ticketsSortby" :sortDirection="ticketSsortDirection" :filters="ticketsFilters" @selected-tickets-on-change="() => {}" />
+				<ListManager
+					class="px-[16px]"
+					ref="ticketList"
+					:options="{
+						cache: ['Ticket', 'Contact', contactId],
+						doctype: 'Ticket',
+						fields: [
+							'priority', 
+							'name', 
+							'subject', 
+							'ticket_type', 
+							'status', 
+							'contact', 
+							'response_by', 
+							'resolution_by', 
+							'agreement_status', 
+							'modified', 
+							'_assign', 
+							'_seen'
+						],
+						filters: {'contact': ['=', contactId]},
+						limit: 20,
+						order_by: 'modified desc',
+					}"
+				>
+					<template #body="{ manager }">
+						<TicketList :manager="manager" />
+					</template>
+				</ListManager>
 			</div>
 		</div>
 		<div v-else class="p-5">
@@ -45,18 +73,19 @@
 </template>
 
 <script>
-import TicketList from "@/components/desk/tickets/TicketList.vue"
 import { LoadingText, FeatherIcon } from 'frappe-ui'
 import { ref } from 'vue'
-import router from '@/router';
+import ListManager from '@/components/global/ListManager.vue'
+import TicketList from '@/components/desk/tickets/TicketList.vue'
 
 export default {
 	name: 'Contact',
 	props: ['contactId'],
 	components: {
-		TicketList,
 		LoadingText,
-		FeatherIcon
+		FeatherIcon,
+		ListManager,
+		TicketList
 	},
 	setup(props) {
 		const ticketsSortby = ref('modified')

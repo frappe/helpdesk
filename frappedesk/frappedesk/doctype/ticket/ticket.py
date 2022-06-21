@@ -37,7 +37,7 @@ class Ticket(Document):
 		self.update_priority_based_on_ticket_type()
 
 	def after_insert(self):
-		log_ticket_activity(self.name, "Create")
+		log_ticket_activity(self.name, "created")
 
 	def on_update(self):
 		pass
@@ -161,7 +161,7 @@ class Ticket(Document):
 			"name": self.name
 		})
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
-		log_ticket_activity(self.name, f"Assigned to {agent_name}")
+		log_ticket_activity(self.name, f"assigned to {agent_name}")
 
 	def on_trash(self):
 		activities = frappe.db.get_all("Ticket Activity", {"Ticket": self.name})
@@ -174,7 +174,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 	if ticket_doc.status == 'Replied':
 		ticket_doc.status = 'Open'
-		log_ticket_activity(ticket, f"Status set to Open")
+		log_ticket_activity(ticket, f"status set to Open")
 		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")
@@ -323,7 +323,7 @@ def get_user_tickets(filters='{}', order_by='creation desc', impersonate=None):
 	if impersonate and frappe.db.exists("Agent", frappe.session.user):
 		filters['raised_by'] = ['=', impersonate]
 
-	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation'])
+	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'feedback_submitted', 'satisfied', 'customer_feedback'])
 	return tickets
 
 def get_ticket_list(

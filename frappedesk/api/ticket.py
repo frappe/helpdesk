@@ -1,44 +1,9 @@
-from dataclasses import fields
-import frappe
-from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
-from frappe.website.utils import cleanup_page_name
 import json
+import frappe
 
+from frappe.website.utils import cleanup_page_name
 from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
-
-@frappe.whitelist(allow_guest=True)
-def get_tickets():
-	all_tickets = frappe.db.sql("""
-		SELECT
-			ticket.subject,
-			ticket.modified,
-			ticket.status,
-			ticket.name,
-			ticket.ticket_type,
-			ticket.priority,
-			ticket.resolution_by,
-			ticket.response_by,
-			ticket.agreement_status,
-			ticket.contact,
-			ticket.template,
-			ticket.agent_group,
-			ticket.first_responded_on,
-			ticket.notes,
-			ticket.raised_by
-		FROM `tabTicket` ticket
-		ORDER BY ticket.creation desc
-	""", as_dict=1)
-
-	# TODO: optimize this (try using sql query)
-	for ticket in all_tickets:
-		assignees = get_agent_assigned_to_ticket(ticket['name'])
-		
-		ticket['seen'] = frappe.session.user in (frappe.get_value("Ticket", ticket['name'], '_seen') or [])
-		ticket['custom_fields'] = frappe.get_doc("Ticket", ticket.name, fields=['custom_fields']).custom_fields
-		ticket['assignees'] = assignees
-		ticket['contact'] = get_contact(ticket['name'])
-	
-	return all_tickets
+from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
 
 @frappe.whitelist(allow_guest=True)
 def get_ticket(ticket_id):
@@ -83,12 +48,15 @@ def create_new(values, template='Default', attachments=[], via_customer_portal=F
 	for field in template_fields:
 		if field.fieldname in ['subject', 'description']:
 			continue
-		if not field.auto_set:
+		if field.auto_set and field.auto_set_via == 'Backend (Python)':
+			continue
+		else:
 			ticket_doc.append('custom_fields', {
 				'label': field.label,
 				'fieldname': field.fieldname,
 				'value': values[field.fieldname],
-				'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else ''
+				'route': f'/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}' if field.fieldtype == 'Link' else '',
+				'is_action_field': field.is_action_field
 			})
 
 	ticket_doc.insert(ignore_permissions=True)
@@ -113,15 +81,21 @@ def update_contact(ticket_id, contact):
 
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
-	ticket_doc = frappe.get_doc("Ticket", ticket_id)
-	if ticket_doc._assign:
-		assignees = json.loads(ticket_doc._assign)
-		for assignee in assignees:
-			if (frappe.db.exists("Agent", assignee)):
-				agent = frappe.get_doc("Agent", assignee)
-				agent = agent.__dict__
-				agent['image'] = frappe.get_value("User", agent["name"], "user_image")
-				agents.append(agent)
+	assignee_list = frappe.db.get_value("Ticket", ticket_id, "_assign")
+	if assignee_list:
+		assignees = json.loads(assignee_list)
+
+		agent = frappe.qb.DocType("Agent")
+		user = frappe.qb.DocType("User")
+		query = (
+			frappe.qb.from_(agent)
+			.join(user)
+			.on(agent.name == user.name)
+			.select(agent.name, agent.agent_name, agent.group, user.user_image.as_("image"))
+			.where(agent.name.isin(assignees))
+		)
+		agents = query.run(as_dict=True)
+
 	return agents
 
 @frappe.whitelist()
@@ -161,7 +135,7 @@ def assign_ticket_type(ticket_id, type):
 			ticket_doc.ticket_type = check_and_create_ticket_type(type).name
 			ticket_doc.update_priority_based_on_ticket_type()
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Type set to {type}")
+			log_ticket_activity(ticket_id, f"type set to {type}")
 
 		return ticket_doc
 
@@ -173,7 +147,7 @@ def assign_ticket_status(ticket_id, status):
 		if ticket_doc.status != status:
 			ticket_doc.status = status
 			ticket_doc.save(ignore_permissions=True)
-			log_ticket_activity(ticket_id, f"Status set to {status}")
+			log_ticket_activity(ticket_id, f"status set to {status}")
 
 		return ticket_doc
 
@@ -185,7 +159,7 @@ def set_ticket_notes(ticket_id, notes):
 		if ticket_doc.notes != notes:
 			ticket_doc.notes = notes
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Updated notes")
+			log_ticket_activity(ticket_id, f"updated notes")
 
 		return ticket_doc
 
@@ -207,7 +181,7 @@ def assign_ticket_priority(ticket_id, priority):
 		if ticket_doc.priority != priority:
 			ticket_doc.priority = priority
 			ticket_doc.save()
-			log_ticket_activity(ticket_id, f"Priority set to {priority}")
+			log_ticket_activity(ticket_id, f"priority set to {priority}")
 
 		return ticket_doc
 
@@ -218,7 +192,7 @@ def assign_ticket_group(ticket_id, agent_group):
 		
 		if ticket_doc.agent_group != agent_group:
 			ticket_doc.agent_group = agent_group
-			log_ticket_activity(ticket_id, f"Team set to {agent_group}")
+			log_ticket_activity(ticket_id, f"team set to {agent_group}")
 			ticket_doc.save()
 		
 		return ticket_doc
@@ -307,3 +281,12 @@ def activities(name):
 	)
 
 	return activities
+
+@frappe.whitelist(allow_guest=True)
+def submit_customer_feedback(ticket_id, satisfied, feedback_text):
+	ticket_doc = frappe.get_doc("Ticket", ticket_id)
+	ticket_doc.satisfied = satisfied
+	ticket_doc.customer_feedback = feedback_text
+	ticket_doc.feedback_submitted = True
+	ticket_doc.save(ignore_permissions=True)
+	return ticket_doc

@@ -47,7 +47,8 @@ export default {
 					xs: 'h-5 w-5',
                     sm: 'h-6 w-6',
                     md: 'h-7 w-7',
-                    lg: 'h-8 w-8'
+                    lg: 'h-8 w-8',
+					xl: 'h-10 w-10'
                 }[this.size]
 				
 				const shapeClass = {

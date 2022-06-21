@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "frappedesk",
   "version": "1.0.0",
   "description": "Customer Service Software",
@@ -19,7 +20,8 @@
     "url": "https://github.com/frappe/desk/issues"
   },
   "homepage": "https://github.com/frappe/desk#readme",
-  "dependencies": {
-    "frappe-ui": "0.0.19"
-  }
+  "workspaces": [
+    "desk",
+    "frappe-ui"
+  ]
 }

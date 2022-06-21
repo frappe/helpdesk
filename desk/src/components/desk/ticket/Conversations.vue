@@ -39,7 +39,7 @@ import CommentCard from './CommentCard.vue'
 
 export default {
 	name: "Conversations",
-	props: ["ticketId", "scrollToBottom"],
+	props: ["ticketId", "scrollToBottom", "autoScroll"],
 	components: {
 		ConversationCard,
 		LoadingText,
@@ -54,6 +54,7 @@ export default {
 	resources: {
 		communications() {
 			return {
+				cache: ['Ticket', 'Conversations', this.ticketId],
 				method: 'frappedesk.api.ticket.get_conversations',
 				params: {
 					ticket_id: this.ticketId
@@ -96,6 +97,7 @@ export default {
 		},
 		communications() {
 			return this.$resources.communications.data || []
+
 		},
 		comments() {
 			return this.$resources.comments.data || []

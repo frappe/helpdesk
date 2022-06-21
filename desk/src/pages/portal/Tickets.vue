@@ -6,7 +6,7 @@
 					<Dropdown :options="getTicketFilterOptions()">
 						<template v-slot="{ toggleTicketFilters }" @click="toggleTicketFilters">
 							<div class="flex space-x-2 items-center cursor-pointer">
-								<p class="text-4xl font-semibold">{{ this.ticketFilter }}</p>
+								<p class="text-[18px] font-semibold">{{ this.ticketFilter }}</p>
 								<FeatherIcon name="chevron-down" class="w-5 h-5" />
 							</div>
 						</template>

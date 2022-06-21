@@ -32,6 +32,12 @@ export default {
 					label: 'Support Policies',
 					pageName: 'SlaPolicies',
 					route: '/frappedesk/settings/sla'
+				},
+				{
+					label: 'Email Accounts',
+					action: () => {
+						window.location.href = '/app/email-account'
+					}
 				}
 			]
 		}
@@ -39,9 +45,13 @@ export default {
 	methods: {
 		changeSelectedSettingItem(setting) {
 			this.selectedSetting = setting.label
-			this.$router.push({
-				name: setting.pageName,
-			})
+			if (setting.pageName) {
+				this.$router.push({
+					name: setting.pageName,
+				})
+			} else if (setting.action) {
+				setting.action()
+			}
 		}
 	}
 }

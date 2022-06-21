@@ -22,6 +22,14 @@
 			</div>
 			<div class="grow flex flex-col h-full space-y-2">
 				<div class="overflow-auto grow">
+					<div v-if="['Closed', 'Resolved'].includes(ticket.status)" class="w-full bg-gray-100 rounded-[8px] py-[10px] px-[15px] flex flex-row items-center justify-between mb-[12px]">
+						<div class="flex flex-row items-center space-x-[9px]">
+							<CustomIcons name="circle-check" class="w-[18px] h-[18px]" />
+							<div class="text-base">This ticket has been closed.</div>
+						</div>
+						<div class="text-[#096CC3] text-[12px] font-medium cursor-pointer hover:text-blue-500" @click="reopenTicket()">Reopen ticket</div>
+					</div>
+					<CustomerSatisfactionFeedback :ticket="ticket" v-if="['Closed', 'Resolved'].includes(ticket.status)" />
 					<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom"/>
 				</div>
 				<div v-if="!editing && ['Open', 'Replied'].includes(ticket.status)" class="mt-5 ml-9">
@@ -98,17 +106,21 @@ import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { QuillEditor } from '@vueup/vue-quill'
 import { FeatherIcon, FileUploader } from 'frappe-ui'
+import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue";
 
 export default {
     name: "Tickets",
     props: ["ticketId"],
 	components: {
-		Conversations,
-		ActionPanel,
-		QuillEditor,
-		FeatherIcon,
-		FileUploader
-	},
+    Conversations,
+    ActionPanel,
+    QuillEditor,
+    FeatherIcon,
+    FileUploader,
+    CustomIcons,
+	CustomerSatisfactionFeedback
+},
 	data() {
 		return {
 			editing: false,
@@ -181,6 +193,7 @@ export default {
 				method: 'frappedesk.api.ticket.submit_conversation_via_contact',
 				onSuccess: () => {
 					this.tempTextEditorData = {}
+					this.editing = false
 				},
 				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
