@@ -32,8 +32,8 @@
 				>
 					<div 
 						class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
+						:class="!seen ? 'font-semibold text-gray-800' : (ticket.status == 'Closed' ? 'font-normal text-gray-600' : 'font-normal text-gray-900')"
 					>
-						<!-- :class="!ticket.seen ? 'font-semibold text-gray-800' : (ticket.status == 'Closed' ? 'font-normal text-gray-600' : 'font-normal text-gray-900')" -->
 						{{ ticket.subject }}
 					</div>
 					<div v-if="ticket.ticket_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ ticket.ticket_type }}</div>
@@ -140,6 +140,17 @@ export default {
 				return result
 			}
 			return []
+		},
+		seen() {
+			let seenFlag = false
+			if (this.ticket._seen) {
+				JSON.parse(this.ticket._seen).forEach(seen => {
+					if (seen === this.user.user) {
+						seenFlag = true
+					}
+				})
+			}
+			return seenFlag
 		}
 	},
 	methods: {
