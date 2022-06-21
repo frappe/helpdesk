@@ -3,27 +3,51 @@
 		<router-view v-slot="{ Component }">
 			<component :is="Component" />
 		</router-view>
+		<Toasts />
 	</div>
 </template>
 
 <script>
 import { provide, ref } from 'vue'
 import { call } from 'frappe-ui'
+import { Toasts } from '@/utils/toasts'
 
 export default {
 	name: "App",
+	components: {
+		Toasts	
+	},
 	setup() {
 		const user = ref({})
-		
-		provide('user', user)
-		
 		const viewportWidth = ref(Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0))
 		
+		provide('user', user)
 		provide('viewportWidth', viewportWidth)
 		
 		return { user }
 	},
 	mounted() {
+		window.addEventListener('online', () => {
+			this.$clearToasts()
+			this.$toast({
+				title: "You're online now",
+				text: 'Hurray! Internet is connected.',
+				icon: 'wifi',
+				iconClasses: 'stroke-green-600',
+				appearance: 'success'
+			})
+		})
+		window.addEventListener('offline', () => {
+			this.$toast({
+				title: "You're offline now",
+				text: 'Opps! Internet is disconnected.',
+				icon: 'wifi-off',
+				iconClasses: 'stroke-red-600',
+				appearance: 'danger',
+				fixed: true
+			})
+		})
+
 		this.user = {
 			signup: async (email, firstName, lastName, password) => {
 				return await this.$resources.signup.submit({

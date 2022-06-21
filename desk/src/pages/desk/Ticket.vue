@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
-			<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px] h-[64px]">
+			<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px] h-[72px]">
 			</div>
 			<div
 				v-if="ticket" 
