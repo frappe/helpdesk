@@ -1,5 +1,5 @@
 <template>
-	<div v-if="comment" class="flex flex-col my-[24px] bg-[#FDF9F2] p-[10px] rounded-[6px]">
+	<div v-if="comment" class="flex flex-col my-[16px] bg-[#FDF9F2] p-[10px] rounded-[6px]">
 		<div class="flex flex-row justify-between">
 			<div class="flex flex-row items-center space-x-[8px]" v-if="user">
 				<CustomAvatar :imageURL="user.user_image" :label="user.full_name" size="sm" />

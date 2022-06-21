@@ -7,15 +7,22 @@
 					ref="conversationContainer"
 				>
 					<div :ref="`conversation-${index}`">
-						<ConversationCard 
-							v-if="conversation.type == 'Communication'"
-							:userName="getUserName(conversation)" 
-							:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
-							:time="conversation.creation" 
-							:message="conversation.content"
-							:attachments="conversation.attachments"
-							:isLast="index == conversation.length - 1"
-						/>
+						<div 
+							v-if="conversation.type == 'Communication'" 
+							class="border-gray-100" 
+							:class="`
+								${(index != 0) && conversations[index - 1].type === 'Comment' ? 'border-t' : ''} 
+								${(index != conversations.length - 1) ? 'border-b' : ''}
+							`"
+						>
+							<ConversationCard 
+								:userName="getUserName(conversation)" 
+								:profilePicUrl="conversation.sender.image ? conversation.sender.image : conversation.sender.user_image" 
+								:time="conversation.creation" 
+								:message="conversation.content"
+								:attachments="conversation.attachments"
+							/>
+						</div>
 						<CommentCard 
 							v-else
 							:comment="conversation"
@@ -64,6 +71,7 @@ export default {
 		},
 		comments() {
 			return {
+				cache: ['Ticket', 'Comments', this.ticketId],
 				method: 'frappe.client.get_list',
 				params: {
 					doctype: 'Comment',
