@@ -4,6 +4,7 @@ import router from './router'
 import App from './App.vue'
 import './index.css'
 import { dayjs } from '@/utils'
+import { createToast } from '@/utils/toasts'
 
 let app = createApp(App)
 
@@ -13,5 +14,6 @@ app.use(FrappeUI)
 app.component('Button', Button)
 
 app.config.globalProperties.$dayjs = dayjs
+app.config.globalProperties.$toast = createToast
 
 app.mount('#app')

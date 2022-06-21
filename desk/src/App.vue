@@ -3,15 +3,20 @@
 		<router-view v-slot="{ Component }">
 			<component :is="Component" />
 		</router-view>
+		<Toasts />
 	</div>
 </template>
 
 <script>
 import { provide, ref } from 'vue'
 import { call } from 'frappe-ui'
+import { Toasts } from '@/utils/toasts'
 
 export default {
 	name: "App",
+	components: {
+		Toasts	
+	},
 	setup() {
 		const user = ref({})
 		
