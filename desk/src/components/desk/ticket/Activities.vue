@@ -29,6 +29,7 @@ export default {
     resources: {
         activities() {
 			return {
+				cache: ['Activities', 'Info Panel', this.ticketId],
 				method: 'frappedesk.api.ticket.activities',
 				params: {
 					name: this.ticketId
