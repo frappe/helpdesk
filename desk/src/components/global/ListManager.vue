@@ -172,7 +172,7 @@ export default {
           /**
            * Remove all the duplicates which might have been added to the
            * current list when new entry was added via socket list_update
-           */2
+           */
           var newItems = this.newItems
           data = data.filter(function(i) {
             return !newItems.find(j => {
