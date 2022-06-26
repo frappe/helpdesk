@@ -143,6 +143,7 @@ export default {
 					to: {
 						path: '/frappedesk/tickets',
 						query: () => {
+							delete this.$route.query['page']
 							return {
 								...this.$route.query,
 								menu_filter: 'my-open-tickets'
@@ -155,6 +156,7 @@ export default {
 					to: {
 						path: '/frappedesk/tickets',
 						query: () => {
+							delete this.$route.query['page']
 							return {
 								...this.$route.query,
 								menu_filter: 'my-replied-tickets'
@@ -167,6 +169,7 @@ export default {
 					to: {
 						path: '/frappedesk/tickets',
 						query: () => {
+							delete this.$route.query['page']
 							return {
 								...this.$route.query,
 								menu_filter: 'my-resolved-tickets'
@@ -179,6 +182,7 @@ export default {
 					to: {
 						path: '/frappedesk/tickets',
 						query: () => {
+							delete this.$route.query['page']
 							return {
 								...this.$route.query,
 								menu_filter: 'my-closed-tickets'
@@ -195,6 +199,7 @@ export default {
 				to: {
 					path: '/frappedesk/tickets',
 					query: () => {
+						delete this.$route.query['page']
 						return {
 							...this.$route.query,
 							menu_filter: 'all'
