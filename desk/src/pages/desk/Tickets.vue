@@ -22,6 +22,7 @@
 				],
 				limit: 20,
 				order_by: 'modified desc',
+				route_query_pagination: true
 			}"
 		>
 			<template #body="{ manager }">
@@ -183,7 +184,9 @@ export default {
 					finalFilters[key] = (key === '_assign') ?  ['like', `%${value}%`] : ['=', value]
 				}
 			})
-			this.$refs.ticketList.manager.update({filters: finalFilters})
+			if (JSON.stringify(finalFilters) != JSON.stringify(this.$refs.ticketList.manager.options.filters)) {
+				this.$refs.ticketList.manager.update({filters: finalFilters})
+			}
 		},
 		filterBoxOptions() {
 			return [

@@ -6,16 +6,20 @@
 
 <script>
 import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'ListManager',
   props: ['options'],
   setup(props) {
+    const router = useRouter()
+    const route = useRoute()
+
     const options = {
       handle_row_click: () => {},
       ...props.options
     }
-    const resource = ref(null)
+    const resources = ref(null)
     const newItems = ref([])
     const selectedItems = ref({})
     const selectionMode = ref(0)
@@ -33,13 +37,14 @@ export default {
 
     const manager = ref({
       loading: false,
-      resource,
+      resources,
       options,
       selectedItems,
       allItemsSelected,
       list: [],
       start: 0,
       currPage: 1,
+      totalPages: 0,
       previousPage: () => {
         if (manager.value.start > 0) {
           let newStart = manager.value.start - options.limit
@@ -56,33 +61,46 @@ export default {
         manager.value.loadPage(options.limit * (page - 1))
       },
       loadPage: (start) => {
-        clearList()
-        manager.value.start = start
-        manager.value.currPage = Math.floor(manager.value.start / options.limit) + 1
-        resource.value.update({
-          ...options,
-          start: manager.value.start,
-          limit: options.limit
-        })
+        if (manager.value.options.route_query_pagination) {
+          router.push({
+            query: {...route.query, page: Math.ceil(start / manager.value.options.limit) + 1}
+          })
+        } else {
+          clearList()
+          manager.value.start = start
+          manager.value.currPage = Math.floor(manager.value.start / manager.value.options.limit) + 1
+          resources.value.list.update({
+            ...manager.value.options,
+            start: manager.value.start,
+            limit: manager.value.options.limit
+          })
+        }
+      }, 
+      hasPage: (page) => {
+        if (page <= 0) return false
+        return page <= manager.value.totalPages
       },
       reload: () => {
         manager.value.currPage = 1
-        resource.value.update({
-          ...options,
-          start: 0,
-          limit: options.limit
-        })
+        if (manager.value.options.route_query_pagination) {
+          router.push({
+            query: {...route.query, page: 1}
+          })
+        } else {
+          resources.value.list.update({
+            ...options,
+            start: 0,
+            limit: options.limit
+          })
+        }
       },
       update: (newOptions) => {
         clearList()
-        manager.value.currPage = 1
         if (newOptions.filters) options.filters = newOptions.filters
         if (newOptions.order_by) options.order_by = newOptions.order_by
-        resource.value.update({
-          ...options,
-          start: 0,
-          limit: options.limit
-        })
+
+        manager.value.currPage = parseInt(route.query.page ? route.query.page : 1)
+        manager.value.getPage(manager.value.currPage)
       },
       itemSelected: (rowData) => {
         return rowData.name in selectedItems.value
@@ -136,26 +154,37 @@ export default {
     }
 
     manager.value.list = computed(() => {
-      return manager.value?.resource?.data || []
+      manager.value?.resources?.count.fetch({
+        doctype: manager.value.options.doctype,
+        filters: manager.value.options.filters
+      })
+      return manager.value?.resources?.list?.data || []
     })
 
     manager.value.loading = computed(() => {
-      return manager.value.resource?.list.loading
+      return manager.value.resources?.list?.list.loading
     })
 
     return {
       manager,
       newItems,
       selectedItems,
-      selectionMode
+      selectionMode,
+      clearList
     }
   },
   mounted() {
-    this.manager.resource = this.$resources.list
+    this.manager.resources = this.$resources
     this.handleRealtimeUpdate()
+    this.syncPage()
   },
   unmounted() {
     this.cleanup()
+  },
+  watch: {
+    $route() {
+      this.syncPage()
+    }
   },
   resources: {
     list() {
@@ -197,9 +226,39 @@ export default {
           }
         }
       }
+    },
+    count() {
+      return {
+        method: 'frappe.client.get_count',
+        onSuccess: (count) => {
+          this.manager.totalPages = Math.ceil(count / this.manager.options.limit)
+        }
+      }
     }
   },
   methods: {
+    syncPage() {
+      if (!this.manager.options.route_query_pagination) return
+
+      if (this.$route.query.page) {
+        let page = this.$route.query.page
+        if (page <= 0) {
+          return this.$router.push({
+            query: {...this.$route.query, page: 1}
+          })
+        }
+        const start = this.manager.options.limit * (page - 1)
+
+        this.clearList()
+        this.manager.start = start
+        this.manager.currPage = Math.floor(this.manager.start / this.manager.options.limit) + 1
+        this.$resources.list.update({
+          ...this.manager.options,
+          start: this.manager.start,
+          limit: this.manager.options.limit
+        })
+      }
+    },
     handleRealtimeUpdate() {
       this.$socket.on("list_update", (data) => {
         if (data.doctype === this.options.doctype) {
