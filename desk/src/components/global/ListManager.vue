@@ -15,7 +15,7 @@ export default {
       handle_row_click: () => {},
       ...props.options
     }
-    const resource = ref(null)
+    const resources = ref(null)
     const newItems = ref([])
     const selectedItems = ref({})
     const selectionMode = ref(0)
@@ -33,13 +33,14 @@ export default {
 
     const manager = ref({
       loading: false,
-      resource,
+      resources,
       options,
       selectedItems,
       allItemsSelected,
       list: [],
       start: 0,
       currPage: 1,
+      totalPages: 0,
       previousPage: () => {
         if (manager.value.start > 0) {
           let newStart = manager.value.start - options.limit
@@ -59,15 +60,19 @@ export default {
         clearList()
         manager.value.start = start
         manager.value.currPage = Math.floor(manager.value.start / options.limit) + 1
-        resource.value.update({
+        resources.value.list.update({
           ...options,
           start: manager.value.start,
           limit: options.limit
         })
       },
+      hasPage: (page) => {
+        if (page <= 0) return false
+        return page <= manager.value.totalPages
+      },
       reload: () => {
         manager.value.currPage = 1
-        resource.value.update({
+        resources.value.list.update({
           ...options,
           start: 0,
           limit: options.limit
@@ -78,7 +83,7 @@ export default {
         manager.value.currPage = 1
         if (newOptions.filters) options.filters = newOptions.filters
         if (newOptions.order_by) options.order_by = newOptions.order_by
-        resource.value.update({
+        resources.value.list.update({
           ...options,
           start: 0,
           limit: options.limit
@@ -136,11 +141,15 @@ export default {
     }
 
     manager.value.list = computed(() => {
-      return manager.value?.resource?.data || []
+      manager.value?.resources?.count.fetch({
+        doctype: manager.value.options.doctype,
+        filters: manager.value.options.filters
+      })
+      return manager.value?.resources?.list?.data || []
     })
 
     manager.value.loading = computed(() => {
-      return manager.value.resource?.list.loading
+      return manager.value.resources?.list?.list.loading
     })
 
     return {
@@ -151,7 +160,7 @@ export default {
     }
   },
   mounted() {
-    this.manager.resource = this.$resources.list
+    this.manager.resources = this.$resources
     this.handleRealtimeUpdate()
   },
   unmounted() {
@@ -195,6 +204,14 @@ export default {
               this.newItems.push(data[0].name)
             }
           }
+        }
+      }
+    },
+    count() {
+      return {
+        method: 'frappe.client.get_count',
+        onSuccess: (count) => {
+          this.manager.totalPages = Math.ceil(count / this.manager.options.limit)
         }
       }
     }
