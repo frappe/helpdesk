@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<ListManager
+			v-if="listManagerInitialised"
 			class="px-[16px]"
 			ref="ticketList"
 			:options="{
@@ -22,6 +23,8 @@
 				],
 				limit: 20,
 				order_by: 'modified desc',
+				filters: initialFilters,
+				start_page: initialPage,
 				route_query_pagination: true
 			}"
 		>
@@ -94,9 +97,17 @@ export default {
 		ListManager,
 		TicketList
 	},
+	data() {
+		return {
+			initialFilters: [],
+			initialPage: 1
+		}
+	},
 	setup() {
 		const user = inject('user')
 		const showNewTicketDialog = ref(false)
+
+		const listManagerInitialised = ref(false)
 
 		const filters = ref([])
 		const toggleFilters = ref(false)
@@ -110,7 +121,8 @@ export default {
 		return {
 			user, 
 			showNewTicketDialog, 
-			filters, 
+			listManagerInitialised,
+			filters,
 			toggleFilters,
 			ticketTypes,
 			ticketPriorities,
@@ -133,7 +145,10 @@ export default {
 	},
 	watch: {
 		filters(newValue) {
-			let query = this.$route.query.menu_filter ? {menu_filter: this.$route.query.menu_filter} : {}
+			let query = {}
+			
+			if (this.$route.query.menu_filter) query['menu_filter'] = this.$route.query.menu_filter
+
 			newValue.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
 					if (['ticket_type', 'contact', 'status', 'priority', '_assign'].includes(key)) {
@@ -184,8 +199,14 @@ export default {
 					finalFilters[key] = (key === '_assign') ?  ['like', `%${value}%`] : ['=', value]
 				}
 			})
-			if (JSON.stringify(finalFilters) != JSON.stringify(this.$refs.ticketList.manager.options.filters)) {
-				this.$refs.ticketList.manager.update({filters: finalFilters})
+			if (this.listManagerInitialised) {
+				if (JSON.stringify(finalFilters) != JSON.stringify(this.$refs.ticketList.manager.options.filters)) {
+					this.$refs.ticketList.manager.update({filters: finalFilters})
+				}
+			} else {
+				this.initialFilters = finalFilters
+				this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
+				this.listManagerInitialised = true
 			}
 		},
 		filterBoxOptions() {

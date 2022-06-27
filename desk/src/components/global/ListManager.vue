@@ -15,10 +15,10 @@ export default {
     const router = useRouter()
     const route = useRoute()
 
-    const options = {
+    const options = ref({
       handle_row_click: () => {},
       ...props.options
-    }
+    })
     const resources = ref(null)
     const newItems = ref([])
     const selectedItems = ref({})
@@ -42,12 +42,12 @@ export default {
       selectedItems,
       allItemsSelected,
       list: [],
-      start: 0,
-      currPage: 1,
+      start: options.value.limit * (options.value.start_page - 1),
+      currPage: options.value.start_page || 1,
       totalPages: 0,
       previousPage: () => {
         if (manager.value.start > 0) {
-          let newStart = manager.value.start - options.limit
+          let newStart = manager.value.start - options.value.limit
           if (newStart < 0) {
             newStart = 0
           }
@@ -55,24 +55,24 @@ export default {
         }
       },
       nextPage: () => {
-        manager.value.loadPage(manager.value.start + options.limit)
+        manager.value.loadPage(manager.value.start + options.value.limit)
       },
       getPage: (page) => {
-        manager.value.loadPage(options.limit * (page - 1))
+        manager.value.loadPage(options.value.limit * (page - 1))
       },
       loadPage: (start) => {
-        if (manager.value.options.route_query_pagination) {
+        if (options.value.route_query_pagination) {
           router.push({
-            query: {...route.query, page: Math.ceil(start / manager.value.options.limit) + 1}
+            query: {...route.query, page: Math.ceil(start / options.value.limit) + 1}
           })
         } else {
           clearList()
           manager.value.start = start
-          manager.value.currPage = Math.floor(manager.value.start / manager.value.options.limit) + 1
+          manager.value.currPage = Math.floor(manager.value.start / options.value.limit) + 1
           resources.value.list.update({
-            ...manager.value.options,
+            ...options.value,
             start: manager.value.start,
-            limit: manager.value.options.limit
+            limit: options.value.limit
           })
         }
       }, 
@@ -82,22 +82,22 @@ export default {
       },
       reload: () => {
         manager.value.currPage = 1
-        if (manager.value.options.route_query_pagination) {
+        if (options.value.route_query_pagination) {
           router.push({
             query: {...route.query, page: 1}
           })
         } else {
           resources.value.list.update({
-            ...options,
+            ...options.value,
             start: 0,
-            limit: options.limit
+            limit: options.value.limit
           })
         }
       },
       update: (newOptions) => {
         clearList()
-        if (newOptions.filters) options.filters = newOptions.filters
-        if (newOptions.order_by) options.order_by = newOptions.order_by
+        if (newOptions.filters) options.value.filters = newOptions.filters
+        if (newOptions.order_by) options.value.order_by = newOptions.order_by
 
         manager.value.currPage = parseInt(route.query.page ? route.query.page : 1)
         manager.value.getPage(manager.value.currPage)
@@ -111,7 +111,7 @@ export default {
         } else if (selectionMode.value == 2) {
           manager.value.select(rowData)
         } else {
-          manager.value.options.handle_row_click(rowData)
+          options.value.handle_row_click(rowData)
         }
       },
       selectAll: () => {
@@ -138,7 +138,7 @@ export default {
       },
       toggleOrderBy: (field) => {
         let newOrderBy = `${field} desc`
-        const oldOrderBy = manager.value.options?.order_by
+        const oldOrderBy = options.value?.order_by
         if (oldOrderBy) {
           if (oldOrderBy.split(' ')[0] === newOrderBy.split(' ')[0]) {
             newOrderBy = `${field} ${oldOrderBy.split(' ')[1] === 'desc' ? 'asc' : 'desc'}`
@@ -176,7 +176,6 @@ export default {
   mounted() {
     this.manager.resources = this.$resources
     this.handleRealtimeUpdate()
-    this.syncPage()
   },
   unmounted() {
     this.cleanup()
@@ -195,7 +194,7 @@ export default {
         cache: this.options?.cache,
         order_by: this.options?.order_by,
         filters: this.options?.filters,
-        start: 0,
+        start: this.options?.limit * (this.options?.start_page - 1),
         limit: this.options?.limit || 20,
         onSuccess: (data) => {
           /**
@@ -231,15 +230,14 @@ export default {
       return {
         method: 'frappe.client.get_count',
         onSuccess: (count) => {
-          this.manager.totalPages = Math.ceil(count / this.manager.options.limit)
+          this.manager.totalPages = Math.ceil(count / this.options.limit)
         }
       }
     }
   },
   methods: {
     syncPage() {
-      if (!this.manager.options.route_query_pagination) return
-
+      if (!this.options.route_query_pagination) return
       if (this.$route.query.page) {
         let page = this.$route.query.page
         if (page <= 0) {
@@ -247,15 +245,15 @@ export default {
             query: {...this.$route.query, page: 1}
           })
         }
-        const start = this.manager.options.limit * (page - 1)
+        const start = this.options.limit * (page - 1)
 
         this.clearList()
         this.manager.start = start
-        this.manager.currPage = Math.floor(this.manager.start / this.manager.options.limit) + 1
+        this.manager.currPage = Math.floor(this.manager.start / this.options.limit) + 1
         this.$resources.list.update({
           ...this.manager.options,
           start: this.manager.start,
-          limit: this.manager.options.limit
+          limit: this.options.limit
         })
       }
     },
@@ -263,12 +261,12 @@ export default {
       this.$socket.on("list_update", (data) => {
         if (data.doctype === this.options.doctype) {
           this.$resources.document.fetch({
-            doctype: this.manager.options.doctype,
+            doctype: this.options.doctype,
             filters: {
               ...this.options.filters,
               name: data.name
             },
-            fields: this.manager.options.fields,
+            fields: this.options.fields,
             limit: 1
           })
         }
