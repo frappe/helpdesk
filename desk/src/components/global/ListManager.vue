@@ -61,13 +61,12 @@ export default {
         manager.value.loadPage(options.value.limit * (page - 1))
       },
       loadPage: (start) => {
-        if (options.value.route_query_pagination) {
+        if (options.value.route_query_pagination && manager.value.start != start) {
           router.push({
             query: {...route.query, page: Math.ceil(start / options.value.limit) + 1}
           })
         } else {
           clearList()
-          manager.value.start = start
           manager.value.currPage = Math.floor(manager.value.start / options.value.limit) + 1
           resources.value.list.update({
             ...options.value,
