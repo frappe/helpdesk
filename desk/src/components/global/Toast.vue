@@ -5,8 +5,9 @@
 				v-if="shown"
 				:style="style"
 				:class="[
-					'absolute transition duration-200 ease-out mx-[15px] my-[80px] pointer-events-auto',
+					'absolute transition duration-200 ease-out mx-[15px] pointer-events-auto',
 					position.includes('center') ? '-translate-x-1/2' : '',
+					position.includes('top') ? 'my-[80px]' : 'my-[10px]'
 				]"
 			>
 				<div
