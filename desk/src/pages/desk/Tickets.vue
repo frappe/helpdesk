@@ -23,7 +23,8 @@
 				],
 				limit: 20,
 				order_by: 'modified desc',
-				filters: finalFilters,
+				filters: initialFilters,
+				start_page: initialPage,
 				route_query_pagination: true
 			}"
 		>
@@ -96,6 +97,12 @@ export default {
 		ListManager,
 		TicketList
 	},
+	data() {
+		return {
+			initialFilters: [],
+			initialPage: 1
+		}
+	},
 	setup() {
 		const user = inject('user')
 		const showNewTicketDialog = ref(false)
@@ -103,7 +110,6 @@ export default {
 		const listManagerInitialised = ref(false)
 
 		const filters = ref([])
-		const finalFilters = ref([])
 		const toggleFilters = ref(false)
 
 		const ticketTypes = inject('ticketTypes')
@@ -116,8 +122,7 @@ export default {
 			user, 
 			showNewTicketDialog, 
 			listManagerInitialised,
-			filters, 
-			finalFilters,
+			filters,
 			toggleFilters,
 			ticketTypes,
 			ticketPriorities,
@@ -140,7 +145,10 @@ export default {
 	},
 	watch: {
 		filters(newValue) {
-			let query = this.$route.query.menu_filter ? {menu_filter: this.$route.query.menu_filter} : {}
+			let query = {}
+			
+			if (this.$route.query.menu_filter) query['menu_filter'] = this.$route.query.menu_filter
+
 			newValue.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
 					if (['ticket_type', 'contact', 'status', 'priority', '_assign'].includes(key)) {
@@ -159,7 +167,7 @@ export default {
 	},
 	methods: {
 		applyFiltersToList() {
-			const _finalFilters = {}
+			const finalFilters = {}
 			const menuFilter = this.$route.query.menu_filter
 			if (this.user.agent) {
 				const sideBarFilters = {
@@ -169,34 +177,35 @@ export default {
 					myClosedTickets: 'my-closed-tickets'
 				}
 				if (Object.values(sideBarFilters).includes(menuFilter)) {
-					_finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
+					finalFilters['_assign'] = ['like', `%${this.user.agent.name}%`]
 				}
 				switch(menuFilter) {
 					case sideBarFilters['myOpenTickets']:
-						_finalFilters['status'] = ['like', '%Open%']
+						finalFilters['status'] = ['like', '%Open%']
 						break;
 					case sideBarFilters['myRepliedTickets']:
-						_finalFilters['status'] = ['like', '%Replied%']
+						finalFilters['status'] = ['like', '%Replied%']
 						break;
 					case sideBarFilters['myResolecedTickets']:
-						_finalFilters['status'] = ['like', '%Resolved%']
+						finalFilters['status'] = ['like', '%Resolved%']
 						break;
 					case sideBarFilters['myClosedTickets']:
-						_finalFilters['status'] = ['like', '%Closed%']
+						finalFilters['status'] = ['like', '%Closed%']
 						break;
 				}
 			}
 			this.filters.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {
-					_finalFilters[key] = (key === '_assign') ?  ['like', `%${value}%`] : ['=', value]
+					finalFilters[key] = (key === '_assign') ?  ['like', `%${value}%`] : ['=', value]
 				}
 			})
-			this.finalFilters = _finalFilters
 			if (this.listManagerInitialised) {
-				if (JSON.stringify(this.finalFilters) != JSON.stringify(this.$refs.ticketList.manager.options.filters)) {
-					this.$refs.ticketList.manager.update({filters: this.finalFilters})
+				if (JSON.stringify(finalFilters) != JSON.stringify(this.$refs.ticketList.manager.options.filters)) {
+					this.$refs.ticketList.manager.update({filters: finalFilters})
 				}
 			} else {
+				this.initialFilters = finalFilters
+				this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 				this.listManagerInitialised = true
 			}
 		},
