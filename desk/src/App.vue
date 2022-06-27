@@ -31,20 +31,20 @@ export default {
 			this.$clearToasts()
 			this.$toast({
 				title: "You're online now",
-				text: 'Hurray! Internet is connected.',
 				icon: 'wifi',
 				iconClasses: 'stroke-green-600',
-				appearance: 'success'
+				appearance: 'success',
+				position: 'bottom-right'
 			})
 		})
 		window.addEventListener('offline', () => {
 			this.$toast({
 				title: "You're offline now",
-				text: 'Opps! Internet is disconnected.',
 				icon: 'wifi-off',
 				iconClasses: 'stroke-red-600',
 				appearance: 'danger',
-				fixed: true
+				fixed: true,
+				position: 'bottom-right'
 			})
 		})
 
