@@ -41,7 +41,7 @@
 									style="min-height:150px; max-height:200px; overflow-y: auto;"
 									@click="focusEditor()"
 								/>
-								<div class="border-b border-l border-r border-gray-400 p-2 select-none">
+								<div v-if="editingType === 'reply'" class="border-b border-l border-r border-gray-400 p-2 select-none">
 									<div class="w-full">
 										<FileUploader @success="(file) => attachments.push(file)">
 											<template
@@ -78,28 +78,28 @@
 							<div v-if="editing">
 								<div class="flex flex-row space-x-[14px]">
 									<Button 
-										:loading="$resources.submitConversation.loading" 
-										@click="submitConversation()" 
+										:loading="editingType == 'reply' ? $resources.submitConversation.loading : $resources.submitComment.loading" 
+										@click="submit()" 
 										appearance="primary" 
 										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
 									>
 										Send
-									</Button>
-									<Button 
-										@click="submitComment()"
-										appearance="secondary" 
-										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
-									>
-										Add Comment
 									</Button>
 									<Button appearance="secondary" @click="cancelEditing()">
 										Cancel
 									</Button>
 								</div>
 							</div>
-							<div v-else>
-								<Button appearance="primary" @click="startEditing()">
+							<div v-else class="flex flex-row space-x-[14px]">
+								<Button appearance="primary" @click="startEditing('reply')">
 									Reply 
+								</Button>
+								<Button 
+									@click="startEditing('comment')"
+									appearance="secondary" 
+									:disabled="(!user.agent && !user.isAdmin)"
+								>
+									Add Comment
 								</Button>
 							</div>
 						</div>
@@ -171,7 +171,7 @@ export default {
 								key: 13,
 								shortKey: true,
 								handler: () => {
-									this.submitConversation();
+									this.submit();
 								}
 							}
 						}
@@ -190,6 +190,8 @@ export default {
 		const tickets = inject('tickets')
 		const attachments = ref([])
 
+		const editingType = ref('')
+
 		const tempTextEditorData = ref({})
 		
 		return { 
@@ -198,7 +200,8 @@ export default {
 			user,
 			tickets,
 			attachments,
-			tempTextEditorData
+			tempTextEditorData,
+			editingType
 		}
 	},
 	resources: {
@@ -221,6 +224,7 @@ export default {
 				method: 'frappe.client.insert',
 				onSuccess: () => {
 					this.tempTextEditorData = {}
+					this.editing = false
 				},
 				onError: () => {
 					var element = document.getElementsByClassName("ql-editor");
@@ -257,8 +261,9 @@ export default {
 		}
 	},
 	methods: {
-		startEditing() {
+		startEditing(type='reply') {
 			this.editing = true
+			this.editingType = type
 			this.delayedConversationScroll()
 			this.$nextTick(() => {
 				this.focusEditor()
@@ -278,6 +283,16 @@ export default {
 
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
+		},
+		submit() {
+			switch(this.editingType) {
+				case 'reply':
+					this.submitConversation()
+					break
+				case 'comment':
+					this.submitComment()
+					break
+			}
 		},
 		submitConversation() {
 			var element = document.getElementsByClassName("ql-editor");
