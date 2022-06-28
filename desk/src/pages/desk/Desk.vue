@@ -48,6 +48,9 @@ export default {
 		provide('agentGroups', agentGroups)
 		provide('agentController', agentController)
 
+		const updateSidebarTicketCount = ref(() => {})
+		provide('updateSidebarTicketCount', updateSidebarTicketCount)
+
 		return {
 			user,
 
@@ -62,7 +65,9 @@ export default {
 
 			agents,
 			agentGroups,
-			agentController
+			agentController,
+
+			updateSidebarTicketCount
 		}
 	},
 	mounted() {
@@ -137,6 +142,9 @@ export default {
 					break
 				case 'Agent':
 					this.$resources.agents.fetch()
+					break
+				case 'Ticket Activity':
+					this.updateSidebarTicketCount()
 					break
 			}
 		})

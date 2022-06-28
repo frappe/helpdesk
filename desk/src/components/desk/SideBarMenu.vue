@@ -105,7 +105,9 @@ export default {
 		const profileSettings = ref()
 		const showProfileSettings = ref(false)
 
-		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings }
+		const updateSidebarTicketCount = inject('updateSidebarTicketCount')
+
+		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings, updateSidebarTicketCount }
 	},
 	mounted() {
 		this.menuOptions = [
@@ -228,56 +230,45 @@ export default {
 			}
 		]
 		this.syncSelectedMenuItemBasedOnRoute()
-		this.updateTicketsCount()
-		this.$socket.on("list_update", (data) => {
-			if (data.doctype === "Ticket Activity") {
-				this.updateTicketsCount()
-			}
-		})
+		this.updateSidebarTicketCount = this.updateTicketCount
 	},
 	watch: {
 		$route() {
 			this.syncSelectedMenuItemBasedOnRoute()
 		}
 	},
+	resources: {
+		myOpenTicketsCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Ticket',
+					filters: {status: ['=', 'Open'], _assign: ['like', `%${this.user.agent.name}%`]}
+				},
+				auto: true,
+				onSuccess(count) {
+					this.menuOptions.find(option => option.label == 'Tickets').children[0].extra = count
+				}
+			}
+		},
+		myRepliedTicketsCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Ticket',
+					filters: {status: ['=', 'Replied'], _assign: ['Like', `%${this.user.agent.name}%`]}
+				},
+				auto: true,
+				onSuccess(count) {
+					this.menuOptions.find(option => option.label == 'Tickets').children[1].extra = count
+				}
+			}
+		}
+	},
 	methods: {
-		async updateTicketsCount() {
-			let filterLabelMap = {
-				// 'All Tickets': {
-				// 	status: ['in', ['Open', 'Replied']]
-				// }
-			}
-			if (this.user.agent) {
-				let assigneeFilter = {_assign: ['like', '%' + this.user.agent.name + '%']}
-				filterLabelMap = {...filterLabelMap, 
-					'My Open Tickets': {
-						...assigneeFilter,
-						status: 'Open'
-					},
-					'My Replied Tickets': {
-						...assigneeFilter,
-						status: 'Replied'
-					},
-					// 'My Resolved Tickets': {
-					// 	...assigneeFilter,
-					// 	status: 'Resolved',
-					// },
-					// 'My Closed Tickets': {
-					// 	...assigneeFilter,
-					// 	status: 'Closed',
-					// },
-				}
-			}
-			for(let index in Object.values(this.menuOptions.find(option => option.label == 'Tickets').children)) {
-				let option = this.menuOptions.find(option => option.label == 'Tickets').children[index]
-				if (filterLabelMap[option.label]) {
-					let count = await call('frappe.client.get_count', {
-						doctype: "Ticket",
-						filters: filterLabelMap[option.label],
-					})
-					this.menuOptions.find(option => option.label == 'Tickets').children[index].extra = count
-				}
-			}
+		updateTicketCount() {
+			this.$resources.myOpenTicketsCount.fetch()
+			this.$resources.myRepliedTicketsCount.fetch()
 		},
 		syncSelectedMenuItemBasedOnRoute() {
 			const handleTicketFilterQueries = () => {
