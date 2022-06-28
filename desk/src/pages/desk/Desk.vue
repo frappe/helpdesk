@@ -2,9 +2,7 @@
 	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen">
 		<div class="flex flex-row w-screen">
 			<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
-			<router-view class="grow" v-slot="{ Component }">
-				<component :is="Component" />
-			</router-view>
+			<router-view class="grow" />
 		</div>
 	</div>
 </template>
