@@ -100,7 +100,6 @@ export default {
 				return x
 			})
 			const conversations = [...communications, ...comments].sort((a, b) => (new Date(a.creation) - new Date(b.creation))) || []
-			console.log(conversations)
 			return conversations
 		},
 		communications() {

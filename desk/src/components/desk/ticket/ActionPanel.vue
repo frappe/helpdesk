@@ -224,7 +224,6 @@ export default {
 		const viewportWidth = inject('viewportWidth')
 
 		const user = inject('user')
-		const tickets = inject('tickets')
 		const ticketTypes = inject('ticketTypes')
 		const ticketPriorities = inject('ticketPriorities')
 		const ticketStatuses = inject('ticketStatuses')
@@ -250,7 +249,6 @@ export default {
 			viewportWidth,
 
 			user,
-			tickets,
 			ticketTypes,
 			ticketPriorities,
 			ticketStatuses,

@@ -80,18 +80,7 @@ export default {
         return page <= manager.value.totalPages
       },
       reload: () => {
-        manager.value.currPage = 1
-        if (options.value.route_query_pagination) {
-          router.push({
-            query: {...route.query, page: 1}
-          })
-        } else {
-          resources.value.list.update({
-            ...options.value,
-            start: 0,
-            limit: options.value.limit
-          })
-        }
+        manager.value.getPage(manager.value.currPage)
       },
       update: (newOptions) => {
         clearList()

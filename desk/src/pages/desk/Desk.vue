@@ -2,9 +2,7 @@
 	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen">
 		<div class="flex flex-row w-screen">
 			<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
-			<router-view class="grow" v-slot="{ Component }">
-				<component :is="Component" />
-			</router-view>
+			<router-view class="grow" />
 		</div>
 	</div>
 </template>
@@ -48,6 +46,9 @@ export default {
 		provide('agentGroups', agentGroups)
 		provide('agentController', agentController)
 
+		const updateSidebarTicketCount = ref(() => {})
+		provide('updateSidebarTicketCount', updateSidebarTicketCount)
+
 		return {
 			user,
 
@@ -62,7 +63,9 @@ export default {
 
 			agents,
 			agentGroups,
-			agentController
+			agentController,
+
+			updateSidebarTicketCount
 		}
 	},
 	mounted() {
@@ -263,8 +266,8 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: async (ticket) => {
-
+				onSuccess: async () => {
+					this.updateSidebarTicketCount()
 				},
 				onFailure: () => {
 					// TODO:
@@ -285,8 +288,8 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_status',
-				onSuccess: async (ticket) => {
-
+				onSuccess: async () => {
+					this.updateSidebarTicketCount()
 				},
 				onFailure: () => {
 					// TODO:
