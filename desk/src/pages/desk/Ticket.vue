@@ -187,7 +187,6 @@ export default {
 		const editor = ref(null);
 		const viewportWidth = inject('viewportWidth')
 		const user = inject('user')
-		const tickets = inject('tickets')
 		const attachments = ref([])
 
 		const tempTextEditorData = ref({})
@@ -196,7 +195,6 @@ export default {
 			editor,
 			viewportWidth,
 			user,
-			tickets,
 			attachments,
 			tempTextEditorData
 		}

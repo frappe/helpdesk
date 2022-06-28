@@ -87,6 +87,7 @@ import NewTicketDialog from '@/components/desk/tickets/NewTicketDialog.vue'
 import FilterBox from '@/components/desk/global/FilterBox.vue'
 import TicketList from '@/components/desk/tickets/TicketList.vue'
 import ListManager from '@/components/global/ListManager.vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'Tickets',
@@ -95,7 +96,8 @@ export default {
 		Dropdown,
 		FilterBox,
 		ListManager,
-		TicketList
+		TicketList,
+		CustomIcons
 	},
 	data() {
 		return {
