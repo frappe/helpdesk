@@ -28,10 +28,14 @@
 								<div class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50 bg-white">
 									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
 										<div 
-											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[85px]"
+											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
 											@click="updateStatus(status)"
 										> 
-											{{ status }} 
+											<div class="flex flex-row space-x-2 items-center">
+												<FeatherIcon v-if="status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[status]" class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]" />
+												<CustomIcons v-else name="comment" class="w-[16px] h-[16px] stroke-green-600" />
+												<div>{{ status }}</div>
+											</div>
 										</div>
 									</div>
 								</div>
