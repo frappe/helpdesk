@@ -141,9 +141,6 @@ export default {
 				case 'Agent':
 					this.$resources.agents.fetch()
 					break
-				case 'Ticket Activity':
-					this.updateSidebarTicketCount()
-					break
 			}
 		})
 	},
@@ -269,8 +266,8 @@ export default {
 		assignTicketToAgent() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_to_agent',
-				onSuccess: async (ticket) => {
-
+				onSuccess: async () => {
+					this.updateSidebarTicketCount()
 				},
 				onFailure: () => {
 					// TODO:
@@ -291,8 +288,8 @@ export default {
 		assignTicketStatus() {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_status',
-				onSuccess: async (ticket) => {
-
+				onSuccess: async () => {
+					this.updateSidebarTicketCount()
 				},
 				onFailure: () => {
 					// TODO:
