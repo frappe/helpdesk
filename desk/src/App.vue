@@ -135,6 +135,15 @@ export default {
 					console.error(error)
 				}
 			}
+		},
+		companyName() {
+			return {
+				method: 'frappedesk.api.website.company_name',
+				auto: true,
+				onSuccess: (res) => {
+					document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`
+				}
+			}
 		}
 	}
 }
