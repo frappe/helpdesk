@@ -175,6 +175,7 @@ export default {
   mounted() {
     this.manager.resources = this.$resources
     this.handleRealtimeUpdate()
+    this.syncPage()
   },
   unmounted() {
     this.cleanup()
