@@ -162,7 +162,9 @@ export default {
 			this.$router.push({path: this.$route.path, query})
 		},
 		$route() {
-			this.applyFiltersToList()
+			if(this.$route.name === 'DeskTickets') {
+				this.applyFiltersToList()
+			}
 		}
 	},
 	methods: {
