@@ -157,7 +157,33 @@ export default {
         doctype: manager.value.options.doctype,
         filters: manager.value.options.filters
       })
-      return manager.value?.resources?.list?.data || []
+
+      let list = manager.value?.resources?.list?.data || []
+      let newList = []
+      if (options.value.group) {
+        for(let i = 0; i < list.length - 1; i++) {
+          if(!newList.find((x) => x.name === list[i].name)) {
+            newList.push(list[i])
+            
+            options.value.group.forEach(field => {
+              newList.at(-1)[field] = newList.at(-1)[field] ? [newList.at(-1)[field]] : []
+            })
+
+            for(let j = i + 1; j < list.length; j++) {
+              if (list[j].name === list[i].name) {
+                options.value.group.forEach(field => {
+                  if (list[j][field]) {
+                    newList.at(-1)[field] = [...new Set([...newList.at(-1)[field], list[j][field]])]
+                  }
+                })
+              }
+            }
+          }
+        }
+      } else {
+        newList = list
+      }
+      return newList
     })
 
     manager.value.loading = computed(() => {
