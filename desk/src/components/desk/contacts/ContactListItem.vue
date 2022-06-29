@@ -1,57 +1,68 @@
 <template>
-	<div class="block hover:bg-gray-50 border-b text-base">
-		<router-link 
+	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
+		<div
 			v-if="contact"
-			class="group flex items-center justify-between sm:justify-start font-light h-10"
-			:to="`/frappedesk/contacts/${contact.name}`"
+			role="button"
+			@pointerover="() => {toggleSelectBox = true}"
+			@pointerleave="() => {toggleSelectBox = false}"
+			class="flex items-center text-base"
 		>
-			<div class="mr-2">
-				<Input type="checkbox" value="" />
+			<div 
+				class="w-[37px] h-[14px] flex items-center"
+			>
+				<Input
+					v-if="toggleSelectBox || selected"
+					type="checkbox" 
+					@click="$emit('toggleSelect')" 
+					:checked="selected" 
+					class="cursor-pointer mr-1 hover:visible" 
+				/>
 			</div>
-			<div class="sm:w-3/12 truncate pr-10">
-				{{ fullName }}
-			</div>
-			<div class="sm:w-3/12 truncate pr-10">
-				<div v-if="contact.email_ids && contact.email_ids.length > 0">
-					{{ contact.email_ids[0].email_id }}
+			<router-link :to="`/frappedesk/contacts/${contact.name}`" class="w-full group flex items-center">
+				<div class="sm:w-6/12 truncate pr-10">
+					{{ fullName }}
 				</div>
-				<div v-else-if="contact.email_id">
-					{{ contact.email_id }}
+				<div class="sm:w-4/12 truncate pr-10">
+					<div v-if="contact.email && contact.email.length > 0">
+						{{ contact.email[0] }}
+					</div>
 				</div>
-			</div>
-			<div class="sm:w-3/12 truncate pr-10">
-				<div v-if="contact.phone_nos && contact.phone_nos.length > 0">
-					{{ contact.phone_nos[0].phone }}
+				<div class="sm:w-4/12 truncate pr-10">
+					<div v-if="contact.phone && contact.phone.length > 0">
+						{{ contact.phone[0] }}
+					</div>
 				</div>
-				<div v-if="contact.phone">
-					{{ contact.phone }}
+				<div class="sm:w-4/12 truncate pr-10">
+					Temp Org
 				</div>
-			</div>
-			<div class="sm:w-3/12 truncate pr-10">Temp Org</div>
-		</router-link>
+			</router-link>
+		</div>
 	</div>
 </template>
 
 <script>
+import { ref, computed } from 'vue'
 import { Input, FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'ContactListItem',
-	props: ['contact'],
+	props: ['contact', 'selected'],
 	components: {
 		Input,
 		FeatherIcon,
 	},
-	computed: {
-		fullName() {
-			if (this.contact) {
-				return (this.contact.first_name || "") + " " + (this.contact.last_name || "")
+	setup(props) {
+		const toggleSelectBox = ref(false)
+		const fullName = computed(() => {
+			if (props.contact) {
+				return (props.contact.first_name || "") + " " + (props.contact.last_name || "")
 			}
-		},
+		})
+
+		return {
+			toggleSelectBox,
+			fullName
+		}
 	}
 }
 </script>
-
-<style>
-
-</style>

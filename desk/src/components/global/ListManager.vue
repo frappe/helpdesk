@@ -19,6 +19,9 @@ export default {
       handle_row_click: () => {},
       ...props.options
     })
+
+    options.value.fields = [...new Set([...(options.value.fields || []), 'name'])]
+
     const resources = ref(null)
     const newItems = ref([])
     const selectedItems = ref({})
@@ -146,7 +149,37 @@ export default {
         doctype: manager.value.options.doctype,
         filters: manager.value.options.filters
       })
-      return manager.value?.resources?.list?.data || []
+
+      if (!manager.value?.resources?.list?.data) {
+        return []
+      }
+
+      let list = JSON.parse(JSON.stringify(manager.value?.resources?.list?.data))
+      let newList = []
+      if (options.value.group) {
+        for(let i = 0; i < list.length; i++) {
+          if(!newList.find((x) => x.name === list[i].name)) {
+            newList.push(list[i])
+            
+            options.value.group.forEach(field => {
+              newList.at(-1)[field] = newList.at(-1)[field] ? [newList.at(-1)[field]] : []
+            })
+
+            for(let j = i + 1; j < list.length; j++) {
+              if (list[j].name === list[i].name) {
+                options.value.group.forEach(field => {
+                  if (list[j][field]) {
+                    newList.at(-1)[field] = [...new Set([...newList.at(-1)[field], list[j][field]])]
+                  }
+                })
+              }
+            }
+          }
+        }
+      } else {
+        newList = list
+      }
+      return newList
     })
 
     manager.value.loading = computed(() => {
@@ -178,13 +211,13 @@ export default {
     list() {
       return {
         type: 'list',
-        doctype: this.options?.doctype,
-        fields: [...this.options?.fields, "name"],
-        cache: this.options?.cache,
-        order_by: this.options?.order_by,
-        filters: this.options?.filters,
-        start: this.options?.limit * (this.options?.start_page - 1),
-        limit: this.options?.limit || 20,
+        doctype: this.manager.options?.doctype,
+        fields: this.manager.options?.fields,
+        cache: this.manager.options?.cache,
+        order_by: this.manager.options?.order_by,
+        filters: this.manager.options?.filters,
+        start: this.manager.options?.limit * (this.manager.options?.start_page - 1),
+        limit: this.manager.options?.limit || 20,
         onSuccess: (data) => {
           /**
            * Remove all the duplicates which might have been added to the
