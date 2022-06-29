@@ -3,7 +3,7 @@
         <div
             @pointerenter="() => { showSelectAllCheckbox = true}"
             @pointerleave="() => { showSelectAllCheckbox = false}"
-            class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px] select-none"
+            class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] pl-[11px] pr-[17px] rounded-[6px] select-none"
         >
             <div class="w-[37px] h-[14px]">
                 <Input 
@@ -14,41 +14,19 @@
                     :class="manager.allItemsSelected || showSelectAllCheckbox ? 'visible' : 'invisible'" 
                 />
             </div>
-            <div 
-                class="sm:w-1/12 flex flex-row items-center space-x-[7px] cursor-pointer"
-                @click="manager.toggleOrderBy('name')"
-            >
-                <span>#</span>
-            </div>
-            <div 
-                class="sm:w-8/12 flex flex-row items-center space-x-[6px] cursor-pointer"
-                @click="manager.toggleOrderBy('subject')"
-            >
-                <span>Subject</span>
-            </div>
-            <div 
-                class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
-                @click="manager.toggleOrderBy('status')"
-            >
-                <span>Status</span>
-            </div>
-            <div 
-                class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
-                @click="manager.toggleOrderBy('contact')"
-            >
-                <span>Created By</span>
-            </div>
-            <div 
-                class="sm:w-2/12 flex flex-row items-center space-x-[6px] cursor-pointer"
-                @click="manager.toggleOrderBy('resolution_by')"
-            >
-                <span>Due In</span>
-            </div>
-            <div
-                class="sm:w-1/12 flex flex-row items-center space-x-[6px] cursor-pointer"
-                @click="manager.toggleOrderBy('modified')"
-            >
-                <span>Modified</span>
+            <div class="flex flex-row items-center group w-full">
+                <div class="sm:w-6/12">
+                    Name
+                </div>
+                <div class="sm:w-4/12">
+                    Email
+                </div>
+                <div class="sm:w-4/12">
+                    Phone
+                </div>
+                <div class="sm:w-4/12">
+                    Organisation
+                </div>
             </div>
         </div>
         <div 
