@@ -172,15 +172,7 @@
 						</template>
 					</Dropdown>
 				</div>
-				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="(newValue) => { 
-					ticketController.set(this.ticketId, 'notes', newValue).then(() => {
-						$toast({
-							title: 'Ticket updated successfully.',
-							customIcon: 'circle-check',
-							appearance: 'success',
-						})
-					})
-				}" />
+				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @input="updateNotes" />
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -198,7 +190,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown, Input, Dialog, Badge, LoadingText } from 'frappe-ui'
+import { FeatherIcon, Dropdown, Input, Dialog, Badge, LoadingText, debounce } from 'frappe-ui'
 import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import CustomAvatar from '@/components/global/CustomAvatar.vue'
@@ -300,9 +292,15 @@ export default {
 		},
 	},
 	methods: {
-		updateNotes(value) {
-			this.ticketController.set(this.ticketId, 'notes', value)
-		},
+		updateNotes: debounce(function(note) {
+			this.ticketController.set(this.ticketId, 'notes', note).then(() => {
+				this.$toast({
+					title: 'Ticket updated successfully.',
+					customIcon: 'circle-check',
+					appearance: 'success',
+				})
+			})
+		}, 500),
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
 				this.updatingTicketType = true
