@@ -95,18 +95,18 @@
         </div>
         <div 
             id="rows" 
-            class="flex flex-col space-y-2 overflow-scroll"
+            class="flex flex-col overflow-scroll"
             :style="{ height: viewportWidth > 768 ? 'calc(100vh - 6.4rem)' : null }"
         >
             <div v-if="manager.loading">
                 <div v-for="n in 3" :key="n">
-                    <TicketListItemSkeleton />
+                    <TicketListItemSkeleton :class="n == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" class="my-[9px]" />
                 </div>
             </div>
             <div v-else>
                 <div v-if="manager.list.length > 0">
-                    <div v-for="ticket in manager.list" :key="ticket.name">
-                        <TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
+                    <div v-for="(ticket, index) in manager.list" :key="ticket.name">
+                        <TicketListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
                     </div>
                 </div>
                 <div v-else>
