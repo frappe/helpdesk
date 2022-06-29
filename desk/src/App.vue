@@ -136,7 +136,7 @@ export default {
 		},
 		companyName() {
 			return {
-				method: 'frappedesk.api.website.company_name',
+				method: 'frappedesk.api.website.helpdesk_name',
 				auto: true,
 				onSuccess: (res) => {
 					document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`

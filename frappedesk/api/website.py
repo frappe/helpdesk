@@ -16,6 +16,6 @@ def navbar_items():
     return frappe.get_doc("Website Settings").top_bar_items
 
 @frappe.whitelist(allow_guest=True)
-def company_name():
-    name = frappe.get_doc("Company").company_name
+def helpdesk_name():
+    name = frappe.get_doc("Support Settings").helpdesk_name
     return name if name else ''
