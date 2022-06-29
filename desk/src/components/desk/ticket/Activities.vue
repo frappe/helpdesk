@@ -26,6 +26,9 @@ export default {
 			}
 		});
 	},
+	unmounted() {
+		this.$socket.off('list_update')
+	},
     resources: {
         activities() {
 			return {

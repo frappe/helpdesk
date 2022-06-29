@@ -14,3 +14,8 @@ def brand_html():
 @frappe.whitelist(allow_guest=True)
 def navbar_items():
     return frappe.get_doc("Website Settings").top_bar_items
+
+@frappe.whitelist(allow_guest=True)
+def company_name():
+    name = frappe.get_doc("Company").company_name
+    return name if name else ''

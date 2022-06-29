@@ -210,7 +210,6 @@ export default {
 		const showNewContactDialog = ref(false)
 		const showTicketHistory = ref(false)
 
-		const tickets = inject('tickets')
 		const contacts = inject('contacts')
 		const ticketController = inject('ticketController')
 
@@ -225,7 +224,6 @@ export default {
 			query,
 			showNewContactDialog,
 			showTicketHistory,
-			tickets,
 			contacts,
 			ticketController,
 			showOtherTicketsOfContacts

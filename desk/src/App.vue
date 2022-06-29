@@ -1,8 +1,6 @@
 <template>
 	<div v-if="!user.loading">
-		<router-view v-slot="{ Component }">
-			<component :is="Component" />
-		</router-view>
+		<router-view />
 		<Toasts />
 	</div>
 </template>
@@ -133,6 +131,15 @@ export default {
 				},
 				onFailure: (error) => {
 					console.error(error)
+				}
+			}
+		},
+		companyName() {
+			return {
+				method: 'frappedesk.api.website.company_name',
+				auto: true,
+				onSuccess: (res) => {
+					document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`
 				}
 			}
 		}
