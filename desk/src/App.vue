@@ -134,7 +134,7 @@ export default {
 				}
 			}
 		},
-		companyName() {
+		helpdeskName() {
 			return {
 				method: 'frappedesk.api.website.helpdesk_name',
 				auto: true,

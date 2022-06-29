@@ -67,9 +67,9 @@
         <div class="footer-info">
             <div class="row">
                 <div class="footer-col-left col-sm-6 col-12">
-                    {% set company = frappe.get_doc("Company") %}
-                    {% if company.company_name %}
-                    <div class="ql-editor read-mode"><p>© {{ company.company_name }}. 2022</p></div>
+                    {% set helpdesk_name = frappe.get_doc("Support Settings").helpdesk_name %}
+                    {% if helpdesk_name %}
+                    <div class="ql-editor read-mode"><p>© {{ helpdesk_name }}. 2022</p></div>
                     {% endif %}
                 </div>
                 <div class="footer-col-right col-sm-6 col-12 footer-powered">

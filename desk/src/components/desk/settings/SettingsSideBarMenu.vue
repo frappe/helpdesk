@@ -38,6 +38,11 @@ export default {
 					action: () => {
 						window.location.href = '/app/email-account'
 					}
+				},
+				{
+					label: 'Helpdesk Settings',
+					pageName: 'Helpdesk Settings',
+					route: '/frappedesk/settings/helpdesk'
 				}
 			]
 		}

@@ -103,83 +103,28 @@ const routes = [
 					{
 						path: 'agents',
 						name: 'Agents',
-						component: () => import('@/pages/desk/settings/agent/Agents.vue'),
-						meta: {
-							// breadcrumbs() {
-							// 	return [
-							// 		{
-							// 			label: 'Settings',
-							// 			path: '/frappedesk/settings'
-							// 		},
-							// 		{
-							// 			label: 'Agents'
-							// 		}
-							// 	]
-							// }
-						}
+						component: () => import('@/pages/desk/settings/agent/Agents.vue')
 					},
 					{
 						path: 'sla',
 						name: 'SlaPolicies',
-						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue'),
-						meta: {
-							// breadcrumbs() {
-							// 	return [
-							// 		{
-							// 			label: 'Settings',
-							// 			path: '/frappedesk/settings'
-							// 		},
-							// 		{
-							// 			label: 'Support Policies'
-							// 		}
-							// 	]
-							// }
-						}
+						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue')
 					},
 					{
 						path: 'sla/new',
 						name: 'NewSlaPolicy',
-						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
-						meta: {
-							// breadcrumbs() {
-							// 	return [
-							// 		{
-							// 			label: 'Settings',
-							// 			path: '/frappedesk/settings'
-							// 		},
-							// 		{
-							// 			label: 'Support Policies',
-							// 			path: '/frappedesk/settings/sla'
-							// 		},
-							// 		{
-							// 			label: 'New Support Policy'
-							// 		}
-							// 	]
-							// }
-						}
+						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue')
 					},
 					{
 						path: 'sla/:slaId',
 						name: 'SlaPolicy',
 						component: () => import('@/pages/desk/settings/sla/SlaPolicy.vue'),
-						props: true,
-						meta: {
-							// breadcrumbs(route) {
-							// 	return [
-							// 		{
-							// 			label: 'Settings',
-							// 			path: '/frappedesk/settings'
-							// 		},
-							// 		{
-							// 			label: 'Support Policies',
-							// 			path: '/frappedesk/settings/sla'
-							// 		},
-							// 		{
-							// 			label: route.params.slaId
-							// 		}
-							// 	]
-							// }
-						}
+						props: true
+					},
+					{
+						path: 'helpdesk',
+						name: 'Helpdesk Settings',
+						component: () => import('@/pages/desk/settings/helpdesk/HelpdeskSettings.vue')
 					}
 				]
 			}
