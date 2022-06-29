@@ -118,15 +118,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!manager.loading && !(manager.list.length == 0 && manager.start == 0)" class="flex justify-center">
-                <div v-if="manager.hasPage(2)" class="flex flex-row space-x-2">
-                    <Button v-if="manager.hasPage(manager.currPage -1)" appearance="minimal" icon-left="chevron-left" @click="manager.previousPage()">Previous</Button>
-                    <Button appearance="primary"> {{ manager.currPage }} </Button>
-                    <Button v-if="manager.hasPage(manager.currPage + 1)" appearance="minimal" @click="manager.getPage(manager.currPage + 1)"> {{ manager.currPage + 1 }} </Button>
-                    <Button v-if="manager.hasPage(manager.currPage + 2)" appearance="minimal" @click="manager.getPage(manager.currPage + 2)"> {{ manager.currPage + 2 }}</Button>
-                    <Button v-if="manager.hasPage(manager.currPage + 1)" appearance="minimal" icon-right="chevron-right" @click="manager.nextPage()">Next</Button>
-                </div>
-            </div>
+            <ListPageController :manager="manager" />
         </div>
     </div>
 </template>
@@ -137,6 +129,7 @@ import { Input } from 'frappe-ui'
 import TicketListItem from '@/components/desk/tickets/TicketListItem.vue'
 import TicketListItemSkeleton from '@/components/desk/tickets/TicketListItemSkeleton.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+import ListPageController from '@/components/global/ListPageController.vue'
 
 export default {
     name: 'TicketList',
@@ -145,7 +138,8 @@ export default {
         TicketListItem,
         TicketListItemSkeleton,
         CustomIcons,
-        Input
+        Input,
+        ListPageController
     },
     setup() {
         const showSelectAllCheckbox = ref(false)

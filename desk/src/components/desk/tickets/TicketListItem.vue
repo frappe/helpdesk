@@ -110,7 +110,7 @@ import { inject, ref } from 'vue'
 
 export default {
 	name: 'TicketListItem',
-	props: ['ticket', 'selected', 'isLoading'],
+	props: ['ticket', 'selected'],
 	components: {
 		Input,
 		Badge,
