@@ -1,5 +1,5 @@
 ––<template>
-	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
+	<div class="block select-none rounded-[6px] py-[7px] pl-[11px] pr-[9px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
 		<div 
 			v-if="ticket"
 			@pointerover="() => {toggleSelectBox = true}"
@@ -24,7 +24,7 @@
 			>
 				{{ ticket.name }}
 			</div>
-			<div class="sm:w-8/12">
+			<div class="sm:w-7/12">
 				<router-link 
 					:to="`/frappedesk/tickets/${ticket.name}`"
 					class="flex items-center space-x-[8px]"
@@ -84,7 +84,7 @@
 				</a>
 			</div>
 			<div 
-				class="pt-[-3px] w-[50.37px]"
+				class="pt-[-3px] sm:w-1/12 ml-[2px]"
 			>
 				<div>
 					<div class="text-base flex flex-row-reverse">

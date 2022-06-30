@@ -48,6 +48,7 @@ export default {
       start: options.value.limit * (options.value.start_page - 1),
       currPage: options.value.start_page || 1,
       totalPages: 0,
+      totalCount: 0,
       previousPage: () => {
         if (manager.value.start > 0) {
           let newStart = manager.value.start - options.value.limit
@@ -252,6 +253,7 @@ export default {
       return {
         method: 'frappe.client.get_count',
         onSuccess: (count) => {
+          this.manager.totalCount = count
           this.manager.totalPages = Math.ceil(count / this.options.limit)
         }
       }
