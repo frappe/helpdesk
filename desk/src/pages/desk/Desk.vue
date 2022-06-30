@@ -7,14 +7,12 @@
 	</div>
 </template>
 <script>
-import NavBar from "@/components/desk/NavBar.vue"
 import SideBarMenu from "@/components/desk/SideBarMenu.vue"
 import { inject, provide, ref } from 'vue'
 
 export default {
 	name: "Desk",
 	components: {
-		NavBar,
 		SideBarMenu,
 	},
 	setup() {
