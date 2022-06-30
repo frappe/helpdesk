@@ -12,12 +12,13 @@ def after_install():
 	add_default_ticket_template()
 	add_default_agent_groups()
 	update_agent_role_permissions()
+	add_default_assignment_rule()
 
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
 
 	if not website_settings.home_page:
-		website_settings.home_page = '/support/kb'
+		website_settings.home_page = "/support/kb"
 		website_settings.save()
 
 def add_support_redirect_to_tickets():
@@ -33,7 +34,7 @@ def add_support_redirect_to_tickets():
         "target": "support/tickets"
     })
 
-    website_settings.append('route_redirects', base_route)
+    website_settings.append("route_redirects", base_route)
     website_settings.save()
 
 def add_default_categories():
@@ -159,16 +160,16 @@ def add_default_ticket_template():
 	
 	template.template_name = "Default"
 	template.append("fields", {
-		'label': 'Subject',
-		'fieldname': 'subject',
-		'fieldtype': 'Data',
-		'reqd': True
+		"label": "Subject",
+		"fieldname": "subject",
+		"fieldtype": "Data",
+		"reqd": True
 	})
 	template.append("fields", {
-		'label': 'Description',
-		'fieldname': 'description',
-		'fieldtype': 'Text Editor',
-		'reqd': True
+		"label": "Description",
+		"fieldname": "description",
+		"fieldtype": "Text Editor",
+		"reqd": True
 	})
 
 	template.insert()
@@ -212,7 +213,7 @@ def add_on_ticket_create_script():
 		script_doc.insert()
 
 def update_agent_role_permissions():
-	if (frappe.db.exists("Role", "Agent")):
+	if frappe.db.exists("Role", "Agent"):
 		agent_role_doc = frappe.get_doc("Role", "Agent")
 		agent_role_doc.search_bar = True
 		agent_role_doc.notifications = True
@@ -225,3 +226,21 @@ def update_agent_role_permissions():
 		agent_role_doc.dashboard = True
 		agent_role_doc.save()
 
+def add_default_assignment_rule():
+	if frappe.get_list("Assignment Rule", filters={"document_type": "Ticket"}):
+		return
+	
+	rule_doc = frappe.new_doc("Assignment Rule")
+	rule_doc.name = "Support Rotation"
+	rule_doc.document_type = "Ticket"
+	rule_doc.description = "Automatic Ticket Assignment"
+	rule_doc.assign_condition = "status == 'Open'"
+
+	for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
+		day_doc = frappe.get_doc({
+    	    "doctype": "Assignment Rule Day",
+			"day": day
+		})
+		rule_doc.append("assignment_days", day_doc)
+	
+	rule_doc.save()

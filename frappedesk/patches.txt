@@ -12,3 +12,4 @@ frappedesk.patches.remove_agent_role_profile
 frappedesk.patches.add_roles_to_agent_user
 frappedesk.patches.create_and_set_contact_using_user_who_created_the_ticket
 frappedesk.patches.refactor_ticket_activity_grammar
+frappedesk.patches.add_default_assignment_rule
