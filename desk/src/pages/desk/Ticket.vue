@@ -17,7 +17,8 @@
 							<div class="grow">
 								<div class="grow flex flex-row items-center space-x-[13.5px]">
 									<div>
-										<CustomIcons name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
+										<CustomIcons v-if="ticket.via_customer_portal" name="comment" class="h-[25px] w-[25px] stroke-[#A6B1B9]" />
+										<FeatherIcon v-else name="mail" class="h-[25px] w-[25px] p-[1.5px] stroke-[#A6B1B9]" />
 									</div>
 									<a :title="ticket.subject" class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold">
 										{{ ticket.subject }}
