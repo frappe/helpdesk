@@ -256,7 +256,7 @@ export default {
 				method: 'frappe.client.get_count',
 				params: {
 					doctype: 'Ticket',
-					filters: {status: ['=', 'Replied'], _assign: ['Like', `%${this.user.agent.name}%`]}
+					filters: {status: ['=', 'Replied'], _assign: ['like', `%${this.user.agent.name}%`]}
 				},
 				auto: true,
 				onSuccess(count) {
