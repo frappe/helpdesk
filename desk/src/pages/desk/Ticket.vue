@@ -1,12 +1,20 @@
 <template>
 	<div>
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
-			<div class="flow-root pt-4 pb-6 pr-[26.14px] pl-[18px] h-[72px]">
+			<div class="h-[72px] px-[20px]">
+				<router-link 
+					:to="(prevRoute && prevRoute.path === '/frappedesk/tickets') ? prevRoute : {path: '/frappedesk/tickets', query: {menu_filter: ticketSideBarFilter}}"
+					class="h-[20px] my-[26px] text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
+					role="button"
+				>
+					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
+					<div> Back to {{ sideBarFilterMap[ticketSideBarFilter] }} </div>
+				</router-link>
 			</div>
 			<div
 				v-if="ticket" 
 				class="flex border-t w-full"
-				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 4rem)' : null }"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 72px)' : null }"
 			>
 				<div class="border-r w-[252px] shrink-0">
 					<ActionPanel :ticketId="ticket.name" />
@@ -181,8 +189,15 @@ export default {
 				placeholder: 'Compose your reply...',
 				theme: 'snow',
 				bounds: document.body,
-			}
+			},
+			prevRoute: null
+
 		}
+	},
+	beforeRouteEnter(to, from, next) {
+		next(vm => {
+			vm.prevRoute = from
+		})
 	},
 	setup() {
 		const editor = ref(null);
@@ -194,13 +209,18 @@ export default {
 
 		const tempTextEditorData = ref({})
 		
+		const sideBarFilterMap = inject('sideBarFilterMap')
+		const ticketSideBarFilter = inject('ticketSideBarFilter')
+		
 		return { 
 			editor,
 			viewportWidth,
 			user,
 			attachments,
 			tempTextEditorData,
-			editingType
+			editingType,
+			sideBarFilterMap,
+			ticketSideBarFilter
 		}
 	},
 	resources: {
