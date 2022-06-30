@@ -26,6 +26,7 @@ doc_events = {
 		]
 	},
 	"Contact": {"on_trash": "frappedesk.frappedesk.doctype.ticket.ticket.update_ticket",},
+	"Assignment Rule": {"on_trash": "frappedesk.overrides.on_assignment_rule_trash"}
 }
 
 scheduler_events = {

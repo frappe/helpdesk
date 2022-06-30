@@ -17,6 +17,31 @@ class Agent(Document):
 			})
 		user.save()
 
+	def after_insert(self):
+		rule_doc = get_assignment_rule()
+		user_doc = frappe.get_doc({
+			"doctype": "Assignment Rule User",
+			"user": self.user
+		})
+		rule_doc.append("users", user_doc)
+		rule_doc.save(ignore_permissions=True)
+
+	def on_trash(self):
+		rule_doc = get_assignment_rule()
+		for user in rule_doc.get("users"):
+			if user.user == self.name:
+				rule_doc.remove(user)
+		rule_doc.save(ignore_permissions=True)
+
+def get_assignment_rule():
+	rules = frappe.get_all("Assignment Rule", filters={"document_type": "Ticket", "disabled": False})
+	if rules:
+		return frappe.get_doc("Assignment Rule", rules[0])
+	else:
+		frappe.throw("No assignment rule found for Tickets!!")
+
+
+
 @frappe.whitelist()
 def create_agent(first_name, last_name, email, signature, team):
 	if frappe.db.exists("User", email):
