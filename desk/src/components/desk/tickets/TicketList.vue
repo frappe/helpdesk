@@ -3,7 +3,7 @@
         <div
             @pointerenter="() => { showSelectAllCheckbox = true}"
             @pointerleave="() => { showSelectAllCheckbox = false}"
-            class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] pl-[11px] pr-[49.80px] rounded-[6px] select-none"
+            class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] px-[11px] rounded-[6px] select-none"
         >
             <div class="w-[37px] h-[14px]">
                 <Input 
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div 
-                class="sm:w-8/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+                class="sm:w-7/12 flex flex-row items-center space-x-[6px] cursor-pointer"
                 @click="manager.toggleOrderBy('subject')"
             >
                 <span>Subject</span>
@@ -92,21 +92,24 @@
                     />
                 </div>
             </div>
+            <div class="sm:w-1/12 text-[10px] flex flex-row-reverse text-gray-400">
+                <span v-if="totalTickets"> {{ `${manager.totalCount} of ${totalTickets}` }} </span>
+            </div>
         </div>
         <div 
             id="rows" 
-            class="flex flex-col space-y-2 overflow-scroll"
+            class="flex flex-col overflow-scroll"
             :style="{ height: viewportWidth > 768 ? 'calc(100vh - 6.4rem)' : null }"
         >
             <div v-if="manager.loading">
                 <div v-for="n in 3" :key="n">
-                    <TicketListItemSkeleton />
+                    <TicketListItemSkeleton :class="n == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" class="my-[9px]" />
                 </div>
             </div>
             <div v-else>
                 <div v-if="manager.list.length > 0">
-                    <div v-for="ticket in manager.list" :key="ticket.name">
-                        <TicketListItem :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
+                    <div v-for="(ticket, index) in manager.list" :key="ticket.name">
+                        <TicketListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :ticket="ticket" @toggle-select="manager.select(ticket)" :selected="manager.itemSelected(ticket)" />
                     </div>
                 </div>
                 <div v-else>
@@ -147,6 +150,32 @@ export default {
         return {
             showSelectAllCheckbox,
             viewportWidth
+        }
+    },
+    mounted() {
+        this.$socket.on("list_update", (data) => {
+            if (data.doctype == "Ticket") {
+                this.$resources.totalTickets.fetch()
+            }
+        })
+    },
+    unmounted() {
+        this.$socket.off()
+    },
+    computed: {
+        totalTickets() {
+            return this.$resources.totalTickets.data || null
+        }
+    },
+    resources: {
+        totalTickets() {
+            return {
+                method: 'frappe.client.get_count',
+                params: {
+                    doctype: 'Ticket'
+                },
+                auto: true
+            }
         }
     }
 }

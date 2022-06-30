@@ -1,6 +1,14 @@
 <template>
 	<div v-if="ticket" class="flex flex-col h-full">
-		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] border-b border-dashed">
+		<div 
+			class="pl-[19px] pr-[17px] pt-[18px] pb-[28px]" 
+			style="
+				background-image: linear-gradient(to right, #EBEEF0 33%, rgba(255,255,255,0) 0%);
+				background-position: bottom;
+				background-size: 19.5px 1px;
+				background-repeat: repeat-x;
+			"
+		>
 			<div class="flex flex-row pb-[15px]">
 				<div class="grow"><span class="text-[16px] font-normal text-gray-500">Ticket</span> <span class="text-[15px] font-semibold">{{ `#${ticket.name}` }}</span></div>
 				<div class="w-[88.54px] select-none">
@@ -28,10 +36,14 @@
 								<div class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50 bg-white">
 									<div v-for="status in ['Open', 'Replied', 'Resolved', 'Closed']" :key="status">
 										<div 
-											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[85px]"
+											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
 											@click="updateStatus(status)"
 										> 
-											{{ status }} 
+											<div class="flex flex-row space-x-2 items-center">
+												<FeatherIcon v-if="status != 'Open'" :name="{ Closed: 'lock', Resolved: 'check', Replied: 'corner-up-left' }[status]" class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]" />
+												<CustomIcons v-else name="comment" class="w-[16px] h-[16px] stroke-green-600" />
+												<div>{{ status }}</div>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -168,15 +180,7 @@
 						</template>
 					</Dropdown>
 				</div>
-				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="(newValue) => { 
-					ticketController.set(this.ticketId, 'notes', newValue).then(() => {
-						$toast({
-							title: 'Ticket updated successfully.',
-							customIcon: 'circle-check',
-							appearance: 'success',
-						})
-					})
-				}" />
+				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @input="updateNotes" />
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -194,7 +198,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown, Input, Dialog, Badge, LoadingText } from 'frappe-ui'
+import { FeatherIcon, Dropdown, Input, Dialog, Badge, LoadingText, debounce } from 'frappe-ui'
 import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import CustomAvatar from '@/components/global/CustomAvatar.vue'
@@ -296,9 +300,15 @@ export default {
 		},
 	},
 	methods: {
-		updateNotes(value) {
-			this.ticketController.set(this.ticketId, 'notes', value)
-		},
+		updateNotes: debounce(function(note) {
+			this.ticketController.set(this.ticketId, 'notes', note).then(() => {
+				this.$toast({
+					title: 'Ticket updated successfully.',
+					customIcon: 'circle-check',
+					appearance: 'success',
+				})
+			})
+		}, 500),
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
 				this.updatingTicketType = true

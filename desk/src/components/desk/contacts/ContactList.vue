@@ -36,8 +36,8 @@
         >
             <div v-if="!manager.loading">
                 <div v-if="manager.list.length > 0">
-                    <div v-for="contact in manager.list" :key="contact.name">
-                        <ContactListItem :contact="contact" @toggle-select="manager.select(contact)" :selected="manager.itemSelected(contact)" />
+                    <div v-for="(contact, index) in manager.list" :key="contact.name">
+                        <ContactListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :contact="contact" @toggle-select="manager.select(contact)" :selected="manager.itemSelected(contact)" />
                     </div>
                 </div>
                 <div v-else>

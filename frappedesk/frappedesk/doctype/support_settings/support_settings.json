@@ -27,7 +27,8 @@
   "column_break_19",
   "greeting_subtitle",
   "search_apis_sb",
-  "search_apis"
+  "search_apis",
+  "helpdesk_name"
  ],
  "fields": [
   {
@@ -151,12 +152,16 @@
    "fieldname": "greetings_section_section",
    "fieldtype": "Section Break",
    "label": "Greetings Section"
+  },
+  {
+   "fieldname": "helpdesk_name",
+   "fieldtype": "Data",
+   "label": "Helpdesk Name"
   }
  ],
  "issingle": 1,
  "links": [],
- "migration_hash": "530d5e30443848e96beb1ae1ff4965e7",
- "modified": "2021-10-21 14:27:08.693585",
+ "modified": "2022-06-29 11:22:53.995066",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Support Settings",
@@ -176,5 +181,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }
