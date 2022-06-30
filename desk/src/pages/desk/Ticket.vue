@@ -48,6 +48,8 @@
 									contentType="html" 
 									:options="editorOptions"
 									style="min-height:150px; max-height:200px; overflow-y: auto;"
+									:class="editingType === 'reply' ? '' : 'bg-[#FDF9F2]'"
+									:placeholder="`Type a ${editingType == 'reply' ? 'response' : 'comment' }`"
 									@click="focusEditor()"
 								/>
 								<div v-if="editingType === 'reply'" class="border-b border-l border-r border-gray-400 p-2 select-none">
@@ -186,7 +188,6 @@ export default {
 						}
 					}
 				},
-				placeholder: 'Compose your reply...',
 				theme: 'snow',
 				bounds: document.body,
 			},
