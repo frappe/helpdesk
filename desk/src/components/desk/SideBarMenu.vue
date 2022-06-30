@@ -107,7 +107,21 @@ export default {
 
 		const updateSidebarTicketCount = inject('updateSidebarTicketCount')
 
-		return { viewportWidth, user, iconHeight, iconWidth, menuOptions, profileSettings, showProfileSettings, updateSidebarTicketCount }
+		const sideBarFilterMap = inject('sideBarFilterMap')
+		const ticketSideBarFilter = inject('ticketSideBarFilter')
+
+		return { 
+			viewportWidth, 
+			user, 
+			iconHeight, 
+			iconWidth, 
+			menuOptions, 
+			profileSettings, 
+			showProfileSettings, 
+			updateSidebarTicketCount, 
+			ticketSideBarFilter,
+			sideBarFilterMap
+		}
 	},
 	mounted() {
 		this.menuOptions = [
@@ -139,6 +153,8 @@ export default {
 		]
 
 		if (this.user.agent) {
+			this.ticketSideBarFilter = 'my-open-tickets'
+
 			this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 				{
 					label: 'My Open Tickets',
@@ -229,11 +245,15 @@ export default {
 				}
 			}
 		]
+
+		this.syncSideBarTicketFilter()
 		this.syncSelectedMenuItemBasedOnRoute()
+
 		this.updateSidebarTicketCount = this.updateTicketCount
 	},
 	watch: {
 		$route() {
+			this.syncSideBarTicketFilter()
 			this.syncSelectedMenuItemBasedOnRoute()
 		}
 	},
@@ -270,17 +290,13 @@ export default {
 			this.$resources.myOpenTicketsCount.fetch()
 			this.$resources.myRepliedTicketsCount.fetch()
 		},
+		syncSideBarTicketFilter() {
+			this.ticketSideBarFilter = this.$route.name === 'DeskTickets' ? this.$route.query.menu_filter : this.ticketSideBarFilter
+		},
 		syncSelectedMenuItemBasedOnRoute() {
 			const handleTicketFilterQueries = () => {
-				const ticketFilterMap = {
-					'all': 'All Tickets',
-					'my-open-tickets': 'My Open Tickets',
-					'my-replied-tickets': 'My Replied Tickets',
-					'my-resolved-tickets': 'My Resolved Tickets',
-					'my-closed-tickets': 'My Closed Tickets',
-				}
-				if (ticketFilterMap[this.$route.query.menu_filter]) {
-					return ticketFilterMap[this.$route.query.menu_filter]
+				if (this.sideBarFilterMap[this.ticketSideBarFilter]) {
+					return this.sideBarFilterMap[this.ticketSideBarFilter]
 				} else {
 					return 'All Tickets'
 				}

@@ -30,7 +30,7 @@
 		>
 			<template #body="{ manager }">
 				<div>
-					<div class="flow-root py-4 px-[16px]">
+					<div class="flow-root py-[22px] h-[72px] px-[16px]">
 						<div class="float-left">
 						</div>
 						<div class="float-right">
@@ -152,7 +152,9 @@ export default {
 		filters(newValue) {
 			let query = {}
 			
-			if (this.$route.query.menu_filter) query['menu_filter'] = this.$route.query.menu_filter
+			if (this.$route.query.menu_filter) {
+				query['menu_filter'] = this.$route.query.menu_filter
+			}
 
 			newValue.forEach(filter => {
 				for (const [key, value] of Object.entries(filter)) {

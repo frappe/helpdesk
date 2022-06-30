@@ -180,7 +180,7 @@
 						</template>
 					</Dropdown>
 				</div>
-				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @input="updateNotes" />
+				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="updateNotes" />
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -300,7 +300,7 @@ export default {
 		},
 	},
 	methods: {
-		updateNotes: debounce(function(note) {
+		updateNotes(note) {
 			this.ticketController.set(this.ticketId, 'notes', note).then(() => {
 				this.$toast({
 					title: 'Ticket updated successfully.',
@@ -308,7 +308,7 @@ export default {
 					appearance: 'success',
 				})
 			})
-		}, 500),
+		},
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
 				this.updatingTicketType = true

@@ -7,14 +7,12 @@
 	</div>
 </template>
 <script>
-import NavBar from "@/components/desk/NavBar.vue"
 import SideBarMenu from "@/components/desk/SideBarMenu.vue"
 import { inject, provide, ref } from 'vue'
 
 export default {
 	name: "Desk",
 	components: {
-		NavBar,
 		SideBarMenu,
 	},
 	setup() {
@@ -32,6 +30,19 @@ export default {
 		const agents = ref([])
 		const agentGroups = ref([])
 		const agentController = ref({})
+
+		const sideBarFilterMap = ref({
+			'all': 'All Tickets',
+			'my-open-tickets': 'My Open Tickets',
+			'my-replied-tickets': 'My Replied Tickets',
+			'my-resolved-tickets': 'My Resolved Tickets',
+			'my-closed-tickets': 'My Closed Tickets',
+		})
+		provide('sideBarFilterMap', sideBarFilterMap)
+		
+		const ticketSideBarFilter = ref('all')
+		provide('ticketSideBarFilter', ticketSideBarFilter)
+		
 		
 		provide('ticketTypes', ticketTypes)
 		provide('ticketPriorities', ticketPriorities)

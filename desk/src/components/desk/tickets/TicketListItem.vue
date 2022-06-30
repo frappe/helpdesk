@@ -20,7 +20,7 @@
 			</div>
 			<div 
 				class="sm:w-1/12 text-gray-600 font-normal"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
 			>
 				{{ ticket.name }}
 			</div>
@@ -28,11 +28,11 @@
 				<router-link 
 					:to="`/frappedesk/tickets/${ticket.name}`"
 					class="flex items-center space-x-[8px]"
-					:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+					:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
 				>
 					<div 
 						class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
-						:class="!seen ? 'font-semibold text-gray-800' : (ticket.status == 'Closed' ? 'font-normal text-gray-600' : 'font-normal text-gray-900')"
+						:class="!seen ? 'font-semibold text-gray-800' : (['Closed', 'Resolved'].includes(ticket.status) ? 'font-normal text-gray-600' : 'font-normal text-gray-900')"
 					>
 						{{ ticket.subject }}
 					</div>
@@ -41,7 +41,7 @@
 			</div>
 			<div 
 				class="sm:w-3/12"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
 			>
 				<div class="w-full">
 					<div v-if="false" class="stroke-green-600 stroke-red-600 stroke-yellow-600 w-0 h-0"></div>
@@ -58,13 +58,13 @@
 			</div>
 			<div 
 				class="sm:w-3/12"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
 			>
 				<div class="truncate w-40 text-gray-600 font-normal" v-if="ticket.contact">{{ ticket.contact }}</div>
 			</div>
 			<div 
 				class="sm:w-2/12 font-normal"
-				:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
 			>
 				<a 
 					v-if="getResolutionDueIn()" 
@@ -78,7 +78,7 @@
 				<a 
 					:title="$dayjs(ticket.modified)"
 					class="text-gray-600 font-normal"
-					:style="ticket.status == 'Closed' ? 'opacity: 0.5;': ''"
+					:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
 				>
 					{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
 				</a>

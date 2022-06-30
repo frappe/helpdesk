@@ -3,8 +3,11 @@
         <div class="mb-[16px]">
             <div class="font-semibold">Helpdesk Settings</div>
         </div>
-        <div class="w-53">
-            <Input label="Helpdesk Name" type="text" v-model="helpdeskName" class="text-gray-600 w-52" @input="updateHelpdeskName" />
+        <div class="w-53 flex flex-row space-x-2">
+            <Input label="Helpdesk Name" type="text" v-model="helpdeskName" class="text-gray-600 w-52" @input="checkHelpdeskNameChange" />
+            <div class="mt-[22px]">
+                <Button :disabled="!helpdeskNameChanged" appearance="primary" @click="updateHelpdeskName"> Save </Button>
+            </div>
         </div>
     </div>
 </template>
@@ -20,9 +23,13 @@ export default {
     },
     setup() {
         const helpdeskName = ref('')
+        const newHelpdeskName = ref('')
+        const helpdeskNameChanged = ref(false)
 
         return {
-            helpdeskName
+            helpdeskName,
+            newHelpdeskName,
+            helpdeskNameChanged
         }
     },
     resources: {
@@ -46,14 +53,19 @@ export default {
                         customIcon: 'circle-check',
                         appearance: 'success',
                     })
+                    this.helpdeskNameChanged = false
                 }
             }
         }
     },
     methods: {
-        updateHelpdeskName: debounce(function(name) {
-            this.$resources.updateHelpdeskName.submit({name})
-        }, 500)
+        checkHelpdeskNameChange: debounce(function(name) {
+            this.helpdeskNameChanged = this.helpdeskName != name
+            this.newHelpdeskName = name
+        }, 500),
+        updateHelpdeskName() {
+            this.$resources.updateHelpdeskName.submit({name: this.newHelpdeskName})
+        } 
     }
 }
 </script>

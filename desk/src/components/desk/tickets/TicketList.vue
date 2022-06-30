@@ -3,7 +3,7 @@
         <div
             @pointerenter="() => { showSelectAllCheckbox = true}"
             @pointerleave="() => { showSelectAllCheckbox = false}"
-            class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] px-[11px] rounded-[6px] select-none"
+            class="bg-[#F7F7F7] group flex items-center h-[40px] text-base font-medium text-gray-500 py-[10px] px-[11px] rounded-[6px] select-none"
         >
             <div class="w-[37px] h-[14px]">
                 <Input 
@@ -99,7 +99,7 @@
         <div 
             id="rows" 
             class="flex flex-col overflow-scroll"
-            :style="{ height: viewportWidth > 768 ? 'calc(100vh - 6.4rem)' : null }"
+            :style="{ height: viewportWidth > 768 ? 'calc(100vh - 112px)' : null }"
         >
             <div v-if="manager.loading">
                 <div v-for="n in 3" :key="n">
