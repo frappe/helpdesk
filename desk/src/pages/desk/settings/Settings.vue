@@ -1,11 +1,11 @@
 <template>
 	<div>
 		<SettingsTopPanel :selectedSetting="selectedSetting" />
-		<div :style="{ height: viewportWidth > 768 ? 'calc(100vh - 6.5rem)' : null }" class="flex">
+		<div :style="{ height: viewportWidth > 768 ? 'calc(100vh - 55px)' : null }" class="flex">
 			<div class="sm:w-2/12 border-r">
 				<SettingsSideBarMenu />
 			</div>
-			<div class="sm:w-11/12 h-full">
+			<div class="sm:w-10/12 h-full">
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />

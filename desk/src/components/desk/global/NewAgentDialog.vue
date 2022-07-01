@@ -128,7 +128,7 @@ export default {
 				first_name:this.firstName,
 				last_name:this.lastName,
 				signature:this.signature,
-				team:'L1'
+				team:this.team,
 			})
 		},
 		validateInputs() {
