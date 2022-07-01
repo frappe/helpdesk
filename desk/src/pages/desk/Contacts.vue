@@ -5,7 +5,7 @@
 				class="px-[16px]"
 				ref="contactList"
 				:options="{
-					cache: ['Contact', 'Desk'],
+					cache: ['Contacts', 'Desk'],
 					doctype: 'Contact',
 					fields: [
 						'first_name', 
@@ -54,7 +54,6 @@ export default {
 	},
 	data() {
 		return {
-			initialFilters: [],
 			initialPage: 1
 		}
 	},
@@ -72,11 +71,6 @@ export default {
 	},
 	mounted() {
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
-	},
-    activated() {
-    },
-    deactivated() {
-
-    },
+	}
 }
 </script>

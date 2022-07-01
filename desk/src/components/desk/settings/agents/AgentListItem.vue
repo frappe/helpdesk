@@ -1,49 +1,58 @@
 <template>
-	<div class="block py-4 hover:bg-gray-50 border-b text-base">
-		<router-link 
+	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
+		<div
 			v-if="agent"
-			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8 space-x-2"
-            :to="`/frappedesk/settings/agents/${agent.name}`"
+			role="button"
+			@pointerover="() => {toggleSelectBox = true}"
+			@pointerleave="() => {toggleSelectBox = false}"
+			class="flex items-center text-base"
 		>
-			<div
-				class="mr-4"
+			<div 
+				class="w-[37px] h-[14px] flex items-center"
 			>
-				<Input type="checkbox" value="" />
+				<Input
+					v-if="toggleSelectBox || selected"
+					type="checkbox" 
+					@click="$emit('toggleSelect')" 
+					:checked="selected" 
+					class="cursor-pointer mr-1 hover:visible" 
+				/>
 			</div>
-			<div class="sm:w-3/12">
-				{{ agent.agent_name }}
-			</div>
-			<div class="sm:w-3/12">
-				{{ agentRoles }}
-			</div>
-			<div class="sm:w-3/12">
-                {{ agent.group.name }}
-			</div>
-		</router-link>
+			<router-link :to="`/frappedesk/settings/agents/${agent.name}`" class="w-full group flex items-center">
+				<div class="sm:w-6/12 truncate pr-10">
+					{{ agent.full_name }}
+				</div>
+				<div class="sm:w-4/12 truncate pr-10">
+					{{ agent.email }}
+				</div>
+				<div class="sm:w-4/12 truncate pr-10">
+					Roles
+				</div>
+				<div class="sm:w-4/12 truncate pr-10">
+					{{ agent.group }}
+				</div>
+			</router-link>
+		</div>
 	</div>
 </template>
 
 <script>
+import { ref } from 'vue'
 import { Input, FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'AgentListItem',
-	props: ['agent'],
+	props: ['agent', 'selected'],
 	components: {
 		Input,
 		FeatherIcon,
 	},
-    computed: {
-        agentRoles() {
-            if (this.agent) {
-                return this.agent.roles ? this.agent.roles.slice(0, 2).join(', ') : ''
-            }
-            return ''
-        }
-    }
+	setup() {
+		const toggleSelectBox = ref(false)
+
+		return {
+			toggleSelectBox,
+		}
+	}
 }
 </script>
-
-<style>
-
-</style>

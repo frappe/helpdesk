@@ -1,55 +1,52 @@
 <template>
-	<div>
-		<div v-if="agents">
-			<AgentList :agents="agents" />
-		</div>
+	<div class="mt-[9px]">
+		<ListManager
+			class="px-[16px]"
+			ref="agentList"
+			:options="{
+				cache: ['Agents', 'Desk'],
+				doctype: 'Agent',
+				fields: [
+					'user.full_name',
+					'user as email',
+					'group',
+				],
+				limit: 20,
+				start_page: initialPage,
+				route_query_pagination: true
+			}"
+		>
+			<template #body="{ manager }">
+				<AgentList :manager="manager" />
+			</template>
+		</ListManager>
 	</div>
 </template>
 <script>
-import { Input } from 'frappe-ui'
+import { inject } from 'vue'
 import AgentList from '@/components/desk/settings/agents/AgentList.vue'
-import { inject, ref } from 'vue'
+import ListManager from '@/components/global/ListManager.vue'
 
 export default {
 	name: 'Agents',
 	components: {
 		AgentList,
-		Input
+		ListManager
+	},
+	data() {
+		return {
+			initialPage: 1
+		}
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
 		const selectedSetting = inject('selectedSetting')
 
-		const showNewAgentDialog = ref(false)
-
-		return { viewportWidth, selectedSetting, showNewAgentDialog }
-	},
-	resources: {
-		agents() {
-			return {
-				method: 'frappedesk.api.agent.get_all',
-				auto: true,
-				fields: ['name']
-			}
-		}
+		return { viewportWidth, selectedSetting }
 	},
 	activated() {
 		this.selectedSetting = 'Agents'
-	},
-	deactivated() {
-
-	},
-	computed: {
-		agents() {
-			console.log(this.$resources.agents.data)
-			return this.$resources.agents.data || null
-		}
-	},
-	methods: {
-		agentCreated(agent) {
-			this.$resources.agents.fetch();
-			this.showNewAgentDialog = false
-		}
+		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 	},
 }
 </script>

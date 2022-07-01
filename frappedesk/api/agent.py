@@ -1,23 +1,6 @@
 import frappe
 
 @frappe.whitelist(allow_guest=True)
-def get_all():
-	all_agents = frappe.get_all("Agent", fields=['agent_name', 'name', 'group'])
-
-	for agent in all_agents:
-		user = frappe.get_doc("User", agent['name'])
-		team = frappe.get_doc("Agent Group", agent['group'])
-		agent['user'] = user.__dict__
-		agent['group'] = team.__dict__
-		
-		agent['roles'] = []
-		for role in user.roles:
-			agent['roles'].append(role.role)
-
-	return all_agents
-
-
-@frappe.whitelist(allow_guest=True)
 def get_session_agent():
 	session_user = frappe.session.user
 	session_agent = None
