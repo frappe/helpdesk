@@ -105,8 +105,6 @@ export default {
 		const profileSettings = ref()
 		const showProfileSettings = ref(false)
 
-		const updateSidebarTicketCount = inject('updateSidebarTicketCount')
-
 		const sideBarFilterMap = inject('sideBarFilterMap')
 		const ticketSideBarFilter = inject('ticketSideBarFilter')
 
@@ -118,7 +116,6 @@ export default {
 			menuOptions, 
 			profileSettings, 
 			showProfileSettings, 
-			updateSidebarTicketCount, 
 			ticketSideBarFilter,
 			sideBarFilterMap
 		}
@@ -249,7 +246,10 @@ export default {
 		this.syncSideBarTicketFilter()
 		this.syncSelectedMenuItemBasedOnRoute()
 
-		this.updateSidebarTicketCount = this.updateTicketCount
+		this.$event.on('update_ticket_list', this.updateTicketCount)
+	},
+	unmounted() {
+		this.$event.off('update_ticket_list')
 	},
 	watch: {
 		$route() {

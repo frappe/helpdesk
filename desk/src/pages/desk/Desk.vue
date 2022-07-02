@@ -57,9 +57,6 @@ export default {
 		provide('agentGroups', agentGroups)
 		provide('agentController', agentController)
 
-		const updateSidebarTicketCount = ref(() => {})
-		provide('updateSidebarTicketCount', updateSidebarTicketCount)
-
 		return {
 			user,
 
@@ -74,9 +71,7 @@ export default {
 
 			agents,
 			agentGroups,
-			agentController,
-
-			updateSidebarTicketCount
+			agentController
 		}
 	},
 	mounted() {
@@ -278,7 +273,7 @@ export default {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_to_agent',
 				onSuccess: async () => {
-					this.updateSidebarTicketCount()
+					this.$event.emit('update_ticket_list')
 				},
 				onFailure: () => {
 					// TODO:
@@ -300,7 +295,7 @@ export default {
 			return {
 				method: 'frappedesk.api.ticket.assign_ticket_status',
 				onSuccess: async () => {
-					this.updateSidebarTicketCount()
+					this.$event.emit('update_ticket_list')
 				},
 				onFailure: () => {
 					// TODO:

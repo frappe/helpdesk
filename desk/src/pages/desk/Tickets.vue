@@ -120,8 +120,6 @@ export default {
 		const agents = inject('agents')
 		const contacts = inject('contacts')
 
-		const updateSidebarTicketCount = inject('updateSidebarTicketCount')
-
 		return {
 			user, 
 			showNewTicketDialog, 
@@ -132,8 +130,7 @@ export default {
 			ticketPriorities,
 			ticketStatuses,
 			agents,
-			contacts,
-			updateSidebarTicketCount
+			contacts
 		}
 	},
 	mounted() {
@@ -291,7 +288,7 @@ export default {
 						appearance: 'success',
 					})
 
-					this.updateSidebarTicketCount()
+					this.$event.emit('update_ticket_list')
 
 				},
 				onFailure: () => {
@@ -316,7 +313,7 @@ export default {
 						appearance: 'success',
 					})
 
-					this.updateSidebarTicketCount()
+					this.$event.emit('update_ticket_list')
 				},
 				onFailure: () => {
 					this.$toast({
