@@ -291,7 +291,17 @@ export default {
 			this.$resources.myRepliedTicketsCount.fetch()
 		},
 		syncSideBarTicketFilter() {
-			this.ticketSideBarFilter = this.$route.name === 'DeskTickets' ? this.$route.query.menu_filter : this.ticketSideBarFilter
+			if (this.$route.name === 'DeskTickets' && !this.$route.query.menu_filter) {
+				this.$router.push({
+					path: '/frappedesk/tickets',
+					query: {
+						...this.$route.query,
+						menu_filter: this.user.agent ? 'my-open-tickets' : 'all',
+						page: 1
+					}
+				})
+			}
+			this.ticketSideBarFilter = (this.$route.name === 'DeskTickets' && this.$route.query.menu_filter) ? this.$route.query.menu_filter : this.ticketSideBarFilter
 		},
 		syncSelectedMenuItemBasedOnRoute() {
 			const handleTicketFilterQueries = () => {

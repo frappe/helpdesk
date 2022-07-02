@@ -115,7 +115,7 @@ export default {
 				method: 'login',
 				onSuccess: (res) => {
 					if (res) {
-						this.$resources.user.fetch()
+						this.$router.go()
 					}
 				},
 				onFailure: (error) => {
