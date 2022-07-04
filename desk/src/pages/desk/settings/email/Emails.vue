@@ -43,12 +43,13 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const selectedSetting = inject('selectedSetting')
 
-		return { viewportWidth, selectedSetting }
+		return { 
+			viewportWidth 
+		}
 	},
 	activated() {
-		this.selectedSetting = 'Email Accounts'
+		this.$event.emit('set-selected-setting', 'Email Accounts')
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 	},
 }

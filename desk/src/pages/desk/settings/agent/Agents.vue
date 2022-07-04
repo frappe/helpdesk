@@ -39,12 +39,12 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const selectedSetting = inject('selectedSetting')
-
-		return { viewportWidth, selectedSetting }
+		return { 
+			viewportWidth 
+		}
 	},
 	activated() {
-		this.selectedSetting = 'Agents'
+		this.$event.emit('set-selected-setting', 'Agents')
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 	},
 }

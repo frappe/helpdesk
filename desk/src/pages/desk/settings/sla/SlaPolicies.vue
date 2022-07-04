@@ -34,9 +34,10 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const selectedSetting = inject('selectedSetting')
 		
-		return { viewportWidth, selectedSetting }
+		return { 
+			viewportWidth 
+		}
 	},
 	data() {
 		return {
@@ -44,7 +45,7 @@ export default {
 		}
 	},
 	activated() {
-		this.selectedSetting = 'Support Policies'
+		this.$event.emit('set-selected-setting', 'Support Policies')
 	},
 }
 </script>

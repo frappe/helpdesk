@@ -2,7 +2,7 @@
 	<div class="h-full pt-1 space-y-2">
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
 			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="selectedSetting === setting.label ? 'bg-slate-50' : ''">
-				<div class="p-2 text-base" @click="changeSelectedSettingItem(setting)">
+				<div class="p-2 text-base" @click="markSettingAsSelected(setting)">
 					{{ setting.label }}
 				</div>
 			</div>
@@ -11,17 +11,11 @@
 </template>
 
 <script>
-import { inject } from 'vue'
-
 export default {
 	name: 'SettingsSideBarMenu',
-	setup() {
-		const selectedSetting = inject('selectedSetting')
-
-		return { selectedSetting }
-	},
 	data() {
 		return {
+			selectedSetting: 'Agents',
 			settings: [
 				{
 					label: 'Agents',
@@ -47,7 +41,7 @@ export default {
 		}
 	},
 	methods: {
-		changeSelectedSettingItem(setting) {
+		markSettingAsSelected(setting) {
 			this.selectedSetting = setting.label
 			if (setting.pageName) {
 				this.$router.push({
@@ -57,6 +51,15 @@ export default {
 				setting.action()
 			}
 		}
+	},
+	mounted() {
+		this.$event.on('set-selected-setting', (settingLabel) => {
+			const setting = this.settings.find(s => s.label === settingLabel)
+			this.markSettingAsSelected(setting)
+		})
+	},
+	unmounted() {
+		this.$event.off('set-selected-setting')
 	}
 }
 </script>

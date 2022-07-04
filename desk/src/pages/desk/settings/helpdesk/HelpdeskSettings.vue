@@ -66,6 +66,9 @@ export default {
         updateHelpdeskName() {
             this.$resources.updateHelpdeskName.submit({name: this.newHelpdeskName})
         } 
+    },
+    activated() {
+        this.$event.emit('set-selected-setting', 'Helpdesk Settings')
     }
 }
 </script>
