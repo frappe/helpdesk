@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue'
+import { inject } from 'vue'
 import { Input } from 'frappe-ui'
 import AgentListItem from '@/components/desk/settings/agents/AgentListItem.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
