@@ -1,8 +1,6 @@
 <template>
     <div>
         <div
-            @pointerenter="() => { showSelectAllCheckbox = true}"
-            @pointerleave="() => { showSelectAllCheckbox = false}"
             class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-[10px] pl-[11px] pr-[17px] rounded-[6px] select-none"
         >
             <div class="w-[37px] h-[14px]">
@@ -10,22 +8,18 @@
                     type="checkbox" 
                     @click="manager.selectAll()" 
                     :checked="manager.allItemsSelected" 
-                    class="cursor-pointer mr-1 hover:visible" 
-                    :class="manager.allItemsSelected || showSelectAllCheckbox ? 'visible' : 'invisible'" 
+                    role="button"
                 />
             </div>
             <div class="flex flex-row items-center group w-full">
-                <div class="sm:w-6/12">
+                <div class="sm:w-5/12">
                     Name
                 </div>
-                <div class="sm:w-4/12">
+                <div class="sm:w-6/12">
                     Email
                 </div>
-                <div class="sm:w-4/12">
+                <div class="sm:w-3/12">
                     Phone
-                </div>
-                <div class="sm:w-4/12">
-                    Organisation
                 </div>
             </div>
         </div>
@@ -55,7 +49,7 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue'
+import { inject } from 'vue'
 import { Input } from 'frappe-ui'
 import ContactListItem from '@/components/desk/contacts/ContactListItem.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
@@ -71,10 +65,8 @@ export default {
         ListPageController
     },
     setup() {
-        const showSelectAllCheckbox = ref(false)
         const viewportWidth = inject('viewportWidth')
         return {
-            showSelectAllCheckbox,
             viewportWidth
         }
     }

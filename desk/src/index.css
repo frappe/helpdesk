@@ -24,12 +24,12 @@
 	}
 
 	*::-webkit-scrollbar {
-		width: 6px;
+		width: 0px;
 		height: 6px;
 	}
 
 	body::-webkit-scrollbar {
-		width: 12px;
+		width: 0px;
 		height: 12px;
 	}
 
