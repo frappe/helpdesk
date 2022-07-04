@@ -1,8 +1,8 @@
 <template>
-	<div class="flow-root py-3 pl-5 pr-8 border-b">
+	<div class="flow-root py-3 pl-5 pr-8 border-b h-[55px]">
 		<div class="float-left">
 			<div class="flex items-center">
-				<div class="font-bold text-2xl">Settings</div>
+				<div class="font-normal text-2xl">Settings</div>
 			</div>
 		</div>
 		<div class="float-right">

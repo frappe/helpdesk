@@ -1,7 +1,7 @@
 <template>
     <div class="p-5 overflow-auto h-full">
         <div class="mb-[16px]">
-            <div class="font-semibold">Helpdesk Settings</div>
+            <div class="font-normal">Helpdesk Settings</div>
         </div>
         <div class="w-53 flex flex-row space-x-2">
             <Input label="Helpdesk Name" type="text" v-model="helpdeskName" class="text-gray-600 w-52" @input="checkHelpdeskNameChange" />
