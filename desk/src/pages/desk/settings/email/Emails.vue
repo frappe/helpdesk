@@ -50,6 +50,8 @@ export default {
 	},
 	activated() {
 		this.$event.emit('set-selected-setting', 'Email Accounts')
+		this.$event.emit('show-top-panel-actions-settings', 'Email Accounts')
+
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 	},
 }

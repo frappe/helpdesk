@@ -2,9 +2,11 @@
 	<div class="h-full pt-1 space-y-2">
 		<div v-for="setting in settings" :key="setting" class="space-y-2">
 			<div class="cursor-pointer px-3 hover:bg-slate-50 rounded-md mx-2 mb-1" :class="selectedSetting === setting.label ? 'bg-slate-50' : ''">
-				<div class="p-2 text-base" @click="markSettingAsSelected(setting)">
-					{{ setting.label }}
-				</div>
+				<router-link :to="{name: setting.pageName}">
+					<div class="p-2 text-base">
+						{{ setting.label }}
+					</div>
+				</router-link>
 			</div>
 		</div>
 	</div>
@@ -43,13 +45,6 @@ export default {
 	methods: {
 		markSettingAsSelected(setting) {
 			this.selectedSetting = setting.label
-			if (setting.pageName) {
-				this.$router.push({
-					name: setting.pageName,
-				})
-			} else if (setting.action) {
-				setting.action()
-			}
 		}
 	},
 	mounted() {

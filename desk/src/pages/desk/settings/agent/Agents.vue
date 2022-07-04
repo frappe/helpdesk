@@ -19,18 +19,25 @@
 				<AgentList :manager="manager" />
 			</template>
 		</ListManager>
+		<NewAgentDialog v-model="showNewAgentDialog" @agent-created="() => {
+				showNewAgentDialog = false
+				$router.go()
+			}" 
+		/>
 	</div>
 </template>
 <script>
-import { inject } from 'vue'
+import { inject, ref } from 'vue'
 import AgentList from '@/components/desk/settings/agents/AgentList.vue'
 import ListManager from '@/components/global/ListManager.vue'
+import NewAgentDialog from "@/components/desk/global/NewAgentDialog.vue"
 
 export default {
 	name: 'Agents',
 	components: {
 		AgentList,
-		ListManager
+		ListManager,
+		NewAgentDialog
 	},
 	data() {
 		return {
@@ -39,13 +46,23 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
+		const showNewAgentDialog = ref(false)
 		return { 
-			viewportWidth 
+			viewportWidth,
+			showNewAgentDialog 
 		}
 	},
 	activated() {
 		this.$event.emit('set-selected-setting', 'Agents')
+		
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
+
+		this.$event.on('show-new-agent-dialog', () => {
+			this.showNewAgentDialog = true
+		})
 	},
+	deactivated() {
+		this.$event.off('show-new-agent-dialog')
+	}
 }
 </script>

@@ -69,6 +69,7 @@ export default {
     },
     activated() {
         this.$event.emit('set-selected-setting', 'Helpdesk Settings')
+        this.$event.emit('show-top-panel-actions-settings', 'Helpdesk Settings')
     }
 }
 </script>

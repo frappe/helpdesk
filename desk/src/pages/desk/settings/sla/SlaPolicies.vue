@@ -46,6 +46,7 @@ export default {
 	},
 	activated() {
 		this.$event.emit('set-selected-setting', 'Support Policies')
+		this.$event.emit('show-top-panel-actions-settings', 'Support Policies')
 	},
 }
 </script>
