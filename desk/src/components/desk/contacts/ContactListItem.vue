@@ -3,37 +3,31 @@
 		<div
 			v-if="contact"
 			role="button"
-			@pointerover="() => {toggleSelectBox = true}"
-			@pointerleave="() => {toggleSelectBox = false}"
 			class="flex items-center text-base"
 		>
 			<div 
 				class="w-[37px] h-[14px] flex items-center"
 			>
 				<Input
-					v-if="toggleSelectBox || selected"
 					type="checkbox" 
 					@click="$emit('toggleSelect')" 
 					:checked="selected" 
-					class="cursor-pointer mr-1 hover:visible" 
+					role="button"
 				/>
 			</div>
 			<router-link :to="`/frappedesk/contacts/${contact.name}`" class="w-full group flex items-center">
-				<div class="sm:w-6/12 truncate pr-10">
+				<div class="sm:w-5/12 truncate pr-10">
 					{{ fullName }}
 				</div>
-				<div class="sm:w-4/12 truncate pr-10">
+				<div class="sm:w-6/12 truncate pr-10">
 					<div v-if="contact.email && contact.email.length > 0">
 						{{ contact.email[0] }}
 					</div>
 				</div>
-				<div class="sm:w-4/12 truncate pr-10">
+				<div class="sm:w-3/12 truncate pr-10">
 					<div v-if="contact.phone && contact.phone.length > 0">
 						{{ contact.phone[0] }}
 					</div>
-				</div>
-				<div class="sm:w-4/12 truncate pr-10">
-					Temp Org
 				</div>
 			</router-link>
 		</div>
@@ -41,7 +35,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { Input, FeatherIcon } from 'frappe-ui'
 
 export default {
@@ -52,7 +46,6 @@ export default {
 		FeatherIcon,
 	},
 	setup(props) {
-		const toggleSelectBox = ref(false)
 		const fullName = computed(() => {
 			if (props.contact) {
 				return (props.contact.first_name || "") + " " + (props.contact.last_name || "")
@@ -60,7 +53,6 @@ export default {
 		})
 
 		return {
-			toggleSelectBox,
 			fullName
 		}
 	}
