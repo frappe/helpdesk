@@ -1,20 +1,37 @@
 <template>
-	<div>
-		<div v-if="policies">
-			<SlaPolicyList :policies="policies" />
-		</div>
+	<div class="mt-[9px]">
+		<ListManager
+			class="px-[16px]"
+			ref="agentList"
+			:options="{
+				cache: ['Service Level Agreement', 'Settings'],
+				doctype: 'Service Level Agreement',
+				fields: [
+					'name',
+					'default_service_level_agreement',
+					'enabled'
+				],
+				limit: 20,
+				start_page: initialPage,
+				route_query_pagination: true
+			}"
+		>
+			<template #body="{ manager }">
+				<SlaPolicyList :manager="manager" />
+			</template>
+		</ListManager>
 	</div>
 </template>
 <script>
-import { Input } from 'frappe-ui'
-import SlaPolicyList from '@/components/desk/settings/policies/SlaPolicyList.vue'
 import { inject } from 'vue'
+import ListManager from '@/components/global/ListManager.vue'
+import SlaPolicyList from '@/components/desk/settings/policies/SlaPolicyList.vue'
 
 export default {
 	name: 'SlaPolicies',
 	components: {
 		SlaPolicyList,
-		Input,
+		ListManager,
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
@@ -22,29 +39,13 @@ export default {
 		
 		return { viewportWidth, selectedSetting }
 	},
-	resources: {
-		policies() {
-			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: "Service Level Agreement",
-					fields: ["*"]
-				},
-				auto: true,
-			}
+	data() {
+		return {
+			initialPage: 1
 		}
 	},
 	activated() {
 		this.selectedSetting = 'Support Policies'
-	},
-	deactivated() {
-
-	},
-	computed: {
-		policies() {
-			console.log(this.$resources.policies.data)
-			return this.$resources.policies.data || null
-		}
 	},
 }
 </script>

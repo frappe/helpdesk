@@ -1,55 +1,55 @@
 <template>
-	<div class="block py-3 hover:bg-gray-50 border-b text-base">
-		<router-link 
+	<div 
+		class="block select-none rounded-[6px] py-[7px] px-[11px]" 
+		:class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'"
+	>
+		<div
 			v-if="policy"
-			class="group flex items-center justify-between sm:justify-start font-light pl-4 pr-8 space-x-2"
-			:to="`/frappedesk/settings/sla/${policy.name}`"
+			role="button"
+			class="flex items-center text-base"
 		>
-			<div>
-				<Input type="checkbox" value="" />
+			<div 
+				class="w-[37px] h-[14px] flex items-center"
+			>
+				<Input
+					type="checkbox" 
+					@click="$emit('toggleSelect')" 
+					:checked="selected" 
+					role="button"
+				/>
 			</div>
-			<div class="sm:w-3/12">
-				{{ policy.name }}
+			<div class="w-full group flex items-center">
+				<router-link :to="`/frappedesk/settings/sla/${policy.name}`" class="sm:w-10/12 truncate pr-10 flex flex-row items-center space-x-2">
+					<div>
+						{{ policy.name }}
+					</div>
+					<a title="Default service level agreement">
+						<CustomIcons v-if="policy.default_service_level_agreement" name="circle-check" class="w-[16px] h-[16px] fill-blue-500" />
+					</a>
+				</router-link>
+				<div class="sm:w-2/12">
+					<div class="flex flex-row-reverse">
+						<CustomSwitch v-model="policy.enabled" :disabled="policy.default_service_level_agreement" />
+					</div>
+				</div>
 			</div>
-			<div class="sm:w-2/12">
-				{{ policy.default_service_level_agreement ? "Default" : ""}}
-			</div>
-			<div class="sm:w-2/12">
-				<CustomSwitch v-model="policy.enabled" />
-			</div>
-		</router-link>
+		</div>
 	</div>
 </template>
 
 <script>
 import { Input, FeatherIcon } from 'frappe-ui'
 import CustomSwitch from '@/components/global/CustomSwitch.vue'
-import { onMounted, ref, watch } from 'vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'SlaPolicyListItem',
-	props: ['policy'],
+	props: ['policy', 'selected'],
 	components: {
 		Input,
 		FeatherIcon,
-		CustomSwitch
-	},
-	setup(props) {
-		const enabled = ref(false)
-
-		watch(enabled, async (newVal, oldVal) => {
-			console.log(`enabled switched to ${newVal}`)
-		})
-		
-		onMounted(() => {
-			enabled.value = props.policy.enabled
-		})
-
-		return { enabled }
-    },
+		CustomSwitch,
+		CustomIcons
+	}
 }
 </script>
-
-<style>
-
-</style>
