@@ -35,9 +35,8 @@ export default {
 				},
 				{
 					label: 'Email Accounts',
-					action: () => {
-						window.location.href = '/app/email-account'
-					}
+					pageName: 'Emails',
+					route: '/frappedesk/settings/emails'
 				},
 				{
 					label: 'Helpdesk Settings',

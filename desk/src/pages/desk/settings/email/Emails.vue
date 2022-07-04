@@ -3,33 +3,37 @@
 		<ListManager
 			class="px-[16px]"
 			:options="{
-				cache: ['Agents', 'Desk'],
-				doctype: 'Agent',
+				cache: ['EmailAccounts', 'Settings'],
+				doctype: 'Email Account',
 				fields: [
-					'user.full_name',
-					'user as email',
-					'group',
+					'email_account_name',
+					'email_id',
+					'enable_incoming',
+                    'default_incoming',
+                    'enable_outgoing',
+                    'default_outgoing'
 				],
 				limit: 20,
+				filters: [['IMAP Folder','append_to','in',['Ticket']]],
 				start_page: initialPage,
 				route_query_pagination: true
 			}"
 		>
 			<template #body="{ manager }">
-				<AgentList :manager="manager" />
+				<EmailList :manager="manager" />
 			</template>
 		</ListManager>
 	</div>
 </template>
 <script>
 import { inject } from 'vue'
-import AgentList from '@/components/desk/settings/agents/AgentList.vue'
+import EmailList from '@/components/desk/settings/emails/EmailList.vue'
 import ListManager from '@/components/global/ListManager.vue'
 
 export default {
-	name: 'Agents',
+	name: 'Emails',
 	components: {
-		AgentList,
+		EmailList,
 		ListManager
 	},
 	data() {
@@ -44,7 +48,7 @@ export default {
 		return { viewportWidth, selectedSetting }
 	},
 	activated() {
-		this.selectedSetting = 'Agents'
+		this.selectedSetting = 'Email Accounts'
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 	},
 }

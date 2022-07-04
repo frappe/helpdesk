@@ -2,7 +2,6 @@
 	<div class="mt-[9px]">
 		<ListManager
 			class="px-[16px]"
-			ref="agentList"
 			:options="{
 				cache: ['Service Level Agreement', 'Settings'],
 				doctype: 'Service Level Agreement',
