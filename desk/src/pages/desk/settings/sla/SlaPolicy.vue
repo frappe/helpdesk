@@ -135,7 +135,7 @@
 <script>
 import { FeatherIcon, Input, LoadingText, Dropdown, ErrorMessage } from 'frappe-ui'
 import TimeDurationInput from '@/components/desk/global/TimeDurationInput.vue'
-import CustomSwitch from '../../../../components/global/CustomSwitch.vue'
+import CustomSwitch from '@/components/global/CustomSwitch.vue'
 import { inject, ref } from 'vue'
 
 export default {
@@ -167,9 +167,6 @@ export default {
 
 		const ticketPriorities = inject('ticketPriorities')
 
-		const selectedSetting = inject('selectedSetting')
-
-
 		return {
 			isNew, 
 			slaPolicyName, 
@@ -178,7 +175,6 @@ export default {
 			rules, 
 			workingHours, 
 			ticketPriorities,
-			selectedSetting,
 			selectedHolidayList,
 			rulesValidationError,
 			workingHoursValidationError,
@@ -186,7 +182,9 @@ export default {
 		}
 	},
 	activated() {
-		this.selectedSetting = 'Support Policies' // TODO: use a better logic for this
+		this.$event.emit('set-selected-setting', 'Support Policies')
+		this.$event.emit('show-top-panel-actions-settings', 'Support Policy')
+
 		this.isNew = (this.$route.name === 'NewSlaPolicy')
 		this.editingName = false
 		if (this.isNew) {
@@ -205,7 +203,7 @@ export default {
 				params: {
 					doctype: 'Service Level Agreement',
 					name: this.slaId,
-					fields: ["*"]
+					fields: ['*']
 				},
 				onSuccess: (data) => {
 					this.slaPolicyName = data.name
@@ -456,14 +454,7 @@ export default {
 
 		},
 		cancel() {
-			if (!this.isNew) {
-				this.editingName = false
-				this.$resources.getSlaPolicy.fetch()
-			} else {
-				this.$router.push({
-					name: 'SlaPolicies'
-				})
-			}
+			this.$router.go()
 		},
 		prioritiesAsDropdownOptions(index) {
 			let priorityItems = [];

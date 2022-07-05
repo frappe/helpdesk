@@ -2,7 +2,6 @@
 	<div class="mt-[9px]">
 		<ListManager
 			class="px-[16px]"
-			ref="agentList"
 			:options="{
 				cache: ['Service Level Agreement', 'Settings'],
 				doctype: 'Service Level Agreement',
@@ -35,9 +34,10 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const selectedSetting = inject('selectedSetting')
 		
-		return { viewportWidth, selectedSetting }
+		return { 
+			viewportWidth 
+		}
 	},
 	data() {
 		return {
@@ -45,7 +45,8 @@ export default {
 		}
 	},
 	activated() {
-		this.selectedSetting = 'Support Policies'
+		this.$event.emit('set-selected-setting', 'Support Policies')
+		this.$event.emit('show-top-panel-actions-settings', 'Support Policies')
 	},
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<SettingsTopPanel :selectedSetting="selectedSetting" />
+		<SettingsTopPanel />
 		<div :style="{ height: viewportWidth > 768 ? 'calc(100vh - 55px)' : null }" class="flex">
 			<div class="sm:w-2/12 border-r">
 				<SettingsSideBarMenu />
@@ -20,7 +20,7 @@
 import SettingsSideBarMenu from "@/components/desk/settings/SettingsSideBarMenu.vue"
 import SettingsTopPanel from "@/components/desk/settings/SettingsTopPanel.vue"
 
-import { inject, provide, ref } from 'vue'
+import { inject } from 'vue'
 
 export default {
 	name: 'Settings',
@@ -30,10 +30,9 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const selectedSetting = ref('Agents')
-		provide('selectedSetting', selectedSetting)
-
-		return { viewportWidth, selectedSetting }
+		return { 
+			viewportWidth 
+		}
 	},
 }
 </script>

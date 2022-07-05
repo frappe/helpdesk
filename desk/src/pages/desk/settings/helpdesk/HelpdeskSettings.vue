@@ -66,6 +66,10 @@ export default {
         updateHelpdeskName() {
             this.$resources.updateHelpdeskName.submit({name: this.newHelpdeskName})
         } 
+    },
+    activated() {
+        this.$event.emit('set-selected-setting', 'Helpdesk Settings')
+        this.$event.emit('show-top-panel-actions-settings', 'Helpdesk Settings')
     }
 }
 </script>

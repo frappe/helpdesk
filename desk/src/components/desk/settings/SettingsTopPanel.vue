@@ -12,57 +12,65 @@
 				</div>
 			</div>
 		</div>
-		<NewAgentDialog v-model="showNewAgentDialog" @agent-created="() => {
-				showNewAgentDialog = false
-				$router.go()
-			}" 
-		/>
 	</div>
 </template>
 
 <script>
-import { ref } from '@vue/reactivity';
-import NewAgentDialog from "../global/NewAgentDialog.vue"
+import { ref } from 'vue';
+
+class Action {
+	constructor(label, icon, appearance, onClick) {
+		this.label = label
+		this.icon = icon
+		this.appearance = appearance
+		this.onClick = onClick
+	}
+}
+
 export default {
-    props: ["selectedSetting"],
+	props: ["selectedSetting"],
 	setup() {
-		const showNewAgentDialog = ref(false)
+		const actions = ref({})
 		
-		return { showNewAgentDialog }
+		return { 
+			actions
+		}
 	},
-    computed: {
-        actions() {
-            switch (this.$route.name) {
-                case "Agents":
-                    return [
-                        {
-                            label: "Add Agent",
-                            icon: "plus",
-                            appearance: "primary",
-                            onClick: () => {
-								this.showNewAgentDialog = true
-                            }
-                        }
-                    ];
-                case "SlaPolicies":
-                    return [
-                        {
-                            label: "Add Policy",
-                            icon: "plus",
-                            appearance: "primary",
-                            onClick: () => {
-                                this.$router.push({
-                                    name: "NewSlaPolicy"
-                                });
-                            }
-                        }
-                    ];
-                default:
-                    return [];
-            }
-        }
-    },
-    components: { NewAgentDialog }
+	mounted() {
+		this.actionGroups = {
+			"Agents": [
+				new Action("New Agent", "plus", "primary", () => {
+					this.$event.emit('show-new-agent-dialog')
+				}),
+			],
+			"Agents Bulk": [
+				new Action("Delete", "plus", "secondary", () => {}),
+			],
+			"Support Policies": [
+				new Action("New Policy", "plus", "primary", () => {
+					this.$router.push({ name: "NewSlaPolicy" })
+				}),
+			],
+			"Support Policies Bulk": [],
+			"Email Accounts": [
+				new Action("New Email", "plus", "primary", () => {
+					// this.$router.push({ name: "NewEmailAccount" })
+				}),
+			],
+			"Email Accounts Bulk": [],
+			"Helpdesk Settings": []
+		}
+
+		this.$event.on('show-top-panel-actions-settings', (group) => {
+			this.actions = []
+			if (this.actionGroups[group]) {
+				this.actions = this.actionGroups[group]
+			}
+		})
+	},
+	unmounted() {
+		this.$event.off('show-top-panel-actions-settings')
+	}
 }
 </script>
 

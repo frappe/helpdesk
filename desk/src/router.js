@@ -122,6 +122,22 @@ const routes = [
 						props: true
 					},
 					{
+						path: 'emails',
+						name: 'Emails',
+						component: () => import('@/pages/desk/settings/email/Emails.vue')
+					},
+					{
+						path: 'emails/new',
+						name: 'NewEmailAccount',
+						component: () => import('@/pages/desk/settings/email/EmailAccount.vue')
+					},
+					{
+						path: 'emails/:emailAccountId',
+						name: 'EmailAccount',
+						component: () => import('@/pages/desk/settings/email/EmailAccount.vue'),
+						props: true
+					},
+					{
 						path: 'helpdesk',
 						name: 'Helpdesk Settings',
 						component: () => import('@/pages/desk/settings/helpdesk/HelpdeskSettings.vue')
