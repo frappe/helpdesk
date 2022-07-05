@@ -1,4 +1,11 @@
 frappe.ui.form.on("Ticket", {
+	refresh: function (frm) {
+		frm.add_web_link(
+			`/frappedesk/tickets/${frm.doc.name}`,
+			'View in FrappeDesk'
+		);
+	},
+
 	onload: function(frm) {
 		frm.email_field = "raised_by";
 
@@ -69,7 +76,6 @@ frappe.ui.form.on("Ticket", {
 
 		reset_sla.show();
 	},
-
 
 	timeline_refresh: function(frm) {
 		if (!frm.timeline.wrapper.find(".btn-split-ticket").length) {
