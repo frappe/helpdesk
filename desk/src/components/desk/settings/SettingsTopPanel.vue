@@ -54,7 +54,7 @@ export default {
 			"Support Policies Bulk": [],
 			"Email Accounts": [
 				new Action("New Email", "plus", "primary", () => {
-					this.$router.push({ name: "NewEmailAccount" })
+					// this.$router.push({ name: "NewEmailAccount" })
 				}),
 			],
 			"Email Accounts Bulk": [],

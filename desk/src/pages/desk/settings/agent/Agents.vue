@@ -54,6 +54,7 @@ export default {
 	},
 	activated() {
 		this.$event.emit('set-selected-setting', 'Agents')
+		this.$event.emit('show-top-panel-actions-settings', 'Agents')
 		
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 
