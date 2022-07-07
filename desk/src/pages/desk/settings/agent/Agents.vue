@@ -6,8 +6,8 @@
 				cache: ['Agents', 'Desk'],
 				doctype: 'Agent',
 				fields: [
-					'user.full_name',
 					'user as email',
+					'user.full_name as full_name',
 					'group',
 				],
 				limit: 20,
@@ -19,37 +19,33 @@
 				<AgentList :manager="manager" />
 			</template>
 		</ListManager>
-		<NewAgentDialog v-model="showNewAgentDialog" @agent-created="() => {
-				showNewAgentDialog = false
-				$router.go()
-			}" 
-		/>
+		<AddNewAgentsDialog :show="showNewAgentDialog" @close="() => { showNewAgentDialog = false}" />
 	</div>
 </template>
 <script>
 import { inject, ref } from 'vue'
 import AgentList from '@/components/desk/settings/agents/AgentList.vue'
 import ListManager from '@/components/global/ListManager.vue'
-import NewAgentDialog from "@/components/desk/global/NewAgentDialog.vue"
+import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue"
 
 export default {
 	name: 'Agents',
 	components: {
 		AgentList,
 		ListManager,
-		NewAgentDialog
+		AddNewAgentsDialog
 	},
 	data() {
 		return {
-			initialPage: 1
+			initialPage: 1,
 		}
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const showNewAgentDialog = ref(false)
+		const showNewAgentDialog =  ref(false)
 		return { 
 			viewportWidth,
-			showNewAgentDialog 
+			showNewAgentDialog
 		}
 	},
 	activated() {
@@ -59,6 +55,7 @@ export default {
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 
 		this.$event.on('show-new-agent-dialog', () => {
+			console.log(this.showNewAgentDialog)
 			this.showNewAgentDialog = true
 		})
 	},

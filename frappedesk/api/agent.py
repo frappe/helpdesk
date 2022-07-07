@@ -25,3 +25,22 @@ def get_user():
 		'has_desk_access': (session_agent or is_admin)
 	}
 	
+@frappe.whitelist()
+def sent_invites(emails):
+	for email in emails:
+		if frappe.db.exists("User", email):
+			user = frappe.get_doc("User", email)
+		else:
+			user = frappe.get_doc({
+				"doctype": "User",
+				"email": email,
+				"first_name": email.split("@")[0]
+			}).insert()
+			
+			user.send_welcome_mail_to_user()
+
+		frappe.get_doc({
+			"doctype": "Agent",
+			"user": user.name
+		}).insert()
+	return
