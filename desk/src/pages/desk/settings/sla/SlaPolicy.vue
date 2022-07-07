@@ -252,7 +252,7 @@ export default {
 						return weekdays.findIndex(x => x == a.workday) - weekdays.findIndex(x => x == b.workday)
 					})
 				},
-				onFailure: (error) => {
+				onError: (error) => {
 					console.log(error)
 				}
 			}
@@ -260,7 +260,7 @@ export default {
 		updateServicePolicy() {
 			return {
 				method: 'frappe.client.set_value',
-				onFailure: (error) => {
+				onError: (error) => {
 					console.log(error)
 				}
 			}

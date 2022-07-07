@@ -160,7 +160,7 @@ export default {
 				onSuccess: () => {
 					// TODO:
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -171,7 +171,7 @@ export default {
 				onSuccess: async (ticket) => {
 					// TODO: 
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -187,7 +187,7 @@ export default {
 				onSuccess: (data) => {
 					this.ticketTypes = data
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -202,7 +202,7 @@ export default {
 				onSuccess: (data) => {
 					this.ticketPriorities = data
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -214,7 +214,7 @@ export default {
 				onSuccess: (data) => {
 					this.ticketStatuses = data
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -231,7 +231,7 @@ export default {
 				onSuccess: (data) => {
 					this.contacts = data
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -249,7 +249,7 @@ export default {
 				onSuccess: (data) => {
 					this.agents = data
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -264,7 +264,7 @@ export default {
 				onSuccess: (data) => {
 					this.agentGroups = data
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -275,7 +275,7 @@ export default {
 				onSuccess: async () => {
 					this.$event.emit('update_ticket_list')
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -286,7 +286,7 @@ export default {
 				onSuccess: async (ticket) => {
 
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -297,7 +297,7 @@ export default {
 				onSuccess: async () => {
 					this.$event.emit('update_ticket_list')
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -308,7 +308,7 @@ export default {
 				onSuccess: async (ticket) => {
 
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -319,7 +319,7 @@ export default {
 				onSuccess: async (ticket) => {
 
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -330,7 +330,7 @@ export default {
 				onSuccess: () => {
 					this.$resources.types.fetch();
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO:
 				}
 			}
@@ -341,7 +341,7 @@ export default {
 				onSuccess: async (ticket) => {
 					
 				},
-				onFailure: () => {
+				onError: () => {
 
 				}
 			}
