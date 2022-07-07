@@ -103,7 +103,7 @@ export default {
 						this.user.loading = false
 					}
 				},
-				onFailure: () => {
+				onError: () => {
 					// TODO: check if error occured due to not logged in else handle the error
 					this.user.loading = false
 					this.$router.push({name: "PortalLogin"})
@@ -114,12 +114,10 @@ export default {
 			return {
 				method: 'login',
 				onSuccess: (res) => {
-					if (res) {
-						this.$router.go()
-					}
+					this.$event.emit('user-login-success', res)
 				},
-				onFailure: (error) => {
-					console.error(error)
+				onError: (error) => {
+					this.$event.emit('user-login-error', error)
 				}
 			};
 		},
@@ -127,10 +125,10 @@ export default {
 			return {
 				method: 'frappedesk.api.account.signup',
 				onSuccess: (res) => {
-
+					this.$event.emit('user-signup-success', res)
 				},
-				onFailure: (error) => {
-					console.error(error)
+				onError: (error) => {
+					this.$event.emit('user-signup-error', error)
 				}
 			}
 		},

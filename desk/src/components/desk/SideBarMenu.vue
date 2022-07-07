@@ -150,8 +150,6 @@ export default {
 		]
 
 		if (this.user.agent) {
-			this.ticketSideBarFilter = 'my-open-tickets'
-
 			this.menuOptions.find(option => option.label == 'Tickets').children.push(...[
 				{
 					label: 'My Open Tickets',

@@ -38,7 +38,7 @@ export default {
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
-			this.$router.push({path: '/support/login'})
+			this.$router.push({name: "PortalLogin", query:{route: this.$route.path}})
 		}
 		if (this.user.isAdmin || this.user.agent) {
 			this.impersonateContact = (contact) => {
@@ -95,7 +95,7 @@ export default {
 						this.tickets[data[i].name] = data[i];
 					}
 				},
-				onFailure: (error) => {
+				onError: (error) => {
 					console.log(`tickets error : ${error}`);
 				}
 			};
@@ -106,7 +106,7 @@ export default {
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket;
 				},
-				onFailure: (error) => {
+				onError: (error) => {
 					console.log(`ticket error : ${error}`);
 				}
 			};
@@ -118,7 +118,7 @@ export default {
 				onSuccess: (data) => {
 					this.ticketStatuses = data;
 				},
-                onFailure: (error) => {
+                onError: (error) => {
                     console.log(`statuses error : ${error}`);
                 }
 			};
@@ -130,7 +130,7 @@ export default {
 				onSuccess: (data) => {
 					this.ticketTemplates = data;
 				},
-                onFailure: (error) => {
+                onError: (error) => {
                     console.log(`template error : ${error}`);
                 }
 			};
@@ -141,7 +141,7 @@ export default {
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name);
 				},
-                onFailure: (error) => {
+                onError: (error) => {
                     console.log(`assign status error : ${error}`);
                 }
 			};
@@ -158,7 +158,7 @@ export default {
 						}
 					});
 				},
-                onFailure: (error) => {
+                onError: (error) => {
                     console.log(`create ticket error : ${error}`);
                 }
 			};

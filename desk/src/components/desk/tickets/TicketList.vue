@@ -92,8 +92,8 @@
                     />
                 </div>
             </div>
-            <div class="sm:w-1/12 text-[10px] flex flex-row-reverse text-gray-400">
-                <span v-if="totalTickets"> {{ `${manager.totalCount} of ${totalTickets}` }} </span>
+            <div class="sm:w-1/12 text-[11px] flex flex-row-reverse text-gray-500">
+                <span v-if="totalTickets"> {{ manager.totalCount }} </span>
             </div>
         </div>
         <div 

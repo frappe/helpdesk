@@ -1,6 +1,6 @@
 <template>
 	<LoginBox
-		v-if="!emailSent"
+		v-if="!signupStatus"
 		:title="this.$route.name === 'PortalSignup' ? 'Create an account' : ''"
 	>
 		<div v-if="(this.$route.name === 'PortalSignup')">
@@ -68,19 +68,31 @@
 	<SuccessCard
 		class="mx-auto mt-20 w-96 shadow-md"
 		title="Verification Email Sent!"
+		v-else-if="signupStatus==='EMAIL SENT'"
+	>
+		We have sent an email to <span class="font-semibold">{{ email }}</span>. Please click on the link received to verify your email and set up your account.
+	</SuccessCard>
+	<ErrorCard
+		class="mx-auto mt-20 w-96 shadow-md"
+		title="Error while signing up!"
 		v-else
 	>
-		We have sent an email to
-		<span class="font-semibold">{{ email }}</span
-		>. Please click on the link received to verify your email and set up your
-		account.
-	</SuccessCard>
+		<div class="flex flex-col space-y-5">
+			<div>
+				{{ error }}
+			</div>
+			<div>
+				<Button appearance="primary" @click="$router.go()">Try Again</Button>
+			</div>
+		</div>
+	</ErrorCard>
 </template>
 
 <script>
 import LoginBox from '@/components/global/LoginBox.vue';
 import { Input, FeatherIcon, ErrorMessage } from 'frappe-ui'
 import SuccessCard from '@/components/global/SuccessCard.vue';
+import ErrorCard from '@/components/global/ErrorCard.vue';
 import { ref, inject } from 'vue';
 
 export default {
@@ -90,19 +102,30 @@ export default {
 		Input,
 		FeatherIcon,
 		ErrorMessage,
-		SuccessCard
+		SuccessCard,
+		ErrorCard
 	},
 	setup() {
 		const email = ref(null)
 		const firstName = ref(null)
 		const lastName = ref(null)
-		const emailSent = ref(false)
+
+		const signupStatus = ref(null)
+		const error = ref(null)
 
 		const user = inject('user')
 
 		const submitting = ref(false)
 
-		return { email, firstName, lastName, emailSent, user, submitting }
+		return { 
+			email, 
+			firstName, 
+			lastName, 
+			signupStatus,
+			user, 
+			submitting,
+			error
+		}
 	},
 	async mounted() {
 		if (this.user.isLoggedIn()) {
@@ -116,9 +139,21 @@ export default {
 	methods: {
 		async signup() {
 			this.submitting = true
-			await this.user.signup(this.email, this.firstName, this.lastName) // TODO: handle error, success and loading responeses
-			this.emailSent = true
-			this.submitting = false
+			
+			this.$event.on('user-signup-success', (res) => {
+				this.submitting = false
+				this.signupStatus = 'EMAIL SENT'
+			})
+			this.$event.on('user-signup-error', (error) => {
+				this.error = error
+				this.submitting = false
+				this.signupStatus = 'SINGUP ERROR'
+			})
+			
+			await this.user.signup(this.email, this.firstName, this.lastName)
+			
+			this.$event.off('user-signup-success')
+			this.$event.off('user-signup-error')
 		}
 	}
 };

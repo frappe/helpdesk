@@ -291,7 +291,7 @@ export default {
 					this.$event.emit('update_ticket_list')
 
 				},
-				onFailure: () => {
+				onError: () => {
 					this.$toast({
 						title: 'Unable to mark tickets as closed.',
 						customIcon: 'circle-fail',
@@ -315,7 +315,7 @@ export default {
 
 					this.$event.emit('update_ticket_list')
 				},
-				onFailure: () => {
+				onError: () => {
 					this.$toast({
 						title: 'Unable to assign tickets to agent.',
 						customIcon: 'circle-fail',
