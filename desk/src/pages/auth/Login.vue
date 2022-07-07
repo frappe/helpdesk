@@ -105,7 +105,7 @@ export default {
 	async mounted() {
 		if (this.$route?.query?.route) {
 			this.redirect_route = this.$route.query.route;
-			this.$router.replace({ query: null });
+			// this.$router.replace({ query: null });
 		}
 		if (this.user.isLoggedIn()) {
 			this.redirect()
@@ -144,15 +144,7 @@ export default {
 					this.$router.push(this.redirect_route)
 				})
 			} else {
-				if (this.$route.name == 'DeskLogin') {
-					this.user.refetch(() => {
-						this.$router.push({ path: '/frappedesk/tickets' })
-					})
-				} else if (this.$route.name == 'PortalLogin') {
-					this.user.refetch(() => {
-						this.$router.push({ path: '/support/tickets' })
-					})
-				}
+				window.location.href = (this.$route.name == 'DeskLogin') ? '/frappedesk/tickets' : '/support/tickets'
 			}
 		}
 	}

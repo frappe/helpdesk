@@ -55,7 +55,7 @@ export default {
                     await this.user.login(this.email, this.password)
                     this.$router.push("/support/tickets")
                 },
-                onFailiure: () => {
+                onError: () => {
                 },
             }
         }

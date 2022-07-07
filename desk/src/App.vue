@@ -114,12 +114,10 @@ export default {
 			return {
 				method: 'login',
 				onSuccess: (res) => {
-					if (res) {
-						this.$router.go()
-					}
+					this.$event.emit('user-login-success', res)
 				},
 				onError: (error) => {
-					console.error(error)
+					this.$event.emit('user-login-error', error)
 				}
 			};
 		},

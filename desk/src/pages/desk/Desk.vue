@@ -76,7 +76,7 @@ export default {
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
-			this.$router.push({name: "DeskLogin"})
+			this.$router.push({name: "DeskLogin", query:{route: this.$route.path}})
 			return
 		}
 		if (!this.user.has_desk_access) {

@@ -38,7 +38,7 @@ export default {
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
-			this.$router.push({path: '/support/login'})
+			this.$router.push({name: "PortalLogin", query:{route: this.$route.path}})
 		}
 		if (this.user.isAdmin || this.user.agent) {
 			this.impersonateContact = (contact) => {
