@@ -1,14 +1,17 @@
 <template>
 	<div class="p-5 overflow-auto h-full">
-		<div>
+		<form>
 			<div class="flow-root mb-4">
-				<div class="float-left">
+				<div class="float-left" @click="() => {
+					editingName = true
+					tempEmailAccountName = values.emailAccountName
+				}">
 					<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer">
 						<div class="font-semibold">{{ values.emailAccountName }}</div>
-						<FeatherIcon v-if="isNew" class="w-3 h-3" name="edit-2" />
+						<FeatherIcon class="w-3 h-3" name="edit-2" />
 					</div>
 					<div v-else class="flex space-x-2 items-center">
-						<Input v-model="tempEmailAccountName" type="text" placeholder="Enter Email Account name" />
+						<Input id="emailAccountNameInput" v-model="tempEmailAccountName" type="text" placeholder="Enter Email Account name" />
 						<FeatherIcon class="w-4 h-4 cursor-pointer" name="x" @click="() => {
 							editingName = false
 							tempEmailAccountName = values.emailAccountName
@@ -18,9 +21,15 @@
 				<div class="float-right">
 					<div class="flex space-x-2 items-center">
 						<Button appearance="secondary" @click="cancel()">Cancel</Button>
-						<Button v-if="isNew" appearance="primary" @click="create()">Create</Button>
-						<!-- <Button :loading="this.$resources.createNewServicePolicy.loading" v-if="isNew" appearance="primary" @click="create()">Create</Button> -->
-						<Button :loading="this.$resources.updateEmailAccount.loading" v-else appearance="primary" @click="save()">Save</Button>
+						<Button
+							appearance="primary"
+							@click="() => {
+								isNew ? create() : save()
+							}"
+							:loading="isNew ? $resources.createNewEmailAccount.loading : ($resources.updateEmailAccount.loading || $resources.renameEmailAccount.loading)"
+						>
+							{{ ` ${isNew ? "Create" : "Save"}` }}
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -63,7 +72,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 </template>
 
@@ -155,9 +164,10 @@ export default {
 	methods: {
 		setDefaultValues() {
 			this.values = {
-				emailAccountName: '',
+				emailAccountName: 'New Email Account',
 				emailId: '',
 				password: '',
+				service: 'GMail',
 				enableIncoming: true,
 				enableOutgoing: true,
 				defaultIncoming: false,
@@ -166,30 +176,32 @@ export default {
 		},
 		create() {
 			if(this.validateInputs()) {
-				this.$resources.createNewEmailAccount.fetch({
-					email_account_name: this.values.emailAccountName,
-					email_id: this.values.emailId,
-					password: this.values.password,
-					enable_incoming: this.values.enableIncoming,
-					enable_outgoing: this.values.enableOutgoing,
-					default_incoming: this.values.defaultIncoming,
-					default_outgoing: this.values.defaultOutgoing,
-					email_sync_option: 'UNSEEN',
-					initial_sync_count: 100,
-					imap_folder: [
-						{
-							append_to: "Ticket",
-							folder_name: "INBOX",
-
-						}
-					],
-					create_contact: true,
-					track_email_status: true,
-					service: this.values.service,
-					use_tls: 1,
-					use_imap: 1,
-					smtp_port: 587,
-					...emailDefaults[this.values.service]
+				this.$resources.createNewEmailAccount.submit({
+					doc: {
+						doctype: 'Email Account',
+						email_id: this.values.emailId,
+						password: this.values.password,
+						enable_incoming: this.values.enableIncoming,
+						enable_outgoing: this.values.enableOutgoing,
+						default_incoming: this.values.defaultIncoming,
+						default_outgoing: this.values.defaultOutgoing,
+						email_sync_option: 'UNSEEN',
+						initial_sync_count: 100,
+						imap_folder: [
+							{
+								append_to: "Ticket",
+								folder_name: "INBOX",
+	
+							}
+						],
+						create_contact: true,
+						track_email_status: true,
+						service: this.values.service,
+						use_tls: 1,
+						use_imap: 1,
+						smtp_port: 587,
+						...this.emailDefaults[this.values.service]
+					}
 				})
 			}
 		},
@@ -254,9 +266,17 @@ export default {
 			return {
 				method: 'frappe.client.insert',
 				onSuccess: () => {
+					this.$toast({
+						message: 'Email Account Created',
+						customIcon: 'circle-check',
+						type: 'success'
+					})
 					this.$router.push({
 						name: 'Emails'
 					})
+				},
+				onError: (error) => {
+					console.log(error)
 				}
 			}
 		},
@@ -264,11 +284,19 @@ export default {
 			return {
 				method: 'frappe.client.set_value',
 				onSuccess: () => {
-					this.$toast({
-						title: 'Email Account updated.',
-						customIcon: 'circle-check',
-						appearance: 'success',
-					})
+					if (this.values.emailAccountName != this.tempEmailAccountName) {
+						this.$resources.renameEmailAccount.submit({
+							doctype: "Email Account",
+							old_name: this.values.emailAccountName,
+							new_name: this.tempEmailAccountName
+						})
+					} else {
+						this.$toast({
+							title: 'Email Account Updated.',
+							customIcon: 'circle-check',
+							appearance: 'success',
+						})
+					}
 				},
 				onError: (error) => {
 					const errors = {
@@ -283,6 +311,14 @@ export default {
 				}
 			}
 		},
+		renameEmailAccount() {
+			return {
+				method: 'frappe.client.rename_doc',
+				onSuccess: (data) => {
+					window.location.href = `/frappedesk/settings/emails/${data}`
+				}
+			}
+		}
 	}
 }
 </script>
