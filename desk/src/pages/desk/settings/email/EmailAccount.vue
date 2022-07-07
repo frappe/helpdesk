@@ -32,6 +32,9 @@
 					<Input class="grow max-w-sm" label="Email Id" type="text" :value="values.emailId" placeholder="Email Id" @change="(val) => values.emailId = val"/>
 					<Input class="grow max-w-sm" label="Password" type="password" :value="values.password" placeholder="Password" @change="(val) => values.password = val"/>
 				</div>
+				<div>
+					<Input class="grow max-w-sm" label="Service" type="select" :value="values.service" :options="['GMail', 'Sendgrid', 'SparkPost', 'Yahoo Mail', 'Outlook.com', 'Yandex.Mail']" @change="(val) => values.service = val" />
+				</div>
 			</div>
 			<div class="mb-5">
 				<div class="flex space-x-2 items-center">
@@ -79,6 +82,38 @@ export default {
 		LoadingText
 	},
 	setup() {
+		const emailDefaults = {
+			"GMail": {
+				"email_server": "imap.gmail.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp.gmail.com",
+			},
+			"Outlook.com": {
+				"email_server": "imap-mail.outlook.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp-mail.outlook.com",
+			},
+			"Sendgrid": {
+				"smtp_server": "smtp.sendgrid.net",
+				"smtp_port": 587
+			},
+			"SparkPost": {
+				"smtp_server": "smtp.sparkpostmail.com",
+			},
+			"Yahoo Mail": {
+				"email_server": "imap.mail.yahoo.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp.mail.yahoo.com",
+				"smtp_port": 587
+			},
+			"Yandex.Mail": {
+				"email_server": "imap.yandex.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp.yandex.com",
+				"smtp_port": 587
+			},
+		};
+
 		const isNew = ref(false)
 
 		const editingName = ref(false)
@@ -96,6 +131,7 @@ export default {
 		const tempEmailAccountName = ref('')
 
 		return {
+			emailDefaults,
 			isNew,
 			editingName,
 			values,
@@ -138,7 +174,6 @@ export default {
 					enable_outgoing: this.values.enableOutgoing,
 					default_incoming: this.values.defaultIncoming,
 					default_outgoing: this.values.defaultOutgoing,
-					use_imap: true,
 					email_sync_option: 'UNSEEN',
 					initial_sync_count: 100,
 					imap_folder: [
@@ -149,10 +184,12 @@ export default {
 						}
 					],
 					create_contact: true,
-					smtp_server: 'smtp.gmail.com',
-					use_tls: true,
 					track_email_status: true,
-					service: 'Gmail'
+					service: this.values.service,
+					use_tls: 1,
+					use_imap: 1,
+					smtp_port: 587,
+					...emailDefaults[this.values.service]
 				})
 			}
 		},
@@ -201,6 +238,7 @@ export default {
 						emailAccountName: data.email_account_name,
 						emailId: data.email_id,
 						password: data.password,
+						service: data.service,
 						enableIncoming: data.enable_incoming ? true : false,
 						enableOutgoing: data.enable_outgoing ? true : false,
 						defaultIncoming: data.default_incoming ? true : false,

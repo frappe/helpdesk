@@ -8,6 +8,7 @@
 				fields: [
 					'email_account_name',
 					'email_id',
+					'service',
 					'enable_incoming',
                     'default_incoming',
                     'enable_outgoing',

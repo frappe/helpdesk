@@ -21,14 +21,17 @@
 				<div class="sm:w-5/12">
 					{{ emailAccount.email_id }}
 				</div>
+				<div class="sm:w-5/12">
+					{{ emailAccount.service }}
+				</div>
 				<div class="sm:w-3/12">
                     <div class="pl-4">
-                        <a :title="emailAccount.default_incoming ? 'default incoming' : ''"><FeatherIcon v-if="emailAccount.enable_incoming" name="arrow-down-circle" class="w-5 h-5 stroke-2" :class="emailAccount.default_incoming ? 'stroke-blue-500' : 'stroke-gray-600'" /></a>
+                        <a :title="emailAccount.default_incoming ? 'default incoming' : ''"><CustomIcons v-if="emailAccount.enable_incoming" name="circle-check" class="h-[20px] w-[20px] fill-blue-500"/></a>
                     </div>
 				</div>
                 <div class="sm:w-3/12">
                     <div class="pl-4">
-                        <a :title="emailAccount.default_outgoing ? 'default outging' : ''"><FeatherIcon v-if="emailAccount.enable_outgoing" name="arrow-up-circle" class="w-5 h-5 stroke-2" :class="emailAccount.default_outgoing ? 'stroke-blue-500' : 'stroke-gray-600'" /></a>
+                        <a :title="emailAccount.default_outgoing ? 'default outging' : ''"><CustomIcons v-if="emailAccount.enable_outgoing" name="circle-check" class="h-[20px] w-[20px] fill-blue-500"/></a>
                     </div>
                 </div>
 			</div>
@@ -38,13 +41,15 @@
 
 <script>
 import { Input, FeatherIcon } from 'frappe-ui'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'EmailListItem',
 	props: ['emailAccount', 'selected'],
 	components: {
-		Input,
-		FeatherIcon,
-	}
+    Input,
+    FeatherIcon,
+    CustomIcons
+}
 }
 </script>
