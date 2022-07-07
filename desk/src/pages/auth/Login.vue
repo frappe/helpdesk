@@ -105,7 +105,6 @@ export default {
 	async mounted() {
 		if (this.$route?.query?.route) {
 			this.redirect_route = this.$route.query.route;
-			// this.$router.replace({ query: null });
 		}
 		if (this.user.isLoggedIn()) {
 			this.redirect()
@@ -140,9 +139,7 @@ export default {
 		},
 		redirect() {
 			if (this.redirect_route) {
-				this.user.refetch(() => {
-					this.$router.push(this.redirect_route)
-				})
+				window.location.href = this.redirect_route
 			} else {
 				window.location.href = (this.$route.name == 'DeskLogin') ? '/frappedesk/tickets' : '/support/tickets'
 			}
