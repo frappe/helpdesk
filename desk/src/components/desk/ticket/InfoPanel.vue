@@ -130,7 +130,7 @@
 						<div v-for="(_ticket, index) in otherTicketsOfContact" :key="_ticket.name" :set="maxCount = 5">
 							<router-link 
 								v-if="index <= maxCount" 
-								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?contact=${ticket.contact.name}`" 
+								:to="index < maxCount ? `/frappedesk/tickets/${_ticket.name}` : `/frappedesk/tickets/?contact=${ticket.contact.name}&menu_filter=all&page=1`" 
 								class="text-[12px] rounded"
 							>
 								<div class="py-[1px]">
