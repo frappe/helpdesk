@@ -18,6 +18,9 @@
                 <div class="sm:w-5/12">
                     Email
                 </div>
+                <div class="sm:w-5/12">
+                    Service
+                </div>
                 <div class="sm:w-3/12">
                     Incoming
                 </div>
