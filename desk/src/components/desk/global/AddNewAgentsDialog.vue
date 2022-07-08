@@ -16,7 +16,7 @@
 						<ul v-if="inviteQueue.length" class="flex flex-wrap gap-2 py-2">
 							<li
 								class="flex items-center p-1 space-x-2 bg-white shadow rounded"
-								v-for="email in inviteQueue"
+								v-for="email in inviteQueue.slice().reverse()"
 								:key="email"
 								:title="email"
 							>
@@ -27,11 +27,6 @@
 									<FeatherIcon class="w-3" name="x" />
 								</button>
 							</li>
-							<li v-if="inviteQueue.length > 1" role="button" class="hover:bg-gray-100 p-1 bg-white shadow rounded">
-								<span class="text-base mx-2" @click="removeAllEmailFromQueue()">
-									Clear All
-								</span>
-							</li>
 						</ul>
 					</div>
 				</div>
@@ -39,6 +34,11 @@
 			<template #actions>
 				<Button :disabled="inviteQueue.length == 0" appearance="primary" @click="sentInvites()" :loading="$resources.sentInvites.loading">Sent Invites</Button>
 				<Button appearance="secondary" @click="close()">Cancel</Button>
+				<div class="grow">
+					<Button @click="removeAllEmailFromQueue()" v-if="inviteQueue.length > 1">
+						Clear All
+					</Button>
+				</div>
 			</template>
 		</Dialog>
   </div>
