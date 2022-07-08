@@ -1,6 +1,7 @@
 <template>
 	<div class="mt-[9px]">
 		<ListManager
+			ref="listManager"
 			class="px-[16px]"
 			:options="{
 				cache: ['Agents', 'Desk'],
@@ -13,6 +14,13 @@
 				limit: 20,
 				start_page: initialPage,
 				route_query_pagination: true
+			}"
+			@selection="(selectedItems) => {
+				if (Object.keys(selectedItems).length > 0) {
+					$event.emit('show-top-panel-actions-settings', 'Agents Bulk')
+				} else {
+					$event.emit('show-top-panel-actions-settings', 'Agents')
+				}
 			}"
 		>
 			<template #body="{ manager }">
@@ -61,9 +69,40 @@ export default {
 		this.$event.on('show-new-agent-dialog', () => {
 			this.showNewAgentDialog = true
 		})
+		this.$event.on('delete-selected-agents', () => {
+			this.$resources.bulk_delete_agents.submit({
+				items: Object.keys(this.$refs.listManager.manager.selectedItems),
+				doctype: 'Agent'
+			})
+		})
 	},
 	deactivated() {
 		this.$event.off('show-new-agent-dialog')
+		this.$event.off('delete-selected-agents')
+	},
+	resources: {
+		bulk_delete_agents() {
+			return {
+				method: 'frappedesk.api.doc.delete_items',
+				onSuccess: (res) => {
+					this.$refs.listManager.manager.selectedItems = {}
+					this.$refs.listManager.manager.reload()
+					this.$toast({
+						title: 'Agents deleted',
+						customIcon: 'circle-check',
+						appearance: 'success'
+					})
+				},
+				onError: (err) => {
+					this.$toast({
+						title: 'Error while deleting agents',
+						text: err,
+						customIcon: 'circle-check',
+						appearance: 'success'
+					})
+				}
+			}
+		}
 	}
 }
 </script>

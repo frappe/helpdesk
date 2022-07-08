@@ -139,13 +139,13 @@ export default {
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case 'Ticket Type':
-					this.$resources.types.fetch()
+					this.$resources.types.reload()
 					break
 				case 'Contact':
-					this.$resources.contacts.fetch()
+					this.$resources.contacts.reload()
 					break
 				case 'Agent':
-					this.$resources.agents.fetch()
+					this.$resources.agents.reload()
 					break
 			}
 		})
