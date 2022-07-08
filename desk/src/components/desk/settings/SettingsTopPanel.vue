@@ -44,7 +44,9 @@ export default {
 				}),
 			],
 			"Agents Bulk": [
-				new Action("Delete", "plus", "secondary", () => {}),
+				new Action("Delete", "", "secondary", () => {
+					this.$event.emit('delete-selected-agents')
+				}),
 			],
 			"Support Policies": [
 				new Action("New Policy", "plus", "primary", () => {

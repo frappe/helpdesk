@@ -285,8 +285,10 @@ export default {
 	},
 	methods: {
 		updateTicketCount() {
-			this.$resources.myOpenTicketsCount.fetch()
-			this.$resources.myRepliedTicketsCount.fetch()
+			if (this.user.agent) {
+				this.$resources.myOpenTicketsCount.fetch()
+				this.$resources.myRepliedTicketsCount.fetch()
+			}
 		},
 		syncSideBarTicketFilter() {
 			if (this.$route.name === 'DeskTickets' && !this.$route.query.menu_filter) {

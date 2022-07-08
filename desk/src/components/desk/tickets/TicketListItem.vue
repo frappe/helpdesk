@@ -135,7 +135,10 @@ export default {
 			if (this.ticket._assign) {
 				const result = []
 				JSON.parse(this.ticket._assign).forEach(assignee => {
-					result.push(this.agents.find(x => x.name === assignee))
+					const agent = this.agents.find(x => x.name === assignee)
+					if (agent) {
+						result.push(agent)
+					}
 				})
 				return result
 			}
