@@ -5,13 +5,13 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'ListManager',
   props: ['options'],
-  setup(props) {
+  setup(props, context) {
     const router = useRouter()
     const route = useRoute()
 
@@ -186,6 +186,11 @@ export default {
     manager.value.loading = computed(() => {
       return manager.value.resources?.list?.list.loading
     })
+
+    watch(manager.value.selectedItems, (newValue) => {
+      context.emit('selection', newValue)
+    })
+
 
     return {
       manager,
