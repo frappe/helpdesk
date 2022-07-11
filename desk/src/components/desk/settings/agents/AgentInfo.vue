@@ -44,7 +44,7 @@
 						<Button @click="cancel()">Cancel</Button>
 					</div>
 					<div class="grow flex flex-row-reverse">
-						<Button appearance="primary" @click="save()">Save</Button>
+						<Button :loading="this.$resources.agent.setValue.loading || this.$resources.user.setValue.loading" appearance="primary" @click="save()">Save</Button>
 					</div>
 				</div>
 			</div>
@@ -68,10 +68,12 @@ export default {
 	setup() {
 		const editingName = ref(false)
 		const tempAgentName = ref('')
+		const updatingValues = ref(false)
 
 		return {
 			editingName,
-			tempAgentName
+			tempAgentName,
+			updatingValues
 		}
 	},
 	computed: {
@@ -82,6 +84,9 @@ export default {
 			return this.$resources.user.doc || null
 		},
 		values() {
+			if (this.updatingValues) {
+				return this.values || null
+			}
 			return {
 				agentName: this.agentDoc?.agent_name || null,
 				profilePicture: this.userDoc?.user_image || null,
@@ -108,23 +113,26 @@ export default {
 			return {
 				type: 'document',
 				doctype: 'Agent',
-				name: this.agent
+				name: this.agent,
+				setValue: {
+					onSuccess: () => {
+						this.resetForm()
+						this.updatingValues = false
+
+						this.$toast({
+							title: 'Agent Updated.',
+							customIcon: 'circle-check',
+							appearance: 'success',
+						})
+					}
+				}
 			}
 		},
 		user() {
 			return {
 				type: 'document',
 				doctype: 'User',
-				name: this.agent,
-				setValue: {
-					onSuccess: () => {
-						this.$resources.agent.setValue.submit({
-							agent_name: this.tempAgentName,
-							group: this.values.team,
-						})
-						this.resetForm()
-					}
-				}
+				name: this.agent
 			}
 		},
 		teams() {
@@ -141,14 +149,22 @@ export default {
 			this.tempAgentName = this.values.agentName
 		},
 		save() {
+			this.updatingValues = true
+			const newValues = this.values
+
 			this.$resources.user.setValue.submit({
-				email: this.values.email,
-				email_signature: this.values.signature,
+				email: newValues.email,
+				email_signature: newValues.signature,
 				full_name: this.tempAgentName,
+			}).then(() => {
+				this.$resources.agent.setValue.submit({
+					agent_name: this.tempAgentName,
+					group: newValues.team,
+				})
 			})
 		},
 		cancel() {
-			this.resetForm()
+			this.$router.go()
 		}
 	}
 }
