@@ -187,7 +187,7 @@ export default {
       return manager.value.resources?.list?.list.loading
     })
 
-    watch(manager.value.selectedItems, (newValue) => {
+    watch(selectedItems.value, (newValue) => {
       context.emit('selection', newValue)
     })
 

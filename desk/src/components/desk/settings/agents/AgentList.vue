@@ -21,6 +21,8 @@
                 <div class="sm:w-3/12">
                     Team
                 </div>
+                <div class="sm:w-2/12">
+                </div>
             </div>
         </div>
         <div 
