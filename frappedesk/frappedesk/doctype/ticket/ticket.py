@@ -25,9 +25,6 @@ class Ticket(Document):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
 	def validate(self):
-		# if self.is_new() and self.via_customer_portal:
-		# 	self.flags.create_communication = True
-
 		if not self.raised_by:
 			self.raised_by = frappe.session.user
 
@@ -38,13 +35,6 @@ class Ticket(Document):
 
 	def after_insert(self):
 		log_ticket_activity(self.name, "created")
-
-	def on_update(self):
-		pass
-		# Add a communication in the ticket timeline
-		# if self.flags.create_communication and self.via_customer_portal:
-		# 	self.create_communication()
-		# 	self.flags.communication_created = None
 
 	def update_priority_based_on_ticket_type(self):
 		if (self.ticket_type):
@@ -205,9 +195,44 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_agent(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
+	last_ticket_communication_doc = frappe.get_last_doc("Communication", filters={"reference_name":[ "=", ticket_doc.name]})
 
-	if (not ticket_doc.via_customer_portal) and (not frappe.db.exists("Email Account", {"default_outgoing": "1"})):
-		frappe.throw("Default outgoing email account needs to be setup to reply to this ticket")
+	sent_email = True	# if not set email will not be sent
+	reply_email_account = None
+
+	ticket_email_account = last_ticket_communication_doc.email_account if last_ticket_communication_doc else None
+
+	default_ticket_outgoing_email_account = frappe.get_value("Email Account", [["IMAP Folder","append_to","=","Ticket"],["Email Account","default_outgoing","=",1]])
+	default_outgoing_email_account = frappe.get_value("Email Account", [["Email Account","default_outgoing","=",1]])
+
+
+	# TODO: <a href="https://frappecloud.com/support/tickets/{ticket_doc.name}" rel="noopener noreferrer" target="_blank">View the message</a>
+	new_reply_notification_message = f"""
+		<div class="ql-container text-[13px] text-gray-700"><h3><strong>Ticket #{ticket_doc.name}</strong></h3><h4>You received a new message</h4><h4><br></h4><h4>{message}</h4><h4><br></h4>Please check visit the customer portal to reply to this message</div>
+	"""
+
+	# 1 if not via customer portal check if email account is set in ticket doc, else check if default outgoing is available, else throw error
+	if not ticket_doc.via_customer_portal:
+		if ticket_email_account and frappe.get_doc("Email Account", ticket_email_account).enable_outgoing:
+			reply_email_account = ticket_email_account
+		elif default_ticket_outgoing_email_account:
+			reply_email_account = default_ticket_outgoing_email_account
+		elif default_outgoing_email_account:
+			reply_email_account = default_outgoing_email_account
+			message = new_reply_notification_message
+		else:
+			frappe.throw("No outgoing email account found for Ticket")
+	else:
+		if default_ticket_outgoing_email_account:
+			# 2 if via customer portal, check if a default outgoing email with IMAP folder with ticket doctype is present, if so use that
+			reply_email_account = default_ticket_outgoing_email_account
+		elif default_outgoing_email_account:
+			# 3 if not check if default outgoing email is present, if then send the mail but it should say reply on the customer portal (as replying in the email will not trigger ticket updatee on desk)
+			reply_email_account = default_outgoing_email_account
+			message = new_reply_notification_message
+		else:
+			# 4 if via customer portal and no default outgoing email is present, throw error
+			sent_email = False
 
 	communication = frappe.new_doc("Communication")
 	communication.update(
@@ -223,6 +248,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			"status": "Linked",
 			"reference_doctype": "Ticket",
 			"reference_name": ticket_doc.name,
+			"email_account": reply_email_account
 		}
 	)
 	communication.ignore_permissions = True
@@ -238,26 +264,26 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		file_doc.save(ignore_permissions=True)
 		
 		_attachments.append({'file_url': file_doc.file_url})
-	
-	reply_to_email = None
-	if frappe.db.exists("Email Account", {"name": "Support", "enable_outgoing": True}):
-		reply_to_email=frappe.get_doc("Email Account", "Support").email_id
 
-	try:
-		frappe.sendmail(
-			subject=f"Re: {ticket_doc.subject}",
-			sender=reply_to_email,
-			reply_to=reply_to_email,
-			message=message,
-			recipients=[ticket_doc.raised_by],
-			reference_doctype='Ticket',
-			reference_name=ticket_doc.name,
-			communication=communication.name,
-			attachments=_attachments if len(_attachments) > 0 else None,
-			now=True,
-		)
-	except:
-		frappe.throw("Either setup up Support email account or there should be a default outgoing email account")
+	if sent_email:
+		reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
+		try:
+			frappe.sendmail(
+				subject=f"Re: {ticket_doc.subject}",
+				sender=reply_to_email,
+				reply_to=reply_to_email,
+				message=message,
+				recipients=[ticket_doc.raised_by],
+				reference_doctype='Ticket',
+				reference_name=ticket_doc.name,
+				communication=communication.name,
+				attachments=_attachments if len(_attachments) > 0 else None,
+				now=True,
+			)
+		except:
+			frappe.throw("Either setup up support email account or there should be a default outgoing email account")
+	else:
+		frappe.log_error('Reply email not sent, no email account found for Ticket!!')
 
 @frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):
