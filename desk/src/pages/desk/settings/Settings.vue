@@ -2,7 +2,7 @@
 	<div>
 		<SettingsTopPanel />
 		<div :style="{ height: viewportWidth > 768 ? 'calc(100vh - 55px)' : null }" class="flex">
-			<div class="min-w-[167px] border-r">
+			<div class="w-[167px] border-r">
 				<SettingsSideBarMenu />
 			</div>
 			<div class="grow h-full">
