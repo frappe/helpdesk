@@ -1,150 +1,28 @@
 <template>
-	<div>
-		<div v-if="!$resources.contact.loading && contact">
-			<div class="flex py-3 border-b items-center text-base pl-4 pr-8">
-				<div class="grow">
-					<div class="flex items-center">
-						<div class="sm:w-3/12 truncate pr-10">
-						{{ fullName }}
-						</div>
-						<div class="sm:w-3/12">
-							<div v-if="email" class="flex items-center space-x-2">
-								<div class="w-[1.1rem]">
-									<FeatherIcon name="mail" class="w-4 h-4" />
-								</div>
-								<div class="truncate pr-10">
-									{{ email }}
-								</div>
-							</div>
-						</div>
-						<div class="sm:w-3/12">
-							<div v-if="phone" class="flex items-center space-x-2">
-								<div class="w-[1.1rem]">
-									<FeatherIcon name="phone" class="w-4 h-4" />
-								</div>
-								<div class="truncate pr-10">
-									{{ phone }}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="flex items-center space-x-2">
-					<Button>Edit Details</Button>
-				</div>
-			</div>
-			<div class="pt-4">
-				<div class="mb-4 ml-4 font-semibold text-xl"> Tickets </div>
-				<ListManager
-					class="px-[16px]"
-					ref="ticketList"
-					:options="{
-						cache: ['Ticket', 'Contact', contactId],
-						doctype: 'Ticket',
-						fields: [
-							'priority', 
-							'name', 
-							'subject', 
-							'ticket_type', 
-							'status', 
-							'contact', 
-							'response_by', 
-							'resolution_by', 
-							'agreement_status', 
-							'modified', 
-							'_assign', 
-							'_seen'
-						],
-						filters: {'contact': ['=', contactId]},
-						limit: 20,
-						order_by: 'modified desc',
-					}"
-				>
-					<template #body="{ manager }">
-						<TicketList :manager="manager" />
-					</template>
-				</ListManager>
-			</div>
-		</div>
-		<div v-else class="p-5">
-			<LoadingText text="Fetching contact details..." />
-		</div>
-	</div>
+    <div class="flex flex-col">
+        <div class="flex border-b h-[52px] px-[24px]">
+            <div class="grow my-auto text-[16px] font-semibold text-gray-900">
+                Contacts
+            </div>
+        </div>
+        <div class="flex flex-row w-full h-full">
+            <ContactInfo class="shrink-0 border-r border-[#F4F5F6]" :contact="contactId" />
+            <!-- <ContactRelatedInfo class="grow" :agent="contactId" /> -->
+        </div>
+    </div>
 </template>
 
 <script>
-import { LoadingText, FeatherIcon } from 'frappe-ui'
-import { ref } from 'vue'
-import ListManager from '@/components/global/ListManager.vue'
-import TicketList from '@/components/desk/tickets/TicketList.vue'
+import ContactInfo from '@/components/desk/contacts/ContactInfo.vue'
+// import ContactRelatedInfo from '@/components/desk/contacts/ContactRelatedInfo.vue'
 
 export default {
-	name: 'Contact',
-	props: ['contactId'],
-	components: {
-		LoadingText,
-		FeatherIcon,
-		ListManager,
-		TicketList
-	},
-	setup(props) {
-		const ticketsSortby = ref('modified')
-		const ticketsSortDirection = ref('dessending')
-		const ticketsFilters = ref([{ raised_by: props.contactId }])
+    name: 'Contact',
+    props: ['contactId'],
+    components: {
+        ContactInfo,
+        // ContactRelatedInfo
+    },
 
-		return {
-			ticketsSortby,
-			ticketsSortDirection,
-			ticketsFilters
-		}
-	},
-	resources: {
-		contact() {
-			return {
-				method: 'frappe.client.get',
-				params: {
-					doctype: 'Contact',
-					name: this.contactId,
-					fields: ["*"]
-				},
-				onSuccess: (data) => {
-					console.log(data)
-				},
-				auto: true
-			}
-		}
-	},
-	computed: {
-		contact() {
-			return this.$resources.contact.data || null
-		},
-		fullName() {
-			if (this.contact) {
-				return (this.contact.first_name || "") + " " + (this.contact.last_name || "")
-			}
-		},
-		email() {
-			if (this.contact) {
-				if (this.contact.email_ids && this.contact.email_ids.length > 0) {
-					return this.contact.email_ids[0].email_id
-				} else if (this.contact.email_id) {
-					return this.contact.email_id
-				}
-			}
-		},
-		phone() {
-			if (this.contact) {
-				if (this.contact.phone_nos && this.contact.phone_nos.length > 0) {
-					return this.contact.phone_nos[0].phone
-				} else if (this.contact.phone) {
-					return this.contact.phone
-				}
-			}
-		}
-	},
 }
 </script>
-
-<style>
-
-</style>
