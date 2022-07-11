@@ -2,10 +2,10 @@
 	<div>
 		<SettingsTopPanel />
 		<div :style="{ height: viewportWidth > 768 ? 'calc(100vh - 55px)' : null }" class="flex">
-			<div class="sm:w-2/12 border-r">
+			<div class="w-[167px] border-r">
 				<SettingsSideBarMenu />
 			</div>
-			<div class="sm:w-10/12 h-full">
+			<div class="grow h-full">
 				<router-view v-slot="{ Component }">
 					<keep-alive>
 						<component :is="Component" />
