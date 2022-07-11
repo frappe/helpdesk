@@ -27,7 +27,11 @@
 				<AgentList :manager="manager" />
 			</template>
 		</ListManager>
-		<AddNewAgentsDialog :show="showNewAgentDialog" @close="() => { showNewAgentDialog = false}" />
+		<AddNewAgentsDialog :show="showNewAgentDialog" @close="() => { 
+			showNewAgentDialog = false
+			$refs.listManager.manager.reload()
+			$router.go()	// TODO: this is a hack
+		}" />
 	</div>
 </template>
 <script>
@@ -63,7 +67,6 @@ export default {
 		this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 
 		this.$event.on('show-new-agent-dialog', () => {
-			console.log(this.showNewAgentDialog)
 			this.showNewAgentDialog = true
 		})
 		this.$event.on('delete-selected-agents', () => {
@@ -81,22 +84,25 @@ export default {
 		bulk_delete_agents() {
 			return {
 				method: 'frappedesk.api.doc.delete_items',
-				onSuccess: (res) => {
-					this.$refs.listManager.manager.selectedItems = {}
-					this.$refs.listManager.manager.reload()
-					this.$toast({
-						title: 'Agents deleted',
-						customIcon: 'circle-check',
-						appearance: 'success'
-					})
+				onSuccess: () => {
+					this.$router.go()
+					// this.$refs.listManager.manager.reload()
+					// this.$toast({
+					// 	title: 'Agents deleted',
+					// 	customIcon: 'circle-check',
+					// 	appearance: 'success'
+					// })
+					// this.$event.emit('show-top-panel-actions-settings', 'Agents')
 				},
 				onError: (err) => {
+					this.$refs.listManager.manager.reload()
 					this.$toast({
 						title: 'Error while deleting agents',
 						text: err,
 						customIcon: 'circle-check',
 						appearance: 'success'
 					})
+					this.$event.emit('show-top-panel-actions-settings', 'Agents')
 				}
 			}
 		}
