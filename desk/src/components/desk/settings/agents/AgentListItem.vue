@@ -25,6 +25,13 @@
 				<div class="sm:w-3/12 truncate pr-10">
 					{{ agent.group }}
 				</div>
+				<div class="sm:w-2/12 truncate">
+					<div class="w-full flex flex-row-reverse">
+						<Badge v-if="agent.send_welcome_email" color="yellow">
+							Pending
+						</Badge>
+					</div>
+				</div>
 			</router-link>
 		</div>
 	</div>
@@ -32,13 +39,15 @@
 
 <script>
 import { Input, FeatherIcon } from 'frappe-ui'
+import Badge from 'frappe-ui/src/components/Badge.vue'
 
 export default {
 	name: 'AgentListItem',
 	props: ['agent', 'selected'],
 	components: {
-		Input,
-		FeatherIcon,
-	}
+    Input,
+    FeatherIcon,
+    Badge
+}
 }
 </script>

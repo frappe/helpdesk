@@ -7,8 +7,8 @@
 				cache: ['Agents', 'Desk'],
 				doctype: 'Agent',
 				fields: [
-					'user.full_name',
 					'user as email',
+					'user.full_name as full_name',
 					'group',
 				],
 				limit: 20,
@@ -27,37 +27,37 @@
 				<AgentList :manager="manager" />
 			</template>
 		</ListManager>
-		<NewAgentDialog v-model="showNewAgentDialog" @agent-created="() => {
-				showNewAgentDialog = false
-				$router.go()
-			}" 
-		/>
+		<AddNewAgentsDialog :show="showNewAgentDialog" @close="() => { 
+			showNewAgentDialog = false
+			$refs.listManager.manager.reload()
+			$router.go()	// TODO: this is a hack
+		}" />
 	</div>
 </template>
 <script>
 import { inject, ref } from 'vue'
 import AgentList from '@/components/desk/settings/agents/AgentList.vue'
 import ListManager from '@/components/global/ListManager.vue'
-import NewAgentDialog from "@/components/desk/global/NewAgentDialog.vue"
+import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue"
 
 export default {
 	name: 'Agents',
 	components: {
 		AgentList,
 		ListManager,
-		NewAgentDialog
+		AddNewAgentsDialog
 	},
 	data() {
 		return {
-			initialPage: 1
+			initialPage: 1,
 		}
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
-		const showNewAgentDialog = ref(false)
+		const showNewAgentDialog =  ref(false)
 		return { 
 			viewportWidth,
-			showNewAgentDialog 
+			showNewAgentDialog
 		}
 	},
 	activated() {
@@ -84,22 +84,25 @@ export default {
 		bulk_delete_agents() {
 			return {
 				method: 'frappedesk.api.doc.delete_items',
-				onSuccess: (res) => {
-					this.$refs.listManager.manager.selectedItems = {}
-					this.$refs.listManager.manager.reload()
-					this.$toast({
-						title: 'Agents deleted',
-						customIcon: 'circle-check',
-						appearance: 'success'
-					})
+				onSuccess: () => {
+					this.$router.go()
+					// this.$refs.listManager.manager.reload()
+					// this.$toast({
+					// 	title: 'Agents deleted',
+					// 	customIcon: 'circle-check',
+					// 	appearance: 'success'
+					// })
+					// this.$event.emit('show-top-panel-actions-settings', 'Agents')
 				},
 				onError: (err) => {
+					this.$refs.listManager.manager.reload()
 					this.$toast({
 						title: 'Error while deleting agents',
 						text: err,
 						customIcon: 'circle-check',
 						appearance: 'success'
 					})
+					this.$event.emit('show-top-panel-actions-settings', 'Agents')
 				}
 			}
 		}
