@@ -44,7 +44,7 @@ export default {
 			initialPage: 1
 		}
 	},
-	activated() {
+	mounted() {
 		this.$event.emit('set-selected-setting', 'Support Policies')
 		this.$event.emit('show-top-panel-actions-settings', 'Support Policies')
 	},

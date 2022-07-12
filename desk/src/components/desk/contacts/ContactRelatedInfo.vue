@@ -16,7 +16,7 @@
 						'status',
 						'_seen'
 					],
-					limit: 20,
+					limit: 50,
 					order_by: 'modified desc',
 					filters: {
 						'contact': ['=', contact]
