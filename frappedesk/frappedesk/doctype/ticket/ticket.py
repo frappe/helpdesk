@@ -202,14 +202,10 @@ def create_communication_via_agent(ticket, message, attachments=None):
 
 	ticket_email_account = last_ticket_communication_doc.email_account if last_ticket_communication_doc else None
 
-	default_ticket_outgoing_email_account = frappe.get_value("Email Account", [["IMAP Folder","append_to","=","Ticket"],["Email Account","default_outgoing","=",1]])
+	default_ticket_outgoing_email_account = frappe.get_value("Email Account", [["use_imap", "=", 1], ["IMAP Folder","append_to","=","Ticket"], ["default_outgoing","=",1]])
 	default_outgoing_email_account = frappe.get_value("Email Account", [["Email Account","default_outgoing","=",1]])
 
-
-	# TODO: <a href="https://frappecloud.com/support/tickets/{ticket_doc.name}" rel="noopener noreferrer" target="_blank">View the message</a>
-	new_reply_notification_message = f"""
-		<div class="ql-container text-[13px] text-gray-700"><h3><strong>Ticket #{ticket_doc.name}</strong></h3><h4>You received a new message</h4><h4><br></h4><h4>{message}</h4><h4><br></h4>Please check visit the customer portal to reply to this message</div>
-	"""
+	just_sent_email_notification = False
 
 	# 1 if not via customer portal check if email account is set in ticket doc, else check if default outgoing is available, else throw error
 	if not ticket_doc.via_customer_portal:
@@ -219,7 +215,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			reply_email_account = default_ticket_outgoing_email_account
 		elif default_outgoing_email_account:
 			reply_email_account = default_outgoing_email_account
-			message = new_reply_notification_message
+			just_sent_email_notification = True
 		else:
 			frappe.throw("No outgoing email account found for Ticket")
 	else:
@@ -229,7 +225,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		elif default_outgoing_email_account:
 			# 3 if not check if default outgoing email is present, if then send the mail but it should say reply on the customer portal (as replying in the email will not trigger ticket updatee on desk)
 			reply_email_account = default_outgoing_email_account
-			message = new_reply_notification_message
+			just_sent_email_notification = True
 		else:
 			# 4 if via customer portal and no default outgoing email is present, throw error
 			sent_email = False
@@ -268,18 +264,33 @@ def create_communication_via_agent(ticket, message, attachments=None):
 	if sent_email:
 		reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
 		try:
-			frappe.sendmail(
-				subject=f"Re: {ticket_doc.subject}",
-				sender=reply_to_email,
-				reply_to=reply_to_email,
-				message=message,
-				recipients=[ticket_doc.raised_by],
-				reference_doctype='Ticket',
-				reference_name=ticket_doc.name,
-				communication=communication.name,
-				attachments=_attachments if len(_attachments) > 0 else None,
-				now=True,
-			)
+			if just_sent_email_notification:
+				frappe.sendmail(
+					sender=reply_to_email,
+					reply_to=reply_to_email,
+					recipients=[ticket_doc.raised_by],
+					reference_doctype='Ticket',
+					reference_name=ticket_doc.name,
+					communication=communication.name,
+					attachments=_attachments if len(_attachments) > 0 else None,
+					subject=f"[Ticket #{ticket_doc.name}] New reply",
+					template="new_reply_on_customer_portal_notification",
+					args={"ticket_id": ticket_doc.name, "message": message, "portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}"},
+					now=True,
+				)
+			else:
+				frappe.sendmail(
+					subject=f"Re: {ticket_doc.subject}",
+					sender=reply_to_email,
+					reply_to=reply_to_email,
+					message=message,
+					recipients=[ticket_doc.raised_by],
+					reference_doctype='Ticket',
+					reference_name=ticket_doc.name,
+					communication=communication.name,
+					attachments=_attachments if len(_attachments) > 0 else None,
+					now=True,
+				)
 		except:
 			frappe.throw("Either setup up support email account or there should be a default outgoing email account")
 	else:
