@@ -12,8 +12,8 @@
 				>
 					{{ ticket.name }}
 				</div>
-				<a :title="ticket.subject" class="lg:max-w-sm shrink" :class="!seenTicket(ticket) ? 'font-semibold text-gray-800' : (['Closed', 'Resolved'].includes(ticket.status) ? 'font-normal text-gray-600' : 'font-normal text-gray-900')">
-					<p class="truncate">
+				<a :title="ticket.subject" class="shrink" :class="size ? `sm:max-w-${size}` : 'sm:max-w-sm'">
+					<p class="truncate" :class="!seenTicket(ticket) ? 'font-semibold text-gray-800' : (['Closed', 'Resolved'].includes(ticket.status) ? 'font-normal text-gray-600' : 'font-normal text-gray-900')">
 						{{ ticket.subject }}
 					</p>
 				</a>
@@ -32,7 +32,7 @@ import { inject } from 'vue'
 
 export default {
 	name: 'MiniTicketlist',
-	props: ['manager'],
+	props: ['manager', 'size'],
 	setup() {
 		const user = inject('user')
 		return {
@@ -51,7 +51,7 @@ export default {
 			}
 			return seenFlag
 		}
-	}
+	},
 }
 </script>
 
