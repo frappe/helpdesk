@@ -39,7 +39,16 @@
 				</div>
 				<div class="flex flex-row py-4 space-x-10 w-full">
 					<Input class="grow max-w-sm" label="Email Id" type="text" :value="values.emailId" placeholder="Email Id" @change="(val) => values.emailId = val"/>
-					<Input class="grow max-w-sm" label="Password" type="password" :value="values.password" placeholder="Password" @change="(val) => values.password = val"/>
+					<Input @click="() => {
+						if (initialPassword === values.password) {
+							values.password = ''
+						}
+
+						if(initialPassword === '') {
+							initialPassword = values.password
+							values.password = ''
+						}
+					}" class="grow max-w-sm" label="Password" type="password" :value="values.password" placeholder="Password" @change="(val) => values.password = val"/>
 				</div>
 				<div>
 					<Input class="grow max-w-sm" label="Service" type="select" :value="values.service" :options="['GMail', 'Sendgrid', 'SparkPost', 'Yahoo Mail', 'Outlook.com', 'Yandex.Mail']" @change="(val) => values.service = val" />
@@ -127,6 +136,8 @@ export default {
 
 		const editingName = ref(false)
 
+		const initialPassword = ref('')
+
 		const values = ref({
 			emailAccountName: '',
 			emailId: '',
@@ -144,7 +155,8 @@ export default {
 			isNew,
 			editingName,
 			values,
-			tempEmailAccountName
+			tempEmailAccountName,
+			initialPassword
 		}
 	},
 	activated() {
@@ -213,6 +225,7 @@ export default {
 					fieldname: {
 						email_account_name: this.tempEmailAccountName,
 						email_id: this.values.emailId,
+						password: this.values.password,
 						enable_incoming: this.values.enableIncoming,
 						enable_outgoing: this.values.enableOutgoing,
 						default_incoming: this.values.defaultIncoming,
