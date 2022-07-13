@@ -1,19 +1,28 @@
 <template>
-	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen">
-		<div class="flex flex-row w-screen">
-			<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
-			<router-view class="grow" />
+	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen h-screen">
+		<div v-if="initialized">
+			<div class="flex flex-row w-screen">
+				<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
+				<router-view class="grow" />
+			</div>
+		</div>
+		<div v-else class="h-full w-full flex max-w-full grow-0">
+			<div class="mx-auto my-auto text-base font-normal">
+				<CustomIcons name="frappedesk" class="w-[200px]"/>
+			</div>
 		</div>
 	</div>
 </template>
 <script>
 import SideBarMenu from "@/components/desk/SideBarMenu.vue"
 import { inject, provide, ref } from 'vue'
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
 	name: "Desk",
 	components: {
 		SideBarMenu,
+		CustomIcons
 	},
 	setup() {
 		const user = inject('user')
@@ -72,6 +81,17 @@ export default {
 			agents,
 			agentGroups,
 			agentController
+		}
+	},
+	computed: {
+		initialized() {
+			if (this.$resources.supportSettings.loading) return false
+			if (!this.$resources.supportSettings.data.setup_complete) {
+				this.$router.push({ name: 'DeskSetup' })
+				return false
+			}
+
+			return true
 		}
 	},
 	mounted() {
@@ -154,6 +174,25 @@ export default {
 		this.$socket.off('list_update')
 	},
 	resources: {
+		supportSettings() {
+			return {
+				method: 'frappe.client.get',
+				params: {
+					doctype: 'Support Settings',
+					name: 'Support Settings'
+				},
+				onError: (error) => {
+					console.log(error)
+					this.$toast({
+						title: 'Something went wrong.',
+						text: 'Please try again later.',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				},
+				auto: true
+			}
+		},
 		createTicket() {
 			return {
 				method: 'frappedesk.api.ticket.create_new',

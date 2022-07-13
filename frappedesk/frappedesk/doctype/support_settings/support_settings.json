@@ -28,7 +28,10 @@
   "greeting_subtitle",
   "search_apis_sb",
   "search_apis",
-  "helpdesk_name"
+  "other_settings_section",
+  "helpdesk_name",
+  "column_break_26",
+  "setup_complete"
  ],
  "fields": [
   {
@@ -157,11 +160,26 @@
    "fieldname": "helpdesk_name",
    "fieldtype": "Data",
    "label": "Helpdesk Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "setup_complete",
+   "fieldtype": "Check",
+   "label": "Setup Complete"
+  },
+  {
+   "fieldname": "other_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Other Settings"
+  },
+  {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-06-29 11:22:53.995066",
+ "modified": "2022-07-13 07:35:11.718862",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Support Settings",
