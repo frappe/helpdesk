@@ -217,7 +217,10 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			reply_email_account = default_outgoing_email_account
 			just_sent_email_notification = True
 		else:
-			frappe.throw("No outgoing email account found for Ticket")
+			return {
+				"status": "error",
+				"error_code": "No default outgoing email available"
+			}
 	else:
 		if default_ticket_outgoing_email_account:
 			# 2 if via customer portal, check if a default outgoing email with IMAP folder with ticket doctype is present, if so use that
@@ -294,7 +297,13 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		except:
 			frappe.throw("Either setup up support email account or there should be a default outgoing email account")
 	else:
-		frappe.log_error('Reply email not sent, no email account found for Ticket!!')
+		return {
+			"status": "error",
+			"error_code": "No default outgoing email available"
+		}
+	return {
+		"status": "success",
+	}
 
 @frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):
