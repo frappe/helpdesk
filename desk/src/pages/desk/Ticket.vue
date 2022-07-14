@@ -244,6 +244,13 @@ export default {
 							text: error.text,
 							customIcon: 'circle-fail',
 							appearance: 'danger',
+							fixed: true,
+							action: {
+								title: 'Setup Now',
+								onClick: () => {
+									this.$router.push({ name: 'Emails'})
+								}
+							}
 						})
 					}
 					this.tempTextEditorData = {}
