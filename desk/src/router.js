@@ -111,6 +111,12 @@ const routes = [
 						component: () => import('@/pages/desk/settings/agent/Agents.vue')
 					},
 					{
+						path: 'agents/:agentId',
+						name: 'Agent',
+						component: () => import('@/pages/desk/settings/agent/Agent.vue'),
+						props: true
+					},
+					{
 						path: 'sla',
 						name: 'SlaPolicies',
 						component: () => import('@/pages/desk/settings/sla/SlaPolicies.vue')

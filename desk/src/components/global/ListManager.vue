@@ -45,7 +45,7 @@ export default {
       selectedItems,
       allItemsSelected,
       list: [],
-      start: options.value.limit * (options.value.start_page - 1),
+      start: (options.value.limit * (options.value.start_page - 1)) || 0,
       currPage: options.value.start_page || 1,
       totalPages: 0,
       totalCount: 0,
