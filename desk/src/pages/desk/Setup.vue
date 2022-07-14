@@ -99,7 +99,7 @@
 								</label>
 								<Button :loading="submitInProgress" appearance="primary" class="w-full mb-[14px]">Finish</Button>
 								<div class="flex justify-center mb-[30px]">
-									<div class="text-base font-normal text-gray-600 text-center hover:text-gray-700" role="button">I’ll do this later</div>
+									<div class="text-base font-normal text-gray-600 text-center hover:text-gray-700" role="button" @click="skip">I’ll do this later</div>
 								</div>
 								<div 
 									class="max-w-fit text-base font-normal text-gray-600 hover:text-gray-700" 
@@ -224,13 +224,62 @@ export default {
 	mounted() {
 		this.$event.on('email-account-created', () => {
 			console.log('email account created successfully!!')
+
+			if (this.inputValues.agentEmailList.length > 0) {
+				this.$resources.sentInvites.submit({
+					emails: this.inputValues.agentEmailList,
+					send_welcome_mail_to_user: true
+				})
+			}
+
+			this.$resources.completeSetup.submit()
 		})
 
 		this.$event.on('email-account-creation-failed', (error) => {
 			console.log('email account creation failed!!', error)
+
+			this.$toast({
+				title: 'Email account creation failed',
+				text: error,
+				customIcon: 'circle-fail',
+				appearance: 'danger',
+			})
+
+			this.submitInProgress = false
 		})
 	},
 	methods: {
+		createEmailAccount() {
+			this.submitInProgress = true
+			this.$resources.createEmailAccount.submit({
+				doc: {
+					doctype: 'Email Account',
+					email_account_name: 'Support',
+					email_id: this.inputValues.email,
+					password: this.inputValues.password,
+					enable_incoming: 1,
+					enable_outgoing: 1,
+					default_incoming: 0,
+					default_outgoing: 1,
+					email_sync_option: 'UNSEEN',
+					initial_sync_count: 100,
+					imap_folder: [
+						{
+							append_to: "Ticket",
+							folder_name: "INBOX",
+
+						}
+					],
+					create_contact: true,
+					track_email_status: true,
+					service: this.inputValues.service,
+					use_tls: 1,
+					use_imap: 1,
+					smtp_port: 587,
+					...this.emailDefaults[this.inputValues.service]
+				}
+			})
+		},
 		submitStep() {
 			if (this.validateInputs(this.currentStep)) {
 				if (this.currentStep == 1) {
@@ -238,37 +287,19 @@ export default {
 				}
 				if (this.currentStep < this.totalSteps) {
 					this.currentStep++
-				} else {
+				} 
+				else {
 					if (!this.emailAccountCreationSkipped) {
-						this.submitInProgress = true
-						this.$resources.createEmailAccount.submit({
-							doc: {
-								doctype: 'Email Account',
-								email_account_name: 'Support',
-								email_id: this.inputValues.email,
-								password: this.inputValues.password,
-								enable_incoming: 1,
-								enable_outgoing: 1,
-								default_incoming: 0,
-								default_outgoing: 1,
-								email_sync_option: 'UNSEEN',
-								initial_sync_count: 100,
-								imap_folder: [
-									{
-										append_to: "Ticket",
-										folder_name: "INBOX",
-			
-									}
-								],
-								create_contact: true,
-								track_email_status: true,
-								service: this.inputValues.service,
-								use_tls: 1,
-								use_imap: 1,
-								smtp_port: 587,
-								...this.emailDefaults[this.inputValues.service]
-							}
-						})
+						this.createEmailAccount()
+					} else {
+						if (this.inputValues.agentEmailList.length > 0) {
+							this.$resources.sentInvites.submit({
+								emails: this.inputValues.agentEmailList,
+								send_welcome_mail_to_user: false
+							}).then(() => {
+								this.$resources.completeSetup.submit()
+							})
+						}
 					}
 				}
 			} else {
@@ -279,7 +310,16 @@ export default {
 			if (this.currentStep == 1) {
 				this.emailAccountCreationSkipped = true
 			}
-			this.currentStep++
+			if (this.currentStep == this.totalSteps) {
+				if (!this.emailAccountCreationSkipped) {
+					this.createEmailAccount()
+				} else {
+					this.$resources.completeSetup.submit()
+				}
+			}
+			if (this.currentStep < this.totalSteps) {
+				this.currentStep++
+			}
 		},
 		goBack() {
 			if (this.currentStep > 1) {
@@ -339,6 +379,8 @@ export default {
 							}
 						})
 						this.inputValues['agentEmailList'] = agentEmailList
+					} else {
+						this.errors['agentEmailsStr'] = 'Please enter at least one email address'
 					}
 					break
 			}
@@ -357,9 +399,44 @@ export default {
 				}
 			}
 		},
-		inviteAgents() {
+		sentInvites() {
 			return {
-				// TODO: add invite agent email list
+				method: 'frappedesk.api.agent.sent_invites',
+				onSuccess: () => {
+					this.$event.emit('sent-invites-success')
+				},
+				onError: (error) => {
+					this.$event.emit('sent-invites-failed', error)
+				}
+			}
+		},
+		completeSetup() {
+			return {
+				method: 'frappe.client.set_value',
+				params: {
+					doctype: 'Support Settings',
+					name: "Support Settings",
+					fieldname: 'setup_complete',
+					value: 1
+				},
+				onSuccess: () => {
+					this.$toast({
+						title: 'Setup Complete',
+						customIcon: 'circle-check',
+						appearance: 'success',
+					})
+					this.submitInProgress = false
+					this.$router.push({name: 'DeskTickets'})
+				},
+				onError: (error) => {
+					this.$toast({
+						title: 'Setup Failed',
+						text: error,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+					this.submitInProgress = false
+				}
 			}
 		}
 	}

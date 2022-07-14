@@ -26,7 +26,7 @@ def get_user():
 	}
 	
 @frappe.whitelist()
-def sent_invites(emails):
+def sent_invites(emails, send_welcome_mail_to_user=True):
 	for email in emails:
 		if frappe.db.exists("User", email):
 			user = frappe.get_doc("User", email)
@@ -37,7 +37,8 @@ def sent_invites(emails):
 				"first_name": email.split("@")[0]
 			}).insert()
 			
-			user.send_welcome_mail_to_user()
+			if send_welcome_mail_to_user:
+				user.send_welcome_mail_to_user()
 
 		frappe.get_doc({
 			"doctype": "Agent",
