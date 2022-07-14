@@ -1,15 +1,18 @@
 <template>
-	<div class="bg-[#F3F5F8] h-screen w-screen">
-		<div class="p-[80px]">
+	<div 
+		class="bg-[#F3F5F8] w-screen"
+		style="min-height: 100vh"
+	>
+		<div class="lg:p-[80px] md:p-[0px]">
 			<div
-				class="bg-white rounded-[10px]"
+				class="bg-white lg:rounded-[10px] sm:rounded-none sm:h-[100hv]"
 				style="{
 					box-shadow: 0px 1px 42px rgba(97, 97, 97, 0.07);
-					height: calc(100vh - 160px);
+					min-height: calc(100vh - 160px);
 				}"
 			>
-				<div class="py-[60px] flex justify-center">
-					<div class="flex flex-col space-y-[60px] max-w-[370px]">
+				<div class="py-[60px] lg:px-[0px] sm:px-[10px] flex justify-center">
+					<div class="flex flex-col space-y-[60px] w-[370px]">
 						<div class="flex justify-center">
 							<CustomIcons name="frappedesk" class="h-[24px]"/>
 						</div>
@@ -24,17 +27,45 @@
 								<div class="text-[16px] font-normal text-gray-900 mb-[30px]">
 									Configure your e-mail address to start sending and receiving e-mails into FrappeDesk.
 								</div>
-								 <label class="flex flex-col space-y-[10px] mb-[30px]">
+								<div class="mb-[30px]">
+									<span class="block mb-2 text-sm leading-4 text-gray-700">
+										Service
+									</span>
+									<div class="flex flex-wrap text-[11px] text-gray-700 mx-[-4px]">
+										<div v-for="service in services" :key="service.title"
+											role="button" 
+											class="h-[80px] w-[80px] m-1 p-1.5 items-center border hover:shadow-sm rounded flex flex-col space-y-2"
+											:class="service.selected ? 'border-2 border-blue-500 bg-blue-50' : 'bg-white'"
+											@click="selectService(service)"
+										>
+											<Images :name="service.image" class="h-10 w-10"/>
+											<div>{{ service.title }}</div>
+										</div>
+									</div>
+								</div>
+								<div v-if="inputValues['service'] == 'GMail'" class="mb-[30px] bg-blue-50 border-blue-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
+									<FeatherIcon name="info" class="shrink-0 w-6 h-6 stroke-blue-500 stroke-2" />
+									<p>
+										GMail will only work if you enable 2-step authentication and use app-specific password. <a href="https://docs.erpnext.com/docs/v13/user/manual/en/setting-up/email/email_account_setup_with_gmail" target="_blank" class="text-blue-500 hover:underline">Read the step by step guide here.</a>
+									</p>
+								</div>
+								<label class="flex flex-col space-y-[10px] mb-[30px]">
 									<span class="block mb-2 text-sm leading-4 text-gray-700">
 										E-mail ID
 									</span>
-									<input type="text" class="rounded-[6px] w-full border-[#EBEEF0] h-[36px]" />
+									<div>
+										<input type="text" class="rounded-[6px] w-full border-[#EBEEF0] h-[36px]" v-model="inputValues['email']" />
+										<span class="text-red-500 text-base font-normal" v-if="errors['email']">{{ errors['email'] }}</span>
+									</div>
 								</label>
 								<label class="flex flex-col space-y-[10px] mb-[30px]">
 									<span class="block mb-2 text-sm leading-4 text-gray-700">
 										Password
 									</span>
-									<input type="password" class="rounded-[6px] w-full border-[#EBEEF0] h-[36px]" />
+									<div>
+										<input type="password" class="rounded-[6px] w-full border-[#EBEEF0] h-[36px]" v-model="inputValues['password']" />
+										<span class="text-red-500 text-base font-normal" v-if="errors['password']">{{ errors['password'] }}</span>
+									</div>
 								</label>
 								<Button appearance="primary" class="w-full mb-[14px]">Next</Button>
 								<div class="flex justify-center">
@@ -51,13 +82,22 @@
 								<div class="text-[24px] font-bold mb-[30px] text-gray-900">
 									Let’s invite your teammates
 								</div>
-								 <label class="flex flex-col space-y-[10px] mb-[30px]">
+								<div v-if="emailAccountCreationSkipped" class="mb-[30px] bg-yellow-50 border-yellow-300 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
+									<FeatherIcon name="alert-triangle" class="shrink-0 w-6 h-6 stroke-yellow-500 stroke-2" />
+									<p>
+										Invitation emails will only be sent once email account is setup up, <span class="text-blue-500 hover:underline" @click="goBack" role="button">setup up now</span>
+									</p>
+								</div>
+								<label class="flex flex-col space-y-[10px] mb-[30px]">
 									<span class="block mb-2 text-sm leading-4 text-gray-700">
 										E-mail IDs (comma-separated)
 									</span>
-									<textarea rows="3" class="max-h-[130px] min-h-[80px] placeholder-gray-400 text-[16px] font-normal rounded-[6px] w-full border-[#EBEEF0]" placeholder="tom@frappe.io, alex@frappe.io, joe@frappe.io" />
+									<div>
+										<textarea rows="3" class="max-h-[130px] min-h-[80px] placeholder-gray-400 text-[16px] font-normal rounded-[6px] w-full border-[#EBEEF0]" placeholder="tom@frappe.io, alex@frappe.io, joe@frappe.io" v-model="inputValues['agentEmailsStr']"/>
+										<span class="text-red-500 text-base font-normal" v-if="errors['agentEmailsStr']">{{ errors['agentEmailsStr'] }}</span>
+									</div>
 								</label>
-								<Button appearance="primary" class="w-full mb-[14px]">Finish</Button>
+								<Button :loading="submitInProgress" appearance="primary" class="w-full mb-[14px]">Finish</Button>
 								<div class="flex justify-center mb-[30px]">
 									<div class="text-base font-normal text-gray-600 text-center hover:text-gray-700" role="button">I’ll do this later</div>
 								</div>
@@ -85,42 +125,243 @@
 
 <script>
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
+import Images from '@/components/global/Images.vue';
+import { FeatherIcon } from 'frappe-ui';
 import { ref } from 'vue'
 
 export default {
-    name: "DeskSetup",
-    components: {
-		CustomIcons
+	name: "DeskSetup",
+	components: {
+		CustomIcons,
+		FeatherIcon,
+		Images
 	},
 	setup() {
 		const currentStep = ref(1)
 		const totalSteps = ref(2)
 
+		const submitInProgress = ref(false)
+
+		const emailAccountCreationSkipped = ref(true)
+
+		const emailDefaults = {
+			"GMail": {
+				"email_server": "imap.gmail.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp.gmail.com",
+			},
+			"Outlook.com": {
+				"email_server": "imap-mail.outlook.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp-mail.outlook.com",
+			},
+			"Sendgrid": {
+				"smtp_server": "smtp.sendgrid.net",
+				"smtp_port": 587
+			},
+			"SparkPost": {
+				"smtp_server": "smtp.sparkpostmail.com",
+			},
+			"Yahoo Mail": {
+				"email_server": "imap.mail.yahoo.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp.mail.yahoo.com",
+				"smtp_port": 587
+			},
+			"Yandex.Mail": {
+				"email_server": "imap.yandex.com",
+				"use_ssl": 1,
+				"smtp_server": "smtp.yandex.com",
+				"smtp_port": 587
+			},
+		};
+
+		const services = ref([
+			{
+				title: 'GMail',
+				image: 'gmail',
+				name: 'GMail',
+				selected: true
+			},
+			{
+				title: 'Outlook',
+				image: 'outlook',
+				name: 'Outlook.com'
+			},
+			{
+				title: 'SendGrid',
+				image: 'sendgrid',
+				name: 'Sendgrid'
+			},
+			{
+				title: 'Yahoo Mail',
+				image: 'yahoo',
+				name: 'Yahoo Mail'
+			}
+		])
+
+		const inputValues = ref({
+			service: services.value[0].name,
+			email: '',
+			password: '',
+			agentEmailsStr: '',
+			agentEmailList: []
+		})
+
+		const errors = ref({})
+
 		return {
+			emailDefaults,
+			submitInProgress,
+			emailAccountCreationSkipped,
 			currentStep,
 			totalSteps,
+			services,
+			inputValues,
+			errors
 		}
+	},
+	mounted() {
+		this.$event.on('email-account-created', () => {
+			console.log('email account created successfully!!')
+		})
+
+		this.$event.on('email-account-creation-failed', (error) => {
+			console.log('email account creation failed!!', error)
+		})
 	},
 	methods: {
 		submitStep() {
-			if (this.currentStep < this.totalSteps) {
-				this.currentStep++
+			if (this.validateInputs(this.currentStep)) {
+				if (this.currentStep == 1) {
+					this.emailAccountCreationSkipped = false
+				}
+				if (this.currentStep < this.totalSteps) {
+					this.currentStep++
+				} else {
+					if (!this.emailAccountCreationSkipped) {
+						this.submitInProgress = true
+						this.$resources.createEmailAccount.submit({
+							doc: {
+								doctype: 'Email Account',
+								email_account_name: 'Support',
+								email_id: this.inputValues.email,
+								password: this.inputValues.password,
+								enable_incoming: 1,
+								enable_outgoing: 1,
+								default_incoming: 0,
+								default_outgoing: 1,
+								email_sync_option: 'UNSEEN',
+								initial_sync_count: 100,
+								imap_folder: [
+									{
+										append_to: "Ticket",
+										folder_name: "INBOX",
+			
+									}
+								],
+								create_contact: true,
+								track_email_status: true,
+								service: this.inputValues.service,
+								use_tls: 1,
+								use_imap: 1,
+								smtp_port: 587,
+								...this.emailDefaults[this.inputValues.service]
+							}
+						})
+					}
+				}
 			} else {
-				console.log('setup completed')
+				console.log('input validation error!!!')
 			}
 		},
 		skip() {
+			if (this.currentStep == 1) {
+				this.emailAccountCreationSkipped = true
+			}
 			this.currentStep++
 		},
 		goBack() {
 			if (this.currentStep > 1) {
 				this.currentStep--
 			}
+		},
+		selectService(service) {
+			this.services.forEach(s => {
+				s.selected = false
+			})
+			service.selected = true
+			this.inputValues['service'] = service.name
+		},
+		validateInputs(step) {
+			this.errors = {}
+
+			const testEmailRegex = (val) => {
+				let emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/
+				return emailRegex.test(val)
+			}
+
+			const textPasswordRegex = (val) => {
+				let paaswordRegex = /^(?=.*\d)(?=.*[a-z]).{6,20}$/
+				return paaswordRegex.test(val)
+			}
+
+			switch(step) {
+				case 1:
+					// validate email
+					if (!this.inputValues['email']) {
+						this.errors['email'] = 'Email is required'
+					}
+					else if (!testEmailRegex(this.inputValues['email'])) {
+						this.errors['email'] = 'Please enter a valid email address'
+					}
+					// validate password
+					if (!this.inputValues['password']) {
+						this.errors['password'] = 'Password is required'
+					}
+					else if (!textPasswordRegex(this.inputValues['password'])) {
+						this.errors['password'] = 'Password must be at least 6 characters long and contain at least one number and one letter'
+					}
+					// validate service
+
+					if (!this.inputValues['service']) {
+						this.errors['service'] = 'Service is required'
+					}
+					break
+				case 2:
+					// validate agent emails
+					this.inputValues['agentEmailList'] = []
+					if (this.inputValues['agentEmailsStr'].replaceAll(' ', '') != '') {
+						let agentEmailList = this.inputValues['agentEmailsStr'].replaceAll(' ', '').split(',')
+						agentEmailList.forEach(email => {
+							if (!testEmailRegex(email)) {
+								this.errors['agentEmailsStr'] = 'Please enter a valid email address'
+							}
+						})
+						this.inputValues['agentEmailList'] = agentEmailList
+					}
+					break
+			}
+			return Object.keys(this.errors).length === 0
+		}
+	},
+	resources: {
+		createEmailAccount() {
+			return {
+				method: 'frappe.client.insert',
+				onSuccess: () => {
+					this.$event.emit('email-account-created')
+				},
+				onError: (error) => {
+					this.$event.emit('email-account-creation-failed', error)
+				}
+			}
+		},
+		inviteAgents() {
+			return {
+				// TODO: add invite agent email list
+			}
 		}
 	}
 }
 </script>
-
-<style>
-
-</style>
