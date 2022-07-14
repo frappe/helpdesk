@@ -68,13 +68,18 @@
 									</div>
 								</label>
 								<Button appearance="primary" class="w-full mb-[14px]">Next</Button>
-								<div class="flex justify-center">
+								<div class="flex justify-center pl-[15px]">
 									<div 
-										class="text-base font-normal text-gray-600 text-center hover:text-gray-700"
-										role="button"
-										@click="skip"
+										class="flex flex-row items-center space-x-3 text-base font-normal text-gray-600 text-center hover:text-gray-700"
+										:class="$resources.completeSetup.loading ? 'text-gray-500 hover:text-gray-500 cursor-wait' : 'cursor-pointer'"
+										@click="$resources.completeSetup.submit()"
 									>
-										Skip
+										<span>
+											Skip Onboarding
+										</span>
+										<div class="h-[15px]">
+											<Spinner v-if="$resources.completeSetup.loading" />
+										</div>
 									</div>
 								</div>
 							</form>
@@ -126,7 +131,7 @@
 <script>
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
 import Images from '@/components/global/Images.vue';
-import { FeatherIcon } from 'frappe-ui';
+import { FeatherIcon, Spinner } from 'frappe-ui';
 import { ref } from 'vue'
 
 export default {
@@ -134,7 +139,8 @@ export default {
 	components: {
 		CustomIcons,
 		FeatherIcon,
-		Images
+		Images,
+		Spinner
 	},
 	setup() {
 		const currentStep = ref(1)
