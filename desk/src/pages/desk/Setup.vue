@@ -157,7 +157,6 @@ export default {
 			},
 			"Sendgrid": {
 				"smtp_server": "smtp.sendgrid.net",
-				"smtp_port": 587
 			},
 			"SparkPost": {
 				"smtp_server": "smtp.sparkpostmail.com",
@@ -166,14 +165,10 @@ export default {
 				"email_server": "imap.mail.yahoo.com",
 				"use_ssl": 1,
 				"smtp_server": "smtp.mail.yahoo.com",
-				"smtp_port": 587
 			},
-			"Yandex.Mail": {
-				"email_server": "imap.yandex.com",
+			"Others": {
 				"use_ssl": 1,
-				"smtp_server": "smtp.yandex.com",
-				"smtp_port": 587
-			},
+			}
 		};
 
 		const services = ref([
@@ -189,14 +184,13 @@ export default {
 				name: 'Outlook.com'
 			},
 			{
-				title: 'SendGrid',
-				image: 'sendgrid',
-				name: 'Sendgrid'
-			},
-			{
 				title: 'Yahoo Mail',
 				image: 'yahoo',
 				name: 'Yahoo Mail'
+			},
+			{
+				title: 'Others',
+				name: 'Others'
 			}
 		])
 
@@ -272,7 +266,7 @@ export default {
 					],
 					create_contact: true,
 					track_email_status: true,
-					service: this.inputValues.service,
+					service: this.inputValues.service != 'Others' ? this.inputValues.service : '',
 					use_tls: 1,
 					use_imap: 1,
 					smtp_port: 587,
