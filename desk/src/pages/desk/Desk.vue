@@ -193,6 +193,72 @@ export default {
 				auto: true
 			}
 		},
+		defaultOutgoingEmailAccount() {
+			return {
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Email Account',
+					filters: [["use_imap", "=", 1], ["IMAP Folder","append_to","=","Ticket"], ["default_outgoing","=",1]]
+				},
+				onSuccess: (data) => {
+					if (data.length == 0) {
+						this.$toast({
+							title: "Default outgoing email account not added",
+							text: "Please add a default outgoing email account in settings.",
+							appearance: 'info',
+							icon: 'info',
+							iconClasses: 'stroke-blue-500 stroke-2',
+							fixed: true,
+							position: 'bottom-right',
+							action: {
+								title: 'Setup now',
+								onClick: () => {
+									this.$clearToasts()
+									this.$router.push({name: 'Emails'})
+								}
+							}
+						})
+					} else {
+						this.$resources.agentCount.fetch()
+					}
+				},
+				onError: (error) =>{
+					console.log(error)
+				},
+				auto: true
+			}
+		},
+		agentCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Agent',
+				},
+				onSuccess: (count) => {
+					if (count <= 1) {
+						this.$toast({
+							title: "Add agents",
+							text: "Please add a agents from settings.",
+							appearance: 'info',
+							icon: 'info',
+							iconClasses: 'stroke-blue-500 stroke-2',
+							fixed: true,
+							position: 'bottom-right',
+							action: {
+								title: 'Add now',
+								onClick: () => {
+									this.$clearToasts()
+									this.$router.push({name: 'Agents'})
+								}
+							}
+						})
+					}
+				},
+				onError: (error) =>{
+					console.log(error)
+				},
+			}
+		},
 		createTicket() {
 			return {
 				method: 'frappedesk.api.ticket.create_new',
