@@ -195,7 +195,7 @@ export default {
 	methods: {
 		setDefaultValues() {
 			this.values = {
-				emailAccountName: 'New Email Account',
+				emailAccountName: '',
 				emailId: '',
 				password: '',
 				service: 'GMail',
@@ -210,6 +210,7 @@ export default {
 				this.$resources.createNewEmailAccount.submit({
 					doc: {
 						doctype: 'Email Account',
+						email_account_name: this.tempEmailAccountName,
 						email_id: this.values.emailId,
 						password: this.values.password,
 						enable_incoming: this.values.enableIncoming,
@@ -304,9 +305,9 @@ export default {
 				method: 'frappe.client.insert',
 				onSuccess: () => {
 					this.$toast({
-						message: 'Email Account Created',
+						title: 'Email Account Created!!',
 						customIcon: 'circle-check',
-						type: 'success'
+						appearance: 'success'
 					})
 					this.$router.push({
 						name: 'Emails'

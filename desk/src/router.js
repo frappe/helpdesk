@@ -31,6 +31,11 @@ const routes = [
 		props: true,
 	},
 	{
+		path: '/frappedesk/setup',
+		name: 'DeskSetup',
+		component: () => import('@/pages/desk/Setup.vue'),
+	},
+	{
 		path: '/frappedesk',
 		name: 'Desk',
 		component: () => import('@/pages/desk/Desk.vue'),

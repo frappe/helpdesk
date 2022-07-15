@@ -228,7 +228,31 @@ export default {
 		submitConversation() {
 			return {
 				method: 'frappedesk.api.ticket.submit_conversation_via_agent',
-				onSuccess: () => {
+				onSuccess: (res) => {
+					if (res.status == 'error') {
+
+						const error = {
+							"No default outgoing email available": {
+								title: "Email not sent",
+								text: "No default outgoing email available"
+							}
+						}[res.error_code]
+
+						this.$toast({
+							fixed: true,
+							title: error.title,
+							text: error.text,
+							customIcon: 'circle-fail',
+							appearance: 'danger',
+							fixed: true,
+							action: {
+								title: 'Setup Now',
+								onClick: () => {
+									this.$router.push({ name: 'Emails'})
+								}
+							}
+						})
+					}
 					this.tempTextEditorData = {}
 					this.editing = false
 				},
