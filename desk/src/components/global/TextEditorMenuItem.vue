@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import CustomIcons from './CustomIcons.vue'
+import CustomIcons from '../desk/global/CustomIcons.vue'
 import { FileUploader, FeatherIcon } from 'frappe-ui'
 import { ref } from 'vue'
 

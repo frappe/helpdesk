@@ -151,10 +151,8 @@ import Conversations from '@/components/desk/ticket/Conversations.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
-import TextEditorMenuItem from '@/components/desk/global/TextEditorMenuItem.vue';
-import { QuillEditor } from '@vueup/vue-quill'
+import TextEditorMenuItem from '@/components/global/TextEditorMenuItem.vue';
 import CustomerSatisfactionFeedback from '@/components/portal/ticket/CustomerSatisfactionFeedback.vue';
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
 
 export default {
@@ -172,7 +170,6 @@ export default {
 		InfoPanel,
 		ActionPanel,
 		CustomIcons,
-		QuillEditor,
 		CustomerSatisfactionFeedback,
 		TextEditorMenuItem
 	},
