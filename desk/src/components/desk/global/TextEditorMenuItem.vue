@@ -19,6 +19,21 @@
 				/>
 			</a>
 		</div>
+		<Dialog :options="{ title: 'Set Link' }" v-model="setLinkDialog.show">
+			<template #body-content>
+				<Input
+					type="text"
+					label="URL"
+					v-model="setLinkDialog.url"
+					@keydown.enter="(e) => setLink(e.target.value)"
+				/>
+			</template>
+			<template #actions>
+				<Button appearance="primary" @click="setLink(setLinkDialog.url)">
+					Save
+				</Button>
+			</template>
+		</Dialog>
 	</div>
 </template>
 
@@ -30,6 +45,11 @@ import { ref } from 'vue'
 export default {
 	name: 'TextEditorMenuItem',
 	props: ['item', 'editor', 'attachments'],
+	data() {
+		return {
+			setLinkDialog: { url: '', show: false },
+		}
+	},
 	components: {
 		CustomIcons,
 		FileUploader,
@@ -48,55 +68,61 @@ export default {
 				label: 'Bold',
 				icon: 'bold',
 				action: (editor) => editor.chain().focus().toggleBold().run(),
-    			isActive: (editor) => editor.isActive('bold'),
+				isActive: (editor) => editor.isActive('bold'),
 			},
 			italic: {
 				label: 'Italic',
 				icon: 'italic',
 				action: (editor) => editor.chain().focus().toggleItalic().run(),
-    			isActive: (editor) => editor.isActive('italic'),
+				isActive: (editor) => editor.isActive('italic'),
 			},
 			underline: {
 				label: 'Underline',
 				icon: 'underline',
 				action: (editor) => editor.chain().focus().toggleUnderline().run(),
-    			isActive: (editor) => editor.isActive('underline'),
+				isActive: (editor) => editor.isActive('underline'),
 			},
 			quote: {
 				label: 'Quote',
 				icon: 'quote',
 				action: (editor) => editor.chain().focus().toggleBlockquote().run(),
-    			isActive: (editor) => editor.isActive('blockquote'),
+				isActive: (editor) => editor.isActive('blockquote'),
 			},
 			code: {
 				label: 'Code',
 				icon: 'code',
 				action: (editor) => editor.chain().focus().toggleCodeBlock().run(),
-    			isActive: (editor) => editor.isActive('codeBlock'),
+				isActive: (editor) => editor.isActive('codeBlock'),
 			},
 			'link-url': {
 				label: 'Link',
 				icon: 'link-url',
-				action: (editor) => editor.chain().focus().toggleLink().run(),
-    			isActive: (editor) => editor.isActive('link'),
+				action: (editor) => {
+					this.setLinkDialog.show = true
+					let existingURL = editor.getAttributes('link').href
+					if (existingURL) {
+						this.setLinkDialog.url = existingURL
+					}
+				},
+				isActive: (editor) => editor.isActive('link'),
 			},
 			'numbered-list': {
 				label: 'Numbered List',
 				icon: 'numbered-list',
 				action: (editor) => editor.chain().focus().toggleOrderedList().run(),
-    			isActive: (editor) => editor.isActive('orderedList'),
+				isActive: (editor) => editor.isActive('orderedList'),
 			},
 			'bullet-list': {
 				label: 'Bullet List',
 				icon: 'bullet-list',
 				action: (editor) => editor.chain().focus().toggleBulletList().run(),
-    			isActive: (editor) => editor.isActive('bulletList'),
+				isActive: (editor) => editor.isActive('bulletList'),
 			},
 			'left-align': {
 				label: 'Left Align',
 				icon: 'left-align',
 				action: (editor) => editor.chain().focus().setTextAlign('left').run(),
-    			isActive: (editor) => editor.isActive({ textAlign: 'left' }),
+				isActive: (editor) => editor.isActive({ textAlign: 'left' }),
 			},
 			'clear-formatting': {
 				label: 'Clear Formatting',
@@ -104,6 +130,25 @@ export default {
 				action: (editor) => editor.chain().focus().clearNodes().unsetAllMarks()
 			},
 		}
+	},
+	methods: {
+		setLink(url) {
+			// empty
+			if (url === '') {
+				this.editor.chain().focus().extendMarkRange('link').unsetLink().run()
+			} else {
+				// update link
+				this.editor
+				.chain()
+				.focus()
+				.extendMarkRange('link')
+				.setLink({ href: url })
+				.run()
+			}
+
+			this.setLinkDialog.show = false
+			this.setLinkDialog.url = ''
+		},
 	}
 }
 </script>

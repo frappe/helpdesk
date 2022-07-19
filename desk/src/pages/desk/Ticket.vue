@@ -67,7 +67,6 @@
 										:content="content"
 										editor-class="w-full"
 										:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
-										:bubbleMenu="true"
 										:editable="true"
 										@change="(val) => { content = val }"
 									/>

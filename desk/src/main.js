@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import { FrappeUI, Button, onOutsideClickDirective } from 'frappe-ui'
+import { FrappeUI, Button, Dialog, Input, onOutsideClickDirective } from 'frappe-ui'
 import router from './router'
 import App from './App.vue'
 import './index.css'
@@ -13,6 +13,8 @@ app.directive('on-outside-click', onOutsideClickDirective)
 app.use(router)
 app.use(FrappeUI)
 app.component('Button', Button)
+app.component('Dialog', Dialog)
+app.component('Input', Input)
 
 app.config.globalProperties.$dayjs = dayjs
 app.config.globalProperties.$toast = createToast
