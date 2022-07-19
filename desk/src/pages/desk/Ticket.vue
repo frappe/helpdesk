@@ -43,10 +43,16 @@
 						<div>
 							<div v-if="editing">
 								<div class="border border-gray-300 rounded-[8px] p-[12px]">
-									<div class="flex flex-row items-center text-[12px] font-normal">
-										<div class="flex flex-row space-x-2 items-center" v-if="ticket.raised_by">
-											<span class="text-gray-700">to</span>
-											<div class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]">{{ ticket.raised_by }}</div>
+									<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
+										<div v-if="editingType=='reply'">
+											<div v-if="ticket.raised_by" class="flex flex-row space-x-2 items-center">
+												<span class="text-gray-700">to</span>
+												<div class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]">{{ ticket.raised_by }}</div>
+											</div>
+										</div>
+										<div v-else class="flex flex-row items-center space-x-2">
+											<span class="text-gray-700">as</span>
+											<span class="text-[11px] text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]">Comment</span>
 										</div>
 										<div class="grow flex flex-row-reverse">
 											<a role="button" @click="cancelEditing" title="Hide Editor">
@@ -60,7 +66,7 @@
 										class="w-full min-h-[50px] max-h-[130px] overflow-y-scroll"
 										:content="content"
 										editor-class="w-full"
-										placeholder="Type a response"
+										:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
 										:bubbleMenu="true"
 										:editable="true"
 										@change="(val) => { content = val }"
@@ -85,13 +91,17 @@
 											</li>
 										</ul>
 									</div>
-									<div class="pt-2 select-none flex flex-row">
+									<div class="pt-2 select-none flex flex-row" v-if="$refs.replyEditor">
 										<div class="w-full flex flex-row items-center space-x-2">
-											<FileUploader @success="(file) => attachments.push(file)" v-if="editingType === 'reply'">
-												<template v-slot="{ progress, uploading, openFileSelector }">
-													<FeatherIcon name="paperclip" class="h-[15px]" @click="openFileSelector" role="button" :disabled="uploading" />
-												</template>
-											</FileUploader>
+											<div v-for="item in [
+												'bold', 'italic', '|',
+												'quote', 'code', '|',
+												'link-url', 'file-upload', '|',
+												'numbered-list', 'bullet-list', 'left-align', '|',
+												'clear-formatting',
+											]" :key="item">
+												<TextEditorMenuItem :item="item" :editor="$refs.replyEditor?.editor" :attachments="attachments" />
+											</div>
 										</div>
 										<FeatherIcon name="trash-2" role="button" class="h-4 w-4" @click="() => {
 											content = ''
@@ -110,7 +120,7 @@
 										appearance="primary" 
 										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
 									>
-										Send
+										{{ editingType == 'reply' ? 'Send' : 'Create' }}
 									</Button>
 								</div>
 							</div>
@@ -142,6 +152,7 @@ import Conversations from '@/components/desk/ticket/Conversations.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
+import TextEditorMenuItem from '@/components/desk/global/TextEditorMenuItem.vue';
 import { QuillEditor } from '@vueup/vue-quill'
 import CustomerSatisfactionFeedback from '@/components/portal/ticket/CustomerSatisfactionFeedback.vue';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -163,7 +174,8 @@ export default {
 		ActionPanel,
 		CustomIcons,
 		QuillEditor,
-		CustomerSatisfactionFeedback
+		CustomerSatisfactionFeedback,
+		TextEditorMenuItem
 	},
 	data() {
 		return {
@@ -278,7 +290,10 @@ export default {
 		},
 		sendingDeissabled() {
 			let content = this.content.trim()
-			return (content == "" || content == "<p><br></p>") && this.attachments.length == 0
+			content = content.replaceAll('<p></p>', '')
+			content = content.replaceAll(' ', '')
+			console.log(content)
+			return (content == "" || content == "<p><br></p>" || content == '<p></p>') && this.attachments.length == 0
 		}
 	},
 	methods: {
