@@ -7,7 +7,7 @@
 				<div class="text-sm text-slate-500">{{ $dayjs(time).fromNow() }}</div>
 			</div>
 			<div class="grow rounded p-2 text-base mt-2" :class="`bg-${color}-50`">
-				<div class="ql-container ql-snow text-[13px] text-gray-700" style="border: 0px;" v-html="cleanedMessage"></div>
+				<div class="ProseMirror prose prose-sm prose-p:my-1 text-[13px] text-gray-700" style="border: 0px;" v-html="cleanedMessage"></div>
 				<div v-if="attachments.length > 0" class="flex space-x-2 flex-wrap mt-3">
 					<div v-for="attachment in attachments" :key="attachment">
 						<a :href="attachment.file_url" target="_blank" class="py-1 rounded-sm text-gray-900 hover:underline flex items-center space-x-1">

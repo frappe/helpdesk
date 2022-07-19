@@ -21,7 +21,8 @@ def get_user():
 		'profile_image': frappe.get_value("User", session_user, "user_image"),
 		'username': username,
 		'isAdmin': is_admin,
-		'user': frappe.session.user,
+		'user': session_user,
+		'doc': frappe.get_doc("User", session_user),
 		'has_desk_access': (session_agent or is_admin)
 	}
 	
