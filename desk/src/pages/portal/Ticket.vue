@@ -38,6 +38,7 @@
 				<div
 					v-if="editing"
 					class="flex flex-col" 
+					@keyup.ctrl.enter="!sendButtonDissabled ? submitConversation() : {}"
 				>
 					<div class="grow">
 						<div class="flex">
@@ -168,7 +169,9 @@ export default {
         },
 		sendButtonDissabled() {
 			let content = this.content.trim()
-			return (content == "" || content == "<p><br></p>") && this.attachments.length == 0
+			content = content.replaceAll('<p></p>', '')
+			content = content.replaceAll(' ', '')
+			return (content == "" || content == "<p><br></p>" || content == '<p></p>') && this.attachments.length == 0
 		}
     },
 	resources: {

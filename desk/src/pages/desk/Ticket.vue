@@ -41,7 +41,7 @@
 					</div>
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] space-y-[11px]">
 						<div>
-							<div v-if="editing">
+							<div v-if="editing" @keyup.ctrl.enter="!sendingDeissabled ? submit() : {}">
 								<div class="border border-gray-300 rounded-[8px] p-[12px]">
 									<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
 										<div v-if="editingType=='reply'">
@@ -288,7 +288,6 @@ export default {
 			let content = this.content.trim()
 			content = content.replaceAll('<p></p>', '')
 			content = content.replaceAll(' ', '')
-			console.log(content)
 			return (content == "" || content == "<p><br></p>" || content == '<p></p>') && this.attachments.length == 0
 		}
 	},
