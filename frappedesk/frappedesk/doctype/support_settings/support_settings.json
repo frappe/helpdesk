@@ -31,7 +31,8 @@
   "other_settings_section",
   "helpdesk_name",
   "column_break_26",
-  "setup_complete"
+  "setup_complete",
+  "initial_agent_set"
  ],
  "fields": [
   {
@@ -175,11 +176,17 @@
   {
    "fieldname": "column_break_26",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "initial_agent_set",
+   "fieldtype": "Check",
+   "label": "Initial Agent Set"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-07-13 07:35:11.718862",
+ "modified": "2022-07-20 16:23:41.696477",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Support Settings",

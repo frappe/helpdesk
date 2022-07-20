@@ -86,10 +86,11 @@ export default {
 	computed: {
 		initialized() {
 			if (this.$resources.supportSettings.loading) return false
-			if (!this.$resources.supportSettings.data.setup_complete) {
-				this.$router.push({ name: 'DeskSetup' })
-				return false
-			}
+			// TODO: uncomment this part when setup wizard can be skipped
+			// if (!this.$resources.supportSettings.data.setup_complete) {
+			// 	this.$router.push({ name: 'DeskSetup' })
+			// 	return false
+			// }
 
 			return true
 		}
