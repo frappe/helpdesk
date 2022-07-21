@@ -26,11 +26,19 @@ def initial_demo_ticket_created():
 		agent = frappe.get_last_doc("Agent")
 		if agent:
 			new_ticket_doc = frappe.new_doc("Ticket")
-			new_ticket_doc.subject = "Demo Ticket"
-			new_ticket_doc.description = "This is a demo ticket created by the initial setup script."
-			new_ticket_doc.ticket_type = "Question"
-			new_ticket_doc.priority = "Low"
-			new_ticket_doc.raised_by = "Administrator"
+			new_ticket_doc.subject = "Harshit Agrawal"
+			new_ticket_doc.description = """
+			<p>Hi 👋🏻</p>
+			<p><br></p>
+			<p>I'm glad you decided to try Frappe Desk! We're working hard to build a better way for teams to communicate and serve customers well. I'm excited to get started.</p>
+			<p><br></p>
+			<p>You can get started right away by setting up a support email. This will help you see what your support will look like with FrappeDesk!</p>
+			<p><br></p>
+			<p>Best,</p>
+			<p>Harshit</p>
+			<p>Frappe Desk | Frappe.</p>
+			"""
+			new_ticket_doc.raised_by = "harshit@frappe.io"
 			new_ticket_doc.via_customer_portal = True
 			new_ticket_doc.insert()
 
