@@ -32,7 +32,8 @@
   "helpdesk_name",
   "column_break_26",
   "setup_complete",
-  "initial_agent_set"
+  "initial_agent_set",
+  "initial_demo_ticket_created"
  ],
  "fields": [
   {
@@ -182,11 +183,17 @@
    "fieldname": "initial_agent_set",
    "fieldtype": "Check",
    "label": "Initial Agent Set"
+  },
+  {
+   "default": "0",
+   "fieldname": "initial_demo_ticket_created",
+   "fieldtype": "Check",
+   "label": "Initial Demo Ticket Created"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-07-20 16:23:41.696477",
+ "modified": "2022-07-21 20:22:14.359497",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Support Settings",

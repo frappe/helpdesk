@@ -85,7 +85,16 @@ export default {
 	},
 	computed: {
 		initialized() {
+			console.log('here')
 			if (this.$resources.supportSettings.loading) return false
+			if (!this.$resources.supportSettings.data.initial_agent_set) {
+				this.$resources.setupInitialAgent.submit()
+				return false
+			}
+			if (!this.$resources.supportSettings.data.initial_demo_ticket_created) {
+				this.$resources.createInitialDemoTicket.submit()
+				return false
+			}
 			// TODO: uncomment this part when setup wizard can be skipped
 			// if (!this.$resources.supportSettings.data.setup_complete) {
 			// 	this.$router.push({ name: 'DeskSetup' })
@@ -175,6 +184,40 @@ export default {
 		this.$socket.off('list_update')
 	},
 	resources: {
+		setupInitialAgent() {
+			return {
+				method: 'frappedesk.api.setup.initial_agent_setup',
+				onSuccess: (res) => {
+					this.$resources.supportSettings.fetch()
+				},
+				onError: (err) => {
+					console.log(err)
+					this.$toast({
+						title: 'Something went wrong.',
+						text: 'Please try again later.',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
+			}
+		},
+		createInitialDemoTicket() {
+			return {
+				method: 'frappedesk.api.setup.initial_demo_ticket_created',
+				onSuccess: (res) => {
+					this.$resources.supportSettings.fetch()
+				},
+				onError: (err) => {
+					console.log(err)
+					this.$toast({
+						title: 'Something went wrong.',
+						text: 'Please try again later.',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
+			}
+		},
 		supportSettings() {
 			return {
 				method: 'frappe.client.get',
