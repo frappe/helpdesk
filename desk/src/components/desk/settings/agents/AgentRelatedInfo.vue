@@ -12,19 +12,23 @@
 						'status',
 						'_seen'
 					],
-					limit: 20,
+					limit: 50,
 					order_by: 'modified desc',
 					filters: {
 						'_assign': ['like', `%${agent}%`]
 					},
+					route_query_pagination: true
 				}"
 			>
 				<template #body="{ manager }">
-					<MiniTicketList 
-						class="overflow-y-scroll"
-						:style="{ height: viewportWidth > 768 ? 'calc(100vh - 95.5px)' : null }"
-						:manager="manager" 
-					/>
+					<div>
+						<MiniTicketList 
+							class="overflow-y-scroll"
+							:style="{ height: viewportWidth > 768 ? 'calc(100vh - 135.5px)' : null }"
+							:manager="manager" 
+						/>
+						<ListPageController :manager="manager" />
+					</div>
 				</template>
 			</ListManager>
 		</div>
@@ -40,6 +44,7 @@
 import AgentRelatedInfoTopPanel from './AgentRelatedInfoTopPanel.vue'
 import MiniTicketList from '@/components/desk/global/MiniTicketList.vue'
 import ListManager from '@/components/global/ListManager.vue'
+import ListPageController from '@/components/global/ListPageController.vue'
 import { ref, inject } from 'vue'
 
 export default {
@@ -48,7 +53,8 @@ export default {
 	components: {
 		AgentRelatedInfoTopPanel,
 		MiniTicketList,
-		ListManager
+		ListManager,
+		ListPageController
 	},
 	setup() {
 		const relatedInfoToShow = ref('tickets')

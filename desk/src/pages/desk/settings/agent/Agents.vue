@@ -60,7 +60,7 @@ export default {
 			showNewAgentDialog
 		}
 	},
-	activated() {
+	mounted() {
 		this.$event.emit('set-selected-setting', 'Agents')
 		this.$event.emit('show-top-panel-actions-settings', 'Agents')
 		
@@ -76,7 +76,7 @@ export default {
 			})
 		})
 	},
-	deactivated() {
+	unmounted() {
 		this.$event.off('show-new-agent-dialog')
 		this.$event.off('delete-selected-agents')
 	},

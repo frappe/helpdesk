@@ -181,7 +181,7 @@ export default {
 			holidayListValidationError
 		}
 	},
-	activated() {
+	mounted() {
 		this.$event.emit('set-selected-setting', 'Support Policies')
 		this.$event.emit('show-top-panel-actions-settings', 'Support Policy')
 
@@ -192,9 +192,6 @@ export default {
 		} else {
 			this.$resources.getSlaPolicy.fetch()
 		}
-	},
-	deactivated() {
-
 	},
 	resources: {
 		getSlaPolicy() {

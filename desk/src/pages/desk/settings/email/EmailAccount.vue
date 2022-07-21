@@ -178,7 +178,7 @@ export default {
 			errors
 		}
 	},
-	activated() {
+	mounted() {
 		this.$event.emit('set-selected-setting', 'Email Accounts')
 		this.$event.emit('show-top-panel-actions-settings', 'Email Account')
 

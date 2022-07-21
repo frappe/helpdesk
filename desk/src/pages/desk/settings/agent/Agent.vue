@@ -19,7 +19,7 @@ export default {
     setup() {
 
     },
-    activated() {
+    mounted() {
 		this.$event.emit('set-selected-setting', 'Agents')
     },
 
