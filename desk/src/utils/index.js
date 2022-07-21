@@ -24,14 +24,14 @@ _dayjs.updateLocale('en', {
 })
 
 _dayjs.longFormating = (s) => {
-    if (s === 'Now' || s === 'Now ago') { 
+    if (s === 'now' || s === 'now ago') { 
         return 'just now'
     }
     return s
 }
 
 _dayjs.shortFormating = (s) => {
-    if (s === 'Now' || s === 'Now ago') { 
+    if (s === 'now' || s === 'now ago') { 
         return 'now'
     }
 
