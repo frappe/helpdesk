@@ -131,14 +131,9 @@ export default {
 			{
 				label: 'Contacts',
 				icon: 'customers',
-				children: [
-					{
-						label: 'Contacts',
-						to: {
-							path: '/frappedesk/contacts',
-						}
-					},
-				],
+				to: {
+					path: '/frappedesk/contacts',
+				}
 			},
 			{
 				label: 'Settings',

@@ -41,7 +41,7 @@
 					</div>
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] space-y-[11px]">
 						<div>
-							<div v-if="editing" @keyup.ctrl.enter="!sendingDeissabled ? submit() : {}">
+							<div v-if="editing" v-on:keydown="!sendingDissabled ? handleSubmitShortcut($event) : {}">
 								<div class="border border-gray-300 rounded-[8px] p-[12px]">
 									<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
 										<div v-if="editingType=='reply'">
@@ -60,16 +60,18 @@
 											</a>
 										</div>
 									</div>
-									<TextEditor
-										style="scrollbar-width: 10px;"
-										ref="replyEditor"
-										class="w-full min-h-[50px] max-h-[130px] overflow-y-scroll"
-										:content="content"
-										editor-class="w-full"
-										:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
-										:editable="true"
-										@change="(val) => { content = val }"
-									/>
+									<div @click="$refs.replyEditor.editor.commands.focus()">
+										<TextEditor
+											style="scrollbar-width: 10px;"
+											ref="replyEditor"
+											class="w-full min-h-[80px] max-h-[300px] overflow-y-scroll"
+											:content="content"
+											editor-class="w-full"
+											:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
+											:editable="true"
+											@change="(val) => { content = val }"
+										/>
+									</div>
 									<div v-if="attachments.length" class="max-h-[100px] overflow-y-scroll rounded flex flex-col">
 										<ul class="flex flex-wrap gap-2 py-2">
 											<li
@@ -117,7 +119,7 @@
 										:loading="editingType == 'reply' ? $resources.submitConversation.loading : $resources.submitComment.loading" 
 										@click="submit()" 
 										appearance="primary" 
-										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
+										:disabled="(!user.agent && !user.isAdmin) || sendingDissabled"
 									>
 										{{ editingType == 'reply' ? 'Send' : 'Create' }}
 									</Button>
@@ -284,7 +286,7 @@ export default {
 		ticket() {
 			return this.$resources.ticket.doc || null
 		},
-		sendingDeissabled() {
+		sendingDissabled() {
 			let content = this.content.trim()
 			content = content.replaceAll('<p></p>', '')
 			content = content.replaceAll(' ', '')
@@ -313,6 +315,11 @@ export default {
 
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
+		},
+		handleSubmitShortcut(e) {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
+				this.submit()
+			}
 		},
 		submit() {
 			switch(this.editingType) {

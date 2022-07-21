@@ -38,7 +38,7 @@
 				<div
 					v-if="editing"
 					class="flex flex-col" 
-					@keyup.ctrl.enter="!sendButtonDissabled ? submitConversation() : {}"
+					v-on:keydown="!sendingDissabled ? handleSubmitShortcut($event) : {}"
 				>
 					<div class="grow">
 						<div class="flex">
@@ -48,16 +48,18 @@
 									<div class="text-lg">{{ user.doc.full_name }}</div>
 									<div class="grow" v-if="!(['Closed', 'Resolved'].includes(ticket.status))">
 										<div class="border border-gray-300 rounded-[8px] p-[12px] w-full">
-											<TextEditor
-												style="scrollbar-width: 10px;"
-												ref="replyEditor"
-												class="w-full min-h-[130px] max-h-[200px] overflow-y-scroll"
-												:content="content"
-												editor-class="w-full"
-												:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
-												:editable="true"
-												@change="(val) => { content = val }"
-											/>
+											<div @click="$refs.replyEditor.editor.commands.focus()">
+												<TextEditor
+													style="scrollbar-width: 10px;"
+													ref="replyEditor"
+													class="w-full min-h-[130px] max-h-[200px] overflow-y-scroll"
+													:content="content"
+													editor-class="w-full"
+													:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
+													:editable="true"
+													@change="(val) => { content = val }"
+												/>
+											</div>
 											<div v-if="attachments.length" class="max-h-[100px] overflow-y-scroll rounded flex flex-col">
 												<ul class="flex flex-wrap gap-2 py-2">
 													<li
@@ -98,7 +100,7 @@
 										</div>
 										<div class="mt-2 space-x-2 flex">
 											<Button 
-												:disabled="sendButtonDissabled"
+												:disabled="sendingDissabled"
 												:loading="this.$resources.submitConversation.loading" 
 												@click="this.submitConversation" 
 												appearance="primary" 
@@ -167,7 +169,7 @@ export default {
 				return null
 			}
         },
-		sendButtonDissabled() {
+		sendingDissabled() {
 			let content = this.content.trim()
 			content = content.replaceAll('<p></p>', '')
 			content = content.replaceAll(' ', '')
@@ -207,6 +209,11 @@ export default {
 
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
+		},
+		handleSubmitShortcut(e) {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
+				this.submitConversation()
+			}
 		},
 		submitConversation() {
 			this.tempTextEditorData.content = this.content
