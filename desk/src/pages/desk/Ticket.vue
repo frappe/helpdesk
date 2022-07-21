@@ -60,16 +60,18 @@
 											</a>
 										</div>
 									</div>
-									<TextEditor
-										style="scrollbar-width: 10px;"
-										ref="replyEditor"
-										class="w-full min-h-[50px] max-h-[130px] overflow-y-scroll"
-										:content="content"
-										editor-class="w-full"
-										:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
-										:editable="true"
-										@change="(val) => { content = val }"
-									/>
+									<div @click="$refs.replyEditor.editor.commands.focus()">
+										<TextEditor
+											style="scrollbar-width: 10px;"
+											ref="replyEditor"
+											class="w-full min-h-[80px] max-h-[300px] overflow-y-scroll"
+											:content="content"
+											editor-class="w-full"
+											:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
+											:editable="true"
+											@change="(val) => { content = val }"
+										/>
+									</div>
 									<div v-if="attachments.length" class="max-h-[100px] overflow-y-scroll rounded flex flex-col">
 										<ul class="flex flex-wrap gap-2 py-2">
 											<li
