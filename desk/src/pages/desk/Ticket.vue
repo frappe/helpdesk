@@ -39,48 +39,75 @@
 						<CustomerSatisfactionFeedback :fromDesk="true" v-if="ticket.feedback_submitted && ['Closed', 'Resolved'].includes(ticket.status)" class="mt-[10px]" :editable="false" :ticket="ticket"/>
 						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" :autoScroll="['Open', 'Replied'].includes(ticket.status)" />
 					</div>
-					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] pt-[11px] space-y-[11px]">
+					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] space-y-[11px]">
 						<div>
-							<div v-if="editing">
-								<quill-editor 
-									:ref="editor"
-									v-model:content="content" 
-									contentType="html" 
-									:options="editorOptions"
-									style="min-height:150px; max-height:200px; overflow-y: auto;"
-									:class="editingType === 'reply' ? '' : 'bg-[#FDF9F2]'"
-									:placeholder="`Type a ${editingType == 'reply' ? 'response' : 'comment' }`"
-									@click="focusEditor()"
-								/>
-								<div v-if="editingType === 'reply'" class="border-b border-l border-r border-gray-400 p-2 select-none">
-									<div class="w-full">
-										<FileUploader @success="(file) => attachments.push(file)">
-											<template
-												v-slot="{ progress, uploading, openFileSelector }"
+							<div v-if="editing" v-on:keydown="!sendingDissabled ? handleSubmitShortcut($event) : {}">
+								<div class="border border-gray-300 rounded-[8px] p-[12px]">
+									<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
+										<div v-if="editingType=='reply'">
+											<div v-if="ticket.raised_by" class="flex flex-row space-x-2 items-center">
+												<span class="text-gray-700">to</span>
+												<div class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]">{{ ticket.raised_by }}</div>
+											</div>
+										</div>
+										<div v-else class="flex flex-row items-center space-x-2">
+											<span class="text-gray-700">as</span>
+											<span class="text-[11px] text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]">Comment</span>
+										</div>
+										<div class="grow flex flex-row-reverse">
+											<a role="button" @click="cancelEditing" title="Hide Editor">
+												<FeatherIcon name="chevron-down" class="h-4 w-4"/>
+											</a>
+										</div>
+									</div>
+									<div @click="$refs.replyEditor.editor.commands.focus()">
+										<TextEditor
+											style="scrollbar-width: 10px;"
+											ref="replyEditor"
+											class="w-full min-h-[80px] max-h-[300px] overflow-y-scroll"
+											:content="content"
+											editor-class="w-full"
+											:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
+											:editable="true"
+											@change="(val) => { content = val }"
+										/>
+									</div>
+									<div v-if="attachments.length" class="max-h-[100px] overflow-y-scroll rounded flex flex-col">
+										<ul class="flex flex-wrap gap-2 py-2">
+											<li
+												class="flex items-center p-1 space-x-2 bg-gray-100 border-gray-400 border shadow rounded"
+												v-for="file in attachments"
+												:key="file"
+												:title="file.name"
 											>
-												<div class="flex flex-row justify-between space-x-2 items-center">
-													<div class="flex flex-row space-x-2">
-														<div v-for="file in attachments" :key="file.name">
-															<div class="flex space-x-2 items-center text-base bg-white border border-gray-400 rounded-md px-3 py-1">
-																<div class="inline-block max-w-[100px] truncate">
-																	{{ file.file_name }}
-																</div>
-																<div>
-																	<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
-																		attachments = attachments.filter(x => x.name != file.name)
-																	}"/>
-																</div>
-															</div>
-														</div>
-													</div>
-													<div>
-														<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
-															{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
-														</Button>
-													</div>
+												<div class="flex flex-row items-center space-x-1">
+													<FeatherIcon name="file-text" class="h-[15px] stroke-gray-600"/>
+													<span class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate">
+														{{ file.file_name }}
+													</span>
 												</div>
-											</template>
-										</FileUploader>
+												<button class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center" @click="() => { attachments = attachments.filter(x => x.name != file.name) }">
+													<FeatherIcon class="w-3" name="x" />
+												</button>
+											</li>
+										</ul>
+									</div>
+									<div class="pt-2 select-none flex flex-row" v-if="$refs.replyEditor">
+										<div class="w-full flex flex-row items-center space-x-2">
+											<div v-for="item in [
+												'bold', 'italic', '|',
+												'quote', 'code', '|',
+												'link-url', 'file-upload', '|',
+												'numbered-list', 'bullet-list', 'left-align', '|',
+												'clear-formatting',
+											]" :key="item">
+												<TextEditorMenuItem :item="item" :editor="$refs.replyEditor?.editor" :attachments="attachments" />
+											</div>
+										</div>
+										<FeatherIcon name="trash-2" role="button" class="h-4 w-4" @click="() => {
+											content = ''
+											attachments = []
+										}" />
 									</div>
 								</div>
 							</div>
@@ -92,12 +119,9 @@
 										:loading="editingType == 'reply' ? $resources.submitConversation.loading : $resources.submitComment.loading" 
 										@click="submit()" 
 										appearance="primary" 
-										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
+										:disabled="(!user.agent && !user.isAdmin) || sendingDissabled"
 									>
-										Send
-									</Button>
-									<Button appearance="secondary" @click="cancelEditing()">
-										Cancel
+										{{ editingType == 'reply' ? 'Send' : 'Create' }}
 									</Button>
 								</div>
 							</div>
@@ -124,14 +148,13 @@
 	</div>
 </template>
 <script>
-import { Badge, Card, Dropdown, Avatar, FileUploader, FeatherIcon } from 'frappe-ui'
+import { Badge, Card, Dropdown, Avatar, FileUploader, FeatherIcon, TextEditor } from 'frappe-ui'
 import Conversations from '@/components/desk/ticket/Conversations.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
-import { QuillEditor } from '@vueup/vue-quill'
+import TextEditorMenuItem from '@/components/global/TextEditorMenuItem.vue';
 import CustomerSatisfactionFeedback from '@/components/portal/ticket/CustomerSatisfactionFeedback.vue';
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { inject, ref } from 'vue'
 
 export default {
@@ -144,53 +167,19 @@ export default {
 		Avatar,
 		FileUploader,
 		FeatherIcon,
+		TextEditor,
 		Conversations,
 		InfoPanel,
 		ActionPanel,
 		CustomIcons,
-		QuillEditor,
-		CustomerSatisfactionFeedback
+		CustomerSatisfactionFeedback,
+		TextEditorMenuItem
 	},
 	data() {
 		return {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
-			editorOptions: {
-				modules: {
-					toolbar: [
-						['bold', 'italic', 'underline', 'strike', 'link'],        // toggled buttons
-						['blockquote', 'code-block'],
-
-						[{ 'header': 1 }, { 'header': 2 }],               // custom button values
-						[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-
-						[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-						[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-						
-						['image'],
-						
-						[{ 'align': [] }],
-
-						['clean']                                         // remove formatting button
-					],
-					keyboard: {
-						bindings: {
-							// Ctrl+Enter to send reply
-							ctrlEnter: {
-								key: 13,
-								shortKey: true,
-								handler: () => {
-									this.submit();
-								}
-							}
-						}
-					}
-				},
-				theme: 'snow',
-				bounds: document.body,
-			},
 			prevRoute: null
 
 		}
@@ -228,13 +217,36 @@ export default {
 		submitConversation() {
 			return {
 				method: 'frappedesk.api.ticket.submit_conversation_via_agent',
-				onSuccess: () => {
+				onSuccess: (res) => {
+					if (res.status == 'error') {
+
+						const error = {
+							"No default outgoing email available": {
+								title: "Email not sent",
+								text: "No default outgoing email available"
+							}
+						}[res.error_code]
+
+						this.$toast({
+							fixed: true,
+							title: error.title,
+							text: error.text,
+							customIcon: 'circle-fail',
+							appearance: 'danger',
+							fixed: true,
+							action: {
+								title: 'Setup Now',
+								onClick: () => {
+									this.$router.push({ name: 'Emails'})
+								}
+							}
+						})
+					}
 					this.tempTextEditorData = {}
 					this.editing = false
 				},
 				onError: () => {
-					var element = document.getElementsByClassName("ql-editor");
-					element[0].innerHTML = this.tempTextEditorData.innerHTML;
+					this.content = this.tempTextEditorData.content
 					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
@@ -247,8 +259,7 @@ export default {
 					this.editing = false
 				},
 				onError: () => {
-					var element = document.getElementsByClassName("ql-editor");
-					element[0].innerHTML = this.tempTextEditorData.innerHTML;
+					this.content = this.tempTextEditorData.content
 					this.attachments = this.tempTextEditorData.attachments
 				}
 			}
@@ -275,9 +286,11 @@ export default {
 		ticket() {
 			return this.$resources.ticket.doc || null
 		},
-		sendingDeissabled() {
+		sendingDissabled() {
 			let content = this.content.trim()
-			return (content == "" || content == "<p><br></p>") && this.attachments.length == 0
+			content = content.replaceAll('<p></p>', '')
+			content = content.replaceAll(' ', '')
+			return (content == "" || content == "<p><br></p>" || content == '<p></p>') && this.attachments.length == 0
 		}
 	},
 	methods: {
@@ -285,13 +298,12 @@ export default {
 			this.editing = true
 			this.editingType = type
 			this.delayedConversationScroll()
-			this.$nextTick(() => {
-				this.focusEditor()
-			})
+			this.focusEditor()
 		},
 		focusEditor() {
-			var element = document.getElementsByClassName("ql-editor");
-			element[0].focus() // TODO: focus the cursor to the end of the text
+			this.$nextTick(() => {
+				this.$refs.replyEditor.editor.commands.focus()
+			})
 		},
 		cancelEditing() {
 			this.editing = false
@@ -304,6 +316,11 @@ export default {
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
+		handleSubmitShortcut(e) {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
+				this.submit()
+			}
+		},
 		submit() {
 			switch(this.editingType) {
 				case 'reply':
@@ -315,10 +332,8 @@ export default {
 			}
 		},
 		submitConversation() {
-			var element = document.getElementsByClassName("ql-editor");
-
+			this.tempTextEditorData.content = this.content
 			this.tempTextEditorData.attachments = this.attachments
-			this.tempTextEditorData.innerHTML = element[0].innerHTML
 
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
@@ -326,14 +341,12 @@ export default {
 				attachments: this.attachments.map(x => x.name)
 			})
 
-			element[0].innerHTML = "";
+			this.content = ""
 			this.attachments = []
 		},
 		submitComment() {
-			var element = document.getElementsByClassName("ql-editor");
-
 			this.tempTextEditorData.attachments = this.attachments
-			this.tempTextEditorData.innerHTML = element[0].innerHTML
+			this.tempTextEditorData.content = this.content
 
 			this.$resources.submitComment.submit({
 				doc: {
@@ -345,7 +358,7 @@ export default {
 				}
 			})
 
-			element[0].innerHTML = "";
+			this.content = ""
 			this.attachments = []
 		},
 		getNextTicket() {

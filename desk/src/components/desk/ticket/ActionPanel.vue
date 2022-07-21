@@ -78,7 +78,7 @@
 		<div class="px-[19px] py-[28px] h-full overflow-y-auto">
 			<div class="text-base space-y-[12px]">
 				<div v-if="this.user.agent">
-					<router-link class="hover:underline" :to="{ path: '/support/impersonate', query: {contact: ticket.raised_by, ticketId: ticket.name}}" target="_blank">See On Support Portal</router-link>
+					<router-link class="hover:underline" :to="{ path: '/support/impersonate', query: {contact: ticket.raised_by, ticketId: ticket.name}}" target="_blank">See on Support Portal</router-link>
 				</div>
 				<div class="flex flex-col space-y-[8px]">
 					<div class="text-gray-600 font-normal text-[12px]">Assignee</div>

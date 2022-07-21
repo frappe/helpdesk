@@ -21,12 +21,13 @@ def get_user():
 		'profile_image': frappe.get_value("User", session_user, "user_image"),
 		'username': username,
 		'isAdmin': is_admin,
-		'user': frappe.session.user,
+		'user': session_user,
+		'doc': frappe.get_doc("User", session_user),
 		'has_desk_access': (session_agent or is_admin)
 	}
 	
 @frappe.whitelist()
-def sent_invites(emails):
+def sent_invites(emails, send_welcome_mail_to_user=True):
 	for email in emails:
 		if frappe.db.exists("User", email):
 			user = frappe.get_doc("User", email)
@@ -37,7 +38,8 @@ def sent_invites(emails):
 				"first_name": email.split("@")[0]
 			}).insert()
 			
-			user.send_welcome_mail_to_user()
+			if send_welcome_mail_to_user:
+				user.send_welcome_mail_to_user()
 
 		frappe.get_doc({
 			"doctype": "Agent",

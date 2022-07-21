@@ -1,25 +1,85 @@
 <template>
 	<div class="p-5 overflow-auto h-full">
 		<form>
-			<div class="flow-root mb-4">
-				<div class="float-left" @click="() => {
-					editingName = true
-					tempEmailAccountName = values.emailAccountName
-				}">
-					<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer">
-						<div class="font-semibold">{{ values.emailAccountName }}</div>
-						<FeatherIcon class="w-3 h-3" name="edit-2" />
+			<div class="flex flex-row mb-4 w-full">
+				<div class="grow flex flex-col space-y-6">
+					<div class="flex flex-row w-full space-x-10">
+						<div 
+							@click="() => {
+								editingName = true
+								if (!isNew) {
+									tempEmailAccountName = values.emailAccountName
+								}
+							}"
+							class="sm:w-6/12"
+						>
+							<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer">
+								<div class="font-semibold">{{ values.emailAccountName }}</div>
+								<FeatherIcon class="w-3 h-3" name="edit-2" />
+							</div>
+							<div v-else class="flex space-x-2 items-center w-full">
+								<Input class="grow" id="emailAccountNameInput" v-model="tempEmailAccountName" type="text" placeholder="Email Account Name" />
+								<FeatherIcon v-if="!isNew" class="w-4 h-4 cursor-pointer" name="x" @click="() => {
+									editingName = false
+									tempEmailAccountName = values.emailAccountName
+								}" />
+							</div>
+						</div>
+						<div class="sm:w-6/12"></div>
 					</div>
-					<div v-else class="flex space-x-2 items-center">
-						<Input id="emailAccountNameInput" v-model="tempEmailAccountName" type="text" placeholder="Enter Email Account name" />
-						<FeatherIcon class="w-4 h-4 cursor-pointer" name="x" @click="() => {
-							editingName = false
-							tempEmailAccountName = values.emailAccountName
-						}" />
+					<div>
+						<div class="flex space-x-2 items-center">
+							<div class="text-base font-semibold">Email Setup</div>
+						</div>
+						<div class="flex flex-row py-4 space-x-10 w-full">
+							<Input class="grow max-w-sm" label="Email Id" type="text" :value="values.emailId" placeholder="Email Id" @change="(val) => values.emailId = val"/>
+							<Input @click="() => {
+								if (!isNew) {
+									if (initialPassword === values.password) {
+										values.password = ''
+									}
+		
+									if(initialPassword === '') {
+										initialPassword = values.password
+										values.password = ''
+									}
+								}
+							}" class="grow max-w-sm" label="Password" type="password" :value="values.password" placeholder="Password" @change="(val) => values.password = val"/>
+						</div>
+						<div>
+							<Input class="grow max-w-sm" label="Service" type="select" :value="values.service" :options="['GMail', 'Sendgrid', 'SparkPost', 'Yahoo Mail', 'Outlook.com', 'Yandex.Mail']" @change="(val) => values.service = val" />
+						</div>
+					</div>
+					<div>
+						<div class="flex space-x-2 items-center">
+							<div class="text-base font-semibold">Properties</div>
+						</div>
+						<div class="py-4 w-full text-gray-900 text-base flex flex-col space-y-2">
+							<div class="flex flex-row w-full mb-2 space-x-10">
+								<div class="flex flex-row space-x-5">
+									<div>Incoming</div>
+									<CustomSwitch v-model="values.enableIncoming" />
+								</div>
+								<div class="flex flex-row space-x-5">
+									<div v-if="values.enableIncoming">Default</div>
+									<CustomSwitch v-if="values.enableIncoming" v-model="values.defaultIncoming" />
+								</div>
+							</div>
+							<div class="flex flex-row w-full space-x-10">
+								<div class="flex flex-row space-x-5">
+									<div>Outgoing</div>
+									<CustomSwitch v-model="values.enableOutgoing"/>
+								</div>
+								<div class="flex flex-row space-x-5">
+									<div v-if="values.enableOutgoing">Default</div>
+									<CustomSwitch v-if="values.enableOutgoing" v-model="values.defaultOutgoing"/>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="float-right">
-					<div class="flex space-x-2 items-center">
+				<div>
+					<div class="flex flex-row space-x-2 items-center">
 						<Button appearance="secondary" @click="cancel()">Cancel</Button>
 						<Button
 							appearance="primary"
@@ -30,45 +90,6 @@
 						>
 							{{ ` ${isNew ? "Create" : "Save"}` }}
 						</Button>
-					</div>
-				</div>
-			</div>
-			<div class="mb-5">
-				<div class="flex space-x-2 items-center">
-					<div class="text-base font-semibold">Email Setup</div>
-				</div>
-				<div class="flex flex-row py-4 space-x-10 w-full">
-					<Input class="grow max-w-sm" label="Email Id" type="text" :value="values.emailId" placeholder="Email Id" @change="(val) => values.emailId = val"/>
-					<Input class="grow max-w-sm" label="Password" type="password" :value="values.password" placeholder="Password" @change="(val) => values.password = val"/>
-				</div>
-				<div>
-					<Input class="grow max-w-sm" label="Service" type="select" :value="values.service" :options="['GMail', 'Sendgrid', 'SparkPost', 'Yahoo Mail', 'Outlook.com', 'Yandex.Mail']" @change="(val) => values.service = val" />
-				</div>
-			</div>
-			<div class="mb-5">
-				<div class="flex space-x-2 items-center">
-					<div class="text-base font-semibold">Properties</div>
-				</div>
-				<div class="py-4 w-full text-gray-900 text-base flex flex-col space-y-2">
-					<div class="flex flex-row w-full mb-2 space-x-10">
-						<div class="flex flex-row space-x-5">
-							<div>Incoming</div>
-							<CustomSwitch v-model="values.enableIncoming" />
-						</div>
-						<div class="flex flex-row space-x-5">
-							<div v-if="values.enableIncoming">Default</div>
-							<CustomSwitch v-if="values.enableIncoming" v-model="values.defaultIncoming" />
-						</div>
-					</div>
-					<div class="flex flex-row w-full space-x-10">
-						<div class="flex flex-row space-x-5">
-							<div>Outgoing</div>
-							<CustomSwitch v-model="values.enableOutgoing"/>
-						</div>
-						<div class="flex flex-row space-x-5">
-							<div v-if="values.enableOutgoing">Default</div>
-							<CustomSwitch v-if="values.enableOutgoing" v-model="values.defaultOutgoing"/>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -127,6 +148,8 @@ export default {
 
 		const editingName = ref(false)
 
+		const initialPassword = ref('')
+
 		const values = ref({
 			emailAccountName: '',
 			emailId: '',
@@ -139,12 +162,20 @@ export default {
 
 		const tempEmailAccountName = ref('')
 
+		const errors = {
+			'Error: frappe.client.set_value InvalidEmailCredentials': 'Invalid Email ID or Password.',
+			'Error: frappe.client.insert ValidationError': 'Validation Error.',
+			'Error: frappe.client.insert InvalidEmailCredentials': 'Invalid Email ID or Password.',
+		}
+
 		return {
 			emailDefaults,
 			isNew,
 			editingName,
 			values,
-			tempEmailAccountName
+			tempEmailAccountName,
+			initialPassword,
+			errors
 		}
 	},
 	mounted() {
@@ -153,7 +184,7 @@ export default {
 
 		this.isNew = (this.$route.name === 'NewEmailAccount')
 
-		this.editingName = false
+		this.editingName = this.isNew
 
 		if (this.isNew) {
 			this.setDefaultValues()
@@ -164,7 +195,7 @@ export default {
 	methods: {
 		setDefaultValues() {
 			this.values = {
-				emailAccountName: 'New Email Account',
+				emailAccountName: '',
 				emailId: '',
 				password: '',
 				service: 'GMail',
@@ -179,6 +210,7 @@ export default {
 				this.$resources.createNewEmailAccount.submit({
 					doc: {
 						doctype: 'Email Account',
+						email_account_name: this.tempEmailAccountName,
 						email_id: this.values.emailId,
 						password: this.values.password,
 						enable_incoming: this.values.enableIncoming,
@@ -213,6 +245,7 @@ export default {
 					fieldname: {
 						email_account_name: this.tempEmailAccountName,
 						email_id: this.values.emailId,
+						password: this.values.password,
 						enable_incoming: this.values.enableIncoming,
 						enable_outgoing: this.values.enableOutgoing,
 						default_incoming: this.values.defaultIncoming,
@@ -258,7 +291,12 @@ export default {
 					}
 				},
 				onError: (error) => {
-					console.log(error)
+					this.$toast({
+						title: 'Error getting Email Account.',
+						text: this.errors[error] || error,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
 				}
 			}
 		},
@@ -267,16 +305,21 @@ export default {
 				method: 'frappe.client.insert',
 				onSuccess: () => {
 					this.$toast({
-						message: 'Email Account Created',
+						title: 'Email Account Created!!',
 						customIcon: 'circle-check',
-						type: 'success'
+						appearance: 'success'
 					})
 					this.$router.push({
 						name: 'Emails'
 					})
 				},
 				onError: (error) => {
-					console.log(error)
+					this.$toast({
+						title: 'Error creating new Email Account.',
+						text: this.errors[error] || error,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
 				}
 			}
 		},
@@ -299,12 +342,9 @@ export default {
 					}
 				},
 				onError: (error) => {
-					const errors = {
-						'Error: frappe.client.set_value InvalidEmailCredentials': 'Invalid Email ID or Password.',
-					}
 					this.$toast({
 						title: 'Error updating Email Account.',
-						text: errors[error] || error,
+						text: this.errors[error] || error,
 						customIcon: 'circle-fail',
 						appearance: 'danger',
 					})
@@ -316,13 +356,17 @@ export default {
 				method: 'frappe.client.rename_doc',
 				onSuccess: (data) => {
 					window.location.href = `/frappedesk/settings/emails/${data}`
+				},
+				onError: (error) => {
+					this.$toast({
+						title: 'Error renaming Email Account.',
+						text: this.errors[error] || error,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
 				}
 			}
 		}
 	}
 }
 </script>
-
-<style>
-
-</style>

@@ -11,7 +11,7 @@
 				]"
 			>
 				<div
-					class="px-5 pt-[14px] pb-[12px] rounded-lg shadow-md min-w-[25rem] max-w-[40rem]"
+					class="px-5 pt-[14px] pb-[12px] rounded-lg shadow-md min-w-[25rem] max-w-[40rem] flex flex-col space-y-5"
 					:class="bodyClasses"
 				>
 					<div class="flex items-start">
@@ -27,6 +27,12 @@
 								<p class="mt-1 text-base font-normal text-gray-700">
 									{{ text }}
 								</p>
+								<div class="flex mt-5" v-if="action">
+									<Button appearance="primary" @click="() => {
+										$clearToasts()
+										action.onClick()
+									}">{{ action.title }}</Button>
+								</div>
 							</slot>
 						</div>
 						<div class="pl-2 ml-auto">
@@ -86,6 +92,10 @@ export default {
 	fixed: {
 		type: Boolean,
 		default: false
+	},
+	action: {
+		type: Object,
+		default: null
 	}
   },
   components: {
