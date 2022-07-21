@@ -41,7 +41,7 @@
 					</div>
 					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] space-y-[11px]">
 						<div>
-							<div v-if="editing" @keyup.ctrl.enter="!sendingDeissabled ? submit() : {}">
+							<div v-if="editing" v-on:keydown="!sendingDissabled ? handleSubmitShortcut($event) : {}">
 								<div class="border border-gray-300 rounded-[8px] p-[12px]">
 									<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
 										<div v-if="editingType=='reply'">
@@ -117,7 +117,7 @@
 										:loading="editingType == 'reply' ? $resources.submitConversation.loading : $resources.submitComment.loading" 
 										@click="submit()" 
 										appearance="primary" 
-										:disabled="(!user.agent && !user.isAdmin) || sendingDeissabled"
+										:disabled="(!user.agent && !user.isAdmin) || sendingDissabled"
 									>
 										{{ editingType == 'reply' ? 'Send' : 'Create' }}
 									</Button>
@@ -284,7 +284,7 @@ export default {
 		ticket() {
 			return this.$resources.ticket.doc || null
 		},
-		sendingDeissabled() {
+		sendingDissabled() {
 			let content = this.content.trim()
 			content = content.replaceAll('<p></p>', '')
 			content = content.replaceAll(' ', '')
@@ -313,6 +313,11 @@ export default {
 
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
+		},
+		handleSubmitShortcut(e) {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
+				this.submit()
+			}
 		},
 		submit() {
 			switch(this.editingType) {

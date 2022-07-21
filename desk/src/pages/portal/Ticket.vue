@@ -38,7 +38,7 @@
 				<div
 					v-if="editing"
 					class="flex flex-col" 
-					@keyup.ctrl.enter="!sendButtonDissabled ? submitConversation() : {}"
+					v-on:keydown="!sendingDissabled ? handleSubmitShortcut($event) : {}"
 				>
 					<div class="grow">
 						<div class="flex">
@@ -98,7 +98,7 @@
 										</div>
 										<div class="mt-2 space-x-2 flex">
 											<Button 
-												:disabled="sendButtonDissabled"
+												:disabled="sendingDissabled"
 												:loading="this.$resources.submitConversation.loading" 
 												@click="this.submitConversation" 
 												appearance="primary" 
@@ -167,7 +167,7 @@ export default {
 				return null
 			}
         },
-		sendButtonDissabled() {
+		sendingDissabled() {
 			let content = this.content.trim()
 			content = content.replaceAll('<p></p>', '')
 			content = content.replaceAll(' ', '')
@@ -207,6 +207,11 @@ export default {
 
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
+		},
+		handleSubmitShortcut(e) {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
+				this.submitConversation()
+			}
 		},
 		submitConversation() {
 			this.tempTextEditorData.content = this.content
