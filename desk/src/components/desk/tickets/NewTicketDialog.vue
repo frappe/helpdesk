@@ -12,7 +12,7 @@
 							</span>
 							<Combobox v-model="selectedContact">
 								<ComboboxInput 
-									class="rounded-md w-full py-1 border-none focus:ring-0 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-gray-100"
+									class="rounded-md text-base w-full py-1 border-none focus:ring-0 pl-3 pr-10 leading-5 text-gray-900 bg-gray-100"
 									autocomplete="off"
 									@change="query = $event.target.value" 
 								/>
