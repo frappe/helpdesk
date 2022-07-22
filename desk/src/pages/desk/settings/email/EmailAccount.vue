@@ -48,11 +48,19 @@
 									</div>
 								</div>
 							</div>
-							<div v-if="values['service'] == 'GMail'" class="max-w-sm mb-[10px] bg-blue-50 border-blue-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
-								<FeatherIcon name="info" class="shrink-0 w-6 h-6 stroke-blue-500 stroke-2" />
-								<p>
-									GMail will only work if you enable 2-step authentication and use app-specific password. <a href="https://docs.erpnext.com/docs/v13/user/manual/en/setting-up/email/email_account_setup_with_gmail" target="_blank" class="text-blue-500 hover:underline">Read the step by step guide here.</a>
-								</p>
+							<div class="flex flex-col space-y-3">
+								<div v-if="values['service'] == 'GMail'" class="max-w-sm bg-blue-50 border-blue-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
+									<FeatherIcon name="info" class="shrink-0 w-6 h-6 stroke-blue-500 stroke-2" />
+									<p>
+										GMail will only work if you enable 2-step authentication and use app-specific password. <a href="https://docs.erpnext.com/docs/v13/user/manual/en/setting-up/email/email_account_setup_with_gmail" target="_blank" class="text-blue-500 hover:underline">Read the step by step guide here.</a>
+									</p>
+								</div>
+								<div class="max-w-sm bg-blue-50 border-blue-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
+									<FeatherIcon name="info" class="shrink-0 w-6 h-6 stroke-blue-500 stroke-2" />
+									<p>
+										Only unseen emails will be synchronized.
+									</p>
+								</div>
 							</div>
 							<Input class="grow max-w-sm" label="Email Id" type="text" :value="values.emailId" placeholder="Email Id" @change="(val) => values.emailId = val"/>
 							<Input @click="() => {
