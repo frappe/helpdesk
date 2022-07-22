@@ -38,7 +38,7 @@ def initial_demo_ticket_created():
 			}).insert()
 
 			new_ticket_doc = frappe.new_doc("Ticket")
-			new_ticket_doc.subject = "Harshit Agrawal"
+			new_ticket_doc.subject = "Welcome to Frappe Desk"
 			new_ticket_doc.description = """
 			<p>Hi 👋🏻</p>
 			<p><br></p>
