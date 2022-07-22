@@ -25,6 +25,18 @@ def initial_demo_ticket_created():
 	if ticket_count == 0:
 		agent = frappe.get_last_doc("Agent")
 		if agent:
+			frappe.get_doc({
+				"doctype": "Contact",
+				"first_name": "Harshit",
+				"last_name": "Agrawal",
+				"email_ids": [
+					{
+						"email_id": "harshit@frappe.io",
+						"is_primary": 1
+					}
+				]
+			}).insert()
+
 			new_ticket_doc = frappe.new_doc("Ticket")
 			new_ticket_doc.subject = "Harshit Agrawal"
 			new_ticket_doc.description = """
@@ -39,6 +51,7 @@ def initial_demo_ticket_created():
 			<p>Frappe Desk | Frappe.</p>
 			"""
 			new_ticket_doc.raised_by = "harshit@frappe.io"
+			new_ticket_doc.contact = "Harshit Agrawal"
 			new_ticket_doc.via_customer_portal = True
 			new_ticket_doc.insert()
 
