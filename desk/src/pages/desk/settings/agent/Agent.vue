@@ -21,6 +21,7 @@ export default {
     },
     mounted() {
 		this.$event.emit('set-selected-setting', 'Agents')
+        this.$event.emit('show-top-panel-actions-settings', 'Agent')
     },
 
 }

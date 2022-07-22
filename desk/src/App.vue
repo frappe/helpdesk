@@ -137,7 +137,7 @@ export default {
 				method: 'frappedesk.api.website.helpdesk_name',
 				auto: true,
 				onSuccess: (res) => {
-					document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`
+					document.title = `Frappe Desk ${res ? ` | ${res}` : ''}`
 				}
 			}
 		}
