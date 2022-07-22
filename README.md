@@ -14,6 +14,8 @@ FrappeDesk offers an easy setup, clean user interface, and automation tools to r
 - Empower customers with a comprehensive knowledge base and self-service portal
 - Automate redundant tasks like agent assignment and set up triggers to notify agents and customers based on certain events
 
+<img src="https://user-images.githubusercontent.com/46772424/180410739-a64b8b65-43b4-4ec8-8a87-1f5e97f355e0.png" width="">
+
 ## Contributions and Community
 
 There are many ways you can contribute even if you don't code:
