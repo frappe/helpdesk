@@ -151,7 +151,21 @@ export default {
 					this.close()
 				},
 				onError: (err) => {
-
+					if (err.exc_type == 'PaywallReachedError') {
+						this.$toast({
+							title: 'Paywall Reached!',
+							text: 'You have reached the maximum number of agents you can add. Please upgrade your plan to add more agents.',
+							customIcon: 'circle-fail',
+							appearance: 'danger',
+							fixed: true
+						})
+					} else {
+						this.$toast({
+							title: 'Error Sending Invites!',
+							customIcon: 'circle-fail',
+							appearance: 'danger',
+						})
+					}
 				}
 			}
 		}
