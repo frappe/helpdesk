@@ -17,8 +17,8 @@
 								<div class="font-semibold">{{ values.emailAccountName }}</div>
 								<FeatherIcon class="w-3 h-3" name="edit-2" />
 							</div>
-							<div v-else class="flex space-x-2 items-center w-full">
-								<Input class="grow" id="emailAccountNameInput" v-model="tempEmailAccountName" type="text" placeholder="Email Account Name" />
+							<div v-else class="flex space-x-2 max-w-sm items-center w-full">
+								<Input label="Email Account name" class="grow" id="emailAccountNameInput" v-model="tempEmailAccountName" type="text" placeholder="Email Account Name" />
 								<FeatherIcon v-if="!isNew" class="w-4 h-4 cursor-pointer" name="x" @click="() => {
 									editingName = false
 									tempEmailAccountName = values.emailAccountName
@@ -31,7 +31,37 @@
 						<div class="flex space-x-2 items-center">
 							<div class="text-base font-semibold">Email Setup</div>
 						</div>
-						<div class="flex flex-row py-4 space-x-10 w-full">
+						<div class="pt-4 space-y-5 w-full">
+							<div>
+								<span class="block mb-2 text-sm leading-4 text-gray-700">
+									Service
+								</span>
+								<div class="flex flex-wrap text-[11px] text-gray-700 mx-[-4px]">
+									<div v-for="service in services" :key="service.title"
+										role="button" 
+										class="h-[90px] w-[90px] m-1 p-[8px] items-center border hover:shadow-sm rounded flex flex-col space-y-2"
+										:class="service.selected ? 'border-2 border-blue-500 bg-blue-50' : 'bg-white'"
+										@click="selectService(service)"
+									>
+										<Images :name="service.image" class="h-11 w-11"/>
+										<div>{{ service.title }}</div>
+									</div>
+								</div>
+							</div>
+							<div class="flex flex-col space-y-3">
+								<div v-if="values['service'] == 'GMail'" class="max-w-sm bg-blue-50 border-blue-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
+									<FeatherIcon name="info" class="shrink-0 w-6 h-6 stroke-blue-500 stroke-2" />
+									<p>
+										GMail will only work if you enable 2-step authentication and use app-specific password. <a href="https://docs.erpnext.com/docs/v13/user/manual/en/setting-up/email/email_account_setup_with_gmail" target="_blank" class="text-blue-500 hover:underline">Read the step by step guide here.</a>
+									</p>
+								</div>
+								<div class="max-w-sm bg-blue-50 border-blue-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center">
+									<FeatherIcon name="info" class="shrink-0 w-6 h-6 stroke-blue-500 stroke-2" />
+									<p>
+										Only unseen emails will be synchronized.
+									</p>
+								</div>
+							</div>
 							<Input class="grow max-w-sm" label="Email Id" type="text" :value="values.emailId" placeholder="Email Id" @change="(val) => values.emailId = val"/>
 							<Input @click="() => {
 								if (!isNew) {
@@ -46,34 +76,45 @@
 								}
 							}" class="grow max-w-sm" label="Password" type="password" :value="values.password" placeholder="Password" @change="(val) => values.password = val"/>
 						</div>
-						<div>
-							<Input class="grow max-w-sm" label="Service" type="select" :value="values.service" :options="['GMail', 'Sendgrid', 'SparkPost', 'Yahoo Mail', 'Outlook.com', 'Yandex.Mail']" @change="(val) => values.service = val" />
-						</div>
 					</div>
 					<div>
 						<div class="flex space-x-2 items-center">
 							<div class="text-base font-semibold">Properties</div>
 						</div>
-						<div class="py-4 w-full text-gray-900 text-base flex flex-col space-y-2">
-							<div class="flex flex-row w-full mb-2 space-x-10">
-								<div class="flex flex-row space-x-5">
-									<div>Incoming</div>
-									<CustomSwitch v-model="values.enableIncoming" />
+						<div class="py-4 w-full text-gray-900 text-base flex flex-col space-y-5">
+							<div class="flex flex-col space-y-2">
+								<div class="flex flex-row w-full mb-2 space-x-10">
+									<div class="flex flex-row space-x-5">
+										<div>Incoming</div>
+										<CustomSwitch v-model="values.enableIncoming" />
+									</div>
+									<div class="flex flex-row space-x-5">
+										<div v-if="values.enableIncoming">Default</div>
+										<CustomSwitch v-if="values.enableIncoming" v-model="values.defaultIncoming" />
+									</div>
 								</div>
-								<div class="flex flex-row space-x-5">
-									<div v-if="values.enableIncoming">Default</div>
-									<CustomSwitch v-if="values.enableIncoming" v-model="values.defaultIncoming" />
+								<div class="flex flex-row w-full space-x-10">
+									<div class="flex flex-row space-x-5">
+										<div>Outgoing</div>
+										<CustomSwitch v-model="values.enableOutgoing"/>
+									</div>
+									<div class="flex flex-row space-x-5">
+										<div v-if="values.enableOutgoing">Default</div>
+										<CustomSwitch v-if="values.enableOutgoing" v-model="values.defaultOutgoing"/>
+									</div>
 								</div>
 							</div>
-							<div class="flex flex-row w-full space-x-10">
-								<div class="flex flex-row space-x-5">
-									<div>Outgoing</div>
-									<CustomSwitch v-model="values.enableOutgoing"/>
-								</div>
-								<div class="flex flex-row space-x-5">
-									<div v-if="values.enableOutgoing">Default</div>
-									<CustomSwitch v-if="values.enableOutgoing" v-model="values.defaultOutgoing"/>
-								</div>
+							<div 
+								v-if="!values.defaultOutgoing && 
+									values.enableOutgoing && 
+									!$resources.checkDefaultOutgoingEmailAccount.loading && 
+									$resources.checkDefaultOutgoingEmailAccount.data == 0" 
+								class="max-w-sm bg-yellow-50 border-yellow-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center"
+							>
+								<FeatherIcon name="alert-triangle" class="shrink-0 w-6 h-6 stroke-yellow-500 stroke-2" />
+								<p>
+									There should be an email account which is marked as default outgoing.
+								</p>
 							</div>
 						</div>
 					</div>
@@ -100,6 +141,7 @@
 <script>
 import { ref } from 'vue'
 import CustomSwitch from '@/components/global/CustomSwitch.vue'
+import Images from '@/components/global/Images.vue'
 import { Input, FeatherIcon, LoadingText } from 'frappe-ui'
 
 export default {
@@ -107,11 +149,34 @@ export default {
 	props: ['emailAccountId'],
 	components: {
 		Input,
-		FeatherIcon,
 		CustomSwitch,
-		LoadingText
+		FeatherIcon,
+		Images,
+		LoadingText,
 	},
 	setup() {
+		const services = ref([
+			{
+				title: 'GMail',
+				image: 'gmail',
+				name: 'GMail',
+				selected: true
+			},
+			{
+				title: 'Outlook',
+				image: 'outlook',
+				name: 'Outlook.com'
+			},
+			{
+				title: 'Yahoo Mail',
+				image: 'yahoo',
+				name: 'Yahoo Mail'
+			},
+			{
+				title: 'Others',
+				name: 'Others'
+			}
+		])
 		const emailDefaults = {
 			"GMail": {
 				"email_server": "imap.gmail.com",
@@ -151,6 +216,7 @@ export default {
 		const initialPassword = ref('')
 
 		const values = ref({
+			service: services.value[0].name,
 			emailAccountName: '',
 			emailId: '',
 			password: '',
@@ -169,6 +235,7 @@ export default {
 		}
 
 		return {
+			services,
 			emailDefaults,
 			isNew,
 			editingName,
@@ -193,6 +260,13 @@ export default {
 		}
 	},
 	methods: {
+		selectService(service) {
+			this.services.forEach(s => {
+				s.selected = false
+			})
+			service.selected = true
+			this.values['service'] = service.name
+		},
 		setDefaultValues() {
 			this.values = {
 				emailAccountName: '',
@@ -269,6 +343,22 @@ export default {
 		}
 	},
 	resources: {
+		checkDefaultOutgoingEmailAccount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Email Account',
+					filters: [["use_imap", "=", 1], ["IMAP Folder","append_to","=","Ticket"], ["default_outgoing","=",1]]
+				},
+				onSuccess: (res) => {
+					if (res == 0) {
+						this.values.enableOutgoing = true
+						this.values.defaultOutgoing = true
+					}
+				},
+				auto: true
+			}
+		},
 		getEmailAccount() {
 			return {
 				method: 'frappe.client.get',
