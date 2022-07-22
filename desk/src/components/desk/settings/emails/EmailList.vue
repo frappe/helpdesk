@@ -44,7 +44,7 @@
                     <div class="grid place-content-center h-48 w-full">
                         <div>
                             <CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
-                            <div class="text-gray-500 mb-2">No agents found</div>
+                            <div class="text-gray-500 mb-2">No email accounts found</div>
                         </div>
                     </div>
                 </div>
