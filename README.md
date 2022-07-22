@@ -25,4 +25,4 @@ There are many ways you can contribute even if you don't code:
 3. You can join our [telegram group](https://t.me/frappedesk) and share your thoughts.
 
 ## License
-[GNU Affero General Public License v3.0](LICENSE)
+[GNU Affero General Public License v3.0](https://github.com/frappe/desk/blob/main/licence.md)
