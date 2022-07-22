@@ -106,7 +106,7 @@
 							</div>
 							<div 
 								v-if="!values.defaultOutgoing && 
-									values.enableOutgoing && 
+									!values.enableOutgoing && 
 									!$resources.checkDefaultOutgoingEmailAccount.loading && 
 									$resources.checkDefaultOutgoingEmailAccount.data == 0" 
 								class="max-w-sm bg-yellow-50 border-yellow-500 rounded p-3 border-2 text-base text-gray-700 flex flex-row space-x-4 items-center"
