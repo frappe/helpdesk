@@ -85,7 +85,6 @@ export default {
 	},
 	computed: {
 		initialized() {
-			console.log('here')
 			if (this.$resources.supportSettings.loading) return false
 			if (!this.$resources.supportSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit()
