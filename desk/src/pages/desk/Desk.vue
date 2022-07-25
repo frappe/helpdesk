@@ -202,7 +202,7 @@ export default {
 		},
 		createInitialDemoTicket() {
 			return {
-				method: 'frappedesk.api.setup.initial_demo_ticket_created',
+				method: 'frappedesk.api.setup.create_initial_demo_ticket',
 				onSuccess: (res) => {
 					this.$resources.supportSettings.fetch()
 				},

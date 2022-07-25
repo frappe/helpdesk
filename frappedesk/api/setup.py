@@ -17,7 +17,7 @@ def initial_agent_setup():
 			return
 
 @frappe.whitelist()
-def initial_demo_ticket_created():
+def create_initial_demo_ticket():
 	support_settings_doc = frappe.get_doc("Support Settings", "Support Settings")
 	if support_settings_doc.initial_demo_ticket_created:
 		return    
