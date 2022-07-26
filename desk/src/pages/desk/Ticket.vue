@@ -98,7 +98,7 @@
 												'bold', 'italic', '|',
 												'quote', 'code', '|',
 												'link-url', 'file-upload', '|',
-												'numbered-list', 'bullet-list', 'left-align', '|',
+												'numbered-list', 'bullet-list', 'left-align', 'center-align', 'right-align', '|',
 												'clear-formatting',
 											]" :key="item">
 												<TextEditorMenuItem :item="item" :editor="$refs.replyEditor?.editor" :attachments="attachments" />

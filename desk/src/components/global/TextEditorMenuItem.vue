@@ -124,6 +124,18 @@ export default {
 				action: (editor) => editor.chain().focus().setTextAlign('left').run(),
 				isActive: (editor) => editor.isActive({ textAlign: 'left' }),
 			},
+			'right-align': {
+				label: 'Right Align',
+				icon: 'right-align',
+				action: (editor) => editor.chain().focus().setTextAlign('right').run(),
+				isActive: (editor) => editor.isActive({ textAlign: 'right' }),
+			},
+			'center-align': {
+				label: 'Center Align',
+				icon: 'center-align',
+				action: (editor) => editor.chain().focus().setTextAlign('center').run(),
+				isActive: (editor) => editor.isActive({ textAlign: 'center' }),
+			},
 			'clear-formatting': {
 				label: 'Clear Formatting',
 				icon: 'clear-formatting',

@@ -196,11 +196,9 @@
 			</clipPath>
 			</defs>
 		</svg>
-		<svg v-if="this.name=='left-align'" :class="this.class" :width="this.width" :height="this.height" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M3.81857 3.2002H13.8186" stroke="#1F272E" stroke-linecap="round" stroke-linejoin="round"/>
-			<path d="M3.81857 8.00024H13.8186" stroke="#1F272E" stroke-linecap="round" stroke-linejoin="round"/>
-			<path d="M3.81857 12.8003H9.81857" stroke="#1F272E" stroke-linecap="round" stroke-linejoin="round"/>
-		</svg>
+		<svg v-if="this.name=='right-align'" :class="this.class" :width="this.width" :height="this.height" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-right feather feather-align-right"><line x1="21" y1="10" x2="7" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+		<svg v-if="this.name=='center-align'" :class="this.class" :width="this.width" :height="this.height" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-center feather feather-align-center"><line x1="18" y1="10" x2="6" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+		<svg v-if="this.name=='left-align'" :class="this.class" :width="this.width" :height="this.height" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-left feather feather-align-left"><line x1="17" y1="10" x2="3" y2="10"></line><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="14" x2="3" y2="14"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
 		<svg v-if="this.name=='link-url'" :class="this.class" :width="this.width" :height="this.height" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M6.09201 10.7268L11.5463 5.27246" stroke="#1F272E" stroke-linecap="round" stroke-linejoin="round"/>
 			<path d="M7.72766 4.72735L9.55158 2.90344C10.1303 2.32496 10.915 2 11.7333 2C12.5515 2 13.3363 2.32496 13.915 2.90344V2.90344C14.4935 3.48215 14.8185 4.2669 14.8185 5.08516C14.8185 5.90341 14.4935 6.68817 13.915 7.26687L12.0911 9.09079" stroke="#1F272E" stroke-linecap="round" stroke-linejoin="round"/>
