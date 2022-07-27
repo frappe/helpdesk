@@ -62,13 +62,21 @@
 							>
 								Description
 							</span>
-							<quill-editor 
-								:ref="editor"
-								v-model:content="descriptionContent" 
-								contentType="html" 
-								:options="editorOptions"
-								style="min-height:150px; max-height:200px; overflow-y: auto;"
-							/>
+							<CustomTextEditor :show="true" :content="descriptionContent" editorClasses="w-full min-h-[80px] max-h-[300px]" @change="(val) => { descriptionContent = val }">
+								<template #bottom-section="{ editor }">
+									<div class="pt-2 select-none flex flex-row">
+										<div class="w-full flex flex-row items-center space-x-2">
+											<div v-for="item in [
+													'bold', 'italic', '|',
+													'quote', 'code', '|',
+													'numbered-list', 'bullet-list', 'left-align', 'center-align', 'right-align'
+												]" :key="item">
+												<TextEditorMenuItem :item="item" :editor="editor"/>
+											</div>
+										</div>
+									</div>
+								</template>
+							</CustomTextEditor>
 						</div>
 						<ErrorMessage :message="descriptionValidationError" />
 					</div>
@@ -89,8 +97,8 @@
 
 <script>
 import { Input, Dialog, ErrorMessage } from 'frappe-ui'
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import CustomTextEditor from '@/components/global/CustomTextEditor.vue';
+import TextEditorMenuItem from '@/components/global/TextEditorMenuItem.vue';
 import { inject, ref, computed } from 'vue'
 import {
 	Combobox,
@@ -107,8 +115,18 @@ export default {
 			required: true,
 		},
 	},
+	components: {
+		CustomTextEditor,
+		TextEditorMenuItem,
+		Input,
+		Dialog,
+		ErrorMessage,
+		Combobox,
+		ComboboxInput,
+		ComboboxOption,
+		ComboboxOptions,
+	},
 	setup(props, { emit }) {
-		const editor = ref(null);
 		const isCreating = ref(false);
 
 		const contactName = ref('')
@@ -134,7 +152,6 @@ export default {
 		const ticketController = inject('ticketController')
 
 		return { 
-			editor, 
 			isCreating, 
 			contactName, 
 			selectedContact, 
@@ -153,30 +170,6 @@ export default {
 			description: "",
 
 			descriptionContent: "",
-			editorOptions: {
-				modules: {
-					toolbar: [
-						['bold', 'italic', 'underline', 'strike', 'link'],        // toggled buttons
-						['blockquote', 'code-block'],
-
-						[{ 'header': 1 }, { 'header': 2 }],               // custom button values
-						[{ 'list': 'ordered'}, { 'list': 'bullet' }],
-
-						[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-						[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-						
-						['image'],
-						
-						[{ 'align': [] }],
-
-						['clean']                                         // remove formatting button
-					]
-				},
-				placeholder: 'Compose your reply...',
-				theme: 'snow',
-				bounds: document.body,
-			}
 		}
 	},
 	computed: {
@@ -187,16 +180,6 @@ export default {
 					return contactItem.name.toLowerCase().includes(this.query.toLowerCase())
 				})
 		}
-	},
-	components: {
-		Input,
-		QuillEditor,
-		Dialog,
-		ErrorMessage,
-		Combobox,
-		ComboboxInput,
-		ComboboxOption,
-		ComboboxOptions,
 	},
 	watch: {
 		selectedContact(newValue) {

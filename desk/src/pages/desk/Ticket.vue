@@ -39,39 +39,38 @@
 						<CustomerSatisfactionFeedback :fromDesk="true" v-if="ticket.feedback_submitted && ['Closed', 'Resolved'].includes(ticket.status)" class="mt-[10px]" :editable="false" :ticket="ticket"/>
 						<Conversations :ticketId="ticket.name" :scrollToBottom="scrollConversationsToBottom" :autoScroll="['Open', 'Replied'].includes(ticket.status)" />
 					</div>
-					<div class="shrink-0 flex flex-col pb-[19px] px-[18px] space-y-[11px]">
-						<div>
-							<div v-if="editing" v-on:keydown="!sendingDissabled ? handleSubmitShortcut($event) : {}">
-								<div class="border border-gray-300 rounded-[8px] p-[12px]">
-									<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
-										<div v-if="editingType=='reply'">
-											<div v-if="ticket.raised_by" class="flex flex-row space-x-2 items-center">
-												<span class="text-gray-700">to</span>
-												<div class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]">{{ ticket.raised_by }}</div>
-											</div>
-										</div>
-										<div v-else class="flex flex-row items-center space-x-2">
-											<span class="text-gray-700">as</span>
-											<span class="text-[11px] text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]">Comment</span>
-										</div>
-										<div class="grow flex flex-row-reverse">
-											<a role="button" @click="cancelEditing" title="Hide Editor">
-												<FeatherIcon name="chevron-down" class="h-4 w-4"/>
-											</a>
+					<div class="shrink-0 flex flex-col mb-[19px] px-[18px] space-y-[11px]">
+						<CustomTextEditor 
+							ref="replyEditor"
+							:show="editing"
+							v-on:keydown="handleShortcuts($event)"
+							@click="$refs.replyEditor.focusEditor()"
+							:content="content" 
+							@change="(val) => { content = val }"
+							:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'" 
+							editorClasses="w-full min-h-[248px] max-h-[300px] " class="border border-gray-300 rounded-[8px] p-[12px]"
+						>
+							<template #top-section>
+								<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">
+									<div v-if="editingType=='reply'">
+										<div v-if="ticket.raised_by" class="flex flex-row space-x-2 items-center">
+											<span class="text-gray-700">to</span>
+											<div class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]">{{ ticket.raised_by }}</div>
 										</div>
 									</div>
-									<div @click="$refs.replyEditor.editor.commands.focus()">
-										<TextEditor
-											style="scrollbar-width: 10px;"
-											ref="replyEditor"
-											class="w-full min-h-[80px] max-h-[300px] overflow-y-scroll"
-											:content="content"
-											editor-class="w-full"
-											:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'"
-											:editable="true"
-											@change="(val) => { content = val }"
-										/>
+									<div v-else class="flex flex-row items-center space-x-2">
+										<span class="text-gray-700">as</span>
+										<span class="text-[11px] text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]">Comment</span>
 									</div>
+									<div class="grow flex flex-row-reverse">
+										<a role="button" @click="cancelEditing" title="Hide Editor">
+											<FeatherIcon name="chevron-down" class="h-4 w-4"/>
+										</a>
+									</div>
+								</div>
+							</template>
+							<template #bottom-section="{ editor }">
+								<div>
 									<div v-if="attachments.length" class="max-h-[100px] overflow-y-scroll rounded flex flex-col">
 										<ul class="flex flex-wrap gap-2 py-2">
 											<li
@@ -92,40 +91,47 @@
 											</li>
 										</ul>
 									</div>
-									<div class="pt-2 select-none flex flex-row" v-if="$refs.replyEditor">
-										<div class="w-full flex flex-row items-center space-x-2">
+									<div v-if="showTextFormattingMenu">
+										<div class="flex flex-row items-center space-x-1.5 p-1.5 rounded shadow w-fit">
 											<div v-for="item in [
 												'bold', 'italic', '|',
 												'quote', 'code', '|',
-												'link-url', 'file-upload', '|',
-												'numbered-list', 'bullet-list', 'left-align', '|',
-												'clear-formatting',
+												'numbered-list', 'bullet-list', 'left-align', 'center-align', 'right-align'
 											]" :key="item">
-												<TextEditorMenuItem :item="item" :editor="$refs.replyEditor?.editor" :attachments="attachments" />
+												<TextEditorMenuItem :item="item" :editor="editor" :attachments="attachments" />
 											</div>
 										</div>
-										<FeatherIcon name="trash-2" role="button" class="h-4 w-4" @click="() => {
-											content = ''
-											attachments = []
-										}" />
+									</div>
+									<div class="pt-2 select-none flex flex-row items-center space-x-2" v-if="$refs.replyEditor">
+										<Button 
+											:loading="editingType == 'reply' ? $resources.submitConversation.loading : $resources.submitComment.loading" 
+											@click="submit()" 
+											appearance="primary" 
+											:disabled="(!user.agent && !user.isAdmin) || sendingDissabled"
+										>
+											{{ editingType == 'reply' ? 'Send' : 'Create' }}
+										</Button>
+										<div class="flex flex-row items-center space-x-2">
+											<CustomIcons :class="showTextFormattingMenu ? 'bg-gray-200' : ''" name="text-formatting" class="h-7 w-7 rounded p-1" role="button" @click="() => { showTextFormattingMenu = !showTextFormattingMenu}"/>
+											<FileUploader @success="(file) => attachments.push(file)">
+												<template v-slot="{ progress, uploading, openFileSelector }">
+													<FeatherIcon name="paperclip" class="h-[17px]" @click="openFileSelector" role="button" :disabled="uploading" />
+												</template>
+											</FileUploader>
+											<CustomIcons :class="editor.isActive('link') ? 'bg-gray-100' : ''" name="link-url" class="h-7 w-7 rounded p-1" role="button" @click="$refs.replyEditor.insertLink"/>
+										</div>
+										<div class="grow flex flex-row-reverse">
+											<FeatherIcon name="trash-2" role="button" class="h-4 w-4" @click="() => {
+												content = ''
+												attachments = []
+											}" />
+										</div>
 									</div>
 								</div>
-							</div>
-						</div>
+							</template>
+						</CustomTextEditor>
 						<div>
-							<div v-if="editing">
-								<div class="flex flex-row space-x-[14px]">
-									<Button 
-										:loading="editingType == 'reply' ? $resources.submitConversation.loading : $resources.submitComment.loading" 
-										@click="submit()" 
-										appearance="primary" 
-										:disabled="(!user.agent && !user.isAdmin) || sendingDissabled"
-									>
-										{{ editingType == 'reply' ? 'Send' : 'Create' }}
-									</Button>
-								</div>
-							</div>
-							<div v-else class="flex flex-row space-x-[14px]">
+							<div v-if="!editing" class="flex flex-row space-x-[14px]">
 								<Button appearance="primary" @click="startEditing('reply')">
 									Reply 
 								</Button>
@@ -149,6 +155,7 @@
 </template>
 <script>
 import { Badge, Card, Dropdown, Avatar, FileUploader, FeatherIcon, TextEditor } from 'frappe-ui'
+import CustomTextEditor from '@/components/global/CustomTextEditor.vue';
 import Conversations from '@/components/desk/ticket/Conversations.vue';
 import InfoPanel from '@/components/desk/ticket/InfoPanel.vue';
 import ActionPanel from '@/components/desk/ticket/ActionPanel.vue';
@@ -161,6 +168,7 @@ export default {
 	name: 'Ticket',
 	props: ['ticketId'],
 	components: {
+		CustomTextEditor,
 		Badge,
 		Card,
 		Dropdown,
@@ -190,7 +198,7 @@ export default {
 		})
 	},
 	setup() {
-		const editor = ref(null);
+		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject('viewportWidth')
 		const user = inject('user')
 		const attachments = ref([])
@@ -203,7 +211,7 @@ export default {
 		const ticketSideBarFilter = inject('ticketSideBarFilter')
 		
 		return { 
-			editor,
+			showTextFormattingMenu,
 			viewportWidth,
 			user,
 			attachments,
@@ -298,12 +306,7 @@ export default {
 			this.editing = true
 			this.editingType = type
 			this.delayedConversationScroll()
-			this.focusEditor()
-		},
-		focusEditor() {
-			this.$nextTick(() => {
-				this.$refs.replyEditor.editor.commands.focus()
-			})
+			this.$refs.replyEditor.focusEditor()
 		},
 		cancelEditing() {
 			this.editing = false
@@ -316,9 +319,14 @@ export default {
 			delay(400).then(() => this.scrollConversationsToBottom = true)
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
-		handleSubmitShortcut(e) {
+		handleShortcuts(e) {
 			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
-				this.submit()
+				if (!this.sendingDissabled) {
+					this.submit()
+				}
+			}
+			if ((e.metaKey || e.ctrlKey) && e.keyCode == 75) {
+				this.$refs.replyEditor.insertLink()
 			}
 		},
 		submit() {
