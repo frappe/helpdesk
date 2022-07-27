@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<div>
-			<div class="h-4 border-r w-2" v-if="item=='|'"></div>
-			<div v-else-if="item=='file-upload'" class="hover:bg-gray-50 rounded h-[20px] w-[20px] p-[2px]">
+			<div class="h-4 border-r" v-if="item=='|'"></div>
+			<div v-else-if="item=='file-upload'" class="hover:bg-gray-200 rounded h-[20px] w-[20px] p-[2px]">
 				<FileUploader @success="(file) => attachments.push(file)">
 					<template v-slot="{ progress, uploading, openFileSelector }">
 						<FeatherIcon name="paperclip" class="h-[17px]" @click="openFileSelector" role="button" :disabled="uploading" />
@@ -12,10 +12,10 @@
 			<a v-else-if="commands[item] && editor" :title="commands[item].label">
 				<CustomIcons 
 					@click="commands[item].action(editor)" 
-					:class="commands[item].isActive && commands[item].isActive(editor) ? 'bg-blue-50 border-blue-500 border' : ''" 
+					:class="commands[item].isActive && commands[item].isActive(editor) ? 'bg-gray-200' : ''" 
 					role="button" 
 					:name="commands[item].icon" 
-					class="h-5 w-5 rounded hover:bg-gray-50" 
+					class="h-6 w-6 p-0.5 rounded hover:bg-gray-200" 
 				/>
 			</a>
 		</div>
