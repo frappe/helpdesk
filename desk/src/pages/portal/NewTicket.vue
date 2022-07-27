@@ -23,9 +23,7 @@
 												<div v-for="item in [
 													'bold', 'italic', '|',
 													'quote', 'code', '|',
-													'numbered-list', 'bullet-list', 'left-align', 'center-align', 'right-align', '|',
-													'clear-formatting',
-												]" :key="item">
+													'numbered-list', 'bullet-list', 'left-align', 'center-align', 'right-align'												]" :key="item">
 													<TextEditorMenuItem :item="item" :editor="editor"/>
 												</div>
 											</div>
