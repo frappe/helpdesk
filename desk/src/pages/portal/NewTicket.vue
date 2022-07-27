@@ -5,7 +5,7 @@
 				<div class="font-medium">{{ `New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}` }}</div>
 				<!-- <div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div> -->
 				<div class="text-[13px] text-gray-700" v-html="template.about"></div>
-				<div class="space-y-4 mb-4">
+				<div class="space-y-4 pb-4">
 					<div v-for="field in template.fields" :key="field">
 						<div v-if="!field.auto_set">
 							<div v-if="field.fieldtype == 'Data'">
@@ -16,48 +16,22 @@
 							</div>
 							<div v-else-if="field.fieldtype == 'Text Editor'">
 								<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
-								<div>
-									<quill-editor  
-										content=""
-										contentType="html" 
-										:options="editorOptions"
-										style="min-height:150px; max-height:200px; overflow-y: auto;"
-										@update:content="(data) => {validateField(field, data)}"
-										@click="focusEditor(field)"
-										:class="`text-editor-${field.fieldname}`"
-									/>
-									<div v-if="field.fieldname == 'description'" class="border-b border-l border-r border-gray-400 p-2 select-none">
-										<div class="w-full">
-											<FileUploader @success="(file) => attachments.push(file)">
-												<template
-													v-slot="{ progress, uploading, openFileSelector }"
-												>
-													<div class="flex flex-row justify-between space-x-2 items-center">
-														<div class="flex flex-row space-x-2">
-															<div v-for="file in attachments" :key="file.name">
-																<div class="flex space-x-2 items-center text-base bg-white border border-gray-400 rounded-md px-3 py-1">
-																	<div class="inline-block max-w-[100px] truncate">
-																		{{ file.file_name }}
-																	</div>
-																	<div>
-																		<FeatherIcon name="x" class="h-3 w-3 cursor-pointer hover:stroke-red-400 stroke-3" @click="() => {
-																			attachments = attachments.filter(x => x.name != file.name)
-																		}"/>
-																	</div>
-																</div>
-															</div>
-														</div>
-														<div>
-															<Button icon-left="plus" appearance="primary" class="inline-block" @click="openFileSelector" :loading="uploading">
-																{{ uploading ? `Uploading ${progress}%` : 'Attachment' }}
-															</Button>
-														</div>
-													</div>
-												</template>
-											</FileUploader>
+								<CustomTextEditor :show="true" editorClasses="w-full min-h-[80px] max-h-[300px]" @change="(val) => {validateField(field, val)}">
+									<template #bottom-section="{ editor }">
+										<div class="pt-2 select-none flex flex-row">
+											<div class="w-full flex flex-row items-center space-x-2">
+												<div v-for="item in [
+													'bold', 'italic', '|',
+													'quote', 'code', '|',
+													'numbered-list', 'bullet-list', 'left-align', 'center-align', 'right-align', '|',
+													'clear-formatting',
+												]" :key="item">
+													<TextEditorMenuItem :item="item" :editor="editor"/>
+												</div>
+											</div>
 										</div>
-									</div>
-								</div>
+									</template>
+								</CustomTextEditor>
 							</div>
 							<div v-else-if="field.fieldtype == 'Link'">
 								<div class="block mb-2 text-sm leading-4 text-gray-700">{{ field.label }}</div>
@@ -95,17 +69,37 @@
 						</div>
 					</div>
 				</div>
+				<div class="max-h-[100px] overflow-y-scroll rounded flex flex-col">
+					<ul class="flex flex-wrap gap-2 pb-4">
+						<li
+							class="flex items-center p-1 space-x-2 bg-gray-100 border-gray-400 border shadow rounded"
+							v-for="file in attachments"
+							:key="file"
+							:title="file.name"
+						>
+							<div class="flex flex-row items-center space-x-1">
+								<FeatherIcon name="file-text" class="h-[15px] stroke-gray-600"/>
+								<span class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate">
+									{{ file.file_name }}
+								</span>
+							</div>
+							<button class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center" @click="() => { attachments = attachments.filter(x => x.name != file.name) }">
+								<FeatherIcon class="w-3" name="x" />
+							</button>
+						</li>
+					</ul>
+				</div>
 				<div class="flex space-x-2 mb-1">
+					<FileUploader @success="(file) => attachments.push(file)">
+						<template v-slot="{ progress, uploading, openFileSelector }">
+							<Button @click="openFileSelector" :disabled="uploading">Add Attachment</Button>
+						</template>
+					</FileUploader>
 					<div class="grow"></div>
 					<Button :class="newTicketSubmitLoading ? 'cursor-not-allowed disabled' : ''" @click="cancel()">Cancel</Button>
 					<Button :loading="newTicketSubmitLoading" appearance="primary" @click="submitTicket()">Submit</Button>
 				</div>
 			</div>
-			<!-- <Card 
-				:title="`New Ticket ${template.template_name != 'Default' ? `(${template.template_name})` : ''}`" class="space-y-6"
-			>
-				
-			</Card> -->
 		</div>
 	</div>
 </template>
@@ -113,8 +107,8 @@
 import { inject, ref } from 'vue'
 import { Input, TextEditor, Card, Dropdown, ErrorMessage, FileUploader, FeatherIcon } from 'frappe-ui'
 import { call } from 'frappe-ui'
-import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { QuillEditor } from '@vueup/vue-quill'
+import TextEditorMenuItem from '@/components/global/TextEditorMenuItem.vue';
+import CustomTextEditor from '@/components/global/CustomTextEditor.vue';
 
 export default {
 	name: 'NewTicket',
@@ -125,9 +119,10 @@ export default {
 		Card,
 		Dropdown,
 		ErrorMessage,
-		QuillEditor,
 		FileUploader,
-		FeatherIcon
+		FeatherIcon,
+		TextEditorMenuItem,
+		CustomTextEditor,
 	},
 	setup() {
 		const user = inject('user')
