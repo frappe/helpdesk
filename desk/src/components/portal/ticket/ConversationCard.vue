@@ -4,7 +4,7 @@
 		<div class="w-full ml-2 pt-1">
 			<div class="flex justify-between">
 				<div class="text-lg">{{ userName }}</div>
-				<div class="text-sm text-slate-500">{{ $dayjs(time).fromNow() }}</div>
+				<div class="text-sm text-slate-500">{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</div>
 			</div>
 			<div class="grow rounded p-2 text-base mt-2" :class="`bg-${color}-50`">
 				<div class="prose prose-sm prose-p:my-1 text-[13px] text-gray-700" style="border: 0px;" v-html="cleanedMessage"></div>
