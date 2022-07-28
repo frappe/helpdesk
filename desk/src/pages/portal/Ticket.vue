@@ -52,7 +52,7 @@
 											@click="$refs.replyEditor.focusEditor()"
 											:content="content" 
 											@change="(val) => { content = val }"
-											:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'" 
+											placeholder="Type a response"
 											editorClasses="w-full min-h-[248px] max-h-[300px] " class="border border-gray-300 rounded-[8px] p-[12px]"
 										>
 											<template #bottom-section="{ editor }">
@@ -91,11 +91,11 @@
 													<div class="pt-2 select-none flex flex-row items-center space-x-2">
 														<Button 
 															:loading="$resources.submitConversation.loading" 
-															@click="submit()" 
+															@click="submitConversation()" 
 															appearance="primary" 
-															:disabled="(!user.agent && !user.isAdmin) || sendingDissabled"
+															:disabled="sendingDissabled"
 														>
-															{{ editingType == 'reply' ? 'Send' : 'Create' }}
+															Send
 														</Button>
 														<Button @click="() => {editing = false}">Cancel</Button>
 														<div class="flex flex-row items-center space-x-2">
