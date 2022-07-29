@@ -9,7 +9,7 @@
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
-				<div class="prose prose-sm prose-p:my-1 text-[13px] text-gray-700" style="border: 0px;" v-html="cleanedMessage"></div>
+				<div class="prose prose-p:my-1 text-[13px] text-gray-700" style="border: 0px;" v-html="cleanedMessage"></div>
 				<div v-if="attachments.length > 0" class="flex flex-wrap text-base mt-[8px]">
 					<div v-for="attachment in attachments" :key="attachment">
 						<a :href="attachment.file_url" target="_blank" class="py-[4px] max-w-[180px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-[12px] hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]">

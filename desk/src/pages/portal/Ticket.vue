@@ -53,7 +53,7 @@
 											:content="content" 
 											@change="(val) => { content = val }"
 											placeholder="Type a response"
-											editorClasses="w-full min-h-[248px] max-h-[300px] " class="border border-gray-300 rounded-[8px] p-[12px]"
+											editorClasses="w-full min-h-[180px] max-h-[300px] " class="border border-gray-300 rounded-[8px] p-[12px]"
 										>
 											<template #bottom-section="{ editor }">
 												<div>
