@@ -2,6 +2,7 @@ import frappe
 
 def before_install():
 	set_home_page_to_kb()
+	add_support_redirect_to_tickets()
 
 def after_install():
 	add_default_categories()
