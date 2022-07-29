@@ -24,6 +24,11 @@ export default {
 		SideBarMenu,
 		CustomIcons
 	},
+	data() {
+		return {
+			mounted: false
+		}
+	},
 	setup() {
 		const user = inject('user')
 
@@ -85,6 +90,9 @@ export default {
 	},
 	computed: {
 		initialized() {
+			if (!this.mounted) return false
+			if (!this.user.isLoggedIn()) return false
+			if (!this.user.has_desk_access) return false
 			if (this.$resources.supportSettings.loading) return false
 			if (!this.$resources.supportSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit()
@@ -112,6 +120,8 @@ export default {
 			this.$router.push({path: "/support/tickets"})
 			return
 		}
+		this.$resources.supportSettings.fetch()
+		this.$resources.defaultOutgoingEmailAccount.fetch()
 
 		this.ticketController.set = (ticketId, type, ref=null) => {
 			switch (type) {
@@ -178,6 +188,8 @@ export default {
 					break
 			}
 		})
+
+		this.mounted = true
 	},
 	unmounted() {
 		this.$socket.off('list_update')
@@ -233,7 +245,6 @@ export default {
 						appearance: 'danger',
 					})
 				},
-				auto: true
 			}
 		},
 		defaultOutgoingEmailAccount() {
@@ -268,7 +279,6 @@ export default {
 				onError: (error) =>{
 					console.log(error)
 				},
-				auto: true
 			}
 		},
 		agentCount() {
@@ -386,14 +396,15 @@ export default {
 		},
 		agents() {
 			return {
-				type: 'list',
-				doctype: 'Agent',
-				cache: ['Desk', 'Agents'],
-				fields: [
-					'name',
-					'agent_name',
-					// TODO: 'user.user_image'
-				],
+				method: 'frappe.client.get_list',
+				params: {
+					doctype: 'Agent',
+					fields: [
+						'name',
+						'agent_name',
+						// TODO: 'user.user_image'
+					],
+				},
 				onSuccess: (data) => {
 					this.agents = data
 				},
