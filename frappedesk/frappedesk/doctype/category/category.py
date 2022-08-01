@@ -40,15 +40,17 @@ class Category(WebsiteGenerator):
 			for category in all_previous_sub_categories:
 				category_doc = frappe.get_doc("Category", category)
 				category_doc.parent_category = ""
+				category_doc.order = None
 				category_doc.save()
 
 			# set parent_category fields for all the sub_cateogries
-			for category in self.sub_categories:
+			for index, category in enumerate(self.sub_categories):
 				category_doc = frappe.get_doc("Category", category.sub_category)
 				if category_doc:
 					if not category_doc.is_group:
 						if not category_doc.parent_category or category_doc.parent_category == self.name:
 							category_doc.parent_category = self.name
+							category_doc.order = index
 							category_doc.set_page_route()
 							category_doc.save()
 						else:
@@ -63,14 +65,16 @@ class Category(WebsiteGenerator):
 			for article in all_previous_category_articles:
 				article_doc = frappe.get_doc("Article", article)
 				article_doc.category = ""
+				article_doc.order = None
 				article_doc.save()
 			
 			# set parent_category fields for all the sub_cateogries
-			for article in self.articles:
+			for index, article in enumerate(self.articles):
 				article_doc = frappe.get_doc("Article", article.article)
 				if article_doc:
 					if not article_doc.category or article_doc.category == self.name:
 						article_doc.category = self.name
+						article_doc.order = index
 						article_doc.set_page_route()
 						article_doc.save()
 					else:

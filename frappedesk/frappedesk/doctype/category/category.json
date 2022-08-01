@@ -15,7 +15,8 @@
   "articles",
   "sub_categories",
   "route",
-  "linked_web_page"
+  "linked_web_page",
+  "order"
  ],
  "fields": [
   {
@@ -73,12 +74,17 @@
    "fieldtype": "Table",
    "label": "Sub Categories",
    "options": "Sub Category Item"
+  },
+  {
+   "fieldname": "order",
+   "fieldtype": "Data",
+   "label": "Order"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-17 18:00:52.983498",
+ "modified": "2022-08-01 05:40:32.588767",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Category",
