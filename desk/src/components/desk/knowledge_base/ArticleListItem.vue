@@ -30,7 +30,7 @@
 			<div class="sm:w-3/12">
 				<div class="w-full">
 					<div class="flex flex-row items-center space-x-1">
-						<div class="text-base font-normal">{{ article.author }}</div>
+						<div class="text-base font-normal">{{ article.author_name }}</div>
 					</div>
 				</div>
 			</div>

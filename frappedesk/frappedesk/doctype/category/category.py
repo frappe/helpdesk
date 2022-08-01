@@ -32,6 +32,11 @@ class Category(WebsiteGenerator):
 
 	def on_update(self):
 		self.update_article_and_sub_category_ordering()
+		if self.parent_category and not self.is_group:
+			parent_category_doc = frappe.get_doc("Category", self.parent_category)
+			if not next((x for x in parent_category_doc.sub_categories if x.sub_category == self.category_name), None):
+				parent_category_doc.append('sub_categories', {'sub_category': self.category_name})
+				parent_category_doc.save()
 
 	def update_article_and_sub_category_ordering(self):
 		if self.is_group:

@@ -48,6 +48,13 @@ export default {
 			this.$router.push(`/frappedesk/knowledge-base/${category.parent_category}/${category.name}`)
 		},
 	},
+	mounted() {
+		this.$socket.on('list_update', (data) => {
+			if (data['doctype'] == 'Category') {
+				this.$resources.categories.list.reload()
+			}
+		});
+	},
 	resources: {
 		categories() {
 			return {
