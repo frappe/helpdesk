@@ -12,14 +12,14 @@
 					</div>
 					<div v-if="category.expanded" class="pt-[16px] space-y-[16px] flex flex-col">
 						<div v-for="subCategory in category.children" :key="subCategory.name">
-							<div 
-								class="px-[12px] py-[4px] truncate rounded w-full" 
-								:class="subCategory.name === selectedCategory.name ? 'bg-gray-50' : ''" 
-								role="button"
-								@click="() => { selectedCategory = subCategory }"
-							> 
-								{{ subCategory.name }} 
-							</div>
+							<router-link :to="`/frappedesk/knowledge-base/${subCategory.parent_category}/${subCategory.name}`"> 
+								<div
+									class="px-[12px] py-[4px] truncate rounded w-full" 
+									:class="subCategory.name === selectedCategory.name ? 'bg-gray-50' : ''" 
+								>
+									{{ subCategory.name }} 
+								</div>
+							</router-link>
 						</div>
 					</div>
 				</div>
@@ -43,16 +43,14 @@ export default {
 
 		return { categories, selectedCategory }
 	},
-	watch: {
-		selectedCategory(category) {
-			this.$router.push(`/frappedesk/knowledge-base/${category.parent_category}/${category.name}`)
-		},
-	},
 	mounted() {
 		this.$socket.on('list_update', (data) => {
 			if (data['doctype'] == 'Category') {
 				this.$resources.categories.list.reload()
 			}
+		});
+		this.$event.on('select-category', (category) => {
+			this.selectedCategory = category
 		});
 	},
 	resources: {
@@ -63,7 +61,7 @@ export default {
 				fields: ['is_group', 'parent_category', 'name', 'order'],
 				onSuccess: (list) => {
 					let categories = []
-					let expandedFlag = false
+					let expandedFlag = this.selectedCategory ? true : false
 					list.forEach(category => {
 						if (category.is_group) {
 							categories.push({...category, children: [], expanded: expandedFlag ? false : true})
@@ -72,21 +70,22 @@ export default {
 					})
 					list.forEach(category => {
 						if (!category.is_group && category.parent_category && categories.find(c => c.name == category.parent_category)) {
-							if (!this.selectedCategory) {
-								this.selectedCategory = category
-							}
 							categories.find(c => c.name == category.parent_category).children.push(category)
 						}
 					})
-
 					categories.sort(function(c1, c2){return c1.order - c2.order});
 					for (let category of categories) {
 						if (category.children.length > 0) {
 							category.children.sort(function(c1, c2){return c1.order - c2.order});
+							if (!this.selectedCategory) {
+								this.selectedCategory = category.children[0]
+								this.$router.push({path: `/frappedesk/knowledge-base/${this.selectedCategory.parent_category}/${this.selectedCategory.name}`})
+							}
 						}
 					}
 
 					this.categories = categories
+					this.categories.find(cat => cat.name == this.selectedCategory.parent_category).expanded = true
 				}
 			}
 		}

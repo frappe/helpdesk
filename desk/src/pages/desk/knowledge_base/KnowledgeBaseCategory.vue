@@ -111,7 +111,16 @@ export default {
 			}
 		} 
 	},
+	watch: {
+		subCategory(val) {
+			this.$refs.articleList?.manager?.update({
+				filters: [['category', '=', val]],
+			})
+			this.$event.emit('select-category', {name: this.subCategory, parent_category: this.category})
+		}
+	},
 	mounted() {
+		this.$event.emit('select-category', {name: this.subCategory, parent_category: this.category})
 		this.$event.on('create_new_category', () => {
 			this.showCreateNewCategoryDialog = true
 		})
