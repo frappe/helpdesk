@@ -40,7 +40,7 @@ class Category(WebsiteGenerator):
 			for category in all_previous_sub_categories:
 				category_doc = frappe.get_doc("Category", category)
 				category_doc.parent_category = ""
-				category_doc.order = None
+				category_doc.order = 0
 				category_doc.save()
 
 			# set parent_category fields for all the sub_cateogries
@@ -65,7 +65,7 @@ class Category(WebsiteGenerator):
 			for article in all_previous_category_articles:
 				article_doc = frappe.get_doc("Article", article)
 				article_doc.category = ""
-				article_doc.order = None
+				article_doc.order = 0
 				article_doc.save()
 			
 			# set parent_category fields for all the sub_cateogries

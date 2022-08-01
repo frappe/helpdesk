@@ -45,7 +45,6 @@ export default {
 	},
 	watch: {
 		selectedCategory(category) {
-			console.log(category)
 			this.$router.push(`/frappedesk/knowledge-base/${category.parent_category}/${category.name}`)
 		},
 	},
@@ -73,14 +72,12 @@ export default {
 						}
 					})
 
-					console.log("before sorting : ", categories)
 					categories.sort(function(c1, c2){return c1.order - c2.order});
 					for (let category of categories) {
 						if (category.children.length > 0) {
 							category.children.sort(function(c1, c2){return c1.order - c2.order});
 						}
 					}
-					console.log("after sorting : ", categories)
 
 					this.categories = categories
 				}
