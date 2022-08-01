@@ -1,76 +1,80 @@
 <template>
-	<div class="text-[13px] font-normal p-5">
-		<ListManager
-			ref="articleList"
-			:options="{
-				doctype: 'Article',
-				fields: [
-					'title',
-					'author',
-					'author.full_name as author_name',
-					'views',
-					'modified'
-				],
-				filters: [['category', '=', subCategory]],
-				order_by: 'modified desc',
-				limit: 20
-			}"
-		>
-			<template #body="{ manager }">
-				<div>
-					<ArticleList :manager="manager" />
-				</div>
-			</template>
-		</ListManager>
-		<Dialog :options="{title: 'New Category'}" :show="showCreateNewCategoryDialog" @close="() => { 
-				showCreateNewCategoryDialog = false
-			}"
-		>
-			<template #body-content>
-				<div class="flex flex-col space-y-3">
+	<div class="flex flex-row w-full">
+		<SideBarMenu class="w-[173px] shrink-0 border-r" />
+		<div class="grow text-[13px] font-normal p-5">
+			<ListManager
+				ref="articleList"
+				:options="{
+					doctype: 'Article',
+					fields: [
+						'title',
+						'author',
+						'author.full_name as author_name',
+						'views',
+						'modified'
+					],
+					filters: [['category', '=', subCategory]],
+					order_by: 'modified desc',
+					limit: 20
+				}"
+			>
+				<template #body="{ manager }">
 					<div>
-						<Input label="Category name" type="text" @change="(val) => { 
-							newCategoryInputValues.name = val 
-							newCategoryInputErrors.name = ''
-						}" />
-						<ErrorMessage :message="newCategoryInputErrors.name" />
+						<ArticleList :manager="manager" />
 					</div>
+				</template>
+			</ListManager>
+			<Dialog :options="{title: 'New Category'}" :show="showCreateNewCategoryDialog" @close="() => { 
+					showCreateNewCategoryDialog = false
+				}"
+			>
+				<template #body-content>
+					<div class="flex flex-col space-y-3">
+						<div>
+							<Input label="Category name" type="text" @change="(val) => { 
+								newCategoryInputValues.name = val 
+								newCategoryInputErrors.name = ''
+							}" />
+							<ErrorMessage :message="newCategoryInputErrors.name" />
+						</div>
+						<div>
+							<Input label="Parent category" type="select" :options="parentCategories" @change="(val) => {
+								newCategoryInputValues.parent = val
+								newCategoryInputErrors.parent =	''
+							}" />
+							<ErrorMessage :message="newCategoryInputErrors.parent" />
+						</div>
+						<ErrorMessage :message="newCategoryInputErrors.others" />
+					</div>
+				</template>
+				<template #actions>
 					<div>
-						<Input label="Parent category" type="select" :options="parentCategories" @change="(val) => {
-							newCategoryInputValues.parent = val
-							newCategoryInputErrors.parent =	''
-						}" />
-						<ErrorMessage :message="newCategoryInputErrors.parent" />
+						<Button 
+							:loading="$resources.createNewCategory.loading"
+							appearance="primary" 
+							@click="$resources.createNewCategory.submit({
+								name: newCategoryInputValues.name,
+								parent: newCategoryInputValues.parent
+							})"
+						>
+							Add Category
+						</Button>
 					</div>
-					<ErrorMessage :message="newCategoryInputErrors.others" />
-				</div>
-			</template>
-			<template #actions>
-				<div>
-					<Button 
-						:loading="$resources.createNewCategory.loading"
-						appearance="primary" 
-						@click="$resources.createNewCategory.submit({
-							name: newCategoryInputValues.name,
-							parent: newCategoryInputValues.parent
-						})"
-					>
-						Add Category
-					</Button>
-				</div>
-			</template>
-		</Dialog>
+				</template>
+			</Dialog>
+		</div>
 	</div>
 </template>
 
 <script>
 import ListManager from '@/components/global/ListManager.vue'
+import SideBarMenu from '@/components/desk/knowledge_base/SideBarMenu.vue'
 import ArticleList from '@/components/desk/knowledge_base/ArticleList.vue'
 import { ErrorMessage } from 'frappe-ui'
 import { ref } from '@vue/reactivity'
 
 export default {
-	name: 'KnowledgeBaseCategory',
+	name: 'Category',
 	props: {
 		category: {
 			type: String,
@@ -85,6 +89,7 @@ export default {
 		ListManager,
 		ArticleList,
 		ErrorMessage,
+		SideBarMenu,
 	},
 	setup() {
 		const showCreateNewCategoryDialog = ref(false)
@@ -120,6 +125,7 @@ export default {
 		}
 	},
 	mounted() {
+		this.$event.emit('toggle_navbar_actions', 'Category')
 		this.$event.emit('select-category', {name: this.subCategory, parent_category: this.category})
 		this.$event.on('create_new_category', () => {
 			this.showCreateNewCategoryDialog = true

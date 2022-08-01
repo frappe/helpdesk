@@ -16,7 +16,7 @@
 			</div>
 			<div class="sm:w-6/12">
 				<router-link 
-					:to="`/frappedesk/articles/${article.name}`"
+					:to="`/frappedesk/knowledge-base/articles/${article.name}`"
 					class="flex items-center space-x-[8px]"
 				>
 					<div 
