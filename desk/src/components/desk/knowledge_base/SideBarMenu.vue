@@ -49,9 +49,14 @@ export default {
 				this.$resources.categories.list.reload()
 			}
 		});
-		this.$event.on('select-category', (category) => {
-			this.selectedCategory = category
+		this.$event.on('select_category', (category) => {
+			if (category) {
+				this.selectedCategory = category
+			}
 		});
+	},
+	umbounted() {
+		this.$event.off('select_category')
 	},
 	resources: {
 		categories() {
@@ -60,6 +65,7 @@ export default {
 				doctype: 'Category',
 				fields: ['is_group', 'parent_category', 'name', 'order'],
 				onSuccess: (list) => {
+					console.log(this.selectedCategory)
 					let categories = []
 					let expandedFlag = this.selectedCategory ? true : false
 					list.forEach(category => {

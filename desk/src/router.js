@@ -76,6 +76,11 @@ const routes = [
 				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
 				children: [
 					{
+						path: '',
+						name: 'CategoryList',
+						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
+					},
+					{
 						path: ':category/:subCategory',
 						name: 'Category',
 						props: true,

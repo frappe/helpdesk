@@ -121,12 +121,12 @@ export default {
 			this.$refs.articleList?.manager?.update({
 				filters: [['category', '=', val]],
 			})
-			this.$event.emit('select-category', {name: this.subCategory, parent_category: this.category})
+			this.$event.emit('select_category', {name: this.subCategory, parent_category: this.category})
 		}
 	},
 	mounted() {
 		this.$event.emit('toggle_navbar_actions', 'Category')
-		this.$event.emit('select-category', {name: this.subCategory, parent_category: this.category})
+		this.$event.emit('select_category',  (this.category && this.subCategory ) ? {name: this.subCategory, parent_category: this.category} : null)
 		this.$event.on('create_new_category', () => {
 			this.showCreateNewCategoryDialog = true
 		})
