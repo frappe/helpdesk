@@ -19,8 +19,12 @@
 					</template>
 				</Dropdown>
 			</div>
-			<div v-else-if="actionType == 'Article'" class="flex flex-row space-x-[12px]">
-				<Button appearane="secondary">Save</Button>
+			<div v-else-if="actionType == 'Published Article'" class="flex flex-row space-x-[12px]">
+				<Button appearane="secondary">Edit</Button>
+				<Button appearance="secondary">Unpublish</Button>
+			</div>
+			<div v-else-if="actionType == 'Draft Article'" class="flex flex-row space-x-[12px]">
+				<Button appearane="secondary">Edit</Button>
 				<Button appearance="primary">Publish</Button>
 			</div>
 		</div>

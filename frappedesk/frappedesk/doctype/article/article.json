@@ -9,8 +9,10 @@
  "field_order": [
   "title",
   "category",
+  "order",
   "published",
-  "column_break_4",
+  "column_break_7",
+  "published_on",
   "author",
   "content_section",
   "content_type",
@@ -20,7 +22,7 @@
   "views",
   "helpful",
   "not_helpful",
-  "order"
+  "note"
  ],
  "fields": [
   {
@@ -110,20 +112,31 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "order",
    "fieldtype": "Data",
    "label": "Order"
+  },
+  {
+   "depends_on": "eval:doc.published",
+   "fieldname": "published_on",
+   "fieldtype": "Datetime",
+   "label": "Published On"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Long Text",
+   "label": "Note"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-08-01 06:57:19.629190",
+ "modified": "2022-08-08 08:24:17.192038",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Article",
