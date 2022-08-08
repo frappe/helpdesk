@@ -14,4 +14,3 @@ frappedesk.patches.create_and_set_contact_using_user_who_created_the_ticket
 frappedesk.patches.refactor_ticket_activity_grammar
 frappedesk.patches.add_default_assignment_rule
 frappedesk.patches.add_support_redirect_to_tickets
-frappedesk.patches.article_and_category_ordering

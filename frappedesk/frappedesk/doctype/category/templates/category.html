@@ -6,26 +6,27 @@
 {% if is_group %}
 <div class="container d-flex flex-wrap">
     {% set max_articles = 6 %}
-    {% for sub_category in sub_categories %}
+    {% set sub_categories = frappe.get_all("Category", filters={"parent_category": name}, fields=["*"]) %}
+    {% set ordered_sub_categories = sub_categories|sort(attribute='order') %}
+    {% for sub_category in ordered_sub_categories %}
     <div class="col-sm-6 col-12 mb-8 p-0">
-        {% set sub_category_doc = frappe.get_doc("Category", sub_category.sub_category) %}
-        {% set articles = sub_category_doc.articles %}
+        {% set articles = frappe.get_all("Article", filters={"category": sub_category.name, "published": True}, fields=["*"]) %}
+        {% set ordered_articles = articles|sort(attribute='order') %}
         <div class="d-flex">
-            <h3 role="button" class="font-weight-bold" onclick="window.location='/{{ sub_category_doc.route }}'">{{ sub_category_doc.category_name }}</h3>
-            <h3 class="font-weight-light ml-1">({{ articles|length }})</h3>
+            <h3 role="button" class="font-weight-bold" onclick="window.location='/{{ sub_category.route }}'">{{ sub_category.category_name }}</h3>
+            <h3 class="font-weight-light ml-1">({{ ordered_articles|length }})</h3>
         </div>
-        {% for article in articles %}
-        {% set article_doc = frappe.get_doc("Article", article.article) %}
+        {% for article in ordered_articles %}
         {% if loop.index < max_articles %}
         <div class="article-list py-1">
             <svg class="pb-1" width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16 6.94C15.9896 6.84813 15.9695 6.75763 15.94 6.67V6.58C15.8919 6.47718 15.8278 6.38267 15.75 6.3L9.75 0.3C9.66734 0.222216 9.57282 0.158081 9.47 0.11H9.38L9.06 0H3C2.20435 0 1.44129 0.316071 0.87868 0.87868C0.316071 1.44129 0 2.20435 0 3V17C0 17.7956 0.316071 18.5587 0.87868 19.1213C1.44129 19.6839 2.20435 20 3 20H13C13.7956 20 14.5587 19.6839 15.1213 19.1213C15.6839 18.5587 16 17.7956 16 17V7C16 7 16 7 16 6.94ZM10 3.41L12.59 6H10V3.41ZM14 17C14 17.2652 13.8946 17.5196 13.7071 17.7071C13.5196 17.8946 13.2652 18 13 18H3C2.73478 18 2.48043 17.8946 2.29289 17.7071C2.10536 17.5196 2 17.2652 2 17V3C2 2.73478 2.10536 2.48043 2.29289 2.29289C2.48043 2.10536 2.73478 2 3 2H8V7C8 7.26522 8.10536 7.51957 8.29289 7.70711C8.48043 7.89464 8.73478 8 9 8H14V17Z" fill="#E2E6E9"/>
             </svg>                
-            <a href="/{{ article_doc.route }}">{{ article_doc.title }}</a>
+            <a href="/{{ article.route }}">{{ article.title }}</a>
         </div>
         {% elif loop.index == max_articles %}
         <div class="mt-2 d-flex">
-            <a class="font-weight-bold" href='/{{ sub_category_doc.route }}'>View all articles</a>
+            <a class="font-weight-bold" href='/{{ sub_category.route }}'>View all articles</a>
             <i class="pl-2 bi bi-chevron-right"></i>
         </div>
         {% endif %}
@@ -35,36 +36,37 @@
 </div>
 {% else %}
 <div class="container mb-5">
+    {% set articles = frappe.get_all("Article", filters={"category": name, "published": True}, fields=["*"]) %}
+    {% set ordered_articles = articles|sort(attribute='order') %}
     <div class="d-flex">
         <h3 class="font-weight-bold">{{ category_name }}</h3>
-        <h3 class="font-weight-light ml-1">({{ articles|length }})</h3>
+        <h3 class="font-weight-light ml-1">({{ ordered_articles|length }})</h3>
     </div>
     {% set max_articles = 6 %}
     <div class="d-flex flex-wrap">
         <div class="col-sm-6 col-12 p-0">
-            {% for article in articles %}
-            {% set article_doc = frappe.get_doc("Article", article.article, filters={"category": ["=", name], "published": ["=", "1"]}, fields=['title', 'route', 'creation']) %}
-            {% if (loop.index <= (articles|length)/2 + 1) 
+            {% for article in ordered_articles %}
+            {% if (loop.index <= (ordered_articles|length)/2 + 1) 
                 or (loop.index <= max_articles) %}
             <div class="article-list py-1">
                 <svg class="pb-1" width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M16 6.94C15.9896 6.84813 15.9695 6.75763 15.94 6.67V6.58C15.8919 6.47718 15.8278 6.38267 15.75 6.3L9.75 0.3C9.66734 0.222216 9.57282 0.158081 9.47 0.11H9.38L9.06 0H3C2.20435 0 1.44129 0.316071 0.87868 0.87868C0.316071 1.44129 0 2.20435 0 3V17C0 17.7956 0.316071 18.5587 0.87868 19.1213C1.44129 19.6839 2.20435 20 3 20H13C13.7956 20 14.5587 19.6839 15.1213 19.1213C15.6839 18.5587 16 17.7956 16 17V7C16 7 16 7 16 6.94ZM10 3.41L12.59 6H10V3.41ZM14 17C14 17.2652 13.8946 17.5196 13.7071 17.7071C13.5196 17.8946 13.2652 18 13 18H3C2.73478 18 2.48043 17.8946 2.29289 17.7071C2.10536 17.5196 2 17.2652 2 17V3C2 2.73478 2.10536 2.48043 2.29289 2.29289C2.48043 2.10536 2.73478 2 3 2H8V7C8 7.26522 8.10536 7.51957 8.29289 7.70711C8.48043 7.89464 8.73478 8 9 8H14V17Z" fill="#E2E6E9"/>
                 </svg>
-                <a href="/{{ article_doc.route }}">{{ article_doc.title }}</a>
+                <a href="/{{ article.route }}">{{ article.title }}</a>
             </div>
             {% endif %}
             {% endfor %}
         </div>
         <div class="col-sm-6 col-12 p-0">
-            {% for article in articles %}
-            {% set article_doc = frappe.get_doc("Article", article.article, filters={"category": ["=", name], "published": ["=", "1"]}, fields=['title', 'route', 'creation']) %}
-            {% if (loop.index > (articles|length)/2 + 1) 
+            {% for article in ordered_articles %}
+            
+            {% if (loop.index > (ordered_articles|length)/2 + 1) 
                 and (loop.index > max_articles)%}
             <div class="article-list py-1">
                 <svg class="pb-1" width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M16 6.94C15.9896 6.84813 15.9695 6.75763 15.94 6.67V6.58C15.8919 6.47718 15.8278 6.38267 15.75 6.3L9.75 0.3C9.66734 0.222216 9.57282 0.158081 9.47 0.11H9.38L9.06 0H3C2.20435 0 1.44129 0.316071 0.87868 0.87868C0.316071 1.44129 0 2.20435 0 3V17C0 17.7956 0.316071 18.5587 0.87868 19.1213C1.44129 19.6839 2.20435 20 3 20H13C13.7956 20 14.5587 19.6839 15.1213 19.1213C15.6839 18.5587 16 17.7956 16 17V7C16 7 16 7 16 6.94ZM10 3.41L12.59 6H10V3.41ZM14 17C14 17.2652 13.8946 17.5196 13.7071 17.7071C13.5196 17.8946 13.2652 18 13 18H3C2.73478 18 2.48043 17.8946 2.29289 17.7071C2.10536 17.5196 2 17.2652 2 17V3C2 2.73478 2.10536 2.48043 2.29289 2.29289C2.48043 2.10536 2.73478 2 3 2H8V7C8 7.26522 8.10536 7.51957 8.29289 7.70711C8.48043 7.89464 8.73478 8 9 8H14V17Z" fill="#E2E6E9"/>
                 </svg>                    
-                <a href="/{{ article_doc.route }}">{{ article_doc.title }}</a>
+                <a href="/{{ article.route }}">{{ article.title }}</a>
             </div>
             {% endif %}
             {% endfor %}
