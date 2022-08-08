@@ -18,6 +18,24 @@ export default {
 		ArticleTitleAndContent,
 		ArticleDetails
 	},
+	mounted() {
+		this.$event.on('edit_current_article', () => {
+			// this.$router.push({name: 'EditArticle', path: `/frappedesk/knowledge-base/articles/${this.articleId}/edit`})
+			console.log('edit_current_article')
+			console.log(this.articleId)
+		})
+		this.$event.on('publish_current_article', () => {
+			this.$resources.article.setValue.submit({published:  true})
+		})
+		this.$event.on('unpublish_current_article', () => {
+			this.$resources.article.setValue.submit({published:  false})
+		})
+	},
+	unmounted() {
+		this.$event.off('edit_current_article')
+		this.$event.off('publish_current_article')
+		this.$event.off('unpublish_current_article')
+	},
 	computed: {
 		isNew() {
 			return this.articleId ? false : true
@@ -44,7 +62,7 @@ export default {
 					doctype: 'Article',
 					name: this.articleId,
 					setValue: {
-						onSuccess: (doc) => {
+						onSuccess: () => {
 							this.$toast({
 								title: 'Article updated',
 								customIcon: 'circle-check',

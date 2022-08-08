@@ -19,13 +19,10 @@
 					</template>
 				</Dropdown>
 			</div>
-			<div v-else-if="actionType == 'Published Article'" class="flex flex-row space-x-[12px]">
-				<Button appearane="secondary">Edit</Button>
-				<Button appearance="secondary">Unpublish</Button>
-			</div>
-			<div v-else-if="actionType == 'Draft Article'" class="flex flex-row space-x-[12px]">
-				<Button appearane="secondary">Edit</Button>
-				<Button appearance="primary">Publish</Button>
+			<div v-else class="flex flex-row space-x-[12px]">
+				<Button appearane="secondary" @click="() => { $event.emit('edit_current_article') }">Edit</Button>
+				<Button v-if="actionType == 'Published Article'" appearance="secondary" @click="() => { $event.emit('unpublish_current_article') }">Unpublish</Button>
+				<Button v-else-if="actionType == 'Draft Article'" appearance="primary" @click="() => { $event.emit('publish_current_article') }">Publish</Button>
 			</div>
 		</div>
 	</div>
