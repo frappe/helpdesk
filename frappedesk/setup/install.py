@@ -197,7 +197,7 @@ def add_default_agent_groups():
 	agent_groups = ["Billing", "Product Experts"]
 
 	for agent_group in agent_groups:
-		if not frappe.db.exists("Agent Groups", agent_group):
+		if not frappe.db.exists("Agent Group", agent_group):
 			agent_group_doc = frappe.new_doc("Agent Group")
 			agent_group_doc.team_name = agent_group
 			agent_group_doc.insert()
