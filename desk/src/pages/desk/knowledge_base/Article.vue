@@ -1,7 +1,7 @@
 <template>
 	<div class="pt-[17px] pl-[18px] pr-[24px]">
-		<div class="flex flex-row space-x-[24px]">
-			<ArticleTitleAndContent class="grow" :title="article.title" :content="article.content" />
+		<div class="flex flex-row space-x-[24px] h-full">
+			<ArticleTitleAndContent :editable="editMode" class="grow" :title="article.title" :content="article.content" :articleResource="$resources.article" @exit_edit_mode="() => { editMode = false }" />
 			<ArticleDetails v-if="article" class="w-[220px] shrink-0" :article="article" :articleResource="$resources.article" />
 		</div>
 	</div>
@@ -10,6 +10,7 @@
 <script>
 import ArticleTitleAndContent from '../../../components/desk/knowledge_base/ArticleTitleAndContent.vue'
 import ArticleDetails from '../../../components/desk/knowledge_base/ArticleDetails.vue'
+import { ref } from '@vue/reactivity'
 
 export default {
 	name: 'Article',
@@ -20,9 +21,8 @@ export default {
 	},
 	mounted() {
 		this.$event.on('edit_current_article', () => {
-			// this.$router.push({name: 'EditArticle', path: `/frappedesk/knowledge-base/articles/${this.articleId}/edit`})
-			console.log('edit_current_article')
-			console.log(this.articleId)
+			this.editMode = true
+			this.$event.emit('toggle_navbar_actions', 'Edit Article')
 		})
 		this.$event.on('publish_current_article', () => {
 			this.$resources.article.setValue.submit({published:  true})
@@ -35,6 +35,13 @@ export default {
 		this.$event.off('edit_current_article')
 		this.$event.off('publish_current_article')
 		this.$event.off('unpublish_current_article')
+	},
+	setup() {
+		const editMode = ref(false)
+
+		return {
+			editMode
+		}
 	},
 	computed: {
 		isNew() {

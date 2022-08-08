@@ -19,10 +19,14 @@
 					</template>
 				</Dropdown>
 			</div>
-			<div v-else class="flex flex-row space-x-[12px]">
-				<Button appearane="secondary" @click="() => { $event.emit('edit_current_article') }">Edit</Button>
+			<div v-else-if="['Published Article', 'Draft Article'].includes(actionType)" class="flex flex-row space-x-[12px]">
+				<Button appearance="secondary" @click="() => { $event.emit('edit_current_article') }">Edit</Button>
 				<Button v-if="actionType == 'Published Article'" appearance="secondary" @click="() => { $event.emit('unpublish_current_article') }">Unpublish</Button>
 				<Button v-else-if="actionType == 'Draft Article'" appearance="primary" @click="() => { $event.emit('publish_current_article') }">Publish</Button>
+			</div>
+			<div v-else-if="actionType === 'Edit Article'" class="flex flex-row space-x-[12px]">
+				<Button appearance="secondary" @click="() => { $event.emit('save_current_article') }">Save</Button>
+				<Button appearance="primary" @click="() => { $event.emit('save_and_publish_current_article') }">Publish</Button>
 			</div>
 		</div>
 	</div>
