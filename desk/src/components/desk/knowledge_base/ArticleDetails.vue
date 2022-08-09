@@ -9,13 +9,13 @@
 					<FeatherIcon name="external-link" class="w-4" />
 				</a>
 			</div>
-			<Input v-if="!$resources.users.loading" type="select" label="Author" :value="article.author" @input="(val) => setArticleDetail('author', val)" :options="$resources.users.data.map(x => x.name)" />
-			<Input v-if="!$resources.categories.loading" type="select" label="Category" :value="article.category" @input="(val) => setArticleDetail('category', val)" :options="$resources.categories.data.map(x => x.name)" />
+			<Input v-if="!$resources.users.loading" type="select" label="Author" :value="isNew ? user.user : article.author" @input="(val) => setArticleDetail('author', val)" :options="$resources.users.data.map(x => x.name)" />
+			<Input v-if="!$resources.categories.loading" type="select" label="Category" :value="isNew ? newArticleTempValues.category : article.category" @input="(val) => setArticleDetail('category', val)" :options="$resources.categories.data.map(x => x.name)" />
 			<Input type="textarea" label="Note" :value="article.note" @input="(val) => setArticleDetail('note', val)" :debounce="500" placeholder="Start typing to save..." />
-			<div class="flex flex-row items-center text-[12px] text-gray-700">
+			<div class="flex flex-row items-center text-[12px] text-gray-700" v-if="!isNew">
 				<div class="flex flex-row items-center space-x-[6px]">
 					<FeatherIcon name="eye" class="w-[16px] stroke-gray-500" />
-					<div class="w-[28px] text-left">{{ article.views }}</div>
+					<div class="w-[28px] text-left">{{ article.views || 0 }}</div>
 				</div>
 				<div class="flex flex-row items-center space-x-[6px]">
 					<FeatherIcon name="smile" class="w-[14px] stroke-gray-500" />
@@ -33,13 +33,25 @@
 <script>
 import { FeatherIcon } from 'frappe-ui'
 import CustomComboboxInput from '@/components/global/CustomComboboxInput.vue'
+import { inject } from '@vue/runtime-core'
 
 export default {
 	name: 'ArticleDetails',
-	props: ['article', 'articleResource'],
+	props: ['article', 'articleResource', 'isNew'],
 	components: {
 		FeatherIcon,
 		CustomComboboxInput
+	},
+	setup() {
+		const user = inject('user')
+		const updateNewArticleInput = inject('updateNewArticleInput')
+		const newArticleTempValues = inject('newArticleTempValues')
+
+		return {
+			user,
+			updateNewArticleInput,
+			newArticleTempValues
+		}
 	},
 	resources: {
 		users() {
@@ -52,7 +64,12 @@ export default {
 						enabled: 1
 					}
 				},
-				auto: true
+				auto: true,
+				onSuccess: (data) => {
+					if (this.isNew) {
+						this.setArticleDetail('author', this.user.user)
+					}
+				}
 			}
 		},
 		categories() {
@@ -63,15 +80,24 @@ export default {
 					fields: ['name'],
 					filters: {is_group: ['=', 0]},
 				},
-				auto: true
+				auto: true,
+				onSuccess: (data) => {
+					if (this.isNew) {
+						this.setArticleDetail('category', this.$route.query.category ? this.$route.query.category : data.map(x => x.name)[0])
+					}
+				}
 			}
 		},
 	},
 	methods: {
 		setArticleDetail(field, value) {
-			let params = {}
-			params[field] = value
-			this.articleResource.setValue.submit(params)
+			if (!this.isNew) {
+				let params = {}
+				params[field] = value
+				this.articleResource.setValue.submit(params)
+			} {
+				this.updateNewArticleInput({ field, value })
+			}
 		}
 	}
 }

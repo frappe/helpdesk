@@ -1,16 +1,16 @@
 <template>
 	<div class="pt-[17px] pl-[18px] pr-[24px]">
 		<div class="flex flex-row space-x-[24px] h-full">
-			<ArticleTitleAndContent :editable="editMode" class="grow" :title="article.title" :content="article.content" :articleResource="$resources.article" @exit_edit_mode="() => { editMode = false }" />
-			<ArticleDetails v-if="article" class="w-[220px] shrink-0" :article="article" :articleResource="$resources.article" />
+			<ArticleTitleAndContent :isNew="isNew" :editable="editMode" class="grow" :title="article.title" :content="article.content" :articleResource="$resources.article" @exit_edit_mode="() => { editMode = false }" />
+			<ArticleDetails v-if="article" :isNew="isNew" class="w-[220px] shrink-0" :article="article" :articleResource="$resources.article" />
 		</div>
 	</div>
 </template>
 
 <script>
-import ArticleTitleAndContent from '../../../components/desk/knowledge_base/ArticleTitleAndContent.vue'
-import ArticleDetails from '../../../components/desk/knowledge_base/ArticleDetails.vue'
-import { ref } from '@vue/reactivity'
+import ArticleTitleAndContent from '@/components/desk/knowledge_base/ArticleTitleAndContent.vue'
+import ArticleDetails from '@/components/desk/knowledge_base/ArticleDetails.vue'
+import { ref, provide } from 'vue'
 
 export default {
 	name: 'Article',
@@ -20,27 +20,45 @@ export default {
 		ArticleDetails
 	},
 	mounted() {
-		this.$event.on('edit_current_article', () => {
-			this.editMode = true
-			this.$event.emit('toggle_navbar_actions', 'Edit Article')
-		})
-		this.$event.on('publish_current_article', () => {
-			this.$resources.article.setValue.submit({published:  true})
-		})
-		this.$event.on('unpublish_current_article', () => {
-			this.$resources.article.setValue.submit({published:  false})
-		})
-	},
-	unmounted() {
-		this.$event.off('edit_current_article')
-		this.$event.off('publish_current_article')
-		this.$event.off('unpublish_current_article')
+		if (!this.articleId) {
+			// toggle nav bar actions for new article
+			const actions = [
+				{ label: 'Cancel', appearance:'danger', handler: () => {
+					this.$router.push('/frappedesk/knowledge-base/')
+				}},
+				{ label: 'Save', appearance: 'primary', handler: () => { this.saveNewArticle() }, dropdown: [
+					{ label: 'Publish', appearance: 'secondary', handler: () => { this.saveNewArticle(true) } }
+				] },
+			]
+			this.$event.emit('toggle_navbar_actions', ({type: "New Article", actions}))
+		}
+
+		this.saveNewArticle = (publish=false) => {
+			this.insertArticle(publish)
+		}
 	},
 	setup() {
 		const editMode = ref(false)
+		provide('editMode', editMode)
+		
+		const newArticleTempValues = ref({})
+		const updateNewArticleInput = ref((input) => {
+			newArticleTempValues.value[input.field] = input.value
+		})
+		provide('updateNewArticleInput', updateNewArticleInput)
+		provide('newArticleTempValues', newArticleTempValues)
+
+		const saveNewArticle = ref(() => {})
+		provide('saveNewArticle', saveNewArticle)
+
+		const saveArticleTitleAndContent = ref(() => {})
+		provide('saveArticleTitleAndContent', saveArticleTitleAndContent)
 
 		return {
-			editMode
+			editMode,
+			newArticleTempValues,
+			saveNewArticle,
+			saveArticleTitleAndContent,
 		}
 	},
 	computed: {
@@ -52,12 +70,21 @@ export default {
 				const doc = this.$resources.article.doc
 				
 				if (doc) {
-					this.$event.emit('toggle_navbar_actions', doc.published ? 'Published Article' : 'Draft Article')
+					const actions = [
+						{ label: 'Edit', appearance:'secondary', handler: () => {
+							this.editMode = true
+						}},
+						{ label: doc.published ? 'Unpublish' : 'Publish', appearance: doc.published ? 'secondary' : 'primary', handler: () => {
+							this.editMode = false
+							this.$resources.article.setValue.submit({published: !doc.published})
+						}}
+					]
+					this.$event.emit('toggle_navbar_actions', ({type: doc.published ? 'Published Article' : 'Draft Article', actions}))
 				}
 
 				return doc || {}
 			} 
-			
+
 			return {}
 		}
 	},
@@ -76,9 +103,10 @@ export default {
 								appearance: 'success'
 							})
 						},
-						onError: () => {
+						onError: (err) => {
 							this.$toast({
 								title: 'Error while updating article',
+								text: err,
 								customIcon: 'circle-fail',
 								appearance: 'danger',
 							})
@@ -86,9 +114,74 @@ export default {
 					}
 				}
 			} else {
-				return false
+				return {}
+			}
+		},
+		newArticle() {
+			return {
+				method: 'frappe.client.insert',
+				onSuccess: (doc) => {
+					this.$router.push({path: '/frappedesk/knowledge-base/'})
+				},
+				onError: (err) => {
+					this.$toast({
+						title: 'Error while creating article',
+						text: err,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
+			 }
+		}
+	},
+	watch: {
+		editMode(val) {
+			if (val) {
+				const actions = [
+					{ label: 'Cancel', appearance:'danger', handler: () => {
+						this.$router.go()
+					}},
+					{ label: 'Save', appearance: 'primary', handler: () => { this.saveArticleTitleAndContent() }, dropdown: [
+						{ label: 'Publish', appearance: 'secondary', handler: () => { this.saveArticleTitleAndContent(true) } }
+					] },
+				]
+				this.$event.emit('toggle_navbar_actions', ({type: "Edit Article", actions}))
 			}
 		}
+	},
+	methods: {
+		insertArticle(publish=false) {
+			const validateInputs = (input) => {
+				if (!input.title || input.title == "") {
+					return false
+				}
+				if (!input.content || input.content.replaceAll(' ', '') == '<p></p>') {
+					return false
+				}
+				if (!input.author) {
+					return false
+				}
+				if (!input.category) {
+					return false
+				}
+
+				return true
+			}
+
+			if (validateInputs(this.newArticleTempValues)) {
+				this.$resources.newArticle.submit({
+					doc: {
+						doctype: 'Article',
+						title: this.newArticleTempValues.title,
+						content: this.newArticleTempValues.content,
+						author: this.newArticleTempValues.author,
+						category: this.newArticleTempValues.category,
+						note: this.insertArticle.note,
+						published: publish
+					}
+				})
+			}
+		},
 	}
 }
 </script>

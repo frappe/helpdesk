@@ -65,7 +65,6 @@ export default {
 				doctype: 'Category',
 				fields: ['is_group', 'parent_category', 'name', 'order'],
 				onSuccess: (list) => {
-					console.log(this.selectedCategory)
 					let categories = []
 					let expandedFlag = this.selectedCategory ? true : false
 					list.forEach(category => {

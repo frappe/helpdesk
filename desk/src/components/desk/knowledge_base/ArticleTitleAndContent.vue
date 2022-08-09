@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div v-if="!editable" class="flex flex-col space-y-[16px]">
+		<div v-if="!editable && !isNew" class="flex flex-col space-y-[16px]">
 			<div class="font-semibold text-[24px] prose prose-p:my-1"> {{ title }} </div>
 			<div v-html="content"></div>
 		</div>
@@ -39,34 +39,52 @@
 <script>
 import CustomTextEditor from '@/components/global/CustomTextEditor.vue'
 import TextEditorMenuItem from '@/components/global/TextEditorMenuItem.vue'
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 
 export default {
 	name: 'ArticleTitleAndContent',
-	props: ['title', 'content', 'editable', 'articleResource'],
+	props: ['title', 'content', 'editable', 'articleResource', 'isNew'],
 	components: {
 		CustomTextEditor,
 		TextEditorMenuItem
 	},
 	mounted() {
-		this.$event.on('save_current_article', () => {
-			this.save()
+		this.$event.on('save_current_article', (publish=false) => {
+			this.save(publish)
 		})
 
-		this.$event.on('save_and_publish_current_article', () => {
-			this.save(true)
-		})
+		this.saveArticleTitleAndContent = this.save
 	},
 	unmounted() {
-
+		this.$event.off('save_current_article')
+	},
+	watch: {
+		tempNewTitle(val) {
+			if (this.isNew) {
+				this.updateNewArticleInput({ field: 'title', value: val })
+			}
+		},
+		tempNewContent(val) {
+			if (this.isNew) {
+				this.updateNewArticleInput({ field: 'content', value: val })
+			}
+		}
 	},
 	setup(props) {
 		const tempNewTitle = ref(props.title)
 		const tempNewContent = ref(props.content)
 
+		const editMode = inject('editMode')
+		const updateNewArticleInput = inject('updateNewArticleInput')
+
+		const saveArticleTitleAndContent = inject('saveArticleTitleAndContent')
+
 		return {
 			tempNewTitle,
-			tempNewContent
+			tempNewContent,
+			editMode,
+			updateNewArticleInput,
+			saveArticleTitleAndContent
 		}
 	},
 	methods: {
@@ -76,7 +94,7 @@ export default {
 				content: this.tempNewContent, 
 				published: publish
 			})
-			this.$emit('exit_edit_mode')
+			this.editMode = false
 		}
 	}
 }

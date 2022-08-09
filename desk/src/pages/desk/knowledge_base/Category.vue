@@ -125,11 +125,15 @@ export default {
 		}
 	},
 	mounted() {
-		this.$event.emit('toggle_navbar_actions', 'Category')
+		const actions = [
+			{ label: 'Add article', handler: () => { this.$router.push({name: 'NewArticle', query: { category: this.subCategory }}) }, appearance: 'primary', dropdown: [
+				{ label: 'Add category', handler: () => {
+					this.showCreateNewCategoryDialog = true
+				}}
+			] },
+		]
+		this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
 		this.$event.emit('select_category',  (this.category && this.subCategory ) ? {name: this.subCategory, parent_category: this.category} : null)
-		this.$event.on('create_new_category', () => {
-			this.showCreateNewCategoryDialog = true
-		})
 	},
 	unmounted() {
 		this.$event.off('create_new_category')
