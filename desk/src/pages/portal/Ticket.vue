@@ -97,7 +97,7 @@
 														>
 															Send
 														</Button>
-														<Button @click="() => {editing = false}">Cancel</Button>
+														<Button @click="cancelEditing">Cancel</Button>
 														<div class="flex flex-row items-center space-x-2">
 															<CustomIcons :class="showTextFormattingMenu ? 'bg-gray-200' : ''" name="text-formatting" class="h-7 w-7 rounded p-1" role="button" @click="() => { showTextFormattingMenu = !showTextFormattingMenu}"/>
 															<FileUploader @success="(file) => attachments.push(file)">
@@ -209,14 +209,20 @@ export default {
 					this.submitConversation()
 				}
 			}
-			if ((e.metaKey || e.ctrlKey) && e.keyCode == 75) {
+			else if ((e.metaKey || e.ctrlKey) && e.keyCode == 75) {
 				this.$refs.replyEditor.insertLink()
+			}
+			else if (e.keyCode === 27) {
+				this.cancelEditing()
 			}
 		},
 		startEditing() {
 			this.editing = true
 			this.delayedConversationScroll()
 			this.$refs.replyEditor.focusEditor()
+		},
+		cancelEditing() {
+			this.editing = false
 		},
 		delayedConversationScroll() {
 			function delay(time) {

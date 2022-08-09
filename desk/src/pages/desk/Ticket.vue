@@ -320,13 +320,16 @@ export default {
 			delay(1000).then(() => this.scrollConversationsToBottom = false)
 		},
 		handleShortcuts(e) {
-			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode === 13) {
 				if (!this.sendingDissabled) {
 					this.submit()
 				}
 			}
-			if ((e.metaKey || e.ctrlKey) && e.keyCode == 75) {
+			else if ((e.metaKey || e.ctrlKey) && e.keyCode === 75) {
 				this.$refs.replyEditor.insertLink()
+			}
+			else if (e.keyCode === 27) {
+				this.cancelEditing()
 			}
 		},
 		submit() {
