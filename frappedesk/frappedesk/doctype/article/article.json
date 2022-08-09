@@ -2,7 +2,6 @@
  "actions": [],
  "allow_guest_to_view": 1,
  "allow_rename": 1,
- "autoname": "field:title",
  "creation": "2022-02-08 18:13:42.994713",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -10,8 +9,10 @@
  "field_order": [
   "title",
   "category",
+  "order",
   "published",
-  "column_break_4",
+  "column_break_7",
+  "published_on",
   "author",
   "content_section",
   "content_type",
@@ -20,7 +21,8 @@
   "route",
   "views",
   "helpful",
-  "not_helpful"
+  "not_helpful",
+  "note"
  ],
  "fields": [
   {
@@ -52,7 +54,6 @@
   {
    "fieldname": "route",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Route"
   },
   {
@@ -111,19 +112,34 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_4",
+   "fieldname": "order",
+   "fieldtype": "Data",
+   "label": "Order"
+  },
+  {
+   "depends_on": "eval:doc.published",
+   "fieldname": "published_on",
+   "fieldtype": "Datetime",
+   "label": "Published On"
+  },
+  {
+   "fieldname": "column_break_7",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Long Text",
+   "label": "Note"
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-02-17 18:00:29.892591",
+ "modified": "2022-08-08 08:24:17.192038",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Article",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -151,6 +167,7 @@
    "write": 1
   }
  ],
+ "route": "route",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

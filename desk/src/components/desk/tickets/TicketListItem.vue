@@ -1,4 +1,4 @@
-––<template>
+<template>
 	<div class="block select-none rounded-[6px] py-[7px] pl-[11px] pr-[9px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
 		<div 
 			v-if="ticket"

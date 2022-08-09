@@ -16,6 +16,11 @@ class Article(WebsiteGenerator):
 		if self.category:
 			self.route = self.get_page_route()
 
+		if not self.published:
+			self.published_on = None
+		if not self.published_on and self.published:
+			self.published_on = frappe.utils.now()
+
 	def set_page_route(self):
 		self.route = self.get_page_route()
 

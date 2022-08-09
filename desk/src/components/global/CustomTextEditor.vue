@@ -1,5 +1,5 @@
 <template>
-	<div class="border border-gray-300 rounded-[8px] p-[12px]" v-if="show">
+	<div v-if="show">
 		<slot name="main">
 			<slot v-if="editor" name="top-section" :editor="editor"></slot>
 			<div @click="editor?.commands.focus()">

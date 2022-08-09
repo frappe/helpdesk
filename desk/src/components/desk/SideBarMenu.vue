@@ -129,6 +129,13 @@ export default {
 				children: [],
 			},
 			{
+				label: 'Knowledge Base',
+				icon: 'knowledge-base',
+				to: {
+					path: '/frappedesk/knowledge-base',
+				}
+			},
+			{
 				label: 'Contacts',
 				icon: 'customers',
 				to: {

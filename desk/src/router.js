@@ -71,6 +71,36 @@ const routes = [
 				}
 			},
 			{
+				path: 'knowledge-base',
+				name: 'KnowledgeBase',
+				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
+				children: [
+					{
+						path: '',
+						name: 'CategoryList',
+						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
+					},
+					{
+						path: ':category/:subCategory',
+						name: 'Category',
+						props: true,
+						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
+					},
+					{
+						path: 'articles/:articleId',
+						name: 'Article',
+						component: () => import('@/pages/desk/knowledge_base/Article.vue'),
+						props: true,
+					},
+					{
+						path: 'articles/new',
+						name: 'NewArticle',
+						props: false,
+						component: () => import('@/pages/desk/knowledge_base/Article.vue'),
+					},
+				]
+			},
+			{
 				path: 'contacts',
 				name: 'Contacts',
 				component: () => import('@/pages/desk/Contacts.vue')
