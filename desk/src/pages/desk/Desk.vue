@@ -199,7 +199,7 @@ export default {
 			return {
 				method: 'frappedesk.api.setup.initial_agent_setup',
 				onSuccess: (res) => {
-					this.$resources.supportSettings.fetch()
+					this.$router.go()
 				},
 				onError: (err) => {
 					console.log(err)
