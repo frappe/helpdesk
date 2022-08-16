@@ -19,9 +19,5 @@
   "bugs": {
     "url": "https://github.com/frappe/desk/issues"
   },
-  "homepage": "https://github.com/frappe/desk#readme",
-  "workspaces": [
-    "desk",
-    "frappe-ui"
-  ]
+  "homepage": "https://github.com/frappe/desk#readme"
 }
