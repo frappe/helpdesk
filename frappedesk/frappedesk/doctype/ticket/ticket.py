@@ -417,7 +417,7 @@ def set_status(name, status):
 def auto_close_tickets():
 	"""Auto-close replied support tickets after 7 days"""
 	auto_close_after_days = (
-		frappe.db.get_value("Support Settings", "Support Settings", "close_ticket_after_days")
+		frappe.db.get_value("Frappe Desk Settings", "Frappe Desk Settings", "close_ticket_after_days")
 		or 7
 	)
 

@@ -106,13 +106,13 @@ class ServiceLevelAgreement(Document):
 			self.enabled
 			and self.document_type == "Ticket"
 			and not frappe.db.get_single_value(
-				"Support Settings", "track_service_level_agreement"
+				"Frappe Desk Settings", "track_service_level_agreement"
 			)
 		):
 			frappe.throw(
 				_("{0} is not enabled in {1}").format(
 					frappe.bold("Track Service Level Agreement"),
-					get_link_to_form("Support Settings", "Support Settings"),
+					get_link_to_form("Frappe Desk Settings", "Frappe Desk Settings"),
 				)
 			)
 
@@ -288,7 +288,7 @@ def check_agreement_status():
 
 
 def get_active_service_level_agreement_for(doc):
-	if not frappe.db.get_single_value("Support Settings", "track_service_level_agreement"):
+	if not frappe.db.get_single_value("Frappe Desk Settings", "track_service_level_agreement"):
 		return
 
 	filters = [
@@ -347,7 +347,7 @@ def get_context(doc):
 
 @frappe.whitelist()
 def get_service_level_agreement_filters(doctype, name):
-	if not frappe.db.get_single_value("Support Settings", "track_service_level_agreement"):
+	if not frappe.db.get_single_value("Frappe Desk Settings", "track_service_level_agreement"):
 		return
 
 	filters = [
@@ -663,7 +663,7 @@ def change_service_level_agreement_and_priority(self):
 	if (
 		self.service_level_agreement
 		and frappe.db.exists("Ticket", self.name)
-		and frappe.db.get_single_value("Support Settings", "track_service_level_agreement")
+		and frappe.db.get_single_value("Frappe Desk Settings", "track_service_level_agreement")
 	):
 
 		if not self.priority == frappe.db.get_value("Ticket", self.name, "priority"):
@@ -699,9 +699,9 @@ def get_response_and_resolution_duration(doc):
 
 def reset_service_level_agreement(doc, reason, user):
 	if not frappe.db.get_single_value(
-		"Support Settings", "allow_resetting_service_level_agreement"
+		"Frappe Desk Settings", "allow_resetting_service_level_agreement"
 	):
-		frappe.throw(_("Allow Resetting Service Level Agreement from Support Settings."))
+		frappe.throw(_("Allow Resetting Service Level Agreement from Frappe Desk Settings."))
 
 	frappe.get_doc(
 		{

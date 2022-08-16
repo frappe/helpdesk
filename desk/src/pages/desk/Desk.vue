@@ -233,8 +233,8 @@ export default {
 			return {
 				method: 'frappe.client.get',
 				params: {
-					doctype: 'Support Settings',
-					name: 'Support Settings'
+					doctype: 'Frappe Desk Settings',
+					name: 'Frappe Desk Settings'
 				},
 				onError: (error) => {
 					console.log(error)

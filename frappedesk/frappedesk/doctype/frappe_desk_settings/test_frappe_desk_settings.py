@@ -6,5 +6,5 @@ from __future__ import unicode_literals
 import unittest
 
 
-class TestSupportSettings(unittest.TestCase):
+class TestFrappeDeskSettings(unittest.TestCase):
 	pass

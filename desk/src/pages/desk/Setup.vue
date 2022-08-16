@@ -414,8 +414,8 @@ export default {
 			return {
 				method: 'frappe.client.set_value',
 				params: {
-					doctype: 'Support Settings',
-					name: "Support Settings",
+					doctype: 'Frappe Desk Settings',
+					name: "Frappe Desk Settings",
 					fieldname: 'setup_complete',
 					value: 1
 				},

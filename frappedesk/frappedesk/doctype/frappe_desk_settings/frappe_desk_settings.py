@@ -7,5 +7,5 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 
 
-class SupportSettings(Document):
+class FrappeDeskSettings(Document):
 	pass
