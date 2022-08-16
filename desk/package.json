@@ -10,11 +10,11 @@
 		"copy-html-entry": "cp ../frappedesk/public/desk/index.html ../frappedesk/www/frappedesk/index.html"
 	},
 	"dependencies": {
-		"@vitejs/plugin-vue": "^2.3.3",
-		"luxon": "^2.3.2",
 		"@headlessui/vue": "^1.5.0",
+		"@vitejs/plugin-vue": "^2.3.3",
 		"dayjs": "^1.10.7",
-		"frappe-ui": "^0.0.38",
+		"frappe-ui": "^0.0.48",
+		"luxon": "^2.3.2",
 		"vue": "^3.2.26",
 		"vue-router": "^4.0.12",
 		"vuedraggable": "^4.1.0"
