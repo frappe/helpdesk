@@ -22,13 +22,6 @@
   "post_description_key",
   "post_route_key",
   "post_route_string",
-  "greetings_section_section",
-  "greeting_title",
-  "column_break_19",
-  "greeting_subtitle",
-  "search_apis_sb",
-  "search_apis",
-  "other_settings_section",
   "helpdesk_name",
   "column_break_26",
   "setup_complete",
@@ -109,17 +102,6 @@
    "label": "Post Route String"
   },
   {
-   "fieldname": "search_apis_sb",
-   "fieldtype": "Section Break",
-   "label": "Search APIs"
-  },
-  {
-   "fieldname": "search_apis",
-   "fieldtype": "Table",
-   "label": "Search APIs",
-   "options": "Support Search Source"
-  },
-  {
    "fieldname": "sb_00",
    "fieldtype": "Section Break",
    "label": "Service Level Agreements"
@@ -138,27 +120,6 @@
    "label": "Allow Resetting Service Level Agreement"
   },
   {
-   "default": "We're here to help",
-   "fieldname": "greeting_title",
-   "fieldtype": "Data",
-   "label": "Greeting Title"
-  },
-  {
-   "fieldname": "column_break_19",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Browse help topics",
-   "fieldname": "greeting_subtitle",
-   "fieldtype": "Data",
-   "label": "Greeting Subtitle"
-  },
-  {
-   "fieldname": "greetings_section_section",
-   "fieldtype": "Section Break",
-   "label": "Greetings Section"
-  },
-  {
    "fieldname": "helpdesk_name",
    "fieldtype": "Data",
    "label": "Helpdesk Name"
@@ -167,12 +128,8 @@
    "default": "0",
    "fieldname": "setup_complete",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Setup Complete"
-  },
-  {
-   "fieldname": "other_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Other Settings"
   },
   {
    "fieldname": "column_break_26",
@@ -182,18 +139,20 @@
    "default": "0",
    "fieldname": "initial_agent_set",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Initial Agent Set"
   },
   {
    "default": "0",
    "fieldname": "initial_demo_ticket_created",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Initial Demo Ticket Created"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-07-21 20:22:14.359497",
+ "modified": "2022-08-16 20:29:24.040069",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
