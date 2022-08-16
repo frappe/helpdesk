@@ -8,4 +8,5 @@ from frappe.model.document import Document
 
 
 class FrappeDeskSettings(Document):
-	pass
+	def before_save(self):
+		self.setup_complete = self.initial_agent_set and self.initial_demo_ticket_created
