@@ -102,11 +102,6 @@ export default {
 				this.$resources.createInitialDemoTicket.submit()
 				return false
 			}
-			// TODO: uncomment this part when setup wizard can be skipped
-			// if (!this.$resources.supportSettings.data.setup_complete) {
-			// 	this.$router.push({ name: 'DeskSetup' })
-			// 	return false
-			// }
 
 			return true
 		}
@@ -233,8 +228,8 @@ export default {
 			return {
 				method: 'frappe.client.get',
 				params: {
-					doctype: 'Support Settings',
-					name: 'Support Settings'
+					doctype: 'Frappe Desk Settings',
+					name: 'Frappe Desk Settings'
 				},
 				onError: (error) => {
 					console.log(error)

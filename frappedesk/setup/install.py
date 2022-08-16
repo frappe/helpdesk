@@ -148,7 +148,7 @@ def add_default_holidy_list():
 	frappe.db.commit()
 
 def enable_track_service_level_agreement_in_support_settings():
-	support_settings = frappe.get_doc("Support Settings")
+	support_settings = frappe.get_doc("Frappe Desk Settings")
 	support_settings.track_service_level_agreement = True
 	support_settings.save()
 	frappe.db.commit()

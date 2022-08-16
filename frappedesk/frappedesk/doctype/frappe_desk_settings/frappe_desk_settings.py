@@ -7,5 +7,6 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 
 
-class SupportSettings(Document):
-	pass
+class FrappeDeskSettings(Document):
+	def before_save(self):
+		self.setup_complete = self.initial_agent_set and self.initial_demo_ticket_created
