@@ -15,3 +15,4 @@ frappedesk.patches.refactor_ticket_activity_grammar
 frappedesk.patches.add_default_assignment_rule
 frappedesk.patches.add_support_redirect_to_tickets
 frappedesk.patches.set_initial_order_for_articles_and_categories
+frappedesk.patches.mark_track_service_level_agreement_true

@@ -107,7 +107,7 @@
    "label": "Service Level Agreements"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "track_service_level_agreement",
    "fieldtype": "Check",
    "label": "Track Service Level Agreement"
@@ -152,7 +152,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-08-16 20:36:52.875181",
+ "modified": "2022-08-17 22:24:32.937552",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
