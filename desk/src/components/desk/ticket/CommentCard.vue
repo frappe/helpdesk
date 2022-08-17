@@ -9,7 +9,7 @@
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
-				<div class="ql-container text-[13px] text-gray-700" v-html="cleanedMessage"></div>
+				<div class="prose prose-p:my-1 text-[13px] text-gray-700" v-html="cleanedMessage"></div>
 			</div>
 		</div>
 	</div>
