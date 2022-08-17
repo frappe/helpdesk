@@ -8,7 +8,7 @@
 					class="overflow-y-scroll"
 					:class="editorClasses"
 					:content="content"
-					editor-class="w-full"
+					editor-class="w-full text-[13px]"
 					:placeholder="placeholder"
 					:editable="true"
 					@change="(val) => {
