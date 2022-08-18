@@ -400,6 +400,7 @@ export default {
 						// TODO: 'user.user_image'
 					],
 				},
+				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.agents = data
 				},
