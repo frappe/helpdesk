@@ -11,6 +11,7 @@
 					editor-class="w-full text-[13px]"
 					:placeholder="placeholder"
 					:editable="true"
+					:extensions="[CustomHardBreakExtention]"
 					@change="(val) => {
 						content = val 
 						this.$emit('change', val)
@@ -39,6 +40,7 @@
 
 <script>
 import { TextEditor } from 'frappe-ui'
+import { HardBreak } from '@tiptap/extension-hard-break'
 import { ref, computed, nextTick } from 'vue'
 
 export default {
@@ -87,6 +89,17 @@ export default {
 			setLink,
 			focusEditor,
 			editor
+		}
+	},
+	computed: {
+		CustomHardBreakExtention() {
+			return HardBreak.extend({
+				addKeyboardShortcuts () {
+					return {
+						Enter: () => this.editor.commands.setHardBreak()
+					}
+				}
+			})
 		}
 	}
 }
