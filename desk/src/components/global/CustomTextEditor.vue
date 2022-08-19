@@ -5,7 +5,7 @@
 			<div @click="editor?.commands.focus()">
 				<TextEditor
 					ref="textEditor"
-					class="overflow-y-scroll"
+					class="overflow-y-scroll cursor-text"
 					:class="editorClasses"
 					:content="content"
 					editor-class="w-full text-[13px]"
