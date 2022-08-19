@@ -16,7 +16,10 @@
 					{%- elif banner_image -%}
 					<img src='{{ banner_image }}'>
 					{%- else -%}
-					<span>{{ (frappe.get_hooks("brand_html") or [_("Home")])[0] }}</span>
+						{% set helpdesk_name = frappe.get_doc("Frappe Desk Settings").helpdesk_name %}
+						{% if helpdesk_name %}
+						<div class="ql-editor read-mode"><p>{{ helpdesk_name }}</p></div>
+						{% endif %}
 					{%- endif -%}
 				</a>
 			</div>

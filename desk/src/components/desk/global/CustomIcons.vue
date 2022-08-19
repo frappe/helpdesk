@@ -231,7 +231,8 @@
 			</defs>
 		</svg>
 		<div v-if="this.name=='company'" :class="this.class">
-			<div v-html="this.$resources.brandHtml.data"></div>
+			<div v-if="$resources.brandHtml.data" v-html="$resources.brandHtml.data"></div>
+			<div v-else>{{ $resources.helpdeskName.data }}</div>
 		</div>
 	</div>
 </template>
@@ -243,12 +244,18 @@ export default {
 	mounted() {
 		if (this.name == 'company') {
 			this.$resources.brandHtml.fetch()
+			this.$resources.helpdeskName.fetch()
 		}
 	},
 	resources: {
 		brandHtml() {
 			return {
-				method: 'frappedesk.api.website.brand_html'
+				method: 'frappedesk.api.website.brand_html',
+			}
+		},
+		helpdeskName() {
+			return {
+				method: 'frappedesk.api.website.helpdesk_name',
 			}
 		}
 	}
