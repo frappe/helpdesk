@@ -17,7 +17,7 @@
 								</div>
 							</template>
 						</Dropdown>
-						<a v-else :href="item.url" class="hover:text-[#2490ef]">{{ item.label }}</a>
+						<a v-else :href="item.url" class="hover:text-[#2490ef]" v-html="item.label"/>
 					</div>
 					<Dropdown
 						placement="right"
