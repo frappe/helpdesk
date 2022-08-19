@@ -8,6 +8,8 @@
   "sb_00",
   "track_service_level_agreement",
   "allow_resetting_service_level_agreement",
+  "column_break_4",
+  "helpdesk_name",
   "issues_sb",
   "close_issue_after_days",
   "portal_sb",
@@ -22,11 +24,10 @@
   "post_description_key",
   "post_route_key",
   "post_route_string",
-  "helpdesk_name",
-  "column_break_26",
   "setup_complete",
   "initial_agent_set",
-  "initial_demo_ticket_created"
+  "initial_demo_ticket_created",
+  "initial_helpdesk_name_setup_skipped"
  ],
  "fields": [
   {
@@ -132,10 +133,6 @@
    "label": "Setup Complete"
   },
   {
-   "fieldname": "column_break_26",
-   "fieldtype": "Column Break"
-  },
-  {
    "default": "0",
    "fieldname": "initial_agent_set",
    "fieldtype": "Check",
@@ -148,11 +145,21 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Initial Demo Ticket Created"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "initial_helpdesk_name_setup_skipped",
+   "fieldtype": "Check",
+   "label": "Initial Helpdesk Name Setup Skipped"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-08-17 22:24:32.937552",
+ "modified": "2022-08-19 08:44:42.593268",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
