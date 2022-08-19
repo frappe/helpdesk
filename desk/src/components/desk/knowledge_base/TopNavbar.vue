@@ -12,7 +12,7 @@
 					>
 						{{ action.label }}
 					</div>
-					<Dropdown :options="action.dropdown">
+					<Dropdown :options="action.dropdown" placement="right">
 						<template v-slot="{ toggle }">
 							<div class="py-[4px]" @click="toggle">
 								<FeatherIcon name="chevron-down" class="w-4 h-4 stroke-blue-400" role="button" />

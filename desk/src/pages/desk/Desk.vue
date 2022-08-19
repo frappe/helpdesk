@@ -93,12 +93,12 @@ export default {
 			if (!this.mounted) return false
 			if (!this.user.isLoggedIn()) return false
 			if (!this.user.has_desk_access) return false
-			if (this.$resources.supportSettings.loading) return false
-			if (!this.$resources.supportSettings.data.initial_agent_set) {
+			if (this.$resources.frappedeskSettings.loading) return false
+			if (!this.$resources.frappedeskSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit()
 				return false
 			}
-			if (!this.$resources.supportSettings.data.initial_demo_ticket_created) {
+			if (!this.$resources.frappedeskSettings.data.initial_demo_ticket_created) {
 				this.$resources.createInitialDemoTicket.submit()
 				return false
 			}
@@ -115,7 +115,7 @@ export default {
 			this.$router.push({path: "/support/tickets"})
 			return
 		}
-		this.$resources.supportSettings.fetch()
+		this.$resources.frappedeskSettings.fetch()
 		this.$resources.defaultOutgoingEmailAccount.fetch()
 
 		this.ticketController.set = (ticketId, type, ref=null) => {
@@ -211,7 +211,7 @@ export default {
 			return {
 				method: 'frappedesk.api.setup.create_initial_demo_ticket',
 				onSuccess: (res) => {
-					this.$resources.supportSettings.fetch()
+					this.$resources.frappedeskSettings.fetch()
 				},
 				onError: (err) => {
 					console.log(err)
@@ -224,12 +224,55 @@ export default {
 				}
 			}
 		},
-		supportSettings() {
+		setHelpdeskName() {
+            return {
+                method: 'frappedesk.api.settings.update_helpdesk_name',
+                onSuccess: (res) => {
+                    document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`
+                    this.$toast({
+                        title: 'Helpdesk name updated!!',
+                        customIcon: 'circle-check',
+                        appearance: 'success',
+                    })
+                }
+            }
+        },
+		skipHelpdeskNameSetup() {
+            return {
+                method: 'frappedesk.api.settings.skip_helpdesk_name_setup',
+            }
+		},
+		frappedeskSettings() {
 			return {
 				method: 'frappe.client.get',
 				params: {
 					doctype: 'Frappe Desk Settings',
 					name: 'Frappe Desk Settings'
+				},
+				onSuccess: (data) => {
+					if (!data.initial_helpdesk_name_setup_skipped && data.helpdesk_name == "") {
+						this.$toast({
+							title: 'Setup Helpdesk Name',
+							form: {
+								inputs: [{
+									type: 'text',
+									fieldname: 'helpdesk_name',
+									placeholder: 'eg: FDESK'
+								}],
+								onSubmit: (values) => {
+									if (values.helpdesk_name) {
+										this.$resources.setHelpdeskName.submit({name: values.helpdesk_name})
+									}
+								},
+							},
+							fixed: true,
+							appearance: 'info',
+							position: 'bottom-right',
+							onClose: () => {
+								this.$resources.skipHelpdeskNameSetup.submit()
+							},
+						})
+					}
 				},
 				onError: (error) => {
 					console.log(error)

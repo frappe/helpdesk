@@ -19,7 +19,7 @@
 							<FeatherIcon v-if="icon" :name="icon" :class="['w-5 h-5', iconClasses]" />
 							<CustomIcons v-else :name="customIcon" :class="['w-5 h-5', iconClasses]" />
 						</div>
-						<div>
+						<div class="w-full">
 							<slot>
 								<p class="text-[14px] font-medium text-gray-900">
 									{{ title }}
@@ -27,11 +27,23 @@
 								<p class="mt-1 text-base font-normal text-gray-700">
 									{{ text }}
 								</p>
-								<div class="flex mt-5" v-if="action">
+								<form v-if="form" class="mt-2" @submit.prevent="() => {
+									$clearToasts()
+									form.submit ? form.submit.action(formInputs) : form.onSubmit(formInputs)
+								 }">
+									<div class="flex flex-col space-y-3 mb-3" v-for="input in form.inputs" :key="input.fieldname">
+										<Input class="rounded-lg bg-white" :type="input.type ? input.type : 'text'" :placeholder="input.placeholder" @input="(val) => { formInputs[input.fieldname] = val }"/>
+									</div>
+								</form>
+								<div class="flex mt-5" v-if="action || form ">
 									<Button appearance="primary" @click="() => {
 										$clearToasts()
-										action.onClick()
-									}">{{ action.title }}</Button>
+										if (form) {
+											form.submit ? form.submit.action(formInputs) : form.onSubmit(formInputs)
+										} else {
+											action()
+										}
+									}">{{ action ? action.title : ( form.submit ? form.submit.title : 'Submit' ) }}</Button>
 								</div>
 							</slot>
 						</div>
@@ -40,7 +52,10 @@
 								<div
 									role="button"
 									class="grid w-5 h-5 place-items-center"
-									@click="shown = false"
+									@click="() => {
+										shown = false
+										onClose()
+									}"
 								>
 									<FeatherIcon 
 										name="x" 
@@ -82,6 +97,10 @@ export default {
 	text: {
 		type: String,
 	},
+	form: {
+		type: Object,
+		default: null
+	},
 	appearance: {
 		type: String,
 	},
@@ -96,6 +115,10 @@ export default {
 	action: {
 		type: Object,
 		default: null
+	},
+	onClose: {
+		type: Function,
+		default: () => {}
 	}
   },
   components: {
@@ -127,6 +150,7 @@ export default {
   data() {
 	return {
 		shown: false,
+		formInputs: {},
 	}
   },
 	computed: {
@@ -168,6 +192,7 @@ export default {
 			return props
 		},
 		bodyClasses() {
+			if (this.appearanceColor === 'white') return 'bg-white'
 			return `bg-${this.appearanceColor}-${this.appearanceColor === 'red' ? '100' : '50'}`
 		},
 		closeIconClassess() {
@@ -188,6 +213,9 @@ export default {
 						break
 					case 'info':
 						color = 'blue'
+						break
+					default: 
+						color = 'white'
 						break
 				}
 			}

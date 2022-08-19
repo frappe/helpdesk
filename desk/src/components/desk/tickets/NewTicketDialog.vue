@@ -62,9 +62,9 @@
 							>
 								Description
 							</span>
-							<CustomTextEditor :show="true" :content="descriptionContent" editorClasses="w-full min-h-[80px] max-h-[300px]" @change="(val) => { descriptionContent = val }">
+							<CustomTextEditor :show="true" :content="descriptionContent" editorClasses="w-full min-h-[80px] max-h-[300px] bg-gray-100 px-3 rounded-t-lg" @change="(val) => { descriptionContent = val }">
 								<template #bottom-section="{ editor }">
-									<div class="pt-2 select-none flex flex-row">
+									<div class="p-1 select-none flex flex-row border-b border-x rounded-b-lg">
 										<div class="w-full flex flex-row items-center space-x-2">
 											<div v-for="item in [
 													'bold', 'italic', '|',
