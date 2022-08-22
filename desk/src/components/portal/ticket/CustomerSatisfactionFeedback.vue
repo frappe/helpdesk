@@ -33,9 +33,9 @@
 				</Button>
 			</div>
 		</div>
-		<div v-if="submitted" class="flex flex-col space-y-[8px] text-[12px] font-normal text-gray-700">
+		<div v-if="submitted && (ticket.customer_feedback || feedbackText)" class="flex flex-col space-y-[8px] text-[12px] font-normal text-gray-700">
 			<div class="flex flex-col space-y-[2px]">
-				<div class="italic">"{{ ticket.customer_feedback }}"</div>
+				<div class="italic">"{{ ticket.customer_feedback || feedbackText }}"</div>
 			</div>
 		</div>
 	</div>
