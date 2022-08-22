@@ -23,6 +23,9 @@ doc_events = {
 		"on_update": [
 			"frappedesk.frappedesk.doctype.service_level_agreement.service_level_agreement.on_communication_update",
 			"frappedesk.frappedesk.doctype.ticket.ticket.set_first_response_time",
+		],
+		"after_insert": [
+			"frappedesk.frappedesk.doctype.ticket.ticket.set_descritption_from_communication",
 		]
 	},
 	"Contact": {"on_trash": "frappedesk.frappedesk.doctype.ticket.ticket.update_ticket",},

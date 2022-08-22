@@ -158,6 +158,12 @@ class Ticket(Document):
 		for activity in activities:
 			frappe.db.delete("Ticket Activity", activity)
 
+def set_descritption_from_communication(doc, type):
+	if doc.reference_doctype == "Ticket":
+		ticket_doc = frappe.get_doc("Ticket", doc.reference_name)
+		ticket_doc.description = doc.content
+		ticket_doc.save()
+
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_contact(ticket, message, attachments=[]):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
