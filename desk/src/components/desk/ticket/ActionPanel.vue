@@ -274,6 +274,12 @@ export default {
 			mandatoryFieldsNotSet
 		}
 	},
+	mounted() {
+        document.addEventListener('keydown', this.handleShortcuts.bind(this));
+	},
+	beforeDestroy() {
+        document.removeEventListener('keydown', this.handleShortcuts);
+    },
 	updated() {
 		var elems = document.querySelectorAll(".error-animation");
 		setTimeout(function() {
@@ -300,6 +306,21 @@ export default {
 		},
 	},
 	methods: {
+		handleShortcuts(e) {
+			if ((e.metaKey || e.ctrlKey) && e.altKey) {
+				e.preventDefault()
+				switch(e.keyCode){
+					case 82:
+						this.updateStatus('Replied')
+						break
+					case 69:
+						this.updateStatus('Resolved')
+						break
+					case 67:
+						this.updateStatus('Closed')
+				}
+			}
+		},
 		updateNotes(note) {
 			this.ticketController.set(this.ticketId, 'notes', note).then(() => {
 				this.$toast({
