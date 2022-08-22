@@ -25,6 +25,7 @@
 				</template>
 			</ListManager>
 			<Dialog :options="{title: 'New Category'}" :show="showCreateNewCategoryDialog" @close="() => { 
+					newCategoryInputErrors = {name: '', parent: '', others: ''}
 					showCreateNewCategoryDialog = false
 				}"
 			>
@@ -52,10 +53,14 @@
 						<Button 
 							:loading="$resources.createNewCategory.loading"
 							appearance="primary" 
-							@click="$resources.createNewCategory.submit({
-								name: newCategoryInputValues.name,
-								parent: newCategoryInputValues.parent
-							})"
+							@click="() => {
+								if (validateNewCategoryInputs()) {
+									$resources.createNewCategory.submit({
+										name: newCategoryInputValues.name,
+										parent: newCategoryInputValues.parent
+									})
+								}
+							}"
 						>
 							Add Category
 						</Button>
@@ -95,7 +100,7 @@ export default {
 		const showCreateNewCategoryDialog = ref(false)
 
 		const newCategoryInputValues = ref({name: '', parent: 'none'})
-		const newCategoryInputErrors = ref({name: '', parent: '', other: ''})
+		const newCategoryInputErrors = ref({name: '', parent: '', others: ''})
 		
 		return {
 			showCreateNewCategoryDialog,
@@ -138,6 +143,19 @@ export default {
 	unmounted() {
 		this.$event.off('create_new_category')
 	},
+	methods: {
+		validateNewCategoryInputs() {
+			this.newCategoryInputErrors = {name: '', parent: '', others: ''}
+
+			if (!this.newCategoryInputValues.name) {
+				this.newCategoryInputErrors.name = "Category name is required"
+			} else if (this.newCategoryInputValues.name.length < 3) {
+				this.newCategoryInputErrors.name = "Category name should have atleast 3 characters"
+			}
+
+			return !Object.values(this.newCategoryInputErrors).some(val => val)
+		}
+	},
 	resources: {
 		allParentCategories() {
 			return {
@@ -163,18 +181,12 @@ export default {
 						},
 					}
 				},
-				validate(params) {
-					if (!params.doc.category_name) {
-						this.newCategoryInputErrors.name = 'Category name is required'
-						return `Please enter category name`
-					}
-				},
 				onSuccess() {
 					this.showCreateNewCategoryDialog = false
 					this.newCategoryInputValues = {}
 				},
-				onError() {
-					this.showCreateNewCategoryDialog = false
+				onError(err) {
+					this.newCategoryInputErrors.others = err
 					this.$toast({
 						title: 'Error while creating category!',
 						customIcon: 'circle-fail',
