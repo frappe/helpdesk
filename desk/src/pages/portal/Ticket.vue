@@ -100,7 +100,7 @@
 														<Button @click="cancelEditing">Cancel</Button>
 														<div class="flex flex-row items-center space-x-2">
 															<CustomIcons :class="showTextFormattingMenu ? 'bg-gray-200' : ''" name="text-formatting" class="h-7 w-7 rounded p-1" role="button" @click="() => { showTextFormattingMenu = !showTextFormattingMenu}"/>
-															<FileUploader @success="(file) => attachments.push(file)">
+															<FileUploader :uploadArgs="{ private: true }" @success="(file) => attachments.push(file)">
 																<template v-slot="{ progress, uploading, openFileSelector }">
 																	<FeatherIcon name="paperclip" class="h-[17px]" @click="openFileSelector" role="button" :disabled="uploading" />
 																</template>
