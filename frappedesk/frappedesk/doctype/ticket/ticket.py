@@ -161,8 +161,8 @@ class Ticket(Document):
 def set_descritption_from_communication(doc, type):
 	if doc.reference_doctype == "Ticket":
 		ticket_doc = frappe.get_doc("Ticket", doc.reference_name)
-		ticket_doc.description = doc.content
-		ticket_doc.save()
+		if not ticket_doc.via_customer_portal:
+			ticket_doc.description = doc.content
 
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_contact(ticket, message, attachments=[]):
