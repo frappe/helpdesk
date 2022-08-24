@@ -12,7 +12,7 @@
 							}
 						"
 					>
-						<span class="text-base" v-if="selectedValue">
+						<span class="text-base truncate" v-if="selectedValue">
 							{{ displayValue(selectedValue) }}
 						</span>
 						<span class="text-base text-gray-500" v-else>
