@@ -46,13 +46,14 @@
 </template>
 
 <script>
-import { Dialog } from 'frappe-ui';
+import { Dialog, ErrorMessage } from 'frappe-ui';
 import { computed, ref } from 'vue'
 
 export default {
 	name: 'NewCategoryDialog',
 	components: {
-		Dialog
+		Dialog,
+		ErrorMessage
 	},
 	props: {
 		modelValue: {
