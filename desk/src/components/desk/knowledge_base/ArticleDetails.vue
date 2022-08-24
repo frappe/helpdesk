@@ -19,6 +19,7 @@
 					:value="isNew ? user.user : article.author" 
 					@change="(val) => setArticleDetail('author', val)"
 				/>
+				<ErrorMessage :message="articleInputErrors.author" />
 			</div>
 			<div v-if="$resources.categories.data">
 				<span class="block mb-2 text-sm leading-4 text-gray-700">Category</span>
@@ -40,12 +41,17 @@
 						</div>
 					</template>
 				</Autocomplete>
+				<ErrorMessage :message="articleInputErrors.category" />
 				<NewCategoryDialog
 					:createParentCategories="false" 
 					:restrictedToChildCategory="true"
 					:show="showCreateNewCategoryDialog" 
 					@close="showCreateNewCategoryDialog = false" 
-					@new-category-created="(category) => setArticleDetail('category', category)" 
+					@new-category-created="(category) => {
+						this.$resources.categories.fetch().then(() => {
+							this.setArticleDetail('category', category)
+						})	
+					}" 
 				/>
 			</div>
 			<Input type="textarea" label="Note" :value="article.note" @input="(val) => setArticleDetail('note', val)" :debounce="500" placeholder="Start typing to save..." />
@@ -68,7 +74,7 @@
 </template>
 
 <script>
-import { FeatherIcon } from 'frappe-ui'
+import { FeatherIcon, ErrorMessage } from 'frappe-ui'
 import Autocomplete from '@/components/global/Autocomplete.vue'
 import NewCategoryDialog from '@/components/desk/knowledge_base/NewCategoryDialog.vue'
 import { inject, ref } from '@vue/runtime-core'
@@ -78,6 +84,7 @@ export default {
 	props: ['article', 'articleResource', 'isNew'],
 	components: {
 		FeatherIcon,
+		ErrorMessage,
 		Autocomplete,
 		NewCategoryDialog
 	},
@@ -85,12 +92,14 @@ export default {
 		const user = inject('user')
 		const updateNewArticleInput = inject('updateNewArticleInput')
 		const newArticleTempValues = inject('newArticleTempValues')
+		const articleInputErrors = inject('articleInputErrors')
 		const showCreateNewCategoryDialog = ref(false)
 
 		return {
 			user,
 			updateNewArticleInput,
 			newArticleTempValues,
+			articleInputErrors,
 			showCreateNewCategoryDialog
 		}
 	},
@@ -139,7 +148,7 @@ export default {
 			} {
 				this.updateNewArticleInput({ field, value })
 			}
-		}
+		},
 	}
 }
 </script>

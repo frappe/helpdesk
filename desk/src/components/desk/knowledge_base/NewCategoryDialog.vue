@@ -8,7 +8,7 @@
 		<template #body-content>
 			<div class="flex flex-col space-y-3">
 				<div>
-					<Input label="Category name" type="text" @change="(val) => { 
+					<Input label="Category name" :value="newCategoryName" type="text" @change="(val) => { 
 						newCategoryInputValues.name = val 
 						newCategoryInputErrors.name = ''
 					}" />
@@ -56,6 +56,10 @@ export default {
 		ErrorMessage
 	},
 	props: {
+		newCategoryName: {
+			type: String,
+			default: '',
+		},
 		modelValue: {
 			type: Boolean,
 			required: true,
@@ -147,8 +151,8 @@ export default {
 						customIcon: 'circle-check',
 						appearance: 'success'
 					})
-					this.$emit('new-category-created', doc)
-					this.$emit('close', doc)
+					this.$emit('new-category-created', doc.name)
+					this.$emit('close', doc.name)
 				},
 				onError(err) {
 					this.newCategoryInputErrors.others = err
