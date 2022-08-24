@@ -17,7 +17,7 @@
 					})" 
 					placeholder="Choose author" 
 					:value="isNew ? user.user : article.author" 
-					@change="(val) => setArticleDetail('author', val)"
+					@change="(item) => setArticleDetail('author', item.value)"
 				/>
 				<ErrorMessage :message="articleInputErrors.author" />
 			</div>
@@ -29,7 +29,7 @@
 					})" 
 					placeholder="Choose category" 
 					:value="isNew ? newArticleTempValues.category : article.category" 
-					@change="(val) => setArticleDetail('category', val)"
+					@change="(item) => setArticleDetail('category', item.value)"
 				>
 					<template #no-result-found>
 						<div 

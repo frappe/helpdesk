@@ -99,6 +99,7 @@ export default {
 				this.$resources.allParentCategories.data.forEach(category => {
 					categories.push(category.name)
 				})
+				this.newCategoryInputValues.parent = categories[0]
 				return categories
 			} else {
 				return []
