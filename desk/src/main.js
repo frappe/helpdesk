@@ -6,12 +6,17 @@ import './index.css'
 import { dayjs } from '@/utils'
 import { createToast, clearToasts } from '@/utils/toasts'
 import { event } from '@/utils/event'
+import { socketio_port } from '../../../../sites/common_site_config.json'
 
 let app = createApp(App)
 
 app.directive('on-outside-click', onOutsideClickDirective)
 app.use(router)
-app.use(FrappeUI)
+app.use(FrappeUI, {
+    socketio: {
+		port: socketio_port,
+	},
+})
 app.component('Button', Button)
 app.component('Dialog', Dialog)
 app.component('Input', Input)
