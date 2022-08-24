@@ -3,27 +3,23 @@
 		<Popover class="w-full">
 			<template #target="{ open: openPopover }">
 				<div class="w-full">
-					<ComboboxButton
-						class="flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
-						:class="{ 'rounded-b-none': isComboboxOpen }"
-						@click="
-							() => {
-							openPopover()
-							}
-						"
-					>
-						<span class="text-base truncate" v-if="selectedValue">
-							{{ displayValue(selectedValue) }}
-						</span>
-						<span class="text-base text-gray-500" v-else>
-							{{ placeholder || '' }}
-						</span>
-						<FeatherIcon
-							name="chevron-down"
-							class="w-4 h-4 text-gray-500"
-							aria-hidden="true"
-						/>
-					</ComboboxButton>
+					<slot name="input-holder" :open="foo">
+						<ComboboxButton
+							class="flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
+							:class="{ 'rounded-b-none': isComboboxOpen }"
+							@click="() => { openPopover() }"
+						>
+								<slot name="input" :selectedValue="selectedValue" :placeholder="placeholder">
+									<span class="text-base truncate" v-if="selectedValue">
+										{{ displayValue(selectedValue) }}
+									</span>
+									<span class="text-base text-gray-500" v-else>
+										{{ placeholder || '' }}
+									</span>
+								</slot>
+								<CustomIcons name="select" class="w-[12px] h-[12px] stroke-gray-500" />
+						</ComboboxButton>
+					</slot>
 				</div>
 			</template>
 			<template #body>
@@ -38,11 +34,9 @@
 						<ComboboxInput
 							class="w-full placeholder-gray-500 form-input"
 							type="text"
-							@change="
-							(e) => {
-								query = e.target.value
-							}
-							"
+							@change="(e) => {
+									query = e.target.value
+							}"
 							:value="query"
 							autocomplete="off"
 							placeholder="Search by keyword"
@@ -87,6 +81,7 @@ import {
 	ComboboxButton,
 } from '@headlessui/vue'
 import { Popover } from 'frappe-ui'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'Autocomplete',
@@ -94,6 +89,7 @@ export default {
 	emits: ['update:modelValue', 'change'],
 	components: {
 		Popover,
+		CustomIcons,
 		Combobox,
 		ComboboxInput,
 		ComboboxOptions,
@@ -137,6 +133,9 @@ export default {
 			}
 			return option?.label
 		},
+		foo() {
+			console.log('foo')
+		}
 	},
 }
 </script>
