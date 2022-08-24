@@ -59,6 +59,10 @@ export default {
 			type: Boolean,
 			required: true,
 		},
+		createParentCategories: {
+			type: Boolean,
+			default: true
+		},
 	},
 	emits: ['update:modelValue', 'close', 'new-category-created'],
 	setup(props, { emit }) {
@@ -83,7 +87,10 @@ export default {
 	computed: {
 		parentCategories() {
 			if (this.$resources.allParentCategories.data) {
-				let categories = ['none']
+				let categories = []
+				if (this.createParentCategories) {
+					categories.push('none')
+				}
 				this.$resources.allParentCategories.data.forEach(category => {
 					categories.push(category.name)
 				})
