@@ -13,7 +13,7 @@
 		"@headlessui/vue": "^1.5.0",
 		"@vitejs/plugin-vue": "^2.3.3",
 		"dayjs": "^1.10.7",
-		"frappe-ui": "^0.0.48",
+		"frappe-ui": "^0.0.54",
 		"luxon": "^2.3.2",
 		"vue": "^3.2.26",
 		"vue-router": "^4.0.12",
