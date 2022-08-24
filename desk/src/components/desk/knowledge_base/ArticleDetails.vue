@@ -9,8 +9,45 @@
 					<FeatherIcon name="external-link" class="w-4" />
 				</a>
 			</div>
-			<Input v-if="!$resources.users.loading" type="select" label="Author" :value="isNew ? user.user : article.author" @input="(val) => setArticleDetail('author', val)" :options="$resources.users.data.map(x => x.name)" />
-			<Input v-if="!$resources.categories.loading" type="select" label="Category" :value="isNew ? newArticleTempValues.category : article.category" @input="(val) => setArticleDetail('category', val)" :options="$resources.categories.data.map(x => x.name)" />
+			<div v-if="$resources.users.data" class="flex flex-col">
+				<span class="block mb-2 text-sm leading-4 text-gray-700">Author</span>
+				<Autocomplete 
+					:options="$resources.users.data.map(x => {
+						return {label: x.full_name , value: x.name}
+					})" 
+					placeholder="Choose author" 
+					:value="isNew ? user.user : article.author" 
+					@change="(val) => setArticleDetail('author', val)"
+				/>
+			</div>
+			<div v-if="$resources.categories.data">
+				<span class="block mb-2 text-sm leading-4 text-gray-700">Category</span>
+				<Autocomplete 
+					:options="$resources.categories.data.map(x => {
+						return {label: x.name, value: x.name}
+					})" 
+					placeholder="Choose category" 
+					:value="isNew ? newArticleTempValues.category : article.category" 
+					@change="(val) => setArticleDetail('category', val)"
+				>
+					<template #no-result-found>
+						<div 
+							role="button" 
+							class="hover:bg-gray-100 px-2.5 py-1.5 rounded-md text-base text-blue-500 font-semibold"
+							@click="showCreateNewCategoryDialog = true"
+						>
+							Create new category
+						</div>
+					</template>
+				</Autocomplete>
+				<NewCategoryDialog
+					:createParentCategories="false" 
+					:restrictedToChildCategory="true"
+					:show="showCreateNewCategoryDialog" 
+					@close="showCreateNewCategoryDialog = false" 
+					@new-category-created="(category) => setArticleDetail('category', category)" 
+				/>
+			</div>
 			<Input type="textarea" label="Note" :value="article.note" @input="(val) => setArticleDetail('note', val)" :debounce="500" placeholder="Start typing to save..." />
 			<div class="flex flex-row items-center text-[12px] text-gray-700" v-if="!isNew">
 				<div class="flex flex-row items-center space-x-[6px]">
@@ -32,25 +69,29 @@
 
 <script>
 import { FeatherIcon } from 'frappe-ui'
-import CustomComboboxInput from '@/components/global/CustomComboboxInput.vue'
-import { inject } from '@vue/runtime-core'
+import Autocomplete from '@/components/global/Autocomplete.vue'
+import NewCategoryDialog from '@/components/desk/knowledge_base/NewCategoryDialog.vue'
+import { inject, ref } from '@vue/runtime-core'
 
 export default {
 	name: 'ArticleDetails',
 	props: ['article', 'articleResource', 'isNew'],
 	components: {
 		FeatherIcon,
-		CustomComboboxInput
+		Autocomplete,
+		NewCategoryDialog
 	},
 	setup() {
 		const user = inject('user')
 		const updateNewArticleInput = inject('updateNewArticleInput')
 		const newArticleTempValues = inject('newArticleTempValues')
+		const showCreateNewCategoryDialog = ref(false)
 
 		return {
 			user,
 			updateNewArticleInput,
-			newArticleTempValues
+			newArticleTempValues,
+			showCreateNewCategoryDialog
 		}
 	},
 	resources: {
