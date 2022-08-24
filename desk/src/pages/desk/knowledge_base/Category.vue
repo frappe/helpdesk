@@ -24,49 +24,10 @@
 					</div>
 				</template>
 			</ListManager>
-			<Dialog :options="{title: 'New Category'}" :show="showCreateNewCategoryDialog" @close="() => { 
-					newCategoryInputErrors = {name: '', parent: '', others: ''}
-					showCreateNewCategoryDialog = false
-				}"
-			>
-				<template #body-content>
-					<div class="flex flex-col space-y-3">
-						<div>
-							<Input label="Category name" type="text" @change="(val) => { 
-								newCategoryInputValues.name = val 
-								newCategoryInputErrors.name = ''
-							}" />
-							<ErrorMessage :message="newCategoryInputErrors.name" />
-						</div>
-						<div>
-							<Input label="Parent category" type="select" :options="parentCategories" @change="(val) => {
-								newCategoryInputValues.parent = val
-								newCategoryInputErrors.parent =	''
-							}" />
-							<ErrorMessage :message="newCategoryInputErrors.parent" />
-						</div>
-						<ErrorMessage :message="newCategoryInputErrors.others" />
-					</div>
-				</template>
-				<template #actions>
-					<div>
-						<Button 
-							:loading="$resources.createNewCategory.loading"
-							appearance="primary" 
-							@click="() => {
-								if (validateNewCategoryInputs()) {
-									$resources.createNewCategory.submit({
-										name: newCategoryInputValues.name,
-										parent: newCategoryInputValues.parent
-									})
-								}
-							}"
-						>
-							Add Category
-						</Button>
-					</div>
-				</template>
-			</Dialog>
+			<NewCategoryDialog 
+				:show="showCreateNewCategoryDialog" 
+				@close="showCreateNewCategoryDialog = false"
+			/>
 		</div>
 	</div>
 </template>
@@ -77,6 +38,7 @@ import SideBarMenu from '@/components/desk/knowledge_base/SideBarMenu.vue'
 import ArticleList from '@/components/desk/knowledge_base/ArticleList.vue'
 import { ErrorMessage } from 'frappe-ui'
 import { ref } from '@vue/reactivity'
+import NewCategoryDialog from '@/components/desk/knowledge_base/NewCategoryDialog.vue'
 
 export default {
 	name: 'Category',
@@ -91,35 +53,18 @@ export default {
 		},
 	},
 	components: {
-		ListManager,
-		ArticleList,
-		ErrorMessage,
-		SideBarMenu,
-	},
+    ListManager,
+    ArticleList,
+    ErrorMessage,
+    SideBarMenu,
+    NewCategoryDialog
+},
 	setup() {
 		const showCreateNewCategoryDialog = ref(false)
-
-		const newCategoryInputValues = ref({name: '', parent: 'none'})
-		const newCategoryInputErrors = ref({name: '', parent: '', others: ''})
 		
 		return {
 			showCreateNewCategoryDialog,
-			newCategoryInputValues,
-			newCategoryInputErrors
 		}
-	},
-	computed: {
-		parentCategories() {
-			if (this.$resources.allParentCategories.data) {
-				let categories = ['none']
-				this.$resources.allParentCategories.data.forEach(category => {
-					categories.push(category.name)
-				})
-				return categories
-			} else {
-				return []
-			}
-		} 
 	},
 	watch: {
 		subCategory(val) {
@@ -139,62 +84,6 @@ export default {
 		]
 		this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
 		this.$event.emit('select_category',  (this.category && this.subCategory ) ? {name: this.subCategory, parent_category: this.category} : null)
-	},
-	unmounted() {
-		this.$event.off('create_new_category')
-	},
-	methods: {
-		validateNewCategoryInputs() {
-			this.newCategoryInputErrors = {name: '', parent: '', others: ''}
-
-			if (!this.newCategoryInputValues.name) {
-				this.newCategoryInputErrors.name = "Category name is required"
-			} else if (this.newCategoryInputValues.name.length < 3) {
-				this.newCategoryInputErrors.name = "Category name should have atleast 3 characters"
-			}
-
-			return !Object.values(this.newCategoryInputErrors).some(val => val)
-		}
-	},
-	resources: {
-		allParentCategories() {
-			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: 'Category',
-					filters: {is_group: ['=', 1]},
-					fields: ['name']
-				},
-				auto: true,
-			}
-		},
-		createNewCategory() {
-			return {
-				method: 'frappe.client.insert',
-				makeParams({ name, parent }) {
-					return {
-						doc: {
-							doctype: 'Category',
-							category_name: name,
-							parent_category: parent === 'none' ? '' : parent,
-							is_group: parent === 'none' ? 1 : 0,
-						},
-					}
-				},
-				onSuccess() {
-					this.showCreateNewCategoryDialog = false
-					this.newCategoryInputValues = {}
-				},
-				onError(err) {
-					this.newCategoryInputErrors.others = err
-					this.$toast({
-						title: 'Error while creating category!',
-						customIcon: 'circle-fail',
-						appearance: 'danger',
-					})
-				}
-			}
-		}
 	},
 }
 </script>

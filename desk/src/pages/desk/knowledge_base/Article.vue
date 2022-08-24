@@ -45,8 +45,10 @@ export default {
 		const updateNewArticleInput = ref((input) => {
 			newArticleTempValues.value[input.field] = input.value
 		})
+		const articleInputErrors = ref({})
 		provide('updateNewArticleInput', updateNewArticleInput)
 		provide('newArticleTempValues', newArticleTempValues)
+		provide('articleInputErrors', articleInputErrors)
 
 		const saveNewArticle = ref(() => {})
 		provide('saveNewArticle', saveNewArticle)
@@ -59,6 +61,7 @@ export default {
 			newArticleTempValues,
 			saveNewArticle,
 			saveArticleTitleAndContent,
+			articleInputErrors
 		}
 	},
 	computed: {
@@ -151,21 +154,22 @@ export default {
 	},
 	methods: {
 		insertArticle(publish=false) {
+			this.articleInputErrors = {}
 			const validateInputs = (input) => {
 				if (!input.title || input.title == "") {
-					return false
+					this.articleInputErrors.title = "Title is required"
 				}
 				if (!input.content || input.content.replaceAll(' ', '') == '<p></p>') {
-					return false
+					this.articleInputErrors.content = "Content is required"
 				}
 				if (!input.author) {
-					return false
+					this.articleInputErrors.author = "Author is required"
 				}
 				if (!input.category) {
-					return false
+					this.articleInputErrors.category = "Category is required"
 				}
 
-				return true
+				return Object.keys(this.articleInputErrors).length == 0
 			}
 
 			if (validateInputs(this.newArticleTempValues)) {
