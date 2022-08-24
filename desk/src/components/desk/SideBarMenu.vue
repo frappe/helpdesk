@@ -226,11 +226,11 @@ export default {
 
 		this.profileSettings = [
 			{
-				label: 'View Website',
+				label: 'Go to customer portal',
 				icon: 'external-link',
 				style: 'text-gray-800',
 				action: () => {
-					window.location.replace('/')
+					window.location.replace('/support/tickets')
 				}
 			},
 			{
