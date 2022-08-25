@@ -1,0 +1,56 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-08-25 23:50:58.598316",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "content",
+  "commented_by",
+  "reference_ticket"
+ ],
+ "fields": [
+  {
+   "fieldname": "content",
+   "fieldtype": "Text",
+   "label": "Content"
+  },
+  {
+   "fieldname": "commented_by",
+   "fieldtype": "Link",
+   "label": "Commented By",
+   "options": "User"
+  },
+  {
+   "fieldname": "reference_ticket",
+   "fieldtype": "Link",
+   "label": "Reference Ticket",
+   "options": "Ticket"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-08-25 23:50:58.598316",
+ "modified_by": "Administrator",
+ "module": "FrappeDesk",
+ "name": "Frappe Desk Comment",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
