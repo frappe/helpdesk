@@ -105,20 +105,20 @@
   {
    "fieldname": "sb_00",
    "fieldtype": "Section Break",
-   "label": "Service Level Agreements"
+   "label": "SLAs"
   },
   {
    "default": "1",
    "fieldname": "track_service_level_agreement",
    "fieldtype": "Check",
-   "label": "Track Service Level Agreement"
+   "label": "Track SLA"
   },
   {
    "default": "0",
    "depends_on": "eval:doc.track_service_level_agreement;",
    "fieldname": "allow_resetting_service_level_agreement",
    "fieldtype": "Check",
-   "label": "Allow Resetting Service Level Agreement"
+   "label": "Allow Resetting SLA"
   },
   {
    "fieldname": "helpdesk_name",
@@ -159,7 +159,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2022-08-19 08:44:42.593268",
+ "modified": "2022-08-25 08:44:42.593268",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",

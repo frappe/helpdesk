@@ -88,9 +88,9 @@ class Ticket(Document):
 		replicated_ticket.creation = now_datetime()
 
 		# Reset SLA
-		if replicated_ticket.service_level_agreement:
+		if replicated_ticket.sla:
 			replicated_ticket.service_level_agreement_creation = now_datetime()
-			replicated_ticket.service_level_agreement = None
+			replicated_ticket.sla = None
 			replicated_ticket.agreement_status = "Ongoing"
 			replicated_ticket.response_by = None
 			replicated_ticket.response_by_variance = None
@@ -494,7 +494,7 @@ def get_time_in_timedelta(time):
 def set_first_response_time(communication, method):
 	if communication.get("reference_doctype") == "Ticket":
 		ticket = get_parent_doc(communication)
-		if is_first_response(ticket) and ticket.service_level_agreement:
+		if is_first_response(ticket) and ticket.sla:
 			first_response_time = calculate_first_response_time(
 				ticket, get_datetime(ticket.first_responded_on)
 			)
@@ -515,7 +515,7 @@ def calculate_first_response_time(ticket, first_responded_on):
 	ticket_creation_time = get_time_in_seconds(ticket_creation_date)
 	first_responded_on_in_seconds = get_time_in_seconds(first_responded_on)
 	support_hours = frappe.get_cached_doc(
-		"Service Level Agreement", ticket.service_level_agreement
+		"SLA", ticket.sla
 	).support_and_resolution
 
 	if ticket_creation_date.day == first_responded_on.day:

@@ -24,12 +24,12 @@
 						{{ policy.name }}
 					</div>
 					<a title="Default service level agreement">
-						<CustomIcons v-if="policy.default_service_level_agreement" name="circle-check" class="w-[16px] h-[16px] fill-blue-500" />
+						<CustomIcons v-if="policy.default_sla" name="circle-check" class="w-[16px] h-[16px] fill-blue-500" />
 					</a>
 				</router-link>
 				<div class="sm:w-2/12">
 					<div class="flex flex-row-reverse">
-						<CustomSwitch v-model="policy.enabled" :disabled="policy.default_service_level_agreement" />
+						<CustomSwitch v-model="policy.enabled" :disabled="policy.default_sla" />
 					</div>
 				</div>
 			</div>

@@ -17,11 +17,11 @@ has_website_permission = {
 
 doc_events = {
 	"*": {
-		"validate": "frappedesk.frappedesk.doctype.service_level_agreement.service_level_agreement.apply",
+		"validate": "frappedesk.frappedesk.doctype.sla.sla.apply",
 	},
 	"Communication": {
 		"on_update": [
-			"frappedesk.frappedesk.doctype.service_level_agreement.service_level_agreement.on_communication_update",
+			"frappedesk.frappedesk.doctype.sla.sla.on_communication_update",
 			"frappedesk.frappedesk.doctype.ticket.ticket.set_first_response_time",
 		],
 		"after_insert": [
@@ -36,7 +36,7 @@ doc_events = {
 scheduler_events = {
 	"daily": [
 		"frappedesk.frappedesk.doctype.ticket.ticket.auto_close_tickets",
-		"frappedesk.frappedesk.doctype.service_level_agreement.service_level_agreement.check_agreement_status",
+		"frappedesk.frappedesk.doctype.sla.sla.check_agreement_status",
 	],
 	"cron": {
 		"* * * * * 0/5": [

@@ -7,7 +7,7 @@ from frappe.desk.form.assign_to import add as add_assignment
 from frappe.utils import add_months, getdate
 
 from frappedesk.frappedesk.doctype.ticket.test_ticket import make_ticket
-from frappedesk.frappedesk.doctype.service_level_agreement.test_service_level_agreement import (
+from frappedesk.frappedesk.doctype.sla.test_service_level_agreement import (
 	create_service_level_agreements_for_tickets,
 )
 from frappedesk.frappedesk.report.ticket_analytics.ticket_analytics import execute

@@ -198,7 +198,7 @@ export default {
 			return {
 				method: 'frappe.client.get',
 				params: {
-					doctype: 'Service Level Agreement',
+					doctype: 'SLA',
 					name: this.slaId,
 					fields: ['*']
 				},
@@ -361,7 +361,7 @@ export default {
 		rename() {
 			// TODO: once Service level agreement is renamable uncomment this block
 			// return this.$resources.renameServicePolicy.submit({
-			// 	doctype: "Service Level Agreement",
+			// 	doctype: "SLA",
 			// 	old_name: this.slaPolicyName,
 			// 	new_name: this.tempSlaPolicyName
 			// })
@@ -371,7 +371,7 @@ export default {
 			if (this.validateInputs()) {
 				this.$resources.createNewServicePolicy.submit({
 					doc: {
-						doctype: 'Service Level Agreement',
+						doctype: 'SLA',
 						service_level: this.tempSlaPolicyName,
 						priorities: this.priorities,
 						support_and_resolution: this.supportAndResolution,
@@ -392,7 +392,7 @@ export default {
 		save() {
 			if (this.validateInputs()) {
 				this.$resources.updateServicePolicy.submit({
-					doctype: 'Service Level Agreement',
+					doctype: 'SLA',
 					name: this.slaPolicyName,
 					fieldname: {
 						priorities: this.priorities,

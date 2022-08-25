@@ -43,7 +43,7 @@ frappe.ui.form.on("Ticket", {
 
 	reset_service_level_agreement: function(frm) {
 		let reset_sla = new frappe.ui.Dialog({
-			title: __("Reset Service Level Agreement"),
+			title: __("Reset SLA"),
 			fields: [
 				{
 					fieldtype: "Data",
@@ -60,16 +60,16 @@ frappe.ui.form.on("Ticket", {
 
 				frappe.show_alert({
 					indicator: "green",
-					message: __("Resetting Service Level Agreement.")
+					message: __("Resetting SLA.")
 				});
 
-				frappe.call("erpnext.support.doctype.service_level_agreement.service_level_agreement.reset_service_level_agreement", {
+				frappe.call("erpnext.support.doctype.sla.sla.reset_service_level_agreement", {
 					reason: values.reason,
 					user: frappe.session.user_email
 				}, () => {
 					reset_sla.enable_primary_action();
 					frm.refresh();
-					frappe.msgprint(__("Service Level Agreement was reset."));
+					frappe.msgprint(__("SLA was reset."));
 				});
 			}
 		});
