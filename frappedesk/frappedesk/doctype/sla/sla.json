@@ -12,7 +12,7 @@
   "service_level",
   "enabled",
   "filters_section",
-  "default_service_level_agreement",
+  "default_sla",
   "entity_type",
   "entity",
   "column_break_15",
@@ -100,7 +100,7 @@
    "reqd": 1
   },
   {
-   "depends_on": "eval: !doc.default_service_level_agreement",
+   "depends_on": "eval: !doc.default_sla",
    "fieldname": "entity",
    "fieldtype": "Dynamic Link",
    "in_list_view": 1,
@@ -109,7 +109,7 @@
    "options": "entity_type"
   },
   {
-   "depends_on": "eval: !doc.default_service_level_agreement",
+   "depends_on": "eval: !doc.default_sla",
    "fieldname": "entity_type",
    "fieldtype": "Select",
    "in_standard_filter": 1,
@@ -118,9 +118,9 @@
   },
   {
    "default": "0",
-   "fieldname": "default_service_level_agreement",
+   "fieldname": "default_sla",
    "fieldtype": "Check",
-   "label": "Default Service Level Agreement"
+   "label": "Default SLA"
   },
   {
    "fieldname": "default_priority",
@@ -179,7 +179,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: !doc.default_service_level_agreement",
+   "depends_on": "eval: !doc.default_sla",
    "description": "Simple Python Expression, Example: doc.status == 'Open' and doc.ticket_type == 'Bug'",
    "fieldname": "condition",
    "fieldtype": "Code",
@@ -193,10 +193,10 @@
   }
  ],
  "links": [],
- "modified": "2022-02-17 17:58:36.377776",
+ "modified": "2022-08-25 23:11:36.377776",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
- "name": "Service Level Agreement",
+ "name": "SLA",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [

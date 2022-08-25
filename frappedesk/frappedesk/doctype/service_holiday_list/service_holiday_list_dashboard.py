@@ -5,5 +5,5 @@ def get_data():
 			"Company": "default_holiday_list",
 			"Leave Period": "optional_holiday_list",
 		},
-		"transactions": [{"items": ["Service Level", "Service Level Agreement"]}],
+		"transactions": [{"items": ["Service Level", "SLA"]}],
 	}
