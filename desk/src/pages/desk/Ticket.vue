@@ -361,11 +361,10 @@ export default {
 
 			this.$resources.submitComment.submit({
 				doc: {
-					doctype: 'Comment',
-					comment_type: 'Comment',
-					reference_doctype: 'Ticket',
-					reference_name: this.ticketId,
-					content: this.content
+					doctype: 'Frappe Desk Comment',
+					reference_ticket: this.ticketId,
+					content: this.content,
+					commented_by: this.user.user
 				}
 			})
 
