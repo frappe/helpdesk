@@ -1,13 +1,13 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "autoname": "format:COM-{reference_ticket}-{#######}",
  "creation": "2022-08-25 23:50:58.598316",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "commented_by",
   "reference_ticket",
+  "commented_by",
   "column_break_3",
   "content"
  ],
@@ -16,13 +16,6 @@
    "fieldname": "content",
    "fieldtype": "Text",
    "label": "Content"
-  },
-  {
-   "fieldname": "commented_by",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Commented By",
-   "options": "User"
   },
   {
    "fieldname": "reference_ticket",
@@ -34,14 +27,22 @@
   {
    "fieldname": "column_break_3",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "commented_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Commented By",
+   "options": "User"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-26 00:11:52.861962",
+ "modified": "2022-08-26 05:08:06.668346",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Comment",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
