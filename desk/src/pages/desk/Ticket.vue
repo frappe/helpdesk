@@ -46,6 +46,7 @@
 							v-on:keydown="handleShortcuts($event)"
 							@click="$refs.replyEditor.focusEditor()"
 							:content="content" 
+							:mentions="mentions"
 							@change="(val) => { content = val }"
 							:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'" 
 							editorClasses="w-full min-h-[180px] max-h-[300px] " class="border border-gray-300 rounded-[8px] p-[12px]"
@@ -201,6 +202,7 @@ export default {
 		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject('viewportWidth')
 		const user = inject('user')
+		const agents = inject('agents')
 		const attachments = ref([])
 
 		const editingType = ref('')
@@ -214,6 +216,7 @@ export default {
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
+			agents,
 			attachments,
 			tempTextEditorData,
 			editingType,
@@ -299,6 +302,13 @@ export default {
 			content = content.replaceAll('<p></p>', '')
 			content = content.replaceAll(' ', '')
 			return (content == "" || content == "<p><br></p>" || content == '<p></p>') && this.attachments.length == 0
+		},
+		mentions() {
+			const users = this.editingType === 'comment' ? this.agents : []
+			return users.map((user) => ({
+				label: user.agent_name,
+				value: user.name,
+			}))
 		}
 	},
 	methods: {
