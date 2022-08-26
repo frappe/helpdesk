@@ -69,9 +69,9 @@
 					<div>
 						<CustomAvatar :label="user.username" class="cursor-pointer" size="lg" v-if="user" :imageURL="user.profile_image" />
 					</div>
-					<div class="flex flex-col text-gray-700">
-						<span class="truncate text-base font-medium">{{ user.agent ? user.agent.agent_name : user.user }}</span>
-						<span class="truncate text-[11px] font-normal">{{ user.user }}</span>
+					<div class="flex flex-col text-gray-700 max-w-[150px]">
+						<a :title="user.agent ? user.agent.agent_name : user.user" class="truncate text-base font-medium">{{ user.agent ? user.agent.agent_name : user.user }}</a>
+						<a :title="user.user" class="truncate text-[11px] font-normal">{{ user.user }}</a>
 					</div>
 				</div>
 			</div>
@@ -81,7 +81,7 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { Dropdown, FeatherIcon, call } from 'frappe-ui'
+import { Dropdown, FeatherIcon } from 'frappe-ui'
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import { inject, ref } from 'vue'
 
