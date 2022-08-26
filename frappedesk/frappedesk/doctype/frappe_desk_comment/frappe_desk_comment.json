@@ -38,7 +38,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-26 05:08:06.668346",
+ "modified": "2022-08-26 21:25:20.467433",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Comment",
@@ -54,6 +54,17 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
    "share": 1,
    "write": 1
   }
