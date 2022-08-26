@@ -19,17 +19,17 @@ class TestServiceHolidayList(unittest.TestCase):
 				{"holiday_date": test_holiday_dates[1], "description": "test holiday2"},
 			],
 		)
-		fetched_service_holiday_list = frappe.get_value("Holiday List", service_holiday_list.name)
+		fetched_service_holiday_list = frappe.get_value("Service Holiday List", service_holiday_list.name)
 		self.assertEqual(service_holiday_list.name, fetched_service_holiday_list)
 
 
 def make_service_holiday_list(
 	name, from_date=getdate() - timedelta(days=10), to_date=getdate(), holiday_dates=None
 ):
-	frappe.delete_doc_if_exists("Holiday List", name, force=1)
+	frappe.delete_doc_if_exists("Service Holiday List", name, force=1)
 	doc = frappe.get_doc(
 		{
-			"doctype": "Holiday List",
+			"doctype": "Service Holiday List",
 			"service_holiday_list_name": name,
 			"from_date": from_date,
 			"to_date": to_date,

@@ -26,7 +26,7 @@ from frappe.utils.safe_exec import get_safe_globals
 from frappedesk.frappedesk.doctype.ticket.ticket import get_holidays
 
 
-class ServiceLevelAgreement(Document):
+class SLA(Document):
 	def validate(self):
 		self.validate_doc()
 		self.validate_status_field()
@@ -111,21 +111,21 @@ class ServiceLevelAgreement(Document):
 		):
 			frappe.throw(
 				_("{0} is not enabled in {1}").format(
-					frappe.bold("Track Service Level Agreement"),
+					frappe.bold("Track SLA"),
 					get_link_to_form("Frappe Desk Settings", "Frappe Desk Settings"),
 				)
 			)
 
-		if self.default_service_level_agreement and frappe.db.exists(
-			"Service Level Agreement",
+		if self.default_sla and frappe.db.exists(
+			"SLA",
 			{
 				"document_type": self.document_type,
-				"default_service_level_agreement": "1",
+				"default_sla": "1",
 				"name": ["!=", self.name],
 			},
 		):
 			frappe.throw(
-				_("Default Service Level Agreement for {0} already exists.").format(
+				_("Default SLA for {0} already exists.").format(
 					self.document_type
 				)
 			)
@@ -137,12 +137,12 @@ class ServiceLevelAgreement(Document):
 			self.entity_type
 			and self.entity
 			and frappe.db.exists(
-				"Service Level Agreement",
+				"SLA",
 				{"entity_type": self.entity_type, "entity": self.entity, "name": ["!=", self.name]},
 			)
 		):
 			frappe.throw(
-				_("Service Level Agreement for {0} {1} already exists.").format(
+				_("SLA for {0} {1} already exists.").format(
 					frappe.bold(self.entity_type), frappe.bold(self.entity)
 				)
 			)
@@ -153,7 +153,7 @@ class ServiceLevelAgreement(Document):
 			frappe.throw(
 				_(
 					"The Document Type {0} must have a Status field to configure"
-					"Service Level Agreement"
+					"SLA"
 				).format(frappe.bold(self.document_type))
 			)
 
@@ -165,7 +165,7 @@ class ServiceLevelAgreement(Document):
 			except Exception:
 				frappe.throw(_("The Condition '{0}' is invalid").format(self.condition))
 
-	def get_service_level_agreement_priority(self, priority):
+	def get_sla_priority(self, priority):
 		priority = frappe.get_doc(
 			"Service Level Priority", {"priority": priority, "parent": self.name}
 		)
@@ -183,29 +183,29 @@ class ServiceLevelAgreement(Document):
 		if self.document_type == "Ticket":
 			return
 
-		service_level_agreement_fields = get_service_level_agreement_fields()
+		sla_fields = get_sla_fields()
 		meta = frappe.get_meta(self.document_type, cached=False)
 
 		if meta.custom:
-			self.create_docfields(meta, service_level_agreement_fields)
+			self.create_docfields(meta, sla_fields)
 		else:
-			self.create_custom_fields(meta, service_level_agreement_fields)
+			self.create_custom_fields(meta, sla_fields)
 
 	def on_trash(self):
 		if self.service_level == "Default":
 			frappe.throw("The Default SLA cannot be deleted")
-		set_documents_with_active_service_level_agreement()
+		set_documents_with_active_sla()
 
 	def after_insert(self):
-		set_documents_with_active_service_level_agreement()
+		set_documents_with_active_sla()
 
 	def on_update(self):
-		set_documents_with_active_service_level_agreement()
+		set_documents_with_active_sla()
 
-	def create_docfields(self, meta, service_level_agreement_fields):
+	def create_docfields(self, meta, sla_fields):
 		last_index = len(meta.fields)
 
-		for field in service_level_agreement_fields:
+		for field in sla_fields:
 			if not meta.has_field(field.get("fieldname")):
 				last_index += 1
 
@@ -234,8 +234,8 @@ class ServiceLevelAgreement(Document):
 		# to update meta and modified timestamp
 		frappe.get_doc("DocType", self.document_type).save(ignore_permissions=True)
 
-	def create_custom_fields(self, meta, service_level_agreement_fields):
-		for field in service_level_agreement_fields:
+	def create_custom_fields(self, meta, sla_fields):
+		for field in sla_fields:
 			if not meta.has_field(field.get("fieldname")):
 				frappe.get_doc(
 					{
@@ -273,50 +273,50 @@ class ServiceLevelAgreement(Document):
 
 
 def check_agreement_status():
-	service_level_agreements = frappe.get_all(
-		"Service Level Agreement",
-		filters=[{"enabled": 1}, {"default_service_level_agreement": 0}],
+	slas = frappe.get_all(
+		"SLA",
+		filters=[{"enabled": 1}, {"default_sla": 0}],
 		fields=["name"],
 	)
 
-	for service_level_agreement in service_level_agreements:
-		doc = frappe.get_doc("Service Level Agreement", service_level_agreement.name)
+	for sla in slas:
+		doc = frappe.get_doc("SLA", sla.name)
 		if doc.end_date and getdate(doc.end_date) < getdate(frappe.utils.getdate()):
 			frappe.db.set_value(
-				"Service Level Agreement", service_level_agreement.name, "enabled", 0
+				"SLA", sla.name, "enabled", 0
 			)
 
 
-def get_active_service_level_agreement_for(doc):
+def get_active_sla_for(doc):
 	if not frappe.db.get_single_value("Frappe Desk Settings", "track_service_level_agreement"):
 		return
 
 	filters = [
-		["Service Level Agreement", "document_type", "=", doc.get("doctype")],
-		["Service Level Agreement", "enabled", "=", 1],
+		["SLA", "document_type", "=", doc.get("doctype")],
+		["SLA", "enabled", "=", 1],
 	]
 
 	if doc.get("priority"):
 		filters.append(["Service Level Priority", "priority", "=", doc.get("priority")])
 
 	or_filters = []
-	if doc.get("service_level_agreement"):
+	if doc.get("sla"):
 		or_filters = [
-			["Service Level Agreement", "name", "=", doc.get("service_level_agreement")],
+			["SLA", "name", "=", doc.get("sla")],
 		]
 
 	default_sla_filter = filters + [
-		["Service Level Agreement", "default_service_level_agreement", "=", 1]
+		["SLA", "default_sla", "=", 1]
 	]
 	default_sla = frappe.get_all(
-		"Service Level Agreement",
+		"SLA",
 		filters=default_sla_filter,
 		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
 	)
 
-	filters += [["Service Level Agreement", "default_service_level_agreement", "=", 0]]
+	filters += [["SLA", "default_sla", "=", 0]]
 	agreements = frappe.get_all(
-		"Service Level Agreement",
+		"SLA",
 		filters=filters,
 		or_filters=or_filters,
 		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
@@ -346,16 +346,16 @@ def get_context(doc):
 
 
 @frappe.whitelist()
-def get_service_level_agreement_filters(doctype, name):
+def get_sla_filters(doctype, name):
 	if not frappe.db.get_single_value("Frappe Desk Settings", "track_service_level_agreement"):
 		return
 
 	filters = [
-		["Service Level Agreement", "document_type", "=", doctype],
-		["Service Level Agreement", "enabled", "=", 1],
+		["SLA", "document_type", "=", doctype],
+		["SLA", "enabled", "=", 1],
 	]
 
-	or_filters = [["Service Level Agreement", "default_service_level_agreement", "=", 1]]
+	or_filters = [["SLA", "default_sla", "=", 1]]
 
 	return {
 		"priority": [
@@ -364,10 +364,10 @@ def get_service_level_agreement_filters(doctype, name):
 				"Service Level Priority", filters={"parent": name}, fields=["priority"]
 			)
 		],
-		"service_level_agreements": [
+		"slas": [
 			d.name
 			for d in frappe.get_all(
-				"Service Level Agreement", filters=filters, or_filters=or_filters
+				"SLA", filters=filters, or_filters=or_filters
 			)
 		],
 	}
@@ -385,21 +385,21 @@ def get_repeated(values):
 	return " ".join(diff)
 
 
-def get_documents_with_active_service_level_agreement():
-	sla_doctypes = frappe.cache().hget("service_level_agreement", "active")
+def get_documents_with_active_sla():
+	sla_doctypes = frappe.cache().hget("sla", "active")
 
 	if sla_doctypes is None:
-		return set_documents_with_active_service_level_agreement()
+		return set_documents_with_active_sla()
 
 	return sla_doctypes
 
 
-def set_documents_with_active_service_level_agreement():
+def set_documents_with_active_sla():
 	active = [
 		sla.document_type
-		for sla in frappe.get_all("Service Level Agreement", fields=["document_type"])
+		for sla in frappe.get_all("SLA", fields=["document_type"])
 	]
-	frappe.cache().hset("service_level_agreement", "active", active)
+	frappe.cache().hset("sla", "active", active)
 	return active
 
 
@@ -410,11 +410,11 @@ def apply(doc, method=None):
 		or frappe.flags.in_migrate
 		or frappe.flags.in_install
 		or frappe.flags.in_setup_wizard
-		or doc.doctype not in get_documents_with_active_service_level_agreement()
+		or doc.doctype not in get_documents_with_active_sla()
 	):
 		return
 
-	sla = get_active_service_level_agreement_for(doc)
+	sla = get_active_sla_for(doc)
 
 	if not sla:
 		return
@@ -426,10 +426,10 @@ def process_sla(doc, sla):
 
 	if not doc.creation:
 		doc.creation = now_datetime(doc.get("owner"))
-		if doc.meta.has_field("service_level_agreement_creation"):
-			doc.service_level_agreement_creation = now_datetime(doc.get("owner"))
+		if doc.meta.has_field("sla_creation"):
+			doc.sla_creation = now_datetime(doc.get("owner"))
 
-	doc.service_level_agreement = sla.name
+	doc.sla = sla.name
 	doc.priority = doc.get("priority") or sla.default_priority
 
 	handle_status_change(doc, sla.apply_sla_for_resolution)
@@ -441,8 +441,8 @@ def handle_status_change(doc, apply_sla_for_resolution):
 	now_time = frappe.flags.current_time or now_datetime(doc.get("owner"))
 	prev_status = frappe.db.get_value(doc.doctype, doc.name, "status")
 
-	hold_statuses = get_hold_statuses(doc.service_level_agreement)
-	fulfillment_statuses = get_fulfillment_statuses(doc.service_level_agreement)
+	hold_statuses = get_hold_statuses(doc.sla)
+	fulfillment_statuses = get_fulfillment_statuses(doc.sla)
 
 	def is_hold_status(status):
 		return status in hold_statuses
@@ -520,22 +520,22 @@ def handle_status_change(doc, apply_sla_for_resolution):
 			set_resolution_time(doc)
 
 
-def get_fulfillment_statuses(service_level_agreement):
+def get_fulfillment_statuses(sla):
 	return [
 		entry.status
 		for entry in frappe.db.get_all(
 			"SLA Fulfilled On Status",
-			filters={"parent": service_level_agreement},
+			filters={"parent": sla},
 			fields=["status"],
 		)
 	]
 
 
-def get_hold_statuses(service_level_agreement):
+def get_hold_statuses(sla):
 	return [
 		entry.status
 		for entry in frappe.db.get_all(
-			"Pause SLA On Status", filters={"parent": service_level_agreement}, fields=["status"]
+			"Pause SLA On Status", filters={"parent": sla}, fields=["status"]
 		)
 	]
 
@@ -543,7 +543,7 @@ def get_hold_statuses(service_level_agreement):
 def update_response_and_resolution_metrics(doc, apply_sla_for_resolution):
 	priority = get_response_and_resolution_duration(doc)
 	start_date_time = get_datetime(
-		doc.get("service_level_agreement_creation") or doc.creation
+		doc.get("sla_creation") or doc.creation
 	)
 	set_response_by(doc, start_date_time, priority)
 	if apply_sla_for_resolution and not doc.get(
@@ -626,7 +626,7 @@ def get_support_days(service_level):
 
 def set_resolution_time(doc):
 	start_date_time = get_datetime(
-		doc.get("service_level_agreement_creation") or doc.creation
+		doc.get("sla_creation") or doc.creation
 	)
 	if doc.meta.has_field("resolution_time"):
 		doc.resolution_time = time_diff_in_seconds(doc.resolution_date, start_date_time)
@@ -659,35 +659,35 @@ def set_resolution_time(doc):
 	doc.user_resolution_time = resolution_time_in_secs - total_pending_time
 
 
-def change_service_level_agreement_and_priority(self):
+def change_sla_and_priority(self):
 	if (
-		self.service_level_agreement
+		self.sla
 		and frappe.db.exists("Ticket", self.name)
 		and frappe.db.get_single_value("Frappe Desk Settings", "track_service_level_agreement")
 	):
 
 		if not self.priority == frappe.db.get_value("Ticket", self.name, "priority"):
 			self.set_response_and_resolution_time(
-				priority=self.priority, service_level_agreement=self.service_level_agreement
+				priority=self.priority, sla=self.sla
 			)
 			frappe.msgprint(_("Priority has been changed to {0}.").format(self.priority))
 
-		if not self.service_level_agreement == frappe.db.get_value(
-			"Ticket", self.name, "service_level_agreement"
+		if not self.sla == frappe.db.get_value(
+			"Ticket", self.name, "sla"
 		):
 			self.set_response_and_resolution_time(
-				priority=self.priority, service_level_agreement=self.service_level_agreement
+				priority=self.priority, sla=self.sla
 			)
 			frappe.msgprint(
-				_("Service Level Agreement has been changed to {0}.").format(
-					self.service_level_agreement
+				_("SLA has been changed to {0}.").format(
+					self.sla
 				)
 			)
 
 
 def get_response_and_resolution_duration(doc):
-	sla = frappe.get_doc("Service Level Agreement", doc.service_level_agreement)
-	priority = sla.get_service_level_agreement_priority(doc.priority)
+	sla = frappe.get_doc("SLA", doc.sla)
+	priority = sla.get_sla_priority(doc.priority)
 	priority.update(
 		{
 			"support_and_resolution": sla.support_and_resolution,
@@ -697,11 +697,11 @@ def get_response_and_resolution_duration(doc):
 	return priority
 
 
-def reset_service_level_agreement(doc, reason, user):
+def reset_sla(doc, reason, user):
 	if not frappe.db.get_single_value(
-		"Frappe Desk Settings", "allow_resetting_service_level_agreement"
+		"Frappe Desk Settings", "allow_resetting_sla"
 	):
-		frappe.throw(_("Allow Resetting Service Level Agreement from Frappe Desk Settings."))
+		frappe.throw(_("Allow Resetting SLA from Frappe Desk Settings."))
 
 	frappe.get_doc(
 		{
@@ -710,11 +710,11 @@ def reset_service_level_agreement(doc, reason, user):
 			"reference_doctype": doc.doctype,
 			"reference_name": doc.name,
 			"comment_email": user,
-			"content": " resetted Service Level Agreement - {0}".format(_(reason)),
+			"content": " resetted SLA - {0}".format(_(reason)),
 		}
 	).insert(ignore_permissions=True)
 
-	doc.service_level_agreement_creation = now_datetime(doc.get("owner"))
+	doc.sla_creation = now_datetime(doc.get("owner"))
 	doc.save()
 
 
@@ -738,7 +738,7 @@ def on_communication_update(doc, status):
 	if not parent:
 		return
 
-	if not parent.meta.has_field("service_level_agreement"):
+	if not parent.meta.has_field("sla"):
 		return
 
 	if (
@@ -776,7 +776,7 @@ def on_communication_update(doc, status):
 		return
 
 	for_resolution = frappe.db.get_value(
-		"Service Level Agreement", parent.service_level_agreement, "apply_sla_for_resolution"
+		"SLA", parent.sla, "apply_sla_for_resolution"
 	)
 
 	handle_status_change(parent, for_resolution)
@@ -829,7 +829,7 @@ def record_assigned_users_on_failure(doc):
 		doc.add_comment(comment_type="Assigned", text=message)
 
 
-def get_service_level_agreement_fields():
+def get_sla_fields():
 	return [
 		{
 			"collapsible": 1,
@@ -838,10 +838,10 @@ def get_service_level_agreement_fields():
 			"label": "Service Level",
 		},
 		{
-			"fieldname": "service_level_agreement",
+			"fieldname": "sla",
 			"fieldtype": "Link",
-			"label": "Service Level Agreement",
-			"options": "Service Level Agreement",
+			"label": "SLA",
+			"options": "SLA",
 		},
 		{
 			"fieldname": "priority",
@@ -880,7 +880,7 @@ def get_service_level_agreement_fields():
 			"default": "First Response Due",
 			"fieldname": "agreement_status",
 			"fieldtype": "Select",
-			"label": "Service Level Agreement Status",
+			"label": "SLA Status",
 			"options": "First Response Due\nResolution Due\nFulfilled\nOverdue",
 			"read_only": 1,
 		},
@@ -891,10 +891,10 @@ def get_service_level_agreement_fields():
 			"read_only": 1,
 		},
 		{
-			"fieldname": "service_level_agreement_creation",
+			"fieldname": "sla_creation",
 			"fieldtype": "Datetime",
 			"hidden": 1,
-			"label": "Service Level Agreement Creation",
+			"label": "SLA Creation",
 			"read_only": 1,
 		},
 		{
@@ -978,7 +978,7 @@ def get_user_time(user, to_string=False):
 def get_sla_doctypes():
 	doctypes = []
 	data = frappe.get_list(
-		"Service Level Agreement", {"enabled": 1}, ["document_type"], distinct=1
+		"SLA", {"enabled": 1}, ["document_type"], distinct=1
 	)
 
 	for entry in data:

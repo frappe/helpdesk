@@ -22,7 +22,7 @@
   "template",
   "custom_fields",
   "service_level_section",
-  "service_level_agreement",
+  "sla",
   "response_by",
   "response_by_variance",
   "reset_service_level_agreement",
@@ -146,23 +146,23 @@
    "collapsible": 1,
    "fieldname": "service_level_section",
    "fieldtype": "Section Break",
-   "label": "Service Level Agreement Details"
+   "label": "SLA Details"
   },
   {
-   "fieldname": "service_level_agreement",
+   "fieldname": "sla",
    "fieldtype": "Link",
-   "label": "Service Level Agreement",
-   "options": "Service Level Agreement"
+   "label": "SLA",
+   "options": "SLA"
   },
   {
-   "depends_on": "eval: doc.status != 'Replied' && doc.service_level_agreement;",
+   "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
    "fieldname": "response_by",
    "fieldtype": "Datetime",
    "label": "Response By",
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.service_level_agreement && doc.status != 'Replied';",
+   "depends_on": "eval: doc.sla && doc.status != 'Replied';",
    "fieldname": "response_by_variance",
    "fieldtype": "Duration",
    "hide_seconds": 1,
@@ -170,10 +170,10 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.service_level_agreement",
+   "depends_on": "eval: doc.sla",
    "fieldname": "reset_service_level_agreement",
    "fieldtype": "Button",
-   "label": "Reset Service Level Agreement"
+   "label": "Reset SLA"
   },
   {
    "collapsible": 1,
@@ -184,22 +184,22 @@
   },
   {
    "default": "First Response Due",
-   "depends_on": "eval: doc.service_level_agreement",
+   "depends_on": "eval: doc.sla",
    "fieldname": "agreement_status",
    "fieldtype": "Select",
-   "label": "Service Level Agreement Status",
+   "label": "SLA Status",
    "options": "First Response Due\nResolution Due\nFulfilled\nOverdue",
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.status != 'Replied' && doc.service_level_agreement;",
+   "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
    "fieldname": "resolution_by",
    "fieldtype": "Datetime",
    "label": "Resolution By",
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.service_level_agreement && doc.status != 'Replied';",
+   "depends_on": "eval: doc.sla && doc.status != 'Replied';",
    "fieldname": "resolution_by_variance",
    "fieldtype": "Duration",
    "hide_seconds": 1,
@@ -210,7 +210,7 @@
    "fieldname": "service_level_agreement_creation",
    "fieldtype": "Datetime",
    "hidden": 1,
-   "label": "Service Level Agreement Creation",
+   "label": "SLA Creation",
    "read_only": 1
   },
   {
@@ -419,7 +419,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-05-19 22:18:01.474617",
+ "modified": "2022-08-25 23:10:18.067777",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",

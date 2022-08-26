@@ -3,11 +3,11 @@
 		<ListManager
 			class="px-[16px]"
 			:options="{
-				cache: ['Service Level Agreement', 'Settings'],
-				doctype: 'Service Level Agreement',
+				cache: ['SLA', 'Settings'],
+				doctype: 'SLA',
 				fields: [
 					'name',
-					'default_service_level_agreement',
+					'default_sla',
 					'enabled'
 				],
 				limit: 20,

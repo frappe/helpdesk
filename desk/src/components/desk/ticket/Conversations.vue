@@ -74,11 +74,10 @@ export default {
 				cache: ['Ticket', 'Comments', this.ticketId],
 				method: 'frappe.client.get_list',
 				params: {
-					doctype: 'Comment',
+					doctype: 'Frappe Desk Comment',
 					fields: ['*'],
 					filters: {
-						comment_type: 'Comment',
-						reference_name: this.ticketId
+						reference_ticket: this.ticketId
 					},
 					order_by: 'creation asc',
 				},
@@ -122,7 +121,7 @@ export default {
 			if (data['doctype'] === 'Ticket' && data['name'] == this.ticketId) {
 				this.$resources.communications.fetch()
 			}
-			if (data['doctype'] === 'Comment') {
+			if (data['doctype'] === 'Frappe Desk Comment' && data['name'].split('-')[1] === this.ticketId) {
 				this.$resources.comments.fetch()
 			}
 		});

@@ -230,7 +230,7 @@ export default {
 				icon: 'external-link',
 				style: 'text-gray-800',
 				action: () => {
-					window.location.replace('/support/tickets')
+					window.open('/support/tickets', '_blank')
 				}
 			},
 			{

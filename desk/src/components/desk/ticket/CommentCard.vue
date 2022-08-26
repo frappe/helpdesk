@@ -44,7 +44,7 @@ export default {
 				method: 'frappe.client.get',
 				params: {
 					doctype: 'User',
-					name: this.comment?.owner,
+					name: this.comment?.commented_by,
 					fields: ['*']
 				},
 				auto: true
