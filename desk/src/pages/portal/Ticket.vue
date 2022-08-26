@@ -111,6 +111,7 @@
 															<FeatherIcon name="trash-2" role="button" class="h-4 w-4" @click="() => {
 																content = ''
 																attachments = []
+																editing = false
 															}" />
 														</div>
 													</div>
