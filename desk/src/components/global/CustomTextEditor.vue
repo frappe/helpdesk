@@ -12,6 +12,7 @@
 					:placeholder="placeholder"
 					:editable="true"
 					:extensions="[CustomHardBreakExtention]"
+					:mentions="mentions"
 					@change="(val) => {
 						content = val 
 						this.$emit('change', val)
@@ -45,7 +46,7 @@ import { ref, computed, nextTick } from 'vue'
 
 export default {
 	name: 'CustomTextEditor',
-	props: ['content', 'placeholder', 'editorClasses', 'show'],
+	props: ['content', 'placeholder', 'editorClasses', 'show', 'mentions'],
 	emits: ['change'],
 	components: {
 		TextEditor
