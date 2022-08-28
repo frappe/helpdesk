@@ -51,7 +51,8 @@
 						this.$resources.categories.fetch().then(() => {
 							this.setArticleDetail('category', category)
 						})	
-					}" 
+					}"
+					:redirectToCategory="false"
 				/>
 			</div>
 			<Input type="textarea" label="Note" :value="article.note" @input="(val) => setArticleDetail('note', val)" :debounce="500" placeholder="Start typing to save..." />

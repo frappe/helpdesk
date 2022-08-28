@@ -69,20 +69,8 @@
 			class="flex flex-col overflow-scroll"
 			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 132px)' : null }"
 		>
-			<div v-if="!manager.loading">
-				<div v-if="manager.list.length > 0">
-					<div v-for="(article, index) in manager.list" :key="article.name">
-						<ArticleListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :article="article" @toggle-select="manager.select(article)" :selected="manager.itemSelected(article)" />
-					</div>
-				</div>
-				<div v-else>
-					<div class="grid place-content-center h-48 w-full">
-						<div>
-							<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
-							<div class="text-gray-500 mb-2">No articles found</div>
-						</div>
-					</div>
-				</div>
+			<div v-for="(article, index) in manager.list" :key="article.name">
+				<ArticleListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :article="article" @toggle-select="manager.select(article)" :selected="manager.itemSelected(article)" />
 			</div>
 			<ListPageController :manager="manager" />
 		</div>
