@@ -6,7 +6,7 @@ def before_install():
 	add_support_redirect_to_tickets()
 
 def after_install():
-	add_default_categories()
+	add_default_categories_and_articles()
 	add_default_ticket_types()
 	add_default_ticket_priorities()
 	add_default_sla()
@@ -39,19 +39,28 @@ def add_support_redirect_to_tickets():
     website_settings.append("route_redirects", base_route)
     website_settings.save()
 
-def add_default_categories():
-	frappe.get_doc({
-		"doctype": "Category",
-		"category_name": "FAQ",
-		"description": "Description for your FAQs",
-		"is_group": True
-	}).insert()
-
+def add_default_categories_and_articles():
 	frappe.get_doc({
 		"doctype": "Category",
 		"category_name": "Getting Started",
 		"description": "Description for your Getting Started",
 		"is_group": True
+	}).insert()
+
+	frappe.get_doc({
+		"doctype": "Category",
+		"category_name": "Introduction",
+		"description": "Description for your Introduction",
+		"parent_category": "Getting Started",
+		"is_group": False
+	}).insert()
+
+	frappe.get_doc({
+		"doctype": "Article",
+		"title": "Article 1",
+		"content": "Content for your Article",
+		"category": "Introduction",
+		"published": False
 	}).insert()
 
 def add_default_sla():
