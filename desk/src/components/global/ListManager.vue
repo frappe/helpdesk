@@ -114,6 +114,7 @@ export default {
             selectedItems.value[manager.value.list[i].name] = manager.value.list[i]
           }
         }
+        context.emit('selection', selectedItems.value)
       },
       select: (rowData) => {
         if (selectionMode.value == 0) {
