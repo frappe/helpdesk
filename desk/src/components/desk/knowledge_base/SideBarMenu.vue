@@ -7,8 +7,8 @@
 						role="button" 
 						class="flex flex-row items-center group space-x-2"
 					>
-						<div class="grow truncate" @click="() => { category.expanded = !category.expanded }">{{ category.name }}</div>
-						<FeatherIcon @click="() => { category.expanded = !category.expanded }" :name="category.expanded ? 'chevron-up' : 'chevron-down'" class="h-4 w-4 shrink-0" />
+						<div class="grow truncate" @click="expandCategory(category)">{{ category.name }}</div>
+						<FeatherIcon @click="expandCategory(category)" :name="category.expanded ? 'chevron-up' : 'chevron-down'" class="h-4 w-4 shrink-0" />
 					</div>
 					<div v-if="category.expanded" class="pt-[16px] space-y-[16px] flex flex-col">
 						<div v-for="subCategory in category.children" :key="subCategory.name">
@@ -58,6 +58,21 @@ export default {
 	umbounted() {
 		this.$event.off('select_category')
 	},
+	methods: {
+		expandCategory(category) {
+			if (category.children.length > 0) {
+				category.expanded = !category.expanded
+			} else {
+				this.$toast({
+					title: 'No Sub Categories',
+					text: 'This category does not have any subcategories',
+					icon: 'info',
+					iconClasses: 'stroke-yellow-500',
+					appearance: 'warning'
+				})
+			}
+		}
+	},
 	resources: {
 		categories() {
 			return {
@@ -66,11 +81,9 @@ export default {
 				fields: ['is_group', 'parent_category', 'name', 'order'],
 				onSuccess: (list) => {
 					let categories = []
-					let expandedFlag = this.selectedCategory ? true : false
 					list.forEach(category => {
 						if (category.is_group) {
-							categories.push({...category, children: [], expanded: expandedFlag ? false : true})
-							expandedFlag = true
+							categories.push({...category, children: [], expanded: false})
 						}
 					})
 					list.forEach(category => {
@@ -90,7 +103,9 @@ export default {
 					}
 
 					this.categories = categories
-					this.categories.find(cat => cat.name == this.selectedCategory.parent_category).expanded = true
+					if (this.selectedCategory && this.selectedCategory.hasOwnProperty('parent_category')) {
+						this.categories.find(cat => cat.name == this.selectedCategory.parent_category).expanded = true
+					}
 				}
 			}
 		}
