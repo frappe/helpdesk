@@ -17,16 +17,55 @@
 					order_by: 'modified desc',
 					limit: 20
 				}"
+				@selection="updateActions()"
 			>
 				<template #body="{ manager }">
-					<div>
-						<ArticleList :manager="manager" />
+					<div v-if="!manager.loading">
+						<div v-if="manager.list.length > 0">
+							<ArticleList :manager="manager" />
+						</div>
+						<div v-else>
+							<div class="grid place-content-center w-full mt-10">
+								<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
+								<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No articles found</div>
+								<div class="flex flex-row space-x-2 mt-4">
+									<Button @click="() => { 
+										doctypeToDelete = 'Category';
+										documentsToDelete = [subCategory]
+										showDeleteDialog = true
+									}" appearance="danger">Delete Category</Button>
+									<Button @click="() => { $router.push({name: 'NewArticle', query: { category: subCategory }}) }" appearance="primary">Add Article</Button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</template>
 			</ListManager>
 			<NewCategoryDialog 
 				:show="showCreateNewCategoryDialog" 
 				@close="showCreateNewCategoryDialog = false"
+			/>
+			<Dialog 
+				:options="{
+					title: `Deleting ${documentsToDeleteStr}`, 
+					message: `Do you really want to delete this ${doctypeToDelete.toLowerCase()}(s)?`,
+					actions: [
+						{
+							label: 'Delete',
+							appearance: 'danger',
+							handler: () => {
+								$resources.deleteDoc.submit({doctype: doctypeToDelete, items: JSON.stringify(documentsToDelete)})
+							}
+						},
+						{
+							label: 'Cancel',
+							appearance: 'secondary',
+							handler: () => { showDeleteDialog = false }
+						},
+					]
+				}" 
+				:show="showDeleteDialog" 
+				@close="showDeleteDialog = false"
 			/>
 		</div>
 	</div>
@@ -36,6 +75,7 @@
 import ListManager from '@/components/global/ListManager.vue'
 import SideBarMenu from '@/components/desk/knowledge_base/SideBarMenu.vue'
 import ArticleList from '@/components/desk/knowledge_base/ArticleList.vue'
+import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { ErrorMessage } from 'frappe-ui'
 import { ref } from '@vue/reactivity'
 import NewCategoryDialog from '@/components/desk/knowledge_base/NewCategoryDialog.vue'
@@ -57,13 +97,21 @@ export default {
     ArticleList,
     ErrorMessage,
     SideBarMenu,
+	CustomIcons,
     NewCategoryDialog
 },
 	setup() {
 		const showCreateNewCategoryDialog = ref(false)
+		const showDeleteDialog = ref(false)
+
+		const documentsToDelete = ref([])
+		const doctypeToDelete = ref('')
 		
 		return {
 			showCreateNewCategoryDialog,
+			showDeleteDialog,
+			documentsToDelete,
+			doctypeToDelete
 		}
 	},
 	watch: {
@@ -74,16 +122,60 @@ export default {
 			this.$event.emit('select_category', {name: this.subCategory, parent_category: this.category})
 		}
 	},
+	computed: {
+		documentsToDeleteStr() {
+			let str = ''
+			this.documentsToDelete.forEach((doc, index) => {
+				str += doc
+				if (index !== this.documentsToDelete.length - 1) {
+					str += ', '
+				}
+			})
+			return str
+		}
+	},
 	mounted() {
-		const actions = [
-			{ label: 'Add article', handler: () => { this.$router.push({name: 'NewArticle', query: { category: this.subCategory }}) }, appearance: 'primary', dropdown: [
-				{ label: 'Add category', handler: () => {
-					this.showCreateNewCategoryDialog = true
-				}}
-			] },
-		]
+		const actions = this.getBaseActions()
 		this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
 		this.$event.emit('select_category',  (this.category && this.subCategory ) ? {name: this.subCategory, parent_category: this.category} : null)
 	},
+	resources: {
+		deleteDoc() {
+			return {
+				method: 'frappe.desk.reportview.delete_items',
+				onSuccess: () => {
+					this.$router.go()
+				}
+			}
+		}
+	},
+	methods: {
+		updateActions() {
+			const selectedArticles = this.$refs.articleList?.manager?.selectedItems
+			const actions = this.getBaseActions()
+			if (Object.keys(selectedArticles).length > 0) {
+				actions.unshift({
+					label: 'Delete',
+					appearance: 'danger',
+					handler: () => {
+						this.doctypeToDelete = 'Article';
+						this.documentsToDelete = Object.values(selectedArticles).map(x => x.name)
+						this.showDeleteDialog = true
+					}
+				})
+			}
+			this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
+		},
+		getBaseActions() {
+			const actions = [
+				{ label: 'Add article', handler: () => { this.$router.push({name: 'NewArticle', query: { category: this.subCategory }}) }, appearance: 'primary', dropdown: [
+					{ label: 'Add category', handler: () => {
+						this.showCreateNewCategoryDialog = true
+					}}
+				] },
+			]
+			return actions
+		}
+	}
 }
 </script>
