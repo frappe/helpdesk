@@ -1,8 +1,9 @@
 <template>
 	<div class="flex flex-row w-full">
-		<SideBarMenu class="w-[173px] shrink-0 border-r" />
+		<SideBarMenu class="w-[173px] shrink-0 border-r"/>
 		<div class="grow text-[13px] font-normal p-5">
 			<ListManager
+				v-if="subCategory"
 				ref="articleList"
 				:options="{
 					doctype: 'Article',
@@ -41,9 +42,25 @@
 					</div>
 				</template>
 			</ListManager>
+			<div v-else-if="category">
+				<div class="grid place-content-center w-full mt-10">
+					<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
+					<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No sub categories found</div>
+					<div class="flex flex-row space-x-2 mt-4 mx-auto">
+						<Button v-if="allCategories.length > 1" @click="() => { 
+							doctypeToDelete = 'Category';
+							documentsToDelete = [category]
+							showDeleteDialog = true
+						}" appearance="danger">Delete Category</Button>
+						<Button @click="() => { showCreateNewCategoryDialog = true }" appearance="primary">{{ allCategories.length > 1 ? 'Add Sub Category' : 'Add Category'}}</Button>
+					</div>
+				</div>
+			</div>
+			<ErrorMessage v-else message="Something went wrong"/>
 			<NewCategoryDialog 
 				:show="showCreateNewCategoryDialog" 
 				@close="showCreateNewCategoryDialog = false"
+				:newCategoryParent="category"
 			/>
 			<Dialog 
 				:options="{
@@ -77,7 +94,7 @@ import SideBarMenu from '@/components/desk/knowledge_base/SideBarMenu.vue'
 import ArticleList from '@/components/desk/knowledge_base/ArticleList.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import { ErrorMessage } from 'frappe-ui'
-import { ref } from '@vue/reactivity'
+import { ref, inject } from 'vue'
 import NewCategoryDialog from '@/components/desk/knowledge_base/NewCategoryDialog.vue'
 
 export default {
@@ -106,12 +123,15 @@ export default {
 
 		const documentsToDelete = ref([])
 		const doctypeToDelete = ref('')
+
+		const allCategories = inject('allCategories')
 		
 		return {
 			showCreateNewCategoryDialog,
 			showDeleteDialog,
 			documentsToDelete,
-			doctypeToDelete
+			doctypeToDelete,
+			allCategories
 		}
 	},
 	watch: {
@@ -144,7 +164,16 @@ export default {
 			return {
 				method: 'frappe.desk.reportview.delete_items',
 				onSuccess: () => {
-					this.$router.go()
+					if (this.doctypeToDelete == 'Category') {
+						this.$router.push({name: 'Category', params: {category: this.category}}).then(() => {
+							this.$router.go()
+						})
+					} else {
+						this.$router.push({name: 'SubCategory', params: {category: this.category, subCategory: this.subCategory}}).then(() => {
+							this.$router.go()
+						})
+					}
+					this.showDeleteDialog = false
 				}
 			}
 		}

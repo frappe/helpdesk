@@ -63,13 +63,7 @@ export default {
 			if (category.children.length > 0) {
 				category.expanded = !category.expanded
 			} else {
-				this.$toast({
-					title: 'No Sub Categories',
-					text: 'This category does not have any subcategories',
-					icon: 'info',
-					iconClasses: 'stroke-yellow-500',
-					appearance: 'warning'
-				})
+				this.$router.push(`/frappedesk/knowledge-base/${category.name}`)
 			}
 		}
 	},
@@ -105,6 +99,9 @@ export default {
 					this.categories = categories
 					if (this.selectedCategory && this.selectedCategory.hasOwnProperty('parent_category')) {
 						this.categories.find(cat => cat.name == this.selectedCategory.parent_category).expanded = true
+					} else {
+						this.selectedCategory = categories[0]
+						this.$router.push(`/frappedesk/knowledge-base/${this.selectedCategory.name}`)
 					}
 				}
 			}

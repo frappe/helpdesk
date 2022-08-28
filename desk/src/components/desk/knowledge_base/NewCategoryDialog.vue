@@ -68,6 +68,14 @@ export default {
 			type: Boolean,
 			default: true
 		},
+		newCategoryParent: {
+			type: String,
+			default: ''
+		},
+		redirectToCategory: {
+			type: Boolean,
+			default: true
+		}
 	},
 	emits: ['update:modelValue', 'close', 'new-category-created'],
 	setup(props, { emit }) {
@@ -93,11 +101,16 @@ export default {
 		parentCategories() {
 			if (this.$resources.allParentCategories.data) {
 				let categories = []
+				if (this.newCategoryParent) {
+					categories.push(this.newCategoryParent)
+				}
 				if (this.createParentCategories) {
 					categories.push('none')
 				}
 				this.$resources.allParentCategories.data.forEach(category => {
-					categories.push(category.name)
+					if (!categories.includes(category.name)) {
+						categories.push(category.name)
+					}
 				})
 				this.newCategoryInputValues.parent = categories[0]
 				return categories
@@ -154,6 +167,9 @@ export default {
 					})
 					this.$emit('new-category-created', doc.name)
 					this.$emit('close', doc.name)
+					if (this.redirectToCategory) {
+						this.$router.push(`/frappedesk/knowledge-base/${doc.parent_category ? doc.parent_category : doc.category_name}/${doc.parent_category ? doc.category_name : ''}`).then(() => this.$router.go())
+					}
 				},
 				onError(err) {
 					this.newCategoryInputErrors.others = err

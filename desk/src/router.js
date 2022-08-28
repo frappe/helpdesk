@@ -82,6 +82,12 @@ const routes = [
 					},
 					{
 						path: ':category/:subCategory',
+						name: 'SubCategory',
+						props: true,
+						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
+					},
+					{
+						path: ':category',
 						name: 'Category',
 						props: true,
 						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
