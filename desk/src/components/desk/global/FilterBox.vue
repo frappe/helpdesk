@@ -68,6 +68,7 @@ export default {
 		},
 		applyFilters() {
 			this.$emit("update:modelValue", this.tempFilters.filter((item) => item != null && Object.values(item)[0] != ''));
+			this.$emit("close")
 		},
 		clearAllFilters() {
 			this.tempFilters = []
