@@ -16,7 +16,7 @@
 			<div class="grow"></div>
 			<div>
 				<div class="flex flex-reverse space-x-2">
-					<Button appearance="primary" @click="applyFilters()">Apply Filters</Button>
+					<Button appearance="primary" @click="applyFilters()">Apply</Button>
 					<Button appearance="secondary" @click="clearAllFilters()">Clear All</Button>
 				</div>
 			</div>
