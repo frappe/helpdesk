@@ -17,7 +17,7 @@
 			<div>
 				<div class="flex flex-reverse space-x-2">
 					<Button appearance="primary" @click="applyFilters()">Apply</Button>
-					<Button appearance="secondary" @click="clearAllFilters()">Clear All</Button>
+					<Button appearance="secondary" @click="clearAllFilters()">Clear</Button>
 				</div>
 			</div>
 		</div>
