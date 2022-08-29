@@ -41,7 +41,11 @@
 										if (form) {
 											form.submit ? form.submit.action(formInputs) : form.onSubmit(formInputs)
 										} else {
-											action()
+											if (typeof(action) === 'function') {
+												action()
+											} else {
+												action.onClick()
+											}
 										}
 									}">{{ action ? action.title : ( form.submit ? form.submit.title : 'Submit' ) }}</Button>
 								</div>
