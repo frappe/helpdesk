@@ -8,7 +8,7 @@
  "hide_custom": 0,
  "icon": "support",
  "idx": 0,
- "label": "FrappeDesk",
+ "label": "Frappe Desk",
  "links": [
   {
    "hidden": 0,
@@ -152,7 +152,7 @@
  "modified": "2022-08-25 19:26:55.214322",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
- "name": "FrappeDesk",
+ "name": "Frappe Desk",
  "owner": "Administrator",
  "parent_page": "",
  "public": 1,
