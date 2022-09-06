@@ -57,8 +57,7 @@
   "customer_feedback_section",
   "feedback_submitted",
   "satisfied",
-  "customer_feedback",
-  "agent_remark"
+  "customer_feedback"
  ],
  "fields": [
   {
@@ -407,19 +406,12 @@
    "fieldname": "customer_feedback",
    "fieldtype": "Long Text",
    "label": "Feedback"
-  },
-  {
-   "depends_on": "eval:!doc.satisfied",
-   "fieldname": "agent_remark",
-   "fieldtype": "Select",
-   "label": "Agent Remark",
-   "options": "Argent\nPoor Knowledge"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-08-25 23:10:18.067777",
+ "modified": "2022-09-06 14:55:21.802527",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",
