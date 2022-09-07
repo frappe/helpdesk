@@ -112,6 +112,7 @@
    "read_only": 1
   },
   {
+   "default": "0",
    "fieldname": "order",
    "fieldtype": "Data",
    "label": "Order"
@@ -136,7 +137,7 @@
  "index_web_pages_for_search": 1,
  "is_published_field": "published",
  "links": [],
- "modified": "2022-08-08 08:24:17.192038",
+ "modified": "2022-09-07 16:03:49.824097",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Article",
