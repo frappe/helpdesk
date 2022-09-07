@@ -103,21 +103,24 @@ def mark_ticket_as_seen(ticket_id):
 	if ticket_id:
 		return frappe.get_doc("Ticket", ticket_id).add_seen()
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def assign_ticket_to_agent(ticket_id, agent_id=None):
-	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
-		
-		if agent_id is None:
-			# assign to self
-			agent_id = frappe.session.user
-			if not frappe.db.exists("Agent", agent_id):
-				frappe.throw('Tickets can only assigned to agents')
-		
-		ticket_doc.assign_agent(agent_id)
-		return ticket_doc
+	if not ticket_id:
+		return
 
-@frappe.whitelist(allow_guest=True)
+	ticket_doc = frappe.get_doc("Ticket", ticket_id)
+
+	if not agent_id:
+		# assign to self
+		agent_id = frappe.session.user
+
+	if not frappe.db.exists("Agent", agent_id):
+		frappe.throw('Tickets can only assigned to agents')
+
+	ticket_doc.assign_agent(agent_id)
+	return ticket_doc
+
+@frappe.whitelist()
 def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
 	if ticket_ids:
 		ticket_docs = []
@@ -126,7 +129,7 @@ def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
 			ticket_docs.append(ticket_doc)
 		return ticket_docs
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def assign_ticket_type(ticket_id, type):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
@@ -139,7 +142,7 @@ def assign_ticket_type(ticket_id, type):
 
 		return ticket_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def assign_ticket_status(ticket_id, status):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
@@ -151,7 +154,7 @@ def assign_ticket_status(ticket_id, status):
 
 		return ticket_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def set_ticket_notes(ticket_id, notes):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
@@ -164,7 +167,7 @@ def set_ticket_notes(ticket_id, notes):
 		return ticket_doc
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def bulk_assign_ticket_status(ticket_ids, status):
 	if ticket_ids:
 		ticket_docs = []
@@ -173,7 +176,7 @@ def bulk_assign_ticket_status(ticket_ids, status):
 			ticket_docs.append(ticket_doc)
 		return ticket_docs
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def assign_ticket_priority(ticket_id, priority):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
@@ -185,7 +188,7 @@ def assign_ticket_priority(ticket_id, priority):
 
 		return ticket_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def assign_ticket_group(ticket_id, agent_group):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
@@ -197,12 +200,12 @@ def assign_ticket_group(ticket_id, agent_group):
 		
 		return ticket_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_all_ticket_types():
 	return frappe.get_all("Ticket Type", pluck="name")
 
 #TODO: the code can be made better
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_all_ticket_statuses():
 	statuses = []
 	ticket_doctype = frappe.get_doc("DocType", "Ticket")
@@ -212,7 +215,7 @@ def get_all_ticket_statuses():
 			statuses = doc_field.options.split("\n")
 	return statuses
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_all_ticket_priorities():
 	return frappe.get_all("Ticket Priority", pluck="name")
 
@@ -231,7 +234,7 @@ def get_contact(ticket_id):
 				return contact_doc
 	return None
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_conversations(ticket_id):
 	return get_all_conversations(ticket_id)
 
@@ -260,7 +263,7 @@ def check_and_create_ticket_type(type):
 
 	return ticket_type_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_all_ticket_templates():
 	templates = frappe.get_all("Ticket Template")
 	for index, template in enumerate(templates):
@@ -268,7 +271,7 @@ def get_all_ticket_templates():
 	
 	return templates
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def activities(name):
 	activities = frappe.db.sql(
 		"""
