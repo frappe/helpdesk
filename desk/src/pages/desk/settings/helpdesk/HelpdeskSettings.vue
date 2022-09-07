@@ -46,7 +46,7 @@ export default {
             return {
                 method: 'frappedesk.api.settings.update_helpdesk_name',
                 onSuccess: (res) => {
-                    document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`
+                    document.title = `Frappe Desk ${res ? ` | ${res}` : ''}`
                     this.helpdeskName = res
                     this.$toast({
                         title: 'Helpdesk name updated!!',
