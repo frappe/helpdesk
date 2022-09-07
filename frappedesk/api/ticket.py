@@ -66,7 +66,7 @@ def create_new(values, template='Default', attachments=[], via_customer_portal=F
 
 	return ticket_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_contact(ticket_id, contact):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
