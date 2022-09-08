@@ -204,15 +204,9 @@ def assign_ticket_group(ticket_id, agent_group):
 def get_all_ticket_types():
 	return frappe.get_all("Ticket Type", pluck="name")
 
-#TODO: the code can be made better
 @frappe.whitelist()
 def get_all_ticket_statuses():
-	statuses = []
-	ticket_doctype = frappe.get_doc("DocType", "Ticket")
-	for field in ticket_doctype.fields:
-		doc_field = frappe.get_doc("DocField", field.__dict__["name"])
-		if doc_field.label == "Status":
-			statuses = doc_field.options.split("\n")
+	statuses = list(frappe.get_meta("Ticket").get_field("status").options.split("\n"))
 	return statuses
 
 @frappe.whitelist()
