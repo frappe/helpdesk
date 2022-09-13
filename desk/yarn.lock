@@ -765,10 +765,10 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
-frappe-ui@^0.0.58:
-  version "0.0.58"
-  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.58.tgz#7b761c22a0764928bac61698de5b5af81c1915fc"
-  integrity sha512-7BCx/JYx8K7r5PephaL0ZAg05xrPXI/pbc3hOEyqsNBjCvFF7s/WdZ9o8WUigxU8w5Ubov0tI648/9lODyHjfg==
+frappe-ui@^0.0.65:
+  version "0.0.65"
+  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.65.tgz#f7534f2536b2e342c5eac2fd07efd91ce7edee47"
+  integrity sha512-su7X4IFffqJa6B4IlVKbEuPKyhbp/QIoioMjJTSZJA7cLIrHoaN6BGgfjM9fsqVNCIA7LK4mrB32xnpfpnv5UQ==
   dependencies:
     "@headlessui/vue" "^1.5.0"
     "@popperjs/core" "^2.11.2"
@@ -787,6 +787,7 @@ frappe-ui@^0.0.58:
     "@tiptap/vue-3" "^2.0.0-beta.96"
     autoprefixer "^10.4.2"
     feather-icons "^4.28.0"
+    idb-keyval "^6.2.0"
     postcss "^8.4.5"
     socket.io-client "^4.5.1"
     tailwindcss "^3.0.12"
@@ -827,6 +828,13 @@ he@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
+
+idb-keyval@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/idb-keyval/-/idb-keyval-6.2.0.tgz#3af94a3cc0689d6ee0bc9e045d2a3340ea897173"
+  integrity sha512-uw+MIyQn2jl3+hroD7hF8J7PUviBU7BPKWw4f/ISf32D4LoGu98yHjrzWWJDASu9QNrX10tCJqk9YY0ClWm8Ng==
+  dependencies:
+    safari-14-idb-fix "^3.0.0"
 
 is-binary-path@~2.1.0:
   version "2.1.0"
@@ -1193,6 +1201,11 @@ run-parallel@^1.1.9:
   integrity sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==
   dependencies:
     queue-microtask "^1.2.2"
+
+safari-14-idb-fix@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/safari-14-idb-fix/-/safari-14-idb-fix-3.0.0.tgz#450fc049b996ec7f3fd9ca2f89d32e0761583440"
+  integrity sha512-eBNFLob4PMq8JA1dGyFn6G97q3/WzNtFK4RnzT1fnLq+9RyrGknzYiM/9B12MnKAxuj1IXr7UKYtTNtjyKMBog==
 
 socket.io-client@^4.5.1:
   version "4.5.1"
