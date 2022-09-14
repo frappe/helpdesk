@@ -24,12 +24,8 @@ export default {
 		SideBarMenu,
 		CustomIcons
 	},
-	data() {
-		return {
-			mounted: false
-		}
-	},
 	setup() {
+		const mounted = ref(false)
 		const user = inject('user')
 
 		const ticketTypes = ref([])
@@ -72,6 +68,7 @@ export default {
 		provide('agentController', agentController)
 
 		return {
+			mounted,
 			user,
 
 			ticketTypes,
@@ -440,7 +437,7 @@ export default {
 					fields: [
 						'name',
 						'agent_name',
-						// TODO: 'user.user_image'
+						'user.user_image'
 					],
 				},
 				auto: this.user.has_desk_access,

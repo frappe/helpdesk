@@ -91,7 +91,7 @@
 						<div class="h-[26px] w-[26px]">
 							<div v-if="assignees.length > 0">
 								<div v-for="assignee in assignees" :key="assignee">
-									<Avatar class="h-[26px] w-[26px]" :label="assignee.agent_name" />
+									<Avatar class="h-[26px] w-[26px]" :imageURL="assignee.user_image" :label="assignee.agent_name" />
 								</div>
 							</div>
 						</div>
