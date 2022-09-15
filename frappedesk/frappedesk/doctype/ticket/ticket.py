@@ -164,7 +164,7 @@ def set_descritption_from_communication(doc, type):
 		if not ticket_doc.via_customer_portal:
 			ticket_doc.description = doc.content
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_communication_via_contact(ticket, message, attachments=[]):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
