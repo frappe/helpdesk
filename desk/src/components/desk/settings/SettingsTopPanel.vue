@@ -59,8 +59,7 @@ export default {
 					this.$router.push({ name: "NewEmailAccount" })
 				}),
 			],
-			"Email Accounts Bulk": [],
-			"Helpdesk Settings": []
+			"Email Accounts Bulk": []
 		}
 
 		this.$event.on('show-top-panel-actions-settings', (group) => {
