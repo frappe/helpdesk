@@ -43,50 +43,52 @@
 						</div>
 					</div>
 				</div>
-				<div v-else class="w-full">
-					<div class="flex space-x-2 mb-2">
-						<div class="grow">Select Contact</div>
-						<FeatherIcon 
-							name="x" 
-							class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-red-500"
-							@click="() => {editingContact=!editingContact}"
-						/>
-					</div>
-					<Combobox v-model="selectedContact">
-						<ComboboxInput 
-							class="rounded-md w-full border-none focus:ring-0 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 bg-slate-100"
-							autocomplete="off"
-							@change="query = $event.target.value" 
-						/>
-						<ComboboxOptions
-							class="w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+				<div v-else class="flex items-center space-x-2 mb-2 w-full">
+					<div class="grow w-full">
+						<Autocomplete 
+							v-if="contacts"
+							:options="contacts.map(x => {
+								return {label: `${x.first_name ? x.first_name : ''} ${x.last_name ? x.last_name : ''}` , value: x.name}
+							})"
+							placeholder="Set contact"
+							:value="contactFullName && !updatingContact ? contactFullName : ''" 
+							@change="(item) => {
+								if (item.value) {
+									updatingContact = true
+									ticketController.set(ticketId, 'contact', item.value).then(() => {
+										updatingContact = false
+										editingContact = false
+										$resources.otherTicketsOfContact.fetch()
+										$resources.ticket.fetch()
+	
+										$toast({
+											title: 'Ticket updated successfully.',
+											customIcon: 'circle-check',
+											appearance: 'success',
+										})
+									})
+								}
+							}"
 						>
-							<div
-								v-if="filterdContacts.length === 0 && query !== ''"
-								class="select-none relative py-2 px-4 text-gray-700 cursor-pointer"
-								@click="() => {showNewContactDialog = true}"
-							>
-								Create new
-							</div>
-							<ComboboxOption
-								v-slot="{ selected, active }"
-								v-for="contactItem in filterdContacts" :key="contactItem"
-								:value="contactItem.name"
-							>
-								<li
-									class="cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
-									:class="{'bg-slate-50': active}"
-								>
-									<span
-										class="block truncate"
-										:class="{ 'font-medium': selected, 'font-normal': !selected }"
-										>
-										{{ contactItem.name }}
-									</span>
-								</li>
-							</ComboboxOption>
-						</ComboboxOptions>
-					</Combobox>
+							<template #input>
+								<div class="flex flex-row space-x-1 items-center">
+									<div class="w-[170px]">
+										<div v-if="ticket.contact && !updatingContact" class="text-left truncate">{{ contactFullName }}</div>
+										<div v-else>
+											<LoadingText v-if="updatingContact" />
+											<div v-else class="text-base text-left text-gray-400"> set contact </div>
+										</div>
+									</div>
+								</div>
+							</template>
+						</Autocomplete>
+
+					</div>
+					<FeatherIcon 
+						name="x" 
+						class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-red-500"
+						@click="() => {editingContact=!editingContact}"
+					/>
 				</div>
 			</div>
 		</div>
@@ -174,12 +176,7 @@ import { FeatherIcon, Input, LoadingText } from 'frappe-ui'
 import CustomAvatar from '@/components/global/CustomAvatar.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 import Activities from '@/components/desk/ticket/Activities.vue'
-import {
-	Combobox,
-	ComboboxInput,
-	ComboboxOptions,
-	ComboboxOption,
-} from '@headlessui/vue'
+import Autocomplete from '@/components/global/Autocomplete.vue'
 import NewContactDialog from '@/components/desk/global/NewContactDialog.vue'
 import { inject, ref } from 'vue'
 
@@ -193,19 +190,13 @@ export default {
 		CustomAvatar,
 		CustomIcons,
 		Activities,
-		Combobox,
-		ComboboxInput,
-		ComboboxOption,
-		ComboboxOptions,
+		Autocomplete,
 		NewContactDialog
 	},
 	setup() {
 		const viewportWidth = inject('viewportWidth')
 		const editingContact = ref(false)
 		const updatingContact = ref(false)
-		const contactName = ref('')
-		const selectedContact = ref('')
-		const query = ref('')
 
 		const showNewContactDialog = ref(false)
 		const showTicketHistory = ref(false)
@@ -219,9 +210,6 @@ export default {
 			viewportWidth,
 			editingContact,
 			updatingContact,
-			contactName,
-			selectedContact,
-			query,
 			showNewContactDialog,
 			showTicketHistory,
 			contacts,
@@ -238,13 +226,6 @@ export default {
 				return ((this.ticket.contact.first_name || "") + " " + (this.ticket.contact.last_name || "")).slice(0, 40)
 			}
 		},
-		filterdContacts() {
-			return this.query === ''
-				? this.contacts
-				: this.contacts.filter((contactItem) => {
-					return contactItem.name.toLowerCase().includes(this.query.toLowerCase())
-				})
-		},
 		otherTicketsOfContact() {
 			return this.$resources.otherTicketsOfContact.data || null
 		},
@@ -259,26 +240,7 @@ export default {
 			return offset + ( multiplier * ( this.showOtherTicketsOfContacts ? ( this.otherTicketsOfContact.length <= maxCount ? this.otherTicketsOfContact.length : maxCount ) : 0 )) + (this.ticket.custom_fields.length > 0 ? (customFieldPadding * 2 + customFiledWidth * this.ticket.custom_fields.length) : 0)
 		},
 	},
-	watch: {
-		selectedContact(newValue) {
-			if (newValue) {
-				this.updateContact()
-			}
-		}
-	},
 	methods: {
-		updateContact() {
-			this.editingContact = false
-			this.updatingContact = true
-			this.ticketController.set(this.ticketId, 'contact', this.selectedContact).then(() => {
-				this.selectedContact = ''
-				this.query = ''
-				this.updatingContact = false
-				this.$resources.otherTicketsOfContact.fetch()
-
-				this.$resources.ticket.fetch()
-			})
-		},
 		contactCreated(contact) {
 			this.showNewContactDialog = false
 			this.editingContact = false
