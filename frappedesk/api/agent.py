@@ -1,6 +1,5 @@
 import frappe
 
-@frappe.whitelist(allow_guest=True)
 def get_session_agent():
 	session_user = frappe.session.user
 	session_agent = None
@@ -10,7 +9,7 @@ def get_session_agent():
 		session_agent["image"] = frappe.get_value("User", session_user, "user_image")
 	return session_agent
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_user():
 	session_user = frappe.session.user
 	session_agent = get_session_agent()

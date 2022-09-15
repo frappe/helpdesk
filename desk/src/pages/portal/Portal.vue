@@ -23,7 +23,6 @@ export default {
 	setup() {
 		const user = inject("user");
 		const tickets = ref();
-		const ticketStatuses = ref([]);
 		const ticketTemplates = ref([]);
 		const ticketController = ref({});
 
@@ -31,10 +30,9 @@ export default {
 		provide('impersonateContact', impersonateContact)
 
 		provide("tickets", tickets);
-		provide("ticketStatuses", ticketStatuses);
 		provide("ticketTemplates", ticketTemplates);
 		provide("ticketController", ticketController);
-		return { user, tickets, ticketStatuses, ticketTemplates, ticketController, impersonateContact };
+		return { user, tickets, ticketTemplates, ticketController, impersonateContact };
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
@@ -109,18 +107,6 @@ export default {
 				onError: (error) => {
 					console.log(`ticket error : ${error}`);
 				}
-			};
-		},
-		statuses() {
-			return {
-				method: "frappedesk.api.ticket.get_all_ticket_statuses",
-				auto: this.user.isLoggedIn(),
-				onSuccess: (data) => {
-					this.ticketStatuses = data;
-				},
-                onError: (error) => {
-                    console.log(`statuses error : ${error}`);
-                }
 			};
 		},
 		templates() {

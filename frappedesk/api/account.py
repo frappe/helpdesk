@@ -2,7 +2,7 @@ import frappe
 from frappe.core.doctype.user.user import test_password_strength
 
 """
-	Singup for customer portal only (TODO: agent signups)
+	Signup for customer portal only (TODO: agent signups)
 """
 @frappe.whitelist(allow_guest=True)
 def signup(email, first_name, last_name):
