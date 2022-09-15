@@ -33,11 +33,6 @@ export default {
 					label: 'Email Accounts',
 					pageName: 'Emails',
 					route: '/frappedesk/settings/emails'
-				},
-				{
-					label: 'Helpdesk Settings',
-					pageName: 'Helpdesk Settings',
-					route: '/frappedesk/settings/helpdesk'
 				}
 			]
 		}
