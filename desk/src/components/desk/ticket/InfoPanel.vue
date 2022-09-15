@@ -24,10 +24,10 @@
 								<a :title="phone_no.phone" class="text-gray-700 text-base">{{ phone_no.phone }}</a>
 							</div>
 						</div>
-						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-[12px] items-center">
-							<FeatherIcon name="mail" class="stroke-gray-500" style="width: 15px;" />
-							<div class="space-y-1 max-w-[173px]" v-for="email in ticket.contact.email_ids" :key="email">
-								<div :title="email.email_id" class="truncate text-gray-700 text-base">
+						<div v-if="ticket.contact.email_ids.length > 0" class="flex space-x-[12px]">
+							<FeatherIcon name="mail" class="stroke-gray-500 mt-[2.5px]" style="width: 15px; height: 15px;" />
+							<div class="space-y-1 max-w-[173px] break-words" v-for="email in ticket.contact.email_ids" :key="email">
+								<div :title="email.email_id" class="text-gray-700 text-base">
 									<a :title="email.email_id">{{ email.email_id }}</a>
 								</div>
 							</div>
