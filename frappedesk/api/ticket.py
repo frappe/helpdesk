@@ -5,7 +5,7 @@ from frappe.website.utils import cleanup_page_name
 from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
 from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact, get_all_conversations, create_communication_via_agent
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_ticket(ticket_id):
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)
 	ticket_doc = ticket_doc.__dict__
@@ -14,7 +14,7 @@ def get_ticket(ticket_id):
 	
 	return ticket_doc
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_new(values, template='Default', attachments=[], via_customer_portal=False):
 	ticket_doc = frappe.new_doc("Ticket")
 	ticket_doc.via_customer_portal = via_customer_portal
