@@ -68,12 +68,20 @@ def create_new(values, template='Default', attachments=[], via_customer_portal=F
 
 @frappe.whitelist()
 def update_contact(ticket_id, contact):
+	def full_name(contact):
+		_full_name = ''
+		if contact.first_name:
+			_full_name += contact.first_name
+		if contact.last_name:
+			_full_name += ' ' + contact.last_name
+		return _full_name
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		contact_doc = frappe.get_doc("Contact", contact)
 		if contact_doc.email_ids and len(contact_doc.email_ids) > 0:
 			ticket_doc.raised_by = contact_doc.email_ids[0].email_id
 			ticket_doc.contact = contact_doc.name
+			log_ticket_activity(ticket_id, f"contact set to {full_name(contact_doc)}")
 
 		ticket_doc.save()
 		

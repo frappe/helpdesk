@@ -83,6 +83,7 @@
 				<div class="flex flex-col space-y-[8px]">
 					<div class="text-gray-600 font-normal text-[12px]">Assignee</div>
 					<Autocomplete 
+						width="220"
 						:options="agents.map(x => {
 							return {label: x.agent_name , value: x.name}
 						})"
@@ -126,6 +127,7 @@
 					</div>
 					<Autocomplete 
 						v-if="ticketTypes"
+						width="220"
 						:options="ticketTypes.map(x => {
 							return {label: x.name , value: x.name}
 						})"
@@ -177,6 +179,7 @@
 					</div>
 					<Autocomplete 
 						v-if="agentGroups"
+						width="220"
 						:options="agentGroups.map(x => {
 							return {label: x.name , value: x.name}
 						})"
@@ -215,6 +218,7 @@
 					<div class="text-gray-600 font-normal text-[12px]">Priority</div>
 					<Autocomplete 
 						v-if="ticketPriorities"
+						width="220"
 						:options="ticketPriorities.map(x => {
 							return {label: x.name , value: x.name}
 						})"
@@ -249,7 +253,6 @@
 						</template>
 					</Autocomplete>
 				</div>
-				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="updateNotes" />
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -315,8 +318,6 @@ export default {
 
 		const toggleStatuese = ref(false)
 
-		const notes = ref('')
-
 		const mandatoryFields = ref(['ticket_type'])
 		const mandatoryFieldsNotSet = ref(false)
 
@@ -338,8 +339,6 @@ export default {
 			updatingStatus,
 			updatingTeam,
 			toggleStatuese,
-
-			notes,
 
 			mandatoryFields,
 			mandatoryFieldsNotSet
@@ -391,15 +390,6 @@ export default {
 						this.updateStatus('Closed')
 				}
 			}
-		},
-		updateNotes(note) {
-			this.ticketController.set(this.ticketId, 'notes', note).then(() => {
-				this.$toast({
-					title: 'Ticket updated successfully.',
-					customIcon: 'circle-check',
-					appearance: 'success',
-				})
-			})
 		},
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {

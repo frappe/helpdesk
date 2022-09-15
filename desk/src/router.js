@@ -183,11 +183,6 @@ const routes = [
 						name: 'EmailAccount',
 						component: () => import('@/pages/desk/settings/email/EmailAccount.vue'),
 						props: true
-					},
-					{
-						path: 'helpdesk',
-						name: 'Helpdesk Settings',
-						component: () => import('@/pages/desk/settings/helpdesk/HelpdeskSettings.vue')
 					}
 				]
 			}

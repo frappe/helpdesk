@@ -237,8 +237,9 @@ def update_agent_role_permissions():
 		agent_role_doc.dashboard = True
 		agent_role_doc.save()
 
-		# Agents should be able to view private files uploaded from customer
 		add_permission("File", "Agent", 0)
+		add_permission("Contact", "Agent", 0)
+		add_permission("Email Account", "Agent", 0)
 
 def add_default_assignment_rule():
 	if frappe.get_list("Assignment Rule", filters={"document_type": "Ticket"}):
