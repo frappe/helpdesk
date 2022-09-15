@@ -55,7 +55,8 @@
 							:class="item.style"
 							@click="item.action()"
 						>
-							<CustomIcons class="h-[16px] w-[16px]" :name="item.icon" />
+							<CustomIcons v-if="item.customIcon" class="h-[16px] w-[16px]" :name="item.customIcon" />
+							<FeatherIcon v-else class="h-[16px] w-[16px]" :name="item.icon" />
 							<span>{{ item.label }}</span>
 						</div>
 					</div>
@@ -76,6 +77,24 @@
 				</div>
 			</div>
 		</div>
+		<Dialog :options="{title: 'Keyboard Shortcuts'}" v-model="showKeyboardShortcuts">
+			<template #body-content>
+				<div class="py-5 text-base">
+					<table class="w-full table-fixed border-collapse border">
+						<tbody>
+							<tr v-for="shortcut in keyboardShortcuts" :key="shortcut.label" class="h-[50px] border-y">
+								<td class="w-[170px] border-r px-4">
+									<span class="bg-gray-100 p-1.5 rounded shadow shadow-gray-400 text-gray-500">
+										{{ shortcut.sequence }}
+									</span>
+								</td>
+								<td class="px-4">{{ shortcut.label }}</td>
+							</tr>
+						</tbody>
+						</table>
+				</div>
+			</template>
+		</Dialog>
 	</div>
 </template>
 
@@ -94,6 +113,23 @@ export default {
 		FeatherIcon
 	},
 	setup() {
+		const isMac = ref(navigator.userAgent.indexOf('Mac OS X') != -1)
+		const keyboardShortcuts = ref([
+			{
+				'sequence': isMac ? '⌃ + ⌥ + R' : 'Ctrl + Alt + R',
+				'label': 'Mark status of ticket as Replied'
+			},
+			{
+				'sequence': isMac ? '⌃ + ⌥ + E' : 'Ctrl + Alt + E',
+				'label': 'Mark status of ticket as Resolved'
+			},
+			{
+				'sequence': isMac ? '⌃ + ⌥ + C' : 'Ctrl + Alt + C',
+				'label': 'Mark status of ticket as Closed'
+			}
+		])
+		
+		const showKeyboardShortcuts = ref(false)
 		const viewportWidth = inject('viewportWidth')
 		
 		const user = inject('user')
@@ -109,6 +145,8 @@ export default {
 		const ticketSideBarFilter = inject('ticketSideBarFilter')
 
 		return { 
+			showKeyboardShortcuts,
+			keyboardShortcuts,
 			viewportWidth, 
 			user, 
 			iconHeight, 
@@ -226,8 +264,16 @@ export default {
 
 		this.profileSettings = [
 			{
+				label: 'Keyboard Shortcuts',
+				icon: 'command',
+				style: 'text-gray-800',
+				action: () => {
+					this.showKeyboardShortcuts = true
+				}
+			},
+			{
 				label: 'Go to customer portal',
-				icon: 'external-link',
+				customIcon: 'external-link',
 				style: 'text-gray-800',
 				action: () => {
 					window.open('/support/tickets', '_blank')
@@ -235,7 +281,7 @@ export default {
 			},
 			{
 				label: 'Log out',
-				icon: 'log-out',
+				customIcon: 'log-out',
 				style: 'text-red-600',
 				action: () => {
 					this.user.logout()
