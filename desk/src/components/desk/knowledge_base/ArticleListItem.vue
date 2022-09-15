@@ -38,7 +38,7 @@
 				<div class="text-gray-600 font-normal" v-if="article.views">{{ article.views }}</div>
 			</div>
 			<div class="sm:w-2/12 font-normal">
-				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs(article.modified).format('D MMMM, YYYY') }}</div>
+				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs(article.modified).format('D MMM, YYYY') }}</div>
 			</div>
 		</div>
 		<div class="transform translate-y-2"/>
