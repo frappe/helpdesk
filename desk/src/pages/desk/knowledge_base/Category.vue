@@ -29,12 +29,7 @@
 							<div class="grid place-content-center w-full mt-10">
 								<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
 								<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No articles found</div>
-								<div class="flex flex-row space-x-2 mt-4">
-									<Button @click="() => { 
-										doctypeToDelete = 'Category';
-										documentsToDelete = [subCategory]
-										showDeleteDialog = true
-									}" appearance="danger">Delete Category</Button>
+								<div class="mt-4 mx-auto">
 									<Button @click="() => { $router.push({name: 'NewArticle', query: { category: subCategory }}) }" appearance="primary">Add Article</Button>
 								</div>
 							</div>
@@ -46,12 +41,7 @@
 				<div class="grid place-content-center w-full mt-10">
 					<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
 					<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No sub categories found</div>
-					<div class="flex flex-row space-x-2 mt-4 mx-auto">
-						<Button v-if="allCategories.length > 1" @click="() => { 
-							doctypeToDelete = 'Category';
-							documentsToDelete = [category]
-							showDeleteDialog = true
-						}" appearance="danger">Delete Category</Button>
+					<div class="mx-auto space-x-2 mt-4">
 						<Button @click="() => { showCreateNewCategoryDialog = true }" appearance="primary">{{ allCategories.length > 1 ? 'Add Sub Category' : 'Add Category'}}</Button>
 					</div>
 				</div>
@@ -155,9 +145,17 @@ export default {
 		}
 	},
 	mounted() {
-		const actions = this.getBaseActions()
-		this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
+		const updateBaseActions = () => {
+			const actions = this.getBaseActions()
+			this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
+		}
+
+		updateBaseActions()
 		this.$event.emit('select_category',  (this.category && this.subCategory ) ? {name: this.subCategory, parent_category: this.category} : null)
+		
+		this.$event.on('select_category', () => {
+			updateBaseActions()
+		})
 	},
 	resources: {
 		deleteDoc() {
@@ -196,13 +194,34 @@ export default {
 			this.$event.emit('toggle_navbar_actions', ({type: 'Category', actions}))
 		},
 		getBaseActions() {
-			const actions = [
-				{ label: 'Add article', handler: () => { this.$router.push({name: 'NewArticle', query: { category: this.subCategory }}) }, appearance: 'primary', dropdown: [
-					{ label: 'Add category', handler: () => {
-						this.showCreateNewCategoryDialog = true
-					}}
-				] },
-			]
+			let actions = []
+			if (this.subCategory) {
+				actions = [
+					{ 
+						label: 'Add article', 
+						handler: () => { this.$router.push({name: 'NewArticle', query: { category: this.subCategory }}) }, 
+						appearance: 'primary', 
+						dropdown: [
+							{ 
+								label: 'Add category', 
+								handler: () => {
+									this.showCreateNewCategoryDialog = true
+								}
+							},
+						] 
+					},
+				]
+			} else if (this.category) {
+				actions = [
+					{ 
+						label: 'Add category', 
+						handler: () => {
+							this.showCreateNewCategoryDialog = true
+						},
+						appearance: 'primary'
+					},
+				]
+			}
 			return actions
 		}
 	}
