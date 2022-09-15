@@ -147,11 +147,6 @@ export default {
 						ticket_id: ticketId,
 						agent_group: ref
 					})
-				case 'notes':
-					return this.$resources.setTicketNotes.submit({
-						ticket_id: ticketId,
-						notes: ref
-					})
 			}
 		},
 		this.ticketController.new = (type, values) => {
@@ -527,17 +522,6 @@ export default {
 				},
 				onError: () => {
 					// TODO:
-				}
-			}
-		},
-		setTicketNotes() {
-			return {
-				method: 'frappedesk.api.ticket.set_ticket_notes',
-				onSuccess: async (ticket) => {
-					
-				},
-				onError: () => {
-
 				}
 			}
 		}

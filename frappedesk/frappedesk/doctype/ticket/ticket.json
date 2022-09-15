@@ -53,7 +53,6 @@
   "via_customer_portal",
   "attachment",
   "content_type",
-  "notes",
   "customer_feedback_section",
   "feedback_submitted",
   "satisfied",
@@ -378,11 +377,6 @@
    "options": "Agent Group"
   },
   {
-   "fieldname": "notes",
-   "fieldtype": "Long Text",
-   "label": "Notes"
-  },
-  {
    "depends_on": "eval:doc.feedback_submitted",
    "fieldname": "customer_feedback_section",
    "fieldtype": "Section Break",
@@ -411,7 +405,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-09-06 14:55:21.802527",
+ "modified": "2022-09-15 21:35:00.011251",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",
@@ -452,6 +446,19 @@
    "report": 1,
    "role": "Agent",
    "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
    "share": 1,
    "write": 1
   }
