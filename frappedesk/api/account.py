@@ -1,4 +1,5 @@
 import frappe
+from frappe.core.doctype.user.user import test_password_strength
 
 """
 	Signup for customer portal only (TODO: agent signups)
@@ -50,3 +51,17 @@ def verify_and_create_account(request_key, email, password):
 			frappe.throw("Ivalid request key")
 	else:
 		frappe.throw(f"Account request for {email} not found, please signup first")
+
+@frappe.whitelist(allow_guest=True)
+def validate_password(password, first_name, last_name, email):
+	available = True
+
+	user_data = (first_name, last_name, email)
+	result = test_password_strength(password, "", None, user_data)
+	feedback = result.get("feedback", None)
+	print(result, feedback)
+
+	if feedback and not feedback.get("password_policy_validation_passed", False):
+		available = False
+
+	return available
