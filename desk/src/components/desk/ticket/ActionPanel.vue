@@ -249,7 +249,6 @@
 						</template>
 					</Autocomplete>
 				</div>
-				<Input label="Notes" type="textarea" v-model="ticket.notes" class="text-gray-600" @change="updateNotes" />
 			</div>
 		</div>
 		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
@@ -315,8 +314,6 @@ export default {
 
 		const toggleStatuese = ref(false)
 
-		const notes = ref('')
-
 		const mandatoryFields = ref(['ticket_type'])
 		const mandatoryFieldsNotSet = ref(false)
 
@@ -338,8 +335,6 @@ export default {
 			updatingStatus,
 			updatingTeam,
 			toggleStatuese,
-
-			notes,
 
 			mandatoryFields,
 			mandatoryFieldsNotSet
@@ -391,15 +386,6 @@ export default {
 						this.updateStatus('Closed')
 				}
 			}
-		},
-		updateNotes(note) {
-			this.ticketController.set(this.ticketId, 'notes', note).then(() => {
-				this.$toast({
-					title: 'Ticket updated successfully.',
-					customIcon: 'circle-check',
-					appearance: 'success',
-				})
-			})
 		},
 		createAndAssignTicketTypeFromDialog() {
 			if (this.newType) {
