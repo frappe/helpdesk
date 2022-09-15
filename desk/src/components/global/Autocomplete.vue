@@ -26,6 +26,7 @@
 				<ComboboxOptions
 					class="px-1.5 pb-1.5 bg-white rounded-md shadow-md rounded-t-none max-h-[11rem] overflow-y-auto"
 					static
+					:class="width ? `w-[${width}px]` : 'w-[250px]'"
 					v-show="isComboboxOpen"
 				>
 					<div
@@ -52,8 +53,8 @@
 					>
 						<li
 							:class="[
-							'px-2.5 py-1.5 rounded-md text-base',
-							{ 'bg-gray-100': active },
+								'px-2.5 py-1.5 rounded-md text-base truncate',
+								{ 'bg-gray-100': active },
 							]"
 						>
 							{{ option.label }}
@@ -85,7 +86,7 @@ import CustomIcons from '@/components/desk/global/CustomIcons.vue'
 
 export default {
 	name: 'Autocomplete',
-	props: ['modelValue', 'options', 'placeholder'],
+	props: ['modelValue', 'options', 'placeholder', 'width'],
 	emits: ['update:modelValue', 'change'],
 	components: {
 		Popover,
