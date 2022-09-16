@@ -20,7 +20,7 @@
 			</div>
 			<div 
 				class="sm:w-1/12 text-gray-600 font-normal"
-				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
+				:style="getOpacityStyleBasedOnStatus(ticket.status)"
 			>
 				{{ ticket.name }}
 			</div>
@@ -28,7 +28,7 @@
 				<router-link 
 					:to="`/frappedesk/tickets/${ticket.name}`"
 					class="flex items-center space-x-[8px]"
-					:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
+					:style="getOpacityStyleBasedOnStatus(ticket.status)"
 				>
 					<div 
 						class="truncate max-w-fit lg:w-80 md:w-52 sm:w-40" 
@@ -41,7 +41,7 @@
 			</div>
 			<div 
 				class="sm:w-3/12"
-				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
+				:style="getOpacityStyleBasedOnStatus(ticket.status)"
 			>
 				<div class="w-full">
 					<div v-if="false" class="stroke-green-600 stroke-red-600 stroke-yellow-600 w-0 h-0"></div>
@@ -58,13 +58,13 @@
 			</div>
 			<div 
 				class="sm:w-3/12"
-				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
+				:style="getOpacityStyleBasedOnStatus(ticket.status)"
 			>
 				<div class="truncate w-40 text-gray-600 font-normal" v-if="ticket.contact">{{ ticket.contact }}</div>
 			</div>
 			<div 
 				class="sm:w-2/12 font-normal"
-				:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
+				:style="getOpacityStyleBasedOnStatus(ticket.status)"
 			>
 				<a 
 					v-if="getResolutionDueIn()" 
@@ -78,7 +78,7 @@
 				<a 
 					:title="$dayjs(ticket.modified)"
 					class="text-gray-600 font-normal"
-					:style="['Closed', 'Resolved'].includes(ticket.status) ? 'opacity: 0.5;': ''"
+					:style="getOpacityStyleBasedOnStatus(ticket.status)"
 				>
 					{{ $dayjs.shortFormating($dayjs(ticket.modified).fromNow()) }}
 				</a>
@@ -157,6 +157,9 @@ export default {
 		}
 	},
 	methods: {
+		getOpacityStyleBasedOnStatus(status) {
+			return ['Closed', 'Resolved'].includes(status) ? 'opacity: 0.8;': ''
+		},
 		getColorBasedOnStatus(status) {
 			return (status == 'Open') ? 'text-green-600' : 'text-gray-600'
 		},

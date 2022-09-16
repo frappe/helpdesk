@@ -3,12 +3,10 @@
 		<div class="flex flex-col space-y-[12px] text-base">
 			<div class="font-semibold">Details</div>
 			<div class="border-b w-full"></div>
-			<div v-if="article.published_on" class="flex flex-row justify-between items-center">
-				<div>Published {{ $dayjs.shortFormating($dayjs(article.published_on).fromNow()) }} ago</div>
-				<a :href="`/${article.route}`" target="_blank">
-					<FeatherIcon name="external-link" class="w-4" />
-				</a>
-			</div>
+			<a :href="`/${article.route}`" target="_blank" v-if="article.published_on" class="flex flex-row justify-between items-center">
+				<div>Published {{ $dayjs.shortFormating($dayjs(article.published_on).fromNow(), true) }}</div>
+				<FeatherIcon name="external-link" class="w-4" />
+			</a>
 			<div v-if="$resources.users.data" class="flex flex-col">
 				<span class="block mb-2 text-sm leading-4 text-gray-700">Author</span>
 				<Autocomplete 
