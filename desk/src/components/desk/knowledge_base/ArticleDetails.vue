@@ -4,7 +4,7 @@
 			<div class="font-semibold">Details</div>
 			<div class="border-b w-full"></div>
 			<div v-if="article.published_on" class="flex flex-row justify-between items-center">
-				<div>Published {{ $dayjs.shortFormating($dayjs(article.published_on).fromNow()) }} ago</div>
+				<div>Published {{ $dayjs.shortFormating($dayjs(article.published_on).fromNow(), true) }}</div>
 				<a :href="`/${article.route}`" target="_blank">
 					<FeatherIcon name="external-link" class="w-4" />
 				</a>

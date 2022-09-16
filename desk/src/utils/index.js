@@ -30,7 +30,7 @@ _dayjs.longFormating = (s) => {
     return s
 }
 
-_dayjs.shortFormating = (s) => {
+_dayjs.shortFormating = (s, ago = false) => {
     if (s === 'now' || s === 'now ago') { 
         return 'now'
     }
@@ -70,7 +70,7 @@ _dayjs.shortFormating = (s) => {
             newPostfix = 'Y'
             break
     }
-    return `${prefix}${newPostfix}`
+    return `${prefix}${newPostfix}${ago ? ' ago' : ''}`
 }
 
 export function remove_script_and_style(txt) {
