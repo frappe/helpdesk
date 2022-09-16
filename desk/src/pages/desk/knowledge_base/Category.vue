@@ -26,24 +26,18 @@
 							<ArticleList :manager="manager" />
 						</div>
 						<div v-else>
-							<div class="grid place-content-center w-full mt-10">
+							<div class="grid place-content-center w-full my-[100px]">
 								<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
 								<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No articles found</div>
-								<div class="mt-4 mx-auto">
-									<Button @click="() => { $router.push({name: 'NewArticle', query: { category: subCategory }}) }" appearance="primary">Add Article</Button>
-								</div>
 							</div>
 						</div>
 					</div>
 				</template>
 			</ListManager>
 			<div v-else-if="category">
-				<div class="grid place-content-center w-full mt-10">
+				<div class="grid place-content-center w-full my-[100px]">
 					<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
 					<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No sub categories found</div>
-					<div class="mx-auto space-x-2 mt-4">
-						<Button @click="() => { showCreateNewCategoryDialog = true }" appearance="primary">{{ allCategories.length > 1 ? 'Add Sub Category' : 'Add Category'}}</Button>
-					</div>
 				</div>
 			</div>
 			<ErrorMessage v-else message="Something went wrong"/>
