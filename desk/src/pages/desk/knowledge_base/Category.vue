@@ -183,7 +183,7 @@ export default {
 			if (Object.keys(selectedArticles).length > 0) {
 				actions.unshift({
 					label: 'Delete',
-					appearance: 'danger',
+					appearance: 'secondary',
 					handler: () => {
 						this.doctypeToDelete = 'Article';
 						this.documentsToDelete = Object.values(selectedArticles).map(x => x.name)
