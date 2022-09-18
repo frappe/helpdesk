@@ -68,7 +68,7 @@
 		</ListManager>
 		<Dialog 
 			:options="{
-				category_name: `New Category`, 
+				title: `New Category`, 
 				actions: [
 					{
 						label: 'Create',
@@ -122,7 +122,7 @@
 		</Dialog>
 		<Dialog 
 			:options="{
-				category_name: `Edit Category`, 
+				title: `Edit Category`, 
 				actions: [
 					{
 						label: 'Save',
@@ -135,8 +135,8 @@
 									new_category_name: _.inputValues.category_name,
 									new_description: _.inputValues.description
 								})
+								_.reset()
 							}
-							_.reset()
 						}
 					},
 					{
@@ -176,7 +176,7 @@
 		</Dialog>
 		<Dialog 
 			:options="{
-				category_name: `Delete Category`, 
+				title: `Delete Category`, 
 				actions: [
 					{
 						label: 'Delete',
@@ -187,8 +187,8 @@
 								$resources.deleteCategory.submit({
 									category: _.categoryToDelete
 								})
+								_.reset()
 							}
-							_.reset()
 						}
 					},
 					{
@@ -255,8 +255,8 @@ export default {
 				}
 				if (_.inputValues.description === '') {
 					_.validationErrors.description = 'Description cannot be empty'
-				} else if (_.inputValues.description.length > 200) {
-					_.validationErrors.description = 'Description must should be less than 200 characters'
+				} else if (_.inputValues.description.length > 145) {
+					_.validationErrors.description = 'Description must should be less than 145 characters'
 				}
 				newCategoryCreationParams.value = _
 				
@@ -299,8 +299,8 @@ export default {
 				}
 				if (_.inputValues.description === '') {
 					_.validationErrors.description = 'Description cannot be empty'
-				} else if (_.inputValues.description.length > 200) {
-					_.validationErrors.description = 'Description must should be less than 200 characters'
+				} else if (_.inputValues.description.length > 145) {
+					_.validationErrors.description = 'Description must should be less than 145 characters'
 				}
 				editCategoryParams.value = _
 				
@@ -338,7 +338,7 @@ export default {
 			},
 			reset: () => {
 				var _ = categoryDeletionParams.value
-				_.validateInput = ''
+				_.inputValue = ''
 				_.validationError = ''
 				_.showDialog = false
 				categoryDeletionParams.value = _
@@ -361,6 +361,7 @@ export default {
                         customIcon: 'circle-check',
                         appearance: 'success'
 					})
+					this.$refs.categories.manager.reload()
 				},
 				onError: () => {
 					this.$toast({
@@ -380,6 +381,7 @@ export default {
 						customIcon: 'circle-check',
 						appearance: 'success'
 					})
+					this.$refs.categories.manager.reload()
 				},
 				onError: () => {
 					this.$toast({
@@ -399,9 +401,9 @@ export default {
 						customIcon: 'circle-check',
 						appearance: 'success'
 					})
+					this.$refs.categories.manager.reload()
 				},
 				onError: (res) => {
-					console.log(res)
 					this.$toast({
 						title: 'Category cannot be deleted!!',
 						text: res,
