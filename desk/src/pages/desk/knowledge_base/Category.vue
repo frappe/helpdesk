@@ -82,7 +82,7 @@ import { ref, inject } from 'vue'
 import NewCategoryDialog from '@/components/desk/knowledge_base/NewCategoryDialog.vue'
 
 export default {
-	name: 'Category',
+	name: 'Categories',
 	props: {
 		category: {
 			type: String,
