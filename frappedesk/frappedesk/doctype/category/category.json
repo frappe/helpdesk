@@ -12,7 +12,7 @@
   "description",
   "route",
   "linked_web_page",
-  "order"
+  "idx"
  ],
  "fields": [
   {
@@ -42,16 +42,17 @@
    "options": "Web Page"
   },
   {
-   "default": "0",
-   "fieldname": "order",
-   "fieldtype": "Data",
-   "label": "Order"
+   "fieldname": "idx",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Index",
+   "non_negative": 1
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-18 14:43:20.410091",
+ "modified": "2022-09-18 18:13:06.036168",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Category",
