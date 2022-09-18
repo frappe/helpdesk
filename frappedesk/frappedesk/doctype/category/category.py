@@ -10,6 +10,8 @@ from frappe.website.utils import cleanup_page_name
 class Category(WebsiteGenerator):
 	def before_save(self):
 		self.route = self.get_page_route()
+		if not self.idx:
+			self.idx = frappe.db.count("Category") + 1
 
 	def set_page_route(self):
 		self.route = self.get_page_route()

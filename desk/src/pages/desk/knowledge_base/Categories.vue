@@ -6,7 +6,7 @@
 					doctype: 'Category',
 					fields: ['name', 'description'],
 					limit: 100,
-					order_by: 'idx',
+					order_by: 'idx desc',
 				}"
 			>
 			<template #body="{ manager }">
@@ -28,20 +28,23 @@
 											{{ category.name }}
 										</div>
 										<div class="h-full flex flex-row space-x-3 invisible group-hover:visible">
-											<a title="Edit">
+											<a category_name="Edit">
 												<FeatherIcon 
 													name="edit-2" 
 													class="h-3 w-3 hover:stroke-2 stroke-1"
 													@click="() => {
-														editCategoryParams.inputValues = {
-															title: category.name,
+														const _ = editCategoryParams
+														_.categoryToEdit = category.name
+														_.inputValues = {
+															category_name: category.name,
 															description: category.description
 														}
-														editCategoryParams.showDialog = true
+														_.showDialog = true
+														editCategoryParams = _
 													}"
 												/>
 											</a>
-											<a title="Delete">
+											<a category_name="Delete">
 												<FeatherIcon 
 													name="trash" 
 													class="h-3 w-3 stroke-red-400 hover:stroke-2 stroke-1" 
@@ -65,14 +68,22 @@
 		</ListManager>
 		<Dialog 
 			:options="{
-				title: `New Category`, 
+				category_name: `New Category`, 
 				actions: [
 					{
 						label: 'Create',
 						appearance: 'primary',
 						handler: () => {
-							if (newCategoryCreationParams.validateInput()) {
-
+							const _ = newCategoryCreationParams
+							if (_.validateInput()) {
+								$resources.createNewCategory.submit({
+									doc: {
+										doctype: 'Category',
+										category_name: _.inputValues.category_name,
+										description: _.inputValues.description
+									}
+								})
+								_.reset()
 							}
 						}
 					},
@@ -93,10 +104,10 @@
 					<div>
 						<Input 
 							type="text" 
-							label="Title" 
-							@change="(val) => { newCategoryCreationParams.inputValues.title = val }" 
+							label="Category Name" 
+							@change="(val) => { newCategoryCreationParams.inputValues.category_name = val }" 
 						/>
-						<ErrorMessage :message="newCategoryCreationParams.validationErrors.title" />
+						<ErrorMessage :message="newCategoryCreationParams.validationErrors.category_name" />
 					</div>
 					<div>
 						<Input 
@@ -111,15 +122,21 @@
 		</Dialog>
 		<Dialog 
 			:options="{
-				title: `Edit Category`, 
+				category_name: `Edit Category`, 
 				actions: [
 					{
 						label: 'Save',
 						appearance: 'primary',
 						handler: () => {
-							if (editCategoryParams.validateInput()) {
-
+							const _ = editCategoryParams
+							if (_.validateInput()) {
+								$resources.updateCategory.submit({
+									old_category_name: _.categoryToEdit,
+									new_category_name: _.inputValues.category_name,
+									new_description: _.inputValues.description
+								})
 							}
+							_.reset()
 						}
 					},
 					{
@@ -139,11 +156,11 @@
 					<div>
 						<Input 
 							type="text" 
-							label="Title" 
-							:value="editCategoryParams.inputValues.title" 
-							@change="(val) => { editCategoryParams.inputValues.title = val }" 
+							label="Category Name" 
+							:value="editCategoryParams.inputValues.category_name" 
+							@change="(val) => { editCategoryParams.inputValues.category_name = val }" 
 						/>
-						<ErrorMessage :message="editCategoryParams.validationErrors.title" />
+						<ErrorMessage :message="editCategoryParams.validationErrors.category_name" />
 					</div>
 					<div>
 						<Input 
@@ -159,15 +176,19 @@
 		</Dialog>
 		<Dialog 
 			:options="{
-				title: `Delete Category`, 
+				category_name: `Delete Category`, 
 				actions: [
 					{
 						label: 'Delete',
 						appearance: 'danger',
 						handler: () => {
-							if(categoryDeletionParams.validateInput()) {
-
+							const _ = categoryDeletionParams
+							if(_.validateInput()) {
+								$resources.deleteCategory.submit({
+									category: _.categoryToDelete
+								})
 							}
+							_.reset()
 						}
 					},
 					{
@@ -216,21 +237,21 @@ export default {
 		const newCategoryCreationParams = ref({
 			showDialog: false,
 			inputValues: {
-				title: '',
+				category_name: '',
 				description: '',
 			},
 			validationErrors: {
-				title: '',
+				category_name: '',
 				description: '',
 			},
 			validateInput: () => {
 				var _ = newCategoryCreationParams.value
 				_.validationErrors = {
-					title: '',
+					category_name: '',
 					description: '',
 				}
-				if (_.inputValues.title === '') {
-					_.validationErrors.title = 'Title cannot be empty'
+				if (_.inputValues.category_name === '') {
+					_.validationErrors.category_name = 'Category name cannot be empty'
 				}
 				if (_.inputValues.description === '') {
 					_.validationErrors.description = 'Description cannot be empty'
@@ -238,15 +259,17 @@ export default {
 					_.validationErrors.description = 'Description must should be less than 200 characters'
 				}
 				newCategoryCreationParams.value = _
+				
+				return _.validationErrors.category_name === '' && _.validationErrors.description === ''
 			},
 			reset: () => {
 				var _ = newCategoryCreationParams.value
 				_.inputValues = {
-					title: '',
+					category_name: '',
 					description: '',
 				}
 				_.validationErrors = {
-					title: '',
+					category_name: '',
 					description: '',
 				}
 				_.showDialog = false
@@ -256,22 +279,23 @@ export default {
 
 		const editCategoryParams = ref({
 			showDialog: false,
+			categoryToEdit: '',
 			inputValues: {
-				title: '',
+				category_name: '',
 				description: '',
 			},
 			validationErrors: {
-				title: '',
+				category_name: '',
 				description: '',
 			},
 			validateInput: () => {
 				var _ = editCategoryParams.value
 				_.validationErrors = {
-					title: '',
+					category_name: '',
 					description: '',
 				}
-				if (_.inputValues.title === '') {
-					_.validationErrors.title = 'Title cannot be empty'
+				if (_.inputValues.category_name === '') {
+					_.validationErrors.category_name = 'Category name cannot be empty'
 				}
 				if (_.inputValues.description === '') {
 					_.validationErrors.description = 'Description cannot be empty'
@@ -279,15 +303,17 @@ export default {
 					_.validationErrors.description = 'Description must should be less than 200 characters'
 				}
 				editCategoryParams.value = _
+				
+				return _.validationErrors.category_name === '' && _.validationErrors.description === ''
 			},
 			reset: () => {
 				var _ = editCategoryParams.value
 				_.inputValues = {
-					title: '',
+					category_name: '',
 					description: '',
 				}
 				_.validationErrors = {
-					title: '',
+					category_name: '',
 					description: '',
 				}
 				_.showDialog = false
@@ -305,10 +331,10 @@ export default {
 				_.validationError = ''
 				if (_.inputValue != _.categoryToDelete) {
 					_.validationError = 'Please type the category name to confirm.'
-				} else {
-					console.log('delete')
 				}
 				categoryDeletionParams.value = _
+				
+				return _.validationError === ''
 			},
 			reset: () => {
 				var _ = categoryDeletionParams.value
@@ -328,12 +354,61 @@ export default {
 	resources: {
 		createNewCategory() {
 			return {
-
+				method: 'frappe.client.insert',
+				onSuccess: () => {
+					this.$toast({
+						title: 'New cateogry created!!',
+                        customIcon: 'circle-check',
+                        appearance: 'success'
+					})
+				},
+				onError: () => {
+					this.$toast({
+						title: 'Error creating new cateogry!!',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
+			}
+		},
+		updateCategory() {
+			return {
+				method: 'frappedesk.api.kb.update_category',
+				onSuccess: () => {
+					this.$toast({
+						title: 'Category updated!!',
+						customIcon: 'circle-check',
+						appearance: 'success'
+					})
+				},
+				onError: () => {
+					this.$toast({
+						title: 'Error updating category!!',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
 			}
 		},
 		deleteCategory() {
 			return {
-
+				method: 'frappedesk.api.kb.delete_category',
+				onSuccess: () => {
+					this.$toast({
+						title: 'Category deleted!!',
+						customIcon: 'circle-check',
+						appearance: 'success'
+					})
+				},
+				onError: (res) => {
+					console.log(res)
+					this.$toast({
+						title: 'Category cannot be deleted!!',
+						text: res,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
 			}
 		}
 	}
