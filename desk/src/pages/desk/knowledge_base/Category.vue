@@ -1,6 +1,21 @@
 <template>
-	<div class="flex flex-row w-full">
-		<div class="grow text-[13px] font-normal p-5">
+	<div class="flex flex-col h-screen">
+		<div class="grow flex flex-col border-t text-[13px] font-normal px-[16px]">
+			<div class="h-[72px] py-[22px] flow-root">
+				<div class="float-left">
+					<router-link
+						to="/frappedesk/knowledge-base"
+						class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
+						role="button"
+					>
+						<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
+						<div> Back to Knowledge Base </div>
+					</router-link>
+				</div>
+				<div class="float-right">
+					<Button icon-left="plus" appearance="primary" @click="() => {}">Add Article</Button>
+				</div>
+			</div>
 			<ListManager
 				ref="articleList"
 				:options="{
@@ -16,7 +31,6 @@
 					order_by: 'modified desc',
 					limit: 20
 				}"
-				@selection="updateActions()"
 			>
 				<template #body="{ manager }">
 					<div v-if="!manager.loading">
@@ -40,7 +54,7 @@
 import ListManager from '@/components/global/ListManager.vue'
 import ArticleList from '@/components/desk/knowledge_base/ArticleList.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import { ErrorMessage } from 'frappe-ui'
+import { ErrorMessage, FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'Categories',
@@ -55,6 +69,7 @@ export default {
 		ArticleList,
 		ErrorMessage,
 		CustomIcons,
+		FeatherIcon
 	},
 	setup() {
 		

@@ -11,7 +11,7 @@
 			>
 			<template #body="{ manager }">
 				<div class="flex flex-col">
-					<div class="h-[72px] py-[22px] px-[16px]">
+					<div class="h-[72px] py-[22px]">
 						<div class="float-right">
 							<div class="flex items-center space-x-3">
 								<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
