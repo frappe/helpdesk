@@ -260,9 +260,7 @@ export default {
 				if (_.inputValues.category_name === '') {
 					_.validationErrors.category_name = 'Category name cannot be empty'
 				}
-				if (_.inputValues.description === '') {
-					_.validationErrors.description = 'Description cannot be empty'
-				} else if (_.inputValues.description.length > 145) {
+				if (_.inputValues.description.length > 145) {
 					_.validationErrors.description = 'Description must should be less than 145 characters'
 				}
 				newCategoryCreationParams.value = _
