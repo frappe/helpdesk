@@ -11,62 +11,24 @@
 			>
 			<template #body="{ manager }">
 				<div class="flex flex-col">
-					<div class="h-[72px] py-[22px]">
-						<div class="float-right">
+					<div class="pt-[22px] pb-[8px] flex flex-row justify-between items-center">
+						<div class="grow">
+							Categories
+						</div>
+						<div>
 							<div class="flex items-center space-x-3">
 								<div class="stroke-blue-500 fill-blue-500 w-0 h-0 block"></div>
-								<Button icon-left="plus" appearance="primary" @click="newCategoryCreationParams.showDialog = true">Add Category</Button>
+								<div class="cursor-pointer p-1 hover:bg-gray-200 bg-gray-100 rounded" @click="newCategoryCreationParams.showDialog = true"><FeatherIcon name="plus" class="h-3 w-3"/></div>
 							</div>
 						</div>
 					</div>
-					<div v-if="!manager.loading" class="px-5">
-						<div class="flex flex-wrap">
-							<div v-for="category in manager.list" :key="category.name">
-								<router-link 
-									:to="`/frappedesk/knowledge-base/${category.name}`" 
-									custom v-slot="{ href, navigate }"
-								>
-									<div
-										class="select-none rounded-lg flex flex-col hover:shadow-sm border p-5 mb-4 mx-2 h-[180px] w-[250px] group cursor-pointer"
-									>
-										<div class="flex flex-row items-center">
-											<a :href="href" @click="navigate" class="text-[16px] font-normal mb-3 grow">
-												{{ category.name }}
-											</a>
-											<div class="h-full flex flex-row space-x-3 invisible group-hover:visible">
-												<a category_name="Edit">
-													<FeatherIcon 
-														name="edit-2" 
-														class="h-3 w-3 hover:stroke-2 stroke-1"
-														@click="() => {
-															const _ = editCategoryParams
-															_.categoryToEdit = category.name
-															_.inputValues = {
-																category_name: category.name,
-																description: category.description
-															}
-															_.showDialog = true
-															editCategoryParams = _
-														}"
-													/>
-												</a>
-												<a category_name="Delete">
-													<FeatherIcon 
-														name="trash" 
-														class="h-3 w-3 stroke-red-400 hover:stroke-2 stroke-1" 
-														@click="() => {
-															categoryDeletionParams.categoryToDelete = category.name
-															categoryDeletionParams.showDialog = true
-														}"
-													/>
-												</a>
-											</div>
-										</div>
-										<a :href="href" @click="navigate" class="text-base h-full">
-											{{ category.description }}
-										</a>
-									</div>
-								</router-link>
+					<div v-if="!manager.loading">
+						<div class="flex flex-col">
+							<div v-for="(category, index) in manager.list" :key="category.name">
+								<div>
+									<CategoryCard :category="category" :isSelected="category.name == selectedCategory" />
+									<div class="mx-[10px]" :class="index < (manager.list.length - 1) ? 'border-b' : ''"></div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -230,6 +192,7 @@
 
 <script>
 import ListManager from '@/components/global/ListManager.vue';
+import CategoryCard from '@/components/desk/knowledge_base/CategoryCard.vue';
 import { FeatherIcon, ErrorMessage } from 'frappe-ui';
 import { ref } from 'vue'
 
@@ -238,7 +201,14 @@ export default {
 	components: {
 		ListManager,
 		FeatherIcon,
-		ErrorMessage
+		ErrorMessage,
+		CategoryCard
+	},
+	props: {
+		selectedCategory: {
+			type: String,
+			default: ''
+		}
 	},
 	setup() {     
 		const newCategoryCreationParams = ref({

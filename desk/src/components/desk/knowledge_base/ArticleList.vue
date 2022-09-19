@@ -67,15 +67,23 @@
 				<span> {{ manager.totalCount }} </span>
 			</div>
 		</div>
-		<div 
-			id="rows" 
-			class="flex flex-col overflow-scroll"
-			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 132px)' : null }"
-		>
-			<div v-for="(article, index) in manager.list" :key="article.name">
-				<ArticleListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :article="article" @toggle-select="manager.select(article)" :selected="manager.itemSelected(article)" />
+		<div v-if="manager.list.length > 0">
+			<div 
+				id="rows" 
+				class="flex flex-col overflow-scroll"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 132px)' : null }"
+			>
+				<div v-for="(article, index) in manager.list" :key="article.name">
+					<ArticleListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :article="article" @toggle-select="manager.select(article)" :selected="manager.itemSelected(article)" />
+				</div>
+				<ListPageController :manager="manager" />
 			</div>
-			<ListPageController :manager="manager" />
+		</div>
+		<div v-else>
+			<div class="grid place-content-center w-full my-[100px]">
+				<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
+				<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No articles found</div>
+			</div>
 		</div>
 	</div>
 </template>

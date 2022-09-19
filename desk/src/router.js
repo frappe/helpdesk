@@ -74,31 +74,18 @@ const routes = [
 				path: 'knowledge-base',
 				name: 'KnowledgeBase',
 				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
-				children: [
-					{
-						path: '',
-						name: 'Categories',
-						component: () => import('@/pages/desk/knowledge_base/Categories.vue'),
-					},
-					{
-						path: ':categoryId',
-						name: 'Category',
-						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
-						props: true,
-					},
-					{
-						path: 'articles/:articleId',
-						name: 'Article',
-						component: () => import('@/pages/desk/knowledge_base/Article.vue'),
-						props: true,
-					},
-					{
-						path: 'articles/new',
-						name: 'NewArticle',
-						props: false,
-						component: () => import('@/pages/desk/knowledge_base/Article.vue'),
-					},
-				]
+			},
+			{
+				path: 'knowledge-base/:categoryId',
+				name: 'KnowledgeBaseCategory',
+				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
+				props: true,
+			},
+			{
+				path: 'knowledge-base/articles/:articleId',
+				name: 'Article',
+				component: () => import('@/pages/desk/knowledge_base/Article.vue'),
+				props: true,
 			},
 			{
 				path: 'contacts',
