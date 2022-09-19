@@ -81,9 +81,10 @@ const routes = [
 						component: () => import('@/pages/desk/knowledge_base/Categories.vue'),
 					},
 					{
-						path: '',
+						path: ':categoryId',
 						name: 'Category',
 						component: () => import('@/pages/desk/knowledge_base/Category.vue'),
+						props: true,
 					},
 					{
 						path: 'articles/:articleId',

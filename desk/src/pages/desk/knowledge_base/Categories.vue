@@ -22,44 +22,51 @@
 					<div v-if="!manager.loading" class="px-5">
 						<div class="flex flex-wrap">
 							<div v-for="category in manager.list" :key="category.name">
-								<div class="select-none rounded-lg flex flex-col hover:shadow-sm border p-5 mb-4 mx-2 h-[180px] w-[250px] group cursor-pointer">
-									<div class="flex flex-row items-center">
-										<div class="text-[16px] font-normal mb-3 grow">
-											{{ category.name }}
-										</div>
-										<div class="h-full flex flex-row space-x-3 invisible group-hover:visible">
-											<a category_name="Edit">
-												<FeatherIcon 
-													name="edit-2" 
-													class="h-3 w-3 hover:stroke-2 stroke-1"
-													@click="() => {
-														const _ = editCategoryParams
-														_.categoryToEdit = category.name
-														_.inputValues = {
-															category_name: category.name,
-															description: category.description
-														}
-														_.showDialog = true
-														editCategoryParams = _
-													}"
-												/>
+								<router-link 
+									:to="`/frappedesk/knowledge-base/${category.name}`" 
+									custom v-slot="{ href, navigate }"
+								>
+									<div
+										class="select-none rounded-lg flex flex-col hover:shadow-sm border p-5 mb-4 mx-2 h-[180px] w-[250px] group cursor-pointer"
+									>
+										<div class="flex flex-row items-center">
+											<a :href="href" @click="navigate" class="text-[16px] font-normal mb-3 grow">
+												{{ category.name }}
 											</a>
-											<a category_name="Delete">
-												<FeatherIcon 
-													name="trash" 
-													class="h-3 w-3 stroke-red-400 hover:stroke-2 stroke-1" 
-													@click="() => {
-														categoryDeletionParams.categoryToDelete = category.name
-														categoryDeletionParams.showDialog = true
-													}"
-												/>
-											</a>
+											<div class="h-full flex flex-row space-x-3 invisible group-hover:visible">
+												<a category_name="Edit">
+													<FeatherIcon 
+														name="edit-2" 
+														class="h-3 w-3 hover:stroke-2 stroke-1"
+														@click="() => {
+															const _ = editCategoryParams
+															_.categoryToEdit = category.name
+															_.inputValues = {
+																category_name: category.name,
+																description: category.description
+															}
+															_.showDialog = true
+															editCategoryParams = _
+														}"
+													/>
+												</a>
+												<a category_name="Delete">
+													<FeatherIcon 
+														name="trash" 
+														class="h-3 w-3 stroke-red-400 hover:stroke-2 stroke-1" 
+														@click="() => {
+															categoryDeletionParams.categoryToDelete = category.name
+															categoryDeletionParams.showDialog = true
+														}"
+													/>
+												</a>
+											</div>
 										</div>
+										<a :href="href" @click="navigate" class="text-base h-full">
+											{{ category.description }}
+										</a>
 									</div>
-									<div class="text-base">
-										{{ category.description }}
-									</div>
-								</div>
+								</router-link>
 							</div>
 						</div>
 					</div>
