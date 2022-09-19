@@ -26,12 +26,12 @@
 			</div>
 			<div 
 				class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
-				@click="manager.toggleOrderBy('author')"
+				@click="manager.toggleOrderBy('published')"
 			>
-				<span>Author</span>
+				<span>Status</span>
 				<div class="w-[10px]">
 					<CustomIcons 
-						v-if="manager.options.order_by.split(' ')[0] === 'author'"
+						v-if="manager.options.order_by.split(' ')[0] === 'views'"
 						:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
@@ -63,6 +63,9 @@
 				</div>
 				<span class="px-[6px]">Modified</span>
 			</div>
+			<div class="sm:w-1/12 text-[11px] flex flex-row-reverse text-gray-500">
+				<span> {{ manager.totalCount }} </span>
+			</div>
 		</div>
 		<div 
 			id="rows" 
@@ -81,7 +84,7 @@
 import ArticleListItem from './ArticleListItem.vue'
 import CustomIcons from '../global/CustomIcons.vue'
 import ListPageController from '../../global/ListPageController.vue'
-import { ref, inject } from 'vue'
+import { inject } from 'vue'
 
 export default {
 	name: 'ArticleList',
@@ -96,6 +99,17 @@ export default {
 		
 		return {
 			viewportWidth
+		}
+	},
+	resources: {
+		totalArticles() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Article'
+				},
+				auto: true
+			}
 		}
 	}
 }

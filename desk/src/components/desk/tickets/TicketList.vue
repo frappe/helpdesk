@@ -93,7 +93,7 @@
 				</div>
 			</div>
 			<div class="sm:w-1/12 text-[11px] flex flex-row-reverse text-gray-500">
-				<span v-if="totalTickets"> {{ manager.totalCount }} </span>
+				<span> {{ manager.totalCount }} </span>
 			</div>
 		</div>
 		<div 
@@ -152,31 +152,8 @@ export default {
 			viewportWidth
 		}
 	},
-	mounted() {
-		this.$socket.on("list_update", (data) => {
-			if (data.doctype == "Ticket") {
-				this.$resources.totalTickets.fetch()
-			}
-		})
-	},
 	unmounted() {
 		this.$socket.off()
-	},
-	computed: {
-		totalTickets() {
-			return this.$resources.totalTickets.data || null
-		}
-	},
-	resources: {
-		totalTickets() {
-			return {
-				method: 'frappe.client.get_count',
-				params: {
-					doctype: 'Ticket'
-				},
-				auto: true
-			}
-		}
 	}
 }
 </script>

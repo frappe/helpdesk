@@ -24,21 +24,19 @@
 					>
 						{{ article.title }}
 					</div>
-					<!-- <div v-if="article.article_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ article.article_type }}</div> -->
 				</router-link>
 			</div>
 			<div class="sm:w-3/12">
-				<div class="w-full">
-					<div class="flex flex-row items-center space-x-1">
-						<div class="text-base font-normal">{{ article.author_name }}</div>
-					</div>
-				</div>
+				<Badge class="text-base font-normal" :class="article.published ? 'text-green-600' : 'text-red-600'" v-if="article">{{ article.published ? 'Publiished' : 'Draft' }}</Badge>
 			</div>
 			<div class="sm:w-1/12">
 				<div class="text-gray-600 font-normal" v-if="article.views">{{ article.views }}</div>
 			</div>
 			<div class="sm:w-2/12 font-normal">
 				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs(article.modified).format('D MMM, YYYY') }}</div>
+			</div>
+			<div class="sm:w-1/12 flex flex-row-reverse">
+				<Avatar class="h-[26px] w-[26px]" :imageURL="article.author_image" :label="article.author_name" />
 			</div>
 		</div>
 		<div class="transform translate-y-2"/>
@@ -47,13 +45,14 @@
 
 <script>
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import { ref } from 'vue'
+import { Avatar } from 'frappe-ui'
 
 export default {
 	name: 'ArticleListItem',
 	props: ['article', 'selected'],
 	components: {
-		CustomIcons
+		CustomIcons,
+		Avatar
 	}
 }
 </script>

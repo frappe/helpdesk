@@ -23,9 +23,11 @@
 					fields: [
 						'title',
 						'author',
+						'author.user_image as author_image',
 						'author.full_name as author_name',
 						'views',
-						'modified'
+						'modified',
+						'published',
 					],
 					filters: [['category', '=', categoryId]],
 					order_by: 'modified desc',
