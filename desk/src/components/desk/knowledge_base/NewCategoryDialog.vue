@@ -1,190 +1,133 @@
 <template>
-	<Dialog :options="{title: 'New Category'}" :show="open" @close="() => { 
-			newCategoryInputErrors = {name: '', parent: '', others: ''}
-			open = false
-			$emit('close')
-		}"
+	<Dialog 
+		:options="{
+			title: `New Category`, 
+			actions: [
+				{
+					label: 'Create',
+					appearance: 'primary',
+					handler: () => {
+						if (validateInput()) {
+							$resources.createNewCategory.submit({
+								doc: {
+									doctype: 'Category',
+									category_name: inputValues.category_name,
+									description: inputValues.description
+								}
+							})
+							reset()
+						}
+					}
+				},
+				{
+					label: 'Cancel',
+					appearance: 'secondary',
+					handler: () => { 
+						reset()
+					}
+				},
+			]
+		}" 
+		:show="show"
+		@close="reset()"
 	>
 		<template #body-content>
-			<div class="flex flex-col space-y-3">
+			<div class="flex flex-col space-y-2">
 				<div>
-					<Input label="Category name" :value="newCategoryName" type="text" @change="(val) => { 
-						newCategoryInputValues.name = val 
-						newCategoryInputErrors.name = ''
-					}" />
-					<ErrorMessage :message="newCategoryInputErrors.name" />
+					<Input 
+						type="text" 
+						label="Category Name" 
+						@change="(val) => { inputValues.category_name = val }" 
+					/>
+					<ErrorMessage :message="validationErrors.category_name" />
 				</div>
 				<div>
-					<Input label="Parent category" type="select" :options="parentCategories" @change="(val) => {
-						newCategoryInputValues.parent = val
-						newCategoryInputErrors.parent =	''
-					}" />
-					<ErrorMessage :message="newCategoryInputErrors.parent" />
+					<Input 
+						type="textarea" 
+						label="Description" 
+						@change="(val) => { inputValues.description = val }" 
+					/>
+					<ErrorMessage :message="validationErrors.description" />
 				</div>
-				<ErrorMessage :message="newCategoryInputErrors.others" />
-			</div>
-		</template>
-		<template #actions>
-			<div>
-				<Button 
-					:loading="$resources.createNewCategory.loading"
-					appearance="primary" 
-					@click="() => {
-						if (validateNewCategoryInputs()) {
-							$resources.createNewCategory.submit({
-								name: newCategoryInputValues.name,
-								parent: newCategoryInputValues.parent
-							})
-						}
-					}"
-				>
-					Add Category
-				</Button>
 			</div>
 		</template>
 	</Dialog>
 </template>
 
 <script>
-import { Dialog, ErrorMessage } from 'frappe-ui';
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 export default {
 	name: 'NewCategoryDialog',
-	components: {
-		Dialog,
-		ErrorMessage
-	},
 	props: {
-		newCategoryName: {
-			type: String,
-			default: '',
-		},
-		modelValue: {
+		show: {
 			type: Boolean,
-			required: true,
-		},
-		createParentCategories: {
-			type: Boolean,
-			default: true
-		},
-		newCategoryParent: {
-			type: String,
-			default: ''
-		},
-		redirectToCategory: {
-			type: Boolean,
-			default: true
+			default: false
 		}
 	},
-	emits: ['update:modelValue', 'close', 'new-category-created'],
-	setup(props, { emit }) {
-		let open = computed({
-			get: () => props.modelValue,
-			set: (val) => {
-				emit('update:modelValue', val)
-				if (!val) {
-					emit('close')
-				}
-			},
+	setup(props, context) {
+		const inputValues = ref({
+			category_name: '',
+			description: '',
 		})
-		const newCategoryInputValues = ref({name: '', parent: ''})
-		const newCategoryInputErrors = ref({name: '', parent: '', others: ''})
+		const validationErrors = ref({
+			category_name: '',
+			description: '',
+		})
+		const validateInput = () => {
+			validationErrors.value = {
+				category_name: '',
+				description: '',
+			}
+			if (inputValues.value.category_name === '') {
+				validationErrors.value.category_name = 'Category name cannot be empty'
+			}
+			if (inputValues.value.description.length > 145) {
+				validationErrors.value.description = 'Description must should be less than 145 characters'
+			}
+			
+			return validationErrors.value.category_name === '' && validationErrors.value.description === ''
+		}
+		const reset = () => {
+			inputValues.value = {
+				category_name: '',
+				description: '',
+			}
+			validationErrors.value = {
+				category_name: '',
+				description: '',
+			}
+			context.emit('close')
+		}
 
 		return {
-			newCategoryInputValues,
-			newCategoryInputErrors,
-			open
-		}
-	},
-	computed: {
-		parentCategories() {
-			if (this.$resources.allParentCategories.data) {
-				let categories = []
-				if (this.newCategoryParent) {
-					categories.push(this.newCategoryParent)
-				}
-				if (this.createParentCategories) {
-					categories.push('none')
-				}
-				this.$resources.allParentCategories.data.forEach(category => {
-					if (!categories.includes(category.name)) {
-						categories.push(category.name)
-					}
-				})
-				this.newCategoryInputValues.parent = categories[0]
-				return categories
-			} else {
-				return []
-			}
-		} 
-	},
-	methods: {
-		validateNewCategoryInputs() {
-			this.newCategoryInputErrors = {name: '', parent: '', others: ''}
-
-			if (!this.newCategoryInputValues.name) {
-				this.newCategoryInputErrors.name = "Category name is required"
-			} else if (this.newCategoryInputValues.name.length < 3) {
-				this.newCategoryInputErrors.name = "Category name should have atleast 3 characters"
-			}
-
-			return !Object.values(this.newCategoryInputErrors).some(val => val)
+			inputValues,
+			validationErrors,
+			validateInput,
+			reset
 		}
 	},
 	resources: {
-		allParentCategories() {
-			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: 'Category',
-					filters: {is_group: ['=', 1]},
-					fields: ['name']
-				},
-				auto: true,
-			}
-		},
 		createNewCategory() {
 			return {
 				method: 'frappe.client.insert',
-				makeParams({ name, parent }) {
-					return {
-						doc: {
-							doctype: 'Category',
-							category_name: name,
-							parent_category: parent === 'none' ? '' : parent,
-							is_group: parent === 'none' ? 1 : 0,
-						},
-					}
-				},
-				onSuccess(doc) {
-					this.open = false
-					this.newCategoryInputValues = {}
+				onSuccess: (res) => {
 					this.$toast({
-						title: 'New category created successfully',
-						customIcon: 'circle-check',
-						appearance: 'success'
+						title: 'New cateogry created!!',
+                        customIcon: 'circle-check',
+                        appearance: 'success'
 					})
-					this.$emit('new-category-created', doc.name)
-					this.$emit('close', doc.name)
-					if (this.redirectToCategory) {
-						this.$router.push(`/frappedesk/knowledge-base/${doc.parent_category ? doc.parent_category : doc.category_name}/${doc.parent_category ? doc.category_name : ''}`).then(() => this.$router.go())
-					}
+					this.$emit('category-created', res)
 				},
-				onError(err) {
-					this.newCategoryInputErrors.others = err
+				onError: () => {
 					this.$toast({
-						title: 'Error while creating category!',
+						title: 'Error creating new cateogry!!',
 						customIcon: 'circle-fail',
 						appearance: 'danger',
 					})
 				}
 			}
-		}
+		},
 	}
 }
 </script>
-
-<style>
-
-</style>
