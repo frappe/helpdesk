@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div v-if="!editable && !isNew" class="flex flex-col space-y-[16px] rounded-[8px] border shadow-sm p-[32px]">
-			<div class="font-semibold text-[24px] prose prose-p:my-1 border-b"> {{ title }} </div>
+			<div class="font-semibold text-[24px] prose prose-p:my-1 border-b pb-[16px] mb-[10px]"> {{ title }} </div>
 			<div class="overflow-y-scroll" style="min-height: calc(100vh - 500px); max-height: calc(100vh - 245px);" v-html="content"></div>
 		</div>
 		<div v-else>
