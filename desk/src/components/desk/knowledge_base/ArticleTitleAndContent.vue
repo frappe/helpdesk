@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<div v-if="!editable && !isNew" class="flex flex-col space-y-[16px]">
-			<div class="font-semibold text-[24px] prose prose-p:my-1"> {{ title }} </div>
-			<div v-html="content"></div>
+		<div v-if="!editable && !isNew" class="flex flex-col space-y-[16px] rounded-[8px] border shadow-sm p-[32px]">
+			<div class="font-semibold text-[24px] prose prose-p:my-1 border-b"> {{ title }} </div>
+			<div class="overflow-y-scroll" style="min-height: calc(100vh - 500px); max-height: calc(100vh - 245px);" v-html="content"></div>
 		</div>
 		<div v-else>
 			<div class="flex flex-col space-y-[16px] h-full">
@@ -68,14 +68,11 @@ export default {
 	},
 	watch: {
 		tempNewTitle(val) {
-			if (this.isNew) {
-				this.updateNewArticleInput({ field: 'title', value: val })
-			}
+			this.updateNewArticleInput({ field: 'title', value: val })
+
 		},
 		tempNewContent(val) {
-			if (this.isNew) {
-				this.updateNewArticleInput({ field: 'content', value: val })
-			}
+			this.updateNewArticleInput({ field: 'content', value: val })
 		}
 	},
 	setup(props) {

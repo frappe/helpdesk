@@ -39,10 +39,10 @@
 							<div class="float-right">
 								<div class="flex flex-row space-x-2" v-if="Object.keys(manager.selectedItems).length == 0"> 
 									<router-link :to="{
-										path: '/frappedesk/knowledge-base/articles/new',
+										name: 'NewArticle',
 										query: { category: categoryId }
 									}">
-										<Button icon-left="plus" appearance="primary" @click="() => {}">Add Article</Button>
+										<Button icon-left="plus" appearance="primary">Add Article</Button>
 									</router-link>
 								</div>
 								<div v-else class="flex flex-row space-x-2">

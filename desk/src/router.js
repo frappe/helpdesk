@@ -88,6 +88,11 @@ const routes = [
 				props: true,
 			},
 			{
+				path: 'knowledge-base/articles/new',
+				name: 'NewArticle',
+				component: () => import('@/pages/desk/knowledge_base/Article.vue'),
+			},
+			{
 				path: 'contacts',
 				name: 'Contacts',
 				component: () => import('@/pages/desk/Contacts.vue')

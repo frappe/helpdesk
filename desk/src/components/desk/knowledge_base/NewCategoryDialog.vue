@@ -111,13 +111,13 @@ export default {
 		createNewCategory() {
 			return {
 				method: 'frappe.client.insert',
-				onSuccess: (res) => {
+				onSuccess: (doc) => {
 					this.$toast({
 						title: 'New cateogry created!!',
                         customIcon: 'circle-check',
                         appearance: 'success'
 					})
-					this.$emit('category-created', res)
+					this.$emit('category-created', doc.name)
 				},
 				onError: () => {
 					this.$toast({
