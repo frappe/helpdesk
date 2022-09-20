@@ -14,7 +14,7 @@
 					class="cursor-pointer"
 				/>
 			</div>
-			<div class="sm:w-6/12">
+			<div class="sm:w-5/12">
 				<router-link 
 					:to="`/frappedesk/knowledge-base/articles/${article.name}`"
 					class="flex items-center space-x-[8px]"
@@ -26,17 +26,17 @@
 					</div>
 				</router-link>
 			</div>
-			<div class="sm:w-3/12">
+			<div class="sm:w-2/12">
 				<Badge class="text-base font-normal" :class="article.published ? 'text-green-600' : 'text-red-600'" v-if="article">{{ article.published ? 'Publiished' : 'Draft' }}</Badge>
+			</div>
+			<div class="sm:w-3/12">
+				<Badge class="text-base font-normal" v-if="article.author_name">{{ article.author_name }}</Badge>
 			</div>
 			<div class="sm:w-1/12">
 				<div class="text-gray-600 font-normal" v-if="article.views">{{ article.views }}</div>
 			</div>
-			<div class="sm:w-2/12 font-normal">
-				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs(article.modified).format('D MMM, YYYY') }}</div>
-			</div>
-			<div class="sm:w-1/12 flex flex-row-reverse">
-				<Avatar class="h-[26px] w-[26px]" :imageURL="article.author_image" :label="article.author_name" />
+			<div class="sm:w-1/12 font-normal">
+				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs.shortFormating($dayjs(article.modified).fromNow()) }}</div>
 			</div>
 		</div>
 		<div class="transform translate-y-2"/>

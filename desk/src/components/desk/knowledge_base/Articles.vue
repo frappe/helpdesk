@@ -28,11 +28,11 @@
 								>
 									<div class="flex flex-row space-x-2 items-center">
 										<div class="text-[14px]">Published</div>
-										<div class="rounded-lg px-[10px] py-[3px] bg-blue-50 text-[13px]">3</div>
+										<div class="rounded-lg px-[10px] py-[3px] bg-blue-50 text-[13px]">{{ $resources.publishedArticlesCount.data }}</div>
 									</div>
 									<div class="flex flex-row space-x-2 items-center">
 										<div class="text-[14px]">Draft</div>
-										<div class="rounded-lg px-[10px] py-[3px] bg-gray-50 text-[13px]">10</div>
+										<div class="rounded-lg px-[10px] py-[3px] bg-gray-50 text-[13px]">{{ $resources.draftArticlesCount.data }}</div>
 									</div>
 							</div>
 							</div>
@@ -101,6 +101,26 @@ export default {
 			return {
 				method: 'frappe.desk.reportview.delete_items',
 				onSuccess: () => {}
+			}
+		},
+		publishedArticlesCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Article',
+					filters: [['category', '=', this.categoryId], ['published', '=', 1]]
+				},
+				auto: true
+			}
+		},
+		draftArticlesCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Article',
+					filters: [['category', '=', this.categoryId], ['published', '=', 0]]
+				},
+				auto: true
 			}
 		}
 	},

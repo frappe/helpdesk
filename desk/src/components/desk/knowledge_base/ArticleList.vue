@@ -12,7 +12,7 @@
 				/>
 			</div>
 			<div 
-				class="sm:w-6/12 flex flex-row items-center space-x-[7px] cursor-pointer"
+				class="sm:w-5/12 flex flex-row items-center space-x-[7px] cursor-pointer"
 				@click="manager.toggleOrderBy('title')"
 			>
 				<span>Title</span>
@@ -25,13 +25,26 @@
 				</div>
 			</div>
 			<div 
-				class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+				class="sm:w-2/12 flex flex-row items-center space-x-[6px] cursor-pointer"
 				@click="manager.toggleOrderBy('published')"
 			>
 				<span>Status</span>
 				<div class="w-[10px]">
 					<CustomIcons 
 						v-if="manager.options.order_by.split(' ')[0] === 'views'"
+						:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
+				</div>
+			</div>
+			<div 
+				class="sm:w-3/12 flex flex-row items-center space-x-[7px] cursor-pointer"
+				@click="manager.toggleOrderBy('author')"
+			>
+				<span>Author</span>
+				<div class="w-[10px]">
+					<CustomIcons 
+						v-if="manager.options.order_by.split(' ')[0] === 'title'"
 						:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
@@ -51,7 +64,7 @@
 				</div>
 			</div>
 			<div 
-				class="sm:w-2/12 flex flex-row-reverse items-center cursor-pointer"
+				class="sm:w-1/12 flex flex-row-reverse items-center cursor-pointer"
 				@click="manager.toggleOrderBy('modified')"
 			>
 				<div class="w-[10px]">
@@ -62,9 +75,6 @@
 					/>
 				</div>
 				<span class="px-[6px]">Modified</span>
-			</div>
-			<div class="sm:w-1/12 text-[11px] flex flex-row-reverse text-gray-500">
-				<span> {{ manager.totalCount }} </span>
 			</div>
 		</div>
 		<div v-if="manager.list.length > 0">
