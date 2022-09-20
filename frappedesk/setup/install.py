@@ -50,7 +50,7 @@ def add_default_categories_and_articles():
 		"doctype": "Article",
 		"title": "Introduction",
 		"content": "Content for your Article",
-		"category": "Introduction",
+		"category": "Getting Started",
 		"published": False
 	}).insert()
 
