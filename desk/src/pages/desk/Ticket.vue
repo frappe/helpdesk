@@ -49,7 +49,7 @@
 							:mentions="mentions"
 							@change="(val) => { content = val }"
 							:placeholder="editingType == 'reply' ? 'Type a response' : 'Type a comment'" 
-							editorClasses="w-full min-h-[180px] max-h-[300px] " class="border border-gray-300 rounded-[8px] p-[12px]"
+							editorClasses="w-full min-h-[180px] max-h-[300px] text-[13px]" class="border border-gray-300 rounded-[8px] p-[12px]"
 						>
 							<template #top-section>
 								<div class="flex flex-row items-center text-[12px] font-normal pb-[8px]">

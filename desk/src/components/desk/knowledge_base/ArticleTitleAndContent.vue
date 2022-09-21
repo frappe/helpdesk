@@ -17,7 +17,7 @@
 						@click="$refs.contentEditor.focusEditor()"
 						:content="content" 
 						@change="(val) => { tempNewContent = val }"
-						editorClasses="w-full p-[12px] bg-gray-100 min-h-[180px] max-h-[300px]"
+						editorClasses="w-full p-[12px] bg-gray-100 min-h-[180px] max-h-[500px] text-[16px]"
 						class="rounded-[8px]"
 					>
 						<template #top-section="{ editor }">
