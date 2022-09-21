@@ -27,7 +27,7 @@
 				</router-link>
 			</div>
 			<div class="sm:w-2/12">
-				<Badge class="text-base font-normal" :class="article.published ? 'text-green-600' : 'text-red-600'" v-if="article">{{ article.published ? 'Publiished' : 'Draft' }}</Badge>
+				<Badge class="text-base font-normal" :class="article.published ? 'text-green-600' : 'text-gray-600'" v-if="article">{{ article.published ? 'Publiished' : 'Draft' }}</Badge>
 			</div>
 			<div class="sm:w-3/12">
 				<Badge class="text-base font-normal" v-if="article.author_name">{{ article.author_name }}</Badge>
