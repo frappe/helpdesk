@@ -4,21 +4,10 @@ import frappe
 def get_context(context):
 	context.categories = frappe.get_all(
 		"Category",
-		fields=["name", "description", "parent_category", "is_group", "category_name"],
-		filters={"parent_category": ["=", ""]},
+		fields=["name", "description", "category_name"]
 	)
 	context.articles = frappe.get_all("Article")
 	return context
-
-
-@frappe.whitelist(allow_guest=True)
-def get_child_categories(category):
-	child_categories = frappe.get_all(
-		"Category",
-		fields=["name", "description", "parent_category", "is_group"],
-		filters={"parent_category": ["=", category]},
-	)
-	return child_categories
 
 
 @frappe.whitelist(allow_guest=True)

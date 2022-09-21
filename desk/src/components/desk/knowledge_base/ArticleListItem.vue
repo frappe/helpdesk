@@ -14,7 +14,7 @@
 					class="cursor-pointer"
 				/>
 			</div>
-			<div class="sm:w-6/12">
+			<div class="sm:w-5/12">
 				<router-link 
 					:to="`/frappedesk/knowledge-base/articles/${article.name}`"
 					class="flex items-center space-x-[8px]"
@@ -24,21 +24,19 @@
 					>
 						{{ article.title }}
 					</div>
-					<!-- <div v-if="article.article_type" class="text-gray-600 font-medium bg-gray-200 px-[8px] py-[2px] rounded-[48px] uppercase text-xs">{{ article.article_type }}</div> -->
 				</router-link>
 			</div>
+			<div class="sm:w-2/12">
+				<Badge class="text-base font-normal" :class="article.published ? 'text-green-600' : 'text-gray-600'" v-if="article">{{ article.published ? 'Publiished' : 'Draft' }}</Badge>
+			</div>
 			<div class="sm:w-3/12">
-				<div class="w-full">
-					<div class="flex flex-row items-center space-x-1">
-						<div class="text-base font-normal">{{ article.author_name }}</div>
-					</div>
-				</div>
+				<Badge class="text-base font-normal" v-if="article.author_name">{{ article.author_name }}</Badge>
 			</div>
 			<div class="sm:w-1/12">
 				<div class="text-gray-600 font-normal" v-if="article.views">{{ article.views }}</div>
 			</div>
-			<div class="sm:w-2/12 font-normal">
-				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs(article.modified).format('D MMM, YYYY') }}</div>
+			<div class="sm:w-1/12 font-normal">
+				<div class="text-gray-600 font-normal text-right" v-if="article.modified">{{ $dayjs.shortFormating($dayjs(article.modified).fromNow()) }}</div>
 			</div>
 		</div>
 		<div class="transform translate-y-2"/>
@@ -47,13 +45,14 @@
 
 <script>
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import { ref } from 'vue'
+import { Avatar } from 'frappe-ui'
 
 export default {
 	name: 'ArticleListItem',
 	props: ['article', 'selected'],
 	components: {
-		CustomIcons
+		CustomIcons,
+		Avatar
 	}
 }
 </script>

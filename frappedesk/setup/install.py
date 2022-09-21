@@ -43,23 +43,14 @@ def add_default_categories_and_articles():
 	frappe.get_doc({
 		"doctype": "Category",
 		"category_name": "Getting Started",
-		"description": "Description for your Getting Started",
-		"is_group": True
-	}).insert()
-
-	frappe.get_doc({
-		"doctype": "Category",
-		"category_name": "Introduction",
-		"description": "Description for your Introduction",
-		"parent_category": "Getting Started",
-		"is_group": False
+		"description": "Content for your Category",
 	}).insert()
 
 	frappe.get_doc({
 		"doctype": "Article",
-		"title": "Article 1",
+		"title": "Introduction",
 		"content": "Content for your Article",
-		"category": "Introduction",
+		"category": "Getting Started",
 		"published": False
 	}).insert()
 

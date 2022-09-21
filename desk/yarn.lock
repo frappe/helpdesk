@@ -66,6 +66,11 @@
   dependencies:
     mini-svg-data-uri "^1.2.3"
 
+"@tailwindcss/line-clamp@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/line-clamp/-/line-clamp-0.4.2.tgz#f353c5a8ab2c939c6267ac5b907f012e5ee130f9"
+  integrity sha512-HFzAQuqYCjyy/SX9sLGB1lroPzmcnWv1FHkIpmypte10hptf4oPUfucryMKovZh2u0uiS9U5Ty3GghWfEJGwVw==
+
 "@tailwindcss/typography@^0.5.0":
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/@tailwindcss/typography/-/typography-0.5.4.tgz#ad8c9e6808bae297bb7826742e4789f2a9f09a48"
@@ -292,6 +297,15 @@
     "@tiptap/extension-paragraph" "^2.0.0-beta.26"
     "@tiptap/extension-strike" "^2.0.0-beta.29"
     "@tiptap/extension-text" "^2.0.0-beta.17"
+
+"@tiptap/suggestion@^2.0.0-beta.195":
+  version "2.0.0-beta.195"
+  resolved "https://registry.yarnpkg.com/@tiptap/suggestion/-/suggestion-2.0.0-beta.195.tgz#287aaed7bc7580094c5770c878d51e1da365f5fa"
+  integrity sha512-3ATDgy8U+mqaffLV2K2tBGzyTqcb8Ca7YVyZ2sws/j/E2rUIF3t8Ec4FGTpeRGLDVd3foRRidC1PHwV7ca4f5Q==
+  dependencies:
+    prosemirror-model "1.18.1"
+    prosemirror-state "1.4.1"
+    prosemirror-view "1.26.2"
 
 "@tiptap/suggestion@^2.0.0-beta.97":
   version "2.0.0-beta.97"
@@ -765,10 +779,10 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
-frappe-ui@^0.0.65:
-  version "0.0.65"
-  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.65.tgz#f7534f2536b2e342c5eac2fd07efd91ce7edee47"
-  integrity sha512-su7X4IFffqJa6B4IlVKbEuPKyhbp/QIoioMjJTSZJA7cLIrHoaN6BGgfjM9fsqVNCIA7LK4mrB32xnpfpnv5UQ==
+frappe-ui@^0.0.69:
+  version "0.0.69"
+  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.69.tgz#378b6ba4d9721cd60a18403a70aecaba632cf418"
+  integrity sha512-+vGZCMycriU4koRdU1NAg6She2kDzxEhbOFPS95W97nFTL3auTyLtkkaK0DNEOIexXeJuhuzJGDFgEnEOZr1ZQ==
   dependencies:
     "@headlessui/vue" "^1.5.0"
     "@popperjs/core" "^2.11.2"
@@ -784,6 +798,7 @@ frappe-ui@^0.0.65:
     "@tiptap/extension-table-row" "^2.0.0-beta.22"
     "@tiptap/extension-text-align" "^2.0.0-beta.31"
     "@tiptap/starter-kit" "^2.0.0-beta.191"
+    "@tiptap/suggestion" "^2.0.0-beta.195"
     "@tiptap/vue-3" "^2.0.0-beta.96"
     autoprefixer "^10.4.2"
     feather-icons "^4.28.0"

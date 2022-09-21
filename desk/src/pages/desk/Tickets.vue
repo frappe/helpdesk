@@ -30,7 +30,7 @@
 		>
 			<template #body="{ manager }">
 				<div>
-					<div class="flow-root py-[22px] h-[72px] px-[16px]">
+					<div class="flow-root py-[22px] h-[72px]">
 						<div class="float-left">
 						</div>
 						<div class="float-right">

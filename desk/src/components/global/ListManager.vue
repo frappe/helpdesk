@@ -37,7 +37,6 @@ export default {
         return false
       }
     })
-
     const manager = ref({
       loading: false,
       resources,
@@ -84,7 +83,8 @@ export default {
         return page <= manager.value.totalPages
       },
       reload: () => {
-        manager.value.getPage(manager.value.currPage)
+        clearList()
+        resources.value.list.reload()
       },
       update: (newOptions) => {
         clearList()
@@ -225,6 +225,7 @@ export default {
         filters: this.manager.options?.filters,
         start: this.manager.options?.limit * (this.manager.options?.start_page - 1),
         limit: this.manager.options?.limit || 20,
+        realtime: true,
         onSuccess: (data) => {
           /**
            * Remove all the duplicates which might have been added to the

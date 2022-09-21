@@ -5,10 +5,10 @@
 			<div @click="editor?.commands.focus()">
 				<TextEditor
 					ref="textEditor"
-					class="overflow-y-scroll cursor-text"
+					class="overflow-y-scroll cursor-text h-full"
 					:class="editorClasses"
 					:content="content"
-					editor-class="w-full text-[13px]"
+					:editor-class="editorClasses"
 					:placeholder="placeholder"
 					:editable="true"
 					:extensions="[CustomHardBreakExtention]"

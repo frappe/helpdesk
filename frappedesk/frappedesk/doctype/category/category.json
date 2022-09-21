@@ -10,11 +10,9 @@
  "field_order": [
   "category_name",
   "description",
-  "is_group",
-  "parent_category",
   "route",
   "linked_web_page",
-  "order"
+  "idx"
  ],
  "fields": [
   {
@@ -31,22 +29,6 @@
    "label": "Description"
   },
   {
-   "default": "0",
-   "fieldname": "is_group",
-   "fieldtype": "Check",
-   "label": "Is Group"
-  },
-  {
-   "depends_on": "eval:(!doc.is_group && doc.parent_cateogry !='')",
-   "fieldname": "parent_category",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Parent Category",
-   "options": "Category",
-   "read_only": 1
-  },
-  {
    "fieldname": "route",
    "fieldtype": "Data",
    "hidden": 1,
@@ -61,15 +43,17 @@
   },
   {
    "default": "0",
-   "fieldname": "order",
-   "fieldtype": "Data",
-   "label": "Order"
+   "fieldname": "idx",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Index",
+   "non_negative": 1
   }
  ],
  "has_web_view": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-07 16:04:04.269863",
+ "modified": "2022-09-18 23:37:14.490065",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Category",

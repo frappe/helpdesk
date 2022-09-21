@@ -12,7 +12,7 @@
 				/>
 			</div>
 			<div 
-				class="sm:w-6/12 flex flex-row items-center space-x-[7px] cursor-pointer"
+				class="sm:w-5/12 flex flex-row items-center space-x-[7px] cursor-pointer"
 				@click="manager.toggleOrderBy('title')"
 			>
 				<span>Title</span>
@@ -25,13 +25,26 @@
 				</div>
 			</div>
 			<div 
-				class="sm:w-3/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+				class="sm:w-2/12 flex flex-row items-center space-x-[6px] cursor-pointer"
+				@click="manager.toggleOrderBy('published')"
+			>
+				<span>Status</span>
+				<div class="w-[10px]">
+					<CustomIcons 
+						v-if="manager.options.order_by.split(' ')[0] === 'views'"
+						:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
+						class="h-[6px] fill-gray-400 stroke-transparent" 
+					/>
+				</div>
+			</div>
+			<div 
+				class="sm:w-3/12 flex flex-row items-center space-x-[7px] cursor-pointer"
 				@click="manager.toggleOrderBy('author')"
 			>
 				<span>Author</span>
 				<div class="w-[10px]">
 					<CustomIcons 
-						v-if="manager.options.order_by.split(' ')[0] === 'author'"
+						v-if="manager.options.order_by.split(' ')[0] === 'title'"
 						:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-down' : 'chevron-up'"
 						class="h-[6px] fill-gray-400 stroke-transparent" 
 					/>
@@ -51,7 +64,7 @@
 				</div>
 			</div>
 			<div 
-				class="sm:w-2/12 flex flex-row-reverse items-center cursor-pointer"
+				class="sm:w-1/12 flex flex-row-reverse items-center cursor-pointer"
 				@click="manager.toggleOrderBy('modified')"
 			>
 				<div class="w-[10px]">
@@ -64,15 +77,23 @@
 				<span class="px-[6px]">Modified</span>
 			</div>
 		</div>
-		<div 
-			id="rows" 
-			class="flex flex-col overflow-scroll"
-			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 132px)' : null }"
-		>
-			<div v-for="(article, index) in manager.list" :key="article.name">
-				<ArticleListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :article="article" @toggle-select="manager.select(article)" :selected="manager.itemSelected(article)" />
+		<div v-if="manager.list.length > 0">
+			<div 
+				id="rows" 
+				class="flex flex-col overflow-scroll"
+				:style="{ height: viewportWidth > 768 ? 'calc(100vh - 132px)' : null }"
+			>
+				<div v-for="(article, index) in manager.list" :key="article.name">
+					<ArticleListItem :class="index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'" :article="article" @toggle-select="manager.select(article)" :selected="manager.itemSelected(article)" />
+				</div>
+				<ListPageController :manager="manager" />
 			</div>
-			<ListPageController :manager="manager" />
+		</div>
+		<div v-else>
+			<div class="grid place-content-center w-full my-[100px]">
+				<CustomIcons name="empty-list" class="h-12 w-12 mx-auto mb-2" />
+				<div class="text-gray-500 mb-2 w-full text-center text-[16px]">No articles found</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -81,7 +102,7 @@
 import ArticleListItem from './ArticleListItem.vue'
 import CustomIcons from '../global/CustomIcons.vue'
 import ListPageController from '../../global/ListPageController.vue'
-import { ref, inject } from 'vue'
+import { inject } from 'vue'
 
 export default {
 	name: 'ArticleList',
@@ -96,6 +117,17 @@ export default {
 		
 		return {
 			viewportWidth
+		}
+	},
+	resources: {
+		totalArticles() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Article'
+				},
+				auto: true
+			}
 		}
 	}
 }

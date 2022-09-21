@@ -41,11 +41,9 @@
 				</Autocomplete>
 				<ErrorMessage :message="articleInputErrors.category" />
 				<NewCategoryDialog
-					:createParentCategories="false" 
-					:restrictedToChildCategory="true"
 					:show="showCreateNewCategoryDialog" 
 					@close="showCreateNewCategoryDialog = false" 
-					@new-category-created="(category) => {
+					@category-created="(category) => {
 						this.$resources.categories.fetch().then(() => {
 							this.setArticleDetail('category', category)
 						})	
@@ -127,7 +125,6 @@ export default {
 				params: {
 					doctype: 'Category',
 					fields: ['name'],
-					filters: {is_group: ['=', 0]},
 				},
 				auto: true,
 				onSuccess: (data) => {

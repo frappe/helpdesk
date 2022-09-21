@@ -11,9 +11,10 @@
 	},
 	"dependencies": {
 		"@headlessui/vue": "^1.5.0",
+		"@tailwindcss/line-clamp": "^0.4.2",
 		"@vitejs/plugin-vue": "^2.3.3",
 		"dayjs": "^1.10.7",
-		"frappe-ui": "^0.0.65",
+		"frappe-ui": "^0.0.69",
 		"luxon": "^2.3.2",
 		"vue": "^3.2.26",
 		"vue-router": "^4.0.12",

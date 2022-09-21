@@ -1,6 +1,50 @@
 <template>
-	<div class="pt-[17px] pl-[18px] pr-[24px]">
-		<div class="flex flex-row space-x-[24px] h-full">
+	<div class="flex flex-col" v-if="article">
+		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
+			<div class="float-left">
+				<router-link
+					:to="`/frappedesk/knowledge-base/${article.category || $route.query.category}`"
+					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
+					role="button"
+				>
+					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
+					<div> Back to {{ article.category || $route.query.category }} </div>
+				</router-link>
+			</div>
+			<div class="float-right">
+				<div v-if="!editMode" class="flex flex-row space-x-2">
+					<Button 
+						appearance="secondary" 
+						@click="() => { 
+							editMode = true 
+							newArticleTempValues = {
+								title: article.title,
+								content: article.content,
+								published: article.published,
+								author: article.author,
+								category: article.category,
+								note: article.note
+							}
+						}"
+					>
+						Edit
+					</Button>
+					<Button v-if="article.published" appearance="secondary" @click="$resources.article.setValue.submit({published: false})">Unpublish</Button>
+					<Button v-else appearance="primary" @click="$resources.article.setValue.submit({published: true})">Publish</Button>
+				</div>
+				<div v-else class="flex flex-row space-x-2">
+					<Button appearance="secondary" @click="() => {
+						if (isNew) {
+							$router.push(`/frappedesk/knowledge-base/${article.category}`)
+						} else {
+							this.$router.go()
+						}
+					}">Cancel</Button>
+					<Button appearance="primary" @click="saveArticle()">Save</Button>
+				</div>
+			</div>
+		</div>
+		<div class="flex flex-row space-x-[24px] h-full border-t px-[16px] py-[22px]">
 			<ArticleTitleAndContent :isNew="isNew" :editable="editMode" class="grow" :title="article.title" :content="article.content" :articleResource="$resources.article" @exit_edit_mode="() => { editMode = false }" />
 			<ArticleDetails v-if="article" :isNew="isNew" class="w-[220px] shrink-0" :article="article" :articleResource="$resources.article" />
 		</div>
@@ -11,34 +55,23 @@
 import ArticleTitleAndContent from '@/components/desk/knowledge_base/ArticleTitleAndContent.vue'
 import ArticleDetails from '@/components/desk/knowledge_base/ArticleDetails.vue'
 import { ref, provide } from 'vue'
+import { FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'Article',
 	props: ['articleId'],
 	components: {
 		ArticleTitleAndContent,
-		ArticleDetails
+		ArticleDetails,
+		FeatherIcon
 	},
 	mounted() {
 		if (!this.articleId) {
-			// toggle nav bar actions for new article
-			const actions = [
-				{ label: 'Cancel', appearance:'danger', handler: () => {
-					this.$router.push('/frappedesk/knowledge-base/')
-				}},
-				{ label: 'Save', appearance: 'primary', handler: () => { this.saveNewArticle() }, dropdown: [
-					{ label: 'Publish', appearance: 'secondary', handler: () => { this.saveNewArticle(true) } }
-				] },
-			]
-			this.$event.emit('toggle_navbar_actions', ({type: "New Article", actions}))
-		}
-
-		this.saveNewArticle = (publish=false) => {
-			this.insertArticle(publish)
+			this.editMode = true
 		}
 	},
-	setup() {
-		const editMode = ref(false)
+	setup(props) {
+		const editMode = ref(!props.articleId)
 		provide('editMode', editMode)
 		
 		const newArticleTempValues = ref({})
@@ -50,16 +83,12 @@ export default {
 		provide('newArticleTempValues', newArticleTempValues)
 		provide('articleInputErrors', articleInputErrors)
 
-		const saveNewArticle = ref(() => {})
-		provide('saveNewArticle', saveNewArticle)
-
 		const saveArticleTitleAndContent = ref(() => {})
 		provide('saveArticleTitleAndContent', saveArticleTitleAndContent)
 
 		return {
 			editMode,
 			newArticleTempValues,
-			saveNewArticle,
 			saveArticleTitleAndContent,
 			articleInputErrors
 		}
@@ -70,24 +99,8 @@ export default {
 		},
 		article() {
 			if (!this.isNew) {
-				const doc = this.$resources.article.doc
-				
-				if (doc) {
-					const actions = [
-						{ label: 'Edit', appearance:'secondary', handler: () => {
-							this.editMode = true
-						}},
-						{ label: doc.published ? 'Unpublish' : 'Publish', appearance: doc.published ? 'secondary' : 'primary', handler: () => {
-							this.editMode = false
-							this.$resources.article.setValue.submit({published: !doc.published})
-						}}
-					]
-					this.$event.emit('toggle_navbar_actions', ({type: doc.published ? 'Published Article' : 'Draft Article', actions}))
-				}
-
-				return doc || {}
+				return this.$resources.article.doc || {}
 			} 
-
 			return {}
 		}
 	},
@@ -124,7 +137,7 @@ export default {
 			return {
 				method: 'frappe.client.insert',
 				onSuccess: (doc) => {
-					this.$router.push({path: '/frappedesk/knowledge-base/'})
+					this.$router.push(`/frappedesk/knowledge-base/articles/${doc.name}`)
 				},
 				onError: (err) => {
 					this.$toast({
@@ -137,55 +150,49 @@ export default {
 			 }
 		}
 	},
-	watch: {
-		editMode(val) {
-			if (val) {
-				const actions = [
-					{ label: 'Cancel', appearance:'danger', handler: () => {
-						this.$router.go()
-					}},
-					{ label: 'Save', appearance: 'primary', handler: () => { this.saveArticleTitleAndContent() }, dropdown: [
-						{ label: 'Publish', appearance: 'secondary', handler: () => { this.saveArticleTitleAndContent(true) } }
-					] },
-				]
-				this.$event.emit('toggle_navbar_actions', ({type: "Edit Article", actions}))
-			}
-		}
-	},
 	methods: {
-		insertArticle(publish=false) {
-			this.articleInputErrors = {}
-			const validateInputs = (input) => {
-				if (!input.title || input.title == "") {
-					this.articleInputErrors.title = "Title is required"
+		saveArticle(publish=false) {
+			if (this.validateArticleInputValues(this.newArticleTempValues)) {
+				const inputParams = {
+					title: this.newArticleTempValues.title,
+					content: this.newArticleTempValues.content,
+					author: this.newArticleTempValues.author,
+					category: this.newArticleTempValues.category,
+					note: this.newArticleTempValues.note,
+					published: publish
 				}
-				if (!input.content || input.content.replaceAll(' ', '') == '<p></p>') {
-					this.articleInputErrors.content = "Content is required"
+				if (this.isNew) {
+					this.$resources.newArticle.submit({
+						doc: {
+							doctype: 'Article',
+							...inputParams
+						}
+					})
+				} else {
+					this.$resources.article.setValue.submit({
+						...inputParams
+					})
+					this.editMode = false
 				}
-				if (!input.author) {
-					this.articleInputErrors.author = "Author is required"
-				}
-				if (!input.category) {
-					this.articleInputErrors.category = "Category is required"
-				}
-
-				return Object.keys(this.articleInputErrors).length == 0
-			}
-
-			if (validateInputs(this.newArticleTempValues)) {
-				this.$resources.newArticle.submit({
-					doc: {
-						doctype: 'Article',
-						title: this.newArticleTempValues.title,
-						content: this.newArticleTempValues.content,
-						author: this.newArticleTempValues.author,
-						category: this.newArticleTempValues.category,
-						note: this.insertArticle.note,
-						published: publish
-					}
-				})
 			}
 		},
+		validateArticleInputValues(input) {
+			this.articleInputErrors = {}
+			if (!input.title || input.title == "") {
+				this.articleInputErrors.title = "Title is required"
+			}
+			if (!input.content || input.content.replaceAll(' ', '') == '<p></p>') {
+				this.articleInputErrors.content = "Content is required"
+			}
+			if (!input.author) {
+				this.articleInputErrors.author = "Author is required"
+			}
+			if (!input.category) {
+				this.articleInputErrors.category = "Category is required"
+			}
+
+			return Object.keys(this.articleInputErrors).length == 0
+		}
 	}
 }
 </script>
