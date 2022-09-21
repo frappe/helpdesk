@@ -3,7 +3,6 @@ from frappe.model.rename_doc import rename_doc
 
 @frappe.whitelist()
 def update_category(old_category_name, new_category_name, new_description):
-	print(f"old_category_name: {old_category_name} new_category_name: {new_category_name} new_description: {new_description}")
 	category_doc = frappe.get_doc("Category", old_category_name)
 	category_doc.category_name = new_category_name
 	category_doc.description = new_description
