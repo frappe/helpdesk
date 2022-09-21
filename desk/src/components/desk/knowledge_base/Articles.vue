@@ -46,7 +46,22 @@
 									</router-link>
 								</div>
 								<div v-else class="flex flex-row space-x-2">
-									<Button appearance="secondary" @click="() => {}">Mark as Draft</Button>
+									<Button 
+										appearance="secondary" 
+										@click="() => {
+											changeArticleStatus(manager.selectedItems, false)
+										}"
+									>
+										Mark as Draft
+									</Button>
+									<Button 
+										appearance="primary" 
+										@click="() => {
+											changeArticleStatus(manager.selectedItems, true)
+										}"
+									>
+										Publish
+									</Button>
 								</div>
 							</div>
 						</div>
@@ -96,6 +111,19 @@ export default {
 			return str
 		}
 	},
+	methods: {
+		changeArticleStatus(items, publish=false) {
+			const docs = []
+			Object.keys(items).forEach((item) => {
+				docs.push({
+					doctype: 'Article',
+					docname: item,
+					published: publish
+				})
+			})
+			this.$resources.markArticlesAsDraft.submit({ docs: JSON.stringify(docs) })
+		},
+	},
 	resources: {
 		deleteDoc() {
 			return {
@@ -121,6 +149,29 @@ export default {
 					filters: [['category', '=', this.categoryId], ['published', '=', 0]]
 				},
 				auto: true
+			}
+		},
+		markArticlesAsDraft() {
+			return {
+				method: 'frappe.client.bulk_update',
+				onSuccess: () => {
+					this.$resources.publishedArticlesCount.fetch()
+					this.$resources.draftArticlesCount.fetch()
+					this.$toast({
+						title: 'Articles updated!!',
+                        customIcon: 'circle-check',
+                        appearance: 'success'
+					})
+					this.$refs.articleList.manager.reload()
+				},
+				onError: (err) => {
+					this.$toast({
+						title: 'Something went wrong!!',
+						text: err,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
 			}
 		}
 	},
