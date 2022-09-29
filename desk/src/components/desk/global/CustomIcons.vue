@@ -230,6 +230,23 @@
 			</clipPath>
 			</defs>
 		</svg>
+		<svg
+			v-if="this.name=='drag-handle'" :class="this.class" :width="this.width" :height="this.height"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<circle cx="12" cy="9" r="1"></circle>
+			<circle cx="19" cy="9" r="1"></circle>
+			<circle cx="5" cy="9" r="1"></circle>
+			<circle cx="12" cy="15" r="1"></circle>
+			<circle cx="19" cy="15" r="1"></circle>
+			<circle cx="5" cy="15" r="1"></circle>
+		</svg>
 		<div v-if="this.name=='company'" :class="this.class">
 			<div v-if="$resources.brandHtml.data" v-html="$resources.brandHtml.data"></div>
 			<div v-else>{{ $resources.helpdeskName.data }}</div>

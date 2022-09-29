@@ -1,53 +1,26 @@
 <template>
-	<div class="flex flex-row" v-if="selectedCategory">
-		<Categories 
-			class="border-r w-[300px]" 
-			:selectedCategory="selectedCategory"
-		/>
-		<Articles class="grow" :categoryId="selectedCategory" />
+	<div class="mx-auto w-full h-screen p-4">
+		<div class="rounded shadow p-5 h-full overflow-y-scroll">
+			<KBHome v-if="viewMode == 'website'" :editable="true"/>
+		</div>
 	</div>
 </template>
 
 <script>
-import Categories from '@/components/desk/knowledge_base/Categories.vue'
-import Articles from '@/components/desk/knowledge_base/Articles.vue'
-import { ref } from 'vue'
+import { ref } from 'vue';
+import KBHome from '@/components/global/KBHome.vue';
 
 export default {
 	name: 'KnowledgeBase',
 	components: {
-		Categories,
-		Articles
+		KBHome
 	},
-	props: {
-		categoryId: {
-			type: String,
-			default: ''
-		}
-	},
-	setup(props) {
-		const selectedCategory = ref(props.categoryId || '')
+	setup() {
+		const viewMode = ref('website'); // website or list
 
 		return {
-			selectedCategory
-		}
-	},
-	resources: {
-		categories() {
-			return {
-				method: 'frappe.client.get_list',
-				params: {
-					doctype: 'Category',
-					fields: ['name']
-				},
-				auto: true,
-				onSuccess: (res) => {
-					if (!this.selectedCategory) {
-						this.$router.push('/frappedesk/knowledge-base/' + res[0].name)
-					}
-				}
-			}
-		}
+			viewMode,
+		};
 	}
 }
 </script>
