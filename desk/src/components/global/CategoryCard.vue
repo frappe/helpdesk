@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { inject, ref } from 'vue';
+import { inject, ref, watch } from 'vue';
 import { ErrorMessage, debounce } from 'frappe-ui';
 import CustomIcons from '@/components/desk/global/CustomIcons.vue';
 
@@ -75,12 +75,28 @@ export default {
 		CustomIcons,
 		ErrorMessage
 	},
-	setup() {
+	setup(props) {
 		const validationErrors = ref({
 			category_name: "",
 			description: ""
 		});
 		const checkIfCategoryNameExistsInCurrentHierarchy = inject('checkIfCategoryNameExistsInCurrentHierarchy')
+
+		const allValidationErrors = inject('allValidationErrors')
+
+		watch(validationErrors.value, (newVal) => {
+			if (newVal.category_name || newVal.description) {
+				if (!allValidationErrors.value.some(c => c == props.category.name)) {
+					allValidationErrors.value.push(props.category.name)
+				}
+			} else {
+				// remove the category name from the array
+				const index = allValidationErrors.value.indexOf(props.category.name)
+				if (index > -1) {
+					allValidationErrors.value.splice(index, 1)
+				}
+			}
+		})
 
 		return {
 			validationErrors,
@@ -160,7 +176,10 @@ export default {
 		onCategoryNameInput: debounce(function(value) {
 			this.category.category_name = value
 			this.validationErrors.category_name = "";
-			if (this.checkIfCategoryNameExistsInCurrentHierarchy(value, this.category.idx)) {
+			if (!value) {
+				this.validationErrors.category_name = `Category name is required.`;
+			}
+			else if (this.checkIfCategoryNameExistsInCurrentHierarchy(value, this.category.idx)) {
 				this.$resources.checkIfCategoryNameExistsOutsideCurrentHierarchy.submit({
 					category_name: this.category.category_name,
 					parent_category: this.category.parent_category

@@ -1,16 +1,19 @@
 <template>
 	<div 
 		class="flex flex-col" 
-		:class="editMode ? 'border-2 border-gray-300 rounded p-5 space-y-4 mt-5' : 'group'"
+		:class="editMode ? 'border-2 border-gray-300 rounded p-5 space-y-4 mt-5' : ''"
 	>
 		<div class="h-12">
 			<div v-if="editMode" class="flex flex-row-reverse">
 				<Button 
 					icon-left="save" 
 					class="ml-2"
+					:class="disableSaving ? 'cursor-not-allowed' : ''"
+					:disable="disableSaving"
 					@click="() => {
 						if(validateChanges()) {
 							// TODO: save the changes	
+							saveChanges()
 						}
 					}"
 				>
@@ -26,7 +29,7 @@
 					Discard
 				</Button>
 			</div>
-			<div v-else-if="editable" class="flex flex-row-reverse py-2 group-hover:visible invisible">
+			<div v-else-if="editable" class="flex flex-row-reverse py-2">
 				<Button 
 					icon-left="edit-2" 
 					@click="() => {
@@ -53,8 +56,8 @@
 						:editMode="editMode"
 						:deletable="categories.length > 1"
 						@delete="() => {
-							const index = categories.findIndex(c => c == element);
-							categories.splice(index, 1);
+							const index = categories.findIndex(c => c == element)
+							categories.splice(index, 1)
 						}"
 					/>
 					<div v-if="editMode" class="group h-full">
@@ -63,7 +66,7 @@
 								name="plus" 
 								class="w-4 cursor-pointer my-auto hover:bg-gray-100 rounded"
 								@click="() => {
-									const index = categories.findIndex(c => c == element);
+									const index = categories.findIndex(c => c == element)
 									categories.splice(index + 1, 0, {
 										is_new: true,
 										category_name: 'New Category',
@@ -85,8 +88,8 @@
 <script>
 import { provide, ref } from 'vue'
 import draggable from 'vuedraggable'
-import { FeatherIcon } from 'frappe-ui';
-import CategoryCard from '@/components/global/CategoryCard.vue';
+import { FeatherIcon } from 'frappe-ui'
+import CategoryCard from '@/components/global/CategoryCard.vue'
 
 export default {
 	name: 'CategoryList',
@@ -110,25 +113,32 @@ export default {
 		FeatherIcon
 	},
 	setup() {
-		const editMode = ref(false);
-		const tempCategories = ref([]);
+		const editMode = ref(false)
+		const tempCategories = ref([])
+		const allValidationErrors = ref([])
+
+		provide('allValidationErrors', allValidationErrors)
 
 		provide('checkIfCategoryNameExistsInCurrentHierarchy', (categoryName, idx) => {
-			return !tempCategories.value.some(c => c.category_name == categoryName && c.idx != idx);
-		});
+			return !tempCategories.value.some(c => c.category_name == categoryName && c.idx != idx)
+		})
 		
 		return {
 			editMode,
-			tempCategories
+			tempCategories,
+			allValidationErrors
 		}
 	},
 	computed: {
 		categories() {
 			if (!this.editMode) {
-				return this.$resources.categories.data || [];
+				return this.$resources.categories.data || []
 			} else {
-				return this.tempCategories;
+				return this.tempCategories
 			}
+		},
+		disableSaving() {
+			return this.allValidationErrors.length > 0
 		}
 	},
 	watch: {
@@ -142,7 +152,7 @@ export default {
 		categories() {
 			const filters = this.parentCategory ? 
 				{'parent_category': this.parentCategory} : 
-				{'is_group': true};
+				{'is_group': true}
 			
 			return {
 				type: 'list',
@@ -164,10 +174,15 @@ export default {
 	},
 	methods: {
 		validateChanges() {
-			console.log('tempCategories: ', this.tempCategories)
-			console.log('categories: ', this.categories)
+			console.log('before: ', this.$resources.categories.data)
+			console.log('after: ', this.tempCategories)
+			// TODO: check if any validation errors are there for any of the categories
+			// TODO:
 
 			return false
+		},
+		saveChanges() {
+			console.log('save changes')
 		}
 	}
 }
