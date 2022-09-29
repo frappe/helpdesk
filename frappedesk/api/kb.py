@@ -19,3 +19,14 @@ def delete_category(category):
 		raise Exception("Cannot delete category with articles")
 	else:
 		frappe.delete_doc("Category", category)
+
+@frappe.whitelist()
+def check_if_category_name_exists_outside_current_hierarchy(category_name, parent_category=None):
+	doc = {"doctype": "Category", "category_name": category_name}
+
+	if parent_category:
+		doc["parent_category"] = parent_category
+	else:
+		doc["is_group"] = False
+
+	return (frappe.db.exists(doc) is not None)

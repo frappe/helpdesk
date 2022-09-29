@@ -9,7 +9,9 @@
 					icon-left="save" 
 					class="ml-2"
 					@click="() => {
-						// TODO: save the changes
+						if(validateChanges()) {
+							// TODO: save the changes	
+						}
 					}"
 				>
 					Save
@@ -81,7 +83,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { provide, ref } from 'vue'
 import draggable from 'vuedraggable'
 import { FeatherIcon } from 'frappe-ui';
 import CategoryCard from '@/components/global/CategoryCard.vue';
@@ -110,23 +112,24 @@ export default {
 	setup() {
 		const editMode = ref(false);
 		const tempCategories = ref([]);
+
+		provide('checkIfCategoryNameExistsInCurrentHierarchy', (categoryName, idx) => {
+			return !tempCategories.value.some(c => c.category_name == categoryName && c.idx != idx);
+		});
 		
 		return {
 			editMode,
 			tempCategories
 		}
-
 	},
 	computed: {
 		categories() {
 			if (!this.editMode) {
-				console.log('using real categories', this.$resources.categories.data);
 				return this.$resources.categories.data || [];
 			} else {
-				console.log('using temp', this.tempCategories);
 				return this.tempCategories;
 			}
-		},
+		}
 	},
 	watch: {
 		editMode(newVal) {
@@ -160,9 +163,11 @@ export default {
 		}
 	},
 	methods: {
-		updateCategory(category_name, newValues) {
-			// TODO: update the category.
-			console.log('updating', category_name, newValues);
+		validateChanges() {
+			console.log('tempCategories: ', this.tempCategories)
+			console.log('categories: ', this.categories)
+
+			return false
 		}
 	}
 }
