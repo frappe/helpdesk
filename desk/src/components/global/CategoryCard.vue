@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-white grow shadow rounded p-5 cursor-pointer group flex flex-row space-x-2 h-full">
+	<div class="bg-white grow shadow rounded p-5 group flex flex-row space-x-2 h-full" :class="editMode ? '' : 'cursor-pointer'">
 		<div class="flex flex-row items-center grow">
 			<div class="grow flex flex-col space-y-2" :class="editMode ? 'h-[90px]' : ''">
 				<div class="flex flex-col">
@@ -29,13 +29,21 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="editMode" class="w-[30px] h-full flex flex-col justify-between items-center opacity-50">
+		<div v-if="editMode" class="w-[30px] h-full flex flex-col justify-between items-center">
 			<div class="flex flex-row-reverse">
 				<CustomIcons name="drag-handle" class="w-4 h-4 handle cursor-grab" />
 			</div>
 			<div class="flex flex-row-reverse" v-if="deletable">
-				<Tooltip text="Delete" placement="top">
-					<Button icon="trash" appearance="minimal" @click="$emit('delete')"/>
+				<Tooltip 
+					:class="dissableCategoryDeletion ? 'cursor-not-allowed' : 'cursor-pointer'"
+					placement="top"
+				>
+					<template #body>
+						<div class="max-w-[30ch] rounded-lg border border-gray-100 bg-gray-800 px-2 py-1 text-center text-xs text-white shadow-xl">
+							{{ dissableCategoryDeletion ? 'Cannot delete this category, it contains subcategories or articles' : 'Delete' }}
+						</div>
+					</template>
+					<Button :disabled="dissableCategoryDeletion" icon="trash" appearance="minimal" @click="$emit('delete')"/>
 				</Tooltip>
 			</div>
 		</div>
@@ -94,6 +102,17 @@ export default {
 			}
 		}
 	},
+	computed: {
+		numberOfArticlesInCategory() {
+			return this.category.is_new ? 0 : this.$resources.numberOfArticlesInCategory.data
+		},
+		numberOfSubCategoriesInCategory() {
+			return this.category.is_new ? 0 : this.$resources.numberOfSubCategoriesInCategory.data
+		},
+		dissableCategoryDeletion() {
+			return this.numberOfArticlesInCategory > 0 || this.numberOfSubCategoriesInCategory > 0
+		}
+	},
 	resources: {
 		checkIfCategoryNameExistsOutsideCurrentHierarchy() {
 			return {
@@ -103,6 +122,32 @@ export default {
 						this.validationErrors.category_name = `${this.category.category_name} already exists.`;
 					}
 				}
+			}
+		},
+		numberOfArticlesInCategory() {
+			if (this.category.is_new) return
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Article',
+					filters: {
+						category: this.category.name
+					}
+				},
+				auto: true
+			}
+		},
+		numberOfSubCategoriesInCategory() {
+			if (this.category.is_new) return
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Category',
+					filters: {
+						parent_category: this.category.name
+					}
+				},
+				auto: true
 			}
 		}
 	},
