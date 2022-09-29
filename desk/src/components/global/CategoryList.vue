@@ -6,6 +6,7 @@
 		<div class="h-12">
 			<div v-if="editMode" class="flex flex-row-reverse">
 				<Button 
+					:loading="$resources.saveCategories.loading"
 					icon-left="save" 
 					class="ml-2"
 					:class="disableSaving ? 'cursor-not-allowed' : ''"
@@ -171,19 +172,40 @@ export default {
 				order_by: 'idx',
 				realtime: true
 			}
+		},
+		saveCategories() {
+			return {
+				method: 'frappedesk.api.kb.insert_new_update_existing_categories',
+				onSuccess: () => {
+					this.editMode = false
+					this.$resources.categories.reload()
+
+					this.$toast({
+						title: 'Categories updated!!',
+						customIcon: 'circle-check',
+                        appearance: 'success',
+					})
+				},
+				onError: (err) => {
+					this.$toast({
+						title: 'Error while saving',
+						text: err,
+						customIcon: 'circle-fail',
+						appearance: 'danger',
+					})
+				}
+			}
 		}
 	},
 	methods: {
 		validateChanges() {
-			console.log('before: ', this.$resources.categories.data)
-			console.log('after: ', this.tempCategories)
-			// TODO: check if any validation errors are there for any of the categories
-			// TODO:
-
-			return false
+			return this.allValidationErrors.length == 0
 		},
 		saveChanges() {
-			console.log('save changes')
+			this.$resources.saveCategories.submit({
+				new_values: this.tempCategories,
+				old_values: this.$resources.categories.data
+			})
 		}
 	}
 }
