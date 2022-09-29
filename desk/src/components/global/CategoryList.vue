@@ -69,8 +69,8 @@
 									const index = categories.findIndex(c => c == element)
 									categories.splice(index + 1, 0, {
 										is_new: true,
-										category_name: 'New Category',
-										description: 'Description',
+										category_name: '',
+										description: '',
 										parent_category: parentCategory ? parentCategory : null,
 										is_group: parentCategory ? 0 : 1,
 										idx: categories.length
@@ -169,6 +169,7 @@ export default {
 				],
 				limit: 999,
 				order_by: 'idx',
+				realtime: true
 			}
 		}
 	},

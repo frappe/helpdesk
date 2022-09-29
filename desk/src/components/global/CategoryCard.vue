@@ -4,6 +4,13 @@
 			<div class="grow flex flex-col space-y-2" :class="editMode ? 'h-[90px]' : ''">
 				<div class="flex flex-col">
 					<input 
+						v-if="editMode"
+						v-on-outside-click="() => { 
+							if (category.is_new) {
+								onCategoryNameInput(category.category_name)
+							}
+						}"
+						:placeholder="editMode ? 'Category name' : ''"
 						ref="categoryName"
 						type="text" 
 						:disabled="!editMode" 
@@ -12,19 +19,23 @@
 						:value="category.category_name" 
 						@input="onCategoryNameInput($event.target.value)"
 					/>
+					<div class="line-clamp-1 text-[14px] text-gray-700" v-else>{{ category.category_name }}</div>
 					<ErrorMessage :message="validationErrors.category_name"/>
 				</div>
 				<div class="flex flex-col">
 					<textarea 
+						v-if="editMode"
 						ref="categoryDescription"
 						rows="2" 
 						maxlength="80" 
+						:placeholder="editMode ? 'Write a description' : ''"
 						:disabled="!editMode"
-						class="resize-none border-none p-0 text-[12px] text-gray-600 focus:ring-0"
+						class="resize-none border-none p-0 text-[12px] text-gray-600 focus:ring-0 line-clamp-2"
 						:class="editMode ? '' : 'cursor-pointer'" 
 						:value="category.description" 
 						@input="onDescriptionInput($event.target.value)"
 					/>
+					<div class="h-[48px] line-clamp-2 text-[12px] text-gray-600" v-else>{{ category.description }}</div>
 					<ErrorMessage :message="validationErrors.description"/>
 				</div>
 			</div>
