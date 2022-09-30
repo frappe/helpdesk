@@ -1,7 +1,7 @@
 <template>
-	<div class="bg-white grow shadow rounded p-5 group flex flex-row space-x-2 h-full" :class="editMode ? '' : 'cursor-pointer'">
+	<div class="bg-white grow shadow rounded border p-5 group flex flex-row space-x-1 h-full" :class="editMode ? '' : 'cursor-pointer hover:shadow-lg'">
 		<div class="flex flex-row items-center grow">
-			<div class="grow flex flex-col space-y-2" :class="editMode ? 'h-[90px]' : ''">
+			<div class="grow flex flex-col space-y-2" :class="editMode ? 'h-[130px]' : ''">
 				<div class="flex flex-col">
 					<input 
 						v-if="editMode"
@@ -14,28 +14,27 @@
 						ref="categoryName"
 						type="text" 
 						:disabled="!editMode" 
-						class="border-none p-0 text-gray-700 text-[14px] focus:ring-0"
+						class="border-none p-0 text-gray-900 text-xl focus:ring-0 font-semibold"
 						:class="editMode ? '' : 'cursor-pointer'" 
 						:value="category.category_name" 
 						@input="onCategoryNameInput($event.target.value)"
 					/>
-					<div class="line-clamp-1 text-[14px] text-gray-700" v-else>{{ category.category_name }}</div>
+					<div class="line-clamp-1 text-xl text-gray-900 font-semibold" v-else>{{ category.category_name }}</div>
 					<ErrorMessage :message="validationErrors.category_name"/>
 				</div>
 				<div class="flex flex-col">
 					<textarea 
 						v-if="editMode"
 						ref="categoryDescription"
-						rows="2" 
-						maxlength="80" 
+						rows="4" 
 						:placeholder="editMode ? 'Write a description' : ''"
 						:disabled="!editMode"
-						class="resize-none border-none p-0 text-[12px] text-gray-600 focus:ring-0 line-clamp-2"
+						class="resize-none border-none p-0 text-base text-gray-500 focus:ring-0 line-clamp-4"
 						:class="editMode ? '' : 'cursor-pointer'" 
 						:value="category.description" 
 						@input="onDescriptionInput($event.target.value)"
 					/>
-					<div class="h-[48px] line-clamp-2 text-[12px] text-gray-600" v-else>{{ category.description }}</div>
+					<div class="h-[81px] line-clamp-4 text-base text-gray-500" v-else>{{ category.description }}</div>
 					<ErrorMessage :message="validationErrors.description"/>
 				</div>
 			</div>
@@ -187,6 +186,7 @@ export default {
 		onCategoryNameInput: debounce(function(value) {
 			this.category.category_name = value
 			this.validationErrors.category_name = "";
+			value = value.trim()
 			if (!value) {
 				this.validationErrors.category_name = `Category name is required.`;
 			}
