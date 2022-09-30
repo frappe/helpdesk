@@ -7,17 +7,28 @@
 				<div class="grow text-[12px] text-left text-gray-500">Write a question or problem</div>
 			</div>
 		</div>
-		<CategoryList 
+		<CategoryCardList
+			v-if="!(categoryId && parentCategoryId)"
 			:editable="editable" 
-			:viewMode="viewMode" 
+			:categoryId="categoryId" 
+			:parentCategoryId="parentCategoryId" 
 		/>
+		<ArticleMiniList 
+			v-if="categoryId" 
+			:editable="editable" 
+			:categoryId="categoryId" 
+		/>
+		<!-- <FAQList :editable="editable" v-else>
+			TODO: Show FAQ edit list
+		</FAQList> -->
 	</div>
 </template>
 
 <script>
 import { FeatherIcon } from 'frappe-ui';
-import { ref } from 'vue'
-import CategoryList from '@/components/global/CategoryList.vue'
+import { inject } from 'vue'
+import CategoryCardList from '@/components/global/CategoryCardList.vue'
+import ArticleMiniList from '@/components/global/ArticleMiniList.vue'
 
 export default {
 	name: 'KBHome',
@@ -29,13 +40,16 @@ export default {
 	},
 	components: {
 		FeatherIcon,
-		CategoryList
+		CategoryCardList,
+		ArticleMiniList
 	},
 	setup() {
-		const viewMode = ref('website')
+		const categoryId = inject('categoryId')
+		const parentCategoryId = inject('parentCategoryId')
 
 		return {
-			viewMode
+			categoryId,
+			parentCategoryId
 		}
 	}
 }

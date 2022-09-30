@@ -60,6 +60,10 @@
 							const index = categories.findIndex(c => c == element)
 							categories.splice(index, 1)
 						}"
+						@click="() => {
+							if (editMode) return
+							$router.push({path: `/frappedesk/knowledge-base/${element.name}`})
+						}"
 					/>
 					<div v-if="editMode" class="group h-full">
 						<div class="group-hover:visible invisible flex h-full">
@@ -70,11 +74,11 @@
 									const index = categories.findIndex(c => c == element)
 									categories.splice(index + 1, 0, {
 										is_new: true,
+										idx: categories.length,
 										category_name: '',
 										description: '',
-										parent_category: parentCategory ? parentCategory : null,
-										is_group: parentCategory ? 0 : 1,
-										idx: categories.length
+										parent_category: categoryId ? categoryId : null,
+										is_group: (!parentCategoryId && !categoryId) ? 1 : 0,	// mark is_group as true if in root, other cases will be decided when child categories are added / removed from the category
 									})
 								}"
 							/>
@@ -93,19 +97,19 @@ import { FeatherIcon } from 'frappe-ui'
 import CategoryCard from '@/components/global/CategoryCard.vue'
 
 export default {
-	name: 'CategoryList',
+	name: 'CategoryCardList',
 	props: {
-		parentCategory: {
+		categoryId: {
+			type: String,
+			default: null
+		},
+		parentCategoryId: {
 			type: String,
 			default: null
 		},
 		editable: {
 			type: Boolean,
 			default: false
-		},
-		viewMode: {
-			type: String,
-			default: 'website'
 		}
 	},
 	components: {
@@ -126,6 +130,7 @@ export default {
 		
 		return {
 			editMode,
+
 			tempCategories,
 			allValidationErrors
 		}
@@ -151,13 +156,11 @@ export default {
 	},
 	resources: {
 		categories() {
-			const filters = this.parentCategory ? 
-				{'parent_category': this.parentCategory} : 
-				{'is_group': true}
+			const filters = this.categoryId ? {'parent_category': this.categoryId} : {'is_group': true, 'parent_category': ''}
 			
 			return {
 				type: 'list',
-				cache: ['Categories', this.parentCategory ? this.parentCategory : ''],
+				cache: ['Categories', this.categoryId ? this.categoryId : ''],
 				doctype: 'Category',
 				filters,
 				fields: [
@@ -183,7 +186,7 @@ export default {
 					this.$toast({
 						title: 'Categories updated!!',
 						customIcon: 'circle-check',
-                        appearance: 'success',
+						appearance: 'success',
 					})
 				},
 				onError: (err) => {

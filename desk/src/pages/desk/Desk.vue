@@ -3,7 +3,7 @@
 		<div v-if="initialized">
 			<div class="flex flex-row w-screen">
 				<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
-				<router-view class="grow"/>
+				<router-view class="grow" :key="$route.fullPath" />
 			</div>
 		</div>
 		<div v-else class="h-full w-full flex max-w-full grow-0">

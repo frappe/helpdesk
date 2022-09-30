@@ -74,9 +74,56 @@ const routes = [
 				path: 'knowledge-base',
 				name: 'KnowledgeBase',
 				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
+				children: [
+					{
+						path: '',
+						name: 'Home',
+						component: () => import('@/pages/desk/knowledge_base/CategoriesWebView.vue') // KB.vue - shows root categories and faqs
+					},
+					{
+						path: ':categoryId',
+						name: 'CategoryPage', // Category Page
+						component: () => import('@/pages/desk/knowledge_base/CategoriesWebView.vue'), // KB.vue - shows sub categories and articles
+						props: true
+					},
+					{
+						path: ':parentCategoryId/:categoryId',
+						name: 'CategoryPage2', // Category Page
+						component: () => import('@/pages/desk/knowledge_base/CategoriesWebView.vue'), // KB.vue - shows sub categories and articles
+						props: true
+					},
+					{
+						path: 'categories',
+						name: '', // Categories (list) Page
+						component: () => import('') // CategoriesListView.vue - shows all categories
+					},
+					{
+						path: 'articles',
+						name: '', // Articles (list) Page
+						component: () => import('') // Articles.vue - shows all articles
+					},
+					{
+						path: 'articles/:articleId',
+						name: '', // Article Edit page
+						component: () => import(''), // Article.vue - article edit page
+						props: true
+					},
+					{
+						path: 'articles/new',
+						name: '', // Article Edit page
+						component: () => import(''), // Article.vue - article edit page
+						props: true
+					},
+				]
 			},
 			{
 				path: 'knowledge-base/:categoryId',
+				name: 'KnowledgeBaseCategory',
+				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
+				props: true,
+			},
+			{
+				path: 'knowledge-base/:categoryId/:subCategoryId',
 				name: 'KnowledgeBaseCategory',
 				component: () => import('@/pages/desk/knowledge_base/KnowledgeBase.vue'),
 				props: true,
