@@ -1,93 +1,70 @@
 <template>
-	<div 
-		class="flex flex-col" 
-		:class="editMode ? 'border-2 border-gray-300 rounded p-5 space-y-4 mt-5' : ''"
+	<KBEditableBlock
+		:editable="editable"
+		:editMode="editMode"
+		:saveInProgress="$resources.saveCategories.loading"
+		:disableSaving="disableSaving"
+		@edit="() => {
+			editMode = true
+		}"
+		@discard="() => {
+			editMode = false
+		}"
+		@save="() => {
+			if(validateChanges()) {
+				saveChanges()
+			}
+		}"
 	>
-		<div class="h-12">
-			<div v-if="editMode" class="flex flex-row-reverse">
-				<Button 
-					:loading="$resources.saveCategories.loading"
-					icon-left="save" 
-					class="ml-2"
-					:class="disableSaving ? 'cursor-not-allowed' : ''"
-					:disable="disableSaving"
-					@click="() => {
-						if(validateChanges()) {
-							// TODO: save the changes	
-							saveChanges()
-						}
-					}"
-				>
-					Save
-				</Button>
-				<Button 
-					icon-left="rotate-ccw" 
-					@click="() => {
-						editMode = false
-						// TODO: discard the changes
-					}"
-				>
-					Discard
-				</Button>
-			</div>
-			<div v-else-if="editable" class="flex flex-row-reverse py-2">
-				<Button 
-					icon-left="edit-2" 
-					@click="() => {
-						editMode = true
-					}"
-				>
-					Edit
-				</Button>
-			</div>
-		</div>
-		<draggable 
-			:list="categories"
-			:disabled="!editMode"
-			handle=".handle" 
-			item-key="idx"
-			class="grid place-content-center grid-cols-3 gap-y-6"
-			:class="editMode ? 'gap-x-1 mr-[-1.25rem]' : 'gap-x-6'"
-		>
-			<template #item="{element}">
-				<div class="flex flex-row items-center space-x-1">
-					<CategoryCard 
-						class="grow"
-						:category="element"
-						:editMode="editMode"
-						:deletable="categories.length > 1"
-						@delete="() => {
-							const index = categories.findIndex(c => c == element)
-							categories.splice(index, 1)
-						}"
-						@click="() => {
-							if (editMode) return
-							$router.push({path: `/frappedesk/knowledge-base/${element.name}`})
-						}"
-					/>
-					<div v-if="editMode" class="group h-full">
-						<div class="group-hover:visible invisible flex h-full">
-							<FeatherIcon 
-								name="plus" 
-								class="w-4 cursor-pointer my-auto hover:bg-gray-100 rounded"
-								@click="() => {
-									const index = categories.findIndex(c => c == element)
-									categories.splice(index + 1, 0, {
-										is_new: true,
-										idx: categories.length,
-										category_name: '',
-										description: '',
-										parent_category: categoryId ? categoryId : null,
-										is_group: (!parentCategoryId && !categoryId) ? 1 : 0,	// mark is_group as true if in root, other cases will be decided when child categories are added / removed from the category
-									})
-								}"
-							/>
+		<template #body>
+			<draggable 
+				:list="categories"
+				:disabled="!editMode"
+				handle=".handle" 
+				item-key="idx"
+				class="grid place-content-center grid-cols-3 gap-y-6"
+				:class="editMode ? 'gap-x-1 mr-[-1.25rem]' : 'gap-x-6'"
+			>
+				<template #item="{element}">
+					<div class="flex flex-row items-center space-x-1">
+						<CategoryCard 
+							class="grow"
+							:category="element"
+							:editMode="editMode"
+							:deletable="categories.length > 1"
+							@delete="() => {
+								const index = categories.findIndex(c => c == element)
+								categories.splice(index, 1)
+							}"
+							@click="() => {
+								if (editMode) return
+								$router.push({path: `/frappedesk/knowledge-base/${element.name}`})
+							}"
+						/>
+						<div v-if="editMode" class="group h-full">
+							<div class="group-hover:visible invisible flex h-full">
+								<FeatherIcon 
+									name="plus" 
+									class="w-4 cursor-pointer my-auto hover:bg-gray-100 rounded"
+									@click="() => {
+										const index = categories.findIndex(c => c == element)
+										categories.splice(index + 1, 0, {
+											is_new: true,
+											idx: categories.length,
+											category_name: '',
+											description: '',
+											parent_category: categoryId ? categoryId : null,
+											is_group: (!parentCategoryId && !categoryId) ? 1 : 0,	// mark is_group as true if in root, other cases will be decided when child categories are added / removed from the category
+										})
+									}"
+								/>
+							</div>
 						</div>
 					</div>
-				</div>
-			</template>
-		</draggable>
-	</div>
+				</template>
+			</draggable>
+		</template>
+	</KBEditableBlock>
 </template>
 
 <script>
@@ -95,6 +72,7 @@ import { provide, ref } from 'vue'
 import draggable from 'vuedraggable'
 import { FeatherIcon } from 'frappe-ui'
 import CategoryCard from '@/components/global/CategoryCard.vue'
+import KBEditableBlock from '@/components/global/KBEditableBlock.vue'
 
 export default {
 	name: 'CategoryCardList',
@@ -115,7 +93,8 @@ export default {
 	components: {
 		draggable,
 		CategoryCard,
-		FeatherIcon
+		FeatherIcon,
+		KBEditableBlock
 	},
 	setup() {
 		const editMode = ref(false)
@@ -173,7 +152,8 @@ export default {
 				],
 				limit: 999,
 				order_by: 'idx',
-				realtime: true
+				// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
+				// or implement colaborative editing
 			}
 		},
 		saveCategories() {

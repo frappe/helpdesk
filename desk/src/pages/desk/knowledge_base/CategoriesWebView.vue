@@ -24,7 +24,6 @@ export default {
         KBHome
     },
     setup(props) {
-        console.log(props.categoryId, props.parentCategoryId)
         provide('categoryId', props.categoryId)
         if (props.parentCategoryId) {
             provide('parentCategoryId', props.parentCategoryId)
