@@ -1,47 +1,29 @@
 <template>
-	<KBEditableBlock
-		:editable="editable"
-		:editMode="editMode"
-		:saveInProgress="$resources.saveArticles.loading"
-		:disableSaving="disableSaving"
-		@edit="() => {
-			editMode = true
-		}"
-		@discard="() => {
-			editMode = false
-		}"
-		@save="() => {
-			if(validateChanges()) {
-				saveChanges()
-			}
-		}"
-	>
-		<template #body>
-			<draggable 
-				:list="articles"
-				:disabled="!editMode"
-				handle=".handle" 
-				item-key="idx"
-				class="grid place-content-center grid-cols-2 gap-y-6"
-				:class="editMode ? 'gap-x-1 mr-[-1.25rem]' : 'gap-x-6'"
-			>
-				<template #item="{element}">
-					<div class="flex flex-row items-center space-x-1">
-						<div class="handle">
-							{{ element.title }}
-						</div>
-					</div>
-				</template>
-			</draggable>
-		</template>
-	</KBEditableBlock>
+	<div class="flex flex-col space-y-5">
+		<div class="text-3xl font-bold text-gray-800">Articles</div>
+		<draggable 
+			:list="articles"
+			:disabled="!editMode"
+			item-key="idx"
+			class="grow grid place-content-center gap-y-3"
+			:class="articles.length > 6 ? 'grid-cols-2' : 'grid-cols-1'"
+		>
+			<template #item="{element}">
+				<div class="flex flex-row items-center space-x-1">
+					<ArticleMiniListItem 
+						:editMode="editMode" 
+						:article="element" 
+					/>
+				</div>
+			</template>
+		</draggable>
+	</div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import draggable from 'vuedraggable'
 import ArticleMiniListItem from '@/components/global/ArticleMiniListItem.vue'
-import KBEditableBlock from '@/components/global/KBEditableBlock.vue'
 
 export default {
 	name: 'ArticleMiniList',
@@ -53,19 +35,20 @@ export default {
 		editable: {
 			type: Boolean,
 			default: false
+		},
+		editMode: {
+			type: Boolean,
+			default: false
 		}
 	},
 	components: {
 		draggable,
-		ArticleMiniListItem,
-		KBEditableBlock
+		ArticleMiniListItem
 	},
 	setup() {
-		const editMode = ref(false)
 		const tempArticles = ref([])
 
 		return {
-			editMode,
 			tempArticles
 		}
 	},
@@ -143,6 +126,5 @@ export default {
 			})
 		}
 	}
-
 }
 </script>

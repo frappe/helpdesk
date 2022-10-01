@@ -7,28 +7,57 @@
 				<div class="grow text-[12px] text-left text-gray-500">Write a question or problem</div>
 			</div>
 		</div>
-		<CategoryCardList
-			v-if="!(categoryId && parentCategoryId)"
-			:editable="editable" 
-			:categoryId="categoryId" 
-			:parentCategoryId="parentCategoryId" 
-		/>
-		<ArticleMiniList 
-			v-if="categoryId" 
-			:editable="editable" 
-			:categoryId="categoryId" 
-		/>
-		<!-- <FAQList :editable="editable" v-else>
-			TODO: Show FAQ edit list
-		</FAQList> -->
+		<KBEditableBlock
+			:editable="editable"
+			:editMode="editMode"
+			:saveInProgress="saveInProgress"
+			:disableSaving="disableSaving"
+			@edit="() => {
+				editMode = true
+			}"
+			@discard="() => {
+				editMode = false
+			}"
+			@save="() => {
+				if(validateChanges()) {
+					saveChanges().then(() => {
+						editMode = false
+					})
+				}
+			}"
+		>
+			<template #body>
+				<div class="flex flex-col space-y-7">
+					<CategoryCardList as="div"
+						v-if="!(categoryId && parentCategoryId)"
+						ref="categoryCardList"
+						:editable="editable" 
+						:editMode="editMode"
+						:categoryId="categoryId" 
+						:parentCategoryId="parentCategoryId" 
+					/>
+					<ArticleMiniList as="div"
+						v-if="categoryId" 
+						ref="articleMiniList"
+						:editable="editable"
+						:editMode="editMode" 
+						:categoryId="categoryId" 
+					/>
+					<!-- <FAQList :editable="editable" v-else>
+						TODO: Show FAQ edit list
+					</FAQList> -->
+				</div>
+			</template>
+		</KBEditableBlock>
 	</div>
 </template>
 
 <script>
 import { FeatherIcon } from 'frappe-ui';
-import { inject } from 'vue'
+import { inject, ref } from 'vue'
 import CategoryCardList from '@/components/global/CategoryCardList.vue'
 import ArticleMiniList from '@/components/global/ArticleMiniList.vue'
+import KBEditableBlock from '@/components/global/KBEditableBlock.vue'
 
 export default {
 	name: 'KBHome',
@@ -41,15 +70,45 @@ export default {
 	components: {
 		FeatherIcon,
 		CategoryCardList,
-		ArticleMiniList
+		ArticleMiniList,
+		KBEditableBlock
 	},
 	setup() {
 		const categoryId = inject('categoryId')
 		const parentCategoryId = inject('parentCategoryId')
 
+		const editable = ref(true)
+		const editMode = ref(false)
+
+		const saveInProgress = ref(false)
+
 		return {
 			categoryId,
-			parentCategoryId
+			parentCategoryId,
+
+			editable,
+			editMode,
+
+			saveInProgress
+		}
+	},
+	computed: {
+		disableSaving() {
+			// TODO: check of validation errors etc
+			return false
+			// return this.$refs.categoryCardList?.disableSaving // || this.$refs.articleMiniList.disableSaving
+		}
+	},
+	methods: {
+		validateChanges() {
+			return this.$refs.categoryCardList.validateChanges() && this.$refs.articleMiniList.validateChanges()
+		},
+		async saveChanges() {
+			this.saveInProgress = true
+			await this.$refs.categoryCardList.saveChanges()
+			await this.$refs.articleMiniList.saveChanges()
+			this.saveInProgress = false
+			return
 		}
 	}
 }

@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-white grow shadow rounded border p-5 group flex flex-row space-x-1 h-full" :class="editMode ? '' : 'cursor-pointer hover:shadow-lg'">
+	<div class="bg-white grow shadow rounded border p-5 group flex flex-row space-x-1 h-full" :class="editMode ? '' : 'cursor-pointer hover:shadow-md'">
 		<div class="flex flex-row items-center grow">
 			<div class="grow flex flex-col space-y-2" :class="editMode ? 'h-[130px]' : ''">
 				<div class="flex flex-col">

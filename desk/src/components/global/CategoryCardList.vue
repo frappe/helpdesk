@@ -1,78 +1,57 @@
 <template>
-	<KBEditableBlock
-		:editable="editable"
-		:editMode="editMode"
-		:saveInProgress="$resources.saveCategories.loading"
-		:disableSaving="disableSaving"
-		@edit="() => {
-			editMode = true
-		}"
-		@discard="() => {
-			editMode = false
-		}"
-		@save="() => {
-			if(validateChanges()) {
-				saveChanges()
-			}
-		}"
+	<draggable 
+		:list="categories"
+		:disabled="!editMode"
+		handle=".handle" 
+		item-key="idx"
+		class="grid place-content-center grid-cols-3 gap-y-6"
+		:class="editMode ? 'gap-x-1 mr-[-1.25rem]' : 'gap-x-6'"
 	>
-		<template #body>
-			<draggable 
-				:list="categories"
-				:disabled="!editMode"
-				handle=".handle" 
-				item-key="idx"
-				class="grid place-content-center grid-cols-3 gap-y-6"
-				:class="editMode ? 'gap-x-1 mr-[-1.25rem]' : 'gap-x-6'"
-			>
-				<template #item="{element}">
-					<div class="flex flex-row items-center space-x-1">
-						<CategoryCard 
-							class="grow"
-							:category="element"
-							:editMode="editMode"
-							:deletable="categories.length > 1"
-							@delete="() => {
-								const index = categories.findIndex(c => c == element)
-								categories.splice(index, 1)
-							}"
+		<template #item="{element}">
+			<div class="flex flex-row items-center space-x-1">
+				<CategoryCard 
+					class="grow"
+					:category="element"
+					:editMode="editMode"
+					:deletable="categories.length > 1"
+					@delete="() => {
+						const index = categories.findIndex(c => c == element)
+						categories.splice(index, 1)
+					}"
+					@click="() => {
+						if (editMode) return
+						$router.push({path: `/frappedesk/knowledge-base/${element.name}`})
+					}"
+				/>
+				<div v-if="editMode" class="group h-full">
+					<div class="group-hover:visible invisible flex h-full">
+						<FeatherIcon 
+							name="plus" 
+							class="w-4 cursor-pointer my-auto hover:bg-gray-100 rounded"
 							@click="() => {
-								if (editMode) return
-								$router.push({path: `/frappedesk/knowledge-base/${element.name}`})
+								const index = categories.findIndex(c => c == element)
+								categories.splice(index + 1, 0, {
+									is_new: true,
+									idx: categories.length,
+									category_name: '',
+									description: '',
+									parent_category: categoryId ? categoryId : null,
+									is_group: (!parentCategoryId && !categoryId) ? 1 : 0,	// mark is_group as true if in root, other cases will be decided when child categories are added / removed from the category
+								})
 							}"
 						/>
-						<div v-if="editMode" class="group h-full">
-							<div class="group-hover:visible invisible flex h-full">
-								<FeatherIcon 
-									name="plus" 
-									class="w-4 cursor-pointer my-auto hover:bg-gray-100 rounded"
-									@click="() => {
-										const index = categories.findIndex(c => c == element)
-										categories.splice(index + 1, 0, {
-											is_new: true,
-											idx: categories.length,
-											category_name: '',
-											description: '',
-											parent_category: categoryId ? categoryId : null,
-											is_group: (!parentCategoryId && !categoryId) ? 1 : 0,	// mark is_group as true if in root, other cases will be decided when child categories are added / removed from the category
-										})
-									}"
-								/>
-							</div>
-						</div>
 					</div>
-				</template>
-			</draggable>
+				</div>
+			</div>
 		</template>
-	</KBEditableBlock>
+	</draggable>
 </template>
 
 <script>
-import { provide, ref } from 'vue'
+import { provide, ref, computed } from 'vue'
 import draggable from 'vuedraggable'
 import { FeatherIcon } from 'frappe-ui'
 import CategoryCard from '@/components/global/CategoryCard.vue'
-import KBEditableBlock from '@/components/global/KBEditableBlock.vue'
 
 export default {
 	name: 'CategoryCardList',
@@ -88,31 +67,60 @@ export default {
 		editable: {
 			type: Boolean,
 			default: false
+		},
+		editMode: {
+			type: Boolean,
+			default: false
 		}
 	},
 	components: {
 		draggable,
 		CategoryCard,
-		FeatherIcon,
-		KBEditableBlock
+		FeatherIcon
 	},
-	setup() {
-		const editMode = ref(false)
+	setup(props, context) {
 		const tempCategories = ref([])
 		const allValidationErrors = ref([])
 
 		provide('allValidationErrors', allValidationErrors)
-
 		provide('checkIfCategoryNameExistsInCurrentHierarchy', (categoryName, idx) => {
 			return !tempCategories.value.some(c => c.category_name == categoryName && c.idx != idx)
 		})
+
+		const resources = ref(null)
+
+		const saveInProgress = computed(() => {
+			return resources.value.saveCategories.loading
+		})
+		const disableSaving = computed(() => {
+			return saveInProgress.value || allValidationErrors.value.length > 0
+		})
+		const validateChanges = () => {
+			return allValidationErrors.value.length == 0
+		}
+		const saveChanges = async () => {
+			if (disableSaving.value) return
+			await resources.value.saveCategories.submit({
+				new_values: tempCategories.value,
+				old_values: resources.value.categories.data
+			})
+		}
+
+		context.expose({ 
+			saveInProgress,
+			disableSaving,
+			validateChanges,
+			saveChanges
+		})
 		
 		return {
-			editMode,
-
 			tempCategories,
-			allValidationErrors
+			allValidationErrors,
+			resources
 		}
+	},
+	mounted() {
+		this.resources = this.$resources
 	},
 	computed: {
 		categories() {
@@ -160,7 +168,6 @@ export default {
 			return {
 				method: 'frappedesk.api.kb.insert_new_update_existing_categories',
 				onSuccess: () => {
-					this.editMode = false
 					this.$resources.categories.reload()
 
 					this.$toast({
@@ -178,17 +185,6 @@ export default {
 					})
 				}
 			}
-		}
-	},
-	methods: {
-		validateChanges() {
-			return this.allValidationErrors.length == 0
-		},
-		saveChanges() {
-			this.$resources.saveCategories.submit({
-				new_values: this.tempCategories,
-				old_values: this.$resources.categories.data
-			})
 		}
 	}
 }

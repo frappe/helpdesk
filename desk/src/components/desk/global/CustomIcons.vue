@@ -251,6 +251,23 @@
 			<div v-if="$resources.brandHtml.data" v-html="$resources.brandHtml.data"></div>
 			<div v-else>{{ $resources.helpdeskName.data }}</div>
 		</div>
+		<svg
+			v-if="this.name=='list-drag-handle'" :class="this.class" :width="this.width" :height="this.height"
+			xmlns="http://www.w3.org/2000/svg" 
+			viewBox="0 0 24 24" 
+			fill="none" 
+			stroke="currentColor" 
+			stroke-width="1.5" 
+			stroke-linecap="round" 
+			stroke-linejoin="round" 
+		>
+			<line x1="3" y1="15" x2="21" y2="15"></line>
+			<line x1="3" y1="9" x2="21" y2="9"></line>
+		</svg>
+		<div v-if="this.name=='company'" :class="this.class">
+			<div v-if="$resources.brandHtml.data" v-html="$resources.brandHtml.data"></div>
+			<div v-else>{{ $resources.helpdeskName.data }}</div>
+		</div>
 	</div>
 </template>
 
