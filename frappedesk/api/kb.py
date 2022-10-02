@@ -45,16 +45,16 @@ def insert_new_update_existing_categories(new_values, old_values):
 	names_in_old_values = [c["name"] for c in old_values]
 	names_in_new_values = [c["name"] if "name" in c else "" for c in new_values]
 	
-	to_delete = [c for c in names_in_old_values if c not in names_in_new_values]
+	to_archive = [c for c in names_in_old_values if c not in names_in_new_values]
 
 	# validate and delete missing categories
-	for category in to_delete:
+	for category in to_archive:
 		if frappe.db.exists("Category", {"name": category, "parent_category": category}):
-			raise Exception("Cannot delete category with subcategories")
+			raise Exception("Cannot archive category with subcategories")
 		elif frappe.db.exists("Article", {"category": category}):
-			raise Exception("Cannot delete category with articles")
+			raise Exception("Cannot archive category with articles")
 		else:
-			frappe.delete_doc("Category", category)
+			frappe.get_doc("Category", category).archive()
 	
 	# create new categories if present
 	for category in to_insert:
@@ -72,4 +72,26 @@ def insert_new_update_existing_categories(new_values, old_values):
 		if (category["category_name"] != category["name"]):
 			frappe.rename_doc("Category", category["name"], category["category_name"])
 
+	return
+
+@frappe.whitelist()
+def update_articles_order_and_status(new_values):
+	# set idx values after filtering out articles marked as draft
+	to_update = [c for c in new_values if c["status"] == "Published"]
+	for i in range(len(to_update)):
+		to_update[i]["idx"] = i
+
+	for article in to_update:
+		doc = frappe.get_doc("Article", article["name"])
+		doc.update(article)
+		doc.save()
+
+	to_mark_as_draft = [c["name"] for c in new_values if c["status"] == "Draft"]
+
+	for article in to_mark_as_draft:
+		doc = frappe.get_doc("Article", article)
+		doc.status = "Draft"
+		doc.idx = -1
+		doc.save()
+	
 	return

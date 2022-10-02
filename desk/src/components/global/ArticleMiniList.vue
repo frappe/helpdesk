@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col space-y-5">
+	<div class="flex flex-col space-y-5" v-if="categoryId">
 		<div class="text-3xl font-bold text-gray-800">Articles</div>
 		<draggable 
 			:list="articles"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, provide, computed } from 'vue'
 import draggable from 'vuedraggable'
 import ArticleMiniListItem from '@/components/global/ArticleMiniListItem.vue'
 
@@ -45,12 +45,46 @@ export default {
 		draggable,
 		ArticleMiniListItem
 	},
-	setup() {
+	setup(props, context) {
 		const tempArticles = ref([])
+		const allValidationErrors = ref([])
+
+		provide('allValidationErrors', allValidationErrors)
+
+		const resources = ref(null)
+
+		const saveInProgress = computed(() => {
+			return resources.value.saveArticles.loading
+		})
+		const disableSaving = computed(() => {
+			return saveInProgress.value || allValidationErrors.value.length > 0
+		})
+		const validateChanges = () => {
+			return allValidationErrors.value.length == 0
+		}
+		const saveChanges = async () => {
+			if (disableSaving.value) return
+			if (!props.categoryId) return
+			await resources.value.saveArticles.submit({
+				articles: tempArticles.value
+			})
+		}
+
+		context.expose({
+			saveInProgress,
+			disableSaving,
+			validateChanges,
+			saveChanges
+		})
 
 		return {
-			tempArticles
+			tempArticles,
+			allValidationErrors,
+			resources
 		}
+	},
+	mounted() {
+		this.resources = this.$resources
 	},
 	computed: {
 		articles() {
@@ -59,9 +93,6 @@ export default {
 			} else {
 				return this.tempArticles
 			}
-		},
-		disableSaving() {
-			return false // TODO: Add validation
 		}
 	},
 	watch: {
@@ -73,7 +104,7 @@ export default {
 	},
 	resources: {
 		articles() {
-			const filters = { category: this.categoryId, published: true }
+			const filters = { category: this.categoryId, status: 'Published' }
 
 			return {
 				type: 'list',
@@ -83,7 +114,8 @@ export default {
 				fields: [
 					'name',
 					'title',
-					'idx'
+					'idx',
+					'status'
 				],
 				limit: 999,
 				order_by: 'idx',
@@ -95,7 +127,6 @@ export default {
 			return {
 				method: 'frappedesk.api.kb.update_articles_order_and_status',
 				onSuccess: () => {
-					this.editMode = false
 					this.$resources.articles.reload()
 
 					this.$toast({
@@ -114,17 +145,6 @@ export default {
 				}
 			}
 		},
-	},
-	methods: {
-		validateChanges() {
-			return true // TODO: implement validation
-		},
-		saveChanges() {
-			this.$resources.saveArticles.submit({
-				new_values: this.tempArticles,
-				old_values: this.$resources.articles.data
-			})
-		}
 	}
 }
 </script>

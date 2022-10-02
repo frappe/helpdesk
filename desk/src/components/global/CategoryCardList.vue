@@ -129,9 +129,6 @@ export default {
 			} else {
 				return this.tempCategories
 			}
-		},
-		disableSaving() {
-			return this.allValidationErrors.length > 0
 		}
 	},
 	watch: {
@@ -144,6 +141,7 @@ export default {
 	resources: {
 		categories() {
 			const filters = this.categoryId ? {'parent_category': this.categoryId} : {'is_group': true, 'parent_category': ''}
+			filters.status = 'Published'
 			
 			return {
 				type: 'list',

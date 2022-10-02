@@ -2,43 +2,30 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.website.website_generator import WebsiteGenerator
-from frappe import _
+from frappe.model.document import Document
 from frappe.utils import cint
-from frappe.website.utils import (cleanup_page_name, get_html_content_based_on_type)
 
-class Article(WebsiteGenerator):
+
+class Article(Document):
 	def before_insert(self):
 		self.author = frappe.session.user
 
-	#TODO: when renamed, website route should be updated
 	def before_save(self):
-		if self.category:
-			self.route = self.get_page_route()
-
-		if not self.published:
-			self.published_on = None
-		if not self.published_on and self.published:
+		# set published date of the article
+		if self.status == "Published" and not self.published_on:
 			self.published_on = frappe.utils.now()
+		else:
+			self.published_on = None
 
-	def set_page_route(self):
-		self.route = self.get_page_route()
-
-	def get_page_route(self):
-		category_doc = frappe.get_doc("Category", self.category)
-		scrubbed_title = cleanup_page_name(self.title)
-		return f"{category_doc.route}/{scrubbed_title}"
-
-	def get_context(self, context):
-		context.content = get_html_content_based_on_type(self, 'content', self.content_type)
-
-		return context
+		# index is only set if its not set already, this allows defining index at the time of creation itself
+		# if not set the index is set to the last index + 1, i.e. the article is added at the end
+		if self.status == "Published" and self.idx == -1:
+			self.idx = cint(frappe.db.count("Article", {"category": self.category}, {"status": "Published"}))
 
 @frappe.whitelist(allow_guest=True)
 def add_feedback(article, helpful):
-	field = "helpful"
-	if helpful == "No":
-		field = "not_helpful"
+	# TODO: use a base 5 or 10 rating system instead of a boolean
+	field = "helpful" if helpful else "not_helpful"
 
 	value = cint(frappe.db.get_value("Article", article, field))
 	frappe.db.set_value("Article", article, field, value + 1, update_modified=False)

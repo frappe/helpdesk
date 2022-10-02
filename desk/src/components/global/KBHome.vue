@@ -29,7 +29,6 @@
 			<template #body>
 				<div class="flex flex-col space-y-7">
 					<CategoryCardList as="div"
-						v-if="!(categoryId && parentCategoryId)"
 						ref="categoryCardList"
 						:editable="editable" 
 						:editMode="editMode"
@@ -37,7 +36,6 @@
 						:parentCategoryId="parentCategoryId" 
 					/>
 					<ArticleMiniList as="div"
-						v-if="categoryId" 
 						ref="articleMiniList"
 						:editable="editable"
 						:editMode="editMode" 
@@ -96,7 +94,10 @@ export default {
 		disableSaving() {
 			// TODO: check of validation errors etc
 			return false
-			// return this.$refs.categoryCardList?.disableSaving // || this.$refs.articleMiniList.disableSaving
+			// return this.$refs.categoryCardList?.disableSaving // || this.$refs.articleMiniList?.disableSaving
+		},
+		isRoot() {
+			return !this.categoryId && !this.parentCategoryId
 		}
 	},
 	methods: {
