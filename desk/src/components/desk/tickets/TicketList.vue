@@ -98,7 +98,7 @@
 		</div>
 		<div 
 			id="rows" 
-			class="flex flex-col overflow-scroll"
+			class="flex flex-col overflow-y-scroll"
 			:style="{ height: viewportWidth > 768 ? 'calc(100vh - 112px)' : null }"
 		>
 			<div v-if="manager.loading">
@@ -121,7 +121,14 @@
 					</div>
 				</div>
 			</div>
-			<ListPageController :manager="manager" />
+			<div class="pb-2">
+				<Button
+					v-if="manager.hasNextPage" 
+					@click="manager.nextPage()" 
+				>
+					Load More
+				</Button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -132,7 +139,6 @@ import { Input } from 'frappe-ui'
 import TicketListItem from '@/components/desk/tickets/TicketListItem.vue'
 import TicketListItemSkeleton from '@/components/desk/tickets/TicketListItemSkeleton.vue'
 import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import ListPageController from '@/components/global/ListPageController.vue'
 
 export default {
 	name: 'TicketList',
@@ -141,8 +147,7 @@ export default {
 		TicketListItem,
 		TicketListItemSkeleton,
 		CustomIcons,
-		Input,
-		ListPageController
+		Input
 	},
 	setup() {
 		const showSelectAllCheckbox = ref(false)
@@ -157,7 +162,3 @@ export default {
 	}
 }
 </script>
-
-<style>
-
-</style>

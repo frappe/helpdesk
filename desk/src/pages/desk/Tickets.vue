@@ -23,9 +23,7 @@
 				],
 				limit: 20,
 				order_by: 'modified desc',
-				filters: initialFilters,
-				start_page: initialPage,
-				route_query_pagination: true
+				filters: initialFilters
 			}"
 		>
 			<template #body="{ manager }">
@@ -102,7 +100,6 @@ export default {
 	data() {
 		return {
 			initialFilters: [],
-			initialPage: 1
 		}
 	},
 	setup() {
@@ -205,13 +202,13 @@ export default {
 					finalFilters[key] = (key === '_assign') ?  ['like', `%${value}%`] : ['=', value]
 				}
 			})
+			// TODO: move this to filter box
 			if (this.listManagerInitialised) {
 				if (JSON.stringify(finalFilters) != JSON.stringify(this.$refs.ticketList.manager.options.filters)) {
 					this.$refs.ticketList.manager.update({filters: finalFilters})
 				}
 			} else {
 				this.initialFilters = finalFilters
-				this.initialPage = parseInt(this.$route.query.page ? this.$route.query.page : 1)
 				this.listManagerInitialised = true
 			}
 		},

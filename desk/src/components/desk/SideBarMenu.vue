@@ -198,8 +198,7 @@ export default {
 						query: () => {
 							return {
 								...this.$route.query,
-								menu_filter: 'my-open-tickets',
-								page: 1
+								menu_filter: 'my-open-tickets'
 							}
 						}
 					}
@@ -211,8 +210,7 @@ export default {
 						query: () => {
 							return {
 								...this.$route.query,
-								menu_filter: 'my-replied-tickets',
-								page: 1
+								menu_filter: 'my-replied-tickets'
 							}
 						}
 					},
@@ -224,8 +222,7 @@ export default {
 						query: () => {
 							return {
 								...this.$route.query,
-								menu_filter: 'my-resolved-tickets',
-								page: 1
+								menu_filter: 'my-resolved-tickets'
 							}
 						}
 					},
@@ -237,8 +234,7 @@ export default {
 						query: () => {
 							return {
 								...this.$route.query,
-								menu_filter: 'my-closed-tickets',
-								page: 1
+								menu_filter: 'my-closed-tickets'
 							}
 						}
 					},
@@ -254,8 +250,7 @@ export default {
 					query: () => {
 						return {
 							...this.$route.query,
-							menu_filter: 'all',
-							page: 1
+							menu_filter: 'all'
 						}
 					}
 				},
@@ -344,8 +339,7 @@ export default {
 					path: '/frappedesk/tickets',
 					query: {
 						...this.$route.query,
-						menu_filter: this.user.agent ? 'my-open-tickets' : 'all',
-						page: 1
+						menu_filter: this.user.agent ? 'my-open-tickets' : 'all'
 					}
 				})
 			}
