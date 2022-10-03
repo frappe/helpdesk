@@ -20,7 +20,7 @@
 		}"
 	>
 		<template #body>
-			<div :class="editable ? `rounded shadow p-5 h-full overflow-y-scroll ${ editMode ? 'border-2 border-gray-300' : ''}` : ''">
+			<div :class="editable ? `rounded-md p-5 h-full overflow-y-scroll ${ editMode ? 'border-2 border-gray-300' : 'shadow'}` : ''">
 				<div class="grid grid-cols-1 place-content-center gap-10">
 					<div class="grid place-content-center gap-5 text-center bg-gray-100 w-full h-[250px]">
 						<div class="text-[36px] text-gray-900 font-semibold">How can I help you?</div>
@@ -29,7 +29,7 @@
 							<div class="grow text-[12px] text-left text-gray-500">Write a question or problem</div>
 						</div>
 					</div>
-					<div class="flex flex-col space-y-7">
+					<div class="flex flex-col">
 						<CategoryCardList as="div"
 							v-if="!(parentCategoryId && categoryId)"
 							ref="categoryCardList"
@@ -45,6 +45,9 @@
 							:editMode="editMode"
 							:categoryId="categoryId"
 						/>
+						<div v-if="isEmpty && !editMode" class="text-base text-gray-600">
+							Its empty here
+						</div>
 						<!-- <FAQList :editable="editable" v-else>
 							TODO: Show FAQ edit list
 						</FAQList> -->
@@ -108,6 +111,12 @@ export default {
 		},
 		isRoot() {
 			return !this.categoryId && !this.parentCategoryId
+		},
+		isEmpty() {
+			if (this.$resources.articlesCount.loading || this.$resources.subCategoriesCount.loading) return
+			const isEmpty = this.$resources.subCategoriesCount.data === 0 && this.$resources.subCategoriesCount.data === 0
+			if (this.editable) this.editMode = isEmpty
+			return isEmpty
 		}
 	},
 	methods: {
@@ -120,6 +129,34 @@ export default {
 			if (this.$refs.articleMiniList) await this.$refs.articleMiniList.saveChanges()
 			this.saveInProgress = false
 			return
+		}
+	},
+	resources: {
+		articlesCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Article',
+					filters: {
+						category: this.categoryId,
+						status: 'Published'
+					}
+				},
+				auto: true
+			}
+		},
+		subCategoriesCount() {
+			return {
+				method: 'frappe.client.get_count',
+				params: {
+					doctype: 'Category',
+					filters: {
+						parent_category: this.categoryId,
+						status: 'Published'
+					}
+				},
+				auto: true
+			}
 		}
 	}
 }

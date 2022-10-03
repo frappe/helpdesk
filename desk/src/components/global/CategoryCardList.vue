@@ -1,11 +1,12 @@
 <template>
 	<!-- TODO: if no category exists then show a sudo category card (dashed border or something) to fill the edit space -->
 	<draggable 
+		v-if="(categories && categories.length > 0) || editMode"
 		:list="categories"
 		:disabled="!editMode"
 		handle=".handle" 
 		item-key="idx"
-		class="grid place-content-center grid-cols-3 gap-y-6"
+		class="grid place-content-center grid-cols-3 gap-y-6 mb-5"
 		:class="editMode ? 'gap-x-1 mr-[-1.25rem]' : 'gap-x-6'"
 	>
 		<template #item="{element}">

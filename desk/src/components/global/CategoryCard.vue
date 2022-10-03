@@ -1,13 +1,13 @@
 <template>
 	<div class="h-full">
-		<div v-if="category.is_placeholder" class="border-2 border-dashed border-gray-400 rounded p-5">
+		<div v-if="category.is_placeholder" class="border-2 border-dashed border-gray-400 rounded-md p-5">
 			<div class="h-[130px]">
-				<div class="my-auto flex items-center space-x-2 p-5 hover:bg-gray-50 h-full hover:cursor-pointer rounded group">
+				<div class="my-auto flex items-center space-x-2 p-5 hover:bg-gray-50 h-full hover:cursor-pointer rounded-md group">
 					<div class="grow text-center text-gray-700 group-hover:text-gray-900">Add Category</div>
 				</div>
 			</div>
 		</div>
-		<div v-else class="bg-white grow shadow rounded border p-5 group flex flex-row space-x-1 h-full" :class="editMode ? '' : 'cursor-pointer hover:shadow-md'">
+		<div v-else class="bg-white grow shadow rounded-md border p-5 group flex flex-row space-x-1 h-full" :class="editMode ? '' : 'cursor-pointer hover:shadow-md'">
 			<div class="flex flex-row items-center grow">
 				<div class="grow flex flex-col space-y-2" :class="editMode ? 'h-[130px]' : ''">
 					<div class="flex flex-col">

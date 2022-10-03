@@ -1,7 +1,19 @@
 <template>
 	<!-- TODO: option to add articles via combobox, create new articles too ? -->
-	<div class="flex flex-col space-y-5" v-if="categoryId">
-		<div class="text-3xl font-bold text-gray-800">Articles</div>
+	<div 
+		v-if="categoryId && (articles.length > 0 || editMode)"
+		class="flex flex-col space-y-5"
+	>
+		<div class="flex flex-row space-x-2 items-center">
+			<div class="text-3xl font-bold text-gray-800">Articles</div>
+			<!-- TODO: <FeatherIcon v-if="editMode" name="plus" class="w-4 cursor-pointer my-auto bg-gray-50 hover:bg-gray-100 rounded" /> -->
+			<p 
+				v-if="articles.length == 0" 
+				class="text-base text-gray-500"
+			>
+				( add articles from <router-link class="underline" :to="{ path: '/frappedesk/knowledge-base/articles'}">here</router-link> )
+			</p>
+		</div>
 		<draggable 
 			:list="articles"
 			:disabled="!editMode"
@@ -25,6 +37,7 @@
 import { ref, provide, computed } from 'vue'
 import draggable from 'vuedraggable'
 import ArticleMiniListItem from '@/components/global/ArticleMiniListItem.vue'
+import { FeatherIcon } from 'frappe-ui'
 
 export default {
 	name: 'ArticleMiniList',
@@ -44,7 +57,8 @@ export default {
 	},
 	components: {
 		draggable,
-		ArticleMiniListItem
+		ArticleMiniListItem,
+		FeatherIcon
 	},
 	setup(props, context) {
 		const tempArticles = ref([])
@@ -96,6 +110,7 @@ export default {
 			}
 		}
 	},
+	expose: ['articles'],
 	watch: {
 		editMode(newVal) {
 			if (newVal) {
