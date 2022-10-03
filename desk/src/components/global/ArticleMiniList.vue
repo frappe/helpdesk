@@ -1,4 +1,5 @@
 <template>
+	<!-- TODO: option to add articles via combobox, create new articles too ? -->
 	<div class="flex flex-col space-y-5" v-if="categoryId">
 		<div class="text-3xl font-bold text-gray-800">Articles</div>
 		<draggable 
@@ -66,7 +67,7 @@ export default {
 			if (disableSaving.value) return
 			if (!props.categoryId) return
 			await resources.value.saveArticles.submit({
-				articles: tempArticles.value
+				new_values: tempArticles.value
 			})
 		}
 

@@ -78,7 +78,10 @@ const routes = [
 					{
 						path: '',
 						name: 'Home',
-						component: () => import('@/components/global/KBHome.vue') // shows root categories and faqs
+						component: () => import('@/components/global/KBHome.vue'), // shows root categories and faqs
+						meta: {
+							editable: true
+						}
 					},
 					{
 						path: ':categoryId',

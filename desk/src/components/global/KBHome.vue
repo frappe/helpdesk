@@ -31,6 +31,7 @@
 					</div>
 					<div class="flex flex-col space-y-7">
 						<CategoryCardList as="div"
+							v-if="!(parentCategoryId && categoryId)"
 							ref="categoryCardList"
 							:editable="editable"
 							:editMode="editMode"
@@ -38,6 +39,7 @@
 							:parentCategoryId="parentCategoryId"
 						/>
 						<ArticleMiniList as="div"
+							v-if="!isRoot"
 							ref="articleMiniList"
 							:editable="editable"
 							:editMode="editMode"
@@ -56,6 +58,7 @@
 <script>
 import { FeatherIcon } from 'frappe-ui';
 import { provide, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import CategoryCardList from '@/components/global/CategoryCardList.vue'
 import ArticleMiniList from '@/components/global/ArticleMiniList.vue'
 import KBEditableBlock from '@/components/global/KBEditableBlock.vue'
@@ -79,14 +82,15 @@ export default {
 		KBEditableBlock
 	},
 	setup(props) {
+		const route = useRoute()
+		const editable = ref(route.meta.editable)
+
 		provide('categoryId', props.categoryId)
 		if (props.parentCategoryId) {
 			provide('parentCategoryId', props.parentCategoryId)
 		}
 
-		const editable = ref(true)
 		const editMode = ref(false)
-
 		const saveInProgress = ref(false)
 
 		return {
@@ -108,12 +112,12 @@ export default {
 	},
 	methods: {
 		validateChanges() {
-			return this.$refs.categoryCardList.validateChanges() && this.$refs.articleMiniList.validateChanges()
+			return this.$refs.categoryCardList.validateChanges() && this.$refs.articleMiniList ? this.$refs.articleMiniList.validateChanges() : true
 		},
 		async saveChanges() {
 			this.saveInProgress = true
 			await this.$refs.categoryCardList.saveChanges()
-			await this.$refs.articleMiniList.saveChanges()
+			if (this.$refs.articleMiniList) await this.$refs.articleMiniList.saveChanges()
 			this.saveInProgress = false
 			return
 		}
