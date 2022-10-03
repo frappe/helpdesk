@@ -103,13 +103,13 @@ const routes = [
 					},
 					{
 						path: 'categories',
-						name: '', // Categories (list) Page
-						component: () => import('') // CategoriesListView.vue - shows all categories
+						name: 'Categories',
+						component: () => import('@/pages/desk/knowledge_base/Categories.vue') // CategoriesListView.vue - shows all categories
 					},
 					{
 						path: 'articles',
-						name: '', // Articles (list) Page
-						component: () => import('') // Articles.vue - shows all articles
+						name: 'Articles',
+						component: () => import('@/pages/desk/knowledge_base/Articles.vue') // Articles.vue - shows all articles
 					},
 					{
 						path: 'articles/:articleId',
