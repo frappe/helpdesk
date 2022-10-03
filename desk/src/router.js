@@ -78,19 +78,25 @@ const routes = [
 					{
 						path: '',
 						name: 'Home',
-						component: () => import('@/pages/desk/knowledge_base/CategoriesWebView.vue') // KB.vue - shows root categories and faqs
+						component: () => import('@/components/global/KBHome.vue') // shows root categories and faqs
 					},
 					{
 						path: ':categoryId',
 						name: 'CategoryPage', // Category Page
-						component: () => import('@/pages/desk/knowledge_base/CategoriesWebView.vue'), // KB.vue - shows sub categories and articles
-						props: true
+						component: () => import('@/components/global/KBHome.vue'), // shows sub categories and articles
+						props: true,
+						meta: {
+							editable: true
+						}
 					},
 					{
 						path: ':parentCategoryId/:categoryId',
 						name: 'CategoryPage2', // Category Page
-						component: () => import('@/pages/desk/knowledge_base/CategoriesWebView.vue'), // KB.vue - shows sub categories and articles
-						props: true
+						component: () => import('@/components/global/KBHome.vue'), // shows sub categories and articles
+						props: true,
+						meta: {
+							editable: true
+						}
 					},
 					{
 						path: 'categories',

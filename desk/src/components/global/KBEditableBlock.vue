@@ -1,43 +1,44 @@
 <template>
-	<div 
-		class="flex flex-col" 
-		:class="editMode ? 'border-2 border-gray-300 rounded p-5 space-y-4 mt-5' : ''"
-	>
+	<div class="flex flex-col">
 		<div class="h-12">
-			<div v-if="editMode" class="flex flex-row-reverse">
-				<Button 
-					:loading="saveInProgress"
-					icon-left="save" 
-					class="ml-2"
-					:class="disableSaving ? 'cursor-not-allowed' : ''"
-					:disable="disableSaving"
-					@click="$emit('save')"
-				>
-					Save
-				</Button>
-				<Button 
-					icon-left="rotate-ccw" 
-					@click="$emit('discard')"
-				>
-					Discard
-				</Button>
-			</div>
-			<div v-else-if="editable" class="flex flex-row-reverse py-2">
-				<Button 
-					icon-left="edit-2" 
-					@click="$emit('edit')"
-				>
-					Edit
-				</Button>
+			<div v-if="editable" class="flex flex-row items-center">
+				<div class="grow text-xl">Knowledge Base</div>
+				<div v-if="editMode" class="flex flex-row-reverse">
+					<Button 
+						:loading="saveInProgress"
+						icon-left="save" 
+						class="ml-2"
+						:class="disableSaving ? 'cursor-not-allowed' : ''"
+						:disable="disableSaving"
+						@click="$emit('save')"
+					>
+						Save
+					</Button>
+					<Button 
+						icon-left="rotate-ccw" 
+						@click="$emit('discard')"
+					>
+						Discard
+					</Button>
+				</div>
+				<div v-else class="flex flex-row-reverse items-center">
+					<KBLayoutSwitcher viewMode="Web" class="ml-2" />
+					<Button 
+						icon-left="edit-2" 
+						@click="$emit('edit')"
+					>
+						Edit
+					</Button>
+				</div>
 			</div>
 		</div>
-		<div>
-			<slot name="body" />
-		</div>
+		<slot class="h-full" name="body" />
 	</div>
 </template>
 
 <script>
+import KBLayoutSwitcher from '@/components/global/KBLayoutSwitcher.vue';
+
 export default {
 	name: 'KBEditableBlock',
 	props: {
@@ -57,6 +58,9 @@ export default {
 			type: Boolean,
 			default: false
 		},
+	},
+	components: {
+		KBLayoutSwitcher
 	}
 }
 </script>
