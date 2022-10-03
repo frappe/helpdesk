@@ -1,4 +1,5 @@
 <template>
+	<!-- TODO: if no category exists then show a sudo category card (dashed border or something) to fill the edit space -->
 	<draggable 
 		:list="categories"
 		:disabled="!editMode"
@@ -19,13 +20,25 @@
 						categories.splice(index, 1)
 					}"
 					@click="() => {
+						if (element.is_placeholder) {
+							categories.splice(categories.indexOf(element), 1)	// remove placeholder card
+							categories.push({
+								is_new: true,
+								idx: categories.length,
+								category_name: '',
+								description: '',
+								parent_category: categoryId ? categoryId : null,
+								is_group: (!parentCategoryId && !categoryId) ? 1 : 0
+							})
+						}
 						if (editMode) return
-						$router.push({path: `/frappedesk/knowledge-base/${element.name}`})
+						return $router.push({path: `${$route.path}/${element.name}`})
 					}"
 				/>
 				<div v-if="editMode" class="group h-full">
 					<div class="group-hover:visible invisible flex h-full">
-						<FeatherIcon 
+						<FeatherIcon
+							v-if="!element.is_placeholder"
 							name="plus" 
 							class="w-4 cursor-pointer my-auto hover:bg-gray-100 rounded"
 							@click="() => {
@@ -135,6 +148,11 @@ export default {
 		editMode(newVal) {
 			if (newVal) {
 				this.tempCategories = JSON.parse(JSON.stringify(this.$resources.categories.data))
+				if (this.tempCategories.length == 0) {
+					this.tempCategories.push({
+						is_placeholder: true
+					})
+				}
 			}
 		}
 	},
