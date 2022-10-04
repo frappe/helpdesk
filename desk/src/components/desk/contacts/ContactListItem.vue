@@ -1,21 +1,21 @@
 <template>
-	<div class="block select-none rounded-[6px] py-[7px] px-[11px]" :class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'">
-		<div
-			v-if="contact"
-			role="button"
-			class="flex items-center text-base"
-		>
-			<div 
-				class="w-[37px] h-[14px] flex items-center"
-			>
+	<div
+		class="block select-none rounded-[6px] py-[7px] px-[11px]"
+		:class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'"
+	>
+		<div v-if="contact" role="button" class="flex items-center text-base">
+			<div class="w-[37px] h-[14px] flex items-center">
 				<Input
-					type="checkbox" 
-					@click="$emit('toggleSelect')" 
-					:checked="selected" 
+					type="checkbox"
+					@click="$emit('toggleSelect')"
+					:checked="selected"
 					role="button"
 				/>
 			</div>
-			<router-link :to="`/frappedesk/contacts/${contact.name}`" class="w-full group flex items-center">
+			<router-link
+				:to="`/frappedesk/contacts/${contact.name}`"
+				class="w-full group flex items-center"
+			>
 				<div class="sm:w-5/12 truncate pr-10">
 					{{ fullName }}
 				</div>
@@ -35,12 +35,12 @@
 </template>
 
 <script>
-import { computed } from 'vue'
-import { Input, FeatherIcon } from 'frappe-ui'
+import { computed } from "vue"
+import { Input, FeatherIcon } from "frappe-ui"
 
 export default {
-	name: 'ContactListItem',
-	props: ['contact', 'selected'],
+	name: "ContactListItem",
+	props: ["contact", "selected"],
 	components: {
 		Input,
 		FeatherIcon,
@@ -48,13 +48,17 @@ export default {
 	setup(props) {
 		const fullName = computed(() => {
 			if (props.contact) {
-				return (props.contact.first_name || "") + " " + (props.contact.last_name || "")
+				return (
+					(props.contact.first_name || "") +
+					" " +
+					(props.contact.last_name || "")
+				)
 			}
 		})
 
 		return {
-			fullName
+			fullName,
 		}
-	}
+	},
 }
 </script>

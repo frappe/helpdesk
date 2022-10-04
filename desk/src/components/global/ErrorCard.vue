@@ -1,6 +1,9 @@
 <template>
 	<div class="flex flex-col items-center rounded-md p-10 text-base bg-red-50">
-		<FeatherIcon name="x-circle" class="stroke-red-500 stroke-2 h-20 w-20" />
+		<FeatherIcon
+			name="x-circle"
+			class="stroke-red-500 stroke-2 h-20 w-20"
+		/>
 		<h2 class="mt-4 text-lg font-medium text-gray-900">
 			{{ title }}
 		</h2>
@@ -11,13 +14,13 @@
 </template>
 
 <script>
-import { FeatherIcon } from 'frappe-ui'
+import { FeatherIcon } from "frappe-ui"
 
 export default {
-	name: 'SuccessCard',
-	props: ['title', 'message'],
+	name: "SuccessCard",
+	props: ["title", "message"],
 	components: {
-		FeatherIcon
-	}
-};
+		FeatherIcon,
+	},
+}
 </script>
