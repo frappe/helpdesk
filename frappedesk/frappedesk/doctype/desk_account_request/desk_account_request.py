@@ -6,13 +6,14 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import random_string, get_url
 
+
 class DeskAccountRequest(Document):
 	def before_save(self):
 		if not self.request_key:
 			self.request_key = random_string(32)
 
 		self.ip_address = frappe.local.request_ip
-	
+
 	def after_insert(self):
 		self.send_verification_email()
 
@@ -23,7 +24,7 @@ class DeskAccountRequest(Document):
 
 		sender = None
 		if frappe.db.exists("Email Account", {"name": "Support", "enable_outgoing": True}):
-			sender=frappe.get_doc("Email Account", "Support").email_id
+			sender = frappe.get_doc("Email Account", "Support").email_id
 
 		try:
 			frappe.sendmail(
@@ -31,10 +32,11 @@ class DeskAccountRequest(Document):
 				sender=sender,
 				subject=subject,
 				template="email_verification",
-				args=dict(
-					link=url
-				),
+				args=dict(link=url),
 				now=True,
 			)
 		except:
-			frappe.throw("Either setup up Support email account or there should be a default outgoing email account")
+			frappe.throw(
+				"Either setup up Support email account or there should be a default"
+				" outgoing email account"
+			)
