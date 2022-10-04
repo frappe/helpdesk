@@ -1,12 +1,15 @@
 import frappe
 from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact
 
+
 @frappe.whitelist()
 def initial_agent_setup():
 	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
 	if support_settings_doc.initial_agent_set:
 		return
-	users = frappe.get_all("User", filters={"user_type": "System User"}, order_by="creation")
+	users = frappe.get_all(
+		"User", filters={"user_type": "System User"}, order_by="creation"
+	)
 	for user in users:
 		if user.name != "Administrator":
 			agent = frappe.new_doc("Agent")
@@ -17,29 +20,27 @@ def initial_agent_setup():
 
 			if frappe.session.user == "Administrator":
 				frappe.local.login_manager.login_as(agent.user)
-			
+
 			return
+
 
 @frappe.whitelist()
 def create_initial_demo_ticket():
 	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
 	if support_settings_doc.initial_demo_ticket_created:
-		return    
+		return
 	ticket_count = len(frappe.get_all("Ticket"))
 	if ticket_count == 0:
 		agent = frappe.get_last_doc("Agent")
 		if agent:
-			frappe.get_doc({
-				"doctype": "Contact",
-				"first_name": "Harshit",
-				"last_name": "Agrawal",
-				"email_ids": [
-					{
-						"email_id": "harshit@frappe.io",
-						"is_primary": 1
-					}
-				]
-			}).insert()
+			frappe.get_doc(
+				{
+					"doctype": "Contact",
+					"first_name": "Harshit",
+					"last_name": "Agrawal",
+					"email_ids": [{"email_id": "harshit@frappe.io", "is_primary": 1}],
+				}
+			).insert()
 
 			new_ticket_doc = frappe.new_doc("Ticket")
 			new_ticket_doc.subject = "Welcome to Frappe Desk"

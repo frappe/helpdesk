@@ -1,26 +1,26 @@
-@import './assets/Inter/inter.css';
-@import 'frappe-ui/src/style.css';
+@import "./assets/Inter/inter.css";
+@import "frappe-ui/src/style.css";
 
 @layer components {
 	/* Works on Firefox */
 	* {
 		scrollbar-width: thin;
-		scrollbar-color: #C0C6CC #EBEEF0;
+		scrollbar-color: #c0c6cc #ebeef0;
 	}
-	
+
 	html {
 		scrollbar-width: auto;
 	}
 
 	/* Works on Chrome, Edge, and Safari */
 	*::-webkit-scrollbar-thumb {
-		background: #E2E8F0;
+		background: #e2e8f0;
 		border-radius: 6px;
 	}
 
 	*::-webkit-scrollbar-track,
 	*::-webkit-scrollbar-corner {
-		background: #F8FAFC;
+		background: #f8fafc;
 	}
 
 	*::-webkit-scrollbar {
@@ -32,7 +32,6 @@
 		width: 0px;
 		height: 12px;
 	}
-
 }
 
 .ProseMirror {

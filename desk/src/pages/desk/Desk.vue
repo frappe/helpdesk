@@ -1,5 +1,8 @@
 <template>
-	<div v-if="user.isLoggedIn() && user.has_desk_access" class="w-screen h-screen">
+	<div
+		v-if="user.isLoggedIn() && user.has_desk_access"
+		class="w-screen h-screen"
+	>
 		<div v-if="initialized">
 			<div class="flex flex-row w-screen">
 				<SideBarMenu class="bg-gray-50 shrink-0 w-[241px]" />
@@ -8,25 +11,25 @@
 		</div>
 		<div v-else class="h-full w-full flex max-w-full grow-0">
 			<div class="mx-auto my-auto text-base font-normal">
-				<CustomIcons name="frappedesk" class="w-[200px]"/>
+				<CustomIcons name="frappedesk" class="w-[200px]" />
 			</div>
 		</div>
 	</div>
 </template>
 <script>
 import SideBarMenu from "@/components/desk/SideBarMenu.vue"
-import { inject, provide, ref } from 'vue'
+import { inject, provide, ref } from "vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
 	name: "Desk",
 	components: {
 		SideBarMenu,
-		CustomIcons
+		CustomIcons,
 	},
 	setup() {
 		const mounted = ref(false)
-		const user = inject('user')
+		const user = inject("user")
 
 		const ticketTypes = ref([])
 		const ticketPriorities = ref([])
@@ -36,36 +39,35 @@ export default {
 
 		const contacts = ref([])
 		const contactController = ref({})
-		
+
 		const agents = ref([])
 		const agentGroups = ref([])
 		const agentController = ref({})
 
 		const sideBarFilterMap = ref({
-			'all': 'All Tickets',
-			'my-open-tickets': 'My Open Tickets',
-			'my-replied-tickets': 'My Replied Tickets',
-			'my-resolved-tickets': 'My Resolved Tickets',
-			'my-closed-tickets': 'My Closed Tickets',
+			all: "All Tickets",
+			"my-open-tickets": "My Open Tickets",
+			"my-replied-tickets": "My Replied Tickets",
+			"my-resolved-tickets": "My Resolved Tickets",
+			"my-closed-tickets": "My Closed Tickets",
 		})
-		provide('sideBarFilterMap', sideBarFilterMap)
-		
-		const ticketSideBarFilter = ref('all')
-		provide('ticketSideBarFilter', ticketSideBarFilter)
-		
-		
-		provide('ticketTypes', ticketTypes)
-		provide('ticketPriorities', ticketPriorities)
-		provide('ticketStatuses', ticketStatuses)
+		provide("sideBarFilterMap", sideBarFilterMap)
 
-		provide('ticketController', ticketController)
+		const ticketSideBarFilter = ref("all")
+		provide("ticketSideBarFilter", ticketSideBarFilter)
 
-		provide('contacts', contacts)
-		provide('contactController', contactController)
+		provide("ticketTypes", ticketTypes)
+		provide("ticketPriorities", ticketPriorities)
+		provide("ticketStatuses", ticketStatuses)
 
-		provide('agents', agents)
-		provide('agentGroups', agentGroups)
-		provide('agentController', agentController)
+		provide("ticketController", ticketController)
+
+		provide("contacts", contacts)
+		provide("contactController", contactController)
+
+		provide("agents", agents)
+		provide("agentGroups", agentGroups)
+		provide("agentController", agentController)
 
 		return {
 			mounted,
@@ -82,7 +84,7 @@ export default {
 
 			agents,
 			agentGroups,
-			agentController
+			agentController,
 		}
 	},
 	computed: {
@@ -95,82 +97,87 @@ export default {
 				this.$resources.setupInitialAgent.submit()
 				return false
 			}
-			if (!this.$resources.frappedeskSettings.data.initial_demo_ticket_created) {
+			if (
+				!this.$resources.frappedeskSettings.data
+					.initial_demo_ticket_created
+			) {
 				this.$resources.createInitialDemoTicket.submit()
 				return false
 			}
 
 			return true
-		}
+		},
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
-			this.$router.push({name: "DeskLogin", query:{route: this.$route.path}})
+			this.$router.push({
+				name: "DeskLogin",
+				query: { route: this.$route.path },
+			})
 			return
 		}
 		if (!this.user.has_desk_access) {
-			this.$router.push({path: "/support/tickets"})
+			this.$router.push({ path: "/support/tickets" })
 			return
 		}
 		this.$resources.frappedeskSettings.fetch()
 		this.$resources.defaultOutgoingEmailAccount.fetch()
-
-		this.ticketController.set = (ticketId, type, ref=null) => {
+		;(this.ticketController.set = (ticketId, type, ref = null) => {
 			switch (type) {
-				case 'type':
+				case "type":
 					return this.$resources.assignTicketType.submit({
 						ticket_id: ticketId,
-						type: ref
+						type: ref,
 					})
-				case 'status':
+				case "status":
 					return this.$resources.assignTicketStatus.submit({
 						ticket_id: ticketId,
-						status: ref
+						status: ref,
 					})
-				case 'priority':
+				case "priority":
 					return this.$resources.assignTicketPriority.submit({
 						ticket_id: ticketId,
-						priority: ref
+						priority: ref,
 					})
-				case 'contact':
+				case "contact":
 					return this.$resources.updateTicketContact.submit({
 						ticket_id: ticketId,
-						contact: ref
+						contact: ref,
 					})
-				case 'agent':
+				case "agent":
 					return this.$resources.assignTicketToAgent.submit({
 						ticket_id: ticketId,
-						agent_id: ref
+						agent_id: ref,
 					})
-				case 'group':
+				case "group":
 					return this.$resources.assignTicketGroup.submit({
 						ticket_id: ticketId,
-						agent_group: ref
+						agent_group: ref,
 					})
 			}
-		},
-		this.ticketController.new = (type, values) => {
-			switch (type) {
-				case 'ticket':
-					return this.$resources.createTicket.submit({
-						values
-					})
-				case 'type':
-					this.$resources.createTicketType.submit({
-						type: values
-					})
-					break
-			}
-		}
+		}),
+			(this.ticketController.new = (type, values) => {
+				switch (type) {
+					case "ticket":
+						return this.$resources.createTicket.submit({
+							values,
+						})
+					case "type":
+						this.$resources.createTicketType.submit({
+							type: values,
+						})
+						break
+				}
+			})
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
-				case 'Ticket Type':
+				case "Ticket Type":
 					this.$resources.types.reload()
 					break
-				case 'Contact':
+				case "Contact":
 					this.$resources.contacts.reload()
 					break
-				case 'Agent':
+				case "Agent":
 					this.$resources.agents.reload()
 					break
 			}
@@ -179,87 +186,94 @@ export default {
 		this.mounted = true
 	},
 	unmounted() {
-		this.$socket.off('list_update')
+		this.$socket.off("list_update")
 	},
 	resources: {
 		setupInitialAgent() {
 			return {
-				method: 'frappedesk.api.setup.initial_agent_setup',
+				method: "frappedesk.api.setup.initial_agent_setup",
 				onSuccess: (res) => {
 					this.$router.go()
 				},
 				onError: (err) => {
 					console.log(err)
 					this.$toast({
-						title: 'Something went wrong.',
-						text: 'Please try again later.',
-						customIcon: 'circle-fail',
-						appearance: 'danger',
+						title: "Something went wrong.",
+						text: "Please try again later.",
+						customIcon: "circle-fail",
+						appearance: "danger",
 					})
-				}
+				},
 			}
 		},
 		createInitialDemoTicket() {
 			return {
-				method: 'frappedesk.api.setup.create_initial_demo_ticket',
+				method: "frappedesk.api.setup.create_initial_demo_ticket",
 				onSuccess: (res) => {
 					this.$resources.frappedeskSettings.fetch()
 				},
 				onError: (err) => {
 					console.log(err)
 					this.$toast({
-						title: 'Something went wrong.',
-						text: 'Please try again later.',
-						customIcon: 'circle-fail',
-						appearance: 'danger',
+						title: "Something went wrong.",
+						text: "Please try again later.",
+						customIcon: "circle-fail",
+						appearance: "danger",
 					})
-				}
+				},
 			}
 		},
 		setHelpdeskName() {
-            return {
-                method: 'frappedesk.api.settings.update_helpdesk_name',
-                onSuccess: (res) => {
-                    document.title = `FrappeDesk ${res ? ` | ${res}` : ''}`
-                    this.$toast({
-                        title: 'Helpdesk name updated!!',
-                        customIcon: 'circle-check',
-                        appearance: 'success',
-                    })
-                }
-            }
-        },
+			return {
+				method: "frappedesk.api.settings.update_helpdesk_name",
+				onSuccess: (res) => {
+					document.title = `FrappeDesk ${res ? ` | ${res}` : ""}`
+					this.$toast({
+						title: "Helpdesk name updated!!",
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+				},
+			}
+		},
 		skipHelpdeskNameSetup() {
-            return {
-                method: 'frappedesk.api.settings.skip_helpdesk_name_setup',
-            }
+			return {
+				method: "frappedesk.api.settings.skip_helpdesk_name_setup",
+			}
 		},
 		frappedeskSettings() {
 			return {
-				method: 'frappe.client.get',
+				method: "frappe.client.get",
 				params: {
-					doctype: 'Frappe Desk Settings',
-					name: 'Frappe Desk Settings'
+					doctype: "Frappe Desk Settings",
+					name: "Frappe Desk Settings",
 				},
 				onSuccess: (data) => {
-					if (!data.initial_helpdesk_name_setup_skipped && data.helpdesk_name == "") {
+					if (
+						!data.initial_helpdesk_name_setup_skipped &&
+						data.helpdesk_name == ""
+					) {
 						this.$toast({
-							title: 'Setup Helpdesk Name',
+							title: "Setup Helpdesk Name",
 							form: {
-								inputs: [{
-									type: 'text',
-									fieldname: 'helpdesk_name',
-									placeholder: 'eg: FDESK'
-								}],
+								inputs: [
+									{
+										type: "text",
+										fieldname: "helpdesk_name",
+										placeholder: "eg: FDESK",
+									},
+								],
 								onSubmit: (values) => {
 									if (values.helpdesk_name) {
-										this.$resources.setHelpdeskName.submit({name: values.helpdesk_name})
+										this.$resources.setHelpdeskName.submit({
+											name: values.helpdesk_name,
+										})
 									}
 								},
 							},
 							fixed: true,
-							appearance: 'info',
-							position: 'bottom-right',
+							appearance: "info",
+							position: "bottom-right",
 							onClose: () => {
 								this.$resources.skipHelpdeskNameSetup.submit()
 							},
@@ -269,107 +283,111 @@ export default {
 				onError: (error) => {
 					console.log(error)
 					this.$toast({
-						title: 'Something went wrong.',
-						text: 'Please try again later.',
-						customIcon: 'circle-fail',
-						appearance: 'danger',
+						title: "Something went wrong.",
+						text: "Please try again later.",
+						customIcon: "circle-fail",
+						appearance: "danger",
 					})
 				},
 			}
 		},
 		defaultOutgoingEmailAccount() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Email Account',
-					filters: [["use_imap", "=", 1], ["IMAP Folder","append_to","=","Ticket"], ["default_outgoing","=",1]]
+					doctype: "Email Account",
+					filters: [
+						["use_imap", "=", 1],
+						["IMAP Folder", "append_to", "=", "Ticket"],
+						["default_outgoing", "=", 1],
+					],
 				},
 				onSuccess: (data) => {
 					if (data.length == 0) {
 						this.$toast({
 							title: "Default outgoing email account not added",
 							text: "Please add a default outgoing email account in settings.",
-							appearance: 'info',
-							icon: 'info',
-							iconClasses: 'stroke-blue-500 stroke-2',
+							appearance: "info",
+							icon: "info",
+							iconClasses: "stroke-blue-500 stroke-2",
 							fixed: true,
-							position: 'bottom-right',
+							position: "bottom-right",
 							action: {
-								title: 'Setup now',
+								title: "Setup now",
 								onClick: () => {
 									this.$clearToasts()
-									this.$router.push({name: 'Emails'})
-								}
-							}
+									this.$router.push({ name: "Emails" })
+								},
+							},
 						})
 					} else {
 						this.$resources.agentCount.fetch()
 					}
 				},
-				onError: (error) =>{
+				onError: (error) => {
 					console.log(error)
 				},
 			}
 		},
 		agentCount() {
 			return {
-				method: 'frappe.client.get_count',
+				method: "frappe.client.get_count",
 				params: {
-					doctype: 'Agent',
+					doctype: "Agent",
 				},
 				onSuccess: (count) => {
 					if (count <= 1) {
 						this.$toast({
 							title: "Add agents",
 							text: "Please add a agents from settings.",
-							appearance: 'info',
-							icon: 'info',
-							iconClasses: 'stroke-blue-500 stroke-2',
+							appearance: "info",
+							icon: "info",
+							iconClasses: "stroke-blue-500 stroke-2",
 							fixed: true,
-							position: 'bottom-right',
+							position: "bottom-right",
 							action: {
-								title: 'Add now',
+								title: "Add now",
 								onClick: () => {
 									this.$clearToasts()
-									this.$router.push({name: 'Agents'})
-								}
-							}
+									this.$router.push({ name: "Agents" })
+								},
+							},
 						})
 					}
 				},
-				onError: (error) =>{
+				onError: (error) => {
 					console.log(error)
 				},
 			}
 		},
 		createTicket() {
 			return {
-				method: 'frappedesk.api.ticket.create_new',
+				method: "frappedesk.api.ticket.create_new",
 				onSuccess: () => {
 					// TODO:
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		updateTicketContact() {
 			return {
-				method: 'frappedesk.api.ticket.update_contact',
+				method: "frappedesk.api.ticket.update_contact",
 				onSuccess: async (ticket) => {
-					// TODO: 
+					// TODO:
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		types() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Ticket Type',
-					pluck: 'name'
+					doctype: "Ticket Type",
+					pluck: "name",
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
@@ -377,14 +395,14 @@ export default {
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		priorities() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Ticket Priority',
+					doctype: "Ticket Priority",
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
@@ -392,28 +410,28 @@ export default {
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		statuses() {
 			return {
-				method: 'frappedesk.api.ticket.get_all_ticket_statuses',
+				method: "frappedesk.api.ticket.get_all_ticket_statuses",
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.ticketStatuses = data
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		contacts() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Contact',
-					fields: ['*'],
-					limit_page_length: 0
+					doctype: "Contact",
+					fields: ["*"],
+					limit_page_length: 0,
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
@@ -421,19 +439,15 @@ export default {
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		agents() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Agent',
-					fields: [
-						'name',
-						'agent_name',
-						'user.user_image'
-					],
+					doctype: "Agent",
+					fields: ["name", "agent_name", "user.user_image"],
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
@@ -441,14 +455,14 @@ export default {
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		agentGroups() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Agent Group'
+					doctype: "Agent Group",
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
@@ -456,78 +470,70 @@ export default {
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		assignTicketToAgent() {
 			return {
-				method: 'frappedesk.api.ticket.assign_ticket_to_agent',
+				method: "frappedesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: async () => {
-					this.$event.emit('update_ticket_list')
+					this.$event.emit("update_ticket_list")
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		assignTicketType() {
 			return {
-				method: 'frappedesk.api.ticket.assign_ticket_type',
-				onSuccess: async (ticket) => {
-
-				},
+				method: "frappedesk.api.ticket.assign_ticket_type",
+				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		assignTicketStatus() {
 			return {
-				method: 'frappedesk.api.ticket.assign_ticket_status',
+				method: "frappedesk.api.ticket.assign_ticket_status",
 				onSuccess: async () => {
-					this.$event.emit('update_ticket_list')
+					this.$event.emit("update_ticket_list")
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		assignTicketPriority() {
 			return {
-				method: 'frappedesk.api.ticket.assign_ticket_priority',
-				onSuccess: async (ticket) => {
-
-				},
+				method: "frappedesk.api.ticket.assign_ticket_priority",
+				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		assignTicketGroup() {
 			return {
-				method: 'frappedesk.api.ticket.assign_ticket_group',
-				onSuccess: async (ticket) => {
-
-				},
+				method: "frappedesk.api.ticket.assign_ticket_group",
+				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
 		},
 		createTicketType() {
 			return {
-				method: 'frappedesk.api.ticket.check_and_create_ticket_type',
+				method: "frappedesk.api.ticket.check_and_create_ticket_type",
 				onSuccess: () => {
-					this.$resources.types.fetch();
+					this.$resources.types.fetch()
 				},
 				onError: () => {
 					// TODO:
-				}
+				},
 			}
-		}
+		},
 	},
-	directivs: {
-		
-	}
+	directivs: {},
 }
 </script>

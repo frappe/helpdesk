@@ -19,19 +19,19 @@
 </template>
 
 <script>
-import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
-	name: 'LoginBox',
-	props: ['title'],
+	name: "LoginBox",
+	props: ["title"],
 	components: {
-		CustomIcons
+		CustomIcons,
 	},
 	methods: {
 		redirectForFrappeioAuth() {
 			// TODO: ref (https://github.com/frappe/press/commit/f38b26dca5ea44c9b57de37a0162f9707356a903)
-			window.location = '/f-login';
-		}
-	}
-};
+			window.location = "/f-login"
+		},
+	},
+}
 </script>

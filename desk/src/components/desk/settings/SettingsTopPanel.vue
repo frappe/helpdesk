@@ -8,7 +8,12 @@
 		<div class="float-right">
 			<div class="flex space-x-3 items-center">
 				<div v-for="action in actions" :key="action">
-					<Button :appearance="action.appearance" @click="action.onClick()" :icon-left="action.icon">{{ action.label }}</Button>
+					<Button
+						:appearance="action.appearance"
+						@click="action.onClick()"
+						:icon-left="action.icon"
+						>{{ action.label }}</Button
+					>
 				</div>
 			</div>
 		</div>
@@ -16,7 +21,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref } from "vue"
 
 class Action {
 	constructor(label, icon, appearance, onClick) {
@@ -31,21 +36,21 @@ export default {
 	props: ["selectedSetting"],
 	setup() {
 		const actions = ref({})
-		
-		return { 
-			actions
+
+		return {
+			actions,
 		}
 	},
 	mounted() {
 		this.actionGroups = {
-			"Agents": [
+			Agents: [
 				new Action("New Agent", "plus", "primary", () => {
-					this.$event.emit('show-new-agent-dialog')
+					this.$event.emit("show-new-agent-dialog")
 				}),
 			],
 			"Agents Bulk": [
 				new Action("Delete", "", "secondary", () => {
-					this.$event.emit('delete-selected-agents')
+					this.$event.emit("delete-selected-agents")
 				}),
 			],
 			"Support Policies": [
@@ -59,10 +64,10 @@ export default {
 					this.$router.push({ name: "NewEmailAccount" })
 				}),
 			],
-			"Email Accounts Bulk": []
+			"Email Accounts Bulk": [],
 		}
 
-		this.$event.on('show-top-panel-actions-settings', (group) => {
+		this.$event.on("show-top-panel-actions-settings", (group) => {
 			this.actions = []
 			if (this.actionGroups[group]) {
 				this.actions = this.actionGroups[group]
@@ -70,11 +75,9 @@ export default {
 		})
 	},
 	unmounted() {
-		this.$event.off('show-top-panel-actions-settings')
-	}
+		this.$event.off("show-top-panel-actions-settings")
+	},
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

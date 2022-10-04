@@ -1,27 +1,52 @@
 <template>
 	<div class="min-w-[490px] px-[24px] py-[10px]">
 		<div class="form w-full flex flex-col">
-			<div class="float-left mb-[16px]" @click="() => {
-				editingName = true
-				tempAgentName = values.agentName
-			}">
-				<div v-if="!editingName" class="flex space-x-2 items-center cursor-pointer">
+			<div
+				class="float-left mb-[16px]"
+				@click="
+					() => {
+						editingName = true
+						tempAgentName = values.agentName
+					}
+				"
+			>
+				<div
+					v-if="!editingName"
+					class="flex space-x-2 items-center cursor-pointer"
+				>
 					<div class="font-semibold">{{ values.agentName }}</div>
 					<FeatherIcon class="w-3 h-3" name="edit-2" />
 				</div>
 				<div v-else class="flex space-x-2 items-center">
-					<Input id="agentNameInput" v-model="tempAgentName" type="text"/>
-					<FeatherIcon class="w-4 h-4" role="button" name="x" @click="() => {
-						editingName = false
-						tempAgentName = values.agentName
-					}" />
+					<Input
+						id="agentNameInput"
+						v-model="tempAgentName"
+						type="text"
+					/>
+					<FeatherIcon
+						class="w-4 h-4"
+						role="button"
+						name="x"
+						@click="
+							() => {
+								editingName = false
+								tempAgentName = values.agentName
+							}
+						"
+					/>
 				</div>
 			</div>
 			<div class="flex flex-col space-y-[24px]">
 				<div>
-					<span class="block mb-2 text-sm leading-4 text-gray-700">Profile Picture</span>
+					<span class="block mb-2 text-sm leading-4 text-gray-700"
+						>Profile Picture</span
+					>
 					<div class="flex flex-row space-x-[8px] items-center">
-						<CustomAvatar :label="values?.agentName" size="2xl" :imageURL="values?.profilePicture" />
+						<CustomAvatar
+							:label="values?.agentName"
+							size="2xl"
+							:imageURL="values?.profilePicture"
+						/>
 						<div class="flex flex-row space-x-[8px]">
 							<Button>Upload new</Button>
 							<Button>Remove</Button>
@@ -30,21 +55,45 @@
 				</div>
 				<div class="flex flex-row space-x-[16px]">
 					<div class="grow">
-						<Input label="E-mail" type="text" :value="values?.email" @change="(val) => values.email = val"/>
+						<Input
+							label="E-mail"
+							type="text"
+							:value="values?.email"
+							@change="(val) => (values.email = val)"
+						/>
 					</div>
 					<div class="grow">
-						<Input label="Team" type="select" :options="teams" :value="values?.team" @change="(val) => values.team = val"/>
+						<Input
+							label="Team"
+							type="select"
+							:options="teams"
+							:value="values?.team"
+							@change="(val) => (values.team = val)"
+						/>
 					</div>
 				</div>
 				<div class="grow">
-					<Input label="Signature" type="textarea" :value="values?.signature" @change="(val) => values.signature = val"/>
+					<Input
+						label="Signature"
+						type="textarea"
+						:value="values?.signature"
+						@change="(val) => (values.signature = val)"
+					/>
 				</div>
 				<div class="w-full flex flex-row">
 					<div>
 						<Button @click="cancel()">Cancel</Button>
 					</div>
 					<div class="grow flex flex-row-reverse">
-						<Button :loading="this.$resources.agent.setValue.loading || this.$resources.user.setValue.loading" appearance="primary" @click="save()">Save</Button>
+						<Button
+							:loading="
+								this.$resources.agent.setValue.loading ||
+								this.$resources.user.setValue.loading
+							"
+							appearance="primary"
+							@click="save()"
+							>Save</Button
+						>
 					</div>
 				</div>
 			</div>
@@ -53,27 +102,27 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { FeatherIcon, Input } from 'frappe-ui'
-import CustomAvatar from '@/components/global/CustomAvatar.vue'
+import { ref } from "vue"
+import { FeatherIcon, Input } from "frappe-ui"
+import CustomAvatar from "@/components/global/CustomAvatar.vue"
 
 export default {
-	name: 'AgentInfo',
-	props: ['agent'],
+	name: "AgentInfo",
+	props: ["agent"],
 	components: {
 		FeatherIcon,
 		Input,
-		CustomAvatar
+		CustomAvatar,
 	},
 	setup() {
 		const editingName = ref(false)
-		const tempAgentName = ref('')
+		const tempAgentName = ref("")
 		const updatingValues = ref(false)
 
 		return {
 			editingName,
 			tempAgentName,
-			updatingValues
+			updatingValues,
 		}
 	},
 	computed: {
@@ -97,13 +146,13 @@ export default {
 		},
 		teams() {
 			if (this.$resources.teams.data) {
-				return this.$resources.teams.data.map(team => {
+				return this.$resources.teams.data.map((team) => {
 					return team.name
 				})
 			} else {
 				return []
 			}
-		}
+		},
 	},
 	deactivated() {
 		this.resetForm()
@@ -111,8 +160,8 @@ export default {
 	resources: {
 		agent() {
 			return {
-				type: 'document',
-				doctype: 'Agent',
+				type: "document",
+				doctype: "Agent",
 				name: this.agent,
 				setValue: {
 					onSuccess: () => {
@@ -120,28 +169,28 @@ export default {
 						this.updatingValues = false
 
 						this.$toast({
-							title: 'Agent Updated.',
-							customIcon: 'circle-check',
-							appearance: 'success',
+							title: "Agent Updated.",
+							customIcon: "circle-check",
+							appearance: "success",
 						})
-					}
-				}
+					},
+				},
 			}
 		},
 		user() {
 			return {
-				type: 'document',
-				doctype: 'User',
-				name: this.agent
+				type: "document",
+				doctype: "User",
+				name: this.agent,
 			}
 		},
 		teams() {
 			return {
-				type: 'list',
-				doctype: 'Agent Group',
-				fields: ['name']
+				type: "list",
+				doctype: "Agent Group",
+				fields: ["name"],
 			}
-		}
+		},
 	},
 	methods: {
 		resetForm() {
@@ -152,24 +201,24 @@ export default {
 			this.updatingValues = true
 			const newValues = this.values
 
-			this.$resources.user.setValue.submit({
-				email: newValues.email,
-				email_signature: newValues.signature,
-				full_name: this.tempAgentName,
-			}).then(() => {
-				this.$resources.agent.setValue.submit({
-					agent_name: this.tempAgentName,
-					group: newValues.team,
+			this.$resources.user.setValue
+				.submit({
+					email: newValues.email,
+					email_signature: newValues.signature,
+					full_name: this.tempAgentName,
 				})
-			})
+				.then(() => {
+					this.$resources.agent.setValue.submit({
+						agent_name: this.tempAgentName,
+						group: newValues.team,
+					})
+				})
 		},
 		cancel() {
 			this.$router.go()
-		}
-	}
+		},
+	},
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
