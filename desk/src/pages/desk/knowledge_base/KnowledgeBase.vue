@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-row" v-if="selectedCategory">
-		<Categories 
-			class="border-r w-[300px]" 
+		<Categories
+			class="border-r w-[300px]"
 			:selectedCategory="selectedCategory"
 		/>
 		<Articles class="grow" :categoryId="selectedCategory" />
@@ -9,45 +9,47 @@
 </template>
 
 <script>
-import Categories from '@/components/desk/knowledge_base/Categories.vue'
-import Articles from '@/components/desk/knowledge_base/Articles.vue'
-import { ref } from 'vue'
+import Categories from "@/components/desk/knowledge_base/Categories.vue"
+import Articles from "@/components/desk/knowledge_base/Articles.vue"
+import { ref } from "vue"
 
 export default {
-	name: 'KnowledgeBase',
+	name: "KnowledgeBase",
 	components: {
 		Categories,
-		Articles
+		Articles,
 	},
 	props: {
 		categoryId: {
 			type: String,
-			default: ''
-		}
+			default: "",
+		},
 	},
 	setup(props) {
-		const selectedCategory = ref(props.categoryId || '')
+		const selectedCategory = ref(props.categoryId || "")
 
 		return {
-			selectedCategory
+			selectedCategory,
 		}
 	},
 	resources: {
 		categories() {
 			return {
-				method: 'frappe.client.get_list',
+				method: "frappe.client.get_list",
 				params: {
-					doctype: 'Category',
-					fields: ['name']
+					doctype: "Category",
+					fields: ["name"],
 				},
 				auto: true,
 				onSuccess: (res) => {
 					if (!this.selectedCategory) {
-						this.$router.push('/frappedesk/knowledge-base/' + res[0].name)
+						this.$router.push(
+							"/frappedesk/knowledge-base/" + res[0].name
+						)
 					}
-				}
+				},
 			}
-		}
-	}
+		},
+	},
 }
 </script>

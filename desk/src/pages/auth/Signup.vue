@@ -3,7 +3,7 @@
 		v-if="!signupStatus"
 		:title="this.$route.name === 'PortalSignup' ? 'Create an account' : ''"
 	>
-		<div v-if="(this.$route.name === 'PortalSignup')">
+		<div v-if="this.$route.name === 'PortalSignup'">
 			<form class="space-y-4" @submit.prevent="signup()">
 				<Input
 					label="Email"
@@ -31,7 +31,12 @@
 				/>
 				<ErrorMessage class="mt-4" error="" />
 				<div>
-					<Button appearance="primary" class="w-full mt-4" :loading="submitting" type="primary"> 
+					<Button
+						appearance="primary"
+						class="w-full mt-4"
+						:loading="submitting"
+						type="primary"
+					>
 						Submit
 					</Button>
 				</div>
@@ -46,31 +51,36 @@
 						</div>
 					</div>
 				</div>
-				<router-link 
-					class="text-center text-base" 
-					:to="`${this.$route.name === 'DeskSignup' ? '/frappedesk' : '/support'}/login`"
+				<router-link
+					class="text-center text-base"
+					:to="`${
+						this.$route.name === 'DeskSignup'
+							? '/frappedesk'
+							: '/support'
+					}/login`"
 				>
-					<div>
-						Already have an account? Log in.
-					</div>
+					<div>Already have an account? Log in.</div>
 				</router-link>
 			</form>
 		</div>
 		<div v-else class="text-base mt-[-20px]">
 			<div class="flex space-x-3">
-				<FeatherIcon name="alert-triangle" class="h-10 w-10 stroke-2 stroke-orange-500" />
-				<div>
-					Please ask the admin to add you as an agent
-				</div>
+				<FeatherIcon
+					name="alert-triangle"
+					class="h-10 w-10 stroke-2 stroke-orange-500"
+				/>
+				<div>Please ask the admin to add you as an agent</div>
 			</div>
 		</div>
 	</LoginBox>
 	<SuccessCard
 		class="mx-auto mt-20 w-96 shadow-md"
 		title="Verification Email Sent!"
-		v-else-if="signupStatus==='EMAIL SENT'"
+		v-else-if="signupStatus === 'EMAIL SENT'"
 	>
-		We have sent an email to <span class="font-semibold">{{ email }}</span>. Please click on the link received to verify your email and set up your account.
+		We have sent an email to <span class="font-semibold">{{ email }}</span
+		>. Please click on the link received to verify your email and set up
+		your account.
 	</SuccessCard>
 	<ErrorCard
 		class="mx-auto mt-20 w-96 shadow-md"
@@ -82,28 +92,30 @@
 				{{ error }}
 			</div>
 			<div>
-				<Button appearance="primary" @click="$router.go()">Try Again</Button>
+				<Button appearance="primary" @click="$router.go()"
+					>Try Again</Button
+				>
 			</div>
 		</div>
 	</ErrorCard>
 </template>
 
 <script>
-import LoginBox from '@/components/global/LoginBox.vue';
-import { Input, FeatherIcon, ErrorMessage } from 'frappe-ui'
-import SuccessCard from '@/components/global/SuccessCard.vue';
-import ErrorCard from '@/components/global/ErrorCard.vue';
-import { ref, inject } from 'vue';
+import LoginBox from "@/components/global/LoginBox.vue"
+import { Input, FeatherIcon, ErrorMessage } from "frappe-ui"
+import SuccessCard from "@/components/global/SuccessCard.vue"
+import ErrorCard from "@/components/global/ErrorCard.vue"
+import { ref, inject } from "vue"
 
 export default {
-	name: 'Signup',
+	name: "Signup",
 	components: {
 		LoginBox,
 		Input,
 		FeatherIcon,
 		ErrorMessage,
 		SuccessCard,
-		ErrorCard
+		ErrorCard,
 	},
 	setup() {
 		const email = ref(null)
@@ -113,48 +125,48 @@ export default {
 		const signupStatus = ref(null)
 		const error = ref(null)
 
-		const user = inject('user')
+		const user = inject("user")
 
 		const submitting = ref(false)
 
-		return { 
-			email, 
-			firstName, 
-			lastName, 
+		return {
+			email,
+			firstName,
+			lastName,
 			signupStatus,
-			user, 
+			user,
 			submitting,
-			error
+			error,
 		}
 	},
 	async mounted() {
 		if (this.user.isLoggedIn()) {
-			if (this.$route.name == 'PortalSignup') {
-				this.$router.push({ path: '/support/tickets' })
-			} else if(this.$route.name == 'DeskSignup') {
-				this.$router.push({ path: '/frappedesk/tickets' })
+			if (this.$route.name == "PortalSignup") {
+				this.$router.push({ path: "/support/tickets" })
+			} else if (this.$route.name == "DeskSignup") {
+				this.$router.push({ path: "/frappedesk/tickets" })
 			}
 		}
 	},
 	methods: {
 		async signup() {
 			this.submitting = true
-			
-			this.$event.on('user-signup-success', (res) => {
+
+			this.$event.on("user-signup-success", (res) => {
 				this.submitting = false
-				this.signupStatus = 'EMAIL SENT'
+				this.signupStatus = "EMAIL SENT"
 			})
-			this.$event.on('user-signup-error', (error) => {
+			this.$event.on("user-signup-error", (error) => {
 				this.error = error
 				this.submitting = false
-				this.signupStatus = 'SINGUP ERROR'
+				this.signupStatus = "SINGUP ERROR"
 			})
-			
+
 			await this.user.signup(this.email, this.firstName, this.lastName)
-			
-			this.$event.off('user-signup-success')
-			this.$event.off('user-signup-error')
-		}
-	}
-};
+
+			this.$event.off("user-signup-success")
+			this.$event.off("user-signup-error")
+		},
+	},
+}
 </script>

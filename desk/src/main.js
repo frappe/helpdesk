@@ -1,25 +1,31 @@
-import { createApp } from 'vue'
-import { FrappeUI, Button, Dialog, Input, onOutsideClickDirective } from 'frappe-ui'
-import router from './router'
-import App from './App.vue'
-import './index.css'
-import { dayjs } from '@/utils'
-import { createToast, clearToasts } from '@/utils/toasts'
-import { event } from '@/utils/event'
-import { socketio_port } from '../../../../sites/common_site_config.json'
+import { createApp } from "vue"
+import {
+	FrappeUI,
+	Button,
+	Dialog,
+	Input,
+	onOutsideClickDirective,
+} from "frappe-ui"
+import router from "./router"
+import App from "./App.vue"
+import "./index.css"
+import { dayjs } from "@/utils"
+import { createToast, clearToasts } from "@/utils/toasts"
+import { event } from "@/utils/event"
+import { socketio_port } from "../../../../sites/common_site_config.json"
 
 let app = createApp(App)
 
-app.directive('on-outside-click', onOutsideClickDirective)
+app.directive("on-outside-click", onOutsideClickDirective)
 app.use(router)
 app.use(FrappeUI, {
-    socketio: {
+	socketio: {
 		port: socketio_port,
 	},
 })
-app.component('Button', Button)
-app.component('Dialog', Dialog)
-app.component('Input', Input)
+app.component("Button", Button)
+app.component("Dialog", Dialog)
+app.component("Input", Input)
 
 app.config.globalProperties.$dayjs = dayjs
 app.config.globalProperties.$toast = createToast
@@ -27,4 +33,4 @@ app.config.globalProperties.$clearToasts = clearToasts
 
 app.config.globalProperties.$event = event
 
-app.mount('#app')
+app.mount("#app")

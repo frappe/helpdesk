@@ -5,14 +5,10 @@
 			:options="{
 				cache: ['SLA', 'Settings'],
 				doctype: 'SLA',
-				fields: [
-					'name',
-					'default_sla',
-					'enabled'
-				],
+				fields: ['name', 'default_sla', 'enabled'],
 				limit: 20,
 				start_page: initialPage,
-				route_query_pagination: true
+				route_query_pagination: true,
 			}"
 		>
 			<template #body="{ manager }">
@@ -22,31 +18,31 @@
 	</div>
 </template>
 <script>
-import { inject } from 'vue'
-import ListManager from '@/components/global/ListManager.vue'
-import SlaPolicyList from '@/components/desk/settings/policies/SlaPolicyList.vue'
+import { inject } from "vue"
+import ListManager from "@/components/global/ListManager.vue"
+import SlaPolicyList from "@/components/desk/settings/policies/SlaPolicyList.vue"
 
 export default {
-	name: 'SlaPolicies',
+	name: "SlaPolicies",
 	components: {
 		SlaPolicyList,
 		ListManager,
 	},
 	setup() {
-		const viewportWidth = inject('viewportWidth')
-		
-		return { 
-			viewportWidth 
+		const viewportWidth = inject("viewportWidth")
+
+		return {
+			viewportWidth,
 		}
 	},
 	data() {
 		return {
-			initialPage: 1
+			initialPage: 1,
 		}
 	},
 	mounted() {
-		this.$event.emit('set-selected-setting', 'Support Policies')
-		this.$event.emit('show-top-panel-actions-settings', 'Support Policies')
+		this.$event.emit("set-selected-setting", "Support Policies")
+		this.$event.emit("show-top-panel-actions-settings", "Support Policies")
 	},
 }
 </script>

@@ -1,87 +1,106 @@
-{% extends "templates/kb_base_template.html" %}
-
-{% block page_content %}
+{% extends "templates/kb_base_template.html" %} {% block page_content %}
 <div class="pt-4">
-	{{ frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html', {})}}
+	{{
+	frappe.render_template('templates/components/breadcrumbs/breadcrumbs.html',
+	{})}}
 </div>
 <div class="container">
 	<div class="col-sm-12 col-md-10 pl-0 mb-5">
 		<h2>{{ title }}</h2>
 		<div>
 			<i class="bi bi-clock smile mr-1"></i>
-			<span class="text-secondary" style="color: #A6B1B9;">Last updated on {{ frappe.format_date(modified) }}</span>
+			<span class="text-secondary" style="color: #a6b1b9"
+				>Last updated on {{ frappe.format_date(modified) }}</span
+			>
 		</div>
 		<div class="from-markdown my-8" itemprop="articleBody">
 			{{ content }}
 		</div>
-		<div class="card border-0 p-0 bg-light" style="width: min-content;">
+		<div class="card border-0 p-0 bg-light" style="width: min-content">
 			<div class="card-body feedback-view bg-gray-500">
-				<div id="feedbackQustion" class="article-feedback d-flex flex-nowrap">
-					<div style="white-space: nowrap;">{{ _("Did you find this useful?") }}</div>
-					<i class="happy-face feedback bi bi-emoji-smile mx-1 ml-3" data-value="Yes"></i>
-					<i class="sad-face feedback bi bi-emoji-frown mx-1" data-value="No"></i>
+				<div
+					id="feedbackQustion"
+					class="article-feedback d-flex flex-nowrap"
+				>
+					<div style="white-space: nowrap">
+						{{ _("Did you find this useful?") }}
+					</div>
+					<i
+						class="happy-face feedback bi bi-emoji-smile mx-1 ml-3"
+						data-value="Yes"
+					></i>
+					<i
+						class="sad-face feedback bi bi-emoji-frown mx-1"
+						data-value="No"
+					></i>
 				</div>
-				<span class="feedback-msg hidden" style="white-space: nowrap;">{{ _("Thank you for your feedback!") }}</span>
+				<span class="feedback-msg hidden" style="white-space: nowrap"
+					>{{ _("Thank you for your feedback!") }}</span
+				>
 			</div>
-		  </div>
+		</div>
 	</div>
 	<div class="col-sm-0 col-md-5 hidden">
 		<h2 class="mb-8">{{ _("Related") }}</h2>
-		{% set related_articles = frappe.get_all("Article", filters={"category": ["=", category]}, fields=["title", "route"]) %}
-		{% set max_related_articles = 5 %}
-		{% for related_article in related_articles %}
-		{% if loop.index < max_related_articles %}
+		{% set related_articles = frappe.get_all("Article", filters={"category":
+		["=", category]}, fields=["title", "route"]) %} {% set
+		max_related_articles = 5 %} {% for related_article in related_articles
+		%} {% if loop.index < max_related_articles %}
 		<div class="article-list mb-3">
-			<span style="color: #2490EF;" role="button" onclick="window.location='/{{ related_article.route }}'">{{ related_article.title }}</span>
+			<span
+				style="color: #2490ef"
+				role="button"
+				onclick="window.location='/{{ related_article.route }}'"
+				>{{ related_article.title }}</span
+			>
 		</div>
-		{% endif %}
-		{% endfor %}
+		{% endif %} {% endfor %}
 	</div>
 </div>
 
 <script>
-frappe.ready(function() {
-	frappe.set_search_path("/kb");
-    let article = "{{ reference_name or name }}"
-    
-    if(localStorage[`${article}_feedback_done`]) {
-		$("#feedbackQustion").empty();
-        $(".feedback-msg")[0].classList.remove("hidden");
-    } else {
-        frappe.call({
-            method: "frappedesk.frappedesk.doctype.article.article.increment_view",
-            args: {
-                article: article
-            }
-        });
-    }
+	frappe.ready(function () {
+		frappe.set_search_path("/kb")
+		let article = "{{ reference_name or name }}"
 
-	$(".feedback").click(function() {
-		let args = {
-			article: article,
-			helpful: this.getAttribute("data-value"),
+		if (localStorage[`${article}_feedback_done`]) {
+			$("#feedbackQustion").empty()
+			$(".feedback-msg")[0].classList.remove("hidden")
+		} else {
+			frappe.call({
+				method: "frappedesk.frappedesk.doctype.article.article.increment_view",
+				args: {
+					article: article,
+				},
+			})
 		}
 
-		frappe.call({
-			btn: this,
-			method: "frappedesk.frappedesk.doctype.article.article.add_feedback",
-			args: args,
-			callback: function(r) {
-				$("#feedbackQustion").empty();
-				$(".feedback-msg")[0].classList.remove("hidden");
-                localStorage[`${article}_feedback_done`] = true;
+		$(".feedback").click(function () {
+			let args = {
+				article: article,
+				helpful: this.getAttribute("data-value"),
 			}
+
+			frappe.call({
+				btn: this,
+				method: "frappedesk.frappedesk.doctype.article.article.add_feedback",
+				args: args,
+				callback: function (r) {
+					$("#feedbackQustion").empty()
+					$(".feedback-msg")[0].classList.remove("hidden")
+					localStorage[`${article}_feedback_done`] = true
+				},
+			})
 		})
-	});
-});
+	})
 </script>
 
 <style>
 	.happy-face:hover {
-		color: #48BB74;
+		color: #48bb74;
 	}
 	.sad-face:hover {
-		color: #E24C4C;
+		color: #e24c4c;
 	}
 </style>
 {% endblock %}

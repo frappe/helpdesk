@@ -4,8 +4,10 @@
 import frappe
 from frappe.model.document import Document
 
+
 class TicketActivity(Document):
 	pass
+
 
 def log_ticket_activity(ticket, action):
 	return frappe.get_doc(

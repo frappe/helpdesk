@@ -16,9 +16,7 @@ has_website_permission = {
 }
 
 doc_events = {
-	"*": {
-		"validate": "frappedesk.frappedesk.doctype.sla.sla.apply",
-	},
+	"*": {"validate": "frappedesk.frappedesk.doctype.sla.sla.apply",},
 	"Communication": {
 		"on_update": [
 			"frappedesk.frappedesk.doctype.sla.sla.on_communication_update",
@@ -26,11 +24,11 @@ doc_events = {
 		],
 		"after_insert": [
 			"frappedesk.frappedesk.doctype.ticket.ticket.set_descritption_from_communication",
-		]
+		],
 	},
 	"Contact": {"on_trash": "frappedesk.frappedesk.doctype.ticket.ticket.update_ticket",},
 	"Assignment Rule": {"on_trash": "frappedesk.overrides.on_assignment_rule_trash"},
-	"Agent": {"before_insert": "frappedesk.limits.validate_agent_count"}
+	"Agent": {"before_insert": "frappedesk.limits.validate_agent_count"},
 }
 
 scheduler_events = {
@@ -38,11 +36,7 @@ scheduler_events = {
 		"frappedesk.frappedesk.doctype.ticket.ticket.auto_close_tickets",
 		"frappedesk.frappedesk.doctype.sla.sla.check_agreement_status",
 	],
-	"cron": {
-		"* * * * * 0/5": [
-			"frappedesk.overrides.pull_support_emails"
-		]
-	}
+	"cron": {"* * * * * 0/5": ["frappedesk.overrides.pull_support_emails"]},
 }
 
 website_route_rules = [

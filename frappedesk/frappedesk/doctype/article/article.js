@@ -1,19 +1,19 @@
 // Copyright (c) 2021, Frappe Technologies and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Article', {
-	refresh: function(frm) {
-		frm.set_query("category", function() {
+frappe.ui.form.on("Article", {
+	refresh: function (frm) {
+		frm.set_query("category", function () {
 			return {
-				"filters": {
-					"is_group": "0",
-				}
-			};
-		});
+				filters: {
+					is_group: "0",
+				},
+			}
+		})
 
-		show_content_wrt_type(frm);
-		
-		frm.dashboard.clear_headline();
+		show_content_wrt_type(frm)
+
+		frm.dashboard.clear_headline()
 
 		frm.dashboard.set_headline_alert(`
 			<div class="row">
@@ -33,15 +33,15 @@ frappe.ui.form.on('Article', {
 					</span>
 				</div>
 			</div>
-		`);
+		`)
 	},
 
-	content_type: function(frm) {
-		show_content_wrt_type(frm);
-	}
-});
+	content_type: function (frm) {
+		show_content_wrt_type(frm)
+	},
+})
 
 function show_content_wrt_type(frm) {
-	frm.toggle_display('content_md', (frm.doc.content_type === "Markdown"));
-	frm.toggle_display('content', (frm.doc.content_type === "Rich Text"));
+	frm.toggle_display("content_md", frm.doc.content_type === "Markdown")
+	frm.toggle_display("content", frm.doc.content_type === "Rich Text")
 }

@@ -26,8 +26,9 @@ If you notice the browser URL is `/frontend`, this is the base URL where your fr
 To change this, open `src/router.js` and change the base URL passed to `createWebHistory`.
 
 ## Resources
-- [Vue 3](https://v3.vuejs.org/guide/introduction.html)
-- [Vue Router](https://next.router.vuejs.org/guide/)
-- [Frappe UI](https://github.com/frappe/frappe-ui)
-- [TailwindCSS](https://tailwindcss.com/docs/utility-first)
-- [Vite](https://vitejs.dev/guide/)
+
+-   [Vue 3](https://v3.vuejs.org/guide/introduction.html)
+-   [Vue Router](https://next.router.vuejs.org/guide/)
+-   [Frappe UI](https://github.com/frappe/frappe-ui)
+-   [TailwindCSS](https://tailwindcss.com/docs/utility-first)
+-   [Vite](https://vitejs.dev/guide/)

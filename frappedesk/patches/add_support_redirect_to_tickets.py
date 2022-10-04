@@ -1,4 +1,5 @@
 from frappedesk.setup.install import add_support_redirect_to_tickets
 
+
 def execute():
-    add_support_redirect_to_tickets()
+	add_support_redirect_to_tickets()

@@ -1,39 +1,60 @@
 <template>
-  <div>
-		<Dialog :options="{title: 'Create New Contact'}" v-model="open">
+	<div>
+		<Dialog :options="{ title: 'Create New Contact' }" v-model="open">
 			<template #body-content>
 				<div class="space-y-4">
 					<div class="space-y-1">
-						<Input label="Email Id" type="email" v-model="emailId" />
+						<Input
+							label="Email Id"
+							type="email"
+							v-model="emailId"
+						/>
 						<ErrorMessage :message="emailValidationError" />
 					</div>
 					<div class="space-y-1">
-						<Input label="First Name" type="text" v-model="firstName" />
+						<Input
+							label="First Name"
+							type="text"
+							v-model="firstName"
+						/>
 						<ErrorMessage :message="firstNameValidationError" />
 					</div>
 					<div class="space-y-1">
-						<Input label="Last Name (optional)" type="text" v-model="lastName" />
+						<Input
+							label="Last Name (optional)"
+							type="text"
+							v-model="lastName"
+						/>
 						<ErrorMessage :message="lastNameValidationError" />
 					</div>
 					<div class="space-y-1">
-						<Input label="Phone (optional)" type="text" v-model="phone" />
+						<Input
+							label="Phone (optional)"
+							type="text"
+							v-model="phone"
+						/>
 						<ErrorMessage :message="phoneValidationError" />
 					</div>
 					<div class="flex float-right space-x-2">
-						<Button :loading="this.$resources.createContact.loading" appearance="primary" @click="createContact()">Create</Button>
+						<Button
+							:loading="this.$resources.createContact.loading"
+							appearance="primary"
+							@click="createContact()"
+							>Create</Button
+						>
 					</div>
 				</div>
 			</template>
 		</Dialog>
-  </div>
+	</div>
 </template>
 
 <script>
-import { Input, Dialog, ErrorMessage } from 'frappe-ui'
-import { computed, ref, inject } from 'vue'
+import { Input, Dialog, ErrorMessage } from "frappe-ui"
+import { computed, ref, inject } from "vue"
 
 export default {
-	name: 'NewContactDialog',
+	name: "NewContactDialog",
 	props: {
 		modelValue: {
 			type: Boolean,
@@ -41,24 +62,31 @@ export default {
 		},
 	},
 	setup(props, { emit }) {
-		const emailValidationError = ref('')
-		const firstNameValidationError = ref('')
-		const lastNameValidationError = ref('')
-		const phoneValidationError = ref('')
+		const emailValidationError = ref("")
+		const firstNameValidationError = ref("")
+		const lastNameValidationError = ref("")
+		const phoneValidationError = ref("")
 
-		const contacts = inject('contacts')
+		const contacts = inject("contacts")
 
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
-				emit('update:modelValue', val)
+				emit("update:modelValue", val)
 				if (!val) {
-					emit('close')
+					emit("close")
 				}
 			},
 		})
 
-		return { open, contacts, emailValidationError, firstNameValidationError, lastNameValidationError, phoneValidationError }
+		return {
+			open,
+			contacts,
+			emailValidationError,
+			firstNameValidationError,
+			lastNameValidationError,
+			phoneValidationError,
+		}
 	},
 	data() {
 		return {
@@ -77,46 +105,46 @@ export default {
 		},
 		phone(newValue) {
 			this.validatePhone(newValue)
-		}
+		},
 	},
 	resources: {
 		createContact() {
 			return {
-				method: 'frappe.client.insert',
+				method: "frappe.client.insert",
 				onSuccess(data) {
-					this.emailId = ''
-					this.firstName = ''
-					this.lastName = ''
-					this.phone = ''
+					this.emailId = ""
+					this.firstName = ""
+					this.lastName = ""
+					this.phone = ""
 
-					this.$emit('contactCreated', data)
-				}
+					this.$emit("contactCreated", data)
+				},
 			}
-		}
+		},
 	},
 	components: {
 		Input,
 		Dialog,
-		ErrorMessage
+		ErrorMessage,
 	},
 	methods: {
 		createContact() {
 			if (this.validateInputs()) {
 				return
 			}
-			
+
 			let doc = {
-				doctype: 'Contact',
+				doctype: "Contact",
 				first_name: this.firstName,
 				last_name: this.lastName,
-				email_ids: [{ email_id: this.emailId, is_primary: true }]
+				email_ids: [{ email_id: this.emailId, is_primary: true }],
 			}
 			if (this.phone) {
-				doc.phone_nos = [{ phone: this.phone }] 
+				doc.phone_nos = [{ phone: this.phone }]
 			}
 
 			this.$resources.createContact.submit({
-				doc
+				doc,
 			})
 		},
 		validateInputs() {
@@ -134,40 +162,39 @@ export default {
 				return list
 			}
 
-			this.emailValidationError = ''
-			const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+			this.emailValidationError = ""
+			const reg =
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
 			if (!value) {
-				this.emailValidationError = 'Email should not be empty'
+				this.emailValidationError = "Email should not be empty"
 			} else if (!reg.test(value)) {
-				this.emailValidationError = 'Enter a valid email'
+				this.emailValidationError = "Enter a valid email"
 			} else if (existingContactEmails(this.contacts).includes(value)) {
-				this.emailValidationError = 'Contact with email already exists'
+				this.emailValidationError = "Contact with email already exists"
 			}
 			return this.emailValidationError
 		},
 		validateFirstName(value) {
-			this.firstNameValidationError = ''
+			this.firstNameValidationError = ""
 			if (!value) {
-				this.firstNameValidationError = 'First name should not be empty'
-			} else if (value.trim() == '') {
-				this.firstNameValidationError = 'First name should not be empty'
+				this.firstNameValidationError = "First name should not be empty"
+			} else if (value.trim() == "") {
+				this.firstNameValidationError = "First name should not be empty"
 			}
 			return this.firstNameValidationError
 		},
 		validatePhone(value) {
-			this.phoneValidationError = ''
+			this.phoneValidationError = ""
 			const reg = /[0-9]+/
 			if (!value) {
-				this.phoneValidationError = ''
+				this.phoneValidationError = ""
 			} else if (!reg.test(value) || value.length < 10) {
-				this.phoneValidationError = 'Enter a valid phone number'
+				this.phoneValidationError = "Enter a valid phone number"
 			}
 			return this.phoneValidationError
-		}
-	}
+		},
+	},
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

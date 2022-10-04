@@ -5,13 +5,14 @@ import frappe
 from frappe.website.website_generator import WebsiteGenerator
 from frappe import _
 from frappe.utils import cint
-from frappe.website.utils import (cleanup_page_name, get_html_content_based_on_type)
+from frappe.website.utils import cleanup_page_name, get_html_content_based_on_type
+
 
 class Article(WebsiteGenerator):
 	def before_insert(self):
 		self.author = frappe.session.user
 
-	#TODO: when renamed, website route should be updated
+	# TODO: when renamed, website route should be updated
 	def before_save(self):
 		if self.category:
 			self.route = self.get_page_route()
@@ -30,9 +31,10 @@ class Article(WebsiteGenerator):
 		return f"{category_doc.route}/{scrubbed_title}"
 
 	def get_context(self, context):
-		context.content = get_html_content_based_on_type(self, 'content', self.content_type)
+		context.content = get_html_content_based_on_type(self, "content", self.content_type)
 
 		return context
+
 
 @frappe.whitelist(allow_guest=True)
 def add_feedback(article, helpful):

@@ -1,5 +1,9 @@
 <template>
-	<Combobox v-model="selectedValue" nullable v-slot="{ open: isComboboxOpen }">
+	<Combobox
+		v-model="selectedValue"
+		nullable
+		v-slot="{ open: isComboboxOpen }"
+	>
 		<Popover class="w-full">
 			<template #target="{ open: openPopover }">
 				<div class="w-full">
@@ -7,17 +11,31 @@
 						<ComboboxButton
 							class="flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
 							:class="{ 'rounded-b-none': isComboboxOpen }"
-							@click="() => { openPopover() }"
+							@click="
+								() => {
+									openPopover()
+								}
+							"
 						>
-								<slot name="input" :selectedValue="selectedValue" :placeholder="placeholder">
-									<span class="text-base truncate" v-if="selectedValue">
-										{{ displayValue(selectedValue) }}
-									</span>
-									<span class="text-base text-gray-500" v-else>
-										{{ placeholder || '' }}
-									</span>
-								</slot>
-								<CustomIcons name="select" class="w-[12px] h-[12px] stroke-gray-500" />
+							<slot
+								name="input"
+								:selectedValue="selectedValue"
+								:placeholder="placeholder"
+							>
+								<span
+									class="text-base truncate"
+									v-if="selectedValue"
+								>
+									{{ displayValue(selectedValue) }}
+								</span>
+								<span class="text-base text-gray-500" v-else>
+									{{ placeholder || "" }}
+								</span>
+							</slot>
+							<CustomIcons
+								name="select"
+								class="w-[12px] h-[12px] stroke-gray-500"
+							/>
 						</ComboboxButton>
 					</slot>
 				</div>
@@ -35,9 +53,11 @@
 						<ComboboxInput
 							class="w-full placeholder-gray-500 form-input"
 							type="text"
-							@change="(e) => {
+							@change="
+								(e) => {
 									query = e.target.value
-							}"
+								}
+							"
 							:value="query"
 							autocomplete="off"
 							placeholder="Search by keyword"
@@ -60,11 +80,13 @@
 							{{ option.label }}
 						</li>
 					</ComboboxOption>
-					<slot 
+					<slot
 						v-if="filteredOptions.length == 0"
 						name="no-result-found"
 					>
-						<li class="px-2.5 py-1.5 rounded-md text-base text-gray-600">
+						<li
+							class="px-2.5 py-1.5 rounded-md text-base text-gray-600"
+						>
 							No results found
 						</li>
 					</slot>
@@ -80,14 +102,14 @@ import {
 	ComboboxOptions,
 	ComboboxOption,
 	ComboboxButton,
-} from '@headlessui/vue'
-import { Popover } from 'frappe-ui'
-import CustomIcons from '@/components/desk/global/CustomIcons.vue'
+} from "@headlessui/vue"
+import { Popover } from "frappe-ui"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
-	name: 'Autocomplete',
-	props: ['modelValue', 'options', 'placeholder', 'width'],
-	emits: ['update:modelValue', 'change'],
+	name: "Autocomplete",
+	props: ["modelValue", "options", "placeholder", "width"],
+	emits: ["update:modelValue", "change"],
 	components: {
 		Popover,
 		CustomIcons,
@@ -99,20 +121,25 @@ export default {
 	},
 	data() {
 		return {
-			query: '',
+			query: "",
 		}
 	},
 	computed: {
 		valuePropPassed() {
-			return 'value' in this.$attrs
+			return "value" in this.$attrs
 		},
 		selectedValue: {
 			get() {
-				return this.valuePropPassed ? this.$attrs.value : this.modelValue
+				return this.valuePropPassed
+					? this.$attrs.value
+					: this.modelValue
 			},
 			set(val) {
-				this.query = ''
-				this.$emit(this.valuePropPassed ? 'change' : 'update:modelValue', val)
+				this.query = ""
+				this.$emit(
+					this.valuePropPassed ? "change" : "update:modelValue",
+					val
+				)
 			},
 		},
 		filteredOptions() {
@@ -122,21 +149,23 @@ export default {
 			return this.options.filter((option) => {
 				let searchTexts = [option.label, option.value]
 				return searchTexts.some((text) =>
-					(text || '').toLowerCase().includes(this.query.toLowerCase())
+					(text || "")
+						.toLowerCase()
+						.includes(this.query.toLowerCase())
 				)
 			})
 		},
 	},
 	methods: {
 		displayValue(option) {
-			if (typeof option === 'string') {
+			if (typeof option === "string") {
 				return option
 			}
 			return option?.label
 		},
 		foo() {
-			console.log('foo')
-		}
+			console.log("foo")
+		},
 	},
 }
 </script>

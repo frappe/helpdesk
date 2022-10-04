@@ -4,14 +4,14 @@
 		:title="!forgot ? 'Log in to your account' : 'Reset your password'"
 	>
 		<form class="space-y-4" @submit.prevent="login">
-			<Input 
-				required 
+			<Input
+				required
 				label="Email"
 				:type="email !== 'Administrator' ? 'email' : 'text'"
-				v-model="email" 
-				placeholder="johndeo@gmail.com" 
+				v-model="email"
+				placeholder="johndeo@gmail.com"
 			/>
-			<Input 
+			<Input
 				v-if="!forgot"
 				label="Password"
 				type="password"
@@ -19,13 +19,15 @@
 				v-model="password"
 				name="password"
 				autocomplete="current-password"
-				required 
+				required
 			/>
 			<div class="mt-2 text-sm">
 				<router-link v-if="forgot" to="/login">
 					I remember my password
 				</router-link>
-				<router-link v-else to="/login/forgot"> Forgot Password </router-link>
+				<router-link v-else to="/login/forgot">
+					Forgot Password
+				</router-link>
 			</div>
 			<ErrorMessage :error="errorMessage" class="mt-4" />
 			<Button
@@ -48,13 +50,15 @@
 							</span>
 						</div>
 					</div>
-					<router-link 
+					<router-link
 						class="text-center text-base"
-						:to="`${this.$route.name === 'DeskLogin' ? '/frappedesk' : '/support'}/signup`"
+						:to="`${
+							this.$route.name === 'DeskLogin'
+								? '/frappedesk'
+								: '/support'
+						}/signup`"
 					>
-						<div>
-							Sign up for a new account
-						</div>
+						<div>Sign up for a new account</div>
 					</router-link>
 				</template>
 			</div>
@@ -67,44 +71,52 @@
 </template>
 
 <script>
-import LoginBox from "@/components/global/LoginBox.vue";
-import { Input } from 'frappe-ui'
-import { ref, inject } from 'vue';
+import LoginBox from "@/components/global/LoginBox.vue"
+import { Input } from "frappe-ui"
+import { ref, inject } from "vue"
 
 export default {
 	name: "Login",
 	props: {
 		forgot: {
-			default: false
-		}
+			default: false,
+		},
 	},
 	components: {
 		LoginBox,
-		Input
+		Input,
 	},
 	setup() {
 		const state = ref(null) // Idle, Logging In, Login Error
-		const email =  ref(null)
-		const password =  ref(null)
-		const errorMessage =  ref(null)
-		const successMessage =  ref(null)
-		const redirect_route =  ref(null)
+		const email = ref(null)
+		const password = ref(null)
+		const errorMessage = ref(null)
+		const successMessage = ref(null)
+		const redirect_route = ref(null)
 
-		const user = inject('user')
+		const user = inject("user")
 
-		return { state, email, password, errorMessage, successMessage, redirect_route, user }
+		return {
+			state,
+			email,
+			password,
+			errorMessage,
+			successMessage,
+			redirect_route,
+			user,
+		}
 	},
 	watch: {
 		forgot() {
-			this.errorMessage = null;
-			this.state = null;
-			this.password = null;
-			this.successMessage = null;
-		}
+			this.errorMessage = null
+			this.state = null
+			this.password = null
+			this.successMessage = null
+		},
 	},
 	async mounted() {
 		if (this.$route?.query?.route) {
-			this.redirect_route = this.$route.query.route;
+			this.redirect_route = this.$route.query.route
 		}
 		if (this.user.isLoggedIn()) {
 			this.redirect()
@@ -113,41 +125,42 @@ export default {
 	methods: {
 		async loginOrResetPassword() {
 			try {
-				this.errorMessage = null;
-				this.state = 'RequestStarted';
+				this.errorMessage = null
+				this.state = "RequestStarted"
 				if (!this.forgot) {
-					await this.login();
+					await this.login()
 				} else {
-					await this.resetPassword();
+					await this.resetPassword()
 				}
 			} catch (error) {
 				console.error(error)
-				this.errorMessage = error.messages.join('\n');
+				this.errorMessage = error.messages.join("\n")
 			} finally {
-				this.state = null;
+				this.state = null
 			}
 		},
 		async login() {
 			if (this.email && this.password) {
-				await this.user.login(this.email, this.password);
+				await this.user.login(this.email, this.password)
 				this.redirect()
 			}
 		},
 		async resetPassword() {
-			await this.user.resetPassword(this.email);
-			this.successMessage = true;
+			await this.user.resetPassword(this.email)
+			this.successMessage = true
 		},
 		redirect() {
 			if (this.redirect_route) {
 				window.location.href = this.redirect_route
 			} else {
-				window.location.href = (this.$route.name == 'DeskLogin') ? '/frappedesk/tickets' : '/support/tickets'
+				window.location.href =
+					this.$route.name == "DeskLogin"
+						? "/frappedesk/tickets"
+						: "/support/tickets"
 			}
-		}
-	}
+		},
+	},
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
