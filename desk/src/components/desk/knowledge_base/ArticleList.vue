@@ -127,7 +127,14 @@
 						:selected="manager.itemSelected(article)"
 					/>
 				</div>
-				<ListPageController :manager="manager" />
+				<div class="pb-2">
+					<Button
+						v-if="manager.hasNextPage"
+						@click="manager.nextPage()"
+					>
+						Load More
+					</Button>
+				</div>
 			</div>
 		</div>
 		<div v-else>
@@ -144,7 +151,6 @@
 <script>
 import ArticleListItem from "./ArticleListItem.vue"
 import CustomIcons from "../global/CustomIcons.vue"
-import ListPageController from "../../global/ListPageController.vue"
 import { inject } from "vue"
 
 export default {
@@ -153,7 +159,6 @@ export default {
 	components: {
 		ArticleListItem,
 		CustomIcons,
-		ListPageController,
 	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")

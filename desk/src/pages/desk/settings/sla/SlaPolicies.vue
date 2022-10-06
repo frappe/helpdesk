@@ -7,8 +7,6 @@
 				doctype: 'SLA',
 				fields: ['name', 'default_sla', 'enabled'],
 				limit: 20,
-				start_page: initialPage,
-				route_query_pagination: true,
 			}"
 		>
 			<template #body="{ manager }">
@@ -33,11 +31,6 @@ export default {
 
 		return {
 			viewportWidth,
-		}
-	},
-	data() {
-		return {
-			initialPage: 1,
 		}
 	},
 	mounted() {

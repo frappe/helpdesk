@@ -15,7 +15,6 @@
 					filters: {
 						_assign: ['like', `%${agent}%`],
 					},
-					route_query_pagination: true,
 				}"
 			>
 				<template #body="{ manager }">
@@ -30,7 +29,14 @@
 							}"
 							:manager="manager"
 						/>
-						<ListPageController :manager="manager" />
+						<div class="pb-2">
+							<Button
+								v-if="manager.hasNextPage"
+								@click="manager.nextPage()"
+							>
+								Load More
+							</Button>
+						</div>
 					</div>
 				</template>
 			</ListManager>
@@ -47,7 +53,6 @@
 import AgentRelatedInfoTopPanel from "./AgentRelatedInfoTopPanel.vue"
 import MiniTicketList from "@/components/desk/global/MiniTicketList.vue"
 import ListManager from "@/components/global/ListManager.vue"
-import ListPageController from "@/components/global/ListPageController.vue"
 import { ref, inject } from "vue"
 
 export default {
@@ -57,7 +62,6 @@ export default {
 		AgentRelatedInfoTopPanel,
 		MiniTicketList,
 		ListManager,
-		ListPageController,
 	},
 	setup() {
 		const relatedInfoToShow = ref("tickets")
