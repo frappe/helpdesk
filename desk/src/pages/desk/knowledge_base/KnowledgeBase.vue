@@ -6,6 +6,6 @@
 
 <script>
 export default {
-	name: 'KnowledgeBase',
+	name: "KnowledgeBase",
 }
 </script>

@@ -13,10 +13,12 @@
 					:editable="true"
 					:extensions="[CustomHardBreakExtention]"
 					:mentions="mentions"
-					@change="(val) => {
-						content = val 
-						this.$emit('change', val)
-					}"
+					@change="
+						(val) => {
+							content = val
+							this.$emit('change', val)
+						}
+					"
 				/>
 			</div>
 			<slot v-if="editor" name="bottom-section" :editor="editor"></slot>
@@ -31,7 +33,10 @@
 				/>
 			</template>
 			<template #actions>
-				<Button appearance="primary" @click="setLink(setLinkDialog.url)">
+				<Button
+					appearance="primary"
+					@click="setLink(setLinkDialog.url)"
+				>
 					Save
 				</Button>
 			</template>
@@ -40,16 +45,16 @@
 </template>
 
 <script>
-import { TextEditor } from 'frappe-ui'
-import { HardBreak } from '@tiptap/extension-hard-break'
-import { ref, computed, nextTick } from 'vue'
+import { TextEditor } from "frappe-ui"
+import { HardBreak } from "@tiptap/extension-hard-break"
+import { ref, computed, nextTick } from "vue"
 
 export default {
-	name: 'CustomTextEditor',
-	props: ['content', 'placeholder', 'editorClasses', 'show', 'mentions'],
-	emits: ['change'],
+	name: "CustomTextEditor",
+	props: ["content", "placeholder", "editorClasses", "show", "mentions"],
+	emits: ["change"],
 	components: {
-		TextEditor
+		TextEditor,
 	},
 	setup() {
 		const textEditor = ref(null)
@@ -62,25 +67,35 @@ export default {
 			})
 		}
 
-		const setLinkDialog = ref({url: '', show: false})
+		const setLinkDialog = ref({ url: "", show: false })
 		const insertLink = () => {
 			setLinkDialog.value.show = true
-			let existingURL = editor.value?.getAttributes('link').href
+			let existingURL = editor.value?.getAttributes("link").href
 			if (existingURL) {
 				setLinkDialog.value.url = existingURL
 			}
 		}
 		const setLink = (url) => {
 			// empty
-			if (url === '') {
-				editor.value?.chain().focus().extendMarkRange('link').unsetLink().run()
+			if (url === "") {
+				editor.value
+					?.chain()
+					.focus()
+					.extendMarkRange("link")
+					.unsetLink()
+					.run()
 			} else {
 				// update link
-				editor.value?.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+				editor.value
+					?.chain()
+					.focus()
+					.extendMarkRange("link")
+					.setLink({ href: url })
+					.run()
 			}
 
 			setLinkDialog.value.show = false
-			setLinkDialog.value.url = ''
+			setLinkDialog.value.url = ""
 		}
 
 		return {
@@ -89,19 +104,19 @@ export default {
 			insertLink,
 			setLink,
 			focusEditor,
-			editor
+			editor,
 		}
 	},
 	computed: {
 		CustomHardBreakExtention() {
 			return HardBreak.extend({
-				addKeyboardShortcuts () {
+				addKeyboardShortcuts() {
 					return {
-						Enter: () => this.editor.commands.setHardBreak()
+						Enter: () => this.editor.commands.setHardBreak(),
 					}
-				}
+				},
 			})
-		}
-	}
+		},
+	},
 }
 </script>

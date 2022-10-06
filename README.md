@@ -3,16 +3,16 @@
 
 **Open Source Helpdesk** </br>
 [frappedesk.com](https://frappedesk.com)
+
 </div>
 
 ---
 
-
 FrappeDesk offers an easy setup, clean user interface, and automation tools to resolve customer issues efficiently. It is based on Frappe Framework. It lets you streamline your company's support and helps you to efficiently manage your customer queries. It can help you to,
 
-- Create tickets from email or help center
-- Empower customers with a comprehensive knowledge base and self-service portal
-- Automate redundant tasks like agent assignment and set up triggers to notify agents and customers based on certain events
+-   Create tickets from email or help center
+-   Empower customers with a comprehensive knowledge base and self-service portal
+-   Automate redundant tasks like agent assignment and set up triggers to notify agents and customers based on certain events
 
 <img src="https://user-images.githubusercontent.com/46772424/180410739-a64b8b65-43b4-4ec8-8a87-1f5e97f355e0.png" width=" ">
 
@@ -39,4 +39,5 @@ There are many ways you can contribute even if you don't code:
 3. You can join our [telegram group](https://t.me/frappedesk) and share your thoughts.
 
 ## License
+
 [GNU Affero General Public License v3.0](https://github.com/frappe/desk/blob/main/licence.md)

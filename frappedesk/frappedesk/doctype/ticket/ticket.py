@@ -15,7 +15,10 @@ from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
-from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import log_ticket_activity
+from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
+	log_ticket_activity,
+)
+
 
 class Ticket(Document):
 	def autoname(self):
@@ -37,9 +40,9 @@ class Ticket(Document):
 		log_ticket_activity(self.name, "created")
 
 	def update_priority_based_on_ticket_type(self):
-		if (self.ticket_type):
+		if self.ticket_type:
 			ticket_type_doc = frappe.get_doc("Ticket Type", self.ticket_type)
-			if (ticket_type_doc.priority):
+			if ticket_type_doc.priority:
 				self.priority = ticket_type_doc.priority
 				self.save()
 
@@ -145,11 +148,7 @@ class Ticket(Document):
 					return
 
 		clear_all_assignments("Ticket", self.name)
-		assign({
-			"assign_to": [agent],
-			"doctype": "Ticket",
-			"name": self.name
-		})
+		assign({"assign_to": [agent], "doctype": "Ticket", "name": self.name})
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 
@@ -158,18 +157,20 @@ class Ticket(Document):
 		for activity in activities:
 			frappe.db.delete("Ticket Activity", activity)
 
+
 def set_descritption_from_communication(doc, type):
 	if doc.reference_doctype == "Ticket":
 		ticket_doc = frappe.get_doc("Ticket", doc.reference_name)
 		if not ticket_doc.via_customer_portal:
 			ticket_doc.description = doc.content
 
+
 @frappe.whitelist()
 def create_communication_via_contact(ticket, message, attachments=[]):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 
-	if ticket_doc.status == 'Replied':
-		ticket_doc.status = 'Open'
+	if ticket_doc.status == "Replied":
+		ticket_doc.status = "Open"
 		log_ticket_activity(ticket, f"status set to Open")
 		ticket_doc.save(ignore_permissions=True)
 
@@ -198,24 +199,41 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 		file_doc.attached_to_doctype = "Communication"
 		file_doc.save(ignore_permissions=True)
 
+
 @frappe.whitelist(allow_guest=True)
 def create_communication_via_agent(ticket, message, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
-	last_ticket_communication_doc = frappe.get_last_doc("Communication", filters={"reference_name":[ "=", ticket_doc.name]})
+	last_ticket_communication_doc = frappe.get_last_doc(
+		"Communication", filters={"reference_name": ["=", ticket_doc.name]}
+	)
 
-	sent_email = True	# if not set email will not be sent
+	sent_email = True  # if not set email will not be sent
 	reply_email_account = None
 
-	ticket_email_account = last_ticket_communication_doc.email_account if last_ticket_communication_doc else None
+	ticket_email_account = (
+		last_ticket_communication_doc.email_account if last_ticket_communication_doc else None
+	)
 
-	default_ticket_outgoing_email_account = frappe.get_value("Email Account", [["use_imap", "=", 1], ["IMAP Folder","append_to","=","Ticket"], ["default_outgoing","=",1]])
-	default_outgoing_email_account = frappe.get_value("Email Account", [["Email Account","default_outgoing","=",1]])
+	default_ticket_outgoing_email_account = frappe.get_value(
+		"Email Account",
+		[
+			["use_imap", "=", 1],
+			["IMAP Folder", "append_to", "=", "Ticket"],
+			["default_outgoing", "=", 1],
+		],
+	)
+	default_outgoing_email_account = frappe.get_value(
+		"Email Account", [["Email Account", "default_outgoing", "=", 1]]
+	)
 
 	just_sent_email_notification = False
 
 	# 1 if not via customer portal check if email account is set in ticket doc, else check if default outgoing is available, else throw error
 	if not ticket_doc.via_customer_portal:
-		if ticket_email_account and frappe.get_doc("Email Account", ticket_email_account).enable_outgoing:
+		if (
+			ticket_email_account
+			and frappe.get_doc("Email Account", ticket_email_account).enable_outgoing
+		):
 			reply_email_account = ticket_email_account
 		elif default_ticket_outgoing_email_account:
 			reply_email_account = default_ticket_outgoing_email_account
@@ -223,10 +241,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			reply_email_account = default_outgoing_email_account
 			just_sent_email_notification = True
 		else:
-			return {
-				"status": "error",
-				"error_code": "No default outgoing email available"
-			}
+			return {"status": "error", "error_code": "No default outgoing email available"}
 	else:
 		if default_ticket_outgoing_email_account:
 			# 2 if via customer portal, check if a default outgoing email with IMAP folder with ticket doctype is present, if so use that
@@ -248,12 +263,14 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			"email_status": "Open",
 			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
 			"sender": frappe.session.user,
-			"recipients": frappe.get_value("User", "Administrator", "email") if ticket_doc.raised_by == 'Administrator' else ticket_doc.raised_by,
+			"recipients": frappe.get_value("User", "Administrator", "email")
+			if ticket_doc.raised_by == "Administrator"
+			else ticket_doc.raised_by,
 			"content": message,
 			"status": "Linked",
 			"reference_doctype": "Ticket",
 			"reference_name": ticket_doc.name,
-			"email_account": reply_email_account
+			"email_account": reply_email_account,
 		}
 	)
 	communication.ignore_permissions = True
@@ -261,14 +278,14 @@ def create_communication_via_agent(ticket, message, attachments=None):
 	communication.save(ignore_permissions=True)
 
 	_attachments = []
-	
+
 	for attachment in attachments:
 		file_doc = frappe.get_doc("File", attachment)
 		file_doc.attached_to_name = communication.name
 		file_doc.attached_to_doctype = "Communication"
 		file_doc.save(ignore_permissions=True)
-		
-		_attachments.append({'file_url': file_doc.file_url})
+
+		_attachments.append({"file_url": file_doc.file_url})
 
 	if sent_email:
 		reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
@@ -278,13 +295,17 @@ def create_communication_via_agent(ticket, message, attachments=None):
 					sender=reply_to_email,
 					reply_to=reply_to_email,
 					recipients=[ticket_doc.raised_by],
-					reference_doctype='Ticket',
+					reference_doctype="Ticket",
 					reference_name=ticket_doc.name,
 					communication=communication.name,
 					attachments=_attachments if len(_attachments) > 0 else None,
 					subject=f"[Ticket #{ticket_doc.name}] New reply",
 					template="new_reply_on_customer_portal_notification",
-					args={"ticket_id": ticket_doc.name, "message": message, "portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}"},
+					args={
+						"ticket_id": ticket_doc.name,
+						"message": message,
+						"portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}",
+					},
 					now=True,
 				)
 			else:
@@ -294,22 +315,23 @@ def create_communication_via_agent(ticket, message, attachments=None):
 					reply_to=reply_to_email,
 					message=message,
 					recipients=[ticket_doc.raised_by],
-					reference_doctype='Ticket',
+					reference_doctype="Ticket",
 					reference_name=ticket_doc.name,
 					communication=communication.name,
 					attachments=_attachments if len(_attachments) > 0 else None,
 					now=True,
 				)
 		except:
-			frappe.throw("Either setup up support email account or there should be a default outgoing email account")
+			frappe.throw(
+				"Either setup up support email account or there should be a default"
+				" outgoing email account"
+			)
 	else:
-		return {
-			"status": "error",
-			"error_code": "No default outgoing email available"
-		}
+		return {"status": "error", "error_code": "No default outgoing email available"}
 	return {
 		"status": "success",
 	}
+
 
 @frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):
@@ -320,41 +342,54 @@ def update_ticket_status_via_customer_portal(ticket, new_status):
 
 	return ticket_doc.status
 
+
 @frappe.whitelist()
 def get_all_conversations(ticket):
-	conversations = frappe.db.get_all("Communication", filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]}, order_by="creation asc", fields=["name", "content", "creation", "sent_or_received", "sender"])
-	
+	conversations = frappe.db.get_all(
+		"Communication",
+		filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]},
+		order_by="creation asc",
+		fields=["name", "content", "creation", "sent_or_received", "sender"],
+	)
+
 	for conversation in conversations:
 		if frappe.db.exists("Agent", conversation.sender):
 			# user User details instead of Contact if the sender is an agent
 			sender = frappe.get_doc("User", conversation.sender).__dict__
-			sender['image'] = sender['user_image']
+			sender["image"] = sender["user_image"]
 		else:
-			contacts = frappe.get_all('Contact Email', filters=[['email_id', 'like', '%{0}'.format(conversation.sender)]], fields=["parent"], limit=1)
+			contacts = frappe.get_all(
+				"Contact Email",
+				filters=[["email_id", "like", "%{0}".format(conversation.sender)]],
+				fields=["parent"],
+				limit=1,
+			)
 			if len(contacts) > 0:
 				sender = frappe.get_doc("Contact", contacts[0].parent)
 			else:
-				sender = frappe.get_last_doc("User", filters={'email': conversation.sender})
+				sender = frappe.get_last_doc("User", filters={"email": conversation.sender})
 
 		conversation.sender = sender
 
 		attachments = frappe.get_all(
-			"File", 
+			"File",
 			["file_name", "file_url"],
-			{"attached_to_name": conversation.name, "attached_to_doctype": "Communication"}
+			{"attached_to_name": conversation.name, "attached_to_doctype": "Communication"},
 		)
 
 		conversation.attachments = attachments
 	return conversations
+
 
 @frappe.whitelist()
 def get_all_attachments(ticket):
 	attachments = frappe.get_all(
 		"File",
 		["file_name", "file_url"],
-		{"attached_to_name": ticket, "attached_to_doctype": "Ticket"}
+		{"attached_to_name": ticket, "attached_to_doctype": "Ticket"},
 	)
 	return attachments
+
 
 def get_list_context(context=None):
 	return {
@@ -366,17 +401,36 @@ def get_list_context(context=None):
 		"no_breadcrumbs": True,
 	}
 
-@frappe.whitelist()
-def get_user_tickets(filters='{}', order_by='creation desc', impersonate=None):
-	print(f'CALL: get_user_tickets, filters: {filters} order_by: {order_by} impersonate: {impersonate}')
-	filters = json.loads(filters)
-	filters['raised_by'] = ['=', frappe.session.user]
-	
-	if impersonate and frappe.db.exists("Agent", frappe.session.user):
-		filters['raised_by'] = ['=', impersonate]
 
-	tickets = frappe.get_all("Ticket", filters=filters, order_by=order_by, fields=['name', 'subject', 'description', 'status', 'creation', 'feedback_submitted', 'satisfied', 'customer_feedback'])
+@frappe.whitelist()
+def get_user_tickets(filters="{}", order_by="creation desc", impersonate=None):
+	print(
+		f"CALL: get_user_tickets, filters: {filters} order_by: {order_by} impersonate:"
+		f" {impersonate}"
+	)
+	filters = json.loads(filters)
+	filters["raised_by"] = ["=", frappe.session.user]
+
+	if impersonate and frappe.db.exists("Agent", frappe.session.user):
+		filters["raised_by"] = ["=", impersonate]
+
+	tickets = frappe.get_all(
+		"Ticket",
+		filters=filters,
+		order_by=order_by,
+		fields=[
+			"name",
+			"subject",
+			"description",
+			"status",
+			"creation",
+			"feedback_submitted",
+			"satisfied",
+			"customer_feedback",
+		],
+	)
 	return tickets
+
 
 def get_ticket_list(
 	doctype, txt, filters, limit_start, limit_page_length=20, order_by=None
@@ -423,7 +477,9 @@ def set_status(name, status):
 def auto_close_tickets():
 	"""Auto-close replied support tickets after 7 days"""
 	auto_close_after_days = (
-		frappe.db.get_value("Frappe Desk Settings", "Frappe Desk Settings", "close_ticket_after_days")
+		frappe.db.get_value(
+			"Frappe Desk Settings", "Frappe Desk Settings", "close_ticket_after_days"
+		)
 		or 7
 	)
 
@@ -514,9 +570,7 @@ def calculate_first_response_time(ticket, first_responded_on):
 	ticket_creation_date = ticket.creation
 	ticket_creation_time = get_time_in_seconds(ticket_creation_date)
 	first_responded_on_in_seconds = get_time_in_seconds(first_responded_on)
-	support_hours = frappe.get_cached_doc(
-		"SLA", ticket.sla
-	).support_and_resolution
+	support_hours = frappe.get_cached_doc("SLA", ticket.sla).support_and_resolution
 
 	if ticket_creation_date.day == first_responded_on.day:
 		if is_work_day(ticket_creation_date, support_hours):

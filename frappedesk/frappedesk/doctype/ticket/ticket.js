@@ -2,46 +2,60 @@ frappe.ui.form.on("Ticket", {
 	refresh: function (frm) {
 		frm.add_web_link(
 			`/frappedesk/tickets/${frm.doc.name}`,
-			'View in FrappeDesk'
-		);
+			"View in FrappeDesk"
+		)
 	},
 
-	onload: function(frm) {
-		frm.email_field = "raised_by";
+	onload: function (frm) {
+		frm.email_field = "raised_by"
 
-		frappe.db.get_value("Frappe Desk Settings", {name: "Frappe Desk Settings"},
-			["allow_resetting_service_level_agreement", "track_service_level_agreement"], (r) => {
+		frappe.db.get_value(
+			"Frappe Desk Settings",
+			{ name: "Frappe Desk Settings" },
+			[
+				"allow_resetting_service_level_agreement",
+				"track_service_level_agreement",
+			],
+			(r) => {
 				if (r && r.track_service_level_agreement == "0") {
-					frm.set_df_property("service_level_section", "hidden", 1);
+					frm.set_df_property("service_level_section", "hidden", 1)
 				}
 				if (r && r.allow_resetting_service_level_agreement == "0") {
-					frm.set_df_property("reset_service_level_agreement", "hidden", 1);
+					frm.set_df_property(
+						"reset_service_level_agreement",
+						"hidden",
+						1
+					)
 				}
-			});
+			}
+		)
 
 		// buttons
 		if (frm.doc.status !== "Closed") {
-			frm.add_custom_button(__("Close"), function() {
-				frm.set_value("status", "Closed");
-				frm.save();
-			});
+			frm.add_custom_button(__("Close"), function () {
+				frm.set_value("status", "Closed")
+				frm.save()
+			})
 
-			frm.add_custom_button(__("Task"), function() {
-				frappe.model.open_mapped_doc({
-					method: "erpnext.support.doctype.ticket.ticket.make_task",
-					frm: frm
-				});
-			}, __("Create"));
-
+			frm.add_custom_button(
+				__("Task"),
+				function () {
+					frappe.model.open_mapped_doc({
+						method: "erpnext.support.doctype.ticket.ticket.make_task",
+						frm: frm,
+					})
+				},
+				__("Create")
+			)
 		} else {
-			frm.add_custom_button(__("Reopen"), function() {
-				frm.set_value("status", "Open");
-				frm.save();
-			});
+			frm.add_custom_button(__("Reopen"), function () {
+				frm.set_value("status", "Open")
+				frm.save()
+			})
 		}
 	},
 
-	reset_service_level_agreement: function(frm) {
+	reset_service_level_agreement: function (frm) {
 		let reset_sla = new frappe.ui.Dialog({
 			title: __("Reset SLA"),
 			fields: [
@@ -49,47 +63,53 @@ frappe.ui.form.on("Ticket", {
 					fieldtype: "Data",
 					fieldname: "reason",
 					label: __("Reason"),
-					reqd: 1
-				}
+					reqd: 1,
+				},
 			],
 			primary_action_label: __("Reset"),
 			primary_action: (values) => {
-				reset_sla.disable_primary_action();
-				reset_sla.hide();
-				reset_sla.clear();
+				reset_sla.disable_primary_action()
+				reset_sla.hide()
+				reset_sla.clear()
 
 				frappe.show_alert({
 					indicator: "green",
-					message: __("Resetting SLA.")
-				});
+					message: __("Resetting SLA."),
+				})
 
-				frappe.call("erpnext.support.doctype.sla.sla.reset_service_level_agreement", {
-					reason: values.reason,
-					user: frappe.session.user_email
-				}, () => {
-					reset_sla.enable_primary_action();
-					frm.refresh();
-					frappe.msgprint(__("SLA was reset."));
-				});
-			}
-		});
+				frappe.call(
+					"erpnext.support.doctype.sla.sla.reset_service_level_agreement",
+					{
+						reason: values.reason,
+						user: frappe.session.user_email,
+					},
+					() => {
+						reset_sla.enable_primary_action()
+						frm.refresh()
+						frappe.msgprint(__("SLA was reset."))
+					}
+				)
+			},
+		})
 
-		reset_sla.show();
+		reset_sla.show()
 	},
 
-	timeline_refresh: function(frm) {
+	timeline_refresh: function (frm) {
 		if (!frm.timeline.wrapper.find(".btn-split-ticket").length) {
 			let split_ticket_btn = $(`
 				<a class="action-btn btn-split-ticket" title="${__("Split Ticket")}">
-					${frappe.utils.icon('branch', 'sm')}
+					${frappe.utils.icon("branch", "sm")}
 				</a>
-			`);
+			`)
 
-			let communication_box = frm.timeline.wrapper.find('.timeline-item[data-doctype="Communication"]');
-			communication_box.find('.actions').prepend(split_ticket_btn);
+			let communication_box = frm.timeline.wrapper.find(
+				'.timeline-item[data-doctype="Communication"]'
+			)
+			communication_box.find(".actions").prepend(split_ticket_btn)
 
 			if (!frm.timeline.wrapper.data("split-ticket-event-attached")) {
-				frm.timeline.wrapper.on('click', '.btn-split-ticket', (e) => {
+				frm.timeline.wrapper.on("click", ".btn-split-ticket", (e) => {
 					var dialog = new frappe.ui.Dialog({
 						title: __("Split Ticket"),
 						fields: [
@@ -98,24 +118,34 @@ frappe.ui.form.on("Ticket", {
 								fieldtype: "Data",
 								reqd: 1,
 								label: __("Subject"),
-								description: __("All communications including and above this shall be moved into the new Ticket")
-							}
+								description: __(
+									"All communications including and above this shall be moved into the new Ticket"
+								),
+							},
 						],
 						primary_action_label: __("Split"),
 						primary_action: () => {
-							frm.call("split_ticket", {
-								subject: dialog.fields_dict.subject.value,
-								communication_id: e.currentTarget.closest(".timeline-item").getAttribute("data-name")
-							}, (r) => {
-								frappe.msgprint(`New ticket created: <a href="/app/ticket/${r.message}">${r.message}</a>`);
-								frm.reload_doc();
-								dialog.hide();
-							});
-						}
-					});
-					dialog.show();
-				});
-				frm.timeline.wrapper.data("split-ticket-event-attached", true);
+							frm.call(
+								"split_ticket",
+								{
+									subject: dialog.fields_dict.subject.value,
+									communication_id: e.currentTarget
+										.closest(".timeline-item")
+										.getAttribute("data-name"),
+								},
+								(r) => {
+									frappe.msgprint(
+										`New ticket created: <a href="/app/ticket/${r.message}">${r.message}</a>`
+									)
+									frm.reload_doc()
+									dialog.hide()
+								}
+							)
+						},
+					})
+					dialog.show()
+				})
+				frm.timeline.wrapper.data("split-ticket-event-attached", true)
 			}
 		}
 
@@ -144,4 +174,4 @@ frappe.ui.form.on("Ticket", {
 		// 	frm.timeline.wrapper.data("help-article-event-attached", true);
 		// }
 	},
-});
+})

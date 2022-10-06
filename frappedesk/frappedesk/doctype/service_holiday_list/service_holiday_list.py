@@ -115,7 +115,9 @@ def is_holiday(service_holiday_list, date=None):
 		date = today()
 	if service_holiday_list:
 		return bool(
-			frappe.get_all("Service Holiday List", dict(name=service_holiday_list, holiday_date=date))
+			frappe.get_all(
+				"Service Holiday List", dict(name=service_holiday_list, holiday_date=date)
+			)
 		)
 	else:
 		return False

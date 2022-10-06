@@ -20,7 +20,10 @@ class Article(Document):
 		# index is only set if its not set already, this allows defining index at the time of creation itself
 		# if not set the index is set to the last index + 1, i.e. the article is added at the end
 		if self.status == "Published" and self.idx == -1:
-			self.idx = cint(frappe.db.count("Article", {"category": self.category}, {"status": "Published"}))
+			self.idx = cint(
+				frappe.db.count("Article", {"category": self.category}, {"status": "Published"})
+			)
+
 
 @frappe.whitelist(allow_guest=True)
 def add_feedback(article, helpful):

@@ -6,29 +6,61 @@
 					<div class="text-slate-500">Status</div>
 					<CustomDropdown
 						v-if="ticketStatuses"
-						:options="statusesAsDropdownOptions()" 
+						:options="statusesAsDropdownOptions()"
 						class="text-base w-56"
 					>
-						<template v-slot="{ toggleAssignees }" @click="toggleAssignees" class="w-full">
+						<template
+							v-slot="{ toggleAssignees }"
+							@click="toggleAssignees"
+							class="w-full"
+						>
 							<div class="w-full">
-								<div class="flex w-56 py-1 hover:bg-slate-50 space-x-1">
-									<div v-if="ticket.status" class="grow w-52 text-left">{{ ticket.status }}</div>
-									<div v-else class="text-base grow w-52 text-left text-gray-400"> set status </div>
-								<CustomIcons name="select" class="w-4 h-4 float-right" />
-							</div>
+								<div
+									class="flex w-56 py-1 hover:bg-slate-50 space-x-1"
+								>
+									<div
+										v-if="ticket.status"
+										class="grow w-52 text-left"
+									>
+										{{ ticket.status }}
+									</div>
+									<div
+										v-else
+										class="text-base grow w-52 text-left text-gray-400"
+									>
+										set status
+									</div>
+									<CustomIcons
+										name="select"
+										class="w-4 h-4 float-right"
+									/>
+								</div>
 							</div>
 						</template>
 					</CustomDropdown>
 				</div>
 			</div>
 		</div>
-		<Dialog :options="{title: 'Create New Type'}" v-model="openCreateNewTicketTypeDialog">
+		<Dialog
+			:options="{ title: 'Create New Type' }"
+			v-model="openCreateNewTicketTypeDialog"
+		>
 			<template #body-content>
 				<div class="space-y-4">
-					<Input type="text" v-model="newType" placeholder="eg: Bug" />
+					<Input
+						type="text"
+						v-model="newType"
+						placeholder="eg: Bug"
+					/>
 					<div class="flex float-right space-x-2">
-						<Button @click="createAndAssignTicketTypeFromDialog()">Create and Assign</Button>
-						<Button @click="createTicketFromDialog()" appearance="primary">Create</Button>
+						<Button @click="createAndAssignTicketTypeFromDialog()"
+							>Create and Assign</Button
+						>
+						<Button
+							@click="createTicketFromDialog()"
+							appearance="primary"
+							>Create</Button
+						>
 					</div>
 				</div>
 			</template>
@@ -37,10 +69,10 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown, Input, Dialog } from 'frappe-ui'
-import CustomDropdown from '@/components/desk/global/CustomDropdown.vue'
-import CustomIcons from '@/components/desk/global/CustomIcons.vue'
-import { inject } from '@vue/runtime-core'
+import { FeatherIcon, Dropdown, Input, Dialog } from "frappe-ui"
+import CustomDropdown from "@/components/desk/global/CustomDropdown.vue"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { inject } from "@vue/runtime-core"
 
 export default {
 	name: "ActionPanel",
@@ -51,7 +83,7 @@ export default {
 		CustomDropdown,
 		Input,
 		Dialog,
-		CustomIcons
+		CustomIcons,
 	},
 	data() {
 		return {
@@ -60,10 +92,10 @@ export default {
 		}
 	},
 	setup() {
-		const user = inject('user')
-		const tickets = inject('tickets')
-		const ticketStatuses = inject('ticketStatuses')
-		const ticketController = inject('ticketController')
+		const user = inject("user")
+		const tickets = inject("tickets")
+		const ticketStatuses = inject("ticketStatuses")
+		const ticketController = inject("ticketController")
 
 		return {
 			user,
@@ -75,25 +107,27 @@ export default {
 	computed: {
 		ticket() {
 			return this.tickets[this.ticketId] || null
-		}
+		},
 	},
 	methods: {
 		statusesAsDropdownOptions() {
-			let statusItems = [];
-            ['Open', 'Close'].forEach(status => {
-                statusItems.push({
-                    label: status,
-                    handler: () => {
-                        this.ticketController.set(this.ticketId, 'status', status == 'Open' ? 'Open' : 'Closed')
-                    },
-                });
-            });
-            return statusItems;
+			let statusItems = []
+			;["Open", "Close"].forEach((status) => {
+				statusItems.push({
+					label: status,
+					handler: () => {
+						this.ticketController.set(
+							this.ticketId,
+							"status",
+							status == "Open" ? "Open" : "Closed"
+						)
+					},
+				})
+			})
+			return statusItems
 		},
-	}
+	},
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

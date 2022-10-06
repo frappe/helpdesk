@@ -19,7 +19,9 @@ class TestServiceHolidayList(unittest.TestCase):
 				{"holiday_date": test_holiday_dates[1], "description": "test holiday2"},
 			],
 		)
-		fetched_service_holiday_list = frappe.get_value("Service Holiday List", service_holiday_list.name)
+		fetched_service_holiday_list = frappe.get_value(
+			"Service Holiday List", service_holiday_list.name
+		)
 		self.assertEqual(service_holiday_list.name, fetched_service_holiday_list)
 
 
