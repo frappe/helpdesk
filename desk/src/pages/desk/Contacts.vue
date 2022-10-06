@@ -15,8 +15,6 @@
 					],
 					group: ['email', 'phone'],
 					limit: 40,
-					start_page: initialPage,
-					route_query_pagination: true,
 				}"
 			>
 				<template #body="{ manager }">
@@ -69,11 +67,6 @@ export default {
 		NewContactDialog,
 		ContactList,
 	},
-	data() {
-		return {
-			initialPage: 1,
-		}
-	},
 	setup() {
 		const showNewContactDialog = ref(false)
 
@@ -85,11 +78,6 @@ export default {
 		contacts() {
 			return this.contacts || null
 		},
-	},
-	mounted() {
-		this.initialPage = parseInt(
-			this.$route.query.page ? this.$route.query.page : 1
-		)
 	},
 }
 </script>

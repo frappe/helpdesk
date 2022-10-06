@@ -296,7 +296,6 @@ export default {
 									return {
 										...this.$route.query,
 										menu_filter: "my-open-tickets",
-										page: 1,
 									}
 								},
 							},
@@ -309,7 +308,6 @@ export default {
 									return {
 										...this.$route.query,
 										menu_filter: "my-replied-tickets",
-										page: 1,
 									}
 								},
 							},
@@ -322,7 +320,6 @@ export default {
 									return {
 										...this.$route.query,
 										menu_filter: "my-resolved-tickets",
-										page: 1,
 									}
 								},
 							},
@@ -335,7 +332,6 @@ export default {
 									return {
 										...this.$route.query,
 										menu_filter: "my-closed-tickets",
-										page: 1,
 									}
 								},
 							},
@@ -356,14 +352,12 @@ export default {
 								return {
 									...this.$route.query,
 									menu_filter: "all",
-									page: 1,
 								}
 							},
 						},
 					},
 				]
 			)
-
 		this.profileSettings = [
 			{
 				label: "Keyboard Shortcuts",
@@ -462,7 +456,6 @@ export default {
 						menu_filter: this.user.agent
 							? "my-open-tickets"
 							: "all",
-						page: 1,
 					},
 				})
 			}

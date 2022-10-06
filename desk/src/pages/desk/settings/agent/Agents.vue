@@ -12,8 +12,6 @@
 					'group',
 				],
 				limit: 20,
-				start_page: initialPage,
-				route_query_pagination: true,
 			}"
 			@selection="
 				(selectedItems) => {
@@ -57,11 +55,6 @@ export default {
 		ListManager,
 		AddNewAgentsDialog,
 	},
-	data() {
-		return {
-			initialPage: 1,
-		}
-	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
 		const showNewAgentDialog = ref(false)
@@ -73,10 +66,6 @@ export default {
 	mounted() {
 		this.$event.emit("set-selected-setting", "Agents")
 		this.$event.emit("show-top-panel-actions-settings", "Agents")
-
-		this.initialPage = parseInt(
-			this.$route.query.page ? this.$route.query.page : 1
-		)
 
 		this.$event.on("show-new-agent-dialog", () => {
 			this.showNewAgentDialog = true

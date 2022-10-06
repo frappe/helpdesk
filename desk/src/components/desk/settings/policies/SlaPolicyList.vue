@@ -53,7 +53,11 @@
 					</div>
 				</div>
 			</div>
-			<ListPageController :manager="manager" />
+			<div class="pb-2">
+				<Button v-if="manager.hasNextPage" @click="manager.nextPage()">
+					Load More
+				</Button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -63,7 +67,6 @@ import { inject } from "vue"
 import { Input } from "frappe-ui"
 import SlaPolicyListItem from "@/components/desk/settings/policies/SlaPolicyListItem.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import ListPageController from "@/components/global/ListPageController.vue"
 
 export default {
 	name: "SlaPolicyList",
@@ -72,7 +75,6 @@ export default {
 		SlaPolicyListItem,
 		CustomIcons,
 		Input,
-		ListPageController,
 	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
@@ -82,5 +84,3 @@ export default {
 	},
 }
 </script>
-
-<style></style>

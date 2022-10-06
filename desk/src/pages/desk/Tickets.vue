@@ -24,8 +24,6 @@
 				limit: 20,
 				order_by: 'modified desc',
 				filters: initialFilters,
-				start_page: initialPage,
-				route_query_pagination: true,
 			}"
 		>
 			<template #body="{ manager }">
@@ -178,7 +176,6 @@ export default {
 	data() {
 		return {
 			initialFilters: [],
-			initialPage: 1,
 		}
 	},
 	setup() {
@@ -303,6 +300,7 @@ export default {
 							: ["=", value]
 				}
 			})
+			// TODO: move this to filter box
 			if (this.listManagerInitialised) {
 				if (
 					JSON.stringify(finalFilters) !=
@@ -316,9 +314,6 @@ export default {
 				}
 			} else {
 				this.initialFilters = finalFilters
-				this.initialPage = parseInt(
-					this.$route.query.page ? this.$route.query.page : 1
-				)
 				this.listManagerInitialised = true
 			}
 		},

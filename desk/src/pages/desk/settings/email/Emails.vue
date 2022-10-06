@@ -16,8 +16,6 @@
 				],
 				limit: 20,
 				filters: [['IMAP Folder', 'append_to', 'in', ['Ticket']]],
-				start_page: initialPage,
-				route_query_pagination: true,
 			}"
 		>
 			<template #body="{ manager }">
@@ -37,11 +35,6 @@ export default {
 		EmailList,
 		ListManager,
 	},
-	data() {
-		return {
-			initialPage: 1,
-		}
-	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
 
@@ -52,10 +45,6 @@ export default {
 	mounted() {
 		this.$event.emit("set-selected-setting", "Email Accounts")
 		this.$event.emit("show-top-panel-actions-settings", "Email Accounts")
-
-		this.initialPage = parseInt(
-			this.$route.query.page ? this.$route.query.page : 1
-		)
 	},
 }
 </script>

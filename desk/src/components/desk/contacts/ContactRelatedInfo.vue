@@ -16,7 +16,6 @@
 					filters: {
 						contact: ['=', contact],
 					},
-					route_query_pagination: true,
 				}"
 			>
 				<template #body="{ manager }">
@@ -32,7 +31,14 @@
 										: null,
 							}"
 						/>
-						<ListPageController :manager="manager" />
+						<div class="pb-2">
+							<Button
+								v-if="manager.hasNextPage"
+								@click="manager.nextPage()"
+							>
+								Load More
+							</Button>
+						</div>
 					</div>
 				</template>
 			</ListManager>
@@ -43,7 +49,6 @@
 <script>
 import MiniTicketList from "@/components/desk/global/MiniTicketList.vue"
 import ListManager from "@/components/global/ListManager.vue"
-import ListPageController from "@/components/global/ListPageController.vue"
 import { inject } from "vue"
 
 export default {
@@ -52,7 +57,6 @@ export default {
 	components: {
 		MiniTicketList,
 		ListManager,
-		ListPageController,
 	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
