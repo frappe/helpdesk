@@ -5,32 +5,60 @@
 		:editMode="editMode"
 		:saveInProgress="saveInProgress"
 		:disableSaving="disableSaving"
-		@edit="() => {
-			editMode = true
-		}"
-		@discard="() => {
-			editMode = false
-		}"
-		@save="() => {
-			if(validateChanges()) {
-				saveChanges().then(() => {
-					editMode = false
-				})
+		@edit="
+			() => {
+				editMode = true
 			}
-		}"
+		"
+		@discard="
+			() => {
+				editMode = false
+			}
+		"
+		@save="
+			() => {
+				if (validateChanges()) {
+					saveChanges().then(() => {
+						editMode = false
+					})
+				}
+			}
+		"
 	>
 		<template #body>
-			<div :class="editable ? `rounded-md p-5 h-full overflow-y-scroll ${ editMode ? 'border-2 border-gray-300' : 'shadow'}` : ''">
+			<div
+				:class="
+					editable
+						? `rounded-md p-5 h-full overflow-y-scroll ${
+								editMode ? 'border-2 border-gray-300' : 'shadow'
+						  }`
+						: ''
+				"
+			>
 				<div class="grid grid-cols-1 place-content-center gap-10">
-					<div class="grid place-content-center gap-5 text-center bg-gray-100 w-full h-[250px]">
-						<div class="text-[36px] text-gray-900 font-semibold">How can I help you?</div>
-						<div class="rounded-xl max-w-3xl shadow bg-white h-10 flex flex-row items-center px-3 space-x-3">
-							<FeatherIcon name="search" class="h-4 w-4 stroke-gray-500"/>
-							<div class="grow text-[12px] text-left text-gray-500">Write a question or problem</div>
+					<div
+						class="grid place-content-center gap-5 text-center bg-gray-100 w-full h-[250px]"
+					>
+						<div class="text-[36px] text-gray-900 font-semibold">
+							How can I help you?
+						</div>
+						<div
+							class="rounded-xl max-w-3xl shadow bg-white h-10 flex flex-row items-center px-3 space-x-3"
+						>
+							<FeatherIcon
+								name="search"
+								class="h-4 w-4 stroke-gray-500"
+							/>
+							<div
+								class="grow text-[12px] text-left text-gray-500"
+							>
+								Write a question or problem
+							</div>
 						</div>
 					</div>
 					<div class="flex flex-col">
-						<CategoryCardList as="div"
+						<CategoryCardList
+							as="div"
 							v-if="!(parentCategoryId && categoryId)"
 							ref="categoryCardList"
 							:editable="editable"
@@ -38,14 +66,18 @@
 							:categoryId="categoryId"
 							:parentCategoryId="parentCategoryId"
 						/>
-						<ArticleMiniList as="div"
+						<ArticleMiniList
+							as="div"
 							v-if="!isRoot"
 							ref="articleMiniList"
 							:editable="editable"
 							:editMode="editMode"
 							:categoryId="categoryId"
 						/>
-						<div v-if="isEmpty && !editMode" class="text-base text-gray-600">
+						<div
+							v-if="isEmpty && !editMode"
+							class="text-base text-gray-600"
+						>
 							Its empty here
 						</div>
 						<!-- <FAQList :editable="editable" v-else>
@@ -59,38 +91,38 @@
 </template>
 
 <script>
-import { FeatherIcon } from 'frappe-ui';
-import { provide, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import CategoryCardList from '@/components/global/CategoryCardList.vue'
-import ArticleMiniList from '@/components/global/ArticleMiniList.vue'
-import KBEditableBlock from '@/components/global/KBEditableBlock.vue'
+import { FeatherIcon } from "frappe-ui"
+import { provide, ref } from "vue"
+import { useRoute } from "vue-router"
+import CategoryCardList from "@/components/global/CategoryCardList.vue"
+import ArticleMiniList from "@/components/global/ArticleMiniList.vue"
+import KBEditableBlock from "@/components/global/KBEditableBlock.vue"
 
 export default {
-	name: 'KBHome',
+	name: "KBHome",
 	props: {
 		categoryId: {
 			type: String,
-			default: null
+			default: null,
 		},
 		parentCategoryId: {
 			type: String,
-			default: null
-		}
+			default: null,
+		},
 	},
 	components: {
 		FeatherIcon,
 		CategoryCardList,
 		ArticleMiniList,
-		KBEditableBlock
+		KBEditableBlock,
 	},
 	setup(props) {
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
 
-		provide('categoryId', props.categoryId)
+		provide("categoryId", props.categoryId)
 		if (props.parentCategoryId) {
-			provide('parentCategoryId', props.parentCategoryId)
+			provide("parentCategoryId", props.parentCategoryId)
 		}
 
 		const editMode = ref(false)
@@ -100,7 +132,7 @@ export default {
 			editable,
 			editMode,
 
-			saveInProgress
+			saveInProgress,
 		}
 	},
 	computed: {
@@ -113,51 +145,61 @@ export default {
 			return !this.categoryId && !this.parentCategoryId
 		},
 		isEmpty() {
-			if (this.$resources.articlesCount.loading || this.$resources.subCategoriesCount.loading) return
-			const isEmpty = this.$resources.subCategoriesCount.data === 0 && this.$resources.subCategoriesCount.data === 0
+			if (
+				this.$resources.articlesCount.loading ||
+				this.$resources.subCategoriesCount.loading
+			)
+				return
+			const isEmpty =
+				this.$resources.subCategoriesCount.data === 0 &&
+				this.$resources.subCategoriesCount.data === 0
 			if (this.editable) this.editMode = isEmpty
 			return isEmpty
-		}
+		},
 	},
 	methods: {
 		validateChanges() {
-			return this.$refs.categoryCardList.validateChanges() && this.$refs.articleMiniList ? this.$refs.articleMiniList.validateChanges() : true
+			return this.$refs.categoryCardList.validateChanges() &&
+				this.$refs.articleMiniList
+				? this.$refs.articleMiniList.validateChanges()
+				: true
 		},
 		async saveChanges() {
 			this.saveInProgress = true
 			await this.$refs.categoryCardList.saveChanges()
-			if (this.$refs.articleMiniList) await this.$refs.articleMiniList.saveChanges()
+			if (this.$refs.articleMiniList)
+				await this.$refs.articleMiniList.saveChanges()
 			this.saveInProgress = false
 			return
-		}
+		},
 	},
 	resources: {
 		articlesCount() {
 			return {
-				method: 'frappe.client.get_count',
+				method: "frappe.client.get_count",
 				params: {
-					doctype: 'Article',
+					doctype: "Article",
 					filters: {
 						category: this.categoryId,
-						status: 'Published'
-					}
+						status: "Published",
+					},
 				},
-				auto: true
+				auto: true,
 			}
 		},
 		subCategoriesCount() {
 			return {
-				method: 'frappe.client.get_count',
+				method: "frappe.client.get_count",
 				params: {
-					doctype: 'Category',
+					doctype: "Category",
 					filters: {
 						parent_category: this.categoryId,
-						status: 'Published'
-					}
+						status: "Published",
+					},
 				},
-				auto: true
+				auto: true,
 			}
-		}
-	}
+		},
+	},
 }
 </script>

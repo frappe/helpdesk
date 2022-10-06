@@ -4,9 +4,9 @@
 			<div v-if="editable" class="flex flex-row items-center">
 				<div class="grow text-xl">Knowledge Base</div>
 				<div v-if="editMode" class="flex flex-row-reverse">
-					<Button 
+					<Button
 						:loading="saveInProgress"
-						icon-left="save" 
+						icon-left="save"
 						class="ml-2"
 						:class="disableSaving ? 'cursor-not-allowed' : ''"
 						:disable="disableSaving"
@@ -14,19 +14,13 @@
 					>
 						Save
 					</Button>
-					<Button 
-						icon-left="rotate-ccw" 
-						@click="$emit('discard')"
-					>
+					<Button icon-left="rotate-ccw" @click="$emit('discard')">
 						Discard
 					</Button>
 				</div>
 				<div v-else class="flex flex-row-reverse items-center">
 					<KBLayoutSwitcher viewMode="Web" class="ml-2" />
-					<Button 
-						icon-left="edit-2" 
-						@click="$emit('edit')"
-					>
+					<Button icon-left="edit-2" @click="$emit('edit')">
 						Edit
 					</Button>
 				</div>
@@ -37,30 +31,30 @@
 </template>
 
 <script>
-import KBLayoutSwitcher from '@/components/global/KBLayoutSwitcher.vue';
+import KBLayoutSwitcher from "@/components/global/KBLayoutSwitcher.vue"
 
 export default {
-	name: 'KBEditableBlock',
+	name: "KBEditableBlock",
 	props: {
 		editable: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		editMode: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		saveInProgress: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 		disableSaving: {
 			type: Boolean,
-			default: false
+			default: false,
 		},
 	},
 	components: {
-		KBLayoutSwitcher
-	}
+		KBLayoutSwitcher,
+	},
 }
 </script>
