@@ -31,7 +31,7 @@ def check_if_category_name_exists_outside_current_hierarchy(
 	doc = {"doctype": "Category", "category_name": category_name}
 
 	if parent_category:
-		doc["parent_category"] = parent_category
+		doc["parent_category"] = ["!=", parent_category]
 	else:
 		doc["is_group"] = False
 
