@@ -29,8 +29,8 @@ class Category(Document):
 	def archive(self):
 		self.idx = -1
 		self.status = "Archived"
-		self.rename(append_number_if_name_exists("Category", self.name + ".archived"))
 		self.save()
+		self.rename(append_number_if_name_exists("Category", self.name + ".archived"))
 
 	def unarchive(self):
 		self.status = "Published"
