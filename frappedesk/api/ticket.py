@@ -333,9 +333,9 @@ def activities(name):
 
 
 @frappe.whitelist(allow_guest=True)
-def submit_customer_feedback(ticket_id, satisfied, feedback_text):
+def submit_customer_feedback(ticket_id, satisfaction_rating, feedback_text):
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)
-	ticket_doc.satisfied = satisfied
+	ticket_doc.satisfaction_rating = satisfaction_rating
 	ticket_doc.customer_feedback = feedback_text
 	ticket_doc.feedback_submitted = True
 	ticket_doc.save(ignore_permissions=True)
