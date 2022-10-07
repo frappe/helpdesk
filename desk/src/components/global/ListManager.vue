@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="h-full">
 		<slot name="body" :manager="manager" />
 	</div>
 </template>
