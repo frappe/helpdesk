@@ -56,7 +56,6 @@
 		"customer_feedback_section",
 		"feedback_submitted",
 		"satisfaction_rating",
-		"satisfied",
 		"customer_feedback"
 	],
 	"fields": [
@@ -392,12 +391,6 @@
 			"label": "Feedback Submitted"
 		},
 		{
-			"default": "0",
-			"fieldname": "satisfied",
-			"fieldtype": "Check",
-			"label": "Satisfied"
-		},
-		{
 			"fieldname": "customer_feedback",
 			"fieldtype": "Long Text",
 			"label": "Feedback"
@@ -405,13 +398,13 @@
 		{
 			"fieldname": "satisfaction_rating",
 			"fieldtype": "Rating",
-			"label": "Satisfaction Rating"
+			"label": "Rating"
 		}
 	],
 	"icon": "fa fa-issue",
 	"idx": 7,
 	"links": [],
-	"modified": "2022-10-07 11:29:17.605407",
+	"modified": "2022-10-08 13:57:48.550744",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Ticket",
