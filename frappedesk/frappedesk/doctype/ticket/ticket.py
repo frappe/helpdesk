@@ -425,7 +425,7 @@ def get_user_tickets(filters="{}", order_by="creation desc", impersonate=None):
 			"status",
 			"creation",
 			"feedback_submitted",
-			"satisfied",
+			"satisfaction_rating",
 			"customer_feedback",
 		],
 	)
