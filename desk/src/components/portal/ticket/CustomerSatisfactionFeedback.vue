@@ -13,76 +13,53 @@
 				}}
 			</div>
 			<div
-				v-if="!submitted"
-				class="ml-[80px] flex flex-row items-center space-x-[40px] font-normal text-base"
+				class="ml-[25px] flex flex-row items-center space-x-[20px] font-normal text-base"
 			>
 				<div
-					class="flex flex-row items-center space-x-[8px] cursor-pointer"
-					@click="
+					class="flex flex-row space-x-2"
+					@pointerleave="
 						() => {
-							satisfaction =
-								satisfaction != 'Satisfied'
-									? 'Satisfied'
-									: 'Not Set'
+							ratingHovered = 0
 						}
 					"
 				>
-					<FeatherIcon
-						name="smile"
-						class="w-[14px] h-[14px]"
-						:class="
-							satisfaction === 'Satisfied'
-								? 'stroke-blue-500'
-								: 'stroke-gray-400'
-						"
-					/>
-					<span>Good, I’m satisfied.</span>
+					<div v-for="index in [1, 2, 3, 4, 5]" :key="index">
+						<FeatherIcon
+							name="star"
+							class="w-5 h-5 stroke-gray-500"
+							:class="`
+								${
+									(ratingHovered ||
+										satisfactionRating ||
+										ticket.satisfaction_rating) >=
+									index * 0.2
+										? 'fill-yellow-500'
+										: 'fill-gray-200'
+								} 
+								${submitted ? 'cursor-default' : 'cursor-pointer'}
+							`"
+							@pointerenter="
+								() => {
+									if (!submitted) {
+										ratingHovered = index * 0.2
+									}
+								}
+							"
+							@click="
+								() => {
+									if (!submitted) {
+										satisfactionRating = index * 0.2
+									}
+								}
+							"
+						/>
+					</div>
 				</div>
-				<div
-					class="flex flex-row items-center space-x-[8px] cursor-pointer"
-					@click="
-						() => {
-							satisfaction =
-								satisfaction != 'Un Satisfied'
-									? 'Un Satisfied'
-									: 'Not Set'
-						}
-					"
-				>
-					<FeatherIcon
-						name="frown"
-						class="w-[14px] h-[14px]"
-						:class="
-							satisfaction === 'Un Satisfied'
-								? 'stroke-red-500'
-								: 'stroke-gray-400'
-						"
-					/>
-					<span>Bad, I’m not satisfied.</span>
-				</div>
-			</div>
-			<div
-				v-else
-				class="ml-[10px] flex flex-row items-center space-x-[6px] text-base"
-			>
-				<FeatherIcon
-					:name="ticket.satisfied ? 'smile' : 'frown'"
-					class="w-[14px] h-[14px]"
-					:class="
-						ticket.satisfied ? 'stroke-blue-500' : 'stroke-red-400'
-					"
-				/>
-				<div>
-					{{
-						ticket.satisfied
-							? "Good, I’m satisfied."
-							: "Bad, I’m not satisfied."
-					}}
-				</div>
+				<div class="text-sm text-gray-600">{{ ratingToText }}</div>
 			</div>
 		</div>
 		<div
-			v-if="!submitted && satisfaction != 'Not Set'"
+			v-if="!submitted && satisfactionRating != 0"
 			class="flex flex-col space-y-[8px]"
 		>
 			<Input
@@ -103,7 +80,7 @@
 					@click="
 						$resources.submitFeedback.submit({
 							ticket_id: ticket.name,
-							satisfied: this.satisfaction === 'Satisfied',
+							satisfaction_rating: this.satisfactionRating,
 							feedback_text: this.feedbackText,
 						})
 					"
@@ -137,12 +114,15 @@ export default {
 		FeatherIcon,
 	},
 	setup() {
-		const satisfaction = ref("Not Set")
+		const satisfactionRating = ref(0)
 		const feedbackText = ref("")
 		const submitted = ref(false)
 
+		const ratingHovered = ref(0)
+
 		return {
-			satisfaction,
+			ratingHovered,
+			satisfactionRating,
 			feedbackText,
 			submitted,
 		}
@@ -157,10 +137,28 @@ export default {
 			}
 		},
 	},
+	computed: {
+		ratingToText() {
+			const rating = this.submitted
+				? this.ticket.satisfaction_rating
+				: this.ratingHovered || this.satisfactionRating
+			if (rating == 0) {
+				return ""
+			} else if (rating < 0.4) {
+				return "Very Bad"
+			} else if (rating < 0.6) {
+				return "Bad"
+			} else if (rating < 0.8) {
+				return "Average"
+			} else if (rating < 1) {
+				return "Good"
+			} else {
+				return "Very Good"
+			}
+		},
+	},
 	mounted() {
 		this.submitted = this.ticket.feedback_submitted
 	},
 }
 </script>
-
-<style></style>
