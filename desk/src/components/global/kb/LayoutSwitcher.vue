@@ -88,8 +88,5 @@ export default {
 	components: {
 		FeatherIcon,
 	},
-	setup(props) {
-		console.log(props.selectedList)
-	},
 }
 </script>
