@@ -10,15 +10,20 @@
 	"field_order": [
 		"category_name",
 		"description",
-		"route",
-		"linked_web_page",
-		"idx"
+		"status",
+		"idx",
+		"lft",
+		"rgt",
+		"is_group",
+		"old_parent",
+		"parent_category"
 	],
 	"fields": [
 		{
 			"allow_in_quick_entry": 1,
 			"fieldname": "category_name",
 			"fieldtype": "Data",
+			"in_list_view": 1,
 			"label": "Name",
 			"unique": 1
 		},
@@ -29,31 +34,56 @@
 			"label": "Description"
 		},
 		{
-			"fieldname": "route",
-			"fieldtype": "Data",
-			"hidden": 1,
-			"label": "Route"
+			"default": "-1",
+			"fieldname": "idx",
+			"fieldtype": "Int",
+			"label": "Index"
 		},
 		{
-			"fieldname": "linked_web_page",
-			"fieldtype": "Link",
+			"fieldname": "lft",
+			"fieldtype": "Int",
 			"hidden": 1,
-			"label": "Linked Web Page",
-			"options": "Web Page"
+			"label": "Left",
+			"no_copy": 1,
+			"read_only": 1
+		},
+		{
+			"fieldname": "rgt",
+			"fieldtype": "Int",
+			"hidden": 1,
+			"label": "Right",
+			"no_copy": 1,
+			"read_only": 1
 		},
 		{
 			"default": "0",
-			"fieldname": "idx",
-			"fieldtype": "Int",
-			"in_list_view": 1,
-			"label": "Index",
-			"non_negative": 1
+			"fieldname": "is_group",
+			"fieldtype": "Check",
+			"label": "Is Group"
+		},
+		{
+			"fieldname": "old_parent",
+			"fieldtype": "Link",
+			"label": "Old Parent",
+			"options": "Category"
+		},
+		{
+			"fieldname": "parent_category",
+			"fieldtype": "Link",
+			"label": "Parent Category",
+			"options": "Category"
+		},
+		{
+			"default": "Published",
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"label": "Status",
+			"options": "Published\nDraft\nArchived"
 		}
 	],
-	"has_web_view": 1,
-	"index_web_pages_for_search": 1,
+	"is_tree": 1,
 	"links": [],
-	"modified": "2022-09-18 23:37:14.490065",
+	"modified": "2022-10-02 13:58:22.916490",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Category",
@@ -74,16 +104,13 @@
 			"write": 1
 		},
 		{
-			"create": 1,
-			"delete": 1,
 			"email": 1,
 			"export": 1,
 			"print": 1,
 			"read": 1,
 			"report": 1,
-			"role": "Agent",
-			"share": 1,
-			"write": 1
+			"role": "Guest",
+			"share": 1
 		}
 	],
 	"sort_field": "modified",

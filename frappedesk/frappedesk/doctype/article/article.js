@@ -3,18 +3,9 @@
 
 frappe.ui.form.on("Article", {
 	refresh: function (frm) {
-		frm.set_query("category", function () {
-			return {
-				filters: {
-					is_group: "0",
-				},
-			}
-		})
-
 		show_content_wrt_type(frm)
 
 		frm.dashboard.clear_headline()
-
 		frm.dashboard.set_headline_alert(`
 			<div class="row">
 				<div class="col-md-4 col-xs-12">
