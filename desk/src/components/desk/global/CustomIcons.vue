@@ -1269,13 +1269,6 @@
 			<circle cx="19" cy="15" r="1"></circle>
 			<circle cx="5" cy="15" r="1"></circle>
 		</svg>
-		<div v-if="this.name == 'company'" :class="this.class">
-			<div
-				v-if="$resources.brandHtml.data"
-				v-html="$resources.brandHtml.data"
-			></div>
-			<div v-else>{{ $resources.helpdeskName.data }}</div>
-		</div>
 		<svg
 			v-if="this.name == 'list-drag-handle'"
 			:class="this.class"
@@ -1296,7 +1289,7 @@
 			<div
 				v-if="$resources.brandHtml.data"
 				v-html="$resources.brandHtml.data"
-			></div>
+			/>
 			<div v-else>{{ $resources.helpdeskName.data }}</div>
 		</div>
 	</div>
