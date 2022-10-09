@@ -219,16 +219,6 @@ export default {
 		},
 	},
 	resources: {
-		checkIfCategoryNameExistsOutsideCurrentHierarchy() {
-			return {
-				method: "frappedesk.api.kb.check_if_category_name_exists_outside_current_hierarchy",
-				onSuccess: (exists) => {
-					if (exists) {
-						this.validationErrors.category_name = `${this.category.category_name} already exists.`
-					}
-				},
-			}
-		},
 		numberOfArticlesInCategory() {
 			if (this.category.is_new) return
 			return {
@@ -274,13 +264,6 @@ export default {
 					this.category.idx
 				)
 			) {
-				this.$resources.checkIfCategoryNameExistsOutsideCurrentHierarchy.submit(
-					{
-						category_name: this.category.category_name,
-						parent_category: this.category.parent_category,
-					}
-				)
-			} else {
 				this.validationErrors.category_name = `${this.category.category_name} already exists.`
 			}
 		}, 300),

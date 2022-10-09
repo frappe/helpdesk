@@ -79,10 +79,6 @@ def insert_new_update_existing_categories(new_values, old_values):
 		doc.update(category)
 		doc.save()
 
-		# update category name if changed
-		if category["category_name"] != category["name"]:
-			frappe.rename_doc("Category", category["name"], category["category_name"])
-
 	return
 
 

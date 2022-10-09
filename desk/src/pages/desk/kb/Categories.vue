@@ -61,7 +61,7 @@
 					<template #field-category_name="{ value, row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/knowledge-base/categories/${row.name}`,
+								path: `/frappedesk/kb/categories/${row.name}`,
 							}"
 							class="cursor-pointer hover:text-gray-900 text-gray-600"
 							>{{ value }}</router-link

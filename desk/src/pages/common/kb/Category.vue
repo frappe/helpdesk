@@ -40,12 +40,10 @@
 					<div class="flex flex-col mx-auto container">
 						<CategoryCardList
 							as="div"
-							v-if="!(parentCategoryId && categoryId)"
 							ref="categoryCardList"
 							:editable="editable"
 							:editMode="editMode"
 							:categoryId="categoryId"
-							:parentCategoryId="parentCategoryId"
 						/>
 						<ArticleMiniList
 							as="div"
@@ -75,8 +73,7 @@
 </template>
 
 <script>
-import { FeatherIcon } from "frappe-ui"
-import { provide, ref } from "vue"
+import { ref } from "vue"
 import { useRoute } from "vue-router"
 import CategoryCardList from "@/components/global/kb/CategoryCardList.vue"
 import ArticleMiniList from "@/components/global/kb/ArticleMiniList.vue"
@@ -84,32 +81,24 @@ import EditableBlock from "@/components/global/kb/EditableBlock.vue"
 import SearchSection from "@/components/global/kb/SearchSection.vue"
 
 export default {
-	name: "KBHome",
-	props: {
-		categoryId: {
-			type: String,
-			default: null,
-		},
-		parentCategoryId: {
-			type: String,
-			default: null,
-		},
-	},
+	name: "Category",
 	components: {
-		FeatherIcon,
 		CategoryCardList,
 		ArticleMiniList,
 		EditableBlock,
 		SearchSection,
 	},
-	setup(props) {
+	props: {
+		categoryId: {
+			type: String,
+			default: null,
+		},
+	},
+	setup() {
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
 
-		provide("categoryId", props.categoryId)
-		if (props.parentCategoryId) {
-			provide("parentCategoryId", props.parentCategoryId)
-		}
+		const isRoot = ref(route.meta.isRoot)
 
 		const editMode = ref(false)
 		const saveInProgress = ref(false)
@@ -117,6 +106,8 @@ export default {
 		return {
 			editable,
 			editMode,
+
+			isRoot,
 
 			saveInProgress,
 		}
@@ -126,9 +117,6 @@ export default {
 			// TODO: check of validation errors etc
 			return false
 			// return this.$refs.categoryCardList?.disableSaving // || this.$refs.articleMiniList?.disableSaving
-		},
-		isRoot() {
-			return !this.categoryId && !this.parentCategoryId
 		},
 		isEmpty() {
 			if (

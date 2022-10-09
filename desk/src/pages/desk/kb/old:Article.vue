@@ -3,7 +3,7 @@
 		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
 			<div class="float-left">
 				<router-link
-					:to="`/frappedesk/knowledge-base/${
+					:to="`/frappedesk/kb/${
 						article.category || $route.query.category
 					}`"
 					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
@@ -63,7 +63,7 @@
 							() => {
 								if (isNew) {
 									$router.push(
-										`/frappedesk/knowledge-base/${article.category}`
+										`/frappedesk/kb/${article.category}`
 									)
 								} else {
 									this.$router.go()
@@ -191,9 +191,7 @@ export default {
 			return {
 				method: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(
-						`/frappedesk/knowledge-base/articles/${doc.name}`
-					)
+					this.$router.push(`/frappedesk/kb/articles/${doc.name}`)
 				},
 				onError: (err) => {
 					this.$toast({

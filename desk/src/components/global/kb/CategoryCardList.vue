@@ -39,15 +39,18 @@
 									parent_category: categoryId
 										? categoryId
 										: null,
-									is_group:
-										!parentCategoryId && !categoryId
-											? 1
-											: 0,
+									is_group: 1,
 								})
 							}
 							if (editMode) return
 							return $router.push({
-								path: `${$route.path}/${element.name}`,
+								path: `/${
+									['DeskKBHome', 'DeskKBCategory'].includes(
+										$route.name
+									)
+										? 'frappedesk'
+										: 'support'
+								}/kb/categories/${element.name}`,
 							})
 						}
 					"
@@ -71,10 +74,7 @@
 										parent_category: categoryId
 											? categoryId
 											: null,
-										is_group:
-											!parentCategoryId && !categoryId
-												? 1
-												: 0, // mark is_group as true if in root, other cases will be decided when child categories are added / removed from the category
+										is_group: 1,
 									})
 								}
 							"
@@ -96,10 +96,6 @@ export default {
 	name: "CategoryCardList",
 	props: {
 		categoryId: {
-			type: String,
-			default: null,
-		},
-		parentCategoryId: {
 			type: String,
 			default: null,
 		},
@@ -125,7 +121,7 @@ export default {
 		provide(
 			"checkIfCategoryNameExistsInCurrentHierarchy",
 			(categoryName, idx) => {
-				return !tempCategories.value.some(
+				return tempCategories.value.some(
 					(c) => c.category_name == categoryName && c.idx != idx
 				)
 			}
