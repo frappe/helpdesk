@@ -72,13 +72,13 @@ const routes = [
 			},
 			{
 				path: "knowledge-base",
-				name: "KnowledgeBase",
+				name: "DeskKB",
 				component: () =>
 					import("@/pages/desk/knowledge_base/KnowledgeBase.vue"),
 				children: [
 					{
 						path: "",
-						name: "Home",
+						name: "DeskKBHome",
 						component: () =>
 							import("@/components/global/KBHome.vue"), // shows root categories and faqs
 						meta: {
@@ -87,7 +87,7 @@ const routes = [
 					},
 					{
 						path: ":categoryId",
-						name: "CategoryPage", // Category Page
+						name: "DeskKBCategoryPage", // Category Page
 						component: () =>
 							import("@/components/global/KBHome.vue"), // shows sub categories and articles
 						props: true,
@@ -97,7 +97,7 @@ const routes = [
 					},
 					{
 						path: ":parentCategoryId/:categoryId",
-						name: "CategoryPage2", // Category Page
+						name: "DeskKBCategoryPage2", // Category Page
 						component: () =>
 							import("@/components/global/KBHome.vue"), // shows sub categories and articles
 						props: true,
@@ -107,7 +107,7 @@ const routes = [
 					},
 					{
 						path: "categories",
-						name: "Categories",
+						name: "DeskKBCategories",
 						component: () =>
 							import(
 								"@/pages/desk/knowledge_base/Categories.vue"
@@ -115,19 +115,19 @@ const routes = [
 					},
 					{
 						path: "articles",
-						name: "Articles",
+						name: "DeskKBArticles",
 						component: () =>
 							import("@/pages/desk/knowledge_base/Articles.vue"), // Articles.vue - shows all articles
 					},
 					{
 						path: "articles/:articleId",
-						name: "", // Article Edit page
+						name: "DeskKBArticle", // Article Edit page
 						component: () => import(""), // Article.vue - article edit page
 						props: true,
 					},
 					{
 						path: "articles/new",
-						name: "", // Article Edit page
+						name: "DeskKBArticleNew", // Article Edit page
 						component: () => import(""), // Article.vue - article edit page
 						props: true,
 					},
@@ -285,6 +285,48 @@ const routes = [
 				path: "impersonate",
 				name: "Impersonate",
 				component: () => import("@/pages/portal/Impersonate.vue"),
+			},
+			{
+				path: "kb",
+				name: "PortalKB",
+				component: () => import("@/pages/portal/KnowledgeBase.vue"),
+				children: [
+					{
+						path: "",
+						name: "PortalKBHome",
+						component: () =>
+							import("@/components/global/KBHome.vue"), // shows root categories and faqs
+						meta: {
+							editable: false,
+						},
+					},
+					{
+						path: ":categoryId",
+						name: "PortalKBCategoryPage", // Category Page
+						component: () =>
+							import("@/components/global/KBHome.vue"), // shows sub categories and articles
+						props: true,
+						meta: {
+							editable: false,
+						},
+					},
+					{
+						path: ":parentCategoryId/:categoryId",
+						name: "PortalKBCategoryPage2", // Category Page
+						component: () =>
+							import("@/components/global/KBHome.vue"), // shows sub categories and articles
+						props: true,
+						meta: {
+							editable: false,
+						},
+					},
+					{
+						path: "articles/:articleId",
+						name: "PortalKBArticle",
+						component: () => import(""),
+						props: true,
+					},
+				],
 			},
 		],
 	},
