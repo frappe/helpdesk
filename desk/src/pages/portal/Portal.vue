@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="h-15 mb-5 border-b">
+		<div class="h-15 border-b">
 			<NavBar />
 		</div>
 		<div class="mb-10">

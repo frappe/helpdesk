@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-20">
+	<div class="mb-20 mt-5">
 		<div class="mx-auto max-w-4xl">
 			<div class="flex justify-between items-center mb-2">
 				<div class="mb-2">

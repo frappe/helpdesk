@@ -2,7 +2,7 @@
 	<div class="flex flex-col space-y-4">
 		<div v-if="editable" class="flex flex-row items-center">
 			<div>
-				<div v-if="!editMode"><KBLayoutSwitcher viewMode="Web" /></div>
+				<div v-if="!editMode"><LayoutSwitcher viewMode="Web" /></div>
 				<div v-else class="text-base text-gray-700 italic">
 					Editing - Knowledge Base
 				</div>
@@ -34,10 +34,10 @@
 </template>
 
 <script>
-import KBLayoutSwitcher from "@/components/global/KBLayoutSwitcher.vue"
+import LayoutSwitcher from "@/components/global/kb/LayoutSwitcher.vue"
 
 export default {
-	name: "KBEditableBlock",
+	name: "EditableBlock",
 	props: {
 		editable: {
 			type: Boolean,
@@ -57,7 +57,7 @@ export default {
 		},
 	},
 	components: {
-		KBLayoutSwitcher,
+		LayoutSwitcher,
 	},
 }
 </script>

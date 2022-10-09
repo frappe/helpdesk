@@ -90,7 +90,7 @@
 import { provide, ref, computed } from "vue"
 import draggable from "vuedraggable"
 import { FeatherIcon } from "frappe-ui"
-import CategoryCard from "@/components/global/CategoryCard.vue"
+import CategoryCard from "@/components/global/kb/CategoryCard.vue"
 
 export default {
 	name: "CategoryCardList",

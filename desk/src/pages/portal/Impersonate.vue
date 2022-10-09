@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="mt-5">
 		<LoadingText text="Impersonating contact..." />
 	</div>
 </template>

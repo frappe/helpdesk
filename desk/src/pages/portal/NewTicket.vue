@@ -1,5 +1,5 @@
 <template>
-	<div v-if="template" class="mx-auto max-w-2xl pt-4">
+	<div v-if="template" class="mx-auto max-w-2xl pt-4 mt-5">
 		<div>
 			<div class="rounded-lg shadow-md border p-8">
 				<div class="font-medium">

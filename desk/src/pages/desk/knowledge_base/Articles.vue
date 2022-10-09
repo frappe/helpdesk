@@ -40,7 +40,7 @@
 					class="text-base"
 				>
 					<template #top-sub-section-1>
-						<KBLayoutSwitcher
+						<LayoutSwitcher
 							viewMode="List"
 							selectedList="Articles"
 						/>
@@ -100,7 +100,7 @@
 <script>
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
-import KBLayoutSwitcher from "@/components/global/KBLayoutSwitcher.vue"
+import LayoutSwitcher from "@/components/global/kb/LayoutSwitcher.vue"
 
 export default {
 	name: "Articles",
@@ -113,7 +113,7 @@ export default {
 	components: {
 		ListManager,
 		ListViewer,
-		KBLayoutSwitcher,
+		LayoutSwitcher,
 	},
 }
 </script>

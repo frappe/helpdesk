@@ -74,7 +74,7 @@
 import { FeatherIcon } from "frappe-ui"
 
 export default {
-	name: "KBLayoutSwitcher",
+	name: "LayoutSwitcher",
 	props: {
 		viewMode: {
 			type: String,

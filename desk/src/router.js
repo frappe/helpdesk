@@ -80,7 +80,7 @@ const routes = [
 						path: "",
 						name: "DeskKBHome",
 						component: () =>
-							import("@/components/global/KBHome.vue"), // shows root categories and faqs
+							import("@/components/global/kb/Home.vue"), // shows root categories and faqs
 						meta: {
 							editable: true,
 						},
@@ -89,7 +89,7 @@ const routes = [
 						path: ":categoryId",
 						name: "DeskKBCategoryPage", // Category Page
 						component: () =>
-							import("@/components/global/KBHome.vue"), // shows sub categories and articles
+							import("@/components/global/kb/Home.vue"), // shows sub categories and articles
 						props: true,
 						meta: {
 							editable: true,
@@ -99,7 +99,7 @@ const routes = [
 						path: ":parentCategoryId/:categoryId",
 						name: "DeskKBCategoryPage2", // Category Page
 						component: () =>
-							import("@/components/global/KBHome.vue"), // shows sub categories and articles
+							import("@/components/global/kb/Home.vue"), // shows sub categories and articles
 						props: true,
 						meta: {
 							editable: true,
@@ -295,7 +295,7 @@ const routes = [
 						path: "",
 						name: "PortalKBHome",
 						component: () =>
-							import("@/components/global/KBHome.vue"), // shows root categories and faqs
+							import("@/components/global/kb/Home.vue"), // shows root categories and faqs
 						meta: {
 							editable: false,
 						},
@@ -304,7 +304,7 @@ const routes = [
 						path: ":categoryId",
 						name: "PortalKBCategoryPage", // Category Page
 						component: () =>
-							import("@/components/global/KBHome.vue"), // shows sub categories and articles
+							import("@/components/global/kb/Home.vue"), // shows sub categories and articles
 						props: true,
 						meta: {
 							editable: false,
@@ -314,7 +314,7 @@ const routes = [
 						path: ":parentCategoryId/:categoryId",
 						name: "PortalKBCategoryPage2", // Category Page
 						component: () =>
-							import("@/components/global/KBHome.vue"), // shows sub categories and articles
+							import("@/components/global/kb/Home.vue"), // shows sub categories and articles
 						props: true,
 						meta: {
 							editable: false,

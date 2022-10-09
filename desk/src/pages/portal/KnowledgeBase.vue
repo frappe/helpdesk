@@ -1,5 +1,5 @@
 <template>
-	<div class="mx-auto w-full container">
+	<div class="mx-auto w-full">
 		<router-view class="grow" />
 	</div>
 </template>

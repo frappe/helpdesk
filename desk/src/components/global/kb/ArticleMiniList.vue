@@ -39,7 +39,7 @@
 <script>
 import { ref, provide, computed } from "vue"
 import draggable from "vuedraggable"
-import ArticleMiniListItem from "@/components/global/ArticleMiniListItem.vue"
+import ArticleMiniListItem from "@/components/global/kb/ArticleMiniListItem.vue"
 import { FeatherIcon } from "frappe-ui"
 
 export default {
