@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="text-base rounded-md h-[30px] w-[120px] bg-gray-100 p-[3px] select-none"
-	>
+	<div class="text-base rounded-md h-[30px] bg-gray-100 p-[3px] select-none">
 		<div
 			v-if="viewMode === 'Web'"
 			class="flex flex-row items-center space-x-2"

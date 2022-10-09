@@ -39,6 +39,25 @@
 					}"
 					class="text-base"
 				>
+					<template #top-sub-section-1>
+						<KBLayoutSwitcher
+							viewMode="List"
+							selectedList="Articles"
+						/>
+					</template>
+					<template #bulk-actions="{ selectedItems }">
+						<div class="flex flex-row space-x-2">
+							<Button @click="() => {}">Mark as Draft</Button>
+							<Button @click="() => {}">Add to FAQ</Button>
+							<Button @click="() => {}">Archive</Button>
+						</div>
+					</template>
+					<template #actions>
+						<div class="flex flex-row space-x-2">
+							<Button> Action 1 </Button>
+							<Button> Action 2 </Button>
+						</div>
+					</template>
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
@@ -81,6 +100,7 @@
 <script>
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
+import KBLayoutSwitcher from "@/components/global/KBLayoutSwitcher.vue"
 
 export default {
 	name: "Articles",
@@ -93,6 +113,7 @@ export default {
 	components: {
 		ListManager,
 		ListViewer,
+		KBLayoutSwitcher,
 	},
 }
 </script>

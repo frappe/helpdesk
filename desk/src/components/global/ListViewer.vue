@@ -1,10 +1,76 @@
 <template>
 	<div class="h-full">
 		<slot name="body">
-			<slot v-if="!manager.loading" name="listBody">
+			<slot v-if="!manager.loading" name="list-body">
 				<div>
-					<slot name="topSection">
-						<div></div>
+					<slot name="top-section">
+						<div
+							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
+						>
+							<div>
+								<slot name="top-sub-section-1">
+									<!-- Filter Box -->
+								</slot>
+							</div>
+							<div class="grow">
+								<slot name="top-sub-section-2">
+									<!-- Filter Box -->
+									<div class="flex flex-row items-center">
+										<Button
+											icon-right="chevron-down"
+											class="mr-[-10px] bg-gray-300"
+											>Filters</Button
+										>
+										<div class="grow">
+											<Input
+												type="text"
+												class="h-[30px]"
+											></Input>
+										</div>
+									</div>
+								</slot>
+							</div>
+							<div>
+								<slot name="top-sub-section-3">
+									<div
+										v-if="
+											Object.keys(manager.selectedItems)
+												.length > 0
+										"
+									>
+										<slot
+											name="bulk-actions"
+											:selectedItems="
+												manager.selectedItems
+											"
+										>
+											<!-- Bulk Actions -->
+										</slot>
+									</div>
+									<div v-else class="flex flex-row space-x-2">
+										<div>
+											<slot name="actions">
+												<!-- Actions -->
+											</slot>
+										</div>
+										<div>
+											<slot name="primary-action">
+												<!-- Add Item -->
+												<Button
+													appearance="primary"
+													icon-left="plus"
+												>
+													{{
+														`Add ${manager.options.doctype}`
+													}}
+												</Button>
+											</slot>
+										</div>
+									</div>
+									<!-- Actions / Bulk actions -->
+								</slot>
+							</div>
+						</div>
 					</slot>
 					<slot name="header">
 						<div class="w-full">
