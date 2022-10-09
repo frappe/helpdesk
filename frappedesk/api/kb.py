@@ -1,5 +1,6 @@
 import frappe
 from frappe.model.rename_doc import rename_doc
+import json
 
 
 @frappe.whitelist()
@@ -103,3 +104,10 @@ def update_articles_order_and_status(new_values):
 		doc.save()
 
 	return
+
+
+@frappe.whitelist(allow_guest=True)
+def get_breadcrumbs(docType, docName):
+	if docType not in ["Article", "Category"]:
+		frappe.throw("Doctype should be either Article or Category")
+	return frappe.get_doc(docType, docName).get_breadcrumbs()

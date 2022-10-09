@@ -35,9 +35,19 @@
 						: ''
 				"
 			>
-				<div class="grid grid-cols-1 place-content-center gap-10">
-					<SearchSection :isRoot="isRoot" />
+				<div class="grid grid-cols-1 place-content-center">
+					<SearchSection
+						:isRoot="isRoot"
+						:class="isRoot ? 'mb-14' : 'mb-5'"
+					/>
 					<div class="flex flex-col mx-auto container">
+						<div v-if="!isRoot">
+							<Breadcrumbs
+								docType="Category"
+								:docName="categoryId"
+								class="mb-5"
+							/>
+						</div>
 						<CategoryCardList
 							as="div"
 							ref="categoryCardList"
@@ -79,6 +89,7 @@ import CategoryCardList from "@/components/global/kb/CategoryCardList.vue"
 import ArticleMiniList from "@/components/global/kb/ArticleMiniList.vue"
 import EditableBlock from "@/components/global/kb/EditableBlock.vue"
 import SearchSection from "@/components/global/kb/SearchSection.vue"
+import Breadcrumbs from "@/components/global/kb/Breadcrumbs.vue"
 
 export default {
 	name: "Category",
@@ -87,6 +98,7 @@ export default {
 		ArticleMiniList,
 		EditableBlock,
 		SearchSection,
+		Breadcrumbs,
 	},
 	props: {
 		categoryId: {

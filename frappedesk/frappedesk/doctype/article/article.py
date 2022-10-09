@@ -4,6 +4,7 @@
 import frappe
 from frappe.model.document import Document
 from frappe.utils import cint
+import json
 
 
 class Article(Document):
@@ -23,6 +24,19 @@ class Article(Document):
 			self.idx = cint(
 				frappe.db.count("Article", {"category": self.category}, {"status": "Published"})
 			)
+
+	def get_breadcrumbs(self):
+		breadcrumbs = [self.title]
+		current_category = frappe.get_doc("Category", self.category)
+		breadcrumbs.append(
+			{"name": current_category.name, "label": current_category.category_name}
+		)
+		while current_category.parent_category:
+			current_category = frappe.get_doc("Category", current_category.parent_category)
+			breadcrumbs.append(
+				{"name": current_category.name, "label": current_category.category_name}
+			)
+		return breadcrumbs[::-1]
 
 
 @frappe.whitelist(allow_guest=True)

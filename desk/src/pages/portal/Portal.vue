@@ -5,7 +5,7 @@
 		</div>
 		<div class="mb-10">
 			<div v-if="user.isLoggedIn()">
-				<router-view v-slot="{ Component }">
+				<router-view v-slot="{ Component }" :key="$route.fullPath">
 					<component :is="Component" />
 				</router-view>
 			</div>
