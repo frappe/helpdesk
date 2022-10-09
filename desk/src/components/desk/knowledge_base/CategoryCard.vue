@@ -3,7 +3,7 @@
 		class="flex flex-row group cursor-pointer"
 		:class="isSelected ? 'bg-gray-50' : ''"
 	>
-		<router-link :to="`/frappedesk/knowledge-base/${category.name}`">
+		<router-link :to="`/frappedesk/kb/${category.name}`">
 			<div class="select-none flex flex-col py-[16px] px-[10px] rounded">
 				<a
 					:href="href"

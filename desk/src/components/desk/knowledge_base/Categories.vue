@@ -53,7 +53,7 @@
 													selectedCategory
 												) {
 													$router.push(
-														'/frappedesk/knowledge-base'
+														'/frappedesk/kb'
 													)
 												}
 												$refs.categories.manager.reload()

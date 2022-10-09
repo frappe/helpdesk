@@ -11,7 +11,7 @@
 				( add articles from
 				<router-link
 					class="underline"
-					:to="{ path: '/frappedesk/knowledge-base/articles' }"
+					:to="{ path: '/frappedesk/kb/articles' }"
 					>here</router-link
 				>
 				)

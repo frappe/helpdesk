@@ -7,7 +7,7 @@
 			<router-link
 				:title="'Toggle List view'"
 				:to="{
-					path: `/frappedesk/knowledge-base/${selectedList.toLowerCase()}`,
+					path: `/frappedesk/kb/${selectedList.toLowerCase()}`,
 				}"
 			>
 				<FeatherIcon
@@ -41,7 +41,7 @@
 												? 'Categories'
 												: 'Articles'
 										$router.push({
-											path: `/frappedesk/knowledge-base/${selectedList.toLowerCase()}`,
+											path: `/frappedesk/kb/${selectedList.toLowerCase()}`,
 										})
 									}
 								"
@@ -57,7 +57,7 @@
 				</div>
 				<router-link
 					:title="'Toggle Web view'"
-					:to="{ path: '/frappedesk/knowledge-base' }"
+					:to="{ path: '/frappedesk/kb' }"
 				>
 					<FeatherIcon
 						role="button"
