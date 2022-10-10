@@ -5,7 +5,7 @@
 			class="w-1/12 w-2/12 w-3/12 w-4/12 w-5/12 w-6/12 w-7/12 w-8/12 w-9/12 w-10/12 w-11/12"
 		></div>
 		<slot name="body">
-			<slot v-if="!manager.loading" name="list-body">
+			<slot name="list-body">
 				<div>
 					<slot name="top-section">
 						<div
@@ -155,7 +155,11 @@
 							</div>
 						</div>
 					</slot>
-					<slot name="rows" :items="manager.list">
+					<slot
+						v-if="!manager.loading"
+						name="rows"
+						:items="manager.list"
+					>
 						<div class="flex flex-col w-full">
 							<div
 								v-for="(item, index) in manager.list"
@@ -217,9 +221,9 @@
 							</div>
 						</div>
 					</slot>
+					<slot v-else name="listLoading"> List is loading... </slot>
 				</div>
 			</slot>
-			<slot v-else name="listLoading"> List is loading... </slot>
 		</slot>
 	</div>
 </template>
