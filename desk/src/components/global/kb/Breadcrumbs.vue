@@ -9,12 +9,7 @@
 							if (!isBreadcrumbLast()) {
 								$router.push({
 									path: `/${
-										[
-											'DeskKBHome',
-											'DeskKBCategory',
-										].includes($route.name)
-											? 'frappedesk'
-											: 'support'
+										isDesk ? 'frappedesk' : 'support'
 									}/kb${
 										breadcrumb.name
 											? `/categories/${breadcrumb.name}`
@@ -49,6 +44,10 @@ import { FeatherIcon } from "frappe-ui"
 export default {
 	name: "Breadcrumbs",
 	props: {
+		isDesk: {
+			type: Boolean,
+			default: false,
+		},
 		isRoot: {
 			type: Boolean,
 			default: false,

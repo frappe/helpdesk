@@ -26,7 +26,7 @@ class Article(Document):
 			)
 
 	def get_breadcrumbs(self):
-		breadcrumbs = [self.title]
+		breadcrumbs = [{"name": self.name, "label": self.title}]
 		current_category = frappe.get_doc("Category", self.category)
 		breadcrumbs.append(
 			{"name": current_category.name, "label": current_category.category_name}

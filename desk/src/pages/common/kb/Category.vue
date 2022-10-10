@@ -48,6 +48,7 @@
 							<Breadcrumbs
 								docType="Category"
 								:docName="categoryId"
+								:isDesk="editable"
 								class="mb-5"
 							/>
 						</div>
