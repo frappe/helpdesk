@@ -40,10 +40,7 @@
 					class="text-base"
 				>
 					<template #top-sub-section-1>
-						<LayoutSwitcher
-							viewMode="List"
-							selectedList="Articles"
-						/>
+						<LayoutSwitcher viewMode="List" />
 					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">

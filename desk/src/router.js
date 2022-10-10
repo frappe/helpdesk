@@ -86,12 +86,6 @@ const routes = [
 						},
 					},
 					{
-						path: "categories",
-						name: "DeskKBCategories",
-						component: () =>
-							import("@/pages/desk/kb/Categories.vue"), // CategoriesListView.vue - shows all categories
-					},
-					{
 						path: "categories/:categoryId",
 						name: "DeskKBCategory", // Category Page
 						component: () =>

@@ -55,9 +55,10 @@
 			"read_only": 1
 		},
 		{
-			"default": "0",
+			"default": "1",
 			"fieldname": "is_group",
 			"fieldtype": "Check",
+			"hidden": 1,
 			"label": "Is Group"
 		},
 		{
@@ -82,7 +83,7 @@
 	],
 	"is_tree": 1,
 	"links": [],
-	"modified": "2022-10-10 04:06:30.602575",
+	"modified": "2022-10-10 19:24:04.997142",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Category",

@@ -5,6 +5,7 @@
 				<div
 					@click="
 						() => {
+							if (!interactable) return
 							if (!isBreadcrumbLast()) {
 								$router.push({
 									path: `/${
@@ -24,7 +25,7 @@
 						}
 					"
 					:class="
-						isBreadcrumbLast(index)
+						isBreadcrumbLast(index) && interactable
 							? 'cursor-pointer hover:text-gray-900'
 							: ''
 					"
@@ -59,6 +60,10 @@ export default {
 		docName: {
 			type: String,
 			default: null,
+		},
+		interactable: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	components: {

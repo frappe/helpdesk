@@ -40,7 +40,10 @@
 						:isRoot="isRoot"
 						:class="isRoot ? 'mb-14' : 'mb-5'"
 					/>
-					<div class="flex flex-col mx-auto container">
+					<div
+						class="flex flex-col"
+						:class="editable ? '' : 'container mx-auto'"
+					>
 						<div v-if="!isRoot">
 							<Breadcrumbs
 								docType="Category"
