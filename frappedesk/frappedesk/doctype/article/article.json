@@ -1,7 +1,6 @@
 {
 	"actions": [],
-	"allow_rename": 1,
-	"autoname": "field:title",
+	"autoname": "hash",
 	"creation": "2022-02-08 18:13:42.994713",
 	"doctype": "DocType",
 	"editable_grid": 1,
@@ -127,11 +126,11 @@
 		}
 	],
 	"links": [],
-	"modified": "2022-10-02 13:55:37.501492",
+	"modified": "2022-10-11 17:56:39.593408",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Article",
-	"naming_rule": "By fieldname",
+	"naming_rule": "Random",
 	"owner": "Administrator",
 	"permissions": [
 		{

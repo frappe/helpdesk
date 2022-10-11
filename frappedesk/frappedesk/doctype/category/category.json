@@ -1,7 +1,6 @@
 {
 	"actions": [],
 	"allow_guest_to_view": 1,
-	"allow_rename": 1,
 	"autoname": "hash",
 	"creation": "2022-02-08 18:13:42.039744",
 	"doctype": "DocType",
@@ -83,7 +82,7 @@
 	],
 	"is_tree": 1,
 	"links": [],
-	"modified": "2022-10-10 19:24:04.997142",
+	"modified": "2022-10-11 17:56:48.886953",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Category",
