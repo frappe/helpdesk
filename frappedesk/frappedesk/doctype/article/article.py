@@ -15,7 +15,7 @@ class Article(Document):
 		# set published date of the article
 		if self.status == "Published" and not self.published_on:
 			self.published_on = frappe.utils.now()
-		else:
+		elif self.status == "Draft" and self.published_on:
 			self.published_on = None
 
 		# index is only set if its not set already, this allows defining index at the time of creation itself
