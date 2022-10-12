@@ -106,3 +106,8 @@ def get_breadcrumbs(docType, docName):
 	if docType not in ["Article", "Category"]:
 		frappe.throw("Doctype should be either Article or Category")
 	return frappe.get_doc(docType, docName).get_breadcrumbs()
+
+
+@frappe.whitelist(allow_guest=True)
+def check_if_article_is_published(article_name):
+	return frappe.db.exists("Article", {"name": article_name, "status": "Published"})

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router"
+import { call } from "frappe-ui"
 
 const routes = [
 	{
@@ -294,6 +295,22 @@ const routes = [
 let router = createRouter({
 	history: createWebHistory("/"),
 	routes,
+})
+
+router.beforeEach(async (to, from) => {
+	// go to article page only if the article is published
+	if (to.name === "PortalKBArticle") {
+		const articleIsPublished = await call(
+			"frappedesk.api.kb.check_if_article_is_published",
+			{ article_name: to.params.articleId }
+		)
+		if (!articleIsPublished) {
+			console.log(to.params.articleId, " is not available")
+			return { name: "PortalKBHome" }
+		}
+	}
+
+	return true
 })
 
 export default router
