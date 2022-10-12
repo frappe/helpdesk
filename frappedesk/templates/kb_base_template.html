@@ -14,8 +14,10 @@ head_include %}
 					{%- if brand_html -%} {{ brand_html }} {%- elif banner_image
 					-%}
 					<img src="{{ banner_image }}" />
-					{%- else -%} {% set helpdesk_name = frappe.get_doc("Frappe
-					Desk Settings").helpdesk_name %} {% if helpdesk_name %}
+					{%- else -%}
+					<!-- prettier-ignore -->
+					{% set helpdesk_name = frappe.get_doc("Frappe Desk Settings").helpdesk_name %}
+						{% if helpdesk_name %}
 					<div class="ql-editor read-mode">
 						<p>{{ helpdesk_name }}</p>
 					</div>
@@ -73,8 +75,9 @@ head_include %}
 		<div class="footer-info">
 			<div class="row">
 				<div class="footer-col-left col-sm-6 col-12">
-					{% set helpdesk_name = frappe.get_doc("Frappe Desk
-					Settings").helpdesk_name %} {% if helpdesk_name %}
+					<!-- prettier-ignore -->
+					{% set helpdesk_name = frappe.get_doc("Frappe Desk Settings").helpdesk_name %}
+					{% if helpdesk_name %}
 					<div class="ql-editor read-mode">
 						<p>© {{ helpdesk_name }}. 2022</p>
 					</div>
