@@ -141,7 +141,7 @@ export default {
 			)
 				return
 			const isEmpty =
-				this.$resources.subCategoriesCount.data === 0 &&
+				this.$resources.articlesCount.data === 0 &&
 				this.$resources.subCategoriesCount.data === 0
 			if (this.editable) this.editMode = isEmpty
 			return isEmpty
