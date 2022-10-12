@@ -7,27 +7,37 @@
 						() => {
 							if (!interactable) return
 							if (!isBreadcrumbLast()) {
-								$router.push({
-									path: `/${
-										isDesk ? 'frappedesk' : 'support'
-									}/kb${
-										breadcrumb.name
-											? `/categories/${breadcrumb.name}`
-											: ''
-									}`,
-								})
+								if (overrideInteraction != null) {
+									overrideInteraction(
+										{
+											name: breadcrumb.name,
+											docname: breadcrumb.label,
+										},
+										index === 0
+									)
+								} else {
+									$router.push({
+										path: `/${
+											isDesk ? 'frappedesk' : 'support'
+										}/kb${
+											breadcrumb.name
+												? `/categories/${breadcrumb.name}`
+												: ''
+										}`,
+									})
+								}
 							}
 						}
 					"
 					:class="
-						isBreadcrumbLast(index) && interactable
+						!isBreadcrumbLast(index) && interactable
 							? 'cursor-pointer hover:text-gray-900'
 							: ''
 					"
 				>
 					{{ breadcrumb.label }}
 				</div>
-				<div v-if="isBreadcrumbLast(index)">
+				<div v-if="!isBreadcrumbLast(index)">
 					<FeatherIcon
 						class="h-3 w-3 stroke-gray-500"
 						name="chevron-right"
@@ -64,19 +74,21 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		overrideInteraction: {
+			type: Function,
+			default: null,
+		},
 	},
 	components: {
 		FeatherIcon,
 	},
 	computed: {
 		breadcrumbs() {
+			const breadcrumbs = [{ name: "", label: "Home" }]
 			if (this.isRoot) {
-				return []
+				return breadcrumbs
 			}
-			return [
-				{ name: "", label: "Home" },
-				...(this.$resources.breadcrumbs.data || []),
-			]
+			return [...breadcrumbs, ...(this.$resources.breadcrumbs.data || [])]
 		},
 	},
 	resources: {
@@ -96,7 +108,7 @@ export default {
 	},
 	methods: {
 		isBreadcrumbLast(index) {
-			return index < this.breadcrumbs.length - 1
+			return index == this.breadcrumbs.length - 1
 		},
 	},
 }
