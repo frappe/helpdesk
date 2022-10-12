@@ -9,19 +9,39 @@
 			</slot>
 			<div class="grow" />
 			<div v-if="editMode" class="flex flex-row-reverse">
-				<Button
-					:loading="saveInProgress"
-					icon-left="save"
-					class="ml-2"
-					:class="disableSaving ? 'cursor-not-allowed' : ''"
-					:disable="disableSaving"
-					@click="$emit('save')"
+				<slot
+					name="save-action"
+					:save="
+						(params) => {
+							$emit('save', params)
+						}
+					"
+					:disableSaving="disableSaving"
+					:saveInProgress="saveInProgress"
 				>
-					Save
-				</Button>
-				<Button icon-left="rotate-ccw" @click="$emit('discard')">
-					Discard
-				</Button>
+					<Button
+						:loading="saveInProgress"
+						icon-left="save"
+						class="ml-2"
+						:class="disableSaving ? 'cursor-not-allowed' : ''"
+						:disable="disableSaving"
+						@click="$emit('save')"
+					>
+						Save
+					</Button>
+				</slot>
+				<slot
+					name="discard-action"
+					:discard="
+						(params) => {
+							$emit('discard', params)
+						}
+					"
+				>
+					<Button icon-left="rotate-ccw" @click="$emit('discard')">
+						Discard
+					</Button>
+				</slot>
 			</div>
 			<div v-else>
 				<Button icon-left="edit-2" @click="$emit('edit')">

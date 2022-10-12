@@ -17,9 +17,9 @@
 			}
 		"
 		@save="
-			() => {
+			(publish = false) => {
 				if (validateChanges()) {
-					saveChanges().then(() => {
+					saveChanges(publish).then(() => {
 						// TODO: remove the $router.go() hack,
 						// instead reload the breadcrumbs on top if
 						// the name of the article is changed
@@ -35,6 +35,38 @@
 				:docName="articleId"
 				:isDesk="editable"
 			/>
+		</template>
+		<template #save-action="{ save, disableSaving, saveInProgress }">
+			<Dropdown
+				placement="right"
+				:options="[
+					{
+						label: 'Save',
+						handler: () => {
+							save()
+						},
+					},
+					{
+						label: 'Save and Publish',
+						handler: () => {
+							save(true)
+						},
+					},
+				]"
+			>
+				<template v-slot="{ toggleDropdown }">
+					<Button
+						:loading="saveInProgress"
+						icon-left="save"
+						class="ml-2"
+						:class="disableSaving ? 'cursor-not-allowed' : ''"
+						:disable="disableSaving"
+						@click="toggleDropdown"
+					>
+						Save
+					</Button>
+				</template>
+			</Dropdown>
 		</template>
 		<template #body>
 			<div class="h-full grid grid-cols-1">
@@ -81,6 +113,7 @@ import ArticleDetails from "@/components/desk/kb/ArticleDetails.vue"
 import ArticleTitleAndContent from "@/components/desk/kb/ArticleTitleAndContent.vue"
 import { useRoute } from "vue-router"
 import { ref, provide } from "vue"
+import { Dropdown } from "frappe-ui"
 
 export default {
 	name: "Article",
@@ -96,6 +129,7 @@ export default {
 		Breadcrumbs,
 		ArticleDetails,
 		ArticleTitleAndContent,
+		Dropdown,
 	},
 	setup() {
 		const route = useRoute()
