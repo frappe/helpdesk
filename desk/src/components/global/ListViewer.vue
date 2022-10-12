@@ -12,14 +12,15 @@
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
 						>
 							<div>
-								<slot name="top-sub-section-1">
-									<!-- Filter Box -->
-								</slot>
+								<slot name="top-sub-section-1"> </slot>
 							</div>
 							<div class="grow">
 								<slot name="top-sub-section-2">
 									<!-- Filter Box -->
-									<div class="flex flex-row items-center">
+									<div
+										v-if="options.showFilterBox"
+										class="flex flex-row items-center"
+									>
 										<Button
 											icon-right="chevron-down"
 											class="mr-[-10px] bg-gray-300"
@@ -257,6 +258,7 @@ export default {
 					width: this.options.fields[i].width || 1,
 					priority: this.options.fields[i].priority || 5,
 					align: this.options.fields[i].align || "left",
+					showFilterBox: this.options.fields[i].showFilterBox || true,
 				}
 			}
 			return options

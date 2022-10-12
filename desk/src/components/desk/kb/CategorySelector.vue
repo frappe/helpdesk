@@ -1,6 +1,14 @@
 <template>
 	<div>
-		<slot name="selector-main" :selectedCategoryName="selectedCategoryName">
+		<slot
+			name="selector-main"
+			:show="
+				() => {
+					showDialog = true
+				}
+			"
+			:selectedCategoryName="selectedCategoryName"
+		>
 			<Input
 				@click="
 					() => {
@@ -16,6 +24,11 @@
 		<Dialog
 			:options="{ title: 'Select a Category' }"
 			:show="showDialog"
+			@close="
+				() => {
+					currentCategory = null
+				}
+			"
 			v-model="showDialog"
 		>
 			<template #body-main>
@@ -80,6 +93,7 @@
 							showDialog = false
 							$emit('selection', currentCategory)
 							selectedCategoryName = currentCategory.category_name
+							currentCategory = null
 						}
 					"
 				>

@@ -111,3 +111,29 @@ def get_breadcrumbs(docType, docName):
 @frappe.whitelist(allow_guest=True)
 def check_if_article_is_published(article_name):
 	return frappe.db.exists("Article", {"name": article_name, "status": "Published"})
+
+
+@frappe.whitelist()
+def move_articles_to_category(articles, category):
+	for article in articles:
+		doc = frappe.get_doc("Article", article)
+		doc.category = category
+		doc.save()
+
+
+@frappe.whitelist()
+def set_status_for_articles(articles, status):
+	if status not in ["Published", "Draft"]:
+		frappe.throw("Invalid status")
+	for article in articles:
+		doc = frappe.get_doc("Article", article)
+		doc.status = status
+		doc.save()
+
+
+@frappe.whitelist()
+def delete_articles(articles):
+	for article in articles:
+		doc = frappe.get_doc("Article", article)
+		doc.status = "Archived"
+		doc.save()

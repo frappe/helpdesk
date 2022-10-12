@@ -76,9 +76,12 @@ export default {
 					options.value.handle_row_click(rowData)
 				}
 			},
+			unselect: () => {
+				selectedItems.value = {}
+			},
 			selectAll: () => {
 				if (allItemsSelected.value) {
-					selectedItems.value = {}
+					manager.value.unselect()
 				} else {
 					for (let i = 0; i < manager.value.list.length; i++) {
 						selectedItems.value[manager.value.list[i].name] =

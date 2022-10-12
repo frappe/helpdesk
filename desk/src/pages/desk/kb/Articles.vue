@@ -4,29 +4,43 @@
 			ref="articleList"
 			:options="{
 				doctype: 'Article',
-				fields: ['title', 'status', 'views', 'author', 'modified'],
+				fields: [
+					'title',
+					'status',
+					'views',
+					'author',
+					'modified',
+					'category.category_name as category_name',
+				],
 				order_by: 'modified desc',
 				limit: 20,
+				filters: { status: ['!=', 'Archived'] },
 			}"
 		>
 			<template #body="{ manager }">
 				<ListViewer
 					:manager="manager"
 					:options="{
+						showFilterBox: false,
 						fields: {
 							title: {
 								label: 'Title',
-								width: '6',
+								width: '5',
+								priority: 1,
+							},
+							category_name: {
+								label: 'Category',
+								width: '3',
 								priority: 1,
 							},
 							status: {
 								label: 'Status',
-								width: '3',
+								width: '2',
 								priority: 1,
 							},
 							views: {
 								label: 'Views',
-								width: '2',
+								width: '1',
 								priority: 3,
 							},
 							modified: {
@@ -44,15 +58,98 @@
 					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
-							<Button @click="() => {}">Mark as Draft</Button>
-							<Button @click="() => {}">Add to FAQ</Button>
-							<Button @click="() => {}">Archive</Button>
+							<CategorySelector
+								@selection="
+									(category) => {
+										$resources.moveArticlesToCategory
+											.submit({
+												articles:
+													Object.keys(selectedItems),
+												category: category.name,
+											})
+											.then(() => {
+												manager.unselect()
+											})
+									}
+								"
+							>
+								<template #selector-main="{ show }">
+									<Button @click="show">Move to</Button>
+								</template>
+							</CategorySelector>
+							<Dropdown
+								placement="right"
+								:options="[
+									{
+										label: 'Draft',
+										handler: () => {
+											$resources.setStatusForArticles
+												.submit({
+													articles:
+														Object.keys(
+															selectedItems
+														),
+													status: 'Draft',
+												})
+												.then(() => {
+													manager.unselect()
+												})
+										},
+									},
+									{
+										label: 'Published',
+										handler: () => {
+											$resources.setStatusForArticles
+												.submit({
+													articles:
+														Object.keys(
+															selectedItems
+														),
+													status: 'Published',
+												})
+												.then(() => {
+													manager.unselect()
+												})
+										},
+									},
+								]"
+							>
+								<template v-slot="{ toggleDropdown }">
+									<Button
+										:loading="
+											$resources.setStatusForArticles
+												.loading
+										"
+										icon-right="chevron-down"
+										class="ml-2"
+										@click="toggleDropdown"
+									>
+										Mark as
+									</Button>
+								</template>
+							</Dropdown>
+							<!-- <Button @click="() => {}">Add to FAQ</Button> -->
+							<Button
+								@click="
+									() => {
+										$resources.deleteArticles
+											.submit({
+												articles:
+													Object.keys(selectedItems),
+											})
+											.then(() => {
+												manager.unselect()
+												manager.reload()
+											})
+									}
+								"
+								>Delete</Button
+							>
 						</div>
 					</template>
 					<template #actions>
 						<div class="flex flex-row space-x-2">
-							<Button> Action 1 </Button>
-							<Button> Action 2 </Button>
+							<!-- Add actions here -->
 						</div>
 					</template>
 					<template #field-title="{ value, row }">
@@ -98,6 +195,8 @@
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import LayoutSwitcher from "@/components/global/kb/LayoutSwitcher.vue"
+import CategorySelector from "@/components/desk/kb/CategorySelector.vue"
+import { Dropdown } from "frappe-ui"
 
 export default {
 	name: "Articles",
@@ -111,6 +210,25 @@ export default {
 		ListManager,
 		ListViewer,
 		LayoutSwitcher,
+		CategorySelector,
+		Dropdown,
+	},
+	resources: {
+		moveArticlesToCategory() {
+			return {
+				method: "frappedesk.api.kb.move_articles_to_category",
+			}
+		},
+		setStatusForArticles() {
+			return {
+				method: "frappedesk.api.kb.set_status_for_articles",
+			}
+		},
+		deleteArticles() {
+			return {
+				method: "frappedesk.api.kb.delete_articles",
+			}
+		},
 	},
 }
 </script>
