@@ -154,7 +154,7 @@ export default {
 	setup() {
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
-		const isNew = ref(route.meta.isNew)
+		const isNew = ref(route.meta.isNew || false)
 
 		const editMode = ref(false)
 		const saveInProgress = ref(false)

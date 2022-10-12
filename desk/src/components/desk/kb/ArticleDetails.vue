@@ -40,6 +40,16 @@
 			/>
 			<ErrorMessage :message="articleInputErrors.author" />
 		</div>
+		<div>
+			<CategorySelector
+				:selectedCategory="article.category"
+				@selection="
+					(category) => {
+						setArticleDetail('category', category.name)
+					}
+				"
+			/>
+		</div>
 		<div
 			class="flex flex-row items-center text-[12px] text-gray-700"
 			v-if="!isNew"
@@ -69,7 +79,8 @@
 <script>
 import { FeatherIcon, ErrorMessage } from "frappe-ui"
 import Autocomplete from "@/components/global/Autocomplete.vue"
-import { inject } from "vue"
+import { ref, inject } from "vue"
+import CategorySelector from "@/components/desk/kb/CategorySelector.vue"
 
 export default {
 	name: "ArticleDetails",
@@ -91,6 +102,7 @@ export default {
 		FeatherIcon,
 		ErrorMessage,
 		Autocomplete,
+		CategorySelector,
 	},
 	setup() {
 		const user = inject("user")
@@ -126,9 +138,14 @@ export default {
 			if (!this.isNew) {
 				let params = {}
 				params[field] = value
-				this.articleResource.setValue.submit(params)
-			}
-			{
+				this.articleResource.setValue.submit(params).then(() => {
+					if (field === "category") {
+						// This Refreshes the breadcrumbs
+						// TODO: Find a better way to do this
+						this.$router.go()
+					}
+				})
+			} else {
 				this.updateNewArticleInput({ field, value })
 			}
 		},
