@@ -26,17 +26,12 @@ def delete_category(category):
 
 
 @frappe.whitelist()
-def check_if_category_name_exists_outside_current_hierarchy(
-	category_name, parent_category=None
-):
-	doc = {"doctype": "Category", "category_name": category_name}
+def check_if_article_title_exists(name, title):
+	filters = {"title": ["=", title]}
+	if name:
+		filters["name"] = ["!=", name]
 
-	if parent_category:
-		doc["parent_category"] = ["!=", parent_category]
-	else:
-		doc["is_group"] = False
-
-	return frappe.db.exists(doc) is not None
+	return frappe.db.exists("Article", filters)
 
 
 @frappe.whitelist()

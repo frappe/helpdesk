@@ -29,6 +29,16 @@
 					<ArticleMiniListItem
 						:editMode="editMode"
 						:article="element"
+						@click="
+							() => {
+								if (editMode) return
+								$router.push({
+									path: `/${
+										editable ? 'frappedesk' : 'support'
+									}/kb/articles/${element.name}`,
+								})
+							}
+						"
 					/>
 				</div>
 			</template>

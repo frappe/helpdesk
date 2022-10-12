@@ -1,12 +1,12 @@
 <template>
 	<div class="flex flex-col space-y-4">
 		<div v-if="editable" class="flex flex-row items-center">
-			<div>
+			<slot name="top-left-section">
 				<div v-if="!editMode"><LayoutSwitcher viewMode="Web" /></div>
 				<div v-else class="text-base text-gray-700 italic">
 					Editing - Knowledge Base
 				</div>
-			</div>
+			</slot>
 			<div class="grow" />
 			<div v-if="editMode" class="flex flex-row-reverse">
 				<Button
