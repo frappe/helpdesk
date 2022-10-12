@@ -77,7 +77,7 @@
 				<template v-slot="{ toggleDropdown }">
 					<Button
 						:loading="saveInProgress"
-						icon-left="save"
+						icon-right="chevron-down"
 						class="ml-2"
 						:class="disableSaving ? 'cursor-not-allowed' : ''"
 						:disable="disableSaving"
