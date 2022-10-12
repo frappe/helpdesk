@@ -36,6 +36,26 @@
 				:isDesk="editable"
 			/>
 		</template>
+		<template #other-main-actions>
+			<div>
+				<Button
+					:loading="saveInProgress"
+					:appearance="
+						article.status === 'Published' ? 'secondary' : 'primary'
+					"
+					@click="
+						() => {
+							articleTempValues = { ...article }
+							saveChanges(!(article.status === 'Published'))
+						}
+					"
+				>
+					{{
+						article.status === "Published" ? "Unpublish" : "Publish"
+					}}
+				</Button>
+			</div>
+		</template>
 		<template #save-action="{ save, disableSaving, saveInProgress }">
 			<Dropdown
 				placement="right"

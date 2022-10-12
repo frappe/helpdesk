@@ -8,45 +8,54 @@
 				</div>
 			</slot>
 			<div class="grow" />
-			<div v-if="editMode" class="flex flex-row-reverse">
-				<slot
-					name="save-action"
-					:save="
-						(params) => {
-							$emit('save', params)
-						}
-					"
-					:disableSaving="disableSaving"
-					:saveInProgress="saveInProgress"
-				>
-					<Button
-						:loading="saveInProgress"
-						icon-left="save"
-						class="ml-2"
-						:class="disableSaving ? 'cursor-not-allowed' : ''"
-						:disable="disableSaving"
-						@click="$emit('save')"
+			<slot> </slot>
+			<div v-if="editMode" class="flex flex-row items-center space-x-2">
+				<slot name="edit-actions">
+					<slot
+						name="discard-action"
+						:discard="
+							(params) => {
+								$emit('discard', params)
+							}
+						"
 					>
-						Save
-					</Button>
-				</slot>
-				<slot
-					name="discard-action"
-					:discard="
-						(params) => {
-							$emit('discard', params)
-						}
-					"
-				>
-					<Button icon-left="rotate-ccw" @click="$emit('discard')">
-						Discard
-					</Button>
+						<Button
+							icon-left="rotate-ccw"
+							@click="$emit('discard')"
+						>
+							Discard
+						</Button>
+					</slot>
+					<slot
+						name="save-action"
+						:save="
+							(params) => {
+								$emit('save', params)
+							}
+						"
+						:disableSaving="disableSaving"
+						:saveInProgress="saveInProgress"
+					>
+						<Button
+							:loading="saveInProgress"
+							icon-left="save"
+							:class="disableSaving ? 'cursor-not-allowed' : ''"
+							:disable="disableSaving"
+							@click="$emit('save')"
+						>
+							Save
+						</Button>
+					</slot>
+					<slot name="other-edit-actions" />
 				</slot>
 			</div>
-			<div v-else>
-				<Button icon-left="edit-2" @click="$emit('edit')">
-					Edit
-				</Button>
+			<div v-else class="flex flex-row items-center space-x-2">
+				<slot name="main-actions">
+					<Button icon-left="edit-2" @click="$emit('edit')">
+						Edit
+					</Button>
+					<slot name="other-main-actions" />
+				</slot>
 			</div>
 		</div>
 		<slot class="h-full" name="body" />
