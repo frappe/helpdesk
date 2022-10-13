@@ -20,9 +20,9 @@
 			<FeatherIcon name="external-link" class="w-4" />
 		</router-link>
 		<div v-if="$resources.users.data" class="flex flex-col">
-			<span class="block mb-2 text-sm leading-4 text-gray-700"
-				>Author</span
-			>
+			<span class="block mb-2 text-sm leading-4 text-gray-700">
+				Author
+			</span>
 			<Autocomplete
 				:options="
 					$resources.users.data.map((x) => {
@@ -30,7 +30,7 @@
 					})
 				"
 				placeholder="Choose author"
-				:value="isNew ? user.user : article.author"
+				:value="isNew ? articleTempValues?.author : article.author"
 				@change="
 					(item) => {
 						if (!item) return
@@ -42,13 +42,16 @@
 		</div>
 		<div>
 			<CategorySelector
-				:selectedCategory="article.category"
+				:selectedCategory="
+					isNew ? articleTempValues?.category : article.category
+				"
 				@selection="
 					(category) => {
 						setArticleDetail('category', category.name)
 					}
 				"
 			/>
+			<ErrorMessage :message="articleInputErrors.category" />
 		</div>
 		<div
 			class="flex flex-row items-center text-[12px] text-gray-700"
@@ -79,7 +82,7 @@
 <script>
 import { FeatherIcon, ErrorMessage } from "frappe-ui"
 import Autocomplete from "@/components/global/Autocomplete.vue"
-import { ref, inject } from "vue"
+import { inject } from "vue"
 import CategorySelector from "@/components/desk/kb/CategorySelector.vue"
 
 export default {
@@ -106,14 +109,14 @@ export default {
 	},
 	setup() {
 		const user = inject("user")
-		const updateNewArticleInput = inject("updateNewArticleInput")
-		const newArticleTempValues = inject("newArticleTempValues")
+		const updateArticleTempValues = inject("updateArticleTempValues")
+		const articleTempValues = inject("articleTempValues")
 		const articleInputErrors = inject("articleInputErrors")
 
 		return {
 			user,
-			updateNewArticleInput,
-			newArticleTempValues,
+			updateArticleTempValues,
+			articleTempValues,
 			articleInputErrors,
 		}
 	},
@@ -146,7 +149,7 @@ export default {
 					}
 				})
 			} else {
-				this.updateNewArticleInput({ field, value })
+				this.updateArticleTempValues({ field, value })
 			}
 		},
 	},

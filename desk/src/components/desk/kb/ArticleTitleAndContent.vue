@@ -97,27 +97,8 @@ export default {
 			updateArticleTempValues,
 		}
 	},
-	resources: {
-		checkIfTitleExists() {
-			return {
-				method: "frappedesk.api.kb.check_if_article_title_exists",
-				onSuccess: (exists) => {
-					if (exists) {
-						this.articleInputErrors.title =
-							"Article with this title already exists"
-					} else {
-						this.articleInputErrors.title = ""
-					}
-				},
-			}
-		},
-	},
 	methods: {
 		onTitleInput: debounce(function (value) {
-			this.$resources.checkIfTitleExists.submit({
-				name: this.isNew ? "" : this.article.name,
-				title: value,
-			})
 			this.updateArticleTempValues({ field: "title", value })
 		}, 300),
 		onContentInput: debounce(function (value) {

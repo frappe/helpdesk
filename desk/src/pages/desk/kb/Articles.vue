@@ -51,6 +51,11 @@
 							},
 						},
 					}"
+					@add-item="
+						() => {
+							$router.push('/frappedesk/kb/articles/new')
+						}
+					"
 					class="text-base"
 				>
 					<template #top-sub-section-1>

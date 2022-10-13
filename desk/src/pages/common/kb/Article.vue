@@ -13,28 +13,44 @@
 		"
 		@discard="
 			() => {
-				editMode = false
-			}
-		"
-		@save="
-			(publish = false) => {
-				if (validateChanges()) {
-					saveChanges(publish).then(() => {
-						// TODO: remove the $router.go() hack,
-						// instead reload the breadcrumbs on top if
-						// the name of the article is changed
-						editMode = false
-					})
+				if (isNew) {
+					$router.push({ path: '/frappedesk/kb/articles' })
+				} else {
+					editMode = false
 				}
 			}
 		"
+		@save="saveChanges"
 	>
 		<template #top-left-section>
-			<Breadcrumbs
-				docType="Article"
-				:docName="articleId"
-				:isDesk="editable"
-			/>
+			<div>
+				<Breadcrumbs
+					v-if="!isNew"
+					docType="Article"
+					:docName="articleId"
+					:isDesk="editable"
+				/>
+				<BaseBreadcrumbs
+					v-else
+					:breadcrumbs="[
+						{
+							label: 'Articles',
+							name: 'articles',
+							handler: () => {
+								$router.push({
+									path: `/${
+										editable ? 'frappedesk' : 'support'
+									}/kb/articles`,
+								})
+							},
+						},
+						{
+							label: 'New',
+							name: 'new',
+						},
+					]"
+				/>
+			</div>
 		</template>
 		<template #other-main-actions>
 			<div>
@@ -132,8 +148,9 @@ import Breadcrumbs from "@/components/global/kb/Breadcrumbs.vue"
 import ArticleDetails from "@/components/desk/kb/ArticleDetails.vue"
 import ArticleTitleAndContent from "@/components/desk/kb/ArticleTitleAndContent.vue"
 import { useRoute } from "vue-router"
-import { ref, provide } from "vue"
-import { Dropdown } from "frappe-ui"
+import { ref, provide, inject } from "vue"
+import { Dropdown, FeatherIcon } from "frappe-ui"
+import BaseBreadcrumbs from "../../../components/global/BaseBreadcrumbs.vue"
 
 export default {
 	name: "Article",
@@ -150,20 +167,28 @@ export default {
 		ArticleDetails,
 		ArticleTitleAndContent,
 		Dropdown,
+		FeatherIcon,
+		BaseBreadcrumbs,
 	},
 	setup() {
+		const user = inject("user")
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
 		const isNew = ref(route.meta.isNew || false)
 
-		const editMode = ref(false)
+		const editMode = ref(route.meta.editMode || false)
 		const saveInProgress = ref(false)
 
 		const articleTempValues = ref({})
-		const updateArticleTempValues = ref((input) => {
-			articleTempValues.value[input.field] = input.value
-		})
+		if (isNew) {
+			articleTempValues.value = {
+				author: user.value.user,
+				category: route.meta.category || null,
+			}
+		}
+		const updateArticleTempValues = ref(() => {})
 		const articleInputErrors = ref({})
+		const validators = ref({})
 		provide("updateArticleTempValues", updateArticleTempValues)
 		provide("articleTempValues", articleTempValues)
 		provide("articleInputErrors", articleInputErrors)
@@ -174,7 +199,22 @@ export default {
 			editMode,
 			saveInProgress,
 			articleTempValues,
+			updateArticleTempValues,
 			articleInputErrors,
+			validators,
+		}
+	},
+	mounted() {
+		this.validators = {
+			title: this.validateTitle,
+			content: this.validateContent,
+			author: this.validateAuthor,
+			category: this.validateCategory,
+		}
+
+		this.updateArticleTempValues = (input) => {
+			this.articleTempValues[input.field] = input.value
+			this.validators[input.field](input.value)
 		}
 	},
 	computed: {
@@ -233,47 +273,98 @@ export default {
 				},
 			}
 		},
+		checkIfTitleExists() {
+			return {
+				method: "frappedesk.api.kb.check_if_article_title_exists",
+				onSuccess: (exists) => {
+					if (exists) {
+						this.articleInputErrors.title =
+							"Article with this title already exists"
+					} else {
+						this.articleInputErrors.title = ""
+					}
+				},
+			}
+		},
 	},
 	methods: {
-		validateChanges() {
-			const input = this.articleTempValues
-			this.articleInputErrors = {}
-			if (!input.title || input.title == "") {
+		async validateTitle(value) {
+			this.articleInputErrors.titlle = ""
+			if (!value || value == "") {
 				this.articleInputErrors.title = "Title is required"
+			} else if (value.length <= 3) {
+				this.articleInputErrors.title =
+					"Title should be atleast 3 characters long"
+			} else {
+				await this.$resources.checkIfTitleExists.submit({
+					title: value,
+					name: this.isNew ? null : this.article.name,
+				})
 			}
-			if (
-				!input.content ||
-				input.content.replaceAll(" ", "") == "<p></p>"
-			) {
+			return this.articleInputErrors.title
+		},
+		validateContent(value) {
+			this.articleInputErrors.content = ""
+			if (!value || value.replaceAll(" ", "") == "<p></p>") {
 				this.articleInputErrors.content = "Content is required"
 			}
-			if (!input.author) {
+			return this.articleInputErrors.content
+		},
+		validateAuthor(value) {
+			this.articleInputErrors.author = ""
+			if (!value) {
 				this.articleInputErrors.author = "Author is required"
 			}
-			if (!input.category) {
+			return this.articleInputErrors.author
+		},
+		validateCategory(value) {
+			this.articleInputErrors.category = ""
+			if (!value) {
 				this.articleInputErrors.category = "Category is required"
 			}
+			return this.articleInputErrors.category
+		},
+		async validateChanges() {
+			const input = this.articleTempValues
 
-			return Object.keys(this.articleInputErrors).length == 0
+			let errors = ""
+			errors += await this.validateTitle(input.title)
+			errors += this.validateContent(input.content)
+			errors += this.validateAuthor(input.author)
+			errors += this.validateCategory(input.category)
+
+			return errors.length == 0
 		},
 		async saveChanges(publish = false) {
-			this.saveInProgress = true
-			if (this.isNew) {
-			} else {
-				// page is reloaded to fetch the new breadcrumbs
-				// TODO: find a better way to do this
-				let reloadPage =
-					this.articleTempValues.title != this.article.title
-				await this.$resources.article.setValue.submit({
-					title: this.articleTempValues.title,
-					content: this.articleTempValues.content,
-					status: publish ? "Published" : "Draft",
-				})
-				if (reloadPage) {
-					this.$router.go()
+			if (await this.validateChanges()) {
+				this.saveInProgress = true
+				if (this.isNew) {
+					this.articleTempValues.status = publish
+						? "Published"
+						: "Draft"
+					await this.$resources.newArticle.submit({
+						doc: {
+							doctype: "Article",
+							...this.articleTempValues,
+						},
+					})
+				} else {
+					// page is reloaded to fetch the new breadcrumbs
+					// TODO: find a better way to do this
+					let reloadPage =
+						this.articleTempValues.title != this.article.title
+					await this.$resources.article.setValue.submit({
+						title: this.articleTempValues.title,
+						content: this.articleTempValues.content,
+						status: publish ? "Published" : "Draft",
+					})
+					if (reloadPage) {
+						this.$router.go()
+					}
 				}
+				this.editMode = false
+				this.saveInProgress = false
 			}
-			this.saveInProgress = false
 			return
 		},
 	},

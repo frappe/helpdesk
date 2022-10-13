@@ -10,15 +10,16 @@
 			:selectedCategoryName="selectedCategoryName"
 		>
 			<Input
+				id="input"
+				label="Category"
 				@click="
 					() => {
 						showDialog = true
 					}
 				"
-				label="Category"
-				type="text"
-				:value="selectedCategoryName"
+				placeholder="Choose Category"
 				role="button"
+				:value="selectedCategoryName"
 			/>
 		</slot>
 		<Dialog
@@ -136,6 +137,14 @@ export default {
 	},
 	mounted() {
 		this.fetchSubCategoriesInCategory(this.currentCategory?.name)
+
+		// removes edit cursor from input when clicked on
+		const input = document.getElementById("input")
+		if (input) {
+			input.addEventListener("focus", (event) => {
+				input.blur()
+			})
+		}
 	},
 	computed: {
 		isRoot() {

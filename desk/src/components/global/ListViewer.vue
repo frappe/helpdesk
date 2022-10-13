@@ -64,6 +64,7 @@
 												<Button
 													appearance="primary"
 													icon-left="plus"
+													@click="$emit('add-item')"
 												>
 													{{
 														`Add ${manager.options.doctype}`

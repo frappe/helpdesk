@@ -26,7 +26,7 @@ def delete_category(category):
 
 
 @frappe.whitelist()
-def check_if_article_title_exists(name, title):
+def check_if_article_title_exists(title, name=None):
 	filters = {"title": ["=", title]}
 	if name:
 		filters["name"] = ["!=", name]
