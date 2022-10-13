@@ -1,55 +1,36 @@
 <template>
-	<div class="flex flex-row space-x-2 items-center text-gray-600 text-base">
-		<div v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb">
-			<div class="flex flex-row items-center space-x-2">
-				<div
-					@click="
-						() => {
-							if (!interactable) return
-							if (!isBreadcrumbLast()) {
-								if (overrideInteraction != null) {
-									overrideInteraction(
-										{
-											name: breadcrumb.name,
-											docname: breadcrumb.label,
-										},
-										index === 0
-									)
-								} else {
-									$router.push({
-										path: `/${
-											isDesk ? 'frappedesk' : 'support'
-										}/kb${
-											breadcrumb.name
-												? `/categories/${breadcrumb.name}`
-												: ''
-										}`,
-									})
-								}
-							}
-						}
-					"
-					:class="
-						!isBreadcrumbLast(index) && interactable
-							? 'cursor-pointer hover:text-gray-900'
-							: ''
-					"
-				>
-					{{ breadcrumb.label }}
-				</div>
-				<div v-if="!isBreadcrumbLast(index)">
-					<FeatherIcon
-						class="h-3 w-3 stroke-gray-500"
-						name="chevron-right"
-					/>
-				</div>
-			</div>
-		</div>
-	</div>
+	<BaseBreadcrumbs
+		:breadcrumbs="breadcrumbs"
+		:interactable="interactable"
+		@item-click="
+			(breadcrumb, index) => {
+				if (!interactable) return
+				if (index < breadcrumbs.length - 1) {
+					if (overrideInteraction != null) {
+						overrideInteraction(
+							{
+								name: breadcrumb.name,
+								docname: breadcrumb.label,
+							},
+							index === 0
+						)
+					} else {
+						$router.push({
+							path: `/${isDesk ? 'frappedesk' : 'support'}/kb${
+								breadcrumb.name
+									? `/categories/${breadcrumb.name}`
+									: ''
+							}`,
+						})
+					}
+				}
+			}
+		"
+	/>
 </template>
 
 <script>
-import { FeatherIcon } from "frappe-ui"
+import BaseBreadcrumbs from "@/components/global/BaseBreadcrumbs.vue"
 
 export default {
 	name: "Breadcrumbs",
@@ -80,7 +61,7 @@ export default {
 		},
 	},
 	components: {
-		FeatherIcon,
+		BaseBreadcrumbs,
 	},
 	computed: {
 		breadcrumbs() {
