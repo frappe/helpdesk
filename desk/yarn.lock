@@ -527,6 +527,11 @@ color-name@^1.1.4:
   resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
 
+commander@^9.0.0:
+  version "9.4.1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-9.4.1.tgz#d1dd8f2ce6faf93147295c0df13c7c21141cfbdd"
+  integrity sha512-5EEkTNyHNGFPD2H+c/dXXfQZYa/scCKasxWcXJaWnNJ99pnQN9Vnmqow+p+PlFPE63Q6mThaZws1T+HxfpgtPw==
+
 core-js@^3.1.3:
   version "3.24.1"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.24.1.tgz#cf7724d41724154010a6576b7b57d94c5d66e64f"
@@ -779,10 +784,10 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
-frappe-ui@^0.0.72:
-  version "0.0.72"
-  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.72.tgz#7f7a4a34d6a57a1e7f37326625d9168248f75410"
-  integrity sha512-OOdmx+r4Q4JXS7ku5Oa0Bhul8iRsLw7E8BghqQup9sHn+hGAVdnYi0cUPBAUVeYlGwgWrG/xJh0EW/vCKJ2K9g==
+frappe-ui@^0.0.80:
+  version "0.0.80"
+  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.0.80.tgz#73fadf1fcab462d13711fac82da2dbf5f6d48e5f"
+  integrity sha512-lWLVfGkxkxc9CBdqEIwV7rtH1pJPyvjoppErTFni/T+u6bNqQOBhqQEHMsPwg9aZyirvAwo51L5+b5XSyJ8XpQ==
   dependencies:
     "@headlessui/vue" "^1.5.0"
     "@popperjs/core" "^2.11.2"
@@ -804,6 +809,7 @@ frappe-ui@^0.0.72:
     feather-icons "^4.28.0"
     idb-keyval "^6.2.0"
     postcss "^8.4.5"
+    showdown "^2.1.0"
     socket.io-client "^4.5.1"
     tailwindcss "^3.0.12"
     tippy.js "^6.3.7"
@@ -1221,6 +1227,13 @@ safari-14-idb-fix@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/safari-14-idb-fix/-/safari-14-idb-fix-3.0.0.tgz#450fc049b996ec7f3fd9ca2f89d32e0761583440"
   integrity sha512-eBNFLob4PMq8JA1dGyFn6G97q3/WzNtFK4RnzT1fnLq+9RyrGknzYiM/9B12MnKAxuj1IXr7UKYtTNtjyKMBog==
+
+showdown@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/showdown/-/showdown-2.1.0.tgz#1251f5ed8f773f0c0c7bfc8e6fd23581f9e545c5"
+  integrity sha512-/6NVYu4U819R2pUIk79n67SYgJHWCce0a5xTP979WbNp0FL9MN1I1QK662IDU1b6JzKTvmhgI7T7JYIxBi3kMQ==
+  dependencies:
+    commander "^9.0.0"
 
 socket.io-client@^4.5.1:
   version "4.5.1"
