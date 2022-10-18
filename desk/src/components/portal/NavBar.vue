@@ -106,10 +106,39 @@ export default {
 							.children.push(item)
 					}
 				})
-				return parentItems
-			} else {
-				return parentItems
 			}
+			// Add "Create a Ticket" option on the navbar if not already present
+			const newTicketRoutes = [
+				"/support/tickets",
+				"/support/tickets/",
+				"/support/tickets/new",
+				"/support/tickets/new/",
+			]
+			const currentRouteIsNewTicket = () => {
+				for (let route of newTicketRoutes) {
+					if (
+						this.$route.fullPath.substring(0, route.length) ===
+						route
+					) {
+						return true
+					}
+				}
+				return false
+			}
+			const newTicketRouteExists = () => {
+				return (
+					parentItems.find((x) => newTicketRoutes.includes(x.url)) !==
+					undefined
+				)
+			}
+			if (!currentRouteIsNewTicket() && !newTicketRouteExists()) {
+				parentItems.push({
+					label: "Create a Ticket",
+					url: "/support/tickets",
+					children: [],
+				})
+			}
+			return parentItems
 		},
 		profileOptions() {
 			return [
