@@ -2,7 +2,7 @@
 	<div class="h-full">
 		<div
 			v-if="category.is_placeholder"
-			class="border-2 border-dashed border-gray-400 rounded-md p-5"
+			class="border-2 border-dashed border-gray-400 rounded-md p-5 mr-4"
 		>
 			<div class="h-[130px]">
 				<div
@@ -126,7 +126,6 @@
 import { inject, ref, watch } from "vue"
 import { ErrorMessage, debounce } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import FeatherIcon from "frappe-ui/src/components/FeatherIcon.vue"
 
 export default {
 	name: "CategoryCard",
@@ -147,7 +146,6 @@ export default {
 	components: {
 		CustomIcons,
 		ErrorMessage,
-		FeatherIcon,
 	},
 	setup(props) {
 		const validationErrors = ref({

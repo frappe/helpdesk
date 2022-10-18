@@ -41,6 +41,9 @@
 										: null,
 									is_group: 1,
 								})
+								categories.push({
+									is_placeholder: true,
+								})
 							}
 							if (editMode) return
 							return $router.push({
