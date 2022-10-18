@@ -112,7 +112,7 @@
 			"label": "Note"
 		},
 		{
-			"default": "0",
+			"default": "-1",
 			"fieldname": "idx",
 			"fieldtype": "Data",
 			"label": "Index"
@@ -126,7 +126,7 @@
 		}
 	],
 	"links": [],
-	"modified": "2022-10-11 17:56:39.593408",
+	"modified": "2022-10-18 14:26:30.177110",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Article",
