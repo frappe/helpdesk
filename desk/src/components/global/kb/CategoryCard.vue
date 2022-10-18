@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import { inject, ref, watch } from "vue"
+import { inject, ref } from "vue"
 import { ErrorMessage, debounce } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
@@ -134,10 +134,6 @@ export default {
 			type: Object,
 			required: true,
 		},
-		editMode: {
-			type: Boolean,
-			default: false,
-		},
 		deletable: {
 			type: Boolean,
 			default: false,
@@ -147,7 +143,9 @@ export default {
 		CustomIcons,
 		ErrorMessage,
 	},
-	setup(props) {
+	setup() {
+		const editable = inject("editable")
+		const editMode = inject("editMode")
 		const validationErrors = ref({
 			category_name: "",
 			description: "",
@@ -159,6 +157,8 @@ export default {
 		const allValidationErrors = inject("allValidationErrors")
 
 		return {
+			editable,
+			editMode,
 			validationErrors,
 			checkIfCategoryNameExistsInCurrentHierarchy,
 			allValidationErrors,

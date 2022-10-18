@@ -1,7 +1,7 @@
 <template>
 	<!-- TODO: option to add articles via combobox, create new articles too ? -->
 	<div
-		v-if="categoryId && (articles.length > 0 || editMode)"
+		v-if="categoryId && (articles?.length > 0 || editMode)"
 		class="flex flex-col space-y-5"
 	>
 		<div class="flex flex-row space-x-2 items-center">
@@ -22,7 +22,7 @@
 			:disabled="!editMode"
 			item-key="idx"
 			class="grow grid place-content-center gap-y-3"
-			:class="articles.length > 6 ? 'grid-cols-2' : 'grid-cols-1'"
+			:class="articles?.length > 6 ? 'grid-cols-2' : 'grid-cols-1'"
 		>
 			<template #item="{ element }">
 				<div class="flex flex-row items-center space-x-1">
@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { ref, provide, computed } from "vue"
+import { ref, provide, computed, inject } from "vue"
 import draggable from "vuedraggable"
 import ArticleMiniListItem from "@/components/global/kb/ArticleMiniListItem.vue"
 import { FeatherIcon } from "frappe-ui"
@@ -58,14 +58,6 @@ export default {
 		categoryId: {
 			type: String,
 			default: null,
-		},
-		editable: {
-			type: Boolean,
-			default: false,
-		},
-		editMode: {
-			type: Boolean,
-			default: false,
 		},
 	},
 	components: {
@@ -94,6 +86,9 @@ export default {
 			})
 		}
 
+		const editable = inject("editable")
+		const editMode = inject("editMode")
+
 		context.expose({
 			saveInProgress,
 			validateChanges,
@@ -104,6 +99,8 @@ export default {
 			tempArticles,
 			allValidationErrors,
 			resources,
+			editMode,
+			editable,
 		}
 	},
 	mounted() {

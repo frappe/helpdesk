@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import { ref } from "vue"
+import { ref, provide } from "vue"
 import { useRoute } from "vue-router"
 import CategoryCardList from "@/components/global/kb/CategoryCardList.vue"
 import ArticleMiniList from "@/components/global/kb/ArticleMiniList.vue"
@@ -120,10 +120,14 @@ export default {
 	setup() {
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
+		provide("editble", editable)
 
 		const isRoot = ref(route.meta.isRoot)
+		provide("isRoot", isRoot)
 
 		const editMode = ref(false)
+		provide("editMode", editMode)
+
 		const saveInProgress = ref(false)
 
 		return {
@@ -145,7 +149,9 @@ export default {
 			const isEmpty =
 				this.$resources.articlesCount.data === 0 &&
 				this.$resources.subCategoriesCount.data === 0
-			if (this.editable) this.editMode = isEmpty
+			if (this.editable) {
+				this.editMode = isEmpty
+			}
 			return isEmpty
 		},
 	},

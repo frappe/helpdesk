@@ -14,8 +14,7 @@
 				<CategoryCard
 					class="grow"
 					:category="element"
-					:editMode="editMode"
-					:deletable="categories.length > 1"
+					:deletable="isRoot ? categories.length > 1 : true"
 					@delete="
 						() => {
 							allValidationErrors.splice(
@@ -96,7 +95,7 @@
 </template>
 
 <script>
-import { provide, ref, computed } from "vue"
+import { provide, ref, computed, inject } from "vue"
 import draggable from "vuedraggable"
 import { FeatherIcon } from "frappe-ui"
 import CategoryCard from "@/components/global/kb/CategoryCard.vue"
@@ -108,14 +107,6 @@ export default {
 			type: String,
 			default: null,
 		},
-		editable: {
-			type: Boolean,
-			default: false,
-		},
-		editMode: {
-			type: Boolean,
-			default: false,
-		},
 	},
 	components: {
 		draggable,
@@ -123,6 +114,9 @@ export default {
 		FeatherIcon,
 	},
 	setup(props, context) {
+		const editMode = inject("editMode")
+		const editable = inject("editable")
+		const isRoot = inject("isRoot")
 		const tempCategories = ref([])
 		const allValidationErrors = ref([])
 
@@ -169,6 +163,9 @@ export default {
 		})
 
 		return {
+			editMode,
+			editable,
+			isRoot,
 			tempCategories,
 			allValidationErrors,
 			resources,
