@@ -77,7 +77,7 @@
 import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
 import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
 import { ErrorMessage, debounce, TextEditor } from "frappe-ui"
-import { ref, inject } from "vue"
+import { inject } from "vue"
 
 export default {
 	name: "ArticleTitleAndContent",

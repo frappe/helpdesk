@@ -106,7 +106,11 @@
 		</template>
 		<template #body>
 			<div class="h-full grid grid-cols-1">
-				<SearchSection v-if="!editable" class="mb-5" />
+				<SearchSection
+					v-if="!editable"
+					:disabled="editable"
+					class="mb-5"
+				/>
 				<div
 					class="flex flex-col h-full"
 					:class="editable ? '' : 'container mx-auto'"

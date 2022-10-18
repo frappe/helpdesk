@@ -56,11 +56,12 @@ export default {
 	components: {
 		TextEditor,
 	},
-	setup() {
+	setup(props, { expose }) {
 		const textEditor = ref(null)
 		const editor = computed(() => {
 			return textEditor.value?.editor || null
 		})
+		expose({ editor })
 		const focusEditor = () => {
 			nextTick(() => {
 				editor.value?.commands.focus()

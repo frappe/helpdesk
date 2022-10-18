@@ -137,3 +137,48 @@ def delete_articles(articles):
 		doc = frappe.get_doc("Article", article)
 		doc.status = "Archived"
 		doc.save()
+
+
+@frappe.whitelist()
+def search(text, limit=999):
+	# TODO: change limit to 20, once search result page is implemented
+	# TODO: filter based on user permissions
+	# TODO: optimize search
+
+	articles = frappe.get_list(
+		"Article",
+		filters={"status": ["=", "Published"]},
+		or_filters={"title": ["like", f"%{text}%"], "content": ["like", f"%{text}%"]},
+		fields=["name", "title", "category"],
+		order_by="idx",
+		limit=limit,
+	)
+
+	categories = frappe.get_list(
+		"Category",
+		filters={"status": ["=", "Published"]},
+		or_filters={
+			"category_name": ["like", f"%{text}%"],
+			"description": ["like", f"%{text}%"],
+		},
+		fields=["name", "category_name"],
+		order_by="idx",
+		limit=limit,
+	)
+
+	results = []
+	for article in articles:
+		results.append(
+			{
+				"doctype": "Article",
+				"name": article.name,
+				"title": article.title,
+				"category": article.category,
+			}
+		)
+	for category in categories:
+		results.append(
+			{"doctype": "Category", "name": category.name, "title": category.category_name,}
+		)
+
+	return results

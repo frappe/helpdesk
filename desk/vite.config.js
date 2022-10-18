@@ -22,6 +22,6 @@ export default defineConfig({
 		target: "es2015",
 	},
 	optimizeDeps: {
-		include: ["feather-icons"],
+		include: ["feather-icons", "showdown"],
 	},
 })

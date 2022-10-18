@@ -37,6 +37,7 @@
 			>
 				<div class="grid grid-cols-1 place-content-center">
 					<SearchSection
+						:disabled="editable"
 						:isRoot="isRoot"
 						:class="isRoot ? 'mb-14' : 'mb-5'"
 					/>
