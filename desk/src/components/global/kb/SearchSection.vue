@@ -42,7 +42,7 @@
 					</template>
 					<template #body>
 						<div
-							class="text-base text-gray-700 shadow rounded bg-white mt-2"
+							class="text-base text-gray-700 shadow rounded bg-white mt-2 max-h-[300px] overflow-y-scroll"
 						>
 							<div v-if="searchResults.length > 0">
 								<div
