@@ -1,5 +1,4 @@
 import frappe
-from frappe.model.rename_doc import rename_doc
 
 
 @frappe.whitelist()
@@ -116,11 +115,12 @@ def delete_articles(articles):
 		doc.save()
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def search(text, limit=999):
 	# TODO: change limit to 20, once search result page is implemented
 	# TODO: filter based on user permissions
 	# TODO: optimize search
+	# TODO: filter based on user permissions / guest user
 
 	articles = frappe.get_list(
 		"Article",
@@ -188,7 +188,7 @@ def submit_article_feedback(article, score, previous_score=None):
 			else:
 				article_doc.helpful -= 1
 				article_doc.not_helpful += 1
-			article_doc.save()
+			article_doc.save(ignore_permissions=True)
 	else:
 		if user != "Guest":
 			user_article_feedback_doc = frappe.new_doc("User Article Feedback")
@@ -201,7 +201,7 @@ def submit_article_feedback(article, score, previous_score=None):
 			article_doc.not_helpful += 1
 		elif score == 1:
 			article_doc.helpful += 1
-		article_doc.save()
+		article_doc.save(ignore_permissions=True)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -209,4 +209,32 @@ def increment_article_views(article):
 	# TODO: use data to compute related articles, using past viewed articles of the user and giving a rank to each article
 	article_doc = frappe.get_doc("Article", article)
 	article_doc.views += 1
-	article_doc.save()
+	article_doc.save(
+		ignore_permissions=True
+	)  # ignore_permisssion is required to allow guest users to increment views
+
+
+@frappe.whitelist(allow_guest=True)
+def get_article(article):
+	# TODO: check if article has gust access enabled
+	# TODO: else filter out with required permissions to view the article
+	article_doc = frappe.get_doc("Article", article)
+	return article_doc
+
+
+@frappe.whitelist(allow_guest=True)
+def get_articles(
+	filters, fields, limit=20, order_by="idx",
+):
+	return frappe.get_list(
+		"Article", filters=filters, fields=fields, limit=limit, order_by=order_by,
+	)
+
+
+@frappe.whitelist(allow_guest=True)
+def get_categories(
+	filters, fields, limit=20, order_by="idx",
+):
+	return frappe.get_list(
+		"Category", filters=filters, fields=fields, limit=limit, order_by=order_by,
+	)

@@ -236,7 +236,9 @@ export default {
 		},
 		article() {
 			if (!this.isNew) {
-				return this.$resources.article.doc || {}
+				return this.editable
+					? this.$resources.article.doc || {}
+					: this.$resources.article.data || {}
 			}
 			return {}
 		},
@@ -247,27 +249,37 @@ export default {
 		},
 		article() {
 			if (!this.isNew) {
-				return {
-					type: "document",
-					doctype: "Article",
-					name: this.articleId,
-					setValue: {
-						onSuccess: () => {
-							this.$toast({
-								title: "Article updated",
-								customIcon: "circle-check",
-								appearance: "success",
-							})
+				if (this.editable) {
+					return {
+						type: "document",
+						doctype: "Article",
+						name: this.articleId,
+						setValue: {
+							onSuccess: () => {
+								this.$toast({
+									title: "Article updated",
+									customIcon: "circle-check",
+									appearance: "success",
+								})
+							},
+							onError: (err) => {
+								this.$toast({
+									title: "Error while updating article",
+									text: err,
+									customIcon: "circle-fail",
+									appearance: "danger",
+								})
+							},
 						},
-						onError: (err) => {
-							this.$toast({
-								title: "Error while updating article",
-								text: err,
-								customIcon: "circle-fail",
-								appearance: "danger",
-							})
+					}
+				} else {
+					return {
+						method: "frappedesk.api.kb.get_article",
+						params: {
+							article: this.articleId,
 						},
-					},
+						auto: true,
+					}
 				}
 			} else {
 				return {}

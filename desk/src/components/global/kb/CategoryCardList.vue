@@ -156,13 +156,20 @@ export default {
 			})
 		}
 
+		const list = ref({
+			loading: true,
+			data: [],
+		})
+
 		context.expose({
+			list,
 			saveInProgress,
 			validateChanges,
 			saveChanges,
 		})
 
 		return {
+			list,
 			editMode,
 			editable,
 			isRoot,
@@ -177,7 +184,9 @@ export default {
 	computed: {
 		categories() {
 			if (!this.editMode) {
-				return this.$resources.categories.data || []
+				this.list.loading = this.$resources.categories.loading
+				this.list.data = this.$resources.categories.data || []
+				return this.list.data
 			} else {
 				return this.tempCategories
 			}
@@ -204,23 +213,42 @@ export default {
 				: { is_group: true, parent_category: "" }
 			filters.status = "Published"
 
-			return {
-				type: "list",
-				cache: ["Categories", this.categoryId ? this.categoryId : ""],
-				doctype: "Category",
-				filters,
-				fields: [
-					"name",
-					"category_name",
-					"description",
-					"parent_category",
-					"is_group",
-					"idx",
-				],
-				limit: 999,
-				order_by: "idx",
-				// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
-				// or implement colaborative editing
+			const fields = [
+				"name",
+				"category_name",
+				"description",
+				"parent_category",
+				"is_group",
+				"idx",
+			]
+
+			const cache = ["Categories", this.categoryId ? this.categoryId : ""]
+			const limit = 999
+			const order_by = "idx"
+			if (this.editable) {
+				return {
+					type: "list",
+					cache,
+					doctype: "Category",
+					filters,
+					fields,
+					limit,
+					order_by,
+					// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
+					// or implement colaborative editing
+				}
+			} else {
+				return {
+					cache,
+					method: "frappedesk.api.kb.get_categories",
+					params: {
+						filters,
+						fields,
+						limit,
+						order_by,
+					},
+					auto: true,
+				}
 			}
 		},
 		saveCategories() {

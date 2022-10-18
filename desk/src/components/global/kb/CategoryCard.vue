@@ -144,7 +144,6 @@ export default {
 		ErrorMessage,
 	},
 	setup() {
-		const editable = inject("editable")
 		const editMode = inject("editMode")
 		const validationErrors = ref({
 			category_name: "",
@@ -157,7 +156,6 @@ export default {
 		const allValidationErrors = inject("allValidationErrors")
 
 		return {
-			editable,
 			editMode,
 			validationErrors,
 			checkIfCategoryNameExistsInCurrentHierarchy,
@@ -200,6 +198,7 @@ export default {
 	resources: {
 		numberOfArticlesInCategory() {
 			if (this.category.is_new) return
+			if (!this.editMode) return
 			return {
 				method: "frappe.client.get_count",
 				params: {
@@ -213,6 +212,7 @@ export default {
 		},
 		numberOfSubCategoriesInCategory() {
 			if (this.category.is_new) return
+			if (!this.editMode) return
 			return {
 				method: "frappe.client.get_count",
 				params: {

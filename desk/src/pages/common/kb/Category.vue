@@ -117,6 +117,11 @@ export default {
 			default: null,
 		},
 	},
+	data() {
+		return {
+			isMounted: false,
+		}
+	},
 	setup() {
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
@@ -141,19 +146,29 @@ export default {
 	},
 	computed: {
 		isEmpty() {
-			if (
-				this.$resources.articlesCount.loading ||
-				this.$resources.subCategoriesCount.loading
-			)
+			if (!this.isMounted) return
+			var articles = 0
+			var categories = 0
+			if (!this.isRoot) {
+				if (this.$refs.articleMiniList.list.loading) {
+					return
+				}
+				articles = this.$refs.articleMiniList.list.data.length
+			}
+			if (!this.$refs.categoryCardList.list.loading) {
+				categories = this.$refs.categoryCardList.list.data.length
+			} else {
 				return
-			const isEmpty =
-				this.$resources.articlesCount.data === 0 &&
-				this.$resources.subCategoriesCount.data === 0
+			}
+			const isEmpty = articles + categories === 0
 			if (this.editable) {
 				this.editMode = isEmpty
 			}
 			return isEmpty
 		},
+	},
+	mounted() {
+		this.isMounted = true
 	},
 	methods: {
 		validateChanges() {
@@ -171,34 +186,6 @@ export default {
 				await this.$refs.articleMiniList.saveChanges()
 			this.saveInProgress = false
 			return
-		},
-	},
-	resources: {
-		articlesCount() {
-			return {
-				method: "frappe.client.get_count",
-				params: {
-					doctype: "Article",
-					filters: {
-						category: this.categoryId,
-						status: "Published",
-					},
-				},
-				auto: true,
-			}
-		},
-		subCategoriesCount() {
-			return {
-				method: "frappe.client.get_count",
-				params: {
-					doctype: "Category",
-					filters: {
-						parent_category: this.categoryId,
-						status: "Published",
-					},
-				},
-				auto: true,
-			}
 		},
 	},
 }

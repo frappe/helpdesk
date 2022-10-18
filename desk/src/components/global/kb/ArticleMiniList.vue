@@ -89,13 +89,20 @@ export default {
 		const editable = inject("editable")
 		const editMode = inject("editMode")
 
+		const list = ref({
+			loading: true,
+			data: [],
+		})
+
 		context.expose({
+			list,
 			saveInProgress,
 			validateChanges,
 			saveChanges,
 		})
 
 		return {
+			list,
 			tempArticles,
 			allValidationErrors,
 			resources,
@@ -109,7 +116,9 @@ export default {
 	computed: {
 		articles() {
 			if (!this.editMode) {
-				return this.$resources.articles.data || []
+				this.list.loading = this.$resources.articles.loading
+				this.list.data = this.$resources.articles.data || []
+				return this.list.data
 			} else {
 				return this.tempArticles
 			}
@@ -128,17 +137,32 @@ export default {
 	resources: {
 		articles() {
 			const filters = { category: this.categoryId, status: "Published" }
+			const fields = ["name", "title", "idx"]
 
-			return {
-				type: "list",
-				cache: ["Articles", this.categoryId, "published"],
-				doctype: "Article",
-				filters,
-				fields: ["name", "title", "idx", "status"],
-				limit: 999,
-				order_by: "idx",
-				// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
-				// or implement colaborative editing
+			if (this.editable) {
+				return {
+					cache: ["Articles", this.categoryId, "published"],
+					type: "list",
+					doctype: "Article",
+					filters,
+					fields: [...fields, "status"],
+					limit: 999,
+					order_by: "idx",
+					// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
+					// or implement colaborative editing
+				}
+			} else {
+				return {
+					cache: ["Articles", this.categoryId, "published"],
+					method: "frappedesk.api.kb.get_articles",
+					params: {
+						filters,
+						fields,
+						limit: 999,
+						order_by: "idx",
+					},
+					auto: true,
+				}
 			}
 		},
 		saveArticles() {

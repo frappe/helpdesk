@@ -54,17 +54,23 @@ export default {
 			user,
 		}
 	},
+	data() {
+		return {
+			refreshKey: 0,
+		}
+	},
 	computed: {
 		feedback() {
-			if (this.user) {
+			this.refreshKey // used to force re-compute feedback after localstorage update
+			if (this.user.isLoggedIn()) {
 				const d = this.$resources.articleFeedback.data || []
 				return d.length > 0 ? d[0].feedback : null
 			} else {
 				// TODO: check local storage if article has a feedback
-				return (
+				return JSON.parse(
 					localStorage.getItem(
 						`article-${this.article.name}-feedback`
-					) || null
+					)
 				)
 			}
 		},
@@ -87,7 +93,7 @@ export default {
 	},
 	resources: {
 		articleFeedback() {
-			if (!this.user) {
+			if (!this.user.isLoggedIn()) {
 				return
 			}
 			return {
@@ -115,7 +121,7 @@ export default {
 	methods: {
 		async submitFeedback(score) {
 			// score range: 0 - 1 [0-bad, 1-good]
-			if (!this.user) {
+			if (!this.user.isLoggedIn()) {
 				localStorage.setItem(
 					`article-${this.article.name}-feedback`,
 					score
@@ -128,7 +134,11 @@ export default {
 					previous_score: this.feedback, // will be used in case the user is not signed in
 				})
 				.then(() => {
-					this.$resources.articleFeedback.fetch()
+					if (this.user.isLoggedIn()) {
+						this.$resources.articleFeedback.fetch()
+					} else {
+						this.refreshKey += 1
+					}
 				})
 		},
 	},
