@@ -27,14 +27,15 @@
 			<template #item="{ element }">
 				<div class="flex flex-row items-center space-x-1">
 					<ArticleMiniListItem
-						:editMode="editMode"
 						:article="element"
 						@click="
 							() => {
 								if (editMode) return
 								$router.push({
 									path: `/${
-										editable ? 'frappedesk' : 'support'
+										$route.meta.editable
+											? 'frappedesk'
+											: 'support'
 									}/kb/articles/${element.name}`,
 								})
 							}
@@ -86,7 +87,6 @@ export default {
 			})
 		}
 
-		const editable = inject("editable")
 		const editMode = inject("editMode")
 
 		const list = ref({
@@ -107,7 +107,6 @@ export default {
 			allValidationErrors,
 			resources,
 			editMode,
-			editable,
 		}
 	},
 	mounted() {
@@ -137,32 +136,18 @@ export default {
 	resources: {
 		articles() {
 			const filters = { category: this.categoryId, status: "Published" }
-			const fields = ["name", "title", "idx"]
+			const fields = ["name", "title", "idx", "status"]
 
-			if (this.editable) {
-				return {
-					cache: ["Articles", this.categoryId, "published"],
-					type: "list",
-					doctype: "Article",
+			return {
+				cache: ["Articles", this.categoryId, "published"],
+				method: "frappedesk.api.kb.get_articles",
+				params: {
 					filters,
-					fields: [...fields, "status"],
+					fields,
 					limit: 999,
 					order_by: "idx",
-					// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
-					// or implement colaborative editing
-				}
-			} else {
-				return {
-					cache: ["Articles", this.categoryId, "published"],
-					method: "frappedesk.api.kb.get_articles",
-					params: {
-						filters,
-						fields,
-						limit: 999,
-						order_by: "idx",
-					},
-					auto: true,
-				}
+				},
+				auto: true,
 			}
 		},
 		saveArticles() {

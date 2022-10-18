@@ -21,6 +21,7 @@
 <script>
 import { FeatherIcon } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { inject } from "vue"
 
 export default {
 	name: "ArticleMiniListItem",
@@ -29,14 +30,17 @@ export default {
 			type: Object,
 			default: null,
 		},
-		editMode: {
-			type: Boolean,
-			default: false,
-		},
 	},
 	components: {
 		FeatherIcon,
 		CustomIcons,
+	},
+	setup() {
+		const editMode = inject("editMode")
+
+		return {
+			editMode,
+		}
 	},
 }
 </script>

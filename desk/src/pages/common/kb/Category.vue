@@ -62,16 +62,12 @@
 						<CategoryCardList
 							as="div"
 							ref="categoryCardList"
-							:editable="editable"
-							:editMode="editMode"
 							:categoryId="categoryId"
 						/>
 						<ArticleMiniList
 							as="div"
 							v-if="!isRoot"
 							ref="articleMiniList"
-							:editable="editable"
-							:editMode="editMode"
 							:categoryId="categoryId"
 						/>
 						<div
@@ -125,7 +121,6 @@ export default {
 	setup() {
 		const route = useRoute()
 		const editable = ref(route.meta.editable)
-		provide("editble", editable)
 
 		const isRoot = ref(route.meta.isRoot)
 		provide("isRoot", isRoot)

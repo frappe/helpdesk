@@ -115,7 +115,6 @@ export default {
 	},
 	setup(props, context) {
 		const editMode = inject("editMode")
-		const editable = inject("editable")
 		const isRoot = inject("isRoot")
 		const tempCategories = ref([])
 		const allValidationErrors = ref([])
@@ -171,7 +170,6 @@ export default {
 		return {
 			list,
 			editMode,
-			editable,
 			isRoot,
 			tempCategories,
 			allValidationErrors,
@@ -225,30 +223,16 @@ export default {
 			const cache = ["Categories", this.categoryId ? this.categoryId : ""]
 			const limit = 999
 			const order_by = "idx"
-			if (this.editable) {
-				return {
-					type: "list",
-					cache,
-					doctype: "Category",
+			return {
+				cache,
+				method: "frappedesk.api.kb.get_categories",
+				params: {
 					filters,
 					fields,
 					limit,
 					order_by,
-					// realtime: true TODO: if there are any updates inform the user via some promt (also handle editMode: true senarios)
-					// or implement colaborative editing
-				}
-			} else {
-				return {
-					cache,
-					method: "frappedesk.api.kb.get_categories",
-					params: {
-						filters,
-						fields,
-						limit,
-						order_by,
-					},
-					auto: true,
-				}
+				},
+				auto: true,
 			}
 		},
 		saveCategories() {
