@@ -158,29 +158,10 @@ export default {
 
 		const allValidationErrors = inject("allValidationErrors")
 
-		watch(validationErrors.value, (newVal) => {
-			if (newVal.category_name || newVal.description) {
-				if (
-					!allValidationErrors.value.some(
-						(c) => c == props.category.name
-					)
-				) {
-					allValidationErrors.value.push(props.category.name)
-				}
-			} else {
-				// remove the category name from the array
-				const index = allValidationErrors.value.indexOf(
-					props.category.name
-				)
-				if (index > -1) {
-					allValidationErrors.value.splice(index, 1)
-				}
-			}
-		})
-
 		return {
 			validationErrors,
 			checkIfCategoryNameExistsInCurrentHierarchy,
+			allValidationErrors,
 		}
 	},
 	mounted() {
@@ -245,6 +226,30 @@ export default {
 		},
 	},
 	methods: {
+		updateVlidationErrors(errorType, error) {
+			this.validationErrors[errorType] = error
+
+			if (
+				this.validationErrors.category_name ||
+				this.validationErrors.description
+			) {
+				if (
+					!this.allValidationErrors.some(
+						(c) => c == this.category.name
+					)
+				) {
+					this.allValidationErrors.push(this.category.name)
+				}
+			} else {
+				// remove the category name from the array
+				const index = this.allValidationErrors.indexOf(
+					this.category.name
+				)
+				if (index > -1) {
+					this.allValidationErrors.splice(index, 1)
+				}
+			}
+		},
 		focusOnCategoryNameInput() {
 			this.$nextTick(() => {
 				this.$refs.categoryName.focus()
@@ -252,17 +257,24 @@ export default {
 		},
 		onCategoryNameInput: debounce(function (value) {
 			this.category.category_name = value
-			this.validationErrors.category_name = ""
+			this.updateVlidationErrors("category_name", "")
+
 			value = value.trim()
 			if (!value) {
-				this.validationErrors.category_name = `Category name is required.`
+				this.updateVlidationErrors(
+					"category_name",
+					"Category name is required"
+				)
 			} else if (
 				this.checkIfCategoryNameExistsInCurrentHierarchy(
 					value,
 					this.category.idx
 				)
 			) {
-				this.validationErrors.category_name = `${this.category.category_name} already exists.`
+				this.updateVlidationErrors(
+					"category_name",
+					`${this.category.category_name} already exists.`
+				)
 			}
 		}, 300),
 		onDescriptionInput: debounce(function (value) {

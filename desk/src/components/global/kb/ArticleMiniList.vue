@@ -84,14 +84,10 @@ export default {
 		const saveInProgress = computed(() => {
 			return resources.value.saveArticles.loading
 		})
-		const disableSaving = computed(() => {
-			return saveInProgress.value || allValidationErrors.value.length > 0
-		})
 		const validateChanges = () => {
 			return allValidationErrors.value.length == 0
 		}
 		const saveChanges = async () => {
-			if (disableSaving.value) return
 			if (!props.categoryId) return
 			await resources.value.saveArticles.submit({
 				new_values: tempArticles.value,
@@ -100,7 +96,6 @@ export default {
 
 		context.expose({
 			saveInProgress,
-			disableSaving,
 			validateChanges,
 			saveChanges,
 		})

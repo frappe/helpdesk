@@ -4,7 +4,6 @@
 		:editable="editable"
 		:editMode="editMode"
 		:saveInProgress="saveInProgress"
-		:disableSaving="disableSaving"
 		@edit="
 			() => {
 				editMode = true
@@ -20,6 +19,13 @@
 				if (validateChanges()) {
 					saveChanges().then(() => {
 						editMode = false
+					})
+				} else {
+					$toast({
+						title: 'Validation Error',
+						text: 'Please fix the errors before saving',
+						customIcon: 'circle-fail',
+						appearance: 'danger',
 					})
 				}
 			}
@@ -130,11 +136,6 @@ export default {
 		}
 	},
 	computed: {
-		disableSaving() {
-			// TODO: check of validation errors etc
-			return false
-			// return this.$refs.categoryCardList?.disableSaving // || this.$refs.articleMiniList?.disableSaving
-		},
 		isEmpty() {
 			if (
 				this.$resources.articlesCount.loading ||
@@ -150,10 +151,12 @@ export default {
 	},
 	methods: {
 		validateChanges() {
-			return this.$refs.categoryCardList.validateChanges() &&
-				this.$refs.articleMiniList
-				? this.$refs.articleMiniList.validateChanges()
-				: true
+			return (
+				this.$refs.categoryCardList.validateChanges() &&
+				(this.$refs.articleMiniList
+					? this.$refs.articleMiniList.validateChanges()
+					: true)
+			)
 		},
 		async saveChanges() {
 			this.saveInProgress = true

@@ -18,10 +18,16 @@
 					:deletable="categories.length > 1"
 					@delete="
 						() => {
-							const index = categories.findIndex(
-								(c) => c == element
+							allValidationErrors.splice(
+								allValidationErrors.findIndex(
+									(c) => c == element
+								),
+								1
 							)
-							categories.splice(index, 1)
+							categories.splice(
+								categories.findIndex((c) => c == element),
+								1
+							)
 						}
 					"
 					@click="
@@ -135,15 +141,20 @@ export default {
 		const saveInProgress = computed(() => {
 			return resources.value.saveCategories.loading
 		})
-		const disableSaving = computed(() => {
-			return saveInProgress.value || allValidationErrors.value.length > 0
-		})
 		const validateChanges = () => {
 			return allValidationErrors.value.length == 0
 		}
 		const saveChanges = async () => {
-			if (disableSaving.value) return
-			await resources.value.saveCategories.submit({
+			if (!validateChanges()) {
+				this.$toast({
+					title: "Validation Error",
+					text: "Please fix the errors before saving",
+					customIcon: "circle-fail",
+					appearance: "danger",
+				})
+				return
+			}
+			return await resources.value.saveCategories.submit({
 				new_values: tempCategories.value.filter(
 					(c) => !c.is_placeholder
 				),
@@ -153,7 +164,6 @@ export default {
 
 		context.expose({
 			saveInProgress,
-			disableSaving,
 			validateChanges,
 			saveChanges,
 		})
@@ -185,6 +195,8 @@ export default {
 				this.tempCategories.push({
 					is_placeholder: true,
 				})
+			} else {
+				this.allValidationErrors = []
 			}
 		},
 	},
