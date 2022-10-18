@@ -223,6 +223,12 @@ export default {
 			this.articleTempValues[input.field] = input.value
 			this.validators[input.field](input.value)
 		}
+
+		if (!this.editable) {
+			this.$resources.incrementArtileViews.submit({
+				article: this.articleId,
+			})
+		}
 	},
 	computed: {
 		disableSaving() {
@@ -236,6 +242,9 @@ export default {
 		},
 	},
 	resources: {
+		incrementArtileViews: {
+			method: "frappedesk.api.kb.increment_article_views",
+		},
 		article() {
 			if (!this.isNew) {
 				return {

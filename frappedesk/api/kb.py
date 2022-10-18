@@ -202,3 +202,11 @@ def submit_article_feedback(article, score, previous_score=None):
 		elif score == 1:
 			article_doc.helpful += 1
 		article_doc.save()
+
+
+@frappe.whitelist(allow_guest=True)
+def increment_article_views(article):
+	# TODO: use data to compute related articles, using past viewed articles of the user and giving a rank to each article
+	article_doc = frappe.get_doc("Article", article)
+	article_doc.views += 1
+	article_doc.save()
