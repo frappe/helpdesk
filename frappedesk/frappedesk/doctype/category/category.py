@@ -21,11 +21,9 @@ class Category(Document):
 		self.idx = -1
 		self.status = "Archived"
 		self.save()
-		self.rename(append_number_if_name_exists("Category", self.name + ".archived"))
 
 	def unarchive(self):
 		self.status = "Published"
-		self.rename(self.name.replace(".archived", ""))
 		self.save()
 
 	def get_breadcrumbs(self):
