@@ -225,36 +225,55 @@ const routes = [
 		component: () => import("@/pages/portal/Portal.vue"),
 		children: [
 			{
+				path: "",
+				redirect: () => {
+					return { path: "/frappedesk/tickets" }
+				},
+			},
+			{
 				path: "tickets",
-				name: "ProtalTickets",
-				component: () => import("@/pages/portal/Tickets.vue"),
-			},
-			{
-				path: "tickets/:ticketId",
-				name: "PortalTicket",
-				component: () => import("@/pages/portal/Ticket.vue"),
-				props: true,
-			},
-			{
-				path: "tickets/new/:templateId",
-				name: "TemplatedNewTicket",
-				component: () => import("@/pages/portal/NewTicket.vue"),
-				props: true,
-			},
-			{
-				path: "tickets/new",
-				name: "DefaultNewTicket",
-				component: () => import("@/pages/portal/NewTicket.vue"),
-			},
-			{
-				path: "impersonate",
-				name: "Impersonate",
-				component: () => import("@/pages/portal/Impersonate.vue"),
+				name: "Ticketing",
+				component: () =>
+					import("@/pages/portal/ticketing/Ticketing.vue"),
+				children: [
+					{
+						path: "",
+						name: "ProtalTickets",
+						component: () =>
+							import("@/pages/portal/ticketing/Tickets.vue"),
+					},
+					{
+						path: ":ticketId",
+						name: "PortalTicket",
+						component: () =>
+							import("@/pages/portal/ticketing/Ticket.vue"),
+						props: true,
+					},
+					{
+						path: "new/:templateId",
+						name: "TemplatedNewTicket",
+						component: () =>
+							import("@/pages/portal/ticketing/NewTicket.vue"),
+						props: true,
+					},
+					{
+						path: "new",
+						name: "DefaultNewTicket",
+						component: () =>
+							import("@/pages/portal/ticketing/NewTicket.vue"),
+					},
+					{
+						path: "impersonate",
+						name: "Impersonate",
+						component: () =>
+							import("@/pages/portal/ticketing/Impersonate.vue"),
+					},
+				],
 			},
 			{
 				path: "kb",
-				name: "PortalKB",
-				component: () => import("@/pages/portal/KnowledgeBase.vue"),
+				name: "PortalBK",
+				component: () => import("@/pages/portal/kb/KnowledgeBase.vue"),
 				children: [
 					{
 						path: "",
