@@ -141,7 +141,9 @@ export default {
 		const saveChanges = async () => {
 			if (disableSaving.value) return
 			await resources.value.saveCategories.submit({
-				new_values: tempCategories.value,
+				new_values: tempCategories.value.filter(
+					(c) => !c.is_placeholder
+				),
 				old_values: resources.value.categories.data,
 			})
 		}
@@ -177,11 +179,9 @@ export default {
 				this.tempCategories = JSON.parse(
 					JSON.stringify(this.$resources.categories.data)
 				)
-				if (this.tempCategories.length == 0) {
-					this.tempCategories.push({
-						is_placeholder: true,
-					})
-				}
+				this.tempCategories.push({
+					is_placeholder: true,
+				})
 			}
 		},
 	},
