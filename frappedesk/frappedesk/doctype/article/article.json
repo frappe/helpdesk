@@ -51,14 +51,14 @@
 		{
 			"default": "0",
 			"fieldname": "helpful",
-			"fieldtype": "Data",
+			"fieldtype": "Int",
 			"hidden": 1,
 			"label": "Helpful"
 		},
 		{
 			"default": "0",
 			"fieldname": "not_helpful",
-			"fieldtype": "Data",
+			"fieldtype": "Int",
 			"hidden": 1,
 			"label": "Not Helpful"
 		},
@@ -126,7 +126,7 @@
 		}
 	],
 	"links": [],
-	"modified": "2022-10-18 14:26:30.177110",
+	"modified": "2022-10-19 00:43:31.168273",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Article",

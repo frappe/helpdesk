@@ -66,13 +66,13 @@
 			<div class="flex flex-row items-center space-x-[6px]">
 				<FeatherIcon name="smile" class="w-[14px] stroke-gray-500" />
 				<div class="w-[28px] text-left">
-					{{ article.likes || 0 }}
+					{{ article.helpful || 0 }}
 				</div>
 			</div>
 			<div class="flex flex-row items-center space-x-[6px]">
 				<FeatherIcon name="frown" class="w-[14px] stroke-gray-500" />
 				<div class="w-[28px] text-left">
-					{{ article.dislikes || 0 }}
+					{{ article.not_helpful || 0 }}
 				</div>
 			</div>
 		</div>

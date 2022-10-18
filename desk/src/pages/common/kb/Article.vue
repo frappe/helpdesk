@@ -139,6 +139,7 @@
 							<!-- TODO: <RelatedArticles v-else :articleId="articleId" /> -->
 						</div>
 					</div>
+					<ArticleFeedback v-if="!editable" :article="article" />
 				</div>
 			</div>
 		</template>
@@ -154,7 +155,8 @@ import ArticleTitleAndContent from "@/components/desk/kb/ArticleTitleAndContent.
 import { useRoute } from "vue-router"
 import { ref, provide, inject } from "vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
-import BaseBreadcrumbs from "../../../components/global/BaseBreadcrumbs.vue"
+import BaseBreadcrumbs from "@/components/global/BaseBreadcrumbs.vue"
+import ArticleFeedback from "@/components/portal/kb/ArticleFeedback.vue"
 
 export default {
 	name: "Article",
@@ -173,6 +175,7 @@ export default {
 		Dropdown,
 		FeatherIcon,
 		BaseBreadcrumbs,
+		ArticleFeedback,
 	},
 	setup() {
 		const user = inject("user")

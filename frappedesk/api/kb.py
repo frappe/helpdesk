@@ -159,3 +159,46 @@ def search(text, limit=999):
 		)
 
 	return results
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_article_feedback(article, score, previous_score=None):
+	user = frappe.session.user
+	article_doc = frappe.get_doc("Article", article)
+	if previous_score is not None:
+		if user != "Guest":
+			user_article_feedback = frappe.get_value(
+				doctype="User Article Feedback",
+				filters={"article": article, "user": user,},
+				fieldname="name",
+			)
+			if user_article_feedback:
+				user_article_feedback_doc = frappe.get_doc(
+					"User Article Feedback", user_article_feedback
+				)
+				user_article_feedback_doc.feedback = score
+				user_article_feedback_doc.save()
+			else:
+				frappe.throw("User Article Feedback not found")
+
+		if previous_score != score:
+			if score == 1:
+				article_doc.helpful += 1
+				article_doc.not_helpful -= 1
+			else:
+				article_doc.helpful -= 1
+				article_doc.not_helpful += 1
+			article_doc.save()
+	else:
+		if user != "Guest":
+			user_article_feedback_doc = frappe.new_doc("User Article Feedback")
+			user_article_feedback_doc.update(
+				{"article": article, "user": user, "feedback": score}
+			)
+			user_article_feedback_doc.save()
+
+		if score == 0:
+			article_doc.not_helpful += 1
+		elif score == 1:
+			article_doc.helpful += 1
+		article_doc.save()
