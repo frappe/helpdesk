@@ -177,7 +177,7 @@ export default {
 		editMode(newVal) {
 			if (newVal) {
 				this.tempCategories = JSON.parse(
-					JSON.stringify(this.$resources.categories.data)
+					JSON.stringify(this.$resources.categories.data || [])
 				)
 				this.tempCategories.push({
 					is_placeholder: true,
