@@ -173,6 +173,7 @@ export default {
 							customIcon: "circle-check",
 							appearance: "success",
 						})
+						this.$router.go()
 					},
 				},
 			}
@@ -205,7 +206,10 @@ export default {
 				.submit({
 					email: newValues.email,
 					email_signature: newValues.signature,
-					full_name: this.tempAgentName,
+					first_name: this.tempAgentName.split(" ")[0],
+					last_name: this.tempAgentName.slice(
+						this.tempAgentName.indexOf(" ") + 1
+					),
 				})
 				.then(() => {
 					this.$resources.agent.setValue.submit({
