@@ -1,5 +1,5 @@
 <template>
-	<div class="min-w-[490px] px-[24px] py-[10px]">
+	<div class="min-w-[390px] px-[24px] py-[10px]">
 		<div class="form w-full flex flex-col">
 			<div
 				class="float-left mb-[16px]"
@@ -76,14 +76,6 @@
 				<div class="flex flex-row space-x-[16px]">
 					<div class="grow">
 						<Input
-							label="E-mail"
-							type="text"
-							:value="values?.email"
-							@change="(val) => (values.email = val)"
-						/>
-					</div>
-					<div class="grow">
-						<Input
 							label="Team"
 							type="select"
 							:options="teams"
@@ -91,15 +83,23 @@
 							@change="(val) => (values.team = val)"
 						/>
 					</div>
+					<!--<div class="grow">
+						<Input
+							label="E-mail"
+							type="text"
+							:value="values?.email"
+							@change="(val) => (values.email = val)"
+						/>
+					</div> -->
 				</div>
-				<div class="grow">
+				<!-- <div class="grow">
 					<Input
 						label="Signature"
 						type="textarea"
 						:value="values?.signature"
 						@change="(val) => (values.signature = val)"
 					/>
-				</div>
+				</div> -->
 				<div class="w-full flex flex-row">
 					<div>
 						<Button @click="cancel()">Cancel</Button>
@@ -124,7 +124,6 @@
 <script>
 import { ref } from "vue"
 import { FeatherIcon, Input, FileUploader } from "frappe-ui"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import UserAvatar from "@/components/global/UserAvatar.vue"
 
 export default {
@@ -133,7 +132,6 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
-		CustomAvatar,
 		FileUploader,
 		UserAvatar,
 	},
@@ -150,6 +148,7 @@ export default {
 	},
 	computed: {
 		agentDoc() {
+			this.tempAgentName = this.$resources.agent?.doc?.agent_name
 			return this.$resources.agent.doc || null
 		},
 		userDoc() {
