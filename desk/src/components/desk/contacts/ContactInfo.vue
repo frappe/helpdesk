@@ -42,15 +42,39 @@
 						>Profile Picture</span
 					>
 					<div class="flex flex-row space-x-[8px] items-center">
-						<CustomAvatar
-							:label="values?.contactName"
-							size="2xl"
-							:imageURL="values?.profilePicture"
-						/>
-						<div class="flex flex-row space-x-[8px]">
-							<Button>Upload new</Button>
-							<Button>Remove</Button>
-						</div>
+						<FileUploader
+							@success="(file) => setContactImage(file.file_url)"
+						>
+							<template
+								v-slot="{
+									file,
+									progress,
+									uploading,
+									openFileSelector,
+								}"
+							>
+								<div class="flex items-center space-x-2">
+									<UserAvatar
+										size="lg"
+										:fullName="values?.contactName"
+										:userImage="values?.profilePicture"
+									/>
+									<Button @click="openFileSelector">
+										{{
+											uploading
+												? `Uploading ${progress}%`
+												: "Upload Image"
+										}}
+									</Button>
+									<Button
+										v-if="values?.profilePicture"
+										@click="setContactImage(null)"
+									>
+										Remove
+									</Button>
+								</div>
+							</template>
+						</FileUploader>
 					</div>
 				</div>
 				<Input
@@ -87,8 +111,8 @@
 
 <script>
 import { ref } from "vue"
-import { FeatherIcon, Input } from "frappe-ui"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import { FeatherIcon, Input, FileUploader } from "frappe-ui"
+import UserAvatar from "@/components/global/UserAvatar.vue"
 
 export default {
 	name: "ContactInfo",
@@ -96,7 +120,8 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
-		CustomAvatar,
+		FileUploader,
+		UserAvatar,
 	},
 	setup() {
 		const editingName = ref(false)
@@ -159,6 +184,9 @@ export default {
 		},
 	},
 	methods: {
+		setContactImage(url) {
+			this.$resources.contact.setValue.submit({ image: url })
+		},
 		resetForm() {
 			this.editingName = false
 			this.tempContactName = this.values.contactName

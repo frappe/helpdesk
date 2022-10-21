@@ -54,7 +54,11 @@
 								}"
 							>
 								<div class="flex items-center space-x-2">
-									<UserAvatar size="lg" :user="userDoc" />
+									<UserAvatar
+										size="lg"
+										:fullName="userDoc.full_name"
+										:userImage="userDoc.user_image"
+									/>
 									<Button @click="openFileSelector">
 										{{
 											uploading
