@@ -42,15 +42,35 @@
 						>Profile Picture</span
 					>
 					<div class="flex flex-row space-x-[8px] items-center">
-						<CustomAvatar
-							:label="values?.agentName"
-							size="2xl"
-							:imageURL="values?.profilePicture"
-						/>
-						<div class="flex flex-row space-x-[8px]">
-							<Button>Upload new</Button>
-							<Button>Remove</Button>
-						</div>
+						<FileUploader
+							@success="(file) => setUserImage(file.file_url)"
+						>
+							<template
+								v-slot="{
+									file,
+									progress,
+									uploading,
+									openFileSelector,
+								}"
+							>
+								<div class="flex items-center space-x-2">
+									<UserAvatar size="lg" :user="userDoc" />
+									<Button @click="openFileSelector">
+										{{
+											uploading
+												? `Uploading ${progress}%`
+												: "Upload Image"
+										}}
+									</Button>
+									<Button
+										v-if="userDoc?.user_image"
+										@click="setUserImage(null)"
+									>
+										Remove
+									</Button>
+								</div>
+							</template>
+						</FileUploader>
 					</div>
 				</div>
 				<div class="flex flex-row space-x-[16px]">
@@ -103,8 +123,9 @@
 
 <script>
 import { ref } from "vue"
-import { FeatherIcon, Input } from "frappe-ui"
+import { FeatherIcon, Input, FileUploader } from "frappe-ui"
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import UserAvatar from "@/components/global/UserAvatar.vue"
 
 export default {
 	name: "AgentInfo",
@@ -113,6 +134,8 @@ export default {
 		FeatherIcon,
 		Input,
 		CustomAvatar,
+		FileUploader,
+		UserAvatar,
 	},
 	setup() {
 		const editingName = ref(false)
@@ -173,7 +196,7 @@ export default {
 							customIcon: "circle-check",
 							appearance: "success",
 						})
-						this.$router.go()
+						this.$router.go() // TODO: fix this
 					},
 				},
 			}
@@ -194,6 +217,10 @@ export default {
 		},
 	},
 	methods: {
+		setUserImage(url) {
+			this.$resources.user.setValue.submit({ user_image: url })
+			this.$router.go() // TODO: fix this
+		},
 		resetForm() {
 			this.editingName = false
 			this.tempAgentName = this.values.agentName
