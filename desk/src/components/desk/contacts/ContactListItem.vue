@@ -21,12 +21,12 @@
 				</div>
 				<div class="sm:w-6/12 truncate pr-10">
 					<div v-if="contact.email && contact.email.length > 0">
-						{{ contact.email[0] }}
+						{{ contact.email }}
 					</div>
 				</div>
 				<div class="sm:w-3/12 truncate pr-10">
 					<div v-if="contact.phone && contact.phone.length > 0">
-						{{ contact.phone[0] }}
+						{{ contact.phone }}
 					</div>
 				</div>
 			</router-link>
