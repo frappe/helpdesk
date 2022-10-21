@@ -13,7 +13,6 @@
 						'email_ids.email_id as email',
 						'phone_nos.phone as phone',
 					],
-					group: ['email', 'phone'],
 					limit: 40,
 				}"
 			>

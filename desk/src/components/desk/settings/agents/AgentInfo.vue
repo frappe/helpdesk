@@ -1,5 +1,5 @@
 <template>
-	<div class="min-w-[490px] px-[24px] py-[10px]">
+	<div class="min-w-[390px] px-[24px] py-[10px]">
 		<div class="form w-full flex flex-col">
 			<div
 				class="float-left mb-[16px]"
@@ -42,26 +42,42 @@
 						>Profile Picture</span
 					>
 					<div class="flex flex-row space-x-[8px] items-center">
-						<CustomAvatar
-							:label="values?.agentName"
-							size="2xl"
-							:imageURL="values?.profilePicture"
-						/>
-						<div class="flex flex-row space-x-[8px]">
-							<Button>Upload new</Button>
-							<Button>Remove</Button>
-						</div>
+						<FileUploader
+							@success="(file) => setUserImage(file.file_url)"
+						>
+							<template
+								v-slot="{
+									file,
+									progress,
+									uploading,
+									openFileSelector,
+								}"
+							>
+								<div class="flex items-center space-x-2">
+									<UserAvatar
+										size="lg"
+										:fullName="userDoc.full_name"
+										:userImage="userDoc.user_image"
+									/>
+									<Button @click="openFileSelector">
+										{{
+											uploading
+												? `Uploading ${progress}%`
+												: "Upload Image"
+										}}
+									</Button>
+									<Button
+										v-if="userDoc?.user_image"
+										@click="setUserImage(null)"
+									>
+										Remove
+									</Button>
+								</div>
+							</template>
+						</FileUploader>
 					</div>
 				</div>
 				<div class="flex flex-row space-x-[16px]">
-					<div class="grow">
-						<Input
-							label="E-mail"
-							type="text"
-							:value="values?.email"
-							@change="(val) => (values.email = val)"
-						/>
-					</div>
 					<div class="grow">
 						<Input
 							label="Team"
@@ -71,15 +87,23 @@
 							@change="(val) => (values.team = val)"
 						/>
 					</div>
+					<!--<div class="grow">
+						<Input
+							label="E-mail"
+							type="text"
+							:value="values?.email"
+							@change="(val) => (values.email = val)"
+						/>
+					</div> -->
 				</div>
-				<div class="grow">
+				<!-- <div class="grow">
 					<Input
 						label="Signature"
 						type="textarea"
 						:value="values?.signature"
 						@change="(val) => (values.signature = val)"
 					/>
-				</div>
+				</div> -->
 				<div class="w-full flex flex-row">
 					<div>
 						<Button @click="cancel()">Cancel</Button>
@@ -103,8 +127,8 @@
 
 <script>
 import { ref } from "vue"
-import { FeatherIcon, Input } from "frappe-ui"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import { FeatherIcon, Input, FileUploader } from "frappe-ui"
+import UserAvatar from "@/components/global/UserAvatar.vue"
 
 export default {
 	name: "AgentInfo",
@@ -112,7 +136,8 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
-		CustomAvatar,
+		FileUploader,
+		UserAvatar,
 	},
 	setup() {
 		const editingName = ref(false)
@@ -127,6 +152,7 @@ export default {
 	},
 	computed: {
 		agentDoc() {
+			this.tempAgentName = this.$resources.agent?.doc?.agent_name
 			return this.$resources.agent.doc || null
 		},
 		userDoc() {
@@ -173,6 +199,7 @@ export default {
 							customIcon: "circle-check",
 							appearance: "success",
 						})
+						this.$router.go() // TODO: fix this
 					},
 				},
 			}
@@ -193,6 +220,10 @@ export default {
 		},
 	},
 	methods: {
+		setUserImage(url) {
+			this.$resources.user.setValue.submit({ user_image: url })
+			this.$router.go() // TODO: fix this
+		},
 		resetForm() {
 			this.editingName = false
 			this.tempAgentName = this.values.agentName
@@ -205,7 +236,10 @@ export default {
 				.submit({
 					email: newValues.email,
 					email_signature: newValues.signature,
-					full_name: this.tempAgentName,
+					first_name: this.tempAgentName.split(" ")[0],
+					last_name: this.tempAgentName.slice(
+						this.tempAgentName.indexOf(" ") + 1
+					),
 				})
 				.then(() => {
 					this.$resources.agent.setValue.submit({
