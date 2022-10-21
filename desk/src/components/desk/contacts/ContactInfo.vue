@@ -118,19 +118,21 @@ export default {
 
 			return {
 				contactName: this.contactDoc
-					? `${this.contactDoc?.first_name} ${this.contactDoc?.last_name}`
-					: null,
+					? `${this.contactDoc?.first_name || ""} ${
+							this.contactDoc?.last_name || ""
+					  }`
+					: "",
 				profilePicture: this.contactDoc?.image || null,
 				firstName: this.contactDoc?.first_name || null,
 				lastName: this.contactDoc?.last_name || null,
 				email:
 					this.contactDoc && this.contactDoc.email_ids.length > 0
 						? this.contactDoc.email_ids[0].email_id
-						: null,
+						: "",
 				phone:
 					this.contactDoc && this.contactDoc.phone_nos.length > 0
 						? this.contactDoc.phone_nos[0].phone
-						: null,
+						: "",
 			}
 		},
 	},
@@ -191,5 +193,3 @@ export default {
 	},
 }
 </script>
-
-<style></style>
