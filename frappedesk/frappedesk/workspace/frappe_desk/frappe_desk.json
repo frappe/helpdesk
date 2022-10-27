@@ -132,7 +132,7 @@
 		},
 		{
 			"hidden": 0,
-			"is_query_report": 0,
+			"is_query_report": 1,
 			"label": "First Response Time for Tickets",
 			"link_count": 0,
 			"link_to": "First Response Time for Tickets",
