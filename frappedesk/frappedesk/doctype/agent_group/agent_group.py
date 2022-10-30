@@ -25,7 +25,6 @@ class AgentGroup(Document):
 		rule_doc.name = f"Support Rotation - {self.name}"
 		rule_doc.document_type = "Ticket"
 		rule_doc.assign_condition = f"status == 'Open' and agent_group == '{self.name}'"
-		rule_doc.unassign_condition = f"agent_group != '{self.name}'"
 
 		for day in [
 			"Monday",
@@ -57,7 +56,6 @@ def get_assignement_rule_by_group_name(name):
 					"=",
 					f"status == 'Open' and agent_group == '{name}'",
 				],
-				["Assignment Rule", "unassign_condition", "=", f"agent_group != '{name}'",],
 			],
 		)
 	except DoesNotExistError:

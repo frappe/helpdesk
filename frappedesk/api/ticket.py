@@ -109,18 +109,17 @@ def get_agent_assigned_to_ticket(ticket_id):
 	assignee_list = frappe.db.get_value("Ticket", ticket_id, "_assign")
 	if assignee_list:
 		assignees = json.loads(assignee_list)
-
-		agent = frappe.qb.DocType("Agent")
-		user = frappe.qb.DocType("User")
-		query = (
-			frappe.qb.from_(agent)
-			.join(user)
-			.on(agent.name == user.name)
-			.select(agent.name, agent.agent_name, agent.group, user.user_image.as_("image"))
-			.where(agent.name.isin(assignees))
-		)
-		agents = query.run(as_dict=True)
-
+		if len(assignees) > 0:
+			agent = frappe.qb.DocType("Agent")
+			user = frappe.qb.DocType("User")
+			query = (
+				frappe.qb.from_(agent)
+				.join(user)
+				.on(agent.name == user.name)
+				.select(agent.name, agent.agent_name, agent.group, user.user_image.as_("image"),)
+				.where(agent.name.isin(assignees))
+			)
+			agents = query.run(as_dict=True)
 	return agents
 
 
@@ -226,10 +225,6 @@ def assign_ticket_group(ticket_id, agent_group):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		if ticket_doc.agent_group != agent_group:
-			ticket_doc.agent_group = agent_group
-			log_ticket_activity(ticket_id, f"team set to {agent_group}")
-			ticket_doc.save()
-
 			current_assigned_agent = ticket_doc.get_assigned_agent()
 			if (
 				(
@@ -237,10 +232,14 @@ def assign_ticket_group(ticket_id, agent_group):
 					and current_assigned_agent.group
 					!= agent_group  # if assigned agent is not in the new group
 				)
-				and frappe.db.count("Agent", {"group": agent_group}) > 0
+				and frappe.db.count("Agent", {"group": agent_group, "is_active": True}) > 0
 			):  # if there are agents in the group
 				clear_all_assignments("Ticket", ticket_id)
 				# new agent will be assigned automatically via assignment rule
+
+			ticket_doc.agent_group = agent_group
+			log_ticket_activity(ticket_id, f"team set to {agent_group}")
+			ticket_doc.save()
 
 		return ticket_doc
 
