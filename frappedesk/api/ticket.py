@@ -10,6 +10,7 @@ from frappedesk.frappedesk.doctype.ticket.ticket import (
 	get_all_conversations,
 	create_communication_via_agent,
 )
+from frappe.desk.form.assign_to import clear as clear_all_assignments
 
 
 @frappe.whitelist()
@@ -224,11 +225,22 @@ def assign_ticket_priority(ticket_id, priority):
 def assign_ticket_group(ticket_id, agent_group):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
-
 		if ticket_doc.agent_group != agent_group:
 			ticket_doc.agent_group = agent_group
 			log_ticket_activity(ticket_id, f"team set to {agent_group}")
 			ticket_doc.save()
+
+			current_assigned_agent = ticket_doc.get_assigned_agent()
+			if (
+				(
+					current_assigned_agent
+					and current_assigned_agent.group
+					!= agent_group  # if assigned agent is not in the new group
+				)
+				and frappe.db.count("Agent", {"group": agent_group}) > 0
+			):  # if there are agents in the group
+				clear_all_assignments("Ticket", ticket_id)
+				# new agent will be assigned automatically via assignment rule
 
 		return ticket_doc
 
