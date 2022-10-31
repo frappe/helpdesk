@@ -152,6 +152,14 @@ class Ticket(Document):
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 
+	def get_assigned_agent(self):
+		if self._assign:
+			assignees = json.loads(self._assign)
+			if len(assignees) > 0:
+				agent_doc = frappe.get_doc("Agent", assignees[0])
+				return agent_doc
+		return None
+
 	def on_trash(self):
 		activities = frappe.db.get_all("Ticket Activity", {"Ticket": self.name})
 		for activity in activities:
@@ -241,7 +249,10 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			reply_email_account = default_outgoing_email_account
 			just_sent_email_notification = True
 		else:
-			return {"status": "error", "error_code": "No default outgoing email available"}
+			return {
+				"status": "error",
+				"error_code": "No default outgoing email available",
+			}
 	else:
 		if default_ticket_outgoing_email_account:
 			# 2 if via customer portal, check if a default outgoing email with IMAP folder with ticket doctype is present, if so use that
@@ -374,7 +385,7 @@ def get_all_conversations(ticket):
 		attachments = frappe.get_all(
 			"File",
 			["file_name", "file_url"],
-			{"attached_to_name": conversation.name, "attached_to_doctype": "Communication"},
+			{"attached_to_name": conversation.name, "attached_to_doctype": "Communication",},
 		)
 
 		conversation.attachments = attachments
@@ -522,7 +533,7 @@ def make_task(source_name, target_doc=None):
 
 @frappe.whitelist()
 def make_ticket_from_communication(communication, ignore_communication_links=False):
-	""" raise a ticket from email """
+	"""raise a ticket from email"""
 
 	doc = frappe.get_doc("Communication", communication)
 	ticket = frappe.get_doc(
@@ -559,7 +570,7 @@ def set_first_response_time(communication, method):
 
 def is_first_response(ticket):
 	responses = frappe.get_all(
-		"Communication", filters={"reference_name": ticket.name, "sent_or_received": "Sent"}
+		"Communication", filters={"reference_name": ticket.name, "sent_or_received": "Sent"},
 	)
 	if len(responses) == 1:
 		return True
