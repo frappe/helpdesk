@@ -30,7 +30,7 @@
 			"options": "Agent Group"
 		},
 		{
-			"default": "0",
+			"default": "1",
 			"fieldname": "is_active",
 			"fieldtype": "Check",
 			"in_list_view": 1,
@@ -39,7 +39,7 @@
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-10-30 21:50:02.306627",
+	"modified": "2022-10-31 13:25:28.444980",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Agent",
