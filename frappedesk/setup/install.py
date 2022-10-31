@@ -265,9 +265,6 @@ def update_agent_role_permissions():
 
 
 def add_default_assignment_rule():
-	if frappe.get_list("Assignment Rule", filters={"document_type": "Ticket"}):
-		return
-
 	rule_doc = frappe.new_doc("Assignment Rule")
 	rule_doc.name = "Support Rotation"
 	rule_doc.document_type = "Ticket"
@@ -291,4 +288,4 @@ def add_default_assignment_rule():
 		day_doc = frappe.get_doc({"doctype": "Assignment Rule Day", "day": day})
 		rule_doc.append("assignment_days", day_doc)
 
-	rule_doc.save()
+	rule_doc.insert()
