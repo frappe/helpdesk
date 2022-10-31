@@ -82,7 +82,7 @@
 	],
 	"is_tree": 1,
 	"links": [],
-	"modified": "2022-10-11 17:56:48.886953",
+	"modified": "2022-10-31 15:05:28.396778",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Category",
@@ -115,5 +115,6 @@
 	"sort_field": "modified",
 	"sort_order": "DESC",
 	"states": [],
+	"title_field": "category_name",
 	"track_changes": 1
 }

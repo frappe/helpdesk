@@ -30,6 +30,7 @@ app.component("Dialog", Dialog)
 app.component("Input", Input)
 app.component("Tooltip", Tooltip)
 
+app.config.unwrapInjectedRef = true
 app.config.globalProperties.$dayjs = dayjs
 app.config.globalProperties.$toast = createToast
 app.config.globalProperties.$clearToasts = clearToasts
