@@ -3,10 +3,10 @@
 		class="flex flex-col border-r pt-[23px]"
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
-		<div class="mb-[38.4px] pl-[22px] cursor-pointer">
+		<div class="mb-[38.4px] cursor-pointer pl-[22px]">
 			<CustomIcons
 				name="frappedesk"
-				class="w-[67.84px] h-[16.6px]"
+				class="h-[16.6px] w-[67.84px]"
 				@click="
 					() => {
 						$router.push({ path: '/frappedesk/tickets' })
@@ -14,10 +14,10 @@
 				"
 			/>
 		</div>
-		<div class="mb-auto space-y-[4px] select-none mx-[8px] text-gray-800">
+		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div
-					class="group stroke-gray-600 rounded-[8px] cursor-pointer hover:bg-gray-200"
+					class="group cursor-pointer rounded-[8px] stroke-gray-600 hover:bg-gray-200"
 					:class="option.selected ? 'bg-gray-200' : ''"
 					@click="
 						() => {
@@ -31,7 +31,7 @@
 						}
 					"
 				>
-					<div class="pl-[8px] py-[5.5px] flex items-center">
+					<div class="flex items-center py-[5.5px] pl-[8px]">
 						<div class="w-[14px]">
 							<FeatherIcon
 								v-if="option.children"
@@ -49,7 +49,7 @@
 								class="ml-[8px] h-[14px] w-[14px]"
 							/>
 						</div>
-						<span class="grow ml-[6px] text-[14px]">{{
+						<span class="ml-[6px] grow text-[14px]">{{
 							option.label
 						}}</span>
 					</div>
@@ -61,7 +61,7 @@
 							:key="childOption.label"
 						>
 							<router-link
-								class="group py-[6.25px] rounded-[8px] flex items-center cursor-pointer hover:bg-gray-200"
+								class="group flex cursor-pointer items-center rounded-[8px] py-[6.25px] hover:bg-gray-200"
 								:class="
 									childOption.selected ? 'bg-gray-200' : ''
 								"
@@ -77,13 +77,13 @@
 								"
 							>
 								<div
-									class="pl-[52px] w-full flex flex-row items-center justify-between"
+									class="flex w-full flex-row items-center justify-between pl-[52px]"
 								>
 									<div class="text-base">
 										{{ childOption.label }}
 									</div>
 									<div
-										class="text-[11px] font-normal mr-[10px] text-gray-500"
+										class="mr-[10px] text-[11px] font-normal text-gray-500"
 									>
 										{{ childOption.extra }}
 									</div>
@@ -95,14 +95,14 @@
 			</div>
 		</div>
 		<div>
-			<div class="mx-[8px] pb-[17px] flex flex-col">
+			<div class="mx-[8px] flex flex-col pb-[17px]">
 				<div
 					v-if="showProfileSettings"
-					class="rounded-[6px] bg-white h-50 shadow-md z-50 px-[7px] py-[6px]"
+					class="h-50 z-50 rounded-[6px] bg-white px-[7px] py-[6px] shadow-md"
 				>
 					<div v-for="item in profileSettings" :key="item.label">
 						<div
-							class="flex flex-row items-center text-base font-normal hover:bg-gray-100 cursor-pointer px-[13px] py-[5px] rounded-[8px] space-x-[10px]"
+							class="flex cursor-pointer flex-row items-center space-x-[10px] rounded-[8px] px-[13px] py-[5px] text-base font-normal hover:bg-gray-100"
 							:class="item.style"
 							@click="item.action()"
 						>
@@ -131,7 +131,7 @@
 							showProfileSettings = false
 						}
 					"
-					class="flex flex-row items-center px-[14px] space-x-[7px] cursor-pointer hover:bg-gray-100 py-[12px] rounded-[6px]"
+					class="flex cursor-pointer flex-row items-center space-x-[7px] rounded-[6px] px-[14px] py-[12px] hover:bg-gray-100"
 					:class="showProfileSettings ? 'bg-gray-100' : ''"
 				>
 					<div>
@@ -143,7 +143,7 @@
 							:imageURL="user.profile_image"
 						/>
 					</div>
-					<div class="flex flex-col text-gray-700 max-w-[150px]">
+					<div class="flex max-w-[150px] flex-col text-gray-700">
 						<a
 							:title="
 								user.agent ? user.agent.agent_name : user.user
@@ -177,7 +177,7 @@
 							>
 								<td class="w-[170px] border-r px-4">
 									<span
-										class="bg-gray-100 p-1.5 rounded shadow shadow-gray-400 text-gray-500"
+										class="rounded bg-gray-100 p-1.5 text-gray-500 shadow shadow-gray-400"
 									>
 										{{ shortcut.sequence }}
 									</span>
@@ -476,7 +476,7 @@ export default {
 
 			const routeMenuItemMap = {
 				"frappedesk/tickets": "Tickets",
-				"frappedesk/knowledge-base": "Knowledge Base",
+				"frappedesk/kb": "Knowledge Base",
 				"frappedesk/reports": "Reports",
 				"frappedesk/contacts": "Contacts",
 				"frappedesk/settings": "Settings",
