@@ -5,6 +5,7 @@ import {
 	Dialog,
 	Input,
 	onOutsideClickDirective,
+	Tooltip,
 } from "frappe-ui"
 import router from "./router"
 import App from "./App.vue"
@@ -23,10 +24,13 @@ app.use(FrappeUI, {
 		port: socketio_port,
 	},
 })
+
 app.component("Button", Button)
 app.component("Dialog", Dialog)
 app.component("Input", Input)
+app.component("Tooltip", Tooltip)
 
+app.config.unwrapInjectedRef = true
 app.config.globalProperties.$dayjs = dayjs
 app.config.globalProperties.$toast = createToast
 app.config.globalProperties.$clearToasts = clearToasts

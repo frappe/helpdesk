@@ -1,8 +1,7 @@
 {
 	"actions": [],
 	"allow_guest_to_view": 1,
-	"allow_rename": 1,
-	"autoname": "field:category_name",
+	"autoname": "hash",
 	"creation": "2022-02-08 18:13:42.039744",
 	"doctype": "DocType",
 	"editable_grid": 1,
@@ -10,17 +9,21 @@
 	"field_order": [
 		"category_name",
 		"description",
-		"route",
-		"linked_web_page",
-		"idx"
+		"status",
+		"idx",
+		"lft",
+		"rgt",
+		"is_group",
+		"old_parent",
+		"parent_category"
 	],
 	"fields": [
 		{
 			"allow_in_quick_entry": 1,
 			"fieldname": "category_name",
 			"fieldtype": "Data",
-			"label": "Name",
-			"unique": 1
+			"in_list_view": 1,
+			"label": "Name"
 		},
 		{
 			"allow_in_quick_entry": 1,
@@ -29,35 +32,61 @@
 			"label": "Description"
 		},
 		{
-			"fieldname": "route",
-			"fieldtype": "Data",
-			"hidden": 1,
-			"label": "Route"
-		},
-		{
-			"fieldname": "linked_web_page",
-			"fieldtype": "Link",
-			"hidden": 1,
-			"label": "Linked Web Page",
-			"options": "Web Page"
-		},
-		{
-			"default": "0",
+			"default": "-1",
 			"fieldname": "idx",
 			"fieldtype": "Int",
-			"in_list_view": 1,
-			"label": "Index",
-			"non_negative": 1
+			"label": "Index"
+		},
+		{
+			"fieldname": "lft",
+			"fieldtype": "Int",
+			"hidden": 1,
+			"label": "Left",
+			"no_copy": 1,
+			"read_only": 1
+		},
+		{
+			"fieldname": "rgt",
+			"fieldtype": "Int",
+			"hidden": 1,
+			"label": "Right",
+			"no_copy": 1,
+			"read_only": 1
+		},
+		{
+			"default": "1",
+			"fieldname": "is_group",
+			"fieldtype": "Check",
+			"hidden": 1,
+			"label": "Is Group"
+		},
+		{
+			"fieldname": "old_parent",
+			"fieldtype": "Link",
+			"label": "Old Parent",
+			"options": "Category"
+		},
+		{
+			"fieldname": "parent_category",
+			"fieldtype": "Link",
+			"label": "Parent Category",
+			"options": "Category"
+		},
+		{
+			"default": "Published",
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"label": "Status",
+			"options": "Published\nDraft\nArchived"
 		}
 	],
-	"has_web_view": 1,
-	"index_web_pages_for_search": 1,
+	"is_tree": 1,
 	"links": [],
-	"modified": "2022-09-18 23:37:14.490065",
+	"modified": "2022-10-31 15:05:28.396778",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Category",
-	"naming_rule": "By fieldname",
+	"naming_rule": "Random",
 	"nsm_parent_field": "parent_category",
 	"owner": "Administrator",
 	"permissions": [
@@ -74,20 +103,18 @@
 			"write": 1
 		},
 		{
-			"create": 1,
-			"delete": 1,
 			"email": 1,
 			"export": 1,
 			"print": 1,
 			"read": 1,
 			"report": 1,
-			"role": "Agent",
-			"share": 1,
-			"write": 1
+			"role": "Guest",
+			"share": 1
 		}
 	],
 	"sort_field": "modified",
 	"sort_order": "DESC",
 	"states": [],
+	"title_field": "category_name",
 	"track_changes": 1
 }

@@ -175,7 +175,7 @@
 					<router-link
 						class="hover:underline"
 						:to="{
-							path: '/support/impersonate',
+							path: '/support/tickets/impersonate',
 							query: {
 								contact: ticket.raised_by,
 								ticketId: ticket.name,

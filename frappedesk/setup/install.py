@@ -47,7 +47,7 @@ def add_support_redirect_to_tickets():
 
 
 def add_default_categories_and_articles():
-	frappe.get_doc(
+	category = frappe.get_doc(
 		{
 			"doctype": "Category",
 			"category_name": "Getting Started",
@@ -60,7 +60,7 @@ def add_default_categories_and_articles():
 			"doctype": "Article",
 			"title": "Introduction",
 			"content": "Content for your Article",
-			"category": "Getting Started",
+			"category": category.name,
 			"published": False,
 		}
 	).insert()
