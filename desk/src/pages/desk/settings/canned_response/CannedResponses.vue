@@ -25,18 +25,29 @@
 				<CannedResponseList :manager="manager" />
 			</template>
 		</ListManager>
+		<AddNewCannedResponsesDialog
+			:show="showNewCannedResponsesDialog"
+			@close="
+				() => {
+					showNewCannedResponsesDialog = false
+					$refs.listManager.manager.reload()
+					$router.go()
+				}
+			"
+		/>
 	</div>
 </template>
 <script>
 import { inject, ref } from "vue"
 import CannedResponseList from "@/components/desk/settings/canned_responses/CannedResponseList.vue"
 import ListManager from "@/components/global/ListManager.vue"
-
+import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue"
 export default {
 	name: "Canned Responses",
 	components: {
     CannedResponseList,
     ListManager,
+    AddNewCannedResponsesDialog
 },
 	setup() {
 		const viewportWidth = inject("viewportWidth")
@@ -49,6 +60,9 @@ export default {
 	mounted() {
 		// this.$event.emit("set-selected-setting", "CannedResponses")
 		this.$event.emit("show-top-panel-actions-settings", "CannedResponses")
+		this.$event.on("show-new-canned_response-dialog", () => {
+			this.showNewCannedResponsesDialog = true
+		})
 		this.$event.on("delete-selected-canned_responses", () => {
 			this.$resources.bulk_delete_responses.submit({
 				items: Object.keys(
@@ -59,7 +73,7 @@ export default {
 		})
 	},
 	unmounted() {
-
+		this.$event.off("show-new-canned_response-dialog")
 		this.$event.off("delete-selected-canned_responses")
 	},
 	resources: {
