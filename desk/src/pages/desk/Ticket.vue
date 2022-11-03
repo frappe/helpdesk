@@ -305,6 +305,21 @@
 													$refs.replyEditor.insertLink
 												"
 											/>
+											<CustomIcons	
+												name="add-response"
+												class="h-7 w-7 rounded p-1"
+												role="button"
+												@click="()=>{
+													showCannedResponsesDialog=true
+												}"
+											/>
+											<CannedResponsesDialog
+												:show="showCannedResponsesDialog"
+												@messageVal="getMessage($event)"
+												@close="()=>{
+													showCannedResponsesDialog=false
+												}"					
+											/>
 										</div>
 										<div class="grow flex flex-row-reverse">
 											<FeatherIcon
@@ -370,6 +385,7 @@ import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
+import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
 import { inject, ref } from "vue"
 
 export default {
@@ -390,6 +406,7 @@ export default {
 		CustomIcons,
 		CustomerSatisfactionFeedback,
 		TextEditorMenuItem,
+		CannedResponsesDialog
 	},
 	data() {
 		return {
@@ -417,6 +434,8 @@ export default {
 
 		const sideBarFilterMap = inject("sideBarFilterMap")
 		const ticketSideBarFilter = inject("ticketSideBarFilter")
+		const showCannedResponsesDialog=ref(false)
+		const tempMessage=ref("")
 
 		return {
 			showTextFormattingMenu,
@@ -428,6 +447,8 @@ export default {
 			editingType,
 			sideBarFilterMap,
 			ticketSideBarFilter,
+			showCannedResponsesDialog,
+			tempMessage
 		}
 	},
 	resources: {
@@ -591,6 +612,11 @@ export default {
 		},
 		getNextTicket() {},
 		getPreviousTicket() {},
+
+		getMessage(message){
+			this.$refs.tempMessage=message
+			this.content=this.$refs.tempMessage
+		},
 	},
 }
 </script>
