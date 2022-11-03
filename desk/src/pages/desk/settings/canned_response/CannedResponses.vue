@@ -82,13 +82,7 @@ export default {
 				method: "frappedesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
-					// this.$refs.listManager.manager.reload()
-					// this.$toast({
-					// 	title: 'Canned Responses deleted',
-					// 	customIcon: 'circle-check',
-					// 	appearance: 'success'
-					// })
-					// this.$event.emit('show-top-panel-actions-settings', 'CannedResponses')
+
 				},
 				onError: (err) => {
 					this.$refs.listManager.manager.reload()

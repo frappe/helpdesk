@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Dialog :options="{ title: 'Canned responses'}"
+        <Dialog :options="{ title: 'Canned Responses'}"
                 :show="show"
                 @close="close()"
         >

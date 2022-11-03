@@ -54,7 +54,7 @@ export default {
 				}),
 			],
 			CannedResponses: [
-				new Action("New Canned Response", "plus", "primary", () => {
+				new Action("Add Response", "plus", "primary", () => {
 					this.$event.emit("show-new-canned_response-dialog")
 				}),
 			],
