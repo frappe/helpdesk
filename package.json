@@ -1,27 +1,12 @@
 {
 	"private": true,
-	"name": "frappedesk",
-	"version": "1.0.0",
-	"description": "Customer Service Software",
-	"main": "index.js",
+	"aworkspaces": [
+		"desk",
+		"frappe-ui"
+	],
 	"scripts": {
 		"postinstall": "cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/frappe/desk.git"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/frappe/desk/issues"
-	},
-	"homepage": "https://github.com/frappe/desk#readme",
-	"workspaces": [
-		"desk",
-		"frappe-ui"
-	]
+	}
 }
