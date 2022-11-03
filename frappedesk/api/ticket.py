@@ -281,17 +281,17 @@ def get_conversations(ticket_id):
 	return get_all_conversations(ticket_id)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def submit_conversation_via_agent(ticket_id, message, attachments):
 	return create_communication_via_agent(ticket_id, message, attachments)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def submit_conversation_via_contact(ticket_id, message, attachments):
 	return create_communication_via_contact(ticket_id, message, attachments)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_other_tickets_of_contact(ticket_id):
 	contact = frappe.get_value("Ticket", ticket_id, "raised_by")
 	tickets = frappe.get_all(
@@ -306,7 +306,7 @@ def get_other_tickets_of_contact(ticket_id):
 	return tickets
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_and_create_ticket_type(type):
 	if not frappe.db.exists("Ticket Type", type):
 		ticket_type_doc = frappe.new_doc("Ticket Type")
@@ -343,7 +343,7 @@ def activities(name):
 	return activities
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def submit_customer_feedback(ticket_id, satisfaction_rating, feedback_text):
 	ticket_doc = frappe.get_doc("Ticket", ticket_id)
 	ticket_doc.satisfaction_rating = satisfaction_rating
