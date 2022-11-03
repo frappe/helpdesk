@@ -58,7 +58,7 @@ export default {
 		}
 	},
 	mounted() {
-		// this.$event.emit("set-selected-setting", "CannedResponses")
+		this.$event.emit("set-selected-setting", "Canned Responses")
 		this.$event.emit("show-top-panel-actions-settings", "CannedResponses")
 		this.$event.on("show-new-canned_response-dialog", () => {
 			this.showNewCannedResponsesDialog = true
