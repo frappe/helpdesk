@@ -27,7 +27,7 @@
 					ref="textEditor"
 					:editor-class="
 						!editable
-							? 'flex flex-col space-y-[16px]'
+							? 'flex flex-col'
 							: editMode
 							? 'min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3'
 							: 'min-h-[20rem] overflow-y-auto max-h-[85vh]'
