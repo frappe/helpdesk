@@ -28,6 +28,7 @@ class AgentGroup(Document):
 		rule_doc.name = f"Support Rotation - {self.name}"
 		rule_doc.document_type = "Ticket"
 		rule_doc.assign_condition = f"status == 'Open' and agent_group == '{self.name}'"
+		rule_doc.priority = 1
 
 		for day in [
 			"Monday",

@@ -271,6 +271,7 @@ def add_default_assignment_rule():
 	rule_doc.description = "Automatic Ticket Assignment"
 	rule_doc.assign_condition = "status == 'Open'"
 	rule_doc.rule = "Round Robin"
+	rule_doc.priority = 0
 
 	for agent in frappe.get_all("Agent", fields=["user"]):
 		user_doc = frappe.get_doc({"doctype": "Assignment Rule User", "user": agent.user})
