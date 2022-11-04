@@ -61,7 +61,6 @@ export default {
 		const editor = computed(() => {
 			return textEditor.value?.editor || null
 		})
-		expose({ editor })
 		const focusEditor = () => {
 			nextTick(() => {
 				editor.value?.commands.focus()
@@ -76,6 +75,8 @@ export default {
 				setLinkDialog.value.url = existingURL
 			}
 		}
+		expose({ editor, focusEditor, insertLink })
+
 		const setLink = (url) => {
 			// empty
 			if (url === "") {
