@@ -72,12 +72,24 @@
 						v-slot="{ active, selected }"
 					>
 						<li
-							:class="[
-								'px-2.5 py-1.5 rounded-md text-base truncate',
-								{ 'bg-gray-100': active },
-							]"
+							class="px-2.5 py-1.5 cursor-pointer rounded-md text-base"
+							:class="[{ 'bg-gray-100': active }]"
 						>
-							{{ option.label }}
+							<Tooltip
+								v-if="option.label.length > (20 * width) / 220"
+								placement="top"
+								:text="option.label"
+							>
+								<div
+									:class="[
+										'line-clamp-1',
+										`w-[${width - 25 + 'px'}]`,
+									]"
+								>
+									{{ option.label }}
+								</div>
+							</Tooltip>
+							<div v-else>{{ option.label }}</div>
 						</li>
 					</ComboboxOption>
 					<slot
