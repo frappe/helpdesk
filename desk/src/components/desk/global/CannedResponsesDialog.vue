@@ -1,22 +1,29 @@
 <template>
     <div>
-        <Dialog :options="{ title: 'Canned Responses'}"
+        
+        <Dialog :options="{ title: '&nbsp;'}"
                 :show="show"
                 @close="close()"
         >
         <template #body-content>
-            <div class="space-y-6 flex flex-row">
+            <div class="border-b border-grey-400 w-full pl-2 pb-4 absolute left-0 top-0 px-4 py-3 sm:px-6">Canned Responses</div>
+            <div class="w-full border bg-[#EBEEF0] h-8 flex flex-row items-center space-x-3 mt-5 rounded">
+                <FeatherIcon
+					name="search"
+					class="h-4 w-4 stroke-gray-500 ml-[8px]"
+				/>
                 <Input 
                     v-model="search"
                     id="searchInput"
-                    class="w-full"
+                    class="grow text-[12px] text-left text-gray-500 border-0 bg-[#EBEEF0] h-[31px] rounded-none"
                     type="text"
                     placeholder="Search for response"
                     @input="getCannedResponses"
                 />
+            
             </div>
             <div class="divide-y divide-slate-200 ">
-            <div v-for="item in this.cannedResponses" class="relative py-1">
+            <div v-for="item in this.cannedResponses" class="relative py-3">
                 <CustomIcons
                     name="add-new"
                     class="h-7 w-7 rounded p-1 mb-4 absolute right-0"
@@ -30,7 +37,7 @@
                 <span class="font-medium text-lg ">{{item.title}}</span>
             </template>
             <template v-slot:content>
-                <div v-html="item.message" class="font-normal text-lg text-grey ml-5">
+                <div v-html="item.message" class="font-normal text-lg text-slate-500 ml-5 mt-4">
                     
                 </div>
                     
@@ -109,3 +116,4 @@ export default{
     }
 }
 </script>
+
