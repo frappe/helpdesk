@@ -7,7 +7,7 @@
 			}"
 			class="flex"
 		>
-			<div class="w-[167px] border-r">
+			<div class="w-[185px] border-r">
 				<SettingsSideBarMenu />
 			</div>
 			<div class="grow h-full">
