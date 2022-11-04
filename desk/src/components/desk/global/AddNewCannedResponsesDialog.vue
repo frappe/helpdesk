@@ -18,8 +18,8 @@
 							placeholder="Enter Title"
 							@input="(val) => {
 								tempNewTitle=val
-							}"
-						/>
+							}"> Title</Input>
+						
 					</form>
 				</div>
 				<div>
@@ -77,6 +77,7 @@
 				<Button
 					appearance="primary"
 					@click="addResponse()"
+                    class="mr-auto"
 					>Add Response</Button
 				>
 			</template>
