@@ -120,13 +120,14 @@ export default {
 		}
 	},
 	methods: {
+        
 		save() {
 			this.responseResource.setValue.submit({
 				title: this.tempNewTitle,
 				message: this.tempNewMessage,
 			})
 			this.editMode = false
-		},
+		}
         
 	},
 }

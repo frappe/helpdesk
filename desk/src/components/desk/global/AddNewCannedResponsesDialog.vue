@@ -7,29 +7,24 @@
 		>
 			<template #body-content>
 				<div class="space-y-6">
-					<form
-						@submit.prevent="onSubmit"
-						class="flex flex-row space-x-5 items-center"
-					>
+					
 						<Input
 							id="searchInput"
 							class="w-full"
 							type="text"
+							label="Title"
 							placeholder="Enter Title"
-							@input="(val) => {
-								tempNewTitle=val
-							}"> Title</Input>
-						
-					</form>
+							v-model="title"
+							/>
+							<ErrorMessage :message="titleValidationError" />
+
 				</div>
 				<div>
 					<CustomTextEditor
-
 						:show="true"
-						ref="contentEditor"
-						@click="$refs.contentEditor.focusEditor()"
-						@change="(res)=>{
-							tempNewMessage=res
+						:content="message"
+						@change="(val)=>{
+							message=val
 						}"
 						editorClasses="w-full p-[12px] bg-gray-100 min-h-[180px] max-h-[500px] text-[16px]"
 						class="rounded-[8px]"
@@ -71,7 +66,9 @@
 
 					</template>
 					</CustomTextEditor>
+					
 				</div>
+				<ErrorMessage :message="messageValidationError" />
 			</template>
 			<template #actions>
 				<Button
@@ -86,7 +83,7 @@
 </template>
 
 <script>
-import { Dialog, Input, FeatherIcon } from "frappe-ui"
+import { Dialog, Input, FeatherIcon, ErrorMessage } from "frappe-ui"
 import { ref } from "@vue/reactivity"
 import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
 import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
@@ -97,29 +94,49 @@ export default {
 		Dialog,
 		Input,
 		FeatherIcon,
+		ErrorMessage,
 		CustomTextEditor,
 		TextEditorMenuItem
 	},
 	setup() {
-		const tempNewTitle=ref("")
-		const tempNewMessage=ref("")
-		const responseInputErrors=ref("")
+
+		const titleValidationError=ref("")
+		const messageValidationError=ref("")
 		return {
-			tempNewMessage,
-			tempNewTitle,
-			responseInputErrors
+			titleValidationError,
+			messageValidationError
+		}
+	},
+
+	data(){
+		return{
+			title:"",
+			message:""
+		}
+
+	},
+
+	watch:{
+		title(newValue){
+			this.validateTitle(newValue)
+		},
+		message(newValue){
+			this.validateMessage(newValue)
 		}
 	},
 	methods: {
 		close() {
-			this.tempNewTitle = ""
-			this.tempNewMessage = ""
+			this.title = ""
+			this.message = ""
 			this.$emit("close")
 		},
 		addResponse(){
+			if (this.validateInputs()) {
+				return
+			}
 			const inputParams={
-				title:this.tempNewTitle,
-				message:this.tempNewMessage
+				title:this.title,
+				message:this.message
 			}
 			this.$resources.newResponse.submit({
 				doc:{
@@ -127,6 +144,38 @@ export default {
 					...inputParams,
 				}
 			})
+		},
+		validateInputs(){
+			let error = this.validateTitle(this.title)
+			error += this.validateMessage(this.message)
+
+			return error
+		},
+		validateTitle(value){
+			this.titleValidationError = ""
+			if(!value){
+				this.titleValidationError="Title is required"
+			}
+			else if(value.trim() == ""){
+				this.titleValidationError = "Title is required"
+			}
+
+			return this.titleValidationError
+
+		},
+
+		validateMessage(value){
+			this.messageValidationError = ""
+			if(!value){
+				this.messageValidationError = "Message is required"
+			}
+			else if(
+				["<p><br></p>", "<p></p>"].includes(value.replaceAll(" ", ""))
+			){
+				this.messageValidationError = "Message is required"
+			}
+
+			return this.messageValidationError
 		}
 	},
 	resources: {
