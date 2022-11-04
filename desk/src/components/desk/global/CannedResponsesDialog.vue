@@ -6,7 +6,15 @@
                 @close="close()"
         >
         <template #body-content>
-            <div class="border-b border-grey-400 w-full pl-2 pb-4 absolute left-0 top-0 px-4 py-3 sm:px-6">Canned Responses</div>
+            <div class="border-b border-grey-400 w-full pl-2 pb-4 absolute left-0 top-0 px-4 py-3 sm:px-6 flex justify-between items-center">
+                <div class="">Canned Responses</div>
+                <Button 
+                    icon="x"
+                    class="bg-transparent w-2 h-2" 
+                    @click="close()"
+
+                />
+            </div>
             <div class="w-full border bg-[#EBEEF0] h-8 flex flex-row items-center space-x-3 mt-5 rounded">
                 <FeatherIcon
 					name="search"
@@ -53,7 +61,7 @@
 </template>
 
 <script>
-import { Dialog,FeatherIcon, Input } from "frappe-ui"
+import { Dialog,FeatherIcon, Input, Button } from "frappe-ui"
 import Accordion from "@/components/global/Accordion.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import {ref,computed,provide} from "vue"
