@@ -340,9 +340,23 @@
 											ticket.ticket_type &&
 											!updatingTicketType
 										"
-										class="text-left"
+										class="text-left h-[20px]"
 									>
-										{{ ticket.ticket_type }}
+										<Tooltip
+											v-if="
+												ticket.ticket_type.length > 20
+											"
+											placement="top"
+											:text="ticket.ticket_type"
+											class="line-clamp-1 w-[180px]"
+										>
+											<div class="">
+												{{ ticket.ticket_type }}
+											</div>
+										</Tooltip>
+										<div v-else>
+											{{ ticket.ticket_type }}
+										</div>
 									</div>
 									<div v-else>
 										<LoadingText
@@ -415,7 +429,7 @@
 					>
 						<template #input>
 							<div
-								class="flex flex-row space-x-1 items-center w-full"
+								class="flex flex-row space-x-1 items-center w-full line-clamp-1"
 							>
 								<div class="grow">
 									<div
@@ -480,7 +494,7 @@
 					>
 						<template #input>
 							<div
-								class="flex flex-row space-x-1 items-center w-full"
+								class="flex flex-row space-x-1 items-center w-full line-clamp-1"
 							>
 								<div class="grow">
 									<div

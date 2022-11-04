@@ -23,7 +23,7 @@
 								:placeholder="placeholder"
 							>
 								<span
-									class="text-base truncate"
+									class="text-base line-clamp-1"
 									v-if="selectedValue"
 								>
 									{{ displayValue(selectedValue) }}
