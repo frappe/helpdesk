@@ -6,6 +6,7 @@
 		"dev": "vite",
 		"preview": "vite preview",
 		"build": "vite build --base=/assets/frappedesk/desk/ && yarn copy-html-entry",
+		"watch": "vite build --watch --base=/assets/frappedesk/desk/ && yarn copy-html-entry",
 		"serve": "vite preview",
 		"copy-html-entry": "cp ../frappedesk/public/desk/index.html ../frappedesk/www/frappedesk/index.html"
 	},
