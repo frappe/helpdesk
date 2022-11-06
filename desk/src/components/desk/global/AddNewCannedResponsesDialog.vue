@@ -22,11 +22,11 @@
 				<div>
 					<CustomTextEditor
 						:show="true"
-						:content="message"
+						:content="message"						
 						@change="(val)=>{
 							message=val
 						}"
-						editorClasses="w-full p-[12px] bg-gray-100 min-h-[180px] max-h-[500px] text-[16px]"
+						editorClasses="w-full p-[7px]  bg-gray-100 min-h-[180px] max-h-[500px] text-[12px] max-w-full"
 						class="rounded-[8px]"
 					>
 					<template #top-section="{ editor }">
