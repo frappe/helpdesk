@@ -26,7 +26,9 @@ class AgentGroup(Document):
 		try:
 			rule = self.get_assignment_rule()
 			if rule:
-				rule.delete(ignore_permissions=True)
+				self.assignment_rule = ""
+				self.save()
+				frappe.get_doc("Assignment Rule", rule).delete()
 		except DoesNotExistError:
 			# TODO: Log this error
 			pass
