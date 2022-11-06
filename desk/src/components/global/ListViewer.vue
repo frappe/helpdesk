@@ -4,6 +4,10 @@
 			v-if="false"
 			class="w-1/12 w-2/12 w-3/12 w-4/12 w-5/12 w-6/12 w-7/12 w-8/12 w-9/12 w-10/12 w-11/12"
 		></div>
+		<div
+			v-if="false"
+			class="w-1/24 w-2/24 w-3/24 w-4/24 w-5/24 w-6/24 w-7/24 w-8/24 w-9/24 w-10/24 w-11/24 w-12/24 w-13/24 w-14/24 w-15/24 w-16/24 w-17/24 w-18/24 w-19/24 w-20/24 w-21/24 w-22/24 w-23/24"
+		></div>
 		<slot name="body">
 			<slot name="list-body">
 				<div>
@@ -96,7 +100,7 @@
 										renderOptions.fields
 									)"
 									:key="field"
-									:class="`w-${renderOptions.fields[field].width}/12`"
+									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 								>
 									<div>
 										<slot
@@ -195,7 +199,7 @@
 												renderOptions.fields
 											)"
 											:key="field"
-											:class="`w-${renderOptions.fields[field].width}/12`"
+											:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 										>
 											<div
 												class="flex"
@@ -252,7 +256,8 @@ export default {
 	},
 	computed: {
 		renderOptions() {
-			const options = { fields: {} }
+			const options = { fields: {}, base: 12 }
+			options.base = this.options.base || "12"
 			for (let i in this.options.fields) {
 				options.fields[i] = {
 					label: this.options.fields[i].label || i,
