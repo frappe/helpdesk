@@ -12,9 +12,8 @@
 				/>
 			</div>
 			<div class="flex flex-row items-center group w-full">
-				<div class="sm:w-4/12">Name</div>
+				<div class="sm:w-5/12">Name</div>
 				<div class="sm:w-5/12">Email</div>
-				<div class="sm:w-3/12">Team</div>
 				<div class="sm:w-2/12"></div>
 			</div>
 		</div>
