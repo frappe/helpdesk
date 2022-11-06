@@ -4,14 +4,25 @@
 import frappe
 from frappe.model.document import Document
 from frappe.exceptions import DoesNotExistError
+from frappe.model.naming import append_number_if_name_exists
 
 
 class AgentGroup(Document):
-	# TODO: handle document rename
 	def after_insert(self):
 		self.create_assignment_rule()
 
+	def after_rename(self, olddn, newdn, merge=False):
+		# super(AgentGroup, self).after_rename(olddn, newdn, merge)
+
+		# Update the condition for the linked assignment rule
+		rule = self.get_assignment_rule()
+		rule_doc = frappe.get_doc("Assignment Rule", rule)
+		rule_doc.assign_condition = f"status == 'Open' and agent_group == '{newdn}'"
+		rule_doc.save(ignore_permissions=True)
+
 	def on_trash(self):
+
+		# Deletes the assignment rule for this group
 		try:
 			rule = self.get_assignment_rule()
 			if rule:
@@ -21,11 +32,12 @@ class AgentGroup(Document):
 			pass
 
 	def create_assignment_rule(self):
-		if frappe.db.exists("Assignment Rule", f"Support Rotation - {self.name}"):
-			return
+		"""Creates the assignment rule for this group"""
 
 		rule_doc = frappe.new_doc("Assignment Rule")
-		rule_doc.name = f"Support Rotation - {self.name}"
+		rule_doc.name = append_number_if_name_exists(
+			"Assignment Rule", f"{self.name} - Support Rotation"
+		)
 		rule_doc.document_type = "Ticket"
 		rule_doc.assign_condition = f"status == 'Open' and agent_group == '{self.name}'"
 		rule_doc.priority = 1
@@ -43,26 +55,12 @@ class AgentGroup(Document):
 			rule_doc.append("assignment_days", day_doc)
 
 		rule_doc.save(ignore_permissions=True)
+		self.assignment_rule = rule_doc.name
+		self.save(ignore_permissions=True)
 
 	def get_assignment_rule(self):
-		return get_assignement_rule_by_group_name(self.name)
+		"""Returns the assignment rule for this group, if not found creates one and retures it"""
 
-
-def get_assignement_rule_by_group_name(name):
-	rule_doc = None
-	try:
-		rule_doc = frappe.get_last_doc(
-			"Assignment Rule",
-			filters=[
-				[
-					"Assignment Rule",
-					"assign_condition",
-					"=",
-					f"status == 'Open' and agent_group == '{name}'",
-				],
-			],
-		)
-	except DoesNotExistError:
-		pass
-
-	return rule_doc
+		if not self.get_assignment_rule:
+			self.create_assignment_rule()
+		return self.assignment_rule
