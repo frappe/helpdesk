@@ -21,7 +21,6 @@
 				<ListViewer
 					:manager="manager"
 					:options="{
-						showFilterBox: false,
 						fields: {
 							title: {
 								label: 'Title',
@@ -150,11 +149,6 @@
 								"
 								>Delete</Button
 							>
-						</div>
-					</template>
-					<template #actions>
-						<div class="flex flex-row space-x-2">
-							<!-- Add actions here -->
 						</div>
 					</template>
 					<template #field-title="{ value, row }">

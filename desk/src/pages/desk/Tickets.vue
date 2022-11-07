@@ -1,5 +1,9 @@
 <template>
 	<div class="flex flex-col h-full p-4">
+		<div
+			v-if="false"
+			class="text-green-600 text-gray-600 text-green-500 bg-green-100 border-green-500 text-yellow-500 bg-yellow-100 border-yellow-500 text-orange-500 bg-orange-100 border-orange-500 text-red-500 bg-red-100 border-red-500"
+		/>
 		<ListManager
 			ref="ticketList"
 			:options="{
@@ -30,7 +34,9 @@
 					:manager="manager"
 					:options="{
 						base: '24',
-						showFilterBox: false,
+						filterBox: true,
+						quickSelectFilters: true,
+						presetFilters: [],
 						fields: {
 							name: {
 								label: '#',
@@ -100,11 +106,10 @@
 							/>
 							<div
 								class="text-base font-normal"
-								:class="
-									value == 'Open'
-										? 'text-green-600'
-										: 'text-gray-600'
-								"
+								:class="{
+									'text-green-600': value == 'Open',
+									'text-gray-600': value != 'Open',
+								}"
 							>
 								{{ value }}
 							</div>
@@ -115,18 +120,14 @@
 							<div
 								class="text-sm font-semibold px-2 border rounded-lg"
 								:class="{
-									'text-green-500': value == 'Low',
-									'text-yellow-500': value == 'Medium',
-									'text-orange-500': value == 'High',
-									'text-red-500': value == 'Urgent',
-									'bg-green-100': value == 'Low',
-									'bg-yellow-100': value == 'Medium',
-									'bg-orange-100': value == 'High',
-									'bg-red-100': value == 'Urgent',
-									'border-green-500': value == 'Low',
-									'border-yellow-500': value == 'Medium',
-									'border-orange-500': value == 'High',
-									'border-red-500': value == 'Urgent',
+									'text-green-500 bg-green-100 border-green-500':
+										value == 'Low',
+									'text-yellow-500 bg-yellow-100 border-yellow-500':
+										value == 'Medium',
+									'text-orange-500 bg-orange-100 border-orange-500':
+										value == 'High',
+									'text-red-500 bg-red-100 border-red-500':
+										value == 'Urgent',
 								}"
 							>
 								{{ value.toLowerCase() }}

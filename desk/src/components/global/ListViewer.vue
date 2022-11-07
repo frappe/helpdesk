@@ -15,71 +15,49 @@
 						<div
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
 						>
-							<div>
-								<slot name="top-sub-section-1"> </slot>
-							</div>
+							<slot name="top-sub-section-1" />
 							<div class="grow">
 								<slot name="top-sub-section-2">
 									<!-- Filter Box -->
 									<div
-										v-if="options.showFilterBox"
-										class="flex flex-row items-center"
+										v-if="options.filterBox"
+										class="flex flex-row items-center bg-gray-100"
 									>
+										<div>Filter Box</div>
+									</div>
+								</slot>
+							</div>
+							<slot name="top-sub-section-3">
+								<!-- Actions / Bulk actions -->
+								<div
+									v-if="
+										Object.keys(manager.selectedItems)
+											.length > 0
+									"
+								>
+									<!-- Bulk Actions -->
+									<slot
+										name="bulk-actions"
+										:selectedItems="manager.selectedItems"
+									/>
+								</div>
+								<div v-else class="flex flex-row space-x-2">
+									<!-- Actions -->
+									<slot name="actions" />
+									<slot name="primary-action">
+										<!-- Add Item -->
 										<Button
-											icon-right="chevron-down"
-											class="mr-[-10px] bg-gray-300"
-											>Filters</Button
+											appearance="primary"
+											icon-left="plus"
+											@click="$emit('add-item')"
 										>
-										<div class="grow">
-											<Input
-												type="text"
-												class="h-[30px]"
-											></Input>
-										</div>
-									</div>
-								</slot>
-							</div>
-							<div>
-								<slot name="top-sub-section-3">
-									<div
-										v-if="
-											Object.keys(manager.selectedItems)
-												.length > 0
-										"
-									>
-										<slot
-											name="bulk-actions"
-											:selectedItems="
-												manager.selectedItems
-											"
-										>
-											<!-- Bulk Actions -->
-										</slot>
-									</div>
-									<div v-else class="flex flex-row space-x-2">
-										<div>
-											<slot name="actions">
-												<!-- Actions -->
-											</slot>
-										</div>
-										<div>
-											<slot name="primary-action">
-												<!-- Add Item -->
-												<Button
-													appearance="primary"
-													icon-left="plus"
-													@click="$emit('add-item')"
-												>
-													{{
-														`Add ${manager.options.doctype}`
-													}}
-												</Button>
-											</slot>
-										</div>
-									</div>
-									<!-- Actions / Bulk actions -->
-								</slot>
-							</div>
+											{{
+												`Add ${manager.options.doctype}`
+											}}
+										</Button>
+									</slot>
+								</div>
+							</slot>
 						</div>
 					</slot>
 					<slot name="header">
@@ -256,15 +234,19 @@ export default {
 	},
 	computed: {
 		renderOptions() {
-			const options = { fields: {}, base: 12 }
-			options.base = this.options.base || "12"
+			const options = {
+				fields: {},
+				base: this.options.base || "12",
+				filterBox: this.options.filterBox || false,
+				quickSelectFilters: this.options.quickSelectFilters || false,
+				presetFilters: this.options.presetFilters || [],
+			}
 			for (let i in this.options.fields) {
 				options.fields[i] = {
 					label: this.options.fields[i].label || i,
 					width: this.options.fields[i].width || 1,
 					priority: this.options.fields[i].priority || 5,
 					align: this.options.fields[i].align || "left",
-					showFilterBox: this.options.fields[i].showFilterBox || true,
 				}
 			}
 			return options
