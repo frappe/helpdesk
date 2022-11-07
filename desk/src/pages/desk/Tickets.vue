@@ -54,15 +54,16 @@
 							},
 							contact: {
 								label: 'Created By',
-								width: '3',
-							},
-							creation: {
-								label: 'Created',
-								width: '2',
+								width: '4',
 							},
 							modified: {
 								label: 'Modified',
 								width: '2',
+							},
+							creation: {
+								label: ' ',
+								width: '1',
+								align: 'right',
 							},
 							_assign: {
 								label: ' ',
@@ -138,21 +139,21 @@
 						</div>
 					</template>
 					<template #field-creation="{ value }">
-						<div class="text-gray-500">
-							{{
-								$dayjs.longFormating(
-									$dayjs(value).fromNow(),
-									false
-								)
-							}}
-						</div>
+						<Tooltip
+							placement="top"
+							:text="`Created on ${$dayjs(value)}`"
+						>
+							<div class="text-gray-500">
+								{{ $dayjs(value).format("DD MMM") }}
+							</div>
+						</Tooltip>
 					</template>
 					<template #field-modified="{ value }">
 						<div class="text-gray-500">
 							{{
-								$dayjs.longFormating(
+								$dayjs.shortFormating(
 									$dayjs(value).fromNow(),
-									false
+									true
 								)
 							}}
 						</div>
@@ -213,7 +214,7 @@ import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import AgentAvatar from "@/components/global/AgentAvatar.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { FeatherIcon, Dropdown } from "frappe-ui"
+import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
 
 export default {
 	name: "Tickets",
@@ -224,6 +225,7 @@ export default {
 		CustomIcons,
 		FeatherIcon,
 		Dropdown,
+		Tooltip,
 	},
 	inject: ["agents", "user"],
 	mounted() {
