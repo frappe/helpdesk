@@ -5,12 +5,13 @@
 </template>
 
 <script>
-import { ref, computed, watch, provide } from "vue"
+import { ref, computed, watch, provide, inject } from "vue"
 
 export default {
 	name: "ListManager",
 	props: ["options"],
 	setup(props, context) {
+		const user = inject("user")
 		const options = ref({
 			handle_row_click: () => {},
 			...props.options,
@@ -45,6 +46,42 @@ export default {
 			allItemsSelected,
 			list: [],
 			totalCount: 0,
+			applyFilters: (filters) => {
+				let mapOperator = (x) => {
+					switch (x) {
+						case "is":
+							return "="
+						case "is not":
+							return "!="
+						default:
+							return x
+					}
+				}
+				let mapValue = (x, type) => {
+					switch (type) {
+						case "like":
+							return `%${x}%`
+						default:
+							return x
+					}
+				}
+
+				let finalFilters = filters.map((x) => {
+					return [
+						x.fieldname,
+						mapOperator(x.filter_type),
+						mapValue(
+							x.fieldname == "_assign" && x.value == "@me"
+								? user.value.user
+								: x.value,
+							x.filter_type
+						),
+					]
+				})
+				manager.value.update({
+					filters: finalFilters,
+				})
+			},
 			nextPage: () => {
 				resources.value.list.next()
 			},
