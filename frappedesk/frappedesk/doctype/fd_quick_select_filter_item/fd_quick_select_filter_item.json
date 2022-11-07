@@ -1,0 +1,43 @@
+{
+	"actions": [],
+	"autoname": "autoincrement",
+	"creation": "2022-11-07 18:04:24.442212",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": ["fieldname", "filter_type", "value"],
+	"fields": [
+		{
+			"fieldname": "fieldname",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Field Name"
+		},
+		{
+			"fieldname": "filter_type",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"label": "Filter Type",
+			"options": "is\nis not\nbefore\nafter\nbetween\nlike\nnot like\nin\nnot in"
+		},
+		{
+			"fieldname": "value",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Value"
+		}
+	],
+	"index_web_pages_for_search": 1,
+	"istable": 1,
+	"links": [],
+	"modified": "2022-11-07 18:06:02.050241",
+	"modified_by": "Administrator",
+	"module": "FrappeDesk",
+	"name": "FD Quick Select Filter Item",
+	"naming_rule": "Autoincrement",
+	"owner": "Administrator",
+	"permissions": [],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}
