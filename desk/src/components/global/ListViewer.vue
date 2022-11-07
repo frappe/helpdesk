@@ -16,8 +16,9 @@
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
 						>
 							<slot name="top-sub-section-1">
-								<QuickSelectFilters
-									v-if="options.quickSelectFilters"
+								<PresetFilters
+									v-if="options.presetFilters"
+									@apply-filter="applyFilter"
 								/>
 							</slot>
 							<div class="grow">
@@ -257,7 +258,7 @@
 
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import QuickSelectFilters from "@/components/global/QuickSelectFilters.vue"
+import PresetFilters from "@/components/global/PresetFilters.vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
 
 export default {
@@ -271,7 +272,7 @@ export default {
 	inject: ["manager"],
 	components: {
 		CustomIcons,
-		QuickSelectFilters,
+		PresetFilters,
 		Dropdown,
 		FeatherIcon,
 	},
@@ -281,7 +282,7 @@ export default {
 				fields: {},
 				base: this.options.base || "12",
 				filterBox: this.options.filterBox || false,
-				quickSelectFilters: this.options.quickSelectFilters || false,
+				presetFilters: this.options.presetFilters || false,
 			}
 			for (let i in this.options.fields) {
 				options.fields[i] = {
@@ -292,6 +293,11 @@ export default {
 				}
 			}
 			return options
+		},
+	},
+	methods: {
+		applyFilter(filters) {
+			this.manager.applyFilters(filters)
 		},
 	},
 }
