@@ -6,9 +6,7 @@
 				@click="toggleDropdown"
 			>
 				<div class="text-lg font-semibold">
-					{{
-						`All ${manager.options.doctype}s (${manager.totalCount})`
-					}}
+					{{ `${title} (${manager.totalCount})` }}
 				</div>
 				<FeatherIcon name="chevron-down" class="h-4 w-4 stroke-2" />
 			</div>
@@ -18,6 +16,7 @@
 
 <script>
 import { Dropdown, FeatherIcon } from "frappe-ui"
+import { inject, ref } from "vue"
 
 export default {
 	name: "PresetFilters",
@@ -25,7 +24,18 @@ export default {
 		Dropdown,
 		FeatherIcon,
 	},
-	inject: ["manager", "user"],
+	setup() {
+		const manager = inject("manager")
+		const user = inject("user")
+
+		const title = ref(`All ${manager.value.options.doctype}s`)
+
+		return {
+			manager,
+			user,
+			title,
+		}
+	},
 	computed: {
 		options() {
 			let options = []
@@ -40,6 +50,7 @@ export default {
 								return {
 									label: item.title,
 									handler: () => {
+										this.title = item.title
 										this.$emit("apply-filter", item.filters)
 									},
 								}
