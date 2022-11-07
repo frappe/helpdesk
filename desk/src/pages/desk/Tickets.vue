@@ -31,12 +31,10 @@
 		>
 			<template #body="{ manager }">
 				<ListViewer
-					:manager="manager"
 					:options="{
 						base: '24',
 						filterBox: true,
 						quickSelectFilters: true,
-						presetFilters: [],
 						fields: {
 							name: {
 								label: '#',

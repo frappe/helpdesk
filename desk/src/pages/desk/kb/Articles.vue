@@ -19,7 +19,6 @@
 		>
 			<template #body="{ manager }">
 				<ListViewer
-					:manager="manager"
 					:options="{
 						fields: {
 							title: {

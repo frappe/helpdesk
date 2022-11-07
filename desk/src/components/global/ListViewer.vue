@@ -15,15 +15,58 @@
 						<div
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
 						>
-							<slot name="top-sub-section-1" />
+							<slot name="top-sub-section-1">
+								<QuickSelectFilters
+									v-if="options.quickSelectFilters"
+								/>
+							</slot>
 							<div class="grow">
 								<slot name="top-sub-section-2">
 									<!-- Filter Box -->
 									<div
 										v-if="options.filterBox"
-										class="flex flex-row items-center bg-gray-100"
+										class="flex flex-row items-center space-x-1"
 									>
-										<div>Filter Box</div>
+										<div
+											class="py-1 px-2 bg-white rounded shadow flex flex-row space-x-1 items-center"
+										>
+											<div class="text-base">
+												assignee:
+												<span class="font-semibold"
+													>@me</span
+												>
+											</div>
+											<button
+												class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
+											>
+												<FeatherIcon
+													class="w-3"
+													name="x"
+												/>
+											</button>
+										</div>
+										<div
+											class="py-1 px-2 bg-white rounded shadow flex flex-row space-x-1 items-center"
+										>
+											<div class="text-base">
+												status:
+												<span class="font-semibold"
+													>Open</span
+												>
+											</div>
+											<button
+												class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
+											>
+												<FeatherIcon
+													class="w-3"
+													name="x"
+												/>
+											</button>
+										</div>
+										<FeatherIcon
+											name="plus"
+											class="h-3 w-3"
+										/>
 									</div>
 								</slot>
 							</div>
@@ -213,24 +256,24 @@
 </template>
 
 <script>
-import ListManager from "./ListManager.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import QuickSelectFilters from "@/components/global/QuickSelectFilters.vue"
+import { Dropdown, FeatherIcon } from "frappe-ui"
 
 export default {
 	name: "ListViewer",
 	props: {
-		manager: {
-			type: Object,
-			required: true,
-		},
 		options: {
 			type: Object,
 			default: () => ({}),
 		},
 	},
+	inject: ["manager"],
 	components: {
-		ListManager,
 		CustomIcons,
+		QuickSelectFilters,
+		Dropdown,
+		FeatherIcon,
 	},
 	computed: {
 		renderOptions() {
@@ -239,7 +282,6 @@ export default {
 				base: this.options.base || "12",
 				filterBox: this.options.filterBox || false,
 				quickSelectFilters: this.options.quickSelectFilters || false,
-				presetFilters: this.options.presetFilters || [],
 			}
 			for (let i in this.options.fields) {
 				options.fields[i] = {

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { ref, computed, watch } from "vue"
+import { ref, computed, watch, provide } from "vue"
 
 export default {
 	name: "ListManager",
@@ -116,6 +116,7 @@ export default {
 				manager.value.update({ order_by: newOrderBy })
 			},
 		})
+		provide("manager", manager)
 
 		const clearList = () => {
 			selectedItems.value = {}
