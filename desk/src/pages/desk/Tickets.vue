@@ -62,8 +62,7 @@
 							},
 							modified: {
 								label: 'Modified',
-								width: '1',
-								align: 'right',
+								width: '2',
 							},
 							_assign: {
 								label: ' ',
@@ -74,6 +73,7 @@
 					}"
 					class="text-base"
 				>
+					<!-- Field Templates -->
 					<template #field-name="{ value }">
 						<div class="text-xs text-gray-500">
 							{{ value }}
@@ -140,7 +140,7 @@
 					<template #field-creation="{ value }">
 						<div class="text-gray-500">
 							{{
-								$dayjs.shortFormating(
+								$dayjs.longFormating(
 									$dayjs(value).fromNow(),
 									false
 								)
@@ -150,7 +150,7 @@
 					<template #field-modified="{ value }">
 						<div class="text-gray-500">
 							{{
-								$dayjs.shortFormating(
+								$dayjs.longFormating(
 									$dayjs(value).fromNow(),
 									false
 								)
@@ -159,6 +159,49 @@
 					</template>
 					<template #field-_assign="{ value }">
 						<AgentAvatar :agent="JSON.parse(value)[0]" />
+					</template>
+
+					<!-- Other Templates -->
+					<template #bulk-actions="{ selectedItems }">
+						<div class="flex flex-row space-x-2">
+							<Dropdown
+								placement="right"
+								:options="agentsAsDropdownOptions()"
+							>
+								<template v-slot="{ toggleDropdown }">
+									<Button
+										:loading="
+											$resources.bulkAssignTicketToAgent
+												.loading
+										"
+										icon-right="chevron-down"
+										class="ml-2"
+										@click="toggleDropdown"
+									>
+										Assign to
+									</Button>
+								</template>
+							</Dropdown>
+							<!-- <Button @click="() => {}">Add to FAQ</Button> -->
+							<Button
+								@click="
+									() => {
+										$resources.bulkAssignTicketStatus
+											.submit({
+												ticket_ids:
+													Object.keys(selectedItems),
+												status: 'Closed',
+											})
+											.then(() => {
+												manager.unselect()
+												manager.reload()
+											})
+									}
+								"
+							>
+								Close Ticket
+							</Button>
+						</div>
 					</template>
 				</ListViewer>
 			</template>
@@ -170,7 +213,7 @@ import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import AgentAvatar from "@/components/global/AgentAvatar.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { FeatherIcon } from "frappe-ui"
+import { FeatherIcon, Dropdown } from "frappe-ui"
 
 export default {
 	name: "Tickets",
@@ -180,7 +223,9 @@ export default {
 		AgentAvatar,
 		CustomIcons,
 		FeatherIcon,
+		Dropdown,
 	},
+	inject: ["agents", "user"],
 	mounted() {
 		if (this.$route.query) {
 			for (const [key, value] of Object.entries(this.$route.query)) {
@@ -202,12 +247,6 @@ export default {
 		// TODO: this.applyFiltersToList()
 	},
 	methods: {
-		markSelectedTicketsAsClosed() {
-			this.$resources.bulkAssignTicketStatus.submit({
-				ticket_ids: Object.keys(this.$refs.ticketList.selectedItems),
-				status: "Closed",
-			})
-		},
 		agentsAsDropdownOptions() {
 			let agentItems = []
 			if (this.agents) {
@@ -262,12 +301,13 @@ export default {
 		bulkAssignTicketStatus() {
 			return {
 				method: "frappedesk.api.ticket.bulk_assign_ticket_status",
-				onSuccess: () => {
+				onSuccess: (res) => {
+					//res: {docs: Ticket Docs, status: NewStatus}
 					this.$refs.ticketList.selectedItems = []
 					this.$refs.ticketList.manager.reload()
 
 					this.$toast({
-						title: "Tickets marked as closed.",
+						title: `Tickets marked as ${res.status}.`,
 						customIcon: "circle-check",
 						appearance: "success",
 					})
