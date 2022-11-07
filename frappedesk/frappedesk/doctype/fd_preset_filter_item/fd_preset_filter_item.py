@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class FDQuickSelectFilter(Document):
+class FDPresetFilterItem(Document):
 	pass

@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestFDQuickSelectFilter(FrappeTestCase):
+class TestFDPresetFilter(FrappeTestCase):
 	pass
