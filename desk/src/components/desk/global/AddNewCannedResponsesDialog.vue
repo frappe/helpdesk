@@ -6,8 +6,8 @@
 			@close="close()"
 		>
 			<template #body-content>
-				<div class="space-y-6">
-					
+				<div class="flex flex-col">
+
 						<Input
 							id="searchInput"
 							class="w-full"
@@ -19,8 +19,37 @@
 							<ErrorMessage :message="titleValidationError" />
 
 				</div>
+				<div
+					class="mb-2 block text-sm leading-4 text-gray-700"
+				>
+					Message
+				</div>
 				<div>
-					<CustomTextEditor
+					<TextEditor
+						class="bg-gray-100"
+						ref="textEditor"
+						editor-class="min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3"
+						:content="message"
+						:starterkit-options="{
+						heading: { levels: [2, 3, 4, 5, 6] },
+						}"
+						@change="(val)=>{
+							message=val
+						}"
+					>
+
+					<template v-slot:top>
+						<div>
+							<TextEditorFixedMenu
+								class="m-3 overflow-x-auto"
+								:buttons="textEditorMenuButtons"
+							/>
+						</div>
+					</template>
+
+
+					</TextEditor>
+					<!-- <CustomTextEditor
 						:show="true"
 						:content="message"						
 						@change="(val)=>{
@@ -65,7 +94,7 @@
 						</div>
 
 					</template>
-					</CustomTextEditor>
+					</CustomTextEditor> -->
 					
 				</div>
 				<ErrorMessage :message="messageValidationError" />
@@ -83,10 +112,11 @@
 </template>
 
 <script>
-import { Dialog, Input, FeatherIcon, ErrorMessage } from "frappe-ui"
+import { Dialog, Input, FeatherIcon, ErrorMessage, TextEditor } from "frappe-ui"
 import { ref } from "@vue/reactivity"
-import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
-import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
+// import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
+// import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 export default {
 	name: "AddNewCannedResponsesDialog",
 	props: ["show"],
@@ -95,8 +125,8 @@ export default {
 		Input,
 		FeatherIcon,
 		ErrorMessage,
-		CustomTextEditor,
-		TextEditorMenuItem
+		TextEditor,
+		TextEditorFixedMenu
 	},
 	setup() {
 
@@ -123,6 +153,55 @@ export default {
 		message(newValue){
 			this.validateMessage(newValue)
 		}
+	},
+	computed: {
+		textEditorMenuButtons() {
+			return [
+				"Paragraph",
+				[
+					"Heading 2",
+					"Heading 3",
+					"Heading 4",
+					"Heading 5",
+					"Heading 6",
+				],
+				"Separator",
+				"Bold",
+				"Italic",
+				"Separator",
+				"Bullet List",
+				"Numbered List",
+				"Separator",
+				"Align Left",
+				"Align Center",
+				"Align Right",
+				"Separator",
+				"Image",
+				"Video",
+				"Link",
+				"Blockquote",
+				"Code",
+				"Horizontal Rule",
+				[
+					"InsertTable",
+					"AddColumnBefore",
+					"AddColumnAfter",
+					"DeleteColumn",
+					"AddRowBefore",
+					"AddRowAfter",
+					"DeleteRow",
+					"MergeCells",
+					"SplitCell",
+					"ToggleHeaderColumn",
+					"ToggleHeaderRow",
+					"ToggleHeaderCell",
+					"DeleteTable",
+				],
+				"Separator",
+				"Undo",
+				"Redo",
+			]
+		},
 	},
 	methods: {
 		close() {
