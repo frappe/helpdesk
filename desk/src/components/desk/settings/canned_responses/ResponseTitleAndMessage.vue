@@ -18,14 +18,14 @@
         "
         v-html="message"
     >
+
     </div>
         
     </div>
     <div v-else>
         <div class="flex flex-col space-y-[16px] h-full">
             <div>
-                <input
-                    class="border-gray-400 placeholder-gray-500 form-input block w-full"
+                <Input
                     label="Title"
                     type="text"
                     :value="title"
@@ -34,49 +34,41 @@
                     }"
                 />
             </div>
-            <div>
-                <CustomTextEditor 
-                :show="true"
-                ref="contentEditor"
-                @click="$refs.contentEditor.focusEditor()"
-                :content="message"
-                @change="(val)=>{
-                    tempNewMessage=val
-                }"
-                editorClasses="w-full p-[12px] bg-gray-100 min-h-[180px] max-h-[500px] text-[16px]"
-                class="rounded-[8px]"            
-                >
-                <template #top-section="{ editor }">
-                    <div class="flex flex-col">
-                        <div class="block mb-2 text-sm leading-4 text-gray-700">
-                            Message
-                        </div>
-                        <div class="flex flex-row items-center space-x-1.5 p-1.5 rounded-t-[8px] border bg-gray-50">
-                            <div 
-                                v-for="item in [
-                                    'bold',
-									'italic',
-									'|',
-									'quote',
-									'code',
-									'|',
-									'numbered-list',
-									'bullet-list',
-									'left-align',
-									'center-align',
-									'right-align',
-                                ]"
-                                :key="item"
-                            >
-                            <TextEditorMenuItem
-                                :item="item"
-                                :editor="editor"
-                            />
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                </CustomTextEditor>
+            <div class="flex flex-col">
+                <div
+					v-if="editMode"
+					class="mb-2 block text-sm leading-4 text-gray-700"
+				>
+					Message
+				</div>
+                <TextEditor
+					:class="editMode ? 'bg-gray-100' : ''"
+					ref="textEditor"
+					:editor-class="
+						!editable
+							? 'flex flex-col'
+							: editMode
+							? 'min-h-[20rem] overflow-y-auto max-h-[73vh] px-3 max-w-full'
+							: 'min-h-[20rem] overflow-y-auto max-h-[85vh]'
+					"
+					:content="message"
+					:starterkit-options="{
+						heading: { levels: [2, 3, 4, 5, 6] },
+					}"
+					@change="(val)=>{
+                        tempNewMessage=val
+                    }"
+					:editable="editMode"
+				>
+					<template v-slot:top>
+						<div v-if="editMode">
+							<TextEditorFixedMenu
+								class="m-3 overflow-x-auto"
+								:buttons="textEditorMenuButtons"
+							/>
+						</div>
+					</template>
+				</TextEditor>
             </div>
         </div>
     </div>
@@ -84,15 +76,15 @@
 </template>
 
 <script>
-import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
-import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
+import { TextEditor } from "frappe-ui"
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import { ref, inject } from "vue"
 export default {
 	name: "ResponseTitleAndMessage",
 	props: ["title", "message", "editable", "responseResource"],
 	components: {
-		CustomTextEditor,
-		TextEditorMenuItem,
+        TextEditor,
+        TextEditorFixedMenu
 	},
 	mounted() {
 		this.saveResponseTitleAndMessage = this.save
@@ -118,6 +110,55 @@ export default {
 			updateNewResponseInput,
 			saveResponseTitleAndMessage,
 		}
+	},
+    computed: {
+		textEditorMenuButtons() {
+			return [
+				"Paragraph",
+				[
+					"Heading 2",
+					"Heading 3",
+					"Heading 4",
+					"Heading 5",
+					"Heading 6",
+				],
+				"Separator",
+				"Bold",
+				"Italic",
+				"Separator",
+				"Bullet List",
+				"Numbered List",
+				"Separator",
+				"Align Left",
+				"Align Center",
+				"Align Right",
+				"Separator",
+				"Image",
+				"Video",
+				"Link",
+				"Blockquote",
+				"Code",
+				"Horizontal Rule",
+				[
+					"InsertTable",
+					"AddColumnBefore",
+					"AddColumnAfter",
+					"DeleteColumn",
+					"AddRowBefore",
+					"AddRowAfter",
+					"DeleteRow",
+					"MergeCells",
+					"SplitCell",
+					"ToggleHeaderColumn",
+					"ToggleHeaderRow",
+					"ToggleHeaderCell",
+					"DeleteTable",
+				],
+				"Separator",
+				"Undo",
+				"Redo",
+			]
+		},
 	},
 	methods: {
         
