@@ -7,7 +7,10 @@
 				@add-filter="applyFilters"
 				@remove-filter="
 					() => {
-						filters.splice(filters.indexOf(filter), 1)
+						manager.sudoFilters.splice(
+							manager.sudoFilters.indexOf(filter),
+							1
+						)
 						applyFilters()
 					}
 				"
@@ -41,12 +44,6 @@ export default {
 		FilterBoxItem,
 	},
 	inject: ["manager"],
-	setup() {
-		const filters = ref([])
-		return {
-			filters,
-		}
-	},
 	data() {
 		return {
 			isMounted: false,
@@ -56,6 +53,9 @@ export default {
 		this.isMounted = true
 	},
 	computed: {
+		filters() {
+			return this.manager.sudoFilters
+		},
 		filterBoxFieldnameOptions() {
 			// TODO: redo the fields list to options part
 			let options = []
@@ -81,7 +81,9 @@ export default {
 				let label = convertFieldNameToLabel(fieldname)
 				if (
 					label && // monkey-patch to remove _seen from the list
-					!this.filters.find((f) => f.fieldname === fieldname) // don't show filter options that are already applied
+					!this.manager.sudoFilters.find(
+						(f) => f.fieldname === fieldname
+					) // don't show filter options that are already applied
 				) {
 					options.push({
 						label,
@@ -96,7 +98,7 @@ export default {
 	},
 	methods: {
 		createNewFilterItem(fieldname, label = "") {
-			this.filters.push({
+			this.manager.sudoFilters.push({
 				label: label || fieldname,
 				data_type: null,
 				fieldname: fieldname,
@@ -105,7 +107,7 @@ export default {
 			})
 		},
 		applyFilters() {
-			let filters = this.filters.filter((f) => {
+			let filters = this.manager.sudoFilters.filter((f) => {
 				return f.fieldname && f.filter_type && f.value
 			})
 			this.manager.addFilters(filters, false)

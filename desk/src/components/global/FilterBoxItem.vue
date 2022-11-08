@@ -30,6 +30,9 @@
 					:value="filter.value"
 					@change="
 						(item) => {
+							if (!item) {
+								return
+							}
 							filter.value = item.value
 							$emit('add-filter', filter)
 						}
@@ -77,7 +80,6 @@
 <script>
 import { FeatherIcon, Dropdown } from "frappe-ui"
 import Autocomplete from "@/components/global/Autocomplete.vue"
-import { nextTick } from "@vue/runtime-core"
 
 export default {
 	name: "FilterBoxItem",
@@ -132,8 +134,9 @@ export default {
 		},
 	},
 	mounted() {
-		// TODO: check if this is too hacky? can be removed once Dropdown has a focus method
-		this.toggleDropdown("operator")
+		if (!this.filter.filter_type) {
+			this.toggleDropdown("operator")
+		}
 	},
 	resources: {
 		dataType() {

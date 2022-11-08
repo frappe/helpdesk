@@ -29,6 +29,8 @@ export default {
 		const selectedItems = ref({})
 		const selectionMode = ref(0)
 
+		const sudoFilters = ref([])
+
 		const allItemsSelected = computed(() => {
 			if (manager.value.loading) {
 				return false
@@ -46,6 +48,7 @@ export default {
 			loading: false,
 			resources,
 			options,
+			sudoFilters,
 			selectedItems,
 			allItemsSelected,
 			list: [],
@@ -90,21 +93,20 @@ export default {
 				]
 				return executableFilter
 			},
-			addFilter: (filter, append = true) => {
-				let executableFilter =
-					manager.value.generateExecutableFilter(filter)
-				manager.value.applyFilters([filter], [executableFilter], append)
-			},
-			addFilters: (filters, append = true) => {
+			addFilters: (sudoFilters, append = true) => {
 				let executableFilters = []
-				for (let i in filters) {
+				for (let i in sudoFilters) {
 					executableFilters.push(
-						manager.value.generateExecutableFilter(filters[i])
+						manager.value.generateExecutableFilter(sudoFilters[i])
 					)
 				}
-				manager.value.applyFilters(filters, executableFilters, append)
+				manager.value.applyFilters(
+					sudoFilters,
+					executableFilters,
+					append
+				)
 			},
-			applyFilters: (filters, executableFilters, append = true) => {
+			applyFilters: (sudoFilters, executableFilters, append = true) => {
 				// applyFilters should be called with a list of executable filters only
 				let finaleExecutableFilters = []
 				if (append) {
@@ -118,6 +120,7 @@ export default {
 				manager.value.update({
 					filters: finaleExecutableFilters,
 				})
+				manager.value.sudoFilters = sudoFilters
 			},
 			nextPage: () => {
 				resources.value.list.next()
