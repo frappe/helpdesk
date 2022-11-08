@@ -7,42 +7,55 @@
 		<Popover class="w-full">
 			<template #target="{ open: openPopover }">
 				<div class="w-full">
-					<slot name="input-holder" :open="foo">
-						<ComboboxButton
-							class="flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
-							:class="{ 'rounded-b-none': isComboboxOpen }"
-							@click="
-								() => {
-									openPopover()
-								}
-							"
+					<ComboboxButton
+						class="w-full"
+						@click="
+							() => {
+								openPopover()
+							}
+						"
+					>
+						<slot
+							name="input-holder"
+							:open="foo"
+							:selectedValue="selectedValue"
 						>
-							<slot
-								name="input"
-								:selectedValue="selectedValue"
-								:placeholder="placeholder"
+							<div
+								class="flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
+								:class="{
+									'rounded-b-none': isComboboxOpen,
+								}"
 							>
-								<span
-									class="text-base line-clamp-1"
-									v-if="selectedValue"
+								<slot
+									name="input"
+									:selectedValue="selectedValue"
+									:placeholder="placeholder"
 								>
-									{{ displayValue(selectedValue) }}
-								</span>
-								<span class="text-base text-gray-500" v-else>
-									{{ placeholder || "" }}
-								</span>
-							</slot>
-							<CustomIcons
-								name="select"
-								class="w-[12px] h-[12px] stroke-gray-500"
-							/>
-						</ComboboxButton>
-					</slot>
+									<span
+										class="text-base line-clamp-1"
+										v-if="selectedValue"
+									>
+										{{ displayValue(selectedValue) }}
+									</span>
+									<span
+										class="text-base text-gray-500"
+										v-else
+									>
+										{{ placeholder || "" }}
+									</span>
+								</slot>
+								<CustomIcons
+									name="select"
+									class="w-[12px] h-[12px] stroke-gray-500"
+								/>
+							</div>
+						</slot>
+					</ComboboxButton>
 				</div>
 			</template>
 			<template #body>
 				<ComboboxOptions
-					class="px-1.5 pb-1.5 bg-white rounded-md shadow-md rounded-t-none max-h-[11rem] overflow-y-auto"
+					class="px-1.5 pb-1.5 bg-white rounded-md mt-2 border shadow-md max-h-[11rem] overflow-y-auto"
 					static
 					:class="width ? `w-[${width}px]` : 'w-[250px]'"
 					v-show="isComboboxOpen"
@@ -56,6 +69,9 @@
 							@change="
 								(e) => {
 									query = e.target.value
+									if (resourceOptions) {
+										search(query)
+									}
 								}
 							"
 							:value="query"
@@ -115,12 +131,19 @@ import {
 	ComboboxOption,
 	ComboboxButton,
 } from "@headlessui/vue"
-import { Popover } from "frappe-ui"
+import { Popover, debounce } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
 	name: "Autocomplete",
-	props: ["modelValue", "options", "placeholder", "width"],
+	props: [
+		"modelValue",
+		"options",
+		"placeholder",
+		"width",
+		"resourceOptions",
+		"show",
+	],
 	emits: ["update:modelValue", "change"],
 	components: {
 		Popover,
@@ -155,17 +178,25 @@ export default {
 			},
 		},
 		filteredOptions() {
-			if (!this.query) {
-				return this.options
+			if (!this.resourceOptions) {
+				if (!this.query) {
+					return this.options
+				}
+				return this.options.filter((option) => {
+					let searchTexts = [option.label, option.value]
+					return searchTexts.some((text) =>
+						(text || "")
+							.toLowerCase()
+							.includes(this.query.toLowerCase())
+					)
+				})
+			} else {
+				let data = this.$resources.search.data || []
+				if (data.length == 0) {
+					return []
+				}
+				return this.resourceOptions.responseMap(data)
 			}
-			return this.options.filter((option) => {
-				let searchTexts = [option.label, option.value]
-				return searchTexts.some((text) =>
-					(text || "")
-						.toLowerCase()
-						.includes(this.query.toLowerCase())
-				)
-			})
 		},
 	},
 	methods: {
@@ -175,8 +206,23 @@ export default {
 			}
 			return option?.label
 		},
-		foo() {
-			console.log("foo")
+		search: debounce(function (query) {
+			this.$resources.search.fetch(this.resourceOptions.inputMap(query))
+		}, 100),
+	},
+	mounted() {
+		if (this.resourceOptions) {
+			this.search("")
+		}
+	},
+	resources: {
+		search() {
+			if (!this.resourceOptions) {
+				return
+			}
+			return {
+				method: this.resourceOptions.method,
+			}
 		},
 	},
 }
