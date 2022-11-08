@@ -4,9 +4,10 @@
 			:options="{ title: 'New canned response', size: '3xl'}"
 			:show="show"
 			@close="close()"
+			class="bg-white px-6 py-5 pb-1 pt-6"
 		>
 			<template #body-content>
-				<div class="flex flex-col">
+				<div class="flex flex-col mt-6">
 
 						<Input
 							id="searchInput"
@@ -20,7 +21,7 @@
 
 				</div>
 				<div
-					class="mb-2 block text-sm leading-4 text-gray-700"
+					class="mb-2 block text-sm leading-4 text-gray-700 mt-4"
 				>
 					Message
 				</div>
@@ -28,7 +29,7 @@
 					<TextEditor
 						class="bg-gray-100"
 						ref="textEditor"
-						editor-class="min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3"
+						editor-class="min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3 max-w-full"
 						:content="message"
 						:starterkit-options="{
 						heading: { levels: [2, 3, 4, 5, 6] },
@@ -47,54 +48,7 @@
 						</div>
 					</template>
 
-
 					</TextEditor>
-					<!-- <CustomTextEditor
-						:show="true"
-						:content="message"						
-						@change="(val)=>{
-							message=val
-						}"
-						editorClasses="w-full p-[7px]  bg-gray-100 min-h-[180px] max-h-[500px] text-[12px] max-w-full"
-						class="rounded-[8px]"
-					>
-					<template #top-section="{ editor }">
-						<div class="flex flex-col">
-							<div
-							class="block mb-2 text-sm leading-4 text-gray-700"
-							>
-							Message
-							</div>
-							<div class="flex flex-row items-center space-x-1.5 p-1.5 rounded-t-[8px] border bg-gray-50">
-								<div
-									v-for="item in [
-										'bold',
-										'italic',
-										'|',
-										'quote',
-										'code',
-										'|',
-										'numbered-list',
-										'bullet-list',
-										'left-align',
-										'center-align',
-										'right-align',
-									]"
-									:key="item"
-								>
-								<TextEditorMenuItem
-									:item="item"
-									:editor="editor"
-								/>
-
-								</div>
-
-							</div>
-
-						</div>
-
-					</template>
-					</CustomTextEditor> -->
 					
 				</div>
 				<ErrorMessage :message="messageValidationError" />
@@ -114,8 +68,6 @@
 <script>
 import { Dialog, Input, FeatherIcon, ErrorMessage, TextEditor } from "frappe-ui"
 import { ref } from "@vue/reactivity"
-// import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
-// import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 export default {
 	name: "AddNewCannedResponsesDialog",
