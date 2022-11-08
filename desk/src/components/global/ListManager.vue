@@ -14,7 +14,11 @@ export default {
 		const user = inject("user")
 		const options = ref({
 			handle_row_click: () => {},
-			...props.options,
+			fields: props.options.fields || [],
+			doctype: props.options.doctype,
+			filters: props.options.filters || [],
+			limit: props.options.limit || 20,
+			order_by: props.options.order_by || "",
 		})
 
 		options.value.fields = [
@@ -65,14 +69,21 @@ export default {
 							return x
 					}
 				}
+
+				let filterType = filter.filter_type
+				if (filter.fieldname == "_assign") {
+					filterType =
+						filter.filter_type == "is" ? "like" : "not like"
+				}
+
 				let executableFilter = [
 					filter.fieldname,
-					mapOperator(filter.filter_type),
+					mapOperator(filterType),
 					mapValue(
 						filter.fieldname == "_assign" && filter.value == "@me"
 							? user.value.user
 							: filter.value,
-						filter.filter_type
+						filterType
 					),
 				]
 				return executableFilter
@@ -96,7 +107,7 @@ export default {
 				let finaleExecutableFilters = []
 				if (append) {
 					finaleExecutableFilters = [
-						...manager.value.options.value.filters,
+						...manager.value.options.filters,
 						...executableFilters,
 					]
 				} else {
@@ -216,12 +227,12 @@ export default {
 		list() {
 			return {
 				type: "list",
-				doctype: this.manager.options?.doctype,
-				fields: this.manager.options?.fields,
 				cache: this.manager.options?.cache,
-				order_by: this.manager.options?.order_by,
-				filters: this.manager.options?.filters,
-				limit: this.manager.options?.limit || 20,
+				doctype: this.manager.options.doctype,
+				fields: this.manager.options.fields,
+				order_by: this.manager.options.order_by,
+				filters: this.manager.options.filters,
+				limit: this.manager.options.limit,
 				realtime: true,
 			}
 		},
