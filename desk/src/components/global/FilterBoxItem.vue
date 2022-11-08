@@ -31,7 +31,7 @@
 					@change="
 						(item) => {
 							filter.value = item.value
-							manager.addFilter(filter)
+							$emit('add-filter', filter)
 						}
 					"
 					:resourceOptions="{
@@ -65,7 +65,11 @@
 			</div>
 		</div>
 		<div class="hover:bg-gray-100 p-1 rounded my-0.5" role="button">
-			<FeatherIcon name="x" class="h-3 w-3" />
+			<FeatherIcon
+				@click="$emit('remove-filter')"
+				name="x"
+				class="h-3 w-3"
+			/>
 		</div>
 	</div>
 </template>
@@ -120,7 +124,7 @@ export default {
 						if (!this.filter.value) {
 							this.toggleDropdown("value")
 						} else {
-							this.manager.addFilter(this.filter)
+							this.$emit("add-filter", this.filter)
 						}
 					},
 				}

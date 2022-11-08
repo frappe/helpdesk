@@ -4,7 +4,13 @@
 			<FilterBoxItem
 				:ref="`filter-box-item-${filter.fieldname}`"
 				:filter="filter"
-				@apply-filter="applyFilter"
+				@add-filter="applyFilters"
+				@remove-filter="
+					() => {
+						filters.splice(filters.indexOf(filter), 1)
+						applyFilters()
+					}
+				"
 			/>
 		</div>
 		<Dropdown :options="filterBoxFieldnameOptions">
@@ -80,7 +86,7 @@ export default {
 					options.push({
 						label,
 						handler: () => {
-							this.addFilter(fieldname, label)
+							this.createNewFilterItem(fieldname, label)
 						},
 					})
 				}
@@ -89,7 +95,7 @@ export default {
 		},
 	},
 	methods: {
-		addFilter(fieldname, label = "") {
+		createNewFilterItem(fieldname, label = "") {
 			this.filters.push({
 				label: label || fieldname,
 				data_type: null,
@@ -98,8 +104,11 @@ export default {
 				value: "",
 			})
 		},
-		applyFilter(filter) {
-			this.manager.addFilter(filter, true)
+		applyFilters() {
+			let filters = this.filters.filter((f) => {
+				return f.fieldname && f.filter_type && f.value
+			})
+			this.manager.addFilters(filters, false)
 		},
 	},
 }
