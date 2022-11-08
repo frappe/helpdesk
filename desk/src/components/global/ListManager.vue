@@ -65,6 +65,8 @@ export default {
 					switch (type) {
 						case "like":
 							return `%${x}%`
+						case "not like":
+							return `%${x}%`
 						default:
 							return x
 					}
