@@ -18,17 +18,47 @@
 		<div
 			v-if="filter.filter_type"
 			role="button"
-			class="hover:bg-gray-100 py-0.5 px-1"
+			class="hover:bg-gray-100 py-0.5"
 		>
 			<div v-if="['like', 'not like'].includes(filter.filter_type)">
 				text input
 			</div>
 			<div v-else-if="['Link', 'Select'].includes(filter.data_type)">
-				{{
-					`combobox / dropdown via ${
-						filter.data_type == "Link" ? "get_list" : "api"
-					}`
-				}}
+				<Autocomplete
+					class="px-1"
+					:placeholder="`Select ${filter.label.toLowerCase()}`"
+					:value="filter.value"
+					@change="
+						(item) => {
+							filter.value = item.value
+							manager.addFilter(filter)
+						}
+					"
+					:resourceOptions="{
+						method: 'frappe.client.get_list',
+						inputMap: (query) => {
+							return {
+								doctype: filter.link_doctype,
+								pluck: 'name',
+								filters: [['name', 'like', `%${query}%`]],
+							}
+						},
+						responseMap: (res) => {
+							return res.map((d) => {
+								return {
+									label: d.name,
+									value: d.name,
+								}
+							})
+						},
+					}"
+				>
+					<template #input-holder="{ selectedValue }">
+						<div class="text-gray-700">
+							{{ selectedValue || "select a value" }}
+						</div>
+					</template>
+				</Autocomplete>
 			</div>
 			<div v-else-if="['Datetime', 'Date'].includes(filter.data_type)">
 				date picker
@@ -42,7 +72,8 @@
 
 <script>
 import { FeatherIcon, Dropdown } from "frappe-ui"
-import { inject } from "vue"
+import Autocomplete from "@/components/global/Autocomplete.vue"
+import { nextTick } from "@vue/runtime-core"
 
 export default {
 	name: "FilterBoxItem",
@@ -55,12 +86,10 @@ export default {
 	components: {
 		FeatherIcon,
 		Dropdown,
+		Autocomplete,
 	},
 	inject: ["manager"],
 	computed: {
-		status() {
-			return this.filter.value ? "completed" : "editing"
-		},
 		operatorOptions() {
 			let getOperatorsForDataType = (dataType) => {
 				switch (dataType) {
@@ -78,24 +107,24 @@ export default {
 						return ["is", "is not"]
 				}
 			}
-			let dataType = this.$resources.dataType.data || "Data"
+			let [dataType, options] = this.$resources.dataType.data || "Data"
 			this.filter.data_type = dataType
+			if (this.filter.data_type == "Link") {
+				this.filter.link_doctype = options
+			}
 			return getOperatorsForDataType(dataType).map((operator) => {
 				return {
 					label: operator,
 					handler: () => {
 						this.filter.filter_type = operator
-						this.toggleDropdown("value")
+						if (!this.filter.value) {
+							this.toggleDropdown("value")
+						} else {
+							this.manager.addFilter(this.filter)
+						}
 					},
 				}
 			})
-		},
-	},
-	watch: {
-		status() {
-			if (this.status === "completed") {
-				this.manager.addFilter(this.filter)
-			}
 		},
 	},
 	mounted() {

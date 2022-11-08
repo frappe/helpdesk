@@ -55,15 +55,17 @@ def get_field_data_type(doctype, fieldname):
 
 	# handle special fieldnames
 	if fieldname == "name":
-		return "Data"
+		return ["Data"]
 	elif fieldname == "_assign":
-		return "Link"
+		return ["Link", "Agent"]
 	elif fieldname in ["creation", "modified"]:
-		return "Datetime"
+		return ["Datetime"]
 
 	field = frappe.get_meta(doctype).get_field(fieldname)
 
 	if not field:
 		return "Data"  # for custom fields, TODO: to be handled properly
 
-	return field.fieldtype
+	return (
+		[field.fieldtype] if field.fieldtype != "Link" else [field.fieldtype, field.options]
+	)
