@@ -16,7 +16,10 @@
 				"
 			/>
 		</div>
-		<Dropdown :options="filterBoxFieldnameOptions">
+		<Dropdown
+			:options="filterBoxFieldnameOptions"
+			v-if="showAddFilterButton"
+		>
 			<template v-slot="{ toggle }">
 				<div
 					role="button"
@@ -53,6 +56,17 @@ export default {
 		this.isMounted = true
 	},
 	computed: {
+		showAddFilterButton() {
+			return (
+				this.manager.sudoFilters.filter((filter) => {
+					return !(
+						filter.fieldname &&
+						filter.filter_type &&
+						filter.value
+					)
+				}).length === 0
+			)
+		},
 		filters() {
 			return this.manager.sudoFilters
 		},
