@@ -1,7 +1,7 @@
 <template>
     <div>
         
-        <Dialog :options="{ title: '&nbsp;'}"
+        <Dialog :options="{ title: '&nbsp;', size: '3xl'}"
                 :show="show"
                 @close="close()"
         >
@@ -10,7 +10,7 @@
                 <div class="">Canned Responses</div>
                 <Button 
                     icon="x"
-                    class="bg-transparent w-2 h-2" 
+                    class="bg-transparent w-2 h-2"
                     @click="close()"
 
                 />
@@ -23,14 +23,14 @@
                 <Input 
                     v-model="search"
                     id="searchInput"
-                    class="grow text-[12px] text-left text-gray-500 border-0 bg-[#EBEEF0] h-[31px] rounded-none"
+                    class="grow text-[12px] text-left text-black border-0 bg-[#EBEEF0] h-[31px] rounded-none"
                     type="text"
                     placeholder="Search for response"
                     @input="getCannedResponses"
                 />
             
             </div>
-            <div class="divide-y divide-slate-200 ">
+            <div class="divide-y divide-slate-200 max-h-[256px] overflow-y-scroll">
             <div v-for="item in this.cannedResponses" class="relative py-3">
                 <CustomIcons
                     name="add-new"
