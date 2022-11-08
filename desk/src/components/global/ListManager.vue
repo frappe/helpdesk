@@ -46,7 +46,7 @@ export default {
 			allItemsSelected,
 			list: [],
 			totalCount: 0,
-			applyFilters: (filters) => {
+			generateExecutableFilter: (filter) => {
 				let mapOperator = (x) => {
 					switch (x) {
 						case "is":
@@ -65,21 +65,45 @@ export default {
 							return x
 					}
 				}
-
-				let finalFilters = filters.map((x) => {
-					return [
-						x.fieldname,
-						mapOperator(x.filter_type),
-						mapValue(
-							x.fieldname == "_assign" && x.value == "@me"
-								? user.value.user
-								: x.value,
-							x.filter_type
-						),
+				let executableFilter = [
+					filter.fieldname,
+					mapOperator(filter.filter_type),
+					mapValue(
+						filter.fieldname == "_assign" && filter.value == "@me"
+							? user.value.user
+							: filter.value,
+						filter.filter_type
+					),
+				]
+				return executableFilter
+			},
+			addFilter: (filter, append = true) => {
+				let executableFilter =
+					manager.value.generateExecutableFilter(filter)
+				manager.value.applyFilters([filter], [executableFilter], append)
+			},
+			addFilters: (filters, append = true) => {
+				let executableFilters = []
+				for (let i in filters) {
+					executableFilters.push(
+						manager.value.generateExecutableFilter(filters[i])
+					)
+				}
+				manager.value.applyFilters(filters, executableFilters, append)
+			},
+			applyFilters: (filters, executableFilters, append = true) => {
+				// applyFilters should be called with a list of executable filters only
+				let finaleExecutableFilters = []
+				if (append) {
+					finaleExecutableFilters = [
+						...manager.value.options.value.filters,
+						...executableFilters,
 					]
-				})
+				} else {
+					finaleExecutableFilters = executableFilters
+				}
 				manager.value.update({
-					filters: finalFilters,
+					filters: finaleExecutableFilters,
 				})
 			},
 			nextPage: () => {

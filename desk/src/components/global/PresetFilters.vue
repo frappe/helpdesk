@@ -51,7 +51,10 @@ export default {
 									label: item.title,
 									handler: () => {
 										this.title = item.title
-										this.$emit("apply-filter", item.filters)
+										this.manager.addFilters(
+											item.filters,
+											false
+										)
 									},
 								}
 							}),
