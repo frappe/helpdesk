@@ -92,6 +92,7 @@ export default {
 		addFilter(fieldname, label = "") {
 			this.filters.push({
 				label: label || fieldname,
+				data_type: null,
 				fieldname: fieldname,
 				filter_type: "",
 				value: "",

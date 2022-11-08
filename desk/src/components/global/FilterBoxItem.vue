@@ -20,7 +20,19 @@
 			role="button"
 			class="hover:bg-gray-100 py-0.5 px-1"
 		>
-			value
+			<div v-if="['like', 'not like'].includes(filter.filter_type)">
+				text input
+			</div>
+			<div v-else-if="['Link', 'Select'].includes(filter.data_type)">
+				{{
+					`combobox / dropdown via ${
+						filter.data_type == "Link" ? "get_list" : "api"
+					}`
+				}}
+			</div>
+			<div v-else-if="['Datetime', 'Date'].includes(filter.data_type)">
+				date picker
+			</div>
 		</div>
 		<div class="hover:bg-gray-100 p-1 rounded my-0.5" role="button">
 			<FeatherIcon name="x" class="h-3 w-3" />
@@ -44,30 +56,22 @@ export default {
 		FeatherIcon,
 		Dropdown,
 	},
-	setup() {
-		const manager = inject("manager")
-
-		return {
-			manager,
-		}
-	},
+	inject: ["manager"],
 	computed: {
 		status() {
 			return this.filter.value ? "completed" : "editing"
 		},
 		operatorOptions() {
-			// TODO fetch doctype fieldtype and return options accordingly
-			// TODO: use a single api to fetch the operator options for a fieldname, parameters will be doctype & fieldname
 			let getOperatorsForDataType = (dataType) => {
 				switch (dataType) {
 					case "Data":
-						return ["is", "is not", "like", "not like"]
+						return ["like", "not like"]
 					case "Link":
 						return ["is", "is not", "like", "not like"]
 					case "Datetime":
-						return ["is", "before", "after"] //, "between"]
+						return ["at", "before", "after"] //, "between"]
 					case "Date":
-						return ["is", "before", "after"] //, "between"]
+						return ["at", "before", "after"] //, "between"]
 					case "Select":
 						return ["is", "is not"]
 					default:
@@ -75,14 +79,13 @@ export default {
 				}
 			}
 			let dataType = this.$resources.dataType.data || "Data"
+			this.filter.data_type = dataType
 			return getOperatorsForDataType(dataType).map((operator) => {
 				return {
 					label: operator,
 					handler: () => {
 						this.filter.filter_type = operator
-						if (!this.filter.value) {
-							this.toggleDropdown("value")
-						}
+						this.toggleDropdown("value")
 					},
 				}
 			})
@@ -110,13 +113,32 @@ export default {
 				auto: true,
 			}
 		},
+		getList() {
+			return {
+				method: "frappe.client.get_list",
+			}
+		},
+		selectOptionsForField() {
+			return {
+				method: "frappedesk.api.general.get_select_options_for_field",
+			}
+		},
 	},
 	methods: {
 		toggleDropdown(item) {
-			let a = document.getElementById(
-				`filter-item-${item}-dropdown-${this.filter.fieldname}`
-			)
-			a.click()
+			switch (item) {
+				case "operator":
+					let a = document.getElementById(
+						`filter-item-${item}-dropdown-${this.filter.fieldname}`
+					)
+					a.click()
+					break
+				case "value":
+					// TODO: open the dropdown / combobox / text input / date picker
+					break
+				default:
+					break
+			}
 		},
 	},
 }
