@@ -15,93 +15,53 @@
 						<div
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
 						>
-							<slot name="top-sub-section-1">
-								<PresetFilters
-									v-if="options.presetFilters"
-									@apply-filter="applyFilter"
-								/>
-							</slot>
-							<div class="grow">
+							<div class="shrink-0">
+								<slot name="top-sub-section-1">
+									<PresetFilters
+										v-if="options.presetFilters"
+									/>
+								</slot>
+							</div>
+							<div class="w-full">
 								<slot name="top-sub-section-2">
-									<!-- Filter Box -->
+									<FilterBox v-if="options.filterBox" />
+								</slot>
+							</div>
+							<div class="shrink-0">
+								<slot name="top-sub-section-3">
+									<!-- Actions / Bulk actions -->
 									<div
-										v-if="options.filterBox"
-										class="flex flex-row items-center space-x-1"
+										v-if="
+											Object.keys(manager.selectedItems)
+												.length > 0
+										"
 									>
-										<div
-											class="py-1 px-2 bg-white rounded shadow flex flex-row space-x-1 items-center"
-										>
-											<div class="text-base">
-												assignee:
-												<span class="font-semibold"
-													>@me</span
-												>
-											</div>
-											<button
-												class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
-											>
-												<FeatherIcon
-													class="w-3"
-													name="x"
-												/>
-											</button>
-										</div>
-										<div
-											class="py-1 px-2 bg-white rounded shadow flex flex-row space-x-1 items-center"
-										>
-											<div class="text-base">
-												status:
-												<span class="font-semibold"
-													>Open</span
-												>
-											</div>
-											<button
-												class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
-											>
-												<FeatherIcon
-													class="w-3"
-													name="x"
-												/>
-											</button>
-										</div>
-										<FeatherIcon
-											name="plus"
-											class="h-3 w-3"
+										<!-- Bulk Actions -->
+										<slot
+											name="bulk-actions"
+											:selectedItems="
+												manager.selectedItems
+											"
 										/>
+									</div>
+									<div v-else class="flex flex-row space-x-2">
+										<!-- Actions -->
+										<slot name="actions" />
+										<slot name="primary-action">
+											<!-- Add Item -->
+											<Button
+												appearance="primary"
+												icon-left="plus"
+												@click="$emit('add-item')"
+											>
+												{{
+													`Add ${manager.options.doctype}`
+												}}
+											</Button>
+										</slot>
 									</div>
 								</slot>
 							</div>
-							<slot name="top-sub-section-3">
-								<!-- Actions / Bulk actions -->
-								<div
-									v-if="
-										Object.keys(manager.selectedItems)
-											.length > 0
-									"
-								>
-									<!-- Bulk Actions -->
-									<slot
-										name="bulk-actions"
-										:selectedItems="manager.selectedItems"
-									/>
-								</div>
-								<div v-else class="flex flex-row space-x-2">
-									<!-- Actions -->
-									<slot name="actions" />
-									<slot name="primary-action">
-										<!-- Add Item -->
-										<Button
-											appearance="primary"
-											icon-left="plus"
-											@click="$emit('add-item')"
-										>
-											{{
-												`Add ${manager.options.doctype}`
-											}}
-										</Button>
-									</slot>
-								</div>
-							</slot>
 						</div>
 					</slot>
 					<slot name="header">
@@ -259,6 +219,7 @@
 <script>
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import PresetFilters from "@/components/global/PresetFilters.vue"
+import FilterBox from "@/components/global/FilterBox.vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
 
 export default {
@@ -273,6 +234,7 @@ export default {
 	components: {
 		CustomIcons,
 		PresetFilters,
+		FilterBox,
 		Dropdown,
 		FeatherIcon,
 	},
@@ -293,11 +255,6 @@ export default {
 				}
 			}
 			return options
-		},
-	},
-	methods: {
-		applyFilter(filters) {
-			this.manager.applyFilters(filters)
 		},
 	},
 }
