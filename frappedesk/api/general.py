@@ -31,3 +31,32 @@ def get_preset_filters(doctype):
 			"global" if preset_filter_doc.type in ["Global", "System"] else "user"
 		].append(preset_filter_doc)
 	return options
+
+
+@frappe.whitelist()
+def get_filter_operators_for_field(doctype, fieldname):
+	def get_operators(fieldtype):
+		if fieldtype == "Data":
+			return ["is", "is not"]
+		elif fieldtype in {"Datetime", "Date"}:
+			return ["is", "is not", "before", "after"]
+		elif fieldtype in ["Select", "Link"]:
+			return ["is", "is not"]  # TODO: add "in" and "not in"
+		else:
+			return ["is", "is not"]
+
+	# handle special fieldnames
+	if fieldname == "name":
+		return ["is", "is not", "like", "not like"]
+	elif fieldname == "_assign":
+		return ["is", "is not"]
+	elif fieldname in ["creation", "modified"]:
+		return ["is", "before", "after", "between"]
+
+	field = frappe.get_meta(doctype).get_field(fieldname)
+	print("field", field.fieldtype)
+
+	if not field:
+		return ["is", "is not"]  # for custom fields, TODO: to be handled properly
+
+	return get_operators(field.fieldtype)
