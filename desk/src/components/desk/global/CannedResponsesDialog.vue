@@ -1,7 +1,7 @@
 <template>
     <div>
         
-        <Dialog :options="{ title: '&nbsp;', size: '3xl'}"
+        <Dialog :options="{ title: '&nbsp;', size: '2xl'}"
                 :show="show"
                 @close="close()"
         >
@@ -36,9 +36,11 @@
                     name="add-new"
                     class="h-7 w-7 rounded p-1 mb-4 absolute right-0"
                     role="button"
-                    
-                    @click="addMessage(item);emitMessage();close()"
-
+                    @click="()=>{
+                        addMessage(item);
+                        emitMessage();
+                        close()
+                        }"
                 />
             <Accordion class="my-2">
             <template v-slot:title>
@@ -91,16 +93,15 @@ export default{
     methods:{
         close(){
             this.$emit("close")
-            this.$emit('messageVal',this.$refs.tempMessage)
+            this.$emit('messageVal',this.tempMessage)
         },
         emitMessage(){
-            this.$emit('messageVal',this.$refs.tempMessage)
+            this.$emit('messageVal',this.tempMessage)
         },
         addMessage(item){
-            this.$refs.tempMessage=item.message
+            this.tempMessage=item.message
         },
         getCannedResponses(event){
-    
             let title = event
             this.$resources.list.fetch({
                     title:title
