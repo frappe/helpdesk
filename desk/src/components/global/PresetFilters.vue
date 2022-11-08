@@ -41,6 +41,10 @@ export default {
 	},
 	watch: {
 		filters(filters) {
+			filters = filters.filter((filter) => {
+				return filter.fieldname && filter.filter_type && filter.value
+			})
+
 			let checkIfFiltersAreSame = (a, b) => {
 				if (a.length !== b.length) {
 					return false
@@ -62,7 +66,7 @@ export default {
 			this.title = `Filtered ${this.manager.options.doctype}s`
 
 			if (filters.length == 0) {
-				title = `All ${this.manager.options.doctype}s`
+				this.title = `All ${this.manager.options.doctype}s`
 			} else {
 				this.options.forEach((group) => {
 					group.items.forEach((x) => {
