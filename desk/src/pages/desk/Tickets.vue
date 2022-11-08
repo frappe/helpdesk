@@ -25,7 +25,6 @@
 				],
 				limit: 20,
 				order_by: 'modified desc',
-				filters: initialFilters,
 			}"
 		>
 			<template #body="{ manager }">

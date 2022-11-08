@@ -58,38 +58,65 @@ export default {
 		operatorOptions() {
 			// TODO fetch doctype fieldtype and return options accordingly
 			// TODO: use a single api to fetch the operator options for a fieldname, parameters will be doctype & fieldname
-			let operators = this.$resources.operators.data || []
-			return operators.map((operator) => {
+			let getOperatorsForDataType = (dataType) => {
+				switch (dataType) {
+					case "Data":
+						return ["is", "is not", "like", "not like"]
+					case "Link":
+						return ["is", "is not", "like", "not like"]
+					case "Datetime":
+						return ["is", "before", "after"] //, "between"]
+					case "Date":
+						return ["is", "before", "after"] //, "between"]
+					case "Select":
+						return ["is", "is not"]
+					default:
+						return ["is", "is not"]
+				}
+			}
+			let dataType = this.$resources.dataType.data || "Data"
+			return getOperatorsForDataType(dataType).map((operator) => {
 				return {
 					label: operator,
+					handler: () => {
+						this.filter.filter_type = operator
+						if (!this.filter.value) {
+							this.toggleDropdown("value")
+						}
+					},
 				}
 			})
 		},
 	},
-	// watch: {
-	// status() {
-	// 	if (this.status === "completed") {
-	// 		this.manager.addFilter(this.filter)
-	// 	}
-	// },
-	// },
+	watch: {
+		status() {
+			if (this.status === "completed") {
+				this.manager.addFilter(this.filter)
+			}
+		},
+	},
 	mounted() {
 		// TODO: check if this is too hacky? can be removed once Dropdown has a focus method
-		let a = document.getElementById(
-			`filter-item-operator-dropdown-${this.filter.fieldname}`
-		)
-		a.click()
+		this.toggleDropdown("operator")
 	},
 	resources: {
-		operators() {
+		dataType() {
 			return {
-				method: "frappedesk.api.general.get_filter_operators_for_field",
+				method: "frappedesk.api.general.get_field_data_type",
 				params: {
 					doctype: this.manager.options.doctype,
 					fieldname: this.filter.fieldname,
 				},
 				auto: true,
 			}
+		},
+	},
+	methods: {
+		toggleDropdown(item) {
+			let a = document.getElementById(
+				`filter-item-${item}-dropdown-${this.filter.fieldname}`
+			)
+			a.click()
 		},
 	},
 }

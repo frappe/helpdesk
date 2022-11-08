@@ -4,6 +4,14 @@ from pypika import Order
 
 @frappe.whitelist()
 def get_preset_filters(doctype):
+	"""
+	Args:
+	        doctype (_type_): _description_
+
+	Returns:
+	        Dict {"user": [], "global": []}: Returns the preset filters for a given doctype
+	"""
+
 	options = {"user": [], "global": []}
 
 	fd_preset_filter = frappe.qb.DocType("FD Preset Filter")
@@ -34,29 +42,28 @@ def get_preset_filters(doctype):
 
 
 @frappe.whitelist()
-def get_filter_operators_for_field(doctype, fieldname):
-	def get_operators(fieldtype):
-		if fieldtype == "Data":
-			return ["is", "is not"]
-		elif fieldtype in {"Datetime", "Date"}:
-			return ["is", "is not", "before", "after"]
-		elif fieldtype in ["Select", "Link"]:
-			return ["is", "is not"]  # TODO: add "in" and "not in"
-		else:
-			return ["is", "is not"]
+def get_field_data_type(doctype, fieldname):
+	"""_summary_
+
+	Args:
+	        doctype (_type_): Doctype name
+	        fieldname (_type_): Fieldname
+
+	Returns:
+	        String: Data type of the field
+	"""
 
 	# handle special fieldnames
 	if fieldname == "name":
-		return ["is", "is not", "like", "not like"]
+		return "Data"
 	elif fieldname == "_assign":
-		return ["is", "is not"]
+		return "Link"
 	elif fieldname in ["creation", "modified"]:
-		return ["is", "before", "after", "between"]
+		return "Datetime"
 
 	field = frappe.get_meta(doctype).get_field(fieldname)
-	print("field", field.fieldtype)
 
 	if not field:
-		return ["is", "is not"]  # for custom fields, TODO: to be handled properly
+		return "Data"  # for custom fields, TODO: to be handled properly
 
-	return get_operators(field.fieldtype)
+	return field.fieldtype
