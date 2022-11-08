@@ -70,7 +70,7 @@
 								(e) => {
 									query = e.target.value
 									if (resourceOptions) {
-										search(query)
+										dsearch(query)
 									}
 								}
 							"
@@ -206,9 +206,12 @@ export default {
 			}
 			return option?.label
 		},
-		search: debounce(function (query) {
+		dsearch: debounce(function (query) {
+			this.search(query)
+		}, 300),
+		search(query) {
 			this.$resources.search.fetch(this.resourceOptions.inputMap(query))
-		}, 100),
+		},
 	},
 	mounted() {
 		if (this.resourceOptions) {
