@@ -69,3 +69,24 @@ def get_field_data_type(doctype, fieldname):
 	return (
 		[field.fieldtype] if field.fieldtype != "Link" else [field.fieldtype, field.options]
 	)
+
+
+@frappe.whitelist()
+def get_filtered_select_field_options(doctype, fieldname, query):
+	"""_summary_
+
+	Args:
+	        doctype (_type_): Doctype name
+	        fieldname (_type_): Fieldname
+
+	Returns:
+	        List: Filtered list of options for the field
+	"""
+
+	field = frappe.get_meta(doctype).get_field(fieldname)
+	if field.fieldtype == "Select":
+		return [
+			x for x in field.options.split("\n") if query.lower() in x[0 : len(query)].lower()
+		]
+	else:
+		frappe.throw("Select options are only available for Select fields")

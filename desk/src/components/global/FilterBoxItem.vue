@@ -37,24 +37,7 @@
 							$emit('add-filter', filter)
 						}
 					"
-					:resourceOptions="{
-						method: 'frappe.client.get_list',
-						inputMap: (query) => {
-							return {
-								doctype: filter.link_doctype,
-								pluck: 'name',
-								filters: [['name', 'like', `%${query}%`]],
-							}
-						},
-						responseMap: (res) => {
-							return res.map((d) => {
-								return {
-									label: d.name,
-									value: d.name,
-								}
-							})
-						},
-					}"
+					:resourceOptions="getResourceOptions(filter)"
 				>
 					<template #input-holder="{ selectedValue }">
 						<div class="text-gray-700">
@@ -174,6 +157,50 @@ export default {
 					break
 				default:
 					break
+			}
+		},
+		getResourceOptions(filter) {
+			switch (filter.data_type) {
+				case "Link":
+					return {
+						method: "frappe.client.get_list",
+						inputMap: (query) => {
+							return {
+								doctype: filter.link_doctype,
+								pluck: "name",
+								filters: [["name", "like", `%${query}%`]],
+							}
+						},
+						responseMap: (res) => {
+							return res.map((d) => {
+								return {
+									label: d.name,
+									value: d.name,
+								}
+							})
+						},
+					}
+				case "Select":
+					return {
+						method: "frappedesk.api.general.get_filtered_select_field_options",
+						inputMap: (query) => {
+							return {
+								doctype: this.manager.options.doctype,
+								fieldname: filter.fieldname,
+								query,
+							}
+						},
+						responseMap: (res) => {
+							return res.map((d) => {
+								return {
+									label: d,
+									value: d,
+								}
+							})
+						},
+					}
+				default:
+					return null
 			}
 		},
 	},
