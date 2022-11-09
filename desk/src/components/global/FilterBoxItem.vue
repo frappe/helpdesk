@@ -47,7 +47,17 @@
 				</Autocomplete>
 			</div>
 			<div v-else-if="['Datetime', 'Date'].includes(filter.data_type)">
-				date picker
+				<input
+					type="date"
+					class="h-2 border-0 bg-transparent text-base text-gray-700 focus:ring-0 px-1"
+					role="button"
+					@input="
+						(val) => {
+							filter.value = val.target.value
+							$emit('add-filter', filter)
+						}
+					"
+				/>
 			</div>
 		</div>
 		<div class="hover:bg-gray-100 p-1 rounded my-0.5" role="button">
@@ -87,9 +97,9 @@ export default {
 					case "Link":
 						return ["is", "is not", "like", "not like"]
 					case "Datetime":
-						return ["at", "before", "after"] //, "between"]
+						return ["before", "after"] //, "between"]
 					case "Date":
-						return ["at", "before", "after"] //, "between"]
+						return ["before", "after"] //, "between"]
 					case "Select":
 						return ["is", "is not"]
 					default:
@@ -206,3 +216,9 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+input[type="date"]::-webkit-calendar-picker-indicator {
+	margin-left: -18px;
+}
+</style>

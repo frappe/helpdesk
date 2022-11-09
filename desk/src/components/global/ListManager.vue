@@ -60,6 +60,10 @@ export default {
 							return "="
 						case "is not":
 							return "!="
+						case "before":
+							return "<"
+						case "after":
+							return ">"
 						default:
 							return x
 					}
