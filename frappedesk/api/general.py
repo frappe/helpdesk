@@ -6,10 +6,10 @@ from pypika import Order
 def get_preset_filters(doctype):
 	"""
 	Args:
-	        doctype (_type_): _description_
+	                doctype (_type_): _description_
 
 	Returns:
-	        Dict {"user": [], "global": []}: Returns the preset filters for a given doctype
+	                Dict {"user": [], "global": []}: Returns the preset filters for a given doctype
 	"""
 
 	options = {"user": [], "global": []}
@@ -46,11 +46,11 @@ def get_field_data_type(doctype, fieldname):
 	"""_summary_
 
 	Args:
-	        doctype (_type_): Doctype name
-	        fieldname (_type_): Fieldname
+	                doctype (_type_): Doctype name
+	                fieldname (_type_): Fieldname
 
 	Returns:
-	        String: Data type of the field
+	                String: Data type of the field
 	"""
 
 	# handle special fieldnames
@@ -76,11 +76,11 @@ def get_filtered_select_field_options(doctype, fieldname, query):
 	"""_summary_
 
 	Args:
-	        doctype (_type_): Doctype name
-	        fieldname (_type_): Fieldname
+	                doctype (_type_): Doctype name
+	                fieldname (_type_): Fieldname
 
 	Returns:
-	        List: Filtered list of options for the field
+	                List: Filtered list of options for the field
 	"""
 
 	field = frappe.get_meta(doctype).get_field(fieldname)
@@ -90,3 +90,44 @@ def get_filtered_select_field_options(doctype, fieldname, query):
 		]
 	else:
 		frappe.throw("Select options are only available for Select fields")
+
+
+@frappe.whitelist()
+def save_filter_preset(doctype, is_global, title, filters):
+	"""_summary_
+
+	Args:
+	                doctype (_type_): Doctype name
+	                name (_type_): Name of the preset filter
+	                filters (_type_): Filters
+	                sort_by (_type_): Sort by
+	                sort_order (_type_): Sort order
+
+	Returns:
+	                _type_:
+	"""
+
+	fd_preset_filter_items = []
+	for filter in filters:
+		print(f"label : {filter['label']}")
+		fd_preset_filter_items.append(
+			{
+				"doctype": "FD Preset Filter Item",
+				"label": filter["label"],
+				"fieldname": filter["fieldname"],
+				"filter_type": filter["filter_type"],
+				"value": filter["value"],
+			}
+		)
+
+	preset_filter = frappe.get_doc(
+		{
+			"doctype": "FD Preset Filter",
+			"reference_doctype": doctype,
+			"type": "Global" if is_global else "User",
+			"title": title,
+			"filters": fd_preset_filter_items,
+		}
+	)
+	preset_filter.save(ignore_permissions=True)
+	return preset_filter.name

@@ -27,6 +27,29 @@
 									<FilterBox v-if="options.filterBox" />
 								</slot>
 							</div>
+							<div
+								v-if="
+									options.filterBox &&
+									options.presetFilters &&
+									manager.options.filters.length > 0
+								"
+							>
+								<Button
+									icon-left="layers"
+									appearance="minimal"
+									@click="
+										() => {
+											showSaveFiltersDialog = true
+										}
+									"
+								>
+									Save
+								</Button>
+								<SaveFiltersDialog
+									v-model="showSaveFiltersDialog"
+									@close="showSaveFiltersDialog = false"
+								/>
+							</div>
 							<div class="shrink-0">
 								<slot name="top-sub-section-3">
 									<!-- Actions / Bulk actions -->
@@ -238,6 +261,7 @@ import PresetFilters from "@/components/global/PresetFilters.vue"
 import FilterBox from "@/components/global/FilterBox.vue"
 import ListPageController from "@/components/global/ListPageController.vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
+import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
 
 export default {
 	name: "ListViewer",
@@ -255,6 +279,12 @@ export default {
 		ListPageController,
 		Dropdown,
 		FeatherIcon,
+		SaveFiltersDialog,
+	},
+	data() {
+		return {
+			showSaveFiltersDialog: false,
+		}
 	},
 	computed: {
 		renderOptions() {
