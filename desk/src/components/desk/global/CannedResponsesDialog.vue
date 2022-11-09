@@ -15,7 +15,7 @@
 
                 />
             </div>
-            <div class="w-full border bg-[#EBEEF0] h-8 flex flex-row items-center space-x-3 mt-5 rounded">
+            <div class="w-full border bg-[#EBEEF0] h-8 flex flex-row items-center space-x-3 mt-5 rounded mb-3">
                 <FeatherIcon
 					name="search"
 					class="h-4 w-4 stroke-gray-500 ml-[8px]"
