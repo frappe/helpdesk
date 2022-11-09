@@ -223,7 +223,7 @@
 					</div>
 					<slot name="pagination">
 						<div class="flex flex-row items-center h-[43px]">
-							<div class="w-full">Pagination Space</div>
+							<ListPageController />
 						</div>
 					</slot>
 				</div>
@@ -236,6 +236,7 @@
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import PresetFilters from "@/components/global/PresetFilters.vue"
 import FilterBox from "@/components/global/FilterBox.vue"
+import ListPageController from "@/components/global/ListPageController.vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
 
 export default {
@@ -251,6 +252,7 @@ export default {
 		CustomIcons,
 		PresetFilters,
 		FilterBox,
+		ListPageController,
 		Dropdown,
 		FeatherIcon,
 	},
