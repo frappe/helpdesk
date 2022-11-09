@@ -39,43 +39,18 @@ export default {
 			presetFilters,
 		}
 	},
-	watch: {
-		filters(filters) {
-			filters = filters.filter((filter) => {
-				return filter.fieldname && filter.filter_type && filter.value
-			})
-
-			let checkIfFiltersAreSame = (a, b) => {
-				if (a.length !== b.length) {
-					return false
-				}
-				for (let i = 0; i < a.length; i++) {
-					if (a[i].fieldname !== b[i].fieldname) {
-						return false
-					}
-					if (a[i].filter_type !== b[i].filter_type) {
-						return false
-					}
-					if (a[i].value !== b[i].value) {
-						return false
-					}
-				}
-				return true
-			}
-
-			this.title = `Filtered ${this.manager.options.doctype}s`
-
-			if (filters.length == 0) {
-				this.title = `All ${this.manager.options.doctype}s`
-			} else {
-				this.options.forEach((group) => {
-					group.items.forEach((x) => {
-						if (checkIfFiltersAreSame(x.filters, filters)) {
-							this.title = x.label
-						}
-					})
+	mounted() {
+		this.$socket.on("list_update", (data) => {
+			if (data.doctype === "FD Preset Filter") {
+				this.$resources.presetFilterOptions.fetch().then(() => {
+					this.sync()
 				})
 			}
+		})
+	},
+	watch: {
+		filters(val) {
+			this.sync()
 		},
 	},
 	computed: {
@@ -110,6 +85,45 @@ export default {
 				})
 			}
 			return options
+		},
+	},
+	methods: {
+		sync() {
+			let filters = this.filters.filter((filter) => {
+				return filter.fieldname && filter.filter_type && filter.value
+			})
+
+			let checkIfFiltersAreSame = (a, b) => {
+				if (a.length !== b.length) {
+					return false
+				}
+				for (let i = 0; i < a.length; i++) {
+					if (a[i].fieldname !== b[i].fieldname) {
+						return false
+					}
+					if (a[i].filter_type !== b[i].filter_type) {
+						return false
+					}
+					if (a[i].value !== b[i].value) {
+						return false
+					}
+				}
+				return true
+			}
+
+			this.title = `Filtered ${this.manager.options.doctype}s`
+
+			if (filters.length == 0) {
+				this.title = `All ${this.manager.options.doctype}s`
+			} else {
+				this.options.forEach((group) => {
+					group.items.forEach((x) => {
+						if (checkIfFiltersAreSame(x.filters, filters)) {
+							this.title = x.label
+						}
+					})
+				})
+			}
 		},
 	},
 	resources: {
