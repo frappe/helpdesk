@@ -204,7 +204,7 @@ def bulk_assign_ticket_status(ticket_ids, status):
 		for ticket_id in ticket_ids:
 			ticket_doc = assign_ticket_status(ticket_id, status)
 			ticket_docs.append(ticket_doc)
-		return ticket_docs
+		return {"docs": ticket_docs, "status": status}
 
 
 @frappe.whitelist()
