@@ -236,26 +236,6 @@ export default {
 		Tooltip,
 	},
 	inject: ["agents", "user"],
-	mounted() {
-		if (this.$route.query) {
-			for (const [key, value] of Object.entries(this.$route.query)) {
-				if (
-					[
-						"ticket_type",
-						"contact",
-						"status",
-						"priority",
-						"_assign",
-					].includes(key)
-				) {
-					const filter = {}
-					filter[key] = value
-					this.filters.push(filter)
-				}
-			}
-		}
-		// TODO: this.applyFiltersToList()
-	},
 	methods: {
 		agentsAsDropdownOptions() {
 			let agentItems = []
