@@ -191,7 +191,7 @@
 												:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 											>
 												<div
-													class="flex"
+													class="flex w-full"
 													:class="
 														renderOptions.fields[
 															field

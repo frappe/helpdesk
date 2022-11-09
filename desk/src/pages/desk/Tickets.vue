@@ -82,6 +82,17 @@
 							{{ value }}
 						</div>
 					</template>
+					<template #field-subject="{ value, row }">
+						<router-link
+							:to="{
+								path: `/frappedesk/tickets/${row.name}`,
+							}"
+							role="button"
+							class="line-clamp-1 hover:text-gray-900 text-gray-600"
+						>
+							{{ value }}
+						</router-link>
+					</template>
 					<template #field-status="{ value }">
 						<div class="flex flex-row items-center space-x-1">
 							<FeatherIcon
