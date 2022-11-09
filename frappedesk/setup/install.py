@@ -17,6 +17,7 @@ def after_install():
 	add_default_agent_groups()
 	update_agent_role_permissions()
 	add_default_assignment_rule()
+	add_system_preset_filters()
 
 
 def set_home_page_to_kb():
@@ -290,3 +291,27 @@ def add_default_assignment_rule():
 		rule_doc.append("assignment_days", day_doc)
 
 	rule_doc.insert()
+
+
+def add_system_preset_filters():
+	preset_filters = []
+	for status in ["Closed", "Resolved", "Replied", "Open"]:
+		preset_filters.append(
+			{
+				"doctype": "FD Preset Filter",
+				"title": f"My {status} Tickets",
+				"reference_doctype": "Ticket",
+				"filters": [
+					{
+						"label": "Assigned To",
+						"fieldname": "_assign",
+						"filter_type": "is",
+						"value": "@me",
+					},
+					{"label": "Status", "fieldname": "status", "filter_type": "is", "value": status},
+				],
+			}
+		)
+	for preset in preset_filters:
+		preset_filter_doc = frappe.get_doc(preset)
+		preset_filter_doc.insert()
