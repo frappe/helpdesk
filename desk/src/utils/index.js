@@ -37,6 +37,7 @@ _dayjs.shortFormating = (s, ago = false) => {
 
 	const prefix = s.split(" ")[0]
 	const posfix = s.split(" ")[1]
+	const isPast = s.includes("ago")
 	let newPostfix = ""
 	switch (posfix) {
 		case "minute":
@@ -70,7 +71,7 @@ _dayjs.shortFormating = (s, ago = false) => {
 			newPostfix = "Y"
 			break
 	}
-	return `${prefix}${newPostfix}${ago ? " ago" : ""}`
+	return `${prefix}${newPostfix}${isPast ? (ago ? " ago" : "") : ""}`
 }
 
 export function remove_script_and_style(txt) {

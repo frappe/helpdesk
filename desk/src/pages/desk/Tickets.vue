@@ -40,7 +40,7 @@
 							},
 							subject: {
 								label: 'Subject',
-								width: '9',
+								width: '8',
 							},
 							status: {
 								label: 'Status',
@@ -50,13 +50,17 @@
 								label: 'Type',
 								width: '3',
 							},
+							resolution_by: {
+								label: 'Due In',
+								width: '2',
+							},
 							priority: {
 								label: 'Priority',
 								width: '2',
 							},
 							contact: {
 								label: 'Created By',
-								width: '4',
+								width: '3',
 							},
 							modified: {
 								label: 'Modified',
@@ -65,7 +69,6 @@
 							creation: {
 								label: ' ',
 								width: '1',
-								align: 'right',
 							},
 							_assign: {
 								label: ' ',
@@ -141,6 +144,11 @@
 							</div>
 						</div>
 					</template>
+					<template #field-ticket_type="{ value }">
+						<div v-if="value" class="text-gray-600">
+							{{ value }}
+						</div>
+					</template>
 					<template #field-contact="{ value }">
 						<div class="text-gray-500">
 							{{ value }}
@@ -155,6 +163,25 @@
 								{{ $dayjs(value).format("DD MMM") }}
 							</div>
 						</Tooltip>
+					</template>
+					<template #field-resolution_by="{ value }">
+						<div
+							class="text-gray-500 flex flex-row space-x-1 items-center"
+							:class="{
+								'text-red-500': $dayjs(value)
+									.fromNow()
+									.includes('ago'),
+							}"
+						>
+							{{
+								value
+									? $dayjs.shortFormating(
+											$dayjs(value).fromNow(),
+											true
+									  )
+									: ""
+							}}
+						</div>
 					</template>
 					<template #field-modified="{ value }">
 						<div class="text-gray-500">
