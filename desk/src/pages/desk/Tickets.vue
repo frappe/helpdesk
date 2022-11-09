@@ -78,6 +78,11 @@
 						},
 					}"
 					class="text-base h-[100vh] pt-4"
+					@add-item="
+						() => {
+							showNewTicketDialog = true
+						}
+					"
 				>
 					<!-- Field Templates -->
 					<template #field-name="{ value }">
@@ -242,6 +247,16 @@
 				</ListViewer>
 			</template>
 		</ListManager>
+		<NewTicketDialog
+			v-model="showNewTicketDialog"
+			@close="showNewTicketDialog = false"
+			@ticket-created="
+				() => {
+					showNewTicketDialog = false
+					$refs.ticketList.manager.reload() // TODO: remove this once the list manager realtime update is fixed
+				}
+			"
+		/>
 	</div>
 </template>
 <script>
@@ -249,6 +264,7 @@ import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import AgentAvatar from "@/components/global/AgentAvatar.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue"
 import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
 
 export default {
@@ -258,11 +274,17 @@ export default {
 		ListViewer,
 		AgentAvatar,
 		CustomIcons,
+		NewTicketDialog,
 		FeatherIcon,
 		Dropdown,
 		Tooltip,
 	},
 	inject: ["agents", "user"],
+	data() {
+		return {
+			showNewTicketDialog: false,
+		}
+	},
 	methods: {
 		agentsAsDropdownOptions() {
 			let agentItems = []
