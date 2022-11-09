@@ -37,7 +37,6 @@
 <script>
 import { FeatherIcon, Dropdown } from "frappe-ui"
 import FilterBoxItem from "@/components/global/FilterBoxItem.vue"
-import { ref } from "vue"
 
 export default {
 	name: "FilterBox",
@@ -47,18 +46,13 @@ export default {
 		FilterBoxItem,
 	},
 	inject: ["manager"],
-	data() {
-		return {
-			isMounted: false,
-		}
-	},
-	mounted() {
-		this.isMounted = true
-	},
 	computed: {
 		showAddFilterButton() {
 			return (
 				this.manager.sudoFilters.filter((filter) => {
+					if (["like", "not like"].includes(filter.filter_type)) {
+						return !(filter.fieldname && filter.filter_type)
+					}
 					return !(
 						filter.fieldname &&
 						filter.filter_type &&
@@ -122,6 +116,9 @@ export default {
 		},
 		applyFilters() {
 			let filters = this.manager.sudoFilters.filter((f) => {
+				if (["like", "not like"].includes(f.filter_type)) {
+					return f.fieldname && f.filter_type
+				}
 				return f.fieldname && f.filter_type && f.value
 			})
 			this.manager.addFilters(filters, false)

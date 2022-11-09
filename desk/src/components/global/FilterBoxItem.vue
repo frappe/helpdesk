@@ -21,7 +21,11 @@
 			class="hover:bg-gray-100 py-0.5"
 		>
 			<div v-if="['like', 'not like'].includes(filter.filter_type)">
-				text input
+				<input
+					type="text"
+					@input="onInput"
+					class="h-2 focus:ring-0 border-0 bg-transparent px-2 text-base text-gray-700"
+				/>
 			</div>
 			<div v-else-if="['Link', 'Select'].includes(filter.data_type)">
 				<Autocomplete
@@ -33,6 +37,7 @@
 							if (!item) {
 								return
 							}
+							// onInput is not used, since Autocomplete input already uses debounce for input handle
 							filter.value = item.value
 							$emit('add-filter', filter)
 						}
@@ -51,12 +56,7 @@
 					type="date"
 					class="h-2 border-0 bg-transparent text-base text-gray-700 focus:ring-0 px-1"
 					role="button"
-					@input="
-						(val) => {
-							filter.value = val.target.value
-							$emit('add-filter', filter)
-						}
-					"
+					@input="onInput"
 				/>
 			</div>
 		</div>
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown } from "frappe-ui"
+import { FeatherIcon, Dropdown, debounce } from "frappe-ui"
 import Autocomplete from "@/components/global/Autocomplete.vue"
 
 export default {
@@ -142,11 +142,6 @@ export default {
 				auto: true,
 			}
 		},
-		getList() {
-			return {
-				method: "frappe.client.get_list",
-			}
-		},
 		selectOptionsForField() {
 			return {
 				method: "frappedesk.api.general.get_select_options_for_field",
@@ -154,6 +149,12 @@ export default {
 		},
 	},
 	methods: {
+		onInput: debounce(function (val) {
+			// for datepicker & text input, inputs only
+			console.log(val.target.value)
+			this.filter.value = val.target.value
+			this.$emit("add-filter", this.filter)
+		}, 300),
 		toggleDropdown(item) {
 			switch (item) {
 				case "operator":
