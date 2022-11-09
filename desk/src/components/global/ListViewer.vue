@@ -10,7 +10,7 @@
 		></div>
 		<slot name="body">
 			<slot name="list-body">
-				<div>
+				<div class="h-full">
 					<slot name="top-section">
 						<div
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
@@ -143,73 +143,89 @@
 							</div>
 						</div>
 					</slot>
-					<slot
-						v-if="!manager.loading"
-						name="rows"
-						:items="manager.list"
+					<div
+						class="h-[calc(100%-8rem)] overflow-y-scroll flex flex-col"
 					>
-						<div class="flex flex-col w-full">
-							<div
-								v-for="(item, index) in manager.list"
-								:key="item.name"
-							>
-								<slot name="row" :item="item">
-									<div
-										class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
-										:class="`${
-											manager.itemSelected(item)
-												? 'bg-blue-50 hover:bg-blue-100'
-												: 'hover:bg-gray-50'
-										} ${
-											index == 0
-												? 'mt-[9px] mb-[2px]'
-												: 'my-[2px]'
-										}`"
-									>
-										<div class="w-[25px]">
-											<Input
-												type="checkbox"
-												@click="manager.select(item)"
-												:checked="
-													manager.itemSelected(item)
-												"
-												class="cursor-pointer"
-											/>
-										</div>
+						<slot
+							v-if="!manager.loading"
+							name="rows"
+							:items="manager.list"
+						>
+							<div class="flex flex-col w-full">
+								<div
+									v-for="(item, index) in manager.list"
+									:key="item.name"
+								>
+									<slot name="row" :item="item">
 										<div
-											v-for="field in Object.keys(
-												renderOptions.fields
-											)"
-											:key="field"
-											:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
+											class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
+											:class="`${
+												manager.itemSelected(item)
+													? 'bg-blue-50 hover:bg-blue-100'
+													: 'hover:bg-gray-50'
+											} ${
+												index == 0
+													? 'mt-[9px] mb-[2px]'
+													: 'my-[2px]'
+											}`"
 										>
+											<div class="w-[25px]">
+												<Input
+													type="checkbox"
+													@click="
+														manager.select(item)
+													"
+													:checked="
+														manager.itemSelected(
+															item
+														)
+													"
+													class="cursor-pointer"
+												/>
+											</div>
 											<div
-												class="flex"
-												:class="
-													renderOptions.fields[field]
-														.align === 'right'
-														? 'justify-end'
-														: 'justify-start line-clamp-1'
-												"
+												v-for="field in Object.keys(
+													renderOptions.fields
+												)"
+												:key="field"
+												:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 											>
-												<slot
-													:name="'field-' + field"
-													:field="field"
-													:value="item[field]"
-													:row="item"
+												<div
+													class="flex"
+													:class="
+														renderOptions.fields[
+															field
+														].align === 'right'
+															? 'justify-end'
+															: 'justify-start line-clamp-1'
+													"
 												>
-													<div>
-														{{ item[field] }}
-													</div>
-												</slot>
+													<slot
+														:name="'field-' + field"
+														:field="field"
+														:value="item[field]"
+														:row="item"
+													>
+														<div>
+															{{ item[field] }}
+														</div>
+													</slot>
+												</div>
 											</div>
 										</div>
-									</div>
-								</slot>
+									</slot>
+								</div>
 							</div>
+						</slot>
+						<slot v-else name="listLoading">
+							List is loading...
+						</slot>
+					</div>
+					<slot name="pagination">
+						<div class="flex flex-row items-center h-[43px]">
+							<div class="w-full">Pagination Space</div>
 						</div>
 					</slot>
-					<slot v-else name="listLoading"> List is loading... </slot>
 				</div>
 			</slot>
 		</slot>

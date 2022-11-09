@@ -1,4 +1,5 @@
 module.exports = {
+	mode: "jit",
 	presets: [require("frappe-ui/src/utils/tailwind.config")],
 	content: [
 		"./index.html",
