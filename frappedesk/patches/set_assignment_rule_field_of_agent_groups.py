@@ -2,6 +2,11 @@ import frappe
 
 
 def execute():
+	frappe.reload_doc("FrappeDesk", "doctype", "Agent")
+	frappe.reload_doc("FrappeDesk", "doctype", "Agent Group Item")
+	frappe.reload_doc("FrappeDesk", "doctype", "Agent Group")
+	frappe.reload_doc("FrappeDesk", "doctype", "Frappe Desk Settings")
+
 	agent_groups = frappe.get_all("Agent Group", pluck="name")
 	for agent_group in agent_groups:
 		agent_group_doc = frappe.get_doc("Agent Group", agent_group)
