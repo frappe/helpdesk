@@ -16,14 +16,11 @@
 				:to="`/frappedesk/settings/agents/${agent.name}`"
 				class="w-full group flex items-center"
 			>
-				<div class="sm:w-4/12 truncate pr-10">
+				<div class="sm:w-5/12 truncate pr-10">
 					{{ agent.full_name }}
 				</div>
 				<div class="sm:w-5/12 truncate pr-10">
 					{{ agent.email }}
-				</div>
-				<div class="sm:w-3/12 truncate pr-10">
-					{{ agent.group }}
 				</div>
 				<div class="sm:w-2/12 truncate">
 					<div class="w-full flex flex-row-reverse">

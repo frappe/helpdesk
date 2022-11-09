@@ -6,11 +6,7 @@
 			:options="{
 				cache: ['Agents', 'Desk'],
 				doctype: 'Agent',
-				fields: [
-					'user as email',
-					'user.full_name as full_name',
-					'group',
-				],
+				fields: ['user as email', 'user.full_name as full_name'],
 				limit: 20,
 			}"
 			@selection="

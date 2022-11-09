@@ -7,8 +7,9 @@ from frappe.model.document import Document
 
 class Agent(Document):
 	def before_save(self):
-		self.name = self.user
-		self.set_user_roles()
+		if self.name != self.user:
+			self.rename(self.user)
+			self.set_user_roles()
 
 	def set_user_roles(self):
 		user = frappe.get_doc("User", self.user)
@@ -23,28 +24,66 @@ class Agent(Document):
 			else:
 				self.add_to_support_rotations()
 
-		if self.has_value_changed("group") and self.is_active:
+		if self.has_value_changed("groups") and self.is_active:
+			print(f"GROUPS VALUE CHANGED")
 			previous = self.get_doc_before_save()
-			if previous:
-				self.remove_from_support_rotations(group=previous.get("group"))
-			if self.group:
-				self.add_to_support_rotations()
+			for group in previous.groups:
+				if not next((g for g in self.groups if g.agent_group == group.agent_group), None):
+					self.remove_from_support_rotations(group.agent_group)
+
+			self.add_to_support_rotations()
+		print(f"\n\nAFTER ON UPDATE : {self.groups}")
 
 	def on_trash(self):
 		self.remove_from_support_rotations()
 
-	def add_to_support_rotations(self):
+	def add_to_support_rotations(self, group=None):
+		print(f"ADDING TO SUPPORT ROTATION {group}")
+		"""Add the agent to the support rotation for the given group or all groups the agent belongs to
+		if agent already added to the support roatation for a group, skip
+
+		:param str group: Agent Group name, defaults to None.
+		"""
+
 		rule_docs = []
-		rule_docs.append(frappe.get_doc("Assignment Rule", "Support Rotation"))
-		if self.group:
-			rule_docs.append(frappe.get_doc("Agent Group", self.group).get_assignment_rule())
+		if not group:
+			# Add the agent to the base support rotation
+
+			rule_docs.append(
+				frappe.get_doc(
+					"Assignment Rule",
+					frappe.get_doc("Frappe Desk Settings").get_base_support_rotation(),
+				)
+			)
+
+			# Add the agent to the support rotation for each group they belong to
+			if self.groups:
+				for group in self.groups:
+					rule_docs.append(
+						frappe.get_doc(
+							"Assignment Rule",
+							frappe.get_doc("Agent Group", group.agent_group).get_assignment_rule(),
+						)
+					)
+		else:
+			# check if the group is in self.groups
+			if next((group for group in self.groups if group["group_name"] == group), None):
+				rule_docs.append(
+					frappe.get_doc(
+						"Assignment Rule", frappe.get_doc("Agent Group", group).get_assignment_rule(),
+					)
+				)
+			else:
+				frappe.throw(
+					frappe._("Agent {0} does not belong to group {1}".format(self.agent_name, group))
+				)
 
 		for rule_doc in rule_docs:
 			skip = False
 			if rule_doc:
 				if rule_doc.users and len(rule_doc.users) > 0:
 					for user in rule_doc.users:
-						if user.user == self.name:  # if the user is already in the rule, skip
+						if user.user == self.user:  # if the user is already in the rule, skip
 							skip = True
 							break
 				if skip:
@@ -56,20 +95,33 @@ class Agent(Document):
 
 	def remove_from_support_rotations(self, group=None):
 		rule_docs = []
+
 		if group:
-			rule_docs.append(frappe.get_doc("Agent Group", group).get_assignment_rule())
-		else:
-			rules = frappe.get_all(
-				"Assignment Rule",
-				filters={
-					"user": self.user,
-					"name": ["like", "%Support Rotation%"],
-					"document_type": "Ticket",
-				},
-				fields=["name"],
+			# remove the agent from the support rotation for the given group
+			rule_docs.append(
+				frappe.get_doc(
+					"Assignment Rule", frappe.get_doc("Agent Group", group).get_assignment_rule(),
+				)
 			)
-			for rule in rules:
-				rule_docs.append(frappe.get_doc("Assignment Rule", rule.name))
+
+		else:
+			# Remove the agent from the base support rotation
+			rule_docs.append(
+				frappe.get_doc(
+					"Assignment Rule",
+					frappe.get_doc("Frappe Desk Settings").get_base_support_rotation(),
+				)
+			)
+
+			# Remove the agent from the support rotation for each group they belong to
+			for group in self.groups:
+				rule_docs.append(
+					frappe.get_doc(
+						"Assignment Rule",
+						frappe.get_doc("Agent Group", group.agent_group).get_assignment_rule(),
+					)
+				)
+
 		for rule_doc in rule_docs:
 			if rule_doc.users and len(rule_doc.users) > 0:
 				for user in rule_doc.users:
