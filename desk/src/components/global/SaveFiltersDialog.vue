@@ -22,7 +22,7 @@
 				<div
 					class="flex justify-between space-x-2 items-center text-base"
 				>
-					<div>Show all agents</div>
+					<div>Show to all agents</div>
 					<CustomSwitch v-model="showSavedFiltersToAll" />
 				</div>
 			</form>
