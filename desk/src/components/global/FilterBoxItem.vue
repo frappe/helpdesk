@@ -24,6 +24,7 @@
 				<input
 					type="text"
 					@input="onInput"
+					:value="filter.value"
 					class="h-2 focus:ring-0 border-0 bg-transparent px-2 text-base text-gray-700"
 				/>
 			</div>
