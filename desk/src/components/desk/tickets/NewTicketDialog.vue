@@ -3,60 +3,50 @@
 		<Dialog :options="{ title: 'Create New Ticket' }" v-model="open">
 			<template #body-content>
 				<div class="space-y-4">
+					<div class="space-y-1">
+						<Input label="Subject" type="text" v-model="subject" />
+						<ErrorMessage :message="subjectValidationError" />
+					</div>
 					<div class="w-full space-y-1">
 						<div>
 							<span
 								class="block mb-2 text-sm leading-4 text-gray-700"
 							>
-								Raised By
+								Created By
 							</span>
-							<Combobox v-model="selectedContact">
-								<ComboboxInput
-									class="rounded-md text-base w-full py-1 border-none focus:ring-0 pl-3 pr-10 leading-5 text-gray-900 bg-gray-100"
-									autocomplete="off"
-									@change="query = $event.target.value"
-								/>
-								<ComboboxOptions
-									class="absolute z-50 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
-								>
-									<div
-										v-if="
-											filterdContacts.length === 0 &&
-											query !== ''
-										"
-										class="select-none py-2 relative px-4 text-slate-400"
-									>
-										No such contact
-									</div>
-									<ComboboxOption
-										v-slot="{ selected, active }"
-										v-for="contactItem in filterdContacts"
-										:key="contactItem"
-										:value="contactItem.name"
-									>
-										<li
-											class="cursor-default select-none relative py-2 pl-4 pr-4 text-gray-900"
-											:class="{ 'bg-slate-50': active }"
-										>
-											<span
-												class="block truncate"
-												:class="{
-													'font-medium': selected,
-													'font-normal': !selected,
-												}"
-											>
-												{{ contactItem.name }}
-											</span>
-										</li>
-									</ComboboxOption>
-								</ComboboxOptions>
-							</Combobox>
 						</div>
+						<Autocomplete
+							:value="selectedContact"
+							@change="
+								(item) => {
+									if (!item) {
+										return
+									}
+									selectedContact = item.value
+								}
+							"
+							:resourceOptions="{
+								method: 'frappe.client.get_list',
+								inputMap: (query) => {
+									return {
+										doctype: 'Contact',
+										pluck: 'name',
+										filters: [
+											['name', 'like', `%${query}%`],
+										],
+									}
+								},
+								responseMap: (res) => {
+									return res.map((d) => {
+										return {
+											label: d.name,
+											value: d.name,
+										}
+									})
+								},
+							}"
+						/>
 						<ErrorMessage :message="contactValidationError" />
-					</div>
-					<div class="space-y-1">
-						<Input label="Subject" type="text" v-model="subject" />
-						<ErrorMessage :message="subjectValidationError" />
 					</div>
 					<div class="space-y-1">
 						<div>
@@ -65,48 +55,28 @@
 							>
 								Description
 							</span>
-							<CustomTextEditor
-								:show="true"
+							<TextEditor
+								ref="textEditor"
+								class="border rounded"
+								editor-class="px-2 min-h-[8rem] overflow-y-auto max-h-[15vh]"
 								:content="descriptionContent"
-								editorClasses="w-full min-h-[80px] max-h-[300px] bg-gray-100 px-3 rounded-t-lg"
+								:starterkit-options="{
+									heading: { levels: [2, 3, 4, 5, 6] },
+								}"
 								@change="
-									(val) => {
-										descriptionContent = val
+									(content) => {
+										descriptionContent = content
 									}
 								"
+								:editable="true"
 							>
-								<template #bottom-section="{ editor }">
-									<div
-										class="p-1 select-none flex flex-row border-b border-x rounded-b-lg"
-									>
-										<div
-											class="w-full flex flex-row items-center space-x-2"
-										>
-											<div
-												v-for="item in [
-													'bold',
-													'italic',
-													'|',
-													'quote',
-													'code',
-													'|',
-													'numbered-list',
-													'bullet-list',
-													'left-align',
-													'center-align',
-													'right-align',
-												]"
-												:key="item"
-											>
-												<TextEditorMenuItem
-													:item="item"
-													:editor="editor"
-												/>
-											</div>
-										</div>
-									</div>
+								<template v-slot:top>
+									<TextEditorFixedMenu
+										:buttons="textEditorMenuButtons"
+										class="bg-gray-100"
+									/>
 								</template>
-							</CustomTextEditor>
+							</TextEditor>
 						</div>
 						<ErrorMessage :message="descriptionValidationError" />
 					</div>
@@ -126,16 +96,10 @@
 </template>
 
 <script>
-import { Input, Dialog, ErrorMessage } from "frappe-ui"
-import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
-import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
+import { ErrorMessage, TextEditor } from "frappe-ui"
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
+import Autocomplete from "@/components/global/Autocomplete.vue"
 import { inject, ref, computed } from "vue"
-import {
-	Combobox,
-	ComboboxInput,
-	ComboboxOptions,
-	ComboboxOption,
-} from "@headlessui/vue"
 
 export default {
 	name: "NewTicketDialog",
@@ -146,24 +110,15 @@ export default {
 		},
 	},
 	components: {
-		CustomTextEditor,
-		TextEditorMenuItem,
-		Input,
-		Dialog,
+		TextEditor,
+		TextEditorFixedMenu,
+		Autocomplete,
 		ErrorMessage,
-		Combobox,
-		ComboboxInput,
-		ComboboxOption,
-		ComboboxOptions,
 	},
 	setup(props, { emit }) {
 		const isCreating = ref(false)
 
-		const contactName = ref("")
 		const selectedContact = ref("")
-		const query = ref("")
-
-		const contacts = inject("contacts")
 
 		const contactValidationError = ref("")
 		const subjectValidationError = ref("")
@@ -183,10 +138,7 @@ export default {
 
 		return {
 			isCreating,
-			contactName,
 			selectedContact,
-			query,
-			contacts,
 			contactValidationError,
 			subjectValidationError,
 			descriptionValidationError,
@@ -197,20 +149,53 @@ export default {
 	data() {
 		return {
 			subject: "",
-			description: "",
-
 			descriptionContent: "",
 		}
 	},
 	computed: {
-		filterdContacts() {
-			return this.query === ""
-				? this.contacts
-				: this.contacts.filter((contactItem) => {
-						return contactItem.name
-							.toLowerCase()
-							.includes(this.query.toLowerCase())
-				  })
+		textEditorMenuButtons() {
+			return [
+				"Paragraph",
+				[
+					"Heading 2",
+					"Heading 3",
+					"Heading 4",
+					"Heading 5",
+					"Heading 6",
+				],
+				"Separator",
+				"Bold",
+				"Italic",
+				"Separator",
+				"Bullet List",
+				"Numbered List",
+				"Separator",
+				"Align Left",
+				"Align Center",
+				"Align Right",
+				"Separator",
+				"Image",
+				"Link",
+				"Blockquote",
+				"Code",
+				"Horizontal Rule",
+				[
+					"InsertTable",
+					"AddColumnBefore",
+					"AddColumnAfter",
+					"DeleteColumn",
+					"AddRowBefore",
+					"AddRowAfter",
+					"DeleteRow",
+					"MergeCells",
+					"SplitCell",
+					"ToggleHeaderColumn",
+					"ToggleHeaderRow",
+					"ToggleHeaderCell",
+					"DeleteTable",
+				],
+				"Separator",
+			]
 		},
 	},
 	watch: {
@@ -239,7 +224,7 @@ export default {
 				})
 				.then(() => {
 					this.isCreating = false
-					this.$emit("ticketCreated")
+					this.$emit("ticket-created")
 				})
 		},
 		validateInputs() {
@@ -286,5 +271,3 @@ export default {
 	},
 }
 </script>
-
-<style></style>

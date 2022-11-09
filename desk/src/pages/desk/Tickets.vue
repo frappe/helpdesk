@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full p-4">
+	<div class="flex flex-col h-full px-4">
 		<div
 			v-if="false"
 			class="text-green-600 text-gray-600 text-green-500 bg-green-100 border-green-500 text-yellow-500 bg-yellow-100 border-yellow-500 text-orange-500 bg-orange-100 border-orange-500 text-red-500 bg-red-100 border-red-500"
@@ -10,23 +10,21 @@
 				cache: ['Ticket', 'Desk'],
 				doctype: 'Ticket',
 				fields: [
+					'_assign',
+					'status',
 					'priority',
-					'name',
 					'subject',
 					'ticket_type',
-					'status',
 					'contact',
-					'response_by',
-					'resolution_by',
-					'agreement_status',
 					'creation',
 					'modified',
-					'_assign',
+					'name',
+					'response_by',
+					'resolution_by',
 					'_seen',
 				],
 				limit: 20,
 				order_by: 'modified desc',
-				filters: initialFilters,
 			}"
 		>
 			<template #body="{ manager }">
@@ -34,7 +32,7 @@
 					:options="{
 						base: '24',
 						filterBox: true,
-						quickSelectFilters: true,
+						presetFilters: true,
 						fields: {
 							name: {
 								label: '#',
@@ -42,7 +40,7 @@
 							},
 							subject: {
 								label: 'Subject',
-								width: '9',
+								width: '8',
 							},
 							status: {
 								label: 'Status',
@@ -52,13 +50,17 @@
 								label: 'Type',
 								width: '3',
 							},
+							resolution_by: {
+								label: 'Due In',
+								width: '2',
+							},
 							priority: {
 								label: 'Priority',
 								width: '2',
 							},
 							contact: {
 								label: 'Created By',
-								width: '4',
+								width: '3',
 							},
 							modified: {
 								label: 'Modified',
@@ -67,7 +69,6 @@
 							creation: {
 								label: ' ',
 								width: '1',
-								align: 'right',
 							},
 							_assign: {
 								label: ' ',
@@ -76,13 +77,29 @@
 							},
 						},
 					}"
-					class="text-base"
+					class="text-base h-[100vh] pt-4"
+					@add-item="
+						() => {
+							showNewTicketDialog = true
+						}
+					"
 				>
 					<!-- Field Templates -->
 					<template #field-name="{ value }">
 						<div class="text-xs text-gray-500">
 							{{ value }}
 						</div>
+					</template>
+					<template #field-subject="{ value, row }">
+						<router-link
+							:to="{
+								path: `/frappedesk/tickets/${row.name}`,
+							}"
+							role="button"
+							class="line-clamp-1 hover:text-gray-900 text-gray-600"
+						>
+							{{ value }}
+						</router-link>
 					</template>
 					<template #field-status="{ value }">
 						<div class="flex flex-row items-center space-x-1">
@@ -132,6 +149,11 @@
 							</div>
 						</div>
 					</template>
+					<template #field-ticket_type="{ value }">
+						<div v-if="value" class="text-gray-600">
+							{{ value }}
+						</div>
+					</template>
 					<template #field-contact="{ value }">
 						<div class="text-gray-500">
 							{{ value }}
@@ -146,6 +168,25 @@
 								{{ $dayjs(value).format("DD MMM") }}
 							</div>
 						</Tooltip>
+					</template>
+					<template #field-resolution_by="{ value }">
+						<div
+							class="text-gray-500 flex flex-row space-x-1 items-center"
+							:class="{
+								'text-red-500': $dayjs(value)
+									.fromNow()
+									.includes('ago'),
+							}"
+						>
+							{{
+								value
+									? $dayjs.shortFormating(
+											$dayjs(value).fromNow(),
+											true
+									  )
+									: ""
+							}}
+						</div>
 					</template>
 					<template #field-modified="{ value }">
 						<div class="text-gray-500">
@@ -206,6 +247,16 @@
 				</ListViewer>
 			</template>
 		</ListManager>
+		<NewTicketDialog
+			v-model="showNewTicketDialog"
+			@close="showNewTicketDialog = false"
+			@ticket-created="
+				() => {
+					showNewTicketDialog = false
+					$refs.ticketList.manager.reload() // TODO: remove this once the list manager realtime update is fixed
+				}
+			"
+		/>
 	</div>
 </template>
 <script>
@@ -213,6 +264,7 @@ import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import AgentAvatar from "@/components/global/AgentAvatar.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue"
 import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
 
 export default {
@@ -222,30 +274,16 @@ export default {
 		ListViewer,
 		AgentAvatar,
 		CustomIcons,
+		NewTicketDialog,
 		FeatherIcon,
 		Dropdown,
 		Tooltip,
 	},
 	inject: ["agents", "user"],
-	mounted() {
-		if (this.$route.query) {
-			for (const [key, value] of Object.entries(this.$route.query)) {
-				if (
-					[
-						"ticket_type",
-						"contact",
-						"status",
-						"priority",
-						"_assign",
-					].includes(key)
-				) {
-					const filter = {}
-					filter[key] = value
-					this.filters.push(filter)
-				}
-			}
+	data() {
+		return {
+			showNewTicketDialog: false,
 		}
-		// TODO: this.applyFiltersToList()
 	},
 	methods: {
 		agentsAsDropdownOptions() {

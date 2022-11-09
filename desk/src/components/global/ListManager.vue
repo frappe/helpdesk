@@ -5,15 +5,20 @@
 </template>
 
 <script>
-import { ref, computed, watch, provide } from "vue"
+import { ref, computed, watch, provide, inject } from "vue"
 
 export default {
 	name: "ListManager",
 	props: ["options"],
 	setup(props, context) {
+		const user = inject("user")
 		const options = ref({
 			handle_row_click: () => {},
-			...props.options,
+			fields: props.options.fields || [],
+			doctype: props.options.doctype,
+			filters: props.options.filters || [],
+			limit: props.options.limit || 20,
+			order_by: props.options.order_by || "",
 		})
 
 		options.value.fields = [
@@ -23,6 +28,8 @@ export default {
 		const resources = ref(null)
 		const selectedItems = ref({})
 		const selectionMode = ref(0)
+
+		const sudoFilters = ref([])
 
 		const allItemsSelected = computed(() => {
 			if (manager.value.loading) {
@@ -41,10 +48,84 @@ export default {
 			loading: false,
 			resources,
 			options,
+			sudoFilters,
 			selectedItems,
 			allItemsSelected,
 			list: [],
 			totalCount: 0,
+			generateExecutableFilter: (filter) => {
+				let mapOperator = (x) => {
+					switch (x) {
+						case "is":
+							return "="
+						case "is not":
+							return "!="
+						case "before":
+							return "<"
+						case "after":
+							return ">"
+						default:
+							return x
+					}
+				}
+				let mapValue = (x, type) => {
+					switch (type) {
+						case "like":
+							return `%${x}%`
+						case "not like":
+							return `%${x}%`
+						default:
+							return x
+					}
+				}
+
+				let filterType = filter.filter_type
+				if (filter.fieldname == "_assign") {
+					filterType =
+						filter.filter_type == "is" ? "like" : "not like"
+				}
+
+				let executableFilter = [
+					filter.fieldname,
+					mapOperator(filterType),
+					mapValue(
+						filter.fieldname == "_assign" && filter.value == "@me"
+							? user.value.user
+							: filter.value,
+						filterType
+					),
+				]
+				return executableFilter
+			},
+			addFilters: (sudoFilters, append = true) => {
+				let executableFilters = []
+				for (let i in sudoFilters) {
+					executableFilters.push(
+						manager.value.generateExecutableFilter(sudoFilters[i])
+					)
+				}
+				manager.value.applyFilters(
+					sudoFilters,
+					executableFilters,
+					append
+				)
+			},
+			applyFilters: (sudoFilters, executableFilters, append = true) => {
+				// applyFilters should be called with a list of executable filters only
+				let finaleExecutableFilters = []
+				if (append) {
+					finaleExecutableFilters = [
+						...manager.value.options.filters,
+						...executableFilters,
+					]
+				} else {
+					finaleExecutableFilters = executableFilters
+				}
+				manager.value.update({
+					filters: finaleExecutableFilters,
+				})
+				manager.value.sudoFilters = sudoFilters
+			},
 			nextPage: () => {
 				resources.value.list.next()
 			},
@@ -155,12 +236,12 @@ export default {
 		list() {
 			return {
 				type: "list",
-				doctype: this.manager.options?.doctype,
-				fields: this.manager.options?.fields,
 				cache: this.manager.options?.cache,
-				order_by: this.manager.options?.order_by,
-				filters: this.manager.options?.filters,
-				limit: this.manager.options?.limit || 20,
+				doctype: this.manager.options.doctype,
+				fields: this.manager.options.fields,
+				order_by: this.manager.options.order_by,
+				filters: this.manager.options.filters,
+				limit: this.manager.options.limit,
 				realtime: true,
 			}
 		},
