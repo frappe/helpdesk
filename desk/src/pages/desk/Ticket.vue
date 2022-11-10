@@ -614,8 +614,8 @@ export default {
 		getPreviousTicket() {},
 
 		getMessage(message){
-			this.$refs.tempMessage=message
-			this.content=this.$refs.tempMessage
+			this.tempMessage=message
+			this.content=this.tempMessage
 		},
 	},
 }
