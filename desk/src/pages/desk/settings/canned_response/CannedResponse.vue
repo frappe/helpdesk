@@ -17,7 +17,7 @@ export default {
 },
 	setup() {},
 	mounted() {
-		this.$event.emit("set-selected-setting", "CannedResponses")
+		this.$event.emit("set-selected-setting", "Canned Responses")
 		this.$event.emit("show-top-panel-actions-settings", "CannedResponse")
 	},
 }
