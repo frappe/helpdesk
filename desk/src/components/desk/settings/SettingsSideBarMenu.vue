@@ -33,6 +33,11 @@ export default {
 					route: "/frappedesk/settings/sla",
 				},
 				{
+					label: "Canned Responses",
+					pageName: "CannedResponses",
+					route: "/frappedesk/settings/canned_response",
+				},
+				{
 					label: "Email Accounts",
 					pageName: "Emails",
 					route: "/frappedesk/settings/emails",

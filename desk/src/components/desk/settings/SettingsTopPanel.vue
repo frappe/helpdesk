@@ -53,6 +53,16 @@ export default {
 					this.$event.emit("delete-selected-agents")
 				}),
 			],
+			CannedResponses: [
+				new Action("Add Response", "plus", "primary", () => {
+					this.$event.emit("show-new-canned_response-dialog")
+				}),
+			],
+			"Canned Responses Bulk": [
+				new Action("Delete", "", "secondary", () => {
+					this.$event.emit("delete-selected-canned_responses")
+				}),
+			],
 			"Support Policies": [
 				new Action("New Policy", "plus", "primary", () => {
 					this.$router.push({ name: "NewSlaPolicy" })
