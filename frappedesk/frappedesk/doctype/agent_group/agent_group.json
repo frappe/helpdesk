@@ -6,18 +6,25 @@
 	"doctype": "DocType",
 	"editable_grid": 1,
 	"engine": "InnoDB",
-	"field_order": ["team_name"],
+	"field_order": ["team_name", "assignment_rule"],
 	"fields": [
 		{
 			"fieldname": "team_name",
 			"fieldtype": "Data",
 			"label": "Name",
 			"unique": 1
+		},
+		{
+			"fieldname": "assignment_rule",
+			"fieldtype": "Link",
+			"label": "Assignment Rule",
+			"options": "Assignment Rule",
+			"read_only": 1
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-09-08 12:39:46.756222",
+	"modified": "2022-11-06 15:48:24.518880",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Agent Group",

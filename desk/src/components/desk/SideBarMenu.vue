@@ -235,9 +235,6 @@ export default {
 		const profileSettings = ref()
 		const showProfileSettings = ref(false)
 
-		const sideBarFilterMap = inject("sideBarFilterMap")
-		const ticketSideBarFilter = inject("ticketSideBarFilter")
-
 		return {
 			showKeyboardShortcuts,
 			keyboardShortcuts,
@@ -248,8 +245,6 @@ export default {
 			menuOptions,
 			profileSettings,
 			showProfileSettings,
-			ticketSideBarFilter,
-			sideBarFilterMap,
 		}
 	},
 	mounted() {
@@ -257,8 +252,9 @@ export default {
 			{
 				label: "Tickets",
 				icon: "ticket",
-				expanded: true,
-				children: [],
+				to: {
+					path: "/frappedesk/tickets",
+				},
 			},
 			{
 				label: "Knowledge Base",
@@ -283,81 +279,6 @@ export default {
 			},
 		]
 
-		if (this.user.agent) {
-			this.menuOptions
-				.find((option) => option.label == "Tickets")
-				.children.push(
-					...[
-						{
-							label: "My Open Tickets",
-							to: {
-								path: "/frappedesk/tickets",
-								query: () => {
-									return {
-										...this.$route.query,
-										menu_filter: "my-open-tickets",
-									}
-								},
-							},
-						},
-						{
-							label: "My Replied Tickets",
-							to: {
-								path: "/frappedesk/tickets",
-								query: () => {
-									return {
-										...this.$route.query,
-										menu_filter: "my-replied-tickets",
-									}
-								},
-							},
-						},
-						{
-							label: "My Resolved Tickets",
-							to: {
-								path: "/frappedesk/tickets",
-								query: () => {
-									return {
-										...this.$route.query,
-										menu_filter: "my-resolved-tickets",
-									}
-								},
-							},
-						},
-						{
-							label: "My Closed Tickets",
-							to: {
-								path: "/frappedesk/tickets",
-								query: () => {
-									return {
-										...this.$route.query,
-										menu_filter: "my-closed-tickets",
-									}
-								},
-							},
-						},
-					]
-				)
-		}
-
-		this.menuOptions
-			.find((option) => option.label == "Tickets")
-			.children.push(
-				...[
-					{
-						label: "All Tickets",
-						to: {
-							path: "/frappedesk/tickets",
-							query: () => {
-								return {
-									...this.$route.query,
-									menu_filter: "all",
-								}
-							},
-						},
-					},
-				]
-			)
 		this.profileSettings = [
 			{
 				label: "Keyboard Shortcuts",
@@ -385,95 +306,15 @@ export default {
 			},
 		]
 
-		this.syncSideBarTicketFilter()
 		this.syncSelectedMenuItemBasedOnRoute()
-
-		this.$event.on("update_ticket_list", this.updateTicketCount)
-	},
-	unmounted() {
-		this.$event.off("update_ticket_list")
 	},
 	watch: {
 		$route() {
-			this.syncSideBarTicketFilter()
 			this.syncSelectedMenuItemBasedOnRoute()
 		},
 	},
-	resources: {
-		myOpenTicketsCount() {
-			return {
-				method: "frappe.client.get_count",
-				params: {
-					doctype: "Ticket",
-					filters: {
-						status: ["=", "Open"],
-						_assign: ["like", `%${this.user.agent.name}%`],
-					},
-				},
-				auto: true,
-				onSuccess(count) {
-					this.menuOptions.find(
-						(option) => option.label == "Tickets"
-					).children[0].extra = count
-				},
-			}
-		},
-		myRepliedTicketsCount() {
-			return {
-				method: "frappe.client.get_count",
-				params: {
-					doctype: "Ticket",
-					filters: {
-						status: ["=", "Replied"],
-						_assign: ["like", `%${this.user.agent.name}%`],
-					},
-				},
-				auto: true,
-				onSuccess(count) {
-					this.menuOptions.find(
-						(option) => option.label == "Tickets"
-					).children[1].extra = count
-				},
-			}
-		},
-	},
 	methods: {
-		updateTicketCount() {
-			if (this.user.agent) {
-				this.$resources.myOpenTicketsCount.fetch()
-				this.$resources.myRepliedTicketsCount.fetch()
-			}
-		},
-		syncSideBarTicketFilter() {
-			if (
-				this.$route.name === "DeskTickets" &&
-				!this.$route.query.menu_filter
-			) {
-				this.$router.push({
-					path: "/frappedesk/tickets",
-					query: {
-						...this.$route.query,
-						menu_filter: this.user.agent
-							? "my-open-tickets"
-							: "all",
-					},
-				})
-			}
-			this.ticketSideBarFilter =
-				this.$route.name === "DeskTickets" &&
-				this.$route.query.menu_filter
-					? this.$route.query.menu_filter
-					: this.ticketSideBarFilter
-		},
 		syncSelectedMenuItemBasedOnRoute() {
-			const handleTicketFilterQueries = () => {
-				if (this.sideBarFilterMap[this.ticketSideBarFilter]) {
-					return this.sideBarFilterMap[this.ticketSideBarFilter]
-				} else {
-					return "All Tickets"
-				}
-			}
-
 			const routeMenuItemMap = {
 				"frappedesk/tickets": "Tickets",
 				"frappedesk/kb": "Knowledge Base",
@@ -484,9 +325,6 @@ export default {
 			Object.keys(routeMenuItemMap).forEach((route) => {
 				if (this.$route.path.includes(route)) {
 					let selectedMenuItem = routeMenuItemMap[route]
-					if (routeMenuItemMap[route] == "Tickets") {
-						selectedMenuItem = handleTicketFilterQueries()
-					}
 					this.select(selectedMenuItem)
 					return
 				}

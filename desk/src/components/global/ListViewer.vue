@@ -4,76 +4,85 @@
 			v-if="false"
 			class="w-1/12 w-2/12 w-3/12 w-4/12 w-5/12 w-6/12 w-7/12 w-8/12 w-9/12 w-10/12 w-11/12"
 		></div>
+		<div
+			v-if="false"
+			class="w-1/24 w-2/24 w-3/24 w-4/24 w-5/24 w-6/24 w-7/24 w-8/24 w-9/24 w-10/24 w-11/24 w-12/24 w-13/24 w-14/24 w-15/24 w-16/24 w-17/24 w-18/24 w-19/24 w-20/24 w-21/24 w-22/24 w-23/24"
+		></div>
 		<slot name="body">
 			<slot name="list-body">
-				<div>
+				<div class="h-full">
 					<slot name="top-section">
 						<div
 							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
 						>
-							<div>
-								<slot name="top-sub-section-1"> </slot>
-							</div>
-							<div class="grow">
-								<slot name="top-sub-section-2">
-									<!-- Filter Box -->
-									<div
-										v-if="options.showFilterBox"
-										class="flex flex-row items-center"
-									>
-										<Button
-											icon-right="chevron-down"
-											class="mr-[-10px] bg-gray-300"
-											>Filters</Button
-										>
-										<div class="grow">
-											<Input
-												type="text"
-												class="h-[30px]"
-											></Input>
-										</div>
-									</div>
+							<div class="shrink-0">
+								<slot name="top-sub-section-1">
+									<PresetFilters
+										v-if="options.presetFilters"
+									/>
 								</slot>
 							</div>
-							<div>
+							<div class="w-full">
+								<slot name="top-sub-section-2">
+									<FilterBox v-if="options.filterBox" />
+								</slot>
+							</div>
+							<div
+								v-if="
+									options.filterBox &&
+									options.presetFilters &&
+									manager.options.filters.length > 0
+								"
+							>
+								<Button
+									icon-left="layers"
+									appearance="minimal"
+									@click="
+										() => {
+											showSaveFiltersDialog = true
+										}
+									"
+								>
+									Save
+								</Button>
+								<SaveFiltersDialog
+									v-model="showSaveFiltersDialog"
+									@close="showSaveFiltersDialog = false"
+								/>
+							</div>
+							<div class="shrink-0">
 								<slot name="top-sub-section-3">
+									<!-- Actions / Bulk actions -->
 									<div
 										v-if="
 											Object.keys(manager.selectedItems)
 												.length > 0
 										"
 									>
+										<!-- Bulk Actions -->
 										<slot
 											name="bulk-actions"
 											:selectedItems="
 												manager.selectedItems
 											"
-										>
-											<!-- Bulk Actions -->
-										</slot>
+										/>
 									</div>
 									<div v-else class="flex flex-row space-x-2">
-										<div>
-											<slot name="actions">
-												<!-- Actions -->
-											</slot>
-										</div>
-										<div>
-											<slot name="primary-action">
-												<!-- Add Item -->
-												<Button
-													appearance="primary"
-													icon-left="plus"
-													@click="$emit('add-item')"
-												>
-													{{
-														`Add ${manager.options.doctype}`
-													}}
-												</Button>
-											</slot>
-										</div>
+										<!-- Actions -->
+										<slot name="actions" />
+										<slot name="primary-action">
+											<!-- Add Item -->
+											<Button
+												appearance="primary"
+												icon-left="plus"
+												@click="$emit('add-item')"
+											>
+												{{
+													`Add ${manager.options.doctype}`
+												}}
+											</Button>
+										</slot>
 									</div>
-									<!-- Actions / Bulk actions -->
 								</slot>
 							</div>
 						</div>
@@ -96,7 +105,7 @@
 										renderOptions.fields
 									)"
 									:key="field"
-									:class="`w-${renderOptions.fields[field].width}/12`"
+									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 								>
 									<div>
 										<slot
@@ -157,73 +166,89 @@
 							</div>
 						</div>
 					</slot>
-					<slot
-						v-if="!manager.loading"
-						name="rows"
-						:items="manager.list"
+					<div
+						class="h-[calc(100%-8rem)] overflow-y-scroll flex flex-col"
 					>
-						<div class="flex flex-col w-full">
-							<div
-								v-for="(item, index) in manager.list"
-								:key="item.name"
-							>
-								<slot name="row" :item="item">
-									<div
-										class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
-										:class="`${
-											manager.itemSelected(item)
-												? 'bg-blue-50 hover:bg-blue-100'
-												: 'hover:bg-gray-50'
-										} ${
-											index == 0
-												? 'mt-[9px] mb-[2px]'
-												: 'my-[2px]'
-										}`"
-									>
-										<div class="w-[25px]">
-											<Input
-												type="checkbox"
-												@click="manager.select(item)"
-												:checked="
-													manager.itemSelected(item)
-												"
-												class="cursor-pointer"
-											/>
-										</div>
+						<slot
+							v-if="!manager.loading"
+							name="rows"
+							:items="manager.list"
+						>
+							<div class="flex flex-col w-full">
+								<div
+									v-for="(item, index) in manager.list"
+									:key="item.name"
+								>
+									<slot name="row" :item="item">
 										<div
-											v-for="field in Object.keys(
-												renderOptions.fields
-											)"
-											:key="field"
-											:class="`w-${renderOptions.fields[field].width}/12`"
+											class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
+											:class="`${
+												manager.itemSelected(item)
+													? 'bg-blue-50 hover:bg-blue-100'
+													: 'hover:bg-gray-50'
+											} ${
+												index == 0
+													? 'mt-[9px] mb-[2px]'
+													: 'my-[2px]'
+											}`"
 										>
+											<div class="w-[25px]">
+												<Input
+													type="checkbox"
+													@click="
+														manager.select(item)
+													"
+													:checked="
+														manager.itemSelected(
+															item
+														)
+													"
+													class="cursor-pointer"
+												/>
+											</div>
 											<div
-												class="flex"
-												:class="
-													renderOptions.fields[field]
-														.align === 'right'
-														? 'justify-end'
-														: 'justify-start line-clamp-1'
-												"
+												v-for="field in Object.keys(
+													renderOptions.fields
+												)"
+												:key="field"
+												:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 											>
-												<slot
-													:name="'field-' + field"
-													:field="field"
-													:value="item[field]"
-													:row="item"
+												<div
+													class="flex w-full"
+													:class="
+														renderOptions.fields[
+															field
+														].align === 'right'
+															? 'justify-end'
+															: 'justify-start line-clamp-1'
+													"
 												>
-													<div>
-														{{ item[field] }}
-													</div>
-												</slot>
+													<slot
+														:name="'field-' + field"
+														:field="field"
+														:value="item[field]"
+														:row="item"
+													>
+														<div>
+															{{ item[field] }}
+														</div>
+													</slot>
+												</div>
 											</div>
 										</div>
-									</div>
-								</slot>
+									</slot>
+								</div>
 							</div>
+						</slot>
+						<slot v-else name="listLoading">
+							List is loading...
+						</slot>
+					</div>
+					<slot name="pagination">
+						<div class="flex flex-row items-center h-[43px]">
+							<ListPageController />
 						</div>
 					</slot>
-					<slot v-else name="listLoading"> List is loading... </slot>
 				</div>
 			</slot>
 		</slot>
@@ -231,35 +256,50 @@
 </template>
 
 <script>
-import ListManager from "./ListManager.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import PresetFilters from "@/components/global/PresetFilters.vue"
+import FilterBox from "@/components/global/FilterBox.vue"
+import ListPageController from "@/components/global/ListPageController.vue"
+import { Dropdown, FeatherIcon } from "frappe-ui"
+import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
 
 export default {
 	name: "ListViewer",
 	props: {
-		manager: {
-			type: Object,
-			required: true,
-		},
 		options: {
 			type: Object,
 			default: () => ({}),
 		},
 	},
+	inject: ["manager"],
 	components: {
-		ListManager,
 		CustomIcons,
+		PresetFilters,
+		FilterBox,
+		ListPageController,
+		Dropdown,
+		FeatherIcon,
+		SaveFiltersDialog,
+	},
+	data() {
+		return {
+			showSaveFiltersDialog: false,
+		}
 	},
 	computed: {
 		renderOptions() {
-			const options = { fields: {} }
+			const options = {
+				fields: {},
+				base: this.options.base || "12",
+				filterBox: this.options.filterBox || false,
+				presetFilters: this.options.presetFilters || false,
+			}
 			for (let i in this.options.fields) {
 				options.fields[i] = {
 					label: this.options.fields[i].label || i,
 					width: this.options.fields[i].width || 1,
 					priority: this.options.fields[i].priority || 5,
 					align: this.options.fields[i].align || "left",
-					showFilterBox: this.options.fields[i].showFilterBox || true,
 				}
 			}
 			return options

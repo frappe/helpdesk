@@ -78,7 +78,7 @@
 					</div>
 				</div>
 				<div class="flex flex-row space-x-[16px]">
-					<div class="grow">
+					<!-- <div class="grow">
 						<Input
 							label="Team"
 							type="select"
@@ -86,7 +86,7 @@
 							:value="values?.team"
 							@change="(val) => (values.team = val)"
 						/>
-					</div>
+					</div> -->
 					<!--<div class="grow">
 						<Input
 							label="E-mail"

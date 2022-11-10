@@ -27,7 +27,9 @@
 		"setup_complete",
 		"initial_agent_set",
 		"initial_demo_ticket_created",
-		"initial_helpdesk_name_setup_skipped"
+		"initial_helpdesk_name_setup_skipped",
+		"assignment_rules_section",
+		"base_support_rotation"
 	],
 	"fields": [
 		{
@@ -155,11 +157,23 @@
 			"fieldname": "initial_helpdesk_name_setup_skipped",
 			"fieldtype": "Check",
 			"label": "Initial Helpdesk Name Setup Skipped"
+		},
+		{
+			"fieldname": "assignment_rules_section",
+			"fieldtype": "Section Break",
+			"label": "Assignment Rules"
+		},
+		{
+			"fieldname": "base_support_rotation",
+			"fieldtype": "Link",
+			"label": "Base Support Rotation",
+			"options": "Assignment Rule",
+			"read_only": 1
 		}
 	],
 	"issingle": 1,
 	"links": [],
-	"modified": "2022-09-08 12:39:21.458020",
+	"modified": "2022-11-06 15:48:46.754859",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Frappe Desk Settings",

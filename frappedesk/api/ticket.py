@@ -204,7 +204,7 @@ def bulk_assign_ticket_status(ticket_ids, status):
 		for ticket_id in ticket_ids:
 			ticket_doc = assign_ticket_status(ticket_id, status)
 			ticket_docs.append(ticket_doc)
-		return ticket_docs
+		return {"docs": ticket_docs, "status": status}
 
 
 @frappe.whitelist()
@@ -225,15 +225,18 @@ def assign_ticket_group(ticket_id, agent_group):
 	if ticket_id:
 		ticket_doc = frappe.get_doc("Ticket", ticket_id)
 		if ticket_doc.agent_group != agent_group:
-			current_assigned_agent = ticket_doc.get_assigned_agent()
+			current_assigned_agent_doc = ticket_doc.get_assigned_agent()
 			if (
 				(
-					current_assigned_agent
-					and current_assigned_agent.group
-					!= agent_group  # if assigned agent is not in the new group
+					current_assigned_agent_doc
+					and not current_assigned_agent_doc.in_group(
+						agent_group
+					)  # if assigned agent is not in the new group
 				)
-				and frappe.db.count("Agent", {"group": agent_group, "is_active": True}) > 0
-			):  # if there are agents in the group
+				and frappe.get_doc(
+					"Assignment Rule", frappe.get_doc("Agent Group", agent_group).assignment_rule
+				).users  # check if there are any users(agnets) in the new group assignment rule
+			):
 				clear_all_assignments("Ticket", ticket_id)
 				# new agent will be assigned automatically via assignment rule
 
