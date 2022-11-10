@@ -447,7 +447,11 @@ export default {
 				method: "frappe.client.get_list",
 				params: {
 					doctype: "Agent",
-					fields: ["name", "agent_name", "user.user_image", "group"],
+					fields: [
+						"name",
+						"agent_name",
+						"user.user_image as user_image",
+					],
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {

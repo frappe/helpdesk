@@ -11,8 +11,7 @@
 			"fieldname": "user",
 			"fieldtype": "Link",
 			"label": "User",
-			"options": "User",
-			"read_only": 1
+			"options": "User"
 		},
 		{
 			"fetch_from": "user.full_name",
@@ -39,7 +38,7 @@
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-11-05 21:28:53.586540",
+	"modified": "2022-11-10 13:47:00.960100",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Agent",

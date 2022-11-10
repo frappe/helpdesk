@@ -8,7 +8,7 @@ from frappe.model.document import Document
 class Agent(Document):
 	def before_save(self):
 		if self.name != self.user:
-			self.rename(self.user)
+			self.name = self.user
 			self.set_user_roles()
 
 	def set_user_roles(self):
@@ -25,20 +25,18 @@ class Agent(Document):
 				self.add_to_support_rotations()
 
 		if self.has_value_changed("groups") and self.is_active:
-			print(f"GROUPS VALUE CHANGED")
 			previous = self.get_doc_before_save()
-			for group in previous.groups:
-				if not next((g for g in self.groups if g.agent_group == group.agent_group), None):
-					self.remove_from_support_rotations(group.agent_group)
+			if previous:
+				for group in previous.groups:
+					if not next((g for g in self.groups if g.agent_group == group.agent_group), None):
+						self.remove_from_support_rotations(group.agent_group)
 
 			self.add_to_support_rotations()
-		print(f"\n\nAFTER ON UPDATE : {self.groups}")
 
 	def on_trash(self):
 		self.remove_from_support_rotations()
 
 	def add_to_support_rotations(self, group=None):
-		print(f"ADDING TO SUPPORT ROTATION {group}")
 		"""Add the agent to the support rotation for the given group or all groups the agent belongs to
 		if agent already added to the support roatation for a group, skip
 
@@ -128,6 +126,12 @@ class Agent(Document):
 					if user.user == self.user:
 						rule_doc.remove(user)
 						rule_doc.save()
+
+	def in_group(self, group):
+		"""Check if the agent is in the given group"""
+		if self.groups:
+			return next((g for g in self.groups if g.agent_group == group), False)
+		return False
 
 
 @frappe.whitelist()
