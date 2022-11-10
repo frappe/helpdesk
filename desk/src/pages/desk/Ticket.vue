@@ -305,20 +305,26 @@
 													$refs.replyEditor.insertLink
 												"
 											/>
-											<CustomIcons	
+											<CustomIcons
 												name="add-response"
 												class="h-7 w-7 rounded p-1"
 												role="button"
-												@click="()=>{
-													showCannedResponsesDialog=true
-												}"
+												@click="
+													() => {
+														showCannedResponsesDialog = true
+													}
+												"
 											/>
 											<CannedResponsesDialog
-												:show="showCannedResponsesDialog"
+												:show="
+													showCannedResponsesDialog
+												"
 												@messageVal="getMessage($event)"
-												@close="()=>{
-													showCannedResponsesDialog=false
-												}"					
+												@close="
+													() => {
+														showCannedResponsesDialog = false
+													}
+												"
 											/>
 										</div>
 										<div class="grow flex flex-row-reverse">
@@ -406,7 +412,7 @@ export default {
 		CustomIcons,
 		CustomerSatisfactionFeedback,
 		TextEditorMenuItem,
-		CannedResponsesDialog
+		CannedResponsesDialog,
 	},
 	data() {
 		return {
@@ -434,8 +440,8 @@ export default {
 
 		const sideBarFilterMap = inject("sideBarFilterMap")
 		const ticketSideBarFilter = inject("ticketSideBarFilter")
-		const showCannedResponsesDialog=ref(false)
-		const tempMessage=ref("")
+		const showCannedResponsesDialog = ref(false)
+		const tempMessage = ref("")
 
 		return {
 			showTextFormattingMenu,
@@ -448,7 +454,7 @@ export default {
 			sideBarFilterMap,
 			ticketSideBarFilter,
 			showCannedResponsesDialog,
-			tempMessage
+			tempMessage,
 		}
 	},
 	resources: {
@@ -613,9 +619,9 @@ export default {
 		getNextTicket() {},
 		getPreviousTicket() {},
 
-		getMessage(message){
-			this.tempMessage=message
-			this.content=this.tempMessage
+		getMessage(message) {
+			this.tempMessage = message
+			this.content = this.tempMessage
 		},
 	},
 }

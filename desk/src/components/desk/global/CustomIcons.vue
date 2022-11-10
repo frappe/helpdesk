@@ -1220,66 +1220,68 @@
 			/>
 		</svg>
 		<svg
-			v-if="this.name=='add-response'"
-			:class="this.class" 
-			:width="this.width" 
-			:height="this.height" 
-			viewBox="0 0 17 17" 
-			fill="none" 
-			xmlns="http://www.w3.org/2000/svg">
-			<path 
-				d="M10.0783 2.05H4.97627L4.00006 2.05C2.61935 2.05 1.50006 3.16929 1.50006 4.55V8.32288V8.32289L1.50003 10.121C1.50001 11.5018 2.61931 12.6211 4.00003 12.6211H7.87765L7.87765 13.8306C7.87765 14.6723 8.85393 15.1375 9.50759 14.6073L11.8186 12.7328C11.9077 12.6605 12.0189 12.6211 12.1336 12.6211H12.7552C14.1359 12.6211 15.2552 11.5018 15.2552 10.1211V8.32289V4.54999C15.2552 3.16928 14.1359 2.04999 12.7552 2.04999L10.0783 2.05Z" 
-				stroke="#1F272E" 
-				stroke-miterlimit="10" 
-				stroke-linecap="square"/>
-			<path 
-				d="M8.72406 10.2L7.95645 9.69359L9.28934 7.65922H7.45026C7.34116 7.659 7.23577 7.61848 7.15378 7.5453C7.07179 7.47212 7.01851 7.37113 7.004 7.26109C6.9895 7.15104 7.0147 7.03939 7.07487 6.9468L8.87594 4.20001L9.64355 4.7236L8.28967 6.74073H10.1497C10.2588 6.74105 10.3642 6.78147 10.4462 6.85465C10.5282 6.92793 10.5815 7.02881 10.596 7.13886C10.6105 7.2489 10.5853 7.36055 10.5251 7.45325L8.72406 10.2Z" 
-				fill="black"/>
-		</svg>
-		<svg
-			v-if="this.name=='chevron-down-accordion'"
-          	class="w-3 transition-all duration-200 transform"
-          	:class="this.class"
+			v-if="this.name == 'add-response'"
+			:class="this.class"
 			:width="this.width"
 			:height="this.height"
-          	fill="none"
-          	stroke="currentColor"
-          	xmlns="http://www.w3.org/2000/svg"
-          	viewBox="0 0 16 10"
-          	aria-hidden="true"
-        >
-          <path
-            d="M15 1.2l-7 7-7-7"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+			viewBox="0 0 17 17"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M10.0783 2.05H4.97627L4.00006 2.05C2.61935 2.05 1.50006 3.16929 1.50006 4.55V8.32288V8.32289L1.50003 10.121C1.50001 11.5018 2.61931 12.6211 4.00003 12.6211H7.87765L7.87765 13.8306C7.87765 14.6723 8.85393 15.1375 9.50759 14.6073L11.8186 12.7328C11.9077 12.6605 12.0189 12.6211 12.1336 12.6211H12.7552C14.1359 12.6211 15.2552 11.5018 15.2552 10.1211V8.32289V4.54999C15.2552 3.16928 14.1359 2.04999 12.7552 2.04999L10.0783 2.05Z"
+				stroke="#1F272E"
+				stroke-miterlimit="10"
+				stroke-linecap="square"
+			/>
+			<path
+				d="M8.72406 10.2L7.95645 9.69359L9.28934 7.65922H7.45026C7.34116 7.659 7.23577 7.61848 7.15378 7.5453C7.07179 7.47212 7.01851 7.37113 7.004 7.26109C6.9895 7.15104 7.0147 7.03939 7.07487 6.9468L8.87594 4.20001L9.64355 4.7236L8.28967 6.74073H10.1497C10.2588 6.74105 10.3642 6.78147 10.4462 6.85465C10.5282 6.92793 10.5815 7.02881 10.596 7.13886C10.6105 7.2489 10.5853 7.36055 10.5251 7.45325L8.72406 10.2Z"
+				fill="black"
+			/>
+		</svg>
 		<svg
-			v-if="this.name=='add-new'"
-			:class="this.class" 
-			:width="this.width" 
-			:height="this.height" 
-			viewBox="0 0 24 24" 
-			fill="none" 
-			xmlns="http://www.w3.org/2000/svg">
-			<rect 
-				:width="24" 
-				:height="24" 
-				rx="6" 
-				fill="#F4F5F6"/>
-				<path 
-				d="M12 8V16" 
-				stroke="#1F272E" 
-				stroke-miterlimit="10" 
-				stroke-linecap="round" 
-				stroke-linejoin="round"/>
-				<path 
-				d="M8 12H16" 
-				stroke="#1F272E" 
-				stroke-miterlimit="10" 
-				stroke-linecap="round" 
-				stroke-linejoin="round"/>
+			v-if="this.name == 'chevron-down-accordion'"
+			class="w-3 transition-all duration-200 transform"
+			:class="this.class"
+			:width="this.width"
+			:height="this.height"
+			fill="none"
+			stroke="currentColor"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 16 10"
+			aria-hidden="true"
+		>
+			<path
+				d="M15 1.2l-7 7-7-7"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+		</svg>
+		<svg
+			v-if="this.name == 'add-new'"
+			:class="this.class"
+			:width="this.width"
+			:height="this.height"
+			viewBox="0 0 24 24"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<rect :width="24" :height="24" rx="6" fill="#F4F5F6" />
+			<path
+				d="M12 8V16"
+				stroke="#1F272E"
+				stroke-miterlimit="10"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			<path
+				d="M8 12H16"
+				stroke="#1F272E"
+				stroke-miterlimit="10"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
 		</svg>
 
 		<svg

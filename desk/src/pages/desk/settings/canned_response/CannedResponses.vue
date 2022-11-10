@@ -5,7 +5,7 @@
 			class="px-[16px]"
 			:options="{
 				doctype: 'Canned Response',
-				fields: ['title','owner'],
+				fields: ['title', 'owner'],
 				limit: 20,
 			}"
 			@selection="
@@ -16,7 +16,10 @@
 							'Canned Responses Bulk'
 						)
 					} else {
-						$event.emit('show-top-panel-actions-settings', 'CannedResponses')
+						$event.emit(
+							'show-top-panel-actions-settings',
+							'CannedResponses'
+						)
 					}
 				}
 			"
@@ -45,10 +48,10 @@ import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedRe
 export default {
 	name: "Canned Responses",
 	components: {
-    CannedResponseList,
-    ListManager,
-    AddNewCannedResponsesDialog
-},
+		CannedResponseList,
+		ListManager,
+		AddNewCannedResponsesDialog,
+	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
 		const showNewCannedResponsesDialog = ref(false)
@@ -82,7 +85,6 @@ export default {
 				method: "frappedesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
-
 				},
 				onError: (err) => {
 					this.$refs.listManager.manager.reload()

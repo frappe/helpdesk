@@ -1,28 +1,24 @@
 <template>
 	<div>
 		<Dialog
-			:options="{ title: 'New canned response', size: '3xl'}"
+			:options="{ title: 'New canned response', size: '3xl' }"
 			:show="show"
 			@close="close()"
 			class="bg-white px-6 py-5 pb-1 pt-6"
 		>
 			<template #body-content>
 				<div class="flex flex-col mt-6">
-
-						<Input
-							id="searchInput"
-							class="w-full"
-							type="text"
-							label="Title"
-							placeholder="Enter Title"
-							v-model="title"
-							/>
-							<ErrorMessage :message="titleValidationError" />
-
+					<Input
+						id="searchInput"
+						class="w-full"
+						type="text"
+						label="Title"
+						placeholder="Enter Title"
+						v-model="title"
+					/>
+					<ErrorMessage :message="titleValidationError" />
 				</div>
-				<div
-					class="mb-2 block text-sm leading-4 text-gray-700 mt-4"
-				>
+				<div class="mb-2 block text-sm leading-4 text-gray-700 mt-4">
 					Message
 				</div>
 				<div>
@@ -32,24 +28,23 @@
 						editor-class="min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3 max-w-full"
 						:content="message"
 						:starterkit-options="{
-						heading: { levels: [2, 3, 4, 5, 6] },
+							heading: { levels: [2, 3, 4, 5, 6] },
 						}"
-						@change="(val)=>{
-							message=val
-						}"
+						@change="
+							(val) => {
+								message = val
+							}
+						"
 					>
-
-					<template v-slot:top>
-						<div>
-							<TextEditorFixedMenu
-								class="m-3 overflow-x-auto"
-								:buttons="textEditorMenuButtons"
-							/>
-						</div>
-					</template>
-
+						<template v-slot:top>
+							<div>
+								<TextEditorFixedMenu
+									class="m-3 overflow-x-auto"
+									:buttons="textEditorMenuButtons"
+								/>
+							</div>
+						</template>
 					</TextEditor>
-					
 				</div>
 				<ErrorMessage :message="messageValidationError" />
 			</template>
@@ -57,7 +52,7 @@
 				<Button
 					appearance="primary"
 					@click="addResponse()"
-                    class="mr-auto"
+					class="mr-auto"
 					>Add Response</Button
 				>
 			</template>
@@ -78,33 +73,31 @@ export default {
 		FeatherIcon,
 		ErrorMessage,
 		TextEditor,
-		TextEditorFixedMenu
+		TextEditorFixedMenu,
 	},
 	setup() {
-
-		const titleValidationError=ref("")
-		const messageValidationError=ref("")
+		const titleValidationError = ref("")
+		const messageValidationError = ref("")
 		return {
 			titleValidationError,
-			messageValidationError
+			messageValidationError,
 		}
 	},
 
-	data(){
-		return{
-			title:"",
-			message:""
+	data() {
+		return {
+			title: "",
+			message: "",
 		}
-
 	},
 
-	watch:{
-		title(newValue){
+	watch: {
+		title(newValue) {
 			this.validateTitle(newValue)
 		},
-		message(newValue){
+		message(newValue) {
 			this.validateMessage(newValue)
-		}
+		},
 	},
 	computed: {
 		textEditorMenuButtons() {
@@ -161,73 +154,70 @@ export default {
 			this.message = ""
 			this.$emit("close")
 		},
-		addResponse(){
+		addResponse() {
 			if (this.validateInputs()) {
 				return
 			}
-			const inputParams={
-				title:this.title,
-				message:this.message
+			const inputParams = {
+				title: this.title,
+				message: this.message,
 			}
 			this.$resources.newResponse.submit({
-				doc:{
-					doctype:"Canned Response",
+				doc: {
+					doctype: "Canned Response",
 					...inputParams,
-				}
+				},
 			})
 		},
-		validateInputs(){
+		validateInputs() {
 			let error = this.validateTitle(this.title)
 			error += this.validateMessage(this.message)
 
 			return error
 		},
-		validateTitle(value){
+		validateTitle(value) {
 			this.titleValidationError = ""
-			if(!value){
-				this.titleValidationError="Title is required"
-			}
-			else if(value.trim() == ""){
+			if (!value) {
+				this.titleValidationError = "Title is required"
+			} else if (value.trim() == "") {
 				this.titleValidationError = "Title is required"
 			}
 
 			return this.titleValidationError
-
 		},
 
-		validateMessage(value){
+		validateMessage(value) {
 			this.messageValidationError = ""
-			if(!value){
+			if (!value) {
 				this.messageValidationError = "Message is required"
-			}
-			else if(
+			} else if (
 				["<p><br></p>", "<p></p>"].includes(value.replaceAll(" ", ""))
-			){
+			) {
 				this.messageValidationError = "Message is required"
 			}
 
 			return this.messageValidationError
-		}
+		},
 	},
 	resources: {
-		newResponse(){
+		newResponse() {
 			return {
-				method:"frappe.client.insert",
-				onSuccess: (doc)=>{
+				method: "frappe.client.insert",
+				onSuccess: (doc) => {
 					this.$router.push(
 						`/frappedesk/settings/canned_responses/${doc.name}`
 					)
 				},
-				onError: (err)=>{
+				onError: (err) => {
 					this.$toast({
 						title: "Error while creating canned response",
 						text: err,
 						customIcon: "circle-fail",
 						appearance: "danger",
 					})
-				}
+				},
 			}
-		}
+		},
 	},
 }
 </script>

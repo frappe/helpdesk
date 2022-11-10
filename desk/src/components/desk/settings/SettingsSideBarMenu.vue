@@ -36,7 +36,7 @@ export default {
 					label: "Canned Responses",
 					pageName: "CannedResponses",
 					route: "/frappedesk/settings/canned_response",
-				},	
+				},
 				{
 					label: "Email Accounts",
 					pageName: "Emails",

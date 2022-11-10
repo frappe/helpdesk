@@ -15,7 +15,6 @@
 				<div class="sm:w-10/12">Title</div>
 				<div class="sm:w-2/12">Author</div>
 				<div class="sm:w-2/12"></div>
-				
 			</div>
 		</div>
 		<div

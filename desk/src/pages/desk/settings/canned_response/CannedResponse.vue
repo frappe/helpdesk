@@ -13,8 +13,8 @@ export default {
 	name: "CannedResponse",
 	props: ["canned_responseId"],
 	components: {
-    CannedResponseInfo
-},
+		CannedResponseInfo,
+	},
 	setup() {},
 	mounted() {
 		this.$event.emit("set-selected-setting", "Canned Responses")

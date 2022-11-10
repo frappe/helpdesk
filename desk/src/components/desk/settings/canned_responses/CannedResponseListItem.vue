@@ -3,7 +3,11 @@
 		class="block select-none rounded-[6px] py-[7px] px-[11px]"
 		:class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'"
 	>
-		<div v-if="canned_response" role="button" class="flex items-center text-base">
+		<div
+			v-if="canned_response"
+			role="button"
+			class="flex items-center text-base"
+		>
 			<div class="w-[37px] h-[14px] flex items-center">
 				<Input
 					type="checkbox"
@@ -22,9 +26,7 @@
 				<div class="sm:w-2/12 truncate pr-10">
 					{{ canned_response.owner }}
 				</div>
-				<div class="sm:w-2/12 truncate">
-
-				</div>
+				<div class="sm:w-2/12 truncate"></div>
 			</router-link>
 		</div>
 	</div>
