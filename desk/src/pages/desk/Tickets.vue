@@ -98,7 +98,9 @@
 							role="button"
 							class="line-clamp-1 hover:text-gray-900 text-gray-600"
 							:class="{
-								'font-semibold text-gray-900': !row._seen,
+								'font-semibold text-gray-900': !(
+									JSON.parse(row._seen) || []
+								).includes(user.user),
 							}"
 						>
 							{{ value }}
