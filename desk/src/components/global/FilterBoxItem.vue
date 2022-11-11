@@ -23,7 +23,8 @@
 			<div v-if="['like', 'not like'].includes(filter.filter_type)">
 				<input
 					type="text"
-					@input="onInput"
+					@input="(val) => onInput(val, true)"
+					@change="(val) => onInput(val, false)"
 					:value="filter.value"
 					class="h-2 focus:ring-0 border-0 bg-transparent px-2 text-base text-gray-700"
 				/>
@@ -40,7 +41,7 @@
 							}
 							// onInput is not used, since Autocomplete input already uses debounce for input handle
 							filter.value = item.value
-							$emit('add-filter', filter)
+							$emit('add-filter')
 						}
 					"
 					:resourceOptions="getResourceOptions(filter)"
@@ -57,7 +58,8 @@
 					type="date"
 					class="h-2 border-0 bg-transparent text-base text-gray-700 focus:ring-0 px-1"
 					role="button"
-					@input="onInput"
+					:value="filter.value"
+					@input="(val) => onInput(val, false)"
 				/>
 			</div>
 		</div>
@@ -120,7 +122,7 @@ export default {
 						if (!this.filter.value) {
 							this.toggleDropdown("value")
 						} else {
-							this.$emit("add-filter", this.filter)
+							this.$emit("add-filter")
 						}
 					},
 				}
@@ -150,11 +152,11 @@ export default {
 		},
 	},
 	methods: {
-		onInput: debounce(function (val) {
+		onInput: debounce(function (val, intermediate = true) {
 			// for datepicker & text input, inputs only
-			console.log(val.target.value)
+			// intermediate parameter is used to restric updating url query filters on every input
 			this.filter.value = val.target.value
-			this.$emit("add-filter", this.filter)
+			this.$emit("add-filter", intermediate)
 		}, 300),
 		toggleDropdown(item) {
 			switch (item) {

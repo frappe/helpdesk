@@ -26,6 +26,7 @@ export default {
 	},
 	setup() {
 		const manager = inject("manager")
+		const renderOptions = inject("renderOptions")
 		const user = inject("user")
 
 		const title = ref(`All ${manager.value.options.doctype}s`)
@@ -34,6 +35,7 @@ export default {
 
 		return {
 			manager,
+			renderOptions,
 			user,
 			title,
 			presetFilters,
@@ -74,7 +76,7 @@ export default {
 										this.presetFilters = [...item.filters]
 										this.manager.addFilters(
 											[...item.filters],
-											false
+											this.renderOptions.urlQueryFilters
 										)
 									},
 									filters: [...item.filters],

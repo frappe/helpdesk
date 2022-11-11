@@ -6,11 +6,13 @@
 
 <script>
 import { ref, computed, watch, provide, inject } from "vue"
+import { useRouter } from "vue-router"
 
 export default {
 	name: "ListManager",
 	props: ["options"],
 	setup(props, context) {
+		const router = useRouter()
 		const user = inject("user")
 		const options = ref({
 			handle_row_click: () => {},
@@ -97,30 +99,38 @@ export default {
 				]
 				return executableFilter
 			},
-			addFilters: (sudoFilters, append = true) => {
+			addFilters: (sudoFilters, addToUrlQuery) => {
 				let executableFilters = []
 				for (let i in sudoFilters) {
 					executableFilters.push(
 						manager.value.generateExecutableFilter(sudoFilters[i])
 					)
 				}
-				manager.value.applyFilters(
-					sudoFilters,
-					executableFilters,
-					append
-				)
+				manager.value.applyFilters(sudoFilters, executableFilters)
+				if (addToUrlQuery) {
+					let query = {}
+					sudoFilters.forEach((filter) => {
+						let fieldname = filter.fieldname
+						let filter_type = filter.filter_type
+						let value =
+							filter.fieldname == "_assign" &&
+							filter.value == "@me"
+								? user.value.user
+								: filter.value
+
+						query[fieldname] = JSON.stringify([filter_type, value])
+					})
+					// let urlQueryStr = ""
+					// if (Object.keys(query).length > 0) {
+					// 	urlQueryStr = `?${new URLSearchParams(query)}`
+					// }
+					router.replace({ query })
+				}
 			},
-			applyFilters: (sudoFilters, executableFilters, append = true) => {
+			applyFilters: (sudoFilters, executableFilters) => {
 				// applyFilters should be called with a list of executable filters only
 				let finaleExecutableFilters = []
-				if (append) {
-					finaleExecutableFilters = [
-						...manager.value.options.filters,
-						...executableFilters,
-					]
-				} else {
-					finaleExecutableFilters = executableFilters
-				}
+				finaleExecutableFilters = executableFilters
 				manager.value.update({
 					filters: finaleExecutableFilters,
 				})
