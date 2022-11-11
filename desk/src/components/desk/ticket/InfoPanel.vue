@@ -312,7 +312,9 @@
 								:to="
 									index < maxCount
 										? `/frappedesk/tickets/${_ticket.name}`
-										: `/frappedesk/tickets/?contact=${ticket.contact.name}&menu_filter=all&page=1`
+										: `/frappedesk/tickets/?contact=${JSON.stringify(
+												['is', ticket.contact.name]
+										  )}`
 								"
 								class="text-[12px] rounded"
 							>

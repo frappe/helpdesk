@@ -120,10 +120,6 @@ export default {
 
 						query[fieldname] = JSON.stringify([filter_type, value])
 					})
-					// let urlQueryStr = ""
-					// if (Object.keys(query).length > 0) {
-					// 	urlQueryStr = `?${new URLSearchParams(query)}`
-					// }
 					router.replace({ query })
 				}
 			},
