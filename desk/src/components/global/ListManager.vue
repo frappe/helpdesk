@@ -24,6 +24,7 @@ export default {
 			doctype: props.options.doctype,
 			filters: props.options.filters || [],
 			limit: props.options.limit || 20,
+			start: 0,
 			order_by: props.options.order_by || "",
 		})
 
@@ -36,6 +37,7 @@ export default {
 				order_by: options.value.order_by,
 				filters: options.value.filters,
 				limit: options.value.limit,
+				start: options.value.start,
 				realtime: true,
 			},
 			context
@@ -167,7 +169,8 @@ export default {
 					}`
 				}
 			}
-			manager.value.update({ order_by: newOrderBy })
+			update({ order_by: newOrderBy })
+			reload()
 		}
 
 		const onClick = (rowData) => {
