@@ -9,6 +9,7 @@
 			:options="{
 				cache: ['Ticket', 'Desk'],
 				urlQueryFilters: true,
+				saveFiltersLocally: true,
 				doctype: 'Ticket',
 				fields: [
 					'_assign',
