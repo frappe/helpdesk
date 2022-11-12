@@ -48,7 +48,10 @@ export default {
 	inject: ["manager", "renderOptions"],
 	mounted() {
 		if (this.renderOptions.urlQueryFilters) {
-			this.convertUrlQueryToFilters()
+			this.manager.sudoFilters = this.convertUrlQueryToFilters()
+			this.$nextTick(() => {
+				this.applyFilters(true)
+			})
 		}
 	},
 	computed: {
@@ -121,10 +124,7 @@ export default {
 				}
 				filters.push(filter)
 			}
-			this.manager.sudoFilters = filters
-			this.$nextTick(() => {
-				this.applyFilters()
-			})
+			return filters
 		},
 		convertFieldNameToLabel(fieldname) {
 			switch (fieldname) {

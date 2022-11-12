@@ -44,14 +44,12 @@ export default {
 	mounted() {
 		this.$socket.on("list_update", (data) => {
 			if (data.doctype === "FD Preset Filter") {
-				this.$resources.presetFilterOptions.fetch().then(() => {
-					this.sync()
-				})
+				this.$resources.presetFilterOptions.fetch()
 			}
 		})
 	},
 	watch: {
-		filters(val) {
+		filters() {
 			this.sync()
 		},
 	},
@@ -86,6 +84,9 @@ export default {
 					}
 				})
 			}
+			this.$nextTick(() => {
+				this.sync()
+			})
 			return options
 		},
 	},
@@ -102,6 +103,13 @@ export default {
 				for (let i = 0; i < a.length; i++) {
 					if (a[i].fieldname !== b[i].fieldname) {
 						return false
+					}
+					if (
+						a[i].fieldname === "_assign" &&
+						a[i].value === "@me" &&
+						b[i].value === this.user.user
+					) {
+						continue
 					}
 					if (a[i].filter_type !== b[i].filter_type) {
 						return false
