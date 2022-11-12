@@ -1,71 +1,339 @@
 <template>
-	<div class="flex flex-col w-full">
-		<div class="flex border-b h-[52px] px-[24px] shrink-0">
-			<div class="grow my-auto text-[16px] font-semibold text-gray-900">
-				Tickets
-			</div>
-		</div>
-		<div class="w-full max-w-full grow-0">
-			<ListManager
-				ref="miniTicketList"
-				:options="{
-					doctype: 'Ticket',
-					fields: ['subject', 'ticket_type', 'status', '_seen'],
-					limit: 50,
-					order_by: 'modified desc',
-					filters: {
-						contact: ['=', contact],
-					},
-				}"
-			>
-				<template #body="{ manager }">
-					<div>
-						<MiniTicketList
-							:manager="manager"
-							size="lg"
-							class="overflow-y-scroll"
-							:style="{
-								height:
-									viewportWidth > 768
-										? 'calc(100vh - 144px)'
-										: null,
+	<div class="flex flex-col h-full px-4">
+		<div
+			v-if="false"
+			class="text-green-600 text-gray-600 text-green-500 bg-green-100 border-green-500 text-yellow-500 bg-yellow-100 border-yellow-500 text-orange-500 bg-orange-100 border-orange-500 text-red-500 bg-red-100 border-red-500"
+		/>
+		<ListManager
+			ref="miniTicketList"
+			:options="{
+				doctype: 'Ticket',
+				fields: [
+					'_assign',
+					'status',
+					'priority',
+					'subject',
+					'ticket_type',
+					'creation',
+					'modified',
+					'name',
+					'_seen',
+				],
+				limit: 20,
+				order_by: 'modified desc',
+				filters: {
+					contact: ['=', contact],
+				},
+			}"
+		>
+			<template #body="{ manager }">
+				<ListViewer
+					:options="{
+						base: 24,
+						fields: {
+							name: {
+								label: '#',
+								width: '1',
+							},
+							subject: {
+								label: 'Subject',
+								width: '9',
+							},
+							status: {
+								label: 'Status',
+								width: '3',
+							},
+							ticket_type: {
+								label: 'Type',
+								width: '4',
+							},
+							priority: {
+								label: 'Priority',
+								width: '5',
+							},
+							creation: {
+								label: 'Created',
+								width: '2',
+							},
+							_assign: {
+								label: ' ',
+								width: '1',
+								align: 'right',
+							},
+						},
+					}"
+					class="text-base h-[93vh] pt-4"
+				>
+					<template #top-sub-section-1>
+						<div class="text-xl font-semibold py-2">Tickets</div>
+					</template>
+					<template #field-name="{ value }">
+						<div class="text-xs text-gray-500">
+							{{ value }}
+						</div>
+					</template>
+					<template #field-subject="{ value, row }">
+						<router-link
+							:to="{
+								path: `/frappedesk/tickets/${row.name}`,
 							}"
-						/>
-						<div class="pb-2">
-							<Button
-								v-if="manager.hasNextPage"
-								@click="manager.nextPage()"
+							role="button"
+							class="line-clamp-1 hover:text-gray-900 text-gray-600"
+							:class="{
+								'font-semibold text-gray-900': !(
+									JSON.parse(row._seen) || []
+								).includes(user.user),
+							}"
+						>
+							{{ value }}
+						</router-link>
+					</template>
+					<template #field-status="{ value }">
+						<div class="flex flex-row items-center space-x-1">
+							<FeatherIcon
+								v-if="value != 'Open'"
+								:name="
+									{
+										Closed: 'lock',
+										Resolved: 'check',
+										Replied: 'corner-up-left',
+									}[value]
+								"
+								class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]"
+							/>
+							<CustomIcons
+								v-else
+								name="comment"
+								class="w-[16px] h-[16px] stroke-green-600"
+							/>
+							<div
+								class="text-base font-normal"
+								:class="{
+									'text-green-600': value == 'Open',
+									'text-gray-600': value != 'Open',
+								}"
 							>
-								Load More
+								{{ value }}
+							</div>
+						</div>
+					</template>
+					<template #field-priority="{ value }">
+						<div class="flex flex-row items-center space-x-1">
+							<div
+								class="text-sm font-semibold px-2 border rounded-lg"
+								:class="{
+									'text-green-500 bg-green-100 border-green-500':
+										value == 'Low',
+									'text-yellow-500 bg-yellow-100 border-yellow-500':
+										value == 'Medium',
+									'text-orange-500 bg-orange-100 border-orange-500':
+										value == 'High',
+									'text-red-500 bg-red-100 border-red-500':
+										value == 'Urgent',
+								}"
+							>
+								{{ value.toLowerCase() }}
+							</div>
+						</div>
+					</template>
+					<template #field-ticket_type="{ value }">
+						<div v-if="value" class="text-gray-600">
+							{{ value }}
+						</div>
+					</template>
+					<template #field-creation="{ value }">
+						<Tooltip
+							placement="top"
+							:text="`Created on ${$dayjs(value)}`"
+						>
+							<div class="text-gray-500">
+								{{ $dayjs(value).format("DD MMM") }}
+							</div>
+						</Tooltip>
+					</template>
+					<template #field-modified="{ value }">
+						<div class="text-gray-500">
+							{{
+								$dayjs.shortFormating(
+									$dayjs(value).fromNow(),
+									true
+								)
+							}}
+						</div>
+					</template>
+					<template #field-_assign="{ value }">
+						<AgentAvatar :agent="JSON.parse(value)[0]" />
+					</template>
+
+					<template #bulk-actions="{ selectedItems }">
+						<div class="flex flex-row space-x-2">
+							<Dropdown
+								placement="right"
+								:options="agentsAsDropdownOptions()"
+							>
+								<template v-slot="{ toggleDropdown }">
+									<Button
+										:loading="
+											$resources.bulkAssignTicketToAgent
+												.loading
+										"
+										icon-right="chevron-down"
+										class="ml-2"
+										@click="toggleDropdown"
+									>
+										Assign to
+									</Button>
+								</template>
+							</Dropdown>
+							<!-- <Button @click="() => {}">Add to FAQ</Button> -->
+							<Button
+								@click="
+									() => {
+										$resources.bulkAssignTicketStatus
+											.submit({
+												ticket_ids:
+													Object.keys(selectedItems),
+												status: 'Closed',
+											})
+											.then(() => {
+												manager.unselect()
+												manager.reload()
+											})
+									}
+								"
+							>
+								Close Ticket
 							</Button>
 						</div>
-					</div>
-				</template>
-			</ListManager>
-		</div>
+					</template>
+				</ListViewer>
+			</template>
+		</ListManager>
 	</div>
 </template>
 
 <script>
-import MiniTicketList from "@/components/desk/global/MiniTicketList.vue"
 import ListManager from "@/components/global/ListManager.vue"
-import { inject } from "vue"
+import ListViewer from "@/components/global/ListViewer.vue"
+import AgentAvatar from "@/components/global/AgentAvatar.vue"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
 
 export default {
 	name: "ContactRelatedInfo",
 	props: ["contact"],
 	components: {
-		MiniTicketList,
 		ListManager,
+		ListViewer,
+		AgentAvatar,
+		FeatherIcon,
+		Dropdown,
+		Tooltip,
+		CustomIcons,
 	},
-	setup() {
-		const viewportWidth = inject("viewportWidth")
+	inject: ["agents", "user"],
+	methods: {
+		agentsAsDropdownOptions() {
+			let agentItems = []
+			if (this.agents) {
+				this.agents.forEach((agent) => {
+					agentItems.push({
+						label: agent.agent_name,
+						handler: () => {
+							console.log(this.$refs.miniTicketList.manager)
+							this.$resources.bulkAssignTicketToAgent.submit({
+								ticket_ids: Object.keys(
+									this.$refs.miniTicketList.manager
+										.selectedItems
+								),
+								agent_id: agent.name,
+							})
+						},
+					})
+				})
+				let options = []
+				if (this.user.agent) {
+					options.push({
+						group: "Myself",
+						hideLabel: true,
+						items: [
+							{
+								label: "Assign to me",
+								handler: () => {
+									this.$resources.bulkAssignTicketToAgent.submit(
+										{
+											ticket_ids: Object.keys(
+												this.$refs.miniTicketList
+													.manager.selectedItems
+											),
+											agent_id: this.user.agent.name,
+										}
+									)
+								},
+							},
+						],
+					})
+				}
+				options.push({
+					group: "All Agents",
+					hideLabel: true,
+					items: agentItems,
+				})
+				return options
+			} else {
+				return null
+			}
+		},
+	},
+	resources: {
+		bulkAssignTicketStatus() {
+			return {
+				method: "frappedesk.api.ticket.bulk_assign_ticket_status",
+				onSuccess: (res) => {
+					this.$refs.miniTicketList.manager.selectedItems = []
+					this.$refs.miniTicketList.manager.reload()
 
-		return {
-			viewportWidth,
-		}
+					this.$toast({
+						title: `Tickets marked as ${res.status}.`,
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+
+					this.$event.emit("update_ticket_list")
+				},
+				onError: () => {
+					this.$toast({
+						title: "Unable to mark tickets as closed.",
+						customIcon: "circle-fail",
+						appearance: "danger",
+					})
+				},
+			}
+		},
+		bulkAssignTicketToAgent() {
+			return {
+				method: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
+				onSuccess: () => {
+					this.$refs.miniTicketList.manager.selectedItems = []
+					this.$refs.miniTicketList.manager.reload()
+
+					this.$toast({
+						title: "Tickets assigned to agent.",
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+
+					this.$event.emit("update_ticket_list")
+				},
+				onError: () => {
+					this.$toast({
+						title: "Unable to assign tickets to agent.",
+						customIcon: "circle-fail",
+						appearance: "danger",
+					})
+				},
+			}
+		},
 	},
 }
 </script>
-
-<style></style>

@@ -269,6 +269,10 @@ export default {
 				reload()
 			})
 		})
+
+		return {
+			manager,
+		}
 	},
 }
 </script>
