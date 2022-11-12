@@ -46,14 +46,6 @@ export default {
 		FilterBoxItem,
 	},
 	inject: ["manager", "renderOptions"],
-	mounted() {
-		if (this.renderOptions.urlQueryFilters) {
-			this.manager.sudoFilters = this.convertUrlQueryToFilters()
-			this.$nextTick(() => {
-				this.applyFilters(true)
-			})
-		}
-	},
 	computed: {
 		showAddFilterButton() {
 			return (
@@ -79,7 +71,10 @@ export default {
 			for (let i in this.manager.options.fields) {
 				let fieldname = this.manager.options.fields[i]
 
-				let label = this.convertFieldNameToLabel(fieldname)
+				let label =
+					this.manager.helperMethods.convertFieldNameToLabel(
+						fieldname
+					)
 				if (
 					label && // monkey-patch to remove _seen from the list
 					!this.manager.sudoFilters.find(
@@ -98,47 +93,6 @@ export default {
 		},
 	},
 	methods: {
-		convertUrlQueryToFilters() {
-			let urlQuery = this.$route.query
-			let filters = []
-
-			for (let key in urlQuery) {
-				let filterType = "like"
-				let value = ""
-				urlQuery[key] = JSON.parse(urlQuery[key])
-				if (urlQuery[key].constructor.name == "Array") {
-					if (urlQuery[key].length == 1) {
-						value = urlQuery[key][0]
-					} else {
-						filterType = urlQuery[key][0]
-						value = urlQuery[key][1]
-					}
-				} else {
-					value = urlQuery[key]
-				}
-				let filter = {
-					label: this.convertFieldNameToLabel(key),
-					fieldname: key,
-					filter_type: filterType,
-					value,
-				}
-				filters.push(filter)
-			}
-			return filters
-		},
-		convertFieldNameToLabel(fieldname) {
-			switch (fieldname) {
-				case "_assign":
-					return "Assigned to"
-				case "_seen":
-					return false
-				default:
-					fieldname = fieldname.replace(/_/g, " ")
-					return (
-						fieldname.charAt(0).toUpperCase() + fieldname.slice(1)
-					)
-			}
-		},
 		createNewFilterItem(fieldname, label = "") {
 			this.manager.sudoFilters.push({
 				label: label || fieldname,
@@ -148,7 +102,7 @@ export default {
 				value: "",
 			})
 		},
-		applyFilters(dontUpdateQuery = false) {
+		applyFilters() {
 			let filters = this.manager.sudoFilters.filter((f) => {
 				if (["like", "not like"].includes(f.filter_type)) {
 					return f.fieldname && f.filter_type
@@ -157,7 +111,7 @@ export default {
 			})
 			this.manager.addFilters(
 				filters,
-				!dontUpdateQuery && this.renderOptions.urlQueryFilters
+				this.manager.options.urlQueryFilters
 			)
 		},
 	},

@@ -3,11 +3,7 @@
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
 			<div class="h-[72px] px-[20px] flex">
 				<router-link
-					:to="
-						prevRoute && prevRoute.path === '/frappedesk/tickets'
-							? prevRoute
-							: { path: '/frappedesk/tickets' }
-					"
+					:to="{ path: '/frappedesk/tickets' }"
 					class="h-[20px] my-[26px] text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
@@ -414,13 +410,7 @@ export default {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
-			prevRoute: null,
 		}
-	},
-	beforeRouteEnter(to, from, next) {
-		next((vm) => {
-			vm.prevRoute = from
-		})
 	},
 	setup() {
 		const showTextFormattingMenu = ref(true)

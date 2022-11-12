@@ -79,7 +79,7 @@ export default {
 										this.presetFilters = [...item.filters]
 										this.manager.addFilters(
 											[...item.filters],
-											this.renderOptions.urlQueryFilters
+											this.manager.options.urlQueryFilters
 										)
 									},
 									filters: [...item.filters],

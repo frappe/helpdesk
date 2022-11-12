@@ -8,6 +8,8 @@
 			ref="ticketList"
 			:options="{
 				cache: ['Ticket', 'Desk'],
+				urlQueryFilters: true,
+				saveFiltersLocally: true,
 				doctype: 'Ticket',
 				fields: [
 					'_assign',
@@ -33,7 +35,6 @@
 						base: '24',
 						filterBox: true,
 						presetFilters: true,
-						urlQueryFilters: true,
 						fields: {
 							name: {
 								label: '#',
