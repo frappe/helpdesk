@@ -240,7 +240,6 @@ export default {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
-							console.log(this.$refs.miniTicketList.manager)
 							this.$resources.bulkAssignTicketToAgent.submit({
 								ticket_ids: Object.keys(
 									this.$refs.miniTicketList.manager
