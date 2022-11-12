@@ -2,13 +2,18 @@
 	<Dropdown placement="left" :options="options">
 		<template v-slot="{ toggleDropdown }">
 			<div
-				class="flex flex-row items-center space-x-1 cursor-pointer select-none"
+				class="flex flex-row items-center space-x-1 select-none"
+				:class="{ 'cursor-pointer': options.length > 0 }"
 				@click="toggleDropdown"
 			>
 				<div class="text-lg font-semibold">
 					{{ `${title} (${manager.totalCount})` }}
 				</div>
-				<FeatherIcon name="chevron-down" class="h-4 w-4 stroke-2" />
+				<FeatherIcon
+					v-if="options.length > 0"
+					name="chevron-down"
+					class="h-4 w-4 stroke-2"
+				/>
 			</div>
 		</template>
 	</Dropdown>
