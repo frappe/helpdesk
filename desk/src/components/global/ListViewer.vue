@@ -262,6 +262,7 @@ import FilterBox from "@/components/global/FilterBox.vue"
 import ListPageController from "@/components/global/ListPageController.vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
 import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
+import { ref, computed, provide } from "vue"
 
 export default {
 	name: "ListViewer",
@@ -281,29 +282,32 @@ export default {
 		FeatherIcon,
 		SaveFiltersDialog,
 	},
-	data() {
-		return {
-			showSaveFiltersDialog: false,
-		}
-	},
-	computed: {
-		renderOptions() {
+	setup(props) {
+		const showSaveFiltersDialog = ref(false)
+		const renderOptions = computed(() => {
 			const options = {
 				fields: {},
-				base: this.options.base || "12",
-				filterBox: this.options.filterBox || false,
-				presetFilters: this.options.presetFilters || false,
+				base: props.options.base || "12",
+				filterBox: props.options.filterBox || false,
+				presetFilters: props.options.presetFilters || false,
+				urlQueryFilters: props.options.urlQueryFilters || false,
 			}
-			for (let i in this.options.fields) {
+			for (let i in props.options.fields) {
 				options.fields[i] = {
-					label: this.options.fields[i].label || i,
-					width: this.options.fields[i].width || 1,
-					priority: this.options.fields[i].priority || 5,
-					align: this.options.fields[i].align || "left",
+					label: props.options.fields[i].label || i,
+					width: props.options.fields[i].width || 1,
+					priority: props.options.fields[i].priority || 5,
+					align: props.options.fields[i].align || "left",
 				}
 			}
 			return options
-		},
+		})
+		provide("renderOptions", renderOptions)
+
+		return {
+			showSaveFiltersDialog,
+			renderOptions,
+		}
 	},
 }
 </script>
