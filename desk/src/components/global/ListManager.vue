@@ -22,6 +22,7 @@ export default {
 		const options = ref({
 			handleRowClick: () => {},
 			urlQueryFilters: props.options.urlQueryFilters || false,
+			saveFiltersLocally: props.options.saveFiltersLocally || false,
 			cache: props.options.cache || null,
 			fields: [...new Set([...(props.options.fields || []), "name"])],
 			doctype: props.options.doctype,
@@ -144,8 +145,13 @@ export default {
 
 					query[fieldname] = JSON.stringify([filter_type, value])
 				})
-				// adding to the route will trigger the route(watcher) to apply filters
 				router.replace({ query })
+				if (
+					Object.keys(query).length == 0 &&
+					options.value.saveFiltersLocally
+				) {
+					applyFilters()
+				}
 			} else {
 				let executableFilters = []
 				for (let i in sudoFilters) {
@@ -153,10 +159,16 @@ export default {
 						generateExecutableFilter(sudoFilters[i])
 					)
 				}
-				applyFilters(executableFilters)
+				applyFilters(sudoFilters, executableFilters)
 			}
 		}
-		const applyFilters = (executableFilters) => {
+		const applyFilters = (sudoFilters = [], executableFilters = []) => {
+			if (options.value.saveFiltersLocally) {
+				localStorage.setItem(
+					`list_filters_${route.path}`,
+					JSON.stringify(sudoFilters || [])
+				)
+			}
 			manager.value.update({
 				filters: executableFilters,
 			})
@@ -315,9 +327,18 @@ export default {
 
 		onMounted(() => {
 			nextTick(() => {
-				if (options.value.urlQueryFilters) {
+				if (
+					options.value.urlQueryFilters &&
+					Object.keys(route.query).length > 0
+				) {
 					sudoFilters.value = convertUrlQueryToFilters()
 					addFilters(sudoFilters.value, false)
+				} else if (options.value.saveFiltersLocally) {
+					sudoFilters.value = JSON.parse(
+						localStorage.getItem(`list_filters_${route.path}`) ||
+							"[]"
+					)
+					addFilters(sudoFilters.value, options.value.urlQueryFilters)
 				}
 				reload()
 			})
