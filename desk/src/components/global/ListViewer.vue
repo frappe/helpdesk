@@ -290,7 +290,6 @@ export default {
 				base: props.options.base || "12",
 				filterBox: props.options.filterBox || false,
 				presetFilters: props.options.presetFilters || false,
-				urlQueryFilters: props.options.urlQueryFilters || false,
 			}
 			for (let i in props.options.fields) {
 				options.fields[i] = {

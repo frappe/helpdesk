@@ -6,7 +6,7 @@
 
 <script>
 import { ref, computed, watch, provide, inject, nextTick } from "vue"
-import { useRouter } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
 import { createListResource, createResource } from "frappe-ui"
 import { onMounted } from "@vue/runtime-core"
 
@@ -15,10 +15,13 @@ export default {
 	props: ["options"],
 	setup(props, context) {
 		const router = useRouter()
+		const route = useRoute()
+
 		const user = inject("user")
 
 		const options = ref({
 			handleRowClick: () => {},
+			urlQueryFilters: props.options.urlQueryFilters || false,
 			cache: props.options.cache || null,
 			fields: [...new Set([...(props.options.fields || []), "name"])],
 			doctype: props.options.doctype,
@@ -233,6 +236,48 @@ export default {
 			return rowData.name in selectedItems.value
 		}
 
+		const convertFieldNameToLabel = (fieldname) => {
+			switch (fieldname) {
+				case "_assign":
+					return "Assigned to"
+				case "_seen":
+					return false
+				default:
+					fieldname = fieldname.replace(/_/g, " ")
+					return (
+						fieldname.charAt(0).toUpperCase() + fieldname.slice(1)
+					)
+			}
+		}
+		const convertUrlQueryToFilters = () => {
+			let urlQuery = route.query
+			let filters = []
+
+			for (let key in urlQuery) {
+				let filterType = "like"
+				let value = ""
+				urlQuery[key] = JSON.parse(urlQuery[key])
+				if (urlQuery[key].constructor.name == "Array") {
+					if (urlQuery[key].length == 1) {
+						value = urlQuery[key][0]
+					} else {
+						filterType = urlQuery[key][0]
+						value = urlQuery[key][1]
+					}
+				} else {
+					value = urlQuery[key]
+				}
+				let filter = {
+					label: convertFieldNameToLabel(key),
+					fieldname: key,
+					filter_type: filterType,
+					value,
+				}
+				filters.push(filter)
+			}
+			return filters
+		}
+
 		const manager = ref({
 			options,
 
@@ -261,11 +306,19 @@ export default {
 			selectedItems,
 			allItemsSelected,
 			itemSelected,
+
+			helperMethods: {
+				convertFieldNameToLabel,
+			},
 		})
 		provide("manager", manager)
 
 		onMounted(() => {
 			nextTick(() => {
+				if (options.value.urlQueryFilters) {
+					sudoFilters.value = convertUrlQueryToFilters()
+					addFilters(sudoFilters.value, false)
+				}
 				reload()
 			})
 		})
