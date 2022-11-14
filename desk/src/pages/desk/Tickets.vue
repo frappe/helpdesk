@@ -237,7 +237,7 @@ export default {
 						handler: () => {
 							this.$resources.bulkAssignTicketToAgent.submit({
 								ticket_ids: Object.keys(
-									this.$refs.ticketList.selectedItems
+									this.$refs.ticketList.manager.selectedItems
 								),
 								agent_id: agent.name,
 							})
@@ -256,7 +256,7 @@ export default {
 									this.$resources.bulkAssignTicketToAgent.submit(
 										{
 											ticket_ids: Object.keys(
-												this.$refs.ticketList
+												this.$refs.ticketList.manager
 													.selectedItems
 											),
 											agent_id: this.user.agent.name,
@@ -284,7 +284,7 @@ export default {
 				method: "frappedesk.api.ticket.bulk_assign_ticket_status",
 				onSuccess: (res) => {
 					//res: {docs: Ticket Docs, status: NewStatus}
-					this.$refs.ticketList.selectedItems = []
+					this.$refs.ticketList.manager.selectedItems = []
 					this.$refs.ticketList.manager.reload()
 
 					this.$toast({
@@ -308,7 +308,7 @@ export default {
 			return {
 				method: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
-					this.$refs.ticketList.selectedItems = []
+					this.$refs.ticketList.manager.selectedItems = []
 					this.$refs.ticketList.manager.reload()
 
 					this.$toast({
