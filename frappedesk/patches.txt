@@ -28,4 +28,5 @@ frappedesk.patches.add_system_preset_filters #9/11/22
 frappedesk.patches.add_agent_group_to_agent_groups
 frappedesk.patches.set_assignment_rule_field_of_agent_groups
 frappedesk.patches.add_base_assignment_rule_to_frappe_desk_settings
+frappedesk.patches.add_all_tickets_system_preset_filter
 
