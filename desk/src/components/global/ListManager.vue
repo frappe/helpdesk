@@ -71,21 +71,53 @@ export default {
 			selectedItems.value = {}
 			listResource.reload()
 		}
-		const update = (newOptions) => {
-			if (newOptions.filters) options.value.filters = newOptions.filters
-			if (newOptions.order_by)
-				options.value.order_by = newOptions.order_by
+		const fetch = () => {
+			listResource.list.fetch()
+		}
+		const update = (newOptions = null) => {
+			if (newOptions) {
+				if (newOptions.filters)
+					options.value.filters = newOptions.filters
+				if (newOptions.order_by)
+					options.value.order_by = newOptions.order_by
+			}
 
 			listResource.update({
 				...options.value,
 			})
 		}
 
+		const getPage = (page) => {
+			if (page < 0 || page > totalPages.value) return
+			options.value.start = (page - 1) * options.value.limit
+			update()
+			fetch()
+		}
 		const nextPage = () => {
-			listResource.next()
+			if (currentPageNumber.value == totalPages.value) return
+			options.value.start += options.value.limit
+			update()
+			fetch()
+		}
+		const previousPage = () => {
+			if (currentPageNumber.value == 1) return
+			let newStart = options.value.start - options.value.limit
+			if (newStart < 0) newStart = 0
+			options.value.start = newStart
+			update()
+			fetch()
 		}
 		const hasNextPage = computed(() => {
-			return listResource.hasNextPage
+			return options.value.start + options.value.limit < totalCount.value
+		})
+		const hasPreviousPage = computed(() => {
+			return options.value.start > 0
+		})
+		const currentPageNumber = computed(() => {
+			return Math.ceil(options.value.start / options.value.limit) + 1
+		})
+		const totalPages = computed(() => {
+			return Math.ceil(totalCount.value / options.value.limit)
 		})
 
 		const sudoFilters = ref([])
@@ -300,8 +332,13 @@ export default {
 			reload,
 			update,
 
+			getPage,
 			nextPage,
+			previousPage,
 			hasNextPage,
+			hasPreviousPage,
+			currentPageNumber,
+			totalPages,
 
 			sudoFilters,
 			addFilters,
