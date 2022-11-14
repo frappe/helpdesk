@@ -312,6 +312,14 @@ def add_system_preset_filters():
 				],
 			}
 		)
+	preset_filters.append(
+		{
+			"doctype": "FD Preset Filter",
+			"title": "All Tickets",
+			"reference_doctype": "Ticket",
+			"filters": [],
+		}
+	)
 	for preset in preset_filters:
 		preset_filter_doc = frappe.get_doc(preset)
 		preset_filter_doc.insert()
