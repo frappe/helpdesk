@@ -93,73 +93,16 @@
 						</div>
 					</template>
 					<template #field-subject="{ value, row }">
-						<router-link
-							:to="{
-								path: `/frappedesk/tickets/${row.name}`,
-							}"
-							role="button"
-							class="line-clamp-1 hover:text-gray-900 text-gray-600"
-							:class="{
-								'font-semibold text-gray-900': !(
-									JSON.parse(row._seen) || []
-								).includes(user.user),
-							}"
-						>
-							{{ value }}
-						</router-link>
+						<Subject :ticket="row" />
 					</template>
 					<template #field-status="{ value }">
-						<div class="flex flex-row items-center space-x-1">
-							<FeatherIcon
-								v-if="value != 'Open'"
-								:name="
-									{
-										Closed: 'lock',
-										Resolved: 'check',
-										Replied: 'corner-up-left',
-									}[value]
-								"
-								class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]"
-							/>
-							<CustomIcons
-								v-else
-								name="comment"
-								class="w-[16px] h-[16px] stroke-green-600"
-							/>
-							<div
-								class="text-base font-normal"
-								:class="{
-									'text-green-600': value == 'Open',
-									'text-gray-600': value != 'Open',
-								}"
-							>
-								{{ value }}
-							</div>
-						</div>
+						<TicketStatus :value="value" />
 					</template>
 					<template #field-priority="{ value }">
-						<div class="flex flex-row items-center space-x-1">
-							<div
-								class="text-sm font-semibold px-2 border rounded-lg"
-								:class="{
-									'text-green-500 bg-green-100 border-green-500':
-										value == 'Low',
-									'text-yellow-500 bg-yellow-100 border-yellow-500':
-										value == 'Medium',
-									'text-orange-500 bg-orange-100 border-orange-500':
-										value == 'High',
-									'text-red-500 bg-red-100 border-red-500':
-										value == 'Urgent',
-								}"
-							>
-								{{ value.toLowerCase() }}
-							</div>
-						</div>
+						<TicketPriority :value="value" />
 					</template>
 					<template #field-ticket_type="{ value }">
-						<div v-if="value" class="text-gray-600">
-							{{ value }}
-						</div>
+						<TicketType :value="value" />
 					</template>
 					<template #field-contact="{ value }">
 						<div class="text-gray-500">
@@ -176,24 +119,8 @@
 							</div>
 						</Tooltip>
 					</template>
-					<template #field-resolution_by="{ value }">
-						<div
-							class="text-gray-500 flex flex-row space-x-1 items-center"
-							:class="{
-								'text-red-500': $dayjs(value)
-									.fromNow()
-									.includes('ago'),
-							}"
-						>
-							{{
-								value
-									? $dayjs.shortFormating(
-											$dayjs(value).fromNow(),
-											true
-									  )
-									: ""
-							}}
-						</div>
+					<template #field-resolution_by="{ value, row }">
+						<ResolutionBy :ticket="row" />
 					</template>
 					<template #field-modified="{ value }">
 						<div class="text-gray-500">
@@ -270,9 +197,13 @@
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import AgentAvatar from "@/components/global/AgentAvatar.vue"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue"
 import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
+import ResolutionBy from "@/components/global/ticket_list_item/ResolutionBy.vue"
+import TicketType from "@/components/global/ticket_list_item/TicketType.vue"
+import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
+import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue"
+import Subject from "@/components/global/ticket_list_item/Subject.vue"
 
 export default {
 	name: "Tickets",
@@ -280,11 +211,15 @@ export default {
 		ListManager,
 		ListViewer,
 		AgentAvatar,
-		CustomIcons,
 		NewTicketDialog,
 		FeatherIcon,
 		Dropdown,
 		Tooltip,
+		ResolutionBy,
+		TicketType,
+		TicketStatus,
+		TicketPriority,
+		Subject,
 	},
 	inject: ["agents", "user"],
 	data() {
