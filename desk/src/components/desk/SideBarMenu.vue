@@ -3,7 +3,7 @@
 		class="flex flex-col border-r pt-[23px]"
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
-		<div class="mb-[38.4px] cursor-pointer pl-[22px]">
+		<div class="mb-[38.4px] cursor-pointer pl-[22px] pr-[22px] w-fit">
 			<CustomIcons
 				name="frappedesk"
 				class="h-[16.6px] w-[67.84px]"
