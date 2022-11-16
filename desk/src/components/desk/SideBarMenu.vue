@@ -3,10 +3,10 @@
 		class="flex flex-col border-r pt-[23px]"
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
-		<div class="mb-[38.4px] cursor-pointer pl-[22px] pr-[22px] w-fit">
+		<div class="mb-[18.4px] cursor-pointer pl-[22px] pr-[22px] w-fit">
 			<CustomIcons
 				name="frappedesk"
-				class="h-[16.6px] w-[67.84px]"
+				class="h-[30px]"
 				@click="
 					() => {
 						$router.push({ path: '/frappedesk/tickets' })
@@ -17,7 +17,7 @@
 		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div
-					class="group cursor-pointer rounded-[8px] stroke-gray-600 hover:bg-gray-200"
+					class="pl-1 group cursor-pointer rounded-[8px] stroke-gray-600 hover:bg-gray-200"
 					:class="option.selected ? 'bg-gray-200' : ''"
 					@click="
 						() => {
@@ -31,18 +31,7 @@
 						}
 					"
 				>
-					<div class="flex items-center py-[5.5px] pl-[8px]">
-						<div class="w-[14px]">
-							<FeatherIcon
-								v-if="option.children"
-								class="h-[14px] w-[14px] stroke-gray-600"
-								:name="
-									option.expanded
-										? 'chevron-up'
-										: 'chevron-down'
-								"
-							/>
-						</div>
+					<div class="flex items-center py-[5.5px]">
 						<div class="w-[24px]">
 							<CustomIcons
 								:name="option.icon"
