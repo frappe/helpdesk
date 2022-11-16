@@ -363,24 +363,27 @@ def get_all_conversations(ticket):
 		fields=["name", "content", "creation", "sent_or_received", "sender"],
 	)
 
-	for conversation in conversations:
-		if frappe.db.exists("Agent", conversation.sender):
-			# user User details instead of Contact if the sender is an agent
-			sender = frappe.get_doc("User", conversation.sender).__dict__
-			sender["image"] = sender["user_image"]
-		else:
-			contacts = frappe.get_all(
-				"Contact Email",
-				filters=[["email_id", "like", "%{0}".format(conversation.sender)]],
-				fields=["parent"],
-				limit=1,
-			)
-			if len(contacts) > 0:
-				sender = frappe.get_doc("Contact", contacts[0].parent)
-			else:
-				sender = frappe.get_last_doc("User", filters={"email": conversation.sender})
+	print('conversations', conversations)
 
-		conversation.sender = sender
+	for conversation in conversations:
+		# TODO: fix this mess
+		# if frappe.db.exists("Agent", conversation.sender):
+		# 	# user User details instead of Contact if the sender is an agent
+		# 	sender = frappe.get_doc("User", conversation.sender).__dict__
+		# 	sender["image"] = sender["user_image"]
+		# else:
+		# 	contacts = frappe.get_all(
+		# 		"Contact Email",
+		# 		filters=[["email_id", "like", "%{0}".format(conversation.sender)]],
+		# 		fields=["parent"],
+		# 		limit=1,
+		# 	)
+		# 	if len(contacts) > 0:
+		# 		sender = frappe.get_doc("Contact", contacts[0].parent)
+		# 	else:
+		# 		sender = frappe.get_last_doc("User", filters={"email": conversation.sender})
+
+		# conversation.sender = sender
 
 		attachments = frappe.get_all(
 			"File",

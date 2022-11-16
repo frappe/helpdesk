@@ -11,6 +11,141 @@ from frappedesk.frappedesk.doctype.ticket.ticket import (
 	create_communication_via_agent,
 )
 from frappe.desk.form.assign_to import clear as clear_all_assignments
+from frappe.utils import datetime
+
+from frappedesk.frappedesk.doctype.sla.sla import get_expected_time_for
+
+
+@frappe.whitelist()
+def bulk_insert_tickets(tickets, sla="Default"):
+	# trying a faster way to insert tickets
+	# sla assignement is working
+	# communication creation is working
+
+	# TODO: insert works but assignment is not working
+	# TODO: contact not created from raised_by
+	contacts = []
+	communications = []
+
+	resolution_by_wrt_priority = {}
+	response_by_wrt_priority = {}
+
+	if frappe.db.count("Ticket") >= 1:
+		ticket_doc = frappe.get_all("Ticket", fields=['name', 'idx'], order_by="idx desc", limit_start=0, limit_page_length=1)[0]
+		t_idx = ticket_doc.idx
+		t_name = ticket_doc.name
+	else:
+		t_idx = 0
+		t_name = '0'
+
+	if frappe.db.count("Communication") >= 1:
+		communication_doc = frappe.get_all("Communication", fields=['name', 'idx'], order_by="idx desc", limit_start=0, limit_page_length=1)[0]
+		c_idx = communication_doc.idx
+		c_name = communication_doc.name
+	else:
+		c_idx = 0
+		c_name = '0'
+
+
+	priorities = ["Low", "Medium", "High", "Urgent"]
+	sla_doc = frappe.get_doc("SLA", sla)
+	creation_time = datetime.datetime.now()
+
+	for priority in priorities:
+		p = sla_doc.get_sla_priority(priority)
+		p.update(
+			{
+				"support_and_resolution": sla_doc.support_and_resolution,
+				"holiday_list": sla_doc.holiday_list,
+			}
+		)
+		response_by = get_expected_time_for(
+			parameter="response", service_level=p, start_date_time=creation_time
+		)
+		resolution_by = get_expected_time_for(
+			parameter="resolution", service_level=p, start_date_time=creation_time
+		)
+		response_by_wrt_priority[priority] = response_by
+		resolution_by_wrt_priority[priority] = resolution_by
+
+	for ticket in tickets:
+		t_idx = t_idx + 1
+		t_name = str(int(t_name) + 1)
+
+		c_idx = c_idx + 1
+		c_name = str(int(c_name) + 1)
+		
+		ticket += [
+			t_idx,
+			t_name,  # name	TODO: folow naming series
+			sla,
+			resolution_by_wrt_priority[ticket[4]],
+			resolution_by_wrt_priority[ticket[4]],
+			creation_time,  # modified
+			creation_time  # creation
+		]
+
+		communication = [
+			c_idx,
+			c_name,  # name	TODO: folow naming series
+			"Communication",
+			"Email",
+			"Received",
+			"Open",
+			f"Re: {ticket[0]}",	# subject
+			ticket[2],	# sender
+			ticket[1],	# content
+			"Linked",
+			"Ticket",
+			t_name,
+			creation_time,
+			creation_time
+		]
+		communications.append(communication)
+
+	frappe.db.bulk_insert(
+		"Ticket",
+		[
+			"subject",
+			"description",
+			"raised_by",
+			"ticket_type",
+			"priority",
+
+			"idx",
+			"name",
+			"sla",
+			"response_by",
+			"resolution_by",
+			"modified",
+			"creation"
+		],
+		tickets,
+		ignore_duplicates=True,
+	)
+
+	frappe.db.bulk_insert(
+		"Communication",
+		[
+			"idx",
+			"name",
+			"communication_type",
+			"communication_medium",
+			"sent_or_received",
+			"email_status",
+			"subject",
+			"sender",
+			"content",
+			"status",
+			"reference_doctype",
+			"reference_name",
+			"modified",
+			"creation"
+		],
+		communications,
+		ignore_duplicates=True,
+	)
+	frappe.db.commit()
 
 
 @frappe.whitelist()
