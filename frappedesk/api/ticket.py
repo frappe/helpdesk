@@ -14,6 +14,8 @@ from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.utils import datetime
 
 from frappedesk.frappedesk.doctype.sla.sla import get_expected_time_for
+from frappe.automation.doctype.assignment_rule.assignment_rule import bulk_apply
+from frappe.contacts.doctype.contact.contact import get_contact_name
 
 
 @frappe.whitelist()
@@ -21,31 +23,42 @@ def bulk_insert_tickets(tickets, sla="Default"):
 	# trying a faster way to insert tickets
 	# sla assignement is working
 	# communication creation is working
+	# base assignment rule is working
+	# assignment rule based on agent group is working (TODO: but a bit slow, could be improved by increasing number of dedicated workers)
+	# bulk creation of contacts via background job is working (TODO: use bulk insert instead of enqueue, need to figure ot a way to avoid creating duplicate contacts)
 
-	# TODO: insert works but assignment is not working
-	# TODO: contact not created from raised_by
-	contacts = []
 	communications = []
 
 	resolution_by_wrt_priority = {}
 	response_by_wrt_priority = {}
 
 	if frappe.db.count("Ticket") >= 1:
-		ticket_doc = frappe.get_all("Ticket", fields=['name', 'idx'], order_by="idx desc", limit_start=0, limit_page_length=1)[0]
+		ticket_doc = frappe.get_all(
+			"Ticket",
+			fields=["name", "idx"],
+			order_by="idx desc",
+			limit_start=0,
+			limit_page_length=1,
+		)[0]
 		t_idx = ticket_doc.idx
 		t_name = ticket_doc.name
 	else:
 		t_idx = 0
-		t_name = '0'
+		t_name = "0"
 
 	if frappe.db.count("Communication") >= 1:
-		communication_doc = frappe.get_all("Communication", fields=['name', 'idx'], order_by="idx desc", limit_start=0, limit_page_length=1)[0]
+		communication_doc = frappe.get_all(
+			"Communication",
+			fields=["name", "idx"],
+			order_by="idx desc",
+			limit_start=0,
+			limit_page_length=1,
+		)[0]
 		c_idx = communication_doc.idx
 		c_name = communication_doc.name
 	else:
 		c_idx = 0
-		c_name = '0'
-
+		c_name = "0"
 
 	priorities = ["Low", "Medium", "High", "Urgent"]
 	sla_doc = frappe.get_doc("SLA", sla)
@@ -74,7 +87,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 
 		c_idx = c_idx + 1
 		c_name = str(int(c_name) + 1)
-		
+
 		ticket += [
 			t_idx,
 			t_name,  # name	TODO: folow naming series
@@ -82,7 +95,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 			resolution_by_wrt_priority[ticket[4]],
 			resolution_by_wrt_priority[ticket[4]],
 			creation_time,  # modified
-			creation_time  # creation
+			creation_time,  # creation
 		]
 
 		communication = [
@@ -92,14 +105,14 @@ def bulk_insert_tickets(tickets, sla="Default"):
 			"Email",
 			"Received",
 			"Open",
-			f"Re: {ticket[0]}",	# subject
-			ticket[2],	# sender
-			ticket[1],	# content
+			f"Re: {ticket[0]}",  # subject
+			ticket[2],  # sender
+			ticket[1],  # content
 			"Linked",
 			"Ticket",
 			t_name,
 			creation_time,
-			creation_time
+			creation_time,
 		]
 		communications.append(communication)
 
@@ -111,14 +124,14 @@ def bulk_insert_tickets(tickets, sla="Default"):
 			"raised_by",
 			"ticket_type",
 			"priority",
-
+			"agent_group",
 			"idx",
 			"name",
 			"sla",
 			"response_by",
 			"resolution_by",
 			"modified",
-			"creation"
+			"creation",
 		],
 		tickets,
 		ignore_duplicates=True,
@@ -140,12 +153,49 @@ def bulk_insert_tickets(tickets, sla="Default"):
 			"reference_doctype",
 			"reference_name",
 			"modified",
-			"creation"
+			"creation",
 		],
 		communications,
 		ignore_duplicates=True,
 	)
 	frappe.db.commit()
+
+	ticket_names = [ticket[7] for ticket in tickets]
+	bulk_create_contacts_for_tickets(tickets)
+	bulk_apply("Ticket", ticket_names)
+
+def bulk_create_contacts_for_tickets(tickets):
+	background = len(tickets) > 5
+	for ticket in tickets:
+		if background:
+			frappe.enqueue(
+				"frappedesk.api.ticket.create_contact_for_ticket", ticket=ticket,
+			)
+		else:
+			create_contact_for_ticket(ticket)
+
+def create_contact_for_ticket(ticket):
+	email = ticket[2]
+	contact_name = get_contact_name(email)
+	print("email", email, "contact_name", contact_name)
+	if not contact_name and email:
+		email_parts = email.split("@")
+		first_name = frappe.unscrub(email_parts[0])
+
+		try:
+			contact_name = (
+				f"{first_name}-{email_parts[1]}" if first_name == "Contact" else first_name
+			)
+			contact = frappe.get_doc(
+				{"doctype": "Contact", "first_name": contact_name, "name": contact_name}
+			)
+			contact.add_email(email_id=email, is_primary=True)
+			contact.insert(ignore_permissions=True)
+			contact_name = contact.name
+		except Exception:
+			contact.log_error("Unable to add contact")
+
+	frappe.db.set_value("Ticket", ticket[7], "contact", contact_name)
 
 
 @frappe.whitelist()

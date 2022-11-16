@@ -130,7 +130,9 @@
 						</div>
 					</template>
 					<template #field-_assign="{ value }">
-						<AgentAvatar :agent="JSON.parse(value)[0]" />
+						<div v-if="value">
+							<AgentAvatar :agent="JSON.parse(value)[0]" />
+						</div>
 					</template>
 
 					<!-- Other Templates -->
