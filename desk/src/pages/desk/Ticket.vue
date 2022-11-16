@@ -53,7 +53,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="grow overflow-scroll px-[18px]">
+					<div class="grow overflow-scroll px-[25px]">
 						<CustomerSatisfactionFeedback
 							:fromDesk="true"
 							v-if="
