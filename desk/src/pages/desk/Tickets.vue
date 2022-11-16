@@ -17,6 +17,7 @@
 					'priority',
 					'subject',
 					'ticket_type',
+					'agent_group',
 					'contact',
 					'creation',
 					'modified',

@@ -116,7 +116,7 @@ def get_agent_assigned_to_ticket(ticket_id):
 				frappe.qb.from_(agent)
 				.join(user)
 				.on(agent.name == user.name)
-				.select(agent.name, agent.agent_name, agent.group, user.user_image.as_("image"),)
+				.select(agent.name, agent.agent_name)
 				.where(agent.name.isin(assignees))
 			)
 			agents = query.run(as_dict=True)

@@ -192,22 +192,13 @@
 					<Autocomplete
 						width="220"
 						:options="
-							agents
-								.filter((agent) => {
-									if (ticket.agent_group) {
-										return (
-											agent.group === ticket.agent_group
-										)
-									} else {
-										return true
-									}
-								})
-								.map((x) => {
-									return {
-										label: x.agent_name,
-										value: x.name,
-									}
-								})
+							agents.map((x) => {
+								// TODO(Urgent): filter out agents who are not in the same agent group as the ticket
+								return {
+									label: x.agent_name,
+									value: x.name,
+								}
+							})
 						"
 						placeholder="Assign to"
 						:value="
