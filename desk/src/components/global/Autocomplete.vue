@@ -55,7 +55,7 @@
 			</template>
 			<template #body>
 				<ComboboxOptions
-					class="px-1.5 pb-1.5 bg-white rounded-md mt-2 border shadow-md max-h-[11rem] overflow-y-auto"
+					class="max-w-[240px] px-1.5 pb-1.5 bg-white rounded-md mt-2 border shadow-md max-h-[11rem] overflow-y-auto"
 					static
 					:class="width ? `w-[${width}px]` : 'w-[250px]'"
 					v-show="isComboboxOpen"
