@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full px-4">
+	<div class="flex flex-col h-full px-4 overflow-y-clip">
 		<div
 			v-if="false"
 			class="text-green-600 text-gray-600 text-green-500 bg-green-100 border-green-500 text-yellow-500 bg-yellow-100 border-yellow-500 text-orange-500 bg-orange-100 border-orange-500 text-red-500 bg-red-100 border-red-500"
@@ -39,39 +39,35 @@
 						fields: {
 							name: {
 								label: '#',
-								width: '1',
+								width: manager.totalCount > 999 ? '2' : '1',
 							},
 							subject: {
 								label: 'Subject',
-								width: '8',
+								width: '7',
 							},
 							status: {
 								label: 'Status',
-								width: '2',
+								width: '3',
 							},
 							ticket_type: {
 								label: 'Type',
+								width: '3',
+							},
+							priority: {
+								label: 'Priority',
 								width: '3',
 							},
 							resolution_by: {
 								label: 'Due In',
 								width: '2',
 							},
-							priority: {
-								label: 'Priority',
-								width: '2',
-							},
 							contact: {
 								label: 'Created By',
-								width: '3',
+								width: manager.totalCount > 999 ? '3' : '4',
 							},
 							modified: {
 								label: 'Modified',
 								width: '2',
-							},
-							creation: {
-								label: ' ',
-								width: '1',
 							},
 							_assign: {
 								label: ' ',

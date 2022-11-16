@@ -14,13 +14,13 @@
 			"
 		>
 			<div class="flex flex-row pb-[15px]">
-				<div class="grow">
-					<span class="text-[16px] font-normal text-gray-500"
-						>Ticket</span
-					>
-					<span class="text-[15px] font-semibold">{{
-						`#${ticket.name}`
-					}}</span>
+				<div class="grow flex flex-row space-x-1.5 items-center">
+					<div class="text-[16px] font-normal text-gray-500">
+						Ticket
+					</div>
+					<div class="text-[15px] font-semibold">
+						{{ `#${ticket.name}` }}
+					</div>
 				</div>
 				<div class="w-[88.54px] select-none">
 					<div
