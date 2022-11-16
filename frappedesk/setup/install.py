@@ -292,6 +292,9 @@ def add_default_assignment_rule():
 
 	rule_doc.insert()
 
+	support_settings = frappe.get_doc("Frappe Desk Settings")
+	support_settings.base_support_rotation = rule_doc.name
+	support_settings.save()
 
 def add_system_preset_filters():
 	preset_filters = []
