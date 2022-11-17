@@ -6,7 +6,7 @@
 		<div class="mb-[18.4px] cursor-pointer pl-[22px] pr-[22px] w-fit">
 			<CustomIcons
 				name="frappedesk"
-				class="h-[30px]"
+				class="h-[16.6px] w-[67.84px]"
 				@click="
 					() => {
 						$router.push({ path: '/frappedesk/tickets' })
