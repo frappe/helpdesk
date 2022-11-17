@@ -3,16 +3,23 @@
 		class="flex flex-col border-r pt-[23px]"
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
-		<div class="mb-[18.4px] cursor-pointer pl-[22px] pr-[22px] w-fit">
+		<div
+			class="mb-[18.4px] cursor-pointer pl-[22px] pr-[22px] w-fit flex flex-row space-x-[6px]"
+		>
 			<CustomIcons
 				name="frappedesk"
-				class="h-[16.6px] w-[67.84px]"
+				class="h-[12.88px]"
 				@click="
 					() => {
 						$router.push({ path: '/frappedesk/tickets' })
 					}
 				"
 			/>
+			<div
+				class="text-[10px] font-normal text-gray-700 h-[16.6px] pt-[1.5px]"
+			>
+				v{{ fdVersion }}
+			</div>
 		</div>
 		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
@@ -302,6 +309,12 @@ export default {
 			this.syncSelectedMenuItemBasedOnRoute()
 		},
 	},
+	computed: {
+		fdVersion() {
+			if (this.$resources.fdeskVersion.loading) return ""
+			return this.$resources.fdeskVersion.data.frappedesk.version
+		},
+	},
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
 			const routeMenuItemMap = {
@@ -336,6 +349,14 @@ export default {
 					option.selected = false
 				}
 			})
+		},
+	},
+	resources: {
+		fdeskVersion() {
+			return {
+				method: "frappe.utils.change_log.get_versions",
+				auto: true,
+			}
 		},
 	},
 }
