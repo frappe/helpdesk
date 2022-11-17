@@ -39,15 +39,15 @@
 						fields: {
 							name: {
 								label: '#',
-								width: manager.totalCount > 999 ? '2' : '1',
+								width: '2',
 							},
 							subject: {
 								label: 'Subject',
-								width: '7',
+								width: '8',
 							},
 							status: {
 								label: 'Status',
-								width: '3',
+								width: '2',
 							},
 							ticket_type: {
 								label: 'Type',
@@ -55,7 +55,7 @@
 							},
 							priority: {
 								label: 'Priority',
-								width: '3',
+								width: '2',
 							},
 							resolution_by: {
 								label: 'Due In',
@@ -63,11 +63,11 @@
 							},
 							contact: {
 								label: 'Created By',
-								width: manager.totalCount > 999 ? '3' : '4',
+								width: '3',
 							},
 							modified: {
 								label: 'Modified',
-								width: '2',
+								width: '1',
 							},
 							_assign: {
 								label: ' ',
