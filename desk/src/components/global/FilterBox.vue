@@ -45,7 +45,7 @@ export default {
 		Dropdown,
 		FilterBoxItem,
 	},
-	inject: ["manager"],
+	inject: ["manager", "renderOptions"],
 	computed: {
 		showAddFilterButton() {
 			return (
@@ -71,22 +71,10 @@ export default {
 			for (let i in this.manager.options.fields) {
 				let fieldname = this.manager.options.fields[i]
 
-				let convertFieldNameToLabel = (fieldname) => {
-					switch (fieldname) {
-						case "_assign":
-							return "Assigned to"
-						case "_seen":
-							return false
-						default:
-							fieldname = fieldname.replace(/_/g, " ")
-							return (
-								fieldname.charAt(0).toUpperCase() +
-								fieldname.slice(1)
-							)
-					}
-				}
-
-				let label = convertFieldNameToLabel(fieldname)
+				let label =
+					this.manager.helperMethods.convertFieldNameToLabel(
+						fieldname
+					)
 				if (
 					label && // monkey-patch to remove _seen from the list
 					!this.manager.sudoFilters.find(
@@ -121,7 +109,10 @@ export default {
 				}
 				return f.fieldname && f.filter_type && f.value
 			})
-			this.manager.addFilters(filters, false)
+			this.manager.addFilters(
+				filters,
+				this.manager.options.urlQueryFilters
+			)
 		},
 	},
 }

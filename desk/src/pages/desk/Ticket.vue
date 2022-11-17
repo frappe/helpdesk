@@ -3,21 +3,12 @@
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
 			<div class="h-[72px] px-[20px] flex">
 				<router-link
-					:to="
-						prevRoute && prevRoute.path === '/frappedesk/tickets'
-							? prevRoute
-							: {
-									path: '/frappedesk/tickets',
-									query: { menu_filter: ticketSideBarFilter },
-							  }
-					"
+					:to="{ path: '/frappedesk/tickets' }"
 					class="h-[20px] my-[26px] text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
 					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
-					<div>
-						Back to {{ sideBarFilterMap[ticketSideBarFilter] }}
-					</div>
+					<div>Back to Tickets</div>
 				</router-link>
 			</div>
 			<div
@@ -419,13 +410,7 @@ export default {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
-			prevRoute: null,
 		}
-	},
-	beforeRouteEnter(to, from, next) {
-		next((vm) => {
-			vm.prevRoute = from
-		})
 	},
 	setup() {
 		const showTextFormattingMenu = ref(true)
@@ -438,8 +423,6 @@ export default {
 
 		const tempTextEditorData = ref({})
 
-		const sideBarFilterMap = inject("sideBarFilterMap")
-		const ticketSideBarFilter = inject("ticketSideBarFilter")
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
 
@@ -451,8 +434,6 @@ export default {
 			attachments,
 			tempTextEditorData,
 			editingType,
-			sideBarFilterMap,
-			ticketSideBarFilter,
 			showCannedResponsesDialog,
 			tempMessage,
 		}

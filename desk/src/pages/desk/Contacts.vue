@@ -1,53 +1,62 @@
 <template>
-	<div>
-		<div>
-			<ListManager
-				class="px-[16px]"
-				ref="contactList"
-				:options="{
-					cache: ['Contacts', 'Desk'],
-					doctype: 'Contact',
-					fields: [
-						'first_name',
-						'last_name',
-						'email_ids.email_id as email',
-						'phone_nos.phone as phone',
-					],
-					limit: 40,
-				}"
-			>
-				<template #body="{ manager }">
-					<div>
-						<div class="flow-root py-4 px-[16px]">
-							<div class="float-left"></div>
-							<div class="float-right">
-								<div class="flex items-center space-x-3">
-									<div
-										class="stroke-blue-500 fill-blue-500 w-0 h-0 block"
-									></div>
-									<Button
-										icon-left="plus"
-										appearance="primary"
-										@click="
-											() => {
-												showNewContactDialog = true
-											}
-										"
-										>Add Contact</Button
-									>
-								</div>
-							</div>
-						</div>
-						<ContactList :manager="manager" />
-					</div>
-				</template>
-			</ListManager>
-		</div>
+	<div class="flex flex-col h-full px-4">
+		<ListManager
+			ref="contactList"
+			:options="{
+				cache: ['Contacts', 'Desk'],
+				doctype: 'Contact',
+				fields: [
+					'first_name',
+					'last_name',
+					'email_ids.email_id as email',
+					'phone_nos.phone as phone',
+				],
+				limit: 20,
+			}"
+		>
+			<template #body>
+				<ListViewer
+					:options="{
+						base: '12',
+						presetFilters: true,
+						fields: {
+							first_name: {
+								label: 'Name',
+								width: '4',
+							},
+							email: {
+								label: 'Email',
+								width: '4',
+							},
+							phone: {
+								label: 'Phone',
+								width: '4',
+							},
+						},
+					}"
+					class="text-base h-[100vh] pt-4"
+					@add-item="
+						() => {
+							showNewContactDialog = true
+						}
+					"
+				>
+					<template #field-first_name="{ row }">
+						<router-link
+							:to="{ path: `/frappedesk/contacts/${row.name}` }"
+						>
+							{{ `${row.first_name} ${row.last_name}` }}
+						</router-link>
+					</template>
+				</ListViewer>
+			</template>
+		</ListManager>
 		<NewContactDialog
 			v-model="showNewContactDialog"
 			@contact-created="
 				() => {
 					showNewContactDialog = false
+					$refs.contactList.manager.reload()
 				}
 			"
 		/>
@@ -55,28 +64,20 @@
 </template>
 <script>
 import ListManager from "@/components/global/ListManager.vue"
-import ContactList from "../../components/desk/contacts/ContactList.vue"
+import ListViewer from "@/components/global/ListViewer.vue"
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue"
-import { ref } from "vue"
 
 export default {
 	name: "Contacts",
 	components: {
 		ListManager,
+		ListViewer,
 		NewContactDialog,
-		ContactList,
 	},
-	setup() {
-		const showNewContactDialog = ref(false)
-
+	data() {
 		return {
-			showNewContactDialog,
+			showNewContactDialog: false,
 		}
-	},
-	computed: {
-		contacts() {
-			return this.contacts || null
-		},
 	},
 }
 </script>
