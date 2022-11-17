@@ -1,18 +1,6 @@
 <template>
 	<div v-if="ticket" class="flex flex-col h-full">
-		<div
-			class="pl-[19px] pr-[17px] pt-[18px] pb-[28px]"
-			style="
-				background-image: linear-gradient(
-					to right,
-					#ebeef0 33%,
-					rgba(255, 255, 255, 0) 0%
-				);
-				background-position: bottom;
-				background-size: 19.5px 1px;
-				background-repeat: repeat-x;
-			"
-		>
+		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] dashes">
 			<div class="flex flex-row pb-[15px]">
 				<div class="grow flex flex-row space-x-1.5 items-center">
 					<div class="text-[16px] font-normal text-gray-500">
@@ -757,6 +745,16 @@ export default {
 </script>
 
 <style>
+.dashes {
+	background-image: linear-gradient(
+		to right,
+		#ebeef0 33%,
+		rgba(255, 255, 255, 0) 0%
+	);
+	background-position: bottom;
+	background-size: 19.5px 1px;
+	background-repeat: repeat-x;
+}
 .dot {
 	height: 21px;
 	width: 10.5px;
