@@ -2,8 +2,13 @@ import frappe
 
 
 def pull_support_emails():
-	if frappe.db.exists("Email Account", "Support"):
-		email_account = frappe.get_doc("Email Account", "Support")
+	email_accounts = frappe.get_all(
+		"Email Account",
+		filters=[["IMAP Folder", "append_to", "=", "Ticket"]],
+		fields=["name"],
+	)
+	for account in email_accounts:
+		email_account = frappe.get_doc("Email Account", account["name"])
 
 		if email_account.enable_incoming:
 			email_account.receive()
