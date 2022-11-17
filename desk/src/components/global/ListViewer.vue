@@ -106,7 +106,7 @@
 									)"
 									:key="field"
 									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-									class="pr-[2px]"
+									class="pr-[5px]"
 								>
 									<div>
 										<slot
@@ -179,7 +179,7 @@
 								<div
 									v-for="(item, index) in manager.list"
 									:key="item.name"
-									class="pr-[2px]"
+									class="pr-[5px]"
 								>
 									<slot name="row" :item="item">
 										<div
