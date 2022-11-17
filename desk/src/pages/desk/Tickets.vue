@@ -24,6 +24,7 @@
 					'name',
 					'response_by',
 					'resolution_by',
+					'agreement_status',
 					'_seen',
 				],
 				limit: 20,
@@ -43,7 +44,7 @@
 							},
 							subject: {
 								label: 'Subject',
-								width: '8',
+								width: '9',
 							},
 							status: {
 								label: 'Status',
@@ -51,7 +52,7 @@
 							},
 							ticket_type: {
 								label: 'Type',
-								width: '3',
+								width: '2',
 							},
 							priority: {
 								label: 'Priority',
@@ -124,7 +125,7 @@
 							{{
 								$dayjs.shortFormating(
 									$dayjs(value).fromNow(),
-									true
+									false
 								)
 							}}
 						</div>
