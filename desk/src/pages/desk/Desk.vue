@@ -174,9 +174,6 @@ export default {
 				case "Ticket Type":
 					this.$resources.types.reload()
 					break
-				case "Contact":
-					this.$resources.contacts.reload()
-					break
 				case "Agent":
 					this.$resources.agents.reload()
 					break
