@@ -27,6 +27,8 @@ export default {
 	computed: {
 		value() {
 			if (!this.ticket.resolution_by) return null
+			if (this.ticket.status == "Replied") return ""
+
 			if (["Resolved", "Closed"].includes(this.ticket.status)) {
 				if (this.ticket.agreement_status == "Overdue") {
 					this.overdue = true
@@ -42,7 +44,7 @@ export default {
 
 			return this.$dayjs.shortFormating(
 				this.$dayjs(this.ticket.resolution_by).fromNow(),
-				true
+				false
 			)
 		},
 	},
