@@ -14,7 +14,7 @@ from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.utils import datetime
 
 from frappedesk.frappedesk.doctype.sla.sla import get_expected_time_for
-from frappe.automation.doctype.assignment_rule.assignment_rule import bulk_apply
+from frappe.automation.doctype.assignment_rule.assignment_rule import apply
 from frappe.contacts.doctype.contact.contact import get_contact_name
 
 
@@ -160,24 +160,23 @@ def bulk_insert_tickets(tickets, sla="Default"):
 	)
 	frappe.db.commit()
 
-	ticket_names = [ticket[7] for ticket in tickets]
-	bulk_create_contacts_for_tickets(tickets)
-	bulk_apply("Ticket", ticket_names)
+	bulk_create_contacts_and_assignments_for_tickets(tickets)
+	# ticket_names = [ticket[7] for ticket in tickets]
+	# bulk_apply("Ticket", ticket_names)
 
-def bulk_create_contacts_for_tickets(tickets):
+def bulk_create_contacts_and_assignments_for_tickets(tickets):
 	background = len(tickets) > 5
 	for ticket in tickets:
 		if background:
 			frappe.enqueue(
-				"frappedesk.api.ticket.create_contact_for_ticket", ticket=ticket,
+				"frappedesk.api.ticket.create_contacts_and_assignments_for_tickets", ticket=ticket,
 			)
 		else:
-			create_contact_for_ticket(ticket)
+			create_contacts_and_assignments_for_tickets(ticket)
 
-def create_contact_for_ticket(ticket):
+def create_contacts_and_assignments_for_tickets(ticket):
 	email = ticket[2]
 	contact_name = get_contact_name(email)
-	print("email", email, "contact_name", contact_name)
 	if not contact_name and email:
 		email_parts = email.split("@")
 		first_name = frappe.unscrub(email_parts[0])
@@ -196,6 +195,7 @@ def create_contact_for_ticket(ticket):
 			contact.log_error("Unable to add contact")
 
 	frappe.db.set_value("Ticket", ticket[7], "contact", contact_name)
+	apply(doctype="Ticket", name=ticket[7])
 
 
 @frappe.whitelist()
