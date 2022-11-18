@@ -179,7 +179,6 @@
 								<div
 									v-for="(item, index) in manager.list"
 									:key="item.name"
-									class="pr-[2px]"
 								>
 									<slot name="row" :item="item">
 										<div
@@ -213,6 +212,7 @@
 													renderOptions.fields
 												)"
 												:key="field"
+												class="pr-[5px]"
 												:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 											>
 												<div
@@ -312,3 +312,11 @@ export default {
 	},
 }
 </script>
+
+<style>
+.line-truncate {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+</style>
