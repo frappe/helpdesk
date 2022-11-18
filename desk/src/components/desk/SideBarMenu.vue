@@ -4,28 +4,26 @@
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
 		<div
-			class="mb-[18.4px] cursor-pointer pl-[22px] pr-[22px] w-fit flex flex-row space-x-[6px]"
+			class="mb-[18.4px] cursor-pointer items-baseline pl-[22px] pr-[22px] w-fit flex flex-row space-x-[6px]"
 		>
 			<CustomIcons
 				name="frappedesk"
-				class="h-[12.88px]"
+				class="h-[15.88px]"
 				@click="
 					() => {
 						$router.push({ path: '/frappedesk/tickets' })
 					}
 				"
 			/>
-			<div
-				class="text-[10px] font-normal text-gray-700 h-[16.6px] pt-[1.5px]"
-			>
+			<div class="text-[10px] font-normal text-gray-700">
 				v{{ fdVersion }}
 			</div>
 		</div>
 		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div
-					class="pl-1 group cursor-pointer rounded-[8px] stroke-gray-600 hover:bg-gray-200"
-					:class="option.selected ? 'bg-gray-200' : ''"
+					class="pl-1 group cursor-pointer rounded-[6px] stroke-gray-600 hover:bg-gray-200"
+					:class="option.selected ? 'bg-gray-100' : ''"
 					@click="
 						() => {
 							if (option.children) {
@@ -45,7 +43,7 @@
 								class="ml-[8px] h-[14px] w-[14px]"
 							/>
 						</div>
-						<span class="ml-[6px] grow text-[14px]">{{
+						<span class="ml-[6px] grow text-[13px]">{{
 							option.label
 						}}</span>
 					</div>
