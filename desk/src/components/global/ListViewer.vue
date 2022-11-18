@@ -106,7 +106,7 @@
 									)"
 									:key="field"
 									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-									class="pr-[2px]"
+									class="pr-[5px]"
 								>
 									<div>
 										<slot
@@ -312,11 +312,3 @@ export default {
 	},
 }
 </script>
-
-<style>
-.line-truncate {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-</style>
