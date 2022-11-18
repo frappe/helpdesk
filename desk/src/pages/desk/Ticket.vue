@@ -53,7 +53,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="grow overflow-scroll px-[25px]">
+					<div class="grow overflow-scroll px-[17px]">
 						<CustomerSatisfactionFeedback
 							:fromDesk="true"
 							v-if="
@@ -73,7 +73,7 @@
 						/>
 					</div>
 					<div
-						class="shrink-0 flex flex-col mb-[19px] px-[18px] space-y-[11px]"
+						class="shrink-0 flex flex-col mb-[19px] px-[18px] space-y-[11px] pt-2"
 					>
 						<CustomTextEditor
 							ref="replyEditor"
