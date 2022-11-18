@@ -57,12 +57,17 @@ class Agent(Document):
 			# Add the agent to the support rotation for each group they belong to
 			if self.groups:
 				for group in self.groups:
-					rule_docs.append(
-						frappe.get_doc(
-							"Assignment Rule",
-							frappe.get_doc("Agent Group", group.agent_group).get_assignment_rule(),
+					try:
+						agent_group_assignment_rule = frappe.get_doc(
+							"Agent Group", group.agent_group
+						).get_assignment_rule()
+						rule_docs.append(frappe.get_doc("Assignment Rule", agent_group_assignment_rule,))
+					except frappe.DoesNotExistError:
+						frappe.throw(
+							frappe._("Assignment Rule for Agent Group {0} does not exist").format(
+								group.agent_group
+							)
 						)
-					)
 		else:
 			# check if the group is in self.groups
 			if next((group for group in self.groups if group["group_name"] == group), None):

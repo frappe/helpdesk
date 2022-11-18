@@ -63,6 +63,6 @@ class AgentGroup(Document):
 	def get_assignment_rule(self):
 		"""Returns the assignment rule for this group, if not found creates one and retures it"""
 
-		if not self.get_assignment_rule:
+		if not self.assignment_rule:
 			self.create_assignment_rule()
 		return self.assignment_rule
