@@ -4,14 +4,6 @@
 
 frappe.query_reports["Ticket Analytics"] = {
 	filters: [
-//		{
-//			fieldname: "company",
-//			label: __("Company"),
-//			fieldtype: "Link",
-//			options: "Company",
-//			default: frappe.defaults.get_user_default("Company"),
-//			reqd: 1,
-//		},
 		{
 			fieldname: "based_on",
 			label: __("Based On"),
@@ -76,12 +68,6 @@ frappe.query_reports["Ticket Analytics"] = {
 			fieldtype: "Link",
 			options: "Contact",
 		},
-//		{
-//			fieldname: "project",
-//			label: __("Project"),
-//			fieldtype: "Link",
-//			options: "Project",
-//		},
 		{
 			fieldname: "assigned_to",
 			label: __("Assigned To"),
