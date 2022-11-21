@@ -13,7 +13,7 @@
 				:class="`bg-${color}-50`"
 			>
 				<div
-					class="prose prose-p:my-1 text-[13px] text-gray-700"
+					class="ProseMirror prose prose-p:my-1 text-[13px] text-gray-700"
 					style="border: 0px"
 					v-html="cleanedMessage"
 				></div>

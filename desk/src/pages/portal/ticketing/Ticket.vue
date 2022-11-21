@@ -92,28 +92,26 @@
 											)
 										"
 									>
-										<CustomTextEditor
+										<TextEditor
+											v-if="editing"
 											ref="replyEditor"
-											:show="editing"
+											:content="content"
+											editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
 											v-on:keydown="
 												handleShortcuts($event)
 											"
-											@click="
-												$refs.replyEditor.focusEditor()
-											"
-											:content="content"
 											@change="
 												(val) => {
 													content = val
 												}
 											"
+											@click="
+												$refs.replyEditor.editor.commands.focus()
+											"
 											placeholder="Type a response"
-											editorClasses="w-full min-h-[180px] max-h-[300px] text-[13px]"
 											class="border border-gray-300 rounded-[8px] p-[12px]"
 										>
-											<template
-												#bottom-section="{ editor }"
-											>
+											<template #bottom>
 												<div>
 													<div
 														v-if="
@@ -175,39 +173,16 @@
 															showTextFormattingMenu
 														"
 													>
-														<div
-															class="flex flex-row items-center space-x-1.5 p-1.5 rounded shadow w-fit"
-														>
-															<div
-																v-for="item in [
-																	'bold',
-																	'italic',
-																	'|',
-																	'quote',
-																	'code',
-																	'|',
-																	'numbered-list',
-																	'bullet-list',
-																	'left-align',
-																	'center-align',
-																	'right-align',
-																]"
-																:key="item"
-															>
-																<TextEditorMenuItem
-																	:item="item"
-																	:editor="
-																		editor
-																	"
-																	:attachments="
-																		attachments
-																	"
-																/>
-															</div>
-														</div>
+														<TextEditorFixedMenu
+															class="my-1 overflow-x-auto rounded shadow-sm border"
+															:buttons="
+																textEditorMenuButtons
+															"
+														/>
 													</div>
 													<div
 														class="pt-2 select-none flex flex-row items-center space-x-2"
+														v-if="$refs.replyEditor"
 													>
 														<Button
 															:loading="
@@ -219,18 +194,9 @@
 																submitConversation()
 															"
 															appearance="primary"
-															:disabled="
-																sendingDissabled
-															"
 														>
 															Send
 														</Button>
-														<Button
-															@click="
-																cancelEditing
-															"
-															>Cancel</Button
-														>
 														<div
 															class="flex flex-row items-center space-x-2"
 														>
@@ -251,9 +217,6 @@
 																"
 															/>
 															<FileUploader
-																:uploadArgs="{
-																	private: true,
-																}"
 																@success="
 																	(file) =>
 																		attachments.push(
@@ -281,23 +244,6 @@
 																	/>
 																</template>
 															</FileUploader>
-															<CustomIcons
-																:class="
-																	editor.isActive(
-																		'link'
-																	)
-																		? 'bg-gray-100'
-																		: ''
-																"
-																name="link-url"
-																class="h-7 w-7 rounded p-1"
-																role="button"
-																@click="
-																	$refs
-																		.replyEditor
-																		.insertLink;
-																"
-															/>
 														</div>
 														<div
 															class="grow flex flex-row-reverse"
@@ -320,7 +266,7 @@
 													</div>
 												</div>
 											</template>
-										</CustomTextEditor>
+										</TextEditor>
 									</div>
 								</div>
 							</div>
@@ -335,26 +281,24 @@
 <script>
 import { inject, ref } from "vue"
 import Conversations from "@/components/portal/ticket/Conversations.vue"
-import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
 import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import { FeatherIcon, FileUploader, TextEditor, Avatar } from "frappe-ui"
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
-import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
 
 export default {
 	name: "Tickets",
 	props: ["ticketId"],
 	components: {
 		Conversations,
-		CustomTextEditor,
 		ActionPanel,
 		FeatherIcon,
 		TextEditor,
+		TextEditorFixedMenu,
 		FileUploader,
 		CustomIcons,
 		CustomerSatisfactionFeedback,
-		TextEditorMenuItem,
 		Avatar,
 	},
 	data() {
@@ -386,6 +330,53 @@ export default {
 		}
 	},
 	computed: {
+		textEditorMenuButtons() {
+			return [
+				"Paragraph",
+				[
+					"Heading 2",
+					"Heading 3",
+					"Heading 4",
+					"Heading 5",
+					"Heading 6",
+				],
+				"Separator",
+				"Bold",
+				"Italic",
+				"Separator",
+				"Bullet List",
+				"Numbered List",
+				"Separator",
+				"Align Left",
+				"Align Center",
+				"Align Right",
+				"Separator",
+				"Image",
+				"Video",
+				"Link",
+				"Blockquote",
+				"Code",
+				"Horizontal Rule",
+				[
+					"InsertTable",
+					"AddColumnBefore",
+					"AddColumnAfter",
+					"DeleteColumn",
+					"AddRowBefore",
+					"AddRowAfter",
+					"DeleteRow",
+					"MergeCells",
+					"SplitCell",
+					"ToggleHeaderColumn",
+					"ToggleHeaderRow",
+					"ToggleHeaderCell",
+					"DeleteTable",
+				],
+				"Separator",
+				"Undo",
+				"Redo",
+			]
+		},
 		ticket() {
 			if (this.tickets) {
 				return this.tickets[this.ticketId] || null
@@ -435,7 +426,9 @@ export default {
 		startEditing() {
 			this.editing = true
 			this.delayedConversationScroll()
-			this.$refs.replyEditor.focusEditor()
+			this.$nextTick(() => {
+				this.$refs.replyEditor.editor.commands.focus()
+			})
 		},
 		cancelEditing() {
 			this.editing = false
