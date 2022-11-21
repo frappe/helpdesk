@@ -207,8 +207,9 @@ export default {
 			// add agents
 			if (
 				!this.$resources.agentCount.loading &&
-				this.$resources.agentCount.data <= 1
+				this.$resources.agentCount.data == 0
 			) {
+				// this block should theoretically never fire, since the initial agent is created during the setup process
 				this.showAddAgentsToast()
 			}
 		},
