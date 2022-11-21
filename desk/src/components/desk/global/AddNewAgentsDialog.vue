@@ -181,6 +181,7 @@ export default {
 					this.searchInput = ""
 					this.inviteQueue = []
 
+					this.$clearToasts()
 					this.$toast({
 						title: "Invites Sent Successfully!",
 						customIcon: "circle-check",
