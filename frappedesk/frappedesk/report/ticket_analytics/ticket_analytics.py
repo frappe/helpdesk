@@ -9,13 +9,14 @@ import frappe
 from frappe import _, scrub
 from frappe.utils import add_days, add_to_date, flt, getdate
 from six import iteritems
-
+from datetime import date
 # from erpnext.accounts.utils import get_fiscal_year
 
 
 def get_fiscal_year():
 	# TODO: handle this function properly
-	pass
+	today_date = date.today()
+	return today_date
 
 
 def execute(filters=None):
@@ -38,12 +39,12 @@ class TicketAnalytics(object):
 	def get_columns(self):
 		self.columns = []
 
-		if self.filters.based_on == "Customer":
+		if self.filters.based_on == "Contact":
 			self.columns.append(
 				{
-					"label": _("Customer"),
-					"options": "Customer",
-					"fieldname": "customer",
+					"label": _("Contact"),
+					"options": "Contact",
+					"fieldname": "contact",
 					"fieldtype": "Link",
 					"width": 200,
 				}
@@ -119,8 +120,8 @@ class TicketAnalytics(object):
 		elif self.filters.range == "Quarterly":
 			period = "Quarter " + str(((date.month - 1) // 3) + 1)
 		else:
-			year = get_fiscal_year(date, self.filters.company)
-			period = str(year[0])
+			year = get_fiscal_year()
+			period = str(year)
 
 		if (
 			getdate(self.filters.from_date).year != getdate(self.filters.to_date).year
@@ -142,7 +143,7 @@ class TicketAnalytics(object):
 		if self.filters.range in ["Monthly", "Quarterly"]:
 			from_date = from_date.replace(day=1)
 		elif self.filters.range == "Yearly":
-			from_date = get_fiscal_year(from_date)[1]
+			from_date = get_fiscal_year()
 		else:
 			from_date = from_date + relativedelta(from_date, weekday=MO(-1))
 
@@ -152,8 +153,9 @@ class TicketAnalytics(object):
 				period_end_date = add_days(from_date, 6)
 			else:
 				period_end_date = add_to_date(from_date, months=increment, days=-1)
-
-			if period_end_date > to_date:
+			if self.filters.range == "Yearly":
+				period_end_date = to_date
+			elif period_end_date > to_date:
 				period_end_date = to_date
 
 			self.periodic_daterange.append(period_end_date)
@@ -165,7 +167,7 @@ class TicketAnalytics(object):
 	def get_tickets(self):
 		filters = self.get_common_filters()
 		self.field_map = {
-			"Customer": "customer",
+			"Contact": "contact",
 			"Ticket Type": "ticket_type",
 			"Ticket Priority": "priority",
 			"Assigned To": "_assign",
@@ -184,7 +186,7 @@ class TicketAnalytics(object):
 		if self.filters.get("assigned_to"):
 			filters["_assign"] = ("like", "%" + self.filters.get("assigned_to") + "%")
 
-		for entry in ["company", "status", "priority", "customer", "project"]:
+		for entry in ["status", "priority", "contact"]:
 			if self.filters.get(entry):
 				filters[entry] = self.filters.get(entry)
 
@@ -195,8 +197,8 @@ class TicketAnalytics(object):
 		self.get_periodic_data()
 
 		for entity, period_data in iteritems(self.ticket_periodic_data):
-			if self.filters.based_on == "Customer":
-				row = {"customer": entity}
+			if self.filters.based_on == "Contact":
+				row = {"contact": entity}
 			elif self.filters.based_on == "Assigned To":
 				row = {"user": entity}
 			elif self.filters.based_on == "Ticket Type":
