@@ -330,7 +330,6 @@ class TicketSummary(object):
 		labels = []
 		open_tickets = []
 		replied_tickets = []
-		on_hold_tickets = []
 		resolved_tickets = []
 		closed_tickets = []
 
@@ -343,7 +342,6 @@ class TicketSummary(object):
 			labels.append(entry.get(entity_field))
 			open_tickets.append(entry.get("open"))
 			replied_tickets.append(entry.get("replied"))
-			on_hold_tickets.append(entry.get("on_hold"))
 			resolved_tickets.append(entry.get("resolved"))
 			closed_tickets.append(entry.get("closed"))
 
@@ -353,7 +351,6 @@ class TicketSummary(object):
 				"datasets": [
 					{"name": "Open", "values": open_tickets[:30]},
 					{"name": "Replied", "values": replied_tickets[:30]},
-					{"name": "On Hold", "values": on_hold_tickets[:30]},
 					{"name": "Resolved", "values": resolved_tickets[:30]},
 					{"name": "Closed", "values": closed_tickets[:30]},
 				],
@@ -367,21 +364,18 @@ class TicketSummary(object):
 
 		open_tickets = 0
 		replied = 0
-		# on_hold = 0
 		resolved = 0
 		closed = 0
 
 		for entry in self.data:
 			open_tickets += entry.get("open")
 			replied += entry.get("replied")
-			# on_hold += entry.get("on_hold")
 			resolved += entry.get("resolved")
 			closed += entry.get("closed")
 
 		self.report_summary = [
 			{"value": open_tickets, "indicator": "Red", "label": _("Open"), "datatype": "Int"},
 			{"value": replied, "indicator": "Grey", "label": _("Replied"), "datatype": "Int"},
-			# {"value": on_hold, "indicator": "Grey", "label": _("On Hold"), "datatype": "Int"},
 			{
 				"value": resolved,
 				"indicator": "Green",

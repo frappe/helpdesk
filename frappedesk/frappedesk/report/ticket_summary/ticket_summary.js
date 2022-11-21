@@ -4,14 +4,7 @@
 
 frappe.query_reports["Ticket Summary"] = {
 	filters: [
-//		{
-//			fieldname: "company",
-//			label: __("Company"),
-//			fieldtype: "Link",
-//			options: "Company",
-//			default: frappe.defaults.get_user_default("Company"),
-//			reqd: 1,
-//		},
+
 		{
 			fieldname: "based_on",
 			label: __("Based On"),
@@ -47,7 +40,6 @@ frappe.query_reports["Ticket Summary"] = {
 				"",
 				{ label: __("Open"), value: "Open" },
 				{ label: __("Replied"), value: "Replied" },
-//				{ label: __("On Hold"), value: "On Hold" },
 				{ label: __("Resolved"), value: "Resolved" },
 				{ label: __("Closed"), value: "Closed" },
 			],
@@ -64,12 +56,6 @@ frappe.query_reports["Ticket Summary"] = {
 			fieldtype: "Link",
 			options: "Contact",
 		},
-//		{
-//			fieldname: "project",
-//			label: __("Project"),
-//			fieldtype: "Link",
-//			options: "Project",
-//		},ss
 		{
 			fieldname: "assigned_to",
 			label: __("Assigned To"),
