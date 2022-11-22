@@ -63,6 +63,11 @@
 						},
 					}"
 					class="text-base h-[93vh] pt-4"
+					@add-item="
+						() => {
+							showNewTicketDialog = true
+						}
+					"
 				>
 					<template #top-sub-section-1>
 						<div class="text-xl font-semibold py-2">Tickets</div>
@@ -152,6 +157,16 @@
 				</ListViewer>
 			</template>
 		</ListManager>
+		<NewTicketDialog
+			v-model="showNewTicketDialog"
+			@close="showNewTicketDialog = false"
+			@ticket-created="
+				() => {
+					showNewTicketDialog = false
+					$refs.miniTicketList.manager.reload() // TODO: remove this once the list manager realtime update is fixed
+				}
+			"
+		/>
 	</div>
 </template>
 
@@ -164,6 +179,7 @@ import TicketType from "@/components/global/ticket_list_item/TicketType.vue"
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
 import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue"
 import Subject from "@/components/global/ticket_list_item/Subject.vue"
+import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue"
 
 export default {
 	name: "ContactRelatedInfo",
@@ -179,8 +195,14 @@ export default {
 		TicketStatus,
 		TicketPriority,
 		Subject,
+		NewTicketDialog,
 	},
 	inject: ["agents", "user"],
+	data() {
+		return {
+			showNewTicketDialog: false,
+		}
+	},
 	methods: {
 		agentsAsDropdownOptions() {
 			let agentItems = []

@@ -96,7 +96,11 @@
 						<Button @click="cancel()">Cancel</Button>
 					</div>
 					<div class="grow flex flex-row-reverse">
+						<Button appearance="danger" @click="delete_contact(values?.contactName)">Delete</Button>
+					</div>
+					<div class="flex flex-row-reverse pl-2">
 						<Button
+							v-if="editingName"
 							:loading="this.$resources.contact.setValue.loading"
 							appearance="primary"
 							@click="save()"
@@ -182,6 +186,28 @@ export default {
 				},
 			}
 		},
+		delete_contacts() {
+			return {
+				method: "frappedesk.api.doc.delete_items",
+				onSuccess: () => {
+					this.$toast({
+							title: "Contact Deleted.",
+							customIcon: "circle-check",
+							appearance: "success",
+						})
+						this.resetForm()
+					this.$router.go(-1)
+				},
+				onError: (err) => {
+					this.$toast({
+						title: "Error while deleting contacts",
+						text: err,
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+				},
+			}
+		}
 	},
 	methods: {
 		setContactImage(url) {
@@ -218,6 +244,12 @@ export default {
 		cancel() {
 			this.$router.go()
 		},
+		delete_contact(email) {
+			this.$resources.delete_contacts.submit({
+				items: email,
+				doctype: "Contact",
+			})
+		}
 	},
 }
 </script>
