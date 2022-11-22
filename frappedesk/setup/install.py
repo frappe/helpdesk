@@ -280,35 +280,8 @@ def update_agent_role_permissions():
 
 
 def add_default_assignment_rule():
-	rule_doc = frappe.new_doc("Assignment Rule")
-	rule_doc.name = "Support Rotation"
-	rule_doc.document_type = "Ticket"
-	rule_doc.description = "Automatic Ticket Assignment"
-	rule_doc.assign_condition = "status == 'Open'"
-	rule_doc.rule = "Round Robin"
-	rule_doc.priority = 0
-
-	for agent in frappe.get_all("Agent", fields=["user"]):
-		user_doc = frappe.get_doc({"doctype": "Assignment Rule User", "user": agent.user})
-		rule_doc.append("users", user_doc)
-
-	for day in [
-		"Monday",
-		"Tuesday",
-		"Wednesday",
-		"Thursday",
-		"Friday",
-		"Saturday",
-		"Sunday",
-	]:
-		day_doc = frappe.get_doc({"doctype": "Assignment Rule Day", "day": day})
-		rule_doc.append("assignment_days", day_doc)
-
-	rule_doc.insert()
-
 	support_settings = frappe.get_doc("Frappe Desk Settings")
-	support_settings.base_support_rotation = rule_doc.name
-	support_settings.save()
+	support_settings.create_base_support_rotation()
 
 
 def add_system_preset_filters():

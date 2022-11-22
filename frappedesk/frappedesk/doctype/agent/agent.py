@@ -94,6 +94,7 @@ class Agent(Document):
 
 				user_doc = frappe.get_doc({"doctype": "Assignment Rule User", "user": self.user})
 				rule_doc.append("users", user_doc)
+				rule_doc.disabled = False  # enable the rule if it is disabled
 				rule_doc.save(ignore_permissions=True)
 
 	def remove_from_support_rotations(self, group=None):
@@ -129,6 +130,8 @@ class Agent(Document):
 			if rule_doc.users and len(rule_doc.users) > 0:
 				for user in rule_doc.users:
 					if user.user == self.user:
+						if len(rule_doc.users) == 1:
+							rule_doc.disabled = True  # disable the rule if there are no users left
 						rule_doc.remove(user)
 						rule_doc.save()
 

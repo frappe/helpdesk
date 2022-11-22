@@ -28,6 +28,7 @@ class FrappeDeskSettings(Document):
 		rule_doc.document_type = "Ticket"
 		rule_doc.assign_condition = f"status == 'Open'"
 		rule_doc.priority = 0
+		rule_doc.disabled = True  # Disable the rule by default, when agents are added to the group, the rule will be enabled
 
 		for day in [
 			"Monday",
