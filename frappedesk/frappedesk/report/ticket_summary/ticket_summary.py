@@ -12,10 +12,10 @@ from six import iteritems
 
 
 def execute(filters=None):
-	return IssueSummary(filters).run()
+	return TicketSummary(filters).run()
 
 
-class IssueSummary(object):
+class TicketSummary(object):
 	def __init__(self, filters=None):
 		self.filters = frappe._dict(filters or {})
 
@@ -30,12 +30,12 @@ class IssueSummary(object):
 	def get_columns(self):
 		self.columns = []
 
-		if self.filters.based_on == "Customer":
+		if self.filters.based_on == "Contact":
 			self.columns.append(
 				{
-					"label": _("Customer"),
-					"options": "Customer",
-					"fieldname": "customer",
+					"label": _("Contact"),
+					"options": "Contact",
+					"fieldname": "contact",
 					"fieldtype": "Link",
 					"width": 200,
 				}
@@ -52,29 +52,29 @@ class IssueSummary(object):
 				}
 			)
 
-		elif self.filters.based_on == "Issue Type":
+		elif self.filters.based_on == "Ticket Type":
 			self.columns.append(
 				{
-					"label": _("Issue Type"),
-					"fieldname": "issue_type",
+					"label": _("Ticket Type"),
+					"fieldname": "ticket_type",
 					"fieldtype": "Link",
-					"options": "Issue Type",
+					"options": "Ticket Type",
 					"width": 200,
 				}
 			)
 
-		elif self.filters.based_on == "Issue Priority":
+		elif self.filters.based_on == "Ticket Priority":
 			self.columns.append(
 				{
-					"label": _("Issue Priority"),
+					"label": _("Ticket Priority"),
 					"fieldname": "priority",
 					"fieldtype": "Link",
-					"options": "Issue Priority",
+					"options": "Ticket Priority",
 					"width": 200,
 				}
 			)
 
-		self.statuses = ["Open", "Replied", "On Hold", "Resolved", "Closed"]
+		self.statuses = ["Open", "Replied", "Resolved", "Closed"]
 		for status in self.statuses:
 			self.columns.append(
 				{"label": _(status), "fieldname": scrub(status), "fieldtype": "Int", "width": 80}
@@ -82,8 +82,8 @@ class IssueSummary(object):
 
 		self.columns.append(
 			{
-				"label": _("Total Issues"),
-				"fieldname": "total_issues",
+				"label": _("Total Ticket"),
+				"fieldname": "total_tickets",
 				"fieldtype": "Int",
 				"width": 100,
 			}
@@ -119,20 +119,20 @@ class IssueSummary(object):
 			)
 
 	def get_data(self):
-		self.get_issues()
+		self.get_tickets()
 		self.get_rows()
 
-	def get_issues(self):
+	def get_tickets(self):
 		filters = self.get_common_filters()
 		self.field_map = {
-			"Customer": "customer",
-			"Issue Type": "issue_type",
-			"Issue Priority": "priority",
+			"Contact": "contact",
+			"Ticket Type": "ticket_type",
+			"Ticket Priority": "priority",
 			"Assigned To": "_assign",
 		}
 
 		self.entries = frappe.db.get_all(
-			"Issue",
+			"Ticket",
 			fields=[
 				self.field_map.get(self.filters.based_on),
 				"name",
@@ -155,7 +155,7 @@ class IssueSummary(object):
 		if self.filters.get("assigned_to"):
 			filters["_assign"] = ("like", "%" + self.filters.get("assigned_to") + "%")
 
-		for entry in ["company", "status", "priority", "customer", "project"]:
+		for entry in ["status", "priority", "contact", "ticket_type"]:
 			if self.filters.get(entry):
 				filters[entry] = self.filters.get(entry)
 
@@ -165,21 +165,21 @@ class IssueSummary(object):
 		self.data = []
 		self.get_summary_data()
 
-		for entity, data in iteritems(self.issue_summary_data):
-			if self.filters.based_on == "Customer":
-				row = {"customer": entity}
+		for entity, data in iteritems(self.ticket_summary_data):
+			if self.filters.based_on == "Contact":
+				row = {"contact": entity}
 			elif self.filters.based_on == "Assigned To":
 				row = {"user": entity}
-			elif self.filters.based_on == "Issue Type":
-				row = {"issue_type": entity}
-			elif self.filters.based_on == "Issue Priority":
+			elif self.filters.based_on == "Ticket Type":
+				row = {"ticket_type": entity}
+			elif self.filters.based_on == "Ticket Priority":
 				row = {"priority": entity}
 
 			for status in self.statuses:
 				count = flt(data.get(status, 0.0))
 				row[scrub(status)] = count
 
-			row["total_issues"] = data.get("total_issues", 0.0)
+			row["total_tickets"] = data.get("total_tickets", 0.0)
 
 			for sla_status in self.sla_status_map.values():
 				value = flt(data.get(sla_status), 0.0)
@@ -192,7 +192,7 @@ class IssueSummary(object):
 			self.data.append(row)
 
 	def get_summary_data(self):
-		self.issue_summary_data = frappe._dict()
+		self.ticket_summary_data = frappe._dict()
 
 		for d in self.entries:
 			status = d.status
@@ -201,16 +201,16 @@ class IssueSummary(object):
 			if self.filters.based_on == "Assigned To":
 				if d._assign:
 					for entry in json.loads(d._assign):
-						self.issue_summary_data.setdefault(entry, frappe._dict()).setdefault(status, 0.0)
-						self.issue_summary_data.setdefault(entry, frappe._dict()).setdefault(
+						self.ticket_summary_data.setdefault(entry, frappe._dict()).setdefault(status, 0.0)
+						self.ticket_summary_data.setdefault(entry, frappe._dict()).setdefault(
 							agreement_status, 0.0
 						)
-						self.issue_summary_data.setdefault(entry, frappe._dict()).setdefault(
-							"total_issues", 0.0
+						self.ticket_summary_data.setdefault(entry, frappe._dict()).setdefault(
+							"total_tickets", 0.0
 						)
-						self.issue_summary_data[entry][status] += 1
-						self.issue_summary_data[entry][agreement_status] += 1
-						self.issue_summary_data[entry]["total_issues"] += 1
+						self.ticket_summary_data[entry][status] += 1
+						self.ticket_summary_data[entry][agreement_status] += 1
+						self.ticket_summary_data[entry]["total_tickets"] += 1
 
 			else:
 				field = self.field_map.get(self.filters.based_on)
@@ -218,21 +218,21 @@ class IssueSummary(object):
 				if not value:
 					value = _("Not Specified")
 
-				self.issue_summary_data.setdefault(value, frappe._dict()).setdefault(status, 0.0)
-				self.issue_summary_data.setdefault(value, frappe._dict()).setdefault(
+				self.ticket_summary_data.setdefault(value, frappe._dict()).setdefault(status, 0.0)
+				self.ticket_summary_data.setdefault(value, frappe._dict()).setdefault(
 					agreement_status, 0.0
 				)
-				self.issue_summary_data.setdefault(value, frappe._dict()).setdefault(
-					"total_issues", 0.0
+				self.ticket_summary_data.setdefault(value, frappe._dict()).setdefault(
+					"total_tickets", 0.0
 				)
-				self.issue_summary_data[value][status] += 1
-				self.issue_summary_data[value][agreement_status] += 1
-				self.issue_summary_data[value]["total_issues"] += 1
+				self.ticket_summary_data[value][status] += 1
+				self.ticket_summary_data[value][agreement_status] += 1
+				self.ticket_summary_data[value]["total_tickets"] += 1
 
 		self.get_metrics_data()
 
 	def get_metrics_data(self):
-		issues = []
+		ticket = []
 
 		metrics_list = [
 			"avg_response_time",
@@ -243,34 +243,34 @@ class IssueSummary(object):
 		]
 
 		for entry in self.entries:
-			issues.append(entry.name)
+			ticket.append(entry.name)
 
 		field = self.field_map.get(self.filters.based_on)
 
-		if issues:
+		if ticket:
 			if self.filters.based_on == "Assigned To":
 				assignment_map = frappe._dict()
 				for d in self.entries:
 					if d._assign:
 						for entry in json.loads(d._assign):
 							for metric in metrics_list:
-								self.issue_summary_data.setdefault(entry, frappe._dict()).setdefault(
+								self.ticket_summary_data.setdefault(entry, frappe._dict()).setdefault(
 									metric, 0.0
 								)
 
-							self.issue_summary_data[entry]["avg_response_time"] += (
+							self.ticket_summary_data[entry]["avg_response_time"] += (
 								d.get("avg_response_time") or 0.0
 							)
-							self.issue_summary_data[entry]["avg_first_response_time"] += (
+							self.ticket_summary_data[entry]["avg_first_response_time"] += (
 								d.get("first_response_time") or 0.0
 							)
-							self.issue_summary_data[entry]["avg_hold_time"] += (
+							self.ticket_summary_data[entry]["avg_hold_time"] += (
 								d.get("total_hold_time") or 0.0
 							)
-							self.issue_summary_data[entry]["avg_resolution_time"] += (
+							self.ticket_summary_data[entry]["avg_resolution_time"] += (
 								d.get("resolution_time") or 0.0
 							)
-							self.issue_summary_data[entry]["avg_user_resolution_time"] += (
+							self.ticket_summary_data[entry]["avg_user_resolution_time"] += (
 								d.get("user_resolution_time") or 0.0
 							)
 
@@ -280,7 +280,7 @@ class IssueSummary(object):
 
 				for entry in assignment_map:
 					for metric in metrics_list:
-						self.issue_summary_data[entry][metric] /= flt(assignment_map.get(entry))
+						self.ticket_summary_data[entry][metric] /= flt(assignment_map.get(entry))
 
 			else:
 				data = frappe.db.sql(
@@ -291,14 +291,14 @@ class IssueSummary(object):
 						AVG(total_hold_time) as avg_hold_time,
 						AVG(resolution_time) as avg_resolution_time,
 						AVG(user_resolution_time) as avg_user_resolution_time
-					FROM `tabIssue`
+					FROM `tabTicket`
 					WHERE
-						name IN %(issues)s
+						name IN %(ticket)s
 					GROUP BY {0}
 				""".format(
 						field
 					),
-					{"issues": issues},
+					{"ticket": ticket},
 					as_dict=1,
 				)
 
@@ -308,19 +308,19 @@ class IssueSummary(object):
 						value = _("Not Specified")
 
 					for metric in metrics_list:
-						self.issue_summary_data.setdefault(value, frappe._dict()).setdefault(metric, 0.0)
+						self.ticket_summary_data.setdefault(value, frappe._dict()).setdefault(metric, 0.0)
 
-					self.issue_summary_data[value]["avg_response_time"] = (
+					self.ticket_summary_data[value]["avg_response_time"] = (
 						entry.get("avg_resp_time") or 0.0
 					)
-					self.issue_summary_data[value]["avg_first_response_time"] = (
+					self.ticket_summary_data[value]["avg_first_response_time"] = (
 						entry.get("avg_frt") or 0.0
 					)
-					self.issue_summary_data[value]["avg_hold_time"] = entry.get("avg_hold_time") or 0.0
-					self.issue_summary_data[value]["avg_resolution_time"] = (
+					self.ticket_summary_data[value]["avg_hold_time"] = entry.get("avg_hold_time") or 0.0
+					self.ticket_summary_data[value]["avg_resolution_time"] = (
 						entry.get("avg_resolution_time") or 0.0
 					)
-					self.issue_summary_data[value]["avg_user_resolution_time"] = (
+					self.ticket_summary_data[value]["avg_user_resolution_time"] = (
 						entry.get("avg_user_resolution_time") or 0.0
 					)
 
@@ -328,11 +328,10 @@ class IssueSummary(object):
 		self.chart = []
 
 		labels = []
-		open_issues = []
-		replied_issues = []
-		on_hold_issues = []
-		resolved_issues = []
-		closed_issues = []
+		open_tickets = []
+		replied_tickets = []
+		resolved_tickets = []
+		closed_tickets = []
 
 		entity = self.filters.based_on
 		entity_field = self.field_map.get(entity)
@@ -341,21 +340,19 @@ class IssueSummary(object):
 
 		for entry in self.data:
 			labels.append(entry.get(entity_field))
-			open_issues.append(entry.get("open"))
-			replied_issues.append(entry.get("replied"))
-			on_hold_issues.append(entry.get("on_hold"))
-			resolved_issues.append(entry.get("resolved"))
-			closed_issues.append(entry.get("closed"))
+			open_tickets.append(entry.get("open"))
+			replied_tickets.append(entry.get("replied"))
+			resolved_tickets.append(entry.get("resolved"))
+			closed_tickets.append(entry.get("closed"))
 
 		self.chart = {
 			"data": {
 				"labels": labels[:30],
 				"datasets": [
-					{"name": "Open", "values": open_issues[:30]},
-					{"name": "Replied", "values": replied_issues[:30]},
-					{"name": "On Hold", "values": on_hold_issues[:30]},
-					{"name": "Resolved", "values": resolved_issues[:30]},
-					{"name": "Closed", "values": closed_issues[:30]},
+					{"name": "Open", "values": open_tickets[:30]},
+					{"name": "Replied", "values": replied_tickets[:30]},
+					{"name": "Resolved", "values": resolved_tickets[:30]},
+					{"name": "Closed", "values": closed_tickets[:30]},
 				],
 			},
 			"type": "bar",
@@ -365,28 +362,25 @@ class IssueSummary(object):
 	def get_report_summary(self):
 		self.report_summary = []
 
-		open_issues = 0
+		open_tickets = 0
 		replied = 0
-		on_hold = 0
 		resolved = 0
 		closed = 0
 
 		for entry in self.data:
-			open_issues += entry.get("open")
+			open_tickets += entry.get("open")
 			replied += entry.get("replied")
-			on_hold += entry.get("on_hold")
 			resolved += entry.get("resolved")
 			closed += entry.get("closed")
 
 		self.report_summary = [
-			{"value": open_issues, "indicator": "Red", "label": _("Open"), "datatype": "Int",},
-			{"value": replied, "indicator": "Grey", "label": _("Replied"), "datatype": "Int",},
-			{"value": on_hold, "indicator": "Grey", "label": _("On Hold"), "datatype": "Int",},
+			{"value": open_tickets, "indicator": "Red", "label": _("Open"), "datatype": "Int"},
+			{"value": replied, "indicator": "Grey", "label": _("Replied"), "datatype": "Int"},
 			{
 				"value": resolved,
 				"indicator": "Green",
 				"label": _("Resolved"),
 				"datatype": "Int",
 			},
-			{"value": closed, "indicator": "Green", "label": _("Closed"), "datatype": "Int",},
+			{"value": closed, "indicator": "Green", "label": _("Closed"), "datatype": "Int"},
 		]
