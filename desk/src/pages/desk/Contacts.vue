@@ -1,65 +1,75 @@
 <template>
 	<div class="flex flex-col h-full px-4">
-		<ListManager
-			ref="contactList"
-			:options="{
-				cache: ['Contacts', 'Desk'],
-				doctype: 'Contact',
-				fields: [
-					'first_name',
-					'last_name',
-					'email_ids.email_id as email',
-					'phone_nos.phone as phone',
-				],
-				limit: 20,
-			}"
-		>
-			<template #body>
-				<ListViewer
-					:options="{
-						base: '12',
-						presetFilters: true,
-						fields: {
-							first_name: {
-								label: 'Name',
-								width: '4',
-							},
-							email: {
-								label: 'Email',
-								width: '4',
-							},
-							phone: {
-								label: 'Phone',
-								width: '4',
-							},
+		<ListManager ref="contactList" :options="{
+			cache: ['Contacts', 'Desk'],
+			urlQueryFilters: true,
+			saveFiltersLocally: true,
+			doctype: 'Contact',
+			fields: [
+				'first_name',
+				'last_name',
+				'email_ids.email_id as email',
+				'phone_nos.phone as phone',
+			],
+			limit: 20,
+		}">
+			<template #body="{ manager }">
+				<ListViewer :options="{
+					base: '12',
+					filterBox: true,
+					presetFilters: true,
+					fields: {
+						first_name: {
+							label: 'Name',
+							width: '4',
 						},
-					}"
-					class="text-base h-[100vh] pt-4"
-					@add-item="
-						() => {
-							showNewContactDialog = true
-						}
-					"
-				>
+						email: {
+							label: 'Email',
+							width: '4',
+						},
+						phone: {
+							label: 'Phone',
+							width: '4',
+						},
+					},
+				}" class="text-base h-[100vh] pt-4" @add-item="
+	() => {
+		showNewContactDialog = true
+	}
+">
 					<template #field-first_name="{ row }">
-						<router-link
-							:to="{ path: `/frappedesk/contacts/${row.name}` }"
-						>
+						<router-link :to="{ path: `/frappedesk/contacts/${row.name}` }">
 							{{ `${row.first_name} ${row.last_name}` }}
 						</router-link>
+					</template>
+					<template #bulk-actions="{ selectedItems }">
+						<div class="flex flex-row space-x-2">
+							<!-- <Button @click="() => {}">Add to FAQ</Button> -->
+							<Button appearance="danger" @click="
+								() => {
+									$resources.deleteContact
+										.submit({
+											items: Object.keys(selectedItems),
+											doctype: 'Contact',
+										}).then(() => {
+											manager.unselect()
+											manager.reload()
+										})
+								}
+							">
+								Delete
+							</Button>
+						</div>
 					</template>
 				</ListViewer>
 			</template>
 		</ListManager>
-		<NewContactDialog
-			v-model="showNewContactDialog"
-			@contact-created="
-				() => {
-					showNewContactDialog = false
-					$refs.contactList.manager.reload()
-				}
-			"
-		/>
+		<NewContactDialog v-model="showNewContactDialog" @contact-created="
+	() => {
+		showNewContactDialog = false
+		$refs.contactList.manager.reload()
+	}
+		" />
 	</div>
 </template>
 <script>
@@ -79,5 +89,31 @@ export default {
 			showNewContactDialog: false,
 		}
 	},
+	resources: {
+		deleteContact() {
+			return {
+				// method: "frappedesk.api.delete_contact.delete_bulk_contact",
+				method: "frappedesk.api.doc.delete_items",
+				onSuccess: () => {
+					this.$toast({
+						title: "Contact Deleted.",
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+					// this.$router.go()
+					// this.ListManager.reload()
+					// this.ListViewer.reload()
+				},
+				onError: (err) => {
+					this.$toast({
+						title: "Error while deleting contacts",
+						text: err,
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+				},
+			}
+		}
+	}
 }
 </script>
