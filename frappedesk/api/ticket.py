@@ -541,3 +541,32 @@ def submit_customer_feedback(ticket_id, satisfaction_rating, feedback_text):
 	ticket_doc.feedback_submitted = True
 	ticket_doc.save(ignore_permissions=True)
 	return ticket_doc
+
+
+@frappe.whitelist()
+def get_field_meta_info(fieldname):
+	meta_info = frappe.get_meta("Ticket").get_field(fieldname).as_dict()
+
+	# check if field is a custom field
+	custom_field = frappe.get_value(
+		"Custom Field", {"dt": "Ticket", "fieldname": fieldname}, "name"
+	)
+	if custom_field:
+		custom_field_extra_info = frappe.get_doc(
+			"Ticket Custom Fields Config"
+		).get_field_info(fieldname)
+		custom_field_extra_info.update({"is_custom_field": True})
+		meta_info.update(custom_field_extra_info)
+
+	return meta_info
+
+
+@frappe.whitelist()
+def get_field_value(ticket_id, fieldname):
+	return frappe.get_value("Ticket", ticket_id, fieldname)
+
+
+@frappe.whitelist()
+def update_field_value(ticket_id, fieldname, value):
+	frappe.db.set_value("Ticket", ticket_id, fieldname, value)
+	frappe.db.commit()
