@@ -1,7 +1,7 @@
 {
 	"actions": [],
 	"allow_import": 1,
-	"autoname": "format:{####}",
+	"autoname": "format:{#######}",
 	"creation": "2022-03-02 03:10:19.254460",
 	"doctype": "DocType",
 	"document_type": "Setup",
@@ -404,11 +404,10 @@
 	"icon": "fa fa-issue",
 	"idx": 7,
 	"links": [],
-	"modified": "2022-10-08 13:57:48.550744",
+	"modified": "2022-11-17 12:56:04.314350",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Ticket",
-	"name_case": "UPPER CASE",
 	"naming_rule": "Expression",
 	"owner": "Administrator",
 	"permissions": [

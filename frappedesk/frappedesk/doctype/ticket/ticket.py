@@ -301,37 +301,28 @@ def create_communication_via_agent(ticket, message, attachments=None):
 	if sent_email:
 		reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
 		try:
-			if just_sent_email_notification:
-				frappe.sendmail(
-					sender=reply_to_email,
-					reply_to=reply_to_email,
-					recipients=[ticket_doc.raised_by],
-					reference_doctype="Ticket",
-					reference_name=ticket_doc.name,
-					communication=communication.name,
-					attachments=_attachments if len(_attachments) > 0 else None,
-					subject=f"[Ticket #{ticket_doc.name}] New reply",
-					template="new_reply_on_customer_portal_notification",
-					args={
-						"ticket_id": ticket_doc.name,
-						"message": message,
-						"portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}",
-					},
-					now=True,
-				)
-			else:
-				frappe.sendmail(
-					subject=f"Re: {ticket_doc.subject}",
-					sender=reply_to_email,
-					reply_to=reply_to_email,
-					message=message,
-					recipients=[ticket_doc.raised_by],
-					reference_doctype="Ticket",
-					reference_name=ticket_doc.name,
-					communication=communication.name,
-					attachments=_attachments if len(_attachments) > 0 else None,
-					now=True,
-				)
+			frappe.sendmail(
+				subject=f"[Ticket #{ticket_doc.name}] New reply",
+				sender=reply_to_email,
+				reply_to=reply_to_email,
+				recipients=[ticket_doc.raised_by],
+				reference_doctype="Ticket",
+				reference_name=ticket_doc.name,
+				communication=communication.name,
+				attachments=_attachments if len(_attachments) > 0 else None,
+				template="new_reply_on_customer_portal_notification"
+				if just_sent_email_notification
+				else None,
+				message=message if not just_sent_email_notification else None,
+				args={
+					"ticket_id": ticket_doc.name,
+					"message": message,
+					"portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}",
+				}
+				if just_sent_email_notification
+				else None,
+				now=False,
+			)
 		except:
 			frappe.throw(
 				"Either setup up support email account or there should be a default"

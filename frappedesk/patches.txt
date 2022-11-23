@@ -29,4 +29,6 @@ frappedesk.patches.add_agent_group_to_agent_groups
 frappedesk.patches.set_assignment_rule_field_of_agent_groups
 frappedesk.patches.add_base_assignment_rule_to_frappe_desk_settings
 frappedesk.patches.add_all_tickets_system_preset_filter
+frappedesk.patches.set_home_page_to_kb #2
+frappedesk.patches.mark_assignment_rule_disabled_if_no_agents_is_active
 

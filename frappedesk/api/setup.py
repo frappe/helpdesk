@@ -5,32 +5,29 @@ from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via
 @frappe.whitelist()
 def initial_agent_setup():
 	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
-	if support_settings_doc.initial_agent_set:
-		return
-	users = frappe.get_all(
-		"User", filters={"user_type": "System User"}, order_by="creation"
-	)
-	for user in users:
-		if user.name != "Administrator":
-			agent = frappe.new_doc("Agent")
-			agent.user = user.name
-			agent.insert()
-			support_settings_doc.initial_agent_set = True
-			support_settings_doc.save()
+	if frappe.db.count("Agent") == 0:
+		agent_added = False
+		users = frappe.get_all(
+			"User", filters={"user_type": "System User"}, order_by="creation"
+		)
+		for user in users:
+			if user.name != "Administrator":
+				agent = frappe.new_doc("Agent")
+				agent.user = user.name
+				agent.insert()
+				agent_added = True
 
-			if frappe.session.user == "Administrator":
-				frappe.local.login_manager.login_as(agent.user)
+		if not agent_added:
+			frappe.throw("No user found to create agent")
 
-			return
+	support_settings_doc.initial_agent_set = True
+	support_settings_doc.save()
 
 
 @frappe.whitelist()
 def create_initial_demo_ticket():
 	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
-	if support_settings_doc.initial_demo_ticket_created:
-		return
-	ticket_count = len(frappe.get_all("Ticket"))
-	if ticket_count == 0:
+	if frappe.db.count("Ticket") == 0:
 		agent = frappe.get_last_doc("Agent")
 		if agent:
 			frappe.get_doc(

@@ -3,25 +3,28 @@
 		v-if="comment"
 		class="flex flex-col my-[16px] bg-[#FDF9F2] p-[10px] rounded-[6px]"
 	>
-		<div class="flex flex-row justify-between">
+		<div class="flex flex-row items-center justify-between">
 			<div class="flex flex-row items-center space-x-[8px]" v-if="user">
 				<CustomAvatar
 					:imageURL="user.user_image"
 					:label="user.full_name"
 					size="sm"
 				/>
-				<div class="truncate text-[14px] font-normal max-w-[200px]">
-					{{ user.full_name }}
+				<div class="flex flex-row space-x-1 items-center text-[13px]">
+					<div class="truncate font-medium max-w-[200px]">
+						{{ user.full_name }}
+					</div>
+					<div class="font-normal text-gray-900">added a comment</div>
 				</div>
 			</div>
-			<div class="text-gray-500 text-[12px]">
+			<div class="text-gray-500 font-normal text-[12px]">
 				{{ $dayjs.longFormating($dayjs(comment.creation).fromNow()) }}
 			</div>
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<div
-					class="prose prose-p:my-1 text-[13px] text-gray-700"
+					class="ProseMirror prose prose-p:my-1 max-w-full text-[13px] text-gray-700"
 					v-html="cleanedMessage"
 				></div>
 			</div>
@@ -68,4 +71,9 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.mention {
+	color: #2490ef;
+	font-weight: 500;
+}
+</style>

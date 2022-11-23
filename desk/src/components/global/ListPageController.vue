@@ -5,11 +5,11 @@
 	>
 		<div>
 			Showing
-			<span class="text-gray-900 font-semibold">{{ showing.from }}</span>
+			<span class="text-gray-900 font-medium">{{ showing.from }}</span>
 			-
-			<span class="text-gray-900 font-semibold">{{ showing.to }}</span>
+			<span class="text-gray-900 font-medium">{{ showing.to }}</span>
 			of
-			<span class="text-gray-900 font-semibold">{{ showing.of }}</span>
+			<span class="text-gray-900 font-medium">{{ showing.of }}</span>
 		</div>
 		<div
 			class="flex flex-row space-x-0 items-center"

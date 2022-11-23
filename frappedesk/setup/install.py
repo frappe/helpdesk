@@ -23,9 +23,23 @@ def after_install():
 def set_home_page_to_kb():
 	website_settings = frappe.get_doc("Website Settings")
 
-	if not website_settings.home_page:
-		website_settings.home_page = "/support/kb"
-		website_settings.save()
+	if not website_settings.home_page or website_settings.home_page in [
+		"/support/kb",
+		"support/kb",
+	]:
+		website_settings.home_page = "/"
+
+	add_base_route_to_route_redirects = True
+	for route_redirects in website_settings.route_redirects:
+		if route_redirects.source == "/":
+			add_base_route_to_route_redirects = False
+
+	if add_base_route_to_route_redirects:
+		base_route = frappe.get_doc(
+			{"doctype": "Website Route Redirect", "source": "/", "target": "support/kb",}
+		)
+		website_settings.append("route_redirects", base_route)
+	website_settings.save()
 
 
 def add_support_redirect_to_tickets():
@@ -266,31 +280,8 @@ def update_agent_role_permissions():
 
 
 def add_default_assignment_rule():
-	rule_doc = frappe.new_doc("Assignment Rule")
-	rule_doc.name = "Support Rotation"
-	rule_doc.document_type = "Ticket"
-	rule_doc.description = "Automatic Ticket Assignment"
-	rule_doc.assign_condition = "status == 'Open'"
-	rule_doc.rule = "Round Robin"
-	rule_doc.priority = 0
-
-	for agent in frappe.get_all("Agent", fields=["user"]):
-		user_doc = frappe.get_doc({"doctype": "Assignment Rule User", "user": agent.user})
-		rule_doc.append("users", user_doc)
-
-	for day in [
-		"Monday",
-		"Tuesday",
-		"Wednesday",
-		"Thursday",
-		"Friday",
-		"Saturday",
-		"Sunday",
-	]:
-		day_doc = frappe.get_doc({"doctype": "Assignment Rule Day", "day": day})
-		rule_doc.append("assignment_days", day_doc)
-
-	rule_doc.insert()
+	support_settings = frappe.get_doc("Frappe Desk Settings")
+	support_settings.create_base_support_rotation()
 
 
 def add_system_preset_filters():

@@ -57,12 +57,17 @@ class Agent(Document):
 			# Add the agent to the support rotation for each group they belong to
 			if self.groups:
 				for group in self.groups:
-					rule_docs.append(
-						frappe.get_doc(
-							"Assignment Rule",
-							frappe.get_doc("Agent Group", group.agent_group).get_assignment_rule(),
+					try:
+						agent_group_assignment_rule = frappe.get_doc(
+							"Agent Group", group.agent_group
+						).get_assignment_rule()
+						rule_docs.append(frappe.get_doc("Assignment Rule", agent_group_assignment_rule,))
+					except frappe.DoesNotExistError:
+						frappe.throw(
+							frappe._("Assignment Rule for Agent Group {0} does not exist").format(
+								group.agent_group
+							)
 						)
-					)
 		else:
 			# check if the group is in self.groups
 			if next((group for group in self.groups if group["group_name"] == group), None):
@@ -89,6 +94,7 @@ class Agent(Document):
 
 				user_doc = frappe.get_doc({"doctype": "Assignment Rule User", "user": self.user})
 				rule_doc.append("users", user_doc)
+				rule_doc.disabled = False  # enable the rule if it is disabled
 				rule_doc.save(ignore_permissions=True)
 
 	def remove_from_support_rotations(self, group=None):
@@ -124,6 +130,8 @@ class Agent(Document):
 			if rule_doc.users and len(rule_doc.users) > 0:
 				for user in rule_doc.users:
 					if user.user == self.user:
+						if len(rule_doc.users) == 1:
+							rule_doc.disabled = True  # disable the rule if there are no users left
 						rule_doc.remove(user)
 						rule_doc.save()
 

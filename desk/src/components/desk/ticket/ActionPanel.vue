@@ -1,26 +1,14 @@
 <template>
 	<div v-if="ticket" class="flex flex-col h-full">
-		<div
-			class="pl-[19px] pr-[17px] pt-[18px] pb-[28px]"
-			style="
-				background-image: linear-gradient(
-					to right,
-					#ebeef0 33%,
-					rgba(255, 255, 255, 0) 0%
-				);
-				background-position: bottom;
-				background-size: 19.5px 1px;
-				background-repeat: repeat-x;
-			"
-		>
+		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] dashes">
 			<div class="flex flex-row pb-[15px]">
-				<div class="grow">
-					<span class="text-[16px] font-normal text-gray-500"
-						>Ticket</span
-					>
-					<span class="text-[15px] font-semibold">{{
-						`#${ticket.name}`
-					}}</span>
+				<div class="grow flex flex-row space-x-1.5 items-center">
+					<div class="text-[16px] font-normal text-gray-500">
+						Ticket
+					</div>
+					<div class="text-[15px] font-semibold">
+						{{ `#${ticket.name}` }}
+					</div>
 				</div>
 				<div class="w-[88.54px] select-none">
 					<div
@@ -192,22 +180,13 @@
 					<Autocomplete
 						width="220"
 						:options="
-							agents
-								.filter((agent) => {
-									if (ticket.agent_group) {
-										return (
-											agent.group === ticket.agent_group
-										)
-									} else {
-										return true
-									}
-								})
-								.map((x) => {
-									return {
-										label: x.agent_name,
-										value: x.name,
-									}
-								})
+							agents.map((x) => {
+								// TODO(Urgent): filter out agents who are not in the same agent group as the ticket
+								return {
+									label: x.agent_name,
+									value: x.name,
+								}
+							})
 						"
 						placeholder="Assign to"
 						:value="
@@ -766,6 +745,16 @@ export default {
 </script>
 
 <style>
+.dashes {
+	background-image: linear-gradient(
+		to right,
+		#ebeef0 33%,
+		rgba(255, 255, 255, 0) 0%
+	);
+	background-position: bottom;
+	background-size: 19.5px 1px;
+	background-repeat: repeat-x;
+}
 .dot {
 	height: 21px;
 	width: 10.5px;

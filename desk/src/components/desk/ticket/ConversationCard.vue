@@ -1,26 +1,28 @@
 <template>
-	<div class="flex flex-col my-[16px] px-[10px]">
-		<div class="flex flex-row justify-between">
+	<div class="flex flex-col my-[16px] px-[8px]">
+		<div class="flex flex-row items-center justify-between">
 			<div class="flex flex-row items-center space-x-[8px]">
 				<CustomAvatar
 					:label="userName"
 					:imageURL="profilePicUrl"
 					size="sm"
 				/>
-				<div class="truncate text-[14px] font-normal max-w-[200px]">
+				<div
+					class="truncate text-[13px] max-w-[200px] text-gray-900 font-medium"
+				>
 					{{ userName }}
 				</div>
 			</div>
 			<a
 				:title="$dayjs(time)"
-				class="text-gray-500 text-[12px] select-none"
+				class="text-gray-500 text-[12px] select-none font-normal"
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<div
-					class="prose prose-p:my-1 text-[13px] text-gray-700"
+					class="ProseMirror prose prose-p:my-1 max-w-full text-[13px] text-gray-700 font-normal"
 					style="border: 0px"
 					v-html="cleanedMessage"
 				></div>
@@ -78,5 +80,3 @@ export default {
 	},
 }
 </script>
-
-<style></style>

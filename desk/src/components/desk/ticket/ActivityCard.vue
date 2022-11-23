@@ -11,11 +11,16 @@
 		<div class="grow pr-[6px]">
 			<div class="flex flex-col text-gray-700">
 				<div>
-					<span class="font-medium">{{ activity.owner }}</span>
-					<span class="font-normal">{{ activity.action }}</span>
+					<div class="font-normal">
+						{{ capitalizeFirstLetter(activity.action) }}
+					</div>
+					<div class="flex flex-row space-x-1">
+						<div>by</div>
+						<div class="font-medium">{{ activity.owner }}</div>
+					</div>
 				</div>
 				<a
-					class="text-gray-600 text-[11px]"
+					class="text-gray-600 text-[11px] text-normal"
 					:title="$dayjs(activity.creation)"
 					>{{
 						$dayjs.longFormating(
@@ -37,7 +42,10 @@ export default {
 		CustomIcons,
 	},
 	props: ["activity", "isLast"],
+	methods: {
+		capitalizeFirstLetter(string) {
+			return string.charAt(0).toUpperCase() + string.slice(1)
+		},
+	},
 }
 </script>
-
-<style></style>

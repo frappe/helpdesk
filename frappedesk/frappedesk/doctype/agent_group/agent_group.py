@@ -43,6 +43,7 @@ class AgentGroup(Document):
 		rule_doc.document_type = "Ticket"
 		rule_doc.assign_condition = f"status == 'Open' and agent_group == '{self.name}'"
 		rule_doc.priority = 1
+		rule_doc.disabled = True  # Disable the rule by default, when agents are added to the group, the rule will be enabled
 
 		for day in [
 			"Monday",
@@ -63,6 +64,6 @@ class AgentGroup(Document):
 	def get_assignment_rule(self):
 		"""Returns the assignment rule for this group, if not found creates one and retures it"""
 
-		if not self.get_assignment_rule:
+		if not self.assignment_rule:
 			self.create_assignment_rule()
 		return self.assignment_rule

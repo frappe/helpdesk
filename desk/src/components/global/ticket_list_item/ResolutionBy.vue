@@ -1,11 +1,12 @@
 <template>
 	<div
-		class="text-gray-500 flex flex-row space-x-1 items-center"
+		class="flex flex-row space-x-1 items-center"
 		:class="{
-			'text-red-500': $dayjs(value).fromNow().includes('ago'),
+			'text-red-500': overdue,
+			'text-gray-500': !overdue,
 		}"
 	>
-		{{ value ? $dayjs.shortFormating($dayjs(value).fromNow(), true) : "" }}
+		{{ value }}
 	</div>
 </template>
 
@@ -18,9 +19,33 @@ export default {
 			required: true,
 		},
 	},
+	data() {
+		return {
+			overdue: false,
+		}
+	},
 	computed: {
 		value() {
-			return this.ticket.resolution_by || null
+			if (!this.ticket.resolution_by) return null
+			if (this.ticket.status == "Replied") return ""
+
+			if (["Resolved", "Closed"].includes(this.ticket.status)) {
+				if (this.ticket.agreement_status == "Overdue") {
+					this.overdue = true
+					return "Overdue"
+				} else {
+					this.overdue = false
+					return "Fulfiled"
+				}
+			}
+			this.overdue = this.$dayjs(this.ticket.resolution_by)
+				.fromNow()
+				.includes("ago")
+
+			return this.$dayjs.shortFormating(
+				this.$dayjs(this.ticket.resolution_by).fromNow(),
+				false
+			)
 		},
 	},
 }
