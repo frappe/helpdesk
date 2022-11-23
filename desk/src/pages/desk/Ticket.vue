@@ -22,7 +22,7 @@
 					<ActionPanel :ticketId="ticket.name" />
 				</div>
 				<div
-					class="grow flex flex-col h-full"
+					class="grow flex flex-col h-full overflow-x-scroll"
 					:style="{ width: 'calc(100vh - 252px - 240px - 252px)' }"
 				>
 					<div class="border-b py-[14px] px-[18px]">
@@ -53,7 +53,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="grow overflow-y-scroll px-[17px]">
+					<div class="grow overflow-scroll px-[25px]">
 						<CustomerSatisfactionFeedback
 							:fromDesk="true"
 							v-if="
@@ -73,29 +73,29 @@
 						/>
 					</div>
 					<div
-						class="shrink-0 flex flex-col mb-[15px] px-[18px] space-y-[11px] pt-2"
+						class="shrink-0 flex flex-col mb-[19px] px-[18px] space-y-[11px]"
 					>
-						<TextEditor
-							v-if="editing"
+						<CustomTextEditor
 							ref="replyEditor"
-							:content="content"
-							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
+							:show="editing"
 							v-on:keydown="handleShortcuts($event)"
+							@click="$refs.replyEditor.focusEditor()"
+							:content="content"
 							:mentions="mentions"
 							@change="
 								(val) => {
 									content = val
 								}
 							"
-							@click="$refs.replyEditor.editor.commands.focus()"
 							:placeholder="
 								editingType == 'reply'
 									? 'Type a response'
 									: 'Type a comment'
 							"
+							editorClasses="w-full min-h-[180px] max-h-[300px] text-[13px]"
 							class="border border-gray-300 rounded-[8px] p-[12px]"
 						>
-							<template #top>
+							<template #top-section>
 								<div
 									class="flex flex-row items-center text-[12px] font-normal pb-[8px]"
 								>
@@ -138,7 +138,7 @@
 									</div>
 								</div>
 							</template>
-							<template #bottom>
+							<template #bottom-section="{ editor }">
 								<div>
 									<div
 										v-if="attachments.length"
@@ -186,10 +186,32 @@
 										</ul>
 									</div>
 									<div v-if="showTextFormattingMenu">
-										<TextEditorFixedMenu
-											class="my-1 overflow-x-auto rounded shadow-sm border"
-											:buttons="textEditorMenuButtons"
-										/>
+										<div
+											class="flex flex-row items-center space-x-1.5 p-1.5 rounded shadow w-fit"
+										>
+											<div
+												v-for="item in [
+													'bold',
+													'italic',
+													'|',
+													'quote',
+													'code',
+													'|',
+													'numbered-list',
+													'bullet-list',
+													'left-align',
+													'center-align',
+													'right-align',
+												]"
+												:key="item"
+											>
+												<TextEditorMenuItem
+													:item="item"
+													:editor="editor"
+													:attachments="attachments"
+												/>
+											</div>
+										</div>
 									</div>
 									<div
 										class="pt-2 select-none flex flex-row items-center space-x-2"
@@ -262,6 +284,19 @@
 												</template>
 											</FileUploader>
 											<CustomIcons
+												:class="
+													editor.isActive('link')
+														? 'bg-gray-100'
+														: ''
+												"
+												name="link-url"
+												class="h-7 w-7 rounded p-1"
+												role="button"
+												@click="
+													$refs.replyEditor.insertLink
+												"
+											/>
+											<CustomIcons
 												name="add-response"
 												class="h-7 w-7 rounded p-1"
 												role="button"
@@ -300,7 +335,7 @@
 									</div>
 								</div>
 							</template>
-						</TextEditor>
+						</CustomTextEditor>
 						<div>
 							<div
 								v-if="!editing"
@@ -340,11 +375,12 @@ import {
 	FeatherIcon,
 	TextEditor,
 } from "frappe-ui"
-import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
+import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
 import Conversations from "@/components/desk/ticket/Conversations.vue"
 import InfoPanel from "@/components/desk/ticket/InfoPanel.vue"
 import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
 import { inject, ref } from "vue"
@@ -353,6 +389,7 @@ export default {
 	name: "Ticket",
 	props: ["ticketId"],
 	components: {
+		CustomTextEditor,
 		Badge,
 		Card,
 		Dropdown,
@@ -365,8 +402,8 @@ export default {
 		ActionPanel,
 		CustomIcons,
 		CustomerSatisfactionFeedback,
+		TextEditorMenuItem,
 		CannedResponsesDialog,
-		TextEditorFixedMenu,
 	},
 	data() {
 		return {
@@ -470,53 +507,6 @@ export default {
 		})
 	},
 	computed: {
-		textEditorMenuButtons() {
-			return [
-				"Paragraph",
-				[
-					"Heading 2",
-					"Heading 3",
-					"Heading 4",
-					"Heading 5",
-					"Heading 6",
-				],
-				"Separator",
-				"Bold",
-				"Italic",
-				"Separator",
-				"Bullet List",
-				"Numbered List",
-				"Separator",
-				"Align Left",
-				"Align Center",
-				"Align Right",
-				"Separator",
-				"Image",
-				"Video",
-				"Link",
-				"Blockquote",
-				"Code",
-				"Horizontal Rule",
-				[
-					"InsertTable",
-					"AddColumnBefore",
-					"AddColumnAfter",
-					"DeleteColumn",
-					"AddRowBefore",
-					"AddRowAfter",
-					"DeleteRow",
-					"MergeCells",
-					"SplitCell",
-					"ToggleHeaderColumn",
-					"ToggleHeaderRow",
-					"ToggleHeaderCell",
-					"DeleteTable",
-				],
-				"Separator",
-				"Undo",
-				"Redo",
-			]
-		},
 		ticket() {
 			return this.$resources.ticket.doc || null
 		},
@@ -544,9 +534,7 @@ export default {
 			this.editing = true
 			this.editingType = type
 			this.delayedConversationScroll()
-			this.$nextTick(() => {
-				this.$refs.replyEditor.editor.commands.focus()
-			})
+			this.$refs.replyEditor.focusEditor()
 		},
 		cancelEditing() {
 			this.editing = false
@@ -565,7 +553,7 @@ export default {
 					this.submit()
 				}
 			} else if ((e.metaKey || e.ctrlKey) && e.keyCode === 75) {
-				this.$refs.replyEditor.editor.commands.insertLink()
+				this.$refs.replyEditor.insertLink()
 			} else if (e.keyCode === 27) {
 				this.cancelEditing()
 			}
@@ -619,3 +607,9 @@ export default {
 	},
 }
 </script>
+<style scoped>
+*::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+}
+</style>

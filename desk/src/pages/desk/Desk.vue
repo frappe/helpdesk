@@ -44,6 +44,18 @@ export default {
 		const agentGroups = ref([])
 		const agentController = ref({})
 
+		const sideBarFilterMap = ref({
+			all: "All Tickets",
+			"my-open-tickets": "My Open Tickets",
+			"my-replied-tickets": "My Replied Tickets",
+			"my-resolved-tickets": "My Resolved Tickets",
+			"my-closed-tickets": "My Closed Tickets",
+		})
+		provide("sideBarFilterMap", sideBarFilterMap)
+
+		const ticketSideBarFilter = ref("all")
+		provide("ticketSideBarFilter", ticketSideBarFilter)
+
 		provide("ticketTypes", ticketTypes)
 		provide("ticketPriorities", ticketPriorities)
 		provide("ticketStatuses", ticketStatuses)
@@ -95,12 +107,6 @@ export default {
 
 			return true
 		},
-		defaultOutgoingEmailAccountSetup() {
-			if (this.$resources.defaultOutgoingEmailAccount.loading) {
-				return "NOT SET"
-			}
-			return this.$resources.defaultOutgoingEmailAccount.data > 0
-		},
 	},
 	mounted() {
 		if (!this.user.isLoggedIn()) {
@@ -115,7 +121,8 @@ export default {
 			return
 		}
 		this.$resources.frappedeskSettings.fetch()
-		this.ticketController.set = (ticketId, type, ref = null) => {
+		this.$resources.defaultOutgoingEmailAccount.fetch()
+		;(this.ticketController.set = (ticketId, type, ref = null) => {
 			switch (type) {
 				case "type":
 					return this.$resources.assignTicketType.submit({
@@ -148,20 +155,20 @@ export default {
 						agent_group: ref,
 					})
 			}
-		}
-		this.ticketController.new = (type, values) => {
-			switch (type) {
-				case "ticket":
-					return this.$resources.createTicket.submit({
-						values,
-					})
-				case "type":
-					this.$resources.createTicketType.submit({
-						type: values,
-					})
-					break
-			}
-		}
+		}),
+			(this.ticketController.new = (type, values) => {
+				switch (type) {
+					case "ticket":
+						return this.$resources.createTicket.submit({
+							values,
+						})
+					case "type":
+						this.$resources.createTicketType.submit({
+							type: values,
+						})
+						break
+				}
+			})
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case "Ticket Type":
@@ -178,119 +185,17 @@ export default {
 	unmounted() {
 		this.$socket.off("list_update")
 	},
-	watch: {
-		initialized(val) {
-			if (val) {
-				this.handlePostOnboardSetupReqs()
-			}
-		},
-	},
-	methods: {
-		handlePostOnboardSetupReqs() {
-			// helpdesk name
-			if (
-				!this.$resources.frappedeskSettings.data.helpdesk_name &&
-				!this.$resources.frappedeskSettings.data
-					.initial_helpdesk_name_setup_skipped
-			) {
-				this.showHelpdeskNameSetupToast()
-				return
-			}
-			// default email account
-			if (
-				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
-				!this.defaultOutgoingEmailAccountSetup
-			) {
-				this.showDefaultEmailAccountSetupToast()
-				return
-			}
-			// add agents
-			if (
-				!this.$resources.agentCount.loading &&
-				this.$resources.agentCount.data == 0
-			) {
-				// this block should theoretically never fire, since the initial agent is created during the setup process
-				this.showAddAgentsToast()
-			}
-		},
-		showHelpdeskNameSetupToast() {
-			console.log("showing helpdesk name setup toast")
-			this.$toast({
-				title: "Setup Helpdesk Name",
-				form: {
-					inputs: [
-						{
-							type: "text",
-							fieldname: "helpdesk_name",
-							placeholder: "eg: FDESK",
-						},
-					],
-					onSubmit: (values) => {
-						if (values.helpdesk_name) {
-							this.$resources.setHelpdeskName.submit({
-								name: values.helpdesk_name,
-							})
-						}
-					},
-				},
-				fixed: true,
-				appearance: "info",
-				position: "bottom-right",
-				onClose: () => {
-					this.$resources.skipHelpdeskNameSetup.submit()
-				},
-			})
-		},
-		showDefaultEmailAccountSetupToast() {
-			this.$toast({
-				title: "Default outgoing email account not added",
-				text: "Please add a default outgoing email account in settings.",
-				appearance: "info",
-				icon: "info",
-				iconClasses: "stroke-blue-500 stroke-2",
-				fixed: true,
-				position: "bottom-right",
-				action: {
-					title: "Setup now",
-					onClick: () => {
-						this.$clearToasts()
-						this.$router.push({ name: "Emails" })
-					},
-				},
-			})
-		},
-		showAddAgentsToast() {
-			this.$toast({
-				title: "Add agents",
-				text: "Please add an agents from settings.",
-				appearance: "info",
-				icon: "info",
-				iconClasses: "stroke-blue-500 stroke-2",
-				fixed: true,
-				position: "bottom-right",
-				action: {
-					title: "Add now",
-					onClick: () => {
-						this.$clearToasts()
-						this.$router.push({ name: "Agents" })
-					},
-				},
-			})
-		},
-	},
 	resources: {
-		// onboarding related resources
-		// setters
 		setupInitialAgent() {
-			// sets up an initial agent
 			return {
 				method: "frappedesk.api.setup.initial_agent_setup",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch()
+					this.$router.go()
 				},
 				onError: (err) => {
+					console.log(err)
 					this.$toast({
-						title: "Something went wrong, while adding initial agent",
+						title: "Something went wrong.",
 						text: "Please try again later.",
 						customIcon: "circle-fail",
 						appearance: "danger",
@@ -299,15 +204,15 @@ export default {
 			}
 		},
 		createInitialDemoTicket() {
-			// creates a demo ticket
 			return {
 				method: "frappedesk.api.setup.create_initial_demo_ticket",
 				onSuccess: (res) => {
 					this.$resources.frappedeskSettings.fetch()
 				},
 				onError: (err) => {
+					console.log(err)
 					this.$toast({
-						title: "Something went wrong, while creating a demo ticket",
+						title: "Something went wrong.",
 						text: "Please try again later.",
 						customIcon: "circle-fail",
 						appearance: "danger",
@@ -316,34 +221,23 @@ export default {
 			}
 		},
 		setHelpdeskName() {
-			// set helpdesk name in Frappe Desk Settings
 			return {
 				method: "frappedesk.api.settings.update_helpdesk_name",
 				onSuccess: (res) => {
-					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`
+					document.title = `FrappeDesk ${res ? ` | ${res}` : ""}`
 					this.$toast({
 						title: "Helpdesk name updated!!",
 						customIcon: "circle-check",
 						appearance: "success",
 					})
 				},
-				onError: (err) => {
-					this.$toast({
-						title: "Something went wrong, updating helpdesk name",
-						text: "Please try again later.",
-						customIcon: "circle-fail",
-						appearance: "danger",
-					})
-				},
 			}
 		},
 		skipHelpdeskNameSetup() {
-			// sets the values of skip_helpdesk_name_setup to true inside Frappe Desk Settings
 			return {
 				method: "frappedesk.api.settings.skip_helpdesk_name_setup",
 			}
 		},
-		// getters
 		frappedeskSettings() {
 			return {
 				method: "frappe.client.get",
@@ -351,7 +245,40 @@ export default {
 					doctype: "Frappe Desk Settings",
 					name: "Frappe Desk Settings",
 				},
+				onSuccess: (data) => {
+					if (
+						!data.initial_helpdesk_name_setup_skipped &&
+						data.helpdesk_name == ""
+					) {
+						this.$toast({
+							title: "Setup Helpdesk Name",
+							form: {
+								inputs: [
+									{
+										type: "text",
+										fieldname: "helpdesk_name",
+										placeholder: "eg: FDESK",
+									},
+								],
+								onSubmit: (values) => {
+									if (values.helpdesk_name) {
+										this.$resources.setHelpdeskName.submit({
+											name: values.helpdesk_name,
+										})
+									}
+								},
+							},
+							fixed: true,
+							appearance: "info",
+							position: "bottom-right",
+							onClose: () => {
+								this.$resources.skipHelpdeskNameSetup.submit()
+							},
+						})
+					}
+				},
 				onError: (error) => {
+					console.log(error)
 					this.$toast({
 						title: "Something went wrong.",
 						text: "Please try again later.",
@@ -363,7 +290,7 @@ export default {
 		},
 		defaultOutgoingEmailAccount() {
 			return {
-				method: "frappe.client.get_count",
+				method: "frappe.client.get_list",
 				params: {
 					doctype: "Email Account",
 					filters: [
@@ -372,7 +299,31 @@ export default {
 						["default_outgoing", "=", 1],
 					],
 				},
-				auto: true,
+				onSuccess: (data) => {
+					if (data.length == 0) {
+						this.$toast({
+							title: "Default outgoing email account not added",
+							text: "Please add a default outgoing email account in settings.",
+							appearance: "info",
+							icon: "info",
+							iconClasses: "stroke-blue-500 stroke-2",
+							fixed: true,
+							position: "bottom-right",
+							action: {
+								title: "Setup now",
+								onClick: () => {
+									this.$clearToasts()
+									this.$router.push({ name: "Emails" })
+								},
+							},
+						})
+					} else {
+						this.$resources.agentCount.fetch()
+					}
+				},
+				onError: (error) => {
+					console.log(error)
+				},
 			}
 		},
 		agentCount() {
@@ -381,11 +332,31 @@ export default {
 				params: {
 					doctype: "Agent",
 				},
-				auto: true,
+				onSuccess: (count) => {
+					if (count <= 1) {
+						this.$toast({
+							title: "Add agents",
+							text: "Please add a agents from settings.",
+							appearance: "info",
+							icon: "info",
+							iconClasses: "stroke-blue-500 stroke-2",
+							fixed: true,
+							position: "bottom-right",
+							action: {
+								title: "Add now",
+								onClick: () => {
+									this.$clearToasts()
+									this.$router.push({ name: "Agents" })
+								},
+							},
+						})
+					}
+				},
+				onError: (error) => {
+					console.log(error)
+				},
 			}
 		},
-
-		// ticket related resources
 		createTicket() {
 			return {
 				method: "frappedesk.api.ticket.create_new",

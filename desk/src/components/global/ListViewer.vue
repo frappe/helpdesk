@@ -90,7 +90,7 @@
 					<slot name="header">
 						<div class="w-full">
 							<div
-								class="flex flex-row bg-[#F7F7F7] group items-center text-base font-normal text-gray-500 py-[10px] p-[10px] rounded-[6px] select-none"
+								class="flex flex-row bg-[#F7F7F7] group items-center text-base font-medium text-gray-500 py-[10px] p-[10px] rounded-[6px] select-none"
 							>
 								<div class="w-[25px]">
 									<Input

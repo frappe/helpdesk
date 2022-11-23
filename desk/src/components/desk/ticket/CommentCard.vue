@@ -24,7 +24,7 @@
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<div
-					class="ProseMirror prose prose-p:my-1 max-w-full text-[13px] text-gray-700"
+					class="prose prose-p:my-1 text-[13px] text-gray-700"
 					v-html="cleanedMessage"
 				></div>
 			</div>

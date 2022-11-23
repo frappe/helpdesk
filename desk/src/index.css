@@ -14,26 +14,24 @@
 
 	/* Works on Chrome, Edge, and Safari */
 	*::-webkit-scrollbar-thumb {
-		background: #c0c6cc;
+		background: #e2e8f0;
 		border-radius: 6px;
 	}
 
 	*::-webkit-scrollbar-track,
+	*::-webkit-scrollbar-corner {
+		background: #f8fafc;
+	}
+
 	*::-webkit-scrollbar {
-		width: 5px;
+		width: 0px;
 		height: 6px;
 	}
 
 	body::-webkit-scrollbar {
-		width: 5px;
+		width: 0px;
 		height: 12px;
 	}
-}
-
-.form-checkbox {
-	height: 14px;
-	width: 14px;
-	border-radius: 4px;
 }
 
 .ProseMirror {

@@ -523,7 +523,6 @@ export default {
 						customIcon: "circle-check",
 						appearance: "success",
 					})
-					this.$clearToasts()
 					this.$router.push({
 						name: "Emails",
 					})

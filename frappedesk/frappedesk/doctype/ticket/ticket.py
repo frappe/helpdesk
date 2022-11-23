@@ -310,17 +310,13 @@ def create_communication_via_agent(ticket, message, attachments=None):
 				reference_name=ticket_doc.name,
 				communication=communication.name,
 				attachments=_attachments if len(_attachments) > 0 else None,
-				template="new_reply_on_customer_portal_notification"
-				if just_sent_email_notification
-				else None,
+				template="new_reply_on_customer_portal_notification" if just_sent_email_notification else None,
 				message=message if not just_sent_email_notification else None,
 				args={
 					"ticket_id": ticket_doc.name,
 					"message": message,
 					"portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}",
-				}
-				if just_sent_email_notification
-				else None,
+				} if just_sent_email_notification else None,
 				now=False,
 			)
 		except:

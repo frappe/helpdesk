@@ -164,7 +164,6 @@ def bulk_insert_tickets(tickets, sla="Default"):
 	# ticket_names = [ticket[7] for ticket in tickets]
 	# bulk_apply("Ticket", ticket_names)
 
-
 def bulk_create_contacts_and_assignments_for_tickets(tickets):
 	background = len(tickets) > 5
 	for ticket in tickets:
@@ -174,7 +173,6 @@ def bulk_create_contacts_and_assignments_for_tickets(tickets):
 			)
 		else:
 			create_contacts_and_assignments_for_tickets(ticket)
-
 
 def create_contacts_and_assignments_for_tickets(ticket):
 	email = ticket[2]
