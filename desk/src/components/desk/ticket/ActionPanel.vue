@@ -1,102 +1,6 @@
 <template>
 	<div v-if="ticket" class="flex flex-col h-full">
 		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] dashes">
-			<div class="flex flex-row pb-[15px]">
-				<div class="grow flex flex-row space-x-1.5 items-center">
-					<div class="text-[16px] font-normal text-gray-500">
-						Ticket
-					</div>
-					<div class="text-[15px] font-semibold">
-						{{ `#${ticket.name}` }}
-					</div>
-				</div>
-				<div class="w-[88.54px] select-none">
-					<div
-						v-if="false"
-						class="fixed border-[#38A160] border-[#FF7C36] border-[#E24C4C] text-[#38A160] text-[#FF7C36] text-[#E24C4C]"
-					></div>
-					<div class="absolute w-[88.54px] flex flex-row">
-						<div class="grow"></div>
-						<div class="shrink-0">
-							<div
-								class="bg-white border px-[8px] rounded-[10px] h-fit cursor-pointer w-fit"
-								:class="getStatusStyle(ticket.status)"
-								@click="toggleStatuese = !toggleStatuese"
-								v-on-outside-click="
-									() => {
-										toggleStatuese = false
-									}
-								"
-							>
-								<div
-									v-if="!updatingStatus"
-									class="flex flex-row items-center h-[20px] space-x-[7px]"
-								>
-									<div class="text-[10px] uppercase grow">
-										{{ ticket.status }}
-									</div>
-									<div>
-										<FeatherIcon
-											name="chevron-down"
-											class="h-3 stroke-gray-500"
-										/>
-									</div>
-								</div>
-								<div v-else>
-									<div
-										class="text-[10px] h-[20px] flex flex-row items-center text-gray-500"
-									>
-										Updating...
-									</div>
-								</div>
-							</div>
-							<div v-if="toggleStatuese">
-								<div
-									class="rounded-[10px] shadow py-[4px] space-y-[4px] mt-[3px] absolute z-50 bg-white"
-								>
-									<div
-										v-for="status in [
-											'Open',
-											'Replied',
-											'Resolved',
-											'Closed',
-										]"
-										:key="status"
-									>
-										<div
-											class="px-[8px] hover:bg-gray-50 hover:text-gray-900 cursor-pointer text-base text-gray-600 mx-[4px] rounded-[6px] py-[4px] w-[95px]"
-											@click="updateStatus(status)"
-										>
-											<div
-												class="flex flex-row space-x-2 items-center"
-											>
-												<FeatherIcon
-													v-if="status != 'Open'"
-													:name="
-														{
-															Closed: 'lock',
-															Resolved: 'check',
-															Replied:
-																'corner-up-left',
-														}[status]
-													"
-													class="stroke-gray-600 w-[12px] h-[12px] mx-[2px]"
-												/>
-												<CustomIcons
-													v-else
-													name="comment"
-													class="w-[16px] h-[16px] stroke-green-600"
-												/>
-												<div>{{ status }}</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 			<div class="text-base space-y-[11px]">
 				<div class="flex flex-col space-y-[2px]">
 					<div class="flex flex-row space-x-[5.33px] items-center">
@@ -158,389 +62,32 @@
 			></span>
 		</div>
 		<div class="px-[19px] py-[28px] h-full overflow-y-auto">
-			<div class="text-base space-y-[12px]">
-				<div v-if="user.agent">
-					<router-link
-						class="hover:underline"
-						:to="{
-							path: '/support/tickets/impersonate',
-							query: {
-								contact: ticket.raised_by,
-								ticketId: ticket.name,
-							},
-						}"
-						target="_blank"
-						>See on Support Portal</router-link
-					>
-				</div>
-				<div class="flex flex-col space-y-[8px]">
-					<div class="text-gray-600 font-normal text-[12px]">
-						Assignee
-					</div>
-					<Autocomplete
-						width="220"
-						:options="
-							agents.map((x) => {
-								// TODO(Urgent): filter out agents who are not in the same agent group as the ticket
-								return {
-									label: x.agent_name,
-									value: x.name,
-								}
-							})
-						"
-						placeholder="Assign to"
-						:value="
-							ticket.assignees.length > 0 && !updatingAssignee
-								? ticket.assignees[0].agent_name
-								: ''
-						"
-						@change="
-							(item) => {
-								if (item.value) {
-									updatingAssignee = true
-									ticketController
-										.set(this.ticketId, 'agent', item.value)
-										.then(() => {
-											updatingAssignee = false
-											$resources.ticket.fetch()
-
-											$toast({
-												title: 'Ticket updated successfully.',
-												customIcon: 'circle-check',
-												appearance: 'success',
-											})
-										})
-								}
-							}
-						"
-					>
-						<template #input>
-							<div
-								class="flex flex-row space-x-1 items-center w-full"
-								@click="open"
-							>
-								<div class="grow">
-									<div
-										v-if="
-											ticket.assignees.length > 0 &&
-											!updatingAssignee
-										"
-										class="flex flex-row text-left space-x-2"
-									>
-										<CustomAvatar
-											:label="
-												ticket.assignees[0].agent_name
-											"
-											:imageURL="
-												ticket.assignees[0].image
-											"
-											size="xs"
-										/>
-										<div>
-											{{ ticket.assignees[0].agent_name }}
-										</div>
-									</div>
-									<div v-else>
-										<LoadingText v-if="updatingAssignee" />
-										<div
-											v-else
-											class="text-base text-left text-gray-400"
-										>
-											assign agent
-										</div>
-									</div>
-								</div>
-							</div>
-						</template>
-					</Autocomplete>
-				</div>
+			<div class="flex flex-col space-y-[12px]">
+				<!-- Show system ticket fields: Status, Ticket Type, Priority and Agent Group  -->
+				<TicketField :ticketId="ticket.name" fieldname="status" />
+				<TicketField :ticketId="ticket.name" fieldname="ticket_type" />
+				<TicketField :ticketId="ticket.name" fieldname="priority" />
+				<TicketField :ticketId="ticket.name" fieldname="agent_group" />
+				<!-- Show all the ticket custom fields that can be viewed by an agent -->
 				<div
-					class="flex flex-col space-y-[8px]"
-					:class="
-						mandatoryFieldsNotSet && !ticket.ticket_type
-							? 'error-animation'
-							: ''
-					"
+					v-for="customField in customFields"
+					:key="customField.fieldname"
 				>
-					<div
-						class="flex flex-row justify-between text-gray-600 font-normal text-[12px]"
-					>
-						<div
-							:class="
-								mandatoryFieldsNotSet && !ticket.ticket_type
-									? 'text-red-600'
-									: 'text-gray-600'
-							"
-						>
-							Type*
-						</div>
-					</div>
-					<Autocomplete
-						v-if="ticketTypes"
-						width="220"
-						:options="
-							ticketTypes.map((x) => {
-								return { label: x.name, value: x.name }
-							})
-						"
-						placeholder="Set type"
-						:value="
-							ticket.ticket_type && !updatingTicketType
-								? ticket.ticket_type
-								: ''
-						"
-						@change="
-							(item) => {
-								if (item.value) {
-									updatingTicketType = true
-									ticketController
-										.set(ticketId, 'type', item.value)
-										.then(() => {
-											updatingTicketType = false
-											$resources.ticket.fetch()
-
-											$toast({
-												title: 'Ticket updated successfully.',
-												customIcon: 'circle-check',
-												appearance: 'success',
-											})
-										})
-								}
-							}
-						"
-					>
-						<template #input>
-							<div
-								class="flex flex-row space-x-1 items-center w-full"
-							>
-								<div class="grow">
-									<div
-										v-if="
-											ticket.ticket_type &&
-											!updatingTicketType
-										"
-										class="text-left h-[20px]"
-									>
-										<Tooltip
-											v-if="
-												ticket.ticket_type.length > 20
-											"
-											placement="top"
-											:text="ticket.ticket_type"
-											class="line-clamp-1 w-[180px]"
-										>
-											<div class="">
-												{{ ticket.ticket_type }}
-											</div>
-										</Tooltip>
-										<div v-else>
-											{{ ticket.ticket_type }}
-										</div>
-									</div>
-									<div v-else>
-										<LoadingText
-											v-if="updatingTicketType"
-										/>
-										<div
-											v-else
-											class="text-base text-left text-gray-400"
-										>
-											set type
-										</div>
-									</div>
-								</div>
-							</div>
-						</template>
-						<template #no-result-found>
-							<div
-								role="button"
-								class="hover:bg-gray-100 px-2.5 py-1.5 rounded-md text-base text-blue-500 font-semibold"
-								@click="
-									() => {
-										this.openCreateNewTicketTypeDialog = true
-									}
-								"
-							>
-								Create new
-							</div>
-						</template>
-					</Autocomplete>
-				</div>
-				<div class="flex flex-col space-y-[8px]">
-					<div
-						class="flex flex-row justify-between text-gray-600 font-normal text-[12px]"
-					>
-						<div>Team</div>
-					</div>
-					<Autocomplete
-						v-if="agentGroups"
-						width="220"
-						:options="
-							agentGroups.map((x) => {
-								return { label: x.name, value: x.name }
-							})
-						"
-						placeholder="Set team"
-						:value="
-							ticket.agent_group && !updatingTeam
-								? ticket.agent_group
-								: ''
-						"
-						@change="
-							(item) => {
-								if (item.value) {
-									updatingTeam = true
-									ticketController
-										.set(ticketId, 'group', item.value)
-										.then(() => {
-											updatingTeam = false
-											$resources.ticket.fetch()
-
-											$toast({
-												title: 'Ticket updated successfully.',
-												customIcon: 'circle-check',
-												appearance: 'success',
-											})
-										})
-								}
-							}
-						"
-					>
-						<template #input>
-							<div
-								class="flex flex-row space-x-1 items-center w-full line-clamp-1"
-							>
-								<div class="grow">
-									<div
-										v-if="
-											ticket.agent_group && !updatingTeam
-										"
-										class="text-left"
-									>
-										{{ ticket.agent_group }}
-									</div>
-									<div v-else>
-										<LoadingText v-if="updatingTeam" />
-										<div
-											v-else
-											class="text-base text-left text-gray-400"
-										>
-											set team
-										</div>
-									</div>
-								</div>
-							</div>
-						</template>
-					</Autocomplete>
-				</div>
-				<div class="flex flex-col space-y-[8px]">
-					<div class="text-gray-600 font-normal text-[12px]">
-						Priority
-					</div>
-					<Autocomplete
-						v-if="ticketPriorities"
-						width="220"
-						:options="
-							ticketPriorities.map((x) => {
-								return { label: x.name, value: x.name }
-							})
-						"
-						placeholder="Set priority"
-						:value="
-							ticket.priority && !updatingPriority
-								? ticket.priority
-								: ''
-						"
-						@change="
-							(item) => {
-								if (item.value) {
-									updatingPriority = true
-									ticketController
-										.set(ticketId, 'priority', item.value)
-										.then(() => {
-											updatingPriority = false
-											$resources.ticket.fetch()
-
-											$toast({
-												title: 'Ticket updated successfully.',
-												customIcon: 'circle-check',
-												appearance: 'success',
-											})
-										})
-								}
-							}
-						"
-					>
-						<template #input>
-							<div
-								class="flex flex-row space-x-1 items-center w-full line-clamp-1"
-							>
-								<div class="grow">
-									<div
-										v-if="
-											ticket.priority && !updatingPriority
-										"
-										class="text-left"
-									>
-										{{ ticket.priority }}
-									</div>
-									<div v-else>
-										<LoadingText v-if="updatingPriority" />
-										<div
-											v-else
-											class="text-base text-left text-gray-400"
-										>
-											set priority
-										</div>
-									</div>
-								</div>
-							</div>
-						</template>
-					</Autocomplete>
+					<TicketField
+						:ticketId="ticket.name"
+						:fieldname="customField.fieldname"
+					/>
 				</div>
 			</div>
 		</div>
-		<Dialog
-			:options="{ title: 'Create New Type' }"
-			v-model="openCreateNewTicketTypeDialog"
-		>
-			<template #body-content>
-				<div class="space-y-4">
-					<Input
-						type="text"
-						v-model="newType"
-						placeholder="eg: Bug"
-					/>
-					<div class="flex float-right space-x-2">
-						<Button @click="createAndAssignTicketTypeFromDialog()"
-							>Create and Assign</Button
-						>
-						<Button
-							@click="createTicketTypeFromDialog()"
-							appearance="primary"
-							>Create</Button
-						>
-					</div>
-				</div>
-			</template>
-		</Dialog>
 	</div>
 </template>
 
 <script>
-import {
-	FeatherIcon,
-	Dropdown,
-	Input,
-	Dialog,
-	Badge,
-	LoadingText,
-} from "frappe-ui"
-import Autocomplete from "@/components/global/Autocomplete.vue"
-import CustomDropdown from "@/components/desk/global/CustomDropdown.vue"
+import { FeatherIcon, Badge } from "frappe-ui"
+import { inject } from "@vue/runtime-core"
+import TicketField from "@/components/global/TicketField.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
-import { inject, ref } from "@vue/runtime-core"
 
 export default {
 	name: "ActionPanel",
@@ -548,71 +95,20 @@ export default {
 	components: {
 		Badge,
 		FeatherIcon,
-		Dropdown,
-		CustomDropdown,
-		Input,
-		Dialog,
-		Autocomplete,
+		TicketField,
 		CustomIcons,
-		CustomAvatar,
-		LoadingText,
-	},
-	data() {
-		return {
-			openCreateNewTicketTypeDialog: false,
-			newType: "",
-		}
 	},
 	setup() {
-		const viewportWidth = inject("viewportWidth")
-
 		const user = inject("user")
-		const ticketTypes = inject("ticketTypes")
-		const ticketPriorities = inject("ticketPriorities")
-		const ticketStatuses = inject("ticketStatuses")
-		const ticketController = inject("ticketController")
-
-		const agents = inject("agents")
-		const agentGroups = inject("agentGroups")
-
-		const updatingTicketType = ref(false)
-		const updatingAssignee = ref(false)
-		const updatingPriority = ref(false)
-		const updatingStatus = ref(false)
-		const updatingTeam = ref(false)
-
-		const toggleStatuese = ref(false)
-
-		const mandatoryFields = ref(["ticket_type"])
-		const mandatoryFieldsNotSet = ref(false)
 
 		return {
-			viewportWidth,
-
 			user,
-			ticketTypes,
-			ticketPriorities,
-			ticketStatuses,
-			ticketController,
-
-			agents,
-			agentGroups,
-
-			updatingTicketType,
-			updatingAssignee,
-			updatingPriority,
-			updatingStatus,
-			updatingTeam,
-			toggleStatuese,
-
-			mandatoryFields,
-			mandatoryFieldsNotSet,
 		}
 	},
 	mounted() {
 		document.addEventListener("keydown", this.handleShortcuts.bind(this))
 	},
-	beforeDestroy() {
+	unmounted() {
 		document.removeEventListener("keydown", this.handleShortcuts)
 	},
 	updated() {
@@ -627,8 +123,21 @@ export default {
 		ticket() {
 			return this.$resources.ticket.data || null
 		},
+		customFields() {
+			return this.$resources.customFields.data || null
+		},
 	},
 	resources: {
+		customFields() {
+			return {
+				method: "frappedesk.api.ticket.get_custom_fields",
+				params: {
+					doctype: "Ticket",
+					view: "Agent Portal",
+				},
+				auto: true,
+			}
+		},
 		ticket() {
 			return {
 				cache: ["Ticket", "Action Panel", this.ticketId],
@@ -655,66 +164,6 @@ export default {
 						this.updateStatus("Closed")
 				}
 			}
-		},
-		createAndAssignTicketTypeFromDialog() {
-			if (this.newType) {
-				this.updatingTicketType = true
-				this.ticketController
-					.set(this.ticketId, "type", this.newType)
-					.then(() => {
-						this.updatingTicketType = false
-						this.$resources.ticket.fetch()
-
-						this.$toast({
-							title: "Ticket updated successfully.",
-							customIcon: "circle-check",
-							appearance: "success",
-						})
-					})
-				this.closeCreateNewTicketTypeDialog()
-			}
-		},
-		createTicketTypeFromDialog() {
-			if (this.newType) {
-				this.ticketController.new("type", this.newType)
-				this.closeCreateNewTicketTypeDialog()
-			}
-		},
-		closeCreateNewTicketTypeDialog() {
-			this.newType = ""
-			this.openCreateNewTicketTypeDialog = false
-		},
-		updateStatus(status) {
-			this.mandatoryFieldsNotSet = false
-			this.mandatoryFields.forEach((fieldname) => {
-				if (!this.ticket[fieldname]) {
-					this.mandatoryFieldsNotSet = true
-				}
-			})
-			if (!this.mandatoryFieldsNotSet) {
-				this.updatingStatus = true
-				this.ticketController
-					.set(this.ticketId, "status", status)
-					.then(() => {
-						this.updatingStatus = false
-						this.$resources.ticket.fetch()
-
-						this.$toast({
-							title: "Ticket updated successfully.",
-							customIcon: "circle-check",
-							appearance: "success",
-						})
-					})
-			}
-		},
-		getStatusStyle(status) {
-			const color = {
-				Open: "#38A160",
-				Replied: "#FF7C36",
-				Resolved: "#E24C4C",
-				Closed: "#E24C4C",
-			}[status]
-			return `border-[${color}] text-[${color}]`
 		},
 		getFormatedDate(date, format) {
 			return date ? this.$dayjs(date).format(format) : ""

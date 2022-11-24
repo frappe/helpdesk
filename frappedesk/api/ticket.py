@@ -570,3 +570,8 @@ def get_field_value(ticket_id, fieldname):
 def update_field_value(ticket_id, fieldname, value):
 	frappe.db.set_value("Ticket", ticket_id, fieldname, value)
 	frappe.db.commit()
+
+
+@frappe.whitelist()
+def get_custom_fields(view="Customer Portal"):
+	return frappe.get_doc("Ticket Custom Fields Config").get_custom_fields(view)

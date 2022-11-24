@@ -21,7 +21,7 @@
 							:selectedValue="selectedValue"
 						>
 							<div
-								class="flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
+								class="h-[28px] flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
 								:class="{
 									'rounded-b-none': isComboboxOpen,
 								}"

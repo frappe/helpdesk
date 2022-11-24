@@ -19,7 +19,11 @@
 				v-else
 				:placeholder="`Select ${fieldMetaInfo.label.toLowerCase()}`"
 				:value="fieldValue"
-				@change="onInput"
+				@change="
+					(val) => {
+						onInput(val.value)
+					}
+				"
 				:resourceOptions="getResourceOptions()"
 			/>
 		</div>
@@ -81,37 +85,29 @@ export default {
 				auto: true,
 			}
 		},
-		updateFieldValue() {
-			return {
-				method: "frappedesk.api.ticket.update_field_value",
-				params: {
-					ticket_id: this.ticketId,
-					fieldname: this.fieldname,
-					value: this.value,
-				},
-			}
-		},
 	},
 	methods: {
+		updateValue(val) {
+			this.updatingValue = true
+			this.ticketController
+				.set(this.ticketId, this.fieldname, val)
+				.then(() => {
+					this.updatingValue = false
+
+					this.$toast({
+						title: "Ticket updated successfully.",
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+				})
+		},
 		onInput(val) {
-			console.log(
-				this.fieldMetaInfo.fieldtype,
-				" input for ",
-				this.fieldMetaInfo.label,
-				" value: ",
-				val.target.value
-			)
+			this.updateValue(val)
 		},
 		debouncedOnInput: debounce(function (val) {
-			// for datepicker & text input, inputs only
-			// intermediate parameter is used to restric updating url query filters on every input
-			console.log("text input value value", val.target.value)
+			this.onInput(val)
 		}, 300),
 		getResourceOptions() {
-			console.log(
-				this.fieldMetaInfo.fieldname,
-				this.fieldMetaInfo.fieldtype
-			)
 			switch (this.fieldMetaInfo.fieldtype) {
 				case "Link":
 					return {
