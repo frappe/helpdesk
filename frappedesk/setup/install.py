@@ -3,7 +3,6 @@ from frappe.permissions import add_permission
 
 
 def before_install():
-	set_home_page_to_kb()
 	add_support_redirect_to_tickets()
 
 
@@ -18,28 +17,6 @@ def after_install():
 	update_agent_role_permissions()
 	add_default_assignment_rule()
 	add_system_preset_filters()
-
-
-def set_home_page_to_kb():
-	website_settings = frappe.get_doc("Website Settings")
-
-	if not website_settings.home_page or website_settings.home_page in [
-		"/support/kb",
-		"support/kb",
-	]:
-		website_settings.home_page = "/"
-
-	add_base_route_to_route_redirects = True
-	for route_redirects in website_settings.route_redirects:
-		if route_redirects.source == "/":
-			add_base_route_to_route_redirects = False
-
-	if add_base_route_to_route_redirects:
-		base_route = frappe.get_doc(
-			{"doctype": "Website Route Redirect", "source": "/", "target": "support/kb",}
-		)
-		website_settings.append("route_redirects", base_route)
-	website_settings.save()
 
 
 def add_support_redirect_to_tickets():
