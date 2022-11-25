@@ -545,6 +545,13 @@ def submit_customer_feedback(ticket_id, satisfaction_rating, feedback_text):
 
 @frappe.whitelist()
 def get_field_meta_info(fieldname):
+	if fieldname in ["_assign"]:
+		return {
+			"fieldtype": "Link",
+			"options": "Agent",
+			"fieldname": fieldname,
+			"label": "Assignee",
+		}
 	meta_info = frappe.get_meta("Ticket").get_field(fieldname).as_dict()
 
 	# check if field is a custom field
@@ -575,3 +582,8 @@ def update_field_value(ticket_id, fieldname, value):
 @frappe.whitelist()
 def get_custom_fields(view="Customer Portal"):
 	return frappe.get_doc("Ticket Custom Fields Config").get_custom_fields(view)
+
+
+@frappe.whitelist()
+def get_assignee(ticket_id):
+	return frappe.get_doc("Ticket", ticket_id).get_assigned_agent()

@@ -151,6 +151,9 @@ class Ticket(Document):
 		assign({"assign_to": [agent], "doctype": "Ticket", "name": self.name})
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
+		frappe.publish_realtime(
+			"ticket_assignee_update", {"ticket_id": self.name}, after_commit=True
+		)
 
 	def get_assigned_agent(self):
 		if self._assign:

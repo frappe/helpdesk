@@ -11,6 +11,15 @@ function createTicketDocumentResource(ticketId, vm) {
 		vm
 	)
 }
+function createTicketAssignmentsResource(ticketId, agentId) {
+	return createResource({
+		method: "frappedesk.api.ticket.assign_ticket_to_agent",
+		params: {
+			ticket_id: ticketId,
+			agent_id: agentId,
+		},
+	})
+}
 
 function get(options, vm) {
 	const ticketId = options?.ticketId
@@ -30,6 +39,11 @@ function get(options, vm) {
 }
 
 function set(ticketId, fieldname, value) {
+	if (fieldname === "_assign") {
+		let resource = createTicketAssignmentsResource(ticketId, value)
+		return resource.submit()
+	}
+
 	let resource = createTicketDocumentResource(ticketId)
 	return resource.setValue.submit({ [fieldname]: value })
 }

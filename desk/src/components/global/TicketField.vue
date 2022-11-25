@@ -60,21 +60,33 @@ export default {
 	emits: ["validate"], // validate can be used to triger external validations, eg: before updating ticket status, ticket type should be set, etc
 	setup(props, { context }) {
 		const $tickets = inject("$tickets")
-		const fieldValue = computed(() => {
-			return $tickets.get(
-				{ ticketId: props.ticketId, fieldname: props.fieldname },
-				context
-			).value
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, context).value
 		})
 
 		return {
-			fieldValue,
+			ticket,
 		}
 	},
 	computed: {
 		fieldMetaInfo() {
 			return this.$resources.fieldMetaInfo.data || null
 		},
+		fieldValue() {
+			if (this.fieldname == "_assign") {
+				return this.$resources.getAssignee.data?.agent_name || null
+			}
+			return this.ticket?.[this.fieldname] || null
+		},
+	},
+	mounted() {
+		if (this.fieldname == "_assign") {
+			this.$socket.on("ticket_assignee_update", (data) => {
+				if (data.ticket_id == this.ticket.name) {
+					this.$resources.getAssignee.fetch()
+				}
+			})
+		}
 	},
 	resources: {
 		fieldMetaInfo() {
@@ -86,6 +98,17 @@ export default {
 				method: "frappedesk.api.ticket.get_field_meta_info",
 				params: {
 					fieldname: this.fieldname,
+				},
+				auto: true,
+			}
+		},
+		getAssignee() {
+			// TODO: this is a temparary fix, should be done in a better way
+			if (this.fieldname !== "_assign") return
+			return {
+				method: "frappedesk.api.ticket.get_assignee",
+				params: {
+					ticket_id: this.ticketId,
 				},
 				auto: true,
 			}

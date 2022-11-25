@@ -71,6 +71,7 @@
 				<!-- Show system ticket fields: Status, Ticket Type, Priority and Agent Group  -->
 				<div
 					v-for="fieldname in [
+						'_assign',
 						'status',
 						'ticket_type',
 						'priority',
