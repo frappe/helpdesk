@@ -1,30 +1,33 @@
 <template>
-	<div
-		v-if="!$resources.fieldMetaInfo.loading"
-		class="flex flex-col space-y-[8px]"
-	>
+	<div class="flex flex-col space-y-[8px]">
 		<div class="text-[12px] text-gray-600">
-			{{ fieldMetaInfo.label }}
+			{{ fieldMetaInfo?.label }}
 		</div>
 		<div>
 			<!-- Data field -->
 			<Input
-				v-if="fieldMetaInfo.fieldtype === 'Data'"
+				v-if="fieldMetaInfo?.fieldtype === 'Data'"
 				type="text"
-				@change="debouncedOnInput"
+				@change="
+					(val) => {
+						onInput(val)
+					}
+				"
 				:value="fieldValue"
+				:debounce="300"
 			/>
 			<!-- Link / Select field -->
 			<Autocomplete
 				v-else
-				:placeholder="`Select ${fieldMetaInfo.label.toLowerCase()}`"
+				:placeholder="`Select ${fieldMetaInfo?.label.toLowerCase()}`"
 				:value="fieldValue"
 				@change="
 					(val) => {
-						onInput(val.value)
+						onInput(val)
 					}
 				"
 				:resourceOptions="getResourceOptions()"
+				:searchable="editable"
 			/>
 		</div>
 	</div>
@@ -32,7 +35,7 @@
 
 <script>
 import Autocomplete from "@/components/global/Autocomplete.vue"
-import { debounce } from "frappe-ui"
+import { inject, computed } from "vue"
 
 export default {
 	name: "TicketField",
@@ -45,19 +48,32 @@ export default {
 			type: String,
 			required: true,
 		},
+		editable: {
+			type: Boolean,
+			default: true,
+		},
 		// TODO: use a prop to trigger mandatory field validation errors: use case (ticket type should be set before changing ticket status)
 	},
 	components: {
 		Autocomplete,
 	},
-	emits: ["validate", "update"], // validate can be used to triger external validations, eg: before updating ticket status, ticket type should be set, etc
-	inject: ["ticketController"], // TODO: use ticket controller to fetch field values and update ticket, instead of individual apis
+	emits: ["validate"], // validate can be used to triger external validations, eg: before updating ticket status, ticket type should be set, etc
+	setup(props, { context }) {
+		const $tickets = inject("$tickets")
+		const fieldValue = computed(() => {
+			return $tickets.get(
+				{ ticketId: props.ticketId, fieldname: props.fieldname },
+				context
+			).value
+		})
+
+		return {
+			fieldValue,
+		}
+	},
 	computed: {
 		fieldMetaInfo() {
-			return this.$resources.fieldMetaInfo.data || {}
-		},
-		fieldValue() {
-			return this.$resources.fieldValue.data || ""
+			return this.$resources.fieldMetaInfo.data || null
 		},
 	},
 	resources: {
@@ -74,47 +90,28 @@ export default {
 				auto: true,
 			}
 		},
-		fieldValue() {
-			// field can be a custom or a standard field
-			return {
-				method: "frappedesk.api.ticket.get_field_value",
-				params: {
-					ticket_id: this.ticketId,
-					fieldname: this.fieldname,
-				},
-				auto: true,
-			}
-		},
 	},
 	methods: {
-		updateValue(val) {
-			this.updatingValue = true
-			this.ticketController
-				.set(this.ticketId, this.fieldname, val)
-				.then(() => {
-					this.updatingValue = false
-
-					this.$toast({
-						title: "Ticket updated successfully.",
-						customIcon: "circle-check",
-						appearance: "success",
-					})
-				})
-		},
 		onInput(val) {
-			this.updateValue(val)
+			if (!val) return
+			let value = val.value
+			this.$tickets.set(this.ticketId, this.fieldname, value).then(() => {
+				this.$toast({
+					title: "Ticket updated successfully.",
+					appearance: "success",
+					customIcon: "circle-check",
+				})
+			})
 		},
-		debouncedOnInput: debounce(function (val) {
-			this.onInput(val)
-		}, 300),
 		getResourceOptions() {
-			switch (this.fieldMetaInfo.fieldtype) {
+			if (!(this.editable || this.fieldMetaInfo)) return
+			switch (this.fieldMetaInfo?.fieldtype) {
 				case "Link":
 					return {
 						method: "frappe.client.get_list",
 						inputMap: (query) => {
 							return {
-								doctype: this.fieldMetaInfo.options,
+								doctype: this.fieldMetaInfo?.options,
 								pluck: "name",
 								filters: [["name", "like", `%${query}%`]],
 							}
@@ -134,7 +131,7 @@ export default {
 						inputMap: (query) => {
 							return {
 								doctype: "Ticket",
-								fieldname: this.fieldMetaInfo.fieldname,
+								fieldname: this.fieldMetaInfo?.fieldname,
 								query,
 							}
 						},
