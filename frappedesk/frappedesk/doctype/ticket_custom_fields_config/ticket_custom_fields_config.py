@@ -42,4 +42,5 @@ class TicketCustomFieldsConfig(Document):
 					}
 				)
 			return dict
+
 		return [get_dict(field, view) for field in self.custom_fields if filter(field, view)]

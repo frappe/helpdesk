@@ -61,13 +61,31 @@
 				class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"
 			></span>
 		</div>
-		<div class="px-[19px] py-[28px] h-full overflow-y-auto">
-			<div class="flex flex-col space-y-[12px]">
+		<div
+			class="px-[19px] py-[28px] h-full overflow-y-auto flex flex-col space-y-2.5"
+		>
+			<div
+				class="flex flex-col space-y-[12px] pb-5"
+				:class="{ 'border-b': customFields?.length > 0 }"
+			>
 				<!-- Show system ticket fields: Status, Ticket Type, Priority and Agent Group  -->
-				<TicketField :ticketId="ticket.name" fieldname="status" />
-				<TicketField :ticketId="ticket.name" fieldname="ticket_type" />
-				<TicketField :ticketId="ticket.name" fieldname="priority" />
-				<TicketField :ticketId="ticket.name" fieldname="agent_group" />
+				<div
+					v-for="fieldname in [
+						'status',
+						'ticket_type',
+						'priority',
+						'agent_group',
+					]"
+					:key="fieldname"
+				>
+					<TicketField
+						:ticketId="ticket.name"
+						:fieldname="fieldname"
+						:editable="true"
+					/>
+				</div>
+			</div>
+			<div class="flex flex-col space-y-[12px]">
 				<!-- Show all the ticket custom fields that can be viewed by an agent -->
 				<div
 					v-for="customField in customFields"
@@ -76,6 +94,7 @@
 					<TicketField
 						:ticketId="ticket.name"
 						:fieldname="customField.fieldname"
+						:editable="customField.is_editable_by_agent"
 					/>
 				</div>
 			</div>
@@ -85,7 +104,7 @@
 
 <script>
 import { FeatherIcon, Badge } from "frappe-ui"
-import { inject } from "@vue/runtime-core"
+import { inject, computed } from "@vue/runtime-core"
 import TicketField from "@/components/global/TicketField.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
@@ -98,11 +117,17 @@ export default {
 		TicketField,
 		CustomIcons,
 	},
-	setup() {
+	setup(props, { context }) {
 		const user = inject("user")
+		const $tickets = inject("$tickets")
+
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, context).value
+		})
 
 		return {
 			user,
+			ticket,
 		}
 	},
 	mounted() {
@@ -120,9 +145,6 @@ export default {
 		}, 820)
 	},
 	computed: {
-		ticket() {
-			return this.$resources.ticket.data || null
-		},
 		customFields() {
 			return this.$resources.customFields.data || null
 		},
@@ -134,16 +156,6 @@ export default {
 				params: {
 					doctype: "Ticket",
 					view: "Agent Portal",
-				},
-				auto: true,
-			}
-		},
-		ticket() {
-			return {
-				cache: ["Ticket", "Action Panel", this.ticketId],
-				method: "frappedesk.api.ticket.get_ticket",
-				params: {
-					ticket_id: this.ticketId,
 				},
 				auto: true,
 			}

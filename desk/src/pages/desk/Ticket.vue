@@ -357,7 +357,7 @@ import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
-import { inject, ref } from "vue"
+import { inject, ref, computed } from "vue"
 
 export default {
 	name: "Ticket",
@@ -385,7 +385,7 @@ export default {
 			content: "",
 		}
 	},
-	setup() {
+	setup(props, { context }) {
 		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject("viewportWidth")
 		const user = inject("user")
@@ -399,7 +399,13 @@ export default {
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
 
+		const $tickets = inject("$tickets")
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, context).value
+		})
+
 		return {
+			ticket,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -466,13 +472,6 @@ export default {
 				method: "frappedesk.api.ticket.mark_ticket_as_seen",
 			}
 		},
-		ticket() {
-			return {
-				type: "document",
-				doctype: "Ticket",
-				name: this.ticketId,
-			}
-		},
 	},
 	mounted() {
 		this.$resources.markTicketAsSeen.submit({
@@ -526,9 +525,6 @@ export default {
 				"Undo",
 				"Redo",
 			]
-		},
-		ticket() {
-			return this.$resources.ticket.doc || null
 		},
 		sendingDissabled() {
 			let content = this.content.trim()
