@@ -11,7 +11,9 @@
 						class="w-full"
 						@click="
 							() => {
-								openPopover()
+								if (searchable) {
+									openPopover()
+								}
 							}
 						"
 					>
@@ -29,7 +31,7 @@
 								<slot
 									name="input"
 									:selectedValue="selectedValue"
-									:placeholder="placeholder"
+									:placeholder="searchable ? placeholder : ''"
 								>
 									<span
 										class="text-base line-clamp-1"
@@ -41,10 +43,13 @@
 										class="text-base text-gray-500"
 										v-else
 									>
-										{{ placeholder || "" }}
+										{{
+											searchable ? placeholder : "" || ""
+										}}
 									</span>
 								</slot>
 								<CustomIcons
+									v-if="searchable"
 									name="select"
 									class="w-[12px] h-[12px] stroke-gray-500"
 								/>
@@ -109,7 +114,7 @@
 						</li>
 					</ComboboxOption>
 					<slot
-						v-if="filteredOptions.length == 0"
+						v-if="filteredOptions?.length == 0"
 						name="no-result-found"
 					>
 						<li
@@ -136,14 +141,35 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
 	name: "Autocomplete",
-	props: [
-		"modelValue",
-		"options",
-		"placeholder",
-		"width",
-		"resourceOptions",
-		"show",
-	],
+	props: {
+		modelValue: {
+			type: Object,
+			default: null,
+		},
+		options: {
+			type: Array,
+			default: () => [],
+		},
+		resourceOptions: {
+			type: Function,
+			default: () => {},
+		},
+		placeholder: {
+			type: String,
+		},
+		searchable: {
+			type: Boolean,
+			default: true,
+		},
+		width: {
+			type: Number,
+			default: 250,
+		},
+		show: {
+			type: Boolean,
+			default: false,
+		},
+	},
 	emits: ["update:modelValue", "change"],
 	components: {
 		Popover,
@@ -210,13 +236,18 @@ export default {
 			this.search(query)
 		}, 300),
 		search(query) {
+			if (!this.searchable) return
 			this.$resources.search.fetch(this.resourceOptions.inputMap(query))
 		},
 	},
-	mounted() {
-		if (this.resourceOptions) {
-			this.search("")
-		}
+	watch: {
+		resourceOptions(val) {
+			if (val) {
+				this.$nextTick(() => {
+					this.search("")
+				})
+			}
+		},
 	},
 	resources: {
 		search() {
