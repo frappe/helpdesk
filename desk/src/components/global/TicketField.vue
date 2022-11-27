@@ -20,6 +20,10 @@
 			<Autocomplete
 				v-else
 				:placeholder="`Select ${fieldMetaInfo?.label.toLowerCase()}`"
+				class="rounded-md"
+				:class="{
+					'border-red-500 border': triggerValidationError,
+				}"
 				:value="fieldValue"
 				@change="
 					(val) => {
@@ -36,6 +40,7 @@
 <script>
 import Autocomplete from "@/components/global/Autocomplete.vue"
 import { inject, computed } from "vue"
+import { ref } from "@vue/reactivity"
 
 export default {
 	name: "TicketField",
@@ -52,13 +57,22 @@ export default {
 			type: Boolean,
 			default: true,
 		},
+		validate: {
+			type: Function,
+			default: function () {
+				return true
+			},
+		},
+		triggerValidationError: {
+			type: Boolean,
+			default: false,
+		},
 		// TODO: use a prop to trigger mandatory field validation errors: use case (ticket type should be set before changing ticket status)
 	},
 	components: {
 		Autocomplete,
 	},
-	emits: ["validate"], // validate can be used to triger external validations, eg: before updating ticket status, ticket type should be set, etc
-	setup(props, { context }) {
+	setup(props, context) {
 		const $tickets = inject("$tickets")
 		const ticket = computed(() => {
 			return $tickets.get({ ticketId: props.ticketId }, context).value
@@ -117,14 +131,25 @@ export default {
 	methods: {
 		onInput(val) {
 			if (!val) return
-			let value = val.value
-			this.$tickets.set(this.ticketId, this.fieldname, value).then(() => {
+			if (this.validate()) {
+				let value = val.value
+				this.$tickets
+					.set(this.ticketId, this.fieldname, value)
+					.then(() => {
+						this.$toast({
+							title: "Ticket updated successfully.",
+							appearance: "success",
+							customIcon: "circle-check",
+						})
+					})
+			} else {
+				console.log("validation failed")
 				this.$toast({
-					title: "Ticket updated successfully.",
-					appearance: "success",
-					customIcon: "circle-check",
+					title: "Please fill all mandatory fields.",
+					customIcon: "circle-fail",
+					appearance: "danger",
 				})
-			})
+			}
 		},
 		getResourceOptions() {
 			if (!(this.editable || this.fieldMetaInfo)) return

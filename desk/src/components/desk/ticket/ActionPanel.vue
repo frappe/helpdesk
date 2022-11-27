@@ -80,9 +80,35 @@
 					:key="fieldname"
 				>
 					<TicketField
+						:ref="`field-${fieldname}-input`"
 						:ticketId="ticket.name"
 						:fieldname="fieldname"
 						:editable="true"
+						:validate="
+							function () {
+								// remove the validation error, from current field if any (since the value is updated)
+								if (validationErrorFields.includes(fieldname)) {
+									validationErrorFields.splice(
+										validationErrorFields.indexOf(
+											fieldname
+										),
+										1
+									)
+								}
+								if (fieldname === 'status') {
+									if (!ticket.ticket_type) {
+										validationErrorFields.push(
+											'ticket_type'
+										)
+										return false
+									}
+								}
+								return true
+							}
+						"
+						:triggerValidationError="
+							validationErrorFields.includes(fieldname)
+						"
 					/>
 				</div>
 			</div>
@@ -105,7 +131,7 @@
 
 <script>
 import { FeatherIcon, Badge } from "frappe-ui"
-import { inject, computed } from "@vue/runtime-core"
+import { inject, computed, ref } from "@vue/runtime-core"
 import TicketField from "@/components/global/TicketField.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
@@ -121,6 +147,7 @@ export default {
 	setup(props, { context }) {
 		const user = inject("user")
 		const $tickets = inject("$tickets")
+		const validationErrorFields = ref([])
 
 		const ticket = computed(() => {
 			return $tickets.get({ ticketId: props.ticketId }, context).value
@@ -129,6 +156,7 @@ export default {
 		return {
 			user,
 			ticket,
+			validationErrorFields,
 		}
 	},
 	mounted() {

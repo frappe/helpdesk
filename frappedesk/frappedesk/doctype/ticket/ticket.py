@@ -53,6 +53,7 @@ class Ticket(Document):
 			"priority": "priority",
 			"agent_group": "team",
 			"ticket_type": "type",
+			"contact": "contact",
 		}
 		for field in [
 			"status",
@@ -60,7 +61,6 @@ class Ticket(Document):
 			"agent_group",
 			"contact",
 			"ticket_type",
-			"_assign",
 		]:
 			if self.has_value_changed(field):
 				log_ticket_activity(
