@@ -408,33 +408,6 @@ def assign_ticket_priority(ticket_id, priority):
 
 
 @frappe.whitelist()
-def assign_ticket_group(ticket_id, agent_group):
-	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
-		if ticket_doc.agent_group != agent_group:
-			current_assigned_agent_doc = ticket_doc.get_assigned_agent()
-			if (
-				(
-					current_assigned_agent_doc
-					and not current_assigned_agent_doc.in_group(
-						agent_group
-					)  # if assigned agent is not in the new group
-				)
-				and frappe.get_doc(
-					"Assignment Rule", frappe.get_doc("Agent Group", agent_group).assignment_rule
-				).users  # check if there are any users(agnets) in the new group assignment rule
-			):
-				clear_all_assignments("Ticket", ticket_id)
-				# new agent will be assigned automatically via assignment rule
-
-			ticket_doc.agent_group = agent_group
-			log_ticket_activity(ticket_id, f"team set to {agent_group}")
-			ticket_doc.save()
-
-		return ticket_doc
-
-
-@frappe.whitelist()
 def get_all_ticket_types():
 	return frappe.get_all("Ticket Type", pluck="name")
 

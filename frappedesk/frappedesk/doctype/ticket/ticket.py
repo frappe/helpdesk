@@ -39,6 +39,55 @@ class Ticket(Document):
 	def after_insert(self):
 		log_ticket_activity(self.name, "created")
 
+	def on_update(self):
+		self.handle_ticket_activity_update()
+		self.remove_assignment_if_not_in_team()
+
+	def handle_ticket_activity_update(self):
+		"""
+		Handles the ticket activity update.
+		Should be called inside on_update
+		"""
+		field_maps = {
+			"status": "status",
+			"priority": "priority",
+			"agent_group": "team",
+			"ticket_type": "type",
+		}
+		for field in [
+			"status",
+			"priority",
+			"agent_group",
+			"contact",
+			"ticket_type",
+			"_assign",
+		]:
+			if self.has_value_changed(field):
+				log_ticket_activity(
+					self.name, f"{field_maps[field]} set to {self.as_dict()[field]}"
+				)
+
+	def remove_assignment_if_not_in_team(self):
+		"""
+		Removes the assignment if the agent is not in the team.
+		Shoule be called inside on_update
+		"""
+		if self.has_value_changed("agent_group"):
+			current_assigned_agent_doc = self.get_assigned_agent()
+			if (
+				(
+					current_assigned_agent_doc
+					and not current_assigned_agent_doc.in_group(self.agent_group)
+				)
+				and frappe.get_doc(
+					"Assignment Rule", frappe.get_doc("Agent Group", self.agent_group).assignment_rule
+				).users
+			):
+				clear_all_assignments("Ticket", self.name)
+				frappe.publish_realtime(
+					"ticket_assignee_update", {"ticket_id": self.name}, after_commit=True
+				)
+
 	def update_priority_based_on_ticket_type(self):
 		if self.ticket_type:
 			ticket_type_doc = frappe.get_doc("Ticket Type", self.ticket_type)

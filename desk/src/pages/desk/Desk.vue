@@ -142,11 +142,6 @@ export default {
 						ticket_id: ticketId,
 						agent_id: ref,
 					})
-				case "group":
-					return this.$resources.assignTicketGroup.submit({
-						ticket_id: ticketId,
-						agent_group: ref,
-					})
 			}
 		}
 		this.ticketController.new = (type, values) => {
@@ -537,15 +532,6 @@ export default {
 		assignTicketPriority() {
 			return {
 				method: "frappedesk.api.ticket.assign_ticket_priority",
-				onSuccess: async (ticket) => {},
-				onError: () => {
-					// TODO:
-				},
-			}
-		},
-		assignTicketGroup() {
-			return {
-				method: "frappedesk.api.ticket.assign_ticket_group",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
