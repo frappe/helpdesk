@@ -316,7 +316,9 @@ class TicketSummary(object):
 					self.ticket_summary_data[value]["avg_first_response_time"] = (
 						entry.get("avg_frt") or 0.0
 					)
-					self.ticket_summary_data[value]["avg_hold_time"] = entry.get("avg_hold_time") or 0.0
+					self.ticket_summary_data[value]["avg_hold_time"] = (
+						entry.get("avg_hold_time") or 0.0
+					)
 					self.ticket_summary_data[value]["avg_resolution_time"] = (
 						entry.get("avg_resolution_time") or 0.0
 					)

@@ -4,7 +4,6 @@
 
 frappe.query_reports["Ticket Summary"] = {
 	filters: [
-
 		{
 			fieldname: "based_on",
 			label: __("Based On"),
