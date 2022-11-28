@@ -8,6 +8,7 @@
 				<SideBarMenu class="bg-gray-50 shrink-0 w-[200px]" />
 				<router-view class="grow" :key="$route.fullPath" />
 			</div>
+			<Dialer />
 		</div>
 		<div v-else class="h-full w-full flex max-w-full grow-0">
 			<div class="mx-auto my-auto text-base font-normal">
@@ -20,12 +21,14 @@
 import SideBarMenu from "@/components/desk/SideBarMenu.vue"
 import { inject, provide, ref } from "vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import Dialer from "@/components/desk/dialer/Dialer.vue"
 
 export default {
 	name: "Desk",
 	components: {
 		SideBarMenu,
 		CustomIcons,
+		Dialer,
 	},
 	setup() {
 		const mounted = ref(false)

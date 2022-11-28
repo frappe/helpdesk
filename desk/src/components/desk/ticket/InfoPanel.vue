@@ -52,6 +52,16 @@
 									class="text-gray-700 text-base"
 									>{{ phone_no.phone }}</a
 								>
+								<Button
+									icon="phone-outgoing"
+									appearance="primary"
+									@click="
+										$dialer.show({
+											contact,
+											phoneNumber: phone_no.phone,
+										})
+									"
+								/>
 							</div>
 						</div>
 						<div
