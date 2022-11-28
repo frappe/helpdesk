@@ -125,8 +125,26 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Reports",
+			"label": "SLA",
 			"link_count": 1,
+			"onboard": 0,
+			"type": "Card Break"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "SLA",
+			"link_count": 0,
+			"link_to": "SLA",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Reports",
+			"link_count": 2,
 			"onboard": 0,
 			"type": "Card Break"
 		},
@@ -143,23 +161,15 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "SLA",
-			"link_count": 1,
-			"onboard": 0,
-			"type": "Card Break"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "SLA",
+			"label": "Summary",
 			"link_count": 0,
-			"link_to": "SLA",
-			"link_type": "DocType",
+			"link_to": "Ticket Summary",
+			"link_type": "Report",
 			"onboard": 0,
 			"type": "Link"
 		}
 	],
-	"modified": "2022-09-17 12:11:42.562135",
+	"modified": "2022-11-28 20:16:02.832932",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Frappe Desk",
