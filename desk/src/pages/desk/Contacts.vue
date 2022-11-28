@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full px-4">
+	<div class="flex flex-col h-full px-4 overflow-y-clip">
 		<ListManager
 			ref="contactList"
 			:options="{
@@ -45,7 +45,11 @@
 						<router-link
 							:to="{ path: `/frappedesk/contacts/${row.name}` }"
 						>
-							{{ `${row.first_name} ${row.last_name}` }}
+							{{
+								`${row.first_name ? row.first_name : ""} ${
+									row.last_name ? row.last_name : ""
+								}`
+							}}
 						</router-link>
 					</template>
 				</ListViewer>
