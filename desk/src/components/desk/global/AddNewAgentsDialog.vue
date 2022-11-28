@@ -109,7 +109,7 @@ export default {
 	},
 	methods: {
 		testEmailRegex(val) {
-			let emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/
+			let emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 			return emailRegex.test(val)
 		},
 		onSearchInputChange(val) {
