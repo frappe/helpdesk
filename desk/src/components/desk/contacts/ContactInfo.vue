@@ -96,7 +96,11 @@
 						<Button @click="cancel()">Cancel</Button>
 					</div>
 					<div class="grow flex flex-row-reverse">
-						<Button appearance="danger" @click="delete_contact(values?.contactName)">Delete</Button>
+						<Button
+							appearance="danger"
+							@click="delete_contact(values?.contactName)"
+							>Delete</Button
+						>
 					</div>
 					<div class="flex flex-row-reverse pl-2">
 						<Button
@@ -191,11 +195,11 @@ export default {
 				method: "frappedesk.api.doc.delete_item",
 				onSuccess: () => {
 					this.$toast({
-							title: "Contact Deleted.",
-							customIcon: "circle-check",
-							appearance: "success",
-						})
-						this.resetForm()
+						title: "Contact Deleted.",
+						customIcon: "circle-check",
+						appearance: "success",
+					})
+					this.resetForm()
 					this.$router.go(-1)
 				},
 				onError: (err) => {
@@ -207,7 +211,7 @@ export default {
 					})
 				},
 			}
-		}
+		},
 	},
 	methods: {
 		setContactImage(url) {
@@ -249,7 +253,7 @@ export default {
 				item: email,
 				doctype: "Contact",
 			})
-		}
+		},
 	},
 }
 </script>

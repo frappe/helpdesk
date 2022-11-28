@@ -296,6 +296,7 @@ def add_default_assignment_rule():
 	support_settings.base_support_rotation = rule_doc.name
 	support_settings.save()
 
+
 def add_system_preset_filters():
 	preset_filters = []
 	for status in ["Closed", "Resolved", "Replied", "Open"]:
