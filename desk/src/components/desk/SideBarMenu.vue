@@ -260,6 +260,9 @@ export default {
 			{
 				label: "Customers",
 				icon: "customer",
+				to: {
+					path: "/frappedesk/customers",
+				},
 			},
 			{
 				label: "Contacts",
@@ -323,6 +326,7 @@ export default {
 				"frappedesk/tickets": "Tickets",
 				"frappedesk/kb": "Knowledge Base",
 				"frappedesk/reports": "Reports",
+				"frappedesk/customers": "Customers",
 				"frappedesk/contacts": "Contacts",
 				"frappedesk/settings": "Settings",
 			}

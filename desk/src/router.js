@@ -126,6 +126,11 @@ const routes = [
 				],
 			},
 			{
+				path: "customers",
+				name: "Customers",
+				component: () => import("@/pages/desk/Customers.vue")
+			},
+			{
 				path: "contacts",
 				name: "Contacts",
 				component: () => import("@/pages/desk/Contacts.vue"),
