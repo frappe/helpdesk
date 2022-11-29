@@ -13,7 +13,7 @@
 				name="chevron-down-accordion"
 			/>
 		</button>
-		<div v-show="!isOpen" :id="`collapse${_uid}`">
+		<div v-show="isOpen" :id="`collapse${_uid}`">
 			<slot name="data" />
 		</div>
 	</div>

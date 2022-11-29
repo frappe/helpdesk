@@ -60,3 +60,7 @@
 .badge-incident {
 	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-white bg-pink-400 rounded dark:bg-pink-600 dark:text-pink-800
 }
+
+.badge-replied {
+	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-orange-600 bg-orange-100 rounded dark:bg-orange-600 dark:text-orange-800
+}

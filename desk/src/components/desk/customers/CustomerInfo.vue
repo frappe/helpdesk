@@ -278,7 +278,6 @@ export default {
 			return this.$resources.ticket.data
 		},
 		contactDoc() {
-			
 			return this.$resources.contact.data
 		},
 		customerDoc() {
@@ -374,6 +373,7 @@ export default {
 				Open: "badge-success",
 				Resolved: "badge-danger",
 				Closed: "badge-danger",
+				Replied: "badge-replied ",
 			}[status]
 			return badge
 		},
