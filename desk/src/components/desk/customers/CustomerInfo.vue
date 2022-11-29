@@ -109,7 +109,10 @@
 		</div>
 
 		<div class="customer-table flex-1">
-			<AccordionCustomer class="customer-accordion flex flex-col">
+			<AccordionCustomer
+				:isOpen="false"
+				class="customer-accordion flex flex-col"
+			>
 				<template v-slot:title>
 					<span class="font-medium text-lg flex-1"
 						>Contacts ({{
@@ -152,7 +155,10 @@
 			</AccordionCustomer>
 		</div>
 		<div class="ticket-table flex-1 mt-5">
-			<AccordionCustomer class="flex flex-col ticket-accordion">
+			<AccordionCustomer
+				:isOpen="true"
+				class="flex flex-col ticket-accordion"
+			>
 				<template v-slot:title>
 					<span class="flex-1 font-medium text-lg"
 						>Tickets ({{
