@@ -4,8 +4,6 @@
 			ref="contactList"
 			:options="{
 				cache: ['Contacts', 'Desk'],
-				urlQueryFilters: true,
-				saveFiltersLocally: true,
 				doctype: 'Contact',
 				fields: [
 					'first_name',
@@ -20,8 +18,6 @@
 				<ListViewer
 					:options="{
 						base: '12',
-						filterBox: true,
-						presetFilters: true,
 						fields: {
 							first_name: {
 								label: 'Name',
