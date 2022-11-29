@@ -56,10 +56,12 @@
 									icon="phone-outgoing"
 									appearance="primary"
 									@click="
-										$dialer.show({
-											contact,
-											phoneNumber: phone_no.phone,
-										})
+										() => {
+											$event.emit('dialer:make-call', {
+												contactId: contact.name,
+												to: phone_no.phone,
+											})
+										}
 									"
 								/>
 							</div>
