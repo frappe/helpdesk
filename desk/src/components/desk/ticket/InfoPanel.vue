@@ -78,6 +78,20 @@
 								</div>
 							</div>
 						</div>
+						<div class="flex space-x-[12px]">
+							<CustomIcons
+								name="customer"
+								class="stroke-gray-500 mt-[2.5px]"
+								style="width: 15px; height: 15px"
+							/>
+							<div class="text-gray-700 text-base">
+								<a
+									:title="ticket.customer"
+									class="grow truncate font-normal text-base"
+									>{{ ticket.customer }}</a
+								>
+							</div>
+						</div>
 					</div>
 					<div v-else>
 						<div
