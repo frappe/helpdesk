@@ -44,7 +44,11 @@
 							</span>
 						</div>
 						<Autocomplete
-							:value="selectedCustomer"
+							:value="
+								fdCustomer != null
+									? fdCustomer
+									: selectedCustomer
+							"
 							@change="
 								(item) => {
 									if (!item) {
@@ -100,6 +104,10 @@ export default {
 		modelValue: {
 			type: Boolean,
 			required: true,
+		},
+		fdCustomer: {
+			type: String,
+			default: null,
 		},
 	},
 	setup(props, { emit }) {

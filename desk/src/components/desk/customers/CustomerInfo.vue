@@ -221,6 +221,7 @@
 
 		<NewContactDialog
 			v-model="showNewContactDialog"
+			:fdCustomer="customer"
 			@contact-created="
 				() => {
 					showNewContactDialog = false
