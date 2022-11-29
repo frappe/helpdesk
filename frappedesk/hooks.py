@@ -26,9 +26,22 @@ doc_events = {
 			"frappedesk.frappedesk.doctype.ticket.ticket.set_descritption_from_communication",
 		],
 	},
-	"Contact": {"on_trash": "frappedesk.frappedesk.doctype.ticket.ticket.update_ticket",},
+	"Contact": {
+		"on_trash": [
+			"frappedesk.frappedesk.doctype.ticket.ticket.update_ticket",
+			"frappedesk.frappedesk.doctype.fd_customer.fd_customer.get_contact_count"
+		],
+		"after_insert": [
+			"frappedesk.frappedesk.doctype.fd_customer.fd_customer.get_contact_count"
+		]
+	},
+
 	"Assignment Rule": {"on_trash": "frappedesk.overrides.on_assignment_rule_trash"},
 	"Agent": {"before_insert": "frappedesk.limits.validate_agent_count"},
+	"Ticket": {
+		"after_insert": "frappedesk.frappedesk.doctype.fd_customer.fd_customer.get_ticket_count",
+		"on_trash": "frappedesk.frappedesk.doctype.fd_customer.fd_customer.get_ticket_count"
+	}
 }
 
 scheduler_events = {
