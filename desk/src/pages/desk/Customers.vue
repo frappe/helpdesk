@@ -5,13 +5,21 @@
 			:options="{
 				cache: ['FD Customer', 'Desk'],
 				doctype: 'FD Customer',
-				fields: ['customer_name', 'domain'],
+				urlQueryFilters: true,
+				saveFiltersLocally: true,
+				fields: [
+					'customer_name',
+					'domain',
+					'contact_count',
+					'ticket_count',
+				],
 				limit: 20,
 			}"
 		>
 			<template #body>
 				<ListViewer
 					:options="{
+						name: 'Customer',
 						base: '12',
 						filterBox: true,
 						presetFilters: true,
@@ -20,9 +28,13 @@
 								label: 'Name',
 								width: '4',
 							},
-							contact: {
+							contact_count: {
 								label: 'Contacts',
-								width: '4',
+								width: '2',
+							},
+							ticket_count: {
+								label: 'Tickets',
+								width: '2',
 							},
 						},
 					}"
