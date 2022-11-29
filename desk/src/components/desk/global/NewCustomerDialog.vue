@@ -1,22 +1,37 @@
 <template>
 	<div>
-		<Dialog :options="{ title: 'Create New Customer' }" v-model="open">
+		<Dialog
+			:options="{ title: 'Add New Customer', size: 'sm' }"
+			v-model="open"
+		>
 			<template #body-content>
 				<div class="space-y-4">
 					<div class="space-y-1">
 						<Input
 							label="Customer Name"
 							type="text"
+							placeholder="Tesla Inc."
 							v-model="customer"
 						/>
 					</div>
 					<div class="space-y-1">
-						<Input label="Domain" type="text" v-model="domain" />
+						<Input
+							label="Domain"
+							type="text"
+							placeholder="eg: tesla.com, mycompany.com"
+							v-model="domain"
+						/>
 					</div>
 					<div class="flex float-right space-x-2">
 						<Button
 							appearance="primary"
-							@click="addCustomer()"
+							@click="
+								() => {
+									addCustomer()
+									close()
+									this.$router.go()
+								}
+							"
 							class="mr-auto"
 							>Add</Button
 						>
@@ -30,7 +45,6 @@
 <script>
 import { Input, Dialog, ErrorMessage } from "frappe-ui"
 import { computed, ref, inject } from "vue"
-
 export default {
 	name: "newCustomerDialog",
 	props: {
@@ -49,7 +63,6 @@ export default {
 				}
 			},
 		})
-
 		return {
 			open,
 		}
@@ -64,14 +77,12 @@ export default {
 			domain: "",
 		}
 	},
-
 	methods: {
 		addCustomer() {
 			const inputParams = {
 				customer_name: this.customer,
 				domain: this.domain,
 			}
-
 			this.$resources.newCustomer.submit({
 				doc: {
 					doctype: "FD Customer",
