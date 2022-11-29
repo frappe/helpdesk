@@ -1350,6 +1350,22 @@
 			<line x1="3" y1="15" x2="21" y2="15"></line>
 			<line x1="3" y1="9" x2="21" y2="9"></line>
 		</svg>
+		<svg
+			v-if="this.name == 'customer'"
+			:width="this.width"
+			:height="this.height"
+			:class="this.class"
+			viewBox="0 0 17 15"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M9.25 7H12.85C13.6901 7 14.1101 7 14.431 7.16349C14.7132 7.3073 14.9427 7.53677 15.0865 7.81901C15.25 8.13988 15.25 8.55992 15.25 9.4V14.5M9.25 7V3.4C9.25 2.55992 9.25 2.13988 9.08651 1.81901C8.9427 1.53677 8.71323 1.3073 8.43099 1.16349C8.11012 1 7.69008 1 6.85 1H4.15C3.30992 1 2.88988 1 2.56901 1.16349C2.28677 1.3073 2.0573 1.53677 1.91349 1.81901C1.75 2.13988 1.75 2.55992 1.75 3.4V14.5M9.25 7V14.5M15.25 14.5H16M15.25 14.5H9.25M9.25 14.5H1.75M1.75 14.5H1M4.375 3.99982H6.625M4.375 6.99982H6.625M4.375 9.99982H6.625"
+				stroke="#687178"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+		</svg>
 		<div v-if="this.name == 'company'" :class="this.class">
 			<div
 				v-if="$resources.brandHtml.data"

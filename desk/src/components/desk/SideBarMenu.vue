@@ -258,6 +258,10 @@ export default {
 				},
 			},
 			{
+				label: "Customers",
+				icon: "customer",
+			},
+			{
 				label: "Contacts",
 				icon: "customers",
 				to: {
