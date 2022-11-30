@@ -44,7 +44,11 @@
 							</span>
 						</div>
 						<Autocomplete
-							:value="selectedCustomer"
+							:value="
+								fdCustomer != null
+									? fdCustomer
+									: selectedCustomer
+							"
 							@change="
 								(item) => {
 									if (!item) {
@@ -201,7 +205,10 @@ export default {
 				links: [
 					{
 						link_doctype: "FD Customer",
-						link_name: this.selectedCustomer,
+						link_name:
+							this.fdCustomer != null
+								? this.fdCustomer
+								: this.selectedCustomer,
 					},
 				],
 			}
