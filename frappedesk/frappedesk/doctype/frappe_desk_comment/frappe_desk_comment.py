@@ -9,9 +9,7 @@ from frappe.utils import get_fullname
 
 class FrappeDeskComment(Document):
 	def on_change(self):
-		print(f"\n\nFrappe Desk Comment created : {self.name}\n\n")
 		mentions = extract_mentions(self.content)
-		print(f"\n\nMentions : {mentions}\n\n")
 		for mention in mentions:
 			values = frappe._dict(
 				from_user=self.commented_by,

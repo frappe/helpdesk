@@ -1,6 +1,7 @@
 {
 	"actions": [],
 	"allow_rename": 1,
+	"autoname": "format:CLOG-{ticket_ref}-{#######}",
 	"creation": "2022-11-29 14:37:18.353207",
 	"default_view": "List",
 	"doctype": "DocType",
@@ -92,10 +93,11 @@
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-11-30 14:26:15.874587",
+	"modified": "2022-11-30 18:14:24.598150",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Avaya Call Log",
+	"naming_rule": "Expression",
 	"owner": "Administrator",
 	"permissions": [
 		{

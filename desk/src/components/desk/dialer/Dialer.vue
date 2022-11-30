@@ -63,7 +63,9 @@
 				>
 					<div class="text-base italic text-gray-700 font-semibold">
 						{{
-							`${callLog.status.replace("-", "").toUpperCase()} ${
+							`${callLog.status
+								.replace("-", " ")
+								.toUpperCase()} ${
 								callLog.status == "in-progress" &&
 								callLog.call_started_at
 									? callDuration
@@ -134,6 +136,7 @@ export default {
 			contact,
 
 			createCallLogDocumentResource,
+			resource,
 		}
 	},
 	watch: {
@@ -156,6 +159,18 @@ export default {
 	},
 	mounted() {
 		// TODO: check if any ongoing call is there for the current agent.
+		this.$socket.on("list_update", (data) => {
+			if (this.callLog && this.callLog.ticket_ref) {
+				if (
+					data["doctype"] === "Avaya Call Log" &&
+					data["name"].split("-")[1] === this.callLog.ticket_ref
+				) {
+					if (this.resource) {
+						this.resource.get.fetch()
+					}
+				}
+			}
+		})
 		this.$event.on("dialer:make-call", (options) => {
 			if (this.show) {
 				// TODO: check if current call is active, is yes then show alert, else make call
@@ -171,6 +186,7 @@ export default {
 		})
 	},
 	unmounted() {
+		this.$socket.off("list_update")
 		this.$event.off("dialer:make-call")
 	},
 	methods: {
