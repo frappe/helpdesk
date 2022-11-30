@@ -4,22 +4,24 @@ from frappe import _
 
 
 @frappe.whitelist()
-def make_call(contact_id, to):
+def make_call(ticket_id, to):
 	"""Make a call to the given number"""
 
 	from_ = "1234"  # this is shown as the caller id
 	to = "+917012043162"  # TODO: Remove this line
 	# call_to = phone_no
-
+	if not frappe.db.exists("Ticket", ticket_id):
+		frappe.throw(_("Ticket does not exist"))
 	if not frappe.db.exists("Agent", {"user": frappe.session.user}):
 		frappe.throw(_("Calls can only be made by agents"))
-	if not frappe.db.exists("Contact", contact_id):
-		frappe.throw(_("Contact not found"))
+	ticket = frappe.get_doc("Ticket", ticket_id)
+	if not frappe.db.exists("Contact", ticket.contact):
+		frappe.throw(_("Contact does not exist"))
 
 	agent = frappe.get_doc("Agent", {"user": frappe.session.user})
-	contact = frappe.get_doc("Contact", contact_id)
+	contact = frappe.get_doc("Contact", ticket.contact)
 
-	# TODO: this block should be removed -----------
+	# TODO: this block should be removed, once proper avaya api calls can be made -----------
 	call_log = frappe.get_doc(
 		{
 			"doctype": "Avaya Call Log",
@@ -28,6 +30,7 @@ def make_call(contact_id, to):
 			"to": to,
 			"agent_ref": agent.name,
 			"contact_ref": contact.name,
+			"ticket_ref": ticket.name,
 			"status": "queued",
 		}
 	)
@@ -89,3 +92,22 @@ def make_call(contact_id, to):
 
 	except ZangException as ze:
 		frappe.throw(_("Error making call: {0}").format(ze))
+
+
+@frappe.whitelist()
+def end_call(call_log_id):
+	"""End the call"""
+
+	avaya_settings = frappe.get_doc("Avaya Settings")
+	account_sid = avaya_settings.account_sid
+	auth_token = avaya_settings.auth_token
+
+	configuration = Configuration(account_sid, auth_token)
+	calls_connector = ConnectorFactory(configuration).callsConnector
+
+	call_log = frappe.get_doc("Avaya Call Log", call_log_id)
+	call = calls_connector.endCall(call_log.call_sid)
+	call_log.status = call.status
+	call_log.save(ignore_permissions=True)
+
+	return call_log

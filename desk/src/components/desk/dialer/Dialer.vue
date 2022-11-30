@@ -3,11 +3,6 @@
 		<div class="w-[20rem] rounded-lg border bg-white p-3 shadow-md">
 			<div v-if="callLog" class="flex flex-col space-y-3">
 				<div
-					class="flex flex-col w-full items-center text-[12px] italic text-gray-500"
-				>
-					{{ `STATUS: ${callLog.status.toUpperCase()}` }}
-				</div>
-				<div
 					class="flex flex-col w-full bg-gray-50 rounded-lg p-4 space-y-2"
 				>
 					<div
@@ -15,31 +10,67 @@
 						class="flex flex-col w-full items-center border-b py-4 space-y-2"
 					>
 						<Avatar size="lg" label="Contact Id" />
-						<div>
-							{{
-								`${contact.first_name} ${
-									contact.last_name ? contact.last_name : ""
-								}`
-							}}
+						<div class="flex flex-col space-y-0.5 items-center">
+							<div>
+								{{
+									`${contact.first_name} ${
+										contact.last_name
+											? contact.last_name
+											: ""
+									}`
+								}}
+							</div>
+							<div class="text-base text-gray-500">
+								{{ callLog.to }}
+							</div>
 						</div>
 					</div>
-					<div
-						class="flex flex-row items-center justify-between w-full text-base"
+					<router-link
+						:to="{
+							path: `/frappedesk/tickets/${callLog.ticket_ref}`,
+						}"
 					>
-						<div>Reference Ticket</div>
-						<Button icon="arrow-up-right" appearance="minimal" />
-					</div>
+						<div
+							class="flex flex-row items-center justify-between w-full text-base text-gray-600 hover:text-gray-900"
+							role="button"
+						>
+							<div>{{ `Ticket: #${callLog.ticket_ref}` }}</div>
+							<FeatherIcon
+								name="arrow-up-right"
+								class="h-4 w-4"
+							/>
+						</div>
+					</router-link>
+					<router-link
+						:to="{
+							path: `/frappedesk/contacts/${callLog.contact_ref}`,
+						}"
+					>
+						<div
+							class="flex flex-row items-center justify-between w-full text-base text-gray-600 hover:text-gray-900"
+							role="button"
+						>
+							<div>{{ `Contact: ${callLog.contact_ref}` }}</div>
+							<FeatherIcon
+								name="arrow-up-right"
+								class="h-4 w-4"
+							/>
+						</div>
+					</router-link>
 				</div>
 				<div
 					class="flex flex-row bg-gray-100 rounded-lg justify-between items-center p-2"
 				>
-					<div
-						v-if="callLog.call_started_at"
-						class="text-base italic text-gray-500"
-					>
-						{{ `ONGOING: ${callDuration}` }}
+					<div class="text-base italic text-gray-700 font-semibold">
+						{{
+							`${callLog.status.replace("-", "").toUpperCase()} ${
+								callLog.status == "in-progress" &&
+								callLog.call_started_at
+									? callDuration
+									: ""
+							}`
+						}}
 					</div>
-					<Button icon="phone-off" appearance="danger" />
 				</div>
 			</div>
 		</div>
@@ -47,7 +78,7 @@
 </template>
 
 <script>
-import { Avatar } from "frappe-ui"
+import { Avatar, FeatherIcon } from "frappe-ui"
 import { createDocumentResource } from "frappe-ui"
 import { ref, computed, inject } from "vue"
 
@@ -56,6 +87,7 @@ export default {
 	props: {},
 	components: {
 		Avatar,
+		FeatherIcon,
 	},
 	data() {
 		return {
@@ -144,7 +176,7 @@ export default {
 	methods: {
 		makeCall(options) {
 			this.$resources.makeCall.submit({
-				contact_id: options.contactId,
+				ticket_id: options.ticketId,
 				to: options.to,
 			})
 		},

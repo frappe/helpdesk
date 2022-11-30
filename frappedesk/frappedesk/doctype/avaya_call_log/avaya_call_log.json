@@ -18,7 +18,8 @@
 		"agent_ref",
 		"column_break_8",
 		"to",
-		"contact_ref"
+		"contact_ref",
+		"ticket_ref"
 	],
 	"fields": [
 		{
@@ -81,11 +82,17 @@
 			"fieldname": "call_started_at",
 			"fieldtype": "Datetime",
 			"label": "Call Started At"
+		},
+		{
+			"fieldname": "ticket_ref",
+			"fieldtype": "Link",
+			"label": "Ticket Ref",
+			"options": "Ticket"
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-11-30 13:33:05.423790",
+	"modified": "2022-11-30 14:26:15.874587",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Avaya Call Log",

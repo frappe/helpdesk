@@ -43,7 +43,7 @@
 								style="width: 15px"
 							/>
 							<div
-								class="space-y-1"
+								class="flex flex-row space-x-[12px] items-center"
 								v-for="phone_no in contact.phone_nos"
 								:key="phone_no"
 							>
@@ -52,18 +52,20 @@
 									class="text-gray-700 text-base"
 									>{{ phone_no.phone }}</a
 								>
-								<Button
-									icon="phone-outgoing"
-									appearance="primary"
+								<div
+									class="bg-blue-500 text-white px-2 py-0.5 rounded-md shadow-sm hover:shadow-md"
+									role="button"
 									@click="
 										() => {
 											$event.emit('dialer:make-call', {
-												contactId: contact.name,
+												ticketId: ticket.name,
 												to: phone_no.phone,
 											})
 										}
 									"
-								/>
+								>
+									Call
+								</div>
 							</div>
 						</div>
 						<div
