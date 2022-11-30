@@ -44,11 +44,7 @@
 							</span>
 						</div>
 						<Autocomplete
-							:value="
-								fdCustomer != null
-									? fdCustomer
-									: selectedCustomer
-							"
+							:value="selectedCustomer"
 							@change="
 								(item) => {
 									if (!item) {
@@ -138,7 +134,7 @@ export default {
 			selectedCustomer,
 		}
 	},
-	data() {
+	data(props) {
 		return {
 			firstName: "",
 			lastName: "",
@@ -170,6 +166,7 @@ export default {
 					this.firstName = ""
 					this.lastName = ""
 					this.phone = ""
+					this.customer = ""
 					this.$emit("contactCreated", data)
 				},
 			}

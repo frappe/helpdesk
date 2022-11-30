@@ -193,10 +193,7 @@
 						</div>
 
 						<div class="w-[10%] font-medium text-xs text-[#74808B]">
-							<span
-								class="rounded-[48px]"
-								:class="getTypeStyle(ticket.ticket_type)"
-							>
+							<span :class="getTypeStyle(ticket.ticket_type)">
 								{{ ticket.ticket_type }}
 							</span>
 						</div>
@@ -387,7 +384,7 @@ export default {
 		getTypeStyle(ticket_type) {
 			const badge = {
 				Question: "badge-question",
-				Bug: "badge-danger",
+				Bug: "badge-bug",
 				Incident: "badge-incident",
 			}[ticket_type]
 			return badge

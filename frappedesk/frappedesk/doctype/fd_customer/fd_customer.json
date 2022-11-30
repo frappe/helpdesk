@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:customer_name",
  "creation": "2022-11-30 00:08:11.831313",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -23,7 +24,8 @@
   {
    "fieldname": "customer_name",
    "fieldtype": "Data",
-   "label": "Customer Name"
+   "label": "Customer Name",
+   "unique": 1
   },
   {
    "fieldname": "domain",
@@ -61,10 +63,11 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-11-30 00:08:11.831313",
+ "modified": "2022-11-30 09:33:13.848020",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "FD Customer",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
