@@ -404,6 +404,8 @@
   {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Customer",
    "options": "FD Customer"
   }
@@ -411,7 +413,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-11-30 00:34:25.858823",
+ "modified": "2022-11-30 10:37:29.813012",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",
