@@ -1,9 +1,11 @@
 import _dayjs from "dayjs"
 import relativeTime from "dayjs/esm/plugin/relativeTime"
 import updateLocale from "dayjs/esm/plugin/updateLocale"
+import duration from "dayjs/plugin/duration"
 
 _dayjs.extend(relativeTime)
 _dayjs.extend(updateLocale)
+_dayjs.extend(duration)
 
 _dayjs.updateLocale("en", {
 	relativeTime: {
