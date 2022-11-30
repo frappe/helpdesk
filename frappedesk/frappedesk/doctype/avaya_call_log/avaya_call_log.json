@@ -1,104 +1,110 @@
 {
- "actions": [],
- "allow_rename": 1,
- "creation": "2022-11-29 14:37:18.353207",
- "default_view": "List",
- "doctype": "DocType",
- "editable_grid": 1,
- "engine": "InnoDB",
- "field_order": [
-  "call_sid",
-  "recording_url",
-  "duration",
-  "column_break_3",
-  "status",
-  "section_break_5",
-  "from",
-  "agent_ref",
-  "column_break_8",
-  "to",
-  "contact_ref"
- ],
- "fields": [
-  {
-   "fieldname": "recording_url",
-   "fieldtype": "Data",
-   "label": "Recording URL"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "busy\ncanceled\ncompleted\nfailed\nin-progress\nno-answer\npre-queued\nqueued\nringing\nrejected\nno-balance\nstraight-to-vm\nunknown"
-  },
-  {
-   "description": "Call Duration in seconds",
-   "fieldname": "duration",
-   "fieldtype": "Duration",
-   "label": "Duration"
-  },
-  {
-   "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_5",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "from",
-   "fieldtype": "Data",
-   "label": "From"
-  },
-  {
-   "fieldname": "agent_ref",
-   "fieldtype": "Link",
-   "label": "Agent Ref",
-   "options": "Agent"
-  },
-  {
-   "fieldname": "column_break_8",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "to",
-   "fieldtype": "Data",
-   "label": "To"
-  },
-  {
-   "fieldname": "contact_ref",
-   "fieldtype": "Link",
-   "label": "Contact Ref",
-   "options": "Contact"
-  },
-  {
-   "fieldname": "call_sid",
-   "fieldtype": "Data",
-   "label": "Call SID"
-  }
- ],
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2022-11-29 16:22:05.996960",
- "modified_by": "Administrator",
- "module": "FrappeDesk",
- "name": "Avaya Call Log",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  }
- ],
- "sort_field": "modified",
- "sort_order": "DESC",
- "states": []
+	"actions": [],
+	"allow_rename": 1,
+	"creation": "2022-11-29 14:37:18.353207",
+	"default_view": "List",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"call_sid",
+		"recording_url",
+		"duration",
+		"column_break_3",
+		"status",
+		"call_started_at",
+		"section_break_5",
+		"from",
+		"agent_ref",
+		"column_break_8",
+		"to",
+		"contact_ref"
+	],
+	"fields": [
+		{
+			"fieldname": "recording_url",
+			"fieldtype": "Data",
+			"label": "Recording URL"
+		},
+		{
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"label": "Status",
+			"options": "busy\ncanceled\ncompleted\nfailed\nin-progress\nno-answer\npre-queued\nqueued\nringing\nrejected\nno-balance\nstraight-to-vm\nunknown"
+		},
+		{
+			"description": "Call Duration in seconds",
+			"fieldname": "duration",
+			"fieldtype": "Duration",
+			"label": "Duration"
+		},
+		{
+			"fieldname": "column_break_3",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "section_break_5",
+			"fieldtype": "Section Break"
+		},
+		{
+			"fieldname": "from",
+			"fieldtype": "Data",
+			"label": "From"
+		},
+		{
+			"fieldname": "agent_ref",
+			"fieldtype": "Link",
+			"label": "Agent Ref",
+			"options": "Agent"
+		},
+		{
+			"fieldname": "column_break_8",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "to",
+			"fieldtype": "Data",
+			"label": "To"
+		},
+		{
+			"fieldname": "contact_ref",
+			"fieldtype": "Link",
+			"label": "Contact Ref",
+			"options": "Contact"
+		},
+		{
+			"fieldname": "call_sid",
+			"fieldtype": "Data",
+			"label": "Call SID"
+		},
+		{
+			"fieldname": "call_started_at",
+			"fieldtype": "Datetime",
+			"label": "Call Started At"
+		}
+	],
+	"index_web_pages_for_search": 1,
+	"links": [],
+	"modified": "2022-11-30 13:33:05.423790",
+	"modified_by": "Administrator",
+	"module": "FrappeDesk",
+	"name": "Avaya Call Log",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
 }
