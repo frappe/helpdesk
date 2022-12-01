@@ -252,7 +252,7 @@ export default {
 			},
 			{
 				label: "Knowledge Base",
-				icon: "knowledge-base",
+				icon: "kb-article",
 				to: {
 					path: "/frappedesk/kb",
 				},
