@@ -41,7 +41,7 @@ frappe.query_reports["Ticket Analytics"] = {
 				{ value: "Quarterly", label: __("Quarterly") },
 				{ value: "Yearly", label: __("Yearly") },
 			],
-			default: "Monthly",
+			default: "Weekly",
 			reqd: 1,
 		},
 		{
