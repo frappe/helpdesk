@@ -96,7 +96,8 @@ export default {
 			show: false,
 		}
 	},
-	setup(props, context) {
+	setup(context) {
+		const user = inject("user")
 		const callDuration = ref(null)
 		const resource = ref(null)
 		const $socket = inject("$socket")
@@ -132,6 +133,8 @@ export default {
 		})
 
 		return {
+			user,
+
 			callDuration,
 			callLog,
 			contact,
@@ -159,7 +162,11 @@ export default {
 		},
 	},
 	mounted() {
-		// TODO: check if any ongoing call is there for the current agent.
+		// check if any ongoing call is there for the current agent. if yes, then fetch the call log
+		if (this.user && this.user.agent) {
+			this.$resources.getOngoingCall.fetch()
+		}
+
 		this.$socket.on("list_update", (data) => {
 			if (this.callLog && this.callLog.ticket_ref) {
 				if (
@@ -212,6 +219,25 @@ export default {
 						customIcon: "circle-fail",
 						appearance: "danger",
 					})
+				},
+			}
+		},
+		getOngoingCall() {
+			return {
+				method: "frappe.client.get_list",
+				params: {
+					doctype: "Avaya Call Log",
+					filters: {
+						agent_ref: this.user.agent.name,
+						status: ["not in", ["completed", "failed"]],
+					},
+					fields: ["name"],
+				},
+				onSuccess: (res) => {
+					if (res.length) {
+						this.show = true
+						this.createCallLogDocumentResource(res[0].name)
+					}
 				},
 			}
 		},
