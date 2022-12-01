@@ -37,7 +37,7 @@
 									:label="field.label"
 									type="text"
 									v-model="formData[field.fieldname]"
-									@change="
+									@input="
 										(data) => {
 											validateField(field, data)
 										}
@@ -234,7 +234,7 @@
 			</div>
 		</div>
 		<div v-if="suggestArticles" class="w-full px-5 border-l">
-			<ArticleSuggestions :query="formData.subject" />
+			<ArticleSuggestions :query="formData.subject || ''" />
 		</div>
 	</div>
 </template>
@@ -423,9 +423,7 @@ export default {
 					}
 				}
 			}
-			if (!this.validationErrors[fieldname]) {
-				this.formData[fieldname] = data
-			}
+			this.formData[fieldname] = data
 		},
 		setLinkedFieldOptions(template) {
 			for (let index in template.fields) {
