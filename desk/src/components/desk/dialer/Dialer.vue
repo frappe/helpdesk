@@ -145,19 +145,24 @@ export default {
 	},
 	watch: {
 		callLog(newVal) {
-			if (newVal && newVal.call_started_at) {
-				setInterval(() => {
-					let nowTime = new Date(this.$dayjs())
-					let startTime = new Date(
-						this.$dayjs(newVal.call_started_at)
-					)
-					this.callDuration = this.$dayjs
-						.duration(
-							parseInt((nowTime - startTime) / 1000),
-							"seconds"
+			if (newVal) {
+				if (newVal.call_started_at) {
+					setInterval(() => {
+						let nowTime = new Date(this.$dayjs())
+						let startTime = new Date(
+							this.$dayjs(newVal.call_started_at)
 						)
-						.format("H:m:s")
-				}, 1000)
+						this.callDuration = this.$dayjs
+							.duration(
+								parseInt((nowTime - startTime) / 1000),
+								"seconds"
+							)
+							.format("H:m:s")
+					}, 1000)
+				}
+				if (["completed", "failed"].includes(newVal.status)) {
+					this.closeDialer()
+				}
 			}
 		},
 	},
@@ -203,6 +208,10 @@ export default {
 				ticket_id: options.ticketId,
 				to: options.to,
 			})
+		},
+		async closeDialer() {
+			await new Promise((resolve) => setTimeout(resolve, 3000))
+			this.show = false
 		},
 	},
 	resources: {
