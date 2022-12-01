@@ -49,4 +49,6 @@ app.provide("$agents", app.config.globalProperties.$agents)
 app.config.globalProperties.$contacts = contacts
 app.provide("$contacts", app.config.globalProperties.$contacts)
 
+app.provide("$socket", app.config.globalProperties.$socket)
+
 app.mount("#app")

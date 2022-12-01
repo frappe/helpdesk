@@ -7,6 +7,7 @@ function createTicketDocumentResource(ticketId, vm) {
 			doctype: "Ticket",
 			name: ticketId,
 			debounce: 300,
+			realtime: true,
 		},
 		vm
 	)

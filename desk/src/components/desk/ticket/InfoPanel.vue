@@ -355,7 +355,7 @@ export default {
 		Autocomplete,
 		NewContactDialog,
 	},
-	setup(props, { context }) {
+	setup(props) {
 		const viewportWidth = inject("viewportWidth")
 
 		const editingContact = ref(false)
@@ -366,16 +366,19 @@ export default {
 		const showOtherTicketsOfContacts = ref(false)
 		const showTicketHistory = ref(false)
 
+		const $socket = inject("$socket")
 		const $tickets = inject("$tickets")
 		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, context).value
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
 		})
 
 		const $contacts = inject("$contacts")
 		const contact = computed(() => {
 			if (!(ticket.value && ticket.value.contact)) return null
-			return $contacts.get({ contactId: ticket.value.contact }, context)
-				.value
+			return $contacts.get(
+				{ contactId: ticket.value.contact },
+				{ $socket }
+			).value
 		})
 
 		return {

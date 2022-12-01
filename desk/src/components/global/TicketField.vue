@@ -72,10 +72,11 @@ export default {
 	components: {
 		Autocomplete,
 	},
-	setup(props, context) {
+	setup(props) {
+		const $socket = inject("$socket")
 		const $tickets = inject("$tickets")
 		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, context).value
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
 		})
 
 		return {
