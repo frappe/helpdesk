@@ -2,27 +2,19 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Issue Summary"] = {
+frappe.query_reports["Ticket Summary"] = {
 	filters: [
-		{
-			fieldname: "company",
-			label: __("Company"),
-			fieldtype: "Link",
-			options: "Company",
-			default: frappe.defaults.get_user_default("Company"),
-			reqd: 1,
-		},
 		{
 			fieldname: "based_on",
 			label: __("Based On"),
 			fieldtype: "Select",
 			options: [
-				"Customer",
-				"Issue Type",
-				"Issue Priority",
+				"Contact",
+				"Ticket Type",
+				"Ticket Priority",
 				"Assigned To",
 			],
-			default: "Customer",
+			default: "Contact",
 			reqd: 1,
 		},
 		{
@@ -47,28 +39,21 @@ frappe.query_reports["Issue Summary"] = {
 				"",
 				{ label: __("Open"), value: "Open" },
 				{ label: __("Replied"), value: "Replied" },
-				{ label: __("On Hold"), value: "On Hold" },
 				{ label: __("Resolved"), value: "Resolved" },
 				{ label: __("Closed"), value: "Closed" },
 			],
 		},
 		{
 			fieldname: "priority",
-			label: __("Issue Priority"),
+			label: __("Ticket Priority"),
 			fieldtype: "Link",
-			options: "Issue Priority",
+			options: "Ticket Priority",
 		},
 		{
-			fieldname: "customer",
-			label: __("Customer"),
+			fieldname: "contact",
+			label: __("Contact"),
 			fieldtype: "Link",
-			options: "Customer",
-		},
-		{
-			fieldname: "project",
-			label: __("Project"),
-			fieldtype: "Link",
-			options: "Project",
+			options: "Contact",
 		},
 		{
 			fieldname: "assigned_to",
