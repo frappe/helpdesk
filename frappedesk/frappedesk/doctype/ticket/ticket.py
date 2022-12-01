@@ -70,9 +70,9 @@ class Ticket(Document):
 	def remove_assignment_if_not_in_team(self):
 		"""
 		Removes the assignment if the agent is not in the team.
-		Shoule be called inside on_update
+		Should be called inside on_update
 		"""
-		if self.has_value_changed("agent_group"):
+		if self.has_value_changed("agent_group") and self.status == "Open":
 			current_assigned_agent_doc = self.get_assigned_agent()
 			if (
 				(
