@@ -99,6 +99,7 @@ export default {
 	setup(props, context) {
 		const callDuration = ref(null)
 		const resource = ref(null)
+		const $socket = inject("$socket")
 		const createCallLogDocumentResource = (callLogId) => {
 			resource.value = createDocumentResource(
 				{
@@ -107,7 +108,7 @@ export default {
 					debounce: 300,
 					realtime: true,
 				},
-				context
+				{ $socket }
 			)
 		}
 
