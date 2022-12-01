@@ -18,6 +18,7 @@
 							<div class="shrink-0">
 								<slot name="top-sub-section-1">
 									<PresetFilters
+										:ListTitle="options.listTitle"
 										v-if="options.presetFilters"
 									/>
 								</slot>

@@ -20,6 +20,7 @@
 				<ListViewer
 					:options="{
 						name: 'Customer',
+						listTitle: 'Customers',
 						base: '12',
 						filterBox: true,
 						presetFilters: true,
