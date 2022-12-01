@@ -271,6 +271,16 @@
 													}
 												"
 											/>
+											<CustomIcons
+												name="add-response"
+												class="h-7 w-7 rounded p-1"
+												role="button"
+												@click="
+													() => {
+														showArticleResponseDialog = true
+													}
+												"
+											/>
 											<CannedResponsesDialog
 												:show="
 													showCannedResponsesDialog
@@ -279,6 +289,18 @@
 												@close="
 													() => {
 														showCannedResponsesDialog = false
+													}
+												"
+											/>
+
+											<ArticleResponseDialog
+												:show="
+													showArticleResponseDialog
+												"
+												@contentVal="getContent($event)"
+												@close="
+													() => {
+														showArticleResponseDialog = false
 													}
 												"
 											/>
@@ -347,6 +369,7 @@ import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
+import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
 import { inject, ref } from "vue"
 
 export default {
@@ -367,6 +390,7 @@ export default {
 		CustomerSatisfactionFeedback,
 		CannedResponsesDialog,
 		TextEditorFixedMenu,
+		ArticleResponseDialog,
 	},
 	data() {
 		return {
@@ -389,6 +413,9 @@ export default {
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
 
+		const showArticleResponseDialog = ref(false)
+		const tempContent = ref("")
+
 		return {
 			showTextFormattingMenu,
 			viewportWidth,
@@ -399,6 +426,8 @@ export default {
 			editingType,
 			showCannedResponsesDialog,
 			tempMessage,
+			showArticleResponseDialog,
+			tempContent,
 		}
 	},
 	resources: {
@@ -615,6 +644,10 @@ export default {
 		getMessage(message) {
 			this.tempMessage = message
 			this.content = this.tempMessage
+		},
+		getContent(content) {
+			this.tempContent = content
+			this.content = this.tempContent
 		},
 	},
 }
