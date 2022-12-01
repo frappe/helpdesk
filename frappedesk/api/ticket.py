@@ -238,6 +238,7 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 
 	ticket_doc.subject = values["subject"]
 	ticket_doc.description = values["description"]
+	ticket_doc.customer = values["customer"]
 
 	ticket_doc.template = template
 	template_fields = frappe.get_doc("Ticket Template", template).fields

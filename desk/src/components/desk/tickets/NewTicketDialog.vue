@@ -264,7 +264,10 @@ export default {
 					contact: this.selectedContact,
 					subject: this.subject,
 					description: this.descriptionContent,
-					customer: this.selectedCustomer,
+					customer:
+						this.fdCustomer != null
+							? this.fdCustomer
+							: this.selectedCustomer,
 				})
 				.then(() => {
 					this.isCreating = false
