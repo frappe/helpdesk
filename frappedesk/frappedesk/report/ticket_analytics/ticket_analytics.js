@@ -76,10 +76,8 @@ frappe.query_reports["Ticket Analytics"] = {
 		},
 	],
 	after_datatable_render: function (datatable_obj) {
-		$(datatable_obj.wrapper)
-			.find("input[type=checkbox]")[0]
-			.click()
-    },
+		$(datatable_obj.wrapper).find("input[type=checkbox]")[0].click()
+	},
 
 	get_datatable_options(options) {
 		return Object.assign(options, {
