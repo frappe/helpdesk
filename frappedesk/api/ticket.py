@@ -408,33 +408,6 @@ def assign_ticket_priority(ticket_id, priority):
 
 
 @frappe.whitelist()
-def assign_ticket_group(ticket_id, agent_group):
-	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
-		if ticket_doc.agent_group != agent_group:
-			current_assigned_agent_doc = ticket_doc.get_assigned_agent()
-			if (
-				(
-					current_assigned_agent_doc
-					and not current_assigned_agent_doc.in_group(
-						agent_group
-					)  # if assigned agent is not in the new group
-				)
-				and frappe.get_doc(
-					"Assignment Rule", frappe.get_doc("Agent Group", agent_group).assignment_rule
-				).users  # check if there are any users(agnets) in the new group assignment rule
-			):
-				clear_all_assignments("Ticket", ticket_id)
-				# new agent will be assigned automatically via assignment rule
-
-			ticket_doc.agent_group = agent_group
-			log_ticket_activity(ticket_id, f"team set to {agent_group}")
-			ticket_doc.save()
-
-		return ticket_doc
-
-
-@frappe.whitelist()
 def get_all_ticket_types():
 	return frappe.get_all("Ticket Type", pluck="name")
 
@@ -541,3 +514,49 @@ def submit_customer_feedback(ticket_id, satisfaction_rating, feedback_text):
 	ticket_doc.feedback_submitted = True
 	ticket_doc.save(ignore_permissions=True)
 	return ticket_doc
+
+
+@frappe.whitelist()
+def get_field_meta_info(fieldname):
+	if fieldname in ["_assign"]:
+		return {
+			"fieldtype": "Link",
+			"options": "Agent",
+			"fieldname": fieldname,
+			"label": "Assignee",
+		}
+	meta_info = frappe.get_meta("Ticket").get_field(fieldname).as_dict()
+
+	# check if field is a custom field
+	custom_field = frappe.get_value(
+		"Custom Field", {"dt": "Ticket", "fieldname": fieldname}, "name"
+	)
+	if custom_field:
+		custom_field_extra_info = frappe.get_doc(
+			"Ticket Custom Fields Config"
+		).get_field_info(fieldname)
+		custom_field_extra_info.update({"is_custom_field": True})
+		meta_info.update(custom_field_extra_info)
+
+	return meta_info
+
+
+@frappe.whitelist()
+def get_field_value(ticket_id, fieldname):
+	return frappe.get_value("Ticket", ticket_id, fieldname)
+
+
+@frappe.whitelist()
+def update_field_value(ticket_id, fieldname, value):
+	frappe.db.set_value("Ticket", ticket_id, fieldname, value)
+	frappe.db.commit()
+
+
+@frappe.whitelist()
+def get_custom_fields(view="Customer Portal"):
+	return frappe.get_doc("Ticket Custom Fields Config").get_custom_fields(view)
+
+
+@frappe.whitelist()
+def get_assignee(ticket_id):
+	return frappe.get_doc("Ticket", ticket_id).get_assigned_agent()
