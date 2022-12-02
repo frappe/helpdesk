@@ -8,7 +8,7 @@
 			<Input
 				v-if="fieldMetaInfo?.fieldtype === 'Data'"
 				type="text"
-				@change="
+				@input="
 					(val) => {
 						onInput(val)
 					}
@@ -27,7 +27,7 @@
 				:value="fieldValue"
 				@change="
 					(val) => {
-						onInput(val)
+						onInput(val?.value)
 					}
 				"
 				:resourceOptions="getResourceOptions()"
@@ -40,7 +40,6 @@
 <script>
 import Autocomplete from "@/components/global/Autocomplete.vue"
 import { inject, computed } from "vue"
-import { ref } from "@vue/reactivity"
 
 export default {
 	name: "TicketField",
@@ -130,10 +129,8 @@ export default {
 		},
 	},
 	methods: {
-		onInput(val) {
-			if (!val) return
+		onInput(value) {
 			if (this.validate()) {
-				let value = val.value
 				this.$tickets
 					.set(this.ticketId, this.fieldname, value)
 					.then(() => {

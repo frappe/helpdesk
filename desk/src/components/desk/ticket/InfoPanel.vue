@@ -426,11 +426,6 @@ export default {
 		contactCreated(contact) {
 			this.showNewContactDialog = false
 			this.editingContact = false
-			this.$tickets.set({
-				ticketId: this.ticketId,
-				fieldname: "contact",
-				value: contact.name,
-			})
 			this.$tickets.set(this.ticketId, "contact", contact.name)
 		},
 	},
