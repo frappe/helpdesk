@@ -144,13 +144,14 @@ export default {
 		TicketField,
 		CustomIcons,
 	},
-	setup(props, { context }) {
+	setup(props) {
 		const user = inject("user")
-		const $tickets = inject("$tickets")
 		const validationErrorFields = ref([])
 
+		const $socket = inject("$socket")
+		const $tickets = inject("$tickets")
 		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, context).value
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
 		})
 
 		return {

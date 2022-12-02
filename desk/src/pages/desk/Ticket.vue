@@ -385,7 +385,7 @@ export default {
 			content: "",
 		}
 	},
-	setup(props, { context }) {
+	setup(props) {
 		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject("viewportWidth")
 		const user = inject("user")
@@ -399,9 +399,10 @@ export default {
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
 
+		const $socket = inject("$socket")
 		const $tickets = inject("$tickets")
 		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, context).value
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
 		})
 
 		return {

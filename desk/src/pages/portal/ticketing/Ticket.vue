@@ -22,10 +22,11 @@
 				<div>
 					<Button
 						v-if="['Open', 'Replied'].includes(ticket.status)"
-						@click="closeTicket()"
+						@click="$tickets.set(ticketId, 'status', 'Closed')"
 						class="bg-gray-100 text-red-500"
-						>Close</Button
 					>
+						Close
+					</Button>
 				</div>
 			</div>
 			<div class="flex items-center pb-2 justify-between">
@@ -55,7 +56,9 @@
 							</div>
 							<div
 								class="text-[#096CC3] text-[12px] font-medium cursor-pointer hover:text-blue-500"
-								@click="reopenTicket()"
+								@click="
+									$tickets.set(ticketId, 'status', 'Open')
+								"
 							>
 								Reopen ticket
 							</div>
@@ -313,9 +316,8 @@
 </template>
 
 <script>
-import { inject, ref } from "vue"
+import { inject, ref, computed } from "vue"
 import Conversations from "@/components/portal/ticket/Conversations.vue"
-import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import { FeatherIcon, FileUploader, TextEditor, Avatar } from "frappe-ui"
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
@@ -327,7 +329,6 @@ export default {
 	props: ["ticketId"],
 	components: {
 		Conversations,
-		ActionPanel,
 		FeatherIcon,
 		TextEditor,
 		TextEditorFixedMenu,
@@ -344,25 +345,28 @@ export default {
 			content: "",
 		}
 	},
-	setup() {
+	setup(props) {
 		const user = inject("user")
 		const editor = ref(null)
 		const viewportWidth = inject("viewportWidth")
-		const tickets = inject("tickets")
-		const ticketController = inject("ticketController")
 		const attachments = ref([])
 		const tempTextEditorData = ref({})
 		const showTextFormattingMenu = ref(true)
+
+		const $socket = inject("$socket")
+		const $tickets = inject("$tickets")
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
+		})
 
 		return {
 			user,
 			editor,
 			viewportWidth,
-			tickets,
-			ticketController,
 			attachments,
 			tempTextEditorData,
 			showTextFormattingMenu,
+			ticket,
 		}
 	},
 	computed: {
@@ -413,14 +417,7 @@ export default {
 				"Redo",
 			]
 		},
-		ticket() {
-			if (this.tickets) {
-				return this.tickets[this.ticketId] || null
-			} else {
-				return null
-			}
-		},
-		sendingDissabled() {
+		sendingDisabled() {
 			let content = this.content.trim()
 			content = content.replaceAll("<p></p>", "")
 			content = content.replaceAll(" ", "")
@@ -463,7 +460,7 @@ export default {
 	methods: {
 		handleShortcuts(e) {
 			if ((e.metaKey || e.ctrlKey) && e.keyCode == 13) {
-				if (!this.sendingDissabled) {
+				if (!this.sendingDisabled) {
 					this.submitConversation()
 				}
 			} else if ((e.metaKey || e.ctrlKey) && e.keyCode == 75) {
@@ -502,12 +499,6 @@ export default {
 
 			this.attachments = []
 			this.content = ""
-		},
-		closeTicket() {
-			this.ticketController.set(this.ticketId, "status", "Closed")
-		},
-		reopenTicket() {
-			this.ticketController.set(this.ticketId, "status", "Open")
 		},
 	},
 }
