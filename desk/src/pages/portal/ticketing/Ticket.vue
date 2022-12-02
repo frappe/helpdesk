@@ -315,7 +315,6 @@
 <script>
 import { inject, ref } from "vue"
 import Conversations from "@/components/portal/ticket/Conversations.vue"
-import ActionPanel from "@/components/portal/ticket/ActionPanel.vue"
 import { FeatherIcon, FileUploader, TextEditor, Avatar } from "frappe-ui"
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
@@ -327,7 +326,6 @@ export default {
 	props: ["ticketId"],
 	components: {
 		Conversations,
-		ActionPanel,
 		FeatherIcon,
 		TextEditor,
 		TextEditorFixedMenu,
