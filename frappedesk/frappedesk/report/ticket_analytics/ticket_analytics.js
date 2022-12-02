@@ -5,38 +5,30 @@
 frappe.query_reports["Ticket Analytics"] = {
 	filters: [
 		{
-			fieldname: "company",
-			label: __("Company"),
-			fieldtype: "Link",
-			options: "Company",
-			default: frappe.defaults.get_user_default("Company"),
-			reqd: 1,
-		},
-		{
 			fieldname: "based_on",
 			label: __("Based On"),
 			fieldtype: "Select",
 			options: [
-				"Customer",
+				"Contact",
 				"Ticket Type",
 				"Ticket Priority",
 				"Assigned To",
 			],
-			default: "Customer",
+			default: "Contact",
 			reqd: 1,
 		},
 		{
 			fieldname: "from_date",
 			label: __("From Date"),
 			fieldtype: "Date",
-			default: frappe.defaults.get_global_default("year_start_date"),
+			default: frappe.datetime.add_days(frappe.datetime.nowdate(), -30),
 			reqd: 1,
 		},
 		{
 			fieldname: "to_date",
 			label: __("To Date"),
 			fieldtype: "Date",
-			default: frappe.defaults.get_global_default("year_end_date"),
+			default: frappe.datetime.nowdate(),
 			reqd: 1,
 		},
 		{
@@ -49,7 +41,7 @@ frappe.query_reports["Ticket Analytics"] = {
 				{ value: "Quarterly", label: __("Quarterly") },
 				{ value: "Yearly", label: __("Yearly") },
 			],
-			default: "Monthly",
+			default: "Weekly",
 			reqd: 1,
 		},
 		{
@@ -71,16 +63,10 @@ frappe.query_reports["Ticket Analytics"] = {
 			options: "Ticket Priority",
 		},
 		{
-			fieldname: "customer",
-			label: __("Customer"),
+			fieldname: "contact",
+			label: __("Contact"),
 			fieldtype: "Link",
-			options: "Customer",
-		},
-		{
-			fieldname: "project",
-			label: __("Project"),
-			fieldtype: "Link",
-			options: "Project",
+			options: "Contact",
 		},
 		{
 			fieldname: "assigned_to",
@@ -90,11 +76,9 @@ frappe.query_reports["Ticket Analytics"] = {
 		},
 	],
 	after_datatable_render: function (datatable_obj) {
-		$(datatable_obj.wrapper)
-			.find(".dt-row-0")
-			.find("input[type=checkbox]")
-			.click()
+		$(datatable_obj.wrapper).find("input[type=checkbox]")[0].click()
 	},
+
 	get_datatable_options(options) {
 		return Object.assign(options, {
 			checkboxColumn: true,
@@ -109,7 +93,6 @@ frappe.query_reports["Ticket Analytics"] = {
 							name: row_name,
 							values: row_values,
 						}
-
 						let raw_data = frappe.query_report.chart.data
 						let new_datasets = raw_data.datasets
 
@@ -139,7 +122,6 @@ frappe.query_reports["Ticket Analytics"] = {
 						setTimeout(() => {
 							frappe.query_report.chart.draw(true)
 						}, 1000)
-
 						frappe.query_report.raw_chart_data = new_data
 					}
 				},
