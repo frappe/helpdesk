@@ -1,6 +1,19 @@
 <template>
-	<div v-if="template" class="mx-auto max-w-2xl pt-4 mt-5">
-		<div>
+	<div
+		v-if="template"
+		class="flex flex-row mx-auto pt-4 mt-5"
+		:class="{
+			'max-w-2xl': !suggestArticles,
+			'max-w-5xl space-x-5': suggestArticles,
+		}"
+	>
+		<div
+			class="shrink-0"
+			:class="{
+				'w-[55%]': suggestArticles,
+				'w-full': !suggestArticles,
+			}"
+		>
 			<div class="rounded-lg shadow-md border p-8">
 				<div class="font-medium">
 					{{
@@ -24,7 +37,7 @@
 									:label="field.label"
 									type="text"
 									v-model="formData[field.fieldname]"
-									@change="
+									@input="
 										(data) => {
 											validateField(field, data)
 										}
@@ -220,10 +233,13 @@
 				</div>
 			</div>
 		</div>
+		<div v-if="suggestArticles" class="w-full px-5 border-l">
+			<ArticleSuggestions :query="formData.subject || ''" />
+		</div>
 	</div>
 </template>
 <script>
-import { inject, ref } from "vue"
+import { inject, ref, computed } from "vue"
 import {
 	Input,
 	TextEditor,
@@ -236,6 +252,7 @@ import {
 import { call } from "frappe-ui"
 import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
 import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
+import ArticleSuggestions from "@/components/global/kb/ArticleSuggestions.vue"
 
 export default {
 	name: "NewTicket",
@@ -250,6 +267,7 @@ export default {
 		FeatherIcon,
 		TextEditorMenuItem,
 		CustomTextEditor,
+		ArticleSuggestions,
 	},
 	setup() {
 		const user = inject("user")
@@ -289,6 +307,15 @@ export default {
 
 		const attachments = ref([])
 
+		const $socket = inject("$socket")
+		const $fdSettings = inject("$fdSettings")
+		const suggestArticles = computed(() => {
+			return $fdSettings.get(
+				{ fieldname: "suggest_articles_in_new_ticket_page" },
+				{ $socket }
+			).value
+		})
+
 		return {
 			user,
 			ticketTemplates,
@@ -299,6 +326,8 @@ export default {
 			validationErrors,
 			editorOptions,
 			attachments,
+
+			suggestArticles,
 		}
 	},
 	computed: {
@@ -324,7 +353,6 @@ export default {
 			}
 		},
 	},
-	resources: {},
 	methods: {
 		focusEditor(field) {
 			const element = document.getElementsByClassName(
@@ -395,9 +423,7 @@ export default {
 					}
 				}
 			}
-			if (!this.validationErrors[fieldname]) {
-				this.formData[fieldname] = data
-			}
+			this.formData[fieldname] = data
 		},
 		setLinkedFieldOptions(template) {
 			for (let index in template.fields) {

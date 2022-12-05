@@ -17,6 +17,7 @@ import { socketio_port } from "../../../../sites/common_site_config.json"
 import { tickets } from "@/controllers/tickets"
 import { agents } from "@/controllers/agents"
 import { contacts } from "@/controllers/contacts"
+import { fdSettings } from "@/controllers/fdSettings"
 
 let app = createApp(App)
 
@@ -48,6 +49,9 @@ app.provide("$agents", app.config.globalProperties.$agents)
 
 app.config.globalProperties.$contacts = contacts
 app.provide("$contacts", app.config.globalProperties.$contacts)
+
+app.config.globalProperties.$fdSettings = fdSettings
+app.provide("$fdSettings", app.config.globalProperties.$fdSettings)
 
 app.provide("$socket", app.config.globalProperties.$socket)
 
