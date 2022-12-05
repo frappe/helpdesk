@@ -272,7 +272,7 @@
 												"
 											/>
 											<CustomIcons
-												name="kb-article"
+												name="article-reply"
 												class="h-7 w-7 rounded p-1"
 												role="button"
 												@click="

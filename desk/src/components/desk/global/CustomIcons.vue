@@ -1372,6 +1372,82 @@
 				fill="#74808B"
 			/>
 		</svg>
+		<svg
+			v-if="this.name == 'article-reply'"
+			:class="this.class"
+			:width="this.width"
+			:height="this.height"
+			viewBox="0 0 15 15"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M7.64624 2.51627V9.06354"
+				stroke="black"
+				stroke-miterlimit="10"
+				stroke-linecap="round"
+			/>
+			<path
+				d="M9.30747 0.855011C8.38963 0.855011 7.64622 1.59842 7.64622 2.51626C7.64622 1.59842 6.90281 0.855011 5.98497 0.855011H2.00122C1.44894 0.855011 1.00122 1.30273 1.00122 1.85501V10.4838C1.00122 11.5883 1.89665 12.4838 3.00122 12.4838H5.98497C6.90281 12.4838 7.64622 13.2272 7.64622 14.145C7.64622 13.2272 8.38963 12.4838 9.30747 12.4838H12.2912C13.3958 12.4838 14.2912 11.5883 14.2912 10.4838V1.85501C14.2912 1.30273 13.8435 0.855011 13.2912 0.855011H9.30747Z"
+				stroke="black"
+				stroke-miterlimit="10"
+				stroke-linecap="square"
+			/>
+		</svg>
+		<svg
+			v-if="this.name == 'kb-articles'"
+			:class="this.class"
+			:width="18"
+			:height="18"
+			viewBox="0 0 18 18"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<line
+				x1="11.5"
+				y1="5.5"
+				x2="15.5"
+				y2="5.5"
+				stroke="#687178"
+				stroke-linecap="round"
+			/>
+			<line
+				x1="3.5"
+				y1="5.5"
+				x2="7.5"
+				y2="5.5"
+				stroke="#687178"
+				stroke-linecap="round"
+			/>
+			<line
+				x1="11.5"
+				y1="8.5"
+				x2="13.5"
+				y2="8.5"
+				stroke="#687178"
+				stroke-linecap="round"
+			/>
+			<line
+				x1="3.5"
+				y1="8.5"
+				x2="7.5"
+				y2="8.5"
+				stroke="#687178"
+				stroke-linecap="round"
+			/>
+			<path
+				d="M9.14575 3.0365V11.0625"
+				stroke="#687178"
+				stroke-miterlimit="10"
+				stroke-linecap="round"
+			/>
+			<path
+				d="M11.1823 1C10.0571 1 9.14583 1.91132 9.14583 3.03646C9.14583 1.91132 8.23452 1 7.10938 1H2C1.44772 1 1 1.44772 1 2V13.2552C1 14.3598 1.89543 15.2552 3 15.2552H7.10938C8.23452 15.2552 9.14583 16.1665 9.14583 17.2917C9.14583 16.1665 10.0571 15.2552 11.1823 15.2552H15.2917C16.3962 15.2552 17.2917 14.3598 17.2917 13.2552V2C17.2917 1.44772 16.844 1 16.2917 1H11.1823Z"
+				stroke="#687178"
+				stroke-miterlimit="10"
+				stroke-linecap="square"
+			/>
+		</svg>
 		<div v-if="this.name == 'company'" :class="this.class">
 			<div
 				v-if="$resources.brandHtml.data"
