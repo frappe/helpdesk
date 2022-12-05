@@ -28,7 +28,11 @@
 								:attachments="conversation.attachments"
 							/>
 						</div>
-						<CommentCard v-else :comment="conversation" />
+						<CommentCard
+							v-else-if="conversation.type == 'Comment'"
+							:comment="conversation"
+						/>
+						<CallLogCard v-else :callLog="conversation" />
 					</div>
 				</div>
 			</div>
@@ -47,6 +51,7 @@ import ConversationCard from "./ConversationCard.vue"
 import { LoadingText } from "frappe-ui"
 import { ref } from "vue"
 import CommentCard from "./CommentCard.vue"
+import CallLogCard from "@/components/desk/dialer/CallLogCard.vue"
 
 export default {
 	name: "Conversations",
@@ -55,6 +60,7 @@ export default {
 		ConversationCard,
 		LoadingText,
 		CommentCard,
+		CallLogCard,
 	},
 	setup() {
 		const userColors = ref({})
@@ -88,6 +94,21 @@ export default {
 				auto: true,
 			}
 		},
+		callLogs() {
+			return {
+				cache: ["Ticket", "CallLogs", this.ticketId],
+				method: "frappe.client.get_list",
+				params: {
+					doctype: "Avaya Call Log",
+					fields: ["*"],
+					filters: {
+						ticket_ref: this.ticketId,
+					},
+					order_by: "creation asc",
+				},
+				auto: true,
+			}
+		},
 	},
 	computed: {
 		conversations() {
@@ -102,8 +123,12 @@ export default {
 				x.type = "Comment"
 				return x
 			})
+			const callLogs = this.callLogs.map((x) => {
+				x.type = "CallLog"
+				return x
+			})
 			const conversations =
-				[...communications, ...comments].sort(
+				[...communications, ...comments, ...callLogs].sort(
 					(a, b) => new Date(a.creation) - new Date(b.creation)
 				) || []
 			return conversations
@@ -113,6 +138,9 @@ export default {
 		},
 		comments() {
 			return this.$resources.comments.data || []
+		},
+		callLogs() {
+			return this.$resources.callLogs.data || []
 		},
 	},
 	watch: {
@@ -132,6 +160,12 @@ export default {
 				data["name"].split("-")[1] === this.ticketId
 			) {
 				this.$resources.comments.fetch()
+			}
+			if (
+				data["doctype"] === "Avaya Call Log" &&
+				data["name"].split("-")[1] === this.ticketId
+			) {
+				this.$resources.callLogs.fetch()
 			}
 		})
 	},
