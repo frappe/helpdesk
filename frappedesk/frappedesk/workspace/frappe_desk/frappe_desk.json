@@ -1,6 +1,6 @@
 {
 	"charts": [],
-	"content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/frappedesk/tickets\\\">Go To Frappe Desk</a></span>\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Your Shortcuts</b></span>\",\"col\":12}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tickets\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Level Agreement\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Frappe Desk Settings\",\"col\":3}},{\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Ticket Templates\",\"col\":3}},{\"type\":\"card\",\"data\":{\"card_name\":\"Tickets\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"SLA\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Settings\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Agents\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Knowledge Base\",\"col\":4}}]",
+	"content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/frappedesk/tickets\\\">Go To Frappe Desk</a></span>\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Frappe Desk Configuration<br></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Ticket Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Agent Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Frappe Desk Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Automation\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Channels\",\"col\":4}}]",
 	"creation": "2022-09-17 11:48:26.825712",
 	"docstatus": 0,
 	"doctype": "Workspace",
@@ -13,63 +13,7 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Tickets",
-			"link_count": 3,
-			"onboard": 0,
-			"type": "Card Break"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "Ticket",
-			"link_count": 0,
-			"link_to": "Ticket",
-			"link_type": "DocType",
-			"onboard": 0,
-			"type": "Link"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "Type",
-			"link_count": 0,
-			"link_to": "Ticket Type",
-			"link_type": "DocType",
-			"onboard": 0,
-			"type": "Link"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "Priority",
-			"link_count": 0,
-			"link_to": "Ticket Priority",
-			"link_type": "DocType",
-			"onboard": 0,
-			"type": "Link"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "Settings",
-			"link_count": 1,
-			"onboard": 0,
-			"type": "Card Break"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "Frappe Desk Settings",
-			"link_count": 0,
-			"link_to": "Frappe Desk Settings",
-			"link_type": "DocType",
-			"onboard": 0,
-			"type": "Link"
-		},
-		{
-			"hidden": 0,
-			"is_query_report": 0,
-			"label": "Agents",
+			"label": "Agent Configuration",
 			"link_count": 2,
 			"onboard": 0,
 			"type": "Card Break"
@@ -97,7 +41,7 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Knowledge Base",
+			"label": "Automation",
 			"link_count": 2,
 			"onboard": 0,
 			"type": "Card Break"
@@ -105,9 +49,9 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Category",
+			"label": "Notification Settings",
 			"link_count": 0,
-			"link_to": "Category",
+			"link_to": "Notification Settings",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"
@@ -115,9 +59,9 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Article",
+			"label": "Assignment Rule",
 			"link_count": 0,
-			"link_to": "Article",
+			"link_to": "Assignment Rule",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"
@@ -125,7 +69,7 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "SLA",
+			"label": "Channels",
 			"link_count": 1,
 			"onboard": 0,
 			"type": "Card Break"
@@ -133,7 +77,35 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "SLA",
+			"label": "Email Account",
+			"link_count": 0,
+			"link_to": "Email Account",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Ticket Configuration",
+			"link_count": 3,
+			"onboard": 0,
+			"type": "Card Break"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Ticket Type",
+			"link_count": 0,
+			"link_to": "Ticket Type",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Support Policy",
 			"link_count": 0,
 			"link_to": "SLA",
 			"link_type": "DocType",
@@ -143,7 +115,17 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Reports",
+			"label": "General Settings",
+			"link_count": 0,
+			"link_to": "Frappe Desk Settings",
+			"link_type": "DocType",
+			"onboard": 0,
+			"type": "Link"
+		},
+		{
+			"hidden": 0,
+			"is_query_report": 0,
+			"label": "Frappe Desk Reports",
 			"link_count": 2,
 			"onboard": 0,
 			"type": "Card Break"
@@ -151,9 +133,9 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "First Response Time for Tickets",
+			"label": "Ticket Analytics",
 			"link_count": 0,
-			"link_to": "First Response Time for Tickets",
+			"link_to": "Ticket Analytics",
 			"link_type": "Report",
 			"onboard": 0,
 			"type": "Link"
@@ -161,7 +143,7 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Summary",
+			"label": "Ticket Summary",
 			"link_count": 0,
 			"link_to": "Ticket Summary",
 			"link_type": "Report",
@@ -169,7 +151,7 @@
 			"type": "Link"
 		}
 	],
-	"modified": "2022-11-28 20:16:02.832932",
+	"modified": "2022-12-02 16:07:39.761267",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Frappe Desk",
@@ -178,38 +160,7 @@
 	"public": 1,
 	"quick_lists": [],
 	"roles": [],
-	"sequence_id": 30.0,
-	"shortcuts": [
-		{
-			"color": "Green",
-			"doc_view": "List",
-			"format": "{} Open",
-			"label": "Tickets",
-			"link_to": "Ticket",
-			"stats_filter": "{\"status\":[\"=\",\"Open\"]}",
-			"type": "DocType"
-		},
-		{
-			"color": "Grey",
-			"doc_view": "List",
-			"label": "Service Level Agreement",
-			"link_to": "SLA",
-			"type": "DocType"
-		},
-		{
-			"color": "Grey",
-			"doc_view": "List",
-			"label": "Frappe Desk Settings",
-			"link_to": "Frappe Desk Settings",
-			"type": "DocType"
-		},
-		{
-			"color": "Grey",
-			"doc_view": "List",
-			"label": "Ticket Templates",
-			"link_to": "Ticket Template",
-			"type": "DocType"
-		}
-	],
+	"sequence_id": 1,
+	"shortcuts": [],
 	"title": "Frappe Desk"
 }
