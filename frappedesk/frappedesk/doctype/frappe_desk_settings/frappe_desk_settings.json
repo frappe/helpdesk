@@ -29,7 +29,9 @@
 		"initial_demo_ticket_created",
 		"initial_helpdesk_name_setup_skipped",
 		"assignment_rules_section",
-		"base_support_rotation"
+		"base_support_rotation",
+		"knowledge_base_section",
+		"suggest_articles_in_new_ticket_page"
 	],
 	"fields": [
 		{
@@ -169,11 +171,22 @@
 			"label": "Base Support Rotation",
 			"options": "Assignment Rule",
 			"read_only": 1
+		},
+		{
+			"fieldname": "knowledge_base_section",
+			"fieldtype": "Section Break",
+			"label": "Knowledge Base"
+		},
+		{
+			"default": "0",
+			"fieldname": "suggest_articles_in_new_ticket_page",
+			"fieldtype": "Check",
+			"label": "Suggest Articles in New TIcket Page"
 		}
 	],
 	"issingle": 1,
 	"links": [],
-	"modified": "2022-11-06 15:48:46.754859",
+	"modified": "2022-12-01 14:54:43.250637",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Frappe Desk Settings",

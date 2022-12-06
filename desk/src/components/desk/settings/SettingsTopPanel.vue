@@ -44,7 +44,7 @@ export default {
 	mounted() {
 		this.actionGroups = {
 			Agents: [
-				new Action("New Agent", "plus", "primary", () => {
+				new Action("Add Agent", "plus", "primary", () => {
 					this.$event.emit("show-new-agent-dialog")
 				}),
 			],
