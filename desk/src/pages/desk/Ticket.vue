@@ -1,21 +1,31 @@
 <template>
 	<div>
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
-			<div class="h-[72px] px-[20px] flex">
+			<div class="h-[60px] px-[20px] flex">
 				<router-link
 					:to="{ path: '/frappedesk/tickets' }"
-					class="h-[20px] my-[26px] text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
+					class="text-[18px] text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
 					role="button"
 				>
-					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
-					<div>Back to Tickets</div>
+					<FeatherIcon name="arrow-left" class="w-[12px] h-[12px]" />
+					<div>Ticket #{{ ticket.name }}</div>
+					<Badge
+						:color="
+							['Resolved', 'Closed'].includes(ticket.status)
+								? 'gray'
+								: ticket.status == 'Open'
+								? 'red'
+								: 'yellow'
+						"
+						>{{ ticket.status }}</Badge
+					>
 				</router-link>
 			</div>
 			<div
 				v-if="ticket"
 				class="flex border-t w-full"
 				:style="{
-					height: viewportWidth > 768 ? 'calc(100vh - 72px)' : null,
+					height: viewportWidth > 768 ? 'calc(100vh - 60px)' : null,
 				}"
 			>
 				<div class="border-r w-[252px] shrink-0">
@@ -347,7 +357,7 @@ import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
-import { inject, ref } from "vue"
+import { inject, ref, computed } from "vue"
 
 export default {
 	name: "Ticket",
@@ -375,7 +385,7 @@ export default {
 			content: "",
 		}
 	},
-	setup() {
+	setup(props) {
 		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject("viewportWidth")
 		const user = inject("user")
@@ -389,7 +399,14 @@ export default {
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
 
+		const $socket = inject("$socket")
+		const $tickets = inject("$tickets")
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
+		})
+
 		return {
+			ticket,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -456,13 +473,6 @@ export default {
 				method: "frappedesk.api.ticket.mark_ticket_as_seen",
 			}
 		},
-		ticket() {
-			return {
-				type: "document",
-				doctype: "Ticket",
-				name: this.ticketId,
-			}
-		},
 	},
 	mounted() {
 		this.$resources.markTicketAsSeen.submit({
@@ -516,9 +526,6 @@ export default {
 				"Undo",
 				"Redo",
 			]
-		},
-		ticket() {
-			return this.$resources.ticket.doc || null
 		},
 		sendingDissabled() {
 			let content = this.content.trim()

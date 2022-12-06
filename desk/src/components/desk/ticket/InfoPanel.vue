@@ -7,12 +7,12 @@
 			<LoadingText v-if="updatingContact" />
 			<div v-else>
 				<div v-if="!editingContact">
-					<div v-if="ticket.contact" class="space-y-[12px]">
+					<div v-if="contact" class="space-y-[12px]">
 						<div class="flex flex-row items-center space-x-[12px]">
 							<div class="w-7">
 								<CustomAvatar
 									:label="contactFullName"
-									:imageURL="ticket.contact.image"
+									:imageURL="contact?.image"
 									size="md"
 								/>
 							</div>
@@ -34,7 +34,7 @@
 							</div>
 						</div>
 						<div
-							v-if="ticket.contact.phone_nos.length > 0"
+							v-if="contact.phone_nos.length > 0"
 							class="flex space-x-[12px] items-center"
 						>
 							<FeatherIcon
@@ -44,7 +44,7 @@
 							/>
 							<div
 								class="space-y-1"
-								v-for="phone_no in ticket.contact.phone_nos"
+								v-for="phone_no in contact.phone_nos"
 								:key="phone_no"
 							>
 								<a
@@ -55,7 +55,7 @@
 							</div>
 						</div>
 						<div
-							v-if="ticket.contact.email_ids.length > 0"
+							v-if="contact.email_ids.length > 0"
 							class="flex space-x-[12px]"
 						>
 							<FeatherIcon
@@ -65,7 +65,7 @@
 							/>
 							<div
 								class="space-y-1 max-w-[173px] break-words"
-								v-for="email in ticket.contact.email_ids"
+								v-for="email in contact.email_ids"
 								:key="email"
 							>
 								<div
@@ -98,79 +98,8 @@
 				</div>
 				<div v-else class="flex items-center space-x-2 mb-2 w-full">
 					<div class="grow w-full">
-						<Autocomplete
-							v-if="contacts"
-							:options="
-								contacts.map((x) => {
-									return {
-										label: `${
-											x.first_name ? x.first_name : ''
-										} ${x.last_name ? x.last_name : ''}`,
-										value: x.name,
-									}
-								})
-							"
-							placeholder="Set contact"
-							:value="
-								contactFullName && !updatingContact
-									? contactFullName
-									: ''
-							"
-							@change="
-								(item) => {
-									if (item.value) {
-										updatingContact = true
-										ticketController
-											.set(
-												ticketId,
-												'contact',
-												item.value
-											)
-											.then(() => {
-												updatingContact = false
-												editingContact = false
-												$resources.otherTicketsOfContact.fetch()
-												$resources.ticket.fetch()
-
-												$toast({
-													title: 'Ticket updated successfully.',
-													customIcon: 'circle-check',
-													appearance: 'success',
-												})
-											})
-									}
-								}
-							"
-						>
-							<template #input>
-								<div
-									class="flex flex-row space-x-1 items-center"
-								>
-									<div class="w-[170px]">
-										<div
-											v-if="
-												ticket.contact &&
-												!updatingContact
-											"
-											class="text-left truncate"
-										>
-											{{ contactFullName }}
-										</div>
-										<div v-else>
-											<LoadingText
-												v-if="updatingContact"
-											/>
-											<div
-												v-else
-												class="text-base text-left text-gray-400"
-											>
-												set contact
-											</div>
-										</div>
-									</div>
-								</div>
-							</template>
-						</Autocomplete>
+						<!-- TODO: use the new functionalities of autocomplete -->
+						<Autocomplete />
 					</div>
 					<FeatherIcon
 						name="x"
@@ -313,7 +242,7 @@
 									index < maxCount
 										? `/frappedesk/tickets/${_ticket.name}`
 										: `/frappedesk/tickets/?contact=${JSON.stringify(
-												['is', ticket.contact.name]
+												['is', contact.name]
 										  )}`
 								"
 								class="text-[12px] rounded"
@@ -411,7 +340,7 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import Activities from "@/components/desk/ticket/Activities.vue"
 import Autocomplete from "@/components/global/Autocomplete.vue"
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue"
-import { inject, ref } from "vue"
+import { inject, ref, computed } from "vue"
 
 export default {
 	name: "InfoPanel",
@@ -426,40 +355,51 @@ export default {
 		Autocomplete,
 		NewContactDialog,
 	},
-	setup() {
+	setup(props) {
 		const viewportWidth = inject("viewportWidth")
+
 		const editingContact = ref(false)
 		const updatingContact = ref(false)
 
 		const showNewContactDialog = ref(false)
-		const showTicketHistory = ref(false)
-
-		const contacts = inject("contacts")
-		const ticketController = inject("ticketController")
 
 		const showOtherTicketsOfContacts = ref(false)
+		const showTicketHistory = ref(false)
+
+		const $socket = inject("$socket")
+		const $tickets = inject("$tickets")
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
+		})
+
+		const $contacts = inject("$contacts")
+		const contact = computed(() => {
+			if (!(ticket.value && ticket.value.contact)) return null
+			return $contacts.get(
+				{ contactId: ticket.value.contact },
+				{ $socket }
+			).value
+		})
 
 		return {
+			ticket,
+			contact,
+
 			viewportWidth,
 			editingContact,
 			updatingContact,
 			showNewContactDialog,
 			showTicketHistory,
-			contacts,
-			ticketController,
 			showOtherTicketsOfContacts,
 		}
 	},
 	computed: {
-		ticket() {
-			return this.$resources.ticket.data || null
-		},
 		contactFullName() {
-			if (this.ticket.contact) {
+			if (this.contact) {
 				return (
-					(this.ticket.contact.first_name || "") +
+					(this.contact.first_name || "") +
 					" " +
-					(this.ticket.contact.last_name || "")
+					(this.contact.last_name || "")
 				).slice(0, 40)
 			}
 		},
@@ -471,10 +411,6 @@ export default {
 			const multiplier = 30
 			const maxCount = 5
 
-			const customFiledWidth = 34
-			const customFieldPadding =
-				this.ticket.custom_fields.length == 1 ? 30 : 60
-
 			return (
 				offset +
 				multiplier *
@@ -482,11 +418,7 @@ export default {
 						? this.otherTicketsOfContact.length <= maxCount
 							? this.otherTicketsOfContact.length
 							: maxCount
-						: 0) +
-				(this.ticket.custom_fields.length > 0
-					? customFieldPadding * 2 +
-					  customFiledWidth * this.ticket.custom_fields.length
-					: 0)
+						: 0)
 			)
 		},
 	},
@@ -494,7 +426,7 @@ export default {
 		contactCreated(contact) {
 			this.showNewContactDialog = false
 			this.editingContact = false
-			this.ticketController.set(this.ticketId, "contact", contact.name)
+			this.$tickets.set(this.ticketId, "contact", contact.name)
 		},
 	},
 	resources: {
@@ -502,16 +434,6 @@ export default {
 			return {
 				cache: ["Other Tickets", "Action Panel", this.ticketId],
 				method: "frappedesk.api.ticket.get_other_tickets_of_contact",
-				params: {
-					ticket_id: this.ticketId,
-				},
-				auto: true,
-			}
-		},
-		ticket() {
-			return {
-				cache: ["Ticket", "Action Panel", this.ticketId],
-				method: "frappedesk.api.ticket.get_ticket",
 				params: {
 					ticket_id: this.ticketId,
 				},

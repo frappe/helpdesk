@@ -31,7 +31,7 @@ months = [
 class TestTicketAnalytics(unittest.TestCase):
 	@classmethod
 	def setUpClass(self):
-		frappe.db.sql("delete from `tabTicket` where company='_Test Company'")
+		# frappe.db.sql("delete from `tabTicket` where company='_Test Company'")
 		frappe.db.set_value("Frappe Desk Settings", None, "track_service_level_agreement", 1)
 
 		current_month_date = getdate()
@@ -54,7 +54,7 @@ class TestTicketAnalytics(unittest.TestCase):
 
 	def compare_result_for_customer(self):
 		filters = {
-			"company": "_Test Company",
+			# "company": "_Test Company",
 			"based_on": "Customer",
 			"from_date": add_months(getdate(), -1),
 			"to_date": getdate(),
@@ -89,7 +89,7 @@ class TestTicketAnalytics(unittest.TestCase):
 
 	def compare_result_for_ticket_type(self):
 		filters = {
-			"company": "_Test Company",
+			# "company": "_Test Company",
 			"based_on": "Ticket Type",
 			"from_date": add_months(getdate(), -1),
 			"to_date": getdate(),
@@ -119,7 +119,7 @@ class TestTicketAnalytics(unittest.TestCase):
 
 	def compare_result_for_ticket_priority(self):
 		filters = {
-			"company": "_Test Company",
+			# "company": "_Test Company",
 			"based_on": "Ticket Priority",
 			"from_date": add_months(getdate(), -1),
 			"to_date": getdate(),
@@ -139,7 +139,7 @@ class TestTicketAnalytics(unittest.TestCase):
 
 	def compare_result_for_assignment(self):
 		filters = {
-			"company": "_Test Company",
+			# "company": "_Test Company",
 			"based_on": "Assigned To",
 			"from_date": add_months(getdate(), -1),
 			"to_date": getdate(),
