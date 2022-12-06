@@ -45,7 +45,11 @@
 						<router-link
 							:to="{ path: `/frappedesk/contacts/${row.name}` }"
 						>
-							{{ `${row.first_name} ${row.last_name}` }}
+							{{
+								`${row.first_name ? row.first_name : ""} ${
+									row.last_name ? row.last_name : ""
+								}`
+							}}
 						</router-link>
 					</template>
 				</ListViewer>
