@@ -380,7 +380,7 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
-import { inject, ref } from "vue"
+import { inject, ref, computed } from "vue"
 
 export default {
 	name: "Ticket",
@@ -425,6 +425,11 @@ export default {
 
 		const showArticleResponseDialog = ref(false)
 		const tempContent = ref("")
+		const $socket = inject("$socket")
+		const $tickets = inject("$tickets")
+		const ticket = computed(() => {
+			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
+		})
 
 		return {
 			ticket,
