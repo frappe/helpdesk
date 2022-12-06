@@ -1,0 +1,100 @@
+{
+	"actions": [],
+	"allow_rename": 1,
+	"creation": "2022-12-05 16:06:33.034555",
+	"default_view": "List",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"call_sid",
+		"twilio_number",
+		"to",
+		"from_",
+		"contact",
+		"agent",
+		"status",
+		"duration",
+		"recording_url"
+	],
+	"fields": [
+		{
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"label": "Status",
+			"options": "queued\ninitiated\nringing\nin-progress\ncompleted\nbusy\nno-answer\ncanceled\nfailed"
+		},
+		{
+			"fieldname": "duration",
+			"fieldtype": "Duration",
+			"in_list_view": 1,
+			"label": "Duration"
+		},
+		{
+			"fieldname": "recording_url",
+			"fieldtype": "Data",
+			"label": "Recording URL"
+		},
+		{
+			"fieldname": "call_sid",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Call SID"
+		},
+		{
+			"fieldname": "twilio_number",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Twilio Number"
+		},
+		{
+			"fieldname": "to",
+			"fieldtype": "Data",
+			"label": "To"
+		},
+		{
+			"fieldname": "from_",
+			"fieldtype": "Data",
+			"label": "From"
+		},
+		{
+			"fieldname": "contact",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"label": "Contact",
+			"options": "Contact"
+		},
+		{
+			"fieldname": "agent",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"label": "Agent",
+			"options": "Agent"
+		}
+	],
+	"index_web_pages_for_search": 1,
+	"links": [],
+	"modified": "2022-12-06 10:57:31.119341",
+	"modified_by": "Administrator",
+	"module": "FrappeDesk",
+	"name": "FD Twilio Call Log",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}

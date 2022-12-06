@@ -1,0 +1,55 @@
+{
+	"actions": [],
+	"creation": "2020-01-28 15:21:44.457163",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": ["account_sid", "enabled", "column_break_3", "auth_token"],
+	"fields": [
+		{
+			"fieldname": "account_sid",
+			"fieldtype": "Data",
+			"label": "Account SID",
+			"mandatory_depends_on": "eval: doc.enabled"
+		},
+		{
+			"fieldname": "auth_token",
+			"fieldtype": "Password",
+			"label": "Auth Token",
+			"mandatory_depends_on": "eval: doc.enabled"
+		},
+		{
+			"fieldname": "column_break_3",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "enabled",
+			"fieldtype": "Check",
+			"label": "Enabled"
+		}
+	],
+	"index_web_pages_for_search": 1,
+	"issingle": 1,
+	"links": [],
+	"modified": "2022-12-06 08:11:24.995857",
+	"modified_by": "Administrator",
+	"module": "FrappeDesk",
+	"name": "Twilio Settings",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}
