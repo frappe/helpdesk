@@ -128,7 +128,7 @@ const routes = [
 			{
 				path: "customers",
 				name: "Customers",
-				component: () => import("@/pages/desk/Customers.vue")
+				component: () => import("@/pages/desk/Customers.vue"),
 			},
 			{
 				path: "customers/:customerId",
