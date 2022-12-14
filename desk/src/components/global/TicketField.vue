@@ -8,13 +8,14 @@
 			<Input
 				v-if="fieldMetaInfo?.fieldtype === 'Data'"
 				type="text"
-				@input="
+				@change="
 					(val) => {
 						onInput(val)
 					}
 				"
 				:value="fieldValue"
 				:debounce="300"
+				:disabled="!editable"
 			/>
 			<!-- Link / Select field -->
 			<Autocomplete

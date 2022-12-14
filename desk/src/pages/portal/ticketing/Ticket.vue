@@ -306,7 +306,7 @@
 						<TicketField
 							:ticketId="ticket.name"
 							:fieldname="customField.fieldname"
-							:editable="customField.is_editable_by_agent"
+							:editable="customField.is_editable_by_customer"
 						/>
 					</div>
 				</div>
