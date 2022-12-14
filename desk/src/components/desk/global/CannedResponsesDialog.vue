@@ -60,7 +60,7 @@
 							<template v-slot:content>
 								<div
 									v-html="item.message"
-									class="font-normal text-lg text-slate-500 ml-5 mt-4"
+									class="ProseMirror prose font-normal text-lg text-slate-500 ml-5 mt-4"
 								></div>
 							</template>
 						</Accordion>
