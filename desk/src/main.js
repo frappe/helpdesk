@@ -14,7 +14,6 @@ import { dayjs } from "@/utils"
 import { createToast, clearToasts } from "@/utils/toasts"
 import { event } from "@/utils/event"
 import { socketio_port } from "../../../../sites/common_site_config.json"
-import { contacts } from "@/controllers/contacts"
 
 let app = createApp(App)
 
@@ -37,10 +36,5 @@ app.config.globalProperties.$dayjs = dayjs
 app.config.globalProperties.$toast = createToast
 app.config.globalProperties.$clearToasts = clearToasts
 app.config.globalProperties.$event = event
-
-app.config.globalProperties.$contacts = contacts
-app.provide("$contacts", app.config.globalProperties.$contacts)
-
-app.provide("$socket", app.config.globalProperties.$socket)
 
 app.mount("#app")

@@ -1,119 +1,9 @@
 <template>
 	<div class="pt-[20px] h-full flex flex-col" v-if="ticket">
-		<div
-			class="shrink-0 text-base px-[16px] pb-[17px]"
-			:class="editingContact ? '' : 'border-b'"
-		>
-			<LoadingText v-if="updatingContact" />
-			<div v-else>
-				<div v-if="!editingContact">
-					<div v-if="contact" class="space-y-[12px]">
-						<div class="flex flex-row items-center space-x-[12px]">
-							<div class="w-7">
-								<CustomAvatar
-									:label="contactFullName"
-									:imageURL="contact?.image"
-									size="md"
-								/>
-							</div>
-							<a
-								:title="contactFullName"
-								class="grow truncate font-normal text-base"
-								>{{ contactFullName }}</a
-							>
-							<div class="flex">
-								<FeatherIcon
-									name="edit-2"
-									class="stroke-slate-400 w-4 h-4 cursor-pointer"
-									@click="
-										() => {
-											editingContact = !editingContact
-										}
-									"
-								/>
-							</div>
-						</div>
-						<div
-							v-if="contact.phone_nos.length > 0"
-							class="flex space-x-[12px] items-center"
-						>
-							<FeatherIcon
-								name="phone"
-								class="stroke-gray-500"
-								style="width: 15px"
-							/>
-							<div
-								class="space-y-1"
-								v-for="phone_no in contact.phone_nos"
-								:key="phone_no"
-							>
-								<a
-									:title="phone_no.phone"
-									class="text-gray-700 text-base"
-									>{{ phone_no.phone }}</a
-								>
-							</div>
-						</div>
-						<div
-							v-if="contact.email_ids.length > 0"
-							class="flex space-x-[12px]"
-						>
-							<FeatherIcon
-								name="mail"
-								class="stroke-gray-500 mt-[2.5px]"
-								style="width: 15px; height: 15px"
-							/>
-							<div
-								class="space-y-1 max-w-[173px] break-words"
-								v-for="email in contact.email_ids"
-								:key="email"
-							>
-								<div
-									:title="email.email_id"
-									class="text-gray-700 text-base"
-								>
-									<a :title="email.email_id">{{
-										email.email_id
-									}}</a>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div v-else>
-						<div
-							v-if="!updatingContact"
-							class="flex flex-row-reverse"
-						>
-							<FeatherIcon
-								name="edit-2"
-								class="stroke-slate-400 w-4 h-4 cursor-pointer"
-								@click="
-									() => {
-										editingContact = !editingContact
-									}
-								"
-							/>
-						</div>
-					</div>
-				</div>
-				<div v-else class="flex items-center space-x-2 mb-2 w-full">
-					<div class="grow w-full">
-						<!-- TODO: use the new functionalities of autocomplete -->
-						<Autocomplete />
-					</div>
-					<FeatherIcon
-						name="x"
-						class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-red-500"
-						@click="
-							() => {
-								editingContact = !editingContact
-							}
-						"
-					/>
-				</div>
-			</div>
+		<div class="shrink-0 text-base px-[16px] pb-[17px] border-b">
+			<ContactInfo :contactId="ticket.contact" />
 		</div>
-		<div class="grow" v-if="!editingContact">
+		<div class="grow">
 			<div class="h-full flex flex-col">
 				<div
 					class="p-[16px] border-t border-b"
@@ -322,25 +212,16 @@
 				</div>
 			</div>
 		</div>
-		<NewContactDialog
-			v-model="showNewContactDialog"
-			@contact-created="
-				(contact) => {
-					contactCreated(contact)
-				}
-			"
-		/>
 	</div>
 </template>
 
 <script>
-import { FeatherIcon, Input, LoadingText } from "frappe-ui"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import { FeatherIcon, Input } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import Activities from "@/components/desk/ticket/Activities.vue"
 import Autocomplete from "@/components/global/Autocomplete.vue"
-import NewContactDialog from "@/components/desk/global/NewContactDialog.vue"
-import { inject, ref, computed } from "vue"
+import ContactInfo from "@/components/desk/ticket/ContactInfo.vue"
+import { inject, ref } from "vue"
 
 export default {
 	name: "InfoPanel",
@@ -348,54 +229,24 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
-		LoadingText,
-		CustomAvatar,
 		CustomIcons,
 		Activities,
 		Autocomplete,
-		NewContactDialog,
+		ContactInfo,
 	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
 
-		const editingContact = ref(false)
-		const updatingContact = ref(false)
-
-		const showNewContactDialog = ref(false)
-
 		const showOtherTicketsOfContacts = ref(false)
 		const showTicketHistory = ref(false)
 
-		const $contacts = inject("$contacts")
-		const contact = computed(() => {
-			if (!(ticket.value && ticket.value.contact)) return null
-			return $contacts.get(
-				{ contactId: ticket.value.contact },
-				{ $socket }
-			).value
-		})
-
 		return {
-			contact,
-
 			viewportWidth,
-			editingContact,
-			updatingContact,
-			showNewContactDialog,
 			showTicketHistory,
 			showOtherTicketsOfContacts,
 		}
 	},
 	computed: {
-		contactFullName() {
-			if (this.contact) {
-				return (
-					(this.contact.first_name || "") +
-					" " +
-					(this.contact.last_name || "")
-				).slice(0, 40)
-			}
-		},
 		otherTicketsOfContact() {
 			return this.$resources.otherTicketsOfContact.data || null
 		},
@@ -416,13 +267,6 @@ export default {
 		},
 		ticket() {
 			return this.$resources.ticket.doc || null
-		},
-	},
-	methods: {
-		contactCreated(contact) {
-			this.showNewContactDialog = false
-			this.editingContact = false
-			this.$resources.ticket.setValue("contact", contact.name)
 		},
 	},
 	resources: {
