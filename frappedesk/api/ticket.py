@@ -217,9 +217,14 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 
 	if "contact" in values:
 		contact_doc = frappe.get_doc("Contact", values["contact"])
-		if contact_doc.email_ids and len(contact_doc.email_ids) > 0:
-			ticket_doc.raised_by = contact_doc.email_ids[0].email_id
-			ticket_doc.contact = contact_doc.name
+		email_id = ""
+		if contact_doc.email_id:
+			email_id = contact_doc.email_id
+		elif contact_doc.email_ids and len(contact_doc.email_ids) > 0:
+			email_id = contact_doc.email_ids[0].email_id
+
+		ticket_doc.raised_by = email_id
+		ticket_doc.contact = contact_doc.name
 
 	if via_customer_portal:
 		if not frappe.db.exists({"doctype": "Contact", "email_id": frappe.session.user}):
@@ -247,6 +252,8 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 		if field.auto_set and field.auto_set_via == "Backend (Python)":
 			continue
 		else:
+			if field.fieldname not in values:
+				continue
 			ticket_doc.append(
 				"custom_fields",
 				{
