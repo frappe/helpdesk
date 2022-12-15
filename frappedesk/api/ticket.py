@@ -222,7 +222,7 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 			email_id = contact_doc.email_id
 		elif contact_doc.email_ids and len(contact_doc.email_ids) > 0:
 			email_id = contact_doc.email_ids[0].email_id
-		
+
 		ticket_doc.raised_by = email_id
 		ticket_doc.contact = contact_doc.name
 
