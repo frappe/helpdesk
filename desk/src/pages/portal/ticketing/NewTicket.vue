@@ -239,7 +239,7 @@
 	</div>
 </template>
 <script>
-import { inject, ref, computed } from "vue"
+import { inject, ref } from "vue"
 import {
 	Input,
 	TextEditor,
@@ -307,15 +307,6 @@ export default {
 
 		const attachments = ref([])
 
-		const $socket = inject("$socket")
-		const $fdSettings = inject("$fdSettings")
-		const suggestArticles = computed(() => {
-			return $fdSettings.get(
-				{ fieldname: "suggest_articles_in_new_ticket_page" },
-				{ $socket }
-			).value
-		})
-
 		return {
 			user,
 			ticketTemplates,
@@ -326,11 +317,15 @@ export default {
 			validationErrors,
 			editorOptions,
 			attachments,
-
-			suggestArticles,
 		}
 	},
 	computed: {
+		fdSettings() {
+			return this.$resources.fdSettings.doc || null
+		},
+		suggestArticles() {
+			return this.fdSettings?.suggest_articles_in_new_ticket_page || null
+		},
 		template() {
 			const templateRoutes = this.ticketTemplates.map(
 				(x) => x.template_route
@@ -350,6 +345,15 @@ export default {
 					this.setLinkedFieldOptions(template)
 					return template
 				}
+			}
+		},
+	},
+	resources: {
+		fdSettings() {
+			return {
+				type: "document",
+				doctype: "Frappe Desk Settings",
+				name: "Frappe Desk Settings",
 			}
 		},
 	},

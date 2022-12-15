@@ -15,7 +15,6 @@ import { createToast, clearToasts } from "@/utils/toasts"
 import { event } from "@/utils/event"
 import { socketio_port } from "../../../../sites/common_site_config.json"
 import { contacts } from "@/controllers/contacts"
-import { fdSettings } from "@/controllers/fdSettings"
 
 let app = createApp(App)
 
@@ -41,9 +40,6 @@ app.config.globalProperties.$event = event
 
 app.config.globalProperties.$contacts = contacts
 app.provide("$contacts", app.config.globalProperties.$contacts)
-
-app.config.globalProperties.$fdSettings = fdSettings
-app.provide("$fdSettings", app.config.globalProperties.$fdSettings)
 
 app.provide("$socket", app.config.globalProperties.$socket)
 
