@@ -355,7 +355,7 @@ export default {
 		Autocomplete,
 		NewContactDialog,
 	},
-	setup(props) {
+	setup() {
 		const viewportWidth = inject("viewportWidth")
 
 		const editingContact = ref(false)
@@ -365,12 +365,6 @@ export default {
 
 		const showOtherTicketsOfContacts = ref(false)
 		const showTicketHistory = ref(false)
-
-		const $socket = inject("$socket")
-		const $tickets = inject("$tickets")
-		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
-		})
 
 		const $contacts = inject("$contacts")
 		const contact = computed(() => {
@@ -382,7 +376,6 @@ export default {
 		})
 
 		return {
-			ticket,
 			contact,
 
 			viewportWidth,
@@ -421,12 +414,15 @@ export default {
 						: 0)
 			)
 		},
+		ticket() {
+			return this.$resources.ticket.doc || null
+		},
 	},
 	methods: {
 		contactCreated(contact) {
 			this.showNewContactDialog = false
 			this.editingContact = false
-			this.$tickets.set(this.ticketId, "contact", contact.name)
+			this.$resources.ticket.setValue("contact", contact.name)
 		},
 	},
 	resources: {
@@ -438,6 +434,13 @@ export default {
 					ticket_id: this.ticketId,
 				},
 				auto: true,
+			}
+		},
+		ticket() {
+			return {
+				type: "document",
+				doctype: "Ticket",
+				name: this.ticketId,
 			}
 		},
 	},

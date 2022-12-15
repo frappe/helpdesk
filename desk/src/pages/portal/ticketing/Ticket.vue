@@ -22,7 +22,11 @@
 				<div>
 					<Button
 						v-if="['Open', 'Replied'].includes(ticket.status)"
-						@click="$tickets.set(ticketId, 'status', 'Closed')"
+						@click="
+							() => {
+								$resources.ticket.setValue('status', 'Closed')
+							}
+						"
 						class="bg-gray-100 text-red-500"
 					>
 						Close
@@ -57,7 +61,12 @@
 							<div
 								class="text-[#096CC3] text-[12px] font-medium cursor-pointer hover:text-blue-500"
 								@click="
-									$tickets.set(ticketId, 'status', 'Open')
+									() => {
+										$resources.ticket.setValue(
+											'status',
+											'Closed'
+										)
+									}
 								"
 							>
 								Reopen ticket
@@ -345,19 +354,13 @@ export default {
 			content: "",
 		}
 	},
-	setup(props) {
+	setup() {
 		const user = inject("user")
 		const editor = ref(null)
 		const viewportWidth = inject("viewportWidth")
 		const attachments = ref([])
 		const tempTextEditorData = ref({})
 		const showTextFormattingMenu = ref(true)
-
-		const $socket = inject("$socket")
-		const $tickets = inject("$tickets")
-		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
-		})
 
 		return {
 			user,
@@ -366,10 +369,12 @@ export default {
 			attachments,
 			tempTextEditorData,
 			showTextFormattingMenu,
-			ticket,
 		}
 	},
 	computed: {
+		ticket() {
+			return this.$resources.ticket.doc || null
+		},
 		textEditorMenuButtons() {
 			return [
 				"Paragraph",
@@ -433,6 +438,13 @@ export default {
 		},
 	},
 	resources: {
+		ticket() {
+			return {
+				type: "document",
+				doctype: "Ticket",
+				name: this.ticketId,
+			}
+		},
 		customFields() {
 			return {
 				method: "frappedesk.api.ticket.get_custom_fields",

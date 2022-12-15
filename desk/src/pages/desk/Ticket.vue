@@ -409,7 +409,7 @@ export default {
 			content: "",
 		}
 	},
-	setup(props) {
+	setup() {
 		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject("viewportWidth")
 		const user = inject("user")
@@ -425,14 +425,8 @@ export default {
 
 		const showArticleResponseDialog = ref(false)
 		const tempContent = ref("")
-		const $socket = inject("$socket")
-		const $tickets = inject("$tickets")
-		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
-		})
 
 		return {
-			ticket,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -447,6 +441,13 @@ export default {
 		}
 	},
 	resources: {
+		ticket() {
+			return {
+				type: "document",
+				doctype: "Ticket",
+				name: this.ticketId,
+			}
+		},
 		submitConversation() {
 			return {
 				method: "frappedesk.api.ticket.submit_conversation_via_agent",
@@ -508,6 +509,9 @@ export default {
 		})
 	},
 	computed: {
+		ticket() {
+			return this.$resources.ticket.doc || null
+		},
 		textEditorMenuButtons() {
 			return [
 				"Paragraph",
