@@ -24,7 +24,9 @@
 						v-if="['Open', 'Replied'].includes(ticket.status)"
 						@click="
 							() => {
-								$resources.ticket.setValue('status', 'Closed')
+								$resources.ticket.setValue.submit({
+									status: 'Closed',
+								})
 							}
 						"
 						class="bg-gray-100 text-red-500"
@@ -62,10 +64,9 @@
 								class="text-[#096CC3] text-[12px] font-medium cursor-pointer hover:text-blue-500"
 								@click="
 									() => {
-										$resources.ticket.setValue(
-											'status',
-											'Closed'
-										)
+										$resources.ticket.setValue.submit({
+											status: 'Closed',
+										})
 									}
 								"
 							>

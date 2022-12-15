@@ -102,11 +102,19 @@ export default {
 				doctype: "Ticket",
 				name: this.ticketId,
 				setValue: {
-					onSuccess: () => {
+					onSuccess() {
 						this.$toast({
 							title: "Ticket updated successfully.",
 							appearance: "success",
 							customIcon: "circle-check",
+						})
+					},
+					onError(err) {
+						this.$toast({
+							title: "Error while updating ticket",
+							text: err,
+							customIcon: "circle-fail",
+							appearance: "danger",
 						})
 					},
 				},
@@ -146,6 +154,14 @@ export default {
 						customIcon: "circle-check",
 					})
 				},
+				onError: (res) => {
+					this.$toast({
+						title: "Error while assigning agent",
+						text: res,
+						customIcon: "circle-fail",
+						appearance: "danger",
+					})
+				},
 			}
 		},
 	},
@@ -155,13 +171,14 @@ export default {
 				if (this.fieldname == "_assign") {
 					this.$resources.setTicketAssignee.submit({
 						ticket_id: this.ticketId,
-						agent: value,
+						agent_id: value,
 					})
 				} else {
-					this.$resources.ticket.setValue(this.fieldname, value)
+					let val = {}
+					val[this.fieldname] = value
+					this.$resources.ticket.setValue.submit(val)
 				}
 			} else {
-				console.log("validation failed")
 				this.$toast({
 					title: "Please fill all mandatory fields.",
 					customIcon: "circle-fail",
