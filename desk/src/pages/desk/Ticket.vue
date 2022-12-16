@@ -380,7 +380,7 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
-import { inject, ref, computed } from "vue"
+import { inject, ref } from "vue"
 
 export default {
 	name: "Ticket",
