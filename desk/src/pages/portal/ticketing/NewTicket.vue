@@ -64,14 +64,14 @@
 								</div>
 								<TextEditor
 									:content="content"
-									editor-class="px-[12px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll"
+									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
 									@change="
 										(val) => {
 											validateField(field, val)
 										}
 									"
 									placeholder="Type your text here..."
-									class="border border-gray-300 rounded-[8px] pt-[5px]"
+									class="border border-gray-300 rounded-[8px]"
 								>
 									<template #bottom>
 										<TextEditorFixedMenu
