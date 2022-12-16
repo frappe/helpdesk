@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col">
+	<div class="flex flex-col ml-[200px]">
 		<div class="flex border-b h-[52px] px-[24px] shrink-0">
 			<div class="grow my-auto text-[16px] font-semibold text-gray-900">
 				Dashboard
@@ -22,6 +22,11 @@
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
+				<TicketSummaryChart
+					class="w-50"
+					:fromDate="fromDate"
+					:toDate="toDate"
+				/>
 				<TicketTypeChart
 					class="w-50"
 					:fromDate="fromDate"
@@ -38,6 +43,7 @@ import TicketTrendsChart from "@/components/desk/dashboard/TicketTrendsChart.vue
 import Datepicker from "@vuepic/vue-datepicker"
 import "@vuepic/vue-datepicker/dist/main.css"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
+import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
 export default {
 	name: "Dashboard",
 	components: {
@@ -45,6 +51,7 @@ export default {
 		TicketTrendsChart,
 		Datepicker,
 		TicketTypeChart,
+		TicketSummaryChart,
 	},
 	data() {
 		let date = {}
