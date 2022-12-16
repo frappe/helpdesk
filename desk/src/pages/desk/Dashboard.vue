@@ -32,6 +32,11 @@
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
+				<CustomerSatisfactionChart
+					class="w-50"
+					:fromDate="fromDate"
+					:toDate="toDate"
+				/>
 			</div>
 		</div>
 	</div>
@@ -44,6 +49,7 @@ import Datepicker from "@vuepic/vue-datepicker"
 import "@vuepic/vue-datepicker/dist/main.css"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
 import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
+import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
 export default {
 	name: "Dashboard",
 	components: {
@@ -52,6 +58,7 @@ export default {
 		Datepicker,
 		TicketTypeChart,
 		TicketSummaryChart,
+		CustomerSatisfactionChart,
 	},
 	data() {
 		let date = {}
