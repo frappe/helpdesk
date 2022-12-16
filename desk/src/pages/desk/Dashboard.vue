@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col ml-[200px]">
+	<div class="flex flex-col">
 		<div class="flex border-b h-[52px] px-[24px] shrink-0">
 			<div class="grow my-auto text-[16px] font-semibold text-gray-900">
 				Dashboard
@@ -38,6 +38,7 @@
 					:toDate="toDate"
 				/>
 			</div>
+			<SlaSummaryCards />
 		</div>
 	</div>
 </template>
@@ -50,6 +51,7 @@ import "@vuepic/vue-datepicker/dist/main.css"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
 import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
+import SlaSummaryCards from "@/components/desk/dashboard/SlaSummaryCards.vue"
 export default {
 	name: "Dashboard",
 	components: {
@@ -59,6 +61,7 @@ export default {
 		TicketTypeChart,
 		TicketSummaryChart,
 		CustomerSatisfactionChart,
+		SlaSummaryCards,
 	},
 	data() {
 		let date = {}
