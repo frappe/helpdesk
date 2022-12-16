@@ -26,7 +26,7 @@
 				</div>
 				<!-- <div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div> -->
 				<div
-					class="text-[13px] text-gray-700"
+					class="text-[13px] text-gray-700 pb-2"
 					v-html="template.about"
 				></div>
 				<div class="space-y-4 pb-4">
