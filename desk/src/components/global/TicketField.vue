@@ -72,18 +72,10 @@ export default {
 	components: {
 		Autocomplete,
 	},
-	setup(props) {
-		const $socket = inject("$socket")
-		const $tickets = inject("$tickets")
-		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
-		})
-
-		return {
-			ticket,
-		}
-	},
 	computed: {
+		ticket() {
+			return this.$resources.ticket.doc || null
+		},
 		fieldMetaInfo() {
 			return this.$resources.fieldMetaInfo.data || null
 		},
@@ -104,6 +96,30 @@ export default {
 		}
 	},
 	resources: {
+		ticket() {
+			return {
+				type: "document",
+				doctype: "Ticket",
+				name: this.ticketId,
+				setValue: {
+					onSuccess() {
+						this.$toast({
+							title: "Ticket updated successfully.",
+							appearance: "success",
+							customIcon: "circle-check",
+						})
+					},
+					onError(err) {
+						this.$toast({
+							title: "Error while updating ticket",
+							text: err,
+							customIcon: "circle-fail",
+							appearance: "danger",
+						})
+					},
+				},
+			}
+		},
 		fieldMetaInfo() {
 			// field can be a custom or a standard field
 			// field type : Data, Link, Select
@@ -128,21 +144,41 @@ export default {
 				auto: true,
 			}
 		},
+		setTicketAssignee() {
+			return {
+				method: "frappedesk.api.ticket.assign_ticket_to_agent",
+				onSuccess: () => {
+					this.$toast({
+						title: "Agent assigned successfully.",
+						appearance: "success",
+						customIcon: "circle-check",
+					})
+				},
+				onError: (res) => {
+					this.$toast({
+						title: "Error while assigning agent",
+						text: res,
+						customIcon: "circle-fail",
+						appearance: "danger",
+					})
+				},
+			}
+		},
 	},
 	methods: {
 		onInput(value) {
 			if (this.validate()) {
-				this.$tickets
-					.set(this.ticketId, this.fieldname, value)
-					.then(() => {
-						this.$toast({
-							title: "Ticket updated successfully.",
-							appearance: "success",
-							customIcon: "circle-check",
-						})
+				if (this.fieldname == "_assign") {
+					this.$resources.setTicketAssignee.submit({
+						ticket_id: this.ticketId,
+						agent_id: value,
 					})
+				} else {
+					let val = {}
+					val[this.fieldname] = value
+					this.$resources.ticket.setValue.submit(val)
+				}
 			} else {
-				console.log("validation failed")
 				this.$toast({
 					title: "Please fill all mandatory fields.",
 					customIcon: "circle-fail",
