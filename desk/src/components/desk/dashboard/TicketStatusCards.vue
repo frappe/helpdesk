@@ -37,8 +37,8 @@ export default {
 	computed: {
 		dueToday() {
 			let value = null
-			let ticket_status_value = this.$resources.getTicketStatusCount.data
-			ticket_status_value?.map((res) => {
+			let ticketStatusValue = this.$resources.getTicketStatusCount.data
+			ticketStatusValue?.map((res) => {
 				if (res.map == "Open" && res.resolution_by == new Date()) {
 					value = res.count
 				} else {
@@ -49,8 +49,8 @@ export default {
 		},
 		resolved() {
 			let value = null
-			let ticket_status_value = this.$resources.getTicketStatusCount.data
-			ticket_status_value?.map((res) => {
+			let ticketStatusValue = this.$resources.getTicketStatusCount.data
+			ticketStatusValue?.map((res) => {
 				if (res.status == "Resolved") {
 					value = res.count
 				}
@@ -59,8 +59,8 @@ export default {
 		},
 		replied() {
 			let value = null
-			let ticket_status_value = this.$resources.getTicketStatusCount.data
-			ticket_status_value?.map((res) => {
+			let ticketStatusValue = this.$resources.getTicketStatusCount.data
+			ticketStatusValue?.map((res) => {
 				if (res.status == "Replied") {
 					value = res.count
 				}
@@ -69,8 +69,8 @@ export default {
 		},
 		open() {
 			let value = null
-			let ticket_status_value = this.$resources.getTicketStatusCount.data
-			ticket_status_value?.map((res) => {
+			let ticketStatusValue = this.$resources.getTicketStatusCount.data
+			ticketStatusValue?.map((res) => {
 				if (res.status == "Open") {
 					value = res.count
 				}
@@ -79,8 +79,8 @@ export default {
 		},
 		closed() {
 			let value = null
-			let ticket_status_value = this.$resources.getTicketStatusCount.data
-			ticket_status_value?.map((res) => {
+			let ticketStatusValue = this.$resources.getTicketStatusCount.data
+			ticketStatusValue?.map((res) => {
 				if (res.status == "Closed") {
 					value = res.count
 				}
