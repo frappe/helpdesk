@@ -244,6 +244,13 @@ export default {
 	mounted() {
 		this.menuOptions = [
 			{
+				label: "Dashboard",
+				icon: "dashboard",
+				to: {
+					path: "/frappedesk/dashboard",
+				},
+			},
+			{
 				label: "Tickets",
 				icon: "ticket",
 				to: {
