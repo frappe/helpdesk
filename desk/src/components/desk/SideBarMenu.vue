@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex flex-col border-r pt-[23px] fixed"
+		class="flex flex-col border-r pt-[23px]"
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
 		<div
