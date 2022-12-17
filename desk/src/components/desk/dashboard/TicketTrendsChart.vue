@@ -1,5 +1,5 @@
 <template>
-	<v-chart class="chart" :option="option" />
+	<v-chart class="chart" :option="option" :theme="theme" />
 </template>
 
 <script>
@@ -7,6 +7,7 @@ import ECharts from "vue-echarts"
 import echarts from "echarts"
 import "echarts/lib/chart/line"
 import "echarts/lib/component/polar"
+import theme from "./theme"
 export default {
 	components: {
 		"v-chart": ECharts,
@@ -68,6 +69,7 @@ export default {
 			ticketCount,
 			ticketMonth,
 			option,
+			theme,
 		}
 	},
 	methods: {
