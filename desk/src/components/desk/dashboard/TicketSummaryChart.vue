@@ -1,11 +1,12 @@
 <template>
-	<v-chart class="chart" :option="option" />
+	<v-chart class="chart" :option="option" :theme="theme" />
 </template>
 
 <script>
 import ECharts from "vue-echarts"
 import "echarts/lib/chart/line"
 import "echarts/lib/component/polar"
+import theme from "./theme"
 export default {
 	name: "TicketSummaryChart",
 	components: {
@@ -43,7 +44,11 @@ export default {
 				trigger: "axis",
 			},
 			legend: {
-				data: ["Open", "Closed", "Replied"],
+				data: [
+					{ name: "Open", icon: "circle" },
+					{ name: "Closed", icon: "circle" },
+					{ name: "Replied", icon: "circle" },
+				],
 			},
 			xAxis: {
 				type: "category",
@@ -80,6 +85,7 @@ export default {
 			closed,
 			replied,
 			option,
+			theme,
 		}
 	},
 	methods: {
