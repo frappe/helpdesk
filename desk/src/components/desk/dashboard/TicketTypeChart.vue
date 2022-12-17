@@ -1,10 +1,11 @@
 <template>
-	<v-chart class="chart" :option="option" />
+	<v-chart class="chart" :option="option" :theme="theme" />
 </template>
 
 <script>
 import ECharts from "vue-echarts"
 import "echarts/lib/chart/bar"
+import theme from "./theme"
 export default {
 	name: "TicketTypeChart",
 	components: {
@@ -54,6 +55,7 @@ export default {
 			option,
 			ticketType,
 			ticketCount,
+			theme,
 		}
 	},
 	methods: {
