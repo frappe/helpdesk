@@ -40,8 +40,15 @@ export default {
 				text: "Ticket Summary",
 				left: "5%",
 			},
+			// color: ["#2D95F0", "#61B2F9", "#5FD8C4", "#f8bad0", "#EEA4EF", "#f2b3c9"],
 			tooltip: {
 				trigger: "axis",
+				axisPointer: {
+					type: "cross",
+					label: {
+						backgroundColor: "#6a7985",
+					},
+				},
 			},
 			legend: {
 				data: [
@@ -49,6 +56,8 @@ export default {
 					{ name: "Closed", icon: "circle" },
 					{ name: "Replied", icon: "circle" },
 				],
+				right: 0,
+				top: "top",
 			},
 			xAxis: {
 				type: "category",
@@ -64,18 +73,42 @@ export default {
 					type: "line",
 					stack: "Total",
 					data: open,
+					lineStyle: {
+						width: 3,
+						color: "#61B2F9",
+					},
+					areaStyle: {
+						color: "#61B2F9",
+						opacity: 0.5,
+					},
 				},
 				{
 					name: "Closed",
 					type: "line",
 					stack: "Total",
 					data: closed,
+					lineStyle: {
+						width: 3,
+						color: "#5FD8C4",
+					},
+					areaStyle: {
+						color: "#5FD8C4",
+						opacity: 0.5,
+					},
 				},
 				{
 					name: "Replied",
 					type: "line",
 					stack: "Total",
 					data: replied,
+					lineStyle: {
+						width: 3,
+						color: "#EEA4EF",
+					},
+					areaStyle: {
+						color: "#EEA4EF",
+						opacity: 0.5,
+					},
 				},
 			],
 		}
@@ -122,6 +155,6 @@ export default {
 </script>
 <style scoped>
 .chart {
-	height: 50vh;
+	height: 30rem;
 }
 </style>
