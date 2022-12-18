@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col">
+	<div class="flex flex-col h-screen">
 		<div class="flex border-b h-[52px] px-[24px] shrink-0">
 			<div class="grow my-auto text-[16px] font-semibold text-gray-900">
 				Dashboard
@@ -18,22 +18,22 @@
 			</div>
 			<div class="grid grid-cols-2">
 				<TicketTrendsChart
-					class="w-50"
+					class="min-w-[35rem]"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<TicketSummaryChart
-					class="w-50"
+					class="min-w-[35rem]"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<TicketTypeChart
-					class="w-50"
+					class="min-w-[35rem]"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<CustomerSatisfactionChart
-					class="w-50"
+					class="min-w-[35rem]"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
