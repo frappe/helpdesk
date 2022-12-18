@@ -36,7 +36,7 @@ export default {
 			title: {
 				text: "Tickets by Type",
 				left: "5%",
-			},
+			}, // color: ["#2D95F0", "#61B2F9", "#5FD8C4", "#f8bad0", "#EEA4EF", "#f2b3c9"],
 			yAxis: {
 				type: "category",
 				data: ticketType,
@@ -47,7 +47,7 @@ export default {
 			series: [
 				{
 					data: ticketCount,
-					type: "bar",
+					type: "bar",					
 				},
 			],
 		}
@@ -88,6 +88,6 @@ export default {
 </script>
 <style scoped>
 .chart {
-	height: 50vh;
+	height: 30rem;
 }
 </style>
