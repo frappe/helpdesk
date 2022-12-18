@@ -57,10 +57,7 @@ export default {
 					stack: "total",
 					showSymbol: false,
 					lineStyle: {
-						width: 3,
-						shadowColor: "rgba(0,0,0,0.3)",
-						shadowBlur: 10,
-						shadowOffsetY: 8,
+						width: 3					
 					},
 				},
 			],
