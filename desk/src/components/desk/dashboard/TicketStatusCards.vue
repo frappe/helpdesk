@@ -1,26 +1,26 @@
 <template>
 	<div class="grid grid-cols-4 gap-4 mt-8 ml-8 mb-8 mr-6">
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
-			<div>Due Today</div>
-			<div>
+		<div class="box-border h-[86px] p-4 border-1 rounded-md">
+			<div class="text-base text-red-500">Due Today</div>
+			<div class="text-3xl font-bold">
 				{{ dueToday != null ? dueToday : 0 }}
 			</div>
 		</div>
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
-			<div>Unresolved</div>
-			<div>
+		<div class="box-border h-[86px] p-4 border-1 rounded-md">
+			<div class="text-base">Unresolved</div>
+			<div class="text-3xl font-medium">
 				{{ open != null ? open : 0 }}
 			</div>
 		</div>
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
-			<div>Open</div>
-			<div>
+		<div class="box-border h-[86px] p-4 border-1 rounded-md">
+			<div class="text-base">Open</div>
+			<div class="text-3xl font-medium">
 				{{ open != null ? open : 0 }}
 			</div>
 		</div>
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
-			<div>Replied</div>
-			<div>
+		<div class="box-border h-[86px] p-4 border-1 rounded-md">
+			<div class="text-base">Replied</div>
+			<div class="text-3xl font-medium">
 				{{ replied != null ? replied : 0 }}
 			</div>
 		</div>
