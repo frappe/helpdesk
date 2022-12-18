@@ -33,40 +33,52 @@ export default {
 	data() {
 		let ticketCount = []
 		let ticketMonth = []
-		let option = {
-			title: {
-				text: "Ticket Trends",
-				left: "5%",
-			},
-			tooltip: {
-				trigger: "axis",
-			},
-			xAxis: {
-				type: "category",
-				boundaryGap: false,
-				data: ticketMonth,
-			},
-			yAxis: {
-				type: "value",
-			},
-			series: [
-				{
-					name: "Ticket Count",
-					data: ticketCount,
-					type: "line",
-					stack: "total",
-					showSymbol: false,
-					lineStyle: {
-						width: 3					
+		return {
+			theme,
+			option: {
+				title: {
+					text: "Ticket Trends",
+					left: "5%",
+				},
+				// color: ["#2D95F0", "#61B2F9", "#5FD8C4", "#f8bad0", "#EEA4EF", "#f2b3c9"],
+				tooltip: {
+					trigger: "axis",
+					axisPointer: {
+						type: "cross",
+						label: {
+							backgroundColor: "#6a7985",
+						},
 					},
 				},
-			],
-		}
-		return {
+				xAxis: {
+					type: "category",
+					boundaryGap: false,
+					data: ticketMonth,
+				},
+				yAxis: {
+					type: "value",
+				},
+				series: [
+					{
+						name: "Ticket Count",
+						data: ticketCount,
+						type: "line",
+						stack: "total",
+						showSymbol: false,
+						lineStyle: {
+							width: 3,
+							color: "#61B2F9",
+						},
+						areaStyle: {
+							color: "#61B2F9",
+							opacity: 0.5,
+						},
+					},
+				],
+				color: theme.color,
+			},
 			ticketCount,
 			ticketMonth,
-			option,
-			theme,
 		}
 	},
 	methods: {
@@ -134,6 +146,6 @@ export default {
 </script>
 <style scoped>
 .chart {
-	height: 50vh;
+	height: 30rem;
 }
 </style>
