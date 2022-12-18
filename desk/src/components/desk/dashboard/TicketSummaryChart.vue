@@ -56,7 +56,7 @@ export default {
 					{ name: "Closed", icon: "circle" },
 					{ name: "Replied", icon: "circle" },
 				],
-				right: 0,
+				right: "10%",
 				top: "top",
 			},
 			xAxis: {
