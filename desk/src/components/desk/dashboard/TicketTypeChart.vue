@@ -49,8 +49,8 @@ export default {
 					data: ticketCount,
 					type: "bar",
 					itemStyle: {
-						barBorderRadius: 3,
-						barWidth: 20,
+						barBorderRadius: 5,
+						barWidth: 5,
 					},
 				},
 			],
