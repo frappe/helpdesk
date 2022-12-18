@@ -238,3 +238,17 @@ def get_categories(
 	return frappe.get_list(
 		"Category", filters=filters, fields=fields, limit=limit, order_by=order_by,
 	)
+
+
+@frappe.whitelist(allow_guest=True)
+def get_articles_in_ticket(title=None):
+	if title == None:
+		article_list = frappe.db.get_list("Article", fields=["name", "title", "content"])
+	else:
+		article_list = frappe.db.get_list(
+			"Article",
+			fields=["name", "title", "content"],
+			filters={"title": ["like", "%{}%".format(title)]},
+		)
+
+	return article_list

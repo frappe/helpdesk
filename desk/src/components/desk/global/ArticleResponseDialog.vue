@@ -9,7 +9,7 @@
 				<div
 					class="border-b border-grey-400 w-full pl-2 pb-4 absolute left-0 top-0 px-4 py-3 sm:px-6 flex justify-between items-center"
 				>
-					<div class="">Canned Responses</div>
+					<div class="">Articles</div>
 					<Button
 						icon="x"
 						class="bg-transparent w-2 h-2"
@@ -29,14 +29,14 @@
 						class="grow text-[12px] text-left text-black border-0 bg-[#EBEEF0] h-[31px] rounded-none pl-0"
 						type="text"
 						placeholder="Search for response"
-						@input="getCannedResponses"
+						@input="getArticles"
 					/>
 				</div>
 				<div
 					class="divide-y divide-slate-200 max-h-[256px] overflow-y-scroll"
 				>
 					<div
-						v-for="item in this.cannedResponses"
+						v-for="item in this.articleResponses"
 						class="relative py-3"
 					>
 						<CustomIcons
@@ -45,8 +45,8 @@
 							role="button"
 							@click="
 								() => {
-									addMessage(item)
-									emitMessage()
+									addContent(item)
+									emitContent()
 									close()
 								}
 							"
@@ -59,7 +59,7 @@
 							</template>
 							<template v-slot:content>
 								<div
-									v-html="item.message"
+									v-html="item.content"
 									class="ProseMirror prose font-normal text-lg text-slate-500 ml-5 mt-4"
 								></div>
 							</template>
@@ -77,7 +77,7 @@ import Accordion from "@/components/global/Accordion.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import { ref, computed, provide } from "vue"
 export default {
-	name: "CannedResponsesDialog",
+	name: "ArticleResponseDialog",
 	props: ["show"],
 	components: {
 		Dialog,
@@ -87,30 +87,30 @@ export default {
 	},
 	setup() {
 		const listManager = ref([])
-		const tempMessage = ref("")
-		provide("tempMessage", tempMessage)
+		const tempContent = ref("")
+		provide("tempContent", tempContent)
 		return {
 			listManager,
-			tempMessage,
+			tempContent,
 		}
 	},
 	data() {
 		return {
-			cannedResponses: [],
+			articleResponses: [],
 		}
 	},
 	methods: {
 		close() {
 			this.$emit("close")
-			this.$emit("messageVal", this.tempMessage)
+			this.$emit("contentVal", this.tempContent)
 		},
-		emitMessage() {
-			this.$emit("messageVal", this.tempMessage)
+		emitContent() {
+			this.$emit("ContentVal", this.tempContent)
 		},
-		addMessage(item) {
-			this.tempMessage = item.message
+		addContent(item) {
+			this.tempContent = item.content
 		},
-		getCannedResponses(event) {
+		getArticles(event) {
 			let title = event
 			this.$resources.list.fetch({
 				title: title,
@@ -120,16 +120,16 @@ export default {
 	resources: {
 		list() {
 			return {
-				method: "frappedesk.api.cannedResponse.get_canned_response",
+				method: "frappedesk.api.kb.get_articles_in_ticket",
 				onSuccess(val) {
-					this.cannedResponses = val
-					return this.cannedResponses
+					this.articleResponses = val
+					return this.articleResponses
 				},
 			}
 		},
 	},
 	beforeMount() {
-		this.getCannedResponses()
+		this.getArticles()
 	},
 }
 </script>

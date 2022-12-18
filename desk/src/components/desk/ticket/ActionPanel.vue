@@ -131,7 +131,7 @@
 
 <script>
 import { FeatherIcon, Badge } from "frappe-ui"
-import { inject, computed, ref } from "@vue/runtime-core"
+import { inject, ref } from "@vue/runtime-core"
 import TicketField from "@/components/global/TicketField.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
@@ -144,19 +144,11 @@ export default {
 		TicketField,
 		CustomIcons,
 	},
-	setup(props) {
+	setup() {
 		const user = inject("user")
 		const validationErrorFields = ref([])
-
-		const $socket = inject("$socket")
-		const $tickets = inject("$tickets")
-		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
-		})
-
 		return {
 			user,
-			ticket,
 			validationErrorFields,
 		}
 	},
@@ -178,6 +170,9 @@ export default {
 		customFields() {
 			return this.$resources.customFields.data || null
 		},
+		ticket() {
+			return this.$resources.ticket.doc || null
+		},
 	},
 	resources: {
 		customFields() {
@@ -188,6 +183,13 @@ export default {
 					view: "Agent Portal",
 				},
 				auto: true,
+			}
+		},
+		ticket() {
+			return {
+				type: "document",
+				doctype: "Ticket",
+				name: this.ticketId,
 			}
 		},
 	},
