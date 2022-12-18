@@ -36,6 +36,7 @@ export default {
 				text: "Customer Satisfaction Feedback",
 				left: "5%",
 			},
+			color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
 			tooltip: {
 				trigger: "item",
 			},
@@ -47,8 +48,9 @@ export default {
 				{
 					name: "Feedback Status",
 					type: "pie",
-					radius: "50%",
+					radius: "50%",					
 					data: ticketCount,
+					color: ['#DE61F9', '#EEA4EF', '#37A2FF', '#5FD8C4'],
 					emphasis: {
 						itemStyle: {
 							shadowBlur: 10,
@@ -95,6 +97,6 @@ export default {
 
 <style scoped>
 .chart {
-	height: 50vh;
+	height: 30rem;
 }
 </style>
