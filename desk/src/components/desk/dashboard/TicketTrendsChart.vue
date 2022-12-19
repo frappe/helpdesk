@@ -24,10 +24,10 @@ export default {
 	},
 	watch: {
 		fromDate(newVal, Oldval) {
-			console.log(newVal, Oldval, "trnd")
+			console.log(newVal, Oldval,)
 		},
 		toDate(newVal, oldVal) {
-			console.log(oldVal, newVal, "ddd")
+			console.log(oldVal, newVal,)
 		},
 	},
 	data() {
@@ -37,7 +37,7 @@ export default {
 			theme,
 			option: {
 				title: {
-					text: "Ticket Trends",
+					text: "Ticket Trends (Count)",
 					left: "5%",
 				},
 				// color: ["#2D95F0", "#61B2F9", "#5FD8C4", "#f8bad0", "#EEA4EF", "#f2b3c9"],

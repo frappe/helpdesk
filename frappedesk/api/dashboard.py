@@ -13,13 +13,13 @@ def ticket_summary(startDate=None,endDate=None):
     if startDate and endDate:
         startDate= datetime.datetime.strptime(startDate, "%Y-%m-%d").strftime("%d-%m")
         endDate = datetime.datetime.strptime(endDate, "%Y-%m-%d").strftime("%d-%m")
-    ticket_count = frappe.db.sql("""select TO_CHAR(creation,'DD-MM') as date,
+    ticket_count = frappe.db.sql("""select TO_CHAR(creation,'DD/MM') as date,
                                 COUNT(Case when status="Open" then status end) as "Open", 
                                 COUNT(Case when status="Closed" then status end) as "Closed", 
                                 COUNT(Case when status="Replied" then status end) as "Replied" 
-                                from `tabTicket` WHERE TO_CHAR(creation,'DD-MM') BETWEEN %s AND %s group by 
-                                TO_CHAR(creation,'DD-MM')
-                                ORDER BY TO_CHAR(creation,'MM-DD') ASC""",(startDate,endDate))
+                                from `tabTicket` WHERE TO_CHAR(creation,'DD/MM') BETWEEN %s AND %s group by 
+                                TO_CHAR(creation,'DD/MM')
+                                ORDER BY TO_CHAR(creation,'MM/DD') ASC""",(startDate,endDate))
     print(ticket_count)
     return ticket_count
 

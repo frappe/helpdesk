@@ -23,10 +23,10 @@ export default {
 	},
 	watch: {
 		fromDate(newVal, Oldval) {
-			console.log(newVal, Oldval, "broooo")
+			console.log(newVal, Oldval,)
 		},
 		toDate(newVal, oldVal) {
-			console.log(oldVal, newVal, "todate")
+			console.log(oldVal, newVal,)
 		},
 	},
 	data() {

@@ -123,7 +123,6 @@ export default {
 	},
 	methods: {
 		getStatus() {
-			console.log(this.$resources.ticketStatus.fetch())
 			this.$resources.ticketStatus.fetch()
 		},
 	},

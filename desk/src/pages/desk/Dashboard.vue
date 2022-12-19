@@ -102,7 +102,6 @@ export default {
 				}
 			)
 			this.toDate = this.toDate.split("/").reverse().join("-")
-			console.log(this.fromDate, this.toDate)
 		},
 	},
 
