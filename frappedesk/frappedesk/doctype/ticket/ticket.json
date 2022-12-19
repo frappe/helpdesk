@@ -48,8 +48,8 @@
   "user_resolution_time",
   "additional_info",
   "contact",
-  "customer",
   "email_account",
+  "customer",
   "column_break_16",
   "via_customer_portal",
   "attachment",
@@ -57,7 +57,8 @@
   "customer_feedback_section",
   "feedback_submitted",
   "satisfaction_rating",
-  "customer_feedback"
+  "customer_feedback",
+  "custom_fields_section"
  ],
  "fields": [
   {
@@ -404,16 +405,19 @@
   {
    "fieldname": "customer",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Customer",
    "options": "FD Customer"
+  },
+  {
+   "fieldname": "custom_fields_section",
+   "fieldtype": "Section Break",
+   "label": "Custom Fields"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2022-11-30 10:37:29.813012",
+ "modified": "2022-12-19 13:47:31.803272",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",

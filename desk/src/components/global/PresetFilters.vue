@@ -8,7 +8,7 @@
 			>
 				<div class="text-lg font-semibold">
 					{{
-						`All ${ListTitle != null ? ListTitle : title} (${
+						`${ListTitle ? ListTitle : title} (${
 							manager.totalCount
 						})`
 					}}

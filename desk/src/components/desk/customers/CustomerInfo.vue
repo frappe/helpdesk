@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col">
+	<div class="flex flex-col" v-if="customerDoc">
 		<div class="customer-info flex-1">
 			<div class="flex flex-row">
 				<div class="info basis-1/2 m-[20px]">
@@ -273,7 +273,7 @@ export default {
 	},
 	computed: {
 		acronym() {
-			var str = this.$resources.customer.doc.customer_name
+			var str = this.customerDoc.customer_name
 			var matches = str.match(/\b(\w)/g)
 			var acronym = matches.join("")
 			return acronym
