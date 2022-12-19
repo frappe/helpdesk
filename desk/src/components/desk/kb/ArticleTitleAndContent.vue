@@ -1,7 +1,9 @@
 <template>
-	<div class="flex h-full flex-col space-y-[16px]">
+	<div
+		class="flex h-full flex-col space-y-[16px] rounded-[8px] border shadow-sm p-[32px]"
+	>
 		<div>
-			<div v-if="editMode" class="flex flex-col">
+			<div v-if="editMode" class="flex flex-col edit_title max-w-full">
 				<Input
 					label="Title"
 					type="text"
@@ -10,7 +12,8 @@
 				/>
 				<ErrorMessage :message="articleInputErrors.title" />
 			</div>
-			<div v-else class="text-[24px] font-semibold">
+
+			<div v-else class="text-[24px] font-semibold title max-w-full border-b pb-[16px] mb-[10px]">
 				{{ article.title }}
 			</div>
 		</div>
@@ -22,32 +25,37 @@
 				>
 					Content
 				</div>
-				<TextEditor
-					:class="editMode ? 'bg-gray-100' : ''"
-					ref="textEditor"
-					:editor-class="
-						!editable
-							? 'flex flex-col'
-							: editMode
-							? 'min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3'
-							: 'min-h-[20rem] overflow-y-auto max-h-[85vh]'
-					"
-					:content="article.content"
-					:starterkit-options="{
-						heading: { levels: [2, 3, 4, 5, 6] },
-					}"
-					@change="onContentInput"
-					:editable="editMode"
-				>
-					<template v-slot:top>
-						<div v-if="editMode">
-							<TextEditorFixedMenu
-								class="m-3 overflow-x-auto"
-								:buttons="textEditorMenuButtons"
-							/>
-						</div>
-					</template>
-				</TextEditor>
+
+				<div class="max-w-full flex overflow-y-auto px-2 h-full">
+					<TextEditor
+						:class="editMode ? 'bg-gray-100' : ''"
+						ref="textEditor"
+						class="edit_body max-w-full"
+						:editor-class="
+							!editable
+								? 'flex flex-col'
+								: editMode
+								? 'min-h-[20rem] max-h-[73vh] w-full px-3 max-w-full'
+								: 'min-h-[20rem] max-h-[85vh] max-w-full w-full h-full'
+						"
+						:content="article.content"
+						:starterkit-options="{
+							heading: { levels: [2, 3, 4, 5, 6] },
+						}"
+						@change="onContentInput"
+						:editable="editMode"
+					>
+						<template v-slot:top>
+							<div v-if="editMode">
+								<TextEditorFixedMenu
+									class="m-3 overflow-x-auto"
+									:buttons="textEditorMenuButtons"
+								/>
+							</div>
+						</template>
+					</TextEditor>
+				</div>
+
 				<ErrorMessage :message="articleInputErrors.content" />
 			</div>
 		</div>
