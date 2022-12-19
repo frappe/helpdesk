@@ -6,7 +6,7 @@
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
-			<div class="mt-3.5 mr-8 ml-8">Welcome</div>
+			<div class="mt-3.5 mr-8 ml-8">Welcome, {{ user }}</div>
 			<TicketStatusCards />
 			<div class="mb-[20px] flex flex-row-reverse">
 				<div class="w-48 mr-5">
@@ -65,7 +65,7 @@ export default {
 		TicketSummaryChart,
 		CustomerSatisfactionChart,
 		SlaSummaryCards,
-	},	
+	},
 	data() {
 		let date = {}
 		let fromDate = ""
@@ -75,6 +75,11 @@ export default {
 			fromDate,
 			toDate,
 		}
+	},
+	computed: {
+		user() {
+			return this.$resources.getSessionUser.data
+		},
 	},
 	methods: {
 		handleDate(modelData) {
@@ -98,6 +103,15 @@ export default {
 			)
 			this.toDate = this.toDate.split("/").reverse().join("-")
 			console.log(this.fromDate, this.toDate)
+		},
+	},
+
+	resources: {
+		getSessionUser() {
+			return {
+				method: "frappedesk.api.general.get_session_user",
+				auto: true,
+			}
 		},
 	},
 	beforeMount() {
