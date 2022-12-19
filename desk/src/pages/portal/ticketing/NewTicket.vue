@@ -26,7 +26,7 @@
 				</div>
 				<!-- <div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div> -->
 				<div
-					class="text-[13px] text-gray-700"
+					class="text-[13px] text-gray-700 pb-2"
 					v-html="template.about"
 				></div>
 				<div class="space-y-4 pb-4">
@@ -62,47 +62,24 @@
 								>
 									{{ field.label }}
 								</div>
-								<CustomTextEditor
-									:show="true"
-									editorClasses="w-full min-h-[100px] max-h-[300px] bg-gray-100 px-3 rounded-t-lg"
+								<TextEditor
+									:content="content"
+									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
 									@change="
 										(val) => {
 											validateField(field, val)
 										}
 									"
+									placeholder="Type your text here..."
+									class="border border-gray-300 rounded-[8px]"
 								>
-									<template #bottom-section="{ editor }">
-										<div
-											class="p-1 select-none flex flex-row border-b border-x rounded-b-lg"
-										>
-											<div
-												class="w-full flex flex-row items-center space-x-2"
-											>
-												<div
-													v-for="item in [
-														'bold',
-														'italic',
-														'|',
-														'quote',
-														'code',
-														'|',
-														'numbered-list',
-														'bullet-list',
-														'left-align',
-														'center-align',
-														'right-align',
-													]"
-													:key="item"
-												>
-													<TextEditorMenuItem
-														:item="item"
-														:editor="editor"
-													/>
-												</div>
-											</div>
-										</div>
+									<template #bottom>
+										<TextEditorFixedMenu
+											class="bg-transparent border-t w-full px-1.5"
+											:buttons="textEditorMenuButtons"
+										/>
 									</template>
-								</CustomTextEditor>
+								</TextEditor>
 							</div>
 							<div v-else-if="field.fieldtype == 'Link'">
 								<div
@@ -239,7 +216,7 @@
 	</div>
 </template>
 <script>
-import { inject, ref, computed } from "vue"
+import { inject, ref } from "vue"
 import {
 	Input,
 	TextEditor,
@@ -250,9 +227,8 @@ import {
 	FeatherIcon,
 } from "frappe-ui"
 import { call } from "frappe-ui"
-import TextEditorMenuItem from "@/components/global/TextEditorMenuItem.vue"
-import CustomTextEditor from "@/components/global/CustomTextEditor.vue"
 import ArticleSuggestions from "@/components/global/kb/ArticleSuggestions.vue"
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 
 export default {
 	name: "NewTicket",
@@ -265,9 +241,8 @@ export default {
 		ErrorMessage,
 		FileUploader,
 		FeatherIcon,
-		TextEditorMenuItem,
-		CustomTextEditor,
 		ArticleSuggestions,
+		TextEditorFixedMenu,
 	},
 	setup() {
 		const user = inject("user")
@@ -280,41 +255,7 @@ export default {
 
 		const validationErrors = ref({})
 
-		const editorOptions = ref({
-			modules: {
-				toolbar: [
-					["bold", "italic", "underline", "strike", "link"], // toggled buttons
-					["blockquote", "code-block"],
-
-					[{ header: 1 }, { header: 2 }], // custom button values
-					[{ list: "ordered" }, { list: "bullet" }],
-
-					[{ header: [1, 2, 3, 4, 5, 6, false] }],
-
-					[{ color: [] }, { background: [] }], // dropdown with defaults from theme
-
-					["image"],
-
-					[{ align: [] }],
-
-					["clean"], // remove formatting button
-				],
-			},
-			placeholder: "Compose your reply...",
-			theme: "snow",
-			bounds: document.body,
-		})
-
 		const attachments = ref([])
-
-		const $socket = inject("$socket")
-		const $fdSettings = inject("$fdSettings")
-		const suggestArticles = computed(() => {
-			return $fdSettings.get(
-				{ fieldname: "suggest_articles_in_new_ticket_page" },
-				{ $socket }
-			).value
-		})
 
 		return {
 			user,
@@ -324,13 +265,59 @@ export default {
 			linkedFieldOptions,
 			newTicketSubmitLoading,
 			validationErrors,
-			editorOptions,
 			attachments,
-
-			suggestArticles,
 		}
 	},
 	computed: {
+		textEditorMenuButtons() {
+			return [
+				"Paragraph",
+				[
+					"Heading 2",
+					"Heading 3",
+					"Heading 4",
+					"Heading 5",
+					"Heading 6",
+				],
+				"Separator",
+				"Bold",
+				"Italic",
+				"Separator",
+				"Bullet List",
+				"Numbered List",
+				"Separator",
+				"Align Left",
+				"Align Center",
+				"Align Right",
+				"Separator",
+				"Image",
+				"Video",
+				"Link",
+				"Blockquote",
+				"Code",
+				[
+					"InsertTable",
+					"AddColumnBefore",
+					"AddColumnAfter",
+					"DeleteColumn",
+					"AddRowBefore",
+					"AddRowAfter",
+					"DeleteRow",
+					"MergeCells",
+					"SplitCell",
+					"ToggleHeaderColumn",
+					"ToggleHeaderRow",
+					"ToggleHeaderCell",
+					"DeleteTable",
+				],
+			]
+		},
+		fdSettings() {
+			return this.$resources.fdSettings.doc || null
+		},
+		suggestArticles() {
+			return this.fdSettings?.suggest_articles_in_new_ticket_page || null
+		},
 		template() {
 			const templateRoutes = this.ticketTemplates.map(
 				(x) => x.template_route
@@ -350,6 +337,15 @@ export default {
 					this.setLinkedFieldOptions(template)
 					return template
 				}
+			}
+		},
+	},
+	resources: {
+		fdSettings() {
+			return {
+				type: "document",
+				doctype: "Frappe Desk Settings",
+				name: "Frappe Desk Settings",
 			}
 		},
 	},

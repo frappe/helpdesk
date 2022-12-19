@@ -281,6 +281,16 @@
 													}
 												"
 											/>
+											<CustomIcons
+												name="article-reply"
+												class="h-7 w-7 rounded p-1"
+												role="button"
+												@click="
+													() => {
+														showArticleResponseDialog = true
+													}
+												"
+											/>
 											<CannedResponsesDialog
 												:show="
 													showCannedResponsesDialog
@@ -289,6 +299,18 @@
 												@close="
 													() => {
 														showCannedResponsesDialog = false
+													}
+												"
+											/>
+
+											<ArticleResponseDialog
+												:show="
+													showArticleResponseDialog
+												"
+												@contentVal="getContent($event)"
+												@close="
+													() => {
+														showArticleResponseDialog = false
 													}
 												"
 											/>
@@ -357,7 +379,8 @@ import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
-import { inject, ref, computed } from "vue"
+import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
+import { inject, ref } from "vue"
 
 export default {
 	name: "Ticket",
@@ -377,6 +400,7 @@ export default {
 		CustomerSatisfactionFeedback,
 		CannedResponsesDialog,
 		TextEditorFixedMenu,
+		ArticleResponseDialog,
 	},
 	data() {
 		return {
@@ -385,7 +409,7 @@ export default {
 			content: "",
 		}
 	},
-	setup(props) {
+	setup() {
 		const showTextFormattingMenu = ref(true)
 		const viewportWidth = inject("viewportWidth")
 		const user = inject("user")
@@ -399,14 +423,10 @@ export default {
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
 
-		const $socket = inject("$socket")
-		const $tickets = inject("$tickets")
-		const ticket = computed(() => {
-			return $tickets.get({ ticketId: props.ticketId }, { $socket }).value
-		})
+		const showArticleResponseDialog = ref(false)
+		const tempContent = ref("")
 
 		return {
-			ticket,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -416,9 +436,18 @@ export default {
 			editingType,
 			showCannedResponsesDialog,
 			tempMessage,
+			showArticleResponseDialog,
+			tempContent,
 		}
 	},
 	resources: {
+		ticket() {
+			return {
+				type: "document",
+				doctype: "Ticket",
+				name: this.ticketId,
+			}
+		},
 		submitConversation() {
 			return {
 				method: "frappedesk.api.ticket.submit_conversation_via_agent",
@@ -480,6 +509,9 @@ export default {
 		})
 	},
 	computed: {
+		ticket() {
+			return this.$resources.ticket.doc || null
+		},
 		textEditorMenuButtons() {
 			return [
 				"Paragraph",
@@ -622,6 +654,10 @@ export default {
 		getMessage(message) {
 			this.tempMessage = message
 			this.content = this.tempMessage
+		},
+		getContent(content) {
+			this.tempContent = content
+			this.content = this.tempContent
 		},
 	},
 }
