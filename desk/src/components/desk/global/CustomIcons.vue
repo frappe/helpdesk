@@ -1427,7 +1427,7 @@
 			/>
 		</svg>
 		<svg
-			v-if="this.name=='dashboard'"
+			v-if="this.name == 'dashboard'"
 			:class="this.class"
 			:width="this.width"
 			:height="this.height"
@@ -1438,6 +1438,29 @@
 			<path
 				d="M9.7549 0.499939H13.4804C14.043 0.499939 14.5 0.95864 14.5 1.50963V13.4902C14.5 14.0412 14.043 14.4999 13.4804 14.4999H9.7549C9.19235 14.4999 8.73534 14.0412 8.73534 13.4902V1.50963C8.73534 0.95864 9.19235 0.499939 9.7549 0.499939ZM1.51955 10.776H5.24511C5.80765 10.776 6.26466 11.2347 6.26466 11.7857V13.4902C6.26466 14.0412 5.80765 14.4999 5.24511 14.4999H1.51955C0.957002 14.4999 0.5 14.0412 0.5 13.4902V11.7857C0.5 11.2347 0.957001 10.776 1.51955 10.776ZM1.51955 0.499939H5.24511C5.80765 0.499939 6.26466 0.95864 6.26466 1.50963V7.40247C6.26466 7.95346 5.80765 8.41216 5.24511 8.41216H1.51955C0.957002 8.41216 0.5 7.95346 0.5 7.40247V1.50963C0.5 0.95864 0.957001 0.499939 1.51955 0.499939Z"
 				stroke="#687178"
+			/>
+		</svg>
+		<svg
+			v-if="this.name == 'corner-up-right'"
+			:class="this.class"
+			:width="this.width"
+			:height="this.height"
+			viewBox="0 0 11 12"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M1 10.6667L10.3333 1.33342"
+				stroke="#A6B1B9"
+				stroke-miterlimit="10"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			<path
+				d="M10.3333 8.66671V1.33337H3"
+				stroke="#A6B1B9"
+				stroke-linecap="round"
+				stroke-linejoin="round"
 			/>
 		</svg>
 		<div v-if="this.name == 'company'" :class="this.class">
