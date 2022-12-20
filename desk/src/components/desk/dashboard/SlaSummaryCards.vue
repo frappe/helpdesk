@@ -5,26 +5,32 @@
 		</div>
 		<div class="grid grid-cols-3 mt-8 mb-8 gap-4">
 			<div
-				class="flex flex-row box-border h-16 p-4 border-2 rounded-md justify-between"
+				class="flex flex-row items-center box-border h-[68px] p-4 border-2 rounded-md justify-between"
 			>
-				<div class="font-light">Avg. First Response time (hours)</div>
-				<div class="font-semibold text-3xl">
+				<div class="font-light text-xl text-[#74808B]">
+					Avg. First Response time (hours)
+				</div>
+				<div class="font-medium text-[36px] text-[#505A62]">
 					{{ averageFirstResponseTime }}
 				</div>
 			</div>
 			<div
-				class="flex flex-row box-border h-16 p-4 border-2 rounded-md justify-between"
+				class="flex flex-row items-center box-border h-[68px] p-4 border-2 rounded-md justify-between"
 			>
-				<div class="font-light">Avg. Resolution Time (hours)</div>
-				<div class="font-semibold text-3xl">
+				<div class="font-light text-xl text-[#74808B]">
+					Avg. Resolution Time (hours)
+				</div>
+				<div class="font-medium text-[36px] text-[#505A62]">
 					{{ averageResolutionTime }}
 				</div>
 			</div>
 			<div
-				class="flex flex-row box-border h-16 p-4 border-2 rounded-md justify-between"
+				class="flex flex-row items-center box-border h-[68px] p-4 border-2 rounded-md justify-between"
 			>
-				<div class="font-light">Resolution within SLA</div>
-				<div class="font-semibold text-3xl">
+				<div class="font-light text-xl text-[#74808B]">
+					Resolution within SLA
+				</div>
+				<div class="font-semibold text-[36px] text-[#505A62]">
 					{{ resolutionWithinSla }}
 				</div>
 			</div>

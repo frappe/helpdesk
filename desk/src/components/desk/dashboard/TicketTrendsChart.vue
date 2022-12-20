@@ -24,10 +24,10 @@ export default {
 	},
 	watch: {
 		fromDate(newVal, Oldval) {
-			console.log(newVal, Oldval,)
+			console.log(newVal, Oldval)
 		},
 		toDate(newVal, oldVal) {
-			console.log(oldVal, newVal,)
+			console.log(oldVal, newVal)
 		},
 	},
 	data() {
@@ -68,10 +68,6 @@ export default {
 						lineStyle: {
 							width: 3,
 							color: "#61B2F9",
-						},
-						areaStyle: {
-							color: "#61B2F9",
-							opacity: 0.5,
 						},
 					},
 				],

@@ -77,10 +77,6 @@ export default {
 						width: 3,
 						color: "#61B2F9",
 					},
-					areaStyle: {
-						color: "#61B2F9",
-						opacity: 0.5,
-					},
 				},
 				{
 					name: "Closed",
@@ -91,10 +87,6 @@ export default {
 						width: 3,
 						color: "#5FD8C4",
 					},
-					areaStyle: {
-						color: "#5FD8C4",
-						opacity: 0.5,
-					},
 				},
 				{
 					name: "Replied",
@@ -104,10 +96,6 @@ export default {
 					lineStyle: {
 						width: 3,
 						color: "#EEA4EF",
-					},
-					areaStyle: {
-						color: "#EEA4EF",
-						opacity: 0.5,
 					},
 				},
 			],

@@ -36,11 +36,11 @@ export default {
 				text: "Customer Satisfaction Feedback",
 				left: "5%",
 			},
-			color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
 			tooltip: {
 				trigger: "item",
 			},
 			legend: {
+				icon: "circle",
 				orient: "horizontal",
 				top: "bottom",
 			},
@@ -48,9 +48,12 @@ export default {
 				{
 					name: "Feedback Status",
 					type: "pie",
-					radius: "50%",					
+					radius: "50%",
 					data: ticketCount,
-					color: ['#DE61F9', '#EEA4EF', '#37A2FF', '#5FD8C4'],
+					color: ["#98F5E6", "#EEA4EF", "#61B2F9"],
+					label: {
+						formatter: "{b}: {c}",
+					},
 					emphasis: {
 						itemStyle: {
 							shadowBlur: 10,

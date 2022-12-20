@@ -23,10 +23,10 @@ export default {
 	},
 	watch: {
 		fromDate(newVal, Oldval) {
-			console.log(newVal, Oldval,)
+			console.log(newVal, Oldval)
 		},
 		toDate(newVal, oldVal) {
-			console.log(oldVal, newVal,)
+			console.log(oldVal, newVal)
 		},
 	},
 	data() {
@@ -36,7 +36,7 @@ export default {
 			title: {
 				text: "Tickets by Type",
 				left: "5%",
-			}, // color: ["#2D95F0", "#61B2F9", "#5FD8C4", "#f8bad0", "#EEA4EF", "#f2b3c9"],
+			},
 			yAxis: {
 				type: "category",
 				data: ticketType,
@@ -48,6 +48,11 @@ export default {
 				{
 					data: ticketCount,
 					type: "bar",
+					label: {
+						show: true,
+						position: "right",
+						formatter: "{c}",
+					},
 					itemStyle: {
 						barBorderRadius: 5,
 						barWidth: 5,

@@ -1,12 +1,11 @@
 <template>
 	<div class="flex flex-col h-screen">
 		<div class="flex border-b h-[52px] px-[24px] shrink-0">
-			<div class="grow my-auto text-[16px] font-semibold text-gray-900">
-				Dashboard
+			<div class="grow my-auto ml-2.5 text-[16px] text-gray-900">
+				Welcome, {{ user }}
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
-			<div class="mt-3.5 mr-8 ml-8">Welcome, {{ user }}</div>
 			<TicketStatusCards />
 			<div class="mb-[20px] flex flex-row-reverse">
 				<div class="w-48 mr-5">
@@ -55,6 +54,7 @@ import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
 import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
 import SlaSummaryCards from "@/components/desk/dashboard/SlaSummaryCards.vue"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 export default {
 	name: "Dashboard",
 	components: {
@@ -65,6 +65,7 @@ export default {
 		TicketSummaryChart,
 		CustomerSatisfactionChart,
 		SlaSummaryCards,
+		CustomIcons,
 	},
 	data() {
 		let date = {}
@@ -104,7 +105,6 @@ export default {
 			this.toDate = this.toDate.split("/").reverse().join("-")
 		},
 	},
-
 	resources: {
 		getSessionUser() {
 			return {

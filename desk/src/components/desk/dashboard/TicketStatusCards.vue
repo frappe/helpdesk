@@ -1,6 +1,6 @@
 <template>
 	<div class="grid grid-cols-4 gap-4 mt-8 ml-8 mb-8 mr-6">
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
+		<div class="box-border h-24 p-4 border-2 rounded-md">
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-red-500">Due Today</div>
 				<CustomIcons
@@ -8,46 +8,46 @@
 					class="h-3 relative top-1.5"
 				/>
 			</div>
-			<div class="text-3xl font-bold">
+			<span class="text-[36px] font-bold">
 				{{ dueToday != null ? dueToday : 0 }}
-			</div>
+			</span>
 		</div>
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
+		<div class="box-border h-24 p-4 border-2 rounded-md">
 			<div class="flex flex-row gap-2">
-				<div class="text-xl">Unresolved</div>
+				<div class="text-xl font-normal text-[#687178]">Unresolved</div>
 				<CustomIcons
 					name="corner-up-right"
 					class="h-3 relative top-1.5"
 				/>
 			</div>
-			<div class="text-3xl font-medium">
-				{{ open != null ? open : 0 }}
-			</div>
+			<span class="text-[36px] text-[#505A62] font-medium">
+				{{ open + replied }}
+			</span>
 		</div>
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
+		<div class="box-border h-24 p-4 border-2 rounded-md">
 			<div class="flex flex-row gap-2">
-				<div class="text-xl">Open</div>
+				<div class="text-xl text-[#687178] font-normal">Open</div>
 				<CustomIcons
 					name="corner-up-right"
 					class="h-3 relative top-1.5"
 				/>
 			</div>
-			<div class="text-3xl font-medium">
+			<span class="text-[36px] text-[#505A62] font-medium">
 				{{ open != null ? open : 0 }}
-			</div>
+			</span>
 		</div>
 
-		<div class="box-border h-[86px] p-4 border-2 rounded-md">
+		<div class="box-border h-24 p-4 border-2 rounded-md">
 			<div class="flex flex-row gap-2">
-				<div class="text-xl">Replied</div>
+				<div class="text-xl text-[#687178] font-normal">Replied</div>
 				<CustomIcons
 					name="corner-up-right"
 					class="h-3 relative top-1.5"
 				/>
 			</div>
-			<div class="text-3xl font-medium">
+			<span class="text-[36px] text-[#505A62] font-medium">
 				{{ replied != null ? replied : 0 }}
-			</div>
+			</span>
 		</div>
 	</div>
 </template>
