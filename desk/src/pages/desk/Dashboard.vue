@@ -18,7 +18,7 @@
 					/>
 				</div>
 			</div>
-			<div class="grid grid-cols-2">
+			<div class="grid grid-cols-2 ml-8">
 				<TicketTrendsChart
 					class="min-w-[35rem]"
 					:fromDate="fromDate"

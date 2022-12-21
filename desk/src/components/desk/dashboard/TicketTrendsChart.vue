@@ -38,7 +38,7 @@ export default {
 			option: {
 				title: {
 					text: "Ticket Trends (Count)",
-					left: "5%",
+					textAlign: "left",
 				},
 				// color: ["#2D95F0", "#61B2F9", "#5FD8C4", "#f8bad0", "#EEA4EF", "#f2b3c9"],
 				tooltip: {

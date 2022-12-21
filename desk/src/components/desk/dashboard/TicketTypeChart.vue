@@ -35,7 +35,10 @@ export default {
 		let option = {
 			title: {
 				text: "Tickets by Type",
-				left: "5%",
+				textAlign: "left",
+			},
+			tooltip:{
+				trigger:'axis'
 			},
 			yAxis: {
 				type: "category",
