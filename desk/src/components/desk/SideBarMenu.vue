@@ -275,7 +275,7 @@ export default {
 
 		this.profileSettings = [
 			{
-				label: "Keyboard Shortcuts",
+				label: "Shortcuts",
 				icon: "command",
 				style: "text-gray-800",
 				action: () => {
@@ -283,7 +283,7 @@ export default {
 				},
 			},
 			{
-				label: "Go to customer portal",
+				label: "Customer portal",
 				customIcon: "external-link",
 				style: "text-gray-800",
 				action: () => {

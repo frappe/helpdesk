@@ -202,7 +202,7 @@
 										/>
 									</div>
 									<div
-										class="pt-2 select-none flex flex-row items-center space-x-2"
+										class="pt-2 select-none flex flex-row items-center space-x-2 gap-2"
 										v-if="$refs.replyEditor"
 									>
 										<Button
