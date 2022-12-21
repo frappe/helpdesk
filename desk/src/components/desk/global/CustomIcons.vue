@@ -1220,10 +1220,10 @@
 			/>
 		</svg>
 		<svg
-			v-if="this.name=='add-response'"
+			v-if="this.name == 'add-response'"
 			:class="this.class"
-			:width="16"
-			:height="15"
+			:width="this.width"
+			:height="this.height"
 			viewBox="0 0 16 15"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
