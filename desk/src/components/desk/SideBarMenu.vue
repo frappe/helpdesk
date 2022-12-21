@@ -11,7 +11,7 @@
 				class="h-[15.88px]"
 				@click="
 					() => {
-						$router.push({ path: '/frappedesk/tickets' })
+						$router.push({ path: '/frappedesk/dashboard' })
 					}
 				"
 			/>
@@ -323,6 +323,7 @@ export default {
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
 			const routeMenuItemMap = {
+				"frappedesk/dashboard": "Dashboard",
 				"frappedesk/tickets": "Tickets",
 				"frappedesk/kb": "Knowledge Base",
 				"frappedesk/reports": "Reports",
