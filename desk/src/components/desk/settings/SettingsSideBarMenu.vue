@@ -28,6 +28,11 @@ export default {
 					route: "/frappedesk/settings/agents",
 				},
 				{
+					label: "Ticket Types",
+					pageName: "TicketTypes",
+					route: "/frappedesk/settings/ticket_types",
+				},
+				{
 					label: "Support Policies",
 					pageName: "SlaPolicies",
 					route: "/frappedesk/settings/sla",

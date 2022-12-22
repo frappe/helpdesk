@@ -174,6 +174,14 @@ const routes = [
 						props: true,
 					},
 					{
+						path:"ticket_types",
+						name:"TicketTypes",
+						component:()=>
+							import(
+								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
+							)
+					},
+					{
 						path: "sla",
 						name: "SlaPolicies",
 						component: () =>
@@ -232,6 +240,14 @@ const routes = [
 							),
 						props: true,
 					},
+					{
+						path:"ticket_types",
+						name:"TicketTypes",
+						component:()=>
+							import(
+								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
+							)
+					}
 				],
 			},
 		],
