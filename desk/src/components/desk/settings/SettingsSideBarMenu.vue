@@ -28,6 +28,11 @@ export default {
 					route: "/frappedesk/settings/agents",
 				},
 				{
+					label: "Teams",
+					pageName: "Teams",
+					route: "/frappedesk/settings/teams",
+				},
+				{
 					label: "Ticket Types",
 					pageName: "TicketTypes",
 					route: "/frappedesk/settings/ticket_types",
