@@ -17,6 +17,7 @@
 		"frappe-ui": "^0.0.84",
 		"luxon": "^2.3.2",
 		"vue": "^3.2.26",
+		"vue-multiselect": "^3.0.0-alpha.2",
 		"vue-router": "^4.0.12",
 		"vuedraggable": "^4.1.0"
 	},
