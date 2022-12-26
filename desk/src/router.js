@@ -177,7 +177,7 @@ const routes = [
 						path: "teams",
 						name: "Teams",
 						component: () =>
-							import("@/pages/desk/settings/teams/Teams.vue"),
+							import("@/pages/desk/settings/team/Teams.vue"),
 					},
 					{
 						path:"ticket_types",
@@ -186,6 +186,13 @@ const routes = [
 							import(
 								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
 							)
+					},
+					{
+						path: "ticket_type/:ticketTypeId",
+						name: "TicketType",
+						component: () =>
+							import("@/pages/desk/settings/ticket_type/TicketType.vue"),
+						props: true,
 					},
 					{
 						path: "sla",
@@ -246,14 +253,6 @@ const routes = [
 							),
 						props: true,
 					},
-					{
-						path:"ticket_types",
-						name:"TicketTypes",
-						component:()=>
-							import(
-								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
-							)
-					}
 				],
 			},
 		],

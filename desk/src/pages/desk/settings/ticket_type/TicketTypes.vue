@@ -32,6 +32,15 @@
 						}
 					"
 				>
+					<template #field-name="{ row }">
+						<router-link
+							:to="{
+								path: `/frappedesk/settings/ticket_type/${row.name}`,
+							}"
+						>
+							{{ `${row.name}` }}
+						</router-link>
+					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
 							<Button
