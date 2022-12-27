@@ -21,11 +21,11 @@
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
-				<div
-					class="ProseMirror prose prose-p:my-1 max-w-full text-[13px] text-gray-700 font-normal"
-					style="border: 0px"
-					v-html="cleanedMessage"
-				></div>
+				<TextEditor
+					editor-class="text-[13px] max-w-full"
+					:content="cleanedMessage"
+					:editable="false"
+				/>
 				<div
 					v-if="attachments.length > 0"
 					class="flex flex-wrap text-base mt-[8px]"
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { FeatherIcon } from "frappe-ui"
+import { FeatherIcon, TextEditor } from "frappe-ui"
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import { remove_script_and_style } from "@/utils"
 
@@ -68,6 +68,7 @@ export default {
 	],
 	components: {
 		FeatherIcon,
+		TextEditor,
 		CustomAvatar,
 	},
 	computed: {

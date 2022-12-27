@@ -23,17 +23,18 @@
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
-				<div
-					class="ProseMirror prose prose-p:my-1 max-w-full text-[13px] text-gray-700"
-					v-html="cleanedMessage"
-				></div>
+				<TextEditor
+					editor-class="text-[13px] max-w-full"
+					:content="cleanedMessage"
+					:editable="false"
+				/>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
-import { FeatherIcon } from "frappe-ui"
+import { FeatherIcon, TextEditor } from "frappe-ui"
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import { remove_script_and_style } from "@/utils"
 
@@ -42,6 +43,7 @@ export default {
 	props: ["comment"],
 	components: {
 		FeatherIcon,
+		TextEditor,
 		CustomAvatar,
 	},
 	computed: {
