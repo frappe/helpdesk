@@ -85,17 +85,19 @@ export default {
 	},
 	computed: {
 		ticketTypeDoc() {
-			console.log(this.$resources.ticketType.doc, "docc")
-			return this.$resources.ticketType.doc || null
+			if (this.$resources.ticketType.doc != null) {
+				return this.$resources.ticketType.doc
+			}
 		},
 		values() {
-			if (this.updatingValues) {
-				return this.values || null
-			}
+			console.log(this.ticketTypeDoc?.priority, "priority")
+			// if (this.updatingValues) {
+			// 	return this.values || null
+			// }
 			return {
 				ticketTypeName: this.ticketTypeDoc?.name || null,
 				description: this.ticketTypeDoc?.description || null,
-				priority: this.ticketTypeDoc?.priority || null,
+				priority: this.ticketTypeDoc.priority || null,
 			}
 		},
 	},
@@ -140,6 +142,7 @@ export default {
 				.submit({
 					name: newValues.name,
 					description: newValues.description,
+					priority: newValues.priority,
 				})
 				.then(() => {
 					this.$resources.ticketType.setValue.submit({

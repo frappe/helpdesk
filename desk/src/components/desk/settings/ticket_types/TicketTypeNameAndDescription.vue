@@ -1,31 +1,12 @@
 <template>
 	<div>
-		<!-- <div
-			v-if="!editable"
-			class="flex flex-col space-y-[16px] rounded-[8px] border shadow-sm p-[32px]"
-		>
-			<div
-				class="font-semibold text-[24px] prose prose-p:my-1 border-b pb-[16px] mb-[10px]"
-			>
-				{{ name }}
-			</div>
-
-			<div
-				class="overflow-y-scroll"
-				style="
-					min-height: calc(100vh - 500px);
-					max-height: calc(100vh - 245px);
-				"
-				v-html="description"
-			></div>
-		</div> -->
 		<div>
 			<div class="flex flex-col space-y-[16px] h-full">
 				<div>
 					<Input
 						label="Title"
 						type="text"
-						:value="name ? name : selectedPriority"
+						:value="name"
 						@input="
 							(val) => {
 								tempNewName = val
@@ -40,7 +21,7 @@
 						</span>
 					</div>
 					<Autocomplete
-						:value="priority"
+						:value="selectedPriority"
 						@change="
 							(item) => {
 								if (!item) {
@@ -121,6 +102,9 @@ export default {
 		tempNewDescription(val) {
 			this.updateNewTicketTypeInput({ field: "description", value: val })
 		},
+		selectedPriority(val) {
+			this.updateNewTicketTypeInput({ field: "priority", value: val })
+		},
 	},
 	setup(props) {
 		const tempNewName = ref(props.name)
@@ -130,7 +114,7 @@ export default {
 		const saveTicketTypeNameAndDescription = inject(
 			"saveTicketTypeNameAndDescription"
 		)
-		let selectedPriority = ref("")
+		const selectedPriority = ref(props.priority)
 		return {
 			tempNewName,
 			tempNewDescription,
@@ -145,6 +129,7 @@ export default {
 			this.ticketTypeResource.setValue.submit({
 				name: this.tempNewName,
 				description: this.tempNewDescription,
+				priority: this.selectedPriority,
 			})
 			this.editMode = false
 		},
