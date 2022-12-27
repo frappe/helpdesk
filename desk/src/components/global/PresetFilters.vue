@@ -7,7 +7,11 @@
 				@click="toggleDropdown"
 			>
 				<div class="text-lg font-semibold">
-					{{ `${title} (${manager.totalCount})` }}
+					{{
+						`All ${ListTitle != null ? ListTitle : title} (${
+							manager.totalCount
+						})`
+					}}
 				</div>
 				<FeatherIcon
 					v-if="options.length > 0"
@@ -29,6 +33,7 @@ export default {
 		Dropdown,
 		FeatherIcon,
 	},
+	props: ["ListTitle"],
 	setup() {
 		const manager = inject("manager")
 		const renderOptions = inject("renderOptions")
