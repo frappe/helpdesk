@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<Dialog :options="{ title: 'Add New Team', size: 'sm' }" v-model="open">
+		<Dialog
+			:options="{ title: 'Add New Team', size: '3xl' }"
+			v-model="open"
+		>
 			<template #body-content>
 				<div class="space-y-4">
 					<div class="space-y-1">
@@ -11,7 +14,93 @@
 							v-model="teamName"
 						/>
 					</div>
-					<div>
+					<form
+						@submit.prevent="onSubmit"
+						class="flex flex-row space-x-2 items-end"
+					>
+						<div class="w-full space-y-1">
+							<div>
+								<span
+									class="block text-sm leading-4 text-gray-700"
+								>
+									Users
+								</span>
+							</div>
+							<Autocomplete
+								id="searchInput"
+								:value="selectedUser"
+								@change="
+									(item) => {
+										if (!item) {
+											return
+										}
+										selectedUser = item.value
+									}
+								"
+								:resourceOptions="{
+									method: 'frappe.client.get_list',
+									inputMap: (query) => {
+										return {
+											doctype: 'User',
+											pluck: 'name',
+											filters: [
+												['name', 'like', `%${query}%`],
+											],
+										}
+									},
+									responseMap: (res) => {
+										return res.map((d) => {
+											return {
+												label: d.name,
+												value: d.name,
+											}
+										})
+									},
+								}"
+							/>
+						</div>
+						<Button
+							appearance="primary"
+							type="submit"
+							icon="arrow-down"
+							@click="
+								() => {
+									addUserToList(selectedUser)
+									clearSearchInput()
+								}
+							"
+						>
+							Add
+						</Button>
+					</form>
+					<div
+						class="bg-gray-100 min-h-[100px] max-h-[300px] overflow-y-scroll px-2 rounded border flex flex-col"
+					>
+						<ul
+							v-if="selectedOptions.length"
+							class="flex flex-wrap gap-2 py-2"
+						>
+							<li
+								v-for="email in selectedOptions
+									.slice()
+									.reverse()"
+								class="flex items-center p-1 space-x-2 bg-white shadow rounded"
+								:key="email"
+								:title="email"
+							>
+								<span class="text-base ml-2">
+									{{ email }}
+								</span>
+								<button
+									class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
+									@click="removeUserFromList(email)"
+								>
+									<FeatherIcon class="w-3" name="x" />
+								</button>
+							</li>
+						</ul>
+					</div>
+					<!-- <div>
 						<label class="block text-sm leading-4 text-gray-700"
 							>Users</label
 						>
@@ -20,9 +109,9 @@
 							v-model="selectedOptions"
 							tag-placeholder="Add user"
 							placeholder="Search user"
-							label="email"
+							label="user"
 							:tag-position="top"
-							track-by="email"
+							track-by="user"
 							:tag-color="red"
 							:options="options"
 							:multiple="true"
@@ -32,7 +121,7 @@
 						<pre
 							class="language-json"
 						><code>{{ value  }}</code></pre>
-					</div>
+					</div> -->
 
 					<div class="flex float-right space-x-2">
 						<Button
@@ -48,6 +137,15 @@
 							>Add</Button
 						>
 					</div>
+					<div class="flex flex-row gap-2">
+						<Button appearance="secondary" @click="close()"
+							>Cancel</Button
+						>
+
+						<Button @click="removeAllUserFromList()">
+							Clear All
+						</Button>
+					</div>
 				</div>
 			</template>
 		</Dialog>
@@ -55,9 +153,10 @@
 </template>
 
 <script>
-import { Input, Dialog } from "frappe-ui"
+import { Input, Dialog, FeatherIcon } from "frappe-ui"
 import { computed, ref } from "vue"
 import VueMultiselect from "vue-multiselect"
+import Autocomplete from "@/components/global/Autocomplete.vue"
 
 export default {
 	name: "AddNewTeamDialog",
@@ -77,15 +176,21 @@ export default {
 				}
 			},
 		})
+		let selectedUser = ref("")
+		const searchInput = ref("")
 
 		return {
 			open,
+			selectedUser,
+			searchInput,
 		}
 	},
 	components: {
 		Dialog,
 		Input,
 		VueMultiselect,
+		Autocomplete,
+		FeatherIcon,
 	},
 	data() {
 		return {
@@ -98,7 +203,7 @@ export default {
 		addTeam() {
 			const inputParams = {
 				team_name: this.teamName,
-				users: this.options,
+				users: this.selectedOptions,
 			}
 			this.$resources.newTeam.submit({
 				doc: {
@@ -109,6 +214,8 @@ export default {
 		},
 		close() {
 			this.teamName = ""
+			this.selectedOptions = []
+			this.searchInput = ""
 			this.$emit("close")
 		},
 		addTag(newTag) {
@@ -120,9 +227,29 @@ export default {
 			}
 			this.selectedOptions.push(tag)
 			this.options.push(tag)
+
+			console.log(this.selectedOptions, "options")
 		},
 		users() {
 			this.$resources.getUser.fetch()
+		},
+		addUserToList(email) {
+			this.selectedOptions = [
+				...new Set([...this.selectedOptions, email]),
+			]
+		},
+		removeAllUserFromList() {
+			this.selectedOptions = []
+		},
+		removeUserFromList(email) {
+			this.selectedOptions = this.selectedOptions.filter(
+				(item) => item !== email
+			)
+		},
+		clearSearchInput() {
+			this.searchInput = ""
+
+			this.selectedUser = ""
 		},
 	},
 	resources: {
@@ -130,6 +257,7 @@ export default {
 			return {
 				method: "frappe.client.insert",
 				onSuccess: (doc) => {
+					console.log(doc, "document")
 					this.$router.push(`/frappedesk/teams`)
 				},
 			}
@@ -140,6 +268,9 @@ export default {
 				onSuccess: (res) => {
 					this.options.length = 0
 					res.map((value) => {
+						value["user"] = value["email"]
+						delete value["username"]
+						delete value["email"]
 						this.options.push(value)
 					})
 				},
@@ -149,9 +280,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="css" src="vue-multiselect/dist/vue-multiselect.css">
-.agentselect .multiselect__tags {
-	background-color: black;
-}
-</style>
