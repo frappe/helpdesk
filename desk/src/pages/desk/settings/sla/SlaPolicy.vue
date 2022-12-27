@@ -569,7 +569,7 @@ export default {
 		changeDefaultPriority(index) {
 			this.rules.forEach((rule, i) => {
 				if (i == index) {
-					rule.default = !rule.default
+					rule.default = true
 				} else {
 					rule.default = false
 				}
