@@ -233,12 +233,6 @@
 							</template>
 						</Dropdown>
 						<ErrorMessage :message="holidayListValidationError" />
-						<Input
-							label="Conditions"
-							type="textarea"
-							value=""
-							placeholder=""
-						/>
 					</div>
 				</div>
 				<div class="mt-5 flow-root">
