@@ -13,7 +13,9 @@
 			</div>
 			<div class="flex flex-row items-center group w-full">
 				<div class="sm:w-10/12">Policy Name</div>
-				<div class="sm:w-2/12" />
+				<div class="sm:w-2/12">
+					<div class="flex flex-row-reverse">Active</div>
+				</div>
 			</div>
 		</div>
 		<div
