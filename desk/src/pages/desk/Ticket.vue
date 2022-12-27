@@ -2,24 +2,35 @@
 	<div>
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
 			<div class="h-[60px] px-[20px] flex">
-				<router-link
-					:to="{ path: '/frappedesk/tickets' }"
-					class="text-[18px] text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
-					role="button"
-				>
-					<FeatherIcon name="arrow-left" class="w-[12px] h-[12px]" />
-					<div>Ticket #{{ ticket.name }}</div>
-					<Badge
-						:color="
-							['Resolved', 'Closed'].includes(ticket.status)
-								? 'gray'
-								: ticket.status == 'Open'
-								? 'red'
-								: 'yellow'
-						"
-						>{{ ticket.status }}</Badge
+				<div class="flex flex-row space-x-2 items-center">
+					<router-link
+						:to="{ path: '/frappedesk/tickets' }"
+						class="text-[18px] text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
+						role="button"
 					>
-				</router-link>
+						<FeatherIcon
+							name="arrow-left"
+							class="w-[12px] h-[12px]"
+						/>
+						<div>Ticket #{{ ticket.name }}</div>
+						<Badge
+							:color="
+								['Resolved', 'Closed'].includes(ticket.status)
+									? 'gray'
+									: ticket.status == 'Open'
+									? 'red'
+									: 'yellow'
+							"
+							>{{ ticket.status }}</Badge
+						>
+					</router-link>
+					<FeatherIcon
+						name="copy"
+						class="w-[24px] h-[24px] bg-gray-100 p-1 rounded-md stroke-gray-700"
+						role="button"
+						@click="copyTicketNameToClipboard"
+					/>
+				</div>
 			</div>
 			<div
 				v-if="ticket"
@@ -579,6 +590,28 @@ export default {
 		},
 	},
 	methods: {
+		async copyTicketNameToClipboard() {
+			if (window.isSecureContext) {
+				await navigator.clipboard.writeText(this.ticket.name)
+			} else {
+				const textArea = document.createElement("textarea")
+				textArea.value = this.ticket.name
+				document.body.appendChild(textArea)
+				textArea.focus()
+				textArea.select()
+				try {
+					document.execCommand("copy")
+				} catch (err) {
+					console.error("Unable to copy to clipboard", err)
+				}
+				document.body.removeChild(textArea)
+			}
+			this.$toast({
+				title: "Copied to clipboard",
+				customIcon: "circle-check",
+				appearance: "success",
+			})
+		},
 		startEditing(type = "reply") {
 			this.editing = true
 			this.editingType = type
