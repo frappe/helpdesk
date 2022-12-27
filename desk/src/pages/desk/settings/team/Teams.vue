@@ -12,7 +12,9 @@
 			<template #body="{ manager }">
 				<ListViewer
 					:options="{
+						name:'Teams',
 						base: '12',
+						listTitle: 'Teams',
 						presetFilters: true,
 						fields: {
 							team_name: {
@@ -32,6 +34,15 @@
 						}
 					"
 				>
+					<template #field-team_name="{ row }">
+						<router-link
+							:to="{
+								path: `/frappedesk/settings/team/${row.name}`,
+							}"
+						>
+							{{ `${row.name}` }}
+						</router-link>
+					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
 							<Button

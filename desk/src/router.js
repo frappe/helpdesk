@@ -180,6 +180,13 @@ const routes = [
 							import("@/pages/desk/settings/team/Teams.vue"),
 					},
 					{
+						path: "team/:teamId",
+						name: "Team",
+						component: () =>
+							import("@/pages/desk/settings/team/Team.vue"),
+						props: true,
+					},
+					{
 						path:"ticket_types",
 						name:"TicketTypes",
 						component:()=>
