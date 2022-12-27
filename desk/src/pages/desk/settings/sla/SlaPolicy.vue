@@ -619,6 +619,11 @@ export default {
 						if (this.slaPolicyName != this.tempSlaPolicyName) {
 							this.rename()
 						}
+						this.$toast({
+							title: "Policy updated",
+							customIcon: "circle-check",
+							appearance: "success",
+						})
 					})
 			}
 		},
