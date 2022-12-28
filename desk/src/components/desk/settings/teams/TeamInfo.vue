@@ -92,14 +92,15 @@ export default {
 			}
 		},
 		usersValue() {
-			let value = []
+			let value = {}
+			let options = []
 			this.teamDoc.users?.map((res) => {
-				res["user"] = res["user"]
-				value.push(res)
+				value["user"] = res["user"]
+				options.push(value)
 			})
-			console.log(value, "value")
+			console.log(options, "value")
 
-			return value
+			return options
 		},
 	},
 	deactivated() {
@@ -140,10 +141,11 @@ export default {
 		save() {
 			this.updatingValues = true
 			const newValues = this.values
+			const newUsers = this.usersValue
 			this.$resources.user.setValue
 				.submit({
 					team_name: newValues.title,
-					users: newValues.users,
+					users: usersValue,
 				})
 				.then(() => {
 					this.$resources.ticketType.setValue.submit({

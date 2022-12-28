@@ -15,7 +15,7 @@
 			</div>
 			<form
 				@submit.prevent="onSubmit"
-				class="flex flex-row space-x-2 items-center"
+				class="flex flex-row space-x-2 items-end"
 			>
 				<div class="w-full space-y-1">
 					<div>
@@ -39,8 +39,10 @@
 							inputMap: (query) => {
 								return {
 									doctype: 'User',
-									pluck: 'name',
-									filters: [['name', 'like', `%${query}%`]],
+									fields: ['name', 'username', 'email'],
+									filters: {
+										name: ['like', `%${query}%`],
+									},
 								}
 							},
 							responseMap: (res) => {
@@ -82,7 +84,7 @@
 						:title="email"
 					>
 						<span class="text-base ml-2">
-							{{ email }}
+							{{ email.user ? email.user : email }}
 						</span>
 						<button
 							class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
@@ -122,35 +124,57 @@
 <script>
 import VueMultiselect from "vue-multiselect"
 import Autocomplete from "@/components/global/Autocomplete.vue"
+import { Input, FeatherIcon } from "frappe-ui"
+import { ref, inject } from "vue"
 export default {
 	name: "TeamTitleAndDescription",
 	components: {
 		VueMultiselect,
 		Autocomplete,
+		FeatherIcon,
 	},
-	props: ["name", "users", "editable", "ticketTypeResource"],
-	data(props) {
+
+	props: ["name", "users", "editable", "teamResource"],
+	mounted() {
+		this.saveTeamTitleAndDescription = this.save
+	},
+	watch: {
+		teamName(val) {
+			this.updateNewTeamInput({ field: "team_name", value: val })
+		},
+		selectedOptions(val) {
+			this.updateNewTeamInput({ field: "users", value: val })
+		},
+	},
+	setup(props) {
+		const teamName = ref(props.name)
+		const searchInput = ref("")
+		const selectedUser = ref("")
+		const updateNewTeamInput = inject("updateNewTeamInput")
+		const saveTeamTitleAndDescription = inject(
+			"saveTeamTitleAndDescription"
+		)
+		const selectedOptions = ref(props.users)
+		const options = ref([])
 		return {
-			teamName: "",
-			searchInput: "",
-			selectedUser: "",
-			selectedOptions: props.users,
-			options: [],
+			teamName,
+			searchInput,
+			selectedUser,
+			updateNewTeamInput,
+			saveTeamTitleAndDescription,
+			selectedOptions,
+			options,
 		}
 	},
 
 	methods: {
-		addTag(newTag) {
-			const tag = {
-				username: newTag,
-				email:
-					newTag.substring(0, 2) +
-					Math.floor(Math.random() * 10000000),
-			}
-			this.selectedOptions.push(tag)
-			this.options.push(tag)
-
-			console.log(this.options, "options")
+		save() {
+			console.log(this.selectedOptions, "opsel")
+			this.teamResource.setValue.submit({
+				team_name: this.teamName,
+				users: this.selectedOptions,
+			})
+			this.editMode = false
 		},
 		users() {
 			this.$resources.getUser.fetch()
@@ -180,7 +204,6 @@ export default {
 			return {
 				method: "frappedesk.api.agent.get_agent_user",
 				onSuccess: (res) => {
-					this.options.length = 0
 					res.map((value) => {
 						value["user"] = value["email"]
 						delete value["username"]
@@ -194,39 +217,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="css" src="vue-multiselect/dist/vue-multiselect.css">
-.multiselect__tag {
-	background: grey;
-}
-
-.multiselect__option--highlight {
-	background: grey;
-}
-
-.multiselect__option--highlight:after {
-	background: grey;
-}
-
-.multiselect__option--selected.multiselect__option--highlight {
-	background: grey;
-}
-
-.multiselect__option--selected.multiselect__option--highlight:after {
-	background: #798b91;
-}
-
-.multiselect__tag-icon:hover {
-	background: grey;
-}
-
-.multiselect__input,
-.multiselect__single {
-	padding: 0 0 0 0;
-}
-
-.multiselect__placeholder {
-	margin-left: 4px;
-	color: #999999;
-}
-</style>
