@@ -1,3 +1,4 @@
+2
 <template>
 	<div class="flex flex-col space-y-[8px]">
 		<div class="text-[12px] text-gray-600">
@@ -190,13 +191,30 @@ export default {
 			if (!(this.editable || this.fieldMetaInfo)) return
 			switch (this.fieldMetaInfo?.fieldtype) {
 				case "Link":
+					let baseFilters = []
+					if (this.fieldname == "_assign") {
+						// adding agent_group and is_active filters to get only active agents of the group
+						baseFilters.push(["Agent", "is_active", "=", 1])
+						if (this.ticket.agent_group) {
+							baseFilters.push([
+								"Agent Group Item",
+								"agent_group",
+								"=",
+								this.ticket.agent_group,
+							])
+						}
+					}
 					return {
 						method: "frappe.client.get_list",
 						inputMap: (query) => {
+							const filters = [
+								...baseFilters,
+								["name", "like", `%${query}%`],
+							]
 							return {
 								doctype: this.fieldMetaInfo?.options,
 								pluck: "name",
-								filters: [["name", "like", `%${query}%`]],
+								filters,
 							}
 						},
 						responseMap: (res) => {
