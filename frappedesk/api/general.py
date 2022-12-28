@@ -140,6 +140,6 @@ def save_filter_preset(doctype, is_global, title, filters):
 
 @frappe.whitelist()
 def get_session_user():
-    user = frappe.session.user
+    user = frappe.get_user().doc.full_name
 
     return user
