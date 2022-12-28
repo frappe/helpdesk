@@ -37,8 +37,8 @@ export default {
 				text: "Tickets by Type",
 				textAlign: "left",
 			},
-			tooltip:{
-				trigger:'axis'
+			tooltip: {
+				trigger: "axis",
 			},
 			yAxis: {
 				type: "category",

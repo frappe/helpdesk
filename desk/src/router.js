@@ -48,9 +48,9 @@ const routes = [
 				},
 			},
 			{
-				path:"dashboard",
-				name:"Dashboard",
-				component:() => import("@/pages/desk/Dashboard.vue")
+				path: "dashboard",
+				name: "Dashboard",
+				component: () => import("@/pages/desk/Dashboard.vue"),
 			},
 			{
 				path: "tickets",
