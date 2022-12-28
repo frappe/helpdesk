@@ -55,6 +55,7 @@ import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.v
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
 import SlaSummaryCards from "@/components/desk/dashboard/SlaSummaryCards.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { onMounted, ref } from "vue"
 export default {
 	name: "Dashboard",
 	components: {
@@ -67,14 +68,27 @@ export default {
 		SlaSummaryCards,
 		CustomIcons,
 	},
+
 	data() {
-		let date = {}
 		let fromDate = ""
 		let toDate = ""
+
 		return {
-			date,
 			fromDate,
 			toDate,
+		}
+	},
+
+	setup() {
+		const date = ref()
+		onMounted(() => {
+			const startDate = new Date().setDate(new Date().getDate() - 7)
+			const endDate = new Date()
+			date.value = [startDate, endDate]
+		})
+
+		return {
+			date,
 		}
 	},
 	computed: {
@@ -116,7 +130,6 @@ export default {
 	beforeMount() {
 		const startDate = new Date().setDate(new Date().getDate() - 7)
 		const endDate = new Date()
-		this.date.value = [startDate, endDate]
 		this.fromDate = startDate
 		this.fromDate = new Date(startDate).toLocaleDateString("en-IN", {
 			year: "numeric",
