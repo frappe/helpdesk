@@ -6,22 +6,28 @@
 	"doctype": "DocType",
 	"editable_grid": 1,
 	"engine": "InnoDB",
-	"field_order": ["custom_fields"],
+	"field_order": ["custom_fields", "conditional_select_fields"],
 	"fields": [
 		{
 			"fieldname": "custom_fields",
 			"fieldtype": "Table",
 			"label": "Custom Fields",
 			"options": "Ticket Custom Field Item"
+		},
+		{
+			"fieldname": "conditional_select_fields",
+			"fieldtype": "Table",
+			"label": "Conditional Select Fields",
+			"options": "Ticket Conditional Select Fields"
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"issingle": 1,
 	"links": [],
-	"modified": "2022-11-23 00:41:14.736494",
+	"modified": "2022-12-28 21:00:35.773424",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
-	"name": "Ticket Custom Fields Config",
+	"name": "Ticket Fields Config",
 	"owner": "Administrator",
 	"permissions": [
 		{

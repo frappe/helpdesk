@@ -1,0 +1,46 @@
+{
+	"actions": [],
+	"autoname": "autoincrement",
+	"creation": "2022-12-28 20:58:23.254433",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": ["fieldname", "condition", "options"],
+	"fields": [
+		{
+			"fieldname": "fieldname",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Fieldname",
+			"width": "2"
+		},
+		{
+			"fieldname": "condition",
+			"fieldtype": "Code",
+			"in_list_view": 1,
+			"label": "Condition",
+			"options": "Python",
+			"width": "4"
+		},
+		{
+			"fieldname": "options",
+			"fieldtype": "Long Text",
+			"in_list_view": 1,
+			"label": "Options",
+			"width": "3"
+		}
+	],
+	"index_web_pages_for_search": 1,
+	"istable": 1,
+	"links": [],
+	"modified": "2022-12-28 21:29:36.620985",
+	"modified_by": "Administrator",
+	"module": "FrappeDesk",
+	"name": "Ticket Conditional Select Fields",
+	"naming_rule": "Autoincrement",
+	"owner": "Administrator",
+	"permissions": [],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": []
+}
