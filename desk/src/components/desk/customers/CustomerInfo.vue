@@ -225,9 +225,11 @@
 		<NewContactDialog
 			v-model="showNewContactDialog"
 			:fdCustomer="customer"
-			@contact-created="
+			@contactCreated="
 				() => {
 					showNewContactDialog = false
+				
+					$router.go()
 				}
 			"
 		/>
@@ -238,6 +240,7 @@
 			@ticket-created="
 				() => {
 					showNewTicketDialog = false
+					$router.go()
 				}
 			"
 		/>
@@ -350,6 +353,7 @@ export default {
 				},
 			})
 		},
+
 		updateCustomer() {
 			this.$resources.customer.setValue.submit({
 				customer_name: this.customer,

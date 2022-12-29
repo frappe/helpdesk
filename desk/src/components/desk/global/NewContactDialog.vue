@@ -84,7 +84,7 @@
 						<Button
 							:loading="this.$resources.createContact.loading"
 							appearance="primary"
-							@click="createContact(), reload()"
+							@click="createContact()"
 							>Create</Button
 						>
 					</div>
@@ -165,13 +165,14 @@ export default {
 		createContact() {
 			return {
 				method: "frappe.client.insert",
-				onSuccess(data) {
+				onSuccess: (data) => {
 					this.emailId = ""
 					this.firstName = ""
 					this.lastName = ""
 					this.phone = ""
 					this.customer = ""
 					this.$emit("contactCreated", data)
+
 				},
 			}
 		},
@@ -224,9 +225,6 @@ export default {
 			error += this.validateFirstName(this.firstName)
 			error += this.validatePhone(this.phone)
 			return error
-		},
-		reload() {
-			window.location.reload()
 		},
 		validateEmailInput(value) {
 			function existingContactEmails(contacts) {
