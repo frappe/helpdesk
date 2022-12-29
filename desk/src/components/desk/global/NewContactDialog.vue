@@ -84,7 +84,7 @@
 						<Button
 							:loading="this.$resources.createContact.loading"
 							appearance="primary"
-							@click="createContact()"
+							@click="createContact(), reload()"
 							>Create</Button
 						>
 					</div>
@@ -224,6 +224,9 @@ export default {
 			error += this.validateFirstName(this.firstName)
 			error += this.validatePhone(this.phone)
 			return error
+		},
+		reload() {
+			window.location.reload()
 		},
 		validateEmailInput(value) {
 			function existingContactEmails(contacts) {
