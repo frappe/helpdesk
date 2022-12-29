@@ -44,8 +44,13 @@ const routes = [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/tickets" }
+					return { path: "/frappedesk/dashboard" }
 				},
+			},
+			{
+				path: "dashboard",
+				name: "Dashboard",
+				component: () => import("@/pages/desk/Dashboard.vue"),
 			},
 			{
 				path: "tickets",

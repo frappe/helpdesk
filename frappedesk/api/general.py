@@ -99,40 +99,41 @@ def get_filtered_select_field_options(doctype, fieldname, query):
 
 @frappe.whitelist()
 def save_filter_preset(doctype, is_global, title, filters):
-    """_summary_
+	"""_summary_
 
-    Args:
-                    doctype (_type_): Doctype name
-                    name (_type_): Name of the preset filter
-                    filters (_type_): Filters
-                    sort_by (_type_): Sort by
-                    sort_order (_type_): Sort order
+	Args:
+	                doctype (_type_): Doctype name
+	                name (_type_): Name of the preset filter
+	                filters (_type_): Filters
+	                sort_by (_type_): Sort by
+	                sort_order (_type_): Sort order
 
-    Returns:
-                    _type_:
-    """
+	Returns:
+	                _type_:
+	"""
 
-    fd_preset_filter_items = []
-    for filter in filters:
-        print(f"label : {filter['label']}")
-        fd_preset_filter_items.append(
-            {
-                "doctype": "FD Preset Filter Item",
-                "label": filter["label"],
-                "fieldname": filter["fieldname"],
-                "filter_type": filter["filter_type"],
-                "value": filter["value"],
-            }
-        )
+	fd_preset_filter_items = []
+	for filter in filters:
+		print(f"label : {filter['label']}")
+		fd_preset_filter_items.append(
+			{
+				"doctype": "FD Preset Filter Item",
+				"label": filter["label"],
+				"fieldname": filter["fieldname"],
+				"filter_type": filter["filter_type"],
+				"value": filter["value"],
+			}
+		)
 
-    preset_filter = frappe.get_doc(
-        {
-            "doctype": "FD Preset Filter",
-            "reference_doctype": doctype,
-            "type": "Global" if is_global else "User",
-            "title": title,
-            "filters": fd_preset_filter_items,
-        }
-    )
-    preset_filter.save(ignore_permissions=True)
-    return preset_filter.name
+	preset_filter = frappe.get_doc(
+		{
+			"doctype": "FD Preset Filter",
+			"reference_doctype": doctype,
+			"type": "Global" if is_global else "User",
+			"title": title,
+			"filters": fd_preset_filter_items,
+		}
+	)
+	preset_filter.save(ignore_permissions=True)
+	return preset_filter.name
+

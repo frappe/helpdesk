@@ -58,6 +58,7 @@
 		"feedback_submitted",
 		"satisfaction_rating",
 		"customer_feedback",
+		"feedback_status",
 		"custom_fields_section"
 	],
 	"fields": [
@@ -412,6 +413,12 @@
 			"fieldname": "custom_fields_section",
 			"fieldtype": "Section Break",
 			"label": "Custom Fields"
+		},
+		{
+			"fieldname": "feedback_status",
+			"fieldtype": "Select",
+			"label": "Feedback Status",
+			"options": "\nPositive\nNeutral\nNegative"
 		}
 	],
 	"icon": "fa fa-issue",

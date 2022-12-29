@@ -21,7 +21,7 @@
 						{{
 							getFormatedDate(
 								ticket.response_by,
-								"ddd, MMM DD, YYYY HH:mm"
+								"ddd, MMM DD, HH:mm"
 							)
 						}}
 					</div>
@@ -46,7 +46,7 @@
 						{{
 							getFormatedDate(
 								ticket.resolution_by,
-								"ddd, MMM DD, YYYY HH:mm"
+								"ddd, MMM DD, HH:mm"
 							)
 						}}
 					</div>
