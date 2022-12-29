@@ -6,25 +6,25 @@
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
-			<TicketStatusCards />
-			<div class="grid grid-cols-2 ml-[18px]">
+			<TicketStatusCards class="mx-4 my-4" />
+			<div class="grid grid-cols-2 gap-4 w-full px-[18px]">
 				<TicketTrendsChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<TicketSummaryChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<TicketTypeChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<CustomerSatisfactionChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
@@ -125,4 +125,8 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style>
+.chart-card {
+	@apply max-h-[400px] min-w-[535px] rounded-md border-gray-200 border shadow-sm p-5;
+}
+</style>
