@@ -37,7 +37,6 @@
 <script>
 import TicketStatusCards from "@/components/desk/dashboard/TicketStatusCards.vue"
 import TicketTrendsChart from "@/components/desk/dashboard/TicketTrendsChart.vue"
-import "@vuepic/vue-datepicker/dist/main.css"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
 import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
