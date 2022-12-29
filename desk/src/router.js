@@ -187,18 +187,20 @@ const routes = [
 						props: true,
 					},
 					{
-						path:"ticket_types",
-						name:"TicketTypes",
-						component:()=>
+						path: "ticket_types",
+						name: "TicketTypes",
+						component: () =>
 							import(
 								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
-							)
+							),
 					},
 					{
 						path: "ticket_type/:ticketTypeId",
 						name: "TicketType",
 						component: () =>
-							import("@/pages/desk/settings/ticket_type/TicketType.vue"),
+							import(
+								"@/pages/desk/settings/ticket_type/TicketType.vue"
+							),
 						props: true,
 					},
 					{

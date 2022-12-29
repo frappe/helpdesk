@@ -12,7 +12,7 @@
 			<template #body="{ manager }">
 				<ListViewer
 					:options="{
-						name:'Teams',
+						name: 'Teams',
 						base: '12',
 						listTitle: 'Teams',
 						presetFilters: true,
