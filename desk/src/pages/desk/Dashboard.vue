@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col h-screen">
-		<div class="flex border-b h-[52px] px-[24px] shrink-0">
-			<div class="grow my-auto ml-2.5 text-[16px] text-gray-900">
+		<div class="flex border-b h-[52px] px-[18px] shrink-0">
+			<div class="grow my-auto text-[16px] text-gray-900">
 				Welcome, {{ user.agent ? user.agent.agent_name : user.user }}
 			</div>
 		</div>
@@ -18,7 +18,7 @@
 					/>
 				</div>
 			</div>
-			<div class="grid grid-cols-2 ml-8">
+			<div class="grid grid-cols-2 ml-[18px]">
 				<TicketTrendsChart
 					class="min-w-[35rem]"
 					:fromDate="fromDate"
