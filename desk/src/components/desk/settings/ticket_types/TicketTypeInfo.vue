@@ -90,7 +90,6 @@ export default {
 			}
 		},
 		values() {
-			console.log(this.ticketTypeDoc?.priority, "priority")
 			// if (this.updatingValues) {
 			// 	return this.values || null
 			// }

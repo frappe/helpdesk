@@ -32,7 +32,7 @@
 		<div
 			class="flex flex-row space-x-[24px] h-full border-t px-[16px] py-[22px]"
 		>
-			<TeamTitleAndDescription
+			<TeamTitleAndUsers
 				class="grow"
 				:name="values?.teamName"
 				:users="usersValue"
@@ -45,7 +45,7 @@
 <script>
 import { ref, provide } from "vue"
 import { FeatherIcon, Input } from "frappe-ui"
-import TeamTitleAndDescription from "@/components/desk/settings/teams/TeamTitleAndDescription.vue"
+import TeamTitleAndUsers from "@/components/desk/settings/teams/TeamTitleAndUsers.vue"
 
 export default {
 	name: "TeamInfo",
@@ -53,7 +53,7 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
-		TeamTitleAndDescription,
+		TeamTitleAndUsers,
 	},
 	setup(props) {
 		const editingTitle = ref(false)
@@ -63,8 +63,8 @@ export default {
 		})
 		provide("updateNewTeamInput", updateNewTeamInput)
 		provide("newTeamTempValues", newTeamTempValues)
-		const saveTeamTitleAndDescription = ref(() => {})
-		provide("saveTeamTitleAndDescription", saveTeamTitleAndDescription)
+		const saveTeamTitleAndUsers = ref(() => {})
+		provide("saveTeamTitleAndUsers", saveTeamTitleAndUsers)
 		const tempTeamTitle = ref("")
 		const updatingValues = ref(false)
 		const editMode = ref(!props.teamId)
@@ -76,7 +76,7 @@ export default {
 			updatingValues,
 			editMode,
 			newTeamTempValues,
-			saveTeamTitleAndDescription,
+			saveTeamTitleAndUsers,
 		}
 	},
 	computed: {
@@ -92,13 +92,13 @@ export default {
 			}
 		},
 		usersValue() {
-			let value = {}
 			let options = []
 			this.teamDoc.users?.map((res) => {
+				let value = {}
 				value["user"] = res["user"]
+
 				options.push(value)
 			})
-			console.log(options, "value")
 
 			return options
 		},
@@ -145,10 +145,10 @@ export default {
 			this.$resources.user.setValue
 				.submit({
 					team_name: newValues.title,
-					users: usersValue,
+					users: newUsers,
 				})
 				.then(() => {
-					this.$resources.ticketType.setValue.submit({
+					this.$resources.team.setValue.submit({
 						team_name: this.tempTeamTitle,
 					})
 				})

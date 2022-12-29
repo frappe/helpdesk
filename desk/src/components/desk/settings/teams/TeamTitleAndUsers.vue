@@ -78,13 +78,12 @@
 					class="flex flex-wrap gap-2 py-2"
 				>
 					<li
-						v-for="email in selectedOptions.slice().reverse()"
+						v-for="email in selectedOptions"
 						class="flex items-center p-1 space-x-2 bg-white shadow rounded"
-						:key="email"
-						:title="email"
+						:key="email.user"
 					>
 						<span class="text-base ml-2">
-							{{ email.user ? email.user : email }}
+							{{ email.user }}
 						</span>
 						<button
 							class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
@@ -95,55 +94,34 @@
 					</li>
 				</ul>
 			</div>
-			<!-- <div>
-				<label class="block text-sm leading-4 text-gray-700"
-					>Users</label
-				>
-				<VueMultiselect
-					class="agentselect"
-					v-model="selectedOptions"
-					tag-placeholder="Add user"
-					placeholder="Search user"
-					label="user"
-					:tag-position="top"
-					:max-height="300"
-					:color="grey"
-					track-by="user"
-					:tag-color="red"
-					:options="options"
-					:multiple="true"
-					:taggable="true"
-					@tag="addTag"
-				></VueMultiselect>
-				<pre class="language-json"><code>{{ value  }}</code></pre>
-			</div> -->
 		</div>
 	</div>
 </template>
 
 <script>
-import VueMultiselect from "vue-multiselect"
 import Autocomplete from "@/components/global/Autocomplete.vue"
 import { Input, FeatherIcon } from "frappe-ui"
 import { ref, inject } from "vue"
 export default {
-	name: "TeamTitleAndDescription",
+	name: "TeamTitleAndUsers",
 	components: {
-		VueMultiselect,
 		Autocomplete,
 		FeatherIcon,
 	},
 
 	props: ["name", "users", "editable", "teamResource"],
 	mounted() {
-		this.saveTeamTitleAndDescription = this.save
+		this.saveTeamTitleAndUsers = this.save
 	},
 	watch: {
 		teamName(val) {
 			this.updateNewTeamInput({ field: "team_name", value: val })
 		},
 		selectedOptions(val) {
-			this.updateNewTeamInput({ field: "users", value: val })
+			this.updateNewTeamInput({
+				field: "users",
+				value: this.selectedOptions,
+			})
 		},
 	},
 	setup(props) {
@@ -151,9 +129,7 @@ export default {
 		const searchInput = ref("")
 		const selectedUser = ref("")
 		const updateNewTeamInput = inject("updateNewTeamInput")
-		const saveTeamTitleAndDescription = inject(
-			"saveTeamTitleAndDescription"
-		)
+		const saveTeamTitleAndUsers = inject("saveTeamTitleAndUsers")
 		const selectedOptions = ref(props.users)
 		const options = ref([])
 		return {
@@ -161,7 +137,7 @@ export default {
 			searchInput,
 			selectedUser,
 			updateNewTeamInput,
-			saveTeamTitleAndDescription,
+			saveTeamTitleAndUsers,
 			selectedOptions,
 			options,
 		}
@@ -169,23 +145,18 @@ export default {
 
 	methods: {
 		save() {
-			console.log(this.selectedOptions, "opsel")
 			this.teamResource.setValue.submit({
 				team_name: this.teamName,
 				users: this.selectedOptions,
 			})
-			this.editMode = false
 		},
 		users() {
 			this.$resources.getUser.fetch()
 		},
 		addUserToList(email) {
-			this.selectedOptions = [
-				...new Set([...this.selectedOptions, email]),
-			]
-		},
-		removeAllUserFromList() {
-			this.selectedOptions = []
+			let user = {}
+			user["user"] = email
+			this.selectedOptions = [...new Set([...this.selectedOptions, user])]
 		},
 		removeUserFromList(email) {
 			this.selectedOptions = this.selectedOptions.filter(

@@ -155,7 +155,6 @@
 <script>
 import { Input, Dialog, FeatherIcon } from "frappe-ui"
 import { computed, ref } from "vue"
-import VueMultiselect from "vue-multiselect"
 import Autocomplete from "@/components/global/Autocomplete.vue"
 
 export default {
@@ -188,7 +187,6 @@ export default {
 	components: {
 		Dialog,
 		Input,
-		VueMultiselect,
 		Autocomplete,
 		FeatherIcon,
 	},
