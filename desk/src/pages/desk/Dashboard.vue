@@ -2,7 +2,7 @@
 	<div class="flex flex-col h-screen">
 		<div class="flex border-b h-[52px] px-[24px] shrink-0">
 			<div class="grow my-auto ml-2.5 text-[16px] text-gray-900">
-				Welcome, {{ user }}
+				Welcome, {{ user.agent ? user.agent.agent_name : user.user }}
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
@@ -55,7 +55,7 @@ import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.v
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
 import SlaSummaryCards from "@/components/desk/dashboard/SlaSummaryCards.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, inject } from "vue"
 export default {
 	name: "Dashboard",
 	components: {
@@ -87,14 +87,12 @@ export default {
 			date.value = [startDate, endDate]
 		})
 
+		const user = inject("user")
+
 		return {
 			date,
+			user,
 		}
-	},
-	computed: {
-		user() {
-			return this.$resources.getSessionUser.data
-		},
 	},
 	methods: {
 		handleDate(modelData) {
@@ -117,14 +115,6 @@ export default {
 				}
 			)
 			this.toDate = this.toDate.split("/").reverse().join("-")
-		},
-	},
-	resources: {
-		getSessionUser() {
-			return {
-				method: "frappedesk.api.general.get_session_user",
-				auto: true,
-			}
 		},
 	},
 	beforeMount() {
