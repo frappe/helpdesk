@@ -8,14 +8,24 @@
 							<Input
 								label="Customer Name"
 								type="text"
-								v-model="customer"
+								:value="customerDoc.customer_name"
+								@change="
+									(val) => {
+										values.customerName = val
+									}
+								"
 							/>
 						</div>
 						<div class="max-w-max">
 							<Input
 								label="Domain"
 								type="text"
-								v-model="values.domain"
+								:value="customerDoc.domain"
+								@change="
+									(val) => {
+										values.domain = val
+									}
+								"
 							/>
 						</div>
 					</div>
@@ -228,7 +238,6 @@
 			@contactCreated="
 				() => {
 					showNewContactDialog = false
-				
 					$router.go()
 				}
 			"
@@ -249,7 +258,6 @@
 
 <script>
 import { Dropdown, Avatar } from "frappe-ui"
-import { ref, toRaw } from "vue"
 import { Input } from "frappe-ui"
 import AccordionCustomer from "@/components/global/AccordionCustomer.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
@@ -272,6 +280,10 @@ export default {
 			editingTitle: false,
 			showNewContactDialog: false,
 			showNewTicketDialog: false,
+			values: {
+				customerName: "",
+				domain: "",
+			},
 		}
 	},
 	computed: {
@@ -288,14 +300,12 @@ export default {
 			return this.$resources.contact.data
 		},
 		customerDoc() {
-			return this.$resources.customer.doc || null
-		},
-		values() {
-			return {
-				customerName: this.customerDoc?.customer_name || null,
-				domain: this.customerDoc?.domain || null,
-				mobile: this.contactDoc?.email_id || null,
+			if (this.$resources.customer.doc) {
+				this.values.customerName =
+					this.$resources.customer.doc.customer_name
+				this.values.domain = this.$resources.customer.doc.domain
 			}
+			return this.$resources.customer.doc || null
 		},
 	},
 	resources: {
@@ -304,6 +314,25 @@ export default {
 				type: "document",
 				doctype: "FD Customer",
 				name: this.customer,
+				setValue: {
+					onSuccess() {
+						this.$toast({
+							title: "Customer updated successfully.",
+							appearance: "success",
+							customIcon: "circle-check",
+						})
+					},
+				},
+			}
+		},
+		renameCustomerDoc() {
+			return {
+				method: "frappe.client.rename_doc",
+				onSuccess: (res) => {
+					this.$router.push({
+						path: `/frappedesk/customers/${res}`,
+					})
+				},
 			}
 		},
 		contact() {
@@ -332,6 +361,9 @@ export default {
 		},
 	},
 	methods: {
+		validateInputs() {
+			return !(this.values.customerName == "" || this.values.domain == "")
+		},
 		deleteCustomer() {
 			return this.$resources.customer.delete.submit(null, {
 				onSuccess: () => {
@@ -353,12 +385,26 @@ export default {
 				},
 			})
 		},
-
 		updateCustomer() {
-			this.$resources.customer.setValue.submit({
-				customer_name: this.customer,
-				domain: this.values.domain,
-			})
+			if (this.validateInputs()) {
+				this.$resources.customer.setValue.submit({
+					domain: this.values.domain,
+				})
+				if (this.values.customerName !== this.customer) {
+					this.$resources.renameCustomerDoc.submit({
+						doctype: "FD Customer",
+						old_name: this.customer,
+						new_name: this.values.customerName,
+					})
+				}
+			} else {
+				console.log(this.values)
+				this.$toast({
+					title: "Please fill all the fields",
+					customIcon: "circle-fail",
+					appearance: "danger",
+				})
+			}
 		},
 		updateUrlSlug() {
 			let doc = this.customer
