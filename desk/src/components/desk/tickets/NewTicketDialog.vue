@@ -48,6 +48,50 @@
 						/>
 						<ErrorMessage :message="contactValidationError" />
 					</div>
+					<div class="w-full space-y-1">
+						<div>
+							<span
+								class="block mb-2 text-sm leading-4 text-gray-700"
+							>
+								Customer
+							</span>
+						</div>
+						<Autocomplete
+							:value="
+								fdCustomer != null
+									? fdCustomer
+									: selectedCustomer
+							"
+							@change="
+								(item) => {
+									if (!item) {
+										return
+									}
+									selectedCustomer = item.value
+								}
+							"
+							:resourceOptions="{
+								method: 'frappe.client.get_list',
+								inputMap: (query) => {
+									return {
+										doctype: 'FD Customer',
+										pluck: 'name',
+										filters: [
+											['name', 'like', `%${query}%`],
+										],
+									}
+								},
+								responseMap: (res) => {
+									return res.map((d) => {
+										return {
+											label: d.name,
+											value: d.name,
+										}
+									})
+								},
+							}"
+						/>
+					</div>
 					<div class="space-y-1">
 						<div>
 							<span
@@ -100,13 +144,16 @@ import { ErrorMessage, TextEditor } from "frappe-ui"
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import Autocomplete from "@/components/global/Autocomplete.vue"
 import { inject, ref, computed } from "vue"
-
 export default {
 	name: "NewTicketDialog",
 	props: {
 		modelValue: {
 			type: Boolean,
 			required: true,
+		},
+		fdCustomer: {
+			type: String,
+			default: null,
 		},
 	},
 	components: {
@@ -117,13 +164,11 @@ export default {
 	},
 	setup(props, { emit }) {
 		const isCreating = ref(false)
-
 		const selectedContact = ref("")
-
 		const contactValidationError = ref("")
 		const subjectValidationError = ref("")
 		const descriptionValidationError = ref("")
-
+		const selectedCustomer = ref("")
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
@@ -133,9 +178,7 @@ export default {
 				}
 			},
 		})
-
 		const ticketController = inject("ticketController")
-
 		return {
 			isCreating,
 			selectedContact,
@@ -144,6 +187,7 @@ export default {
 			descriptionValidationError,
 			open,
 			ticketController,
+			selectedCustomer,
 		}
 	},
 	data() {
@@ -214,13 +258,16 @@ export default {
 			if (this.validateInputs()) {
 				return
 			}
-
 			this.isCreating = true
 			this.ticketController
 				.new("ticket", {
 					contact: this.selectedContact,
 					subject: this.subject,
 					description: this.descriptionContent,
+					customer:
+						this.fdCustomer != null
+							? this.fdCustomer
+							: this.selectedCustomer,
 				})
 				.then(() => {
 					this.isCreating = false
