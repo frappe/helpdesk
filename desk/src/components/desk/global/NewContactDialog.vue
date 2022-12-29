@@ -172,7 +172,6 @@ export default {
 					this.phone = ""
 					this.customer = ""
 					this.$emit("contactCreated", data)
-
 				},
 			}
 		},
