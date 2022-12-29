@@ -7,17 +7,6 @@
 		</div>
 		<div class="overflow-y-scroll h-full">
 			<TicketStatusCards />
-			<div class="mb-[20px] flex flex-row-reverse">
-				<div class="w-48 mr-5">
-					<Datepicker
-						v-model="date"
-						range
-						@update:modelValue="handleDate"
-						:enable-time-picker="false"
-						format="MMM dd"
-					/>
-				</div>
-			</div>
 			<div class="grid grid-cols-2 ml-[18px]">
 				<TicketTrendsChart
 					class="min-w-[35rem]"
@@ -48,7 +37,6 @@
 <script>
 import TicketStatusCards from "@/components/desk/dashboard/TicketStatusCards.vue"
 import TicketTrendsChart from "@/components/desk/dashboard/TicketTrendsChart.vue"
-import Datepicker from "@vuepic/vue-datepicker"
 import "@vuepic/vue-datepicker/dist/main.css"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
 import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
@@ -61,7 +49,6 @@ export default {
 	components: {
 		TicketStatusCards,
 		TicketTrendsChart,
-		Datepicker,
 		TicketTypeChart,
 		TicketSummaryChart,
 		CustomerSatisfactionChart,
