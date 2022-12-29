@@ -35,6 +35,51 @@
 						/>
 						<ErrorMessage :message="phoneValidationError" />
 					</div>
+					<div class="w-full space-y-1">
+						<div>
+							<span
+								class="block mb-2 text-sm leading-4 text-gray-700"
+							>
+								Customer
+							</span>
+						</div>
+						<Autocomplete
+							:value="
+								fdCustomer != null
+									? fdCustomer
+									: selectedCustomer
+							"
+							@change="
+								(item) => {
+									if (!item) {
+										return
+									}
+									selectedCustomer = item.value
+								}
+							"
+							:resourceOptions="{
+								method: 'frappe.client.get_list',
+								inputMap: (query) => {
+									return {
+										doctype: 'FD Customer',
+										pluck: 'name',
+										filters: [
+											['name', 'like', `%${query}%`],
+										],
+									}
+								},
+								responseMap: (res) => {
+									return res.map((d) => {
+										return {
+											label: d.name,
+											value: d.name,
+										}
+									})
+								},
+							}"
+						/>
+						<ErrorMessage :message="customerValidationError" />
+					</div>
 					<div class="flex float-right space-x-2">
 						<Button
 							:loading="this.$resources.createContact.loading"
@@ -52,7 +97,7 @@
 <script>
 import { Input, Dialog, ErrorMessage } from "frappe-ui"
 import { computed, ref, inject } from "vue"
-
+import Autocomplete from "@/components/global/Autocomplete.vue"
 export default {
 	name: "NewContactDialog",
 	props: {
@@ -60,15 +105,19 @@ export default {
 			type: Boolean,
 			required: true,
 		},
+		fdCustomer: {
+			type: String,
+			default: null,
+		},
 	},
 	setup(props, { emit }) {
 		const emailValidationError = ref("")
 		const firstNameValidationError = ref("")
 		const lastNameValidationError = ref("")
 		const phoneValidationError = ref("")
-
+		const customerValidationError = ref("")
+		const selectedCustomer = ref("")
 		const contacts = inject("contacts")
-
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
@@ -78,7 +127,6 @@ export default {
 				}
 			},
 		})
-
 		return {
 			open,
 			contacts,
@@ -86,14 +134,17 @@ export default {
 			firstNameValidationError,
 			lastNameValidationError,
 			phoneValidationError,
+			customerValidationError,
+			selectedCustomer,
 		}
 	},
-	data() {
+	data(props) {
 		return {
 			firstName: "",
 			lastName: "",
 			emailId: "",
 			phone: "",
+			customer: "",
 		}
 	},
 	watch: {
@@ -106,19 +157,33 @@ export default {
 		phone(newValue) {
 			this.validatePhone(newValue)
 		},
+		customer(newValue) {
+			this.validateCustomer(newValue)
+		},
 	},
 	resources: {
 		createContact() {
 			return {
 				method: "frappe.client.insert",
-				onSuccess(data) {
+				onSuccess: (data) => {
 					this.emailId = ""
 					this.firstName = ""
 					this.lastName = ""
 					this.phone = ""
-
+					this.customer = ""
 					this.$emit("contactCreated", data)
+
 				},
+			}
+		},
+		getCustomers() {
+			return {
+				method: "frappe.client.get_list",
+				params: {
+					doctype: "FD Customer",
+					fields: ["name", "customer_name"],
+				},
+				auto: true,
 			}
 		},
 	},
@@ -126,23 +191,31 @@ export default {
 		Input,
 		Dialog,
 		ErrorMessage,
+		Autocomplete,
 	},
 	methods: {
 		createContact() {
 			if (this.validateInputs()) {
 				return
 			}
-
 			let doc = {
 				doctype: "Contact",
 				first_name: this.firstName,
 				last_name: this.lastName,
 				email_ids: [{ email_id: this.emailId, is_primary: true }],
+				links: [
+					{
+						link_doctype: "FD Customer",
+						link_name:
+							this.fdCustomer != null
+								? this.fdCustomer
+								: this.selectedCustomer,
+					},
+				],
 			}
 			if (this.phone) {
 				doc.phone_nos = [{ phone: this.phone }]
 			}
-
 			this.$resources.createContact.submit({
 				doc,
 			})
@@ -161,7 +234,6 @@ export default {
 				}
 				return list
 			}
-
 			this.emailValidationError = ""
 			const reg =
 				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
@@ -192,6 +264,15 @@ export default {
 				this.phoneValidationError = "Enter a valid phone number"
 			}
 			return this.phoneValidationError
+		},
+		validateCustomer(value) {
+			this.customerValidationError = ""
+			if (!value) {
+				this.customerValidationError = "Customer should not be empty"
+			} else if (value.trim() == "") {
+				this.customerValidationError = "Customer should not be empty"
+			}
+			return this.customerValidationError
 		},
 	},
 }

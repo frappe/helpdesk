@@ -39,3 +39,30 @@
 .ProseMirror {
 	outline: none;
 }
+
+.badge-primary {
+	@apply bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800;
+}
+
+.badge-danger {
+	@apply bg-red-100 text-red-600 text-xs font-normal mr-2 px-2.5 py-0.5 rounded dark:bg-red-100 dark:text-red-900;
+}
+
+.badge-success {
+	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-green-600 bg-green-100 rounded dark:bg-green-200 dark:text-green-800;
+}
+
+.badge-question {
+	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-white bg-[#B7B6FC] rounded-full dark:bg-purple-200 dark:text-purple-800;
+}
+
+.badge-incident {
+	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-white bg-[#F683AE] rounded-full dark:bg-pink-600 dark:text-pink-800;
+}
+
+.badge-replied {
+	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-orange-600 bg-orange-100 rounded dark:bg-orange-600 dark:text-orange-800;
+}
+.badge-bug {
+	@apply bg-red-400 text-white text-xs font-normal mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-200 dark:text-red-800;
+}

@@ -7,7 +7,11 @@
 				@click="toggleDropdown"
 			>
 				<div class="text-lg font-semibold">
-					{{ `${title} (${manager.totalCount})` }}
+					{{
+						`${ListTitle ? ListTitle : title} (${
+							manager.totalCount
+						})`
+					}}
 				</div>
 				<FeatherIcon
 					v-if="options.length > 0"
@@ -25,6 +29,7 @@ import { inject, ref } from "vue"
 
 export default {
 	name: "PresetFilters",
+	props: ["ListTitle"],
 	components: {
 		Dropdown,
 		FeatherIcon,
