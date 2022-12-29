@@ -85,11 +85,10 @@
 									.slice()
 									.reverse()"
 								class="flex items-center p-1 space-x-2 bg-white shadow rounded"
-								:key="email"
-								:title="email"
+								:key="email.user"
 							>
 								<span class="text-base ml-2">
-									{{ email }}
+									{{ email.user }}
 								</span>
 								<button
 									class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
@@ -100,28 +99,6 @@
 							</li>
 						</ul>
 					</div>
-					<!-- <div>
-						<label class="block text-sm leading-4 text-gray-700"
-							>Users</label
-						>
-						<VueMultiselect
-							class="agentselect"
-							v-model="selectedOptions"
-							tag-placeholder="Add user"
-							placeholder="Search user"
-							label="user"
-							:tag-position="top"
-							track-by="user"
-							:tag-color="red"
-							:options="options"
-							:multiple="true"
-							:taggable="true"
-							@tag="addTag"
-						></VueMultiselect>
-						<pre
-							class="language-json"
-						><code>{{ value  }}</code></pre>
-					</div> -->
 
 					<div class="flex float-right space-x-2">
 						<Button
@@ -216,25 +193,10 @@ export default {
 			this.searchInput = ""
 			this.$emit("close")
 		},
-		addTag(newTag) {
-			const tag = {
-				username: newTag,
-				email:
-					newTag.substring(0, 2) +
-					Math.floor(Math.random() * 10000000),
-			}
-			this.selectedOptions.push(tag)
-			this.options.push(tag)
-
-			console.log(this.selectedOptions, "options")
-		},
-		users() {
-			this.$resources.getUser.fetch()
-		},
 		addUserToList(email) {
-			this.selectedOptions = [
-				...new Set([...this.selectedOptions, email]),
-			]
+			let user = {}
+			user["user"] = email
+			this.selectedOptions = [...new Set([...this.selectedOptions, user])]
 		},
 		removeAllUserFromList() {
 			this.selectedOptions = []
@@ -260,21 +222,7 @@ export default {
 				},
 			}
 		},
-		getUser() {
-			return {
-				method: "frappedesk.api.agent.get_agent_user",
-				onSuccess: (res) => {
-					this.options.length = 0
-					res.map((value) => {
-						value["user"] = value["email"]
-						delete value["username"]
-						delete value["email"]
-						this.options.push(value)
-					})
-				},
-				auto: true,
-			}
-		},
+
 	},
 }
 </script>
