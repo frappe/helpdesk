@@ -398,7 +398,7 @@ export default {
 					})
 				}
 			} else {
-				console.log(this.values)
+			
 				this.$toast({
 					title: "Please fill all the fields",
 					customIcon: "circle-fail",

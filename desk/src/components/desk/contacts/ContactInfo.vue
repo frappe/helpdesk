@@ -91,6 +91,50 @@
 					:value="values?.phone"
 					@change="(val) => (values.phone = val)"
 				/>
+				<div class="w-full space-y-1">
+					<div>
+						<span
+							class="block mb-2 text-sm leading-4 text-gray-700"
+						>
+							Customer
+						</span>
+					</div>
+					<Autocomplete
+						:value="
+							values?.customer
+								? values?.customer
+								: selectedCustomer
+						"
+						@change="
+							(item) => {
+								if (!item) {
+									return
+								}
+								values.customer = item.value
+							}
+						"
+						:resourceOptions="{
+							method: 'frappe.client.get_list',
+							inputMap: (query) => {
+								return {
+									doctype: 'FD Customer',
+									pluck: 'name',
+									filters: [['name', 'like', `%${query}%`]],
+								}
+							},
+							responseMap: (res) => {
+								return res.map((d) => {
+									return {
+										label: d.name,
+										value: d.name,
+									}
+								})
+							},
+						}"
+					/>
+					<ErrorMessage :message="customerValidationError" />
+				</div>
+
 				<div class="w-full flex flex-row">
 					<div>
 						<Button @click="cancel()">Cancel</Button>
@@ -113,6 +157,7 @@
 import { ref } from "vue"
 import { FeatherIcon, Input, FileUploader } from "frappe-ui"
 import UserAvatar from "@/components/global/UserAvatar.vue"
+import Autocomplete from "@/components/global/Autocomplete.vue"
 
 export default {
 	name: "ContactInfo",
@@ -122,14 +167,17 @@ export default {
 		Input,
 		FileUploader,
 		UserAvatar,
+		Autocomplete,
 	},
 	setup() {
 		const editingName = ref(false)
 		const tempContactName = ref("")
+		const selectedCustomer = ref("")
 
 		return {
 			editingName,
 			tempContactName,
+			selectedCustomer,
 		}
 	},
 	computed: {
@@ -157,6 +205,10 @@ export default {
 				phone:
 					this.contactDoc && this.contactDoc.phone_nos.length > 0
 						? this.contactDoc.phone_nos[0].phone
+						: "",
+				customer:
+					this.contactDoc && this.contactDoc.links.length > 0
+						? this.contactDoc.links[0].link_name
 						: "",
 			}
 		},
@@ -212,6 +264,9 @@ export default {
 					: [],
 				phone_nos: this.values.phone
 					? [{ phone: this.values.phone }]
+					: [],
+				links: this.values.customer
+					? [{ link_name: this.values.customer }]
 					: [],
 			})
 		},

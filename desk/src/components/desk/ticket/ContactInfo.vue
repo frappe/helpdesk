@@ -61,9 +61,9 @@
 			>
 				<div class="text-gray-700 text-base">
 					<a
-						:title="link.link_title"
+						:title="link.link_name"
 						class="grow truncate font-normal text-base"
-						>{{ link.link_title }}</a
+						>{{ link.link_name }}</a
 					>
 				</div>
 			</div>
