@@ -34,6 +34,8 @@ class Ticket(Document):
 		self.set_contact(self.raised_by)
 
 	def before_insert(self):
+		if not self.ticket_type:
+			self.ticket_type = frappe.get_doc("Frappe Desk Settings").default_ticket_type
 		self.update_priority_based_on_ticket_type()
 
 	def after_insert(self):
