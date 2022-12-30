@@ -34,7 +34,7 @@
 									:placeholder="searchable ? placeholder : ''"
 								>
 									<span
-										class="text-base line-clamp-1"
+										class="text-base line-clamp-1 text-left"
 										v-if="selectedValue"
 									>
 										{{ displayValue(selectedValue) }}
