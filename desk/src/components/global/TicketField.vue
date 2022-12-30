@@ -232,6 +232,7 @@ export default {
 						inputMap: (query) => {
 							return {
 								doctype: "Ticket",
+								docname: this.ticketId,
 								fieldname: this.fieldMetaInfo?.fieldname,
 								query,
 							}

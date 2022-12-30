@@ -72,7 +72,7 @@ def get_field_data_type(doctype, fieldname):
 
 
 @frappe.whitelist()
-def get_filtered_select_field_options(doctype, fieldname, query):
+def get_filtered_select_field_options(doctype, fieldname, query, docname=None):
 	"""_summary_
 
 	Args:
@@ -85,6 +85,22 @@ def get_filtered_select_field_options(doctype, fieldname, query):
 
 	field = frappe.get_meta(doctype).get_field(fieldname)
 	if field.fieldtype == "Select":
+		# Handling conditional select fields
+		if doctype == "Ticket" and docname is not None:
+			field_config = frappe.get_doc("Ticket Fields Config")
+			for _field in field_config.conditional_select_fields:
+				if _field.fieldname == fieldname:
+					doc = frappe.get_doc(
+						"Ticket", docname
+					)  # don't remove this line, its used inside eval(_field.condition)
+					print(doc)
+					if eval(_field.condition):
+						return [
+							x
+							for x in _field.options.split("\n")
+							if query.lower() in x[0 : len(query)].lower()
+						]
+
 		return [
 			x for x in field.options.split("\n") if query.lower() in x[0 : len(query)].lower()
 		]
