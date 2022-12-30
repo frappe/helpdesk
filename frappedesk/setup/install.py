@@ -204,6 +204,10 @@ def add_default_ticket_types():
 			type_doc.name = type
 			type_doc.insert()
 
+	settings = frappe.get_doc("Frappe Desk Settings")
+	settings.default_ticket_type = "Question"
+	settings.save()
+
 
 def add_default_ticket_priorities():
 	ticket_priorities = ["Low", "Medium", "High", "Urgent"]
