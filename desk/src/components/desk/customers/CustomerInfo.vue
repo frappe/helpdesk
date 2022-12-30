@@ -424,9 +424,9 @@ export default {
 		},
 		getStatusStyle(status) {
 			const badge = {
-				Open: "badge-success",
-				Resolved: "badge-danger",
-				Closed: "badge-danger",
+				Open: "badge-danger",
+				Resolved: "badge-replied",
+				Closed: "badge-success",
 				Replied: "badge-replied ",
 			}[status]
 			return badge

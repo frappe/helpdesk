@@ -61,7 +61,7 @@
 }
 
 .badge-replied {
-	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-orange-600 bg-orange-100 rounded dark:bg-orange-600 dark:text-orange-800;
+	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-[#505A62] bg-[#F9FAFA] rounded dark:bg-orange-600 dark:text-orange-800;
 }
 .badge-bug {
 	@apply bg-red-400 text-white text-xs font-normal mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-200 dark:text-red-800;
