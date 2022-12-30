@@ -10,7 +10,10 @@ class FDCustomer(Document):
 
 
 def get_contact_count(doc, event):
-	contact = frappe.db.count(
+	if len(doc.links) == 0:
+		return
+
+	contact_count = frappe.db.count(
 		"Dynamic Link",
 		{
 			"link_doctype": "FD Customer",
@@ -19,14 +22,17 @@ def get_contact_count(doc, event):
 		},
 	)
 	customer = frappe.get_doc("FD Customer", doc.links[0].link_name)
-	customer.contact_count = contact
+	customer.contact_count = contact_count
 
 	customer.save()
 
 
 def get_ticket_count(doc, event):
-	ticket = frappe.db.count("Ticket", {"customer": doc.customer})
+	if not doc.customer:
+		return
+
+	ticket_count = frappe.db.count("Ticket", {"customer": doc.customer})
 	customer = frappe.get_doc("FD Customer", doc.customer)
-	customer.ticket_count = ticket
+	customer.ticket_count = ticket_count
 
 	customer.save()

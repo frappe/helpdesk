@@ -67,6 +67,9 @@ def average_first_response_time():
 		filters={"first_response_time": ["not like", ""]},
 	)
 
+	if len(ticket_list) == 0:
+		return 0.0
+
 	for ticket in ticket_list:
 		average_response_time += ticket.first_response_time
 
@@ -82,6 +85,9 @@ def average_resolution_time():
 		filters={"resolution_time": ["not like", ""]},
 	)
 
+	if len(ticket_list) == 0:
+		return 0.0
+
 	for ticket in ticket_list:
 		average_resolution_time += ticket.resolution_time
 
@@ -94,6 +100,9 @@ def resolution_within_sla():
 		"Ticket", filters={"status": "Closed"}, fields=["name", "agreement_status", "sla"],
 	)
 	count = 0
+
+	if len(ticket_list) == 0:
+		return 0.0
 
 	for ticket in ticket_list:
 		if ticket.agreement_status == "Fulfilled":

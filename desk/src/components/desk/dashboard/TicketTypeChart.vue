@@ -4,6 +4,7 @@
 
 <script>
 import ECharts from "vue-echarts"
+import * as echarts from "echarts"
 import "echarts/lib/chart/bar"
 import theme from "./theme"
 export default {

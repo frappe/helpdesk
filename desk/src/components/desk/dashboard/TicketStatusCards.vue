@@ -1,7 +1,7 @@
 <template>
-	<div class="grid grid-cols-4 gap-4 ml-[18px] mt-8 mb-8 mr-6">
+	<div class="grid grid-cols-4 gap-4">
 		<div
-			class="flex flex-row box-border h-[68px] p-4 border-2 rounded-md justify-between items-center"
+			class="flex flex-row card h-[68px] p-4 rounded-md justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-red-500">Due Today</div>
@@ -11,7 +11,7 @@
 			</span>
 		</div>
 		<div
-			class="flex flex-row box-border h-[68px] p-4 border-2 rounded-md justify-between items-center"
+			class="flex flex-row card h-[68px] p-4 justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
 				<div class="text-xl font-normal text-[#687178]">Unresolved</div>
@@ -21,7 +21,7 @@
 			</span>
 		</div>
 		<div
-			class="flex flex-row box-border h-[68px] p-4 border-2 rounded-md justify-between items-center"
+			class="flex flex-row h-[68px] p-4 card justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-[#687178] font-normal">Open</div>
@@ -32,7 +32,7 @@
 		</div>
 
 		<div
-			class="flex flex-row box-border h-[68px] p-4 border-2 rounded-md justify-between items-center"
+			class="flex flex-row h-[68px] p-4 card justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-[#687178] font-normal">Replied</div>
@@ -115,3 +115,9 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+.card {
+	@apply rounded-md border-gray-200 border shadow-sm;
+}
+</style>

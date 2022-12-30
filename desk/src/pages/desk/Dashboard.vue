@@ -6,36 +6,25 @@
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
-			<TicketStatusCards />
-			<div class="mb-[20px] flex flex-row-reverse">
-				<div class="w-48 mr-5">
-					<Datepicker
-						v-model="date"
-						range
-						@update:modelValue="handleDate"
-						:enable-time-picker="false"
-						format="MMM dd"
-					/>
-				</div>
-			</div>
-			<div class="grid grid-cols-2 ml-[18px]">
+			<TicketStatusCards class="mx-4 my-4" />
+			<div class="grid grid-cols-2 gap-4 w-full px-[18px]">
 				<TicketTrendsChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<TicketSummaryChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<TicketTypeChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
 				<CustomerSatisfactionChart
-					class="min-w-[35rem]"
+					class="chart-card"
 					:fromDate="fromDate"
 					:toDate="toDate"
 				/>
@@ -48,8 +37,6 @@
 <script>
 import TicketStatusCards from "@/components/desk/dashboard/TicketStatusCards.vue"
 import TicketTrendsChart from "@/components/desk/dashboard/TicketTrendsChart.vue"
-import Datepicker from "@vuepic/vue-datepicker"
-import "@vuepic/vue-datepicker/dist/main.css"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
 import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.vue"
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
@@ -61,7 +48,6 @@ export default {
 	components: {
 		TicketStatusCards,
 		TicketTrendsChart,
-		Datepicker,
 		TicketTypeChart,
 		TicketSummaryChart,
 		CustomerSatisfactionChart,
@@ -138,4 +124,8 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style>
+.chart-card {
+	@apply max-h-[400px] min-w-[535px] rounded-md border-gray-200 border shadow-sm p-5;
+}
+</style>
