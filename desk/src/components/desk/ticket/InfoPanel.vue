@@ -262,7 +262,7 @@
 										index < maxCount
 											? `/frappedesk/tickets/${_ticket.name}`
 											: `/frappedesk/tickets/?contact=${JSON.stringify(
-													['is', contact.name]
+													['is', ticket.contact]
 											  )}`
 									"
 									class="text-[12px] rounded"
