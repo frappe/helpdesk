@@ -90,6 +90,10 @@ export default {
 		ListViewer,
 		AddNewTeamDialog,
 	},
+	setup() {},
+	mounted() {
+		this.$event.emit("set-selected-setting", "Teams")
+	},
 	data() {
 		return {
 			showAddNewTeamDialog: false,

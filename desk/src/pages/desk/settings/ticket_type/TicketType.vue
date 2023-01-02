@@ -12,5 +12,8 @@ export default {
 	components: {
 		TicketTypeInfo,
 	},
+	mounted() {
+		this.$event.emit("set-selected-setting", "Ticket Types")
+	},
 }
 </script>

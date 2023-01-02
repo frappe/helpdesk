@@ -12,5 +12,9 @@ export default {
 	components: {
 		TeamInfo,
 	},
+	setup() {},
+	mounted() {
+		this.$event.emit("set-selected-setting", "Teams")
+	},
 }
 </script>

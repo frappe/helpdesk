@@ -88,6 +88,10 @@ export default {
 		ListViewer,
 		AddNewTicketTypeDialog,
 	},
+	setup() {},
+	mounted() {
+		this.$event.emit("set-selected-setting", "Ticket Types")
+	},
 	data() {
 		return {
 			showAddNewTicketTypeDialog: false,
