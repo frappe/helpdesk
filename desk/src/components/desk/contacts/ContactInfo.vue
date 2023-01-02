@@ -100,17 +100,11 @@
 						</span>
 					</div>
 					<Autocomplete
-						:value="
-							values?.customer
-								? values?.customer
-								: selectedCustomer
-						"
+						:searchable="editable"
+						:value="selectedCustomer"
 						@change="
 							(item) => {
-								if (!item) {
-									return
-								}
-								values.customer = item.value
+								selectedCustomer = item.value
 							}
 						"
 						:resourceOptions="{
@@ -161,7 +155,16 @@ import Autocomplete from "@/components/global/Autocomplete.vue"
 
 export default {
 	name: "ContactInfo",
-	props: ["contact"],
+	props: {
+		contact: {
+			type: String,
+			required: true,
+		},
+		editable: {
+			type: Boolean,
+			default: true,
+		},
+	},
 	components: {
 		FeatherIcon,
 		Input,
@@ -208,7 +211,8 @@ export default {
 						: "",
 				customer:
 					this.contactDoc && this.contactDoc.links.length > 0
-						? this.contactDoc.links[0].link_name
+						? (this.selectedCustomer =
+								this.contactDoc.links[0].link_name)
 						: "",
 			}
 		},
@@ -265,8 +269,9 @@ export default {
 				phone_nos: this.values.phone
 					? [{ phone: this.values.phone }]
 					: [],
+				links: [{ link_doctype: "FD Customer" }],
 				links: this.values.customer
-					? [{ link_name: this.values.customer }]
+					? [{ link_name: this.selectedCustomer }]
 					: [],
 			})
 		},
