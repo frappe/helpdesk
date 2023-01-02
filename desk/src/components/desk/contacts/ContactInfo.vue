@@ -269,9 +269,13 @@ export default {
 				phone_nos: this.values.phone
 					? [{ phone: this.values.phone }]
 					: [],
-				links: [{ link_doctype: "FD Customer" }],
 				links: this.values.customer
-					? [{ link_name: this.selectedCustomer }]
+					? [
+							{
+								link_doctype: "FD Customer",
+								link_name: this.selectedCustomer,
+							},
+					  ]
 					: [],
 			})
 		},
