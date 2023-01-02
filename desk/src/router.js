@@ -44,8 +44,13 @@ const routes = [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/tickets" }
+					return { path: "/frappedesk/dashboard" }
 				},
+			},
+			{
+				path: "dashboard",
+				name: "Dashboard",
+				component: () => import("@/pages/desk/Dashboard.vue"),
 			},
 			{
 				path: "tickets",
@@ -124,6 +129,17 @@ const routes = [
 						},
 					},
 				],
+			},
+			{
+				path: "customers",
+				name: "Customers",
+				component: () => import("@/pages/desk/Customers.vue"),
+			},
+			{
+				path: "customers/:customerId",
+				name: "Customer",
+				component: () => import("@/pages/desk/Customer.vue"),
+				props: true,
 			},
 			{
 				path: "contacts",

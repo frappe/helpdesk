@@ -268,7 +268,6 @@ import ListPageController from "@/components/global/ListPageController.vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
 import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
 import { ref, computed, provide } from "vue"
-
 export default {
 	name: "ListViewer",
 	props: {
@@ -307,7 +306,6 @@ export default {
 			return options
 		})
 		provide("renderOptions", renderOptions)
-
 		return {
 			showSaveFiltersDialog,
 			renderOptions,
