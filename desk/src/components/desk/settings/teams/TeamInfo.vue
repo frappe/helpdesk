@@ -13,101 +13,170 @@
 			</div>
 			<div class="float-right">
 				<div class="flex flex-row space-x-2">
+					<Button appearance="secondary" @click="cancel">
+						Cancel
+					</Button>
 					<Button
-						appearance="secondary"
+						appearance="primary"
 						@click="
 							() => {
-								this.$router.go()
+								if (validate()) {
+									save()
+								}
 							}
 						"
 					>
-						Cancel
-					</Button>
-					<Button appearance="primary" @click="saveDocument()">
 						Save
 					</Button>
 				</div>
 			</div>
 		</div>
 		<div
+			v-if="team"
 			class="flex flex-row space-x-[24px] h-full border-t px-[16px] py-[22px]"
 		>
-			<TeamTitleAndUsers
-				class="grow"
-				:name="values?.teamName"
-				:users="usersValue"
-				:editable="editMode"
-				:teamResource="$resources.team"
-			/>
+			<div class="flex flex-col space-y-[16px] h-full w-full">
+				<div>
+					<Input
+						label="Title"
+						type="text"
+						:value="team.name"
+						@input="
+							(val) => {
+								newTeamValues['title'] = val
+							}
+						"
+					/>
+					<ErrorMessage :message="teamInputErrors['title']" />
+				</div>
+				<form
+					@submit.prevent="onSubmit"
+					class="flex flex-row space-x-2 items-end"
+				>
+					<div class="w-full space-y-1">
+						<div>
+							<span class="block text-sm leading-4 text-gray-700">
+								Users
+							</span>
+						</div>
+						<Autocomplete
+							id="searchInput"
+							:value="''"
+							@change="
+								(item) => {
+									if (
+										!newTeamValues.users.includes(
+											item.value
+										)
+									) {
+										newTeamValues.users.push(item.value)
+									}
+								}
+							"
+							:resourceOptions="{
+								method: 'frappe.client.get_list',
+								inputMap: (query) => {
+									return {
+										doctype: 'Agent',
+										fields: ['name', 'agent_name'],
+										filters: {
+											name: ['like', `%${query}%`],
+										},
+									}
+								},
+								responseMap: (res) => {
+									return res.map((d) => {
+										return {
+											label: d.agent_name,
+											value: d.name,
+										}
+									})
+								},
+							}"
+						/>
+					</div>
+				</form>
+				<div
+					class="bg-gray-100 min-h-[100px] max-h-[300px] overflow-y-scroll px-2 rounded border flex flex-col"
+				>
+					<ul
+						v-if="newTeamValues.users.length > 0"
+						class="flex flex-wrap gap-2 py-2"
+					>
+						<li
+							v-for="user in newTeamValues.users"
+							class="flex items-center p-1 space-x-2 bg-white shadow rounded"
+							:key="user"
+						>
+							<span class="text-base ml-2">
+								{{ user }}
+							</span>
+							<button
+								class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
+								@click="
+									() => {
+										newTeamValues.users =
+											newTeamValues.users.filter(
+												(u) => u !== user
+											)
+									}
+								"
+							>
+								<FeatherIcon class="w-3" name="x" />
+							</button>
+						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 <script>
-import { ref, provide } from "vue"
-import { FeatherIcon, Input } from "frappe-ui"
-import TeamTitleAndUsers from "@/components/desk/settings/teams/TeamTitleAndUsers.vue"
-
+import { ref } from "vue"
+import { FeatherIcon, ErrorMessage } from "frappe-ui"
+import Autocomplete from "@/components/global/Autocomplete.vue"
 export default {
 	name: "TeamInfo",
 	props: ["teamId"],
 	components: {
 		FeatherIcon,
-		Input,
-		TeamTitleAndUsers,
+		Autocomplete,
+		ErrorMessage,
 	},
-	setup(props) {
-		const editingTitle = ref(false)
-		const newTeamTempValues = ref({})
-		const updateNewTeamInput = ref((input) => {
-			newTeamTempValues.value[input.field] = input.value
+	setup() {
+		const newTeamValues = ref({
+			title: "",
+			users: [],
 		})
-		provide("updateNewTeamInput", updateNewTeamInput)
-		provide("newTeamTempValues", newTeamTempValues)
-		const saveTeamTitleAndUsers = ref(() => {})
-		provide("saveTeamTitleAndUsers", saveTeamTitleAndUsers)
-		const tempTeamTitle = ref("")
-		const updatingValues = ref(false)
-		const editMode = ref(!props.teamId)
-		provide("editMode", editMode)
-
+		const teamInputErrors = ref({
+			title: "",
+		})
 		return {
-			editingTitle,
-			tempTeamTitle,
-			updatingValues,
-			editMode,
-			newTeamTempValues,
-			saveTeamTitleAndUsers,
+			newTeamValues,
+			teamInputErrors,
 		}
 	},
 	computed: {
-		teamDoc() {
-			return this.$resources.team.doc || null
-		},
-		values() {
-			if (this.updatingValues) {
-				return this.values || null
+		team() {
+			if (this.teamId) {
+				const doc = this.$resources.team.doc
+				if (doc) {
+					this.newTeamValues["title"] = doc.name
+					let users = []
+					doc.users.map((res) => {
+						users.push(res["user"])
+					})
+					this.newTeamValues["users"] = users
+				}
+				return doc
+			} else {
+				return { title: "", users: [] }
 			}
-			return {
-				teamName: this.teamDoc?.team_name || null,
-			}
 		},
-		usersValue() {
-			let options = []
-			this.teamDoc.users?.map((res) => {
-				let value = {}
-				value["user"] = res["user"]
-
-				options.push(value)
-			})
-
-			return options
-		},
-	},
-	deactivated() {
-		this.resetForm()
 	},
 	resources: {
 		team() {
+			if (!this.teamId) return
 			return {
 				type: "document",
 				doctype: "Agent Group",
@@ -132,36 +201,73 @@ export default {
 				},
 			}
 		},
+		renameTeamDoc() {
+			return {
+				method: "frappe.client.rename_doc",
+				onSuccess: (res) => {
+					this.$router.push({
+						path: `/frappedesk/settings/teams/${res}`,
+					})
+				},
+			}
+		},
+		newTeam() {
+			return {
+				method: "frappe.client.insert",
+				onSuccess: (res) => {
+					this.$router.push({
+						path: `/frappedesk/settings/teams/${res.name}`,
+					})
+				},
+			}
+		},
 	},
 	methods: {
-		resetForm() {
-			this.editingTitle = false
-			this.tempTeamTitle = this.values.teamName
+		validate() {
+			if (this.newTeamValues.title === "") {
+				this.teamInputErrors.title = "Team name is required"
+				return false
+			} else if (this.newTeamValues.title.length < 4) {
+				this.teamInputErrors.title =
+					"Team name must be at least 4 characters long"
+				return false
+			}
+			return true
 		},
 		save() {
-			this.updatingValues = true
-			const newValues = this.values
-			const newUsers = this.usersValue
-			this.$resources.user.setValue
-				.submit({
-					team_name: newValues.title,
-					users: newUsers,
+			const oldTeamName = this.team.name
+			const newTeamName = this.newTeamValues.title
+			const values = this.newTeamValues
+			let users = []
+			values.users.map((user) => {
+				users.push({
+					user,
 				})
-				.then(() => {
-					this.$resources.team.setValue.submit({
-						team_name: this.tempTeamTitle,
-					})
-				})
-		},
-		saveDocument() {
-			const inputParams = {
-				team_name: this.newTeamTempValues.title,
-				users: this.newTeamTempValues.users,
-			}
-			this.$resources.team.setValue.submit({
-				...inputParams,
 			})
-			this.editMode = false
+			if (this.teamId) {
+				this.$resources.team.setValue
+					.submit({
+						team_name: values.title,
+						users,
+					})
+					.then(() => {
+						if (newTeamName != oldTeamName) {
+							this.$resources.renameTeamDoc.submit({
+								doctype: "Agent Group",
+								old_name: oldTeamName,
+								new_name: newTeamName,
+							})
+						}
+					})
+			} else {
+				this.$resources.newTeam.submit({
+					doc: {
+						doctype: "Agent Group",
+						team_name: values.title,
+						users,
+					},
+				})
+			}
 		},
 		cancel() {
 			this.$router.go()

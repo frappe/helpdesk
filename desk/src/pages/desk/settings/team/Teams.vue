@@ -7,6 +7,7 @@
 				doctype: 'Agent Group',
 				fields: ['team_name', 'assignment_rule'],
 				limit: 20,
+				order_by: 'modified desc',
 			}"
 		>
 			<template #body="{ manager }">
@@ -30,14 +31,14 @@
 					class="text-base h-[100vh] pt-4"
 					@add-item="
 						() => {
-							showAddNewTeamDialog = true
+							$router.push('/frappedesk/settings/teams/new')
 						}
 					"
 				>
 					<template #field-team_name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/team/${row.name}`,
+								path: `/frappedesk/settings/teams/${row.name}`,
 							}"
 						>
 							{{ `${row.name}` }}
@@ -68,36 +69,21 @@
 				</ListViewer>
 			</template>
 		</ListManager>
-		<AddNewTeamDialog
-			v-model="showAddNewTeamDialog"
-			@close="
-				() => {
-					showAddNewTeamDialog = false
-				}
-			"
-		/>
 	</div>
 </template>
 
 <script>
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
-import AddNewTeamDialog from "@/components/desk/global/AddNewTeamDialog.vue"
 export default {
 	name: "Teams",
 	components: {
 		ListManager,
 		ListViewer,
-		AddNewTeamDialog,
 	},
 	setup() {},
 	mounted() {
 		this.$event.emit("set-selected-setting", "Teams")
-	},
-	data() {
-		return {
-			showAddNewTeamDialog: false,
-		}
 	},
 	resources: {
 		deleteTeam() {
