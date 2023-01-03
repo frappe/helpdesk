@@ -60,7 +60,7 @@
 							/>
 						</div>
 						<Button
-							v-if="selectedUser != '' "
+							v-if="selectedUser != ''"
 							appearance="primary"
 							type="submit"
 							icon="arrow-down"

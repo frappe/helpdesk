@@ -8,9 +8,7 @@
 			>
 				<div class="text-lg font-semibold">
 					{{
-
 						`${ListTitle ? ListTitle : title} (${
-
 							manager.totalCount
 						})`
 					}}
