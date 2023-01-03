@@ -44,11 +44,11 @@
 						:value="ticketType.name"
 						@input="
 							(val) => {
-								newTicketTypeValues['title'] = val
+								newTicketTypeValues.title = val
 							}
 						"
 					/>
-					<ErrorMessage :message="ticketTypeinputErrors['title']" />
+					<ErrorMessage :message="ticketTypeInputErrors.title" />
 				</div>
 				<div class="w-full space-y-1">
 					<div>
@@ -57,7 +57,7 @@
 						</span>
 					</div>
 					<Autocomplete
-						:value="ticketType.priority"
+						:value="newTicketTypeValues.priority"
 						@change="
 							(item) => {
 								if (!item) {
@@ -100,7 +100,7 @@
 						}"
 						@change="
 							(val) => {
-								newTicketTypeValues['description'] = val
+								newTicketTypeValues.description = val
 							}
 						"
 					>
@@ -114,7 +114,6 @@
 import { ref } from "vue"
 import { FeatherIcon, Input, ErrorMessage, TextEditor } from "frappe-ui"
 import Autocomplete from "@/components/global/Autocomplete.vue"
-
 export default {
 	name: "TicketTypeInfo",
 	props: ["ticketTypeId"],
@@ -131,13 +130,12 @@ export default {
 			priority: "",
 			description: "",
 		})
-		const ticketTypeinputErrors = ref({
+		const ticketTypeInputErrors = ref({
 			title: "",
 		})
-
 		return {
 			newTicketTypeValues,
-			ticketTypeinputErrors,
+			ticketTypeInputErrors,
 		}
 	},
 	computed: {
@@ -145,11 +143,10 @@ export default {
 			if (this.ticketTypeId) {
 				const doc = this.$resources.ticketType.doc
 				if (doc) {
-					this.newTicketTypeValues["title"] = doc.name
-					this.newTicketTypeValues["priority"] = doc.priority
-					this.newTicketTypeValues["description"] = doc.description
+					this.newTicketTypeValues.title = doc.name
+					this.newTicketTypeValues.priority = doc.priority
+					this.newTicketTypeValues.description = doc.description
 				}
-
 				return doc
 			} else {
 				return { title: "", description: "", priority: "" }
@@ -182,7 +179,6 @@ export default {
 				},
 			}
 		},
-
 		renameTicketTypeDoc() {
 			return {
 				method: "frappe.client.rename_doc",
@@ -210,9 +206,9 @@ export default {
 				this.ticketTypeInputErrors.title =
 					"Ticket Type name is required"
 				return false
-			} else if (this.newTeamValues.title.length < 4) {
+			} else if (this.newTicketTypeValues.title == "new") {
 				this.ticketTypeInputErrors.title =
-					"Ticket Type name must be at least 4 characters long"
+					"Ticket Type name cannot be 'new'"
 				return false
 			}
 			return true
@@ -221,18 +217,13 @@ export default {
 			const oldTicketTypeName = this.ticketType.name
 			const newTicketTypeName = this.newTicketTypeValues.title
 			const values = this.newTicketTypeValues
-
-			console.log(values)
 			if (this.ticketTypeId) {
 				this.$resources.ticketType.setValue
 					.submit({
-						name: values.title,
 						priority: values.priority,
 						description: values.description,
 					})
 					.then(() => {
-						console.log(newTicketTypeName, oldTicketTypeName)
-
 						if (newTicketTypeName != oldTicketTypeName) {
 							this.$resources.renameTicketTypeDoc.submit({
 								doctype: "Ticket Type",

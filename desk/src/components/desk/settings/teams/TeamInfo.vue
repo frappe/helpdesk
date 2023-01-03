@@ -227,9 +227,8 @@ export default {
 			if (this.newTeamValues.title === "") {
 				this.teamInputErrors.title = "Team name is required"
 				return false
-			} else if (this.newTeamValues.title.length < 4) {
-				this.teamInputErrors.title =
-					"Team name must be at least 4 characters long"
+			} else if (this.newTeamValues.title === "new") {
+				this.teamInputErrors.title = "Team name cannot be 'new'"
 				return false
 			}
 			return true
