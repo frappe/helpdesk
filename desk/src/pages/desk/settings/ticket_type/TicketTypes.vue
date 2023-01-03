@@ -7,6 +7,7 @@
 				doctype: 'Ticket Type',
 				fields: ['name', 'priority'],
 				limit: 20,
+				order_by: 'modified desc',
 			}"
 		>
 			<template #body="{ manager }">
@@ -27,15 +28,13 @@
 					}"
 					class="text-base h-[100vh] pt-4"
 					@add-item="
-						() => {
-							showAddNewTicketTypeDialog = true
-						}
+						$router.push('/frappedesk/settings/ticket_types/new')
 					"
 				>
 					<template #field-name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/ticket_type/${row.name}`,
+								path: `/frappedesk/settings/ticket_types/${row.name}`,
 							}"
 						>
 							{{ `${row.name}` }}
@@ -66,37 +65,23 @@
 				</ListViewer>
 			</template>
 		</ListManager>
-		<AddNewTicketTypeDialog
-			v-model="showAddNewTicketTypeDialog"
-			@close="
-				() => {
-					showAddNewTicketTypeDialog = false
-				}
-			"
-		/>
 	</div>
 </template>
 
 <script>
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
-import AddNewTicketTypeDialog from "@/components/desk/global/AddNewTicketTypeDialog.vue"
 export default {
 	name: "TicketTypes",
 	components: {
 		ListManager,
 		ListViewer,
-		AddNewTicketTypeDialog,
 	},
 	setup() {},
 	mounted() {
 		this.$event.emit("set-selected-setting", "Ticket Types")
 	},
-	data() {
-		return {
-			showAddNewTicketTypeDialog: false,
-		}
-	},
+
 	resources: {
 		deleteTicketType() {
 			return {

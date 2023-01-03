@@ -13,40 +13,107 @@
 			</div>
 			<div class="float-right">
 				<div class="flex flex-row space-x-2">
+					<Button appearance="secondary" @click="cancel()">
+						Cancel
+					</Button>
 					<Button
-						appearance="secondary"
+						appearance="primary"
 						@click="
 							() => {
-								this.$router.go()
+								if (validate()) {
+									save()
+								}
 							}
 						"
 					>
-						Cancel
-					</Button>
-					<Button appearance="primary" @click="saveDocument()">
 						Save
 					</Button>
 				</div>
 			</div>
 		</div>
+
 		<div
+			v-if="ticketType"
 			class="flex flex-row space-x-[24px] h-full border-t px-[16px] py-[22px]"
 		>
-			<TicketTypeNameAndDescription
-				class="grow"
-				:name="values?.ticketTypeName"
-				:description="values?.description"
-				:priority="values?.priority"
-				:editable="editMode"
-				:ticketTypeResource="$resources.ticketType"
-			/>
+			<div class="flex flex-col space-y-[16px] h-full w-full">
+				<div>
+					<Input
+						label="Title"
+						type="text"
+						:value="ticketType.name"
+						@input="
+							(val) => {
+								newTicketTypeValues['title'] = val
+							}
+						"
+					/>
+					<ErrorMessage :message="ticketTypeinputErrors['title']" />
+				</div>
+				<div class="w-full space-y-1">
+					<div>
+						<span class="block text-sm leading-4 text-gray-700">
+							Priority
+						</span>
+					</div>
+					<Autocomplete
+						:value="ticketType.priority"
+						@change="
+							(item) => {
+								if (!item) {
+									return
+								}
+								newTicketTypeValues.priority = item.value
+							}
+						"
+						:resourceOptions="{
+							method: 'frappe.client.get_list',
+							inputMap: (query) => {
+								return {
+									doctype: 'Ticket Priority',
+									pluck: 'name',
+									filters: [['name', 'like', `%${query}%`]],
+								}
+							},
+							responseMap: (res) => {
+								return res.map((d) => {
+									return {
+										label: d.name,
+										value: d.name,
+									}
+								})
+							},
+						}"
+					/>
+				</div>
+				<div class="flex flex-col">
+					<div class="mb-2 block text-sm leading-4 text-gray-700">
+						Description
+					</div>
+					<TextEditor
+						:class="'bg-gray-100'"
+						ref="textEditor"
+						:editor-class="'min-h-[20rem] overflow-y-auto max-h-[73vh] px-3 max-w-full'"
+						:content="ticketType.description"
+						:starterkit-options="{
+							heading: { levels: [2, 3, 4, 5, 6] },
+						}"
+						@change="
+							(val) => {
+								newTicketTypeValues['description'] = val
+							}
+						"
+					>
+					</TextEditor>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 <script>
-import { ref, provide } from "vue"
-import { FeatherIcon, Input } from "frappe-ui"
-import TicketTypeNameAndDescription from "@/components/desk/settings/ticket_types/TicketTypeNameAndDescription.vue"
+import { ref } from "vue"
+import { FeatherIcon, Input, ErrorMessage, TextEditor } from "frappe-ui"
+import Autocomplete from "@/components/global/Autocomplete.vue"
 
 export default {
 	name: "TicketTypeInfo",
@@ -54,57 +121,44 @@ export default {
 	components: {
 		FeatherIcon,
 		Input,
-		TicketTypeNameAndDescription,
+		Autocomplete,
+		TextEditor,
+		ErrorMessage,
 	},
-	setup(props) {
-		const editingName = ref(false)
-		const newTicketTypeTempValues = ref({})
-		const updateNewTicketTypeInput = ref((input) => {
-			newTicketTypeTempValues.value[input.field] = input.value
+	setup() {
+		const newTicketTypeValues = ref({
+			title: "",
+			priority: "",
+			description: "",
 		})
-		provide("updateNewTicketTypeInput", updateNewTicketTypeInput)
-		provide("newTicketTypeTempValues", newTicketTypeTempValues)
-		const saveTicketTypeNameAndDescription = ref(() => {})
-		provide(
-			"saveTicketTypeNameAndDescription",
-			saveTicketTypeNameAndDescription
-		)
-		const tempTicketTypeName = ref("")
-		const updatingValues = ref(false)
-		const editMode = ref(!props.ticketTypeId)
-		provide("editMode", editMode)
+		const ticketTypeinputErrors = ref({
+			title: "",
+		})
 
 		return {
-			editingName,
-			tempTicketTypeName,
-			updatingValues,
-			editMode,
-			newTicketTypeTempValues,
-			saveTicketTypeNameAndDescription,
+			newTicketTypeValues,
+			ticketTypeinputErrors,
 		}
 	},
 	computed: {
-		ticketTypeDoc() {
-			if (this.$resources.ticketType.doc != null) {
-				return this.$resources.ticketType.doc
+		ticketType() {
+			if (this.ticketTypeId) {
+				const doc = this.$resources.ticketType.doc
+				if (doc) {
+					this.newTicketTypeValues["title"] = doc.name
+					this.newTicketTypeValues["priority"] = doc.priority
+					this.newTicketTypeValues["description"] = doc.description
+				}
+
+				return doc
+			} else {
+				return { title: "", description: "", priority: "" }
 			}
 		},
-		values() {
-			// if (this.updatingValues) {
-			// 	return this.values || null
-			// }
-			return {
-				ticketTypeName: this.ticketTypeDoc?.name || null,
-				description: this.ticketTypeDoc?.description || null,
-				priority: this.ticketTypeDoc.priority || null,
-			}
-		},
-	},
-	deactivated() {
-		this.resetForm()
 	},
 	resources: {
 		ticketType() {
+			if (!this.ticketTypeId) return
 			return {
 				type: "document",
 				doctype: "Ticket Type",
@@ -128,37 +182,75 @@ export default {
 				},
 			}
 		},
+
+		renameTicketTypeDoc() {
+			return {
+				method: "frappe.client.rename_doc",
+				onSuccess: (res) => {
+					this.$router.push({
+						path: `/frappedesk/settings/ticket_types/${res}`,
+					})
+				},
+			}
+		},
+		newTicketType() {
+			return {
+				method: "frappe.client.insert",
+				onSuccess: (res) => {
+					this.$router.push({
+						path: `/frappedesk/settings/ticket_types/${res.name}`,
+					})
+				},
+			}
+		},
 	},
 	methods: {
-		resetForm() {
-			this.editingName = false
-			this.tempTicketTypeName = this.values.ticketTypeName
+		validate() {
+			if (this.newTicketTypeValues.title === "") {
+				this.ticketTypeInputErrors.title =
+					"Ticket Type name is required"
+				return false
+			} else if (this.newTeamValues.title.length < 4) {
+				this.ticketTypeInputErrors.title =
+					"Ticket Type name must be at least 4 characters long"
+				return false
+			}
+			return true
 		},
 		save() {
-			this.updatingValues = true
-			const newValues = this.values
-			this.$resources.user.setValue
-				.submit({
-					name: newValues.name,
-					description: newValues.description,
-					priority: newValues.priority,
-				})
-				.then(() => {
-					this.$resources.ticketType.setValue.submit({
-						name: this.tempTicketTypeName,
+			const oldTicketTypeName = this.ticketType.name
+			const newTicketTypeName = this.newTicketTypeValues.title
+			const values = this.newTicketTypeValues
+
+			console.log(values)
+			if (this.ticketTypeId) {
+				this.$resources.ticketType.setValue
+					.submit({
+						name: values.title,
+						priority: values.priority,
+						description: values.description,
 					})
+					.then(() => {
+						console.log(newTicketTypeName, oldTicketTypeName)
+
+						if (newTicketTypeName != oldTicketTypeName) {
+							this.$resources.renameTicketTypeDoc.submit({
+								doctype: "Ticket Type",
+								old_name: oldTicketTypeName,
+								new_name: newTicketTypeName,
+							})
+						}
+					})
+			} else {
+				this.$resources.newTicketType.submit({
+					doc: {
+						doctype: "Ticket Type",
+						name: values.title,
+						description: values.description,
+						priority: values.priority,
+					},
 				})
-		},
-		saveDocument() {
-			const inputParams = {
-				name: this.newTicketTypeTempValues.name,
-				description: this.newTicketTypeTempValues.description,
-				priority: this.newTicketTypeTempValues.priority,
 			}
-			this.$resources.ticketType.setValue.submit({
-				...inputParams,
-			})
-			this.editMode = false
 		},
 		cancel() {
 			this.$router.go()

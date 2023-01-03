@@ -44,11 +44,3 @@ def sent_invites(emails, send_welcome_mail_to_user=True):
         frappe.get_doc({"doctype": "Agent", "user": user.name}).insert()
     return
 
-
-@frappe.whitelist()
-def get_agent_user():
-    user_list = frappe.db.get_list(
-        "User", fields=["username", "email"], filters={"role": "Agent"}
-    )
-
-    return user_list

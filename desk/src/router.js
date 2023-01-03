@@ -217,13 +217,19 @@ const routes = [
 							),
 					},
 					{
-						path: "ticket_type/:ticketTypeId",
+						path: "ticket_types/:ticketTypeId",
 						name: "TicketType",
 						component: () =>
 							import(
 								"@/pages/desk/settings/ticket_type/TicketType.vue"
 							),
 						props: true,
+					},
+					{
+						path: "ticket_types/new",
+						name: "NewTicketType",
+						component: () =>
+							import("@/pages/desk/settings/ticket_type/TicketType.vue"),
 					},
 					{
 						path: "sla",
