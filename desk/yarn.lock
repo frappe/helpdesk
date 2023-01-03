@@ -1390,6 +1390,7 @@ vite@^2.0.5:
   optionalDependencies:
     fsevents "~2.3.2"
 
+
 vue-demi@^0.13.2:
   version "0.13.11"
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.13.11.tgz#7d90369bdae8974d87b1973564ad390182410d99"

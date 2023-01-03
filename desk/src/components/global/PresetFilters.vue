@@ -34,6 +34,7 @@ export default {
 		Dropdown,
 		FeatherIcon,
 	},
+	props: ["ListTitle"],
 	setup() {
 		const manager = inject("manager")
 		const renderOptions = inject("renderOptions")

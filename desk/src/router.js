@@ -190,6 +190,48 @@ const routes = [
 						props: true,
 					},
 					{
+						path: "teams",
+						name: "Teams",
+						component: () =>
+							import("@/pages/desk/settings/team/Teams.vue"),
+					},
+					{
+						path: "teams/:teamId",
+						name: "Team",
+						component: () =>
+							import("@/pages/desk/settings/team/Team.vue"),
+						props: true,
+					},
+					{
+						path: "teams/new",
+						name: "NewTeam",
+						component: () =>
+							import("@/pages/desk/settings/team/Team.vue"),
+					},
+					{
+						path: "ticket_types",
+						name: "TicketTypes",
+						component: () =>
+							import(
+								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
+							),
+					},
+					{
+						path: "ticket_types/:ticketTypeId",
+						name: "TicketType",
+						component: () =>
+							import(
+								"@/pages/desk/settings/ticket_type/TicketType.vue"
+							),
+						props: true,
+					},
+					{
+						path: "ticket_types/new",
+						name: "NewTicketType",
+						component: () =>
+							import("@/pages/desk/settings/ticket_type/TicketType.vue"),
+					},
+					{
 						path: "sla",
 						name: "SlaPolicies",
 						component: () =>
