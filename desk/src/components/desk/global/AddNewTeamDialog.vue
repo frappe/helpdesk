@@ -60,6 +60,7 @@
 							/>
 						</div>
 						<Button
+							v-if="selectedUser != '' "
 							appearance="primary"
 							type="submit"
 							icon="arrow-down"
@@ -222,7 +223,6 @@ export default {
 				},
 			}
 		},
-
 	},
 }
 </script>

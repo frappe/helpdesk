@@ -93,7 +93,7 @@ export default {
 		},
 		usersValue() {
 			let options = []
-			this.teamDoc.users?.map((res) => {
+			this.teamDoc?.users?.map((res) => {
 				let value = {}
 				value["user"] = res["user"]
 
