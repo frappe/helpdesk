@@ -212,7 +212,9 @@
 							{{ ticket.priority }}
 						</div>
 
-						<div class="w-[10%] font-normal text-sm text-[#74808B]">
+						<div
+							class="w-[10%] font-normal text-sm text-[#74808B] line-clamp-1"
+						>
 							{{ ticket.contact }}
 						</div>
 						<!-- <div class="w-[10%]" v-for="contact in contactDoc">
@@ -398,7 +400,6 @@ export default {
 					})
 				}
 			} else {
-				console.log(this.values)
 				this.$toast({
 					title: "Please fill all the fields",
 					customIcon: "circle-fail",
@@ -424,9 +425,9 @@ export default {
 		},
 		getStatusStyle(status) {
 			const badge = {
-				Open: "badge-success",
-				Resolved: "badge-danger",
-				Closed: "badge-danger",
+				Open: "badge-danger",
+				Resolved: "badge-replied",
+				Closed: "badge-success",
 				Replied: "badge-replied ",
 			}[status]
 			return badge

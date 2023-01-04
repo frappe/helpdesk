@@ -10,6 +10,7 @@
 					'last_name',
 					'email_ids.email_id as email',
 					'phone_nos.phone as phone',
+					'links.link_name as customer',
 				],
 				limit: 20,
 			}"
@@ -22,15 +23,19 @@
 						fields: {
 							first_name: {
 								label: 'Name',
-								width: '4',
+								width: '3',
 							},
 							email: {
 								label: 'Email',
-								width: '4',
+								width: '3',
 							},
 							phone: {
 								label: 'Phone',
-								width: '4',
+								width: '3',
+							},
+							customer: {
+								label: 'Customer',
+								width: '3',
 							},
 						},
 					}"

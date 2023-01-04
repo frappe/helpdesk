@@ -48,12 +48,33 @@
 				</div>
 			</div>
 		</div>
+		<div v-if="contact.links.length > 0" class="flex space-x-[12px]">
+			<CustomIcons
+				name="customer"
+				class="stroke-gray-500 mt-[2.5px]"
+				style="width: 15px; height: 15px"
+			/>
+			<div
+				class="space-y-1 max-w-[173px] break-words"
+				v-for="link in contact.links"
+				:key="link"
+			>
+				<div class="text-gray-700 text-base">
+					<a
+						:title="link.link_name"
+						class="grow truncate font-normal text-base"
+						>{{ link.link_name }}</a
+					>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
 <script>
 import { FeatherIcon } from "frappe-ui"
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
 export default {
 	name: "ContactInfo",
@@ -61,6 +82,7 @@ export default {
 	components: {
 		FeatherIcon,
 		CustomAvatar,
+		CustomIcons,
 	},
 	computed: {
 		contact() {
