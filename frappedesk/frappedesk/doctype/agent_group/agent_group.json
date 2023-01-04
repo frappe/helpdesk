@@ -6,7 +6,7 @@
 	"doctype": "DocType",
 	"editable_grid": 1,
 	"engine": "InnoDB",
-	"field_order": ["team_name", "assignment_rule"],
+	"field_order": ["team_name", "assignment_rule", "users"],
 	"fields": [
 		{
 			"fieldname": "team_name",
@@ -20,11 +20,17 @@
 			"label": "Assignment Rule",
 			"options": "Assignment Rule",
 			"read_only": 1
+		},
+		{
+			"fieldname": "users",
+			"fieldtype": "Table MultiSelect",
+			"label": "Users",
+			"options": "Teams User"
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-11-06 15:48:24.518880",
+	"modified": "2023-01-03 13:16:16.718714",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Agent Group",

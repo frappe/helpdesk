@@ -212,6 +212,7 @@ def get_ticket(ticket_id):
 
 @frappe.whitelist()
 def create_new(values, template="Default", attachments=[], via_customer_portal=False):
+
 	ticket_doc = frappe.new_doc("Ticket")
 	ticket_doc.via_customer_portal = via_customer_portal
 
