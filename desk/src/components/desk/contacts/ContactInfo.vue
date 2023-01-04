@@ -1,12 +1,11 @@
 <template>
 	<div class="min-w-[304px] px-[24px] py-[10px]">
-		<div class="form w-full flex flex-col">
+		<div v-if="contact" class="form w-full flex flex-col">
 			<div
 				class="float-left mb-[16px]"
 				@click="
 					() => {
 						editingName = true
-						tempContactName = values.contactName
 					}
 				"
 			>
@@ -14,15 +13,29 @@
 					v-if="!editingName"
 					class="flex space-x-2 items-center cursor-pointer"
 				>
-					<div class="font-semibold">{{ values.contactName }}</div>
+					<div class="font-semibold">
+						{{
+							`${contact.first_name || ""} ${
+								contact.last_name || ""
+							}`
+						}}
+					</div>
 					<FeatherIcon class="w-3 h-3" name="edit-2" />
 				</div>
-				<div v-else class="flex space-x-2 items-center">
-					<Input
-						id="contactNameInput"
-						v-model="tempContactName"
-						type="text"
-					/>
+				<div v-else class="flex space-x-2">
+					<div>
+						<Input
+							id="contactNameInput"
+							:value="newContactValues.fullName"
+							@change="
+								(val) => {
+									newContactValues.fullName = val
+								}
+							"
+							type="text"
+						/>
+						<ErrorMessage :message="contactInputErrors.fullName" />
+					</div>
 					<FeatherIcon
 						class="w-4 h-4"
 						role="button"
@@ -30,7 +43,10 @@
 						@click="
 							() => {
 								editingName = false
-								tempContactName = values.contactName
+								newContactValues.fullName =
+									(contact.first_name || '') +
+									' ' +
+									(contact.last_name || '')
 							}
 						"
 					/>
@@ -56,8 +72,10 @@
 								<div class="flex items-center space-x-2">
 									<UserAvatar
 										size="lg"
-										:fullName="values?.contactName"
-										:userImage="values?.profilePicture"
+										:fullName="newContactValues?.fullName"
+										:userImage="
+											newContactValues?.profilePicture
+										"
 									/>
 									<Button @click="openFileSelector">
 										{{
@@ -67,7 +85,7 @@
 										}}
 									</Button>
 									<Button
-										v-if="values?.profilePicture"
+										v-if="newContactValues?.profilePicture"
 										@click="setContactImage(null)"
 									>
 										Remove
@@ -81,15 +99,15 @@
 					class="grow"
 					label="E-mail"
 					type="text"
-					:value="values?.email"
-					@change="(val) => (values.email = val)"
+					:value="newContactValues.email"
+					@change="(val) => (newContactValues.email = val)"
 				/>
 				<Input
 					class="grow"
 					label="Phone"
 					type="text"
-					:value="values?.phone"
-					@change="(val) => (values.phone = val)"
+					:value="newContactValues.phone"
+					@change="(val) => (newContactValues.phone = val)"
 				/>
 				<div class="w-full space-y-1">
 					<div>
@@ -100,11 +118,10 @@
 						</span>
 					</div>
 					<Autocomplete
-						:searchable="editable"
-						:value="selectedCustomer"
+						:value="newContactValues.customer"
 						@change="
 							(item) => {
-								selectedCustomer = item.value
+								newContactValues.customer = item.value
 							}
 						"
 						:resourceOptions="{
@@ -126,9 +143,8 @@
 							},
 						}"
 					/>
-					<ErrorMessage :message="customerValidationError" />
+					<ErrorMessage :message="contactInputErrors.customer" />
 				</div>
-
 				<div class="w-full flex flex-row">
 					<div>
 						<Button @click="cancel()">Cancel</Button>
@@ -137,7 +153,13 @@
 						<Button
 							:loading="this.$resources.contact.setValue.loading"
 							appearance="primary"
-							@click="save()"
+							@click="
+								() => {
+									if (validate()) {
+										save()
+									}
+								}
+							"
 							>Save</Button
 						>
 					</div>
@@ -146,94 +168,77 @@
 		</div>
 	</div>
 </template>
-
 <script>
 import { ref } from "vue"
-import { FeatherIcon, Input, FileUploader } from "frappe-ui"
+import { FeatherIcon, Input, FileUploader, ErrorMessage } from "frappe-ui"
 import UserAvatar from "@/components/global/UserAvatar.vue"
 import Autocomplete from "@/components/global/Autocomplete.vue"
-
 export default {
 	name: "ContactInfo",
-	props: {
-		contact: {
-			type: String,
-			required: true,
-		},
-		editable: {
-			type: Boolean,
-			default: true,
-		},
-	},
+	props: ["contactId"],
 	components: {
 		FeatherIcon,
 		Input,
 		FileUploader,
 		UserAvatar,
 		Autocomplete,
+		ErrorMessage,
 	},
 	setup() {
 		const editingName = ref(false)
-		const tempContactName = ref("")
-		const selectedCustomer = ref("")
-
+		const newContactValues = ref({
+			fullName: "",
+			email: "",
+			phone: "",
+			customer: "",
+			profilePicture: "",
+		})
+		const contactInputErrors = ref({
+			fullName: "",
+			email: "",
+			phone: "",
+			customer: "",
+		})
 		return {
 			editingName,
-			tempContactName,
-			selectedCustomer,
+			newContactValues,
+			contactInputErrors,
 		}
 	},
 	computed: {
-		contactDoc() {
-			return this.$resources.contact.doc || null
-		},
-		values() {
-			if (this.$resources.contact.setValue.loading) {
-				return this.values || null
+		contact() {
+			const doc = this.$resources.contact.doc
+			if (doc) {
+				this.newContactValues.fullName =
+					(doc.first_name || "") + " " + (doc.last_name || "")
+				if (doc.email_ids.length > 0) {
+					this.newContactValues.email = doc.email_ids[0].email_id
+				}
+				if (doc.phone_nos.length > 0) {
+					this.newContactValues.phone = doc.phone_nos[0].phone
+				}
+				if (doc.links.length > 0) {
+					this.newContactValues.customer = doc.links[0].link_name
+				}
+				this.newContactValues.profilePicture = doc.image || ""
 			}
-
-			return {
-				contactName: this.contactDoc
-					? `${this.contactDoc?.first_name || ""} ${
-							this.contactDoc?.last_name || ""
-					  }`
-					: "",
-				profilePicture: this.contactDoc?.image || null,
-				firstName: this.contactDoc?.first_name || null,
-				lastName: this.contactDoc?.last_name || null,
-				email:
-					this.contactDoc && this.contactDoc.email_ids.length > 0
-						? this.contactDoc.email_ids[0].email_id
-						: "",
-				phone:
-					this.contactDoc && this.contactDoc.phone_nos.length > 0
-						? this.contactDoc.phone_nos[0].phone
-						: "",
-				customer:
-					this.contactDoc && this.contactDoc.links.length > 0
-						? (this.selectedCustomer =
-								this.contactDoc.links[0].link_name)
-						: "",
-			}
+			return doc
 		},
-	},
-	deactivated() {
-		this.resetForm()
 	},
 	resources: {
 		contact() {
 			return {
 				type: "document",
 				doctype: "Contact",
-				name: this.contact,
+				name: this.contactId,
 				setValue: {
-					onSuccess: () => {
+					onSuccess: (res) => {
 						this.$toast({
 							title: "Contact Updated.",
 							customIcon: "circle-check",
 							appearance: "success",
 						})
-						this.resetForm()
+						this.$router.go()
 					},
 				},
 			}
@@ -243,40 +248,37 @@ export default {
 		setContactImage(url) {
 			this.$resources.contact.setValue.submit({ image: url })
 		},
-		resetForm() {
-			this.editingName = false
-			this.tempContactName = this.values.contactName
+		validate() {
+			if (this.newContactValues.fullName === "") {
+				this.contactInputErrors.fullName = "Name is required."
+				return false
+			}
+			return true
 		},
 		save() {
+			const values = this.newContactValues
+			const links = []
+			if (values.customer) {
+				links.push({
+					link_doctype: "FD Customer",
+					link_name: values.customer,
+				})
+			}
 			let firstName = ""
 			let lastName = ""
-			if (this.tempContactName.split(" ").length > 1) {
-				firstName = this.tempContactName.split(" ")[0]
-				lastName = this.tempContactName.slice(
-					firstName.length + 1,
-					this.tempContactName.length
-				)
+			if (values.fullName.split(" ").length > 1) {
+				firstName = values.fullName.split(" ")[0]
+				lastName = values.fullName.substring(firstName.length + 1)
 			} else {
-				firstName = this.tempContactName
+				firstName = values.fullName
+				lastName = ""
 			}
-
 			this.$resources.contact.setValue.submit({
 				first_name: firstName,
 				last_name: lastName,
-				email_ids: this.values.email
-					? [{ email_id: this.values.email }]
-					: [],
-				phone_nos: this.values.phone
-					? [{ phone: this.values.phone }]
-					: [],
-				links: this.values.customer
-					? [
-							{
-								link_doctype: "FD Customer",
-								link_name: this.selectedCustomer,
-							},
-					  ]
-					: [],
+				email_ids: values.email ? [{ email_id: values.email }] : [],
+				phone_nos: values.phone ? [{ phone: values.phone }] : [],
+				links,
 			})
 		},
 		cancel() {

@@ -212,7 +212,9 @@
 							{{ ticket.priority }}
 						</div>
 
-						<div class="w-[10%] font-normal text-sm text-[#74808B]">
+						<div
+							class="w-[10%] font-normal text-sm text-[#74808B] line-clamp-1"
+						>
 							{{ ticket.contact }}
 						</div>
 						<!-- <div class="w-[10%]" v-for="contact in contactDoc">
@@ -398,7 +400,6 @@ export default {
 					})
 				}
 			} else {
-			
 				this.$toast({
 					title: "Please fill all the fields",
 					customIcon: "circle-fail",
