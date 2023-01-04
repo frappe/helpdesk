@@ -1,103 +1,22 @@
 <template>
 	<div class="pt-[20px] h-full flex flex-col" v-if="ticket">
-		<div
-			class="shrink-0 text-base px-[16px] pb-[17px]"
-			:class="editingContact ? '' : 'border-b'"
-		>
-			<LoadingText v-if="updatingContact" />
-			<div v-else>
-				<div v-if="!editingContact">
-					<div v-if="contact" class="space-y-[12px]">
-						<div class="flex flex-row items-center space-x-[12px]">
-							<div class="w-7">
-								<CustomAvatar
-									:label="contactFullName"
-									:imageURL="contact?.image"
-									size="md"
-								/>
-							</div>
-							<a
-								:title="contactFullName"
-								class="grow truncate font-normal text-base"
-								>{{ contactFullName }}</a
-							>
-							<div class="flex">
-								<FeatherIcon
-									name="edit-2"
-									class="stroke-slate-400 w-4 h-4 cursor-pointer"
-									@click="
-										() => {
-											editingContact = !editingContact
-										}
-									"
-								/>
-							</div>
-						</div>
-						<div
-							v-if="contact.phone_nos.length > 0"
-							class="flex space-x-[12px] items-center"
-						>
-							<FeatherIcon
-								name="phone"
-								class="stroke-gray-500"
-								style="width: 15px"
+		<div class="shrink-0 text-base px-[16px] pb-[17px]">
+			<div>
+				<div v-if="contact" class="space-y-[12px]">
+					<div class="flex flex-row items-center space-x-[12px]">
+						<div class="w-7">
+							<CustomAvatar
+								:label="contactFullName"
+								:imageURL="contact?.image"
+								size="md"
 							/>
-							<div
-								class="space-y-1"
-								v-for="phone_no in contact.phone_nos"
-								:key="phone_no"
-							>
-								<a
-									:title="phone_no.phone"
-									class="text-gray-700 text-base"
-									>{{ phone_no.phone }}</a
-								>
-							</div>
 						</div>
-						<div
-							v-if="contact.email_ids.length > 0"
-							class="flex space-x-[12px]"
+						<a
+							:title="contactFullName"
+							class="grow truncate font-normal text-base"
+							>{{ contactFullName }}</a
 						>
-							<FeatherIcon
-								name="mail"
-								class="stroke-gray-500 mt-[2.5px]"
-								style="width: 15px; height: 15px"
-							/>
-							<div
-								class="space-y-1 max-w-[173px] break-words"
-								v-for="email in contact.email_ids"
-								:key="email"
-							>
-								<div
-									:title="email.email_id"
-									class="text-gray-700 text-base"
-								>
-									<a :title="email.email_id">{{
-										email.email_id
-									}}</a>
-								</div>
-							</div>
-						</div>
-						<div class="flex space-x-[12px]">
-							<CustomIcons
-								name="customer"
-								class="stroke-gray-500 mt-[2.5px]"
-								style="width: 15px; height: 15px"
-							/>
-							<div class="text-gray-700 text-base">
-								<a
-									:title="ticket.customer"
-									class="grow truncate font-normal text-base"
-									>{{ ticket.customer }}</a
-								>
-							</div>
-						</div>
-					</div>
-					<div v-else>
-						<div
-							v-if="!updatingContact"
-							class="flex flex-row-reverse"
-						>
+						<div class="flex">
 							<FeatherIcon
 								name="edit-2"
 								class="stroke-slate-400 w-4 h-4 cursor-pointer"
@@ -109,21 +28,65 @@
 							/>
 						</div>
 					</div>
-				</div>
-				<div v-else class="flex items-center space-x-2 mb-2 w-full">
-					<div class="grow w-full">
-						<!-- TODO: use the new functionalities of autocomplete -->
-						<Autocomplete />
+					<div
+						v-if="contact.phone_nos.length > 0"
+						class="flex space-x-[12px] items-center"
+					>
+						<FeatherIcon
+							name="phone"
+							class="stroke-gray-500"
+							style="width: 15px"
+						/>
+						<div
+							class="space-y-1"
+							v-for="phone_no in contact.phone_nos"
+							:key="phone_no"
+						>
+							<a
+								:title="phone_no.phone"
+								class="text-gray-700 text-base"
+								>{{ phone_no.phone }}</a
+							>
+						</div>
 					</div>
-					<FeatherIcon
-						name="x"
-						class="stroke-slate-400 w-4 h-4 cursor-pointer hover:stroke-red-500"
-						@click="
-							() => {
-								editingContact = !editingContact
-							}
-						"
-					/>
+					<div
+						v-if="contact.email_ids.length > 0"
+						class="flex space-x-[12px]"
+					>
+						<FeatherIcon
+							name="mail"
+							class="stroke-gray-500 mt-[2.5px]"
+							style="width: 15px; height: 15px"
+						/>
+						<div
+							class="space-y-1 max-w-[173px] break-words"
+							v-for="email in contact.email_ids"
+							:key="email"
+						>
+							<div
+								:title="email.email_id"
+								class="text-gray-700 text-base"
+							>
+								<a :title="email.email_id">{{
+									email.email_id
+								}}</a>
+							</div>
+						</div>
+					</div>
+					<div class="flex space-x-[12px]">
+						<CustomIcons
+							name="customer"
+							class="stroke-gray-500 mt-[2.5px]"
+							style="width: 15px; height: 15px"
+						/>
+						<div class="text-gray-700 text-base">
+							<a
+								:title="ticket.customer"
+								class="grow truncate font-normal text-base"
+								>{{ ticket.customer }}</a
+							>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="shrink-0 text-base px-[16px] pb-[17px] border-b">
@@ -355,7 +318,6 @@ import Activities from "@/components/desk/ticket/Activities.vue"
 import Autocomplete from "@/components/global/Autocomplete.vue"
 import ContactInfo from "@/components/desk/ticket/ContactInfo.vue"
 import { inject, ref } from "vue"
-
 export default {
 	name: "InfoPanel",
 	props: ["ticketId"],
@@ -369,10 +331,8 @@ export default {
 	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
-
 		const showOtherTicketsOfContacts = ref(false)
 		const showTicketHistory = ref(false)
-
 		return {
 			viewportWidth,
 			showTicketHistory,
@@ -387,7 +347,6 @@ export default {
 			const offset = 290
 			const multiplier = 30
 			const maxCount = 5
-
 			return (
 				offset +
 				multiplier *
