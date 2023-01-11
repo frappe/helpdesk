@@ -13,17 +13,8 @@
 							class="w-[12px] h-[12px]"
 						/>
 						<div>Ticket #{{ ticket.name }}</div>
-						<Badge
-							:color="
-								['Resolved', 'Closed'].includes(ticket.status)
-									? 'gray'
-									: ticket.status == 'Open'
-									? 'red'
-									: 'yellow'
-							"
-							>{{ ticket.status }}</Badge
-						>
 					</router-link>
+					<TicketStatus :value="ticket.status" />
 					<FeatherIcon
 						name="copy"
 						class="w-[24px] h-[24px] bg-gray-100 p-1 rounded-md stroke-gray-700"
@@ -392,6 +383,7 @@ import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSat
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
 import { inject, ref } from "vue"
+import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
 
 export default {
 	name: "Ticket",
@@ -412,6 +404,7 @@ export default {
 		CannedResponsesDialog,
 		TextEditorFixedMenu,
 		ArticleResponseDialog,
+		TicketStatus,
 	},
 	data() {
 		return {
