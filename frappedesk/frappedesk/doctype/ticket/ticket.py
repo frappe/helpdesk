@@ -356,7 +356,7 @@ def create_communication_via_agent(ticket, message, attachments=None):
 		reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
 		try:
 			frappe.sendmail(
-				subject=f"[Ticket #{ticket_doc.name}] New reply",
+				subject=f"Re: {ticket_doc.subject}",
 				sender=reply_to_email,
 				reply_to=reply_to_email,
 				recipients=[ticket_doc.raised_by],
