@@ -68,12 +68,7 @@
 							},
 							modified: {
 								label: 'Modified',
-								width: '1',
-							},
-							_assign: {
-								label: ' ',
-								width: '1',
-								align: 'right',
+								width: '2',
 							},
 						},
 					}"
@@ -90,7 +85,7 @@
 							{{ value }}
 						</div>
 					</template>
-					<template #field-subject="{ value, row }">
+					<template #field-subject="{ row }">
 						<Subject :ticket="row" />
 					</template>
 					<template #field-status="{ value }">
@@ -117,22 +112,23 @@
 							</div>
 						</Tooltip>
 					</template>
-					<template #field-resolution_by="{ value, row }">
+					<template #field-resolution_by="{ row }">
 						<ResolutionBy :ticket="row" />
 					</template>
-					<template #field-modified="{ value }">
-						<div class="text-gray-500">
-							{{
-								$dayjs.shortFormating(
-									$dayjs(value).fromNow(),
-									false
-								)
-							}}
-						</div>
-					</template>
-					<template #field-_assign="{ value }">
-						<div v-if="value">
-							<AgentAvatar :agent="JSON.parse(value)[0]" />
+					<template #field-modified="{ row }">
+						<div class="flex justify-between w-full">
+							<div class="text-gray-500">
+								{{
+									$dayjs.shortFormating(
+										$dayjs(row.modified).fromNow(),
+										false
+									)
+								}}
+							</div>
+							<AgentAvatar
+								v-if="row._assign"
+								:agent="JSON.parse(row._assign)[0]"
+							/>
 						</div>
 					</template>
 
