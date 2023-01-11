@@ -45,6 +45,7 @@
 						}
 					"
 					:resourceOptions="getResourceOptions(filter)"
+					:searchable="true"
 				>
 					<template #input-holder="{ selectedValue }">
 						<div class="text-gray-700">
