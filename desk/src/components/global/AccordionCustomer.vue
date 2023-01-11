@@ -1,8 +1,12 @@
 <template>
-	<div>
+	<div class="mx-5">
 		<button
-			@click="isOpen = !isOpen"
-			class="flex flex-row py-2 mx-5 py-2 px-4 bg-[#F9FAFA] rounded text-left items-center"
+			@click="
+				() => {
+					$emit('toggle')
+				}
+			"
+			class="flex flex-row py-2 px-4 bg-[#F9FAFA] rounded text-left items-center"
 			:aria-expanded="this.isOpen"
 			:aria-controls="`collapse${_uid}`"
 		>
@@ -13,7 +17,7 @@
 				name="chevron-down-accordion"
 			/>
 		</button>
-		<div v-show="isOpen" :id="`collapse${_uid}`">
+		<div v-show="isOpen" :id="`collapse${_uid}`" class="px-2">
 			<slot name="data" />
 		</div>
 	</div>
@@ -33,15 +37,5 @@ export default {
 	components: {
 		CustomIcons,
 	},
-	// data() {
-	// 	return {
-	// 		isOpen: true,
-	// 	}
-	// },
-	// methods: {
-	// 	toggleAccordion() {
-	// 		this.isOpen = !this.isOpen
-	// 	},
-	// },
 }
 </script>

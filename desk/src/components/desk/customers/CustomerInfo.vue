@@ -117,10 +117,21 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="customer-table flex-1">
+		<div class="customer-table flex-1 grow-1">
 			<AccordionCustomer
-				:isOpen="false"
+				:isOpen="toggleContacts"
+				@toggle="
+					() => {
+						if (toggleContacts) {
+							toggleContacts = false
+						} else {
+							if (toggleTickets) {
+								toggleTickets = false
+							}
+							toggleContacts = true
+						}
+					}
+				"
 				class="customer-accordion flex flex-col"
 			>
 				<template v-slot:title>
@@ -136,7 +147,7 @@
 				<template v-slot:data>
 					<div
 						v-for="contact in contactDoc"
-						class="flex font-normal text-sm py-2 items-center space-x-3 mx-5 py-2 px-4 border-b border-[#F4F5F6]-200"
+						class="flex font-normal text-sm py-2 items-center space-x-3 mx-5 py-2 px-4 border-b border-[#F4F5F6]-200 overflow-y-scroll max-h-[calc(100vh-245px)]"
 					>
 						<div class="w-[30%]">
 							<router-link
@@ -164,9 +175,21 @@
 				</template>
 			</AccordionCustomer>
 		</div>
-		<div class="ticket-table flex-1 mt-5">
+		<div class="ticket-table flex-1 mt-5 grow-1">
 			<AccordionCustomer
-				:isOpen="true"
+				:isOpen="toggleTickets"
+				@toggle="
+					() => {
+						if (toggleTickets) {
+							toggleTickets = false
+						} else {
+							if (toggleContacts) {
+								toggleContacts = false
+							}
+							toggleTickets = true
+						}
+					}
+				"
 				class="flex flex-col ticket-accordion"
 			>
 				<template v-slot:title>
@@ -180,55 +203,88 @@
 				</template>
 
 				<template v-slot:data>
-					<div
-						v-for="ticket in ticketDoc"
-						class="flex w-[100%] pl-[22px] font-normal text-sm py-3 mx-5"
-					>
-						<div class="font-normal w-[10%] text-sm text-[#74808B]">
-							{{ ticket.name }}
-						</div>
-
-						<div class="w-[40%] font-normal text-sm text-[#192734]">
-							<router-link
-								:to="`/frappedesk/tickets/${ticket.name}`"
-							>
-								{{ ticket.subject }}
-							</router-link>
-						</div>
-
-						<div class="w-[10%] font-normal text-xs text-[#74808B]">
-							<span :class="getStatusStyle(ticket.status)">{{
-								ticket.status
-							}}</span>
-						</div>
-
-						<div class="w-[10%] font-medium text-xs text-[#74808B]">
-							<span :class="getTypeStyle(ticket.ticket_type)">
-								{{ ticket.ticket_type }}
-							</span>
-						</div>
-
-						<div class="w-[10%] font-normal text-xs text-[#74808B]">
-							{{ ticket.priority }}
-						</div>
-
-						<div
-							class="w-[10%] font-normal text-sm text-[#74808B] line-clamp-1"
+					<div>
+						<ListManager
+							ref="ticketList"
+							:options="{
+								cache: ['Ticket', 'Customer', customer],
+								saveFiltersLocally: false,
+								urlQueryFilters: false,
+								doctype: 'Ticket',
+								fields: [
+									'status',
+									'priority',
+									'subject',
+									'ticket_type',
+									'contact',
+									'name',
+									'_seen',
+								],
+								limit: 20,
+								order_by: 'modified desc',
+							}"
 						>
-							{{ ticket.contact }}
-						</div>
-						<!-- <div class="w-[10%]" v-for="contact in contactDoc">
-							<Avatar
-								:label="user"
-								class="w-[10%]"
-								:imageURL="
-									contact.name == ticket.contact
-										? contact.image
-										: ''
-								"
-								size="md"
-							/>
-						</div> -->
+							<template #body>
+								<ListViewer
+									:options="{
+										base: '12',
+										fields: {
+											name: {
+												label: '#',
+												width: '1',
+											},
+											subject: {
+												label: 'Subject',
+												width: '5',
+											},
+											status: {
+												label: 'Status',
+												width: '2',
+											},
+											priority: {
+												label: 'Priority',
+												width: '2',
+											},
+											contact: {
+												label: 'Created By',
+												width: '2',
+											},
+										},
+									}"
+									class="text-base h-[calc(100vh-245px)]"
+								>
+									<template #top-section>
+										<div></div>
+									</template>
+									<template #header>
+										<div></div>
+									</template>
+									<template #row-checkbox>
+										<div></div>
+									</template>
+									<!-- Field Templates -->
+									<template #field-name="{ value }">
+										<div class="text-xs text-gray-500">
+											{{ value }}
+										</div>
+									</template>
+									<template #field-subject="{ row }">
+										<Subject :ticket="row" />
+									</template>
+									<template #field-status="{ value }">
+										<TicketStatus :value="value" />
+									</template>
+									<template #field-priority="{ value }">
+										<TicketPriority :value="value" />
+									</template>
+									<template #field-contact="{ value }">
+										<div class="text-gray-500">
+											{{ value }}
+										</div>
+									</template>
+								</ListViewer>
+							</template>
+						</ListManager>
 					</div>
 				</template>
 			</AccordionCustomer>
@@ -260,20 +316,34 @@
 
 <script>
 import { Dropdown, Avatar } from "frappe-ui"
-import { Input } from "frappe-ui"
 import AccordionCustomer from "@/components/global/AccordionCustomer.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue"
 import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue"
+import ListManager from "@/components/global/ListManager.vue"
+import ListViewer from "@/components/global/ListViewer.vue"
+import ResolutionBy from "@/components/global/ticket_list_item/ResolutionBy.vue"
+import TicketType from "@/components/global/ticket_list_item/TicketType.vue"
+import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
+import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue"
+import Subject from "@/components/global/ticket_list_item/Subject.vue"
+import { ref } from "vue"
+
 export default {
 	name: "CustomerInfo",
 	props: ["customer"],
 	components: {
+		ResolutionBy,
+		TicketType,
+		TicketStatus,
+		TicketPriority,
+		Subject,
+		ListManager,
+		ListViewer,
 		Dropdown,
 		CustomIcons,
 		NewContactDialog,
 		NewTicketDialog,
-		Input,
 		Avatar,
 		AccordionCustomer,
 	},
@@ -288,15 +358,21 @@ export default {
 			},
 		}
 	},
+	setup() {
+		const toggleContacts = ref(false)
+		const toggleTickets = ref(true)
+
+		return {
+			toggleContacts,
+			toggleTickets,
+		}
+	},
 	computed: {
 		acronym() {
 			var str = this.customerDoc.customer_name
 			var matches = str.match(/\b(\w)/g)
 			var acronym = matches.join("")
 			return acronym
-		},
-		ticketDoc() {
-			return this.$resources.ticket.data
 		},
 		contactDoc() {
 			return this.$resources.contact.data
@@ -344,19 +420,6 @@ export default {
 					doctype: "Contact",
 					link_name: this.customer,
 					fields: ["*"],
-				},
-				auto: true,
-			}
-		},
-		ticket() {
-			return {
-				method: "frappe.client.get_list",
-				params: {
-					doctype: "Ticket",
-					fields: ["*"],
-					filters: {
-						customer: this.customer,
-					},
 				},
 				auto: true,
 			}

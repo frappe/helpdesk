@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col w-full">
 		<AgentRelatedInfoTopPanel />
-		<div v-if="relatedInfoToShow === 'tickets'" class="w-full px-4 h-full">
+		<div v-if="relatedInfoToShow === 'tickets'" class="w-full px-4">
 			<ListManager
 				ref="miniTicketList"
 				:options="{
@@ -22,7 +22,7 @@
 					},
 				}"
 			>
-				<template #body="{ manager }">
+				<template #body>
 					<ListViewer
 						:options="{
 							base: 12,
@@ -50,7 +50,7 @@
 								},
 							},
 						}"
-						class="text-base h-[87vh] pt-4"
+						class="text-base h-[calc(100vh-9rem)] pt-4"
 					>
 						<template #top-section> <div></div> </template>
 						<template #field-name="{ value }">
