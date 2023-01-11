@@ -75,15 +75,7 @@ _dayjs.shortFormating = (s, ago = false) => {
 }
 
 export function remove_script_and_style(txt) {
-	const evil_tags = [
-		"script",
-		"style",
-		"noscript",
-		"title",
-		"meta",
-		"base",
-		"head",
-	]
+	const evil_tags = ["script", "noscript", "title", "meta", "base", "head"]
 	const regex = new RegExp(
 		evil_tags.map((tag) => `<${tag}>.*<\\/${tag}>`).join("|"),
 		"s"

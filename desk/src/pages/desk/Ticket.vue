@@ -655,10 +655,11 @@ export default {
 		submitConversation() {
 			this.tempTextEditorData.content = this.content
 			this.tempTextEditorData.attachments = this.attachments
+			const content = `<div class='content-block'>${this.content}</div>`
 
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
-				message: this.content,
+				message: content,
 				attachments: this.attachments.map((x) => x.name),
 			})
 
@@ -668,12 +669,13 @@ export default {
 		submitComment() {
 			this.tempTextEditorData.attachments = this.attachments
 			this.tempTextEditorData.content = this.content
+			const content = `<div class='content-block'>${this.content}</div>`
 
 			this.$resources.submitComment.submit({
 				doc: {
 					doctype: "Frappe Desk Comment",
 					reference_ticket: this.ticketId,
-					content: this.content,
+					content: content,
 					commented_by: this.user.user,
 				},
 			})
