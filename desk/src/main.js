@@ -6,6 +6,7 @@ import {
 	Input,
 	onOutsideClickDirective,
 	Tooltip,
+	Badge,
 } from "frappe-ui"
 import router from "./router"
 import App from "./App.vue"
@@ -29,6 +30,7 @@ app.component("Button", Button)
 app.component("Dialog", Dialog)
 app.component("Input", Input)
 app.component("Tooltip", Tooltip)
+app.component("Badge", Badge)
 
 app.config.unwrapInjectedRef = true
 

@@ -185,6 +185,9 @@ export default {
 			query: "",
 		}
 	},
+	mounted() {
+		this.dsearch("")
+	},
 	computed: {
 		valuePropPassed() {
 			return "value" in this.$attrs

@@ -18,15 +18,8 @@
 		border-radius: 6px;
 	}
 
-	*::-webkit-scrollbar-track,
-	*::-webkit-scrollbar {
-		width: 5px;
-		height: 6px;
-	}
-
-	body::-webkit-scrollbar {
-		width: 5px;
-		height: 12px;
+	*::-webkit-scrollbar-track {
+		width: 0px;
 	}
 }
 

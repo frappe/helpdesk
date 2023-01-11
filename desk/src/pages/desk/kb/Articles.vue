@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full">
+	<div class="flex flex-col">
 		<ListManager
 			ref="articleList"
 			:options="{
@@ -54,7 +54,7 @@
 							$router.push('/frappedesk/kb/articles/new')
 						}
 					"
-					class="text-base"
+					class="text-base h-[calc(100vh-6.5rem)]"
 				>
 					<template #top-sub-section-1>
 						<LayoutSwitcher viewMode="List" />
