@@ -53,6 +53,7 @@
 
 <script>
 import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import { FeatherIcon } from "frappe-ui"
 import { remove_script_and_style } from "@/utils"
 
 export default {
