@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col">
+	<div class="flex flex-col max-h-screen">
 		<div class="flex border-b h-[52px] px-[24px] shrink-0">
 			<div class="grow my-auto">
 				<BaseBreadcrumbs
@@ -21,7 +21,7 @@
 				/>
 			</div>
 		</div>
-		<div class="customer">
+		<div class="customer max-h-[calc(100vh-52px)]">
 			<CustomerInfo
 				class="flex border-r border-[#F4F5F6] w-full"
 				:customer="customerId"

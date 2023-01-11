@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full px-4 overflow-y-clip">
+	<div class="flex flex-col px-4 overflow-y-clip">
 		<div
 			v-if="false"
 			class="text-green-600 text-gray-600 text-green-500 bg-green-100 border-green-500 text-yellow-500 bg-yellow-100 border-yellow-500 text-orange-500 bg-orange-100 border-orange-500 text-red-500 bg-red-100 border-red-500"
@@ -68,16 +68,11 @@
 							},
 							modified: {
 								label: 'Modified',
-								width: '1',
-							},
-							_assign: {
-								label: ' ',
-								width: '1',
-								align: 'right',
+								width: '2',
 							},
 						},
 					}"
-					class="text-base h-[100vh] pt-4"
+					class="text-base h-[calc(100vh-5.5rem)] pt-4"
 					@add-item="
 						() => {
 							showNewTicketDialog = true
@@ -90,7 +85,7 @@
 							{{ value }}
 						</div>
 					</template>
-					<template #field-subject="{ value, row }">
+					<template #field-subject="{ row }">
 						<Subject :ticket="row" />
 					</template>
 					<template #field-status="{ value }">
@@ -117,22 +112,23 @@
 							</div>
 						</Tooltip>
 					</template>
-					<template #field-resolution_by="{ value, row }">
+					<template #field-resolution_by="{ row }">
 						<ResolutionBy :ticket="row" />
 					</template>
-					<template #field-modified="{ value }">
-						<div class="text-gray-500">
-							{{
-								$dayjs.shortFormating(
-									$dayjs(value).fromNow(),
-									false
-								)
-							}}
-						</div>
-					</template>
-					<template #field-_assign="{ value }">
-						<div v-if="value">
-							<AgentAvatar :agent="JSON.parse(value)[0]" />
+					<template #field-modified="{ row }">
+						<div class="flex justify-between w-full">
+							<div class="text-gray-500">
+								{{
+									$dayjs.shortFormating(
+										$dayjs(row.modified).fromNow(),
+										false
+									)
+								}}
+							</div>
+							<AgentAvatar
+								v-if="row._assign"
+								:agent="JSON.parse(row._assign)[0]"
+							/>
 						</div>
 					</template>
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full px-4">
+	<div class="flex flex-col px-4">
 		<ListManager
 			ref="agentGroupList"
 			:options="{
@@ -28,7 +28,7 @@
 							},
 						},
 					}"
-					class="text-base h-[100vh] pt-4"
+					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
 						() => {
 							$router.push('/frappedesk/settings/teams/new')
