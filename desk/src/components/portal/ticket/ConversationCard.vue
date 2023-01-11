@@ -13,7 +13,7 @@
 				:class="`bg-${color}-50`"
 			>
 				<div
-					class="content-block"
+					class="message text-[13px]"
 					style="border: 0px"
 					v-html="cleanedMessage"
 				></div>
@@ -70,7 +70,7 @@ export default {
 </script>
 
 <style scoped>
-.content-block {
-	@apply prose prose-p:my-1 prose-table:table-fixed prose-td:p-2 prose-th:p-2 prose-td:border prose-th:border prose-td:border-gray-300 prose-th:border-gray-300 prose-td:relative prose-th:relative prose-th:bg-gray-100 text-[13px] max-w-full;
+.message >>> .content-block {
+	@apply prose prose-p:my-1 prose-table:table-fixed prose-td:p-2 prose-th:p-2 prose-td:border prose-th:border prose-td:border-gray-300 prose-th:border-gray-300 prose-td:relative prose-th:relative prose-th:bg-gray-100 max-w-full;
 }
 </style>

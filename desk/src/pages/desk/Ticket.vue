@@ -648,7 +648,7 @@ export default {
 		submitConversation() {
 			this.tempTextEditorData.content = this.content
 			this.tempTextEditorData.attachments = this.attachments
-			const content = `<div class='content-block'>${this.content}</div>`
+			const content = `<div class='content-block'><div>${this.content}</div></div>`
 
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
@@ -662,7 +662,7 @@ export default {
 		submitComment() {
 			this.tempTextEditorData.attachments = this.attachments
 			this.tempTextEditorData.content = this.content
-			const content = `<div class='content-block'>${this.content}</div>`
+			const content = `<div class='content-block'><div>${this.content}</div></div>`
 
 			this.$resources.submitComment.submit({
 				doc: {

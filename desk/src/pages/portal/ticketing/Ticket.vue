@@ -503,10 +503,11 @@ export default {
 		submitConversation() {
 			this.tempTextEditorData.content = this.content
 			this.tempTextEditorData.attachments = this.attachments
+			const content = `<div class='content-block'><div>${this.content}</div></div>`
 
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
-				message: this.content,
+				message: content,
 				attachments: this.attachments.map((x) => x.name),
 			})
 
