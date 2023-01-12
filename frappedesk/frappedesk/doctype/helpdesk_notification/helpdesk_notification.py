@@ -1,9 +1,10 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
-# import frappe
+import frappe
 from frappe.model.document import Document
 
 
-class FDPresetFilterItem(Document):
-	pass
+class HelpdeskNotification(Document):
+	def after_insert(self):
+		frappe.publish_realtime("frappedesk:new_notification", user=self.to_user)

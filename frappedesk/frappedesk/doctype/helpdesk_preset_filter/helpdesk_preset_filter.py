@@ -5,7 +5,7 @@ import frappe
 from frappe.model.document import Document
 
 
-class FDPresetFilter(Document):
+class HelpdeskPresetFilter(Document):
 	def before_save(self):
 		if self.type == "User":
 			self.user = frappe.session.user

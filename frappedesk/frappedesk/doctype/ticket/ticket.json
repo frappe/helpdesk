@@ -407,7 +407,7 @@
 			"fieldname": "customer",
 			"fieldtype": "Link",
 			"label": "Customer",
-			"options": "FD Customer"
+			"options": "Helpdesk Customer"
 		},
 		{
 			"fieldname": "custom_fields_section",
@@ -424,7 +424,7 @@
 	"icon": "fa fa-issue",
 	"idx": 7,
 	"links": [],
-	"modified": "2022-12-29 12:53:14.989213",
+	"modified": "2023-01-12 09:07:17.219772",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Ticket",

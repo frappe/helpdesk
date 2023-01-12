@@ -5,7 +5,7 @@ import frappe
 from frappe.model.document import Document
 
 
-class FDCustomer(Document):
+class HelpdeskCustomer(Document):
 	pass
 
 

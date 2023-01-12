@@ -66,7 +66,7 @@
 	"modified": "2022-11-30 09:33:13.848020",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
-	"name": "FD Customer",
+	"name": "Helpdesk Customer",
 	"naming_rule": "Expression (old style)",
 	"owner": "Administrator",
 	"permissions": [

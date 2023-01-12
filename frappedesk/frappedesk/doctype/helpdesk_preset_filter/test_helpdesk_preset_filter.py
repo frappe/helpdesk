@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestFrappeDeskComment(FrappeTestCase):
+class TestHelpdeskPresetFilter(FrappeTestCase):
 	pass

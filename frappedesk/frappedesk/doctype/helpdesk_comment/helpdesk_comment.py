@@ -7,7 +7,7 @@ from frappedesk.utils import extract_mentions
 from frappe.utils import get_fullname
 
 
-class FrappeDeskComment(Document):
+class HelpdeskComment(Document):
 	def on_change(self):
 		print(f"\n\nFrappe Desk Comment created : {self.name}\n\n")
 		mentions = extract_mentions(self.content)

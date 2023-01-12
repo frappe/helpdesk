@@ -58,15 +58,15 @@
 			"fieldname": "filters",
 			"fieldtype": "Table",
 			"label": "Filters",
-			"options": "FD Preset Filter Item"
+			"options": "Helpdesk Preset Filter Item"
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-11-07 19:58:11.918230",
+	"modified": "2023-01-12 09:07:35.091727",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
-	"name": "FD Preset Filter",
+	"name": "Helpdesk Preset Filter",
 	"naming_rule": "Random",
 	"owner": "Administrator",
 	"permissions": [
