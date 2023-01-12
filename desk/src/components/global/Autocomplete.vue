@@ -240,7 +240,11 @@ export default {
 		}, 300),
 		search(query) {
 			if (!this.searchable) return
-			this.$resources.search.fetch(this.resourceOptions.inputMap(query))
+			if (this.resourceOptions) {
+				this.$resources.search.fetch(
+					this.resourceOptions.inputMap(query)
+				)
+			}
 		},
 	},
 	watch: {
