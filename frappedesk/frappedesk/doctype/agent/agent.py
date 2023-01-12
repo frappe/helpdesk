@@ -49,8 +49,7 @@ class Agent(Document):
 
 			rule_docs.append(
 				frappe.get_doc(
-					"Assignment Rule",
-					frappe.get_doc("Frappe Desk Settings").get_base_support_rotation(),
+					"Assignment Rule", frappe.get_doc("Helpdesk Settings").get_base_support_rotation(),
 				)
 			)
 
@@ -112,8 +111,7 @@ class Agent(Document):
 			# Remove the agent from the base support rotation
 			rule_docs.append(
 				frappe.get_doc(
-					"Assignment Rule",
-					frappe.get_doc("Frappe Desk Settings").get_base_support_rotation(),
+					"Assignment Rule", frappe.get_doc("Helpdesk Settings").get_base_support_rotation(),
 				)
 			)
 

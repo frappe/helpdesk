@@ -21,7 +21,7 @@ class FrappeDeskSettings(Document):
 		return self.base_support_rotation
 
 	def create_base_support_rotation(self):
-		"""Creates the base support rotation rule, and set it to frappe desk settings"""
+		"""Creates the base support rotation rule, and set it to helpdesk settings"""
 
 		rule_doc = frappe.new_doc("Assignment Rule")
 		rule_doc.name = append_number_if_name_exists("Assignment Rule", "Support Rotation")

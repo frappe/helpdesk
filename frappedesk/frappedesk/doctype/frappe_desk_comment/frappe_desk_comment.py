@@ -3,7 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
-from frappedesk.utils import extract_mentions
+from helpdesk.utils import extract_mentions
 from frappe.utils import get_fullname
 
 
@@ -19,9 +19,9 @@ class FrappeDeskComment(Document):
 				ticket=self.reference_ticket,
 				comment=self.name,
 			)
-			if frappe.db.exists("Frappe Desk Notification", values):
+			if frappe.db.exists("Helpdesk Notification", values):
 				continue
-			notification = frappe.get_doc(doctype="Frappe Desk Notification")
+			notification = frappe.get_doc(doctype="Helpdesk Notification")
 			notification.message = (
 				f"{get_fullname(self.owner)} mentioned you in Ticket #{self.reference_ticket}",
 			)

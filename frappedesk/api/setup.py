@@ -1,10 +1,10 @@
 import frappe
-from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact
+from helpdesk.helpdesk.doctype.ticket.ticket import create_communication_via_contact
 
 
 @frappe.whitelist()
 def initial_agent_setup():
-	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
+	support_settings_doc = frappe.get_doc("Helpdesk Settings", "Helpdesk Settings")
 	if frappe.db.count("Agent") == 0:
 		agent_added = False
 		users = frappe.get_all(
@@ -26,7 +26,7 @@ def initial_agent_setup():
 
 @frappe.whitelist()
 def create_initial_demo_ticket():
-	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
+	support_settings_doc = frappe.get_doc("Helpdesk Settings", "Helpdesk Settings")
 	if frappe.db.count("Ticket") == 0:
 		agent = frappe.get_last_doc("Agent")
 		if agent:
@@ -40,17 +40,17 @@ def create_initial_demo_ticket():
 			).insert()
 
 			new_ticket_doc = frappe.new_doc("Ticket")
-			new_ticket_doc.subject = "Welcome to Frappe Desk"
+			new_ticket_doc.subject = "Welcome to Frappe Helpdesk"
 			new_ticket_doc.description = """
 			<p>Hi 👋🏻</p>
 			<p><br></p>
-			<p>I'm glad you decided to try Frappe Desk! We're working hard to build a better way for teams to communicate and serve customers well. I'm excited to get started.</p>
+			<p>I'm glad you decided to try Frappe Helpdesk! We're working hard to build a better way for teams to communicate and serve customers well. I'm excited to get started.</p>
 			<p><br></p>
-			<p>You can get started right away by setting up a support email. This will help you see what your support will look like with FrappeDesk!</p>
+			<p>You can get started right away by setting up a support email. This will help you see what your support will look like with Helpdesk!</p>
 			<p><br></p>
 			<p>Best,</p>
 			<p>Harshit</p>
-			<p>Frappe Desk | Frappe.</p>
+			<p>Frappe Helpdesk | Frappe.</p>
 			"""
 			new_ticket_doc.raised_by = "harshit@frappe.io"
 			new_ticket_doc.contact = "Harshit Agrawal"

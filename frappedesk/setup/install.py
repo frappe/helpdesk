@@ -165,7 +165,7 @@ def add_default_holidy_list():
 
 
 def enable_track_service_level_agreement_in_support_settings():
-	support_settings = frappe.get_doc("Frappe Desk Settings")
+	support_settings = frappe.get_doc("Helpdesk Settings")
 	support_settings.track_service_level_agreement = True
 	support_settings.save()
 	frappe.db.commit()
@@ -204,7 +204,7 @@ def add_default_ticket_types():
 			type_doc.name = type
 			type_doc.insert()
 
-	settings = frappe.get_doc("Frappe Desk Settings")
+	settings = frappe.get_doc("Helpdesk Settings")
 	settings.default_ticket_type = "Question"
 	settings.save()
 
@@ -234,7 +234,7 @@ def add_on_ticket_create_script():
 		script_doc = frappe.new_doc("Server Script")
 		script_doc.name = "Ticket Auto Set Custom Fields"
 		script_doc.script_type = "DocType Event"
-		script_doc.module = "FrappeDesk"
+		script_doc.module = "Helpdesk"
 		script_doc.reference_doctype = "Ticket"
 		script_doc.doctype_event = "Before Insert"
 		script_doc.script = "# Do Nothing"
@@ -261,7 +261,7 @@ def update_agent_role_permissions():
 
 
 def add_default_assignment_rule():
-	support_settings = frappe.get_doc("Frappe Desk Settings")
+	support_settings = frappe.get_doc("Helpdesk Settings")
 	support_settings.create_base_support_rotation()
 
 

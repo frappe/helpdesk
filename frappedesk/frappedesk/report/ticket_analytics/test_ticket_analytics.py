@@ -6,11 +6,11 @@ import frappe
 from frappe.desk.form.assign_to import add as add_assignment
 from frappe.utils import add_months, getdate
 
-from frappedesk.frappedesk.doctype.ticket.test_ticket import make_ticket
-from frappedesk.frappedesk.doctype.sla.test_service_level_agreement import (
+from helpdesk.helpdesk.doctype.ticket.test_ticket import make_ticket
+from helpdesk.helpdesk.doctype.sla.test_service_level_agreement import (
 	create_service_level_agreements_for_tickets,
 )
-from frappedesk.frappedesk.report.ticket_analytics.ticket_analytics import execute
+from helpdesk.helpdesk.report.ticket_analytics.ticket_analytics import execute
 
 months = [
 	"Jan",
@@ -32,7 +32,7 @@ class TestTicketAnalytics(unittest.TestCase):
 	@classmethod
 	def setUpClass(self):
 		# frappe.db.sql("delete from `tabTicket` where company='_Test Company'")
-		frappe.db.set_value("Frappe Desk Settings", None, "track_service_level_agreement", 1)
+		frappe.db.set_value("Helpdesk Settings", None, "track_service_level_agreement", 1)
 
 		current_month_date = getdate()
 		last_month_date = add_months(current_month_date, -1)

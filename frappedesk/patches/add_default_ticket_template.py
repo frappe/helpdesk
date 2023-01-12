@@ -1,4 +1,4 @@
-from frappedesk.setup.install import add_default_ticket_template
+from helpdesk.setup.install import add_default_ticket_template
 
 
 def execute():

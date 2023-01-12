@@ -1,4 +1,4 @@
-from frappedesk.setup.install import update_agent_role_permissions
+from helpdesk.setup.install import update_agent_role_permissions
 
 
 def execute():

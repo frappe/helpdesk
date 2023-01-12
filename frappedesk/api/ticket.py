@@ -2,10 +2,10 @@ import json
 import frappe
 
 from frappe.website.utils import cleanup_page_name
-from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
+from helpdesk.helpdesk.doctype.ticket_activity.ticket_activity import (
 	log_ticket_activity,
 )
-from frappedesk.frappedesk.doctype.ticket.ticket import (
+from helpdesk.helpdesk.doctype.ticket.ticket import (
 	create_communication_via_contact,
 	get_all_conversations,
 	create_communication_via_agent,
@@ -13,7 +13,7 @@ from frappedesk.frappedesk.doctype.ticket.ticket import (
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.utils import datetime
 
-from frappedesk.frappedesk.doctype.sla.sla import get_expected_time_for
+from helpdesk.helpdesk.doctype.sla.sla import get_expected_time_for
 from frappe.automation.doctype.assignment_rule.assignment_rule import apply
 from frappe.contacts.doctype.contact.contact import get_contact_name
 
@@ -170,7 +170,7 @@ def bulk_create_contacts_and_assignments_for_tickets(tickets):
 	for ticket in tickets:
 		if background:
 			frappe.enqueue(
-				"frappedesk.api.ticket.create_contacts_and_assignments_for_tickets", ticket=ticket,
+				"helpdesk.api.ticket.create_contacts_and_assignments_for_tickets", ticket=ticket,
 			)
 		else:
 			create_contacts_and_assignments_for_tickets(ticket)

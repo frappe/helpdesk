@@ -15,7 +15,7 @@ from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
-from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
+from helpdesk.helpdesk.doctype.ticket_activity.ticket_activity import (
 	log_ticket_activity,
 )
 
@@ -35,7 +35,7 @@ class Ticket(Document):
 
 	def before_insert(self):
 		if not self.ticket_type:
-			self.ticket_type = frappe.get_doc("Frappe Desk Settings").default_ticket_type
+			self.ticket_type = frappe.get_doc("Helpdesk Settings").default_ticket_type
 		self.update_priority_based_on_ticket_type()
 
 	def after_insert(self):
@@ -534,7 +534,7 @@ def auto_close_tickets():
 	"""Auto-close replied support tickets after 7 days"""
 	auto_close_after_days = (
 		frappe.db.get_value(
-			"Frappe Desk Settings", "Frappe Desk Settings", "close_ticket_after_days"
+			"Helpdesk Settings", "Helpdesk Settings", "close_ticket_after_days"
 		)
 		or 7
 	)

@@ -23,7 +23,7 @@ from frappe.utils import (
 )
 from frappe.utils.safe_exec import get_safe_globals
 
-from frappedesk.frappedesk.doctype.ticket.ticket import get_holidays
+from helpdesk.helpdesk.doctype.ticket.ticket import get_holidays
 
 
 class SLA(Document):
@@ -106,13 +106,13 @@ class SLA(Document):
 			self.enabled
 			and self.document_type == "Ticket"
 			and not frappe.db.get_single_value(
-				"Frappe Desk Settings", "track_service_level_agreement"
+				"Helpdesk Settings", "track_service_level_agreement"
 			)
 		):
 			frappe.throw(
 				_("{0} is not enabled in {1}").format(
 					frappe.bold("Track SLA"),
-					get_link_to_form("Frappe Desk Settings", "Frappe Desk Settings"),
+					get_link_to_form("Helpdesk Settings", "Helpdesk Settings"),
 				)
 			)
 
@@ -280,7 +280,7 @@ def check_agreement_status():
 
 def get_active_sla_for(doc):
 	if not frappe.db.get_single_value(
-		"Frappe Desk Settings", "track_service_level_agreement"
+		"Helpdesk Settings", "track_service_level_agreement"
 	):
 		return
 
@@ -339,7 +339,7 @@ def get_context(doc):
 @frappe.whitelist()
 def get_sla_filters(doctype, name):
 	if not frappe.db.get_single_value(
-		"Frappe Desk Settings", "track_service_level_agreement"
+		"Helpdesk Settings", "track_service_level_agreement"
 	):
 		return
 
@@ -644,9 +644,7 @@ def change_sla_and_priority(self):
 	if (
 		self.sla
 		and frappe.db.exists("Ticket", self.name)
-		and frappe.db.get_single_value(
-			"Frappe Desk Settings", "track_service_level_agreement"
-		)
+		and frappe.db.get_single_value("Helpdesk Settings", "track_service_level_agreement")
 	):
 
 		if not self.priority == frappe.db.get_value("Ticket", self.name, "priority"):
@@ -671,8 +669,8 @@ def get_response_and_resolution_duration(doc):
 
 
 def reset_sla(doc, reason, user):
-	if not frappe.db.get_single_value("Frappe Desk Settings", "allow_resetting_sla"):
-		frappe.throw(_("Allow Resetting SLA from Frappe Desk Settings."))
+	if not frappe.db.get_single_value("Helpdesk Settings", "allow_resetting_sla"):
+		frappe.throw(_("Allow Resetting SLA from Helpdesk Settings."))
 
 	frappe.get_doc(
 		{

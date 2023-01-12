@@ -1,4 +1,4 @@
-from frappedesk.setup.install import add_default_ticket_priorities
+from helpdesk.setup.install import add_default_ticket_priorities
 
 
 def execute():

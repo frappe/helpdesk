@@ -1,4 +1,4 @@
-from frappedesk.setup.install import set_home_page_to_kb
+from helpdesk.setup.install import set_home_page_to_kb
 import frappe
 
 

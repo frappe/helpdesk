@@ -1,4 +1,4 @@
-from frappedesk.setup.install import add_support_redirect_to_tickets
+from helpdesk.setup.install import add_support_redirect_to_tickets
 
 
 def execute():
