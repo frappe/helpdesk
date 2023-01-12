@@ -490,7 +490,7 @@
 			/>
 		</svg>
 		<svg
-			v-if="this.name == 'frappedesk'"
+			v-if="this.name == 'helpdesk'"
 			:class="this.class"
 			:width="this.width"
 			:height="this.height"
@@ -1528,12 +1528,12 @@ export default {
 	resources: {
 		brandHtml() {
 			return {
-				method: "frappedesk.api.website.brand_html",
+				method: "helpdesk.api.website.brand_html",
 			}
 		},
 		helpdeskName() {
 			return {
-				method: "frappedesk.api.website.helpdesk_name",
+				method: "helpdesk.api.website.helpdesk_name",
 			}
 		},
 	},

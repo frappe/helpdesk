@@ -66,7 +66,7 @@ export default {
 		communications() {
 			return {
 				cache: ["Ticket", "Conversations", this.ticketId],
-				method: "frappedesk.api.ticket.get_conversations",
+				method: "helpdesk.api.ticket.get_conversations",
 				params: {
 					ticket_id: this.ticketId,
 				},
@@ -78,7 +78,7 @@ export default {
 				cache: ["Ticket", "Comments", this.ticketId],
 				method: "frappe.client.get_list",
 				params: {
-					doctype: "Frappe Desk Comment",
+					doctype: "Helpdesk Comment",
 					fields: ["*"],
 					filters: {
 						reference_ticket: this.ticketId,
@@ -128,7 +128,7 @@ export default {
 				this.$resources.communications.fetch()
 			}
 			if (
-				data["doctype"] === "Frappe Desk Comment" &&
+				data["doctype"] === "Helpdesk Comment" &&
 				data["name"].split("-")[1] === this.ticketId
 			) {
 				this.$resources.comments.fetch()

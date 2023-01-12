@@ -55,7 +55,7 @@
 					class="text-center text-base"
 					:to="`${
 						this.$route.name === 'DeskSignup'
-							? '/frappedesk'
+							? '/helpdesk'
 							: '/support'
 					}/login`"
 				>
@@ -144,7 +144,7 @@ export default {
 			if (this.$route.name == "PortalSignup") {
 				this.$router.push({ path: "/support/tickets" })
 			} else if (this.$route.name == "DeskSignup") {
-				this.$router.push({ path: "/frappedesk/tickets" })
+				this.$router.push({ path: "/helpdesk/tickets" })
 			}
 		}
 	},

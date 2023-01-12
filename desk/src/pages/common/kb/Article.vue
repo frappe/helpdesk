@@ -14,7 +14,7 @@
 		@discard="
 			() => {
 				if (isNew) {
-					$router.push({ path: '/frappedesk/kb/articles' })
+					$router.push({ path: '/helpdesk/kb/articles' })
 				} else {
 					editMode = false
 				}
@@ -39,7 +39,7 @@
 							handler: () => {
 								$router.push({
 									path: `/${
-										editable ? 'frappedesk' : 'support'
+										editable ? 'helpdesk' : 'support'
 									}/kb/articles`,
 								})
 							},
@@ -245,7 +245,7 @@ export default {
 	},
 	resources: {
 		incrementArtileViews: {
-			method: "frappedesk.api.kb.increment_article_views",
+			method: "helpdesk.api.kb.increment_article_views",
 		},
 		article() {
 			if (!this.isNew) {
@@ -274,7 +274,7 @@ export default {
 					}
 				} else {
 					return {
-						method: "frappedesk.api.kb.get_article",
+						method: "helpdesk.api.kb.get_article",
 						params: {
 							article: this.articleId,
 						},
@@ -289,7 +289,7 @@ export default {
 			return {
 				method: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/frappedesk/kb/articles/${doc.name}`)
+					this.$router.push(`/helpdesk/kb/articles/${doc.name}`)
 				},
 				onError: (err) => {
 					this.$toast({
@@ -303,7 +303,7 @@ export default {
 		},
 		checkIfTitleExists() {
 			return {
-				method: "frappedesk.api.kb.check_if_article_title_exists",
+				method: "helpdesk.api.kb.check_if_article_title_exists",
 				onSuccess: (exists) => {
 					if (exists) {
 						this.articleInputErrors.title =

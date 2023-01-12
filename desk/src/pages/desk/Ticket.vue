@@ -4,7 +4,7 @@
 			<div class="h-[60px] px-[20px] flex">
 				<div class="flex flex-row space-x-2 items-center">
 					<router-link
-						:to="{ path: '/frappedesk/tickets' }"
+						:to="{ path: '/helpdesk/tickets' }"
 						class="text-[18px] text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
 						role="button"
 					>
@@ -454,7 +454,7 @@ export default {
 		},
 		submitConversation() {
 			return {
-				method: "frappedesk.api.ticket.submit_conversation_via_agent",
+				method: "helpdesk.api.ticket.submit_conversation_via_agent",
 				onSuccess: (res) => {
 					if (res.status == "error") {
 						const error = {
@@ -503,7 +503,7 @@ export default {
 		},
 		markTicketAsSeen() {
 			return {
-				method: "frappedesk.api.ticket.mark_ticket_as_seen",
+				method: "helpdesk.api.ticket.mark_ticket_as_seen",
 			}
 		},
 	},
@@ -666,7 +666,7 @@ export default {
 
 			this.$resources.submitComment.submit({
 				doc: {
-					doctype: "Frappe Desk Comment",
+					doctype: "Helpdesk Comment",
 					reference_ticket: this.ticketId,
 					content: content,
 					commented_by: this.user.user,

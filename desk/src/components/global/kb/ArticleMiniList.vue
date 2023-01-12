@@ -11,7 +11,7 @@
 				( add articles from
 				<router-link
 					class="underline"
-					:to="{ path: '/frappedesk/kb/articles' }"
+					:to="{ path: '/helpdesk/kb/articles' }"
 					>here</router-link
 				>
 				)
@@ -34,7 +34,7 @@
 								$router.push({
 									path: `/${
 										$route.meta.editable
-											? 'frappedesk'
+											? 'helpdesk'
 											: 'support'
 									}/kb/articles/${element.name}`,
 								})
@@ -140,7 +140,7 @@ export default {
 
 			return {
 				cache: ["Articles", this.categoryId, "published"],
-				method: "frappedesk.api.kb.get_articles",
+				method: "helpdesk.api.kb.get_articles",
 				params: {
 					filters,
 					fields,
@@ -152,7 +152,7 @@ export default {
 		},
 		saveArticles() {
 			return {
-				method: "frappedesk.api.kb.update_articles_order_and_status",
+				method: "helpdesk.api.kb.update_articles_order_and_status",
 				onSuccess: () => {
 					this.$resources.articles.reload()
 

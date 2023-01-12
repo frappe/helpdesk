@@ -82,7 +82,7 @@ export default {
 	resources: {
 		bulk_delete_responses() {
 			return {
-				method: "frappedesk.api.doc.delete_items",
+				method: "helpdesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
 				},

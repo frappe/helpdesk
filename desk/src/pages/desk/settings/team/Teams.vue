@@ -31,14 +31,14 @@
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/settings/teams/new')
+							$router.push('/helpdesk/settings/teams/new')
 						}
 					"
 				>
 					<template #field-team_name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/teams/${row.name}`,
+								path: `/helpdesk/settings/teams/${row.name}`,
 							}"
 						>
 							{{ `${row.name}` }}

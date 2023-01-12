@@ -48,7 +48,7 @@
 				>
 					<template #field-first_name="{ row }">
 						<router-link
-							:to="{ path: `/frappedesk/contacts/${row.name}` }"
+							:to="{ path: `/helpdesk/contacts/${row.name}` }"
 						>
 							{{ row.first_name || "" }} {{ row.last_name || "" }}
 						</router-link>

@@ -28,13 +28,13 @@
 					}"
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
-						$router.push('/frappedesk/settings/ticket_types/new')
+						$router.push('/helpdesk/settings/ticket_types/new')
 					"
 				>
 					<template #field-name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/ticket_types/${row.name}`,
+								path: `/helpdesk/settings/ticket_types/${row.name}`,
 							}"
 						>
 							{{ `${row.name}` }}

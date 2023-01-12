@@ -120,7 +120,7 @@ export default {
 	resources: {
 		list() {
 			return {
-				method: "frappedesk.api.kb.get_articles_in_ticket",
+				method: "helpdesk.api.kb.get_articles_in_ticket",
 				onSuccess(val) {
 					this.articleResponses = val
 					return this.articleResponses

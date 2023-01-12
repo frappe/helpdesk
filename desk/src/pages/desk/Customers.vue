@@ -48,7 +48,7 @@
 				>
 					<template #field-customer_name="{ row }">
 						<router-link
-							:to="{ path: `/frappedesk/customers/${row.name}` }"
+							:to="{ path: `/helpdesk/customers/${row.name}` }"
 						>
 							{{ `${row.customer_name}` }}
 						</router-link>

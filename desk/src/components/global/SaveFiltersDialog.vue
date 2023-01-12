@@ -111,7 +111,7 @@ export default {
 	resources: {
 		saveFilterPreset() {
 			return {
-				method: "frappedesk.api.general.save_filter_preset",
+				method: "helpdesk.api.general.save_filter_preset",
 				onSuccess: (res) => {
 					this.$toast({
 						title: "Filter Saved!",

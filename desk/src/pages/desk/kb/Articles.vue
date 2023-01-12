@@ -51,7 +51,7 @@
 					}"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/kb/articles/new')
+							$router.push('/helpdesk/kb/articles/new')
 						}
 					"
 					class="text-base h-[calc(100vh-6.5rem)]"
@@ -153,7 +153,7 @@
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/kb/articles/${row.name}`,
+								path: `/helpdesk/kb/articles/${row.name}`,
 							}"
 							class="cursor-pointer hover:text-gray-900 text-gray-600"
 							>{{ value }}</router-link
@@ -214,17 +214,17 @@ export default {
 	resources: {
 		moveArticlesToCategory() {
 			return {
-				method: "frappedesk.api.kb.move_articles_to_category",
+				method: "helpdesk.api.kb.move_articles_to_category",
 			}
 		},
 		setStatusForArticles() {
 			return {
-				method: "frappedesk.api.kb.set_status_for_articles",
+				method: "helpdesk.api.kb.set_status_for_articles",
 			}
 		},
 		deleteArticles() {
 			return {
-				method: "frappedesk.api.kb.delete_articles",
+				method: "helpdesk.api.kb.delete_articles",
 			}
 		},
 	},

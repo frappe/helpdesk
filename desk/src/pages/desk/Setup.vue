@@ -15,7 +15,7 @@
 				>
 					<div class="flex flex-col space-y-[60px] w-[370px]">
 						<div class="flex justify-center">
-							<CustomIcons name="frappedesk" class="h-[24px]" />
+							<CustomIcons name="helpdesk" class="h-[24px]" />
 						</div>
 						<div>
 							<form
@@ -25,7 +25,7 @@
 								<div
 									class="text-[24px] font-bold mb-[10px] text-gray-900"
 								>
-									Welcome to FrappeDesk
+									Welcome to Frappe Helpdesk
 								</div>
 								<div
 									class="text-[16px] font-normal text-gray-600 mb-[30px]"
@@ -36,8 +36,8 @@
 									class="text-[16px] font-normal text-gray-900 mb-[30px]"
 								>
 									Configure your e-mail address to start
-									sending and receiving e-mails into
-									FrappeDesk.
+									sending and receiving e-mails into Frappe
+									Helpdesk.
 								</div>
 								<div class="mb-[30px]">
 									<span
@@ -538,7 +538,7 @@ export default {
 		},
 		sentInvites() {
 			return {
-				method: "frappedesk.api.agent.sent_invites",
+				method: "helpdesk.api.agent.sent_invites",
 				onSuccess: () => {
 					this.$event.emit("sent-invites-success")
 				},
@@ -551,8 +551,8 @@ export default {
 			return {
 				method: "frappe.client.set_value",
 				params: {
-					doctype: "Frappe Desk Settings",
-					name: "Frappe Desk Settings",
+					doctype: "Helpdesk Settings",
+					name: "Helpdesk Settings",
 					fieldname: "setup_complete",
 					value: 1,
 				},

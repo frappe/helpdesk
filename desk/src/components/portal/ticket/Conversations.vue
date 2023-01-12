@@ -51,7 +51,7 @@ export default {
 	resources: {
 		conversations() {
 			return {
-				method: "frappedesk.api.ticket.get_conversations",
+				method: "helpdesk.api.ticket.get_conversations",
 				params: {
 					ticket_id: this.ticketId,
 				},

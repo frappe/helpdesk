@@ -68,7 +68,7 @@ export default {
 			},
 			logout: async () => {
 				await call("logout")
-				this.$router.push({ path: "/frappedesk/login" })
+				this.$router.push({ path: "/helpdesk/login" })
 			},
 			resetPassword: async (email) => {
 				console.log("reset password")
@@ -100,7 +100,7 @@ export default {
 	resources: {
 		user() {
 			return {
-				method: "frappedesk.api.agent.get_user",
+				method: "helpdesk.api.agent.get_user",
 				onSuccess: () => {
 					const userData = this.$resources.user.data
 					if (userData) {
@@ -128,7 +128,7 @@ export default {
 		},
 		signup() {
 			return {
-				method: "frappedesk.api.account.signup",
+				method: "helpdesk.api.account.signup",
 				onSuccess: (res) => {
 					this.$event.emit("user-signup-success", res)
 				},
@@ -139,10 +139,10 @@ export default {
 		},
 		helpdeskName() {
 			return {
-				method: "frappedesk.api.website.helpdesk_name",
+				method: "helpdesk.api.website.helpdesk_name",
 				auto: true,
 				onSuccess: (res) => {
-					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`
+					document.title = `Frappe Helpdesk ${res ? ` | ${res}` : ""}`
 				},
 			}
 		},

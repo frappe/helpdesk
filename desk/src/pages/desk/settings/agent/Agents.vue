@@ -82,7 +82,7 @@ export default {
 	resources: {
 		bulk_delete_agents() {
 			return {
-				method: "frappedesk.api.doc.delete_items",
+				method: "helpdesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
 					// this.$refs.listManager.manager.reload()
