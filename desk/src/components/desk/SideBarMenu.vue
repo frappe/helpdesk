@@ -7,11 +7,11 @@
 			class="mb-[18.4px] cursor-pointer items-baseline pl-[22px] pr-[22px] w-fit flex flex-row space-x-[6px]"
 		>
 			<CustomIcons
-				name="frappedesk"
+				name="helpdesk"
 				class="h-[15.88px]"
 				@click="
 					() => {
-						$router.push({ path: '/frappedesk/dashboard' })
+						$router.push({ path: '/helpdesk/dashboard' })
 					}
 				"
 			/>
@@ -247,42 +247,42 @@ export default {
 				label: "Dashboard",
 				icon: "dashboard",
 				to: {
-					path: "/frappedesk/dashboard",
+					path: "/helpdesk/dashboard",
 				},
 			},
 			{
 				label: "Tickets",
 				icon: "ticket",
 				to: {
-					path: "/frappedesk/tickets",
+					path: "/helpdesk/tickets",
 				},
 			},
 			{
 				label: "Knowledge Base",
 				icon: "kb-articles",
 				to: {
-					path: "/frappedesk/kb",
+					path: "/helpdesk/kb",
 				},
 			},
 			{
 				label: "Customers",
 				icon: "customer",
 				to: {
-					path: "/frappedesk/customers",
+					path: "/helpdesk/customers",
 				},
 			},
 			{
 				label: "Contacts",
 				icon: "customers",
 				to: {
-					path: "/frappedesk/contacts",
+					path: "/helpdesk/contacts",
 				},
 			},
 			{
 				label: "Settings",
 				icon: "settings",
 				to: {
-					path: "/frappedesk/settings",
+					path: "/helpdesk/settings",
 				},
 			},
 		]
@@ -324,19 +324,19 @@ export default {
 	computed: {
 		fdVersion() {
 			if (this.$resources.fdeskVersion.loading) return ""
-			return this.$resources.fdeskVersion.data.frappedesk.version
+			return this.$resources.fdeskVersion.data.helpdesk.version
 		},
 	},
 	methods: {
 		syncSelectedMenuItemBasedOnRoute() {
 			const routeMenuItemMap = {
-				"frappedesk/dashboard": "Dashboard",
-				"frappedesk/tickets": "Tickets",
-				"frappedesk/kb": "Knowledge Base",
-				"frappedesk/reports": "Reports",
-				"frappedesk/customers": "Customers",
-				"frappedesk/contacts": "Contacts",
-				"frappedesk/settings": "Settings",
+				"helpdesk/dashboard": "Dashboard",
+				"helpdesk/tickets": "Tickets",
+				"helpdesk/kb": "Knowledge Base",
+				"helpdesk/reports": "Reports",
+				"helpdesk/customers": "Customers",
+				"helpdesk/contacts": "Contacts",
+				"helpdesk/settings": "Settings",
 			}
 			Object.keys(routeMenuItemMap).forEach((route) => {
 				if (this.$route.path.includes(route)) {

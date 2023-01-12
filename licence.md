@@ -1,4 +1,4 @@
-## FRAPPE DESK LICENSE TERMS
+## FRAPPE HELPDESK LICENSE TERMS
 
 Copyright (C) 2016-2022, Frappe Technologies Pvt. Ltd. <developers@frappe.io>.
 

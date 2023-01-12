@@ -25,32 +25,32 @@ export default {
 				{
 					label: "Agents",
 					pageName: "Agents",
-					route: "/frappedesk/settings/agents",
+					route: "/helpdesk/settings/agents",
 				},
 				{
 					label: "Teams",
 					pageName: "Teams",
-					route: "/frappedesk/settings/teams",
+					route: "/helpdesk/settings/teams",
 				},
 				{
 					label: "Ticket Types",
 					pageName: "TicketTypes",
-					route: "/frappedesk/settings/ticket_types",
+					route: "/helpdesk/settings/ticket_types",
 				},
 				{
 					label: "Support Policies",
 					pageName: "SlaPolicies",
-					route: "/frappedesk/settings/sla",
+					route: "/helpdesk/settings/sla",
 				},
 				{
 					label: "Canned Responses",
 					pageName: "CannedResponses",
-					route: "/frappedesk/settings/canned_response",
+					route: "/helpdesk/settings/canned_response",
 				},
 				{
 					label: "Email Accounts",
 					pageName: "Emails",
-					route: "/frappedesk/settings/emails",
+					route: "/helpdesk/settings/emails",
 				},
 			],
 		}

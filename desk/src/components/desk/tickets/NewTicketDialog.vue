@@ -74,7 +74,7 @@
 								method: 'frappe.client.get_list',
 								inputMap: (query) => {
 									return {
-										doctype: 'FD Customer',
+										doctype: 'Helpdesk Customer',
 										pluck: 'name',
 										filters: [
 											['name', 'like', `%${query}%`],

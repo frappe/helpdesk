@@ -3,7 +3,7 @@
 		<div>
 			<div class="flex">
 				<div class="mx-auto h-4 w-auto">
-					<CustomIcons name="frappedesk" class="`w-5 h-5" />
+					<CustomIcons name="helpdesk" class="`w-5 h-5" />
 				</div>
 			</div>
 			<div

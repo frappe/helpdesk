@@ -56,7 +56,7 @@
 									['DeskKBHome', 'DeskKBCategory'].includes(
 										$route.name
 									)
-										? 'frappedesk'
+										? 'helpdesk'
 										: 'support'
 								}/kb/categories/${element.name}`,
 							})
@@ -225,7 +225,7 @@ export default {
 			const order_by = "idx"
 			return {
 				cache,
-				method: "frappedesk.api.kb.get_categories",
+				method: "helpdesk.api.kb.get_categories",
 				params: {
 					filters,
 					fields,
@@ -237,7 +237,7 @@ export default {
 		},
 		saveCategories() {
 			return {
-				method: "frappedesk.api.kb.insert_new_update_existing_categories",
+				method: "helpdesk.api.kb.insert_new_update_existing_categories",
 				onSuccess: () => {
 					this.$resources.categories.reload()
 

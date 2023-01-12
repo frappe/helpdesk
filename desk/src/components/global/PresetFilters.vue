@@ -54,7 +54,7 @@ export default {
 	},
 	mounted() {
 		this.$socket.on("list_update", (data) => {
-			if (data.doctype === "FD Preset Filter") {
+			if (data.doctype === "Helpdesk Preset Filter") {
 				this.$resources.presetFilterOptions.fetch()
 			}
 		})
@@ -150,7 +150,7 @@ export default {
 	resources: {
 		presetFilterOptions() {
 			return {
-				method: "frappedesk.api.general.get_preset_filters",
+				method: "helpdesk.api.general.get_preset_filters",
 				params: {
 					doctype: this.manager.options.doctype,
 				},

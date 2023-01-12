@@ -3,7 +3,7 @@
 		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
 			<div class="float-left">
 				<router-link
-					:to="`/frappedesk/settings/teams`"
+					:to="`/helpdesk/settings/teams`"
 					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
@@ -206,7 +206,7 @@ export default {
 				method: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/frappedesk/settings/teams/${res}`,
+						path: `/helpdesk/settings/teams/${res}`,
 					})
 				},
 			}
@@ -216,7 +216,7 @@ export default {
 				method: "frappe.client.insert",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/frappedesk/settings/teams/${res.name}`,
+						path: `/helpdesk/settings/teams/${res.name}`,
 					})
 				},
 			}

@@ -53,7 +53,7 @@ export default {
 	resources: {
 		verifyAccount() {
 			return {
-				method: "frappedesk.api.account.verify_and_create_account",
+				method: "helpdesk.api.account.verify_and_create_account",
 				onSuccess: async () => {
 					await this.user.login(this.email, this.password)
 					this.$router.push("/support/tickets")

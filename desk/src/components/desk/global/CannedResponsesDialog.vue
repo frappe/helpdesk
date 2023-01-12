@@ -120,7 +120,7 @@ export default {
 	resources: {
 		list() {
 			return {
-				method: "frappedesk.api.cannedResponse.get_canned_response",
+				method: "helpdesk.api.cannedResponse.get_canned_response",
 				onSuccess(val) {
 					this.cannedResponses = val
 					return this.cannedResponses

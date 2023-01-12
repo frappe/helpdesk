@@ -344,8 +344,8 @@ export default {
 		fdSettings() {
 			return {
 				type: "document",
-				doctype: "Frappe Desk Settings",
-				name: "Frappe Desk Settings",
+				doctype: "Helpdesk Settings",
+				name: "Helpdesk Settings",
 			}
 		},
 	},

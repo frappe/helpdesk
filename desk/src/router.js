@@ -3,7 +3,7 @@ import { call } from "frappe-ui"
 
 const routes = [
 	{
-		path: "/frappedesk/login",
+		path: "/helpdesk/login",
 		name: "DeskLogin",
 		component: () => import("@/pages/auth/Login.vue"),
 	},
@@ -13,7 +13,7 @@ const routes = [
 		component: () => import("@/pages/auth/Login.vue"),
 	},
 	{
-		path: "/frappedesk/signup",
+		path: "/helpdesk/signup",
 		name: "DeskSignup",
 		component: () => import("@/pages/auth/Signup.vue"),
 	},
@@ -32,19 +32,19 @@ const routes = [
 		props: true,
 	},
 	{
-		path: "/frappedesk/setup",
+		path: "/helpdesk/setup",
 		name: "DeskSetup",
 		component: () => import("@/pages/desk/Setup.vue"),
 	},
 	{
-		path: "/frappedesk",
+		path: "/helpdesk",
 		name: "Desk",
 		component: () => import("@/pages/desk/Desk.vue"),
 		children: [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/dashboard" }
+					return { path: "/helpdesk/dashboard" }
 				},
 			},
 			{
@@ -67,7 +67,7 @@ const routes = [
 						return [
 							{
 								label: "Tickets",
-								path: "/frappedesk/tickets",
+								path: "/helpdesk/tickets",
 							},
 							{
 								label: route.params.ticketId,
@@ -156,7 +156,7 @@ const routes = [
 						return [
 							{
 								label: "Contacts",
-								path: "/frappedesk/contacts",
+								path: "/helpdesk/contacts",
 							},
 							{
 								label: route.params.contactId,
@@ -173,7 +173,7 @@ const routes = [
 					{
 						path: "",
 						redirect: () => {
-							return { path: "/frappedesk/settings/agents" }
+							return { path: "/helpdesk/settings/agents" }
 						},
 					},
 					{
@@ -304,7 +304,7 @@ const routes = [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/tickets" }
+					return { path: "/helpdesk/tickets" }
 				},
 			},
 			{
@@ -397,7 +397,7 @@ router.beforeEach(async (to, from) => {
 	// go to article page only if the article is published
 	if (to.name === "PortalKBArticle") {
 		const articleIsPublished = await call(
-			"frappedesk.api.kb.check_if_article_is_published",
+			"helpdesk.api.kb.check_if_article_is_published",
 			{ article_name: to.params.articleId }
 		)
 		if (!articleIsPublished) {

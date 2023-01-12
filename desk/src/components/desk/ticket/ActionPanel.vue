@@ -177,7 +177,7 @@ export default {
 	resources: {
 		customFields() {
 			return {
-				method: "frappedesk.api.ticket.get_custom_fields",
+				method: "helpdesk.api.ticket.get_custom_fields",
 				params: {
 					doctype: "Ticket",
 					view: "Agent Portal",

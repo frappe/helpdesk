@@ -277,7 +277,7 @@ export default {
 	resources: {
 		bulkAssignTicketStatus() {
 			return {
-				method: "frappedesk.api.ticket.bulk_assign_ticket_status",
+				method: "helpdesk.api.ticket.bulk_assign_ticket_status",
 				onSuccess: (res) => {
 					//res: {docs: Ticket Docs, status: NewStatus}
 					this.$refs.ticketList.manager.selectedItems = []
@@ -302,7 +302,7 @@ export default {
 		},
 		bulkAssignTicketToAgent() {
 			return {
-				method: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
+				method: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
 					this.$refs.ticketList.manager.selectedItems = []
 					this.$refs.ticketList.manager.reload()

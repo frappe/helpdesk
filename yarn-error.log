@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/kamaljohnson/work-stuff/frappedesk-bench/apps/frappedesk/package.json: Unexpected token } in JSON at position 563
+  SyntaxError: /Users/kamaljohnson/work-stuff/helpdesk-bench/apps/helpdesk/package.json: Unexpected token } in JSON at position 563
       at JSON.parse (<anonymous>)
       at /usr/local/Cellar/yarn/1.22.17_2/libexec/lib/cli.js:1625:59
       at Generator.next (<anonymous>)
@@ -23,7 +23,7 @@ Trace:
 
 npm manifest: 
   {
-    "name": "frappedesk",
+    "name": "helpdesk",
     "version": "1.0.0",
     "description": "Customer Service Software",
     "main": "index.js",

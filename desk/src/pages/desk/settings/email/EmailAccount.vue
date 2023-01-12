@@ -573,7 +573,7 @@ export default {
 			return {
 				method: "frappe.client.rename_doc",
 				onSuccess: (data) => {
-					window.location.href = `/frappedesk/settings/emails/${data}`
+					window.location.href = `/helpdesk/settings/emails/${data}`
 				},
 				onError: (error) => {
 					this.$toast({

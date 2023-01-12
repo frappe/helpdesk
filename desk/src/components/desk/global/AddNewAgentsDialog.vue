@@ -175,7 +175,7 @@ export default {
 	resources: {
 		sentInvites() {
 			return {
-				method: "frappedesk.api.agent.sent_invites",
+				method: "helpdesk.api.agent.sent_invites",
 				onSuccess: (res) => {
 					this.currentInputIsValidEmail = false
 					this.searchInput = ""

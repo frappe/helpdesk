@@ -16,7 +16,7 @@
 						)
 					} else {
 						$router.push({
-							path: `/${isDesk ? 'frappedesk' : 'support'}/kb${
+							path: `/${isDesk ? 'helpdesk' : 'support'}/kb${
 								breadcrumb.name
 									? `/categories/${breadcrumb.name}`
 									: ''
@@ -78,7 +78,7 @@ export default {
 				return
 			}
 			return {
-				method: "frappedesk.api.kb.get_breadcrumbs",
+				method: "helpdesk.api.kb.get_breadcrumbs",
 				params: {
 					docType: this.docType,
 					docName: this.docName,

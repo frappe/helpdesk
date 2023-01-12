@@ -3,11 +3,11 @@ from setuptools import setup, find_packages
 with open("requirements.txt") as f:
 	install_requires = f.read().strip().split("\n")
 
-# get version from __version__ variable in frappedesk/__init__.py
-from frappedesk import __version__ as version
+# get version from __version__ variable in helpdesk/__init__.py
+from helpdesk import __version__ as version
 
 setup(
-	name="frappedesk",
+	name="helpdesk",
 	version=version,
 	description="Customer Service Software",
 	author="Frappe Technologies",

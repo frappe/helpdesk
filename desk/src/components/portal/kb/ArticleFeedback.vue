@@ -111,7 +111,7 @@ export default {
 		},
 		submitArticleFeedback() {
 			return {
-				method: "frappedesk.api.kb.submit_article_feedback",
+				method: "helpdesk.api.kb.submit_article_feedback",
 				onSuccess: (res) => {
 					// TODO: show thank you message
 				},

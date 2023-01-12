@@ -1,0 +1,225 @@
+{
+	"actions": [],
+	"creation": "2017-02-17 13:07:35.686409",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"sb_00",
+		"track_service_level_agreement",
+		"allow_resetting_service_level_agreement",
+		"column_break_4",
+		"helpdesk_name",
+		"issues_sb",
+		"default_ticket_type",
+		"close_issue_after_days",
+		"portal_sb",
+		"get_started_sections",
+		"show_latest_forum_posts",
+		"forum_sb",
+		"forum_url",
+		"get_latest_query",
+		"response_key_list",
+		"column_break_10",
+		"post_title_key",
+		"post_description_key",
+		"post_route_key",
+		"post_route_string",
+		"setup_complete",
+		"initial_agent_set",
+		"initial_demo_ticket_created",
+		"initial_helpdesk_name_setup_skipped",
+		"assignment_rules_section",
+		"base_support_rotation",
+		"knowledge_base_section",
+		"suggest_articles_in_new_ticket_page"
+	],
+	"fields": [
+		{
+			"fieldname": "issues_sb",
+			"fieldtype": "Section Break",
+			"label": "Issues"
+		},
+		{
+			"default": "7",
+			"fieldname": "close_issue_after_days",
+			"fieldtype": "Int",
+			"label": "Close Issue After Days"
+		},
+		{
+			"fieldname": "portal_sb",
+			"fieldtype": "Section Break",
+			"label": "Support Portal"
+		},
+		{
+			"fieldname": "get_started_sections",
+			"fieldtype": "Code",
+			"label": "Get Started Sections"
+		},
+		{
+			"default": "0",
+			"fieldname": "show_latest_forum_posts",
+			"fieldtype": "Check",
+			"label": "Show Latest Forum Posts"
+		},
+		{
+			"depends_on": "show_latest_forum_posts",
+			"fieldname": "forum_sb",
+			"fieldtype": "Section Break",
+			"label": "Forum Posts"
+		},
+		{
+			"fieldname": "forum_url",
+			"fieldtype": "Data",
+			"label": "Forum URL"
+		},
+		{
+			"fieldname": "get_latest_query",
+			"fieldtype": "Data",
+			"label": "Get Latest Query"
+		},
+		{
+			"fieldname": "response_key_list",
+			"fieldtype": "Data",
+			"label": "Response Key List"
+		},
+		{
+			"fieldname": "column_break_10",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "post_title_key",
+			"fieldtype": "Data",
+			"label": "Post Title Key"
+		},
+		{
+			"fieldname": "post_description_key",
+			"fieldtype": "Data",
+			"label": "Post Description Key"
+		},
+		{
+			"fieldname": "post_route_key",
+			"fieldtype": "Data",
+			"label": "Post Route Key"
+		},
+		{
+			"fieldname": "post_route_string",
+			"fieldtype": "Data",
+			"label": "Post Route String"
+		},
+		{
+			"fieldname": "sb_00",
+			"fieldtype": "Section Break",
+			"label": "SLAs"
+		},
+		{
+			"default": "1",
+			"fieldname": "track_service_level_agreement",
+			"fieldtype": "Check",
+			"label": "Track SLA"
+		},
+		{
+			"default": "0",
+			"depends_on": "eval:doc.track_service_level_agreement;",
+			"fieldname": "allow_resetting_service_level_agreement",
+			"fieldtype": "Check",
+			"label": "Allow Resetting SLA"
+		},
+		{
+			"fieldname": "helpdesk_name",
+			"fieldtype": "Data",
+			"label": "Helpdesk Name"
+		},
+		{
+			"default": "0",
+			"fieldname": "setup_complete",
+			"fieldtype": "Check",
+			"hidden": 1,
+			"label": "Setup Complete"
+		},
+		{
+			"default": "0",
+			"fieldname": "initial_agent_set",
+			"fieldtype": "Check",
+			"hidden": 1,
+			"label": "Initial Agent Set"
+		},
+		{
+			"default": "0",
+			"fieldname": "initial_demo_ticket_created",
+			"fieldtype": "Check",
+			"hidden": 1,
+			"label": "Initial Demo Ticket Created"
+		},
+		{
+			"fieldname": "column_break_4",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "initial_helpdesk_name_setup_skipped",
+			"fieldtype": "Check",
+			"label": "Initial Helpdesk Name Setup Skipped"
+		},
+		{
+			"fieldname": "assignment_rules_section",
+			"fieldtype": "Section Break",
+			"label": "Assignment Rules"
+		},
+		{
+			"fieldname": "base_support_rotation",
+			"fieldtype": "Link",
+			"label": "Base Support Rotation",
+			"options": "Assignment Rule",
+			"read_only": 1
+		},
+		{
+			"fieldname": "knowledge_base_section",
+			"fieldtype": "Section Break",
+			"label": "Knowledge Base"
+		},
+		{
+			"default": "0",
+			"fieldname": "suggest_articles_in_new_ticket_page",
+			"fieldtype": "Check",
+			"label": "Suggest Articles in New TIcket Page"
+		},
+		{
+			"fieldname": "default_ticket_type",
+			"fieldtype": "Link",
+			"label": "Default Ticket Type",
+			"options": "Ticket Type"
+		}
+	],
+	"issingle": 1,
+	"links": [],
+	"modified": "2022-12-30 14:45:58.112267",
+	"modified_by": "Administrator",
+	"module": "Helpdesk",
+	"name": "Helpdesk Settings",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		},
+		{
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"role": "Agent",
+			"share": 1
+		}
+	],
+	"quick_entry": 1,
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
+}

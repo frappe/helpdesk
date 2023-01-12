@@ -130,7 +130,7 @@ export default {
 	resources: {
 		submitFeedback() {
 			return {
-				method: "frappedesk.api.ticket.submit_customer_feedback",
+				method: "helpdesk.api.ticket.submit_customer_feedback",
 				onSuccess() {
 					this.submitted = true
 				},

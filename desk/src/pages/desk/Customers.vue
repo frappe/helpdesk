@@ -3,8 +3,8 @@
 		<ListManager
 			ref="fdCustomerList"
 			:options="{
-				cache: ['FD Customer', 'Desk'],
-				doctype: 'FD Customer',
+				cache: ['Helpdesk Customer', 'Desk'],
+				doctype: 'Helpdesk Customer',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: [
@@ -48,7 +48,7 @@
 				>
 					<template #field-customer_name="{ row }">
 						<router-link
-							:to="{ path: `/frappedesk/customers/${row.name}` }"
+							:to="{ path: `/helpdesk/customers/${row.name}` }"
 						>
 							{{ `${row.customer_name}` }}
 						</router-link>

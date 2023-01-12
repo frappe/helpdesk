@@ -79,7 +79,7 @@ export default {
 	resources: {
 		getTicketTypeCount() {
 			return {
-				method: "frappedesk.api.dashboard.ticket_type",
+				method: "helpdesk.api.dashboard.ticket_type",
 				params: {
 					filters: [
 						["creation", "between", [this.fromDate, this.toDate]],
