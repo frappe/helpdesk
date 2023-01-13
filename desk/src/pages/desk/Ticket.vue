@@ -207,8 +207,9 @@
 										class="pt-2 select-none flex flex-row items-center space-x-2 gap-2"
 										v-if="$refs.replyEditor"
 									>
-										<div>
+										<div class="flex">
 											<Button
+												class="rounded-br-none rounded-tr-none border-r-[.5px] border-t-0 border-l-0 border-b-0 border-[#636363]"
 												:loading="
 													editingType == 'reply'
 														? $resources
@@ -234,16 +235,14 @@
 											</Button>
 											<Dropdown
 												v-if="editingType == 'reply'"
-												:disabled="
-													(!user.agent &&
-														!user.isAdmin) ||
-													sendingDissabled
-												"
+												
 												placement="right"
 												:button="{
+													class: 'rounded-bl-none rounded-tl-none',
 													appearance: 'primary',
 													label: 'Menu',
 													icon: 'chevron-down',
+													
 												}"
 												:options="[
 													{
