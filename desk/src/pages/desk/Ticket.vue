@@ -111,19 +111,57 @@
 								<div
 									class="flex flex-row items-center text-[12px] font-normal pb-[8px]"
 								>
-									<div v-if="editingType == 'reply'">
+									<div
+										class="flex flex-col"
+										v-if="editingType == 'reply'"
+									>
 										<div
 											v-if="ticket.raised_by"
 											class="flex flex-row space-x-2 items-center"
 										>
 											<span class="text-gray-700"
-												>to</span
+												>To</span
 											>
 											<div
 												class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]"
 											>
 												{{ ticket.raised_by }}
 											</div>
+										</div>
+										<div
+											v-if="ticket.raised_by"
+											class="flex flex-row space-x-2 items-center"
+										>
+											<span class="text-gray-700"
+												>Cc</span
+											>
+											<Input
+												class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]"
+												@input="
+													(val) => {
+														this.recipients.cc = val
+													}
+												"
+											>
+											</Input>
+										</div>
+										<div
+											v-if="ticket.raised_by"
+											class="flex flex-row space-x-2 items-center"
+										>
+											<span class="text-gray-700"
+												>Bcc</span
+											>
+											<Input
+												class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]"
+												@input="
+													(val) => {
+														this.recipients.bcc =
+															val
+													}
+												"
+											>
+											</Input>
 										</div>
 									</div>
 									<div
@@ -235,14 +273,12 @@
 											</Button>
 											<Dropdown
 												v-if="editingType == 'reply'"
-												
 												placement="right"
 												:button="{
 													class: 'rounded-bl-none rounded-tl-none',
 													appearance: 'primary',
 													label: 'Menu',
 													icon: 'chevron-down',
-													
 												}"
 												:options="[
 													{
@@ -474,6 +510,10 @@ export default {
 		const user = inject("user")
 		const agents = inject("agents")
 		const attachments = ref([])
+		const recipients = ref({
+			cc: "",
+			bcc: "",
+		})
 
 		const editingType = ref("")
 		const replied = ref("Replied")
@@ -493,6 +533,7 @@ export default {
 			agents,
 			attachments,
 			tempTextEditorData,
+			recipients,
 			editingType,
 			showCannedResponsesDialog,
 			tempMessage,
@@ -718,6 +759,7 @@ export default {
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: content,
+				recipients: this.recipients,
 				attachments: this.attachments.map((x) => x.name),
 			})
 
