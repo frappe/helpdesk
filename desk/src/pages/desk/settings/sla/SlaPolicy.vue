@@ -233,12 +233,6 @@
 							</template>
 						</Dropdown>
 						<ErrorMessage :message="holidayListValidationError" />
-						<Input
-							label="Conditions"
-							type="textarea"
-							value=""
-							placeholder=""
-						/>
 					</div>
 				</div>
 				<div class="mt-5 flow-root">
@@ -569,7 +563,7 @@ export default {
 		changeDefaultPriority(index) {
 			this.rules.forEach((rule, i) => {
 				if (i == index) {
-					rule.default = !rule.default
+					rule.default = true
 				} else {
 					rule.default = false
 				}
@@ -619,6 +613,11 @@ export default {
 						if (this.slaPolicyName != this.tempSlaPolicyName) {
 							this.rename()
 						}
+						this.$toast({
+							title: "Policy updated",
+							customIcon: "circle-check",
+							appearance: "success",
+						})
 					})
 			}
 		},
