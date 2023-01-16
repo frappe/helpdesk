@@ -462,8 +462,8 @@ def get_conversations(ticket_id):
 
 
 @frappe.whitelist()
-def submit_conversation_via_agent(ticket_id, message,recipients, attachments):
-	return create_communication_via_agent(ticket_id, message,recipients, attachments)
+def submit_conversation_via_agent(ticket_id, message,cc,bcc, attachments):
+	return create_communication_via_agent(ticket_id, message,cc,bcc, attachments)
 
 
 @frappe.whitelist()
