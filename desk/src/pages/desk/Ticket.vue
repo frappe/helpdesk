@@ -132,7 +132,7 @@
 										>
 											<div class="text-gray-700">Cc</div>
 											<Input
-												class="py-[4px] bg-white w-11/12 focus:bg-white"
+												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[4px]"
 												@input="
 													(val) => {
 														this.cc = val
@@ -153,16 +153,16 @@
 											>
 												Bcc
 											</div>
-											<div>
+											
 												<Input
-													class="py-[4px] bg-white w-11/12 focus:bg-white"
+													class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[2px]"
 													@input="
 														(val) => {
 															this.bcc = val
 														}
 													"
 												/>
-											</div>
+										
 										</div>
 										<ErrorMessage
 											v-if="showBcc"
@@ -790,9 +790,9 @@ export default {
 			}
 		},
 		submit() {
-			if (this.validateInputs()) {
-				return
-			}
+			// if (this.validateInputs()) {
+			// 	return
+			// }
 			switch (this.editingType) {
 				case "reply":
 					this.submitConversation()
