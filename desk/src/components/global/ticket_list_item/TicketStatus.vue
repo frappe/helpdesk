@@ -16,7 +16,7 @@ export default {
 			return {
 				Open: "red",
 				Replied: "gray",
-				Resolved: "gray",
+				Resolved: "green",
 				Closed: "green",
 			}[this.value]
 		},
