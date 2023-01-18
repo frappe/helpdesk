@@ -97,7 +97,7 @@
 					</div>
 				</form>
 				<div
-					class="bg-gray-100 min-h-[100px] max-h-[300px] overflow-y-scroll px-2 rounded border flex flex-col"
+					class="bg-gray-100 min-h-[100px] max-h-[300px] overflow-y-auto px-2 rounded border flex flex-col"
 				>
 					<ul
 						v-if="newTeamValues.users.length > 0"

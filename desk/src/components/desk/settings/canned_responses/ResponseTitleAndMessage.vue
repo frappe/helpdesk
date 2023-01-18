@@ -10,7 +10,7 @@
 				{{ title }}
 			</div>
 			<div
-				class="overflow-y-scroll"
+				class="overflow-y-auto"
 				style="
 					min-height: calc(100vh - 500px);
 					max-height: calc(100vh - 245px);

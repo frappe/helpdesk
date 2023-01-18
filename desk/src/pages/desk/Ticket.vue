@@ -65,7 +65,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="grow overflow-y-scroll px-[17px]">
+					<div class="grow overflow-y-auto px-[17px]">
 						<CustomerSatisfactionFeedback
 							:fromDesk="true"
 							v-if="
@@ -91,7 +91,7 @@
 							v-if="editing"
 							ref="replyEditor"
 							:content="content"
-							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
+							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-auto"
 							v-on:keydown="handleShortcuts($event)"
 							:mentions="mentions"
 							@change="
@@ -154,7 +154,7 @@
 								<div>
 									<div
 										v-if="attachments.length"
-										class="max-h-[100px] overflow-y-scroll rounded flex flex-col"
+										class="max-h-[100px] overflow-y-auto rounded flex flex-col"
 									>
 										<ul class="flex flex-wrap gap-2 py-2">
 											<li

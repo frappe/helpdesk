@@ -19,7 +19,7 @@
 		</div>
 		<div
 			id="rows"
-			class="flex flex-col space-y-2 overflow-scroll"
+			class="flex flex-col space-y-2 overflow-auto"
 			:style="{
 				height: viewportWidth > 768 ? 'calc(100vh - 120px)' : null,
 			}"
