@@ -35,7 +35,7 @@
 			<div
 				:class="
 					editable
-						? `rounded-md p-5 h-full overflow-y-scroll ${
+						? `rounded-md p-5 h-full overflow-y-auto ${
 								editMode ? 'border-2 border-gray-300' : 'shadow'
 						  }`
 						: ''

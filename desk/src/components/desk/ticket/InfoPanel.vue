@@ -210,7 +210,7 @@
 								showOtherTicketsOfContacts &&
 								otherTicketsOfContact.length > 0
 							"
-							class="overflow-scroll pt-[4px] space-y-[4px] text-gray-700 font-normal"
+							class="overflow-auto pt-[4px] space-y-[4px] text-gray-700 font-normal"
 						>
 							<div
 								v-for="(
@@ -293,7 +293,7 @@
 							</div>
 							<div
 								v-if="showTicketHistory"
-								class="overflow-y-scroll"
+								class="overflow-y-auto"
 								:style="{
 									height:
 										viewportWidth > 768
