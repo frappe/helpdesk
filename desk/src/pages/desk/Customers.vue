@@ -49,9 +49,20 @@
 					<template #field-customer_name="{ row }">
 						<router-link
 							:to="{ path: `/frappedesk/customers/${row.name}` }"
+							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.customer_name}` }}
 						</router-link>
+					</template>
+					<template #field-contact_count="{ row }">
+						<div class="text-[13px] font-inter text-gray-600">
+							{{ row.contact_count }}
+						</div>
+					</template>
+					<template #field-ticket_count="{ row }">
+						<div class="text-[13px] font-inter text-gray-600">
+							{{ row.ticket_count }}
+						</div>
 					</template>
 				</ListViewer>
 			</template>
