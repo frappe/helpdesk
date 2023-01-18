@@ -379,6 +379,13 @@ def assign_ticket_status(ticket_id, status):
 			log_ticket_activity(ticket_id, f"status set to {status}")
 
 		return ticket_doc
+@frappe.whitelist()
+def update_ticket_status(ticket_id,status):
+	frappe.db.set_value('Ticket', ticket_id, 'status', status,update_modified=False)
+
+	doc = frappe.get_doc('Ticket',ticket_id)
+
+	return doc
 
 
 @frappe.whitelist()
@@ -455,8 +462,8 @@ def get_conversations(ticket_id):
 
 
 @frappe.whitelist()
-def submit_conversation_via_agent(ticket_id, message, attachments):
-	return create_communication_via_agent(ticket_id, message, attachments)
+def submit_conversation_via_agent(ticket_id, message,cc,bcc, attachments):
+	return create_communication_via_agent(ticket_id, message,cc,bcc, attachments)
 
 
 @frappe.whitelist()
