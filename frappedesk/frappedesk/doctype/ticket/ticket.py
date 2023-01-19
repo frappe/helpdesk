@@ -409,7 +409,7 @@ def get_all_conversations(ticket):
 		"Communication",
 		filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]},
 		order_by="creation asc",
-		fields=["name", "content", "creation", "sent_or_received", "sender"],
+		fields=["name", "content", "creation", "sent_or_received", "sender","cc","bcc"],
 	)
 
 	for conversation in conversations:

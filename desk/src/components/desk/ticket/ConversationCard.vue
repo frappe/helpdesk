@@ -22,6 +22,12 @@
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<div
+					class="flex flex-row gap-1 text-[12px] text-[#74808B] font-inter"
+				>
+					<div v-if="cc">cc: {{ cc }},</div>
+					<div v-if="bcc">bcc: {{ bcc }}</div>
+				</div>
+				<div
 					class="message text-[13px]"
 					style="border: 0px"
 					v-html="cleanedMessage"
@@ -65,6 +71,8 @@ export default {
 		"message",
 		"color",
 		"attachments",
+		"cc",
+		"bcc",
 	],
 	components: {
 		FeatherIcon,
