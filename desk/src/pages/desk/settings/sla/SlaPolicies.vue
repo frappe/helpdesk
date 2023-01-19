@@ -31,6 +31,11 @@
 						},
 					}"
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
+					@add-item="
+						() => {
+							$router.push('/frappedesk/settings/sla/new')
+						}
+					"
 				>
 					<template #field-name="{ row }">
 						<div class="w-full group flex items-center">
