@@ -7,7 +7,7 @@
 				doctype: 'Agent',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
-				fields: ['email', 'full_name'],
+				fields: ['user', 'agent_name'],
 				limit: 20,
 			}"
 		>
@@ -20,8 +20,8 @@
 						filterBox: true,
 						presetFilters: true,
 						fields: {
-							full_name: { label: 'Name', width: '4' },
-							email: {
+							agent_name: { label: 'Name', width: '4' },
+							user: {
 								label: 'Email',
 								width: '2',
 							},
@@ -34,19 +34,19 @@
 						}
 					"
 				>
-					<template #field-full_name="{ row }">
+					<template #field-agent_name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/agents/${row.email}`,
+								path: `/frappedesk/settings/agents/${row.user}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
-							{{ `${row.full_name}` }}
+							{{ `${row.agent_name}` }}
 						</router-link>
 					</template>
-					<template #field-email="{ row }">
+					<template #field-user="{ row }">
 						<div class="text-[13px] font-inter text-gray-600">
-							{{ row.email }}
+							{{ `${row.user}` }}
 						</div>
 					</template>
 					<template #bulk-actions="{ selectedItems }">

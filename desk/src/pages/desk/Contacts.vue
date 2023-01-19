@@ -1,6 +1,7 @@
 <template>
-	<div class="flex flex-col px-4">
+	<div class="flex flex-col px-4 overflow-hidden">
 		<ListManager
+		
 			ref="contactList"
 			:options="{
 				cache: ['Contacts', 'Desk'],
@@ -10,9 +11,9 @@
 				fields: [
 					'first_name',
 					'last_name',
-					'email_ids.email_id',
-					'phone_nos.phone',
-					'links.link_name',
+					'email_ids.email_id as email',
+					'phone_nos.phone as phone',
+					'links.link_name as customer',
 				],
 				limit: 20,
 			}"

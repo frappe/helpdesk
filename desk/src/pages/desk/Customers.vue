@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full px-4">
+	<div class="flex flex-col h-full px-4 overflow-hidden">
 		<ListManager
 			ref="fdCustomerList"
 			:options="{
