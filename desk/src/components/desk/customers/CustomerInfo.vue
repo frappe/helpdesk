@@ -211,6 +211,9 @@
 								saveFiltersLocally: false,
 								urlQueryFilters: false,
 								doctype: 'Ticket',
+								filters: {
+									customer: ['=', customerDoc.customer_name],
+								},
 								fields: [
 									'status',
 									'priority',
