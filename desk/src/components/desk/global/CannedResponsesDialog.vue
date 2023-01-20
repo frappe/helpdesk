@@ -33,7 +33,7 @@
 					/>
 				</div>
 				<div
-					class="divide-y divide-slate-200 max-h-[256px] overflow-y-scroll"
+					class="divide-y divide-slate-200 max-h-[256px] overflow-y-auto"
 				>
 					<div
 						v-for="item in this.cannedResponses"

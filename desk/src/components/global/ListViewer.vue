@@ -171,7 +171,7 @@
 						</div>
 					</slot>
 					<div class="flex flex-col justify-between grow h-full">
-						<div class="overflow-y-scroll flex flex-col">
+						<div class="overflow-y-auto flex flex-col">
 							<slot
 								v-if="!manager.loading"
 								name="rows"

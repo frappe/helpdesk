@@ -23,6 +23,8 @@
 										return
 									}
 									selectedContact = item.value
+									selectedCustomer =
+										selectedContact.split('-')[1]
 								}
 							"
 							:resourceOptions="{

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="overflow-hidden">
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
 			<div class="h-[60px] px-[20px] flex">
 				<div class="flex flex-row space-x-2 items-center">

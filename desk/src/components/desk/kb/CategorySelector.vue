@@ -51,7 +51,7 @@
 						>
 						</Breadcrumbs>
 					</div>
-					<div class="h-[200px] overflow-y-scroll">
+					<div class="h-[200px] overflow-y-auto">
 						<div
 							class="flex flex-col"
 							v-if="categoriesInCurrentLevel.length > 0"
