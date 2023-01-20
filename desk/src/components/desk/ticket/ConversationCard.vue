@@ -19,7 +19,7 @@
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
-		<div class="pl-[32px] pt-[6px]">
+		<div class="pl-[32px] pt-[0px]">
 			<div class="flex flex-col">
 				<div
 					v-if="cc || bcc"
