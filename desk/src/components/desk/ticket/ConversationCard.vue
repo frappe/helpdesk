@@ -22,6 +22,7 @@
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<div
+					v-if="cc || bcc"
 					class="flex flex-row gap-1 text-[12px] text-[#74808B] font-inter"
 				>
 					<div v-if="cc">cc: {{ cc }},</div>
