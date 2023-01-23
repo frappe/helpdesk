@@ -5,6 +5,8 @@
 			:options="{
 				cache: ['Agent Group', 'Desk'],
 				doctype: 'Agent Group',
+				urlQueryFilters: true,
+				saveFiltersLocally: true,
 				fields: ['team_name', 'assignment_rule'],
 				limit: 20,
 				order_by: 'modified desc',
@@ -16,6 +18,7 @@
 						name: 'Teams',
 						base: '12',
 						listTitle: 'Teams',
+						filterBox: true,
 						presetFilters: true,
 						fields: {
 							team_name: {
@@ -40,9 +43,15 @@
 							:to="{
 								path: `/frappedesk/settings/teams/${row.name}`,
 							}"
+							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.name}` }}
 						</router-link>
+					</template>
+					<template #field-assignment_rule="{ row }">
+						<div class="text-[13px] font-inter text-gray-600">
+							{{ row.assignment_rule }}
+						</div>
 					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
