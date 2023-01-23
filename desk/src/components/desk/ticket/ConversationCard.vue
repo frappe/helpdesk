@@ -19,11 +19,11 @@
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
-		<div class="pl-[32px] pt-[0px]">
+		<div class="pl-8 pt-0">
 			<div class="flex flex-col">
 				<div
 					v-if="cc || bcc"
-					class="flex flex-row gap-1 text-[12px] text-[#74808B] font-inter"
+					class="flex flex-row gap-1 text-[12px] text-gray-600 font-inter"
 				>
 					<div v-if="cc">cc: {{ cc }},</div>
 					<div v-if="bcc">bcc: {{ bcc }}</div>

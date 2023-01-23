@@ -133,11 +133,7 @@
 											<div class="text-gray-700">Cc</div>
 											<Input
 												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[4px]"
-												@input="
-													(val) => {
-														this.cc = val
-													}
-												"
+												@input="cc = $event"
 											/>
 										</div>
 										<ErrorMessage
@@ -156,11 +152,7 @@
 
 											<Input
 												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[2px]"
-												@input="
-													(val) => {
-														this.bcc = val
-													}
-												"
+												@input="bcc = $event"
 											/>
 										</div>
 										<ErrorMessage
@@ -280,32 +272,30 @@
 										class="pt-2 select-none flex flex-row items-center space-x-2 gap-2"
 										v-if="$refs.replyEditor"
 									>
-											<Button
-												
-												:loading="
-													editingType == 'reply'
-														? $resources
-																.submitConversation
-																.loading
-														: $resources
-																.submitComment
-																.loading
-												"
-												@click="submit()"
-												appearance="primary"
-												:disabled="
-													(!user.agent &&
-														!user.isAdmin) ||
-													sendingDissabled
-												"
-											>
-												{{
-													editingType == "reply"
-														? "Send"
-														: "Create"
-												}}
-											</Button>
-										
+										<Button
+											:loading="
+												editingType == 'reply'
+													? $resources
+															.submitConversation
+															.loading
+													: $resources.submitComment
+															.loading
+											"
+											@click="submit()"
+											appearance="primary"
+											:disabled="
+												(!user.agent &&
+													!user.isAdmin) ||
+												sendingDissabled
+											"
+										>
+											{{
+												editingType == "reply"
+													? "Send"
+													: "Create"
+											}}
+										</Button>
+
 										<div
 											class="flex flex-row items-center space-x-2"
 										>
@@ -749,19 +739,6 @@ export default {
 			this.content = ""
 			this.attachments = []
 		},
-		submitResolvedTicket() {
-			this.tempTextEditorData.content = this.content
-			this.tempTextEditorData.attachments = this.attachments
-			const content = `<div class='content-block'><div>${this.content}</div></div>`
-			this.$resources.submitConversation.submit({
-				ticket_id: this.ticketId,
-				message: content,
-				status: "Resolved",
-				attachments: this.attachments.map((x) => x.name),
-			})
-			this.content = ""
-			this.attachments = []
-		},
 		submitComment() {
 			this.tempTextEditorData.attachments = this.attachments
 			this.tempTextEditorData.content = this.content
@@ -815,4 +792,3 @@ export default {
 	},
 }
 </script>
-
