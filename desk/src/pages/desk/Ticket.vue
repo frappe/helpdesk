@@ -55,12 +55,57 @@
 											class="h-[25px] w-[25px] p-[1.5px] stroke-[#A6B1B9]"
 										/>
 									</div>
-									<a
-										:title="ticket.subject"
-										class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold"
+									<div
+										v-if="!editingSubject"
+										class="flex grow items-center justify-between"
 									>
-										{{ ticket.subject }}
-									</a>
+										<a
+											:title="ticket.subject"
+											class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold"
+										>
+											{{ ticket.subject }}
+										</a>
+										<FeatherIcon
+											class="w-4 h-4 cursor-pointer"
+											name="edit-2"
+											@click="editingSubject = true"
+										/>
+									</div>
+									<div
+										v-else
+										class="flex grow gap-2 items-center justify-between"
+									>
+										<Input
+											class="w-full"
+											id="subjectInput"
+											:value="ticket.subject"
+											@change="subject = $event"
+											type="text"
+										/>
+										<div class="flex flex-row gap-2">
+											<Button
+												appearance="primary"
+												@click="
+													() => {
+														$resources.ticket.setValue
+															.submit({
+																subject:
+																	subject,
+															})
+															.then(
+																(editingSubject = false)
+															)
+													}
+												"
+												>Save</Button
+											>
+											<Button
+												appearance="secondary"
+												@click="$router.go()"
+												>Discard</Button
+											>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -429,6 +474,7 @@ export default {
 
 		const showArticleResponseDialog = ref(false)
 		const tempContent = ref("")
+		const editingSubject = ref("")
 
 		return {
 			showTextFormattingMenu,
@@ -442,6 +488,7 @@ export default {
 			tempMessage,
 			showArticleResponseDialog,
 			tempContent,
+			editingSubject,
 		}
 	},
 	resources: {
