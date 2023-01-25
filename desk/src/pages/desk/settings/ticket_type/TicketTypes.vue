@@ -5,6 +5,8 @@
 			:options="{
 				cache: ['Ticket Type', 'Desk'],
 				doctype: 'Ticket Type',
+				urlQueryFilters: true,
+				saveFiltersLocally: true,
 				fields: ['name', 'priority'],
 				limit: 20,
 				order_by: 'modified desc',
@@ -14,6 +16,7 @@
 				<ListViewer
 					:options="{
 						base: '12',
+						filterBox: true,
 						presetFilters: true,
 						fields: {
 							name: {
@@ -36,9 +39,15 @@
 							:to="{
 								path: `/frappedesk/settings/ticket_types/${row.name}`,
 							}"
+							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.name}` }}
 						</router-link>
+					</template>
+					<template #field-priority="{ row }">
+						<div class="text-[13px] font-inter text-gray-600">
+							{{ row.priority }}
+						</div>
 					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">

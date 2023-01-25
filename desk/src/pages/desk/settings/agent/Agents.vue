@@ -1,29 +1,77 @@
 <template>
-	<div class="mt-[9px]">
+	<div class="flex flex-col px-4">
 		<ListManager
 			ref="listManager"
-			class="px-[16px]"
 			:options="{
 				cache: ['Agents', 'Desk'],
 				doctype: 'Agent',
-				fields: ['user as email', 'user.full_name as full_name'],
+				urlQueryFilters: true,
+				saveFiltersLocally: true,
+				fields: ['user', 'agent_name'],
 				limit: 20,
 			}"
-			@selection="
-				(selectedItems) => {
-					if (Object.keys(selectedItems).length > 0) {
-						$event.emit(
-							'show-top-panel-actions-settings',
-							'Agents Bulk'
-						)
-					} else {
-						$event.emit('show-top-panel-actions-settings', 'Agents')
-					}
-				}
-			"
 		>
 			<template #body="{ manager }">
-				<AgentList :manager="manager" />
+				<ListViewer
+					:options="{
+						name: 'Agent',
+						base: '12',
+						listTitle: 'Agents',
+						filterBox: true,
+						presetFilters: true,
+						fields: {
+							agent_name: { label: 'Name', width: '4' },
+							user: {
+								label: 'Email',
+								width: '2',
+							},
+						},
+					}"
+					class="text-base h-[calc(100vh-9.5rem)] pt-4"
+					@add-item="
+						() => {
+							showNewAgentDialog = true
+						}
+					"
+				>
+					<template #field-agent_name="{ row }">
+						<router-link
+							:to="{
+								path: `/frappedesk/settings/agents/${row.user}`,
+							}"
+							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
+						>
+							{{ `${row.agent_name}` }}
+						</router-link>
+					</template>
+					<template #field-user="{ row }">
+						<div class="text-[13px] font-inter text-gray-600">
+							{{ `${row.user}` }}
+						</div>
+					</template>
+					<template #bulk-actions="{ selectedItems }">
+						<div class="flex flex-row space-x-2">
+							<Button
+								@click="
+									() => {
+										$resources.deleteAgent
+											.submit({
+												doctype: 'Agent',
+												name: Object.keys(
+													selectedItems
+												),
+											})
+											.then(() => {
+												manager.unselect()
+												manager.reload()
+											})
+									}
+								"
+								>Delete</Button
+							>
+						</div>
+					</template>
+				</ListViewer>
 			</template>
 		</ListManager>
 		<AddNewAgentsDialog
@@ -43,13 +91,14 @@ import { inject, ref } from "vue"
 import AgentList from "@/components/desk/settings/agents/AgentList.vue"
 import ListManager from "@/components/global/ListManager.vue"
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue"
-
+import ListViewer from "@/components/global/ListViewer.vue"
 export default {
 	name: "Agents",
 	components: {
 		AgentList,
 		ListManager,
 		AddNewAgentsDialog,
+		ListViewer,
 	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
@@ -59,27 +108,13 @@ export default {
 			showNewAgentDialog,
 		}
 	},
-	mounted() {
-		this.$event.emit("set-selected-setting", "Agents")
-		this.$event.emit("show-top-panel-actions-settings", "Agents")
 
-		this.$event.on("show-new-agent-dialog", () => {
-			this.showNewAgentDialog = true
-		})
-		this.$event.on("delete-selected-agents", () => {
-			this.$resources.bulk_delete_agents.submit({
-				items: Object.keys(
-					this.$refs.listManager.manager.selectedItems
-				),
-				doctype: "Agent",
-			})
-		})
-	},
-	unmounted() {
-		this.$event.off("show-new-agent-dialog")
-		this.$event.off("delete-selected-agents")
-	},
 	resources: {
+		deleteAgent() {
+			return {
+				method: "frappe.client.delete",
+			}
+		},
 		bulk_delete_agents() {
 			return {
 				method: "frappedesk.api.doc.delete_items",
@@ -101,10 +136,6 @@ export default {
 						customIcon: "circle-check",
 						appearance: "success",
 					})
-					this.$event.emit(
-						"show-top-panel-actions-settings",
-						"Agents"
-					)
 				},
 			}
 		},
