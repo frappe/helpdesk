@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col space-y-2 w-full">
-		<div class="text-[16px] font-medium">Related Articles</div>
+		<div class="text-xl font-medium">Related Articles</div>
 		<ListManager
 			ref="suggestedArticles"
 			:options="{

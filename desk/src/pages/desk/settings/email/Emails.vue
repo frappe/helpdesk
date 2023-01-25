@@ -64,7 +64,7 @@
 								:to="{
 									path: `/frappedesk/settings/emails/${row.email_account_name}`,
 								}"
-								class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
+								class="text-base text-gray-600 font-inter hover:text-gray-900"
 							>
 								<div>
 									{{ `${row.email_account_name}` }}
@@ -73,12 +73,12 @@
 						</div>
 					</template>
 					<template #field-email_id="{ row }"
-						><div class="text-[13px] text-gray-600 font-inter">
+						><div class="text-base text-gray-600 font-inter">
 							{{ `${row.email_id}` }}
 						</div>
 					</template>
 					<template #field-service="{ row }"
-						><div class="text-[13px] text-gray-600 font-inter">
+						><div class="text-base text-gray-600 font-inter">
 							{{ `${row.service}` }}
 						</div>
 					</template>

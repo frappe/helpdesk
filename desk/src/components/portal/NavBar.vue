@@ -8,7 +8,7 @@
 					/></a>
 				</div>
 				<div
-					class="flex space-x-8 text-[14px] text-[#4C5A67] items-center"
+					class="flex space-x-8 text-lg text-[#4C5A67] items-center"
 				>
 					<div v-for="item in navbarItems" :key="item.label">
 						<Dropdown

@@ -84,7 +84,7 @@
 								</div>
 								<div class="sm:w-2/12">
 									<Badge
-										class="text-[12px]"
+										class="text-sm"
 										:color="
 											getStatusBadgeColor(ticket.status)
 										"

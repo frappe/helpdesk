@@ -43,13 +43,13 @@
 							:to="{
 								path: `/frappedesk/settings/teams/${row.name}`,
 							}"
-							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
+							class="text-base text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.name}` }}
 						</router-link>
 					</template>
 					<template #field-assignment_rule="{ row }">
-						<div class="text-[13px] font-inter text-gray-600">
+						<div class="text-base font-inter text-gray-600">
 							{{ row.assignment_rule }}
 						</div>
 					</template>

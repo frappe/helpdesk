@@ -67,7 +67,7 @@
 									Service
 								</span>
 								<div
-									class="flex flex-wrap text-[11px] text-gray-700 mx-[-4px]"
+									class="flex flex-wrap text-xs text-gray-700 mx-[-4px]"
 								>
 									<div
 										v-for="service in services"

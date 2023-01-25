@@ -6,7 +6,7 @@
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-red-500">Due Today</div>
 			</div>
-			<span class="text-[28px] text-[#505A62] font-medium">
+			<span class="text-7xl text-[#505A62] font-medium">
 				{{ dueToday != null ? dueToday : 0 }}
 			</span>
 		</div>
@@ -16,7 +16,7 @@
 			<div class="flex flex-row gap-2">
 				<div class="text-xl font-normal text-[#687178]">Unresolved</div>
 			</div>
-			<span class="text-[28px] text-[#505A62] font-medium">
+			<span class="text-7xl text-[#505A62] font-medium">
 				{{ open + replied }}
 			</span>
 		</div>
@@ -26,7 +26,7 @@
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-[#687178] font-normal">Open</div>
 			</div>
-			<span class="text-[28px] text-[#505A62] font-medium">
+			<span class="text-7xl text-[#505A62] font-medium">
 				{{ open != null ? open : 0 }}
 			</span>
 		</div>
@@ -37,7 +37,7 @@
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-[#687178] font-normal">Replied</div>
 			</div>
-			<span class="text-[28px] text-[#505A62] font-medium">
+			<span class="text-7xl text-[#505A62] font-medium">
 				{{ replied != null ? replied : 0 }}
 			</span>
 		</div>

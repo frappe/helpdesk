@@ -42,13 +42,13 @@
 							:to="{
 								path: `/frappedesk/settings/canned_responses/${row.title}`,
 							}"
-							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
+							class="text-base text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.title}` }}
 						</router-link>
 					</template>
 					<template #field-owner="{ row }">
-						<div class="text-[13px] font-inter text-gray-600">
+						<div class="text-base font-inter text-gray-600">
 							{{ row.owner }}
 						</div>
 					</template>

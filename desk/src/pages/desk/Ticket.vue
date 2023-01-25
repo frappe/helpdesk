@@ -5,7 +5,7 @@
 				<div class="flex flex-row space-x-2 items-center">
 					<router-link
 						:to="{ path: '/frappedesk/tickets' }"
-						class="text-[18px] text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
+						class="text-2xl text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
 						role="button"
 					>
 						<FeatherIcon
@@ -91,7 +91,7 @@
 							v-if="editing"
 							ref="replyEditor"
 							:content="content"
-							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
+							editor-class="text-base min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
 							v-on:keydown="handleShortcuts($event)"
 							:mentions="mentions"
 							@change="
@@ -109,7 +109,7 @@
 						>
 							<template #top>
 								<div
-									class="flex flex-row items-center text-[12px] font-normal pb-[8px]"
+									class="flex flex-row items-center text-sm font-normal pb-[8px]"
 								>
 									<div v-if="editingType == 'reply'">
 										<div
@@ -132,7 +132,7 @@
 									>
 										<span class="text-gray-700">as</span>
 										<span
-											class="text-[11px] text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]"
+											class="text-xs text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]"
 											>Comment</span
 										>
 									</div>
@@ -171,7 +171,7 @@
 														class="h-[15px] stroke-gray-600"
 													/>
 													<span
-														class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate"
+														class="text-sm text-gray-700 font-normal ml-2 max-w-[100px] truncate"
 													>
 														{{ file.file_name }}
 													</span>

@@ -3,7 +3,7 @@
 		class="p-[10px] rounded-[6px] text-gray-900 bg-white shadow-sm border flex flex-col space-y-[8px]"
 	>
 		<div class="flex flex-row items-center">
-			<div class="text-[14px] font-medium">
+			<div class="text-lg font-medium">
 				{{
 					submitted
 						? fromDesk
@@ -91,7 +91,7 @@
 		</div>
 		<div
 			v-if="submitted && (ticket.customer_feedback || feedbackText)"
-			class="flex flex-col space-y-[8px] text-[12px] font-normal text-gray-700"
+			class="flex flex-col space-y-[8px] text-sm font-normal text-gray-700"
 		>
 			<div class="flex flex-col space-y-[2px]">
 				<div class="italic">

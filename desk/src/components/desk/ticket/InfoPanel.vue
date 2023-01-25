@@ -99,7 +99,7 @@
 						v-if="ticket.custom_fields.length > 0"
 					>
 						<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
-						<div class="space-y-[12px] text-[12px]">
+						<div class="space-y-[12px] text-sm">
 							<div class="space-y-[12px]">
 								<div
 									class="flex flex-col space-y-[8px] font-normal hover:underline"
@@ -189,7 +189,7 @@
 							"
 						>
 							<div
-								class="grow text-gray-600 text-[11px] font-semibold"
+								class="grow text-gray-600 text-xs font-semibold"
 							>
 								OPEN TICKETS ({{
 									otherTicketsOfContact.length
@@ -228,7 +228,7 @@
 													['is', ticket.contact]
 											  )}`
 									"
-									class="text-[12px] rounded"
+									class="text-sm rounded"
 								>
 									<div class="py-[1px]">
 										<div
@@ -244,7 +244,7 @@
 											<div class="max-w-[180px]">
 												<div class="truncate">
 													<a
-														class="text-[12px]"
+														class="text-sm"
 														:title="_ticket.subject"
 														>{{
 															_ticket.subject
@@ -255,7 +255,7 @@
 										</div>
 										<div
 											v-else
-											class="hover:text-gray-600 flex flex-row-reverse text-[11px]"
+											class="hover:text-gray-600 flex flex-row-reverse text-xs"
 										>
 											View all
 										</div>
@@ -278,7 +278,7 @@
 								"
 							>
 								<div
-									class="grow text-gray-600 text-[11px] font-semibold"
+									class="grow text-gray-600 text-xs font-semibold"
 								>
 									TICKET HISTORY
 								</div>

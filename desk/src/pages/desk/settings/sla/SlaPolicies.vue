@@ -43,7 +43,7 @@
 								:to="{
 									path: `/frappedesk/settings/sla/${row.name}`,
 								}"
-								class="text-[13px] text-gray-600 font-inter hover:text-gray-900 sm:w-10/12 truncate pr-10 flex flex-row items-center space-x-2"
+								class="text-base text-gray-600 font-inter hover:text-gray-900 sm:w-10/12 truncate pr-10 flex flex-row items-center space-x-2"
 								><div>
 									{{ `${row.name}` }}
 								</div>

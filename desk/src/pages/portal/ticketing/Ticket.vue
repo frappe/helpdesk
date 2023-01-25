@@ -61,7 +61,7 @@
 								</div>
 							</div>
 							<div
-								class="text-[#096CC3] text-[12px] font-medium cursor-pointer hover:text-blue-500"
+								class="text-[#096CC3] text-sm font-medium cursor-pointer hover:text-blue-500"
 								@click="
 									() => {
 										$resources.ticket.setValue.submit({
@@ -122,7 +122,7 @@
 												v-if="editing"
 												ref="replyEditor"
 												:content="content"
-												editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
+												editor-class="text-base min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
 												v-on:keydown="
 													handleShortcuts($event)
 												"
@@ -164,7 +164,7 @@
 																			class="h-[15px] stroke-gray-600"
 																		/>
 																		<span
-																			class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate"
+																			class="text-sm text-gray-700 font-normal ml-2 max-w-[100px] truncate"
 																		>
 																			{{
 																				file.file_name

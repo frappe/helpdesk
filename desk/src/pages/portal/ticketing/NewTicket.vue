@@ -26,7 +26,7 @@
 				</div>
 				<!-- <div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div> -->
 				<div
-					class="text-[13px] text-gray-700 pb-2"
+					class="text-base text-gray-700 pb-2"
 					v-html="template.about"
 				></div>
 				<div class="space-y-4 pb-4">
@@ -64,7 +64,7 @@
 								</div>
 								<TextEditor
 									:content="content"
-									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
+									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-base min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
 									@change="
 										(val) => {
 											validateField(field, val)
@@ -159,7 +159,7 @@
 									class="h-[15px] stroke-gray-600"
 								/>
 								<span
-									class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate"
+									class="text-sm text-gray-700 font-normal ml-2 max-w-[100px] truncate"
 								>
 									{{ file.file_name }}
 								</span>

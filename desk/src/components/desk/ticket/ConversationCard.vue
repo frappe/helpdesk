@@ -8,21 +8,21 @@
 					size="sm"
 				/>
 				<div
-					class="truncate text-[13px] max-w-[200px] text-gray-900 font-medium"
+					class="truncate text-base max-w-[200px] text-gray-900 font-medium"
 				>
 					{{ userName }}
 				</div>
 			</div>
 			<a
 				:title="$dayjs(time)"
-				class="text-gray-500 text-[12px] select-none font-normal"
+				class="text-gray-500 text-sm select-none font-normal"
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<div
-					class="message text-[13px]"
+					class="message text-base"
 					style="border: 0px"
 					v-html="cleanedMessage"
 				></div>
@@ -34,7 +34,7 @@
 						<a
 							:href="attachment.file_url"
 							target="_blank"
-							class="py-[4px] max-w-[180px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-[12px] hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
+							class="py-[4px] max-w-[180px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
 						>
 							<FeatherIcon
 								name="paperclip"

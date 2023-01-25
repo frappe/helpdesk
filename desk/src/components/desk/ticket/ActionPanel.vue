@@ -4,7 +4,7 @@
 			<div class="text-base space-y-[11px]">
 				<div class="flex flex-col space-y-[2px]">
 					<div class="flex flex-row space-x-[5.33px] items-center">
-						<div class="text-gray-600 text-[12px]">
+						<div class="text-gray-600 text-sm">
 							First Response Due
 						</div>
 						<CustomIcons
@@ -28,7 +28,7 @@
 				</div>
 				<div class="flex flex-col space-y-[2px]">
 					<div class="flex flex-row space-x-[5.33px] items-center">
-						<div class="text-gray-600 text-[12px]">
+						<div class="text-gray-600 text-sm">
 							Resolution Due
 						</div>
 						<CustomIcons

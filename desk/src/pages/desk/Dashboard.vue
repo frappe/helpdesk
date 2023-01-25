@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col h-screen">
 		<div class="flex border-b h-[52px] px-[18px] shrink-0">
-			<div class="grow my-auto text-[16px] text-gray-900">
+			<div class="grow my-auto text-xl text-gray-900">
 				Welcome, {{ user.agent ? user.agent.agent_name : user.user }}
 			</div>
 		</div>

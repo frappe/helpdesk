@@ -15,7 +15,7 @@
 					}
 				"
 			/>
-			<div class="text-[10px] font-normal text-gray-700">
+			<div class="text-xs font-normal text-gray-700">
 				v{{ fdVersion }}
 			</div>
 		</div>
@@ -43,7 +43,7 @@
 								class="ml-[8px] h-[14px] w-[14px]"
 							/>
 						</div>
-						<span class="ml-[6px] grow text-[13px]">{{
+						<span class="ml-[6px] grow text-base">{{
 							option.label
 						}}</span>
 					</div>
@@ -77,7 +77,7 @@
 										{{ childOption.label }}
 									</div>
 									<div
-										class="mr-[10px] text-[11px] font-normal text-gray-500"
+										class="mr-[10px] text-xs font-normal text-gray-500"
 									>
 										{{ childOption.extra }}
 									</div>
@@ -149,7 +149,7 @@
 						>
 						<a
 							:title="user.user"
-							class="truncate text-[11px] font-normal"
+							class="truncate text-xs font-normal"
 							>{{ user.user }}</a
 						>
 					</div>

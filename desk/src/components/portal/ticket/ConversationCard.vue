@@ -13,7 +13,7 @@
 				:class="`bg-${color}-50`"
 			>
 				<div
-					class="message text-[13px]"
+					class="message text-base"
 					style="border: 0px"
 					v-html="cleanedMessage"
 				></div>

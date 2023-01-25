@@ -35,7 +35,7 @@
 						<div class="w-full">
 							<slot>
 								<p
-									class="text-[14px] font-medium text-gray-900"
+									class="text-lg font-medium text-gray-900"
 								>
 									{{ title }}
 								</p>

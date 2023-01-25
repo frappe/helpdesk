@@ -10,7 +10,7 @@
 				/>
 				<ErrorMessage :message="articleInputErrors.title" />
 			</div>
-			<div v-else class="text-[24px] font-semibold">
+			<div v-else class="text-5xl font-semibold">
 				{{ article.title }}
 			</div>
 		</div>

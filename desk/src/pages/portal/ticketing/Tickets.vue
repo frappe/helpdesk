@@ -11,7 +11,7 @@
 							<div
 								class="flex space-x-2 items-center cursor-pointer"
 							>
-								<p class="text-[18px] font-semibold">
+								<p class="text-2xl font-semibold">
 									{{ this.ticketFilter }}
 								</p>
 								<FeatherIcon

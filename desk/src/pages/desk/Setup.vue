@@ -23,17 +23,17 @@
 								@submit.prevent="submitStep"
 							>
 								<div
-									class="text-[24px] font-bold mb-[10px] text-gray-900"
+									class="text-5xl font-bold mb-[10px] text-gray-900"
 								>
 									Welcome to FrappeDesk
 								</div>
 								<div
-									class="text-[16px] font-normal text-gray-600 mb-[30px]"
+									class="text-xl font-normal text-gray-600 mb-[30px]"
 								>
 									Thanks for verifying your e-mail.
 								</div>
 								<div
-									class="text-[16px] font-normal text-gray-900 mb-[30px]"
+									class="text-xl font-normal text-gray-900 mb-[30px]"
 								>
 									Configure your e-mail address to start
 									sending and receiving e-mails into
@@ -46,7 +46,7 @@
 										Service
 									</span>
 									<div
-										class="flex flex-wrap text-[11px] text-gray-700 mx-[-4px]"
+										class="flex flex-wrap text-xs text-gray-700 mx-[-4px]"
 									>
 										<div
 											v-for="service in services"
@@ -165,7 +165,7 @@
 								@submit.prevent="submitStep"
 							>
 								<div
-									class="text-[24px] font-bold mb-[30px] text-gray-900"
+									class="text-5xl font-bold mb-[30px] text-gray-900"
 								>
 									Let’s invite your teammates
 								</div>
@@ -199,7 +199,7 @@
 									<div>
 										<textarea
 											rows="3"
-											class="max-h-[130px] min-h-[80px] placeholder-gray-400 text-[16px] font-normal rounded-[6px] w-full border-[#EBEEF0]"
+											class="max-h-[130px] min-h-[80px] placeholder-gray-400 text-xl font-normal rounded-[6px] w-full border-[#EBEEF0]"
 											placeholder="tom@frappe.io, alex@frappe.io, joe@frappe.io"
 											v-model="
 												inputValues['agentEmailsStr']
