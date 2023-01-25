@@ -26,6 +26,8 @@
 								:time="conversation.creation"
 								:message="conversation.content"
 								:attachments="conversation.attachments"
+								:cc="conversation.cc"
+								:bcc="conversation.bcc"
 							/>
 						</div>
 						<CommentCard v-else :comment="conversation" />
@@ -109,6 +111,7 @@ export default {
 			return conversations
 		},
 		communications() {
+			console.log(this.$resources.communications.data, "commu")
 			return this.$resources.communications.data || []
 		},
 		comments() {
