@@ -109,22 +109,56 @@
 						>
 							<template #top>
 								<div
-									class="flex flex-row items-center text-[12px] font-normal pb-[8px]"
+									class="flex flex-row text-[12px] font-normal pb-[8px] border-[#F4F5F6] border-b-[1px]"
 								>
-									<div v-if="editingType == 'reply'">
+									<div
+										class="flex flex-col w-[85%]"
+										v-if="editingType == 'reply'"
+									>
 										<div
 											v-if="ticket.raised_by"
 											class="flex flex-row space-x-2 items-center"
 										>
-											<span class="text-gray-700"
-												>to</span
-											>
+											<div class="text-gray-700">To</div>
 											<div
 												class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]"
 											>
 												{{ ticket.raised_by }}
 											</div>
 										</div>
+										<div
+											v-if="showCc"
+											class="flex flex-row space-x-2 items-center bg-transparent"
+										>
+											<div class="text-gray-700">Cc</div>
+											<Input
+												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[4px]"
+												@input="cc = $event"
+											/>
+										</div>
+										<ErrorMessage
+											v-if="showCc"
+											:message="ccValidationError"
+										/>
+										<div
+											v-if="showBcc"
+											class="flex flex-row space-x-2 items-center"
+										>
+											<div
+												class="text-gray-700 bg-transparent"
+											>
+												Bcc
+											</div>
+
+											<Input
+												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[2px]"
+												@input="bcc = $event"
+											/>
+										</div>
+										<ErrorMessage
+											v-if="showBcc"
+											:message="bccValidationError"
+										/>
 									</div>
 									<div
 										v-else
@@ -136,17 +170,48 @@
 											>Comment</span
 										>
 									</div>
-									<div class="grow flex flex-row-reverse">
+									<div
+										class="grow gap-1.5 flex flex-row-reverse"
+									>
 										<a
 											role="button"
 											@click="cancelEditing"
 											title="Hide Editor"
 										>
-											<FeatherIcon
-												name="chevron-down"
-												class="h-4 w-4"
+											<CustomIcons
+												name="arrow-down"
+												class="h-[24px] w-[24px]"
 											/>
 										</a>
+										<div v-if="editingType == 'reply'">
+											<Button
+												v-if="showCcBtn"
+												class="h-[24px] w-[24px] bg-transparent text-[#4C5A67]"
+												label="Cc"
+												@click="
+													() => {
+														showCc = true
+														showCcBtn = false
+													}
+												"
+												title="Cc"
+											>
+											</Button>
+											<Button
+												v-if="showBccBtn"
+												class="h-[24px] w-[24px] bg-transparent text-[#4C5A67]"
+												appearenece="secondary"
+												label="Bcc"
+												@click="
+													() => {
+														showBcc = true
+														showBccBtn = false
+													}
+												"
+												title="Bcc"
+											>
+											</Button>
+										</div>
 									</div>
 								</div>
 							</template>
@@ -230,6 +295,7 @@
 													: "Create"
 											}}
 										</Button>
+
 										<div
 											class="flex flex-row items-center space-x-2"
 										>
@@ -366,6 +432,7 @@
 </template>
 <script>
 import {
+	ErrorMessage,
 	Badge,
 	Card,
 	Dropdown,
@@ -384,7 +451,7 @@ import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialo
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
 import { inject, ref } from "vue"
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
-
+import { color } from "echarts"
 export default {
 	name: "Ticket",
 	props: ["ticketId"],
@@ -405,12 +472,15 @@ export default {
 		TextEditorFixedMenu,
 		ArticleResponseDialog,
 		TicketStatus,
+		ErrorMessage,
 	},
 	data() {
 		return {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
+			cc: "",
+			bcc: "",
 		}
 	},
 	setup() {
@@ -419,17 +489,19 @@ export default {
 		const user = inject("user")
 		const agents = inject("agents")
 		const attachments = ref([])
-
 		const editingType = ref("")
-
+		const replied = ref("Replied")
 		const tempTextEditorData = ref({})
-
 		const showCannedResponsesDialog = ref(false)
 		const tempMessage = ref("")
-
 		const showArticleResponseDialog = ref(false)
 		const tempContent = ref("")
-
+		const ccValidationError = ref("")
+		const bccValidationError = ref("")
+		const showCc = ref(false)
+		const showBcc = ref(false)
+		const showCcBtn = ref(true)
+		const showBccBtn = ref(true)
 		return {
 			showTextFormattingMenu,
 			viewportWidth,
@@ -442,6 +514,13 @@ export default {
 			tempMessage,
 			showArticleResponseDialog,
 			tempContent,
+			replied,
+			ccValidationError,
+			bccValidationError,
+			showCc,
+			showBcc,
+			showCcBtn,
+			showBccBtn,
 		}
 	},
 	resources: {
@@ -463,7 +542,6 @@ export default {
 								text: "No default outgoing email available",
 							},
 						}[res.error_code]
-
 						this.$toast({
 							fixed: true,
 							title: error.title,
@@ -620,7 +698,6 @@ export default {
 			function delay(time) {
 				return new Promise((resolve) => setTimeout(resolve, time))
 			}
-
 			delay(400).then(() => (this.scrollConversationsToBottom = true))
 			delay(1000).then(() => (this.scrollConversationsToBottom = false))
 		},
@@ -636,6 +713,9 @@ export default {
 			}
 		},
 		submit() {
+			// if (this.validateInputs()) {
+			// 	return
+			// }
 			switch (this.editingType) {
 				case "reply":
 					this.submitConversation()
@@ -649,13 +729,13 @@ export default {
 			this.tempTextEditorData.content = this.content
 			this.tempTextEditorData.attachments = this.attachments
 			const content = `<div class='content-block'><div>${this.content}</div></div>`
-
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: content,
+				cc: this.cc,
+				bcc: this.bcc,
 				attachments: this.attachments.map((x) => x.name),
 			})
-
 			this.content = ""
 			this.attachments = []
 		},
@@ -663,7 +743,6 @@ export default {
 			this.tempTextEditorData.attachments = this.attachments
 			this.tempTextEditorData.content = this.content
 			const content = `<div class='content-block'><div>${this.content}</div></div>`
-
 			this.$resources.submitComment.submit({
 				doc: {
 					doctype: "Frappe Desk Comment",
@@ -672,13 +751,11 @@ export default {
 					commented_by: this.user.user,
 				},
 			})
-
 			this.content = ""
 			this.attachments = []
 		},
 		getNextTicket() {},
 		getPreviousTicket() {},
-
 		getMessage(message) {
 			this.tempMessage = message
 			this.content = this.tempMessage
@@ -686,6 +763,31 @@ export default {
 		getContent(content) {
 			this.tempContent = content
 			this.content = this.tempContent
+		},
+		validateInputs() {
+			if (this.cc || this.bcc != "") {
+				let error = this.validateCcInput(this.cc)
+				error += this.validateBccInput(this.bcc)
+				return error
+			}
+		},
+		validateCcInput(value) {
+			this.ccValidationError = ""
+			const reg =
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+			if (!reg.test(value)) {
+				this.ccValidationError = "Enter a valid email"
+			}
+			return this.ccValidationError
+		},
+		validateBccInput(value) {
+			this.bccValidationError = ""
+			const reg =
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+			if (!reg.test(value)) {
+				this.bccValidationError = "Enter a valid email"
+			}
+			return this.bccValidationError
 		},
 	},
 }

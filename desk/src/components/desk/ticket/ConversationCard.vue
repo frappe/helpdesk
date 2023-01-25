@@ -19,8 +19,15 @@
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
-		<div class="pl-[32px] pt-[6px]">
+		<div class="pl-8 pt-0">
 			<div class="flex flex-col">
+				<div
+					v-if="cc || bcc"
+					class="flex flex-row gap-1 text-[12px] text-gray-600 font-inter"
+				>
+					<div v-if="cc">cc: {{ cc }},</div>
+					<div v-if="bcc">bcc: {{ bcc }}</div>
+				</div>
 				<div
 					class="message text-[13px]"
 					style="border: 0px"
@@ -65,6 +72,8 @@ export default {
 		"message",
 		"color",
 		"attachments",
+		"cc",
+		"bcc",
 	],
 	components: {
 		FeatherIcon,
@@ -83,6 +92,6 @@ export default {
 
 <style scoped>
 .message >>> .content-block {
-	@apply prose prose-p:my-1 prose-table:table-fixed prose-td:p-2 prose-th:p-2 prose-td:border prose-th:border prose-td:border-gray-300 prose-th:border-gray-300 prose-td:relative prose-th:relative prose-th:bg-gray-100 max-w-full;
+	@apply prose prose-p:my-1 prose-table:table-fixed prose-td:p-2 prose-th:p-2 prose-td:border prose-th:border prose-td:border-gray-300 prose-th:border-gray-300 prose-td:relative prose-th:relative prose-th:bg-gray-100 max-w-full text-[13px];
 }
 </style>
