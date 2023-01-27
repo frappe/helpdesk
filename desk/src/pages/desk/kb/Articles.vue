@@ -57,7 +57,13 @@
 					class="text-base h-[calc(100vh-6.5rem)]"
 				>
 					<template #top-sub-section-1>
-						<LayoutSwitcher viewMode="List" />
+						<TabButtons
+							:buttons="[
+								{ label: 'Articles', active: true },
+								{ label: 'Webview' },
+							]"
+							v-model="activeTab"
+						/>
 					</template>
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
@@ -192,9 +198,9 @@
 <script>
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
-import LayoutSwitcher from "@/components/global/kb/LayoutSwitcher.vue"
 import CategorySelector from "@/components/desk/kb/CategorySelector.vue"
 import { Dropdown } from "frappe-ui"
+import TabButtons from "@/components/global/TabButtons.vue"
 
 export default {
 	name: "Articles",
@@ -204,12 +210,17 @@ export default {
 			default: "",
 		},
 	},
+	data() {
+		return {
+			activeTab: "Articles",
+		}
+	},
 	components: {
 		ListManager,
 		ListViewer,
-		LayoutSwitcher,
 		CategorySelector,
 		Dropdown,
+		TabButtons,
 	},
 	resources: {
 		moveArticlesToCategory() {
@@ -225,6 +236,14 @@ export default {
 		deleteArticles() {
 			return {
 				method: "frappedesk.api.kb.delete_articles",
+			}
+		},
+		knowledgeBase() {
+			if (this.activeTab == "Webview") {
+				this.$router.push({ path: "/frappedesk/kb" })
+			}
+			return {
+				auto: true,
 			}
 		},
 	},

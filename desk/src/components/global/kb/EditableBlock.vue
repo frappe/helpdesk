@@ -2,7 +2,15 @@
 	<div class="flex flex-col space-y-4">
 		<div v-if="editable" class="flex flex-row items-center">
 			<slot name="top-left-section">
-				<div v-if="!editMode"><LayoutSwitcher viewMode="Web" /></div>
+				<div v-if="!editMode">
+					<TabButtons
+						:buttons="[
+							{ label: 'Articles', active: true },
+							{ label: 'Webview' },
+						]"
+						v-model="activeTab"
+					/>
+				</div>
 				<div v-else class="text-base text-gray-700 italic">
 					Editing - Knowledge Base
 				</div>
@@ -63,7 +71,8 @@
 </template>
 
 <script>
-import LayoutSwitcher from "@/components/global/kb/LayoutSwitcher.vue"
+
+import TabButtons from "@/components/global/TabButtons.vue"
 
 export default {
 	name: "EditableBlock",
@@ -86,7 +95,22 @@ export default {
 		},
 	},
 	components: {
-		LayoutSwitcher,
+		TabButtons,
+	},
+	data() {
+		return {
+			activeTab: "Webview",
+		}
+	},
+	resources: {
+		articles() {
+			if (this.activeTab == "Articles") {
+				this.$router.push({ path: "/frappedesk/kb/articles" })
+			}
+			return {
+				auto: true,
+			}
+		},
 	},
 }
 </script>
