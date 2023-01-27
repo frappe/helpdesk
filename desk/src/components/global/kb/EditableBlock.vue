@@ -5,8 +5,8 @@
 				<div v-if="!editMode">
 					<TabButtons
 						:buttons="[
-							{ label: 'Articles', active: true },
-							{ label: 'Webview' },
+							{ label: 'Articles' },
+							{ label: 'Webview', active: true },
 						]"
 						v-model="activeTab"
 					/>
@@ -71,7 +71,6 @@
 </template>
 
 <script>
-
 import TabButtons from "@/components/global/TabButtons.vue"
 
 export default {
