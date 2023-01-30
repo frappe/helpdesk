@@ -64,7 +64,7 @@
 								</div>
 								<TextEditor
 									:content="content"
-									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-base min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
+									editor-class="px-3 pt-1.5 rounded-t-lg text-base min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
 									@change="
 										(val) => {
 											validateField(field, val)
@@ -156,7 +156,7 @@
 							<div class="flex flex-row items-center space-x-1">
 								<FeatherIcon
 									name="file-text"
-									class="h-[15px] stroke-gray-600"
+									class="h-4 stroke-gray-600"
 								/>
 								<span
 									class="text-sm text-gray-700 font-normal ml-2 max-w-[100px] truncate"

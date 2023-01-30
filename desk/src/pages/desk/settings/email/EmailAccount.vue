@@ -73,7 +73,7 @@
 										v-for="service in services"
 										:key="service.title"
 										role="button"
-										class="h-[90px] w-[90px] m-1 p-[8px] items-center border hover:shadow-sm rounded flex flex-col space-y-2"
+										class="h-[90px] w-[90px] m-1 p-2 items-center border hover:shadow-sm rounded flex flex-col space-y-2"
 										:class="
 											service.selected
 												? 'border-2 border-blue-500 bg-blue-50'

@@ -51,7 +51,7 @@
 									<CustomIcons
 										v-if="row.default_sla"
 										name="circle-check"
-										class="w-[16px] h-[16px] fill-blue-500"
+										class="w-4 h-4 fill-blue-500"
 									/>
 								</a>
 							</router-link>

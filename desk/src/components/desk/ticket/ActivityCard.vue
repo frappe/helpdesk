@@ -1,14 +1,14 @@
 <template>
 	<div
 		v-if="activity"
-		class="pb-[20px] space-x-[17.78px] flex flex-row select-none text-sm"
+		class="pb-5 space-x-[17.78px] flex flex-row select-none text-sm"
 	>
 		<div>
 			<CustomIcons class="h-4 w-4" name="disc" />
 			<div v-if="!isLast" class="h-full border-l mx-2" />
-			<div v-if="!isLast" class="h-[20px] border-l mx-2" />
+			<div v-if="!isLast" class="h-5 border-l mx-2" />
 		</div>
-		<div class="grow pr-[6px]">
+		<div class="grow pr-1.5">
 			<div class="flex flex-col text-gray-700">
 				<div>
 					<div class="font-normal">

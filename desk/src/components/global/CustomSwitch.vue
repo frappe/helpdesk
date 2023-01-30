@@ -9,7 +9,7 @@
 					? 'border-blue-500'
 					: 'border-gray-700'
 			"
-			class="relative inline-flex items-center h-4 bg-white border rounded-full w-[1.7rem]"
+			class="relative inline-flex items-center h-4 bg-white border rounded-full w-7"
 		>
 			<span
 				:class="`${
@@ -21,7 +21,7 @@
 						? 'bg-blue-500'
 						: 'bg-gray-700'
 				}`"
-				class="inline-block w-[0.5rem] h-[0.5rem] transform rounded-full"
+				class="inline-block w-2 h-2 transform rounded-full"
 			/>
 		</Switch>
 	</div>

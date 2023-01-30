@@ -1,7 +1,7 @@
 <template>
 	<div class="overflow-hidden">
 		<div v-if="ticket" class="flex flex-col h-screen grow-0">
-			<div class="h-[60px] px-[20px] flex">
+			<div class="h-[60px] px-5 flex">
 				<div class="flex flex-row space-x-2 items-center">
 					<router-link
 						:to="{ path: '/frappedesk/tickets' }"
@@ -10,14 +10,14 @@
 					>
 						<FeatherIcon
 							name="arrow-left"
-							class="w-[12px] h-[12px]"
+							class="w-3 h-3"
 						/>
 						<div>Ticket #{{ ticket.name }}</div>
 					</router-link>
 					<TicketStatus :value="ticket.status" />
 					<FeatherIcon
 						name="copy"
-						class="w-[24px] h-[24px] bg-gray-100 p-1 rounded-md stroke-gray-700"
+						class="w-6 h-6 bg-gray-100 p-1 rounded-md stroke-gray-700"
 						role="button"
 						@click="copyTicketNameToClipboard"
 					/>
@@ -37,7 +37,7 @@
 					class="grow flex flex-col h-full"
 					:style="{ width: 'calc(100vh - 252px - 240px - 252px)' }"
 				>
-					<div class="border-b py-[14px] px-[18px]">
+					<div class="border-b py-3.5 px-5">
 						<div class="flex flex-row justify-between">
 							<div class="grow">
 								<div
@@ -47,12 +47,12 @@
 										<CustomIcons
 											v-if="ticket.via_customer_portal"
 											name="comment"
-											class="h-[25px] w-[25px] stroke-[#A6B1B9]"
+											class="h-6 w-6 stroke-[#A6B1B9]"
 										/>
 										<FeatherIcon
 											v-else
 											name="mail"
-											class="h-[25px] w-[25px] p-[1.5px] stroke-[#A6B1B9]"
+											class="h-6 w-6 p-0.5 stroke-[#A6B1B9]"
 										/>
 									</div>
 									<a
@@ -65,7 +65,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="grow overflow-y-scroll px-[17px]">
+					<div class="grow overflow-y-scroll px-4">
 						<CustomerSatisfactionFeedback
 							:fromDesk="true"
 							v-if="
@@ -85,7 +85,7 @@
 						/>
 					</div>
 					<div
-						class="shrink-0 flex flex-col mb-[15px] px-[18px] space-y-[11px] pt-2"
+						class="shrink-0 flex flex-col mb-[15px] px-5 space-y-[11px] pt-2"
 					>
 						<TextEditor
 							v-if="editing"
@@ -105,11 +105,11 @@
 									? 'Type a response'
 									: 'Type a comment'
 							"
-							class="border border-gray-300 rounded-[8px] p-[12px]"
+							class="border border-gray-300 rounded-[8px] p-3"
 						>
 							<template #top>
 								<div
-									class="flex flex-row items-center text-sm font-normal pb-[8px]"
+									class="flex flex-row items-center text-sm font-normal pb-2"
 								>
 									<div v-if="editingType == 'reply'">
 										<div
@@ -120,7 +120,7 @@
 												>to</span
 											>
 											<div
-												class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]"
+												class="bg-gray-50 rounded-md px-2.5 py-1"
 											>
 												{{ ticket.raised_by }}
 											</div>
@@ -132,7 +132,7 @@
 									>
 										<span class="text-gray-700">as</span>
 										<span
-											class="text-xs text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]"
+											class="text-xs text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-md px-2.5 py-1"
 											>Comment</span
 										>
 									</div>
@@ -168,7 +168,7 @@
 												>
 													<FeatherIcon
 														name="file-text"
-														class="h-[15px] stroke-gray-600"
+														class="h-4 stroke-gray-600"
 													/>
 													<span
 														class="text-sm text-gray-700 font-normal ml-2 max-w-[100px] truncate"
@@ -264,7 +264,7 @@
 												>
 													<FeatherIcon
 														name="paperclip"
-														class="h-[17px]"
+														class="h-4"
 														@click="
 															openFileSelector
 														"

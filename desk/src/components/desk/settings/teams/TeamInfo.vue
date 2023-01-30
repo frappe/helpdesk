@@ -1,13 +1,13 @@
 <template>
-	<div class="min-w-[490px] px-[24px] py-[10px]">
-		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
+	<div class="min-w-[490px] px-6 py-2.5">
+		<div class="shrink-0 h-[72px] py-5 flow-root px-4">
 			<div class="float-left">
 				<router-link
 					:to="`/frappedesk/settings/teams`"
 					class="my-1 text-sm text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
-					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
+					<FeatherIcon name="arrow-left" class="w-3 h-3" />
 					<div>Back to team list</div>
 				</router-link>
 			</div>
@@ -33,7 +33,7 @@
 		</div>
 		<div
 			v-if="team"
-			class="flex flex-row space-x-[24px] h-full border-t px-[16px] py-[22px]"
+			class="flex flex-row space-x-[24px] h-full border-t px-4 py-5"
 		>
 			<div class="flex flex-col space-y-[16px] h-full w-full">
 				<div>

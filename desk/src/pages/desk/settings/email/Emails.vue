@@ -90,7 +90,7 @@
 							<CustomIcons
 								v-if="row.default_incoming"
 								name="circle-check"
-								class="w-[16px] h-[16px] fill-blue-500"
+								class="w-4 h-4 fill-blue-500"
 							/> </a
 					></template>
 					<template #field-default_outgoing="{ row }">
@@ -98,7 +98,7 @@
 							<CustomIcons
 								v-if="row.default_outgoing"
 								name="circle-check"
-								class="w-[16px] h-[16px] fill-blue-500"
+								class="w-4 h-4 fill-blue-500"
 							/> </a
 					></template>
 				</ListViewer>

@@ -13,7 +13,7 @@
 				<div class="h-full">
 					<slot name="top-section">
 						<div
-							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
+							class="flex flex-row w-full items-center h-8 mb-4 space-x-2"
 						>
 							<div class="shrink-0">
 								<slot name="top-sub-section-1">
@@ -93,9 +93,9 @@
 					<slot name="header">
 						<div class="w-full">
 							<div
-								class="flex flex-row bg-[#F7F7F7] group items-center text-base font-normal text-gray-500 py-[10px] p-[10px] rounded-[6px] select-none"
+								class="flex flex-row bg-[#F7F7F7] group items-center text-base font-normal text-gray-500 py-2.5 p-2.5 rounded-[6px] select-none"
 							>
-								<div class="w-[25px]">
+								<div class="w-6">
 									<Input
 										type="checkbox"
 										@click="manager.selectAll()"
@@ -109,7 +109,7 @@
 									)"
 									:key="field"
 									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-									class="pr-[5px]"
+									class="pr-1.5"
 								>
 									<div>
 										<slot
@@ -146,7 +146,7 @@
 														].label
 													}}
 												</div>
-												<div class="w-[10px]">
+												<div class="w-2.5">
 													<CustomIcons
 														v-if="
 															manager.options.order_by.split(
@@ -160,7 +160,7 @@
 																? 'chevron-down'
 																: 'chevron-up'
 														"
-														class="h-[6px] fill-gray-400 stroke-transparent"
+														class="h-1.5 fill-gray-400 stroke-transparent"
 													/>
 												</div>
 											</div>
@@ -184,7 +184,7 @@
 									>
 										<slot name="row" :item="item">
 											<div
-												class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
+												class="flex flex-row items-center px-2.5 select-none rounded-md py-2.5"
 												:class="`${
 													manager.itemSelected(item)
 														? 'bg-blue-50 hover:bg-blue-100'
@@ -196,7 +196,7 @@
 												}`"
 											>
 												<slot name="row-checkbox">
-													<div class="w-[25px]">
+													<div class="w-6">
 														<Input
 															type="checkbox"
 															@click="
@@ -218,7 +218,7 @@
 														renderOptions.fields
 													)"
 													:key="field"
-													class="pr-[5px]"
+													class="pr-1.5"
 													:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
 												>
 													<div
@@ -260,7 +260,7 @@
 						<div>
 							<slot name="pagination">
 								<div
-									class="flex flex-row items-center h-[43px]"
+									class="flex flex-row items-center h-11"
 								>
 									<ListPageController />
 								</div>

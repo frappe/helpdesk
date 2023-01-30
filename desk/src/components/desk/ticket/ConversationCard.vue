@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col my-[16px] px-[8px]">
+	<div class="flex flex-col my-[16px] px-2">
 		<div class="flex flex-row items-center justify-between">
 			<div class="flex flex-row items-center space-x-[8px]">
 				<CustomAvatar
@@ -19,7 +19,7 @@
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
-		<div class="pl-[32px] pt-[6px]">
+		<div class="pl-8 pt-1.5">
 			<div class="flex flex-col">
 				<div
 					class="message text-base"
@@ -34,11 +34,11 @@
 						<a
 							:href="attachment.file_url"
 							target="_blank"
-							class="py-[4px] max-w-[180px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
+							class="py-1 max-w-[180px] rounded-[6px] border px-2 text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
 						>
 							<FeatherIcon
 								name="paperclip"
-								class="h-[12px] w-[12px] shrink-0"
+								class="h-3 w-3 shrink-0"
 							/>
 							<span class="truncate">{{
 								attachment.file_name

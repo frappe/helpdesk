@@ -24,7 +24,7 @@
 						}
 					}
 				"
-				class="rounded-[14px] p-1.5 w-[28px] bg-gray-100 hover:bg-gray-300 stroke-gray-700"
+				class="rounded-[14px] p-1.5 w-7 bg-gray-100 hover:bg-gray-300 stroke-gray-700"
 				role="button"
 			/>
 			<div v-for="i in manager.totalPages" :key="i">
@@ -39,7 +39,7 @@
 						].includes(i)
 					"
 					role="button"
-					class="rounded-[14px] py-1 w-[28px] text-center mx-1 hover:bg-gray-600 hover:border hover:border-gray-700 hover:text-white"
+					class="rounded-[14px] py-1 w-7 text-center mx-1 hover:bg-gray-600 hover:border hover:border-gray-700 hover:text-white"
 					:class="{
 						'text-white bg-gray-600':
 							i === manager.currentPageNumber,
@@ -64,7 +64,7 @@
 						i > 1 &&
 						i < manager.totalPages
 					"
-					class="rounded-[14px] py-1 w-[28px] text-center mx-1"
+					class="rounded-[14px] py-1 w-7 text-center mx-1"
 				>
 					...
 				</div>
@@ -78,7 +78,7 @@
 					}
 				"
 				name="chevron-right"
-				class="rounded-[14px] p-1.5 w-[28px] bg-gray-100 hover:bg-gray-300 stroke-gray-700"
+				class="rounded-[14px] p-1.5 w-7 bg-gray-100 hover:bg-gray-300 stroke-gray-700"
 				role="button"
 			/>
 		</div>

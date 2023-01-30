@@ -5,7 +5,7 @@
 		</div>
 		<div class="grid grid-cols-3 mt-8 mb-8 gap-4">
 			<div
-				class="flex flex-row items-center box-border h-[68px] p-4 border-2 rounded-md justify-between"
+				class="flex flex-row items-center box-border h-16 p-4 border-2 rounded-md justify-between"
 			>
 				<div class="font-light text-xl text-[#74808B]">
 					Avg. First Response time (hours)
@@ -15,7 +15,7 @@
 				</div>
 			</div>
 			<div
-				class="flex flex-row items-center box-border h-[68px] p-4 border-2 rounded-md justify-between"
+				class="flex flex-row items-center box-border h-16 p-4 border-2 rounded-md justify-between"
 			>
 				<div class="font-light text-xl text-[#74808B]">
 					Avg. Resolution Time (hours)
@@ -25,7 +25,7 @@
 				</div>
 			</div>
 			<div
-				class="flex flex-row items-center box-border h-[68px] p-4 border-2 rounded-md justify-between"
+				class="flex flex-row items-center box-border h-16 p-4 border-2 rounded-md justify-between"
 			>
 				<div class="font-light text-xl text-[#74808B]">
 					Resolution within SLA

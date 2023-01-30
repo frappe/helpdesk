@@ -47,14 +47,14 @@
 							v-if="
 								['Closed', 'Resolved'].includes(ticket.status)
 							"
-							class="w-full bg-gray-100 rounded-[8px] py-[10px] px-[15px] flex flex-row items-center justify-between mb-[12px]"
+							class="w-full bg-gray-100 rounded-lg py-2.5 px-4 flex flex-row items-center justify-between mb-[12px]"
 						>
 							<div
 								class="flex flex-row items-center space-x-[9px]"
 							>
 								<CustomIcons
 									name="circle-check"
-									class="w-[18px] h-[18px]"
+									class="w-5 h-5"
 								/>
 								<div class="text-base">
 									This ticket has been closed.
@@ -135,7 +135,7 @@
 													$refs.replyEditor.editor.commands.focus()
 												"
 												placeholder="Type a response"
-												class="border border-gray-300 rounded-[8px] p-[12px]"
+												class="border border-gray-300 rounded-[8px] p-3"
 											>
 												<template #bottom>
 													<div>
@@ -161,7 +161,7 @@
 																	>
 																		<FeatherIcon
 																			name="file-text"
-																			class="h-[15px] stroke-gray-600"
+																			class="h-4 stroke-gray-600"
 																		/>
 																		<span
 																			class="text-sm text-gray-700 font-normal ml-2 max-w-[100px] truncate"
@@ -263,7 +263,7 @@
 																	>
 																		<FeatherIcon
 																			name="paperclip"
-																			class="h-[17px]"
+																			class="h-4"
 																			@click="
 																				openFileSelector
 																			"

@@ -1,5 +1,5 @@
 <template>
-	<div class="pt-[8px]">
+	<div class="pt-2">
 		<div v-for="(activity, index) in activities" :key="activity.name">
 			<ActivityCard
 				:activity="activity"

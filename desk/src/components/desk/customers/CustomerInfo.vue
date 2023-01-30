@@ -149,7 +149,7 @@
 						v-for="contact in contactDoc"
 						class="flex font-normal text-sm py-2 items-center space-x-3 mx-5 py-2 px-4 border-b border-[#F4F5F6]-200 overflow-y-auto max-h-[calc(100vh-245px)]"
 					>
-						<div class="w-[30%]">
+						<div class="w-7/24">
 							<router-link
 								:to="`/frappedesk/contacts/${contact.name}`"
 							>
@@ -161,10 +161,10 @@
 								}}
 							</router-link>
 						</div>
-						<div class="w-[20%]">
+						<div class="w-5/24">
 							{{ contact.email_ids[0].email_id }}
 						</div>
-						<div class="w-[20%]">
+						<div class="w-5/24">
 							{{
 								contact.phone_nos.length == 0
 									? ""

@@ -29,7 +29,7 @@
 						>
 							<FeatherIcon
 								name="paperclip"
-								class="h-[12px] w-[12px]"
+								class="h-3 w-3"
 							/>
 							<span>{{ attachment.file_name }}</span>
 						</a>

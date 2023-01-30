@@ -4,7 +4,7 @@
 			v-if="category.is_placeholder"
 			class="border-2 border-dashed border-gray-400 rounded-md p-5 mr-4"
 		>
-			<div class="h-[130px]">
+			<div class="h-32">
 				<div
 					class="my-auto flex items-center space-x-2 p-5 hover:bg-gray-50 h-full hover:cursor-pointer rounded-md group"
 				>
@@ -24,7 +24,7 @@
 			<div class="flex flex-row items-center grow">
 				<div
 					class="grow flex flex-col space-y-2"
-					:class="editMode ? 'h-[130px]' : ''"
+					:class="editMode ? 'h-32' : ''"
 				>
 					<div class="flex flex-col">
 						<input
@@ -70,7 +70,7 @@
 							@input="onDescriptionInput($event.target.value)"
 						/>
 						<div
-							class="h-[81px] line-clamp-4 text-base text-gray-500"
+							class="h-20 line-clamp-4 text-base text-gray-500"
 							v-else
 						>
 							{{ category.description }}
@@ -81,7 +81,7 @@
 			</div>
 			<div
 				v-if="editMode"
-				class="w-[30px] h-full flex flex-col justify-between items-center"
+				class="w-7 h-full flex flex-col justify-between items-center"
 			>
 				<div class="flex flex-row-reverse">
 					<CustomIcons

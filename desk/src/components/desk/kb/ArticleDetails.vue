@@ -58,20 +58,20 @@
 			v-if="!isNew"
 		>
 			<div class="flex flex-row items-center space-x-[6px]">
-				<FeatherIcon name="eye" class="w-[16px] stroke-gray-500" />
-				<div class="w-[28px] text-left">
+				<FeatherIcon name="eye" class="w-4 stroke-gray-500" />
+				<div class="w-7 text-left">
 					{{ article.views || 0 }}
 				</div>
 			</div>
 			<div class="flex flex-row items-center space-x-[6px]">
-				<FeatherIcon name="smile" class="w-[14px] stroke-gray-500" />
-				<div class="w-[28px] text-left">
+				<FeatherIcon name="smile" class="w-3.5 stroke-gray-500" />
+				<div class="w-7 text-left">
 					{{ article.helpful || 0 }}
 				</div>
 			</div>
 			<div class="flex flex-row items-center space-x-[6px]">
-				<FeatherIcon name="frown" class="w-[14px] stroke-gray-500" />
-				<div class="w-[28px] text-left">
+				<FeatherIcon name="frown" class="w-3.5 stroke-gray-500" />
+				<div class="w-7 text-left">
 					{{ article.not_helpful || 0 }}
 				</div>
 			</div>

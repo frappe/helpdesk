@@ -1,5 +1,5 @@
 <template>
-	<div class="text-base rounded-md h-[30px] bg-gray-100 p-[3px] select-none">
+	<div class="text-base rounded-md h-8 bg-gray-100 p-0.5 select-none">
 		<div
 			v-if="viewMode === 'Web'"
 			class="flex flex-row items-center space-x-2"
@@ -16,15 +16,13 @@
 					class="h-5 w-5 ml-2 stroke-gray-500 hover:stroke-gray-900"
 				/>
 			</router-link>
-			<div
-				class="bg-white rounded-md shadow px-2 py-0.5 w-[82px] h-[24px]"
-			>
+			<div class="bg-white rounded-md shadow px-2 py-0.5 w-20 h-6">
 				Webview
 			</div>
 		</div>
 		<div v-else class="flex flex-row items-center space-x-2">
 			<div
-				class="bg-white rounded-md shadow px-2 py-0.5 w-[82px] h-[24px] group"
+				class="bg-white rounded-md shadow px-2 py-0.5 w-20 h-6 group"
 			>
 				<div>Articles</div>
 			</div>

@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="comment"
-		class="flex flex-col my-[16px] bg-[#FDF9F2] p-[10px] rounded-[6px]"
+		class="flex flex-col my-[16px] bg-[#FDF9F2] p-2.5 rounded-[6px]"
 	>
 		<div class="flex flex-row items-center justify-between">
 			<div class="flex flex-row items-center space-x-[8px]" v-if="user">
@@ -21,7 +21,7 @@
 				{{ $dayjs.longFormating($dayjs(comment.creation).fromNow()) }}
 			</div>
 		</div>
-		<div class="pl-[32px] pt-[6px]">
+		<div class="pl-8 pt-1.5">
 			<div class="flex flex-col">
 				<TextEditor
 					editor-class="text-base max-w-full"

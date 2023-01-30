@@ -4,7 +4,7 @@
 			<div
 				role="button"
 				@click="option.action()"
-				class="text-center py-[12px] mb-[-1px]"
+				class="text-center py-3 mb-[-1px]"
 				:class="
 					option.selected
 						? 'border-b border-blue-500 text-gray-900'

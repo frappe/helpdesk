@@ -1,6 +1,6 @@
 <template>
 	<div v-if="ticket" class="flex flex-col h-full">
-		<div class="pl-[19px] pr-[17px] pt-[18px] pb-[28px] dashes">
+		<div class="pl-5 pr-4 pt-4 pb-7 dashes">
 			<div class="text-base space-y-[11px]">
 				<div class="flex flex-col space-y-[2px]">
 					<div class="flex flex-row space-x-[5.33px] items-center">
@@ -14,7 +14,7 @@
 									firstResponseStatus()
 								]
 							"
-							class="w-[16px] h-[16px]"
+							class="w-4 h-4"
 						/>
 					</div>
 					<div class="font-normal text-gray-900">
@@ -38,7 +38,7 @@
 									resolutionStatus()
 								]
 							"
-							class="w-[16px] h-[16px]"
+							class="w-4 h-4"
 						/>
 						<Badge v-else color="blue">Paused</Badge>
 					</div>
@@ -62,7 +62,7 @@
 			></span>
 		</div>
 		<div
-			class="px-[19px] py-[28px] h-full overflow-y-auto flex flex-col space-y-2.5"
+			class="px-5 py-7 h-full overflow-y-auto flex flex-col space-y-2.5"
 		>
 			<div
 				class="flex flex-col space-y-[12px] pb-5"

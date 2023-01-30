@@ -2,10 +2,10 @@
 	<div>
 		<div
 			v-if="!editable"
-			class="flex flex-col space-y-[16px] rounded-[8px] border shadow-sm p-[32px]"
+			class="flex flex-col space-y-[16px] rounded-[8px] border shadow-sm p-8"
 		>
 			<div
-				class="font-semibold text-5xl prose prose-p:my-1 border-b pb-[16px] mb-[10px]"
+				class="font-semibold text-5xl prose prose-p:my-1 border-b pb-4 mb-[10px]"
 			>
 				{{ title }}
 			</div>

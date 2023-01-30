@@ -1,13 +1,13 @@
 <template>
 	<div class="flex flex-col h-screen">
-		<div class="flex border-b h-[52px] px-[18px] shrink-0">
+		<div class="flex border-b h-[52px] px-4 shrink-0">
 			<div class="grow my-auto text-xl text-gray-900">
 				Welcome, {{ user.agent ? user.agent.agent_name : user.user }}
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
 			<TicketStatusCards class="mx-4 my-4" />
-			<div class="grid grid-cols-2 gap-4 w-full px-[18px]">
+			<div class="grid grid-cols-2 gap-4 w-full px-4">
 				<TicketTrendsChart
 					class="chart-card"
 					:fromDate="fromDate"

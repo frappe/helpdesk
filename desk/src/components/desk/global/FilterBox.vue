@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="absolute border rounded shadow-md p-2 bg-white z-50 w-[286px] ml-[-31px] text-base"
+		class="absolute border rounded shadow-md p-2 bg-white z-50 w-72 ml-[-31px] text-base"
 		v-on-outside-click="() => {}"
 	>
 		<div v-if="tempFilters.length > 0" class="border-b pb-2 mb-2 space-y-2">

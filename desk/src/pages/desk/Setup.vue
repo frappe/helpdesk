@@ -1,6 +1,6 @@
 <template>
 	<div class="bg-[#F3F5F8] w-screen" style="min-height: 100vh">
-		<div class="lg:p-[80px] md:p-[0px]">
+		<div class="lg:p-20 md:p-0">
 			<div
 				class="bg-white lg:rounded-[10px] sm:rounded-none sm:h-[100hv]"
 				style="
@@ -11,11 +11,11 @@
 				"
 			>
 				<div
-					class="py-[60px] lg:px-[0px] sm:px-[10px] flex justify-center"
+					class="py-[60px] lg:px-0 sm:px-2.5 flex justify-center"
 				>
 					<div class="flex flex-col space-y-[60px] w-[370px]">
 						<div class="flex justify-center">
-							<CustomIcons name="frappedesk" class="h-[24px]" />
+							<CustomIcons name="frappedesk" class="h-6" />
 						</div>
 						<div>
 							<form
@@ -52,7 +52,7 @@
 											v-for="service in services"
 											:key="service.title"
 											role="button"
-											class="h-[80px] w-[80px] m-1 p-1.5 items-center border hover:shadow-sm rounded flex flex-col space-y-2"
+											class="h-20 w-20 m-1 p-1.5 items-center border hover:shadow-sm rounded flex flex-col space-y-2"
 											:class="
 												service.selected
 													? 'border-2 border-blue-500 bg-blue-50'
@@ -100,7 +100,7 @@
 									<div>
 										<input
 											type="text"
-											class="rounded-[6px] w-full border-[#EBEEF0] h-[36px]"
+											class="rounded-[6px] w-full border-[#EBEEF0] h-9"
 											v-model="inputValues['email']"
 										/>
 										<span
@@ -121,7 +121,7 @@
 									<div>
 										<input
 											type="password"
-											class="rounded-[6px] w-full border-[#EBEEF0] h-[36px]"
+											class="rounded-[6px] w-full border-[#EBEEF0] h-9"
 											v-model="inputValues['password']"
 										/>
 										<span
@@ -136,7 +136,7 @@
 									class="w-full mb-[14px]"
 									>Next</Button
 								>
-								<div class="flex justify-center pl-[15px]">
+								<div class="flex justify-center pl-3.5">
 									<div
 										class="flex flex-row items-center space-x-3 text-base font-normal text-gray-600 text-center hover:text-gray-700"
 										:class="
@@ -149,7 +149,7 @@
 										"
 									>
 										<span> Skip Onboarding </span>
-										<div class="h-[15px]">
+										<div class="h-4">
 											<Spinner
 												v-if="
 													$resources.completeSetup

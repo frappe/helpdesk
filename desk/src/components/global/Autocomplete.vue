@@ -23,7 +23,7 @@
 							:selectedValue="selectedValue"
 						>
 							<div
-								class="h-[28px] flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
+								class="h-7 flex items-center justify-between w-full py-1.5 pl-3 pr-2 rounded-md bg-gray-100"
 								:class="{
 									'rounded-b-none': isComboboxOpen,
 								}"
@@ -51,7 +51,7 @@
 								<CustomIcons
 									v-if="searchable"
 									name="select"
-									class="w-[12px] h-[12px] stroke-gray-500"
+									class="w-3 h-3 stroke-gray-500"
 								/>
 							</div>
 						</slot>

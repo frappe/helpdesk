@@ -1,6 +1,6 @@
 <template>
-	<div class="pt-[20px] h-full flex flex-col" v-if="ticket">
-		<div class="shrink-0 text-base px-[16px] pb-[17px]">
+	<div class="pt-5 h-full flex flex-col" v-if="ticket">
+		<div class="shrink-0 text-base px-4 pb-4">
 			<div>
 				<div v-if="contact" class="space-y-[12px]">
 					<div class="flex flex-row items-center space-x-[12px]">
@@ -89,13 +89,13 @@
 					</div>
 				</div>
 			</div>
-			<div class="shrink-0 text-base px-[16px] pb-[17px] border-b">
+			<div class="shrink-0 text-base px-4 pb-4 border-b">
 				<ContactInfo :contactId="ticket.contact" />
 			</div>
 			<div class="grow">
 				<div class="h-full flex flex-col">
 					<div
-						class="p-[16px] border-t border-b"
+						class="p-4 border-t border-b"
 						v-if="ticket.custom_fields.length > 0"
 					>
 						<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
@@ -137,7 +137,7 @@
 									>
 										<FeatherIcon
 											name="external-link"
-											class="w-[14px] h-[14px] stroke-gray-500"
+											class="w-3.5 h-3.5 stroke-gray-500"
 										/>
 										<div class="w-[200px] truncate">
 											<a
@@ -155,7 +155,7 @@
 										>
 											<FeatherIcon
 												name="info"
-												class="w-[14px] h-[14px] stroke-gray-500"
+												class="w-3.5 h-3.5 stroke-gray-500"
 											/>
 											<div class="w-[200px] truncate">
 												<a
@@ -171,7 +171,7 @@
 						</div>
 					</div>
 					<div
-						class="shrink-0 border-b p-[16px] space-y-1 select-none"
+						class="shrink-0 border-b p-4 space-y-1 select-none"
 						v-if="otherTicketsOfContact"
 					>
 						<div
@@ -197,7 +197,7 @@
 							</div>
 							<FeatherIcon
 								v-if="otherTicketsOfContact.length > 0"
-								class="h-[15px] w-[15px] stroke-gray-500"
+								class="h-4 w-4 stroke-gray-500"
 								:name="
 									showOtherTicketsOfContacts
 										? 'chevron-up'
@@ -210,7 +210,7 @@
 								showOtherTicketsOfContacts &&
 								otherTicketsOfContact.length > 0
 							"
-							class="overflow-auto pt-[4px] space-y-[4px] text-gray-700 font-normal"
+							class="overflow-auto pt-1 space-y-[4px] text-gray-700 font-normal"
 						>
 							<div
 								v-for="(
@@ -230,15 +230,15 @@
 									"
 									class="text-sm rounded"
 								>
-									<div class="py-[1px]">
+									<div class="p-py">
 										<div
 											v-if="index < maxCount"
 											class="flex flex-row space-x-[12px] items-center hover:bg-gray-100"
 										>
-											<div class="w-[15px] h-[15px]">
+											<div class="w-4 h-4">
 												<FeatherIcon
 													name="arrow-up-right"
-													class="w-[15px] h-[15px] stroke-gray-500"
+													class="w-4 h-4 stroke-gray-500"
 												/>
 											</div>
 											<div class="max-w-[180px]">
@@ -266,7 +266,7 @@
 					</div>
 					<div class="h-full">
 						<div
-							class="flex flex-col p-[16px] select-none"
+							class="flex flex-col p-4 select-none"
 							:class="showTicketHistory ? '' : 'border-b'"
 						>
 							<div
@@ -283,7 +283,7 @@
 									TICKET HISTORY
 								</div>
 								<FeatherIcon
-									class="h-[15px] w-[15px] stroke-gray-500"
+									class="h-4 w-4 stroke-gray-500"
 									:name="
 										showTicketHistory
 											? 'chevron-up'

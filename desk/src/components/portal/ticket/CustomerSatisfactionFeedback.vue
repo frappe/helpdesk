@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="p-[10px] rounded-[6px] text-gray-900 bg-white shadow-sm border flex flex-col space-y-[8px]"
+		class="p-2.5 rounded-[6px] text-gray-900 bg-white shadow-sm border flex flex-col space-y-[8px]"
 	>
 		<div class="flex flex-row items-center">
 			<div class="text-lg font-medium">

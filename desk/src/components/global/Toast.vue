@@ -13,7 +13,7 @@
 				]"
 			>
 				<div
-					class="px-5 pt-[14px] pb-[12px] rounded-lg shadow-md min-w-[25rem] max-w-[40rem] flex flex-col space-y-5"
+					class="px-5 pt-3.5 pb-3 rounded-lg shadow-md min-w-[25rem] max-w-[40rem] flex flex-col space-y-5"
 					:class="bodyClasses"
 				>
 					<div class="flex items-start">

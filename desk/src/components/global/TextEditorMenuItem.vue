@@ -4,7 +4,7 @@
 			<div class="h-4 border-r" v-if="item == '|'"></div>
 			<div
 				v-else-if="item == 'file-upload'"
-				class="hover:bg-gray-200 rounded h-[20px] w-[20px] p-[2px]"
+				class="hover:bg-gray-200 rounded h-5 w-5 p-0.5"
 			>
 				<FileUploader @success="(file) => attachments.push(file)">
 					<template
@@ -12,7 +12,7 @@
 					>
 						<FeatherIcon
 							name="paperclip"
-							class="h-[17px]"
+							class="h-4"
 							@click="openFileSelector"
 							role="button"
 							:disabled="uploading"

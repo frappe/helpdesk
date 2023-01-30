@@ -1,10 +1,10 @@
 <template>
 	<div
-		class="block select-none rounded-[6px] py-[7px] px-[11px]"
+		class="block select-none rounded-[6px] py-1.5 px-2.5"
 		:class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'"
 	>
 		<div v-if="policy" role="button" class="flex items-center text-base">
-			<div class="w-[37px] h-[14px] flex items-center">
+			<div class="w-9 h-3.5 flex items-center">
 				<Input
 					type="checkbox"
 					@click="$emit('toggleSelect')"
@@ -24,7 +24,7 @@
 						<CustomIcons
 							v-if="policy.default_sla"
 							name="circle-check"
-							class="w-[16px] h-[16px] fill-blue-500"
+							class="w-4 h-4 fill-blue-500"
 						/>
 					</a>
 				</router-link>

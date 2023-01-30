@@ -1,5 +1,5 @@
 <template>
-	<div class="min-w-[390px] px-[24px] py-[10px]">
+	<div class="min-w-[390px] px-6 py-2.5">
 		<div class="form w-full flex flex-col">
 			<div
 				class="float-left mb-[16px]"
