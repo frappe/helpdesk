@@ -2,8 +2,8 @@
 	<div class="pt-5 h-full flex flex-col" v-if="ticket">
 		<div class="shrink-0 text-base px-4 pb-4">
 			<div>
-				<div v-if="contact" class="space-y-[12px]">
-					<div class="flex flex-row items-center space-x-[12px]">
+				<div v-if="contact" class="space-y-3">
+					<div class="flex flex-row items-center space-x-3">
 						<div class="w-7">
 							<CustomAvatar
 								:label="contactFullName"
@@ -30,7 +30,7 @@
 					</div>
 					<div
 						v-if="contact.phone_nos.length > 0"
-						class="flex space-x-[12px] items-center"
+						class="flex space-x-3 items-center"
 					>
 						<FeatherIcon
 							name="phone"
@@ -51,7 +51,7 @@
 					</div>
 					<div
 						v-if="contact.email_ids.length > 0"
-						class="flex space-x-[12px]"
+						class="flex space-x-3"
 					>
 						<FeatherIcon
 							name="mail"
@@ -73,7 +73,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="flex space-x-[12px]">
+					<div class="flex space-x-3">
 						<CustomIcons
 							name="customer"
 							class="stroke-gray-500 mt-[2.5px]"
@@ -99,10 +99,10 @@
 						v-if="ticket.custom_fields.length > 0"
 					>
 						<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
-						<div class="space-y-[12px] text-sm">
-							<div class="space-y-[12px]">
+						<div class="space-y-3 text-sm">
+							<div class="space-y-3">
 								<div
-									class="flex flex-col space-y-[8px] font-normal hover:underline"
+									class="flex flex-col space-y-2 font-normal hover:underline"
 									v-for="field in ticket.custom_fields.filter(
 										(field) => {
 											return field.is_action_field == '1'
@@ -118,9 +118,9 @@
 									>
 								</div>
 							</div>
-							<div class="space-y-[12px]">
+							<div class="space-y-3">
 								<div
-									class="flex flex-col space-y-[8px] font-normal"
+									class="flex flex-col space-y-2 font-normal"
 									v-for="field in ticket.custom_fields.filter(
 										(field) => {
 											return field.is_action_field != '1'
@@ -133,7 +133,7 @@
 									</div>
 									<div
 										v-if="field.route"
-										class="w-fit flex flex-row items-center space-x-[12px] cursor-pointer hover:underline"
+										class="w-fit flex flex-row items-center space-x-3 cursor-pointer hover:underline"
 									>
 										<FeatherIcon
 											name="external-link"
@@ -151,7 +151,7 @@
 									</div>
 									<div v-else>
 										<div
-											class="flex flex-row items-center space-x-[12px]"
+											class="flex flex-row items-center space-x-3"
 										>
 											<FeatherIcon
 												name="info"
@@ -210,7 +210,7 @@
 								showOtherTicketsOfContacts &&
 								otherTicketsOfContact.length > 0
 							"
-							class="overflow-auto pt-1 space-y-[4px] text-gray-700 font-normal"
+							class="overflow-auto pt-1 space-y-1 text-gray-700 font-normal"
 						>
 							<div
 								v-for="(
@@ -233,7 +233,7 @@
 									<div class="p-py">
 										<div
 											v-if="index < maxCount"
-											class="flex flex-row space-x-[12px] items-center hover:bg-gray-100"
+											class="flex flex-row space-x-3 items-center hover:bg-gray-100"
 										>
 											<div class="w-4 h-4">
 												<FeatherIcon

@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col my-[16px] px-2">
 		<div class="flex flex-row items-center justify-between">
-			<div class="flex flex-row items-center space-x-[8px]">
+			<div class="flex flex-row items-center space-x-2">
 				<CustomAvatar
 					:label="userName"
 					:imageURL="profilePicUrl"
@@ -34,7 +34,7 @@
 						<a
 							:href="attachment.file_url"
 							target="_blank"
-							class="py-1 max-w-[180px] rounded-md border px-2 text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
+							class="py-1 max-w-[180px] rounded-md border px-2 text-gray-700 font-normal text-sm hover:underline flex items-center space-x-2 border-gray-200 mr-[10px] mb-[5px]"
 						>
 							<FeatherIcon
 								name="paperclip"

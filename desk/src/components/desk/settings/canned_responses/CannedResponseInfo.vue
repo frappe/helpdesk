@@ -45,7 +45,7 @@
 			</div>
 		</div>
 		<div
-			class="flex flex-row space-x-[24px] h-full border-t px-4 py-6"
+			class="flex flex-row space-x-6 h-full border-t px-4 py-6"
 		>
 			<ResponseTitleAndMessage
 				class="grow"

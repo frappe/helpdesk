@@ -36,12 +36,12 @@
 					/>
 				</div>
 			</div>
-			<div class="flex flex-col space-y-[24px]">
+			<div class="flex flex-col space-y-6">
 				<div>
 					<span class="block mb-2 text-sm leading-4 text-gray-700"
 						>Profile Picture</span
 					>
-					<div class="flex flex-row space-x-[8px] items-center">
+					<div class="flex flex-row space-x-2 items-center">
 						<FileUploader
 							@success="(file) => setUserImage(file.file_url)"
 						>
@@ -77,7 +77,7 @@
 						</FileUploader>
 					</div>
 				</div>
-				<div class="flex flex-row space-x-[16px]">
+				<div class="flex flex-row space-x-4">
 					<!-- <div class="grow">
 						<Input
 							label="Team"

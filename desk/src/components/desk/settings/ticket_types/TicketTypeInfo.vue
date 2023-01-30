@@ -34,9 +34,9 @@
 
 		<div
 			v-if="ticketType"
-			class="flex flex-row space-x-[24px] h-full border-t px-4 py-5"
+			class="flex flex-row space-x-6 h-full border-t px-4 py-5"
 		>
-			<div class="flex flex-col space-y-[16px] h-full w-full">
+			<div class="flex flex-col space-y-4 h-full w-full">
 				<div>
 					<Input
 						label="Title"

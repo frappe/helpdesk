@@ -1,5 +1,5 @@
 <template>
-	<div class="flex h-full flex-col space-y-[16px]">
+	<div class="flex h-full flex-col space-y-4">
 		<div>
 			<div v-if="editMode" class="flex flex-col">
 				<Input

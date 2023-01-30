@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="p-2.5 rounded-md text-gray-900 bg-white shadow-sm border flex flex-col space-y-[8px]"
+		class="p-2.5 rounded-md text-gray-900 bg-white shadow-sm border flex flex-col space-y-2"
 	>
 		<div class="flex flex-row items-center">
 			<div class="text-lg font-medium">
@@ -13,7 +13,7 @@
 				}}
 			</div>
 			<div
-				class="ml-[25px] flex flex-row items-center space-x-[20px] font-normal text-base"
+				class="ml-[25px] flex flex-row items-center space-x-5 font-normal text-base"
 			>
 				<div
 					class="flex flex-row space-x-2"
@@ -60,7 +60,7 @@
 		</div>
 		<div
 			v-if="!submitted && satisfactionRating != 0"
-			class="flex flex-col space-y-[8px]"
+			class="flex flex-col space-y-2"
 		>
 			<Input
 				type="textarea"
@@ -91,9 +91,9 @@
 		</div>
 		<div
 			v-if="submitted && (ticket.customer_feedback || feedbackText)"
-			class="flex flex-col space-y-[8px] text-sm font-normal text-gray-700"
+			class="flex flex-col space-y-2 text-sm font-normal text-gray-700"
 		>
-			<div class="flex flex-col space-y-[2px]">
+			<div class="flex flex-col space-y-0.5">
 				<div class="italic">
 					"{{ ticket.customer_feedback || feedbackText }}"
 				</div>

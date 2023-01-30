@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col rounded shadow p-5 text-base space-y-[12px]">
+	<div class="flex flex-col rounded shadow p-5 text-base space-y-3">
 		<div class="font-semibold">Details</div>
 		<div class="border-b w-full"></div>
 		<router-link
@@ -57,19 +57,19 @@
 			class="flex flex-row items-center text-sm text-gray-700"
 			v-if="!isNew"
 		>
-			<div class="flex flex-row items-center space-x-[6px]">
+			<div class="flex flex-row items-center space-x-1.5">
 				<FeatherIcon name="eye" class="w-4 stroke-gray-500" />
 				<div class="w-7 text-left">
 					{{ article.views || 0 }}
 				</div>
 			</div>
-			<div class="flex flex-row items-center space-x-[6px]">
+			<div class="flex flex-row items-center space-x-1.5">
 				<FeatherIcon name="smile" class="w-3.5 stroke-gray-500" />
 				<div class="w-7 text-left">
 					{{ article.helpful || 0 }}
 				</div>
 			</div>
-			<div class="flex flex-row items-center space-x-[6px]">
+			<div class="flex flex-row items-center space-x-1.5">
 				<FeatherIcon name="frown" class="w-3.5 stroke-gray-500" />
 				<div class="w-7 text-left">
 					{{ article.not_helpful || 0 }}

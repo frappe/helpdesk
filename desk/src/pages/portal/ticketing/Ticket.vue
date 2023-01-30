@@ -50,7 +50,7 @@
 							class="w-full bg-gray-100 rounded-lg py-2.5 px-4 flex flex-row items-center justify-between mb-[12px]"
 						>
 							<div
-								class="flex flex-row items-center space-x-[9px]"
+								class="flex flex-row items-center space-x-2.5"
 							>
 								<CustomIcons
 									name="circle-check"
@@ -306,7 +306,7 @@
 				</div>
 				<div
 					v-if="customFields?.length > 0"
-					class="ml-5 flex flex-col space-y-[12px] w-[200px]"
+					class="ml-5 flex flex-col space-y-3 w-[200px]"
 				>
 					<!-- Show all the ticket custom fields that can be viewed by an agent -->
 					<div

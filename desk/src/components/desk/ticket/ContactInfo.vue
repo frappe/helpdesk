@@ -1,6 +1,6 @@
 <template>
-	<div v-if="contact" class="space-y-[12px]">
-		<div class="flex flex-row items-center space-x-[12px]">
+	<div v-if="contact" class="space-y-3">
+		<div class="flex flex-row items-center space-x-3">
 			<CustomAvatar
 				:label="contactFullName"
 				:imageURL="contact?.image"
@@ -15,7 +15,7 @@
 		</div>
 		<div
 			v-if="contact.phone_nos.length > 0"
-			class="flex space-x-[12px] items-center"
+			class="flex space-x-3 items-center"
 		>
 			<FeatherIcon
 				name="phone"
@@ -32,7 +32,7 @@
 				}}</a>
 			</div>
 		</div>
-		<div v-if="contact.email_ids.length > 0" class="flex space-x-[12px]">
+		<div v-if="contact.email_ids.length > 0" class="flex space-x-3">
 			<FeatherIcon
 				name="mail"
 				class="stroke-gray-500 mt-[2.5px]"
@@ -48,7 +48,7 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="contact.links.length > 0" class="flex space-x-[12px]">
+		<div v-if="contact.links.length > 0" class="flex space-x-3">
 			<CustomIcons
 				name="customer"
 				class="stroke-gray-500 mt-[2.5px]"

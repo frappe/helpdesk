@@ -1,9 +1,9 @@
 <template>
 	<div v-if="ticket" class="flex flex-col h-full">
 		<div class="pl-5 pr-4 pt-4 pb-7 dashes">
-			<div class="text-base space-y-[11px]">
-				<div class="flex flex-col space-y-[2px]">
-					<div class="flex flex-row space-x-[5.33px] items-center">
+			<div class="text-base space-y-3">
+				<div class="flex flex-col space-y-0.5">
+					<div class="flex flex-row space-x-1.5 items-center">
 						<div class="text-gray-600 text-sm">
 							First Response Due
 						</div>
@@ -26,8 +26,8 @@
 						}}
 					</div>
 				</div>
-				<div class="flex flex-col space-y-[2px]">
-					<div class="flex flex-row space-x-[5.33px] items-center">
+				<div class="flex flex-col space-y-0.5">
+					<div class="flex flex-row space-x-1.5 items-center">
 						<div class="text-gray-600 text-sm">
 							Resolution Due
 						</div>
@@ -65,7 +65,7 @@
 			class="px-5 py-7 h-full overflow-y-auto flex flex-col space-y-2.5"
 		>
 			<div
-				class="flex flex-col space-y-[12px] pb-5"
+				class="flex flex-col space-y-3 pb-5"
 				:class="{ 'border-b': customFields?.length > 0 }"
 			>
 				<!-- Show system ticket fields: Status, Ticket Type, Priority and Agent Group  -->
@@ -112,7 +112,7 @@
 					/>
 				</div>
 			</div>
-			<div class="flex flex-col space-y-[12px]">
+			<div class="flex flex-col space-y-3">
 				<!-- Show all the ticket custom fields that can be viewed by an agent -->
 				<div
 					v-for="customField in customFields"

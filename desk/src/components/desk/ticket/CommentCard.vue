@@ -4,7 +4,7 @@
 		class="flex flex-col my-[16px] bg-[#FDF9F2] p-2.5 rounded-md"
 	>
 		<div class="flex flex-row items-center justify-between">
-			<div class="flex flex-row items-center space-x-[8px]" v-if="user">
+			<div class="flex flex-row items-center space-x-2" v-if="user">
 				<CustomAvatar
 					:imageURL="user.user_image"
 					:label="user.full_name"

@@ -90,7 +90,7 @@
 									</p>
 								</div>
 								<label
-									class="flex flex-col space-y-[10px] mb-[30px]"
+									class="flex flex-col space-y-2.5 mb-[30px]"
 								>
 									<span
 										class="block mb-2 text-sm leading-4 text-gray-700"
@@ -111,7 +111,7 @@
 									</div>
 								</label>
 								<label
-									class="flex flex-col space-y-[10px] mb-[30px]"
+									class="flex flex-col space-y-2.5 mb-[30px]"
 								>
 									<span
 										class="block mb-2 text-sm leading-4 text-gray-700"
@@ -189,7 +189,7 @@
 									</p>
 								</div>
 								<label
-									class="flex flex-col space-y-[10px] mb-[30px]"
+									class="flex flex-col space-y-2.5 mb-[30px]"
 								>
 									<span
 										class="block mb-2 text-sm leading-4 text-gray-700"

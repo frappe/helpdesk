@@ -122,7 +122,7 @@
 						:isDesk="editable"
 						class="mb-5"
 					/>
-					<div class="flex flex-row space-x-[24px] grow">
+					<div class="flex flex-row space-x-6 grow">
 						<ArticleTitleAndContent
 							class="grow"
 							:editable="editable"

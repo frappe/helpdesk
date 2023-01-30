@@ -5,7 +5,7 @@
 				<div class="flex flex-row space-x-2 items-center">
 					<router-link
 						:to="{ path: '/frappedesk/tickets' }"
-						class="text-2xl text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
+						class="text-2xl text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-3 hover:stroke-gray-700 select-none"
 						role="button"
 					>
 						<FeatherIcon
@@ -41,7 +41,7 @@
 						<div class="flex flex-row justify-between">
 							<div class="grow">
 								<div
-									class="grow flex flex-row items-center space-x-[13.5px]"
+									class="grow flex flex-row items-center space-x-3.5"
 								>
 									<div>
 										<CustomIcons
@@ -85,7 +85,7 @@
 						/>
 					</div>
 					<div
-						class="shrink-0 flex flex-col mb-[15px] px-5 space-y-[11px] pt-2"
+						class="shrink-0 flex flex-col mb-[15px] px-5 space-y-3 pt-2"
 					>
 						<TextEditor
 							v-if="editing"
@@ -338,7 +338,7 @@
 						<div>
 							<div
 								v-if="!editing"
-								class="flex flex-row space-x-[14px]"
+								class="flex flex-row space-x-3.5"
 							>
 								<Button
 									appearance="primary"

@@ -4,7 +4,7 @@
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
 		<div
-			class="mb-[18.4px] cursor-pointer items-baseline pl-5 pr-6 w-fit flex flex-row space-x-[6px]"
+			class="mb-[18.4px] cursor-pointer items-baseline pl-5 pr-6 w-fit flex flex-row space-x-1.5"
 		>
 			<CustomIcons
 				name="frappedesk"
@@ -19,7 +19,7 @@
 				v{{ fdVersion }}
 			</div>
 		</div>
-		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
+		<div class="mx-[8px] mb-auto select-none space-y-1 text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div
 					class="pl-1 group cursor-pointer rounded-md stroke-gray-600 hover:bg-gray-200"
@@ -49,7 +49,7 @@
 					</div>
 				</div>
 				<div v-if="option.children && option.expanded" class="mt-[4px]">
-					<div class="space-y-[4px]">
+					<div class="space-y-1">
 						<div
 							v-for="childOption in option.children"
 							:key="childOption.label"
@@ -96,7 +96,7 @@
 				>
 					<div v-for="item in profileSettings" :key="item.label">
 						<div
-							class="flex cursor-pointer flex-row items-center space-x-[10px] rounded-lg px-3 py-1.5 text-base font-normal hover:bg-gray-100"
+							class="flex cursor-pointer flex-row items-center space-x-2.5 rounded-lg px-3 py-1.5 text-base font-normal hover:bg-gray-100"
 							:class="item.style"
 							@click="item.action()"
 						>
@@ -125,7 +125,7 @@
 							showProfileSettings = false
 						}
 					"
-					class="flex cursor-pointer flex-row items-center space-x-[7px] rounded-md px-3.5 py-3 hover:bg-gray-100"
+					class="flex cursor-pointer flex-row items-center space-x-2 rounded-md px-3.5 py-3 hover:bg-gray-100"
 					:class="showProfileSettings ? 'bg-gray-100' : ''"
 				>
 					<div>
