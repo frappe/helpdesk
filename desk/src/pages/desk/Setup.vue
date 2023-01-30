@@ -100,7 +100,7 @@
 									<div>
 										<input
 											type="text"
-											class="rounded-[6px] w-full border-[#EBEEF0] h-9"
+											class="rounded-md w-full border-[#EBEEF0] h-9"
 											v-model="inputValues['email']"
 										/>
 										<span
@@ -121,7 +121,7 @@
 									<div>
 										<input
 											type="password"
-											class="rounded-[6px] w-full border-[#EBEEF0] h-9"
+											class="rounded-md w-full border-[#EBEEF0] h-9"
 											v-model="inputValues['password']"
 										/>
 										<span
@@ -199,7 +199,7 @@
 									<div>
 										<textarea
 											rows="3"
-											class="max-h-[130px] min-h-[80px] placeholder-gray-400 text-xl font-normal rounded-[6px] w-full border-[#EBEEF0]"
+											class="max-h-[130px] min-h-[80px] placeholder-gray-400 text-xl font-normal rounded-md w-full border-[#EBEEF0]"
 											placeholder="tom@frappe.io, alex@frappe.io, joe@frappe.io"
 											v-model="
 												inputValues['agentEmailsStr']

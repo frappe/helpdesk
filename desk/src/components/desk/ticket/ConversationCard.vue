@@ -34,7 +34,7 @@
 						<a
 							:href="attachment.file_url"
 							target="_blank"
-							class="py-1 max-w-[180px] rounded-[6px] border px-2 text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
+							class="py-1 max-w-[180px] rounded-md border px-2 text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
 						>
 							<FeatherIcon
 								name="paperclip"

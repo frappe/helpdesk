@@ -135,7 +135,7 @@
 													$refs.replyEditor.editor.commands.focus()
 												"
 												placeholder="Type a response"
-												class="border border-gray-300 rounded-[8px] p-3"
+												class="border border-gray-300 rounded-lg p-3"
 											>
 												<template #bottom>
 													<div>

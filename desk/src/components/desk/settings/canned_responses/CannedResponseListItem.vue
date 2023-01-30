@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="block select-none rounded-[6px] py-1.5 px-2.5"
+		class="block select-none rounded-md py-1.5 px-2.5"
 		:class="selected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'"
 	>
 		<div

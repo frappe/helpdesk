@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div
-			class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-2.5 px-2.5 rounded-[6px] select-none"
+			class="bg-[#F7F7F7] group flex items-center text-base font-medium text-gray-500 py-2.5 px-2.5 rounded-md select-none"
 		>
 			<div class="w-9 h-3.5">
 				<Input

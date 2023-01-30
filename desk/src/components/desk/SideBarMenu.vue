@@ -22,7 +22,7 @@
 		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div
-					class="pl-1 group cursor-pointer rounded-[6px] stroke-gray-600 hover:bg-gray-200"
+					class="pl-1 group cursor-pointer rounded-md stroke-gray-600 hover:bg-gray-200"
 					:class="option.selected ? 'bg-gray-100' : ''"
 					@click="
 						() => {
@@ -55,7 +55,7 @@
 							:key="childOption.label"
 						>
 							<router-link
-								class="group flex cursor-pointer items-center rounded-[8px] py-1.5 hover:bg-gray-200"
+								class="group flex cursor-pointer items-center rounded-lg py-1.5 hover:bg-gray-200"
 								:class="
 									childOption.selected ? 'bg-gray-200' : ''
 								"

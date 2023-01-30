@@ -71,7 +71,7 @@
 										}
 									"
 									placeholder="Type your text here..."
-									class="border border-gray-300 rounded-[8px]"
+									class="border border-gray-300 rounded-lg"
 								>
 									<template #bottom>
 										<TextEditorFixedMenu

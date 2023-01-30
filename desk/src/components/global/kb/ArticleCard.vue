@@ -1,7 +1,7 @@
 <template>
 	<router-link :to="`/support/kb/articles/${article.name}`">
 		<div
-			class="group rounded-[6px] shadow-md bg-white p-5 w-full flex flex-row justify-between items-center hover:bg-gray-50"
+			class="group rounded-md shadow-md bg-white p-5 w-full flex flex-row justify-between items-center hover:bg-gray-50"
 		>
 			<div class="text-base text-gray-600">
 				{{ article.title }}
