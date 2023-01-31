@@ -147,7 +147,7 @@
 				<template v-slot:data>
 					<div
 						v-for="contact in contactDoc"
-						class="flex font-normal text-sm py-2 items-center space-x-3 mx-5 py-2 px-4 border-b border-[#F4F5F6]-200 overflow-y-auto max-h-[calc(100vh-245px)]"
+						class="flex font-normal text-sm py-2 items-center space-x-3 mx-5 py-2 px-4 border-b border-gray-100-200 overflow-y-auto max-h-[calc(100vh-245px)]"
 					>
 						<div class="w-7/24">
 							<router-link

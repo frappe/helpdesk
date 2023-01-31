@@ -6,7 +6,7 @@
 					$emit('toggle')
 				}
 			"
-			class="flex flex-row py-2 px-4 bg-[#F9FAFA] rounded text-left items-center"
+			class="flex flex-row py-2 px-4 bg-gray-50 rounded text-left items-center"
 			:aria-expanded="this.isOpen"
 			:aria-controls="`collapse${_uid}`"
 		>

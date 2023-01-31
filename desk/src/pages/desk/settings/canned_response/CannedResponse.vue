@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col">
 		<CannedResponseInfo
-			class="shrink-0 border-r border-[#F4F5F6]"
+			class="shrink-0 border-r border-gray-100"
 			:canned_response="canned_responseId"
 		/>
 	</div>

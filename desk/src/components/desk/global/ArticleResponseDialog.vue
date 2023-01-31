@@ -17,7 +17,7 @@
 					/>
 				</div>
 				<div
-					class="w-full border bg-[#EBEEF0] h-8 flex flex-row items-center space-x-3 mt-5 rounded mb-3"
+					class="w-full border bg-gray-200 h-8 flex flex-row items-center space-x-3 mt-5 rounded mb-3"
 				>
 					<FeatherIcon
 						name="search"
@@ -26,7 +26,7 @@
 					<Input
 						v-model="search"
 						id="searchInput"
-						class="grow text-sm text-left text-black border-0 bg-[#EBEEF0] h-8 rounded-none pl-0"
+						class="grow text-sm text-left text-black border-0 bg-gray-200 h-8 rounded-none pl-0"
 						type="text"
 						placeholder="Search for response"
 						@input="getArticles"

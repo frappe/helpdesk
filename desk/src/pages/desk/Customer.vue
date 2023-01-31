@@ -23,7 +23,7 @@
 		</div>
 		<div class="customer max-h-[calc(100vh-52px)]">
 			<CustomerInfo
-				class="flex border-r border-[#F4F5F6] w-full"
+				class="flex border-r border-gray-100 w-full"
 				:customer="customerId"
 			/>
 		</div>

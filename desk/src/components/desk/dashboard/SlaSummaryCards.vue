@@ -10,7 +10,7 @@
 				<div class="font-light text-xl text-[#74808B]">
 					Avg. First Response time (hours)
 				</div>
-				<div class="font-medium text-[36px] text-[#505A62]">
+				<div class="font-medium text-[36px] text-gray-700">
 					{{ averageFirstResponseTime }}
 				</div>
 			</div>
@@ -20,7 +20,7 @@
 				<div class="font-light text-xl text-[#74808B]">
 					Avg. Resolution Time (hours)
 				</div>
-				<div class="font-medium text-[36px] text-[#505A62]">
+				<div class="font-medium text-[36px] text-gray-700">
 					{{ averageResolutionTime }}
 				</div>
 			</div>
@@ -30,7 +30,7 @@
 				<div class="font-light text-xl text-[#74808B]">
 					Resolution within SLA
 				</div>
-				<div class="font-semibold text-[36px] text-[#505A62]">
+				<div class="font-semibold text-[36px] text-gray-700">
 					{{ resolutionWithinSla }}
 				</div>
 			</div>

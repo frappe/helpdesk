@@ -6,7 +6,7 @@
 			<div class="flex flex-row gap-2">
 				<div class="text-xl text-red-500">Due Today</div>
 			</div>
-			<span class="text-7xl text-[#505A62] font-medium">
+			<span class="text-7xl text-gray-700 font-medium">
 				{{ dueToday != null ? dueToday : 0 }}
 			</span>
 		</div>
@@ -14,9 +14,9 @@
 			class="flex flex-row card h-16 p-4 justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
-				<div class="text-xl font-normal text-[#687178]">Unresolved</div>
+				<div class="text-xl font-normal text-gray-600">Unresolved</div>
 			</div>
-			<span class="text-7xl text-[#505A62] font-medium">
+			<span class="text-7xl text-gray-700 font-medium">
 				{{ open + replied }}
 			</span>
 		</div>
@@ -24,9 +24,9 @@
 			class="flex flex-row h-16 p-4 card justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
-				<div class="text-xl text-[#687178] font-normal">Open</div>
+				<div class="text-xl text-gray-600 font-normal">Open</div>
 			</div>
-			<span class="text-7xl text-[#505A62] font-medium">
+			<span class="text-7xl text-gray-700 font-medium">
 				{{ open != null ? open : 0 }}
 			</span>
 		</div>
@@ -35,9 +35,9 @@
 			class="flex flex-row h-16 p-4 card justify-between items-center"
 		>
 			<div class="flex flex-row gap-2">
-				<div class="text-xl text-[#687178] font-normal">Replied</div>
+				<div class="text-xl text-gray-600 font-normal">Replied</div>
 			</div>
-			<span class="text-7xl text-[#505A62] font-medium">
+			<span class="text-7xl text-gray-700 font-medium">
 				{{ replied != null ? replied : 0 }}
 			</span>
 		</div>

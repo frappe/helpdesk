@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-row border-b border-[#F4F5F6] text-base font-normal">
+	<div class="flex flex-row border-b border-gray-100 text-base font-normal">
 		<div v-for="option in options" :key="option.name" class="grow">
 			<div
 				role="button"

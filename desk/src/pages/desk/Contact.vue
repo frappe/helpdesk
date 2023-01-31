@@ -7,7 +7,7 @@
 		</div>
 		<div class="flex flex-row w-full h-full">
 			<ContactInfo
-				class="shrink-0 border-r border-[#F4F5F6]"
+				class="shrink-0 border-r border-gray-100"
 				:contactId="contactId"
 			/>
 			<ContactRelatedInfo class="grow" :contact="contactId" />

@@ -20,7 +20,7 @@
 									class="flex flex-row space-x-2 items-center cursor-pointer"
 									@click="toggleDropdown"
 								>
-									<span class="hover:text-[#2490ef]">{{
+									<span class="hover:text-blue-500">{{
 										item.label
 									}}</span>
 									<FeatherIcon
@@ -33,7 +33,7 @@
 						<a
 							v-else
 							:href="item.url"
-							class="hover:text-[#2490ef]"
+							class="hover:text-blue-500"
 							v-html="item.label"
 						/>
 					</div>
