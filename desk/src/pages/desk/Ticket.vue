@@ -67,7 +67,7 @@
 										</a>
 										<FeatherIcon
 											class="w-4 h-4 cursor-pointer"
-											name="edit-2"
+											name="edit"
 											@click="editingSubject = true"
 										/>
 									</div>
