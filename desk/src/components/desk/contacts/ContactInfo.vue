@@ -20,7 +20,7 @@
 							}`
 						}}
 					</div>
-					<FeatherIcon class="w-3 h-3" name="edit-2" />
+					<FeatherIcon class="w-3 h-3" name="edit" />
 				</div>
 				<div v-else class="flex space-x-2">
 					<div>

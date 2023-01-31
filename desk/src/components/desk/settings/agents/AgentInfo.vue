@@ -15,7 +15,7 @@
 					class="flex space-x-2 items-center cursor-pointer"
 				>
 					<div class="font-semibold">{{ values.agentName }}</div>
-					<FeatherIcon class="w-3 h-3" name="edit-2" />
+					<FeatherIcon class="w-3 h-3" name="edit" />
 				</div>
 				<div v-else class="flex space-x-2 items-center">
 					<Input

@@ -59,7 +59,7 @@
 			</div>
 			<div v-else class="flex flex-row items-center space-x-2">
 				<slot name="main-actions">
-					<Button icon-left="edit-2" @click="$emit('edit')">
+					<Button icon-left="edit" @click="$emit('edit')">
 						Edit
 					</Button>
 					<slot name="other-main-actions" />
