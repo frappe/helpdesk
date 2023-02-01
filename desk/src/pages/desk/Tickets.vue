@@ -81,7 +81,7 @@
 				>
 					<!-- Field Templates -->
 					<template #field-name="{ value }">
-						<div class="text-xs text-gray-500">
+						<div class="text-gray-500">
 							{{ value }}
 						</div>
 					</template>
