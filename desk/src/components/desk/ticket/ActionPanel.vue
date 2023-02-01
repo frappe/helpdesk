@@ -58,7 +58,7 @@
 				class="dot fixed ml-[-1px] mt-[-10.5px] bg-gray-50 border-r border-t border-b"
 			></span>
 			<span
-				class="dot rotate-180 fixed ml-[241.5px] mt-[-10.5px] bg-white border-r border-t border-b"
+				class="dot rotate-180 fixed ml-60 mt-[-10.5px] bg-white border-r border-t border-b"
 			></span>
 		</div>
 		<div

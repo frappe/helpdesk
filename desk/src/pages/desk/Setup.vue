@@ -23,7 +23,7 @@
 								@submit.prevent="submitStep"
 							>
 								<div
-									class="text-5xl font-bold mb-[10px] text-gray-900"
+									class="text-5xl font-bold mb-2.5 text-gray-900"
 								>
 									Welcome to FrappeDesk
 								</div>
@@ -133,7 +133,7 @@
 								</label>
 								<Button
 									appearance="primary"
-									class="w-full mb-[14px]"
+									class="w-full mb-3.5"
 									>Next</Button
 								>
 								<div class="flex justify-center pl-3.5">
@@ -217,7 +217,7 @@
 								<Button
 									:loading="submitInProgress"
 									appearance="primary"
-									class="w-full mb-[14px]"
+									class="w-full mb-3.5"
 									>Finish</Button
 								>
 								<div class="flex justify-center mb-[30px]">

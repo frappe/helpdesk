@@ -55,7 +55,7 @@
 					>
 						<FeatherIcon
 							name="mail"
-							class="stroke-gray-500 mt-[2.5px]"
+							class="stroke-gray-500 mt-0.5"
 							style="width: 15px; height: 15px"
 						/>
 						<div
@@ -76,7 +76,7 @@
 					<div class="flex space-x-3">
 						<CustomIcons
 							name="customer"
-							class="stroke-gray-500 mt-[2.5px]"
+							class="stroke-gray-500 mt-0.5"
 							style="width: 15px; height: 15px"
 						/>
 						<div class="text-gray-700 text-base">

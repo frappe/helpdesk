@@ -32,7 +32,7 @@
 					>
 						<AgentListItem
 							:class="
-								index == 0 ? 'mt-[9px] mb-[2px]' : 'my-[2px]'
+								index == 0 ? 'mt-2.5 mb-0.5' : 'mt-0.5'
 							"
 							:agent="agent"
 							@toggle-select="manager.select(agent)"

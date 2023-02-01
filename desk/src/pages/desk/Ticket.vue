@@ -72,7 +72,7 @@
 								ticket.feedback_submitted &&
 								['Closed', 'Resolved'].includes(ticket.status)
 							"
-							class="mt-[10px]"
+							class="mt-2.5"
 							:editable="false"
 							:ticket="ticket"
 						/>
@@ -85,7 +85,7 @@
 						/>
 					</div>
 					<div
-						class="shrink-0 flex flex-col mb-[15px] px-5 space-y-3 pt-2"
+						class="shrink-0 flex flex-col mb-4 px-5 space-y-3 pt-2"
 					>
 						<TextEditor
 							v-if="editing"

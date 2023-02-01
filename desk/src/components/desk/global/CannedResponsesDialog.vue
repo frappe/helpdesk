@@ -21,7 +21,7 @@
 				>
 					<FeatherIcon
 						name="search"
-						class="h-4 w-4 stroke-gray-500 ml-[8px]"
+						class="h-4 w-4 stroke-gray-500 ml-2"
 					/>
 					<Input
 						v-model="search"

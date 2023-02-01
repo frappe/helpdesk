@@ -4,7 +4,7 @@
 		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
 	>
 		<div
-			class="mb-[18.4px] cursor-pointer items-baseline pl-5 pr-6 w-fit flex flex-row space-x-1.5"
+			class="mb-5 cursor-pointer items-baseline pl-5 pr-6 w-fit flex flex-row space-x-1.5"
 		>
 			<CustomIcons
 				name="frappedesk"
@@ -19,7 +19,7 @@
 				v{{ fdVersion }}
 			</div>
 		</div>
-		<div class="mx-[8px] mb-auto select-none space-y-1 text-gray-800">
+		<div class="mx-2 mb-auto select-none space-y-1 text-gray-800">
 			<div v-for="option in menuOptions" :key="option.label">
 				<div
 					class="pl-1 group cursor-pointer rounded-md stroke-gray-600 hover:bg-gray-200"
@@ -40,15 +40,15 @@
 						<div class="w-6">
 							<CustomIcons
 								:name="option.icon"
-								class="ml-[8px] h-3.5 w-3.5"
+								class="ml-2 h-3.5 w-3.5"
 							/>
 						</div>
-						<span class="ml-[6px] grow text-base">{{
+						<span class="ml-1.5 grow text-base">{{
 							option.label
 						}}</span>
 					</div>
 				</div>
-				<div v-if="option.children && option.expanded" class="mt-[4px]">
+				<div v-if="option.children && option.expanded" class="mt-1">
 					<div class="space-y-1">
 						<div
 							v-for="childOption in option.children"
@@ -77,7 +77,7 @@
 										{{ childOption.label }}
 									</div>
 									<div
-										class="mr-[10px] text-xs font-normal text-gray-500"
+										class="mr-2.5 text-xs font-normal text-gray-500"
 									>
 										{{ childOption.extra }}
 									</div>
@@ -89,7 +89,7 @@
 			</div>
 		</div>
 		<div>
-			<div class="mx-[8px] flex flex-col pb-4">
+			<div class="mx-2 flex flex-col pb-4">
 				<div
 					v-if="showProfileSettings"
 					class="h-50 z-50 rounded-md bg-white px-2 py-1.5 shadow-md"

@@ -191,8 +191,8 @@
 														: 'hover:bg-gray-50'
 												} ${
 													index == 0
-														? 'mt-[9px] mb-[2px]'
-														: 'my-[2px]'
+														? 'mt-2.5 mb-0.5'
+														: 'mt-0.5'
 												}`"
 											>
 												<slot name="row-checkbox">

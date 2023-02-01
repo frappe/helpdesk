@@ -47,7 +47,7 @@
 							v-if="
 								['Closed', 'Resolved'].includes(ticket.status)
 							"
-							class="w-full bg-gray-100 rounded-lg py-2.5 px-4 flex flex-row items-center justify-between mb-[12px]"
+							class="w-full bg-gray-100 rounded-lg py-2.5 px-4 flex flex-row items-center justify-between mb-3"
 						>
 							<div
 								class="flex flex-row items-center space-x-2.5"

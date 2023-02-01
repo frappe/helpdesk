@@ -1,5 +1,5 @@
 <template>
-	<div class="mt-8 ml-[18px] mb-8 mr-6">
+	<div class="mt-8 ml-4 mb-8 mr-6">
 		<div class="line-clamp-1 text-xl text-gray-900 font-semibold">
 			SLA Summary
 		</div>

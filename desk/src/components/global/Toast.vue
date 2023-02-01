@@ -7,9 +7,9 @@
 				v-if="shown"
 				:style="style"
 				:class="[
-					'absolute transition duration-200 ease-out mx-[15px] pointer-events-auto',
+					'absolute transition duration-200 ease-out mx-4 pointer-events-auto',
 					position.includes('center') ? '-translate-x-1/2' : '',
-					position.includes('top') ? 'my-[80px]' : 'my-[10px]',
+					position.includes('top') ? 'my-20' : 'my-2.5',
 				]"
 			>
 				<div

@@ -13,7 +13,7 @@
 				}}
 			</div>
 			<div
-				class="ml-[25px] flex flex-row items-center space-x-5 font-normal text-base"
+				class="ml-6 flex flex-row items-center space-x-5 font-normal text-base"
 			>
 				<div
 					class="flex flex-row space-x-2"

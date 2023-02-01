@@ -2,9 +2,9 @@
 	<div class="flex flex-col" v-if="customerDoc">
 		<div class="customer-info flex-1">
 			<div class="flex flex-row">
-				<div class="info basis-1/2 m-[20px]">
+				<div class="info basis-1/2 m-5">
 					<div v-if="editingTitle">
-						<div class="max-w-max mb-[10px]">
+						<div class="max-w-max mb-2.5">
 							<Input
 								label="Customer Name"
 								type="text"
@@ -49,7 +49,7 @@
 					</div>
 				</div>
 
-				<div class="actions basis-1/2 m-[20px]">
+				<div class="actions basis-1/2 m-5">
 					<div v-if="editingTitle" class="flex flex-row justify-end">
 						<Button
 							class="mr-1"
