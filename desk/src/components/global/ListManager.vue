@@ -57,6 +57,45 @@ export default {
 			return listResource.list.loading
 		})
 
+		const idWidth = computed(() => {
+			// Default width for id column in cases where calculation is impossible
+			const defaultWidth = 1;
+
+			// Minimum length of id. This is an assumed value, and could be wrong
+			const minIdLength = 3;
+
+			// Spread operator is used to clone original array
+			const data = [...(listResource.data || [])];
+
+			// Find row with longest id from data.
+			const longest = data
+				.sort((a, b) => a.name.length - b.name.length)
+				.pop();
+
+			// Default width if longest name is not found. This could happen in
+			// case of an empty list
+			if (!longest) return defaultWidth;
+
+			// Length is the length of name string. `name` here the key and should not
+			// be confused with other properties like subject
+			const idLength = longest.name.length;
+
+			// Default width is enough for short ids
+			if (idLength <= minIdLength) return defaultWidth;
+
+			// Reduce minimum width, to adjust width according to remaining width
+			const extraWidth = idLength - minIdLength;
+
+			// This value will be passed to tailwind width classes, which does not
+			// support fractional values. (It does support some, but not all).
+			// Refer https://tailwindcss.com/docs/width for more
+			//
+			// Extra width is here is the number of characters and we don't need that
+			// number in pixels/css. Hence the it is divided by another number. This
+			// could be a flaw and improved if possible
+			return Math.ceil(extraWidth / 3);
+		})
+
 		const countResource = createResource(
 			{
 				method: "frappe.client.get_count",
@@ -328,6 +367,7 @@ export default {
 			list,
 			loading,
 			totalCount,
+			idWidth,
 
 			reload,
 			update,

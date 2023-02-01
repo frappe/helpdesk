@@ -40,7 +40,7 @@
 						fields: {
 							name: {
 								label: '#',
-								width: '2',
+								width: manager.idWidth,
 							},
 							subject: {
 								label: 'Subject',
