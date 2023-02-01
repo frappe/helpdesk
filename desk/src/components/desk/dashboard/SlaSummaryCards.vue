@@ -7,30 +7,30 @@
 			<div
 				class="flex flex-row items-center box-border h-16 p-4 border-2 rounded-md justify-between"
 			>
-				<div class="font-light text-xl text-[#74808B]">
+				<div class="font-light text-xl text-gray-600">
 					Avg. First Response time (hours)
 				</div>
-				<div class="font-medium text-[36px] text-gray-700">
+				<div class="font-medium text-7xl text-gray-700">
 					{{ averageFirstResponseTime }}
 				</div>
 			</div>
 			<div
 				class="flex flex-row items-center box-border h-16 p-4 border-2 rounded-md justify-between"
 			>
-				<div class="font-light text-xl text-[#74808B]">
+				<div class="font-light text-xl text-gray-600">
 					Avg. Resolution Time (hours)
 				</div>
-				<div class="font-medium text-[36px] text-gray-700">
+				<div class="font-medium text-7xl text-gray-700">
 					{{ averageResolutionTime }}
 				</div>
 			</div>
 			<div
 				class="flex flex-row items-center box-border h-16 p-4 border-2 rounded-md justify-between"
 			>
-				<div class="font-light text-xl text-[#74808B]">
+				<div class="font-light text-xl text-gray-600">
 					Resolution within SLA
 				</div>
-				<div class="font-semibold text-[36px] text-gray-700">
+				<div class="font-semibold text-7xl text-gray-700">
 					{{ resolutionWithinSla }}
 				</div>
 			</div>

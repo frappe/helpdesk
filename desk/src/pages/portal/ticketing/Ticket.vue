@@ -49,9 +49,7 @@
 							"
 							class="w-full bg-gray-100 rounded-lg py-2.5 px-4 flex flex-row items-center justify-between mb-3"
 						>
-							<div
-								class="flex flex-row items-center space-x-2.5"
-							>
+							<div class="flex flex-row items-center space-x-2.5">
 								<CustomIcons
 									name="circle-check"
 									class="w-5 h-5"
@@ -61,7 +59,7 @@
 								</div>
 							</div>
 							<div
-								class="text-[#096CC3] text-sm font-medium cursor-pointer hover:text-blue-500"
+								class="text-blue-500 text-sm font-medium cursor-pointer hover:text-blue-500"
 								@click="
 									() => {
 										$resources.ticket.setValue.submit({
