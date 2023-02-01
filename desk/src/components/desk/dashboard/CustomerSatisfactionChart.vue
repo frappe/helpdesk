@@ -7,6 +7,7 @@ import ECharts from "vue-echarts"
 import * as echarts from "echarts"
 import "echarts/lib/chart/pie"
 import "echarts/lib/component/polar"
+import theme from "./theme"
 export default {
 	name: "CustomerSatisfactionChart",
 	components: {
@@ -51,7 +52,7 @@ export default {
 					type: "pie",
 					radius: "50%",
 					data: ticketCount,
-					color: ["#98F5E6", "#EEA4EF", "#61B2F9"],
+					color: [theme.green, theme.pink, theme.lightBlue],
 					label: {
 						formatter: "{b}: {c}",
 					},

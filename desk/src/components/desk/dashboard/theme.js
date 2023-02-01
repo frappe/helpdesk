@@ -43,4 +43,8 @@ export default {
 			// ...
 		},
 	],
+	blue:'#2D95F0',
+	lightBlue:'#61B2F9',
+	pink:'#EEA4EF',
+	green:'#5FD8C4',
 }

@@ -76,7 +76,7 @@ export default {
 					data: open,
 					lineStyle: {
 						width: 3,
-						color: "#61B2F9",
+						color: theme.lightBlue,
 					},
 				},
 				{
@@ -86,7 +86,7 @@ export default {
 					data: closed,
 					lineStyle: {
 						width: 3,
-						color: "#5FD8C4",
+						color: theme.green,
 					},
 				},
 				{
@@ -96,7 +96,7 @@ export default {
 					data: replied,
 					lineStyle: {
 						width: 3,
-						color: "#EEA4EF",
+						color: theme.pink,
 					},
 				},
 			],
