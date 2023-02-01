@@ -27,7 +27,7 @@
 							<FeatherIcon
 								v-if="slaPolicyName != 'Default'"
 								class="w-3 h-3"
-								name="edit-2"
+								name="edit"
 							/>
 						</div>
 						<div v-else class="flex space-x-2 items-center">

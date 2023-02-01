@@ -292,12 +292,6 @@ def get_active_sla_for(doc):
 	if doc.get("priority"):
 		filters.append(["Service Level Priority", "priority", "=", doc.get("priority")])
 
-	or_filters = []
-	if doc.get("sla"):
-		or_filters = [
-			["SLA", "name", "=", doc.get("sla")],
-		]
-
 	default_sla_filter = filters + [["SLA", "default_sla", "=", 1]]
 	default_sla = frappe.get_all(
 		"SLA",
@@ -309,7 +303,6 @@ def get_active_sla_for(doc):
 	agreements = frappe.get_all(
 		"SLA",
 		filters=filters,
-		or_filters=or_filters,
 		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
 	)
 

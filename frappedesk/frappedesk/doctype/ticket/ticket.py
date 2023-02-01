@@ -263,7 +263,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 
 @frappe.whitelist(allow_guest=True)
-def create_communication_via_agent(ticket, message, attachments=None):
+def create_communication_via_agent(ticket, message, cc,bcc,attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 	last_ticket_communication_doc = frappe.get_last_doc(
 		"Communication", filters={"reference_name": ["=", ticket_doc.name]}
@@ -331,6 +331,8 @@ def create_communication_via_agent(ticket, message, attachments=None):
 			"recipients": frappe.get_value("User", "Administrator", "email")
 			if ticket_doc.raised_by == "Administrator"
 			else ticket_doc.raised_by,
+			"cc":cc,
+			"bcc":bcc,
 			"content": message,
 			"status": "Linked",
 			"reference_doctype": "Ticket",
@@ -360,6 +362,8 @@ def create_communication_via_agent(ticket, message, attachments=None):
 				sender=reply_to_email,
 				reply_to=reply_to_email,
 				recipients=[ticket_doc.raised_by],
+				cc=cc,
+				bcc=bcc,
 				reference_doctype="Ticket",
 				reference_name=ticket_doc.name,
 				communication=communication.name,
@@ -405,7 +409,7 @@ def get_all_conversations(ticket):
 		"Communication",
 		filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]},
 		order_by="creation asc",
-		fields=["name", "content", "creation", "sent_or_received", "sender"],
+		fields=["name", "content", "creation", "sent_or_received", "sender","cc","bcc"],
 	)
 
 	for conversation in conversations:

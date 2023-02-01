@@ -380,7 +380,6 @@ def assign_ticket_status(ticket_id, status):
 
 		return ticket_doc
 
-
 @frappe.whitelist()
 def set_ticket_notes(ticket_id, notes):
 	if ticket_id:
@@ -455,8 +454,8 @@ def get_conversations(ticket_id):
 
 
 @frappe.whitelist()
-def submit_conversation_via_agent(ticket_id, message, attachments):
-	return create_communication_via_agent(ticket_id, message, attachments)
+def submit_conversation_via_agent(ticket_id, message,cc,bcc, attachments):
+	return create_communication_via_agent(ticket_id, message,cc,bcc, attachments)
 
 
 @frappe.whitelist()

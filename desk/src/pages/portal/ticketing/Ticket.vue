@@ -35,9 +35,44 @@
 					</Button>
 				</div>
 			</div>
-			<div class="flex items-center pb-2 justify-between">
+			<div
+				v-if="!editingSubject"
+				class="flex items-center pb-2 justify-between"
+			>
 				<div class="text-5xl font-bold">
 					{{ ticket.subject }}
+				</div>
+				<FeatherIcon
+					class="w-4 h-4 cursor-pointer"
+					name="edit"
+					@click="editingSubject = true"
+				/>
+			</div>
+			<div v-else class="flex gap-2 items-center pb-2 justify-between">
+				<Input
+					class="w-full"
+					id="subjectInput"
+					:value="ticket.subject"
+					@change="subject = $event"
+					type="text"
+				/>
+				<div class="flex flex-row gap-2">
+					<Button
+						appearance="primary"
+						@click="
+							() => {
+								$resources.ticket.setValue
+									.submit({
+										subject: subject,
+									})
+									.then((editingSubject = false))
+							}
+						"
+						>Save</Button
+					>
+					<Button appearance="secondary" @click="$router.go()"
+						>Discard</Button
+					>
 				</div>
 			</div>
 			<div class="flex flex-row h-full">
@@ -326,7 +361,13 @@
 <script>
 import { inject, ref, computed } from "vue"
 import Conversations from "@/components/portal/ticket/Conversations.vue"
-import { FeatherIcon, FileUploader, TextEditor, Avatar } from "frappe-ui"
+import {
+	FeatherIcon,
+	FileUploader,
+	TextEditor,
+	Avatar,
+	Button,
+} from "frappe-ui"
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
@@ -351,6 +392,7 @@ export default {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
+			subject: "",
 		}
 	},
 	setup() {
@@ -360,6 +402,7 @@ export default {
 		const attachments = ref([])
 		const tempTextEditorData = ref({})
 		const showTextFormattingMenu = ref(true)
+		const editingSubject = ref(false)
 
 		return {
 			user,
@@ -368,6 +411,7 @@ export default {
 			attachments,
 			tempTextEditorData,
 			showTextFormattingMenu,
+			editingSubject,
 		}
 	},
 	computed: {
