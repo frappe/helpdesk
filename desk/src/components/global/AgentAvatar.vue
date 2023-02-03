@@ -1,5 +1,5 @@
 <template>
-	<Avatar size="sm" :imageURL="agent.user_image" :label="agent.agent_name" />
+	<Avatar size="sm" v-if="agent" :imageURL="agent.user_image" :label="agent.agent_name" />
 </template>
 
 <script>
