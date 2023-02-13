@@ -20,7 +20,13 @@ export default {
 	},
 	computed: {
 		agent() {
-			return this.agents.find((x) => x.name === this.agent)
+			const a = this.agents.find((x) => x.name === this.agent);
+
+			// Agent could be missing, corrupt or invalid. It is better to
+			// have a fallback value, which in this case is an empty object.
+			if (!a) return {};
+
+			return a;
 		},
 	},
 }
