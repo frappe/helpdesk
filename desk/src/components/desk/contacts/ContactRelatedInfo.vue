@@ -1,9 +1,5 @@
 <template>
 	<div class="flex flex-col h-full px-4">
-		<div
-			v-if="false"
-			class="text-green-600 text-gray-600 text-green-500 bg-green-100 border-green-500 text-yellow-500 bg-yellow-100 border-yellow-500 text-orange-500 bg-orange-100 border-orange-500 text-red-500 bg-red-100 border-red-500"
-		/>
 		<ListManager
 			ref="miniTicketList"
 			:options="{
