@@ -5,7 +5,13 @@
 	"doctype": "DocType",
 	"editable_grid": 1,
 	"engine": "InnoDB",
-	"field_order": ["user", "agent_name", "is_active", "groups"],
+	"field_order": [
+		"user",
+		"agent_name",
+		"user_image",
+		"is_active",
+		"groups"
+	],
 	"fields": [
 		{
 			"fieldname": "user",
@@ -34,11 +40,17 @@
 			"fieldtype": "Table",
 			"label": "Groups",
 			"options": "Agent Group Item"
+		},
+		{
+			"fetch_from": "user.user_image",
+			"fieldname": "user_image",
+			"fieldtype": "Data",
+			"label": "User Image"
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2022-11-10 13:47:00.960100",
+	"modified": "2023-02-13 23:47:22.780889",
 	"modified_by": "Administrator",
 	"module": "FrappeDesk",
 	"name": "Agent",

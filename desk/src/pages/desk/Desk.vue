@@ -471,7 +471,7 @@ export default {
 					fields: [
 						"name",
 						"agent_name",
-						"user.user_image as user_image",
+						"user_image",
 					],
 				},
 				auto: this.user.has_desk_access,
