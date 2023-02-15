@@ -82,182 +82,75 @@
 							</div>
 						</div>
 					</slot>
-					<slot name="header">
-						<div class="w-full">
-							<div
-								class="flex flex-row bg-[#F7F7F7] group items-center text-base font-normal text-gray-500 py-[10px] p-[10px] rounded-[6px] select-none"
+					<div class="grow h-full">
+						<table class="w-full table-auto border-separate border-spacing-y-2">
+							<tr class="bg-gray-100 text-base text-gray-500 select-none">
+								<th class="p-3 rounded-tl-md rounded-bl-md">
+									<div>
+										<Input
+											type="checkbox"
+											@click="manager.selectAll"
+											:checked="manager.allItemsSelected"
+											class="cursor-pointer" />
+									</div>
+								</th>
+								<th
+									class="text-start last-of-type:rounded-tr-md last-of-type:rounded-br-md 
+									font-normal hover:text-gray-600 cursor-pointer fill-gray-300"
+									v-for="field in Object.keys(renderOptions.fields)"
+									:key="field"
+									@click="manager.toggleOrderBy(field)"
+								>
+									{{ renderOptions.fields[field].label }}
+									<div class="inline-table">
+										<CustomIcons
+											v-show="manager.options.order_by.split(' ')[0] === field"
+											:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-up' : 'chevron-down'"
+											class="h-1 fill-gray-400 stroke-transparent"
+										/>
+									</div>
+								</th>
+							</tr>
+
+							<tr
+								v-for="item in manager.list"
+								class="hover:bg-gray-50"
 							>
-								<div class="w-[25px]">
+								<td class="p-3 rounded-tl-md rounded-bl-md">
 									<Input
 										type="checkbox"
-										@click="manager.selectAll()"
-										:checked="manager.allItemsSelected"
-										class="cursor-pointer mr-1"
+										@click="manager.select(item)"
+										:checked="manager.itemSelected(item)"
+										class="cursor-pointer"
 									/>
-								</div>
-								<div
-									v-for="field in Object.keys(
-										renderOptions.fields
-									)"
+								</td>
+								<td
+									v-for="field in Object.keys(renderOptions.fields)"
 									:key="field"
-									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-									class="pr-[5px]"
+									class="py-2 last-of-type:rounded-tr-md last-of-type:rounded-br-md last-of-type:pr-3"
 								>
-									<div>
-										<slot
-											:name="'header-field-' + field"
-											:field="field"
-										>
-											<div
-												class="flex space-x-1 items-center"
-												:class="
-													renderOptions.fields[field]
-														.align === 'right'
-														? 'flex-row-reverse'
-														: 'flex-row'
-												"
-											>
-												<div
-													class="hover:text-gray-600 cursor-pointer fill-gray-400"
-													:class="
-														renderOptions.fields[
-															field
-														].align === 'right'
-															? 'ml-1'
-															: ''
-													"
-													@click="
-														manager.toggleOrderBy(
-															field
-														)
-													"
-												>
-													{{
-														renderOptions.fields[
-															field
-														].label
-													}}
-												</div>
-												<div class="w-[10px]">
-													<CustomIcons
-														v-if="
-															manager.options.order_by.split(
-																' '
-															)[0] === field
-														"
-														:name="
-															manager.options.order_by.split(
-																' '
-															)[1] === 'desc'
-																? 'chevron-down'
-																: 'chevron-up'
-														"
-														class="h-[6px] fill-gray-400 stroke-transparent"
-													/>
-												</div>
-											</div>
-										</slot>
-									</div>
-								</div>
-							</div>
-						</div>
-					</slot>
-					<div class="flex flex-col justify-between grow h-full">
-						<div class="overflow-y-auto flex flex-col">
-							<slot
-								v-if="!manager.loading"
-								name="rows"
-								:items="manager.list"
-							>
-								<div class="flex flex-col w-full">
-									<div
-										v-for="(item, index) in manager.list"
-										:key="item.name"
+									<slot
+										:name="
+											'field-' + field
+										"
+										:field="field"
+										:value="item[field]"
+										:row="item"
 									>
-										<slot name="row" :item="item">
-											<div
-												class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
-												:class="`${
-													manager.itemSelected(item)
-														? 'bg-blue-50 hover:bg-blue-100'
-														: 'hover:bg-gray-50'
-												} ${
-													index == 0
-														? 'mt-[9px] mb-[2px]'
-														: 'my-[2px]'
-												}`"
-											>
-												<slot name="row-checkbox">
-													<div class="w-[25px]">
-														<Input
-															type="checkbox"
-															@click="
-																manager.select(
-																	item
-																)
-															"
-															:checked="
-																manager.itemSelected(
-																	item
-																)
-															"
-															class="cursor-pointer"
-														/>
-													</div>
-												</slot>
-												<div
-													v-for="field in Object.keys(
-														renderOptions.fields
-													)"
-													:key="field"
-													class="pr-[5px]"
-													:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-												>
-													<div
-														class="flex w-full"
-														:class="
-															renderOptions
-																.fields[field]
-																.align ===
-															'right'
-																? 'justify-end'
-																: 'justify-start line-clamp-1'
-														"
-													>
-														<slot
-															:name="
-																'field-' + field
-															"
-															:field="field"
-															:value="item[field]"
-															:row="item"
-														>
-															<div>
-																{{
-																	item[field]
-																}}
-															</div>
-														</slot>
-													</div>
-												</div>
-											</div>
-										</slot>
-									</div>
-								</div>
-							</slot>
-							<slot v-else name="listLoading">
-								List is loading...
-							</slot>
-						</div>
-						<div>
-							<slot name="pagination">
-								<div
-									class="flex flex-row items-center h-[43px]"
-								>
-									<ListPageController />
-								</div>
-							</slot>
-						</div>
+										{{
+											item[field]
+										}}
+									</slot>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div>
+						<slot name="pagination">
+							<div class="flex flex-row items-center h-[43px]">
+								<ListPageController />
+							</div>
+						</slot>
 					</div>
 				</div>
 			</slot>
@@ -266,22 +159,15 @@
 </template>
 
 <script>
+import { Dropdown, FeatherIcon } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import PresetFilters from "@/components/global/PresetFilters.vue"
 import FilterBox from "@/components/global/FilterBox.vue"
 import ListPageController from "@/components/global/ListPageController.vue"
-import { Dropdown, FeatherIcon } from "frappe-ui"
 import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
 import { ref, computed, provide } from "vue"
 export default {
 	name: "ListViewer",
-	props: {
-		options: {
-			type: Object,
-			default: () => ({}),
-		},
-	},
-	inject: ["manager"],
 	components: {
 		CustomIcons,
 		PresetFilters,
@@ -291,6 +177,13 @@ export default {
 		FeatherIcon,
 		SaveFiltersDialog,
 	},
+	props: {
+		options: {
+			type: Object,
+			default: () => ({}),
+		},
+	},
+	inject: ["manager"],
 	setup(props) {
 		const showSaveFiltersDialog = ref(false)
 		const renderOptions = computed(() => {
