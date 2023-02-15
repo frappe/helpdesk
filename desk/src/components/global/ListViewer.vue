@@ -98,9 +98,7 @@
 												<slot :name="
 													'field-' + field
 												" :field="field" :value="item[field]" :row="item">
-													{{
-	item[field]
-													}}
+													{{ item[field] }}
 												</slot>
 											</td>
 										</tr>
