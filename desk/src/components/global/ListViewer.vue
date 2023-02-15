@@ -87,13 +87,12 @@
 							<thead>
 								<tr class="bg-gray-100 text-base text-gray-500 select-none">
 									<th class="p-3 rounded-tl-md rounded-bl-md">
-										<div class="">
-											<Input
-												type="checkbox"
-												@click="manager.selectAll"
-												:checked="manager.allItemsSelected"
-												class="cursor-pointer" />
-										</div>
+										<Input
+											type="checkbox"
+											@click="manager.selectAll"
+											:checked="manager.allItemsSelected"
+											class="cursor-pointer"
+										/>
 									</th>
 									<th
 										class="text-start last-of-type:rounded-tr-md last-of-type:rounded-br-md 
