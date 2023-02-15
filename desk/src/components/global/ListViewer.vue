@@ -104,8 +104,8 @@
 									{{ renderOptions.fields[field].label }}
 									<div class="inline-table">
 										<CustomIcons
-											v-show="manager.options.order_by.split(' ')[0] === field"
-											:name="manager.options.order_by.split(' ')[1] === 'desc' ? 'chevron-up' : 'chevron-down'"
+											v-show="sortArrowShow(field)"
+											:name="sortArrowName()"
 											class="h-1 fill-gray-400 stroke-transparent"
 										/>
 									</div>
@@ -166,15 +166,16 @@ import FilterBox from "@/components/global/FilterBox.vue"
 import ListPageController from "@/components/global/ListPageController.vue"
 import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
 import { ref, computed, provide } from "vue"
+
 export default {
 	name: "ListViewer",
 	components: {
 		CustomIcons,
-		PresetFilters,
-		FilterBox,
-		ListPageController,
 		Dropdown,
 		FeatherIcon,
+		FilterBox,
+		ListPageController,
+		PresetFilters,
 		SaveFiltersDialog,
 	},
 	props: {
@@ -209,5 +210,15 @@ export default {
 			renderOptions,
 		}
 	},
+	methods: {
+		sortArrowShow(field) {
+			const [orderByField] = this.manager.options.order_by.split(" ");
+			return orderByField === field;
+		},
+		sortArrowName() {
+			const [_, sortOrder] = this.manager.options.order_by.split(" ");
+			return sortOrder === "desc" ? "chevron-up" : "chevron-down";
+		}
+	}
 }
 </script>
