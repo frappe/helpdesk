@@ -12,14 +12,21 @@ jobs:
   lint-files:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Install yarn
         run: npm install -g yarn
-      - name: Install dependencies
-        run: yarn
-      - name: Pull main
-        run: git pull origin main
-      - name: Soft reset to main
-        run: git reset --soft main
-      - name: Run lint-staged
-        run: yarn lint-staged
+
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: csv
+          token: ${{ github.token }}
+
+      - name: Run scoped actions
+        uses: DukeManh/scoped-actions@v1
+        with:
+          files: ${{ steps.files.outputs.added_modified }}
+          s0: 'yarn'
+          s1: 'yarn lint'
