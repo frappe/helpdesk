@@ -8,6 +8,7 @@ module.exports = {
 		"eslint:recommended",
 		"plugin:json/recommended",
 		"plugin:vue/vue3-recommended",
+		"plugin:tailwindcss/recommended",
 		"prettier",
 	],
 	parserOptions: {
