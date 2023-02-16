@@ -8,5 +8,8 @@
 		"postinstall": "cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
+	},
+	"devDependencies": {
+		"prettier": "2.8.4"
 	}
 }
