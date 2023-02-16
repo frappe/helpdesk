@@ -9,7 +9,7 @@ module.exports = {
 		"plugin:json/recommended",
 		"plugin:vue/vue3-recommended",
 		"plugin:tailwindcss/recommended",
-		"prettier",
+		"plugin:prettier/recommended",
 	],
 	parserOptions: {
 		ecmaVersion: "latest",
