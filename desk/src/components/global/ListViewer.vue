@@ -1,280 +1,146 @@
 <template>
 	<div class="h-full">
-		<slot name="body">
-			<slot name="list-body">
-				<div class="h-full">
-					<slot name="top-section">
-						<div
-							class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2"
-						>
-							<div class="shrink-0">
-								<slot name="top-sub-section-1">
-									<PresetFilters
-										:ListTitle="options.listTitle"
-										v-if="options.presetFilters"
-									/>
-								</slot>
-							</div>
-							<div class="w-full">
-								<slot name="top-sub-section-2">
-									<FilterBox v-if="options.filterBox" />
-								</slot>
-							</div>
-							<div
-								v-if="
-									options.filterBox &&
-									options.presetFilters &&
-									manager.options.filters.length > 0
-								"
-							>
-								<Button
-									icon-left="layers"
-									appearance="minimal"
-									@click="
-										() => {
-											showSaveFiltersDialog = true
-										}
-									"
-								>
-									Save
-								</Button>
-								<SaveFiltersDialog
-									v-model="showSaveFiltersDialog"
-									@close="showSaveFiltersDialog = false"
-								/>
-							</div>
-							<div class="shrink-0">
-								<slot name="top-sub-section-3">
-									<!-- Actions / Bulk actions -->
-									<div
-										v-if="
-											Object.keys(manager.selectedItems)
-												.length > 0
-										"
-									>
-										<!-- Bulk Actions -->
-										<slot
-											name="bulk-actions"
-											:selectedItems="
-												manager.selectedItems
-											"
-										/>
-									</div>
-									<div v-else class="flex flex-row space-x-2">
-										<!-- Actions -->
-										<slot name="actions" />
-										<slot name="primary-action">
-											<!-- Add Item -->
-											<Button
-												appearance="primary"
-												icon-left="plus"
-												@click="$emit('add-item')"
-											>
-												{{
-													options.name != null
-														? `Add ${options.name}`
-														: `Add ${manager.options.doctype}`
-												}}
-											</Button>
+		<div v-if="isLoading" class="h-full w-full flex justify-center align-middle">
+			<LoadingIndicator class="w-8 text-blue-600" />
+		</div>
+		<div v-else class="h-full">
+			<slot name="body">
+				<slot name="list-body">
+					<div class="h-full">
+						<div class="h-full">
+							<slot name="top-section">
+								<div class="flex flex-row w-full items-center h-[30px] mb-4 space-x-2">
+									<div class="shrink-0">
+										<slot name="top-sub-section-1">
+											<PresetFilters :ListTitle="options.listTitle"
+												v-if="options.presetFilters" />
 										</slot>
 									</div>
-								</slot>
-							</div>
-						</div>
-					</slot>
-					<slot name="header">
-						<div class="w-full">
-							<div
-								class="flex flex-row bg-[#F7F7F7] group items-center text-base font-normal text-gray-500 py-[10px] p-[10px] rounded-[6px] select-none"
-							>
-								<div class="w-[25px]">
-									<Input
-										type="checkbox"
-										@click="manager.selectAll()"
-										:checked="manager.allItemsSelected"
-										class="cursor-pointer mr-1"
-									/>
-								</div>
-								<div
-									v-for="field in Object.keys(
-										renderOptions.fields
-									)"
-									:key="field"
-									:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-									class="pr-[5px]"
-								>
-									<div>
-										<slot
-											:name="'header-field-' + field"
-											:field="field"
-										>
-											<div
-												class="flex space-x-1 items-center"
-												:class="
-													renderOptions.fields[field]
-														.align === 'right'
-														? 'flex-row-reverse'
-														: 'flex-row'
-												"
-											>
-												<div
-													class="hover:text-gray-600 cursor-pointer fill-gray-400"
-													:class="
-														renderOptions.fields[
-															field
-														].align === 'right'
-															? 'ml-1'
-															: ''
-													"
-													@click="
-														manager.toggleOrderBy(
-															field
-														)
-													"
-												>
-													{{
-														renderOptions.fields[
-															field
-														].label
-													}}
-												</div>
-												<div class="w-[10px]">
-													<CustomIcons
-														v-if="
-															manager.options.order_by.split(
-																' '
-															)[0] === field
-														"
-														:name="
-															manager.options.order_by.split(
-																' '
-															)[1] === 'desc'
-																? 'chevron-down'
-																: 'chevron-up'
-														"
-														class="h-[6px] fill-gray-400 stroke-transparent"
-													/>
-												</div>
+									<div class="w-full">
+										<slot name="top-sub-section-2">
+											<FilterBox v-if="options.filterBox" />
+										</slot>
+									</div>
+									<div v-if="
+										options.filterBox &&
+										options.presetFilters &&
+										manager.options.filters.length > 0
+									">
+										<Button icon-left="layers" appearance="minimal" @click="
+											() => {
+												showSaveFiltersDialog = true
+											}
+										">
+											Save
+										</Button>
+										<SaveFiltersDialog v-model="showSaveFiltersDialog"
+											@close="showSaveFiltersDialog = false" />
+									</div>
+									<div class="shrink-0">
+										<slot name="top-sub-section-3">
+											<!-- Actions / Bulk actions -->
+											<div v-if="
+												Object.keys(manager.selectedItems)
+													.length > 0
+											">
+												<!-- Bulk Actions -->
+												<slot name="bulk-actions" :selectedItems="
+													manager.selectedItems
+												" />
 											</div>
-										</slot>
-									</div>
-								</div>
-							</div>
-						</div>
-					</slot>
-					<div class="flex flex-col justify-between grow h-full">
-						<div class="overflow-y-auto flex flex-col">
-							<slot
-								v-if="!manager.loading"
-								name="rows"
-								:items="manager.list"
-							>
-								<div class="flex flex-col w-full">
-									<div
-										v-for="(item, index) in manager.list"
-										:key="item.name"
-									>
-										<slot name="row" :item="item">
-											<div
-												class="flex flex-row items-center px-[10px] select-none rounded-[6px] py-[9px]"
-												:class="`${
-													manager.itemSelected(item)
-														? 'bg-blue-50 hover:bg-blue-100'
-														: 'hover:bg-gray-50'
-												} ${
-													index == 0
-														? 'mt-[9px] mb-[2px]'
-														: 'my-[2px]'
-												}`"
-											>
-												<slot name="row-checkbox">
-													<div class="w-[25px]">
-														<Input
-															type="checkbox"
-															@click="
-																manager.select(
-																	item
-																)
-															"
-															:checked="
-																manager.itemSelected(
-																	item
-																)
-															"
-															class="cursor-pointer"
-														/>
-													</div>
+											<div v-else class="flex flex-row space-x-2">
+												<!-- Actions -->
+												<slot name="actions" />
+												<slot name="primary-action">
+													<!-- Add Item -->
+													<Button appearance="primary" icon-left="plus"
+														@click="$emit('add-item')">
+														{{
+															options.name != null
+																? `Add ${options.name}`
+																: `Add ${manager.options.doctype}`
+														}}
+													</Button>
 												</slot>
-												<div
-													v-for="field in Object.keys(
-														renderOptions.fields
-													)"
-													:key="field"
-													class="pr-[5px]"
-													:class="`w-${renderOptions.fields[field].width}/${renderOptions.base}`"
-												>
-													<div
-														class="flex w-full"
-														:class="
-															renderOptions
-																.fields[field]
-																.align ===
-															'right'
-																? 'justify-end'
-																: 'justify-start line-clamp-1'
-														"
-													>
-														<slot
-															:name="
-																'field-' + field
-															"
-															:field="field"
-															:value="item[field]"
-															:row="item"
-														>
-															<div>
-																{{
-																	item[field]
-																}}
-															</div>
-														</slot>
-													</div>
-												</div>
 											</div>
 										</slot>
 									</div>
 								</div>
 							</slot>
-							<slot v-else name="listLoading">
-								List is loading...
-							</slot>
-						</div>
-						<div>
-							<slot name="pagination">
-								<div
-									class="flex flex-row items-center h-[43px]"
-								>
-									<ListPageController />
-								</div>
-							</slot>
+							<div class="grow h-full">
+								<table class="w-full table-auto border-separate border-spacing-y-2">
+									<thead>
+										<tr class="bg-gray-100 text-base text-gray-500 select-none">
+											<th class="p-3 rounded-tl-md rounded-bl-md">
+												<Input type="checkbox" @click="manager.selectAll"
+													:checked="manager.allItemsSelected" class="cursor-pointer" />
+											</th>
+											<th class="text-start last-of-type:rounded-tr-md last-of-type:rounded-br-md 
+										font-normal hover:text-gray-600 cursor-pointer fill-gray-300"
+												v-for="field in Object.keys(renderOptions.fields)" :key="field"
+												@click="manager.toggleOrderBy(field)">
+												{{ renderOptions.fields[field].label }}
+												<div class="inline-table">
+													<CustomIcons v-show="sortArrowShow(field)" :name="sortArrowName()"
+														class="h-1 fill-gray-400 stroke-transparent" />
+												</div>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="item in manager.list" class="hover:bg-gray-50">
+											<td class="p-3 rounded-tl-md rounded-bl-md">
+												<Input type="checkbox" @click="manager.select(item)"
+													:checked="manager.itemSelected(item)" class="cursor-pointer" />
+											</td>
+											<td v-for="field in Object.keys(renderOptions.fields)" :key="field"
+												class="py-2 last-of-type:rounded-tr-md last-of-type:rounded-br-md last-of-type:pr-3">
+												<slot :name="
+													'field-' + field
+												" :field="field" :value="item[field]" :row="item">
+													{{ item[field] }}
+												</slot>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div>
+								<slot name="pagination">
+									<div class="flex flex-row items-center h-[43px]">
+										<ListPageController />
+									</div>
+								</slot>
+							</div>
 						</div>
 					</div>
-				</div>
+				</slot>
 			</slot>
-		</slot>
+		</div>
 	</div>
 </template>
 
 <script>
+import { Dropdown, FeatherIcon, LoadingIndicator } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import PresetFilters from "@/components/global/PresetFilters.vue"
 import FilterBox from "@/components/global/FilterBox.vue"
 import ListPageController from "@/components/global/ListPageController.vue"
-import { Dropdown, FeatherIcon } from "frappe-ui"
 import SaveFiltersDialog from "@/components/global/SaveFiltersDialog.vue"
 import { ref, computed, provide } from "vue"
+
 export default {
 	name: "ListViewer",
+	components: {
+		CustomIcons,
+		Dropdown,
+		FeatherIcon,
+		FilterBox,
+		ListPageController,
+		LoadingIndicator,
+		PresetFilters,
+		SaveFiltersDialog,
+	},
 	props: {
 		options: {
 			type: Object,
@@ -282,15 +148,6 @@ export default {
 		},
 	},
 	inject: ["manager"],
-	components: {
-		CustomIcons,
-		PresetFilters,
-		FilterBox,
-		ListPageController,
-		Dropdown,
-		FeatherIcon,
-		SaveFiltersDialog,
-	},
 	setup(props) {
 		const showSaveFiltersDialog = ref(false)
 		const renderOptions = computed(() => {
@@ -314,6 +171,21 @@ export default {
 		return {
 			showSaveFiltersDialog,
 			renderOptions,
+		}
+	},
+	methods: {
+		sortArrowShow(field) {
+			const [orderByField] = this.manager.options.order_by.split(" ");
+			return orderByField === field;
+		},
+		sortArrowName() {
+			const [_, sortOrder] = this.manager.options.order_by.split(" ");
+			return sortOrder === "desc" ? "chevron-up" : "chevron-down";
+		}
+	},
+	computed: {
+		isLoading() {
+			return this.manager.loading;
 		}
 	},
 }
