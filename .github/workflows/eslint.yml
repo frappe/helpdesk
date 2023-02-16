@@ -1,0 +1,22 @@
+name: Lint
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+
+jobs:
+  lint-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install yarn
+        run: npm install -g yarn
+      - name: Install dependencies
+        run: yarn
+      - name: Fetch changed files
+        uses: jitterbit/get-changed-files@v1
+      - name: Run ESLint
+        run: yarn eslint ${{ steps.files.outputs.all }}
