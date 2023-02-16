@@ -5,11 +5,16 @@
 		"frappe-ui"
 	],
 	"scripts": {
-		"postinstall": "cd desk && yarn install",
+		"postinstall": "husky install && cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
 	},
 	"devDependencies": {
+		"husky": "^8.0.3",
+		"lint-staged": "^13.1.2",
 		"prettier": "2.8.4"
+	},
+	"lint-staged": {
+		"**/*": "prettier --write --ignore-unknown"
 	}
 }
