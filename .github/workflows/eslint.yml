@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Pull main
-        run: git pull origin main --depth 1
+        run: git pull origin main
       - name: Soft reset to main
         run: git reset --soft main
       - name: Run lint-staged
