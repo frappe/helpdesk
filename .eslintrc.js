@@ -4,11 +4,7 @@ module.exports = {
 		es2021: true,
 		node: true,
 	},
-	extends: [
-		"eslint:recommended",
-		"plugin:json/recommended",
-		"plugin:prettier/recommended",
-	],
+	extends: ["eslint:recommended", "plugin:json/recommended", "prettier"],
 	parserOptions: {
 		ecmaVersion: "latest",
 		sourceType: "module",
