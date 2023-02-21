@@ -10,6 +10,22 @@ permissions:
   pull-requests: write 
 
 jobs:
+  commit-lint:
+    name: Semantic Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 200
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          check-latest: true
+      - name: Check commit titles
+        run: |
+          npm install @commitlint/cli @commitlint/config-conventional
+          npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
@@ -28,7 +44,7 @@ jobs:
           reporter: github-pr-review
           fail_on_error: true
 
-  linter:
+  semgrep:
     name: Semgrep Rules
     runs-on: ubuntu-latest
     steps:
