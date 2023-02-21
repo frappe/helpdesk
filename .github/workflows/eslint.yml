@@ -8,19 +8,24 @@ on:
       - opened
       - reopened
 
+permissions:
+  contents: read
+  pull-requests: write 
+
 jobs:
-  lint-files:
+  eslint:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'yarn'
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
       - uses: reviewdog/action-eslint@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          eslint_flags: '--ext vue --ext js --ext ts --ext json .'
           reporter: github-pr-review
+          fail_on_error: true
