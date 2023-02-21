@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   eslint:
+    name: ESLint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,3 +30,19 @@ jobs:
           eslint_flags: '--ext vue --ext js --ext ts --ext json .'
           reporter: github-pr-review
           fail_on_error: true
+
+  linter:
+    name: Semgrep Rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: pre-commit/action@v3.0.0
+      - name: Download Semgrep rules
+        run: git clone --depth 1 https://github.com/frappe/semgrep-rules.git frappe-semgrep-rules
+      - name: Run Semgrep rules
+        run: |
+          pip install semgrep==0.97.0
+          semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness
