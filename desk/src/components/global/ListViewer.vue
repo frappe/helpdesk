@@ -83,11 +83,11 @@
 									</div>
 								</div>
 							</slot>
-							<div class="h-full grow">
+							<div class="h-full grow overflow-auto">
 								<table
 									class="w-full table-auto border-separate border-spacing-y-2"
 								>
-									<thead>
+									<thead class="z-10 sticky top-0">
 										<tr class="select-none bg-gray-100 text-base text-gray-500">
 											<th class="rounded-l-md p-3">
 												<Input
