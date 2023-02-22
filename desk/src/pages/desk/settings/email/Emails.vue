@@ -121,6 +121,9 @@ export default {
 		ListViewer,
 		CustomIcons,
 	},
+	mounted() {
+		this.$event.emit("set-selected-setting", "Email Accounts")
+	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
 
