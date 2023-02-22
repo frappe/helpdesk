@@ -86,6 +86,9 @@ export default {
 		CustomIcons,
 		CustomSwitch,
 	},
+	mounted() {
+		this.$event.emit("set-selected-setting", "Support Policies")
+	},
 	setup() {
 		const viewportWidth = inject("viewportWidth")
 

@@ -30,10 +30,10 @@
 							},
 						},
 					}"
-					class="text-base h-[calc(100vh-9.5rem)] pt-4"
+					class="h-[calc(100vh-9.5rem)] pt-4 text-base"
 					@add-item="
 						() => {
-							showNewCannedResponsesDialog = true
+							showNewCannedResponsesDialog = true;
 						}
 					"
 				>
@@ -42,13 +42,13 @@
 							:to="{
 								path: `/frappedesk/settings/canned_responses/${row.title}`,
 							}"
-							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
+							class="font-inter text-[13px] text-gray-600 hover:text-gray-900"
 						>
 							{{ `${row.title}` }}
 						</router-link>
 					</template>
 					<template #field-owner="{ row }">
-						<div class="text-[13px] font-inter text-gray-600">
+						<div class="font-inter text-[13px] text-gray-600">
 							{{ row.owner }}
 						</div>
 					</template>
@@ -60,14 +60,12 @@
 										$resources.deleteTeam
 											.submit({
 												doctype: 'Canned Response',
-												name: Object.keys(
-													selectedItems
-												),
+												name: Object.keys(selectedItems),
 											})
 											.then(() => {
-												manager.unselect()
-												manager.reload()
-											})
+												manager.unselect();
+												manager.reload();
+											});
 									}
 								"
 								>Delete</Button
@@ -81,19 +79,19 @@
 			:show="showNewCannedResponsesDialog"
 			@close="
 				() => {
-					showNewCannedResponsesDialog = false
-					$refs.listManager.manager.reload()
-					$router.go()
+					showNewCannedResponsesDialog = false;
+					$refs.listManager.manager.reload();
+					$router.go();
 				}
 			"
 		/>
 	</div>
 </template>
 <script>
-import { inject, ref } from "vue"
-import ListManager from "@/components/global/ListManager.vue"
-import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue"
-import ListViewer from "@/components/global/ListViewer.vue"
+import { inject, ref } from "vue";
+import ListManager from "@/components/global/ListManager.vue";
+import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue";
+import ListViewer from "@/components/global/ListViewer.vue";
 export default {
 	name: "Canned Responses",
 	components: {
@@ -102,37 +100,39 @@ export default {
 		ListViewer,
 	},
 	setup() {
-		const viewportWidth = inject("viewportWidth")
-		const showNewCannedResponsesDialog = ref(false)
+		const viewportWidth = inject("viewportWidth");
+		const showNewCannedResponsesDialog = ref(false);
 		return {
 			viewportWidth,
 			showNewCannedResponsesDialog,
-		}
+		};
 	},
-
+	mounted() {
+		this.$event.emit("set-selected-setting", "Canned Responses");
+	},
 	resources: {
 		deleteTeam() {
 			return {
 				method: "frappe.client.delete",
-			}
+			};
 		},
 		bulk_delete_responses() {
 			return {
 				method: "frappedesk.api.doc.delete_items",
 				onSuccess: () => {
-					this.$router.go()
+					this.$router.go();
 				},
 				onError: (err) => {
-					this.$refs.listManager.manager.reload()
+					this.$refs.listManager.manager.reload();
 					this.$toast({
 						title: "Error while deleting canned responses",
 						text: err,
 						customIcon: "circle-check",
 						appearance: "success",
-					})
+					});
 				},
-			}
+			};
 		},
 	},
-}
+};
 </script>
