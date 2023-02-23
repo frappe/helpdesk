@@ -9,6 +9,7 @@ from datetime import timedelta
 import frappe
 from frappe import _
 from frappe.core.utils import get_parent_doc
+from frappe.database.database import Criterion, Query
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.email.inbox import link_communication_to_document
@@ -24,7 +25,22 @@ from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
 
 class Ticket(Document):
 	@staticmethod
-	def get_list_query(query):
+	def get_list_query(query: Query):
+		query = Ticket.filter_by_team(query)
+		return query
+
+	@staticmethod
+	def filter_by_team(query: Query):
+		QBTicket = frappe.qb.DocType("Ticket")
+		filters = {"user": frappe.session.user}
+		teams = frappe.get_list("Agent Group", filters=filters)
+		criterions = [QBTicket.agent_group == team.name for team in teams]
+
+		# Consider tickets without any assigned agent group
+		criterions.append(QBTicket.agent_group.isnull())
+
+		query = query.where(Criterion.any(criterions))
+
 		return query
 
 	def autoname(self):
