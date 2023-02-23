@@ -609,10 +609,11 @@ def has_website_permission(doc, ptype, user, verbose=False):
 
 
 def update_ticket(contact, method):
-	"""Called when Contact is deleted"""
-	frappe.db.sql(
-		"""UPDATE `tabTicket` set contact='' where contact=%s""", contact.name
-	)
+	"""
+	Called when Contact is deleted
+	"""
+	QBTicket = frappe.qb.DocType("Ticket")
+	QBTicket.update().set(QBTicket.contact, "").where(QBTicket.contact == contact.name)
 
 
 @frappe.whitelist()
