@@ -1,126 +1,68 @@
 <template>
 	<div class="min-w-[490px] px-[24px] py-[10px]">
-		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
+		<div class="flow-root h-[72px] shrink-0 py-[22px] px-[16px]">
 			<div class="float-left">
 				<router-link
 					:to="`/frappedesk/settings/teams`"
-					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
+					class="my-1 flex select-none flex-row items-center space-x-1 stroke-gray-600 text-[12px] text-gray-600 hover:stroke-gray-700 hover:text-gray-700"
 					role="button"
 				>
-					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />
+					<FeatherIcon name="arrow-left" class="h-[13px] w-[13px]" />
 					<div>Back to team list</div>
 				</router-link>
 			</div>
 			<div class="float-right">
 				<div class="flex flex-row space-x-2">
-					<Button appearance="secondary" @click="cancel">
-						Cancel
-					</Button>
-					<Button
-						appearance="primary"
-						@click="
-							() => {
-								if (validate()) {
-									save()
-								}
-							}
-						"
-					>
-						Save
-					</Button>
+					<Button appearance="secondary" @click="cancel">Cancel</Button>
+					<Button appearance="primary" @click="onSave">Save</Button>
 				</div>
 			</div>
 		</div>
 		<div
 			v-if="team"
-			class="flex flex-row space-x-[24px] h-full border-t px-[16px] py-[22px]"
+			class="flex h-full flex-row space-x-[24px] border-t px-[16px] py-[22px]"
 		>
-			<div class="flex flex-col space-y-[16px] h-full w-full">
+			<div class="flex h-full w-full flex-col space-y-[16px]">
 				<div>
 					<Input
 						label="Title"
 						type="text"
-						:value="team.name"
-						@input="
-							(val) => {
-								newTeamValues['title'] = val
-							}
-						"
+						:value="team.team_name"
+						@input="onNameChange"
 					/>
 					<ErrorMessage :message="teamInputErrors['title']" />
 				</div>
 				<form
+					class="flex flex-row items-end space-x-2"
 					@submit.prevent="onSubmit"
-					class="flex flex-row space-x-2 items-end"
 				>
 					<div class="w-full space-y-1">
 						<div>
-							<span class="block text-sm leading-4 text-gray-700">
-								Users
-							</span>
+							<span class="block text-sm leading-4 text-gray-700"> Users </span>
 						</div>
 						<Autocomplete
 							id="searchInput"
 							:value="''"
-							@change="
-								(item) => {
-									if (
-										!newTeamValues.users.includes(
-											item.value
-										)
-									) {
-										newTeamValues.users.push(item.value)
-									}
-								}
-							"
-							:resourceOptions="{
-								method: 'frappe.client.get_list',
-								inputMap: (query) => {
-									return {
-										doctype: 'Agent',
-										fields: ['name', 'agent_name'],
-										filters: {
-											name: ['like', `%${query}%`],
-										},
-									}
-								},
-								responseMap: (res) => {
-									return res.map((d) => {
-										return {
-											label: d.agent_name,
-											value: d.name,
-										}
-									})
-								},
-							}"
+							:resource-options="autoCompleteOptions"
+							@change="onAutocompleteChange"
 						/>
 					</div>
 				</form>
 				<div
-					class="bg-gray-100 min-h-[100px] max-h-[300px] overflow-y-auto px-2 rounded border flex flex-col"
+					class="flex max-h-[300px] min-h-[100px] flex-col overflow-y-auto rounded border bg-gray-100 px-2"
 				>
-					<ul
-						v-if="newTeamValues.users.length > 0"
-						class="flex flex-wrap gap-2 py-2"
-					>
+					<ul class="flex flex-wrap gap-2 py-2">
 						<li
-							v-for="user in newTeamValues.users"
-							class="flex items-center p-1 space-x-2 bg-white shadow rounded"
+							v-for="user in team.users"
 							:key="user"
+							class="flex items-center space-x-2 rounded bg-white p-1 shadow"
 						>
-							<span class="text-base ml-2">
-								{{ user }}
+							<span class="ml-2 text-base">
+								{{ userDisplayName(user) }}
 							</span>
 							<button
-								class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
-								@click="
-									() => {
-										newTeamValues.users =
-											newTeamValues.users.filter(
-												(u) => u !== user
-											)
-									}
-								"
+								class="grid h-4 w-4 place-items-center rounded text-gray-700 hover:bg-gray-300"
+								@click="() => onUserClick(user)"
 							>
 								<FeatherIcon class="w-3" name="x" />
 							</button>
@@ -131,85 +73,106 @@
 		</div>
 	</div>
 </template>
+
 <script>
-import { ref } from "vue"
-import { FeatherIcon, ErrorMessage } from "frappe-ui"
-import Autocomplete from "@/components/global/Autocomplete.vue"
+import { ref } from "vue";
+import { FeatherIcon, ErrorMessage } from "frappe-ui";
+import Autocomplete from "@/components/global/Autocomplete.vue";
+
 export default {
 	name: "TeamInfo",
-	props: ["teamId"],
 	components: {
-		FeatherIcon,
 		Autocomplete,
 		ErrorMessage,
+		FeatherIcon,
+	},
+	props: {
+		teamId: {
+			type: String,
+			default: "",
+		},
 	},
 	setup() {
-		const newTeamValues = ref({
-			title: "",
+		const isTeamNameChanged = false;
+		const team = ref({
+			team_name: "",
 			users: [],
-		})
+		});
 		const teamInputErrors = ref({
 			title: "",
-		})
+		});
+
 		return {
-			newTeamValues,
+			isTeamNameChanged,
+			team,
 			teamInputErrors,
-		}
+		};
 	},
-	computed: {
-		team() {
-			if (this.teamId) {
-				const doc = this.$resources.team.doc
-				if (doc) {
-					this.newTeamValues["title"] = doc.name
-					let users = []
-					doc.users.map((res) => {
-						users.push(res["user"])
-					})
-					this.newTeamValues["users"] = users
-				}
-				return doc
-			} else {
-				return { title: "", users: [] }
-			}
-		},
+	data() {
+		return {
+			autoCompleteOptions: {
+				method: "frappe.client.get_list",
+				inputMap: (query) => {
+					return {
+						doctype: "Agent",
+						fields: ["name", "agent_name"],
+						filters: {
+							name: ["like", `%${query}%`],
+						},
+					};
+				},
+				responseMap: (res) => {
+					return res.map((data) => {
+						return {
+							label: data.agent_name,
+							value: data.name,
+						};
+					});
+				},
+			},
+		};
 	},
 	resources: {
 		team() {
-			if (!this.teamId) return
+			if (!this.teamId) return;
+
 			return {
 				type: "document",
 				doctype: "Agent Group",
-				fields: ["name", "users"],
 				name: this.teamId,
+				fields: ["name", "users"],
+				whitelistedMethods: {
+					renameTeam: "rename_self",
+				},
+				onSuccess(data) {
+					this.team = data;
+				},
+				onError: (err) => {
+					this.$toast({
+						title: "Error Fetching Team",
+						text: err,
+						customIcon: "circle-fail",
+						appearance: "danger",
+					});
+				},
 				setValue: {
 					onSuccess: () => {
 						this.$toast({
-							title: "Team Updated.",
+							title: "Team Updated",
 							customIcon: "circle-check",
 							appearance: "success",
-						})
+						});
 					},
 					onError: (err) => {
 						this.$toast({
-							title: "Error while updating ticket type",
+							title: "Error While Updating Ticket Type",
 							text: err,
 							customIcon: "circle-fail",
 							appearance: "danger",
-						})
+						});
 					},
 				},
-			}
-		},
-		renameTeamDoc() {
-			return {
-				method: "frappe.client.rename_doc",
-				onSuccess: (res) => {
-					this.$router.push({
-						path: `/frappedesk/settings/teams/${res}`,
-					})
-				},
-			}
+			};
 		},
 		newTeam() {
 			return {
@@ -217,60 +180,109 @@ export default {
 				onSuccess: (res) => {
 					this.$router.push({
 						path: `/frappedesk/settings/teams/${res.name}`,
-					})
+					});
+
+					this.$toast({
+						title: "New Team Created",
+						customIcon: "circle-check",
+						appearance: "success",
+					});
 				},
-			}
+			};
 		},
 	},
 	methods: {
 		validate() {
-			if (this.newTeamValues.title === "") {
-				this.teamInputErrors.title = "Team name is required"
-				return false
-			} else if (this.newTeamValues.title === "new") {
-				this.teamInputErrors.title = "Team name cannot be 'new'"
-				return false
+			const teamName = this.team.team_name;
+
+			if (teamName === "") {
+				this.teamInputErrors.title = "Team name is required";
+				return false;
 			}
-			return true
+
+			if (teamName.toLowerCase() === "new") {
+				this.teamInputErrors.title = `Team name cannot be '${teamName}'`;
+				return false;
+			}
+
+			return true;
+		},
+		renameTeam() {
+			if (!this.isTeamNameChanged) return;
+
+			const title = this.team.team_name;
+
+			this.$resources.team.renameTeam
+				.submit({
+					new_name: title,
+				})
+				.then(() => {
+					this.$router.push({
+						path: `/frappedesk/settings/teams/${title}`,
+					});
+				});
+		},
+		/**
+		 * What to show in user list. This has to be done because some users may not
+		 * be fully loaded, and only ID will be available.
+		 * @param {String|Object} user the user object, or just the ID
+		 */
+		userDisplayName(user) {
+			return user.user ? user.user : user;
+		},
+		/**
+		 * Map user list to be used in frappe client
+		 * eg: `['mail@example.com']` -> `[{ 'user': 'mail@example.com' }]`
+		 * @param {any} users Original list of users, this is not modified
+		 * @returns {Array} Mapped list of users
+		 */
+		mapUsers(users) {
+			return users.map((user) => ({ user }));
+		},
+		saveNew() {
+			this.$resources.newTeam.submit({
+				doc: {
+					doctype: "Agent Group",
+					team_name: this.team.team_name,
+					users: this.mapUsers(this.team.users),
+				},
+			});
 		},
 		save() {
-			const oldTeamName = this.team.name
-			const newTeamName = this.newTeamValues.title
-			const values = this.newTeamValues
-			let users = []
-			values.users.map((user) => {
-				users.push({
-					user,
+			this.$resources.team.setValue
+				.submit({
+					users: this.mapUsers(this.team.users),
 				})
-			})
-			if (this.teamId) {
-				this.$resources.team.setValue
-					.submit({
-						team_name: values.title,
-						users,
-					})
-					.then(() => {
-						if (newTeamName != oldTeamName) {
-							this.$resources.renameTeamDoc.submit({
-								doctype: "Agent Group",
-								old_name: oldTeamName,
-								new_name: newTeamName,
-							})
-						}
-					})
-			} else {
-				this.$resources.newTeam.submit({
-					doc: {
-						doctype: "Agent Group",
-						team_name: values.title,
-						users,
-					},
-				})
-			}
+				.then(this.renameTeam);
+		},
+		onNameChange(value) {
+			this.isTeamNameChanged = this.team.team_name !== value;
+			this.team.team_name = value;
+		},
+		onAutocompleteChange(item) {
+			const user = item.value;
+			const isUserInList = this.team.users.includes(user);
+
+			if (isUserInList) return;
+
+			this.team.users.push(user);
+		},
+		onUserClick(user) {
+			this.team.users = this.team.users.filter((u) => u !== user);
 		},
 		cancel() {
-			this.$router.go()
+			this.$router.go();
+		},
+		onSave() {
+			if (!this.validate()) return;
+
+			if (!this.$resources.team) {
+				this.saveNew();
+				return;
+			}
+
+			this.save();
 		},
 	},
-}
+};
 </script>
