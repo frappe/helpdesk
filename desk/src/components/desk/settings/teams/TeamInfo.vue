@@ -27,7 +27,7 @@
 					<Input
 						label="Title"
 						type="text"
-						:value="team.team_name"
+						:value="teamDisplayName(team)"
 						@input="onNameChange"
 					/>
 					<ErrorMessage :message="teamInputErrors['title']" />
@@ -221,6 +221,11 @@ export default {
 						path: `/frappedesk/settings/teams/${title}`,
 					});
 				});
+		},
+		teamDisplayName(team) {
+			if (team.team_name) return team.team_name;
+			if (team.name) return team.name;
+			if (this.teamId) return this.teamId;
 		},
 		/**
 		 * What to show in user list. This has to be done because some users may not
