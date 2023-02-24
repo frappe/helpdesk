@@ -87,7 +87,7 @@
 								<table
 									class="w-full table-auto border-separate border-spacing-y-2"
 								>
-									<thead class="z-10 sticky top-0">
+									<thead class="z-5 sticky top-0">
 										<tr class="select-none bg-gray-100 text-base text-gray-500">
 											<th class="rounded-l-md p-3">
 												<Input
