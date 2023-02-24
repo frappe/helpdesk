@@ -31,13 +31,31 @@ class Ticket(Document):
 
 	@staticmethod
 	def filter_by_team(query: Query):
+		should_filter: str = (
+			frappe.get_value(
+				"Frappe Desk Settings", None, "restrict_tickets_by_agent_group"
+			)
+			or "0"
+		)
+
+		if not int(should_filter):
+			return query
+
 		QBTicket = frappe.qb.DocType("Ticket")
 		filters = {"user": frappe.session.user}
 		teams = frappe.get_list("Agent Group", filters=filters)
 		criterions = [QBTicket.agent_group == team.name for team in teams]
 
 		# Consider tickets without any assigned agent group
-		criterions.append(QBTicket.agent_group.isnull())
+		filter_unassigned: str = (
+			frappe.get_value(
+				"Frappe Desk Settings", None, "do_not_restrict_tickets_without_an_agent_group"
+			)
+			or "0"
+		)
+
+		if not int(filter_unassigned):
+			criterions.append(QBTicket.agent_group.isnull())
 
 		query = query.where(Criterion.any(criterions))
 
