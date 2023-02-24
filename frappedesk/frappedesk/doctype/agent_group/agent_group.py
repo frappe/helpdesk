@@ -2,12 +2,16 @@
 # For license information, please see license.txt
 
 import frappe
-from frappe.model.document import Document
 from frappe.exceptions import DoesNotExistError
+from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 
 
 class AgentGroup(Document):
+	@frappe.whitelist()
+	def rename_self(self, new_name: str):
+		self.rename(new_name)
+
 	def after_insert(self):
 		self.create_assignment_rule()
 

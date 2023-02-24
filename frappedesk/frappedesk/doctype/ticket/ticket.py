@@ -9,18 +9,80 @@ from datetime import timedelta
 import frappe
 from frappe import _
 from frappe.core.utils import get_parent_doc
+from frappe.database.database import Criterion, Query
+from frappe.desk.form.assign_to import add as assign
+from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.email.inbox import link_communication_to_document
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
-from frappe.desk.form.assign_to import add as assign, clear as clear_all_assignments
+
 from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
 	log_ticket_activity,
 )
 
 
 class Ticket(Document):
+	@staticmethod
+	def get_list_query(query: Query):
+		query = Ticket.filter_by_team(query)
+		return query
+
+	@staticmethod
+	def filter_by_team(query: Query):
+		user = frappe.session.user
+
+		if Ticket.can_ignore_restrictions(user):
+			return query
+
+		should_filter: str = (
+			frappe.get_value(
+				"Frappe Desk Settings", None, "restrict_tickets_by_agent_group"
+			)
+			or "0"
+		)
+
+		if not int(should_filter):
+			return query
+
+		QBTicket = frappe.qb.DocType("Ticket")
+		filters = {"user": user}
+		teams = frappe.get_list("Agent Group", filters=filters)
+		criterions = [QBTicket.agent_group == team.name for team in teams]
+
+		# Consider tickets without any assigned agent group
+		filter_unassigned: str = (
+			frappe.get_value(
+				"Frappe Desk Settings",
+				None,
+				"do_not_restrict_tickets_without_an_agent_group",
+			)
+			or "0"
+		)
+
+		if not int(filter_unassigned):
+			criterions.append(QBTicket.agent_group.isnull())
+
+		query = query.where(Criterion.any(criterions))
+
+		return query
+
+	@staticmethod
+	def can_ignore_restrictions(user: str) -> bool:
+		"""
+		Check if a user can ignore restrictions. Can be used for admins
+
+		:param user: The user to check against
+		:return: Whether the user can ignore restrictions
+		"""
+		# Get teams which can ignore restrictions, where user is a member
+		filters = {"user": user, "ignore_restrictions": True}
+		teams = frappe.get_list("Agent Group", filters=filters)
+
+		# Must be part of at-least one team which can ignore restrictions
+		return len(teams) > 0
+
 	def autoname(self):
 		return self.name
 
@@ -35,7 +97,9 @@ class Ticket(Document):
 
 	def before_insert(self):
 		if not self.ticket_type:
-			self.ticket_type = frappe.get_doc("Frappe Desk Settings").default_ticket_type
+			self.ticket_type = frappe.get_doc(
+				"Frappe Desk Settings"
+			).default_ticket_type
 		self.update_priority_based_on_ticket_type()
 
 	def after_insert(self):
@@ -77,17 +141,17 @@ class Ticket(Document):
 		if self.has_value_changed("agent_group") and self.status == "Open":
 			current_assigned_agent_doc = self.get_assigned_agent()
 			if (
-				(
-					current_assigned_agent_doc
-					and not current_assigned_agent_doc.in_group(self.agent_group)
-				)
-				and frappe.get_doc(
-					"Assignment Rule", frappe.get_doc("Agent Group", self.agent_group).assignment_rule
-				).users
-			):
+				current_assigned_agent_doc
+				and not current_assigned_agent_doc.in_group(self.agent_group)
+			) and frappe.get_doc(
+				"Assignment Rule",
+				frappe.get_doc("Agent Group", self.agent_group).assignment_rule,
+			).users:
 				clear_all_assignments("Ticket", self.name)
 				frappe.publish_realtime(
-					"ticket_assignee_update", {"ticket_id": self.name}, after_commit=True
+					"ticket_assignee_update",
+					{"ticket_id": self.name},
+					after_commit=True,
 				)
 
 	def update_priority_based_on_ticket_type(self):
@@ -178,8 +242,9 @@ class Ticket(Document):
 				"reference_doctype": "Ticket",
 				"reference_name": replicated_ticket.name,
 				"content": (
-					" - Split the Ticket from <a href='/app/Form/Ticket/{0}'>{1}</a>"
-					.format(self.name, frappe.bold(self.name))
+					" - Split the Ticket from <a href='/app/Form/Ticket/{0}'>{1}</a>".format(
+						self.name, frappe.bold(self.name)
+					)
 				),
 			}
 		).insert(ignore_permissions=True)
@@ -263,7 +328,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 
 @frappe.whitelist(allow_guest=True)
-def create_communication_via_agent(ticket, message, cc,bcc,attachments=None):
+def create_communication_via_agent(ticket, message, cc, bcc, attachments=None):
 	ticket_doc = frappe.get_doc("Ticket", ticket)
 	last_ticket_communication_doc = frappe.get_last_doc(
 		"Communication", filters={"reference_name": ["=", ticket_doc.name]}
@@ -273,7 +338,9 @@ def create_communication_via_agent(ticket, message, cc,bcc,attachments=None):
 	reply_email_account = None
 
 	ticket_email_account = (
-		last_ticket_communication_doc.email_account if last_ticket_communication_doc else None
+		last_ticket_communication_doc.email_account
+		if last_ticket_communication_doc
+		else None
 	)
 
 	default_ticket_outgoing_email_account = frappe.get_value(
@@ -331,8 +398,8 @@ def create_communication_via_agent(ticket, message, cc,bcc,attachments=None):
 			"recipients": frappe.get_value("User", "Administrator", "email")
 			if ticket_doc.raised_by == "Administrator"
 			else ticket_doc.raised_by,
-			"cc":cc,
-			"bcc":bcc,
+			"cc": cc,
+			"bcc": bcc,
 			"content": message,
 			"status": "Linked",
 			"reference_doctype": "Ticket",
@@ -409,7 +476,15 @@ def get_all_conversations(ticket):
 		"Communication",
 		filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]},
 		order_by="creation asc",
-		fields=["name", "content", "creation", "sent_or_received", "sender","cc","bcc"],
+		fields=[
+			"name",
+			"content",
+			"creation",
+			"sent_or_received",
+			"sender",
+			"cc",
+			"bcc",
+		],
 	)
 
 	for conversation in conversations:
@@ -427,14 +502,19 @@ def get_all_conversations(ticket):
 			if len(contacts) > 0:
 				sender = frappe.get_doc("Contact", contacts[0].parent)
 			else:
-				sender = frappe.get_last_doc("User", filters={"email": conversation.sender})
+				sender = frappe.get_last_doc(
+					"User", filters={"email": conversation.sender}
+				)
 
 		conversation.sender = sender
 
 		attachments = frappe.get_all(
 			"File",
 			["file_name", "file_url"],
-			{"attached_to_name": conversation.name, "attached_to_doctype": "Communication",},
+			{
+				"attached_to_name": conversation.name,
+				"attached_to_doctype": "Communication",
+			},
 		)
 
 		conversation.attachments = attachments
@@ -569,8 +649,11 @@ def has_website_permission(doc, ptype, user, verbose=False):
 
 
 def update_ticket(contact, method):
-	"""Called when Contact is deleted"""
-	frappe.db.sql("""UPDATE `tabTicket` set contact='' where contact=%s""", contact.name)
+	"""
+	Called when Contact is deleted
+	"""
+	QBTicket = frappe.qb.DocType("Ticket")
+	QBTicket.update().set(QBTicket.contact, "").where(QBTicket.contact == contact.name)
 
 
 @frappe.whitelist()
@@ -595,7 +678,9 @@ def make_ticket_from_communication(communication, ignore_communication_links=Fal
 		}
 	).insert(ignore_permissions=True)
 
-	link_communication_to_document(doc, "Ticket", ticket.name, ignore_communication_links)
+	link_communication_to_document(
+		doc, "Ticket", ticket.name, ignore_communication_links
+	)
 
 	return ticket.name
 
@@ -619,7 +704,8 @@ def set_first_response_time(communication, method):
 
 def is_first_response(ticket):
 	responses = frappe.get_all(
-		"Communication", filters={"reference_name": ticket.name, "sent_or_received": "Sent"},
+		"Communication",
+		filters={"reference_name": ticket.name, "sent_or_received": "Sent"},
 	)
 	if len(responses) == 1:
 		return True
@@ -634,7 +720,9 @@ def calculate_first_response_time(ticket, first_responded_on):
 
 	if ticket_creation_date.day == first_responded_on.day:
 		if is_work_day(ticket_creation_date, support_hours):
-			start_time, end_time = get_working_hours(ticket_creation_date, support_hours)
+			start_time, end_time = get_working_hours(
+				ticket_creation_date, support_hours
+			)
 
 			# ticket creation and response on the same day during working hours
 			if is_during_working_hours(
@@ -670,7 +758,9 @@ def calculate_first_response_time(ticket, first_responded_on):
 
 		# time taken on day of ticket creation
 		if is_work_day(ticket_creation_date, support_hours):
-			start_time, end_time = get_working_hours(ticket_creation_date, support_hours)
+			start_time, end_time = get_working_hours(
+				ticket_creation_date, support_hours
+			)
 
 			if is_during_working_hours(ticket_creation_date, support_hours):
 				first_response_time += get_elapsed_time(ticket_creation_time, end_time)
@@ -682,7 +772,9 @@ def calculate_first_response_time(ticket, first_responded_on):
 			start_time, end_time = get_working_hours(first_responded_on, support_hours)
 
 			if is_during_working_hours(first_responded_on, support_hours):
-				first_response_time += get_elapsed_time(start_time, first_responded_on_in_seconds)
+				first_response_time += get_elapsed_time(
+					start_time, first_responded_on_in_seconds
+				)
 			elif not is_before_working_hours(first_responded_on, support_hours):
 				first_response_time += get_elapsed_time(start_time, end_time)
 
