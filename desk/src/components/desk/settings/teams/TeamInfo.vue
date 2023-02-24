@@ -158,6 +158,8 @@ export default {
 					renameTeam: "rename_self",
 				},
 				onSuccess(data) {
+					// Only need user's name, not full object
+					data.users = data.users.map((user) => user.user);
 					this.team = data;
 				},
 				onError: (err) => {
