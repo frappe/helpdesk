@@ -31,6 +31,11 @@ class Ticket(Document):
 
 	@staticmethod
 	def filter_by_team(query: Query):
+		user = frappe.session.user
+
+		if Ticket.can_ignore_restrictions(user):
+			return query
+
 		should_filter: str = (
 			frappe.get_value(
 				"Frappe Desk Settings", None, "restrict_tickets_by_agent_group"
@@ -42,14 +47,16 @@ class Ticket(Document):
 			return query
 
 		QBTicket = frappe.qb.DocType("Ticket")
-		filters = {"user": frappe.session.user}
+		filters = {"user": user}
 		teams = frappe.get_list("Agent Group", filters=filters)
 		criterions = [QBTicket.agent_group == team.name for team in teams]
 
 		# Consider tickets without any assigned agent group
 		filter_unassigned: str = (
 			frappe.get_value(
-				"Frappe Desk Settings", None, "do_not_restrict_tickets_without_an_agent_group"
+				"Frappe Desk Settings",
+				None,
+				"do_not_restrict_tickets_without_an_agent_group",
 			)
 			or "0"
 		)
@@ -60,6 +67,21 @@ class Ticket(Document):
 		query = query.where(Criterion.any(criterions))
 
 		return query
+
+	@staticmethod
+	def can_ignore_restrictions(user: str) -> bool:
+		"""
+		Check if a user can ignore restrictions. Can be used for admins
+
+		:param user: The user to check against
+		:return: Whether the user can ignore restrictions
+		"""
+		# Get teams which can ignore restrictions, where user is a member
+		filters = {"user": user, "ignore_restrictions": True}
+		teams = frappe.get_list("Agent Group", filters=filters)
+
+		# Must be part of at-least one team which can ignore restrictions
+		return len(teams) > 0
 
 	def autoname(self):
 		return self.name

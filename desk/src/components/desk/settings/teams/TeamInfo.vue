@@ -69,6 +69,17 @@
 						</li>
 					</ul>
 				</div>
+				<div class="w-max">
+					<Tooltip
+						text="Agents belonging to this group can ignore any restrictions"
+					>
+						<Input
+							v-model="team.ignore_restrictions"
+							label="Ignore Restrictions"
+							type="checkbox"
+						/>
+					</Tooltip>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -76,7 +87,7 @@
 
 <script>
 import { ref } from "vue";
-import { FeatherIcon, ErrorMessage } from "frappe-ui";
+import { FeatherIcon, ErrorMessage, Tooltip } from "frappe-ui";
 import Autocomplete from "@/components/global/Autocomplete.vue";
 
 export default {
@@ -85,6 +96,7 @@ export default {
 		Autocomplete,
 		ErrorMessage,
 		FeatherIcon,
+		Tooltip,
 	},
 	props: {
 		teamId: {
@@ -95,6 +107,7 @@ export default {
 	setup() {
 		const isTeamNameChanged = false;
 		const team = ref({
+			ignore_restrictions: false,
 			team_name: "",
 			users: [],
 		});
@@ -248,6 +261,7 @@ export default {
 			this.$resources.newTeam.submit({
 				doc: {
 					doctype: "Agent Group",
+					ignore_restrictions: this.team.ignore_restrictions,
 					team_name: this.team.team_name,
 					users: this.mapUsers(this.team.users),
 				},
@@ -256,6 +270,7 @@ export default {
 		save() {
 			this.$resources.team.setValue
 				.submit({
+					ignore_restrictions: this.team.ignore_restrictions,
 					users: this.mapUsers(this.team.users),
 				})
 				.then(this.renameTeam);
