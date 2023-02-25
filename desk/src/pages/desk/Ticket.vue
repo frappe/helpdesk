@@ -317,30 +317,85 @@
 										class="pt-2 select-none flex flex-row items-center space-x-2 gap-2"
 										v-if="$refs.replyEditor"
 									>
-										<Button
-											:loading="
-												editingType == 'reply'
-													? $resources
-															.submitConversation
-															.loading
-													: $resources.submitComment
-															.loading
-											"
-											@click="submit()"
-											appearance="primary"
-											:disabled="
-												(!user.agent &&
-													!user.isAdmin) ||
-												sendingDissabled
-											"
-										>
-											{{
-												editingType == "reply"
-													? "Send"
-													: "Create"
-											}}
-										</Button>
-
+										<div class="flex">
+											<Button
+												class="rounded-br-none rounded-tr-none border-r-[.5px] border-t-0 border-l-0 border-b-0 border-[#636363]"
+												:loading="
+													editingType == 'reply'
+														? $resources
+																.submitConversation
+																.loading
+														: $resources
+																.submitComment
+																.loading
+												"
+												@click="submit()"
+												appearance="primary"
+												:disabled="
+													(!user.agent &&
+														!user.isAdmin) ||
+													sendingDissabled
+												"
+											>
+												{{
+													editingType == "reply"
+														? "Send"
+														: "Create"
+												}}
+											</Button>
+											<Dropdown
+												v-if="editingType == 'reply'"
+												placement="right"
+												:button="{
+													class: 'rounded-bl-none rounded-tl-none',
+													disabled:
+														(!user.agent &&
+															!user.isAdmin) ||
+														sendingDissabled,
+													appearance: 'primary',
+													label: 'Menu',
+													icon: 'chevron-down',
+												}"
+												:options="[
+													{
+														label: 'Send and set as Replied',
+														handler: () => {
+															let status =
+																'Replied'
+															submit()
+															submitAndUpdateTicketStatus(
+																status
+															)
+															this.$router.go()
+														},
+													},
+													{
+														label: 'Send and set as Resolved',
+														handler: () => {
+															let status =
+																'Resolved'
+															submit()
+															submitAndUpdateTicketStatus(
+																status
+															)
+															this.$router.go()
+														},
+													},
+													{
+														label: 'Send and set as Closed',
+														handler: () => {
+															let status =
+																'Closed'
+															submit()
+															submitAndUpdateTicketStatus(
+																status
+															)
+															this.$router.go()
+														},
+													},
+												]"
+											/>
+										</div>
 										<div
 											class="flex flex-row items-center space-x-2"
 										>
@@ -475,6 +530,7 @@
 		</div>
 	</div>
 </template>
+
 <script>
 import {
 	ErrorMessage,
@@ -497,6 +553,7 @@ import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialo
 import { inject, ref } from "vue"
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
 import { color } from "echarts"
+
 export default {
 	name: "Ticket",
 	props: ["ticketId"],
@@ -548,6 +605,7 @@ export default {
 		const showBcc = ref(false)
 		const showCcBtn = ref(true)
 		const showBccBtn = ref(true)
+
 		return {
 			showTextFormattingMenu,
 			viewportWidth,
@@ -568,6 +626,7 @@ export default {
 			showBcc,
 			showCcBtn,
 			showBccBtn,
+			replied,
 		}
 	},
 	resources: {
@@ -576,6 +635,14 @@ export default {
 				type: "document",
 				doctype: "Ticket",
 				name: this.ticketId,
+			}
+		},
+		submitAndUpdateTicketStatus() {
+			return {
+				method: "frappedesk.api.ticket.update_ticket_status",
+				onSuccess: (val) => {
+					console.log(val)
+				},
 			}
 		},
 		submitConversation() {
@@ -781,6 +848,25 @@ export default {
 				message: content,
 				cc: this.cc,
 				bcc: this.bcc,
+				attachments: this.attachments.map((x) => x.name),
+			})
+			this.content = ""
+			this.attachments = []
+		},
+		submitAndUpdateTicketStatus(status) {
+			this.$resources.submitAndUpdateTicketStatus.submit({
+				ticket_id: this.ticketId,
+				status: status,
+			})
+		},
+		submitResolvedTicket() {
+			this.tempTextEditorData.content = this.content
+			this.tempTextEditorData.attachments = this.attachments
+			const content = `<div class='content-block'><div>${this.content}</div></div>`
+			this.$resources.submitConversation.submit({
+				ticket_id: this.ticketId,
+				message: content,
+				status: "Resolved",
 				attachments: this.attachments.map((x) => x.name),
 			})
 			this.content = ""
