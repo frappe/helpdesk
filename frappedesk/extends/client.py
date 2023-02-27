@@ -1,9 +1,10 @@
 # Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and Contributors
 # MIT License. See license.txt
 
-from __future__ import unicode_literals
 import frappe
 from frappe.model.base_document import get_controller
+
+from .qb import get_query
 
 
 @frappe.whitelist()
@@ -20,7 +21,7 @@ def get_list(
 ):
 	check_permissions(doctype, parent)
 
-	query = frappe.qb.get_query(
+	query = get_query(
 		table=doctype,
 		fields=fields,
 		filters=filters,
