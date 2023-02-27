@@ -5,19 +5,19 @@
 </template>
 
 <script>
-import { ref, computed, watch, provide, inject, nextTick } from "vue"
-import { useRouter, useRoute } from "vue-router"
-import { createListResource, createResource } from "frappe-ui"
-import { onMounted } from "@vue/runtime-core"
+import { ref, computed, watch, provide, inject, nextTick } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { createListResource, createResource } from "frappe-ui";
+import { onMounted } from "vue";
 
 export default {
 	name: "ListManager",
 	props: ["options"],
 	setup(props, context) {
-		const router = useRouter()
-		const route = useRoute()
+		const router = useRouter();
+		const route = useRoute();
 
-		const user = inject("user")
+		const user = inject("user");
 
 		const options = ref({
 			handleRowClick: () => {},
@@ -30,11 +30,12 @@ export default {
 			limit: props.options.limit || 20,
 			start: 0,
 			order_by: props.options.order_by || "",
-		})
+		});
 
 		const listResource = createListResource(
 			{
 				type: "list",
+				method: "frappedesk.extends.client.get_list",
 				cache: options.value.cache,
 				doctype: options.value.doctype,
 				fields: options.value.fields,
@@ -45,111 +46,109 @@ export default {
 				realtime: true,
 			},
 			context
-		)
+		);
 		const list = computed(() => {
 			countResource.fetch({
 				doctype: options.value.doctype,
 				filters: options.value.filters,
-			})
-			return listResource.list.data || []
-		})
+			});
+			return listResource.list.data || [];
+		});
 		const loading = computed(() => {
-			return listResource.list.loading
-		})
+			return listResource.list.loading;
+		});
 
 		const countResource = createResource(
 			{
 				method: "frappe.client.get_count",
 			},
 			context
-		)
+		);
 		const totalCount = computed(() => {
-			return countResource.data || 0
-		})
+			return countResource.data || 0;
+		});
 
 		const reload = () => {
-			selectedItems.value = {}
-			listResource.reload()
-		}
+			selectedItems.value = {};
+			listResource.reload();
+		};
 		const fetch = () => {
-			listResource.list.fetch()
-		}
+			listResource.list.fetch();
+		};
 		const update = (newOptions = null) => {
 			if (newOptions) {
-				if (newOptions.filters)
-					options.value.filters = newOptions.filters
-				if (newOptions.order_by)
-					options.value.order_by = newOptions.order_by
+				if (newOptions.filters) options.value.filters = newOptions.filters;
+				if (newOptions.order_by) options.value.order_by = newOptions.order_by;
 			}
 
 			listResource.update({
 				...options.value,
-			})
-		}
+			});
+		};
 
 		const getPage = (page) => {
-			if (page < 0 || page > totalPages.value) return
-			options.value.start = (page - 1) * options.value.limit
-			update()
-			fetch()
-		}
+			if (page < 0 || page > totalPages.value) return;
+			options.value.start = (page - 1) * options.value.limit;
+			update();
+			fetch();
+		};
 		const nextPage = () => {
-			if (currentPageNumber.value == totalPages.value) return
-			options.value.start += options.value.limit
-			update()
-			fetch()
-		}
+			if (currentPageNumber.value == totalPages.value) return;
+			options.value.start += options.value.limit;
+			update();
+			fetch();
+		};
 		const previousPage = () => {
-			if (currentPageNumber.value == 1) return
-			let newStart = options.value.start - options.value.limit
-			if (newStart < 0) newStart = 0
-			options.value.start = newStart
-			update()
-			fetch()
-		}
+			if (currentPageNumber.value == 1) return;
+			let newStart = options.value.start - options.value.limit;
+			if (newStart < 0) newStart = 0;
+			options.value.start = newStart;
+			update();
+			fetch();
+		};
 		const hasNextPage = computed(() => {
-			return options.value.start + options.value.limit < totalCount.value
-		})
+			return options.value.start + options.value.limit < totalCount.value;
+		});
 		const hasPreviousPage = computed(() => {
-			return options.value.start > 0
-		})
+			return options.value.start > 0;
+		});
 		const currentPageNumber = computed(() => {
-			return Math.ceil(options.value.start / options.value.limit) + 1
-		})
+			return Math.ceil(options.value.start / options.value.limit) + 1;
+		});
 		const totalPages = computed(() => {
-			return Math.ceil(totalCount.value / options.value.limit)
-		})
+			return Math.ceil(totalCount.value / options.value.limit);
+		});
 
-		const sudoFilters = ref([])
+		const sudoFilters = ref([]);
 		const generateExecutableFilter = (filter) => {
 			let mapOperator = (x) => {
 				switch (x) {
 					case "is":
-						return "="
+						return "=";
 					case "is not":
-						return "!="
+						return "!=";
 					case "before":
-						return "<"
+						return "<";
 					case "after":
-						return ">"
+						return ">";
 					default:
-						return x
+						return x;
 				}
-			}
+			};
 			let mapValue = (x, type) => {
 				switch (type) {
 					case "like":
-						return `%${x}%`
+						return `%${x}%`;
 					case "not like":
-						return `%${x}%`
+						return `%${x}%`;
 					default:
-						return x
+						return x;
 				}
-			}
+			};
 
-			let filterType = filter.filter_type
+			let filterType = filter.filter_type;
 			if (filter.fieldname == "_assign") {
-				filterType = filter.filter_type == "is" ? "like" : "not like"
+				filterType = filter.filter_type == "is" ? "like" : "not like";
 			}
 
 			let executableFilter = [
@@ -161,166 +160,161 @@ export default {
 						: filter.value,
 					filterType
 				),
-			]
-			return executableFilter
-		}
+			];
+			return executableFilter;
+		};
 		const addFilters = (sudoFilters, addToUrlQuery) => {
 			if (addToUrlQuery) {
-				let query = {}
+				let query = {};
 				sudoFilters.forEach((filter) => {
-					let fieldname = filter.fieldname
-					let filter_type = filter.filter_type
+					let fieldname = filter.fieldname;
+					let filter_type = filter.filter_type;
 					let value =
 						filter.fieldname == "_assign" && filter.value == "@me"
 							? user.value.user
-							: filter.value
+							: filter.value;
 
-					query[fieldname] = JSON.stringify([filter_type, value])
-				})
-				router.replace({ query })
+					query[fieldname] = JSON.stringify([filter_type, value]);
+				});
+				router.replace({ query });
 				if (
 					Object.keys(query).length == 0 &&
 					options.value.saveFiltersLocally
 				) {
-					applyFilters()
+					applyFilters();
 				}
 			} else {
-				let executableFilters = []
+				let executableFilters = [];
 				for (let i in sudoFilters) {
-					executableFilters.push(
-						generateExecutableFilter(sudoFilters[i])
-					)
+					executableFilters.push(generateExecutableFilter(sudoFilters[i]));
 				}
-				applyFilters(sudoFilters, executableFilters)
+				applyFilters(sudoFilters, executableFilters);
 			}
-		}
+		};
 		const applyFilters = (sudoFilters = [], executableFilters = []) => {
 			if (options.value.saveFiltersLocally) {
 				localStorage.setItem(
 					`list_filters_${route.path}`,
 					JSON.stringify(sudoFilters || [])
-				)
+				);
 			}
 			manager.value.update({
 				filters: executableFilters,
-			})
-		}
+			});
+		};
 
 		const toggleOrderBy = (field) => {
-			let newOrderBy = `${field} desc`
-			const oldOrderBy = options.value?.order_by
+			let newOrderBy = `${field} desc`;
+			const oldOrderBy = options.value?.order_by;
 			if (oldOrderBy) {
 				if (oldOrderBy.split(" ")[0] === newOrderBy.split(" ")[0]) {
 					newOrderBy = `${field} ${
 						oldOrderBy.split(" ")[1] === "desc" ? "asc" : "desc"
-					}`
+					}`;
 				}
 			}
-			update({ order_by: newOrderBy })
-			reload()
-		}
+			update({ order_by: newOrderBy });
+			reload();
+		};
 
 		const onClick = (rowData) => {
 			if (selectionMode.value == 1) {
-				selectionMode.value = 2
+				selectionMode.value = 2;
 			} else if (selectionMode.value == 2) {
-				manager.value.select(rowData)
+				manager.value.select(rowData);
 			} else {
-				options.value.handleRowClick(rowData)
+				options.value.handleRowClick(rowData);
 			}
-		}
+		};
 
 		const select = (rowData) => {
 			if (selectionMode.value == 0) {
-				selectionMode.value = 1
+				selectionMode.value = 1;
 			}
 			if (rowData.name in selectedItems.value) {
-				delete selectedItems.value[rowData.name]
+				delete selectedItems.value[rowData.name];
 				if (Object.keys(selectedItems.value).length == 0) {
-					selectionMode.value = 0
+					selectionMode.value = 0;
 				}
 			} else {
-				selectedItems.value[rowData.name] = rowData
+				selectedItems.value[rowData.name] = rowData;
 			}
-		}
+		};
 		const unselect = () => {
-			selectedItems.value = {}
-		}
+			selectedItems.value = {};
+		};
 		const selectAll = () => {
 			if (allItemsSelected.value) {
-				manager.value.unselect()
+				manager.value.unselect();
 			} else {
 				for (let i = 0; i < manager.value.list.length; i++) {
 					selectedItems.value[manager.value.list[i].name] =
-						manager.value.list[i]
+						manager.value.list[i];
 				}
 			}
-			context.emit("selection", selectedItems.value)
-		}
+			context.emit("selection", selectedItems.value);
+		};
 
-		const selectionMode = ref(0)
-		const selectedItems = ref({})
+		const selectionMode = ref(0);
+		const selectedItems = ref({});
 		watch(selectedItems.value, (newValue) => {
-			context.emit("selection", newValue)
-		})
+			context.emit("selection", newValue);
+		});
 		const allItemsSelected = computed(() => {
 			if (manager.value.loading) {
-				return false
+				return false;
 			} else {
 				if (manager.value.list.length > 0) {
 					return (
-						Object.keys(selectedItems.value).length ==
-						manager.value.list.length
-					)
+						Object.keys(selectedItems.value).length == manager.value.list.length
+					);
 				}
-				return false
+				return false;
 			}
-		})
+		});
 		const itemSelected = (rowData) => {
-			return rowData.name in selectedItems.value
-		}
+			return rowData.name in selectedItems.value;
+		};
 
 		const convertFieldNameToLabel = (fieldname) => {
 			switch (fieldname) {
 				case "_assign":
-					return "Assigned to"
+					return "Assigned to";
 				case "_seen":
-					return false
+					return false;
 				default:
-					fieldname = fieldname.replace(/_/g, " ")
-					return (
-						fieldname.charAt(0).toUpperCase() + fieldname.slice(1)
-					)
+					fieldname = fieldname.replace(/_/g, " ");
+					return fieldname.charAt(0).toUpperCase() + fieldname.slice(1);
 			}
-		}
+		};
 		const convertUrlQueryToFilters = () => {
-			let urlQuery = route.query
-			let filters = []
+			let urlQuery = route.query;
+			let filters = [];
 
 			for (let key in urlQuery) {
-				let filterType = "like"
-				let value = ""
-				urlQuery[key] = JSON.parse(urlQuery[key])
+				let filterType = "like";
+				let value = "";
+				urlQuery[key] = JSON.parse(urlQuery[key]);
 				if (urlQuery[key].constructor.name == "Array") {
 					if (urlQuery[key].length == 1) {
-						value = urlQuery[key][0]
+						value = urlQuery[key][0];
 					} else {
-						filterType = urlQuery[key][0]
-						value = urlQuery[key][1]
+						filterType = urlQuery[key][0];
+						value = urlQuery[key][1];
 					}
 				} else {
-					value = urlQuery[key]
+					value = urlQuery[key];
 				}
 				let filter = {
 					label: convertFieldNameToLabel(key),
 					fieldname: key,
 					filter_type: filterType,
 					value,
-				}
-				filters.push(filter)
+				};
+				filters.push(filter);
 			}
-			return filters
-		}
+			return filters;
+		};
 
 		const manager = ref({
 			options,
@@ -359,8 +353,8 @@ export default {
 			helperMethods: {
 				convertFieldNameToLabel,
 			},
-		})
-		provide("manager", manager)
+		});
+		provide("manager", manager);
 
 		onMounted(() => {
 			nextTick(() => {
@@ -368,22 +362,21 @@ export default {
 					options.value.urlQueryFilters &&
 					Object.keys(route.query).length > 0
 				) {
-					sudoFilters.value = convertUrlQueryToFilters()
-					addFilters(sudoFilters.value, false)
+					sudoFilters.value = convertUrlQueryToFilters();
+					addFilters(sudoFilters.value, false);
 				} else if (options.value.saveFiltersLocally) {
 					sudoFilters.value = JSON.parse(
-						localStorage.getItem(`list_filters_${route.path}`) ||
-							"[]"
-					)
-					addFilters(sudoFilters.value, options.value.urlQueryFilters)
+						localStorage.getItem(`list_filters_${route.path}`) || "[]"
+					);
+					addFilters(sudoFilters.value, options.value.urlQueryFilters);
 				}
-				reload()
-			})
-		})
+				reload();
+			});
+		});
 
 		return {
 			manager,
-		}
+		};
 	},
-}
+};
 </script>

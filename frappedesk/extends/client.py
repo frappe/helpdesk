@@ -37,12 +37,11 @@ def get_list(
 
 def check_permissions(doctype, parent):
 	user = frappe.session.user
-	has_select_permission = frappe.has_permission(
-		doctype, "select", user=user, parent_doctype=parent
-	)
-	has_read_permission = frappe.has_permission(
-		doctype, "read", user=user, parent_doctype=parent
-	)
+	permissions = ("select", "read")
+	has_select_permission, has_read_permission = [
+		frappe.has_permission(doctype, perm, user=user, parent_doctype=parent)
+		for perm in permissions
+	]
 
 	if not has_select_permission and not has_read_permission:
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
