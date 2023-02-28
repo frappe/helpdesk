@@ -197,13 +197,13 @@
   {
    "fieldname": "agent_groups_section",
    "fieldtype": "Section Break",
-   "label": "Agent Groups"
+   "label": "Team restrictions"
   },
   {
    "default": "0",
    "fieldname": "restrict_tickets_by_agent_group",
    "fieldtype": "Check",
-   "label": "Restrict Tickets by Agent Group"
+   "label": "Restrict Tickets by Team"
   },
   {
    "fieldname": "column_break_dxlq",
@@ -214,7 +214,7 @@
    "depends_on": "restrict_tickets_by_agent_group",
    "fieldname": "do_not_restrict_tickets_without_an_agent_group",
    "fieldtype": "Check",
-   "label": "Do Not Restrict Tickets Without an Agent Group"
+   "label": "Do Not Restrict Tickets Without a Team"
   }
  ],
  "issingle": 1,
