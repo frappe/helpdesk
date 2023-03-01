@@ -36,9 +36,10 @@ def extract_order_by(params: dict) -> tuple[str, str]:
 	:param params: Dict of call parameters
 	:return: Order by field and order direction
 	"""
-	order_by: list = params.get(ORDER_BY_FIELD, DEFAULT_ORDER_FIELD).split(" ")
+	order_by = params.get(ORDER_BY_FIELD) or DEFAULT_ORDER_FIELD
+	result: list = order_by.split(" ")
 
-	if len(order_by) < 2:
-		return order_by.pop(), DEFAULT_ORDER_DIR
+	if len(result) < 2:
+		return result.pop(), DEFAULT_ORDER_DIR
 
-	return order_by
+	return result

@@ -1,6 +1,8 @@
 # Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and Contributors
 # MIT License. See license.txt
 
+import importlib
+
 import frappe
 from frappe.model.base_document import get_controller
 
@@ -31,9 +33,10 @@ def get_list(
 		group_by=group_by,
 	)
 
-	custom_query = apply_custom_filters(doctype, query)
+	query = apply_custom_filters(doctype, query)
+	query = apply_hook(doctype, query)
 
-	return custom_query.run(as_dict=True, debug=debug)
+	return query.run(as_dict=True, debug=debug)
 
 
 def check_permissions(doctype, parent):
@@ -48,7 +51,7 @@ def check_permissions(doctype, parent):
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
-def apply_custom_filters(doctype, query):
+def apply_custom_filters(doctype: str, query):
 	"""
 	Apply custom filters to query
 	"""
@@ -60,3 +63,17 @@ def apply_custom_filters(doctype, query):
 			query = return_value
 
 	return query
+
+
+def apply_hook(doctype: str, query):
+	"""
+	Apply hooks to query
+	"""
+	try:
+		_module_path = "frappedesk.frappedesk.hooks." + doctype.lower()
+		_module = importlib.import_module(_module_path)
+		_class = getattr(_module, doctype)
+		_function = getattr(_class, "get_list_query")
+		return _function(query)
+	except:
+		return query
