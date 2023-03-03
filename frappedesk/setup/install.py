@@ -1,6 +1,8 @@
 import frappe
 from frappe.permissions import add_permission
 
+from frappedesk.frappedesk.doctype.fd_preset_filter import FDPresetFilter
+
 
 def before_install():
 	add_support_redirect_to_tickets()
@@ -157,7 +159,9 @@ def add_default_holidy_list():
 			"doctype": "Service Holiday List",
 			"holiday_list_name": "Default",
 			"from_date": datetime.strptime(f"Jan 1 {datetime.now().year}", "%b %d %Y"),
-			"to_date": datetime.strptime(f"Jan 1 {datetime.now().year + 1}", "%b %d %Y"),
+			"to_date": datetime.strptime(
+				f"Jan 1 {datetime.now().year + 1}", "%b %d %Y"
+			),
 		}
 	).insert()
 
@@ -267,6 +271,7 @@ def add_default_assignment_rule():
 
 def add_system_preset_filters():
 	preset_filters = []
+
 	for status in ["Closed", "Resolved", "Replied", "Open"]:
 		preset_filters.append(
 			{
@@ -274,16 +279,12 @@ def add_system_preset_filters():
 				"title": f"My {status} Tickets",
 				"reference_doctype": "Ticket",
 				"filters": [
-					{
-						"label": "Assigned To",
-						"fieldname": "_assign",
-						"filter_type": "is",
-						"value": "@me",
-					},
-					{"label": "Status", "fieldname": "status", "filter_type": "is", "value": status},
+					FDPresetFilter.get_assign_filter("@me"),
+					FDPresetFilter.get_status_filter(status),
 				],
 			}
 		)
+
 	preset_filters.append(
 		{
 			"doctype": "FD Preset Filter",
@@ -292,6 +293,16 @@ def add_system_preset_filters():
 			"filters": [],
 		}
 	)
+
+	preset_filters.append(
+		{
+			"doctype": "FD Preset Filter",
+			"title": "All Open Tickets",
+			"reference_doctype": "Ticket",
+			"filters": [FDPresetFilter.get_status_filter("Open")],
+		}
+	)
+
 	for preset in preset_filters:
 		preset_filter_doc = frappe.get_doc(preset)
 		preset_filter_doc.insert()

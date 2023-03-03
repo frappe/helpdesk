@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col px-4 overflow-y-clip">
+	<div class="flex flex-col overflow-y-clip px-4">
 		<ListManager
 			ref="ticketList"
 			:options="{
@@ -68,10 +68,10 @@
 							},
 						},
 					}"
-					class="text-base h-[calc(100vh-5.5rem)] pt-4"
+					class="h-[calc(100vh-5.5rem)] pt-4 text-base"
 					@add-item="
 						() => {
-							showNewTicketDialog = true
+							showNewTicketDialog = true;
 						}
 					"
 				>
@@ -99,10 +99,7 @@
 						</div>
 					</template>
 					<template #field-creation="{ value }">
-						<Tooltip
-							placement="top"
-							:text="`Created on ${$dayjs(value)}`"
-						>
+						<Tooltip placement="top" :text="`Created on ${$dayjs(value)}`">
 							<div class="text-gray-500">
 								{{ $dayjs(value).format("DD MMM") }}
 							</div>
@@ -112,13 +109,10 @@
 						<ResolutionBy :ticket="row" />
 					</template>
 					<template #field-modified="{ row }">
-						<div class="flex justify-between w-full">
+						<div class="flex w-full justify-between">
 							<div class="text-gray-500">
 								{{
-									$dayjs.shortFormating(
-										$dayjs(row.modified).fromNow(),
-										false
-									)
+									$dayjs.shortFormating($dayjs(row.modified).fromNow(), false)
 								}}
 							</div>
 							<AgentAvatar
@@ -131,16 +125,10 @@
 					<!-- Other Templates -->
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
-							<Dropdown
-								placement="right"
-								:options="agentsAsDropdownOptions()"
-							>
-								<template v-slot="{ toggleDropdown }">
+							<Dropdown placement="right" :options="agentsAsDropdownOptions()">
+								<template #default="{ toggleDropdown }">
 									<Button
-										:loading="
-											$resources.bulkAssignTicketToAgent
-												.loading
-										"
+										:loading="$resources.bulkAssignTicketToAgent.loading"
 										icon-right="chevron-down"
 										class="ml-2"
 										@click="toggleDropdown"
@@ -155,14 +143,13 @@
 									() => {
 										$resources.bulkAssignTicketStatus
 											.submit({
-												ticket_ids:
-													Object.keys(selectedItems),
+												ticket_ids: Object.keys(selectedItems),
 												status: 'Closed',
 											})
 											.then(() => {
-												manager.unselect()
-												manager.reload()
-											})
+												manager.unselect();
+												manager.reload();
+											});
 									}
 								"
 							>
@@ -178,24 +165,25 @@
 			@close="showNewTicketDialog = false"
 			@ticket-created="
 				() => {
-					showNewTicketDialog = false
-					$refs.ticketList.manager.reload() // TODO: remove this once the list manager realtime update is fixed
+					showNewTicketDialog = false;
+					$refs.ticketList.manager.reload(); // TODO: remove this once the list manager realtime update is fixed
 				}
 			"
 		/>
 	</div>
 </template>
+
 <script>
-import ListManager from "@/components/global/ListManager.vue"
-import ListViewer from "@/components/global/ListViewer.vue"
-import AgentAvatar from "@/components/global/AgentAvatar.vue"
-import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue"
-import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
-import ResolutionBy from "@/components/global/ticket_list_item/ResolutionBy.vue"
-import TicketType from "@/components/global/ticket_list_item/TicketType.vue"
-import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
-import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue"
-import Subject from "@/components/global/ticket_list_item/Subject.vue"
+import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui";
+import ListManager from "@/components/global/ListManager.vue";
+import ListViewer from "@/components/global/ListViewer.vue";
+import AgentAvatar from "@/components/global/AgentAvatar.vue";
+import ResolutionBy from "@/components/global/ticket_list_item/ResolutionBy.vue";
+import TicketType from "@/components/global/ticket_list_item/TicketType.vue";
+import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
+import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue";
+import Subject from "@/components/global/ticket_list_item/Subject.vue";
+import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue";
 
 export default {
 	name: "Tickets",
@@ -217,11 +205,11 @@ export default {
 	data() {
 		return {
 			showNewTicketDialog: false,
-		}
+		};
 	},
 	methods: {
 		agentsAsDropdownOptions() {
-			let agentItems = []
+			let agentItems = [];
 			if (this.agents) {
 				this.agents.forEach((agent) => {
 					agentItems.push({
@@ -232,11 +220,11 @@ export default {
 									this.$refs.ticketList.manager.selectedItems
 								),
 								agent_id: agent.name,
-							})
+							});
 						},
-					})
-				})
-				let options = []
+					});
+				});
+				let options = [];
 				if (this.user.agent) {
 					options.push({
 						group: "Myself",
@@ -245,28 +233,25 @@ export default {
 							{
 								label: "Assign to me",
 								handler: () => {
-									this.$resources.bulkAssignTicketToAgent.submit(
-										{
-											ticket_ids: Object.keys(
-												this.$refs.ticketList.manager
-													.selectedItems
-											),
-											agent_id: this.user.agent.name,
-										}
-									)
+									this.$resources.bulkAssignTicketToAgent.submit({
+										ticket_ids: Object.keys(
+											this.$refs.ticketList.manager.selectedItems
+										),
+										agent_id: this.user.agent.name,
+									});
 								},
 							},
 						],
-					})
+					});
 				}
 				options.push({
 					group: "All Agents",
 					hideLabel: true,
 					items: agentItems,
-				})
-				return options
+				});
+				return options;
 			} else {
-				return null
+				return null;
 			}
 		},
 	},
@@ -276,50 +261,50 @@ export default {
 				method: "frappedesk.api.ticket.bulk_assign_ticket_status",
 				onSuccess: (res) => {
 					//res: {docs: Ticket Docs, status: NewStatus}
-					this.$refs.ticketList.manager.selectedItems = []
-					this.$refs.ticketList.manager.reload()
+					this.$refs.ticketList.manager.selectedItems = [];
+					this.$refs.ticketList.manager.reload();
 
 					this.$toast({
 						title: `Tickets marked as ${res.status}.`,
 						customIcon: "circle-check",
 						appearance: "success",
-					})
+					});
 
-					this.$event.emit("update_ticket_list")
+					this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					this.$toast({
 						title: "Unable to mark tickets as closed.",
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 		bulkAssignTicketToAgent() {
 			return {
 				method: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
-					this.$refs.ticketList.manager.selectedItems = []
-					this.$refs.ticketList.manager.reload()
+					this.$refs.ticketList.manager.selectedItems = [];
+					this.$refs.ticketList.manager.reload();
 
 					this.$toast({
 						title: "Tickets assigned to agent.",
 						customIcon: "circle-check",
 						appearance: "success",
-					})
+					});
 
-					this.$event.emit("update_ticket_list")
+					this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					this.$toast({
 						title: "Unable to assign tickets to agent.",
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 	},
-}
+};
 </script>

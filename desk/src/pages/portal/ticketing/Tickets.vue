@@ -1,47 +1,40 @@
 <template>
 	<div class="mb-20 mt-5">
 		<div class="mx-auto max-w-4xl">
-			<div class="flex justify-between items-center mb-2">
+			<div class="mb-2 flex items-center justify-between">
 				<div class="mb-2">
 					<Dropdown :options="getTicketFilterOptions()">
 						<template
-							v-slot="{ toggleTicketFilters }"
+							#default="{ toggleTicketFilters }"
 							@click="toggleTicketFilters"
 						>
-							<div
-								class="flex space-x-2 items-center cursor-pointer"
-							>
+							<div class="flex cursor-pointer items-center space-x-2">
 								<p class="text-[18px] font-semibold">
-									{{ this.ticketFilter }}
+									{{ ticketFilter }}
 								</p>
-								<FeatherIcon
-									name="chevron-down"
-									class="w-5 h-5"
-								/>
+								<FeatherIcon name="chevron-down" class="h-5 w-5" />
 							</div>
 						</template>
 					</Dropdown>
 				</div>
-				<div class="space-x-3 items-center flex">
+				<div class="flex items-center space-x-3">
 					<Dropdown
 						placement="right"
 						:options="
-							ticketTemplateOptions().length > 1
-								? ticketTemplateOptions()
-								: []
+							ticketTemplateOptions().length > 1 ? ticketTemplateOptions() : []
 						"
 						:dropdown-width-full="true"
 					>
-						<template v-slot="{ toggleTemplates }">
+						<template #default="{ toggleTemplates }">
 							<div>
 								<Button
+									icon-left="plus"
+									appearance="primary"
 									@click="
 										ticketTemplateOptions().length > 1
 											? toggleTemplates
 											: openDefaultTicketTemplate()
 									"
-									icon-left="plus"
-									appearance="primary"
 								>
 									Create New
 								</Button>
@@ -56,10 +49,10 @@
 </template>
 
 <script>
-import { inject, ref } from "vue"
-import { Badge, Dropdown, FeatherIcon } from "frappe-ui"
-import TicketList from "@/components/portal/tickets/TicketList.vue"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { inject, ref } from "vue";
+import { Badge, Dropdown, FeatherIcon } from "frappe-ui";
+import TicketList from "@/components/portal/tickets/TicketList.vue";
+import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 
 export default {
 	name: "Tickets",
@@ -71,58 +64,48 @@ export default {
 		FeatherIcon,
 	},
 	setup() {
-		const tickets = inject("tickets")
-		const ticketTemplates = inject("ticketTemplates")
-		const ticketFilter = ref("All Tickets")
+		const tickets = inject("tickets");
+		const ticketTemplates = inject("ticketTemplates");
+		const ticketFilter = ref("All Tickets");
 
-		return { tickets, ticketTemplates, ticketFilter }
+		return { tickets, ticketTemplates, ticketFilter };
 	},
 	computed: {
 		tickets() {
-			return this.tickets || null
+			return this.tickets || null;
 		},
 	},
 	methods: {
 		ticketTemplateOptions() {
-			let templateItems = []
-			if (this.ticketTemplates) {
-				this.ticketTemplates.forEach((template) => {
-					templateItems.push({
-						label: template.name,
-						handler: () => {
-							this.$router.push({
-								name: "TemplatedNewTicket",
-								params: {
-									templateId: template.template_route,
-								},
-							})
+			if (!this.ticketTemplates) return;
+
+			return this.ticketTemplates.map((template) => ({
+				label: template.name,
+				handler: () => {
+					this.$router.push({
+						name: "TemplatedNewTicket",
+						params: {
+							templateId: template.template_route,
 						},
-					})
-				})
-				return templateItems
-			} else {
-				return null
-			}
+					});
+				},
+			}));
 		},
 		openDefaultTicketTemplate() {
 			this.$router.push({
 				name: "DefaultNewTicket",
-			})
+			});
 		},
 		getTicketFilterOptions() {
-			let items = []
-			;["All Tickets", "Open Tickets", "Closed Tickets"].forEach(
-				(item) => {
-					items.push({
-						label: item,
-						handler: () => {
-							this.ticketFilter = item
-						},
-					})
-				}
-			)
-			return items
+			const opts = ["All Tickets", "Open Tickets", "Closed Tickets"];
+
+			return opts.map((item) => ({
+				label: item,
+				handler: () => {
+					this.ticketFilter = item;
+				},
+			}));
 		},
 	},
-}
+};
 </script>
