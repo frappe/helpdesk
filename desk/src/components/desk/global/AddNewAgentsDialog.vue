@@ -67,7 +67,7 @@
 					appearance="primary"
 					@click="sentInvites()"
 					:loading="$resources.sentInvites.loading"
-					>Sent Invites</Button
+					>Send Invites</Button
 				>
 				<Button appearance="secondary" @click="close()">Cancel</Button>
 				<div class="grow">
