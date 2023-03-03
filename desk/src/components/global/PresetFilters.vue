@@ -50,7 +50,7 @@ export default {
 			return this.manager.sudoFilters;
 		},
 		options() {
-			const data = this.$resources.presetFilterOptions.data || [];
+			const data = this.$resources.presetFilterOptions.data || {};
 			const d = Object.keys(data);
 
 			this.$nextTick(() => {
