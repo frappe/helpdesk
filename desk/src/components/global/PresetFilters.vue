@@ -50,13 +50,14 @@ export default {
 			return this.manager.sudoFilters;
 		},
 		options() {
-			const data = Object.keys(this.$resources.presetFilterOptions.data || []);
+			const data = this.$resources.presetFilterOptions.data || [];
+			const d = Object.keys(data);
 
 			this.$nextTick(() => {
 				this.sync();
 			});
 
-			return data
+			return d
 				.filter((group) => data[group].length)
 				.map((group) => ({
 					group: group === "user" ? "My Filters" : "Global",
