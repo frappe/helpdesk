@@ -14,19 +14,6 @@
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
   "column_break_dxlq",
-  "forum_sb",
-  "forum_url",
-  "get_latest_query",
-  "response_key_list",
-  "column_break_10",
-  "post_title_key",
-  "post_description_key",
-  "post_route_key",
-  "post_route_string",
-  "setup_complete",
-  "initial_agent_set",
-  "initial_demo_ticket_created",
-  "initial_helpdesk_name_setup_skipped",
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
@@ -37,51 +24,6 @@
   "column_break_qkui"
  ],
  "fields": [
-  {
-   "depends_on": "show_latest_forum_posts",
-   "fieldname": "forum_sb",
-   "fieldtype": "Section Break",
-   "label": "Forum Posts"
-  },
-  {
-   "fieldname": "forum_url",
-   "fieldtype": "Data",
-   "label": "Forum URL"
-  },
-  {
-   "fieldname": "get_latest_query",
-   "fieldtype": "Data",
-   "label": "Get Latest Query"
-  },
-  {
-   "fieldname": "response_key_list",
-   "fieldtype": "Data",
-   "label": "Response Key List"
-  },
-  {
-   "fieldname": "column_break_10",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "post_title_key",
-   "fieldtype": "Data",
-   "label": "Post Title Key"
-  },
-  {
-   "fieldname": "post_description_key",
-   "fieldtype": "Data",
-   "label": "Post Description Key"
-  },
-  {
-   "fieldname": "post_route_key",
-   "fieldtype": "Data",
-   "label": "Post Route Key"
-  },
-  {
-   "fieldname": "post_route_string",
-   "fieldtype": "Data",
-   "label": "Post Route String"
-  },
   {
    "fieldname": "sb_00",
    "fieldtype": "Section Break",
@@ -106,35 +48,8 @@
    "label": "Helpdesk Name"
   },
   {
-   "default": "0",
-   "fieldname": "setup_complete",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Setup Complete"
-  },
-  {
-   "default": "0",
-   "fieldname": "initial_agent_set",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Initial Agent Set"
-  },
-  {
-   "default": "0",
-   "fieldname": "initial_demo_ticket_created",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Initial Demo Ticket Created"
-  },
-  {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "initial_helpdesk_name_setup_skipped",
-   "fieldtype": "Check",
-   "label": "Initial Helpdesk Name Setup Skipped"
   },
   {
    "fieldname": "assignment_rules_section",
@@ -204,7 +119,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-06 00:54:43.478315",
+ "modified": "2023-03-06 00:55:41.584489",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
