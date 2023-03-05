@@ -10,9 +10,6 @@
   "allow_resetting_service_level_agreement",
   "column_break_4",
   "helpdesk_name",
-  "issues_sb",
-  "default_ticket_type",
-  "close_issue_after_days",
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
@@ -36,20 +33,13 @@
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
-  "suggest_articles_in_new_ticket_page"
+  "suggest_articles_in_new_ticket_page",
+  "misc_tab",
+  "toasts_column",
+  "suppress_default_email_toast",
+  "column_break_qkui"
  ],
  "fields": [
-  {
-   "fieldname": "issues_sb",
-   "fieldtype": "Section Break",
-   "label": "Issues"
-  },
-  {
-   "default": "7",
-   "fieldname": "close_issue_after_days",
-   "fieldtype": "Int",
-   "label": "Close Issue After Days"
-  },
   {
    "fieldname": "portal_sb",
    "fieldtype": "Section Break",
@@ -189,12 +179,6 @@
    "label": "Suggest Articles in New TIcket Page"
   },
   {
-   "fieldname": "default_ticket_type",
-   "fieldtype": "Link",
-   "label": "Default Ticket Type",
-   "options": "Ticket Type"
-  },
-  {
    "fieldname": "agent_groups_section",
    "fieldtype": "Section Break",
    "label": "Team restrictions"
@@ -215,11 +199,31 @@
    "fieldname": "do_not_restrict_tickets_without_an_agent_group",
    "fieldtype": "Check",
    "label": "Do not restrict tickets without a Team"
+  },
+  {
+   "fieldname": "misc_tab",
+   "fieldtype": "Tab Break",
+   "label": "Misc"
+  },
+  {
+   "fieldname": "toasts_column",
+   "fieldtype": "Column Break",
+   "label": "Toasts"
+  },
+  {
+   "default": "1",
+   "fieldname": "suppress_default_email_toast",
+   "fieldtype": "Check",
+   "label": "Suppress default email toast"
+  },
+  {
+   "fieldname": "column_break_qkui",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-02-24 03:57:23.892702",
+ "modified": "2023-03-06 00:53:55.524007",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
