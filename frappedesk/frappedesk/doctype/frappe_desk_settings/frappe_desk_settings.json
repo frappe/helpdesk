@@ -14,9 +14,6 @@
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
   "column_break_dxlq",
-  "portal_sb",
-  "get_started_sections",
-  "show_latest_forum_posts",
   "forum_sb",
   "forum_url",
   "get_latest_query",
@@ -40,22 +37,6 @@
   "column_break_qkui"
  ],
  "fields": [
-  {
-   "fieldname": "portal_sb",
-   "fieldtype": "Section Break",
-   "label": "Support Portal"
-  },
-  {
-   "fieldname": "get_started_sections",
-   "fieldtype": "Code",
-   "label": "Get Started Sections"
-  },
-  {
-   "default": "0",
-   "fieldname": "show_latest_forum_posts",
-   "fieldtype": "Check",
-   "label": "Show Latest Forum Posts"
-  },
   {
    "depends_on": "show_latest_forum_posts",
    "fieldname": "forum_sb",
@@ -223,7 +204,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-06 00:53:55.524007",
+ "modified": "2023-03-06 00:54:43.478315",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
