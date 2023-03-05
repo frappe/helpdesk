@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import { Dropdown, FeatherIcon } from "frappe-ui";
 import { inject, ref } from "vue";
+import { Dropdown, FeatherIcon } from "frappe-ui";
 
 export default {
 	name: "PresetFilters",

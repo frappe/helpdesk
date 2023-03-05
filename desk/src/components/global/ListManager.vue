@@ -5,10 +5,18 @@
 </template>
 
 <script>
-import { ref, computed, watch, provide, inject, nextTick } from "vue";
+import {
+	ref,
+	computed,
+	watch,
+	provide,
+	inject,
+	nextTick,
+	onMounted,
+} from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { createListResource, createResource } from "frappe-ui";
-import { onMounted } from "vue";
+import { useTableFilterStore } from "@/stores/tableFilter";
 
 export default {
 	name: "ListManager",
@@ -16,7 +24,6 @@ export default {
 	setup(props, context) {
 		const router = useRouter();
 		const route = useRoute();
-
 		const user = inject("user");
 
 		const options = ref({
@@ -47,6 +54,7 @@ export default {
 			},
 			context
 		);
+
 		const list = computed(() => {
 			countResource.fetch({
 				doctype: options.value.doctype,
@@ -54,6 +62,7 @@ export default {
 			});
 			return listResource.list.data || [];
 		});
+
 		const loading = computed(() => {
 			return listResource.list.loading;
 		});
@@ -64,6 +73,7 @@ export default {
 			},
 			context
 		);
+
 		const totalCount = computed(() => {
 			return countResource.data || 0;
 		});
@@ -72,9 +82,11 @@ export default {
 			selectedItems.value = {};
 			listResource.reload();
 		};
+
 		const fetch = () => {
 			listResource.list.fetch();
 		};
+
 		const update = (newOptions = null) => {
 			if (newOptions) {
 				if (newOptions.filters) options.value.filters = newOptions.filters;
@@ -92,12 +104,14 @@ export default {
 			update();
 			fetch();
 		};
+
 		const nextPage = () => {
 			if (currentPageNumber.value == totalPages.value) return;
 			options.value.start += options.value.limit;
 			update();
 			fetch();
 		};
+
 		const previousPage = () => {
 			if (currentPageNumber.value == 1) return;
 			let newStart = options.value.start - options.value.limit;
@@ -106,15 +120,19 @@ export default {
 			update();
 			fetch();
 		};
+
 		const hasNextPage = computed(() => {
 			return options.value.start + options.value.limit < totalCount.value;
 		});
+
 		const hasPreviousPage = computed(() => {
 			return options.value.start > 0;
 		});
+
 		const currentPageNumber = computed(() => {
 			return Math.ceil(options.value.start / options.value.limit) + 1;
 		});
+
 		const totalPages = computed(() => {
 			return Math.ceil(totalCount.value / options.value.limit);
 		});
@@ -163,6 +181,7 @@ export default {
 			];
 			return executableFilter;
 		};
+
 		const addFilters = (sudoFilters, addToUrlQuery) => {
 			if (addToUrlQuery) {
 				let query = {};
@@ -191,6 +210,7 @@ export default {
 				applyFilters(sudoFilters, executableFilters);
 			}
 		};
+
 		const applyFilters = (sudoFilters = [], executableFilters = []) => {
 			if (options.value.saveFiltersLocally) {
 				localStorage.setItem(
@@ -240,6 +260,7 @@ export default {
 				selectedItems.value[rowData.name] = rowData;
 			}
 		};
+
 		const unselect = () => {
 			selectedItems.value = {};
 		};
@@ -257,9 +278,11 @@ export default {
 
 		const selectionMode = ref(0);
 		const selectedItems = ref({});
+
 		watch(selectedItems.value, (newValue) => {
 			context.emit("selection", newValue);
 		});
+
 		const allItemsSelected = computed(() => {
 			if (manager.value.loading) {
 				return false;
@@ -272,6 +295,7 @@ export default {
 				return false;
 			}
 		});
+
 		const itemSelected = (rowData) => {
 			return rowData.name in selectedItems.value;
 		};
@@ -287,6 +311,7 @@ export default {
 					return fieldname.charAt(0).toUpperCase() + fieldname.slice(1);
 			}
 		};
+
 		const convertUrlQueryToFilters = () => {
 			let urlQuery = route.query;
 			let filters = [];
@@ -318,14 +343,11 @@ export default {
 
 		const manager = ref({
 			options,
-
 			list,
 			loading,
 			totalCount,
-
 			reload,
 			update,
-
 			getPage,
 			nextPage,
 			previousPage,
@@ -333,27 +355,22 @@ export default {
 			hasPreviousPage,
 			currentPageNumber,
 			totalPages,
-
 			sudoFilters,
 			addFilters,
-
 			toggleOrderBy,
-
 			onClick,
-
 			select,
 			unselect,
 			selectAll,
-
 			selectionMode,
 			selectedItems,
 			allItemsSelected,
 			itemSelected,
-
 			helperMethods: {
 				convertFieldNameToLabel,
 			},
 		});
+
 		provide("manager", manager);
 
 		onMounted(() => {

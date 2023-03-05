@@ -18,6 +18,7 @@
 		"echarts": "^5.4.1",
 		"frappe-ui": "^0.0.84",
 		"luxon": "^2.3.2",
+		"pinia": "^2.0.32",
 		"vue": "^3.2.26",
 		"vue-echarts": "^6.3.1",
 		"vue-router": "^4.0.12",
