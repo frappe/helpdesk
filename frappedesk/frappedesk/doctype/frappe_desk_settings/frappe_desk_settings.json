@@ -36,7 +36,11 @@
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
-  "suggest_articles_in_new_ticket_page"
+  "suggest_articles_in_new_ticket_page",
+  "misc_tab",
+  "toasts_column",
+  "suppress_default_email_toast",
+  "column_break_qkui"
  ],
  "fields": [
   {
@@ -215,11 +219,31 @@
    "fieldname": "do_not_restrict_tickets_without_an_agent_group",
    "fieldtype": "Check",
    "label": "Do not restrict tickets without a Team"
+  },
+  {
+   "fieldname": "misc_tab",
+   "fieldtype": "Tab Break",
+   "label": "Misc"
+  },
+  {
+   "fieldname": "toasts_column",
+   "fieldtype": "Column Break",
+   "label": "Toasts"
+  },
+  {
+   "default": "1",
+   "fieldname": "suppress_default_email_toast",
+   "fieldtype": "Check",
+   "label": "Suppress default email toast"
+  },
+  {
+   "fieldname": "column_break_qkui",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-02-24 03:57:23.892702",
+ "modified": "2023-03-06 00:33:09.638082",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",

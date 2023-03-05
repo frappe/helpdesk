@@ -193,6 +193,7 @@ export default {
 			}
 			// default email account
 			if (
+				!this.$resources.frappedeskSettings.data.suppress_default_email_toast &&
 				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
 				!this.defaultOutgoingEmailAccountSetup
 			) {
