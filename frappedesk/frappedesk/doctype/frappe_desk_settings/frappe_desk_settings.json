@@ -21,7 +21,13 @@
   "misc_tab",
   "toasts_column",
   "suppress_default_email_toast",
-  "column_break_qkui"
+  "column_break_qkui",
+  "setup_section",
+  "setup_complete",
+  "initial_agent_set",
+  "initial_demo_ticket_created",
+  "initial_helpdesk_name_setup_skipped",
+  "column_break_hjfh"
  ],
  "fields": [
   {
@@ -115,11 +121,44 @@
   {
    "fieldname": "column_break_qkui",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "setup_section",
+   "fieldtype": "Section Break",
+   "label": "Setup"
+  },
+  {
+   "default": "0",
+   "fieldname": "setup_complete",
+   "fieldtype": "Check",
+   "label": "Is setup complete"
+  },
+  {
+   "default": "0",
+   "fieldname": "initial_agent_set",
+   "fieldtype": "Check",
+   "label": "Is initial agent set"
+  },
+  {
+   "default": "0",
+   "fieldname": "initial_demo_ticket_created",
+   "fieldtype": "Check",
+   "label": "Is demo ticket created"
+  },
+  {
+   "default": "0",
+   "fieldname": "initial_helpdesk_name_setup_skipped",
+   "fieldtype": "Check",
+   "label": "Is name setup skipped"
+  },
+  {
+   "fieldname": "column_break_hjfh",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-06 00:55:41.584489",
+ "modified": "2023-03-06 12:03:32.687088",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
