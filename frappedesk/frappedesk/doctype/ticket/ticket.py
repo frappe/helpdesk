@@ -292,7 +292,7 @@ class Ticket(Document):
 			return
 
 		if not self.ticket_type:
-			frappe.throw("Ticket type is mandatory")
+			frappe.throw(_("Ticket type is mandatory"))
 
 
 def set_descritption_from_communication(doc, type):
