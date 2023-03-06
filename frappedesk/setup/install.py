@@ -157,7 +157,9 @@ def add_default_holidy_list():
 			"doctype": "Service Holiday List",
 			"holiday_list_name": "Default",
 			"from_date": datetime.strptime(f"Jan 1 {datetime.now().year}", "%b %d %Y"),
-			"to_date": datetime.strptime(f"Jan 1 {datetime.now().year + 1}", "%b %d %Y"),
+			"to_date": datetime.strptime(
+				f"Jan 1 {datetime.now().year + 1}", "%b %d %Y"
+			),
 		}
 	).insert()
 
@@ -178,6 +180,16 @@ def add_default_ticket_template():
 	template = frappe.new_doc("Ticket Template")
 
 	template.template_name = "Default"
+	template.append(
+		"fields",
+		{
+			"label": "Type",
+			"fieldname": "ticket_type",
+			"fieldtype": "Link",
+			"options": "Ticket Type",
+			"reqd": True,
+		},
+	)
 	template.append(
 		"fields",
 		{"label": "Subject", "fieldname": "subject", "fieldtype": "Data", "reqd": True},
@@ -203,10 +215,6 @@ def add_default_ticket_types():
 			type_doc = frappe.new_doc("Ticket Type")
 			type_doc.name = type
 			type_doc.insert()
-
-	settings = frappe.get_doc("Frappe Desk Settings")
-	settings.default_ticket_type = "Question"
-	settings.save()
 
 
 def add_default_ticket_priorities():
@@ -280,7 +288,12 @@ def add_system_preset_filters():
 						"filter_type": "is",
 						"value": "@me",
 					},
-					{"label": "Status", "fieldname": "status", "filter_type": "is", "value": status},
+					{
+						"label": "Status",
+						"fieldname": "status",
+						"filter_type": "is",
+						"value": status,
+					},
 				],
 			}
 		)

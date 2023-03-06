@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="template"
-		class="flex flex-row mx-auto pt-4 mt-5"
+		class="mx-auto mt-5 flex flex-row pt-4"
 		:class="{
 			'max-w-2xl': !suggestArticles,
 			'max-w-5xl space-x-5': suggestArticles,
@@ -14,7 +14,7 @@
 				'w-full': !suggestArticles,
 			}"
 		>
-			<div class="rounded-lg shadow-md border p-8">
+			<div class="rounded-lg border p-8 shadow-md">
 				<div class="font-medium">
 					{{
 						`New Ticket ${
@@ -24,9 +24,8 @@
 						}`
 					}}
 				</div>
-				<!-- <div v-if="template.about" class="font-normal text-base mb-3">{{ template.about }}</div> -->
 				<div
-					class="text-[13px] text-gray-700 pb-2"
+					class="pb-2 text-[13px] text-gray-700"
 					v-html="template.about"
 				></div>
 				<div class="space-y-4 pb-4">
@@ -34,57 +33,53 @@
 						<div v-if="!field.auto_set">
 							<div v-if="field.fieldtype == 'Data'">
 								<Input
+									v-model="formData[field.fieldname]"
 									:label="field.label"
 									type="text"
-									v-model="formData[field.fieldname]"
 									@input="
 										(data) => {
-											validateField(field, data)
+											validateField(field, data);
 										}
 									"
 								/>
 							</div>
 							<div v-else-if="field.fieldtype == 'Long Text'">
 								<Input
+									v-model="formData[field.fieldname]"
 									:label="field.label"
 									type="textarea"
-									v-model="formData[field.fieldname]"
 									@change="
 										(data) => {
-											validateField(field, data)
+											validateField(field, data);
 										}
 									"
 								/>
 							</div>
 							<div v-else-if="field.fieldtype == 'Text Editor'">
-								<div
-									class="block mb-2 text-sm leading-4 text-gray-700"
-								>
+								<div class="mb-2 block text-sm leading-4 text-gray-700">
 									{{ field.label }}
 								</div>
 								<TextEditor
 									:content="content"
 									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
+									placeholder="Type your text here..."
+									class="rounded-[8px] border border-gray-300"
 									@change="
 										(val) => {
-											validateField(field, val)
+											validateField(field, val);
 										}
 									"
-									placeholder="Type your text here..."
-									class="border border-gray-300 rounded-[8px]"
 								>
 									<template #bottom>
 										<TextEditorFixedMenu
-											class="bg-transparent border-t w-full px-1.5"
+											class="w-full border-t bg-transparent px-1.5"
 											:buttons="textEditorMenuButtons"
 										/>
 									</template>
 								</TextEditor>
 							</div>
 							<div v-else-if="field.fieldtype == 'Link'">
-								<div
-									class="block mb-2 text-sm leading-4 text-gray-700"
-								>
+								<div class="mb-2 block text-sm leading-4 text-gray-700">
 									{{ field.label }}
 								</div>
 								<Dropdown
@@ -94,24 +89,21 @@
 									:dropdown-width-full="true"
 									@change="
 										(data) => {
-											validateField(field, data)
+											validateField(field, data);
 										}
 									"
 								>
-									<template v-slot="{ toggleDropdown }">
+									<template #default="{ toggleDropdown }">
 										<div>
 											<Button @click="toggleDropdown">{{
-												formData[field.fieldname] ||
-												"Select"
+												formData[field.fieldname] || "Select"
 											}}</Button>
 										</div>
 									</template>
 								</Dropdown>
 							</div>
 							<div v-else-if="field.fieldtype == 'Select'">
-								<div
-									class="block mb-2 text-sm leading-4 text-gray-700"
-								>
+								<div class="mb-2 block text-sm leading-4 text-gray-700">
 									{{ field.label }}
 								</div>
 								<Dropdown
@@ -121,15 +113,14 @@
 									:dropdown-width-full="true"
 									@change="
 										(data) => {
-											validateField(field, data)
+											validateField(field, data);
 										}
 									"
 								>
-									<template v-slot="{ toggleDropdown }">
+									<template #default="{ toggleDropdown }">
 										<div>
 											<Button @click="toggleDropdown">{{
-												formData[field.fieldname] ||
-												"Select"
+												formData[field.fieldname] || "Select"
 											}}</Button>
 										</div>
 									</template>
@@ -143,14 +134,12 @@
 						</div>
 					</div>
 				</div>
-				<div
-					class="max-h-[100px] overflow-y-scroll rounded flex flex-col"
-				>
+				<div class="flex max-h-[100px] flex-col overflow-y-scroll rounded">
 					<ul class="flex flex-wrap gap-2 pb-4">
 						<li
-							class="flex items-center p-1 space-x-2 bg-gray-100 border-gray-400 border shadow rounded"
 							v-for="file in attachments"
 							:key="file"
+							class="flex items-center space-x-2 rounded border border-gray-400 bg-gray-100 p-1 shadow"
 							:title="file.name"
 						>
 							<div class="flex flex-row items-center space-x-1">
@@ -159,18 +148,18 @@
 									class="h-[15px] stroke-gray-600"
 								/>
 								<span
-									class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate"
+									class="ml-2 max-w-[100px] truncate text-[12px] font-normal text-gray-700"
 								>
 									{{ file.file_name }}
 								</span>
 							</div>
 							<button
-								class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
+								class="grid h-4 w-4 place-items-center rounded text-gray-700 hover:bg-gray-300"
 								@click="
 									() => {
 										attachments = attachments.filter(
 											(x) => x.name != file.name
-										)
+										);
 									}
 								"
 							>
@@ -179,25 +168,17 @@
 						</li>
 					</ul>
 				</div>
-				<div class="flex space-x-2 mb-1">
+				<div class="mb-1 flex space-x-2">
 					<FileUploader @success="(file) => attachments.push(file)">
-						<template
-							v-slot="{ progress, uploading, openFileSelector }"
-						>
-							<Button
-								@click="openFileSelector"
-								:disabled="uploading"
+						<template #default="{ progress, uploading, openFileSelector }">
+							<Button :disabled="uploading" @click="openFileSelector"
 								>Add Attachment</Button
 							>
 						</template>
 					</FileUploader>
 					<div class="grow"></div>
 					<Button
-						:class="
-							newTicketSubmitLoading
-								? 'cursor-not-allowed disabled'
-								: ''
-						"
+						:class="newTicketSubmitLoading ? 'cursor-not-allowed disabled' : ''"
 						@click="cancel()"
 						>Cancel</Button
 					>
@@ -210,13 +191,14 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="suggestArticles" class="w-full px-5 border-l">
+		<div v-if="suggestArticles" class="w-full border-l px-5">
 			<ArticleSuggestions :query="formData.subject || ''" />
 		</div>
 	</div>
 </template>
+
 <script>
-import { inject, ref } from "vue"
+import { inject, ref } from "vue";
 import {
 	Input,
 	TextEditor,
@@ -225,14 +207,13 @@ import {
 	ErrorMessage,
 	FileUploader,
 	FeatherIcon,
-} from "frappe-ui"
-import { call } from "frappe-ui"
-import ArticleSuggestions from "@/components/global/kb/ArticleSuggestions.vue"
-import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
+} from "frappe-ui";
+import { call } from "frappe-ui";
+import ArticleSuggestions from "@/components/global/kb/ArticleSuggestions.vue";
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
 
 export default {
 	name: "NewTicket",
-	props: ["templateId"],
 	components: {
 		Input,
 		TextEditor,
@@ -244,18 +225,19 @@ export default {
 		ArticleSuggestions,
 		TextEditorFixedMenu,
 	},
+	props: ["templateId"],
 	setup() {
-		const user = inject("user")
-		const ticketTemplates = inject("ticketTemplates")
-		const ticketController = inject("ticketController")
+		const user = inject("user");
+		const ticketTemplates = inject("ticketTemplates");
+		const ticketController = inject("ticketController");
 
-		const formData = ref({})
-		const linkedFieldOptions = ref({})
-		const newTicketSubmitLoading = ref(false)
+		const formData = ref({});
+		const linkedFieldOptions = ref({});
+		const newTicketSubmitLoading = ref(false);
 
-		const validationErrors = ref({})
+		const validationErrors = ref({});
 
-		const attachments = ref([])
+		const attachments = ref([]);
 
 		return {
 			user,
@@ -266,19 +248,13 @@ export default {
 			newTicketSubmitLoading,
 			validationErrors,
 			attachments,
-		}
+		};
 	},
 	computed: {
 		textEditorMenuButtons() {
 			return [
 				"Paragraph",
-				[
-					"Heading 2",
-					"Heading 3",
-					"Heading 4",
-					"Heading 5",
-					"Heading 6",
-				],
+				["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
 				"Separator",
 				"Bold",
 				"Italic",
@@ -310,32 +286,30 @@ export default {
 					"ToggleHeaderCell",
 					"DeleteTable",
 				],
-			]
+			];
 		},
 		fdSettings() {
-			return this.$resources.fdSettings.doc || null
+			return this.$resources.fdSettings.doc || null;
 		},
 		suggestArticles() {
-			return this.fdSettings?.suggest_articles_in_new_ticket_page || null
+			return this.fdSettings?.suggest_articles_in_new_ticket_page || null;
 		},
 		template() {
-			const templateRoutes = this.ticketTemplates.map(
-				(x) => x.template_route
-			)
+			const templateRoutes = this.ticketTemplates.map((x) => x.template_route);
 			if (templateRoutes.length > 0) {
 				if (!templateRoutes.includes(this.templateId)) {
-					this.$router.push({ name: "DefaultNewTicket" })
+					this.$router.push({ name: "DefaultNewTicket" });
 					const template = this.ticketTemplates.filter(
 						(x) => x.template_route == "default"
-					)[0]
-					this.setLinkedFieldOptions(template)
-					return template
+					)[0];
+					this.setLinkedFieldOptions(template);
+					return template;
 				} else {
 					const template = this.ticketTemplates.filter(
 						(x) => x.template_route == this.templateId
-					)[0]
-					this.setLinkedFieldOptions(template)
-					return template
+					)[0];
+					this.setLinkedFieldOptions(template);
+					return template;
 				}
 			}
 		},
@@ -346,138 +320,124 @@ export default {
 				type: "document",
 				doctype: "Frappe Desk Settings",
 				name: "Frappe Desk Settings",
-			}
+			};
 		},
 	},
 	methods: {
 		focusEditor(field) {
 			const element = document.getElementsByClassName(
 				`text-editor-${field.fieldname}`
-			)
-			element[0].getElementsByClassName("ql-editor")[0].focus()
+			);
+			element[0].getElementsByClassName("ql-editor")[0].focus();
 		},
 		submitTicket() {
-			this.setAutoSetFields()
+			this.setAutoSetFields();
 			if (this.validateTicketForm()) {
 				this.newTicketSubmitLoading = this.ticketController.newTicket(
 					this.formData,
 					this.template.name,
 					this.attachments.map((x) => x.name)
-				)
+				);
 			}
 		},
 		setAutoSetFields() {
 			if (this.template.fields) {
 				this.template.fields.forEach((field) => {
-					if (
-						field.auto_set &&
-						field.auto_set_via === "Frontend (JS)"
-					) {
-						const foo = new Function(field.value_frontend)
-						const value = foo()
-						this.formData[field.fieldname] = value || "None"
+					if (field.auto_set && field.auto_set_via === "Frontend (JS)") {
+						const foo = new Function(field.value_frontend);
+						const value = foo();
+						this.formData[field.fieldname] = value || "None";
 					}
-				})
+				});
 			}
 		},
 		validateTicketForm() {
-			let errors = []
+			let errors = [];
 			for (let index in this.template.fields) {
-				let field = this.template.fields[index]
-				this.validateField(
-					field,
-					this.formData[field.fieldname] || null
-				)
+				let field = this.template.fields[index];
+				this.validateField(field, this.formData[field.fieldname] || null);
 				if (this.validationErrors[field.fieldname]) {
-					errors.push(this.validationErrors[field.fieldname])
+					errors.push(this.validationErrors[field.fieldname]);
 				}
 			}
 			if (errors.length > 0) {
-				return false
+				return false;
 			}
-			return true
+			return true;
 		},
 		validateField(field, data) {
-			let fieldname = field.fieldname
-			let label = field.label
+			let fieldname = field.fieldname;
+			let label = field.label;
 
-			this.validationErrors[fieldname] = null
+			this.validationErrors[fieldname] = null;
 			if (field.reqd) {
 				if (!data) {
-					this.validationErrors[
-						fieldname
-					] = `${label} is a mandatory field`
+					this.validationErrors[fieldname] = `${label} is a mandatory field`;
 				} else if (field.fieldtype == "Text Editor") {
-					if (
-						["<p><br></p>", "<p></p>"].includes(
-							data.replaceAll(" ", "")
-						)
-					) {
-						this.validationErrors[
-							fieldname
-						] = `${label} is a mandatory field`
+					if (["<p><br></p>", "<p></p>"].includes(data.replaceAll(" ", ""))) {
+						this.validationErrors[fieldname] = `${label} is a mandatory field`;
 					}
 				}
 			}
-			this.formData[fieldname] = data
+			this.formData[fieldname] = data;
 		},
 		setLinkedFieldOptions(template) {
 			for (let index in template.fields) {
-				let field = template.fields[index]
+				let field = template.fields[index];
 				if (field.fieldtype == "Link") {
-					this.setLinkOptions(field)
+					this.setLinkOptions(field);
 				}
 			}
 		},
 		getSelectFieldOptions(field) {
-			let items = []
+			let items = [];
 			field.options.split("\n").forEach((option) => {
 				items.push({
 					label: option,
 					handler: () => {
-						this.formData[field.fieldname] = option
+						this.formData[field.fieldname] = option;
 					},
-				})
-			})
-			return items
+				});
+			});
+			return items;
 		},
 		async setLinkOptions(field) {
-			let doctype = field.options
+			let doctype = field.options;
 			if (doctype) {
-				let items = []
-				let list = []
+				let items = [];
+				let list = [];
 				switch (field.filter_using) {
 					case "API Response":
-						list = await call(field.api_method)
-						break
+						list = await call(field.api_method);
+						break;
 					case "frappe.get_list()":
 						list = (
 							await call("frappe.client.get_list", {
 								doctype,
 								filters: field.filters,
 							})
-						).map((x) => x.name)
-						break
+						).map((x) => x.name);
+						break;
 				}
 				list.forEach((doc) => {
 					items.push({
 						label: doc,
 						handler: () => {
-							this.formData[field.fieldname] = doc
+							this.formData[field.fieldname] = doc;
 						},
-					})
-				})
-				this.linkedFieldOptions[doctype] = items
+					});
+				});
+				this.linkedFieldOptions[doctype] = items;
 			}
-			return null
+			return null;
 		},
 		cancel() {
 			this.$router.push({
 				name: "ProtalTickets",
-			})
+			});
 		},
 	},
-}
+};
 </script>
 <style>
 .ql-editor.read-mode {

@@ -10,6 +10,10 @@
   "allow_resetting_service_level_agreement",
   "column_break_4",
   "helpdesk_name",
+  "ticket_type_section",
+  "default_ticket_type",
+  "is_ticket_type_mandatory",
+  "column_break_zxek",
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
@@ -83,7 +87,7 @@
   {
    "fieldname": "agent_groups_section",
    "fieldtype": "Section Break",
-   "label": "Team restrictions"
+   "label": "Team Restrictions"
   },
   {
    "default": "0",
@@ -154,11 +158,32 @@
   {
    "fieldname": "column_break_hjfh",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ticket_type_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Type"
+  },
+  {
+   "fieldname": "default_ticket_type",
+   "fieldtype": "Link",
+   "label": "Default ticket type",
+   "options": "Ticket Type"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_ticket_type_mandatory",
+   "fieldtype": "Check",
+   "label": "Ticket type is mandatory"
+  },
+  {
+   "fieldname": "column_break_zxek",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-06 12:03:32.687088",
+ "modified": "2023-03-06 17:05:10.302469",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
