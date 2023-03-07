@@ -96,10 +96,7 @@ class Ticket(Document):
 		self.set_contact(self.raised_by)
 
 	def before_insert(self):
-		if not self.ticket_type:
-			self.ticket_type = frappe.get_doc(
-				"Frappe Desk Settings"
-			).default_ticket_type
+		self.verify_ticket_type()
 		self.update_priority_based_on_ticket_type()
 
 	def after_insert(self):
@@ -283,6 +280,19 @@ class Ticket(Document):
 		activities = frappe.db.get_all("Ticket Activity", {"Ticket": self.name})
 		for activity in activities:
 			frappe.db.delete("Ticket Activity", activity)
+
+	def verify_ticket_type(self):
+		if self.ticket_type:
+			return
+
+		settings = frappe.get_doc("Frappe Desk Settings")
+		self.ticket_type = settings.default_ticket_type
+
+		if not settings.is_ticket_type_mandatory:
+			return
+
+		if not self.ticket_type:
+			frappe.throw(_("Ticket type is mandatory"))
 
 
 def set_descritption_from_communication(doc, type):
