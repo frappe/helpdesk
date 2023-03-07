@@ -187,7 +187,7 @@ def add_default_ticket_template():
 			"fieldname": "ticket_type",
 			"fieldtype": "Link",
 			"options": "Ticket Type",
-			"reqd": True,
+			"reqd": False,
 		},
 	)
 	template.append(

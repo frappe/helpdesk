@@ -151,7 +151,12 @@ export default {
 					})
 				},
 				onError: (error) => {
-					console.log(`create ticket error : ${error}`)
+					this.$toast({
+						title: "Error while creating ticket",
+						text: error.messages.join(' '),
+						customIcon: "circle-fail",
+						appearance: "danger",
+					})
 				},
 			}
 		},

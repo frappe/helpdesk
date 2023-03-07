@@ -13,7 +13,7 @@ def execute():
 			"fieldname": "ticket_type",
 			"fieldtype": "Link",
 			"options": "Ticket Type",
-			"reqd": True,
+			"reqd": False,
 		},
 	)
 
