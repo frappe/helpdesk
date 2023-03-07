@@ -1,7 +1,7 @@
-import { h, reactive, ref } from "vue"
-import Toast from "@/components/global/Toast.vue"
+import { h, reactive, ref } from "vue";
+import Toast from "@/components/global/Toast.vue";
 
-let toasts = ref([])
+let toasts = ref([]);
 
 export let Toasts = {
 	name: "Toasts",
@@ -12,12 +12,13 @@ export let Toasts = {
 				modelValue: toast.show,
 				"onUpdate:modelValue": (val) => (toast.show = val),
 			})
-		)
+		);
 	},
-}
+};
 export function clearToasts() {
-	const root = document.getElementById("frappeui-toast-root")
-	root.innerHTML = ""
+	const root = document.getElementById("frappeui-toast-root");
+	if (!root) return;
+	root.innerHTML = "";
 }
 
 export function createToast(options) {
@@ -25,9 +26,9 @@ export function createToast(options) {
 		key: "toast-" + toasts.value.length,
 		show: false,
 		...options,
-	})
+	});
 	setTimeout(() => {
-		toast.show = true
-	}, 0)
-	toasts.value.push(toast)
+		toast.show = true;
+	}, 0);
+	toasts.value.push(toast);
 }
