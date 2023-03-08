@@ -32,7 +32,9 @@ def insert_new_update_existing_categories(new_values, old_values):
 
 	# validate and delete missing categories
 	for category in to_archive:
-		if frappe.db.exists("Category", {"name": category, "parent_category": category}):
+		if frappe.db.exists(
+			"Category", {"name": category, "parent_category": category}
+		):
 			raise Exception("Cannot archive category with subcategories")
 		elif frappe.db.exists("Article", {"category": category}):
 			raise Exception("Cannot archive category with articles")
@@ -155,7 +157,11 @@ def search(text, limit=999):
 		)
 	for category in categories:
 		results.append(
-			{"doctype": "Category", "name": category.name, "title": category.category_name,}
+			{
+				"doctype": "Category",
+				"name": category.name,
+				"title": category.category_name,
+			}
 		)
 
 	return results
@@ -169,7 +175,10 @@ def submit_article_feedback(article, score, previous_score=None):
 		if user != "Guest":
 			user_article_feedback = frappe.get_value(
 				doctype="User Article Feedback",
-				filters={"article": article, "user": user,},
+				filters={
+					"article": article,
+					"user": user,
+				},
 				fieldname="name",
 			)
 			if user_article_feedback:
@@ -224,26 +233,42 @@ def get_article(article):
 
 @frappe.whitelist(allow_guest=True)
 def get_articles(
-	filters, fields, limit=20, order_by="idx",
+	filters,
+	limit=20,
+	order_by="idx",
 ):
-	return frappe.get_list(
-		"Article", filters=filters, fields=fields, limit=limit, order_by=order_by,
+	articles = frappe.get_list(
+		"Article",
+		filters=filters,
+		limit=limit,
+		order_by=order_by,
 	)
+
+	return [frappe.get_doc("Article", article.name) for article in articles]
 
 
 @frappe.whitelist(allow_guest=True)
 def get_categories(
-	filters, fields, limit=20, order_by="idx",
+	filters,
+	fields,
+	limit=20,
+	order_by="idx",
 ):
 	return frappe.get_list(
-		"Category", filters=filters, fields=fields, limit=limit, order_by=order_by,
+		"Category",
+		filters=filters,
+		fields=fields,
+		limit=limit,
+		order_by=order_by,
 	)
 
 
 @frappe.whitelist(allow_guest=True)
 def get_articles_in_ticket(title=None):
 	if title == None:
-		article_list = frappe.db.get_list("Article", fields=["name", "title", "content"])
+		article_list = frappe.db.get_list(
+			"Article", fields=["name", "title", "content"]
+		)
 	else:
 		article_list = frappe.db.get_list(
 			"Article",
