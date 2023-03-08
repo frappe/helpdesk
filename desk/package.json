@@ -12,7 +12,7 @@
 	"dependencies": {
 		"@headlessui/vue": "^1.7.12",
 		"@tailwindcss/line-clamp": "^0.4.2",
-		"@vitejs/plugin-vue": "^2.3.3",
+		"@vitejs/plugin-vue": "^4.0.0",
 		"@vuepic/vue-datepicker": "^3.6.3",
 		"dayjs": "^1.11.7",
 		"echarts": "^5.4.1",
@@ -23,11 +23,10 @@
 		"vuedraggable": "^4.1.0"
 	},
 	"devDependencies": {
-		"@vitejs/plugin-vue": "^2.3.3",
 		"autoprefixer": "^10.4.13",
 		"postcss": "^8.4.21",
 		"tailwindcss": "^3.2.7",
-		"vite": "^2.0.5",
+		"vite": "^4.1.4",
 		"vue-template-compiler": "^2.7.14"
 	}
 }
