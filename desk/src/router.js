@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from "vue-router"
-import { call } from "frappe-ui"
+import { createRouter, createWebHistory } from "vue-router";
+import { call } from "frappe-ui";
 
 const routes = [
 	{
@@ -44,7 +44,7 @@ const routes = [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/dashboard" }
+					return { path: "/frappedesk/dashboard" };
 				},
 			},
 			{
@@ -72,7 +72,7 @@ const routes = [
 							{
 								label: route.params.ticketId,
 							},
-						]
+						];
 					},
 				},
 			},
@@ -84,8 +84,8 @@ const routes = [
 					{
 						path: "",
 						name: "DeskKBHome",
-						component: () =>
-							import("@/pages/common/kb/Category.vue"), // shows root categories and faqs
+						// shows root categories and faqs
+						component: () => import("@/pages/common/kb/Category.vue"), 
 						meta: {
 							editable: true,
 							isRoot: true,
@@ -93,9 +93,11 @@ const routes = [
 					},
 					{
 						path: "categories/:categoryId",
-						name: "DeskKBCategory", // Category Page
+						// Category Page
+						name: "DeskKBCategory",
 						component: () =>
-							import("@/pages/common/kb/Category.vue"), // shows sub categories and articles
+							// shows sub categories and articles
+							import("@/pages/common/kb/Category.vue"),
 						props: true,
 						meta: {
 							editable: true,
@@ -104,13 +106,16 @@ const routes = [
 					{
 						path: "articles",
 						name: "DeskKBArticles",
-						component: () => import("@/pages/desk/kb/Articles.vue"), // Articles.vue - shows all articles
+						// Articles.vue - shows all articles
+						component: () => import("@/pages/desk/kb/Articles.vue"),
 					},
 					{
 						path: "articles/:articleId",
-						name: "DeskKBArticle", // Article Edit page
+						// Article Edit page
+						name: "DeskKBArticle",
 						component: () =>
-							import("@/pages/common/kb/Article.vue"), // Article.vue - article edit page
+							// Article.vue - article edit page
+							import("@/pages/common/kb/Article.vue"),
 						props: true,
 						meta: {
 							editable: true,
@@ -118,9 +123,11 @@ const routes = [
 					},
 					{
 						path: "articles/new",
-						name: "DeskKBArticleNew", // Article Edit page
+						// Article Edit page
+						name: "DeskKBArticleNew",
 						component: () =>
-							import("@/pages/common/kb/Article.vue"), // Article.vue - article edit page
+							// Article.vue - article edit page
+							import("@/pages/common/kb/Article.vue"),
 						props: true,
 						meta: {
 							editable: true,
@@ -161,7 +168,7 @@ const routes = [
 							{
 								label: route.params.contactId,
 							},
-						]
+						];
 					},
 				},
 			},
@@ -173,65 +180,54 @@ const routes = [
 					{
 						path: "",
 						redirect: () => {
-							return { path: "/frappedesk/settings/agents" }
+							return { path: "/frappedesk/settings/agents" };
 						},
 					},
 					{
 						path: "agents",
 						name: "Agents",
-						component: () =>
-							import("@/pages/desk/settings/agent/Agents.vue"),
+						component: () => import("@/pages/desk/settings/agent/Agents.vue"),
 					},
 					{
 						path: "agents/:agentId",
 						name: "Agent",
-						component: () =>
-							import("@/pages/desk/settings/agent/Agent.vue"),
+						component: () => import("@/pages/desk/settings/agent/Agent.vue"),
 						props: true,
 					},
 					{
 						path: "teams",
 						name: "Teams",
-						component: () =>
-							import("@/pages/desk/settings/team/Teams.vue"),
+						component: () => import("@/pages/desk/settings/team/Teams.vue"),
 					},
 					{
 						path: "teams/:teamId",
 						name: "Team",
-						component: () =>
-							import("@/pages/desk/settings/team/Team.vue"),
+						component: () => import("@/pages/desk/settings/team/Team.vue"),
 						props: true,
 					},
 					{
 						path: "teams/new",
 						name: "NewTeam",
-						component: () =>
-							import("@/pages/desk/settings/team/Team.vue"),
+						component: () => import("@/pages/desk/settings/team/Team.vue"),
 					},
 					{
 						path: "ticket_types",
 						name: "TicketTypes",
 						component: () =>
-							import(
-								"@/pages/desk/settings/ticket_type/TicketTypes.vue"
-							),
+							import("@/pages/desk/settings/ticket_type/TicketTypes.vue"),
 					},
 					{
 						path: "ticket_types/:ticketTypeId",
 						name: "TicketType",
 						component: () =>
-							import(
-								"@/pages/desk/settings/ticket_type/TicketType.vue"
-							),
+							import("@/pages/desk/settings/ticket_type/TicketType.vue"),
 						props: true,
 					},
 					{
 						path: "ticket_types/new",
 						name: "NewTicketType",
 						component: () =>
-							import(
-								"@/pages/desk/settings/ticket_type/TicketType.vue"
-							),
+							import("@/pages/desk/settings/ticket_type/TicketType.vue"),
 					},
 					{
 						path: "sla",
@@ -242,14 +238,12 @@ const routes = [
 					{
 						path: "sla/new",
 						name: "NewSlaPolicy",
-						component: () =>
-							import("@/pages/desk/settings/sla/SlaPolicy.vue"),
+						component: () => import("@/pages/desk/settings/sla/SlaPolicy.vue"),
 					},
 					{
 						path: "sla/:slaId",
 						name: "SlaPolicy",
-						component: () =>
-							import("@/pages/desk/settings/sla/SlaPolicy.vue"),
+						component: () => import("@/pages/desk/settings/sla/SlaPolicy.vue"),
 						props: true,
 					},
 					{
@@ -272,24 +266,19 @@ const routes = [
 					{
 						path: "emails",
 						name: "Emails",
-						component: () =>
-							import("@/pages/desk/settings/email/Emails.vue"),
+						component: () => import("@/pages/desk/settings/email/Emails.vue"),
 					},
 					{
 						path: "emails/new",
 						name: "NewEmailAccount",
 						component: () =>
-							import(
-								"@/pages/desk/settings/email/EmailAccount.vue"
-							),
+							import("@/pages/desk/settings/email/EmailAccount.vue"),
 					},
 					{
 						path: "emails/:emailAccountId",
 						name: "EmailAccount",
 						component: () =>
-							import(
-								"@/pages/desk/settings/email/EmailAccount.vue"
-							),
+							import("@/pages/desk/settings/email/EmailAccount.vue"),
 						props: true,
 					},
 				],
@@ -304,46 +293,40 @@ const routes = [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/tickets" }
+					return { path: "/frappedesk/tickets" };
 				},
 			},
 			{
 				path: "tickets",
 				name: "Ticketing",
-				component: () =>
-					import("@/pages/portal/ticketing/Ticketing.vue"),
+				component: () => import("@/pages/portal/ticketing/Ticketing.vue"),
 				children: [
 					{
 						path: "",
 						name: "ProtalTickets",
-						component: () =>
-							import("@/pages/portal/ticketing/Tickets.vue"),
+						component: () => import("@/pages/portal/ticketing/Tickets.vue"),
 					},
 					{
 						path: ":ticketId",
 						name: "PortalTicket",
-						component: () =>
-							import("@/pages/portal/ticketing/Ticket.vue"),
+						component: () => import("@/pages/portal/ticketing/Ticket.vue"),
 						props: true,
 					},
 					{
 						path: "new/:templateId",
 						name: "TemplatedNewTicket",
-						component: () =>
-							import("@/pages/portal/ticketing/NewTicket.vue"),
+						component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
 						props: true,
 					},
 					{
 						path: "new",
 						name: "DefaultNewTicket",
-						component: () =>
-							import("@/pages/portal/ticketing/NewTicket.vue"),
+						component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
 					},
 					{
 						path: "impersonate",
 						name: "Impersonate",
-						component: () =>
-							import("@/pages/portal/ticketing/Impersonate.vue"),
+						component: () => import("@/pages/portal/ticketing/Impersonate.vue"),
 					},
 				],
 			},
@@ -356,7 +339,8 @@ const routes = [
 						path: "",
 						name: "PortalKBHome",
 						component: () =>
-							import("@/pages/common/kb/Category.vue"), // shows root categories and faqs
+							// shows root categories and faqs
+							import("@/pages/common/kb/Category.vue"),
 						meta: {
 							editable: false,
 							isRoot: true,
@@ -366,17 +350,17 @@ const routes = [
 						path: "categories/:categoryId",
 						name: "PortalKBCategory", // Category Page
 						component: () =>
-							import("@/pages/common/kb/Category.vue"), // shows sub categories and articles
+							// shows sub categories and articles
+							import("@/pages/common/kb/Category.vue"),
 						props: true,
 						meta: {
 							editable: false,
 						},
 					},
 					{
-						path: "articles/:articleId",
+						path: "articles/:articleId/:articleTitleSlug",
 						name: "PortalKBArticle",
-						component: () =>
-							import("@/pages/common/kb/Article.vue"),
+						component: () => import("@/pages/common/kb/Article.vue"),
 						props: true,
 						meta: {
 							editable: false,
@@ -386,12 +370,12 @@ const routes = [
 			},
 		],
 	},
-]
+];
 
 let router = createRouter({
 	history: createWebHistory("/"),
 	routes,
-})
+});
 
 router.beforeEach(async (to, from) => {
 	// go to article page only if the article is published
@@ -399,14 +383,14 @@ router.beforeEach(async (to, from) => {
 		const articleIsPublished = await call(
 			"frappedesk.api.kb.check_if_article_is_published",
 			{ article_name: to.params.articleId }
-		)
+		);
 		if (!articleIsPublished) {
-			console.log(to.params.articleId, " is not available")
-			return { name: "PortalKBHome" }
+			console.log(to.params.articleId, " is not available");
+			return { name: "PortalKBHome" };
 		}
 	}
 
-	return true
-})
+	return true;
+});
 
-export default router
+export default router;
