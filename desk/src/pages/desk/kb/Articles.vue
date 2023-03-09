@@ -242,9 +242,6 @@ export default {
 			if (this.activeTab == "Webview") {
 				this.$router.push({ path: "/frappedesk/kb" })
 			}
-			return {
-				auto: true,
-			}
 		},
 	},
 }
