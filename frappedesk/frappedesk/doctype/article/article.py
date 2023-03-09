@@ -20,12 +20,25 @@ class Article(Document):
 		if self.status == "Archived" and self.category != None:
 			self.category = None
 
-		# index is only set if its not set already, this allows defining index at the time of creation itself
-		# if not set the index is set to the last index + 1, i.e. the article is added at the end
+		# index is only set if its not set already, this allows defining index
+		# at the time of creation itself if not set the index is set to the
+		# last index + 1, i.e. the article is added at the end
 		if self.status == "Published" and self.idx == -1:
 			self.idx = cint(
-				frappe.db.count("Article", {"category": self.category}, {"status": "Published"})
+				frappe.db.count(
+					"Article", {"category": self.category}, {"status": "Published"}
+				)
 			)
+
+	@property
+	def title_slug(self) -> str:
+		"""
+		Generate slug from article title.
+		Example: "Introduction to Frappe Helpdesk" -> "introduction-to-frappe-helpdesk"
+
+		:return: Generated slug
+		"""
+		return self.title.lower().replace(" ", "-")
 
 	def get_breadcrumbs(self):
 		breadcrumbs = [{"name": self.name, "label": self.title}]
@@ -34,7 +47,9 @@ class Article(Document):
 			{"name": current_category.name, "label": current_category.category_name}
 		)
 		while current_category.parent_category:
-			current_category = frappe.get_doc("Category", current_category.parent_category)
+			current_category = frappe.get_doc(
+				"Category", current_category.parent_category
+			)
 			breadcrumbs.append(
 				{"name": current_category.name, "label": current_category.category_name}
 			)

@@ -32,7 +32,7 @@
 								$router.push({
 									path: `/${
 										$route.meta.editable ? 'frappedesk' : 'support'
-									}/kb/articles/${element.name}`,
+									}/kb/articles/${element.name}/${element.title_slug}`,
 								});
 							}
 						"
@@ -137,14 +137,12 @@ export default {
 	resources: {
 		articles() {
 			const filters = { category: this.categoryId, status: "Published" };
-			const fields = ["name", "title", "idx", "status"];
 
 			return {
 				cache: ["Articles", this.categoryId, "published"],
 				url: "frappedesk.api.kb.get_articles",
 				params: {
 					filters,
-					fields,
 					limit: 999,
 					order_by: "idx",
 				},
