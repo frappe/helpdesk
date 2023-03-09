@@ -5,10 +5,17 @@
 </template>
 
 <script>
-import { ref, computed, watch, provide, inject, nextTick } from "vue";
+import {
+	ref,
+	computed,
+	watch,
+	provide,
+	inject,
+	nextTick,
+	onMounted,
+} from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { createListResource, createResource } from "frappe-ui";
-import { onMounted } from "vue";
 
 export default {
 	name: "ListManager",
@@ -27,23 +34,26 @@ export default {
 			fields: [...new Set([...(props.options.fields || []), "name"])],
 			doctype: props.options.doctype,
 			filters: props.options.filters || [],
-			limit: props.options.limit || 20,
+			pageLength: props.options.limit || 20,
 			start: 0,
-			order_by: props.options.order_by || "",
+			orderBy: props.options.order_by || "",
+			debug: true,
 		});
 
 		const listResource = createListResource(
 			{
 				type: "list",
 				url: "frappedesk.extends.client.get_list",
-				cache: options.value.cache,
+				cache: false,
 				doctype: options.value.doctype,
 				fields: options.value.fields,
-				order_by: options.value.order_by,
+				orderBy: options.value.orderBy,
 				filters: options.value.filters,
-				limit: options.value.limit,
+				pageLength: options.value.pageLength,
 				start: options.value.start,
 				realtime: true,
+				pageLength: 3,
+				debug: true,
 			},
 			context
 		);
@@ -78,7 +88,7 @@ export default {
 		const update = (newOptions = null) => {
 			if (newOptions) {
 				if (newOptions.filters) options.value.filters = newOptions.filters;
-				if (newOptions.order_by) options.value.order_by = newOptions.order_by;
+				if (newOptions.orderBy) options.value.orderBy = newOptions.orderBy;
 			}
 
 			listResource.update({
@@ -88,35 +98,35 @@ export default {
 
 		const getPage = (page) => {
 			if (page < 0 || page > totalPages.value) return;
-			options.value.start = (page - 1) * options.value.limit;
+			options.value.start = (page - 1) * options.value.pageLength;
 			update();
 			fetch();
 		};
 		const nextPage = () => {
 			if (currentPageNumber.value == totalPages.value) return;
-			options.value.start += options.value.limit;
+			options.value.start += options.value.pageLength;
 			update();
 			fetch();
 		};
 		const previousPage = () => {
 			if (currentPageNumber.value == 1) return;
-			let newStart = options.value.start - options.value.limit;
+			let newStart = options.value.start - options.value.pageLength;
 			if (newStart < 0) newStart = 0;
 			options.value.start = newStart;
 			update();
 			fetch();
 		};
 		const hasNextPage = computed(() => {
-			return options.value.start + options.value.limit < totalCount.value;
+			return options.value.start + options.value.pageLength < totalCount.value;
 		});
 		const hasPreviousPage = computed(() => {
 			return options.value.start > 0;
 		});
 		const currentPageNumber = computed(() => {
-			return Math.ceil(options.value.start / options.value.limit) + 1;
+			return Math.ceil(options.value.start / options.value.pageLength) + 1;
 		});
 		const totalPages = computed(() => {
-			return Math.ceil(totalCount.value / options.value.limit);
+			return Math.ceil(totalCount.value / options.value.pageLength);
 		});
 
 		const sudoFilters = ref([]);
@@ -205,7 +215,7 @@ export default {
 
 		const toggleOrderBy = (field) => {
 			let newOrderBy = `${field} desc`;
-			const oldOrderBy = options.value?.order_by;
+			const oldOrderBy = options.value?.orderBy;
 			if (oldOrderBy) {
 				if (oldOrderBy.split(" ")[0] === newOrderBy.split(" ")[0]) {
 					newOrderBy = `${field} ${
@@ -213,7 +223,7 @@ export default {
 					}`;
 				}
 			}
-			update({ order_by: newOrderBy });
+			update({ orderBy: newOrderBy });
 			reload();
 		};
 

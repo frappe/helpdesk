@@ -68,7 +68,7 @@
 							},
 						},
 					}"
-					class="text-base h-[calc(100vh-5.5rem)] pt-4"
+					class="text-base pt-4"
 					@add-item="
 						() => {
 							showNewTicketDialog = true
