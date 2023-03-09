@@ -245,7 +245,7 @@ export default {
 	},
 	resources: {
 		incrementArtileViews: {
-			method: "frappedesk.api.kb.increment_article_views",
+			url: "frappedesk.api.kb.increment_article_views",
 		},
 		article() {
 			if (!this.isNew) {
@@ -274,7 +274,7 @@ export default {
 					}
 				} else {
 					return {
-						method: "frappedesk.api.kb.get_article",
+						url: "frappedesk.api.kb.get_article",
 						params: {
 							article: this.articleId,
 						},
@@ -287,7 +287,7 @@ export default {
 		},
 		newArticle() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: (doc) => {
 					this.$router.push(`/frappedesk/kb/articles/${doc.name}`)
 				},
@@ -303,7 +303,7 @@ export default {
 		},
 		checkIfTitleExists() {
 			return {
-				method: "frappedesk.api.kb.check_if_article_title_exists",
+				url: "frappedesk.api.kb.check_if_article_title_exists",
 				onSuccess: (exists) => {
 					if (exists) {
 						this.articleInputErrors.title =

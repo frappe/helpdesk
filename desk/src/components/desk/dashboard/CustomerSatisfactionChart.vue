@@ -78,7 +78,7 @@ export default {
 	resources: {
 		getFeedbackStatusCount() {
 			return {
-				method: "frappedesk.api.dashboard.feedback_status",
+				url: "frappedesk.api.dashboard.feedback_status",
 				params: {
 					dateFilter: [
 						"creation",

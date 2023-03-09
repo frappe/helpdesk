@@ -60,7 +60,7 @@ export default {
 	resources: {
 		user() {
 			return {
-				method: "frappe.client.get",
+				url: "frappe.client.get",
 				params: {
 					doctype: "User",
 					name: this.comment?.commented_by,

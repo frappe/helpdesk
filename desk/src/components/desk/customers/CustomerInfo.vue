@@ -408,7 +408,7 @@ export default {
 		},
 		renameCustomerDoc() {
 			return {
-				method: "frappe.client.rename_doc",
+				url: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
 						path: `/frappedesk/customers/${res}`,
@@ -418,7 +418,7 @@ export default {
 		},
 		contact() {
 			return {
-				method: "frappedesk.api.fdCustomer.get_contact",
+				url: "frappedesk.api.fdCustomer.get_contact",
 				params: {
 					doctype: "Contact",
 					link_name: this.customer,

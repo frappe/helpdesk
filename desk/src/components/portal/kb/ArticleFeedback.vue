@@ -97,7 +97,7 @@ export default {
 				return
 			}
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "User Article Feedback",
 					filters: {
@@ -111,7 +111,7 @@ export default {
 		},
 		submitArticleFeedback() {
 			return {
-				method: "frappedesk.api.kb.submit_article_feedback",
+				url: "frappedesk.api.kb.submit_article_feedback",
 				onSuccess: (res) => {
 					// TODO: show thank you message
 				},

@@ -118,7 +118,7 @@ export default {
 	resources: {
 		ticketStatus() {
 			return {
-				method: "frappedesk.api.dashboard.ticket_summary",
+				url: "frappedesk.api.dashboard.ticket_summary",
 				params: {
 					startDate: this.fromDate,
 					endDate: this.toDate,

@@ -368,7 +368,7 @@ export default {
 	resources: {
 		fdeskVersion() {
 			return {
-				method: "frappe.utils.change_log.get_versions",
+				url: "frappe.utils.change_log.get_versions",
 				auto: true,
 			}
 		},

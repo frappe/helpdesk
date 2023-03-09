@@ -200,7 +200,7 @@ export default {
 			if (this.category.is_new) return
 			if (!this.editMode) return
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Article",
 					filters: {
@@ -214,7 +214,7 @@ export default {
 			if (this.category.is_new) return
 			if (!this.editMode) return
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Category",
 					filters: {

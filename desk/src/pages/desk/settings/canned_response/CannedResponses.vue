@@ -113,12 +113,12 @@ export default {
 	resources: {
 		deleteTeam() {
 			return {
-				method: "frappe.client.delete",
+				url: "frappe.client.delete",
 			};
 		},
 		bulk_delete_responses() {
 			return {
-				method: "frappedesk.api.doc.delete_items",
+				url: "frappedesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go();
 				},

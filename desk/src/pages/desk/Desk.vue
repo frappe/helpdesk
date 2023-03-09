@@ -279,7 +279,7 @@ export default {
 		setupInitialAgent() {
 			// sets up an initial agent
 			return {
-				method: "frappedesk.api.setup.initial_agent_setup",
+				url: "frappedesk.api.setup.initial_agent_setup",
 				onSuccess: (res) => {
 					this.$resources.frappedeskSettings.fetch();
 				},
@@ -296,7 +296,7 @@ export default {
 		createInitialDemoTicket() {
 			// creates a demo ticket
 			return {
-				method: "frappedesk.api.setup.create_initial_demo_ticket",
+				url: "frappedesk.api.setup.create_initial_demo_ticket",
 				onSuccess: (res) => {
 					this.$resources.frappedeskSettings.fetch();
 				},
@@ -313,7 +313,7 @@ export default {
 		setHelpdeskName() {
 			// set helpdesk name in Frappe Desk Settings
 			return {
-				method: "frappedesk.api.settings.update_helpdesk_name",
+				url: "frappedesk.api.settings.update_helpdesk_name",
 				onSuccess: (res) => {
 					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
 					this.$toast({
@@ -335,13 +335,13 @@ export default {
 		skipHelpdeskNameSetup() {
 			// sets the values of skip_helpdesk_name_setup to true inside Frappe Desk Settings
 			return {
-				method: "frappedesk.api.settings.skip_helpdesk_name_setup",
+				url: "frappedesk.api.settings.skip_helpdesk_name_setup",
 			};
 		},
 		// getters
 		frappedeskSettings() {
 			return {
-				method: "frappe.client.get",
+				url: "frappe.client.get",
 				params: {
 					doctype: "Frappe Desk Settings",
 					name: "Frappe Desk Settings",
@@ -358,7 +358,7 @@ export default {
 		},
 		defaultOutgoingEmailAccount() {
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Email Account",
 					filters: [
@@ -372,7 +372,7 @@ export default {
 		},
 		agentCount() {
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Agent",
 				},
@@ -383,7 +383,7 @@ export default {
 		// ticket related resources
 		createTicket() {
 			return {
-				method: "frappedesk.api.ticket.create_new",
+				url: "frappedesk.api.ticket.create_new",
 				onSuccess: () => {
 					// TODO:
 				},
@@ -401,7 +401,7 @@ export default {
 		},
 		updateTicketContact() {
 			return {
-				method: "frappedesk.api.ticket.update_contact",
+				url: "frappedesk.api.ticket.update_contact",
 				onSuccess: async (ticket) => {
 					// TODO:
 				},
@@ -412,7 +412,7 @@ export default {
 		},
 		types() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Ticket Type",
 					pluck: "name",
@@ -428,7 +428,7 @@ export default {
 		},
 		priorities() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Ticket Priority",
 				},
@@ -443,7 +443,7 @@ export default {
 		},
 		statuses() {
 			return {
-				method: "frappedesk.api.ticket.get_all_ticket_statuses",
+				url: "frappedesk.api.ticket.get_all_ticket_statuses",
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
 					this.ticketStatuses = data;
@@ -455,7 +455,7 @@ export default {
 		},
 		contacts() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Contact",
 					fields: ["*"],
@@ -472,7 +472,7 @@ export default {
 		},
 		agents() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Agent",
 					fields: ["name", "agent_name", "user_image"],
@@ -488,7 +488,7 @@ export default {
 		},
 		agentGroups() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Agent Group",
 				},
@@ -503,7 +503,7 @@ export default {
 		},
 		assignTicketToAgent() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_to_agent",
+				url: "frappedesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: async () => {
 					this.$event.emit("update_ticket_list");
 				},
@@ -514,7 +514,7 @@ export default {
 		},
 		assignTicketType() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_type",
+				url: "frappedesk.api.ticket.assign_ticket_type",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
@@ -523,7 +523,7 @@ export default {
 		},
 		assignTicketStatus() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_status",
+				url: "frappedesk.api.ticket.assign_ticket_status",
 				onSuccess: async () => {
 					this.$event.emit("update_ticket_list");
 				},
@@ -534,7 +534,7 @@ export default {
 		},
 		assignTicketPriority() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_priority",
+				url: "frappedesk.api.ticket.assign_ticket_priority",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
@@ -543,7 +543,7 @@ export default {
 		},
 		createTicketType() {
 			return {
-				method: "frappedesk.api.ticket.check_and_create_ticket_type",
+				url: "frappedesk.api.ticket.check_and_create_ticket_type",
 				onSuccess: () => {
 					this.$resources.types.fetch();
 				},

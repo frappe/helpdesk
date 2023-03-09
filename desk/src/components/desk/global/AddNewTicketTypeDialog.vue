@@ -31,7 +31,7 @@
 								}
 							"
 							:resourceOptions="{
-								method: 'frappe.client.get_list',
+								url: 'frappe.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'Ticket Priority',
@@ -150,7 +150,7 @@ export default {
 	resources: {
 		newTicketType() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: (doc) => {
 					this.$router.push(`/frappedesk/ticket_types`)
 				},

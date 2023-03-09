@@ -466,7 +466,7 @@ export default {
 	resources: {
 		createEmailAccount() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: () => {
 					this.$event.emit("email-account-created");
 				},
@@ -477,7 +477,7 @@ export default {
 		},
 		sentInvites() {
 			return {
-				method: "frappedesk.api.agent.sent_invites",
+				url: "frappedesk.api.agent.sent_invites",
 				onSuccess: () => {
 					this.$event.emit("sent-invites-success");
 				},
@@ -488,7 +488,7 @@ export default {
 		},
 		completeSetup() {
 			return {
-				method: "frappe.client.set_value",
+				url: "frappe.client.set_value",
 				params: {
 					doctype: "Frappe Desk Settings",
 					name: "Frappe Desk Settings",

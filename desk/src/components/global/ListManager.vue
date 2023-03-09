@@ -35,7 +35,7 @@ export default {
 		const listResource = createListResource(
 			{
 				type: "list",
-				method: "frappedesk.extends.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				cache: options.value.cache,
 				doctype: options.value.doctype,
 				fields: options.value.fields,
@@ -60,7 +60,7 @@ export default {
 
 		const countResource = createResource(
 			{
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 			},
 			context
 		);

@@ -150,7 +150,7 @@ export default {
 	resources: {
 		presetFilterOptions() {
 			return {
-				method: "frappedesk.api.general.get_preset_filters",
+				url: "frappedesk.api.general.get_preset_filters",
 				params: {
 					doctype: this.manager.options.doctype,
 				},

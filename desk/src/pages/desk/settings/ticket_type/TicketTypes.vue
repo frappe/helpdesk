@@ -94,7 +94,7 @@ export default {
 	resources: {
 		deleteTicketType() {
 			return {
-				method: "frappe.client.delete",
+				url: "frappe.client.delete",
 			}
 		},
 	},

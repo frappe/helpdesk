@@ -81,7 +81,7 @@ export default {
 	resources: {
 		navbarItems() {
 			return {
-				method: "frappedesk.api.website.navbar_items",
+				url: "frappedesk.api.website.navbar_items",
 				auto: true,
 			}
 		},

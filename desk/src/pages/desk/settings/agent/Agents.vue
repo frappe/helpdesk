@@ -112,12 +112,12 @@ export default {
 	resources: {
 		deleteAgent() {
 			return {
-				method: "frappe.client.delete",
+				url: "frappe.client.delete",
 			}
 		},
 		bulk_delete_agents() {
 			return {
-				method: "frappedesk.api.doc.delete_items",
+				url: "frappedesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
 					// this.$refs.listManager.manager.reload()

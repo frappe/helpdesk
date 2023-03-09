@@ -141,7 +141,7 @@ export default {
 
 			return {
 				cache: ["Articles", this.categoryId, "published"],
-				method: "frappedesk.api.kb.get_articles",
+				url: "frappedesk.api.kb.get_articles",
 				params: {
 					filters,
 					fields,
@@ -153,7 +153,7 @@ export default {
 		},
 		saveArticles() {
 			return {
-				method: "frappedesk.api.kb.update_articles_order_and_status",
+				url: "frappedesk.api.kb.update_articles_order_and_status",
 				onSuccess: () => {
 					this.$resources.articles.reload();
 

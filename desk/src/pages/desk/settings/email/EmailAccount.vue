@@ -465,7 +465,7 @@ export default {
 	resources: {
 		checkDefaultOutgoingEmailAccount() {
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Email Account",
 					filters: [
@@ -485,7 +485,7 @@ export default {
 		},
 		getEmailAccount() {
 			return {
-				method: "frappe.client.get",
+				url: "frappe.client.get",
 				params: {
 					doctype: "Email Account",
 					name: this.emailAccountId,
@@ -516,7 +516,7 @@ export default {
 		},
 		createNewEmailAccount() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: () => {
 					this.$toast({
 						title: "Email Account Created!!",
@@ -540,7 +540,7 @@ export default {
 		},
 		updateEmailAccount() {
 			return {
-				method: "frappe.client.set_value",
+				url: "frappe.client.set_value",
 				onSuccess: () => {
 					if (
 						this.values.emailAccountName !=
@@ -571,7 +571,7 @@ export default {
 		},
 		renameEmailAccount() {
 			return {
-				method: "frappe.client.rename_doc",
+				url: "frappe.client.rename_doc",
 				onSuccess: (data) => {
 					window.location.href = `/frappedesk/settings/emails/${data}`
 				},
