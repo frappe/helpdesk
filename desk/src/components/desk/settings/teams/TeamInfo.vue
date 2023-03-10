@@ -124,7 +124,7 @@ export default {
 	data() {
 		return {
 			autoCompleteOptions: {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				inputMap: (query) => {
 					return {
 						doctype: "Agent",

@@ -412,7 +412,7 @@ export default {
 		},
 		types() {
 			return {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "Ticket Type",
 					pluck: "name",
@@ -428,7 +428,7 @@ export default {
 		},
 		priorities() {
 			return {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "Ticket Priority",
 				},
@@ -455,7 +455,7 @@ export default {
 		},
 		contacts() {
 			return {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "Contact",
 					fields: ["*"],
@@ -472,7 +472,7 @@ export default {
 		},
 		agents() {
 			return {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "Agent",
 					fields: ["name", "agent_name", "user_image"],
@@ -488,7 +488,7 @@ export default {
 		},
 		agentGroups() {
 			return {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "Agent Group",
 				},

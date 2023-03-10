@@ -78,7 +78,7 @@ export default {
 		comments() {
 			return {
 				cache: ["Ticket", "Comments", this.ticketId],
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "Frappe Desk Comment",
 					fields: ["*"],

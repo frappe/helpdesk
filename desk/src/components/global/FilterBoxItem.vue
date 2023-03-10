@@ -178,7 +178,7 @@ export default {
 			switch (filter.data_type) {
 				case "Link":
 					return {
-						url: "frappe.client.get_list",
+						url: "frappedesk.extends.client.get_list",
 						inputMap: (query) => {
 							return {
 								doctype: filter.link_doctype,
