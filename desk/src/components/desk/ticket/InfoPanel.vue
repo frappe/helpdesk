@@ -1,6 +1,6 @@
 <template>
 	<div class="pt-[20px] h-full flex flex-col" v-if="ticket">
-		<div class="shrink-0 text-base px-[16px] pb-[17px]">
+		<div class="shrink-0 text-base pb-[17px]">
 			<div>
 				<div v-if="contact" class="space-y-[12px]">
 					<div class="flex flex-row items-center space-x-[12px]">
