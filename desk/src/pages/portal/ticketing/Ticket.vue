@@ -492,7 +492,7 @@ export default {
 		},
 		customFields() {
 			return {
-				method: "frappedesk.api.ticket.get_custom_fields",
+				url: "frappedesk.api.ticket.get_custom_fields",
 				params: {
 					doctype: "Ticket",
 					view: "Customer Portal",
@@ -502,7 +502,7 @@ export default {
 		},
 		submitConversation() {
 			return {
-				method: "frappedesk.api.ticket.submit_conversation_via_contact",
+				url: "frappedesk.api.ticket.submit_conversation_via_contact",
 				onSuccess: () => {
 					this.tempTextEditorData = {}
 					this.editing = false

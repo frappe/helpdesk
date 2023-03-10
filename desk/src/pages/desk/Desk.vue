@@ -1,25 +1,25 @@
 <template>
 	<div
 		v-if="user.isLoggedIn() && user.has_desk_access"
-		class="w-screen h-screen"
+		class="h-screen w-screen"
 	>
 		<div v-if="initialized">
-			<div class="flex flex-row w-screen">
-				<SideBarMenu class="bg-gray-50 shrink-0 w-[200px]" />
-				<router-view class="grow" :key="$route.fullPath" />
+			<div class="flex h-screen w-screen flex-row">
+				<SideBarMenu class="w-[200px] shrink-0 bg-gray-50" />
+				<router-view :key="$route.fullPath" class="grow" />
 			</div>
 		</div>
-		<div v-else class="h-full w-full flex max-w-full grow-0">
-			<div class="mx-auto my-auto text-base font-normal">
+		<div v-else class="flex h-full w-full max-w-full grow-0">
+			<div class="m-auto text-base font-normal">
 				<CustomIcons name="frappedesk" class="w-[200px]" />
 			</div>
 		</div>
 	</div>
 </template>
 <script>
-import SideBarMenu from "@/components/desk/SideBarMenu.vue"
-import { inject, provide, ref } from "vue"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import SideBarMenu from "@/components/desk/SideBarMenu.vue";
+import { inject, provide, ref } from "vue";
+import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 
 export default {
 	name: "Desk",
@@ -28,34 +28,34 @@ export default {
 		CustomIcons,
 	},
 	setup() {
-		const mounted = ref(false)
-		const user = inject("user")
+		const mounted = ref(false);
+		const user = inject("user");
 
-		const ticketTypes = ref([])
-		const ticketPriorities = ref([])
-		const ticketStatuses = ref([])
+		const ticketTypes = ref([]);
+		const ticketPriorities = ref([]);
+		const ticketStatuses = ref([]);
 
-		const ticketController = ref({})
+		const ticketController = ref({});
 
-		const contacts = ref([])
-		const contactController = ref({})
+		const contacts = ref([]);
+		const contactController = ref({});
 
-		const agents = ref([])
-		const agentGroups = ref([])
-		const agentController = ref({})
+		const agents = ref([]);
+		const agentGroups = ref([]);
+		const agentController = ref({});
 
-		provide("ticketTypes", ticketTypes)
-		provide("ticketPriorities", ticketPriorities)
-		provide("ticketStatuses", ticketStatuses)
+		provide("ticketTypes", ticketTypes);
+		provide("ticketPriorities", ticketPriorities);
+		provide("ticketStatuses", ticketStatuses);
 
-		provide("ticketController", ticketController)
+		provide("ticketController", ticketController);
 
-		provide("contacts", contacts)
-		provide("contactController", contactController)
+		provide("contacts", contacts);
+		provide("contactController", contactController);
 
-		provide("agents", agents)
-		provide("agentGroups", agentGroups)
-		provide("agentController", agentController)
+		provide("agents", agents);
+		provide("agentGroups", agentGroups);
+		provide("agentController", agentController);
 
 		return {
 			mounted,
@@ -73,33 +73,39 @@ export default {
 			agents,
 			agentGroups,
 			agentController,
-		}
+		};
 	},
 	computed: {
 		initialized() {
-			if (!this.mounted) return false
-			if (!this.user.isLoggedIn()) return false
-			if (!this.user.has_desk_access) return false
-			if (this.$resources.frappedeskSettings.loading) return false
+			if (!this.mounted) return false;
+			if (!this.user.isLoggedIn()) return false;
+			if (!this.user.has_desk_access) return false;
+			if (this.$resources.frappedeskSettings.loading) return false;
 			if (!this.$resources.frappedeskSettings.data.initial_agent_set) {
-				this.$resources.setupInitialAgent.submit()
-				return false
+				this.$resources.setupInitialAgent.submit();
+				return false;
 			}
 			if (
-				!this.$resources.frappedeskSettings.data
-					.initial_demo_ticket_created
+				!this.$resources.frappedeskSettings.data.initial_demo_ticket_created
 			) {
-				this.$resources.createInitialDemoTicket.submit()
-				return false
+				this.$resources.createInitialDemoTicket.submit();
+				return false;
 			}
 
-			return true
+			return true;
 		},
 		defaultOutgoingEmailAccountSetup() {
 			if (this.$resources.defaultOutgoingEmailAccount.loading) {
-				return "NOT SET"
+				return "NOT SET";
 			}
-			return this.$resources.defaultOutgoingEmailAccount.data > 0
+			return this.$resources.defaultOutgoingEmailAccount.data > 0;
+		},
+	},
+	watch: {
+		initialized(val) {
+			if (val) {
+				this.handlePostOnboardSetupReqs();
+			}
 		},
 	},
 	mounted() {
@@ -107,78 +113,71 @@ export default {
 			this.$router.push({
 				name: "DeskLogin",
 				query: { route: this.$route.path },
-			})
-			return
+			});
+			return;
 		}
 		if (!this.user.has_desk_access) {
-			this.$router.push({ path: "/support/tickets" })
-			return
+			this.$router.push({ path: "/support/tickets" });
+			return;
 		}
-		this.$resources.frappedeskSettings.fetch()
+		this.$resources.frappedeskSettings.fetch();
 		this.ticketController.set = (ticketId, type, ref = null) => {
 			switch (type) {
 				case "type":
 					return this.$resources.assignTicketType.submit({
 						ticket_id: ticketId,
 						type: ref,
-					})
+					});
 				case "status":
 					return this.$resources.assignTicketStatus.submit({
 						ticket_id: ticketId,
 						status: ref,
-					})
+					});
 				case "priority":
 					return this.$resources.assignTicketPriority.submit({
 						ticket_id: ticketId,
 						priority: ref,
-					})
+					});
 				case "contact":
 					return this.$resources.updateTicketContact.submit({
 						ticket_id: ticketId,
 						contact: ref,
-					})
+					});
 				case "agent":
 					return this.$resources.assignTicketToAgent.submit({
 						ticket_id: ticketId,
 						agent_id: ref,
-					})
+					});
 			}
-		}
+		};
 		this.ticketController.new = (type, values) => {
 			switch (type) {
 				case "ticket":
 					return this.$resources.createTicket.submit({
 						values,
-					})
+					});
 				case "type":
 					this.$resources.createTicketType.submit({
 						type: values,
-					})
-					break
+					});
+					break;
 			}
-		}
+		};
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case "Ticket Type":
-					this.$resources.types.reload()
-					break
+					this.$resources.types.reload();
+					break;
 				case "Agent":
-					this.$resources.agents.reload()
-					break
+					this.$resources.agents.reload();
+					break;
 			}
-		})
+		});
 
-		this.mounted = true
+		this.mounted = true;
 	},
 	unmounted() {
-		this.$socket.off("list_update")
-	},
-	watch: {
-		initialized(val) {
-			if (val) {
-				this.handlePostOnboardSetupReqs()
-			}
-		},
+		this.$socket.off("list_update");
 	},
 	methods: {
 		handlePostOnboardSetupReqs() {
@@ -188,16 +187,17 @@ export default {
 				!this.$resources.frappedeskSettings.data
 					.initial_helpdesk_name_setup_skipped
 			) {
-				this.showHelpdeskNameSetupToast()
-				return
+				this.showHelpdeskNameSetupToast();
+				return;
 			}
 			// default email account
 			if (
+				!this.$resources.frappedeskSettings.data.suppress_default_email_toast &&
 				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
 				!this.defaultOutgoingEmailAccountSetup
 			) {
-				this.showDefaultEmailAccountSetupToast()
-				return
+				this.showDefaultEmailAccountSetupToast();
+				return;
 			}
 			// add agents
 			if (
@@ -205,11 +205,11 @@ export default {
 				this.$resources.agentCount.data == 0
 			) {
 				// this block should theoretically never fire, since the initial agent is created during the setup process
-				this.showAddAgentsToast()
+				this.showAddAgentsToast();
 			}
 		},
 		showHelpdeskNameSetupToast() {
-			console.log("showing helpdesk name setup toast")
+			console.log("showing helpdesk name setup toast");
 			this.$toast({
 				title: "Setup Helpdesk Name",
 				form: {
@@ -224,7 +224,7 @@ export default {
 						if (values.helpdesk_name) {
 							this.$resources.setHelpdeskName.submit({
 								name: values.helpdesk_name,
-							})
+							});
 						}
 					},
 				},
@@ -232,9 +232,9 @@ export default {
 				appearance: "info",
 				position: "bottom-right",
 				onClose: () => {
-					this.$resources.skipHelpdeskNameSetup.submit()
+					this.$resources.skipHelpdeskNameSetup.submit();
 				},
-			})
+			});
 		},
 		showDefaultEmailAccountSetupToast() {
 			this.$toast({
@@ -248,11 +248,11 @@ export default {
 				action: {
 					title: "Setup now",
 					onClick: () => {
-						this.$clearToasts()
-						this.$router.push({ name: "Emails" })
+						this.$clearToasts();
+						this.$router.push({ name: "Emails" });
 					},
 				},
-			})
+			});
 		},
 		showAddAgentsToast() {
 			this.$toast({
@@ -266,11 +266,11 @@ export default {
 				action: {
 					title: "Add now",
 					onClick: () => {
-						this.$clearToasts()
-						this.$router.push({ name: "Agents" })
+						this.$clearToasts();
+						this.$router.push({ name: "Agents" });
 					},
 				},
-			})
+			});
 		},
 	},
 	resources: {
@@ -279,9 +279,9 @@ export default {
 		setupInitialAgent() {
 			// sets up an initial agent
 			return {
-				method: "frappedesk.api.setup.initial_agent_setup",
+				url: "frappedesk.api.setup.initial_agent_setup",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch()
+					this.$resources.frappedeskSettings.fetch();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -289,16 +289,16 @@ export default {
 						text: "Please try again later.",
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 		createInitialDemoTicket() {
 			// creates a demo ticket
 			return {
-				method: "frappedesk.api.setup.create_initial_demo_ticket",
+				url: "frappedesk.api.setup.create_initial_demo_ticket",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch()
+					this.$resources.frappedeskSettings.fetch();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -306,21 +306,21 @@ export default {
 						text: "Please try again later.",
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 		setHelpdeskName() {
 			// set helpdesk name in Frappe Desk Settings
 			return {
-				method: "frappedesk.api.settings.update_helpdesk_name",
+				url: "frappedesk.api.settings.update_helpdesk_name",
 				onSuccess: (res) => {
-					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`
+					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
 					this.$toast({
 						title: "Helpdesk name updated!!",
 						customIcon: "circle-check",
 						appearance: "success",
-					})
+					});
 				},
 				onError: (err) => {
 					this.$toast({
@@ -328,20 +328,20 @@ export default {
 						text: "Please try again later.",
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 		skipHelpdeskNameSetup() {
 			// sets the values of skip_helpdesk_name_setup to true inside Frappe Desk Settings
 			return {
-				method: "frappedesk.api.settings.skip_helpdesk_name_setup",
-			}
+				url: "frappedesk.api.settings.skip_helpdesk_name_setup",
+			};
 		},
 		// getters
 		frappedeskSettings() {
 			return {
-				method: "frappe.client.get",
+				url: "frappe.client.get",
 				params: {
 					doctype: "Frappe Desk Settings",
 					name: "Frappe Desk Settings",
@@ -352,13 +352,13 @@ export default {
 						text: "Please try again later.",
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 		defaultOutgoingEmailAccount() {
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Email Account",
 					filters: [
@@ -368,87 +368,94 @@ export default {
 					],
 				},
 				auto: true,
-			}
+			};
 		},
 		agentCount() {
 			return {
-				method: "frappe.client.get_count",
+				url: "frappe.client.get_count",
 				params: {
 					doctype: "Agent",
 				},
 				auto: true,
-			}
+			};
 		},
 
 		// ticket related resources
 		createTicket() {
 			return {
-				method: "frappedesk.api.ticket.create_new",
+				url: "frappedesk.api.ticket.create_new",
 				onSuccess: () => {
 					// TODO:
 				},
-				onError: () => {
-					// TODO:
+				onError: (error) => {
+					this.$toast({
+						title: "Error while creating ticket",
+						text: error.messages.join(", "),
+						customIcon: "circle-fail",
+						appearance: "danger",
+					});
+
+					throw error;
 				},
-			}
+			};
 		},
 		updateTicketContact() {
 			return {
-				method: "frappedesk.api.ticket.update_contact",
+				url: "frappedesk.api.ticket.update_contact",
 				onSuccess: async (ticket) => {
 					// TODO:
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		types() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Ticket Type",
 					pluck: "name",
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
-					this.ticketTypes = data
+					this.ticketTypes = data;
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		priorities() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Ticket Priority",
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
-					this.ticketPriorities = data
+					this.ticketPriorities = data;
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		statuses() {
 			return {
-				method: "frappedesk.api.ticket.get_all_ticket_statuses",
+				url: "frappedesk.api.ticket.get_all_ticket_statuses",
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
-					this.ticketStatuses = data
+					this.ticketStatuses = data;
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		contacts() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Contact",
 					fields: ["*"],
@@ -456,100 +463,96 @@ export default {
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
-					this.contacts = data
+					this.contacts = data;
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		agents() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Agent",
-					fields: [
-						"name",
-						"agent_name",
-						"user_image",
-					],
+					fields: ["name", "agent_name", "user_image"],
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
-					this.agents = data
+					this.agents = data;
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		agentGroups() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Agent Group",
 				},
 				auto: this.user.has_desk_access,
 				onSuccess: (data) => {
-					this.agentGroups = data
+					this.agentGroups = data;
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		assignTicketToAgent() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_to_agent",
+				url: "frappedesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: async () => {
-					this.$event.emit("update_ticket_list")
+					this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		assignTicketType() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_type",
+				url: "frappedesk.api.ticket.assign_ticket_type",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		assignTicketStatus() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_status",
+				url: "frappedesk.api.ticket.assign_ticket_status",
 				onSuccess: async () => {
-					this.$event.emit("update_ticket_list")
+					this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		assignTicketPriority() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_priority",
+				url: "frappedesk.api.ticket.assign_ticket_priority",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 		createTicketType() {
 			return {
-				method: "frappedesk.api.ticket.check_and_create_ticket_type",
+				url: "frappedesk.api.ticket.check_and_create_ticket_type",
 				onSuccess: () => {
-					this.$resources.types.fetch()
+					this.$resources.types.fetch();
 				},
 				onError: () => {
 					// TODO:
 				},
-			}
+			};
 		},
 	},
 	directivs: {},
-}
+};
 </script>

@@ -258,7 +258,7 @@ export default {
 				return
 			}
 			return {
-				method: this.resourceOptions.method,
+				url: this.resourceOptions.url,
 			}
 		},
 	},

@@ -125,7 +125,7 @@
 							}
 						"
 						:resourceOptions="{
-							method: 'frappe.client.get_list',
+							url: 'frappe.client.get_list',
 							inputMap: (query) => {
 								return {
 									doctype: 'FD Customer',

@@ -1,6 +1,6 @@
 <template>
 	<div class="pt-[20px] h-full flex flex-col" v-if="ticket">
-		<div class="shrink-0 text-base px-[16px] pb-[17px]">
+		<div class="shrink-0 text-base pb-[17px]">
 			<div>
 				<div v-if="contact" class="space-y-[12px]">
 					<div class="flex flex-row items-center space-x-[12px]">
@@ -365,7 +365,7 @@ export default {
 		otherTicketsOfContact() {
 			return {
 				cache: ["Other Tickets", "Action Panel", this.ticketId],
-				method: "frappedesk.api.ticket.get_other_tickets_of_contact",
+				url: "frappedesk.api.ticket.get_other_tickets_of_contact",
 				params: {
 					ticket_id: this.ticketId,
 				},

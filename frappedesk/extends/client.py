@@ -1,9 +1,12 @@
 # Copyright (c) 2022, Frappe Technologies Pvt. Ltd. and Contributors
 # MIT License. See license.txt
 
-from __future__ import unicode_literals
+import importlib
+
 import frappe
 from frappe.model.base_document import get_controller
+
+from .qb import get_query
 
 
 @frappe.whitelist()
@@ -20,7 +23,7 @@ def get_list(
 ):
 	check_permissions(doctype, parent)
 
-	query = frappe.qb.get_query(
+	query = get_query(
 		table=doctype,
 		fields=fields,
 		filters=filters,
@@ -30,25 +33,25 @@ def get_list(
 		group_by=group_by,
 	)
 
-	custom_query = apply_custom_filters(doctype, query)
+	query = apply_custom_filters(doctype, query)
+	query = apply_hook(doctype, query)
 
-	return custom_query.run(as_dict=True, debug=debug)
+	return query.run(as_dict=True, debug=debug)
 
 
 def check_permissions(doctype, parent):
 	user = frappe.session.user
-	has_select_permission = frappe.has_permission(
-		doctype, "select", user=user, parent_doctype=parent
-	)
-	has_read_permission = frappe.has_permission(
-		doctype, "read", user=user, parent_doctype=parent
-	)
+	permissions = ("select", "read")
+	has_select_permission, has_read_permission = [
+		frappe.has_permission(doctype, perm, user=user, parent_doctype=parent)
+		for perm in permissions
+	]
 
 	if not has_select_permission and not has_read_permission:
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
-def apply_custom_filters(doctype, query):
+def apply_custom_filters(doctype: str, query):
 	"""
 	Apply custom filters to query
 	"""
@@ -60,3 +63,17 @@ def apply_custom_filters(doctype, query):
 			query = return_value
 
 	return query
+
+
+def apply_hook(doctype: str, query):
+	"""
+	Apply hooks to query
+	"""
+	try:
+		_module_path = "frappedesk.frappedesk.hooks." + doctype.lower()
+		_module = importlib.import_module(_module_path)
+		_class = getattr(_module, doctype)
+		_function = getattr(_class, "get_list_query")
+		return _function(query)
+	except:
+		return query

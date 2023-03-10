@@ -49,20 +49,20 @@
 							},
 						},
 					}"
+					class="h-[calc(100vh-6.5rem)] text-base"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/kb/articles/new')
+							$router.push('/frappedesk/kb/articles/new');
 						}
 					"
-					class="text-base h-[calc(100vh-6.5rem)]"
 				>
 					<template #top-sub-section-1>
 						<TabButtons
+							v-model="activeTab"
 							:buttons="[
 								{ label: 'Articles', active: true },
 								{ label: 'Webview' },
 							]"
-							v-model="activeTab"
 						/>
 					</template>
 					<template #bulk-actions="{ selectedItems }">
@@ -72,13 +72,12 @@
 									(category) => {
 										$resources.moveArticlesToCategory
 											.submit({
-												articles:
-													Object.keys(selectedItems),
+												articles: Object.keys(selectedItems),
 												category: category.name,
 											})
 											.then(() => {
-												manager.unselect()
-											})
+												manager.unselect();
+											});
 									}
 								"
 							>
@@ -94,15 +93,12 @@
 										handler: () => {
 											$resources.setStatusForArticles
 												.submit({
-													articles:
-														Object.keys(
-															selectedItems
-														),
+													articles: Object.keys(selectedItems),
 													status: 'Draft',
 												})
 												.then(() => {
-													manager.unselect()
-												})
+													manager.unselect();
+												});
 										},
 									},
 									{
@@ -110,25 +106,19 @@
 										handler: () => {
 											$resources.setStatusForArticles
 												.submit({
-													articles:
-														Object.keys(
-															selectedItems
-														),
+													articles: Object.keys(selectedItems),
 													status: 'Published',
 												})
 												.then(() => {
-													manager.unselect()
-												})
+													manager.unselect();
+												});
 										},
 									},
 								]"
 							>
-								<template v-slot="{ toggleDropdown }">
+								<template #default="{ toggleDropdown }">
 									<Button
-										:loading="
-											$resources.setStatusForArticles
-												.loading
-										"
+										:loading="$resources.setStatusForArticles.loading"
 										icon-right="chevron-down"
 										class="ml-2"
 										@click="toggleDropdown"
@@ -143,13 +133,12 @@
 									() => {
 										$resources.deleteArticles
 											.submit({
-												articles:
-													Object.keys(selectedItems),
+												articles: Object.keys(selectedItems),
 											})
 											.then(() => {
-												manager.unselect()
-												manager.reload()
-											})
+												manager.unselect();
+												manager.reload();
+											});
 									}
 								"
 								>Delete</Button
@@ -159,18 +148,16 @@
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/kb/articles/${row.name}`,
+								path: `/frappedesk/kb/articles/${row.name}/${row.title_slug}`,
 							}"
-							class="cursor-pointer hover:text-gray-900 text-gray-600"
+							class="cursor-pointer text-gray-600 hover:text-gray-900"
 							>{{ value }}</router-link
 						>
 					</template>
 					<template #field-status="{ value }">
 						<div
 							:class="
-								value === 'Published'
-									? 'text-green-500'
-									: 'text-gray-500'
+								value === 'Published' ? 'text-green-500' : 'text-gray-500'
 							"
 						>
 							{{ value }}
@@ -181,12 +168,7 @@
 					</template>
 					<template #field-modified="{ value }">
 						<div>
-							{{
-								$dayjs.shortFormating(
-									$dayjs(value).fromNow(),
-									false
-								)
-							}}
+							{{ $dayjs.shortFormating($dayjs(value).fromNow(), false) }}
 						</div>
 					</template>
 				</ListViewer>
@@ -196,14 +178,21 @@
 </template>
 
 <script>
-import ListManager from "@/components/global/ListManager.vue"
-import ListViewer from "@/components/global/ListViewer.vue"
-import CategorySelector from "@/components/desk/kb/CategorySelector.vue"
-import { Dropdown } from "frappe-ui"
-import TabButtons from "@/components/global/TabButtons.vue"
+import ListManager from "@/components/global/ListManager.vue";
+import ListViewer from "@/components/global/ListViewer.vue";
+import CategorySelector from "@/components/desk/kb/CategorySelector.vue";
+import { Dropdown } from "frappe-ui";
+import TabButtons from "@/components/global/TabButtons.vue";
 
 export default {
 	name: "Articles",
+	components: {
+		ListManager,
+		ListViewer,
+		CategorySelector,
+		Dropdown,
+		TabButtons,
+	},
 	props: {
 		categoryId: {
 			type: String,
@@ -213,39 +202,29 @@ export default {
 	data() {
 		return {
 			activeTab: "Articles",
-		}
-	},
-	components: {
-		ListManager,
-		ListViewer,
-		CategorySelector,
-		Dropdown,
-		TabButtons,
+		};
 	},
 	resources: {
 		moveArticlesToCategory() {
 			return {
-				method: "frappedesk.api.kb.move_articles_to_category",
+				url: "frappedesk.api.kb.move_articles_to_category",
 			}
 		},
 		setStatusForArticles() {
 			return {
-				method: "frappedesk.api.kb.set_status_for_articles",
+				url: "frappedesk.api.kb.set_status_for_articles",
 			}
 		},
 		deleteArticles() {
 			return {
-				method: "frappedesk.api.kb.delete_articles",
+				url: "frappedesk.api.kb.delete_articles",
 			}
 		},
 		knowledgeBase() {
 			if (this.activeTab == "Webview") {
 				this.$router.push({ path: "/frappedesk/kb" })
 			}
-			return {
-				auto: true,
-			}
 		},
 	},
-}
+};
 </script>

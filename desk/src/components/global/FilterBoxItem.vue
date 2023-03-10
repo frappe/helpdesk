@@ -138,7 +138,7 @@ export default {
 	resources: {
 		dataType() {
 			return {
-				method: "frappedesk.api.general.get_field_data_type",
+				url: "frappedesk.api.general.get_field_data_type",
 				params: {
 					doctype: this.manager.options.doctype,
 					fieldname: this.filter.fieldname,
@@ -148,7 +148,7 @@ export default {
 		},
 		selectOptionsForField() {
 			return {
-				method: "frappedesk.api.general.get_select_options_for_field",
+				url: "frappedesk.api.general.get_select_options_for_field",
 			}
 		},
 	},
@@ -178,7 +178,7 @@ export default {
 			switch (filter.data_type) {
 				case "Link":
 					return {
-						method: "frappe.client.get_list",
+						url: "frappe.client.get_list",
 						inputMap: (query) => {
 							return {
 								doctype: filter.link_doctype,
@@ -197,7 +197,7 @@ export default {
 					}
 				case "Select":
 					return {
-						method: "frappedesk.api.general.get_filtered_select_field_options",
+						url: "frappedesk.api.general.get_filtered_select_field_options",
 						inputMap: (query) => {
 							return {
 								doctype: this.manager.options.doctype,

@@ -90,7 +90,7 @@ export default {
 	resources: {
 		tickets() {
 			return {
-				method: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
+				url: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
 				auto:
 					this.user.isLoggedIn() && this.$route.name != "Impersonate",
 				onSuccess: (data) => {
@@ -106,7 +106,7 @@ export default {
 		},
 		ticket() {
 			return {
-				method: "frappedesk.api.ticket.get_ticket",
+				url: "frappedesk.api.ticket.get_ticket",
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket
 				},
@@ -117,7 +117,7 @@ export default {
 		},
 		templates() {
 			return {
-				method: "frappedesk.api.ticket.get_all_ticket_templates",
+				url: "frappedesk.api.ticket.get_all_ticket_templates",
 				auto: this.user.isLoggedIn(),
 				onSuccess: (data) => {
 					this.ticketTemplates = data
@@ -129,7 +129,7 @@ export default {
 		},
 		assignTicketStatus() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_status",
+				url: "frappedesk.api.ticket.assign_ticket_status",
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -140,7 +140,7 @@ export default {
 		},
 		createTicket() {
 			return {
-				method: "frappedesk.api.ticket.create_new",
+				url: "frappedesk.api.ticket.create_new",
 				onSuccess: (ticket) => {
 					this.ticketController.update()
 					this.$router.push({
@@ -151,7 +151,12 @@ export default {
 					})
 				},
 				onError: (error) => {
-					console.log(`create ticket error : ${error}`)
+					this.$toast({
+						title: "Error while creating ticket",
+						text: error.messages.join(' '),
+						customIcon: "circle-fail",
+						appearance: "danger",
+					})
 				},
 			}
 		},

@@ -1,0 +1,15 @@
+changelog:
+  exclude:
+    authors:
+      - octocat
+  categories:
+    - title: Breaking Changes 🛠
+      labels:
+        - breaking-change
+    - title: Bug Fixes 🐛
+      labels:
+        - bug-fix
+    - title: Exciting New Features 🎉
+      labels:
+        - enhancement
+        - feature

@@ -1,14 +1,11 @@
 <template>
 	<Dialog
-		v-model="modelValue"
+		v-model="open"
 		:options="{ title: 'Save Filters' }"
 		@close="reset()"
 	>
 		<template #body-content>
-			<form
-				@submit.prevent="saveFilterPreset"
-				class="flex flex-col space-y-5"
-			>
+			<form class="flex flex-col space-y-5" @submit.prevent="saveFilterPreset">
 				<div class="flex flex-col space-y-1">
 					<Input
 						type="text"
@@ -19,9 +16,7 @@
 					/>
 					<ErrorMessage :message="titleInputError" />
 				</div>
-				<div
-					class="flex justify-between space-x-2 items-center text-base"
-				>
+				<div class="flex items-center justify-between space-x-2 text-base">
 					<div>Show to all agents</div>
 					<CustomSwitch v-model="showSavedFiltersToAll" />
 				</div>
@@ -34,49 +29,48 @@
 </template>
 
 <script>
-import { computed } from "vue"
-import { ref } from "@vue/reactivity"
-import CustomSwitch from "@/components/global/CustomSwitch.vue"
-import { ErrorMessage } from "frappe-ui"
+import { computed, ref } from "vue";
+import CustomSwitch from "@/components/global/CustomSwitch.vue";
+import { ErrorMessage } from "frappe-ui";
 
 export default {
 	name: "SaveFiltersDialog",
+	components: {
+		CustomSwitch,
+		ErrorMessage,
+	},
+	inject: ["manager"],
 	props: {
 		modelValue: {
 			type: Boolean,
 			required: true,
 		},
 	},
-	components: {
-		CustomSwitch,
-		ErrorMessage,
-	},
-	inject: ["manager"],
 	setup(props, { emit }) {
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
-				emit("update:modelValue", val)
+				emit("update:modelValue", val);
 				if (!val) {
-					emit("close")
+					emit("close");
 				}
 			},
-		})
+		});
 
-		let showSavedFiltersToAll = ref(false)
-		let titleInput = ref("")
-		let titleInputError = ref("")
+		let showSavedFiltersToAll = ref(false);
+		let titleInput = ref("");
+		let titleInputError = ref("");
 
 		return {
 			open,
 			showSavedFiltersToAll,
 			titleInput,
 			titleInputError,
-		}
+		};
 	},
 	watch: {
 		titleInput(val) {
-			this.validateInputs()
+			this.validateInputs();
 		},
 	},
 	methods: {
@@ -87,39 +81,39 @@ export default {
 					is_global: this.showSavedFiltersToAll,
 					title: this.titleInput,
 					filters: this.manager.sudoFilters,
-				})
+				});
 			}
 		},
 		validateInputs() {
-			this.titleInputError = ""
+			this.titleInputError = "";
 			if (this.titleInput === "") {
-				this.titleInputError = "Title is required"
-				return false
+				this.titleInputError = "Title is required";
+				return false;
 			}
-			return true
+			return true;
 		},
 		close() {
-			this.open = false
-			this.reset()
+			this.open = false;
+			this.reset();
 		},
 		reset() {
-			this.showSavedFiltersToAll = false
-			this.titleInput = ""
-			this.titleInputError = ""
+			this.showSavedFiltersToAll = false;
+			this.titleInput = "";
+			this.titleInputError = "";
 		},
 	},
 	resources: {
 		saveFilterPreset() {
 			return {
-				method: "frappedesk.api.general.save_filter_preset",
+				url: "frappedesk.api.general.save_filter_preset",
 				onSuccess: (res) => {
 					this.$toast({
 						title: "Filter Saved!",
 						customIcon: "circle-check",
 						appearance: "success",
-					})
+					});
 
-					this.close()
+					this.close();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -127,12 +121,12 @@ export default {
 						text: err,
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 
-					this.close()
+					this.close();
 				},
-			}
+			};
 		},
 	},
-}
+};
 </script>

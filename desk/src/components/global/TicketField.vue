@@ -127,7 +127,7 @@ export default {
 			// field label
 			// field permissions: read, write (based on is agent / customer)
 			return {
-				method: "frappedesk.api.ticket.get_field_meta_info",
+				url: "frappedesk.api.ticket.get_field_meta_info",
 				params: {
 					fieldname: this.fieldname,
 				},
@@ -138,7 +138,7 @@ export default {
 			// TODO: this is a temparary fix, should be done in a better way
 			if (this.fieldname !== "_assign") return
 			return {
-				method: "frappedesk.api.ticket.get_assignee",
+				url: "frappedesk.api.ticket.get_assignee",
 				params: {
 					ticket_id: this.ticketId,
 				},
@@ -147,7 +147,7 @@ export default {
 		},
 		setTicketAssignee() {
 			return {
-				method: "frappedesk.api.ticket.assign_ticket_to_agent",
+				url: "frappedesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: () => {
 					this.$toast({
 						title: "Agent assigned successfully.",
@@ -205,7 +205,7 @@ export default {
 						}
 					}
 					return {
-						method: "frappe.client.get_list",
+						url: "frappe.client.get_list",
 						inputMap: (query) => {
 							const filters = [
 								...baseFilters,
@@ -228,7 +228,7 @@ export default {
 					}
 				case "Select":
 					return {
-						method: "frappedesk.api.general.get_filtered_select_field_options",
+						url: "frappedesk.api.general.get_filtered_select_field_options",
 						inputMap: (query) => {
 							return {
 								doctype: "Ticket",

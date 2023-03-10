@@ -32,7 +32,7 @@ def make_service_holiday_list(
 	doc = frappe.get_doc(
 		{
 			"doctype": "Service Holiday List",
-			"service_holiday_list_name": name,
+			"holiday_list_name": name,
 			"from_date": from_date,
 			"to_date": to_date,
 			"holidays": holiday_dates,

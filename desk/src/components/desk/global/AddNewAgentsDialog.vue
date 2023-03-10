@@ -67,7 +67,7 @@
 					appearance="primary"
 					@click="sentInvites()"
 					:loading="$resources.sentInvites.loading"
-					>Sent Invites</Button
+					>Send Invites</Button
 				>
 				<Button appearance="secondary" @click="close()">Cancel</Button>
 				<div class="grow">
@@ -175,7 +175,7 @@ export default {
 	resources: {
 		sentInvites() {
 			return {
-				method: "frappedesk.api.agent.sent_invites",
+				url: "frappedesk.api.agent.sent_invites",
 				onSuccess: (res) => {
 					this.currentInputIsValidEmail = false
 					this.searchInput = ""

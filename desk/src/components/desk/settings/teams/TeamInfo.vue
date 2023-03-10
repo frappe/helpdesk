@@ -124,7 +124,7 @@ export default {
 	data() {
 		return {
 			autoCompleteOptions: {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				inputMap: (query) => {
 					return {
 						doctype: "Agent",
@@ -191,7 +191,7 @@ export default {
 		},
 		newTeam() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: (res) => {
 					this.$router.push({
 						path: `/frappedesk/settings/teams/${res.name}`,

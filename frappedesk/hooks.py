@@ -15,10 +15,6 @@ has_website_permission = {
 	"Ticket": "frappedesk.frappedesk.doctype.ticket.ticket.has_website_permission",
 }
 
-override_whitelisted_methods = {
-	"frappe.client.get_list": "frappedesk.extends.client.get_list",
-}
-
 doc_events = {
 	"*": {"validate": "frappedesk.frappedesk.doctype.sla.sla.apply",},
 	"Communication": {

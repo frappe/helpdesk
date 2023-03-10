@@ -67,7 +67,7 @@
 							}
 						"
 						:resourceOptions="{
-							method: 'frappe.client.get_list',
+							url: 'frappe.client.get_list',
 							inputMap: (query) => {
 								return {
 									doctype: 'Ticket Priority',
@@ -181,7 +181,7 @@ export default {
 		},
 		renameTicketTypeDoc() {
 			return {
-				method: "frappe.client.rename_doc",
+				url: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
 						path: `/frappedesk/settings/ticket_types/${res}`,
@@ -191,7 +191,7 @@ export default {
 		},
 		newTicketType() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: (res) => {
 					this.$router.push({
 						path: `/frappedesk/settings/ticket_types/${res.name}`,

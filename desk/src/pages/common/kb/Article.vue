@@ -2,21 +2,21 @@
 	<EditableBlock
 		class="h-full"
 		:editable="editable"
-		:editMode="editMode"
-		:saveInProgress="saveInProgress"
-		:disableSaving="disableSaving"
+		:edit-mode="editMode"
+		:save-in-progress="saveInProgress"
+		:disable-saving="disableSaving"
 		@edit="
 			() => {
-				editMode = true
-				articleTempValues = { ...article } || {}
+				editMode = true;
+				articleTempValues = { ...article } || {};
 			}
 		"
 		@discard="
 			() => {
 				if (isNew) {
-					$router.push({ path: '/frappedesk/kb/articles' })
+					$router.push({ path: '/frappedesk/kb/articles' });
 				} else {
-					editMode = false
+					editMode = false;
 				}
 			}
 		"
@@ -26,9 +26,9 @@
 			<div>
 				<Breadcrumbs
 					v-if="!isNew"
-					docType="Article"
-					:docName="articleId"
-					:isDesk="editable"
+					doc-type="Article"
+					:doc-name="articleId"
+					:is-desk="editable"
 				/>
 				<BaseBreadcrumbs
 					v-else
@@ -38,10 +38,8 @@
 							name: 'articles',
 							handler: () => {
 								$router.push({
-									path: `/${
-										editable ? 'frappedesk' : 'support'
-									}/kb/articles`,
-								})
+									path: `/${editable ? 'frappedesk' : 'support'}/kb/articles`,
+								});
 							},
 						},
 						{
@@ -56,19 +54,15 @@
 			<div>
 				<Button
 					:loading="saveInProgress"
-					:appearance="
-						article.status === 'Published' ? 'secondary' : 'primary'
-					"
+					:appearance="article.status === 'Published' ? 'secondary' : 'primary'"
 					@click="
 						() => {
-							articleTempValues = { ...article }
-							saveChanges(!(article.status === 'Published'))
+							articleTempValues = { ...article };
+							saveChanges(!(article.status === 'Published'));
 						}
 					"
 				>
-					{{
-						article.status === "Published" ? "Unpublish" : "Publish"
-					}}
+					{{ article.status === "Published" ? "Unpublish" : "Publish" }}
 				</Button>
 			</div>
 		</template>
@@ -79,18 +73,18 @@
 					{
 						label: 'Save',
 						handler: () => {
-							save()
+							save();
 						},
 					},
 					{
 						label: 'Save and Publish',
 						handler: () => {
-							save(true)
+							save(true);
 						},
 					},
 				]"
 			>
-				<template v-slot="{ toggleDropdown }">
+				<template #default="{ toggleDropdown }">
 					<Button
 						:loading="saveInProgress"
 						icon-right="chevron-down"
@@ -105,36 +99,32 @@
 			</Dropdown>
 		</template>
 		<template #body>
-			<div class="h-full grid grid-cols-1">
-				<SearchSection
-					v-if="!editable"
-					:disabled="editable"
-					class="mb-5"
-				/>
+			<div class="grid h-full grid-cols-1">
+				<SearchSection v-if="!editable" :disabled="editable" class="mb-5" />
 				<div
-					class="flex flex-col h-full"
+					class="flex h-full flex-col"
 					:class="editable ? '' : 'container mx-auto'"
 				>
 					<Breadcrumbs
 						v-if="!editable"
-						docType="Article"
-						:docName="articleId"
-						:isDesk="editable"
+						doc-type="Article"
+						:doc-name="articleId"
+						:is-desk="editable"
 						class="mb-5"
 					/>
-					<div class="flex flex-row space-x-[24px] grow">
+					<div class="flex grow flex-row space-x-[24px]">
 						<ArticleTitleAndContent
 							class="grow"
 							:editable="editable"
-							:editMode="editMode"
+							:edit-mode="editMode"
 							:article="article"
 						/>
 						<div class="w-[250px] shrink-0">
 							<ArticleDetails
 								v-if="editable"
 								:article="article"
-								:articleResource="$resources.article"
-								:isNew="isNew"
+								:article-resource="$resources.article"
+								:is-new="isNew"
 							/>
 							<!-- TODO: <RelatedArticles v-else :articleId="articleId" /> -->
 						</div>
@@ -147,25 +137,19 @@
 </template>
 
 <script>
-import EditableBlock from "@/components/global/kb/EditableBlock.vue"
-import SearchSection from "@/components/global/kb/SearchSection.vue"
-import Breadcrumbs from "@/components/global/kb/Breadcrumbs.vue"
-import ArticleDetails from "@/components/desk/kb/ArticleDetails.vue"
-import ArticleTitleAndContent from "@/components/desk/kb/ArticleTitleAndContent.vue"
-import { useRoute } from "vue-router"
-import { ref, provide, inject } from "vue"
-import { Dropdown, FeatherIcon } from "frappe-ui"
-import BaseBreadcrumbs from "@/components/global/BaseBreadcrumbs.vue"
-import ArticleFeedback from "@/components/portal/kb/ArticleFeedback.vue"
+import { ref, provide, inject } from "vue";
+import { useRoute } from "vue-router";
+import { Dropdown, FeatherIcon } from "frappe-ui";
+import EditableBlock from "@/components/global/kb/EditableBlock.vue";
+import SearchSection from "@/components/global/kb/SearchSection.vue";
+import Breadcrumbs from "@/components/global/kb/Breadcrumbs.vue";
+import ArticleDetails from "@/components/desk/kb/ArticleDetails.vue";
+import ArticleTitleAndContent from "@/components/desk/kb/ArticleTitleAndContent.vue";
+import BaseBreadcrumbs from "@/components/global/BaseBreadcrumbs.vue";
+import ArticleFeedback from "@/components/portal/kb/ArticleFeedback.vue";
 
 export default {
 	name: "Article",
-	props: {
-		articleId: {
-			type: String,
-			default: null,
-		},
-	},
 	components: {
 		EditableBlock,
 		SearchSection,
@@ -177,28 +161,34 @@ export default {
 		BaseBreadcrumbs,
 		ArticleFeedback,
 	},
+	props: {
+		articleId: {
+			type: String,
+			default: null,
+		},
+	},
 	setup() {
-		const user = inject("user")
-		const route = useRoute()
-		const editable = ref(route.meta.editable)
-		const isNew = ref(route.meta.isNew || false)
+		const user = inject("user");
+		const route = useRoute();
+		const editable = ref(route.meta.editable);
+		const isNew = ref(route.meta.isNew || false);
 
-		const editMode = ref(route.meta.editMode || false)
-		const saveInProgress = ref(false)
+		const editMode = ref(route.meta.editMode || false);
+		const saveInProgress = ref(false);
 
-		const articleTempValues = ref({})
-		if (isNew) {
+		const articleTempValues = ref({});
+		if (isNew.value) {
 			articleTempValues.value = {
 				author: user.value.user,
 				category: route.meta.category || null,
-			}
+			};
 		}
-		const updateArticleTempValues = ref(() => {})
-		const articleInputErrors = ref({})
-		const validators = ref({})
-		provide("updateArticleTempValues", updateArticleTempValues)
-		provide("articleTempValues", articleTempValues)
-		provide("articleInputErrors", articleInputErrors)
+		const updateArticleTempValues = ref(() => {});
+		const articleInputErrors = ref({});
+		const validators = ref({});
+		provide("updateArticleTempValues", updateArticleTempValues);
+		provide("articleTempValues", articleTempValues);
+		provide("articleInputErrors", articleInputErrors);
 
 		return {
 			editable,
@@ -209,7 +199,20 @@ export default {
 			updateArticleTempValues,
 			articleInputErrors,
 			validators,
-		}
+		};
+	},
+	computed: {
+		disableSaving() {
+			return false;
+		},
+		article() {
+			if (!this.isNew) {
+				return this.editable
+					? this.$resources.article.doc || {}
+					: this.$resources.article.data || {};
+			}
+			return {};
+		},
 	},
 	mounted() {
 		this.validators = {
@@ -217,35 +220,22 @@ export default {
 			content: this.validateContent,
 			author: this.validateAuthor,
 			category: this.validateCategory,
-		}
+		};
 
 		this.updateArticleTempValues = (input) => {
-			this.articleTempValues[input.field] = input.value
-			this.validators[input.field](input.value)
-		}
+			this.articleTempValues[input.field] = input.value;
+			this.validators[input.field](input.value);
+		};
 
 		if (!this.editable) {
 			this.$resources.incrementArtileViews.submit({
 				article: this.articleId,
-			})
+			});
 		}
-	},
-	computed: {
-		disableSaving() {
-			return false
-		},
-		article() {
-			if (!this.isNew) {
-				return this.editable
-					? this.$resources.article.doc || {}
-					: this.$resources.article.data || {}
-			}
-			return {}
-		},
 	},
 	resources: {
 		incrementArtileViews: {
-			method: "frappedesk.api.kb.increment_article_views",
+			url: "frappedesk.api.kb.increment_article_views",
 		},
 		article() {
 			if (!this.isNew) {
@@ -260,7 +250,7 @@ export default {
 									title: "Article updated",
 									customIcon: "circle-check",
 									appearance: "success",
-								})
+								});
 							},
 							onError: (err) => {
 								this.$toast({
@@ -268,28 +258,28 @@ export default {
 									text: err,
 									customIcon: "circle-fail",
 									appearance: "danger",
-								})
+								});
 							},
 						},
-					}
+					};
 				} else {
 					return {
-						method: "frappedesk.api.kb.get_article",
+						url: "frappedesk.api.kb.get_article",
 						params: {
 							article: this.articleId,
 						},
 						auto: true,
-					}
+					};
 				}
 			} else {
-				return {}
+				return {};
 			}
 		},
 		newArticle() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/frappedesk/kb/articles/${doc.name}`)
+					this.$router.push(`/frappedesk/kb/articles/${doc.name}`);
 				},
 				onError: (err) => {
 					this.$toast({
@@ -297,104 +287,101 @@ export default {
 						text: err,
 						customIcon: "circle-fail",
 						appearance: "danger",
-					})
+					});
 				},
-			}
+			};
 		},
 		checkIfTitleExists() {
 			return {
-				method: "frappedesk.api.kb.check_if_article_title_exists",
+				url: "frappedesk.api.kb.check_if_article_title_exists",
 				onSuccess: (exists) => {
 					if (exists) {
 						this.articleInputErrors.title =
-							"Article with this title already exists"
+							"Article with this title already exists";
 					} else {
-						this.articleInputErrors.title = ""
+						this.articleInputErrors.title = "";
 					}
 				},
-			}
+			};
 		},
 	},
 	methods: {
 		async validateTitle(value) {
-			this.articleInputErrors.titlle = ""
+			this.articleInputErrors.titlle = "";
 			if (!value || value == "") {
-				this.articleInputErrors.title = "Title is required"
+				this.articleInputErrors.title = "Title is required";
 			} else if (value.length <= 3) {
 				this.articleInputErrors.title =
-					"Title should be atleast 3 characters long"
+					"Title should be atleast 3 characters long";
 			} else {
 				await this.$resources.checkIfTitleExists.submit({
 					title: value,
 					name: this.isNew ? null : this.article.name,
-				})
+				});
 			}
-			return this.articleInputErrors.title
+			return this.articleInputErrors.title;
 		},
 		validateContent(value) {
-			this.articleInputErrors.content = ""
+			this.articleInputErrors.content = "";
 			if (!value || value.replaceAll(" ", "") == "<p></p>") {
-				this.articleInputErrors.content = "Content is required"
+				this.articleInputErrors.content = "Content is required";
 			}
-			return this.articleInputErrors.content
+			return this.articleInputErrors.content;
 		},
 		validateAuthor(value) {
-			this.articleInputErrors.author = ""
+			this.articleInputErrors.author = "";
 			if (!value) {
-				this.articleInputErrors.author = "Author is required"
+				this.articleInputErrors.author = "Author is required";
 			}
-			return this.articleInputErrors.author
+			return this.articleInputErrors.author;
 		},
 		validateCategory(value) {
-			this.articleInputErrors.category = ""
+			this.articleInputErrors.category = "";
 			if (!value) {
-				this.articleInputErrors.category = "Category is required"
+				this.articleInputErrors.category = "Category is required";
 			}
-			return this.articleInputErrors.category
+			return this.articleInputErrors.category;
 		},
 		async validateChanges() {
-			const input = this.articleTempValues
+			const input = this.articleTempValues;
 
-			let errors = ""
-			errors += await this.validateTitle(input.title)
-			errors += this.validateContent(input.content)
-			errors += this.validateAuthor(input.author)
-			errors += this.validateCategory(input.category)
+			let errors = "";
+			errors += await this.validateTitle(input.title);
+			errors += this.validateContent(input.content);
+			errors += this.validateAuthor(input.author);
+			errors += this.validateCategory(input.category);
 
-			return errors.length == 0
+			return errors.length == 0;
 		},
 		async saveChanges(publish = false) {
 			if (await this.validateChanges()) {
-				this.saveInProgress = true
+				this.saveInProgress = true;
 				if (this.isNew) {
-					this.articleTempValues.status = publish
-						? "Published"
-						: "Draft"
+					this.articleTempValues.status = publish ? "Published" : "Draft";
 					await this.$resources.newArticle.submit({
 						doc: {
 							doctype: "Article",
 							...this.articleTempValues,
 						},
-					})
+					});
 				} else {
 					// page is reloaded to fetch the new breadcrumbs
 					// TODO: find a better way to do this
-					let reloadPage =
-						this.articleTempValues.title != this.article.title
+					let reloadPage = this.articleTempValues.title != this.article.title;
 					await this.$resources.article.setValue.submit({
 						title: this.articleTempValues.title,
 						content: this.articleTempValues.content,
 						status: publish ? "Published" : "Draft",
-					})
+					});
 					if (reloadPage) {
-						this.$router.go()
+						this.$router.go();
 					}
 				}
-				this.editMode = false
-				this.saveInProgress = false
+				this.editMode = false;
+				this.saveInProgress = false;
 			}
-			return
+			return;
 		},
 	},
-}
+};
 </script>
