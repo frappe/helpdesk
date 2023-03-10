@@ -547,7 +547,7 @@ export default {
 		},
 		submitAndUpdateTicketStatus() {
 			return {
-				method: "frappedesk.api.ticket.update_ticket_status",
+				url: "frappedesk.api.ticket.update_ticket_status",
 				onSuccess: (val) => {
 					console.log(val);
 				},
