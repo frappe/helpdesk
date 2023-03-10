@@ -1,23 +1,20 @@
 <template>
 	<div class="overflow-hidden">
-		<div v-if="ticket" class="flex flex-col h-screen grow-0">
-			<div class="h-[60px] px-[20px] flex">
-				<div class="flex flex-row space-x-2 items-center">
+		<div v-if="ticket" class="flex h-screen grow-0 flex-col">
+			<div class="flex h-[60px] px-[20px]">
+				<div class="flex flex-row items-center space-x-2">
 					<router-link
 						:to="{ path: '/frappedesk/tickets' }"
-						class="text-[18px] text-gray-900 font-semibold stroke-gray-600 flex flex-row items-center space-x-[12px] hover:stroke-gray-700 select-none"
+						class="flex select-none flex-row items-center space-x-[12px] stroke-gray-600 text-[18px] font-semibold text-gray-900 hover:stroke-gray-700"
 						role="button"
 					>
-						<FeatherIcon
-							name="arrow-left"
-							class="w-[12px] h-[12px]"
-						/>
+						<FeatherIcon name="arrow-left" class="h-[12px] w-[12px]" />
 						<div>Ticket #{{ ticket.name }}</div>
 					</router-link>
 					<TicketStatus :value="ticket.status" />
 					<FeatherIcon
 						name="copy"
-						class="w-[24px] h-[24px] bg-gray-100 p-1 rounded-md stroke-gray-700"
+						class="h-[24px] w-[24px] rounded-md bg-gray-100 stroke-gray-700 p-1"
 						role="button"
 						@click="copyTicketNameToClipboard"
 					/>
@@ -25,24 +22,22 @@
 			</div>
 			<div
 				v-if="ticket"
-				class="flex border-t w-full"
+				class="flex w-full border-t"
 				:style="{
 					height: viewportWidth > 768 ? 'calc(100vh - 60px)' : null,
 				}"
 			>
-				<div class="border-r w-[252px] shrink-0">
-					<ActionPanel :ticketId="ticket.name" />
+				<div class="w-[252px] shrink-0 border-r">
+					<ActionPanel :ticket-id="ticket.name" />
 				</div>
 				<div
-					class="grow flex flex-col h-full"
+					class="flex h-full grow flex-col"
 					:style="{ width: 'calc(100vh - 252px - 240px - 252px)' }"
 				>
 					<div class="border-b py-[14px] px-[18px]">
 						<div class="flex flex-row justify-between">
 							<div class="grow">
-								<div
-									class="grow flex flex-row items-center space-x-[13.5px]"
-								>
+								<div class="flex grow flex-row items-center space-x-[13.5px]">
 									<div>
 										<CustomIcons
 											v-if="ticket.via_customer_portal"
@@ -52,7 +47,7 @@
 										<FeatherIcon
 											v-else
 											name="mail"
-											class="h-[25px] w-[25px] p-[1.5px] stroke-[#A6B1B9]"
+											class="h-[25px] w-[25px] stroke-[#A6B1B9] p-[1.5px]"
 										/>
 									</div>
 									<div
@@ -61,26 +56,26 @@
 									>
 										<a
 											:title="ticket.subject"
-											class="sm:max-w-[200px] lg:max-w-[550px] truncate cursor-pointer font-semibold"
+											class="cursor-pointer truncate font-semibold sm:max-w-[200px] lg:max-w-[550px]"
 										>
 											{{ ticket.subject }}
 										</a>
 										<FeatherIcon
-											class="w-4 h-4 cursor-pointer"
+											class="h-4 w-4 cursor-pointer"
 											name="edit"
 											@click="editingSubject = true"
 										/>
 									</div>
 									<div
 										v-else
-										class="flex grow gap-2 items-center justify-between"
+										class="flex grow items-center justify-between gap-2"
 									>
 										<Input
-											class="w-full"
 											id="subjectInput"
+											class="w-full"
 											:value="ticket.subject"
-											@change="subject = $event"
 											type="text"
+											@change="subject = $event"
 										/>
 										<div class="flex flex-row gap-2">
 											<Button
@@ -89,19 +84,14 @@
 													() => {
 														$resources.ticket.setValue
 															.submit({
-																subject:
-																	subject,
+																subject: subject,
 															})
-															.then(
-																(editingSubject = false)
-															)
+															.then((editingSubject = false));
 													}
 												"
 												>Save</Button
 											>
-											<Button
-												appearance="secondary"
-												@click="$router.go()"
+											<Button appearance="secondary" @click="$router.go()"
 												>Discard</Button
 											>
 										</div>
@@ -112,91 +102,78 @@
 					</div>
 					<div class="grow overflow-y-scroll px-[17px]">
 						<CustomerSatisfactionFeedback
-							:fromDesk="true"
 							v-if="
 								ticket.feedback_submitted &&
 								['Closed', 'Resolved'].includes(ticket.status)
 							"
+							:from-desk="true"
 							class="mt-[10px]"
 							:editable="false"
 							:ticket="ticket"
 						/>
 						<Conversations
-							:ticketId="ticket.name"
-							:scrollToBottom="scrollConversationsToBottom"
-							:autoScroll="
-								['Open', 'Replied'].includes(ticket.status)
-							"
+							:ticket-id="ticket.name"
+							:scroll-to-bottom="scrollConversationsToBottom"
+							:auto-scroll="['Open', 'Replied'].includes(ticket.status)"
 						/>
 					</div>
 					<div
-						class="shrink-0 flex flex-col mb-[15px] px-[18px] space-y-[11px] pt-2"
+						class="mb-[15px] flex shrink-0 flex-col space-y-[11px] px-[18px] pt-2"
 					>
 						<TextEditor
 							v-if="editing"
 							ref="replyEditor"
 							:content="content"
 							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
-							v-on:keydown="handleShortcuts($event)"
 							:mentions="mentions"
+							:placeholder="
+								editingType == 'reply' ? 'Type a response' : 'Type a comment'
+							"
+							class="rounded-[8px] border border-gray-300 p-[12px]"
+							@keydown="handleShortcuts($event)"
 							@change="
 								(val) => {
-									content = val
+									content = val;
 								}
 							"
 							@click="$refs.replyEditor.editor.commands.focus()"
-							:placeholder="
-								editingType == 'reply'
-									? 'Type a response'
-									: 'Type a comment'
-							"
-							class="border border-gray-300 rounded-[8px] p-[12px]"
 						>
 							<template #top>
 								<div
-									class="flex flex-row text-[12px] font-normal pb-[8px] border-[#F4F5F6] border-b-[1px]"
+									class="flex flex-row border-b-[1px] border-[#F4F5F6] pb-[8px] text-[12px] font-normal"
 								>
 									<div
-										class="flex flex-col w-[85%]"
 										v-if="editingType == 'reply'"
+										class="flex w-[85%] flex-col"
 									>
 										<div
 											v-if="ticket.raised_by"
-											class="flex flex-row space-x-2 items-center"
+											class="flex flex-row items-center space-x-2"
 										>
 											<div class="text-gray-700">To</div>
-											<div
-												class="bg-gray-50 rounded-[6px] px-[10px] py-[4px]"
-											>
+											<div class="rounded-[6px] bg-gray-50 px-[10px] py-[4px]">
 												{{ ticket.raised_by }}
 											</div>
 										</div>
 										<div
 											v-if="showCc"
-											class="flex flex-row space-x-2 items-center bg-transparent"
+											class="flex flex-row items-center space-x-2 bg-transparent"
 										>
 											<div class="text-gray-700">Cc</div>
 											<Input
-												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[4px]"
+												class="font-inter w-11/12 bg-white py-[4px] pl-[4px] text-[12px] focus:bg-white"
 												@input="cc = $event"
 											/>
 										</div>
-										<ErrorMessage
-											v-if="showCc"
-											:message="ccValidationError"
-										/>
+										<ErrorMessage v-if="showCc" :message="ccValidationError" />
 										<div
 											v-if="showBcc"
-											class="flex flex-row space-x-2 items-center"
+											class="flex flex-row items-center space-x-2"
 										>
-											<div
-												class="text-gray-700 bg-transparent"
-											>
-												Bcc
-											</div>
+											<div class="bg-transparent text-gray-700">Bcc</div>
 
 											<Input
-												class="py-[4px] bg-white w-11/12 focus:bg-white text-[12px] font-inter pl-[2px]"
+												class="font-inter w-11/12 bg-white py-[4px] pl-[2px] text-[12px] focus:bg-white"
 												@input="bcc = $event"
 											/>
 										</div>
@@ -205,24 +182,15 @@
 											:message="bccValidationError"
 										/>
 									</div>
-									<div
-										v-else
-										class="flex flex-row items-center space-x-2"
-									>
+									<div v-else class="flex flex-row items-center space-x-2">
 										<span class="text-gray-700">as</span>
 										<span
-											class="text-[11px] text-gray-900 bg-[#FDF9F2] shadow font-normal border border-gray-400 rounded-[6px] px-[10px] py-[4px]"
+											class="rounded-[6px] border border-gray-400 bg-[#FDF9F2] px-[10px] py-[4px] text-[11px] font-normal text-gray-900 shadow"
 											>Comment</span
 										>
 									</div>
-									<div
-										class="grow gap-1.5 flex flex-row-reverse"
-									>
-										<a
-											role="button"
-											@click="cancelEditing"
-											title="Hide Editor"
-										>
+									<div class="flex grow flex-row-reverse gap-1.5">
+										<a role="button" title="Hide Editor" @click="cancelEditing">
 											<CustomIcons
 												name="arrow-down"
 												class="h-[24px] w-[24px]"
@@ -233,13 +201,13 @@
 												v-if="showCcBtn"
 												class="h-[24px] w-[24px] bg-transparent text-[#4C5A67]"
 												label="Cc"
+												title="Cc"
 												@click="
 													() => {
-														showCc = true
-														showCcBtn = false
+														showCc = true;
+														showCcBtn = false;
 													}
 												"
-												title="Cc"
 											>
 											</Button>
 											<Button
@@ -247,13 +215,13 @@
 												class="h-[24px] w-[24px] bg-transparent text-[#4C5A67]"
 												appearenece="secondary"
 												label="Bcc"
+												title="Bcc"
 												@click="
 													() => {
-														showBcc = true
-														showBccBtn = false
+														showBcc = true;
+														showBccBtn = false;
 													}
 												"
-												title="Bcc"
 											>
 											</Button>
 										</div>
@@ -264,178 +232,128 @@
 								<div>
 									<div
 										v-if="attachments.length"
-										class="max-h-[100px] overflow-y-scroll rounded flex flex-col"
+										class="flex max-h-[100px] flex-col overflow-y-scroll rounded"
 									>
 										<ul class="flex flex-wrap gap-2 py-2">
 											<li
-												class="flex items-center p-1 space-x-2 bg-gray-100 border-gray-400 border shadow rounded"
 												v-for="file in attachments"
 												:key="file"
+												class="flex items-center space-x-2 rounded border border-gray-400 bg-gray-100 p-1 shadow"
 												:title="file.name"
 											>
-												<div
-													class="flex flex-row items-center space-x-1"
-												>
+												<div class="flex flex-row items-center space-x-1">
 													<FeatherIcon
 														name="file-text"
 														class="h-[15px] stroke-gray-600"
 													/>
 													<span
-														class="text-[12px] text-gray-700 font-normal ml-2 max-w-[100px] truncate"
+														class="ml-2 max-w-[100px] truncate text-[12px] font-normal text-gray-700"
 													>
 														{{ file.file_name }}
 													</span>
 												</div>
 												<button
-													class="grid w-4 h-4 text-gray-700 rounded hover:bg-gray-300 place-items-center"
+													class="grid h-4 w-4 place-items-center rounded text-gray-700 hover:bg-gray-300"
 													@click="
 														() => {
-															attachments =
-																attachments.filter(
-																	(x) =>
-																		x.name !=
-																		file.name
-																)
+															attachments = attachments.filter(
+																(x) => x.name != file.name
+															);
 														}
 													"
 												>
-													<FeatherIcon
-														class="w-3"
-														name="x"
-													/>
+													<FeatherIcon class="w-3" name="x" />
 												</button>
 											</li>
 										</ul>
 									</div>
 									<div v-if="showTextFormattingMenu">
 										<TextEditorFixedMenu
-											class="my-1 overflow-x-auto rounded shadow-sm border"
+											class="my-1 overflow-x-auto rounded border shadow-sm"
 											:buttons="textEditorMenuButtons"
 										/>
 									</div>
 									<div
-										class="pt-2 select-none flex flex-row items-center space-x-2 gap-2"
 										v-if="$refs.replyEditor"
+										class="flex select-none flex-row items-center gap-2 space-x-2 pt-2"
 									>
 										<div class="flex">
-											<Button
-												class="rounded-br-none rounded-tr-none border-r-[.5px] border-t-0 border-l-0 border-b-0 border-[#636363]"
-												:loading="
-													editingType == 'reply'
-														? $resources
-																.submitConversation
-																.loading
-														: $resources
-																.submitComment
-																.loading
-												"
-												@click="submit()"
-												appearance="primary"
-												:disabled="
-													(!user.agent &&
-														!user.isAdmin) ||
-													sendingDissabled
-												"
-											>
-												{{
-													editingType == "reply"
-														? "Send"
-														: "Create"
-												}}
-											</Button>
 											<Dropdown
 												v-if="editingType == 'reply'"
 												placement="right"
 												:button="{
-													class: 'rounded-bl-none rounded-tl-none',
+													class: 'rounded-r-none',
 													disabled:
-														(!user.agent &&
-															!user.isAdmin) ||
-														sendingDissabled,
+														(!user.agent && !user.isAdmin) || sendingDissabled,
 													appearance: 'primary',
 													label: 'Menu',
-													icon: 'chevron-down',
+													icon: 'chevron-up',
 												}"
 												:options="[
 													{
 														label: 'Send and set as Replied',
 														handler: () => {
-															let status =
-																'Replied'
-															submit()
-															submitAndUpdateTicketStatus(
-																status
-															)
-															this.$router.go()
+															submit();
+															submitAndUpdateTicketStatus('Replied');
+															$router.go();
 														},
 													},
 													{
 														label: 'Send and set as Resolved',
 														handler: () => {
-															let status =
-																'Resolved'
-															submit()
-															submitAndUpdateTicketStatus(
-																status
-															)
-															this.$router.go()
+															submit();
+															submitAndUpdateTicketStatus('Resolved');
+															$router.go();
 														},
 													},
 													{
 														label: 'Send and set as Closed',
 														handler: () => {
-															let status =
-																'Closed'
-															submit()
-															submitAndUpdateTicketStatus(
-																status
-															)
-															this.$router.go()
+															submit();
+															submitAndUpdateTicketStatus('Closed');
+															$router.go();
 														},
 													},
 												]"
 											/>
-										</div>
-										<div
-											class="flex flex-row items-center space-x-2"
-										>
-											<CustomIcons
-												:class="
-													showTextFormattingMenu
-														? 'bg-gray-200'
-														: ''
+											<Button
+												class="[&:nth-child(2)]:rounded-l-none"
+												:loading="
+													editingType == 'reply'
+														? $resources.submitConversation.loading
+														: $resources.submitComment.loading
 												"
+												appearance="primary"
+												:disabled="
+													(!user.agent && !user.isAdmin) || sendingDissabled
+												"
+												@click="submit()"
+											>
+												{{ editingType == "reply" ? "Send" : "Create" }}
+											</Button>
+										</div>
+										<div class="flex flex-row items-center space-x-2">
+											<CustomIcons
+												:class="showTextFormattingMenu ? 'bg-gray-200' : ''"
 												name="text-formatting"
 												class="h-7 w-7 rounded p-1"
 												role="button"
 												@click="
 													() => {
-														showTextFormattingMenu =
-															!showTextFormattingMenu
+														showTextFormattingMenu = !showTextFormattingMenu;
 													}
 												"
 											/>
-											<FileUploader
-												@success="
-													(file) =>
-														attachments.push(file)
-												"
-											>
+											<FileUploader @success="(file) => attachments.push(file)">
 												<template
-													v-slot="{
-														progress,
-														uploading,
-														openFileSelector,
-													}"
+													#default="{ progress, uploading, openFileSelector }"
 												>
 													<FeatherIcon
 														name="paperclip"
 														class="h-[17px]"
-														@click="
-															openFileSelector
-														"
 														role="button"
 														:disabled="uploading"
+														@click="openFileSelector"
 													/>
 												</template>
 											</FileUploader>
@@ -445,7 +363,7 @@
 												role="button"
 												@click="
 													() => {
-														showCannedResponsesDialog = true
+														showCannedResponsesDialog = true;
 													}
 												"
 											/>
@@ -455,44 +373,40 @@
 												role="button"
 												@click="
 													() => {
-														showArticleResponseDialog = true
+														showArticleResponseDialog = true;
 													}
 												"
 											/>
 											<CannedResponsesDialog
-												:show="
-													showCannedResponsesDialog
-												"
+												:show="showCannedResponsesDialog"
 												@messageVal="getMessage($event)"
 												@close="
 													() => {
-														showCannedResponsesDialog = false
+														showCannedResponsesDialog = false;
 													}
 												"
 											/>
 
 											<ArticleResponseDialog
-												:show="
-													showArticleResponseDialog
-												"
+												:show="showArticleResponseDialog"
 												@contentVal="getContent($event)"
 												@close="
 													() => {
-														showArticleResponseDialog = false
+														showArticleResponseDialog = false;
 													}
 												"
 											/>
 										</div>
-										<div class="grow flex flex-row-reverse">
+										<div class="flex grow flex-row-reverse">
 											<FeatherIcon
 												name="trash-2"
 												role="button"
 												class="h-4 w-4"
 												@click="
 													() => {
-														content = ''
-														attachments = []
-														editing = false
+														content = '';
+														attachments = [];
+														editing = false;
 													}
 												"
 											/>
@@ -502,20 +416,14 @@
 							</template>
 						</TextEditor>
 						<div>
-							<div
-								v-if="!editing"
-								class="flex flex-row space-x-[14px]"
-							>
-								<Button
-									appearance="primary"
-									@click="startEditing('reply')"
-								>
+							<div v-if="!editing" class="flex flex-row space-x-[14px]">
+								<Button appearance="primary" @click="startEditing('reply')">
 									Reply
 								</Button>
 								<Button
-									@click="startEditing('comment')"
 									appearance="secondary"
 									:disabled="!user.agent && !user.isAdmin"
+									@click="startEditing('comment')"
 								>
 									Add Comment
 								</Button>
@@ -523,8 +431,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="border-l bg-gray-50 w-[252px] shrink-0">
-					<InfoPanel :ticketId="ticket.name" />
+				<div class="w-[252px] shrink-0 border-l bg-gray-50">
+					<InfoPanel :ticket-id="ticket.name" />
 				</div>
 			</div>
 		</div>
@@ -541,22 +449,21 @@ import {
 	FileUploader,
 	FeatherIcon,
 	TextEditor,
-} from "frappe-ui"
-import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
-import Conversations from "@/components/desk/ticket/Conversations.vue"
-import InfoPanel from "@/components/desk/ticket/InfoPanel.vue"
-import ActionPanel from "@/components/desk/ticket/ActionPanel.vue"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
-import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue"
-import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue"
-import { inject, ref } from "vue"
-import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
-import { color } from "echarts"
+} from "frappe-ui";
+import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
+import Conversations from "@/components/desk/ticket/Conversations.vue";
+import InfoPanel from "@/components/desk/ticket/InfoPanel.vue";
+import ActionPanel from "@/components/desk/ticket/ActionPanel.vue";
+import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue";
+import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
+import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
+import { inject, ref } from "vue";
+import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
+import { color } from "echarts";
 
 export default {
 	name: "Ticket",
-	props: ["ticketId"],
 	components: {
 		Badge,
 		Card,
@@ -576,35 +483,27 @@ export default {
 		TicketStatus,
 		ErrorMessage,
 	},
-	data() {
-		return {
-			editing: false,
-			scrollConversationsToBottom: false,
-			content: "",
-			cc: "",
-			bcc: "",
-		}
-	},
+	props: ["ticketId"],
 	setup() {
-		const showTextFormattingMenu = ref(true)
-		const viewportWidth = inject("viewportWidth")
-		const user = inject("user")
-		const agents = inject("agents")
-		const attachments = ref([])
-		const editingType = ref("")
-		const replied = ref("Replied")
-		const tempTextEditorData = ref({})
-		const showCannedResponsesDialog = ref(false)
-		const tempMessage = ref("")
-		const showArticleResponseDialog = ref(false)
-		const tempContent = ref("")
-		const editingSubject = ref("")
-		const ccValidationError = ref("")
-		const bccValidationError = ref("")
-		const showCc = ref(false)
-		const showBcc = ref(false)
-		const showCcBtn = ref(true)
-		const showBccBtn = ref(true)
+		const showTextFormattingMenu = ref(true);
+		const viewportWidth = inject("viewportWidth");
+		const user = inject("user");
+		const agents = inject("agents");
+		const attachments = ref([]);
+		const editingType = ref("");
+		const replied = ref("Replied");
+		const tempTextEditorData = ref({});
+		const showCannedResponsesDialog = ref(false);
+		const tempMessage = ref("");
+		const showArticleResponseDialog = ref(false);
+		const tempContent = ref("");
+		const editingSubject = ref("");
+		const ccValidationError = ref("");
+		const bccValidationError = ref("");
+		const showCc = ref(false);
+		const showBcc = ref(false);
+		const showCcBtn = ref(true);
+		const showBccBtn = ref(true);
 
 		return {
 			showTextFormattingMenu,
@@ -627,7 +526,16 @@ export default {
 			showCcBtn,
 			showBccBtn,
 			replied,
-		}
+		};
+	},
+	data() {
+		return {
+			editing: false,
+			scrollConversationsToBottom: false,
+			content: "",
+			cc: "",
+			bcc: "",
+		};
 	},
 	resources: {
 		ticket() {
@@ -635,15 +543,15 @@ export default {
 				type: "document",
 				doctype: "Ticket",
 				name: this.ticketId,
-			}
+			};
 		},
 		submitAndUpdateTicketStatus() {
 			return {
 				method: "frappedesk.api.ticket.update_ticket_status",
 				onSuccess: (val) => {
-					console.log(val)
+					console.log(val);
 				},
-			}
+			};
 		},
 		submitConversation() {
 			return {
@@ -655,7 +563,7 @@ export default {
 								title: "Email not sent",
 								text: "No default outgoing email available",
 							},
-						}[res.error_code]
+						}[res.error_code];
 						this.$toast({
 							fixed: true,
 							title: error.title,
@@ -666,58 +574,47 @@ export default {
 							action: {
 								title: "Setup Now",
 								onClick: () => {
-									this.$router.push({ name: "Emails" })
+									this.$router.push({ name: "Emails" });
 								},
 							},
-						})
+						});
 					}
-					this.tempTextEditorData = {}
-					this.editing = false
+					this.tempTextEditorData = {};
+					this.editing = false;
 				},
 				onError: () => {
-					this.content = this.tempTextEditorData.content
-					this.attachments = this.tempTextEditorData.attachments
+					this.content = this.tempTextEditorData.content;
+					this.attachments = this.tempTextEditorData.attachments;
 				},
-			}
+			};
 		},
 		submitComment() {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: () => {
-					this.tempTextEditorData = {}
-					this.editing = false
+					this.tempTextEditorData = {};
+					this.editing = false;
 				},
 				onError: () => {
-					this.content = this.tempTextEditorData.content
-					this.attachments = this.tempTextEditorData.attachments
+					this.content = this.tempTextEditorData.content;
+					this.attachments = this.tempTextEditorData.attachments;
 				},
-			}
+			};
 		},
 		markTicketAsSeen() {
 			return {
 				url: "frappedesk.api.ticket.mark_ticket_as_seen",
-			}
+			};
 		},
-	},
-	mounted() {
-		this.$resources.markTicketAsSeen.submit({
-			ticket_id: this.ticketId,
-		})
 	},
 	computed: {
 		ticket() {
-			return this.$resources.ticket.doc || null
+			return this.$resources.ticket.doc || null;
 		},
 		textEditorMenuButtons() {
 			return [
 				"Paragraph",
-				[
-					"Heading 2",
-					"Heading 3",
-					"Heading 4",
-					"Heading 5",
-					"Heading 6",
-				],
+				["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
 				"Separator",
 				"Bold",
 				"Italic",
@@ -753,77 +650,80 @@ export default {
 				"Separator",
 				"Undo",
 				"Redo",
-			]
+			];
 		},
 		sendingDissabled() {
-			let content = this.content.trim()
-			content = content.replaceAll("<p></p>", "")
-			content = content.replaceAll(" ", "")
+			let content = this.content.trim();
+			content = content.replaceAll("<p></p>", "");
+			content = content.replaceAll(" ", "");
 			return (
-				(content == "" ||
-					content == "<p><br></p>" ||
-					content == "<p></p>") &&
+				(content == "" || content == "<p><br></p>" || content == "<p></p>") &&
 				this.attachments.length == 0
-			)
+			);
 		},
 		mentions() {
-			const users = this.editingType === "comment" ? this.agents : []
+			const users = this.editingType === "comment" ? this.agents : [];
 			return users.map((user) => ({
 				label: user.agent_name,
 				value: user.name,
-			}))
+			}));
 		},
+	},
+	mounted() {
+		this.$resources.markTicketAsSeen.submit({
+			ticket_id: this.ticketId,
+		});
 	},
 	methods: {
 		async copyTicketNameToClipboard() {
 			if (window.isSecureContext) {
-				await navigator.clipboard.writeText(this.ticket.name)
+				await navigator.clipboard.writeText(this.ticket.name);
 			} else {
-				const textArea = document.createElement("textarea")
-				textArea.value = this.ticket.name
-				document.body.appendChild(textArea)
-				textArea.focus()
-				textArea.select()
+				const textArea = document.createElement("textarea");
+				textArea.value = this.ticket.name;
+				document.body.appendChild(textArea);
+				textArea.focus();
+				textArea.select();
 				try {
-					document.execCommand("copy")
+					document.execCommand("copy");
 				} catch (err) {
-					console.error("Unable to copy to clipboard", err)
+					console.error("Unable to copy to clipboard", err);
 				}
-				document.body.removeChild(textArea)
+				document.body.removeChild(textArea);
 			}
 			this.$toast({
 				title: "Copied to clipboard",
 				customIcon: "circle-check",
 				appearance: "success",
-			})
+			});
 		},
 		startEditing(type = "reply") {
-			this.editing = true
-			this.editingType = type
-			this.delayedConversationScroll()
+			this.editing = true;
+			this.editingType = type;
+			this.delayedConversationScroll();
 			this.$nextTick(() => {
-				this.$refs.replyEditor.editor.commands.focus()
-			})
+				this.$refs.replyEditor.editor.commands.focus();
+			});
 		},
 		cancelEditing() {
-			this.editing = false
+			this.editing = false;
 		},
 		delayedConversationScroll() {
 			function delay(time) {
-				return new Promise((resolve) => setTimeout(resolve, time))
+				return new Promise((resolve) => setTimeout(resolve, time));
 			}
-			delay(400).then(() => (this.scrollConversationsToBottom = true))
-			delay(1000).then(() => (this.scrollConversationsToBottom = false))
+			delay(400).then(() => (this.scrollConversationsToBottom = true));
+			delay(1000).then(() => (this.scrollConversationsToBottom = false));
 		},
 		handleShortcuts(e) {
 			if ((e.metaKey || e.ctrlKey) && e.keyCode === 13) {
 				if (!this.sendingDissabled) {
-					this.submit()
+					this.submit();
 				}
 			} else if ((e.metaKey || e.ctrlKey) && e.keyCode === 75) {
-				this.$refs.replyEditor.editor.commands.insertLink()
+				this.$refs.replyEditor.editor.commands.insertLink();
 			} else if (e.keyCode === 27) {
-				this.cancelEditing()
+				this.cancelEditing();
 			}
 		},
 		submit() {
@@ -832,50 +732,50 @@ export default {
 			// }
 			switch (this.editingType) {
 				case "reply":
-					this.submitConversation()
-					break
+					this.submitConversation();
+					break;
 				case "comment":
-					this.submitComment()
-					break
+					this.submitComment();
+					break;
 			}
 		},
 		submitConversation() {
-			this.tempTextEditorData.content = this.content
-			this.tempTextEditorData.attachments = this.attachments
-			const content = `<div class='content-block'><div>${this.content}</div></div>`
+			this.tempTextEditorData.content = this.content;
+			this.tempTextEditorData.attachments = this.attachments;
+			const content = `<div class='content-block'><div>${this.content}</div></div>`;
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: content,
 				cc: this.cc,
 				bcc: this.bcc,
 				attachments: this.attachments.map((x) => x.name),
-			})
-			this.content = ""
-			this.attachments = []
+			});
+			this.content = "";
+			this.attachments = [];
 		},
 		submitAndUpdateTicketStatus(status) {
 			this.$resources.submitAndUpdateTicketStatus.submit({
 				ticket_id: this.ticketId,
 				status: status,
-			})
+			});
 		},
 		submitResolvedTicket() {
-			this.tempTextEditorData.content = this.content
-			this.tempTextEditorData.attachments = this.attachments
-			const content = `<div class='content-block'><div>${this.content}</div></div>`
+			this.tempTextEditorData.content = this.content;
+			this.tempTextEditorData.attachments = this.attachments;
+			const content = `<div class='content-block'><div>${this.content}</div></div>`;
 			this.$resources.submitConversation.submit({
 				ticket_id: this.ticketId,
 				message: content,
 				status: "Resolved",
 				attachments: this.attachments.map((x) => x.name),
-			})
-			this.content = ""
-			this.attachments = []
+			});
+			this.content = "";
+			this.attachments = [];
 		},
 		submitComment() {
-			this.tempTextEditorData.attachments = this.attachments
-			this.tempTextEditorData.content = this.content
-			const content = `<div class='content-block'><div>${this.content}</div></div>`
+			this.tempTextEditorData.attachments = this.attachments;
+			this.tempTextEditorData.content = this.content;
+			const content = `<div class='content-block'><div>${this.content}</div></div>`;
 			this.$resources.submitComment.submit({
 				doc: {
 					doctype: "Frappe Desk Comment",
@@ -883,45 +783,45 @@ export default {
 					content: content,
 					commented_by: this.user.user,
 				},
-			})
-			this.content = ""
-			this.attachments = []
+			});
+			this.content = "";
+			this.attachments = [];
 		},
 		getNextTicket() {},
 		getPreviousTicket() {},
 		getMessage(message) {
-			this.tempMessage = message
-			this.content = this.tempMessage
+			this.tempMessage = message;
+			this.content = this.tempMessage;
 		},
 		getContent(content) {
-			this.tempContent = content
-			this.content = this.tempContent
+			this.tempContent = content;
+			this.content = this.tempContent;
 		},
 		validateInputs() {
 			if (this.cc || this.bcc != "") {
-				let error = this.validateCcInput(this.cc)
-				error += this.validateBccInput(this.bcc)
-				return error
+				let error = this.validateCcInput(this.cc);
+				error += this.validateBccInput(this.bcc);
+				return error;
 			}
 		},
 		validateCcInput(value) {
-			this.ccValidationError = ""
+			this.ccValidationError = "";
 			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
 			if (!reg.test(value)) {
-				this.ccValidationError = "Enter a valid email"
+				this.ccValidationError = "Enter a valid email";
 			}
-			return this.ccValidationError
+			return this.ccValidationError;
 		},
 		validateBccInput(value) {
-			this.bccValidationError = ""
+			this.bccValidationError = "";
 			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
 			if (!reg.test(value)) {
-				this.bccValidationError = "Enter a valid email"
+				this.bccValidationError = "Enter a valid email";
 			}
-			return this.bccValidationError
+			return this.bccValidationError;
 		},
 	},
-}
+};
 </script>
