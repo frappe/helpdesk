@@ -337,7 +337,7 @@ export default {
 	resources: {
 		getSlaPolicy() {
 			return {
-				method: "frappe.client.get",
+				url: "frappe.client.get",
 				params: {
 					doctype: "SLA",
 					name: this.slaId,
@@ -410,7 +410,7 @@ export default {
 		},
 		updateServicePolicy() {
 			return {
-				method: "frappe.client.set_value",
+				url: "frappe.client.set_value",
 				onError: (error) => {
 					console.log(error)
 				},
@@ -418,7 +418,7 @@ export default {
 		},
 		createNewServicePolicy() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: () => {
 					this.$router.push({
 						name: "SlaPolicies",
@@ -428,7 +428,7 @@ export default {
 		},
 		renameServicePolicy() {
 			return {
-				method: "frappe.client.rename_doc",
+				url: "frappe.client.rename_doc",
 				onSuccess: (data) => {
 					console.log(data)
 				},
@@ -436,7 +436,7 @@ export default {
 		},
 		getServiceHolidayList() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "Service Holiday List",
 					fields: ["*"],

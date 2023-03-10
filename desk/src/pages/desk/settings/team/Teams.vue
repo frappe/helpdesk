@@ -97,7 +97,7 @@ export default {
 	resources: {
 		deleteTeam() {
 			return {
-				method: "frappe.client.delete",
+				url: "frappe.client.delete",
 			}
 		},
 	},

@@ -98,7 +98,7 @@ export default {
 		})
 		const to = computed(() => {
 			const start = manager.value.options.start
-			const limit = manager.value.options.limit
+			const limit = manager.value.options.pageLength
 			if (start + limit > manager.value.totalCount) {
 				return manager.value.totalCount
 			}

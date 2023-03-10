@@ -78,7 +78,7 @@ export default {
 				return
 			}
 			return {
-				method: "frappedesk.api.kb.get_breadcrumbs",
+				url: "frappedesk.api.kb.get_breadcrumbs",
 				params: {
 					docType: this.docType,
 					docName: this.docName,

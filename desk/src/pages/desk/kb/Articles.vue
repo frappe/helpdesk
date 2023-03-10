@@ -207,26 +207,23 @@ export default {
 	resources: {
 		moveArticlesToCategory() {
 			return {
-				method: "frappedesk.api.kb.move_articles_to_category",
-			};
+				url: "frappedesk.api.kb.move_articles_to_category",
+			}
 		},
 		setStatusForArticles() {
 			return {
-				method: "frappedesk.api.kb.set_status_for_articles",
-			};
+				url: "frappedesk.api.kb.set_status_for_articles",
+			}
 		},
 		deleteArticles() {
 			return {
-				method: "frappedesk.api.kb.delete_articles",
-			};
+				url: "frappedesk.api.kb.delete_articles",
+			}
 		},
 		knowledgeBase() {
 			if (this.activeTab == "Webview") {
-				this.$router.push({ path: "/frappedesk/kb" });
+				this.$router.push({ path: "/frappedesk/kb" })
 			}
-			return {
-				auto: true,
-			};
 		},
 	},
 };

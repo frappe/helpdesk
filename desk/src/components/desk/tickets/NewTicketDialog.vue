@@ -16,7 +16,7 @@
 						<Autocomplete
 							:value="selectedTicketType"
 							:resource-options="{
-								method: 'frappe.client.get_list',
+								url: 'frappe.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'Ticket Type',
@@ -52,7 +52,7 @@
 						<Autocomplete
 							:value="selectedContact"
 							:resource-options="{
-								method: 'frappe.client.get_list',
+								url: 'frappe.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'Contact',
@@ -90,7 +90,7 @@
 						<Autocomplete
 							:value="fdCustomer != null ? fdCustomer : selectedCustomer"
 							:resource-options="{
-								method: 'frappe.client.get_list',
+								url: 'frappe.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'FD Customer',
@@ -291,7 +291,7 @@ export default {
 					this.isCreating = false;
 					this.$emit("ticket-created");
 				})
-				.catch(() => this.isCreating = false)
+				.catch(() => (this.isCreating = false));
 		},
 		validateInputs() {
 			let error = this.validateContactInput(this.selectedContact);

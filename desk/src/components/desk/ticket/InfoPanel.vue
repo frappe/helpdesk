@@ -365,7 +365,7 @@ export default {
 		otherTicketsOfContact() {
 			return {
 				cache: ["Other Tickets", "Action Panel", this.ticketId],
-				method: "frappedesk.api.ticket.get_other_tickets_of_contact",
+				url: "frappedesk.api.ticket.get_other_tickets_of_contact",
 				params: {
 					ticket_id: this.ticketId,
 				},

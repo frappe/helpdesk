@@ -580,7 +580,7 @@ export default {
 		},
 		submitConversation() {
 			return {
-				method: "frappedesk.api.ticket.submit_conversation_via_agent",
+				url: "frappedesk.api.ticket.submit_conversation_via_agent",
 				onSuccess: (res) => {
 					if (res.status == "error") {
 						const error = {
@@ -615,7 +615,7 @@ export default {
 		},
 		submitComment() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: () => {
 					this.tempTextEditorData = {}
 					this.editing = false
@@ -628,7 +628,7 @@ export default {
 		},
 		markTicketAsSeen() {
 			return {
-				method: "frappedesk.api.ticket.mark_ticket_as_seen",
+				url: "frappedesk.api.ticket.mark_ticket_as_seen",
 			}
 		},
 	},

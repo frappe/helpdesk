@@ -100,7 +100,7 @@ export default {
 	resources: {
 		user() {
 			return {
-				method: "frappedesk.api.agent.get_user",
+				url: "frappedesk.api.agent.get_user",
 				onSuccess: () => {
 					const userData = this.$resources.user.data
 					if (userData) {
@@ -117,7 +117,7 @@ export default {
 		},
 		login() {
 			return {
-				method: "login",
+				url: "login",
 				onSuccess: (res) => {
 					this.$event.emit("user-login-success", res)
 				},
@@ -128,7 +128,7 @@ export default {
 		},
 		signup() {
 			return {
-				method: "frappedesk.api.account.signup",
+				url: "frappedesk.api.account.signup",
 				onSuccess: (res) => {
 					this.$event.emit("user-signup-success", res)
 				},
@@ -139,7 +139,7 @@ export default {
 		},
 		helpdeskName() {
 			return {
-				method: "frappedesk.api.website.helpdesk_name",
+				url: "frappedesk.api.website.helpdesk_name",
 				auto: true,
 				onSuccess: (res) => {
 					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`

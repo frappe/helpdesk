@@ -123,7 +123,7 @@ export default {
 	resources: {
 		users() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 				params: {
 					doctype: "User",
 					fields: ["name", "full_name"],

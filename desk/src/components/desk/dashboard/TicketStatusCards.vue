@@ -108,7 +108,7 @@ export default {
 	resources: {
 		getTicketStatusCount() {
 			return {
-				method: "frappedesk.api.dashboard.ticket_status",
+				url: "frappedesk.api.dashboard.ticket_status",
 				auto: true,
 			}
 		},

@@ -106,9 +106,6 @@ export default {
 			if (this.activeTab == "Articles") {
 				this.$router.push({ path: "/frappedesk/kb/articles" })
 			}
-			return {
-				auto: true,
-			}
 		},
 	},
 }

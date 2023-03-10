@@ -202,7 +202,7 @@ export default {
 	resources: {
 		newResponse() {
 			return {
-				method: "frappe.client.insert",
+				url: "frappe.client.insert",
 				onSuccess: (doc) => {
 					this.$router.push(
 						`/frappedesk/settings/canned_responses/${doc.name}`

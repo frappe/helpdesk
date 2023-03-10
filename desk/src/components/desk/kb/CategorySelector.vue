@@ -162,13 +162,13 @@ export default {
 	resources: {
 		categoriesInCurrentLevel() {
 			return {
-				method: "frappe.client.get_list",
+				url: "frappe.client.get_list",
 			}
 		},
 		selectedCategory() {
 			if (!this.selectedCategory) return
 			return {
-				method: "frappe.client.get",
+				url: "frappe.client.get",
 				params: {
 					doctype: "Category",
 					name: this.selectedCategory,
