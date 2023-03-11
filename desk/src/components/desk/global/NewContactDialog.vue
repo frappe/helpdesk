@@ -58,7 +58,7 @@
 								}
 							"
 							:resourceOptions="{
-								url: 'frappe.client.get_list',
+								url: 'frappedesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'FD Customer',
@@ -177,7 +177,7 @@ export default {
 		},
 		getCustomers() {
 			return {
-				url: "frappe.client.get_list",
+				url: "frappedesk.extends.client.get_list",
 				params: {
 					doctype: "FD Customer",
 					fields: ["name", "customer_name"],
