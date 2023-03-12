@@ -37,7 +37,6 @@ export default {
 			pageLength: props.options.limit || 20,
 			start: 0,
 			orderBy: props.options.order_by || "",
-			debug: true,
 		});
 
 		const listResource = createListResource(
@@ -53,7 +52,6 @@ export default {
 				start: options.value.start,
 				realtime: true,
 				pageLength: 3,
-				debug: true,
 			},
 			context
 		);
