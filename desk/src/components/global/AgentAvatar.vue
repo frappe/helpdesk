@@ -1,5 +1,7 @@
 <template>
-	<Avatar size="sm" :image-u-r-l="image" :label="name" />
+	<Tooltip :text="name">
+		<Avatar size="sm" :image-u-r-l="image" :label="name" />
+	</Tooltip>
 </template>
 
 <script>
