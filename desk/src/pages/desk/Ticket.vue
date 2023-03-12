@@ -565,18 +565,20 @@ export default {
 							},
 						}[res.error_code];
 						this.$toast({
-							fixed: true,
 							title: error.title,
 							text: error.text,
-							customIcon: "circle-fail",
-							appearance: "danger",
-							fixed: true,
-							action: {
-								title: "Setup Now",
-								onClick: () => {
-									this.$router.push({ name: "Emails" });
+							icon: "mail",
+							iconClasses: "text-red-500",
+							buttons: [
+								{
+									title: "Setup now",
+									appearance: "primary",
+									iconRight: "arrow-right",
+									onClick: () => {
+										this.$router.push({ name: "Emails" });
+									},
 								},
-							},
+							],
 						});
 					}
 					this.tempTextEditorData = {};

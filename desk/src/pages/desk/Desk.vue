@@ -240,36 +240,39 @@ export default {
 			this.$toast({
 				title: "Default outgoing email account not added",
 				text: "Please add a default outgoing email account in settings.",
-				appearance: "info",
-				icon: "info",
-				iconClasses: "stroke-blue-500 stroke-2",
-				fixed: true,
-				position: "bottom-right",
-				action: {
-					title: "Setup now",
-					onClick: () => {
-						this.$clearToasts();
-						this.$router.push({ name: "Emails" });
+				timeout: 0,
+				icon: "mail",
+				iconClasses: "text-red-500",
+				buttons: [
+					{
+						title: "Setup now",
+						appearance: "primary",
+						iconRight: "arrow-right",
+						onClick: () => {
+							this.$router.push({ name: "Emails" });
+						},
 					},
-				},
+				],
 			});
 		},
 		showAddAgentsToast() {
 			this.$toast({
-				title: "Add agents",
-				text: "Please add an agents from settings.",
+				title: "Add agent",
+				text: "Please add an agent from settings",
+				timeout: 0,
 				appearance: "info",
-				icon: "info",
-				iconClasses: "stroke-blue-500 stroke-2",
-				fixed: true,
-				position: "bottom-right",
-				action: {
-					title: "Add now",
-					onClick: () => {
-						this.$clearToasts();
-						this.$router.push({ name: "Agents" });
-					},
-				},
+				icon: "users",
+				iconClasses: "text-red-500",
+				buttons: [
+					{
+						title: "Add now",
+						appearance: "danger",
+						iconRight: "arrow-right",
+						onClick: () => {
+							this.$router.push({ name: "Agents" });
+						},
+					}
+				],
 			});
 		},
 	},

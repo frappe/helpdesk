@@ -8,7 +8,7 @@
 <script>
 import { provide, ref } from "vue"
 import { call } from "frappe-ui"
-import { Toasts } from "@/utils/toasts"
+import { Toasts } from "@/components/global/toast"
 
 export default {
 	name: "App",
