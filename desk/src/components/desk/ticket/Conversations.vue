@@ -109,7 +109,6 @@ export default {
 			return conversations;
 		},
 		communications() {
-			console.log(this.$resources.communications.data, "commu");
 			return this.$resources.communications.data || [];
 		},
 		comments() {

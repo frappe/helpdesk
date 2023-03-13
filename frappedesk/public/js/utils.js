@@ -15,7 +15,6 @@ window.FileAttachmentHandler = class FileAttachmentHandler {
 		new frappe.ui.FileUploader({
 			folder: "Home/Attachments",
 			on_success: (file_doc) => {
-				console.log(`File ${file_doc.name} uploaded`)
 				if (!this.attachments) this.attachments = []
 				if (!this.save_paths) this.save_paths = {}
 				this.attachments.push(file_doc)
@@ -28,7 +27,6 @@ window.FileAttachmentHandler = class FileAttachmentHandler {
 	}
 
 	build_attachment_table() {
-		console.log("Here 10")
 		var wrapper = $('<div class="helpdesk-attachment"></div>')
 		wrapper.empty()
 

@@ -146,9 +146,6 @@ export default {
 	resources: {
 		searchResults: {
 			url: "frappedesk.api.kb.search",
-			onSuccess: (res) => {
-				console.log(res)
-			},
 		},
 	},
 }
