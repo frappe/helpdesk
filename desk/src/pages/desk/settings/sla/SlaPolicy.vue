@@ -403,17 +403,11 @@ export default {
 						)
 					})
 				},
-				onError: (error) => {
-					console.log(error)
-				},
 			}
 		},
 		updateServicePolicy() {
 			return {
 				url: "frappe.client.set_value",
-				onError: (error) => {
-					console.log(error)
-				},
 			}
 		},
 		createNewServicePolicy() {
@@ -429,9 +423,6 @@ export default {
 		renameServicePolicy() {
 			return {
 				url: "frappe.client.rename_doc",
-				onSuccess: (data) => {
-					console.log(data)
-				},
 			}
 		},
 		getServiceHolidayList() {

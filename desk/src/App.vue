@@ -70,9 +70,6 @@ export default {
 				await call("logout")
 				this.$router.push({ path: "/frappedesk/login" })
 			},
-			resetPassword: async (email) => {
-				console.log("reset password")
-			},
 			isLoggedIn: () => {
 				const cookie = Object.fromEntries(
 					document.cookie

@@ -99,9 +99,6 @@ export default {
 						this.tickets[data[i].name] = data[i]
 					}
 				},
-				onError: (error) => {
-					console.log(`tickets error : ${error}`)
-				},
 			}
 		},
 		ticket() {
@@ -109,9 +106,6 @@ export default {
 				url: "frappedesk.api.ticket.get_ticket",
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket
-				},
-				onError: (error) => {
-					console.log(`ticket error : ${error}`)
 				},
 			}
 		},
@@ -122,9 +116,6 @@ export default {
 				onSuccess: (data) => {
 					this.ticketTemplates = data
 				},
-				onError: (error) => {
-					console.log(`template error : ${error}`)
-				},
 			}
 		},
 		assignTicketStatus() {
@@ -132,9 +123,6 @@ export default {
 				url: "frappedesk.api.ticket.assign_ticket_status",
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
-				},
-				onError: (error) => {
-					console.log(`assign status error : ${error}`)
 				},
 			}
 		},

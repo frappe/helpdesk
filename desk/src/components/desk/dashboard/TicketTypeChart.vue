@@ -22,14 +22,6 @@ export default {
 			required: true,
 		},
 	},
-	watch: {
-		fromDate(newVal, Oldval) {
-			console.log(newVal, Oldval)
-		},
-		toDate(newVal, oldVal) {
-			console.log(oldVal, newVal)
-		},
-	},
 	data() {
 		let ticketType = []
 		let ticketCount = []
