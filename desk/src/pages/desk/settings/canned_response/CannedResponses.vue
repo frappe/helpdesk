@@ -127,8 +127,8 @@ export default {
 					this.$toast({
 						title: "Error while deleting canned responses",
 						text: err,
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-red-500",
 					});
 				},
 			};

@@ -695,8 +695,8 @@ export default {
 			}
 			this.$toast({
 				title: "Copied to clipboard",
-				customIcon: "circle-check",
-				appearance: "success",
+				icon: "check",
+				iconClasses: "text-green-500",
 			});
 		},
 		startEditing(type = "reply") {

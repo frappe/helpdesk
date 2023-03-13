@@ -212,8 +212,8 @@ export default {
 					this.$toast({
 						title: "Error while creating canned response",
 						text: err,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}

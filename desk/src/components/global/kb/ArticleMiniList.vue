@@ -157,16 +157,16 @@ export default {
 
 					this.$toast({
 						title: "Articles updated!!",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					});
 				},
 				onError: (err) => {
 					this.$toast({
 						title: "Error while saving",
 						text: err,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 				},
 			};

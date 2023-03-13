@@ -508,8 +508,8 @@ export default {
 					this.$toast({
 						title: "Error getting Email Account.",
 						text: this.errors[error] || error,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}
@@ -520,8 +520,8 @@ export default {
 				onSuccess: () => {
 					this.$toast({
 						title: "Email Account Created!!",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					})
 					this.$clearToasts()
 					this.$router.push({
@@ -532,8 +532,8 @@ export default {
 					this.$toast({
 						title: "Error creating new Email Account.",
 						text: this.errors[error] || error,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}
@@ -554,8 +554,8 @@ export default {
 					} else {
 						this.$toast({
 							title: "Email Account Updated.",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500",
 						})
 					}
 				},
@@ -563,8 +563,8 @@ export default {
 					this.$toast({
 						title: "Error updating Email Account.",
 						text: this.errors[error] || error,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}
@@ -579,8 +579,8 @@ export default {
 					this.$toast({
 						title: "Error renaming Email Account.",
 						text: this.errors[error] || error,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}

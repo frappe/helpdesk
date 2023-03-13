@@ -399,8 +399,8 @@ export default {
 					onSuccess() {
 						this.$toast({
 							title: "Customer updated successfully.",
-							appearance: "success",
-							customIcon: "circle-check",
+							icon: "check",
+							iconClasses: "text-green-500",
 						})
 					},
 				},
@@ -437,8 +437,8 @@ export default {
 				onSuccess: () => {
 					this.$toast({
 						title: "Customer deleted",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					})
 					this.resetForm()
 				},
@@ -447,8 +447,8 @@ export default {
 					this.$toast({
 						title: "Cannot delete customer",
 						text: e,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			})
@@ -468,8 +468,8 @@ export default {
 			} else {
 				this.$toast({
 					title: "Please fill all the fields",
-					customIcon: "circle-fail",
-					appearance: "danger",
+					icon: "x",
+					iconClasses: "text-red-500",
 				})
 			}
 		},

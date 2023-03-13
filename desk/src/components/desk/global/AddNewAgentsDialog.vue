@@ -184,8 +184,8 @@ export default {
 					this.$clearToasts()
 					this.$toast({
 						title: "Invites Sent Successfully!",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500"
 					})
 
 					this.close()
@@ -195,15 +195,14 @@ export default {
 						this.$toast({
 							title: "Paywall Reached!",
 							text: "You have reached the maximum number of agents you can add. Please upgrade your plan to add more agents.",
-							customIcon: "circle-fail",
-							appearance: "danger",
-							fixed: true,
+							icon: "x",
+							iconClasses: "text-red-500",
 						})
 					} else {
 						this.$toast({
 							title: "Error Sending Invites!",
-							customIcon: "circle-fail",
-							appearance: "danger",
+							icon: "x",
+							iconClasses: "text-red-500",
 						})
 					}
 				},

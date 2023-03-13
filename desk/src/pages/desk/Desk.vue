@@ -294,8 +294,8 @@ export default {
 					this.$toast({
 						title: "Something went wrong, while adding initial agent",
 						text: "Please try again later.",
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 				},
 			};
@@ -311,8 +311,8 @@ export default {
 					this.$toast({
 						title: "Something went wrong, while creating a demo ticket",
 						text: "Please try again later.",
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 				},
 			};
@@ -325,16 +325,16 @@ export default {
 					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
 					this.$toast({
 						title: "Helpdesk name updated!!",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					});
 				},
 				onError: (err) => {
 					this.$toast({
 						title: "Something went wrong, updating helpdesk name",
 						text: "Please try again later.",
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 				},
 			};
@@ -357,8 +357,8 @@ export default {
 					this.$toast({
 						title: "Something went wrong.",
 						text: "Please try again later.",
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 				},
 			};
@@ -398,8 +398,8 @@ export default {
 					this.$toast({
 						title: "Error while creating ticket",
 						text: error.messages.join(", "),
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 
 					throw error;

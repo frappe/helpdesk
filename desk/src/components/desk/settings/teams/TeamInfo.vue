@@ -166,24 +166,24 @@ export default {
 					this.$toast({
 						title: "Error Fetching Team",
 						text: err,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 				},
 				setValue: {
 					onSuccess: () => {
 						this.$toast({
 							title: "Team Updated",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500"
 						});
 					},
 					onError: (err) => {
 						this.$toast({
 							title: "Error While Updating Ticket Type",
 							text: err,
-							customIcon: "circle-fail",
-							appearance: "danger",
+							icon: "x",
+							iconClasses: "text-red-500",
 						});
 					},
 				},
@@ -199,8 +199,8 @@ export default {
 
 					this.$toast({
 						title: "New Team Created",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					});
 				},
 			};

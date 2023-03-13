@@ -164,16 +164,16 @@ export default {
 					onSuccess: () => {
 						this.$toast({
 							title: "Ticket Type Updated.",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500",
 						})
 					},
 					onError: (err) => {
 						this.$toast({
 							title: "Error while updating ticket type",
 							text: err,
-							customIcon: "circle-fail",
-							appearance: "danger",
+							icon: "x",
+							iconClasses: "text-red-500",
 						})
 					},
 				},

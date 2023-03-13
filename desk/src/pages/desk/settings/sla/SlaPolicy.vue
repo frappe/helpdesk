@@ -615,8 +615,8 @@ export default {
 						}
 						this.$toast({
 							title: "Policy updated",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500",
 						})
 					})
 			}

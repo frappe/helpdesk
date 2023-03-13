@@ -142,8 +142,8 @@ export default {
 				this.$toast({
 					title: "Validation Error",
 					text: "Please fix the errors before saving",
-					customIcon: "circle-fail",
-					appearance: "danger",
+					icon: "x",
+					iconClasses: "text-red-500",
 				})
 				return
 			}
@@ -243,16 +243,16 @@ export default {
 
 					this.$toast({
 						title: "Categories updated!!",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					})
 				},
 				onError: (err) => {
 					this.$toast({
 						title: "Error while saving",
 						text: err,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}

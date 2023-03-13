@@ -121,16 +121,16 @@ export default {
 					onSuccess: () => {
 						this.$toast({
 							title: "Canned Response Updated.",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500"
 						})
 					},
 					onError: (err) => {
 						this.$toast({
 							title: "Error while updating canned response",
 							text: err,
-							customIcon: "circle-fail",
-							appearance: "danger",
+							icon: "x",
+							iconClasses: "text-red-500",
 						})
 					},
 				},

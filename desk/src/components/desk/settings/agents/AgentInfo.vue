@@ -196,8 +196,8 @@ export default {
 
 						this.$toast({
 							title: "Agent Updated.",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500"
 						})
 						this.$router.go() // TODO: fix this
 					},

@@ -311,8 +311,8 @@ export default {
 			this.$toast({
 				title: "Email account creation failed",
 				text: error,
-				customIcon: "circle-fail",
-				appearance: "danger",
+				icon: "x",
+				iconClasses: "text-red-500",
 			});
 
 			this.submitInProgress = false;
@@ -498,8 +498,8 @@ export default {
 				onSuccess: () => {
 					this.$toast({
 						title: "Setup Complete",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					});
 					this.submitInProgress = false;
 					this.$router.push({ name: "DeskTickets" });
@@ -508,8 +508,8 @@ export default {
 					this.$toast({
 						title: "Setup Failed",
 						text: error,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 					this.submitInProgress = false;
 				},

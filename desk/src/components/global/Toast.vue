@@ -18,7 +18,7 @@
 					<p v-if="text" class="text-base text-gray-600">
 						{{ text }}
 					</p>
-					<div class="flex flex-wrap gap-1 pt-2">
+					<div v-if="buttons.length" class="flex flex-wrap gap-1 pt-2">
 						<Button
 							v-for="b in buttons"
 							:appearance="b.appearance"
