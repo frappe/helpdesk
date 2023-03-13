@@ -209,29 +209,33 @@ export default {
 			}
 		},
 		showHelpdeskNameSetupToast() {
-			console.log("showing helpdesk name setup toast");
 			this.$toast({
-				title: "Setup Helpdesk Name",
+				title: "Set a name",
+				text: "What would you like to name your helpdesk?",
+				timeout: 0,
+				icon: "edit",
+				iconClasses: "text-blue-500",
 				form: {
+					classes: "flex gap-1",
 					inputs: [
 						{
 							type: "text",
-							fieldname: "helpdesk_name",
-							placeholder: "eg: FDESK",
+							fieldname: "helpdeskName",
+							placeholder: "Frappe Helpdesk",
 						},
 					],
 					onSubmit: (values) => {
-						if (values.helpdesk_name) {
-							this.$resources.setHelpdeskName.submit({
-								name: values.helpdesk_name,
-							});
-						}
+						const inputs = values.target?.elements;
+						const name = inputs?.helpdeskName?.value;
+
+						if (!name) return;
+
+						this.$resources.setHelpdeskName.submit({
+							name,
+						});
 					},
 				},
-				fixed: true,
-				appearance: "info",
-				position: "bottom-right",
-				onClose: () => {
+				actionOnClose: () => {
 					this.$resources.skipHelpdeskNameSetup.submit();
 				},
 			});
@@ -271,7 +275,7 @@ export default {
 						onClick: () => {
 							this.$router.push({ name: "Agents" });
 						},
-					}
+					},
 				],
 			});
 		},

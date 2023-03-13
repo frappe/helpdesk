@@ -29,13 +29,27 @@
 							{{ b.title }}
 						</Button>
 					</div>
+					<div v-if="form">
+						<form
+							:class="form.classes"
+							@submit.prevent="(event) => submitForm(form, event)"
+						>
+							<Input
+								v-for="input in form.inputs"
+								:type="input.type"
+								:placeholder="input.placeholder"
+								:name="input.fieldname"
+							/>
+							<Button appearance="primary" value="submit">Submit</Button>
+						</form>
+					</div>
 				</slot>
 			</div>
 			<div class="ml-auto pl-2">
 				<slot name="actions">
 					<button
 						class="grid h-5 w-5 place-items-center rounded hover:bg-gray-100"
-						@click="$emit('close')"
+						@click="onToastClose"
 					>
 						<FeatherIcon name="x" class="h-4 w-4 text-gray-700" />
 					</button>
@@ -85,29 +99,28 @@ export default {
 			type: Array,
 			default: [],
 		},
+		form: {
+			type: Object,
+		},
+		actionOnClose: {
+			type: Function,
+		}
 	},
 	emits: ["close"],
-	// data() {
-	//   return {
-	//     buttons: [
-	//       {
-	//         title: 'Setup Now',
-	//         appearance: 'primary',
-	//         onClick: () => console.log('foo'),
-	//       },
-	//       {
-	//         title: "Don't remind again!",
-	//         onClick: () => console.log('bar'),
-	//       },
-	//     ]
-	//   }
-	// },
 	mounted() {
 		if (this.timeout > 0) {
-			setTimeout(() => {
-				this.$emit("close");
-			}, this.timeout * 1000);
+			setTimeout(this.onToastClose, this.timeout * 1000);
 		}
+	},
+	methods: {
+		onToastClose() {
+			if (this.actionOnClose instanceof Function) this.actionOnClose();
+			this.$emit('close');
+		},
+		submitForm(form, event) {
+			if (form.onSubmit instanceof Function) form.onSubmit(event);
+			this.$emit("close");
+		},
 	},
 };
 </script>
