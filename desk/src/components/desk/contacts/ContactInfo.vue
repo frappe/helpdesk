@@ -235,8 +235,8 @@ export default {
 					onSuccess: (res) => {
 						this.$toast({
 							title: "Contact Updated.",
-							customIcon: "circle-check",
-							appearance: "success",
+							icon: "check",
+							iconClasses: "text-green-500"
 						})
 						this.$router.go()
 					},

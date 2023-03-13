@@ -109,8 +109,8 @@ export default {
 				onSuccess: (res) => {
 					this.$toast({
 						title: "Filter Saved!",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					});
 
 					this.close();
@@ -119,8 +119,8 @@ export default {
 					this.$toast({
 						title: "Error Sending Invites!",
 						text: err,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					});
 
 					this.close();

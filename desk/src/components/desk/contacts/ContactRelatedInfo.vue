@@ -239,8 +239,8 @@ export default {
 
 					this.$toast({
 						title: `Tickets marked as ${res.status}.`,
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					})
 
 					this.$event.emit("update_ticket_list")
@@ -248,8 +248,8 @@ export default {
 				onError: () => {
 					this.$toast({
 						title: "Unable to mark tickets as closed.",
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}
@@ -263,8 +263,8 @@ export default {
 
 					this.$toast({
 						title: "Tickets assigned to agent.",
-						customIcon: "circle-check",
-						appearance: "success",
+						icon: "check",
+						iconClasses: "text-green-500",
 					})
 
 					this.$event.emit("update_ticket_list")
@@ -272,8 +272,8 @@ export default {
 				onError: () => {
 					this.$toast({
 						title: "Unable to assign tickets to agent.",
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}

@@ -106,16 +106,16 @@ export default {
 					onSuccess() {
 						this.$toast({
 							title: "Ticket updated successfully.",
-							appearance: "success",
-							customIcon: "circle-check",
+							icon: "check",
+							iconClasses: "text-green-500",
 						})
 					},
 					onError(err) {
 						this.$toast({
 							title: "Error while updating ticket",
 							text: err,
-							customIcon: "circle-fail",
-							appearance: "danger",
+							icon: "x",
+							iconClasses: "text-red-500",
 						})
 					},
 				},
@@ -150,17 +150,17 @@ export default {
 				url: "frappedesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: () => {
 					this.$toast({
-						title: "Agent assigned successfully.",
-						appearance: "success",
-						customIcon: "circle-check",
+						title: "Agent assigned successfully",
+						icon: "check",
+						iconClasses: "text-green-500",
 					})
 				},
 				onError: (res) => {
 					this.$toast({
 						title: "Error while assigning agent",
 						text: res,
-						customIcon: "circle-fail",
-						appearance: "danger",
+						icon: "x",
+						iconClasses: "text-red-500",
 					})
 				},
 			}
@@ -182,8 +182,8 @@ export default {
 			} else {
 				this.$toast({
 					title: "Please fill all mandatory fields.",
-					customIcon: "circle-fail",
-					appearance: "danger",
+					icon: "x",
+					iconClasses: "text-red-500",
 				})
 			}
 		},
