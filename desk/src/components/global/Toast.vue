@@ -1,160 +1,85 @@
 <template>
-	<teleport to="#frappeui-toast-root">
-		<transition
-			:name="position.includes('top') ? 'toast-top' : 'toast-bottom'"
-		>
-			<div
-				v-if="shown"
-				:style="style"
-				:class="[
-					'absolute transition duration-200 ease-out mx-[15px] pointer-events-auto',
-					position.includes('center') ? '-translate-x-1/2' : '',
-					position.includes('top') ? 'my-[80px]' : 'my-[10px]',
-				]"
-			>
-				<div
-					class="px-5 pt-[14px] pb-[12px] rounded-lg shadow-md min-w-[25rem] max-w-[40rem] flex flex-col space-y-5"
-					:class="bodyClasses"
-				>
-					<div class="flex items-start">
-						<div
-							v-if="icon || customIcon"
-							class="grid w-5 h-5 mr-3 place-items-center"
-						>
-							<FeatherIcon
-								v-if="icon"
-								:name="icon"
-								:class="['w-5 h-5', iconClasses]"
-							/>
-							<CustomIcons
-								v-else
-								:name="customIcon"
-								:class="['w-5 h-5', iconClasses]"
-							/>
-						</div>
-						<div class="w-full">
-							<slot>
-								<p
-									class="text-[14px] font-medium text-gray-900"
-								>
-									{{ title }}
-								</p>
-								<p
-									class="mt-1 text-base font-normal text-gray-700"
-								>
-									{{ text }}
-								</p>
-								<form
-									v-if="form"
-									class="mt-2"
-									@submit.prevent="
-										() => {
-											$clearToasts()
-											form.submit
-												? form.submit.action(formInputs)
-												: form.onSubmit(formInputs)
-										}
-									"
-								>
-									<div
-										class="flex flex-col space-y-3 mb-3"
-										v-for="input in form.inputs"
-										:key="input.fieldname"
-									>
-										<Input
-											class="rounded-lg bg-white"
-											:type="
-												input.type ? input.type : 'text'
-											"
-											:placeholder="input.placeholder"
-											@input="
-												(val) => {
-													formInputs[
-														input.fieldname
-													] = val
-												}
-											"
-										/>
-									</div>
-								</form>
-								<div class="flex mt-5" v-if="action || form">
-									<Button
-										appearance="primary"
-										@click="
-											() => {
-												$clearToasts()
-												if (form) {
-													form.submit
-														? form.submit.action(
-																formInputs
-														  )
-														: form.onSubmit(
-																formInputs
-														  )
-												} else {
-													if (
-														typeof action ===
-														'function'
-													) {
-														action()
-													} else {
-														action.onClick()
-													}
-												}
-											}
-										"
-										>{{
-											action
-												? action.title
-												: form.submit
-												? form.submit.title
-												: "Submit"
-										}}</Button
-									>
-								</div>
-							</slot>
-						</div>
-						<div class="pl-2 ml-auto">
-							<slot name="actions">
-								<div
-									role="button"
-									class="grid w-5 h-5 place-items-center"
-									@click="
-										() => {
-											shown = false
-											onClose()
-										}
-									"
-								>
-									<FeatherIcon
-										name="x"
-										class="w-4 h-4 stroke-2"
-										:class="closeIconClassess"
-									/>
-								</div>
-							</slot>
-						</div>
-					</div>
-				</div>
+	<div
+		class="my-2 min-w-[15rem] max-w-[40rem] rounded-lg border bg-white p-4 shadow-md"
+	>
+		<div class="flex items-start">
+			<div v-if="icon" class="mr-3 grid h-5 w-5 place-items-center">
+				<FeatherIcon :name="icon" :class="['h-5 w-5', iconClasses]" />
 			</div>
-		</transition>
-	</teleport>
+			<div>
+				<slot>
+					<p
+						v-if="title"
+						class="text-base font-medium text-gray-900"
+						:class="{ 'mb-1': text }"
+					>
+						{{ title }}
+					</p>
+					<p v-if="text" class="text-base text-gray-600">
+						{{ text }}
+					</p>
+					<div class="flex flex-wrap gap-1 pt-2">
+						<Button
+							v-for="b in buttons"
+							:appearance="b.appearance"
+							:icon-left="b.iconLeft"
+							:icon-right="b.iconRight"
+							@click="b.onClick"
+						>
+							{{ b.title }}
+						</Button>
+					</div>
+					<div v-if="form">
+						<form
+							:class="form.classes"
+							@submit.prevent="(event) => submitForm(form, event)"
+						>
+							<Input
+								v-for="input in form.inputs"
+								:type="input.type"
+								:placeholder="input.placeholder"
+								:name="input.fieldname"
+							/>
+							<Button appearance="primary" value="submit">Submit</Button>
+						</form>
+					</div>
+				</slot>
+			</div>
+			<div class="ml-auto pl-2">
+				<slot name="actions">
+					<button
+						class="grid h-5 w-5 place-items-center rounded hover:bg-gray-100"
+						@click="onToastClose"
+					>
+						<FeatherIcon name="x" class="h-4 w-4 text-gray-700" />
+					</button>
+				</slot>
+			</div>
+		</div>
+	</div>
 </template>
 <script>
-import { FeatherIcon } from "frappe-ui"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import { FeatherIcon } from "frappe-ui";
+const positions = [
+	"top-right",
+	"top-center",
+	"top-left",
+	"bottom-right",
+	"bottom-center",
+	"bottom-left",
+];
 
 export default {
 	name: "Toast",
+	components: {
+		FeatherIcon,
+	},
 	props: {
 		position: {
 			type: String,
-			default: "top-right",
+			default: "top-center",
 		},
 		icon: {
-			type: String,
-		},
-		customIcon: {
 			type: String,
 		},
 		iconClasses: {
@@ -166,150 +91,36 @@ export default {
 		text: {
 			type: String,
 		},
-		form: {
-			type: Object,
-			default: null,
-		},
-		appearance: {
-			type: String,
-		},
 		timeout: {
 			type: Number,
 			default: 5,
 		},
-		fixed: {
-			type: Boolean,
-			default: false,
+		buttons: {
+			type: Array,
+			default: [],
 		},
-		action: {
+		form: {
 			type: Object,
-			default: null,
 		},
-		onClose: {
+		actionOnClose: {
 			type: Function,
-			default: () => {},
-		},
-	},
-	components: {
-		FeatherIcon,
-		CustomIcons,
-	},
-	created() {
-		if (!document.getElementById("frappeui-toast-root")) {
-			const root = document.createElement("div")
-			root.id = "frappeui-toast-root"
-			root.style.position = "fixed"
-			root.style.top = "16px"
-			root.style.right = "16px"
-			root.style.bottom = "16px"
-			root.style.left = "16px"
-			root.style.zIndex = "9999"
-			root.style.pointerEvents = "none"
-			document.body.appendChild(root)
 		}
 	},
+	emits: ["close"],
 	mounted() {
-		this.shown = true
-		if (!this.fixed) {
-			setTimeout(() => {
-				this.shown = false
-			}, this.timeout * 1000)
+		if (this.timeout > 0) {
+			setTimeout(this.onToastClose, this.timeout * 1000);
 		}
 	},
-	data() {
-		return {
-			shown: false,
-			formInputs: {},
-		}
-	},
-	computed: {
-		style() {
-			let style = {}
-			if (this.position.includes("top")) {
-				style.top = 0
-			}
-			if (this.position.includes("bottom")) {
-				style.bottom = 0
-			}
-			if (this.position.includes("right")) {
-				style.right = 0
-			}
-			if (this.position.includes("left")) {
-				style.left = 0
-			}
-			if (this.position.includes("center")) {
-				style.left = "50%"
-				// style.transform = 'translateX(-50%)'
-			}
-			return style
+	methods: {
+		onToastClose() {
+			if (this.actionOnClose instanceof Function) this.actionOnClose();
+			this.$emit('close');
 		},
-		transitionProps() {
-			let props = {
-				enterActiveClass: "transition duration-200 ease-out",
-				enterFromClass: "opacity-0",
-				enterToClass: "translate-y-0 opacity-100",
-				leaveActiveClass: "transition duration-100 ease-in",
-				leaveFromClass: "scale-100 translate-y-0 opacity-100",
-				leaveToClass: "scale-75 translate-y-4 opacity-0",
-			}
-			if (this.position.includes("top")) {
-				props.enterFromClass += " -translate-y-12"
-			}
-			if (this.position.includes("bottom")) {
-				props.enterFromClass += " translate-y-12"
-			}
-			return props
-		},
-		bodyClasses() {
-			if (this.appearanceColor === "white") return "bg-white"
-			return `bg-${this.appearanceColor}-${
-				this.appearanceColor === "red" ? "100" : "50"
-			}`
-		},
-		closeIconClassess() {
-			return `stroke-${this.appearanceColor}-600`
-		},
-		appearanceColor() {
-			let color = "white"
-			if (this.appearance) {
-				switch (this.appearance) {
-					case "danger":
-						color = "red"
-						break
-					case "success":
-						color = "green"
-						break
-					case "warning":
-						color = "yellow"
-						break
-					case "info":
-						color = "blue"
-						break
-					default:
-						color = "white"
-						break
-				}
-			}
-			return color
+		submitForm(form, event) {
+			if (form.onSubmit instanceof Function) form.onSubmit(event);
+			this.$emit("close");
 		},
 	},
-}
+};
 </script>
-<style>
-.toast-top-enter-active,
-.toast-bottom-enter-active {
-	transition: all 200ms ease-out;
-}
-.toast-top-leave-active,
-.toast-bottom-leave-active {
-	transition: all 100ms ease-in;
-}
-.toast-top-enter-from {
-	opacity: 0;
-	transform: translateY(0);
-}
-.toast-top-enter-to {
-	opacity: 1;
-	transform: translateY(0);
-}
-</style>
