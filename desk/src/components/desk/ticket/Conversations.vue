@@ -17,8 +17,8 @@
 							`"
 						>
 							<ConversationCard
-								:userName="getUserName(conversation)"
-								:profilePicUrl="
+								:user-name="getUserName(conversation)"
+								:profile-pic-url="
 									conversation.sender.image
 										? conversation.sender.image
 										: conversation.sender.user_image
@@ -34,9 +34,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="text-slate-500 m-4 text-base">
-				Nothing to show
-			</div>
+			<div v-else class="m-4 text-base text-slate-500">Nothing to show</div>
 		</div>
 		<div v-else>
 			<LoadingText />
@@ -45,24 +43,24 @@
 </template>
 
 <script>
-import ConversationCard from "./ConversationCard.vue"
-import { LoadingText } from "frappe-ui"
-import { ref } from "vue"
-import CommentCard from "./CommentCard.vue"
+import { ref } from "vue";
+import { LoadingText } from "frappe-ui";
+import CommentCard from "./CommentCard.vue";
+import ConversationCard from "./ConversationCard.vue";
 
 export default {
 	name: "Conversations",
-	props: ["ticketId", "scrollToBottom", "autoScroll"],
 	components: {
 		ConversationCard,
 		LoadingText,
 		CommentCard,
 	},
+	props: ["ticketId", "scrollToBottom", "autoScroll"],
 	setup() {
-		const userColors = ref({})
-		const lastColorIndex = ref(-1)
+		const userColors = ref({});
+		const lastColorIndex = ref(-1);
 
-		return { userColors, lastColorIndex }
+		return { userColors, lastColorIndex };
 	},
 	resources: {
 		communications() {
@@ -73,7 +71,7 @@ export default {
 					ticket_id: this.ticketId,
 				},
 				auto: true,
-			}
+			};
 		},
 		comments() {
 			return {
@@ -88,88 +86,81 @@ export default {
 					order_by: "creation asc",
 				},
 				auto: true,
-			}
+			};
 		},
 	},
 	computed: {
 		conversations() {
 			this.$nextTick(() => {
-				this.autoScrollToBottom()
-			})
+				this.autoScrollToBottom();
+			});
 			const communications = this.communications.map((x) => {
-				x.type = "Communication"
-				return x
-			})
+				x.type = "Communication";
+				return x;
+			});
 			const comments = this.comments.map((x) => {
-				x.type = "Comment"
-				return x
-			})
+				x.type = "Comment";
+				return x;
+			});
 			const conversations =
 				[...communications, ...comments].sort(
 					(a, b) => new Date(a.creation) - new Date(b.creation)
-				) || []
-			return conversations
+				) || [];
+			return conversations;
 		},
 		communications() {
-			console.log(this.$resources.communications.data, "commu")
-			return this.$resources.communications.data || []
+			console.log(this.$resources.communications.data, "commu");
+			return this.$resources.communications.data || [];
 		},
 		comments() {
-			return this.$resources.comments.data || []
+			return this.$resources.comments.data || [];
 		},
 	},
 	watch: {
 		scrollToBottom(scroll) {
 			if (scroll) {
-				this.autoScrollToBottom()
+				this.autoScrollToBottom();
 			}
 		},
 	},
 	mounted() {
-		this.$socket.on("list_update", (data) => {
-			if (data["doctype"] === "Ticket" && data["name"] == this.ticketId) {
-				this.$resources.communications.fetch()
-			}
-			if (
-				data["doctype"] === "Frappe Desk Comment" &&
-				data["name"].split("-")[1] === this.ticketId
-			) {
-				this.$resources.comments.fetch()
-			}
-		})
+		this.$socket.on("new_frappedesk_communication", (data) => {
+			if (data.ticket_id != this.ticketId) return;
+
+			this.$resources.communications.reload();
+		});
+
+		this.$socket.on("new_frappedesk_comment", (data) => {
+			if (data.ticket_id != this.ticketId) return;
+
+			this.$resources.comments.reload();
+		});
 	},
 	unmounted() {
-		this.$socket.off("list_update")
+		this.$socket.off("new_frappedesk_communication");
+		this.$socket.off("new_frappedesk_comment");
 	},
 	updated() {
-		this.userColors = {}
-		this.lastColorIndex = -1
+		this.userColors = {};
+		this.lastColorIndex = -1;
 	},
 	methods: {
 		getUserName(conversation) {
 			return (
-				(conversation.sender.first_name
-					? conversation.sender.first_name
-					: "") +
+				(conversation.sender.first_name ? conversation.sender.first_name : "") +
 				" " +
-				(conversation.sender.last_name
-					? conversation.sender.last_name
-					: "")
-			)
+				(conversation.sender.last_name ? conversation.sender.last_name : "")
+			);
 		},
 		autoScrollToBottom() {
 			if (this.conversations && this.conversations.length > 0) {
 				const [el] =
-					this.$refs[
-						"conversation-" + (this.conversations.length - 1)
-					]
+					this.$refs["conversation-" + (this.conversations.length - 1)];
 				if (el) {
-					el.scrollIntoView({ behavior: "smooth" })
+					el.scrollIntoView({ behavior: "smooth" });
 				}
 			}
 		},
 	},
-}
+};
 </script>
-
-<style></style>
