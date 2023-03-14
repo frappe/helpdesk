@@ -433,6 +433,10 @@ class Ticket(Document):
 		except Exception as e:
 			frappe.throw(_(e))
 
+	@frappe.whitelist()
+	def mark_seen(self):
+		self.add_seen()
+
 
 def set_descritption_from_communication(doc, type):
 	if doc.reference_doctype == "Ticket":

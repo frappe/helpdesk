@@ -440,6 +440,7 @@
 </template>
 
 <script>
+import { inject, ref } from "vue";
 import {
 	ErrorMessage,
 	Badge,
@@ -458,9 +459,7 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue";
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
-import { inject, ref } from "vue";
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
-import { color } from "echarts";
 
 export default {
 	name: "Ticket",
@@ -483,7 +482,9 @@ export default {
 		TicketStatus,
 		ErrorMessage,
 	},
-	props: ["ticketId"],
+	props: {
+		ticketId: String,
+	},
 	setup() {
 		const showTextFormattingMenu = ref(true);
 		const viewportWidth = inject("viewportWidth");
@@ -544,6 +545,7 @@ export default {
 				doctype: "Ticket",
 				name: this.ticketId,
 				whitelistedMethods: {
+					markSeen: "mark_seen",
 					replyViaAgent: {
 						method: "reply_via_agent",
 						onSuccess: () => {
@@ -569,11 +571,6 @@ export default {
 				},
 			};
 		},
-		submitAndUpdateTicketStatus() {
-			return {
-				url: "frappedesk.api.ticket.update_ticket_status",
-			};
-		},
 		submitComment() {
 			return {
 				url: "frappe.client.insert",
@@ -585,11 +582,6 @@ export default {
 					this.content = this.tempTextEditorData.content;
 					this.attachments = this.tempTextEditorData.attachments;
 				},
-			};
-		},
-		markTicketAsSeen() {
-			return {
-				url: "frappedesk.api.ticket.mark_ticket_as_seen",
 			};
 		},
 	},
@@ -656,9 +648,7 @@ export default {
 		},
 	},
 	mounted() {
-		this.$resources.markTicketAsSeen.submit({
-			ticket_id: this.ticketId,
-		});
+		this.$resources.ticket.markSeen.submit();
 	},
 	methods: {
 		async copyTicketNameToClipboard() {
@@ -672,8 +662,7 @@ export default {
 				textArea.select();
 				try {
 					document.execCommand("copy");
-				} catch (err) {
-				}
+				} catch (err) {}
 				document.body.removeChild(textArea);
 			}
 			this.$toast({
@@ -740,20 +729,25 @@ export default {
 			this.attachments = [];
 		},
 		submitAndUpdateTicketStatus(status) {
-			this.$resources.submitAndUpdateTicketStatus.submit({
-				ticket_id: this.ticketId,
+			this.$resources.ticket.update.submit({
 				status: status,
 			});
+			this.submitConversation();
 		},
 		submitResolvedTicket() {
 			this.tempTextEditorData.content = this.content;
 			this.tempTextEditorData.attachments = this.attachments;
 			const content = `<div class='content-block'><div>${this.content}</div></div>`;
+
+			this.$resources.ticket.update.submit({
+				status: "Resolved",
+			});
+
 			this.$resources.ticket.replyViaAgent.submit({
 				message: content,
-				status: "Resolved",
 				attachments: this.attachments.map((x) => x.name),
 			});
+
 			this.content = "";
 			this.attachments = [];
 		},

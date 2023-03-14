@@ -320,12 +320,6 @@ def get_agent_assigned_to_ticket(ticket_id):
 
 
 @frappe.whitelist()
-def mark_ticket_as_seen(ticket_id):
-	if ticket_id:
-		return frappe.get_doc("Ticket", ticket_id).add_seen()
-
-
-@frappe.whitelist()
 def assign_ticket_to_agent(ticket_id, agent_id=None):
 	if not ticket_id:
 		return
