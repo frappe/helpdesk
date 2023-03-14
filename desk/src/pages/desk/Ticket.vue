@@ -553,7 +553,9 @@ export default {
 						onError: ({ error }) => {
 							this.content = this.tempTextEditorData.content;
 							this.attachments = this.tempTextEditorData.attachments;
-							const text = error?.messages?.join("\n");
+							const text = error?.messages
+								?.filter((v, i, s) => s.indexOf(v) == i)
+								?.join("\n");
 
 							if (!text) return;
 
