@@ -38,12 +38,6 @@ export default {
 			default: "circle",
 			validator(value) {
 				const valid = validShapes.includes(value)
-				if (!valid) {
-					console.warn(
-						`shape property for <Avatar /> must be one of `,
-						validShapes
-					)
-				}
 				return valid
 			},
 		},

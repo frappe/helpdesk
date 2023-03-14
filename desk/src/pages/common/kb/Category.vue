@@ -24,8 +24,8 @@
 					$toast({
 						title: 'Validation Error',
 						text: 'Please fix the errors before saving',
-						icon: "x",
-						iconClasses: "text-red-500",
+						icon: 'x',
+						iconClasses: 'text-red-500',
 					})
 				}
 			}

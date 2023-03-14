@@ -385,7 +385,6 @@ router.beforeEach(async (to, from) => {
 			{ article_name: to.params.articleId }
 		);
 		if (!articleIsPublished) {
-			console.log(to.params.articleId, " is not available");
 			return { name: "PortalKBHome" };
 		}
 	}

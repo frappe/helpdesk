@@ -293,8 +293,6 @@ export default {
 	},
 	mounted() {
 		this.$event.on("email-account-created", () => {
-			console.log("email account created successfully!!");
-
 			if (this.inputValues.agentEmailList.length > 0) {
 				this.$resources.sentInvites.submit({
 					emails: this.inputValues.agentEmailList,
@@ -306,8 +304,6 @@ export default {
 		});
 
 		this.$event.on("email-account-creation-failed", (error) => {
-			console.log("email account creation failed!!", error);
-
 			this.$toast({
 				title: "Email account creation failed",
 				text: error,
@@ -375,8 +371,6 @@ export default {
 						}
 					}
 				}
-			} else {
-				console.log("input validation error!!!");
 			}
 		},
 		skip() {

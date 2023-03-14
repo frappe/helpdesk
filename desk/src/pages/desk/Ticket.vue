@@ -572,9 +572,6 @@ export default {
 		submitAndUpdateTicketStatus() {
 			return {
 				url: "frappedesk.api.ticket.update_ticket_status",
-				onSuccess: (val) => {
-					console.log(val);
-				},
 			};
 		},
 		submitComment() {
@@ -676,7 +673,6 @@ export default {
 				try {
 					document.execCommand("copy");
 				} catch (err) {
-					console.error("Unable to copy to clipboard", err);
 				}
 				document.body.removeChild(textArea);
 			}
