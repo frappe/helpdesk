@@ -299,6 +299,13 @@ class Ticket(Document):
 		if not self.ticket_type:
 			frappe.throw(_("Ticket type is mandatory"))
 
+	def skip_email_workflow(self):
+		skip: str = (
+			frappe.get_value("Frappe Desk Settings", None, "skip_email_workflow") or "0"
+		)
+
+		return bool(int(skip))
+
 	@property
 	def last_communication_email(self):
 		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
@@ -346,8 +353,7 @@ class Ticket(Document):
 	def reply_via_agent(
 		self, message: str, cc: str = None, bcc: str = None, attachments: List[str] = []
 	):
-		skip_email_workflow = False
-
+		skip_email_workflow = self.skip_email_workflow()
 		medium = "" if skip_email_workflow else "Email"
 		subject = f"Re: {self.subject} {self.name}"
 		sender = frappe.session.user
@@ -365,6 +371,7 @@ class Ticket(Document):
 				"communication_type": "Communication",
 				"content": message,
 				"doctype": "Communication",
+				"email_account": self.sender_email,
 				"email_status": "Open",
 				"recipients": recipients,
 				"reference_doctype": "Ticket",
@@ -373,7 +380,6 @@ class Ticket(Document):
 				"sent_or_received": "Sent",
 				"status": "Linked",
 				"subject": subject,
-				"email_account": self.sender_email,
 			}
 		)
 
@@ -394,8 +400,6 @@ class Ticket(Document):
 		if not self.sender_email:
 			frappe.throw(_("Can not send email. No sender email set up!"))
 
-		# FIXME: all instances should be `Email Account`
-		# reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
 		reply_to_email = self.sender_email.email_id
 		template = "new_reply_on_customer_portal_notification"
 		args = {

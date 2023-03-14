@@ -7,7 +7,7 @@ def default_outgoing_email_account():
 		["default_outgoing", "=", 1],
 	]
 
-	return frappe.get_value(
+	return frappe.get_last_doc(
 		"Email Account",
 		filters,
 	)
@@ -20,7 +20,7 @@ def default_ticket_outgoing_email_account():
 		["IMAP Folder", "append_to", "=", "Ticket"],
 	]
 
-	return frappe.get_value(
+	return frappe.get_last_doc(
 		"Email Account",
 		filters,
 	)
