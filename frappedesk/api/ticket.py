@@ -8,7 +8,6 @@ from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
 from frappedesk.frappedesk.doctype.ticket.ticket import (
 	create_communication_via_contact,
 	get_all_conversations,
-	create_communication_via_agent,
 )
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.utils import datetime
@@ -458,11 +457,6 @@ def get_contact(ticket_id):
 @frappe.whitelist()
 def get_conversations(ticket_id):
 	return get_all_conversations(ticket_id)
-
-
-@frappe.whitelist()
-def submit_conversation_via_agent(ticket_id, message,cc,bcc, attachments):
-	return create_communication_via_agent(ticket_id, message,cc,bcc, attachments)
 
 
 @frappe.whitelist()

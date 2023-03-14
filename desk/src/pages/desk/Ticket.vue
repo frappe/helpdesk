@@ -320,7 +320,7 @@
 												class="[&:nth-child(2)]:rounded-l-none"
 												:loading="
 													editingType == 'reply'
-														? $resources.submitConversation.loading
+														? $resources.ticket.replyViaAgent.loading
 														: $resources.submitComment.loading
 												"
 												appearance="primary"
@@ -543,6 +543,28 @@ export default {
 				type: "document",
 				doctype: "Ticket",
 				name: this.ticketId,
+				whitelistedMethods: {
+					replyViaAgent: {
+						method: "reply_via_agent",
+						onSuccess: () => {
+							this.tempTextEditorData = {};
+							this.editing = false;
+						},
+						onError: ({ error }) => {
+							this.content = this.tempTextEditorData.content;
+							this.attachments = this.tempTextEditorData.attachments;
+							const text = error?.messages?.join("\n");
+
+							if (!text) return;
+
+							this.$toast({
+								text,
+								icon: "x",
+								iconClasses: "text-red-500",
+							});
+						},
+					},
+				},
 			};
 		},
 		submitAndUpdateTicketStatus() {
@@ -550,43 +572,6 @@ export default {
 				url: "frappedesk.api.ticket.update_ticket_status",
 				onSuccess: (val) => {
 					console.log(val);
-				},
-			};
-		},
-		submitConversation() {
-			return {
-				url: "frappedesk.api.ticket.submit_conversation_via_agent",
-				onSuccess: (res) => {
-					if (res.status == "error") {
-						const error = {
-							"No default outgoing email available": {
-								title: "Email not sent",
-								text: "No default outgoing email available",
-							},
-						}[res.error_code];
-						this.$toast({
-							title: error.title,
-							text: error.text,
-							icon: "mail",
-							iconClasses: "text-red-500",
-							buttons: [
-								{
-									title: "Setup now",
-									appearance: "primary",
-									iconRight: "arrow-right",
-									onClick: () => {
-										this.$router.push({ name: "Emails" });
-									},
-								},
-							],
-						});
-					}
-					this.tempTextEditorData = {};
-					this.editing = false;
-				},
-				onError: () => {
-					this.content = this.tempTextEditorData.content;
-					this.attachments = this.tempTextEditorData.attachments;
 				},
 			};
 		},
@@ -744,14 +729,15 @@ export default {
 		submitConversation() {
 			this.tempTextEditorData.content = this.content;
 			this.tempTextEditorData.attachments = this.attachments;
-			const content = `<div class='content-block'><div>${this.content}</div></div>`;
-			this.$resources.submitConversation.submit({
-				ticket_id: this.ticketId,
-				message: content,
-				cc: this.cc,
-				bcc: this.bcc,
+			const message = `<div class='content-block'><div>${this.content}</div></div>`;
+
+			this.$resources.ticket.replyViaAgent.submit({
 				attachments: this.attachments.map((x) => x.name),
+				bcc: this.bcc,
+				cc: this.cc,
+				message,
 			});
+
 			this.content = "";
 			this.attachments = [];
 		},
@@ -765,8 +751,7 @@ export default {
 			this.tempTextEditorData.content = this.content;
 			this.tempTextEditorData.attachments = this.attachments;
 			const content = `<div class='content-block'><div>${this.content}</div></div>`;
-			this.$resources.submitConversation.submit({
-				ticket_id: this.ticketId,
+			this.$resources.ticket.replyViaAgent.submit({
 				message: content,
 				status: "Resolved",
 				attachments: this.attachments.map((x) => x.name),
