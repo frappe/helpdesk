@@ -58,7 +58,11 @@
   "feedback_submitted",
   "satisfaction_rating",
   "customer_feedback",
-  "feedback_status"
+  "feedback_status",
+  "computed_tab",
+  "dashboard_column",
+  "dashboard_uri",
+  "column_break_jwcv"
  ],
  "fields": [
   {
@@ -413,12 +417,32 @@
    "fieldtype": "Select",
    "label": "Feedback Status",
    "options": "\nPositive\nNeutral\nNegative"
+  },
+  {
+   "fieldname": "computed_tab",
+   "fieldtype": "Tab Break",
+   "label": "Computed"
+  },
+  {
+   "fieldname": "dashboard_column",
+   "fieldtype": "Column Break",
+   "label": "Dashboard"
+  },
+  {
+   "fieldname": "dashboard_uri",
+   "fieldtype": "Data",
+   "is_virtual": 1,
+   "label": "URI"
+  },
+  {
+   "fieldname": "column_break_jwcv",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-08 21:14:10.879459",
+ "modified": "2023-03-14 20:40:47.817434",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",

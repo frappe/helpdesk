@@ -358,6 +358,7 @@ class Ticket(Document):
 		subject = f"Re: {self.subject} {self.name}"
 		sender = frappe.session.user
 		recipients = self.raised_by
+		sender_email = "" if skip_email_workflow else self.sender_email
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
@@ -371,7 +372,7 @@ class Ticket(Document):
 				"communication_type": "Communication",
 				"content": message,
 				"doctype": "Communication",
-				"email_account": self.sender_email,
+				"email_account": sender_email,
 				"email_status": "Open",
 				"recipients": recipients,
 				"reference_doctype": "Ticket",
@@ -427,7 +428,7 @@ class Ticket(Document):
 				with_container=True,
 			)
 		except Exception as e:
-			frappe.throw(e)
+			frappe.throw(_(e))
 
 
 def set_descritption_from_communication(doc, type):
