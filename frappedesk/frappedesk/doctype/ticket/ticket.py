@@ -306,7 +306,6 @@ class Ticket(Document):
 
 		return bool(int(skip))
 
-	@property
 	def last_communication_email(self):
 		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
 
@@ -328,14 +327,13 @@ class Ticket(Document):
 
 		return email_account
 
-	@property
-	def sender_email(self) -> Document:
+	def sender_email(self):
 		"""
 		Find an email to use as sender. Fall back through multiple choices
 
 		:return: `Email Account`
 		"""
-		if email_account := self.last_communication_email:
+		if email_account := self.last_communication_email():
 			return email_account
 
 		if email_account := default_ticket_outgoing_email_account():
@@ -346,6 +344,11 @@ class Ticket(Document):
 
 	@property
 	def dashboard_uri(self):
+		root_uri = frappe.utils.get_url()
+		return f"{root_uri}/frappedesk/tickets/{self.name}"
+
+	@property
+	def portal_uri(self):
 		root_uri = frappe.utils.get_url()
 		return f"{root_uri}/support/tickets/{self.name}"
 
@@ -358,7 +361,7 @@ class Ticket(Document):
 		subject = f"Re: {self.subject} {self.name}"
 		sender = frappe.session.user
 		recipients = self.raised_by
-		sender_email = "" if skip_email_workflow else self.sender_email
+		sender_email = "" if skip_email_workflow else self.sender_email()
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
@@ -398,10 +401,10 @@ class Ticket(Document):
 		if skip_email_workflow:
 			return
 
-		if not self.sender_email:
+		if not sender_email:
 			frappe.throw(_("Can not send email. No sender email set up!"))
 
-		reply_to_email = self.sender_email.email_id
+		reply_to_email = sender_email.email_id
 		template = "new_reply_on_customer_portal_notification"
 		args = {
 			"message": message,
