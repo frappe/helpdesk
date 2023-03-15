@@ -306,6 +306,14 @@ class Ticket(Document):
 
 		return bool(int(skip))
 
+	def instantly_send_email(self):
+		check: str = (
+			frappe.get_value("Frappe Desk Settings", None, "instantly_send_email")
+			or "0"
+		)
+
+		return bool(int(check))
+
 	def last_communication(self):
 		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
 
@@ -419,6 +427,12 @@ class Ticket(Document):
 			"portal_link": self.portal_uri,
 			"ticket_id": self.name,
 		}
+		send_delayed = True
+		send_now = False
+
+		if self.instantly_send_email():
+			send_delayed = False
+			send_now = True
 
 		try:
 			frappe.sendmail(
@@ -427,9 +441,9 @@ class Ticket(Document):
 				bcc=bcc,
 				cc=cc,
 				communication=communication.name,
-				delayed=False,
+				delayed=send_delayed,
 				message=message,
-				now=True,
+				now=send_now,
 				recipients=recipients,
 				reference_doctype="Ticket",
 				reference_name=self.name,
