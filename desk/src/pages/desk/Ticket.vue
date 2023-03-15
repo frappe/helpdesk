@@ -16,7 +16,7 @@
 						name="copy"
 						class="h-[24px] w-[24px] rounded-md bg-gray-100 stroke-gray-700 p-1"
 						role="button"
-						@click="copyTicketNameToClipboard"
+						@click="copyTicketName"
 					/>
 				</div>
 			</div>
@@ -161,11 +161,11 @@
 										>
 											<div class="text-gray-700">Cc</div>
 											<Input
+												v-model="cc"
 												class="font-inter w-11/12 bg-white py-[4px] pl-[4px] text-[12px] focus:bg-white"
-												@input="cc = $event"
 											/>
 										</div>
-										<ErrorMessage v-if="showCc" :message="ccValidationError" />
+										<ErrorMessage :message="ccValidationError" />
 										<div
 											v-if="showBcc"
 											class="flex flex-row items-center space-x-2"
@@ -173,14 +173,11 @@
 											<div class="bg-transparent text-gray-700">Bcc</div>
 
 											<Input
+												v-model="bcc"
 												class="font-inter w-11/12 bg-white py-[4px] pl-[2px] text-[12px] focus:bg-white"
-												@input="bcc = $event"
 											/>
 										</div>
-										<ErrorMessage
-											v-if="showBcc"
-											:message="bccValidationError"
-										/>
+										<ErrorMessage :message="bccValidationError" />
 									</div>
 									<div v-else class="flex flex-row items-center space-x-2">
 										<span class="text-gray-700">as</span>
@@ -320,7 +317,7 @@
 												class="[&:nth-child(2)]:rounded-l-none"
 												:loading="
 													editingType == 'reply'
-														? $resources.submitConversation.loading
+														? $resources.ticket.replyViaAgent.loading
 														: $resources.submitComment.loading
 												"
 												appearance="primary"
@@ -440,6 +437,7 @@
 </template>
 
 <script>
+import { inject, ref } from "vue";
 import {
 	ErrorMessage,
 	Badge,
@@ -450,6 +448,9 @@ import {
 	FeatherIcon,
 	TextEditor,
 } from "frappe-ui";
+import { useField } from "vee-validate";
+import { toFieldValidator } from "@vee-validate/zod";
+import * as zod from "zod";
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
 import Conversations from "@/components/desk/ticket/Conversations.vue";
 import InfoPanel from "@/components/desk/ticket/InfoPanel.vue";
@@ -458,32 +459,33 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue";
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
-import { inject, ref } from "vue";
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
-import { color } from "echarts";
+import { TextEditorMenuButtons } from "./consts";
 
 export default {
 	name: "Ticket",
 	components: {
-		Badge,
-		Card,
-		Dropdown,
-		Avatar,
-		FileUploader,
-		FeatherIcon,
-		TextEditor,
-		Conversations,
-		InfoPanel,
 		ActionPanel,
+		ArticleResponseDialog,
+		Avatar,
+		Badge,
+		CannedResponsesDialog,
+		Card,
+		Conversations,
 		CustomIcons,
 		CustomerSatisfactionFeedback,
-		CannedResponsesDialog,
-		TextEditorFixedMenu,
-		ArticleResponseDialog,
-		TicketStatus,
+		Dropdown,
 		ErrorMessage,
+		FeatherIcon,
+		FileUploader,
+		InfoPanel,
+		TextEditor,
+		TextEditorFixedMenu,
+		TicketStatus,
 	},
-	props: ["ticketId"],
+	props: {
+		ticketId: String,
+	},
 	setup() {
 		const showTextFormattingMenu = ref(true);
 		const viewportWidth = inject("viewportWidth");
@@ -498,14 +500,24 @@ export default {
 		const showArticleResponseDialog = ref(false);
 		const tempContent = ref("");
 		const editingSubject = ref("");
-		const ccValidationError = ref("");
-		const bccValidationError = ref("");
 		const showCc = ref(false);
 		const showBcc = ref(false);
 		const showCcBtn = ref(true);
 		const showBccBtn = ref(true);
+		const validateEmail = toFieldValidator(zod.string().email());
+
+		const { value: cc, errorMessage: ccValidationError } = useField(
+			"ccField",
+			validateEmail
+		);
+		const { value: bcc, errorMessage: bccValidationError } = useField(
+			"bccField",
+			validateEmail
+		);
 
 		return {
+			cc,
+			bcc,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -533,8 +545,7 @@ export default {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
-			cc: "",
-			bcc: "",
+			textEditorMenuButtons: TextEditorMenuButtons,
 		};
 	},
 	resources: {
@@ -543,47 +554,30 @@ export default {
 				type: "document",
 				doctype: "Ticket",
 				name: this.ticketId,
-			};
-		},
-		submitAndUpdateTicketStatus() {
-			return {
-				url: "frappedesk.api.ticket.update_ticket_status",
-			};
-		},
-		submitConversation() {
-			return {
-				url: "frappedesk.api.ticket.submit_conversation_via_agent",
-				onSuccess: (res) => {
-					if (res.status == "error") {
-						const error = {
-							"No default outgoing email available": {
-								title: "Email not sent",
-								text: "No default outgoing email available",
-							},
-						}[res.error_code];
-						this.$toast({
-							title: error.title,
-							text: error.text,
-							icon: "mail",
-							iconClasses: "text-red-500",
-							buttons: [
-								{
-									title: "Setup now",
-									appearance: "primary",
-									iconRight: "arrow-right",
-									onClick: () => {
-										this.$router.push({ name: "Emails" });
-									},
-								},
-							],
-						});
-					}
-					this.tempTextEditorData = {};
-					this.editing = false;
-				},
-				onError: () => {
-					this.content = this.tempTextEditorData.content;
-					this.attachments = this.tempTextEditorData.attachments;
+				whitelistedMethods: {
+					markSeen: "mark_seen",
+					replyViaAgent: {
+						method: "reply_via_agent",
+						onSuccess: () => {
+							this.tempTextEditorData = {};
+							this.editing = false;
+						},
+						onError: ({ error }) => {
+							this.content = this.tempTextEditorData.content;
+							this.attachments = this.tempTextEditorData.attachments;
+							const text = error?.messages
+								?.filter((v, i, s) => s.indexOf(v) == i)
+								?.join("\n");
+
+							if (!text) return;
+
+							this.$toast({
+								text,
+								icon: "x",
+								iconClasses: "text-red-500",
+							});
+						},
+					},
 				},
 			};
 		},
@@ -600,56 +594,10 @@ export default {
 				},
 			};
 		},
-		markTicketAsSeen() {
-			return {
-				url: "frappedesk.api.ticket.mark_ticket_as_seen",
-			};
-		},
 	},
 	computed: {
 		ticket() {
 			return this.$resources.ticket.doc || null;
-		},
-		textEditorMenuButtons() {
-			return [
-				"Paragraph",
-				["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-				"Separator",
-				"Bold",
-				"Italic",
-				"Separator",
-				"Bullet List",
-				"Numbered List",
-				"Separator",
-				"Align Left",
-				"Align Center",
-				"Align Right",
-				"Separator",
-				"Image",
-				"Video",
-				"Link",
-				"Blockquote",
-				"Code",
-				"Horizontal Rule",
-				[
-					"InsertTable",
-					"AddColumnBefore",
-					"AddColumnAfter",
-					"DeleteColumn",
-					"AddRowBefore",
-					"AddRowAfter",
-					"DeleteRow",
-					"MergeCells",
-					"SplitCell",
-					"ToggleHeaderColumn",
-					"ToggleHeaderRow",
-					"ToggleHeaderCell",
-					"DeleteTable",
-				],
-				"Separator",
-				"Undo",
-				"Redo",
-			];
 		},
 		sendingDissabled() {
 			let content = this.content.trim();
@@ -669,31 +617,11 @@ export default {
 		},
 	},
 	mounted() {
-		this.$resources.markTicketAsSeen.submit({
-			ticket_id: this.ticketId,
-		});
+		this.$resources.ticket.markSeen.submit();
 	},
 	methods: {
-		async copyTicketNameToClipboard() {
-			if (window.isSecureContext) {
-				await navigator.clipboard.writeText(this.ticket.name);
-			} else {
-				const textArea = document.createElement("textarea");
-				textArea.value = this.ticket.name;
-				document.body.appendChild(textArea);
-				textArea.focus();
-				textArea.select();
-				try {
-					document.execCommand("copy");
-				} catch (err) {
-				}
-				document.body.removeChild(textArea);
-			}
-			this.$toast({
-				title: "Copied to clipboard",
-				icon: "check",
-				iconClasses: "text-green-500",
-			});
+		async copyTicketName() {
+			this.$clipboardCopy(this.ticket.name);
 		},
 		startEditing(type = "reply") {
 			this.editing = true;
@@ -725,9 +653,6 @@ export default {
 			}
 		},
 		submit() {
-			// if (this.validateInputs()) {
-			// 	return
-			// }
 			switch (this.editingType) {
 				case "reply":
 					this.submitConversation();
@@ -740,33 +665,38 @@ export default {
 		submitConversation() {
 			this.tempTextEditorData.content = this.content;
 			this.tempTextEditorData.attachments = this.attachments;
-			const content = `<div class='content-block'><div>${this.content}</div></div>`;
-			this.$resources.submitConversation.submit({
-				ticket_id: this.ticketId,
-				message: content,
-				cc: this.cc,
-				bcc: this.bcc,
+			const message = `<div class='content-block'><div>${this.content}</div></div>`;
+
+			this.$resources.ticket.replyViaAgent.submit({
 				attachments: this.attachments.map((x) => x.name),
+				bcc: this.bcc,
+				cc: this.cc,
+				message,
 			});
+
 			this.content = "";
 			this.attachments = [];
 		},
 		submitAndUpdateTicketStatus(status) {
-			this.$resources.submitAndUpdateTicketStatus.submit({
-				ticket_id: this.ticketId,
+			this.$resources.ticket.update.submit({
 				status: status,
 			});
+			this.submitConversation();
 		},
 		submitResolvedTicket() {
 			this.tempTextEditorData.content = this.content;
 			this.tempTextEditorData.attachments = this.attachments;
 			const content = `<div class='content-block'><div>${this.content}</div></div>`;
-			this.$resources.submitConversation.submit({
-				ticket_id: this.ticketId,
-				message: content,
+
+			this.$resources.ticket.update.submit({
 				status: "Resolved",
+			});
+
+			this.$resources.ticket.replyViaAgent.submit({
+				message: content,
 				attachments: this.attachments.map((x) => x.name),
 			});
+
 			this.content = "";
 			this.attachments = [];
 		},
@@ -785,8 +715,6 @@ export default {
 			this.content = "";
 			this.attachments = [];
 		},
-		getNextTicket() {},
-		getPreviousTicket() {},
 		getMessage(message) {
 			this.tempMessage = message;
 			this.content = this.tempMessage;
@@ -794,31 +722,6 @@ export default {
 		getContent(content) {
 			this.tempContent = content;
 			this.content = this.tempContent;
-		},
-		validateInputs() {
-			if (this.cc || this.bcc != "") {
-				let error = this.validateCcInput(this.cc);
-				error += this.validateBccInput(this.bcc);
-				return error;
-			}
-		},
-		validateCcInput(value) {
-			this.ccValidationError = "";
-			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
-			if (!reg.test(value)) {
-				this.ccValidationError = "Enter a valid email";
-			}
-			return this.ccValidationError;
-		},
-		validateBccInput(value) {
-			this.bccValidationError = "";
-			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
-			if (!reg.test(value)) {
-				this.bccValidationError = "Enter a valid email";
-			}
-			return this.bccValidationError;
 		},
 	},
 };

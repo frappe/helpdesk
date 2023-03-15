@@ -22,6 +22,9 @@
   "base_support_rotation",
   "knowledge_base_section",
   "suggest_articles_in_new_ticket_page",
+  "workflow_tab",
+  "skip_email_workflow",
+  "column_break_aomm",
   "misc_tab",
   "toasts_column",
   "suppress_default_email_toast",
@@ -179,11 +182,26 @@
   {
    "fieldname": "column_break_zxek",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "workflow_tab",
+   "fieldtype": "Tab Break",
+   "label": "Workflow"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_email_workflow",
+   "fieldtype": "Check",
+   "label": "Skip e-mail workflow"
+  },
+  {
+   "fieldname": "column_break_aomm",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-06 17:05:10.302469",
+ "modified": "2023-03-14 17:05:08.053813",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",

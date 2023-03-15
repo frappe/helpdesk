@@ -15,6 +15,7 @@ import App from "./App.vue";
 import "./index.css";
 import { dayjs } from "@/utils";
 import { createToast, clearToasts } from "@/utils/toasts";
+import { clipboardCopy } from '@/utils/clipboard';
 import { event } from "@/utils/event";
 import { socketio_port } from "../../../../sites/common_site_config.json";
 
@@ -38,9 +39,10 @@ app.component("Badge", Badge);
 
 app.config.unwrapInjectedRef = true;
 
-app.config.globalProperties.$dayjs = dayjs;
-app.config.globalProperties.$toast = createToast;
 app.config.globalProperties.$clearToasts = clearToasts;
+app.config.globalProperties.$clipboardCopy = clipboardCopy;
+app.config.globalProperties.$dayjs = dayjs;
 app.config.globalProperties.$event = event;
+app.config.globalProperties.$toast = createToast;
 
 app.mount("#app");

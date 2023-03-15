@@ -481,6 +481,15 @@
   resolved "https://registry.yarnpkg.com/@types/throttle-debounce/-/throttle-debounce-2.1.0.tgz#1c3df624bfc4b62f992d3012b84c56d41eab3776"
   integrity sha512-5eQEtSCoESnh2FsiLTxE121IiE60hnMqcb435fShf4bpLRjEu1Eoekht23y6zXS9Ts3l+Szu3TARnTsA0GkOkQ==
 
+"@vee-validate/zod@^4.8.2":
+  version "4.8.2"
+  resolved "https://registry.yarnpkg.com/@vee-validate/zod/-/zod-4.8.2.tgz#4ca5013b5e3f4dd63ed95029b52b979bd67d59e0"
+  integrity sha512-PKeahSiKNkNQTjJ6bKoldqqKqMThpxOtzyIo9ryPvqQ/cKbSfqYTkez76ZC+elCNthr7wJPPY59ZSyNBiV6meQ==
+  dependencies:
+    type-fest "^3.6.1"
+    vee-validate "^4.8.2"
+    zod "^3.21.4"
+
 "@vitejs/plugin-vue@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-4.0.0.tgz#93815beffd23db46288c787352a8ea31a0c03e5e"
@@ -528,7 +537,7 @@
     "@vue/compiler-dom" "3.2.47"
     "@vue/shared" "3.2.47"
 
-"@vue/devtools-api@^6.4.5":
+"@vue/devtools-api@^6.4.5", "@vue/devtools-api@^6.5.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.5.0.tgz#98b99425edee70b4c992692628fa1ea2c1e57d07"
   integrity sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==
@@ -1559,6 +1568,11 @@ type-fest@^2.0.0:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-2.19.0.tgz#88068015bb33036a598b952e55e9311a60fd3a9b"
   integrity sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==
 
+type-fest@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-3.6.1.tgz#cf8025edeebfd6cf48de73573a5e1423350b9993"
+  integrity sha512-htXWckxlT6U4+ilVgweNliPqlsVSSucbxVexRYllyMVJDtf5rTjv6kF/s+qAd4QSL1BZcnJPEJavYBPQiWuZDA==
+
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/uc.micro/-/uc.micro-1.0.6.tgz#9c411a802a409a91fc6cf74081baba34b24499ac"
@@ -1576,6 +1590,13 @@ util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
+
+vee-validate@^4.8.2:
+  version "4.8.2"
+  resolved "https://registry.yarnpkg.com/vee-validate/-/vee-validate-4.8.2.tgz#2861fc2528819f499f4e6527a858ee18ee1dd45c"
+  integrity sha512-lqGzkUrH9dqrYjGgynW1m9nc3fTia3QVNVObINvHYzZTd73bv6J91yk3VVmTSMTKT9cV73vrYozkuNrN9PzU2A==
+  dependencies:
+    "@vue/devtools-api" "^6.5.0"
 
 vite@^4.1.4:
   version "4.1.4"
@@ -1651,6 +1672,11 @@ yaml@^1.10.2:
   version "1.10.2"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
+
+zod@^3.21.4:
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.21.4.tgz#10882231d992519f0a10b5dd58a38c9dabbb64db"
+  integrity sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==
 
 zrender@5.4.1:
   version "5.4.1"

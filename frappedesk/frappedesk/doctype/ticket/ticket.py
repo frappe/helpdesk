@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import json
 from datetime import timedelta
+from typing import List
 
 import frappe
 from frappe import _
@@ -20,6 +21,10 @@ from frappe.utils.user import is_website_user
 
 from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
 	log_ticket_activity,
+)
+from frappedesk.frappedesk.utils.email import (
+	default_outgoing_email_account,
+	default_ticket_outgoing_email_account,
 )
 
 
@@ -294,6 +299,153 @@ class Ticket(Document):
 		if not self.ticket_type:
 			frappe.throw(_("Ticket type is mandatory"))
 
+	def skip_email_workflow(self):
+		skip: str = (
+			frappe.get_value("Frappe Desk Settings", None, "skip_email_workflow") or "0"
+		)
+
+		return bool(int(skip))
+
+	def last_communication(self):
+		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
+
+		communication = frappe.get_last_doc(
+			"Communication",
+			filters=filters,
+		)
+
+		return communication
+
+	def last_communication_email(self):
+		if not (communication := self.last_communication()):
+			return
+
+		if not communication.email_account:
+			return
+
+		email_account = frappe.get_doc("Email Account", communication.email_account)
+
+		if not email_account.enable_outgoing:
+			return
+
+		return email_account
+
+	def sender_email(self):
+		"""
+		Find an email to use as sender. Fall back through multiple choices
+
+		:return: `Email Account`
+		"""
+		if email_account := self.last_communication_email():
+			return email_account
+
+		if email_account := default_ticket_outgoing_email_account():
+			return email_account
+
+		if email_account := default_outgoing_email_account():
+			return email_account
+
+	@property
+	def dashboard_uri(self):
+		root_uri = frappe.utils.get_url()
+		return f"{root_uri}/frappedesk/tickets/{self.name}"
+
+	@property
+	def portal_uri(self):
+		root_uri = frappe.utils.get_url()
+		return f"{root_uri}/support/tickets/{self.name}"
+
+	@frappe.whitelist()
+	def reply_via_agent(
+		self, message: str, cc: str = None, bcc: str = None, attachments: List[str] = []
+	):
+		skip_email_workflow = self.skip_email_workflow()
+		medium = "" if skip_email_workflow else "Email"
+		subject = f"Re: {self.subject} {self.name}"
+		sender = frappe.session.user
+		recipients = self.raised_by
+		sender_email = "" if skip_email_workflow else self.sender_email()
+		last_communication = self.last_communication()
+
+		if last_communication:
+			bcc = bcc or last_communication.bcc
+			cc = cc or last_communication.cc
+
+		if recipients == "Administrator":
+			admin_email = frappe.get_value("User", "Administrator", "email")
+			recipients = admin_email
+
+		communication = frappe.get_doc(
+			{
+				"bcc": bcc,
+				"cc": cc,
+				"communication_medium": medium,
+				"communication_type": "Communication",
+				"content": message,
+				"doctype": "Communication",
+				"email_account": sender_email.name,
+				"email_status": "Open",
+				"recipients": recipients,
+				"reference_doctype": "Ticket",
+				"reference_name": self.name,
+				"sender": sender,
+				"sent_or_received": "Sent",
+				"status": "Linked",
+				"subject": subject,
+			}
+		)
+
+		communication.insert(ignore_permissions=True)
+
+		_attachments = []
+
+		for attachment in attachments:
+			file_doc = frappe.get_doc("File", attachment)
+			file_doc.attached_to_name = communication.name
+			file_doc.attached_to_doctype = "Communication"
+			file_doc.save(ignore_permissions=True)
+			_attachments.append({"file_url": file_doc.file_url})
+
+		if skip_email_workflow:
+			return
+
+		if not sender_email:
+			frappe.throw(_("Can not send email. No sender email set up!"))
+
+		reply_to_email = sender_email.email_id
+		template = "new_reply_on_customer_portal_notification"
+		args = {
+			"message": message,
+			"portal_link": self.portal_uri,
+			"ticket_id": self.name,
+		}
+
+		try:
+			frappe.sendmail(
+				args=args,
+				attachments=_attachments,
+				bcc=bcc,
+				cc=cc,
+				communication=communication.name,
+				delayed=False,
+				message=message,
+				now=True,
+				recipients=recipients,
+				reference_doctype="Ticket",
+				reference_name=self.name,
+				reply_to=reply_to_email,
+				sender=reply_to_email,
+				subject=subject,
+				template=template,
+				with_container=True,
+			)
+		except Exception as e:
+			frappe.throw(_(e))
+
+	@frappe.whitelist()
+	def mark_seen(self):
+		self.add_seen()
+
 
 def set_descritption_from_communication(doc, type):
 	if doc.reference_doctype == "Ticket":
@@ -335,139 +487,6 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 		file_doc.attached_to_name = communication.name
 		file_doc.attached_to_doctype = "Communication"
 		file_doc.save(ignore_permissions=True)
-
-
-@frappe.whitelist(allow_guest=True)
-def create_communication_via_agent(ticket, message, cc, bcc, attachments=None):
-	ticket_doc = frappe.get_doc("Ticket", ticket)
-	last_ticket_communication_doc = frappe.get_last_doc(
-		"Communication", filters={"reference_name": ["=", ticket_doc.name]}
-	)
-
-	sent_email = True  # if not set email will not be sent
-	reply_email_account = None
-
-	ticket_email_account = (
-		last_ticket_communication_doc.email_account
-		if last_ticket_communication_doc
-		else None
-	)
-
-	default_ticket_outgoing_email_account = frappe.get_value(
-		"Email Account",
-		[
-			["use_imap", "=", 1],
-			["IMAP Folder", "append_to", "=", "Ticket"],
-			["default_outgoing", "=", 1],
-		],
-	)
-	default_outgoing_email_account = frappe.get_value(
-		"Email Account", [["Email Account", "default_outgoing", "=", 1]]
-	)
-
-	just_sent_email_notification = False
-
-	# 1 if not via customer portal check if email account is set in ticket doc, else check if default outgoing is available, else throw error
-	if not ticket_doc.via_customer_portal:
-		if (
-			ticket_email_account
-			and frappe.get_doc("Email Account", ticket_email_account).enable_outgoing
-		):
-			reply_email_account = ticket_email_account
-		elif default_ticket_outgoing_email_account:
-			reply_email_account = default_ticket_outgoing_email_account
-		elif default_outgoing_email_account:
-			reply_email_account = default_outgoing_email_account
-			just_sent_email_notification = True
-		else:
-			return {
-				"status": "error",
-				"error_code": "No default outgoing email available",
-			}
-	else:
-		if default_ticket_outgoing_email_account:
-			# 2 if via customer portal, check if a default outgoing email with IMAP folder with ticket doctype is present, if so use that
-			reply_email_account = default_ticket_outgoing_email_account
-		elif default_outgoing_email_account:
-			# 3 if not check if default outgoing email is present, if then send the mail but it should say reply on the customer portal (as replying in the email will not trigger ticket updatee on desk)
-			reply_email_account = default_outgoing_email_account
-			just_sent_email_notification = True
-		else:
-			# 4 if via customer portal and no default outgoing email is present, throw error
-			sent_email = False
-
-	communication = frappe.new_doc("Communication")
-	communication.update(
-		{
-			"communication_type": "Communication",
-			"communication_medium": "Email",
-			"sent_or_received": "Sent",
-			"email_status": "Open",
-			"subject": "Re: " + ticket_doc.subject + f" (#{ticket_doc.name})",
-			"sender": frappe.session.user,
-			"recipients": frappe.get_value("User", "Administrator", "email")
-			if ticket_doc.raised_by == "Administrator"
-			else ticket_doc.raised_by,
-			"cc": cc,
-			"bcc": bcc,
-			"content": message,
-			"status": "Linked",
-			"reference_doctype": "Ticket",
-			"reference_name": ticket_doc.name,
-			"email_account": reply_email_account,
-		}
-	)
-	communication.ignore_permissions = True
-	communication.ignore_mandatory = True
-	communication.save(ignore_permissions=True)
-
-	_attachments = []
-
-	for attachment in attachments:
-		file_doc = frappe.get_doc("File", attachment)
-		file_doc.attached_to_name = communication.name
-		file_doc.attached_to_doctype = "Communication"
-		file_doc.save(ignore_permissions=True)
-
-		_attachments.append({"file_url": file_doc.file_url})
-
-	if sent_email:
-		reply_to_email = frappe.get_doc("Email Account", reply_email_account).email_id
-		try:
-			frappe.sendmail(
-				subject=f"Re: {ticket_doc.subject}",
-				sender=reply_to_email,
-				reply_to=reply_to_email,
-				recipients=[ticket_doc.raised_by],
-				cc=cc,
-				bcc=bcc,
-				reference_doctype="Ticket",
-				reference_name=ticket_doc.name,
-				communication=communication.name,
-				attachments=_attachments if len(_attachments) > 0 else None,
-				template="new_reply_on_customer_portal_notification"
-				if just_sent_email_notification
-				else None,
-				message=message if not just_sent_email_notification else None,
-				args={
-					"ticket_id": ticket_doc.name,
-					"message": message,
-					"portal_link": f"{frappe.utils.get_url()}/support/tickets/{ticket_doc.name}",
-				}
-				if just_sent_email_notification
-				else None,
-				now=False,
-			)
-		except:
-			frappe.throw(
-				"Either setup up support email account or there should be a default"
-				" outgoing email account"
-			)
-	else:
-		return {"status": "error", "error_code": "No default outgoing email available"}
-	return {
-		"status": "success",
-	}
 
 
 @frappe.whitelist()
@@ -635,7 +654,7 @@ def auto_close_tickets():
 
 	tickets = frappe.db.sql(
 		""" select name from tabTicket where status='Replied' and
-		modified<DATE_SUB(CURDATE(), INTERVAL %s DAY) """,
+        modified<DATE_SUB(CURDATE(), INTERVAL %s DAY) """,
 		(auto_close_after_days),
 		as_dict=True,
 	)
