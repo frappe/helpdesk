@@ -306,7 +306,7 @@ class Ticket(Document):
 
 		return bool(int(skip))
 
-	def last_communication_email(self):
+	def last_communication(self):
 		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
 
 		communication = frappe.get_last_doc(
@@ -314,7 +314,10 @@ class Ticket(Document):
 			filters=filters,
 		)
 
-		if not communication:
+		return communication
+
+	def last_communication_email(self):
+		if not (communication := self.last_communication()):
 			return
 
 		if not communication.email_account:
@@ -362,6 +365,11 @@ class Ticket(Document):
 		sender = frappe.session.user
 		recipients = self.raised_by
 		sender_email = "" if skip_email_workflow else self.sender_email()
+		last_communication = self.last_communication()
+
+		if last_communication:
+			bcc = bcc or last_communication.bcc
+			cc = cc or last_communication.cc
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
@@ -421,6 +429,7 @@ class Ticket(Document):
 				communication=communication.name,
 				delayed=False,
 				message=message,
+				now=True,
 				recipients=recipients,
 				reference_doctype="Ticket",
 				reference_name=self.name,
