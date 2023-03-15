@@ -16,7 +16,7 @@
 						name="copy"
 						class="h-[24px] w-[24px] rounded-md bg-gray-100 stroke-gray-700 p-1"
 						role="button"
-						@click="copyTicketNameToClipboard"
+						@click="copyTicketName"
 					/>
 				</div>
 			</div>
@@ -464,23 +464,23 @@ import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
 export default {
 	name: "Ticket",
 	components: {
-		Badge,
-		Card,
-		Dropdown,
-		Avatar,
-		FileUploader,
-		FeatherIcon,
-		TextEditor,
-		Conversations,
-		InfoPanel,
 		ActionPanel,
+		ArticleResponseDialog,
+		Avatar,
+		Badge,
+		CannedResponsesDialog,
+		Card,
+		Conversations,
 		CustomIcons,
 		CustomerSatisfactionFeedback,
-		CannedResponsesDialog,
-		TextEditorFixedMenu,
-		ArticleResponseDialog,
-		TicketStatus,
+		Dropdown,
 		ErrorMessage,
+		FeatherIcon,
+		FileUploader,
+		InfoPanel,
+		TextEditor,
+		TextEditorFixedMenu,
+		TicketStatus,
 	},
 	props: {
 		ticketId: String,
@@ -651,25 +651,8 @@ export default {
 		this.$resources.ticket.markSeen.submit();
 	},
 	methods: {
-		async copyTicketNameToClipboard() {
-			if (window.isSecureContext) {
-				await navigator.clipboard.writeText(this.ticket.name);
-			} else {
-				const textArea = document.createElement("textarea");
-				textArea.value = this.ticket.name;
-				document.body.appendChild(textArea);
-				textArea.focus();
-				textArea.select();
-				try {
-					document.execCommand("copy");
-				} catch (err) {}
-				document.body.removeChild(textArea);
-			}
-			this.$toast({
-				title: "Copied to clipboard",
-				icon: "check",
-				iconClasses: "text-green-500",
-			});
+		async copyTicketName() {
+			this.$clipboardCopy(this.ticket.name);
 		},
 		startEditing(type = "reply") {
 			this.editing = true;
@@ -766,8 +749,6 @@ export default {
 			this.content = "";
 			this.attachments = [];
 		},
-		getNextTicket() {},
-		getPreviousTicket() {},
 		getMessage(message) {
 			this.tempMessage = message;
 			this.content = this.tempMessage;
