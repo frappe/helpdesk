@@ -24,6 +24,7 @@
   "suggest_articles_in_new_ticket_page",
   "workflow_tab",
   "skip_email_workflow",
+  "instantly_send_email",
   "column_break_aomm",
   "misc_tab",
   "toasts_column",
@@ -197,11 +198,17 @@
   {
    "fieldname": "column_break_aomm",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "instantly_send_email",
+   "fieldtype": "Check",
+   "label": "Instantly send e-mail"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-14 17:05:08.053813",
+ "modified": "2023-03-15 21:50:32.939856",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
