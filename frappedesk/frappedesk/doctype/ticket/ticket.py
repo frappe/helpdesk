@@ -375,7 +375,7 @@ class Ticket(Document):
 				"communication_type": "Communication",
 				"content": message,
 				"doctype": "Communication",
-				"email_account": sender_email,
+				"email_account": sender_email.name,
 				"email_status": "Open",
 				"recipients": recipients,
 				"reference_doctype": "Ticket",
@@ -408,7 +408,7 @@ class Ticket(Document):
 		template = "new_reply_on_customer_portal_notification"
 		args = {
 			"message": message,
-			"portal_link": self.dashboard_uri,
+			"portal_link": self.portal_uri,
 			"ticket_id": self.name,
 		}
 
