@@ -364,7 +364,7 @@ class Ticket(Document):
 		subject = f"Re: {self.subject} {self.name}"
 		sender = frappe.session.user
 		recipients = self.raised_by
-		sender_email = "" if skip_email_workflow else self.sender_email()
+		sender_email = None if skip_email_workflow else self.sender_email()
 		last_communication = self.last_communication()
 
 		if last_communication:
@@ -383,7 +383,7 @@ class Ticket(Document):
 				"communication_type": "Communication",
 				"content": message,
 				"doctype": "Communication",
-				"email_account": sender_email.name,
+				"email_account": sender_email.name if sender_email else None,
 				"email_status": "Open",
 				"recipients": recipients,
 				"reference_doctype": "Ticket",
