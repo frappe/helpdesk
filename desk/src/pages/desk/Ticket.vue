@@ -460,6 +460,7 @@ import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSat
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
+import { TextEditorMenuButtons } from "./consts";
 
 export default {
 	name: "Ticket",
@@ -544,6 +545,7 @@ export default {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
+			textEditorMenuButtons: TextEditorMenuButtons,
 		};
 	},
 	resources: {
@@ -596,47 +598,6 @@ export default {
 	computed: {
 		ticket() {
 			return this.$resources.ticket.doc || null;
-		},
-		textEditorMenuButtons() {
-			return [
-				"Paragraph",
-				["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-				"Separator",
-				"Bold",
-				"Italic",
-				"Separator",
-				"Bullet List",
-				"Numbered List",
-				"Separator",
-				"Align Left",
-				"Align Center",
-				"Align Right",
-				"Separator",
-				"Image",
-				"Video",
-				"Link",
-				"Blockquote",
-				"Code",
-				"Horizontal Rule",
-				[
-					"InsertTable",
-					"AddColumnBefore",
-					"AddColumnAfter",
-					"DeleteColumn",
-					"AddRowBefore",
-					"AddRowAfter",
-					"DeleteRow",
-					"MergeCells",
-					"SplitCell",
-					"ToggleHeaderColumn",
-					"ToggleHeaderRow",
-					"ToggleHeaderCell",
-					"DeleteTable",
-				],
-				"Separator",
-				"Undo",
-				"Redo",
-			];
 		},
 		sendingDissabled() {
 			let content = this.content.trim();
