@@ -100,7 +100,7 @@
 								@click="
 									() => {
 										$resources.ticket.setValue.submit({
-											status: 'Closed',
+											status: 'Open',
 										})
 									}
 								"
