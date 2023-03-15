@@ -161,11 +161,11 @@
 										>
 											<div class="text-gray-700">Cc</div>
 											<Input
+												v-model="cc"
 												class="font-inter w-11/12 bg-white py-[4px] pl-[4px] text-[12px] focus:bg-white"
-												@input="cc = $event"
 											/>
 										</div>
-										<ErrorMessage v-if="showCc" :message="ccValidationError" />
+										<ErrorMessage :message="ccValidationError" />
 										<div
 											v-if="showBcc"
 											class="flex flex-row items-center space-x-2"
@@ -173,14 +173,11 @@
 											<div class="bg-transparent text-gray-700">Bcc</div>
 
 											<Input
+												v-model="bcc"
 												class="font-inter w-11/12 bg-white py-[4px] pl-[2px] text-[12px] focus:bg-white"
-												@input="bcc = $event"
 											/>
 										</div>
-										<ErrorMessage
-											v-if="showBcc"
-											:message="bccValidationError"
-										/>
+										<ErrorMessage :message="bccValidationError" />
 									</div>
 									<div v-else class="flex flex-row items-center space-x-2">
 										<span class="text-gray-700">as</span>
@@ -451,6 +448,9 @@ import {
 	FeatherIcon,
 	TextEditor,
 } from "frappe-ui";
+import { useField } from "vee-validate";
+import { toFieldValidator } from "@vee-validate/zod";
+import * as zod from "zod";
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
 import Conversations from "@/components/desk/ticket/Conversations.vue";
 import InfoPanel from "@/components/desk/ticket/InfoPanel.vue";
@@ -499,14 +499,24 @@ export default {
 		const showArticleResponseDialog = ref(false);
 		const tempContent = ref("");
 		const editingSubject = ref("");
-		const ccValidationError = ref("");
-		const bccValidationError = ref("");
 		const showCc = ref(false);
 		const showBcc = ref(false);
 		const showCcBtn = ref(true);
 		const showBccBtn = ref(true);
+		const validateEmail = toFieldValidator(zod.string().email());
+
+		const { value: cc, errorMessage: ccValidationError } = useField(
+			"ccField",
+			validateEmail
+		);
+		const { value: bcc, errorMessage: bccValidationError } = useField(
+			"bccField",
+			validateEmail
+		);
 
 		return {
+			cc,
+			bcc,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -534,8 +544,6 @@ export default {
 			editing: false,
 			scrollConversationsToBottom: false,
 			content: "",
-			cc: "",
-			bcc: "",
 		};
 	},
 	resources: {
@@ -684,9 +692,6 @@ export default {
 			}
 		},
 		submit() {
-			// if (this.validateInputs()) {
-			// 	return
-			// }
 			switch (this.editingType) {
 				case "reply":
 					this.submitConversation();
@@ -756,31 +761,6 @@ export default {
 		getContent(content) {
 			this.tempContent = content;
 			this.content = this.tempContent;
-		},
-		validateInputs() {
-			if (this.cc || this.bcc != "") {
-				let error = this.validateCcInput(this.cc);
-				error += this.validateBccInput(this.bcc);
-				return error;
-			}
-		},
-		validateCcInput(value) {
-			this.ccValidationError = "";
-			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
-			if (!reg.test(value)) {
-				this.ccValidationError = "Enter a valid email";
-			}
-			return this.ccValidationError;
-		},
-		validateBccInput(value) {
-			this.bccValidationError = "";
-			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
-			if (!reg.test(value)) {
-				this.bccValidationError = "Enter a valid email";
-			}
-			return this.bccValidationError;
 		},
 	},
 };
