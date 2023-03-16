@@ -442,6 +442,7 @@ class Ticket(Document):
 				cc=cc,
 				communication=communication.name,
 				delayed=send_delayed,
+				expose_recipients="header",
 				message=message,
 				now=send_now,
 				recipients=recipients,
