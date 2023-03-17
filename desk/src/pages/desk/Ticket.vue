@@ -574,7 +574,21 @@ export default {
 				type: "document",
 				doctype: "Ticket",
 				name: this.ticketId,
+				onSuccess: () => {
+					this.$resources.ticket.lastCommunication.fetch();
+				},
 				whitelistedMethods: {
+					lastCommunication: {
+						method: "last_communication",
+						onSuccess: (data) => {
+							this.ccList = this.ccList.length
+								? this.ccList
+								: data.cc?.split(",") || [];
+							this.bccList = this.bccList.length
+								? this.bccList
+								: data.bcc?.split(",") || [];
+						},
+					},
 					markSeen: "mark_seen",
 					replyViaAgent: {
 						method: "reply_via_agent",
@@ -747,7 +761,7 @@ export default {
 			return zod.string().email().safeParse(email).success;
 		},
 		pushToEmailList(list, e) {
-			if (list.indexOf(email)) return;
+			if (list.indexOf(e.target.value) > 0) return;
 
 			if (!this.validateEmail(e.target.value)) {
 				this.$toast({
