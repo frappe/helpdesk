@@ -191,6 +191,7 @@
   },
   {
    "default": "0",
+   "description": "This field is used to skip email-related workflows for tickets. If this field is checked, no emails will be sent related to tickets, such as new ticket creation, status updates, or notifications.",
    "fieldname": "skip_email_workflow",
    "fieldtype": "Check",
    "label": "Skip e-mail workflow"
@@ -201,6 +202,7 @@
   },
   {
    "default": "0",
+   "description": "This field is used to send an email instantly without adding it into the queue. If this field is checked, the email will be sent immediately after clicking the \"Send\" button, instead of being added to the email queue for later processing.",
    "fieldname": "instantly_send_email",
    "fieldtype": "Check",
    "label": "Instantly send e-mail"
@@ -208,7 +210,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-15 21:50:32.939856",
+ "modified": "2023-03-17 12:14:28.728605",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Frappe Desk Settings",
