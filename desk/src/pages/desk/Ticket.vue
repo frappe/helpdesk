@@ -162,12 +162,19 @@
 											<div class="text-gray-700">Cc</div>
 											<div
 												v-for="email in ccList"
-												class="rounded-md bg-gray-100 px-2 py-1"
+												class="flex items-center rounded-md bg-gray-100"
 												:class="{
 													'bg-red-100': !validateEmail(email),
 												}"
 											>
-												{{ email }}
+												<div class="px-2 py-1">
+													{{ email }}
+												</div>
+												<FeatherIcon
+													name="x"
+													class="h-5 cursor-pointer py-1 pr-2"
+													@click="() => removeFromEmailList(ccList, email)"
+												/>
 											</div>
 											<Input
 												class="bg-white focus:bg-white"
@@ -181,12 +188,19 @@
 											<div class="text-gray-700">Bcc</div>
 											<div
 												v-for="email in bccList"
-												class="rounded-md bg-gray-100 px-2 py-1"
+												class="flex items-center rounded-md bg-gray-100"
 												:class="{
 													'bg-red-100': !validateEmail(email),
 												}"
 											>
-												{{ email }}
+												<div class="px-2 py-1">
+													{{ email }}
+												</div>
+												<FeatherIcon
+													name="x"
+													class="h-5 cursor-pointer py-1 pr-2"
+													@click="() => removeFromEmailList(bccList, email)"
+												/>
 											</div>
 											<Input
 												class="bg-white focus:bg-white"
@@ -733,6 +747,8 @@ export default {
 			return zod.string().email().safeParse(email).success;
 		},
 		pushToEmailList(list, e) {
+			if (list.indexOf(email)) return;
+
 			if (!this.validateEmail(e.target.value)) {
 				this.$toast({
 					title: "Invalid email",
@@ -745,6 +761,9 @@ export default {
 
 			list.push(e.currentTarget.value);
 			e.currentTarget.value = "";
+		},
+		removeFromEmailList(list, email) {
+			list.splice(list.indexOf(email), 1);
 		},
 	},
 };
