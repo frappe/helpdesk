@@ -144,40 +144,55 @@
 								>
 									<div
 										v-if="editingType == 'reply'"
-										class="flex w-[85%] flex-col"
+										class="flex flex-col gap-2"
 									>
 										<div
 											v-if="ticket.raised_by"
-											class="flex flex-row items-center space-x-2"
+											class="flex flex-row items-center gap-2"
 										>
 											<div class="text-gray-700">To</div>
-											<div class="rounded-[6px] bg-gray-50 px-[10px] py-[4px]">
+											<div class="rounded-md bg-gray-100 px-2 py-1">
 												{{ ticket.raised_by }}
 											</div>
 										</div>
 										<div
-											v-if="showCc"
-											class="flex flex-row items-center space-x-2 bg-transparent"
+											v-show="showCc"
+											class="flex flex-row flex-wrap items-center gap-2"
 										>
 											<div class="text-gray-700">Cc</div>
+											<div
+												v-for="email in ccList"
+												class="rounded-md bg-gray-100 px-2 py-1"
+												:class="{
+													'bg-red-100': !validateEmail(email),
+												}"
+											>
+												{{ email }}
+											</div>
 											<Input
-												v-model="cc"
-												class="font-inter w-11/12 bg-white py-[4px] pl-[4px] text-[12px] focus:bg-white"
+												class="bg-white focus:bg-white"
+												@keyup.enter="(e) => pushToEmailList(ccList, e)"
 											/>
 										</div>
-										<ErrorMessage :message="ccValidationError" />
 										<div
-											v-if="showBcc"
-											class="flex flex-row items-center space-x-2"
+											v-show="showBcc"
+											class="flex flex-row flex-wrap items-center gap-2"
 										>
-											<div class="bg-transparent text-gray-700">Bcc</div>
-
+											<div class="text-gray-700">Bcc</div>
+											<div
+												v-for="email in bccList"
+												class="rounded-md bg-gray-100 px-2 py-1"
+												:class="{
+													'bg-red-100': !validateEmail(email),
+												}"
+											>
+												{{ email }}
+											</div>
 											<Input
-												v-model="bcc"
-												class="font-inter w-11/12 bg-white py-[4px] pl-[2px] text-[12px] focus:bg-white"
+												class="bg-white focus:bg-white"
+												@keyup.enter="(e) => pushToEmailList(bccList, e)"
 											/>
 										</div>
-										<ErrorMessage :message="bccValidationError" />
 									</div>
 									<div v-else class="flex flex-row items-center space-x-2">
 										<span class="text-gray-700">as</span>
@@ -504,20 +519,13 @@ export default {
 		const showBcc = ref(false);
 		const showCcBtn = ref(true);
 		const showBccBtn = ref(true);
-		const validateEmail = toFieldValidator(zod.string().email());
 
-		const { value: cc, errorMessage: ccValidationError } = useField(
-			"ccField",
-			validateEmail
-		);
-		const { value: bcc, errorMessage: bccValidationError } = useField(
-			"bccField",
-			validateEmail
-		);
+		const ccList = ref([]);
+		const bccList = ref([]);
 
 		return {
-			cc,
-			bcc,
+			ccList,
+			bccList,
 			showTextFormattingMenu,
 			viewportWidth,
 			user,
@@ -531,8 +539,6 @@ export default {
 			tempContent,
 			editingSubject,
 			replied,
-			ccValidationError,
-			bccValidationError,
 			showCc,
 			showBcc,
 			showCcBtn,
@@ -669,8 +675,8 @@ export default {
 
 			this.$resources.ticket.replyViaAgent.submit({
 				attachments: this.attachments.map((x) => x.name),
-				bcc: this.bcc,
-				cc: this.cc,
+				bcc: this.bccList.join(","),
+				cc: this.ccList.join(","),
 				message,
 			});
 
@@ -722,6 +728,23 @@ export default {
 		getContent(content) {
 			this.tempContent = content;
 			this.content = this.tempContent;
+		},
+		validateEmail(email) {
+			return zod.string().email().safeParse(email).success;
+		},
+		pushToEmailList(list, e) {
+			if (!this.validateEmail(e.target.value)) {
+				this.$toast({
+					title: "Invalid email",
+					icon: "x",
+					iconClasses: "text-red-500",
+				});
+
+				return;
+			}
+
+			list.push(e.currentTarget.value);
+			e.currentTarget.value = "";
 		},
 	},
 };
