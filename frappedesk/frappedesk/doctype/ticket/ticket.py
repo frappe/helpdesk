@@ -314,6 +314,7 @@ class Ticket(Document):
 
 		return bool(int(check))
 
+	@frappe.whitelist()
 	def last_communication(self):
 		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
 
