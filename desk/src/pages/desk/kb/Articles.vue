@@ -4,17 +4,8 @@
 			ref="articleList"
 			:options="{
 				doctype: 'Article',
-				fields: [
-					'title',
-					'status',
-					'views',
-					'author',
-					'modified',
-					'category.category_name as category_name',
-				],
-				order_by: 'modified desc',
+				order_by: 'modified DESC',
 				limit: 20,
-				filters: { status: ['!=', 'Archived'] },
 			}"
 		>
 			<template #body="{ manager }">

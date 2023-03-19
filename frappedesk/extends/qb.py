@@ -22,7 +22,9 @@ def get_query(*args, **kwargs):
 		table = kwargs.get("table")
 		order_by_field, order_by_dir = extract_order_by(kwargs)
 		QBTable = frappe.qb.DocType(table)
-		query = query.orderby(QBTable[order_by_field], order=Order[order_by_dir])
+		query = query.orderby(
+			QBTable[order_by_field], order=Order[order_by_dir.lower()]
+		)
 
 		return query
 

@@ -5,14 +5,14 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
-from frappe.model.naming import append_number_if_name_exists
 
 
 class Category(Document):
 	def before_save(self):
 		if self.idx == -1 and self.status == "Published":
-			# index is only set if its not set already, this allows defining index at the time of creation itself
-			# if not set the index is set to the last index + 1, i.e. the category is added at the end
+			# index is only set if its not set already, this allows defining
+			# index at the time of creation itself if not set the index is set
+			# to the last index + 1, i.e. the category is added at the end
 			self.idx = cint(
 				frappe.db.count("Category", {"parent_category": self.parent_category})
 			)
