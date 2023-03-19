@@ -139,7 +139,7 @@
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/kb/articles/${row.name}/${row.title_slug}`,
+								path: `/frappedesk/kb/articles/${row.name}`,
 							}"
 							class="cursor-pointer text-gray-600 hover:text-gray-900"
 							>{{ value }}</router-link
