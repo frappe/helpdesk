@@ -4,17 +4,8 @@
 			ref="articleList"
 			:options="{
 				doctype: 'Article',
-				fields: [
-					'title',
-					'status',
-					'views',
-					'author',
-					'modified',
-					'category.category_name as category_name',
-				],
-				order_by: 'modified desc',
+				order_by: 'modified DESC',
 				limit: 20,
-				filters: { status: ['!=', 'Archived'] },
 			}"
 		>
 			<template #body="{ manager }">
@@ -148,7 +139,7 @@
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/kb/articles/${row.name}/${row.title_slug}`,
+								path: `/frappedesk/kb/articles/${row.name}`,
 							}"
 							class="cursor-pointer text-gray-600 hover:text-gray-900"
 							>{{ value }}</router-link
