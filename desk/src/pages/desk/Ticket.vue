@@ -178,9 +178,14 @@
 											</div>
 											<Input
 												class="bg-white focus:bg-white"
-												@keydown.prevent.enter="(e) => pushToEmailList(ccList, e)"
-												@keydown.prevent.space="(e) => pushToEmailList(ccList, e)"
+												@keydown.prevent.enter="
+													(e) => pushToEmailList(ccList, e)
+												"
+												@keydown.prevent.space="
+													(e) => pushToEmailList(ccList, e)
+												"
 												@keydown.prevent.,="(e) => pushToEmailList(ccList, e)"
+												@paste.prevent="(e) => onEmailListPaste(ccList, e)"
 											/>
 										</div>
 										<div
@@ -206,9 +211,14 @@
 											</div>
 											<Input
 												class="bg-white focus:bg-white"
-												@keydown.prevent.enter="(e) => pushToEmailList(bccList, e)"
-												@keydown.prevent.space="(e) => pushToEmailList(bccList, e)"
+												@keydown.prevent.enter="
+													(e) => pushToEmailList(bccList, e)
+												"
+												@keydown.prevent.space="
+													(e) => pushToEmailList(bccList, e)
+												"
 												@keydown.prevent.,="(e) => pushToEmailList(bccList, e)"
+												@paste.prevent="(e) => onEmailListPaste(bccList, e)"
 											/>
 										</div>
 									</div>
@@ -765,6 +775,12 @@ export default {
 			return zod.string().email().safeParse(email).success;
 		},
 		pushToEmailList(list, e) {
+			if (typeof e === "string") {
+				if (!this.validateEmail(e)) return;
+				list.push(e);
+				return;
+			}
+
 			if (list.indexOf(e.target.value) > 0) return;
 
 			if (!this.validateEmail(e.target.value)) {
@@ -782,6 +798,14 @@ export default {
 		},
 		removeFromEmailList(list, email) {
 			list.splice(list.indexOf(email), 1);
+		},
+		onEmailListPaste(list, e) {
+			const d = e.clipboardData.getData("text/plain");
+			const delimiter = d.includes(",") ? "," : " ";
+
+			d.split(delimiter)
+				.map((email) => email.trim())
+				.forEach((email) => this.pushToEmailList(list, email));
 		},
 	},
 };
