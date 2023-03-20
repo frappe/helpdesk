@@ -6,6 +6,7 @@ module.exports = {
 	},
 	extends: [
 		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
 		"plugin:json/recommended",
 		"plugin:vue/vue3-recommended",
 		"plugin:tailwindcss/recommended",
@@ -14,5 +15,6 @@ module.exports = {
 	parserOptions: {
 		ecmaVersion: "latest",
 		sourceType: "module",
+		parser: "@typescript-eslint/parser",
 	},
 };
