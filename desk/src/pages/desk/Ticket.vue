@@ -178,7 +178,9 @@
 											</div>
 											<Input
 												class="bg-white focus:bg-white"
-												@keyup.enter="(e) => pushToEmailList(ccList, e)"
+												@keydown.prevent.enter="(e) => pushToEmailList(ccList, e)"
+												@keydown.prevent.space="(e) => pushToEmailList(ccList, e)"
+												@keydown.prevent.,="(e) => pushToEmailList(ccList, e)"
 											/>
 										</div>
 										<div
@@ -204,7 +206,9 @@
 											</div>
 											<Input
 												class="bg-white focus:bg-white"
-												@keyup.enter="(e) => pushToEmailList(bccList, e)"
+												@keydown.prevent.enter="(e) => pushToEmailList(bccList, e)"
+												@keydown.prevent.space="(e) => pushToEmailList(bccList, e)"
+												@keydown.prevent.,="(e) => pushToEmailList(bccList, e)"
 											/>
 										</div>
 									</div>
