@@ -9,6 +9,9 @@ module.exports = {
 	],
 	theme: {
 		extend: {
+			font: {
+				sans: ["Inter", "sans-serif"],
+			},
 			zIndex: {
 				"5": "5",
 			},

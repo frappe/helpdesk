@@ -1,4 +1,7 @@
+import { ref, onMounted } from "vue";
 import { createListResource, createResource } from "frappe-ui";
+import { useListFilters } from "./listFilters";
+import { isEmpty } from "lodash";
 
 const GET_LIST_METHOD = "frappedesk.extends.client.get_list";
 const GET_LIST_META_METHOD = "frappedesk.extends.client.get_list_meta";
@@ -24,11 +27,12 @@ type MetaData = {
 export function createListManager(options: ListOptions) {
 	const doctype = options.doctype;
 	const fields = options.fields;
-	const filters = options.filters;
-	const orderBy = options.orderBy;
+	const filters = ref(options.filters);
+	const orderBy = ref(options.orderBy);
 	const pageLength = options.pageLength;
 	const start = options.start;
 	const cache = options.cache;
+	const filterManager = useListFilters();
 
 	const list = createListResource({
 		type: "list",
@@ -40,17 +44,20 @@ export function createListManager(options: ListOptions) {
 		pageLength,
 		start,
 		cache,
+		onSuccess() {
+			meta.fetch();
+		},
 		auto: true,
 		debug: true,
 	});
 
-	createResource({
+	const meta = createResource({
 		url: GET_LIST_META_METHOD,
 		params: {
 			doctype,
-			filters,
+			filters: filters.value,
 			limit: pageLength,
-			orderBy,
+			orderBy: orderBy.value,
 			start,
 		},
 		onSuccess: (data: MetaData) => {
@@ -62,9 +69,18 @@ export function createListManager(options: ListOptions) {
 				hasPreviousPage: data.has_previous_page,
 			});
 		},
-		auto: true,
 		debug: true,
 	});
+
+	onMounted(() => {
+		const queryFilters = filterManager.queryFilters();
+		const sortBy = filterManager.queryOrderBy();
+
+		if (!isEmpty(queryFilters)) filters.value = queryFilters;
+		if (sortBy) orderBy.value = sortBy;
+
+		list.reload();
+	})
 
 	return list;
 }

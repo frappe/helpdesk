@@ -1,21 +1,22 @@
 import { createApp } from "vue";
 import {
 	FrappeUI,
+	Badge,
 	Button,
 	Dialog,
 	Input,
-	onOutsideClickDirective,
 	Tooltip,
-	Badge,
-	setConfig,
 	frappeRequest,
+	setConfig,
+	onOutsideClickDirective,
 } from "frappe-ui";
+import * as lodash from 'lodash';
 import router from "./router";
 import App from "./App.vue";
 import "./index.css";
-import { dayjs } from "@/utils";
-import { createToast, clearToasts } from "@/utils/toasts";
 import { clipboardCopy } from '@/utils/clipboard';
+import { createToast, clearToasts } from "@/utils/toasts";
+import { dayjs } from "@/utils";
 import { event } from "@/utils/event";
 import { socketio_port } from "../../../../sites/common_site_config.json";
 
@@ -39,6 +40,7 @@ app.component("Badge", Badge);
 
 app.config.unwrapInjectedRef = true;
 
+app.config.globalProperties.$_ = lodash;
 app.config.globalProperties.$clearToasts = clearToasts;
 app.config.globalProperties.$clipboardCopy = clipboardCopy;
 app.config.globalProperties.$dayjs = dayjs;

@@ -31,7 +31,11 @@ from frappedesk.frappedesk.utils.email import (
 class Ticket(Document):
 	@staticmethod
 	def get_list_query(query: Query):
+		QBTicket = frappe.qb.DocType("Ticket")
+
 		query = Ticket.filter_by_team(query)
+		query = query.select(QBTicket.star)
+
 		return query
 
 	@staticmethod

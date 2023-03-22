@@ -18,6 +18,7 @@
 		"dayjs": "^1.11.7",
 		"echarts": "^5.4.1",
 		"frappe-ui": "^0.0.105",
+		"lodash": "^4.17.21",
 		"vee-validate": "^4.8.2",
 		"vue": "^3.2.47",
 		"vue-echarts": "^6.5.4",
