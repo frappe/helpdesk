@@ -16,6 +16,8 @@ from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.email.inbox import link_communication_to_document
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
+from frappe.query_builder import DocType
+from frappe.query_builder.functions import Count
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
@@ -465,6 +467,40 @@ class Ticket(Document):
 	@frappe.whitelist()
 	def mark_seen(self):
 		self.add_seen()
+
+	def get_comment_count(self):
+		QBComment = DocType("Frappe Desk Comment")
+
+		count = Count("*").as_("count")
+		res = (
+			frappe.qb.from_(QBComment)
+			.select(count)
+			.where(QBComment.reference_ticket == self.name)
+			.run(as_dict=True)
+		)
+
+		return res.pop().count
+
+	def get_conversation_count(self):
+		QBCommunication = DocType("Communication")
+
+		count = Count("*").as_("count")
+		res = (
+			frappe.qb.from_(QBCommunication)
+			.select(count)
+			.where(QBCommunication.reference_doctype == "Ticket")
+			.where(QBCommunication.reference_name == self.name)
+			.run(as_dict=True)
+		)
+
+		return res.pop().count
+
+	@frappe.whitelist()
+	def get_meta(self):
+		return {
+			"comment_count": self.get_comment_count(),
+			"conversation_count": self.get_conversation_count(),
+		}
 
 
 def set_descritption_from_communication(doc, type):
