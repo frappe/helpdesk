@@ -1,11 +1,11 @@
 <template>
 	<div class="flex flex-col text-gray-700">
-		<div class="px-3 py-4 text-2xl font-semibold text-gray-900">Tickets</div>
-		<div class="flex justify-between">
+		<div class="px-6 py-4 text-2xl font-semibold text-gray-900">Tickets</div>
+		<div class="flex justify-between px-6 py-3">
 			<div>
-				<PresetFilters doctype="Ticket" class="p-3" />
+				<PresetFilters doctype="Ticket" />
 			</div>
-			<div class="flex gap-1 items-center">
+			<div class="flex items-center gap-1">
 				<FilterBox doctype="Ticket" />
 				<Dropdown
 					:options="sortDropdownOptions"
@@ -13,42 +13,42 @@
 						label: 'Sort',
 						class: 'text-base',
 					}"
-					class="p-3"
 				/>
 			</div>
 		</div>
-		<div class="px-3 font-sans text-base text-gray-500">
-			<div
-				class="flex items-center justify-between border-y border-gray-300 p-2"
-			>
+		<div class="px-6 font-sans text-base text-gray-500">
+			<div class="flex items-center border-y border-gray-300 p-2">
 				<div class="basis-1/3">Summary</div>
-				<div>Assigned To</div>
-				<div>Type</div>
-				<div>Status</div>
-				<div>Priority</div>
+				<div class="flex basis-2/3">
+					<div class="basis-1/4">Assigned To</div>
+					<div class="basis-1/4">Type</div>
+					<div class="basis-1/4">Status</div>
+					<div class="basis-1/4">Priority</div>
+				</div>
 			</div>
 		</div>
-		<div class="overflow-x-scroll px-3 font-sans text-base">
+		<div class="overflow-x-scroll px-6 py-2 font-sans text-base">
 			<div
 				v-for="t in __l.list.data"
 				:key="t.name"
-				class="flex w-full items-center justify-between gap-2 border-b p-2 last-of-type:border-none"
+				class="flex w-full cursor-pointer items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none hover:shadow-[0px_0px_20px_5px_#e2e8f0]"
 			>
 				<div class="basis-1/3">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
-				<div class="flex items-center gap-2">
-					<AgentAvatar agent="hello@ssiyad.com" />
-					Sabu Siyad
-				</div>
-				<div>
-					{{ t.ticket_type }}
-				</div>
-				<div>
-					{{ t.status }}
-				</div>
-				<div>
-					<Badge :color-map="priorityColorMap" :label="t.priority" />
+				<div class="flex basis-2/3">
+					<div class="basis-1/4">
+						<AssignedInfo :ticket-id="t.name" />
+					</div>
+					<div class="basis-1/4">
+						{{ t.ticket_type }}
+					</div>
+					<div class="basis-1/4">
+						{{ t.status }}
+					</div>
+					<div class="basis-1/4">
+						<Badge :color-map="priorityColorMap" :label="t.priority" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -65,8 +65,18 @@
 					{{ __l.currentPage }}
 				</div>
 				of {{ __l.totalPages }}
-				<Button v-show="__l.hasPreviousPage" icon="chevron-left" class="h-5 w-5 rounded-full bg-gray-200" @click="__l.previous" />
-				<Button v-show="__l.hasNextPage" icon="chevron-right" class="h-5 w-5 rounded-full bg-gray-200" @click="__l.next" />
+				<Button
+					v-show="__l.hasPreviousPage"
+					icon="chevron-left"
+					class="h-5 w-5 rounded-full bg-gray-200"
+					@click="__l.previous"
+				/>
+				<Button
+					v-show="__l.hasNextPage"
+					icon="chevron-right"
+					class="h-5 w-5 rounded-full bg-gray-200"
+					@click="__l.next"
+				/>
 			</div>
 		</div>
 		<NewTicketDialog
@@ -83,20 +93,20 @@
 
 <script>
 import { ref } from "vue";
-import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui";
-import AgentAvatar from "@/components/global/AgentAvatar.vue";
+import { Dropdown } from "frappe-ui";
 import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
 import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
 import FilterBox from "@/components/desk/tickets/FilterBox.vue";
+import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
 import { createListManager } from "@/composables/listManager";
 
 export default {
 	name: "Tickets",
 	components: {
 		Dropdown,
-		AgentAvatar,
 		PresetFilters,
 		TicketSummary,
+		AssignedInfo,
 		FilterBox,
 	},
 	inject: ["agents", "user"],
@@ -106,7 +116,7 @@ export default {
 
 		const __l = createListManager({
 			doctype: "Ticket",
-			pageLength: 5,
+			pageLength: 15,
 		});
 
 		return {
@@ -114,10 +124,6 @@ export default {
 			listEnd,
 			__l,
 		};
-	},
-	mounted() {
-		this.listStart = this.__l.start + 1;
-		this.listEnd = this.__l.start + this.__l.pageLength;
 	},
 	data() {
 		function sortBy(key, dir) {
@@ -147,6 +153,10 @@ export default {
 			showNewTicketDialog: false,
 			sortDropdownOptions,
 		};
+	},
+	mounted() {
+		this.listStart = this.__l.start + 1;
+		this.listEnd = this.__l.start + this.__l.pageLength;
 	},
 	methods: {
 		agentsAsDropdownOptions() {
