@@ -2,8 +2,24 @@
 	<div class="flex flex-col text-gray-700">
 		<div class="px-6 py-4 text-2xl font-semibold text-gray-900">Tickets</div>
 		<div class="flex justify-between px-6 py-3">
-			<div>
+			<div class="flex gap-2">
 				<PresetFilters doctype="Ticket" />
+				<Dropdown
+					:options="filterByStatusOptions"
+					:button="{
+						label: 'Status',
+						iconRight: 'chevron-down',
+						class: 'text-gray-500 bg-gray-200 rounded-lg',
+					}"
+				/>
+				<Dropdown
+					:options="filterByPriorityOptions"
+					:button="{
+						label: 'Priority',
+						iconRight: 'chevron-down',
+						class: 'text-gray-500 bg-gray-200 rounded-lg',
+					}"
+				/>
 			</div>
 			<div class="flex items-center gap-1">
 				<FilterBox doctype="Ticket" />
@@ -11,7 +27,8 @@
 					:options="sortDropdownOptions"
 					:button="{
 						label: 'Sort',
-						class: 'text-base',
+						iconLeft: 'list',
+						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				/>
 			</div>
@@ -52,7 +69,7 @@
 				<div class="basis-1/3">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
-				<div class="flex basis-2/3">
+				<div class="flex basis-2/3 items-center">
 					<div class="basis-1/4">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
@@ -60,7 +77,14 @@
 						{{ t.ticket_type }}
 					</div>
 					<div class="basis-1/4">
-						{{ t.status }}
+						<Dropdown
+							:options="statusDropdownOptions(t.name, t.status)"
+							:button="{
+								label: t.status,
+								iconRight: 'chevron-down',
+								class: 'bg-white text-gray-500 hover:bg-white',
+							}"
+						/>
 					</div>
 					<div class="basis-1/4">
 						<Badge :color-map="priorityColorMap" :label="t.priority" />
@@ -159,6 +183,9 @@ import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
 import FilterBox from "@/components/desk/tickets/FilterBox.vue";
 import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
 import { createListManager } from "@/composables/listManager";
+import { useListFilters } from "@/composables/listFilters";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
 
 export default {
 	name: "Tickets",
@@ -174,6 +201,9 @@ export default {
 		const listStart = ref(0);
 		const listEnd = ref(0);
 		const selected = ref(new Set());
+		const listFilters = useListFilters();
+		const ticketStatusStore = useTicketStatusStore();
+		const ticketPriorityStore = useTicketPriorityStore();
 
 		const __l = createListManager({
 			doctype: "Ticket",
@@ -184,6 +214,9 @@ export default {
 			listStart,
 			listEnd,
 			selected,
+			listFilters,
+			ticketStatusStore,
+			ticketPriorityStore,
 			__l,
 		};
 	},
@@ -220,6 +253,18 @@ export default {
 		allSelected() {
 			if (this.$_.isEmpty(this.__l.list.data)) return;
 			return this.__l.list.data.length === this.selected.size;
+		},
+		filterByPriorityOptions() {
+			return this.ticketPriorityStore.getNames().map((priority) => ({
+				label: priority,
+				handler: () => this.filterByPriority(priority),
+			}));
+		},
+		filterByStatusOptions() {
+			return this.ticketStatusStore.options.map((status) => ({
+				label: status,
+				handler: () => this.filterByStatus(status),
+			}));
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
@@ -283,6 +328,36 @@ export default {
 			if (checked) this.selectAll();
 			else this.deselectAll();
 		},
+		setTicketStatus(ticketId, status) {
+			this.__l.setValue.submit({
+				name: ticketId,
+				status,
+			});
+		},
+		statusDropdownOptions(ticketId, currentStatus) {
+			return this.ticketStatusStore.options
+				.filter((o) => o !== currentStatus)
+				.map((o) => ({
+					label: o,
+					handler: () => this.setTicketStatus(ticketId, o),
+				}));
+		},
+		filterByPriority(priority) {
+			this.filterByField("priority", priority);
+		},
+		filterByStatus(status) {
+			this.filterByField("status", status);
+		},
+		filterByField(fieldname, value) {
+			const f = [
+				{
+					fieldname,
+					filter_type: "is",
+					value,
+				},
+			];
+			this.listFilters.applyQuery(this.listFilters.toQuery(f));
+		},
 	},
 	resources: {
 		bulkAssignTicketStatus() {
@@ -314,16 +389,11 @@ export default {
 			return {
 				url: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
-					// this.$refs.ticketList.manager.selectedItems = [];
-					// this.$refs.ticketList.manager.reload();
-					//
 					this.$toast({
 						title: "Tickets assigned to agent",
 						icon: "check",
 						iconClasses: "text-green-500",
 					});
-					//
-					// this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					this.$toast({
