@@ -102,7 +102,7 @@
 		<div class="grow"></div>
 		<div class="flex justify-between border-t p-4 font-sans text-base">
 			<div class="text-gray-700">
-				Showing {{ listStart }} to {{ listEnd }} of {{ __l.totalCount }}
+				Showing {{ __l.startFrom }} to {{ __l.endAt }} of {{ __l.totalCount }}
 			</div>
 			<div class="flex items-center gap-2">
 				Page
@@ -207,8 +207,6 @@ export default {
 	},
 	inject: ["agents", "user"],
 	setup() {
-		const listStart = ref(0);
-		const listEnd = ref(0);
 		const selected = ref(new Set());
 		const listFilters = useListFilters();
 		const ticketStatusStore = useTicketStatusStore();
@@ -216,12 +214,10 @@ export default {
 
 		const __l = createListManager({
 			doctype: "Ticket",
-			pageLength: 15,
+			pageLength: 20,
 		});
 
 		return {
-			listStart,
-			listEnd,
 			selected,
 			listFilters,
 			ticketStatusStore,
@@ -317,10 +313,6 @@ export default {
 				return null;
 			}
 		},
-	},
-	mounted() {
-		this.listStart = this.__l.start + 1;
-		this.listEnd = this.__l.start + this.__l.pageLength;
 	},
 	methods: {
 		toggleOne(ticketId, checked) {

@@ -20,6 +20,8 @@ type MetaData = {
 	total_count: number;
 	total_pages: number;
 	current_page: number;
+	start_from: number;
+	end_at: number;
 	has_next_page: boolean;
 	has_previous_page: boolean;
 };
@@ -29,8 +31,8 @@ export function createListManager(options: ListOptions) {
 	const fields = options.fields;
 	const filters = ref(options.filters);
 	const orderBy = ref(options.orderBy);
-	const pageLength = options.pageLength;
-	const start = options.start;
+	const pageLength = ref(options.pageLength);
+	const start = ref(options.start);
 	const cache = options.cache;
 	const filterManager = useListFilters();
 
@@ -41,33 +43,43 @@ export function createListManager(options: ListOptions) {
 		fields,
 		orderBy,
 		filters,
-		pageLength,
-		start,
+		pageLength: pageLength.value,
+		start: start.value,
 		cache,
 		onSuccess() {
-			meta.fetch();
+			meta.submit({
+				doctype,
+				filters: list.filters,
+				limit: list.pageLength,
+				order_by: list.orderBy,
+				start: list.start,
+			});
 		},
-		auto: true,
 		debug: true,
+	});
+
+	Object.assign(list, {
+		totalCount: ref(0),
+		totalPages: ref(0),
+		currentPage: ref(0),
+		hasNextPage: ref(false),
+		hasPreviousPage: ref(false),
+		startFrom: ref(0),
+		endAt: ref(0),
 	});
 
 	const meta = createResource({
 		url: GET_LIST_META_METHOD,
-		params: {
-			doctype,
-			filters: filters.value,
-			limit: pageLength,
-			orderBy: orderBy.value,
-			start,
-		},
 		onSuccess: (data: MetaData) => {
-			Object.assign(list, {
-				totalCount: data.total_count,
-				totalPages: data.total_pages,
-				currentPage: data.current_page,
-				hasNextPage: data.has_next_page,
-				hasPreviousPage: data.has_previous_page,
-			});
+			// debugger;
+
+			list.totalCount = data.total_count;
+			list.totalPages = data.total_pages;
+			list.currentPage = data.current_page;
+			list.hasNextPage = data.has_next_page;
+			list.hasPreviousPage = data.has_previous_page;
+			list.startFrom = data.start_from;
+			list.endAt = data.end_at;
 		},
 		debug: true,
 	});
@@ -80,7 +92,7 @@ export function createListManager(options: ListOptions) {
 		if (sortBy) orderBy.value = sortBy;
 
 		list.reload();
-	})
+	});
 
 	return list;
 }
