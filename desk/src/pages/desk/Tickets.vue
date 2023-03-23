@@ -1,6 +1,13 @@
 <template>
 	<div class="flex flex-col text-gray-700">
-		<div class="px-6 py-4 text-2xl font-semibold text-gray-900">Tickets</div>
+		<div class="flex justify-between px-6 pt-6 pb-2 text-gray-900">
+			<div class="text-2xl font-semibold">Tickets</div>
+			<div>
+				<Button icon-left="plus" @click="showNewTicketDialog = true">
+					Add Ticket
+				</Button>
+			</div>
+		</div>
 		<div class="flex justify-between px-6 py-3">
 			<div class="flex gap-2">
 				<PresetFilters doctype="Ticket" />
@@ -21,7 +28,7 @@
 					}"
 				/>
 			</div>
-			<div class="flex items-center gap-1">
+			<div class="flex items-center gap-2">
 				<FilterBox doctype="Ticket" />
 				<Dropdown
 					:options="sortDropdownOptions"
@@ -178,6 +185,7 @@
 <script>
 import { ref } from "vue";
 import { Dropdown } from "frappe-ui";
+import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue";
 import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
 import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
 import FilterBox from "@/components/desk/tickets/FilterBox.vue";
@@ -193,6 +201,7 @@ export default {
 		AssignedInfo,
 		Dropdown,
 		FilterBox,
+		NewTicketDialog,
 		PresetFilters,
 		TicketSummary,
 	},
