@@ -18,6 +18,14 @@
 		</div>
 		<div class="px-6 font-sans text-base text-gray-500">
 			<div class="flex items-center border-y border-gray-300 p-2">
+				<div class="pl-1 pr-4">
+					<Input
+						type="checkbox"
+						input-class="cursor-pointer"
+						:value="allSelected"
+						:onchange="(e) => toggleAllSelected(e.target.checked)"
+					/>
+				</div>
 				<div class="basis-1/3">Summary</div>
 				<div class="flex basis-2/3">
 					<div class="basis-1/4">Assigned To</div>
@@ -33,6 +41,14 @@
 				:key="t.name"
 				class="flex w-full cursor-pointer items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none hover:shadow-[0px_0px_20px_5px_#e2e8f0]"
 			>
+				<div class="pl-1 pr-4">
+					<Input
+						type="checkbox"
+						input-class="cursor-pointer"
+						:value="selected.has(t.name)"
+						:onchange="(e) => toggleOne(t.name, e.target.checked)"
+					/>
+				</div>
 				<div class="basis-1/3">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
@@ -79,6 +95,50 @@
 				/>
 			</div>
 		</div>
+		<div
+			v-show="selected.size"
+			class="fixed inset-x-0 bottom-8 mx-auto w-max font-sans text-base"
+		>
+			<div
+				class="flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-[0px_0px_20px_5px_#e2e8f0]"
+			>
+				<div class="w-64">
+					<div class="inline-block align-middle">
+						<Input type="checkbox" :value="true" :disabled="true" />
+					</div>
+					<div class="inline-block pl-2 align-middle">
+						{{ selected.size }}
+						tickets selected
+					</div>
+				</div>
+				<div>
+					<Dropdown
+						:options="agentsAsDropdownOptions"
+						:button="{
+							label: 'Assign',
+							iconLeft: 'plus-circle',
+							class: 'bg-white text-gray-500',
+						}"
+					/>
+				</div>
+				<div class="text-gray-300">&#x007C;</div>
+				<div>
+					<Button
+						label="Select all"
+						class="bg-white text-gray-500"
+						:disabled="allSelected"
+						@click="selectAll"
+					/>
+				</div>
+				<div>
+					<Button
+						icon="x"
+						class="bg-white text-gray-500"
+						@click="deselectAll"
+					/>
+				</div>
+			</div>
+		</div>
 		<NewTicketDialog
 			v-model="showNewTicketDialog"
 			@close="showNewTicketDialog = false"
@@ -103,16 +163,17 @@ import { createListManager } from "@/composables/listManager";
 export default {
 	name: "Tickets",
 	components: {
+		AssignedInfo,
 		Dropdown,
+		FilterBox,
 		PresetFilters,
 		TicketSummary,
-		AssignedInfo,
-		FilterBox,
 	},
 	inject: ["agents", "user"],
 	setup() {
 		const listStart = ref(0);
 		const listEnd = ref(0);
+		const selected = ref(new Set());
 
 		const __l = createListManager({
 			doctype: "Ticket",
@@ -122,6 +183,7 @@ export default {
 		return {
 			listStart,
 			listEnd,
+			selected,
 			__l,
 		};
 	},
@@ -154,11 +216,11 @@ export default {
 			sortDropdownOptions,
 		};
 	},
-	mounted() {
-		this.listStart = this.__l.start + 1;
-		this.listEnd = this.__l.start + this.__l.pageLength;
-	},
-	methods: {
+	computed: {
+		allSelected() {
+			if (this.$_.isEmpty(this.__l.list.data)) return;
+			return this.__l.list.data.length === this.selected.size;
+		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
 			if (this.agents) {
@@ -167,9 +229,7 @@ export default {
 						label: agent.agent_name,
 						handler: () => {
 							this.$resources.bulkAssignTicketToAgent.submit({
-								ticket_ids: Object.keys(
-									this.$refs.ticketList.manager.selectedItems
-								),
+								ticket_ids: Array.from(this.selected),
 								agent_id: agent.name,
 							});
 						},
@@ -185,9 +245,7 @@ export default {
 								label: "Assign to me",
 								handler: () => {
 									this.$resources.bulkAssignTicketToAgent.submit({
-										ticket_ids: Object.keys(
-											this.$refs.ticketList.manager.selectedItems
-										),
+										ticket_ids: Array.from(this.selected),
 										agent_id: this.user.agent.name,
 									});
 								},
@@ -204,6 +262,26 @@ export default {
 			} else {
 				return null;
 			}
+		},
+	},
+	mounted() {
+		this.listStart = this.__l.start + 1;
+		this.listEnd = this.__l.start + this.__l.pageLength;
+	},
+	methods: {
+		toggleOne(ticketId, checked) {
+			if (checked) this.selected.add(ticketId);
+			else this.selected.delete(ticketId);
+		},
+		selectAll() {
+			this.__l.list.data.forEach((t) => this.selected.add(t.name));
+		},
+		deselectAll() {
+			this.selected.clear();
+		},
+		toggleAllSelected(checked) {
+			if (checked) this.selectAll();
+			else this.deselectAll();
 		},
 	},
 	resources: {
@@ -236,16 +314,16 @@ export default {
 			return {
 				url: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
-					this.$refs.ticketList.manager.selectedItems = [];
-					this.$refs.ticketList.manager.reload();
-
+					// this.$refs.ticketList.manager.selectedItems = [];
+					// this.$refs.ticketList.manager.reload();
+					//
 					this.$toast({
 						title: "Tickets assigned to agent",
 						icon: "check",
 						iconClasses: "text-green-500",
 					});
-
-					this.$event.emit("update_ticket_list");
+					//
+					// this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					this.$toast({
