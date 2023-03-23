@@ -52,10 +52,11 @@
 				</div>
 				<div class="basis-1/3">Summary</div>
 				<div class="flex basis-2/3">
-					<div class="basis-1/4">Assigned To</div>
-					<div class="basis-1/4">Type</div>
-					<div class="basis-1/4">Status</div>
-					<div class="basis-1/4">Priority</div>
+					<div class="basis-1/5">Assigned To</div>
+					<div class="basis-1/5">Raised By</div>
+					<div class="basis-1/5">Type</div>
+					<div class="basis-1/5">Status</div>
+					<div class="basis-1/5">Priority</div>
 				</div>
 			</div>
 		</div>
@@ -63,7 +64,7 @@
 			<div
 				v-for="t in __l.list.data"
 				:key="t.name"
-				class="flex w-full cursor-pointer items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none hover:shadow-[0px_0px_20px_5px_#e2e8f0]"
+				class="hover:shadow-around flex w-full items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none"
 			>
 				<div class="pl-1 pr-4">
 					<Input
@@ -77,13 +78,20 @@
 					<TicketSummary :ticket-name="t.name" />
 				</div>
 				<div class="flex basis-2/3 items-center">
-					<div class="basis-1/4">
+					<div class="basis-1/5">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
-					<div class="basis-1/4">
+					<div class="basis-1/5">
+						<Tooltip :text="t.raised_by">
+							<div class="truncate">
+								{{ t.contact }}
+							</div>
+						</Tooltip>
+					</div>
+					<div class="basis-1/5">
 						{{ t.ticket_type }}
 					</div>
-					<div class="basis-1/4">
+					<div class="basis-1/5">
 						<Dropdown
 							:options="statusDropdownOptions(t.name, t.status)"
 							:button="{
@@ -93,7 +101,7 @@
 							}"
 						/>
 					</div>
-					<div class="basis-1/4">
+					<div class="basis-1/5">
 						<Badge :color-map="priorityColorMap" :label="t.priority" />
 					</div>
 				</div>
@@ -131,7 +139,7 @@
 			class="fixed inset-x-0 bottom-8 mx-auto w-max font-sans text-base"
 		>
 			<div
-				class="flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-[0px_0px_20px_5px_#e2e8f0]"
+				class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
 			>
 				<div class="w-64">
 					<div class="inline-block align-middle">

@@ -1,8 +1,10 @@
 <template>
 	<div class="leading-loose">
-		<div class="truncate" :class="{ 'font-semibold': !isSeen }">
-			{{ subject }}
-		</div>
+		<router-link :to="toRoute">
+			<div class="truncate" :class="{ 'font-semibold': !isSeen }">
+				{{ subject }}
+			</div>
+		</router-link>
 		<div class="flex flex-wrap items-center gap-2">
 			<div>&#x0023;</div>
 			<div>{{ ticketName }}</div>
@@ -28,6 +30,7 @@ const props = defineProps({
 });
 
 const { ticketName } = toRefs(props);
+const toRoute = computed(() => `tickets/${ticketName.value}`);
 const subject = computed(() => ticket.doc?.subject);
 const metaData = computed(() => ticket.getMeta?.data?.message);
 const conversationCount = computed(() => metaData.value?.conversation_count);

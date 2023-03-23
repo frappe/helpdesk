@@ -17,4 +17,7 @@ module.exports = {
 		sourceType: "module",
 		parser: "@typescript-eslint/parser",
 	},
+	rules: {
+		"tailwindcss/no-custom-classname": "off",
+	},
 };
