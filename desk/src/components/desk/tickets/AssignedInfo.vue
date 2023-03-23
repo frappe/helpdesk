@@ -10,13 +10,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, toRefs, ref, Ref } from "vue";
+import { computed, defineProps, toRefs } from "vue";
 import { Avatar, createDocumentResource } from "frappe-ui";
-
-type TicketAssignee = {
-	full_name: string;
-	user_image: string;
-};
 
 const props = defineProps({
 	ticketId: {
@@ -26,8 +21,9 @@ const props = defineProps({
 });
 
 const { ticketId } = toRefs(props);
-const avatarUrl: Ref<string> = ref(null);
-const agentName: Ref<string> = ref(null);
+const assignees = computed(() => ticket.getAssignees?.data?.message?.pop());
+const agentName = computed(() => assignees.value?.full_name);
+const avatarUrl = computed(() => assignees.value?.user_image);
 
 const ticket = createDocumentResource({
 	doctype: "Ticket",
@@ -36,11 +32,7 @@ const ticket = createDocumentResource({
 	whitelistedMethods: {
 		getAssignees: {
 			method: "get_assignees",
-			onSuccess: (data: Array<TicketAssignee>) => {
-				const agent = data.pop();
-				avatarUrl.value = agent?.user_image;
-				agentName.value = agent?.full_name;
-			},
+			cache: ["TicketAssignees", ticketId],
 		},
 	},
 });

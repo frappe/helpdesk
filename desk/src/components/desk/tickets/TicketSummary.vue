@@ -5,7 +5,7 @@
 		</div>
 		<div class="flex flex-wrap items-center gap-2">
 			<div>&#x0023;</div>
-			<div>{{ name }}</div>
+			<div>{{ ticketName }}</div>
 			<div>&#x2022;</div>
 			<FeatherIcon name="message-circle" class="h-4 w-4" />
 			{{ commentCount }}
@@ -17,14 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, toRefs } from "vue";
+import { computed, defineProps, toRefs } from "vue";
 import { FeatherIcon, createDocumentResource } from "frappe-ui";
-
-type TicketMetaData = {
-	comment_count: number;
-	conversation_count: number;
-	is_seen: boolean;
-};
 
 const props = defineProps({
 	ticketName: {
@@ -34,11 +28,11 @@ const props = defineProps({
 });
 
 const { ticketName } = toRefs(props);
-const subject = ref("");
-const name = ref("");
-const conversationCount = ref(0);
-const commentCount = ref(0);
-const isSeen = ref(true);
+const subject = computed(() => ticket.doc?.subject);
+const metaData = computed(() => ticket.getMeta?.data?.message);
+const conversationCount = computed(() => metaData.value?.conversation_count);
+const commentCount = computed(() => metaData.value?.comment_count);
+const isSeen = computed(() => metaData.value?.is_seen);
 
 const ticket = createDocumentResource({
 	doctype: "Ticket",
@@ -48,18 +42,9 @@ const ticket = createDocumentResource({
 		getMeta: {
 			method: "get_meta",
 			cache: ["TicketMetaData", ticketName],
-			onSuccess: (data: TicketMetaData) => {
-				conversationCount.value = data.conversation_count;
-				commentCount.value = data.comment_count;
-				isSeen.value = data.is_seen;
-			},
 		},
 	},
-	onSuccess: (data) => {
-		ticket.getMeta.fetch();
-		subject.value = data.subject;
-		name.value = data.name;
-	},
-	auto: true,
 });
+
+ticket.getMeta.fetch();
 </script>
