@@ -49,7 +49,7 @@
 								:label="authStore.username"
 								class="cursor-pointer"
 								size="xl"
-								:imageURL="authStore.profile_image"
+								:imageURL="authStore.userImage"
 							/>
 						</template>
 					</Dropdown>

@@ -134,23 +134,21 @@
 							class="cursor-pointer"
 							size="lg"
 							v-if="authStore"
-							:imageURL="authStore.profile_image"
+							:imageURL="authStore.userImage"
 						/>
 					</div>
 					<div class="flex max-w-[150px] flex-col text-gray-700">
 						<a
-							:title="
-								authStore.agent ? authStore.agent.agent_name : authStore.user
-							"
+							:title="authStore.userName"
 							class="truncate text-base font-medium"
-							>{{
-								authStore.agent ? authStore.agent.agent_name : authStore.user
-							}}</a
+							>
+							{{ authStore.userName }}
+						</a
 						>
 						<a
-							:title="authStore.user"
+							:title="authStore.userId"
 							class="truncate text-[11px] font-normal"
-							>{{ authStore.user}}</a
+							>{{ authStore.userId}}</a
 						>
 					</div>
 				</div>

@@ -119,7 +119,7 @@ export default {
 			this.redirect_route = this.$route.query.route
 		}
 
-		if (this.authStore.isLoggedIn()) this.redirect();
+		if (this.authStore.isLoggedIn) this.redirect();
 	},
 	methods: {
 		async loginOrResetPassword() {

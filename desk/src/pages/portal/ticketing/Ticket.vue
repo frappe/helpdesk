@@ -136,7 +136,7 @@
 								<Avatar
 									v-if="editing"
 									:label="authStore.user"
-									:imageURL="authStore.profileImage"
+									:imageURL="authStore.userImage"
 									size="md"
 								/>
 								<div class="w-full ml-2 pt-1">

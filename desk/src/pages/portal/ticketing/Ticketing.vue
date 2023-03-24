@@ -1,5 +1,5 @@
 <template>
-	<div v-if="authStore.isLoggedIn()">
+	<div v-if="authStore.isLoggedIn">
 		<router-view v-slot="{ Component }" :key="$route.fullPath">
 			<component :is="Component" />
 		</router-view>
@@ -34,13 +34,13 @@ export default {
 		}
 	},
 	mounted() {
-		if (!this.authStore.isLoggedIn()) {
+		if (!this.authStore.isLoggedIn) {
 			this.$router.push({
 				name: "PortalLogin",
 				query: { route: this.$route.path },
 			})
 		}
-		if (this.authStore.isAdmin || this.authStore.agent) {
+		if (this.authStore.isAdmin || this.authStore.isAgent) {
 			this.impersonateContact = (contact) => {
 				return this.$resources.tickets.fetch({
 					impersonate: contact,
@@ -93,7 +93,7 @@ export default {
 			return {
 				url: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
 				auto:
-					this.authStore.isLoggedIn() && this.$route.name != "Impersonate",
+					this.authStore.isLoggedIn && this.$route.name != "Impersonate",
 				onSuccess: (data) => {
 					this.tickets = {}
 					for (var i = 0; i < data.length; i++) {
@@ -113,7 +113,7 @@ export default {
 		templates() {
 			return {
 				url: "frappedesk.api.ticket.get_all_ticket_templates",
-				auto: this.authStore.isLoggedIn(),
+				auto: this.authStore.isLoggedIn,
 				onSuccess: (data) => {
 					this.ticketTemplates = data
 				},

@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="authStore.isLoggedIn() && authStore.hasDeskAccess"
+		v-if="authStore.isLoggedIn && authStore.hasDeskAccess"
 		class="h-screen w-screen"
 	>
 		<div v-if="initialized">
@@ -80,7 +80,7 @@ export default {
 	computed: {
 		initialized() {
 			if (!this.mounted) return false;
-			if (!this.authStore.isLoggedIn()) return false;
+			if (!this.authStore.isLoggedIn) return false;
 			if (!this.authStore.hasDeskAccess) return false;
 			if (this.$resources.frappedeskSettings.loading) return false;
 			if (!this.$resources.frappedeskSettings.data.initial_agent_set) {
@@ -111,7 +111,7 @@ export default {
 		},
 	},
 	mounted() {
-		if (!this.authStore.isLoggedIn()) {
+		if (!this.authStore.isLoggedIn) {
 			this.$router.push({
 				name: "DeskLogin",
 				query: { route: this.$route.path },

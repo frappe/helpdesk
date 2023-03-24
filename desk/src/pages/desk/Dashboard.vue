@@ -2,7 +2,7 @@
 	<div class="flex flex-col h-screen">
 		<div class="flex border-b h-[52px] px-[18px] shrink-0">
 			<div class="grow my-auto text-[16px] text-gray-900">
-				Welcome, {{ authStore.agent ? authStore.agent.agent_name : authStore.user }}
+				Welcome, {{ authStore.userName }}
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">

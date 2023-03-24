@@ -324,7 +324,7 @@
 												:button="{
 													class: 'rounded-r-none',
 													disabled:
-														(!authStore.agent && !authStore.isAdmin) || sendingDissabled,
+														(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled,
 													appearance: 'primary',
 													label: 'Menu',
 													icon: 'chevron-up',
@@ -365,7 +365,7 @@
 												"
 												appearance="primary"
 												:disabled="
-													(!authStore.agent && !authStore.isAdmin) || sendingDissabled
+													(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled
 												"
 												@click="submit()"
 											>
@@ -462,7 +462,7 @@
 								</Button>
 								<Button
 									appearance="secondary"
-									:disabled="!authStore.agent && !authStore.isAdmin"
+									:disabled="!authStore.isAgent && !authStore.isAdmin"
 									@click="startEditing('comment')"
 								>
 									Add Comment

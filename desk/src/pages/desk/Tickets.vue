@@ -202,6 +202,7 @@ import { createListManager } from "@/composables/listManager";
 import { useListFilters } from "@/composables/listFilters";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "Tickets",
@@ -213,12 +214,13 @@ export default {
 		PresetFilters,
 		TicketSummary,
 	},
-	inject: ["agents", "user"],
+	inject: ["agents"],
 	setup() {
 		const selected = ref(new Set());
 		const listFilters = useListFilters();
 		const ticketStatusStore = useTicketStatusStore();
 		const ticketPriorityStore = useTicketPriorityStore();
+		const authStore = useAuthStore();
 
 		const ticketList = createListManager({
 			doctype: "Ticket",
@@ -226,11 +228,12 @@ export default {
 		});
 
 		return {
-			selected,
+			authStore,
 			listFilters,
-			ticketStatusStore,
-			ticketPriorityStore,
+			selected,
 			ticketList,
+			ticketPriorityStore,
+			ticketStatusStore,
 		};
 	},
 	data() {
@@ -294,7 +297,7 @@ export default {
 					});
 				});
 				let options = [];
-				if (this.user.agent) {
+				if (this.authStore.isAgent) {
 					options.push({
 						group: "Myself",
 						hideLabel: true,
@@ -304,7 +307,7 @@ export default {
 								handler: () => {
 									this.$resources.bulkAssignTicketToAgent.submit({
 										ticket_ids: Array.from(this.selected),
-										agent_id: this.user.agent.name,
+										agent_id: this.authStore.userId,
 									});
 								},
 							},
