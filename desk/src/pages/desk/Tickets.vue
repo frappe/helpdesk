@@ -62,7 +62,7 @@
 		</div>
 		<div class="overflow-x-scroll px-6 py-2 font-sans text-base">
 			<div
-				v-for="t in __l.list.data"
+				v-for="t in ticketList.list.data"
 				:key="t.name"
 				class="hover:shadow-around flex w-full items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none"
 			>
@@ -110,27 +110,27 @@
 		<div class="grow"></div>
 		<div class="flex justify-between border-t p-4 font-sans text-base">
 			<div class="text-gray-700">
-				Showing {{ __l.startFrom }} to {{ __l.endAt }} of {{ __l.totalCount }}
+				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of {{ ticketList.totalCount }}
 			</div>
 			<div class="flex items-center gap-2">
 				Page
 				<div
 					class="flex h-5 w-5 flex-wrap content-center justify-center rounded-md bg-gray-200"
 				>
-					{{ __l.currentPage }}
+					{{ ticketList.currentPage }}
 				</div>
-				of {{ __l.totalPages }}
+				of {{ ticketList.totalPages }}
 				<Button
-					v-show="__l.hasPreviousPage"
+					v-show="ticketList.hasPreviousPage"
 					icon="chevron-left"
 					class="h-5 w-5 rounded-full bg-gray-200"
-					@click="__l.previous"
+					@click="ticketList.previous"
 				/>
 				<Button
-					v-show="__l.hasNextPage"
+					v-show="ticketList.hasNextPage"
 					icon="chevron-right"
 					class="h-5 w-5 rounded-full bg-gray-200"
-					@click="__l.next"
+					@click="ticketList.next"
 				/>
 			</div>
 		</div>
@@ -220,7 +220,7 @@ export default {
 		const ticketStatusStore = useTicketStatusStore();
 		const ticketPriorityStore = useTicketPriorityStore();
 
-		const __l = createListManager({
+		const ticketList = createListManager({
 			doctype: "Ticket",
 			pageLength: 20,
 		});
@@ -230,7 +230,7 @@ export default {
 			listFilters,
 			ticketStatusStore,
 			ticketPriorityStore,
-			__l,
+			ticketList,
 		};
 	},
 	data() {
@@ -264,8 +264,8 @@ export default {
 	},
 	computed: {
 		allSelected() {
-			if (this.$_.isEmpty(this.__l.list.data)) return;
-			return this.__l.list.data.length === this.selected.size;
+			if (this.$_.isEmpty(this.ticketList.list.data)) return;
+			return this.ticketList.list.data.length === this.selected.size;
 		},
 		filterByPriorityOptions() {
 			return this.ticketPriorityStore.getNames().map((priority) => ({
@@ -328,7 +328,7 @@ export default {
 			else this.selected.delete(ticketId);
 		},
 		selectAll() {
-			this.__l.list.data.forEach((t) => this.selected.add(t.name));
+			this.ticketList.list.data.forEach((t) => this.selected.add(t.name));
 		},
 		deselectAll() {
 			this.selected.clear();
@@ -338,7 +338,7 @@ export default {
 			else this.deselectAll();
 		},
 		setTicketStatus(ticketId, status) {
-			this.__l.setValue.submit({
+			this.ticketList.setValue.submit({
 				name: ticketId,
 				status,
 			});
