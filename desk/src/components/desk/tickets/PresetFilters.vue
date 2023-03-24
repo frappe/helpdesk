@@ -2,7 +2,7 @@
 	<Dropdown placement="left" :options="options">
 		<template #default="{ toggleDropdown }">
 			<div
-				class="flex select-none items-center gap-2 border px-2 py-1 rounded-lg border-gray-300"
+				class="flex select-none items-center gap-2 rounded-lg border border-gray-300 px-2 py-1"
 				:class="{ 'cursor-pointer': !$_.isEmpty(options) }"
 				@click="toggleDropdown"
 			>
@@ -20,9 +20,9 @@
 </template>
 
 <script>
-import { inject, ref } from "vue";
+import { ref } from "vue";
 import { Dropdown, FeatherIcon } from "frappe-ui";
-import { useListFilters } from "@/composables/listFilters"
+import { useListFilters } from "@/composables/listFilters";
 
 export default {
 	name: "PresetFilters",
@@ -30,49 +30,25 @@ export default {
 		Dropdown,
 		FeatherIcon,
 	},
-	props: {
-		doctype: {
-			type: String,
-			required: true,
-		},
-		listTitle: {
-			type: String,
-			required: true,
-			default: "Default List Title",
-		},
-	},
 	setup() {
-		const manager = inject("manager");
-		// const renderOptions = inject("renderOptions");
-		const user = inject("user");
-
-		// const title = ref(`All ${manager.value.options.doctype}s`);
-
-		// const route = useRoute();
-
 		const listFilters = useListFilters();
 		const presetFilters = ref([]);
-
 		const presetTitle = ref("");
 
 		return {
-			manager,
-			// renderOptions,
-			// route,
-			user,
-			// title,
 			listFilters,
 			presetFilters,
 			presetTitle,
 		};
 	},
 	computed: {
-		title() {
-			// return `${this.listTitle} (${this.itemCount})`;
-			return this.presetTitle || "All tickets";
+		currentQuery() {
+			return this.$route.query.q;
 		},
-		filters() {
-			return this.manager.sudoFilters;
+		title() {
+			if (this.presetTitle) return this.presetTitle;
+			if (this.currentQuery) return "Filtered Tickets";
+			return "All Tickets";
 		},
 		presets() {
 			return this.$resources.presetFilterOptions.data || [];
@@ -89,10 +65,10 @@ export default {
 							items: data[group].map((item) => {
 								const q = this.listFilters.toQuery(item.filters);
 
-								if (q === this.$route.query.q) {
+								if (q === this.currentQuery) {
 									this.presetTitle = item.title;
 								}
-							
+
 								return {
 									label: item.title,
 									handler: () => {
@@ -109,19 +85,20 @@ export default {
 		},
 	},
 	mounted() {
-		// NOTE: probably need to change event
-		// this.$socket.on("list_update", (data) => {
-		// 	if (data.doctype === "FD Preset Filter") {
-		// 		this.$resources.presetFilterOptions.fetch();
-		// 	}
-		// });
+		this.$socket.on("frappedesk-preset-filter-insert", (data) => {
+			if (data.reference_doctype !== "Ticket") return;
+			this.$resources.presetFilterOptions.reload();
+		});
+	},
+	unmounted() {
+		this.$socket.off("frappedesk-preset-filter-insert");
 	},
 	resources: {
 		presetFilterOptions() {
 			return {
 				url: "frappedesk.api.general.get_preset_filters",
 				params: {
-					doctype: this.doctype,
+					doctype: "Ticket",
 				},
 				cache: ["Preset Filter", this.doctype],
 				auto: true,

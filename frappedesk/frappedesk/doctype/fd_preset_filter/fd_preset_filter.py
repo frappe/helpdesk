@@ -3,7 +3,6 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.query_builder import AliasedQuery, DocType, Query
 
 
 class FDPresetFilter(Document):
@@ -14,3 +13,6 @@ class FDPresetFilter(Document):
 	def on_trash(self):
 		if self.type == "System":
 			frappe.throw("System filters cannot be deleted")
+
+	def after_insert(self):
+		frappe.publish_realtime("frappedesk-preset-filter-insert", self)
