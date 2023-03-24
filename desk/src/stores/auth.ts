@@ -24,6 +24,7 @@ export const useAuthStore = defineStore("auth", () => {
 		() => user__.value.has_desk_access
 	);
 	const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
+	const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
 	const isLoggedIn: ComputedRef<boolean> = computed(() => {
 		const cookie = Object.fromEntries(
 			document.cookie
@@ -89,6 +90,7 @@ export const useAuthStore = defineStore("auth", () => {
 		hasDeskAccess,
 		init,
 		isAdmin,
+		isAgent,
 		isLoggedIn,
 		login,
 		logout,
