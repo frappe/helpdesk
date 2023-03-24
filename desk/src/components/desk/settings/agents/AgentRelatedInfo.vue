@@ -107,7 +107,6 @@ export default {
 		TicketPriority,
 		Subject,
 	},
-	inject: ["user"],
 	setup() {
 		const relatedInfoToShow = ref("tickets")
 

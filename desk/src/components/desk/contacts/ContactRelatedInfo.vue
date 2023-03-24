@@ -152,14 +152,15 @@
 </template>
 
 <script>
+import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
 import ListManager from "@/components/global/ListManager.vue"
 import ListViewer from "@/components/global/ListViewer.vue"
 import AgentAvatar from "@/components/global/AgentAvatar.vue"
-import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
 import TicketType from "@/components/global/ticket_list_item/TicketType.vue"
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
 import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue"
 import Subject from "@/components/global/ticket_list_item/Subject.vue"
+import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "ContactRelatedInfo",
@@ -176,7 +177,14 @@ export default {
 		TicketPriority,
 		Subject,
 	},
-	inject: ["agents", "user"],
+	inject: ["agents"],
+	setup() {
+		const authStore = useAuthStore()
+		
+		return {
+			authStore,
+		}
+	},
 	methods: {
 		agentsAsDropdownOptions() {
 			let agentItems = []
@@ -196,7 +204,7 @@ export default {
 					})
 				})
 				let options = []
-				if (this.user.agent) {
+				if (this.authStore.isAgent) {
 					options.push({
 						group: "Myself",
 						hideLabel: true,
@@ -210,7 +218,7 @@ export default {
 												this.$refs.miniTicketList
 													.manager.selectedItems
 											),
-											agent_id: this.user.agent.name,
+											agent_id: this.authStore.userId,
 										}
 									)
 								},
