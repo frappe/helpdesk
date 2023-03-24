@@ -76,9 +76,9 @@
 							<tr
 								v-for="shortcut in keyboardShortcuts"
 								:key="shortcut.label"
-								class="h-[50px] border-y"
+								class="h-16 border-y"
 							>
-								<td class="w-[170px] border-r px-4">
+								<td class="w-28 border-r px-4">
 									<span
 										class="rounded bg-gray-100 p-1.5 text-gray-500 shadow shadow-gray-400"
 									>
@@ -95,137 +95,114 @@
 	</div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { ref } from "vue";
+import { useRoute } from "vue-router";
 import { Dropdown, FeatherIcon, Avatar } from "frappe-ui";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import { useAuthStore } from "@/stores/auth";
 
-export default {
-	name: "SideBarMenu",
-	components: {
-		Avatar,
-		CustomIcons,
-		Dropdown,
-		FeatherIcon,
-	},
-	setup() {
-		const isMac = ref(navigator.userAgent.indexOf("Mac OS X") != -1);
-		const keyboardShortcuts = ref([
-			{
-				sequence: isMac.value ? "⌃ + ⌥ + R" : "Ctrl + Alt + R",
-				label: "Mark status of ticket as Replied",
-			},
-			{
-				sequence: isMac.value ? "⌃ + ⌥ + E" : "Ctrl + Alt + E",
-				label: "Mark status of ticket as Resolved",
-			},
-			{
-				sequence: isMac.value ? "⌃ + ⌥ + C" : "Ctrl + Alt + C",
-				label: "Mark status of ticket as Closed",
-			},
-		]);
-		const showKeyboardShortcuts = ref(false);
-		const authStore = useAuthStore();
-		const iconHeight = ref(30);
-		const iconWidth = ref(30);
-		const showProfileSettings = ref(false);
+const route = useRoute();
+const authStore = useAuthStore();
+const isMac = navigator.userAgent.indexOf("Mac OS X") != -1;
+const showKeyboardShortcuts = ref(false);
 
-		return {
-			authStore,
-			iconHeight,
-			iconWidth,
-			keyboardShortcuts,
-			showKeyboardShortcuts,
-			showProfileSettings,
-		};
+const keyboardShortcuts = [
+	{
+		sequence: isMac ? "⌃ + ⌥ + R" : "Ctrl + Alt + R",
+		label: "Mark status of ticket as Replied",
 	},
-	data() {
-		return {
-			menuOptions: [
-				{
-					label: "Dashboard",
-					icon: "dashboard",
-					to: {
-						path: "/frappedesk/dashboard",
-					},
-				},
-				{
-					label: "Tickets",
-					icon: "ticket",
-					to: {
-						path: "/frappedesk/tickets",
-					},
-				},
-				{
-					label: "Customers",
-					icon: "customer",
-					to: {
-						path: "/frappedesk/customers",
-					},
-				},
-				{
-					label: "Contacts",
-					icon: "customers",
-					to: {
-						path: "/frappedesk/contacts",
-					},
-				},
-			],
-			footerOptions: [
-				{
-					label: "Knowledge Base",
-					icon: "kb-articles",
-					to: {
-						path: "/frappedesk/kb",
-					},
-				},
-				{
-					label: "Settings",
-					icon: "settings",
-					to: {
-						path: "/frappedesk/settings",
-					},
-				},
-			],
-			profileSettings: [
-				{
-					label: "Shortcuts",
-					icon: "command",
-					handler: () => {
-						this.showKeyboardShortcuts = true;
-					},
-				},
-				{
-					label: "Customer portal",
-					icon: "users",
-					handler: () => {
-						window.open("/support/tickets", "_blank");
-					},
-				},
-				{
-					label: "Log out",
-					icon: "log-out",
-					handler: () => {
-						this.authStore.logout();
-					},
-				},
-			],
-			routeMap: {
-				"Knowledge Base": "frappedesk/kb",
-				Contacts: "frappedesk/contacts",
-				Customers: "frappedesk/customers",
-				Dashboard: "frappedesk/dashboard",
-				Reports: "frappedesk/reports",
-				Settings: "frappedesk/settings",
-				Tickets: "frappedesk/tickets",
-			},
-		};
+	{
+		sequence: isMac ? "⌃ + ⌥ + E" : "Ctrl + Alt + E",
+		label: "Mark status of ticket as Resolved",
 	},
-	methods: {
-		isActive(label) {
-			return this.$route.path.includes(this.routeMap[label]);
+	{
+		sequence: isMac ? "⌃ + ⌥ + C" : "Ctrl + Alt + C",
+		label: "Mark status of ticket as Closed",
+	},
+];
+
+const menuOptions = [
+	{
+		label: "Dashboard",
+		icon: "dashboard",
+		to: {
+			path: "/frappedesk/dashboard",
 		},
 	},
+	{
+		label: "Tickets",
+		icon: "ticket",
+		to: {
+			path: "/frappedesk/tickets",
+		},
+	},
+	{
+		label: "Customers",
+		icon: "customer",
+		to: {
+			path: "/frappedesk/customers",
+		},
+	},
+	{
+		label: "Contacts",
+		icon: "customers",
+		to: {
+			path: "/frappedesk/contacts",
+		},
+	},
+];
+
+const footerOptions = [
+	{
+		label: "Knowledge Base",
+		icon: "kb-articles",
+		to: {
+			path: "/frappedesk/kb",
+		},
+	},
+	{
+		label: "Settings",
+		icon: "settings",
+		to: {
+			path: "/frappedesk/settings",
+		},
+	},
+];
+
+const profileSettings = [
+	{
+		label: "Shortcuts",
+		icon: "command",
+		handler: () => {
+			showKeyboardShortcuts.value = true;
+		},
+	},
+	{
+		label: "Customer portal",
+		icon: "users",
+		handler: () => {
+			window.open("/support/tickets", "_blank");
+		},
+	},
+	{
+		label: "Log out",
+		icon: "log-out",
+		handler: () => authStore.logout(),
+	},
+];
+
+const routeMap = {
+	"Knowledge Base": "frappedesk/kb",
+	Contacts: "frappedesk/contacts",
+	Customers: "frappedesk/customers",
+	Dashboard: "frappedesk/dashboard",
+	Reports: "frappedesk/reports",
+	Settings: "frappedesk/settings",
+	Tickets: "frappedesk/tickets",
 };
+
+function isActive(label: string) {
+	return route.path.includes(routeMap[label]);
+}
 </script>
