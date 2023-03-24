@@ -1,162 +1,73 @@
 <template>
 	<div
-		class="flex flex-col border-r pt-[23px]"
-		:style="{ height: viewportWidth > 768 ? 'calc(100vh)' : null }"
+		class="flex w-56 shrink select-none flex-col border-r text-base text-gray-700"
 	>
-		<div
-			class="mb-[18.4px] cursor-pointer items-baseline pl-[22px] pr-[22px] w-fit flex flex-row space-x-[6px]"
-		>
-			<CustomIcons
-				name="frappedesk"
-				class="h-[15.88px]"
-				@click="
-					() => {
-						$router.push({ path: '/frappedesk/dashboard' })
-					}
-				"
-			/>
-			<div class="text-[10px] font-normal text-gray-700">
-				v{{ fdVersion }}
-			</div>
-		</div>
-		<div class="mx-[8px] mb-auto select-none space-y-[4px] text-gray-800">
-			<div v-for="option in menuOptions" :key="option.label">
-				<div
-					class="pl-1 group cursor-pointer rounded-[6px] stroke-gray-600 hover:bg-gray-200"
-					:class="option.selected ? 'bg-gray-100' : ''"
-					@click="
-						() => {
-							if (option.children) {
-								option.children
-									? (option.expanded = !option.expanded)
-									: {}
-							} else if (option.to) {
-								$router.push(option.to)
-							}
-						}
-					"
-				>
-					<div class="flex items-center py-[5.5px]">
-						<div class="w-[24px]">
-							<CustomIcons
-								:name="option.icon"
-								class="ml-[8px] h-[14px] w-[14px]"
-							/>
-						</div>
-						<span class="ml-[6px] grow text-[13px]">{{
-							option.label
-						}}</span>
-					</div>
-				</div>
-				<div v-if="option.children && option.expanded" class="mt-[4px]">
-					<div class="space-y-[4px]">
-						<div
-							v-for="childOption in option.children"
-							:key="childOption.label"
-						>
-							<router-link
-								class="group flex cursor-pointer items-center rounded-[8px] py-[6.25px] hover:bg-gray-200"
-								:class="
-									childOption.selected ? 'bg-gray-200' : ''
-								"
-								:to="
-									childOption.to
-										? {
-												path: childOption.to.path,
-												query: childOption.to.query
-													? childOption.to.query()
-													: {},
-										  }
-										: {}
-								"
-							>
-								<div
-									class="flex w-full flex-row items-center justify-between pl-[52px]"
-								>
-									<div class="text-base">
-										{{ childOption.label }}
-									</div>
-									<div
-										class="mr-[10px] text-[11px] font-normal text-gray-500"
-									>
-										{{ childOption.extra }}
-									</div>
-								</div>
-							</router-link>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 		<div>
-			<div class="mx-[8px] flex flex-col pb-[17px]">
-				<div
-					v-if="showProfileSettings"
-					class="h-50 z-50 rounded-[6px] bg-white px-[7px] py-[6px] shadow-md"
-				>
-					<div v-for="item in profileSettings" :key="item.label">
-						<div
-							class="flex cursor-pointer flex-row items-center space-x-[10px] rounded-[8px] px-[13px] py-[5px] text-base font-normal hover:bg-gray-100"
-							:class="item.style"
-							@click="item.action()"
-						>
-							<CustomIcons
-								v-if="item.customIcon"
-								class="h-[16px] w-[16px]"
-								:name="item.customIcon"
-							/>
-							<FeatherIcon
-								v-else
-								class="h-[16px] w-[16px]"
-								:name="item.icon"
-							/>
-							<span>{{ item.label }}</span>
+			<Dropdown :options="profileSettings">
+				<template #default="{ open }">
+					<Button class="my-3 w-full bg-white px-2 hover:bg-white">
+						<div class="flex items-center gap-2">
+							<div>
+								<Avatar
+									size="sm"
+									:label="authStore.userName"
+									:image-u-r-l="authStore.userImage"
+								/>
+							</div>
+							<div>
+								{{ authStore.userName }}
+							</div>
+							<div>
+								<FeatherIcon
+									:name="open ? 'chevron-up' : 'chevron-down'"
+									class="h-5 w-5 text-gray-500"
+								/>
+							</div>
 						</div>
-					</div>
+					</Button>
+				</template>
+			</Dropdown>
+		</div>
+		<div class="flex flex-col gap-1 px-2">
+			<div
+				v-for="option in menuOptions"
+				:key="option.label"
+				class="flex cursor-pointer items-center gap-2 rounded-lg p-2"
+				:class="{
+					'bg-gray-200': isActive(option.label),
+					'text-gray-900': isActive(option.label),
+					'hover:bg-gray-100': !isActive(option.label),
+				}"
+				@click="$router.push(option.to)"
+			>
+				<CustomIcons :name="option.icon" class="h-4 w-4" />
+				<div>
+					{{ option.label }}
 				</div>
-				<div
-					@click="
-						() => {
-							showProfileSettings = !showProfileSettings
-						}
-					"
-					v-on-outside-click="
-						() => {
-							showProfileSettings = false
-						}
-					"
-					class="flex cursor-pointer flex-row items-center space-x-[7px] rounded-[6px] px-[14px] py-[12px] hover:bg-gray-100"
-					:class="showProfileSettings ? 'bg-gray-100' : ''"
-				>
-					<div>
-						<CustomAvatar
-							:label="authStore.username"
-							class="cursor-pointer"
-							size="lg"
-							v-if="authStore"
-							:imageURL="authStore.userImage"
-						/>
-					</div>
-					<div class="flex max-w-[150px] flex-col text-gray-700">
-						<a
-							:title="authStore.userName"
-							class="truncate text-base font-medium"
-							>
-							{{ authStore.userName }}
-						</a
-						>
-						<a
-							:title="authStore.userId"
-							class="truncate text-[11px] font-normal"
-							>{{ authStore.userId}}</a
-						>
-					</div>
+			</div>
+		</div>
+		<div class="grow"></div>
+		<div class="mb-3 flex flex-col gap-1 px-2">
+			<div
+				v-for="option in footerOptions"
+				:key="option.label"
+				class="flex cursor-pointer items-center gap-2 rounded-lg p-2"
+				:class="{
+					'bg-gray-200': isActive(option.label),
+					'text-gray-900': isActive(option.label),
+					'hover:bg-gray-100': !isActive(option.label),
+				}"
+				@click="$router.push(option.to)"
+			>
+				<CustomIcons :name="option.icon" class="h-4 w-4" />
+				<div>
+					{{ option.label }}
 				</div>
 			</div>
 		</div>
 		<Dialog
-			:options="{ title: 'Keyboard Shortcuts' }"
 			v-model="showKeyboardShortcuts"
+			:options="{ title: 'Keyboard Shortcuts' }"
 		>
 			<template #body-content>
 				<div class="py-5 text-base">
@@ -185,192 +96,136 @@
 </template>
 
 <script>
-import { inject, ref } from "vue"
-import { Dropdown, FeatherIcon } from "frappe-ui"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
-import { useAuthStore } from "@/stores/auth"
+import { ref } from "vue";
+import { Dropdown, FeatherIcon, Avatar } from "frappe-ui";
+import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "SideBarMenu",
 	components: {
+		Avatar,
 		CustomIcons,
 		Dropdown,
-		CustomAvatar,
 		FeatherIcon,
 	},
 	setup() {
-		const isMac = ref(navigator.userAgent.indexOf("Mac OS X") != -1)
+		const isMac = ref(navigator.userAgent.indexOf("Mac OS X") != -1);
 		const keyboardShortcuts = ref([
 			{
-				sequence: isMac ? "⌃ + ⌥ + R" : "Ctrl + Alt + R",
+				sequence: isMac.value ? "⌃ + ⌥ + R" : "Ctrl + Alt + R",
 				label: "Mark status of ticket as Replied",
 			},
 			{
-				sequence: isMac ? "⌃ + ⌥ + E" : "Ctrl + Alt + E",
+				sequence: isMac.value ? "⌃ + ⌥ + E" : "Ctrl + Alt + E",
 				label: "Mark status of ticket as Resolved",
 			},
 			{
-				sequence: isMac ? "⌃ + ⌥ + C" : "Ctrl + Alt + C",
+				sequence: isMac.value ? "⌃ + ⌥ + C" : "Ctrl + Alt + C",
 				label: "Mark status of ticket as Closed",
 			},
-		])
-
-		const showKeyboardShortcuts = ref(false)
-		const viewportWidth = inject("viewportWidth")
-
-		const authStore = useAuthStore()
-
-		const iconHeight = ref(30)
-		const iconWidth = ref(30)
-
-		const menuOptions = ref()
-		const profileSettings = ref()
-		const showProfileSettings = ref(false)
+		]);
+		const showKeyboardShortcuts = ref(false);
+		const authStore = useAuthStore();
+		const iconHeight = ref(30);
+		const iconWidth = ref(30);
+		const showProfileSettings = ref(false);
 
 		return {
-			showKeyboardShortcuts,
-			keyboardShortcuts,
-			viewportWidth,
 			authStore,
 			iconHeight,
 			iconWidth,
-			menuOptions,
-			profileSettings,
+			keyboardShortcuts,
+			showKeyboardShortcuts,
 			showProfileSettings,
-		}
+		};
 	},
-	mounted() {
-		this.menuOptions = [
-			{
-				label: "Dashboard",
-				icon: "dashboard",
-				to: {
-					path: "/frappedesk/dashboard",
+	data() {
+		return {
+			menuOptions: [
+				{
+					label: "Dashboard",
+					icon: "dashboard",
+					to: {
+						path: "/frappedesk/dashboard",
+					},
 				},
-			},
-			{
-				label: "Tickets",
-				icon: "ticket",
-				to: {
-					path: "/frappedesk/tickets",
+				{
+					label: "Tickets",
+					icon: "ticket",
+					to: {
+						path: "/frappedesk/tickets",
+					},
 				},
-			},
-			{
-				label: "Knowledge Base",
-				icon: "kb-articles",
-				to: {
-					path: "/frappedesk/kb",
+				{
+					label: "Customers",
+					icon: "customer",
+					to: {
+						path: "/frappedesk/customers",
+					},
 				},
-			},
-			{
-				label: "Customers",
-				icon: "customer",
-				to: {
-					path: "/frappedesk/customers",
+				{
+					label: "Contacts",
+					icon: "customers",
+					to: {
+						path: "/frappedesk/contacts",
+					},
 				},
-			},
-			{
-				label: "Contacts",
-				icon: "customers",
-				to: {
-					path: "/frappedesk/contacts",
+			],
+			footerOptions: [
+				{
+					label: "Knowledge Base",
+					icon: "kb-articles",
+					to: {
+						path: "/frappedesk/kb",
+					},
 				},
-			},
-			{
-				label: "Settings",
-				icon: "settings",
-				to: {
-					path: "/frappedesk/settings",
+				{
+					label: "Settings",
+					icon: "settings",
+					to: {
+						path: "/frappedesk/settings",
+					},
 				},
-			},
-		]
-
-		this.profileSettings = [
-			{
-				label: "Shortcuts",
-				icon: "command",
-				style: "text-gray-800",
-				action: () => {
-					this.showKeyboardShortcuts = true
+			],
+			profileSettings: [
+				{
+					label: "Shortcuts",
+					icon: "command",
+					handler: () => {
+						this.showKeyboardShortcuts = true;
+					},
 				},
-			},
-			{
-				label: "Customer portal",
-				customIcon: "external-link",
-				style: "text-gray-800",
-				action: () => {
-					window.open("/support/tickets", "_blank")
+				{
+					label: "Customer portal",
+					icon: "users",
+					handler: () => {
+						window.open("/support/tickets", "_blank");
+					},
 				},
-			},
-			{
-				label: "Log out",
-				customIcon: "log-out",
-				style: "text-red-600",
-				action: () => {
-					this.authStore.logout()
+				{
+					label: "Log out",
+					icon: "log-out",
+					handler: () => {
+						this.authStore.logout();
+					},
 				},
+			],
+			routeMap: {
+				"Knowledge Base": "frappedesk/kb",
+				Contacts: "frappedesk/contacts",
+				Customers: "frappedesk/customers",
+				Dashboard: "frappedesk/dashboard",
+				Reports: "frappedesk/reports",
+				Settings: "frappedesk/settings",
+				Tickets: "frappedesk/tickets",
 			},
-		]
-
-		this.syncSelectedMenuItemBasedOnRoute()
-	},
-	watch: {
-		$route() {
-			this.syncSelectedMenuItemBasedOnRoute()
-		},
-	},
-	computed: {
-		fdVersion() {
-			if (this.$resources.fdeskVersion.loading) return ""
-			return this.$resources.fdeskVersion.data.frappedesk.version
-		},
+		};
 	},
 	methods: {
-		syncSelectedMenuItemBasedOnRoute() {
-			const routeMenuItemMap = {
-				"frappedesk/dashboard": "Dashboard",
-				"frappedesk/tickets": "Tickets",
-				"frappedesk/kb": "Knowledge Base",
-				"frappedesk/reports": "Reports",
-				"frappedesk/customers": "Customers",
-				"frappedesk/contacts": "Contacts",
-				"frappedesk/settings": "Settings",
-			}
-			Object.keys(routeMenuItemMap).forEach((route) => {
-				if (this.$route.path.includes(route)) {
-					let selectedMenuItem = routeMenuItemMap[route]
-					this.select(selectedMenuItem)
-					return
-				}
-			})
-		},
-		select(label) {
-			this.menuOptions.forEach((option) => {
-				if (option.children) {
-					option.children.forEach((childOption) => {
-						childOption.selected = childOption.label == label
-					})
-				}
-				if (option.label == label) {
-					if (!option.children) {
-						option.selected = true
-					} else {
-						option.selected = false
-					}
-				} else {
-					option.selected = false
-				}
-			})
+		isActive(label) {
+			return this.$route.path.includes(this.routeMap[label]);
 		},
 	},
-	resources: {
-		fdeskVersion() {
-			return {
-				url: "frappe.utils.change_log.get_versions",
-				auto: true,
-			}
-		},
-	},
-}
+};
 </script>
