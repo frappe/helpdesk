@@ -4,10 +4,11 @@ import frappe
 def get_session_agent():
 	session_user = frappe.session.user
 	session_agent = None
+
 	if session_user and frappe.db.exists("Agent", session_user):
 		session_agent = frappe.get_doc("Agent", session_user)
-		session_agent = session_agent.__dict__
-		session_agent["image"] = frappe.get_value("User", session_user, "user_image")
+		session_agent.image = frappe.get_value("User", session_user, "user_image")
+
 	return session_agent
 
 
@@ -17,6 +18,7 @@ def get_user():
 	session_agent = get_session_agent()
 	username = frappe.get_value("User", frappe.session.user, "username")
 	is_admin = username == "administrator"
+
 	return {
 		"agent": session_agent,
 		"profile_image": frappe.get_value("User", session_user, "user_image"),

@@ -1,5 +1,6 @@
-import { useRouter, useRoute } from "vue-router";
 import { startCase, isEmpty } from "lodash";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 type FrappeFilters = Record<string, Array<string>>;
 
@@ -13,6 +14,7 @@ export type FilterItem = {
 export function useListFilters() {
 	const route = useRoute();
 	const router = useRouter();
+	const authStore = useAuthStore();
 
 	function fromQuery() {
 		const { q } = route.query;
@@ -98,9 +100,8 @@ export function useListFilters() {
 		}
 	}
 
-	// TODO:
 	function getMe() {
-		return "hello@ssiyad.com";
+		return authStore.userId;
 	}
 
 	function transformLabel(f: FilterItem) {
