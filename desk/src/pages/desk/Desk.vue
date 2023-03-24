@@ -5,7 +5,7 @@
 	>
 		<div v-if="initialized">
 			<div class="flex h-screen w-screen flex-row">
-				<SideBarMenu class="w-[200px] shrink-0 bg-gray-50" />
+				<SideBarMenu/>
 				<router-view :key="$route.fullPath" class="grow" />
 			</div>
 		</div>
