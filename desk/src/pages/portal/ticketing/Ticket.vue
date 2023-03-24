@@ -135,14 +135,14 @@
 							<div class="flex">
 								<Avatar
 									v-if="editing"
-									:label="user"
-									:imageURL="user.profile_image"
+									:label="authStore.user"
+									:imageURL="authStore.profileImage"
 									size="md"
 								/>
 								<div class="w-full ml-2 pt-1">
 									<div class="flex flex-col space-y-2">
 										<div v-if="editing" class="text-lg">
-											{{ user.doc.full_name }}
+											{{ authStore.doc.full_name }}
 										</div>
 										<div
 											class="grow"
@@ -361,8 +361,7 @@
 </template>
 
 <script>
-import { inject, ref, computed } from "vue"
-import Conversations from "@/components/portal/ticket/Conversations.vue"
+import { inject, ref } from "vue"
 import {
 	FeatherIcon,
 	FileUploader,
@@ -370,10 +369,12 @@ import {
 	Avatar,
 	Button,
 } from "frappe-ui"
+import Conversations from "@/components/portal/ticket/Conversations.vue"
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import TicketField from "@/components/global/TicketField.vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "Tickets",
@@ -398,7 +399,7 @@ export default {
 		}
 	},
 	setup() {
-		const user = inject("user")
+		const authStore = useAuthStore()
 		const editor = ref(null)
 		const viewportWidth = inject("viewportWidth")
 		const attachments = ref([])
@@ -407,7 +408,7 @@ export default {
 		const editingSubject = ref(false)
 
 		return {
-			user,
+			authStore,
 			editor,
 			viewportWidth,
 			attachments,

@@ -23,6 +23,7 @@
 import { inject, ref } from "vue";
 import { Dropdown, FeatherIcon } from "frappe-ui";
 import { useListFilters } from "@/composables/listFilters"
+import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "PresetFilters",
@@ -44,27 +45,17 @@ export default {
 		itemCount: {
 			type: Number,
 			required: true,
-			default: 444,
 		},
 	},
 	setup() {
 		const manager = inject("manager");
-		// const renderOptions = inject("renderOptions");
-		const user = inject("user");
-
-		// const title = ref(`All ${manager.value.options.doctype}s`);
-
-		// const route = useRoute();
-
+		const authStore = useAuthStore();
 		const listFilters = useListFilters();
 		const presetFilters = ref([]);
 
 		return {
 			manager,
-			// renderOptions,
-			// route,
-			user,
-			// title,
+			authStore,
 			listFilters,
 			presetFilters,
 		};
@@ -89,17 +80,14 @@ export default {
 								return {
 									label: item.title,
 									handler: () => {
-										const q = this.listFilters.toQuery(item.filters);
-										this.$router.push({ query: { q } });
-										// debugger;
-										// this.title = item.title;
-										// this.presetFilters = [...item.filters];
-										// this.manager.addFilters(
-										// 	[...item.filters],
-										// 	this.manager.options.urlQueryFilters
-										// );
+										this.title = item.title;
+										this.presetFilters = [...item.filters];
+										this.manager.addFilters(
+											[...item.filters],
+											this.manager.options.urlQueryFilters
+										);
 									},
-									// filters: [...item.filters],
+									filters: [...item.filters],
 								};
 							}),
 						});
@@ -112,18 +100,17 @@ export default {
 			return options;
 		},
 	},
-	// watch: {
-		// filters() {
-		// 	this.sync();
-		// },
-	// },
+	watch: {
+		filters() {
+			this.sync();
+		},
+	},
 	mounted() {
-		// NOTE: probably need to change event
-		// this.$socket.on("list_update", (data) => {
-		// 	if (data.doctype === "FD Preset Filter") {
-		// 		this.$resources.presetFilterOptions.fetch();
-		// 	}
-		// });
+		this.$socket.on("list_update", (data) => {
+			if (data.doctype === "FD Preset Filter") {
+				this.$resources.presetFilterOptions.fetch();
+			}
+		});
 	},
 	methods: {
 		sync() {
@@ -142,7 +129,7 @@ export default {
 					if (
 						a[i].fieldname === "_assign" &&
 						a[i].value === "@me" &&
-						b[i].value === this.user.user
+						b[i].value === this.authStore.userId
 					) {
 						continue;
 					}

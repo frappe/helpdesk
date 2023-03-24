@@ -9,6 +9,7 @@ type User = {
 	loading: boolean;
 	username: string;
 	user: string;
+	agent: Record<string, any>;
 };
 
 const PATH_LOGIN = "/frappedesk/login";
@@ -22,6 +23,7 @@ export const useAuthStore = defineStore("auth", () => {
 		loading: true,
 		username: "",
 		user: "",
+		agent: null,
 	});
 
 	const userInfo = createResource({
@@ -35,6 +37,9 @@ export const useAuthStore = defineStore("auth", () => {
 		},
 	});
 
+	const agent = computed(() => user.agent);
+	const hasDeskAccess = computed(() => user.hasDeskAccess);
+	const isAdmin = computed(() => user.isAdmin);
 	const userId = computed(() => user.user);
 
 	const resLogin = createResource({
@@ -70,6 +75,17 @@ export const useAuthStore = defineStore("auth", () => {
 		call("logout").then(() => router.push({ path: PATH_LOGIN }));
 	}
 
+	function isLoggedIn() {
+		const cookie = Object.fromEntries(
+			document.cookie
+				.split("; ")
+				.map((part) => part.split("="))
+				.map((d) => [d[0], decodeURIComponent(d[1])])
+		);
+
+		return cookie.user_id && cookie.user_id !== "Guest";
+	}
+
 	function reloadUser() {
 		userInfo.reload();
 	}
@@ -82,7 +98,11 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	return {
+		agent,
+		hasDeskAccess,
 		init,
+		isAdmin,
+		isLoggedIn,
 		login,
 		logout,
 		reloadUser,

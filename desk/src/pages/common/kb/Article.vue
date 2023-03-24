@@ -147,6 +147,7 @@ import ArticleDetails from "@/components/desk/kb/ArticleDetails.vue";
 import ArticleTitleAndContent from "@/components/desk/kb/ArticleTitleAndContent.vue";
 import BaseBreadcrumbs from "@/components/global/BaseBreadcrumbs.vue";
 import ArticleFeedback from "@/components/portal/kb/ArticleFeedback.vue";
+import { useAuthStore } from '@/stores/auth';
 
 export default {
 	name: "Article",
@@ -168,7 +169,7 @@ export default {
 		},
 	},
 	setup() {
-		const user = inject("user");
+		const authStore = useAuthStore();
 		const route = useRoute();
 		const editable = ref(route.meta.editable);
 		const isNew = ref(route.meta.isNew || false);
@@ -179,7 +180,7 @@ export default {
 		const articleTempValues = ref({});
 		if (isNew.value) {
 			articleTempValues.value = {
-				author: user.value.user,
+				author: authStore.userId,
 				category: route.meta.category || null,
 			};
 		}

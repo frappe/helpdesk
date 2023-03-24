@@ -28,7 +28,7 @@ export default {
 
 		authStore.init();
 
-		provide("user", user);
+		// provide("user", user);
 		provide("viewportWidth", viewportWidth);
 
 		return { user };
@@ -44,6 +44,7 @@ export default {
 				position: "bottom-right",
 			});
 		});
+
 		window.addEventListener("offline", () => {
 			this.$toast({
 				title: "You're offline now",
