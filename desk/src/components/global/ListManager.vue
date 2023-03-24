@@ -364,23 +364,23 @@ export default {
 		});
 		provide("manager", manager);
 
-		// onMounted(() => {
-		// 	nextTick(() => {
-		// 		if (
-		// 			options.value.urlQueryFilters &&
-		// 			Object.keys(route.query).length > 0
-		// 		) {
-		// 			sudoFilters.value = convertUrlQueryToFilters();
-		// 			addFilters(sudoFilters.value, false);
-		// 		} else if (options.value.saveFiltersLocally) {
-		// 			sudoFilters.value = JSON.parse(
-		// 				localStorage.getItem(`list_filters_${route.path}`) || "[]"
-		// 			);
-		// 			addFilters(sudoFilters.value, options.value.urlQueryFilters);
-		// 		}
-		// 		reload();
-		// 	});
-		// });
+		onMounted(() => {
+			nextTick(() => {
+				if (
+					options.value.urlQueryFilters &&
+					Object.keys(route.query).length > 0
+				) {
+					sudoFilters.value = convertUrlQueryToFilters();
+					addFilters(sudoFilters.value, false);
+				} else if (options.value.saveFiltersLocally) {
+					sudoFilters.value = JSON.parse(
+						localStorage.getItem(`list_filters_${route.path}`) || "[]"
+					);
+					addFilters(sudoFilters.value, options.value.urlQueryFilters);
+				}
+				reload();
+			});
+		});
 
 		return {
 			manager,
