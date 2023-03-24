@@ -74,7 +74,7 @@
 						:onchange="(e) => toggleOne(t.name, e.target.checked)"
 					/>
 				</div>
-				<div class="basis-1/3">
+				<div class="basis-1/3 w-1/12 pr-8">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
 				<div class="flex basis-2/3 items-center">
