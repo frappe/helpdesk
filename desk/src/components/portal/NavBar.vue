@@ -44,12 +44,12 @@
 					>
 						<template v-slot="{ toggleDropdown }">
 							<CustomAvatar
-								v-if="user"
+								v-if="authStore.userId"
 								@click="toggleDropdown"
-								:label="user.username"
+								:label="authStore.username"
 								class="cursor-pointer"
 								size="xl"
-								:imageURL="user.profile_image"
+								:imageURL="authStore.userImage"
 							/>
 						</template>
 					</Dropdown>
@@ -58,11 +58,13 @@
 		</div>
 	</div>
 </template>
+
 <script>
+import { inject } from "vue"
 import { Dropdown, FeatherIcon } from "frappe-ui"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomAvatar from "../global/CustomAvatar.vue"
-import { inject } from "vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "NavBar",
@@ -73,10 +75,10 @@ export default {
 		FeatherIcon,
 	},
 	setup() {
-		const user = inject("user")
+		const authStore = useAuthStore()
 		const ticketTemplates = inject("ticketTemplates")
 
-		return { user, ticketTemplates }
+		return { authStore, ticketTemplates }
 	},
 	resources: {
 		navbarItems() {
@@ -151,7 +153,7 @@ export default {
 				{
 					label: "Logout",
 					handler: () => {
-						this.user?.logout()
+						this.authStore.logout()
 						window.location.href = "/support/login"
 					},
 				},

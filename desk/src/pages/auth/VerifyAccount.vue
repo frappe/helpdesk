@@ -35,6 +35,7 @@
 import LoginBox from "../../components/global/LoginBox.vue"
 import { Input } from "frappe-ui"
 import { ref, inject } from "vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "VerifyAccount",
@@ -44,18 +45,18 @@ export default {
 		Input,
 	},
 	setup() {
-		const user = inject("user")
+		const authStore = useAuthStore();
 		const email = ref("")
 		const password = ref("")
 
-		return { user, email, password }
+		return { authStore, email, password }
 	},
 	resources: {
 		verifyAccount() {
 			return {
 				url: "frappedesk.api.account.verify_and_create_account",
 				onSuccess: async () => {
-					await this.user.login(this.email, this.password)
+					await this.authStore.login(this.email, this.password)
 					this.$router.push("/support/tickets")
 				},
 				onError: () => {},

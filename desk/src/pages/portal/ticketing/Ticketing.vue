@@ -1,5 +1,5 @@
 <template>
-	<div v-if="user.isLoggedIn()">
+	<div v-if="authStore.isLoggedIn">
 		<router-view v-slot="{ Component }" :key="$route.fullPath">
 			<component :is="Component" />
 		</router-view>
@@ -7,12 +7,13 @@
 </template>
 
 <script>
-import { inject, provide, ref } from "vue"
+import { provide, ref } from "vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "Ticketing",
 	setup() {
-		const user = inject("user")
+		const authStore = useAuthStore()
 		const tickets = ref()
 		const ticketTemplates = ref([])
 		const ticketController = ref({})
@@ -25,7 +26,7 @@ export default {
 		provide("ticketController", ticketController)
 
 		return {
-			user,
+			authStore,
 			tickets,
 			ticketTemplates,
 			ticketController,
@@ -33,13 +34,13 @@ export default {
 		}
 	},
 	mounted() {
-		if (!this.user.isLoggedIn()) {
+		if (!this.authStore.isLoggedIn) {
 			this.$router.push({
 				name: "PortalLogin",
 				query: { route: this.$route.path },
 			})
 		}
-		if (this.user.isAdmin || this.user.agent) {
+		if (this.authStore.isAdmin || this.authStore.isAgent) {
 			this.impersonateContact = (contact) => {
 				return this.$resources.tickets.fetch({
 					impersonate: contact,
@@ -92,7 +93,7 @@ export default {
 			return {
 				url: "frappedesk.frappedesk.doctype.ticket.ticket.get_user_tickets",
 				auto:
-					this.user.isLoggedIn() && this.$route.name != "Impersonate",
+					this.authStore.isLoggedIn && this.$route.name != "Impersonate",
 				onSuccess: (data) => {
 					this.tickets = {}
 					for (var i = 0; i < data.length; i++) {
@@ -112,7 +113,7 @@ export default {
 		templates() {
 			return {
 				url: "frappedesk.api.ticket.get_all_ticket_templates",
-				auto: this.user.isLoggedIn(),
+				auto: this.authStore.isLoggedIn,
 				onSuccess: (data) => {
 					this.ticketTemplates = data
 				},

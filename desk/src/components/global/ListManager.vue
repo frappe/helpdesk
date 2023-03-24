@@ -10,12 +10,12 @@ import {
 	computed,
 	watch,
 	provide,
-	inject,
 	nextTick,
 	onMounted,
 } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { createListResource, createResource } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "ListManager",
@@ -23,8 +23,7 @@ export default {
 	setup(props, context) {
 		const router = useRouter();
 		const route = useRoute();
-
-		const user = inject("user");
+		const authStore = useAuthStore();
 
 		const options = ref({
 			handleRowClick: () => {},
@@ -164,7 +163,7 @@ export default {
 				mapOperator(filterType),
 				mapValue(
 					filter.fieldname == "_assign" && filter.value == "@me"
-						? user.value.user
+						? authStore.userId
 						: filter.value,
 					filterType
 				),
@@ -179,7 +178,7 @@ export default {
 					let filter_type = filter.filter_type;
 					let value =
 						filter.fieldname == "_assign" && filter.value == "@me"
-							? user.value.user
+							? authStore.userId
 							: filter.value;
 
 					query[fieldname] = JSON.stringify([filter_type, value]);

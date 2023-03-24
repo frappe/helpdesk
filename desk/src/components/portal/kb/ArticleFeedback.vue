@@ -38,6 +38,7 @@
 
 <script>
 import { inject } from "vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "ArticleFeedback",
@@ -48,10 +49,10 @@ export default {
 		},
 	},
 	setup() {
-		const user = inject("user")
+		const authStore = useAuthStore()
 
 		return {
-			user,
+			authStore,
 		}
 	},
 	data() {
@@ -62,7 +63,7 @@ export default {
 	computed: {
 		feedback() {
 			this.refreshKey // used to force re-compute feedback after localstorage update
-			if (this.user.isLoggedIn()) {
+			if (this.authStore.isLoggedIn) {
 				const d = this.$resources.articleFeedback.data || []
 				return d.length > 0 ? d[0].feedback : null
 			} else {
@@ -93,7 +94,7 @@ export default {
 	},
 	resources: {
 		articleFeedback() {
-			if (!this.user.isLoggedIn()) {
+			if (!this.authStore.isLoggedIn) {
 				return
 			}
 			return {
@@ -102,7 +103,7 @@ export default {
 					doctype: "User Article Feedback",
 					filters: {
 						article: this.article.name,
-						user: this.user.user,
+						user: this.authStore.userId,
 					},
 					fields: ["*"],
 				},
@@ -121,7 +122,7 @@ export default {
 	methods: {
 		async submitFeedback(score) {
 			// score range: 0 - 1 [0-bad, 1-good]
-			if (!this.user.isLoggedIn()) {
+			if (!this.authStore.isLoggedIn) {
 				localStorage.setItem(
 					`article-${this.article.name}-feedback`,
 					score
@@ -134,7 +135,7 @@ export default {
 					previous_score: this.feedback, // will be used in case the user is not signed in
 				})
 				.then(() => {
-					if (this.user.isLoggedIn()) {
+					if (this.authStore.isLoggedIn) {
 						this.$resources.articleFeedback.fetch()
 					} else {
 						this.refreshKey += 1

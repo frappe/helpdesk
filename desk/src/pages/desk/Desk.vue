@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-if="user.isLoggedIn() && user.has_desk_access"
+		v-if="authStore.isLoggedIn && authStore.hasDeskAccess"
 		class="h-screen w-screen"
 	>
 		<div v-if="initialized">
@@ -16,10 +16,12 @@
 		</div>
 	</div>
 </template>
+
 <script>
-import SideBarMenu from "@/components/desk/SideBarMenu.vue";
 import { inject, provide, ref } from "vue";
+import SideBarMenu from "@/components/desk/SideBarMenu.vue";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "Desk",
@@ -29,7 +31,7 @@ export default {
 	},
 	setup() {
 		const mounted = ref(false);
-		const user = inject("user");
+		const authStore = useAuthStore();
 
 		const ticketTypes = ref([]);
 		const ticketPriorities = ref([]);
@@ -59,7 +61,7 @@ export default {
 
 		return {
 			mounted,
-			user,
+			authStore,
 
 			ticketTypes,
 			ticketPriorities,
@@ -78,8 +80,8 @@ export default {
 	computed: {
 		initialized() {
 			if (!this.mounted) return false;
-			if (!this.user.isLoggedIn()) return false;
-			if (!this.user.has_desk_access) return false;
+			if (!this.authStore.isLoggedIn) return false;
+			if (!this.authStore.hasDeskAccess) return false;
 			if (this.$resources.frappedeskSettings.loading) return false;
 			if (!this.$resources.frappedeskSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit();
@@ -109,14 +111,14 @@ export default {
 		},
 	},
 	mounted() {
-		if (!this.user.isLoggedIn()) {
+		if (!this.authStore.isLoggedIn) {
 			this.$router.push({
 				name: "DeskLogin",
 				query: { route: this.$route.path },
 			});
 			return;
 		}
-		if (!this.user.has_desk_access) {
+		if (!this.authStore.hasDeskAccess) {
 			this.$router.push({ path: "/support/tickets" });
 			return;
 		}
@@ -424,7 +426,7 @@ export default {
 					doctype: "Ticket Type",
 					pluck: "name",
 				},
-				auto: this.user.has_desk_access,
+				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.ticketTypes = data;
 				},
@@ -439,7 +441,7 @@ export default {
 				params: {
 					doctype: "Ticket Priority",
 				},
-				auto: this.user.has_desk_access,
+				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.ticketPriorities = data;
 				},
@@ -451,7 +453,7 @@ export default {
 		statuses() {
 			return {
 				url: "frappedesk.api.ticket.get_all_ticket_statuses",
-				auto: this.user.has_desk_access,
+				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.ticketStatuses = data;
 				},
@@ -468,7 +470,7 @@ export default {
 					fields: ["*"],
 					limit_page_length: 0,
 				},
-				auto: this.user.has_desk_access,
+				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.contacts = data;
 				},
@@ -484,7 +486,7 @@ export default {
 					doctype: "Agent",
 					fields: ["name", "agent_name", "user_image"],
 				},
-				auto: this.user.has_desk_access,
+				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.agents = data;
 				},
@@ -499,7 +501,7 @@ export default {
 				params: {
 					doctype: "Agent Group",
 				},
-				auto: this.user.has_desk_access,
+				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.agentGroups = data;
 				},

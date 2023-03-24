@@ -2,7 +2,7 @@
 	<div class="flex flex-col h-screen">
 		<div class="flex border-b h-[52px] px-[18px] shrink-0">
 			<div class="grow my-auto text-[16px] text-gray-900">
-				Welcome, {{ user.agent ? user.agent.agent_name : user.user }}
+				Welcome, {{ authStore.userName }}
 			</div>
 		</div>
 		<div class="overflow-y-scroll h-full">
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { onMounted, ref, inject } from "vue"
 import TicketStatusCards from "@/components/desk/dashboard/TicketStatusCards.vue"
 import TicketTrendsChart from "@/components/desk/dashboard/TicketTrendsChart.vue"
 import TicketTypeChart from "@//components/desk/dashboard/TicketTypeChart.vue"
@@ -42,7 +43,7 @@ import TicketSummaryChart from "@/components/desk/dashboard/TicketSummaryChart.v
 import CustomerSatisfactionChart from "@/components/desk/dashboard/CustomerSatisfactionChart.vue"
 import SlaSummaryCards from "@/components/desk/dashboard/SlaSummaryCards.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { onMounted, ref, inject } from "vue"
+import { useAuthStore } from "@/stores/auth"
 export default {
 	name: "Dashboard",
 	components: {
@@ -66,18 +67,18 @@ export default {
 	},
 
 	setup() {
+		const authStore = useAuthStore()
 		const date = ref()
+
 		onMounted(() => {
 			const startDate = new Date().setDate(new Date().getDate() - 7)
 			const endDate = new Date()
 			date.value = [startDate, endDate]
 		})
 
-		const user = inject("user")
-
 		return {
+			authStore,
 			date,
-			user,
 		}
 	},
 	methods: {

@@ -1,48 +1,52 @@
-import { reactive, computed } from "vue";
+import { computed, ComputedRef } from "vue";
 import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { createResource, call } from "frappe-ui";
 
-type User = {
-	hasDeskAccess: boolean;
-	isAdmin: boolean;
-	loading: boolean;
-	username: string;
-	user: string;
-};
-
-const PATH_LOGIN = "/frappedesk/login";
+const REDIRECT_LOGIN = "/frappedesk/login";
+const URI_USER_INFO = "frappedesk.api.auth.get_user";
+const URI_SIGNUP = "frappedesk.api.account.signup";
+const URI_LOGIN = "login";
 
 export const useAuthStore = defineStore("auth", () => {
 	const router = useRouter();
 
-	const user: User = reactive({
-		hasDeskAccess: false,
-		isAdmin: false,
-		loading: true,
-		username: "",
-		user: "",
-	});
-
 	const userInfo = createResource({
-		url: "frappedesk.api.agent.get_user",
+		url: URI_USER_INFO,
 		cache: ["LoggedAgent"],
-		onSuccess(data: User) {
-			Object.assign(user, data);
-		},
 		onError() {
 			router.push({ name: "PortalLogin" });
 		},
 	});
 
-	const userId = computed(() => user.user);
+	const user__ = computed(() => userInfo.data);
+	const hasDeskAccess: ComputedRef<boolean> = computed(
+		() => user__.value.has_desk_access
+	);
+	const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
+	const isLoggedIn: ComputedRef<boolean> = computed(() => {
+		const cookie = Object.fromEntries(
+			document.cookie
+				.split("; ")
+				.map((part) => part.split("="))
+				.map((d) => [d[0], decodeURIComponent(d[1])])
+		);
+
+		return cookie.user_id && cookie.user_id !== "Guest";
+	});
+	const userId: ComputedRef<string> = computed(() => user__.value.user_id);
+	const userImage: ComputedRef<string> = computed(
+		() => user__.value.user_image
+	);
+	const userName: ComputedRef<string> = computed(() => user__.value.user_name);
+	const username: ComputedRef<string> = computed(() => user__.value.username);
 
 	const resLogin = createResource({
-		url: "login",
+		url: URI_LOGIN,
 	});
 
 	const resSignup = createResource({
-		url: "frappedesk.api.account.signup",
+		url: URI_SIGNUP,
 	});
 
 	function signup(
@@ -67,7 +71,7 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	function logout() {
-		call("logout").then(() => router.push({ path: PATH_LOGIN }));
+		call("logout").then(() => router.push({ path: REDIRECT_LOGIN }));
 	}
 
 	function reloadUser() {
@@ -82,12 +86,17 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	return {
+		hasDeskAccess,
 		init,
+		isAdmin,
+		isLoggedIn,
 		login,
 		logout,
 		reloadUser,
 		signup,
-		user,
 		userId,
+		userImage,
+		userName,
+		username,
 	};
 });

@@ -16,10 +16,9 @@ export default {
 	setup() {
 		const contact = ref("")
 		const ticketId = ref("")
-		const user = inject("user")
 		const impersonateContact = inject("impersonateContact")
 
-		return { contact, ticketId, impersonateContact, user }
+		return { contact, ticketId, impersonateContact }
 	},
 	watch: {
 		async impersonateContact(impersonateContact) {
@@ -39,5 +38,3 @@ export default {
 	},
 }
 </script>
-
-<style></style>

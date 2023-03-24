@@ -131,7 +131,7 @@
 
 <script>
 import { FeatherIcon, Badge } from "frappe-ui"
-import { inject, ref } from "@vue/runtime-core"
+import { ref } from "@vue/runtime-core"
 import TicketField from "@/components/global/TicketField.vue"
 import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 
@@ -145,10 +145,8 @@ export default {
 		CustomIcons,
 	},
 	setup() {
-		const user = inject("user")
 		const validationErrorFields = ref([])
 		return {
-			user,
 			validationErrorFields,
 		}
 	},

@@ -130,27 +130,25 @@
 				>
 					<div>
 						<CustomAvatar
-							:label="user.username"
+							:label="authStore.username"
 							class="cursor-pointer"
 							size="lg"
-							v-if="user"
-							:imageURL="user.profile_image"
+							v-if="authStore"
+							:imageURL="authStore.userImage"
 						/>
 					</div>
 					<div class="flex max-w-[150px] flex-col text-gray-700">
 						<a
-							:title="
-								user.agent ? user.agent.agent_name : user.user
-							"
+							:title="authStore.userName"
 							class="truncate text-base font-medium"
-							>{{
-								user.agent ? user.agent.agent_name : user.user
-							}}</a
+							>
+							{{ authStore.userName }}
+						</a
 						>
 						<a
-							:title="user.user"
+							:title="authStore.userId"
 							class="truncate text-[11px] font-normal"
-							>{{ user.user }}</a
+							>{{ authStore.userId}}</a
 						>
 					</div>
 				</div>
@@ -187,10 +185,11 @@
 </template>
 
 <script>
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import { Dropdown, FeatherIcon } from "frappe-ui"
-import CustomAvatar from "@/components/global/CustomAvatar.vue"
 import { inject, ref } from "vue"
+import { Dropdown, FeatherIcon } from "frappe-ui"
+import CustomIcons from "@/components/desk/global/CustomIcons.vue"
+import CustomAvatar from "@/components/global/CustomAvatar.vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "SideBarMenu",
@@ -220,7 +219,7 @@ export default {
 		const showKeyboardShortcuts = ref(false)
 		const viewportWidth = inject("viewportWidth")
 
-		const user = inject("user")
+		const authStore = useAuthStore()
 
 		const iconHeight = ref(30)
 		const iconWidth = ref(30)
@@ -233,7 +232,7 @@ export default {
 			showKeyboardShortcuts,
 			keyboardShortcuts,
 			viewportWidth,
-			user,
+			authStore,
 			iconHeight,
 			iconWidth,
 			menuOptions,
@@ -309,7 +308,7 @@ export default {
 				customIcon: "log-out",
 				style: "text-red-600",
 				action: () => {
-					this.user.logout()
+					this.authStore.logout()
 				},
 			},
 		]

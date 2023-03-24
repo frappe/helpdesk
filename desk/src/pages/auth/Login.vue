@@ -73,7 +73,8 @@
 <script>
 import LoginBox from "@/components/global/LoginBox.vue"
 import { Input } from "frappe-ui"
-import { ref, inject } from "vue"
+import { ref } from "vue"
+import { useAuthStore } from "@/stores/auth"
 
 export default {
 	name: "Login",
@@ -87,6 +88,7 @@ export default {
 		Input,
 	},
 	setup() {
+		const authStore = useAuthStore();
 		const state = ref(null) // Idle, Logging In, Login Error
 		const email = ref(null)
 		const password = ref(null)
@@ -94,16 +96,14 @@ export default {
 		const successMessage = ref(null)
 		const redirect_route = ref(null)
 
-		const user = inject("user")
-
 		return {
+			authStore,
 			state,
 			email,
 			password,
 			errorMessage,
 			successMessage,
 			redirect_route,
-			user,
 		}
 	},
 	watch: {
@@ -118,9 +118,8 @@ export default {
 		if (this.$route?.query?.route) {
 			this.redirect_route = this.$route.query.route
 		}
-		if (this.user.isLoggedIn()) {
-			this.redirect()
-		}
+
+		if (this.authStore.isLoggedIn) this.redirect();
 	},
 	methods: {
 		async loginOrResetPassword() {
@@ -140,12 +139,12 @@ export default {
 		},
 		async login() {
 			if (this.email && this.password) {
-				await this.user.login(this.email, this.password)
+				await this.authStore.login(this.email, this.password)
 				this.redirect()
 			}
 		},
 		async resetPassword() {
-			await this.user.resetPassword(this.email)
+			await this.authStore.resetPassword(this.email)
 			this.successMessage = true
 		},
 		redirect() {
@@ -161,5 +160,3 @@ export default {
 	},
 }
 </script>
-
-<style></style>

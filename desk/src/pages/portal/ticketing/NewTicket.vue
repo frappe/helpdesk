@@ -227,7 +227,6 @@ export default {
 	},
 	props: ["templateId"],
 	setup() {
-		const user = inject("user");
 		const ticketTemplates = inject("ticketTemplates");
 		const ticketController = inject("ticketController");
 
@@ -240,7 +239,6 @@ export default {
 		const attachments = ref([]);
 
 		return {
-			user,
 			ticketTemplates,
 			ticketController,
 			formData,

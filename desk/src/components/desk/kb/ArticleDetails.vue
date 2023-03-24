@@ -108,13 +108,11 @@ export default {
 		CategorySelector,
 	},
 	setup() {
-		const user = inject("user")
 		const updateArticleTempValues = inject("updateArticleTempValues")
 		const articleTempValues = inject("articleTempValues")
 		const articleInputErrors = inject("articleInputErrors")
 
 		return {
-			user,
 			updateArticleTempValues,
 			articleTempValues,
 			articleInputErrors,

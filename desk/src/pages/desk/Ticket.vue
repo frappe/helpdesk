@@ -324,7 +324,7 @@
 												:button="{
 													class: 'rounded-r-none',
 													disabled:
-														(!user.agent && !user.isAdmin) || sendingDissabled,
+														(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled,
 													appearance: 'primary',
 													label: 'Menu',
 													icon: 'chevron-up',
@@ -365,7 +365,7 @@
 												"
 												appearance="primary"
 												:disabled="
-													(!user.agent && !user.isAdmin) || sendingDissabled
+													(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled
 												"
 												@click="submit()"
 											>
@@ -462,7 +462,7 @@
 								</Button>
 								<Button
 									appearance="secondary"
-									:disabled="!user.agent && !user.isAdmin"
+									:disabled="!authStore.isAgent && !authStore.isAdmin"
 									@click="startEditing('comment')"
 								>
 									Add Comment
@@ -491,8 +491,6 @@ import {
 	FeatherIcon,
 	TextEditor,
 } from "frappe-ui";
-import { useField } from "vee-validate";
-import { toFieldValidator } from "@vee-validate/zod";
 import * as zod from "zod";
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
 import Conversations from "@/components/desk/ticket/Conversations.vue";
@@ -503,6 +501,7 @@ import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSat
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
+import { useAuthStore } from "@/stores/auth";
 import { TextEditorMenuButtons } from "./consts";
 
 export default {
@@ -532,7 +531,7 @@ export default {
 	setup() {
 		const showTextFormattingMenu = ref(true);
 		const viewportWidth = inject("viewportWidth");
-		const user = inject("user");
+		const authStore = useAuthStore();
 		const agents = inject("agents");
 		const attachments = ref([]);
 		const editingType = ref("");
@@ -556,7 +555,7 @@ export default {
 			bccList,
 			showTextFormattingMenu,
 			viewportWidth,
-			user,
+			authStore,
 			agents,
 			attachments,
 			tempTextEditorData,
@@ -757,7 +756,7 @@ export default {
 					doctype: "Frappe Desk Comment",
 					reference_ticket: this.ticketId,
 					content: content,
-					commented_by: this.user.user,
+					commented_by: this.authStore.userId,
 				},
 			});
 			this.content = "";
