@@ -13,3 +13,6 @@ class FDPresetFilter(Document):
 	def on_trash(self):
 		if self.type == "System":
 			frappe.throw("System filters cannot be deleted")
+
+	def after_insert(self):
+		frappe.publish_realtime("frappedesk-preset-filter-insert", self)

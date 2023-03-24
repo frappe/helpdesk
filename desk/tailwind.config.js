@@ -9,6 +9,12 @@ module.exports = {
 	],
 	theme: {
 		extend: {
+			boxShadow: {
+				around: "0px 0px 20px 5px #e2e8f0",
+			},
+			font: {
+				sans: ["Inter", "sans-serif"],
+			},
 			zIndex: {
 				"5": "5",
 			},

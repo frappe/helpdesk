@@ -2,9 +2,12 @@
 # MIT License. See license.txt
 
 import importlib
+import math
 
 import frappe
 from frappe.model.base_document import get_controller
+from frappe.query_builder import Query
+from frappe.query_builder.functions import Count
 
 from .qb import get_query
 
@@ -37,6 +40,55 @@ def get_list(
 	query = apply_hook(doctype, query)
 
 	return query.run(as_dict=True, debug=debug)
+
+
+@frappe.whitelist()
+def get_list_meta(
+	doctype=None,
+	filters=None,
+	order_by=None,
+	start: int | None = 0,
+	limit=None,
+	group_by=None,
+	parent=None,
+	debug=False,
+):
+	check_permissions(doctype, parent)
+
+	query: Query = get_query(
+		table=doctype,
+		filters=filters,
+		order_by=order_by,
+		group_by=group_by,
+	)
+
+	query = apply_custom_filters(doctype, query)
+	query = apply_hook(doctype, query)
+
+	total_count = Count("*").as_("total_count")
+	query = query.select(total_count)
+
+	res = query.run(as_dict=True, debug=debug)
+	total_count = res.pop().total_count
+	total_pages = math.ceil(total_count / limit) if limit else 1
+	current_page = start // limit + 1 if start and limit else 1
+	has_next_page = current_page < total_pages
+	has_previous_page = current_page > 1
+	start_from = start + 1
+	end_at = start + limit
+
+	if end_at > total_count:
+		end_at = total_count
+
+	return {
+		"total_count": total_count,
+		"total_pages": total_pages,
+		"current_page": current_page,
+		"has_next_page": has_next_page,
+		"has_previous_page": has_previous_page,
+		"start_from": start_from,
+		"end_at": end_at,
+	}
 
 
 def check_permissions(doctype, parent):
