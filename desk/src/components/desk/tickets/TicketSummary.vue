@@ -30,7 +30,12 @@ const props = defineProps({
 });
 
 const { ticketName } = toRefs(props);
-const toRoute = computed(() => `tickets/${ticketName.value}`);
+const toRoute = computed(() => ({
+	name: "DeskTicket",
+	params: {
+		ticketId: ticketName.value,
+	},
+}));
 const subject = computed(() => ticket.doc?.subject);
 const metaData = computed(() => ticket.getMeta?.data?.message);
 const conversationCount = computed(() => metaData.value?.conversation_count);
