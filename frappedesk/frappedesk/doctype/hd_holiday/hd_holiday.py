@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class Holiday(Document):
+class HDHoliday(Document):
 	pass
