@@ -47,7 +47,7 @@
    "fieldname": "holiday_list",
    "fieldtype": "Link",
    "label": "Holiday List",
-   "options": "Service Holiday List",
+   "options": "HD Service Holiday List",
    "reqd": 1
   },
   {
@@ -193,7 +193,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-27 00:45:24.452405",
+ "modified": "2023-03-27 00:50:57.948460",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Service Level Agreement",

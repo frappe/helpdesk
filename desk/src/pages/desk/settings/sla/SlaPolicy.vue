@@ -429,7 +429,7 @@ export default {
 			return {
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "Service Holiday List",
+					doctype: "HD Service Holiday List",
 					fields: ["*"],
 				},
 				auto: true,

@@ -154,7 +154,7 @@ def add_default_holidy_list():
 
 	frappe.get_doc(
 		{
-			"doctype": "Service Holiday List",
+			"doctype": "HD Service Holiday List",
 			"holiday_list_name": "Default",
 			"from_date": datetime.strptime(f"Jan 1 {datetime.now().year}", "%b %d %Y"),
 			"to_date": datetime.strptime(

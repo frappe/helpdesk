@@ -14,7 +14,7 @@ class OverlapError(frappe.ValidationError):
 	pass
 
 
-class ServiceHolidayList(Document):
+class HDServiceHolidayList(Document):
 	def validate(self):
 		self.validate_days()
 		self.total_holidays = len(self.holidays)
@@ -97,7 +97,7 @@ def get_events(start, end, filters=None):
 		filters.append(["Holiday", "holiday_date", "<", getdate(end)])
 
 	return frappe.get_list(
-		"Service Holiday List",
+		"HD Service Holiday List",
 		fields=[
 			"name",
 			"`tabHoliday`.holiday_date",
@@ -109,14 +109,14 @@ def get_events(start, end, filters=None):
 	)
 
 
-def is_holiday(service_holiday_list, date=None):
+def is_holiday(hd_service_holiday_list, date=None):
 	"""Returns true if the given date is a holiday in the given holiday list"""
 	if date is None:
 		date = today()
-	if service_holiday_list:
+	if hd_service_holiday_list:
 		return bool(
 			frappe.get_all(
-				"Service Holiday List", dict(name=service_holiday_list, holiday_date=date)
+				"HD Service Holiday List", dict(name=hd_service_holiday_list, holiday_date=date)
 			)
 		)
 	else:
