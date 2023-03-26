@@ -89,7 +89,7 @@
    "fieldname": "support_and_resolution",
    "fieldtype": "Table",
    "label": "Working Hours",
-   "options": "Service Day",
+   "options": "HD Service Day",
    "reqd": 1
   },
   {
@@ -193,7 +193,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-26 22:41:29.685660",
+ "modified": "2023-03-26 23:19:53.163761",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "SLA",
