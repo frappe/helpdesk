@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class UserArticleFeedback(Document):
+class HDArticleFeedback(Document):
 	pass
