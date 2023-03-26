@@ -10,7 +10,7 @@ frappe.query_reports["Ticket Summary"] = {
 			fieldtype: "Select",
 			options: [
 				"Contact",
-				"Ticket Type",
+				"HD Ticket Type",
 				"Ticket Priority",
 				"Assigned To",
 			],

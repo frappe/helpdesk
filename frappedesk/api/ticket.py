@@ -418,7 +418,7 @@ def assign_ticket_priority(ticket_id, priority):
 
 @frappe.whitelist()
 def get_all_ticket_types():
-	return frappe.get_all("Ticket Type", pluck="name")
+	return frappe.get_all("HD Ticket Type", pluck="name")
 
 
 @frappe.whitelist()

@@ -120,8 +120,8 @@
   {
    "fieldname": "ticket_type",
    "fieldtype": "Link",
-   "label": "Ticket Type",
-   "options": "Ticket Type"
+   "label": "HD Ticket Type",
+   "options": "HD Ticket Type"
   },
   {
    "fieldname": "agent_group",
@@ -442,7 +442,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-26 23:50:51.361182",
+ "modified": "2023-03-26 23:55:16.247463",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket",

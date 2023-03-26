@@ -137,7 +137,7 @@ export default {
 			}
 			this.$resources.newTicketType.submit({
 				doc: {
-					doctype: "Ticket Type",
+					doctype: "HD Ticket Type",
 					...inputParams,
 				},
 			})

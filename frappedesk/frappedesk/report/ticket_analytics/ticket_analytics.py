@@ -60,7 +60,7 @@ class TicketAnalytics(object):
 				}
 			)
 
-		elif self.filters.based_on == "Ticket Type":
+		elif self.filters.based_on == "HD Ticket Type":
 			self.columns.append(
 				{
 					"label": _("Ticket Type"),

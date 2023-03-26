@@ -158,7 +158,7 @@ export default {
 			if (!this.ticketTypeId) return
 			return {
 				type: "document",
-				doctype: "Ticket Type",
+				doctype: "HD Ticket Type",
 				name: this.ticketTypeId,
 				setValue: {
 					onSuccess: () => {

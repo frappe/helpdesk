@@ -166,13 +166,13 @@
   {
    "fieldname": "ticket_type_section",
    "fieldtype": "Section Break",
-   "label": "Ticket Type"
+   "label": "HD Ticket Type"
   },
   {
    "fieldname": "default_ticket_type",
    "fieldtype": "Link",
    "label": "Default ticket type",
-   "options": "Ticket Type"
+   "options": "HD Ticket Type"
   },
   {
    "default": "0",
@@ -210,7 +210,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-17 12:14:28.728605",
+ "modified": "2023-03-26 23:55:16.000707",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Settings",

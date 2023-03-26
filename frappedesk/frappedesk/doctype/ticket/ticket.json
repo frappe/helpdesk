@@ -120,7 +120,7 @@
   {
    "fieldname": "ticket_type",
    "fieldtype": "Link",
-   "label": "Ticket Type",
+   "label": "HD Ticket Type",
    "options": "Ticket Type"
   },
   {

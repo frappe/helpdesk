@@ -244,7 +244,7 @@ export default {
 		}
 
 		const sortOptions = [
-			{ label: "Ticket Type", value: "ticket_type" },
+			{ label: "HD Ticket Type", value: "ticket_type" },
 			{ label: "Modified", value: "modified" },
 			{ label: "Created", value: "created" },
 		];

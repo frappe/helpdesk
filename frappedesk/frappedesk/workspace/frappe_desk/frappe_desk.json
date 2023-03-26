@@ -95,7 +95,7 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Ticket Type",
+			"label": "HD Ticket Type",
 			"link_count": 0,
 			"link_to": "Ticket Type",
 			"link_type": "DocType",

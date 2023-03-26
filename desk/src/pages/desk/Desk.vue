@@ -167,7 +167,7 @@ export default {
 		};
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
-				case "Ticket Type":
+				case "HD Ticket Type":
 					this.$resources.types.reload();
 					break;
 				case "Agent":

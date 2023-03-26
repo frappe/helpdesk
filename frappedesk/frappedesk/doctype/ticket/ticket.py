@@ -164,7 +164,7 @@ class Ticket(Document):
 
 	def update_priority_based_on_ticket_type(self):
 		if self.ticket_type:
-			ticket_type_doc = frappe.get_doc("Ticket Type", self.ticket_type)
+			ticket_type_doc = frappe.get_doc("HD Ticket Type", self.ticket_type)
 			if ticket_type_doc.priority:
 				self.priority = ticket_type_doc.priority
 				self.save()

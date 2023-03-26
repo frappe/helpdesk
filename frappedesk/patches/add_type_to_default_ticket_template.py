@@ -12,7 +12,7 @@ def execute():
 			"label": "Type",
 			"fieldname": "ticket_type",
 			"fieldtype": "Link",
-			"options": "Ticket Type",
+			"options": "HD Ticket Type",
 			"reqd": False,
 		},
 	)
