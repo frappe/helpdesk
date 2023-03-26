@@ -133,7 +133,7 @@
    "fieldname": "pause_sla_on",
    "fieldtype": "Table",
    "label": "SLA Paused On",
-   "options": "Pause SLA On Status"
+   "options": "HD Pause Service Level Agreement On Status"
   },
   {
    "fieldname": "document_type",
@@ -193,7 +193,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-27 00:56:52.145431",
+ "modified": "2023-03-27 01:01:40.067560",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Service Level Agreement",

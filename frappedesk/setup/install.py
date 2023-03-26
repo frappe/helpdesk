@@ -128,7 +128,7 @@ def add_default_sla():
 	sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_closed)
 
 	sla_paused_on_replied = frappe.get_doc(
-		{"doctype": "Pause SLA On Status", "status": "Replied"}
+		{"doctype": "HD Pause Service Level Agreement On Status", "status": "Replied"}
 	)
 
 	sla_doc.append("pause_sla_on", sla_paused_on_replied)
