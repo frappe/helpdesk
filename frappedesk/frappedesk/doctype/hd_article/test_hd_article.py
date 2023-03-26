@@ -5,5 +5,5 @@
 import unittest
 
 
-class TestArticle(unittest.TestCase):
+class TestHDArticle(unittest.TestCase):
 	pass

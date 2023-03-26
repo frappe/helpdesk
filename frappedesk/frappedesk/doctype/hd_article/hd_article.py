@@ -7,10 +7,10 @@ from frappe.query_builder import DocType
 from frappe.utils import cint
 
 
-class Article(Document):
+class HDArticle(Document):
 	@staticmethod
 	def get_list_query(query):
-		QBArticle = DocType("Article")
+		QBArticle = DocType("HD Article")
 		QBCategory = DocType("Category")
 
 		query = (
@@ -33,7 +33,7 @@ class Article(Document):
 		self.author = frappe.session.user
 
 	def before_save(self):
-		# set published date of the article
+		# set published date of the hd_article
 		if self.status == "Published" and not self.published_on:
 			self.published_on = frappe.utils.now()
 		elif self.status == "Draft" and self.published_on:
@@ -44,11 +44,11 @@ class Article(Document):
 
 		# index is only set if its not set already, this allows defining index
 		# at the time of creation itself if not set the index is set to the
-		# last index + 1, i.e. the article is added at the end
+		# last index + 1, i.e. the hd_article is added at the end
 		if self.status == "Published" and self.idx == -1:
 			self.idx = cint(
 				frappe.db.count(
-					"Article", {"category": self.category}, {"status": "Published"}
+					"HD Article", {"category": self.category}, {"status": "Published"}
 				)
 			)
 
@@ -79,15 +79,15 @@ class Article(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def add_feedback(article, helpful):
+def add_feedback(hd_article, helpful):
 	# TODO: use a base 5 or 10 rating system instead of a boolean
 	field = "helpful" if helpful else "not_helpful"
 
-	value = cint(frappe.db.get_value("Article", article, field))
-	frappe.db.set_value("Article", article, field, value + 1, update_modified=False)
+	value = cint(frappe.db.get_value("HD Article", hd_article, field))
+	frappe.db.set_value("HD Article", hd_article, field, value + 1, update_modified=False)
 
 
 @frappe.whitelist(allow_guest=True)
-def increment_view(article):
-	value = cint(frappe.db.get_value("Article", article, "views"))
-	frappe.db.set_value("Article", article, "views", value + 1, update_modified=False)
+def increment_view(hd_article):
+	value = cint(frappe.db.get_value("HD Article", hd_article, "views"))
+	frappe.db.set_value("HD Article", hd_article, "views", value + 1, update_modified=False)
