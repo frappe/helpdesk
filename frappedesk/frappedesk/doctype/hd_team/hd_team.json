@@ -31,7 +31,7 @@
    "fieldname": "users",
    "fieldtype": "Table MultiSelect",
    "label": "Users",
-   "options": "Teams User"
+   "options": "HD Team Member"
   },
   {
    "default": "0",
@@ -48,7 +48,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-02-24 14:38:07.004329",
+ "modified": "2023-03-26 22:50:53.995572",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Team",
