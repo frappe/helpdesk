@@ -162,7 +162,7 @@
    "fieldname": "custom_fields",
    "fieldtype": "Table",
    "label": "Custom Fields",
-   "options": "Ticket Custom Field"
+   "options": "HD Ticket Custom Field"
   },
   {
    "collapsible": 1,
@@ -442,7 +442,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-27 00:18:39.881702",
+ "modified": "2023-03-27 00:26:28.368993",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket",
