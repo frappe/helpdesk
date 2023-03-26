@@ -19,10 +19,10 @@ class HDTicketComment(Document):
 				comment=self.name,
 			)
 
-			if frappe.db.exists("Frappe Desk Notification", values):
+			if frappe.db.exists("HD Notification", values):
 				continue
 
-			notification = frappe.get_doc(doctype="Frappe Desk Notification")
+			notification = frappe.get_doc(doctype="HD Notification")
 			notification.message = (
 				f"{get_fullname(self.owner)} mentioned you in Ticket #{self.reference_ticket}",
 			)

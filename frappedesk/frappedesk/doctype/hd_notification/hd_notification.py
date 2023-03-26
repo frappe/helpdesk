@@ -5,6 +5,6 @@ import frappe
 from frappe.model.document import Document
 
 
-class FrappeDeskNotification(Document):
+class HDNotification(Document):
 	def after_insert(self):
 		frappe.publish_realtime("frappedesk:new_notification", user=self.to_user)
