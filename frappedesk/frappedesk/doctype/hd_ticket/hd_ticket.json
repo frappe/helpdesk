@@ -120,7 +120,7 @@
   {
    "fieldname": "ticket_type",
    "fieldtype": "Link",
-   "label": "HD Ticket Type",
+   "label": "Ticket Type",
    "options": "HD Ticket Type"
   },
   {
@@ -156,7 +156,7 @@
    "fieldname": "template",
    "fieldtype": "Link",
    "label": "Template",
-   "options": "Ticket Template"
+   "options": "HD Ticket Template"
   },
   {
    "fieldname": "custom_fields",
@@ -442,7 +442,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-26 23:55:16.247463",
+ "modified": "2023-03-27 00:13:50.810961",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket",

@@ -7,7 +7,7 @@ from frappe.website.utils import cleanup_page_name
 from frappe.utils.safe_exec import safe_exec
 
 
-class TicketTemplate(Document):
+class HDTicketTemplate(Document):
 	def validate(self):
 		allowed_field_types = [
 			"Data",
@@ -51,7 +51,7 @@ class TicketTemplate(Document):
 
 
 def refresh_server_script():
-	all_ticket_templates = frappe.get_all("Ticket Template")
+	all_hd_ticket_templates = frappe.get_all("HD Ticket Template")
 
 	snippets = []
 
@@ -60,8 +60,8 @@ def refresh_server_script():
 	snippets.append("for f in temp_custom_fields:")
 	snippets.append("\tcustom_fields[f.fieldname]=f.value")
 
-	for template in all_ticket_templates:
-		template_doc = frappe.get_doc("Ticket Template", template)
+	for template in all_hd_ticket_templates:
+		template_doc = frappe.get_doc("HD Ticket Template", template)
 		flag = False
 		for field in template_doc.fields:
 			if field.auto_set and field.auto_set_via == "Backend (Python)":

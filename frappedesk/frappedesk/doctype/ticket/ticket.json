@@ -368,7 +368,7 @@
    "fieldname": "template",
    "fieldtype": "Link",
    "label": "Template",
-   "options": "Ticket Template"
+   "options": "HD Ticket Template"
   },
   {
    "fieldname": "custom_fields",

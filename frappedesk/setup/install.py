@@ -174,10 +174,10 @@ def enable_track_service_level_agreement_in_support_settings():
 
 
 def add_default_ticket_template():
-	if frappe.db.exists("Ticket Template", "Default"):
+	if frappe.db.exists("HD Ticket Template", "Default"):
 		return
 
-	template = frappe.new_doc("Ticket Template")
+	template = frappe.new_doc("HD Ticket Template")
 
 	template.template_name = "Default"
 	template.append(

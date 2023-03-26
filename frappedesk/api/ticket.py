@@ -247,7 +247,7 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 		ticket_doc.customer = values["customer"]
 
 	ticket_doc.template = template
-	template_fields = frappe.get_doc("Ticket Template", template).fields
+	template_fields = frappe.get_doc("HD Ticket Template", template).fields
 	for field in template_fields:
 		if field.fieldname in ["subject", "description"]:
 			continue
@@ -487,9 +487,9 @@ def check_and_create_ticket_type(type):
 
 @frappe.whitelist()
 def get_all_ticket_templates():
-	templates = frappe.get_all("Ticket Template")
+	templates = frappe.get_all("HD Ticket Template")
 	for index, template in enumerate(templates):
-		templates[index] = frappe.get_doc("Ticket Template", template.name).__dict__
+		templates[index] = frappe.get_doc("HD Ticket Template", template.name).__dict__
 
 	return templates
 

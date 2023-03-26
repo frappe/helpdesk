@@ -2,10 +2,10 @@ import frappe
 
 
 def execute():
-	if not frappe.db.exists("Ticket Template", "Default"):
+	if not frappe.db.exists("HD Ticket Template", "Default"):
 		return
 
-	t = frappe.get_doc("Ticket Template", "Default")
+	t = frappe.get_doc("HD Ticket Template", "Default")
 	t.append(
 		"fields",
 		{

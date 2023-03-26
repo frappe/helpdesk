@@ -5,5 +5,5 @@
 import unittest
 
 
-class TestTicketTemplate(unittest.TestCase):
+class TestHDTicketTemplate(unittest.TestCase):
 	pass
