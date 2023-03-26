@@ -25,7 +25,7 @@ export default {
 	mounted() {
 		this.$socket.on("list_update", (data) => {
 			if (
-				data["doctype"] == "Ticket Activity" &&
+				data["doctype"] == "HD Ticket Activity" &&
 				data["name"].split("-")[1] == this.ticketId
 			) {
 				this.$resources.activities.fetch()
