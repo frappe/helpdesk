@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class AgentGroupItem(Document):
+class HDTeamItem(Document):
 	pass

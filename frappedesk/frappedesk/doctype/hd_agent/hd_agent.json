@@ -39,7 +39,7 @@
    "fieldname": "groups",
    "fieldtype": "Table",
    "label": "Groups",
-   "options": "Agent Group Item"
+   "options": "HD Team Item"
   },
   {
    "fetch_from": "user.user_image",
@@ -50,7 +50,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-12 12:17:29.677422",
+ "modified": "2023-03-26 23:16:09.421336",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Agent",
