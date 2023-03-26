@@ -4,7 +4,7 @@ import frappe
 def execute():
 	all_ticket_comments = frappe.get_all(
 		"Comment",
-		filters={"comment_type": "Comment", "reference_doctype": "Ticket"},
+		filters={"comment_type": "Comment", "reference_doctype": "HD Ticket"},
 		fields=["reference_name", "name", "content", "comment_email"],
 	)
 	for ticket_comment in all_ticket_comments:

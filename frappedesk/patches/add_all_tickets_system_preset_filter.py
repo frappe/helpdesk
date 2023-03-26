@@ -6,7 +6,7 @@ def execute():
 		{
 			"doctype": "FD Preset Filter",
 			"title": "All Tickets",
-			"reference_doctype": "Ticket",
+			"reference_doctype": "HD Ticket",
 			"filters": [],
 		}
 	)

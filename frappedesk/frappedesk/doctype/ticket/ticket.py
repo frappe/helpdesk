@@ -33,7 +33,7 @@ from frappedesk.frappedesk.utils.email import (
 class Ticket(Document):
 	@staticmethod
 	def get_list_query(query: Query):
-		QBTicket = frappe.qb.DocType("Ticket")
+		QBTicket = frappe.qb.DocType("HD Ticket")
 
 		query = Ticket.filter_by_team(query)
 		query = query.select(QBTicket.star)
@@ -57,7 +57,7 @@ class Ticket(Document):
 		if not int(should_filter):
 			return query
 
-		QBTicket = frappe.qb.DocType("Ticket")
+		QBTicket = frappe.qb.DocType("HD Ticket")
 		filters = {"user": user}
 		teams = frappe.get_list("Agent Group", filters=filters)
 		criterions = [QBTicket.agent_group == team.name for team in teams]
@@ -155,7 +155,7 @@ class Ticket(Document):
 				"Assignment Rule",
 				frappe.get_doc("Agent Group", self.agent_group).assignment_rule,
 			).users:
-				clear_all_assignments("Ticket", self.name)
+				clear_all_assignments("HD Ticket", self.name)
 				frappe.publish_realtime(
 					"ticket_assignee_update",
 					{"ticket_id": self.name},
@@ -193,7 +193,7 @@ class Ticket(Document):
 				"sender": self.raised_by,
 				"content": self.description,
 				"status": "Linked",
-				"reference_doctype": "Ticket",
+				"reference_doctype": "HD Ticket",
 				"reference_name": self.name,
 			}
 		)
@@ -232,7 +232,7 @@ class Ticket(Document):
 		communications = frappe.get_all(
 			"Communication",
 			filters={
-				"reference_doctype": "Ticket",
+				"reference_doctype": "HD Ticket",
 				"reference_name": comm_to_split_from.reference_name,
 				"creation": (">=", comm_to_split_from.creation),
 			},
@@ -247,7 +247,7 @@ class Ticket(Document):
 			{
 				"doctype": "Comment",
 				"comment_type": "Info",
-				"reference_doctype": "Ticket",
+				"reference_doctype": "HD Ticket",
 				"reference_name": replicated_ticket.name,
 				"content": (
 					" - Split the Ticket from <a href='/app/Form/Ticket/{0}'>{1}</a>".format(
@@ -271,8 +271,8 @@ class Ticket(Document):
 					# the agent is already set as an assignee
 					return
 
-		clear_all_assignments("Ticket", self.name)
-		assign({"assign_to": [agent], "doctype": "Ticket", "name": self.name})
+		clear_all_assignments("HD Ticket", self.name)
+		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 		agent_name = frappe.get_value("Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 		frappe.publish_realtime(
@@ -288,7 +288,7 @@ class Ticket(Document):
 		return None
 
 	def on_trash(self):
-		activities = frappe.db.get_all("Ticket Activity", {"Ticket": self.name})
+		activities = frappe.db.get_all("Ticket Activity", {"HD Ticket": self.name})
 		for activity in activities:
 			frappe.db.delete("Ticket Activity", activity)
 
@@ -322,7 +322,7 @@ class Ticket(Document):
 
 	@frappe.whitelist()
 	def last_communication(self):
-		filters = {"reference_doctype": "Ticket", "reference_name": ["=", self.name]}
+		filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", self.name]}
 
 		communication = frappe.get_last_doc(
 			"Communication",
@@ -401,7 +401,7 @@ class Ticket(Document):
 				"email_account": sender_email.name if sender_email else None,
 				"email_status": "Open",
 				"recipients": recipients,
-				"reference_doctype": "Ticket",
+				"reference_doctype": "HD Ticket",
 				"reference_name": self.name,
 				"sender": sender,
 				"sent_or_received": "Sent",
@@ -453,7 +453,7 @@ class Ticket(Document):
 				message=message,
 				now=send_now,
 				recipients=recipients,
-				reference_doctype="Ticket",
+				reference_doctype="HD Ticket",
 				reference_name=self.name,
 				reply_to=reply_to_email,
 				sender=reply_to_email,
@@ -488,7 +488,7 @@ class Ticket(Document):
 		res = (
 			frappe.qb.from_(QBCommunication)
 			.select(count)
-			.where(QBCommunication.reference_doctype == "Ticket")
+			.where(QBCommunication.reference_doctype == "HD Ticket")
 			.where(QBCommunication.reference_name == self.name)
 			.run(as_dict=True)
 		)
@@ -523,15 +523,15 @@ class Ticket(Document):
 
 
 def set_descritption_from_communication(doc, type):
-	if doc.reference_doctype == "Ticket":
-		ticket_doc = frappe.get_doc("Ticket", doc.reference_name)
+	if doc.reference_doctype == "HD Ticket":
+		ticket_doc = frappe.get_doc("HD Ticket", doc.reference_name)
 		if not ticket_doc.via_customer_portal:
 			ticket_doc.description = doc.content
 
 
 @frappe.whitelist()
 def create_communication_via_contact(ticket, message, attachments=[]):
-	ticket_doc = frappe.get_doc("Ticket", ticket)
+	ticket_doc = frappe.get_doc("HD Ticket", ticket)
 
 	if ticket_doc.status == "Replied":
 		ticket_doc.status = "Open"
@@ -549,7 +549,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 			"sender": ticket_doc.raised_by,
 			"content": message,
 			"status": "Linked",
-			"reference_doctype": "Ticket",
+			"reference_doctype": "HD Ticket",
 			"reference_name": ticket_doc.name,
 		}
 	)
@@ -566,7 +566,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 @frappe.whitelist()
 def update_ticket_status_via_customer_portal(ticket, new_status):
-	ticket_doc = frappe.get_doc("Ticket", ticket)
+	ticket_doc = frappe.get_doc("HD Ticket", ticket)
 
 	ticket_doc.status = new_status
 	ticket_doc.save(ignore_permissions=True)
@@ -578,7 +578,7 @@ def update_ticket_status_via_customer_portal(ticket, new_status):
 def get_all_conversations(ticket):
 	conversations = frappe.db.get_all(
 		"Communication",
-		filters={"reference_doctype": ["=", "Ticket"], "reference_name": ["=", ticket]},
+		filters={"reference_doctype": ["=", "HD Ticket"], "reference_name": ["=", ticket]},
 		order_by="creation asc",
 		fields=[
 			"name",
@@ -630,7 +630,7 @@ def get_all_attachments(ticket):
 	attachments = frappe.get_all(
 		"File",
 		["file_name", "file_url"],
-		{"attached_to_name": ticket, "attached_to_doctype": "Ticket"},
+		{"attached_to_name": ticket, "attached_to_doctype": "HD Ticket"},
 	)
 	return attachments
 
@@ -659,7 +659,7 @@ def get_user_tickets(filters="{}", order_by="creation desc", impersonate=None):
 		filters["raised_by"] = ["=", impersonate]
 
 	tickets = frappe.get_all(
-		"Ticket",
+		"HD Ticket",
 		filters=filters,
 		order_by=order_by,
 		fields=[
@@ -710,12 +710,12 @@ def get_ticket_list(
 def set_multiple_status(names, status):
 
 	for name in json.loads(names):
-		frappe.db.set_value("Ticket", name, "status", status)
+		frappe.db.set_value("HD Ticket", name, "status", status)
 
 
 @frappe.whitelist()
 def set_status(name, status):
-	frappe.db.set_value("Ticket", name, "status", status)
+	frappe.db.set_value("HD Ticket", name, "status", status)
 
 
 def auto_close_tickets():
@@ -735,7 +735,7 @@ def auto_close_tickets():
 	)
 
 	for ticket in tickets:
-		doc = frappe.get_doc("Ticket", ticket.get("name"))
+		doc = frappe.get_doc("HD Ticket", ticket.get("name"))
 		doc.status = "Closed"
 		doc.flags.ignore_permissions = True
 		doc.flags.ignore_mandatory = True
@@ -756,14 +756,14 @@ def update_ticket(contact, method):
 	"""
 	Called when Contact is deleted
 	"""
-	QBTicket = frappe.qb.DocType("Ticket")
+	QBTicket = frappe.qb.DocType("HD Ticket")
 	QBTicket.update().set(QBTicket.contact, "").where(QBTicket.contact == contact.name)
 
 
 @frappe.whitelist()
 def make_task(source_name, target_doc=None):
 	return get_mapped_doc(
-		"Ticket", source_name, {"Ticket": {"doctype": "Task"}}, target_doc
+		"HD Ticket", source_name, {"HD Ticket": {"doctype": "Task"}}, target_doc
 	)
 
 
@@ -774,7 +774,7 @@ def make_ticket_from_communication(communication, ignore_communication_links=Fal
 	doc = frappe.get_doc("Communication", communication)
 	ticket = frappe.get_doc(
 		{
-			"doctype": "Ticket",
+			"doctype": "HD Ticket",
 			"subject": doc.subject,
 			"communication_medium": doc.communication_medium,
 			"raised_by": doc.sender or "",
@@ -783,7 +783,7 @@ def make_ticket_from_communication(communication, ignore_communication_links=Fal
 	).insert(ignore_permissions=True)
 
 	link_communication_to_document(
-		doc, "Ticket", ticket.name, ignore_communication_links
+		doc, "HD Ticket", ticket.name, ignore_communication_links
 	)
 
 	return ticket.name
@@ -797,7 +797,7 @@ def get_time_in_timedelta(time):
 
 
 def set_first_response_time(communication, method):
-	if communication.get("reference_doctype") == "Ticket":
+	if communication.get("reference_doctype") == "HD Ticket":
 		ticket = get_parent_doc(communication)
 		if is_first_response(ticket) and ticket.sla:
 			first_response_time = calculate_first_response_time(

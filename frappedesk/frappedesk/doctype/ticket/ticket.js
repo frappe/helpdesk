@@ -1,4 +1,4 @@
-frappe.ui.form.on("Ticket", {
+frappe.ui.form.on("HD Ticket", {
 	refresh: function (frm) {
 		frm.add_web_link(
 			`/frappedesk/tickets/${frm.doc.name}`,

@@ -31,7 +31,7 @@ def get_ticket_count(doc, event):
 	if not doc.customer:
 		return
 
-	ticket_count = frappe.db.count("Ticket", {"customer": doc.customer})
+	ticket_count = frappe.db.count("HD Ticket", {"customer": doc.customer})
 	customer = frappe.get_doc("HD Customer", doc.customer)
 	customer.ticket_count = ticket_count
 

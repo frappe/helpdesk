@@ -1,4 +1,4 @@
-frappe.listview_settings["Ticket"] = {
+frappe.listview_settings["HD Ticket"] = {
 	colwidths: { subject: 6 },
 	add_fields: ["priority"],
 	onload: function (listview) {

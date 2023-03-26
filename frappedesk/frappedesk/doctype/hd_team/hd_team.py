@@ -42,7 +42,7 @@ class HDTeam(Document):
 		rule_doc.name = append_number_if_name_exists(
 			"Assignment Rule", f"{self.name} - Support Rotation"
 		)
-		rule_doc.document_type = "Ticket"
+		rule_doc.document_type = "HD Ticket"
 		rule_doc.assign_condition = f"status == 'Open' and hd_team == '{self.name}'"
 		rule_doc.priority = 1
 		rule_doc.disabled = True  # Disable the rule by default, when agents are added to the group, the rule will be enabled

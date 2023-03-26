@@ -104,7 +104,7 @@ class SLA(Document):
 	def validate_doc(self):
 		if (
 			self.enabled
-			and self.document_type == "Ticket"
+			and self.document_type == "HD Ticket"
 			and not frappe.db.get_single_value(
 				"Frappe Desk Settings", "track_service_level_agreement"
 			)
@@ -175,7 +175,7 @@ class SLA(Document):
 
 	def before_insert(self):
 		# no need to set up SLA fields for Ticket dt as they are standard fields in Ticket
-		if self.document_type == "Ticket":
+		if self.document_type == "HD Ticket":
 			return
 
 		sla_fields = get_sla_fields()
@@ -636,17 +636,17 @@ def set_resolution_time(doc):
 def change_sla_and_priority(self):
 	if (
 		self.sla
-		and frappe.db.exists("Ticket", self.name)
+		and frappe.db.exists("HD Ticket", self.name)
 		and frappe.db.get_single_value(
 			"Frappe Desk Settings", "track_service_level_agreement"
 		)
 	):
 
-		if not self.priority == frappe.db.get_value("Ticket", self.name, "priority"):
+		if not self.priority == frappe.db.get_value("HD Ticket", self.name, "priority"):
 			self.set_response_and_resolution_time(priority=self.priority, sla=self.sla)
 			frappe.msgprint(_("Priority has been changed to {0}.").format(self.priority))
 
-		if not self.sla == frappe.db.get_value("Ticket", self.name, "sla"):
+		if not self.sla == frappe.db.get_value("HD Ticket", self.name, "sla"):
 			self.set_response_and_resolution_time(priority=self.priority, sla=self.sla)
 			frappe.msgprint(_("SLA has been changed to {0}.").format(self.sla))
 

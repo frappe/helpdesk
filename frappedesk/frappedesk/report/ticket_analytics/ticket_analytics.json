@@ -15,7 +15,7 @@
 	"name": "Ticket Analytics",
 	"owner": "Administrator",
 	"prepared_report": 0,
-	"ref_doctype": "Ticket",
+	"ref_doctype": "HD Ticket",
 	"report_name": "Ticket Analytics",
 	"report_type": "Script Report",
 	"roles": [

@@ -25,7 +25,7 @@ class HDSettings(Document):
 
 		rule_doc = frappe.new_doc("Assignment Rule")
 		rule_doc.name = append_number_if_name_exists("Assignment Rule", "Support Rotation")
-		rule_doc.document_type = "Ticket"
+		rule_doc.document_type = "HD Ticket"
 		rule_doc.assign_condition = f"status == 'Open'"
 		rule_doc.priority = 0
 		rule_doc.disabled = True  # Disable the rule by default, when agents are added to the group, the rule will be enabled

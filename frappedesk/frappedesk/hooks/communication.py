@@ -4,7 +4,7 @@ import frappe
 def after_insert(c, method=None):
 	# DocType against which the communication is created. We only want those
 	# which related to Frappe Desk
-	if not c.reference_doctype == "Ticket":
+	if not c.reference_doctype == "HD Ticket":
 		return
 
 	# Skip if doc is not mentioned

@@ -92,10 +92,6 @@
    "options": "Email"
   },
   {
-   "fieldname": "cb00",
-   "fieldtype": "Column Break"
-  },
-  {
    "default": "Open",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -118,10 +114,20 @@
    "options": "HD Ticket Priority"
   },
   {
+   "fieldname": "cb00",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "ticket_type",
    "fieldtype": "Link",
    "label": "Ticket Type",
    "options": "Ticket Type"
+  },
+  {
+   "fieldname": "agent_group",
+   "fieldtype": "Link",
+   "label": "Agent Group",
+   "options": "HD Team"
   },
   {
    "fieldname": "ticket_split_from",
@@ -145,6 +151,18 @@
    "label": "Description",
    "oldfieldname": "problem_description",
    "oldfieldtype": "Text"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "Template",
+   "options": "Ticket Template"
+  },
+  {
+   "fieldname": "custom_fields",
+   "fieldtype": "Table",
+   "label": "Custom Fields",
+   "options": "Ticket Custom Field"
   },
   {
    "collapsible": 1,
@@ -337,6 +355,12 @@
    "options": "Contact"
   },
   {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "HD Customer"
+  },
+  {
    "fieldname": "email_account",
    "fieldtype": "Link",
    "label": "Email Account",
@@ -365,24 +389,6 @@
    "label": "Content Type"
   },
   {
-   "fieldname": "template",
-   "fieldtype": "Link",
-   "label": "Template",
-   "options": "Ticket Template"
-  },
-  {
-   "fieldname": "custom_fields",
-   "fieldtype": "Table",
-   "label": "Custom Fields",
-   "options": "Ticket Custom Field"
-  },
-  {
-   "fieldname": "agent_group",
-   "fieldtype": "Link",
-   "label": "Agent Group",
-   "options": "HD Team"
-  },
-  {
    "depends_on": "eval:doc.feedback_submitted",
    "fieldname": "customer_feedback_section",
    "fieldtype": "Section Break",
@@ -397,20 +403,14 @@
    "label": "Feedback Submitted"
   },
   {
-   "fieldname": "customer_feedback",
-   "fieldtype": "Long Text",
-   "label": "Feedback"
-  },
-  {
    "fieldname": "satisfaction_rating",
    "fieldtype": "Rating",
    "label": "Rating"
   },
   {
-   "fieldname": "customer",
-   "fieldtype": "Link",
-   "label": "Customer",
-   "options": "HD Customer"
+   "fieldname": "customer_feedback",
+   "fieldtype": "Long Text",
+   "label": "Feedback"
   },
   {
    "fieldname": "feedback_status",
@@ -442,7 +442,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-26 23:38:08.821646",
+ "modified": "2023-03-26 23:50:51.361182",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket",

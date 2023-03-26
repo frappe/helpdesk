@@ -36,7 +36,7 @@ def default_ticket_outgoing_email_account():
 		.where(QBEmailAccount.default_outgoing == 1)
 		.inner_join(QBImapFolder)
 		.on(QBImapFolder.parent == QBEmailAccount.name)
-		.where(QBImapFolder.append_to == "Ticket")
+		.where(QBImapFolder.append_to == "HD Ticket")
 		.limit(1)
 	)
 

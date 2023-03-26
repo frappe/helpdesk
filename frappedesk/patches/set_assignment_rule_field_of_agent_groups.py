@@ -13,7 +13,7 @@ def execute():
 		rules = frappe.get_all(
 			"Assignment Rule",
 			filters={
-				"document_type": "Ticket",
+				"document_type": "HD Ticket",
 				"assign_condition": f"status == 'Open' and agent_group == '{agent_group}'",
 			},
 			pluck="name",

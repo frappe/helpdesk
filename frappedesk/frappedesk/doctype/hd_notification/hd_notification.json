@@ -40,8 +40,8 @@
   {
    "fieldname": "ticket",
    "fieldtype": "Link",
-   "label": "Ticket",
-   "options": "Ticket"
+   "label": "HD Ticket",
+   "options": "HD Ticket"
   },
   {
    "fieldname": "comment",
@@ -52,7 +52,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:22:22.460427",
+ "modified": "2023-03-26 23:50:51.129825",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Notification",

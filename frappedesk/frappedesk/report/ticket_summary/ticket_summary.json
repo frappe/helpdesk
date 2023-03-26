@@ -15,7 +15,7 @@
 	"name": "Ticket Summary",
 	"owner": "Administrator",
 	"prepared_report": 0,
-	"ref_doctype": "Ticket",
+	"ref_doctype": "HD Ticket",
 	"report_name": "Ticket Summary",
 	"report_type": "Script Report",
 	"roles": [

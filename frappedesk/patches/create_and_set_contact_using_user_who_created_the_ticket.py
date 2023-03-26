@@ -3,7 +3,7 @@ import frappe
 
 def execute():
 	for ticket in frappe.db.get_all(
-		"Ticket",
+		"HD Ticket",
 		filters={"contact": "", "owner": ["!=", "Administrator"]},
 		fields=["name", "owner"],
 	):
@@ -19,6 +19,6 @@ def execute():
 		new_contact_doc.append("email_ids", {"email_id": user_doc.email, "is_primary": True})
 		new_contact_doc.insert()
 
-		ticket_doc = frappe.get_doc("Ticket", ticket.name)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket.name)
 		ticket_doc.contact = new_contact_doc.name
 		ticket_doc.save()

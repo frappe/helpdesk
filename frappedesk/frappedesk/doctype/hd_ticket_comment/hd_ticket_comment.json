@@ -22,7 +22,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Reference Ticket",
-   "options": "Ticket"
+   "options": "HD Ticket"
   },
   {
    "fieldname": "column_break_3",
@@ -38,7 +38,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-26 21:25:20.467433",
+ "modified": "2023-03-26 23:50:50.945844",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket Comment",

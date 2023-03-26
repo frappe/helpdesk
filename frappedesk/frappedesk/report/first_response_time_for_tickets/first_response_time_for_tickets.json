@@ -17,7 +17,7 @@
 	"owner": "Administrator",
 	"prepared_report": 0,
 	"query": "select date(creation) as creation_date, avg(mins_to_first_response) from tabTicket where creation > '2016-05-01' group by date(creation) order by creation_date;",
-	"ref_doctype": "Ticket",
+	"ref_doctype": "HD Ticket",
 	"report_name": "First Response Time for Tickets",
 	"report_type": "Script Report",
 	"roles": [
