@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class SubCategoryItem(Document):
+class HDArticleSubCategoryItem(Document):
 	pass
