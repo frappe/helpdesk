@@ -1,13 +1,9 @@
-# Copyright (c) 2022, Frappe Technologies and contributors
-# For license information, please see license.txt
-
-from genericpath import exists
 import frappe
 from frappe.model.document import Document
 from frappe.utils import random_string, get_url
 
 
-class DeskAccountRequest(Document):
+class HDDeskAccountRequest(Document):
 	def before_save(self):
 		if not self.request_key:
 			self.request_key = random_string(32)

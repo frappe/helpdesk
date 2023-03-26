@@ -28,7 +28,7 @@ def signup(email, first_name, last_name):
 		).insert()
 
 		frappe.get_doc(
-			{"doctype": "Desk Account Request", "email": email, "user": user.name,}
+			{"doctype": "HD Desk Account Request", "email": email, "user": user.name,}
 		).insert()
 
 		frappe.set_user(current_user)
@@ -39,7 +39,7 @@ def signup(email, first_name, last_name):
 
 @frappe.whitelist(allow_guest=True)
 def verify_and_create_account(request_key, email, password):
-	account_request = frappe.get_doc("Desk Account Request", {"email": email})
+	account_request = frappe.get_doc("HD Desk Account Request", {"email": email})
 	if account_request:
 		if account_request.request_key == request_key:
 			current_user = frappe.session.user

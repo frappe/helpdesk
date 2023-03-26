@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestDeskAccountRequest(FrappeTestCase):
+class TestHDDeskAccountRequest(FrappeTestCase):
 	pass
