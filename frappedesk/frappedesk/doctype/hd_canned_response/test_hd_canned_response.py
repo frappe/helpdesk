@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestCannedResponse(FrappeTestCase):
+class TestHDCannedResponse(FrappeTestCase):
 	pass

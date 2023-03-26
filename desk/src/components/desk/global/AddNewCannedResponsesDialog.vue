@@ -164,7 +164,7 @@ export default {
 			}
 			this.$resources.newResponse.submit({
 				doc: {
-					doctype: "Canned Response",
+					doctype: "HD Canned Response",
 					...inputParams,
 				},
 			})

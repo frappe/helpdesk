@@ -115,7 +115,7 @@ export default {
 		cannedResponse() {
 			return {
 				type: "document",
-				doctype: "Canned Response",
+				doctype: "HD Canned Response",
 				name: this.canned_response,
 				setValue: {
 					onSuccess: () => {
