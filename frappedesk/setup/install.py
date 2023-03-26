@@ -117,11 +117,11 @@ def add_default_sla():
 	sla_doc.append("priorities", urgent_priority)
 
 	sla_fullfilled_on_resolved = frappe.get_doc(
-		{"doctype": "SLA Fulfilled On Status", "status": "Resolved"}
+		{"doctype": "HD Service Level Agreement Fulfilled On Status", "status": "Resolved"}
 	)
 
 	sla_fullfilled_on_closed = frappe.get_doc(
-		{"doctype": "SLA Fulfilled On Status", "status": "Closed"}
+		{"doctype": "HD Service Level Agreement Fulfilled On Status", "status": "Closed"}
 	)
 
 	sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_resolved)

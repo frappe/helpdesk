@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class SLAFulfilledOnStatus(Document):
+class HDServiceLevelAgreementFulfilledOnStatus(Document):
 	pass

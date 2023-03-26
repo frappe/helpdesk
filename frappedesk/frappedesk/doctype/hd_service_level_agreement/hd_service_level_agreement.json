@@ -159,7 +159,7 @@
    "fieldname": "sla_fulfilled_on",
    "fieldtype": "Table",
    "label": "SLA Fulfilled On",
-   "options": "SLA Fulfilled On Status",
+   "options": "HD Service Level Agreement Fulfilled On Status",
    "reqd": 1
   },
   {
@@ -193,7 +193,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-27 00:50:57.948460",
+ "modified": "2023-03-27 00:56:52.145431",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Service Level Agreement",
