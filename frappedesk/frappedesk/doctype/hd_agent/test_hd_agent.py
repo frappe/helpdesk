@@ -5,5 +5,5 @@
 import unittest
 
 
-class TestAgent(unittest.TestCase):
+class TestHDAgent(unittest.TestCase):
 	pass

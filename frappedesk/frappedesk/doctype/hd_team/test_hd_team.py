@@ -5,5 +5,5 @@
 import unittest
 
 
-class TestAgentGroup(unittest.TestCase):
+class TestHDTeam(unittest.TestCase):
 	pass

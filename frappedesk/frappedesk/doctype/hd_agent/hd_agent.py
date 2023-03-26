@@ -5,7 +5,7 @@ import frappe
 from frappe.model.document import Document
 
 
-class Agent(Document):
+class HDAgent(Document):
 	def before_save(self):
 		if self.name == self.user:
 			return
@@ -15,8 +15,10 @@ class Agent(Document):
 
 	def set_user_roles(self):
 		user = frappe.get_doc("User", self.user)
+
 		for role in ["Agent", "System Manager"]:
 			user.append("roles", {"role": role})
+
 		user.save()
 
 	def on_update(self):
@@ -31,10 +33,10 @@ class Agent(Document):
 			if previous:
 				for group in previous.groups:
 					if not next(
-						(g for g in self.groups if g.agent_group == group.agent_group),
+						(g for g in self.groups if g.hd_agent_group == group.hd_agent_group),
 						None,
 					):
-						self.remove_from_support_rotations(group.agent_group)
+						self.remove_from_support_rotations(group.hd_agent_group)
 
 			self.add_to_support_rotations()
 
@@ -43,15 +45,15 @@ class Agent(Document):
 
 	def add_to_support_rotations(self, group=None):
 		"""
-		Add the agent to the support rotation for the given group or all groups
-		the agent belongs to if agent already added to the support roatation
+		Add the hd_agent to the support rotation for the given group or all groups
+		the hd_agent belongs to if hd_agent already added to the support roatation
 		for a group, skip
 
-		:param str group: Agent Group name, defaults to None.
+		:param str group: Team name, defaults to None.
 		"""
 		rule_docs = []
 		if not group:
-			# Add the agent to the base support rotation
+			# Add the hd_agent to the base support rotation
 
 			rule_docs.append(
 				frappe.get_doc(
@@ -60,24 +62,24 @@ class Agent(Document):
 				)
 			)
 
-			# Add the agent to the support rotation for each group they belong to
+			# Add the hd_agent to the support rotation for each group they belong to
 			if self.groups:
 				for group in self.groups:
 					try:
-						agent_group_assignment_rule = frappe.get_doc(
-							"Agent Group", group.agent_group
+						hd_agent_group_assignment_rule = frappe.get_doc(
+							"HD Team", group.hd_agent_group
 						).get_assignment_rule()
 						rule_docs.append(
 							frappe.get_doc(
 								"Assignment Rule",
-								agent_group_assignment_rule,
+								hd_agent_group_assignment_rule,
 							)
 						)
 					except frappe.DoesNotExistError:
 						frappe.throw(
 							frappe._(
-								"Assignment Rule for Agent Group {0} does not exist"
-							).format(group.agent_group)
+								"Assignment Rule for HD Team {0} does not exist"
+							).format(group.hd_agent_group)
 						)
 		else:
 			# check if the group is in self.groups
@@ -87,14 +89,14 @@ class Agent(Document):
 				rule_docs.append(
 					frappe.get_doc(
 						"Assignment Rule",
-						frappe.get_doc("Agent Group", group).get_assignment_rule(),
+						frappe.get_doc("HD Team", group).get_assignment_rule(),
 					)
 				)
 			else:
 				frappe.throw(
 					frappe._(
-						"Agent {0} does not belong to group {1}".format(
-							self.agent_name, group
+						"Agent {0} does not belong to team {1}".format(
+							self.hd_agent_name, group
 						)
 					)
 				)
@@ -123,16 +125,16 @@ class Agent(Document):
 		rule_docs = []
 
 		if group:
-			# remove the agent from the support rotation for the given group
+			# remove the hd_agent from the support rotation for the given group
 			rule_docs.append(
 				frappe.get_doc(
 					"Assignment Rule",
-					frappe.get_doc("Agent Group", group).get_assignment_rule(),
+					frappe.get_doc("HD Team", group).get_assignment_rule(),
 				)
 			)
 
 		else:
-			# Remove the agent from the base support rotation
+			# Remove the hd_agent from the base support rotation
 			rule_docs.append(
 				frappe.get_doc(
 					"Assignment Rule",
@@ -140,13 +142,13 @@ class Agent(Document):
 				)
 			)
 
-			# Remove the agent from the support rotation for each group they belong to
+			# Remove the hd_agent from the support rotation for each group they belong to
 			for group in self.groups:
 				rule_docs.append(
 					frappe.get_doc(
 						"Assignment Rule",
 						frappe.get_doc(
-							"Agent Group", group.agent_group
+							"HD Team", group.hd_agent_group
 						).get_assignment_rule(),
 					)
 				)
@@ -164,15 +166,16 @@ class Agent(Document):
 
 	def in_group(self, group):
 		"""
-		Check if the agent is in the given group
+		Check if agent is in the given group
 		"""
 		if self.groups:
-			return next((g for g in self.groups if g.agent_group == group), False)
+			return next((g for g in self.groups if g.hd_agent_group == group), False)
+
 		return False
 
 
 @frappe.whitelist()
-def create_agent(first_name, last_name, email, signature, team):
+def create_hd_agent(first_name, last_name, email, signature, team):
 	if frappe.db.exists("User", email):
 		user = frappe.get_doc("User", email)
 	else:
@@ -189,5 +192,5 @@ def create_agent(first_name, last_name, email, signature, team):
 		user.send_welcome_mail_to_user()
 
 	return frappe.get_doc(
-		{"doctype": "Agent", "user": user.name, "group": team}
+		{"doctype": "HD Agent", "user": user.name, "group": team}
 	).insert()
