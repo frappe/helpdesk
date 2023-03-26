@@ -21,12 +21,12 @@
    "fieldname": "contacts",
    "fieldtype": "Table",
    "label": "Contacts",
-   "options": "Organization Contact Item"
+   "options": "HD Organization Contact Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-23 10:32:48.584245",
+ "modified": "2023-03-26 23:31:13.325932",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Organization",
