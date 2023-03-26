@@ -393,7 +393,7 @@ export default {
 		customer() {
 			return {
 				type: "document",
-				doctype: "FD Customer",
+				doctype: "HD Customer",
 				name: this.customer,
 				setValue: {
 					onSuccess() {
@@ -460,7 +460,7 @@ export default {
 				})
 				if (this.values.customerName !== this.customer) {
 					this.$resources.renameCustomerDoc.submit({
-						doctype: "FD Customer",
+						doctype: "HD Customer",
 						old_name: this.customer,
 						new_name: this.values.customerName,
 					})

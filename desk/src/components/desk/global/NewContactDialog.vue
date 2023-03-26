@@ -61,7 +61,7 @@
 								url: 'frappedesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
-										doctype: 'FD Customer',
+										doctype: 'HD Customer',
 										pluck: 'name',
 										filters: [
 											['name', 'like', `%${query}%`],
@@ -179,7 +179,7 @@ export default {
 			return {
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "FD Customer",
+					doctype: "HD Customer",
 					fields: ["name", "customer_name"],
 				},
 				auto: true,
@@ -204,7 +204,7 @@ export default {
 				email_ids: [{ email_id: this.emailId, is_primary: true }],
 				links: [
 					{
-						link_doctype: "FD Customer",
+						link_doctype: "HD Customer",
 						link_name:
 							this.fdCustomer != null
 								? this.fdCustomer

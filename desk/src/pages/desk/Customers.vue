@@ -3,8 +3,8 @@
 		<ListManager
 			ref="fdCustomerList"
 			:options="{
-				cache: ['FD Customer', 'Desk'],
-				doctype: 'FD Customer',
+				cache: ['HD Customer', 'Desk'],
+				doctype: 'HD Customer',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: [

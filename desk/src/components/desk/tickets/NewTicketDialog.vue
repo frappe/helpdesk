@@ -93,7 +93,7 @@
 								url: 'frappedesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
-										doctype: 'FD Customer',
+										doctype: 'HD Customer',
 										pluck: 'name',
 										filters: [['name', 'like', `%${query}%`]],
 									};

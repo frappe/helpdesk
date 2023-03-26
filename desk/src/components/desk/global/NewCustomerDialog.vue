@@ -85,7 +85,7 @@ export default {
 			}
 			this.$resources.newCustomer.submit({
 				doc: {
-					doctype: "FD Customer",
+					doctype: "HD Customer",
 					...inputParams,
 				},
 			})
