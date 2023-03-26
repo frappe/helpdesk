@@ -7,7 +7,7 @@ from frappe import _
 from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 
 
-class TicketCustomFieldsConfig(Document):
+class HDTicketCustomFieldConfig(Document):
 	def get_field_info(self, fieldname):
 		custom_field_item = next(
 			(

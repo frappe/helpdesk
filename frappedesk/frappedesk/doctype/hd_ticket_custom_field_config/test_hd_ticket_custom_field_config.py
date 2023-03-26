@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestTicketCustomFieldsConfig(FrappeTestCase):
+class TestHDTicketCustomFieldConfig(FrappeTestCase):
 	pass
