@@ -1,9 +1,9 @@
-# Copyright (c) 2023, Frappe Technologies and Contributors
+# Copyright (c) 2021, Frappe Technologies and Contributors
 # See license.txt
 
 # import frappe
-from frappe.tests.utils import FrappeTestCase
+import unittest
 
 
-class TestHDArticleCategory(FrappeTestCase):
+class TestHDArticleCategory(unittest.TestCase):
 	pass
