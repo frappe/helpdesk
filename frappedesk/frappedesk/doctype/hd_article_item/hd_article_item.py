@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class ArticleItem(Document):
+class HDArticleItem(Document):
 	pass
