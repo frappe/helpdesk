@@ -109,10 +109,9 @@ def save_filter_preset(doctype, is_global, title, filters):
 
 	fd_preset_filter_items = []
 	for filter in filters:
-		print(f"label : {filter['label']}")
 		fd_preset_filter_items.append(
 			{
-				"doctype": "FD Preset Filter Item",
+				"doctype": "HD Preset Filter Item",
 				"label": filter["label"],
 				"fieldname": filter["fieldname"],
 				"filter_type": filter["filter_type"],

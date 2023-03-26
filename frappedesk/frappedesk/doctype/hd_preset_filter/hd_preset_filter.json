@@ -58,12 +58,12 @@
    "fieldname": "filters",
    "fieldtype": "Table",
    "label": "Filters",
-   "options": "FD Preset Filter Item"
+   "options": "HD Preset Filter Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-20 21:04:17.919275",
+ "modified": "2023-03-26 23:34:29.849463",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Preset Filter",
