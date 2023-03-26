@@ -115,7 +115,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Priority",
-   "options": "Ticket Priority"
+   "options": "HD Ticket Priority"
   },
   {
    "fieldname": "ticket_type",
@@ -442,7 +442,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-26 22:24:11.815392",
+ "modified": "2023-03-26 22:41:30.298874",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "Ticket",
