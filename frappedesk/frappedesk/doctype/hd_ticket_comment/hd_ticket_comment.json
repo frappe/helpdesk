@@ -1,61 +1,48 @@
 {
  "actions": [],
- "allow_rename": 1,
- "creation": "2022-08-26 15:28:06.041322",
+ "autoname": "format:COM-{reference_ticket}-{#######}",
+ "creation": "2022-08-25 23:50:58.598316",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "from_user",
-  "to_user",
-  "type",
-  "message",
-  "ticket",
-  "comment"
+  "reference_ticket",
+  "commented_by",
+  "column_break_3",
+  "content"
  ],
  "fields": [
   {
-   "fieldname": "from_user",
-   "fieldtype": "Link",
-   "label": "From User",
-   "options": "User"
-  },
-  {
-   "fieldname": "to_user",
-   "fieldtype": "Link",
-   "label": "To User",
-   "options": "User"
-  },
-  {
-   "fieldname": "type",
-   "fieldtype": "Select",
-   "label": "Type",
-   "options": "Mention\nAssignment"
-  },
-  {
-   "fieldname": "message",
+   "fieldname": "content",
    "fieldtype": "Text",
-   "label": "Message"
+   "label": "Content"
   },
   {
-   "fieldname": "ticket",
+   "fieldname": "reference_ticket",
    "fieldtype": "Link",
-   "label": "Ticket",
+   "in_list_view": 1,
+   "label": "Reference Ticket",
    "options": "Ticket"
   },
   {
-   "fieldname": "comment",
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "commented_by",
    "fieldtype": "Link",
-   "label": "Comment",
-   "options": "HD Ticket Comment"
+   "in_list_view": 1,
+   "label": "Commented By",
+   "options": "User"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:22:22.460427",
+ "modified": "2022-08-26 21:25:20.467433",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
- "name": "Frappe Desk Notification",
+ "name": "HD Ticket Comment",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

@@ -469,7 +469,7 @@ class Ticket(Document):
 		self.add_seen()
 
 	def get_comment_count(self):
-		QBComment = DocType("Frappe Desk Comment")
+		QBComment = DocType("HD Ticket Comment")
 
 		count = Count("*").as_("count")
 		res = (

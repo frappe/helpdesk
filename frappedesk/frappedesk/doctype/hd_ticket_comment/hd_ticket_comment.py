@@ -7,7 +7,7 @@ from frappedesk.utils import extract_mentions
 from frappe.utils import get_fullname
 
 
-class FrappeDeskComment(Document):
+class HDTicketComment(Document):
 	def on_change(self):
 		mentions = extract_mentions(self.content)
 

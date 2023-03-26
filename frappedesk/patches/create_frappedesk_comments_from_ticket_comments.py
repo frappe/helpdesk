@@ -10,7 +10,7 @@ def execute():
 	for ticket_comment in all_ticket_comments:
 		frappe.get_doc(
 			{
-				"doctype": "Frappe Desk Comment",
+				"doctype": "HD Ticket Comment",
 				"reference_ticket": ticket_comment.reference_name,
 				"content": ticket_comment.content,
 				"commented_by": ticket_comment.comment_email,
