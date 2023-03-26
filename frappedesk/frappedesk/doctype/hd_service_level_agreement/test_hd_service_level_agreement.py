@@ -6,5 +6,5 @@ from __future__ import unicode_literals
 import unittest
 
 
-class TestSLA(unittest.TestCase):
+class TestHDServiceLevelAgreement(unittest.TestCase):
 	pass

@@ -820,7 +820,7 @@ def calculate_first_response_time(ticket, first_responded_on):
 	ticket_creation_date = ticket.creation
 	ticket_creation_time = get_time_in_seconds(ticket_creation_date)
 	first_responded_on_in_seconds = get_time_in_seconds(first_responded_on)
-	support_hours = frappe.get_cached_doc("SLA", ticket.sla).support_and_resolution
+	support_hours = frappe.get_cached_doc("HD Service Level Agreement", ticket.sla).support_and_resolution
 
 	if ticket_creation_date.day == first_responded_on.day:
 		if is_work_day(ticket_creation_date, support_hours):

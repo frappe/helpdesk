@@ -60,7 +60,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 		c_name = "0"
 
 	priorities = ["Low", "Medium", "High", "Urgent"]
-	sla_doc = frappe.get_doc("SLA", sla)
+	sla_doc = frappe.get_doc("HD Service Level Agreement", sla)
 	creation_time = datetime.datetime.now()
 
 	for priority in priorities:

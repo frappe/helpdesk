@@ -174,7 +174,7 @@
    "fieldname": "sla",
    "fieldtype": "Link",
    "label": "SLA",
-   "options": "SLA"
+   "options": "HD Service Level Agreement"
   },
   {
    "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
@@ -442,7 +442,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-27 00:13:50.810961",
+ "modified": "2023-03-27 00:18:39.881702",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket",

@@ -64,7 +64,7 @@ def add_default_sla():
 	add_default_holidy_list()
 	enable_track_service_level_agreement_in_support_settings()
 
-	sla_doc = frappe.new_doc("SLA")
+	sla_doc = frappe.new_doc("HD Service Level Agreement")
 
 	sla_doc.service_level = "Default"
 	sla_doc.document_type = "Ticket"

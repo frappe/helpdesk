@@ -339,7 +339,7 @@ export default {
 			return {
 				url: "frappe.client.get",
 				params: {
-					doctype: "SLA",
+					doctype: "HD Service Level Agreement",
 					name: this.slaId,
 					fields: ["*"],
 				},
@@ -573,7 +573,7 @@ export default {
 			if (this.validateInputs()) {
 				this.$resources.createNewServicePolicy.submit({
 					doc: {
-						doctype: "SLA",
+						doctype: "HD Service Level Agreement",
 						service_level: this.tempSlaPolicyName,
 						priorities: this.priorities,
 						support_and_resolution: this.supportAndResolution,
@@ -593,7 +593,7 @@ export default {
 			if (this.validateInputs()) {
 				this.$resources.updateServicePolicy
 					.submit({
-						doctype: "SLA",
+						doctype: "HD Service Level Agreement",
 						name: this.slaPolicyName,
 						fieldname: {
 							priorities: this.priorities,

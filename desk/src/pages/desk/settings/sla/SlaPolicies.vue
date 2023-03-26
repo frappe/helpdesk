@@ -4,7 +4,7 @@
 			ref="policyList"
 			:options="{
 				cache: ['SLA', 'Settings'],
-				doctype: 'SLA',
+				doctype: 'HD Service Level Agreement',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['name', 'default_sla', 'enabled'],
