@@ -73,7 +73,7 @@ def add_default_sla():
 
 	low_priority = frappe.get_doc(
 		{
-			"doctype": "Service Level Priority",
+			"doctype": "HD Service Level Priority",
 			"default_priority": 0,
 			"priority": "Low",
 			"response_time": 60 * 60 * 24,
@@ -83,7 +83,7 @@ def add_default_sla():
 
 	medium_priority = frappe.get_doc(
 		{
-			"doctype": "Service Level Priority",
+			"doctype": "HD Service Level Priority",
 			"default_priority": 1,
 			"priority": "Medium",
 			"response_time": 60 * 60 * 8,
@@ -93,7 +93,7 @@ def add_default_sla():
 
 	high_priority = frappe.get_doc(
 		{
-			"doctype": "Service Level Priority",
+			"doctype": "HD Service Level Priority",
 			"default_priority": 0,
 			"priority": "High",
 			"response_time": 60 * 60 * 1,
@@ -103,7 +103,7 @@ def add_default_sla():
 
 	urgent_priority = frappe.get_doc(
 		{
-			"doctype": "Service Level Priority",
+			"doctype": "HD Service Level Priority",
 			"default_priority": 0,
 			"priority": "Urgent",
 			"response_time": 60 * 30,

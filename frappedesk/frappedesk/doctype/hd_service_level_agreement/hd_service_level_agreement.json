@@ -96,7 +96,7 @@
    "fieldname": "priorities",
    "fieldtype": "Table",
    "label": "Priorities",
-   "options": "Service Level Priority",
+   "options": "HD Service Level Priority",
    "reqd": 1
   },
   {
@@ -193,7 +193,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-26 23:19:53.163761",
+ "modified": "2023-03-27 00:45:24.452405",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Service Level Agreement",

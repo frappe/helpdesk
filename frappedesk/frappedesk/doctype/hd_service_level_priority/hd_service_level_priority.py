@@ -8,5 +8,5 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 
 
-class ServiceLevelPriority(Document):
+class HDServiceLevelPriority(Document):
 	pass

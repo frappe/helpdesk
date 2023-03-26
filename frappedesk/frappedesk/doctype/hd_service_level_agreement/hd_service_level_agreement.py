@@ -162,7 +162,7 @@ class HDServiceLevelAgreement(Document):
 
 	def get_hd_service_level_agreement_priority(self, priority):
 		priority = frappe.get_doc(
-			"Service Level Priority", {"priority": priority, "parent": self.name}
+			"HD Service Level Priority", {"priority": priority, "parent": self.name}
 		)
 
 		return frappe._dict(
@@ -290,7 +290,7 @@ def get_active_hd_service_level_agreement_for(doc):
 	]
 
 	if doc.get("priority"):
-		filters.append(["Service Level Priority", "priority", "=", doc.get("priority")])
+		filters.append(["HD Service Level Priority", "priority", "=", doc.get("priority")])
 
 	default_hd_service_level_agreement_filter = filters + [["HD Service Level Agreement", "default_hd_service_level_agreement", "=", 1]]
 	default_hd_service_level_agreement = frappe.get_all(
@@ -347,7 +347,7 @@ def get_hd_service_level_agreement_filters(doctype, name):
 		"priority": [
 			priority.priority
 			for priority in frappe.get_all(
-				"Service Level Priority", filters={"parent": name}, fields=["priority"]
+				"HD Service Level Priority", filters={"parent": name}, fields=["priority"]
 			)
 		],
 		"hd_service_level_agreements": [
