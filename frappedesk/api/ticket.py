@@ -2,7 +2,7 @@ import json
 import frappe
 
 from frappe.website.utils import cleanup_page_name
-from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
+from frappedesk.frappedesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
 from frappedesk.frappedesk.doctype.ticket.ticket import (

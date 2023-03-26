@@ -21,7 +21,7 @@ from frappe.query_builder.functions import Count
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
-from frappedesk.frappedesk.doctype.ticket_activity.ticket_activity import (
+from frappedesk.frappedesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
 from frappedesk.frappedesk.utils.email import (
