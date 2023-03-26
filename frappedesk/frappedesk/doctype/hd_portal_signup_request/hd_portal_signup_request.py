@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class PortalSignupRequest(Document):
+class HDPortalSignupRequest(Document):
 	pass
