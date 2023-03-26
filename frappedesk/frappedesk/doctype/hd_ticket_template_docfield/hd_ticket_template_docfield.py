@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class TicketTemplateDocField(Document):
+class HDTicketTemplateDocField(Document):
 	pass

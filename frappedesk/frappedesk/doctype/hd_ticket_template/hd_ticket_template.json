@@ -35,12 +35,12 @@
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Custom Fields",
-   "options": "Ticket Template DocField"
+   "options": "HD Ticket Template DocField"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-11-23 00:32:50.624292",
+ "modified": "2023-03-27 00:28:50.972089",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Ticket Template",
