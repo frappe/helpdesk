@@ -40,7 +40,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Category",
-   "options": "Category"
+   "options": "HD Article Category"
   },
   {
    "default": "0",
@@ -133,7 +133,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-08 21:15:00.885136",
+ "modified": "2023-03-26 23:11:22.834046",
  "modified_by": "Administrator",
  "module": "FrappeDesk",
  "name": "HD Article",
