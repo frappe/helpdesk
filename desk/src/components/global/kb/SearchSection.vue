@@ -145,7 +145,7 @@ export default {
 	},
 	resources: {
 		searchResults: {
-			url: "frappedesk.api.kb.search",
+			url: "helpdesk.api.kb.search",
 		},
 	},
 }

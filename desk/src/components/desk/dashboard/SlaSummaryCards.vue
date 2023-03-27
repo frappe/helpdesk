@@ -55,19 +55,19 @@ export default {
 	resources: {
 		averageFirstResponseTime() {
 			return {
-				url: "frappedesk.api.dashboard.average_first_response_time",
+				url: "helpdesk.api.dashboard.average_first_response_time",
 				auto: true,
 			}
 		},
 		averageResolutionTime() {
 			return {
-				url: "frappedesk.api.dashboard.average_resolution_time",
+				url: "helpdesk.api.dashboard.average_resolution_time",
 				auto: true,
 			}
 		},
 		resolutionWithinSla() {
 			return {
-				url: "frappedesk.api.dashboard.resolution_within_sla",
+				url: "helpdesk.api.dashboard.resolution_within_sla",
 				auto: true,
 			}
 		},

@@ -117,7 +117,7 @@ export default {
 		},
 		bulk_delete_agents() {
 			return {
-				url: "frappedesk.api.doc.delete_items",
+				url: "helpdesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
 					// this.$refs.listManager.manager.reload()

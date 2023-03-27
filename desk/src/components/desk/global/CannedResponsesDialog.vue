@@ -120,7 +120,7 @@ export default {
 	resources: {
 		list() {
 			return {
-				url: "frappedesk.api.cannedResponse.get_canned_response",
+				url: "helpdesk.api.cannedResponse.get_canned_response",
 				onSuccess(val) {
 					this.cannedResponses = val
 					return this.cannedResponses

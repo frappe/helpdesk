@@ -1545,12 +1545,12 @@ export default {
 	resources: {
 		brandHtml() {
 			return {
-				url: "frappedesk.api.website.brand_html",
+				url: "helpdesk.api.website.brand_html",
 			}
 		},
 		helpdeskName() {
 			return {
-				url: "frappedesk.api.website.helpdesk_name",
+				url: "helpdesk.api.website.helpdesk_name",
 			}
 		},
 	},

@@ -39,7 +39,7 @@ export default {
 		activities() {
 			return {
 				cache: ["Activities", "Info Panel", this.ticketId],
-				url: "frappedesk.api.ticket.activities",
+				url: "helpdesk.api.ticket.activities",
 				params: {
 					name: this.ticketId,
 				},

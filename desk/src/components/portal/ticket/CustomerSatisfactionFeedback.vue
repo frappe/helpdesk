@@ -130,7 +130,7 @@ export default {
 	resources: {
 		submitFeedback() {
 			return {
-				url: "frappedesk.api.ticket.submit_customer_feedback",
+				url: "helpdesk.api.ticket.submit_customer_feedback",
 				onSuccess() {
 					this.submitted = true
 				},

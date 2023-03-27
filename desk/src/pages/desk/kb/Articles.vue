@@ -198,17 +198,17 @@ export default {
 	resources: {
 		moveArticlesToCategory() {
 			return {
-				url: "frappedesk.api.kb.move_articles_to_category",
+				url: "helpdesk.api.kb.move_articles_to_category",
 			}
 		},
 		setStatusForArticles() {
 			return {
-				url: "frappedesk.api.kb.set_status_for_articles",
+				url: "helpdesk.api.kb.set_status_for_articles",
 			}
 		},
 		deleteArticles() {
 			return {
-				url: "frappedesk.api.kb.delete_articles",
+				url: "helpdesk.api.kb.delete_articles",
 			}
 		},
 		knowledgeBase() {

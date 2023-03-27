@@ -236,7 +236,7 @@ export default {
 	},
 	resources: {
 		incrementArtileViews: {
-			url: "frappedesk.api.kb.increment_article_views",
+			url: "helpdesk.api.kb.increment_article_views",
 		},
 		article() {
 			if (!this.isNew) {
@@ -265,7 +265,7 @@ export default {
 					};
 				} else {
 					return {
-						url: "frappedesk.api.kb.get_article",
+						url: "helpdesk.api.kb.get_article",
 						params: {
 							article: this.articleId,
 						},
@@ -294,7 +294,7 @@ export default {
 		},
 		checkIfTitleExists() {
 			return {
-				url: "frappedesk.api.kb.check_if_article_title_exists",
+				url: "helpdesk.api.kb.check_if_article_title_exists",
 				onSuccess: (exists) => {
 					if (exists) {
 						this.articleInputErrors.title =

@@ -471,7 +471,7 @@ export default {
 		},
 		sentInvites() {
 			return {
-				url: "frappedesk.api.agent.sent_invites",
+				url: "helpdesk.api.agent.sent_invites",
 				onSuccess: () => {
 					this.$event.emit("sent-invites-success");
 				},

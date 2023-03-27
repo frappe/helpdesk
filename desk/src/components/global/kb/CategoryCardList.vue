@@ -225,7 +225,7 @@ export default {
 			const order_by = "idx"
 			return {
 				cache,
-				url: "frappedesk.api.kb.get_categories",
+				url: "helpdesk.api.kb.get_categories",
 				params: {
 					filters,
 					fields,
@@ -237,7 +237,7 @@ export default {
 		},
 		saveCategories() {
 			return {
-				url: "frappedesk.api.kb.insert_new_update_existing_categories",
+				url: "helpdesk.api.kb.insert_new_update_existing_categories",
 				onSuccess: () => {
 					this.$resources.categories.reload()
 

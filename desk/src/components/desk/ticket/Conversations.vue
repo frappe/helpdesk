@@ -66,7 +66,7 @@ export default {
 		communications() {
 			return {
 				cache: ["HD Ticket", "Conversations", this.ticketId],
-				url: "frappedesk.api.ticket.get_conversations",
+				url: "helpdesk.api.ticket.get_conversations",
 				params: {
 					ticket_id: this.ticketId,
 				},

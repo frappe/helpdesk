@@ -418,7 +418,7 @@ export default {
 		},
 		contact() {
 			return {
-				url: "frappedesk.api.fdCustomer.get_contact",
+				url: "helpdesk.api.fdCustomer.get_contact",
 				params: {
 					doctype: "Contact",
 					link_name: this.customer,

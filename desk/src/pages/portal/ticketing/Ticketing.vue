@@ -104,7 +104,7 @@ export default {
 		},
 		ticket() {
 			return {
-				url: "frappedesk.api.ticket.get_ticket",
+				url: "helpdesk.api.ticket.get_ticket",
 				onSuccess: (ticket) => {
 					this.tickets[ticket.name] = ticket
 				},
@@ -112,7 +112,7 @@ export default {
 		},
 		templates() {
 			return {
-				url: "frappedesk.api.ticket.get_all_ticket_templates",
+				url: "helpdesk.api.ticket.get_all_ticket_templates",
 				auto: this.authStore.isLoggedIn,
 				onSuccess: (data) => {
 					this.ticketTemplates = data
@@ -121,7 +121,7 @@ export default {
 		},
 		assignTicketStatus() {
 			return {
-				url: "frappedesk.api.ticket.assign_ticket_status",
+				url: "helpdesk.api.ticket.assign_ticket_status",
 				onSuccess: (ticket) => {
 					this.ticketController.update(ticket.name)
 				},
@@ -129,7 +129,7 @@ export default {
 		},
 		createTicket() {
 			return {
-				url: "frappedesk.api.ticket.create_new",
+				url: "helpdesk.api.ticket.create_new",
 				onSuccess: (ticket) => {
 					this.ticketController.update()
 					this.$router.push({

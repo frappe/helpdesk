@@ -138,7 +138,7 @@ export default {
 	resources: {
 		dataType() {
 			return {
-				url: "frappedesk.api.general.get_field_data_type",
+				url: "helpdesk.api.general.get_field_data_type",
 				params: {
 					doctype: this.manager.options.doctype,
 					fieldname: this.filter.fieldname,
@@ -148,7 +148,7 @@ export default {
 		},
 		selectOptionsForField() {
 			return {
-				url: "frappedesk.api.general.get_select_options_for_field",
+				url: "helpdesk.api.general.get_select_options_for_field",
 			}
 		},
 	},
@@ -197,7 +197,7 @@ export default {
 					}
 				case "Select":
 					return {
-						url: "frappedesk.api.general.get_filtered_select_field_options",
+						url: "helpdesk.api.general.get_filtered_select_field_options",
 						inputMap: (query) => {
 							return {
 								doctype: this.manager.options.doctype,

@@ -48,7 +48,7 @@ export default {
 	resources: {
 		helpdeskName() {
 			return {
-				url: "frappedesk.api.website.helpdesk_name",
+				url: "helpdesk.api.website.helpdesk_name",
 				auto: true,
 				onSuccess: (res) => {
 					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
