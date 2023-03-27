@@ -124,7 +124,7 @@ export default {
 	data() {
 		return {
 			autoCompleteOptions: {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				inputMap: (query) => {
 					return {
 						doctype: "HD Agent",

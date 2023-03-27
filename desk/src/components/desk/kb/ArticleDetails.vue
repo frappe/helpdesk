@@ -121,7 +121,7 @@ export default {
 	resources: {
 		users() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "User",
 					fields: ["name", "full_name"],

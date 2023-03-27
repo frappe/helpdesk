@@ -76,7 +76,7 @@ export default {
 		comments() {
 			return {
 				cache: ["HD Ticket", "Comments", this.ticketId],
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "HD Ticket Comment",
 					fields: ["*"],

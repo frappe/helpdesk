@@ -427,7 +427,7 @@ export default {
 		},
 		getServiceHolidayList() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "HD Service Holiday List",
 					fields: ["*"],

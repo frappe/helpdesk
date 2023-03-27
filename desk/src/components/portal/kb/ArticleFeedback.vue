@@ -98,7 +98,7 @@ export default {
 				return
 			}
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "User Article Feedback",
 					filters: {

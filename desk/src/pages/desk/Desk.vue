@@ -421,7 +421,7 @@ export default {
 		},
 		types() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "HD Ticket Type",
 					pluck: "name",
@@ -437,7 +437,7 @@ export default {
 		},
 		priorities() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "HD Ticket Priority",
 				},
@@ -464,7 +464,7 @@ export default {
 		},
 		contacts() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "Contact",
 					fields: ["*"],
@@ -481,7 +481,7 @@ export default {
 		},
 		agents() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "HD Agent",
 					fields: ["name", "agent_name", "user_image"],
@@ -497,7 +497,7 @@ export default {
 		},
 		agentGroups() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "HD Team",
 				},

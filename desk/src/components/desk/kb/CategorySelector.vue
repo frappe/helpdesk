@@ -162,7 +162,7 @@ export default {
 	resources: {
 		categoriesInCurrentLevel() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 			}
 		},
 		selectedCategory() {

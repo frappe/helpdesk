@@ -205,7 +205,7 @@ export default {
 						}
 					}
 					return {
-						url: "frappedesk.extends.client.get_list",
+						url: "helpdesk.extends.client.get_list",
 						inputMap: (query) => {
 							const filters = [
 								...baseFilters,

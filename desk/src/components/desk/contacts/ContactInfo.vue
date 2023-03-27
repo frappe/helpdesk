@@ -125,7 +125,7 @@
 							}
 						"
 						:resourceOptions="{
-							url: 'frappedesk.extends.client.get_list',
+							url: 'helpdesk.extends.client.get_list',
 							inputMap: (query) => {
 								return {
 									doctype: 'HD Customer',
