@@ -91,7 +91,7 @@ export default {
 	resources: {
 		tickets() {
 			return {
-				url: "frappedesk.frappedesk.doctype.hd_ticket.hd_ticket.get_user_tickets",
+				url: "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.get_user_tickets",
 				auto:
 					this.authStore.isLoggedIn && this.$route.name != "Impersonate",
 				onSuccess: (data) => {

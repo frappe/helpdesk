@@ -3,8 +3,8 @@ import { createListResource, createResource } from "frappe-ui";
 import { useListFilters } from "./listFilters";
 import { isEmpty } from "lodash";
 
-const GET_LIST_METHOD = "frappedesk.extends.client.get_list";
-const GET_LIST_META_METHOD = "frappedesk.extends.client.get_list_meta";
+const GET_LIST_METHOD = "helpdesk.extends.client.get_list";
+const GET_LIST_META_METHOD = "helpdesk.extends.client.get_list_meta";
 
 type ListOptions = {
 	doctype: string;
