@@ -513,7 +513,7 @@ def get_hold_statuses(hd_service_level_agreement):
 	return [
 		entry.status
 		for entry in frappe.db.get_all(
-			"Pause HD Service Level Agreement On Status", filters={"parent": hd_service_level_agreement}, fields=["status"]
+			"HD Pause Service Level Agreement On Status", filters={"parent": hd_service_level_agreement}, fields=["status"]
 		)
 	]
 

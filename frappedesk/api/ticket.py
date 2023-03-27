@@ -11,7 +11,9 @@ from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import (
 )
 from frappe.utils import datetime
 
-from frappedesk.frappedesk.doctype.hd_service_level_agreement.hd_service_level_agreement import get_expected_time_for
+from frappedesk.frappedesk.doctype.hd_service_level_agreement.hd_service_level_agreement import (
+	get_expected_time_for,
+)
 from frappe.automation.doctype.assignment_rule.assignment_rule import apply
 from frappe.contacts.doctype.contact.contact import get_contact_name
 
@@ -30,9 +32,9 @@ def bulk_insert_tickets(tickets, sla="Default"):
 	resolution_by_wrt_priority = {}
 	response_by_wrt_priority = {}
 
-	if frappe.db.count("Ticket") >= 1:
+	if frappe.db.count("HD Ticket") >= 1:
 		ticket_doc = frappe.get_all(
-			"Ticket",
+			"HD Ticket",
 			fields=["name", "idx"],
 			order_by="idx desc",
 			limit_start=0,
@@ -107,7 +109,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 			ticket[2],  # sender
 			ticket[1],  # content
 			"Linked",
-			"Ticket",
+			"HD Ticket",
 			t_name,
 			creation_time,
 			creation_time,
@@ -115,7 +117,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 		communications.append(communication)
 
 	frappe.db.bulk_insert(
-		"Ticket",
+		"HD Ticket",
 		[
 			"subject",
 			"description",
@@ -160,7 +162,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 
 	bulk_create_contacts_and_assignments_for_tickets(tickets)
 	# ticket_names = [ticket[7] for ticket in tickets]
-	# bulk_apply("Ticket", ticket_names)
+	# bulk_apply("HD Ticket", ticket_names)
 
 
 def bulk_create_contacts_and_assignments_for_tickets(tickets):
@@ -168,7 +170,8 @@ def bulk_create_contacts_and_assignments_for_tickets(tickets):
 	for ticket in tickets:
 		if background:
 			frappe.enqueue(
-				"frappedesk.api.ticket.create_contacts_and_assignments_for_tickets", ticket=ticket,
+				"frappedesk.api.ticket.create_contacts_and_assignments_for_tickets",
+				ticket=ticket,
 			)
 		else:
 			create_contacts_and_assignments_for_tickets(ticket)
@@ -183,7 +186,9 @@ def create_contacts_and_assignments_for_tickets(ticket):
 
 		try:
 			contact_name = (
-				f"{first_name}-{email_parts[1]}" if first_name == "Contact" else first_name
+				f"{first_name}-{email_parts[1]}"
+				if first_name == "Contact"
+				else first_name
 			)
 			contact = frappe.get_doc(
 				{"doctype": "Contact", "first_name": contact_name, "name": contact_name}
@@ -194,13 +199,13 @@ def create_contacts_and_assignments_for_tickets(ticket):
 		except Exception:
 			contact.log_error("Unable to add contact")
 
-	frappe.db.set_value("Ticket", ticket[7], "contact", contact_name)
-	apply(doctype="Ticket", name=ticket[7])
+	frappe.db.set_value("HD Ticket", ticket[7], "contact", contact_name)
+	apply(doctype="HD Ticket", name=ticket[7])
 
 
 @frappe.whitelist()
 def get_ticket(ticket_id):
-	ticket_doc = frappe.get_doc("Ticket", ticket_id)
+	ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 	ticket_doc = ticket_doc.__dict__
 	ticket_doc["assignees"] = get_agent_assigned_to_ticket(ticket_id)
 	ticket_doc["contact"] = get_contact(ticket_id)
@@ -210,7 +215,7 @@ def get_ticket(ticket_id):
 
 @frappe.whitelist()
 def create_new(values, template="Default", attachments=[], via_customer_portal=False):
-	ticket_doc = frappe.new_doc("Ticket")
+	ticket_doc = frappe.new_doc("HD Ticket")
 	ticket_doc.via_customer_portal = via_customer_portal
 	ticket_doc.ticket_type = values.get("ticket_type")
 
@@ -226,7 +231,9 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 		ticket_doc.contact = contact_doc.name
 
 	if via_customer_portal:
-		if not frappe.db.exists({"doctype": "Contact", "email_id": frappe.session.user}):
+		if not frappe.db.exists(
+			{"doctype": "Contact", "email_id": frappe.session.user}
+		):
 			user_doc = frappe.get_doc("User", frappe.session.user)
 			new_contact_doc = frappe.get_doc(
 				doctype="Contact",
@@ -236,7 +243,9 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 				last_name=user_doc.last_name,
 				user=user_doc.name,
 			)
-			new_contact_doc.append("email_ids", {"email_id": user_doc.email, "is_primary": True})
+			new_contact_doc.append(
+				"email_ids", {"email_id": user_doc.email, "is_primary": True}
+			)
 			new_contact_doc.insert(ignore_permissions=True)
 			ticket_doc.contact = new_contact_doc.name
 
@@ -270,7 +279,9 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 
 	ticket_doc.insert(ignore_permissions=True)
 	# TODO: remove this if condition after refactoring doctype/ticket.py logic regarding this
-	create_communication_via_contact(ticket_doc.name, ticket_doc.description, attachments)
+	create_communication_via_contact(
+		ticket_doc.name, ticket_doc.description, attachments
+	)
 	# if not via_customer_portal:
 
 	return ticket_doc
@@ -287,7 +298,7 @@ def update_contact(ticket_id, contact):
 		return _full_name
 
 	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 		contact_doc = frappe.get_doc("Contact", contact)
 		if contact_doc.email_ids and len(contact_doc.email_ids) > 0:
 			ticket_doc.raised_by = contact_doc.email_ids[0].email_id
@@ -301,7 +312,7 @@ def update_contact(ticket_id, contact):
 
 def get_agent_assigned_to_ticket(ticket_id):
 	agents = []
-	assignee_list = frappe.db.get_value("Ticket", ticket_id, "_assign")
+	assignee_list = frappe.db.get_value("HD Ticket", ticket_id, "_assign")
 	if assignee_list:
 		assignees = json.loads(assignee_list)
 		if len(assignees) > 0:
@@ -323,7 +334,7 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 	if not ticket_id:
 		return
 
-	ticket_doc = frappe.get_doc("Ticket", ticket_id)
+	ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 
 	if not agent_id:
 		# assign to self
@@ -349,7 +360,7 @@ def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
 @frappe.whitelist()
 def assign_ticket_type(ticket_id, type):
 	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 
 		if ticket_doc.ticket_type != type:
 			ticket_doc.ticket_type = check_and_create_ticket_type(type).name
@@ -363,7 +374,7 @@ def assign_ticket_type(ticket_id, type):
 @frappe.whitelist()
 def assign_ticket_status(ticket_id, status):
 	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 
 		if ticket_doc.status != status:
 			ticket_doc.status = status
@@ -371,18 +382,21 @@ def assign_ticket_status(ticket_id, status):
 			log_ticket_activity(ticket_id, f"status set to {status}")
 
 		return ticket_doc
-@frappe.whitelist()
-def update_ticket_status(ticket_id,status):
-	frappe.db.set_value('Ticket', ticket_id, 'status', status,update_modified=False)
 
-	doc = frappe.get_doc('Ticket',ticket_id)
+
+@frappe.whitelist()
+def update_ticket_status(ticket_id, status):
+	frappe.db.set_value("Ticket", ticket_id, "status", status, update_modified=False)
+
+	doc = frappe.get_doc("Ticket", ticket_id)
 
 	return doc
+
 
 @frappe.whitelist()
 def set_ticket_notes(ticket_id, notes):
 	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 
 		if ticket_doc.notes != notes:
 			ticket_doc.notes = notes
@@ -405,7 +419,7 @@ def bulk_assign_ticket_status(ticket_ids, status):
 @frappe.whitelist()
 def assign_ticket_priority(ticket_id, priority):
 	if ticket_id:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 
 		if ticket_doc.priority != priority:
 			ticket_doc.priority = priority
@@ -422,7 +436,9 @@ def get_all_ticket_types():
 
 @frappe.whitelist()
 def get_all_ticket_statuses():
-	statuses = list(frappe.get_meta("Ticket").get_field("status").options.split("\n"))
+	statuses = list(
+		frappe.get_meta("HD Ticket").get_field("status").options.split("\n")
+	)
 	return statuses
 
 
@@ -432,15 +448,15 @@ def get_all_ticket_priorities():
 
 
 def get_contact(ticket_id):
-	contact_id = frappe.get_value("Ticket", ticket_id, "contact")
+	contact_id = frappe.get_value("HD Ticket", ticket_id, "contact")
 	if contact_id:
 		contact_doc = frappe.get_doc("Contact", contact_id)
 		return contact_doc
 	else:
-		ticket_doc = frappe.get_doc("Ticket", ticket_id)
+		ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 		if ticket_doc.raised_by:
 			ticket_doc.set_contact(ticket_doc.raised_by, True)
-			contact_id = frappe.get_value("Ticket", ticket_id, "contact")
+			contact_id = frappe.get_value("HD Ticket", ticket_id, "contact")
 			if contact_id:
 				contact_doc = frappe.get_doc("Contact", contact_id)
 				return contact_doc
@@ -459,9 +475,9 @@ def submit_conversation_via_contact(ticket_id, message, attachments):
 
 @frappe.whitelist()
 def get_other_tickets_of_contact(ticket_id):
-	contact = frappe.get_value("Ticket", ticket_id, "raised_by")
+	contact = frappe.get_value("HD Ticket", ticket_id, "raised_by")
 	tickets = frappe.get_all(
-		"Ticket",
+		"HD Ticket",
 		filters={
 			"raised_by": contact,
 			"name": ["!=", ticket_id],
@@ -511,7 +527,7 @@ def activities(name):
 
 @frappe.whitelist()
 def submit_customer_feedback(ticket_id, satisfaction_rating, feedback_text):
-	ticket_doc = frappe.get_doc("Ticket", ticket_id)
+	ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
 	ticket_doc.satisfaction_rating = satisfaction_rating
 	ticket_doc.customer_feedback = feedback_text
 	ticket_doc.feedback_submitted = True
@@ -528,11 +544,11 @@ def get_field_meta_info(fieldname):
 			"fieldname": fieldname,
 			"label": "Assignee",
 		}
-	meta_info = frappe.get_meta("Ticket").get_field(fieldname).as_dict()
+	meta_info = frappe.get_meta("HD Ticket").get_field(fieldname).as_dict()
 
 	# check if field is a custom field
 	custom_field = frappe.get_value(
-		"Custom Field", {"dt": "Ticket", "fieldname": fieldname}, "name"
+		"Custom Field", {"dt": "HD Ticket", "fieldname": fieldname}, "name"
 	)
 	if custom_field:
 		custom_field_extra_info = frappe.get_doc(
@@ -546,12 +562,12 @@ def get_field_meta_info(fieldname):
 
 @frappe.whitelist()
 def get_field_value(ticket_id, fieldname):
-	return frappe.get_value("Ticket", ticket_id, fieldname)
+	return frappe.get_value("HD Ticket", ticket_id, fieldname)
 
 
 @frappe.whitelist()
 def update_field_value(ticket_id, fieldname, value):
-	frappe.db.set_value("Ticket", ticket_id, fieldname, value)
+	frappe.db.set_value("HD Ticket", ticket_id, fieldname, value)
 	frappe.db.commit()
 
 
@@ -562,4 +578,4 @@ def get_custom_fields(view="Customer Portal"):
 
 @frappe.whitelist()
 def get_assignee(ticket_id):
-	return frappe.get_doc("Ticket", ticket_id).get_assigned_agent()
+	return frappe.get_doc("HD Ticket", ticket_id).get_assigned_agent()

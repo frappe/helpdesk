@@ -5,14 +5,14 @@ from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import create_communicati
 @frappe.whitelist()
 def initial_agent_setup():
 	support_settings_doc = frappe.get_doc("HD Settings", "HD Settings")
-	if frappe.db.count("Agent") == 0:
+	if frappe.db.count("HD Agent") == 0:
 		agent_added = False
 		users = frappe.get_all(
 			"User", filters={"user_type": "System User"}, order_by="creation"
 		)
 		for user in users:
 			if user.name != "Administrator":
-				agent = frappe.new_doc("Agent")
+				agent = frappe.new_doc("HD Agent")
 				agent.user = user.name
 				agent.insert()
 				agent_added = True
@@ -27,8 +27,8 @@ def initial_agent_setup():
 @frappe.whitelist()
 def create_initial_demo_ticket():
 	support_settings_doc = frappe.get_doc("HD Settings", "HD Settings")
-	if frappe.db.count("Ticket") == 0:
-		agent = frappe.get_last_doc("Agent")
+	if frappe.db.count("HD Ticket") == 0:
+		agent = frappe.get_last_doc("HD Agent")
 		if agent:
 			frappe.get_doc(
 				{
@@ -39,7 +39,7 @@ def create_initial_demo_ticket():
 				}
 			).insert()
 
-			new_ticket_doc = frappe.new_doc("Ticket")
+			new_ticket_doc = frappe.new_doc("HD Ticket")
 			new_ticket_doc.subject = "Welcome to Frappe Desk"
 			new_ticket_doc.description = """
 			<p>Hi 👋🏻</p>
