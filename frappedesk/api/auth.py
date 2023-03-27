@@ -5,7 +5,7 @@ import frappe
 def get_user():
 	user = frappe.get_doc("User", frappe.session.user)
 
-	is_agent = bool(frappe.db.exists("Agent", frappe.session.user))
+	is_agent = bool(frappe.db.exists("HD Agent", frappe.session.user))
 	is_admin = user.username == "administrator"
 	has_desk_access = is_agent or is_admin
 	user_image = user.user_image

@@ -54,7 +54,7 @@ class HDTicket(Document):
 
 		QBTicket = frappe.qb.DocType("HD Ticket")
 		filters = {"user": user}
-		teams = frappe.get_list("Agent Group", filters=filters)
+		teams = frappe.get_list("HD Team", filters=filters)
 		criterions = [QBTicket.agent_group == team.name for team in teams]
 
 		# Consider tickets without any assigned agent group
@@ -84,7 +84,7 @@ class HDTicket(Document):
 		"""
 		# Get teams which can ignore restrictions, where user is a member
 		filters = {"user": user, "ignore_restrictions": True}
-		teams = frappe.get_list("Agent Group", filters=filters)
+		teams = frappe.get_list("HD Team", filters=filters)
 
 		# Must be part of at-least one team which can ignore restrictions
 		return len(teams) > 0
@@ -148,7 +148,7 @@ class HDTicket(Document):
 				and not current_assigned_agent_doc.in_group(self.agent_group)
 			) and frappe.get_doc(
 				"Assignment Rule",
-				frappe.get_doc("Agent Group", self.agent_group).assignment_rule,
+				frappe.get_doc("HD Team", self.agent_group).assignment_rule,
 			).users:
 				clear_all_assignments("HD Ticket", self.name)
 				frappe.publish_realtime(
@@ -283,9 +283,9 @@ class HDTicket(Document):
 		return None
 
 	def on_trash(self):
-		activities = frappe.db.get_all("Ticket Activity", {"HD Ticket": self.name})
+		activities = frappe.db.get_all("HD Ticket Activity", {"HD Ticket": self.name})
 		for activity in activities:
-			frappe.db.delete("Ticket Activity", activity)
+			frappe.db.delete("HD Ticket Activity", activity)
 
 	def verify_ticket_type(self):
 		if self.ticket_type:
@@ -461,7 +461,7 @@ class HDTicket(Document):
 		self.add_seen()
 
 	def get_comment_count(self):
-		QBComment = DocType("HD Comment")
+		QBComment = DocType("HD Ticket Comment")
 
 		count = Count("*").as_("count")
 		res = (
@@ -488,7 +488,8 @@ class HDTicket(Document):
 		return res.pop().count
 
 	def is_seen(self):
-		return frappe.session.user in self._seen
+		seen = self._seen or ""
+		return frappe.session.user in seen
 
 	@frappe.whitelist()
 	def get_meta(self):

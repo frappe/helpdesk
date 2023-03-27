@@ -14,7 +14,7 @@ def get_preset_filters(doctype):
 
 	options = {"user": [], "global": []}
 
-	fd_preset_filter = frappe.qb.DocType("FD Preset Filter")
+	fd_preset_filter = frappe.qb.DocType("HD Preset Filter")
 	preset_filters = list(
 		(
 			frappe.qb.from_(fd_preset_filter)
@@ -34,7 +34,7 @@ def get_preset_filters(doctype):
 	)
 
 	for preset_filter in preset_filters:
-		preset_filter_doc = frappe.get_doc("FD Preset Filter", preset_filter[0])
+		preset_filter_doc = frappe.get_doc("HD Preset Filter", preset_filter[0])
 		options[
 			"global" if preset_filter_doc.type in ["Global", "System"] else "user"
 		].append(preset_filter_doc)
@@ -121,7 +121,7 @@ def save_filter_preset(doctype, is_global, title, filters):
 
 	preset_filter = frappe.get_doc(
 		{
-			"doctype": "FD Preset Filter",
+			"doctype": "HD Preset Filter",
 			"reference_doctype": doctype,
 			"type": "Global" if is_global else "User",
 			"title": title,

@@ -70,7 +70,7 @@
 							url: 'frappedesk.extends.client.get_list',
 							inputMap: (query) => {
 								return {
-									doctype: 'Ticket Priority',
+									doctype: 'HD Ticket Priority',
 									pluck: 'name',
 									filters: [['name', 'like', `%${query}%`]],
 								}
