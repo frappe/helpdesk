@@ -170,7 +170,7 @@ def bulk_create_contacts_and_assignments_for_tickets(tickets):
 	for ticket in tickets:
 		if background:
 			frappe.enqueue(
-				"frappedesk.api.ticket.create_contacts_and_assignments_for_tickets",
+				"helpdesk.api.ticket.create_contacts_and_assignments_for_tickets",
 				ticket=ticket,
 			)
 		else:
