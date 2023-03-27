@@ -3,7 +3,7 @@
 		<ListManager
 			ref="miniTicketList"
 			:options="{
-				doctype: 'Ticket',
+				doctype: 'HD Ticket',
 				fields: [
 					'_assign',
 					'status',

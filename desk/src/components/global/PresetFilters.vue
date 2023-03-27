@@ -35,7 +35,7 @@ export default {
 		doctype: {
 			type: String,
 			required: true,
-			default: "Ticket",
+			default: "HD Ticket",
 		},
 		listTitle: {
 			type: String,

@@ -268,7 +268,7 @@ class HDTicket(Document):
 
 		clear_all_assignments("HD Ticket", self.name)
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
-		agent_name = frappe.get_value("Agent", agent, "agent_name")
+		agent_name = frappe.get_value("HD Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 		frappe.publish_realtime(
 			"ticket_assignee_update", {"ticket_id": self.name}, after_commit=True
@@ -278,7 +278,7 @@ class HDTicket(Document):
 		if self._assign:
 			assignees = json.loads(self._assign)
 			if len(assignees) > 0:
-				agent_doc = frappe.get_doc("Agent", assignees[0])
+				agent_doc = frappe.get_doc("HD Agent", assignees[0])
 				return agent_doc
 		return None
 
@@ -588,7 +588,7 @@ def get_all_conversations(ticket):
 	)
 
 	for conversation in conversations:
-		if frappe.db.exists("Agent", conversation.sender):
+		if frappe.db.exists("HD Agent", conversation.sender):
 			# user User details instead of Contact if the sender is an agent
 			sender = frappe.get_doc("User", conversation.sender).__dict__
 			sender["image"] = sender["user_image"]
@@ -651,7 +651,7 @@ def get_user_tickets(filters="{}", order_by="creation desc", impersonate=None):
 	filters = json.loads(filters)
 	filters["raised_by"] = ["=", frappe.session.user]
 
-	if impersonate and frappe.db.exists("Agent", frappe.session.user):
+	if impersonate and frappe.db.exists("HD Agent", frappe.session.user):
 		filters["raised_by"] = ["=", impersonate]
 
 	tickets = frappe.get_all(

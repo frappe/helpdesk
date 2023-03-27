@@ -187,7 +187,7 @@ export default {
 		agent() {
 			return {
 				type: "document",
-				doctype: "Agent",
+				doctype: "HD Agent",
 				name: this.agent,
 				setValue: {
 					onSuccess: () => {
@@ -214,7 +214,7 @@ export default {
 		teams() {
 			return {
 				type: "list",
-				doctype: "Agent Group",
+				doctype: "HD Team",
 				fields: ["name"],
 			}
 		},

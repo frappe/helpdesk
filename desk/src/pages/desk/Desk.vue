@@ -170,7 +170,7 @@ export default {
 				case "HD Ticket Type":
 					this.$resources.types.reload();
 					break;
-				case "Agent":
+				case "HD Agent":
 					this.$resources.agents.reload();
 					break;
 			}

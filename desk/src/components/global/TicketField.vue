@@ -100,7 +100,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 				setValue: {
 					onSuccess() {
@@ -194,7 +194,7 @@ export default {
 					let baseFilters = []
 					if (this.fieldname == "_assign") {
 						// adding agent_group and is_active filters to get only active agents of the group
-						baseFilters.push(["Agent", "is_active", "=", 1])
+						baseFilters.push(["HD Agent", "is_active", "=", 1])
 						if (this.ticket.agent_group) {
 							baseFilters.push([
 								"Agent Group Item",
@@ -231,7 +231,7 @@ export default {
 						url: "frappedesk.api.general.get_filtered_select_field_options",
 						inputMap: (query) => {
 							return {
-								doctype: "Ticket",
+								doctype: "HD Ticket",
 								fieldname: this.fieldMetaInfo?.fieldname,
 								query,
 							}

@@ -207,10 +207,10 @@
 						<ListManager
 							ref="ticketList"
 							:options="{
-								cache: ['Ticket', 'Customer', customer],
+								cache: ['HD Ticket', 'Customer', customer],
 								saveFiltersLocally: false,
 								urlQueryFilters: false,
-								doctype: 'Ticket',
+								doctype: 'HD Ticket',
 								filters: {
 									customer: ['=', customerDoc.customer_name],
 								},

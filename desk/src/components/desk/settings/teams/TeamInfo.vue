@@ -127,7 +127,7 @@ export default {
 				url: "frappedesk.extends.client.get_list",
 				inputMap: (query) => {
 					return {
-						doctype: "Agent",
+						doctype: "HD Agent",
 						fields: ["name", "agent_name"],
 						filters: {
 							name: ["like", `%${query}%`],
@@ -151,7 +151,7 @@ export default {
 
 			return {
 				type: "document",
-				doctype: "Agent Group",
+				doctype: "HD Team",
 				name: this.teamId,
 				fields: ["name", "users"],
 				whitelistedMethods: {
@@ -262,7 +262,7 @@ export default {
 		saveNew() {
 			this.$resources.newTeam.submit({
 				doc: {
-					doctype: "Agent Group",
+					doctype: "HD Team",
 					ignore_restrictions: this.team.ignore_restrictions,
 					team_name: this.team.team_name,
 					users: this.mapUsers(this.team.users),

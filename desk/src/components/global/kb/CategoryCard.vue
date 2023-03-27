@@ -216,7 +216,7 @@ export default {
 			return {
 				url: "frappe.client.get_count",
 				params: {
-					doctype: "Category",
+					doctype: "HD Article Category",
 					filters: {
 						parent_category: this.category.name,
 					},

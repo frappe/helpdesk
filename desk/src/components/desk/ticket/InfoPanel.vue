@@ -375,7 +375,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 			}
 		},

@@ -552,7 +552,7 @@ def get_field_meta_info(fieldname):
 	)
 	if custom_field:
 		custom_field_extra_info = frappe.get_doc(
-			"Ticket Custom Fields Config"
+			"HD Ticket Custom Field Config"
 		).get_field_info(fieldname)
 		custom_field_extra_info.update({"is_custom_field": True})
 		meta_info.update(custom_field_extra_info)
@@ -573,7 +573,7 @@ def update_field_value(ticket_id, fieldname, value):
 
 @frappe.whitelist()
 def get_custom_fields(view="Customer Portal"):
-	return frappe.get_doc("Ticket Custom Fields Config").get_custom_fields(view)
+	return frappe.get_doc("HD Ticket Custom Field Config").get_custom_fields(view)
 
 
 @frappe.whitelist()

@@ -226,7 +226,7 @@ export default {
 					.then(() => {
 						if (newTicketTypeName != oldTicketTypeName) {
 							this.$resources.renameTicketTypeDoc.submit({
-								doctype: "Ticket Type",
+								doctype: "HD Ticket Type",
 								old_name: oldTicketTypeName,
 								new_name: newTicketTypeName,
 							})
@@ -235,7 +235,7 @@ export default {
 			} else {
 				this.$resources.newTicketType.submit({
 					doc: {
-						doctype: "Ticket Type",
+						doctype: "HD Ticket Type",
 						name: values.title,
 						description: values.description,
 						priority: values.priority,

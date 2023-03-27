@@ -65,7 +65,7 @@ export default {
 	resources: {
 		communications() {
 			return {
-				cache: ["Ticket", "Conversations", this.ticketId],
+				cache: ["HD Ticket", "Conversations", this.ticketId],
 				url: "frappedesk.api.ticket.get_conversations",
 				params: {
 					ticket_id: this.ticketId,
@@ -75,10 +75,10 @@ export default {
 		},
 		comments() {
 			return {
-				cache: ["Ticket", "Comments", this.ticketId],
+				cache: ["HD Ticket", "Comments", this.ticketId],
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "Frappe Desk Comment",
+					doctype: "HD Ticket Comment",
 					fields: ["*"],
 					filters: {
 						reference_ticket: this.ticketId,

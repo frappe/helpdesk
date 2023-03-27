@@ -174,7 +174,7 @@ export default {
 		category() {
 			return {
 				type: "document",
-				doctype: "Category",
+				doctype: "HD Article Category",
 				name: this.categoryId,
 			};
 		},
