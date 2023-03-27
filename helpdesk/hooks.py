@@ -1,5 +1,5 @@
-app_name = "frappedesk"
-app_title = "FrappeDesk"
+app_name = "helpdesk"
+app_title = "Helpdesk"
 app_publisher = "Frappe Technologies"
 app_description = "Customer Service Software"
 app_icon = "octicon octicon-file-directory"
