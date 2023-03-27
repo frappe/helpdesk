@@ -9,10 +9,9 @@ from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import (
 	create_communication_via_contact,
 	get_all_conversations,
 )
-from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.utils import datetime
 
-from frappedesk.frappedesk.doctype.sla.sla import get_expected_time_for
+from frappedesk.frappedesk.doctype.hd_service_level_agreement.hd_service_level_agreement import get_expected_time_for
 from frappe.automation.doctype.assignment_rule.assignment_rule import apply
 from frappe.contacts.doctype.contact.contact import get_contact_name
 
