@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:team_name",
+ "creation": "2022-02-24 20:55:48.766967",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "team_name",
+  "assignment_rule",
+  "users",
+  "column_break_feto",
+  "ignore_restrictions"
+ ],
+ "fields": [
+  {
+   "fieldname": "team_name",
+   "fieldtype": "Data",
+   "label": "Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "assignment_rule",
+   "fieldtype": "Link",
+   "label": "Assignment Rule",
+   "options": "Assignment Rule",
+   "read_only": 1
+  },
+  {
+   "fieldname": "users",
+   "fieldtype": "Table MultiSelect",
+   "label": "Users",
+   "options": "HD Team Member"
+  },
+  {
+   "default": "0",
+   "description": "Do not apply filters and restrictions to agents of this team",
+   "fieldname": "ignore_restrictions",
+   "fieldtype": "Check",
+   "label": "Ignore Restrictions"
+  },
+  {
+   "fieldname": "column_break_feto",
+   "fieldtype": "Column Break",
+   "label": "Settings"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-03-26 22:50:53.995572",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Team",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -4,7 +4,7 @@ with open("requirements.txt") as f:
 	install_requires = f.read().strip().split("\n")
 
 # get version from __version__ variable in frappedesk/__init__.py
-from frappedesk import __version__ as version
+from helpdesk import __version__ as version
 
 setup(
 	name="frappedesk",

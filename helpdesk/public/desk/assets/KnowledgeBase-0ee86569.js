@@ -1,0 +1,1 @@
+import{_ as o,d as s,i as t,o as n,r}from"./index-d9377e3a.js";const a={name:"KnowledgeBase"},c={class:"mx-auto w-full h-screen p-4"};function _(l,p,d,i,m,u){const e=r("router-view");return n(),s("div",c,[t(e,{class:"grow"})])}const w=o(a,[["render",_]]);export{w as default};
