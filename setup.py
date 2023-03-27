@@ -7,7 +7,7 @@ with open("requirements.txt") as f:
 from helpdesk import __version__ as version
 
 setup(
-	name="frappedesk",
+	name="helpdesk",
 	version=version,
 	description="Customer Service Software",
 	author="Frappe Technologies",
