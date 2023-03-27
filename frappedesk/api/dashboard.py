@@ -5,7 +5,7 @@ import datetime
 @frappe.whitelist()
 def get_ticket_count(filters=None):
 	ticket_count = frappe.db.get_list(
-		"Ticket",
+		"HD Ticket",
 		filters=filters,
 		fields=["count(name) as count", "creation"],
 		group_by="creation",
@@ -17,28 +17,26 @@ def get_ticket_count(filters=None):
 
 @frappe.whitelist()
 def ticket_summary(startDate=None, endDate=None):
-	print(startDate)
 	if startDate and endDate:
 		startDate = datetime.datetime.strptime(startDate, "%Y-%m-%d").strftime("%d-%m")
 		endDate = datetime.datetime.strptime(endDate, "%Y-%m-%d").strftime("%d-%m")
 	ticket_count = frappe.db.sql(
-		"""select TO_CHAR(creation,'DD/MM') as date,
+		"""SELECT TO_CHAR(creation,'DD/MM') AS date,
                                 COUNT(Case when status="Open" then status end) as "Open", 
                                 COUNT(Case when status="Closed" then status end) as "Closed", 
                                 COUNT(Case when status="Replied" then status end) as "Replied" 
-                                from `tabTicket` WHERE TO_CHAR(creation,'DD/MM') BETWEEN %s AND %s group by 
+                                FROM `tabHD Ticket` WHERE TO_CHAR(creation,'DD/MM') BETWEEN %s AND %s group by 
                                 TO_CHAR(creation,'DD/MM')
                                 ORDER BY TO_CHAR(creation,'MM/DD') ASC""",
 		(startDate, endDate),
 	)
-	print(ticket_count)
 	return ticket_count
 
 
 @frappe.whitelist()
 def ticket_status():
 	ticket_count_by_status = frappe.db.get_list(
-		"Ticket",
+		"HD Ticket",
 		fields=["count(name) as count", "status", "creation", "resolution_by"],
 		group_by="status",
 	)
@@ -49,7 +47,7 @@ def ticket_status():
 @frappe.whitelist()
 def ticket_type(filters=None):
 	ticket_count_by_type = frappe.db.get_list(
-		"Ticket",
+		"HD Ticket",
 		filters=filters,
 		fields=["count(name) as count", "ticket_type"],
 		group_by="ticket_type",
@@ -62,7 +60,7 @@ def ticket_type(filters=None):
 def average_first_response_time():
 	average_response_time = float(0.0)
 	ticket_list = frappe.get_list(
-		"Ticket",
+		"HD Ticket",
 		fields=["name", "first_response_time"],
 		filters={"first_response_time": ["not like", ""]},
 	)
@@ -80,7 +78,7 @@ def average_first_response_time():
 def average_resolution_time():
 	average_resolution_time = float(0.0)
 	ticket_list = frappe.get_list(
-		"Ticket",
+		"HD Ticket",
 		fields=["name", "resolution_time"],
 		filters={"resolution_time": ["not like", ""]},
 	)
@@ -97,7 +95,7 @@ def average_resolution_time():
 @frappe.whitelist()
 def resolution_within_sla():
 	ticket_list = frappe.get_list(
-		"Ticket", filters={"status": "Closed"}, fields=["name", "agreement_status", "sla"],
+		"HD Ticket", filters={"status": "Closed"}, fields=["name", "agreement_status", "sla"],
 	)
 	count = 0
 
@@ -117,7 +115,7 @@ def resolution_within_sla():
 @frappe.whitelist()
 def feedback_status(dateFilter=None):
 	feedback_status_count = frappe.db.get_list(
-		"Ticket",
+		"HD Ticket",
 		filters=[{"feedback_status": ["not like", ""]}, dateFilter],
 		fields=["count(name) as value", "feedback_status as name"],
 		group_by="feedback_status",
