@@ -23,7 +23,7 @@ from frappe.utils import (
 )
 from frappe.utils.safe_exec import get_safe_globals
 
-from frappedesk.frappedesk.doctype.ticket.ticket import get_holidays
+from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import get_holidays
 
 
 class HDServiceLevelAgreement(Document):
@@ -46,7 +46,7 @@ class HDServiceLevelAgreement(Document):
 					)
 				)
 
-			if self.apply_hd_service_level_agreement_for_resolution:
+			if self.apply_sla_for_resolution:
 				if not priority.resolution_time:
 					frappe.throw(
 						_("Set Response Time for Priority {0} in row {1}.").format(
@@ -106,21 +106,21 @@ class HDServiceLevelAgreement(Document):
 			self.enabled
 			and self.document_type == "HD Ticket"
 			and not frappe.db.get_single_value(
-				"Frappe Desk Settings", "track_service_level_agreement"
+				"HD Settings", "track_service_level_agreement"
 			)
 		):
 			frappe.throw(
 				_("{0} is not enabled in {1}").format(
 					frappe.bold("Track HD Service Level Agreement"),
-					get_link_to_form("Frappe Desk Settings", "Frappe Desk Settings"),
+					get_link_to_form("HD Settings", "HD Settings"),
 				)
 			)
 
-		if self.default_hd_service_level_agreement and frappe.db.exists(
+		if self.default_sla and frappe.db.exists(
 			"HD Service Level Agreement",
 			{
 				"document_type": self.document_type,
-				"default_hd_service_level_agreement": "1",
+				"default_sla": "1",
 				"name": ["!=", self.name],
 			},
 		):
@@ -269,7 +269,7 @@ class HDServiceLevelAgreement(Document):
 
 def check_agreement_status():
 	hd_service_level_agreements = frappe.get_all(
-		"HD Service Level Agreement", filters=[{"enabled": 1}, {"default_hd_service_level_agreement": 0}], fields=["name"],
+		"HD Service Level Agreement", filters=[{"enabled": 1}, {"default_sla": 0}], fields=["name"],
 	)
 
 	for hd_service_level_agreement in hd_service_level_agreements:
@@ -280,7 +280,7 @@ def check_agreement_status():
 
 def get_active_hd_service_level_agreement_for(doc):
 	if not frappe.db.get_single_value(
-		"Frappe Desk Settings", "track_service_level_agreement"
+		"HD Settings", "track_service_level_agreement"
 	):
 		return
 
@@ -292,18 +292,18 @@ def get_active_hd_service_level_agreement_for(doc):
 	if doc.get("priority"):
 		filters.append(["HD Service Level Priority", "priority", "=", doc.get("priority")])
 
-	default_hd_service_level_agreement_filter = filters + [["HD Service Level Agreement", "default_hd_service_level_agreement", "=", 1]]
-	default_hd_service_level_agreement = frappe.get_all(
+	default_service_level_agreement_filter = filters + [["HD Service Level Agreement", "default_sla", "=", 1]]
+	default_sla = frappe.get_all(
 		"HD Service Level Agreement",
-		filters=default_hd_service_level_agreement_filter,
-		fields=["name", "default_priority", "apply_hd_service_level_agreement_for_resolution", "condition"],
+		filters=default_service_level_agreement_filter,
+		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
 	)
 
-	filters += [["HD Service Level Agreement", "default_hd_service_level_agreement", "=", 0]]
+	filters += [["HD Service Level Agreement", "default_sla", "=", 0]]
 	agreements = frappe.get_all(
 		"HD Service Level Agreement",
 		filters=filters,
-		fields=["name", "default_priority", "apply_hd_service_level_agreement_for_resolution", "condition"],
+		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
 	)
 
 	# check if the current document on which HD Service Level Agreement is to be applied fulfills all the conditions
@@ -316,7 +316,7 @@ def get_active_hd_service_level_agreement_for(doc):
 			filtered_agreements.append(agreement)
 
 	# if any default hd_service_level_agreement
-	filtered_agreements += default_hd_service_level_agreement
+	filtered_agreements += default_sla
 
 	return filtered_agreements[0] if filtered_agreements else None
 
@@ -332,7 +332,7 @@ def get_context(doc):
 @frappe.whitelist()
 def get_hd_service_level_agreement_filters(doctype, name):
 	if not frappe.db.get_single_value(
-		"Frappe Desk Settings", "track_service_level_agreement"
+		"HD Settings", "track_service_level_agreement"
 	):
 		return
 
@@ -341,7 +341,7 @@ def get_hd_service_level_agreement_filters(doctype, name):
 		["HD Service Level Agreement", "enabled", "=", 1],
 	]
 
-	or_filters = [["HD Service Level Agreement", "default_hd_service_level_agreement", "=", 1]]
+	or_filters = [["HD Service Level Agreement", "default_sla", "=", 1]]
 
 	return {
 		"priority": [
@@ -406,18 +406,18 @@ def process_hd_service_level_agreement(doc, hd_service_level_agreement):
 
 	if not doc.creation:
 		doc.creation = now_datetime(doc.get("owner"))
-		if doc.meta.has_field("hd_service_level_agreement_creation"):
-			doc.hd_service_level_agreement_creation = now_datetime(doc.get("owner"))
+		if doc.meta.has_field("service_level_agreement_creation"):
+			doc.service_level_agreement_creation = now_datetime(doc.get("owner"))
 
 	doc.hd_service_level_agreement = hd_service_level_agreement.name
 	doc.priority = doc.get("priority") or hd_service_level_agreement.default_priority
 
-	handle_status_change(doc, hd_service_level_agreement.apply_hd_service_level_agreement_for_resolution)
-	update_response_and_resolution_metrics(doc, hd_service_level_agreement.apply_hd_service_level_agreement_for_resolution)
-	update_agreement_status(doc, hd_service_level_agreement.apply_hd_service_level_agreement_for_resolution)
+	handle_status_change(doc, hd_service_level_agreement.apply_sla_for_resolution)
+	update_response_and_resolution_metrics(doc, hd_service_level_agreement.apply_sla_for_resolution)
+	update_agreement_status(doc, hd_service_level_agreement.apply_sla_for_resolution)
 
 
-def handle_status_change(doc, apply_hd_service_level_agreement_for_resolution):
+def handle_status_change(doc, apply_sla_for_resolution):
 	now_time = frappe.flags.current_time or now_datetime(doc.get("owner"))
 	prev_status = frappe.db.get_value(doc.doctype, doc.name, "status")
 
@@ -495,7 +495,7 @@ def handle_status_change(doc, apply_hd_service_level_agreement_for_resolution):
 		# Ticket was on hold -> Calculate Total Hold Time
 		calculate_hold_hours()
 		# Ticket is closed -> Set resolution_date
-		if apply_hd_service_level_agreement_for_resolution:
+		if apply_sla_for_resolution:
 			doc.resolution_date = now_time
 			set_resolution_time(doc)
 
@@ -518,11 +518,11 @@ def get_hold_statuses(hd_service_level_agreement):
 	]
 
 
-def update_response_and_resolution_metrics(doc, apply_hd_service_level_agreement_for_resolution):
+def update_response_and_resolution_metrics(doc, apply_sla_for_resolution):
 	priority = get_response_and_resolution_duration(doc)
-	start_date_time = get_datetime(doc.get("hd_service_level_agreement_creation") or doc.creation)
+	start_date_time = get_datetime(doc.get("service_level_agreement_creation") or doc.creation)
 	set_response_by(doc, start_date_time, priority)
-	if apply_hd_service_level_agreement_for_resolution and not doc.get(
+	if apply_sla_for_resolution and not doc.get(
 		"on_hold_since"
 	):  # resolution_by is reset if on hold
 		set_resolution_by(doc, start_date_time, priority)
@@ -601,7 +601,7 @@ def get_support_days(service_level):
 
 
 def set_resolution_time(doc):
-	start_date_time = get_datetime(doc.get("hd_service_level_agreement_creation") or doc.creation)
+	start_date_time = get_datetime(doc.get("service_level_agreement_creation") or doc.creation)
 	if doc.meta.has_field("resolution_time"):
 		doc.resolution_time = time_diff_in_seconds(doc.resolution_date, start_date_time)
 
@@ -638,7 +638,7 @@ def change_hd_service_level_agreement_and_priority(self):
 		self.hd_service_level_agreement
 		and frappe.db.exists("HD Ticket", self.name)
 		and frappe.db.get_single_value(
-			"Frappe Desk Settings", "track_service_level_agreement"
+			"HD Settings", "track_service_level_agreement"
 		)
 	):
 
@@ -664,7 +664,7 @@ def get_response_and_resolution_duration(doc):
 
 
 def reset_hd_service_level_agreement(doc, reason, user):
-	if not frappe.db.get_single_value("Frappe Desk Settings", "allow_resetting_hd_service_level_agreement"):
+	if not frappe.db.get_single_value("HD Settings", "allow_resetting_service_level_agreement"):
 		frappe.throw(_("Allow Resetting HD Service Level Agreement from Frappe Desk Settings."))
 
 	frappe.get_doc(
@@ -678,7 +678,7 @@ def reset_hd_service_level_agreement(doc, reason, user):
 		}
 	).insert(ignore_permissions=True)
 
-	doc.hd_service_level_agreement_creation = now_datetime(doc.get("owner"))
+	doc.service_level_agreement_creation = now_datetime(doc.get("owner"))
 	doc.save()
 
 
@@ -739,7 +739,7 @@ def on_communication_update(doc, status):
 	else:
 		return
 
-	for_resolution = frappe.db.get_value("HD Service Level Agreement", parent.hd_service_level_agreement, "apply_hd_service_level_agreement_for_resolution")
+	for_resolution = frappe.db.get_value("HD Service Level Agreement", parent.hd_service_level_agreement, "apply_sla_for_resolution")
 
 	handle_status_change(parent, for_resolution)
 	update_response_and_resolution_metrics(parent, for_resolution)
@@ -848,7 +848,7 @@ def get_hd_service_level_agreement_fields():
 			"read_only": 1,
 		},
 		{
-			"fieldname": "hd_service_level_agreement_creation",
+			"fieldname": "service_level_agreement_creation",
 			"fieldtype": "Datetime",
 			"hidden": 1,
 			"label": "HD Service Level Agreement Creation",
@@ -870,10 +870,10 @@ def update_agreement_status_on_custom_status(doc):
 	update_agreement_status(doc)
 
 
-def update_agreement_status(doc, apply_hd_service_level_agreement_for_resolution):
+def update_agreement_status(doc, apply_sla_for_resolution):
 	if doc.meta.has_field("agreement_status"):
 		# if HD Service Level Agreement is applied for resolution check for response and resolution, else only response
-		if apply_hd_service_level_agreement_for_resolution:
+		if apply_sla_for_resolution:
 			if doc.meta.has_field("first_responded_on") and not doc.get("first_responded_on"):
 				doc.agreement_status = "First Response Due"
 			elif doc.meta.has_field("resolution_date") and not doc.get("resolution_date"):

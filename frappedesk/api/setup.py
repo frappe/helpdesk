@@ -1,10 +1,10 @@
 import frappe
-from frappedesk.frappedesk.doctype.ticket.ticket import create_communication_via_contact
+from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import create_communication_via_contact
 
 
 @frappe.whitelist()
 def initial_agent_setup():
-	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
+	support_settings_doc = frappe.get_doc("HD Settings", "HD Settings")
 	if frappe.db.count("Agent") == 0:
 		agent_added = False
 		users = frappe.get_all(
@@ -26,7 +26,7 @@ def initial_agent_setup():
 
 @frappe.whitelist()
 def create_initial_demo_ticket():
-	support_settings_doc = frappe.get_doc("Frappe Desk Settings", "Frappe Desk Settings")
+	support_settings_doc = frappe.get_doc("HD Settings", "HD Settings")
 	if frappe.db.count("Ticket") == 0:
 		agent = frappe.get_last_doc("Agent")
 		if agent:

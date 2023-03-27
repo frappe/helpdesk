@@ -117,7 +117,7 @@
 			"is_query_report": 0,
 			"label": "General Settings",
 			"link_count": 0,
-			"link_to": "Frappe Desk Settings",
+			"link_to": "HD Settings",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"

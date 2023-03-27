@@ -484,8 +484,8 @@ export default {
 			return {
 				url: "frappe.client.set_value",
 				params: {
-					doctype: "Frappe Desk Settings",
-					name: "Frappe Desk Settings",
+					doctype: "HD Settings",
+					name: "HD Settings",
 					fieldname: "setup_complete",
 					value: 1,
 				},

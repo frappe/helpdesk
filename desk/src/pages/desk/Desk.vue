@@ -352,8 +352,8 @@ export default {
 			return {
 				url: "frappe.client.get",
 				params: {
-					doctype: "Frappe Desk Settings",
-					name: "Frappe Desk Settings",
+					doctype: "HD Settings",
+					name: "HD Settings",
 				},
 				onError: (error) => {
 					this.$toast({

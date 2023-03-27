@@ -4,7 +4,7 @@ import frappe
 def execute():
 	# Disable the base support rotation rule if no agents are active
 	base_support_rotation_rule = frappe.get_doc(
-		"Frappe Desk Settings"
+		"HD Settings"
 	).get_base_support_rotation()
 	if frappe.db.count("Agent", {"is_active": 1}) == 0:
 		base_support_rotation_rule_doc = frappe.get_doc(

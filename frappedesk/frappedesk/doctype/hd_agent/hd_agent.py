@@ -58,7 +58,7 @@ class HDAgent(Document):
 			rule_docs.append(
 				frappe.get_doc(
 					"Assignment Rule",
-					frappe.get_doc("Frappe Desk Settings").get_base_support_rotation(),
+					frappe.get_doc("HD Settings").get_base_support_rotation(),
 				)
 			)
 
@@ -138,7 +138,7 @@ class HDAgent(Document):
 			rule_docs.append(
 				frappe.get_doc(
 					"Assignment Rule",
-					frappe.get_doc("Frappe Desk Settings").get_base_support_rotation(),
+					frappe.get_doc("HD Settings").get_base_support_rotation(),
 				)
 			)
 

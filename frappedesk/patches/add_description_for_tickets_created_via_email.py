@@ -1,4 +1,4 @@
-from frappedesk.frappedesk.doctype.ticket.ticket import (
+from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import (
 	set_descritption_from_communication,
 )
 import frappe

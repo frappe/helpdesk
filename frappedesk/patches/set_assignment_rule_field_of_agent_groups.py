@@ -5,7 +5,7 @@ def execute():
 	frappe.reload_doc("FrappeDesk", "doctype", "Agent")
 	frappe.reload_doc("FrappeDesk", "doctype", "Agent Group Item")
 	frappe.reload_doc("FrappeDesk", "doctype", "Agent Group")
-	frappe.reload_doc("FrappeDesk", "doctype", "Frappe Desk Settings")
+	frappe.reload_doc("FrappeDesk", "doctype", "HD Settings")
 
 	agent_groups = frappe.get_all("Agent Group", pluck="name")
 	for agent_group in agent_groups:

@@ -316,8 +316,8 @@ export default {
 		fdSettings() {
 			return {
 				type: "document",
-				doctype: "Frappe Desk Settings",
-				name: "Frappe Desk Settings",
+				doctype: "HD Settings",
+				name: "HD Settings",
 			};
 		},
 	},

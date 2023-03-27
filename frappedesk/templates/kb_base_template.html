@@ -16,7 +16,7 @@ head_include %}
 					<img src="{{ banner_image }}" />
 					{%- else -%}
 					<!-- prettier-ignore -->
-					{% set helpdesk_name = frappe.get_doc("Frappe Desk Settings").helpdesk_name %}
+					{% set helpdesk_name = frappe.get_doc("HD Settings").helpdesk_name %}
 						{% if helpdesk_name %}
 					<div class="ql-editor read-mode">
 						<p>{{ helpdesk_name }}</p>
@@ -76,7 +76,7 @@ head_include %}
 			<div class="row">
 				<div class="footer-col-left col-sm-6 col-12">
 					<!-- prettier-ignore -->
-					{% set helpdesk_name = frappe.get_doc("Frappe Desk Settings").helpdesk_name %}
+					{% set helpdesk_name = frappe.get_doc("HD Settings").helpdesk_name %}
 					{% if helpdesk_name %}
 					<div class="ql-editor read-mode">
 						<p>© {{ helpdesk_name }}. 2022</p>

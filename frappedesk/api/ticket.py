@@ -5,7 +5,7 @@ from frappe.website.utils import cleanup_page_name
 from frappedesk.frappedesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
-from frappedesk.frappedesk.doctype.ticket.ticket import (
+from frappedesk.frappedesk.doctype.hd_ticket.hd_ticket import (
 	create_communication_via_contact,
 	get_all_conversations,
 )

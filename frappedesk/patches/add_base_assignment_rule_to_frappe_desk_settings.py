@@ -5,9 +5,9 @@ def execute():
 	frappe.reload_doc("FrappeDesk", "doctype", "Agent")
 	frappe.reload_doc("FrappeDesk", "doctype", "Agent Group Item")
 	frappe.reload_doc("FrappeDesk", "doctype", "Agent Group")
-	frappe.reload_doc("FrappeDesk", "doctype", "Frappe Desk Settings")
+	frappe.reload_doc("FrappeDesk", "doctype", "HD Settings")
 
-	settings = frappe.get_doc("Frappe Desk Settings")
+	settings = frappe.get_doc("HD Settings")
 	if not settings.base_support_rotation:
 		if frappe.db.exists("Assignment Rule", "Support Rotation"):
 			settings.base_support_rotation = "Support Rotation"

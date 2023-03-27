@@ -1,4 +1,3 @@
-from frappedesk.frappedesk.doctype.ticket_activity import log_ticket_activity
 import frappe
 
 

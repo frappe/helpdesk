@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import frappe
 from frappe.permissions import add_permission
 
@@ -41,7 +43,7 @@ def add_support_redirect_to_tickets():
 def add_default_categories_and_articles():
 	category = frappe.get_doc(
 		{
-			"doctype": "Category",
+			"doctype": "HD Article Category",
 			"category_name": "Getting Started",
 			"description": "Content for your Category",
 		}
@@ -49,7 +51,7 @@ def add_default_categories_and_articles():
 
 	frappe.get_doc(
 		{
-			"doctype": "Article",
+			"doctype": "HD Article",
 			"title": "Introduction",
 			"content": "Content for your Article",
 			"category": category.name,
@@ -67,7 +69,7 @@ def add_default_sla():
 	sla_doc = frappe.new_doc("HD Service Level Agreement")
 
 	sla_doc.service_level = "Default"
-	sla_doc.document_type = "Ticket"
+	sla_doc.document_type = "HD Ticket"
 	sla_doc.default_sla = 1
 	sla_doc.enabled = 1
 
@@ -138,7 +140,7 @@ def add_default_sla():
 	for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]:
 		service_day = frappe.get_doc(
 			{
-				"doctype": "Service Day",
+				"doctype": "HD Service Day",
 				"workday": day,
 				"start_time": "10:00:00",
 				"end_time": "18:00:00",
@@ -150,8 +152,6 @@ def add_default_sla():
 
 
 def add_default_holidy_list():
-	from datetime import datetime
-
 	frappe.get_doc(
 		{
 			"doctype": "HD Service Holiday List",
@@ -167,7 +167,7 @@ def add_default_holidy_list():
 
 
 def enable_track_service_level_agreement_in_support_settings():
-	support_settings = frappe.get_doc("Frappe Desk Settings")
+	support_settings = frappe.get_doc("HD Settings")
 	support_settings.track_service_level_agreement = True
 	support_settings.save()
 	frappe.db.commit()
@@ -211,8 +211,8 @@ def add_default_ticket_types():
 	ticket_types = ["Question", "Bug", "Incident"]
 
 	for type in ticket_types:
-		if not frappe.db.exists("Ticket Type", type):
-			type_doc = frappe.new_doc("Ticket Type")
+		if not frappe.db.exists("HD Ticket Type", type):
+			type_doc = frappe.new_doc("HD Ticket Type")
 			type_doc.name = type
 			type_doc.insert()
 
@@ -221,8 +221,8 @@ def add_default_ticket_priorities():
 	ticket_priorities = ["Low", "Medium", "High", "Urgent"]
 
 	for priority in ticket_priorities:
-		if not frappe.db.exists("Ticket Priority", priority):
-			priority_doc = frappe.new_doc("Ticket Priority")
+		if not frappe.db.exists("HD Ticket Priority", priority):
+			priority_doc = frappe.new_doc("HD Ticket Priority")
 			priority_doc.name = priority
 			priority_doc.insert()
 
@@ -231,8 +231,8 @@ def add_default_agent_groups():
 	agent_groups = ["Billing", "Product Experts"]
 
 	for agent_group in agent_groups:
-		if not frappe.db.exists("Agent Group", agent_group):
-			agent_group_doc = frappe.new_doc("Agent Group")
+		if not frappe.db.exists("HD Team", agent_group):
+			agent_group_doc = frappe.new_doc("HD Team")
 			agent_group_doc.team_name = agent_group
 			agent_group_doc.insert()
 
@@ -243,7 +243,7 @@ def add_on_ticket_create_script():
 		script_doc.name = "Ticket Auto Set Custom Fields"
 		script_doc.script_type = "DocType Event"
 		script_doc.module = "FrappeDesk"
-		script_doc.reference_doctype = "Ticket"
+		script_doc.reference_doctype = "HD Ticket"
 		script_doc.doctype_event = "Before Insert"
 		script_doc.script = "# Do Nothing"
 		script_doc.insert()
@@ -269,7 +269,7 @@ def update_agent_role_permissions():
 
 
 def add_default_assignment_rule():
-	support_settings = frappe.get_doc("Frappe Desk Settings")
+	support_settings = frappe.get_doc("HD Settings")
 	support_settings.create_base_support_rotation()
 
 
@@ -278,9 +278,9 @@ def add_system_preset_filters():
 	for status in ["Closed", "Resolved", "Replied", "Open"]:
 		preset_filters.append(
 			{
-				"doctype": "FD Preset Filter",
+				"doctype": "HD Preset Filter",
 				"title": f"My {status} Tickets",
-				"reference_doctype": "Ticket",
+				"reference_doctype": "HD Ticket",
 				"filters": [
 					{
 						"label": "Assigned To",
@@ -299,9 +299,9 @@ def add_system_preset_filters():
 		)
 	preset_filters.append(
 		{
-			"doctype": "FD Preset Filter",
+			"doctype": "HD Preset Filter",
 			"title": "All Tickets",
-			"reference_doctype": "Ticket",
+			"reference_doctype": "HD Ticket",
 			"filters": [],
 		}
 	)
