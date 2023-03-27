@@ -12,7 +12,7 @@ def execute():
 			{"name": ticket_doc.name, "satisfied": ticket_doc.satisfied}
 		)
 
-	frappe.reload_doc("FrappeDesk", "doctype", "HD Ticket")
+	frappe.reload_doc("Helpdesk", "doctype", "HD Ticket")
 
 	for ticket in tickets_before_reload:
 		ticket_doc = frappe.get_doc("HD Ticket", ticket["name"])
