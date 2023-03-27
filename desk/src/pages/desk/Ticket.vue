@@ -585,7 +585,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 				onSuccess: () => {
 					this.$resources.ticket.lastCommunication.fetch();
@@ -753,7 +753,7 @@ export default {
 			const content = `<div class='content-block'><div>${this.content}</div></div>`;
 			this.$resources.submitComment.submit({
 				doc: {
-					doctype: "Frappe Desk Comment",
+					doctype: "HD Ticket Comment",
 					reference_ticket: this.ticketId,
 					content: content,
 					commented_by: this.authStore.userId,

@@ -3,7 +3,7 @@
 		<ListManager
 			ref="articleList"
 			:options="{
-				doctype: 'Article',
+				doctype: 'HD Article',
 				order_by: 'modified DESC',
 				limit: 20,
 			}"

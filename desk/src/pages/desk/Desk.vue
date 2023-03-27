@@ -372,7 +372,7 @@ export default {
 					doctype: "Email Account",
 					filters: [
 						["use_imap", "=", 1],
-						["IMAP Folder", "append_to", "=", "Ticket"],
+						["IMAP Folder", "append_to", "=", "HD Ticket"],
 						["default_outgoing", "=", 1],
 					],
 				},
@@ -383,7 +383,7 @@ export default {
 			return {
 				url: "frappe.client.get_count",
 				params: {
-					doctype: "Agent",
+					doctype: "HD Agent",
 				},
 				auto: true,
 			};
@@ -423,7 +423,7 @@ export default {
 			return {
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "Ticket Type",
+					doctype: "HD Ticket Type",
 					pluck: "name",
 				},
 				auto: this.authStore.hasDeskAccess,
@@ -439,7 +439,7 @@ export default {
 			return {
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "Ticket Priority",
+					doctype: "HD Ticket Priority",
 				},
 				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
@@ -483,7 +483,7 @@ export default {
 			return {
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "Agent",
+					doctype: "HD Agent",
 					fields: ["name", "agent_name", "user_image"],
 				},
 				auto: this.authStore.hasDeskAccess,
@@ -499,7 +499,7 @@ export default {
 			return {
 				url: "frappedesk.extends.client.get_list",
 				params: {
-					doctype: "Agent Group",
+					doctype: "HD Team",
 				},
 				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {

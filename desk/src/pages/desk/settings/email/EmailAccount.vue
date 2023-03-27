@@ -416,7 +416,7 @@ export default {
 						initial_sync_count: 100,
 						imap_folder: [
 							{
-								append_to: "Ticket",
+								append_to: "HD Ticket",
 								folder_name: "INBOX",
 							},
 						],
@@ -470,7 +470,7 @@ export default {
 					doctype: "Email Account",
 					filters: [
 						["use_imap", "=", 1],
-						["IMAP Folder", "append_to", "=", "Ticket"],
+						["IMAP Folder", "append_to", "=", "HD Ticket"],
 						["default_outgoing", "=", 1],
 					],
 				},

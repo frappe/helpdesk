@@ -4,7 +4,7 @@
 			ref="listManager"
 			:options="{
 				cache: ['Agents', 'Desk'],
-				doctype: 'Agent',
+				doctype: 'HD Agent',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['user', 'agent_name'],
@@ -14,7 +14,7 @@
 			<template #body="{ manager }">
 				<ListViewer
 					:options="{
-						name: 'Agent',
+						name: 'HD Agent',
 						base: '12',
 						listTitle: 'Agents',
 						filterBox: true,
@@ -56,7 +56,7 @@
 									() => {
 										$resources.deleteAgent
 											.submit({
-												doctype: 'Agent',
+												doctype: 'HD Agent',
 												name: Object.keys(
 													selectedItems
 												),

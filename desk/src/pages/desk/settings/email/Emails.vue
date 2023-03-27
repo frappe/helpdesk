@@ -16,7 +16,7 @@
 					'default_outgoing',
 				],
 				limit: 20,
-				filters: [['IMAP Folder', 'append_to', 'in', ['Ticket']]],
+				filters: [['IMAP Folder', 'append_to', 'in', ['HD Ticket']]],
 			}"
 		>
 			<template #body="{ manager }">

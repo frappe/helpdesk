@@ -10,7 +10,7 @@
 		</div>
 		<div class="flex justify-between px-6 py-3">
 			<div class="flex gap-2">
-				<PresetFilters doctype="Ticket" />
+				<PresetFilters doctype="HD Ticket" />
 				<Dropdown
 					:options="filterByStatusOptions"
 					:button="{
@@ -29,7 +29,7 @@
 				/>
 			</div>
 			<div class="flex items-center gap-2">
-				<FilterBox doctype="Ticket" />
+				<FilterBox doctype="HD Ticket" />
 				<Dropdown
 					:options="sortDropdownOptions"
 					:button="{
@@ -223,7 +223,7 @@ export default {
 		const authStore = useAuthStore();
 
 		const ticketList = createListManager({
-			doctype: "Ticket",
+			doctype: "HD Ticket",
 			pageLength: 20,
 		});
 

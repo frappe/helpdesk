@@ -3,8 +3,8 @@
 		<ListManager
 			ref="agentGroupList"
 			:options="{
-				cache: ['Agent Group', 'Desk'],
-				doctype: 'Agent Group',
+				cache: ['HD Team', 'Desk'],
+				doctype: 'HD Team',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['team_name', 'assignment_rule'],
@@ -60,7 +60,7 @@
 									() => {
 										$resources.deleteTeam
 											.submit({
-												doctype: 'Agent Group',
+												doctype: 'HD Team',
 												name: Object.keys(
 													selectedItems
 												),

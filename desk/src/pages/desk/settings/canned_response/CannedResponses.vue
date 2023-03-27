@@ -3,7 +3,7 @@
 		<ListManager
 			ref="listManager"
 			:options="{
-				doctype: 'Canned Response',
+				doctype: 'HD Canned Response',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['title', 'owner'],
@@ -59,7 +59,7 @@
 									() => {
 										$resources.deleteTeam
 											.submit({
-												doctype: 'Canned Response',
+												doctype: 'HD Canned Response',
 												name: Object.keys(selectedItems),
 											})
 											.then(() => {

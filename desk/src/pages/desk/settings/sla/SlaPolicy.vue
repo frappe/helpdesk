@@ -563,7 +563,7 @@ export default {
 		rename() {
 			// TODO: once Service level agreement is renamable uncomment this block
 			// return this.$resources.renameServicePolicy.submit({
-			// 	doctype: "SLA",
+			// 	doctype: "HD Service Level Agreement",
 			// 	old_name: this.slaPolicyName,
 			// 	new_name: this.tempSlaPolicyName
 			// })
@@ -577,7 +577,7 @@ export default {
 						service_level: this.tempSlaPolicyName,
 						priorities: this.priorities,
 						support_and_resolution: this.supportAndResolution,
-						document_type: "Ticket",
+						document_type: "HD Ticket",
 						holiday_list: this.selectedHolidayList,
 						sla_fulfilled_on: [
 							{ status: "Resolved" },

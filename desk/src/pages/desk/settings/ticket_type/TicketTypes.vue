@@ -3,8 +3,8 @@
 		<ListManager
 			ref="ticketTypeList"
 			:options="{
-				cache: ['Ticket Type', 'Desk'],
-				doctype: 'Ticket Type',
+				cache: ['HD Ticket Type', 'Desk'],
+				doctype: 'HD Ticket Type',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['name', 'priority'],
@@ -56,7 +56,7 @@
 									() => {
 										$resources.deleteTicketType
 											.submit({
-												doctype: 'Ticket Type',
+												doctype: 'HD Ticket Type',
 												name: Object.keys(
 													selectedItems
 												),

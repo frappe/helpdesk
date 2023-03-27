@@ -487,7 +487,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 			}
 		},
@@ -495,7 +495,7 @@ export default {
 			return {
 				url: "frappedesk.api.ticket.get_custom_fields",
 				params: {
-					doctype: "Ticket",
+					doctype: "HD Ticket",
 					view: "Customer Portal",
 				},
 				auto: true,

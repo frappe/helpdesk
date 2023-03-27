@@ -26,7 +26,7 @@
 			<div>
 				<Breadcrumbs
 					v-if="!isNew"
-					doc-type="Article"
+					doc-type="HD Article"
 					:doc-name="articleId"
 					:is-desk="editable"
 				/>
@@ -107,7 +107,7 @@
 				>
 					<Breadcrumbs
 						v-if="!editable"
-						doc-type="Article"
+						doc-type="HD Article"
 						:doc-name="articleId"
 						:is-desk="editable"
 						class="mb-5"
@@ -243,7 +243,7 @@ export default {
 				if (this.editable) {
 					return {
 						type: "document",
-						doctype: "Article",
+						doctype: "HD Article",
 						name: this.articleId,
 						setValue: {
 							onSuccess: () => {
@@ -361,7 +361,7 @@ export default {
 					this.articleTempValues.status = publish ? "Published" : "Draft";
 					await this.$resources.newArticle.submit({
 						doc: {
-							doctype: "Article",
+							doctype: "HD Article",
 							...this.articleTempValues,
 						},
 					});

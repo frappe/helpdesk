@@ -331,7 +331,7 @@ export default {
 					initial_sync_count: 100,
 					imap_folder: [
 						{
-							append_to: "Ticket",
+							append_to: "HD Ticket",
 							folder_name: "INBOX",
 						},
 					],
