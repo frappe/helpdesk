@@ -14,7 +14,7 @@
 			</div>
 			<div class="w-full group flex items-center">
 				<router-link
-					:to="`/helpdesk/dashboard/settings/emails/${emailAccount.name}`"
+					:to="`/helpdesk/settings/emails/${emailAccount.name}`"
 					class="sm:w-4/12"
 				>
 					{{ emailAccount.name }}

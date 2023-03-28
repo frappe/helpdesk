@@ -9,7 +9,7 @@
 			<!-- TODO: <FeatherIcon v-if="editMode" name="plus" class="w-4 cursor-pointer my-auto bg-gray-50 hover:bg-gray-100 rounded" /> -->
 			<p v-if="editMode" class="text-base text-gray-500">
 				( add articles from
-				<router-link class="underline" :to="{ path: '/helpdesk/dashboard/kb/articles' }"
+				<router-link class="underline" :to="{ path: '/helpdesk/kb/articles' }"
 					>here</router-link
 				>
 				)
@@ -31,7 +31,7 @@
 								if (editMode) return;
 								$router.push({
 									path: `/${
-										$route.meta.editable ? 'helpdesk/dashboard' : 'helpdesk'
+										$route.meta.editable ? 'helpdesk' : 'helpdesk'
 									}/kb/articles/${element.name}/${element.title_slug}`,
 								});
 							}

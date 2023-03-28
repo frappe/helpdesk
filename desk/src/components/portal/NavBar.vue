@@ -111,10 +111,10 @@ export default {
 			}
 			// Add "Create a Ticket" option on the navbar if not already present
 			const newTicketRoutes = [
-				"/helpdesk/tickets",
-				"/helpdesk/tickets/",
-				"/helpdesk/tickets/new",
-				"/helpdesk/tickets/new/",
+				"/helpdesk/my-tickets",
+				"/helpdesk/my-tickets/",
+				"/helpdesk/my-tickets/new",
+				"/helpdesk/my-tickets/new/",
 			]
 			const currentRouteIsNewTicket = () => {
 				for (let route of newTicketRoutes) {
@@ -136,7 +136,7 @@ export default {
 			if (!currentRouteIsNewTicket() && !newTicketRouteExists()) {
 				parentItems.push({
 					label: "Create a Ticket",
-					url: "/helpdesk/tickets",
+					url: "/helpdesk/my-tickets",
 					children: [],
 				})
 			}

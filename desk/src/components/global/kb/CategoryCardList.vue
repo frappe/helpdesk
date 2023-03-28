@@ -56,7 +56,7 @@
 									['DeskKBHome', 'DeskKBCategory'].includes(
 										$route.name
 									)
-										? 'helpdesk/dashboard'
+										? 'helpdesk'
 										: 'helpdesk'
 								}/kb/categories/${element.name}`,
 							})

@@ -25,32 +25,32 @@ export default {
 				{
 					label: "Agents",
 					pageName: "Agents",
-					route: "/helpdesk/dashboard/settings/agents",
+					route: "/helpdesk/settings/agents",
 				},
 				{
 					label: "Teams",
 					pageName: "Teams",
-					route: "/helpdesk/dashboard/settings/teams",
+					route: "/helpdesk/settings/teams",
 				},
 				{
 					label: "Ticket Types",
 					pageName: "TicketTypes",
-					route: "/helpdesk/dashboard/settings/ticket_types",
+					route: "/helpdesk/settings/ticket_types",
 				},
 				{
 					label: "Support Policies",
 					pageName: "SlaPolicies",
-					route: "/helpdesk/dashboard/settings/sla",
+					route: "/helpdesk/settings/sla",
 				},
 				{
 					label: "Canned Responses",
 					pageName: "CannedResponses",
-					route: "/helpdesk/dashboard/settings/canned_response",
+					route: "/helpdesk/settings/canned_response",
 				},
 				{
 					label: "Email Accounts",
 					pageName: "Emails",
-					route: "/helpdesk/dashboard/settings/emails",
+					route: "/helpdesk/settings/emails",
 				},
 			],
 		}

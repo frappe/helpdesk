@@ -9,7 +9,7 @@
 							name: 'customer',
 							handler: () => {
 								$router.push({
-									path: `/helpdesk/dashboard/customers`,
+									path: `/helpdesk/customers`,
 								})
 							},
 						},

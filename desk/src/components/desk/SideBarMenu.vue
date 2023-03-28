@@ -127,28 +127,28 @@ const menuOptions = [
 		label: "Dashboard",
 		icon: "dashboard",
 		to: {
-			path: "/helpdesk/dashboard/dashboard",
+			path: "/helpdesk/dashboard",
 		},
 	},
 	{
 		label: "Tickets",
 		icon: "ticket",
 		to: {
-			path: "/helpdesk/dashboard/tickets",
+			path: "/helpdesk/tickets",
 		},
 	},
 	{
 		label: "Customers",
 		icon: "customer",
 		to: {
-			path: "/helpdesk/dashboard/customers",
+			path: "/helpdesk/customers",
 		},
 	},
 	{
 		label: "Contacts",
 		icon: "customers",
 		to: {
-			path: "/helpdesk/dashboard/contacts",
+			path: "/helpdesk/contacts",
 		},
 	},
 ];
@@ -158,14 +158,14 @@ const footerOptions = [
 		label: "Knowledge Base",
 		icon: "kb-articles",
 		to: {
-			path: "/helpdesk/dashboard/kb",
+			path: "/helpdesk/kb",
 		},
 	},
 	{
 		label: "Settings",
 		icon: "settings",
 		to: {
-			path: "/helpdesk/dashboard/settings",
+			path: "/helpdesk/settings",
 		},
 	},
 ];
@@ -182,7 +182,7 @@ const profileSettings = [
 		label: "Customer portal",
 		icon: "users",
 		handler: () => {
-			window.open("/helpdesk/tickets", "_blank");
+			window.open("/helpdesk/my-tickets", "_blank");
 		},
 	},
 	{
@@ -193,13 +193,13 @@ const profileSettings = [
 ];
 
 const routeMap = {
-	"Knowledge Base": "helpdesk/dashboard/kb",
-	Contacts: "helpdesk/dashboard/contacts",
-	Customers: "helpdesk/dashboard/customers",
-	Dashboard: "helpdesk/dashboard/dashboard",
-	Reports: "helpdesk/dashboard/reports",
-	Settings: "helpdesk/dashboard/settings",
-	Tickets: "helpdesk/dashboard/tickets",
+	"Knowledge Base": "helpdesk/kb",
+	Contacts: "helpdesk/contacts",
+	Customers: "helpdesk/customers",
+	Dashboard: "helpdesk/dashboard",
+	Reports: "helpdesk/reports",
+	Settings: "helpdesk/settings",
+	Tickets: "helpdesk/tickets",
 };
 
 function isActive(label: string) {

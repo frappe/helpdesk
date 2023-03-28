@@ -4,7 +4,7 @@
 			<div class="flex h-[60px] px-[20px]">
 				<div class="flex flex-row items-center space-x-2">
 					<router-link
-						:to="{ path: '/helpdesk/dashboard/tickets' }"
+						:to="{ path: '/helpdesk/tickets' }"
 						class="flex select-none flex-row items-center space-x-[12px] stroke-gray-600 text-[18px] font-semibold text-gray-900 hover:stroke-gray-700"
 						role="button"
 					>

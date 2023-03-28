@@ -55,7 +55,7 @@
 					class="text-center text-base"
 					:to="`${
 						this.$route.name === 'DeskSignup'
-							? '/helpdesk/dashboard'
+							? '/helpdesk'
 							: '/helpdesk'
 					}/login`"
 				>
@@ -142,9 +142,9 @@ export default {
 	async mounted() {
 		if (this.user.isLoggedIn()) {
 			if (this.$route.name == "PortalSignup") {
-				this.$router.push({ path: "/helpdesk/tickets" })
+				this.$router.push({ path: "/helpdesk/my-tickets" })
 			} else if (this.$route.name == "DeskSignup") {
-				this.$router.push({ path: "/helpdesk/dashboard/tickets" })
+				this.$router.push({ path: "/helpdesk/tickets" })
 			}
 		}
 	},

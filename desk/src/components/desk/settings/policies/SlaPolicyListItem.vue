@@ -14,7 +14,7 @@
 			</div>
 			<div class="w-full group flex items-center">
 				<router-link
-					:to="`/helpdesk/dashboard/settings/sla/${policy.name}`"
+					:to="`/helpdesk/settings/sla/${policy.name}`"
 					class="sm:w-10/12 truncate pr-10 flex flex-row items-center space-x-2"
 				>
 					<div>

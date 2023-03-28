@@ -1,7 +1,7 @@
 <template>
 	<router-link
 		:to="{
-			path: `/helpdesk/dashboard/tickets/${ticket.name}`,
+			path: `/helpdesk/tickets/${ticket.name}`,
 		}"
 		role="button"
 		class="line-clamp-1 hover:text-gray-900 text-gray-600"

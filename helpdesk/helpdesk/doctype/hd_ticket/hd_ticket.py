@@ -355,12 +355,12 @@ class HDTicket(Document):
 	@property
 	def dashboard_uri(self):
 		root_uri = frappe.utils.get_url()
-		return f"{root_uri}/frappedesk/tickets/{self.name}"
+		return f"{root_uri}/helpdesk/tickets/{self.name}"
 
 	@property
 	def portal_uri(self):
 		root_uri = frappe.utils.get_url()
-		return f"{root_uri}/support/tickets/{self.name}"
+		return f"{root_uri}/helpdesk/my-tickets/{self.name}"
 
 	@frappe.whitelist()
 	def reply_via_agent(

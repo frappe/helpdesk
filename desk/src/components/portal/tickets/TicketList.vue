@@ -62,7 +62,7 @@
 					:key="ticket.name"
 					class="space-y-4"
 				>
-					<router-link :to="`/helpdesk/tickets/${ticket.name}`">
+					<router-link :to="`/helpdesk/my-tickets/${ticket.name}`">
 						<div
 							class="px-1 rounded hover:bg-slate-50 cursor-pointer"
 						>

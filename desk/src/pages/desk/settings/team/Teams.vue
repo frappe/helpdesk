@@ -34,14 +34,14 @@
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
 						() => {
-							$router.push('/helpdesk/dashboard/settings/teams/new')
+							$router.push('/helpdesk/settings/teams/new')
 						}
 					"
 				>
 					<template #field-team_name="{ row }">
 						<router-link
 							:to="{
-								path: `/helpdesk/dashboard/settings/teams/${row.name}`,
+								path: `/helpdesk/settings/teams/${row.name}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>

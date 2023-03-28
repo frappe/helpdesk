@@ -43,7 +43,7 @@
 					class="h-[calc(100vh-6.5rem)] text-base"
 					@add-item="
 						() => {
-							$router.push('/helpdesk/dashboard/kb/articles/new');
+							$router.push('/helpdesk/kb/articles/new');
 						}
 					"
 				>
@@ -139,7 +139,7 @@
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
-								path: `/helpdesk/dashboard/kb/articles/${row.name}`,
+								path: `/helpdesk/kb/articles/${row.name}`,
 							}"
 							class="cursor-pointer text-gray-600 hover:text-gray-900"
 							>{{ value }}</router-link
@@ -213,7 +213,7 @@ export default {
 		},
 		knowledgeBase() {
 			if (this.activeTab == "Webview") {
-				this.$router.push({ path: "/helpdesk/dashboard/kb" })
+				this.$router.push({ path: "/helpdesk/kb" })
 			}
 		},
 	},

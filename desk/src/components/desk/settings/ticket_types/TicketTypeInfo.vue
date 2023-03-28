@@ -3,7 +3,7 @@
 		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
 			<div class="float-left">
 				<router-link
-					:to="`/helpdesk/dashboard/settings/ticket_types`"
+					:to="`/helpdesk/settings/ticket_types`"
 					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
@@ -184,7 +184,7 @@ export default {
 				url: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/helpdesk/dashboard/settings/ticket_types/${res}`,
+						path: `/helpdesk/settings/ticket_types/${res}`,
 					})
 				},
 			}
@@ -194,7 +194,7 @@ export default {
 				url: "frappe.client.insert",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/helpdesk/dashboard/settings/ticket_types/${res.name}`,
+						path: `/helpdesk/settings/ticket_types/${res.name}`,
 					})
 				},
 			}
