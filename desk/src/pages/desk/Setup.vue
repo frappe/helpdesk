@@ -25,7 +25,7 @@
 								</div>
 								<div class="mb-[30px] text-[16px] font-normal text-gray-900">
 									Configure your e-mail address to start sending and receiving
-									e-mails into FrappeDesk.
+									e-mails into Helpdesk.
 								</div>
 								<div class="mb-[30px]">
 									<span class="mb-2 block text-sm leading-4 text-gray-700">
