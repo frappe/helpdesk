@@ -85,13 +85,13 @@ export default {
 		},
 	},
 	mounted() {
-		this.$socket.on("frappedesk-preset-filter-insert", (data) => {
+		this.$socket.on("helpdesk:new-preset-filter", (data) => {
 			if (data.reference_doctype !== "HD Ticket") return;
 			this.$resources.presetFilterOptions.reload();
 		});
 	},
 	unmounted() {
-		this.$socket.off("frappedesk-preset-filter-insert");
+		this.$socket.off("helpdesk:new-preset-filter");
 	},
 	resources: {
 		presetFilterOptions() {

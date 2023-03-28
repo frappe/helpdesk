@@ -123,21 +123,21 @@ export default {
 		},
 	},
 	mounted() {
-		this.$socket.on("new_frappedesk_communication", (data) => {
+		this.$socket.on("helpdesk:new-communication", (data) => {
 			if (data.ticket_id != this.ticketId) return;
 
 			this.$resources.communications.reload();
 		});
 
-		this.$socket.on("new_frappedesk_comment", (data) => {
+		this.$socket.on("helpdesk:new-ticket-comment", (data) => {
 			if (data.ticket_id != this.ticketId) return;
 
 			this.$resources.comments.reload();
 		});
 	},
 	unmounted() {
-		this.$socket.off("new_frappedesk_communication");
-		this.$socket.off("new_frappedesk_comment");
+		this.$socket.off("helpdesk:new-communication");
+		this.$socket.off("helpdesk:new-ticket-comment");
 	},
 	updated() {
 		this.userColors = {};

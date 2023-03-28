@@ -12,7 +12,7 @@ def after_insert(c, method=None):
 		return
 
 	frappe.publish_realtime(
-		"new_frappedesk_communication",
+		"helpdesk:new-communication",
 		{
 			"ticket_id": c.reference_name,
 		},

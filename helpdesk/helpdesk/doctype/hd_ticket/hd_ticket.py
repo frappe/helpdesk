@@ -152,7 +152,7 @@ class HDTicket(Document):
 			).users:
 				clear_all_assignments("HD Ticket", self.name)
 				frappe.publish_realtime(
-					"ticket_assignee_update",
+					"helpdesk:update-ticket-assignee",
 					{"ticket_id": self.name},
 					after_commit=True,
 				)
@@ -271,7 +271,7 @@ class HDTicket(Document):
 		agent_name = frappe.get_value("HD Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 		frappe.publish_realtime(
-			"ticket_assignee_update", {"ticket_id": self.name}, after_commit=True
+			"helpdesk:update-ticket-assignee", {"ticket_id": self.name}, after_commit=True
 		)
 
 	def get_assigned_agent(self):

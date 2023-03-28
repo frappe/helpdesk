@@ -15,4 +15,4 @@ class HDPresetFilter(Document):
 			frappe.throw("System filters cannot be deleted")
 
 	def after_insert(self):
-		frappe.publish_realtime("frappedesk-preset-filter-insert", self)
+		frappe.publish_realtime("helpdesk:new-preset-filter", self)

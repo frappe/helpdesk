@@ -7,4 +7,4 @@ from frappe.model.document import Document
 
 class HDNotification(Document):
 	def after_insert(self):
-		frappe.publish_realtime("frappedesk:new_notification", user=self.to_user)
+		frappe.publish_realtime("helpdesk:new-notification", user=self.to_user)

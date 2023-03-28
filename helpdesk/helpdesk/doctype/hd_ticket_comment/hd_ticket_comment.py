@@ -31,5 +31,5 @@ class HDTicketComment(Document):
 
 	def after_insert(self):
 		frappe.publish_realtime(
-			"new_frappedesk_comment", {"ticket_id": self.reference_ticket}
+			"helpdesk:new-ticket-comment", {"ticket_id": self.reference_ticket}
 		)

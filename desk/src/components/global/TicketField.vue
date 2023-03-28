@@ -89,7 +89,7 @@ export default {
 	},
 	mounted() {
 		if (this.fieldname == "_assign") {
-			this.$socket.on("ticket_assignee_update", (data) => {
+			this.$socket.on("helpdesk:update-ticket-assignee", (data) => {
 				if (data.ticket_id == this.ticket.name) {
 					this.$resources.getAssignee.fetch()
 				}
