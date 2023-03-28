@@ -11,7 +11,7 @@ frappe.views.calendar["HD Service Holiday List"] = {
 	},
 	order_by: `from_date`,
 	get_events_method:
-		"frappedesk.frappedesk.doctype.holiday_list.holiday_list.get_events",
+		"helpdesk.helpdesk.doctype.holiday_list.holiday_list.get_events",
 	filters: [
 		{
 			fieldtype: "Link",

@@ -3,7 +3,7 @@ import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { createResource, call } from "frappe-ui";
 
-const REDIRECT_LOGIN = "DeskLogin";
+const VIEW_LOGIN = "Login";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
 const URI_SIGNUP = "helpdesk.api.account.signup";
 const URI_LOGIN = "login";
@@ -15,7 +15,7 @@ export const useAuthStore = defineStore("auth", () => {
 		url: URI_USER_INFO,
 		cache: ["LoggedAgent"],
 		onError() {
-			router.push({ name: "PortalLogin" });
+			router.push({ name: VIEW_LOGIN });
 		},
 	});
 
@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	function logout() {
-		call("logout").then(() => router.push({ name: REDIRECT_LOGIN }));
+		call("logout").then(() => router.push({ name: VIEW_LOGIN }));
 	}
 
 	function reloadUser() {
