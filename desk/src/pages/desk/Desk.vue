@@ -119,7 +119,7 @@ export default {
 			return;
 		}
 		if (!this.authStore.hasDeskAccess) {
-			this.$router.push({ path: "/support/tickets" });
+			this.$router.push({ path: "/helpdesk/tickets" });
 			return;
 		}
 		this.$resources.frappedeskSettings.fetch();
@@ -320,11 +320,11 @@ export default {
 			};
 		},
 		setHelpdeskName() {
-			// set helpdesk name in Frappe Desk Settings
+			// set helpdesk name in Helpdesk Settings
 			return {
 				url: "helpdesk.api.settings.update_helpdesk_name",
 				onSuccess: (res) => {
-					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
+					document.title = `Helpdesk ${res ? ` | ${res}` : ""}`;
 					this.$toast({
 						title: "Helpdesk name updated!!",
 						icon: "check",
@@ -342,7 +342,7 @@ export default {
 			};
 		},
 		skipHelpdeskNameSetup() {
-			// sets the values of skip_helpdesk_name_setup to true inside Frappe Desk Settings
+			// sets the values of skip_helpdesk_name_setup to true inside Helpdesk Settings
 			return {
 				url: "helpdesk.api.settings.skip_helpdesk_name_setup",
 			};

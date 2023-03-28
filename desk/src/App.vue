@@ -51,7 +51,7 @@ export default {
 				url: "helpdesk.api.website.helpdesk_name",
 				auto: true,
 				onSuccess: (res) => {
-					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
+					document.title = `Helpdesk ${res ? ` | ${res}` : ""}`;
 				},
 			};
 		},

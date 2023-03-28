@@ -56,8 +56,8 @@
 									['DeskKBHome', 'DeskKBCategory'].includes(
 										$route.name
 									)
-										? 'frappedesk'
-										: 'support'
+										? 'helpdesk/dashboard'
+										: 'helpdesk'
 								}/kb/categories/${element.name}`,
 							})
 						}

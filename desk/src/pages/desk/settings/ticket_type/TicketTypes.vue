@@ -31,13 +31,13 @@
 					}"
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
-						$router.push('/frappedesk/settings/ticket_types/new')
+						$router.push('/helpdesk/dashboard/settings/ticket_types/new')
 					"
 				>
 					<template #field-name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/ticket_types/${row.name}`,
+								path: `/helpdesk/dashboard/settings/ticket_types/${row.name}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>

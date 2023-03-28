@@ -1,6 +1,6 @@
 {
 	"charts": [],
-	"content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/frappedesk/tickets\\\">Go To Frappe Desk</a></span>\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Frappe Desk Configuration<br></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Ticket Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Agent Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Frappe Desk Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Automation\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Channels\",\"col\":4}}]",
+	"content": "[{\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h3\\\" style=\\\"\\\"><a href=\\\"/helpdesk\\\">Visit Helpdesk</a></span>\",\"col\":12}},{\"type\":\"spacer\",\"data\":{\"col\":12}},{\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Helpdesk Configuration<br></span>\",\"col\":12}},{\"type\":\"card\",\"data\":{\"card_name\":\"Ticket Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Agent Configuration\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Helpdesk Reports\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Automation\",\"col\":4}},{\"type\":\"card\",\"data\":{\"card_name\":\"Channels\",\"col\":4}}]",
 	"creation": "2022-09-17 11:48:26.825712",
 	"docstatus": 0,
 	"doctype": "Workspace",
@@ -8,7 +8,7 @@
 	"hide_custom": 0,
 	"icon": "support",
 	"idx": 0,
-	"label": "Frappe Desk",
+	"label": "Helpdesk",
 	"links": [
 		{
 			"hidden": 0,
@@ -23,7 +23,7 @@
 			"is_query_report": 0,
 			"label": "Agent",
 			"link_count": 0,
-			"link_to": "Agent",
+			"link_to": "HD Agent",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"
@@ -31,9 +31,9 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Agent Group",
+			"label": "Team",
 			"link_count": 0,
-			"link_to": "Agent Group",
+			"link_to": "HD Team",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"
@@ -95,9 +95,9 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "HD Ticket Type",
+			"label": "Ticket Type",
 			"link_count": 0,
-			"link_to": "Ticket Type",
+			"link_to": "HD Ticket Type",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"
@@ -107,7 +107,7 @@
 			"is_query_report": 0,
 			"label": "Support Policy",
 			"link_count": 0,
-			"link_to": "SLA",
+			"link_to": "HD Service Level Agreement",
 			"link_type": "DocType",
 			"onboard": 0,
 			"type": "Link"
@@ -125,7 +125,7 @@
 		{
 			"hidden": 0,
 			"is_query_report": 0,
-			"label": "Frappe Desk Reports",
+			"label": "Helpdesk Reports",
 			"link_count": 2,
 			"onboard": 0,
 			"type": "Card Break"
@@ -154,7 +154,7 @@
 	"modified": "2022-12-02 16:07:39.761267",
 	"modified_by": "Administrator",
 	"module": "Helpdesk",
-	"name": "Frappe Desk",
+	"name": "Helpdesk",
 	"owner": "Administrator",
 	"parent_page": "",
 	"public": 1,
@@ -162,5 +162,5 @@
 	"roles": [],
 	"sequence_id": 1,
 	"shortcuts": [],
-	"title": "Frappe Desk"
+	"title": "Helpdesk"
 }

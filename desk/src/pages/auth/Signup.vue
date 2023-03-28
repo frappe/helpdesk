@@ -55,8 +55,8 @@
 					class="text-center text-base"
 					:to="`${
 						this.$route.name === 'DeskSignup'
-							? '/frappedesk'
-							: '/support'
+							? '/helpdesk/dashboard'
+							: '/helpdesk'
 					}/login`"
 				>
 					<div>Already have an account? Log in.</div>
@@ -142,9 +142,9 @@ export default {
 	async mounted() {
 		if (this.user.isLoggedIn()) {
 			if (this.$route.name == "PortalSignup") {
-				this.$router.push({ path: "/support/tickets" })
+				this.$router.push({ path: "/helpdesk/tickets" })
 			} else if (this.$route.name == "DeskSignup") {
-				this.$router.push({ path: "/frappedesk/tickets" })
+				this.$router.push({ path: "/helpdesk/dashboard/tickets" })
 			}
 		}
 	},

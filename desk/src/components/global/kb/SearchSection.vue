@@ -51,7 +51,7 @@
 								>
 									<router-link
 										:to="{
-											path: `/support/kb/${
+											path: `/helpdesk/kb/${
 												result.doctype === 'Article'
 													? 'articles'
 													: 'categories'

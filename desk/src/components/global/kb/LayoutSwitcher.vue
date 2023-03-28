@@ -7,7 +7,7 @@
 			<router-link
 				:title="'Articles'"
 				:to="{
-					path: '/frappedesk/kb/articles',
+					path: '/helpdesk/dashboard/kb/articles',
 				}"
 			>
 				<FeatherIcon
@@ -30,7 +30,7 @@
 			</div>
 			<router-link
 				:title="'Toggle Web view'"
-				:to="{ path: '/frappedesk/kb' }"
+				:to="{ path: '/helpdesk/dashboard/kb' }"
 			>
 				<FeatherIcon
 					role="button"

@@ -3,27 +3,27 @@ import { call } from "frappe-ui";
 
 const routes = [
 	{
-		path: "/frappedesk/login",
+		path: "/helpdesk/dashboard/login",
 		name: "DeskLogin",
 		component: () => import("@/pages/auth/Login.vue"),
 	},
 	{
-		path: "/support/login",
+		path: "/helpdesk/login",
 		name: "PortalLogin",
 		component: () => import("@/pages/auth/Login.vue"),
 	},
 	{
-		path: "/frappedesk/signup",
+		path: "/helpdesk/dashboard/signup",
 		name: "DeskSignup",
 		component: () => import("@/pages/auth/Signup.vue"),
 	},
 	{
-		path: "/support/signup",
+		path: "/helpdesk/signup",
 		name: "PortalSignup",
 		component: () => import("@/pages/auth/Signup.vue"),
 	},
 	{
-		path: "/support/verify/:requestKey",
+		path: "/helpdesk/verify/:requestKey",
 		name: "Verify Account",
 		component: () =>
 			import(
@@ -32,19 +32,19 @@ const routes = [
 		props: true,
 	},
 	{
-		path: "/frappedesk/setup",
+		path: "/helpdesk/dashboard/setup",
 		name: "DeskSetup",
 		component: () => import("@/pages/desk/Setup.vue"),
 	},
 	{
-		path: "/frappedesk",
+		path: "/helpdesk/dashboard",
 		name: "Desk",
 		component: () => import("@/pages/desk/Desk.vue"),
 		children: [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/dashboard" };
+					return { path: "/helpdesk/dashboard/dashboard" };
 				},
 			},
 			{
@@ -67,7 +67,7 @@ const routes = [
 						return [
 							{
 								label: "Tickets",
-								path: "/frappedesk/tickets",
+								path: "/helpdesk/dashboard/tickets",
 							},
 							{
 								label: route.params.ticketId,
@@ -163,7 +163,7 @@ const routes = [
 						return [
 							{
 								label: "Contacts",
-								path: "/frappedesk/contacts",
+								path: "/helpdesk/dashboard/contacts",
 							},
 							{
 								label: route.params.contactId,
@@ -180,7 +180,7 @@ const routes = [
 					{
 						path: "",
 						redirect: () => {
-							return { path: "/frappedesk/settings/agents" };
+							return { path: "/helpdesk/dashboard/settings/agents" };
 						},
 					},
 					{
@@ -286,14 +286,14 @@ const routes = [
 		],
 	},
 	{
-		path: "/support",
+		path: "/helpdesk",
 		name: "Portal",
 		component: () => import("@/pages/portal/Portal.vue"),
 		children: [
 			{
 				path: "",
 				redirect: () => {
-					return { path: "/frappedesk/tickets" };
+					return { path: "/helpdesk/tickets" };
 				},
 			},
 			{

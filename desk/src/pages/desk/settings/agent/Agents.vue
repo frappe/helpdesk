@@ -37,7 +37,7 @@
 					<template #field-agent_name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/agents/${row.user}`,
+								path: `/helpdesk/dashboard/settings/agents/${row.user}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>

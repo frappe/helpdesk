@@ -127,28 +127,28 @@ const menuOptions = [
 		label: "Dashboard",
 		icon: "dashboard",
 		to: {
-			path: "/frappedesk/dashboard",
+			path: "/helpdesk/dashboard/dashboard",
 		},
 	},
 	{
 		label: "Tickets",
 		icon: "ticket",
 		to: {
-			path: "/frappedesk/tickets",
+			path: "/helpdesk/dashboard/tickets",
 		},
 	},
 	{
 		label: "Customers",
 		icon: "customer",
 		to: {
-			path: "/frappedesk/customers",
+			path: "/helpdesk/dashboard/customers",
 		},
 	},
 	{
 		label: "Contacts",
 		icon: "customers",
 		to: {
-			path: "/frappedesk/contacts",
+			path: "/helpdesk/dashboard/contacts",
 		},
 	},
 ];
@@ -158,14 +158,14 @@ const footerOptions = [
 		label: "Knowledge Base",
 		icon: "kb-articles",
 		to: {
-			path: "/frappedesk/kb",
+			path: "/helpdesk/dashboard/kb",
 		},
 	},
 	{
 		label: "Settings",
 		icon: "settings",
 		to: {
-			path: "/frappedesk/settings",
+			path: "/helpdesk/dashboard/settings",
 		},
 	},
 ];
@@ -182,7 +182,7 @@ const profileSettings = [
 		label: "Customer portal",
 		icon: "users",
 		handler: () => {
-			window.open("/support/tickets", "_blank");
+			window.open("/helpdesk/tickets", "_blank");
 		},
 	},
 	{
@@ -193,13 +193,13 @@ const profileSettings = [
 ];
 
 const routeMap = {
-	"Knowledge Base": "frappedesk/kb",
-	Contacts: "frappedesk/contacts",
-	Customers: "frappedesk/customers",
-	Dashboard: "frappedesk/dashboard",
-	Reports: "frappedesk/reports",
-	Settings: "frappedesk/settings",
-	Tickets: "frappedesk/tickets",
+	"Knowledge Base": "helpdesk/dashboard/kb",
+	Contacts: "helpdesk/dashboard/contacts",
+	Customers: "helpdesk/dashboard/customers",
+	Dashboard: "helpdesk/dashboard/dashboard",
+	Reports: "helpdesk/dashboard/reports",
+	Settings: "helpdesk/dashboard/settings",
+	Tickets: "helpdesk/dashboard/tickets",
 };
 
 function isActive(label: string) {

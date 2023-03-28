@@ -13,7 +13,7 @@
 				/>
 			</div>
 			<router-link
-				:to="`/frappedesk/settings/agents/${agent.name}`"
+				:to="`/helpdesk/dashboard/settings/agents/${agent.name}`"
 				class="w-full group flex items-center"
 			>
 				<div class="sm:w-5/12 truncate pr-10">

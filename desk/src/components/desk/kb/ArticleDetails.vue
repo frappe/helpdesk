@@ -3,7 +3,7 @@
 		<div class="font-semibold">Details</div>
 		<div class="border-b w-full"></div>
 		<router-link
-			:to="`/support/kb/articles/${article.name}`"
+			:to="`/helpdesk/kb/articles/${article.name}`"
 			target="_blank"
 			v-if="article.published_on"
 			class="flex flex-row justify-between items-center"

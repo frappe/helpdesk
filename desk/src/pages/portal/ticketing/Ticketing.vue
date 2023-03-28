@@ -48,7 +48,7 @@ export default {
 			}
 		} else {
 			this.impersonateContact = () => {
-				this.$router.push({ path: "/support/tickets" })
+				this.$router.push({ path: "/helpdesk/tickets" })
 				this.$resources.tickets.fetch()
 			}
 		}

@@ -16,7 +16,7 @@
 						)
 					} else {
 						$router.push({
-							path: `/${isDesk ? 'frappedesk' : 'support'}/kb${
+							path: `/${isDesk ? 'helpdesk/dashboard' : 'helpdesk'}/kb${
 								breadcrumb.name
 									? `/categories/${breadcrumb.name}`
 									: ''

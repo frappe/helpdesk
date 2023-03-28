@@ -11,7 +11,7 @@
 		>
 			<div class="flex justify-between mb-4">
 				<div class="flex items-center space-x-2 text-lg">
-					<a href="/support/kb">Home</a>
+					<a href="/helpdesk/kb">Home</a>
 					<FeatherIcon name="chevron-right" class="h-3 w-3" />
 					<router-link :to="{ name: 'ProtalTickets' }"
 						>Tickets</router-link

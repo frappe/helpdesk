@@ -14,7 +14,7 @@
 		@discard="
 			() => {
 				if (isNew) {
-					$router.push({ path: '/frappedesk/kb/articles' });
+					$router.push({ path: '/helpdesk/dashboard/kb/articles' });
 				} else {
 					editMode = false;
 				}
@@ -38,7 +38,7 @@
 							name: 'articles',
 							handler: () => {
 								$router.push({
-									path: `/${editable ? 'frappedesk' : 'support'}/kb/articles`,
+									path: `/${editable ? 'helpdesk/dashboard' : 'helpdesk'}/kb/articles`,
 								});
 							},
 						},
@@ -280,7 +280,7 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/frappedesk/kb/articles/${doc.name}`);
+					this.$router.push(`/helpdesk/dashboard/kb/articles/${doc.name}`);
 				},
 				onError: (err) => {
 					this.$toast({

@@ -33,7 +33,7 @@
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/settings/sla/new')
+							$router.push('/helpdesk/dashboard/settings/sla/new')
 						}
 					"
 				>
@@ -41,7 +41,7 @@
 						<div class="w-full group flex items-center">
 							<router-link
 								:to="{
-									path: `/frappedesk/settings/sla/${row.name}`,
+									path: `/helpdesk/dashboard/settings/sla/${row.name}`,
 								}"
 								class="text-[13px] text-gray-600 font-inter hover:text-gray-900 sm:w-10/12 truncate pr-10 flex flex-row items-center space-x-2"
 								><div>

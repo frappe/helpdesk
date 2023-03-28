@@ -205,7 +205,7 @@ export default {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
 					this.$router.push(
-						`/frappedesk/settings/canned_responses/${doc.name}`
+						`/helpdesk/dashboard/settings/canned_responses/${doc.name}`
 					)
 				},
 				onError: (err) => {
