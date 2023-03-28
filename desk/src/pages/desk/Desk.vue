@@ -82,13 +82,13 @@ export default {
 			if (!this.mounted) return false;
 			if (!this.authStore.isLoggedIn) return false;
 			if (!this.authStore.hasDeskAccess) return false;
-			if (this.$resources.frappedeskSettings.loading) return false;
-			if (!this.$resources.frappedeskSettings.data.initial_agent_set) {
+			if (this.$resources.helpdeskSettings.loading) return false;
+			if (!this.$resources.helpdeskSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit();
 				return false;
 			}
 			if (
-				!this.$resources.frappedeskSettings.data.initial_demo_ticket_created
+				!this.$resources.helpdeskSettings.data.initial_demo_ticket_created
 			) {
 				this.$resources.createInitialDemoTicket.submit();
 				return false;
@@ -122,7 +122,7 @@ export default {
 			this.$router.push({ path: "/helpdesk/my-tickets" });
 			return;
 		}
-		this.$resources.frappedeskSettings.fetch();
+		this.$resources.helpdeskSettings.fetch();
 		this.ticketController.set = (ticketId, type, ref = null) => {
 			switch (type) {
 				case "type":
@@ -185,8 +185,8 @@ export default {
 		handlePostOnboardSetupReqs() {
 			// helpdesk name
 			if (
-				!this.$resources.frappedeskSettings.data.helpdesk_name &&
-				!this.$resources.frappedeskSettings.data
+				!this.$resources.helpdeskSettings.data.helpdesk_name &&
+				!this.$resources.helpdeskSettings.data
 					.initial_helpdesk_name_setup_skipped
 			) {
 				this.showHelpdeskNameSetupToast();
@@ -194,7 +194,7 @@ export default {
 			}
 			// default email account
 			if (
-				!this.$resources.frappedeskSettings.data.suppress_default_email_toast &&
+				!this.$resources.helpdeskSettings.data.suppress_default_email_toast &&
 				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
 				!this.defaultOutgoingEmailAccountSetup
 			) {
@@ -290,7 +290,7 @@ export default {
 			return {
 				url: "helpdesk.api.setup.initial_agent_setup",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch();
+					this.$resources.helpdeskSettings.fetch();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -307,7 +307,7 @@ export default {
 			return {
 				url: "helpdesk.api.setup.create_initial_demo_ticket",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch();
+					this.$resources.helpdeskSettings.fetch();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -348,7 +348,7 @@ export default {
 			};
 		},
 		// getters
-		frappedeskSettings() {
+		helpdeskSettings() {
 			return {
 				url: "frappe.client.get",
 				params: {
