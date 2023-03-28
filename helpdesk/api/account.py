@@ -23,7 +23,7 @@ def signup(email, first_name, last_name):
 				"first_name": first_name,
 				"last_name": last_name,
 				"send_welcome_email": "0"
-				# "role_profile_name": "Frappedesk Contact"	TODO: add this role profile and then un-comment this part
+				# "role_profile_name": "Helpdesk Contact"	TODO: add this role profile and then un-comment this part
 			}
 		).insert()
 
