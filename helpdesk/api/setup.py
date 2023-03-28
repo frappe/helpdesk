@@ -46,7 +46,7 @@ def create_initial_demo_ticket():
 			<p><br></p>
 			<p>I'm glad you decided to try Frappe Desk! We're working hard to build a better way for teams to communicate and serve customers well. I'm excited to get started.</p>
 			<p><br></p>
-			<p>You can get started right away by setting up a support email. This will help you see what your support will look like with FrappeDesk!</p>
+			<p>You can get started right away by setting up a support email. This will help you see what your support will look like with Frappe Helpdesk!</p>
 			<p><br></p>
 			<p>Best,</p>
 			<p>Harshit</p>

@@ -18,7 +18,7 @@
 						<div>
 							<form v-if="currentStep == 1" @submit.prevent="submitStep">
 								<div class="mb-[10px] text-[24px] font-bold text-gray-900">
-									Welcome to FrappeDesk
+									Welcome to Frappe Helpdesk
 								</div>
 								<div class="mb-[30px] text-[16px] font-normal text-gray-600">
 									Thanks for verifying your e-mail.
