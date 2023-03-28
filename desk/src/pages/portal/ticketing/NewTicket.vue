@@ -412,7 +412,7 @@ export default {
 						list = (
 							await call("helpdesk.extends.client.get_list", {
 								doctype,
-								filters: field.filters,
+								filters: JSON.parse(field.filters),
 							})
 						).map((x) => x.name);
 						break;
