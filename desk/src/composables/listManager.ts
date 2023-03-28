@@ -71,8 +71,6 @@ export function createListManager(options: ListOptions) {
 	const meta = createResource({
 		url: GET_LIST_META_METHOD,
 		onSuccess: (data: MetaData) => {
-			// debugger;
-
 			list.totalCount = data.total_count;
 			list.totalPages = data.total_pages;
 			list.currentPage = data.current_page;
