@@ -32,7 +32,7 @@
 			<div
 				v-for="option in menuOptions"
 				:key="option.label"
-				class="flex cursor-pointer items-center gap-2 rounded-lg p-2"
+				class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1"
 				:class="{
 					'bg-gray-200': isActive(option.label),
 					'text-gray-900': isActive(option.label),
@@ -51,7 +51,7 @@
 			<div
 				v-for="option in footerOptions"
 				:key="option.label"
-				class="flex cursor-pointer items-center gap-2 rounded-lg p-2"
+				class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1"
 				:class="{
 					'bg-gray-200': isActive(option.label),
 					'text-gray-900': isActive(option.label),

@@ -64,7 +64,7 @@
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="hover:shadow-around flex w-full items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none"
+				class="hover:shadow-around flex w-full items-center rounded-lg border-b px-2 py-1 shadow-black transition-all last-of-type:border-none"
 			>
 				<div class="pl-1 pr-4">
 					<Input
@@ -74,7 +74,7 @@
 						:onchange="(e) => toggleOne(t.name, e.target.checked)"
 					/>
 				</div>
-				<div class="basis-1/3 w-1/12 pr-8">
+				<div class="w-1/12 basis-1/3 pr-8">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
 				<div class="flex basis-2/3 items-center">
@@ -110,7 +110,8 @@
 		<div class="grow"></div>
 		<div class="flex justify-between border-t p-4 font-sans text-base">
 			<div class="text-gray-700">
-				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of {{ ticketList.totalCount }}
+				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of
+				{{ ticketList.totalCount }}
 			</div>
 			<div class="flex items-center gap-2">
 				Page
