@@ -3,7 +3,6 @@ import frappe
 
 
 def extract_mentions(html):
-	print(html)
 	if not html:
 		return []
 	soup = BeautifulSoup(html, "html.parser")

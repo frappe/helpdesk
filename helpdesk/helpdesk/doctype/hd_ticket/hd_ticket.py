@@ -644,10 +644,6 @@ def get_list_context(context=None):
 
 @frappe.whitelist()
 def get_user_tickets(filters="{}", order_by="creation desc", impersonate=None):
-	print(
-		f"CALL: get_user_tickets, filters: {filters} order_by: {order_by} impersonate:"
-		f" {impersonate}"
-	)
 	filters = json.loads(filters)
 	filters["raised_by"] = ["=", frappe.session.user]
 

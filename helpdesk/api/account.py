@@ -63,7 +63,6 @@ def validate_password(password, first_name, last_name, email):
 	user_data = (first_name, last_name, email)
 	result = test_password_strength(password, "", None, user_data)
 	feedback = result.get("feedback", None)
-	print(result, feedback)
 
 	if feedback and not feedback.get("password_policy_validation_passed", False):
 		available = False
