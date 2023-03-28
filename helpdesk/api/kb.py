@@ -7,7 +7,7 @@ def check_if_article_title_exists(title, name=None):
 	if name:
 		filters["name"] = ["!=", name]
 
-	return frappe.db.exists("Article", filters)
+	return frappe.db.exists("HD Article", filters)
 
 
 @frappe.whitelist()
@@ -33,23 +33,23 @@ def insert_new_update_existing_categories(new_values, old_values):
 	# validate and delete missing categories
 	for category in to_archive:
 		if frappe.db.exists(
-			"Category", {"name": category, "parent_category": category}
+			"HD Article Category", {"name": category, "parent_category": category}
 		):
 			raise Exception("Cannot archive category with subcategories")
-		elif frappe.db.exists("Article", {"category": category}):
+		elif frappe.db.exists("HD Article", {"category": category}):
 			raise Exception("Cannot archive category with articles")
 		else:
-			frappe.get_doc("Category", category).archive()
+			frappe.get_doc("HD Article Category", category).archive()
 
 	# create new categories if present
 	for category in to_insert:
-		doc = frappe.new_doc("Category")
+		doc = frappe.new_doc("HD Article Category")
 		doc.update(category)
 		doc.save()
 
 	# update description & category_name
 	for category in to_update:
-		doc = frappe.get_doc("Category", category["name"])
+		doc = frappe.get_doc("HD Article Category", category["name"])
 		doc.update(category)
 		doc.save()
 
@@ -64,14 +64,14 @@ def update_articles_order_and_status(new_values):
 		to_update[i]["idx"] = i
 
 	for article in to_update:
-		doc = frappe.get_doc("Article", article["name"])
+		doc = frappe.get_doc("HD Article", article["name"])
 		doc.update(article)
 		doc.save()
 
 	to_mark_as_draft = [c["name"] for c in new_values if c["status"] == "Draft"]
 
 	for article in to_mark_as_draft:
-		doc = frappe.get_doc("Article", article)
+		doc = frappe.get_doc("HD Article", article)
 		doc.status = "Draft"
 		doc.idx = -1
 		doc.save()
@@ -81,20 +81,20 @@ def update_articles_order_and_status(new_values):
 
 @frappe.whitelist(allow_guest=True)
 def get_breadcrumbs(docType, docName):
-	if docType not in ["Article", "Category"]:
+	if docType not in ["HD Article", "HD Article Category"]:
 		frappe.throw("Doctype should be either Article or Category")
 	return frappe.get_doc(docType, docName).get_breadcrumbs()
 
 
 @frappe.whitelist(allow_guest=True)
 def check_if_article_is_published(article_name):
-	return frappe.db.exists("Article", {"name": article_name, "status": "Published"})
+	return frappe.db.exists("HD Article", {"name": article_name, "status": "Published"})
 
 
 @frappe.whitelist()
 def move_articles_to_category(articles, category):
 	for article in articles:
-		doc = frappe.get_doc("Article", article)
+		doc = frappe.get_doc("HD Article", article)
 		doc.category = category
 		doc.save()
 
@@ -104,7 +104,7 @@ def set_status_for_articles(articles, status):
 	if status not in ["Published", "Draft"]:
 		frappe.throw("Invalid status")
 	for article in articles:
-		doc = frappe.get_doc("Article", article)
+		doc = frappe.get_doc("HD Article", article)
 		doc.status = status
 		doc.save()
 
@@ -112,7 +112,7 @@ def set_status_for_articles(articles, status):
 @frappe.whitelist()
 def delete_articles(articles):
 	for article in articles:
-		doc = frappe.get_doc("Article", article)
+		doc = frappe.get_doc("HD Article", article)
 		doc.status = "Archived"
 		doc.save()
 
@@ -125,7 +125,7 @@ def search(text, limit=999):
 	# TODO: filter based on user permissions / guest user
 
 	articles = frappe.get_list(
-		"Article",
+		"HD Article",
 		filters={"status": ["=", "Published"]},
 		or_filters={"title": ["like", f"%{text}%"], "content": ["like", f"%{text}%"]},
 		fields=["name", "title", "category"],
@@ -134,7 +134,7 @@ def search(text, limit=999):
 	)
 
 	categories = frappe.get_list(
-		"Category",
+		"HD Article Category",
 		filters={"status": ["=", "Published"]},
 		or_filters={
 			"category_name": ["like", f"%{text}%"],
@@ -149,7 +149,7 @@ def search(text, limit=999):
 	for article in articles:
 		results.append(
 			{
-				"doctype": "Article",
+				"doctype": "HD Article",
 				"name": article.name,
 				"title": article.title,
 				"category": article.category,
@@ -158,7 +158,7 @@ def search(text, limit=999):
 	for category in categories:
 		results.append(
 			{
-				"doctype": "Category",
+				"doctype": "HD Article Category",
 				"name": category.name,
 				"title": category.category_name,
 			}
@@ -170,7 +170,7 @@ def search(text, limit=999):
 @frappe.whitelist(allow_guest=True)
 def submit_article_feedback(article, score, previous_score=None):
 	user = frappe.session.user
-	article_doc = frappe.get_doc("Article", article)
+	article_doc = frappe.get_doc("HD Article", article)
 	if previous_score is not None:
 		if user != "Guest":
 			user_article_feedback = frappe.get_value(
@@ -216,7 +216,7 @@ def submit_article_feedback(article, score, previous_score=None):
 @frappe.whitelist(allow_guest=True)
 def increment_article_views(article):
 	# TODO: use data to compute related articles, using past viewed articles of the user and giving a rank to each article
-	article_doc = frappe.get_doc("Article", article)
+	article_doc = frappe.get_doc("HD Article", article)
 	article_doc.views += 1
 	article_doc.save(
 		ignore_permissions=True
@@ -227,7 +227,7 @@ def increment_article_views(article):
 def get_article(article):
 	# TODO: check if article has gust access enabled
 	# TODO: else filter out with required permissions to view the article
-	article_doc = frappe.get_doc("Article", article)
+	article_doc = frappe.get_doc("HD Article", article)
 	return article_doc
 
 
@@ -238,13 +238,13 @@ def get_articles(
 	order_by="idx",
 ):
 	articles = frappe.get_list(
-		"Article",
+		"HD Article",
 		filters=filters,
 		limit=limit,
 		order_by=order_by,
 	)
 
-	return [frappe.get_doc("Article", article.name) for article in articles]
+	return [frappe.get_doc("HD Article", article.name) for article in articles]
 
 
 @frappe.whitelist(allow_guest=True)
@@ -255,7 +255,7 @@ def get_categories(
 	order_by="idx",
 ):
 	return frappe.get_list(
-		"Category",
+		"HD Article Category",
 		filters=filters,
 		fields=fields,
 		limit=limit,
@@ -267,11 +267,11 @@ def get_categories(
 def get_articles_in_ticket(title=None):
 	if title == None:
 		article_list = frappe.db.get_list(
-			"Article", fields=["name", "title", "content"]
+			"HD Article", fields=["name", "title", "content"]
 		)
 	else:
 		article_list = frappe.db.get_list(
-			"Article",
+			"HD Article",
 			fields=["name", "title", "content"],
 			filters={"title": ["like", "%{}%".format(title)]},
 		)
