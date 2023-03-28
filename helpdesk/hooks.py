@@ -10,16 +10,12 @@ app_license = "AGPLv3"
 before_install = "helpdesk.setup.install.before_install"
 after_install = "helpdesk.setup.install.after_install"
 
-# website_route_rules = [
-#     {
-#         "from_route": "/helpdesk/<path:app_path>",
-#         "to_route": "helpdesk",
-#     },
-#     # {
-#     #     "from_route": "/support/<path:app_path>",
-#     #     "to_route": "frappedesk",
-#     # },
-# ]
+website_route_rules = [
+    {
+        "from_route": "/helpdesk/<path:app_path>",
+        "to_route": "helpdesk",
+    },
+]
 
 has_website_permission = {
 	"Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_website_permission",
