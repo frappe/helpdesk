@@ -108,7 +108,7 @@
 			</div>
 		</div>
 		<div class="grow"></div>
-		<div class="flex justify-between border-t p-4 font-sans text-base">
+		<div class="flex justify-between border-t p-3 font-sans text-base">
 			<div class="text-gray-700">
 				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of
 				{{ ticketList.totalCount }}
@@ -137,7 +137,7 @@
 		</div>
 		<div
 			v-show="selected.size"
-			class="fixed inset-x-0 bottom-8 mx-auto w-max font-sans text-base"
+			class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
 		>
 			<div
 				class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
