@@ -316,7 +316,7 @@ def get_agent_assigned_to_ticket(ticket_id):
 	if assignee_list:
 		assignees = json.loads(assignee_list)
 		if len(assignees) > 0:
-			agent = frappe.qb.DocType("Agent")
+			agent = frappe.qb.DocType("HD Agent")
 			user = frappe.qb.DocType("User")
 			query = (
 				frappe.qb.from_(agent)
@@ -340,7 +340,7 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
 		# assign to self
 		agent_id = frappe.session.user
 
-	if not frappe.db.exists("Agent", agent_id):
+	if not frappe.db.exists("HD Agent", agent_id):
 		frappe.throw("Tickets can only assigned to agents")
 
 	ticket_doc.assign_agent(agent_id)
@@ -540,7 +540,7 @@ def get_field_meta_info(fieldname):
 	if fieldname in ["_assign"]:
 		return {
 			"fieldtype": "Link",
-			"options": "Agent",
+			"options": "HD Agent",
 			"fieldname": fieldname,
 			"label": "Assignee",
 		}
