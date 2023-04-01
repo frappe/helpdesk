@@ -34,3 +34,5 @@ helpdesk.patches.add_default_ticket_type
 helpdesk.patches.set_category_as_none_for_archived_articles
 helpdesk.patches.add_type_to_default_ticket_template
 execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
+helpdesk.patches.change_app_name_to_helpdesk
+helpdesk.patches.rename_doctypes_prefix_with_hd
