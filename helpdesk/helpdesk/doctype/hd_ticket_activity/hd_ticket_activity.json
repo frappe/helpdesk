@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:Ticket-{ticket}-{######}",
+ "autoname": "hash",
  "creation": "2022-03-20 22:12:24.118862",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -24,11 +24,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:50:50.650044",
+ "modified": "2023-04-03 03:54:42.803335",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Activity",
- "naming_rule": "Expression",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {

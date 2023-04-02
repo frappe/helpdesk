@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:COM-{reference_ticket}-{#######}",
+ "autoname": "hash",
  "creation": "2022-08-25 23:50:58.598316",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -38,11 +38,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:50:50.945844",
+ "modified": "2023-04-03 03:54:34.234840",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Comment",
- "naming_rule": "Expression",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
