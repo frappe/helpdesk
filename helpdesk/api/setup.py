@@ -40,17 +40,17 @@ def create_initial_demo_ticket():
 			).insert()
 
 			new_ticket_doc = frappe.new_doc("HD Ticket")
-			new_ticket_doc.subject = "Welcome to Frappe Desk"
+			new_ticket_doc.subject = "Welcome to Helpdesk"
 			new_ticket_doc.description = """
 			<p>Hi 👋🏻</p>
 			<p><br></p>
-			<p>I'm glad you decided to try Frappe Desk! We're working hard to build a better way for teams to communicate and serve customers well. I'm excited to get started.</p>
+			<p>I'm glad you decided to try Helpdesk! We're working hard to build a better way for teams to communicate and serve customers well. I'm excited to get started.</p>
 			<p><br></p>
 			<p>You can get started right away by setting up a support email. This will help you see what your support will look like with Frappe Helpdesk!</p>
 			<p><br></p>
 			<p>Best,</p>
 			<p>Harshit</p>
-			<p>Frappe Desk | Frappe.</p>
+			<p>Helpdesk | Frappe.</p>
 			"""
 			new_ticket_doc.raised_by = "harshit@frappe.io"
 			new_ticket_doc.contact = "Harshit Agrawal"

@@ -665,7 +665,7 @@ def get_response_and_resolution_duration(doc):
 
 def reset_hd_service_level_agreement(doc, reason, user):
 	if not frappe.db.get_single_value("HD Settings", "allow_resetting_service_level_agreement"):
-		frappe.throw(_("Allow Resetting HD Service Level Agreement from Frappe Desk Settings."))
+		frappe.throw(_("Allow Resetting HD Service Level Agreement from Helpdesk Settings."))
 
 	frappe.get_doc(
 		{
