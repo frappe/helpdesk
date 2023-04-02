@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_import": 1,
- "autoname": "format:{#######}",
+ "autoname": "autoincrement",
  "creation": "2022-03-02 03:10:19.254460",
  "doctype": "DocType",
  "document_type": "Setup",
@@ -442,11 +442,11 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-03-27 00:26:28.368993",
+ "modified": "2023-04-03 02:31:31.011750",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
- "naming_rule": "Expression",
+ "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [
   {
