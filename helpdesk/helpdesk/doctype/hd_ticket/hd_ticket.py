@@ -283,7 +283,7 @@ class HDTicket(Document):
 		return None
 
 	def on_trash(self):
-		activities = frappe.db.get_all("HD Ticket Activity", {"HD Ticket": self.name})
+		activities = frappe.db.get_all("HD Ticket Activity", {"ticket": self.name})
 		for activity in activities:
 			frappe.db.delete("HD Ticket Activity", activity)
 
