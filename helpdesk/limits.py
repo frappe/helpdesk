@@ -8,7 +8,7 @@ class PaywallReachedError(frappe.ValidationError):
 
 def validate_agent_count(doc, method):
 	plan = frappe.conf.plan
-	count = frappe.db.count("Agent")
+	count = frappe.db.count("HD Agent")
 
 	if plan == "Starter" and count >= 3:
 		frappe.throw(

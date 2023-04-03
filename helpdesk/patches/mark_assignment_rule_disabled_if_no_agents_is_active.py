@@ -6,7 +6,7 @@ def execute():
 	base_support_rotation_rule = frappe.get_doc(
 		"HD Settings"
 	).get_base_support_rotation()
-	if frappe.db.count("Agent", {"is_active": 1}) == 0:
+	if frappe.db.count("HD Agent", {"is_active": 1}) == 0:
 		base_support_rotation_rule_doc = frappe.get_doc(
 			"Assignment Rule", base_support_rotation_rule
 		)
@@ -16,10 +16,10 @@ def execute():
 	# Disable the group support rotation rule, if no agents are active in an agent group
 	# Get all agent group docs
 	all_agent_groups = frappe.get_all(
-		"Agent Group", fields=["name"], limit_page_length=9999
+		"HD Team", fields=["name"], limit_page_length=9999
 	)
 	all_agent_group_docs = [
-		frappe.get_doc("Agent Group", group.name) for group in all_agent_groups
+		frappe.get_doc("HD Team", group.name) for group in all_agent_groups
 	]
 
 	# Check if for each agent group, there are active agents, if not, disable the group support rotation rule
@@ -30,10 +30,10 @@ def execute():
 		)
 		# filter out agnets that are not active and has the current agent group in the agent group list
 		filters = [
-			["Agent Group Item", "agent_group", "=", agent_group_doc.name],
-			["Agent", "is_active", "=", 1],
+			["HD Team Item", "agent_group", "=", agent_group_doc.name],
+			["HD Agent", "is_active", "=", 1],
 		]
-		if frappe.db.count("Agent", filters=filters) == 0:
+		if frappe.db.count("HD Agent", filters=filters) == 0:
 			agent_group_assigmnent_rule_doc.disabled = 1
 		else:
 			agent_group_assigmnent_rule_doc.disabled = 0
