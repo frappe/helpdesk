@@ -27,10 +27,9 @@ def create_sequence():
 
 
 def sequence_start():
-	last_doc = frappe.get_last_doc(DOCTYPE)
-
-	if not last_doc:
+	try:
+		last_doc = frappe.get_last_doc(DOCTYPE)
+		last_id = alphanumeric_to_int(last_doc.name) or 0
+		return last_id + 1
+	except:
 		return 1
-
-	last_id = alphanumeric_to_int(last_doc.name) or 0
-	return last_id + 1
