@@ -55,10 +55,10 @@ doc_events = {
 	"Assignment Rule": {
         "on_trash": "helpdesk.overrides.on_assignment_rule_trash",
     },
-	"Agent": {
+	"HD Agent": {
         "before_insert": "helpdesk.limits.validate_agent_count",
     },
-	"Ticket": {
+	"HD Ticket": {
 		"after_insert": (
 			"helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_ticket_count"
 		),
