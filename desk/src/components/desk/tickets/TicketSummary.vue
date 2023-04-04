@@ -6,21 +6,24 @@
 			</div>
 		</router-link>
 		<div class="flex flex-wrap items-center gap-2">
-			<div>&#x0023;</div>
+			<IconHash />
 			<div>{{ ticketName }}</div>
 			<div>&#x2022;</div>
-			<FeatherIcon name="message-circle" class="h-4 w-4" />
-			{{ commentCount }}
-			<div>&#x2022;</div>
-			<FeatherIcon name="mail" class="h-4 w-4" />
+			<IconMail />
 			{{ conversationCount }}
+			<div>&#x2022;</div>
+			<IconComment />
+			{{ commentCount }}
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { computed, defineProps, toRefs } from "vue";
-import { FeatherIcon, createDocumentResource } from "frappe-ui";
+import { createDocumentResource } from "frappe-ui";
+import IconHash from "@/assets/icons/hash.svg?component";
+import IconMail from "@/assets/icons/mail.svg?component";
+import IconComment from "@/assets/icons/comment.svg?component";
 
 const props = defineProps({
 	ticketName: {
