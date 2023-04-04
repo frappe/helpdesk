@@ -40,7 +40,7 @@
 				}"
 				@click="$router.push(option.to)"
 			>
-				<CustomIcons :name="option.icon" class="h-4 w-4" />
+				<component :is="option.icon_"></component>
 				<div>
 					{{ option.label }}
 				</div>
@@ -59,7 +59,7 @@
 				}"
 				@click="$router.push(option.to)"
 			>
-				<CustomIcons :name="option.icon" class="h-4 w-4" />
+				<component :is="option.icon_"></component>
 				<div>
 					{{ option.label }}
 				</div>
@@ -99,8 +99,13 @@
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { Dropdown, FeatherIcon, Avatar } from "frappe-ui";
-import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import { useAuthStore } from "@/stores/auth";
+import IconDashboard from "@/assets/icons/dashboard.svg?component";
+import IconTicket from "@/assets/icons/ticket.svg?component";
+import IconCustomer from "@/assets/icons/customer.svg?component";
+import IconContact from "@/assets/icons/contact.svg?component";
+import IconKnowledgeBase from "@/assets/icons/knowledge-base.svg?component";
+import IconSettings from "@/assets/icons/settings.svg?component";
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -125,28 +130,28 @@ const keyboardShortcuts = [
 const menuOptions = [
 	{
 		label: "Dashboard",
-		icon: "dashboard",
+		icon_: IconDashboard,
 		to: {
 			path: "/helpdesk/dashboard",
 		},
 	},
 	{
 		label: "Tickets",
-		icon: "ticket",
+		icon_: IconTicket,
 		to: {
 			path: "/helpdesk/tickets",
 		},
 	},
 	{
 		label: "Customers",
-		icon: "customer",
+		icon_: IconCustomer,
 		to: {
 			path: "/helpdesk/customers",
 		},
 	},
 	{
 		label: "Contacts",
-		icon: "customers",
+		icon_: IconContact,
 		to: {
 			path: "/helpdesk/contacts",
 		},
@@ -156,14 +161,14 @@ const menuOptions = [
 const footerOptions = [
 	{
 		label: "Knowledge Base",
-		icon: "kb-articles",
+		icon_: IconKnowledgeBase,
 		to: {
 			path: "/helpdesk/kb",
 		},
 	},
 	{
 		label: "Settings",
-		icon: "settings",
+		icon_: IconSettings,
 		to: {
 			path: "/helpdesk/settings",
 		},
