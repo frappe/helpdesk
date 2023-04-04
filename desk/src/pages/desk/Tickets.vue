@@ -37,7 +37,16 @@
 						iconLeft: 'list',
 						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
-				/>
+				>
+					<template #default>
+						<Button>
+							<template #icon-left>
+								<IconSort />
+							</template>
+							<div class="px-1">Sort</div>
+						</Button>
+					</template>
+				</Dropdown>
 			</div>
 		</div>
 		<div class="px-6 font-sans text-base text-gray-500">
@@ -204,6 +213,7 @@ import { useListFilters } from "@/composables/listFilters";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useAuthStore } from "@/stores/auth";
+import IconSort from "@/assets/icons/sort-arrow.svg?component";
 
 export default {
 	name: "Tickets",
@@ -214,6 +224,7 @@ export default {
 		NewTicketDialog,
 		PresetFilters,
 		TicketSummary,
+		IconSort,
 	},
 	inject: ["agents"],
 	setup() {
