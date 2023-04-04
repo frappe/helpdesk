@@ -8,9 +8,7 @@ const routes = [
 		children: [
 			{
 				path: "",
-				redirect: () => {
-					return { path: "/helpdesk/my-tickets" };
-				},
+				component: () => import("@/pages/WebsiteRoot.vue"),
 			},
 			{
 				path: "login",
@@ -48,7 +46,7 @@ const routes = [
 						children: [
 							{
 								path: "",
-								name: "ProtalTickets",
+								name: "PortalTickets",
 								component: () => import("@/pages/portal/ticketing/Tickets.vue"),
 							},
 							{
