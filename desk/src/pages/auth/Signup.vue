@@ -53,11 +53,7 @@
 				</div>
 				<router-link
 					class="text-center text-base"
-					:to="`${
-						this.$route.name === 'DeskSignup'
-							? '/frappedesk'
-							: '/support'
-					}/login`"
+					:to="{ name: 'Login' }"
 				>
 					<div>Already have an account? Log in.</div>
 				</router-link>
@@ -141,11 +137,7 @@ export default {
 	},
 	async mounted() {
 		if (this.user.isLoggedIn()) {
-			if (this.$route.name == "PortalSignup") {
-				this.$router.push({ path: "/support/tickets" })
-			} else if (this.$route.name == "DeskSignup") {
-				this.$router.push({ path: "/frappedesk/tickets" })
-			}
+			this.$router.push({ name: "Root" })
 		}
 	},
 	methods: {

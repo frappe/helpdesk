@@ -3,7 +3,7 @@
 		<div class="shrink-0 h-[72px] py-[22px] flow-root px-[16px]">
 			<div class="float-left">
 				<router-link
-					:to="`/frappedesk/settings/ticket_types`"
+					:to="`/helpdesk/settings/ticket_types`"
 					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
@@ -67,10 +67,10 @@
 							}
 						"
 						:resourceOptions="{
-							url: 'frappedesk.extends.client.get_list',
+							url: 'helpdesk.extends.client.get_list',
 							inputMap: (query) => {
 								return {
-									doctype: 'Ticket Priority',
+									doctype: 'HD Ticket Priority',
 									pluck: 'name',
 									filters: [['name', 'like', `%${query}%`]],
 								}
@@ -158,7 +158,7 @@ export default {
 			if (!this.ticketTypeId) return
 			return {
 				type: "document",
-				doctype: "Ticket Type",
+				doctype: "HD Ticket Type",
 				name: this.ticketTypeId,
 				setValue: {
 					onSuccess: () => {
@@ -184,7 +184,7 @@ export default {
 				url: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/frappedesk/settings/ticket_types/${res}`,
+						path: `/helpdesk/settings/ticket_types/${res}`,
 					})
 				},
 			}
@@ -194,7 +194,7 @@ export default {
 				url: "frappe.client.insert",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/frappedesk/settings/ticket_types/${res.name}`,
+						path: `/helpdesk/settings/ticket_types/${res.name}`,
 					})
 				},
 			}
@@ -226,7 +226,7 @@ export default {
 					.then(() => {
 						if (newTicketTypeName != oldTicketTypeName) {
 							this.$resources.renameTicketTypeDoc.submit({
-								doctype: "Ticket Type",
+								doctype: "HD Ticket Type",
 								old_name: oldTicketTypeName,
 								new_name: newTicketTypeName,
 							})
@@ -235,7 +235,7 @@ export default {
 			} else {
 				this.$resources.newTicketType.submit({
 					doc: {
-						doctype: "Ticket Type",
+						doctype: "HD Ticket Type",
 						name: values.title,
 						description: values.description,
 						priority: values.priority,

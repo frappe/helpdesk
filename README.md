@@ -1,14 +1,13 @@
 <div align="center" markdown="1">
-<img src="https://user-images.githubusercontent.com/46772424/181754239-a337beb3-fd35-4f27-969c-b9793f011458.svg" alt="FrappeDesk logo" width="170"/>
+<img src="https://user-images.githubusercontent.com/46772424/181754239-a337beb3-fd35-4f27-969c-b9793f011458.svg" alt="Frappe Helpdesk logo" width="170"/>
 
-**Open Source Helpdesk** </br>
+**Free and Open Source Helpdesk** </br>
 [frappedesk.com](https://frappedesk.com)
-
 </div>
 
 ---
 
-FrappeDesk offers an easy setup, clean user interface, and automation tools to resolve customer issues efficiently. It is based on Frappe Framework. It lets you streamline your company's support and helps you to efficiently manage your customer queries. It can help you to,
+Frappe Helpdesk offers an easy setup, clean user interface, and automation tools to resolve customer issues efficiently. It is based on Frappe Framework. It lets you streamline your company's support and helps you to efficiently manage your customer queries. It can help you to,
 
 -   Create tickets from email or help center
 -   Empower customers with a comprehensive knowledge base and self-service portal
@@ -18,17 +17,27 @@ FrappeDesk offers an easy setup, clean user interface, and automation tools to r
 
 ## Installation
 
-### Local
+1. Install and setup bench by following [this guide](https://frappeframework.com/docs/user/en/installation)
+2. In the bench directory, run `bench start` and keep it running
+3. Open another terminal in bench directory, and run these commands
 
-To setup the repository locally follow the steps mentioned below:
+	```
+	bench get-app helpdesk
+	bench new-site helpdesk.test
+	bench --site helpdesk.test install-app helpdesk
+	bench --site helpdesk.test add-to-hosts
+	```
+	
+	You can now access Helpdesk at `http://helpdesk.test`
+5. You can also run a development server by following theses steps, in Helpdesk
+   directory (`apps/helpdesk`)
 
-1. Install bench and setup a `frappe-bench` directory by following the [Installation Steps](https://frappeframework.com/docs/user/en/installation)
-1. Start the server by running `bench start`
-1. In a separate terminal window, create a new site by running `bench new-site frappedesk.test`
-1. Map your site to localhost with the command `bench --site frappedesk.test add-to-hosts`
-1. Get the Frappe Desk app. Run `bench get-app https://github.com/frappe/desk`
-1. Run `bench --site frappedesk.test install-app frappedesk`.
-1. Now open the URL `http://frappedesk.test:8000/frappedesk` in your browser, you should see the app running
+   ```
+   yarn
+   yarn dev
+   ```
+
+   Development server will be now available at `http://localhost:8080`
 
 ## Contributions and Community
 
@@ -36,8 +45,8 @@ There are many ways you can contribute even if you don't code:
 
 1. You can start by giving a star to this repository!
 2. If you find any issues, even if it is a typo, you can [raise an issue](https://github.com/frappe/desk/issues/new) to inform us.
-3. You can join our [telegram group](https://t.me/frappedesk) and share your thoughts.
+3. Join our [Telegram group](https://t.me/frappedesk) and share your thoughts.
 
 ## License
 
-[GNU Affero General Public License v3.0](https://github.com/frappe/desk/blob/main/licence.md)
+[GNU Affero General Public License v3.0](/licence.md)

@@ -14,7 +14,7 @@
 		@discard="
 			() => {
 				if (isNew) {
-					$router.push({ path: '/frappedesk/kb/articles' });
+					$router.push({ path: '/helpdesk/kb/articles' });
 				} else {
 					editMode = false;
 				}
@@ -26,7 +26,7 @@
 			<div>
 				<Breadcrumbs
 					v-if="!isNew"
-					doc-type="Article"
+					doc-type="HD Article"
 					:doc-name="articleId"
 					:is-desk="editable"
 				/>
@@ -38,7 +38,7 @@
 							name: 'articles',
 							handler: () => {
 								$router.push({
-									path: `/${editable ? 'frappedesk' : 'support'}/kb/articles`,
+									path: `/${editable ? 'helpdesk' : 'helpdesk'}/kb/articles`,
 								});
 							},
 						},
@@ -107,7 +107,7 @@
 				>
 					<Breadcrumbs
 						v-if="!editable"
-						doc-type="Article"
+						doc-type="HD Article"
 						:doc-name="articleId"
 						:is-desk="editable"
 						class="mb-5"
@@ -236,14 +236,14 @@ export default {
 	},
 	resources: {
 		incrementArtileViews: {
-			url: "frappedesk.api.kb.increment_article_views",
+			url: "helpdesk.api.kb.increment_article_views",
 		},
 		article() {
 			if (!this.isNew) {
 				if (this.editable) {
 					return {
 						type: "document",
-						doctype: "Article",
+						doctype: "HD Article",
 						name: this.articleId,
 						setValue: {
 							onSuccess: () => {
@@ -265,7 +265,7 @@ export default {
 					};
 				} else {
 					return {
-						url: "frappedesk.api.kb.get_article",
+						url: "helpdesk.api.kb.get_article",
 						params: {
 							article: this.articleId,
 						},
@@ -280,7 +280,7 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/frappedesk/kb/articles/${doc.name}`);
+					this.$router.push(`/helpdesk/kb/articles/${doc.name}`);
 				},
 				onError: (err) => {
 					this.$toast({
@@ -294,7 +294,7 @@ export default {
 		},
 		checkIfTitleExists() {
 			return {
-				url: "frappedesk.api.kb.check_if_article_title_exists",
+				url: "helpdesk.api.kb.check_if_article_title_exists",
 				onSuccess: (exists) => {
 					if (exists) {
 						this.articleInputErrors.title =
@@ -361,7 +361,7 @@ export default {
 					this.articleTempValues.status = publish ? "Published" : "Draft";
 					await this.$resources.newArticle.submit({
 						doc: {
-							doctype: "Article",
+							doctype: "HD Article",
 							...this.articleTempValues,
 						},
 					});

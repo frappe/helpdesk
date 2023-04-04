@@ -83,7 +83,7 @@ export default {
 	resources: {
 		navbarItems() {
 			return {
-				url: "frappedesk.api.website.navbar_items",
+				url: "helpdesk.api.website.navbar_items",
 				auto: true,
 			}
 		},
@@ -111,10 +111,10 @@ export default {
 			}
 			// Add "Create a Ticket" option on the navbar if not already present
 			const newTicketRoutes = [
-				"/support/tickets",
-				"/support/tickets/",
-				"/support/tickets/new",
-				"/support/tickets/new/",
+				"/helpdesk/my-tickets",
+				"/helpdesk/my-tickets/",
+				"/helpdesk/my-tickets/new",
+				"/helpdesk/my-tickets/new/",
 			]
 			const currentRouteIsNewTicket = () => {
 				for (let route of newTicketRoutes) {
@@ -136,7 +136,7 @@ export default {
 			if (!currentRouteIsNewTicket() && !newTicketRouteExists()) {
 				parentItems.push({
 					label: "Create a Ticket",
-					url: "/support/tickets",
+					url: "/helpdesk/my-tickets",
 					children: [],
 				})
 			}
@@ -154,7 +154,7 @@ export default {
 					label: "Logout",
 					handler: () => {
 						this.authStore.logout()
-						window.location.href = "/support/login"
+						window.location.href = "/helpdesk/login"
 					},
 				},
 			]

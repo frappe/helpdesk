@@ -26,7 +26,7 @@ const agentName = computed(() => assignees.value?.full_name);
 const avatarUrl = computed(() => assignees.value?.user_image);
 
 const ticket = createDocumentResource({
-	doctype: "Ticket",
+	doctype: "HD Ticket",
 	name: ticketId,
 	cache: ["Ticket", ticketId],
 	whitelistedMethods: {

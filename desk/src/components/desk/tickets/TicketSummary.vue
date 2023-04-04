@@ -43,7 +43,7 @@ const commentCount = computed(() => metaData.value?.comment_count);
 const isSeen = computed(() => metaData.value?.is_seen);
 
 const ticket = createDocumentResource({
-	doctype: "Ticket",
+	doctype: "HD Ticket",
 	name: ticketName,
 	cache: ["Ticket", ticketName],
 	whitelistedMethods: {

@@ -65,8 +65,8 @@ export default {
 	resources: {
 		communications() {
 			return {
-				cache: ["Ticket", "Conversations", this.ticketId],
-				url: "frappedesk.api.ticket.get_conversations",
+				cache: ["HD Ticket", "Conversations", this.ticketId],
+				url: "helpdesk.api.ticket.get_conversations",
 				params: {
 					ticket_id: this.ticketId,
 				},
@@ -75,10 +75,10 @@ export default {
 		},
 		comments() {
 			return {
-				cache: ["Ticket", "Comments", this.ticketId],
-				url: "frappedesk.extends.client.get_list",
+				cache: ["HD Ticket", "Comments", this.ticketId],
+				url: "helpdesk.extends.client.get_list",
 				params: {
-					doctype: "Frappe Desk Comment",
+					doctype: "HD Ticket Comment",
 					fields: ["*"],
 					filters: {
 						reference_ticket: this.ticketId,
@@ -123,21 +123,21 @@ export default {
 		},
 	},
 	mounted() {
-		this.$socket.on("new_frappedesk_communication", (data) => {
+		this.$socket.on("helpdesk:new-communication", (data) => {
 			if (data.ticket_id != this.ticketId) return;
 
 			this.$resources.communications.reload();
 		});
 
-		this.$socket.on("new_frappedesk_comment", (data) => {
+		this.$socket.on("helpdesk:new-ticket-comment", (data) => {
 			if (data.ticket_id != this.ticketId) return;
 
 			this.$resources.comments.reload();
 		});
 	},
 	unmounted() {
-		this.$socket.off("new_frappedesk_communication");
-		this.$socket.off("new_frappedesk_comment");
+		this.$socket.off("helpdesk:new-communication");
+		this.$socket.off("helpdesk:new-ticket-comment");
 	},
 	updated() {
 		this.userColors = {};

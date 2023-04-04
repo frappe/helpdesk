@@ -1,0 +1,129 @@
+<div
+	class="modal fade"
+	id="searchContainerModal"
+	tabindex="-1"
+	role="dialog"
+	aria-hidden="true"
+>
+	<div class="modal-dialog modal-dialog-scrollable" role="document">
+		<div
+			class="modal-content my-lg-40 my-sm-10"
+			style="border-radius: 25px"
+		>
+			<div class="modal-header p-2">
+				<div class="input-group">
+					<input
+						id="searchBarInput"
+						autocomplete="off"
+						class="bg-white form-control"
+						type="search"
+						placeholder="Type your question..."
+						autofocus
+					/>
+				</div>
+			</div>
+			<div id="results" class="modal-body"></div>
+		</div>
+	</div>
+</div>
+
+<script>
+	frappe.ready(function () {
+		clearResults((hide = true))
+
+		let resultsBlock = $("#results")
+
+		$(".modal").on("shown.bs.modal", function () {
+			$(this).find("[autofocus]").focus()
+
+			$("#searchBarInput").on("input", function () {
+				search(this.value)
+			})
+		})
+
+		$(".modal").on("hidden.bs.modal", function () {
+			document.getElementById("searchBarInput").value = ""
+			clearResults((hide = true))
+		})
+	})
+
+	function showSearchBar() {
+		$("#searchContainerModal").modal("show")
+	}
+
+	function search(text) {
+		if (text == "") {
+			clearResults((hide = true))
+			return
+		}
+
+		showLoading()
+
+		frappe.call({
+			method: "helpdesk.templates.components.search.search.search_text",
+			args: {
+				text: text,
+			},
+			callback: function (r) {
+				showResults(r.message)
+			},
+		})
+	}
+
+	function showLoading() {
+		clearResults((hide = false))
+
+		resultsBlock = $("#results")
+
+		resultsBlock.append(`
+			<div>
+				<span>Searching Knowledge Base</span>
+			</div>
+		`)
+	}
+
+	function showResults(results) {
+		clearResults((hide = false))
+
+		let resultsBlock = $("#results")
+
+		for (var i = 0; i < results.length; i++) {
+			resultsBlock.append(
+				getRenderedResultElement(
+					results[i],
+					(index = i),
+					(last = i == results.length - 1)
+				)
+			)
+			let resultItemBlock = $("#result-item-" + i)
+			resultItemBlock.attr("redirectRoute", results[i].route)
+			resultItemBlock.click(function () {
+				window.open(`/${this.getAttribute("redirectRoute")}`, "_self")
+			})
+		}
+
+		if (results.length == 0) {
+			resultsBlock.append(`
+				<div>
+					<span>No results found</span>
+				</div>
+			`)
+		}
+	}
+
+	function getRenderedResultElement(result, index, last) {
+		return `
+			<div id=${"result-item-" + index} role='button'>
+				<span>${result.title}</span>
+			</div>
+			${last ? "" : "<hr>"}
+		`
+	}
+
+	function clearResults(hide = true) {
+		let resultsBlock = $("#results")
+
+		hide ? resultsBlock.hide() : resultsBlock.show()
+		resultsBlock.empty()
+	}
+</script>

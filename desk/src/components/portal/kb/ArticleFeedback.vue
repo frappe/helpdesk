@@ -98,7 +98,7 @@ export default {
 				return
 			}
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "User Article Feedback",
 					filters: {
@@ -112,7 +112,7 @@ export default {
 		},
 		submitArticleFeedback() {
 			return {
-				url: "frappedesk.api.kb.submit_article_feedback",
+				url: "helpdesk.api.kb.submit_article_feedback",
 				onSuccess: (res) => {
 					// TODO: show thank you message
 				},

@@ -9,7 +9,7 @@
 			<!-- TODO: <FeatherIcon v-if="editMode" name="plus" class="w-4 cursor-pointer my-auto bg-gray-50 hover:bg-gray-100 rounded" /> -->
 			<p v-if="editMode" class="text-base text-gray-500">
 				( add articles from
-				<router-link class="underline" :to="{ path: '/frappedesk/kb/articles' }"
+				<router-link class="underline" :to="{ path: '/helpdesk/kb/articles' }"
 					>here</router-link
 				>
 				)
@@ -31,7 +31,7 @@
 								if (editMode) return;
 								$router.push({
 									path: `/${
-										$route.meta.editable ? 'frappedesk' : 'support'
+										$route.meta.editable ? 'helpdesk' : 'helpdesk'
 									}/kb/articles/${element.name}/${element.title_slug}`,
 								});
 							}
@@ -140,7 +140,7 @@ export default {
 
 			return {
 				cache: ["Articles", this.categoryId, "published"],
-				url: "frappedesk.api.kb.get_articles",
+				url: "helpdesk.api.kb.get_articles",
 				params: {
 					filters,
 					limit: 999,
@@ -151,7 +151,7 @@ export default {
 		},
 		saveArticles() {
 			return {
-				url: "frappedesk.api.kb.update_articles_order_and_status",
+				url: "helpdesk.api.kb.update_articles_order_and_status",
 				onSuccess: () => {
 					this.$resources.articles.reload();
 
@@ -174,7 +174,7 @@ export default {
 		category() {
 			return {
 				type: "document",
-				doctype: "Category",
+				doctype: "HD Article Category",
 				name: this.categoryId,
 			};
 		},

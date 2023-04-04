@@ -82,13 +82,13 @@ export default {
 			if (!this.mounted) return false;
 			if (!this.authStore.isLoggedIn) return false;
 			if (!this.authStore.hasDeskAccess) return false;
-			if (this.$resources.frappedeskSettings.loading) return false;
-			if (!this.$resources.frappedeskSettings.data.initial_agent_set) {
+			if (this.$resources.helpdeskSettings.loading) return false;
+			if (!this.$resources.helpdeskSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit();
 				return false;
 			}
 			if (
-				!this.$resources.frappedeskSettings.data.initial_demo_ticket_created
+				!this.$resources.helpdeskSettings.data.initial_demo_ticket_created
 			) {
 				this.$resources.createInitialDemoTicket.submit();
 				return false;
@@ -119,10 +119,10 @@ export default {
 			return;
 		}
 		if (!this.authStore.hasDeskAccess) {
-			this.$router.push({ path: "/support/tickets" });
+			this.$router.push({ path: "/helpdesk/my-tickets" });
 			return;
 		}
-		this.$resources.frappedeskSettings.fetch();
+		this.$resources.helpdeskSettings.fetch();
 		this.ticketController.set = (ticketId, type, ref = null) => {
 			switch (type) {
 				case "type":
@@ -167,10 +167,10 @@ export default {
 		};
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
-				case "Ticket Type":
+				case "HD Ticket Type":
 					this.$resources.types.reload();
 					break;
-				case "Agent":
+				case "HD Agent":
 					this.$resources.agents.reload();
 					break;
 			}
@@ -185,8 +185,8 @@ export default {
 		handlePostOnboardSetupReqs() {
 			// helpdesk name
 			if (
-				!this.$resources.frappedeskSettings.data.helpdesk_name &&
-				!this.$resources.frappedeskSettings.data
+				!this.$resources.helpdeskSettings.data.helpdesk_name &&
+				!this.$resources.helpdeskSettings.data
 					.initial_helpdesk_name_setup_skipped
 			) {
 				this.showHelpdeskNameSetupToast();
@@ -194,7 +194,7 @@ export default {
 			}
 			// default email account
 			if (
-				!this.$resources.frappedeskSettings.data.suppress_default_email_toast &&
+				!this.$resources.helpdeskSettings.data.suppress_default_email_toast &&
 				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
 				!this.defaultOutgoingEmailAccountSetup
 			) {
@@ -288,9 +288,9 @@ export default {
 		setupInitialAgent() {
 			// sets up an initial agent
 			return {
-				url: "frappedesk.api.setup.initial_agent_setup",
+				url: "helpdesk.api.setup.initial_agent_setup",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch();
+					this.$resources.helpdeskSettings.fetch();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -305,9 +305,9 @@ export default {
 		createInitialDemoTicket() {
 			// creates a demo ticket
 			return {
-				url: "frappedesk.api.setup.create_initial_demo_ticket",
+				url: "helpdesk.api.setup.create_initial_demo_ticket",
 				onSuccess: (res) => {
-					this.$resources.frappedeskSettings.fetch();
+					this.$resources.helpdeskSettings.fetch();
 				},
 				onError: (err) => {
 					this.$toast({
@@ -320,11 +320,11 @@ export default {
 			};
 		},
 		setHelpdeskName() {
-			// set helpdesk name in Frappe Desk Settings
+			// set helpdesk name in Helpdesk Settings
 			return {
-				url: "frappedesk.api.settings.update_helpdesk_name",
+				url: "helpdesk.api.settings.update_helpdesk_name",
 				onSuccess: (res) => {
-					document.title = `Frappe Desk ${res ? ` | ${res}` : ""}`;
+					document.title = `Helpdesk ${res ? ` | ${res}` : ""}`;
 					this.$toast({
 						title: "Helpdesk name updated!!",
 						icon: "check",
@@ -342,18 +342,18 @@ export default {
 			};
 		},
 		skipHelpdeskNameSetup() {
-			// sets the values of skip_helpdesk_name_setup to true inside Frappe Desk Settings
+			// sets the values of skip_helpdesk_name_setup to true inside Helpdesk Settings
 			return {
-				url: "frappedesk.api.settings.skip_helpdesk_name_setup",
+				url: "helpdesk.api.settings.skip_helpdesk_name_setup",
 			};
 		},
 		// getters
-		frappedeskSettings() {
+		helpdeskSettings() {
 			return {
 				url: "frappe.client.get",
 				params: {
-					doctype: "Frappe Desk Settings",
-					name: "Frappe Desk Settings",
+					doctype: "HD Settings",
+					name: "HD Settings",
 				},
 				onError: (error) => {
 					this.$toast({
@@ -372,7 +372,7 @@ export default {
 					doctype: "Email Account",
 					filters: [
 						["use_imap", "=", 1],
-						["IMAP Folder", "append_to", "=", "Ticket"],
+						["IMAP Folder", "append_to", "=", "HD Ticket"],
 						["default_outgoing", "=", 1],
 					],
 				},
@@ -383,7 +383,7 @@ export default {
 			return {
 				url: "frappe.client.get_count",
 				params: {
-					doctype: "Agent",
+					doctype: "HD Agent",
 				},
 				auto: true,
 			};
@@ -392,7 +392,7 @@ export default {
 		// ticket related resources
 		createTicket() {
 			return {
-				url: "frappedesk.api.ticket.create_new",
+				url: "helpdesk.api.ticket.create_new",
 				onSuccess: () => {
 					// TODO:
 				},
@@ -410,7 +410,7 @@ export default {
 		},
 		updateTicketContact() {
 			return {
-				url: "frappedesk.api.ticket.update_contact",
+				url: "helpdesk.api.ticket.update_contact",
 				onSuccess: async (ticket) => {
 					// TODO:
 				},
@@ -421,9 +421,9 @@ export default {
 		},
 		types() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
-					doctype: "Ticket Type",
+					doctype: "HD Ticket Type",
 					pluck: "name",
 				},
 				auto: this.authStore.hasDeskAccess,
@@ -437,9 +437,9 @@ export default {
 		},
 		priorities() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
-					doctype: "Ticket Priority",
+					doctype: "HD Ticket Priority",
 				},
 				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
@@ -452,7 +452,7 @@ export default {
 		},
 		statuses() {
 			return {
-				url: "frappedesk.api.ticket.get_all_ticket_statuses",
+				url: "helpdesk.api.ticket.get_all_ticket_statuses",
 				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
 					this.ticketStatuses = data;
@@ -464,7 +464,7 @@ export default {
 		},
 		contacts() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "Contact",
 					fields: ["*"],
@@ -481,9 +481,9 @@ export default {
 		},
 		agents() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
-					doctype: "Agent",
+					doctype: "HD Agent",
 					fields: ["name", "agent_name", "user_image"],
 				},
 				auto: this.authStore.hasDeskAccess,
@@ -497,9 +497,9 @@ export default {
 		},
 		agentGroups() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
-					doctype: "Agent Group",
+					doctype: "HD Team",
 				},
 				auto: this.authStore.hasDeskAccess,
 				onSuccess: (data) => {
@@ -512,7 +512,7 @@ export default {
 		},
 		assignTicketToAgent() {
 			return {
-				url: "frappedesk.api.ticket.assign_ticket_to_agent",
+				url: "helpdesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: async () => {
 					this.$event.emit("update_ticket_list");
 				},
@@ -523,7 +523,7 @@ export default {
 		},
 		assignTicketType() {
 			return {
-				url: "frappedesk.api.ticket.assign_ticket_type",
+				url: "helpdesk.api.ticket.assign_ticket_type",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
@@ -532,7 +532,7 @@ export default {
 		},
 		assignTicketStatus() {
 			return {
-				url: "frappedesk.api.ticket.assign_ticket_status",
+				url: "helpdesk.api.ticket.assign_ticket_status",
 				onSuccess: async () => {
 					this.$event.emit("update_ticket_list");
 				},
@@ -543,7 +543,7 @@ export default {
 		},
 		assignTicketPriority() {
 			return {
-				url: "frappedesk.api.ticket.assign_ticket_priority",
+				url: "helpdesk.api.ticket.assign_ticket_priority",
 				onSuccess: async (ticket) => {},
 				onError: () => {
 					// TODO:
@@ -552,7 +552,7 @@ export default {
 		},
 		createTicketType() {
 			return {
-				url: "frappedesk.api.ticket.check_and_create_ticket_type",
+				url: "helpdesk.api.ticket.check_and_create_ticket_type",
 				onSuccess: () => {
 					this.$resources.types.fetch();
 				},

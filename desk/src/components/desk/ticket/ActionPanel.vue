@@ -175,9 +175,9 @@ export default {
 	resources: {
 		customFields() {
 			return {
-				url: "frappedesk.api.ticket.get_custom_fields",
+				url: "helpdesk.api.ticket.get_custom_fields",
 				params: {
-					doctype: "Ticket",
+					doctype: "HD Ticket",
 					view: "Agent Portal",
 				},
 				auto: true,
@@ -186,7 +186,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 			}
 		},

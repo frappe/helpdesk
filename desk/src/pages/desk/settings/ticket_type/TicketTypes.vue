@@ -3,8 +3,8 @@
 		<ListManager
 			ref="ticketTypeList"
 			:options="{
-				cache: ['Ticket Type', 'Desk'],
-				doctype: 'Ticket Type',
+				cache: ['HD Ticket Type', 'Desk'],
+				doctype: 'HD Ticket Type',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['name', 'priority'],
@@ -31,13 +31,13 @@
 					}"
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
-						$router.push('/frappedesk/settings/ticket_types/new')
+						$router.push('/helpdesk/settings/ticket_types/new')
 					"
 				>
 					<template #field-name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/ticket_types/${row.name}`,
+								path: `/helpdesk/settings/ticket_types/${row.name}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
@@ -56,7 +56,7 @@
 									() => {
 										$resources.deleteTicketType
 											.submit({
-												doctype: 'Ticket Type',
+												doctype: 'HD Ticket Type',
 												name: Object.keys(
 													selectedItems
 												),

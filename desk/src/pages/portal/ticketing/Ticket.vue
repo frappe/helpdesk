@@ -11,7 +11,7 @@
 		>
 			<div class="flex justify-between mb-4">
 				<div class="flex items-center space-x-2 text-lg">
-					<a href="/support/kb">Home</a>
+					<a href="/helpdesk/knowledge-base">Home</a>
 					<FeatherIcon name="chevron-right" class="h-3 w-3" />
 					<router-link :to="{ name: 'ProtalTickets' }"
 						>Tickets</router-link
@@ -487,15 +487,15 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 			}
 		},
 		customFields() {
 			return {
-				url: "frappedesk.api.ticket.get_custom_fields",
+				url: "helpdesk.api.ticket.get_custom_fields",
 				params: {
-					doctype: "Ticket",
+					doctype: "HD Ticket",
 					view: "Customer Portal",
 				},
 				auto: true,
@@ -503,7 +503,7 @@ export default {
 		},
 		submitConversation() {
 			return {
-				url: "frappedesk.api.ticket.submit_conversation_via_contact",
+				url: "helpdesk.api.ticket.submit_conversation_via_contact",
 				onSuccess: () => {
 					this.tempTextEditorData = {}
 					this.editing = false

@@ -85,7 +85,7 @@ export default {
 			}
 			this.$resources.newCustomer.submit({
 				doc: {
-					doctype: "FD Customer",
+					doctype: "HD Customer",
 					...inputParams,
 				},
 			})
@@ -101,7 +101,7 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/frappedesk/customers`)
+					this.$router.push(`/helpdesk/customers`)
 				},
 			}
 		},

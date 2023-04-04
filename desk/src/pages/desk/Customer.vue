@@ -9,7 +9,7 @@
 							name: 'customer',
 							handler: () => {
 								$router.push({
-									path: `/frappedesk/customers`,
+									path: `/helpdesk/customers`,
 								})
 							},
 						},

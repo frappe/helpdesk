@@ -3,7 +3,7 @@
 		<div class="flow-root h-[72px] shrink-0 py-[22px] px-[16px]">
 			<div class="float-left">
 				<router-link
-					:to="`/frappedesk/settings/teams`"
+					:to="`/helpdesk/settings/teams`"
 					class="my-1 flex select-none flex-row items-center space-x-1 stroke-gray-600 text-[12px] text-gray-600 hover:stroke-gray-700 hover:text-gray-700"
 					role="button"
 				>
@@ -124,10 +124,10 @@ export default {
 	data() {
 		return {
 			autoCompleteOptions: {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				inputMap: (query) => {
 					return {
-						doctype: "Agent",
+						doctype: "HD Agent",
 						fields: ["name", "agent_name"],
 						filters: {
 							name: ["like", `%${query}%`],
@@ -151,7 +151,7 @@ export default {
 
 			return {
 				type: "document",
-				doctype: "Agent Group",
+				doctype: "HD Team",
 				name: this.teamId,
 				fields: ["name", "users"],
 				whitelistedMethods: {
@@ -194,7 +194,7 @@ export default {
 				url: "frappe.client.insert",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/frappedesk/settings/teams/${res.name}`,
+						path: `/helpdesk/settings/teams/${res.name}`,
 					});
 
 					this.$toast({
@@ -233,7 +233,7 @@ export default {
 				})
 				.then(() => {
 					this.$router.push({
-						path: `/frappedesk/settings/teams/${title}`,
+						path: `/helpdesk/settings/teams/${title}`,
 					});
 				});
 		},
@@ -262,7 +262,7 @@ export default {
 		saveNew() {
 			this.$resources.newTeam.submit({
 				doc: {
-					doctype: "Agent Group",
+					doctype: "HD Team",
 					ignore_restrictions: this.team.ignore_restrictions,
 					team_name: this.team.team_name,
 					users: this.mapUsers(this.team.users),

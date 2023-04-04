@@ -10,7 +10,7 @@
 		</div>
 		<div class="flex justify-between px-6 py-3">
 			<div class="flex gap-2">
-				<PresetFilters doctype="Ticket" />
+				<PresetFilters doctype="HD Ticket" />
 				<Dropdown
 					:options="filterByStatusOptions"
 					:button="{
@@ -29,7 +29,7 @@
 				/>
 			</div>
 			<div class="flex items-center gap-2">
-				<FilterBox doctype="Ticket" />
+				<FilterBox doctype="HD Ticket" />
 				<Dropdown
 					:options="sortDropdownOptions"
 					:button="{
@@ -64,7 +64,7 @@
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="hover:shadow-around flex w-full items-center rounded-lg border-b p-2 shadow-black transition-all last-of-type:border-none"
+				class="hover:shadow-around flex w-full items-center rounded-lg border-b px-2 py-1 shadow-black transition-all last-of-type:border-none"
 			>
 				<div class="pl-1 pr-4">
 					<Input
@@ -74,7 +74,7 @@
 						:onchange="(e) => toggleOne(t.name, e.target.checked)"
 					/>
 				</div>
-				<div class="basis-1/3 w-1/12 pr-8">
+				<div class="w-1/12 basis-1/3 pr-8">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
 				<div class="flex basis-2/3 items-center">
@@ -108,9 +108,10 @@
 			</div>
 		</div>
 		<div class="grow"></div>
-		<div class="flex justify-between border-t p-4 font-sans text-base">
+		<div class="flex justify-between border-t p-3 font-sans text-base">
 			<div class="text-gray-700">
-				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of {{ ticketList.totalCount }}
+				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of
+				{{ ticketList.totalCount }}
 			</div>
 			<div class="flex items-center gap-2">
 				Page
@@ -136,7 +137,7 @@
 		</div>
 		<div
 			v-show="selected.size"
-			class="fixed inset-x-0 bottom-8 mx-auto w-max font-sans text-base"
+			class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
 		>
 			<div
 				class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
@@ -223,7 +224,7 @@ export default {
 		const authStore = useAuthStore();
 
 		const ticketList = createListManager({
-			doctype: "Ticket",
+			doctype: "HD Ticket",
 			pageLength: 20,
 		});
 
@@ -244,7 +245,7 @@ export default {
 		}
 
 		const sortOptions = [
-			{ label: "Ticket Type", value: "ticket_type" },
+			{ label: "HD Ticket Type", value: "ticket_type" },
 			{ label: "Modified", value: "modified" },
 			{ label: "Created", value: "created" },
 		];
@@ -374,7 +375,7 @@ export default {
 	resources: {
 		bulkAssignTicketStatus() {
 			return {
-				url: "frappedesk.api.ticket.bulk_assign_ticket_status",
+				url: "helpdesk.api.ticket.bulk_assign_ticket_status",
 				onSuccess: (res) => {
 					//res: {docs: Ticket Docs, status: NewStatus}
 					this.$refs.ticketList.manager.selectedItems = [];
@@ -399,7 +400,7 @@ export default {
 		},
 		bulkAssignTicketToAgent() {
 			return {
-				url: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
+				url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
 					this.$toast({
 						title: "Tickets assigned to agent",

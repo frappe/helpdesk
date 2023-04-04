@@ -3,7 +3,7 @@
 		<ListManager
 			ref="miniTicketList"
 			:options="{
-				doctype: 'Ticket',
+				doctype: 'HD Ticket',
 				fields: [
 					'_assign',
 					'status',
@@ -240,7 +240,7 @@ export default {
 	resources: {
 		bulkAssignTicketStatus() {
 			return {
-				url: "frappedesk.api.ticket.bulk_assign_ticket_status",
+				url: "helpdesk.api.ticket.bulk_assign_ticket_status",
 				onSuccess: (res) => {
 					this.$refs.miniTicketList.manager.selectedItems = []
 					this.$refs.miniTicketList.manager.reload()
@@ -264,7 +264,7 @@ export default {
 		},
 		bulkAssignTicketToAgent() {
 			return {
-				url: "frappedesk.api.ticket.bulk_assign_ticket_to_agent",
+				url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
 					this.$refs.miniTicketList.manager.selectedItems = []
 					this.$refs.miniTicketList.manager.reload()

@@ -32,7 +32,7 @@
 			<div
 				v-for="option in menuOptions"
 				:key="option.label"
-				class="flex cursor-pointer items-center gap-2 rounded-lg p-2"
+				class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1"
 				:class="{
 					'bg-gray-200': isActive(option.label),
 					'text-gray-900': isActive(option.label),
@@ -51,7 +51,7 @@
 			<div
 				v-for="option in footerOptions"
 				:key="option.label"
-				class="flex cursor-pointer items-center gap-2 rounded-lg p-2"
+				class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1"
 				:class="{
 					'bg-gray-200': isActive(option.label),
 					'text-gray-900': isActive(option.label),
@@ -127,28 +127,28 @@ const menuOptions = [
 		label: "Dashboard",
 		icon: "dashboard",
 		to: {
-			path: "/frappedesk/dashboard",
+			path: "/helpdesk/dashboard",
 		},
 	},
 	{
 		label: "Tickets",
 		icon: "ticket",
 		to: {
-			path: "/frappedesk/tickets",
+			path: "/helpdesk/tickets",
 		},
 	},
 	{
 		label: "Customers",
 		icon: "customer",
 		to: {
-			path: "/frappedesk/customers",
+			path: "/helpdesk/customers",
 		},
 	},
 	{
 		label: "Contacts",
 		icon: "customers",
 		to: {
-			path: "/frappedesk/contacts",
+			path: "/helpdesk/contacts",
 		},
 	},
 ];
@@ -158,14 +158,14 @@ const footerOptions = [
 		label: "Knowledge Base",
 		icon: "kb-articles",
 		to: {
-			path: "/frappedesk/kb",
+			path: "/helpdesk/kb",
 		},
 	},
 	{
 		label: "Settings",
 		icon: "settings",
 		to: {
-			path: "/frappedesk/settings",
+			path: "/helpdesk/settings",
 		},
 	},
 ];
@@ -182,7 +182,7 @@ const profileSettings = [
 		label: "Customer portal",
 		icon: "users",
 		handler: () => {
-			window.open("/support/tickets", "_blank");
+			window.open("/helpdesk/my-tickets", "_blank");
 		},
 	},
 	{
@@ -193,13 +193,13 @@ const profileSettings = [
 ];
 
 const routeMap = {
-	"Knowledge Base": "frappedesk/kb",
-	Contacts: "frappedesk/contacts",
-	Customers: "frappedesk/customers",
-	Dashboard: "frappedesk/dashboard",
-	Reports: "frappedesk/reports",
-	Settings: "frappedesk/settings",
-	Tickets: "frappedesk/tickets",
+	"Knowledge Base": "helpdesk/kb",
+	Contacts: "helpdesk/contacts",
+	Customers: "helpdesk/customers",
+	Dashboard: "helpdesk/dashboard",
+	Reports: "helpdesk/reports",
+	Settings: "helpdesk/settings",
+	Tickets: "helpdesk/tickets",
 };
 
 function isActive(label: string) {

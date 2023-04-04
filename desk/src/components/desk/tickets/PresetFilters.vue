@@ -85,20 +85,20 @@ export default {
 		},
 	},
 	mounted() {
-		this.$socket.on("frappedesk-preset-filter-insert", (data) => {
-			if (data.reference_doctype !== "Ticket") return;
+		this.$socket.on("helpdesk:new-preset-filter", (data) => {
+			if (data.reference_doctype !== "HD Ticket") return;
 			this.$resources.presetFilterOptions.reload();
 		});
 	},
 	unmounted() {
-		this.$socket.off("frappedesk-preset-filter-insert");
+		this.$socket.off("helpdesk:new-preset-filter");
 	},
 	resources: {
 		presetFilterOptions() {
 			return {
-				url: "frappedesk.api.general.get_preset_filters",
+				url: "helpdesk.api.general.get_preset_filters",
 				params: {
-					doctype: "Ticket",
+					doctype: "HD Ticket",
 				},
 				cache: ["Preset Filter", this.doctype],
 				auto: true,

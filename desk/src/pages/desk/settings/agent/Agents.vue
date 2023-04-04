@@ -4,7 +4,7 @@
 			ref="listManager"
 			:options="{
 				cache: ['Agents', 'Desk'],
-				doctype: 'Agent',
+				doctype: 'HD Agent',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['user', 'agent_name'],
@@ -14,7 +14,7 @@
 			<template #body="{ manager }">
 				<ListViewer
 					:options="{
-						name: 'Agent',
+						name: 'HD Agent',
 						base: '12',
 						listTitle: 'Agents',
 						filterBox: true,
@@ -37,7 +37,7 @@
 					<template #field-agent_name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/agents/${row.user}`,
+								path: `/helpdesk/settings/agents/${row.user}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
@@ -56,7 +56,7 @@
 									() => {
 										$resources.deleteAgent
 											.submit({
-												doctype: 'Agent',
+												doctype: 'HD Agent',
 												name: Object.keys(
 													selectedItems
 												),
@@ -117,7 +117,7 @@ export default {
 		},
 		bulk_delete_agents() {
 			return {
-				url: "frappedesk.api.doc.delete_items",
+				url: "helpdesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go()
 					// this.$refs.listManager.manager.reload()

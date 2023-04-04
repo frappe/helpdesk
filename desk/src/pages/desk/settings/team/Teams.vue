@@ -3,8 +3,8 @@
 		<ListManager
 			ref="agentGroupList"
 			:options="{
-				cache: ['Agent Group', 'Desk'],
-				doctype: 'Agent Group',
+				cache: ['HD Team', 'Desk'],
+				doctype: 'HD Team',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['team_name', 'assignment_rule'],
@@ -34,14 +34,14 @@
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/settings/teams/new')
+							$router.push('/helpdesk/settings/teams/new')
 						}
 					"
 				>
 					<template #field-team_name="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/teams/${row.name}`,
+								path: `/helpdesk/settings/teams/${row.name}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
@@ -60,7 +60,7 @@
 									() => {
 										$resources.deleteTeam
 											.submit({
-												doctype: 'Agent Group',
+												doctype: 'HD Team',
 												name: Object.keys(
 													selectedItems
 												),

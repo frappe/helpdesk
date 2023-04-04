@@ -31,10 +31,10 @@
 								}
 							"
 							:resourceOptions="{
-								url: 'frappedesk.extends.client.get_list',
+								url: 'helpdesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
-										doctype: 'Ticket Priority',
+										doctype: 'HD Ticket Priority',
 										pluck: 'name',
 										filters: [
 											['name', 'like', `%${query}%`],
@@ -137,7 +137,7 @@ export default {
 			}
 			this.$resources.newTicketType.submit({
 				doc: {
-					doctype: "Ticket Type",
+					doctype: "HD Ticket Type",
 					...inputParams,
 				},
 			})
@@ -152,7 +152,7 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/frappedesk/ticket_types`)
+					this.$router.push(`/helpdesk/ticket_types`)
 				},
 			}
 		},

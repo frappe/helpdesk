@@ -125,10 +125,10 @@
 							}
 						"
 						:resourceOptions="{
-							url: 'frappedesk.extends.client.get_list',
+							url: 'helpdesk.extends.client.get_list',
 							inputMap: (query) => {
 								return {
-									doctype: 'FD Customer',
+									doctype: 'HD Customer',
 									pluck: 'name',
 									filters: [['name', 'like', `%${query}%`]],
 								}
@@ -260,7 +260,7 @@ export default {
 			const links = []
 			if (values.customer) {
 				links.push({
-					link_doctype: "FD Customer",
+					link_doctype: "HD Customer",
 					link_name: values.customer,
 				})
 			}

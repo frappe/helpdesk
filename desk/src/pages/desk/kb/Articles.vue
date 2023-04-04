@@ -3,7 +3,7 @@
 		<ListManager
 			ref="articleList"
 			:options="{
-				doctype: 'Article',
+				doctype: 'HD Article',
 				order_by: 'modified DESC',
 				limit: 20,
 			}"
@@ -43,7 +43,7 @@
 					class="h-[calc(100vh-6.5rem)] text-base"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/kb/articles/new');
+							$router.push('/helpdesk/kb/articles/new');
 						}
 					"
 				>
@@ -139,7 +139,7 @@
 					<template #field-title="{ value, row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/kb/articles/${row.name}`,
+								path: `/helpdesk/kb/articles/${row.name}`,
 							}"
 							class="cursor-pointer text-gray-600 hover:text-gray-900"
 							>{{ value }}</router-link
@@ -198,22 +198,22 @@ export default {
 	resources: {
 		moveArticlesToCategory() {
 			return {
-				url: "frappedesk.api.kb.move_articles_to_category",
+				url: "helpdesk.api.kb.move_articles_to_category",
 			}
 		},
 		setStatusForArticles() {
 			return {
-				url: "frappedesk.api.kb.set_status_for_articles",
+				url: "helpdesk.api.kb.set_status_for_articles",
 			}
 		},
 		deleteArticles() {
 			return {
-				url: "frappedesk.api.kb.delete_articles",
+				url: "helpdesk.api.kb.delete_articles",
 			}
 		},
 		knowledgeBase() {
 			if (this.activeTab == "Webview") {
-				this.$router.push({ path: "/frappedesk/kb" })
+				this.$router.push({ path: "/helpdesk/kb" })
 			}
 		},
 	},

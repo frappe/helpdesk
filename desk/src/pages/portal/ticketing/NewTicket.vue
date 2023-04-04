@@ -316,8 +316,8 @@ export default {
 		fdSettings() {
 			return {
 				type: "document",
-				doctype: "Frappe Desk Settings",
-				name: "Frappe Desk Settings",
+				doctype: "HD Settings",
+				name: "HD Settings",
 			};
 		},
 	},
@@ -410,9 +410,9 @@ export default {
 						break;
 					case "frappe.get_list()":
 						list = (
-							await call("frappedesk.extends.client.get_list", {
+							await call("helpdesk.extends.client.get_list", {
 								doctype,
-								filters: field.filters,
+								filters: JSON.parse(field.filters),
 							})
 						).map((x) => x.name);
 						break;

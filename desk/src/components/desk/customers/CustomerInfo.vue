@@ -151,7 +151,7 @@
 					>
 						<div class="w-[30%]">
 							<router-link
-								:to="`/frappedesk/contacts/${contact.name}`"
+								:to="`/helpdesk/contacts/${contact.name}`"
 							>
 								{{ contact.first_name }}
 								{{
@@ -207,10 +207,10 @@
 						<ListManager
 							ref="ticketList"
 							:options="{
-								cache: ['Ticket', 'Customer', customer],
+								cache: ['HD Ticket', 'Customer', customer],
 								saveFiltersLocally: false,
 								urlQueryFilters: false,
-								doctype: 'Ticket',
+								doctype: 'HD Ticket',
 								filters: {
 									customer: ['=', customerDoc.customer_name],
 								},
@@ -393,7 +393,7 @@ export default {
 		customer() {
 			return {
 				type: "document",
-				doctype: "FD Customer",
+				doctype: "HD Customer",
 				name: this.customer,
 				setValue: {
 					onSuccess() {
@@ -411,14 +411,14 @@ export default {
 				url: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/frappedesk/customers/${res}`,
+						path: `/helpdesk/customers/${res}`,
 					})
 				},
 			}
 		},
 		contact() {
 			return {
-				url: "frappedesk.api.fdCustomer.get_contact",
+				url: "helpdesk.api.fdCustomer.get_contact",
 				params: {
 					doctype: "Contact",
 					link_name: this.customer,
@@ -460,7 +460,7 @@ export default {
 				})
 				if (this.values.customerName !== this.customer) {
 					this.$resources.renameCustomerDoc.submit({
-						doctype: "FD Customer",
+						doctype: "HD Customer",
 						old_name: this.customer,
 						new_name: this.values.customerName,
 					})

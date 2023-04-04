@@ -41,7 +41,7 @@ export default {
 		const listResource = createListResource(
 			{
 				type: "list",
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				cache: false,
 				doctype: options.value.doctype,
 				fields: options.value.fields,

@@ -3,7 +3,7 @@
 		<ListManager
 			ref="listManager"
 			:options="{
-				doctype: 'Canned Response',
+				doctype: 'HD Canned Response',
 				urlQueryFilters: true,
 				saveFiltersLocally: true,
 				fields: ['title', 'owner'],
@@ -40,7 +40,7 @@
 					<template #field-title="{ row }">
 						<router-link
 							:to="{
-								path: `/frappedesk/settings/canned_responses/${row.title}`,
+								path: `/helpdesk/settings/canned_responses/${row.title}`,
 							}"
 							class="font-inter text-[13px] text-gray-600 hover:text-gray-900"
 						>
@@ -59,7 +59,7 @@
 									() => {
 										$resources.deleteTeam
 											.submit({
-												doctype: 'Canned Response',
+												doctype: 'HD Canned Response',
 												name: Object.keys(selectedItems),
 											})
 											.then(() => {
@@ -118,7 +118,7 @@ export default {
 		},
 		bulk_delete_responses() {
 			return {
-				url: "frappedesk.api.doc.delete_items",
+				url: "helpdesk.api.doc.delete_items",
 				onSuccess: () => {
 					this.$router.go();
 				},

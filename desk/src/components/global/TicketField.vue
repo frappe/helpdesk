@@ -89,7 +89,7 @@ export default {
 	},
 	mounted() {
 		if (this.fieldname == "_assign") {
-			this.$socket.on("ticket_assignee_update", (data) => {
+			this.$socket.on("helpdesk:update-ticket-assignee", (data) => {
 				if (data.ticket_id == this.ticket.name) {
 					this.$resources.getAssignee.fetch()
 				}
@@ -100,7 +100,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 				setValue: {
 					onSuccess() {
@@ -127,7 +127,7 @@ export default {
 			// field label
 			// field permissions: read, write (based on is agent / customer)
 			return {
-				url: "frappedesk.api.ticket.get_field_meta_info",
+				url: "helpdesk.api.ticket.get_field_meta_info",
 				params: {
 					fieldname: this.fieldname,
 				},
@@ -138,7 +138,7 @@ export default {
 			// TODO: this is a temparary fix, should be done in a better way
 			if (this.fieldname !== "_assign") return
 			return {
-				url: "frappedesk.api.ticket.get_assignee",
+				url: "helpdesk.api.ticket.get_assignee",
 				params: {
 					ticket_id: this.ticketId,
 				},
@@ -147,7 +147,7 @@ export default {
 		},
 		setTicketAssignee() {
 			return {
-				url: "frappedesk.api.ticket.assign_ticket_to_agent",
+				url: "helpdesk.api.ticket.assign_ticket_to_agent",
 				onSuccess: () => {
 					this.$toast({
 						title: "Agent assigned successfully",
@@ -194,7 +194,7 @@ export default {
 					let baseFilters = []
 					if (this.fieldname == "_assign") {
 						// adding agent_group and is_active filters to get only active agents of the group
-						baseFilters.push(["Agent", "is_active", "=", 1])
+						baseFilters.push(["HD Agent", "is_active", "=", 1])
 						if (this.ticket.agent_group) {
 							baseFilters.push([
 								"Agent Group Item",
@@ -205,7 +205,7 @@ export default {
 						}
 					}
 					return {
-						url: "frappedesk.extends.client.get_list",
+						url: "helpdesk.extends.client.get_list",
 						inputMap: (query) => {
 							const filters = [
 								...baseFilters,
@@ -228,10 +228,10 @@ export default {
 					}
 				case "Select":
 					return {
-						url: "frappedesk.api.general.get_filtered_select_field_options",
+						url: "helpdesk.api.general.get_filtered_select_field_options",
 						inputMap: (query) => {
 							return {
-								doctype: "Ticket",
+								doctype: "HD Ticket",
 								fieldname: this.fieldMetaInfo?.fieldname,
 								query,
 							}

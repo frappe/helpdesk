@@ -18,14 +18,14 @@
 						<div>
 							<form v-if="currentStep == 1" @submit.prevent="submitStep">
 								<div class="mb-[10px] text-[24px] font-bold text-gray-900">
-									Welcome to FrappeDesk
+									Welcome to Frappe Helpdesk
 								</div>
 								<div class="mb-[30px] text-[16px] font-normal text-gray-600">
 									Thanks for verifying your e-mail.
 								</div>
 								<div class="mb-[30px] text-[16px] font-normal text-gray-900">
 									Configure your e-mail address to start sending and receiving
-									e-mails into FrappeDesk.
+									e-mails into Helpdesk.
 								</div>
 								<div class="mb-[30px]">
 									<span class="mb-2 block text-sm leading-4 text-gray-700">
@@ -331,7 +331,7 @@ export default {
 					initial_sync_count: 100,
 					imap_folder: [
 						{
-							append_to: "Ticket",
+							append_to: "HD Ticket",
 							folder_name: "INBOX",
 						},
 					],
@@ -471,7 +471,7 @@ export default {
 		},
 		sentInvites() {
 			return {
-				url: "frappedesk.api.agent.sent_invites",
+				url: "helpdesk.api.agent.sent_invites",
 				onSuccess: () => {
 					this.$event.emit("sent-invites-success");
 				},
@@ -484,8 +484,8 @@ export default {
 			return {
 				url: "frappe.client.set_value",
 				params: {
-					doctype: "Frappe Desk Settings",
-					name: "Frappe Desk Settings",
+					doctype: "HD Settings",
+					name: "HD Settings",
 					fieldname: "setup_complete",
 					value: 1,
 				},

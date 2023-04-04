@@ -164,7 +164,7 @@ export default {
 			}
 			this.$resources.newResponse.submit({
 				doc: {
-					doctype: "Canned Response",
+					doctype: "HD Canned Response",
 					...inputParams,
 				},
 			})
@@ -205,7 +205,7 @@ export default {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
 					this.$router.push(
-						`/frappedesk/settings/canned_responses/${doc.name}`
+						`/helpdesk/settings/canned_responses/${doc.name}`
 					)
 				},
 				onError: (err) => {

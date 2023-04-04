@@ -11,7 +11,7 @@ export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 	const options: Ref<Array<TicketPriority>> = ref([]);
 
 	createListResource({
-		doctype: "Ticket Priority",
+		doctype: "HD Ticket Priority",
 		auto: true,
 		onSuccess(data: Array<TicketPriority>) {
 			options.value = data;

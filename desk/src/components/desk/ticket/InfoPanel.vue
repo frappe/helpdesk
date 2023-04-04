@@ -223,8 +223,8 @@
 									v-if="index <= maxCount"
 									:to="
 										index < maxCount
-											? `/frappedesk/tickets/${_ticket.name}`
-											: `/frappedesk/tickets/?contact=${JSON.stringify(
+											? `/helpdesk/tickets/${_ticket.name}`
+											: `/helpdesk/tickets/?contact=${JSON.stringify(
 													['is', ticket.contact]
 											  )}`
 									"
@@ -365,7 +365,7 @@ export default {
 		otherTicketsOfContact() {
 			return {
 				cache: ["Other Tickets", "Action Panel", this.ticketId],
-				url: "frappedesk.api.ticket.get_other_tickets_of_contact",
+				url: "helpdesk.api.ticket.get_other_tickets_of_contact",
 				params: {
 					ticket_id: this.ticketId,
 				},
@@ -375,7 +375,7 @@ export default {
 		ticket() {
 			return {
 				type: "document",
-				doctype: "Ticket",
+				doctype: "HD Ticket",
 				name: this.ticketId,
 			}
 		},

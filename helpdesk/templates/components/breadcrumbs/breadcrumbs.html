@@ -1,0 +1,45 @@
+<link
+	rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+/>
+{% if no_container %}
+<div class="breadcrumb-container d-flex mb-8 flex-wrap"></div>
+{% else %}
+<div class="breadcrumb-container container d-flex mb-8 flex-wrap"></div>
+{% endif %}
+
+<script>
+	// TODO: use server side rendering instead
+	frappe.ready(function () {
+		frappe.call({
+			method: "helpdesk.templates.components.breadcrumbs.breadcrumbs.get_breadcrumbs",
+			args: {
+				route: window.location.href
+					.toString()
+					.split(window.location.host)[1],
+			},
+			callback: function (r) {
+				let parents = r.message
+				let breadcrumbContainer = $(".breadcrumb-container")
+				if (parents) {
+					for (var i = 0; i < parents.length; i++) {
+						breadcrumbContainer.append(
+							i < parents.length - 1
+								? `
+								<a style="white-space: nowrap;" href='${parents[i]["route"]}'>
+									${parents[i]["label"]}
+								</a>
+								<i class="px-2 bi bi-chevron-right"></i>
+							`
+								: `
+								<span style="white-space: nowrap;">
+									${parents[i]["label"]}
+								</span>
+							`
+						)
+					}
+				}
+			},
+		})
+	})
+</script>

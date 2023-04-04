@@ -70,7 +70,7 @@ export default {
 	resources: {
 		getFeedbackStatusCount() {
 			return {
-				url: "frappedesk.api.dashboard.feedback_status",
+				url: "helpdesk.api.dashboard.feedback_status",
 				params: {
 					dateFilter: [
 						"creation",

@@ -16,7 +16,7 @@
 						<Autocomplete
 							:value="selectedTicketType"
 							:resource-options="{
-								url: 'frappedesk.extends.client.get_list',
+								url: 'helpdesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'Ticket Type',
@@ -52,7 +52,7 @@
 						<Autocomplete
 							:value="selectedContact"
 							:resource-options="{
-								url: 'frappedesk.extends.client.get_list',
+								url: 'helpdesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'Contact',
@@ -90,10 +90,10 @@
 						<Autocomplete
 							:value="fdCustomer != null ? fdCustomer : selectedCustomer"
 							:resource-options="{
-								url: 'frappedesk.extends.client.get_list',
+								url: 'helpdesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
-										doctype: 'FD Customer',
+										doctype: 'HD Customer',
 										pluck: 'name',
 										filters: [['name', 'like', `%${query}%`]],
 									};

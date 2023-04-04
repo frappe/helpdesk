@@ -51,7 +51,7 @@
 								>
 									<router-link
 										:to="{
-											path: `/support/kb/${
+											path: `/helpdesk/knowledge-base/${
 												result.doctype === 'Article'
 													? 'articles'
 													: 'categories'
@@ -145,7 +145,7 @@ export default {
 	},
 	resources: {
 		searchResults: {
-			url: "frappedesk.api.kb.search",
+			url: "helpdesk.api.kb.search",
 		},
 	},
 }

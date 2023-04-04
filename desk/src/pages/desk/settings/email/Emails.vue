@@ -16,7 +16,7 @@
 					'default_outgoing',
 				],
 				limit: 20,
-				filters: [['IMAP Folder', 'append_to', 'in', ['Ticket']]],
+				filters: [['IMAP Folder', 'append_to', 'in', ['HD Ticket']]],
 			}"
 		>
 			<template #body="{ manager }">
@@ -54,7 +54,7 @@
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
 						() => {
-							$router.push('/frappedesk/settings/emails/new')
+							$router.push('/helpdesk/settings/emails/new')
 						}
 					"
 				>
@@ -62,7 +62,7 @@
 						<div class="w-full group flex items-center">
 							<router-link
 								:to="{
-									path: `/frappedesk/settings/emails/${row.email_account_name}`,
+									path: `/helpdesk/settings/emails/${row.email_account_name}`,
 								}"
 								class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 							>

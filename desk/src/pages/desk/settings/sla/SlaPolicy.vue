@@ -339,7 +339,7 @@ export default {
 			return {
 				url: "frappe.client.get",
 				params: {
-					doctype: "SLA",
+					doctype: "HD Service Level Agreement",
 					name: this.slaId,
 					fields: ["*"],
 				},
@@ -427,9 +427,9 @@ export default {
 		},
 		getServiceHolidayList() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
-					doctype: "Service Holiday List",
+					doctype: "HD Service Holiday List",
 					fields: ["*"],
 				},
 				auto: true,
@@ -563,7 +563,7 @@ export default {
 		rename() {
 			// TODO: once Service level agreement is renamable uncomment this block
 			// return this.$resources.renameServicePolicy.submit({
-			// 	doctype: "SLA",
+			// 	doctype: "HD Service Level Agreement",
 			// 	old_name: this.slaPolicyName,
 			// 	new_name: this.tempSlaPolicyName
 			// })
@@ -573,11 +573,11 @@ export default {
 			if (this.validateInputs()) {
 				this.$resources.createNewServicePolicy.submit({
 					doc: {
-						doctype: "SLA",
+						doctype: "HD Service Level Agreement",
 						service_level: this.tempSlaPolicyName,
 						priorities: this.priorities,
 						support_and_resolution: this.supportAndResolution,
-						document_type: "Ticket",
+						document_type: "HD Ticket",
 						holiday_list: this.selectedHolidayList,
 						sla_fulfilled_on: [
 							{ status: "Resolved" },
@@ -593,7 +593,7 @@ export default {
 			if (this.validateInputs()) {
 				this.$resources.updateServicePolicy
 					.submit({
-						doctype: "SLA",
+						doctype: "HD Service Level Agreement",
 						name: this.slaPolicyName,
 						fieldname: {
 							priorities: this.priorities,

@@ -3,7 +3,7 @@
 		<div class="font-semibold">Details</div>
 		<div class="border-b w-full"></div>
 		<router-link
-			:to="`/support/kb/articles/${article.name}`"
+			:to="`/helpdesk/knowledge-base/articles/${article.name}`"
 			target="_blank"
 			v-if="article.published_on"
 			class="flex flex-row justify-between items-center"
@@ -121,7 +121,7 @@ export default {
 	resources: {
 		users() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 				params: {
 					doctype: "User",
 					fields: ["name", "full_name"],

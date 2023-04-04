@@ -104,7 +104,7 @@ export default {
 	resources: {
 		articles() {
 			if (this.activeTab == "Articles") {
-				this.$router.push({ path: "/frappedesk/kb/articles" })
+				this.$router.push({ path: "/helpdesk/kb/articles" })
 			}
 		},
 	},

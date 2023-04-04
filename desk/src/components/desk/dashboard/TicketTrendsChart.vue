@@ -77,7 +77,7 @@ export default {
 	resources: {
 		getTicketCount() {
 			return {
-				url: "frappedesk.api.dashboard.get_ticket_count",
+				url: "helpdesk.api.dashboard.get_ticket_count",
 				params: {
 					filters: [
 						["creation", "between", [this.fromDate, this.toDate]],

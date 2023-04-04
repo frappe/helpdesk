@@ -1,0 +1,98 @@
+{% extends "templates/web.html" %} {%- from
+"templates/includes/navbar/navbar_items.html" import render_item -%} {%- block
+head_include %}
+<link rel="stylesheet" href="/assets/frappe/css/hljs-night-owl.css" />
+{% endblock -%} {%- block navbar -%}
+<nav class="navbar navbar-light navbar-expand-lg doc-navbar fixed-top">
+	<div class="container-fluid doc-container">
+		<div class="row no-gutters w-100">
+			<div class="col-8 col-lg-2">
+				<a
+					class="navbar-brand"
+					href="{{ url_prefix }}{{ home_page or '/' }}"
+				>
+					{%- if brand_html -%} {{ brand_html }} {%- elif banner_image
+					-%}
+					<img src="{{ banner_image }}" />
+					{%- else -%}
+					<!-- prettier-ignore -->
+					{% set helpdesk_name = frappe.get_doc("HD Settings").helpdesk_name %}
+						{% if helpdesk_name %}
+					<div class="ql-editor read-mode">
+						<p>{{ helpdesk_name }}</p>
+					</div>
+					{% endif %} {%- endif -%}
+				</a>
+			</div>
+			<div class="col-4 col-lg-8 d-flex justify-content-end">
+				<div class="d-flex">
+					<button
+						class="navbar-toggler"
+						type="button"
+						data-toggle="collapse"
+						data-target="#navbarSupportedContent"
+						aria-controls="navbarSupportedContent"
+						aria-expanded="false"
+						aria-label="Toggle navigation"
+					>
+						<span class="navbar-toggler-icon"></span>
+					</button>
+				</div>
+			</div>
+			<div class="col-12 col-lg-2 d-flex justify-content-end">
+				<ul class="navbar-nav d-flex">
+					<div
+						class="collapse navbar-collapse"
+						id="navbarSupportedContent"
+					>
+						{{ render_item({'label': 'Submit a Ticket', 'url':
+						'/support/tickets'}, parent=True) }}
+					</div>
+				</ul>
+			</div>
+		</div>
+	</div>
+</nav>
+{%- endblock -%} {% block content %}
+<div style="margin-top: 4.3rem">
+	{%- block page_content -%}{%- endblock -%} {{
+	frappe.render_template('templates/components/search/search.html', {}) }}
+	<script>
+		frappe.ready(function () {
+			$("#propSearchBar").click(function () {
+				showSearchBar()
+			})
+		})
+	</script>
+</div>
+{% endblock %} {% block footer %}
+<div class="contact-us-container hidden">
+	{{ frappe.render_template('templates/components/contact_with_us.html', {})
+	}}
+</div>
+<footer class="web-footer">
+	<div class="container">
+		<div class="footer-info">
+			<div class="row">
+				<div class="footer-col-left col-sm-6 col-12">
+					<!-- prettier-ignore -->
+					{% set helpdesk_name = frappe.get_doc("HD Settings").helpdesk_name %}
+					{% if helpdesk_name %}
+					<div class="ql-editor read-mode">
+						<p>© {{ helpdesk_name }}. 2022</p>
+					</div>
+					{% endif %}
+				</div>
+				<div class="footer-col-right col-sm-6 col-12 footer-powered">
+					<a
+						class="text-muted"
+						href="https://frappeframework.com?source=website_footer"
+						target="_blank"
+						>Powered by Frappe Helpdesk</a
+					>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+{% endblock %}

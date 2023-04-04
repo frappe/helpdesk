@@ -162,7 +162,7 @@ export default {
 	resources: {
 		categoriesInCurrentLevel() {
 			return {
-				url: "frappedesk.extends.client.get_list",
+				url: "helpdesk.extends.client.get_list",
 			}
 		},
 		selectedCategory() {
@@ -170,7 +170,7 @@ export default {
 			return {
 				url: "frappe.client.get",
 				params: {
-					doctype: "Category",
+					doctype: "HD Article Category",
 					name: this.selectedCategory,
 				},
 				auto: true,
@@ -183,7 +183,7 @@ export default {
 	methods: {
 		fetchSubCategoriesInCategory(category) {
 			this.$resources.categoriesInCurrentLevel.fetch({
-				doctype: "Category",
+				doctype: "HD Article Category",
 				fields: ["name", "category_name", "parent_category"],
 				filters: {
 					parent_category: category || "",

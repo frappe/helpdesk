@@ -35,7 +35,7 @@ export default {
 		doctype: {
 			type: String,
 			required: true,
-			default: "Ticket",
+			default: "HD Ticket",
 		},
 		listTitle: {
 			type: String,
@@ -161,7 +161,7 @@ export default {
 	resources: {
 		presetFilterOptions() {
 			return {
-				url: "frappedesk.api.general.get_preset_filters",
+				url: "helpdesk.api.general.get_preset_filters",
 				params: {
 					doctype: this.doctype,
 				},
