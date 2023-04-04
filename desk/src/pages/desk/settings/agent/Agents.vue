@@ -14,7 +14,7 @@
 			<template #body="{ manager }">
 				<ListViewer
 					:options="{
-						name: 'HD Agent',
+						name: 'Agent',
 						base: '12',
 						listTitle: 'Agents',
 						filterBox: true,

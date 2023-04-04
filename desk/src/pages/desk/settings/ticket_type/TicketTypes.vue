@@ -15,6 +15,7 @@
 			<template #body="{ manager }">
 				<ListViewer
 					:options="{
+						name: 'Ticket Type',
 						base: '12',
 						filterBox: true,
 						presetFilters: true,
