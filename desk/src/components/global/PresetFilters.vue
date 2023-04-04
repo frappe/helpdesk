@@ -62,7 +62,7 @@ export default {
 	},
 	computed: {
 		title() {
-			return `${this.listTitle} (${this.itemCount})`;
+			return this.listTitle;
 		},
 		filters() {
 			return this.manager.sudoFilters;
