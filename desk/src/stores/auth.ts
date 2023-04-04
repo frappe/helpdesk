@@ -19,7 +19,7 @@ export const useAuthStore = defineStore("auth", () => {
 		},
 	});
 
-	const user__ = computed(() => userInfo.data);
+	const user__ = computed(() => userInfo.data || {});
 	const hasDeskAccess: ComputedRef<boolean> = computed(
 		() => user__.value.has_desk_access
 	);
