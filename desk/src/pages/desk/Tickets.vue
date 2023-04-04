@@ -49,8 +49,8 @@
 				</Dropdown>
 			</div>
 		</div>
-		<div class="px-6 font-sans text-base text-gray-500">
-			<div class="flex items-center border-y border-gray-300 p-2">
+		<div class="bg-gray-100 px-6 font-sans text-base text-gray-500">
+			<div class="flex items-center p-2">
 				<div class="pl-1 pr-4">
 					<Input
 						type="checkbox"
@@ -73,7 +73,7 @@
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="hover:shadow-around flex w-full items-center rounded-lg border-b px-2 py-1 shadow-black transition-all last-of-type:border-none"
+				class="flex w-full items-center rounded-lg border-b px-2 py-1 shadow-black transition-all last-of-type:border-none hover:shadow-around"
 			>
 				<div class="pl-1 pr-4">
 					<Input
@@ -149,7 +149,7 @@
 			class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
 		>
 			<div
-				class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
+				class="flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-around"
 			>
 				<div class="w-64">
 					<div class="inline-block align-middle">
