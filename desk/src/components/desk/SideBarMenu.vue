@@ -36,6 +36,7 @@
 				:class="{
 					'bg-gray-200': isActive(option.label),
 					'text-gray-900': isActive(option.label),
+					'hover:bg-gray-300': isActive(option.label),
 					'hover:bg-gray-100': !isActive(option.label),
 				}"
 				@click="$router.push(option.to)"
@@ -55,6 +56,7 @@
 				:class="{
 					'bg-gray-200': isActive(option.label),
 					'text-gray-900': isActive(option.label),
+					'hover:bg-gray-300': isActive(option.label),
 					'hover:bg-gray-100': !isActive(option.label),
 				}"
 				@click="$router.push(option.to)"
@@ -198,13 +200,13 @@ const profileSettings = [
 ];
 
 const routeMap = {
-	"Knowledge Base": "helpdesk/kb",
-	Contacts: "helpdesk/contacts",
-	Customers: "helpdesk/customers",
-	Dashboard: "helpdesk/dashboard",
-	Reports: "helpdesk/reports",
-	Settings: "helpdesk/settings",
-	Tickets: "helpdesk/tickets",
+	"Knowledge Base": "/kb",
+	Contacts: "/contacts",
+	Customers: "/customers",
+	Dashboard: "/dashboard",
+	Reports: "/reports",
+	Settings: "/settings",
+	Tickets: "/tickets",
 };
 
 function isActive(label: string) {
