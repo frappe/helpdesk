@@ -59,21 +59,26 @@
 						:onchange="(e) => toggleAllSelected(e.target.checked)"
 					/>
 				</div>
-				<div class="basis-1/3">Summary</div>
+				<div class="basis-1/3">Subject</div>
 				<div class="flex basis-2/3">
 					<div class="basis-1/5">Assigned To</div>
 					<div class="basis-1/5">Raised By</div>
 					<div class="basis-1/5">Type</div>
-					<div class="basis-1/5">Status</div>
+					<div class="basis-1/5">
+						<div class="pl-3">Status</div>
+					</div>
 					<div class="basis-1/5">Priority</div>
 				</div>
 			</div>
 		</div>
-		<div class="overflow-x-scroll px-6 py-2 font-sans text-base">
+		<div class="divide-y overflow-x-scroll px-6 py-2 font-sans text-base">
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="hover:shadow-around flex w-full items-center rounded-lg border-b px-2 py-1 shadow-black transition-all last-of-type:border-none"
+				class="flex w-full items-center px-2 py-1 transition-all"
+				:class="{
+					'bg-gray-100': selected.has(t.name),
+				}"
 			>
 				<div class="pl-1 pr-4">
 					<Input
@@ -106,7 +111,7 @@
 							:button="{
 								label: t.status,
 								iconRight: 'chevron-down',
-								class: 'bg-white text-gray-500 hover:bg-white',
+								appearance: 'minimal',
 							}"
 						/>
 					</div>
@@ -144,50 +149,58 @@
 				/>
 			</div>
 		</div>
-		<div
-			v-show="selected.size"
-			class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
+		<transition
+			enter-active-class="duration-300 ease-out"
+			enter-from-class="transform opacity-0"
+			enter-to-class="opacity-100"
+			leave-active-class="duration-200 ease-in"
+			leave-from-class="opacity-100"
+			leave-to-class="transform opacity-0"
 		>
 			<div
-				class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
+				v-show="selected.size"
+				class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
 			>
-				<div class="w-64">
-					<div class="inline-block align-middle">
-						<Input type="checkbox" :value="true" :disabled="true" />
+				<div
+					class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
+				>
+					<div class="w-64">
+						<div class="inline-block align-middle">
+							<Input type="checkbox" :value="true" :disabled="true" />
+						</div>
+						<div class="inline-block pl-2 align-middle">
+							{{ ticketsSelectedText }}
+						</div>
 					</div>
-					<div class="inline-block pl-2 align-middle">
-						{{ selected.size }}
-						tickets selected
+					<div>
+						<Dropdown
+							:options="agentsAsDropdownOptions"
+							:button="{
+								label: 'Assign',
+								iconLeft: 'plus-circle',
+								class: 'bg-white text-gray-500',
+							}"
+						/>
 					</div>
-				</div>
-				<div>
-					<Dropdown
-						:options="agentsAsDropdownOptions"
-						:button="{
-							label: 'Assign',
-							iconLeft: 'plus-circle',
-							class: 'bg-white text-gray-500',
-						}"
-					/>
-				</div>
-				<div class="text-gray-300">&#x007C;</div>
-				<div>
-					<Button
-						label="Select all"
-						class="bg-white text-gray-500"
-						:disabled="allSelected"
-						@click="selectAll"
-					/>
-				</div>
-				<div>
-					<Button
-						icon="x"
-						class="bg-white text-gray-500"
-						@click="deselectAll"
-					/>
+					<div class="text-gray-300">&#x007C;</div>
+					<div>
+						<Button
+							label="Select all"
+							class="bg-white text-gray-500"
+							:disabled="allSelected"
+							@click="selectAll"
+						/>
+					</div>
+					<div>
+						<Button
+							icon="x"
+							class="bg-white text-gray-500"
+							@click="deselectAll"
+						/>
+					</div>
 				</div>
 			</div>
-		</div>
+		</transition>
 		<NewTicketDialog
 			v-model="showNewTicketDialog"
 			@close="showNewTicketDialog = false"
@@ -237,6 +250,7 @@ export default {
 		const ticketList = createListManager({
 			doctype: "HD Ticket",
 			pageLength: 20,
+			orderBy: "modified desc",
 		});
 
 		return {
@@ -281,6 +295,15 @@ export default {
 		allSelected() {
 			if (this.$_.isEmpty(this.ticketList.list.data)) return;
 			return this.ticketList.list.data.length === this.selected.size;
+		},
+		ticketsSelectedText() {
+			/** Number of selected items */
+			const n = this.selected.size;
+
+			/** Singular or Plural */
+			const s = n > 1 ? "Tickets" : "Ticket";
+
+			return `${n} ${s} selected`;
 		},
 		filterByPriorityOptions() {
 			return this.ticketPriorityStore.getNames().map((priority) => ({

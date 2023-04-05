@@ -1,7 +1,7 @@
 <template>
-	<div class="leading-loose">
+	<div class="leading-relaxed">
 		<router-link :to="toRoute">
-			<div class="truncate" :class="{ 'font-semibold': !isSeen }">
+			<div class="line-clamp-2" :class="{ 'font-semibold': !isSeen }">
 				{{ subject }}
 			</div>
 		</router-link>
