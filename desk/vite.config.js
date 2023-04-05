@@ -18,7 +18,7 @@ export default defineConfig({
 		},
 	},
 	build: {
-		outDir: `../${path.basename(path.resolve(".."))}/public/desk`,
+		outDir: `../helpdesk/public/desk`,
 		emptyOutDir: true,
 		target: "es2021",
 	},

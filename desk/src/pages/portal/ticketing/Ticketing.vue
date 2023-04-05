@@ -48,7 +48,7 @@ export default {
 			}
 		} else {
 			this.impersonateContact = () => {
-				this.$router.push({ path: "/helpdesk/my-tickets" })
+				this.$router.push({ path: "/my-tickets" })
 				this.$resources.tickets.fetch()
 			}
 		}
@@ -82,7 +82,7 @@ export default {
 		}
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
-				case "Ticket":
+				case "HD Ticket":
 					this.ticketController.update()
 					break
 			}

@@ -40,7 +40,7 @@
 					<template #field-title="{ row }">
 						<router-link
 							:to="{
-								path: `/helpdesk/settings/canned_responses/${row.title}`,
+								path: `/settings/canned_responses/${row.title}`,
 							}"
 							class="font-inter text-[13px] text-gray-600 hover:text-gray-900"
 						>

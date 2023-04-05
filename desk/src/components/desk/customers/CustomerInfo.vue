@@ -151,7 +151,7 @@
 					>
 						<div class="w-[30%]">
 							<router-link
-								:to="`/helpdesk/contacts/${contact.name}`"
+								:to="`/contacts/${contact.name}`"
 							>
 								{{ contact.first_name }}
 								{{
@@ -411,7 +411,7 @@ export default {
 				url: "frappe.client.rename_doc",
 				onSuccess: (res) => {
 					this.$router.push({
-						path: `/helpdesk/customers/${res}`,
+						path: `/customers/${res}`,
 					})
 				},
 			}

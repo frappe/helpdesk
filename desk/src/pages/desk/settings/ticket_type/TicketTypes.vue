@@ -32,13 +32,13 @@
 					}"
 					class="text-base h-[calc(100vh-9.5rem)] pt-4"
 					@add-item="
-						$router.push('/helpdesk/settings/ticket_types/new')
+						$router.push('/settings/ticket_types/new')
 					"
 				>
 					<template #field-name="{ row }">
 						<router-link
 							:to="{
-								path: `/helpdesk/settings/ticket_types/${row.name}`,
+								path: `/settings/ticket_types/${row.name}`,
 							}"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>

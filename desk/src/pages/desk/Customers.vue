@@ -48,7 +48,7 @@
 				>
 					<template #field-customer_name="{ row }">
 						<router-link
-							:to="{ path: `/helpdesk/customers/${row.name}` }"
+							:to="{ path: `/customers/${row.name}` }"
 							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.customer_name}` }}

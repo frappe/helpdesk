@@ -57,7 +57,7 @@ export default {
 				url: "helpdesk.api.account.verify_and_create_account",
 				onSuccess: async () => {
 					await this.authStore.login(this.email, this.password)
-					this.$router.push("/helpdesk/my-tickets")
+					this.$router.push("/my-tickets")
 				},
 				onError: () => {},
 			}

@@ -132,28 +132,28 @@ const menuOptions = [
 		label: "Dashboard",
 		icon_: IconDashboard,
 		to: {
-			path: "/helpdesk/dashboard",
+			name: "Dashboard",
 		},
 	},
 	{
 		label: "Tickets",
 		icon_: IconTicket,
 		to: {
-			path: "/helpdesk/tickets",
+			name: "DeskTickets",
 		},
 	},
 	{
 		label: "Customers",
 		icon_: IconCustomer,
 		to: {
-			path: "/helpdesk/customers",
+			name: "Customers",
 		},
 	},
 	{
 		label: "Contacts",
 		icon_: IconContact,
 		to: {
-			path: "/helpdesk/contacts",
+			name: "Contacts",
 		},
 	},
 ];
@@ -163,14 +163,14 @@ const footerOptions = [
 		label: "Knowledge Base",
 		icon_: IconKnowledgeBase,
 		to: {
-			path: "/helpdesk/kb",
+			name: "DeskKBHome",
 		},
 	},
 	{
 		label: "Settings",
 		icon_: IconSettings,
 		to: {
-			path: "/helpdesk/settings",
+			name: "Settings",
 		},
 	},
 ];
@@ -187,7 +187,7 @@ const profileSettings = [
 		label: "Customer portal",
 		icon: "users",
 		handler: () => {
-			window.open("/helpdesk/my-tickets", "_blank");
+			window.open("/my-tickets", "_blank");
 		},
 	},
 	{

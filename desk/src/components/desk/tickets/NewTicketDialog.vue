@@ -19,7 +19,7 @@
 								url: 'helpdesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
-										doctype: 'Ticket Type',
+										doctype: 'HD Ticket Type',
 										pluck: 'name',
 										filters: [['name', 'like', `%${query}%`]],
 									};

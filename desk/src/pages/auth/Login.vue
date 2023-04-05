@@ -54,8 +54,8 @@
 						class="text-center text-base"
 						:to="`${
 							this.$route.name === 'DeskLogin'
-								? '/helpdesk'
-								: '/helpdesk'
+								? ''
+								: ''
 						}/signup`"
 					>
 						<div>Sign up for a new account</div>
@@ -153,8 +153,8 @@ export default {
 			} else {
 				window.location.href =
 					this.$route.name == "DeskLogin"
-						? "/helpdesk/tickets"
-						: "/helpdesk/my-tickets"
+						? "/tickets"
+						: "/my-tickets"
 			}
 		},
 	},

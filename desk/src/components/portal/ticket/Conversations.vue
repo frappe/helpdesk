@@ -76,7 +76,7 @@ export default {
 	},
 	mounted() {
 		this.$socket.on("list_update", (data) => {
-			if (data["doctype"] == "Ticket" && data["name"] == this.ticketId) {
+			if (data["doctype"] == "HD Ticket" && data["name"] == this.ticketId) {
 				this.$resources.conversations.fetch()
 			}
 		})

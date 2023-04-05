@@ -7,7 +7,7 @@
 			<router-link
 				:title="'Articles'"
 				:to="{
-					path: '/helpdesk/kb/articles',
+					path: '/kb/articles',
 				}"
 			>
 				<FeatherIcon
@@ -30,7 +30,7 @@
 			</div>
 			<router-link
 				:title="'Toggle Web view'"
-				:to="{ path: '/helpdesk/kb' }"
+				:to="{ path: '/kb' }"
 			>
 				<FeatherIcon
 					role="button"

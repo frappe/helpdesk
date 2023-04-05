@@ -386,9 +386,9 @@ def assign_ticket_status(ticket_id, status):
 
 @frappe.whitelist()
 def update_ticket_status(ticket_id, status):
-	frappe.db.set_value("Ticket", ticket_id, "status", status, update_modified=False)
+	frappe.db.set_value("HD Ticket", ticket_id, "status", status, update_modified=False)
 
-	doc = frappe.get_doc("Ticket", ticket_id)
+	doc = frappe.get_doc("HD Ticket", ticket_id)
 
 	return doc
 
