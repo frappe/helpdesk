@@ -111,10 +111,10 @@ export default {
 			}
 			// Add "Create a Ticket" option on the navbar if not already present
 			const newTicketRoutes = [
-				"/helpdesk/my-tickets",
-				"/helpdesk/my-tickets/",
-				"/helpdesk/my-tickets/new",
-				"/helpdesk/my-tickets/new/",
+				"/my-tickets",
+				"/my-tickets/",
+				"/my-tickets/new",
+				"/my-tickets/new/",
 			]
 			const currentRouteIsNewTicket = () => {
 				for (let route of newTicketRoutes) {
@@ -136,7 +136,7 @@ export default {
 			if (!currentRouteIsNewTicket() && !newTicketRouteExists()) {
 				parentItems.push({
 					label: "Create a Ticket",
-					url: "/helpdesk/my-tickets",
+					url: "/my-tickets",
 					children: [],
 				})
 			}
@@ -154,7 +154,7 @@ export default {
 					label: "Logout",
 					handler: () => {
 						this.authStore.logout()
-						window.location.href = "/helpdesk/login"
+						window.location.href = "/login"
 					},
 				},
 			]

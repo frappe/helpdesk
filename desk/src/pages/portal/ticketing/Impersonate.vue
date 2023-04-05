@@ -30,9 +30,9 @@ export default {
 				await impersonateContact(this.contact)
 				this.ticketId
 					? this.$router.push({
-							path: `/helpdesk/my-tickets/${this.ticketId}`,
+							path: `/my-tickets/${this.ticketId}`,
 					  })
-					: this.$router.push({ path: "/helpdesk/my-tickets" })
+					: this.$router.push({ path: "/my-tickets" })
 			}
 		},
 	},

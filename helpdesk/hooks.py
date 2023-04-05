@@ -11,14 +11,14 @@ before_install = "helpdesk.setup.install.before_install"
 after_install = "helpdesk.setup.install.after_install"
 
 website_route_rules = [
-    {
-        "from_route": "/helpdesk/<path:app_path>",
-        "to_route": "helpdesk",
-    },
+	{
+		"from_route": "/helpdesk/<path:app_path>",
+		"to_route": "helpdesk",
+	},
 ]
 
 has_website_permission = {
-	"Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_website_permission",
+	"HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_website_permission",
 }
 
 scheduler_events = {
@@ -31,8 +31,8 @@ scheduler_events = {
 
 doc_events = {
 	"*": {
-        "validate": "helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.apply",
-    },
+		"validate": "helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.apply",
+	},
 	"Communication": {
 		"on_update": [
 			"helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.on_communication_update",
@@ -53,11 +53,11 @@ doc_events = {
 		],
 	},
 	"Assignment Rule": {
-        "on_trash": "helpdesk.overrides.on_assignment_rule_trash",
-    },
+		"on_trash": "helpdesk.overrides.on_assignment_rule_trash",
+	},
 	"HD Agent": {
-        "before_insert": "helpdesk.limits.validate_agent_count",
-    },
+		"before_insert": "helpdesk.limits.validate_agent_count",
+	},
 	"HD Ticket": {
 		"after_insert": (
 			"helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_ticket_count"

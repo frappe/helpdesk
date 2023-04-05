@@ -17,7 +17,7 @@
 				/>
 			</div>
 			<router-link
-				:to="`/helpdesk/settings/canned_responses/${canned_response.name}`"
+				:to="`/settings/canned_responses/${canned_response.name}`"
 				class="w-full group flex items-center"
 			>
 				<div class="sm:w-10/12 truncate pr-10">

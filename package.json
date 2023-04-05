@@ -1,9 +1,5 @@
 {
 	"private": true,
-	"aworkspaces": [
-		"desk",
-		"frappe-ui"
-	],
 	"scripts": {
 		"postinstall": "husky install && cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
@@ -23,6 +19,5 @@
 		"prettier": "2.8.4",
 		"tailwindcss": "^3.2.6",
 		"typescript": "^5.0.2"
-	},
-	"dependencies": {}
+	}
 }

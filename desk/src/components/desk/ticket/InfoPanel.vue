@@ -223,8 +223,8 @@
 									v-if="index <= maxCount"
 									:to="
 										index < maxCount
-											? `/helpdesk/tickets/${_ticket.name}`
-											: `/helpdesk/tickets/?contact=${JSON.stringify(
+											? `/tickets/${_ticket.name}`
+											: `/tickets/?contact=${JSON.stringify(
 													['is', ticket.contact]
 											  )}`
 									"

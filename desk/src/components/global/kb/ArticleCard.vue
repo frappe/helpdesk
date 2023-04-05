@@ -1,5 +1,5 @@
 <template>
-	<router-link :to="`/helpdesk/knowledge-base/articles/${article.name}`">
+	<router-link :to="`/knowledge-base/articles/${article.name}`">
 		<div
 			class="group rounded-[6px] shadow-md bg-white p-5 w-full flex flex-row justify-between items-center hover:bg-gray-50"
 		>

@@ -13,7 +13,7 @@
 				/>
 			</div>
 			<router-link
-				:to="`/helpdesk/settings/agents/${agent.name}`"
+				:to="`/settings/agents/${agent.name}`"
 				class="w-full group flex items-center"
 			>
 				<div class="sm:w-5/12 truncate pr-10">

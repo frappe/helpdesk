@@ -14,7 +14,7 @@
 		@discard="
 			() => {
 				if (isNew) {
-					$router.push({ path: '/helpdesk/kb/articles' });
+					$router.push({ path: '/kb/articles' });
 				} else {
 					editMode = false;
 				}
@@ -280,7 +280,7 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/helpdesk/kb/articles/${doc.name}`);
+					this.$router.push(`/kb/articles/${doc.name}`);
 				},
 				onError: (err) => {
 					this.$toast({

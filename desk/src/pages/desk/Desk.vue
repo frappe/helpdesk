@@ -119,7 +119,7 @@ export default {
 			return;
 		}
 		if (!this.authStore.hasDeskAccess) {
-			this.$router.push({ path: "/helpdesk/my-tickets" });
+			this.$router.push({ path: "/my-tickets" });
 			return;
 		}
 		this.$resources.helpdeskSettings.fetch();
