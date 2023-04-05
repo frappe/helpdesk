@@ -3,27 +3,22 @@
 		class="flex w-56 shrink select-none flex-col border-r text-base text-gray-700"
 	>
 		<div>
-			<Dropdown :options="profileSettings">
+			<Dropdown class="p-2" :options="profileSettings">
 				<template #default="{ open }">
-					<Button class="my-3 w-full bg-white px-2 hover:bg-white">
-						<div class="flex items-center gap-2">
-							<div>
-								<Avatar
-									size="sm"
-									:label="authStore.userName"
-									:image-u-r-l="authStore.userImage"
-								/>
-							</div>
-							<div>
-								{{ authStore.userName }}
-							</div>
-							<div>
-								<FeatherIcon
-									:name="open ? 'chevron-up' : 'chevron-down'"
-									class="h-5 w-5 text-gray-500"
-								/>
-							</div>
-						</div>
+					<Button
+						appearance="minimal"
+						class="py-2 pl-2"
+						:label="authStore.userName"
+						:icon-right="open ? 'chevron-up' : 'chevron-down'"
+					>
+						<template #icon-left>
+							<Avatar
+								size="sm"
+								class="mr-2"
+								:label="authStore.userName"
+								:image-u-r-l="authStore.userImage"
+							/>
+						</template>
 					</Button>
 				</template>
 			</Dropdown>
@@ -100,7 +95,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-import { Dropdown, FeatherIcon, Avatar } from "frappe-ui";
+import { Dropdown, Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import IconDashboard from "@/assets/icons/dashboard.svg?component";
 import IconTicket from "@/assets/icons/ticket.svg?component";
