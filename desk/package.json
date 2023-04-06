@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@headlessui/vue": "^1.7.12",
 		"@tailwindcss/line-clamp": "^0.4.4",
+		"@tailwindcss/typography": "^0.5.9",
 		"@vee-validate/zod": "^4.8.2",
 		"@vitejs/plugin-vue": "^4.0.0",
 		"autoprefixer": "^10.4.13",

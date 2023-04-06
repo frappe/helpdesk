@@ -50,7 +50,7 @@
 			</div>
 		</div>
 		<div class="bg-gray-100 px-6 font-sans text-base text-gray-500">
-			<div class="flex items-center px-2 py-1">
+			<div class="flex items-center gap-2 px-2 py-1">
 				<div class="pl-1 pr-4">
 					<Input
 						type="checkbox"
@@ -59,16 +59,13 @@
 						:onchange="(e) => toggleAllSelected(e.target.checked)"
 					/>
 				</div>
-				<div class="basis-1/3">Subject</div>
-				<div class="flex basis-2/3 gap-2">
-					<div class="basis-1/6">Assigned To</div>
-					<div class="basis-1/6">Raised By</div>
-					<div class="basis-1/6">Type</div>
-					<div class="basis-1/6">
-						<div class="pl-3">Status</div>
-					</div>
-					<div class="basis-1/6">Priority</div>
-					<div class="basis-1/6">Due In</div>
+				<div class="w-1/3">Subject</div>
+				<div class="flex w-2/3 gap-2">
+					<div class="w-1/4">Assigned To</div>
+					<div class="w-1/5">Type</div>
+					<div class="w-1/6 pl-1">Status</div>
+					<div class="w-1/6">Priority</div>
+					<div class="w-1/5">Due In</div>
 				</div>
 			</div>
 		</div>
@@ -76,7 +73,7 @@
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="flex w-full items-center px-2 py-1 transition-all"
+				class="flex w-full items-center gap-2 px-2 py-1 transition-all"
 				:class="{
 					'bg-gray-50': selected.has(t.name),
 				}"
@@ -89,30 +86,28 @@
 						:onchange="(e) => toggleOne(t.name, e.target.checked)"
 					/>
 				</div>
-				<div class="w-1/12 basis-1/3 pr-8">
+				<div class="w-1/3">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
-				<div class="flex basis-2/3 items-center gap-2">
-					<div class="basis-1/6">
+				<div class="flex w-2/3 items-center gap-2">
+					<div class="w-1/4">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
-					<div class="line-clamp-2 basis-1/6">
-						{{ t.contact }}
-					</div>
-					<div class="line-clamp-2 basis-1/6">
+					<div class="line-clamp-2 w-1/5">
 						{{ t.ticket_type }}
 					</div>
-					<div class="basis-1/6">
+					<div class="w-1/6">
 						<Dropdown
 							:options="statusDropdownOptions(t.name, t.status)"
 							:button="{
 								label: t.status,
 								iconRight: 'chevron-down',
 								appearance: 'minimal',
+								class: 'pl-1',
 							}"
 						/>
 					</div>
-					<div class="basis-1/6">
+					<div class="w-1/6">
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
 							<template #default>
 								<Badge
@@ -124,7 +119,7 @@
 						</Dropdown>
 					</div>
 					<div
-						class="basis-1/6 capitalize"
+						class="w-1/5 capitalize"
 						:class="{
 							'text-red-700': Date.parse(t.resolution_by) < Date.now(),
 						}"
