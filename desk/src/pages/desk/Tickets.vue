@@ -61,13 +61,14 @@
 				</div>
 				<div class="basis-1/3">Subject</div>
 				<div class="flex basis-2/3 gap-2">
-					<div class="basis-1/5">Assigned To</div>
-					<div class="basis-1/5">Raised By</div>
-					<div class="basis-1/5">Type</div>
-					<div class="basis-1/5">
+					<div class="basis-1/6">Assigned To</div>
+					<div class="basis-1/6">Raised By</div>
+					<div class="basis-1/6">Type</div>
+					<div class="basis-1/6">
 						<div class="pl-3">Status</div>
 					</div>
-					<div class="basis-1/5">Priority</div>
+					<div class="basis-1/6">Priority</div>
+					<div class="basis-1/6">Due In</div>
 				</div>
 			</div>
 		</div>
@@ -92,16 +93,16 @@
 					<TicketSummary :ticket-name="t.name" />
 				</div>
 				<div class="flex basis-2/3 items-center gap-2">
-					<div class="basis-1/5">
+					<div class="basis-1/6">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
-					<div class="basis-1/5 line-clamp-2">
+					<div class="line-clamp-2 basis-1/6">
 						{{ t.contact }}
 					</div>
-					<div class="basis-1/5 line-clamp-2">
+					<div class="line-clamp-2 basis-1/6">
 						{{ t.ticket_type }}
 					</div>
-					<div class="basis-1/5">
+					<div class="basis-1/6">
 						<Dropdown
 							:options="statusDropdownOptions(t.name, t.status)"
 							:button="{
@@ -111,7 +112,7 @@
 							}"
 						/>
 					</div>
-					<div class="basis-1/5">
+					<div class="basis-1/6">
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
 							<template #default>
 								<Badge
@@ -121,6 +122,14 @@
 								/>
 							</template>
 						</Dropdown>
+					</div>
+					<div
+						class="basis-1/6 capitalize"
+						:class="{
+							'text-red-700': Date.parse(t.resolution_by) < Date.now(),
+						}"
+					>
+						{{ t.resolution_by ? $dayjs(t.resolution_by).fromNow() : "" }}
 					</div>
 				</div>
 			</div>
