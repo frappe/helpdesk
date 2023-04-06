@@ -60,7 +60,7 @@
 					/>
 				</div>
 				<div class="basis-1/3">Subject</div>
-				<div class="flex basis-2/3">
+				<div class="flex basis-2/3 gap-2">
 					<div class="basis-1/5">Assigned To</div>
 					<div class="basis-1/5">Raised By</div>
 					<div class="basis-1/5">Type</div>
@@ -91,18 +91,14 @@
 				<div class="w-1/12 basis-1/3 pr-8">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
-				<div class="flex basis-2/3 items-center">
+				<div class="flex basis-2/3 items-center gap-2">
 					<div class="basis-1/5">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
-					<div class="basis-1/5">
-						<Tooltip :text="t.raised_by">
-							<div class="truncate">
-								{{ t.contact }}
-							</div>
-						</Tooltip>
+					<div class="basis-1/5 line-clamp-2">
+						{{ t.contact }}
 					</div>
-					<div class="basis-1/5">
+					<div class="basis-1/5 line-clamp-2">
 						{{ t.ticket_type }}
 					</div>
 					<div class="basis-1/5">
