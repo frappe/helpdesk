@@ -60,14 +60,15 @@
 					/>
 				</div>
 				<div class="basis-1/3">Subject</div>
-				<div class="flex basis-2/3">
-					<div class="basis-1/5">Assigned To</div>
-					<div class="basis-1/5">Raised By</div>
-					<div class="basis-1/5">Type</div>
-					<div class="basis-1/5">
+				<div class="flex basis-2/3 gap-2">
+					<div class="basis-1/6">Assigned To</div>
+					<div class="basis-1/6">Raised By</div>
+					<div class="basis-1/6">Type</div>
+					<div class="basis-1/6">
 						<div class="pl-3">Status</div>
 					</div>
-					<div class="basis-1/5">Priority</div>
+					<div class="basis-1/6">Priority</div>
+					<div class="basis-1/6">Due In</div>
 				</div>
 			</div>
 		</div>
@@ -91,21 +92,17 @@
 				<div class="w-1/12 basis-1/3 pr-8">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
-				<div class="flex basis-2/3 items-center">
-					<div class="basis-1/5">
+				<div class="flex basis-2/3 items-center gap-2">
+					<div class="basis-1/6">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
-					<div class="basis-1/5">
-						<Tooltip :text="t.raised_by">
-							<div class="truncate">
-								{{ t.contact }}
-							</div>
-						</Tooltip>
+					<div class="line-clamp-2 basis-1/6">
+						{{ t.contact }}
 					</div>
-					<div class="basis-1/5">
+					<div class="line-clamp-2 basis-1/6">
 						{{ t.ticket_type }}
 					</div>
-					<div class="basis-1/5">
+					<div class="basis-1/6">
 						<Dropdown
 							:options="statusDropdownOptions(t.name, t.status)"
 							:button="{
@@ -115,8 +112,24 @@
 							}"
 						/>
 					</div>
-					<div class="basis-1/5">
-						<Badge :color-map="priorityColorMap" :label="t.priority" />
+					<div class="basis-1/6">
+						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
+							<template #default>
+								<Badge
+									:color-map="priorityColorMap"
+									:label="t.priority"
+									class="cursor-pointer"
+								/>
+							</template>
+						</Dropdown>
+					</div>
+					<div
+						class="basis-1/6 capitalize"
+						:class="{
+							'text-red-700': Date.parse(t.resolution_by) < Date.now(),
+						}"
+					>
+						{{ t.resolution_by ? $dayjs(t.resolution_by).fromNow() : "" }}
 					</div>
 				</div>
 			</div>
@@ -306,7 +319,7 @@ export default {
 			return `${n} ${s} selected`;
 		},
 		filterByPriorityOptions() {
-			return this.ticketPriorityStore.getNames().map((priority) => ({
+			return this.ticketPriorityStore.names.map((priority) => ({
 				label: priority,
 				handler: () => this.filterByPriority(priority),
 			}));
@@ -375,18 +388,28 @@ export default {
 			if (checked) this.selectAll();
 			else this.deselectAll();
 		},
-		setTicketStatus(ticketId, status) {
-			this.ticketList.setValue.submit({
-				name: ticketId,
-				status,
-			});
-		},
 		statusDropdownOptions(ticketId, currentStatus) {
 			return this.ticketStatusStore.options
 				.filter((o) => o !== currentStatus)
 				.map((o) => ({
 					label: o,
-					handler: () => this.setTicketStatus(ticketId, o),
+					handler: () =>
+						this.ticketList.setValue.submit({
+							name: ticketId,
+							status,
+						}),
+				}));
+		},
+		priorityDropdownOptions(ticketId, currentPriority) {
+			return this.ticketPriorityStore.names
+				.filter((o) => o !== currentPriority)
+				.map((o) => ({
+					label: o,
+					handler: () =>
+						this.ticketList.setValue.submit({
+							name: ticketId,
+							priority: o,
+						}),
 				}));
 		},
 		filterByPriority(priority) {
