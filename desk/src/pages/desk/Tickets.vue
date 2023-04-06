@@ -77,7 +77,7 @@
 				:key="t.name"
 				class="flex w-full items-center px-2 py-1 transition-all"
 				:class="{
-					'bg-gray-100': selected.has(t.name),
+					'bg-gray-50': selected.has(t.name),
 				}"
 			>
 				<div class="pl-1 pr-4">
@@ -162,7 +162,7 @@
 				class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
 			>
 				<div
-					class="shadow-around flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
+					class="bottom-bar flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
 				>
 					<div class="w-64">
 						<div class="inline-block align-middle">
@@ -454,3 +454,10 @@ export default {
 	},
 };
 </script>
+
+<style scoped>
+.bottom-bar {
+	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.3),
+		0px 1px 3px 1px rgba(0, 0, 0, 0.05), 4px 4px 17px 6px rgba(0, 0, 0, 0.07);
+}
+</style>
