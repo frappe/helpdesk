@@ -1,4 +1,4 @@
-import { ref, Ref } from "vue";
+import { computed, ComputedRef } from "vue";
 import { defineStore } from "pinia";
 import { createListResource } from "frappe-ui";
 
@@ -8,26 +8,18 @@ type TicketPriority = {
 };
 
 export const useTicketPriorityStore = defineStore("ticketPriority", () => {
-	const options: Ref<Array<TicketPriority>> = ref([]);
-
-	createListResource({
+	const d__ = createListResource({
 		doctype: "HD Ticket Priority",
 		auto: true,
-		onSuccess(data: Array<TicketPriority>) {
-			options.value = data;
-		},
 	});
 
-	function getAll(): Array<TicketPriority> {
-		return options.value;
-	}
-
-	function getNames(): Array<string> {
-		return options.value.map((o) => o.name);
-	}
+	const options: ComputedRef<Array<TicketPriority>> = computed(
+		() => d__.list?.data || []
+	);
+	const names = computed(() => options.value.map((o) => o.name));
 
 	return {
-		getAll,
-		getNames,
+		options,
+		names,
 	};
 });

@@ -116,7 +116,15 @@
 						/>
 					</div>
 					<div class="basis-1/5">
-						<Badge :color-map="priorityColorMap" :label="t.priority" />
+						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
+							<template #default>
+								<Badge
+									:color-map="priorityColorMap"
+									:label="t.priority"
+									class="cursor-pointer"
+								/>
+							</template>
+						</Dropdown>
 					</div>
 				</div>
 			</div>
@@ -306,7 +314,7 @@ export default {
 			return `${n} ${s} selected`;
 		},
 		filterByPriorityOptions() {
-			return this.ticketPriorityStore.getNames().map((priority) => ({
+			return this.ticketPriorityStore.names.map((priority) => ({
 				label: priority,
 				handler: () => this.filterByPriority(priority),
 			}));
@@ -375,18 +383,28 @@ export default {
 			if (checked) this.selectAll();
 			else this.deselectAll();
 		},
-		setTicketStatus(ticketId, status) {
-			this.ticketList.setValue.submit({
-				name: ticketId,
-				status,
-			});
-		},
 		statusDropdownOptions(ticketId, currentStatus) {
 			return this.ticketStatusStore.options
 				.filter((o) => o !== currentStatus)
 				.map((o) => ({
 					label: o,
-					handler: () => this.setTicketStatus(ticketId, o),
+					handler: () =>
+						this.ticketList.setValue.submit({
+							name: ticketId,
+							status,
+						}),
+				}));
+		},
+		priorityDropdownOptions(ticketId, currentPriority) {
+			return this.ticketPriorityStore.names
+				.filter((o) => o !== currentPriority)
+				.map((o) => ({
+					label: o,
+					handler: () =>
+						this.ticketList.setValue.submit({
+							name: ticketId,
+							priority: o,
+						}),
 				}));
 		},
 		filterByPriority(priority) {
