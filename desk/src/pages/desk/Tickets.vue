@@ -170,7 +170,7 @@
 				class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
 			>
 				<div
-					class="bottom-bar flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2"
+					class="bottom-bar flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1"
 				>
 					<div class="w-64">
 						<div class="inline-block align-middle">
@@ -186,7 +186,7 @@
 							:button="{
 								label: 'Assign',
 								iconLeft: 'plus-circle',
-								class: 'bg-white text-gray-500',
+								appearance: 'minimal',
 							}"
 						/>
 					</div>
@@ -194,17 +194,13 @@
 					<div>
 						<Button
 							label="Select all"
-							class="bg-white text-gray-500"
+							appearance="minimal"
 							:disabled="allSelected"
 							@click="selectAll"
 						/>
 					</div>
 					<div>
-						<Button
-							icon="x"
-							class="bg-white text-gray-500"
-							@click="deselectAll"
-						/>
+						<Button icon="x" appearance="minimal" @click="deselectAll" />
 					</div>
 				</div>
 			</div>

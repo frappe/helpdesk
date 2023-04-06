@@ -36,7 +36,14 @@
 				}"
 				@click="$router.push(option.to)"
 			>
-				<component :is="option.icon_"></component>
+				<component
+					:is="option.icon"
+					v-show="!isActive(option.label)"
+				></component>
+				<component
+					:is="option.iconActive"
+					v-show="isActive(option.label)"
+				></component>
 				<div>
 					{{ option.label }}
 				</div>
@@ -56,7 +63,14 @@
 				}"
 				@click="$router.push(option.to)"
 			>
-				<component :is="option.icon_"></component>
+				<component
+					:is="option.icon"
+					v-show="!isActive(option.label)"
+				></component>
+				<component
+					:is="option.iconActive"
+					v-show="isActive(option.label)"
+				></component>
 				<div>
 					{{ option.label }}
 				</div>
@@ -98,11 +112,17 @@ import { useRoute } from "vue-router";
 import { Dropdown, Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import IconDashboard from "@/assets/icons/dashboard.svg?component";
+import IconDashboardSolid from "@/assets/icons/dashboard-solid.svg?component";
 import IconTicket from "@/assets/icons/ticket.svg?component";
+import IconTicketSolid from "@/assets/icons/ticket-solid.svg?component";
 import IconCustomer from "@/assets/icons/customer.svg?component";
+import IconCustomerSolid from "@/assets/icons/customer-solid.svg?component";
 import IconContact from "@/assets/icons/contact.svg?component";
+import IconContactSolid from "@/assets/icons/contact-solid.svg?component";
 import IconKnowledgeBase from "@/assets/icons/knowledge-base.svg?component";
+import IconKnowledgeBaseSolid from "@/assets/icons/knowledge-base-solid.svg?component";
 import IconSettings from "@/assets/icons/settings.svg?component";
+import IconSettingsSolid from "@/assets/icons/settings-solid.svg?component";
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -127,28 +147,32 @@ const keyboardShortcuts = [
 const menuOptions = [
 	{
 		label: "Dashboard",
-		icon_: IconDashboard,
+		icon: IconDashboard,
+		iconActive: IconDashboardSolid,
 		to: {
 			name: "Dashboard",
 		},
 	},
 	{
 		label: "Tickets",
-		icon_: IconTicket,
+		icon: IconTicket,
+		iconActive: IconTicketSolid,
 		to: {
 			name: "DeskTickets",
 		},
 	},
 	{
 		label: "Customers",
-		icon_: IconCustomer,
+		icon: IconCustomer,
+		iconActive: IconCustomerSolid,
 		to: {
 			name: "Customers",
 		},
 	},
 	{
 		label: "Contacts",
-		icon_: IconContact,
+		icon: IconContact,
+		iconActive: IconContactSolid,
 		to: {
 			name: "Contacts",
 		},
@@ -158,14 +182,16 @@ const menuOptions = [
 const footerOptions = [
 	{
 		label: "Knowledge Base",
-		icon_: IconKnowledgeBase,
+		icon: IconKnowledgeBase,
+		iconActive: IconKnowledgeBaseSolid,
 		to: {
 			name: "DeskKBHome",
 		},
 	},
 	{
 		label: "Settings",
-		icon_: IconSettings,
+		icon: IconSettings,
+		iconActive: IconSettingsSolid,
 		to: {
 			name: "Settings",
 		},
