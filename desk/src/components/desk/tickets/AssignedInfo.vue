@@ -1,9 +1,9 @@
 <template>
-	<div>
-		<div class="inline-block align-middle">
+	<div class="flex items-center gap-2">
+		<div class="">
 			<Avatar size="sm" :label="agentName" :image-u-r-l="avatarUrl" />
 		</div>
-		<div class="ml-2 inline-block truncate align-middle">
+		<div class="truncate">
 			{{ agentName }}
 		</div>
 	</div>
@@ -21,9 +21,10 @@ const props = defineProps({
 });
 
 const { ticketId } = toRefs(props);
-const assignees = computed(() => ticket.getAssignees?.data?.message?.pop());
-const agentName = computed(() => assignees.value?.full_name);
-const avatarUrl = computed(() => assignees.value?.user_image);
+const assignees = computed(() => ticket.getAssignees?.data?.message || []);
+const assignee = computed(() => [...assignees.value].pop());
+const agentName = computed(() => assignee.value?.full_name);
+const avatarUrl = computed(() => assignee.value?.user_image);
 
 const ticket = createDocumentResource({
 	doctype: "HD Ticket",
