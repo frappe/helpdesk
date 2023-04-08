@@ -230,7 +230,7 @@ import { useListFilters } from "@/composables/listFilters";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useAuthStore } from "@/stores/auth";
-import IconSort from "@/assets/icons/sort-arrow.svg?component";
+import IconSort from "~icons/espresso/sort-arrow";
 
 export default {
 	name: "Tickets",

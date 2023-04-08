@@ -6,24 +6,25 @@
 			</div>
 		</router-link>
 		<div class="flex flex-wrap items-center gap-2">
-			<IconHash />
+			<IconHash class="h-3 w-3" />
 			<div>{{ ticketName }}</div>
-			<div>&#x2022;</div>
-			<IconMail />
+			<IconDot class="h-3 w-3" />
+			<IconMail class="h-3 w-3" />
 			{{ conversationCount }}
-			<div>&#x2022;</div>
-			<IconComment />
+			<IconDot class="h-3 w-3" />
+			<IconComment class="h-3 w-3" />
 			{{ commentCount }}
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, toRefs } from "vue";
+import { computed, toRefs } from "vue";
 import { createDocumentResource } from "frappe-ui";
-import IconHash from "@/assets/icons/hash.svg?component";
-import IconMail from "@/assets/icons/mail.svg?component";
-import IconComment from "@/assets/icons/comment.svg?component";
+import IconDot from "~icons/ph/dot-outline-fill";
+import IconHash from "~icons/espresso/hash";
+import IconMail from "~icons/espresso/mail";
+import IconComment from "~icons/espresso/comment";
 
 const props = defineProps({
 	ticketName: {
