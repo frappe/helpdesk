@@ -11,6 +11,7 @@
 	},
 	"dependencies": {
 		"@headlessui/vue": "^1.7.12",
+		"@iconify/tools": "^2.2.6",
 		"@tailwindcss/line-clamp": "^0.4.4",
 		"@tailwindcss/typography": "^0.5.9",
 		"@vee-validate/zod": "^4.8.2",
@@ -29,7 +30,9 @@
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
+		"@iconify-json/ph": "^1.1.5",
 		"tailwindcss": "^3.2.7",
+		"unplugin-icons": "^0.16.1",
 		"vite": "^4.1.4",
 		"vite-svg-loader": "^4.0.0"
 	}

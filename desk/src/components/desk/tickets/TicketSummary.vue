@@ -8,10 +8,10 @@
 		<div class="flex flex-wrap items-center gap-2">
 			<IconHash class="h-3 w-3" />
 			<div>{{ ticketName }}</div>
-			<div>&#x2022;</div>
+			<IconDot class="h-3 w-3" />
 			<IconMail class="h-3 w-3" />
 			{{ conversationCount }}
-			<div>&#x2022;</div>
+			<IconDot class="h-3 w-3" />
 			<IconComment class="h-3 w-3" />
 			{{ commentCount }}
 		</div>
@@ -21,6 +21,7 @@
 <script setup lang="ts">
 import { computed, toRefs } from "vue";
 import { createDocumentResource } from "frappe-ui";
+import IconDot from "~icons/ph/dot-outline-fill";
 import IconHash from "~icons/espresso/hash";
 import IconMail from "~icons/espresso/mail";
 import IconComment from "~icons/espresso/comment";

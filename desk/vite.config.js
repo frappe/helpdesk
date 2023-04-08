@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import Icons from "unplugin-icons/vite";
 import { FileSystemIconLoader } from "unplugin-icons/loaders";
+import { SVG, cleanupSVG, parseColors } from "@iconify/tools";
 import svgLoader from "vite-svg-loader";
 import { getProxyOptions } from "frappe-ui/src/utils/vite-dev-server";
 import { webserver_port } from "../../../sites/common_site_config.json";
@@ -15,9 +16,16 @@ export default defineConfig({
 		Icons({
 			compiler: "vue3",
 			customCollections: {
-				espresso: FileSystemIconLoader("./src/assets/icons", (svg) =>
-					svg.replace(/^<svg /, '<svg fill="currentColor" ')
-				),
+				espresso: FileSystemIconLoader("./src/assets/icons", async (svg) => {
+					const r = new SVG(svg);
+
+					await cleanupSVG(r);
+					await parseColors(r, {
+						callback: () => "currentColor",
+					});
+
+					return r.toMinifiedString();
+				}),
 			},
 		}),
 	],
