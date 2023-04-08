@@ -5,8 +5,8 @@
 	>
 		<div v-if="initialized">
 			<div class="flex h-screen w-screen flex-row">
-				<SideBarMenu/>
-				<router-view :key="$route.fullPath" class="grow" />
+				<SideBar />
+				<router-view :key="$route.fullPath" class="z-0 grow" />
 			</div>
 		</div>
 		<div v-else class="flex h-full w-full max-w-full grow-0">
@@ -18,15 +18,15 @@
 </template>
 
 <script>
-import { inject, provide, ref } from "vue";
-import SideBarMenu from "@/components/desk/SideBarMenu.vue";
+import { provide, ref } from "vue";
+import SideBar from "@/components/desk/sidebar/SideBar.vue";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import { useAuthStore } from "@/stores/auth";
 
 export default {
 	name: "Desk",
 	components: {
-		SideBarMenu,
+		SideBar,
 		CustomIcons,
 	},
 	setup() {
