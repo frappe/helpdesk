@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { useSidebarStore } from "@/stores/sidebar";
 import SidebarLink from "./SidebarLink.vue";
 
 defineProps({
@@ -18,6 +17,4 @@ defineProps({
 		required: true,
 	},
 });
-
-const sidebarStore = useSidebarStore();
 </script>
