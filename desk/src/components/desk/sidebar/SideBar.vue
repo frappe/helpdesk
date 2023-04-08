@@ -1,81 +1,15 @@
 <template>
 	<div
-		class="flex w-56 shrink select-none flex-col border-r text-base text-gray-700"
+		class="flex select-none flex-col border-r p-2 text-base transition-all duration-300 ease-in-out"
+		:class="{
+			'w-56': sidebarStore.isExpanded,
+			'w-12': !sidebarStore.isExpanded,
+		}"
 	>
-		<div>
-			<Dropdown class="p-2" :options="profileSettings">
-				<template #default="{ open }">
-					<Button
-						appearance="minimal"
-						class="py-2 pl-2"
-						:label="authStore.userName"
-						:icon-right="open ? 'chevron-up' : 'chevron-down'"
-					>
-						<template #icon-left>
-							<Avatar
-								size="sm"
-								class="mr-2"
-								:label="authStore.userName"
-								:image-u-r-l="authStore.userImage"
-							/>
-						</template>
-					</Button>
-				</template>
-			</Dropdown>
-		</div>
-		<div class="flex flex-col gap-1 px-2">
-			<div
-				v-for="option in menuOptions"
-				:key="option.label"
-				class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1"
-				:class="{
-					'bg-gray-200': isActive(option.label),
-					'text-gray-900': isActive(option.label),
-					'hover:bg-gray-300': isActive(option.label),
-					'hover:bg-gray-100': !isActive(option.label),
-				}"
-				@click="$router.push(option.to)"
-			>
-				<component
-					:is="option.icon"
-					v-show="!isActive(option.label)"
-				></component>
-				<component
-					:is="option.iconActive"
-					v-show="isActive(option.label)"
-				></component>
-				<div>
-					{{ option.label }}
-				</div>
-			</div>
-		</div>
+		<UserMenu class="pb-2" :options="profileSettings" />
+		<LinkGroup :options="menuOptions" />
 		<div class="grow"></div>
-		<div class="mb-3 flex flex-col gap-1 px-2">
-			<div
-				v-for="option in footerOptions"
-				:key="option.label"
-				class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1"
-				:class="{
-					'bg-gray-200': isActive(option.label),
-					'text-gray-900': isActive(option.label),
-					'hover:bg-gray-300': isActive(option.label),
-					'hover:bg-gray-100': !isActive(option.label),
-				}"
-				@click="$router.push(option.to)"
-			>
-				<component
-					:is="option.icon"
-					v-show="!isActive(option.label)"
-				></component>
-				<component
-					:is="option.iconActive"
-					v-show="isActive(option.label)"
-				></component>
-				<div>
-					{{ option.label }}
-				</div>
-			</div>
-		</div>
+		<LinkGroup :options="footerOptions" />
 		<Dialog
 			v-model="showKeyboardShortcuts"
 			:options="{ title: 'Keyboard Shortcuts' }"
@@ -108,9 +42,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRoute } from "vue-router";
-import { Dropdown, Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
+import { useSidebarStore } from "@/stores/sidebar";
+import UserMenu from "./UserMenu.vue";
+import LinkGroup from "./LinkGroup.vue";
 import IconDashboard from "@/assets/icons/dashboard.svg?component";
 import IconDashboardSolid from "@/assets/icons/dashboard-solid.svg?component";
 import IconTicket from "@/assets/icons/ticket.svg?component";
@@ -124,8 +59,8 @@ import IconKnowledgeBaseSolid from "@/assets/icons/knowledge-base-solid.svg?comp
 import IconSettings from "@/assets/icons/settings.svg?component";
 import IconSettingsSolid from "@/assets/icons/settings-solid.svg?component";
 
-const route = useRoute();
 const authStore = useAuthStore();
+const sidebarStore = useSidebarStore();
 const isMac = navigator.userAgent.indexOf("Mac OS X") != -1;
 const showKeyboardShortcuts = ref(false);
 
@@ -149,33 +84,25 @@ const menuOptions = [
 		label: "Dashboard",
 		icon: IconDashboard,
 		iconActive: IconDashboardSolid,
-		to: {
-			name: "Dashboard",
-		},
+		to: "Dashboard",
 	},
 	{
 		label: "Tickets",
 		icon: IconTicket,
 		iconActive: IconTicketSolid,
-		to: {
-			name: "DeskTickets",
-		},
+		to: "DeskTickets",
 	},
 	{
 		label: "Customers",
 		icon: IconCustomer,
 		iconActive: IconCustomerSolid,
-		to: {
-			name: "Customers",
-		},
+		to: "Customers",
 	},
 	{
 		label: "Contacts",
 		icon: IconContact,
 		iconActive: IconContactSolid,
-		to: {
-			name: "Contacts",
-		},
+		to: "Contacts",
 	},
 ];
 
@@ -184,17 +111,13 @@ const footerOptions = [
 		label: "Knowledge Base",
 		icon: IconKnowledgeBase,
 		iconActive: IconKnowledgeBaseSolid,
-		to: {
-			name: "DeskKBHome",
-		},
+		to: "DeskKBHome",
 	},
 	{
 		label: "Settings",
 		icon: IconSettings,
 		iconActive: IconSettingsSolid,
-		to: {
-			name: "Settings",
-		},
+		to: "Settings",
 	},
 ];
 
@@ -219,18 +142,4 @@ const profileSettings = [
 		handler: () => authStore.logout(),
 	},
 ];
-
-const routeMap = {
-	"Knowledge Base": "/kb",
-	Contacts: "/contacts",
-	Customers: "/customers",
-	Dashboard: "/dashboard",
-	Reports: "/reports",
-	Settings: "/settings",
-	Tickets: "/tickets",
-};
-
-function isActive(label: string) {
-	return route.path.includes(routeMap[label]);
-}
 </script>
