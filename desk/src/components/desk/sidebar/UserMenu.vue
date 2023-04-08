@@ -2,7 +2,7 @@
 	<Dropdown :options="options">
 		<template #default="{ open }">
 			<div
-				class="flex w-max cursor-pointer items-center gap-2 rounded-md px-1 py-2 transition-all"
+				class="flex w-max cursor-pointer items-center gap-2 rounded-md px-1.5 py-2 transition-all"
 				:class="{
 					'hover:bg-gray-100': sidebarStore.isExpanded,
 				}"

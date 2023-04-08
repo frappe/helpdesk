@@ -1,21 +1,25 @@
 <template>
 	<router-link :to="{ name: to }">
 		<div
-			class="flex h-7 cursor-pointer items-center rounded-lg px-1.5 text-gray-700 transition-all duration-300 ease-in-out"
+			class="flex h-8 cursor-pointer items-center rounded-lg px-1.5 text-gray-700 transition-all duration-300 ease-in-out"
 			:class="{
 				'w-full': sidebarStore.isExpanded,
-				'w-7': !sidebarStore.isExpanded,
+				'w-8': !sidebarStore.isExpanded,
 				'bg-gray-200': isActive,
 				'text-gray-900': isActive,
 				'hover:bg-gray-300': isActive,
 				'hover:bg-gray-100': !isActive,
 			}"
 		>
-			<component :is="icon" v-show="!isActive" class="shrink-0"></component>
+			<component
+				:is="icon"
+				v-show="!isActive"
+				class="h-5 w-5 shrink-0"
+			></component>
 			<component
 				:is="iconActive"
 				v-show="isActive"
-				class="shrink-0"
+				class="h-5 w-5 shrink-0"
 			></component>
 			<div
 				class="ml-2 shrink-0 transition-all duration-300 ease-in-out"
