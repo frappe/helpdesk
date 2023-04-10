@@ -43,9 +43,9 @@ export function useListFilters() {
 	function toQuery(filters: Array<FilterItem>) {
 		return filters
 			.map((f) => {
-				return `${f.fieldname}:${f.filter_type}:${f.value}`;
+				const value = transformValue(f);
+				return `${f.fieldname}:${f.filter_type}:${value}`;
 			})
-			.map((f) => encodeURIComponent(f))
 			.join("+");
 	}
 
@@ -67,12 +67,14 @@ export function useListFilters() {
 	}
 
 	function transformOperator(f: FilterItem): string {
+		const filterType = f.filter_type.toLowerCase();
+
 		if (f.fieldname === "_assign") {
-			if (f.filter_type === "is") f.filter_type = "like";
-			if (f.filter_type === "is not") f.filter_type = "not like";
+			if (filterType === "is") f.filter_type = "like";
+			if (filterType === "is not") f.filter_type = "not like";
 		}
 
-		switch (f.filter_type) {
+		switch (filterType) {
 			case "is":
 				return "=";
 			case "is not":
@@ -82,7 +84,7 @@ export function useListFilters() {
 			case "after":
 				return ">";
 			default:
-				return f.filter_type;
+				return filterType;
 		}
 	}
 
@@ -118,8 +120,9 @@ export function useListFilters() {
 		return `${sortBy} ${sortDirection}`;
 	}
 
-	function applyQuery(query: string) {
-		router.push({ query: { ...route.query, q: query } });
+	function applyQuery(query: Array<FilterItem> | string) {
+		const q = typeof query === "string" ? query : toQuery(query);
+		router.push({ query: { ...route.query, q } });
 	}
 
 	return {
