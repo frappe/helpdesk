@@ -271,7 +271,9 @@ export default {
 				label: o,
 				value: o,
 				handler: () =>
-					this.$router.push({ query: { ...this.$route.query, sortBy: o } }),
+					this.$router.push({
+						query: { ...this.$route.query, sortBy: encodeURIComponent(o) },
+					}),
 			}));
 		},
 		allSelected() {
