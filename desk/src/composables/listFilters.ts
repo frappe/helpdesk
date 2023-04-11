@@ -43,67 +43,59 @@ export function useListFilters() {
 	function toQuery(filters: Array<FilterItem>) {
 		return filters
 			.map((f) => {
-				const value = transformValue(f);
-				return `${f.fieldname}:${f.filter_type}:${value}`;
+				return `${f.fieldname}:${f.filter_type}:${f.value}`;
 			})
 			.join("+");
 	}
 
 	function toFrappeFilter(f: Array<FilterItem>): FrappeFilters {
 		return f.reduce((p, c) => {
-			const operator = transformOperator(c);
-			const value = transformValue(c);
+			transformOperator(c);
+			transformValue(c);
 
-			p[c.fieldname] = [operator, value];
+			p[c.fieldname] = [c.filter_type, c.value];
+
 			return p;
 		}, {});
 	}
 
 	function queryFilters() {
-		const filters = fromQuery();
-		const frappeFilters = toFrappeFilter(filters);
-
-		return frappeFilters;
+		return toFrappeFilter(fromQuery());
 	}
 
-	function transformOperator(f: FilterItem): string {
-		const filterType = f.filter_type.toLowerCase();
+	function transformOperator(f: FilterItem) {
+		f.filter_type = f.filter_type.toLowerCase();
 
 		if (f.fieldname === "_assign") {
-			if (filterType === "is") f.filter_type = "like";
-			if (filterType === "is not") f.filter_type = "not like";
+			if (f.filter_type === "is") f.filter_type = "like";
+			if (f.filter_type === "is not") f.filter_type = "not like";
 		}
 
-		switch (filterType) {
+		switch (f.filter_type) {
 			case "is":
-				return "=";
+				f.filter_type = "=";
+				break;
 			case "is not":
-				return "!=";
+				f.filter_type = "!=";
+				break;
 			case "before":
-				return "<";
+				f.filter_type = "<";
+				break;
 			case "after":
-				return ">";
-			default:
-				return filterType;
+				f.filter_type = ">";
 		}
+
+		return f.filter_type;
 	}
 
 	function transformValue(f: FilterItem) {
-		f.value = f.value === "@me" ? getMe() : f.value;
-		const v = f.value;
+		if (f.value === "@me") f.value = authStore.userId;
 
-		switch (f.filter_type) {
-			case "like":
-				return `%${v}%`;
-			case "not like":
-				return `%${v}%`;
-			default:
-				return v;
-		}
-	}
+		f.value = ["like", "not like"].includes(f.filter_type)
+			? `%${f.value}%`
+			: f.value;
 
-	function getMe() {
-		return authStore.userId;
+		return f.value;
 	}
 
 	function transformLabel(f: FilterItem) {
