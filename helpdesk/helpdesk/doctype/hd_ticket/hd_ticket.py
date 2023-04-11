@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import json
 from datetime import timedelta
 from typing import List
+from functools import lru_cache
 
 import frappe
 from frappe import _
@@ -13,7 +14,7 @@ from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.email.inbox import link_communication_to_document
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
-from frappe.query_builder import Case, DocType
+from frappe.query_builder import Case, DocType, Order
 from frappe.query_builder.functions import Count
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
@@ -88,6 +89,30 @@ class HDTicket(Document):
 
 		# Must be part of at-least one team which can ignore restrictions
 		return len(teams) > 0
+
+	@staticmethod
+	@lru_cache
+	def sort_options():
+		def by_priority(query: Query, direction: Order):
+			QBTicket = frappe.qb.DocType("HD Ticket")
+			QBPriority = frappe.qb.DocType("HD Ticket Priority")
+
+			query = (
+				query.left_join(QBPriority)
+				.on(QBPriority.name == QBTicket.priority)
+				.orderby(QBPriority.integer_value, order=direction)
+				.orderby(QBTicket.resolution_by, order=Order.desc)
+			)
+
+			return query
+
+		return {
+			"Due date": ("resolution_by", Order.asc),
+			"Created on": ("creation", Order.asc),
+			"High to low priority": lambda q: by_priority(q, Order.asc),
+			"Low to high priority": lambda q: by_priority(q, Order.desc),
+			"Last modified on": "modified",
+		}
 
 	def autoname(self):
 		return self.name
@@ -271,7 +296,9 @@ class HDTicket(Document):
 		agent_name = frappe.get_value("HD Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 		frappe.publish_realtime(
-			"helpdesk:update-ticket-assignee", {"ticket_id": self.name}, after_commit=True
+			"helpdesk:update-ticket-assignee",
+			{"ticket_id": self.name},
+			after_commit=True,
 		)
 
 	def get_assigned_agent(self):

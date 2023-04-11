@@ -29,7 +29,7 @@
 			<div class="flex items-center gap-2">
 				<CompositeFilters />
 				<Dropdown
-					:options="sortDropdownOptions"
+					:options="sortOptions"
 					:button="{
 						label: 'Sort',
 						iconLeft: 'list',
@@ -108,7 +108,7 @@
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
 							<template #default>
 								<Badge
-									:color-map="priorityColorMap"
+									:color-map="ticketPriorityStore.colorMap"
 									:label="t.priority"
 									class="cursor-pointer"
 								/>
@@ -242,67 +242,38 @@ export default {
 	},
 	inject: ["agents"],
 	setup() {
-		const selected = ref(new Set());
-		const listFilters = useListFilters();
-		const ticketStatusStore = useTicketStatusStore();
-		const ticketPriorityStore = useTicketPriorityStore();
 		const authStore = useAuthStore();
+		const listFilters = useListFilters();
+		const selected = ref(new Set());
+		const showNewTicketDialog = ref(false);
+		const ticketPriorityStore = useTicketPriorityStore();
+		const ticketStatusStore = useTicketStatusStore();
 
 		const ticketList = createListManager({
 			doctype: "HD Ticket",
 			pageLength: 20,
-			orderBy: "modified desc",
 		});
 
 		return {
 			authStore,
 			listFilters,
 			selected,
+			showNewTicketDialog,
 			ticketList,
 			ticketPriorityStore,
 			ticketStatusStore,
 		};
 	},
-	data() {
-		function sortBy(key, dir) {
-			this.$router.push({
-				query: { q: this.$route.query.q, sortBy: key, sortDirection: dir },
-			});
-		}
-
-		const sortOptions = [
-			{ label: "Due date", value: "resolution_by", sortDirection: "asc" },
-			{ label: "Created on", value: "creation" },
-			{
-				label: "High to low priority",
-				value: "priority",
-				sortDirection: "asc",
-			},
-			{
-				label: "Low to high priority",
-				value: "priority",
-				sortDirection: "desc",
-			},
-			{ label: "Last modified on", value: "modified" },
-		];
-
-		const sortDropdownOptions = sortOptions.map((o) => ({
-			label: o.label,
-			handler: sortBy.bind(this, o.value, o.sortDirection || "desc"),
-		}));
-
-		return {
-			priorityColorMap: {
-				Urgent: "red",
-				High: "yellow",
-				Medium: "green",
-				Low: "blue",
-			},
-			showNewTicketDialog: false,
-			sortDropdownOptions,
-		};
-	},
 	computed: {
+		sortOptions() {
+			const options = this.$resources.sortOptions.data || [];
+			return options.map((o) => ({
+				label: o,
+				value: o,
+				handler: () =>
+					this.$router.push({ query: { ...this.$route.query, sortBy: o } }),
+			}));
+		},
 		allSelected() {
 			if (this.$_.isEmpty(this.ticketList.list.data)) return;
 			return this.ticketList.list.data.length === this.selected.size;
@@ -424,10 +395,19 @@ export default {
 					value,
 				},
 			];
-			this.listFilters.applyQuery(this.listFilters.toQuery(f));
+			this.listFilters.applyQuery(f);
 		},
 	},
 	resources: {
+		sortOptions() {
+			return {
+				url: "helpdesk.extends.doc.sort_options",
+				auto: true,
+				params: {
+					doctype: "HD Ticket",
+				},
+			};
+		},
 		bulkAssignTicketStatus() {
 			return {
 				url: "helpdesk.api.ticket.bulk_assign_ticket_status",

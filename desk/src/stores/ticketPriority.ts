@@ -10,6 +10,7 @@ type TicketPriority = {
 export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 	const d__ = createListResource({
 		doctype: "HD Ticket Priority",
+		orderBy: "integer_value desc",
 		auto: true,
 	});
 
@@ -17,9 +18,16 @@ export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 		() => d__.list?.data || []
 	);
 	const names = computed(() => options.value.map((o) => o.name));
+	const colorMap = {
+		Urgent: "red",
+		High: "yellow",
+		Medium: "green",
+		Low: "blue",
+	};
 
 	return {
-		options,
+		colorMap,
 		names,
+		options,
 	};
 });
