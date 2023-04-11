@@ -1,34 +1,22 @@
 <template>
-	<Dropdown placement="left" :options="options">
-		<template #default="{ toggleDropdown }">
-			<div
-				class="flex select-none items-center gap-2 rounded-lg border border-gray-300 px-2 py-1"
-				:class="{ 'cursor-pointer': !$_.isEmpty(options) }"
-				@click="toggleDropdown"
-			>
-				<div class="text-base">
-					{{ title }}
-				</div>
-				<FeatherIcon
-					v-if="!$_.isEmpty(options)"
-					name="chevron-down"
-					class="h-4 w-4 stroke-2"
-				/>
-			</div>
-		</template>
-	</Dropdown>
+	<Dropdown
+		:options="options"
+		:button="{
+			label: title,
+			'icon-right': 'chevron-down',
+		}"
+	/>
 </template>
 
 <script>
 import { ref } from "vue";
-import { Dropdown, FeatherIcon } from "frappe-ui";
+import { Dropdown } from "frappe-ui";
 import { useListFilters } from "@/composables/listFilters";
 
 export default {
 	name: "PresetFilters",
 	components: {
 		Dropdown,
-		FeatherIcon,
 	},
 	setup() {
 		const listFilters = useListFilters();

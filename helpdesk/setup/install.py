@@ -119,11 +119,17 @@ def add_default_sla():
 	sla_doc.append("priorities", urgent_priority)
 
 	sla_fullfilled_on_resolved = frappe.get_doc(
-		{"doctype": "HD Service Level Agreement Fulfilled On Status", "status": "Resolved"}
+		{
+			"doctype": "HD Service Level Agreement Fulfilled On Status",
+			"status": "Resolved",
+		}
 	)
 
 	sla_fullfilled_on_closed = frappe.get_doc(
-		{"doctype": "HD Service Level Agreement Fulfilled On Status", "status": "Closed"}
+		{
+			"doctype": "HD Service Level Agreement Fulfilled On Status",
+			"status": "Closed",
+		}
 	)
 
 	sla_doc.append("sla_fulfilled_on", sla_fullfilled_on_resolved)
@@ -218,13 +224,21 @@ def add_default_ticket_types():
 
 
 def add_default_ticket_priorities():
-	ticket_priorities = ["Low", "Medium", "High", "Urgent"]
+	ticket_priorities = [
+		"Urgent",
+		"High",
+		"Medium",
+		"Low",
+	]
 
-	for priority in ticket_priorities:
-		if not frappe.db.exists("HD Ticket Priority", priority):
-			priority_doc = frappe.new_doc("HD Ticket Priority")
-			priority_doc.name = priority
-			priority_doc.insert()
+	for (i, priority) in enumerate(ticket_priorities):
+		if frappe.db.exists("HD Ticket Priority", priority):
+			continue
+
+		doc = frappe.new_doc("HD Ticket Priority")
+		doc.name = priority
+		doc.integer_value = i * 100
+		doc.insert()
 
 
 def add_default_agent_groups():

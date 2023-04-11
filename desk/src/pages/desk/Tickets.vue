@@ -16,7 +16,6 @@
 					:button="{
 						label: 'Status',
 						iconRight: 'chevron-down',
-						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				/>
 				<Dropdown
@@ -24,7 +23,6 @@
 					:button="{
 						label: 'Priority',
 						iconRight: 'chevron-down',
-						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				/>
 			</div>
@@ -35,22 +33,21 @@
 					:button="{
 						label: 'Sort',
 						iconLeft: 'list',
-						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				>
 					<template #default>
 						<Button>
 							<template #icon-left>
-								<IconSort />
+								<IconSort class="mr-1.5 h-4 w-4" />
 							</template>
-							<div class="px-1">Sort</div>
+							<div>Sort</div>
 						</Button>
 					</template>
 				</Dropdown>
 			</div>
 		</div>
 		<div class="bg-gray-100 px-6 font-sans text-base text-gray-500">
-			<div class="flex items-center gap-2 px-2 py-1">
+			<div class="flex items-center gap-2 px-2 py-1.5">
 				<div class="pl-1 pr-4">
 					<Input
 						type="checkbox"
@@ -274,9 +271,19 @@ export default {
 		}
 
 		const sortOptions = [
-			{ label: "HD Ticket Type", value: "ticket_type" },
-			{ label: "Modified", value: "modified" },
-			{ label: "Created", value: "created" },
+			{ label: "Due date", value: "resolution_by", sortDirection: "asc" },
+			{ label: "Created on", value: "creation" },
+			{
+				label: "High to low priority",
+				value: "priority",
+				sortDirection: "asc",
+			},
+			{
+				label: "Low to high priority",
+				value: "priority",
+				sortDirection: "desc",
+			},
+			{ label: "Last modified on", value: "modified" },
 		];
 
 		const sortDropdownOptions = sortOptions.map((o) => ({
