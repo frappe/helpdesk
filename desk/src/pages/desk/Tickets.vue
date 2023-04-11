@@ -75,12 +75,16 @@
 					'bg-gray-50': selected.has(t.name),
 				}"
 			>
-				<div class="pl-1 pr-4">
-					<Input
-						type="checkbox"
-						input-class="cursor-pointer"
-						:value="selected.has(t.name)"
-						:onchange="(e) => toggleOne(t.name, e.target.checked)"
+				<div class="cursor-pointer select-none pl-1 pr-4">
+					<IconTicket
+						v-show="!selected.has(t.name)"
+						class="h-4 w-4"
+						@click="() => toggleOne(t.name, true)"
+					/>
+					<IconTicketSolid
+						v-show="selected.has(t.name)"
+						class="h-4 w-4"
+						@click="() => toggleOne(t.name, false)"
 					/>
 				</div>
 				<div class="w-1/3">
@@ -228,6 +232,8 @@ import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
 import CompositeFilters from "@/components/desk/tickets/CompositeFilters.vue";
 import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
 import IconSort from "~icons/espresso/sort-arrow";
+import IconTicket from "~icons/espresso/ticket";
+import IconTicketSolid from "~icons/espresso/ticket-solid";
 
 export default {
 	name: "Tickets",
@@ -239,6 +245,8 @@ export default {
 		PresetFilters,
 		TicketSummary,
 		IconSort,
+		IconTicket,
+		IconTicketSolid,
 	},
 	inject: ["agents"],
 	setup() {
