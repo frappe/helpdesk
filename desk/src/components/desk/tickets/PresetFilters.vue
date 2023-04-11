@@ -72,7 +72,7 @@ export default {
 								return {
 									label: item.title,
 									handler: () => {
-										this.$router.push({ query: { q } });
+										this.listFilters.applyQuery(q);
 									},
 								};
 							}),

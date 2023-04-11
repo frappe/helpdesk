@@ -2,11 +2,11 @@
 	<div class="flex flex-col text-gray-700">
 		<div class="flex justify-between px-6 pt-6 pb-2 text-gray-900">
 			<div class="text-2xl font-semibold">Tickets</div>
-			<div>
-				<Button icon-left="plus" @click="showNewTicketDialog = true">
-					Add Ticket
-				</Button>
-			</div>
+			<Button
+				icon-left="plus"
+				label="Add ticket"
+				@click="showNewTicketDialog = true"
+			/>
 		</div>
 		<div class="flex justify-between px-6 py-3">
 			<div class="flex gap-2">
@@ -29,7 +29,7 @@
 				/>
 			</div>
 			<div class="flex items-center gap-2">
-				<FilterBox doctype="HD Ticket" />
+				<CompositeFilters />
 				<Dropdown
 					:options="sortDropdownOptions"
 					:button="{
@@ -220,16 +220,16 @@
 <script>
 import { ref } from "vue";
 import { Dropdown } from "frappe-ui";
-import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue";
-import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
-import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
-import FilterBox from "@/components/desk/tickets/FilterBox.vue";
-import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
 import { createListManager } from "@/composables/listManager";
 import { useListFilters } from "@/composables/listFilters";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useAuthStore } from "@/stores/auth";
+import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue";
+import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
+import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
+import CompositeFilters from "@/components/desk/tickets/CompositeFilters.vue";
+import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
 import IconSort from "~icons/espresso/sort-arrow";
 
 export default {
@@ -237,7 +237,7 @@ export default {
 	components: {
 		AssignedInfo,
 		Dropdown,
-		FilterBox,
+		CompositeFilters,
 		NewTicketDialog,
 		PresetFilters,
 		TicketSummary,
