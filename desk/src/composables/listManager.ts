@@ -46,6 +46,7 @@ export function createListManager(options: ListOptions) {
 		pageLength: pageLength.value,
 		start: start.value,
 		cache,
+		auto: false,
 		onSuccess() {
 			meta.submit({
 				doctype,
@@ -84,10 +85,10 @@ export function createListManager(options: ListOptions) {
 
 	onMounted(() => {
 		const queryFilters = filterManager.queryFilters();
-		const sortBy = filterManager.queryOrderBy();
+		const orderByQuery = filterManager.queryOrderBy();
 
 		if (!isEmpty(queryFilters)) filters.value = queryFilters;
-		if (sortBy) orderBy.value = sortBy;
+		if (orderByQuery) orderBy.value = orderByQuery;
 
 		list.reload();
 	});

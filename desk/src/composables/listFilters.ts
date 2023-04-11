@@ -113,11 +113,9 @@ export function useListFilters() {
 	}
 
 	function queryOrderBy() {
-		const { sortBy, sortDirection = "desc" } = route.query;
-
+		const { sortBy, sortDirection } = route.query;
 		if (!sortBy) return;
-
-		return `${sortBy} ${sortDirection}`;
+		return [sortBy, sortDirection].join(" ").trim();
 	}
 
 	function applyQuery(query: Array<FilterItem> | string) {

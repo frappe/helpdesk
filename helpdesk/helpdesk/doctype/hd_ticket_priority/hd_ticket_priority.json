@@ -5,6 +5,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "integer_value",
+  "column_break_fzcl",
   "description"
  ],
  "fields": [
@@ -12,10 +14,23 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "label": "Description"
+  },
+  {
+   "description": "The integer field represents the priority of a task or item, with lower numbers indicating higher priority. For example, a task with a priority of 1 would be considered more important than a task with a priority of 2, and so on. You can use this field to assign priorities to your tasks or items, which will help you manage them more effectively",
+   "fieldname": "integer_value",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Integer value",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_fzcl",
+   "fieldtype": "Column Break"
   }
  ],
  "links": [],
- "modified": "2022-02-17 17:57:30.628251",
+ "modified": "2023-04-11 20:48:07.721515",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Priority",

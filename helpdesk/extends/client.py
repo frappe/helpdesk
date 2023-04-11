@@ -9,6 +9,7 @@ from frappe.model.base_document import get_controller
 from frappe.query_builder import Query
 from frappe.query_builder.functions import Count
 
+from .doc import apply_sort
 from .qb import get_query
 
 
@@ -30,7 +31,6 @@ def get_list(
 		table=doctype,
 		fields=fields,
 		filters=filters,
-		order_by=order_by,
 		offset=start,
 		limit=limit,
 		group_by=group_by,
@@ -38,6 +38,7 @@ def get_list(
 
 	query = apply_custom_filters(doctype, query)
 	query = apply_hook(doctype, query)
+	query = apply_sort(doctype, order_by, query)
 
 	return query.run(as_dict=True, debug=debug)
 
@@ -58,12 +59,12 @@ def get_list_meta(
 	query: Query = get_query(
 		table=doctype,
 		filters=filters,
-		order_by=order_by,
 		group_by=group_by,
 	)
 
 	query = apply_custom_filters(doctype, query)
 	query = apply_hook(doctype, query)
+	query = apply_sort(doctype, order_by, query)
 
 	total_count = Count("*").as_("total_count")
 	query = query.select(total_count)

@@ -16,7 +16,6 @@
 					:button="{
 						label: 'Status',
 						iconRight: 'chevron-down',
-						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				/>
 				<Dropdown
@@ -24,33 +23,31 @@
 					:button="{
 						label: 'Priority',
 						iconRight: 'chevron-down',
-						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				/>
 			</div>
 			<div class="flex items-center gap-2">
 				<CompositeFilters />
 				<Dropdown
-					:options="sortDropdownOptions"
+					:options="sortOptions"
 					:button="{
 						label: 'Sort',
 						iconLeft: 'list',
-						class: 'text-gray-500 bg-gray-200 rounded-lg',
 					}"
 				>
 					<template #default>
 						<Button>
 							<template #icon-left>
-								<IconSort />
+								<IconSort class="mr-1.5 h-4 w-4" />
 							</template>
-							<div class="px-1">Sort</div>
+							<div>Sort</div>
 						</Button>
 					</template>
 				</Dropdown>
 			</div>
 		</div>
 		<div class="bg-gray-100 px-6 font-sans text-base text-gray-500">
-			<div class="flex items-center gap-2 px-2 py-1">
+			<div class="flex items-center gap-2 px-2 py-1.5">
 				<div class="pl-1 pr-4">
 					<Input
 						type="checkbox"
@@ -111,7 +108,7 @@
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
 							<template #default>
 								<Badge
-									:color-map="priorityColorMap"
+									:color-map="ticketPriorityStore.colorMap"
 									:label="t.priority"
 									class="cursor-pointer"
 								/>
@@ -245,57 +242,38 @@ export default {
 	},
 	inject: ["agents"],
 	setup() {
-		const selected = ref(new Set());
-		const listFilters = useListFilters();
-		const ticketStatusStore = useTicketStatusStore();
-		const ticketPriorityStore = useTicketPriorityStore();
 		const authStore = useAuthStore();
+		const listFilters = useListFilters();
+		const selected = ref(new Set());
+		const showNewTicketDialog = ref(false);
+		const ticketPriorityStore = useTicketPriorityStore();
+		const ticketStatusStore = useTicketStatusStore();
 
 		const ticketList = createListManager({
 			doctype: "HD Ticket",
 			pageLength: 20,
-			orderBy: "modified desc",
 		});
 
 		return {
 			authStore,
 			listFilters,
 			selected,
+			showNewTicketDialog,
 			ticketList,
 			ticketPriorityStore,
 			ticketStatusStore,
 		};
 	},
-	data() {
-		function sortBy(key, dir) {
-			this.$router.push({
-				query: { q: this.$route.query.q, sortBy: key, sortDirection: dir },
-			});
-		}
-
-		const sortOptions = [
-			{ label: "HD Ticket Type", value: "ticket_type" },
-			{ label: "Modified", value: "modified" },
-			{ label: "Created", value: "created" },
-		];
-
-		const sortDropdownOptions = sortOptions.map((o) => ({
-			label: o.label,
-			handler: sortBy.bind(this, o.value, o.sortDirection || "desc"),
-		}));
-
-		return {
-			priorityColorMap: {
-				Urgent: "red",
-				High: "yellow",
-				Medium: "green",
-				Low: "blue",
-			},
-			showNewTicketDialog: false,
-			sortDropdownOptions,
-		};
-	},
 	computed: {
+		sortOptions() {
+			const options = this.$resources.sortOptions.data || [];
+			return options.map((o) => ({
+				label: o,
+				value: o,
+				handler: () =>
+					this.$router.push({ query: { ...this.$route.query, sortBy: o } }),
+			}));
+		},
 		allSelected() {
 			if (this.$_.isEmpty(this.ticketList.list.data)) return;
 			return this.ticketList.list.data.length === this.selected.size;
@@ -417,10 +395,19 @@ export default {
 					value,
 				},
 			];
-			this.listFilters.applyQuery(this.listFilters.toQuery(f));
+			this.listFilters.applyQuery(f);
 		},
 	},
 	resources: {
+		sortOptions() {
+			return {
+				url: "helpdesk.extends.doc.sort_options",
+				auto: true,
+				params: {
+					doctype: "HD Ticket",
+				},
+			};
+		},
 		bulkAssignTicketStatus() {
 			return {
 				url: "helpdesk.api.ticket.bulk_assign_ticket_status",
