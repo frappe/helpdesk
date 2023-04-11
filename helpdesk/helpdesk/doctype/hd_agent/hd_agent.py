@@ -33,10 +33,10 @@ class HDAgent(Document):
 			if previous:
 				for group in previous.groups:
 					if not next(
-						(g for g in self.groups if g.hd_agent_group == group.hd_agent_group),
+						(g for g in self.groups if g.team == group.team),
 						None,
 					):
-						self.remove_from_support_rotations(group.hd_agent_group)
+						self.remove_from_support_rotations(group.team)
 
 			self.add_to_support_rotations()
 
@@ -66,20 +66,20 @@ class HDAgent(Document):
 			if self.groups:
 				for group in self.groups:
 					try:
-						hd_agent_group_assignment_rule = frappe.get_doc(
-							"HD Team", group.hd_agent_group
+						team_assignment_rule = frappe.get_doc(
+							"HD Team", group.team
 						).get_assignment_rule()
 						rule_docs.append(
 							frappe.get_doc(
 								"Assignment Rule",
-								hd_agent_group_assignment_rule,
+								team_assignment_rule,
 							)
 						)
 					except frappe.DoesNotExistError:
 						frappe.throw(
 							frappe._(
 								"Assignment Rule for HD Team {0} does not exist"
-							).format(group.hd_agent_group)
+							).format(group.team)
 						)
 		else:
 			# check if the group is in self.groups
@@ -147,9 +147,7 @@ class HDAgent(Document):
 				rule_docs.append(
 					frappe.get_doc(
 						"Assignment Rule",
-						frappe.get_doc(
-							"HD Team", group.hd_agent_group
-						).get_assignment_rule(),
+						frappe.get_doc("HD Team", group.team).get_assignment_rule(),
 					)
 				)
 
@@ -169,7 +167,7 @@ class HDAgent(Document):
 		Check if agent is in the given group
 		"""
 		if self.groups:
-			return next((g for g in self.groups if g.hd_agent_group == group), False)
+			return next((g for g in self.groups if g.team == group), False)
 
 		return False
 
