@@ -1,9 +1,8 @@
-from functools import lru_cache
 from types import FunctionType
 
 import frappe
 from frappe.model.document import get_controller
-from frappe.query_builder import Order
+from frappe.query_builder import Order, Query
 
 SORT_OPTIONS_METHOD = "sort_options"
 DEFAULT_SORT_FIELD = "modified"
@@ -20,8 +19,7 @@ def sort_options(doctype: str):
 	return c.sort_options().keys()
 
 
-@lru_cache
-def apply_sort(doctype: str, order_by: str, query):
+def apply_sort(doctype: str, order_by: str, query: Query):
 	controller = get_controller(doctype)
 	fallback = query.orderby(DEFAULT_SORT_FIELD, order=DEFAULT_SORT_DIRECTION)
 
