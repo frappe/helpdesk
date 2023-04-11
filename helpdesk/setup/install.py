@@ -224,20 +224,20 @@ def add_default_ticket_types():
 
 
 def add_default_ticket_priorities():
-	ticket_priorities = [
-		"Urgent",
-		"High",
-		"Medium",
-		"Low",
-	]
+	ticket_priorities = {
+		"Urgent": 100,
+		"High": 200,
+		"Medium": 300,
+		"Low": 400,
+	}
 
-	for (i, priority) in enumerate(ticket_priorities):
+	for priority in ticket_priorities:
 		if frappe.db.exists("HD Ticket Priority", priority):
 			continue
 
 		doc = frappe.new_doc("HD Ticket Priority")
 		doc.name = priority
-		doc.integer_value = i * 100
+		doc.integer_value = ticket_priorities[priority]
 		doc.insert()
 
 
