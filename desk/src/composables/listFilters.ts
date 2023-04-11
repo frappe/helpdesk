@@ -4,6 +4,9 @@ import { useAuthStore } from "@/stores/auth";
 
 type FrappeFilters = Record<string, Array<string>>;
 
+const SEPARATOR_PARAM = ":";
+const SEPARATOR_ITEM = " ";
+
 export type FilterItem = {
 	fieldname: string | "_assign";
 	filter_type: string;
@@ -23,10 +26,10 @@ export function useListFilters() {
 		if (Array.isArray(q)) return [];
 
 		return decodeURI(q)
-			.split("+")
+			.split(SEPARATOR_ITEM)
 			.map((f) => decodeURIComponent(f))
 			.map((f) => {
-				const __f = f.split(":");
+				const __f = f.split(SEPARATOR_PARAM);
 				const fieldname = __f.shift();
 				const filter_type = __f.shift();
 				const value = __f.shift();
@@ -43,9 +46,14 @@ export function useListFilters() {
 	function toQuery(filters: Array<FilterItem>) {
 		return filters
 			.map((f) => {
-				return `${f.fieldname}:${f.filter_type}:${f.value}`;
+				const sep = SEPARATOR_PARAM;
+				const fieldname = encodeURIComponent(f.fieldname);
+				const filter_type = encodeURIComponent(f.filter_type);
+				const value = encodeURIComponent(f.value);
+
+				return `${fieldname}${sep}${filter_type}${sep}${value}`;
 			})
-			.join("+");
+			.join(SEPARATOR_ITEM);
 	}
 
 	function toFrappeFilter(f: Array<FilterItem>): FrappeFilters {
@@ -105,9 +113,12 @@ export function useListFilters() {
 	}
 
 	function queryOrderBy() {
-		const { sortBy, sortDirection } = route.query;
-		if (!sortBy) return;
-		return [sortBy, sortDirection].join(" ").trim();
+		const { sort, sortDirection } = route.query;
+
+		if (!sort) return;
+		if (sort instanceof Array) return;
+
+		return [decodeURIComponent(sort), sortDirection].join(" ").trim();
 	}
 
 	function applyQuery(query: Array<FilterItem> | string) {
