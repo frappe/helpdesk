@@ -113,12 +113,12 @@ export function useListFilters() {
 	}
 
 	function queryOrderBy() {
-		const { sortBy, sortDirection } = route.query;
+		const { sort, sortDirection } = route.query;
 
-		if (!sortBy) return;
-		if (sortBy instanceof Array) return;
+		if (!sort) return;
+		if (sort instanceof Array) return;
 
-		return [decodeURIComponent(sortBy), sortDirection].join(" ").trim();
+		return [decodeURIComponent(sort), sortDirection].join(" ").trim();
 	}
 
 	function applyQuery(query: Array<FilterItem> | string) {
