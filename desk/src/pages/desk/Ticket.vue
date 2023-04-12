@@ -324,7 +324,8 @@
 												:button="{
 													class: 'rounded-r-none',
 													disabled:
-														(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled,
+														(!authStore.isAgent && !authStore.isAdmin) ||
+														sendingDissabled,
 													appearance: 'primary',
 													label: 'Menu',
 													icon: 'chevron-up',
@@ -365,7 +366,8 @@
 												"
 												appearance="primary"
 												:disabled="
-													(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled
+													(!authStore.isAgent && !authStore.isAdmin) ||
+													sendingDissabled
 												"
 												@click="submit()"
 											>
@@ -501,8 +503,9 @@ import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSat
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
-import { useAuthStore } from "@/stores/auth";
 import { TextEditorMenuButtons } from "./consts";
+import { useAuthStore } from "@/stores/auth";
+import { useAgentStore } from "@/stores/agent";
 
 export default {
 	name: "Ticket",
@@ -532,7 +535,7 @@ export default {
 		const showTextFormattingMenu = ref(true);
 		const viewportWidth = inject("viewportWidth");
 		const authStore = useAuthStore();
-		const agents = inject("agents");
+		const agentStore = useAgentStore();
 		const attachments = ref([]);
 		const editingType = ref("");
 		const replied = ref("Replied");
@@ -556,7 +559,7 @@ export default {
 			showTextFormattingMenu,
 			viewportWidth,
 			authStore,
-			agents,
+			agentStore,
 			attachments,
 			tempTextEditorData,
 			editingType,
@@ -570,7 +573,6 @@ export default {
 			showBcc,
 			showCcBtn,
 			showBccBtn,
-			replied,
 		};
 	},
 	data() {
@@ -656,7 +658,9 @@ export default {
 			);
 		},
 		mentions() {
-			const users = this.editingType === "comment" ? this.agents : [];
+			const users =
+				this.editingType === "comment" ? this.agentStore.options : [];
+
 			return users.map((user) => ({
 				label: user.agent_name,
 				value: user.name,

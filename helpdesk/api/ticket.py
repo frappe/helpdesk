@@ -429,24 +429,6 @@ def assign_ticket_priority(ticket_id, priority):
 		return ticket_doc
 
 
-@frappe.whitelist()
-def get_all_ticket_types():
-	return frappe.get_all("HD Ticket Type", pluck="name")
-
-
-@frappe.whitelist()
-def get_all_ticket_statuses():
-	statuses = list(
-		frappe.get_meta("HD Ticket").get_field("status").options.split("\n")
-	)
-	return statuses
-
-
-@frappe.whitelist()
-def get_all_ticket_priorities():
-	return frappe.get_all("Ticket Priority", pluck="name")
-
-
 def get_contact(ticket_id):
 	contact_id = frappe.get_value("HD Ticket", ticket_id, "contact")
 	if contact_id:

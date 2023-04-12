@@ -1,88 +1,68 @@
 <template>
 	<div>
-		<Dialog :options="{ title: 'Create New Contact' }" v-model="open">
+		<Dialog v-model="open" :options="{ title: 'Create New Contact' }">
 			<template #body-content>
 				<div class="space-y-4">
 					<div class="space-y-1">
-						<Input
-							label="Email Id"
-							type="email"
-							v-model="emailId"
-						/>
+						<Input v-model="emailId" label="Email Id" type="email" />
 						<ErrorMessage :message="emailValidationError" />
 					</div>
 					<div class="space-y-1">
-						<Input
-							label="First Name"
-							type="text"
-							v-model="firstName"
-						/>
+						<Input v-model="firstName" label="First Name" type="text" />
 						<ErrorMessage :message="firstNameValidationError" />
 					</div>
 					<div class="space-y-1">
 						<Input
+							v-model="lastName"
 							label="Last Name (optional)"
 							type="text"
-							v-model="lastName"
 						/>
 						<ErrorMessage :message="lastNameValidationError" />
 					</div>
 					<div class="space-y-1">
-						<Input
-							label="Phone (optional)"
-							type="text"
-							v-model="phone"
-						/>
+						<Input v-model="phone" label="Phone (optional)" type="text" />
 						<ErrorMessage :message="phoneValidationError" />
 					</div>
 					<div class="w-full space-y-1">
 						<div>
-							<span
-								class="block mb-2 text-sm leading-4 text-gray-700"
-							>
+							<span class="mb-2 block text-sm leading-4 text-gray-700">
 								Customer
 							</span>
 						</div>
 						<Autocomplete
-							:value="
-								fdCustomer != null
-									? fdCustomer
-									: selectedCustomer
-							"
-							@change="
-								(item) => {
-									if (!item) {
-										return
-									}
-									selectedCustomer = item.value
-								}
-							"
-							:resourceOptions="{
+							:value="fdCustomer != null ? fdCustomer : selectedCustomer"
+							:resource-options="{
 								url: 'helpdesk.extends.client.get_list',
 								inputMap: (query) => {
 									return {
 										doctype: 'HD Customer',
 										pluck: 'name',
-										filters: [
-											['name', 'like', `%${query}%`],
-										],
-									}
+										filters: [['name', 'like', `%${query}%`]],
+									};
 								},
 								responseMap: (res) => {
 									return res.map((d) => {
 										return {
 											label: d.name,
 											value: d.name,
-										}
-									})
+										};
+									});
 								},
 							}"
+							@change="
+								(item) => {
+									if (!item) {
+										return;
+									}
+									selectedCustomer = item.value;
+								}
+							"
 						/>
 						<ErrorMessage :message="customerValidationError" />
 					</div>
-					<div class="flex float-right space-x-2">
+					<div class="float-right flex space-x-2">
 						<Button
-							:loading="this.$resources.createContact.loading"
+							:loading="$resources.createContact.loading"
 							appearance="primary"
 							@click="createContact()"
 							>Create</Button
@@ -95,11 +75,18 @@
 </template>
 
 <script>
-import { Input, Dialog, ErrorMessage } from "frappe-ui"
-import { computed, ref, inject } from "vue"
-import Autocomplete from "@/components/global/Autocomplete.vue"
+import { Input, Dialog, ErrorMessage } from "frappe-ui";
+import { computed, ref } from "vue";
+import Autocomplete from "@/components/global/Autocomplete.vue";
+import { useContactStore } from "@/stores/contact";
 export default {
 	name: "NewContactDialog",
+	components: {
+		Input,
+		Dialog,
+		ErrorMessage,
+		Autocomplete,
+	},
 	props: {
 		modelValue: {
 			type: Boolean,
@@ -111,32 +98,33 @@ export default {
 		},
 	},
 	setup(props, { emit }) {
-		const emailValidationError = ref("")
-		const firstNameValidationError = ref("")
-		const lastNameValidationError = ref("")
-		const phoneValidationError = ref("")
-		const customerValidationError = ref("")
-		const selectedCustomer = ref("")
-		const contacts = inject("contacts")
+		const contactStore = useContactStore();
+		const emailValidationError = ref("");
+		const firstNameValidationError = ref("");
+		const lastNameValidationError = ref("");
+		const phoneValidationError = ref("");
+		const customerValidationError = ref("");
+		const selectedCustomer = ref("");
 		let open = computed({
 			get: () => props.modelValue,
 			set: (val) => {
-				emit("update:modelValue", val)
+				emit("update:modelValue", val);
 				if (!val) {
-					emit("close")
+					emit("close");
 				}
 			},
-		})
+		});
+
 		return {
 			open,
-			contacts,
+			contactStore,
 			emailValidationError,
 			firstNameValidationError,
 			lastNameValidationError,
 			phoneValidationError,
 			customerValidationError,
 			selectedCustomer,
-		}
+		};
 	},
 	data(props) {
 		return {
@@ -145,20 +133,20 @@ export default {
 			emailId: "",
 			phone: "",
 			customer: "",
-		}
+		};
 	},
 	watch: {
 		emailId(newValue) {
-			this.validateEmailInput(newValue)
+			this.validateEmailInput(newValue);
 		},
 		firstName(newValue) {
-			this.validateFirstName(newValue)
+			this.validateFirstName(newValue);
 		},
 		phone(newValue) {
-			this.validatePhone(newValue)
+			this.validatePhone(newValue);
 		},
 		customer(newValue) {
-			this.validateCustomer(newValue)
+			this.validateCustomer(newValue);
 		},
 	},
 	resources: {
@@ -166,14 +154,14 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (data) => {
-					this.emailId = ""
-					this.firstName = ""
-					this.lastName = ""
-					this.phone = ""
-					this.customer = ""
-					this.$emit("contactCreated", data)
+					this.emailId = "";
+					this.firstName = "";
+					this.lastName = "";
+					this.phone = "";
+					this.customer = "";
+					this.$emit("contactCreated", data);
 				},
-			}
+			};
 		},
 		getCustomers() {
 			return {
@@ -183,19 +171,13 @@ export default {
 					fields: ["name", "customer_name"],
 				},
 				auto: true,
-			}
+			};
 		},
-	},
-	components: {
-		Input,
-		Dialog,
-		ErrorMessage,
-		Autocomplete,
 	},
 	methods: {
 		createContact() {
 			if (this.validateInputs()) {
-				return
+				return;
 			}
 			let doc = {
 				doctype: "Contact",
@@ -206,75 +188,75 @@ export default {
 					{
 						link_doctype: "HD Customer",
 						link_name:
-							this.fdCustomer != null
-								? this.fdCustomer
-								: this.selectedCustomer,
+							this.fdCustomer != null ? this.fdCustomer : this.selectedCustomer,
 					},
 				],
-			}
+			};
 			if (this.phone) {
-				doc.phone_nos = [{ phone: this.phone }]
+				doc.phone_nos = [{ phone: this.phone }];
 			}
 			this.$resources.createContact.submit({
 				doc,
-			})
+			});
 		},
 		validateInputs() {
-			let error = this.validateEmailInput(this.emailId)
-			error += this.validateFirstName(this.firstName)
-			error += this.validatePhone(this.phone)
-			return error
+			let error = this.validateEmailInput(this.emailId);
+			error += this.validateFirstName(this.firstName);
+			error += this.validatePhone(this.phone);
+			return error;
 		},
 		validateEmailInput(value) {
 			function existingContactEmails(contacts) {
-				let list = []
+				let list = [];
 				for (let index in contacts) {
-					list.push(contacts[index].email_id)
+					list.push(contacts[index].email_id);
 				}
-				return list
+				return list;
 			}
-			this.emailValidationError = ""
+			this.emailValidationError = "";
 			const reg =
-				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+				/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
 			if (!value) {
-				this.emailValidationError = "Email should not be empty"
+				this.emailValidationError = "Email should not be empty";
 			} else if (!reg.test(value)) {
-				this.emailValidationError = "Enter a valid email"
-			} else if (existingContactEmails(this.contacts).includes(value)) {
-				this.emailValidationError = "Contact with email already exists"
+				this.emailValidationError = "Enter a valid email";
+			} else if (
+				existingContactEmails(this.contactStore.options).includes(value)
+			) {
+				this.emailValidationError = "Contact with email already exists";
 			}
-			return this.emailValidationError
+			return this.emailValidationError;
 		},
 		validateFirstName(value) {
-			this.firstNameValidationError = ""
+			this.firstNameValidationError = "";
 			if (!value) {
-				this.firstNameValidationError = "First name should not be empty"
+				this.firstNameValidationError = "First name should not be empty";
 			} else if (value.trim() == "") {
-				this.firstNameValidationError = "First name should not be empty"
+				this.firstNameValidationError = "First name should not be empty";
 			}
-			return this.firstNameValidationError
+			return this.firstNameValidationError;
 		},
 		validatePhone(value) {
-			this.phoneValidationError = ""
-			const reg = /[0-9]+/
+			this.phoneValidationError = "";
+			const reg = /[0-9]+/;
 			if (!value) {
-				this.phoneValidationError = ""
+				this.phoneValidationError = "";
 			} else if (!reg.test(value) || value.length < 10) {
-				this.phoneValidationError = "Enter a valid phone number"
+				this.phoneValidationError = "Enter a valid phone number";
 			}
-			return this.phoneValidationError
+			return this.phoneValidationError;
 		},
 		validateCustomer(value) {
-			this.customerValidationError = ""
+			this.customerValidationError = "";
 			if (!value) {
-				this.customerValidationError = "Customer should not be empty"
+				this.customerValidationError = "Customer should not be empty";
 			} else if (value.trim() == "") {
-				this.customerValidationError = "Customer should not be empty"
+				this.customerValidationError = "Customer should not be empty";
 			}
-			return this.customerValidationError
+			return this.customerValidationError;
 		},
 	},
-}
+};
 </script>
 
 <style></style>

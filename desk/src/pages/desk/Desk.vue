@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { provide, ref } from "vue";
+import { ref } from "vue";
 import SideBar from "@/components/desk/sidebar/SideBar.vue";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import { useAuthStore } from "@/stores/auth";
@@ -30,45 +30,12 @@ export default {
 		CustomIcons,
 	},
 	setup() {
-		const mounted = ref(false);
 		const authStore = useAuthStore();
-
-		const ticketTypes = ref([]);
-		const ticketPriorities = ref([]);
-		const ticketStatuses = ref([]);
-
-		const contacts = ref([]);
-		const contactController = ref({});
-
-		const agents = ref([]);
-		const agentGroups = ref([]);
-		const agentController = ref({});
-
-		provide("ticketTypes", ticketTypes);
-		provide("ticketPriorities", ticketPriorities);
-		provide("ticketStatuses", ticketStatuses);
-
-		provide("contacts", contacts);
-		provide("contactController", contactController);
-
-		provide("agents", agents);
-		provide("agentGroups", agentGroups);
-		provide("agentController", agentController);
+		const mounted = ref(false);
 
 		return {
-			mounted,
 			authStore,
-
-			ticketTypes,
-			ticketPriorities,
-			ticketStatuses,
-
-			contacts,
-			contactController,
-
-			agents,
-			agentGroups,
-			agentController,
+			mounted,
 		};
 	},
 	computed: {
@@ -110,26 +77,14 @@ export default {
 			});
 			return;
 		}
+
 		if (!this.authStore.hasDeskAccess) {
 			this.$router.push({ path: "/my-tickets" });
 			return;
 		}
-		this.$resources.helpdeskSettings.fetch();
-		this.$socket.on("list_update", (data) => {
-			switch (data.doctype) {
-				case "HD Ticket Type":
-					this.$resources.types.reload();
-					break;
-				case "HD Agent":
-					this.$resources.agents.reload();
-					break;
-			}
-		});
 
+		this.$resources.helpdeskSettings.fetch();
 		this.mounted = true;
-	},
-	unmounted() {
-		this.$socket.off("list_update");
 	},
 	methods: {
 		handlePostOnboardSetupReqs() {
@@ -338,149 +293,6 @@ export default {
 				auto: true,
 			};
 		},
-		types() {
-			return {
-				url: "helpdesk.extends.client.get_list",
-				params: {
-					doctype: "HD Ticket Type",
-					pluck: "name",
-				},
-				auto: this.authStore.hasDeskAccess,
-				onSuccess: (data) => {
-					this.ticketTypes = data;
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		priorities() {
-			return {
-				url: "helpdesk.extends.client.get_list",
-				params: {
-					doctype: "HD Ticket Priority",
-				},
-				auto: this.authStore.hasDeskAccess,
-				onSuccess: (data) => {
-					this.ticketPriorities = data;
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		statuses() {
-			return {
-				url: "helpdesk.api.ticket.get_all_ticket_statuses",
-				auto: this.authStore.hasDeskAccess,
-				onSuccess: (data) => {
-					this.ticketStatuses = data;
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		contacts() {
-			return {
-				url: "helpdesk.extends.client.get_list",
-				params: {
-					doctype: "Contact",
-					fields: ["*"],
-					limit_page_length: 0,
-				},
-				auto: this.authStore.hasDeskAccess,
-				onSuccess: (data) => {
-					this.contacts = data;
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		agents() {
-			return {
-				url: "helpdesk.extends.client.get_list",
-				params: {
-					doctype: "HD Agent",
-					fields: ["name", "agent_name", "user_image"],
-				},
-				auto: this.authStore.hasDeskAccess,
-				onSuccess: (data) => {
-					this.agents = data;
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		agentGroups() {
-			return {
-				url: "helpdesk.extends.client.get_list",
-				params: {
-					doctype: "HD Team",
-				},
-				auto: this.authStore.hasDeskAccess,
-				onSuccess: (data) => {
-					this.agentGroups = data;
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		assignTicketToAgent() {
-			return {
-				url: "helpdesk.api.ticket.assign_ticket_to_agent",
-				onSuccess: async () => {
-					this.$event.emit("update_ticket_list");
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		assignTicketType() {
-			return {
-				url: "helpdesk.api.ticket.assign_ticket_type",
-				onSuccess: async (ticket) => {},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		assignTicketStatus() {
-			return {
-				url: "helpdesk.api.ticket.assign_ticket_status",
-				onSuccess: async () => {
-					this.$event.emit("update_ticket_list");
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		assignTicketPriority() {
-			return {
-				url: "helpdesk.api.ticket.assign_ticket_priority",
-				onSuccess: async (ticket) => {},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
-		createTicketType() {
-			return {
-				url: "helpdesk.api.ticket.check_and_create_ticket_type",
-				onSuccess: () => {
-					this.$resources.types.fetch();
-				},
-				onError: () => {
-					// TODO:
-				},
-			};
-		},
 	},
-	directivs: {},
 };
 </script>

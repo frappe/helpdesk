@@ -28,19 +28,12 @@
 			</div>
 			<div class="flex items-center gap-2">
 				<CompositeFilters />
-				<Dropdown
-					:options="sortOptions"
-					:button="{
-						label: 'Sort',
-						iconLeft: 'list',
-					}"
-				>
+				<Dropdown :options="sortOptions">
 					<template #default>
-						<Button>
+						<Button label="Sort">
 							<template #icon-left>
 								<IconSort class="mr-1.5 h-4 w-4" />
 							</template>
-							<div>Sort</div>
 						</Button>
 					</template>
 				</Dropdown>
@@ -226,6 +219,7 @@ import { useListFilters } from "@/composables/listFilters";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useAuthStore } from "@/stores/auth";
+import { useAgentStore } from "@/stores/agent";
 import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue";
 import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
 import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
@@ -248,8 +242,8 @@ export default {
 		IconTicket,
 		IconTicketSolid,
 	},
-	inject: ["agents"],
 	setup() {
+		const agentStore = useAgentStore();
 		const authStore = useAuthStore();
 		const listFilters = useListFilters();
 		const selected = ref(new Set());
@@ -263,6 +257,7 @@ export default {
 		});
 
 		return {
+			agentStore,
 			authStore,
 			listFilters,
 			selected,
@@ -311,8 +306,8 @@ export default {
 		},
 		agentsAsDropdownOptions() {
 			let agentItems = [];
-			if (this.agents) {
-				this.agents.forEach((agent) => {
+			if (this.agentStore.options) {
+				this.agentStore.options.forEach((agent) => {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
