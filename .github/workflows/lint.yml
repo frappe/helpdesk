@@ -24,7 +24,6 @@ jobs:
 
   eslint:
     name: ESLint - Reviewdog
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
@@ -41,7 +40,6 @@ jobs:
 
   black:
     name: Black - Reviewdog
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v4
