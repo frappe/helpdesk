@@ -53,7 +53,7 @@ jobs:
       - run: pip install black-with-tabs
       - uses: reviewdog/action-black@v3
         with:
-          black_args: "--include .py"
+          level: "warning"
           reporter: github-pr-review
           fail_on_error: true
 
