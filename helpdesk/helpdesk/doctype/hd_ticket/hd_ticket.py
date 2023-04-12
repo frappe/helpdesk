@@ -59,16 +59,9 @@ class HDTicket(Document):
 		criterions = [QBTicket.agent_group == team.name for team in teams]
 
 		# Consider tickets without any assigned agent group
-		filter_unassigned: str = (
-			frappe.get_value(
-				"HD Settings",
-				None,
-				"do_not_restrict_tickets_without_an_agent_group",
-			)
-			or "0"
-		)
-
-		if not int(filter_unassigned):
+		do_not_restrict = frappe.db.get_single_value("HD Settings", "do_not_restrict_tickets_without_an_agent_group")
+		if not do_not_restrict:
+			# include those which are not assigned to any team
 			criterions.append(QBTicket.agent_group.isnull())
 
 		query = query.where(Criterion.any(criterions))
