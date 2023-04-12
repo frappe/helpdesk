@@ -24,6 +24,9 @@ jobs:
 
   eslint:
     name: ESLint - Reviewdog
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
@@ -35,8 +38,9 @@ jobs:
       - uses: reviewdog/action-eslint@v1
         with:
           eslint_flags: '--ext vue --ext js --ext ts --ext json .'
-          reporter: github-pr-review
           fail_on_error: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
 
   black:
     name: Black - Reviewdog
