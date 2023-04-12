@@ -27,7 +27,7 @@ jobs:
           npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
   eslint:
-    name: ESLint
+    name: ESLint - Reviewdog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,6 +41,18 @@ jobs:
       - uses: reviewdog/action-eslint@v1
         with:
           eslint_flags: '--ext vue --ext js --ext ts --ext json .'
+          reporter: github-pr-review
+          fail_on_error: true
+
+  black:
+    name: Black - Reviewdog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: pip install black-with-tabs
+      - uses: reviewdog/action-black@v3
+        with:
+          github_token: ${{ secrets.github_token }}
           reporter: github-pr-review
           fail_on_error: true
 
