@@ -40,6 +40,9 @@ jobs:
 
   black:
     name: Black - Reviewdog
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v4
@@ -49,6 +52,7 @@ jobs:
       - run: pip install black-with-tabs
       - uses: reviewdog/action-black@v3
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
 
   semgrep:
