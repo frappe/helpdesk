@@ -30,12 +30,10 @@ jobs:
     name: ESLint - Reviewdog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
+      - uses: actions/checkout@v3
       - run: npm install -g yarn
       - run: yarn install --frozen-lockfile
       - uses: reviewdog/action-eslint@v1
@@ -48,6 +46,9 @@ jobs:
     name: Black - Reviewdog
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - uses: actions/checkout@v3
       - run: pip install black-with-tabs
       - uses: reviewdog/action-black@v3
