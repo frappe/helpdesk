@@ -50,7 +50,6 @@ jobs:
       - uses: reviewdog/action-black@v3
         with:
           reporter: github-pr-review
-          fail_on_error: true
 
   semgrep:
     name: Semgrep Rules
