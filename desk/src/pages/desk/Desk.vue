@@ -37,8 +37,6 @@ export default {
 		const ticketPriorities = ref([]);
 		const ticketStatuses = ref([]);
 
-		const ticketController = ref({});
-
 		const contacts = ref([]);
 		const contactController = ref({});
 
@@ -49,8 +47,6 @@ export default {
 		provide("ticketTypes", ticketTypes);
 		provide("ticketPriorities", ticketPriorities);
 		provide("ticketStatuses", ticketStatuses);
-
-		provide("ticketController", ticketController);
 
 		provide("contacts", contacts);
 		provide("contactController", contactController);
@@ -66,8 +62,6 @@ export default {
 			ticketTypes,
 			ticketPriorities,
 			ticketStatuses,
-
-			ticketController,
 
 			contacts,
 			contactController,
@@ -87,9 +81,7 @@ export default {
 				this.$resources.setupInitialAgent.submit();
 				return false;
 			}
-			if (
-				!this.$resources.helpdeskSettings.data.initial_demo_ticket_created
-			) {
+			if (!this.$resources.helpdeskSettings.data.initial_demo_ticket_created) {
 				this.$resources.createInitialDemoTicket.submit();
 				return false;
 			}
@@ -123,48 +115,6 @@ export default {
 			return;
 		}
 		this.$resources.helpdeskSettings.fetch();
-		this.ticketController.set = (ticketId, type, ref = null) => {
-			switch (type) {
-				case "type":
-					return this.$resources.assignTicketType.submit({
-						ticket_id: ticketId,
-						type: ref,
-					});
-				case "status":
-					return this.$resources.assignTicketStatus.submit({
-						ticket_id: ticketId,
-						status: ref,
-					});
-				case "priority":
-					return this.$resources.assignTicketPriority.submit({
-						ticket_id: ticketId,
-						priority: ref,
-					});
-				case "contact":
-					return this.$resources.updateTicketContact.submit({
-						ticket_id: ticketId,
-						contact: ref,
-					});
-				case "agent":
-					return this.$resources.assignTicketToAgent.submit({
-						ticket_id: ticketId,
-						agent_id: ref,
-					});
-			}
-		};
-		this.ticketController.new = (type, values) => {
-			switch (type) {
-				case "ticket":
-					return this.$resources.createTicket.submit({
-						values,
-					});
-				case "type":
-					this.$resources.createTicketType.submit({
-						type: values,
-					});
-					break;
-			}
-		};
 		this.$socket.on("list_update", (data) => {
 			switch (data.doctype) {
 				case "HD Ticket Type":
@@ -386,37 +336,6 @@ export default {
 					doctype: "HD Agent",
 				},
 				auto: true,
-			};
-		},
-
-		// ticket related resources
-		createTicket() {
-			return {
-				url: "helpdesk.api.ticket.create_new",
-				onSuccess: () => {
-					// TODO:
-				},
-				onError: (error) => {
-					this.$toast({
-						title: "Error while creating ticket",
-						text: error.messages.join(", "),
-						icon: "x",
-						iconClasses: "text-red-500",
-					});
-
-					throw error;
-				},
-			};
-		},
-		updateTicketContact() {
-			return {
-				url: "helpdesk.api.ticket.update_contact",
-				onSuccess: async (ticket) => {
-					// TODO:
-				},
-				onError: () => {
-					// TODO:
-				},
 			};
 		},
 		types() {

@@ -166,7 +166,7 @@
 import { ErrorMessage, TextEditor } from "frappe-ui";
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
 import Autocomplete from "@/components/global/Autocomplete.vue";
-import { inject, ref, computed } from "vue";
+import { ref, computed } from "vue";
 export default {
 	name: "NewTicketDialog",
 	components: {
@@ -202,7 +202,7 @@ export default {
 				}
 			},
 		});
-		const ticketController = inject("ticketController");
+
 		return {
 			isCreating,
 			selectedContact,
@@ -211,7 +211,6 @@ export default {
 			subjectValidationError,
 			descriptionValidationError,
 			open,
-			ticketController,
 			selectedCustomer,
 		};
 	},
@@ -274,24 +273,8 @@ export default {
 	},
 	methods: {
 		createTicket() {
-			if (this.validateInputs()) {
-				return;
-			}
-			this.isCreating = true;
-			this.ticketController
-				.new("ticket", {
-					contact: this.selectedContact,
-					subject: this.subject,
-					ticket_type: this.selectedTicketType,
-					description: this.descriptionContent,
-					customer:
-						this.fdCustomer != null ? this.fdCustomer : this.selectedCustomer,
-				})
-				.then(() => {
-					this.isCreating = false;
-					this.$emit("ticket-created");
-				})
-				.catch(() => (this.isCreating = false));
+			if (this.validateInputs()) return;
+			this.$resources.newTicket.submit();
 		},
 		validateInputs() {
 			let error = this.validateContactInput(this.selectedContact);
@@ -330,6 +313,41 @@ export default {
 				this.descriptionValidationError = "Description should not be empty";
 			}
 			return this.subjectValidationError;
+		},
+	},
+	resources: {
+		newTicket() {
+			return {
+				url: "frappe.client.insert",
+				makeParams() {
+					return {
+						doc: {
+							doctype: "HD Ticket",
+							contact: this.selectedContact,
+							subject: this.subject,
+							ticket_type: this.selectedTicketType,
+							description: this.descriptionContent,
+							customer: this.fdCustomer || this.selectedCustomer,
+						},
+					};
+				},
+				beforeSubmit() {
+					this.isCreating = true;
+				},
+				onSuccess() {
+					this.isCreating = false;
+					this.$emit("ticket-created");
+				},
+				onError(error) {
+					this.isCreating = false;
+					this.$toast({
+						title: "Error while creating ticket",
+						text: error.messages.join(", "),
+						icon: "x",
+						iconClasses: "text-red-500",
+					});
+				},
+			};
 		},
 	},
 };
