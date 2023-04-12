@@ -29,9 +29,6 @@ jobs:
   eslint:
     name: ESLint - Reviewdog
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -50,14 +47,12 @@ jobs:
   black:
     name: Black - Reviewdog
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v3
       - run: pip install black-with-tabs
       - uses: reviewdog/action-black@v3
         with:
+          black_args: "--include .py"
           reporter: github-pr-review
           fail_on_error: true
 
