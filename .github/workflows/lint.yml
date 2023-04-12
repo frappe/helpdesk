@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-  pull-requests: write 
-
 jobs:
   commit-lint:
     name: Semantic Commits
@@ -27,22 +23,41 @@ jobs:
           npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
   eslint:
-    name: ESLint
+    name: ESLint - Reviewdog
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
+      - uses: actions/checkout@v3
       - run: npm install -g yarn
       - run: yarn install --frozen-lockfile
       - uses: reviewdog/action-eslint@v1
         with:
           eslint_flags: '--ext vue --ext js --ext ts --ext json .'
-          reporter: github-pr-review
           fail_on_error: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+
+  black:
+    name: Black - Reviewdog
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: actions/checkout@v3
+      - run: pip install black-with-tabs
+      - uses: reviewdog/action-black@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
 
   semgrep:
     name: Semgrep Rules
