@@ -21,8 +21,8 @@ export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 	const colorMap = {
 		Urgent: "red",
 		High: "yellow",
-		Medium: "green",
-		Low: "blue",
+		Medium: "blue",
+		Low: "green",
 	};
 
 	return {
