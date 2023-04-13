@@ -1,7 +1,7 @@
 <template>
-	<div class="flex flex-col text-gray-700">
-		<div class="flex justify-between px-6 pt-6 pb-2 text-gray-900">
-			<div class="text-2xl font-semibold">Tickets</div>
+	<div class="flex flex-col">
+		<div class="flex justify-between px-6 pt-6 pb-2">
+			<div class="text-2xl font-semibold text-gray-900">Tickets</div>
 			<Button
 				icon-left="plus"
 				label="Add ticket"
@@ -39,7 +39,7 @@
 				</Dropdown>
 			</div>
 		</div>
-		<div class="bg-gray-100 px-6 font-sans text-base text-gray-500">
+		<div class="bg-gray-50 px-6 text-sm text-gray-600">
 			<div class="flex items-center gap-2 px-2 py-1.5">
 				<div class="pl-1 pr-4">
 					<Input
@@ -53,13 +53,13 @@
 				<div class="flex w-2/3 gap-2">
 					<div class="w-1/4">Assigned To</div>
 					<div class="w-1/5">Type</div>
-					<div class="w-1/6 pl-1">Status</div>
+					<div class="w-1/6">Status</div>
 					<div class="w-1/6">Priority</div>
 					<div class="w-1/5">Due In</div>
 				</div>
 			</div>
 		</div>
-		<div class="divide-y overflow-x-scroll px-6 py-2 font-sans text-base">
+		<div class="divide-y overflow-x-scroll px-6 py-2 text-base">
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
@@ -68,7 +68,7 @@
 					'bg-gray-50': selected.has(t.name),
 				}"
 			>
-				<div class="cursor-pointer select-none pl-1 pr-4">
+				<div class="cursor-pointer select-none pl-1 pr-4 text-gray-600">
 					<IconTicket
 						v-show="!selected.has(t.name)"
 						class="h-4 w-4"
@@ -87,19 +87,21 @@
 					<div class="w-1/4">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
-					<div class="line-clamp-2 w-1/5">
+					<div class="line-clamp-1 w-1/5 text-gray-700">
 						{{ t.ticket_type }}
 					</div>
 					<div class="w-1/6">
-						<Dropdown
-							:options="statusDropdownOptions(t.name, t.status)"
-							:button="{
-								label: t.status,
-								iconRight: 'chevron-down',
-								appearance: 'minimal',
-								class: 'pl-1',
-							}"
-						/>
+						<Dropdown :options="statusDropdownOptions(t.name, t.status)">
+							<template #default="{ open }">
+								<div
+									class="flex cursor-pointer select-none items-center gap-1 text-gray-700"
+								>
+									{{ t.status }}
+									<IconCaretDown v-if="!open" class="h-3 w-3" />
+									<IconCaretUp v-if="open" class="h-3 w-3" />
+								</div>
+							</template>
+						</Dropdown>
 					</div>
 					<div class="w-1/6">
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
@@ -113,7 +115,7 @@
 						</Dropdown>
 					</div>
 					<div
-						class="w-1/5 capitalize"
+						class="w-1/5 capitalize text-gray-700"
 						:class="{
 							'text-red-700': Date.parse(t.resolution_by) < Date.now(),
 						}"
@@ -124,12 +126,12 @@
 			</div>
 		</div>
 		<div class="grow"></div>
-		<div class="flex justify-between border-t p-3 font-sans text-base">
-			<div class="text-gray-700">
+		<div class="flex justify-between border-t p-3 text-base">
+			<div class="text-gray-600">
 				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of
 				{{ ticketList.totalCount }}
 			</div>
-			<div class="flex items-center gap-2">
+			<div class="flex items-center gap-2 text-gray-600">
 				Page
 				<div
 					class="flex h-5 w-5 flex-wrap content-center justify-center rounded-md bg-gray-200"
@@ -161,7 +163,7 @@
 		>
 			<div
 				v-show="selected.size"
-				class="fixed inset-x-0 bottom-5 mx-auto w-max font-sans text-base"
+				class="fixed inset-x-0 bottom-5 mx-auto w-max text-base"
 			>
 				<div
 					class="bottom-bar flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1"
@@ -225,6 +227,8 @@ import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
 import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
 import CompositeFilters from "@/components/desk/tickets/CompositeFilters.vue";
 import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
+import IconCaretDown from "~icons/ph/caret-down";
+import IconCaretUp from "~icons/ph/caret-up";
 import IconSort from "~icons/espresso/sort-arrow";
 import IconTicket from "~icons/espresso/ticket";
 import IconTicketSolid from "~icons/espresso/ticket-solid";
@@ -238,6 +242,8 @@ export default {
 		NewTicketDialog,
 		PresetFilters,
 		TicketSummary,
+		IconCaretDown,
+		IconCaretUp,
 		IconSort,
 		IconTicket,
 		IconTicketSolid,

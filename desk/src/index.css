@@ -32,30 +32,3 @@
 .ProseMirror {
 	outline: none;
 }
-
-.badge-primary {
-	@apply bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded;
-}
-
-.badge-danger {
-	@apply bg-red-100 text-red-600 text-xs font-normal mr-2 px-2.5 py-0.5 rounded;
-}
-
-.badge-success {
-	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-green-600 bg-green-100 rounded;
-}
-
-.badge-question {
-	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-white bg-[#B7B6FC] rounded-full;
-}
-
-.badge-incident {
-	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-white bg-[#F683AE] rounded-full;
-}
-
-.badge-replied {
-	@apply text-xs font-normal mr-2 px-2.5 py-0.5 text-[#505A62] bg-[#F9FAFA] rounded;
-}
-.badge-bug {
-	@apply bg-red-400 text-white text-xs font-normal mr-2 px-2.5 py-0.5 rounded-full;
-}

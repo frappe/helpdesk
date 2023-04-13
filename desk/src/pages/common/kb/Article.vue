@@ -38,7 +38,7 @@
 							name: 'articles',
 							handler: () => {
 								$router.push({
-									path: `/${editable ? 'helpdesk' : 'helpdesk'}/kb/articles`,
+									path: `/${editable ? 'kb' : 'knowledge-base'}/articles`,
 								});
 							},
 						},

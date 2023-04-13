@@ -56,9 +56,9 @@
 									['DeskKBHome', 'DeskKBCategory'].includes(
 										$route.name
 									)
-										? 'helpdesk'
-										: 'helpdesk'
-								}/kb/categories/${element.name}`,
+										? 'kb'
+										: 'knowledge-base'
+								}/categories/${element.name}`,
 							})
 						}
 					"
