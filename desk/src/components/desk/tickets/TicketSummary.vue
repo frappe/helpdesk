@@ -1,18 +1,21 @@
 <template>
 	<div class="leading-relaxed">
 		<router-link :to="toRoute">
-			<div class="line-clamp-2" :class="{ 'font-semibold': !isSeen }">
+			<div
+				class="line-clamp-2 text-gray-700"
+				:class="{ 'font-semibold': !isSeen }"
+			>
 				{{ subject }}
 			</div>
 		</router-link>
-		<div class="flex flex-wrap items-center gap-2">
-			<IconHash class="h-3 w-3" />
+		<div class="flex flex-wrap items-center gap-2 text-gray-600">
+			<IconHash class="h-4 w-4" />
 			<div>{{ ticketName }}</div>
-			<IconDot class="h-3 w-3" />
-			<IconMail class="h-3 w-3" />
+			<IconDot class="h-4 w-4" />
+			<IconMail class="h-4 w-4" />
 			{{ conversationCount }}
-			<IconDot class="h-3 w-3" />
-			<IconComment class="h-3 w-3" />
+			<IconDot class="h-4 w-4" />
+			<IconComment class="h-4 w-4" />
 			{{ commentCount }}
 		</div>
 	</div>
