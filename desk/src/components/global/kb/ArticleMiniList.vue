@@ -31,8 +31,8 @@
 								if (editMode) return;
 								$router.push({
 									path: `/${
-										$route.meta.editable ? 'helpdesk' : 'helpdesk'
-									}/kb/articles/${element.name}/${element.title_slug}`,
+										$route.meta.editable ? 'kb' : 'knowledge-base'
+									}/articles/${element.name}/${element.title_slug}`,
 								});
 							}
 						"
