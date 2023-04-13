@@ -166,38 +166,36 @@
 				class="fixed inset-x-0 bottom-5 mx-auto w-max text-base"
 			>
 				<div
-					class="bottom-bar flex items-center rounded-lg border border-gray-300 bg-white px-3 py-1"
+					class="bottom-bar flex items-center gap-4 rounded-lg bg-white px-4 py-2"
 				>
 					<div class="w-64">
 						<div class="inline-block align-middle">
 							<Input type="checkbox" :value="true" :disabled="true" />
 						</div>
-						<div class="inline-block pl-2 align-middle">
+						<div class="inline-block pl-2 align-middle text-gray-900">
 							{{ ticketsSelectedText }}
 						</div>
 					</div>
-					<div>
-						<Dropdown
-							:options="agentsAsDropdownOptions"
-							:button="{
-								label: 'Assign',
-								iconLeft: 'plus-circle',
-								appearance: 'minimal',
-							}"
-						/>
-					</div>
+					<Dropdown :options="agentsAsDropdownOptions">
+						<template #default>
+							<div class="flex cursor-pointer items-center gap-1 text-gray-700">
+								<FeatherIcon name="plus-circle" class="h-4 w-4" />
+								Assign
+							</div>
+						</template>
+					</Dropdown>
 					<div class="text-gray-300">&#x007C;</div>
-					<div>
-						<Button
-							label="Select all"
-							appearance="minimal"
-							:disabled="allSelected"
-							@click="selectAll"
-						/>
+					<div
+						class="flex cursor-pointer items-center gap-1 text-gray-700"
+						@click="selectAll"
+					>
+						Select all entries
 					</div>
-					<div>
-						<Button icon="x" appearance="minimal" @click="deselectAll" />
-					</div>
+					<FeatherIcon
+						name="x"
+						class="h-4 w-4 cursor-pointer text-gray-600"
+						@click="deselectAll"
+					/>
 				</div>
 			</div>
 		</transition>
@@ -215,7 +213,7 @@
 
 <script>
 import { ref } from "vue";
-import { Dropdown } from "frappe-ui";
+import { Dropdown, FeatherIcon } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import { useListFilters } from "@/composables/listFilters";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -238,6 +236,7 @@ export default {
 	components: {
 		AssignedInfo,
 		Dropdown,
+		FeatherIcon,
 		CompositeFilters,
 		NewTicketDialog,
 		PresetFilters,
