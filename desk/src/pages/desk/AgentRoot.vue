@@ -14,7 +14,7 @@ import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import SideBar from "@/components/desk/sidebar/SideBar.vue";
 
 export default {
-	name: "Desk",
+	name: "AgentRoot",
 	components: {
 		SideBar,
 	},

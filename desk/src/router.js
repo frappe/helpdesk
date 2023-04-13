@@ -116,7 +116,7 @@ const routes = [
 	{
 		path: "",
 		name: "AgentRoot",
-		component: () => import("@/pages/desk/Desk.vue"),
+		component: () => import("@/pages/desk/AgentRoot.vue"),
 		children: [
 			{
 				path: "dashboard",
