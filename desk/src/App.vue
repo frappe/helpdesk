@@ -1,60 +1,54 @@
 <template>
-	<div>
+	<div v-if="authStore.isLoggedIn">
 		<router-view />
 		<Toasts />
 	</div>
+	<div v-else class="flex h-full w-full max-w-full grow-0">
+		<div class="m-auto text-base font-normal">
+			<CustomIcons name="frappedesk" class="w-[200px]" />
+		</div>
+	</div>
 </template>
 
-<script>
-import { provide, ref } from "vue";
-import { Toasts } from "@/components/global/toast";
+<script setup lang="ts">
+import { provide, ref, onMounted } from "vue";
+import { createResource } from "frappe-ui";
 import { useAuthStore } from "./stores/auth";
+import { createToast } from "@/utils/toasts";
+import { Toasts } from "@/components/global/toast";
 
-export default {
-	name: "App",
-	components: {
-		Toasts,
-	},
-	setup() {
-		const authStore = useAuthStore();
-		const viewportWidth = ref(
-			Math.max(
-				document.documentElement.clientWidth || 0,
-				window.innerWidth || 0
-			)
-		);
+const authStore = useAuthStore();
+const viewportWidth = ref(
+	Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+);
 
-		authStore.init();
+authStore.init();
+provide("viewportWidth", viewportWidth);
 
-		provide("viewportWidth", viewportWidth);
-	},
-	mounted() {
-		window.addEventListener("online", () => {
-			this.$toast({
-				title: "You're online now",
-				icon: "wifi",
-				iconClasses: "stroke-green-600",
-			});
+onMounted(async () => {
+	window.addEventListener("online", () => {
+		createToast({
+			title: "You are now online",
+			icon: "wifi",
+			iconClasses: "stroke-green-600",
 		});
+	});
 
-		window.addEventListener("offline", () => {
-			this.$toast({
-				title: "You're offline now",
-				icon: "wifi-off",
-				iconClasses: "stroke-red-600",
-			});
+	window.addEventListener("offline", () => {
+		createToast({
+			title: "You are now offline",
+			icon: "wifi-off",
+			iconClasses: "stroke-red-600",
 		});
+	});
+});
+
+createResource({
+	url: "helpdesk.api.website.helpdesk_name",
+	cache: true,
+	auto: true,
+	onSuccess: (res: string) => {
+		document.title = `Helpdesk ${res ? ` | ${res}` : ""}`;
 	},
-	resources: {
-		helpdeskName() {
-			return {
-				url: "helpdesk.api.website.helpdesk_name",
-				auto: true,
-				onSuccess: (res) => {
-					document.title = `Helpdesk ${res ? ` | ${res}` : ""}`;
-				},
-			};
-		},
-	},
-};
+});
 </script>

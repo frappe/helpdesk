@@ -1,6 +1,7 @@
 import { computed, ComputedRef } from "vue";
 import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
+import { isEmpty } from "lodash";
 import { createResource, call } from "frappe-ui";
 
 const VIEW_LOGIN = "Login";
@@ -13,7 +14,6 @@ export const useAuthStore = defineStore("auth", () => {
 
 	const userInfo = createResource({
 		url: URI_USER_INFO,
-		cache: ["LoggedAgent"],
 		onError() {
 			router.push({ name: VIEW_LOGIN });
 		},
@@ -25,16 +25,9 @@ export const useAuthStore = defineStore("auth", () => {
 	);
 	const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
 	const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
-	const isLoggedIn: ComputedRef<boolean> = computed(() => {
-		const cookie = Object.fromEntries(
-			document.cookie
-				.split("; ")
-				.map((part) => part.split("="))
-				.map((d) => [d[0], decodeURIComponent(d[1])])
-		);
-
-		return cookie.user_id && cookie.user_id !== "Guest";
-	});
+	const isLoggedIn: ComputedRef<boolean> = computed(
+		() => !isEmpty(user__.value)
+	);
 	const userId: ComputedRef<string> = computed(() => user__.value.user_id);
 	const userImage: ComputedRef<string> = computed(
 		() => user__.value.user_image

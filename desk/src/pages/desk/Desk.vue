@@ -1,33 +1,22 @@
 <template>
-	<div
-		v-if="authStore.isLoggedIn && authStore.hasDeskAccess"
-		class="h-screen w-screen"
-	>
-		<div v-if="initialized">
-			<div class="flex h-screen w-screen flex-row">
-				<SideBar />
-				<router-view :key="$route.fullPath" class="z-0 grow" />
-			</div>
-		</div>
-		<div v-else class="flex h-full w-full max-w-full grow-0">
-			<div class="m-auto text-base font-normal">
-				<CustomIcons name="frappedesk" class="w-[200px]" />
-			</div>
+	<div v-if="initialized">
+		<div class="flex h-screen w-screen flex-row">
+			<SideBar />
+			<router-view :key="$route.fullPath" class="z-0 grow" />
 		</div>
 	</div>
 </template>
 
 <script>
 import { ref } from "vue";
-import SideBar from "@/components/desk/sidebar/SideBar.vue";
-import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import { useAuthStore } from "@/stores/auth";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
+import SideBar from "@/components/desk/sidebar/SideBar.vue";
 
 export default {
 	name: "Desk",
 	components: {
 		SideBar,
-		CustomIcons,
 	},
 	setup() {
 		const authStore = useAuthStore();
@@ -41,8 +30,6 @@ export default {
 	computed: {
 		initialized() {
 			if (!this.mounted) return false;
-			if (!this.authStore.isLoggedIn) return false;
-			if (!this.authStore.hasDeskAccess) return false;
 			if (this.$resources.helpdeskSettings.loading) return false;
 			if (!this.$resources.helpdeskSettings.data.initial_agent_set) {
 				this.$resources.setupInitialAgent.submit();
@@ -70,16 +57,8 @@ export default {
 		},
 	},
 	mounted() {
-		if (!this.authStore.isLoggedIn) {
-			this.$router.push({
-				name: "DeskLogin",
-				query: { route: this.$route.path },
-			});
-			return;
-		}
-
 		if (!this.authStore.hasDeskAccess) {
-			this.$router.push({ path: "/my-tickets" });
+			this.$router.replace({ name: CUSTOMER_PORTAL_LANDING });
 			return;
 		}
 

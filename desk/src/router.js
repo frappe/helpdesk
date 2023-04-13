@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { call } from "frappe-ui";
 
+export const AGENT_PORTAL_LANDING = "DeskTickets";
+export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+
 const routes = [
 	{
 		path: "",
@@ -42,7 +45,7 @@ const routes = [
 				children: [
 					{
 						path: "",
-						name: "PortalTickets",
+						name: CUSTOMER_PORTAL_LANDING,
 						component: () => import("@/pages/portal/ticketing/Tickets.vue"),
 					},
 					{
@@ -122,7 +125,7 @@ const routes = [
 			},
 			{
 				path: "tickets",
-				name: "DeskTickets",
+				name: AGENT_PORTAL_LANDING,
 				component: () => import("@/pages/desk/Tickets.vue"),
 			},
 			{

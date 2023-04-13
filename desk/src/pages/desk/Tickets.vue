@@ -49,8 +49,8 @@
 						:onchange="(e) => toggleAllSelected(e.target.checked)"
 					/>
 				</div>
-				<div class="w-1/3">Subject</div>
-				<div class="flex w-2/3 gap-2">
+				<div class="w-2/5">Subject</div>
+				<div class="flex w-3/5 gap-2">
 					<div class="w-1/4">Assigned To</div>
 					<div class="w-1/5">Type</div>
 					<div class="w-1/6">Status</div>
@@ -80,10 +80,10 @@
 						@click="() => toggleOne(t.name, false)"
 					/>
 				</div>
-				<div class="w-1/3">
+				<div class="w-2/5">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
-				<div class="flex w-2/3 items-center gap-2">
+				<div class="flex w-3/5 items-center gap-2">
 					<div class="w-1/4">
 						<AssignedInfo :ticket-id="t.name" />
 					</div>
