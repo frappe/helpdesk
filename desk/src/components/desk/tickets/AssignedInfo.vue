@@ -3,7 +3,7 @@
 		<div class="">
 			<Avatar size="sm" :label="agentName" :image-u-r-l="avatarUrl" />
 		</div>
-		<div class="truncate">
+		<div class="truncate text-gray-700">
 			{{ agentName }}
 		</div>
 	</div>

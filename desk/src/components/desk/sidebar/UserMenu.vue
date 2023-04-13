@@ -13,7 +13,7 @@
 					:image-u-r-l="authStore.userImage"
 				/>
 				<div
-					class="flex shrink-0 items-center gap-1 duration-300"
+					class="flex shrink-0 items-center gap-1 text-gray-800 duration-300"
 					:class="{
 						'opacity-100': sidebarStore.isExpanded,
 						'opacity-0': !sidebarStore.isExpanded,
@@ -25,7 +25,7 @@
 					</div>
 					<FeatherIcon
 						:name="open ? 'chevron-up' : 'chevron-down'"
-						class="h-4 w-4"
+						class="h-4 w-4 text-gray-600"
 					/>
 				</div>
 			</div>
