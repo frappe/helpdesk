@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col">
-		<div class="flex justify-between px-6 pt-6 pb-2 text-gray-900">
-			<div class="text-2xl font-semibold">Tickets</div>
+		<div class="flex justify-between px-6 pt-6 pb-2">
+			<div class="text-2xl font-semibold text-gray-900">Tickets</div>
 			<Button
 				icon-left="plus"
 				label="Add ticket"
