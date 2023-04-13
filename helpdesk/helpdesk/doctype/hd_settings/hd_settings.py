@@ -9,9 +9,6 @@ import frappe
 
 
 class HDSettings(Document):
-	def before_save(self):
-		self.setup_complete = self.initial_agent_set and self.initial_demo_ticket_created
-
 	def get_base_support_rotation(self):
 		"""Returns the base support rotation rule if it exists, else creats once and returns it"""
 
@@ -24,7 +21,9 @@ class HDSettings(Document):
 		"""Creates the base support rotation rule, and set it to frappe desk settings"""
 
 		rule_doc = frappe.new_doc("Assignment Rule")
-		rule_doc.name = append_number_if_name_exists("Assignment Rule", "Support Rotation")
+		rule_doc.name = append_number_if_name_exists(
+			"Assignment Rule", "Support Rotation"
+		)
 		rule_doc.document_type = "HD Ticket"
 		rule_doc.assign_condition = f"status == 'Open'"
 		rule_doc.priority = 0

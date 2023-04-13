@@ -31,14 +31,6 @@ export default {
 		initialized() {
 			if (!this.mounted) return false;
 			if (this.$resources.helpdeskSettings.loading) return false;
-			if (!this.$resources.helpdeskSettings.data.initial_agent_set) {
-				this.$resources.setupInitialAgent.submit();
-				return false;
-			}
-			if (!this.$resources.helpdeskSettings.data.initial_demo_ticket_created) {
-				this.$resources.createInitialDemoTicket.submit();
-				return false;
-			}
 
 			return true;
 		},
@@ -74,7 +66,6 @@ export default {
 					.initial_helpdesk_name_setup_skipped
 			) {
 				this.showHelpdeskNameSetupToast();
-				return;
 			}
 			// default email account
 			if (
@@ -83,7 +74,6 @@ export default {
 				!this.defaultOutgoingEmailAccountSetup
 			) {
 				this.showDefaultEmailAccountSetupToast();
-				return;
 			}
 			// add agents
 			if (
@@ -147,8 +137,7 @@ export default {
 		},
 		showAddAgentsToast() {
 			this.$toast({
-				title: "Add agent",
-				text: "Please add an agent from settings",
+				title: "You don't have any agents",
 				timeout: 0,
 				appearance: "info",
 				icon: "users",
@@ -169,40 +158,6 @@ export default {
 	resources: {
 		// onboarding related resources
 		// setters
-		setupInitialAgent() {
-			// sets up an initial agent
-			return {
-				url: "helpdesk.api.setup.initial_agent_setup",
-				onSuccess: (res) => {
-					this.$resources.helpdeskSettings.fetch();
-				},
-				onError: (err) => {
-					this.$toast({
-						title: "Something went wrong, while adding initial agent",
-						text: "Please try again later.",
-						icon: "x",
-						iconClasses: "text-red-500",
-					});
-				},
-			};
-		},
-		createInitialDemoTicket() {
-			// creates a demo ticket
-			return {
-				url: "helpdesk.api.setup.create_initial_demo_ticket",
-				onSuccess: (res) => {
-					this.$resources.helpdeskSettings.fetch();
-				},
-				onError: (err) => {
-					this.$toast({
-						title: "Something went wrong, while creating a demo ticket",
-						text: "Please try again later.",
-						icon: "x",
-						iconClasses: "text-red-500",
-					});
-				},
-			};
-		},
 		setHelpdeskName() {
 			// set helpdesk name in Helpdesk Settings
 			return {

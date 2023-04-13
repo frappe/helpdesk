@@ -32,8 +32,6 @@
   "column_break_qkui",
   "setup_section",
   "setup_complete",
-  "initial_agent_set",
-  "initial_demo_ticket_created",
   "initial_helpdesk_name_setup_skipped",
   "column_break_hjfh"
  ],
@@ -143,18 +141,6 @@
   },
   {
    "default": "0",
-   "fieldname": "initial_agent_set",
-   "fieldtype": "Check",
-   "label": "Is initial agent set"
-  },
-  {
-   "default": "0",
-   "fieldname": "initial_demo_ticket_created",
-   "fieldtype": "Check",
-   "label": "Is demo ticket created"
-  },
-  {
-   "default": "0",
    "fieldname": "initial_helpdesk_name_setup_skipped",
    "fieldtype": "Check",
    "label": "Is name setup skipped"
@@ -210,7 +196,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-03-26 23:55:16.000707",
+ "modified": "2023-04-14 04:03:58.330687",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
