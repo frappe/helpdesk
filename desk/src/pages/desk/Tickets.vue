@@ -375,7 +375,7 @@ export default {
 					handler: () =>
 						this.ticketList.setValue.submit({
 							name: ticketId,
-							status,
+							status: o,
 						}),
 				}));
 		},
