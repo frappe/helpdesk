@@ -91,7 +91,7 @@
 		</div>
 		<div
 			v-if="submitted && (ticket.customer_feedback || feedbackText)"
-			class="flex flex-col space-y-[8px] text-[12px] font-normal text-gray-700"
+			class="flex flex-col space-y-[8px] text-sm font-normal text-gray-700"
 		>
 			<div class="flex flex-col space-y-[2px]">
 				<div class="italic">

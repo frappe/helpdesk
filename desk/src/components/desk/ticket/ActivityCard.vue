@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="activity"
-		class="pb-[20px] space-x-[17.78px] flex flex-row select-none text-[12px]"
+		class="pb-[20px] space-x-[17.78px] flex flex-row select-none text-sm"
 	>
 		<div>
 			<CustomIcons class="h-4 w-4" name="disc" />

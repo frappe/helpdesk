@@ -17,7 +17,7 @@
 					<div class="font-normal text-gray-900">added a comment</div>
 				</div>
 			</div>
-			<div class="text-gray-500 font-normal text-[12px]">
+			<div class="text-gray-500 font-normal text-sm">
 				{{ $dayjs.longFormating($dayjs(comment.creation).fromNow()) }}
 			</div>
 		</div>

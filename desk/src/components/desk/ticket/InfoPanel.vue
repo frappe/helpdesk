@@ -99,7 +99,7 @@
 						v-if="ticket.custom_fields.length > 0"
 					>
 						<!-- <div class="text-gray-700 text-sm">{{ `more info ${ticket.template != 'Default' ? `(${ticket.template})` : ''}` }}</div> -->
-						<div class="space-y-[12px] text-[12px]">
+						<div class="space-y-[12px] text-sm">
 							<div class="space-y-[12px]">
 								<div
 									class="flex flex-col space-y-[8px] font-normal hover:underline"
@@ -228,7 +228,7 @@
 													['is', ticket.contact]
 											  )}`
 									"
-									class="text-[12px] rounded"
+									class="text-sm rounded"
 								>
 									<div class="py-[1px]">
 										<div

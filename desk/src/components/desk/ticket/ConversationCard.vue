@@ -15,7 +15,7 @@
 			</div>
 			<a
 				:title="$dayjs(time)"
-				class="text-gray-500 text-[12px] select-none font-normal"
+				class="text-gray-500 text-sm select-none font-normal"
 				>{{ $dayjs.longFormating($dayjs(time).fromNow()) }}</a
 			>
 		</div>
@@ -23,7 +23,7 @@
 			<div class="flex flex-col">
 				<div
 					v-if="cc || bcc"
-					class="flex flex-row gap-1 text-[12px] text-gray-600 font-inter"
+					class="flex flex-row gap-1 text-sm text-gray-600 font-inter"
 				>
 					<div v-if="cc">cc: {{ cc }},</div>
 					<div v-if="bcc">bcc: {{ bcc }}</div>
@@ -41,7 +41,7 @@
 						<a
 							:href="attachment.file_url"
 							target="_blank"
-							class="py-[4px] max-w-[180px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-[12px] hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
+							class="py-[4px] max-w-[180px] rounded-[6px] border px-[8px] text-gray-700 font-normal text-sm hover:underline flex items-center space-x-[8px] border-gray-200 mr-[10px] mb-[5px]"
 						>
 							<FeatherIcon
 								name="paperclip"

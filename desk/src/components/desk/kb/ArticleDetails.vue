@@ -54,7 +54,7 @@
 			<ErrorMessage :message="articleInputErrors.category" />
 		</div>
 		<div
-			class="flex flex-row items-center text-[12px] text-gray-700"
+			class="flex flex-row items-center text-sm text-gray-700"
 			v-if="!isNew"
 		>
 			<div class="flex flex-row items-center space-x-[6px]">

@@ -140,7 +140,7 @@
 						>
 							<template #top>
 								<div
-									class="flex flex-row border-b-[1px] border-[#F4F5F6] pb-[8px] text-[12px] font-normal"
+									class="flex flex-row border-b-[1px] border-[#F4F5F6] pb-[8px] text-sm font-normal"
 								>
 									<div
 										v-if="editingType == 'reply'"
@@ -287,7 +287,7 @@
 														class="h-[15px] stroke-gray-600"
 													/>
 													<span
-														class="ml-2 max-w-[100px] truncate text-[12px] font-normal text-gray-700"
+														class="ml-2 max-w-[100px] truncate text-sm font-normal text-gray-700"
 													>
 														{{ file.file_name }}
 													</span>

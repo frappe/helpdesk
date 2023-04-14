@@ -26,7 +26,7 @@
 					<Input
 						v-model="search"
 						id="searchInput"
-						class="grow text-[12px] text-left text-black border-0 bg-[#EBEEF0] h-[31px] rounded-none pl-0"
+						class="grow text-sm text-left text-black border-0 bg-[#EBEEF0] h-[31px] rounded-none pl-0"
 						type="text"
 						placeholder="Search for response"
 						@input="getCannedResponses"
