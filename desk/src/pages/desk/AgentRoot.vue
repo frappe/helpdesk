@@ -1,8 +1,8 @@
 <template>
 	<div v-if="initialized">
-		<div class="flex h-screen w-screen flex-row">
+		<div class="flex h-screen w-screen">
 			<SideBar />
-			<router-view :key="$route.fullPath" class="z-0 grow" />
+			<router-view class="z-0 grow" />
 		</div>
 	</div>
 </template>
