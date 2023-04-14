@@ -29,11 +29,6 @@ const routes = [
 		props: true,
 	},
 	{
-		path: "/setup",
-		name: "DeskSetup",
-		component: () => import("@/pages/desk/Setup.vue"),
-	},
-	{
 		path: "",
 		name: "PortalRoot",
 		component: () => import("@/pages/portal/Portal.vue"),
