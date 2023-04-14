@@ -40,13 +40,13 @@
 							:to="{
 								path: `/settings/ticket_types/${row.name}`,
 							}"
-							class="text-[13px] text-gray-600 font-inter hover:text-gray-900"
+							class="text-base text-gray-600 font-inter hover:text-gray-900"
 						>
 							{{ `${row.name}` }}
 						</router-link>
 					</template>
 					<template #field-priority="{ row }">
-						<div class="text-[13px] font-inter text-gray-600">
+						<div class="text-base font-inter text-gray-600">
 							{{ row.priority }}
 						</div>
 					</template>

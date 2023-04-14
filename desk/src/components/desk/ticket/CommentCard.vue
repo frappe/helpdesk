@@ -10,7 +10,7 @@
 					:label="user.full_name"
 					size="sm"
 				/>
-				<div class="flex flex-row space-x-1 items-center text-[13px]">
+				<div class="flex flex-row space-x-1 items-center text-base">
 					<div class="truncate font-medium max-w-[200px]">
 						{{ user.full_name }}
 					</div>
@@ -24,7 +24,7 @@
 		<div class="pl-[32px] pt-[6px]">
 			<div class="flex flex-col">
 				<TextEditor
-					editor-class="text-[13px] max-w-full"
+					editor-class="text-base max-w-full"
 					:content="cleanedMessage"
 					:editable="false"
 				/>

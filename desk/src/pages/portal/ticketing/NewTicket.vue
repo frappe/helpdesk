@@ -25,7 +25,7 @@
 					}}
 				</div>
 				<div
-					class="pb-2 text-[13px] text-gray-700"
+					class="pb-2 text-base text-gray-700"
 					v-html="template.about"
 				></div>
 				<div class="space-y-4 pb-4">
@@ -61,7 +61,7 @@
 								</div>
 								<TextEditor
 									:content="content"
-									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
+									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-base min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
 									placeholder="Type your text here..."
 									class="rounded-[8px] border border-gray-300"
 									@change="

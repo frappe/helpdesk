@@ -124,7 +124,7 @@
 							v-if="editing"
 							ref="replyEditor"
 							:content="content"
-							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
+							editor-class="text-base min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
 							:mentions="mentions"
 							:placeholder="
 								editingType == 'reply' ? 'Type a response' : 'Type a comment'
