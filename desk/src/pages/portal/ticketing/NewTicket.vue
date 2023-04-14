@@ -431,7 +431,7 @@ export default {
 		},
 		cancel() {
 			this.$router.push({
-				name: "ProtalTickets",
+				name: "PortalTickets",
 			});
 		},
 	},

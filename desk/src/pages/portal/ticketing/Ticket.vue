@@ -13,7 +13,7 @@
 				<div class="flex items-center space-x-2 text-lg">
 					<a href="/knowledge-base">Home</a>
 					<FeatherIcon name="chevron-right" class="h-3 w-3" />
-					<router-link :to="{ name: 'ProtalTickets' }"
+					<router-link :to="{ name: 'PortalTickets' }"
 						>Tickets</router-link
 					>
 					<FeatherIcon name="chevron-right" class="h-3 w-3" />
