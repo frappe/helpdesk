@@ -225,7 +225,7 @@
 									<div v-else class="flex flex-row items-center space-x-2">
 										<span class="text-gray-700">as</span>
 										<span
-											class="rounded-[6px] border border-gray-400 bg-[#FDF9F2] px-[10px] py-[4px] text-[11px] font-normal text-gray-900 shadow"
+											class="rounded-[6px] border border-gray-400 bg-[#FDF9F2] px-[10px] py-[4px] text-xs font-normal text-gray-900 shadow"
 											>Comment</span
 										>
 									</div>

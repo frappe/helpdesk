@@ -20,7 +20,7 @@
 					</div>
 				</div>
 				<a
-					class="text-gray-600 text-[11px] text-normal"
+					class="text-gray-600 text-xs text-normal"
 					:title="$dayjs(activity.creation)"
 					>{{
 						$dayjs.longFormating(

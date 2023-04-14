@@ -189,7 +189,7 @@
 							"
 						>
 							<div
-								class="grow text-gray-600 text-[11px] font-semibold"
+								class="grow text-gray-600 text-xs font-semibold"
 							>
 								OPEN TICKETS ({{
 									otherTicketsOfContact.length
@@ -255,7 +255,7 @@
 										</div>
 										<div
 											v-else
-											class="hover:text-gray-600 flex flex-row-reverse text-[11px]"
+											class="hover:text-gray-600 flex flex-row-reverse text-xs"
 										>
 											View all
 										</div>
@@ -278,7 +278,7 @@
 								"
 							>
 								<div
-									class="grow text-gray-600 text-[11px] font-semibold"
+									class="grow text-gray-600 text-xs font-semibold"
 								>
 									TICKET HISTORY
 								</div>
