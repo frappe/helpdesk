@@ -151,10 +151,7 @@ export default {
 			if (this.redirect_route) {
 				window.location.href = this.redirect_route
 			} else {
-				window.location.href =
-					this.$route.name == "DeskLogin"
-						? "/tickets"
-						: "/my-tickets"
+				window.location.href = "/";
 			}
 		},
 	},

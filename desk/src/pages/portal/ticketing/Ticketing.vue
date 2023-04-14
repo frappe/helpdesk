@@ -36,7 +36,7 @@ export default {
 	mounted() {
 		if (!this.authStore.isLoggedIn) {
 			this.$router.push({
-				name: "PortalLogin",
+				name: "Login",
 				query: { route: this.$route.path },
 			})
 		}

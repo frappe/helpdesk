@@ -3,20 +3,19 @@ import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { isEmpty } from "lodash";
 import { createResource, call } from "frappe-ui";
+import { LOGIN } from "@/router";
 
-const VIEW_LOGIN = "Login";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
 const URI_SIGNUP = "helpdesk.api.account.signup";
 const URI_LOGIN = "login";
+const URI_LOGOUT = "logout";
 
 export const useAuthStore = defineStore("auth", () => {
 	const router = useRouter();
 
 	const userInfo = createResource({
 		url: URI_USER_INFO,
-		onError() {
-			router.push({ name: VIEW_LOGIN });
-		},
+		cache: "LoggedInUser",
 	});
 
 	const user__ = computed(() => userInfo.data || {});
@@ -65,7 +64,7 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	function logout() {
-		call("logout").then(() => router.push({ name: VIEW_LOGIN }));
+		call(URI_LOGOUT).then(() => router.push({ name: LOGIN }));
 	}
 
 	function reloadUser() {
@@ -73,8 +72,9 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	/**
-	 * To be called from `App.vue`
-	 */
+	 * This is supposed to be the entry point of authentication. This will be
+	 * called from router itself. Hence the router instance from `useRouter()` will
+	 * not be available. */
 	async function init() {
 		await userInfo.fetch();
 	}
