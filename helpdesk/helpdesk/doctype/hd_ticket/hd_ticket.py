@@ -524,7 +524,11 @@ class HDTicket(Document):
 	@frappe.whitelist()
 	def get_assignees(self):
 		QBUser = DocType("User")
-		assignees = frappe.parse_json(self._assign) or []
+		assignees = frappe.parse_json(self._assign)
+
+		if not assignees:
+			return []
+
 		condition = [QBUser.name == assignee for assignee in assignees]
 
 		res = (
