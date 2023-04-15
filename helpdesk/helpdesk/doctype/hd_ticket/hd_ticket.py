@@ -59,7 +59,9 @@ class HDTicket(Document):
 		criterions = [QBTicket.agent_group == team.name for team in teams]
 
 		# Consider tickets without any assigned agent group
-		do_not_restrict = frappe.db.get_single_value("HD Settings", "do_not_restrict_tickets_without_an_agent_group")
+		do_not_restrict = frappe.db.get_single_value(
+			"HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+		)
 		if not do_not_restrict:
 			# include those which are not assigned to any team
 			criterions.append(QBTicket.agent_group.isnull())
@@ -522,7 +524,7 @@ class HDTicket(Document):
 	@frappe.whitelist()
 	def get_assignees(self):
 		QBUser = DocType("User")
-		assignees = json.loads(self._assign)
+		assignees = frappe.parse_json(self._assign) or []
 		condition = [QBUser.name == assignee for assignee in assignees]
 
 		res = (
