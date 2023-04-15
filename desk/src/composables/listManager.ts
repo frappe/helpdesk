@@ -1,5 +1,5 @@
-import { isEmpty } from "lodash";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import { createListResource, createResource } from "frappe-ui";
 import { useListFilters } from "./listFilters";
 
@@ -27,6 +27,8 @@ type MetaData = {
 };
 
 export function createListManager(options: ListOptions) {
+	const route = useRoute();
+
 	const doctype = options.doctype;
 	const fields = options.fields;
 	const filters = ref(options.filters);
@@ -81,15 +83,15 @@ export function createListManager(options: ListOptions) {
 		},
 	});
 
-	onMounted(() => {
-		const queryFilters = filterManager.queryFilters();
-		const orderByQuery = filterManager.queryOrderBy();
-
-		if (!isEmpty(queryFilters)) filters.value = queryFilters;
-		if (orderByQuery) orderBy.value = orderByQuery;
+	function updateArgs() {
+		filters.value = filterManager.queryFilters();
+		orderBy.value = filterManager.queryOrderBy();
 
 		list.reload();
-	});
+	}
+
+	onMounted(updateArgs);
+	watch(route, updateArgs);
 
 	return list;
 }
