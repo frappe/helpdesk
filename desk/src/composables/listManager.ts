@@ -56,7 +56,6 @@ export function createListManager(options: ListOptions) {
 				start: list.start,
 			});
 		},
-		debug: true,
 	});
 
 	Object.assign(list, {
@@ -80,7 +79,6 @@ export function createListManager(options: ListOptions) {
 			list.startFrom = data.start_from;
 			list.endAt = data.end_at;
 		},
-		debug: true,
 	});
 
 	onMounted(() => {
