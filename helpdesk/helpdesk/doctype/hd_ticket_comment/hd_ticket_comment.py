@@ -3,8 +3,10 @@
 
 import frappe
 from frappe.model.document import Document
-from helpdesk.utils import extract_mentions
+from frappe.realtime import get_website_room
 from frappe.utils import get_fullname
+
+from helpdesk.utils import extract_mentions
 
 
 class HDTicketComment(Document):
@@ -30,6 +32,8 @@ class HDTicketComment(Document):
 			notification.insert(ignore_permissions=True)
 
 	def after_insert(self):
-		frappe.publish_realtime(
-			"helpdesk:new-ticket-comment", {"ticket_id": self.reference_ticket}
-		)
+		event = "helpdesk:new-ticket-comment"
+		data = {"ticket_id": self.reference_ticket}
+		room = get_website_room()
+
+		frappe.publish_realtime(event, message=data, room=room, after_commit=True)

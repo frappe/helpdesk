@@ -1,4 +1,5 @@
 import frappe
+from frappe.realtime import get_website_room
 
 
 def after_insert(c, method=None):
@@ -11,9 +12,8 @@ def after_insert(c, method=None):
 	if not c.reference_name:
 		return
 
-	frappe.publish_realtime(
-		"helpdesk:new-communication",
-		{
-			"ticket_id": c.reference_name,
-		},
-	)
+	event = "helpdesk:new-communication"
+	data = {"ticket_id": c.reference_name}
+	room = get_website_room()
+
+	frappe.publish_realtime(event, message=data, room=room, after_commit=True)
