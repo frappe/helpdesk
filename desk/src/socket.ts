@@ -1,4 +1,3 @@
 import { initSocket } from "frappe-ui";
 
-const socket = initSocket();
-export default socket;
+export const socket = initSocket();

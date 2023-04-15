@@ -12,10 +12,10 @@ import {
 	resourcesPlugin,
 	setConfig,
 } from "frappe-ui";
-import router from "./router";
-import socket from "./socket";
 import App from "./App.vue";
 import "./index.css";
+import { router } from "./router";
+import { socket } from "./socket";
 import { clipboardCopy } from "@/utils/clipboard";
 import { createToast, clearToasts } from "@/utils/toasts";
 import { dayjs } from "@/utils";

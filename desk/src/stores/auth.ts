@@ -1,21 +1,22 @@
 import { computed, ComputedRef } from "vue";
-import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { isEmpty } from "lodash";
 import { createResource, call } from "frappe-ui";
-import { LOGIN } from "@/router";
+import { router, LOGIN } from "@/router";
 
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
 const URI_SIGNUP = "helpdesk.api.account.signup";
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
 
+/**
+ * This is supposed to be the entry point of authentication. This will be
+ * called from router itself. Hence the router instance from `useRouter()` will
+ * not be available. All Authentication related logic should go in this file.
+ * Some of these might contain async methods, beware. */
 export const useAuthStore = defineStore("auth", () => {
-	const router = useRouter();
-
 	const userInfo = createResource({
 		url: URI_USER_INFO,
-		cache: "LoggedInUser",
 	});
 
 	const user__ = computed(() => userInfo.data || {});
@@ -36,6 +37,9 @@ export const useAuthStore = defineStore("auth", () => {
 
 	const resLogin = createResource({
 		url: URI_LOGIN,
+		onSuccess() {
+			router.replace({ path: "/" });
+		},
 	});
 
 	const resSignup = createResource({
@@ -71,10 +75,6 @@ export const useAuthStore = defineStore("auth", () => {
 		userInfo.reload();
 	}
 
-	/**
-	 * This is supposed to be the entry point of authentication. This will be
-	 * called from router itself. Hence the router instance from `useRouter()` will
-	 * not be available. */
 	async function init() {
 		await userInfo.fetch();
 	}

@@ -358,7 +358,7 @@ const routes = [
 	},
 ];
 
-let router = createRouter({
+export const router = createRouter({
 	history: createWebHistory("/helpdesk/"),
 	routes,
 });
@@ -384,5 +384,3 @@ router.beforeEach(async (to) => {
 	const authStore = useAuthStore();
 	await authStore.init().catch(() => router.replace({ name: LOGIN }));
 });
-
-export default router;

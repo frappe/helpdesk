@@ -139,8 +139,7 @@ export default {
 		},
 		async login() {
 			if (this.email && this.password) {
-				await this.authStore.login(this.email, this.password)
-				this.redirect()
+				this.authStore.login(this.email, this.password)
 			}
 		},
 		async resetPassword() {
