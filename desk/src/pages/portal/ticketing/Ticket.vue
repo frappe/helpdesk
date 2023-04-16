@@ -142,7 +142,7 @@
 								<div class="w-full ml-2 pt-1">
 									<div class="flex flex-col space-y-2">
 										<div v-if="editing" class="text-lg">
-											{{ authStore.doc.full_name }}
+											{{ authStore.full_name }}
 										</div>
 										<div
 											class="grow"
