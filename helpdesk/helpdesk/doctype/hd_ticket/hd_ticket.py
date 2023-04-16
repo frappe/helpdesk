@@ -338,12 +338,15 @@ class HDTicket(Document):
 	def last_communication(self):
 		filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", self.name]}
 
-		communication = frappe.get_last_doc(
-			"Communication",
-			filters=filters,
-		)
+		try:
+			communication = frappe.get_last_doc(
+				"Communication",
+				filters=filters,
+			)
 
-		return communication
+			return communication
+		except:
+			pass
 
 	def last_communication_email(self):
 		if not (communication := self.last_communication()):
@@ -397,8 +400,8 @@ class HDTicket(Document):
 		last_communication = self.last_communication()
 
 		if last_communication:
-			bcc = bcc or last_communication.bcc
-			cc = cc or last_communication.cc
+			bcc = last_communication.bcc or bcc
+			cc = last_communication.cc or cc
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
