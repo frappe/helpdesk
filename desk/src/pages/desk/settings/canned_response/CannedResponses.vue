@@ -42,13 +42,13 @@
 							:to="{
 								path: `/settings/canned_responses/${row.title}`,
 							}"
-							class="font-inter text-[13px] text-gray-600 hover:text-gray-900"
+							class="font-inter text-base text-gray-600 hover:text-gray-900"
 						>
 							{{ `${row.title}` }}
 						</router-link>
 					</template>
 					<template #field-owner="{ row }">
-						<div class="font-inter text-[13px] text-gray-600">
+						<div class="font-inter text-base text-gray-600">
 							{{ row.owner }}
 						</div>
 					</template>

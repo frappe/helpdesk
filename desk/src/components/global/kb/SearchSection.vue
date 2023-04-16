@@ -35,7 +35,7 @@
 									:disabled="disabled"
 									type="text"
 									placeholder="Write a question or problem"
-									class="grow text-[12px] text-left text-gray-500 border-0 focus:ring-0"
+									class="grow text-sm text-left text-gray-500 border-0 focus:ring-0"
 								/>
 							</div>
 						</div>

@@ -1,5 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { call } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
+
+export const LOGIN = "Login";
+export const SIGNUP = "Signup";
+export const VERIFY = "Verify Account";
+export const AGENT_PORTAL_LANDING = "DeskTickets";
+export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+export const AUTH_BYPASS_ROUTES = [LOGIN, SIGNUP, VERIFY];
 
 const routes = [
 	{
@@ -8,27 +16,22 @@ const routes = [
 	},
 	{
 		path: "/login",
-		name: "Login",
+		name: LOGIN,
 		component: () => import("@/pages/auth/Login.vue"),
 	},
 	{
 		path: "/signup",
-		name: "Signup",
+		name: SIGNUP,
 		component: () => import("@/pages/auth/Signup.vue"),
 	},
 	{
 		path: "/verify/:requestKey",
-		name: "Verify Account",
+		name: VERIFY,
 		component: () =>
 			import(
 				/* webpackChunkName: "setup-account" */ "@/pages/auth/VerifyAccount.vue"
 			),
 		props: true,
-	},
-	{
-		path: "/setup",
-		name: "DeskSetup",
-		component: () => import("@/pages/desk/Setup.vue"),
 	},
 	{
 		path: "",
@@ -42,7 +45,7 @@ const routes = [
 				children: [
 					{
 						path: "",
-						name: "PortalTickets",
+						name: CUSTOMER_PORTAL_LANDING,
 						component: () => import("@/pages/portal/ticketing/Tickets.vue"),
 					},
 					{
@@ -113,7 +116,7 @@ const routes = [
 	{
 		path: "",
 		name: "AgentRoot",
-		component: () => import("@/pages/desk/Desk.vue"),
+		component: () => import("@/pages/desk/AgentRoot.vue"),
 		children: [
 			{
 				path: "dashboard",
@@ -122,7 +125,7 @@ const routes = [
 			},
 			{
 				path: "tickets",
-				name: "DeskTickets",
+				name: AGENT_PORTAL_LANDING,
 				component: () => import("@/pages/desk/Tickets.vue"),
 			},
 			{
@@ -355,7 +358,7 @@ const routes = [
 	},
 ];
 
-let router = createRouter({
+export const router = createRouter({
 	history: createWebHistory("/helpdesk/"),
 	routes,
 });
@@ -375,4 +378,9 @@ router.beforeEach(async (to) => {
 	return true;
 });
 
-export default router;
+router.beforeEach(async (to) => {
+	if (AUTH_BYPASS_ROUTES.includes(to.name)) return;
+
+	const authStore = useAuthStore();
+	await authStore.init().catch(() => router.replace({ name: LOGIN }));
+});

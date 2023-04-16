@@ -1,22 +1,22 @@
 import { computed, ComputedRef } from "vue";
-import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
+import { isEmpty } from "lodash";
 import { createResource, call } from "frappe-ui";
+import { router, LOGIN } from "@/router";
 
-const VIEW_LOGIN = "Login";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
 const URI_SIGNUP = "helpdesk.api.account.signup";
 const URI_LOGIN = "login";
+const URI_LOGOUT = "logout";
 
+/**
+ * This is supposed to be the entry point of authentication. This will be
+ * called from router itself. Hence the router instance from `useRouter()` will
+ * not be available. All Authentication related logic should go in this file.
+ * Some of these might contain async methods, beware. */
 export const useAuthStore = defineStore("auth", () => {
-	const router = useRouter();
-
 	const userInfo = createResource({
 		url: URI_USER_INFO,
-		cache: ["LoggedAgent"],
-		onError() {
-			router.push({ name: VIEW_LOGIN });
-		},
 	});
 
 	const user__ = computed(() => userInfo.data || {});
@@ -25,16 +25,9 @@ export const useAuthStore = defineStore("auth", () => {
 	);
 	const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
 	const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
-	const isLoggedIn: ComputedRef<boolean> = computed(() => {
-		const cookie = Object.fromEntries(
-			document.cookie
-				.split("; ")
-				.map((part) => part.split("="))
-				.map((d) => [d[0], decodeURIComponent(d[1])])
-		);
-
-		return cookie.user_id && cookie.user_id !== "Guest";
-	});
+	const isLoggedIn: ComputedRef<boolean> = computed(
+		() => !isEmpty(user__.value)
+	);
 	const userId: ComputedRef<string> = computed(() => user__.value.user_id);
 	const userImage: ComputedRef<string> = computed(
 		() => user__.value.user_image
@@ -44,6 +37,9 @@ export const useAuthStore = defineStore("auth", () => {
 
 	const resLogin = createResource({
 		url: URI_LOGIN,
+		onSuccess() {
+			router.replace({ path: "/" });
+		},
 	});
 
 	const resSignup = createResource({
@@ -72,16 +68,13 @@ export const useAuthStore = defineStore("auth", () => {
 	}
 
 	function logout() {
-		call("logout").then(() => router.push({ name: VIEW_LOGIN }));
+		call(URI_LOGOUT).then(() => router.push({ name: LOGIN }));
 	}
 
 	function reloadUser() {
 		userInfo.reload();
 	}
 
-	/**
-	 * To be called from `App.vue`
-	 */
 	async function init() {
 		await userInfo.fetch();
 	}

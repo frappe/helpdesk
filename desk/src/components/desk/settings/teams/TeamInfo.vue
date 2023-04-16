@@ -4,7 +4,7 @@
 			<div class="float-left">
 				<router-link
 					:to="`/settings/teams`"
-					class="my-1 flex select-none flex-row items-center space-x-1 stroke-gray-600 text-[12px] text-gray-600 hover:stroke-gray-700 hover:text-gray-700"
+					class="my-1 flex select-none flex-row items-center space-x-1 stroke-gray-600 text-sm text-gray-600 hover:stroke-gray-700 hover:text-gray-700"
 					role="button"
 				>
 					<FeatherIcon name="arrow-left" class="h-[13px] w-[13px]" />

@@ -4,7 +4,7 @@
 			<div class="float-left">
 				<router-link
 					:to="`/settings/ticket_types`"
-					class="my-1 text-[12px] text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
+					class="my-1 text-sm text-gray-600 stroke-gray-600 flex flex-row items-center space-x-1 hover:text-gray-700 hover:stroke-gray-700 select-none"
 					role="button"
 				>
 					<FeatherIcon name="arrow-left" class="w-[13px] h-[13px]" />

@@ -3,6 +3,8 @@ from datetime import datetime
 import frappe
 from frappe.permissions import add_permission
 
+from .demo_data import create_demo_data
+
 
 def before_install():
 	add_support_redirect_to_tickets()
@@ -19,6 +21,7 @@ def after_install():
 	update_agent_role_permissions()
 	add_default_assignment_rule()
 	add_system_preset_filters()
+	create_demo_data()
 
 
 def add_support_redirect_to_tickets():

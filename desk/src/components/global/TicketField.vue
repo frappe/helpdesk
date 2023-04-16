@@ -1,7 +1,7 @@
 2
 <template>
 	<div class="flex flex-col space-y-[8px]">
-		<div class="text-[12px] text-gray-600">
+		<div class="text-sm text-gray-600">
 			{{ fieldMetaInfo?.label }}
 		</div>
 		<div>

@@ -124,7 +124,7 @@
 							v-if="editing"
 							ref="replyEditor"
 							:content="content"
-							editor-class="text-[13px] min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
+							editor-class="text-base min-h-[180px] max-h-[300px] max-w-full overflow-y-scroll"
 							:mentions="mentions"
 							:placeholder="
 								editingType == 'reply' ? 'Type a response' : 'Type a comment'
@@ -140,7 +140,7 @@
 						>
 							<template #top>
 								<div
-									class="flex flex-row border-b-[1px] border-[#F4F5F6] pb-[8px] text-[12px] font-normal"
+									class="flex flex-row border-b-[1px] border-[#F4F5F6] pb-[8px] text-sm font-normal"
 								>
 									<div
 										v-if="editingType == 'reply'"
@@ -225,7 +225,7 @@
 									<div v-else class="flex flex-row items-center space-x-2">
 										<span class="text-gray-700">as</span>
 										<span
-											class="rounded-[6px] border border-gray-400 bg-[#FDF9F2] px-[10px] py-[4px] text-[11px] font-normal text-gray-900 shadow"
+											class="rounded-[6px] border border-gray-400 bg-[#FDF9F2] px-[10px] py-[4px] text-xs font-normal text-gray-900 shadow"
 											>Comment</span
 										>
 									</div>
@@ -287,7 +287,7 @@
 														class="h-[15px] stroke-gray-600"
 													/>
 													<span
-														class="ml-2 max-w-[100px] truncate text-[12px] font-normal text-gray-700"
+														class="ml-2 max-w-[100px] truncate text-sm font-normal text-gray-700"
 													>
 														{{ file.file_name }}
 													</span>
@@ -324,7 +324,8 @@
 												:button="{
 													class: 'rounded-r-none',
 													disabled:
-														(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled,
+														(!authStore.isAgent && !authStore.isAdmin) ||
+														sendingDissabled,
 													appearance: 'primary',
 													label: 'Menu',
 													icon: 'chevron-up',
@@ -365,7 +366,8 @@
 												"
 												appearance="primary"
 												:disabled="
-													(!authStore.isAgent && !authStore.isAdmin) || sendingDissabled
+													(!authStore.isAgent && !authStore.isAdmin) ||
+													sendingDissabled
 												"
 												@click="submit()"
 											>
@@ -501,8 +503,9 @@ import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSat
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
-import { useAuthStore } from "@/stores/auth";
 import { TextEditorMenuButtons } from "./consts";
+import { useAuthStore } from "@/stores/auth";
+import { useAgentStore } from "@/stores/agent";
 
 export default {
 	name: "Ticket",
@@ -532,7 +535,7 @@ export default {
 		const showTextFormattingMenu = ref(true);
 		const viewportWidth = inject("viewportWidth");
 		const authStore = useAuthStore();
-		const agents = inject("agents");
+		const agentStore = useAgentStore();
 		const attachments = ref([]);
 		const editingType = ref("");
 		const replied = ref("Replied");
@@ -556,7 +559,7 @@ export default {
 			showTextFormattingMenu,
 			viewportWidth,
 			authStore,
-			agents,
+			agentStore,
 			attachments,
 			tempTextEditorData,
 			editingType,
@@ -570,7 +573,6 @@ export default {
 			showBcc,
 			showCcBtn,
 			showBccBtn,
-			replied,
 		};
 	},
 	data() {
@@ -656,7 +658,9 @@ export default {
 			);
 		},
 		mentions() {
-			const users = this.editingType === "comment" ? this.agents : [];
+			const users =
+				this.editingType === "comment" ? this.agentStore.options : [];
+
 			return users.map((user) => ({
 				label: user.agent_name,
 				value: user.name,

@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col h-full px-4">
+	<div class="flex h-full flex-col px-4">
 		<ListManager
 			ref="miniTicketList"
 			:options="{
@@ -58,10 +58,10 @@
 							},
 						},
 					}"
-					class="text-base h-[93vh] pt-4"
+					class="h-[93vh] pt-4 text-base"
 				>
 					<template #top-sub-section-1>
-						<div class="text-xl font-semibold py-2">Tickets</div>
+						<div class="py-2 text-xl font-semibold">Tickets</div>
 					</template>
 					<template #field-name="{ value }">
 						<div class="text-xs text-gray-500">
@@ -81,10 +81,7 @@
 						<TicketType :value="value" />
 					</template>
 					<template #field-creation="{ value }">
-						<Tooltip
-							placement="top"
-							:text="`Created on ${$dayjs(value)}`"
-						>
+						<Tooltip placement="top" :text="`Created on ${$dayjs(value)}`">
 							<div class="text-gray-500">
 								{{ $dayjs(value).format("DD MMM") }}
 							</div>
@@ -92,12 +89,7 @@
 					</template>
 					<template #field-modified="{ value }">
 						<div class="text-gray-500">
-							{{
-								$dayjs.shortFormating(
-									$dayjs(value).fromNow(),
-									true
-								)
-							}}
+							{{ $dayjs.shortFormating($dayjs(value).fromNow(), true) }}
 						</div>
 					</template>
 					<template #field-_assign="{ value }">
@@ -106,16 +98,10 @@
 
 					<template #bulk-actions="{ selectedItems }">
 						<div class="flex flex-row space-x-2">
-							<Dropdown
-								placement="right"
-								:options="agentsAsDropdownOptions()"
-							>
-								<template v-slot="{ toggleDropdown }">
+							<Dropdown placement="right" :options="agentsAsDropdownOptions()">
+								<template #default="{ toggleDropdown }">
 									<Button
-										:loading="
-											$resources.bulkAssignTicketToAgent
-												.loading
-										"
+										:loading="$resources.bulkAssignTicketToAgent.loading"
 										icon-right="chevron-down"
 										class="ml-2"
 										@click="toggleDropdown"
@@ -130,14 +116,13 @@
 									() => {
 										$resources.bulkAssignTicketStatus
 											.submit({
-												ticket_ids:
-													Object.keys(selectedItems),
+												ticket_ids: Object.keys(selectedItems),
 												status: 'Closed',
 											})
 											.then(() => {
-												manager.unselect()
-												manager.reload()
-											})
+												manager.unselect();
+												manager.reload();
+											});
 									}
 								"
 							>
@@ -152,19 +137,19 @@
 </template>
 
 <script>
-import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui"
-import ListManager from "@/components/global/ListManager.vue"
-import ListViewer from "@/components/global/ListViewer.vue"
-import AgentAvatar from "@/components/global/AgentAvatar.vue"
-import TicketType from "@/components/global/ticket_list_item/TicketType.vue"
-import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue"
-import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue"
-import Subject from "@/components/global/ticket_list_item/Subject.vue"
+import { FeatherIcon, Dropdown, Tooltip } from "frappe-ui";
+import ListManager from "@/components/global/ListManager.vue";
+import ListViewer from "@/components/global/ListViewer.vue";
+import AgentAvatar from "@/components/global/AgentAvatar.vue";
+import TicketType from "@/components/global/ticket_list_item/TicketType.vue";
+import TicketStatus from "@/components/global/ticket_list_item/TicketStatus.vue";
+import TicketPriority from "@/components/global/ticket_list_item/TicketPriority.vue";
+import Subject from "@/components/global/ticket_list_item/Subject.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useAgentStore } from "@/stores/agent";
 
 export default {
 	name: "ContactRelatedInfo",
-	props: ["contact"],
 	components: {
 		ListManager,
 		ListViewer,
@@ -177,33 +162,34 @@ export default {
 		TicketPriority,
 		Subject,
 	},
-	inject: ["agents"],
+	props: ["contact"],
 	setup() {
-		const authStore = useAuthStore()
-		
+		const agentStore = useAgentStore();
+		const authStore = useAuthStore();
+
 		return {
+			agentStore,
 			authStore,
-		}
+		};
 	},
 	methods: {
 		agentsAsDropdownOptions() {
-			let agentItems = []
-			if (this.agents) {
-				this.agents.forEach((agent) => {
+			let agentItems = [];
+			if (this.agentStore.options) {
+				this.agentStore.options.forEach((agent) => {
 					agentItems.push({
 						label: agent.agent_name,
 						handler: () => {
 							this.$resources.bulkAssignTicketToAgent.submit({
 								ticket_ids: Object.keys(
-									this.$refs.miniTicketList.manager
-										.selectedItems
+									this.$refs.miniTicketList.manager.selectedItems
 								),
 								agent_id: agent.name,
-							})
+							});
 						},
-					})
-				})
-				let options = []
+					});
+				});
+				let options = [];
 				if (this.authStore.isAgent) {
 					options.push({
 						group: "Myself",
@@ -212,28 +198,25 @@ export default {
 							{
 								label: "Assign to me",
 								handler: () => {
-									this.$resources.bulkAssignTicketToAgent.submit(
-										{
-											ticket_ids: Object.keys(
-												this.$refs.miniTicketList
-													.manager.selectedItems
-											),
-											agent_id: this.authStore.userId,
-										}
-									)
+									this.$resources.bulkAssignTicketToAgent.submit({
+										ticket_ids: Object.keys(
+											this.$refs.miniTicketList.manager.selectedItems
+										),
+										agent_id: this.authStore.userId,
+									});
 								},
 							},
 						],
-					})
+					});
 				}
 				options.push({
 					group: "All Agents",
 					hideLabel: true,
 					items: agentItems,
-				})
-				return options
+				});
+				return options;
 			} else {
-				return null
+				return null;
 			}
 		},
 	},
@@ -242,50 +225,50 @@ export default {
 			return {
 				url: "helpdesk.api.ticket.bulk_assign_ticket_status",
 				onSuccess: (res) => {
-					this.$refs.miniTicketList.manager.selectedItems = []
-					this.$refs.miniTicketList.manager.reload()
+					this.$refs.miniTicketList.manager.selectedItems = [];
+					this.$refs.miniTicketList.manager.reload();
 
 					this.$toast({
 						title: `Tickets marked as ${res.status}.`,
 						icon: "check",
 						iconClasses: "text-green-500",
-					})
+					});
 
-					this.$event.emit("update_ticket_list")
+					this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					this.$toast({
 						title: "Unable to mark tickets as closed.",
 						icon: "x",
 						iconClasses: "text-red-500",
-					})
+					});
 				},
-			}
+			};
 		},
 		bulkAssignTicketToAgent() {
 			return {
 				url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
 				onSuccess: () => {
-					this.$refs.miniTicketList.manager.selectedItems = []
-					this.$refs.miniTicketList.manager.reload()
+					this.$refs.miniTicketList.manager.selectedItems = [];
+					this.$refs.miniTicketList.manager.reload();
 
 					this.$toast({
 						title: "Tickets assigned to agent.",
 						icon: "check",
 						iconClasses: "text-green-500",
-					})
+					});
 
-					this.$event.emit("update_ticket_list")
+					this.$event.emit("update_ticket_list");
 				},
 				onError: () => {
 					this.$toast({
 						title: "Unable to assign tickets to agent.",
 						icon: "x",
 						iconClasses: "text-red-500",
-					})
+					});
 				},
-			}
+			};
 		},
 	},
-}
+};
 </script>

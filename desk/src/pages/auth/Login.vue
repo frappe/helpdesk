@@ -139,8 +139,7 @@ export default {
 		},
 		async login() {
 			if (this.email && this.password) {
-				await this.authStore.login(this.email, this.password)
-				this.redirect()
+				this.authStore.login(this.email, this.password)
 			}
 		},
 		async resetPassword() {
@@ -151,10 +150,7 @@ export default {
 			if (this.redirect_route) {
 				window.location.href = this.redirect_route
 			} else {
-				window.location.href =
-					this.$route.name == "DeskLogin"
-						? "/tickets"
-						: "/my-tickets"
+				window.location.href = "/";
 			}
 		},
 	},

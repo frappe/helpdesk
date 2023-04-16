@@ -25,7 +25,7 @@
 					}}
 				</div>
 				<div
-					class="pb-2 text-[13px] text-gray-700"
+					class="pb-2 text-base text-gray-700"
 					v-html="template.about"
 				></div>
 				<div class="space-y-4 pb-4">
@@ -61,7 +61,7 @@
 								</div>
 								<TextEditor
 									:content="content"
-									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-[13px] min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
+									editor-class="px-[12px] pt-[5px] rounded-t-[8px] text-base min-h-[100px] max-h-[200px] max-w-full overflow-y-scroll bg-gray-100"
 									placeholder="Type your text here..."
 									class="rounded-[8px] border border-gray-300"
 									@change="
@@ -148,7 +148,7 @@
 									class="h-[15px] stroke-gray-600"
 								/>
 								<span
-									class="ml-2 max-w-[100px] truncate text-[12px] font-normal text-gray-700"
+									class="ml-2 max-w-[100px] truncate text-sm font-normal text-gray-700"
 								>
 									{{ file.file_name }}
 								</span>
@@ -431,7 +431,7 @@ export default {
 		},
 		cancel() {
 			this.$router.push({
-				name: "ProtalTickets",
+				name: "PortalTickets",
 			});
 		},
 	},
