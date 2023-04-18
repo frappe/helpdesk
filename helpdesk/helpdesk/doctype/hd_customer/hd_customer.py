@@ -21,10 +21,14 @@ def get_contact_count(doc, event):
 			"parenttype": "Contact",
 		},
 	)
-	customer = frappe.get_doc("HD Customer", doc.links[0].link_name)
-	customer.contact_count = contact_count
 
-	customer.save()
+	try:
+		customer = frappe.get_doc("HD Customer", doc.links[0].link_name)
+		customer.contact_count = contact_count
+
+		customer.save()
+	except:
+		pass
 
 
 def get_ticket_count(doc, event):
