@@ -216,10 +216,11 @@ import { ref } from "vue";
 import { Dropdown, FeatherIcon } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import { useListFilters } from "@/composables/listFilters";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import { useAuthStore } from "@/stores/auth";
 import { useAgentStore } from "@/stores/agent";
+import { useAuthStore } from "@/stores/auth";
+import { useKeymapStore } from "@/stores/keymap";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import NewTicketDialog from "@/components/desk/tickets/NewTicketDialog.vue";
 import TicketSummary from "@/components/desk/tickets/TicketSummary.vue";
 import PresetFilters from "@/components/desk/tickets/PresetFilters.vue";
@@ -255,6 +256,7 @@ export default {
 		const showNewTicketDialog = ref(false);
 		const ticketPriorityStore = useTicketPriorityStore();
 		const ticketStatusStore = useTicketStatusStore();
+		const keymapStore = useKeymapStore();
 
 		const ticketList = createListManager({
 			doctype: "HD Ticket",
@@ -264,12 +266,31 @@ export default {
 		return {
 			agentStore,
 			authStore,
+			keymapStore,
 			listFilters,
 			selected,
 			showNewTicketDialog,
 			ticketList,
 			ticketPriorityStore,
 			ticketStatusStore,
+		};
+	},
+	data() {
+		return {
+			shortcuts: [
+				{
+					button: "R",
+					status: "Replied",
+				},
+				{
+					button: "E",
+					status: "Resolved",
+				},
+				{
+					button: "C",
+					status: "Closed",
+				},
+			],
 		};
 	},
 	computed: {
@@ -351,6 +372,27 @@ export default {
 				return null;
 			}
 		},
+	},
+	mounted() {
+		this.shortcuts.forEach((o) => {
+			this.keymapStore.add(
+				["Control", o.button],
+				() => {
+					this.selected.forEach((ticketId) => {
+						this.ticketList.setValue.submit({
+							name: ticketId,
+							status: o.status,
+						});
+					});
+				},
+				`Set ticket as ${o.status.toLowerCase()}`
+			);
+		});
+	},
+	beforeUnmount() {
+		this.shortcuts.forEach((o) =>
+			this.keymapStore.remove(["Control", o.button])
+		);
 	},
 	methods: {
 		toggleOne(ticketId, checked) {

@@ -1,12 +1,14 @@
 <template>
 	<router-view />
 	<Toasts />
+	<KeymapDialog />
 </template>
 
 <script setup lang="ts">
 import { provide, ref, onMounted } from "vue";
 import { createResource } from "frappe-ui";
 import { createToast } from "@/utils/toasts";
+import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { Toasts } from "@/components/global/toast";
 
 const viewportWidth = ref(

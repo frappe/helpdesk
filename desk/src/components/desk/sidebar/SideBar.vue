@@ -10,39 +10,12 @@
 		<LinkGroup :options="menuOptions" />
 		<div class="grow"></div>
 		<LinkGroup :options="footerOptions" />
-		<Dialog
-			v-model="showKeyboardShortcuts"
-			:options="{ title: 'Keyboard Shortcuts' }"
-		>
-			<template #body-content>
-				<div class="py-5 text-base">
-					<table class="w-full table-fixed border-collapse border">
-						<tbody>
-							<tr
-								v-for="shortcut in keyboardShortcuts"
-								:key="shortcut.label"
-								class="h-16 border-y"
-							>
-								<td class="w-28 border-r px-4">
-									<span
-										class="rounded bg-gray-100 p-1.5 text-gray-500 shadow shadow-gray-400"
-									>
-										{{ shortcut.sequence }}
-									</span>
-								</td>
-								<td class="px-4">{{ shortcut.label }}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</template>
-		</Dialog>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { useKeymapStore } from "@/stores/keymap";
 import { useSidebarStore } from "@/stores/sidebar";
 import UserMenu from "./UserMenu.vue";
 import LinkGroup from "./LinkGroup.vue";
@@ -60,24 +33,8 @@ import IconSettings from "~icons/espresso/settings";
 import IconSettingsSolid from "~icons/espresso/settings-solid";
 
 const authStore = useAuthStore();
+const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
-const isMac = navigator.userAgent.indexOf("Mac OS X") != -1;
-const showKeyboardShortcuts = ref(false);
-
-const keyboardShortcuts = [
-	{
-		sequence: isMac ? "⌃ + ⌥ + R" : "Ctrl + Alt + R",
-		label: "Mark status of ticket as Replied",
-	},
-	{
-		sequence: isMac ? "⌃ + ⌥ + E" : "Ctrl + Alt + E",
-		label: "Mark status of ticket as Resolved",
-	},
-	{
-		sequence: isMac ? "⌃ + ⌥ + C" : "Ctrl + Alt + C",
-		label: "Mark status of ticket as Closed",
-	},
-];
 
 const menuOptions = [
 	{
@@ -125,9 +82,7 @@ const profileSettings = [
 	{
 		label: "Shortcuts",
 		icon: "command",
-		handler: () => {
-			showKeyboardShortcuts.value = true;
-		},
+		handler: () => keymapStore.toggleVisibility(true),
 	},
 	{
 		label: "Customer portal",
