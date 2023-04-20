@@ -27,9 +27,6 @@ module.exports = {
 				2.5: "10px",
 				3.5: "14px",
 			},
-			width: {
-				"ticket-sidebar": "310px",
-			},
 			zIndex: {
 				5: "5",
 			},

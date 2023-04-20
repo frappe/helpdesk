@@ -1,117 +1,71 @@
 <template>
-	<div class="flex w-ticket-sidebar flex-col">
-		<div class="border-x border-gray-100">
-			<div class="my-3.5 mx-4">
-				<div class="flex items-center justify-between">
-					<div class="text-lg font-semibold text-gray-900">Ticket details</div>
-					<Button icon="x" appearance="minimal" />
-				</div>
-				<div class="my-3 flex h-18 flex-col justify-between">
-					<div class="flex justify-between">
-						<div class="text-xs text-gray-600">Customer:</div>
-						<div class="flex items-center gap-1">
-							<Avatar
-								image-u-r-l="https://picsum.photos/200"
-								label="foobar"
-								size="sm"
-							/>
-							<div class="text-xs font-medium text-gray-700">Zach Micheal</div>
-						</div>
-					</div>
-					<div class="flex justify-between">
-						<div class="text-xs text-gray-600">First response Due:</div>
-						<div class="text-xs font-medium text-gray-700">
-							March 12, 2:24 PM
-						</div>
-					</div>
-					<div class="flex justify-between">
-						<div class="text-xs text-gray-600">Resolution Due:</div>
-						<div class="text-xs font-medium text-gray-700">
-							April 9, 12:20 PM
-						</div>
-					</div>
-				</div>
+	<div class="flex">
+		<TabGroup vertical>
+			<div class="main-panel">
+				<TabPanels>
+					<TabPanel v-for="item in items" :key="item.name">
+						<component :is="item.component" />
+					</TabPanel>
+				</TabPanels>
 			</div>
-		</div>
-		<div class="divider"></div>
-		<div class="flex h-full flex-col border-x border-gray-100">
-			<div class="mx-4 my-3.5 flex flex-col gap-3 truncate">
-				<div class="flex flex-col gap-1">
-					<div class="text-xs text-gray-600">Assigned To</div>
-					<Autocomplete placeholder="Select an agent" />
-				</div>
-				<div class="flex flex-col gap-1">
-					<div class="text-xs text-gray-600">Ticket Type</div>
-					<Autocomplete placeholder="Select a ticket type" />
-				</div>
-				<div class="flex gap-2">
-					<div class="flex w-1/2 flex-col gap-1">
-						<div class="text-xs text-gray-600">Priority</div>
-						<Autocomplete placeholder="High" />
+			<TabList class="sidebar flex flex-col gap-2 border-l">
+				<Tab v-for="item in items" :key="item.name" v-slot="{ selected }">
+					<div
+						class="flex h-7 w-7 items-center justify-center rounded-lg"
+						:class="{
+							'bg-gray-200': selected,
+							'text-gray-900': selected,
+							'text-gray-600': !selected,
+						}"
+					>
+						<component :is="item.icon" />
 					</div>
-					<div class="flex w-1/2 flex-col gap-1">
-						<div class="text-xs text-gray-600">Status</div>
-						<Autocomplete placeholder="Open" />
-					</div>
-				</div>
-				<div class="flex flex-col gap-1">
-					<div class="text-xs text-gray-600">Team</div>
-					<Autocomplete placeholder="Select a team" />
-				</div>
-			</div>
-			<div class="grow"></div>
-			<div
-				class="mx-4 my-3.5 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-100 px-3 py-2 text-base text-gray-800 hover:bg-gray-200"
-			>
-				Save
-			</div>
-		</div>
+				</Tab>
+			</TabList>
+		</TabGroup>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Autocomplete, Avatar, Button } from "frappe-ui";
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
+import ContactDetails from "./ContactDetails.vue";
+import TicketDetails from "./TicketDetails.vue";
+import TicketHistory from "./TicketHistory.vue";
+import IconActivity from "~icons/espresso/activity";
+import IconAlert from "~icons/espresso/alert-circle";
+import IconDetails from "~icons/espresso/details";
+
+const items = [
+	{
+		name: "Ticket Details",
+		component: TicketDetails,
+		icon: IconDetails,
+	},
+	{
+		name: "Contact Details",
+		component: ContactDetails,
+		icon: IconAlert,
+	},
+	{
+		name: "Ticket History",
+		component: TicketHistory,
+		icon: IconActivity,
+	},
+];
 </script>
 
 <style scoped>
-.divider {
-	border-bottom: 1px solid #e2e2e2;
-	border-style: dashed;
-	position: relative;
+.main-panel {
+	width: 310px;
 }
 
-.divider:before {
-	position: absolute;
-	bottom: -14px;
-	left: 0;
-	height: 28px;
-	width: 14px;
-	background: white;
-	content: "";
-	border-top-right-radius: 9999px;
-	border-bottom-right-radius: 9999px;
-	border-right-width: 1px;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
+.sidebar {
+	width: 50px;
+	padding: 16px 12px 0 10px;
 }
 
-.divider:after {
-	position: absolute;
-	bottom: -14px;
-	left: 0;
-	height: 28px;
-	width: 14px;
-	background: white;
-	content: "";
-	border-top-left-radius: 9999px;
-	border-bottom-left-radius: 9999px;
-	border-left-width: 1px;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-}
-
-.divider:after {
-	right: 0;
-	left: auto;
+.icon {
+	height: 18px;
+	width: 18px;
 }
 </style>
