@@ -1,13 +1,11 @@
 <template>
 	<div class="flex">
 		<TabGroup vertical>
-			<div class="main-panel">
-				<TabPanels>
-					<TabPanel v-for="item in items" :key="item.name">
-						<component :is="item.component" />
-					</TabPanel>
-				</TabPanels>
-			</div>
+			<TabPanels class="main-panel h-full">
+				<TabPanel v-for="item in items" :key="item.name" class="h-full">
+					<component :is="item.component" class="h-full" />
+				</TabPanel>
+			</TabPanels>
 			<TabList class="sidebar flex flex-col gap-2 border-l">
 				<Tab v-for="item in items" :key="item.name" v-slot="{ selected }">
 					<div
