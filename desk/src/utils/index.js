@@ -9,24 +9,6 @@ _dayjs.extend(updateLocale);
 _dayjs.extend(utc);
 _dayjs.extend(timezone);
 
-_dayjs.updateLocale("en", {
-	relativeTime: {
-		future: "%s",
-		past: "%s ago",
-		s: "now",
-		m: "1 minute",
-		mm: "%d minutes",
-		h: "1 hour",
-		hh: "%d hours",
-		d: "1 day",
-		dd: "%d days",
-		M: "1 month",
-		MM: "%d months",
-		y: "1 year",
-		yy: "%d years",
-	},
-});
-
 _dayjs.longFormating = (s) => {
 	if (s === "now" || s === "now ago") {
 		return "just now";

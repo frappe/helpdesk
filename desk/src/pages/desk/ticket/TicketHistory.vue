@@ -16,7 +16,7 @@
 						{{ activity.action }}
 					</div>
 					<Tooltip :text="activity.dateLong">
-						<div class="text-gray-700">
+						<div class="text-gray-700 first-letter:capitalize">
 							{{ activity.dateShort }}
 						</div>
 					</Tooltip>
