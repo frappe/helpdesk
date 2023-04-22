@@ -7,21 +7,23 @@
 			<IconHash />
 			{{ ticket.name }}
 			<IconDot />
-			Last modified on {{ modifiedDay }} at {{ modifiedTime }}
+			Last modified
+			<Tooltip :text="dateLong">
+				{{ dateShort }}
+			</Tooltip>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import dayjs from "dayjs";
+import { computed } from "vue";
+import { Tooltip } from "frappe-ui";
 import { ticket } from "./data";
 import IconHash from "~icons/espresso/hash";
 import IconDot from "~icons/ph/dot-outline-fill";
 
-const modified = computed(() =>
-	dayjs(ticket.value?.modified).tz(dayjs.tz.guess())
-);
-const modifiedDay = computed(() => modified.value.format("D MMMM YYYY"));
-const modifiedTime = computed(() => modified.value.format("h:mm A"));
+const date = computed(() => dayjs(ticket.value?.modified).tz(dayjs.tz.guess()));
+const dateShort = computed(() => date.value.fromNow());
+const dateLong = computed(() => date.value.format("dddd, MMMM D, YYYY h:mm A"));
 </script>
