@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col border-l">
-		<div class="mx-4">
+		<div class="m-4">
 			<div class="flex items-center justify-between">
 				<div class="text-lg font-semibold text-gray-800">Contact details</div>
 				<Button appearance="minimal" icon="x" />
