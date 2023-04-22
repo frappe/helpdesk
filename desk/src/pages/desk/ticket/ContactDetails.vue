@@ -33,27 +33,7 @@
 					<div class="text-gray-900">{{ contact.value }}</div>
 				</div>
 			</div>
-			<div
-				v-if="!isEmpty(customFields)"
-				class="flex flex-col gap-5 border-b py-4"
-			>
-				<div
-					v-for="field in customFields"
-					:key="field.label"
-					class="flex flex-col gap-2.5"
-				>
-					<div class="text-base text-gray-600">{{ field.label }}</div>
-					<a :href="field.route" target="_blank">
-						<div class="flex items-center gap-2">
-							<div class="flex h-5 w-5 items-center justify-center">
-								<IconWebLink v-if="field.route" class="h-5 w-5 text-gray-600" />
-								<IconTeams v-else class="h-5 w-5 text-gray-600" />
-							</div>
-							<div class="text-base text-gray-800">{{ field.value }}</div>
-						</div>
-					</a>
-				</div>
-			</div>
+			<CustomFieldList />
 			<div
 				class="select-none py-4"
 				:class="{
@@ -91,10 +71,10 @@ import { isEmpty } from "lodash";
 import { ref } from "vue";
 import { Avatar, Button } from "frappe-ui";
 import { sidebar } from "./data";
+import CustomFieldList from "./CustomFieldList.vue";
 import IconCall from "~icons/espresso/call";
 import IconEmail from "~icons/espresso/email";
 import IconLocation from "~icons/espresso/location";
-import IconTeams from "~icons/espresso/teams";
 import IconWebLink from "~icons/espresso/web-link";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
@@ -116,18 +96,6 @@ const contacts = [
 		name: "address",
 		value: "4140 Parker Rd. Allentown, New Mexico 31134",
 		icon: IconLocation,
-	},
-];
-
-const customFields = [
-	{
-		label: "Site",
-		value: "example.frappe.cloud",
-		route: "https://example.frappe.cloud",
-	},
-	{
-		label: "Team",
-		value: "Example Team",
 	},
 ];
 

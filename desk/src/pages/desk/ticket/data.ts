@@ -20,6 +20,7 @@ export function init(id: number) {
 
 	ticket__.value = createDocumentResource({
 		doctype: "HD Ticket",
+		fields: ["name", "custom_fields"],
 		name: id,
 		auto: true,
 	});
