@@ -1,10 +1,10 @@
 <template>
-	<div class="border-l">
+	<div class="flex flex-col border-l">
 		<div class="flex items-center justify-between p-4">
 			<div class="text-lg font-semibold text-gray-800">Ticket history</div>
 			<Button appearance="minimal" icon="x" />
 		</div>
-		<div class="h-full overflow-scroll px-4">
+		<div class="overflow-scroll px-4">
 			<ol class="relative border-l border-gray-200 text-base">
 				<li
 					v-for="activity in activities"
