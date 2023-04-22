@@ -23,5 +23,5 @@ const modified = computed(() =>
 	dayjs(ticket.value?.doc?.modified).tz(dayjs.tz.guess())
 );
 const modifiedDay = computed(() => modified.value.format("D MMMM YYYY"));
-const modifiedTime = computed(() => modified.value.format("h:m A"));
+const modifiedTime = computed(() => modified.value.format("h:mm A"));
 </script>
