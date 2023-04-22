@@ -2,7 +2,11 @@
 	<div class="flex flex-col border-l">
 		<div class="flex items-center justify-between p-4">
 			<div class="text-lg font-semibold text-gray-800">Ticket history</div>
-			<Button appearance="minimal" icon="x" />
+			<Button
+				appearance="minimal"
+				icon="x"
+				@click="sidebar.isVisible = false"
+			/>
 		</div>
 		<div class="overflow-scroll px-4">
 			<ol class="relative border-l border-gray-200 text-base">
@@ -30,6 +34,7 @@
 import { computed, ComputedRef } from "vue";
 import { Button, createListResource, Tooltip } from "frappe-ui";
 import dayjs from "dayjs";
+import { sidebar } from "./data";
 import IconDot from "~icons/ph/dot-bold";
 
 class Activity {

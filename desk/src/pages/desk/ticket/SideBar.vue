@@ -1,7 +1,7 @@
 <template>
 	<div class="flex">
 		<TabGroup vertical>
-			<TabPanels class="main-panel h-full">
+			<TabPanels v-if="sidebar.isVisible" class="main-panel h-full">
 				<TabPanel v-for="item in items" :key="item.name" class="h-full">
 					<component :is="item.component" class="h-full" />
 				</TabPanel>
@@ -9,12 +9,12 @@
 			<TabList class="sidebar flex flex-col gap-2 border-l">
 				<Tab v-for="item in items" :key="item.name" v-slot="{ selected }">
 					<div
-						class="flex h-7 w-7 items-center justify-center rounded-lg"
+						class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-600"
 						:class="{
-							'bg-gray-200': selected,
-							'text-gray-900': selected,
-							'text-gray-600': !selected,
+							'bg-gray-200': sidebar.isVisible && selected,
+							'text-gray-900': sidebar.isVisible && selected,
 						}"
+						@click="sidebar.isVisible = true"
 					>
 						<component :is="item.icon" />
 					</div>
@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
+import { sidebar } from "./data";
 import ContactDetails from "./ContactDetails.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";

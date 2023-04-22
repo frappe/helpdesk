@@ -3,7 +3,11 @@
 		<div class="m-4">
 			<div class="flex items-center justify-between">
 				<div class="text-lg font-semibold text-gray-800">Contact details</div>
-				<Button appearance="minimal" icon="x" />
+				<Button
+					appearance="minimal"
+					icon="x"
+					@click="sidebar.isVisible = false"
+				/>
 			</div>
 			<div class="flex items-center gap-3 border-b py-6">
 				<Avatar image-u-r-l="https://picsum.photos/200" size="lg" />
@@ -86,6 +90,7 @@
 import { isEmpty } from "lodash";
 import { ref } from "vue";
 import { Avatar, Button } from "frappe-ui";
+import { sidebar } from "./data";
 import IconCall from "~icons/espresso/call";
 import IconEmail from "~icons/espresso/email";
 import IconLocation from "~icons/espresso/location";

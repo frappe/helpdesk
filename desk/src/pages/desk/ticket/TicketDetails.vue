@@ -4,7 +4,11 @@
 			<div class="m-4">
 				<div class="flex items-center justify-between">
 					<div class="text-lg font-semibold text-gray-900">Ticket details</div>
-					<Button icon="x" appearance="minimal" />
+					<Button
+						appearance="minimal"
+						icon="x"
+						@click="sidebar.isVisible = false"
+					/>
 				</div>
 				<div class="my-6 flex flex-col justify-between gap-3.5">
 					<div class="flex justify-between">
@@ -75,6 +79,7 @@
 
 <script setup lang="ts">
 import { Autocomplete, Avatar, Button } from "frappe-ui";
+import { sidebar } from "./data";
 </script>
 
 <style scoped>
