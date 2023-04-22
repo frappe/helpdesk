@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col">
+	<div v-if="isResLoaded" class="flex flex-col">
 		<TopBar />
 		<div class="flex overflow-hidden">
 			<div class="flex grow flex-col">
@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { init } from "./data";
 import CommunicationList from "./CommunicationList.vue";
 import ResponseEditor from "./ResponseEditor.vue";
@@ -25,6 +26,7 @@ const props = defineProps({
 		required: true,
 	},
 });
+const isResLoaded = ref(false);
 
-init(parseInt(props.ticketId));
+init(parseInt(props.ticketId)).then(() => (isResLoaded.value = true));
 </script>
