@@ -8,6 +8,7 @@ export const VERIFY = "Verify Account";
 export const AGENT_PORTAL_LANDING = "DeskTickets";
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
 export const AUTH_BYPASS_ROUTES = [LOGIN, SIGNUP, VERIFY];
+export const AGENT_PORTAL_TICKET = "DeskTicket";
 
 const routes = [
 	{
@@ -130,7 +131,7 @@ const routes = [
 			},
 			{
 				path: "tickets/:ticketId",
-				name: "DeskTicket",
+				name: AGENT_PORTAL_TICKET,
 				component: () => import("@/pages/desk/ticket/TicketNeo.vue"),
 				props: true,
 				meta: {

@@ -1,5 +1,6 @@
 <template>
 	<div
+		v-if="!isEmpty(tickets)"
 		class="select-none py-4"
 		:class="{
 			'border-b': !isExpanded,
@@ -14,45 +15,59 @@
 			<IconCaretDown v-else class="h-4 w-4 text-gray-600" />
 		</div>
 		<div v-if="isExpanded" class="flex flex-col gap-2 pt-4">
-			<div v-for="field in tickets" :key="field.name">
-				<a :href="field.url" target="_blank" class="flex items-start gap-2">
+			<div v-for="ticket in tickets" :key="ticket.name">
+				<router-link
+					:to="ticket.to"
+					target="_blank"
+					class="flex items-start gap-2"
+				>
 					<div class="flex h-5 w-5 items-center justify-center">
 						<IconWebLink class="h-5 w-5 text-gray-600" />
 					</div>
-					<div class="text-base text-gray-800">{{ field.title }}</div>
-				</a>
+					<div class="text-base text-gray-800">{{ ticket.subject }}</div>
+				</router-link>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { isEmpty } from "lodash";
+import { computed, ref } from "vue";
+import { createListResource } from "frappe-ui";
+import { AGENT_PORTAL_TICKET } from "@/router";
+import { contactId, ticketId } from "./data";
 import IconWebLink from "~icons/espresso/web-link";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
 
+class Ticket {
+	constructor(public name: number, public subject: string) {}
+
+	get to() {
+		return {
+			name: AGENT_PORTAL_TICKET,
+			params: {
+				ticketId: this.name,
+			},
+		};
+	}
+}
+
 const isExpanded = ref(false);
-const tickets = [
-	{
-		name: 1,
-		title: "Ticket #1",
-		url: "https://example.frappe.cloud/",
+
+const t = createListResource({
+	doctype: "HD Ticket",
+	fields: ["name", "subject"],
+	filters: {
+		name: ["!=", ticketId.value],
+		contact: contactId,
 	},
-	{
-		name: 2,
-		title: "Ticket #2",
-		url: "https://example.frappe.cloud/",
-	},
-	{
-		name: 3,
-		title: "Ticket #3",
-		url: "https://example.frappe.cloud/",
-	},
-	{
-		name: 4,
-		title: "A long ticket name that might be multiple lines long",
-		url: "https://example.frappe.cloud/",
-	},
-];
+	orderBy: "modified desc",
+	auto: true,
+});
+
+const tickets = computed(
+	() => t.data?.map((t: Ticket) => new Ticket(t.name, t.subject)) || []
+);
 </script>
