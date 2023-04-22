@@ -46,7 +46,7 @@ class Activity {
 
 	get dateLong() {
 		// https://day.js.org/docs/en/display/format
-		return this.dayjsInstance.format("dddd, MMM D, YYYY h:mm A");
+		return this.dayjsInstance.format("dddd, MMMM D, YYYY h:mm A");
 	}
 
 	get dateShort() {
