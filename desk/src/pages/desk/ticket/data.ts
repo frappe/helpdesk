@@ -1,8 +1,8 @@
 import { computed, ref, Ref, reactive } from "vue";
 import { createDocumentResource } from "frappe-ui";
 
-export const ticket = ref(null);
-export const contactId = computed(() => ticket.value?.contact);
+export let ticket = null;
+export const contactId = computed(() => ticket?.doc?.contact);
 export const ticketId: Ref<number> = ref(null);
 
 export const sidebar = reactive({
@@ -17,10 +17,16 @@ export const sidebar = reactive({
 export async function init(id: number) {
 	ticketId.value = id;
 
-	ticket.value = await createDocumentResource({
+	ticket = createDocumentResource({
 		doctype: "HD Ticket",
 		fields: ["name", "custom_fields"],
 		name: id,
 		auto: true,
-	}).get.promise;
+		whitelistedMethods: {
+			getComments: "get_comments",
+			getCommunications: "get_communications",
+		},
+	});
+
+	await ticket.get.promise;
 }

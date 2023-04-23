@@ -543,6 +543,75 @@ class HDTicket(Document):
 
 		return res
 
+	@frappe.whitelist()
+	def get_communications(self):
+		conversations = frappe.db.get_all(
+			"Communication",
+			filters={
+				"reference_doctype": ["=", "HD Ticket"],
+				"reference_name": ["=", self.name],
+			},
+			order_by="creation asc",
+			fields=[
+				"name",
+				"content",
+				"creation",
+				"sent_or_received",
+				"sender",
+				"cc",
+				"bcc",
+			],
+		)
+
+		for conversation in conversations:
+			if frappe.db.exists("HD Agent", conversation.sender):
+				# user User details instead of Contact if the sender is an agent
+				sender = frappe.get_doc("User", conversation.sender).__dict__
+				sender["image"] = sender["user_image"]
+			else:
+				contacts = frappe.get_all(
+					"Contact Email",
+					filters=[["email_id", "like", "%{0}".format(conversation.sender)]],
+					fields=["parent"],
+					limit=1,
+				)
+				if len(contacts) > 0:
+					sender = frappe.get_doc("Contact", contacts[0].parent)
+				else:
+					sender = frappe.get_last_doc(
+						"User", filters={"email": conversation.sender}
+					)
+
+			conversation.sender = sender
+
+			attachments = frappe.get_all(
+				"File",
+				["file_name", "file_url"],
+				{
+					"attached_to_name": conversation.name,
+					"attached_to_doctype": "Communication",
+				},
+			)
+
+			conversation.attachments = attachments
+
+		return conversations
+
+	@frappe.whitelist()
+	def get_comments(self):
+		filters = {
+			"reference_ticket": self.name,
+		}
+		fields = ["name", "commented_by", "content", "creation"]
+
+		l = frappe.get_list("HD Ticket Comment", filters=filters, fields=fields)
+		print(l)
+
+		for i in l:
+			i["sender"] = frappe.get_doc("User", i.commented_by)
+
+		return l
+
 
 def set_descritption_from_communication(doc, type):
 	if doc.reference_doctype == "HD Ticket":

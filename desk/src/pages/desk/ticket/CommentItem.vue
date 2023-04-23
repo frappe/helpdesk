@@ -1,45 +1,95 @@
 <template>
-	<div class="flex my-2 rounded-lg bg-gray-50 py-2.5 px-2">
+	<div class="my-2 flex rounded-lg bg-gray-50 py-2.5 px-2">
 		<div class="ml-2 mr-3">
-			<Avatar image-u-r-l="https://picsum.photos/200" size="md" />
+			<Avatar :image-u-r-l="sender.user_image" size="md" />
 		</div>
-		<div class="flex flex-col gap-1">
+		<div class="flex w-full flex-col gap-1">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center">
-					<div class="text-base text-gray-900">Abhay Mukherjee</div>
+					<div class="text-base text-gray-900">{{ sender.full_name }}</div>
 					<IconDot class="text-gray-600" />
-					<div class="text-sm text-gray-600">2:41 PM</div>
+					<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
 				</div>
-				<Dropdown v-bind="dropdownOptions" />
+				<Dropdown
+					v-if="!isEmpty(dropdownOptions.options)"
+					v-bind="dropdownOptions"
+				/>
 			</div>
 			<div class="text-base text-gray-700">
-				Hi, The monthly statistics for February 2023 have been compiled and
-				analysed. These statistics cover a range of areas, including sales
-				figures, customer demographics, and market trends. Additionally, the
-				customer demographics have been analysed to identify potential areas for
-				growth and improvement.
-				<br />
-				<br />
-				Thanks, Zach Micheal
+				<!-- This is vulnerable to attacks. Prefer markdown wherever possible. -->
+				<!-- eslint-disable-next-line vue/no-v-html -->
+				<span v-html="content"></span>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Avatar, Dropdown } from "frappe-ui";
+import { PropType, reactive, toRefs } from "vue";
+import { Avatar, createResource, Dropdown } from "frappe-ui";
+import { isEmpty } from "lodash";
+import dayjs from "dayjs";
+import { useAuthStore } from "@/stores/auth";
+import { createToast } from "@/utils/toasts";
 import IconDot from "~icons/ph/dot-outline-fill";
 
-const dropdownOptions = {
+type Sender = {
+	name: string;
+	full_name: string;
+	user_image: string;
+};
+
+const props = defineProps({
+	content: {
+		type: String,
+		required: true,
+	},
+	date: {
+		type: String,
+		required: true,
+	},
+	name: {
+		type: String,
+		required: true,
+	},
+	sender: {
+		type: Object as PropType<Sender>,
+		required: true,
+	},
+});
+const { content, date, name, sender } = toRefs(props);
+const authStore = useAuthStore();
+const dateDisplay = dayjs(date.value).format("h:mm A");
+const dropdownOptions = reactive({
 	button: {
 		appearance: "minimal",
 		icon: "more-horizontal",
 	},
-	options: [
-		{
-			label: "Delete",
-			handler: () => console.log("foobar"),
+	options: [],
+});
+
+function deleteComment() {
+	createResource({
+		url: "frappe.client.delete",
+		params: {
+			doctype: "HD Ticket Comment",
+			name: name.value,
 		},
-	],
-};
+		auto: true,
+		onSuccess() {
+			createToast({
+				title: "Comment deleted",
+				icon: "check",
+				iconClasses: "text-green-500",
+			});
+		},
+	});
+}
+
+if (sender.value.name === authStore.userId) {
+	dropdownOptions.options.push({
+		label: "Delete",
+		handler: () => deleteComment(),
+	});
+}
 </script>
