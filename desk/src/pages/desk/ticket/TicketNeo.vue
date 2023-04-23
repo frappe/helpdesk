@@ -1,7 +1,7 @@
 <template>
 	<div v-if="isResLoaded" class="flex flex-col">
 		<TopBar />
-		<div class="flex overflow-hidden">
+		<div class="flex grow overflow-hidden">
 			<div class="flex grow flex-col">
 				<CommunicationList />
 				<div class="grow"></div>
