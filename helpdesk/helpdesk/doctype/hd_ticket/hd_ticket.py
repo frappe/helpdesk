@@ -278,6 +278,7 @@ class HDTicket(Document):
 		self.db_set("resolution_time", None)
 		self.db_set("user_resolution_time", None)
 
+	@frappe.whitelist()
 	def assign_agent(self, agent):
 		if self._assign:
 			assignees = json.loads(self._assign)
@@ -536,7 +537,7 @@ class HDTicket(Document):
 
 		res = (
 			frappe.qb.from_(QBUser)
-			.select(QBUser.full_name, QBUser.user_image)
+			.select(QBUser.name, QBUser.full_name, QBUser.user_image)
 			.where(Case.any(condition))
 			.run(as_dict=True)
 		)

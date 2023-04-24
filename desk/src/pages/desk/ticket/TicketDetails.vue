@@ -46,30 +46,56 @@
 		>
 			<div class="flex flex-col gap-1">
 				<div class="text-xs text-gray-600">Assigned To</div>
-				<Autocomplete placeholder="Select an agent" />
+				<Autocomplete
+					placeholder="Select an agent"
+					:options="agentStore.dropdown"
+					:value="changeAssignedTo || assignedTo"
+					@change="changeAssignedTo = $event"
+				/>
 			</div>
 			<div class="flex flex-col gap-1">
 				<div class="text-xs text-gray-600">Ticket Type</div>
-				<Autocomplete placeholder="Select a ticket type" />
+				<Autocomplete
+					v-model="ticket.doc.ticket_type"
+					placeholder="Select a ticket type"
+					:options="ticketTypeStore.dropdown"
+					@update:modelValue="() => changedKeys.add('ticket_type')"
+				/>
 			</div>
 			<div class="flex gap-2">
 				<div class="flex w-1/2 flex-col gap-1">
 					<div class="text-xs text-gray-600">Priority</div>
-					<Autocomplete placeholder="High" />
+					<Autocomplete
+						v-model="ticket.doc.priority"
+						placeholder="High"
+						:options="ticketPriorityStore.dropdown"
+						@update:modelValue="() => changedKeys.add('priority')"
+					/>
 				</div>
 				<div class="flex w-1/2 flex-col gap-1">
 					<div class="text-xs text-gray-600">Status</div>
-					<Autocomplete placeholder="Open" />
+					<Autocomplete
+						v-model="ticket.doc.status"
+						placeholder="Open"
+						:options="ticketStatusStore.dropdown"
+						@update:modelValue="() => changedKeys.add('status')"
+					/>
 				</div>
 			</div>
 			<div class="flex flex-col gap-1">
 				<div class="text-xs text-gray-600">Team</div>
-				<Autocomplete placeholder="Select a team" />
+				<Autocomplete
+					v-model="ticket.doc.agent_group"
+					placeholder="Select a team"
+					:options="teamStore.dropdown"
+					@update:modelValue="() => changedKeys.add('agent_group')"
+				/>
 			</div>
 		</div>
 		<div class="border-l">
 			<div
 				class="mx-4 my-3.5 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-100 px-3 py-2 hover:bg-gray-200"
+				@click="save"
 			>
 				<div class="text-base text-gray-800">Save</div>
 			</div>
@@ -78,8 +104,71 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref, Ref } from "vue";
 import { Autocomplete, Avatar, Button } from "frappe-ui";
-import { sidebar } from "./data";
+import { useAgentStore } from "@/stores/agent";
+import { useTeamStore } from "@/stores/team";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useTicketTypeStore } from "@/stores/ticketType";
+import { createToast } from "@/utils/toasts";
+import { sidebar, ticket } from "./data";
+
+const agentStore = useAgentStore();
+const teamStore = useTeamStore();
+const ticketPriorityStore = useTicketPriorityStore();
+const ticketStatusStore = useTicketStatusStore();
+const ticketTypeStore = useTicketTypeStore();
+
+/**
+Fetch assignee info. This is expected to be a list of assigned users, even though we want
+only one. This could be considered future proofing.
+*/
+ticket.getAssignees.fetch();
+
+/**
+Last assignee from the list, where expected list length is just one. Transformed into an
+object to be used with `Autocomplete`
+*/
+const assignedTo = computed(() => {
+	const assigned = ticket.getAssignees.data?.message?.pop();
+	return agentStore.dropdown.find((agent) => agent.value === assigned?.name);
+});
+
+const changeAssignedTo: Ref = ref(null);
+
+/** 
+This is used to keep track of changed keys. This is needed because updates are not
+committed until save is called, unlike auto-update
+*/
+const changedKeys: Set<string> = new Set();
+
+async function save() {
+	const a = Array.from(changedKeys);
+
+	/**
+	Get an object with only changed keys and their values. The loop starts as an
+	empty object, and adds keys and values into it
+	*/
+	const r = a.reduce((previous, current) => {
+		previous[current] = ticket.doc[current].value;
+		return previous;
+	}, {});
+
+	await ticket.setValue.submit(r);
+
+	if (changeAssignedTo.value) {
+		await ticket.assign.submit({
+			agent: changeAssignedTo.value.value,
+		});
+	}
+
+	createToast({
+		title: "Saved",
+		icon: "check",
+		iconClasses: "text-green-600",
+	});
+}
 </script>
 
 <style scoped>

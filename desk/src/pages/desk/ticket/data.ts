@@ -33,6 +33,8 @@ export async function init(id: number) {
 		name: id,
 		auto: true,
 		whitelistedMethods: {
+			assign: "assign_agent",
+			getAssignees: "get_assignees",
 			getComments: "get_comments",
 			getCommunications: "get_communications",
 			getLastCommunication: {
