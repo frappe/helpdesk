@@ -335,7 +335,7 @@ class HDTicket(Document):
 		return bool(int(check))
 
 	@frappe.whitelist()
-	def last_communication(self):
+	def get_last_communication(self):
 		filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", self.name]}
 
 		try:
@@ -349,7 +349,7 @@ class HDTicket(Document):
 			pass
 
 	def last_communication_email(self):
-		if not (communication := self.last_communication()):
+		if not (communication := self.get_last_communication()):
 			return
 
 		if not communication.email_account:
@@ -397,11 +397,11 @@ class HDTicket(Document):
 		sender = frappe.session.user
 		recipients = self.raised_by
 		sender_email = None if skip_email_workflow else self.sender_email()
-		last_communication = self.last_communication()
+		last_communication = self.get_last_communication()
 
 		if last_communication:
-			bcc = last_communication.bcc or bcc
-			cc = last_communication.cc or cc
+			cc = cc or last_communication.cc
+			bcc = bcc or last_communication.bcc
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
@@ -460,7 +460,7 @@ class HDTicket(Document):
 
 		try:
 			frappe.sendmail(
-				args=args,
+				# args=args,
 				attachments=_attachments,
 				bcc=bcc,
 				cc=cc,
@@ -475,7 +475,7 @@ class HDTicket(Document):
 				reply_to=reply_to_email,
 				sender=reply_to_email,
 				subject=subject,
-				template=template,
+				# template=template,
 				with_container=True,
 			)
 		except Exception as e:

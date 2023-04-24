@@ -75,7 +75,7 @@
 			<div class="flex items-center gap-4">
 				<IconDelete
 					class="h-5 w-5 cursor-pointer text-gray-900"
-					@click.prevent="close"
+					@click.prevent="responseEditor.isExpanded = false"
 				/>
 				<div class="flex">
 					<Button
@@ -122,28 +122,24 @@ const showCannedResponsesDialog = ref(false);
 const isTextFormattingVisible = ref(false);
 const dropdownOptions = [
 	{
+		label: "Reply",
+		handler: () => newCommunication(),
+	},
+	{
 		label: "Comment",
 		handler: () => newComment(),
 	},
 ];
 
-function close() {
-	responseEditor.content = "";
-	responseEditor.isExpanded = false;
-}
-
 const insertRes = createResource({
 	url: "frappe.client.insert",
-	onSuccess() {
-		close();
-	},
 });
 
 function newCommunication() {
 	ticket.replyViaAgent.submit({
 		attachments: responseEditor.attachments.map((x) => x.name),
-		// bcc: this.bccList.join(","),
-		// cc: this.ccList.join(","),
+		cc: responseEditor.cc.join(","),
+		bcc: responseEditor.bcc.join(","),
 		message: responseEditor.content,
 	});
 }

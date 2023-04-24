@@ -22,7 +22,7 @@
 					@change="(v) => (responseEditor.content = v)"
 				>
 					<template #top>
-						<!-- <TopSection /> -->
+						<TopSection />
 					</template>
 					<template #editor="{ editor }">
 						<TextEditorContent :editor="editor" />

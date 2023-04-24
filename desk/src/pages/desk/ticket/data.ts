@@ -13,6 +13,10 @@ export const responseEditor = reactive({
 	isExpanded: true,
 	content: "",
 	attachments: [],
+	cc: [],
+	bcc: [],
+	isCcVisible: false,
+	isBccVisible: false,
 });
 
 /**
@@ -31,6 +35,19 @@ export async function init(id: number) {
 		whitelistedMethods: {
 			getComments: "get_comments",
 			getCommunications: "get_communications",
+			getLastCommunication: {
+				method: "get_last_communication",
+				auto: true,
+				onSuccess(data: { cc: string; bcc: string }) {
+					data?.cc
+						?.split(",")
+						.forEach((recipent) => responseEditor.cc.push(recipent));
+
+					data?.bcc
+						?.split(",")
+						.forEach((recipent) => responseEditor.bcc.push(recipent));
+				},
+			},
 			replyViaAgent: {
 				method: "reply_via_agent",
 				onSuccess() {
@@ -42,4 +59,16 @@ export async function init(id: number) {
 	});
 
 	await ticket.get.promise;
+}
+
+export function clean() {
+	sidebar.isVisible = true;
+
+	responseEditor.isExpanded = false;
+	responseEditor.content = "";
+	responseEditor.attachments = [];
+	responseEditor.cc = [];
+	responseEditor.bcc = [];
+	responseEditor.isCcVisible = false;
+	responseEditor.isBccVisible = false;
 }

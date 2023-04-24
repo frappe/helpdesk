@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { init } from "./data";
+import { ref, onUnmounted } from "vue";
+import { init, clean } from "./data";
 import CommunicationList from "./CommunicationList.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
@@ -29,4 +29,5 @@ const props = defineProps({
 const isResLoaded = ref(false);
 
 init(parseInt(props.ticketId)).then(() => (isResLoaded.value = true));
+onUnmounted(() => clean());
 </script>
