@@ -1,6 +1,6 @@
 <template>
 	<div class="content mx-auto">
-		<div class="my-3.5 ml-2 flex items-start gap-2 pl-2">
+		<div class="my-3.5 flex items-start gap-2.5">
 			<Avatar
 				:image-u-r-l="authStore.userImage"
 				:label="authStore.userName"
