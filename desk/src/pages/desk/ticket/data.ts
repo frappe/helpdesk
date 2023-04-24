@@ -9,7 +9,7 @@ export const sidebar = reactive({
 	isVisible: true,
 });
 
-export const responseEditor = reactive({
+export const editor = reactive({
 	isExpanded: true,
 	content: "",
 	attachments: [],
@@ -39,13 +39,11 @@ export async function init(id: number) {
 				method: "get_last_communication",
 				auto: true,
 				onSuccess(data: { cc: string; bcc: string }) {
-					data?.cc
-						?.split(",")
-						.forEach((recipent) => responseEditor.cc.push(recipent));
+					data?.cc?.split(",").forEach((recipent) => editor.cc.push(recipent));
 
 					data?.bcc
 						?.split(",")
-						.forEach((recipent) => responseEditor.bcc.push(recipent));
+						.forEach((recipent) => editor.bcc.push(recipent));
 				},
 			},
 			replyViaAgent: {
@@ -61,11 +59,11 @@ export async function init(id: number) {
 }
 
 export function clean() {
-	responseEditor.isExpanded = false;
-	responseEditor.content = "";
-	responseEditor.attachments = [];
-	responseEditor.cc = [];
-	responseEditor.bcc = [];
-	responseEditor.isCcVisible = false;
-	responseEditor.isBccVisible = false;
+	editor.isExpanded = false;
+	editor.content = "";
+	editor.attachments = [];
+	editor.cc = [];
+	editor.bcc = [];
+	editor.isCcVisible = false;
+	editor.isBccVisible = false;
 }

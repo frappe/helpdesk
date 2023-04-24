@@ -2,7 +2,7 @@
 	<div class="flex flex-col divide-y rounded-b-xl">
 		<div class="ml-2 flex flex-wrap gap-2 py-2">
 			<div
-				v-for="attachment in responseEditor.attachments"
+				v-for="attachment in editor.attachments"
 				:key="attachment"
 				class="flex items-center gap-1 rounded border border-gray-400 bg-gray-100 p-1 shadow"
 			>
@@ -16,7 +16,7 @@
 					class="h-4 w-4"
 					icon="x"
 					@click="
-						responseEditor.attachments = responseEditor.attachments.filter(
+						editor.attachments = editor.attachments.filter(
 							(x) => x.name != attachment.name
 						)
 					"
@@ -37,9 +37,7 @@
 					role="button"
 					@click="isTextFormattingVisible = !isTextFormattingVisible"
 				/>
-				<FileUploader
-					@success="(file) => responseEditor.attachments.push(file)"
-				>
+				<FileUploader @success="(file) => editor.attachments.push(file)">
 					<template #default="{ uploading, openFileSelector }">
 						<FeatherIcon
 							name="paperclip"
@@ -75,7 +73,7 @@
 			<div class="flex items-center gap-4">
 				<IconDelete
 					class="h-5 w-5 cursor-pointer text-gray-900"
-					@click.prevent="responseEditor.isExpanded = false"
+					@click.prevent="editor.isExpanded = false"
 				/>
 				<div class="flex">
 					<Button
@@ -109,7 +107,7 @@ import {
 	TextEditorFixedMenu,
 } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
-import { responseEditor, ticket, clean } from "../data";
+import { editor, ticket, clean } from "../data";
 import { TextEditorMenuButtons as menuButtons } from "../../consts";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
@@ -140,10 +138,10 @@ const insertRes = createResource({
 
 function newCommunication() {
 	ticket.replyViaAgent.submit({
-		attachments: responseEditor.attachments.map((x) => x.name),
-		cc: responseEditor.cc.join(","),
-		bcc: responseEditor.bcc.join(","),
-		message: responseEditor.content,
+		attachments: editor.attachments.map((x) => x.name),
+		cc: editor.cc.join(","),
+		bcc: editor.bcc.join(","),
+		message: editor.content,
 	});
 }
 
@@ -152,7 +150,7 @@ function newComment() {
 		doc: {
 			doctype: "HD Ticket Comment",
 			reference_ticket: ticket.doc.name,
-			content: responseEditor.content,
+			content: editor.content,
 			commented_by: authStore.userId,
 		},
 	});

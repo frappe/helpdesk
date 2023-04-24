@@ -7,19 +7,19 @@
 				size="md"
 			/>
 			<div
-				v-if="!responseEditor.isExpanded"
+				v-if="!editor.isExpanded"
 				class="flex h-8 w-full cursor-pointer select-none items-center rounded-lg border border-gray-300 px-2.5 text-base text-gray-500"
-				@click="responseEditor.isExpanded = true"
+				@click="editor.isExpanded = true"
 			>
 				{{ placeholder }}
 			</div>
-			<div v-if="responseEditor.isExpanded" class="editor-shadow grow">
+			<div v-if="editor.isExpanded" class="editor-shadow grow">
 				<TextEditor
 					editor-class="prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
 					:mentions="mentions"
 					:placeholder="placeholder"
-					:content="responseEditor.content"
-					@change="(v) => (responseEditor.content = v)"
+					:content="editor.content"
+					@change="(v) => (editor.content = v)"
 				>
 					<template #top>
 						<TopSection />
@@ -41,7 +41,7 @@ import { computed, onUnmounted } from "vue";
 import { Avatar, TextEditor, TextEditorContent } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useAgentStore } from "@/stores/agent";
-import { responseEditor } from "../data";
+import { editor } from "../data";
 import BottomSection from "./BottomSection.vue";
 import TopSection from "./TopSection.vue";
 
@@ -55,7 +55,7 @@ const mentions = computed(() =>
 	}))
 );
 
-onUnmounted(() => (responseEditor.isExpanded = false));
+onUnmounted(() => (editor.isExpanded = false));
 </script>
 
 <style scoped>
