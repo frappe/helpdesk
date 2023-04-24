@@ -16,7 +16,7 @@
 import { ref } from "vue";
 import { init } from "./data";
 import CommunicationList from "./CommunicationList.vue";
-import ResponseEditor from "./ResponseEditor.vue";
+import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
 

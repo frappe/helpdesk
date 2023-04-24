@@ -1,5 +1,5 @@
 <template>
-	<div class="my-2 flex rounded-lg bg-gray-50 py-2.5 px-2">
+	<div class="group my-2 flex rounded-lg bg-gray-50 py-2.5 px-2">
 		<div class="ml-2 mr-3">
 			<Avatar :image-u-r-l="sender.user_image" size="md" />
 		</div>
@@ -13,6 +13,7 @@
 				<Dropdown
 					v-if="!isEmpty(dropdownOptions.options)"
 					v-bind="dropdownOptions"
+					class="opacity-0 group-hover:opacity-100"
 				/>
 			</div>
 			<div class="text-base text-gray-700">

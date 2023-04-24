@@ -10,6 +10,7 @@
 					:sender-image="c.sender.image"
 					:cc="c.cc"
 					:bcc="c.bcc"
+					:attachments="c.attachments"
 				/>
 				<CommentItem
 					v-else
@@ -63,6 +64,9 @@ function execOnSocketEvent(data: SocketData, callback: () => void) {
 	if (parseInt(data.ticket_id) === ticketId.value) callback();
 }
 
+socket.on("helpdesk:new-communication", (data: SocketData) =>
+	execOnSocketEvent(data, ticket.getCommunications.reload)
+);
 socket.on("helpdesk:new-ticket-comment", (data: SocketData) =>
 	execOnSocketEvent(data, ticket.getComments.reload)
 );

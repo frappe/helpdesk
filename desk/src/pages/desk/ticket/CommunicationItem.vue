@@ -1,5 +1,5 @@
 <template>
-	<div class="my-2 flex rounded-lg py-2.5 px-2">
+	<div class="group my-2 flex rounded-lg py-2.5 px-2">
 		<div class="ml-2 mr-3">
 			<Avatar :image-u-r-l="senderImage" size="md" />
 		</div>
@@ -11,7 +11,10 @@
 						<IconDot class="text-gray-600" />
 						<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
 					</div>
-					<Dropdown v-bind="dropdownOptions" />
+					<Dropdown
+						v-bind="dropdownOptions"
+						class="opacity-0 group-hover:opacity-100"
+					/>
 				</div>
 				<div v-if="cc || bcc" class="mb-2">
 					<div v-if="cc" class="flex gap-1">
@@ -29,15 +32,38 @@
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<span v-html="content"></span>
 			</div>
+			<div class="flex flex-wrap gap-2 py-2">
+				<div
+					v-for="attachment in attachments"
+					:key="attachment.file_url"
+					class="flex items-center gap-1 rounded border border-gray-400 bg-gray-100 p-1 shadow"
+				>
+					<div class="flex flex-row items-center space-x-1">
+						<FeatherIcon name="file-text" class="h-4 w-4 text-gray-700" />
+						<a
+							:href="attachment.file_url"
+							target="_blank"
+							class="text-sm text-gray-700"
+						>
+							{{ attachment.file_name }}
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from "vue";
+import { toRefs } from "vue";
 import dayjs from "dayjs";
-import { Avatar, Dropdown } from "frappe-ui";
+import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
 import IconDot from "~icons/ph/dot-outline-fill";
+
+type Attachment = {
+	file_name: string;
+	file_url: string;
+};
 
 const props = defineProps({
 	content: {
@@ -66,6 +92,11 @@ const props = defineProps({
 		type: String,
 		required: false,
 		default: "",
+	},
+	attachments: {
+		type: Array<Attachment>,
+		required: false,
+		default: [],
 	},
 });
 
