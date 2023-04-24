@@ -36,7 +36,7 @@ import { isEmpty } from "lodash";
 import { computed, ref } from "vue";
 import { createListResource } from "frappe-ui";
 import { AGENT_PORTAL_TICKET } from "@/router";
-import { contactId, ticketId } from "./data";
+import { ticket } from "./data";
 import IconWebLink from "~icons/espresso/web-link";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
@@ -60,8 +60,8 @@ const t = createListResource({
 	doctype: "HD Ticket",
 	fields: ["name", "subject"],
 	filters: {
-		name: ["!=", ticketId.value],
-		contact: contactId,
+		name: ["!=", ticket.doc.name],
+		contact: ticket.doc.contact,
 	},
 	orderBy: "modified desc",
 	auto: true,

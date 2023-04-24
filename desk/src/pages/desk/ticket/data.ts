@@ -1,9 +1,7 @@
-import { computed, ref, Ref, reactive } from "vue";
+import { reactive } from "vue";
 import { createDocumentResource } from "frappe-ui";
 
 export let ticket = null;
-export const contactId = computed(() => ticket?.doc?.contact);
-export const ticketId: Ref<number> = ref(null);
 
 export const sidebar = reactive({
 	isVisible: true,
@@ -25,8 +23,6 @@ export const editor = reactive({
  * components.
  */
 export async function init(id: number) {
-	ticketId.value = id;
-
 	ticket = createDocumentResource({
 		doctype: "HD Ticket",
 		fields: ["name", "custom_fields"],

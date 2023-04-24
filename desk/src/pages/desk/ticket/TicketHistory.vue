@@ -34,7 +34,7 @@
 import { computed, ComputedRef } from "vue";
 import { Button, createListResource, Tooltip } from "frappe-ui";
 import dayjs from "dayjs";
-import { sidebar, ticketId } from "./data";
+import { sidebar, ticket } from "./data";
 import IconDot from "~icons/ph/dot-bold";
 
 class Activity {
@@ -63,7 +63,7 @@ const r = createListResource({
 	doctype: "HD Ticket Activity",
 	fields: ["name", "creation", "action", "owner"],
 	filters: {
-		ticket: ticketId,
+		ticket: ticket.doc.name,
 	},
 	orderBy: "creation desc",
 	auto: true,

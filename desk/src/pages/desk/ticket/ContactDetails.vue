@@ -15,11 +15,13 @@
 					:label="c.doc?.full_name"
 					size="lg"
 				/>
-				<div class="flex flex-col gap-1.5">
+				<div class="flex flex-col">
 					<div class="text-lg font-semibold text-gray-800">
-						{{ c?.doc?.full_name }}
+						{{ c.doc?.full_name }}
 					</div>
-					<div class="text-base text-gray-600">Sanfransico, CA</div>
+					<div class="text-base text-gray-600">
+						{{ c.doc?.company_name }}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -49,14 +51,14 @@
 import { isEmpty } from "lodash";
 import { computed } from "vue";
 import { Avatar, Button, createDocumentResource } from "frappe-ui";
-import { sidebar, contactId } from "./data";
+import { sidebar, ticket } from "./data";
 import CustomFieldList from "./CustomFieldList.vue";
 import OpenTicketList from "./OpenTicketList.vue";
 import IconEmail from "~icons/espresso/email";
 
 const c = createDocumentResource({
 	doctype: "Contact",
-	name: contactId.value,
+	name: ticket.doc.contact,
 	auto: true,
 });
 
