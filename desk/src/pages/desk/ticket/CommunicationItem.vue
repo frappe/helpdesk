@@ -16,15 +16,11 @@
 						class="opacity-0 group-hover:opacity-100"
 					/>
 				</div>
-				<div v-if="cc || bcc" class="mb-2">
-					<div v-if="cc" class="flex gap-1">
-						<div class="text-base text-gray-800">Cc:</div>
-						<div class="text-base text-gray-700">{{ cc }}</div>
-					</div>
-					<div v-if="bcc" class="flex gap-1">
-						<div class="text-base text-gray-800">Bcc:</div>
-						<div class="text-base text-gray-700">{{ bcc }}</div>
-					</div>
+				<div v-if="cc || bcc" class="mb-2.5 flex gap-1 text-xs text-gray-600">
+					<div class="font-medium">cc:</div>
+					{{ cc }},
+					<div class="font-medium">bcc:</div>
+					{{ bcc }}
 				</div>
 			</div>
 			<div class="text-base text-gray-700">
@@ -59,7 +55,7 @@ import { toRefs } from "vue";
 import dayjs from "dayjs";
 import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
 import { responseEditor } from "./data";
-import IconDot from "~icons/ph/dot-outline-fill";
+import IconDot from "~icons/ph/dot-bold";
 
 type Attachment = {
 	file_name: string;
