@@ -1,22 +1,29 @@
 <template>
-	<div class="group my-2 flex rounded-lg bg-gray-50 py-2.5 px-2">
-		<div class="ml-2 mr-3">
-			<Avatar :image-u-r-l="sender.user_image" size="md" />
+	<div class="group flex gap-3">
+		<div class="flex w-8 justify-end">
+			<Avatar
+				:image-u-r-l="sender.user_image"
+				:label="sender.full_name"
+				size="sm"
+			/>
 		</div>
-		<div class="flex w-full flex-col gap-1">
-			<div class="flex items-center justify-between">
+		<div class="flex w-full flex-col gap-1.5">
+			<div class="flex items-start justify-between">
 				<div class="flex items-center">
 					<div class="text-base text-gray-900">{{ sender.full_name }}</div>
 					<IconDot class="text-gray-600" />
 					<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
 				</div>
-				<Dropdown
-					v-if="!isEmpty(dropdownOptions.options)"
-					v-bind="dropdownOptions"
-					class="opacity-0 group-hover:opacity-100"
-				/>
+				<Dropdown v-if="!isEmpty(options)" :options="options">
+					<template #default>
+						<FeatherIcon
+							name="more-horizontal"
+							class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
+						/>
+					</template>
+				</Dropdown>
 			</div>
-			<div class="text-base text-gray-700">
+			<div class="rounded-lg bg-gray-100 p-2 text-base text-gray-700">
 				<!-- This is vulnerable to attacks. Prefer markdown wherever possible. -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<span v-html="content"></span>
@@ -26,13 +33,13 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, reactive, toRefs } from "vue";
-import { Avatar, createResource, Dropdown } from "frappe-ui";
+import { PropType, ref, toRefs } from "vue";
+import { createResource, Avatar, Dropdown, FeatherIcon } from "frappe-ui";
 import { isEmpty } from "lodash";
 import dayjs from "dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { createToast } from "@/utils/toasts";
-import IconDot from "~icons/ph/dot-outline-fill";
+import IconDot from "~icons/ph/dot-bold";
 
 type Sender = {
 	name: string;
@@ -61,13 +68,7 @@ const props = defineProps({
 const { content, date, name, sender } = toRefs(props);
 const authStore = useAuthStore();
 const dateDisplay = dayjs(date.value).format("h:mm A");
-const dropdownOptions = reactive({
-	button: {
-		appearance: "minimal",
-		icon: "more-horizontal",
-	},
-	options: [],
-});
+const options = ref([]);
 
 function deleteComment() {
 	createResource({
@@ -88,7 +89,7 @@ function deleteComment() {
 }
 
 if (sender.value.name === authStore.userId) {
-	dropdownOptions.options.push({
+	options.value.push({
 		label: "Delete",
 		handler: () => deleteComment(),
 	});
