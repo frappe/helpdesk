@@ -10,7 +10,7 @@ export const sidebar = reactive({
 });
 
 export const editor = reactive({
-	isExpanded: true,
+	isExpanded: false,
 	content: "",
 	attachments: [],
 	cc: [],
