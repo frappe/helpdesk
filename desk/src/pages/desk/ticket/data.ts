@@ -51,8 +51,7 @@ export async function init(id: number) {
 			replyViaAgent: {
 				method: "reply_via_agent",
 				onSuccess() {
-					responseEditor.content = "";
-					responseEditor.isExpanded = false;
+					clean();
 				},
 			},
 		},
@@ -62,8 +61,6 @@ export async function init(id: number) {
 }
 
 export function clean() {
-	sidebar.isVisible = true;
-
 	responseEditor.isExpanded = false;
 	responseEditor.content = "";
 	responseEditor.attachments = [];

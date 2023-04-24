@@ -109,7 +109,7 @@ import {
 	TextEditorFixedMenu,
 } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
-import { responseEditor, ticket } from "../data";
+import { responseEditor, ticket, clean } from "../data";
 import { TextEditorMenuButtons as menuButtons } from "../../consts";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import CannedResponsesDialog from "@/components/desk/global/CannedResponsesDialog.vue";
@@ -133,6 +133,9 @@ const dropdownOptions = [
 
 const insertRes = createResource({
 	url: "frappe.client.insert",
+	onSuccess() {
+		clean();
+	},
 });
 
 function newCommunication() {
