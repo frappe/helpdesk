@@ -13,25 +13,20 @@
 				<div class="my-6 flex flex-col justify-between gap-3.5">
 					<div class="flex justify-between">
 						<div class="text-xs text-gray-600">Customer:</div>
-						<div class="flex items-center gap-1">
-							<Avatar
-								image-u-r-l="https://picsum.photos/200"
-								label="foobar"
-								size="sm"
-							/>
-							<div class="text-xs font-medium text-gray-700">Zach Micheal</div>
+						<div class="text-xs font-medium text-gray-700">
+							{{ ticket.doc.customer }}
 						</div>
 					</div>
 					<div class="flex justify-between">
-						<div class="text-xs text-gray-600">First response Due:</div>
+						<div class="text-xs text-gray-600">First Response Due:</div>
 						<div class="text-xs font-medium text-gray-700">
-							March 12, 2:24 PM
+							{{ firstResponseDue }}
 						</div>
 					</div>
 					<div class="flex justify-between">
 						<div class="text-xs text-gray-600">Resolution Due:</div>
 						<div class="text-xs font-medium text-gray-700">
-							April 9, 12:20 PM
+							{{ resolutionDue }}
 						</div>
 					</div>
 				</div>
@@ -106,6 +101,7 @@
 <script setup lang="ts">
 import { computed, ref, Ref } from "vue";
 import { Autocomplete, Avatar, Button } from "frappe-ui";
+import dayjs from "dayjs";
 import { useAgentStore } from "@/stores/agent";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
@@ -119,6 +115,13 @@ const teamStore = useTeamStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const ticketTypeStore = useTicketTypeStore();
+
+const firstResponseDue = computed(() =>
+	dayjs(ticket.doc.response_by).format("MMMM D, h:mm A")
+);
+const resolutionDue = computed(() =>
+	dayjs(ticket.doc.resolution_by).format("MMMM D, h:mm A")
+);
 
 /**
 Fetch assignee info. This is expected to be a list of assigned users, even though we want
