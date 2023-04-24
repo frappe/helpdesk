@@ -1,22 +1,26 @@
 <template>
-	<div class="group my-2 flex rounded-lg py-2.5 px-2">
-		<div class="ml-2 mr-3">
+	<div class="group flex gap-3">
+		<div class="flex w-8 justify-end">
 			<Avatar :image-u-r-l="senderImage" size="md" />
 		</div>
 		<div class="flex w-full flex-col gap-1">
-			<div>
-				<div class="flex items-center justify-between">
+			<div class="mb-2.5">
+				<div class="flex items-start justify-between">
 					<div class="flex items-center">
 						<div class="text-base text-gray-900">{{ sender }}</div>
 						<IconDot class="text-gray-600" />
 						<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
 					</div>
-					<Dropdown
-						v-bind="dropdownOptions"
-						class="opacity-0 group-hover:opacity-100"
-					/>
+					<Dropdown :options="options">
+						<template #default>
+							<FeatherIcon
+								name="more-horizontal"
+								class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
+							/>
+						</template>
+					</Dropdown>
 				</div>
-				<div v-if="cc || bcc" class="mb-2.5 flex gap-1 text-xs text-gray-600">
+				<div v-if="cc || bcc" class="flex gap-1 text-xs text-gray-600">
 					<div class="font-medium">cc:</div>
 					{{ cc }},
 					<div class="font-medium">bcc:</div>
@@ -99,32 +103,26 @@ const props = defineProps({
 
 const { content, date, sender, senderImage, cc, bcc } = toRefs(props);
 const dateDisplay = dayjs(date.value).format("h:mm A");
-const dropdownOptions = {
-	button: {
-		appearance: "minimal",
-		icon: "more-horizontal",
+const options = [
+	{
+		label: "Reply",
+		handler: () => {
+			responseEditor.cc = [];
+			responseEditor.bcc = [];
+			responseEditor.content = quote(content.value);
+			responseEditor.isExpanded = true;
+		},
 	},
-	options: [
-		{
-			label: "Reply",
-			handler: () => {
-				responseEditor.cc = [];
-				responseEditor.bcc = [];
-				responseEditor.content = quote(content.value);
-				responseEditor.isExpanded = true;
-			},
+	{
+		label: "Reply All",
+		handler: () => {
+			responseEditor.cc = cc.value?.split(",");
+			responseEditor.bcc = bcc.value?.split(",");
+			responseEditor.content = quote(content.value);
+			responseEditor.isExpanded = true;
 		},
-		{
-			label: "Reply All",
-			handler: () => {
-				responseEditor.cc = cc.value?.split(",");
-				responseEditor.bcc = bcc.value?.split(",");
-				responseEditor.content = quote(content.value);
-				responseEditor.isExpanded = true;
-			},
-		},
-	],
-};
+	},
+];
 
 function quote(s: string) {
 	return `<blockquote>${s}</blockquote><br/>`;
