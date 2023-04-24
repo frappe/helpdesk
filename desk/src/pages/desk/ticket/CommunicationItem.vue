@@ -58,6 +58,7 @@
 import { toRefs } from "vue";
 import dayjs from "dayjs";
 import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
+import { responseEditor } from "./data";
 import IconDot from "~icons/ph/dot-outline-fill";
 
 type Attachment = {
@@ -110,12 +111,26 @@ const dropdownOptions = {
 	options: [
 		{
 			label: "Reply",
-			handler: () => console.log("foobar"),
+			handler: () => {
+				responseEditor.cc = [];
+				responseEditor.bcc = [];
+				responseEditor.content = quote(content.value);
+				responseEditor.isExpanded = true;
+			},
 		},
 		{
 			label: "Reply All",
-			handler: () => console.log("foobar"),
+			handler: () => {
+				responseEditor.cc = cc.value?.split(",");
+				responseEditor.bcc = bcc.value?.split(",");
+				responseEditor.content = quote(content.value);
+				responseEditor.isExpanded = true;
+			},
 		},
 	],
 };
+
+function quote(s: string) {
+	return `<blockquote>${s}</blockquote><br/>`;
+}
 </script>
