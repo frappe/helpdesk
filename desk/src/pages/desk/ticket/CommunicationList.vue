@@ -1,5 +1,8 @@
 <template>
-	<div ref="listElement" class="flex flex-col items-center overflow-scroll">
+	<div
+		ref="listElement"
+		class="mt-8 flex flex-col items-center overflow-scroll"
+	>
 		<div class="content flex flex-col gap-4">
 			<span v-for="c in conversations" :key="c.name">
 				<CommunicationItem
