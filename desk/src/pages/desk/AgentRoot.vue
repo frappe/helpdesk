@@ -10,6 +10,7 @@
 <script>
 import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import SideBar from "@/components/desk/sidebar/SideBar.vue";
 
@@ -20,17 +21,18 @@ export default {
 	},
 	setup() {
 		const authStore = useAuthStore();
+		const configStore = useConfigStore();
 		const mounted = ref(false);
 
 		return {
 			authStore,
+			configStore,
 			mounted,
 		};
 	},
 	computed: {
 		initialized() {
 			if (!this.mounted) return false;
-			if (this.$resources.helpdeskSettings.loading) return false;
 
 			return true;
 		},
@@ -54,22 +56,13 @@ export default {
 			return;
 		}
 
-		this.$resources.helpdeskSettings.fetch();
 		this.mounted = true;
 	},
 	methods: {
 		handlePostOnboardSetupReqs() {
-			// helpdesk name
-			if (
-				!this.$resources.helpdeskSettings.data.helpdesk_name &&
-				!this.$resources.helpdeskSettings.data
-					.initial_helpdesk_name_setup_skipped
-			) {
-				this.showHelpdeskNameSetupToast();
-			}
 			// default email account
 			if (
-				!this.$resources.helpdeskSettings.data.suppress_default_email_toast &&
+				!this.configStore.suppressEmailToast &&
 				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
 				!this.defaultOutgoingEmailAccountSetup
 			) {
@@ -187,23 +180,6 @@ export default {
 			};
 		},
 		// getters
-		helpdeskSettings() {
-			return {
-				url: "frappe.client.get",
-				params: {
-					doctype: "HD Settings",
-					name: "HD Settings",
-				},
-				onError: (error) => {
-					this.$toast({
-						title: "Something went wrong.",
-						text: "Please try again later.",
-						icon: "x",
-						iconClasses: "text-red-500",
-					});
-				},
-			};
-		},
 		defaultOutgoingEmailAccount() {
 			return {
 				url: "frappe.client.get_count",

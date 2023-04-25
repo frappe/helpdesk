@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from frappe.model.naming import append_number_if_name_exists
 from frappe.model.document import Document
 import frappe
+from frappe.realtime import get_website_room
 
 
 class HDSettings(Document):
@@ -46,3 +47,9 @@ class HDSettings(Document):
 		self.save(ignore_permissions=True)
 
 		return
+
+	def on_update(self):
+		event = "helpdesk:settings-updated"
+		room = get_website_room()
+
+		frappe.publish_realtime(event, room=room, after_commit=True)
