@@ -3,7 +3,7 @@
 		<TopBar />
 		<div class="flex grow overflow-hidden">
 			<div class="flex grow flex-col">
-				<CommunicationList />
+				<ConversationBox />
 				<div class="grow"></div>
 				<ResponseEditor />
 			</div>
@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue";
 import { init, clean } from "./data";
-import CommunicationList from "./CommunicationList.vue";
+import ConversationBox from "./ConversationBox.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
 import TopBar from "./TopBar.vue";
