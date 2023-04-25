@@ -1,5 +1,6 @@
 import { reactive } from "vue";
 import { createDocumentResource } from "frappe-ui";
+import { socket } from "@/socket";
 
 export let ticket = null;
 
@@ -54,6 +55,10 @@ export async function init(id: number) {
 	});
 
 	await ticket.get.promise;
+
+	socket.on("helpdesk:ticket-update", (data) => {
+		if (parseInt(data.name) == ticket.doc.name) ticket.reload();
+	});
 }
 
 export function clean() {
@@ -64,4 +69,6 @@ export function clean() {
 	editor.bcc = [];
 	editor.isCcVisible = false;
 	editor.isBccVisible = false;
+
+	socket.off("helpdesk:ticket-update");
 }

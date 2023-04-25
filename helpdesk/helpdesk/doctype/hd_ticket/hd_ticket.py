@@ -16,6 +16,7 @@ from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.query_builder import Case, DocType, Order
 from frappe.query_builder.functions import Count
+from frappe.realtime import get_website_room
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
@@ -155,6 +156,11 @@ class HDTicket(Document):
 				log_ticket_activity(
 					self.name, f"{field_maps[field]} set to {self.as_dict()[field]}"
 				)
+
+		event = "helpdesk:ticket-update"
+		room = get_website_room()
+		data = {"name": self.name}
+		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
 
 	def remove_assignment_if_not_in_team(self):
 		"""
