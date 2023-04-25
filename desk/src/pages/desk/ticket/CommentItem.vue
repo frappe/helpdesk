@@ -23,7 +23,9 @@
 					</template>
 				</Dropdown>
 			</div>
-			<div class="rounded-lg bg-gray-100 p-2 text-base text-gray-700">
+			<div
+				class="prose prose-p:m-0 max-w-none rounded-lg bg-gray-100 p-2 text-base text-gray-700"
+			>
 				<!-- This is vulnerable to attacks. Prefer markdown wherever possible. -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<span v-html="content"></span>

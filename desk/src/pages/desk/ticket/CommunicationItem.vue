@@ -4,35 +4,33 @@
 			<Avatar :image-u-r-l="senderImage" size="md" />
 		</div>
 		<div class="flex w-full flex-col gap-1">
-			<div class="mb-2.5">
-				<div class="flex items-start justify-between">
-					<div class="flex items-center">
-						<div class="text-base text-gray-900">{{ sender }}</div>
-						<IconDot class="text-gray-600" />
-						<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
-					</div>
-					<Dropdown :options="options">
-						<template #default>
-							<FeatherIcon
-								name="more-horizontal"
-								class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
-							/>
-						</template>
-					</Dropdown>
+			<div class="flex items-start justify-between">
+				<div class="flex items-center">
+					<div class="text-base text-gray-900">{{ sender }}</div>
+					<IconDot class="text-gray-600" />
+					<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
 				</div>
-				<div v-if="cc || bcc" class="flex gap-1 text-xs text-gray-600">
-					<div class="font-medium">cc:</div>
-					{{ cc }},
-					<div class="font-medium">bcc:</div>
-					{{ bcc }}
-				</div>
+				<Dropdown :options="options">
+					<template #default>
+						<FeatherIcon
+							name="more-horizontal"
+							class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
+						/>
+					</template>
+				</Dropdown>
 			</div>
-			<div class="text-base text-gray-700">
+			<div v-if="cc || bcc" class="flex gap-1 text-xs text-gray-600">
+				<div class="font-medium">cc:</div>
+				{{ cc }},
+				<div class="font-medium">bcc:</div>
+				{{ bcc }}
+			</div>
+			<div class="prose max-w-none text-base text-gray-700">
 				<!-- This is vulnerable to attacks. Prefer markdown wherever possible. -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<span v-html="content"></span>
 			</div>
-			<div class="flex flex-wrap gap-2 py-2">
+			<div class="flex flex-wrap gap-2">
 				<div
 					v-for="attachment in attachments"
 					:key="attachment.file_url"
