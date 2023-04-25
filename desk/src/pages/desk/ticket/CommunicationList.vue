@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col items-center overflow-scroll">
+	<div ref="listElement" class="flex flex-col items-center overflow-scroll">
 		<div class="content flex flex-col gap-4">
 			<span v-for="c in conversations" :key="c.name">
 				<CommunicationItem
@@ -25,10 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
+import { useScroll } from "@vueuse/core";
 import dayjs from "dayjs";
-import { ticket } from "./data";
+import { orderBy, unionBy } from "lodash";
 import { socket } from "@/socket";
+import { ticket } from "./data";
 import CommentItem from "./CommentItem.vue";
 import CommunicationItem from "./CommunicationItem.vue";
 
@@ -36,43 +38,66 @@ type SocketData = {
 	ticket_id: string;
 };
 
-ticket.getCommunications.submit();
-ticket.getComments.submit();
+ticket.getCommunications
+	.submit()
+	.then(() => (isCommunicationsLoaded.value = true));
+ticket.getComments.submit().then(() => (isCommentsLoaded.value = true));
+
+const listElement = ref<HTMLElement | null>(null);
+const { y: scrollY } = useScroll(listElement, { behavior: "smooth" });
+
+const isCommunicationsLoaded = ref(false);
+const isCommentsLoaded = ref(false);
+const isLoaded = computed(
+	() => isCommunicationsLoaded.value && isCommentsLoaded.value
+);
+
+watch(isLoaded, (v) => {
+	if (v) scrollToBottom();
+});
 
 const ticketId = computed(() => ticket.doc.name);
 const communications = computed(
-	() =>
-		ticket.getCommunications.data?.message?.map((c) => ({
-			...c,
-			isCommunication: true,
-		})) || []
+	() => ticket.getCommunications.data?.message?.map(mapCommunication) || []
 );
-const comments = computed(
-	() =>
-		ticket.getComments.data?.message?.map((c) => ({
-			...c,
-			isComment: true,
-		})) || []
-);
+const comments = computed(() => ticket.getComments.data?.message || []);
 const conversations = computed(() =>
-	[...communications.value, ...comments.value].sort((a, b) =>
-		dayjs(a.creation).diff(b.creation)
+	orderBy(unionBy(communications.value, comments.value), (c) =>
+		dayjs(c.creation)
 	)
 );
 
-function execOnSocketEvent(data: SocketData, callback: () => void) {
-	if (parseInt(data.ticket_id) === ticketId.value) callback();
+function mapCommunication(c) {
+	return {
+		...c,
+		isCommunication: true,
+	};
 }
 
-socket.on("helpdesk:new-communication", (data: SocketData) =>
-	execOnSocketEvent(data, ticket.getCommunications.reload)
-);
-socket.on("helpdesk:new-ticket-comment", (data: SocketData) =>
-	execOnSocketEvent(data, ticket.getComments.reload)
-);
-socket.on("helpdesk:delete-ticket-comment", (data: SocketData) =>
-	execOnSocketEvent(data, ticket.getComments.reload)
-);
+function scrollToBottom() {
+	scrollY.value = listElement.value.scrollHeight;
+}
+
+socket.on("helpdesk:new-communication", (data: SocketData) => {
+	if (data.ticket_id !== ticketId.value) return;
+	ticket.getCommunications.reload().then(() => scrollToBottom());
+});
+
+socket.on("helpdesk:new-ticket-comment", (data: SocketData) => {
+	if (data.ticket_id !== ticketId.value) return;
+	ticket.getComments.reload().then(() => scrollToBottom());
+});
+
+socket.on("helpdesk:delete-ticket-comment", (data: SocketData) => {
+	if (data.ticket_id !== ticketId.value) return;
+	ticket.getComments.reload();
+});
+
+onUnmounted(() => {
+	socket.off("helpdesk:new-communication");
+	socket.off("helpdesk:new-ticket-comment");
+	socket.off("helpdesk:delete-ticket-comment");
+});
 </script>
 
 <style scoped>
