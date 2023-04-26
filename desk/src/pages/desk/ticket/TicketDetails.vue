@@ -99,10 +99,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, Ref } from "vue";
-import { Autocomplete, Avatar, Button } from "frappe-ui";
+import { computed, onMounted, onUnmounted, ref, Ref } from "vue";
+import { Autocomplete, Button } from "frappe-ui";
 import dayjs from "dayjs";
 import { useAgentStore } from "@/stores/agent";
+import { useKeymapStore } from "@/stores/keymap";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -111,6 +112,7 @@ import { createToast } from "@/utils/toasts";
 import { sidebar, ticket } from "./data";
 
 const agentStore = useAgentStore();
+const keymapStore = useKeymapStore();
 const teamStore = useTeamStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
@@ -145,6 +147,11 @@ This is used to keep track of changed keys. This is needed because updates are n
 committed until save is called, unlike auto-update
 */
 const changedKeys: Set<string> = new Set();
+
+// Add and remove shortcuts
+const keyComboSave = ["Control", "s"];
+onMounted(() => keymapStore.add(keyComboSave, save, "Save details"));
+onUnmounted(() => keymapStore.remove(keyComboSave));
 
 async function save() {
 	const a = Array.from(changedKeys);
