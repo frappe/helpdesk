@@ -297,11 +297,11 @@ class HDTicket(Document):
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 		agent_name = frappe.get_value("HD Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
-		frappe.publish_realtime(
-			"helpdesk:update-ticket-assignee",
-			{"ticket_id": self.name},
-			after_commit=True,
-		)
+
+		event = "helpdesk:ticket-assignee-update"
+		data = {"name": self.name}
+		room = get_website_room()
+		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
 
 	def get_assigned_agent(self):
 		if self._assign:

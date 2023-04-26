@@ -171,6 +171,8 @@ async function save() {
 		await ticket.assign.submit({
 			agent: changeAssignedTo.value.value,
 		});
+
+		changeAssignedTo.value = null;
 	}
 
 	createToast({

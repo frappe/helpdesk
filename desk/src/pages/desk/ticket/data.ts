@@ -59,6 +59,10 @@ export async function init(id: number) {
 	socket.on("helpdesk:ticket-update", (data) => {
 		if (parseInt(data.name) == ticket.doc.name) ticket.reload();
 	});
+
+	socket.on("helpdesk:ticket-assignee-update", (data) => {
+		if (parseInt(data.name) == ticket.doc.name) ticket.getAssignees.reload();
+	});
 }
 
 export function clean() {
@@ -71,4 +75,5 @@ export function clean() {
 	editor.isBccVisible = false;
 
 	socket.off("helpdesk:ticket-update");
+	socket.off("helpdesk:ticket-assignee-update");
 }
