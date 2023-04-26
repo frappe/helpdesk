@@ -14,7 +14,8 @@
 
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue";
-import { init, clean } from "./data";
+import { useConfigStore } from "@/stores/config";
+import { clean, init, ticket } from "./data";
 import ConversationBox from "./ConversationBox.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
@@ -27,7 +28,15 @@ const props = defineProps({
 	},
 });
 const isResLoaded = ref(false);
+const configStore = useConfigStore();
 
-init(parseInt(props.ticketId)).then(() => (isResLoaded.value = true));
-onUnmounted(() => clean());
+init(parseInt(props.ticketId)).then(() => {
+	configStore.setTitle(ticket.doc.subject);
+	isResLoaded.value = true;
+});
+
+onUnmounted(() => {
+	clean();
+	configStore.setTitle();
+});
 </script>
