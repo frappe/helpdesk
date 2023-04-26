@@ -10,6 +10,18 @@
 			</div>
 		</div>
 		<div class="ml-11 flex items-center gap-1 text-base text-gray-600">
+			<div class="flex">
+				<Tooltip
+					v-if="ticket.doc.via_customer_portal"
+					text="Created via customer portal"
+				>
+					<IconWeb />
+				</Tooltip>
+				<Tooltip v-else text="Created via email">
+					<IconAtSign />
+				</Tooltip>
+				<IconDot />
+			</div>
 			<IconHash />
 			<div class="cursor-copy" @click="copyId">
 				{{ ticket.doc.name }}
@@ -31,9 +43,11 @@ import { useClipboard } from "@vueuse/core";
 import dayjs from "dayjs";
 import { ticket } from "./data";
 import { createToast } from "@/utils/toasts";
+import IconAtSign from "~icons/espresso/at-sign";
 import IconCaretLeft from "~icons/ph/caret-left";
 import IconDot from "~icons/ph/dot-bold";
 import IconHash from "~icons/espresso/hash";
+import IconWeb from "~icons/espresso/web";
 
 const { copy } = useClipboard();
 const router = useRouter();
