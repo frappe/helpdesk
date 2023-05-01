@@ -11,7 +11,7 @@
 					/>
 				</div>
 				<div class="my-6 flex flex-col justify-between gap-3.5">
-					<div class="flex justify-between">
+					<div v-if="ticket.doc.customer" class="flex justify-between">
 						<div class="text-xs text-gray-600">Customer:</div>
 						<div class="text-xs font-medium text-gray-700">
 							{{ ticket.doc.customer }}
@@ -23,10 +23,13 @@
 							{{ firstResponseDue }}
 						</div>
 					</div>
-					<div class="flex justify-between">
+					<div class="flex items-center justify-between">
 						<div class="text-xs text-gray-600">Resolution Due:</div>
 						<div class="text-xs font-medium text-gray-700">
-							{{ resolutionDue }}
+							<span v-if="ticket.doc.resolution_by">
+								{{ resolutionDue }}
+							</span>
+							<Badge v-else label="Paused" />
 						</div>
 					</div>
 				</div>
