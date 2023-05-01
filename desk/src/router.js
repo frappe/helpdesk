@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { call } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 
 export const LOGIN = "Login";
 export const SIGNUP = "Signup";
@@ -382,5 +383,7 @@ router.beforeEach(async (to) => {
 	if (AUTH_BYPASS_ROUTES.includes(to.name)) return;
 
 	const authStore = useAuthStore();
+
 	await authStore.init().catch(() => router.replace({ name: LOGIN }));
+	useConfigStore();
 });
