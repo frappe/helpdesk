@@ -375,6 +375,7 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue"
 import CustomerSatisfactionFeedback from "@/components/portal/ticket/CustomerSatisfactionFeedback.vue"
 import TicketField from "@/components/global/TicketField.vue"
 import { useAuthStore } from "@/stores/auth"
+import { isEmpty } from "@/utils/editor"
 
 export default {
 	name: "Tickets",
@@ -512,6 +513,17 @@ export default {
 					this.content = this.tempTextEditorData.content
 					this.attachments = this.tempTextEditorData.attachments
 				},
+				validate(params) {
+					if (isEmpty(params.message)) {
+						this.$toast({
+							title: "Message is empty",
+							icon: "x",
+							iconClasses: "text-red-600",
+						});
+
+						return 'Message is empty';
+					}
+				}
 			}
 		},
 	},
