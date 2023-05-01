@@ -189,7 +189,6 @@ export default {
 			}
 		},
 		getStatusBadgeColor(status) {
-			console.log(status);
 			switch (status) {
 				case "Closed":
 					return "green"
