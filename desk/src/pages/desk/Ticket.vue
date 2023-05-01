@@ -369,7 +369,11 @@
 													(!authStore.isAgent && !authStore.isAdmin) ||
 													sendingDissabled
 												"
-												@click="submit()"
+												@click="
+												() => {
+													submit();
+													$router.go();
+												}"
 											>
 												{{ editingType == "reply" ? "Send" : "Create" }}
 											</Button>
