@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col">
 		<div class="border-l">
-			<div class="m-4">
+			<div class="m-4 text-base">
 				<div class="flex items-center justify-between">
 					<div class="text-lg font-semibold text-gray-900">Ticket details</div>
 					<Button
@@ -12,20 +12,20 @@
 				</div>
 				<div class="my-6 flex flex-col justify-between gap-3.5">
 					<div v-if="ticket.doc.customer" class="flex justify-between">
-						<div class="text-xs text-gray-600">Customer:</div>
-						<div class="text-xs font-medium text-gray-700">
+						<div class="text-gray-600">Customer:</div>
+						<div class="font-medium text-gray-700">
 							{{ ticket.doc.customer }}
 						</div>
 					</div>
 					<div class="flex justify-between">
-						<div class="text-xs text-gray-600">First Response Due:</div>
-						<div class="text-xs font-medium text-gray-700">
+						<div class="text-gray-600">First Response Due:</div>
+						<div class="font-medium text-gray-700">
 							{{ firstResponseDue }}
 						</div>
 					</div>
 					<div class="flex items-center justify-between">
-						<div class="text-xs text-gray-600">Resolution Due:</div>
-						<div class="text-xs font-medium text-gray-700">
+						<div class="text-gray-600">Resolution Due:</div>
+						<div class="font-medium text-gray-700">
 							<span v-if="ticket.doc.resolution_by">
 								{{ resolutionDue }}
 							</span>
