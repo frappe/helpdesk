@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex select-none flex-col border-r p-2 text-base transition-all duration-300 ease-in-out"
+		class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base transition-all duration-300 ease-in-out"
 		:class="{
 			'w-56': sidebarStore.isExpanded,
 			'w-12': !sidebarStore.isExpanded,

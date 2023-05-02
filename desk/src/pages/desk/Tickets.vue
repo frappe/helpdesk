@@ -39,7 +39,7 @@
 				</Dropdown>
 			</div>
 		</div>
-		<div class="bg-gray-50 px-6 text-sm text-gray-600">
+		<div class="border-y border-gray-200 px-6 text-sm text-gray-600">
 			<div class="flex items-center gap-2 px-2 py-1.5">
 				<div class="pl-1 pr-4">
 					<Input
@@ -65,7 +65,7 @@
 				:key="t.name"
 				class="flex w-full items-center gap-2 px-2 py-1 transition-all"
 				:class="{
-					'bg-gray-50': selected.has(t.name),
+					'bg-gray-100': selected.has(t.name),
 				}"
 			>
 				<div class="cursor-pointer select-none pl-1 pr-4 text-gray-600">
