@@ -4,7 +4,15 @@
 		class="mt-8 flex flex-col items-center overflow-scroll"
 	>
 		<div class="content flex flex-col gap-4">
-			<span v-for="c in conversations" :key="c.name">
+			<span v-for="(c, i) in conversations" :key="c.name">
+				<div v-if="isNewDay(i)">
+					<div class="flex items-center">
+						<div class="bg h-0.5 grow rounded-full bg-gray-100"></div>
+						<div class="my-2 ml-5 grow-0 text-sm text-gray-800">
+							{{ dayShort(c.creation) }}
+						</div>
+					</div>
+				</div>
 				<CommunicationItem
 					v-if="c.isCommunication"
 					:content="c.content"
@@ -79,6 +87,26 @@ function mapCommunication(c) {
 
 function scrollToBottom() {
 	scrollY.value = listElement.value.scrollHeight;
+}
+
+function isNewDay(index: number) {
+	if (index === 0) return true;
+
+	const currEntry = conversations.value[index];
+	const prevEntry = conversations.value[index - 1];
+
+	return dayjs(currEntry.creation).diff(prevEntry.creation, "day") > 0;
+}
+
+function dayShort(date: string) {
+	switch (dayjs(date).diff(dayjs(), "day")) {
+		case 0:
+			return "Today";
+		case 1:
+			return "Yesterday";
+		default:
+			return dayjs(date).format("DD/MM/YYYY");
+	}
 }
 
 socket.on("helpdesk:new-communication", (data: SocketData) => {
