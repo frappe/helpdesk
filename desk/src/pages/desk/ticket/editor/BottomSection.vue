@@ -61,7 +61,7 @@
 				<div class="flex items-center gap-4">
 					<IconDelete
 						class="h-5 w-5 cursor-pointer text-gray-900"
-						@click.prevent="editor.isExpanded = false"
+						@click.prevent="clean"
 					/>
 					<div class="flex">
 						<Button
