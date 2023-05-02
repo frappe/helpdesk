@@ -1,10 +1,7 @@
 <template>
-	<div
-		ref="listElement"
-		class="mt-8 flex flex-col items-center overflow-scroll"
-	>
+	<div ref="listElement" class="flex flex-col items-center overflow-scroll">
 		<div class="content flex flex-col gap-4">
-			<span v-for="(c, i) in conversations" :key="c.name">
+			<div v-for="(c, i) in conversations" :key="c.name" class="mt-4">
 				<div v-if="isNewDay(i)">
 					<div class="flex items-center">
 						<div class="bg h-0.5 grow rounded-full bg-gray-100"></div>
@@ -30,7 +27,7 @@
 					:date="c.creation"
 					:sender="c.sender"
 				/>
-			</span>
+			</div>
 		</div>
 	</div>
 </template>
