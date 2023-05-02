@@ -2,23 +2,18 @@
 	<div>
 		<div class="flex flex-col divide-y rounded-b-xl">
 			<div class="ml-2 flex flex-wrap gap-2 py-2">
-				<div
+				<AttachmentItem
 					v-for="attachment in editor.attachments"
 					:key="attachment"
-					class="flex items-center gap-1 rounded border border-gray-400 bg-gray-100 p-1 shadow"
+					:label="attachment.file_name"
 				>
-					<div class="flex flex-row items-center space-x-1">
-						<FeatherIcon name="file-text" class="h-4 w-4 text-gray-700" />
-						<span class="text-sm text-gray-700">
-							{{ attachment.file_name }}
-						</span>
-					</div>
-					<Button
-						class="h-4 w-4"
-						icon="x"
-						@click="removeAttachment(attachment.name)"
-					/>
-				</div>
+					<template #extra>
+						<IconX
+							class="h-4 w-4 cursor-pointer"
+							@click="removeAttachment(attachment.name)"
+						/>
+					</template>
+				</AttachmentItem>
 			</div>
 			<div v-if="isTextFormattingVisible" class="px-3.5 py-2">
 				<TextEditorFixedMenu :buttons="menuButtons" />
@@ -109,8 +104,10 @@ import { editor, ticket, clean } from "../data";
 import { TextEditorMenuButtons as menuButtons } from "../../consts";
 import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import CannedResponses from "./CannedResponses.vue";
+import AttachmentItem from "@/components/AttachmentItem.vue";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import IconDelete from "~icons/espresso/delete";
+import IconX from "~icons/ph/x";
 
 const authStore = useAuthStore();
 const showArticleResponse = ref(false);

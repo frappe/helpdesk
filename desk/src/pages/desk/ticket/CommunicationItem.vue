@@ -31,22 +31,14 @@
 				<span v-html="content"></span>
 			</div>
 			<div class="flex flex-wrap gap-2">
-				<div
+				<a
 					v-for="attachment in attachments"
 					:key="attachment.file_url"
-					class="flex items-center gap-1 rounded border border-gray-400 bg-gray-100 p-1 shadow"
+					:href="attachment.file_url"
+					target="_blank"
 				>
-					<div class="flex flex-row items-center space-x-1">
-						<FeatherIcon name="file-text" class="h-4 w-4 text-gray-700" />
-						<a
-							:href="attachment.file_url"
-							target="_blank"
-							class="text-sm text-gray-700"
-						>
-							{{ attachment.file_name }}
-						</a>
-					</div>
-				</div>
+					<AttachmentItem :label="attachment.file_name" />
+				</a>
 			</div>
 		</div>
 	</div>
@@ -58,6 +50,7 @@ import dayjs from "dayjs";
 import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
 import { editor } from "./data";
 import IconDot from "~icons/ph/dot-bold";
+import AttachmentItem from "@/components/AttachmentItem.vue";
 
 type Attachment = {
 	file_name: string;
