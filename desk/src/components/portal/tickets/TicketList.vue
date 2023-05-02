@@ -190,15 +190,15 @@ export default {
 		},
 		getStatusBadgeColor(status) {
 			switch (status) {
+				case "Closed":
+					return "green"
+				case "On Hold":
+					return "blue"
+				case "Open":
+					return "red"
 				case "Replied":
 					return "yellow"
 				case "Resolved":
-					return "red"
-				case "On Hold":
-					return "blue"
-				case "Closed":
-					return "red"
-				case "Open":
 					return "green"
 			}
 		},
