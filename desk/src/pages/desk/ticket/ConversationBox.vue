@@ -1,7 +1,11 @@
 <template>
 	<div ref="listElement" class="flex flex-col items-center overflow-scroll">
 		<div class="content flex flex-col gap-4">
-			<div v-for="(c, i) in conversations" :key="c.name" class="mt-4">
+			<div
+				class="mt-6 text-base leading-relaxed text-gray-800"
+				v-html="ticket.doc.description"
+			></div>
+			<div v-for="(c, i) in conversations" :key="c.name">
 				<div v-if="isNewDay(i)">
 					<div class="flex items-center">
 						<div class="bg h-0.5 grow rounded-full bg-gray-100"></div>
