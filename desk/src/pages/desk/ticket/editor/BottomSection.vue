@@ -55,11 +55,7 @@
 						name="article-reply"
 						class="h-7 w-7 rounded p-1"
 						role="button"
-						@click="showArticleResponseDialog = true"
-					/>
-					<ArticleResponseDialog
-						:show="showArticleResponseDialog"
-						@close="showArticleResponseDialog = false"
+						@click="showArticleResponse = true"
 					/>
 				</div>
 				<div class="flex items-center gap-4">
@@ -86,6 +82,11 @@
 				</div>
 			</div>
 		</div>
+		<ArticleResponseDialog
+			:show="showArticleResponse"
+			@close="showArticleResponse = false"
+			@contentVal="(val) => (editor.content = val)"
+		/>
 		<CannedResponses
 			:show="showCannedResponses"
 			@close="showCannedResponses = false"
@@ -112,7 +113,7 @@ import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import IconDelete from "~icons/espresso/delete";
 
 const authStore = useAuthStore();
-const showArticleResponseDialog = ref(false);
+const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
 const isTextFormattingVisible = ref(false);
 const dropdownOptions = [
