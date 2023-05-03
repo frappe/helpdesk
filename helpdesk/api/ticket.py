@@ -3,7 +3,7 @@ import json
 import frappe
 from frappe.automation.doctype.assignment_rule.assignment_rule import apply
 from frappe.contacts.doctype.contact.contact import get_contact_name
-from frappe.core.doctype.data_import.data_import import form_start_import
+from frappe.core.doctype.data_import.data_import import start_import
 from frappe.handler import upload_file
 from frappe.utils import datetime
 from frappe.website.utils import cleanup_page_name
@@ -33,7 +33,7 @@ def bulk_insert():
 	)
 
 	data_import_doc.save()
-	form_start_import(data_import_doc.name)
+	start_import(data_import_doc.name)
 
 	return data_import_doc
 
