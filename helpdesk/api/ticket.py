@@ -1,56 +1,21 @@
 import json
-
 import frappe
-from frappe.automation.doctype.assignment_rule.assignment_rule import apply
-from frappe.contacts.doctype.contact.contact import get_contact_name
-from frappe.core.doctype.data_import.data_import import start_import
-from frappe.handler import upload_file
-from frappe.model.document import Document
-from frappe.utils import datetime
-from frappe.website.utils import cleanup_page_name
 
-from helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement import (
-	get_expected_time_for,
+from frappe.website.utils import cleanup_page_name
+from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
+	log_ticket_activity,
 )
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
 	create_communication_via_contact,
 	get_all_conversations,
 )
-from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
-	log_ticket_activity,
+from frappe.utils import datetime
+
+from helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement import (
+	get_expected_time_for,
 )
-
-
-@frappe.whitelist()
-def bulk_insert(
-	target_doctype: str, import_type: str = "Insert New Records"
-) -> Document:
-	"""
-	Upload a file and initiate an import against a DocType. File can be of any
-	type supported by data import tool. File should be in a form with key `file`.
-
-	Caveats
-	- `doctype` can not be used as argument, since it is already used by `upload_file`
-	- `file` is not an explicit argument, but is required by `upload_file`
-
-	:param target_doctype: DocType against which import should be performed
-	:param import_type: An import type supported by data import tool
-	:return: Newly created `Data Import` document
-	"""
-	file = upload_file()
-	data_import_doc = frappe.get_doc(
-		{
-			"doctype": "Data Import",
-			"reference_doctype": target_doctype,
-			"import_type": import_type,
-			"import_file": file.file_url,
-		}
-	)
-
-	data_import_doc.save()
-	start_import(data_import_doc.name)
-
-	return data_import_doc
+from frappe.automation.doctype.assignment_rule.assignment_rule import apply
+from frappe.contacts.doctype.contact.contact import get_contact_name
 
 
 @frappe.whitelist()
@@ -125,7 +90,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 
 		ticket += [
 			t_idx,
-			t_name,  # name TODO: folow naming series
+			t_name,  # name	TODO: folow naming series
 			sla,
 			resolution_by_wrt_priority[ticket[4]],
 			resolution_by_wrt_priority[ticket[4]],
@@ -135,7 +100,7 @@ def bulk_insert_tickets(tickets, sla="Default"):
 
 		communication = [
 			c_idx,
-			c_name,  # name TODO: folow naming series
+			c_name,  # name	TODO: folow naming series
 			"Communication",
 			"Email",
 			"Received",
@@ -530,11 +495,11 @@ def get_all_ticket_templates():
 def activities(name):
 	activities = frappe.db.sql(
 		"""
-        SELECT action, creation, owner
-        FROM `tabTicket Activity`
-        WHERE ticket = %(ticket)s
-        ORDER BY creation DESC
-    """,
+		SELECT action, creation, owner
+		FROM `tabTicket Activity`
+		WHERE ticket = %(ticket)s
+		ORDER BY creation DESC
+	""",
 		values={"ticket": name},
 		as_dict=1,
 	)
