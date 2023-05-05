@@ -14,6 +14,7 @@ export const useConfigStore = defineStore("config", () => {
 	});
 
 	const config = computed(() => configRes.data || {});
+	const brandLogo = computed(() => config.value.brand_logo);
 	const helpdeskName: ComputedRef<string> = computed(
 		() => config.value.helpdesk_name || DEFAULT_TITLE
 	);
@@ -27,6 +28,7 @@ export const useConfigStore = defineStore("config", () => {
 
 	return {
 		config,
+		brandLogo,
 		helpdeskName,
 		suppressEmailToast,
 	};
