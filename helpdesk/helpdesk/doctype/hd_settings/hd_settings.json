@@ -26,6 +26,10 @@
   "skip_email_workflow",
   "instantly_send_email",
   "column_break_aomm",
+  "branding_tab",
+  "images_column",
+  "brand_logo",
+  "column_break_fsjn",
   "misc_tab",
   "toasts_column",
   "suppress_default_email_toast",
@@ -192,11 +196,31 @@
    "fieldname": "instantly_send_email",
    "fieldtype": "Check",
    "label": "Instantly send e-mail"
+  },
+  {
+   "fieldname": "branding_tab",
+   "fieldtype": "Tab Break",
+   "label": "Branding"
+  },
+  {
+   "fieldname": "images_column",
+   "fieldtype": "Column Break",
+   "label": "Images"
+  },
+  {
+   "description": "Image to be used in various places, including Login and Signup pages. An image with transparent background and 160 x 32 is preferred",
+   "fieldname": "brand_logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo"
+  },
+  {
+   "fieldname": "column_break_fsjn",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-04-14 04:03:58.330687",
+ "modified": "2023-05-05 12:52:41.086826",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
