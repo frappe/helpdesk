@@ -4,17 +4,6 @@
 			ref="miniTicketList"
 			:options="{
 				doctype: 'HD Ticket',
-				fields: [
-					'_assign',
-					'status',
-					'priority',
-					'subject',
-					'ticket_type',
-					'creation',
-					'modified',
-					'name',
-					'_seen',
-				],
 				limit: 20,
 				order_by: 'modified desc',
 				filters: {
