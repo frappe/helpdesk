@@ -1,6 +1,6 @@
 <template>
 	<div class="flex h-screen w-screen items-center justify-center">
-		<span>
+		<div class="rounded-xl shadow-xl">
 			<img
 				v-if="configStore.brandLogo"
 				:src="configStore.brandLogo"
@@ -11,13 +11,13 @@
 					<CustomIcons name="frappedesk" class="h-6" />
 				</div>
 			</div>
-			<div class="w-96 rounded-xl py-8 px-10 shadow-xl">
+			<div class="w-96 py-8 px-10">
 				<div class="mb-6 text-center text-lg">
 					{{ title }}
 				</div>
 				<slot></slot>
 			</div>
-		</span>
+		</div>
 	</div>
 </template>
 
