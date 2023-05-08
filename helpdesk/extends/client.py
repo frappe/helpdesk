@@ -56,10 +56,11 @@ def get_list_meta(
 ):
 	check_permissions(doctype, parent)
 
-	query: Query = get_query(
+	query = get_query(
 		table=doctype,
 		filters=filters,
 		group_by=group_by,
+		fields=["name"],
 	)
 
 	query = apply_custom_filters(doctype, query)

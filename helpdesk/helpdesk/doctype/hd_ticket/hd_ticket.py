@@ -452,7 +452,11 @@ class HDTicket(Document):
 			frappe.throw(_("Can not send email. No sender email set up!"))
 
 		reply_to_email = sender_email.email_id
-		template = "new_reply_on_customer_portal_notification"
+		template = (
+			"new_reply_on_customer_portal_notification"
+			if self.via_customer_portal
+			else None
+		)
 		args = {
 			"message": message,
 			"portal_link": self.portal_uri,
@@ -482,8 +486,8 @@ class HDTicket(Document):
 				reply_to=reply_to_email,
 				sender=reply_to_email,
 				subject=subject,
-				# template=template,
-				with_container=True,
+				template=template,
+				with_container=False,
 			)
 		except Exception as e:
 			frappe.throw(_(e))

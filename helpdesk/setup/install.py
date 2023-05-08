@@ -3,7 +3,7 @@ from datetime import datetime
 import frappe
 from frappe.permissions import add_permission
 
-from .demo_data import create_demo_data
+from .welcome_ticket import create_welcome_ticket
 
 
 def before_install():
@@ -21,7 +21,7 @@ def after_install():
 	update_agent_role_permissions()
 	add_default_assignment_rule()
 	add_system_preset_filters()
-	create_demo_data()
+	create_welcome_ticket()
 
 
 def add_support_redirect_to_tickets():

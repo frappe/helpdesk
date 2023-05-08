@@ -7,8 +7,11 @@
 <script setup lang="ts">
 import { provide, ref, onMounted } from "vue";
 import { createToast } from "@/utils/toasts";
+import { useConfigStore } from "@/stores/config";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { Toasts } from "@/components/global/toast";
+
+useConfigStore();
 
 const viewportWidth = ref(
 	Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
