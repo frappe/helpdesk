@@ -44,6 +44,12 @@ const configStore = useConfigStore();
 
 const profileItems = [
 	{
+		label: "My Account",
+		handler: () => {
+			window.open("/me");
+		},
+	},
+	{
 		label: "Logout",
 		handler: () => {
 			authStore.logout();
