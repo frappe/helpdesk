@@ -1522,13 +1522,6 @@
 				stroke-linejoin="round"
 			/>
 		</svg>
-		<div v-if="this.name == 'company'" :class="this.class">
-			<div
-				v-if="$resources.brandHtml.data"
-				v-html="$resources.brandHtml.data"
-			/>
-			<div v-else>{{ $resources.helpdeskName.data }}</div>
-		</div>
 	</div>
 </template>
 
@@ -1536,24 +1529,6 @@
 export default {
 	name: "CustomIcons",
 	props: ["name", "height", "width", "class"],
-	mounted() {
-		if (this.name == "company") {
-			this.$resources.brandHtml.fetch()
-			this.$resources.helpdeskName.fetch()
-		}
-	},
-	resources: {
-		brandHtml() {
-			return {
-				url: "helpdesk.api.website.brand_html",
-			}
-		},
-		helpdeskName() {
-			return {
-				url: "helpdesk.api.website.helpdesk_name",
-			}
-		},
-	},
 }
 </script>
 

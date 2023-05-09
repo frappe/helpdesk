@@ -7,7 +7,9 @@ export const SIGNUP = "Signup";
 export const VERIFY = "Verify Account";
 export const AGENT_PORTAL_LANDING = "DeskTickets";
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
 export const AUTH_BYPASS_ROUTES = [LOGIN, SIGNUP, VERIFY];
+export const KNOWLEDGE_BASE_PUBLIC = "Knowledge Base";
 
 const routes = [
 	{
@@ -62,7 +64,7 @@ const routes = [
 					},
 					{
 						path: "new",
-						name: "DefaultNewTicket",
+						name: CUSTOMER_PORTAL_NEW_TICKET,
 						component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
 					},
 					{
@@ -74,12 +76,11 @@ const routes = [
 			},
 			{
 				path: "knowledge-base",
-				name: "PortalBK",
 				component: () => import("@/pages/portal/kb/KnowledgeBase.vue"),
 				children: [
 					{
 						path: "",
-						name: "PortalKBHome",
+						name: KNOWLEDGE_BASE_PUBLIC,
 						component: () =>
 							// shows root categories and faqs
 							import("@/pages/common/kb/Category.vue"),
