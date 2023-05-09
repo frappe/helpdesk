@@ -291,7 +291,7 @@ class TicketSummary(object):
 						AVG(total_hold_time) as avg_hold_time,
 						AVG(resolution_time) as avg_resolution_time,
 						AVG(user_resolution_time) as avg_user_resolution_time
-					FROM `tabTicket`
+					FROM `tabHD Ticket`
 					WHERE
 						name IN %(ticket)s
 					GROUP BY {0}
