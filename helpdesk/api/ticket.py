@@ -496,7 +496,7 @@ def activities(name):
 	activities = frappe.db.sql(
 		"""
 		SELECT action, creation, owner
-		FROM `tabTicket Activity`
+		FROM `tabHD Ticket Activity`
 		WHERE ticket = %(ticket)s
 		ORDER BY creation DESC
 	""",
