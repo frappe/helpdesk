@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "creation": "2023-05-11 22:45:48.325623",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "enabled",
+  "chart_section",
+  "is_chart",
+  "chart_type",
+  "column_break_qmsb",
+  "section_break_wqif",
+  "snippet"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "chart_section",
+   "fieldtype": "Section Break",
+   "label": "Chart"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_chart",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Chart",
+   "reqd": 1
+  },
+  {
+   "depends_on": "is_chart",
+   "fieldname": "chart_type",
+   "fieldtype": "Select",
+   "label": "Chart Type",
+   "mandatory_depends_on": "is_chart",
+   "options": "Line\nPie"
+  },
+  {
+   "fieldname": "column_break_qmsb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_wqif",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "snippet",
+   "fieldtype": "Code",
+   "in_list_view": 1,
+   "label": "Snippet",
+   "options": "Python",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-05-11 22:45:48.325623",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Dashboard Item",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}
