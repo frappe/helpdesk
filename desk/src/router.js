@@ -122,7 +122,7 @@ const routes = [
 			{
 				path: "dashboard",
 				name: "Dashboard",
-				component: () => import("@/pages/desk/Dashboard.vue"),
+				component: () => import("@/pages/desk/DeskDashboard.vue"),
 			},
 			{
 				path: "tickets",

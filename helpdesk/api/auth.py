@@ -9,6 +9,7 @@ def get_user():
 	is_admin = user.username == "administrator"
 	has_desk_access = is_agent or is_admin
 	user_image = user.user_image
+	user_first_name = user.first_name
 	user_name = user.full_name
 	user_id = user.name
 	username = user.username
@@ -19,6 +20,7 @@ def get_user():
 		"is_agent": is_agent,
 		"user_id": user_id,
 		"user_image": user_image,
+		"user_first_name": user_first_name,
 		"user_name": user_name,
 		"username": username,
 	}
