@@ -8,8 +8,7 @@ SNIPPETS = [
 		"enabled": True,
 		"is_chart": True,
 		"chart_type": "Line",
-		"snippet": """
-from datetime import datetime, timedelta
+		"snippet": """from datetime import datetime, timedelta
 
 # Calculate date 7 days ago
 date_7_days_ago = datetime.now() - timedelta(days=7)
@@ -24,14 +23,13 @@ res = frappe.db.get_list(
 	filters = filters,
 	group_by="DATE(creation)",
 )
-			""",
+		""",
 	},
 	{
 		"title": "Resolution Within SLA",
 		"enabled": True,
 		"is_chart": False,
-		"snippet": """
-ticket_list = frappe.get_list(
+		"snippet": """ticket_list = frappe.get_list(
 	"HD Ticket",
 	filters={"status": "Closed"},
 	fields=["name", "agreement_status", "sla"],
@@ -42,18 +40,20 @@ for ticket in ticket_list:
 	if ticket.agreement_status == "Fulfilled":
 		count = count + 1
 
-resolution_within_sla_percentage = (count / len(ticket_list)) * 100
-resolution_within_sla_percentage = round(resolution_within_sla_percentage, 1)
-
-res = str(resolution_within_sla_percentage) + "%"
-			""",
+if count:
+    resolution_within_sla_percentage = (count / len(ticket_list)) * 100
+    resolution_within_sla_percentage = round(resolution_within_sla_percentage, 1)
+    
+    res = str(resolution_within_sla_percentage) + "%"
+else:
+    res = "0%"
+		""",
 	},
 	{
 		"title": "Avg. First Response time",
 		"enabled": True,
 		"is_chart": False,
-		"snippet": """
-average_resolution_time = float(0.0)
+		"snippet": """average_resolution_time = float(0.0)
 ticket_list = frappe.get_list(
 	"HD Ticket",
 	fields=["name", "resolution_time"],
@@ -63,9 +63,12 @@ ticket_list = frappe.get_list(
 for ticket in ticket_list:
 	average_resolution_time += ticket.resolution_time
 
-h = round((((average_resolution_time) / len(ticket_list)) / 3600), 1)
-res = f"{h} Hours"
-			""",
+if ticket_list:
+    h = round((((average_resolution_time) / len(ticket_list)) / 3600), 1)
+    res = f"{h} Hours"
+else:
+    res = "Not enough data"
+		""",
 	},
 	{
 		"title": "Type",
@@ -78,7 +81,7 @@ res = frappe.db.get_list(
 	fields=["count(name) as value", "ticket_type as name"],
 	group_by="ticket_type",
 )
-			""",
+		""",
 	},
 	{
 		"title": "Priority",
@@ -91,20 +94,19 @@ res = frappe.db.get_list(
 	fields=["count(name) as value", "priority as name"],
 	group_by="priority",
 )
-			""",
+		""",
 	},
 	{
 		"title": "Status",
 		"enabled": True,
 		"is_chart": True,
 		"chart_type": "Pie",
-		"snippet": """
-res = frappe.db.get_list(
+		"snippet": """res = frappe.db.get_list(
 	"HD Ticket",
 	fields=["count(name) as value", "status as name"],
 	group_by="status",
 )
-			""",
+		""",
 	},
 ]
 

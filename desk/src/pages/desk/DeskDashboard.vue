@@ -5,7 +5,7 @@
 		</div>
 		<div
 			v-if="isEmpty(items.data)"
-			class="flex grow items-center justify-center text-base text-gray-700"
+			class="flex grow select-none items-center justify-center text-base text-gray-700"
 		>
 			📊 Oops, looks like there are no charts to display on the dashboard right
 			now.
