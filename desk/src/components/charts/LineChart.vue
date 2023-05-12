@@ -51,9 +51,7 @@ use([
 
 const option = ref({
 	grid: {
-		left: "5%",
 		bottom: "10%",
-		right: "5%",
 		top: "20%",
 	},
 	title: {
