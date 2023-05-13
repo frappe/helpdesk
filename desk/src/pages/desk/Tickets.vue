@@ -59,7 +59,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="divide-y overflow-x-scroll px-6 py-2 text-base">
+		<div
+			v-if="ticketList.totalCount"
+			class="divide-y overflow-x-scroll px-6 py-2 text-base"
+		>
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
@@ -125,8 +128,16 @@
 				</div>
 			</div>
 		</div>
-		<div class="grow"></div>
-		<div class="flex justify-between border-t p-3 text-base">
+		<div class="flex grow items-center justify-center text-sm text-gray-800">
+			<div v-if="!ticketList.totalCount">
+				🎉 Great news! There are currently no tickets to display. Keep up the
+				good work!
+			</div>
+		</div>
+		<div
+			v-if="ticketList.totalCount"
+			class="flex justify-between border-t p-3 text-base"
+		>
 			<div class="text-gray-600">
 				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of
 				{{ ticketList.totalCount }}
