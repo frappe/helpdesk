@@ -9,7 +9,7 @@
 				label="Email"
 				:type="email !== 'Administrator' ? 'email' : 'text'"
 				v-model="email"
-				placeholder="johndeo@gmail.com"
+				placeholder="johndoe@gmail.com"
 			/>
 			<Input
 				v-if="!forgot"
