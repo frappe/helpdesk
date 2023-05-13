@@ -325,10 +325,12 @@ export default {
 			const options = this.$resources.sortOptions.data || [];
 			return options.map((o) => ({
 				label: o,
-				value: o,
 				handler: () =>
 					this.$router.push({
-						query: { ...this.$route.query, sort: encodeURIComponent(o) },
+						query: {
+							...this.$route.query,
+							sort: encodeURIComponent(o.replaceAll(" ", "-")),
+						},
 					}),
 			}));
 		},
