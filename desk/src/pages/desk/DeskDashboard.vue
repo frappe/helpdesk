@@ -18,7 +18,7 @@
 			<div
 				v-for="i in items.data"
 				:key="i.name"
-				class="h-56 rounded-lg bg-gray-100 p-2"
+				class="h-56 rounded-lg border bg-gray-50 p-2"
 			>
 				<PieChart
 					v-if="i.is_chart && i.chart_type === 'Pie'"

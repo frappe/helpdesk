@@ -1,5 +1,5 @@
 <template>
-	<v-chart class="chart" :option="option" autoresize />
+	<v-chart class="chart" :option="option" :theme="theme" autoresize />
 </template>
 
 <script setup lang="ts">
@@ -14,6 +14,7 @@ import {
 } from "echarts/components";
 import VChart from "vue-echarts";
 import { sortBy } from "lodash";
+import { theme } from "./theme";
 
 type InputData = {
 	name: string;
@@ -57,7 +58,7 @@ const option = ref({
 		trigger: "item",
 		formatter: "{c} ({d}%)",
 	},
-	// roseType: "radius",
+	roseType: "area",
 	labelLine: {
 		smooth: 0.2,
 		length: 10,

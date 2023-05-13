@@ -1,6 +1,6 @@
 <template>
 	<div class="flex h-full flex-col">
-		<div class="select-none text-base font-medium text-gray-800">
+		<div class="select-none pt-1 pl-1 text-base font-medium text-gray-800">
 			{{ title }}
 		</div>
 		<div

@@ -1,5 +1,5 @@
 <template>
-	<v-chart class="chart" :option="option" autoresize />
+	<v-chart class="chart" :option="option" :theme="theme" autoresize />
 </template>
 
 <script setup lang="ts">
@@ -14,6 +14,7 @@ import {
 	TooltipComponent,
 } from "echarts/components";
 import VChart from "vue-echarts";
+import { theme } from "./theme";
 
 type InputData = {
 	name: string;
