@@ -1,9 +1,11 @@
 <template>
 	<div class="flex flex-col">
 		<div
-			class="flex items-center px-6 pt-6 pb-2 text-2xl font-semibold text-gray-900"
+			class="flex select-none items-center px-6 pt-6 pb-2 text-2xl font-semibold text-gray-900"
 		>
-			Hello, {{ authStore.userFirstName }} 👋
+			Hello,
+			<div class="mx-1 text-gray-800">{{ authStore.userFirstName }}</div>
+			👋
 		</div>
 		<div
 			v-if="isEmpty(items.data)"
