@@ -59,11 +59,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="divide-y overflow-x-scroll px-6 py-2 text-base">
+		<div
+			v-if="ticketList.totalCount"
+			class="grow divide-y overflow-x-scroll px-6 py-2 text-base"
+		>
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="flex w-full items-center gap-2 px-2 py-1 transition-all"
+				class="hover:tickets-row flex h-16 w-full items-center gap-2 px-3 py-2 transition-all hover:rounded-lg hover:shadow-xl"
 				:class="{
 					'bg-gray-100': selected.has(t.name),
 				}"
@@ -125,8 +128,17 @@
 				</div>
 			</div>
 		</div>
-		<div class="grow"></div>
-		<div class="flex justify-between border-t p-3 text-base">
+		<div
+			v-else
+			class="flex grow items-center justify-center text-sm text-gray-800"
+		>
+			🎉 Great news! There are currently no tickets to display. Keep up the good
+			work!
+		</div>
+		<div
+			v-if="ticketList.totalCount"
+			class="flex justify-between border-t p-3 text-base"
+		>
 			<div class="text-gray-600">
 				Showing {{ ticketList.startFrom }} to {{ ticketList.endAt }} of
 				{{ ticketList.totalCount }}
@@ -294,14 +306,31 @@ export default {
 		};
 	},
 	computed: {
+		currentFilters() {
+			return this.listFilters.fromQuery();
+		},
+		currentStatus() {
+			const filter = this.currentFilters.find((f) => f.fieldname === "status");
+			const status = filter?.value;
+			return status ? `Status (${status})` : "Status";
+		},
+		currentPriority() {
+			const filter = this.currentFilters.find(
+				(f) => f.fieldname === "priority"
+			);
+			const priority = filter?.value;
+			return priority ? `Priority (${priority})` : "Priority";
+		},
 		sortOptions() {
 			const options = this.$resources.sortOptions.data || [];
 			return options.map((o) => ({
 				label: o,
-				value: o,
 				handler: () =>
 					this.$router.push({
-						query: { ...this.$route.query, sort: encodeURIComponent(o) },
+						query: {
+							...this.$route.query,
+							sort: encodeURIComponent(o.replaceAll(" ", "-")),
+						},
 					}),
 			}));
 		},
@@ -512,5 +541,10 @@ export default {
 .bottom-bar {
 	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.3),
 		0px 1px 3px 1px rgba(0, 0, 0, 0.05), 4px 4px 17px 6px rgba(0, 0, 0, 0.07);
+}
+
+.tickets-row {
+	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.12), 0px 0.5px 2px rgba(0, 0, 0, 0.15),
+		0px 2px 3px rgba(0, 0, 0, 0.16);
 }
 </style>

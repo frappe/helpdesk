@@ -53,6 +53,12 @@ const menuOptions = [
 		to: "DeskTickets",
 	},
 	{
+		label: "Knowledge Base",
+		icon: IconKnowledgeBase,
+		iconActive: IconKnowledgeBaseSolid,
+		to: "DeskKBHome",
+	},
+	{
 		label: "Customers",
 		icon: IconCustomer,
 		iconActive: IconCustomerSolid,
@@ -67,12 +73,6 @@ const menuOptions = [
 ];
 
 const footerOptions = [
-	{
-		label: "Knowledge Base",
-		icon: IconKnowledgeBase,
-		iconActive: IconKnowledgeBaseSolid,
-		to: "DeskKBHome",
-	},
 	{
 		label: "Settings",
 		icon: IconSettings,

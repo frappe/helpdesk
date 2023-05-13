@@ -1,16 +1,16 @@
 <template>
-	<div class="flex h-screen w-screen items-center justify-center">
-		<div class="rounded-xl shadow-xl">
+	<div
+		class="flex h-screen w-screen flex-col items-center justify-center bg-gray-50"
+	>
+		<div class="mb-8">
 			<img
 				v-if="configStore.brandLogo"
 				:src="configStore.brandLogo"
-				class="m-auto h-6"
+				class="m-auto h-8"
 			/>
-			<div v-else class="flex">
-				<div class="mx-auto h-6 w-auto">
-					<CustomIcons name="frappedesk" class="h-6" />
-				</div>
-			</div>
+			<Logo v-else class="mx-auto h-8" />
+		</div>
+		<div class="rounded-xl bg-white shadow-xl">
 			<div class="w-96 py-8 px-10">
 				<div class="mb-6 text-center text-lg">
 					{{ title }}
@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { useConfigStore } from "@/stores/config";
-import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import Logo from "~icons/logos/helpdesk";
 
 defineProps({
 	title: {
