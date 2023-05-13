@@ -29,6 +29,7 @@
   "branding_tab",
   "images_column",
   "brand_logo",
+  "brand_favicon",
   "column_break_fsjn",
   "misc_tab",
   "toasts_column",
@@ -216,11 +217,17 @@
   {
    "fieldname": "column_break_fsjn",
    "fieldtype": "Column Break"
+  },
+  {
+   "description": "Image to be used as website ",
+   "fieldname": "brand_favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-05-05 12:52:41.086826",
+ "modified": "2023-05-14 00:34:20.077662",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
