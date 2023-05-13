@@ -1,7 +1,9 @@
 <template>
 	<div class="flex flex-col">
-		<div class="flex h-14 items-center border-b px-4 text-xl text-gray-900">
-			Welcome, {{ authStore.userFirstName }} &#128075;
+		<div
+			class="flex items-center px-6 pt-6 pb-2 text-2xl font-semibold text-gray-900"
+		>
+			Hello, {{ authStore.userFirstName }} 👋
 		</div>
 		<div
 			v-if="isEmpty(items.data)"
@@ -26,16 +28,7 @@
 					:title="i.title"
 					:data="i.data"
 				/>
-				<div v-else class="flex h-full flex-col">
-					<div class="select-none text-base font-medium text-gray-800">
-						{{ i.title }}
-					</div>
-					<div
-						class="flex grow select-none items-center justify-center text-6xl text-gray-800"
-					>
-						{{ i.data }}
-					</div>
-				</div>
+				<SingleString v-else :title="i.title" :value="i.data" />
 			</div>
 		</div>
 	</div>
@@ -45,8 +38,9 @@
 import { createResource } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { isEmpty } from "lodash";
-import PieChart from "@/components/charts/PieChart.vue";
 import LineChart from "@/components/charts/LineChart.vue";
+import PieChart from "@/components/charts/PieChart.vue";
+import SingleString from "@/components/charts/SingleString.vue";
 
 const authStore = useAuthStore();
 const items = createResource({

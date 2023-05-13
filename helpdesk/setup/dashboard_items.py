@@ -22,6 +22,7 @@ res = frappe.db.get_list(
 	fields=["COUNT(name) as value", "DATE_FORMAT(creation, '%d/%m/%Y') as name"],
 	filters = filters,
 	group_by="DATE(creation)",
+	order_by="DATE(creation)",
 )
 		""",
 	},
