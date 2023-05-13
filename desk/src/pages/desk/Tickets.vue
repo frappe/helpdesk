@@ -14,14 +14,14 @@
 				<Dropdown
 					:options="filterByStatusOptions"
 					:button="{
-						label: 'Status',
+						label: currentStatus,
 						iconRight: 'chevron-down',
 					}"
 				/>
 				<Dropdown
 					:options="filterByPriorityOptions"
 					:button="{
-						label: 'Priority',
+						label: currentPriority,
 						iconRight: 'chevron-down',
 					}"
 				/>
@@ -305,6 +305,19 @@ export default {
 		};
 	},
 	computed: {
+		currentFilters() {
+			return this.listFilters.fromQuery();
+		},
+		currentStatus() {
+			const filter = this.currentFilters.find((f) => f.fieldname === "status");
+			const status = filter?.value;
+			return status ? `Status (${status})` : "Status";
+		},
+		currentPriority() {
+			const filter = this.currentFilters.find((f) => f.fieldname === "priority");
+			const priority = filter?.value;
+			return priority ? `Priority (${priority})` : "Priority";
+		},
 		sortOptions() {
 			const options = this.$resources.sortOptions.data || [];
 			return options.map((o) => ({
@@ -332,13 +345,13 @@ export default {
 		filterByPriorityOptions() {
 			return this.ticketPriorityStore.names.map((priority) => ({
 				label: priority,
-				handler: () => this.filterByPriority(priority),
+				handler: () => this.filterByField("priority", priority),
 			}));
 		},
 		filterByStatusOptions() {
 			return this.ticketStatusStore.options.map((status) => ({
 				label: status,
-				handler: () => this.filterByStatus(status),
+				handler: () => this.filterByField("status", status),
 			}));
 		},
 		agentsAsDropdownOptions() {
@@ -443,12 +456,6 @@ export default {
 							priority: o,
 						}),
 				}));
-		},
-		filterByPriority(priority) {
-			this.filterByField("priority", priority);
-		},
-		filterByStatus(status) {
-			this.filterByField("status", status);
 		},
 		filterByField(fieldname, value) {
 			const f = [
