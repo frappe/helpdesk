@@ -6,11 +6,7 @@
 				:src="configStore.brandLogo"
 				class="m-auto h-6"
 			/>
-			<div v-else class="flex">
-				<div class="mx-auto h-6 w-auto">
-					<CustomIcons name="frappedesk" class="h-6" />
-				</div>
-			</div>
+			<Logo v-else class="mx-auto h-8" />
 			<div class="w-96 py-8 px-10">
 				<div class="mb-6 text-center text-lg">
 					{{ title }}
@@ -23,7 +19,7 @@
 
 <script setup lang="ts">
 import { useConfigStore } from "@/stores/config";
-import CustomIcons from "@/components/desk/global/CustomIcons.vue";
+import Logo from "~icons/logos/helpdesk";
 
 defineProps({
 	title: {
