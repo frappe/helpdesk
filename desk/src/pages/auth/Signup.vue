@@ -15,7 +15,6 @@
 					label="First Name"
 					type="text"
 					placeholder="John"
-					class="mb-4"
 					required
 				/>
 				<Input
@@ -23,10 +22,8 @@
 					label="Last Name"
 					type="text"
 					placeholder="Doe"
-					class="mb-4"
 					required
 				/>
-				<ErrorMessage class="mt-4" error="" />
 				<div>
 					<Button
 						appearance="primary"
