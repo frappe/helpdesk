@@ -616,7 +616,6 @@ class HDTicket(Document):
 		fields = ["name", "commented_by", "content", "creation"]
 
 		l = frappe.get_list("HD Ticket Comment", filters=filters, fields=fields)
-		print(l)
 
 		for i in l:
 			i["sender"] = frappe.get_doc("User", i.commented_by)
