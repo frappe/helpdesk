@@ -31,6 +31,7 @@ export async function init(id: number) {
 		name: id,
 		auto: true,
 		whitelistedMethods: {
+			markSeen: "mark_seen",
 			assign: "assign_agent",
 			getAssignees: "get_assignees",
 			getComments: "get_comments",

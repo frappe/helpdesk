@@ -1,14 +1,22 @@
 <template>
 	<div class="leading-relaxed">
 		<router-link :to="toRoute">
-			<div
-				class="line-clamp-1"
-				:class="{
-					'text-gray-700': isSeen,
-					'text-gray-900': !isSeen,
-				}"
-			>
-				{{ subject }}
+			<div class="flex justify-between">
+				<div
+					class="line-clamp-1"
+					:class="{
+						'text-gray-700': isSeen,
+						'text-gray-900': !isSeen,
+					}"
+				>
+					{{ subject }}
+				</div>
+				<div
+					v-if="!isSeen"
+					class="badge-new mr-2 flex items-center justify-center bg-gray-900 text-xs text-white"
+				>
+					New
+				</div>
 			</div>
 		</router-link>
 		<div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
@@ -66,3 +74,12 @@ const ticket = createDocumentResource({
 
 ticket.getMeta.fetch();
 </script>
+
+<style scoped>
+.badge-new {
+	padding: 3px 6px;
+	width: 38px;
+	height: 20px;
+	border-radius: 5px;
+}
+</style>

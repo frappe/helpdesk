@@ -32,6 +32,7 @@ const configStore = useConfigStore();
 
 init(parseInt(props.ticketId)).then(() => {
 	configStore.setTitle(ticket.doc.subject);
+	ticket.markSeen.submit();
 	isResLoaded.value = true;
 });
 
