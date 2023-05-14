@@ -135,7 +135,7 @@ const routes = [
 			{
 				path: "tickets/:ticketId",
 				name: AGENT_PORTAL_TICKET,
-				component: () => import("@/pages/desk/ticket/TicketNeo.vue"),
+				component: () => import("@/pages/desk/ticket/TicketSingle.vue"),
 				props: true,
 				meta: {
 					breadcrumbs(route) {

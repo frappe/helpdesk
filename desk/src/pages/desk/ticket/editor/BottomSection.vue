@@ -77,7 +77,7 @@
 				</div>
 			</div>
 		</div>
-		<ArticleResponseDialog
+		<ArticleResponses
 			:show="showArticleResponse"
 			@close="showArticleResponse = false"
 			@contentVal="(val) => (editor.content = val)"
@@ -102,8 +102,8 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { editor, ticket, clean } from "../data";
 import { TextEditorMenuButtons as menuButtons } from "../../consts";
-import ArticleResponseDialog from "@/components/desk/global/ArticleResponseDialog.vue";
 import CannedResponses from "./CannedResponses.vue";
+import ArticleResponses from "./ArticleResponses.vue";
 import AttachmentItem from "@/components/AttachmentItem.vue";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import IconDelete from "~icons/espresso/delete";
