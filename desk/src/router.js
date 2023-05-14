@@ -7,6 +7,7 @@ export const SIGNUP = "Signup";
 export const VERIFY = "Verify Account";
 export const AGENT_PORTAL_LANDING = "DeskTickets";
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+export const AGENT_PORTAL_TICKET = "DeskTicket";
 export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
 export const AUTH_ROUTES = [LOGIN, SIGNUP, VERIFY];
 export const KNOWLEDGE_BASE_PUBLIC = "Knowledge Base";
@@ -133,8 +134,8 @@ const routes = [
 			},
 			{
 				path: "tickets/:ticketId",
-				name: "DeskTicket",
-				component: () => import("@/pages/desk/Ticket.vue"),
+				name: AGENT_PORTAL_TICKET,
+				component: () => import("@/pages/desk/ticket/TicketSingle.vue"),
 				props: true,
 				meta: {
 					breadcrumbs(route) {

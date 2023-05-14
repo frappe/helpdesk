@@ -9,14 +9,26 @@ module.exports = {
 	],
 	theme: {
 		extend: {
-			zIndex: {
-				5: "5",
-			},
 			fontSize: {
 				xs: "12px",
 				sm: "13px",
 				base: "14px",
+				lg: "16px",
+				xl: "18px",
 				"2xl": "20px",
+			},
+			height: {
+				18: "68px",
+			},
+			margin: {
+				3.5: "14px",
+			},
+			padding: {
+				2.5: "10px",
+				3.5: "14px",
+			},
+			zIndex: {
+				5: "5",
 			},
 		},
 	},

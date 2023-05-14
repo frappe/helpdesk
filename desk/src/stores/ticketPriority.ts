@@ -17,6 +17,12 @@ export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 	const options: ComputedRef<Array<TicketPriority>> = computed(
 		() => d__.list?.data || []
 	);
+	const dropdown = computed(() =>
+		options.value.map((o) => ({
+			label: o.name,
+			value: o.name,
+		}))
+	);
 	const names = computed(() => options.value.map((o) => o.name));
 	const colorMap = {
 		Urgent: "red",
@@ -27,6 +33,7 @@ export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 
 	return {
 		colorMap,
+		dropdown,
 		names,
 		options,
 	};

@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, ref } from "vue";
 import { defineStore } from "pinia";
 import { createResource } from "frappe-ui";
 import { useFavicon } from "@vueuse/core";
@@ -23,9 +23,19 @@ export const useConfigStore = defineStore("config", () => {
 	const suppressEmailToast: ComputedRef<boolean> = computed(
 		() => config.value.suppress_default_email_toast ?? true
 	);
+	const pageTitle = ref(null);
+	const windowTitle = computed(() =>
+		pageTitle.value
+			? `${pageTitle.value} | ${helpdeskName.value}`
+			: helpdeskName.value
+	);
+
+	function setTitle(title?: string) {
+		pageTitle.value = title ? title : null;
+	}
 
 	useFavicon(brandFavicon);
-	useTitle(helpdeskName);
+	useTitle(windowTitle);
 
 	socket.on("helpdesk:settings-updated", () => configRes.reload());
 
@@ -34,5 +44,7 @@ export const useConfigStore = defineStore("config", () => {
 		brandLogo,
 		helpdeskName,
 		suppressEmailToast,
+
+		setTitle,
 	};
 });
