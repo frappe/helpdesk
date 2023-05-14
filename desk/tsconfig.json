@@ -1,5 +1,7 @@
 {
 	"compilerOptions": {
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
 		"target": "es2021",
 		"moduleResolution":"node",
 		"paths": {

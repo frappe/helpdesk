@@ -16,6 +16,7 @@ from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.query_builder import Case, DocType, Order
 from frappe.query_builder.functions import Count
+from frappe.realtime import get_website_room
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
@@ -156,6 +157,11 @@ class HDTicket(Document):
 					self.name, f"{field_maps[field]} set to {self.as_dict()[field]}"
 				)
 
+		event = "helpdesk:ticket-update"
+		room = get_website_room()
+		data = {"name": self.name}
+		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+
 	def remove_assignment_if_not_in_team(self):
 		"""
 		Removes the assignment if the agent is not in the team.
@@ -278,6 +284,7 @@ class HDTicket(Document):
 		self.db_set("resolution_time", None)
 		self.db_set("user_resolution_time", None)
 
+	@frappe.whitelist()
 	def assign_agent(self, agent):
 		if self._assign:
 			assignees = json.loads(self._assign)
@@ -290,11 +297,11 @@ class HDTicket(Document):
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 		agent_name = frappe.get_value("HD Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
-		frappe.publish_realtime(
-			"helpdesk:update-ticket-assignee",
-			{"ticket_id": self.name},
-			after_commit=True,
-		)
+
+		event = "helpdesk:ticket-assignee-update"
+		data = {"name": self.name}
+		room = get_website_room()
+		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
 
 	def get_assigned_agent(self):
 		if self._assign:
@@ -335,7 +342,7 @@ class HDTicket(Document):
 		return bool(int(check))
 
 	@frappe.whitelist()
-	def last_communication(self):
+	def get_last_communication(self):
 		filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", self.name]}
 
 		try:
@@ -349,7 +356,7 @@ class HDTicket(Document):
 			pass
 
 	def last_communication_email(self):
-		if not (communication := self.last_communication()):
+		if not (communication := self.get_last_communication()):
 			return
 
 		if not communication.email_account:
@@ -397,11 +404,11 @@ class HDTicket(Document):
 		sender = frappe.session.user
 		recipients = self.raised_by
 		sender_email = None if skip_email_workflow else self.sender_email()
-		last_communication = self.last_communication()
+		last_communication = self.get_last_communication()
 
 		if last_communication:
-			bcc = last_communication.bcc or bcc
-			cc = last_communication.cc or cc
+			cc = cc or last_communication.cc
+			bcc = bcc or last_communication.bcc
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
@@ -540,12 +547,80 @@ class HDTicket(Document):
 
 		res = (
 			frappe.qb.from_(QBUser)
-			.select(QBUser.full_name, QBUser.user_image)
+			.select(QBUser.name, QBUser.full_name, QBUser.user_image)
 			.where(Case.any(condition))
 			.run(as_dict=True)
 		)
 
 		return res
+
+	@frappe.whitelist()
+	def get_communications(self):
+		conversations = frappe.db.get_all(
+			"Communication",
+			filters={
+				"reference_doctype": ["=", "HD Ticket"],
+				"reference_name": ["=", self.name],
+			},
+			order_by="creation asc",
+			fields=[
+				"name",
+				"content",
+				"creation",
+				"sent_or_received",
+				"sender",
+				"cc",
+				"bcc",
+			],
+		)
+
+		for conversation in conversations:
+			if frappe.db.exists("HD Agent", conversation.sender):
+				# user User details instead of Contact if the sender is an agent
+				sender = frappe.get_doc("User", conversation.sender).__dict__
+				sender["image"] = sender["user_image"]
+			else:
+				contacts = frappe.get_all(
+					"Contact Email",
+					filters=[["email_id", "like", "%{0}".format(conversation.sender)]],
+					fields=["parent"],
+					limit=1,
+				)
+				if len(contacts) > 0:
+					sender = frappe.get_doc("Contact", contacts[0].parent)
+				else:
+					sender = frappe.get_last_doc(
+						"User", filters={"email": conversation.sender}
+					)
+
+			conversation.sender = sender
+
+			attachments = frappe.get_all(
+				"File",
+				["file_name", "file_url"],
+				{
+					"attached_to_name": conversation.name,
+					"attached_to_doctype": "Communication",
+				},
+			)
+
+			conversation.attachments = attachments
+
+		return conversations
+
+	@frappe.whitelist()
+	def get_comments(self):
+		filters = {
+			"reference_ticket": self.name,
+		}
+		fields = ["name", "commented_by", "content", "creation"]
+
+		l = frappe.get_list("HD Ticket Comment", filters=filters, fields=fields)
+
+		for i in l:
+			i["sender"] = frappe.get_doc("User", i.commented_by)
+
+		return l
 
 
 def set_descritption_from_communication(doc, type):

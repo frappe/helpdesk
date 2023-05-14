@@ -37,3 +37,10 @@ class HDTicketComment(Document):
 		room = get_website_room()
 
 		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+
+	def after_delete(self):
+		event = "helpdesk:delete-ticket-comment"
+		data = {"ticket_id": self.reference_ticket}
+		room = get_website_room()
+
+		frappe.publish_realtime(event, message=data, room=room, after_commit=True)

@@ -11,6 +11,7 @@
 <script>
 import { ref } from "vue";
 import { Dropdown } from "frappe-ui";
+import { useConfigStore } from "@/stores/config";
 import { useListFilters } from "@/composables/listFilters";
 
 export default {
@@ -19,11 +20,13 @@ export default {
 		Dropdown,
 	},
 	setup() {
+		const configStore = useConfigStore();
 		const listFilters = useListFilters();
 		const presetFilters = ref([]);
 		const presetTitle = ref("");
 
 		return {
+			configStore,
 			listFilters,
 			presetFilters,
 			presetTitle,
@@ -72,13 +75,20 @@ export default {
 			return options;
 		},
 	},
+	watch: {
+		title(newTitle) {
+			this.configStore.setTitle(newTitle);
+		},
+	},
 	mounted() {
+		this.configStore.setTitle(this.title);
 		this.$socket.on("helpdesk:new-preset-filter", (data) => {
 			if (data.reference_doctype !== "HD Ticket") return;
 			this.$resources.presetFilterOptions.reload();
 		});
 	},
 	unmounted() {
+		this.configStore.setTitle();
 		this.$socket.off("helpdesk:new-preset-filter");
 	},
 	resources: {

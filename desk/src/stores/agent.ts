@@ -18,8 +18,15 @@ export const useAgentStore = defineStore("agent", () => {
 	const options: ComputedRef<Array<Agent>> = computed(
 		() => d__.list?.data || []
 	);
+	const dropdown = computed(() =>
+		options.value.map((o) => ({
+			label: o.agent_name,
+			value: o.name,
+		}))
+	);
 
 	return {
+		dropdown,
 		options,
 	};
 });

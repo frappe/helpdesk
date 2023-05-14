@@ -2,26 +2,24 @@ import { computed, ComputedRef } from "vue";
 import { defineStore } from "pinia";
 import { createListResource } from "frappe-ui";
 
-type TicketType = {
+type Team = {
 	name: string;
-	description: string;
-	priority: string;
 };
 
-export const useTicketTypeStore = defineStore("ticketType", () => {
+export const useTeamStore = defineStore("team", () => {
 	const d__ = createListResource({
-		doctype: "HD Ticket Type",
-		fields: ["*"],
+		doctype: "HD Team",
 		auto: true,
 	});
 
-	const options: ComputedRef<Array<TicketType>> = computed(
+	const options: ComputedRef<Array<Team>> = computed(
 		() => d__.list?.data || []
 	);
+
 	const dropdown = computed(() =>
-		options.value.map((o) => ({
-			label: o.name,
-			value: o.name,
+		options.value.map((i) => ({
+			label: i.name,
+			value: i.name,
 		}))
 	);
 
