@@ -1,5 +1,5 @@
 <template>
-	<div class="leading-relaxed">
+	<div class="flex flex-col justify-between">
 		<router-link :to="toRoute">
 			<div class="flex justify-between">
 				<div

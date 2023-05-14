@@ -66,24 +66,20 @@
 			<div
 				v-for="t in ticketList.list.data"
 				:key="t.name"
-				class="hover:tickets-row flex h-16 w-full items-center gap-2 px-3 py-2 transition-all hover:rounded-lg hover:shadow-xl"
+				class="tickets-row flex h-16 w-full items-start gap-2 px-3 py-2 transition-all hover:rounded-lg"
 				:class="{
 					'bg-gray-100': selected.has(t.name),
 				}"
 			>
 				<div class="cursor-pointer select-none pl-1 pr-4 text-gray-600">
-					<IconTicket
-						v-show="!selected.has(t.name)"
-						class="h-4 w-4"
-						@click="() => toggleOne(t.name, true)"
-					/>
-					<IconTicketSolid
-						v-show="selected.has(t.name)"
-						class="h-4 w-4"
-						@click="() => toggleOne(t.name, false)"
+					<Input
+						type="checkbox"
+						class="mt-1 cursor-pointer"
+						:value="selected.has(t.name)"
+						@click="() => toggleOne(t.name, !selected.has(t.name))"
 					/>
 				</div>
-				<div class="w-2/5">
+				<div class="w-2/5 self-center">
 					<TicketSummary :ticket-name="t.name" />
 				</div>
 				<div class="flex w-3/5 items-center gap-2">
@@ -241,8 +237,6 @@ import AssignedInfo from "@/components/desk/tickets/AssignedInfo.vue";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
 import IconSort from "~icons/espresso/sort-arrow";
-import IconTicket from "~icons/espresso/ticket";
-import IconTicketSolid from "~icons/espresso/ticket-solid";
 
 export default {
 	name: "Tickets",
@@ -257,8 +251,6 @@ export default {
 		IconCaretDown,
 		IconCaretUp,
 		IconSort,
-		IconTicket,
-		IconTicketSolid,
 	},
 	setup() {
 		const agentStore = useAgentStore();
@@ -543,7 +535,7 @@ export default {
 		0px 1px 3px 1px rgba(0, 0, 0, 0.05), 4px 4px 17px 6px rgba(0, 0, 0, 0.07);
 }
 
-.tickets-row {
+.tickets-row:hover {
 	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.12), 0px 0.5px 2px rgba(0, 0, 0, 0.15),
 		0px 2px 3px rgba(0, 0, 0, 0.16);
 }
