@@ -44,7 +44,7 @@ const menuOptions = [
 		label: "Dashboard",
 		icon: IconDashboard,
 		iconActive: IconDashboardSolid,
-		to: "Dashboard",
+		to: "DeskDashboard",
 	},
 	{
 		label: "Tickets",
