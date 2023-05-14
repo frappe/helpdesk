@@ -118,7 +118,8 @@ export function useListFilters() {
 		if (!sort) return;
 		if (sort instanceof Array) return;
 
-		return [decodeURIComponent(sort), sortDirection].join(" ").trim();
+		const sortBy = decodeURIComponent(sort).replaceAll("-", " ");
+		return [sortBy, sortDirection].join(" ").trim();
 	}
 
 	function applyQuery(query: Array<FilterItem> | string) {

@@ -1,5 +1,5 @@
 <template>
-	<router-view />
+	<router-view class="antialiased" />
 	<Toasts />
 	<KeymapDialog />
 </template>

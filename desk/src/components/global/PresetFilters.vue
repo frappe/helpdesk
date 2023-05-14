@@ -1,16 +1,20 @@
 <template>
 	<Dropdown placement="left" :options="options">
-		<template #default="{ toggleDropdown }">
+		<template v-slot="{ toggleDropdown }">
 			<div
-				class="flex select-none flex-row items-center space-x-1"
-				:class="{ 'cursor-pointer': !$_.isEmpty(options) }"
+				class="flex flex-row items-center space-x-1 select-none"
+				:class="{ 'cursor-pointer': options.length > 0 }"
 				@click="toggleDropdown"
 			>
 				<div class="text-lg font-semibold">
-					{{ title }}
+					{{
+						`${listTitle ? listTitle : title} (${
+							manager.totalCount
+						})`
+					}}
 				</div>
 				<FeatherIcon
-					v-if="!$_.isEmpty(options)"
+					v-if="options.length > 0"
 					name="chevron-down"
 					class="h-4 w-4 stroke-2"
 				/>
@@ -20,56 +24,52 @@
 </template>
 
 <script>
-import { inject, ref } from "vue";
-import { Dropdown, FeatherIcon } from "frappe-ui";
-import { useListFilters } from "@/composables/listFilters"
-import { useAuthStore } from "@/stores/auth";
+import { Dropdown, FeatherIcon } from "frappe-ui"
+import { inject, ref } from "vue"
 
 export default {
 	name: "PresetFilters",
+	props: ["listTitle"],
 	components: {
 		Dropdown,
 		FeatherIcon,
 	},
-	props: {
-		doctype: {
-			type: String,
-			required: true,
-			default: "HD Ticket",
-		},
-		listTitle: {
-			type: String,
-			required: true,
-			default: "Default List Title",
-		},
-		itemCount: {
-			type: Number,
-			required: true,
-		},
-	},
 	setup() {
-		const manager = inject("manager");
-		const authStore = useAuthStore();
-		const listFilters = useListFilters();
-		const presetFilters = ref([]);
+		const manager = inject("manager")
+		const renderOptions = inject("renderOptions")
+		const user = inject("user")
+
+		const title = ref(`All ${manager.value.options.doctype}s`)
+
+		const presetFilters = ref([])
 
 		return {
 			manager,
-			authStore,
-			listFilters,
+			renderOptions,
+			user,
+			title,
 			presetFilters,
-		};
+		}
+	},
+	mounted() {
+		this.$socket.on("list_update", (data) => {
+			if (data.doctype === "FD Preset Filter") {
+				this.$resources.presetFilterOptions.fetch()
+			}
+		})
+	},
+	watch: {
+		filters() {
+			this.sync()
+		},
 	},
 	computed: {
-		title() {
-			return this.listTitle;
-		},
 		filters() {
-			return this.manager.sudoFilters;
+			return this.manager.sudoFilters
 		},
 		options() {
-			let options = [];
-			let data = this.$resources.presetFilterOptions.data || [];
+			let options = []
+			let data = this.$resources.presetFilterOptions.data || []
 			if (Object.keys(data).length) {
 				Object.keys(data).forEach((group) => {
 					if (data[group].length) {
@@ -80,94 +80,82 @@ export default {
 								return {
 									label: item.title,
 									handler: () => {
-										this.title = item.title;
-										this.presetFilters = [...item.filters];
+										this.title = item.title
+										this.presetFilters = [...item.filters]
 										this.manager.addFilters(
 											[...item.filters],
 											this.manager.options.urlQueryFilters
-										);
+										)
 									},
 									filters: [...item.filters],
-								};
+								}
 							}),
-						});
+						})
 					}
-				});
+				})
 			}
 			this.$nextTick(() => {
-				this.sync();
-			});
-			return options;
+				this.sync()
+			})
+			return options
 		},
-	},
-	watch: {
-		filters() {
-			this.sync();
-		},
-	},
-	mounted() {
-		this.$socket.on("list_update", (data) => {
-			if (data.doctype === "FD Preset Filter") {
-				this.$resources.presetFilterOptions.fetch();
-			}
-		});
 	},
 	methods: {
 		sync() {
 			let filters = this.filters.filter((filter) => {
-				return filter.fieldname && filter.filter_type && filter.value;
-			});
+				return filter.fieldname && filter.filter_type && filter.value
+			})
 
 			let checkIfFiltersAreSame = (a, b) => {
 				if (a.length !== b.length) {
-					return false;
+					return false
 				}
 				for (let i = 0; i < a.length; i++) {
 					if (a[i].fieldname !== b[i].fieldname) {
-						return false;
+						return false
 					}
 					if (
 						a[i].fieldname === "_assign" &&
 						a[i].value === "@me" &&
-						b[i].value === this.authStore.userId
+						b[i].value === this.user.user
 					) {
-						continue;
+						continue
 					}
 					if (a[i].filter_type !== b[i].filter_type) {
-						return false;
+						return false
 					}
 					if (a[i].value !== b[i].value) {
-						return false;
+						return false
 					}
 				}
-				return true;
-			};
+				return true
+			}
 
-			this.title = `Filtered ${this.manager.options.doctype}s`;
+			this.title = `Filtered ${this.manager.options.doctype}s`
 
 			if (filters.length == 0) {
-				this.title = `All ${this.manager.options.doctype}s`;
+				this.title = `All ${this.manager.options.doctype}s`
 			} else {
 				this.options.forEach((group) => {
 					group.items.forEach((x) => {
 						if (checkIfFiltersAreSame(x.filters, filters)) {
-							this.title = x.label;
+							this.title = x.label
 						}
-					});
-				});
+					})
+				})
 			}
 		},
 	},
 	resources: {
 		presetFilterOptions() {
 			return {
-				url: "helpdesk.api.general.get_preset_filters",
+				url: "frappedesk.api.general.get_preset_filters",
 				params: {
-					doctype: this.doctype,
+					doctype: this.manager.options.doctype,
 				},
 				auto: true,
-			};
+			}
 		},
 	},
-};
+}
 </script>

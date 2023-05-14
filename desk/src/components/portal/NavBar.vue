@@ -1,164 +1,70 @@
 <template>
-	<div class="py-4">
-		<div class="container mx-auto">
-			<div class="flex flex-wrap justify-between items-center">
-				<div class="flex items-center">
-					<a href="/"
-						><CustomIcons name="company" class="max-h-10"
-					/></a>
-				</div>
-				<div
-					class="flex space-x-8 text-[14px] text-[#4C5A67] items-center"
-				>
-					<div v-for="item in navbarItems" :key="item.label">
-						<Dropdown
-							v-if="item.children.length > 0"
-							:options="item.children"
-						>
-							<template v-slot="{ toggleDropdown }">
-								<div
-									class="flex flex-row space-x-2 items-center cursor-pointer"
-									@click="toggleDropdown"
-								>
-									<span class="hover:text-[#2490ef]">{{
-										item.label
-									}}</span>
-									<FeatherIcon
-										name="chevron-down"
-										class="h-4 w-4 stroke-black"
-									/>
-								</div>
-							</template>
-						</Dropdown>
-						<a
-							v-else
-							:href="item.url"
-							class="hover:text-[#2490ef]"
-							v-html="item.label"
-						/>
-					</div>
-					<Dropdown
-						placement="right"
-						:options="profileOptions"
-						:dropdown-width-full="true"
-					>
-						<template v-slot="{ toggleDropdown }">
-							<CustomAvatar
-								v-if="authStore.userId"
-								@click="toggleDropdown"
-								:label="authStore.username"
-								class="cursor-pointer"
-								size="xl"
-								:imageURL="authStore.userImage"
-							/>
-						</template>
-					</Dropdown>
-				</div>
+	<div
+		class="container mx-auto flex flex-wrap items-center justify-between py-4"
+	>
+		<a href="/">
+			<img
+				v-if="configStore.brandLogo"
+				:src="configStore.brandLogo"
+				class="m-auto h-6"
+			/>
+			<div v-else class="text-gray-800">
+				{{ configStore.helpdeskName }}
 			</div>
+		</a>
+		<div class="flex items-center gap-4 text-lg text-gray-800">
+			<div v-for="item in navbarItems" :key="item.label">
+				<router-link :to="{ name: item.route }">
+					<div class="hover:text-blue-600">{{ item.label }}</div>
+				</router-link>
+			</div>
+			<Dropdown :options="profileItems">
+				<template #default>
+					<Avatar
+						v-if="authStore.userId"
+						:label="authStore.username"
+						class="cursor-pointer"
+						size="md"
+						:image-u-r-l="authStore.userImage"
+					/>
+				</template>
+			</Dropdown>
 		</div>
 	</div>
 </template>
 
-<script>
-import { inject } from "vue"
-import { Dropdown, FeatherIcon } from "frappe-ui"
-import CustomIcons from "@/components/desk/global/CustomIcons.vue"
-import CustomAvatar from "../global/CustomAvatar.vue"
-import { useAuthStore } from "@/stores/auth"
+<script setup lang="ts">
+import { Avatar, Dropdown } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
+import { CUSTOMER_PORTAL_NEW_TICKET, KNOWLEDGE_BASE_PUBLIC } from "@/router";
 
-export default {
-	name: "NavBar",
-	components: {
-		CustomIcons,
-		CustomAvatar,
-		Dropdown,
-		FeatherIcon,
-	},
-	setup() {
-		const authStore = useAuthStore()
-		const ticketTemplates = inject("ticketTemplates")
+const authStore = useAuthStore();
+const configStore = useConfigStore();
 
-		return { authStore, ticketTemplates }
-	},
-	resources: {
-		navbarItems() {
-			return {
-				url: "helpdesk.api.website.navbar_items",
-				auto: true,
-			}
+const profileItems = [
+	{
+		label: "My Account",
+		handler: () => {
+			window.open("/me");
 		},
 	},
-	computed: {
-		navbarItems() {
-			const parentItems = []
-			if (this.$resources.navbarItems.data) {
-				this.$resources.navbarItems.data.forEach((item) => {
-					if (!item.parent_label) {
-						item.children = []
-						parentItems.push(item)
-					}
-				})
-				this.$resources.navbarItems.data.forEach((item) => {
-					if (item.parent_label) {
-						item.handler = () => {
-							window.location.href = item.url
-						}
-						parentItems
-							.find((x) => x.label === item.parent_label)
-							.children.push(item)
-					}
-				})
-			}
-			// Add "Create a Ticket" option on the navbar if not already present
-			const newTicketRoutes = [
-				"/my-tickets",
-				"/my-tickets/",
-				"/my-tickets/new",
-				"/my-tickets/new/",
-			]
-			const currentRouteIsNewTicket = () => {
-				for (let route of newTicketRoutes) {
-					if (
-						this.$route.fullPath.substring(0, route.length) ===
-						route
-					) {
-						return true
-					}
-				}
-				return false
-			}
-			const newTicketRouteExists = () => {
-				return (
-					parentItems.find((x) => newTicketRoutes.includes(x.url)) !==
-					undefined
-				)
-			}
-			if (!currentRouteIsNewTicket() && !newTicketRouteExists()) {
-				parentItems.push({
-					label: "Create a Ticket",
-					url: "/my-tickets",
-					children: [],
-				})
-			}
-			return parentItems
-		},
-		profileOptions() {
-			return [
-				{
-					label: "My Account",
-					handler: () => {
-						window.location.href = "/me"
-					},
-				},
-				{
-					label: "Logout",
-					handler: () => {
-						this.authStore.logout()
-						window.location.href = "/login"
-					},
-				},
-			]
+	{
+		label: "Logout",
+		handler: () => {
+			authStore.logout();
 		},
 	},
-}
+];
+
+const navbarItems = [
+	{
+		label: "New Ticket",
+		route: CUSTOMER_PORTAL_NEW_TICKET,
+	},
+	{
+		label: "Knowledge Base",
+		route: KNOWLEDGE_BASE_PUBLIC,
+	},
+];
 </script>

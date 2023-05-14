@@ -24,6 +24,11 @@ export default defineConfig({
 
 					return r.toMinifiedString();
 				}),
+				logos: FileSystemIconLoader("./src/assets/logos", async (svg) => {
+					const r = new SVG(svg);
+					await cleanupSVG(r);
+					return r.toMinifiedString();
+				}),
 			},
 		}),
 	],

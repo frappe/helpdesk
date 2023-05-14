@@ -14,9 +14,11 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useKeymapStore } from "@/stores/keymap";
 import { useSidebarStore } from "@/stores/sidebar";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import UserMenu from "./UserMenu.vue";
 import LinkGroup from "./LinkGroup.vue";
 import IconDashboard from "~icons/espresso/dashboard";
@@ -32,6 +34,7 @@ import IconKnowledgeBaseSolid from "~icons/espresso/knowledge-base-solid";
 import IconSettings from "~icons/espresso/settings";
 import IconSettingsSolid from "~icons/espresso/settings-solid";
 
+const router = useRouter();
 const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
@@ -50,6 +53,12 @@ const menuOptions = [
 		to: "DeskTickets",
 	},
 	{
+		label: "Knowledge Base",
+		icon: IconKnowledgeBase,
+		iconActive: IconKnowledgeBaseSolid,
+		to: "DeskKBHome",
+	},
+	{
 		label: "Customers",
 		icon: IconCustomer,
 		iconActive: IconCustomerSolid,
@@ -64,12 +73,6 @@ const menuOptions = [
 ];
 
 const footerOptions = [
-	{
-		label: "Knowledge Base",
-		icon: IconKnowledgeBase,
-		iconActive: IconKnowledgeBaseSolid,
-		to: "DeskKBHome",
-	},
 	{
 		label: "Settings",
 		icon: IconSettings,
@@ -88,7 +91,8 @@ const profileSettings = [
 		label: "Customer portal",
 		icon: "users",
 		handler: () => {
-			window.open("/my-tickets", "_blank");
+			const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
+			window.open(path.href, "_blank");
 		},
 	},
 	{

@@ -153,13 +153,13 @@
 								>
 									<input
 										v-model="workingHour.from"
-										class="w-[6.4rem] rounded border-0 bg-gray-100 p-1 text-base"
+										class="w-28 rounded border-0 bg-gray-100 p-1 text-base"
 										type="time"
 									/>
 									<div class="text-gray-600">TO</div>
 									<input
 										v-model="workingHour.to"
-										class="w-[6.4rem] rounded border-0 bg-gray-100 p-1 text-base"
+										class="w-28 rounded border-0 bg-gray-100 p-1 text-base"
 										type="time"
 									/>
 								</div>
