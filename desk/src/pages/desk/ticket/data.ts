@@ -82,6 +82,7 @@ export function clean() {
 	editor.bcc = [];
 	editor.isCcVisible = false;
 	editor.isBccVisible = false;
+	sidebar.isVisible = true;
 }
 
 /**
