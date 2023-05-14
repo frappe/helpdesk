@@ -471,7 +471,7 @@ class HDTicket(Document):
 
 		try:
 			frappe.sendmail(
-				# args=args,
+				args=args,
 				attachments=_attachments,
 				bcc=bcc,
 				cc=cc,
