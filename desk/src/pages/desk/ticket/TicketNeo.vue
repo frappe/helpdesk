@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue";
 import { useConfigStore } from "@/stores/config";
-import { clean, init, ticket } from "./data";
+import { deinit, init, ticket } from "./data";
 import ConversationBox from "./ConversationBox.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
@@ -36,7 +36,7 @@ init(parseInt(props.ticketId)).then(() => {
 });
 
 onUnmounted(() => {
-	clean();
+	deinit();
 	configStore.setTitle();
 });
 </script>

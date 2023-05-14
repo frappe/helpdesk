@@ -1,6 +1,7 @@
 import { reactive } from "vue";
 import { createDocumentResource } from "frappe-ui";
 import { socket } from "@/socket";
+import { createToast } from "@/utils/toasts";
 
 export let ticket = null;
 
@@ -50,6 +51,14 @@ export async function init(id: number) {
 				onSuccess() {
 					clean();
 				},
+				onError(error) {
+					createToast({
+						title: "Error sending reply",
+						text: error.messages?.join("\n"),
+						icon: "x",
+						iconClasses: "text-red-500",
+					});
+				},
 			},
 		},
 	});
@@ -73,7 +82,13 @@ export function clean() {
 	editor.bcc = [];
 	editor.isCcVisible = false;
 	editor.isBccVisible = false;
+}
 
+/**
+ * Reset all states, and stop listening to socket events
+ */
+export function deinit() {
+	clean();
 	socket.off("helpdesk:ticket-update");
 	socket.off("helpdesk:ticket-assignee-update");
 }
