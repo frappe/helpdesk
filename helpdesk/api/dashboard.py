@@ -17,8 +17,8 @@ def get_all():
 
 
 def ticket_statuses():
-	date_7_days_ago = datetime.now() - timedelta(days=7)
-	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+	thirty_days_ago = datetime.now() - timedelta(days=30)
+	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
 
 	res = frappe.db.get_list(
 		"HD Ticket",
@@ -37,9 +37,9 @@ def ticket_statuses():
 
 def avg_first_response_time():
 	average_resolution_time = float(0.0)
-	date_7_days_ago = datetime.now() - timedelta(days=7)
+	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {
-		"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")],
+		"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")],
 		"resolution_time": ["not like", ""],
 	}
 
@@ -66,8 +66,8 @@ def avg_first_response_time():
 
 
 def ticket_types():
-	date_7_days_ago = datetime.now() - timedelta(days=7)
-	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+	thirty_days_ago = datetime.now() - timedelta(days=30)
+	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
 
 	res = frappe.db.get_list(
 		"HD Ticket",
@@ -85,8 +85,8 @@ def ticket_types():
 
 
 def new_tickets():
-	date_7_days_ago = datetime.now() - timedelta(days=7)
-	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+	thirty_days_ago = datetime.now() - timedelta(days=30)
+	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
 
 	res = frappe.db.get_list(
 		"HD Ticket",
@@ -105,9 +105,9 @@ def new_tickets():
 
 
 def resolution_within_sla():
-	date_7_days_ago = datetime.now() - timedelta(days=7)
+	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {
-		"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")],
+		"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")],
 		"status": "Closed",
 	}
 
@@ -139,8 +139,8 @@ def resolution_within_sla():
 
 
 def ticket_activity():
-	date_7_days_ago = datetime.now() - timedelta(days=7)
-	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+	thirty_days_ago = datetime.now() - timedelta(days=30)
+	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
 
 	res = frappe.db.get_list(
 		"HD Ticket Activity",
@@ -159,8 +159,8 @@ def ticket_activity():
 
 
 def ticket_priority():
-	date_7_days_ago = datetime.now() - timedelta(days=7)
-	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+	thirty_days_ago = datetime.now() - timedelta(days=30)
+	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
 
 	res = frappe.db.get_list(
 		"HD Ticket",
