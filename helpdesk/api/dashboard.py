@@ -112,7 +112,7 @@ def resolution_within_sla():
 		res = str(resolution_within_sla_percentage) + "%"
 
 	return {
-		"title": "Avg First Response Time",
+		"title": "Resolution Within SLA",
 		"is_chart": False,
 		"data": res,
 	}
