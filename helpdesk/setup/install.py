@@ -3,7 +3,6 @@ from datetime import datetime
 import frappe
 from frappe.permissions import add_permission
 
-from .dashboard_items import create_dashboard_items
 from .welcome_ticket import create_welcome_ticket
 
 
@@ -23,7 +22,6 @@ def after_install():
 	add_default_assignment_rule()
 	add_system_preset_filters()
 	create_welcome_ticket()
-	create_dashboard_items()
 
 
 def add_support_redirect_to_tickets():

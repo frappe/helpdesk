@@ -17,7 +17,7 @@
 		<div v-else class="grid grid-cols-3 gap-4 overflow-y-scroll p-4">
 			<div
 				v-for="i in items.data"
-				:key="i.name"
+				:key="i.title"
 				class="h-56 rounded-lg border bg-gray-50 p-2"
 			>
 				<PieChart
@@ -46,7 +46,7 @@ import SingleString from "@/components/charts/SingleString.vue";
 
 const authStore = useAuthStore();
 const items = createResource({
-	url: "helpdesk.api.dashboard.get_many",
+	url: "helpdesk.api.dashboard.get_all",
 	auto: true,
 });
 </script>
