@@ -17,9 +17,13 @@ def get_all():
 
 
 def ticket_statuses():
+	date_7_days_ago = datetime.now() - timedelta(days=7)
+	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+
 	res = frappe.db.get_list(
 		"HD Ticket",
 		fields=["count(name) as value", "status as name"],
+		filters=filters,
 		group_by="status",
 	)
 
@@ -33,10 +37,16 @@ def ticket_statuses():
 
 def avg_first_response_time():
 	average_resolution_time = float(0.0)
+	date_7_days_ago = datetime.now() - timedelta(days=7)
+	filters = {
+		"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")],
+		"resolution_time": ["not like", ""],
+	}
+
 	ticket_list = frappe.get_list(
 		"HD Ticket",
 		fields=["name", "resolution_time"],
-		filters={"resolution_time": ["not like", ""]},
+		filters=filters,
 	)
 
 	for ticket in ticket_list:
@@ -56,9 +66,13 @@ def avg_first_response_time():
 
 
 def ticket_types():
+	date_7_days_ago = datetime.now() - timedelta(days=7)
+	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+
 	res = frappe.db.get_list(
 		"HD Ticket",
 		fields=["count(name) as value", "ticket_type as name"],
+		filters=filters,
 		group_by="ticket_type",
 	)
 
@@ -91,9 +105,15 @@ def new_tickets():
 
 
 def resolution_within_sla():
+	date_7_days_ago = datetime.now() - timedelta(days=7)
+	filters = {
+		"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")],
+		"status": "Closed",
+	}
+
 	ticket_list = frappe.get_list(
 		"HD Ticket",
-		filters={"status": "Closed"},
+		filters=filters,
 		fields=["name", "agreement_status", "sla"],
 	)
 
@@ -139,9 +159,13 @@ def ticket_activity():
 
 
 def ticket_priority():
+	date_7_days_ago = datetime.now() - timedelta(days=7)
+	filters = {"creation": [">=", date_7_days_ago.strftime("%Y-%m-%d")]}
+
 	res = frappe.db.get_list(
 		"HD Ticket",
 		fields=["count(name) as value", "priority as name"],
+		filters=filters,
 		group_by="priority",
 	)
 
