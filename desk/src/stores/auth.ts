@@ -32,6 +32,9 @@ export const useAuthStore = defineStore("auth", () => {
 	const userImage: ComputedRef<string> = computed(
 		() => user__.value.user_image
 	);
+	const userFirstName: ComputedRef<string> = computed(
+		() => user__.value.user_first_name
+	);
 	const userName: ComputedRef<string> = computed(() => user__.value.user_name);
 	const username: ComputedRef<string> = computed(() => user__.value.username);
 
@@ -91,6 +94,7 @@ export const useAuthStore = defineStore("auth", () => {
 		signup,
 		userId,
 		userImage,
+		userFirstName,
 		userName,
 		username,
 	};

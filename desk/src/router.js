@@ -2,16 +2,21 @@ import { createRouter, createWebHistory } from "vue-router";
 import { call } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 
+export const WEBSITE_ROOT = "Website Root";
+
 export const LOGIN = "Login";
 export const SIGNUP = "Signup";
 export const VERIFY = "Verify Account";
-export const AGENT_PORTAL_LANDING = "DeskTickets";
-export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
-export const AGENT_PORTAL_TICKET = "DeskTicket";
-export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
 export const AUTH_ROUTES = [LOGIN, SIGNUP, VERIFY];
+
+export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
 export const KNOWLEDGE_BASE_PUBLIC = "Knowledge Base";
-export const WEBSITE_ROOT = "Website Root";
+
+export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
+export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
+export const AGENT_PORTAL_TICKET = "DeskTicket";
+export const AGENT_PORTAL_LANDING = AGENT_PORTAL_DASHBOARD;
 
 const routes = [
 	{
@@ -124,12 +129,12 @@ const routes = [
 		children: [
 			{
 				path: "dashboard",
-				name: "Dashboard",
-				component: () => import("@/pages/desk/Dashboard.vue"),
+				name: AGENT_PORTAL_DASHBOARD,
+				component: () => import("@/pages/desk/DeskDashboard.vue"),
 			},
 			{
 				path: "tickets",
-				name: AGENT_PORTAL_LANDING,
+				name: AGENT_PORTAL_TICKET_LIST,
 				component: () => import("@/pages/desk/Tickets.vue"),
 			},
 			{
