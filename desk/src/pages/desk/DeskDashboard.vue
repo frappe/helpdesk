@@ -57,5 +57,5 @@ const items = createResource({
 });
 
 const dateInfo =
-	"📊:The information displayed in these charts are derived from data collected over the past 30 days";
+	"📊 The information displayed in these charts are derived from data collected over the past 30 days";
 </script>
