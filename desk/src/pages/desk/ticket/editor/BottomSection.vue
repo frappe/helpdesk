@@ -108,6 +108,8 @@ import AttachmentItem from "@/components/AttachmentItem.vue";
 import CustomIcons from "@/components/desk/global/CustomIcons.vue";
 import IconDelete from "~icons/espresso/delete";
 import IconX from "~icons/ph/x";
+import { isEmpty } from "@/utils/editor";
+import { createToast } from "@/utils/toasts";
 
 const authStore = useAuthStore();
 const showArticleResponse = ref(false);
@@ -136,6 +138,14 @@ function removeAttachment(name: string) {
 }
 
 function newCommunication() {
+	if (isEmpty(editor.content)) {
+		createToast({
+			title: "Message is empty",
+			icon: "x",
+			iconClasses: "text-red-600",
+		});
+		return "Message is empty";
+	}
 	ticket.replyViaAgent.submit({
 		attachments: editor.attachments.map((x) => x.name),
 		cc: editor.cc.join(","),
@@ -145,6 +155,14 @@ function newCommunication() {
 }
 
 function newComment() {
+	if (isEmpty(editor.content)) {
+		createToast({
+			title: "Message is empty",
+			icon: "x",
+			iconClasses: "text-red-600",
+		});
+		return "Message is empty";
+	}
 	insertRes.submit({
 		doc: {
 			doctype: "HD Ticket Comment",
