@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { useData } from "./data";
+import { useTicketListStore } from "./data";
 
-const { tickets } = useData();
+const { tickets } = useTicketListStore();
 </script>

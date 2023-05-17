@@ -52,14 +52,14 @@ import { computed } from "vue";
 import { createResource, Dropdown, FeatherIcon } from "frappe-ui";
 import { useAgentStore } from "@/stores/agent";
 import { createToast } from "@/utils/toasts";
-import { useData } from "./data";
+import { useTicketListStore } from "./data";
 
 const agentStore = useAgentStore();
-const { selected, selectAll, deselectAll } = useData();
+const { selected, selectAll, deselectAll } = useTicketListStore();
 
 const ticketsSelectedText = computed(() => {
 	/** Number of selected items */
-	const n = selected.value.size;
+	const n = selected.size;
 
 	/** Singular or Plural */
 	const s = n > 1 ? "Tickets" : "Ticket";
@@ -90,7 +90,7 @@ const assignOpts = computed(() =>
 		label: a.agent_name,
 		handler: () =>
 			bulkAssignTicketToAgent.submit({
-				ticket_ids: Array.from(selected.value),
+				ticket_ids: Array.from(selected),
 				agent_id: a.name,
 			}),
 	}))

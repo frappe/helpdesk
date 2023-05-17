@@ -1,8 +1,9 @@
-import { ref, reactive } from "vue";
+import { ref, reactive, Ref } from "vue";
+import { defineStore } from "pinia";
 import { useKeymapStore } from "@/stores/keymap";
 import { createListManager } from "@/composables/listManager";
 
-export function useData() {
+export const useTicketListStore = defineStore("ticketList", () => {
 	const KEYMAPS = [
 		{
 			button: "R",
@@ -41,7 +42,7 @@ export function useData() {
 		KEYMAPS.forEach((o) => keymapStore.remove([KEYMAP_PREFIX, o.button]));
 	}
 
-	const selected = ref(new Set());
+	const selected: Ref<Set<number>> = ref(new Set([]));
 	function toggleOne(value) {
 		if (!selected.value.delete(value)) {
 			selected.value.add(value);
@@ -77,4 +78,4 @@ export function useData() {
 		tickets,
 		toggleOne,
 	};
-}
+});

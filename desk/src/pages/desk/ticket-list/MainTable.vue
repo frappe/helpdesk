@@ -129,7 +129,7 @@ import { AGENT_PORTAL_TICKET } from "@/router";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { createToast } from "@/utils/toasts";
-import { useData } from "./data";
+import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
 import ColumnSelector from "./ColumnSelector.vue";
@@ -142,11 +142,11 @@ const { copy } = useClipboard();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const { selected, tickets, toggleOne, selectAll, deselectAll, columns } =
-	useData();
+	useTicketListStore();
 
 const dateFormat = "D/M/YYYY h:mm A";
 const allSelected = computed(() => {
-	return tickets.list?.data?.length === selected.value.size;
+	return tickets.list?.data?.length === selected.size;
 });
 
 function toggleAllSelected(checked: boolean) {

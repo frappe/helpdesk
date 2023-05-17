@@ -16,14 +16,14 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from "vue";
-import { useData } from "./data";
+import { useTicketListStore } from "./data";
 import ListHeader from "./ListHeader.vue";
 import TopSection from "./TopSection.vue";
 import BottomSection from "./BottomSection.vue";
 import SelectionBar from "./SelectionBar.vue";
 import MainTable from "./MainTable.vue";
 
-const { init, deinit, tickets } = useData();
+const { init, deinit, tickets } = useTicketListStore();
 const isEmptyMessage =
 	"🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 
