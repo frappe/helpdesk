@@ -1,7 +1,7 @@
 <template>
 	<router-link
 		:to="toRoute"
-		class="flex justify-between"
+		class="group flex justify-between"
 		:class="{
 			'text-gray-700': isSeen,
 			'text-gray-900': !isSeen,
@@ -10,7 +10,7 @@
 		<div class="line-clamp-1">
 			{{ subject }}
 		</div>
-		<div class="mr-2 flex items-center gap-1">
+		<div class="mr-2 flex items-center gap-2">
 			<Tooltip v-if="!isSeen" text="New ticket">
 				<span class="relative flex h-3 w-3 items-center justify-center">
 					<span
@@ -19,28 +19,27 @@
 					<div class="h-1.5 w-1.5 rounded-full bg-gray-800"></div>
 				</span>
 			</Tooltip>
+			<div class="hidden gap-2 group-hover:inline-flex">
+				<div v-if="conversationCount" class="flex items-center gap-1 text-xs">
+					<IconMail class="h-3 w-3" />
+					{{ conversationCount }}
+				</div>
+				<div v-if="commentCount" class="flex items-center gap-1 text-xs">
+					<IconComment class="h-3 w-3" />
+					{{ commentCount }}
+				</div>
+			</div>
 			<div class="flex items-center gap-1">
 				<IconHash class="h-3 w-3" />
 				{{ ticketName }}
 			</div>
 		</div>
 	</router-link>
-	<!-- <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600"> -->
-	<!-- 	<IconHash class="h-3 w-3" /> -->
-	<!-- 	<div>{{ ticketName }}</div> -->
-	<!-- 	<IconDot class="h-3 w-3" /> -->
-	<!-- 	<IconMail class="h-3 w-3" /> -->
-	<!-- 	{{ conversationCount }} -->
-	<!-- 	<IconDot class="h-3 w-3" /> -->
-	<!-- 	<IconComment class="h-3 w-3" /> -->
-	<!-- 	{{ commentCount }} -->
-	<!-- </div> -->
 </template>
 
 <script setup lang="ts">
 import { computed, toRefs } from "vue";
 import { createDocumentResource, Tooltip } from "frappe-ui";
-import IconDot from "~icons/ph/dot-outline-fill";
 import IconHash from "~icons/espresso/hash";
 import IconMail from "~icons/espresso/mail";
 import IconComment from "~icons/espresso/comment";
@@ -63,9 +62,7 @@ const subject = computed(() => ticket.doc?.subject);
 const metaData = computed(() => ticket.getMeta?.data?.message);
 const conversationCount = computed(() => metaData.value?.conversation_count);
 const commentCount = computed(() => metaData.value?.comment_count);
-// const isSeen = computed(() => metaData.value?.is_seen);
-
-const isSeen = Math.random() < 0.5;
+const isSeen = computed(() => metaData.value?.is_seen);
 
 const ticket = createDocumentResource({
 	doctype: "HD Ticket",
