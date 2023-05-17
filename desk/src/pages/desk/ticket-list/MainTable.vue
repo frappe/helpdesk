@@ -24,7 +24,7 @@
 			</div>
 			<div class="divide-y px-6 py-2 text-base">
 				<div
-					v-for="t in ticketList.list.data"
+					v-for="t in tickets.list.data"
 					:key="t.name"
 					class="flex h-11 w-full items-center gap-2 px-3 py-2 transition-all"
 					:class="{
@@ -124,14 +124,7 @@ import { AGENT_PORTAL_TICKET } from "@/router";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { createToast } from "@/utils/toasts";
-import {
-	selected,
-	ticketList,
-	toggleOne,
-	selectAll,
-	deselectAll,
-	columns,
-} from "./data";
+import { useData } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
 import ColumnSelector from "./ColumnSelector.vue";
@@ -143,10 +136,12 @@ const router = useRouter();
 const { copy } = useClipboard();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
+const { selected, tickets, toggleOne, selectAll, deselectAll, columns } =
+	useData();
 
 const dateFormat = "D/M/YYYY h:mm A";
 const allSelected = computed(() => {
-	return ticketList.list?.data?.length === selected.value.size;
+	return tickets.list?.data?.length === selected.value.size;
 });
 
 function toggleAllSelected(checked: boolean) {

@@ -24,9 +24,11 @@
 <script setup lang="ts">
 import { Popover } from "frappe-ui";
 import { keys } from "lodash";
+import { useData } from "./data";
 import MinimalSwitch from "@/components/MinimalSwitch.vue";
 import IconAdd from "~icons/espresso/add";
-import { columns } from "./data";
+
+const { columns } = useData();
 
 function toggleColumn(column: string) {
 	columns[column] = !columns[column];

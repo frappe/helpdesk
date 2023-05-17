@@ -52,9 +52,10 @@ import { computed } from "vue";
 import { createResource, Dropdown, FeatherIcon } from "frappe-ui";
 import { useAgentStore } from "@/stores/agent";
 import { createToast } from "@/utils/toasts";
-import { selected, selectAll, deselectAll } from "./data";
+import { useData } from "./data";
 
 const agentStore = useAgentStore();
+const { selected, selectAll, deselectAll } = useData();
 
 const ticketsSelectedText = computed(() => {
 	/** Number of selected items */
