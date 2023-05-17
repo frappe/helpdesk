@@ -104,8 +104,13 @@
 							},
 						]"
 					>
-						<template #default>
-							<IconDotHorizontal class="h-4 w-4 cursor-pointer text-gray-700" />
+						<template #default="{ open }">
+							<IconDotHorizontal
+								class="h-4 w-4 cursor-pointer text-gray-500"
+								:class="{
+									'text-gray-700': open,
+								}"
+							/>
 						</template>
 					</Dropdown>
 				</div>
