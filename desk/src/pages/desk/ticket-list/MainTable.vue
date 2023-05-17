@@ -160,7 +160,7 @@ function statusDropdownOptions(ticketId: number, currentStatus: string) {
 		.map((o) => ({
 			label: o,
 			handler: () =>
-				this.ticketList.setValue.submit({
+				tickets.setValue.submit({
 					name: ticketId,
 					status: o,
 				}),
@@ -173,7 +173,7 @@ function priorityDropdownOptions(ticketId: number, currentPriority: string) {
 		.map((o) => ({
 			label: o,
 			handler: () =>
-				this.ticketList.setValue.submit({
+				tickets.setValue.submit({
 					name: ticketId,
 					priority: o,
 				}),
