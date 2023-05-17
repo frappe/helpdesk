@@ -14,6 +14,7 @@ type ListOptions = {
 	pageLength?: number;
 	start?: number;
 	cache?: boolean | string | Array<string>;
+	auto?: boolean;
 };
 
 type MetaData = {
@@ -36,6 +37,7 @@ export function createListManager(options: ListOptions) {
 	const pageLength = ref(options.pageLength);
 	const start = ref(options.start);
 	const cache = options.cache;
+	const auto = options.auto;
 	const filterManager = useListFilters();
 
 	const list = createListResource({
@@ -48,7 +50,6 @@ export function createListManager(options: ListOptions) {
 		pageLength: pageLength.value,
 		start: start.value,
 		cache,
-		auto: false,
 		onSuccess() {
 			meta.submit({
 				doctype,
@@ -59,6 +60,13 @@ export function createListManager(options: ListOptions) {
 			});
 		},
 	});
+
+	list.updateArgs = () => {
+		filters.value = filterManager.queryFilters();
+		orderBy.value = filterManager.queryOrderBy();
+
+		list.reload();
+	};
 
 	Object.assign(list, {
 		totalCount: ref(0),
@@ -83,15 +91,10 @@ export function createListManager(options: ListOptions) {
 		},
 	});
 
-	function updateArgs() {
-		filters.value = filterManager.queryFilters();
-		orderBy.value = filterManager.queryOrderBy();
-
-		list.reload();
+	if (auto) {
+		list.updateArgs();
+		watch(route, list.updateArgs);
 	}
-
-	onMounted(updateArgs);
-	watch(route, updateArgs);
 
 	return list;
 }
