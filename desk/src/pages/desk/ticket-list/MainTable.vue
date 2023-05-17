@@ -22,7 +22,7 @@
 				<div v-if="columns['Source']" class="w-20">Source</div>
 				<ColumnSelector class="ml-auto" />
 			</div>
-			<div class="divide-y px-6 py-2 text-base">
+			<div class="divide-y px-6 text-base">
 				<div
 					v-for="t in tickets.list.data"
 					:key="t.name"
