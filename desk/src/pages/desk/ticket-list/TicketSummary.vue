@@ -11,15 +11,10 @@
 			{{ subject }}
 		</div>
 		<div class="mr-2 flex items-center gap-2">
-			<Tooltip v-if="!isSeen" text="New ticket">
-				<span class="relative flex h-3 w-3 items-center justify-center">
-					<span
-						class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-500 opacity-75"
-					></span>
-					<div class="h-1.5 w-1.5 rounded-full bg-gray-800"></div>
-				</span>
-			</Tooltip>
-			<div class="hidden gap-2 group-hover:inline-flex">
+			<div
+				v-if="conversationCount || commentCount"
+				class="hidden gap-2 group-hover:inline-flex"
+			>
 				<div v-if="conversationCount" class="flex items-center gap-1 text-xs">
 					<IconMail class="h-3 w-3" />
 					{{ conversationCount }}
@@ -29,6 +24,14 @@
 					{{ commentCount }}
 				</div>
 			</div>
+			<Tooltip v-if="!isSeen" text="New ticket">
+				<span class="relative flex h-3 w-3 items-center justify-center">
+					<span
+						class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-500 opacity-75"
+					></span>
+					<div class="h-1.5 w-1.5 rounded-full bg-gray-800"></div>
+				</span>
+			</Tooltip>
 			<div class="flex items-center gap-1">
 				<IconHash class="h-3 w-3" />
 				{{ ticketName }}
