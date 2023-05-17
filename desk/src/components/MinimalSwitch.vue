@@ -1,7 +1,7 @@
 <template>
 	<Switch
 		:class="enabled ? 'bg-gray-900' : 'bg-gray-300'"
-		class="relative inline-flex h-[16px] w-[26px] items-center rounded-full"
+		class="relative inline-flex h-[16px] w-[26px] items-center rounded-full transition"
 	>
 		<span
 			:class="enabled ? 'translate-x-3' : 'translate-x-0.5'"
