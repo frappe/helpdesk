@@ -71,15 +71,19 @@ const sortOptions = computed(() => {
 	}));
 });
 
-const byStatus = ticketStatusStore.options.map((status) => ({
-	label: status,
-	handler: () => filterByField("status", status),
-}));
+const byStatus = computed(() =>
+	ticketStatusStore.options.map((status) => ({
+		label: status,
+		handler: () => filterByField("status", status),
+	}))
+);
 
-const byPriority = ticketPriorityStore.names.map((priority) => ({
-	label: priority,
-	handler: () => filterByField("priority", priority),
-}));
+const byPriority = computed(() =>
+	ticketPriorityStore.names.map((priority) => ({
+		label: priority,
+		handler: () => filterByField("priority", priority),
+	}))
+);
 
 function filterByField(fieldname: string, value: string) {
 	const f = [
