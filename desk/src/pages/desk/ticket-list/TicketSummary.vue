@@ -1,41 +1,41 @@
 <template>
-	<div class="flex flex-col justify-between">
-		<router-link :to="toRoute">
-			<div class="flex justify-between">
-				<div
-					class="line-clamp-1"
-					:class="{
-						'text-gray-700': isSeen,
-						'text-gray-900': !isSeen,
-					}"
-				>
-					{{ subject }}
+	<router-link
+		:to="toRoute"
+		class="group flex justify-between"
+		:class="{
+			'text-gray-700': isSeen,
+			'text-gray-900': !isSeen,
+			'font-medium': !isSeen,
+		}"
+	>
+		<div class="line-clamp-1">
+			{{ subject }}
+		</div>
+		<div class="mr-2 flex items-center gap-2">
+			<div
+				v-if="conversationCount || commentCount"
+				class="hidden gap-2 group-hover:inline-flex"
+			>
+				<div v-if="conversationCount" class="flex items-center gap-1 text-xs">
+					<IconMail class="h-3 w-3" />
+					{{ conversationCount }}
 				</div>
-				<div
-					v-if="!isSeen"
-					class="badge-new mr-2 flex items-center justify-center bg-gray-900 text-xs text-white"
-				>
-					New
+				<div v-if="commentCount" class="flex items-center gap-1 text-xs">
+					<IconComment class="h-3 w-3" />
+					{{ commentCount }}
 				</div>
 			</div>
-		</router-link>
-		<div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-			<IconHash class="h-3 w-3" />
-			<div>{{ ticketName }}</div>
-			<IconDot class="h-3 w-3" />
-			<IconMail class="h-3 w-3" />
-			{{ conversationCount }}
-			<IconDot class="h-3 w-3" />
-			<IconComment class="h-3 w-3" />
-			{{ commentCount }}
+			<div class="flex items-center gap-1">
+				<IconHash class="h-3 w-3" />
+				{{ ticketName }}
+			</div>
 		</div>
-	</div>
+	</router-link>
 </template>
 
 <script setup lang="ts">
 import { computed, toRefs } from "vue";
 import { createDocumentResource } from "frappe-ui";
-import IconDot from "~icons/ph/dot-outline-fill";
 import IconHash from "~icons/espresso/hash";
 import IconMail from "~icons/espresso/mail";
 import IconComment from "~icons/espresso/comment";
