@@ -3,7 +3,7 @@
 		<div class="flex items-center">
 			<IconCaretLeft
 				class="ml-5 mr-2 h-4 w-4 cursor-pointer text-gray-700"
-				@click="router.back"
+				@click="goBack"
 			/>
 			<div class="line-clamp-1 text-xl font-medium text-gray-900">
 				{{ ticket.doc.subject }}
@@ -41,6 +41,7 @@ import { useRouter } from "vue-router";
 import { Tooltip } from "frappe-ui";
 import { useClipboard } from "@vueuse/core";
 import dayjs from "dayjs";
+import { AGENT_PORTAL_TICKET_LIST } from "@/router";
 import { ticket } from "./data";
 import { createToast } from "@/utils/toasts";
 import IconAtSign from "~icons/espresso/at-sign";
@@ -64,5 +65,19 @@ async function copyId() {
 		icon: "check",
 		iconClasses: "text-green-600",
 	});
+}
+
+function goBack() {
+	function fallback() {
+		router.push({ name: AGENT_PORTAL_TICKET_LIST });
+	}
+
+	const previousPage = window.history.state.back;
+	if (!previousPage) fallback();
+
+	const route = router.resolve({ path: window.history.state.back });
+
+	if (route.name === AGENT_PORTAL_TICKET_LIST) router.back();
+	else fallback();
 }
 </script>
