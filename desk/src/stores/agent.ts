@@ -13,6 +13,7 @@ export const useAgentStore = defineStore("agent", () => {
 		doctype: "HD Agent",
 		fields: ["*"],
 		auto: true,
+		pageLength: 99999,
 	});
 
 	const options: ComputedRef<Array<Agent>> = computed(
