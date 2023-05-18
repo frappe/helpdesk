@@ -13,6 +13,7 @@ export const useTicketTypeStore = defineStore("ticketType", () => {
 		doctype: "HD Ticket Type",
 		fields: ["*"],
 		auto: true,
+		pageLength: 99999,
 	});
 
 	const options: ComputedRef<Array<TicketType>> = computed(
