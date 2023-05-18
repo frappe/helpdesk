@@ -435,6 +435,7 @@ class HDTicket(Document):
 		communication.insert(ignore_permissions=True)
 
 		# Mark status, unconditionally.
+		self.reload()
 		self.status = "Replied"
 		self.save()
 
