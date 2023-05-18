@@ -12,6 +12,7 @@
 import { ref } from "vue";
 import { Dialog } from "frappe-ui";
 import SetupName from "./SetupName.vue";
+import SetupLogo from "./SetupLogo.vue";
 
 const options = {
 	title: "Hello there! 👋",
@@ -19,7 +20,7 @@ const options = {
 		{
 			label: "Next",
 			appearance: "primary",
-			class: "bg-gray-900 hover:bg-gray-800",
+			class: "bg-gray-900 hover:bg-gray-800 text-sm",
 			handler() {
 				step.value++;
 			},
@@ -27,7 +28,7 @@ const options = {
 	],
 };
 const step = ref(0);
-const steps = [SetupName];
+const steps = [SetupName, SetupLogo];
 
 const isVisible = ref(true);
 </script>
