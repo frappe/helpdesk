@@ -28,6 +28,8 @@ from helpdesk.helpdesk.utils.email import (
 	default_ticket_outgoing_email_account,
 )
 
+from helpdesk.utils import publish_event
+
 
 class HDTicket(Document):
 	@staticmethod
@@ -110,6 +112,9 @@ class HDTicket(Document):
 			"Last modified on": "modified",
 		}
 
+	def publish_update(self):
+		publish_event("helpdesk:ticket-update", {"name": self.name})
+
 	def autoname(self):
 		return self.name
 
@@ -132,6 +137,7 @@ class HDTicket(Document):
 	def on_update(self):
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
+		self.publish_update()
 
 	def handle_ticket_activity_update(self):
 		"""
@@ -156,11 +162,6 @@ class HDTicket(Document):
 				log_ticket_activity(
 					self.name, f"{field_maps[field]} set to {self.as_dict()[field]}"
 				)
-
-		event = "helpdesk:ticket-update"
-		room = get_website_room()
-		data = {"name": self.name}
-		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
 
 	def remove_assignment_if_not_in_team(self):
 		"""
@@ -298,10 +299,7 @@ class HDTicket(Document):
 		agent_name = frappe.get_value("HD Agent", agent, "agent_name")
 		log_ticket_activity(self.name, f"assigned to {agent_name}")
 
-		event = "helpdesk:ticket-assignee-update"
-		data = {"name": self.name}
-		room = get_website_room()
-		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
 	def get_assigned_agent(self):
 		if self._assign:
@@ -436,6 +434,16 @@ class HDTicket(Document):
 
 		communication.insert(ignore_permissions=True)
 
+		# Mark status, unconditionally.
+		self.status = "Replied"
+		self.save()
+
+		if skip_email_workflow:
+			return
+
+		if not sender_email:
+			frappe.throw(_("Can not send email. No sender email set up!"))
+
 		_attachments = []
 
 		for attachment in attachments:
@@ -444,12 +452,6 @@ class HDTicket(Document):
 			file_doc.attached_to_doctype = "Communication"
 			file_doc.save(ignore_permissions=True)
 			_attachments.append({"file_url": file_doc.file_url})
-
-		if skip_email_workflow:
-			return
-
-		if not sender_email:
-			frappe.throw(_("Can not send email. No sender email set up!"))
 
 		reply_to_email = sender_email.email_id
 		template = (
