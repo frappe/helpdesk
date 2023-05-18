@@ -11,11 +11,11 @@
 					:value="allSelected"
 					:onchange="(e) => toggleAllSelected(e.target.checked)"
 				/>
-				<div class="w-20">Type</div>
 				<div ref="subjectCol" class="col-subject grow">Subject</div>
-				<div class="w-40">Assignee</div>
 				<div class="w-24">Status</div>
 				<div class="w-24">Priority</div>
+				<div class="w-20">Type</div>
+				<div class="w-40">Assignee</div>
 				<div v-if="columns['Due in']" class="w-24">Due in</div>
 				<div v-if="columns['Created on']" class="w-36">Created on</div>
 				<div v-if="columns['Last modified']" class="w-36">Last modified</div>
@@ -39,13 +39,7 @@
 						:value="selected.has(t.name)"
 						@click="() => toggleOne(t.name)"
 					/>
-					<div class="line-clamp-1 w-20 text-gray-700">
-						{{ t.ticket_type || "--" }}
-					</div>
 					<TicketSummary class="col-subject grow" :ticket-name="t.name" />
-					<div class="w-40">
-						<AssignedInfo :ticket-id="t.name" />
-					</div>
 					<div class="w-24">
 						<Dropdown :options="statusDropdownOptions(t.name, t.status)">
 							<template #default="{ open }">
@@ -61,14 +55,22 @@
 					</div>
 					<div class="w-24">
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
-							<template #default>
-								<Badge
-									:color-map="ticketPriorityStore.colorMap"
-									:label="t.priority"
-									class="cursor-pointer"
-								/>
+							<template #default="{ open }">
+								<div
+									class="flex cursor-pointer select-none items-center gap-1 text-gray-700"
+								>
+									{{ t.priority }}
+									<IconCaretDown v-if="!open" class="h-3 w-3" />
+									<IconCaretUp v-if="open" class="h-3 w-3" />
+								</div>
 							</template>
 						</Dropdown>
+					</div>
+					<div class="line-clamp-1 w-20 text-gray-700">
+						{{ t.ticket_type || "--" }}
+					</div>
+					<div class="w-40">
+						<AssignedInfo :ticket-id="t.name" />
 					</div>
 					<div
 						v-if="columns['Due in']"
