@@ -2,6 +2,7 @@
 	<router-view class="antialiased" />
 	<Toasts />
 	<KeymapDialog />
+	<OnboardingDialog />
 </template>
 
 <script setup lang="ts">
@@ -9,6 +10,7 @@ import { provide, ref, onMounted } from "vue";
 import { createToast } from "@/utils/toasts";
 import { useConfigStore } from "@/stores/config";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
+import OnboardingDialog from "@/pages/onboarding/OnboardingDialog.vue";
 import { Toasts } from "@/components/global/toast";
 
 useConfigStore();
