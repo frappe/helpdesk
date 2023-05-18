@@ -131,6 +131,17 @@ const insertRes = createResource({
 	onSuccess() {
 		clean();
 	},
+	validate(params) {
+		if (isEmpty(params.doc.content)) {
+			createToast({
+				title: "Message is empty",
+				icon: "x",
+				iconClasses: "text-red-600",
+			});
+
+			return "Message is empty";
+		}
+	},
 });
 
 function removeAttachment(name: string) {
@@ -138,14 +149,6 @@ function removeAttachment(name: string) {
 }
 
 function newCommunication() {
-	if (isEmpty(editor.content)) {
-		createToast({
-			title: "Message is empty",
-			icon: "x",
-			iconClasses: "text-red-600",
-		});
-		return "Message is empty";
-	}
 	ticket.replyViaAgent.submit({
 		attachments: editor.attachments.map((x) => x.name),
 		cc: editor.cc.join(","),
@@ -155,14 +158,6 @@ function newCommunication() {
 }
 
 function newComment() {
-	if (isEmpty(editor.content)) {
-		createToast({
-			title: "Message is empty",
-			icon: "x",
-			iconClasses: "text-red-600",
-		});
-		return "Message is empty";
-	}
 	insertRes.submit({
 		doc: {
 			doctype: "HD Ticket Comment",

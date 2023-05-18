@@ -2,6 +2,7 @@ import { reactive } from "vue";
 import { createDocumentResource } from "frappe-ui";
 import { socket } from "@/socket";
 import { createToast } from "@/utils/toasts";
+import { isEmpty } from "@/utils/editor";
 
 export let ticket = null;
 
@@ -51,6 +52,17 @@ export async function init(id: number) {
 				method: "reply_via_agent",
 				onSuccess() {
 					clean();
+				},
+				validate(params) {
+					if (isEmpty(editor.content)) {
+						createToast({
+							title: "Message is empty",
+							icon: "x",
+							iconClasses: "text-red-600",
+						});
+
+						return "Message is empty";
+					}
 				},
 				onError(error) {
 					createToast({
