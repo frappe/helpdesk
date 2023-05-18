@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { createResource } from "frappe-ui";
-import IconCheck from "~icons/ph/check";
+import IconCheck from "~icons/ph/check-bold";
 
 const query = "What should we call your Helpdesk?";
 const placeholder = "My Helpdesk";
