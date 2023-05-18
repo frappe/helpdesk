@@ -10,6 +10,7 @@ export const useTeamStore = defineStore("team", () => {
 	const d__ = createListResource({
 		doctype: "HD Team",
 		auto: true,
+		pageLength: 99999,
 	});
 
 	const options: ComputedRef<Array<Team>> = computed(

@@ -15,6 +15,7 @@ export const useContactStore = defineStore("contact", () => {
 		doctype: "Contact",
 		fields: ["*"],
 		auto: true,
+		pageLength: 99999,
 	});
 
 	const options: ComputedRef<Array<Contact>> = computed(
