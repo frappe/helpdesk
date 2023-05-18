@@ -1,7 +1,6 @@
 <template>
-	<div class="flex flex-col gap-2">
-		{{ query }}
-		<div class="text-sm text-gray-700">
+	<div class="flex flex-col gap-4">
+		<div class="text-gray-700">
 			{{ help }}
 		</div>
 		<img v-if="imageUrl" class="m-auto h-8 w-8" :src="imageUrl" />
@@ -26,7 +25,6 @@
 import { Ref, ref } from "vue";
 import { createResource, FileUploader } from "frappe-ui";
 
-const query = "How about a Favicon?";
 const help =
 	"A favicon enhances your website by providing a small, recognizable icon that \
 	appears in browser tabs. It improves brand recognition, adds professionalism, \

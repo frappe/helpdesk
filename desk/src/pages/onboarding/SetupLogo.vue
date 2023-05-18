@@ -1,7 +1,6 @@
 <template>
-	<div class="flex flex-col gap-2">
-		{{ query }}
-		<div class="text-sm text-gray-700">
+	<div class="flex flex-col gap-4">
+		<div class="text-gray-700">
 			{{ help }}
 		</div>
 		<img v-if="imageUrl" class="m-auto h-8" :src="imageUrl" />
@@ -26,7 +25,6 @@
 import { Ref, ref } from "vue";
 import { createResource, FileUploader } from "frappe-ui";
 
-const query = "Do you want to set a logo for Helpdesk?";
 const help =
 	"This will be used in many places, including Login and Loading screens. \
 	An image with transparent background and a resolution of 160 x 32 is preferred";
