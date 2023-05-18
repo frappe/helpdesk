@@ -121,7 +121,6 @@ const routes = [
 			},
 		],
 	},
-
 	{
 		path: "",
 		name: "AgentRoot",
@@ -135,7 +134,7 @@ const routes = [
 			{
 				path: "tickets",
 				name: AGENT_PORTAL_TICKET_LIST,
-				component: () => import("@/pages/desk/Tickets.vue"),
+				component: () => import("@/pages/desk/ticket-list/TicketList.vue"),
 			},
 			{
 				path: "tickets/:ticketId",

@@ -2,7 +2,7 @@
 	<div v-if="initialized">
 		<div class="flex h-screen w-screen">
 			<SideBar />
-			<router-view class="z-0 grow" />
+			<router-view class="z-0 grow overflow-auto" />
 		</div>
 	</div>
 </template>
