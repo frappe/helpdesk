@@ -21,6 +21,10 @@ import { ref } from "vue";
 import { createResource } from "frappe-ui";
 import IconCheck from "~icons/ph/check";
 
+const query = "What should we call your Helpdesk?";
+const placeholder = "My Helpdesk";
+const isCheckVisible = ref(false);
+
 const r = createResource({
 	url: "frappe.client.set_value",
 	debounce: 1000,
@@ -28,10 +32,6 @@ const r = createResource({
 		isCheckVisible.value = true;
 	},
 });
-
-const query = "What should we call your Helpdesk?";
-const placeholder = "My Helpdesk";
-const isCheckVisible = ref(false);
 
 function update(value: string) {
 	isCheckVisible.value = false;
