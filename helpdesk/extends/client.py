@@ -6,7 +6,6 @@ import math
 
 import frappe
 from frappe.model.base_document import get_controller
-from frappe.query_builder import Query
 from frappe.query_builder.functions import Count
 
 from .doc import apply_sort
@@ -20,7 +19,7 @@ def get_list(
 	filters=None,
 	order_by=None,
 	start=0,
-	limit=20,
+	limit=None,
 	group_by=None,
 	parent=None,
 	debug=False,
