@@ -1,7 +1,7 @@
 <template>
-	<div v-if="!isEmpty(customFields)" class="flex flex-col gap-5 border-b py-4">
+	<div v-if="!isEmpty(fields)" class="flex flex-col gap-5 border-b py-4">
 		<div
-			v-for="field in customFields"
+			v-for="field in fields"
 			:key="field.label"
 			class="flex flex-col gap-2.5"
 		>
@@ -26,5 +26,5 @@ import { ticket } from "./data";
 import IconTeams from "~icons/espresso/teams";
 import IconWebLink from "~icons/espresso/web-link";
 
-const customFields = computed(() => ticket.value?.doc?.custom_fields);
+const fields = computed(() => ticket.doc?.custom_fields);
 </script>
