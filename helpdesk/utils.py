@@ -1,6 +1,13 @@
-from bs4 import BeautifulSoup
-import frappe
 import re
+
+import frappe
+from bs4 import BeautifulSoup
+from frappe.realtime import get_website_room
+
+
+def publish_event(event: str, data: dict):
+	room = get_website_room()
+	frappe.publish_realtime(event, message=data, room=room, after_commit=True)
 
 
 def extract_mentions(html):
