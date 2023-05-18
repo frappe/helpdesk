@@ -53,7 +53,7 @@ export async function init(id: number) {
 				onSuccess() {
 					clean();
 				},
-				validate(params) {
+				validate() {
 					if (isEmpty(editor.content)) {
 						createToast({
 							title: "Message is empty",
