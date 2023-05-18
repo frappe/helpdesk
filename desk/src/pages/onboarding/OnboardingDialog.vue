@@ -13,6 +13,7 @@ import { ref } from "vue";
 import { Dialog } from "frappe-ui";
 import SetupName from "./SetupName.vue";
 import SetupLogo from "./SetupLogo.vue";
+import SetupFavicon from "./SetupFavicon.vue";
 
 const options = {
 	title: "Hello there! 👋",
@@ -28,7 +29,7 @@ const options = {
 	],
 };
 const step = ref(0);
-const steps = [SetupName, SetupLogo];
+const steps = [SetupName, SetupLogo, SetupFavicon];
 
 const isVisible = ref(true);
 </script>
