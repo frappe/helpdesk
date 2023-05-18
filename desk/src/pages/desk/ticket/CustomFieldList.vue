@@ -1,20 +1,18 @@
 <template>
 	<div v-if="!isEmpty(fields)" class="flex flex-col gap-5 border-b py-4">
-		<div
-			v-for="field in fields"
-			:key="field.label"
-			class="flex flex-col gap-2.5"
-		>
-			<div class="text-base text-gray-600">{{ field.label }}</div>
-			<a :href="field.route || null" target="_blank">
-				<div class="flex items-center gap-2">
-					<div class="flex h-5 w-5 items-center justify-center">
-						<IconWebLink v-if="field.route" class="h-5 w-5 text-gray-600" />
-						<IconTeams v-else class="h-5 w-5 text-gray-600" />
+		<div v-for="field in fields" :key="field.label">
+			<div v-if="field.value" class="flex flex-col gap-2.5">
+				<div class="text-base text-gray-600">{{ field.label }}</div>
+				<a :href="field.route || null" target="_blank">
+					<div class="flex items-center gap-2">
+						<div class="flex h-5 w-5 items-center justify-center">
+							<IconWebLink v-if="field.route" class="h-5 w-5 text-gray-600" />
+							<IconTeams v-else class="h-5 w-5 text-gray-600" />
+						</div>
+						<div class="text-base text-gray-800">{{ field.value }}</div>
 					</div>
-					<div class="text-base text-gray-800">{{ field.value }}</div>
-				</div>
-			</a>
+				</a>
+			</div>
 		</div>
 	</div>
 </template>
