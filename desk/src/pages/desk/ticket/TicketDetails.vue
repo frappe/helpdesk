@@ -92,17 +92,18 @@
 		</div>
 		<div class="border-l">
 			<div
-				class="mx-4 my-3.5 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-100 px-3 py-2 hover:bg-gray-200"
+				v-if="isSaveButtonVisible"
+				class="mx-4 my-3.5 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-3 py-2 hover:bg-gray-800"
 				@click="save"
 			>
-				<div class="text-base text-gray-800">Save</div>
+				<div class="text-base text-white">Save</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, Ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, Ref, watch } from "vue";
 import { Autocomplete, Button } from "frappe-ui";
 import dayjs from "dayjs";
 import { useAgentStore } from "@/stores/agent";
@@ -120,6 +121,8 @@ const teamStore = useTeamStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const ticketTypeStore = useTicketTypeStore();
+
+const isSaveButtonVisible = ref(false);
 
 const firstResponseDue = computed(() =>
 	dayjs(ticket.doc.response_by).format("MMMM D, h:mm A")
@@ -145,11 +148,21 @@ const assignedTo = computed(() => {
 
 const changeAssignedTo: Ref = ref(null);
 
+watch(
+	changeAssignedTo,
+	(changed) => (isSaveButtonVisible.value = changed.value)
+);
+
 /** 
 This is used to keep track of changed keys. This is needed because updates are not
 committed until save is called, unlike auto-update
 */
-const changedKeys: Set<string> = new Set();
+const changedKeys: Ref<Set<string>> = ref(new Set([]));
+
+// Watch if any key is changed, and make save button visibility accordingly
+watch(changedKeys, (keys) => (isSaveButtonVisible.value = !!keys.size), {
+	deep: true,
+});
 
 // Add and remove shortcuts
 const keyComboSave = ["Control", "s"];
@@ -157,7 +170,7 @@ onMounted(() => keymapStore.add(keyComboSave, save, "Save details"));
 onUnmounted(() => keymapStore.remove(keyComboSave));
 
 async function save() {
-	const a = Array.from(changedKeys);
+	const a = Array.from(changedKeys.value);
 
 	/**
 	Get an object with only changed keys and their values. The loop starts as an
@@ -183,6 +196,8 @@ async function save() {
 		icon: "check",
 		iconClasses: "text-green-600",
 	});
+
+	changedKeys.value.clear();
 }
 </script>
 
