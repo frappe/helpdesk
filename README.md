@@ -1,5 +1,5 @@
 <div align="center" markdown="1">
-<img src="https://user-images.githubusercontent.com/46772424/181754239-a337beb3-fd35-4f27-969c-b9793f011458.svg" alt="Frappe Helpdesk logo" width="170"/>
+<img src="./logo.png" alt="Frappe Helpdesk logo" width="200"/>
 
 **Free and Open Source Helpdesk** </br>
 [frappedesk.com](https://frappedesk.com)
