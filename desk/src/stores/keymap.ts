@@ -33,7 +33,12 @@ class Shortcut {
 }
 
 export const useKeymapStore = defineStore("keymap", () => {
-	const keys = useMagicKeys();
+	const keys = useMagicKeys({
+		passive: false,
+		onEventFired(e) {
+			e.preventDefault();
+		},
+	});
 	const items: Ref<Array<Shortcut>> = ref([]);
 	const isOpen = ref(false);
 
