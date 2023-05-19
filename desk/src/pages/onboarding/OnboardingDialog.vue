@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model="isVisible" :options="options">
+	<Dialog v-model="isVisible" class="bg-gray-900" :options="options">
 		<template #body-content>
 			<div class="mt-4 text-base text-gray-900">
 				<component :is="steps[step]['component']" />
@@ -14,6 +14,7 @@ import { Dialog } from "frappe-ui";
 import SetupName from "./SetupName.vue";
 import SetupLogo from "./SetupLogo.vue";
 import SetupFavicon from "./SetupFavicon.vue";
+import SetupSkipEmail from "./SetupSkipEmail.vue";
 import SuccessMessage from "./SuccessMessage.vue";
 
 const options = computed(() => ({
@@ -52,6 +53,10 @@ const steps = [
 	{
 		title: "How about a Favicon? 🌏",
 		component: SetupFavicon,
+	},
+	{
+		title: "Did you know? 💡",
+		component: SetupSkipEmail,
 	},
 	{
 		title: "That's it for now! 🙏",
