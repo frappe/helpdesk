@@ -36,7 +36,7 @@ export const useKeymapStore = defineStore("keymap", () => {
 	const keys = useMagicKeys({
 		passive: false,
 		onEventFired(e) {
-			e.preventDefault();
+			if (items.value.find((item) => item.isActive)) e.preventDefault();
 		},
 	});
 	const items: Ref<Array<Shortcut>> = ref([]);
