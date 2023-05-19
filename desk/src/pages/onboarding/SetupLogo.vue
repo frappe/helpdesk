@@ -12,7 +12,7 @@
 						:loading="uploading"
 						@click="openFileSelector"
 					>
-						{{ uploading ? `Uploading ${progress}%` : "Upload Image" }}
+						{{ uploading ? `Uploading ${progress}%` : "Upload Logo" }}
 					</Button>
 					<ErrorMessage class="mt-2" :message="error" />
 				</span>
