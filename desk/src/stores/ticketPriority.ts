@@ -12,6 +12,7 @@ export const useTicketPriorityStore = defineStore("ticketPriority", () => {
 		doctype: "HD Ticket Priority",
 		orderBy: "integer_value desc",
 		auto: true,
+		pageLength: 99999,
 	});
 
 	const options: ComputedRef<Array<TicketPriority>> = computed(
