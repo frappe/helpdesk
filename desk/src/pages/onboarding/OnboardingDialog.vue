@@ -21,6 +21,15 @@ const options = computed(() => ({
 	title: steps[step.value]["title"],
 	actions: [
 		{
+			label: "Finish",
+			appearance: "primary",
+			class: "bg-gray-900 hover:bg-gray-800 text-sm",
+			handler() {
+				isVisible.value = false;
+			},
+			condition: step.value + 1 === steps.length,
+		},
+		{
 			label: "Next",
 			appearance: "primary",
 			class: "bg-gray-900 hover:bg-gray-800 text-sm",
@@ -30,13 +39,12 @@ const options = computed(() => ({
 			condition: step.value + 1 < steps.length,
 		},
 		{
-			label: "Finish",
-			appearance: "primary",
-			class: "bg-gray-900 hover:bg-gray-800 text-sm",
+			label: "Previous",
+			appearance: "minimal",
 			handler() {
-				isVisible.value = false;
+				step.value--;
 			},
-			condition: step.value + 1 === steps.length,
+			condition: step.value + 1 > 1 && step.value + 1 <= steps.length,
 		},
 	].filter((a) => a.condition),
 }));
