@@ -67,17 +67,19 @@
 							label="Reply"
 							appearance="primary"
 							class="rounded-r-none bg-gray-900 text-white hover:bg-gray-800"
+							:disabled="isDisabled"
 							@click="newCommunication"
 						/>
-						<Dropdown
-							:options="dropdownOptions"
-							:button="{
-								icon: 'chevron-down',
-								appearance: 'primary',
-								class:
-									'rounded-l-none bg-gray-900 text-white hover:bg-gray-800',
-							}"
-						/>
+						<Dropdown :options="dropdownOptions">
+							<template #default="{ open }">
+								<Button
+									:icon="open ? 'chevron-up' : 'chevron-down'"
+									appearance="primary"
+									class="cursor-pointer rounded-l-none bg-gray-900 text-white hover:bg-gray-800"
+									:disabled="isDisabled"
+								/>
+							</template>
+						</Dropdown>
 					</div>
 				</div>
 			</div>
@@ -95,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import {
 	createResource,
 	Button,
@@ -104,6 +106,7 @@ import {
 	TextEditorFixedMenu,
 } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
+import { isEmpty } from "@/utils/editor";
 import { editor, ticket, clean } from "../data";
 import { TextEditorMenuButtons as menuButtons } from "../../consts";
 import CannedResponses from "./CannedResponses.vue";
@@ -133,16 +136,23 @@ const dropdownOptions = [
 
 const insertRes = createResource({
 	url: "frappe.client.insert",
+	debounce: 500,
 	onSuccess() {
 		clean();
 	},
 });
+
+const isDisabled = computed(
+	() =>
+		isEmpty(editor.content) || ticket.replyViaAgent.loading || insertRes.loading
+);
 
 function removeAttachment(name: string) {
 	editor.attachments = editor.attachments.filter((x) => x.name != name);
 }
 
 function newCommunication() {
+	ticket.replyViaAgent.loading = true;
 	ticket.replyViaAgent.submit({
 		attachments: editor.attachments.map((x) => x.name),
 		cc: editor.cc.join(","),
@@ -152,6 +162,7 @@ function newCommunication() {
 }
 
 function newComment() {
+	insertRes.loading = true;
 	insertRes.submit({
 		doc: {
 			doctype: "HD Ticket Comment",

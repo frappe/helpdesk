@@ -49,6 +49,7 @@ export async function init(id: number) {
 			},
 			replyViaAgent: {
 				method: "reply_via_agent",
+				debounce: 500,
 				onSuccess() {
 					clean();
 				},
