@@ -40,6 +40,9 @@ export const useAuthStore = defineStore("auth", () => {
 
 	const resLogin = createResource({
 		url: URI_LOGIN,
+		onError() {
+			throw new Error("Invalid email or password");
+		},
 		onSuccess() {
 			router.replace({ path: "/" });
 		},
