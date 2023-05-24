@@ -25,9 +25,11 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { WEBSITE_ROOT } from "@/router";
-import SetupName from "./SetupName.vue";
-import SetupLogo from "./SetupLogo.vue";
+import OnboardingIntro from "./OnboardingIntro.vue";
+import SetupEmail from "./email/SetupEmail.vue";
 import SetupFavicon from "./SetupFavicon.vue";
+import SetupLogo from "./SetupLogo.vue";
+import SetupName from "./SetupName.vue";
 import SetupSkipEmail from "./SetupSkipEmail.vue";
 import SuccessMessage from "./SuccessMessage.vue";
 
@@ -35,7 +37,11 @@ const router = useRouter();
 const step = ref(0);
 const steps = [
 	{
-		title: "Hello there! 👋",
+		title: "Welcome to Frappe Helpdesk! 🎉",
+		component: OnboardingIntro,
+	},
+	{
+		title: "Begin with a name! 🖋️",
 		component: SetupName,
 	},
 	{
@@ -51,6 +57,10 @@ const steps = [
 		component: SetupSkipEmail,
 	},
 	{
+		title: "Let's setup an email 📬",
+		component: SetupEmail,
+	},
+	{
 		title: "That's it for now! 🙏",
 		component: SuccessMessage,
 	},
@@ -58,7 +68,7 @@ const steps = [
 const actions = computed(() =>
 	[
 		{
-			label: "Previous",
+			label: "← Previous",
 			appearance: "minimal",
 			handler() {
 				step.value--;
@@ -66,7 +76,7 @@ const actions = computed(() =>
 			condition: step.value + 1 > 1 && step.value + 1 <= steps.length,
 		},
 		{
-			label: "Next",
+			label: "Next →",
 			appearance: "primary",
 			class: "bg-gray-900 hover:bg-gray-800 text-sm",
 			handler() {
@@ -75,7 +85,7 @@ const actions = computed(() =>
 			condition: step.value + 1 < steps.length,
 		},
 		{
-			label: "Finish",
+			label: "Finish ✓",
 			appearance: "primary",
 			class: "bg-gray-900 hover:bg-gray-800 text-sm",
 			handler() {

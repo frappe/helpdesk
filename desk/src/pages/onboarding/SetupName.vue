@@ -1,6 +1,6 @@
 <template>
-	<div class="flex flex-col gap-2 text-gray-800">
-		{{ query }}
+	<div class="flex flex-col gap-4 text-gray-800">
+		{{ text }}
 		<div class="relative flex items-center justify-end">
 			<Input
 				type="text"
@@ -13,6 +13,9 @@
 				class="absolute mr-2 w-6 text-green-500"
 			/>
 		</div>
+		<div class="italic text-gray-800">
+			{{ subText }}
+		</div>
 	</div>
 </template>
 
@@ -21,7 +24,12 @@ import { ref } from "vue";
 import { createResource } from "frappe-ui";
 import IconCheck from "~icons/ph/check-bold";
 
-const query = "What should we call your Helpdesk?";
+const text =
+	"Now, let's set a name for your Helpdesk that reflects your organization's \
+	identity and values. So, what would you like to name your Helpdesk?";
+const subText =
+	"Choose a name that resonates with your brand and instills \
+	trust in your customers";
 const placeholder = "My Helpdesk";
 const isCheckVisible = ref(false);
 
