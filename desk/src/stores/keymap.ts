@@ -1,4 +1,4 @@
-import { ComputedRef, ref, Ref, watch } from "vue";
+import { ComputedRef, ref, Ref } from "vue";
 import { defineStore } from "pinia";
 import { useMagicKeys } from "@vueuse/core";
 import { isEqual } from "lodash";
@@ -36,7 +36,11 @@ export const useKeymapStore = defineStore("keymap", () => {
 	const keys = useMagicKeys({
 		passive: false,
 		onEventFired(e) {
-			if (items.value.find((item) => item.isActive)) e.preventDefault();
+			const k = items.value.find((item) => item.isActive);
+			if (!k) return;
+
+			e.preventDefault();
+			k.handler();
 		},
 	});
 	const items: Ref<Array<Shortcut>> = ref([]);
@@ -58,10 +62,6 @@ export const useKeymapStore = defineStore("keymap", () => {
 	function toggleVisibility(open?: boolean) {
 		isOpen.value = open ?? !isOpen.value;
 	}
-
-	watch(items, (v) => v.filter((s) => s.isActive).forEach((s) => s.handler()), {
-		deep: true,
-	});
 
 	return {
 		add,
