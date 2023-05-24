@@ -57,7 +57,7 @@
 									return {
 										doctype: 'Contact',
 										pluck: 'name',
-										filters: [['name', 'like', `%${query}%`]],
+										filters: [['Contact','name', 'like', `%${query}%`]],
 									};
 								},
 								responseMap: (res) => {
