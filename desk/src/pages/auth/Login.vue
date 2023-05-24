@@ -1,66 +1,44 @@
 <template>
-	<LoginBox
-		v-if="!successMessage"
-		:title="!forgot ? 'Log in to your account' : 'Reset your password'"
-	>
+	<LoginBox v-if="!successMessage" title="Login to your account">
 		<form class="space-y-4" @submit.prevent="login">
 			<Input
-				required
-				label="Email"
-				:type="email !== 'Administrator' ? 'email' : 'text'"
 				v-model="email"
-				placeholder="johndoe@gmail.com"
+				class="rounded-xl"
+				required
+				:type="email !== 'Administrator' ? 'email' : 'text'"
+				placeholder="Email"
 			/>
 			<Input
-				v-if="!forgot"
-				label="Password"
-				type="password"
-				placeholder="•••••"
 				v-model="password"
+				class="rounded-xl"
+				type="password"
+				placeholder="Password"
 				name="password"
 				autocomplete="current-password"
 				required
 			/>
-			<div class="mt-2 text-sm">
-				<router-link v-if="forgot" to="/login">
-					I remember my password
-				</router-link>
-				<router-link v-else to="/login/forgot">
-					Forgot Password
-				</router-link>
-			</div>
-			<ErrorMessage :error="errorMessage" class="mt-4" />
+			<ErrorMessage :message="errorMessage" />
 			<Button
-				appearance="primary"
-				class="w-full"
+				class="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+				label="Login"
 				:disabled="state === 'RequestStarted'"
-				@click="loginOrResetPassword"
 				type="primary"
-			>
-				Submit
-			</Button>
+				@click="login"
+			/>
 			<div>
-				<template v-if="!forgot">
-					<div class="mt-10 border-t text-center">
-						<div class="-translate-y-1/2 transform">
-							<span
-								class="bg-white px-2 text-xs uppercase leading-8 tracking-wider text-gray-800"
-							>
-								Or
-							</span>
-						</div>
+				<div class="mt-8 border-t text-center">
+					<div class="-translate-y-1/2">
+						<span class="bg-white px-2 text-xs tracking-wider text-gray-700">
+							OR
+						</span>
 					</div>
-					<router-link
-						class="text-center text-base"
-						:to="`${
-							this.$route.name === 'DeskLogin'
-								? ''
-								: ''
-						}/signup`"
-					>
-						<div>Sign up for a new account</div>
-					</router-link>
-				</template>
+				</div>
+				<router-link
+					class="text-center text-base"
+					:to="`${$route.name === 'DeskLogin' ? '' : ''}/signup`"
+				>
+					<div>Sign up for a new account</div>
+				</router-link>
 			</div>
 		</form>
 	</LoginBox>
@@ -71,88 +49,49 @@
 </template>
 
 <script>
-import LoginBox from "@/components/global/LoginBox.vue"
-import { Input } from "frappe-ui"
-import { ref } from "vue"
-import { useAuthStore } from "@/stores/auth"
+import { ref } from "vue";
+import { ErrorMessage, Input } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
+import LoginBox from "@/components/global/LoginBox.vue";
+import SuccessCard from "@/components/global/SuccessCard.vue";
 
 export default {
 	name: "Login",
-	props: {
-		forgot: {
-			default: false,
-		},
-	},
 	components: {
-		LoginBox,
+		ErrorMessage,
 		Input,
+		LoginBox,
+		SuccessCard,
 	},
 	setup() {
 		const authStore = useAuthStore();
-		const state = ref(null) // Idle, Logging In, Login Error
-		const email = ref(null)
-		const password = ref(null)
-		const errorMessage = ref(null)
-		const successMessage = ref(null)
-		const redirect_route = ref(null)
+		const state = ref(null); // Idle, Logging In, Login Error
+		const email = ref(null);
+		const password = ref(null);
+		const errorMessage = ref(null);
+		const successMessage = ref(null);
 
 		return {
 			authStore,
-			state,
 			email,
-			password,
 			errorMessage,
+			password,
+			state,
 			successMessage,
-			redirect_route,
-		}
-	},
-	watch: {
-		forgot() {
-			this.errorMessage = null
-			this.state = null
-			this.password = null
-			this.successMessage = null
-		},
-	},
-	async mounted() {
-		if (this.$route?.query?.route) {
-			this.redirect_route = this.$route.query.route
-		}
-
-		if (this.authStore.isLoggedIn) this.redirect();
+		};
 	},
 	methods: {
-		async loginOrResetPassword() {
-			try {
-				this.errorMessage = null
-				this.state = "RequestStarted"
-				if (!this.forgot) {
-					await this.login()
-				} else {
-					await this.resetPassword()
-				}
-			} catch (error) {
-				this.errorMessage = error.messages.join("\n")
-			} finally {
-				this.state = null
-			}
-		},
 		async login() {
-			if (this.email && this.password) {
-				this.authStore.login(this.email, this.password)
-			}
-		},
-		async resetPassword() {
-			await this.authStore.resetPassword(this.email)
-			this.successMessage = true
-		},
-		redirect() {
-			if (this.redirect_route) {
-				window.location.href = this.redirect_route
-			} else {
-				window.location.href = "/";
-			}
+			if (!this.email || !this.password) return;
+
+			this.errorMessage = null;
+			this.state = "RequestStarted";
+
+			await this.authStore
+				.login(this.email, this.password)
+				.catch((error) => (this.errorMessage = error.message))
+				.finally(() => (this.state = null));
 		},
 	},
-}
+};
 </script>
