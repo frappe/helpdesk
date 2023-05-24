@@ -24,8 +24,8 @@
 					<template #top>
 						<TopSection />
 					</template>
-					<template #editor="{ editor }">
-						<TextEditorContent :editor="editor" />
+					<template #editor="{ editor: e }">
+						<TextEditorContent :editor="e" />
 					</template>
 					<template #bottom>
 						<BottomSection />
