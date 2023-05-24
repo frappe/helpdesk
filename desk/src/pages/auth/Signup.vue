@@ -4,29 +4,29 @@
 			<form class="space-y-4" @submit.prevent="signup()">
 				<Input
 					v-model="email"
-					class="rounded-xl"
 					type="email"
-					placeholder="Email"
+					placeholder="john.doe@example.com"
+					label="Email"
 					autocomplete="email"
 					required
 				/>
 				<Input
 					v-model="firstName"
-					class="rounded-xl"
 					type="text"
-					placeholder="Firstname"
+					label="Firstname"
+					placeholder="John"
 					required
 				/>
 				<Input
 					v-model="lastName"
-					class="rounded-xl"
 					type="text"
-					placeholder="Lastname"
+					label="Lastname"
+					placeholder="Doe"
 					required
 				/>
 				<div>
 					<Button
-						class="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+						class="w-full bg-gray-900 text-white hover:bg-gray-800"
 						label="Signup"
 						:loading="submitting"
 						type="primary"
