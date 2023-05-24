@@ -66,7 +66,7 @@ export const useTicketStore = defineStore("ticket", () => {
 	 * components.
 	 */
 	async function init(name: number) {
-		// ticket.update({ name });
+		ticket.name = name;
 		ticket.reload();
 		await ticket.get.promise;
 		startListening();
