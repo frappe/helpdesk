@@ -6,7 +6,7 @@
 				<Button
 					appearance="minimal"
 					icon="x"
-					@click="sidebar.isVisible = false"
+					@click="sidebar.isExpanded = false"
 				/>
 			</div>
 			<div class="flex items-center gap-3 border-b py-6">
@@ -51,10 +51,12 @@
 import { isEmpty } from "lodash";
 import { computed } from "vue";
 import { Avatar, Button, createDocumentResource } from "frappe-ui";
-import { sidebar, ticket } from "./data";
+import { useTicketStore } from "./data";
 import CustomFieldList from "./CustomFieldList.vue";
 import OpenTicketList from "./OpenTicketList.vue";
 import IconEmail from "~icons/espresso/email";
+
+const { sidebar, ticket } = useTicketStore();
 
 const c = createDocumentResource({
 	doctype: "Contact",

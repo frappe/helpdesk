@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref, computed, toRefs, Ref, watch } from "vue";
 import { createResource, Dialog, FeatherIcon, Input } from "frappe-ui";
-import { editor } from "../data";
+import { useTicketStore } from "../data";
 import Accordion from "@/components/global/Accordion.vue";
 
 const props = defineProps({
@@ -56,6 +56,7 @@ const props = defineProps({
 const emit = defineEmits(["close"]);
 
 const { show } = toRefs(props);
+const { editor } = useTicketStore();
 
 const r = createResource({
 	url: "helpdesk.api.cannedResponse.get_canned_response",

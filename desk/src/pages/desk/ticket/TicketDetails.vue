@@ -7,7 +7,7 @@
 					<Button
 						appearance="minimal"
 						icon="x"
-						@click="sidebar.isVisible = false"
+						@click="sidebar.isExpanded = false"
 					/>
 				</div>
 				<div class="my-6 flex flex-col justify-between gap-3.5">
@@ -113,7 +113,7 @@ import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import { createToast } from "@/utils/toasts";
-import { sidebar, ticket } from "./data";
+import { useTicketStore } from "./data";
 
 const agentStore = useAgentStore();
 const keymapStore = useKeymapStore();
@@ -121,6 +121,7 @@ const teamStore = useTeamStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const ticketTypeStore = useTicketTypeStore();
+const { sidebar, ticket } = useTicketStore();
 
 const isSaveButtonVisible = ref(false);
 

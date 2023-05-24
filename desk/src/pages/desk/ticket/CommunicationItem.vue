@@ -48,7 +48,7 @@
 import { toRefs } from "vue";
 import dayjs from "dayjs";
 import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
-import { editor } from "./data";
+import { useTicketStore } from "./data";
 import IconDot from "~icons/ph/dot-bold";
 import AttachmentItem from "@/components/AttachmentItem.vue";
 
@@ -93,6 +93,7 @@ const props = defineProps({
 });
 
 const { content, date, sender, senderImage, cc, bcc } = toRefs(props);
+const { editor } = useTicketStore();
 const dateDisplay = dayjs(date.value).format("h:mm A");
 const options = [
 	{

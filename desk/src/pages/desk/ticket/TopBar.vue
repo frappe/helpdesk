@@ -42,7 +42,7 @@ import { Tooltip } from "frappe-ui";
 import { useClipboard } from "@vueuse/core";
 import dayjs from "dayjs";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
-import { ticket } from "./data";
+import { useTicketStore } from "./data";
 import { createToast } from "@/utils/toasts";
 import IconAtSign from "~icons/espresso/at-sign";
 import IconCaretLeft from "~icons/ph/caret-left";
@@ -52,6 +52,7 @@ import IconWeb from "~icons/espresso/web";
 
 const { copy } = useClipboard();
 const router = useRouter();
+const { ticket } = useTicketStore();
 
 const date = computed(() => dayjs(ticket.doc.modified).tz(dayjs.tz.guess()));
 const dateShort = computed(() => date.value.fromNow());
