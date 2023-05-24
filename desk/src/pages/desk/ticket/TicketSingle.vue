@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue";
 import { useConfigStore } from "@/stores/config";
-import { deinit, init, ticket } from "./data";
+import { useTicketStore } from "./data";
 import ConversationBox from "./ConversationBox.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
@@ -27,6 +27,7 @@ const props = defineProps({
 		required: true,
 	},
 });
+const { init, deinit, ticket } = useTicketStore();
 const isResLoaded = ref(false);
 const configStore = useConfigStore();
 

@@ -71,9 +71,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { editor, ticket } from "../data";
+import { useTicketStore } from "../data";
 import UserBubble from "./UserBubble.vue";
 
+const { editor, ticket } = useTicketStore();
 const to = computed(() => ticket.doc.raised_by);
 
 function addToArray(array: Array<string>, el) {

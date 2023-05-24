@@ -6,47 +6,50 @@
 				:label="authStore.userName"
 				size="md"
 			/>
+			<TextEditor
+				v-if="editor.isExpanded"
+				ref="editorRef"
+				class="editor-shadow grow"
+				editor-class="prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
+				:mentions="mentions"
+				:placeholder="placeholder"
+				:content="editor.content"
+				@change="(v) => (editor.content = v)"
+			>
+				<template #top>
+					<TopSection />
+				</template>
+				<template #editor="{ editor: e }">
+					<TextEditorContent :editor="e" />
+				</template>
+				<template #bottom>
+					<BottomSection />
+				</template>
+			</TextEditor>
 			<div
-				v-if="!editor.isExpanded"
+				v-else
 				class="flex h-8 w-full cursor-pointer select-none items-center rounded-lg border border-gray-300 px-2.5 text-base text-gray-500"
-				@click="editor.isExpanded = true"
+				@click="expand"
 			>
 				{{ placeholder }}
-			</div>
-			<div v-if="editor.isExpanded" class="editor-shadow grow">
-				<TextEditor
-					editor-class="prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
-					:mentions="mentions"
-					:placeholder="placeholder"
-					:content="editor.content"
-					@change="(v) => (editor.content = v)"
-				>
-					<template #top>
-						<TopSection />
-					</template>
-					<template #editor="{ editor: e }">
-						<TextEditorContent :editor="e" />
-					</template>
-					<template #bottom>
-						<BottomSection />
-					</template>
-				</TextEditor>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { Avatar, TextEditor, TextEditorContent } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useAgentStore } from "@/stores/agent";
-import { editor } from "../data";
+import { useTicketStore } from "../data";
 import BottomSection from "./BottomSection.vue";
 import TopSection from "./TopSection.vue";
 
 const authStore = useAuthStore();
 const agentStore = useAgentStore();
+const { editor } = useTicketStore();
+const editorRef = ref(null);
 const placeholder = "Add a reply / comment";
 const mentions = computed(() =>
 	agentStore.options.map((a) => ({
@@ -55,6 +58,15 @@ const mentions = computed(() =>
 	}))
 );
 
+function expand() {
+	editor.isExpanded = true;
+
+	setTimeout(() => {
+		editor.tiptap?.commands.focus();
+	}, 300);
+}
+
+watch(editorRef, (e) => (editor.tiptap = e.editor));
 onUnmounted(() => (editor.isExpanded = false));
 </script>
 

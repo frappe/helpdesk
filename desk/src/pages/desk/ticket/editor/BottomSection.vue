@@ -106,8 +106,7 @@ import {
 	TextEditorFixedMenu,
 } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
-import { isEmpty } from "@/utils/editor";
-import { editor, ticket, clean } from "../data";
+import { useTicketStore } from "../data";
 import { TextEditorMenuButtons as menuButtons } from "../../consts";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
@@ -120,6 +119,7 @@ import IconAttachment from "~icons/espresso/attachment";
 import IconChat from "~icons/espresso/chat";
 
 const authStore = useAuthStore();
+const { clean, editor, ticket } = useTicketStore();
 const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
 const isTextFormattingVisible = ref(false);
@@ -144,7 +144,7 @@ const insertRes = createResource({
 
 const isDisabled = computed(
 	() =>
-		isEmpty(editor.content) || ticket.replyViaAgent.loading || insertRes.loading
+		editor.tiptap?.isEmpty || ticket.replyViaAgent.loading || insertRes.loading
 );
 
 function removeAttachment(name: string) {

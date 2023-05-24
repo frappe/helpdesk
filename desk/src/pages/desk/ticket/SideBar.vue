@@ -1,7 +1,7 @@
 <template>
 	<div class="flex">
 		<TabGroup vertical>
-			<TabPanels v-if="sidebar.isVisible" class="main-panel h-full">
+			<TabPanels v-if="sidebar.isExpanded" class="main-panel h-full">
 				<TabPanel v-for="item in items" :key="item.name" class="h-full">
 					<component :is="item.component" class="h-full" />
 				</TabPanel>
@@ -11,10 +11,10 @@
 					<div
 						class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-600"
 						:class="{
-							'bg-gray-200': sidebar.isVisible && selected,
-							'text-gray-900': sidebar.isVisible && selected,
+							'bg-gray-200': sidebar.isExpanded && selected,
+							'text-gray-900': sidebar.isExpanded && selected,
 						}"
-						@click="sidebar.isVisible = true"
+						@click="sidebar.isExpanded = true"
 					>
 						<component :is="item.icon" />
 					</div>
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
-import { sidebar } from "./data";
+import { useTicketStore } from "./data";
 import ContactDetails from "./ContactDetails.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
@@ -34,6 +34,7 @@ import IconActivity from "~icons/espresso/activity";
 import IconAlert from "~icons/espresso/alert-circle";
 import IconDetails from "~icons/espresso/details";
 
+const { sidebar } = useTicketStore();
 const items = [
 	{
 		name: "Ticket Details",

@@ -20,9 +20,10 @@
 <script setup lang="ts">
 import { isEmpty } from "lodash";
 import { computed } from "vue";
-import { ticket } from "./data";
+import { useTicketStore } from "./data";
 import IconTeams from "~icons/espresso/teams";
 import IconWebLink from "~icons/espresso/web-link";
 
+const { ticket } = useTicketStore();
 const fields = computed(() => ticket.doc?.custom_fields);
 </script>

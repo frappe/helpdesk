@@ -38,13 +38,15 @@ import { useScroll } from "@vueuse/core";
 import dayjs from "dayjs";
 import { orderBy, unionBy } from "lodash";
 import { socket } from "@/socket";
-import { ticket } from "./data";
+import { useTicketStore } from "./data";
 import CommentItem from "./CommentItem.vue";
 import CommunicationItem from "./CommunicationItem.vue";
 
 type SocketData = {
 	ticket_id: string;
 };
+
+const { ticket } = useTicketStore();
 
 ticket.getCommunications
 	.submit()
