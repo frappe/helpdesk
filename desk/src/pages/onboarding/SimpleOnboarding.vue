@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
+import { createResource } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { WEBSITE_ROOT } from "@/router";
@@ -93,16 +94,33 @@ const actions = computed(() =>
 			appearance: "primary",
 			class: "bg-gray-900 hover:bg-gray-800 text-sm",
 			handler() {
-				router.push({ name: WEBSITE_ROOT });
+				finish();
 			},
 			condition: step.value + 1 === steps.length,
 		},
 	].filter((a) => a.condition)
 );
 
+function finish() {
+	createResource({
+		url: "frappe.client.set_value",
+	})
+		.submit({
+			doctype: "HD Settings",
+			name: "HD Settings",
+			fieldname: "setup_complete",
+			value: true,
+		})
+		.then(redirect);
+}
+
+function redirect() {
+	router.replace({ name: WEBSITE_ROOT });
+}
+
 onBeforeMount(() => {
 	if (!authStore.hasDeskAccess || configStore.isSetupComplete) {
-		router.replace({ name: WEBSITE_ROOT });
+		redirect();
 	}
 });
 </script>
