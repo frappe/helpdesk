@@ -3,8 +3,7 @@
 		<TopBar />
 		<div class="flex grow overflow-hidden">
 			<div class="flex grow flex-col">
-				<ConversationBox />
-				<div class="grow"></div>
+				<ConversationBox class="grow" />
 				<ResponseEditor />
 			</div>
 			<SideBar />

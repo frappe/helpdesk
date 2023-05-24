@@ -1,6 +1,6 @@
 <template>
 	<div ref="listElement" class="flex flex-col items-center overflow-scroll">
-		<div class="content flex flex-col gap-4">
+		<div v-if="isLoaded" class="content flex flex-col gap-4">
 			<div v-for="(c, i) in conversations" :key="c.name" class="mt-4">
 				<div v-if="isNewDay(i)">
 					<div class="flex items-center">
@@ -29,12 +29,16 @@
 				/>
 			</div>
 		</div>
+		<div v-else class="flex grow items-center justify-center">
+			<LoadingIndicator class="w-5 text-gray-900" />
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useScroll } from "@vueuse/core";
+import { LoadingIndicator } from "frappe-ui";
 import dayjs from "dayjs";
 import { orderBy, unionBy } from "lodash";
 import { socket } from "@/socket";
@@ -54,7 +58,7 @@ ticket.getCommunications
 ticket.getComments.submit().then(() => (isCommentsLoaded.value = true));
 
 const listElement = ref<HTMLElement | null>(null);
-const { y: scrollY } = useScroll(listElement, { behavior: "smooth" });
+const { y: scrollY } = useScroll(listElement);
 
 const isCommunicationsLoaded = ref(false);
 const isCommentsLoaded = ref(false);
@@ -62,7 +66,7 @@ const isLoaded = computed(
 	() => isCommunicationsLoaded.value && isCommentsLoaded.value
 );
 
-watch(isLoaded, (v) => {
+watch(listElement, (v) => {
 	if (v) scrollToBottom();
 });
 
