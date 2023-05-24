@@ -29,7 +29,7 @@
 			<div
 				v-else
 				class="flex h-8 w-full cursor-pointer select-none items-center rounded-lg border border-gray-300 px-2.5 text-base text-gray-500"
-				@click="expand"
+				@click="editor.isExpanded = true"
 			>
 				{{ placeholder }}
 			</div>
@@ -58,15 +58,10 @@ const mentions = computed(() =>
 	}))
 );
 
-function expand() {
-	editor.isExpanded = true;
-
-	setTimeout(() => {
-		editor.tiptap?.commands.focus();
-	}, 300);
-}
-
-watch(editorRef, (e) => (editor.tiptap = e.editor));
+watch(editorRef, (e) => {
+	editor.tiptap = e.editor;
+	if (editor.tiptap) editor.tiptap?.commands.focus();
+});
 onUnmounted(() => (editor.isExpanded = false));
 </script>
 
