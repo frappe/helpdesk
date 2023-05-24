@@ -22,8 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { WEBSITE_ROOT } from "@/router";
 import OnboardingIntro from "./OnboardingIntro.vue";
 import SetupEmail from "./email/SetupEmail.vue";
@@ -34,6 +36,8 @@ import SetupSkipEmail from "./SetupSkipEmail.vue";
 import SuccessMessage from "./SuccessMessage.vue";
 
 const router = useRouter();
+const authStore = useAuthStore();
+const configStore = useConfigStore();
 const step = ref(0);
 const steps = [
 	{
@@ -95,6 +99,12 @@ const actions = computed(() =>
 		},
 	].filter((a) => a.condition)
 );
+
+onBeforeMount(() => {
+	if (!authStore.hasDeskAccess || configStore.isSetupComplete) {
+		router.replace({ name: WEBSITE_ROOT });
+	}
+});
 </script>
 
 <style scoped>

@@ -1,208 +1,29 @@
 <template>
-	<div v-if="initialized">
-		<div class="flex h-screen w-screen">
-			<SideBar />
-			<router-view class="z-0 grow overflow-auto" />
-		</div>
+	<div class="flex h-screen w-screen">
+		<SideBar />
+		<router-view class="z-0 grow overflow-auto" />
 	</div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script setup lang="ts">
+import { onBeforeMount } from "vue";
+import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
+import { CUSTOMER_PORTAL_LANDING, ONBOARDING_PAGE } from "@/router";
 import SideBar from "@/components/desk/sidebar/SideBar.vue";
 
-export default {
-	name: "AgentRoot",
-	components: {
-		SideBar,
-	},
-	setup() {
-		const authStore = useAuthStore();
-		const configStore = useConfigStore();
-		const mounted = ref(false);
+const router = useRouter();
+const authStore = useAuthStore();
+const configStore = useConfigStore();
 
-		return {
-			authStore,
-			configStore,
-			mounted,
-		};
-	},
-	computed: {
-		initialized() {
-			if (!this.mounted) return false;
+onBeforeMount(() => {
+	if (!authStore.hasDeskAccess) {
+		router.replace({ name: CUSTOMER_PORTAL_LANDING });
+	}
 
-			return true;
-		},
-		defaultOutgoingEmailAccountSetup() {
-			if (this.$resources.defaultOutgoingEmailAccount.loading) {
-				return "NOT SET";
-			}
-			return this.$resources.defaultOutgoingEmailAccount.data > 0;
-		},
-	},
-	watch: {
-		initialized(val) {
-			if (val) {
-				this.handlePostOnboardSetupReqs();
-			}
-		},
-	},
-	mounted() {
-		if (!this.authStore.hasDeskAccess) {
-			this.$router.replace({ name: CUSTOMER_PORTAL_LANDING });
-			return;
-		}
-
-		this.mounted = true;
-	},
-	methods: {
-		handlePostOnboardSetupReqs() {
-			// default email account
-			if (
-				!this.configStore.suppressEmailToast &&
-				this.defaultOutgoingEmailAccountSetup != "NOT SET" &&
-				!this.defaultOutgoingEmailAccountSetup
-			) {
-				this.showDefaultEmailAccountSetupToast();
-			}
-			// add agents
-			if (
-				!this.$resources.agentCount.loading &&
-				this.$resources.agentCount.data == 0
-			) {
-				// this block should theoretically never fire, since the initial agent is created during the setup process
-				this.showAddAgentsToast();
-			}
-		},
-		showHelpdeskNameSetupToast() {
-			this.$toast({
-				title: "Set a name",
-				text: "What would you like to name your helpdesk?",
-				timeout: 0,
-				icon: "edit",
-				iconClasses: "text-blue-500",
-				form: {
-					classes: "flex gap-1",
-					inputs: [
-						{
-							type: "text",
-							fieldname: "helpdeskName",
-							placeholder: "Frappe Helpdesk",
-						},
-					],
-					onSubmit: (values) => {
-						const inputs = values.target?.elements;
-						const name = inputs?.helpdeskName?.value;
-
-						if (!name) return;
-
-						this.$resources.setHelpdeskName.submit({
-							name,
-						});
-					},
-				},
-				actionOnClose: () => {
-					this.$resources.skipHelpdeskNameSetup.submit();
-				},
-			});
-		},
-		showDefaultEmailAccountSetupToast() {
-			this.$toast({
-				title: "Default outgoing email account not added",
-				text: "Please add a default outgoing email account in settings.",
-				timeout: 0,
-				icon: "mail",
-				iconClasses: "text-red-500",
-				buttons: [
-					{
-						title: "Setup now",
-						appearance: "primary",
-						iconRight: "arrow-right",
-						onClick: () => {
-							this.$router.push({ name: "Emails" });
-						},
-					},
-				],
-			});
-		},
-		showAddAgentsToast() {
-			this.$toast({
-				title: "You don't have any agents",
-				timeout: 0,
-				appearance: "info",
-				icon: "users",
-				iconClasses: "text-red-500",
-				buttons: [
-					{
-						title: "Add now",
-						appearance: "danger",
-						iconRight: "arrow-right",
-						onClick: () => {
-							this.$router.push({ name: "Agents" });
-						},
-					},
-				],
-			});
-		},
-	},
-	resources: {
-		// onboarding related resources
-		// setters
-		setHelpdeskName() {
-			// set helpdesk name in Helpdesk Settings
-			return {
-				url: "helpdesk.api.settings.update_helpdesk_name",
-				onSuccess: (res) => {
-					document.title = `Helpdesk ${res ? ` | ${res}` : ""}`;
-					this.$toast({
-						title: "Helpdesk name updated!!",
-						icon: "check",
-						iconClasses: "text-green-500",
-					});
-				},
-				onError: (err) => {
-					this.$toast({
-						title: "Something went wrong, updating helpdesk name",
-						text: "Please try again later.",
-						icon: "x",
-						iconClasses: "text-red-500",
-					});
-				},
-			};
-		},
-		skipHelpdeskNameSetup() {
-			// sets the values of skip_helpdesk_name_setup to true inside Helpdesk Settings
-			return {
-				url: "helpdesk.api.settings.skip_helpdesk_name_setup",
-			};
-		},
-		// getters
-		defaultOutgoingEmailAccount() {
-			return {
-				url: "frappe.client.get_count",
-				params: {
-					doctype: "Email Account",
-					filters: [
-						["use_imap", "=", 1],
-						["IMAP Folder", "append_to", "=", "HD Ticket"],
-						["default_outgoing", "=", 1],
-					],
-				},
-				auto: true,
-			};
-		},
-		agentCount() {
-			return {
-				url: "frappe.client.get_count",
-				params: {
-					doctype: "HD Agent",
-				},
-				auto: true,
-			};
-		},
-	},
-};
+	if (!configStore.isSetupComplete) {
+		router.replace({ name: ONBOARDING_PAGE });
+	}
+});
 </script>
