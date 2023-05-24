@@ -3,23 +3,23 @@
 		<form class="space-y-4" @submit.prevent="login">
 			<Input
 				v-model="email"
-				class="rounded-xl"
 				required
 				:type="email !== 'Administrator' ? 'email' : 'text'"
-				placeholder="Email"
+				label="Email"
+				placeholder="john.doe@example.com"
 			/>
 			<Input
 				v-model="password"
-				class="rounded-xl"
 				type="password"
-				placeholder="Password"
+				placeholder="••••••••"
+				label="Password"
 				name="password"
 				autocomplete="current-password"
 				required
 			/>
 			<ErrorMessage :message="errorMessage" />
 			<Button
-				class="w-full rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+				class="w-full bg-gray-900 text-white hover:bg-gray-800"
 				label="Login"
 				:disabled="state === 'RequestStarted'"
 				type="primary"
