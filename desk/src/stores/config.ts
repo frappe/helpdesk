@@ -20,6 +20,9 @@ export const useConfigStore = defineStore("config", () => {
 	const helpdeskName: ComputedRef<string> = computed(
 		() => config.value.helpdesk_name || DEFAULT_TITLE
 	);
+	const isSetupComplete: ComputedRef<boolean> = computed(
+		() => config.value.is_setup_complete
+	);
 	const suppressEmailToast: ComputedRef<boolean> = computed(
 		() => config.value.suppress_default_email_toast ?? true
 	);
@@ -43,8 +46,8 @@ export const useConfigStore = defineStore("config", () => {
 		config,
 		brandLogo,
 		helpdeskName,
+		isSetupComplete,
 		suppressEmailToast,
-
 		setTitle,
 	};
 });

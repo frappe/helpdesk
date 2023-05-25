@@ -8,6 +8,7 @@ export const LOGIN = "Login";
 export const SIGNUP = "Signup";
 export const VERIFY = "Verify Account";
 export const AUTH_ROUTES = [LOGIN, SIGNUP, VERIFY];
+export const ONBOARDING_PAGE = "Setup";
 
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
 export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
@@ -42,6 +43,11 @@ const routes = [
 				/* webpackChunkName: "setup-account" */ "@/pages/auth/VerifyAccount.vue"
 			),
 		props: true,
+	},
+	{
+		path: "/onboarding",
+		name: ONBOARDING_PAGE,
+		component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
 	},
 	{
 		path: "",
