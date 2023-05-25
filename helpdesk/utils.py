@@ -3,11 +3,16 @@ import re
 import frappe
 from bs4 import BeautifulSoup
 from frappe.realtime import get_website_room
+from frappe.utils.telemetry import capture as _capture
 
 
 def publish_event(event: str, data: dict):
 	room = get_website_room()
 	frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+
+
+def capture_event(event: str):
+    return _capture(event, "helpdesk")
 
 
 def extract_mentions(html):
