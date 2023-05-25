@@ -21,8 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from "vue";
+import { Ref, onMounted, ref } from "vue";
 import { createResource, FileUploader } from "frappe-ui";
+import { capture } from "@/telemetry";
 
 const help =
 	"A favicon enhances your website by providing a small, recognizable icon that \
@@ -35,6 +36,7 @@ const r = createResource({
 	debounce: 1000,
 	onSuccess(data) {
 		imageUrl.value = data.brand_favicon;
+		capture("onboarding_favicon_changed");
 	},
 });
 
@@ -46,4 +48,6 @@ function update(file) {
 		value: file.file_url,
 	});
 }
+
+onMounted(() => capture("onboarding_favicon_reached"));
 </script>

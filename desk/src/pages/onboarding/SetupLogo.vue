@@ -21,8 +21,9 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref } from "vue";
+import { Ref, onMounted, ref } from "vue";
 import { createResource, FileUploader } from "frappe-ui";
+import { capture } from "@/telemetry";
 
 const help =
 	"this will be used in many places, including login and loading screens. \
@@ -34,6 +35,7 @@ const r = createResource({
 	debounce: 1000,
 	onSuccess(data) {
 		imageUrl.value = data.brand_logo;
+		capture("onboarding_logo_changed");
 	},
 });
 
@@ -45,4 +47,6 @@ function update(file) {
 		value: file.file_url,
 	});
 }
+
+onMounted(() => capture("onboarding_logo_reached"));
 </script>

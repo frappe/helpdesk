@@ -34,9 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { createResource, Button, Input, debounce } from "frappe-ui";
+import { capture } from "@/telemetry";
 import { createToast } from "@/utils/toasts";
 import { useOnboardingEmailStore } from "./data";
 
@@ -82,6 +83,7 @@ const emailDefaults = {
 const insertRes = createResource({
 	url: "frappe.client.insert",
 	onSuccess: () => {
+		capture("onboarding_email_credentials_success");
 		next();
 	},
 	onError: (error) => {
@@ -93,6 +95,8 @@ const insertRes = createResource({
 			icon: "x",
 			iconClasses: "text-red-500",
 		});
+
+		capture("onboarding_email_credentials_fail");
 	},
 });
 
@@ -125,4 +129,6 @@ const submit = debounce(() => {
 		},
 	});
 }, 500);
+
+onMounted(() => capture("onboarding_email_credentials_reached"));
 </script>

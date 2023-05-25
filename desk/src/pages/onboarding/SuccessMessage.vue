@@ -32,8 +32,13 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
+import { capture } from "@/telemetry";
+
 const github = "https://github.com/frappe/helpdesk";
 const issues = "https://github.com/frappe/helpdesk/issues";
 const support = "https://frappedesk.com/helpdesk";
 const email = "hello@frappe.io";
+
+onMounted(() => capture("onboarding_finished"));
 </script>

@@ -38,10 +38,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { Button, Tooltip } from "frappe-ui";
 import { isEmpty } from "lodash";
+import { capture } from "@/telemetry";
 import { useOnboardingEmailStore } from "./data";
 import IconAlert from "~icons/espresso/alert-circle";
 import LogoGmail from "@/assets/images/gmail.png";
@@ -86,4 +87,6 @@ const services = [
 const info = computed(
 	() => services.find((s) => s.name === service.value)?.info
 );
+
+onMounted(() => capture("onboarding_email_select_service_reached"));
 </script>
