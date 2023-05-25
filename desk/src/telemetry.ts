@@ -1,6 +1,6 @@
 import { useStorage } from "@vueuse/core";
 import { call } from "frappe-ui";
-import "../../../frappe/public/js/lib/posthog.js";
+import "../../../frappe/frappe/public/js/lib/posthog.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const posthog: any;
