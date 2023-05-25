@@ -5,15 +5,14 @@
 		</div>
 		<img v-if="imageUrl" class="m-auto h-8" :src="imageUrl" />
 		<FileUploader @success="(file) => update(file)">
-			<template #default="{ uploading, progress, error, openFileSelector }">
+			<template #default="{ error, openFileSelector }">
 				<span>
 					<Button
 						class="w-max bg-gray-900 text-sm text-white hover:bg-gray-800"
-						:loading="uploading"
+						:loading="r.loading"
+						label="Upload Logo"
 						@click="openFileSelector"
-					>
-						{{ uploading ? `Uploading ${progress}%` : "Upload Logo" }}
-					</Button>
+					/>
 					<ErrorMessage class="mt-2" :message="error" />
 				</span>
 			</template>
