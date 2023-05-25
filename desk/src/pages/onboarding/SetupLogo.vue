@@ -26,7 +26,7 @@ import { Ref, ref } from "vue";
 import { createResource, FileUploader } from "frappe-ui";
 
 const help =
-	"This will be used in many places, including Login and Loading screens. \
+	"this will be used in many places, including login and loading screens. \
 	An image with transparent background and a resolution of 160 x 32 is preferred";
 const imageUrl: Ref<string> = ref(null);
 

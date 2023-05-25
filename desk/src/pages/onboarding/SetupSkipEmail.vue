@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-4 text-gray-800">
 		{{ query }}
 		<Button
-			:label="isYes ? 'No!' : 'Yes!'"
+			:label="isYes ? 'No' : 'Yes'"
 			class="w-max bg-gray-900 text-white hover:bg-gray-800"
 			@click="update(!isYes)"
 		/>
@@ -14,9 +14,10 @@ import { ref } from "vue";
 import { createResource } from "frappe-ui";
 
 const query =
-	"Helpdesk is useful even without an email! Our customer portal is fine \
-	tuned to be standalone. This is especially helpful if you want to skip the hassle \
-	of email setup. Do you want me to turn off the email workflow?";
+	"Did you know that our Helpdesk is designed to function independently, \
+	without relying on email? Our customer portal is finely tuned to be a \
+	standalone solution, eliminating the hassle of email setup. Would you \
+	like me to disable the email workflow for you?";
 const isYes = ref(false);
 
 const r = createResource({
