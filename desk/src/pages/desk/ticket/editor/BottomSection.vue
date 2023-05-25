@@ -144,13 +144,16 @@ const insertRes = createResource({
 	},
 	validate(params) {
 		if (isEmpty(params.doc.content)) {
-			createToast({
-				title: "Message is empty",
-				icon: "x",
-				iconClasses: "text-red-600",
-			});
 			return "Message is empty";
 		}
+	},
+	onError(error) {
+		createToast({
+			title: "Error sending reply",
+			text: error.messages?.join("\n"),
+			icon: "x",
+			iconClasses: "text-red-500",
+		});
 	},
 });
 

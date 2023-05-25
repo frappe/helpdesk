@@ -51,12 +51,6 @@ export const useTicketStore = defineStore("ticket", () => {
 				},
 				validate() {
 					if (isEmpty(editor.content)) {
-						createToast({
-							title: "Message is empty",
-							icon: "x",
-							iconClasses: "text-red-600",
-						});
-
 						return "Message is empty";
 					}
 				},
