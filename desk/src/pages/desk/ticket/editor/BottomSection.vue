@@ -117,6 +117,8 @@ import IconX from "~icons/ph/x";
 import IconTextT from "~icons/ph/text-t";
 import IconAttachment from "~icons/espresso/attachment";
 import IconChat from "~icons/espresso/chat";
+import { isEmpty } from "@/utils/editor";
+import { createToast } from "@/utils/toasts";
 
 const authStore = useAuthStore();
 const { clean, editor, ticket } = useTicketStore();
@@ -139,6 +141,16 @@ const insertRes = createResource({
 	debounce: 500,
 	onSuccess() {
 		clean();
+	},
+	validate(params) {
+		if (isEmpty(params.doc.content)) {
+			createToast({
+				title: "Message is empty",
+				icon: "x",
+				iconClasses: "text-red-600",
+			});
+			return "Message is empty";
+		}
 	},
 });
 
