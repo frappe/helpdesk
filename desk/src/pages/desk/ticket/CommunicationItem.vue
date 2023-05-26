@@ -28,7 +28,7 @@
 			<div class="prose max-w-none text-base text-gray-700">
 				<!-- This is vulnerable to attacks -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
-				<span v-html="sanitizeHtml(content)"></span>
+				<span v-html="sanitize(content)"></span>
 			</div>
 			<div class="flex flex-wrap gap-2">
 				<a
@@ -119,5 +119,11 @@ const options = [
 
 function quote(s: string) {
 	return `<blockquote>${s}</blockquote><br/>`;
+}
+
+function sanitize(html: string) {
+	return sanitizeHtml(html, {
+		allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+	});
 }
 </script>
