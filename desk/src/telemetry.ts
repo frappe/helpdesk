@@ -14,7 +14,7 @@ const telemetry = useStorage("telemetry", {
 	telemetry_host: undefined,
 });
 
-async function initialize() {
+export async function init() {
 	await set_enabled();
 	if (!telemetry.value.enabled) return;
 	try {
@@ -35,7 +35,8 @@ async function initialize() {
 
 async function set_enabled() {
 	if (telemetry.value.enabled) return;
-	return await call("helpdesk.api.telemetry.is_enabled").then((res) => {
+
+	await call("helpdesk.api.telemetry.is_enabled").then((res) => {
 		telemetry.value.enabled = res;
 	});
 }
@@ -43,7 +44,8 @@ async function set_enabled() {
 async function set_credentials() {
 	if (!telemetry.value.enabled) return;
 	if (telemetry.value.project_id && telemetry.value.telemetry_host) return;
-	return await call("helpdesk.api.telemetry.get_credentials").then((res) => {
+
+	await call("helpdesk.api.telemetry.get_credentials").then((res) => {
 		telemetry.value.project_id = res.project_id;
 		telemetry.value.telemetry_host = res.telemetry_host;
 	});
@@ -53,5 +55,3 @@ export function capture(event: string) {
 	if (!telemetry.value.enabled) return;
 	posthog.capture(`${APP}_${event}`);
 }
-
-initialize();

@@ -3,10 +3,10 @@ import frappe
 
 @frappe.whitelist()
 def is_enabled():
-    return (
+    return bool(
         frappe.get_system_settings("enable_telemetry")
-        and frappe.conf.get("posthog_project_id")
         and frappe.conf.get("posthog_host")
+        and frappe.conf.get("posthog_project_id")
     )
 
 
