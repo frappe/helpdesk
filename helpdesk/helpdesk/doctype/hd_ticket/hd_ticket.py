@@ -112,6 +112,7 @@ class HDTicket(Document):
 
 	def publish_update(self):
 		publish_event("helpdesk:ticket-update", {"name": self.name})
+		capture_event("ticket_updated")
 
 	def autoname(self):
 		return self.name
@@ -131,6 +132,7 @@ class HDTicket(Document):
 
 	def after_insert(self):
 		log_ticket_activity(self.name, "created")
+		capture_event("ticket_created")
 
 	def on_update(self):
 		self.handle_ticket_activity_update()
