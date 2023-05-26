@@ -1,22 +1,25 @@
 # Copyright (c) 2022, Frappe Technologies and contributors
 # For license information, please see license.txt
 
-import frappe
 from frappe.model.document import Document
-from frappe.realtime import get_website_room
+
+from helpdesk.utils import capture_event, publish_event
 
 
 class HDTicketComment(Document):
 	def after_insert(self):
 		event = "helpdesk:new-ticket-comment"
 		data = {"ticket_id": self.reference_ticket}
-		room = get_website_room()
+		telemetry_event = "ticket_comment_added"
 
-		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+		publish_event(event, data)
+		capture_event(telemetry_event)
 
 	def after_delete(self):
 		event = "helpdesk:delete-ticket-comment"
 		data = {"ticket_id": self.reference_ticket}
-		room = get_website_room()
+		telemetry_event = "ticket_comment_deleted"
 
-		frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+		publish_event(event, data)
+		capture_event(telemetry_event)
+
