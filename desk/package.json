@@ -23,6 +23,7 @@
 		"frappe-ui": "^0.0.111",
 		"lodash": "^4.17.21",
 		"pinia": "^2.0.33",
+		"sanitize-html": "^2.10.0",
 		"vee-validate": "^4.8.2",
 		"vue": "^3.2.47",
 		"vue-echarts": "^6.5.4",

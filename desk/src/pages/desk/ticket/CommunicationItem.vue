@@ -26,9 +26,9 @@
 				{{ bcc }}
 			</div>
 			<div class="prose max-w-none text-base text-gray-700">
-				<!-- This is vulnerable to attacks. Prefer markdown wherever possible. -->
+				<!-- This is vulnerable to attacks -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
-				<span v-html="content"></span>
+				<span v-html="sanitizeHtml(content)"></span>
 			</div>
 			<div class="flex flex-wrap gap-2">
 				<a
@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { toRefs } from "vue";
+import sanitizeHtml from "sanitize-html";
 import dayjs from "dayjs";
 import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
 import { useTicketStore } from "./data";
