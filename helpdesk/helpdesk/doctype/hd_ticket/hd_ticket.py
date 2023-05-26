@@ -16,7 +16,6 @@ from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.query_builder import Case, DocType, Order
 from frappe.query_builder.functions import Count
-from frappe.realtime import get_website_room
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
 
@@ -27,8 +26,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-
-from helpdesk.utils import publish_event
+from helpdesk.utils import publish_event, capture_event
 
 
 class HDTicket(Document):
@@ -438,6 +436,8 @@ class HDTicket(Document):
 		self.reload()
 		self.status = "Replied"
 		self.save()
+
+		capture_event("agent_replied")
 
 		if skip_email_workflow:
 			return

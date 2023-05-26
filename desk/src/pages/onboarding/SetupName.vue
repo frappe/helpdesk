@@ -20,8 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { createResource } from "frappe-ui";
+import { capture } from "@/telemetry";
 import IconCheck from "~icons/ph/check-bold";
 
 const text =
@@ -38,6 +39,7 @@ const r = createResource({
 	debounce: 1000,
 	onSuccess() {
 		isCheckVisible.value = true;
+		capture("onboarding_name_changed");
 	},
 });
 
@@ -50,4 +52,6 @@ function update(value: string) {
 		value,
 	});
 }
+
+onMounted(() => capture("onboarding_name_reached"));
 </script>

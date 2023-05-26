@@ -10,8 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { createResource } from "frappe-ui";
+import { capture } from "@/telemetry";
 
 const query =
 	"Did you know that our Helpdesk is designed to function independently, \
@@ -25,6 +26,9 @@ const r = createResource({
 	debounce: 1000,
 	onSuccess(data) {
 		isYes.value = data.skip_email_workflow;
+		const cond = isYes.value ? "yes" : "no";
+		const event = "onboarding_skip_email_" + cond;
+		capture(event);
 	},
 });
 
@@ -36,4 +40,6 @@ function update(value: boolean) {
 		value,
 	});
 }
+
+onMounted(() => capture("onboarding_skip_email_reached"));
 </script>
