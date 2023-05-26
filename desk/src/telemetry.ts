@@ -10,8 +10,8 @@ const SITENAME = window.location.hostname;
 
 const telemetry = useStorage("telemetry", {
 	enabled: false,
-	project_id: undefined,
-	telemetry_host: undefined,
+	project_id: "",
+	host: "",
 });
 
 export async function init() {
@@ -20,7 +20,7 @@ export async function init() {
 	try {
 		await set_credentials();
 		posthog.init(telemetry.value.project_id, {
-			api_host: telemetry.value.telemetry_host,
+			api_host: telemetry.value.host,
 			autocapture: false,
 			capture_pageview: false,
 			capture_pageleave: false,
@@ -43,11 +43,11 @@ async function set_enabled() {
 
 async function set_credentials() {
 	if (!telemetry.value.enabled) return;
-	if (telemetry.value.project_id && telemetry.value.telemetry_host) return;
+	if (telemetry.value.project_id && telemetry.value.host) return;
 
 	await call("helpdesk.api.telemetry.get_credentials").then((res) => {
 		telemetry.value.project_id = res.project_id;
-		telemetry.value.telemetry_host = res.telemetry_host;
+		telemetry.value.host = res.telemetry_host;
 	});
 }
 
