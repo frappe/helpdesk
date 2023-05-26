@@ -90,7 +90,7 @@ def new_tickets():
 
 	res = frappe.db.get_list(
 		"HD Ticket",
-		fields=["COUNT(name) as value", "DATE_FORMAT(creation, '%d/%m/%Y') as name"],
+		fields=["COUNT(name) as value", "DATE(creation) as name"],
 		filters=filters,
 		group_by="DATE(creation)",
 		order_by="DATE(creation)",
@@ -144,7 +144,7 @@ def ticket_activity():
 
 	res = frappe.db.get_list(
 		"HD Ticket Activity",
-		fields=["COUNT(name) as value", "DATE_FORMAT(creation, '%d/%m/%Y') as name"],
+		fields=["COUNT(name) as value", "DATE(creation) as name"],
 		filters=filters,
 		group_by="DATE(creation)",
 		order_by="DATE(creation)",
