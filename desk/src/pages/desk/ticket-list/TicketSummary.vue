@@ -11,10 +11,12 @@
 		<div class="line-clamp-1">
 			{{ subject }}
 		</div>
-		<div class="mr-2 flex items-center gap-2">
+		<div class="mx-2 flex items-center gap-2">
 			<div
-				v-if="conversationCount || commentCount"
-				class="hidden gap-2 group-hover:inline-flex"
+				class="flex gap-2 opacity-0 transition"
+				:class="{
+					'group-hover:opacity-100': conversationCount || commentCount,
+				}"
 			>
 				<div v-if="conversationCount" class="flex items-center gap-1 text-xs">
 					<IconMail class="h-3 w-3" />
@@ -25,7 +27,7 @@
 					{{ commentCount }}
 				</div>
 			</div>
-			<div class="flex items-center gap-1">
+			<div class="flex items-center gap-1 text-xs">
 				<IconHash class="h-3 w-3" />
 				{{ ticketName }}
 			</div>
