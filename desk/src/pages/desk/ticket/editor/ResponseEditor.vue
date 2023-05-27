@@ -17,7 +17,7 @@
 				@change="(v) => (editor.content = v)"
 			>
 				<template #top>
-					<TopSection />
+					<TopSection v-if="!configStore.skipEmailWorkflow" />
 				</template>
 				<template #editor="{ editor: e }">
 					<TextEditorContent :editor="e" />
@@ -42,12 +42,14 @@ import { computed, onUnmounted, ref, watch } from "vue";
 import { Avatar, TextEditor, TextEditorContent } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useAgentStore } from "@/stores/agent";
+import { useConfigStore } from "@/stores/config";
 import { useTicketStore } from "../data";
 import BottomSection from "./BottomSection.vue";
 import TopSection from "./TopSection.vue";
 
 const authStore = useAuthStore();
 const agentStore = useAgentStore();
+const configStore = useConfigStore();
 const { editor } = useTicketStore();
 const editorRef = ref(null);
 const placeholder = "Add a reply / comment";

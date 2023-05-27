@@ -23,8 +23,8 @@ export const useConfigStore = defineStore("config", () => {
 	const isSetupComplete: ComputedRef<boolean> = computed(
 		() => config.value.is_setup_complete
 	);
-	const suppressEmailToast: ComputedRef<boolean> = computed(
-		() => config.value.suppress_default_email_toast ?? true
+	const skipEmailWorkflow: ComputedRef<string> = computed(
+		() => config.value.skip_email_workflow
 	);
 	const pageTitle = ref(null);
 	const windowTitle = computed(() =>
@@ -43,11 +43,11 @@ export const useConfigStore = defineStore("config", () => {
 	socket.on("helpdesk:settings-updated", () => configRes.reload());
 
 	return {
-		config,
 		brandLogo,
+		config,
 		helpdeskName,
 		isSetupComplete,
-		suppressEmailToast,
 		setTitle,
+		skipEmailWorkflow,
 	};
 });
