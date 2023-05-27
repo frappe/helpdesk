@@ -1,5 +1,5 @@
 <template>
-	<div class="overflow-x-scroll">
+	<div class="overflow-x-scroll text-gray-700">
 		<div class="flex w-max min-w-full flex-col">
 			<div
 				class="sticky top-0 z-50 flex items-center gap-2 border-y border-gray-200 bg-white px-9 py-1.5 text-sm text-gray-600"
@@ -11,11 +11,11 @@
 					:value="allSelected"
 					:onchange="(e) => toggleAllSelected(e.target.checked)"
 				/>
-				<div ref="subjectCol" class="col-subject grow">Subject</div>
+				<div class="col-subject grow">Subject</div>
 				<div class="w-24">Status</div>
 				<div class="w-24">Priority</div>
 				<div class="w-20">Type</div>
-				<div class="w-40">Assignee</div>
+				<div class="w-40">Customer</div>
 				<div v-if="columns['Due in']" class="w-24">Due in</div>
 				<div v-if="columns['Created on']" class="w-36">Created on</div>
 				<div v-if="columns['Last modified']" class="w-36">Last modified</div>
@@ -43,9 +43,7 @@
 					<div class="w-24">
 						<Dropdown :options="statusDropdownOptions(t.name, t.status)">
 							<template #default="{ open }">
-								<div
-									class="flex cursor-pointer select-none items-center gap-1 text-gray-700"
-								>
+								<div class="flex cursor-pointer select-none items-center gap-1">
 									{{ t.status }}
 									<IconCaretDown v-if="!open" class="h-3 w-3" />
 									<IconCaretUp v-if="open" class="h-3 w-3" />
@@ -56,9 +54,7 @@
 					<div class="w-24">
 						<Dropdown :options="priorityDropdownOptions(t.name, t.priority)">
 							<template #default="{ open }">
-								<div
-									class="flex cursor-pointer select-none items-center gap-1 text-gray-700"
-								>
+								<div class="flex cursor-pointer select-none items-center gap-1">
 									{{ t.priority }}
 									<IconCaretDown v-if="!open" class="h-3 w-3" />
 									<IconCaretUp v-if="open" class="h-3 w-3" />
@@ -66,55 +62,33 @@
 							</template>
 						</Dropdown>
 					</div>
-					<div class="line-clamp-1 w-20 text-gray-700">
+					<div class="line-clamp-1 w-20">
 						{{ t.ticket_type || "--" }}
 					</div>
-					<div class="w-40">
-						<AssignedInfo :ticket-id="t.name" />
+					<div class="line-clamp-1 w-40">
+						{{ t.customer || "--" }}
 					</div>
 					<div
 						v-if="columns['Due in']"
-						class="line-clamp-1 w-24 text-gray-700"
+						class="line-clamp-1 w-24"
 						:class="{
 							'text-red-700': Date.parse(t.resolution_by) < Date.now(),
 						}"
 					>
 						{{ t.resolution_by ? dayjs(t.resolution_by).fromNow() : "--" }}
 					</div>
-					<div
-						v-if="columns['Created on']"
-						class="line-clamp-1 w-36 text-gray-700"
-					>
+					<div v-if="columns['Created on']" class="line-clamp-1 w-36">
 						{{ dayjs(t.creation).format(dateFormat) }}
 					</div>
-					<div
-						v-if="columns['Last modified']"
-						class="line-clamp-1 w-36 text-gray-700"
-					>
+					<div v-if="columns['Last modified']" class="line-clamp-1 w-36">
 						{{ dayjs(t.modified).format(dateFormat) }}
 					</div>
-					<div v-if="columns['Source']" class="line-clamp-1 w-20 text-gray-700">
+					<div v-if="columns['Source']" class="line-clamp-1 w-20">
 						{{ t.via_customer_portal ? "Customer Portal" : "EMail" }}
 					</div>
-					<Dropdown
-						:options="[
-							{
-								label: 'Copy link',
-								handler() {
-									copyTicketLink(t.name);
-								},
-							},
-						]"
-					>
-						<template #default="{ open }">
-							<IconDotHorizontal
-								class="h-4 w-4 cursor-pointer text-gray-500"
-								:class="{
-									'text-gray-700': open,
-								}"
-							/>
-						</template>
-					</Dropdown>
+					<div class="w-4">
+						<AssignedInfo :ticket-id="t.name" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -123,24 +97,17 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRouter } from "vue-router";
-import { useClipboard } from "@vueuse/core";
 import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
-import { AGENT_PORTAL_TICKET } from "@/router";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import { createToast } from "@/utils/toasts";
 import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
 import ColumnSelector from "./ColumnSelector.vue";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
-import IconDotHorizontal from "~icons/espresso/dot-horizontal";
 
-const router = useRouter();
-const { copy } = useClipboard();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const { selected, tickets, toggleOne, selectAll, deselectAll, columns } =
@@ -180,26 +147,6 @@ function priorityDropdownOptions(ticketId: number, currentPriority: string) {
 					priority: o,
 				}),
 		}));
-}
-
-async function copyTicketLink(name: number) {
-	const loc = router.resolve({
-		name: AGENT_PORTAL_TICKET,
-		params: {
-			ticketId: name,
-		},
-	});
-
-	const base = window.location.protocol + "//" + window.location.host;
-	const full = base + loc.href;
-
-	await copy(full);
-
-	createToast({
-		title: "Link copied to clipboard",
-		icon: "check",
-		iconClasses: "text-green-600",
-	});
 }
 </script>
 
