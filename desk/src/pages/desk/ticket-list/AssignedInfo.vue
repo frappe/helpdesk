@@ -1,17 +1,12 @@
 <template>
-	<div class="flex items-center gap-2">
-		<div class="">
-			<Avatar size="sm" :label="agentName" :image-u-r-l="avatarUrl" />
-		</div>
-		<div class="truncate text-gray-700">
-			{{ agentName }}
-		</div>
-	</div>
+	<Tooltip :text="getTooltipLabel(agentName)">
+		<Avatar size="sm" :label="agentName" :image-u-r-l="avatarUrl" />
+	</Tooltip>
 </template>
 
 <script setup lang="ts">
 import { computed, defineProps, toRefs } from "vue";
-import { Avatar, createDocumentResource } from "frappe-ui";
+import { createDocumentResource, Avatar, Tooltip } from "frappe-ui";
 
 const props = defineProps({
 	ticketId: {
@@ -39,4 +34,8 @@ const ticket = createDocumentResource({
 });
 
 ticket.getAssignees.fetch();
+
+function getTooltipLabel(s: string) {
+	return "Assigned to " + s;
+}
 </script>
