@@ -3,7 +3,6 @@ import { defineStore } from "pinia";
 import { createDocumentResource } from "frappe-ui";
 import { socket } from "@/socket";
 import { createToast } from "@/utils/toasts";
-import { isEmpty } from "@/utils/editor";
 
 export const useTicketStore = defineStore("ticket", () => {
 	const sidebar = reactive({
@@ -49,14 +48,14 @@ export const useTicketStore = defineStore("ticket", () => {
 				onSuccess() {
 					clean();
 				},
-				validate() {
-					if (isEmpty(editor.content)) {
+				validate(params) {
+					if (editor.tiptap?.isEmpty) {
 						return "Message is empty";
 					}
 				},
 				onError(error) {
 					createToast({
-						title: "Error sending reply",
+						title: error.message,
 						text: error.messages?.join("\n"),
 						icon: "x",
 						iconClasses: "text-red-500",

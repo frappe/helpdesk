@@ -149,7 +149,7 @@ const insertRes = createResource({
 	},
 	onError(error) {
 		createToast({
-			title: "Error sending reply",
+			title: error.message,
 			text: error.messages?.join("\n"),
 			icon: "x",
 			iconClasses: "text-red-500",
