@@ -53,7 +53,7 @@ const routes = [
 	{
 		path: "",
 		name: "PortalRoot",
-		component: () => import("@/pages/portal/Portal.vue"),
+		component: () => import("@/pages/portal/CustomerRoot.vue"),
 		children: [
 			{
 				path: "my-tickets",
