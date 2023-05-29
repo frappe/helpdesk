@@ -48,7 +48,7 @@ export const useTicketStore = defineStore("ticket", () => {
 				onSuccess() {
 					clean();
 				},
-				validate(params) {
+				validate() {
 					if (editor.tiptap?.isEmpty) {
 						return "Message is empty";
 					}
