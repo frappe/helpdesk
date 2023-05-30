@@ -48,9 +48,14 @@ export const useTicketStore = defineStore("ticket", () => {
 				onSuccess() {
 					clean();
 				},
+				validate() {
+					if (editor.tiptap?.isEmpty) {
+						return "Message is empty";
+					}
+				},
 				onError(error) {
 					createToast({
-						title: "Error sending reply",
+						title: error.message,
 						text: error.messages?.join("\n"),
 						icon: "x",
 						iconClasses: "text-red-500",
