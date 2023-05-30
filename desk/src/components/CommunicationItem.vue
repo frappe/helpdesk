@@ -10,14 +10,7 @@
 					<IconDot class="text-gray-600" />
 					<div class="text-sm text-gray-600">{{ dateDisplay }}</div>
 				</div>
-				<Dropdown :options="options">
-					<template #default>
-						<FeatherIcon
-							name="more-horizontal"
-							class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
-						/>
-					</template>
-				</Dropdown>
+				<slot name="extra" :cc="cc" :bcc="bcc" :content="content" />
 			</div>
 			<div v-if="cc || bcc" class="flex gap-1 text-xs text-gray-600">
 				<div class="font-medium">cc:</div>
@@ -46,12 +39,11 @@
 
 <script setup lang="ts">
 import { toRefs } from "vue";
+import { Avatar } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import dayjs from "dayjs";
-import { Avatar, Dropdown, FeatherIcon } from "frappe-ui";
-import { useTicketStore } from "./data";
-import IconDot from "~icons/ph/dot-bold";
 import AttachmentItem from "@/components/AttachmentItem.vue";
+import IconDot from "~icons/ph/dot-bold";
 
 type Attachment = {
 	file_name: string;
@@ -94,32 +86,7 @@ const props = defineProps({
 });
 
 const { content, date, sender, senderImage, cc, bcc } = toRefs(props);
-const { editor } = useTicketStore();
 const dateDisplay = dayjs(date.value).format("h:mm A");
-const options = [
-	{
-		label: "Reply",
-		handler: () => {
-			editor.cc = [];
-			editor.bcc = [];
-			editor.content = quote(content.value);
-			editor.isExpanded = true;
-		},
-	},
-	{
-		label: "Reply All",
-		handler: () => {
-			editor.cc = cc.value?.split(",");
-			editor.bcc = bcc.value?.split(",");
-			editor.content = quote(content.value);
-			editor.isExpanded = true;
-		},
-	},
-];
-
-function quote(s: string) {
-	return `<blockquote>${s}</blockquote><br/>`;
-}
 
 function sanitize(html: string) {
 	return sanitizeHtml(html, {

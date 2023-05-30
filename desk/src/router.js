@@ -90,6 +90,7 @@ const routes = [
 	},
 	{
 		path: "/my-tickets",
+		component: () => import("@/pages/portal/CustomerRoot.vue"),
 		children: [
 			{
 				path: "",
@@ -99,7 +100,7 @@ const routes = [
 			{
 				path: ":ticketId",
 				name: CUSTOMER_PORTAL_TICKET,
-				component: () => import("@/pages/portal/ticketing/Ticket.vue"),
+				component: () => import("@/pages/portal/TicketSingle.vue"),
 				props: true,
 			},
 			{

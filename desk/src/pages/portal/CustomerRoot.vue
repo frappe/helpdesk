@@ -1,12 +1,46 @@
 <template>
-	<div>
-		<div class="h-15 border-b">
-			<NavBar />
+	<div class="h-screen w-screen bg-gray-100 p-8">
+		<div
+			class="mx-auto"
+			:style="{
+				width: '900px',
+			}"
+		>
+			<div class="my-8 flex items-center justify-between text-base">
+				<span>
+					<img
+						v-if="configStore.brandLogo"
+						:src="configStore.brandLogo"
+						class="h-8"
+					/>
+					<div v-else class="text-6xl text-gray-800">
+						{{ configStore.helpdeskName }}
+					</div>
+				</span>
+				<RouterLink :to="{ name: KNOWLEDGE_BASE_PUBLIC }">
+					<div class="flex items-center gap-2">
+						<IconKnowledgebase class="h-4 w-4" />
+						Knowledge Base &rightarrow;
+					</div>
+				</RouterLink>
+			</div>
+			<div
+				class="bg-white py-2"
+				:style="{
+					'box-shadow':
+						'0px 0px 1px rgba(0, 0, 0, 0.45), 0px 1px 2px rgba(0, 0, 0, 0.1)',
+				}"
+			>
+				<RouterView />
+			</div>
 		</div>
-		<router-view class="mb-10" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import NavBar from "@/components/portal/NavBar.vue";
+import { useConfigStore } from "@/stores/config";
+import { KNOWLEDGE_BASE_PUBLIC } from "@/router";
+import IconKnowledgebase from "~icons/espresso/knowledge-base";
+
+const configStore = useConfigStore();
 </script>

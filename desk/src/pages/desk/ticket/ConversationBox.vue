@@ -25,7 +25,18 @@
 						:cc="c.cc"
 						:bcc="c.bcc"
 						:attachments="c.attachments"
-					/>
+					>
+						<template #extra="{ content, cc, bcc }">
+							<Dropdown :options="dropdownOptions(content, cc, bcc)">
+								<template #default>
+									<FeatherIcon
+										name="more-horizontal"
+										class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
+									/>
+								</template>
+							</Dropdown>
+						</template>
+					</CommunicationItem>
 					<CommentItem
 						v-else
 						:name="c.name"
@@ -45,13 +56,13 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useScroll } from "@vueuse/core";
-import { debounce, LoadingIndicator } from "frappe-ui";
+import { debounce, Dropdown, FeatherIcon, LoadingIndicator } from "frappe-ui";
 import dayjs from "dayjs";
 import { orderBy, unionBy } from "lodash";
 import { socket } from "@/socket";
 import { useTicketStore } from "./data";
+import CommunicationItem from "@/components/CommunicationItem.vue";
 import CommentItem from "./CommentItem.vue";
-import CommunicationItem from "./CommunicationItem.vue";
 
 type SocketData = {
 	ticket_id: string;
@@ -89,6 +100,29 @@ const conversations = computed(() =>
 	)
 );
 
+function dropdownOptions(content: string, cc: string, bcc: string) {
+	return [
+		{
+			label: "Reply",
+			handler: () => {
+				editor.cc = [];
+				editor.bcc = [];
+				editor.content = quote(content);
+				editor.isExpanded = true;
+			},
+		},
+		{
+			label: "Reply All",
+			handler: () => {
+				editor.cc = cc.split(",");
+				editor.bcc = bcc.split(",");
+				editor.content = quote(content);
+				editor.isExpanded = true;
+			},
+		},
+	];
+}
+
 const scrollBottom = debounce(() => {
 	const { y } = useScroll(listElement, { behavior: "smooth" });
 	y.value = listElement.value.scrollHeight;
@@ -119,6 +153,10 @@ function dayShort(date: string) {
 		default:
 			return dayjs(date).format("DD/MM/YYYY");
 	}
+}
+
+function quote(s: string) {
+	return `<blockquote>${s}</blockquote><br/>`;
 }
 
 socket.on("helpdesk:new-communication", (data: SocketData) => {
