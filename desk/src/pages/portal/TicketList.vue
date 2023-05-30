@@ -1,27 +1,36 @@
 <template>
-	<div class="h-screen w-screen bg-gray-100">
-		<div class="tickets-container mx-auto py-8">
-			<div class="grid-col-3 my-8 grid text-base">
-				<div class="flex items-center justify-between">
-					<span>
-						<img
-							v-if="configStore.brandLogo"
-							:src="configStore.brandLogo"
-							class="h-8"
-						/>
-						<div v-else class="text-6xl text-gray-800">
-							{{ configStore.helpdeskName }}
-						</div>
-					</span>
-					<RouterLink :to="{ name: KNOWLEDGE_BASE_PUBLIC }">
-						<div class="flex items-center gap-2">
-							<IconKnowledgebase class="h-4 w-4" />
-							Knowledge Base &rightarrow;
-						</div>
-					</RouterLink>
-				</div>
+	<div class="h-screen w-screen bg-gray-100 p-8">
+		<div
+			class="mx-auto"
+			:style="{
+				width: '900px',
+			}"
+		>
+			<div class="my-8 flex items-center justify-between text-base">
+				<span>
+					<img
+						v-if="configStore.brandLogo"
+						:src="configStore.brandLogo"
+						class="h-8"
+					/>
+					<div v-else class="text-6xl text-gray-800">
+						{{ configStore.helpdeskName }}
+					</div>
+				</span>
+				<RouterLink :to="{ name: KNOWLEDGE_BASE_PUBLIC }">
+					<div class="flex items-center gap-2">
+						<IconKnowledgebase class="h-4 w-4" />
+						Knowledge Base &rightarrow;
+					</div>
+				</RouterLink>
 			</div>
-			<div class="container-shadow bg-white py-2">
+			<div
+				class="bg-white py-2"
+				:style="{
+					'box-shadow':
+						'0px 0px 1px rgba(0, 0, 0, 0.45), 0px 1px 2px rgba(0, 0, 0, 0.1)',
+				}"
+			>
 				<div
 					class="flex justify-between px-9 py-4 text-base text-gray-700 transition"
 				>
@@ -202,13 +211,3 @@ function isHighlight(ticket) {
 	return ticket.status === "Replied";
 }
 </script>
-
-<style scoped>
-.tickets-container {
-	width: 900px;
-}
-
-.container-shadow {
-	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.45), 0px 1px 2px rgba(0, 0, 0, 0.1);
-}
-</style>
