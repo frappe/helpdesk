@@ -80,12 +80,19 @@
 				>
 					<template #subject="{ data }">
 						<div
+							class="flex items-center gap-2"
 							:class="{
-								'text-gray-900': isHighlight(data),
 								'font-medium': isHighlight(data),
+								'text-gray-900': isHighlight(data),
 							}"
 						>
-							{{ data.subject }}
+							<div class="line-clamp-1 max-w-lg">
+								{{ data.subject }}
+							</div>
+							<div class="flex items-center gap-1 text-xs">
+								<IconHash class="h-3 w-3" />
+								{{ data.name }}
+							</div>
 						</div>
 					</template>
 					<template #status="{ data }">
@@ -111,6 +118,7 @@ import { CUSTOMER_PORTAL_TICKET, KNOWLEDGE_BASE_PUBLIC } from "@/router";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
+import IconHash from "~icons/espresso/hash";
 import IconKnowledgebase from "~icons/espresso/knowledge-base";
 import IconPlus from "~icons/ph/plus";
 
