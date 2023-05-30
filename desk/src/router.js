@@ -13,6 +13,7 @@ export const ONBOARDING_PAGE = "Setup";
 
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
 export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
+export const CUSTOMER_PORTAL_TICKET = "PortalTicket";
 export const KNOWLEDGE_BASE_PUBLIC = "Knowledge Base";
 
 export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
@@ -51,80 +52,71 @@ const routes = [
 		component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
 	},
 	{
-		path: "",
-		name: "PortalRoot",
-		component: () => import("@/pages/portal/CustomerRoot.vue"),
+		path: "/knowledge-base",
+		component: () => import("@/pages/portal/kb/KnowledgeBase.vue"),
 		children: [
 			{
-				path: "my-tickets",
-				name: "Ticketing",
-				component: () => import("@/pages/portal/ticketing/Ticketing.vue"),
-				children: [
-					{
-						path: "",
-						name: CUSTOMER_PORTAL_LANDING,
-						component: () => import("@/pages/portal/ticketing/Tickets.vue"),
-					},
-					{
-						path: ":ticketId",
-						name: "PortalTicket",
-						component: () => import("@/pages/portal/ticketing/Ticket.vue"),
-						props: true,
-					},
-					{
-						path: "new/:templateId",
-						name: "TemplatedNewTicket",
-						component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
-						props: true,
-					},
-					{
-						path: "new",
-						name: CUSTOMER_PORTAL_NEW_TICKET,
-						component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
-					},
-					{
-						path: "impersonate",
-						name: "Impersonate",
-						component: () => import("@/pages/portal/ticketing/Impersonate.vue"),
-					},
-				],
+				path: "",
+				name: KNOWLEDGE_BASE_PUBLIC,
+				component: () =>
+					// shows root categories and faqs
+					import("@/pages/common/kb/Category.vue"),
+				meta: {
+					editable: false,
+					isRoot: true,
+				},
 			},
 			{
-				path: "knowledge-base",
-				component: () => import("@/pages/portal/kb/KnowledgeBase.vue"),
-				children: [
-					{
-						path: "",
-						name: KNOWLEDGE_BASE_PUBLIC,
-						component: () =>
-							// shows root categories and faqs
-							import("@/pages/common/kb/Category.vue"),
-						meta: {
-							editable: false,
-							isRoot: true,
-						},
-					},
-					{
-						path: "categories/:categoryId",
-						name: "PortalKBCategory", // Category Page
-						component: () =>
-							// shows sub categories and articles
-							import("@/pages/common/kb/Category.vue"),
-						props: true,
-						meta: {
-							editable: false,
-						},
-					},
-					{
-						path: "articles/:articleId/:articleTitleSlug",
-						name: "PortalKBArticle",
-						component: () => import("@/pages/common/kb/Article.vue"),
-						props: true,
-						meta: {
-							editable: false,
-						},
-					},
-				],
+				path: "categories/:categoryId",
+				name: "PortalKBCategory", // Category Page
+				component: () =>
+					// shows sub categories and articles
+					import("@/pages/common/kb/Category.vue"),
+				props: true,
+				meta: {
+					editable: false,
+				},
+			},
+			{
+				path: "articles/:articleId/:articleTitleSlug",
+				name: "PortalKBArticle",
+				component: () => import("@/pages/common/kb/Article.vue"),
+				props: true,
+				meta: {
+					editable: false,
+				},
+			},
+		],
+	},
+	{
+		path: "/my-tickets",
+		children: [
+			{
+				path: "",
+				name: CUSTOMER_PORTAL_LANDING,
+				component: () => import("@/pages/portal/TicketList.vue"),
+			},
+			{
+				path: ":ticketId",
+				name: CUSTOMER_PORTAL_TICKET,
+				component: () => import("@/pages/portal/ticketing/Ticket.vue"),
+				props: true,
+			},
+			{
+				path: "new/:templateId",
+				name: "TemplatedNewTicket",
+				component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
+				props: true,
+			},
+			{
+				path: "new",
+				name: CUSTOMER_PORTAL_NEW_TICKET,
+				component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
+			},
+			{
+				path: "impersonate",
+				name: "Impersonate",
+				component: () => import("@/pages/portal/ticketing/Impersonate.vue"),
 			},
 		],
 	},

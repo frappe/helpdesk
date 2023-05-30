@@ -4,74 +4,87 @@
 			class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-700"
 		>
 			<div
-				class="flex items-center gap-2 border-y border-gray-200 bg-white px-9 py-1.5 text-sm text-gray-600"
+				class="border-y border-gray-200 bg-white px-6 py-1.5 text-sm text-gray-600"
 			>
-				<Input
-					v-if="!hideCheckbox"
-					type="checkbox"
-					input-class="cursor-pointer text-gray-900"
-					class="mr-1"
-					:value="allSelected"
-					@click="toggleAllRows"
-				/>
-				<div v-for="column in columns" :key="column.title">
-					<div v-if="isColVisible(column)" :class="column.colClass">
-						{{ column.title }}
+				<div class="flex w-full items-center gap-2 px-3">
+					<Input
+						v-if="!hideCheckbox"
+						type="checkbox"
+						input-class="cursor-pointer text-gray-900"
+						class="mr-1"
+						:value="allSelected"
+						@click="toggleAllRows"
+					/>
+					<div
+						v-for="column in columns"
+						:key="column.title"
+						:class="isColVisible(column) ? column.colClass : ''"
+					>
+						<div v-if="isColVisible(column)">
+							{{ column.title }}
+						</div>
 					</div>
-				</div>
-				<div v-if="!hideColumnSelector" class="ml-auto">
-					<Popover>
-						<template #target="{ togglePopover }">
-							<IconAdd class="h-4 w-4 cursor-pointer" @click="togglePopover" />
-						</template>
-						<template #body-main>
-							<div class="flex w-48 flex-col gap-2 p-3 text-base text-gray-800">
+					<div v-if="!hideColumnSelector" class="ml-auto">
+						<Popover>
+							<template #target="{ togglePopover }">
+								<IconAdd
+									class="h-4 w-4 cursor-pointer"
+									@click="togglePopover"
+								/>
+							</template>
+							<template #body-main>
 								<div
-									v-for="column in columns.filter((c) => c.isTogglable)"
-									:key="column.colKey"
-									class="flex items-center justify-between"
+									class="flex w-48 flex-col gap-2 p-3 text-base text-gray-800"
 								>
-									{{ column.title }}
-									<MinimalSwitch
-										:enabled="isColVisible(column)"
-										@click="toggleColumn(column)"
-									/>
+									<div
+										v-for="column in columns.filter((c) => c.isTogglable)"
+										:key="column.colKey"
+										class="flex items-center justify-between"
+									>
+										{{ column.title }}
+										<MinimalSwitch
+											:enabled="isColVisible(column)"
+											@click="toggleColumn(column)"
+										/>
+									</div>
 								</div>
-							</div>
-						</template>
-					</Popover>
+							</template>
+						</Popover>
+					</div>
 				</div>
 			</div>
 			<div class="divide-y overflow-y-auto px-6 text-base">
 				<div
-					v-for="t in data"
-					:key="t[rowKey]"
-					class="flex h-11 w-full items-center gap-2 px-3 py-2 transition-all"
+					v-for="row in data"
+					:key="row[rowKey]"
+					class="flex h-11 w-full items-center gap-2 px-3 py-2 transition"
 					:class="{
-						'bg-gray-200': selection.has(t[rowKey]),
-						'hover:bg-gray-300': selection.has(t[rowKey]),
-						'hover:bg-gray-100': !selection.has(t[rowKey]),
+						'bg-gray-200': selection.has(row[rowKey]),
+						'hover:bg-gray-300': selection.has(row[rowKey]),
+						'hover:bg-gray-100': !selection.has(row[rowKey]),
+						'cursor-pointer': emitRowClick,
 					}"
+					@click="onRowClick(row)"
 				>
 					<Input
 						v-if="!hideCheckbox"
 						type="checkbox"
 						input-class="cursor-pointer text-gray-900"
 						class="mr-1"
-						:value="selection.has(t[rowKey])"
-						@click="toggleRow(t[rowKey])"
+						:value="selection.has(row[rowKey])"
+						@click="toggleRow(row[rowKey])"
 					/>
 					<div
 						v-for="column in columns"
 						:key="column.colKey"
 						:class="isColVisible(column) ? column.colClass : ''"
 					>
-						<slot v-if="isColVisible(column)" :name="column.colKey" :data="t">
-							{{ t[column.colKey] }}
+						<slot v-if="isColVisible(column)" :name="column.colKey" :data="row">
+							{{ row[column.colKey] }}
 						</slot>
 					</div>
-					<div class="ml-auto">
-						<slot name="row-extra" :data="t" />
+					<div v-if="slots['row-extra']" class="ml-auto">
+						<slot name="row-extra" :data="row" />
 					</div>
 				</div>
 			</div>
@@ -128,16 +141,16 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, computed, reactive, ref, toRefs } from "vue";
+import { Ref, computed, reactive, ref, toRefs, useSlots } from "vue";
 import { FeatherIcon, Popover } from "frappe-ui";
 import MinimalSwitch from "@/components/MinimalSwitch.vue";
 import IconAdd from "~icons/espresso/add";
 
 type Column = {
 	title: string;
-	isTogglable: boolean;
 	colKey: string;
 	colClass?: string;
+	isTogglable?: boolean;
 };
 type RowKey = string;
 type SelectionKey = string | number;
@@ -156,6 +169,11 @@ const props = defineProps({
 		type: Object as () => RowKey,
 		required: true,
 	},
+	emitRowClick: {
+		type: Boolean,
+		required: false,
+		default: false,
+	},
 	hideCheckbox: {
 		type: Boolean,
 		required: false,
@@ -168,7 +186,12 @@ const props = defineProps({
 	},
 });
 
-const { columns, data, rowKey } = toRefs(props);
+const emits = defineEmits<{
+	(event: "row-click", key): void;
+}>();
+
+const { columns, data, emitRowClick, rowKey } = toRefs(props);
+const slots = useSlots();
 const selection: Ref<Set<SelectionKey>> = ref(new Set([]));
 const allSelected = computed(() => selection.value.size === data.value.length);
 const togglableColumns = reactive(
@@ -178,6 +201,12 @@ const togglableColumns = reactive(
 			[c.colKey]: false,
 		}))
 );
+
+const selectionText = computed(() => {
+	const size = selection.value.size;
+	const verb = size > 1 ? "rows" : "row";
+	return `${size} ${verb} selected`;
+});
 
 function isColVisible(column: Column) {
 	return !column.isTogglable || togglableColumns[column.colKey];
@@ -202,11 +231,9 @@ function toggleAllRows(cond: boolean) {
 	data.value.forEach((d) => selection.value.add(d[rowKey.value]));
 }
 
-const selectionText = computed(() => {
-	const size = selection.value.size;
-	const verb = size > 1 ? "rows" : "row";
-	return `${size} ${verb} selected`;
-});
+function onRowClick(row) {
+	if (emitRowClick.value) emits("row-click", row[rowKey.value]);
+}
 </script>
 
 <style scoped>
