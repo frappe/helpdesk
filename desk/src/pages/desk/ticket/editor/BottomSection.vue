@@ -117,7 +117,6 @@ import IconX from "~icons/ph/x";
 import IconTextT from "~icons/ph/text-t";
 import IconAttachment from "~icons/espresso/attachment";
 import IconChat from "~icons/espresso/chat";
-import { isEmpty } from "@/utils/editor";
 import { createToast } from "@/utils/toasts";
 
 const authStore = useAuthStore();
@@ -142,8 +141,8 @@ const insertRes = createResource({
 	onSuccess() {
 		clean();
 	},
-	validate(params) {
-		if (isEmpty(params.doc.content)) {
+	validate() {
+		if (editor.tiptap?.isEmpty) {
 			return "Message is empty";
 		}
 	},
