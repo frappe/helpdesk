@@ -44,19 +44,89 @@
 				/>
 			</div>
 		</span>
+		<span>
+			<div
+				class="my-3.5 flex items-start gap-2.5 rounded-xl border border-gray-300"
+			>
+				<TextEditor
+					v-if="isEditorExpanded"
+					ref="editor"
+					:bubble-menu="true"
+					:floating-menu="true"
+					:content="editorContent"
+					:placeholder="placeholder"
+					editor-class="prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
+					@change="(v) => (editorContent = v)"
+				>
+					<template #bottom>
+						<div class="flex flex-wrap gap-2 px-2">
+							<AttachmentItem
+								v-for="attachment in attachments"
+								:key="attachment.file_name"
+								:label="attachment.file_name"
+								class="w-max"
+							>
+								<template #extra>
+									<IconX
+										class="h-4 w-4 cursor-pointer"
+										@click="attachments.delete(attachment)"
+									/>
+								</template>
+							</AttachmentItem>
+						</div>
+						<div class="flex items-center justify-between p-2">
+							<FileUploader @success="(file) => attachments.add(file)">
+								<template #default="{ uploading, openFileSelector }">
+									<div class="flex h-7 w-7 items-center justify-center">
+										<IconAttachment
+											class="h-5 w-5 cursor-pointer text-gray-900"
+											:class="{
+												'text-gray-600': uploading,
+											}"
+											@click="!uploading && openFileSelector()"
+										/>
+									</div>
+								</template>
+							</FileUploader>
+							<div class="flex items-center gap-4">
+								<IconDelete
+									class="h-5 w-5 cursor-pointer"
+									@click="clearEditor"
+								/>
+								<Button
+									label="Reply"
+									class="bg-gray-900 text-white hover:bg-gray-800"
+								/>
+							</div>
+						</div>
+					</template>
+				</TextEditor>
+				<div
+					v-else
+					class="flex h-8 w-full cursor-pointer select-none items-center rounded px-2.5 text-base text-gray-500"
+					@click="isEditorExpanded = true"
+				>
+					{{ placeholder }}
+				</div>
+			</div>
+		</span>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { createDocumentResource } from "frappe-ui";
+import { Ref, onMounted, onUnmounted, ref, watch } from "vue";
+import { createDocumentResource, FileUploader, TextEditor } from "frappe-ui";
 import dayjs from "dayjs";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
+import AttachmentItem from "@/components/AttachmentItem.vue";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import IconHash from "~icons/espresso/hash";
 import IconHome from "~icons/espresso/home";
 import IconRightChevron from "~icons/espresso/right-chevron";
-import { onMounted, onUnmounted } from "vue";
+import IconAttachment from "~icons/espresso/attachment";
+import IconDelete from "~icons/espresso/delete";
+import IconX from "~icons/ph/x";
 
 const props = defineProps({
 	ticketId: {
@@ -76,6 +146,19 @@ const ticket = createDocumentResource({
 		},
 	},
 });
+
+const editor = ref(null);
+const placeholder = "Type a reply";
+const isEditorExpanded = ref(false);
+const editorContent = ref("");
+const attachments: Ref<Set<Record<any, any>>> = ref(new Set([]));
+watch(editor, (e) => e?.editor.commands.focus());
+
+function clearEditor() {
+	editorContent.value = "";
+	isEditorExpanded.value = false;
+	attachments.value.clear();
+}
 
 function goHome() {
 	const protocol = window.location.protocol;
