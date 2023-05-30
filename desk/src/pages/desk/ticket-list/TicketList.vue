@@ -10,7 +10,6 @@
 			{{ isEmptyMessage }}
 		</div>
 		<BottomSection />
-		<SelectionBar />
 	</div>
 </template>
 
@@ -20,7 +19,6 @@ import { useTicketListStore } from "./data";
 import ListHeader from "./ListHeader.vue";
 import TopSection from "./TopSection.vue";
 import BottomSection from "./BottomSection.vue";
-import SelectionBar from "./SelectionBar.vue";
 import MainTable from "./MainTable.vue";
 
 const { init, deinit, tickets } = useTicketListStore();
