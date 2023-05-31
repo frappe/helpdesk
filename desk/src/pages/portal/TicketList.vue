@@ -128,19 +128,19 @@ const dropdownOptions = [
 	{
 		label: "All tickets",
 		handler() {
-			filter("All Tickets", { status: undefined });
+			filter("All tickets", { status: undefined });
 		},
 	},
 	{
 		label: "Active tickets",
 		handler() {
-			filter("Active Tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
+			filter("Active tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
 		},
 	},
 	{
 		label: "Inative tickets",
 		handler() {
-			filter("Inactive Tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
+			filter("Inactive tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
 		},
 	},
 ];
