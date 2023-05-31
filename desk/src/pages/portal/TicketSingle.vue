@@ -96,6 +96,8 @@
 								<Button
 									label="Reply"
 									class="bg-gray-900 text-white hover:bg-gray-800"
+									:disabled="editor?.editor.isEmpty"
+									@click="newCommunication"
 								/>
 							</div>
 						</div>
@@ -144,6 +146,12 @@ const ticket = createDocumentResource({
 			method: "get_communications",
 			auto: true,
 		},
+		newCommunication: {
+			method: "create_communication_via_contact",
+			onSuccess() {
+				clearEditor();
+			},
+		},
 	},
 });
 
@@ -153,6 +161,16 @@ const isEditorExpanded = ref(false);
 const editorContent = ref("");
 const attachments: Ref<Set<Record<any, any>>> = ref(new Set([]));
 watch(editor, (e) => e?.editor.commands.focus());
+
+function newCommunication() {
+	const message = editorContent.value;
+	const attachmentNames = Array.from(attachments.value).map((a) => a.name);
+
+	ticket.newCommunication.submit({
+		message,
+		attachments: attachmentNames,
+	});
+}
 
 function clearEditor() {
 	editorContent.value = "";
