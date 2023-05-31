@@ -17,7 +17,7 @@
 			<div
 				class="flex cursor-pointer select-none items-center gap-1 hover:text-gray-900"
 			>
-				New Ticket
+				New ticket
 				<IconPlus class="h-3 w-3" />
 			</div>
 		</div>
@@ -123,22 +123,22 @@ const tickets = createListManager({
 });
 
 const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
-const dropdownTitle = ref("All Tickets");
+const dropdownTitle = ref("All tickets");
 const dropdownOptions = [
 	{
-		label: "All Tickets",
+		label: "All tickets",
 		handler() {
 			filter("All Tickets", { status: undefined });
 		},
 	},
 	{
-		label: "Active Tickets",
+		label: "Active tickets",
 		handler() {
 			filter("Active Tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
 		},
 	},
 	{
-		label: "Inative Tickets",
+		label: "Inative tickets",
 		handler() {
 			filter("Inactive Tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
 		},
