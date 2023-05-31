@@ -394,13 +394,13 @@ router.beforeEach(async (to) => {
 });
 
 router.beforeEach(async (to) => {
-	await initTelemetry();
-
 	const isAuthRoute = AUTH_ROUTES.includes(to.name);
 	const authStore = useAuthStore();
 
 	try {
+		await initTelemetry();
 		await authStore.init();
+
 		if (isAuthRoute) {
 			router.replace({ name: WEBSITE_ROOT });
 		}
