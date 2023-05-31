@@ -46,7 +46,7 @@
 		</span>
 		<span>
 			<div
-				class="my-3.5 flex items-start gap-2.5 rounded-xl border border-gray-300"
+				class="mt-6 flex items-start gap-2.5 rounded-xl border border-gray-300"
 			>
 				<TextEditor
 					v-if="isEditorExpanded"
