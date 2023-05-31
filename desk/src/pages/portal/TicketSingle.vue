@@ -126,6 +126,7 @@ import {
 import dayjs from "dayjs";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
+import { useConfigStore } from "@/stores/config";
 import AttachmentItem from "@/components/AttachmentItem.vue";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import IconHash from "~icons/espresso/hash";
@@ -142,10 +143,14 @@ const props = defineProps({
 	},
 });
 
+const configStore = useConfigStore();
 const ticket = createDocumentResource({
 	doctype: "HD Ticket",
 	name: props.ticketId,
 	auto: true,
+	onSuccess() {
+		configStore.setTitle(ticket.doc?.subject);
+	},
 	whitelistedMethods: {
 		getCommunications: {
 			method: "get_communications",
@@ -220,6 +225,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+	configStore.setTitle();
 	socket.off("helpdesk:new-communication");
 });
 </script>
