@@ -19,7 +19,7 @@
 		<div class="mb-8 text-xl font-medium">
 			{{ ticket.doc?.subject }}
 		</div>
-		<span>
+		<div class="flex flex-col gap-6">
 			<div
 				v-for="(communication, index) in ticket.getCommunications.data?.message"
 				:key="communication.name"
@@ -43,7 +43,7 @@
 					:attachments="communication.attachments"
 				/>
 			</div>
-		</span>
+		</div>
 		<span>
 			<div
 				class="mt-6 flex items-start gap-2.5 rounded-xl border border-gray-300"
@@ -117,7 +117,12 @@
 
 <script setup lang="ts">
 import { Ref, onMounted, onUnmounted, ref, watch } from "vue";
-import { createDocumentResource, FileUploader, TextEditor } from "frappe-ui";
+import {
+	createDocumentResource,
+	debounce,
+	FileUploader,
+	TextEditor,
+} from "frappe-ui";
 import dayjs from "dayjs";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
@@ -162,7 +167,7 @@ const editorContent = ref("");
 const attachments: Ref<Set<Record<any, any>>> = ref(new Set([]));
 watch(editor, (e) => e?.editor.commands.focus());
 
-function newCommunication() {
+const newCommunication = debounce(() => {
 	const message = editorContent.value;
 	const attachmentNames = Array.from(attachments.value).map((a) => a.name);
 
@@ -170,7 +175,7 @@ function newCommunication() {
 		message,
 		attachments: attachmentNames,
 	});
-}
+}, 500);
 
 function clearEditor() {
 	editorContent.value = "";
