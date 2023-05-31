@@ -1,7 +1,7 @@
 <template>
-	<div class="h-screen w-screen bg-gray-100 p-8">
+	<div class="min-h-screen bg-gray-100">
 		<div
-			class="mx-auto"
+			class="mx-auto py-8"
 			:style="{
 				width: '900px',
 			}"
