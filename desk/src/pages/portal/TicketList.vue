@@ -14,12 +14,13 @@
 					</div>
 				</template>
 			</Dropdown>
-			<div
+			<RouterLink
+				:to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
 				class="flex cursor-pointer select-none items-center gap-1 hover:text-gray-900"
 			>
 				New ticket
 				<IconPlus class="h-3 w-3" />
-			</div>
+			</RouterLink>
 		</div>
 		<div
 			v-if="tickets.hasPreviousPage || tickets.hasNextPage"
@@ -88,7 +89,7 @@ import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { useConfigStore } from "@/stores/config";
 import { createListManager } from "@/composables/listManager";
-import { CUSTOMER_PORTAL_TICKET } from "@/router";
+import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";

@@ -97,28 +97,28 @@ const routes = [
 				name: CUSTOMER_PORTAL_LANDING,
 				component: () => import("@/pages/portal/TicketList.vue"),
 			},
+			// {
+			// 	path: "new/:templateId",
+			// 	name: "TemplatedNewTicket",
+			// 	component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
+			// 	props: true,
+			// },
+			{
+				path: "new",
+				name: CUSTOMER_PORTAL_NEW_TICKET,
+				component: () => import("@/pages/portal/TicketNew.vue"),
+			},
 			{
 				path: ":ticketId",
 				name: CUSTOMER_PORTAL_TICKET,
 				component: () => import("@/pages/portal/TicketSingle.vue"),
 				props: true,
 			},
-			{
-				path: "new/:templateId",
-				name: "TemplatedNewTicket",
-				component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
-				props: true,
-			},
-			{
-				path: "new",
-				name: CUSTOMER_PORTAL_NEW_TICKET,
-				component: () => import("@/pages/portal/ticketing/NewTicket.vue"),
-			},
-			{
-				path: "impersonate",
-				name: "Impersonate",
-				component: () => import("@/pages/portal/ticketing/Impersonate.vue"),
-			},
+			// {
+			// 	path: "impersonate",
+			// 	name: "Impersonate",
+			// 	component: () => import("@/pages/portal/ticketing/Impersonate.vue"),
+			// },
 		],
 	},
 	{

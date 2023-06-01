@@ -21,7 +21,7 @@
 			<div class="prose max-w-none text-base text-gray-700">
 				<!-- This is vulnerable to attacks -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
-				<span v-html="sanitize(content)"></span>
+				<span class="prose prose-sm" v-html="sanitize(content)"></span>
 			</div>
 			<div class="flex flex-wrap gap-2">
 				<a
