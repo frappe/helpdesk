@@ -114,7 +114,7 @@ const columns = [
 	{
 		title: "Created",
 		colKey: "creation",
-		colClass: "w-24",
+		colClass: "w-32",
 	},
 ];
 
