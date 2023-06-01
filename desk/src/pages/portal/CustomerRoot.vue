@@ -6,7 +6,7 @@
 				width: '900px',
 			}"
 		>
-			<div class="my-8 flex items-center justify-between text-base">
+			<div class="mb-8 flex items-center justify-between text-base">
 				<span>
 					<img
 						v-if="configStore.brandLogo"
