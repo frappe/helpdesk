@@ -129,7 +129,7 @@ const newCommunication = debounce(() => {
 }, 500);
 
 function clearEditor() {
-	editorContent.value = "";
+	textEditor.value?.editor.commands.clearContent();
 	attachments.value.clear();
 }
 
