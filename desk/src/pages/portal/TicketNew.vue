@@ -16,12 +16,10 @@
 				<IconRightChevron class="h-4 w-4" />
 				New ticket
 			</div>
-
 			<div
 				class="prose prose-sm max-w-full"
 				v-html="sanitize(template.doc?.about)"
 			/>
-
 			<div class="grid grid-cols-3 gap-4">
 				<div
 					v-for="field in template.doc?.fields"
@@ -61,10 +59,14 @@
 					<div class="opacity-0 group-hover:opacity-100">&rightarrow;</div>
 				</RouterLink>
 			</div>
-			<Input v-model="subject" placeholder="Subject" />
+			<Input
+				v-model="subject"
+				label="Subject"
+				placeholder="A short description"
+			/>
 			<TextEditor
 				ref="textEditor"
-				placeholder="Type a description"
+				placeholder="Detailed explanation"
 				:content="description"
 				:attachments="attachments"
 				@change="(v) => (description = v)"
