@@ -1,23 +1,25 @@
 <template>
-	<div class="px-9 py-4 text-base text-gray-900">
-		<div class="mb-4 flex items-center gap-2 text-gray-700">
-			<IconHome
-				class="h-4 w-4 cursor-pointer hover:text-gray-900"
-				@click="goHome"
-			/>
-			<IconRightChevron class="h-4 w-4" />
-			<RouterLink
-				:to="{ name: CUSTOMER_PORTAL_LANDING }"
-				class="cursor-pointer hover:text-gray-900"
-			>
-				My tickets
-			</RouterLink>
-			<IconRightChevron class="h-4 w-4" />
-			<IconHash class="h-3 w-3" />
-			{{ ticket.doc?.name }}
-		</div>
-		<div class="mb-8 text-xl font-medium">
-			{{ ticket.doc?.subject }}
+	<div class="px-9 pb-4 text-base text-gray-900">
+		<div id="header" class="sticky top-0 z-50 bg-white py-4">
+			<div class="mb-3 flex items-center gap-2 text-gray-700">
+				<IconHome
+					class="h-4 w-4 cursor-pointer hover:text-gray-900"
+					@click="goHome"
+				/>
+				<IconRightChevron class="h-4 w-4" />
+				<RouterLink
+					:to="{ name: CUSTOMER_PORTAL_LANDING }"
+					class="cursor-pointer hover:text-gray-900"
+				>
+					My tickets
+				</RouterLink>
+				<IconRightChevron class="h-4 w-4" />
+				<IconHash class="h-3 w-3" />
+				{{ ticket.doc?.name }}
+			</div>
+			<div class="text-xl font-medium">
+				{{ ticket.doc?.subject }}
+			</div>
 		</div>
 		<div class="flex flex-col gap-6">
 			<div
@@ -172,5 +174,17 @@ onMounted(() => {
 onUnmounted(() => {
 	configStore.setTitle();
 	socket.off("helpdesk:new-communication");
+});
+
+window.addEventListener("scroll", function () {
+	const header = document.getElementById("header");
+	const rect = header.getBoundingClientRect();
+	const cls = "border-b";
+
+	if (rect.top <= 0) {
+		header.classList.add(cls);
+	} else {
+		header.classList.remove(cls);
+	}
 });
 </script>
