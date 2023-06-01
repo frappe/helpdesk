@@ -18,7 +18,9 @@
 				<div class="font-medium">bcc:</div>
 				{{ bcc }}
 			</div>
-			<div class="prose max-w-none text-base text-gray-700">
+			<div
+				class="prose prose-img:rounded-lg prose-img:border max-w-none text-base text-gray-700"
+			>
 				<!-- This is vulnerable to attacks -->
 				<!-- eslint-disable-next-line vue/no-v-html -->
 				<span class="prose prose-sm" v-html="sanitize(content)"></span>
