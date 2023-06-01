@@ -64,6 +64,7 @@ import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
 import IconKnowledgeBase from "~icons/espresso/knowledge-base";
 import IconChat from "~icons/espresso/chat";
+import { createToast } from "@/utils/toasts";
 
 const authStore = useAuthStore();
 const { clean, editor, ticket } = useTicketStore();
@@ -85,6 +86,19 @@ const insertRes = createResource({
 	debounce: 500,
 	onSuccess() {
 		clean();
+	},
+	validate() {
+		if (editor.tiptap?.isEmpty) {
+			return "Message is empty";
+		}
+	},
+	onError(error) {
+		createToast({
+			title: error.message,
+			text: error.messages?.join("\n"),
+			icon: "x",
+			iconClasses: "text-red-500",
+		});
 	},
 });
 
