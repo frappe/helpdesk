@@ -9,7 +9,7 @@
 		<FTextEditor
 			ref="textEditor"
 			v-bind="attributes"
-			editor-class="rounded-lg prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
+			editor-class="resize-y rounded-lg prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
 		>
 			<template #top>
 				<slot name="top" />
