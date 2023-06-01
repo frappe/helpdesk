@@ -43,7 +43,24 @@
 					</div>
 				</div>
 			</div>
-
+			<div
+				v-if="!isEmpty(articles.data)"
+				class="flex flex-col gap-4 rounded-lg border bg-yellow-50 p-4"
+			>
+				<div class="font-medium">
+					📚 Did you know? These articles might cover what you looking for!
+				</div>
+				<RouterLink
+					v-for="article in articles.data"
+					:key="article.name"
+					class="group flex cursor-pointer gap-2 transition hover:text-gray-900"
+					:to="getArticleLink(article.name, article.title)"
+					target="_blank"
+				>
+					{{ article.title }}
+					<div class="opacity-0 group-hover:opacity-100">&rightarrow;</div>
+				</RouterLink>
+			</div>
 			<Input v-model="subject" placeholder="Subject" />
 			<TextEditor
 				ref="textEditor"
@@ -72,11 +89,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, onUnmounted, computed, reactive } from "vue";
-import { useRouter } from "vue-router";
+import {
+	ref,
+	onBeforeMount,
+	onUnmounted,
+	computed,
+	reactive,
+	watch,
+} from "vue";
+import { RouterLink, useRouter } from "vue-router";
 import {
 	createResource,
 	createDocumentResource,
+	createListResource,
 	debounce,
 	Autocomplete,
 	Button,
@@ -84,7 +109,11 @@ import {
 } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
-import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_TICKET } from "@/router";
+import {
+	CUSTOMER_PORTAL_LANDING,
+	CUSTOMER_PORTAL_TICKET,
+	KB_PUBLIC_ARTICLE,
+} from "@/router";
 import { useConfigStore } from "@/stores/config";
 import { createToast } from "@/utils/toasts";
 import SearchComplete from "@/components/SearchComplete.vue";
@@ -104,17 +133,25 @@ const props = defineProps({
 const router = useRouter();
 const configStore = useConfigStore();
 const textEditor = ref();
+
+const subject = ref("");
+const description = ref("");
+const attachments = ref([]);
 const customFields = reactive({});
 
 const template = createDocumentResource({
 	doctype: "HD Ticket Template",
 	name: props.templateId,
 	fields: ["about", "fields"],
+	auto: true,
 });
 
-const subject = ref("");
-const description = ref("");
-const attachments = ref([]);
+const articles = createListResource({
+	doctype: "HD Article",
+	fields: ["name", "title"],
+	pageLimit: 5,
+	debounce: 500,
+});
 
 const r = createResource({
 	url: "helpdesk.api.ticket.create_new",
@@ -175,6 +212,16 @@ function goHome() {
 	window.location.href = path;
 }
 
+function getArticleLink(name: string, title: string) {
+	return {
+		name: KB_PUBLIC_ARTICLE,
+		params: {
+			articleId: name,
+			articleTitleSlug: title.toLowerCase().replaceAll(" ", "-"),
+		},
+	};
+}
+
 function selectOptions(field: string, opt: string) {
 	const options = opt.split("\n").map((o) => ({
 		label: o,
@@ -188,6 +235,20 @@ function selectOptions(field: string, opt: string) {
 	};
 }
 
+watch(subject, (s) => {
+	if (s.length < 5) {
+		delete articles.data;
+		return;
+	}
+
+	articles.update({
+		filters: {
+			title: ["like", `%${subject.value}%`],
+		},
+	});
+
+	articles.reload();
+});
 onBeforeMount(() => configStore.setTitle("New ticket"));
 onUnmounted(() => configStore.setTitle());
 </script>

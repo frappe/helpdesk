@@ -14,12 +14,14 @@ export const ONBOARDING_PAGE = "Setup";
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
 export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
 export const CUSTOMER_PORTAL_TICKET = "PortalTicket";
-export const KNOWLEDGE_BASE_PUBLIC = "Knowledge Base";
 
 export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
 export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
 export const AGENT_PORTAL_TICKET = "DeskTicket";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_DASHBOARD;
+
+export const KB_PUBLIC = "Knowledge Base";
+export const KB_PUBLIC_ARTICLE = "PortalKBArticle";
 
 const routes = [
 	{
@@ -57,7 +59,7 @@ const routes = [
 		children: [
 			{
 				path: "",
-				name: KNOWLEDGE_BASE_PUBLIC,
+				name: KB_PUBLIC,
 				component: () =>
 					// shows root categories and faqs
 					import("@/pages/common/kb/Category.vue"),
@@ -79,7 +81,7 @@ const routes = [
 			},
 			{
 				path: "articles/:articleId/:articleTitleSlug",
-				name: "PortalKBArticle",
+				name: KB_PUBLIC_ARTICLE,
 				component: () => import("@/pages/common/kb/Article.vue"),
 				props: true,
 				meta: {

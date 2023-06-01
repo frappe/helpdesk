@@ -17,7 +17,7 @@
 						{{ configStore.helpdeskName }}
 					</div>
 				</span>
-				<RouterLink :to="{ name: KNOWLEDGE_BASE_PUBLIC }">
+				<RouterLink :to="{ name: KB_PUBLIC }">
 					<div class="flex items-center gap-2">
 						<IconKnowledgebase class="h-4 w-4" />
 						Knowledge Base &rightarrow;
@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { useConfigStore } from "@/stores/config";
-import { KNOWLEDGE_BASE_PUBLIC } from "@/router";
+import { KB_PUBLIC } from "@/router";
 import IconKnowledgebase from "~icons/espresso/knowledge-base";
 
 const configStore = useConfigStore();
