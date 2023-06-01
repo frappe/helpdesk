@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, Ref, computed, reactive, ref, toRefs, useSlots } from "vue";
+import { Ref, computed, reactive, ref, toRefs, useSlots } from "vue";
 import { FeatherIcon, Popover } from "frappe-ui";
 import MinimalSwitch from "@/components/MinimalSwitch.vue";
 import IconAdd from "~icons/espresso/add";
