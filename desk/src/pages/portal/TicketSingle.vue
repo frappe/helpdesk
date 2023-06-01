@@ -44,97 +44,45 @@
 				/>
 			</div>
 		</div>
-		<span>
-			<div
-				class="mt-6 flex items-start gap-2.5 rounded-xl border border-gray-300"
-			>
-				<TextEditor
-					v-if="isEditorExpanded"
-					ref="editor"
-					:bubble-menu="true"
-					:floating-menu="true"
-					:content="editorContent"
-					:placeholder="placeholder"
-					editor-class="prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
-					@change="(v) => (editorContent = v)"
-				>
-					<template #bottom>
-						<div class="flex flex-wrap gap-2 px-2">
-							<AttachmentItem
-								v-for="attachment in attachments"
-								:key="attachment.file_name"
-								:label="attachment.file_name"
-								class="w-max"
-							>
-								<template #extra>
-									<IconX
-										class="h-4 w-4 cursor-pointer"
-										@click="attachments.delete(attachment)"
-									/>
-								</template>
-							</AttachmentItem>
-						</div>
-						<div class="flex items-center justify-between p-2">
-							<FileUploader @success="(file) => attachments.add(file)">
-								<template #default="{ uploading, openFileSelector }">
-									<div class="flex h-7 w-7 items-center justify-center">
-										<IconAttachment
-											class="h-5 w-5 cursor-pointer text-gray-900"
-											:class="{
-												'text-gray-600': uploading,
-											}"
-											@click="!uploading && openFileSelector()"
-										/>
-									</div>
-								</template>
-							</FileUploader>
-							<div class="flex items-center gap-4">
-								<IconDelete
-									class="h-5 w-5 cursor-pointer"
-									@click="clearEditor"
-								/>
-								<Button
-									label="Reply"
-									class="bg-gray-900 text-white hover:bg-gray-800"
-									:disabled="editor?.editor.isEmpty"
-									@click="newCommunication"
-								/>
-							</div>
-						</div>
+		<TextEditor
+			ref="textEditor"
+			class="mt-6"
+			:placeholder="placeholder"
+			:content="editorContent"
+			:attachments="attachments"
+			@change="(v) => (editorContent = v)"
+			@attachment-added="(item) => attachments.add(item)"
+			@attachment-removed="(item) => attachments.delete(item)"
+		>
+			<template #bottom="{ editor }">
+				<TextEditorBottom :editor="editor">
+					<template #actions-right>
+						<Button
+							label="Send"
+							class="bg-gray-900 text-white hover:bg-gray-800"
+							:disabled="editor.isEmpty"
+							@click="newCommunication"
+						/>
 					</template>
-				</TextEditor>
-				<div
-					v-else
-					class="flex h-8 w-full cursor-pointer select-none items-center rounded px-2.5 text-base text-gray-500"
-					@click="isEditorExpanded = true"
-				>
-					{{ placeholder }}
-				</div>
-			</div>
-		</span>
+				</TextEditorBottom>
+			</template>
+		</TextEditor>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { Ref, onMounted, onUnmounted, ref, watch } from "vue";
-import {
-	createDocumentResource,
-	debounce,
-	FileUploader,
-	TextEditor,
-} from "frappe-ui";
+import { Ref, onMounted, onUnmounted, ref } from "vue";
+import { createDocumentResource, debounce } from "frappe-ui";
 import dayjs from "dayjs";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
-import AttachmentItem from "@/components/AttachmentItem.vue";
 import CommunicationItem from "@/components/CommunicationItem.vue";
+import TextEditor from "@/components/text-editor/TextEditor.vue";
+import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import IconHash from "~icons/espresso/hash";
 import IconHome from "~icons/espresso/home";
 import IconRightChevron from "~icons/espresso/right-chevron";
-import IconAttachment from "~icons/espresso/attachment";
-import IconDelete from "~icons/espresso/delete";
-import IconX from "~icons/ph/x";
 
 const props = defineProps({
 	ticketId: {
@@ -165,12 +113,10 @@ const ticket = createDocumentResource({
 	},
 });
 
-const editor = ref(null);
-const placeholder = "Type a reply";
-const isEditorExpanded = ref(false);
+const textEditor = ref(null);
+const placeholder = "Type a message";
 const editorContent = ref("");
 const attachments: Ref<Set<Record<any, any>>> = ref(new Set([]));
-watch(editor, (e) => e?.editor.commands.focus());
 
 const newCommunication = debounce(() => {
 	const message = editorContent.value;
@@ -184,7 +130,6 @@ const newCommunication = debounce(() => {
 
 function clearEditor() {
 	editorContent.value = "";
-	isEditorExpanded.value = false;
 	attachments.value.clear();
 }
 

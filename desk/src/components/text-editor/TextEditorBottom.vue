@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, toRefs } from "vue";
 import { FileUploader } from "frappe-ui";
 import TextEditorFixedMenu from "./TextEditorFixedMenu.vue";
 import AttachmentItem from "@/components/AttachmentItem.vue";
@@ -66,7 +66,7 @@ import IconX from "~icons/ph/x";
 import IconTextT from "~icons/ph/text-t";
 import IconAttachment from "~icons/espresso/attachment";
 
-defineProps({
+const props = defineProps({
 	editor: {
 		type: Object,
 		required: true,
@@ -78,9 +78,12 @@ defineProps({
 	},
 });
 
+const { editor } = toRefs(props);
+
 const emit = defineEmits<{
 	(event: "attachment-added", data: any): void;
 	(event: "attachment-removed", data: any): void;
+	(event: "content-cleared"): void;
 }>();
 
 const isTextFormattingVisible = ref(false);

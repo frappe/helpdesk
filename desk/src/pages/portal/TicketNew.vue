@@ -17,19 +17,26 @@
 				New ticket
 			</div>
 
-			<!-- eslint-disable-next-line vue/no-v-html -->
-			<div class="prose prose-sm" v-html="sanitize(template.doc?.about)" />
+			<div
+				class="prose prose-sm max-w-full"
+				v-html="sanitize(template.doc?.about)"
+			/>
 
-			<!-- <div -->
-			<!-- 	v-for="field in template.doc?.fields" -->
-			<!-- 	:key="field.label" -->
-			<!-- 	class="space-y-2" -->
-			<!-- > -->
-			<!-- 	<div class="text-xs">{{ field.label }}</div> -->
-			<!-- 	<div v-if="field.fieldtype === 'Link'" class="w-1/2"> -->
-			<!-- 		<SearchComplete :doctype="field.options" /> -->
-			<!-- 	</div> -->
-			<!-- </div> -->
+			<div class="grid grid-cols-3 gap-4">
+				<div
+					v-for="field in template.doc?.fields"
+					:key="field.label"
+					class="space-y-2"
+				>
+					<div class="text-xs">{{ field.label }}</div>
+					<div v-if="field.fieldtype === 'Link'">
+						<SearchComplete :doctype="field.options" />
+					</div>
+					<div v-else-if="field.fieldtype === 'Select'">
+						<Autocomplete v-bind="selectOptions(field.options)" />
+					</div>
+				</div>
+			</div>
 
 			<Input v-model="subject" placeholder="Subject" />
 			<TextEditor
@@ -65,6 +72,7 @@ import {
 	createResource,
 	createDocumentResource,
 	debounce,
+	Autocomplete,
 	Button,
 	Input,
 } from "frappe-ui";
@@ -156,6 +164,18 @@ function goHome() {
 	const path = protocol + "//" + domain;
 
 	window.location.href = path;
+}
+
+function selectOptions(options: string) {
+	const res = options.split("\n").map((o) => ({
+		label: o,
+		value: o,
+	}));
+
+	return {
+		options: res,
+		value: [...res].shift(),
+	};
 }
 
 onBeforeMount(() => configStore.setTitle("New ticket"));
