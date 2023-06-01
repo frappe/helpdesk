@@ -157,8 +157,18 @@ const articles = createListResource({
 
 const r = createResource({
 	url: "helpdesk.api.ticket.create_new",
+	validate(params) {
+		for (const field of template.doc?.fields || []) {
+			if (field.reqd && isEmpty(params.values[field.fieldname])) {
+				return `${field.label} is required`;
+			}
+		}
+
+		if (isEmpty(params.values.subject)) return "Subject is required";
+		if (isEmpty(params.values.description)) return "Description is required";
+	},
 	onError(error) {
-		const title = error.messages?.join("\n");
+		const title = error.message ? error.message : error.messages?.join("\n");
 
 		createToast({
 			title,
