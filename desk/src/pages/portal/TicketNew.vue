@@ -30,10 +30,16 @@
 				>
 					<div class="text-xs">{{ field.label }}</div>
 					<div v-if="field.fieldtype === 'Link'">
-						<SearchComplete :doctype="field.options" />
+						<SearchComplete
+							:doctype="field.options"
+							@change="(v) => (customFields[field.fieldname] = v.value)"
+						/>
 					</div>
 					<div v-else-if="field.fieldtype === 'Select'">
-						<Autocomplete v-bind="selectOptions(field.options)" />
+						<Autocomplete
+							v-bind="selectOptions(field.label, field.options)"
+							@change="(v) => (customFields[field.fieldname] = v.value)"
+						/>
 					</div>
 				</div>
 			</div>
@@ -66,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, onUnmounted, computed } from "vue";
+import { ref, onBeforeMount, onUnmounted, computed, reactive } from "vue";
 import { useRouter } from "vue-router";
 import {
 	createResource,
@@ -98,6 +104,7 @@ const props = defineProps({
 const router = useRouter();
 const configStore = useConfigStore();
 const textEditor = ref();
+const customFields = reactive({});
 
 const template = createDocumentResource({
 	doctype: "HD Ticket Template",
@@ -136,6 +143,8 @@ const create = debounce(() => {
 		description: description.value,
 	};
 
+	Object.assign(values, customFields);
+
 	r.submit({
 		values,
 		template: props.templateId,
@@ -166,15 +175,16 @@ function goHome() {
 	window.location.href = path;
 }
 
-function selectOptions(options: string) {
-	const res = options.split("\n").map((o) => ({
+function selectOptions(field: string, opt: string) {
+	const options = opt.split("\n").map((o) => ({
 		label: o,
 		value: o,
 	}));
+	const value = customFields[field] || [...options].shift();
 
 	return {
-		options: res,
-		value: [...res].shift(),
+		options,
+		value,
 	};
 }
 

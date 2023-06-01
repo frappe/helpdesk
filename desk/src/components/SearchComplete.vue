@@ -1,13 +1,14 @@
 <template>
 	<Autocomplete
 		:options="options"
-		:value="defaultOption"
+		:value="selection || defaultOption"
 		@update:query="(q) => onUpdateQuery(q)"
+		@change="(v) => (selection = v)"
 	/>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { createListResource, Autocomplete } from "frappe-ui";
 
 const props = defineProps({
@@ -51,6 +52,7 @@ const options = computed(
 		})) || []
 );
 const defaultOption = computed(() => [...options.value].shift());
+const selection = ref(null);
 
 function onUpdateQuery(query: string) {
 	r.update({
