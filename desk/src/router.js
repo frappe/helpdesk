@@ -115,11 +115,6 @@ const routes = [
 				component: () => import("@/pages/portal/TicketNew.vue"),
 				props: true,
 			},
-			// {
-			// 	path: "impersonate",
-			// 	name: "Impersonate",
-			// 	component: () => import("@/pages/portal/ticketing/Impersonate.vue"),
-			// },
 		],
 	},
 	{
