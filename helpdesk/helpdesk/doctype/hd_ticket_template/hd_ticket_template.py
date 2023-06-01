@@ -4,17 +4,12 @@
 import frappe
 from frappe.model.document import Document
 from frappe.website.utils import cleanup_page_name
-from frappe.utils.safe_exec import safe_exec
 
 
 class HDTicketTemplate(Document):
 	def validate(self):
 		allowed_field_types = [
-			"Data",
-			"Custom Link",
 			"Link",
-			"Long Text",
-			"Text Editor",
 			"Select",
 		]
 
@@ -25,23 +20,9 @@ class HDTicketTemplate(Document):
 				)
 			if not field.fieldname:
 				field.fieldname = cleanup_page_name(field.label)
+
 			if field.fieldname == "description" and field.fieldtype != "Text Editor":
 				frappe.throw(f"field type for description field should be Text Editor")
-
-		required_fields_not_added = []
-		for fieldname in ["subject", "description"]:
-			if not next(
-				(
-					field
-					for field in self.fields
-					if field.fieldname == fieldname and field.reqd == True
-				),
-				None,
-			):
-				required_fields_not_added.append(fieldname)
-
-		if len(required_fields_not_added) > 0:
-			frappe.throw(f"template mandetory fields {required_fields_not_added} are not added")
 
 	def before_save(self):
 		self.template_route = cleanup_page_name(self.template_name)
