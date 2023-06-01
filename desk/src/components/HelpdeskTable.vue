@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, computed, reactive, ref, toRefs, useSlots } from "vue";
+import { PropType, Ref, computed, reactive, ref, toRefs, useSlots } from "vue";
 import { FeatherIcon, Popover } from "frappe-ui";
 import MinimalSwitch from "@/components/MinimalSwitch.vue";
 import IconAdd from "~icons/espresso/add";
@@ -166,7 +166,7 @@ const props = defineProps({
 		required: true,
 	},
 	rowKey: {
-		type: Object as () => RowKey,
+		type: String,
 		required: true,
 	},
 	emitRowClick: {

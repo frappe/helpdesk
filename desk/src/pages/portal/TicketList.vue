@@ -48,8 +48,9 @@
 		</div>
 	</div>
 	<HelpdeskTable
+		v-if="!isEmpty(tickets.list?.data)"
 		:columns="columns"
-		:data="tickets.list?.data || []"
+		:data="tickets.list?.data"
 		row-key="name"
 		:emit-row-click="true"
 		:hide-checkbox="true"
@@ -80,6 +81,12 @@
 			{{ dayjs(data.creation).fromNow() }}
 		</template>
 	</HelpdeskTable>
+	<div
+		v-else
+		class="flex h-64 items-center justify-center text-base text-gray-900"
+	>
+		📭 No tickets
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +94,7 @@ import { onBeforeMount, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
+import { isEmpty } from "lodash";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { createListManager } from "@/composables/listManager";
