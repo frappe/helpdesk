@@ -1,27 +1,23 @@
 <template>
-	<div v-if="totalCount" class="flex justify-between border-t text-base">
-		<div class="text-gray-600">
-			Showing {{ startFrom }} to {{ endAt }} of
-			{{ totalCount }}
-		</div>
-		<div class="flex items-center gap-2 text-gray-600">
-			Page
-			<div
-				class="flex h-5 w-5 flex-wrap content-center justify-center rounded-md bg-gray-200"
-			>
-				{{ currentPage }}
+	<div v-if="totalCount" class="border-t text-base">
+		<div class="flex items-center justify-end gap-2 text-gray-600">
+			<div class="text-gray-600">
+				{{ startFrom }}
+				-
+				{{ endAt }}
+				of
+				{{ totalCount }}
 			</div>
-			of {{ totalPages }}
 			<Button
-				v-show="hasPreviousPage"
 				icon="chevron-left"
-				class="h-5 w-5 rounded-full bg-gray-200"
+				class="h-5 w-5 rounded-full"
+				:disabled="!hasPreviousPage"
 				@click="previous"
 			/>
 			<Button
-				v-show="hasNextPage"
 				icon="chevron-right"
-				class="h-5 w-5 rounded-full bg-gray-200"
+				class="h-5 w-5 rounded-full"
+				:disabled="!hasNextPage"
 				@click="next"
 			/>
 		</div>

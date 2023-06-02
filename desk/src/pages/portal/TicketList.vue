@@ -22,7 +22,7 @@
 			<Button
 				class="bg-gray-900 text-white hover:bg-gray-800"
 				label="New ticket"
-				icon-right="plus"
+				icon-left="plus"
 			/>
 		</RouterLink>
 	</div>
@@ -160,7 +160,7 @@ function handleRowClick(ticketId: number) {
 function transformStatus(status: string) {
 	switch (status) {
 		case "Replied":
-			return "Feedback needed";
+			return "Awaiting reply";
 		default:
 			return status;
 	}

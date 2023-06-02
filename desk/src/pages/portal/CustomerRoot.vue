@@ -7,7 +7,7 @@
 			}"
 		>
 			<div class="mb-8 flex items-center justify-between text-base">
-				<span>
+				<RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
 					<img
 						v-if="configStore.brandLogo"
 						:src="configStore.brandLogo"
@@ -16,13 +16,25 @@
 					<div v-else class="text-6xl text-gray-800">
 						{{ configStore.helpdeskName }}
 					</div>
-				</span>
-				<RouterLink :to="{ name: KB_PUBLIC }" target="_blank">
-					<div class="flex items-center gap-2">
-						<IconKnowledgebase class="h-4 w-4" />
-						Knowledge Base &rightarrow;
-					</div>
 				</RouterLink>
+				<Dropdown :options="options">
+					<template #default="{ open }">
+						<div
+							class="flex cursor-pointer items-center gap-2 rounded-lg text-base text-gray-900"
+						>
+							<Avatar
+								size="md"
+								:image-u-r-l="authStore.userImage"
+								:label="authStore.userName"
+							/>
+							{{ authStore.userName }}
+							<div class="text-gray-700">
+								<IconCaretUp v-if="open" />
+								<IconCaretDown v-else />
+							</div>
+						</div>
+					</template>
+				</Dropdown>
 			</div>
 			<div
 				class="rounded-lg bg-white"
@@ -38,9 +50,41 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from "vue-router";
+import { Avatar, Dropdown } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import { KB_PUBLIC } from "@/router";
-import IconKnowledgebase from "~icons/espresso/knowledge-base";
+import { CUSTOMER_PORTAL_LANDING, KB_PUBLIC } from "@/router";
+import IconCaretDown from "~icons/ph/caret-down";
+import IconCaretUp from "~icons/ph/caret-up";
 
+const router = useRouter();
+const authStore = useAuthStore();
 const configStore = useConfigStore();
+
+const options = [
+	{
+		label: "Knowledge Base",
+		icon: "book-open",
+		handler: () => {
+			const path = router.resolve({ name: KB_PUBLIC });
+			window.open(path.href, "_blank");
+		},
+	},
+	{
+		label: "My Profile",
+		icon: "user",
+		handler: () => {
+			const protocol = window.location.protocol;
+			const domain = window.location.hostname;
+			const path = protocol + "//" + domain + "/me";
+			window.open(path, "_blank");
+		},
+	},
+	{
+		label: "Log out",
+		icon: "log-out",
+		handler: () => authStore.logout(),
+	},
+];
 </script>
