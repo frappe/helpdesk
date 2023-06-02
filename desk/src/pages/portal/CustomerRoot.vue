@@ -72,7 +72,7 @@ const options = [
 		},
 	},
 	{
-		label: "My Profile",
+		label: "My Account",
 		icon: "user",
 		handler: () => {
 			const protocol = window.location.protocol;
