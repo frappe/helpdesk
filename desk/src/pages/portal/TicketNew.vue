@@ -17,6 +17,7 @@
 				New ticket
 			</div>
 			<div
+				v-if="template.doc?.about"
 				class="prose prose-sm max-w-full"
 				v-html="sanitize(template.doc?.about)"
 			/>
