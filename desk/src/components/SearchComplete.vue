@@ -1,7 +1,8 @@
 <template>
 	<Autocomplete
+		placeholder="Select an option"
 		:options="options"
-		:value="selection || defaultOption"
+		:value="selection"
 		@update:query="(q) => onUpdateQuery(q)"
 		@change="(v) => (selection = v)"
 	/>
@@ -51,7 +52,6 @@ const options = computed(
 			value: result[props.valueField],
 		})) || []
 );
-const defaultOption = computed(() => [...options.value].shift());
 const selection = ref(null);
 
 function onUpdateQuery(query: string) {

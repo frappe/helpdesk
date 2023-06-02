@@ -35,7 +35,9 @@
 					</div>
 					<div v-else-if="field.fieldtype === 'Select'">
 						<Autocomplete
-							v-bind="selectOptions(field.label, field.options)"
+							placeholder="Select an option"
+							:options="selectOptions(field.options)"
+							:value="customFields[field.fieldname]"
 							@change="(v) => (customFields[field.fieldname] = v.value)"
 						/>
 					</div>
@@ -92,14 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	ref,
-	onBeforeMount,
-	onUnmounted,
-	computed,
-	reactive,
-	watch,
-} from "vue";
+import { ref, onBeforeMount, onUnmounted, computed, reactive } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import {
 	createResource,
@@ -235,17 +230,11 @@ function getArticleLink(name: string, title: string) {
 	};
 }
 
-function selectOptions(field: string, opt: string) {
-	const options = opt.split("\n").map((o) => ({
+function selectOptions(options: string) {
+	return options.split("\n").map((o) => ({
 		label: o,
 		value: o,
 	}));
-	const value = customFields[field] || [...options].shift();
-
-	return {
-		options,
-		value,
-	};
 }
 
 function searchArticles(term: string) {
