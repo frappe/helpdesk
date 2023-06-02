@@ -46,6 +46,9 @@ export default defineConfig({
 		outDir: `../helpdesk/public/desk`,
 		emptyOutDir: true,
 		target: "es2021",
+		commonjsOptions: {
+			include: [/tailwind.config.js/, /node_modules/],
+		},
 	},
 	optimizeDeps: {
 		include: ["feather-icons", "showdown", "tailwind.config.js"],
