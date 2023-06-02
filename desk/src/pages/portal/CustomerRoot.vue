@@ -23,7 +23,7 @@
 							class="flex cursor-pointer items-center gap-2 rounded-lg text-base text-gray-900"
 						>
 							<Avatar
-								size="md"
+								size="sm"
 								:image-u-r-l="authStore.userImage"
 								:label="authStore.userName"
 							/>
