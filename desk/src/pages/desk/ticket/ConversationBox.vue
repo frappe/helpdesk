@@ -3,7 +3,7 @@
 		<div
 			v-if="isLoaded"
 			ref="listElement"
-			class="flex w-full flex-col items-center gap-4 overflow-scroll"
+			class="flex w-full flex-col items-center gap-4 overflow-auto"
 		>
 			<div class="content">
 				<div v-for="(c, i) in conversations" :key="c.name" class="mt-4">

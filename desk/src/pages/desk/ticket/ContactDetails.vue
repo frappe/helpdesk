@@ -25,7 +25,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="overflow-scroll px-4">
+		<div class="overflow-auto px-4">
 			<div
 				v-if="!isEmpty(contactOptions)"
 				class="flex flex-col gap-3.5 border-b py-6 text-base"
