@@ -9,16 +9,16 @@
 		>
 			{{ isEmptyMessage }}
 		</div>
-		<BottomSection />
+		<ListNavigation v-bind="tickets" class="p-3" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from "vue";
 import { useTicketListStore } from "./data";
+import ListNavigation from "@/components/ListNavigation.vue";
 import ListHeader from "./ListHeader.vue";
 import TopSection from "./TopSection.vue";
-import BottomSection from "./BottomSection.vue";
 import MainTable from "./MainTable.vue";
 
 const { init, deinit, tickets } = useTicketListStore();

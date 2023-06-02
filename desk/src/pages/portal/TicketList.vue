@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex justify-between px-9 py-4 text-base text-gray-700 transition"
+		class="flex items-center justify-between px-9 py-4 text-base text-gray-700 transition"
 	>
 		<div class="flex gap-4">
 			<Dropdown :options="dropdownOptions">
@@ -14,73 +14,54 @@
 					</div>
 				</template>
 			</Dropdown>
-			<RouterLink
-				:to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
-				class="flex cursor-pointer select-none items-center gap-1 hover:text-gray-900"
-			>
-				New ticket
-				<IconPlus class="h-3 w-3" />
-			</RouterLink>
 		</div>
-		<div
-			v-if="tickets.hasPreviousPage || tickets.hasNextPage"
-			class="flex gap-2 text-xs"
+		<RouterLink
+			:to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+			class="flex cursor-pointer select-none items-center gap-1 hover:text-gray-900"
 		>
-			<div
-				v-if="tickets.hasPreviousPage"
-				class="cursor-pointer"
-				@click="tickets.previous()"
-			>
-				&leftarrow;
-				{{ tickets.currentPage - 1 }}
-			</div>
-			<div class="font-medium text-gray-900">
-				{{ tickets.currentPage }}
-			</div>
-			<div
-				v-if="tickets.hasNextPage"
-				class="cursor-pointer"
-				@click="tickets.next()"
-			>
-				{{ tickets.currentPage + 1 }}
-				&rightarrow;
-			</div>
-		</div>
+			<Button
+				class="bg-gray-900 text-white hover:bg-gray-800"
+				label="New ticket"
+				icon-right="plus"
+			/>
+		</RouterLink>
 	</div>
-	<HelpdeskTable
-		v-if="!isEmpty(tickets.list?.data)"
-		:columns="columns"
-		:data="tickets.list?.data"
-		row-key="name"
-		:emit-row-click="true"
-		:hide-checkbox="true"
-		:hide-column-selector="true"
-		@row-click="(ticketId) => handleRowClick(ticketId)"
-	>
-		<template #subject="{ data }">
-			<div
-				class="flex items-center gap-2"
-				:class="{
-					'font-medium': isHighlight(data),
-					'text-gray-900': isHighlight(data),
-				}"
-			>
-				<div class="line-clamp-1 max-w-lg">
-					{{ data.subject }}
+	<span v-if="!isEmpty(tickets.list?.data)">
+		<HelpdeskTable
+			:columns="columns"
+			:data="tickets.list?.data"
+			row-key="name"
+			:emit-row-click="true"
+			:hide-checkbox="true"
+			:hide-column-selector="true"
+			@row-click="(ticketId) => handleRowClick(ticketId)"
+		>
+			<template #subject="{ data }">
+				<div
+					class="flex items-center justify-between"
+					:class="{
+						'font-medium': isHighlight(data),
+						'text-gray-900': isHighlight(data),
+					}"
+				>
+					<div class="line-clamp-1 max-w-lg">
+						{{ data.subject }}
+					</div>
+					<div class="mx-2 flex items-center gap-1 text-xs">
+						<IconHash class="h-3 w-3" />
+						{{ data.name }}
+					</div>
 				</div>
-				<div class="flex items-center gap-1 text-xs">
-					<IconHash class="h-3 w-3" />
-					{{ data.name }}
-				</div>
-			</div>
-		</template>
-		<template #status="{ data }">
-			{{ transformStatus(data.status) }}
-		</template>
-		<template #creation="{ data }">
-			{{ dayjs(data.creation).fromNow() }}
-		</template>
-	</HelpdeskTable>
+			</template>
+			<template #status="{ data }">
+				{{ transformStatus(data.status) }}
+			</template>
+			<template #creation="{ data }">
+				{{ dayjs(data.creation).fromNow() }}
+			</template>
+		</HelpdeskTable>
+		<ListNavigation v-bind="tickets" class="px-9 py-3" />
+	</span>
 	<div
 		v-else
 		class="flex h-64 items-center justify-center text-base text-gray-900"
@@ -100,10 +81,10 @@ import { useConfigStore } from "@/stores/config";
 import { createListManager } from "@/composables/listManager";
 import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import ListNavigation from "@/components/ListNavigation.vue";
 import IconCaretDown from "~icons/ph/caret-down";
 import IconCaretUp from "~icons/ph/caret-up";
 import IconHash from "~icons/espresso/hash";
-import IconPlus from "~icons/ph/plus";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -128,7 +109,7 @@ const columns = [
 
 const tickets = createListManager({
 	doctype: "HD Ticket",
-	pageLength: 12,
+	pageLength: 10,
 	fields: ["name", "creation", "subject", "status"],
 	filters: {
 		raised_by: ["=", authStore.userId],
@@ -146,15 +127,15 @@ const dropdownOptions = [
 		},
 	},
 	{
-		label: "Active tickets",
+		label: "Open tickets",
 		handler() {
-			filter("Active tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
+			filter("Open tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
 		},
 	},
 	{
-		label: "Inative tickets",
+		label: "Closed tickets",
 		handler() {
-			filter("Inactive tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
+			filter("Closed tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
 		},
 	},
 ];

@@ -17,7 +17,7 @@
 						{{ configStore.helpdeskName }}
 					</div>
 				</span>
-				<RouterLink :to="{ name: KB_PUBLIC }">
+				<RouterLink :to="{ name: KB_PUBLIC }" target="_blank">
 					<div class="flex items-center gap-2">
 						<IconKnowledgebase class="h-4 w-4" />
 						Knowledge Base &rightarrow;
@@ -25,7 +25,7 @@
 				</RouterLink>
 			</div>
 			<div
-				class="rounded-lg bg-white py-2"
+				class="rounded-lg bg-white"
 				:style="{
 					'box-shadow':
 						'0px 0px 1px rgba(0, 0, 0, 0.45), 0px 1px 2px rgba(0, 0, 0, 0.1)',
