@@ -29,7 +29,7 @@ export const useConfigStore = defineStore("config", () => {
 	const pageTitle = ref(null);
 	const windowTitle = computed(() =>
 		pageTitle.value
-			? `${pageTitle.value} | ${helpdeskName.value}`
+			? `${pageTitle.value} • ${helpdeskName.value}`
 			: helpdeskName.value
 	);
 
