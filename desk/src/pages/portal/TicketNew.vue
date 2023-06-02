@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeMount, onUnmounted, computed, reactive } from "vue";
+import { ref, onUnmounted, computed, reactive, onMounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import {
 	createResource,
@@ -252,6 +252,6 @@ function searchArticles(term: string) {
 	articles.reload();
 }
 
-onBeforeMount(() => configStore.setTitle("New ticket"));
+onMounted(() => configStore.setTitle("New ticket"));
 onUnmounted(() => configStore.setTitle());
 </script>

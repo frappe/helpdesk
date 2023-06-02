@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
@@ -189,6 +189,6 @@ function isHighlight(ticket) {
 	return ticket.status === "Replied";
 }
 
-onBeforeMount(() => configStore.setTitle("My Tickets"));
+onMounted(() => configStore.setTitle("My Tickets"));
 onUnmounted(() => configStore.setTitle());
 </script>
