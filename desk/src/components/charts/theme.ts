@@ -1,5 +1,5 @@
 import resolveConfig from "tailwindcss/resolveConfig";
-import * as tailwindConfig from "tailwind.config.js";
+import tailwindConfig from "tailwind.config.js";
 
 const config = resolveConfig(tailwindConfig);
 const ignore = ["slate", "gray", "zinc", "neutral", "stone"];
