@@ -63,6 +63,7 @@
 				v-model="subject"
 				label="Subject"
 				placeholder="A short description"
+				@input="(v) => searchArticles(v)"
 			/>
 			<TextEditor
 				ref="textEditor"
@@ -247,20 +248,21 @@ function selectOptions(field: string, opt: string) {
 	};
 }
 
-watch(subject, (s) => {
-	if (s.length < 5) {
+function searchArticles(term: string) {
+	if (term.length < 5) {
 		delete articles.data;
 		return;
 	}
 
 	articles.update({
 		filters: {
-			title: ["like", `%${subject.value}%`],
+			title: ["like", `%${term}%`],
 		},
 	});
 
 	articles.reload();
-});
+}
+
 onBeforeMount(() => configStore.setTitle("New ticket"));
 onUnmounted(() => configStore.setTitle());
 </script>
