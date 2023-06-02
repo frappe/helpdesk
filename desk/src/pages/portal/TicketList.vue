@@ -1,73 +1,76 @@
 <template>
-	<div
-		class="flex items-center justify-between px-9 py-4 text-base text-gray-700 transition"
-	>
-		<div class="flex gap-4">
-			<Dropdown :options="dropdownOptions">
-				<template #default="{ open }">
+	<span>
+		<div class="space-y-3 px-9 pb-4 pt-6">
+			<div class="flex items-center justify-between">
+				<div class="text-2xl font-semibold text-gray-900">My Tickets</div>
+				<div class="flex gap-2">
 					<div
-						class="flex cursor-pointer select-none items-center gap-1 hover:text-gray-900"
+						class="flex items-center justify-between text-base text-gray-700 transition"
 					>
-						{{ dropdownTitle }}
-						<IconCaretDown v-if="!open" class="h-3 w-3" />
-						<IconCaretUp v-if="open" class="h-3 w-3" />
+						<div class="flex gap-4">
+							<Dropdown :options="dropdownOptions">
+								<template #default="{ open }">
+									<Button
+										:label="dropdownTitle"
+										:icon-right="open ? 'chevron-up' : 'chevron-down'"
+									/>
+								</template>
+							</Dropdown>
+						</div>
+					</div>
+					<RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
+						<Button
+							class="bg-gray-900 text-white hover:bg-gray-800"
+							label="New ticket"
+							icon-right="plus"
+						/>
+					</RouterLink>
+				</div>
+			</div>
+		</div>
+		<span v-if="!isEmpty(tickets.list?.data)">
+			<HelpdeskTable
+				:columns="columns"
+				:data="tickets.list?.data"
+				row-key="name"
+				:emit-row-click="true"
+				:hide-checkbox="true"
+				:hide-column-selector="true"
+				@row-click="(ticketId) => handleRowClick(ticketId)"
+			>
+				<template #subject="{ data }">
+					<div
+						class="flex items-center justify-between"
+						:class="{
+							'font-medium': isHighlight(data),
+							'text-gray-900': isHighlight(data),
+						}"
+					>
+						<div class="line-clamp-1 max-w-lg">
+							{{ data.subject }}
+						</div>
+						<div class="mx-2 flex items-center gap-1 text-xs">
+							<IconHash class="h-3 w-3" />
+							{{ data.name }}
+						</div>
 					</div>
 				</template>
-			</Dropdown>
+				<template #status="{ data }">
+					{{ transformStatus(data.status) }}
+				</template>
+				<template #creation="{ data }">
+					{{ dayjs(data.creation).fromNow() }}
+				</template>
+			</HelpdeskTable>
+			<ListNavigation v-bind="tickets" class="px-9 py-3" />
+		</span>
+		<div
+			v-else
+			class="flex h-64 items-center justify-center text-base text-gray-900"
+		>
+			📭 No tickets
 		</div>
-		<RouterLink
-			:to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
-			class="flex cursor-pointer select-none items-center gap-1 hover:text-gray-900"
-		>
-			<Button
-				class="bg-gray-900 text-white hover:bg-gray-800"
-				label="New ticket"
-				icon-left="plus"
-			/>
-		</RouterLink>
-	</div>
-	<span v-if="!isEmpty(tickets.list?.data)">
-		<HelpdeskTable
-			:columns="columns"
-			:data="tickets.list?.data"
-			row-key="name"
-			:emit-row-click="true"
-			:hide-checkbox="true"
-			:hide-column-selector="true"
-			@row-click="(ticketId) => handleRowClick(ticketId)"
-		>
-			<template #subject="{ data }">
-				<div
-					class="flex items-center justify-between"
-					:class="{
-						'font-medium': isHighlight(data),
-						'text-gray-900': isHighlight(data),
-					}"
-				>
-					<div class="line-clamp-1 max-w-lg">
-						{{ data.subject }}
-					</div>
-					<div class="mx-2 flex items-center gap-1 text-xs">
-						<IconHash class="h-3 w-3" />
-						{{ data.name }}
-					</div>
-				</div>
-			</template>
-			<template #status="{ data }">
-				{{ transformStatus(data.status) }}
-			</template>
-			<template #creation="{ data }">
-				{{ dayjs(data.creation).fromNow() }}
-			</template>
-		</HelpdeskTable>
-		<ListNavigation v-bind="tickets" class="px-9 py-3" />
 	</span>
-	<div
-		v-else
-		class="flex h-64 items-center justify-center text-base text-gray-900"
-	>
-		📭 No tickets
-	</div>
 </template>
 
 <script setup lang="ts">

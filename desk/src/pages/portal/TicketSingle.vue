@@ -1,24 +1,15 @@
 <template>
-	<div class="px-9 pb-4 text-base text-gray-900">
-		<div id="header" class="sticky top-0 z-50 bg-white py-4">
-			<div class="mb-3 flex items-center gap-2 text-gray-700">
-				<IconHome
-					class="h-4 w-4 cursor-pointer hover:text-gray-900"
-					@click="goHome"
-				/>
-				<IconRightChevron class="h-4 w-4" />
-				<RouterLink
-					:to="{ name: CUSTOMER_PORTAL_LANDING }"
-					class="cursor-pointer hover:text-gray-900"
-				>
-					My tickets
-				</RouterLink>
-				<IconRightChevron class="h-4 w-4" />
+	<div class="px-9 py-4 text-base text-gray-900">
+		<div class="flex items-center gap-2 py-4">
+			<RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
+				<IconCaretLeft class="h-4 w-4 cursor-pointer text-gray-700" />
+			</RouterLink>
+			<div class="line-clamp-1 text-xl font-medium text-gray-900">
+				{{ ticket.doc?.subject }}
+			</div>
+			<div class="flex items-center gap-2 text-xs font-normal text-gray-700">
 				<IconHash class="h-3 w-3" />
 				{{ ticket.doc?.name }}
-			</div>
-			<div class="text-xl font-medium">
-				{{ ticket.doc?.subject }}
 			</div>
 		</div>
 		<div class="flex flex-col gap-6">
@@ -82,9 +73,8 @@ import { useConfigStore } from "@/stores/config";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
+import IconCaretLeft from "~icons/ph/caret-left";
 import IconHash from "~icons/espresso/hash";
-import IconHome from "~icons/espresso/home";
-import IconRightChevron from "~icons/espresso/right-chevron";
 
 const props = defineProps({
 	ticketId: {
@@ -133,14 +123,6 @@ const newCommunication = debounce(() => {
 function clearEditor() {
 	textEditor.value?.editor.commands.clearContent();
 	attachments.value.clear();
-}
-
-function goHome() {
-	const protocol = window.location.protocol;
-	const domain = window.location.hostname;
-	const path = protocol + "//" + domain;
-
-	window.location.href = path;
 }
 
 function isNewDay(index: number) {

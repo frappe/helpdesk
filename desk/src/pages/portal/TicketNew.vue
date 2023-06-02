@@ -1,20 +1,11 @@
 <template>
 	<div class="px-9 py-4 text-base text-gray-700">
 		<div class="flex flex-col gap-4">
-			<div class="mb-4 flex items-center gap-2 text-gray-700">
-				<IconHome
-					class="h-4 w-4 cursor-pointer hover:text-gray-900"
-					@click="goHome"
-				/>
-				<IconRightChevron class="h-4 w-4" />
-				<RouterLink
-					:to="{ name: CUSTOMER_PORTAL_LANDING }"
-					class="cursor-pointer hover:text-gray-900"
-				>
-					My tickets
+			<div class="flex items-center gap-2 pt-4">
+				<RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
+					<IconCaretLeft class="h-4 w-4 cursor-pointer text-gray-700" />
 				</RouterLink>
-				<IconRightChevron class="h-4 w-4" />
-				New ticket
+				<div class="text-xl font-medium text-gray-900">New Ticket</div>
 			</div>
 			<div
 				v-if="template.doc?.about"
@@ -118,8 +109,7 @@ import { createToast } from "@/utils/toasts";
 import SearchComplete from "@/components/SearchComplete.vue";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
-import IconHome from "~icons/espresso/home";
-import IconRightChevron from "~icons/espresso/right-chevron";
+import IconCaretLeft from "~icons/ph/caret-left";
 
 const props = defineProps({
 	templateId: {
@@ -211,14 +201,6 @@ function sanitize(html: string) {
 	return sanitizeHtml(html, {
 		allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
 	});
-}
-
-function goHome() {
-	const protocol = window.location.protocol;
-	const domain = window.location.hostname;
-	const path = protocol + "//" + domain;
-
-	window.location.href = path;
 }
 
 function getArticleLink(name: string, title: string) {

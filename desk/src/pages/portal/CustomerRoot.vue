@@ -1,17 +1,17 @@
 <template>
 	<div class="min-h-screen bg-gray-100">
 		<div
-			class="mx-auto py-8"
+			class="mx-auto py-4"
 			:style="{
 				width: '900px',
 			}"
 		>
-			<div class="mb-8 flex items-center justify-between text-base">
+			<div class="mb-4 flex items-center justify-between text-base">
 				<RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
 					<img
 						v-if="configStore.brandLogo"
 						:src="configStore.brandLogo"
-						class="h-8"
+						class="h-7"
 					/>
 					<div v-else class="text-6xl text-gray-800">
 						{{ configStore.helpdeskName }}
