@@ -1,16 +1,32 @@
 <template>
 	<div class="px-9 py-4 text-base text-gray-900">
-		<div class="flex items-center gap-2 py-4">
-			<RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
-				<IconCaretLeft class="h-4 w-4 cursor-pointer text-gray-700" />
-			</RouterLink>
-			<div class="line-clamp-1 text-xl font-medium text-gray-900">
-				{{ ticket.doc?.subject }}
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-2 py-4">
+				<RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
+					<IconCaretLeft class="h-4 w-4 cursor-pointer text-gray-700" />
+				</RouterLink>
+				<div class="line-clamp-1 text-xl font-medium text-gray-900">
+					{{ ticket.doc?.subject }}
+				</div>
+				<div class="flex items-center gap-2 text-xs font-normal text-gray-700">
+					<IconHash class="h-3 w-3" />
+					{{ ticket.doc?.name }}
+				</div>
 			</div>
-			<div class="flex items-center gap-2 text-xs font-normal text-gray-700">
-				<IconHash class="h-3 w-3" />
-				{{ ticket.doc?.name }}
-			</div>
+			<Button
+				v-if="ticket.doc?.status == 'Resolved'"
+				label="Reopen"
+				icon-left="repeat"
+				class="bg-gray-900 text-white hover:bg-gray-800"
+				@click="ticket.reopen.submit()"
+			/>
+			<Button
+				v-else
+				label="Mark as resolved"
+				icon-left="check"
+				class="bg-gray-900 text-white hover:bg-gray-800"
+				@click="ticket.resolve.submit()"
+			/>
 		</div>
 		<div class="flex flex-col gap-6">
 			<div
@@ -102,6 +118,8 @@ const ticket = createDocumentResource({
 				clearEditor();
 			},
 		},
+		reopen: "reopen",
+		resolve: "resolve",
 	},
 });
 
@@ -156,17 +174,5 @@ onMounted(() => {
 onUnmounted(() => {
 	configStore.setTitle();
 	socket.off("helpdesk:new-communication");
-});
-
-window.addEventListener("scroll", function () {
-	const header = document.getElementById("header");
-	const rect = header.getBoundingClientRect();
-	const cls = "border-b";
-
-	if (rect.top <= 0) {
-		header.classList.add(cls);
-	} else {
-		header.classList.remove(cls);
-	}
 });
 </script>

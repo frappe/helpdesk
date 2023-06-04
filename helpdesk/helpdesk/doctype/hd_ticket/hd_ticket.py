@@ -661,6 +661,19 @@ class HDTicket(Document):
 
 		return l
 
+	@frappe.whitelist()
+	def reopen(self):
+		if self.status != "Resolved":
+			frappe.throw("Only resolved tickets can be reopened")
+
+		self.status = "Open"
+		self.save()
+
+	@frappe.whitelist()
+	def resolve(self):
+		self.status = "Resolved"
+		self.save()
+
 
 def set_descritption_from_communication(doc, type):
 	if doc.reference_doctype == "HD Ticket":
