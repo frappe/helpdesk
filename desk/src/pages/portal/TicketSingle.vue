@@ -13,20 +13,22 @@
 					{{ ticket.doc?.name }}
 				</div>
 			</div>
-			<Button
-				v-if="ticket.doc?.status == 'Resolved'"
-				label="Reopen"
-				icon-left="repeat"
-				class="bg-gray-900 text-white hover:bg-gray-800"
-				@click="ticket.reopen.submit()"
-			/>
-			<Button
-				v-else
-				label="Mark as resolved"
-				icon-left="check"
-				class="bg-gray-900 text-white hover:bg-gray-800"
-				@click="ticket.resolve.submit()"
-			/>
+			<span v-if="ticket.doc?.status !== 'Closed'">
+				<Button
+					v-if="ticket.doc?.status == 'Resolved'"
+					label="Reopen"
+					icon-left="repeat"
+					class="bg-gray-900 text-white hover:bg-gray-800"
+					@click="ticket.reopen.submit()"
+				/>
+				<Button
+					v-else
+					label="Mark as resolved"
+					icon-left="check"
+					class="bg-gray-900 text-white hover:bg-gray-800"
+					@click="ticket.resolve.submit()"
+				/>
+			</span>
 		</div>
 		<div class="flex flex-col gap-6">
 			<div
