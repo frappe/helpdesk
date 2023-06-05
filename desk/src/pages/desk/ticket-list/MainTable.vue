@@ -111,9 +111,9 @@ const columns = [
     colClass: "w-20",
   },
   {
-    title: "Customer",
+    title: "Contact",
     isTogglable: false,
-    colKey: "customer",
+    colKey: "contact",
     colClass: "w-40",
   },
   {
@@ -121,6 +121,12 @@ const columns = [
     isTogglable: false,
     colKey: "resolution_by",
     colClass: "w-24",
+  },
+  {
+    title: "Customer",
+    isTogglable: true,
+    colKey: "customer",
+    colClass: "w-40",
   },
   {
     title: "Created on",
