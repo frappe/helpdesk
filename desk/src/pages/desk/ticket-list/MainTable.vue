@@ -1,64 +1,68 @@
 <template>
-	<HelpdeskTable :columns="columns" :data="tickets.list.data" row-key="name">
-		<template #subject="{ data }">
-			<TicketSummary class="col-subject" :ticket-name="data.name" />
-		</template>
-		<template #status="{ data }">
-			<Dropdown :options="statusDropdownOptions(data.name, data.status)">
-				<template #default="{ open }">
-					<div class="flex cursor-pointer select-none items-center gap-1">
-						{{ data.status }}
-						<IconCaretDown v-if="!open" class="h-3 w-3" />
-						<IconCaretUp v-if="open" class="h-3 w-3" />
-					</div>
-				</template>
-			</Dropdown>
-		</template>
-		<template #priority="{ data }">
-			<Dropdown :options="priorityDropdownOptions(data.name, data.priority)">
-				<template #default="{ open }">
-					<div class="flex cursor-pointer select-none items-center gap-1">
-						{{ data.priority }}
-						<IconCaretDown v-if="!open" class="h-3 w-3" />
-						<IconCaretUp v-if="open" class="h-3 w-3" />
-					</div>
-				</template>
-			</Dropdown>
-		</template>
-		<template #resolution_by="{ data }">
-			<div
-				:class="{
-					'text-red-700': Date.parse(data.resolution_by) < Date.now(),
-				}"
-			>
-				{{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "--" }}
-			</div>
-		</template>
-		<template #creation="{ data }">
-			{{ dayjs(data.creation).format(dateFormat) }}
-		</template>
-		<template #modified="{ data }">
-			{{ dayjs(data.modified).format(dateFormat) }}
-		</template>
-		<template #via_customer_portal="{ data }">
-			{{ data.via_customer_portal ? "Customer Portal" : "Email" }}
-		</template>
-		<template #row-extra="{ data }">
-			<AssignedInfo :ticket-id="data.name" />
-		</template>
-		<template #actions="{ selection }">
-			<Dropdown :options="assignOpts(selection as Set<number>)">
-				<template #default>
-					<Button
-						class="flex cursor-pointer items-center gap-1 text-gray-700"
-						label="Assign"
-						icon-left="plus-circle"
-						appearance="minimal"
-					/>
-				</template>
-			</Dropdown>
-		</template>
-	</HelpdeskTable>
+  <HelpdeskTable :columns="columns" :data="tickets.list.data" row-key="name">
+    <template #subject="{ data }">
+      <TicketSummary class="col-subject" :ticket-name="data.name" />
+    </template>
+    <template #status="{ data }">
+      <Dropdown :options="statusDropdownOptions(data.name, data.status)">
+        <template #default="{ open }">
+          <div class="flex cursor-pointer select-none items-center gap-1">
+            <div class="line-clamp-1">
+              {{ data.status }}
+            </div>
+            <IconCaretDown v-if="!open" class="h-3 w-3" />
+            <IconCaretUp v-if="open" class="h-3 w-3" />
+          </div>
+        </template>
+      </Dropdown>
+    </template>
+    <template #priority="{ data }">
+      <Dropdown :options="priorityDropdownOptions(data.name, data.priority)">
+        <template #default="{ open }">
+          <div class="flex cursor-pointer select-none items-center gap-1">
+            <div class="line-clamp-1">
+              {{ data.priority }}
+            </div>
+            <IconCaretDown v-if="!open" class="h-3 w-3" />
+            <IconCaretUp v-if="open" class="h-3 w-3" />
+          </div>
+        </template>
+      </Dropdown>
+    </template>
+    <template #resolution_by="{ data }">
+      <div
+        :class="{
+          'text-red-700': Date.parse(data.resolution_by) < Date.now(),
+        }"
+      >
+        {{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "--" }}
+      </div>
+    </template>
+    <template #creation="{ data }">
+      {{ dayjs(data.creation).format(dateFormat) }}
+    </template>
+    <template #modified="{ data }">
+      {{ dayjs(data.modified).format(dateFormat) }}
+    </template>
+    <template #via_customer_portal="{ data }">
+      {{ data.via_customer_portal ? "Customer Portal" : "Email" }}
+    </template>
+    <template #row-extra="{ data }">
+      <AssignedInfo :ticket-id="data.name" />
+    </template>
+    <template #actions="{ selection }">
+      <Dropdown :options="assignOpts(selection as Set<number>)">
+        <template #default>
+          <Button
+            class="flex cursor-pointer items-center gap-1 text-gray-700"
+            label="Assign"
+            icon-left="plus-circle"
+            appearance="minimal"
+          />
+        </template>
+      </Dropdown>
+    </template>
+  </HelpdeskTable>
 </template>
 
 <script setup lang="ts">
@@ -82,121 +86,120 @@ const { tickets } = useTicketListStore();
 
 const dateFormat = "D/M/YYYY h:mm A";
 const columns = [
-	{
-		title: "Subject",
-		isTogglable: false,
-		colKey: "subject",
-		colClass: "col-subject",
-	},
-	{
-		title: "Status",
-		isTogglable: false,
-		colKey: "status",
-		colClass: "w-24",
-	},
-	{
-		title: "Priority",
-		isTogglable: false,
-		colKey: "priority",
-		colClass: "w-24",
-	},
-	{
-		title: "Type",
-		isTogglable: false,
-		colKey: "ticket_type",
-		colClass: "w-20",
-	},
-	{
-		title: "Customer",
-		isTogglable: false,
-		colKey: "customer",
-		colClass: "w-40",
-	},
-	{
-		title: "Due in",
-		isTogglable: false,
-		colKey: "resolution_by",
-		colClass: "w-24",
-	},
-	{
-		title: "Created on",
-		isTogglable: true,
-		colKey: "creation",
-		colClass: "w-36",
-	},
-	{
-		title: "Last modified",
-		isTogglable: true,
-		colKey: "modified",
-		colClass: "w-36",
-	},
-	{
-		title: "Source",
-		isTogglable: true,
-		colKey: "via_customer_portal",
-		colClass: "w-20",
-	},
+  {
+    title: "Subject",
+    isTogglable: false,
+    colKey: "subject",
+    colClass: "col-subject",
+  },
+  {
+    title: "Status",
+    isTogglable: false,
+    colKey: "status",
+    colClass: "w-24",
+  },
+  {
+    title: "Priority",
+    isTogglable: false,
+    colKey: "priority",
+    colClass: "w-24",
+  },
+  {
+    title: "Type",
+    isTogglable: false,
+    colKey: "ticket_type",
+    colClass: "w-20",
+  },
+  {
+    title: "Customer",
+    isTogglable: false,
+    colKey: "customer",
+    colClass: "w-40",
+  },
+  {
+    title: "Due in",
+    isTogglable: false,
+    colKey: "resolution_by",
+    colClass: "w-24",
+  },
+  {
+    title: "Created on",
+    isTogglable: true,
+    colKey: "creation",
+    colClass: "w-36",
+  },
+  {
+    title: "Last modified",
+    isTogglable: true,
+    colKey: "modified",
+    colClass: "w-36",
+  },
+  {
+    title: "Source",
+    isTogglable: true,
+    colKey: "via_customer_portal",
+    colClass: "w-20",
+  },
 ];
 
 const bulkAssignTicketToAgent = createResource({
-	url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
-	onSuccess: () => {
-		createToast({
-			title: "Tickets assigned to agent",
-			icon: "check",
-			iconClasses: "text-green-500",
-		});
-	},
-	onError: () => {
-		createToast({
-			title: "Unable to assign tickets to agent.",
-			icon: "x",
-			iconClasses: "text-red-500",
-		});
-	},
+  url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
+  onSuccess: () => {
+    createToast({
+      title: "Tickets assigned to agent",
+      icon: "check",
+      iconClasses: "text-green-500",
+    });
+  },
+  onError: () => {
+    createToast({
+      title: "Unable to assign tickets to agent.",
+      icon: "x",
+      iconClasses: "text-red-500",
+    });
+  },
 });
 
 function assignOpts(selected: Set<number>) {
-	return agentStore.options.map((a) => ({
-		label: a.agent_name,
-		handler: () =>
-			bulkAssignTicketToAgent.submit({
-				ticket_ids: Array.from(selected),
-				agent_id: a.name,
-			}),
-	}));
+  return agentStore.options.map((a) => ({
+    label: a.agent_name,
+    handler: () =>
+      bulkAssignTicketToAgent.submit({
+        ticket_ids: Array.from(selected),
+        agent_id: a.name,
+      }),
+  }));
 }
 
 function statusDropdownOptions(ticketId: number, currentStatus: string) {
-	return ticketStatusStore.options
-		.filter((o) => o !== currentStatus)
-		.map((o) => ({
-			label: o,
-			handler: () =>
-				tickets.setValue.submit({
-					name: ticketId,
-					status: o,
-				}),
-		}));
+  return ticketStatusStore.options
+    .filter((o) => o !== currentStatus)
+    .map((o) => ({
+      label: o,
+      handler: () =>
+        tickets.setValue.submit({
+          name: ticketId,
+          status: o,
+        }),
+    }));
 }
 
 function priorityDropdownOptions(ticketId: number, currentPriority: string) {
-	return ticketPriorityStore.names
-		.filter((o) => o !== currentPriority)
-		.map((o) => ({
-			label: o,
-			handler: () =>
-				tickets.setValue.submit({
-					name: ticketId,
-					priority: o,
-				}),
-		}));
+  return ticketPriorityStore.names
+    .filter((o) => o !== currentPriority)
+    .map((o) => ({
+      label: o,
+      handler: () =>
+        tickets.setValue.submit({
+          name: ticketId,
+          priority: o,
+        }),
+    }));
 }
 </script>
 
 <style scoped>
 :deep(.col-subject) {
-	min-width: 420px;
-	max-width: 600px;
+  width: 480px;
 }
 </style>
