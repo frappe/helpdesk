@@ -1,14 +1,13 @@
+import resolveConfig from "tailwindcss/resolveConfig";
+import tailwindConfig from "tailwind.config.js";
+
+const config = resolveConfig(tailwindConfig);
+const ignore = ["slate", "gray", "zinc", "neutral", "stone"];
+const color = Object.entries(config.theme.colors)
+	.filter((color) => !ignore.includes(color[0]))
+	.map((color) => color[1][400])
+	.filter((color) => color);
+
 export const theme = {
-	color: [
-		"#ff595e",
-		"#ff924c",
-		"#ffca3a",
-		"#c5ca30",
-		"#8ac926",
-		"#36949d",
-		"#1982c4",
-		"#4267ac",
-		"#565aa0",
-		"#6a4c93",
-	],
+	color,
 };

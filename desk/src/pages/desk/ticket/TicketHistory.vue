@@ -8,7 +8,7 @@
 				@click="sidebar.isExpanded = false"
 			/>
 		</div>
-		<div class="overflow-scroll px-4">
+		<div class="overflow-auto px-4">
 			<ol class="relative border-l border-gray-200 text-base">
 				<li
 					v-for="activity in activities"

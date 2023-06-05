@@ -498,6 +498,40 @@ class HDTicket(Document):
 			frappe.throw(_(e))
 
 	@frappe.whitelist()
+	def create_communication_via_contact(self, message, attachments=[]):
+		ticket_doc = frappe.get_doc("HD Ticket", self.name)
+
+		if ticket_doc.status == "Replied":
+			ticket_doc.status = "Open"
+			log_ticket_activity(self.name, f"status set to Open")
+			ticket_doc.save(ignore_permissions=True)
+
+		communication = frappe.new_doc("Communication")
+		communication.update(
+			{
+				"communication_type": "Communication",
+				"communication_medium": "Email",
+				"sent_or_received": "Received",
+				"email_status": "Open",
+				"subject": "Re: " + ticket_doc.subject,
+				"sender": ticket_doc.raised_by,
+				"content": message,
+				"status": "Linked",
+				"reference_doctype": "HD Ticket",
+				"reference_name": ticket_doc.name,
+			}
+		)
+		communication.ignore_permissions = True
+		communication.ignore_mandatory = True
+		communication.save(ignore_permissions=True)
+
+		for attachment in attachments:
+			file_doc = frappe.get_doc("File", attachment)
+			file_doc.attached_to_name = communication.name
+			file_doc.attached_to_doctype = "Communication"
+			file_doc.save(ignore_permissions=True)
+
+	@frappe.whitelist()
 	def mark_seen(self):
 		self.add_seen()
 
@@ -626,6 +660,25 @@ class HDTicket(Document):
 			i["sender"] = frappe.get_doc("User", i.commented_by)
 
 		return l
+
+	@frappe.whitelist()
+	def reopen(self):
+		if self.status == "Closed":
+			frappe.throw(_("Closed tickets cannot be reopened"))
+
+		if self.status != "Resolved":
+			frappe.throw(_("Only resolved tickets can be reopened"))
+
+		self.status = "Open"
+		self.save()
+
+	@frappe.whitelist()
+	def resolve(self):
+		if self.status == "Closed":
+			frappe.throw(_("Closed tickets cannot be resolved"))
+
+		self.status = "Resolved"
+		self.save()
 
 
 def set_descritption_from_communication(doc, type):

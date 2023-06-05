@@ -1,4 +1,10 @@
-export const TextEditorMenuButtons = [
+<template>
+	<TextEditorFixedMenu :buttons="MENU_BUTTONS" />
+</template>
+<script setup lang="ts">
+import { TextEditorFixedMenu } from "frappe-ui";
+
+const MENU_BUTTONS = [
 	"Paragraph",
 	["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
 	"Separator",
@@ -37,3 +43,4 @@ export const TextEditorMenuButtons = [
 	"Undo",
 	"Redo",
 ];
+</script>

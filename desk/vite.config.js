@@ -39,14 +39,18 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "src"),
+			"tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
 		},
 	},
 	build: {
 		outDir: `../helpdesk/public/desk`,
 		emptyOutDir: true,
 		target: "es2021",
+		commonjsOptions: {
+			include: [/tailwind.config.js/, /node_modules/],
+		},
 	},
 	optimizeDeps: {
-		include: ["feather-icons", "showdown"],
+		include: ["feather-icons", "showdown", "tailwind.config.js"],
 	},
 });

@@ -4,6 +4,7 @@ import frappe
 from frappe.permissions import add_permission
 
 from .welcome_ticket import create_welcome_ticket
+from .default_template import create_default_template
 
 
 def before_install():
@@ -16,12 +17,12 @@ def after_install():
 	add_default_ticket_priorities()
 	add_default_sla()
 	add_on_ticket_create_script()
-	add_default_ticket_template()
 	add_default_agent_groups()
 	update_agent_role_permissions()
 	add_default_assignment_rule()
 	add_system_preset_filters()
 	create_welcome_ticket()
+	create_default_template()
 
 
 def add_support_redirect_to_tickets():
@@ -181,39 +182,6 @@ def enable_track_service_level_agreement_in_support_settings():
 	support_settings.save()
 	frappe.db.commit()
 
-
-def add_default_ticket_template():
-	if frappe.db.exists("HD Ticket Template", "Default"):
-		return
-
-	template = frappe.new_doc("HD Ticket Template")
-
-	template.template_name = "Default"
-	template.append(
-		"fields",
-		{
-			"label": "Type",
-			"fieldname": "ticket_type",
-			"fieldtype": "Link",
-			"options": "HD Ticket Type",
-			"reqd": False,
-		},
-	)
-	template.append(
-		"fields",
-		{"label": "Subject", "fieldname": "subject", "fieldtype": "Data", "reqd": True},
-	)
-	template.append(
-		"fields",
-		{
-			"label": "Description",
-			"fieldname": "description",
-			"fieldtype": "Text Editor",
-			"reqd": True,
-		},
-	)
-
-	template.insert()
 
 
 def add_default_ticket_types():

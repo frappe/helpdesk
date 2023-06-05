@@ -22,8 +22,9 @@
   },
   {
    "fieldname": "about",
-   "fieldtype": "Text Editor",
-   "label": "About"
+   "fieldtype": "Code",
+   "label": "About",
+   "options": "HTML"
   },
   {
    "fieldname": "template_route",
@@ -40,7 +41,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-27 00:28:50.972089",
+ "modified": "2023-06-02 13:34:05.696001",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",

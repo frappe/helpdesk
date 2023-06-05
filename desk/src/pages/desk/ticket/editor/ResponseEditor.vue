@@ -1,5 +1,10 @@
 <template>
-	<div class="content mx-auto">
+	<div
+		class="content mx-auto"
+		:style="{
+			width: '742px',
+		}"
+	>
 		<div class="my-3.5 flex items-start gap-2.5">
 			<Avatar
 				:image-u-r-l="authStore.userImage"
@@ -9,8 +14,7 @@
 			<TextEditor
 				v-if="editor.isExpanded"
 				ref="editorRef"
-				class="editor-shadow grow"
-				editor-class="prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
+				class="grow"
 				:mentions="mentions"
 				:placeholder="placeholder"
 				:content="editor.content"
@@ -39,10 +43,11 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
-import { Avatar, TextEditor, TextEditorContent } from "frappe-ui";
+import { Avatar, TextEditorContent } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useAgentStore } from "@/stores/agent";
 import { useConfigStore } from "@/stores/config";
+import TextEditor from "@/components/text-editor/TextEditor.vue";
 import { useTicketStore } from "../data";
 import BottomSection from "./BottomSection.vue";
 import TopSection from "./TopSection.vue";
@@ -66,14 +71,3 @@ watch(editorRef, (e) => {
 });
 onUnmounted(() => (editor.isExpanded = false));
 </script>
-
-<style scoped>
-.content {
-	width: 742px;
-}
-
-.editor-shadow {
-	box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.45), 0px 1px 2px rgba(0, 0, 0, 0.1);
-	border-radius: 12px;
-}
-</style>
