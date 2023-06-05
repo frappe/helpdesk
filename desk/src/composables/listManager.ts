@@ -61,12 +61,6 @@ export function createListManager(options: ListOptions) {
     },
   });
 
-  list.updateArgs = () => {
-    list.filters = filterManager.queryFilters();
-    list.orderBy = filterManager.queryOrderBy();
-    list.reload();
-  };
-
   Object.assign(list, {
     totalCount: ref(0),
     totalPages: ref(0),
@@ -91,7 +85,18 @@ export function createListManager(options: ListOptions) {
   });
 
   if (auto) {
-    watch(route, list.updateArgs, { immediate: true });
+    watch(
+      route,
+      () => {
+        list.filters = {
+          ...filters,
+          ...filterManager.queryFilters(),
+        };
+        list.orderBy = filterManager.queryOrderBy();
+        list.reload();
+      },
+      { immediate: true }
+    );
   }
 
   return list;
