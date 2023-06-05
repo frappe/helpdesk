@@ -663,9 +663,6 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def reopen(self):
-		if self.status == "Closed":
-			frappe.throw(_("Closed tickets cannot be reopened"))
-
 		if self.status != "Resolved":
 			frappe.throw(_("Only resolved tickets can be reopened"))
 
