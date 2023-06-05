@@ -63,7 +63,6 @@
                   <Button
                     class="bg-gray-900 text-white hover:bg-gray-800"
                     label="Create"
-                    icon-left="check"
                     :disabled="isDisabled"
                     @click="insertRes.submit()"
                   />
