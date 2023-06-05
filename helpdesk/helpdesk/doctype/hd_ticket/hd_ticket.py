@@ -189,7 +189,6 @@ class HDTicket(Document):
 			ticket_type_doc = frappe.get_doc("HD Ticket Type", self.ticket_type)
 			if ticket_type_doc.priority:
 				self.priority = ticket_type_doc.priority
-				self.save()
 
 	def set_contact(self, email_id, save=False):
 		import email.utils
