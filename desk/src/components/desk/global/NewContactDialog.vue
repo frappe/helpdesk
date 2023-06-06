@@ -63,7 +63,7 @@
 					<div class="float-right flex space-x-2">
 						<Button
 							:loading="$resources.createContact.loading"
-							appearance="primary"
+              class="bg-gray-900 text-white hover:bg-gray-800"
 							@click="createContact()"
 							>Create</Button
 						>
