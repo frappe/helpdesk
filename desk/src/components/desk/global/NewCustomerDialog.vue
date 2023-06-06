@@ -24,7 +24,7 @@
 					</div>
 					<div class="flex float-right space-x-2">
 						<Button
-							appearance="primary"
+              class="bg-gray-900 text-white hover:bg-gray-800"
 							@click="
 								() => {
 									addCustomer()
@@ -32,7 +32,6 @@
 									this.$router.go()
 								}
 							"
-							class="mr-auto"
 							>Add</Button
 						>
 					</div>
