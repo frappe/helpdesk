@@ -18,7 +18,7 @@ export const CUSTOMER_PORTAL_TICKET = "PortalTicket";
 export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
 export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
 export const AGENT_PORTAL_TICKET = "DeskTicket";
-export const AGENT_PORTAL_LANDING = AGENT_PORTAL_DASHBOARD;
+export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
 

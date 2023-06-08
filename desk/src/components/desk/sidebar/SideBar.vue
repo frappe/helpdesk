@@ -19,9 +19,11 @@ import { useAuthStore } from "@/stores/auth";
 import { useKeymapStore } from "@/stores/keymap";
 import { useSidebarStore } from "@/stores/sidebar";
 import {
-  CUSTOMER_PORTAL_LANDING,
-  AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_CONTACT_LIST,
+  AGENT_PORTAL_CUSTOMER_LIST,
+  AGENT_PORTAL_DASHBOARD,
+  AGENT_PORTAL_TICKET_LIST,
+  CUSTOMER_PORTAL_LANDING,
 } from "@/router";
 import UserMenu from "./UserMenu.vue";
 import LinkGroup from "./LinkGroup.vue";
@@ -45,16 +47,16 @@ const sidebarStore = useSidebarStore();
 
 const menuOptions = [
   {
-    label: "Dashboard",
-    icon: IconDashboard,
-    iconActive: IconDashboardSolid,
-    to: "DeskDashboard",
-  },
-  {
     label: "Tickets",
     icon: IconTicket,
     iconActive: IconTicketSolid,
-    to: "DeskTickets",
+    to: AGENT_PORTAL_TICKET_LIST,
+  },
+  {
+    label: "Dashboard",
+    icon: IconDashboard,
+    iconActive: IconDashboardSolid,
+    to: AGENT_PORTAL_DASHBOARD,
   },
   {
     label: "Knowledge Base",
