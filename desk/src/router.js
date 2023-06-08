@@ -20,7 +20,6 @@ export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
 export const AGENT_PORTAL_TICKET = "DeskTicket";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_DASHBOARD;
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
-export const AGENT_PORTAL_CUSTOMER = "Customer";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
 
 export const KB_PUBLIC = "Knowledge Base";
@@ -219,12 +218,6 @@ const routes = [
         path: "customers",
         name: AGENT_PORTAL_CUSTOMER_LIST,
         component: () => import("@/pages/desk/CustomerList.vue"),
-      },
-      {
-        path: "customers/:id",
-        name: AGENT_PORTAL_CUSTOMER,
-        component: () => import("@/pages/desk/Customer.vue"),
-        props: true,
       },
       {
         path: "contacts",
