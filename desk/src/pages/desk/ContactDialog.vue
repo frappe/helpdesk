@@ -25,7 +25,7 @@
         </div>
         <div class="w-full space-y-2 text-sm text-gray-700">
           <div class="space-y-1">
-            <span>Emails</span>
+            <div class="text-xs">Emails</div>
             <MultiSelect
               v-model:items="emails"
               placeholder="john.doe@example.com"
@@ -33,7 +33,7 @@
             />
           </div>
           <div class="space-y-1">
-            <span>Phone Nos</span>
+            <div class="text-xs">Phone Nos</div>
             <MultiSelect
               v-model:items="phones"
               placeholder="+91 98765 43210"
