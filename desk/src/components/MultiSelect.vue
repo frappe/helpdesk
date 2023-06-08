@@ -5,7 +5,7 @@
       :key="item.value"
       :label="item.label"
       icon-right="x"
-      class="h-max w-max select-none rounded border bg-white p-1"
+      class="h-max w-max select-none rounded bg-white p-1 shadow"
       @click="remove(item)"
     />
     <Input
