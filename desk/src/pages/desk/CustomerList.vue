@@ -18,48 +18,66 @@
       :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="goToCustomer"
-    />
+      @row-click="openCustomer"
+    >
+      <template #name="{ data }">
+        <div class="flex items-center gap-2">
+          <Avatar :label="data.name" :image-u-r-l="data.image" size="sm" />
+          <div class="line-clamp-1">{{ data.name }}</div>
+        </div>
+      </template>
+    </HelpdeskTable>
     <ListNavigation class="p-3" v-bind="customers" />
     <NewCustomerDialog
       v-model="isDialogVisible"
       @close="isDialogVisible = false"
     />
+    <span v-if="isCustomerDialogVisible">
+      <CustomerDialog
+        v-model="isCustomerDialogVisible"
+        :name="selectedCustomer"
+      />
+    </span>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { AGENT_PORTAL_CUSTOMER } from "@/router";
+import { Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import CustomerDialog from "./CustomerDialog.vue";
 
-const router = useRouter();
 const isDialogVisible = ref(false);
+const isCustomerDialogVisible = ref(false);
+const selectedCustomer = ref(null);
 const columns = [
   {
     title: "Name",
-    isTogglable: false,
     colKey: "name",
-    colClass: "w-1/2",
+    colClass: "w-1/3",
+  },
+  {
+    title: "Domain",
+    colKey: "domain",
+    colClass: "w-1/3",
+  },
+  {
+    title: "Tickets",
+    colKey: "ticket_count",
   },
 ];
 
 const customers = createListManager({
   doctype: "HD Customer",
-  fields: ["name"],
+  fields: ["name", "image", "domain", "ticket_count"],
   auto: true,
 });
 
-function goToCustomer(id: string) {
-  router.push({
-    name: AGENT_PORTAL_CUSTOMER,
-    params: {
-      id,
-    },
-  });
+function openCustomer(id: string) {
+  selectedCustomer.value = id;
+  isCustomerDialogVisible.value = true;
 }
 </script>
