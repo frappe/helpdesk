@@ -1,16 +1,18 @@
 from datetime import datetime, timedelta
 
 import frappe
+from frappe.query_builder.functions import Count
 
 
 @frappe.whitelist()
 def get_all():
 	return [
-		ticket_statuses(),
 		avg_first_response_time(),
-		ticket_types(),
-		new_tickets(),
 		resolution_within_sla(),
+		my_open_tickets(),
+		ticket_statuses(),
+		new_tickets(),
+		ticket_types(),
 		ticket_activity(),
 		ticket_priority(),
 	]
@@ -59,7 +61,7 @@ def avg_first_response_time():
 		res = f"{h} Hours"
 
 	return {
-		"title": "Avg First Response Time",
+		"title": "Avg. first response time",
 		"is_chart": False,
 		"data": res,
 	}
@@ -97,7 +99,7 @@ def new_tickets():
 	)
 
 	return {
-		"title": "New Tickets",
+		"title": "New tickets",
 		"is_chart": True,
 		"chart_type": "Line",
 		"data": res,
@@ -132,7 +134,7 @@ def resolution_within_sla():
 		res = str(resolution_within_sla_percentage) + "%"
 
 	return {
-		"title": "Resolution Within SLA",
+		"title": "Resolution within SLA",
 		"is_chart": False,
 		"data": res,
 	}
@@ -173,5 +175,32 @@ def ticket_priority():
 		"title": "Priority",
 		"is_chart": True,
 		"chart_type": "Pie",
+		"data": res,
+	}
+
+
+def my_open_tickets():
+	QBTicket = frappe.qb.DocType("HD Ticket")
+	like_str = f"%{frappe.session.user}%"
+	like_query = QBTicket._assign.like(like_str)
+
+	res = (
+		frappe.qb.from_(QBTicket)
+		.select(Count(QBTicket.name, "count"))
+		.select(QBTicket.status)
+		.where(like_query)
+		.where(QBTicket.status.isin(["Open", "Replied"]))
+		.groupby(QBTicket.status)
+		.run(as_dict=True)
+	)
+
+	def map_row(row):
+		return f"{row['count']} {row['status']}"
+
+	res = " / ".join(map(map_row, res)).lower()
+
+	return {
+		"title": "My tickets",
+		"is_chart": False,
 		"data": res,
 	}
