@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useKeymapStore } from "@/stores/keymap";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -49,11 +49,11 @@ import IconTeam from "~icons/lucide/users";
 import IconTicket from "~icons/lucide/ticket";
 import IconTicketType from "~icons/lucide/folder-open";
 
+const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
-const showExtra = ref(false);
 
 const menuOptions = computed(() => [
   {
@@ -141,4 +141,6 @@ const profileSettings = [
     handler: () => authStore.logout(),
   },
 ];
+
+const showExtra = ref(!!extraOptions.find((o) => o.to === route.name));
 </script>
