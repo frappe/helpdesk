@@ -3,9 +3,10 @@
     <PageTitle title="Contacts">
       <template #right>
         <Button
-          icon-left="plus"
           label="New contact"
-          class="bg-gray-900 text-white hover:bg-gray-800"
+          icon-left="plus"
+          theme="gray"
+          variant="solid"
           @click="isDialogVisible = !isDialogVisible"
         />
       </template>

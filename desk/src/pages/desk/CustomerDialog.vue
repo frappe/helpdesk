@@ -85,8 +85,9 @@ const options = computed(() => ({
   actions: [
     {
       label: "Save",
-      class: "bg-gray-900 text-white hover:bg-gray-800",
       iconLeft: "check",
+      theme: "gray",
+      variant: "solid",
       onClick: () => update(),
     },
   ],

@@ -61,9 +61,10 @@
               >
                 <template #actions-right>
                   <Button
-                    class="bg-gray-900 text-white hover:bg-gray-800"
                     label="Create"
                     :disabled="isDisabled"
+                    theme="gray"
+                    variant="solid"
                     @click="insertRes.submit()"
                   />
                 </template>

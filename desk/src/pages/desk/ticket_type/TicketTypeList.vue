@@ -4,9 +4,10 @@
       <template #right>
         <RouterLink :to="{ name: AGENT_PORTAL_TICKET_TYPE_NEW }">
           <Button
-            icon-left="plus"
             label="New ticket type"
-            class="bg-gray-900 text-white hover:bg-gray-800"
+            icon-left="plus"
+            theme="gray"
+            variant="solid"
           />
         </RouterLink>
       </template>

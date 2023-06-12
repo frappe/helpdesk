@@ -6,7 +6,8 @@
           <Button
             icon-left="plus"
             label="New email account"
-            class="bg-gray-900 text-white hover:bg-gray-800"
+            theme="gray"
+            variant="solid"
           />
         </RouterLink>
       </template>

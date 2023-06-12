@@ -3,9 +3,10 @@
     <PageTitle title="Canned Responses">
       <template #right>
         <Button
-          icon-left="plus"
           label="New canned response"
-          class="bg-gray-900 text-white hover:bg-gray-800"
+          icon-left="plus"
+          theme="gray"
+          variant="solid"
           @click="showNewDialog = true"
         />
       </template>

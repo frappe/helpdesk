@@ -3,9 +3,10 @@
     <PageTitle title="Customers">
       <template #right>
         <Button
-          icon-left="plus"
           label="New customer"
-          class="bg-gray-900 text-white hover:bg-gray-800"
+          icon-left="plus"
+          theme="gray"
+          variant="solid"
           @click="isDialogVisible = !isDialogVisible"
         />
       </template>
