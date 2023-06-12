@@ -25,10 +25,18 @@
         <div class="flex justify-between">
           <span>{{ data.email_id }}</span>
           <div class="space-x-2">
-            <Badge v-if="data.default_incoming" color="blue"
+            <Badge
+              v-if="data.default_incoming"
+              theme="blue"
+              variant="subtle"
+              size="md"
               >Default incoming</Badge
             >
-            <Badge v-if="data.default_outgoing" color="yellow"
+            <Badge
+              v-if="data.default_outgoing"
+              theme="green"
+              variant="subtle"
+              size="md"
               >Default outgoing</Badge
             >
           </div>

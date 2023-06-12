@@ -24,7 +24,9 @@
             <Avatar :label="data.name" :image="data.user_image" size="sm" />
             <div class="line-clamp-1">{{ data.full_name }}</div>
           </div>
-          <Badge v-if="!data.is_active">Inactive</Badge>
+          <Badge v-if="data.is_active" size="md" theme="orange" variant="subtle"
+            >Inactive</Badge
+          >
         </div>
       </template>
       <template #row-extra="{ data }">
