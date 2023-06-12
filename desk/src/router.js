@@ -294,7 +294,7 @@ const routes = [
         props: true,
       },
       {
-        path: "canned_response",
+        path: "canned-responses",
         name: AGENT_PORTAL_CANNED_RESPONSE_LIST,
         component: () =>
           import("@/pages/desk/canned_response/CannedResponseList.vue"),
