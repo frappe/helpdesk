@@ -76,8 +76,8 @@ import { createToast } from "@/utils/toasts";
 import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
-import IconCaretDown from "~icons/ph/caret-down";
-import IconCaretUp from "~icons/ph/caret-up";
+import IconCaretDown from "~icons/lucide/chevron-down";
+import IconCaretUp from "~icons/lucide/chevron-up";
 
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();

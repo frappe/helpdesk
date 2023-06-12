@@ -55,8 +55,8 @@ import { Avatar, Dropdown } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { CUSTOMER_PORTAL_LANDING, KB_PUBLIC } from "@/router";
-import IconCaretDown from "~icons/ph/caret-down";
-import IconCaretUp from "~icons/ph/caret-up";
+import IconCaretDown from "~icons/lucide/chevron-down";
+import IconCaretUp from "~icons/lucide/chevron-up";
 
 const router = useRouter();
 const authStore = useAuthStore();
