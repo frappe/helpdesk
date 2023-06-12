@@ -125,8 +125,8 @@
           <div class="text-gray-300">&#x007C;</div>
           <Button
             class="text-gray-700"
-            appearance="minimal"
             :disabled="allSelected"
+            variant="ghosted"
             @click="toggleAllRows(true)"
           >
             Select all

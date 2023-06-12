@@ -57,7 +57,7 @@
             class="flex cursor-pointer items-center gap-1 text-gray-700"
             label="Assign"
             icon-left="plus-circle"
-            appearance="minimal"
+            variant="ghost"
           />
         </template>
       </Dropdown>
