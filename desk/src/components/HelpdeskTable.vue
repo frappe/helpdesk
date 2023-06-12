@@ -126,7 +126,7 @@
           <Button
             class="text-gray-700"
             :disabled="allSelected"
-            variant="ghosted"
+            variant="ghost"
             @click="toggleAllRows(true)"
           >
             Select all
