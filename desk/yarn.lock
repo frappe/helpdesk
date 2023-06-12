@@ -142,6 +142,13 @@
   resolved "https://registry.yarnpkg.com/@headlessui/vue/-/vue-1.7.12.tgz#963b2eb2f548278c49f2d1e67f0a4a84f54078da"
   integrity sha512-IV0k1I2I8Bj37HljFF231Y9cpldfiucf+inMCxA/VPoQT6UTxo0N/rb78CrogBxXNfsPxKmz3y/nlv+eRz6zvg==
 
+"@iconify-json/lucide@^1.1.99":
+  version "1.1.99"
+  resolved "https://registry.yarnpkg.com/@iconify-json/lucide/-/lucide-1.1.99.tgz#f39cfe58cf102d8302fbea8d6fefa0e62ba5371d"
+  integrity sha512-2d908sOUl3tow5QWNU94GQvC1eFt6Zd+/o6MzvVeoNjt7xXLBUYPUkcFQJYbjDCeqaxxk80YwH62PE2krefL8Q==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify-json/ph@^1.1.5":
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/@iconify-json/ph/-/ph-1.1.5.tgz#157a7559945c2c86bab0821091ef5181c7b9929e"

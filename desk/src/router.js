@@ -11,19 +11,35 @@ export const VERIFY = "Verify Account";
 export const AUTH_ROUTES = [LOGIN, SIGNUP, VERIFY];
 export const ONBOARDING_PAGE = "Setup";
 
-export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
 export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
 export const CUSTOMER_PORTAL_TICKET = "PortalTicket";
 
-export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
-export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
-export const AGENT_PORTAL_TICKET = "DeskTicket";
-export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
+export const AGENT_PORTAL_AGENT_LIST = "AgentList";
+export const AGENT_PORTAL_CANNED_RESPONSE_LIST = "CannedResponses";
+export const AGENT_PORTAL_CANNED_RESPONSE_SINGLE = "CannedResponse";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
+export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
+export const AGENT_PORTAL_EMAIL_LIST = "Emails";
+export const AGENT_PORTAL_EMAIL_NEW = "NewEmailAccount";
+export const AGENT_PORTAL_EMAIL_SINGLE = "EmailAccount";
+export const AGENT_PORTAL_SLA_LIST = "SlaPolicies";
+export const AGENT_PORTAL_SLA_NEW = "NewSlaPolicy";
+export const AGENT_PORTAL_SLA_SINGLE = "SlaPolicy";
+export const AGENT_PORTAL_TEAM_LIST = "Teams";
+export const AGENT_PORTAL_TEAM_SINGLE = "Team";
+export const AGENT_PORTAL_TEAM_NEW = "NewTeam";
+export const AGENT_PORTAL_TICKET = "DeskTicket";
+export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
+export const AGENT_PORTAL_TICKET_TYPE_LIST = "TicketTypes";
+export const AGENT_PORTAL_TICKET_TYPE_NEW = "NewTicketType";
+export const AGENT_PORTAL_TICKET_TYPE_SINGLE = "TicketType";
 
 export const KB_PUBLIC = "Knowledge Base";
 export const KB_PUBLIC_ARTICLE = "PortalKBArticle";
+
+export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 
 const routes = [
   {
@@ -225,115 +241,86 @@ const routes = [
         component: () => import("@/pages/desk/ContactList.vue"),
       },
       {
-        path: "settings",
-        name: "Settings",
-        component: () => import("@/pages/desk/settings/Settings.vue"),
-        children: [
-          {
-            path: "",
-            redirect: () => {
-              return { path: "/helpdesk/settings/agents" };
-            },
-          },
-          {
-            path: "agents",
-            name: "Agents",
-            component: () => import("@/pages/desk/settings/agent/Agents.vue"),
-          },
-          {
-            path: "agents/:agentId",
-            name: "Agent",
-            component: () => import("@/pages/desk/settings/agent/Agent.vue"),
-            props: true,
-          },
-          {
-            path: "teams",
-            name: "Teams",
-            component: () => import("@/pages/desk/settings/team/Teams.vue"),
-          },
-          {
-            path: "teams/:teamId",
-            name: "Team",
-            component: () => import("@/pages/desk/settings/team/Team.vue"),
-            props: true,
-          },
-          {
-            path: "teams/new",
-            name: "NewTeam",
-            component: () => import("@/pages/desk/settings/team/Team.vue"),
-          },
-          {
-            path: "ticket_types",
-            name: "TicketTypes",
-            component: () =>
-              import("@/pages/desk/settings/ticket_type/TicketTypes.vue"),
-          },
-          {
-            path: "ticket_types/:ticketTypeId",
-            name: "TicketType",
-            component: () =>
-              import("@/pages/desk/settings/ticket_type/TicketType.vue"),
-            props: true,
-          },
-          {
-            path: "ticket_types/new",
-            name: "NewTicketType",
-            component: () =>
-              import("@/pages/desk/settings/ticket_type/TicketType.vue"),
-          },
-          {
-            path: "sla",
-            name: "SlaPolicies",
-            component: () =>
-              import("@/pages/desk/settings/sla/SlaPolicies.vue"),
-          },
-          {
-            path: "sla/new",
-            name: "NewSlaPolicy",
-            component: () => import("@/pages/desk/settings/sla/SlaPolicy.vue"),
-          },
-          {
-            path: "sla/:slaId",
-            name: "SlaPolicy",
-            component: () => import("@/pages/desk/settings/sla/SlaPolicy.vue"),
-            props: true,
-          },
-          {
-            path: "canned_response",
-            name: "CannedResponses",
-            component: () =>
-              import(
-                "@/pages/desk/settings/canned_response/CannedResponses.vue"
-              ),
-          },
-          {
-            path: "canned_responses/:canned_responseId",
-            name: "CannedResponse",
-            component: () =>
-              import(
-                "@/pages/desk/settings/canned_response/CannedResponse.vue"
-              ),
-            props: true,
-          },
-          {
-            path: "emails",
-            name: "Emails",
-            component: () => import("@/pages/desk/settings/email/Emails.vue"),
-          },
-          {
-            path: "emails/new",
-            name: "NewEmailAccount",
-            component: () =>
-              import("@/pages/desk/settings/email/EmailAccount.vue"),
-          },
-          {
-            path: "emails/:emailAccountId",
-            name: "EmailAccount",
-            component: () =>
-              import("@/pages/desk/settings/email/EmailAccount.vue"),
-            props: true,
-          },
-        ],
+        path: "agents",
+        name: AGENT_PORTAL_AGENT_LIST,
+        component: () => import("@/pages/desk/agent/AgentList.vue"),
+      },
+      {
+        path: "teams",
+        name: AGENT_PORTAL_TEAM_LIST,
+        component: () => import("@/pages/desk/team/TeamList.vue"),
+      },
+      {
+        path: "teams/:teamId",
+        name: AGENT_PORTAL_TEAM_SINGLE,
+        component: () => import("@/pages/desk/team/Team.vue"),
+        props: true,
+      },
+      {
+        path: "teams/new",
+        name: AGENT_PORTAL_TEAM_NEW,
+        component: () => import("@/pages/desk/team/Team.vue"),
+      },
+      {
+        path: "ticket-types",
+        name: AGENT_PORTAL_TICKET_TYPE_LIST,
+        component: () => import("@/pages/desk/ticket_type/TicketTypeList.vue"),
+      },
+      {
+        path: "ticket-types/:id",
+        name: AGENT_PORTAL_TICKET_TYPE_SINGLE,
+        component: () => import("@/pages/desk/ticket_type/TicketType.vue"),
+        props: true,
+      },
+      {
+        path: "ticket-types/new",
+        name: AGENT_PORTAL_TICKET_TYPE_NEW,
+        component: () => import("@/pages/desk/ticket_type/TicketType.vue"),
+      },
+      {
+        path: "sla",
+        name: AGENT_PORTAL_SLA_LIST,
+        component: () => import("@/pages/desk/sla/SlaList.vue"),
+      },
+      {
+        path: "sla/new",
+        name: AGENT_PORTAL_SLA_NEW,
+        component: () => import("@/pages/desk/sla/SlaPolicy.vue"),
+      },
+      {
+        path: "sla/:id",
+        name: AGENT_PORTAL_SLA_SINGLE,
+        component: () => import("@/pages/desk/sla/SlaPolicy.vue"),
+        props: true,
+      },
+      {
+        path: "canned-responses",
+        name: AGENT_PORTAL_CANNED_RESPONSE_LIST,
+        component: () =>
+          import("@/pages/desk/canned_response/CannedResponseList.vue"),
+      },
+      {
+        path: "canned-responses/:id",
+        name: AGENT_PORTAL_CANNED_RESPONSE_SINGLE,
+        component: () =>
+          import("@/pages/desk/canned_response/CannedResponseSingle.vue"),
+        props: true,
+      },
+      {
+        path: "emails",
+        name: AGENT_PORTAL_EMAIL_LIST,
+        component: () => import("@/pages/desk/email/EmailList.vue"),
+      },
+      {
+        path: "emails/new",
+        name: AGENT_PORTAL_EMAIL_NEW,
+        component: () => import("@/pages/desk/email/EmailAccount.vue"),
+      },
+      {
+        path: "emails/:emailAccountId",
+        name: AGENT_PORTAL_EMAIL_SINGLE,
+        component: () => import("@/pages/desk/email/EmailAccount.vue"),
+        props: true,
       },
     ],
   },

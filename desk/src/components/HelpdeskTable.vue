@@ -81,7 +81,7 @@
           >
             <slot v-if="isColVisible(column)" :name="column.colKey" :data="row">
               <div class="line-clamp-1">
-                {{ row[column.colKey] }}
+                {{ row[column.colKey] || "—" }}
               </div>
             </slot>
           </div>

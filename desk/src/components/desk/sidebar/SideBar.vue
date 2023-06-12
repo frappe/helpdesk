@@ -8,82 +8,116 @@
   >
     <UserMenu class="pb-2" :options="profileSettings" />
     <LinkGroup :options="menuOptions" />
-    <div class="grow"></div>
-    <LinkGroup :options="footerOptions" />
+    <span v-if="showExtra">
+      <hr class="my-2" />
+      <LinkGroup :options="extraOptions" />
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useKeymapStore } from "@/stores/keymap";
 import { useSidebarStore } from "@/stores/sidebar";
 import {
+  AGENT_PORTAL_AGENT_LIST,
+  AGENT_PORTAL_CANNED_RESPONSE_LIST,
   AGENT_PORTAL_CONTACT_LIST,
   AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_DASHBOARD,
+  AGENT_PORTAL_EMAIL_LIST,
+  AGENT_PORTAL_SLA_LIST,
+  AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
+  AGENT_PORTAL_TICKET_TYPE_LIST,
   CUSTOMER_PORTAL_LANDING,
 } from "@/router";
 import UserMenu from "./UserMenu.vue";
 import LinkGroup from "./LinkGroup.vue";
-import IconDashboard from "~icons/espresso/dashboard";
-import IconDashboardSolid from "~icons/espresso/dashboard-solid";
-import IconTicket from "~icons/espresso/ticket";
-import IconTicketSolid from "~icons/espresso/ticket-solid";
-import IconCustomer from "~icons/espresso/customer";
-import IconCustomerSolid from "~icons/espresso/customer-solid";
-import IconContact from "~icons/espresso/contact";
-import IconContactSolid from "~icons/espresso/contact-solid";
-import IconKnowledgeBase from "~icons/espresso/knowledge-base";
-import IconKnowledgeBaseSolid from "~icons/espresso/knowledge-base-solid";
-import IconSettings from "~icons/espresso/settings";
-import IconSettingsSolid from "~icons/espresso/settings-solid";
+import IconAgent from "~icons/lucide/user";
+import IconAt from "~icons/lucide/at-sign";
+import IconCannedResponse from "~icons/lucide/cloud-lightning";
+import IconContact from "~icons/lucide/contact-2";
+import IconCustomer from "~icons/lucide/user-circle-2";
+import IconDashboard from "~icons/lucide/layout-grid";
+import IconKnowledgeBase from "~icons/lucide/book-open";
+import IconMore from "~icons/lucide/more-horizontal";
+import IconSLA from "~icons/lucide/scroll-text";
+import IconTeam from "~icons/lucide/users";
+import IconTicket from "~icons/lucide/ticket";
+import IconTicketType from "~icons/lucide/folder-open";
 
+const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
 
-const menuOptions = [
+const menuOptions = computed(() => [
   {
     label: "Tickets",
     icon: IconTicket,
-    iconActive: IconTicketSolid,
     to: AGENT_PORTAL_TICKET_LIST,
   },
   {
     label: "Dashboard",
     icon: IconDashboard,
-    iconActive: IconDashboardSolid,
     to: AGENT_PORTAL_DASHBOARD,
   },
   {
-    label: "Knowledge Base",
+    label: "Agents",
+    icon: IconAgent,
+    to: AGENT_PORTAL_AGENT_LIST,
+  },
+  {
+    label: "Knowledge base",
     icon: IconKnowledgeBase,
-    iconActive: IconKnowledgeBaseSolid,
     to: "DeskKBHome",
+  },
+  {
+    label: showExtra.value ? "Less" : "More",
+    icon: IconMore,
+    handler: () => (showExtra.value = !showExtra.value),
+  },
+]);
+
+const extraOptions = [
+  {
+    label: "Support policies",
+    icon: IconSLA,
+    to: AGENT_PORTAL_SLA_LIST,
+  },
+  {
+    label: "Teams",
+    icon: IconTeam,
+    to: AGENT_PORTAL_TEAM_LIST,
+  },
+  {
+    label: "Email accounts",
+    icon: IconAt,
+    to: AGENT_PORTAL_EMAIL_LIST,
+  },
+  {
+    label: "Ticket types",
+    icon: IconTicketType,
+    to: AGENT_PORTAL_TICKET_TYPE_LIST,
+  },
+  {
+    label: "Canned responses",
+    icon: IconCannedResponse,
+    to: AGENT_PORTAL_CANNED_RESPONSE_LIST,
   },
   {
     label: "Customers",
     icon: IconCustomer,
-    iconActive: IconCustomerSolid,
     to: AGENT_PORTAL_CUSTOMER_LIST,
   },
   {
     label: "Contacts",
     icon: IconContact,
-    iconActive: IconContactSolid,
     to: AGENT_PORTAL_CONTACT_LIST,
-  },
-];
-
-const footerOptions = [
-  {
-    label: "Settings",
-    icon: IconSettings,
-    iconActive: IconSettingsSolid,
-    to: "Settings",
   },
 ];
 
@@ -107,4 +141,6 @@ const profileSettings = [
     handler: () => authStore.logout(),
   },
 ];
+
+const showExtra = ref(!!extraOptions.find((o) => o.to === route.name));
 </script>
