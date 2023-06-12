@@ -8,7 +8,7 @@
         <Avatar
           size="lg"
           :label="customer.doc?.name"
-          :image-u-r-l="customer.doc?.image"
+          :image="customer.doc?.image"
           class="cursor-pointer hover:opacity-80"
         />
         <div class="flex gap-2">

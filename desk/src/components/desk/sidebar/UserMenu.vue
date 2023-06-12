@@ -10,7 +10,7 @@
         <Avatar
           size="sm"
           :label="authStore.userName"
-          :image-u-r-l="authStore.userImage"
+          :image="authStore.userImage"
         />
         <div
           class="flex shrink-0 items-center gap-1 text-gray-800 duration-300"

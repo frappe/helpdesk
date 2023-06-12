@@ -22,7 +22,7 @@
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">
-          <Avatar :label="data.name" :image-u-r-l="data.image" size="sm" />
+          <Avatar :label="data.name" :image="data.image" size="sm" />
           <div class="line-clamp-1">{{ data.name }}</div>
         </div>
       </template>

@@ -18,7 +18,7 @@
     >
       {{ isEmptyMessage }}
     </div>
-    <ListNavigation v-bind="tickets" class="p-3" />
+    <ListNavigation v-bind="tickets" class="p-2" />
     <NewTicketDialog
       v-model="isDialogVisible"
       @close="isDialogVisible = false"

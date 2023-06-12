@@ -21,11 +21,7 @@
       <template #name="{ data }">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <Avatar
-              :label="data.name"
-              :image-u-r-l="data.user_image"
-              size="sm"
-            />
+            <Avatar :label="data.name" :image="data.user_image" size="sm" />
             <div class="line-clamp-1">{{ data.full_name }}</div>
           </div>
           <Badge v-if="!data.is_active">Inactive</Badge>

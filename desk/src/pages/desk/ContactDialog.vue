@@ -8,7 +8,7 @@
         <Avatar
           size="lg"
           :label="contact.doc?.name"
-          :image-u-r-l="contact.doc?.image"
+          :image="contact.doc?.image"
           class="cursor-pointer hover:opacity-80"
         />
         <div class="flex gap-2">
