@@ -32,6 +32,7 @@
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
+		"@iconify-json/lucide": "^1.1.99",
 		"@iconify-json/ph": "^1.1.5",
 		"tailwindcss": "^3.2.7",
 		"unplugin-icons": "^0.16.1",
