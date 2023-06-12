@@ -79,7 +79,7 @@ const menuOptions = computed(() => [
   {
     label: showExtra.value ? "Less" : "More",
     icon: IconMore,
-    handler: () => (showExtra.value = !showExtra.value),
+    onClick: () => (showExtra.value = !showExtra.value),
   },
 ]);
 
@@ -125,12 +125,12 @@ const profileSettings = [
   {
     label: "Shortcuts",
     icon: "command",
-    handler: () => keymapStore.toggleVisibility(true),
+    onClick: () => keymapStore.toggleVisibility(true),
   },
   {
     label: "Customer portal",
     icon: "users",
-    handler: () => {
+    onClick: () => {
       const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
       window.open(path.href, "_blank");
     },
@@ -138,7 +138,7 @@ const profileSettings = [
   {
     label: "Log out",
     icon: "log-out",
-    handler: () => authStore.logout(),
+    onClick: () => authStore.logout(),
   },
 ];
 

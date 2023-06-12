@@ -43,7 +43,7 @@ const props = defineProps({
     required: false,
     default: "",
   },
-  handler: {
+  onClick: {
     type: Function,
     required: false,
     default: () => true,
@@ -56,7 +56,7 @@ const sidebarStore = useSidebarStore();
 const isActive = computed(() => props.to.includes(route.name.toString()));
 
 function handle() {
-  props.handler();
+  props.onClick();
   if (props.to) {
     router.push({
       name: props.to,

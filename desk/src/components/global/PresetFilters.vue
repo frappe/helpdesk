@@ -79,7 +79,7 @@ export default {
 							items: data[group].map((item) => {
 								return {
 									label: item.title,
-									handler: () => {
+									onClick: () => {
 										this.title = item.title
 										this.presetFilters = [...item.filters]
 										this.manager.addFilters(

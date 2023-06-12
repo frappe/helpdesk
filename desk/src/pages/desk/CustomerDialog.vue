@@ -87,7 +87,7 @@ const options = computed(() => ({
       label: "Save",
       class: "bg-gray-900 text-white hover:bg-gray-800",
       iconLeft: "check",
-      handler: () => update(),
+      onClick: () => update(),
     },
   ],
 }));

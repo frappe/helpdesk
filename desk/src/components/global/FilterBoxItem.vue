@@ -118,7 +118,7 @@ export default {
 			return getOperatorsForDataType(dataType).map((operator) => {
 				return {
 					label: operator,
-					handler: () => {
+					onClick: () => {
 						this.filter.filter_type = operator
 						if (!this.filter.value) {
 							this.toggleDropdown("value")

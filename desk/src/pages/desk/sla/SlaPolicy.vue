@@ -618,7 +618,7 @@ export default {
         this.ticketPriorityStore.options.forEach((priority) => {
           priorityItems.push({
             label: priority.name,
-            handler: () => {
+            onClick: () => {
               this.rules[index].priority = priority.name;
             },
           });
@@ -634,7 +634,7 @@ export default {
         this.serviceHolidayList.forEach((holiday) => {
           serviceHolidayListItems.push({
             label: holiday.name,
-            handler: () => {
+            onClick: () => {
               // TODO: selecte the service holiday list
               this.selectedHolidayList = holiday.name;
             },

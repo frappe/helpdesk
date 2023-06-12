@@ -89,7 +89,7 @@ function deleteComment() {
 if (sender.value.name === authStore.userId) {
   options.value.push({
     label: "Delete",
-    handler: () => deleteComment(),
+    onClick: () => deleteComment(),
   });
 }
 </script>

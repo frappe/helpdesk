@@ -169,7 +169,7 @@ const bulkAssignTicketToAgent = createResource({
 function assignOpts(selected: Set<number>) {
   return agentStore.options.map((a) => ({
     label: a.agent_name,
-    handler: () =>
+    onClick: () =>
       bulkAssignTicketToAgent.submit({
         ticket_ids: Array.from(selected),
         agent_id: a.name,
@@ -182,7 +182,7 @@ function statusDropdownOptions(ticketId: number, currentStatus: string) {
     .filter((o) => o !== currentStatus)
     .map((o) => ({
       label: o,
-      handler: () =>
+      onClick: () =>
         tickets.setValue.submit({
           name: ticketId,
           status: o,
@@ -195,7 +195,7 @@ function priorityDropdownOptions(ticketId: number, currentPriority: string) {
     .filter((o) => o !== currentPriority)
     .map((o) => ({
       label: o,
-      handler: () =>
+      onClick: () =>
         tickets.setValue.submit({
           name: ticketId,
           priority: o,

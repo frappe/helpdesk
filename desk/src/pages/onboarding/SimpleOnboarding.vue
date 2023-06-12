@@ -14,7 +14,7 @@
 					:label="action.label"
 					:appearance="action.appearance"
 					:class="action.class"
-					@click="action.handler"
+					@click="action.onClick"
 				/>
 			</div>
 		</div>
@@ -75,7 +75,7 @@ const actions = computed(() =>
 		{
 			label: "← Previous",
 			appearance: "minimal",
-			handler() {
+			onClick() {
 				step.value--;
 			},
 			condition: step.value + 1 > 1 && step.value + 1 <= steps.length,
@@ -84,7 +84,7 @@ const actions = computed(() =>
 			label: "Next →",
 			appearance: "primary",
 			class: "bg-gray-900 hover:bg-gray-800 text-sm",
-			handler() {
+			onClick() {
 				step.value++;
 			},
 			condition: step.value + 1 < steps.length,
@@ -93,7 +93,7 @@ const actions = computed(() =>
 			label: "Finish ✓",
 			appearance: "primary",
 			class: "bg-gray-900 hover:bg-gray-800 text-sm",
-			handler() {
+			onClick() {
 				finish();
 			},
 			condition: step.value + 1 === steps.length,

@@ -65,7 +65,7 @@ const sortOptionsRes = createResource({
 const sortOptions = computed(() => {
   return sortOptionsRes.data?.map((o) => ({
     label: o,
-    handler: () =>
+    onClick: () =>
       router.push({
         query: {
           ...route.query,
@@ -78,14 +78,14 @@ const sortOptions = computed(() => {
 const byStatus = computed(() =>
   ticketStatusStore.options.map((status) => ({
     label: status,
-    handler: () => filterByField("status", status),
+    onClick: () => filterByField("status", status),
   }))
 );
 
 const byPriority = computed(() =>
   ticketPriorityStore.names.map((priority) => ({
     label: priority,
-    handler: () => filterByField("priority", priority),
+    onClick: () => filterByField("priority", priority),
   }))
 );
 

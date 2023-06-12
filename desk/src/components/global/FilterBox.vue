@@ -83,7 +83,7 @@ export default {
 				) {
 					options.push({
 						label,
-						handler: () => {
+						onClick: () => {
 							this.createNewFilterItem(fieldname, label)
 						},
 					})

@@ -73,11 +73,11 @@ const showCannedResponses = ref(false);
 const dropdownOptions = [
 	{
 		label: "Reply",
-		handler: () => newCommunication(),
+		onClick: () => newCommunication(),
 	},
 	{
 		label: "Comment",
-		handler: () => newComment(),
+		onClick: () => newComment(),
 	},
 ];
 

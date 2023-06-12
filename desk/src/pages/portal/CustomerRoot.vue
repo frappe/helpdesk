@@ -66,7 +66,7 @@ const options = [
   {
     label: "Knowledge Base",
     icon: "book-open",
-    handler: () => {
+    onClick: () => {
       const path = router.resolve({ name: KB_PUBLIC });
       window.open(path.href, "_blank");
     },
@@ -74,7 +74,7 @@ const options = [
   {
     label: "My Account",
     icon: "user",
-    handler: () => {
+    onClick: () => {
       const protocol = window.location.protocol;
       const domain = window.location.hostname;
       const path = protocol + "//" + domain + "/me";
@@ -84,7 +84,7 @@ const options = [
   {
     label: "Log out",
     icon: "log-out",
-    handler: () => authStore.logout(),
+    onClick: () => authStore.logout(),
   },
 ];
 </script>

@@ -81,7 +81,7 @@
 								:options="[
 									{
 										label: 'Draft',
-										handler: () => {
+										onClick: () => {
 											$resources.setStatusForArticles
 												.submit({
 													articles: Object.keys(selectedItems),
@@ -94,7 +94,7 @@
 									},
 									{
 										label: 'Published',
-										handler: () => {
+										onClick: () => {
 											$resources.setStatusForArticles
 												.submit({
 													articles: Object.keys(selectedItems),

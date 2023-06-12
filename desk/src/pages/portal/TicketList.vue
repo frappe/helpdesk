@@ -123,19 +123,19 @@ const dropdownTitle = ref("All tickets");
 const dropdownOptions = [
   {
     label: "All tickets",
-    handler() {
+    onClick() {
       filter("All tickets", { status: undefined });
     },
   },
   {
     label: "Open tickets",
-    handler() {
+    onClick() {
       filter("Open tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
     },
   },
   {
     label: "Closed tickets",
-    handler() {
+    onClick() {
       filter("Closed tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
     },
   },

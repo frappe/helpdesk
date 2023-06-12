@@ -64,7 +64,7 @@ export default {
 
                 return {
                   label: item.title,
-                  handler: () => {
+                  onClick: () => {
                     this.listFilters.applyQuery(q);
                   },
                 };
