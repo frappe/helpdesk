@@ -39,8 +39,8 @@
 import { computed, toRefs } from "vue";
 import { createDocumentResource } from "frappe-ui";
 import IconHash from "~icons/espresso/hash";
-import IconMail from "~icons/espresso/mail";
-import IconComment from "~icons/espresso/comment";
+import IconMail from "~icons/lucide/mail";
+import IconComment from "~icons/lucide/message-square";
 
 const props = defineProps({
   ticketName: {
