@@ -50,20 +50,17 @@ const routes = [
   {
     path: "/login",
     name: LOGIN,
-    component: () => import("@/pages/auth/Login.vue"),
+    component: () => import("@/pages/auth/AuthLogin.vue"),
   },
   {
     path: "/signup",
     name: SIGNUP,
-    component: () => import("@/pages/auth/Signup.vue"),
+    component: () => import("@/pages/auth/AuthSignup.vue"),
   },
   {
     path: "/verify/:requestKey",
     name: VERIFY,
-    component: () =>
-      import(
-        /* webpackChunkName: "setup-account" */ "@/pages/auth/VerifyAccount.vue"
-      ),
+    component: () => import("@/pages/auth/AuthVerify.vue"),
     props: true,
   },
   {
