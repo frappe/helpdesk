@@ -5,8 +5,9 @@
         <div class="flex items-center justify-between">
           <div class="text-lg font-semibold text-gray-900">Ticket details</div>
           <Button
-            appearance="minimal"
             icon="x"
+            theme="gray"
+            variant="ghost"
             @click="sidebar.isExpanded = false"
           />
         </div>
