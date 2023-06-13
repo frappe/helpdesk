@@ -42,9 +42,9 @@
                     class="flex items-center justify-between"
                   >
                     {{ column.title }}
-                    <MinimalSwitch
-                      :enabled="isColVisible(column)"
-                      @click="toggleColumn(column)"
+                    <Switch
+                      v-model="togglableColumns[column.colKey]"
+                      size="md"
                     />
                   </div>
                 </div>
@@ -144,8 +144,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, toRefs, useSlots } from "vue";
-import { FeatherIcon, Popover } from "frappe-ui";
-import MinimalSwitch from "@/components/MinimalSwitch.vue";
+import { FeatherIcon, Popover, Switch } from "frappe-ui";
 import IconAdd from "~icons/espresso/add";
 
 type Column = {
@@ -217,10 +216,6 @@ const selectionText = computed(() => {
 
 function isColVisible(column: Column) {
   return !column.isTogglable || togglableColumns[column.colKey];
-}
-
-function toggleColumn(column: Column) {
-  togglableColumns[column.colKey] = !togglableColumns[column.colKey];
 }
 
 function toggleRow(row: RowKey) {
