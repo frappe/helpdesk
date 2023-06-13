@@ -1,5 +1,10 @@
 <template>
-  <HelpdeskTable :columns="columns" :data="tickets.list.data" row-key="name">
+  <HelpdeskTable
+    v-model:selection="selection"
+    :columns="columns"
+    :data="tickets.list.data"
+    row-key="name"
+  >
     <template #subject="{ data }">
       <TicketSummary class="col-subject" :ticket-name="data.name" />
     </template>
@@ -82,7 +87,7 @@ import IconCaretUp from "~icons/lucide/chevron-up";
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
-const { tickets } = useTicketListStore();
+const { selection, tickets } = useTicketListStore();
 
 const dateFormat = "D/M/YYYY h:mm A";
 const columns = [

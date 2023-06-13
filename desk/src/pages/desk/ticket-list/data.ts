@@ -1,3 +1,4 @@
+import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useKeymapStore } from "@/stores/keymap";
 import { createListManager } from "@/composables/listManager";
@@ -19,20 +20,21 @@ export const useTicketListStore = defineStore("ticketList", () => {
   ];
   const KEYMAP_PREFIX = "Control";
   const keymapStore = useKeymapStore();
+  const selection = ref(new Set<string>());
 
   function init() {
     KEYMAPS.forEach((o) => {
       keymapStore.add(
         [KEYMAP_PREFIX, o.button],
         () => {
-          selected.value.forEach((ticketId) => {
+          selection.value.forEach((ticketId) => {
             tickets.setValue.submit({
               name: ticketId,
               status: o.status,
             });
           });
         },
-        `Set ticket as ${o.status.toLowerCase()}`
+        `Mark ticket as ${o.status.toLowerCase()}`
       );
     });
   }
@@ -48,8 +50,9 @@ export const useTicketListStore = defineStore("ticketList", () => {
   });
 
   return {
-    init,
     deinit,
+    init,
+    selection,
     tickets,
   };
 });

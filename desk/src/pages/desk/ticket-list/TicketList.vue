@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import { Button } from "frappe-ui";
 import { useTicketListStore } from "./data";
 import PageTitle from "@/components/PageTitle.vue";
 import ListNavigation from "@/components/ListNavigation.vue";

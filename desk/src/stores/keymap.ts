@@ -13,61 +13,78 @@ const altKey = isMac ? "⌥" : "Alt";
 const metaKey = isMac ? "⌘" : "Meta";
 
 class Shortcut {
-	constructor(
-		public isActive: ComputedRef<boolean>,
-		public keyCombination: KeyCombination,
-		public handler: Handler,
-		public help?: Help
-	) {}
+  constructor(
+    public isActive: ComputedRef<boolean>,
+    public keyCombination: KeyCombination,
+    public handler: Handler,
+    public help?: Help
+  ) {}
 
-	comboString() {
-		return this.keyCombination
-			.map((k) =>
-				k
-					.replaceAll("Control", controlKey)
-					.replaceAll("Alt", altKey)
-					.replaceAll("Meta", metaKey)
-			)
-			.join(" + ");
-	}
+  get display() {
+    return this.keyCombination.map((key) => {
+      switch (key) {
+        case "Control":
+          return controlKey;
+        case "Alt":
+          return altKey;
+        case "Meta":
+          return metaKey;
+        default:
+          return key;
+      }
+    });
+  }
 }
 
 export const useKeymapStore = defineStore("keymap", () => {
-	const keys = useMagicKeys({
-		passive: false,
-		onEventFired(e) {
-			const k = items.value.find((item) => item.isActive);
-			if (!k) return;
+  const keys = useMagicKeys({
+    passive: false,
+    onEventFired(e) {
+      const k = items.value.find((item) => item.isActive);
+      if (!k) return;
 
-			e.preventDefault();
-			k.handler();
-		},
-	});
-	const items: Ref<Array<Shortcut>> = ref([]);
-	const isOpen = ref(false);
+      e.preventDefault();
+      k.handler();
+    },
+  });
+  const items: Ref<Array<Shortcut>> = ref([]);
+  const isOpen = ref(false);
 
-	function add(combination: KeyCombination, handler: Handler, help?: Help) {
-		const combo = Array.isArray(combination) ? combination : [combination];
-		const isActive = keys[combo.join("+")];
-		const s = new Shortcut(isActive, combo, handler, help);
+  function add(combination: KeyCombination, handler: Handler, help?: Help) {
+    const combo = Array.isArray(combination) ? combination : [combination];
+    remove(combo);
 
-		remove(combo);
-		items.value.push(s);
-	}
+    const translated = translate(combo);
+    const isActive = keys[translated.join("+")];
+    const s = new Shortcut(isActive, translated, handler, help);
 
-	function remove(combo: KeyCombination) {
-		items.value = items.value.filter((s) => !isEqual(s.keyCombination, combo));
-	}
+    items.value.push(s);
+  }
 
-	function toggleVisibility(open?: boolean) {
-		isOpen.value = open ?? !isOpen.value;
-	}
+  function remove(combo: KeyCombination) {
+    const translated = translate(combo);
+    items.value = items.value.filter(
+      (s) => !isEqual(s.keyCombination, translated)
+    );
+  }
 
-	return {
-		add,
-		isOpen,
-		items,
-		remove,
-		toggleVisibility,
-	};
+  function toggleVisibility(open?: boolean) {
+    isOpen.value = open ?? !isOpen.value;
+  }
+
+  function translate(combo: KeyCombination) {
+    if (!isMac) return combo;
+    return combo.map((key) => {
+      if (key === "Control") return "Meta";
+      else return key;
+    });
+  }
+
+  return {
+    add,
+    isOpen,
+    items,
+    remove,
+    toggleVisibility,
+  };
 });

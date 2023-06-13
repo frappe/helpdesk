@@ -149,7 +149,7 @@ Last assignee from the list, where expected list length is just one. Transformed
 object to be used with `Autocomplete`
 */
 const assignedTo = computed(() => {
-  const assigned = ticket.getAssignees.data?.message?.pop();
+  const assigned = [ticket.getAssignees.data?.message || []].pop();
   return agentStore.dropdown.find((agent) => agent.value === assigned?.name);
 });
 
@@ -172,7 +172,7 @@ watch(changedKeys, (keys) => (isSaveButtonVisible.value = !!keys.size), {
 });
 
 // Add and remove shortcuts
-const keyComboSave = ["Control", "s"];
+const keyComboSave = ["Control", "S"];
 onMounted(() => keymapStore.add(keyComboSave, save, "Save details"));
 onUnmounted(() => keymapStore.remove(keyComboSave));
 
