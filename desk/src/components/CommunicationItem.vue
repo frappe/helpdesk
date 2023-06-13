@@ -1,7 +1,7 @@
 <template>
   <div class="group flex gap-3">
     <div class="flex w-8 justify-end">
-      <Avatar :image="senderImage" :label="sender" size="md" />
+      <Avatar :image="senderImage" :label="sender" size="xl" />
     </div>
     <div class="flex w-full flex-col gap-1">
       <div class="flex items-start justify-between">

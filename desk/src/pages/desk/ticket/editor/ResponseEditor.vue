@@ -9,7 +9,7 @@
       <Avatar
         :image="authStore.userImage"
         :label="authStore.userName"
-        size="md"
+        size="xl"
       />
       <TextEditor
         v-if="editor.isExpanded"

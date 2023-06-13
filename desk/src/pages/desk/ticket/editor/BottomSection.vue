@@ -34,7 +34,10 @@
               <Button
                 :icon="open ? 'chevron-up' : 'chevron-down'"
                 :disabled="isDisabled"
-                class="cursor-pointer rounded-l-none"
+                class="rounded-l-none"
+                :class="{
+                  'cursor-pointer': !isDisabled,
+                }"
                 theme="gray"
                 variant="solid"
               />
