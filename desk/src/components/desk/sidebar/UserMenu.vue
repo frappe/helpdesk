@@ -13,14 +13,14 @@
           :image="authStore.userImage"
         />
         <div
-          class="flex shrink-0 items-center gap-1 text-gray-800 duration-300"
+          class="flex shrink-0 items-center gap-2 text-gray-800 duration-300"
           :class="{
             'opacity-100': sidebarStore.isExpanded,
             'opacity-0': !sidebarStore.isExpanded,
             '-z-50': !sidebarStore.isExpanded,
           }"
         >
-          <div class="text-sm font-semibold">
+          <div class="text-base font-medium">
             {{ authStore.userName }}
           </div>
           <FeatherIcon
