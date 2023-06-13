@@ -1,30 +1,22 @@
 <template>
-	<div
-		class="flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-2 hover:bg-gray-50"
-	>
-		<div class="flex flex-row items-center space-x-1">
-			<component :is="icon" class="h-4 w-4 text-gray-800" />
-			<span class="text-sm text-gray-800">
-				{{ label }}
-			</span>
-		</div>
-		<slot name="extra"></slot>
-	</div>
+  <Button :label="label" theme="gray" variant="outline">
+    <template #prefix>
+      <IconFile class="h-4 w-4 text-gray-700" />
+    </template>
+    <template #suffix>
+      <slot name="suffix" />
+    </template>
+  </Button>
 </template>
 
 <script setup lang="ts">
-import { toRefs } from "vue";
-import IconFile from "~icons/espresso/file";
-import IconPdf from "~icons/espresso/pdf";
+import { Button } from "frappe-ui";
+import IconFile from "~icons/lucide/file";
 
-const props = defineProps({
-	label: {
-		type: String,
-		required: true,
-	},
+defineProps({
+  label: {
+    type: String,
+    required: true,
+  },
 });
-
-const { label } = toRefs(props);
-
-const icon = label.value.endsWith(".pdf") ? IconPdf : IconFile;
 </script>

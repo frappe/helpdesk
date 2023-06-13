@@ -6,7 +6,7 @@
         :key="attachment"
         :label="attachment.file_name"
       >
-        <template #extra>
+        <template #suffix>
           <IconX
             class="h-4 w-4 cursor-pointer"
             @click="removeAttachment(attachment)"
