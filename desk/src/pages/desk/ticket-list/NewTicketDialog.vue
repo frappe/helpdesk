@@ -54,10 +54,8 @@
           >
             <template #bottom="{ editor }">
               <TextEditorBottom
+                v-model:attachments="attachments"
                 :editor="editor"
-                :attachments="Array.from(attachments)"
-                @attachment-added="(file) => attachments.add(file)"
-                @attachment-removed="(file) => attachments.delete(file)"
               >
                 <template #actions-right>
                   <Button
@@ -92,7 +90,7 @@ const emit = defineEmits<{
 
 const subject = ref("");
 const description = ref("");
-const attachments = ref(new Set([]));
+const attachments = ref([]);
 const contact = ref("");
 const customer = ref("");
 const ticketType = ref("");
@@ -116,9 +114,7 @@ const insertRes = createResource({
         ticket_type: ticketType.value,
         customer: customer.value,
       },
-      attachments: Array.from(attachments.value).map(
-        (attachment) => attachment.name
-      ),
+      attachments: attachments.value.map((attachment) => attachment.name),
       via_customer_portal: true,
     };
   },

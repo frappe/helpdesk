@@ -1,21 +1,20 @@
 <template>
   <span>
     <TextEditorBottom
+      v-model:attachments="editor.attachments"
       :editor="editor.tiptap"
-      :attachments="editor.attachments"
-      @attachment-added="(item) => editor.attachments.push(item)"
-      @attachment-removed="(item) => removeAttachment(item)"
+      @content-cleared="clean"
     >
       <template #actions-left>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconChat
-            class="h-5 w-5 cursor-pointer text-gray-900"
+          <IconMessage
+            class="h-5 w-5 cursor-pointer text-gray-700"
             @click="showCannedResponses = true"
           />
         </div>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconKnowledgeBase
-            class="h-5 w-5 cursor-pointer text-gray-900"
+          <IconBook
+            class="h-5 w-5 cursor-pointer text-gray-700"
             @click="showArticleResponse = true"
           />
         </div>
@@ -61,12 +60,12 @@ import { computed, ref } from "vue";
 import { createResource, Button, Dropdown } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
+import { createToast } from "@/utils/toasts";
 import { useTicketStore } from "../data";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
-import IconKnowledgeBase from "~icons/espresso/knowledge-base";
-import IconChat from "~icons/espresso/chat";
-import { createToast } from "@/utils/toasts";
+import IconBook from "~icons/lucide/book-open";
+import IconMessage from "~icons/lucide/message-square";
 
 const authStore = useAuthStore();
 const { clean, editor, ticket } = useTicketStore();
@@ -108,10 +107,6 @@ const isDisabled = computed(
   () =>
     editor.tiptap?.isEmpty || ticket.replyViaAgent.loading || insertRes.loading
 );
-
-function removeAttachment(item) {
-  editor.attachments = editor.attachments.filter((x) => x.name != item.name);
-}
 
 function newCommunication() {
   ticket.replyViaAgent.loading = true;

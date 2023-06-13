@@ -59,13 +59,11 @@
     </div>
     <TextEditor
       ref="textEditor"
+      v-model:attachments="attachments"
       class="mt-6"
       :placeholder="placeholder"
       :content="editorContent"
-      :attachments="attachments"
       @change="(v) => (editorContent = v)"
-      @attachment-added="(item) => attachments.add(item)"
-      @attachment-removed="(item) => attachments.delete(item)"
     >
       <template #bottom="{ editor }">
         <TextEditorBottom :editor="editor">

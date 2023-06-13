@@ -61,12 +61,10 @@
       />
       <TextEditor
         ref="textEditor"
+        v-model:attachments="attachments"
         placeholder="Detailed explanation"
         :content="description"
-        :attachments="attachments"
         @change="(v) => (description = v)"
-        @attachment-added="(item) => attachments.push(item)"
-        @attachment-removed="(item) => removeAttachment(item)"
       >
         <template #bottom="{ editor }">
           <TextEditorBottom :editor="editor">
@@ -193,10 +191,6 @@ const create = debounce(() => {
 const isDisabled = computed(
   () => r.loading || isEmpty(subject.value) || textEditor.value?.editor.isEmpty
 );
-
-function removeAttachment(item) {
-  attachments.value = attachments.value.filter((x) => x.name != item.name);
-}
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {
