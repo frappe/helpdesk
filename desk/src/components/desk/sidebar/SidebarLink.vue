@@ -12,7 +12,7 @@
   >
     <component :is="icon" class="h-4 w-4 shrink-0"></component>
     <div
-      class="ml-2 shrink-0 text-sm transition-all duration-300 ease-in-out"
+      class="ml-2 shrink-0 text-base transition-all duration-300 ease-in-out"
       :class="{
         'opacity-100': sidebarStore.isExpanded,
         'opacity-0': !sidebarStore.isExpanded,
