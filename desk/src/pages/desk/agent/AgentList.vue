@@ -4,11 +4,14 @@
       <template #right>
         <Button
           label="New agent"
-          icon-left="plus"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
-        />
+        >
+          <template #prefix>
+            <IconPlus class="h-4 w-4" />
+          </template>
+        </Button>
       </template>
     </PageTitle>
     <HelpdeskTable
@@ -58,6 +61,7 @@ import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue"
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const filters = useListFilters();

@@ -50,7 +50,11 @@
           </div>
         </div>
         <div class="flex justify-start gap-2">
-          <Button icon-left="plus" label="Add a filter" @click="addFilter" />
+          <Button label="Add a filter" @click="addFilter">
+            <template #prefix>
+              <IconPlus class="h-4 w-4" />
+            </template>
+          </Button>
           <Button
             v-if="!isEmpty(filters)"
             icon="check"
@@ -79,6 +83,7 @@ import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import IconFilter from "~icons/lucide/list-filter";
+import IconPlus from "~icons/lucide/plus";
 
 type CompletionItem = {
   label: string;

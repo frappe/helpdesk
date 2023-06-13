@@ -55,15 +55,19 @@
     <template #row-extra="{ data }">
       <AssignedInfo :ticket-id="data.name" />
     </template>
-    <template #actions="{ selection }">
-      <Dropdown :options="assignOpts(selection as Set<number>)">
+    <template #actions="{ selection: s }">
+      <Dropdown :options="assignOpts(s as Set<number>)">
         <template #default>
           <Button
             class="flex cursor-pointer items-center gap-1 text-gray-700"
             label="Assign"
-            icon-left="plus-circle"
+            theme="gray"
             variant="ghost"
-          />
+          >
+            <template #prefix>
+              <IconPlusCircle class="h-4 w-4" />
+            </template>
+          </Button>
         </template>
       </Dropdown>
     </template>
@@ -83,6 +87,7 @@ import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
 import IconCaretDown from "~icons/lucide/chevron-down";
 import IconCaretUp from "~icons/lucide/chevron-up";
+import IconPlusCircle from "~icons/lucide/plus-circle";
 
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();

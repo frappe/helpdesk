@@ -3,12 +3,15 @@
     <PageTitle title="Tickets">
       <template #right>
         <Button
-          icon-left="plus"
           label="New ticket"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
-        />
+        >
+          <template #prefix>
+            <IconPlus class="h-4 w-4" />
+          </template>
+        </Button>
       </template>
     </PageTitle>
     <TopSection />
@@ -36,6 +39,7 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import MainTable from "./MainTable.vue";
 import NewTicketDialog from "./NewTicketDialog.vue";
 import TopSection from "./TopSection.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const { init, deinit, tickets } = useTicketListStore();
 const isDialogVisible = ref(false);

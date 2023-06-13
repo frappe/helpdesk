@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2 py-4">
         <RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
-          <IconCaretLeft class="h-4 w-4 cursor-pointer text-gray-700" />
+          <IconChevronLeft class="h-4 w-4 cursor-pointer text-gray-700" />
         </RouterLink>
         <div class="line-clamp-1 text-xl font-medium text-gray-900">
           {{ ticket.doc?.subject }}
@@ -16,20 +16,26 @@
       <span v-if="ticket.doc?.status !== 'Closed'">
         <Button
           v-if="ticket.doc?.status == 'Resolved'"
-          icon-left="repeat"
           label="Reopen"
           theme="gray"
           variant="solid"
           @click="ticket.reopen.submit()"
-        />
+        >
+          <template #prefix>
+            <IconRepeat class="h-4 w-4" />
+          </template>
+        </Button>
         <Button
           v-else
           label="Mark as resolved"
-          icon-left="check"
           theme="gray"
           variant="solid"
           @click="ticket.resolve.submit()"
-        />
+        >
+          <template #prefix>
+            <IconCheck class="h-4 w-4" />
+          </template>
+        </Button>
       </span>
     </div>
     <div class="flex flex-col gap-6">
@@ -92,8 +98,10 @@ import { useConfigStore } from "@/stores/config";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
-import IconCaretLeft from "~icons/ph/caret-left";
+import IconCheck from "~icons/lucide/check";
+import IconChevronLeft from "~icons/lucide/chevron-left";
 import IconHash from "~icons/espresso/hash";
+import IconRepeat from "~icons/lucide/repeat-2";
 
 const props = defineProps({
   ticketId: {

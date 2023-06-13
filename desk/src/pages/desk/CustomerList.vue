@@ -4,11 +4,14 @@
       <template #right>
         <Button
           label="New customer"
-          icon-left="plus"
           theme="gray"
           variant="solid"
           @click="isDialogVisible = !isDialogVisible"
-        />
+        >
+          <template #prefix>
+            <IconPlus class="h-4 w-4" />
+          </template>
+        </Button>
       </template>
     </PageTitle>
     <HelpdeskTable
@@ -50,6 +53,7 @@ import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import CustomerDialog from "./CustomerDialog.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);

@@ -3,12 +3,11 @@
     <PageTitle title="Email Accounts">
       <template #right>
         <RouterLink :to="{ name: AGENT_PORTAL_EMAIL_NEW }">
-          <Button
-            icon-left="plus"
-            label="New email account"
-            theme="gray"
-            variant="solid"
-          />
+          <Button label="New email account" theme="gray" variant="solid">
+            <template #prefix>
+              <IconPlus class="h-4 w-4" />
+            </template>
+          </Button>
         </RouterLink>
       </template>
     </PageTitle>
@@ -61,6 +60,7 @@ import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const columns = [
