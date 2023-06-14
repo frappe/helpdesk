@@ -104,7 +104,7 @@ def check_permissions(doctype, parent):
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
-def apply_custom_filters(doctype: str, query,fields:dict={}):
+def apply_custom_filters(doctype: str, query,fields:list=[]):
 	"""
 	Apply custom filters to query
 	"""
