@@ -57,7 +57,7 @@
         <div
           v-for="row in data"
           :key="row[rowKey]"
-          class="flex h-11 w-full items-center gap-2 px-3 py-2 transition"
+          class="group flex h-11 w-full items-center gap-2 px-3 py-2 transition"
           :class="{
             'bg-gray-200': selection.has(row[rowKey]),
             'hover:bg-gray-300': selection.has(row[rowKey]),

@@ -1,7 +1,7 @@
 <template>
   <router-link
     :to="toRoute"
-    class="group flex justify-between"
+    class="flex justify-between"
     :class="{
       'text-gray-700': isSeen,
       'text-gray-900': !isSeen,
