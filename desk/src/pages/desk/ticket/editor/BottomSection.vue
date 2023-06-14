@@ -8,13 +8,13 @@
       <template #actions-left>
         <div class="flex h-7 w-7 items-center justify-center">
           <IconMessage
-            class="h-5 w-5 cursor-pointer text-gray-700"
+            class="h-4 w-4 cursor-pointer text-gray-700"
             @click="showCannedResponses = true"
           />
         </div>
         <div class="flex h-7 w-7 items-center justify-center">
           <IconBook
-            class="h-5 w-5 cursor-pointer text-gray-700"
+            class="h-4 w-4 cursor-pointer text-gray-700"
             @click="showArticleResponse = true"
           />
         </div>

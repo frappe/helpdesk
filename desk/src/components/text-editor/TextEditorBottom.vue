@@ -26,7 +26,7 @@
           }"
         >
           <IconTextT
-            class="h-5 w-5 text-gray-700"
+            class="h-4 w-4 text-gray-700"
             @click="isTextFormattingVisible = !isTextFormattingVisible"
           />
         </div>
@@ -34,7 +34,7 @@
           <template #default="{ uploading, openFileSelector }">
             <div class="flex h-7 w-7 items-center justify-center">
               <IconAttachment
-                class="h-5 w-5 cursor-pointer text-gray-700"
+                class="h-4 w-4 cursor-pointer text-gray-700"
                 :class="{
                   'text-gray-600': uploading,
                 }"
@@ -47,7 +47,7 @@
       </div>
       <div class="flex items-center gap-4">
         <IconDelete
-          class="h-5 w-5 cursor-pointer text-gray-700"
+          class="h-4 w-4 cursor-pointer text-gray-700"
           @click.prevent="clear"
         />
         <slot name="actions-right" />
