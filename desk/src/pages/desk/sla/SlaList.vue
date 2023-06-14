@@ -22,12 +22,14 @@
       @row-click="gotoPolicy"
     >
       <template #enabled="{ data }">
-        <Badge :color="data.enabled ? 'green' : ''">
+        <Badge :theme="data.enabled ? 'green' : 'gray'" variant="subtle">
           {{ data.enabled ? "Enabled" : "Disabled" }}
         </Badge>
       </template>
       <template #default_sla="{ data }">
-        <Badge v-if="data.default_sla" color="blue"> Default </Badge>
+        <Badge v-if="data.default_sla" theme="blue" variant="subtle"
+          >Default</Badge
+        >
       </template>
     </HelpdeskTable>
     <ListNavigation class="p-3" v-bind="policies" />
