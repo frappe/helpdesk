@@ -40,7 +40,7 @@
           'text-red-700': Date.parse(data.resolution_by) < Date.now(),
         }"
       >
-        {{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "--" }}
+        {{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "—" }}
       </div>
     </template>
     <template #creation="{ data }">
