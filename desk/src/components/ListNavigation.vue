@@ -10,14 +10,16 @@
       </div>
       <Button
         icon="chevron-left"
-        class="h-5 w-5 rounded-full"
         :disabled="!hasPreviousPage"
+        class="rounded-full"
+        variant="outline"
         @click="previous"
       />
       <Button
         icon="chevron-right"
-        class="h-5 w-5 rounded-full"
         :disabled="!hasNextPage"
+        class="rounded-full"
+        variant="outline"
         @click="next"
       />
     </div>

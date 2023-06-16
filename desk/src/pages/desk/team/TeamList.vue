@@ -3,11 +3,11 @@
     <PageTitle title="Teams">
       <template #right>
         <RouterLink :to="{ name: AGENT_PORTAL_TEAM_NEW }">
-          <Button
-            icon-left="plus"
-            label="New team"
-            class="bg-gray-900 text-white hover:bg-gray-800"
-          />
+          <Button label="New team" theme="gray" variant="solid">
+            <template #prefix>
+              <IconPlus class="h-4 w-4" />
+            </template>
+          </Button>
         </RouterLink>
       </template>
     </PageTitle>
@@ -31,6 +31,7 @@ import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const columns = [

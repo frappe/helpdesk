@@ -3,11 +3,15 @@
     <PageTitle title="Canned Responses">
       <template #right>
         <Button
-          icon-left="plus"
           label="New canned response"
-          class="bg-gray-900 text-white hover:bg-gray-800"
+          theme="gray"
+          variant="solid"
           @click="showNewDialog = true"
-        />
+        >
+          <template #prefix>
+            <IconPlus class="h-4 w-4" />
+          </template>
+        </Button>
       </template>
     </PageTitle>
     <HelpdeskTable
@@ -36,6 +40,7 @@ import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const showNewDialog = ref(false);

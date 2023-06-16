@@ -1,44 +1,44 @@
 <template>
-	<div
-		class="content mx-auto"
-		:style="{
-			width: '742px',
-		}"
-	>
-		<div class="my-3.5 flex items-start gap-2.5">
-			<Avatar
-				:image-u-r-l="authStore.userImage"
-				:label="authStore.userName"
-				size="md"
-			/>
-			<TextEditor
-				v-if="editor.isExpanded"
-				ref="editorRef"
-				class="grow"
-				:mentions="mentions"
-				:placeholder="placeholder"
-				:content="editor.content"
-				@change="(v) => (editor.content = v)"
-			>
-				<template #top>
-					<TopSection v-if="!configStore.skipEmailWorkflow" />
-				</template>
-				<template #editor="{ editor: e }">
-					<TextEditorContent :editor="e" />
-				</template>
-				<template #bottom>
-					<BottomSection />
-				</template>
-			</TextEditor>
-			<div
-				v-else
-				class="flex h-8 w-full cursor-pointer select-none items-center rounded-lg border border-gray-300 px-2.5 text-base text-gray-500"
-				@click="editor.isExpanded = true"
-			>
-				{{ placeholder }}
-			</div>
-		</div>
-	</div>
+  <div
+    class="content mx-auto"
+    :style="{
+      width: '742px',
+    }"
+  >
+    <div class="my-3.5 flex items-start gap-2.5">
+      <Avatar
+        :image="authStore.userImage"
+        :label="authStore.userName"
+        size="xl"
+      />
+      <TextEditor
+        v-if="editor.isExpanded"
+        ref="editorRef"
+        class="grow"
+        :mentions="mentions"
+        :placeholder="placeholder"
+        :content="editor.content"
+        @change="(v) => (editor.content = v)"
+      >
+        <template #top>
+          <TopSection v-if="!configStore.skipEmailWorkflow" />
+        </template>
+        <template #editor="{ editor: e }">
+          <TextEditorContent :editor="e" />
+        </template>
+        <template #bottom>
+          <BottomSection />
+        </template>
+      </TextEditor>
+      <div
+        v-else
+        class="flex h-8 w-full cursor-pointer select-none items-center rounded-lg border border-gray-300 px-2.5 text-base text-gray-500"
+        @click="editor.isExpanded = true"
+      >
+        {{ placeholder }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -59,15 +59,15 @@ const { editor } = useTicketStore();
 const editorRef = ref(null);
 const placeholder = "Add a reply / comment";
 const mentions = computed(() =>
-	agentStore.options.map((a) => ({
-		label: a.agent_name,
-		value: a.name,
-	}))
+  agentStore.options.map((a) => ({
+    label: a.agent_name,
+    value: a.name,
+  }))
 );
 
 watch(editorRef, (e) => {
-	editor.tiptap = e.editor;
-	if (editor.tiptap) editor.tiptap?.commands.focus();
+  editor.tiptap = e.editor;
+  if (editor.tiptap) editor.tiptap?.commands.focus();
 });
 onUnmounted(() => (editor.isExpanded = false));
 </script>

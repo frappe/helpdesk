@@ -36,7 +36,7 @@
 						{
 							label: 'Articles',
 							name: 'articles',
-							handler: () => {
+							onClick: () => {
 								$router.push({
 									path: `/${editable ? 'kb' : 'knowledge-base'}/articles`,
 								});
@@ -72,13 +72,13 @@
 				:options="[
 					{
 						label: 'Save',
-						handler: () => {
+						onClick: () => {
 							save();
 						},
 					},
 					{
 						label: 'Save and Publish',
-						handler: () => {
+						onClick: () => {
 							save(true);
 						},
 					},

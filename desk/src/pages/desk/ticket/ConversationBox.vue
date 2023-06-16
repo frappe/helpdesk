@@ -104,7 +104,7 @@ function dropdownOptions(content: string, cc: string, bcc: string) {
 	return [
 		{
 			label: "Reply",
-			handler: () => {
+			onClick: () => {
 				editor.cc = [];
 				editor.bcc = [];
 				editor.content = quote(content);
@@ -113,7 +113,7 @@ function dropdownOptions(content: string, cc: string, bcc: string) {
 		},
 		{
 			label: "Reply All",
-			handler: () => {
+			onClick: () => {
 				editor.cc = cc.split(",");
 				editor.bcc = bcc.split(",");
 				editor.content = quote(content);

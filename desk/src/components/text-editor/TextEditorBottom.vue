@@ -6,10 +6,10 @@
         :key="attachment"
         :label="attachment.file_name"
       >
-        <template #extra>
+        <template #suffix>
           <IconX
             class="h-4 w-4 cursor-pointer"
-            @click="emit('attachment-removed', attachment)"
+            @click="removeAttachment(attachment)"
           />
         </template>
       </AttachmentItem>
@@ -26,15 +26,15 @@
           }"
         >
           <IconTextT
-            class="h-5 w-5 text-gray-900"
+            class="h-4 w-4 text-gray-700"
             @click="isTextFormattingVisible = !isTextFormattingVisible"
           />
         </div>
-        <FileUploader @success="(file) => emit('attachment-added', file)">
+        <FileUploader @success="addAttachment">
           <template #default="{ uploading, openFileSelector }">
             <div class="flex h-7 w-7 items-center justify-center">
               <IconAttachment
-                class="h-5 w-5 cursor-pointer text-gray-900"
+                class="h-4 w-4 cursor-pointer text-gray-700"
                 :class="{
                   'text-gray-600': uploading,
                 }"
@@ -47,8 +47,8 @@
       </div>
       <div class="flex items-center gap-4">
         <IconDelete
-          class="h-5 w-5 cursor-pointer text-gray-900"
-          @click.prevent="editor.commands.clearContent()"
+          class="h-4 w-4 cursor-pointer text-gray-700"
+          @click.prevent="clear"
         />
         <slot name="actions-right" />
       </div>
@@ -61,10 +61,10 @@ import { ref, toRefs } from "vue";
 import { FileUploader } from "frappe-ui";
 import TextEditorFixedMenu from "./TextEditorFixedMenu.vue";
 import AttachmentItem from "@/components/AttachmentItem.vue";
-import IconDelete from "~icons/espresso/delete";
-import IconX from "~icons/ph/x";
-import IconTextT from "~icons/ph/text-t";
-import IconAttachment from "~icons/espresso/attachment";
+import IconAttachment from "~icons/lucide/paperclip";
+import IconDelete from "~icons/lucide/trash-2";
+import IconTextT from "~icons/lucide/type";
+import IconX from "~icons/lucide/x";
 
 const props = defineProps({
   editor: {
@@ -78,13 +78,27 @@ const props = defineProps({
   },
 });
 
-const { editor } = toRefs(props);
-
 const emit = defineEmits<{
-  (event: "attachment-added", data: any): void;
-  (event: "attachment-removed", data: any): void;
   (event: "content-cleared"): void;
+  (event: "update:attachments", data: any): void;
 }>();
 
+const { attachments, editor } = toRefs(props);
 const isTextFormattingVisible = ref(false);
+
+function addAttachment(attachment: any) {
+  emit("update:attachments", [...attachments.value, attachment]);
+}
+
+function removeAttachment(attachment: any) {
+  emit(
+    "update:attachments",
+    attachments.value.filter((a) => a.name !== attachment.name)
+  );
+}
+
+function clear() {
+  editor.value.commands.clearContent();
+  emit("content-cleared");
+}
 </script>

@@ -3,11 +3,15 @@
     <PageTitle title="Contacts">
       <template #right>
         <Button
-          icon-left="plus"
           label="New contact"
-          class="bg-gray-900 text-white hover:bg-gray-800"
+          theme="gray"
+          variant="solid"
           @click="isDialogVisible = !isDialogVisible"
-        />
+        >
+          <template #prefix>
+            <IconPlus class="h-4 w-4" />
+          </template>
+        </Button>
       </template>
     </PageTitle>
     <HelpdeskTable
@@ -22,7 +26,7 @@
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">
-          <Avatar :label="data.name" :image-u-r-l="data.image" size="sm" />
+          <Avatar :label="data.name" :image="data.image" size="sm" />
           <div class="line-clamp-1">{{ data.name }}</div>
         </div>
       </template>
@@ -46,6 +50,7 @@ import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import ContactDialog from "./ContactDialog.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);

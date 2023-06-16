@@ -1,35 +1,39 @@
 <template>
-	<div class="flex justify-between px-6 py-3">
-		<div class="flex gap-2">
-			<PresetFilters doctype="HD Ticket" />
-			<Dropdown
-				:options="byStatus"
-				:button="{
-					label: 'Status',
-					iconRight: 'chevron-down',
-				}"
-			/>
-			<Dropdown
-				:options="byPriority"
-				:button="{
-					label: 'Priority',
-					iconRight: 'chevron-down',
-				}"
-			/>
-		</div>
-		<div class="flex items-center gap-2">
-			<CompositeFilters />
-			<Dropdown :options="sortOptions">
-				<template #default>
-					<Button label="Sort">
-						<template #icon-left>
-							<IconSort class="mr-1.5 h-4 w-4" />
-						</template>
-					</Button>
-				</template>
-			</Dropdown>
-		</div>
-	</div>
+  <div class="flex justify-between px-6 pb-3">
+    <div class="flex gap-2">
+      <PresetFilters doctype="HD Ticket" />
+      <Dropdown
+        :options="byStatus"
+        :button="{
+          label: 'Status',
+          iconRight: 'chevron-down',
+          variant: 'outline',
+          size: 'sm',
+        }"
+      />
+      <Dropdown
+        :options="byPriority"
+        :button="{
+          label: 'Priority',
+          iconRight: 'chevron-down',
+          variant: 'outline',
+          size: 'sm',
+        }"
+      />
+    </div>
+    <div class="flex items-center gap-2">
+      <CompositeFilters />
+      <Dropdown :options="sortOptions">
+        <template #default>
+          <Button label="Sort" variant="outline" size="sm">
+            <template #prefix>
+              <IconSort class="h-3 w-3" />
+            </template>
+          </Button>
+        </template>
+      </Dropdown>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -42,7 +46,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useListFilters } from "@/composables/listFilters";
 import CompositeFilters from "./CompositeFilters.vue";
 import PresetFilters from "./PresetFilters.vue";
-import IconSort from "~icons/espresso/sort-arrow";
+import IconSort from "~icons/lucide/arrow-down-up";
 
 const router = useRouter();
 const route = useRoute();
@@ -51,49 +55,49 @@ const ticketStatusStore = useTicketStatusStore();
 const listFilters = useListFilters();
 
 const sortOptionsRes = createResource({
-	url: "helpdesk.extends.doc.sort_options",
-	auto: true,
-	params: {
-		doctype: "HD Ticket",
-	},
+  url: "helpdesk.extends.doc.sort_options",
+  auto: true,
+  params: {
+    doctype: "HD Ticket",
+  },
 });
 
 const sortOptions = computed(() => {
-	return sortOptionsRes.data?.map((o) => ({
-		label: o,
-		handler: () =>
-			router.push({
-				query: {
-					...route.query,
-					sort: encodeURIComponent(o.replaceAll(" ", "-")),
-				},
-			}),
-	}));
+  return sortOptionsRes.data?.map((o) => ({
+    label: o,
+    onClick: () =>
+      router.push({
+        query: {
+          ...route.query,
+          sort: encodeURIComponent(o.replaceAll(" ", "-")),
+        },
+      }),
+  }));
 });
 
 const byStatus = computed(() =>
-	ticketStatusStore.options.map((status) => ({
-		label: status,
-		handler: () => filterByField("status", status),
-	}))
+  ticketStatusStore.options.map((status) => ({
+    label: status,
+    onClick: () => filterByField("status", status),
+  }))
 );
 
 const byPriority = computed(() =>
-	ticketPriorityStore.names.map((priority) => ({
-		label: priority,
-		handler: () => filterByField("priority", priority),
-	}))
+  ticketPriorityStore.names.map((priority) => ({
+    label: priority,
+    onClick: () => filterByField("priority", priority),
+  }))
 );
 
 function filterByField(fieldname: string, value: string) {
-	const f = [
-		{
-			fieldname,
-			filter_type: "is",
-			value,
-		},
-	];
+  const f = [
+    {
+      fieldname,
+      filter_type: "is",
+      value,
+    },
+  ];
 
-	listFilters.applyQuery(f);
+  listFilters.applyQuery(f);
 }
 </script>

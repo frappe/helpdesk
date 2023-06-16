@@ -3,11 +3,15 @@
     <PageTitle title="Agents">
       <template #right>
         <Button
-          icon-left="plus"
           label="New agent"
-          class="bg-gray-900 text-white hover:bg-gray-800"
+          theme="gray"
+          variant="solid"
           @click="isDialogVisible = !isDialogVisible"
-        />
+        >
+          <template #prefix>
+            <IconPlus class="h-4 w-4" />
+          </template>
+        </Button>
       </template>
     </PageTitle>
     <HelpdeskTable
@@ -21,14 +25,16 @@
       <template #name="{ data }">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <Avatar
-              :label="data.name"
-              :image-u-r-l="data.user_image"
-              size="sm"
-            />
+            <Avatar :label="data.name" :image="data.user_image" size="sm" />
             <div class="line-clamp-1">{{ data.full_name }}</div>
           </div>
-          <Badge v-if="!data.is_active">Inactive</Badge>
+          <Badge
+            v-if="!data.is_active"
+            size="md"
+            theme="orange"
+            variant="subtle"
+            >Inactive</Badge
+          >
         </div>
       </template>
       <template #row-extra="{ data }">
@@ -55,6 +61,7 @@ import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue"
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const filters = useListFilters();

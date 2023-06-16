@@ -8,7 +8,7 @@
         <Avatar
           size="lg"
           :label="contact.doc?.name"
-          :image-u-r-l="contact.doc?.image"
+          :image="contact.doc?.image"
           class="cursor-pointer hover:opacity-80"
         />
         <div class="flex gap-2">
@@ -123,9 +123,9 @@ const options = computed(() => ({
   actions: [
     {
       label: "Save",
-      class: "bg-gray-900 text-white hover:bg-gray-800",
-      iconLeft: "check",
-      handler: () => update(),
+      theme: "gray",
+      variant: "solid",
+      onClick: () => update(),
     },
   ],
 }));

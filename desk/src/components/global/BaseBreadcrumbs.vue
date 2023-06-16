@@ -5,8 +5,8 @@
 				<div
 					@click="
 						() => {
-							if (breadcrumb.handler) {
-								breadcrumb.handler()
+							if (breadcrumb.onClick) {
+								breadcrumb.onClick()
 							}
 							$emit('item-click', breadcrumb, index)
 						}

@@ -1,5 +1,10 @@
 <template>
-  <HelpdeskTable :columns="columns" :data="tickets.list.data" row-key="name">
+  <HelpdeskTable
+    v-model:selection="selection"
+    :columns="columns"
+    :data="tickets.list.data"
+    row-key="name"
+  >
     <template #subject="{ data }">
       <TicketSummary class="col-subject" :ticket-name="data.name" />
     </template>
@@ -35,7 +40,7 @@
           'text-red-700': Date.parse(data.resolution_by) < Date.now(),
         }"
       >
-        {{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "--" }}
+        {{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "—" }}
       </div>
     </template>
     <template #creation="{ data }">
@@ -50,15 +55,19 @@
     <template #row-extra="{ data }">
       <AssignedInfo :ticket-id="data.name" />
     </template>
-    <template #actions="{ selection }">
-      <Dropdown :options="assignOpts(selection as Set<number>)">
+    <template #actions="{ selection: s }">
+      <Dropdown :options="assignOpts(s as Set<number>)">
         <template #default>
           <Button
             class="flex cursor-pointer items-center gap-1 text-gray-700"
             label="Assign"
-            icon-left="plus-circle"
-            appearance="minimal"
-          />
+            theme="gray"
+            variant="ghost"
+          >
+            <template #prefix>
+              <IconPlusCircle class="h-4 w-4" />
+            </template>
+          </Button>
         </template>
       </Dropdown>
     </template>
@@ -76,13 +85,14 @@ import { createToast } from "@/utils/toasts";
 import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
-import IconCaretDown from "~icons/ph/caret-down";
-import IconCaretUp from "~icons/ph/caret-up";
+import IconCaretDown from "~icons/lucide/chevron-down";
+import IconCaretUp from "~icons/lucide/chevron-up";
+import IconPlusCircle from "~icons/lucide/plus-circle";
 
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
-const { tickets } = useTicketListStore();
+const { selection, tickets } = useTicketListStore();
 
 const dateFormat = "D/M/YYYY h:mm A";
 const columns = [
@@ -169,7 +179,7 @@ const bulkAssignTicketToAgent = createResource({
 function assignOpts(selected: Set<number>) {
   return agentStore.options.map((a) => ({
     label: a.agent_name,
-    handler: () =>
+    onClick: () =>
       bulkAssignTicketToAgent.submit({
         ticket_ids: Array.from(selected),
         agent_id: a.name,
@@ -182,7 +192,7 @@ function statusDropdownOptions(ticketId: number, currentStatus: string) {
     .filter((o) => o !== currentStatus)
     .map((o) => ({
       label: o,
-      handler: () =>
+      onClick: () =>
         tickets.setValue.submit({
           name: ticketId,
           status: o,
@@ -195,7 +205,7 @@ function priorityDropdownOptions(ticketId: number, currentPriority: string) {
     .filter((o) => o !== currentPriority)
     .map((o) => ({
       label: o,
-      handler: () =>
+      onClick: () =>
         tickets.setValue.submit({
           name: ticketId,
           priority: o,

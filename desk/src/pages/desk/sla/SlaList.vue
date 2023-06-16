@@ -3,11 +3,11 @@
     <PageTitle title="Support Policies">
       <template #right>
         <RouterLink :to="{ name: AGENT_PORTAL_SLA_NEW }">
-          <Button
-            icon-left="plus"
-            label="New policy"
-            class="bg-gray-900 text-white hover:bg-gray-800"
-          />
+          <Button label="New policy" theme="gray" variant="solid">
+            <template #prefix>
+              <IconPlus class="h-4 w-4" />
+            </template>
+          </Button>
         </RouterLink>
       </template>
     </PageTitle>
@@ -22,12 +22,14 @@
       @row-click="gotoPolicy"
     >
       <template #enabled="{ data }">
-        <Badge :color="data.enabled ? 'green' : ''">
+        <Badge :theme="data.enabled ? 'green' : 'gray'" variant="subtle">
           {{ data.enabled ? "Enabled" : "Disabled" }}
         </Badge>
       </template>
       <template #default_sla="{ data }">
-        <Badge v-if="data.default_sla" color="blue"> Default </Badge>
+        <Badge v-if="data.default_sla" theme="blue" variant="subtle"
+          >Default</Badge
+        >
       </template>
     </HelpdeskTable>
     <ListNavigation class="p-3" v-bind="policies" />
@@ -41,6 +43,7 @@ import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const columns = [

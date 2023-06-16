@@ -156,7 +156,7 @@ export default {
 			this.options.forEach((item, index) => {
 				items.push({
 					label: item.label,
-					handler: () => {
+					onClick: () => {
 						this.modelValue[this.filterIndex] = {}
 						this.modelValue[this.filterIndex][
 							this.options[index].name

@@ -3,7 +3,7 @@
     class="flex select-none flex-col border-r border-gray-200 bg-gray-50 px-3 py-2 text-base transition-all duration-300 ease-in-out"
     :class="{
       'w-56': sidebarStore.isExpanded,
-      'w-12': !sidebarStore.isExpanded,
+      'w-13': !sidebarStore.isExpanded,
     }"
   >
     <UserMenu class="pb-2" :options="profileSettings" />
@@ -79,7 +79,7 @@ const menuOptions = computed(() => [
   {
     label: showExtra.value ? "Less" : "More",
     icon: IconMore,
-    handler: () => (showExtra.value = !showExtra.value),
+    onClick: () => (showExtra.value = !showExtra.value),
   },
 ]);
 
@@ -125,12 +125,12 @@ const profileSettings = [
   {
     label: "Shortcuts",
     icon: "command",
-    handler: () => keymapStore.toggleVisibility(true),
+    onClick: () => keymapStore.toggleVisibility(true),
   },
   {
     label: "Customer portal",
     icon: "users",
-    handler: () => {
+    onClick: () => {
       const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
       window.open(path.href, "_blank");
     },
@@ -138,7 +138,7 @@ const profileSettings = [
   {
     label: "Log out",
     icon: "log-out",
-    handler: () => authStore.logout(),
+    onClick: () => authStore.logout(),
   },
 ];
 

@@ -2,25 +2,25 @@
   <Dropdown :options="options">
     <template #default="{ open }">
       <div
-        class="flex w-max cursor-pointer items-center gap-2 rounded-md px-1.5 py-2 transition-all"
+        class="flex w-max cursor-pointer items-center gap-2 rounded-md px-0.5 py-2 transition-all"
         :class="{
           'hover:bg-gray-100': sidebarStore.isExpanded,
         }"
       >
         <Avatar
-          size="sm"
+          size="md"
           :label="authStore.userName"
-          :image-u-r-l="authStore.userImage"
+          :image="authStore.userImage"
         />
         <div
-          class="flex shrink-0 items-center gap-1 text-gray-800 duration-300"
+          class="flex shrink-0 items-center gap-2 text-gray-800 duration-300"
           :class="{
             'opacity-100': sidebarStore.isExpanded,
             'opacity-0': !sidebarStore.isExpanded,
             '-z-50': !sidebarStore.isExpanded,
           }"
         >
-          <div class="text-sm font-semibold">
+          <div class="text-base font-medium">
             {{ authStore.userName }}
           </div>
           <FeatherIcon

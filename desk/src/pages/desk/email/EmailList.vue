@@ -3,11 +3,11 @@
     <PageTitle title="Email Accounts">
       <template #right>
         <RouterLink :to="{ name: AGENT_PORTAL_EMAIL_NEW }">
-          <Button
-            icon-left="plus"
-            label="New email account"
-            class="bg-gray-900 text-white hover:bg-gray-800"
-          />
+          <Button label="New email account" theme="gray" variant="solid">
+            <template #prefix>
+              <IconPlus class="h-4 w-4" />
+            </template>
+          </Button>
         </RouterLink>
       </template>
     </PageTitle>
@@ -25,10 +25,18 @@
         <div class="flex justify-between">
           <span>{{ data.email_id }}</span>
           <div class="space-x-2">
-            <Badge v-if="data.default_incoming" color="blue"
+            <Badge
+              v-if="data.default_incoming"
+              theme="blue"
+              variant="subtle"
+              size="md"
               >Default incoming</Badge
             >
-            <Badge v-if="data.default_outgoing" color="yellow"
+            <Badge
+              v-if="data.default_outgoing"
+              theme="green"
+              variant="subtle"
+              size="md"
               >Default outgoing</Badge
             >
           </div>
@@ -52,6 +60,7 @@ import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const columns = [

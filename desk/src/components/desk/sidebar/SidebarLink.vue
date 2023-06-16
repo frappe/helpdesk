@@ -12,7 +12,7 @@
   >
     <component :is="icon" class="h-4 w-4 shrink-0"></component>
     <div
-      class="ml-2 shrink-0 text-sm transition-all duration-300 ease-in-out"
+      class="ml-2 shrink-0 text-base transition-all duration-300 ease-in-out"
       :class="{
         'opacity-100': sidebarStore.isExpanded,
         'opacity-0': !sidebarStore.isExpanded,
@@ -43,7 +43,7 @@ const props = defineProps({
     required: false,
     default: "",
   },
-  handler: {
+  onClick: {
     type: Function,
     required: false,
     default: () => true,
@@ -56,7 +56,7 @@ const sidebarStore = useSidebarStore();
 const isActive = computed(() => props.to.includes(route.name.toString()));
 
 function handle() {
-  props.handler();
+  props.onClick();
   if (props.to) {
     router.push({
       name: props.to,
