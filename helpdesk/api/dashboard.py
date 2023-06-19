@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import frappe
 from frappe.query_builder.functions import Count
+from frappe.utils.caching import redis_cache
 
 
 @frappe.whitelist()
@@ -9,7 +10,7 @@ def get_all():
 	return [
 		avg_first_response_time(),
 		resolution_within_sla(),
-		my_open_tickets(),
+		my_tickets(),
 		ticket_statuses(),
 		new_tickets(),
 		ticket_types(),
@@ -18,6 +19,7 @@ def get_all():
 	]
 
 
+@redis_cache(ttl=60 * 5)
 def ticket_statuses():
 	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -37,6 +39,7 @@ def ticket_statuses():
 	}
 
 
+@redis_cache(ttl=60 * 5)
 def avg_first_response_time():
 	average_resolution_time = float(0.0)
 	thirty_days_ago = datetime.now() - timedelta(days=30)
@@ -67,6 +70,7 @@ def avg_first_response_time():
 	}
 
 
+@redis_cache(ttl=60 * 5)
 def ticket_types():
 	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -86,6 +90,7 @@ def ticket_types():
 	}
 
 
+@redis_cache(ttl=60 * 5)
 def new_tickets():
 	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -106,6 +111,7 @@ def new_tickets():
 	}
 
 
+@redis_cache(ttl=60 * 5)
 def resolution_within_sla():
 	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {
@@ -140,6 +146,7 @@ def resolution_within_sla():
 	}
 
 
+@redis_cache(ttl=60 * 5)
 def ticket_activity():
 	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -160,6 +167,7 @@ def ticket_activity():
 	}
 
 
+@redis_cache(ttl=60 * 5)
 def ticket_priority():
 	thirty_days_ago = datetime.now() - timedelta(days=30)
 	filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -179,7 +187,8 @@ def ticket_priority():
 	}
 
 
-def my_open_tickets():
+@redis_cache(ttl=60 * 5, user=True)
+def my_tickets():
 	QBTicket = frappe.qb.DocType("HD Ticket")
 	like_str = f"%{frappe.session.user}%"
 	like_query = QBTicket._assign.like(like_str)
