@@ -12,11 +12,14 @@
   "criterion_section",
   "priority",
   "team",
+  "column_break_aabd",
+  "ticket_type",
   "assign_to_section",
   "to_agent",
   "to_team",
   "column_break_ogxx",
-  "to_priority"
+  "to_priority",
+  "to_ticket_type"
  ],
  "fields": [
   {
@@ -75,11 +78,28 @@
   {
    "fieldname": "column_break_hdwh",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_aabd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ticket_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket type",
+   "options": "HD Ticket Type"
+  },
+  {
+   "fieldname": "to_ticket_type",
+   "fieldtype": "Link",
+   "label": "Ticket type",
+   "options": "HD Ticket Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-19 19:31:23.315678",
+ "modified": "2023-06-19 23:09:37.945913",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Escalation Rule",

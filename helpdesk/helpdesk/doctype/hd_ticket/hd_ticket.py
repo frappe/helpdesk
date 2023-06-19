@@ -669,12 +669,28 @@ class HDTicket(Document):
 			{
 				"priority": self.priority,
 				"team": self.agent_group,
+				"ticket_type": self.ticket_type,
+			},
+			{
+				"priority": self.priority,
+				"team": self.agent_group,
+			},
+			{
+				"priority": self.priority,
+				"ticket_type": self.ticket_type,
+			},
+			{
+				"team": self.agent_group,
+				"ticket_type": self.ticket_type,
+			},
+			{
+				"priority": self.priority,
 			},
 			{
 				"team": self.agent_group,
 			},
 			{
-				"priority": self.priority,
+				"ticket_type": self.ticket_type,
 			},
 		]
 

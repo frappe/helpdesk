@@ -62,15 +62,20 @@ const columns = [
     colClass: "w-1/3",
   },
   {
-    title: "Status",
-    colKey: "is_enabled",
+    title: "Ticket type",
+    colKey: "ticket_type",
     colClass: "w-1/3",
+  },
+  {
+    title: "",
+    colKey: "is_enabled",
+    colClass: "w-20 flex justify-end",
   },
 ];
 
 const rules = createListManager({
   doctype: "HD Escalation Rule",
-  fields: ["name", "priority", "team", "is_enabled"],
+  fields: ["name", "priority", "team", "ticket_type", "is_enabled"],
   auto: true,
 });
 

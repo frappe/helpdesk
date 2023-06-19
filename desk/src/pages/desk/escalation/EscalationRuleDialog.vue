@@ -24,6 +24,16 @@
               @change="(v) => (team = v.value)"
             />
           </div>
+          <div class="text-gray-600">and</div>
+          <div class="flex items-center gap-2">
+            <div class="text-gray-800">Ticket type is</div>
+            <SearchComplete
+              doctype="HD Ticket Type"
+              placeholder="Any"
+              :value="ticketType"
+              @change="(v) => (ticketType = v.value)"
+            />
+          </div>
         </div>
         <div class="text-lg font-medium text-gray-900">Do these</div>
         <div class="flex flex-wrap items-center gap-2">
@@ -44,6 +54,16 @@
               placeholder="Any"
               :value="toTeam"
               @change="(v) => (toTeam = v.value)"
+            />
+          </div>
+          <div class="text-gray-600">and</div>
+          <div class="flex items-center gap-2">
+            <div class="text-gray-800">Change ticket type to</div>
+            <SearchComplete
+              doctype="HD Ticket Type"
+              placeholder="Any"
+              :value="toTicketType"
+              @change="(v) => (toTicketType = v.value)"
             />
           </div>
           <div class="text-gray-600">and</div>
@@ -91,6 +111,14 @@ const team = computed({
     rule.doc.team = team;
   },
 });
+const ticketType = computed({
+  get() {
+    return rule.doc?.ticket_type;
+  },
+  set(ticket_type: string) {
+    rule.doc.ticket_type = ticket_type;
+  },
+});
 const toPriority = computed({
   get() {
     return rule.doc?.to_priority;
@@ -113,6 +141,14 @@ const toAgent = computed({
   },
   set(team: string) {
     rule.doc.to_agent = team;
+  },
+});
+const toTicketType = computed({
+  get() {
+    return rule.doc?.to_ticket_type;
+  },
+  set(ticket_type: string) {
+    rule.doc.to_ticket_type = ticket_type;
   },
 });
 const isEnabled = computed({
@@ -178,9 +214,11 @@ const options = computed(() => ({
           is_enabled: isEnabled.value,
           priority: priority.value,
           team: team.value,
+          ticket_type: ticketType.value,
           to_agent: toAgent.value,
           to_priority: toPriority.value,
           to_team: toTeam.value,
+          to_ticket_type: toTicketType.value,
         }),
     },
     {

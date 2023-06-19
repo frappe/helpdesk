@@ -23,8 +23,10 @@ class HDEscalationRule(Document):
 		self.emit_after_delete()
 
 	def validate_criterion(self):
-		if not (self.priority or self.team):
-			frappe.throw(_("At-least priority or team is required"))
+		if not (self.priority or self.team or self.ticket_type):
+			frappe.throw(
+				_("At-least one of priority, team and ticket type is required")
+			)
 
 	def validate_duplicate(self):
 		is_duplicate = frappe.db.count(
@@ -33,11 +35,12 @@ class HDEscalationRule(Document):
 				"name": ["!=", self.name],
 				"priority": self.priority or "",
 				"team": self.team or "",
+				"ticket_type": self.ticket_type or "",
 			},
 		)
 
 		if is_duplicate:
-			frappe.throw(_("Escalation rule already exists for this criterion"))
+			frappe.throw(_("Escalation rule already exists for this criteria"))
 
 	def emit_after_insert(self):
 		capture_event("escalation_rule_created")
