@@ -98,7 +98,7 @@ const extraOptions = [
     to: AGENT_PORTAL_TEAM_LIST,
   },
   {
-    label: "Escalation Rules",
+    label: "Escalation rules",
     icon: IconEscalation,
     to: AGENT_PORTAL_ESCALATION_RULE_LIST,
   },
