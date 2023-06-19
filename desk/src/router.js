@@ -23,12 +23,13 @@ export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
 export const AGENT_PORTAL_EMAIL_LIST = "Emails";
 export const AGENT_PORTAL_EMAIL_NEW = "NewEmailAccount";
 export const AGENT_PORTAL_EMAIL_SINGLE = "EmailAccount";
+export const AGENT_PORTAL_ESCALATION_RULE_LIST = "EscalationRules";
 export const AGENT_PORTAL_SLA_LIST = "SlaPolicies";
 export const AGENT_PORTAL_SLA_NEW = "NewSlaPolicy";
 export const AGENT_PORTAL_SLA_SINGLE = "SlaPolicy";
 export const AGENT_PORTAL_TEAM_LIST = "Teams";
-export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TEAM_NEW = "NewTeam";
+export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "DeskTicket";
 export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
 export const AGENT_PORTAL_TICKET_TYPE_LIST = "TicketTypes";
@@ -321,7 +322,7 @@ const routes = [
       },
       {
         path: "escalation-rules",
-        name: "EscalationRules",
+        name: AGENT_PORTAL_ESCALATION_RULE_LIST,
         component: () =>
           import("@/pages/desk/escalation/EscalationRuleList.vue"),
       },
