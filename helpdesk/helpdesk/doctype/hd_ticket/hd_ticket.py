@@ -31,11 +31,12 @@ from helpdesk.utils import publish_event, capture_event
 
 class HDTicket(Document):
 	@staticmethod
-	def get_list_query(query: Query):
+	def get_list_query(query: Query,fields):
 		QBTicket = frappe.qb.DocType("HD Ticket")
 
 		query = HDTicket.filter_by_team(query)
-		query = query.select(QBTicket.star)
+		if not fields:
+			query = query.select(QBTicket.star)
 
 		return query
 

@@ -35,7 +35,7 @@ def get_list(
 		group_by=group_by,
 	)
 
-	query = apply_custom_filters(doctype, query)
+	query = apply_custom_filters(doctype, query,fields=fields)
 	query = apply_hook(doctype, query)
 	query = apply_sort(doctype, order_by, query)
 
@@ -104,14 +104,14 @@ def check_permissions(doctype, parent):
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
-def apply_custom_filters(doctype: str, query):
+def apply_custom_filters(doctype: str, query,fields:list=[]):
 	"""
 	Apply custom filters to query
 	"""
 	controller = get_controller(doctype)
 
 	if hasattr(controller, "get_list_query"):
-		return_value = controller.get_list_query(query)
+		return_value = controller.get_list_query(query,fields)
 		if return_value is not None:
 			query = return_value
 
