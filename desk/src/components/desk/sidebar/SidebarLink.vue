@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex h-7 cursor-pointer items-center justify-between rounded-lg px-1.5 text-gray-700 transition-all duration-300 ease-in-out"
+    class="flex h-7 cursor-pointer items-center rounded-lg px-1.5 text-gray-700 transition-all duration-300 ease-in-out"
     :class="{
       'w-full': sidebarStore.isExpanded,
       'w-7': !sidebarStore.isExpanded,
@@ -10,20 +10,18 @@
     }"
     @click="handle"
   >
-    <div class="flex items-center">
-      <component :is="icon" class="h-4 w-4 shrink-0"></component>
-      <div
-        class="ml-2 shrink-0 text-base transition-all duration-300 ease-in-out"
-        :class="{
-          'opacity-100': sidebarStore.isExpanded,
-          'opacity-0': !sidebarStore.isExpanded,
-          '-z-50': !sidebarStore.isExpanded,
-        }"
-      >
-        {{ label }}
-      </div>
+    <component :is="icon" class="h-4 w-4 shrink-0"></component>
+    <div
+      class="ml-2 flex shrink-0 grow items-center justify-between text-base transition-all duration-300 ease-in-out"
+      :class="{
+        'opacity-100': sidebarStore.isExpanded,
+        'opacity-0': !sidebarStore.isExpanded,
+        '-z-50': !sidebarStore.isExpanded,
+      }"
+    >
+      {{ label }}
+      <Badge v-if="isBeta" theme="orange" variant="subtle">beta</Badge>
     </div>
-    <Badge v-if="isBeta" theme="blue" variant="subtle">beta</Badge>
   </div>
 </template>
 
