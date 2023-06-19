@@ -137,12 +137,12 @@
 						</div>
 					</template>
 					<template #field-title="{ value, row }">
-						<router-link
+						<RouterLink
 							:to="{
 								path: `/kb/articles/${row.name}`,
 							}"
 							class="cursor-pointer text-gray-600 hover:text-gray-900"
-							>{{ value }}</router-link
+							>{{ value }}</RouterLink
 						>
 					</template>
 					<template #field-status="{ value }">

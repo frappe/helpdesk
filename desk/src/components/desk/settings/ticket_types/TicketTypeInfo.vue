@@ -2,14 +2,14 @@
   <div class="min-w-[490px] px-[24px] py-[10px]">
     <div class="flow-root h-[72px] shrink-0 py-[22px] px-[16px]">
       <div class="float-left">
-        <router-link
+        <RouterLink
           :to="`/ticket-types`"
           class="my-1 flex select-none flex-row items-center space-x-1 stroke-gray-600 text-sm text-gray-600 hover:stroke-gray-700 hover:text-gray-700"
           role="button"
         >
           <FeatherIcon name="arrow-left" class="h-[13px] w-[13px]" />
           <div>Back to ticket type list</div>
-        </router-link>
+        </RouterLink>
       </div>
       <div class="float-right">
         <div class="flex flex-row space-x-2">

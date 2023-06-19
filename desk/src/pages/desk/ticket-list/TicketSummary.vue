@@ -1,5 +1,5 @@
 <template>
-  <router-link
+  <RouterLink
     :to="toRoute"
     class="flex justify-between"
     :class="{
@@ -32,7 +32,7 @@
         {{ ticketName }}
       </div>
     </div>
-  </router-link>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">

@@ -16,7 +16,7 @@
 					role="button"
 				/>
 			</div>
-			<router-link
+			<RouterLink
 				:to="`/settings/canned_responses/${canned_response.name}`"
 				class="w-full group flex items-center"
 			>
@@ -27,7 +27,7 @@
 					{{ canned_response.owner }}
 				</div>
 				<div class="sm:w-2/12 truncate"></div>
-			</router-link>
+			</RouterLink>
 		</div>
 	</div>
 </template>
