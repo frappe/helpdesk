@@ -33,7 +33,7 @@
           class="flex items-start gap-2"
         >
           <div class="h-5 w-5">
-            <component :is="contact.icon" class="h-5 w-5 text-gray-600" />
+            <component :is="contact.icon" class="h-4 w-4 text-gray-600" />
           </div>
           <div class="text-gray-900">{{ contact.value }}</div>
         </div>
@@ -51,7 +51,7 @@ import { Avatar, Button, createDocumentResource } from "frappe-ui";
 import { useTicketStore } from "./data";
 import CustomFieldList from "./CustomFieldList.vue";
 import OpenTicketList from "./OpenTicketList.vue";
-import IconEmail from "~icons/espresso/email";
+import IconMail from "~icons/lucide/mail";
 
 const { sidebar, ticket } = useTicketStore();
 
@@ -64,7 +64,7 @@ const c = createDocumentResource({
 const fields = [
   {
     field: "email_id",
-    icon: IconEmail,
+    icon: IconMail,
   },
 ];
 
