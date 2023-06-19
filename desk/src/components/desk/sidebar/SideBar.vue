@@ -75,6 +75,7 @@ const menuOptions = computed(() => [
     label: "Knowledge base",
     icon: IconKnowledgeBase,
     to: "DeskKBHome",
+    isBeta: true,
   },
   {
     label: showExtra.value ? "Less" : "More",
@@ -108,6 +109,7 @@ const extraOptions = [
     label: "Canned responses",
     icon: IconCannedResponse,
     to: AGENT_PORTAL_CANNED_RESPONSE_LIST,
+    isBeta: true,
   },
   {
     label: "Customers",
