@@ -31,7 +31,7 @@ from helpdesk.utils import publish_event, capture_event
 
 class HDTicket(Document):
 	@staticmethod
-	def get_list_query(query: Query,fields):
+	def get_list_query(query: Query, fields):
 		QBTicket = frappe.qb.DocType("HD Ticket")
 
 		query = HDTicket.filter_by_team(query)
@@ -287,6 +287,9 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def assign_agent(self, agent):
+		if not agent:
+			return
+
 		if self._assign:
 			assignees = json.loads(self._assign)
 			for assignee in assignees:
@@ -661,10 +664,41 @@ class HDTicket(Document):
 
 		return l
 
+	def get_escalation_rule(self):
+		filters = [
+			{
+				"priority": self.priority,
+				"team": self.agent_group,
+			},
+			{
+				"team": self.agent_group,
+			},
+			{
+				"priority": self.priority,
+			},
+		]
+
+		for i in range(len(filters)):
+			try:
+				f = {
+					**filters[i],
+					"is_enabled": True,
+				}
+				rule = frappe.get_last_doc("HD Escalation Rule", filters=f)
+				if rule:
+					return rule
+			except:
+				pass
+
 	@frappe.whitelist()
 	def reopen(self):
 		if self.status != "Resolved":
 			frappe.throw(_("Only resolved tickets can be reopened"))
+
+		if escalation_rule := self.get_escalation_rule():
+			self.agent_group = escalation_rule.to_team or self.team
+			self.priority = escalation_rule.to_priority or self.priority
+			self.assign_agent(escalation_rule.to_agent)
 
 		self.status = "Open"
 		self.save()
