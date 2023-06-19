@@ -14,12 +14,13 @@ class HDDeskAccountRequest(Document):
 		self.send_verification_email()
 
 	def send_verification_email(self):
-		url = get_url(f"/support/verify/{self.request_key}")
-
+		url = get_url(f"/helpdesk/verify/{self.request_key}")
 		subject = "Verify your account"
-
 		sender = None
-		if frappe.db.exists("Email Account", {"name": "Support", "enable_outgoing": True}):
+
+		if frappe.db.exists(
+			"Email Account", {"name": "Support", "enable_outgoing": True}
+		):
 			sender = frappe.get_doc("Email Account", "Support").email_id
 
 		try:
