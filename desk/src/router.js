@@ -319,6 +319,12 @@ const routes = [
         component: () => import("@/pages/desk/email/EmailAccount.vue"),
         props: true,
       },
+      {
+        path: "escalation-rules",
+        name: "EscalationRules",
+        component: () =>
+          import("@/pages/desk/escalation/EscalationRuleList.vue"),
+      },
     ],
   },
 ];
