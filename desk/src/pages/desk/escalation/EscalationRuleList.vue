@@ -25,7 +25,7 @@
       @row-click="openRule"
     >
       <template #is_enabled="{ data }">
-        <Badge :theme="data.is_enabled ? 'green' : 'orange'" variant="subtle">
+        <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">
           {{ data.is_enabled ? "Enabled" : "Disabled" }}
         </Badge>
       </template>
