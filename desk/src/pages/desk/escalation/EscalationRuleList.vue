@@ -85,7 +85,6 @@ function openRule(id: string) {
   showRule.value = true;
 }
 
-socket.on("helpdesk:new-escalation-rule", () => {
-  if (!rules.hasPreviousPage) rules.reload();
-});
+socket.on("helpdesk:new-escalation-rule", () => rules.reload());
+socket.on("helpdesk:delete-escalation-rule", () => rules.reload());
 </script>

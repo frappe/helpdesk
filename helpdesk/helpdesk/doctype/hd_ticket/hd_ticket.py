@@ -712,8 +712,9 @@ class HDTicket(Document):
 			frappe.throw(_("Only resolved tickets can be reopened"))
 
 		if escalation_rule := self.get_escalation_rule():
-			self.agent_group = escalation_rule.to_team or self.team
+			self.agent_group = escalation_rule.to_team or self.agent_group
 			self.priority = escalation_rule.to_priority or self.priority
+			self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
 			self.assign_agent(escalation_rule.to_agent)
 
 		self.status = "Open"
