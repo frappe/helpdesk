@@ -2,11 +2,10 @@
   <Dialog :options="options">
     <template #body-main>
       <div class="space-y-4 p-6 text-base">
-        <Input v-model="doc.is_enabled" type="checkbox" label="Enabled" />
         <div class="text-lg font-medium text-gray-900">Criteria</div>
         <div class="flex flex-wrap items-center gap-2">
           <div
-            v-for="criterion in criteria"
+            v-for="(criterion, index) in criteria"
             :key="criterion.key"
             class="flex items-center gap-2"
           >
@@ -17,12 +16,15 @@
               :value="doc[criterion.key]"
               @change="(v) => (doc[criterion.key] = v.value)"
             />
+            <span v-if="index + 1 < criteria.length" class="text-gray-600">
+              and
+            </span>
           </div>
         </div>
         <div class="text-lg font-medium text-gray-900">Actions</div>
         <div class="flex flex-wrap items-center gap-2">
           <div
-            v-for="action in actions"
+            v-for="(action, index) in actions"
             :key="action.key"
             class="flex items-center gap-2"
           >
@@ -33,8 +35,12 @@
               :value="doc[action.key]"
               @change="(v) => (doc[action.key] = v.value)"
             />
+            <span v-if="index + 1 < actions.length" class="text-gray-600">
+              and
+            </span>
           </div>
         </div>
+        <!-- <Input v-model="doc.is_enabled" type="checkbox" label="Enabled" /> -->
       </div>
     </template>
   </Dialog>
@@ -162,6 +168,14 @@ const options = computed(() => ({
       theme: "gray",
       variant: "subtle",
       onClick: () => save(),
+    },
+    {
+      label: doc.value?.is_enabled ? "Disable" : "Enable",
+      theme: doc.value?.is_enabled ? "red" : "green",
+      variant: "subtle",
+      onClick: () =>
+        rule.setValue.submit({ is_enabled: !doc.value.is_enabled }),
+      hidden: isNew.value,
     },
     {
       label: "Delete",
