@@ -1,5 +1,5 @@
 <template>
-	<router-link
+	<RouterLink
 		:to="{
 			path: `/tickets/${ticket.name}`,
 		}"
@@ -12,7 +12,7 @@
 		}"
 	>
 		{{ ticket.subject }}
-	</router-link>
+	</RouterLink>
 </template>
 
 <script setup lang="ts">

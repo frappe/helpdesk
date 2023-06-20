@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex h-7 cursor-pointer items-center rounded-lg px-1.5 text-gray-700 transition-all duration-300 ease-in-out"
+    class="flex h-7 cursor-pointer items-center rounded-lg pl-1.5 pr-1 text-gray-700 transition-all duration-300 ease-in-out"
     :class="{
       'w-full': sidebarStore.isExpanded,
       'w-7': !sidebarStore.isExpanded,

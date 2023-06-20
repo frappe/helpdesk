@@ -2,7 +2,7 @@
 	<div class="flex flex-col rounded shadow p-5 text-base space-y-[12px]">
 		<div class="font-semibold">Details</div>
 		<div class="border-b w-full"></div>
-		<router-link
+		<RouterLink
 			:to="`/knowledge-base/articles/${article.name}`"
 			target="_blank"
 			v-if="article.published_on"
@@ -18,7 +18,7 @@
 				}}
 			</div>
 			<FeatherIcon name="external-link" class="w-4" />
-		</router-link>
+		</RouterLink>
 		<div v-if="$resources.users.data" class="flex flex-col">
 			<span class="block mb-2 text-sm leading-4 text-gray-700">
 				Author

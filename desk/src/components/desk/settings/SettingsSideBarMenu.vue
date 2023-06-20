@@ -5,11 +5,11 @@
 				class="cursor-pointer px-3 hover:bg-gray-50 rounded-md mx-2 mb-1"
 				:class="selectedSetting === setting.label ? 'bg-gray-50' : ''"
 			>
-				<router-link :to="{ name: setting.pageName }">
+				<RouterLink :to="{ name: setting.pageName }">
 					<div class="p-2 text-base">
 						{{ setting.label }}
 					</div>
-				</router-link>
+				</RouterLink>
 			</div>
 		</div>
 	</div>

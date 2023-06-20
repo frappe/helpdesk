@@ -39,7 +39,7 @@
         >
           <template #field-name="{ row }">
             <div class="group flex w-full items-center">
-              <router-link
+              <RouterLink
                 :to="{
                   path: `/sla/${row.name}`,
                 }"
@@ -54,7 +54,7 @@
                     class="h-[16px] w-[16px] fill-blue-500"
                   />
                 </a>
-              </router-link>
+              </RouterLink>
             </div>
           </template>
           <template #field-enabled="{ row }">

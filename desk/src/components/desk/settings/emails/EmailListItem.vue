@@ -13,12 +13,12 @@
 				/>
 			</div>
 			<div class="w-full group flex items-center">
-				<router-link
+				<RouterLink
 					:to="`/settings/emails/${emailAccount.name}`"
 					class="sm:w-4/12"
 				>
 					{{ emailAccount.name }}
-				</router-link>
+				</RouterLink>
 				<div class="sm:w-5/12">
 					{{ emailAccount.email_id }}
 				</div>
