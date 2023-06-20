@@ -1,6 +1,13 @@
 <template>
   <div class="w-full overflow-hidden overflow-x-auto">
     <div
+      v-if="isEmpty(data)"
+      class="flex h-full w-full items-center justify-center text-base text-gray-900"
+    >
+      {{ emptyMessage }}
+    </div>
+    <div
+      v-else
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-700"
     >
       <div
@@ -145,6 +152,7 @@
 <script setup lang="ts">
 import { computed, reactive, toRefs, useSlots } from "vue";
 import { FeatherIcon, Popover, Switch } from "frappe-ui";
+import { isEmpty } from "lodash";
 import IconAdd from "~icons/espresso/add";
 
 type Column = {
@@ -189,6 +197,11 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: false,
+  },
+  emptyMessage: {
+    type: String,
+    required: false,
+    default: "🙇 Such empty",
   },
 });
 
