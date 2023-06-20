@@ -6,7 +6,7 @@
           label="New rule"
           theme="gray"
           variant="solid"
-          @click="isDialogVisible = !isDialogVisible"
+          @click="showNewDialog = !showNewDialog"
         >
           <template #prefix>
             <IconPlus class="h-4 w-4" />
@@ -34,6 +34,7 @@
     <span v-if="showRule">
       <EscalationRuleDialog v-model="showRule" :name="selectedRule" />
     </span>
+    <EscalationRuleDialog v-model="showNewDialog" />
   </div>
 </template>
 <script setup lang="ts">
@@ -47,7 +48,7 @@ import PageTitle from "@/components/PageTitle.vue";
 import EscalationRuleDialog from "./EscalationRuleDialog.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const isDialogVisible = ref(false);
+const showNewDialog = ref(false);
 const showRule = ref(false);
 const selectedRule = ref(null);
 const columns = [

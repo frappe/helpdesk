@@ -1,79 +1,37 @@
 <template>
   <Dialog :options="options">
     <template #body-main>
-      <div class="space-y-4 px-6 pt-6 text-base">
-        <Input v-model="isEnabled" type="checkbox" label="Enabled" />
-        <div class="text-lg font-medium text-gray-900">Apply rule if</div>
+      <div class="space-y-4 p-6 text-base">
+        <Input v-model="doc.is_enabled" type="checkbox" label="Enabled" />
+        <div class="text-lg font-medium text-gray-900">Criteria</div>
         <div class="flex flex-wrap items-center gap-2">
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Priority is</div>
+          <div
+            v-for="criterion in criteria"
+            :key="criterion.key"
+            class="flex items-center gap-2"
+          >
+            <div class="text-gray-800">{{ criterion.label }}</div>
             <SearchComplete
-              doctype="HD Ticket Priority"
               placeholder="Any"
-              :value="priority"
-              @change="(v) => (priority = v.value)"
-            />
-          </div>
-          <div class="text-gray-600">and</div>
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Team is</div>
-            <SearchComplete
-              doctype="HD Team"
-              placeholder="Any"
-              :value="team"
-              @change="(v) => (team = v.value)"
-            />
-          </div>
-          <div class="text-gray-600">and</div>
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Ticket type is</div>
-            <SearchComplete
-              doctype="HD Ticket Type"
-              placeholder="Any"
-              :value="ticketType"
-              @change="(v) => (ticketType = v.value)"
+              :doctype="criterion.doctype"
+              :value="doc[criterion.key]"
+              @change="(v) => (doc[criterion.key] = v.value)"
             />
           </div>
         </div>
-        <div class="text-lg font-medium text-gray-900">Do these</div>
+        <div class="text-lg font-medium text-gray-900">Actions</div>
         <div class="flex flex-wrap items-center gap-2">
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Change priority to</div>
+          <div
+            v-for="action in actions"
+            :key="action.key"
+            class="flex items-center gap-2"
+          >
+            <div class="text-gray-800">{{ action.label }}</div>
             <SearchComplete
-              doctype="HD Ticket Priority"
               placeholder="Any"
-              :value="toPriority"
-              @change="(v) => (toPriority = v.value)"
-            />
-          </div>
-          <div class="text-gray-600">and</div>
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Change team to</div>
-            <SearchComplete
-              doctype="HD Team"
-              placeholder="Any"
-              :value="toTeam"
-              @change="(v) => (toTeam = v.value)"
-            />
-          </div>
-          <div class="text-gray-600">and</div>
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Change ticket type to</div>
-            <SearchComplete
-              doctype="HD Ticket Type"
-              placeholder="Any"
-              :value="toTicketType"
-              @change="(v) => (toTicketType = v.value)"
-            />
-          </div>
-          <div class="text-gray-600">and</div>
-          <div class="flex items-center gap-2">
-            <div class="text-gray-800">Assign to</div>
-            <SearchComplete
-              doctype="HD Agent"
-              placeholder="Any"
-              :value="toAgent"
-              @change="(v) => (toAgent = v.value)"
+              :doctype="action.doctype"
+              :value="doc[action.key]"
+              @change="(v) => (doc[action.key] = v.value)"
             />
           </div>
         </div>
@@ -84,88 +42,33 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { createDocumentResource, Dialog, Input } from "frappe-ui";
+import {
+  createResource,
+  createDocumentResource,
+  Dialog,
+  Input,
+} from "frappe-ui";
 import { createToast } from "@/utils/toasts";
 import SearchComplete from "@/components/SearchComplete.vue";
 
 const props = defineProps({
   name: {
     type: String,
-    required: true,
-  },
-});
-
-const priority = computed({
-  get() {
-    return rule.doc?.priority;
-  },
-  set(priority: string) {
-    rule.doc.priority = priority;
-  },
-});
-const team = computed({
-  get() {
-    return rule.doc?.team;
-  },
-  set(team: string) {
-    rule.doc.team = team;
-  },
-});
-const ticketType = computed({
-  get() {
-    return rule.doc?.ticket_type;
-  },
-  set(ticket_type: string) {
-    rule.doc.ticket_type = ticket_type;
-  },
-});
-const toPriority = computed({
-  get() {
-    return rule.doc?.to_priority;
-  },
-  set(priority: string) {
-    rule.doc.to_priority = priority;
-  },
-});
-const toTeam = computed({
-  get() {
-    return rule.doc?.to_team;
-  },
-  set(team: string) {
-    rule.doc.to_team = team;
-  },
-});
-const toAgent = computed({
-  get() {
-    return rule.doc?.to_agent;
-  },
-  set(team: string) {
-    rule.doc.to_agent = team;
-  },
-});
-const toTicketType = computed({
-  get() {
-    return rule.doc?.to_ticket_type;
-  },
-  set(ticket_type: string) {
-    rule.doc.to_ticket_type = ticket_type;
-  },
-});
-const isEnabled = computed({
-  get() {
-    return rule.doc?.is_enabled;
-  },
-  set(enabled: boolean) {
-    rule.doc.is_enabled = enabled;
+    required: false,
+    default: "",
   },
 });
 
 const rule = createDocumentResource({
   doctype: "HD Escalation Rule",
-  name: props.name,
+  name: props.name || 747,
   fields: ["name", "priority", "team", "to_team", "to_agent", "to_priority"],
   auto: true,
+  onError() {
+    rule.doc = {};
+  },
   setValue: {
+    debounce: 3000,
     onSuccess() {
       createToast({
         title: "Rule updated",
@@ -201,32 +104,113 @@ const rule = createDocumentResource({
   },
 });
 
+const newRule = createResource({
+  url: "frappe.client.insert",
+  onSuccess(data) {
+    createToast({
+      title: "Rule created",
+      icon: "check",
+      iconClasses: "text-green-500",
+    });
+
+    rule.name = data.name;
+    rule.reload();
+  },
+  onError(error) {
+    createToast({
+      title: "Error creating rule",
+      text: error.messages.join(", "),
+      icon: "x",
+      iconClasses: "text-red-500",
+    });
+  },
+});
+
+const doc = computed(() => rule.doc || {});
+const isNew = computed(() => !doc.value.name);
+
+function save() {
+  const d = {
+    is_enabled: doc.value.is_enabled,
+    priority: doc.value.priority,
+    team: doc.value.team,
+    ticket_type: doc.value.ticket_type,
+    to_agent: doc.value.to_agent,
+    to_priority: doc.value.to_priority,
+    to_team: doc.value.to_team,
+    to_ticket_type: doc.value.to_ticket_type,
+  };
+
+  if (doc.value.name) {
+    rule.setValue.submit(d);
+    return;
+  }
+
+  newRule.submit({
+    doc: {
+      doctype: "HD Escalation Rule",
+      ...d,
+    },
+  });
+}
+
 const options = computed(() => ({
-  title: rule.doc?.name,
+  title: doc.value.name,
   actions: [
     {
-      label: "Save",
+      label: isNew.value ? "Create" : "Save",
       theme: "gray",
       variant: "subtle",
-      disabled: !rule.doc?.priority && !rule.doc?.team,
-      onClick: () =>
-        rule.setValue.submit({
-          is_enabled: isEnabled.value,
-          priority: priority.value,
-          team: team.value,
-          ticket_type: ticketType.value,
-          to_agent: toAgent.value,
-          to_priority: toPriority.value,
-          to_team: toTeam.value,
-          to_ticket_type: toTicketType.value,
-        }),
+      onClick: () => save(),
     },
     {
       label: "Delete",
       theme: "red",
       variant: "subtle",
       onClick: () => rule.delete.submit(),
+      hidden: isNew.value,
     },
-  ],
+  ].filter((action) => !action.hidden),
 }));
+
+const criteria = [
+  {
+    label: "Priority is",
+    doctype: "HD Ticket Priority",
+    key: "priority",
+  },
+  {
+    label: "Team is",
+    doctype: "HD Team",
+    key: "team",
+  },
+  {
+    label: "Ticket type is",
+    doctype: "HD Ticket Type",
+    key: "ticket_type",
+  },
+];
+
+const actions = [
+  {
+    label: "Change priority to",
+    doctype: "HD Ticket Priority",
+    key: "to_priority",
+  },
+  {
+    label: "Change team to",
+    doctype: "HD Team",
+    key: "to_team",
+  },
+  {
+    label: "Change ticket type to",
+    doctype: "HD Ticket Type",
+    key: "to_ticket_type",
+  },
+  {
+    label: "Assign to",
+    doctype: "HD Agent",
+    key: "to_agent",
+  },
+];
 </script>
