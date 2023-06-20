@@ -101,6 +101,7 @@ const extraOptions = [
     label: "Escalation rules",
     icon: IconEscalation,
     to: AGENT_PORTAL_ESCALATION_RULE_LIST,
+    isBeta: true,
   },
   {
     label: "Email accounts",
