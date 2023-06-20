@@ -4,7 +4,7 @@
 			v-if="viewMode === 'Web'"
 			class="flex flex-row items-center space-x-2"
 		>
-			<router-link
+			<RouterLink
 				:title="'Articles'"
 				:to="{
 					path: '/kb/articles',
@@ -15,7 +15,7 @@
 					name="list"
 					class="h-5 w-5 ml-2 stroke-gray-500 hover:stroke-gray-900"
 				/>
-			</router-link>
+			</RouterLink>
 			<div
 				class="bg-white rounded-md shadow px-2 py-0.5 w-[82px] h-[24px]"
 			>
@@ -28,7 +28,7 @@
 			>
 				<div>Articles</div>
 			</div>
-			<router-link
+			<RouterLink
 				:title="'Toggle Web view'"
 				:to="{ path: '/kb' }"
 			>
@@ -37,7 +37,7 @@
 					name="layout"
 					class="h-5 w-5 mr-2 stroke-gray-500 hover:stroke-gray-900"
 				/>
-			</router-link>
+			</RouterLink>
 		</div>
 	</div>
 </template>

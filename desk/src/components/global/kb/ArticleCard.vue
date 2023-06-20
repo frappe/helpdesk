@@ -1,5 +1,5 @@
 <template>
-	<router-link :to="`/knowledge-base/articles/${article.name}`">
+	<RouterLink :to="`/knowledge-base/articles/${article.name}`">
 		<div
 			class="group rounded-[6px] shadow-md bg-white p-5 w-full flex flex-row justify-between items-center hover:bg-gray-50"
 		>
@@ -11,7 +11,7 @@
 				class="h-4 w-4 group-hover:visible invisible"
 			/>
 		</div>
-	</router-link>
+	</RouterLink>
 </template>
 
 <script>

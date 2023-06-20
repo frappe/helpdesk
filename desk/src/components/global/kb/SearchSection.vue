@@ -49,7 +49,7 @@
 									v-for="(result, index) in searchResults"
 									:key="result.name"
 								>
-									<router-link
+									<RouterLink
 										:to="{
 											path: `/knowledge-base/${
 												result.doctype === 'Article'
@@ -82,7 +82,7 @@
 												<div>{{ result.title }}</div>
 											</div>
 										</div>
-									</router-link>
+									</RouterLink>
 								</div>
 							</div>
 							<div v-else class="p-2 text-gray-500">

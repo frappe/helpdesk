@@ -9,8 +9,8 @@
 			<!-- TODO: <FeatherIcon v-if="editMode" name="plus" class="w-4 cursor-pointer my-auto bg-gray-50 hover:bg-gray-100 rounded" /> -->
 			<p v-if="editMode" class="text-base text-gray-500">
 				( add articles from
-				<router-link class="underline" :to="{ path: '/kb/articles' }"
-					>here</router-link
+				<RouterLink class="underline" :to="{ path: '/kb/articles' }"
+					>here</RouterLink
 				>
 				)
 			</p>

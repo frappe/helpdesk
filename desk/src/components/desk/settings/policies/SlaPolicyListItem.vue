@@ -13,7 +13,7 @@
 				/>
 			</div>
 			<div class="w-full group flex items-center">
-				<router-link
+				<RouterLink
 					:to="`/settings/sla/${policy.name}`"
 					class="sm:w-10/12 truncate pr-10 flex flex-row items-center space-x-2"
 				>
@@ -27,7 +27,7 @@
 							class="w-[16px] h-[16px] fill-blue-500"
 						/>
 					</a>
-				</router-link>
+				</RouterLink>
 				<div class="sm:w-2/12">
 					<div class="flex flex-row-reverse">
 						<CustomSwitch
