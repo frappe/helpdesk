@@ -40,7 +40,6 @@
             </span>
           </div>
         </div>
-        <!-- <Input v-model="doc.is_enabled" type="checkbox" label="Enabled" /> -->
       </div>
     </template>
   </Dialog>
@@ -48,12 +47,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  createResource,
-  createDocumentResource,
-  Dialog,
-  Input,
-} from "frappe-ui";
+import { createResource, createDocumentResource, Dialog } from "frappe-ui";
 import { createToast } from "@/utils/toasts";
 import SearchComplete from "@/components/SearchComplete.vue";
 
