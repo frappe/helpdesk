@@ -28,6 +28,7 @@ import {
   AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_DASHBOARD,
   AGENT_PORTAL_EMAIL_LIST,
+  AGENT_PORTAL_ESCALATION_RULE_LIST,
   AGENT_PORTAL_SLA_LIST,
   AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
@@ -42,6 +43,7 @@ import IconCannedResponse from "~icons/lucide/cloud-lightning";
 import IconContact from "~icons/lucide/contact-2";
 import IconCustomer from "~icons/lucide/user-circle-2";
 import IconDashboard from "~icons/lucide/layout-grid";
+import IconEscalation from "~icons/lucide/arrow-up-from-line";
 import IconKnowledgeBase from "~icons/lucide/book-open";
 import IconMore from "~icons/lucide/more-horizontal";
 import IconSLA from "~icons/lucide/scroll-text";
@@ -94,6 +96,12 @@ const extraOptions = [
     label: "Teams",
     icon: IconTeam,
     to: AGENT_PORTAL_TEAM_LIST,
+  },
+  {
+    label: "Escalation rules",
+    icon: IconEscalation,
+    to: AGENT_PORTAL_ESCALATION_RULE_LIST,
+    isBeta: true,
   },
   {
     label: "Email accounts",

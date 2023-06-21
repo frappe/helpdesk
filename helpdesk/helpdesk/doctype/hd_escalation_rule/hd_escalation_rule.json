@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-06-19 18:19:04.349990",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "is_enabled",
+  "column_break_hdwh",
+  "criterion_section",
+  "priority",
+  "team",
+  "column_break_aabd",
+  "ticket_type",
+  "assign_to_section",
+  "to_agent",
+  "to_team",
+  "column_break_ogxx",
+  "to_priority",
+  "to_ticket_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "priority",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Priority",
+   "options": "HD Ticket Priority"
+  },
+  {
+   "fieldname": "team",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Team",
+   "options": "HD Team"
+  },
+  {
+   "fieldname": "criterion_section",
+   "fieldtype": "Section Break",
+   "label": "Criterion"
+  },
+  {
+   "fieldname": "assign_to_section",
+   "fieldtype": "Section Break",
+   "label": "Assign to"
+  },
+  {
+   "fieldname": "to_agent",
+   "fieldtype": "Link",
+   "label": "Agent",
+   "options": "HD Agent"
+  },
+  {
+   "fieldname": "column_break_ogxx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "to_team",
+   "fieldtype": "Link",
+   "label": "Team",
+   "options": "HD Team"
+  },
+  {
+   "fieldname": "to_priority",
+   "fieldtype": "Link",
+   "label": "Priority",
+   "options": "HD Ticket Priority"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_hdwh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_aabd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ticket_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket type",
+   "options": "HD Ticket Type"
+  },
+  {
+   "fieldname": "to_ticket_type",
+   "fieldtype": "Link",
+   "label": "Ticket type",
+   "options": "HD Ticket Type"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-06-19 23:09:37.945913",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Escalation Rule",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
