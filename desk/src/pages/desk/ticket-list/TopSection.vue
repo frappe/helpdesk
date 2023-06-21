@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-between px-6 pb-3">
+  <div class="flex justify-between">
     <div class="flex gap-2">
       <PresetFilters doctype="HD Ticket" />
       <Dropdown

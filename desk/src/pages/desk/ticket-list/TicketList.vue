@@ -13,8 +13,10 @@
           </template>
         </Button>
       </template>
+      <template #bottom>
+        <TopSection class="mt-4" />
+      </template>
     </PageTitle>
-    <TopSection />
     <MainTable v-if="tickets.totalCount" class="grow" />
     <div
       v-else
