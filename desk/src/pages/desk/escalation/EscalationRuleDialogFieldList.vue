@@ -46,6 +46,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (event: "update:doc", value: any): void;
 }>();
 
