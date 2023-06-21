@@ -54,8 +54,7 @@ import SearchComplete from "@/components/SearchComplete.vue";
 const props = defineProps({
   name: {
     type: String,
-    required: false,
-    default: "",
+    required: true,
   },
 });
 

@@ -6,7 +6,7 @@
           label="New rule"
           theme="gray"
           variant="solid"
-          @click="showNewDialog = !showNewDialog"
+          @click="openDialog(null)"
         >
           <template #prefix>
             <IconPlus class="h-4 w-4" />
@@ -22,7 +22,7 @@
       :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="openRule"
+      @row-click="openDialog"
     >
       <template #is_enabled="{ data }">
         <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">
@@ -31,10 +31,11 @@
       </template>
     </HelpdeskTable>
     <ListNavigation class="p-3" v-bind="rules" />
-    <span v-if="showRule">
-      <EscalationRuleDialog v-model="showRule" :name="selectedRule" />
-    </span>
-    <EscalationRuleDialog v-model="showNewDialog" />
+    <EscalationRuleDialog
+      v-if="showDialog"
+      v-model="showDialog"
+      :name="selectedRule"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -48,8 +49,7 @@ import PageTitle from "@/components/PageTitle.vue";
 import EscalationRuleDialog from "./EscalationRuleDialog.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const showNewDialog = ref(false);
-const showRule = ref(false);
+const showDialog = ref(false);
 const selectedRule = ref(null);
 const columns = [
   {
@@ -80,9 +80,9 @@ const rules = createListManager({
   auto: true,
 });
 
-function openRule(id: string) {
-  selectedRule.value = id;
-  showRule.value = true;
+function openDialog(rule: string | null) {
+  selectedRule.value = rule;
+  showDialog.value = true;
 }
 
 socket.on("helpdesk:new-escalation-rule", () => rules.reload());
