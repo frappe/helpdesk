@@ -1,45 +1,17 @@
 <template>
   <Dialog :options="options">
     <template #body-content>
-      <div class="space-y-4 text-base">
-        <div class="text-lg font-medium text-gray-900">Criteria</div>
-        <div class="flex flex-wrap items-center gap-2">
-          <div
-            v-for="(criterion, index) in criteria"
-            :key="criterion.key"
-            class="flex items-center gap-2"
-          >
-            <div class="text-gray-800">{{ criterion.label }}</div>
-            <SearchComplete
-              placeholder="Any"
-              :doctype="criterion.doctype"
-              :value="doc[criterion.key]"
-              @change="(v) => (doc[criterion.key] = v.value)"
-            />
-            <span v-if="index + 1 < criteria.length" class="text-gray-600">
-              and
-            </span>
-          </div>
-        </div>
-        <div class="text-lg font-medium text-gray-900">Actions</div>
-        <div class="flex flex-wrap items-center gap-2">
-          <div
-            v-for="(action, index) in actions"
-            :key="action.key"
-            class="flex items-center gap-2"
-          >
-            <div class="text-gray-800">{{ action.label }}</div>
-            <SearchComplete
-              placeholder="Any"
-              :doctype="action.doctype"
-              :value="doc[action.key]"
-              @change="(v) => (doc[action.key] = v.value)"
-            />
-            <span v-if="index + 1 < actions.length" class="text-gray-600">
-              and
-            </span>
-          </div>
-        </div>
+      <div class="space-y-4">
+        <EscalationRuleDialogFieldList
+          v-model:doc="doc"
+          title="Criteria"
+          :items="criteria"
+        />
+        <EscalationRuleDialogFieldList
+          v-model:doc="doc"
+          title="Actions"
+          :items="actions"
+        />
       </div>
     </template>
   </Dialog>
@@ -49,7 +21,7 @@
 import { computed } from "vue";
 import { createResource, createDocumentResource, Dialog } from "frappe-ui";
 import { createToast } from "@/utils/toasts";
-import SearchComplete from "@/components/SearchComplete.vue";
+import EscalationRuleDialogFieldList from "./EscalationRuleDialogFieldList.vue";
 
 const props = defineProps({
   name: {
@@ -125,7 +97,14 @@ const newRule = createResource({
   },
 });
 
-const doc = computed(() => rule.doc || {});
+const doc = computed({
+  get() {
+    return rule.doc || {};
+  },
+  set(doc) {
+    rule.doc = doc;
+  },
+});
 const isNew = computed(() => !doc.value.name);
 
 function save() {
