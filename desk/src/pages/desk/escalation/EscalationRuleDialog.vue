@@ -1,7 +1,7 @@
 <template>
   <Dialog :options="options">
-    <template #body-main>
-      <div class="space-y-4 p-6 text-base">
+    <template #body-content>
+      <div class="space-y-4 text-base">
         <div class="text-lg font-medium text-gray-900">Criteria</div>
         <div class="flex flex-wrap items-center gap-2">
           <div
@@ -155,7 +155,7 @@ function save() {
 }
 
 const options = computed(() => ({
-  title: doc.value.name,
+  title: isNew.value ? "New rule" : "Edit rule",
   actions: [
     {
       label: isNew.value ? "Create" : "Save",
