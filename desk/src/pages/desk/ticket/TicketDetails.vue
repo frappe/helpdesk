@@ -150,7 +150,7 @@ Last assignee from the list, where expected list length is just one. Transformed
 object to be used with `Autocomplete`
 */
 const assignedTo = computed(() => {
-  const assigned = [ticket.getAssignees.data?.message || []].pop();
+  const assigned = (ticket.getAssignees.data?.message || []).pop();
   return agentStore.dropdown.find((agent) => agent.value === assigned?.name);
 });
 
