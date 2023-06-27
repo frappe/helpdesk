@@ -2,11 +2,18 @@
   <HelpdeskTable
     v-model:selection="selection"
     :columns="columns"
-    :data="tickets.list.data"
+    :data="tickets.data.tickets"
     row-key="name"
   >
     <template #subject="{ data }">
-      <TicketSummary class="col-subject" :ticket-name="data.name" />
+      <TicketSummary
+        class="col-subject"
+        :name="data.name"
+        :subject="data.subject"
+        :comments="data.count_comment"
+        :conversations="data.count_conversation"
+        :is-seen="isSeen(data._seen)"
+      />
     </template>
     <template #status="{ data }">
       <Dropdown :options="statusDropdownOptions(data.name, data.status)">
@@ -78,10 +85,11 @@
 import { createResource, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { useAgentStore } from "@/stores/agent";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useAuthStore } from "@/stores/auth";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils/toasts";
+import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
@@ -90,6 +98,7 @@ import IconCaretUp from "~icons/lucide/chevron-up";
 import IconPlusCircle from "~icons/lucide/plus-circle";
 
 const agentStore = useAgentStore();
+const authStore = useAuthStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const { selection, tickets } = useTicketListStore();
@@ -211,6 +220,10 @@ function priorityDropdownOptions(ticketId: number, currentPriority: string) {
           priority: o,
         }),
     }));
+}
+
+function isSeen(seen: string) {
+  return seen?.includes(authStore.userId);
 }
 </script>
 

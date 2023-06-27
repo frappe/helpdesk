@@ -10,14 +10,14 @@
       </div>
       <Button
         icon="chevron-left"
-        :disabled="!hasPreviousPage"
+        :disabled="loading || !hasPreviousPage"
         class="rounded-full"
         variant="outline"
         @click="previous"
       />
       <Button
         icon="chevron-right"
-        :disabled="!hasNextPage"
+        :disabled="loading || !hasNextPage"
         class="rounded-full"
         variant="outline"
         @click="next"
@@ -27,42 +27,44 @@
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { computed, toRefs } from "vue";
+
+const props = defineProps({
   startFrom: {
     type: Number,
     required: true,
   },
-  endAt: {
-    type: Number,
-    required: true,
-  },
-  currentPage: {
-    type: Number,
-    required: true,
-  },
-  totalPages: {
+  limit: {
     type: Number,
     required: true,
   },
   totalCount: {
     type: Number,
-    required: true,
-  },
-  hasPreviousPage: {
-    type: Boolean,
-    required: true,
-  },
-  hasNextPage: {
-    type: Boolean,
-    required: true,
+    required: false,
+    default: 0,
   },
   next: {
     type: Function,
-    required: true,
+    required: false,
+    default: () => true,
   },
   previous: {
     type: Function,
-    required: true,
+    required: false,
+    default: () => true,
+  },
+  loading: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
+
+const { startFrom, limit, totalCount } = toRefs(props);
+const endAt = computed(() => {
+  const byLimit = startFrom.value + limit.value;
+  return byLimit < totalCount.value ? byLimit : totalCount.value;
+});
+const hasPreviousPage = computed(() => startFrom.value > 1);
+const hasNextPage = computed(() => endAt.value < totalCount.value);
 </script>

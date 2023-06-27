@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
+import { createResource } from "frappe-ui";
 import { useKeymapStore } from "@/stores/keymap";
-import { createListManager } from "@/composables/listManager";
 
 export const useTicketListStore = defineStore("ticketList", () => {
   const KEYMAPS = [
@@ -21,6 +21,8 @@ export const useTicketListStore = defineStore("ticketList", () => {
   const KEYMAP_PREFIX = "Control";
   const keymapStore = useKeymapStore();
   const selection = ref(new Set<string>());
+  const limit = ref(20);
+  const start = ref(1);
 
   function init() {
     KEYMAPS.forEach((o) => {
@@ -43,16 +45,44 @@ export const useTicketListStore = defineStore("ticketList", () => {
     KEYMAPS.forEach((o) => keymapStore.remove([KEYMAP_PREFIX, o.button]));
   }
 
-  const tickets = createListManager({
-    doctype: "HD Ticket",
-    pageLength: 20,
+  const tickets = createResource({
+    url: "helpdesk.api.ticket.get_many",
     auto: true,
+    params: {
+      start: start.value,
+      limit: limit.value,
+    },
   });
+
+  tickets.previous = () => {
+    const __s = start.value - limit.value;
+    start.value = __s > 0 ? __s : 1;
+    tickets.update({
+      params: {
+        start: start.value,
+        limit: limit.value,
+      },
+    });
+    tickets.reload();
+  };
+
+  tickets.next = () => {
+    start.value = start.value + limit.value;
+    tickets.update({
+      params: {
+        start: start.value,
+        limit: limit.value,
+      },
+    });
+    tickets.reload();
+  };
 
   return {
     deinit,
     init,
+    limit,
     selection,
+    start,
     tickets,
   };
 });

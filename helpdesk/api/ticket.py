@@ -1,9 +1,60 @@
 import frappe
 from frappe.website.utils import cleanup_page_name
+from pypika.functions import Count
 
 from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
 	create_communication_via_contact,
 )
+
+
+@frappe.whitelist()
+def get_many(start: int = 0, limit: int = 20):
+	if not frappe.has_permission("HD Ticket", "read"):
+		frappe.throw("Insufficient Permission", frappe.PermissionError)
+
+	QBTicket = frappe.qb.DocType("HD Ticket")
+	QBCommunication = frappe.qb.DocType("Communication")
+	QBComment = frappe.qb.DocType("HD Ticket Comment")
+
+	tickets = (
+		frappe.qb.from_(QBTicket)
+		.select(QBTicket.star)
+		.offset(start)
+		.limit(limit)
+		.run(as_dict=True)
+	)
+
+	count_total = (
+		frappe.qb.from_(QBTicket)
+		.select(Count(QBTicket.name).as_("count"))
+		.run(as_dict=True)[0]
+		.count
+	)
+
+	for ticket in tickets:
+		ticket_name = ticket.get("name")
+
+		count_comment = (
+			frappe.qb.from_(QBComment)
+			.select(Count(QBComment.name).as_("count"))
+			.where(QBComment.reference_ticket == ticket_name)
+			.run(as_dict=True)[0]
+			.count
+		)
+
+		count_conversation = (
+			frappe.qb.from_(QBCommunication)
+			.select(Count(QBCommunication.name).as_("count"))
+			.where(QBCommunication.reference_doctype == "HD Ticket")
+			.where(QBCommunication.reference_name == ticket_name)
+			.run(as_dict=True)[0]
+			.count
+		)
+
+		ticket["count_comment"] = count_comment
+		ticket["count_conversation"] = count_conversation
+
+	return {"tickets": tickets, "count_total": count_total}
 
 
 @frappe.whitelist()

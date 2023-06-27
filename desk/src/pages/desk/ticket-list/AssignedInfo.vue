@@ -10,7 +10,7 @@ import { createDocumentResource, Avatar, Tooltip } from "frappe-ui";
 
 const props = defineProps({
   ticketId: {
-    type: String,
+    type: Number,
     required: true,
   },
 });
