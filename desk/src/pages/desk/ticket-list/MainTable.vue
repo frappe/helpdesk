@@ -1,9 +1,10 @@
 <template>
   <HelpdeskTable
     v-model:selection="selection"
+    row-key="name"
     :columns="columns"
     :data="tickets.list.data"
-    row-key="name"
+    :empty-message="emptyMessage"
   >
     <template #subject="{ data }">
       <TicketSummary
@@ -101,6 +102,8 @@ const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const { selection, tickets } = useTicketListStore();
 
+const emptyMessage =
+  "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 const dateFormat = "D/M/YYYY h:mm A";
 const columns = [
   {

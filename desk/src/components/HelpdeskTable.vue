@@ -2,7 +2,7 @@
   <div class="w-full overflow-hidden overflow-x-auto">
     <div
       v-if="isEmpty(data)"
-      class="flex h-full w-full items-center justify-center text-base text-gray-900"
+      class="flex h-full w-full items-center justify-center text-base text-gray-700"
     >
       {{ emptyMessage }}
     </div>
