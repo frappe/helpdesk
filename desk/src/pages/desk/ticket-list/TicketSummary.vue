@@ -15,21 +15,21 @@
       <div
         class="flex gap-2 opacity-0 transition"
         :class="{
-          'group-hover:opacity-100': conversationCount || commentCount,
+          'group-hover:opacity-100': communications || comments,
         }"
       >
-        <div v-if="conversationCount" class="flex items-center gap-1 text-xs">
+        <div v-if="communications" class="flex items-center gap-1 text-xs">
           <IconMail class="h-3 w-3" />
-          {{ conversationCount }}
+          {{ communications }}
         </div>
-        <div v-if="commentCount" class="flex items-center gap-1 text-xs">
+        <div v-if="comments" class="flex items-center gap-1 text-xs">
           <IconComment class="h-3 w-3" />
-          {{ commentCount }}
+          {{ comments }}
         </div>
       </div>
       <div class="flex items-center gap-1 text-xs">
         <IconHash class="h-3 w-3" />
-        {{ ticketName }}
+        {{ name }}
       </div>
     </div>
   </RouterLink>
@@ -37,51 +37,44 @@
 
 <script setup lang="ts">
 import { computed, toRefs } from "vue";
-import { createDocumentResource } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
+import IconComment from "~icons/lucide/message-square";
 import IconHash from "~icons/espresso/hash";
 import IconMail from "~icons/lucide/mail";
-import IconComment from "~icons/lucide/message-square";
 
 const props = defineProps({
-  ticketName: {
+  name: {
+    type: Number,
+    required: true,
+  },
+  subject: {
     type: String,
     required: true,
   },
+  communications: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  comments: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  seen: {
+    type: String,
+    required: false,
+    default: "",
+  },
 });
 
-const { ticketName } = toRefs(props);
+const authStore = useAuthStore();
+const { name, seen } = toRefs(props);
+const isSeen = computed(() => seen.value.includes(authStore.userId));
 const toRoute = computed(() => ({
   name: "DeskTicket",
   params: {
-    ticketId: ticketName.value,
+    ticketId: name.value,
   },
 }));
-const subject = computed(() => ticket.doc?.subject);
-const metaData = computed(() => ticket.getMeta?.data?.message);
-const conversationCount = computed(() => metaData.value?.conversation_count);
-const commentCount = computed(() => metaData.value?.comment_count);
-const isSeen = computed(() => metaData.value?.is_seen);
-
-const ticket = createDocumentResource({
-  doctype: "HD Ticket",
-  name: ticketName,
-  cache: ["Ticket", ticketName],
-  whitelistedMethods: {
-    getMeta: {
-      method: "get_meta",
-      cache: ["TicketMetaData", ticketName],
-    },
-  },
-});
-
-ticket.getMeta.fetch();
 </script>
-
-<style scoped>
-.badge-new {
-  padding: 3px 6px;
-  width: 38px;
-  height: 20px;
-  border-radius: 5px;
-}
-</style>
