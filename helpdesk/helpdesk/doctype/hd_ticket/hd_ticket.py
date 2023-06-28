@@ -33,10 +33,25 @@ class HDTicket(Document):
 	@staticmethod
 	def get_list_query(query: Query, fields):
 		QBTicket = frappe.qb.DocType("HD Ticket")
+		QBComment = frappe.qb.DocType("HD Ticket Comment")
+		QBCommunication = frappe.qb.DocType("Communication")
 
-		query = HDTicket.filter_by_team(query)
 		if not fields:
 			query = query.select(QBTicket.star)
+
+		query = HDTicket.filter_by_team(query)
+		query = query.groupby(QBTicket.name)
+		query = (
+			query.left_join(QBComment)
+			.on(QBComment.reference_ticket == QBTicket.name)
+			.select(Count(QBComment.name).as_("count_commment"))
+			.left_join(QBCommunication)
+			.on(
+				(QBCommunication.reference_doctype == "HD Ticket")
+				& (QBCommunication.reference_name == QBTicket.name)
+			)
+			.select(Count(QBCommunication.name).as_("count_communication"))
+		)
 
 		return query
 
