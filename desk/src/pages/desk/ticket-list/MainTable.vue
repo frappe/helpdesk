@@ -60,7 +60,7 @@
       {{ data.via_customer_portal ? "Customer Portal" : "Email" }}
     </template>
     <template #row-extra="{ data }">
-      <AssignedInfo :ticket-id="data.name" />
+      <AssignedInfo :assign="data._assign" />
     </template>
     <template #actions="{ selection: s }">
       <Dropdown :options="assignOpts(s as Set<number>)">
