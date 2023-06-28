@@ -70,7 +70,7 @@ const props = defineProps({
 
 const authStore = useAuthStore();
 const { name, seen } = toRefs(props);
-const isSeen = computed(() => seen.value.includes(authStore.userId));
+const isSeen = computed(() => seen.value?.includes(authStore.userId));
 const toRoute = computed(() => ({
   name: "DeskTicket",
   params: {
