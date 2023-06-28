@@ -39,7 +39,7 @@ def get_list(
 	query = apply_hook(doctype, query)
 	query = apply_sort(doctype, order_by, query)
 
-	if not filters:
+	if not fields:
 		query = apply_custom_select(doctype, query)
 
 	return query.run(as_dict=True, debug=debug)
