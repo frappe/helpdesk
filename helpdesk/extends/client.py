@@ -35,9 +35,12 @@ def get_list(
 		group_by=group_by,
 	)
 
-	query = apply_custom_filters(doctype, query,fields=fields)
+	query = apply_custom_filters(doctype, query)
 	query = apply_hook(doctype, query)
 	query = apply_sort(doctype, order_by, query)
+
+	if not fields:
+		query = apply_custom_select(doctype, query)
 
 	return query.run(as_dict=True, debug=debug)
 
@@ -104,14 +107,28 @@ def check_permissions(doctype, parent):
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
-def apply_custom_filters(doctype: str, query,fields:list=[]):
+def apply_custom_filters(doctype: str, query):
 	"""
 	Apply custom filters to query
 	"""
 	controller = get_controller(doctype)
 
-	if hasattr(controller, "get_list_query"):
-		return_value = controller.get_list_query(query,fields)
+	if hasattr(controller, "get_list_filters"):
+		return_value = controller.get_list_filters(query)
+		if return_value is not None:
+			query = return_value
+
+	return query
+
+
+def apply_custom_select(doctype: str, query):
+	"""
+	Apply custom select logic to query
+	"""
+	controller = get_controller(doctype)
+
+	if hasattr(controller, "get_list_select"):
+		return_value = controller.get_list_select(query)
 		if return_value is not None:
 			query = return_value
 
@@ -126,7 +143,7 @@ def apply_hook(doctype: str, query):
 		_module_path = "helpdesk.helpdesk.hooks." + doctype.lower()
 		_module = importlib.import_module(_module_path)
 		_class = getattr(_module, doctype)
-		_function = getattr(_class, "get_list_query")
+		_function = getattr(_class, "get_list_filters")
 		return _function(query)
 	except:
 		return query

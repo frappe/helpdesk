@@ -6,7 +6,14 @@
     row-key="name"
   >
     <template #subject="{ data }">
-      <TicketSummary class="col-subject" :ticket-name="data.name" />
+      <TicketSummary
+        class="col-subject"
+        :name="data.name"
+        :subject="data.subject"
+        :communications="data.count_communication"
+        :comments="data.count_comment"
+        :seen="data._seen"
+      />
     </template>
     <template #status="{ data }">
       <Dropdown :options="statusDropdownOptions(data.name, data.status)">
@@ -53,7 +60,7 @@
       {{ data.via_customer_portal ? "Customer Portal" : "Email" }}
     </template>
     <template #row-extra="{ data }">
-      <AssignedInfo :ticket-id="data.name" />
+      <AssignedInfo :assign="data._assign" />
     </template>
     <template #actions="{ selection: s }">
       <Dropdown :options="assignOpts(s as Set<number>)">

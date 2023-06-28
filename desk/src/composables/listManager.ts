@@ -99,5 +99,13 @@ export function createListManager(options: ListOptions) {
     );
   }
 
+  watch(
+    () => list.list.loading,
+    () => {
+      list.hasPreviousPage = false;
+      list.hasNextPage = false;
+    }
+  );
+
   return list;
 }
