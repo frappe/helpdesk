@@ -553,45 +553,6 @@ class HDTicket(Document):
 	def mark_seen(self):
 		self.add_seen()
 
-	def get_comment_count(self):
-		QBComment = DocType("HD Ticket Comment")
-
-		count = Count("*").as_("count")
-		res = (
-			frappe.qb.from_(QBComment)
-			.select(count)
-			.where(QBComment.reference_ticket == self.name)
-			.run(as_dict=True)
-		)
-
-		return res.pop().count
-
-	def get_conversation_count(self):
-		QBCommunication = DocType("Communication")
-
-		count = Count("*").as_("count")
-		res = (
-			frappe.qb.from_(QBCommunication)
-			.select(count)
-			.where(QBCommunication.reference_doctype == "HD Ticket")
-			.where(QBCommunication.reference_name == self.name)
-			.run(as_dict=True)
-		)
-
-		return res.pop().count
-
-	def is_seen(self):
-		seen = self._seen or ""
-		return frappe.session.user in seen
-
-	@frappe.whitelist()
-	def get_meta(self):
-		return {
-			"comment_count": self.get_comment_count(),
-			"conversation_count": self.get_conversation_count(),
-			"is_seen": self.is_seen(),
-		}
-
 	@frappe.whitelist()
 	def get_assignees(self):
 		QBUser = DocType("User")
