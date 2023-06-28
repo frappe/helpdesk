@@ -6,7 +6,7 @@ import math
 
 import frappe
 from frappe.model.base_document import get_controller
-from pypika.functions import Count
+from frappe.query_builder.functions import Count
 
 from .doc import apply_sort
 from .qb import get_query
@@ -20,7 +20,7 @@ def get_list(
 	order_by=None,
 	start=0,
 	limit=None,
-	group_by="name",
+	group_by=None,
 	parent=None,
 	debug=False,
 ):
@@ -104,7 +104,7 @@ def check_permissions(doctype, parent):
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
-def apply_custom_filters(doctype: str, query, fields: list = [], ignore_groupby=False):
+def apply_custom_filters(doctype: str, query, fields: list = []):
 	"""
 	Apply custom filters to query
 	"""

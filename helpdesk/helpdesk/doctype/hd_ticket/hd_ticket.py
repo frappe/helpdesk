@@ -40,6 +40,7 @@ class HDTicket(Document):
 			query = query.select(QBTicket.star)
 
 		query = HDTicket.filter_by_team(query)
+		query = query.groupby(QBTicket.name)
 		query = (
 			query.left_join(QBComment)
 			.on(QBComment.reference_ticket == QBTicket.name)
