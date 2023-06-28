@@ -44,7 +44,7 @@ class HDTicket(Document):
 		query = (
 			query.left_join(QBComment)
 			.on(QBComment.reference_ticket == QBTicket.name)
-			.select(Count(QBComment.name).as_("count_commment"))
+			.select(Count(QBComment.name).as_("count_comment"))
 			.left_join(QBCommunication)
 			.on(
 				(QBCommunication.reference_doctype == "HD Ticket")
