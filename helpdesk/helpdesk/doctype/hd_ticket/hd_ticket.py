@@ -2,13 +2,12 @@ from __future__ import unicode_literals
 
 import json
 from datetime import timedelta
-from typing import List
 from functools import lru_cache
+from typing import List
 
 import frappe
 from frappe import _
 from frappe.core.utils import get_parent_doc
-from frappe.database.database import Criterion, Query
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.email.inbox import link_communication_to_document
@@ -18,6 +17,8 @@ from frappe.query_builder import Case, DocType, Order
 from frappe.query_builder.functions import Count
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
+from pypika.queries import Query
+from pypika.terms import Criterion
 
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
@@ -26,21 +27,16 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import publish_event, capture_event
+from helpdesk.utils import capture_event, publish_event
 
 
 class HDTicket(Document):
 	@staticmethod
-	def get_list_query(query: Query, fields):
+	def get_list_select(query: Query):
 		QBTicket = frappe.qb.DocType("HD Ticket")
 		QBComment = frappe.qb.DocType("HD Ticket Comment")
 		QBCommunication = frappe.qb.DocType("Communication")
 
-		if not fields:
-			query = query.select(QBTicket.star)
-
-		query = HDTicket.filter_by_team(query)
-		query = query.groupby(QBTicket.name)
 		query = (
 			query.left_join(QBComment)
 			.on(QBComment.reference_ticket == QBTicket.name)
@@ -51,12 +47,14 @@ class HDTicket(Document):
 				& (QBCommunication.reference_name == QBTicket.name)
 			)
 			.select(Count(QBCommunication.name).as_("count_communication"))
+			.select(QBTicket.star)
+			.groupby(QBTicket.name)
 		)
 
 		return query
 
 	@staticmethod
-	def filter_by_team(query: Query):
+	def get_list_filters(query: Query):
 		user = frappe.session.user
 
 		if HDTicket.can_ignore_restrictions(user):

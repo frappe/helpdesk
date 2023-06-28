@@ -9,7 +9,7 @@ from frappe.utils import cint
 
 class HDArticle(Document):
 	@staticmethod
-	def get_list_query(query):
+	def get_list_filters(query):
 		QBArticle = DocType("HD Article")
 		QBCategory = DocType("Category")
 
@@ -84,10 +84,14 @@ def add_feedback(hd_article, helpful):
 	field = "helpful" if helpful else "not_helpful"
 
 	value = cint(frappe.db.get_value("HD Article", hd_article, field))
-	frappe.db.set_value("HD Article", hd_article, field, value + 1, update_modified=False)
+	frappe.db.set_value(
+		"HD Article", hd_article, field, value + 1, update_modified=False
+	)
 
 
 @frappe.whitelist(allow_guest=True)
 def increment_view(hd_article):
 	value = cint(frappe.db.get_value("HD Article", hd_article, "views"))
-	frappe.db.set_value("HD Article", hd_article, "views", value + 1, update_modified=False)
+	frappe.db.set_value(
+		"HD Article", hd_article, "views", value + 1, update_modified=False
+	)
