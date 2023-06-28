@@ -17,13 +17,7 @@
         <TopSection class="mt-4" />
       </template>
     </PageTitle>
-    <MainTable v-if="tickets.totalCount" class="grow" />
-    <div
-      v-else
-      class="flex grow items-center justify-center text-sm text-gray-800"
-    >
-      {{ isEmptyMessage }}
-    </div>
+    <MainTable class="grow" />
     <ListNavigation v-bind="tickets" class="p-2" />
     <NewTicketDialog
       v-model="isDialogVisible"
@@ -45,8 +39,6 @@ import IconPlus from "~icons/lucide/plus";
 
 const { init, deinit, tickets } = useTicketListStore();
 const isDialogVisible = ref(false);
-const isEmptyMessage =
-  "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 
 onMounted(init);
 onUnmounted(deinit);
