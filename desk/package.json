@@ -20,7 +20,7 @@
 		"autoprefixer": "^10.4.13",
 		"dayjs": "^1.11.7",
 		"echarts": "^5.4.1",
-		"frappe-ui": "^0.1.0-alpha.1",
+		"frappe-ui": "^0.1.0-alpha.4",
 		"lodash": "^4.17.21",
 		"pinia": "^2.0.33",
 		"sanitize-html": "^2.10.0",
