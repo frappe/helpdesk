@@ -6,9 +6,10 @@ import { useListFilters } from "./listFilters";
 const GET_LIST_METHOD = "helpdesk.extends.client.get_list";
 const GET_LIST_META_METHOD = "helpdesk.extends.client.get_list_meta";
 
+type Field = string | Record<string, Array<string>>;
 type ListOptions = {
   doctype: string;
-  fields?: Array<string>;
+  fields?: Array<Field>;
   filters?: object;
   orderBy?: string;
   pageLength?: number;
@@ -16,7 +17,6 @@ type ListOptions = {
   cache?: boolean | string | Array<string>;
   auto?: boolean;
 };
-
 type MetaData = {
   total_count: number;
   total_pages: number;
