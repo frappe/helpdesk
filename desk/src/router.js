@@ -231,12 +231,12 @@ const routes = [
       {
         path: "customers",
         name: AGENT_PORTAL_CUSTOMER_LIST,
-        component: () => import("@/pages/desk/CustomerList.vue"),
+        component: () => import("@/pages/desk/customer/CustomerList.vue"),
       },
       {
         path: "contacts",
         name: AGENT_PORTAL_CONTACT_LIST,
-        component: () => import("@/pages/desk/ContactList.vue"),
+        component: () => import("@/pages/desk/contact/ContactList.vue"),
       },
       {
         path: "agents",
