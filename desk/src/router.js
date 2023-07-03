@@ -251,7 +251,7 @@ const routes = [
       {
         path: "teams/:teamId",
         name: AGENT_PORTAL_TEAM_SINGLE,
-        component: () => import("@/pages/desk/team/Team.vue"),
+        component: () => import("@/pages/desk/team/TeamSingle.vue"),
         props: true,
       },
       {
