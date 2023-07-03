@@ -3,15 +3,9 @@
     <div class="flex flex-col">
       <TopBar :title="teamId" :back-to="AGENT_PORTAL_TEAM_LIST">
         <template #right>
-          <div class="flex gap-2">
-            <Button
-              label="Rename"
-              theme="blue"
-              variant="outline"
-              @click="showRename = !showRename"
-            />
-            <Button label="Delete" theme="red" variant="outline" />
-          </div>
+          <Dropdown :options="docOptions">
+            <Button icon="more-horizontal" variant="ghost" />
+          </Dropdown>
         </template>
       </TopBar>
       <div class="m-6">
@@ -33,7 +27,7 @@
         </div>
       </div>
     </div>
-    <Dialog v-model="showRename" :options="{ title: 'Rename team' }">
+    <Dialog v-model="showRename" :options="renameDialogOptions">
       <template #body-content>
         <div class="space-y-2">
           <FormControl
@@ -63,6 +57,7 @@ import {
   createResource,
   Button,
   Dialog,
+  Dropdown,
   FormControl,
   createDocumentResource,
 } from "frappe-ui";
@@ -111,6 +106,19 @@ const title = computed({
     team.doc.name = t;
   },
 });
+const docOptions = [
+  {
+    label: "Rename",
+    icon: "edit-3",
+    onClick: () => (showRename.value = !showRename.value),
+  },
+  {
+    label: "Delete",
+    icon: "trash-2",
+    onClick: () => (showDelete.value = !showDelete.value),
+  },
+];
+const renameDialogOptions = { title: "Rename team" };
 const deleteDialogOptions = {
   title: "Delete team",
   message: `Are you sure you want to delete ${props.teamId}? This action cannot be reversed!`,
