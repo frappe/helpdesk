@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-// import TeamInfo from "@/components/desk/settings/teams/TeamInfo.vue";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import {
@@ -82,7 +81,7 @@ const props = defineProps({
 const router = useRouter();
 const agents = ref([]);
 const showRename = ref(false);
-const showDelete = ref(true);
+const showDelete = ref(false);
 const team = createDocumentResource({
   doctype: "HD Team",
   name: props.teamId,
