@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none items-center justify-between rounded-lg border bg-gray-50 px-3 py-2"
+    class="flex select-none items-center justify-between rounded border px-3 py-2"
   >
     <div class="text-base font-medium text-gray-800">
       {{ title }}
