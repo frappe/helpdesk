@@ -1,11 +1,17 @@
 <template>
-  <v-chart class="chart" :option="option" :theme="theme" autoresize />
+  <VChart
+    autoresize
+    class="chart"
+    :option="options"
+    :init-options="initOptions"
+    :theme="theme"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, toRefs, PropType } from "vue";
 import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
+import { SVGRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
 import {
   GridComponent,
@@ -42,7 +48,7 @@ const props = defineProps({
 const { data, title, xAxisType } = toRefs(props);
 
 use([
-  CanvasRenderer,
+  SVGRenderer,
   GridComponent,
   LegendComponent,
   LineChart,
@@ -50,7 +56,11 @@ use([
   TooltipComponent,
 ]);
 
-const option = ref({
+const initOptions = {
+  renderer: "svg",
+};
+
+const options = ref({
   grid: {
     bottom: "10%",
     top: "20%",
