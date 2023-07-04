@@ -23,8 +23,8 @@
       📊 Oops, looks like there are no charts to display on the dashboard right
       now.
     </div>
-    <div v-else class="space-y-4 overflow-y-scroll p-4">
-      <div class="grid grid-cols-3 gap-4">
+    <div v-else class="space-y-3 overflow-y-scroll p-4">
+      <div class="grid grid-cols-3 gap-3">
         <SingleString
           v-for="i in items.data.filter((i) => !i.is_chart)"
           :key="i.title"
@@ -32,11 +32,11 @@
           :value="i.data"
         />
       </div>
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-3 gap-3">
         <div
           v-for="i in items.data.filter((i) => i.is_chart)"
           :key="i.title"
-          class="h-56 rounded-lg border bg-gray-50 p-2"
+          class="h-64 rounded border p-2"
         >
           <PieChart
             v-if="i.is_chart && i.chart_type === 'Pie'"
