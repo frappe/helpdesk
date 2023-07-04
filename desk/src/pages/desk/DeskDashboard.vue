@@ -36,7 +36,7 @@
         <div
           v-for="i in items.data.filter((i) => i.is_chart)"
           :key="i.title"
-          class="h-56 rounded-lg border bg-gray-50 p-2"
+          class="h-64 rounded border p-2"
         >
           <PieChart
             v-if="i.is_chart && i.chart_type === 'Pie'"
