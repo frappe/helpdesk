@@ -4,7 +4,12 @@
       <TopBar :title="teamId" :back-to="AGENT_PORTAL_TEAM_LIST">
         <template #right>
           <div class="flex items-center gap-2">
-            <Button label="Add member" theme="gray" variant="solid">
+            <Button
+              label="Add member"
+              theme="gray"
+              variant="solid"
+              @click="showAddMember = !showAddMember"
+            >
               <template #prefix>
                 <IconPlus class="h-4 w-4" />
               </template>
@@ -73,6 +78,31 @@
       </template>
     </Dialog>
     <Dialog v-model="showDelete" :options="deleteDialogOptions" />
+    <Dialog v-model="showAddMember" :options="addMemberDialogOptions">
+      <template #body-content>
+        <div class="space-y-2">
+          <div
+            v-for="agent in agentStore.options"
+            :key="agent.name"
+            class="flex items-center justify-between"
+          >
+            <div class="flex items-center gap-2">
+              <Avatar :label="agent.agent_name" :image="agent.user_image" />
+              <div class="text-base">
+                {{ agent.agent_name }}
+              </div>
+            </div>
+            <Button
+              :disabled="team.doc?.users.find((u) => u.user === agent.user)"
+              label="Add"
+              theme="gray"
+              variant="outline"
+              @click="addMember(agent.user)"
+            />
+          </div>
+        </div>
+      </template>
+    </Dialog>
   </span>
 </template>
 
@@ -82,6 +112,7 @@ import { useRouter } from "vue-router";
 import {
   createDocumentResource,
   createResource,
+  Avatar,
   Button,
   Dialog,
   Dropdown,
@@ -89,6 +120,7 @@ import {
 } from "frappe-ui";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { createToast } from "@/utils/toasts";
+import { useAgentStore } from "@/stores/agent";
 import TopBar from "@/components/TopBar.vue";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";
@@ -102,12 +134,25 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const agentStore = useAgentStore();
 const showRename = ref(false);
 const showDelete = ref(false);
+const showAddMember = ref(true);
 const team = createDocumentResource({
   doctype: "HD Team",
   name: props.teamId,
   auto: true,
+  setValue: {
+    onError(error) {
+      const msg = error.messages.join(", ");
+      createToast({
+        title: "Error updating team",
+        text: msg,
+        icon: "x",
+        iconClasses: "text-red-500",
+      });
+    },
+  },
   delete: {
     onSuccess() {
       router.replace({
@@ -146,6 +191,7 @@ const docOptions = [
   },
 ];
 const renameDialogOptions = { title: "Rename team" };
+const addMemberDialogOptions = { title: "Add member" };
 const deleteDialogOptions = {
   title: "Delete team",
   message: `Are you sure you want to delete ${props.teamId}? This action cannot be reversed!`,
@@ -194,6 +240,13 @@ function renameTeam() {
   });
 
   r.submit();
+}
+
+function addMember(user: string) {
+  const users = team.doc.users.concat([{ user }]);
+  team.setValue.submit({
+    users,
+  });
 }
 
 function removeMember(member: string) {
