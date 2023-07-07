@@ -39,7 +39,7 @@
               </div>
             </div>
             <div class="text-lg font-medium">Members</div>
-            <div class="flex flex-wrap gap-2">
+            <div v-if="!isEmpty(team.doc?.users)" class="flex flex-wrap gap-2">
               <Button
                 v-for="member in team.doc?.users"
                 :key="member.name"
@@ -54,6 +54,7 @@
                 </template>
               </Button>
             </div>
+            <div v-else class="text-base text-gray-900">🙇 Such empty</div>
           </div>
         </div>
       </div>
@@ -118,6 +119,7 @@ import {
   Dropdown,
   FormControl,
 } from "frappe-ui";
+import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { useAgentStore } from "@/stores/agent";
