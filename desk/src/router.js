@@ -28,7 +28,6 @@ export const AGENT_PORTAL_SLA_LIST = "SlaPolicies";
 export const AGENT_PORTAL_SLA_NEW = "NewSlaPolicy";
 export const AGENT_PORTAL_SLA_SINGLE = "SlaPolicy";
 export const AGENT_PORTAL_TEAM_LIST = "Teams";
-export const AGENT_PORTAL_TEAM_NEW = "NewTeam";
 export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "DeskTicket";
 export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
@@ -253,11 +252,6 @@ const routes = [
         name: AGENT_PORTAL_TEAM_SINGLE,
         component: () => import("@/pages/desk/team/TeamSingle.vue"),
         props: true,
-      },
-      {
-        path: "teams/new",
-        name: AGENT_PORTAL_TEAM_NEW,
-        component: () => import("@/pages/desk/team/Team.vue"),
       },
       {
         path: "ticket-types",

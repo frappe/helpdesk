@@ -90,7 +90,7 @@
               </div>
             </div>
             <Button
-              :disabled="team.doc?.users.find((u) => u.user === agent.user)"
+              :disabled="!!team.doc?.users.find((u) => u.user === agent.user)"
               label="Add"
               theme="gray"
               variant="outline"
