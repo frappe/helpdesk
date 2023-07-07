@@ -3,9 +3,20 @@
     <div class="flex flex-col">
       <TopBar :title="teamId" :back-to="AGENT_PORTAL_TEAM_LIST">
         <template #right>
-          <Dropdown :options="docOptions">
-            <Button icon="more-horizontal" variant="ghost" />
-          </Dropdown>
+          <div class="flex items-center gap-2">
+            <Button label="Add member" theme="gray" variant="solid">
+              <template #prefix>
+                <IconPlus class="h-4 w-4" />
+              </template>
+            </Button>
+            <Dropdown :options="docOptions">
+              <Button variant="ghost">
+                <template #icon>
+                  <IconMoreHorizontal />
+                </template>
+              </Button>
+            </Dropdown>
+          </div>
         </template>
       </TopBar>
       <div class="m-6">
@@ -22,7 +33,22 @@
                 nulla pariatur
               </div>
             </div>
-            <MultiSelect v-model:items="agents" />
+            <div class="text-lg font-medium">Members</div>
+            <div class="flex flex-wrap gap-2">
+              <Button
+                v-for="member in team.doc?.users"
+                :key="member.name"
+                :label="member.user"
+                :disabled="team.loading"
+                theme="gray"
+                variant="outline"
+                @click="removeMember(member.user)"
+              >
+                <template #suffix>
+                  <IconX class="h-3 w-3" />
+                </template>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -38,7 +64,7 @@
           <Button
             label="Confirm"
             theme="gray"
-            variant="subtle"
+            variant="solid"
             class="w-full"
             :disabled="title === teamId"
             @click="renameTeam"
@@ -54,17 +80,19 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import {
+  createDocumentResource,
   createResource,
   Button,
   Dialog,
   Dropdown,
   FormControl,
-  createDocumentResource,
 } from "frappe-ui";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { createToast } from "@/utils/toasts";
-import MultiSelect from "@/components/MultiSelect.vue";
 import TopBar from "@/components/TopBar.vue";
+import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import IconPlus from "~icons/lucide/plus";
+import IconX from "~icons/lucide/x";
 
 const props = defineProps({
   teamId: {
@@ -74,7 +102,6 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const agents = ref([]);
 const showRename = ref(false);
 const showDelete = ref(false);
 const team = createDocumentResource({
@@ -126,7 +153,7 @@ const deleteDialogOptions = {
     {
       label: "Confirm",
       theme: "red",
-      variant: "subtle",
+      variant: "solid",
       onClick: () => team.delete.submit(),
     },
   ],
@@ -167,5 +194,12 @@ function renameTeam() {
   });
 
   r.submit();
+}
+
+function removeMember(member: string) {
+  const users = team.doc.users.filter((u) => u.user !== member);
+  team.setValue.submit({
+    users,
+  });
 }
 </script>
