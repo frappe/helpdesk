@@ -17,7 +17,7 @@
             <Dropdown :options="docOptions">
               <Button variant="ghost">
                 <template #icon>
-                  <IconMoreHorizontal />
+                  <IconMoreHorizontal class="h-4 w-4" />
                 </template>
               </Button>
             </Dropdown>
