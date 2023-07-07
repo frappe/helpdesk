@@ -24,20 +24,9 @@
           </div>
         </template>
       </TopBar>
-      <div class="m-6">
+      <div class="my-6">
         <div class="container">
           <div class="space-y-4">
-            <div class="space-y-2">
-              <Input label="Ignore restrictions" type="checkbox" />
-              <div class="text-sm text-gray-700">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur
-              </div>
-            </div>
             <div class="text-lg font-medium">Members</div>
             <div v-if="!isEmpty(team.doc?.users)" class="flex flex-wrap gap-2">
               <Button
@@ -55,6 +44,13 @@
               </Button>
             </div>
             <div v-else class="text-base text-gray-900">🙇 Such empty</div>
+            <Switch
+              v-model="ignoreRestrictions"
+              size="md"
+              label="Bypass restrictions"
+              description="Members of this team will be able to bypass any team-wise restriction"
+              class="rounded border p-4"
+            />
           </div>
         </div>
       </div>
@@ -118,6 +114,7 @@ import {
   Dialog,
   Dropdown,
   FormControl,
+  Switch,
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
@@ -178,6 +175,17 @@ const title = computed({
   },
   set(t: string) {
     team.doc.name = t;
+  },
+});
+const ignoreRestrictions = computed({
+  get() {
+    return !!team.doc?.ignore_restrictions;
+  },
+  set(value: boolean) {
+    if (!team.doc) return;
+    team.setValue.submit({
+      ignore_restrictions: value,
+    });
   },
 });
 const docOptions = [
