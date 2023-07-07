@@ -137,7 +137,7 @@ const router = useRouter();
 const agentStore = useAgentStore();
 const showRename = ref(false);
 const showDelete = ref(false);
-const showAddMember = ref(true);
+const showAddMember = ref(false);
 const team = createDocumentResource({
   doctype: "HD Team",
   name: props.teamId,
