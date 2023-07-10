@@ -61,13 +61,12 @@
       />
       <TextEditor
         ref="textEditor"
-        v-model:attachments="attachments"
         placeholder="Detailed explanation"
         :content="description"
         @change="(v) => (description = v)"
       >
         <template #bottom="{ editor }">
-          <TextEditorBottom :editor="editor">
+          <TextEditorBottom v-model:attachments="attachments" :editor="editor">
             <template #actions-right>
               <Button
                 label="Create"
