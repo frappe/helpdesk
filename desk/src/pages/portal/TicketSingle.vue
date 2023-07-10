@@ -18,7 +18,7 @@
           v-if="ticket.doc?.status == 'Resolved'"
           label="Reopen"
           theme="gray"
-          variant="solid"
+          variant="outline"
           @click="ticket.reopen.submit()"
         >
           <template #prefix>
