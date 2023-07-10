@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, toRef } from "vue";
+import { computed, toRef } from "vue";
 import { createDocumentResource, Avatar, Tooltip } from "frappe-ui";
 
 const props = defineProps({
