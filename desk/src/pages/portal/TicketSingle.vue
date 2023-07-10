@@ -18,7 +18,7 @@
           v-if="ticket.doc?.status == 'Resolved'"
           label="Reopen"
           theme="gray"
-          variant="solid"
+          variant="outline"
           @click="ticket.reopen.submit()"
         >
           <template #prefix>
@@ -29,7 +29,7 @@
           v-else
           label="Mark as resolved"
           theme="gray"
-          variant="solid"
+          variant="outline"
           @click="ticket.resolve.submit()"
         >
           <template #prefix>
@@ -65,14 +65,13 @@
     </div>
     <TextEditor
       ref="textEditor"
-      v-model:attachments="attachments"
       class="mt-6"
       :placeholder="placeholder"
       :content="editorContent"
       @change="(v) => (editorContent = v)"
     >
       <template #bottom="{ editor }">
-        <TextEditorBottom :editor="editor">
+        <TextEditorBottom v-model:attachments="attachments" :editor="editor">
           <template #actions-right>
             <Button
               label="Send"
@@ -137,7 +136,7 @@ const ticket = createDocumentResource({
 const textEditor = ref(null);
 const placeholder = "Type a message";
 const editorContent = ref("");
-const attachments: Ref<Set<Record<any, any>>> = ref(new Set([]));
+const attachments = ref([]);
 
 const newCommunication = debounce(() => {
   const message = editorContent.value;
@@ -151,7 +150,7 @@ const newCommunication = debounce(() => {
 
 function clearEditor() {
   textEditor.value?.editor.commands.clearContent();
-  attachments.value.clear();
+  attachments.value = [];
 }
 
 function isNewDay(index: number) {

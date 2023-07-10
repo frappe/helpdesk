@@ -13,6 +13,8 @@
                   <Button
                     :label="dropdownTitle"
                     :icon-right="open ? 'chevron-up' : 'chevron-down'"
+                    theme="gray"
+                    variant="outline"
                   />
                 </template>
               </Dropdown>
