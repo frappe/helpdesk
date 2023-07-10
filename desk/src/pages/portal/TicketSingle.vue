@@ -1,44 +1,44 @@
 <template>
-  <div class="px-9 py-4 text-base text-gray-900">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2 py-4">
-        <RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
-          <IconChevronLeft class="h-4 w-4 cursor-pointer text-gray-700" />
-        </RouterLink>
-        <div class="line-clamp-1 text-xl font-medium text-gray-900">
-          {{ ticket.doc?.subject }}
+  <span>
+    <TopBar
+      :title="ticket.doc?.subject"
+      :back-to="{ name: CUSTOMER_PORTAL_LANDING }"
+    >
+      <template #bottom>
+        <div class="flex items-center gap-1 text-base italic">
+          <span># {{ ticket.doc?.name }}</span>
+          <IconDot class="h-4 w-4" />
+          <span>{{ ticket.doc?.status }}</span>
         </div>
-        <div class="flex items-center gap-2 text-xs font-normal text-gray-700">
-          <IconHash class="h-3 w-3" />
-          {{ ticket.doc?.name }}
-        </div>
-      </div>
-      <span v-if="ticket.doc?.status !== 'Closed'">
-        <Button
-          v-if="ticket.doc?.status == 'Resolved'"
-          label="Reopen"
-          theme="gray"
-          variant="outline"
-          @click="ticket.reopen.submit()"
-        >
-          <template #prefix>
-            <IconRepeat class="h-4 w-4" />
-          </template>
-        </Button>
-        <Button
-          v-else
-          label="Mark as resolved"
-          theme="gray"
-          variant="outline"
-          @click="ticket.resolve.submit()"
-        >
-          <template #prefix>
-            <IconCheck class="h-4 w-4" />
-          </template>
-        </Button>
-      </span>
-    </div>
-    <div class="flex flex-col gap-6">
+      </template>
+      <template #right>
+        <span v-if="ticket.doc?.status !== 'Closed'">
+          <Button
+            v-if="ticket.doc?.status == 'Resolved'"
+            label="Reopen"
+            theme="gray"
+            variant="outline"
+            @click="ticket.reopen.submit()"
+          >
+            <template #prefix>
+              <IconRepeat class="h-4 w-4" />
+            </template>
+          </Button>
+          <Button
+            v-else
+            label="Mark as resolved"
+            theme="gray"
+            variant="outline"
+            @click="ticket.resolve.submit()"
+          >
+            <template #prefix>
+              <IconCheck class="h-4 w-4" />
+            </template>
+          </Button>
+        </span>
+      </template>
+    </TopBar>
+    <div class="flex flex-col gap-6 px-9 py-4 text-base text-gray-900">
       <div
         v-for="(communication, index) in ticket.getCommunications.data?.message"
         :key="communication.name"
@@ -62,33 +62,32 @@
           :attachments="communication.attachments"
         />
       </div>
+      <TextEditor
+        ref="textEditor"
+        :placeholder="placeholder"
+        :content="editorContent"
+        @change="(v) => (editorContent = v)"
+      >
+        <template #bottom="{ editor }">
+          <TextEditorBottom v-model:attachments="attachments" :editor="editor">
+            <template #actions-right>
+              <Button
+                label="Send"
+                :disabled="editor.isEmpty"
+                theme="gray"
+                variant="solid"
+                @click="newCommunication"
+              />
+            </template>
+          </TextEditorBottom>
+        </template>
+      </TextEditor>
     </div>
-    <TextEditor
-      ref="textEditor"
-      class="mt-6"
-      :placeholder="placeholder"
-      :content="editorContent"
-      @change="(v) => (editorContent = v)"
-    >
-      <template #bottom="{ editor }">
-        <TextEditorBottom v-model:attachments="attachments" :editor="editor">
-          <template #actions-right>
-            <Button
-              label="Send"
-              :disabled="editor.isEmpty"
-              theme="gray"
-              variant="solid"
-              @click="newCommunication"
-            />
-          </template>
-        </TextEditorBottom>
-      </template>
-    </TextEditor>
-  </div>
+  </span>
 </template>
 
 <script setup lang="ts">
-import { Ref, onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { createDocumentResource, debounce } from "frappe-ui";
 import dayjs from "dayjs";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
@@ -97,9 +96,9 @@ import { useConfigStore } from "@/stores/config";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
+import TopBar from "@/components/TopBar.vue";
 import IconCheck from "~icons/lucide/check";
-import IconChevronLeft from "~icons/lucide/chevron-left";
-import IconHash from "~icons/espresso/hash";
+import IconDot from "~icons/lucide/dot";
 import IconRepeat from "~icons/lucide/repeat-2";
 
 const props = defineProps({

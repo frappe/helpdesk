@@ -3,7 +3,7 @@
     <div class="space-y-2">
       <div class="flex items-center gap-3">
         <IconChevronLeft
-          v-if="backTo"
+          v-if="!isEmpty(backTo)"
           class="h-4 w-4 cursor-pointer text-gray-700"
           @click="goBack"
         />
@@ -13,14 +13,23 @@
           </div>
         </div>
       </div>
-      <slot name="bottom" />
+      <div
+        v-if="slots.bottom"
+        :class="{
+          'ml-7': !isEmpty(backTo),
+        }"
+      >
+        <slot name="bottom" />
+      </div>
     </div>
     <slot name="right" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { PropType, useSlots } from "vue";
+import { useRouter, RouteLocationOptions } from "vue-router";
+import { isEmpty } from "lodash";
 import IconChevronLeft from "~icons/lucide/chevron-left";
 
 const props = defineProps({
@@ -29,16 +38,17 @@ const props = defineProps({
     required: true,
   },
   backTo: {
-    type: String,
+    type: Object as PropType<RouteLocationOptions>,
     required: false,
-    default: "",
+    default: () => ({}),
   },
 });
 const router = useRouter();
+const slots = useSlots();
 
 function goBack() {
   function fallback() {
-    router.push({ name: props.backTo });
+    router.push(props.backTo);
   }
 
   const previousPage = window.history.state.back;

@@ -1,7 +1,7 @@
 <template>
   <span>
     <div class="flex flex-col">
-      <TopBar :title="teamId" :back-to="AGENT_PORTAL_TEAM_LIST">
+      <TopBar :title="teamId" :back-to="{ name: AGENT_PORTAL_TEAM_LIST }">
         <template #right>
           <div class="flex items-center gap-2">
             <Button
