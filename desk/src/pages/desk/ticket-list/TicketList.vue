@@ -13,10 +13,8 @@
           </template>
         </Button>
       </template>
-      <template #bottom>
-        <TopSection class="mt-4" />
-      </template>
     </PageTitle>
+    <TopSection class="mx-5 mb-3.5" />
     <MainTable class="grow" />
     <ListNavigation v-bind="tickets" class="p-2" />
     <NewTicketDialog

@@ -1,5 +1,5 @@
 <template>
-  <div class="m-6">
+  <div class="m-5">
     <div class="flex items-center justify-between">
       <slot name="title">
         <div v-if="title" class="text-2xl font-semibold text-gray-900">
@@ -8,7 +8,6 @@
       </slot>
       <slot name="right" />
     </div>
-    <slot name="bottom" />
   </div>
 </template>
 
