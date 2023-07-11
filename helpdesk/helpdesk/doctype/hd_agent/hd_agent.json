@@ -23,10 +23,11 @@
    "fetch_from": "user.full_name",
    "fieldname": "agent_name",
    "fieldtype": "Data",
-   "hidden": 1,
    "in_global_search": 1,
    "in_standard_filter": 1,
-   "label": "Agent Name"
+   "is_virtual": 1,
+   "label": "Full name",
+   "read_only": 1
   },
   {
    "default": "1",
@@ -45,12 +46,14 @@
    "fetch_from": "user.user_image",
    "fieldname": "user_image",
    "fieldtype": "Data",
-   "label": "User Image"
+   "is_virtual": 1,
+   "label": "Image",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:16:09.421336",
+ "modified": "2023-07-11 15:44:27.134778",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",

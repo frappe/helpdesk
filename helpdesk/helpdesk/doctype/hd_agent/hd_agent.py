@@ -171,6 +171,16 @@ class HDAgent(Document):
 
 		return False
 
+	@property
+	def agent_name(self):
+		user = frappe.get_cached_doc("User", self.user)
+		return user.full_name
+
+	@property
+	def user_image(self):
+		user = frappe.get_cached_doc("User", self.user)
+		return user.user_image
+
 
 @frappe.whitelist()
 def create_hd_agent(first_name, last_name, email, signature, team):
