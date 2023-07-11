@@ -27,7 +27,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, publish_event, is_agent
+from helpdesk.utils import capture_event, is_agent, publish_event
 
 
 class HDTicket(Document):
@@ -155,10 +155,9 @@ class HDTicket(Document):
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
-	def validate(self):
-		if not self.raised_by:
-			self.raised_by = frappe.session.user
-
+	def before_validate(self):
+		self.set_type()
+		self.set_raised_by()
 		self.set_contact(self.raised_by)
 
 	def before_insert(self):
@@ -173,6 +172,26 @@ class HDTicket(Document):
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
 		self.publish_update()
+
+	def set_type(self):
+		if self.ticket_type:
+			return
+		settings = frappe.get_doc("HD Settings")
+		ticket_type = settings.default_ticket_type or "Uncategorised"
+		self.ticket_type = ticket_type
+
+	def set_raised_by(self):
+		self.raised_by = self.raised_by or frappe.session.user
+
+	def set_contact(self, email_id):
+		import email.utils
+
+		email_id = email.utils.parseaddr(email_id)[1]
+		if email_id:
+			if not self.contact:
+				contact = frappe.db.get_value("Contact", {"email_id": email_id})
+				if contact:
+					self.contact = contact
 
 	def handle_ticket_activity_update(self):
 		"""
@@ -224,18 +243,6 @@ class HDTicket(Document):
 			ticket_type_doc = frappe.get_doc("HD Ticket Type", self.ticket_type)
 			if ticket_type_doc.priority:
 				self.priority = ticket_type_doc.priority
-
-	def set_contact(self, email_id, save=False):
-		import email.utils
-
-		email_id = email.utils.parseaddr(email_id)[1]
-		if email_id:
-			if not self.contact:
-				contact = frappe.db.get_value("Contact", {"email_id": email_id})
-				if contact:
-					self.contact = contact
-					if save:
-						self.save()
 
 	def create_communication(self):
 		communication = frappe.new_doc("Communication")
