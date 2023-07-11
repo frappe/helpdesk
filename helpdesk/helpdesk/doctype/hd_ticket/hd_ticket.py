@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 from datetime import timedelta
+from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
 
@@ -158,7 +159,7 @@ class HDTicket(Document):
 	def before_validate(self):
 		self.set_ticket_type()
 		self.set_raised_by()
-		self.set_contact(self.raised_by)
+		self.set_contact()
 		self.set_priority()
 
 	def validate(self):
@@ -183,10 +184,8 @@ class HDTicket(Document):
 	def set_raised_by(self):
 		self.raised_by = self.raised_by or frappe.session.user
 
-	def set_contact(self, email_id):
-		import email.utils
-
-		email_id = email.utils.parseaddr(email_id)[1]
+	def set_contact(self):
+		email_id = parseaddr(self.raised_by)[1]
 		if email_id:
 			if not self.contact:
 				contact = frappe.db.get_value("Contact", {"email_id": email_id})
