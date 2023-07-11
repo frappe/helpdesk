@@ -21,6 +21,7 @@ from frappe.utils.user import is_website_user
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import FALLBACK_TICKET_TYPE
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
@@ -178,7 +179,7 @@ class HDTicket(Document):
 		if self.ticket_type:
 			return
 		settings = frappe.get_doc("HD Settings")
-		ticket_type = settings.default_ticket_type or "Unspecified"
+		ticket_type = settings.default_ticket_type or FALLBACK_TICKET_TYPE
 		self.ticket_type = ticket_type
 
 	def set_raised_by(self):
