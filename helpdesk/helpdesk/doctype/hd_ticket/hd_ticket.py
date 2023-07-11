@@ -156,7 +156,7 @@ class HDTicket(Document):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
 	def before_validate(self):
-		self.set_type()
+		self.set_ticket_type()
 		self.set_raised_by()
 		self.set_contact(self.raised_by)
 		self.set_priority()
@@ -173,7 +173,7 @@ class HDTicket(Document):
 		self.remove_assignment_if_not_in_team()
 		self.publish_update()
 
-	def set_type(self):
+	def set_ticket_type(self):
 		if self.ticket_type:
 			return
 		settings = frappe.get_doc("HD Settings")
