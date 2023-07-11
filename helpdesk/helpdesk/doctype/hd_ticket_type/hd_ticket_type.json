@@ -9,6 +9,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "is_system",
   "description",
   "priority"
  ],
@@ -24,10 +25,17 @@
    "in_list_view": 1,
    "label": "Priority",
    "options": "HD Ticket Priority"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_system",
+   "fieldtype": "Check",
+   "label": "System",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2023-07-11 13:43:46.419795",
+ "modified": "2023-07-11 21:50:20.444486",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Type",
