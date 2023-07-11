@@ -5,7 +5,7 @@ TICKET_TYPES = ["Question", "Bug", "Incident"]
 
 
 def create_system_ticket_type():
-	DN = "Uncategorised"
+	DN = "Unspecified"
 
 	if frappe.db.exists(DT, DN):
 		return

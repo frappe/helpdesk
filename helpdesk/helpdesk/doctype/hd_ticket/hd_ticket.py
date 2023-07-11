@@ -178,7 +178,7 @@ class HDTicket(Document):
 		if self.ticket_type:
 			return
 		settings = frappe.get_doc("HD Settings")
-		ticket_type = settings.default_ticket_type or "Uncategorised"
+		ticket_type = settings.default_ticket_type or "Unspecified"
 		self.ticket_type = ticket_type
 
 	def set_raised_by(self):
