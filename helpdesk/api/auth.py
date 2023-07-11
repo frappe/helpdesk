@@ -1,11 +1,13 @@
 import frappe
 
+from helpdesk.utils import is_agent as _is_agent
+
 
 @frappe.whitelist()
 def get_user():
 	user = frappe.get_doc("User", frappe.session.user)
 
-	is_agent = bool(frappe.db.exists("HD Agent", frappe.session.user))
+	is_agent = _is_agent()
 	is_admin = user.username == "administrator"
 	has_desk_access = is_agent or is_admin
 	user_image = user.user_image
@@ -29,8 +31,8 @@ def get_user():
 @frappe.whitelist(allow_guest=True)
 def oauth_providers():
 	from frappe.utils.html_utils import get_icon_html
-	from frappe.utils.password import get_decrypted_password
 	from frappe.utils.oauth import get_oauth2_authorize_url, get_oauth_keys
+	from frappe.utils.password import get_decrypted_password
 
 	out = []
 	providers = frappe.get_all(
