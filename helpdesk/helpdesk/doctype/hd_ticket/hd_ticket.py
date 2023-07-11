@@ -37,18 +37,25 @@ class HDTicket(Document):
 		QBComment = frappe.qb.DocType("HD Ticket Comment")
 		QBCommunication = frappe.qb.DocType("Communication")
 
+		count_comment = (
+			frappe.qb.from_(QBComment)
+			.select(Count("*"))
+			.as_("count_comment")
+			.where(QBComment.reference_ticket == QBTicket.name)
+		)
+
+		count_communication = (
+			frappe.qb.from_(QBCommunication)
+			.select(Count("*"))
+			.as_("count_communication")
+			.where(QBCommunication.reference_doctype == "HD Ticket")
+			.where(QBCommunication.reference_name == QBTicket.name)
+		)
+
 		query = (
-			query.left_join(QBComment)
-			.on(QBComment.reference_ticket == QBTicket.name)
-			.select(Count(QBComment.name).as_("count_comment"))
-			.left_join(QBCommunication)
-			.on(
-				(QBCommunication.reference_doctype == "HD Ticket")
-				& (QBCommunication.reference_name == QBTicket.name)
-			)
-			.select(Count(QBCommunication.name).as_("count_communication"))
-			.select(QBTicket.star)
-			.groupby(QBTicket.name)
+			query.select(QBTicket.star)
+			.select(count_comment)
+			.select(count_communication)
 		)
 
 		return query
