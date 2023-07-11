@@ -1,8 +1,8 @@
 <template>
-	<div class="flex h-screen w-screen">
-		<SideBar />
-		<router-view class="z-0 grow overflow-auto" />
-	</div>
+  <div class="flex h-screen w-screen">
+    <SideBar />
+    <router-view class="z-0 grow overflow-auto" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,12 +18,12 @@ const authStore = useAuthStore();
 const configStore = useConfigStore();
 
 onBeforeMount(() => {
-	if (!authStore.hasDeskAccess) {
-		router.replace({ name: CUSTOMER_PORTAL_LANDING });
-	}
+  if (!authStore.hasDeskAccess) {
+    router.replace({ name: CUSTOMER_PORTAL_LANDING });
+  }
 
-	if (!configStore.isSetupComplete) {
-		router.replace({ name: ONBOARDING_PAGE });
-	}
+  if (!configStore.isSetupComplete) {
+    router.replace({ name: ONBOARDING_PAGE });
+  }
 });
 </script>
