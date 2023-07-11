@@ -27,7 +27,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, publish_event
+from helpdesk.utils import capture_event, publish_event, is_agent
 
 
 class HDTicket(Document):
@@ -55,6 +55,20 @@ class HDTicket(Document):
 
 	@staticmethod
 	def get_list_filters(query: Query):
+		if is_agent():
+			return HDTicket.get_agent_list_filters(query)
+
+		return HDTicket.get_customer_list_filters(query)
+
+	@staticmethod
+	def get_customer_list_filters(query: Query):
+		QBTicket = frappe.qb.DocType("HD Ticket")
+		user = frappe.session.user
+		query = query.where(QBTicket.raised_by == user)
+		return query
+
+	@staticmethod
+	def get_agent_list_filters(query: Query):
 		user = frappe.session.user
 
 		if HDTicket.can_ignore_restrictions(user):
