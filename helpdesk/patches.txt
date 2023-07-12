@@ -8,3 +8,4 @@ helpdesk.patches.naming_autoincrement
 execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
 helpdesk.patches.add_priority_integer
 helpdesk.patches.template_remove_default_fields
+helpdesk.helpdesk.doctype.hd_ticket.patches.set_ticket_type

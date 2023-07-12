@@ -3,8 +3,9 @@ from datetime import datetime
 import frappe
 from frappe.permissions import add_permission
 
-from .welcome_ticket import create_welcome_ticket
 from .default_template import create_default_template
+from .ticket_type import create_ootb_ticket_types, create_fallback_ticket_type
+from .welcome_ticket import create_welcome_ticket
 
 
 def before_install():
@@ -13,7 +14,6 @@ def before_install():
 
 def after_install():
 	add_default_categories_and_articles()
-	add_default_ticket_types()
 	add_default_ticket_priorities()
 	add_default_sla()
 	add_on_ticket_create_script()
@@ -21,8 +21,10 @@ def after_install():
 	update_agent_role_permissions()
 	add_default_assignment_rule()
 	add_system_preset_filters()
-	create_welcome_ticket()
 	create_default_template()
+	create_fallback_ticket_type()
+	create_ootb_ticket_types()
+	create_welcome_ticket()
 
 
 def add_support_redirect_to_tickets():
@@ -181,17 +183,6 @@ def enable_track_service_level_agreement_in_support_settings():
 	support_settings.track_service_level_agreement = True
 	support_settings.save()
 	frappe.db.commit()
-
-
-
-def add_default_ticket_types():
-	ticket_types = ["Question", "Bug", "Incident"]
-
-	for type in ticket_types:
-		if not frappe.db.exists("HD Ticket Type", type):
-			type_doc = frappe.new_doc("HD Ticket Type")
-			type_doc.name = type
-			type_doc.insert()
 
 
 def add_default_ticket_priorities():

@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import json
 from datetime import timedelta
+from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
 
@@ -20,6 +21,7 @@ from frappe.utils.user import is_website_user
 from pypika.queries import Query
 from pypika.terms import Criterion
 
+from helpdesk.consts import FALLBACK_TICKET_TYPE
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
@@ -27,7 +29,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, publish_event, is_agent
+from helpdesk.utils import capture_event, is_agent, publish_event
 
 
 class HDTicket(Document):
@@ -155,15 +157,14 @@ class HDTicket(Document):
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
+	def before_validate(self):
+		self.set_ticket_type()
+		self.set_raised_by()
+		self.set_contact()
+		self.set_priority()
+
 	def validate(self):
-		if not self.raised_by:
-			self.raised_by = frappe.session.user
-
-		self.set_contact(self.raised_by)
-
-	def before_insert(self):
-		self.verify_ticket_type()
-		self.update_priority_based_on_ticket_type()
+		self.validate_ticket_type()
 
 	def after_insert(self):
 		log_ticket_activity(self.name, "created")
@@ -173,6 +174,35 @@ class HDTicket(Document):
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
 		self.publish_update()
+
+	def set_ticket_type(self):
+		if self.ticket_type:
+			return
+		settings = frappe.get_doc("HD Settings")
+		ticket_type = settings.default_ticket_type or FALLBACK_TICKET_TYPE
+		self.ticket_type = ticket_type
+
+	def set_raised_by(self):
+		self.raised_by = self.raised_by or frappe.session.user
+
+	def set_contact(self):
+		email_id = parseaddr(self.raised_by)[1]
+		if email_id:
+			if not self.contact:
+				contact = frappe.db.get_value("Contact", {"email_id": email_id})
+				if contact:
+					self.contact = contact
+
+	def set_priority(self):
+		if self.priority or not self.ticket_type:
+			return
+		ticket_type = frappe.get_doc("HD Ticket Type", self.ticket_type)
+		self.priority = ticket_type.priority
+
+	def validate_ticket_type(self):
+		settings = frappe.get_doc("HD Settings")
+		if settings.is_ticket_type_mandatory and not self.ticket_type:
+			frappe.throw(_("Ticket type is mandatory"))
 
 	def handle_ticket_activity_update(self):
 		"""
@@ -218,24 +248,6 @@ class HDTicket(Document):
 					{"ticket_id": self.name},
 					after_commit=True,
 				)
-
-	def update_priority_based_on_ticket_type(self):
-		if self.ticket_type:
-			ticket_type_doc = frappe.get_doc("HD Ticket Type", self.ticket_type)
-			if ticket_type_doc.priority:
-				self.priority = ticket_type_doc.priority
-
-	def set_contact(self, email_id, save=False):
-		import email.utils
-
-		email_id = email.utils.parseaddr(email_id)[1]
-		if email_id:
-			if not self.contact:
-				contact = frappe.db.get_value("Contact", {"email_id": email_id})
-				if contact:
-					self.contact = contact
-					if save:
-						self.save()
 
 	def create_communication(self):
 		communication = frappe.new_doc("Communication")
@@ -350,19 +362,6 @@ class HDTicket(Document):
 		activities = frappe.db.get_all("HD Ticket Activity", {"ticket": self.name})
 		for activity in activities:
 			frappe.db.delete("HD Ticket Activity", activity)
-
-	def verify_ticket_type(self):
-		if self.ticket_type:
-			return
-
-		settings = frappe.get_doc("HD Settings")
-		self.ticket_type = settings.default_ticket_type
-
-		if not settings.is_ticket_type_mandatory:
-			return
-
-		if not self.ticket_type:
-			frappe.throw(_("Ticket type is mandatory"))
 
 	def skip_email_workflow(self):
 		skip: str = frappe.get_value("HD Settings", None, "skip_email_workflow") or "0"
