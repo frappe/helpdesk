@@ -43,5 +43,8 @@ const categories = createListResource({
   doctype: "HD Article Category",
   auto: true,
   fields: ["name", "category_name"],
+  filters: {
+    parent_category: "",
+  },
 });
 </script>

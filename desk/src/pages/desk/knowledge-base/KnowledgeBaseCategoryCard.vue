@@ -12,7 +12,8 @@
       </div>
     </span>
     <div class="text-base text-gray-600">
-      {{ articleCount ? articleCount : "No" }} articles
+      {{ articleCount ? articleCount : "No" }}
+      {{ articleCount > 1 ? "articles" : "article" }}
     </div>
   </div>
 </template>
