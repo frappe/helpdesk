@@ -4,7 +4,7 @@ import frappe
 from frappe.permissions import add_permission
 
 from .default_template import create_default_template
-from .ticket_type import create_ootb_ticket_types, create_system_ticket_type
+from .ticket_type import create_ootb_ticket_types, create_fallback_ticket_type
 from .welcome_ticket import create_welcome_ticket
 
 
@@ -22,7 +22,7 @@ def after_install():
 	add_default_assignment_rule()
 	add_system_preset_filters()
 	create_default_template()
-	create_system_ticket_type()
+	create_fallback_ticket_type()
 	create_ootb_ticket_types()
 	create_welcome_ticket()
 

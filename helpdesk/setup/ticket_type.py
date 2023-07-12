@@ -6,7 +6,7 @@ DT = "HD Ticket Type"
 TICKET_TYPES = ["Question", "Bug", "Incident"]
 
 
-def create_system_ticket_type():
+def create_fallback_ticket_type():
 	if frappe.db.exists(DT, FALLBACK_TICKET_TYPE):
 		return
 
