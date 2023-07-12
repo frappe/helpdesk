@@ -1,10 +1,7 @@
 <template>
   <div
     class="flex select-none flex-col border-r border-gray-200 bg-gray-50 px-3 py-2 text-base transition-all duration-300 ease-in-out"
-    :class="{
-      'w-56': sidebarStore.isExpanded,
-      'w-13': !sidebarStore.isExpanded,
-    }"
+    :style="sidebarStore.isExpanded ? widthExpanded : widthMinimised"
   >
     <UserMenu class="pb-2" :options="profileSettings" />
     <LinkGroup :options="menuOptions" />
@@ -57,6 +54,14 @@ const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
 
+const widthExpanded = {
+  "min-width": "224px",
+  "max-width": "224px",
+};
+const widthMinimised = {
+  "min-width": "52px",
+  "max-width": "52px",
+};
 const menuOptions = computed(() => [
   {
     label: "Tickets",
