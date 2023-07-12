@@ -7,7 +7,7 @@ const MINIMISE_ON = ["DeskTicket", "Settings"];
 export const useSidebarStore = defineStore("sidebar", () => {
   const route = useRoute();
   const isOpen = ref(true);
-  const isExpanded = ref(true);
+  const isExpanded = ref(false);
 
   function toggle(state?: boolean) {
     isOpen.value = state ?? !isOpen.value;
@@ -23,8 +23,8 @@ export const useSidebarStore = defineStore("sidebar", () => {
     );
   }
 
-  onMounted(setMinimised);
-  watch(route, setMinimised);
+  // onMounted(setMinimised);
+  // watch(route, setMinimised);
 
   return {
     isOpen,

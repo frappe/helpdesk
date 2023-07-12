@@ -168,65 +168,71 @@ const routes = [
       },
       {
         path: "kb",
-        name: "DeskKB",
-        component: () => import("@/pages/desk/kb/KnowledgeBase.vue"),
-        children: [
-          {
-            path: "",
-            name: "DeskKBHome",
-            // shows root categories and faqs
-            component: () => import("@/pages/common/kb/Category.vue"),
-            meta: {
-              editable: true,
-              isRoot: true,
-            },
-          },
-          {
-            path: "categories/:categoryId",
-            // Category Page
-            name: "DeskKBCategory",
-            component: () =>
-              // shows sub categories and articles
-              import("@/pages/common/kb/Category.vue"),
-            props: true,
-            meta: {
-              editable: true,
-            },
-          },
-          {
-            path: "articles",
-            name: "DeskKBArticles",
-            // Articles.vue - shows all articles
-            component: () => import("@/pages/desk/kb/Articles.vue"),
-          },
-          {
-            path: "articles/:articleId",
-            // Article Edit page
-            name: "DeskKBArticle",
-            component: () =>
-              // Article.vue - article edit page
-              import("@/pages/common/kb/Article.vue"),
-            props: true,
-            meta: {
-              editable: true,
-            },
-          },
-          {
-            path: "articles/new",
-            // Article Edit page
-            name: "DeskKBArticleNew",
-            component: () =>
-              // Article.vue - article edit page
-              import("@/pages/common/kb/Article.vue"),
-            props: true,
-            meta: {
-              editable: true,
-              editMode: true,
-              isNew: true,
-            },
-          },
-        ],
+        name: "DeskKBHome",
+        component: () =>
+          import("@/pages/desk/knowledge-base/KnowledgeBase.vue"),
       },
+      // {
+      //   path: "kb",
+      //   name: "DeskKB",
+      //   component: () => import("@/pages/desk/kb/KnowledgeBase.vue"),
+      //   children: [
+      //     {
+      //       path: "",
+      //       name: "DeskKBHome",
+      //       // shows root categories and faqs
+      //       component: () => import("@/pages/common/kb/Category.vue"),
+      //       meta: {
+      //         editable: true,
+      //         isRoot: true,
+      //       },
+      //     },
+      //     {
+      //       path: "categories/:categoryId",
+      //       // Category Page
+      //       name: "DeskKBCategory",
+      //       component: () =>
+      //         // shows sub categories and articles
+      //         import("@/pages/common/kb/Category.vue"),
+      //       props: true,
+      //       meta: {
+      //         editable: true,
+      //       },
+      //     },
+      //     {
+      //       path: "articles",
+      //       name: "DeskKBArticles",
+      //       // Articles.vue - shows all articles
+      //       component: () => import("@/pages/desk/kb/Articles.vue"),
+      //     },
+      //     {
+      //       path: "articles/:articleId",
+      //       // Article Edit page
+      //       name: "DeskKBArticle",
+      //       component: () =>
+      //         // Article.vue - article edit page
+      //         import("@/pages/common/kb/Article.vue"),
+      //       props: true,
+      //       meta: {
+      //         editable: true,
+      //       },
+      //     },
+      //     {
+      //       path: "articles/new",
+      //       // Article Edit page
+      //       name: "DeskKBArticleNew",
+      //       component: () =>
+      //         // Article.vue - article edit page
+      //         import("@/pages/common/kb/Article.vue"),
+      //       props: true,
+      //       meta: {
+      //         editable: true,
+      //         editMode: true,
+      //         isNew: true,
+      //       },
+      //     },
+      //   ],
+      // },
       {
         path: "customers",
         name: AGENT_PORTAL_CUSTOMER_LIST,
