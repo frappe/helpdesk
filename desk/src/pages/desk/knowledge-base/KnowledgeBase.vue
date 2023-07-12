@@ -17,7 +17,13 @@
             </template>
           </Button>
         </div>
-        <LinkGroup :options="categories" />
+        <div class="flex flex-col gap-1">
+          <SidebarLink
+            v-for="category in categories"
+            v-bind="category"
+            :key="category.label"
+          />
+        </div>
       </div>
       <KnowledgeBaseCategory />
     </div>
@@ -27,7 +33,7 @@
 <script setup lang="ts">
 import { Button } from "frappe-ui";
 import PageTitle from "@/components/PageTitle.vue";
-import LinkGroup from "@/components/desk/sidebar/LinkGroup.vue";
+import SidebarLink from "@/components/SidebarLink.vue";
 import KnowledgeBaseCategory from "./KnowledgeBaseCategory.vue";
 import IconBox from "~icons/lucide/box";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
