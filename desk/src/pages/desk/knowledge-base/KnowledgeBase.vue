@@ -5,7 +5,8 @@
       <div
         class="h-full space-y-2 border-r px-3.5 py-2.5"
         :style="{
-          width: '242px',
+          'min-width': '242px',
+          'max-width': '242px',
         }"
       >
         <div class="flex items-center justify-between">
