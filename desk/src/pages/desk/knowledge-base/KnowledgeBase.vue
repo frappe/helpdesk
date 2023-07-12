@@ -19,9 +19,10 @@
         </div>
         <div class="flex flex-col gap-1">
           <SidebarLink
-            v-for="category in categories"
-            v-bind="category"
+            v-for="category in categories.data"
             :key="category.label"
+            :icon="IconBox"
+            :label="category.category_name"
           />
         </div>
       </div>
@@ -31,18 +32,16 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "frappe-ui";
+import { createListResource, Button } from "frappe-ui";
 import PageTitle from "@/components/PageTitle.vue";
 import SidebarLink from "@/components/SidebarLink.vue";
 import KnowledgeBaseCategory from "./KnowledgeBaseCategory.vue";
 import IconBox from "~icons/lucide/box";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 
-const categories = Array(5)
-  .fill(1)
-  .map(() => ({
-    icon: IconBox,
-    label: "Getting started",
-    onClick: () => console.log("clicked"),
-  }));
+const categories = createListResource({
+  doctype: "HD Article Category",
+  auto: true,
+  fields: ["name", "category_name"],
+});
 </script>
