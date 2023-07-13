@@ -1,5 +1,7 @@
 <template>
-  <div class="flex items-center justify-between gap-2 border-b px-6 py-3">
+  <div
+    class="flex items-center justify-between gap-2 border-b bg-white px-6 py-3"
+  >
     <div class="space-y-2">
       <div class="flex items-center gap-3">
         <IconChevronLeft

@@ -34,6 +34,7 @@ export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
 export const AGENT_PORTAL_TICKET_TYPE_LIST = "TicketTypes";
 export const AGENT_PORTAL_TICKET_TYPE_NEW = "NewTicketType";
 export const AGENT_PORTAL_TICKET_TYPE_SINGLE = "TicketType";
+export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
 
 export const KB_PUBLIC = "Knowledge Base";
 export const KB_PUBLIC_ARTICLE = "PortalKBArticle";
@@ -168,9 +169,9 @@ const routes = [
       },
       {
         path: "kb",
-        name: "DeskKBHome",
+        name: AGENT_PORTAL_KNOWLEDGE_BASE,
         component: () =>
-          import("@/pages/desk/knowledge-base/KnowledgeBase.vue"),
+          import("@/pages/desk/knowledge-base/KnowledgeBaseArticle.vue"),
       },
       // {
       //   path: "kb",
