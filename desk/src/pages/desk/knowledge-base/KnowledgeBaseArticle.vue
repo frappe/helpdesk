@@ -64,8 +64,16 @@
             </div>
           </div>
         </div>
-        <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
-          {{ article.data?.title }}
+        <div class="flex items-center gap-2 border-b pb-3">
+          <div class="text-3xl font-semibold text-gray-900">
+            {{ article.data?.title }}
+          </div>
+          <Badge
+            :theme="article.data?.status === 'Published' ? 'green' : 'orange'"
+            variant="subtle"
+          >
+            {{ article.data?.status }}
+          </Badge>
         </div>
         <div
           class="prose-sm my-4 max-w-none"
@@ -77,7 +85,14 @@
 </template>
 <script setup lang="ts">
 import { computed } from "vue";
-import { createResource, debounce, Avatar, Button, Dropdown } from "frappe-ui";
+import {
+  createResource,
+  debounce,
+  Avatar,
+  Badge,
+  Button,
+  Dropdown,
+} from "frappe-ui";
 import dayjs from "dayjs";
 import { AGENT_PORTAL_KNOWLEDGE_BASE } from "@/router";
 import { createToast } from "@/utils/toasts";
