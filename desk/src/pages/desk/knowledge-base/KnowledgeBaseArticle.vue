@@ -1,9 +1,8 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col overflow-hidden">
     <TopBar
       :back-to="{ name: AGENT_PORTAL_KNOWLEDGE_BASE }"
       :title="article.data?.title"
-      class="sticky top-0"
     >
       <template #right>
         <div class="flex gap-2">
@@ -23,54 +22,56 @@
         </div>
       </template>
     </TopBar>
-    <div
-      class="my-8 place-self-center"
-      :style="{
-        width: '742px',
-      }"
-    >
-      <div class="mb-8 flex items-center gap-1.5">
-        <div class="text-base text-gray-600">
-          {{ article.data?.category.category_name }}
-        </div>
-        <IconChevronRight class="h-3 w-3 text-gray-600" />
-        <div class="text-base text-gray-800">
-          {{ article.data?.sub_category.category_name }}
-        </div>
-      </div>
-      <div class="mb-4.5 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <Avatar
-            :label="article.data?.author.full_name"
-            :image="article.data?.author.user_image"
-          />
-          <div class="text-base text-gray-800">
-            {{ article.data?.author.full_name }}
-          </div>
-          <IconDot class="h-4 w-4 text-gray-600" />
-          <div class="text-xs text-gray-800">
-            {{ dateFormatted }}
-          </div>
-        </div>
-        <div class="flex items-center gap-2 text-gray-600">
-          <IconThumbsUp class="h-4 w-4" />
-          <div class="text-base">
-            {{ article.data?.helpful }}
-          </div>
-          <div class="text-base text-gray-300">|</div>
-          <IconThumbsDown class="h-4 w-4" />
-          <div class="text-base">
-            {{ article.data?.not_helpful }}
-          </div>
-        </div>
-      </div>
-      <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
-        {{ article.data?.title }}
-      </div>
+    <div class="overflow-auto">
       <div
-        class="prose-sm my-4 max-w-none"
-        v-html="article.data?.content"
-      ></div>
+        class="my-8 mx-auto"
+        :style="{
+          width: '742px',
+        }"
+      >
+        <div class="mb-8 flex items-center gap-1.5">
+          <div class="text-base text-gray-600">
+            {{ article.data?.category.category_name }}
+          </div>
+          <IconChevronRight class="h-3 w-3 text-gray-600" />
+          <div class="text-base text-gray-800">
+            {{ article.data?.sub_category.category_name }}
+          </div>
+        </div>
+        <div class="mb-4.5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <Avatar
+              :label="article.data?.author.full_name"
+              :image="article.data?.author.user_image"
+            />
+            <div class="text-base text-gray-800">
+              {{ article.data?.author.full_name }}
+            </div>
+            <IconDot class="h-4 w-4 text-gray-600" />
+            <div class="text-xs text-gray-800">
+              {{ dateFormatted }}
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-gray-600">
+            <IconThumbsUp class="h-4 w-4" />
+            <div class="text-base">
+              {{ article.data?.helpful }}
+            </div>
+            <div class="text-base text-gray-300">|</div>
+            <IconThumbsDown class="h-4 w-4" />
+            <div class="text-base">
+              {{ article.data?.not_helpful }}
+            </div>
+          </div>
+        </div>
+        <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
+          {{ article.data?.title }}
+        </div>
+        <div
+          class="prose-sm my-4 max-w-none"
+          v-html="article.data?.content"
+        ></div>
+      </div>
     </div>
   </div>
 </template>
