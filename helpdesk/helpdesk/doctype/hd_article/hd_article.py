@@ -11,7 +11,7 @@ class HDArticle(Document):
 	@staticmethod
 	def get_list_filters(query):
 		QBArticle = DocType("HD Article")
-		QBCategory = DocType("Category")
+		QBCategory = DocType("HD Article Category")
 
 		query = (
 			query.where(QBArticle.status != "Archived")

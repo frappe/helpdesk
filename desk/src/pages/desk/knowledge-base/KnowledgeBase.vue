@@ -26,7 +26,8 @@
           />
         </div>
       </div>
-      <KnowledgeBaseCategory />
+      <!-- <KnowledgeBaseCategory /> -->
+      <KnowledgeBaseSubcategory />
     </div>
   </div>
 </template>
@@ -36,6 +37,7 @@ import { createListResource, Button } from "frappe-ui";
 import PageTitle from "@/components/PageTitle.vue";
 import SidebarLink from "@/components/SidebarLink.vue";
 import KnowledgeBaseCategory from "./KnowledgeBaseCategory.vue";
+import KnowledgeBaseSubcategory from "./KnowledgeBaseSubcategory.vue";
 import IconBox from "~icons/lucide/box";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 
