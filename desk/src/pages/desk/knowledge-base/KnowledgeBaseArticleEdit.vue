@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col overflow-hidden">
     <TopBar
       :back-to="{ name: AGENT_PORTAL_KNOWLEDGE_BASE }"
       :title="article.data?.title"
@@ -17,74 +17,76 @@
         </div>
       </template>
     </TopBar>
-    <div
-      class="my-6 grow place-self-center rounded-xl"
-      :style="{
-        width: '790px',
-        'box-shadow':
-          '0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 0px 1px 0px rgba(0, 0, 0, 0.45)',
-      }"
-    >
-      <TextEditor
-        :bubble-menu="true"
-        :content="article.data?.content"
-        :floating-menu="true"
-        class="rounded-xl px-6 py-4"
-        editor-class="prose prose-sm max-w-none my-4"
-        placeholder="Write something..."
-        @change="article.data.content = $event"
+    <div class="overflow-auto">
+      <div
+        class="m-auto my-6 rounded-xl"
+        :style="{
+          width: '790px',
+          'box-shadow':
+            '0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 0px 1px 0px rgba(0, 0, 0, 0.45)',
+        }"
       >
-        <template #top>
-          <div
-            class="mb-7 flex w-max items-center gap-1 rounded bg-gray-100 px-2 py-1"
-          >
-            <div class="text-base text-gray-600">
-              {{ article.data?.category.category_name }}
-            </div>
-            <IconChevronRight class="h-3 w-3 text-gray-600" />
-            <div class="text-base text-gray-800">
-              {{ article.data?.sub_category.category_name }}
-            </div>
-          </div>
-          <div class="mb-4.5 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <Avatar
-                :label="article.data?.author.full_name"
-                :image="article.data?.author.user_image"
-              />
+        <TextEditor
+          :bubble-menu="true"
+          :content="article.data?.content"
+          :floating-menu="true"
+          class="rounded-xl px-6 py-4"
+          editor-class="prose prose-sm max-w-none my-4"
+          placeholder="Write something..."
+          @change="article.data.content = $event"
+        >
+          <template #top>
+            <div
+              class="mb-7 flex w-max items-center gap-1 rounded bg-gray-100 px-2 py-1"
+            >
+              <div class="text-base text-gray-600">
+                {{ article.data?.category.category_name }}
+              </div>
+              <IconChevronRight class="h-3 w-3 text-gray-600" />
               <div class="text-base text-gray-800">
-                {{ article.data?.author.full_name }}
+                {{ article.data?.sub_category.category_name }}
               </div>
             </div>
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <div class="text-gray-600">Created</div>
-              <div class="text-gray-800">
-                {{ created }}
+            <div class="mb-4.5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <Avatar
+                  :label="article.data?.author.full_name"
+                  :image="article.data?.author.user_image"
+                />
+                <div class="text-base text-gray-800">
+                  {{ article.data?.author.full_name }}
+                </div>
               </div>
-              <div class="text-base text-gray-300">|</div>
-              <div class="text-gray-600">Modified</div>
-              <div class="text-gray-800">
-                {{ modified }}
-              </div>
-              <div class="text-base text-gray-300">|</div>
-              <IconThumbsUp class="h-4 w-4" />
-              <div class="text-gray-600">Likes</div>
-              <div class="text-gray-800">
-                {{ article.data?.helpful }}
-              </div>
-              <div class="text-base text-gray-300">|</div>
-              <IconThumbsDown class="h-4 w-4" />
-              <div class="text-gray-600">Dislikes</div>
-              <div class="text-gray-800">
-                {{ article.data?.not_helpful }}
+              <div class="flex items-center gap-2 text-sm text-gray-600">
+                <div class="text-gray-600">Created</div>
+                <div class="text-gray-800">
+                  {{ created }}
+                </div>
+                <div class="text-base text-gray-300">|</div>
+                <div class="text-gray-600">Modified</div>
+                <div class="text-gray-800">
+                  {{ modified }}
+                </div>
+                <div class="text-base text-gray-300">|</div>
+                <IconThumbsUp class="h-4 w-4" />
+                <div class="text-gray-600">Likes</div>
+                <div class="text-gray-800">
+                  {{ article.data?.helpful }}
+                </div>
+                <div class="text-base text-gray-300">|</div>
+                <IconThumbsDown class="h-4 w-4" />
+                <div class="text-gray-600">Dislikes</div>
+                <div class="text-gray-800">
+                  {{ article.data?.not_helpful }}
+                </div>
               </div>
             </div>
-          </div>
-          <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
-            {{ article.data?.title }}
-          </div>
-        </template>
-      </TextEditor>
+            <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
+              {{ article.data?.title }}
+            </div>
+          </template>
+        </TextEditor>
+      </div>
     </div>
   </div>
 </template>
