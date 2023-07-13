@@ -69,30 +69,23 @@ const isDialogVisible = ref(false);
 const columns = [
   {
     title: "Name",
-    colKey: "name",
+    colKey: "agent_name",
     colClass: "w-1/3",
   },
   {
     title: "Email",
-    colKey: "email",
+    colKey: "user",
     colClass: "w-1/3",
   },
   {
     title: "Username",
-    colKey: "username",
+    colKey: "user",
   },
 ];
 
 const contacts = createListManager({
   doctype: "HD Agent",
-  fields: [
-    "name",
-    "is_active",
-    "user.full_name",
-    "user.user_image",
-    "user.email",
-    "user.username",
-  ],
+  fields: ["*"],
   auto: true,
 });
 
