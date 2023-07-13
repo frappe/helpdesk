@@ -58,7 +58,7 @@ const selectedContact = ref(null);
 const columns = [
   {
     title: "Name",
-    colKey: "name",
+    colKey: "first_name",
     colClass: "w-1/3",
   },
   {
@@ -74,7 +74,7 @@ const columns = [
 
 const contacts = createListManager({
   doctype: "Contact",
-  fields: ["name", "email_id", "image", "phone"],
+  fields: ["*"],
   auto: true,
 });
 

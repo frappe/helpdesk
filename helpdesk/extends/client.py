@@ -11,6 +11,7 @@ from frappe.query_builder.functions import Count
 from .doc import apply_sort
 from .qb import get_query
 
+logger = frappe.logger("clientpy", allow_site=True, file_count=50)
 
 @frappe.whitelist()
 def get_list(
@@ -41,6 +42,8 @@ def get_list(
 
 	if not fields:
 		query = apply_custom_select(doctype, query)
+
+	logger.error("{}".format(query))
 
 	return query.run(as_dict=True, debug=debug)
 
