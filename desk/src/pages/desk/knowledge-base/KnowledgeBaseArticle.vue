@@ -67,7 +67,6 @@
       <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
         {{ article.data?.title }}
       </div>
-      <!-- eslint-disable-next-line vue/no-v-html -->
       <div
         class="prose-sm my-4 max-w-none"
         v-html="article.data?.content"
