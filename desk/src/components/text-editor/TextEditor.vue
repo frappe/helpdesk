@@ -9,7 +9,7 @@
     <FTextEditor
       ref="textEditor"
       v-bind="attributes"
-      editor-class="resize-y rounded-lg prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
+      editor-class="resize-y rounded-lg prose prose-sm max-w-none p-3 overflow-auto h-32 focus:outline-none"
       @change="emit('change', $event)"
     >
       <template #top>

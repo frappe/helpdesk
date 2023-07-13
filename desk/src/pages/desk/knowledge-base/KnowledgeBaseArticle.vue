@@ -76,7 +76,7 @@
           </Badge>
         </div>
         <div
-          class="prose-sm my-4 max-w-none"
+          class="prose prose-sm my-4 max-w-none"
           v-html="article.data?.content"
         ></div>
       </div>
