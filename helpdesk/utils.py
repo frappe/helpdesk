@@ -6,13 +6,14 @@ from frappe.realtime import get_website_room
 from frappe.utils.telemetry import capture as _capture
 
 
-def is_agent(user: str = frappe.session.user) -> bool:
+def is_agent(user: str = None) -> bool:
 	"""
 	Check whether `user` is an agent
 
 	:param user: User to check against, defaults to current user
 	:return: Whether `user` is an agent
 	"""
+	user = user or frappe.session.user
 	return bool(frappe.db.exists("HD Agent", {"name": user}))
 
 
