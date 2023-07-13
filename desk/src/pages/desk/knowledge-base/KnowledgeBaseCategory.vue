@@ -6,9 +6,16 @@
           {{ category.doc?.category_name }}
         </div>
         <div class="space-x-2">
-          <Button label="Edit" theme="gray" variant="outline"
-            ><template #prefix><IconEdit class="h-4 w-4" /></template
-          ></Button>
+          <Button
+            label="Edit"
+            theme="gray"
+            variant="outline"
+            @click="showEdit = !showEdit"
+          >
+            <template #prefix>
+              <IconEdit class="h-4 w-4" />
+            </template>
+          </Button>
           <Button
             label="Add new"
             theme="gray"
@@ -40,6 +47,33 @@
         :article-count="c.count_article"
       />
     </div>
+    <Dialog v-model="showEdit" :options="{ title: 'Edit Category' }">
+      <template #body-content>
+        <form @submit.prevent="saveCategory">
+          <div class="space-y-4">
+            <FormControl
+              v-model="newCategoryName"
+              :placeholder="category.doc.category_name"
+              label="Name"
+              type="text"
+            />
+            <FormControl
+              v-model="newCategoryDescription"
+              :placeholder="category.doc.description"
+              label="Description"
+              type="textarea"
+            />
+            <Button
+              :disabled="!newCategoryName && !newCategoryDescription"
+              class="w-full"
+              label="Save"
+              theme="gray"
+              variant="solid"
+            />
+          </div>
+        </form>
+      </template>
+    </Dialog>
     <Dialog
       v-model="showNewSubCategory"
       :options="{ title: 'New Sub category' }"
@@ -77,6 +111,7 @@ import { ref } from "vue";
 import {
   createResource,
   createDocumentResource,
+  debounce,
   Button,
   Dialog,
   FormControl,
@@ -91,12 +126,34 @@ import IconPlus from "~icons/lucide/plus";
 const newSubCategoryName = ref("");
 const newSubCategoryDescription = ref("");
 const showNewSubCategory = ref(false);
+const newCategoryName = ref("");
+const newCategoryDescription = ref("");
+const showEdit = ref(false);
 
 const category = createDocumentResource({
   doctype: "HD Article Category",
   name: "dd01268bcc",
   auto: true,
+  setValue: {
+    onError(error) {
+      createToast({
+        title: "Error creating sub category",
+        text: error.messages.join(", "),
+        icon: "x",
+        iconClasses: "text-red-500",
+      });
+    },
+  },
 });
+
+const saveCategory = debounce(
+  () =>
+    category.setValue.submit({
+      category_name: newCategoryName.value || category.doc.category_name,
+      description: newCategoryDescription.value || category.doc.description,
+    }),
+  500
+);
 
 const newSubCategory = createResource({
   url: "frappe.client.insert",
