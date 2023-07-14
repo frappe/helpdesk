@@ -6,16 +6,7 @@
       class="flex w-full flex-col items-center gap-4 overflow-auto"
     >
       <div class="content">
-        <div v-for="(c, i) in conversations" :key="c.name" class="mt-4">
-          <div v-if="isNewDay(i)">
-            <div class="my-4 border-t text-center">
-              <div class="-translate-y-1/2">
-                <span class="bg-white px-2 text-xs text-gray-700">
-                  {{ dayShort(c.creation) }}
-                </span>
-              </div>
-            </div>
-          </div>
+        <div v-for="c in conversations" :key="c.name" class="mt-4">
           <CommunicationItem
             v-if="c.isCommunication"
             :content="c.content"
@@ -141,26 +132,6 @@ function mapCommunication(c) {
     ...c,
     isCommunication: true,
   };
-}
-
-function isNewDay(index: number) {
-  if (index === 0) return true;
-
-  const currEntry = conversations.value[index];
-  const prevEntry = conversations.value[index - 1];
-
-  return dayjs(currEntry.creation).diff(prevEntry.creation, "day") > 0;
-}
-
-function dayShort(date: string) {
-  switch (dayjs(date).diff(dayjs(), "day")) {
-    case 0:
-      return "Today";
-    case 1:
-      return "Yesterday";
-    default:
-      return dayjs(date).format("DD/MM/YYYY");
-  }
 }
 
 function quote(s: string) {

@@ -8,7 +8,11 @@
         <div class="flex items-center">
           <div class="text-base text-gray-900">{{ sender }}</div>
           <IconDot class="text-gray-600" />
-          <div class="text-sm text-gray-600">{{ dateDisplay }}</div>
+          <Tooltip :text="dateExtended">
+            <div class="text-xs text-gray-600">
+              {{ dateDisplay }}
+            </div>
+          </Tooltip>
         </div>
         <slot name="extra" :cc="cc" :bcc="bcc" :content="content" />
       </div>
@@ -41,7 +45,7 @@
 
 <script setup lang="ts">
 import { toRefs } from "vue";
-import { Avatar } from "frappe-ui";
+import { Avatar, Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import dayjs from "dayjs";
 import AttachmentItem from "@/components/AttachmentItem.vue";
@@ -88,7 +92,8 @@ const props = defineProps({
 });
 
 const { content, date, sender, senderImage, cc, bcc } = toRefs(props);
-const dateDisplay = dayjs(date.value).format("h:mm A");
+const dateDisplay = dayjs(date.value).fromNow();
+const dateExtended = dayjs(date.value).format("dddd, MMMM D, YYYY h:mm A");
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {
