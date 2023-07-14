@@ -39,27 +39,15 @@
       </template>
     </TopBar>
     <div class="flex flex-col gap-6 px-9 py-4 text-base text-gray-900">
-      <div
-        v-for="(communication, index) in ticket.getCommunications.data?.message"
-        :key="communication.name"
-      >
-        <div v-if="isNewDay(index)">
-          <div class="my-4 border-t text-center">
-            <div class="-translate-y-1/2">
-              <span class="bg-white px-2 text-xs text-gray-700">
-                {{ dayShort(communication.creation) }}
-              </span>
-            </div>
-          </div>
-        </div>
+      <div v-for="c in ticket.getCommunications.data?.message" :key="c.name">
         <CommunicationItem
-          :content="communication.content"
-          :date="communication.creation"
-          :sender="communication.sender.full_name"
-          :sender-image="communication.sender.image"
-          :cc="communication.cc"
-          :bcc="communication.bcc"
-          :attachments="communication.attachments"
+          :content="c.content"
+          :date="c.creation"
+          :sender="c.sender.full_name"
+          :sender-image="c.sender.image"
+          :cc="c.cc"
+          :bcc="c.bcc"
+          :attachments="c.attachments"
         />
       </div>
       <TextEditor
@@ -89,7 +77,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { createDocumentResource, debounce } from "frappe-ui";
-import dayjs from "dayjs";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
@@ -150,27 +137,6 @@ const newCommunication = debounce(() => {
 function clearEditor() {
   textEditor.value?.editor.commands.clearContent();
   attachments.value = [];
-}
-
-function isNewDay(index: number) {
-  if (index === 0) return true;
-  const conversations = ticket.getCommunications.data?.message;
-
-  const currEntry = conversations[index];
-  const prevEntry = conversations[index - 1];
-
-  return dayjs(currEntry.creation).diff(prevEntry.creation, "day") > 0;
-}
-
-function dayShort(date: string) {
-  switch (dayjs(date).diff(dayjs(), "day")) {
-    case 0:
-      return "Today";
-    case 1:
-      return "Yesterday";
-    default:
-      return dayjs(date).format("DD/MM/YYYY");
-  }
 }
 
 onMounted(() => {

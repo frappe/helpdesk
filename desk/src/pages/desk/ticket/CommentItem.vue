@@ -8,7 +8,11 @@
         <div class="flex items-center">
           <div class="text-base text-gray-900">{{ sender.full_name }}</div>
           <IconDot class="text-gray-600" />
-          <div class="text-sm text-gray-600">{{ dateDisplay }}</div>
+          <Tooltip :text="dateExtended">
+            <div class="text-xs text-gray-600">
+              {{ dateDisplay }}
+            </div>
+          </Tooltip>
         </div>
         <Dropdown v-if="!isEmpty(options)" :options="options">
           <template #default>
@@ -31,8 +35,14 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, ref, toRefs } from "vue";
-import { createResource, Avatar, Dropdown, FeatherIcon } from "frappe-ui";
+import { ref, toRefs, PropType } from "vue";
+import {
+  createResource,
+  Avatar,
+  Dropdown,
+  FeatherIcon,
+  Tooltip,
+} from "frappe-ui";
 import { isEmpty } from "lodash";
 import dayjs from "dayjs";
 import { useAuthStore } from "@/stores/auth";
@@ -65,7 +75,8 @@ const props = defineProps({
 });
 const { content, date, name, sender } = toRefs(props);
 const authStore = useAuthStore();
-const dateDisplay = dayjs(date.value).format("h:mm A");
+const dateDisplay = dayjs(date.value).fromNow();
+const dateExtended = dayjs(date.value).format("dddd, MMMM D, YYYY h:mm A");
 const options = ref([]);
 
 function deleteComment() {
