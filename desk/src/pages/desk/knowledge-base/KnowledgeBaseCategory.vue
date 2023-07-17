@@ -151,6 +151,7 @@ import {
   Popover,
 } from "frappe-ui";
 import { isEmpty } from "lodash";
+import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
@@ -257,7 +258,7 @@ onUnmounted(() => (activeCategory.value = ""));
 
 function toSubcategory(subCategoryId: string) {
   router.push({
-    name: "KnowledgeBaseSubcategory",
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
     params: {
       subCategoryId,
     },

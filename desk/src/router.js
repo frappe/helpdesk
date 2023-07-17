@@ -170,7 +170,7 @@ const routes = [
         },
       },
       {
-        path: "kb/categories",
+        path: "kb",
         name: AGENT_PORTAL_KNOWLEDGE_BASE,
         component: () =>
           import("@/pages/desk/knowledge-base/KnowledgeBase.vue"),
