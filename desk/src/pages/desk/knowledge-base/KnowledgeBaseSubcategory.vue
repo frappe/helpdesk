@@ -35,10 +35,12 @@
     <HelpdeskTable
       :columns="columns"
       :data="articles.data || []"
+      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
       class="grow"
       row-key="name"
+      @row-click="toArticle"
     >
       <template #title="{ data }">
         <div class="flex items-center gap-2">
@@ -48,7 +50,7 @@
       </template>
       <template #status="{ data }">
         <Badge
-          :theme="data.status === 'Published' ? 'green' : 'gray'"
+          :theme="data.status === 'Published' ? 'green' : 'orange'"
           variant="subtle"
         >
           {{ data.status }}
@@ -87,6 +89,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import {
   createDocumentResource,
   debounce,
@@ -95,6 +98,7 @@ import {
   Dialog,
   FormControl,
 } from "frappe-ui";
+import { AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
@@ -103,13 +107,21 @@ import IconEdit from "~icons/lucide/edit-3";
 import IconFile from "~icons/lucide/file-text";
 import IconPlus from "~icons/lucide/plus";
 
+const props = defineProps({
+  subCategoryId: {
+    type: String,
+    required: true,
+  },
+});
+
+const router = useRouter();
 const newSubCategoryName = ref("");
 const newSubCategoryDescription = ref("");
 const showEdit = ref(false);
 
 const subCategory = createDocumentResource({
   doctype: "HD Article Category",
-  name: "46c7b0be46",
+  name: props.subCategoryId,
   auto: true,
   setValue: {
     onError(error) {
@@ -136,7 +148,7 @@ const saveSubCategory = debounce(
 const articles = createListManager({
   doctype: "HD Article",
   filters: {
-    category: "46c7b0be46",
+    category: props.subCategoryId,
   },
   auto: true,
 });
@@ -158,4 +170,13 @@ const columns = [
     colClass: "w-1/4",
   },
 ];
+
+function toArticle(articleId: string) {
+  router.push({
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+    params: {
+      articleId,
+    },
+  });
+}
 </script>

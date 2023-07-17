@@ -1,126 +1,96 @@
 <template>
   <div class="flex flex-col overflow-hidden">
-    <TopBar
-      :back-to="{ name: AGENT_PORTAL_KNOWLEDGE_BASE }"
-      :title="article.data?.title"
-    >
+    <TopBar :back-to="backTo" :title="article.data?.title" class="sticky top-0">
       <template #right>
-        <div class="flex gap-2">
-          <Button
-            :label="bLabel"
-            theme="gray"
-            variant="solid"
-            @click="bClick"
-          />
-          <Dropdown :options="dOptions">
-            <Button theme="gray" variant="ghost">
-              <template #icon>
-                <IconMoreHorizontal class="h-4 w-4" />
-              </template>
-            </Button>
-          </Dropdown>
-        </div>
+        <component
+          :is="actionsComponent"
+          :status="article.data?.status"
+          @cancel="() => article.reload().then((editMode = !editMode))"
+          @delete="deleteRes.submit"
+          @save="updateContent"
+          @toggle-edit-mode="editMode = !editMode"
+          @toggle-status="toggleStatus"
+        />
       </template>
     </TopBar>
     <div class="overflow-auto">
-      <div
-        class="my-8 mx-auto"
-        :style="{
-          width: '742px',
-        }"
-      >
-        <div class="mb-8 flex items-center gap-1.5">
-          <div class="text-base text-gray-600">
-            {{ article.data?.category.category_name }}
-          </div>
-          <IconChevronRight class="h-3 w-3 text-gray-600" />
-          <div class="text-base text-gray-800">
-            {{ article.data?.sub_category.category_name }}
-          </div>
-        </div>
-        <div class="mb-4.5 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <Avatar
-              :label="article.data?.author.full_name"
-              :image="article.data?.author.user_image"
+      <div class="m-auto my-6 rounded-xl" :style="containerStyle">
+        <TextEditor
+          :bubble-menu="true"
+          :content="article.data?.content"
+          :editable="editMode"
+          :floating-menu="true"
+          :placeholder="editMode ? 'Write something...' : 'Content is empty'"
+          class="rounded-xl px-6 py-4"
+          editor-class="prose prose-sm prose-img:rounded prose-img:border max-w-none my-4"
+          @change="article.data.content = $event"
+        >
+          <template #top>
+            <component
+              :is="topComponent"
+              :author-fullname="article.data?.author.full_name"
+              :author-image="article.data?.author.user_image"
+              :category-name="article.data?.category.category_name"
+              :creation="article.data?.creation"
+              :dislikes="article.data?.not_helpful"
+              :likes="article.data?.helpful"
+              :modified="article.data?.modified"
+              :status="article.data?.status"
+              :sub-category-name="article.data?.sub_category.category_name"
+              :title="article.data?.title"
             />
-            <div class="text-base text-gray-800">
-              {{ article.data?.author.full_name }}
-            </div>
-            <IconDot class="h-4 w-4 text-gray-600" />
-            <div class="text-xs text-gray-800">
-              {{ dateFormatted }}
-            </div>
-          </div>
-          <div class="flex items-center gap-2 text-gray-600">
-            <IconThumbsUp class="h-4 w-4" />
-            <div class="text-base">
-              {{ article.data?.helpful }}
-            </div>
-            <div class="text-base text-gray-300">|</div>
-            <IconThumbsDown class="h-4 w-4" />
-            <div class="text-base">
-              {{ article.data?.not_helpful }}
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 border-b pb-3">
-          <div class="text-3xl font-semibold text-gray-900">
-            {{ article.data?.title }}
-          </div>
-          <Badge
-            :theme="article.data?.status === 'Published' ? 'green' : 'orange'"
-            variant="subtle"
-          >
-            {{ article.data?.status }}
-          </Badge>
-        </div>
-        <div
-          class="prose prose-sm my-4 max-w-none"
-          v-html="article.data?.content"
-        ></div>
+          </template>
+        </TextEditor>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from "vue";
-import {
-  createResource,
-  debounce,
-  Avatar,
-  Badge,
-  Button,
-  Dropdown,
-} from "frappe-ui";
-import dayjs from "dayjs";
-import { AGENT_PORTAL_KNOWLEDGE_BASE } from "@/router";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { createResource, debounce, TextEditor } from "frappe-ui";
+import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import TopBar from "@/components/TopBar.vue";
-import IconChevronRight from "~icons/lucide/chevron-right";
-import IconDot from "~icons/lucide/dot";
-import IconMoreHorizontal from "~icons/lucide/more-horizontal";
-import IconThumbsDown from "~icons/lucide/thumbs-down";
-import IconThumbsUp from "~icons/lucide/thumbs-up";
-import IconEdit from "~icons/lucide/edit-3";
-import IconTrash from "~icons/lucide/trash-2";
+import KnowledgeBaseArticleActionsEdit from "./KnowledgeBaseArticleActionsEdit.vue";
+import KnowledgeBaseArticleActionsView from "./KnowledgeBaseArticleActionsView.vue";
+import KnowledgeBaseArticleTopEdit from "./KnowledgeBaseArticleTopEdit.vue";
+import KnowledgeBaseArticleTopView from "./KnowledgeBaseArticleTopView.vue";
 
+const props = defineProps({
+  articleId: {
+    type: String,
+    required: true,
+  },
+});
+
+const router = useRouter();
+const editMode = ref(false);
+const actionsComponent = computed(() => {
+  if (editMode.value) return KnowledgeBaseArticleActionsEdit;
+  return KnowledgeBaseArticleActionsView;
+});
+const topComponent = computed(() => {
+  if (editMode.value) return KnowledgeBaseArticleTopEdit;
+  return KnowledgeBaseArticleTopView;
+});
 const article = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article",
   params: {
-    name: "de99e3d725",
+    name: props.articleId,
   },
   auto: true,
 });
-
-const dateFormatted = computed(() =>
-  dayjs(article.data?.creation).format("MMMM D, YYYY")
-);
 
 const setValueRes = createResource({
   url: "frappe.client.set_value",
   onSuccess() {
     article.reload();
+    createToast({
+      title: "Article updated",
+      icon: "check",
+      iconClasses: "text-green-500",
+    });
   },
   onError(error) {
     const msg = error.messages.join(", ");
@@ -133,40 +103,49 @@ const setValueRes = createResource({
   },
 });
 
-const publish = debounce(() => {
+const deleteRes = createResource({
+  url: "frappe.client.delete",
+  makeParams() {
+    return {
+      doctype: "HD Article",
+      name: props.articleId,
+    };
+  },
+  onSuccess() {
+    router.replace(backTo.value);
+  },
+});
+
+const updateContent = debounce(() => {
+  setValueRes.submit({
+    doctype: "HD Article",
+    name: article.data.name,
+    fieldname: "content",
+    value: article.data.content,
+  });
+}, 300);
+
+const toggleStatus = debounce(() => {
+  const status = article.data.status === "Published" ? "Draft" : "Published";
   setValueRes.submit({
     doctype: "HD Article",
     name: article.data.name,
     fieldname: "status",
-    value: "Published",
+    value: status,
   });
-}, 500);
+}, 300);
 
-const unpublish = debounce(() => {
-  setValueRes.submit({
-    doctype: "HD Article",
-    name: article.data.name,
-    fieldname: "status",
-    value: "Draft",
-  });
-}, 500);
+const containerStyle = computed(() => ({
+  width: "790px",
+  "box-shadow": editMode.value
+    ? "0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 0px 1px 0px rgba(0, 0, 0, 0.45)"
+    : "",
+}));
 
-const bLabel = computed(() =>
-  article.data?.status === "Published" ? "Unpublish" : "Publish"
-);
-const bClick = computed(() =>
-  article.data?.status === "Published" ? unpublish : publish
-);
-const dOptions = [
-  {
-    label: "Edit",
-    icon: IconEdit,
-    onClick: () => console.log("Edit"),
+const backTo = computed(() => ({
+  name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+  params: {
+    subCategoryId: article.data?.sub_category.name,
   },
-  {
-    label: "Delete",
-    icon: IconTrash,
-    onClick: () => console.log("Delete"),
-  },
-];
+}));
 </script>

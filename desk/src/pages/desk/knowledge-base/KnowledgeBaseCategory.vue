@@ -41,35 +41,66 @@
       <KnowledgeBaseCategoryCard
         v-for="c in subCategories.data"
         :key="c.name"
-        class="w-full place-self-center"
-        :title="c.category_name"
-        :description="c.description"
         :article-count="c.count_article"
+        :description="c.description"
+        :title="c.category_name"
+        class="w-full place-self-center"
+        @click="toSubcategory(c.name)"
       />
     </div>
-    <Dialog v-model="showEdit" :options="{ title: 'Edit Category' }">
+    <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
       <template #body-content>
         <form @submit.prevent="saveCategory">
           <div class="space-y-4">
-            <FormControl
-              v-model="newCategoryName"
-              :placeholder="category.doc.category_name"
-              label="Name"
-              type="text"
-            />
-            <FormControl
-              v-model="newCategoryDescription"
-              :placeholder="category.doc.description"
-              label="Description"
-              type="textarea"
-            />
-            <Button
-              :disabled="!newCategoryName && !newCategoryDescription"
-              class="w-full"
-              label="Save"
-              theme="gray"
-              variant="solid"
-            />
+            <div class="space-y-2">
+              <div class="text-xs text-gray-700">Title</div>
+              <div class="flex items-center gap-2">
+                <Popover>
+                  <template #target="{ togglePopover }">
+                    <Button @click="togglePopover">
+                      <template #icon>
+                        <component
+                          :is="getIcon(newCategoryIcon || category.doc?.icon)"
+                        />
+                      </template>
+                    </Button>
+                  </template>
+                  <template #body-main="{ togglePopover }">
+                    <div class="grid grid-cols-5 gap-2 p-2">
+                      <Button
+                        v-for="icon in icons"
+                        :key="icon"
+                        class="place-self-center"
+                        @click="
+                          () => {
+                            category.doc.icon = icon;
+                            togglePopover();
+                          }
+                        "
+                      >
+                        <template #icon>
+                          <component :is="getIcon(icon)" />
+                        </template>
+                      </Button>
+                    </div>
+                  </template>
+                </Popover>
+                <FormControl
+                  v-model="category.doc.category_name"
+                  placeholder="A brief guide"
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="text-xs text-gray-700">Description</div>
+              <FormControl
+                v-model="category.doc.description"
+                placeholder="A short description"
+                type="textarea"
+              />
+            </div>
+            <Button class="w-full" label="Save" theme="gray" variant="solid" />
           </div>
         </form>
       </template>
@@ -107,34 +138,59 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 import {
   createResource,
   createDocumentResource,
   debounce,
-  Button,
+  Button as Button,
   Dialog,
   FormControl,
+  Popover,
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
+import { useKnowledgeBaseStore, icons } from "./data";
+import { getIcon } from "./util";
 import IconEdit from "~icons/lucide/edit-3";
 import IconPlus from "~icons/lucide/plus";
 
+const props = defineProps({
+  categoryId: {
+    type: String,
+    required: true,
+  },
+});
+
+const router = useRouter();
+const { activeCategory } = storeToRefs(useKnowledgeBaseStore());
 const newSubCategoryName = ref("");
 const newSubCategoryDescription = ref("");
 const showNewSubCategory = ref(false);
 const newCategoryName = ref("");
 const newCategoryDescription = ref("");
+const newCategoryIcon = ref("");
 const showEdit = ref(false);
 
 const category = createDocumentResource({
   doctype: "HD Article Category",
-  name: "dd01268bcc",
+  name: props.categoryId,
   auto: true,
+  onSuccess(data) {
+    activeCategory.value = data.name;
+  },
   setValue: {
+    onSuccess() {
+      createToast({
+        title: "Article updated",
+        icon: "check",
+        iconClasses: "text-green-500",
+      });
+    },
     onError(error) {
       createToast({
         title: "Error creating sub category",
@@ -151,6 +207,7 @@ const saveCategory = debounce(
     category.setValue.submit({
       category_name: newCategoryName.value || category.doc.category_name,
       description: newCategoryDescription.value || category.doc.description,
+      icon: newCategoryIcon.value || category.doc.icon,
     }),
   500
 );
@@ -191,8 +248,19 @@ const newSubCategory = createResource({
 const subCategories = createListManager({
   doctype: "HD Article Category",
   filters: {
-    parent_category: "dd01268bcc",
+    parent_category: props.categoryId,
   },
   auto: true,
 });
+
+onUnmounted(() => (activeCategory.value = ""));
+
+function toSubcategory(subCategoryId: string) {
+  router.push({
+    name: "KnowledgeBaseSubcategory",
+    params: {
+      subCategoryId,
+    },
+  });
+}
 </script>

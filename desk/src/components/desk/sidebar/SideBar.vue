@@ -21,7 +21,7 @@
           v-bind="option"
           :key="option.label"
           :is-expanded="sidebarStore.isExpanded"
-          :is-active="option.to?.includes(route.name.toString())"
+          :is-active="option.to?.includes(route.name?.toString())"
         />
       </div>
     </span>

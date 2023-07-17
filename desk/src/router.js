@@ -35,6 +35,8 @@ export const AGENT_PORTAL_TICKET_TYPE_LIST = "TicketTypes";
 export const AGENT_PORTAL_TICKET_TYPE_NEW = "NewTicketType";
 export const AGENT_PORTAL_TICKET_TYPE_SINGLE = "TicketType";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
+export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
+export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
 export const KB_PUBLIC = "Knowledge Base";
 export const KB_PUBLIC_ARTICLE = "PortalKBArticle";
@@ -168,10 +170,33 @@ const routes = [
         },
       },
       {
-        path: "kb",
+        path: "kb/categories",
         name: AGENT_PORTAL_KNOWLEDGE_BASE,
         component: () =>
-          import("@/pages/desk/knowledge-base/KnowledgeBaseArticle.vue"),
+          import("@/pages/desk/knowledge-base/KnowledgeBase.vue"),
+        children: [
+          {
+            path: ":subCategoryId",
+            name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+            props: true,
+            component: () =>
+              import(
+                "@/pages/desk/knowledge-base/KnowledgeBaseSubcategory.vue"
+              ),
+          },
+        ],
+      },
+      {
+        path: "kb/articles",
+        children: [
+          {
+            path: ":articleId",
+            name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+            props: true,
+            component: () =>
+              import("@/pages/desk/knowledge-base/KnowledgeBaseArticle.vue"),
+          },
+        ],
       },
       // {
       //   path: "kb",
