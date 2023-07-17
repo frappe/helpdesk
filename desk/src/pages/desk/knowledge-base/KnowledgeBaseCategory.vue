@@ -1,10 +1,10 @@
 <template>
-  <div class="grow px-5 py-3.5">
-    <div class="mb-6 space-y-1">
-      <div class="flex items-center justify-between">
-        <div class="text-xl font-medium text-gray-900">
-          {{ category.doc?.category_name }}
-        </div>
+  <div class="grow">
+    <KnowledgeBaseCategoryHeader
+      :title="category.doc?.category_name"
+      :description="category.doc?.description"
+    >
+      <template #right>
         <div class="space-x-2">
           <Button
             label="Edit"
@@ -27,17 +27,9 @@
             </template>
           </Button>
         </div>
-      </div>
-      <div
-        class="text-base text-gray-700"
-        :style="{
-          width: '770px',
-        }"
-      >
-        {{ category.doc?.description }}
-      </div>
-    </div>
-    <div class="gap-4.5 grid grid-cols-3">
+      </template>
+    </KnowledgeBaseCategoryHeader>
+    <div class="gap-4.5 grid grid-cols-3 px-5">
       <KnowledgeBaseCategoryCard
         v-for="c in subCategories.data"
         :key="c.name"
@@ -128,6 +120,7 @@ import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
+import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import KnowledgeBaseIconSelector from "./KnowledgeBaseIconSelector.vue";
 import { useKnowledgeBaseStore } from "./data";
 import IconEdit from "~icons/lucide/edit-3";

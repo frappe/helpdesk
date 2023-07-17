@@ -1,10 +1,10 @@
 <template>
   <div class="flex grow flex-col">
-    <div class="space-y-1 px-5 pt-3.5 pb-6">
-      <div class="flex items-center justify-between">
-        <div class="text-xl font-medium text-gray-900">
-          {{ subCategory.doc?.category_name }}
-        </div>
+    <KnowledgeBaseCategoryHeader
+      :title="subCategory.doc?.category_name"
+      :description="subCategory.doc?.description"
+    >
+      <template #right>
         <div class="space-x-2">
           <Button
             label="Edit"
@@ -22,16 +22,8 @@
             </template>
           </Button>
         </div>
-      </div>
-      <div
-        class="text-base text-gray-700"
-        :style="{
-          width: '770px',
-        }"
-      >
-        {{ subCategory.doc?.description }}
-      </div>
-    </div>
+      </template>
+    </KnowledgeBaseCategoryHeader>
     <HelpdeskTable
       :columns="columns"
       :data="articles.data || []"
@@ -103,6 +95,7 @@ import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import IconEdit from "~icons/lucide/edit-3";
 import IconFile from "~icons/lucide/file-text";
 import IconPlus from "~icons/lucide/plus";
