@@ -1,5 +1,5 @@
 <template>
-  <div class="ftex flex-col">
+  <div class="flex flex-col">
     <PageTitle title="Knowledge base" />
     <div class="flex grow border-t">
       <KnowledgeBaseSidebar />
