@@ -96,7 +96,7 @@ class HDAgent(Document):
 				frappe.throw(
 					frappe._(
 						"Agent {0} does not belong to team {1}".format(
-							self.hd_agent_name, group
+							self.agent_name, group
 						)
 					)
 				)
