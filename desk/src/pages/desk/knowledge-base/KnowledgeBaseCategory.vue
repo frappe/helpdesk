@@ -55,36 +55,10 @@
             <div class="space-y-2">
               <div class="text-xs text-gray-700">Title</div>
               <div class="flex items-center gap-2">
-                <Popover>
-                  <template #target="{ togglePopover }">
-                    <Button @click="togglePopover">
-                      <template #icon>
-                        <component
-                          :is="getIcon(newCategoryIcon || category.doc?.icon)"
-                        />
-                      </template>
-                    </Button>
-                  </template>
-                  <template #body-main="{ togglePopover }">
-                    <div class="grid grid-cols-6 gap-2 p-2">
-                      <Button
-                        v-for="icon in icons"
-                        :key="icon"
-                        class="place-self-center"
-                        @click="
-                          () => {
-                            category.doc.icon = icon;
-                            togglePopover();
-                          }
-                        "
-                      >
-                        <template #icon>
-                          <component :is="getIcon(icon)" />
-                        </template>
-                      </Button>
-                    </div>
-                  </template>
-                </Popover>
+                <KnowledgeBaseIconSelector
+                  :icon="newCategoryIcon || category.doc?.icon"
+                  @select="(icon) => (newCategoryIcon = icon)"
+                />
                 <FormControl
                   v-model="category.doc.category_name"
                   placeholder="A brief guide"
@@ -148,15 +122,14 @@ import {
   Button as Button,
   Dialog,
   FormControl,
-  Popover,
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
-import { useKnowledgeBaseStore, icons } from "./data";
-import { getIcon } from "./util";
+import KnowledgeBaseIconSelector from "./KnowledgeBaseIconSelector.vue";
+import { useKnowledgeBaseStore } from "./data";
 import IconEdit from "~icons/lucide/edit-3";
 import IconPlus from "~icons/lucide/plus";
 
