@@ -66,7 +66,7 @@
                     </Button>
                   </template>
                   <template #body-main="{ togglePopover }">
-                    <div class="grid grid-cols-5 gap-2 p-2">
+                    <div class="grid grid-cols-6 gap-2 p-2">
                       <Button
                         v-for="icon in icons"
                         :key="icon"

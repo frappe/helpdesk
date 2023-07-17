@@ -14,7 +14,6 @@ export const useKnowledgeBaseStore = defineStore("knowledgeBase", () => {
 export const icons = [
   "alert-circle",
   "atom",
-  "bone",
   "box",
   "camera",
   "command",
