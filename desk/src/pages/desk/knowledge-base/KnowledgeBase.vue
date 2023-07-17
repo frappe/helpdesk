@@ -10,9 +10,7 @@
           :key="activeCategory"
           :category-id="activeCategory"
         />
-        <div v-else class="m-auto text-base text-gray-900">
-          &longleftarrow; Select a category
-        </div>
+        <KnowledgeBaseEmptyMessage v-else message="Select a category" />
       </RouterView>
     </div>
   </div>
@@ -21,8 +19,9 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import PageTitle from "@/components/PageTitle.vue";
-import KnowledgeBaseSidebar from "./KnowledgeBaseSidebar.vue";
 import KnowledgeBaseCategory from "./KnowledgeBaseCategory.vue";
+import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
+import KnowledgeBaseSidebar from "./KnowledgeBaseSidebar.vue";
 import { useKnowledgeBaseStore } from "./data";
 
 const { activeCategory } = storeToRefs(useKnowledgeBaseStore());

@@ -1,5 +1,5 @@
 <template>
-  <div class="grow">
+  <div class="flex grow flex-col">
     <KnowledgeBaseCategoryHeader
       :title="category.doc?.category_name"
       :description="category.doc?.description"
@@ -29,7 +29,11 @@
         </div>
       </template>
     </KnowledgeBaseCategoryHeader>
-    <div class="gap-4.5 grid grid-cols-3 px-5">
+    <KnowledgeBaseEmptyMessage
+      v-if="isEmpty(subCategories.data)"
+      message="This category is empty"
+    />
+    <div v-else class="gap-4.5 grid grid-cols-3 px-5">
       <KnowledgeBaseCategoryCard
         v-for="c in subCategories.data"
         :key="c.name"
@@ -122,6 +126,7 @@ import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import KnowledgeBaseIconSelector from "./KnowledgeBaseIconSelector.vue";
+import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
 import { useKnowledgeBaseStore } from "./data";
 import IconEdit from "~icons/lucide/edit-3";
 import IconPlus from "~icons/lucide/plus";

@@ -48,6 +48,9 @@
           {{ data.status }}
         </Badge>
       </template>
+      <template #emptyMessage>
+        <KnowledgeBaseEmptyMessage message="This sub category is empty" />
+      </template>
     </HelpdeskTable>
     <ListNavigation v-bind="articles" class="p-2" />
     <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
@@ -96,6 +99,7 @@ import { createListManager } from "@/composables/listManager";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
+import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
 import IconEdit from "~icons/lucide/edit-3";
 import IconFile from "~icons/lucide/file-text";
 import IconPlus from "~icons/lucide/plus";
