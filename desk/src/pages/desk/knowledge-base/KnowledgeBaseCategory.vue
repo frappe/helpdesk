@@ -37,7 +37,7 @@
         {{ category.doc?.description }}
       </div>
     </div>
-    <div class="gap-5.5 grid grid-cols-3">
+    <div class="gap-4.5 grid grid-cols-3">
       <KnowledgeBaseCategoryCard
         v-for="c in subCategories.data"
         :key="c.name"
