@@ -3,7 +3,7 @@
     <div class="text-base text-gray-600">
       {{ categoryName }}
     </div>
-    <IconChevronRight class="h-3 w-3 text-gray-600" />
+    <Icon icon="lucide:chevron-right" class="h-3 w-3 text-gray-600" />
     <div class="text-base text-gray-800">
       {{ subCategoryName }}
     </div>
@@ -26,69 +26,52 @@
         {{ dayjs(modified).fromNow() }}
       </div>
       <div class="text-base text-gray-300">|</div>
-      <IconThumbsUp class="h-4 w-4" />
+      <Icon icon="lucide:thumbs-up" class="h-4 w-4" />
       <div class="text-gray-600">Likes</div>
       <div class="text-gray-800">
         {{ likes }}
       </div>
       <div class="text-base text-gray-300">|</div>
-      <IconThumbsDown class="h-4 w-4" />
+      <Icon icon="lucide:thumbs-down" class="h-4 w-4" />
       <div class="text-gray-600">Dislikes</div>
       <div class="text-gray-800">
         {{ dislikes }}
       </div>
     </div>
   </div>
-  <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
-    {{ title }}
+  <div class="border-b pb-3">
+    <FormControl
+      :placeholder="title"
+      type="text"
+      @change="emit('update:title', $event.target.value)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
+import { Avatar, FormControl } from "frappe-ui";
 import dayjs from "dayjs";
-import IconChevronRight from "~icons/lucide/chevron-right";
-import IconThumbsDown from "~icons/lucide/thumbs-down";
-import IconThumbsUp from "~icons/lucide/thumbs-up";
+import { Icon } from "@iconify/vue";
 
-defineProps({
-  categoryName: {
-    type: String,
-    required: true,
-  },
-  subCategoryName: {
-    type: String,
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  authorFullname: {
-    type: String,
-    required: true,
-  },
-  authorImage: {
-    type: String,
-    required: true,
-  },
-  creation: {
-    type: String,
-    required: true,
-  },
-  modified: {
-    type: String,
-    required: true,
-  },
-  likes: {
-    type: Number,
-    required: false,
-    default: 0,
-  },
-  dislikes: {
-    type: Number,
-    required: false,
-    default: 0,
-  },
+interface P {
+  categoryName: string;
+  subCategoryName: string;
+  title: string;
+  authorFullname: string;
+  authorImage: string;
+  creation: string;
+  modified: string;
+  likes?: number;
+  dislikes?: number;
+}
+
+interface E {
+  (event: "update:title", title: string): void;
+}
+
+withDefaults(defineProps<P>(), {
+  likes: 0,
+  dislikes: 0,
 });
+const emit = defineEmits<E>();
 </script>

@@ -211,8 +211,10 @@ const updateContent = debounce(() => {
   setValueRes.submit({
     doctype: "HD Article",
     name: article.data.name,
-    fieldname: "content",
-    value: articleContent.value,
+    fieldname: {
+      content: articleContent.value,
+      title: articleTitle.value,
+    },
   });
 }, 300);
 

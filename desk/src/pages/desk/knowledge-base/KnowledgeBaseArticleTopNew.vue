@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <div class="border-b pb-3 text-3xl font-semibold text-gray-900">
+  <div class="border-b pb-3">
     <FormControl
       type="text"
       placeholder="Title"
