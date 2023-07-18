@@ -1,9 +1,14 @@
 import frappe
+from helpdesk.utils import is_agent
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_article(name: str):
 	article = frappe.get_doc("HD Article", name).as_dict()
+
+	if not is_agent() and article["status"] != "Published":
+		frappe.throw("Access denied", frappe.PermissionError)
+
 	author = frappe.get_cached_doc("User", article["author"])
 	sub_category = frappe.get_cached_doc("HD Article Category", article["category"])
 	category = frappe.get_cached_doc(
