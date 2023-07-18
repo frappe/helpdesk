@@ -16,7 +16,12 @@
               <IconEdit class="h-4 w-4" />
             </template>
           </Button>
-          <Button label="Add new" theme="gray" variant="solid">
+          <Button
+            label="Add new"
+            theme="gray"
+            variant="solid"
+            @click="toNewArticle"
+          >
             <template #prefix>
               <IconPlus class="h-4 w-4" />
             </template>
@@ -84,7 +89,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   createDocumentResource,
   debounce,
@@ -112,6 +117,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const route = useRoute();
 const newSubCategoryName = ref("");
 const newSubCategoryDescription = ref("");
 const showEdit = ref(false);
@@ -173,6 +179,19 @@ function toArticle(articleId: string) {
     name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
     params: {
       articleId,
+    },
+  });
+}
+
+function toNewArticle() {
+  router.push({
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+    params: {
+      articleId: "new",
+    },
+    query: {
+      category: route.params.categoryId,
+      subCategory: route.params.subCategoryId,
     },
   });
 }
