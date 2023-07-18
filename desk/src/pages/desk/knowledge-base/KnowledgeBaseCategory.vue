@@ -46,33 +46,37 @@
     </div>
     <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
       <template #body-content>
-        <form @submit.prevent="saveCategory">
-          <div class="space-y-4">
-            <div class="space-y-2">
-              <div class="text-xs text-gray-700">Title</div>
-              <div class="flex items-center gap-2">
-                <KnowledgeBaseIconSelector
-                  :icon="newCategoryIcon || category.doc?.icon"
-                  @select="(icon) => (newCategoryIcon = icon)"
-                />
-                <FormControl
-                  v-model="category.doc.category_name"
-                  placeholder="A brief guide"
-                  type="text"
-                />
-              </div>
-            </div>
-            <div class="space-y-2">
-              <div class="text-xs text-gray-700">Description</div>
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <div class="text-xs text-gray-700">Title</div>
+            <div class="flex items-center gap-2">
+              <KnowledgeBaseIconSelector
+                :icon="newCategoryIcon || category.doc?.icon"
+                @select="(icon) => (newCategoryIcon = icon)"
+              />
               <FormControl
-                v-model="category.doc.description"
-                placeholder="A short description"
-                type="textarea"
+                v-model="category.doc.category_name"
+                placeholder="A brief guide"
+                type="text"
               />
             </div>
-            <Button class="w-full" label="Save" theme="gray" variant="solid" />
           </div>
-        </form>
+          <div class="space-y-2">
+            <div class="text-xs text-gray-700">Description</div>
+            <FormControl
+              v-model="category.doc.description"
+              placeholder="A short description"
+              type="textarea"
+            />
+          </div>
+          <Button
+            class="w-full"
+            label="Save"
+            theme="gray"
+            variant="solid"
+            @click="saveCategory"
+          />
+        </div>
       </template>
     </Dialog>
     <Dialog
