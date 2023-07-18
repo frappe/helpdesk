@@ -1,16 +1,3 @@
-import { ref } from "vue";
-import { defineStore } from "pinia";
-
-export const useKnowledgeBaseStore = defineStore("knowledgeBase", () => {
-  const activeCategory = ref("");
-  const activeSubCategory = ref("");
-
-  return {
-    activeCategory,
-    activeSubCategory,
-  };
-});
-
 export const icons = [
   "alert-circle",
   "atom",
