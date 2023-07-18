@@ -3,13 +3,8 @@
     <PageTitle title="Knowledge base" />
     <div class="flex grow border-t">
       <KnowledgeBaseSidebar />
-      <RouterView v-slot="{ Component }">
+      <RouterView :key="route.fullPath" v-slot="{ Component }">
         <component :is="Component" v-if="Component" />
-        <KnowledgeBaseCategory
-          v-else-if="activeCategory"
-          :key="activeCategory"
-          :category-id="activeCategory"
-        />
         <KnowledgeBaseEmptyMessage v-else message="Select a category" />
       </RouterView>
     </div>
@@ -17,12 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
+import { useRoute } from "vue-router";
 import PageTitle from "@/components/PageTitle.vue";
-import KnowledgeBaseCategory from "./KnowledgeBaseCategory.vue";
 import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
 import KnowledgeBaseSidebar from "./KnowledgeBaseSidebar.vue";
-import { useKnowledgeBaseStore } from "./data";
 
-const { activeCategory } = storeToRefs(useKnowledgeBaseStore());
+const route = useRoute();
 </script>

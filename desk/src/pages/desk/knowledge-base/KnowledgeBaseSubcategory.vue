@@ -83,8 +83,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 import {
   createDocumentResource,
   debounce,
@@ -100,6 +101,7 @@ import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
+import { useKnowledgeBaseStore } from "./data";
 import IconEdit from "~icons/lucide/edit-3";
 import IconFile from "~icons/lucide/file-text";
 import IconPlus from "~icons/lucide/plus";
@@ -112,6 +114,8 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const knowledgeBaseStore = useKnowledgeBaseStore();
+const { activeCategory } = storeToRefs(knowledgeBaseStore);
 const newSubCategoryName = ref("");
 const newSubCategoryDescription = ref("");
 const showEdit = ref(false);
@@ -120,6 +124,9 @@ const subCategory = createDocumentResource({
   doctype: "HD Article Category",
   name: props.subCategoryId,
   auto: true,
+  onSuccess(data) {
+    activeCategory.value = data.parent_category;
+  },
   setValue: {
     onError(error) {
       createToast({
@@ -176,4 +183,7 @@ function toArticle(articleId: string) {
     },
   });
 }
+
+// onMounted(() => (activeCategory.value = subCategory.doc.parent_category));
+onBeforeUnmount(() => (activeCategory.value = ""));
 </script>

@@ -49,7 +49,7 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { createResource, debounce, TextEditor } from "frappe-ui";
-import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
+import { AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import TopBar from "@/components/TopBar.vue";
 import KnowledgeBaseArticleActionsEdit from "./KnowledgeBaseArticleActionsEdit.vue";
@@ -143,8 +143,9 @@ const containerStyle = computed(() => ({
 }));
 
 const backTo = computed(() => ({
-  name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+  name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
   params: {
+    categoryId: article.data?.category.name,
     subCategoryId: article.data?.sub_category.name,
   },
 }));

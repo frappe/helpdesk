@@ -36,6 +36,7 @@ export const AGENT_PORTAL_TICKET_TYPE_NEW = "NewTicketType";
 export const AGENT_PORTAL_TICKET_TYPE_SINGLE = "TicketType";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
+export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
 export const KB_PUBLIC = "Knowledge Base";
@@ -176,8 +177,15 @@ const routes = [
           import("@/pages/desk/knowledge-base/KnowledgeBase.vue"),
         children: [
           {
-            path: ":subCategoryId",
+            path: ":categoryId",
             name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+            props: true,
+            component: () =>
+              import("@/pages/desk/knowledge-base/KnowledgeBaseCategory.vue"),
+          },
+          {
+            path: ":categoryId/:subCategoryId",
+            name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
             props: true,
             component: () =>
               import(

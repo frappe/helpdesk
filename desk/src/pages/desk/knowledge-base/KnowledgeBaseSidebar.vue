@@ -25,7 +25,7 @@
         :icon="getIcon(category.icon)"
         :is-active="activeCategory === category.name"
         :label="category.category_name"
-        @click="activeCategory = category.name"
+        @click="toCategory(category.name)"
       />
     </div>
     <KnowledgeBaseCategoryNew
@@ -36,16 +36,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { createListResource, Button } from "frappe-ui";
-import { storeToRefs } from "pinia";
 import { Icon } from "@iconify/vue";
+import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
 import SidebarLink from "@/components/SidebarLink.vue";
 import KnowledgeBaseCategoryNew from "./KnowledgeBaseCategoryNew.vue";
-import { useKnowledgeBaseStore } from "./data";
 import { getIcon } from "./util";
 
-const { activeCategory } = storeToRefs(useKnowledgeBaseStore());
+const router = useRouter();
+const route = useRoute();
+const activeCategory = computed(() => route.params.categoryId);
 const categories = createListResource({
   doctype: "HD Article Category",
   auto: true,
@@ -56,10 +58,19 @@ const categories = createListResource({
 });
 const showNewDialog = ref(false);
 
+function toCategory(categoryId: string) {
+  router.push({
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+    params: {
+      categoryId,
+    },
+  });
+}
+
 function onNewCategory(categoryId: string) {
   categories.reload().then(() => {
     showNewDialog.value = false;
-    activeCategory.value = categoryId;
+    toCategory(categoryId);
   });
 }
 </script>

@@ -108,9 +108,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onUnmounted, ref } from "vue";
+import { ref, toRef } from "vue";
 import { useRouter } from "vue-router";
-import { storeToRefs } from "pinia";
 import {
   createResource,
   createDocumentResource,
@@ -120,14 +119,13 @@ import {
   FormControl,
 } from "frappe-ui";
 import { isEmpty } from "lodash";
-import { AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY } from "@/router";
+import { AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import KnowledgeBaseIconSelector from "./KnowledgeBaseIconSelector.vue";
 import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
-import { useKnowledgeBaseStore } from "./data";
 import IconEdit from "~icons/lucide/edit-3";
 import IconPlus from "~icons/lucide/plus";
 
@@ -139,7 +137,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const { activeCategory } = storeToRefs(useKnowledgeBaseStore());
+const categoryId = toRef(props, "categoryId");
 const newSubCategoryName = ref("");
 const newSubCategoryDescription = ref("");
 const showNewSubCategory = ref(false);
@@ -150,11 +148,8 @@ const showEdit = ref(false);
 
 const category = createDocumentResource({
   doctype: "HD Article Category",
-  name: props.categoryId,
+  name: categoryId.value,
   auto: true,
-  onSuccess(data) {
-    activeCategory.value = data.name;
-  },
   setValue: {
     onSuccess() {
       createToast({
@@ -220,16 +215,14 @@ const newSubCategory = createResource({
 const subCategories = createListManager({
   doctype: "HD Article Category",
   filters: {
-    parent_category: props.categoryId,
+    parent_category: categoryId.value,
   },
   auto: true,
 });
 
-onUnmounted(() => (activeCategory.value = ""));
-
 function toSubcategory(subCategoryId: string) {
   router.push({
-    name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
     params: {
       subCategoryId,
     },
