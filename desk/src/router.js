@@ -173,24 +173,21 @@ const routes = [
       {
         path: "kb",
         name: AGENT_PORTAL_KNOWLEDGE_BASE,
-        component: () =>
-          import("@/pages/desk/knowledge-base/KnowledgeBase.vue"),
+        component: () => import("@/pages/knowledge-base/KnowledgeBase.vue"),
         children: [
           {
             path: ":categoryId",
             name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
             props: true,
             component: () =>
-              import("@/pages/desk/knowledge-base/KnowledgeBaseCategory.vue"),
+              import("@/pages/knowledge-base/KnowledgeBaseCategory.vue"),
           },
           {
             path: ":categoryId/:subCategoryId",
             name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
             props: true,
             component: () =>
-              import(
-                "@/pages/desk/knowledge-base/KnowledgeBaseSubcategory.vue"
-              ),
+              import("@/pages/knowledge-base/KnowledgeBaseSubcategory.vue"),
           },
         ],
       },
@@ -199,7 +196,7 @@ const routes = [
         name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
         props: true,
         component: () =>
-          import("@/pages/desk/knowledge-base/KnowledgeBaseArticle.vue"),
+          import("@/pages/knowledge-base/KnowledgeBaseArticle.vue"),
       },
       {
         path: "customers",
