@@ -195,16 +195,11 @@ const routes = [
         ],
       },
       {
-        path: "kb/articles",
-        children: [
-          {
-            path: ":articleId",
-            name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
-            props: true,
-            component: () =>
-              import("@/pages/desk/knowledge-base/KnowledgeBaseArticle.vue"),
-          },
-        ],
+        path: "kb/articles/:articleId",
+        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+        props: true,
+        component: () =>
+          import("@/pages/desk/knowledge-base/KnowledgeBaseArticle.vue"),
       },
       // {
       //   path: "kb",
