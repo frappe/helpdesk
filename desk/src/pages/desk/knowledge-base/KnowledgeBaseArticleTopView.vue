@@ -1,10 +1,10 @@
 <template>
   <div class="mb-8 flex items-center gap-1.5">
-    <div class="text-base text-gray-600">
+    <div class="cursor-pointer text-base text-gray-600" @click="toCategory">
       {{ categoryName }}
     </div>
     <IconChevronRight class="h-3 w-3 text-gray-600" />
-    <div class="text-base text-gray-800">
+    <div class="cursor-pointer text-base text-gray-800" @click="toSubCategory">
       {{ subCategoryName }}
     </div>
   </div>
@@ -48,19 +48,33 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from "vue-router";
 import { Avatar } from "frappe-ui";
 import dayjs from "dayjs";
+import {
+  AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+  AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
+} from "@/router";
 import IconChevronRight from "~icons/lucide/chevron-right";
 import IconDot from "~icons/lucide/dot";
 import IconThumbsDown from "~icons/lucide/thumbs-down";
 import IconThumbsUp from "~icons/lucide/thumbs-up";
+import { toRefs } from "vue";
 
-defineProps({
+const props = defineProps({
   categoryName: {
     type: String,
     required: true,
   },
+  categoryId: {
+    type: String,
+    required: true,
+  },
   subCategoryName: {
+    type: String,
+    required: true,
+  },
+  subCategoryId: {
     type: String,
     required: true,
   },
@@ -100,5 +114,26 @@ defineProps({
   },
 });
 
+const router = useRouter();
+const { categoryId, subCategoryId } = toRefs(props);
 const dateFormat = "MMMM D, YYYY";
+
+function toCategory() {
+  router.push({
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+    params: {
+      categoryId: categoryId.value,
+    },
+  });
+}
+
+function toSubCategory() {
+  router.push({
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
+    params: {
+      categoryId: categoryId.value,
+      subCategoryId: subCategoryId.value,
+    },
+  });
+}
 </script>
