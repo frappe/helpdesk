@@ -41,6 +41,7 @@ export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
 export const KB_PUBLIC = "Knowledge Base";
 export const KB_PUBLIC_ARTICLE = "PortalKBArticle";
+export const KB_PUBLIC_CATEGORY = "PortalKBCategory";
 
 export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
@@ -74,38 +75,30 @@ const routes = [
   },
   {
     path: "/knowledge-base",
-    component: () => import("@/pages/portal/kb/KnowledgeBase.vue"),
+    component: () => import("@/pages/knowledge-base/KnowledgeBasePublic.vue"),
     children: [
       {
         path: "",
         name: KB_PUBLIC,
         component: () =>
-          // shows root categories and faqs
-          import("@/pages/common/kb/Category.vue"),
-        meta: {
-          editable: false,
-          isRoot: true,
-        },
+          import("@/pages/knowledge-base/KnowledgeBasePublicHome.vue"),
       },
       {
-        path: "categories/:categoryId",
-        name: "PortalKBCategory", // Category Page
+        path: ":categoryId",
+        name: KB_PUBLIC_CATEGORY, // Category Page
         component: () =>
-          // shows sub categories and articles
-          import("@/pages/common/kb/Category.vue"),
+          import("@/pages/knowledge-base/KnowledgeBasePublicCategory.vue"),
         props: true,
-        meta: {
-          editable: false,
-        },
       },
       {
-        path: "articles/:articleId/:articleTitleSlug",
+        path: "articles/:articleId",
         name: KB_PUBLIC_ARTICLE,
-        component: () => import("@/pages/common/kb/Article.vue"),
-        props: true,
-        meta: {
-          editable: false,
-        },
+        component: () =>
+          import("@/pages/knowledge-base/KnowledgeBaseArticle.vue"),
+        props: (route) => ({
+          ...route.params,
+          isPublic: true,
+        }),
       },
     ],
   },

@@ -1,6 +1,11 @@
 <template>
   <div class="flex flex-col overflow-hidden">
-    <TopBar :back-to="backTo" :title="pageTitle" class="sticky top-0">
+    <TopBar
+      v-if="!isPublic"
+      :back-to="backTo"
+      :title="pageTitle"
+      class="sticky top-0"
+    >
       <template #right>
         <component
           :is="actionsComponent"
@@ -60,12 +65,18 @@ import KnowledgeBaseArticleActionsNew from "./KnowledgeBaseArticleActionsNew.vue
 import KnowledgeBaseArticleActionsView from "./KnowledgeBaseArticleActionsView.vue";
 import KnowledgeBaseArticleTopEdit from "./KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./KnowledgeBaseArticleTopNew.vue";
+import KnowledgeBaseArticleTopPublic from "./KnowledgeBaseArticleTopPublic.vue";
 import KnowledgeBaseArticleTopView from "./KnowledgeBaseArticleTopView.vue";
 
 const props = defineProps({
   articleId: {
     type: String,
     required: true,
+  },
+  isPublic: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 
@@ -94,6 +105,7 @@ const actionsComponent = computed(() => {
 });
 
 const topComponent = computed(() => {
+  if (props.isPublic) return KnowledgeBaseArticleTopPublic;
   if (isNew) return KnowledgeBaseArticleTopNew;
   if (editMode.value) return KnowledgeBaseArticleTopEdit;
   return KnowledgeBaseArticleTopView;
