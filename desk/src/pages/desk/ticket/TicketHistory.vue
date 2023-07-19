@@ -18,6 +18,7 @@
         >
           <IconDot class="absolute -left-3 h-6 w-6 bg-white text-gray-500" />
           <div class="mb-1 font-medium text-gray-900 first-letter:capitalize">
+            {{ activity.owner }}
             {{ activity.action }}
           </div>
           <Tooltip :text="activity.dateLong">
