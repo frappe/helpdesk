@@ -9,7 +9,7 @@
         {{ category.doc?.category_name }}
       </div>
     </div>
-    <ul class="space-y-4">
+    <ul class="space-y-2">
       <li
         v-for="article in articles.data"
         :key="article.name"
