@@ -7,6 +7,8 @@ def get_list_public():
 	categories = frappe.get_list(
 		"HD Article Category", fields=fields, filters={"parent_category": ""}
 	)
+	res = []
+
 	for category in categories:
 		sub_categories = frappe.get_list(
 			"HD Article Category",
@@ -14,5 +16,7 @@ def get_list_public():
 			fields=fields,
 		)
 		category.sub_categories = sub_categories
-	categories = filter(lambda x: len(x.sub_categories), categories)
-	return categories
+		if len(sub_categories):
+			res.append(category)
+
+	return res
