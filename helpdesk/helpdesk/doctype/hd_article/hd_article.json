@@ -15,13 +15,10 @@
   "published_on",
   "author",
   "content_section",
-  "content_type",
   "content",
-  "content_md",
   "views",
   "helpful",
-  "not_helpful",
-  "note"
+  "not_helpful"
  ],
  "fields": [
   {
@@ -65,28 +62,14 @@
   },
   {
    "allow_in_quick_entry": 1,
-   "default": "Rich Text",
-   "fieldname": "content_type",
-   "fieldtype": "Select",
-   "label": "Content Type",
-   "options": "Rich Text\nMarkdown"
-  },
-  {
-   "allow_in_quick_entry": 1,
    "fieldname": "content_section",
    "fieldtype": "Section Break",
    "label": "Content"
   },
   {
    "allow_in_quick_entry": 1,
-   "fieldname": "content_md",
-   "fieldtype": "Markdown Editor",
-   "label": "Content (Markdown)"
-  },
-  {
-   "allow_in_quick_entry": 1,
    "fieldname": "content",
-   "fieldtype": "Text Editor",
+   "fieldtype": "Text",
    "label": "Content"
   },
   {
@@ -106,11 +89,6 @@
   {
    "fieldname": "column_break_7",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "note",
-   "fieldtype": "Long Text",
-   "label": "Note"
   },
   {
    "default": "-1",
@@ -133,7 +111,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-27 14:39:39.750824",
+ "modified": "2023-07-13 20:32:16.298366",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",

@@ -34,6 +34,7 @@
 	"devDependencies": {
 		"@iconify-json/lucide": "^1.1.99",
 		"@iconify-json/ph": "^1.1.5",
+		"@iconify/vue": "^4.1.1",
 		"tailwindcss": "^3.2.7",
 		"unplugin-icons": "^0.16.1",
 		"vite": "^4.1.4"
