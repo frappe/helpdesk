@@ -225,7 +225,7 @@ class HDTicket(Document):
 		]:
 			if self.has_value_changed(field):
 				log_ticket_activity(
-					self.name, f"{field_maps[field]} set to {self.as_dict()[field]}"
+					self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
 				)
 
 	def remove_assignment_if_not_in_team(self):
