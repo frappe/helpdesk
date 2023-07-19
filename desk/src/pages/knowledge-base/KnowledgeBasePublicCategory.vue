@@ -4,7 +4,7 @@
       <RouterLink :to="{ name: KB_PUBLIC }">
         <Icon icon="lucide:home" class="h-4 w-4" />
       </RouterLink>
-      <Icon icon="lucide:chevron-right" class="h-4 w-4" />
+      <Icon icon="lucide:chevron-right" class="h-4 w-4 text-gray-600" />
       <div class="text-base font-medium text-gray-900">
         {{ category.doc?.category_name }}
       </div>
