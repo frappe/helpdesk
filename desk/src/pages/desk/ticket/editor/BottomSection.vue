@@ -14,11 +14,9 @@
           <Button label="Comment" :disabled="isDisabled"
             class="m-1 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-2 py-1 hover:bg-gray-800"
             theme="gray" variant="solid" @click="newComment" />
-
           <Button label="Reply" :disabled="isDisabled"
             class="m-1 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-2 py-1 hover:bg-gray-800"
             theme="red" variant="solid" @click="newCommunication" />
-
         </div>
       </template>
     </TextEditorBottom>
@@ -44,16 +42,6 @@ const authStore = useAuthStore();
 const { clean, editor, ticket } = useTicketStore();
 const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
-const dropdownOptions = [
-  {
-    label: "Reply",
-    onClick: () => newCommunication(),
-  },
-  {
-    label: "Comment",
-    onClick: () => newComment(),
-  },
-];
 
 const insertRes = createResource({
   url: "frappe.client.insert",
