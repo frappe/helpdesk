@@ -25,8 +25,7 @@
    "fieldtype": "Data",
    "in_global_search": 1,
    "in_standard_filter": 1,
-   "is_virtual": 1,
-   "label": "Full name",
+   "label": "Agent Name",
    "read_only": 1
   },
   {
@@ -46,14 +45,13 @@
    "fetch_from": "user.user_image",
    "fieldname": "user_image",
    "fieldtype": "Data",
-   "is_virtual": 1,
    "label": "Image",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-11 15:44:27.134778",
+ "modified": "2023-07-24 22:31:23.178626",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
