@@ -203,7 +203,7 @@ const props = defineProps({
   emptyMessage: {
     type: String,
     required: false,
-    default: "🙇 Such empty",
+    default: "No records",
   },
 });
 
