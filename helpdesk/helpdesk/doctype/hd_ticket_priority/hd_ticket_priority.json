@@ -16,7 +16,7 @@
    "label": "Description"
   },
   {
-   "description": "The integer field represents the priority of a task or item, with lower numbers indicating higher priority. For example, a task with a priority of 1 would be considered more important than a task with a priority of 2, and so on. You can use this field to assign priorities to your tasks or items, which will help you manage them more effectively",
+   "description": "Lower the Integer value, higher is the priority of the issue",
    "fieldname": "integer_value",
    "fieldtype": "Int",
    "in_list_view": 1,
