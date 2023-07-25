@@ -167,7 +167,7 @@ class HDTicket(Document):
 		self.validate_ticket_type()
 
 	def after_insert(self):
-		log_ticket_activity(self.name, "created")
+		log_ticket_activity(self.name, "created this ticket")
 		capture_event("ticket_created")
 
 	def on_update(self):
@@ -225,7 +225,7 @@ class HDTicket(Document):
 		]:
 			if self.has_value_changed(field):
 				log_ticket_activity(
-					self.name, f"{field_maps[field]} set to {self.as_dict()[field]}"
+					self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
 				)
 
 	def remove_assignment_if_not_in_team(self):
@@ -536,7 +536,7 @@ class HDTicket(Document):
 
 		if ticket_doc.status == "Replied":
 			ticket_doc.status = "Open"
-			log_ticket_activity(self.name, f"status set to Open")
+			log_ticket_activity(self.name, f"set status to Open")
 			ticket_doc.save(ignore_permissions=True)
 
 		communication = frappe.new_doc("Communication")
@@ -733,7 +733,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 	if ticket_doc.status == "Replied":
 		ticket_doc.status = "Open"
-		log_ticket_activity(ticket, f"status set to Open")
+		log_ticket_activity(ticket, f"set status to Open")
 		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")
