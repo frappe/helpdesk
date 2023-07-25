@@ -1,28 +1,54 @@
 <template>
   <span>
-    <TextEditorBottom v-model:attachments="editor.attachments" :editor="editor.tiptap" @content-cleared="clean">
+    <TextEditorBottom
+      v-model:attachments="editor.attachments"
+      :editor="editor.tiptap"
+      @content-cleared="clean"
+    >
       <template #actions-left>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconMessage class="h-4 w-4 cursor-pointer text-gray-700" @click="showCannedResponses = true" />
+          <IconMessage
+            class="h-4 w-4 cursor-pointer text-gray-700"
+            @click="showCannedResponses = true"
+          />
         </div>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconBook class="h-4 w-4 cursor-pointer text-gray-700" @click="showArticleResponse = true" />
+          <IconBook
+            class="h-4 w-4 cursor-pointer text-gray-700"
+            @click="showArticleResponse = true"
+          />
         </div>
       </template>
       <template #actions-right>
         <div class="flex">
-          <Button label="Comment" :disabled="isDisabled"
+          <Button
+            label="Comment"
+            :disabled="isDisabled"
             class="m-1 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-2 py-1 hover:bg-gray-800"
-            theme="gray" variant="solid" @click="newComment" />
-          <Button label="Reply" :disabled="isDisabled"
+            theme="gray"
+            variant="solid"
+            @click="newComment"
+          />
+          <Button
+            label="Reply"
+            :disabled="isDisabled"
             class="m-1 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-2 py-1 hover:bg-gray-800"
-            theme="red" variant="solid" @click="newCommunication" />
+            theme="red"
+            variant="solid"
+            @click="newCommunication"
+          />
         </div>
       </template>
     </TextEditorBottom>
-    <ArticleResponses :show="showArticleResponse" @close="showArticleResponse = false"
-      @contentVal="(val) => (editor.content = val)" />
-    <CannedResponses :show="showCannedResponses" @close="showCannedResponses = false" />
+    <ArticleResponses
+      :show="showArticleResponse"
+      @close="showArticleResponse = false"
+      @contentVal="(val) => (editor.content = val)"
+    />
+    <CannedResponses
+      :show="showCannedResponses"
+      @close="showCannedResponses = false"
+    />
   </span>
 </template>
 
