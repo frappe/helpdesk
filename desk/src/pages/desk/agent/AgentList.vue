@@ -17,7 +17,7 @@
     <HelpdeskTable
       class="grow"
       :columns="columns"
-      :data="contacts.list?.data || []"
+      :data="agents.list?.data || []"
       row-key="name"
       :hide-checkbox="true"
       :hide-column-selector="true"
@@ -43,7 +43,7 @@
         </div>
       </template>
     </HelpdeskTable>
-    <ListNavigation class="p-3" v-bind="contacts" />
+    <ListNavigation class="p-3" v-bind="agents" />
     <AddNewAgentsDialog
       :show="isDialogVisible"
       @close="isDialogVisible = false"
@@ -83,7 +83,7 @@ const columns = [
   },
 ];
 
-const contacts = createListManager({
+const agents = createListManager({
   doctype: "HD Agent",
   fields: [
     "name",
