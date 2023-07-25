@@ -85,7 +85,7 @@ const routes = [
       },
       {
         path: ":categoryId",
-        name: KB_PUBLIC_CATEGORY, // Category Page
+        name: KB_PUBLIC_CATEGORY,
         component: () =>
           import("@/pages/knowledge-base/KnowledgeBasePublicCategory.vue"),
         props: true,

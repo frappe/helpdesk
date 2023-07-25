@@ -21,7 +21,7 @@
       </template>
     </TopBar>
     <div class="overflow-auto">
-      <div class="m-auto my-6 rounded-xl" :style="containerStyle">
+      <div class="m-auto mt-6 mb-12 rounded-xl" :style="containerStyle">
         <TextEditor
           :bubble-menu="true"
           :content="article.data?.content"
@@ -40,6 +40,17 @@
             />
           </template>
         </TextEditor>
+        <div class="flex flex-col gap-2 px-6">
+          <div class="text-base font-medium">Still need help?</div>
+          <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
+            <Button
+              label="Create a ticket"
+              size="md"
+              theme="gray"
+              variant="solid"
+            />
+          </RouterLink>
+        </div>
       </div>
     </div>
   </div>
@@ -51,11 +62,13 @@ import {
   createResource,
   createDocumentResource,
   debounce,
+  Button,
   TextEditor,
 } from "frappe-ui";
 import {
   AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
   AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+  CUSTOMER_PORTAL_NEW_TICKET,
 } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { useAuthStore } from "@/stores/auth";
