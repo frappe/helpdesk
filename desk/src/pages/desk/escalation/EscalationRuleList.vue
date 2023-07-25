@@ -52,9 +52,7 @@ import IconPlus from "~icons/lucide/plus";
 
 const showDialog = ref(false);
 const selectedRule = ref(null);
-
 const emptyMessage = "No Escalation Rules Found";
-
 const columns = [
   {
     title: "Priority",

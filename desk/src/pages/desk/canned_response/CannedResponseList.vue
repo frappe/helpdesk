@@ -46,7 +46,6 @@ import IconPlus from "~icons/lucide/plus";
 const router = useRouter();
 const showNewDialog = ref(false);
 const emptyMessage = "No Canned Responses Found";
-
 const columns = [
   {
     title: "Name",

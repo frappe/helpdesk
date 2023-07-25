@@ -59,9 +59,7 @@ import IconPlus from "~icons/lucide/plus";
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
-
 const emptyMessage = "No Customers Found";
-
 const columns = [
   {
     title: "Name",

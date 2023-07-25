@@ -68,9 +68,7 @@ import IconPlus from "~icons/lucide/plus";
 const router = useRouter();
 const showNewDialog = ref(false);
 const newTeamTitle = ref(null);
-
 const emptyMessage = "No Teams Found";
-
 const columns = [
   {
     title: "Name",

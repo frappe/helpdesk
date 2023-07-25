@@ -64,9 +64,7 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
-
 const emptyMessage = "No Email Accounts Found";
-
 const columns = [
   {
     title: "Name",

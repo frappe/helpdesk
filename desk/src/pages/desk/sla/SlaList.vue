@@ -47,9 +47,7 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
-
 const emptyMessage = "No Support Policies Found";
-
 const columns = [
   {
     title: "Name",

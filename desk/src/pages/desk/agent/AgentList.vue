@@ -67,9 +67,7 @@ import IconPlus from "~icons/lucide/plus";
 const router = useRouter();
 const filters = useListFilters();
 const isDialogVisible = ref(false);
-
 const emptyMessage = "No Agents Found";
-
 const columns = [
   {
     title: "Name",

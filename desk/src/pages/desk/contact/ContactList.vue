@@ -56,9 +56,7 @@ import IconPlus from "~icons/lucide/plus";
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
-
 const emptyMessage = "No Contacts Found";
-
 const columns = [
   {
     title: "Name",
