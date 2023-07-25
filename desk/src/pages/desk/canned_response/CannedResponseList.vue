@@ -18,6 +18,7 @@
       class="grow"
       :columns="columns"
       :data="responses.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :emit-row-click="true"
       :hide-checkbox="true"
@@ -44,6 +45,8 @@ import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
 const showNewDialog = ref(false);
+const emptyMessage = "No Canned Responses Found";
+
 const columns = [
   {
     title: "Name",

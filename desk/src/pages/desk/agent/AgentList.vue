@@ -18,6 +18,7 @@
       class="grow"
       :columns="columns"
       :data="contacts.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :hide-checkbox="true"
       :hide-column-selector="true"
@@ -66,6 +67,9 @@ import IconPlus from "~icons/lucide/plus";
 const router = useRouter();
 const filters = useListFilters();
 const isDialogVisible = ref(false);
+
+const emptyMessage = "No Agents Found";
+
 const columns = [
   {
     title: "Name",

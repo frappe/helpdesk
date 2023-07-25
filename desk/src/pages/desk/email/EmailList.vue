@@ -15,6 +15,7 @@
       class="grow"
       :columns="columns"
       :data="accounts.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :emit-row-click="true"
       :hide-checkbox="true"
@@ -63,6 +64,9 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
+
+const emptyMessage = "No Email Accounts Found";
+
 const columns = [
   {
     title: "Name",

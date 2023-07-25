@@ -18,6 +18,7 @@
       class="grow"
       :columns="columns"
       :data="teams.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :emit-row-click="true"
       :hide-checkbox="true"
@@ -67,6 +68,9 @@ import IconPlus from "~icons/lucide/plus";
 const router = useRouter();
 const showNewDialog = ref(false);
 const newTeamTitle = ref(null);
+
+const emptyMessage = "No Teams Found";
+
 const columns = [
   {
     title: "Name",
