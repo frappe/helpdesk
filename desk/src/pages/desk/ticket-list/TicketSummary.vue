@@ -1,6 +1,5 @@
 <template>
-  <RouterLink
-    :to="toRoute"
+  <div
     class="flex justify-between"
     :class="{
       'text-gray-700': isSeen,
@@ -32,7 +31,7 @@
         {{ name }}
       </div>
     </div>
-  </RouterLink>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -71,10 +70,4 @@ const props = defineProps({
 const authStore = useAuthStore();
 const { name, seen } = toRefs(props);
 const isSeen = computed(() => seen.value?.includes(authStore.userId));
-const toRoute = computed(() => ({
-  name: "DeskTicket",
-  params: {
-    ticketId: name.value,
-  },
-}));
 </script>

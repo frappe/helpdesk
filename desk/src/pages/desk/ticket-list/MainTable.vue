@@ -1,10 +1,12 @@
 <template>
   <HelpdeskTable
     v-model:selection="selection"
-    row-key="name"
     :columns="columns"
     :data="tickets.list.data"
+    :emit-row-click="true"
     :empty-message="emptyMessage"
+    row-key="name"
+    @row-click="toTicket"
   >
     <template #subject="{ data }">
       <TicketSummary
@@ -17,30 +19,18 @@
       />
     </template>
     <template #status="{ data }">
-      <Dropdown :options="statusDropdownOptions(data.name, data.status)">
-        <template #default="{ open }">
-          <div class="flex cursor-pointer select-none items-center gap-1">
-            <div class="line-clamp-1">
-              {{ data.status }}
-            </div>
-            <IconCaretDown v-if="!open" class="h-3 w-3" />
-            <IconCaretUp v-if="open" class="h-3 w-3" />
-          </div>
-        </template>
-      </Dropdown>
+      <Badge
+        :label="data.status"
+        :theme="statusColormap[data.status]"
+        variant="subtle"
+      />
     </template>
     <template #priority="{ data }">
-      <Dropdown :options="priorityDropdownOptions(data.name, data.priority)">
-        <template #default="{ open }">
-          <div class="flex cursor-pointer select-none items-center gap-1">
-            <div class="line-clamp-1">
-              {{ data.priority }}
-            </div>
-            <IconCaretDown v-if="!open" class="h-3 w-3" />
-            <IconCaretUp v-if="open" class="h-3 w-3" />
-          </div>
-        </template>
-      </Dropdown>
+      <Badge
+        :label="data.priority"
+        :theme="priorityColormap[data.priority]"
+        variant="subtle"
+      />
     </template>
     <template #resolution_by="{ data }">
       <div
@@ -83,25 +73,21 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, Dropdown } from "frappe-ui";
+import { useRouter } from "vue-router";
+import { createResource, Badge, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
+import { AGENT_PORTAL_TICKET } from "@/router";
 import { useAgentStore } from "@/stores/agent";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import { createToast } from "@/utils/toasts";
+import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
-import IconCaretDown from "~icons/lucide/chevron-down";
-import IconCaretUp from "~icons/lucide/chevron-up";
 import IconPlusCircle from "~icons/lucide/plus-circle";
 
+const router = useRouter();
 const agentStore = useAgentStore();
-const ticketPriorityStore = useTicketPriorityStore();
-const ticketStatusStore = useTicketStatusStore();
 const { selection, tickets } = useTicketListStore();
-
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 const dateFormat = "D/M/YYYY h:mm A";
@@ -186,6 +172,20 @@ const bulkAssignTicketToAgent = createResource({
   },
 });
 
+const statusColormap = {
+  Open: "red",
+  Replied: "orange",
+  Resolved: "green",
+  Closed: "blue",
+};
+
+const priorityColormap = {
+  Urgent: "red",
+  High: "orange",
+  Medium: "blue",
+  Low: "green",
+};
+
 function assignOpts(selected: Set<number>) {
   return agentStore.options.map((a) => ({
     label: a.agent_name,
@@ -197,30 +197,13 @@ function assignOpts(selected: Set<number>) {
   }));
 }
 
-function statusDropdownOptions(ticketId: number, currentStatus: string) {
-  return ticketStatusStore.options
-    .filter((o) => o !== currentStatus)
-    .map((o) => ({
-      label: o,
-      onClick: () =>
-        tickets.setValue.submit({
-          name: ticketId,
-          status: o,
-        }),
-    }));
-}
-
-function priorityDropdownOptions(ticketId: number, currentPriority: string) {
-  return ticketPriorityStore.names
-    .filter((o) => o !== currentPriority)
-    .map((o) => ({
-      label: o,
-      onClick: () =>
-        tickets.setValue.submit({
-          name: ticketId,
-          priority: o,
-        }),
-    }));
+function toTicket(ticketId: string) {
+  router.push({
+    name: AGENT_PORTAL_TICKET,
+    params: {
+      ticketId,
+    },
+  });
 }
 </script>
 
