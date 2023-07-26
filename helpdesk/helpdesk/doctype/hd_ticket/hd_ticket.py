@@ -553,7 +553,7 @@ class HDTicket(Document):
 				"sent_or_received": "Received",
 				"email_status": "Open",
 				"subject": "Re: " + ticket_doc.subject,
-				"sender": ticket_doc.raised_by,
+				"sender": frappe.session.user,
 				"content": message,
 				"status": "Linked",
 				"reference_doctype": "HD Ticket",
