@@ -21,7 +21,7 @@
               />
             </template>
           </FileUploader>
-          <Button 
+          <Button
             v-if="customer.doc?.image"
             label="Remove photo"
             @click="updateImage(null)"
