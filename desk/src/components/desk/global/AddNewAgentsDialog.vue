@@ -65,10 +65,11 @@
 					:disabled="inviteQueue.length == 0"
 					appearance="primary"
 					@click="sentInvites()"
+					class="mr-2"
 					:loading="$resources.sentInvites.loading"
 					>Send Invites</Button
 				>
-				<Button appearance="secondary" @click="close()">Cancel</Button>
+				<Button appearance="secondary" class="mr-2" @click="close()">Cancel</Button>
 				<div class="grow">
 					<Button
 						@click="removeAllEmailFromQueue()"
