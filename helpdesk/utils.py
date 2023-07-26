@@ -4,6 +4,7 @@ import frappe
 from bs4 import BeautifulSoup
 from frappe.realtime import get_website_room
 from frappe.utils.telemetry import capture as _capture
+from pypika import Criterion
 
 
 def is_agent(user: str = None) -> bool:
@@ -24,6 +25,32 @@ def publish_event(event: str, data: dict):
 
 def capture_event(event: str):
 	return _capture(event, "helpdesk")
+
+
+def get_customer(contact: str) -> str | None:
+	"""
+	Get `Customer` from `Contact`
+
+	:param contact: Contact which belongs to a customer
+	:return: Customer `name` if available
+	"""
+	QBDynamicLink = frappe.qb.DocType("Dynamic Link")
+	QBContact = frappe.qb.DocType("Contact")
+	conditions = [QBDynamicLink.parent == contact, QBContact.email_id == contact]
+	res = (
+		frappe.qb.from_(QBDynamicLink)
+		.select(QBDynamicLink.link_name)
+		.where(QBDynamicLink.parentfield == "links")
+		.where(QBDynamicLink.parenttype == "Contact")
+		.join(QBContact)
+		.on(QBDynamicLink.parent == QBContact.name)
+		.where(Criterion.any(conditions))
+		.limit(1)
+		.run(as_dict=True)
+	)
+	if not len(res):
+		return
+	return res.pop().link_name
 
 
 def extract_mentions(html):

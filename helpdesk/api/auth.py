@@ -5,7 +5,21 @@ from helpdesk.utils import is_agent as _is_agent
 
 @frappe.whitelist()
 def get_user():
-	user = frappe.get_doc("User", frappe.session.user)
+	current_user = frappe.session.user
+	filters = {"name": current_user}
+	fields = [
+		"first_name",
+		"full_name",
+		"name",
+		"user_image",
+		"username",
+	]
+	user = frappe.get_value(
+		doctype="User",
+		filters=filters,
+		fieldname=fields,
+		as_dict=True,
+	)
 
 	is_agent = _is_agent()
 	is_admin = user.username == "administrator"
