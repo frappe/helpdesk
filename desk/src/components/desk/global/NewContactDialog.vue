@@ -66,7 +66,7 @@
               :loading="$resources.createContact.loading"
               theme="gray"
               variant="solid"
-              @click="createContact()"
+              @click="validateInputs() ? null : createContact()"
             />
           </div>
         </div>
@@ -204,6 +204,9 @@ export default {
       let error = this.validateEmailInput(this.emailId);
       error += this.validateFirstName(this.firstName);
       error += this.validatePhone(this.phone);
+      error += this.validateCustomer(
+        this.fdCustomer != null ? this.fdCustomer : this.selectedCustomer
+      );
       return error;
     },
     validateEmailInput(value) {
