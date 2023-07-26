@@ -15,9 +15,9 @@ from frappe.email.inbox import link_communication_to_document
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe.query_builder import Case, DocType, Order
-from frappe.query_builder.functions import Count
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from frappe.utils.user import is_website_user
+from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
@@ -29,7 +29,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, is_agent, publish_event
+from helpdesk.utils import capture_event, is_agent, publish_event, get_customer
 
 
 class HDTicket(Document):
@@ -64,64 +64,67 @@ class HDTicket(Document):
 
 	@staticmethod
 	def get_list_filters(query: Query):
-		if is_agent():
-			return HDTicket.get_agent_list_filters(query)
-
-		return HDTicket.get_customer_list_filters(query)
-
-	@staticmethod
-	def get_customer_list_filters(query: Query):
 		QBTicket = frappe.qb.DocType("HD Ticket")
 		user = frappe.session.user
-		query = query.where(QBTicket.raised_by == user)
-		return query
+		customer = get_customer(user)
+		conditions = (
+			[
+				QBTicket.raised_by == user,
+				QBTicket.customer == customer,
+			]
+			if not is_agent()
+			else []
+		)
+		query = query.where(Criterion.any(conditions))
 
-	@staticmethod
-	def get_agent_list_filters(query: Query):
-		user = frappe.session.user
-
-		if HDTicket.can_ignore_restrictions(user):
+		if HDTicket.can_ignore_restrictions():
 			return query
 
-		should_filter: str = (
-			frappe.get_value("HD Settings", None, "restrict_tickets_by_agent_group")
-			or "0"
+		enable_restrictions, ignore_restrictions = frappe.get_value(
+			doctype="HD Settings",
+			fieldname=[
+				"restrict_tickets_by_agent_group",
+				"do_not_restrict_tickets_without_an_agent_group",
+			],
 		)
 
-		if not int(should_filter):
+		enable_restrictions = bool(int(enable_restrictions))
+		ignore_restrictions = bool(int(ignore_restrictions))
+
+		if not enable_restrictions:
 			return query
 
-		QBTicket = frappe.qb.DocType("HD Ticket")
 		filters = {"user": user}
 		teams = frappe.get_list("HD Team", filters=filters)
-		criterions = [QBTicket.agent_group == team.name for team in teams]
+		conditions = [QBTicket.agent_group == team.name for team in teams]
 
 		# Consider tickets without any assigned agent group
-		do_not_restrict = frappe.db.get_single_value(
-			"HD Settings", "do_not_restrict_tickets_without_an_agent_group"
-		)
-		if not do_not_restrict:
-			# include those which are not assigned to any team
-			criterions.append(QBTicket.agent_group.isnull())
+		if ignore_restrictions:
+			conditions.append(QBTicket.agent_group.isnull())
 
-		query = query.where(Criterion.any(criterions))
-
+		query = query.where(Criterion.any(conditions))
 		return query
 
 	@staticmethod
-	def can_ignore_restrictions(user: str) -> bool:
+	def can_ignore_restrictions() -> bool:
 		"""
 		Check if a user can ignore restrictions. Can be used for admins
 
 		:param user: The user to check against
 		:return: Whether the user can ignore restrictions
 		"""
-		# Get teams which can ignore restrictions, where user is a member
-		filters = {"user": user, "ignore_restrictions": True}
-		teams = frappe.get_list("HD Team", filters=filters)
-
-		# Must be part of at-least one team which can ignore restrictions
-		return len(teams) > 0
+		QBTeam = frappe.qb.DocType("HD Team")
+		QBTeamMember = frappe.qb.DocType("HD Team Member")
+		count = (
+			frappe.qb.from_(QBTeamMember)
+			.select(Count("*"))
+			.where(QBTeamMember.user == frappe.session.user)
+			.join(QBTeam)
+			.on(QBTeam.name == QBTeamMember.parent)
+			.where(QBTeam.ignore_restrictions == 1)
+			.run()[0][0]
+		)
+		return count > 0
 
 	@staticmethod
 	@lru_cache
@@ -161,6 +164,7 @@ class HDTicket(Document):
 		self.set_ticket_type()
 		self.set_raised_by()
 		self.set_contact()
+		self.set_customer()
 		self.set_priority()
 
 	def validate(self):
@@ -192,6 +196,16 @@ class HDTicket(Document):
 				contact = frappe.db.get_value("Contact", {"email_id": email_id})
 				if contact:
 					self.contact = contact
+
+	def set_customer(self):
+		"""
+		Update `Customer` if does not exist already. `Contact` is assumed
+		to be set beforehand.
+		"""
+		# Skip if `Customer` is already set
+		if self.customer:
+			return
+		self.customer = get_customer(self.contact)
 
 	def set_priority(self):
 		if self.priority or not self.ticket_type:

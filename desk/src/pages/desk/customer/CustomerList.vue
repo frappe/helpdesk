@@ -69,15 +69,11 @@ const columns = [
     colKey: "domain",
     colClass: "w-1/3",
   },
-  {
-    title: "Tickets",
-    colKey: "ticket_count",
-  },
 ];
 
 const customers = createListManager({
   doctype: "HD Customer",
-  fields: ["name", "image", "domain", "ticket_count"],
+  fields: ["name", "image", "domain"],
   auto: true,
 });
 
