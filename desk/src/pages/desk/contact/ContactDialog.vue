@@ -15,13 +15,17 @@
           <FileUploader @success="(file) => updateImage(file)">
             <template #default="{ uploading, openFileSelector }">
               <Button
-                label="Change photo"
+                :label="contact.doc?.image ? 'Change photo' : 'Upload photo'"
                 :loading="uploading"
                 @click="openFileSelector"
               />
             </template>
           </FileUploader>
-          <Button label="Remove photo" @click="updateImage(null)" />
+          <Button
+            v-if="contact.doc?.image"
+            label="Remove photo"
+            @click="updateImage(null)"
+          />
         </div>
         <div class="w-full space-y-2 text-sm text-gray-700">
           <div class="space-y-1">
