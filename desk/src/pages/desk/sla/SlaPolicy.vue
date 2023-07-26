@@ -196,27 +196,6 @@
             <ErrorMessage :message="holidayListValidationError" />
           </div>
         </div>
-        <div class="mt-5 flow-root">
-          <div class="float-left">
-            <Button appearance="secondary" @click="cancel()">Cancel</Button>
-          </div>
-          <div class="float-right">
-            <Button
-              v-if="isNew"
-              :loading="$resources.createNewServicePolicy.loading"
-              appearance="primary"
-              @click="create()"
-              >Create</Button
-            >
-            <Button
-              v-else
-              :loading="$resources.updateServicePolicy.loading"
-              appearance="primary"
-              @click="save()"
-              >Save</Button
-            >
-          </div>
-        </div>
       </div>
     </div>
   </div>

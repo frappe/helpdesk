@@ -20,7 +20,10 @@
               </Dropdown>
             </div>
           </div>
-          <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
+          <RouterLink
+            v-if="!configStore.preferKnowledgeBase"
+            :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+          >
             <Button
               class="bg-gray-900 text-white hover:bg-gray-800"
               label="New ticket"

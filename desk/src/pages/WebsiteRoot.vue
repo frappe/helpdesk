@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { AGENT_PORTAL_LANDING, CUSTOMER_PORTAL_LANDING } from "@/router";
+import { useConfigStore } from "@/stores/config";
+import {
+  AGENT_PORTAL_LANDING,
+  CUSTOMER_PORTAL_LANDING,
+  KB_PUBLIC,
+} from "@/router";
 
-const authStore = useAuthStore();
 const router = useRouter();
+const authStore = useAuthStore();
+const configStore = useConfigStore();
 
-if (authStore.hasDeskAccess) router.replace({ name: AGENT_PORTAL_LANDING });
-else router.replace({ name: CUSTOMER_PORTAL_LANDING });
+function getTarget() {
+  if (authStore.hasDeskAccess) return AGENT_PORTAL_LANDING;
+  else if (configStore.preferKnowledgeBase) return KB_PUBLIC;
+  else return CUSTOMER_PORTAL_LANDING;
+}
+
+router.push({ name: getTarget() });
 </script>

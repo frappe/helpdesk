@@ -2,8 +2,8 @@
   <div
     class="flex h-7 cursor-pointer items-center rounded-lg pl-1.5 pr-1 text-gray-700 transition-all duration-300 ease-in-out"
     :class="{
-      'w-full': sidebarStore.isExpanded,
-      'w-7': !sidebarStore.isExpanded,
+      'w-full': isExpanded,
+      'w-7': !isExpanded,
       'bg-gray-200': isActive,
       'hover:bg-gray-300': isActive,
       'hover:bg-gray-100': !isActive,
@@ -14,9 +14,9 @@
     <div
       class="ml-2 flex shrink-0 grow items-center justify-between text-base transition-all duration-300 ease-in-out"
       :class="{
-        'opacity-100': sidebarStore.isExpanded,
-        'opacity-0': !sidebarStore.isExpanded,
-        '-z-50': !sidebarStore.isExpanded,
+        'opacity-100': isExpanded,
+        'opacity-0': !isExpanded,
+        '-z-50': !isExpanded,
       }"
     >
       {{ label }}
@@ -28,10 +28,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { Badge, Tooltip } from "frappe-ui";
-import { useSidebarStore } from "@/stores/sidebar";
 
 const props = defineProps({
   icon: {
@@ -57,12 +55,19 @@ const props = defineProps({
     required: false,
     default: () => true,
   },
+  isExpanded: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  isActive: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
-const route = useRoute();
 const router = useRouter();
-const sidebarStore = useSidebarStore();
-const isActive = computed(() => props.to.includes(route.name.toString()));
 const betaText = "This feature is a work in progress. Use with caution";
 
 function handle() {

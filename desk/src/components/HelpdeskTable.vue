@@ -4,7 +4,9 @@
       v-if="isEmpty(data)"
       class="flex h-full w-full items-center justify-center text-base text-gray-700"
     >
-      {{ emptyMessage }}
+      <slot name="emptyMessage">
+        {{ emptyMessage }}
+      </slot>
     </div>
     <div
       v-else
@@ -201,7 +203,7 @@ const props = defineProps({
   emptyMessage: {
     type: String,
     required: false,
-    default: "🙇 Such empty",
+    default: "No records",
   },
 });
 

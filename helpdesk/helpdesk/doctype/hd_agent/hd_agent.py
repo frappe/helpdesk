@@ -16,7 +16,7 @@ class HDAgent(Document):
 	def set_user_roles(self):
 		user = frappe.get_doc("User", self.user)
 
-		for role in ["Agent", "System Manager"]:
+		for role in ["Agent"]:
 			user.append("roles", {"role": role})
 
 		user.save()
@@ -170,16 +170,6 @@ class HDAgent(Document):
 			return next((g for g in self.groups if g.team == group), False)
 
 		return False
-
-	@property
-	def agent_name(self):
-		user = frappe.get_cached_doc("User", self.user)
-		return user.full_name
-
-	@property
-	def user_image(self):
-		user = frappe.get_cached_doc("User", self.user)
-		return user.user_image
 
 
 @frappe.whitelist()

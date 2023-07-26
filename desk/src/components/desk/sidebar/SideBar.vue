@@ -1,16 +1,29 @@
 <template>
   <div
     class="flex select-none flex-col border-r border-gray-200 bg-gray-50 px-3 py-2 text-base transition-all duration-300 ease-in-out"
-    :class="{
-      'w-56': sidebarStore.isExpanded,
-      'w-13': !sidebarStore.isExpanded,
-    }"
+    :style="sidebarStore.isExpanded ? widthExpanded : widthMinimised"
   >
     <UserMenu class="pb-2" :options="profileSettings" />
-    <LinkGroup :options="menuOptions" />
+    <div class="flex flex-col gap-1">
+      <SidebarLink
+        v-for="option in menuOptions"
+        v-bind="option"
+        :key="option.label"
+        :is-expanded="sidebarStore.isExpanded"
+        :is-active="option.to?.includes(route.name.toString())"
+      />
+    </div>
     <span v-if="showExtra">
       <hr class="my-2" />
-      <LinkGroup :options="extraOptions" />
+      <div class="flex flex-col gap-1">
+        <SidebarLink
+          v-for="option in extraOptions"
+          v-bind="option"
+          :key="option.label"
+          :is-expanded="sidebarStore.isExpanded"
+          :is-active="option.to?.includes(route.name?.toString())"
+        />
+      </div>
     </span>
   </div>
 </template>
@@ -36,7 +49,7 @@ import {
   CUSTOMER_PORTAL_LANDING,
 } from "@/router";
 import UserMenu from "./UserMenu.vue";
-import LinkGroup from "./LinkGroup.vue";
+import SidebarLink from "@/components/SidebarLink.vue";
 import IconAgent from "~icons/lucide/user";
 import IconAt from "~icons/lucide/at-sign";
 import IconCannedResponse from "~icons/lucide/cloud-lightning";
@@ -57,6 +70,14 @@ const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
 
+const widthExpanded = {
+  "min-width": "224px",
+  "max-width": "224px",
+};
+const widthMinimised = {
+  "min-width": "52px",
+  "max-width": "52px",
+};
 const menuOptions = computed(() => [
   {
     label: "Tickets",
