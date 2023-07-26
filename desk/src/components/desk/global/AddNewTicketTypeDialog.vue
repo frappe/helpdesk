@@ -152,7 +152,7 @@ export default {
 			return {
 				url: "frappe.client.insert",
 				onSuccess: (doc) => {
-					this.$router.push(`/ticket_types`)
+					this.$router.push(`/ticket-types`)
 				},
 			}
 		},
