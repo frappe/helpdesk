@@ -22,8 +22,7 @@
 						<Button
 							appearance="primary"
 							type="submit"
-							v-if="currentInputIsValidEmail"
-							icon="arrow-down"
+							:disabled="!currentInputIsValidEmail"
 							@click="
 								() => {
 									addToInviteQueue(searchInput)
