@@ -35,7 +35,7 @@ export default {
 				{
 					label: "Ticket Types",
 					pageName: "TicketTypes",
-					route: "/settings/ticket_types",
+					route: "/ticket-types",
 				},
 				{
 					label: "Support Policies",
