@@ -44,6 +44,7 @@ doc_events = {
 		],
 	},
 	"Contact": {
+		"before_insert": "helpdesk.helpdesk.hooks.contact.before_insert",
 		"on_trash": [
 			"helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_ticket",
 		],
