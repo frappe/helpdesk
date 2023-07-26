@@ -64,21 +64,21 @@ class HDTicket(Document):
 
 	@staticmethod
 	def get_list_filters(query: Query):
+		QBTeam = frappe.qb.DocType("HD Team")
+		QBTeamMember = frappe.qb.DocType("HD Team Member")
 		QBTicket = frappe.qb.DocType("HD Ticket")
 		user = frappe.session.user
 		customer = get_customer(user)
 		conditions = (
 			[
-				QBTicket.raised_by == user,
+				QBTicket.contact == user,
 				QBTicket.customer == customer,
+				QBTicket.raised_by == user,
 			]
 			if not is_agent()
 			else []
 		)
 		query = query.where(Criterion.any(conditions))
-
-		if HDTicket.can_ignore_restrictions():
-			return query
 
 		enable_restrictions, ignore_restrictions = frappe.get_value(
 			doctype="HD Settings",
@@ -87,16 +87,29 @@ class HDTicket(Document):
 				"do_not_restrict_tickets_without_an_agent_group",
 			],
 		)
-
 		enable_restrictions = bool(int(enable_restrictions))
 		ignore_restrictions = bool(int(ignore_restrictions))
 
 		if not enable_restrictions:
 			return query
 
-		filters = {"user": user}
-		teams = frappe.get_list("HD Team", filters=filters)
-		conditions = [QBTicket.agent_group == team.name for team in teams]
+		teams = (
+			frappe.qb.from_(QBTeamMember)
+			.where(QBTeamMember.user == user)
+			.join(QBTeam)
+			.on(QBTeam.name == QBTeamMember.parent)
+			.select(QBTeam.team_name, QBTeam.ignore_restrictions)
+			.run(as_dict=True)
+		)
+
+		can_ignore_restrictions = (
+			len(list(filter(lambda x: x.ignore_restrictions, teams))) > 0
+		)
+
+		if can_ignore_restrictions:
+			return query
+
+		conditions = [QBTicket.agent_group == team.team_name for team in teams]
 
 		# Consider tickets without any assigned agent group
 		if ignore_restrictions:
@@ -104,27 +117,6 @@ class HDTicket(Document):
 
 		query = query.where(Criterion.any(conditions))
 		return query
-
-	@staticmethod
-	def can_ignore_restrictions() -> bool:
-		"""
-		Check if a user can ignore restrictions. Can be used for admins
-
-		:param user: The user to check against
-		:return: Whether the user can ignore restrictions
-		"""
-		QBTeam = frappe.qb.DocType("HD Team")
-		QBTeamMember = frappe.qb.DocType("HD Team Member")
-		count = (
-			frappe.qb.from_(QBTeamMember)
-			.select(Count("*"))
-			.where(QBTeamMember.user == frappe.session.user)
-			.join(QBTeam)
-			.on(QBTeam.name == QBTeamMember.parent)
-			.where(QBTeam.ignore_restrictions == 1)
-			.run()[0][0]
-		)
-		return count > 0
 
 	@staticmethod
 	@lru_cache
