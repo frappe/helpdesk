@@ -22,8 +22,7 @@
 						<Button
 							appearance="primary"
 							type="submit"
-							v-if="currentInputIsValidEmail"
-							icon="arrow-down"
+							:disabled="!currentInputIsValidEmail"
 							@click="
 								() => {
 									addToInviteQueue(searchInput)
@@ -36,9 +35,9 @@
 					</form>
 					<div
 						class="bg-gray-100 min-h-[100px] max-h-[300px] overflow-y-auto px-2 rounded border flex flex-col"
+						v-if="inviteQueue.length"
 					>
 						<ul
-							v-if="inviteQueue.length"
 							class="flex flex-wrap gap-2 py-2"
 						>
 							<li
@@ -61,15 +60,16 @@
 					</div>
 				</div>
 			</template>
-			<template #actions>
+			<template #actions v-if="inviteQueue.length">
 				<Button
 					:disabled="inviteQueue.length == 0"
 					appearance="primary"
 					@click="sentInvites()"
+					class="mr-2"
 					:loading="$resources.sentInvites.loading"
 					>Send Invites</Button
 				>
-				<Button appearance="secondary" @click="close()">Cancel</Button>
+				<Button appearance="secondary" class="mr-2" @click="close()">Cancel</Button>
 				<div class="grow">
 					<Button
 						@click="removeAllEmailFromQueue()"

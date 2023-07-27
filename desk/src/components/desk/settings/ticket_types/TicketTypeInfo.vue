@@ -182,7 +182,7 @@ export default {
         url: "frappe.client.rename_doc",
         onSuccess: (res) => {
           this.$router.push({
-            path: `/settings/ticket_types/${res}`,
+            path: `/ticket-types/${res}`,
           });
         },
       };
@@ -192,7 +192,7 @@ export default {
         url: "frappe.client.insert",
         onSuccess: (res) => {
           this.$router.push({
-            path: `/settings/ticket_types/${res.name}`,
+            path: `/ticket-types/${res.name}`,
           });
         },
       };

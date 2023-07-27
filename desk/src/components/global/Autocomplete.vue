@@ -19,7 +19,6 @@
 					>
 						<slot
 							name="input-holder"
-							:open="foo"
 							:selectedValue="selectedValue"
 						>
 							<div

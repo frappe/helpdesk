@@ -46,10 +46,6 @@ doc_events = {
 	"Contact": {
 		"on_trash": [
 			"helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.update_ticket",
-			"helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_contact_count",
-		],
-		"after_insert": [
-			"helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_contact_count"
 		],
 	},
 	"Assignment Rule": {
@@ -57,11 +53,5 @@ doc_events = {
 	},
 	"HD Agent": {
 		"before_insert": "helpdesk.limits.validate_agent_count",
-	},
-	"HD Ticket": {
-		"after_insert": (
-			"helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_ticket_count"
-		),
-		"on_trash": "helpdesk.helpdesk.doctype.hd_customer.hd_customer.get_ticket_count",
 	},
 }

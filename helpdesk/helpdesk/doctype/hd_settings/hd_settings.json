@@ -22,6 +22,7 @@
   "base_support_rotation",
   "knowledge_base_section",
   "suggest_articles_in_new_ticket_page",
+  "prefer_knowledge_base",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -223,11 +224,17 @@
    "fieldname": "brand_favicon",
    "fieldtype": "Attach Image",
    "label": "Favicon"
+  },
+  {
+   "default": "0",
+   "fieldname": "prefer_knowledge_base",
+   "fieldtype": "Check",
+   "label": "Prefer knowledge base"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-05-14 00:34:20.077662",
+ "modified": "2023-07-25 11:08:34.355664",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
