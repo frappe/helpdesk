@@ -7,36 +7,44 @@
     >
       <template #actions-left>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconMessage
+          <Icon
+            icon="lucide:message-square"
             class="h-4 w-4 cursor-pointer text-gray-700"
             @click="showCannedResponses = true"
           />
         </div>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconBook
+          <Icon
+            icon="lucide:book-open"
             class="h-4 w-4 cursor-pointer text-gray-700"
             @click="showArticleResponse = true"
           />
         </div>
       </template>
       <template #actions-right>
-        <div class="flex">
+        <div class="space-x-2">
           <Button
             label="Comment"
             :disabled="isDisabled"
-            class="m-1 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 p-1 hover:bg-gray-800"
-            theme="blue"
-            variant="outline"
+            theme="gray"
+            variant="subtle"
             @click="newComment"
-          />
+          >
+            <template #prefix>
+              <Icon icon="lucide:message-square" class="h-4 w-4" />
+            </template>
+          </Button>
           <Button
             label="Reply"
             :disabled="isDisabled"
-            class="m-1 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-2 py-1 hover:bg-gray-800"
             theme="gray"
             variant="solid"
             @click="newCommunication"
-          />
+          >
+            <template #prefix>
+              <Icon icon="lucide:send" class="h-4 w-4" />
+            </template>
+          </Button>
         </div>
       </template>
     </TextEditorBottom>
@@ -54,15 +62,14 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { createResource, Button, Dropdown } from "frappe-ui";
+import { createResource, Button } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import { createToast } from "@/utils/toasts";
 import { useTicketStore } from "../data";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
-import IconBook from "~icons/lucide/book-open";
-import IconMessage from "~icons/lucide/message-square";
 
 const authStore = useAuthStore();
 const { clean, editor, ticket } = useTicketStore();
