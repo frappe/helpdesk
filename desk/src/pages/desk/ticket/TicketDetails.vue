@@ -64,28 +64,23 @@
           v-model="ticket.doc.ticket_type"
           placeholder="Select a ticket type"
           :options="ticketTypeStore.dropdown"
-          @update:modelValue="() => changedKeys.add('ticket_type')"
         />
       </div>
-      <div class="flex gap-2">
-        <div class="flex w-1/2 flex-col gap-1">
-          <div class="text-xs text-gray-600">Priority</div>
-          <Autocomplete
-            v-model="ticket.doc.priority"
-            placeholder="High"
-            :options="ticketPriorityStore.dropdown"
-            @update:modelValue="() => changedKeys.add('priority')"
-          />
-        </div>
-        <div class="flex w-1/2 flex-col gap-1">
-          <div class="text-xs text-gray-600">Status</div>
-          <Autocomplete
-            v-model="ticket.doc.status"
-            placeholder="Open"
-            :options="ticketStatusStore.dropdown"
-            @update:modelValue="() => changedKeys.add('status')"
-          />
-        </div>
+      <div class="flex flex-col gap-1">
+        <div class="text-xs text-gray-600">Status</div>
+        <Autocomplete
+          v-model="ticket.doc.status"
+          placeholder="Select a status"
+          :options="ticketStatusStore.dropdown"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <div class="text-xs text-gray-600">Priority</div>
+        <Autocomplete
+          v-model="ticket.doc.priority"
+          placeholder="Select a priority"
+          :options="ticketPriorityStore.dropdown"
+        />
       </div>
       <div class="flex flex-col gap-1">
         <div class="text-xs text-gray-600">Team</div>
@@ -93,50 +88,36 @@
           v-model="ticket.doc.agent_group"
           placeholder="Select a team"
           :options="teamStore.dropdown"
-          @update:modelValue="() => changedKeys.add('agent_group')"
         />
-      </div>
-    </div>
-    <div class="border-l">
-      <div
-        v-if="isSaveButtonVisible"
-        class="mx-4 my-3.5 flex h-8 cursor-pointer items-center justify-center rounded-lg bg-gray-900 px-3 py-2 hover:bg-gray-800"
-        @click="save"
-      >
-        <div class="text-base text-white">Save</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, Ref, watch } from "vue";
+import { computed, ref, watch, Ref } from "vue";
 import { Autocomplete, Button } from "frappe-ui";
 import dayjs from "dayjs";
 import { useAgentStore } from "@/stores/agent";
-import { useKeymapStore } from "@/stores/keymap";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
-import { createToast } from "@/utils/toasts";
 import { useTicketStore } from "./data";
 
 const agentStore = useAgentStore();
-const keymapStore = useKeymapStore();
 const teamStore = useTeamStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
 const ticketTypeStore = useTicketTypeStore();
 const { sidebar, ticket } = useTicketStore();
 
-const isSaveButtonVisible = ref(false);
-
+const dateFormat = "MMM D, h:mm A";
 const firstResponseDue = computed(() =>
-  dayjs(ticket.doc.response_by).format("MMMM D, h:mm A")
+  dayjs(ticket.doc.response_by).format(dateFormat)
 );
 const resolutionDue = computed(() =>
-  dayjs(ticket.doc.resolution_by).format("MMMM D, h:mm A")
+  dayjs(ticket.doc.resolution_by).format(dateFormat)
 );
 
 /**
@@ -156,57 +137,36 @@ const assignedTo = computed(() => {
 
 const changeAssignedTo: Ref = ref(null);
 
-watch(
-  changeAssignedTo,
-  (changed) => (isSaveButtonVisible.value = changed.value)
-);
-
-/** 
-This is used to keep track of changed keys. This is needed because updates are not
-committed until save is called, unlike auto-update
-*/
-const changedKeys: Ref<Set<string>> = ref(new Set([]));
-
-// Watch if any key is changed, and make save button visibility accordingly
-watch(changedKeys, (keys) => (isSaveButtonVisible.value = !!keys.size), {
-  deep: true,
+watch(changeAssignedTo, (changed) => {
+  ticket.assign.submit({
+    agent: changed.value,
+  });
 });
 
-// Add and remove shortcuts
-const keyComboSave = ["Control", "S"];
-onMounted(() => keymapStore.add(keyComboSave, save, "Save details"));
-onUnmounted(() => keymapStore.remove(keyComboSave));
+watch(
+  [
+    () => ticket.doc.agent_group,
+    () => ticket.doc.priority,
+    () => ticket.doc.status,
+    () => ticket.doc.ticket_type,
+  ],
+  () => {
+    const fields = ["agent_group", "priority", "status", "ticket_type"];
+    const isChanged = !!fields.find((f) => ticket.doc[f]?.value);
+    if (!isChanged) return;
 
-async function save() {
-  const a = Array.from(changedKeys.value);
+    const [agent_group, priority, status, ticket_type] = fields.map(
+      (f) => ticket.doc[f]?.value || ticket.doc[f]
+    );
 
-  /**
-	Get an object with only changed keys and their values. The loop starts as an
-	empty object, and adds keys and values into it
-	*/
-  const r = a.reduce((previous, current) => {
-    previous[current] = ticket.doc[current].value;
-    return previous;
-  }, {});
-
-  await ticket.setValue.submit(r);
-
-  if (changeAssignedTo.value) {
-    await ticket.assign.submit({
-      agent: changeAssignedTo.value.value,
+    ticket.setValue.submit({
+      agent_group,
+      priority,
+      status,
+      ticket_type,
     });
-
-    changeAssignedTo.value = null;
   }
-
-  createToast({
-    title: "Saved",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
-
-  changedKeys.value.clear();
-}
+);
 </script>
 
 <style scoped>
