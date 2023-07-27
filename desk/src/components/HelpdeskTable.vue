@@ -5,7 +5,7 @@
       class="flex h-full w-full items-center justify-center text-base text-gray-700"
     >
       <slot name="emptyMessage">
-        {{ emptyMessage }}
+        <EmptyMessage :message="emptyMessage" />
       </slot>
     </div>
     <div
@@ -156,6 +156,7 @@ import { computed, reactive, toRefs, useSlots } from "vue";
 import { FeatherIcon, Popover, Switch } from "frappe-ui";
 import { isEmpty } from "lodash";
 import IconAdd from "~icons/espresso/add";
+import EmptyMessage from "./EmptyMessage.vue";
 
 type Column = {
   title: string;

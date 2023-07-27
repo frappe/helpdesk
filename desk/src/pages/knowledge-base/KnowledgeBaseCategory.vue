@@ -29,7 +29,7 @@
         </div>
       </template>
     </KnowledgeBaseCategoryHeader>
-    <KnowledgeBaseEmptyMessage
+    <EmptyMessage
       v-if="isEmpty(subCategories.data)"
       message="This category is empty"
     />
@@ -129,7 +129,7 @@ import { createListManager } from "@/composables/listManager";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import KnowledgeBaseIconSelector from "./KnowledgeBaseIconSelector.vue";
-import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
+import EmptyMessage from "@/components/EmptyMessage.vue";
 import IconEdit from "~icons/lucide/edit-3";
 import IconPlus from "~icons/lucide/plus";
 
