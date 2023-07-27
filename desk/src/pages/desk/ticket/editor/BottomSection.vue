@@ -7,42 +7,44 @@
     >
       <template #actions-left>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconMessage
+          <Icon
+            icon="lucide:message-square"
             class="h-4 w-4 cursor-pointer text-gray-700"
             @click="showCannedResponses = true"
           />
         </div>
         <div class="flex h-7 w-7 items-center justify-center">
-          <IconBook
+          <Icon
+            icon="lucide:book-open"
             class="h-4 w-4 cursor-pointer text-gray-700"
             @click="showArticleResponse = true"
           />
         </div>
       </template>
       <template #actions-right>
-        <div class="flex">
+        <div class="space-x-2">
+          <Button
+            label="Comment"
+            :disabled="isDisabled"
+            theme="gray"
+            variant="subtle"
+            @click="newComment"
+          >
+            <template #prefix>
+              <Icon icon="lucide:message-square" class="h-4 w-4" />
+            </template>
+          </Button>
           <Button
             label="Reply"
             :disabled="isDisabled"
-            class="rounded-r-none"
             theme="gray"
             variant="solid"
             @click="newCommunication"
-          />
-          <Dropdown :options="dropdownOptions">
-            <template #default="{ open }">
-              <Button
-                :icon="open ? 'chevron-up' : 'chevron-down'"
-                :disabled="isDisabled"
-                class="rounded-l-none"
-                :class="{
-                  'cursor-pointer': !isDisabled,
-                }"
-                theme="gray"
-                variant="solid"
-              />
+          >
+            <template #prefix>
+              <Icon icon="lucide:send" class="h-4 w-4" />
             </template>
-          </Dropdown>
+          </Button>
         </div>
       </template>
     </TextEditorBottom>
@@ -60,30 +62,19 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { createResource, Button, Dropdown } from "frappe-ui";
+import { createResource, Button } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import { createToast } from "@/utils/toasts";
 import { useTicketStore } from "../data";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
-import IconBook from "~icons/lucide/book-open";
-import IconMessage from "~icons/lucide/message-square";
 
 const authStore = useAuthStore();
 const { clean, editor, ticket } = useTicketStore();
 const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
-const dropdownOptions = [
-  {
-    label: "Reply",
-    onClick: () => newCommunication(),
-  },
-  {
-    label: "Comment",
-    onClick: () => newComment(),
-  },
-];
 
 const insertRes = createResource({
   url: "frappe.client.insert",

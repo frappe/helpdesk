@@ -45,7 +45,7 @@
         </FileUploader>
         <slot name="actions-left" />
       </div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
         <IconDelete
           class="h-4 w-4 cursor-pointer text-gray-700"
           @click.prevent="clear"
