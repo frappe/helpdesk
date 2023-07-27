@@ -17,7 +17,6 @@ def default_outgoing_email_account():
 	r = (
 		frappe.qb.from_(QBEmailAccount)
 		.select(QBEmailAccount.star)
-		.where(QBEmailAccount.use_imap == 1)
 		.where(QBEmailAccount.default_outgoing == 1)
 		.limit(1)
 	)
@@ -32,7 +31,6 @@ def default_ticket_outgoing_email_account():
 	r = (
 		frappe.qb.from_(QBEmailAccount)
 		.select(QBEmailAccount.star)
-		.where(QBEmailAccount.use_imap == 1)
 		.where(QBEmailAccount.default_outgoing == 1)
 		.inner_join(QBImapFolder)
 		.on(QBImapFolder.parent == QBEmailAccount.name)
