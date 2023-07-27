@@ -17,7 +17,7 @@
     <HelpdeskTable
       class="grow"
       :columns="columns"
-      :data="contacts.list?.data || []"
+      :data="agents.list?.data || []"
       :empty-message="emptyMessage"
       row-key="name"
       :hide-checkbox="true"
