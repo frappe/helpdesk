@@ -43,7 +43,9 @@
                 </template>
               </Button>
             </div>
-            <div v-else class="text-base text-gray-900">🙇 Such empty</div>
+            <div v-else class="text-base text-gray-900">
+              No Members found in Team: {{ teamId }}
+            </div>
             <Switch
               v-model="ignoreRestrictions"
               size="md"
