@@ -5,7 +5,7 @@
       <KnowledgeBaseSidebar />
       <RouterView :key="route.fullPath" v-slot="{ Component }">
         <component :is="Component" v-if="Component" />
-        <KnowledgeBaseEmptyMessage v-else message="Select a category" />
+        <EmptyMessage v-else message="Select a category" />
       </RouterView>
     </div>
   </div>
@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import PageTitle from "@/components/PageTitle.vue";
-import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
+import EmptyMessage from "@/components/EmptyMessage.vue";
 import KnowledgeBaseSidebar from "./KnowledgeBaseSidebar.vue";
 
 const route = useRoute();

@@ -54,7 +54,7 @@
         </Badge>
       </template>
       <template #emptyMessage>
-        <KnowledgeBaseEmptyMessage message="This sub category is empty" />
+        <EmptyMessage message="This sub category is empty" />
       </template>
     </HelpdeskTable>
     <ListNavigation v-bind="articles" class="p-2" />
@@ -104,7 +104,7 @@ import { createListManager } from "@/composables/listManager";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
-import KnowledgeBaseEmptyMessage from "./KnowledgeBaseEmptyMessage.vue";
+import EmptyMessage from "@/components/EmptyMessage.vue";
 import IconEdit from "~icons/lucide/edit-3";
 import IconFile from "~icons/lucide/file-text";
 import IconPlus from "~icons/lucide/plus";
