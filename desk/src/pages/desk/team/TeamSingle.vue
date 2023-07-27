@@ -44,7 +44,7 @@
               </Button>
             </div>
             <div v-else class="text-base text-gray-900">
-              no members found in team: {{ teamId }}
+              No members found in team: {{ teamId }}
             </div>
             <Switch
               v-model="ignoreRestrictions"
