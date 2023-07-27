@@ -20,6 +20,7 @@
       :data="contacts.list?.data || []"
       row-key="name"
       :emit-row-click="true"
+      :empty-message="emptyMessage"
       :hide-checkbox="true"
       :hide-column-selector="true"
       @row-click="openContact"
@@ -55,6 +56,7 @@ import IconPlus from "~icons/lucide/plus";
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
+const emptyMessage = "No Contacts Found";
 const columns = [
   {
     title: "Name",

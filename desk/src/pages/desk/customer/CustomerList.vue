@@ -18,6 +18,7 @@
       class="grow"
       :columns="columns"
       :data="customers.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :emit-row-click="true"
       :hide-checkbox="true"
@@ -58,6 +59,7 @@ import IconPlus from "~icons/lucide/plus";
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
+const emptyMessage = "No Customers Found";
 const columns = [
   {
     title: "Name",
@@ -69,15 +71,11 @@ const columns = [
     colKey: "domain",
     colClass: "w-1/3",
   },
-  {
-    title: "Tickets",
-    colKey: "ticket_count",
-  },
 ];
 
 const customers = createListManager({
   doctype: "HD Customer",
-  fields: ["name", "image", "domain", "ticket_count"],
+  fields: ["name", "image", "domain"],
   auto: true,
 });
 

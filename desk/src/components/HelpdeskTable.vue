@@ -166,45 +166,24 @@ type Column = {
 type RowKey = string;
 type SelectionKey = string | number;
 
-const props = defineProps({
-  columns: {
-    type: Array<Column>,
-    required: true,
-  },
-  data: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type: Array<Record<any, any>>,
-    required: true,
-  },
-  rowKey: {
-    type: String,
-    required: true,
-  },
-  selection: {
-    type: Set<SelectionKey>,
-    required: false,
-    default: () => new Set(),
-  },
-  emitRowClick: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  hideCheckbox: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  hideColumnSelector: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  emptyMessage: {
-    type: String,
-    required: false,
-    default: "No records",
-  },
+type P = {
+  columns: Column[];
+  rowKey: string;
+  data?: Record<string, any>[];
+  emitRowClick?: boolean;
+  emptyMessage?: string;
+  hideCheckbox?: boolean;
+  hideColumnSelector?: boolean;
+  selection?: Set<SelectionKey>;
+};
+
+const props = withDefaults(defineProps<P>(), {
+  data: () => [],
+  emitRowClick: false,
+  emptyMessage: "No records",
+  hideCheckbox: false,
+  hideColumnSelector: false,
+  selection: () => new Set(),
 });
 
 const emit = defineEmits<{

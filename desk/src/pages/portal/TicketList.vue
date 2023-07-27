@@ -84,7 +84,6 @@ import { useRouter } from "vue-router";
 import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
-import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { createListManager } from "@/composables/listManager";
 import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
@@ -93,7 +92,6 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import IconHash from "~icons/espresso/hash";
 
 const router = useRouter();
-const authStore = useAuthStore();
 const configStore = useConfigStore();
 const columns = [
   {
@@ -117,9 +115,6 @@ const tickets = createListManager({
   doctype: "HD Ticket",
   pageLength: 10,
   fields: ["name", "creation", "subject", "status"],
-  filters: {
-    raised_by: ["=", authStore.userId],
-  },
   auto: true,
 });
 

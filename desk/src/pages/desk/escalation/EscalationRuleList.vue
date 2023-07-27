@@ -18,6 +18,7 @@
       class="grow"
       :columns="columns"
       :data="rules.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :emit-row-click="true"
       :hide-checkbox="true"
@@ -51,6 +52,7 @@ import IconPlus from "~icons/lucide/plus";
 
 const showDialog = ref(false);
 const selectedRule = ref(null);
+const emptyMessage = "No Escalation Rules Found";
 const columns = [
   {
     title: "Priority",

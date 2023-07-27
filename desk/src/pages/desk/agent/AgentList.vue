@@ -17,7 +17,8 @@
     <HelpdeskTable
       class="grow"
       :columns="columns"
-      :data="contacts.list?.data || []"
+      :data="agents.list?.data || []"
+      :empty-message="emptyMessage"
       row-key="name"
       :hide-checkbox="true"
       :hide-column-selector="true"
@@ -43,7 +44,7 @@
         </div>
       </template>
     </HelpdeskTable>
-    <ListNavigation class="p-3" v-bind="contacts" />
+    <ListNavigation class="p-3" v-bind="agents" />
     <AddNewAgentsDialog
       :show="isDialogVisible"
       @close="isDialogVisible = false"
@@ -66,6 +67,7 @@ import IconPlus from "~icons/lucide/plus";
 const router = useRouter();
 const filters = useListFilters();
 const isDialogVisible = ref(false);
+const emptyMessage = "No Agents Found";
 const columns = [
   {
     title: "Name",
@@ -83,7 +85,7 @@ const columns = [
   },
 ];
 
-const contacts = createListManager({
+const agents = createListManager({
   doctype: "HD Agent",
   fields: [
     "name",
