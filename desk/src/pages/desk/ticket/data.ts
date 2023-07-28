@@ -28,18 +28,9 @@ export const useTicketStore = defineStore("ticket", () => {
     whitelistedMethods: {
       markSeen: "mark_seen",
       assign: "assign_agent",
-      getAssignees: {
-        method: "get_assignees",
-        auto: true,
-      },
-      getComments: {
-        method: "get_comments",
-        auto: true,
-      },
-      getCommunications: {
-        method: "get_communications",
-        auto: true,
-      },
+      getAssignees: "get_assignees",
+      getComments: "get_comments",
+      getCommunications: "get_communications",
       getLastCommunication: {
         method: "get_last_communication",
         auto: true,
