@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { defineStore } from "pinia";
 import { createDocumentResource } from "frappe-ui";
 import { socket } from "@/socket";
@@ -8,6 +8,8 @@ export const useTicketStore = defineStore("ticket", () => {
   const sidebar = reactive({
     isExpanded: true,
   });
+
+  const focusedConversationItem = ref(null);
 
   const editor = reactive({
     isExpanded: false,
@@ -115,6 +117,7 @@ export const useTicketStore = defineStore("ticket", () => {
     clean,
     deinit,
     editor,
+    focusedConversationItem,
     init,
     sidebar,
     ticket,

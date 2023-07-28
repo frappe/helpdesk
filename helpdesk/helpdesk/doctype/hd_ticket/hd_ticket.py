@@ -652,7 +652,7 @@ class HDTicket(Document):
 		filters = {
 			"reference_ticket": self.name,
 		}
-		fields = ["name", "commented_by", "content", "creation"]
+		fields = ["name", "commented_by", "content", "creation", "is_pinned"]
 
 		l = frappe.get_list("HD Ticket Comment", filters=filters, fields=fields)
 

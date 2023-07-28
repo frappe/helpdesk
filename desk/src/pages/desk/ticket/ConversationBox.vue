@@ -6,7 +6,7 @@
       class="flex w-full flex-col items-center gap-4 overflow-auto"
     >
       <div class="content">
-        <div v-for="c in conversations" :key="c.name" class="mt-4">
+        <div v-for="c in conversations" :id="c.name" :key="c.name" class="mt-4">
           <CommunicationItem
             v-if="c.isCommunication"
             :content="c.content"
@@ -37,6 +37,7 @@
             :content="c.content"
             :date="c.creation"
             :sender="c.sender"
+            :is-pinned="c.is_pinned"
           />
         </div>
       </div>
@@ -49,6 +50,7 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useScroll } from "@vueuse/core";
 import { debounce, Button, Dropdown, LoadingIndicator } from "frappe-ui";
 import dayjs from "dayjs";
@@ -66,6 +68,7 @@ type SocketData = {
 };
 
 const { editor, ticket } = useTicketStore();
+const { focusedConversationItem } = storeToRefs(useTicketStore());
 const listElement = ref(null);
 const isCommunicationsLoaded = ref(false);
 const isCommentsLoaded = ref(false);
@@ -157,6 +160,11 @@ onUnmounted(() => {
   socket.off("helpdesk:new-communication");
   socket.off("helpdesk:new-ticket-comment");
   socket.off("helpdesk:delete-ticket-comment");
+});
+
+watch(focusedConversationItem, (id) => {
+  const el = document.getElementById(id);
+  el.scrollIntoView({ behavior: "smooth" });
 });
 </script>
 
