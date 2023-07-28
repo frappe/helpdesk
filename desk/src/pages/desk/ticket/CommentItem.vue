@@ -7,7 +7,7 @@
       <div class="flex items-start justify-between">
         <div class="flex items-center">
           <div class="text-base text-gray-900">{{ sender.full_name }}</div>
-          <IconDot class="text-gray-600" />
+          <Icon icon="lucide:dot" class="text-gray-600" />
           <Tooltip :text="dateExtended">
             <div class="text-xs text-gray-600">
               {{ dateDisplay }}
@@ -26,7 +26,6 @@
       <div
         class="prose prose-p:m-0 max-w-none rounded-lg bg-gray-100 p-2 text-base text-gray-700"
       >
-        <!-- This is vulnerable to attacks. Prefer markdown wherever possible. -->
         <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-html="content"></span>
       </div>
@@ -35,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, PropType } from "vue";
+import { ref, toRefs, PropType, h } from "vue";
 import {
   createResource,
   Avatar,
@@ -45,9 +44,9 @@ import {
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import dayjs from "dayjs";
+import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
 import { createToast } from "@/utils/toasts";
-import IconDot from "~icons/ph/dot-bold";
 
 type Sender = {
   name: string;
@@ -72,12 +71,35 @@ const props = defineProps({
     type: Object as PropType<Sender>,
     required: true,
   },
+  isPinned: {
+    type: Boolean,
+    required: true,
+  },
 });
-const { content, date, name, sender } = toRefs(props);
+const { content, date, name, sender, isPinned } = toRefs(props);
 const authStore = useAuthStore();
 const dateDisplay = dayjs(date.value).fromNow();
 const dateExtended = dayjs(date.value).format("dddd, MMMM D, YYYY h:mm A");
-const options = ref([]);
+const options = ref([
+  {
+    label: isPinned.value ? "Unpin" : "Pin",
+    icon: h(Icon, { icon: isPinned.value ? "lucide:pin-off" : "lucide:pin" }),
+    onClick: () => togglePin(),
+  },
+]);
+
+function togglePin() {
+  createResource({
+    url: "frappe.client.set_value",
+    params: {
+      doctype: "HD Ticket Comment",
+      name: name.value,
+      fieldname: "is_pinned",
+      value: !isPinned.value,
+    },
+    auto: true,
+  });
+}
 
 function deleteComment() {
   createResource({
@@ -100,6 +122,7 @@ function deleteComment() {
 if (sender.value.name === authStore.userId) {
   options.value.push({
     label: "Delete",
+    icon: h(Icon, { icon: "lucide:trash-2" }),
     onClick: () => deleteComment(),
   });
 }
