@@ -19,7 +19,18 @@
           class="space-y-2"
         >
           <div class="text-xs">{{ field.label }}</div>
-          <div v-if="field.fieldtype === 'Link'">
+          <div
+            v-if="
+              field.fieldtype === 'Link' &&
+              field.fetch_options_from == 'DocType'
+            "
+          >
+            <SearchComplete
+              :doctype="field.doc_type"
+              @change="(v) => (customFields[field.fieldname] = v.value)"
+            />
+          </div>
+          <div v-else-if="field.fieldtype === 'Link' && field.options">
             <SearchComplete
               :doctype="field.options"
               @change="(v) => (customFields[field.fieldname] = v.value)"
@@ -29,6 +40,14 @@
             <Autocomplete
               placeholder="Select an option"
               :options="selectOptions(field.options)"
+              :value="customFields[field.fieldname]"
+              @change="(v) => (customFields[field.fieldname] = v.value)"
+            />
+          </div>
+          <div v-else-if="field.fetch_options_from === 'API'">
+            <Autocomplete
+              placeholder="Select an option"
+              :options="serverScriptOptions[field.fieldname]"
               :value="customFields[field.fieldname]"
               @change="(v) => (customFields[field.fieldname] = v.value)"
             />
@@ -94,6 +113,7 @@ import {
   Autocomplete,
   Button,
   Input,
+  call,
 } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
@@ -131,6 +151,7 @@ const template = createDocumentResource({
   name: props.templateId,
   fields: ["about", "fields"],
   auto: true,
+  onSuccess: fetchOptionsFromServerScript,
 });
 
 const articles = createListResource({
@@ -227,6 +248,21 @@ function searchArticles(term: string) {
   });
 
   articles.reload();
+}
+
+const serverScriptOptions = reactive({});
+function fetchOptionsFromServerScript() {
+  template.doc?.fields.forEach((field) => {
+    if (field.fetch_options_from === "API") {
+      call(field.api_method).then((data) => {
+        const options = data.map((o) => ({
+          label: o,
+          value: o,
+        }));
+        serverScriptOptions[field.fieldname] = options;
+      });
+    }
+  });
 }
 
 onMounted(() => configStore.setTitle("New ticket"));
