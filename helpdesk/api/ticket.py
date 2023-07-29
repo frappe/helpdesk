@@ -52,8 +52,6 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 	for field in template_fields:
 		if field.fieldname in ["subject", "description"]:
 			continue
-		if field.auto_set and field.auto_set_via == "Backend (Python)":
-			continue
 		else:
 			if field.fieldname not in values:
 				continue
