@@ -24,6 +24,3 @@ class HDTicketTemplate(Document):
 			if field.fieldname == "description" and field.fieldtype != "Text Editor":
 				frappe.throw(f"field type for description field should be Text Editor")
 
-	def before_save(self):
-		self.template_route = cleanup_page_name(self.template_name)
-
