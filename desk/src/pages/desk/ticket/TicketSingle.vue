@@ -1,7 +1,7 @@
 <template>
-  <div v-if="isResLoaded" class="flex flex-col">
+  <div v-if="ticket.data" class="flex flex-col">
     <TopBar
-      :title="ticket.doc?.subject"
+      :title="ticket.data.subject"
       :back-to="{ name: AGENT_PORTAL_TICKET_LIST }"
     >
       <template #bottom>
@@ -14,18 +14,11 @@
           </Tooltip>
           <Icon icon="lucide:dot" />
           <div class="cursor-copy" @click="copyId">
-            # {{ ticket.doc?.name }}
+            # {{ ticket.data.name }}
           </div>
           <Icon icon="lucide:dot" />
           <Tooltip :text="dateLong"> Last modified {{ dateShort }} </Tooltip>
         </div>
-      </template>
-      <template #right>
-        <Button label="Change team" theme="gray" variant="solid">
-          <template #prefix>
-            <Icon icon="lucide:users" />
-          </template>
-        </Button>
       </template>
     </TopBar>
     <div class="flex grow overflow-hidden">
@@ -40,13 +33,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, toRef } from "vue";
+import { storeToRefs } from "pinia";
+import { createResource } from "frappe-ui";
 import { useClipboard } from "@vueuse/core";
-import { Button } from "frappe-ui";
 import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
-import { useConfigStore } from "@/stores/config";
+import { emitter } from "@/emitter";
+import { socket } from "@/socket";
 import { createToast } from "@/utils/toasts";
 import TopBar from "@/components/TopBar.vue";
 import { useTicketStore } from "./data";
@@ -55,25 +50,44 @@ import PinnedComments from "./PinnedComments.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
 
-const props = defineProps({
-  ticketId: {
-    type: String,
-    required: true,
+interface P {
+  ticketId: string;
+}
+
+const props = defineProps<P>();
+const ticketId = toRef(props, "ticketId");
+const ticketStore = useTicketStore();
+const { doc } = storeToRefs(ticketStore);
+
+const ticket = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
+  params: {
+    name: ticketId.value,
   },
+  auto: true,
+  onSuccess: (data) => (doc.value = data),
 });
+
+createResource({
+  url: "run_doc_method",
+  params: {
+    dt: "HD Ticket",
+    dn: ticketId.value,
+    method: "mark_seen",
+  },
+  auto: true,
+});
+
 const { copy } = useClipboard();
-const configStore = useConfigStore();
-const { init, deinit, ticket } = useTicketStore();
-const isResLoaded = ref(false);
-const date = computed(() => dayjs(ticket.doc?.modified).tz(dayjs.tz.guess()));
-const dateShort = computed(() => date.value.fromNow());
+const date = computed(() => dayjs(ticket.data.modified).tz(dayjs.tz.guess()));
 const dateLong = computed(() => date.value.format("dddd, MMMM D, YYYY h:mm A"));
-const viaCustomerPortal = computed(() => ticket.doc?.via_customer_portal);
-const textEmail = "Created via email";
+const dateShort = computed(() => date.value.fromNow());
 const textCustomerPortal = "Created via customer portal";
+const textEmail = "Created via email";
+const viaCustomerPortal = computed(() => ticket.data.via_customer_portal);
 
 async function copyId() {
-  await copy(ticket.doc?.name);
+  await copy(ticket.data.name);
 
   createToast({
     title: "Copied to clipboard",
@@ -82,14 +96,28 @@ async function copyId() {
   });
 }
 
-init(parseInt(props.ticketId)).then(() => {
-  configStore.setTitle(ticket.doc?.subject);
-  ticket.markSeen.submit();
-  isResLoaded.value = true;
-});
+emitter.on("update:ticket", () => ticket.reload());
 
-onUnmounted(() => {
-  deinit();
-  configStore.setTitle();
+const events = [
+  "helpdesk:new-communication",
+  "helpdesk:new-ticket-comment",
+  "helpdesk:delete-ticket-comment",
+  "helpdesk:ticket-update",
+  "helpdesk:update-ticket-assignee",
+  "helpdesk:ticket-assignee-update",
+];
+
+onMounted(() =>
+  events.forEach((e) =>
+    socket.on(e, (d) => {
+      const id = d.name || d.id;
+      const shouldReload = !id || id == ticketId.value;
+      if (shouldReload) ticket.reload();
+    })
+  )
+);
+onBeforeUnmount(() => {
+  events.forEach((e) => socket.off(e));
+  ticketStore.$reset();
 });
 </script>

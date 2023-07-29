@@ -11,18 +11,17 @@
     </div>
     <div class="overflow-auto px-4">
       <ol class="relative border-l border-gray-200 text-base">
-        <li
-          v-for="activity in activities"
-          :key="activity.name"
-          class="mb-4 ml-4"
-        >
-          <IconDot class="absolute -left-3 h-6 w-6 bg-white text-gray-500" />
+        <li v-for="event in doc.history" :key="event.name" class="mb-4 ml-4">
+          <Icon
+            icon="lucide:dot"
+            class="absolute -left-3 h-6 w-6 bg-white text-gray-500"
+          />
           <div class="mb-1 font-medium text-gray-900 first-letter:capitalize">
-            {{ activity.owner }} {{ activity.action }}
+            {{ userStore.getUser(event.owner).full_name }} {{ event.action }}
           </div>
-          <Tooltip :text="activity.dateLong">
+          <Tooltip :text="dayjs(event.creation).format(dateFmtLong)">
             <div class="text-gray-700 first-letter:capitalize">
-              {{ activity.dateShort }}
+              {{ dayjs(event.creation).fromNow() }}
             </div>
           </Tooltip>
         </li>
@@ -32,50 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef } from "vue";
-import { Button, createListResource, Tooltip } from "frappe-ui";
+import { Button, Tooltip } from "frappe-ui";
 import dayjs from "dayjs";
+import { Icon } from "@iconify/vue";
 import { useTicketStore } from "./data";
-import IconDot from "~icons/ph/dot-bold";
+import { useUserStore } from "@/stores/user";
 
-class Activity {
-  constructor(
-    public name: string,
-    public action: string,
-    public creation: string,
-    public owner: string
-  ) {}
-
-  get dayjsInstance() {
-    return dayjs(this.creation).tz(dayjs.tz.guess());
-  }
-
-  get dateLong() {
-    // https://day.js.org/docs/en/display/format
-    return this.dayjsInstance.format("dddd, MMMM D, YYYY h:mm A");
-  }
-
-  get dateShort() {
-    return this.dayjsInstance.fromNow();
-  }
-}
-
-const { sidebar, ticket } = useTicketStore();
-
-const r = createListResource({
-  doctype: "HD Ticket Activity",
-  fields: ["name", "creation", "action", "owner"],
-  filters: {
-    ticket: ticket.doc.name,
-  },
-  orderBy: "creation desc",
-  auto: true,
-});
-
-const activities: ComputedRef<Array<Activity>> = computed(
-  () =>
-    r.data?.map(
-      (a: Activity) => new Activity(a.name, a.action, a.creation, a.owner)
-    ) || []
-);
+const userStore = useUserStore();
+const { doc, sidebar } = useTicketStore();
+const dateFmtLong = "dddd, MMMM D, YYYY h:mm A";
 </script>

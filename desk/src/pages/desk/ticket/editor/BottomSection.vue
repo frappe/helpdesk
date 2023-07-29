@@ -3,7 +3,7 @@
     <TextEditorBottom
       v-model:attachments="editor.attachments"
       :editor="editor.tiptap"
-      @content-cleared="clean"
+      @content-cleared="editor.clean()"
     >
       <template #actions-left>
         <div class="flex h-7 w-7 items-center justify-center">
@@ -28,7 +28,7 @@
             :disabled="isDisabled"
             theme="gray"
             variant="subtle"
-            @click="newComment"
+            @click="addComment.submit()"
           >
             <template #prefix>
               <Icon icon="lucide:message-square" class="h-4 w-4" />
@@ -39,7 +39,7 @@
             :disabled="isDisabled"
             theme="gray"
             variant="solid"
-            @click="newCommunication"
+            @click="addResponse.submit()"
           >
             <template #prefix>
               <Icon icon="lucide:send" class="h-4 w-4" />
@@ -64,63 +64,69 @@
 import { computed, ref } from "vue";
 import { createResource, Button } from "frappe-ui";
 import { Icon } from "@iconify/vue";
-import { useAuthStore } from "@/stores/auth";
-import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
+import { emitter } from "@/emitter";
 import { createToast } from "@/utils/toasts";
+import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import { useTicketStore } from "../data";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
 
-const authStore = useAuthStore();
-const { clean, editor, ticket } = useTicketStore();
+const { editor, doc } = useTicketStore();
 const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
 
-const insertRes = createResource({
-  url: "frappe.client.insert",
-  debounce: 500,
-  onSuccess() {
-    clean();
+const isDisabled = computed(
+  () => editor.tiptap?.isEmpty || addComment.loading || addResponse.loading
+);
+
+const addComment = createResource({
+  url: "run_doc_method",
+  debounce: 300,
+  makeParams: () => ({
+    dt: "HD Ticket",
+    dn: doc.name,
+    method: "new_comment",
+    args: {
+      content: editor.content,
+    },
+  }),
+  onSuccess: () => {
+    emitter.emit("update:ticket");
+    editor.clean();
   },
-  validate() {
-    if (editor.tiptap?.isEmpty) {
-      return "Message is empty";
-    }
-  },
-  onError(error) {
+  onError: () => {
     createToast({
-      title: error.message,
-      text: error.messages?.join("\n"),
+      title: "Error adding comment",
       icon: "x",
-      iconClasses: "text-red-500",
+      iconClasses: "text-red-600",
     });
   },
 });
 
-const isDisabled = computed(
-  () =>
-    editor.tiptap?.isEmpty || ticket.replyViaAgent.loading || insertRes.loading
-);
-
-function newCommunication() {
-  ticket.replyViaAgent.loading = true;
-  ticket.replyViaAgent.submit({
-    attachments: editor.attachments.map((x) => x.name),
-    cc: editor.cc.join(","),
-    bcc: editor.bcc.join(","),
-    message: editor.content,
-  });
-}
-
-function newComment() {
-  insertRes.loading = true;
-  insertRes.submit({
-    doc: {
-      doctype: "HD Ticket Comment",
-      reference_ticket: ticket.doc.name,
-      content: editor.content,
-      commented_by: authStore.userId,
+const addResponse = createResource({
+  url: "run_doc_method",
+  debounce: 300,
+  makeParams: () => ({
+    dt: "HD Ticket",
+    dn: doc.name,
+    method: "reply_via_agent",
+    args: {
+      attachments: editor.attachments.map((x) => x.name),
+      cc: editor.cc.join(","),
+      bcc: editor.bcc.join(","),
+      message: editor.content,
     },
-  });
-}
+  }),
+  onSuccess: () => {
+    emitter.emit("update:ticket");
+    editor.clean();
+  },
+  onError: () => {
+    createToast({
+      title: "Error replying to ticket",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+  },
+});
 </script>

@@ -24,6 +24,6 @@ import { useTicketStore } from "./data";
 import IconLayer from "~icons/lucide/layers";
 import IconLink from "~icons/lucide/external-link";
 
-const { ticket } = useTicketStore();
-const fields = computed(() => ticket.doc?.custom_fields);
+const { doc } = useTicketStore();
+const fields = computed(() => doc.custom_fields);
 </script>

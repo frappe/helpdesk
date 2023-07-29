@@ -1,12 +1,18 @@
 <template>
   <div class="group flex gap-3">
     <div class="flex w-8 justify-end">
-      <Avatar :image="senderImage" :label="sender" size="xl" />
+      <Avatar
+        :image="user?.user_image"
+        :label="user?.full_name || sender"
+        size="xl"
+      />
     </div>
     <div class="flex w-full flex-col gap-1">
       <div class="flex items-start justify-between">
         <div class="flex items-center">
-          <div class="text-base text-gray-900">{{ sender }}</div>
+          <div class="text-base text-gray-900">
+            {{ user?.full_name || sender }}
+          </div>
           <IconDot class="text-gray-600" />
           <Tooltip :text="dateExtended">
             <div class="text-xs text-gray-600">
@@ -44,54 +50,37 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs } from "vue";
+import { toRef } from "vue";
 import { Avatar, Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import dayjs from "dayjs";
+import { useUserStore } from "@/stores/user";
 import AttachmentItem from "@/components/AttachmentItem.vue";
 import IconDot from "~icons/ph/dot-bold";
 
-type Attachment = {
+interface Attachment {
   file_name: string;
   file_url: string;
-};
+}
 
-const props = defineProps({
-  content: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: String,
-    required: true,
-  },
-  sender: {
-    type: String,
-    required: true,
-  },
-  senderImage: {
-    type: String,
-    required: false,
-    default: "",
-  },
-  cc: {
-    type: String,
-    required: false,
-    default: "",
-  },
-  bcc: {
-    type: String,
-    required: false,
-    default: "",
-  },
-  attachments: {
-    type: Array<Attachment>,
-    required: false,
-    default: [],
-  },
+interface P {
+  content: string;
+  date: string;
+  sender: string;
+  cc?: string;
+  bcc?: string;
+  attachments?: Attachment[];
+}
+
+const props = withDefaults(defineProps<P>(), {
+  cc: () => "",
+  bcc: () => "",
+  attachments: () => [],
 });
 
-const { content, date, sender, senderImage, cc, bcc } = toRefs(props);
+const userStore = useUserStore();
+const user = userStore.getUser(props.sender);
+const date = toRef(props, "date");
 const dateDisplay = dayjs(date.value).fromNow();
 const dateExtended = dayjs(date.value).format("dddd, MMMM D, YYYY h:mm A");
 

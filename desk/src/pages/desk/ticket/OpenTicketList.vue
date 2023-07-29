@@ -50,15 +50,15 @@ class Ticket {
   }
 }
 
-const { ticket } = useTicketStore();
+const { doc } = useTicketStore();
 const isExpanded = ref(true);
 
 const ticketRes = createListResource({
   doctype: "HD Ticket",
   fields: ["name", "subject"],
   filters: {
-    name: ["!=", ticket.doc.name],
-    contact: ticket.doc.contact,
+    name: ["!=", doc.name],
+    contact: doc.contact.name,
     status: "Open",
   },
   orderBy: "modified desc",
