@@ -10,8 +10,7 @@
  "field_order": [
   "template_name",
   "about",
-  "fields",
-  "template_route"
+  "fields"
  ],
  "fields": [
   {
@@ -27,12 +26,6 @@
    "options": "HTML"
   },
   {
-   "fieldname": "template_route",
-   "fieldtype": "Data",
-   "hidden": 1,
-   "label": "Template Route"
-  },
-  {
    "fieldname": "fields",
    "fieldtype": "Table",
    "label": "Custom Fields",
@@ -41,7 +34,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-02 13:34:05.696001",
+ "modified": "2023-07-29 13:36:40.231397",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",
