@@ -13,34 +13,15 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 	ticket_doc.ticket_type = values.get("ticket_type")
 
 	if "contact" in values:
-		contact_doc = frappe.get_doc("Contact", values["contact"])
-		email_id = ""
-		if contact_doc.email_id:
-			email_id = contact_doc.email_id
-		elif contact_doc.email_ids and len(contact_doc.email_ids) > 0:
-			email_id = contact_doc.email_ids[0].email_id
-
-		ticket_doc.raised_by = email_id
-		ticket_doc.contact = contact_doc.name
+		contact_name = values["contact"]
+		ticket_doc.raised_by = get_contact_email(contact_name)
+		ticket_doc.contact = contact_name
 
 	if via_customer_portal:
-		if not frappe.db.exists(
-			{"doctype": "Contact", "email_id": frappe.session.user}
-		):
-			user_doc = frappe.get_doc("User", frappe.session.user)
-			new_contact_doc = frappe.get_doc(
-				doctype="Contact",
-				email_id=user_doc.email,
-				full_name=user_doc.full_name,
-				first_name=user_doc.first_name,
-				last_name=user_doc.last_name,
-				user=user_doc.name,
-			)
-			new_contact_doc.append(
-				"email_ids", {"email_id": user_doc.email, "is_primary": True}
-			)
-			new_contact_doc.insert(ignore_permissions=True)
-			ticket_doc.contact = new_contact_doc.name
+		if not frappe.db.exists("Contact", {"email_id": frappe.session.user}):
+			new_contact_name = create_contact_from_user(frappe.session.user)
+			ticket_doc.raised_by = frappe.session.user
+			ticket_doc.contact = new_contact_name
 
 	ticket_doc.subject = values["subject"]
 	ticket_doc.description = values["description"]
@@ -52,21 +33,22 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 	for field in template_fields:
 		if field.fieldname in ["subject", "description"]:
 			continue
-		else:
-			if field.fieldname not in values:
-				continue
-			ticket_doc.append(
-				"custom_fields",
-				{
-					"label": field.label,
-					"fieldname": field.fieldname,
-					"value": values[field.fieldname],
-					"route": f"/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}"
-					if field.fieldtype == "Link"
-					else "",
-					"hide_from_customer": field.hide_from_customer,
-				},
-			)
+		if not field.reqd and field.fieldname not in values:
+			continue
+		if field.reqd and field.fieldname not in values:
+			frappe.throw(f"Field {field.label} is required")
+		ticket_doc.append(
+			"custom_fields",
+			{
+				"label": field.label,
+				"fieldname": field.fieldname,
+				"value": values[field.fieldname],
+				"hide_from_customer": field.hide_from_customer,
+				"route": f"/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}"
+				if field.fieldtype == "Link"
+				else "",
+			},
+		)
 
 	ticket_doc.insert(ignore_permissions=True)
 	# TODO: remove this if condition after refactoring doctype/ticket.py logic regarding this
@@ -77,6 +59,30 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 
 	return ticket_doc
 
+
+def get_contact_email(contact_name):
+	email_id = frappe.db.get_value("Contact", contact_name, "email_id")
+	if email_id:
+		return email_id
+	email_id = frappe.db.get_value("Contact Email", {"parent": contact_name}, "email_id")
+	if email_id:
+		return email_id
+
+def create_contact_from_user(user):
+	user_doc = frappe.get_doc("User", user)
+	new_contact_doc = frappe.get_doc(
+		doctype="Contact",
+		email_id=user_doc.email,
+		full_name=user_doc.full_name,
+		first_name=user_doc.first_name,
+		last_name=user_doc.last_name,
+		user=user_doc.name,
+	)
+	new_contact_doc.append(
+		"email_ids", {"email_id": user_doc.email, "is_primary": True}
+	)
+	new_contact_doc.insert(ignore_permissions=True)
+	return new_contact_doc.name
 
 def assign_ticket_to_agent(ticket_id, agent_id=None):
 	if not ticket_id:
