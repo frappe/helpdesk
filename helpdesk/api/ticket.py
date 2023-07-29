@@ -63,7 +63,8 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 					"value": values[field.fieldname],
 					"route": f"/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}"
 					if field.fieldtype == "Link"
-					else ""
+					else "",
+					"hide_from_customer": field.hide_from_customer,
 				},
 			)
 

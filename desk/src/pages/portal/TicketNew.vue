@@ -14,7 +14,7 @@
       />
       <div class="grid grid-cols-3 gap-4">
         <div
-          v-for="field in template.doc?.fields"
+          v-for="field in visibleCustomFields"
           :key="field.label"
           class="space-y-2"
         >
@@ -161,10 +161,13 @@ const articles = createListResource({
   debounce: 500,
 });
 
+const visibleCustomFields = computed(() =>
+  template.doc?.fields?.filter((f) => !f.hide_from_customer)
+);
 const r = createResource({
   url: "helpdesk.api.ticket.create_new",
   validate(params) {
-    for (const field of template.doc?.fields || []) {
+    for (const field of visibleCustomFields.value || []) {
       if (field.reqd && isEmpty(params.values[field.fieldname])) {
         return `${field.label} is required`;
       }
@@ -252,7 +255,7 @@ function searchArticles(term: string) {
 
 const serverScriptOptions = reactive({});
 function fetchOptionsFromServerScript() {
-  template.doc?.fields.forEach((field) => {
+  visibleCustomFields.value.forEach((field) => {
     if (field.fetch_options_from === "API") {
       call(field.api_method).then((data) => {
         const options = data.map((o) => ({

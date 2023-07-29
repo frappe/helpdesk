@@ -10,7 +10,8 @@
   "label",
   "fieldname",
   "value",
-  "route"
+  "route",
+  "hide_from_customer"
  ],
  "fields": [
   {
@@ -34,12 +35,18 @@
    "fieldname": "label",
    "fieldtype": "Data",
    "label": "Label"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_from_customer",
+   "fieldtype": "Check",
+   "label": "Hide from Customer"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-07-29 12:55:01.812183",
+ "modified": "2023-07-29 13:02:53.237459",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Custom Field",
