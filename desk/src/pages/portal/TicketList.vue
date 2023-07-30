@@ -61,7 +61,12 @@
           </div>
         </template>
         <template #status="{ data }">
-          {{ transformStatus(data.status) }}
+          <Badge
+            :label="data.status"
+            :theme="statusColormap[data.status]"
+            variant="subtle"
+          />
+
         </template>
         <template #creation="{ data }">
           {{ dayjs(data.creation).fromNow() }}
