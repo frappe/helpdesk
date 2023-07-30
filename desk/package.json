@@ -22,6 +22,7 @@
 		"echarts": "^5.4.1",
 		"frappe-ui": "^0.1.0-alpha.9",
 		"lodash": "^4.17.21",
+		"mitt": "^3.0.1",
 		"pinia": "^2.0.33",
 		"sanitize-html": "^2.10.0",
 		"vee-validate": "^4.8.2",

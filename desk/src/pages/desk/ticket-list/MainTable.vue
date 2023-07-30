@@ -21,14 +21,14 @@
     <template #status="{ data }">
       <Badge
         :label="data.status"
-        :theme="statusColormap[data.status]"
+        :theme="ticketStatusStore.colorMapAgent[data.status]"
         variant="subtle"
       />
     </template>
     <template #priority="{ data }">
       <Badge
         :label="data.priority"
-        :theme="priorityColormap[data.priority]"
+        :theme="ticketPriorityStore.colorMap[data.priority]"
         variant="subtle"
       />
     </template>
@@ -78,6 +78,8 @@ import { createResource, Badge, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { useAgentStore } from "@/stores/agent";
+import { useTicketPriorityStore } from "@/stores/ticketPriority";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils/toasts";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import { useTicketListStore } from "./data";
@@ -87,6 +89,8 @@ import IconPlusCircle from "~icons/lucide/plus-circle";
 
 const router = useRouter();
 const agentStore = useAgentStore();
+const ticketPriorityStore = useTicketPriorityStore();
+const ticketStatusStore = useTicketStatusStore();
 const { selection, tickets } = useTicketListStore();
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
@@ -171,20 +175,6 @@ const bulkAssignTicketToAgent = createResource({
     });
   },
 });
-
-const statusColormap = {
-  Open: "red",
-  Replied: "orange",
-  Resolved: "green",
-  Closed: "blue",
-};
-
-const priorityColormap = {
-  Urgent: "red",
-  High: "orange",
-  Medium: "blue",
-  Low: "green",
-};
 
 function assignOpts(selected: Set<number>) {
   return agentStore.options.map((a) => ({

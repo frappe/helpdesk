@@ -63,7 +63,7 @@
         <template #status="{ data }">
           <Badge
             :label="transformStatus(data.status)"
-            :theme="statusColormap[data.status]"
+            :theme="ticketStatusStore.colorMapCustomer[data.status]"
             variant="subtle"
           />
         </template>
@@ -89,6 +89,7 @@ import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { useConfigStore } from "@/stores/config";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createListManager } from "@/composables/listManager";
 import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
@@ -97,6 +98,7 @@ import IconHash from "~icons/espresso/hash";
 
 const router = useRouter();
 const configStore = useConfigStore();
+const ticketStatusStore = useTicketStatusStore();
 const columns = [
   {
     title: "Subject",
@@ -121,13 +123,6 @@ const tickets = createListManager({
   fields: ["name", "creation", "subject", "status"],
   auto: true,
 });
-
-const statusColormap = {
-  Open: "red",
-  Replied: "orange",
-  Resolved: "green",
-  Closed: "blue",
-};
 
 const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
 const dropdownTitle = ref("All tickets");

@@ -8,27 +8,27 @@
             icon="x"
             theme="gray"
             variant="ghost"
-            @click="sidebar.isExpanded = false"
+            @click="ticketStore.sidebar.isExpanded = false"
           />
         </div>
         <div class="my-6 flex flex-col justify-between gap-3.5">
-          <div v-if="ticket.doc.customer" class="flex justify-between">
+          <div v-if="data.customer" class="flex justify-between">
             <div class="text-gray-600">Customer:</div>
             <div class="font-medium text-gray-700">
-              {{ ticket.doc.customer }}
+              {{ data.customer }}
             </div>
           </div>
           <div class="flex justify-between">
             <div class="text-gray-600">First Response Due:</div>
             <div class="font-medium text-gray-700">
-              {{ firstResponseDue }}
+              {{ dayjs(data.response_by).format(dateFormat) }}
             </div>
           </div>
           <div class="flex items-center justify-between">
             <div class="text-gray-600">Resolution Due:</div>
             <div class="font-medium text-gray-700">
-              <span v-if="ticket.doc.resolution_by">
-                {{ resolutionDue }}
+              <span v-if="data.resolution_by">
+                {{ dayjs(data.resolution_by).format(dateFormat) }}
               </span>
               <Badge
                 v-else
@@ -54,40 +54,19 @@
         <Autocomplete
           placeholder="Select an agent"
           :options="agentStore.dropdown"
-          :value="changeAssignedTo || assignedTo"
-          @change="changeAssignedTo = $event"
+          :value="assignedTo"
+          @change="assignAgent($event.value)"
         />
       </div>
-      <div class="flex flex-col gap-1">
-        <div class="text-xs text-gray-600">Ticket Type</div>
+      <div v-for="o in options" :key="o.field" class="flex flex-col gap-1">
+        <div class="text-xs text-gray-600">
+          {{ o.label }}
+        </div>
         <Autocomplete
-          v-model="ticket.doc.ticket_type"
-          placeholder="Select a ticket type"
-          :options="ticketTypeStore.dropdown"
-        />
-      </div>
-      <div class="flex flex-col gap-1">
-        <div class="text-xs text-gray-600">Status</div>
-        <Autocomplete
-          v-model="ticket.doc.status"
-          placeholder="Select a status"
-          :options="ticketStatusStore.dropdown"
-        />
-      </div>
-      <div class="flex flex-col gap-1">
-        <div class="text-xs text-gray-600">Priority</div>
-        <Autocomplete
-          v-model="ticket.doc.priority"
-          placeholder="Select a priority"
-          :options="ticketPriorityStore.dropdown"
-        />
-      </div>
-      <div class="flex flex-col gap-1">
-        <div class="text-xs text-gray-600">Team</div>
-        <Autocomplete
-          v-model="ticket.doc.agent_group"
-          placeholder="Select a team"
-          :options="teamStore.dropdown"
+          :options="o.store.dropdown"
+          :placeholder="`Select a ${o.label}`"
+          :value="data[o.field]"
+          @change="update(o.field, $event.value)"
         />
       </div>
     </div>
@@ -95,78 +74,99 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, Ref } from "vue";
-import { Autocomplete, Button } from "frappe-ui";
+import { computed } from "vue";
+import { createResource, Autocomplete, Button } from "frappe-ui";
 import dayjs from "dayjs";
+import { emitter } from "@/emitter";
+import { createToast } from "@/utils/toasts";
 import { useAgentStore } from "@/stores/agent";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
-import { useTicketStore } from "./data";
-
-const agentStore = useAgentStore();
-const teamStore = useTeamStore();
-const ticketPriorityStore = useTicketPriorityStore();
-const ticketStatusStore = useTicketStatusStore();
-const ticketTypeStore = useTicketTypeStore();
-const { sidebar, ticket } = useTicketStore();
+import { useUserStore } from "@/stores/user";
+import { useTicketStore, useTicket } from "./data";
 
 const dateFormat = "MMM D, h:mm A";
-const firstResponseDue = computed(() =>
-  dayjs(ticket.doc.response_by).format(dateFormat)
-);
-const resolutionDue = computed(() =>
-  dayjs(ticket.doc.resolution_by).format(dateFormat)
-);
+const agentStore = useAgentStore();
+const userStore = useUserStore();
+const ticketStore = useTicketStore();
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
 
-/**
-Fetch assignee info. This is expected to be a list of assigned users, even though we want
-only one. This could be considered future proofing.
-*/
-ticket.getAssignees.fetch();
-
-/**
-Last assignee from the list, where expected list length is just one. Transformed into an
-object to be used with `Autocomplete`
-*/
 const assignedTo = computed(() => {
-  const assigned = (ticket.getAssignees.data?.message || []).pop();
-  return agentStore.dropdown.find((agent) => agent.value === assigned?.name);
+  const assignJson = JSON.parse(data.value._assign);
+  const user = assignJson.slice(-1).pop();
+  const name = userStore.getUser(user).full_name;
+  return name;
 });
 
-const changeAssignedTo: Ref = ref(null);
+const options = computed(() => [
+  {
+    field: "ticket_type",
+    label: "Ticket type",
+    store: useTicketTypeStore(),
+  },
+  {
+    field: "status",
+    label: "Status",
+    store: useTicketStatusStore(),
+  },
+  {
+    field: "priority",
+    label: "Priority",
+    store: useTicketPriorityStore(),
+  },
+  {
+    field: "agent_group",
+    label: "Team",
+    store: useTeamStore(),
+  },
+]);
 
-watch(changeAssignedTo, (changed) => {
-  ticket.assign.submit({
-    agent: changed.value,
+function assignAgent(agent: string) {
+  createResource({
+    url: "run_doc_method",
+    params: {
+      dt: "HD Ticket",
+      dn: data.value.name,
+      method: "assign_agent",
+      args: {
+        agent,
+      },
+    },
+    auto: true,
+    onSuccess: () => {
+      emitter.emit("update:ticket");
+      createToast({
+        title: `Ticket assigned to ${agent}`,
+        icon: "check",
+        iconClasses: "text-green-600",
+      });
+    },
   });
-});
+}
 
-watch(
-  [
-    () => ticket.doc.agent_group,
-    () => ticket.doc.priority,
-    () => ticket.doc.status,
-    () => ticket.doc.ticket_type,
-  ],
-  () => {
-    const fields = ["agent_group", "priority", "status", "ticket_type"];
-    const isChanged = !!fields.find((f) => ticket.doc[f]?.value);
-    if (!isChanged) return;
-
-    const [agent_group, priority, status, ticket_type] = fields.map(
-      (f) => ticket.doc[f]?.value || ticket.doc[f]
-    );
-
-    ticket.setValue.submit({
-      agent_group,
-      priority,
-      status,
-      ticket_type,
-    });
-  }
-);
+function update(fieldname: string, value: string) {
+  createResource({
+    url: "frappe.client.set_value",
+    params: {
+      doctype: "HD Ticket",
+      name: data.value.name,
+      fieldname,
+      value,
+    },
+    auto: true,
+    onSuccess: () => {
+      emitter.emit("update:ticket");
+      createToast({
+        title: "Ticket updated",
+        icon: "check",
+        iconClasses: "text-green-600",
+      });
+    },
+  });
+}
 </script>
 
 <style scoped>

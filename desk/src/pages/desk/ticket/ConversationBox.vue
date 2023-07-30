@@ -1,18 +1,22 @@
 <template>
   <div class="flex flex-col overflow-hidden">
-    <div
-      v-if="isLoaded"
-      ref="listElement"
-      class="flex w-full flex-col items-center gap-4 overflow-auto"
-    >
+    <div class="flex w-full flex-col items-center gap-4 overflow-auto">
       <div class="content">
-        <div v-for="c in conversations" :id="c.name" :key="c.name" class="mt-4">
-          <CommunicationItem
-            v-if="c.isCommunication"
+        <div v-for="c in conversation" :id="c.name" :key="c.name" class="mt-4">
+          <CommentItem
+            v-if="c.commented_by"
+            :name="c.name"
             :content="c.content"
             :date="c.creation"
-            :sender="c.sender.full_name"
-            :sender-image="c.sender.image"
+            :sender="c.commented_by"
+            :is-pinned="c.is_pinned"
+          />
+          <CommunicationItem
+            v-else
+            :content="c.content"
+            :date="c.creation"
+            :sender="c.sender"
+            :sender-image="c.sender"
             :cc="c.cc"
             :bcc="c.bcc"
             :attachments="c.attachments"
@@ -31,74 +35,37 @@
               </Dropdown>
             </template>
           </CommunicationItem>
-          <CommentItem
-            v-else
-            :name="c.name"
-            :content="c.content"
-            :date="c.creation"
-            :sender="c.sender"
-            :is-pinned="c.is_pinned"
-          />
         </div>
       </div>
-    </div>
-    <div v-else class="flex grow items-center justify-center">
-      <LoadingIndicator class="w-5 text-gray-900" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from "vue";
-import { storeToRefs } from "pinia";
-import { useScroll } from "@vueuse/core";
-import { debounce, Button, Dropdown, LoadingIndicator } from "frappe-ui";
+import { computed } from "vue";
+import { Button, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
-import { orderBy, unionBy } from "lodash";
-import { socket } from "@/socket";
-import { useTicketStore } from "./data";
+import { orderBy } from "lodash";
+import { emitter } from "@/emitter";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import CommentItem from "./CommentItem.vue";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconReply from "~icons/lucide/reply";
 import IconReplyAll from "~icons/lucide/reply-all";
+import { useTicketStore, useTicket } from "./data";
 
-type SocketData = {
-  ticket_id: string;
-};
-
-const { editor, ticket } = useTicketStore();
-const { focusedConversationItem } = storeToRefs(useTicketStore());
-const listElement = ref(null);
-const isCommunicationsLoaded = ref(false);
-const isCommentsLoaded = ref(false);
-const isLoaded = computed(
-  () => isCommunicationsLoaded.value && isCommentsLoaded.value
-);
-
-watch(isLoaded, (v) => {
-  if (v) scrollBottom();
-});
-watch(
-  () => editor.isExpanded,
-  () => scrollBottom()
-);
-
-ticket.getCommunications
-  .submit()
-  .then(() => (isCommunicationsLoaded.value = true));
-ticket.getComments.submit().then(() => (isCommentsLoaded.value = true));
-
-const ticketId = computed(() => ticket.doc.name);
-const communications = computed(
-  () => ticket.getCommunications.data?.message?.map(mapCommunication) || []
-);
-const comments = computed(() => ticket.getComments.data?.message || []);
-const conversations = computed(() =>
-  orderBy(unionBy(communications.value, comments.value), (c) =>
+const ticketStore = useTicketStore();
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
+const { editor } = ticketStore;
+const communications = computed(() => data.value.communications || []);
+const comments = computed(() => data.value.comments || []);
+const conversation = computed(() =>
+  orderBy([...communications.value, ...comments.value], (c) =>
     dayjs(c.creation)
   )
 );
+const last = computed(() => conversation.value.slice(-1).pop());
 
 function dropdownOptions(content: string, cc: string, bcc: string) {
   return [
@@ -125,47 +92,13 @@ function dropdownOptions(content: string, cc: string, bcc: string) {
   ];
 }
 
-const scrollBottom = debounce(() => {
-  const { y } = useScroll(listElement, { behavior: "smooth" });
-  y.value = listElement.value.scrollHeight;
-}, 500);
-
-function mapCommunication(c) {
-  return {
-    ...c,
-    isCommunication: true,
-  };
-}
-
 function quote(s: string) {
   return `<blockquote>${s}</blockquote><br/>`;
 }
 
-socket.on("helpdesk:new-communication", (data: SocketData) => {
-  if (data.ticket_id !== ticketId.value) return;
-  ticket.getCommunications.reload().then(() => scrollBottom());
-});
-
-socket.on("helpdesk:new-ticket-comment", (data: SocketData) => {
-  if (data.ticket_id !== ticketId.value) return;
-  ticket.getComments.reload().then(() => scrollBottom());
-});
-
-socket.on("helpdesk:delete-ticket-comment", (data: SocketData) => {
-  if (data.ticket_id !== ticketId.value) return;
-  ticket.getComments.reload();
-});
-
-onUnmounted(() => {
-  socket.off("helpdesk:new-communication");
-  socket.off("helpdesk:new-ticket-comment");
-  socket.off("helpdesk:delete-ticket-comment");
-});
-
-watch(focusedConversationItem, (id) => {
-  const el = document.getElementById(id);
-  el.scrollIntoView({ behavior: "smooth" });
-});
+if (last.value) {
+  setTimeout(() => emitter.emit("ticket:focus", last.value.name), 1000);
+}
 </script>
 
 <style scoped>

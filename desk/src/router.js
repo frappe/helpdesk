@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { call } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 import { init as initTelemetry } from "./telemetry";
 
 export const WEBSITE_ROOT = "Website Root";
@@ -311,6 +312,7 @@ router.beforeEach(async (to) => {
 router.beforeEach(async (to) => {
   const isAuthRoute = AUTH_ROUTES.includes(to.name);
   const authStore = useAuthStore();
+  useUserStore();
 
   try {
     await initTelemetry();

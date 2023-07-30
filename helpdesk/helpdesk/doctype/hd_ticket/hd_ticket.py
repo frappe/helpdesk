@@ -362,6 +362,7 @@ class HDTicket(Document):
 				return agent_doc
 
 		from frappe.desk.form.assign_to import get
+
 		assignees = get({"doctype": "HD Ticket", "name": self.name})
 		if len(assignees) > 0:
 			agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
@@ -438,6 +439,19 @@ class HDTicket(Document):
 	def portal_uri(self):
 		root_uri = frappe.utils.get_url()
 		return f"{root_uri}/helpdesk/my-tickets/{self.name}"
+
+	@frappe.whitelist()
+	def new_comment(self, content: str):
+		if not is_agent():
+			frappe.throw(
+				_("You are not permitted to add a comment"), frappe.PermissionError
+			)
+		c = frappe.new_doc("HD Ticket Comment")
+		c.commented_by = frappe.session.user
+		c.content = content
+		c.is_pinned = False
+		c.reference_ticket = self.name
+		c.save()
 
 	@frappe.whitelist()
 	def reply_via_agent(
@@ -654,20 +668,6 @@ class HDTicket(Document):
 			conversation.attachments = attachments
 
 		return conversations
-
-	@frappe.whitelist()
-	def get_comments(self):
-		filters = {
-			"reference_ticket": self.name,
-		}
-		fields = ["name", "commented_by", "content", "creation", "is_pinned"]
-
-		l = frappe.get_list("HD Ticket Comment", filters=filters, fields=fields)
-
-		for i in l:
-			i["sender"] = frappe.get_doc("User", i.commented_by)
-
-		return l
 
 	def get_escalation_rule(self):
 		filters = [
