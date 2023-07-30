@@ -105,7 +105,6 @@
    "search_index": 1
   },
   {
-   "default": "Medium",
    "fieldname": "priority",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -442,7 +441,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-07-11 22:36:13.671254",
+ "modified": "2023-07-30 21:56:38.042283",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
