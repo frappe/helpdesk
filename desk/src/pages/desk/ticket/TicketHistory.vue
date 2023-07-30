@@ -14,9 +14,9 @@
       <ol class="relative border-l border-gray-200 text-base">
         <li v-for="event in source" :key="event.name" class="mb-4 ml-4">
           <TicketHistoryItem
-            :user="event.owner || event.viewed_by"
+            :user="event['owner'] || event['viewed_by']"
             :date="event.creation"
-            :action="event?.action"
+            :action="event['action']"
           />
         </li>
       </ol>
@@ -26,8 +26,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Button } from "frappe-ui";
-import TabButtons from "@/components/TabButtons.vue";
+import { Button, TabButtons } from "frappe-ui";
 import TicketHistoryItem from "./TicketHistoryItem.vue";
 import { useTicketStore, useTicket } from "./data";
 
