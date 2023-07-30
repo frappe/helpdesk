@@ -67,11 +67,13 @@ import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils/toasts";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
-import { useTicketStore } from "../data";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
+import { useTicketStore, useTicket } from "../data";
 
-const { editor, doc } = useTicketStore();
+const { editor } = useTicketStore();
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
 const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
 
@@ -84,7 +86,7 @@ const addComment = createResource({
   debounce: 300,
   makeParams: () => ({
     dt: "HD Ticket",
-    dn: doc.name,
+    dn: data.value.name,
     method: "new_comment",
     args: {
       content: editor.content,
@@ -108,7 +110,7 @@ const addResponse = createResource({
   debounce: 300,
   makeParams: () => ({
     dt: "HD Ticket",
-    dn: doc.name,
+    dn: data.value.name,
     method: "reply_via_agent",
     args: {
       attachments: editor.attachments.map((x) => x.name),
