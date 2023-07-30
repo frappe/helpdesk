@@ -62,7 +62,7 @@
         </template>
         <template #status="{ data }">
           <Badge
-            :label="data.status"
+            :label="transformStatus(data.status)"
             :theme="statusColormap[data.status]"
             variant="subtle"
           />
@@ -124,7 +124,7 @@ const tickets = createListManager({
 
 const statusColormap = {
   Open: "red",
-  "Awaiting reply": "orange",
+  Replied: "orange",
   Resolved: "green",
   Closed: "blue",
 };
