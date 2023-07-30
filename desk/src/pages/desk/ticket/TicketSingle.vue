@@ -1,26 +1,6 @@
 <template>
   <div v-if="ticket.data" class="flex flex-col">
-    <TopBar
-      :title="ticket.data.subject"
-      :back-to="{ name: AGENT_PORTAL_TICKET_LIST }"
-    >
-      <template #bottom>
-        <div class="flex items-center gap-1 text-base text-gray-600">
-          <Tooltip :text="viaCustomerPortal ? textCustomerPortal : textEmail">
-            <Icon
-              :icon="viaCustomerPortal ? 'lucide:globe' : 'lucide:at-sign'"
-              class="h-4 w-4"
-            />
-          </Tooltip>
-          <Icon icon="lucide:dot" />
-          <div class="cursor-copy" @click="copyId">
-            # {{ ticket.data.name }}
-          </div>
-          <Icon icon="lucide:dot" />
-          <Tooltip :text="dateLong"> Last modified {{ dateShort }} </Tooltip>
-        </div>
-      </template>
-    </TopBar>
+    <TopBar />
     <div class="flex grow overflow-hidden">
       <div class="flex grow flex-col">
         <PinnedComments />
@@ -33,20 +13,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, toRef } from "vue";
+import { onBeforeUnmount, onMounted, toRef } from "vue";
 import { createResource } from "frappe-ui";
-import { useClipboard } from "@vueuse/core";
-import dayjs from "dayjs";
-import { Icon } from "@iconify/vue";
-import { AGENT_PORTAL_TICKET_LIST } from "@/router";
 import { emitter } from "@/emitter";
 import { socket } from "@/socket";
-import { createToast } from "@/utils/toasts";
-import TopBar from "@/components/TopBar.vue";
 import ConversationBox from "./ConversationBox.vue";
 import PinnedComments from "./PinnedComments.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
+import TopBar from "./TopBar.vue";
 import { useTicket } from "./data";
 
 interface P {
@@ -66,26 +41,6 @@ createResource({
   },
   auto: true,
 });
-
-const { copy } = useClipboard();
-const date = computed(() =>
-  dayjs(ticket.value.data.modified).tz(dayjs.tz.guess())
-);
-const dateLong = computed(() => date.value.format("dddd, MMMM D, YYYY h:mm A"));
-const dateShort = computed(() => date.value.fromNow());
-const textCustomerPortal = "Created via customer portal";
-const textEmail = "Created via email";
-const viaCustomerPortal = computed(() => ticket.value.data.via_customer_portal);
-
-async function copyId() {
-  await copy(ticket.value.data.name);
-
-  createToast({
-    title: "Copied to clipboard",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
-}
 
 emitter.on("update:ticket", () => ticket.value.reload());
 
