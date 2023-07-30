@@ -17,8 +17,8 @@
             :date="c.creation"
             :sender="c.sender"
             :sender-image="c.sender"
-            :cc="c.cc"
-            :bcc="c.bcc"
+            :cc="c.cc || ''"
+            :bcc="c.bcc || ''"
             :attachments="c.attachments"
           >
             <template #extra="{ content, cc, bcc }">
