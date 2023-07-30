@@ -354,11 +354,19 @@ class HDTicket(Document):
 		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
 	def get_assigned_agent(self):
-		if self._assign:
+		# for some reason _assign is not set, maybe a framework bug?
+		if hasattr(self, "_assign") and self._assign:
 			assignees = json.loads(self._assign)
 			if len(assignees) > 0:
 				agent_doc = frappe.get_doc("HD Agent", assignees[0])
 				return agent_doc
+
+		from frappe.desk.form.assign_to import get
+		assignees = get({"doctype": "HD Ticket", "name": self.name})
+		if len(assignees) > 0:
+			agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
+			return agent_doc
+
 		return None
 
 	def on_trash(self):

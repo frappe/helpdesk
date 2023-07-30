@@ -61,7 +61,11 @@
           </div>
         </template>
         <template #status="{ data }">
-          {{ transformStatus(data.status) }}
+          <Badge
+            :label="transformStatus(data.status)"
+            :theme="statusColormap[data.status]"
+            variant="subtle"
+          />
         </template>
         <template #creation="{ data }">
           {{ dayjs(data.creation).fromNow() }}
@@ -117,6 +121,13 @@ const tickets = createListManager({
   fields: ["name", "creation", "subject", "status"],
   auto: true,
 });
+
+const statusColormap = {
+  Open: "red",
+  Replied: "orange",
+  Resolved: "green",
+  Closed: "blue",
+};
 
 const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
 const dropdownTitle = ref("All tickets");

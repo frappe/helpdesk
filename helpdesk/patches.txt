@@ -9,3 +9,4 @@ execute:frappe.delete_doc("Workspace", "Frappe Desk", force=True)
 helpdesk.patches.add_priority_integer
 helpdesk.patches.template_remove_default_fields
 helpdesk.helpdesk.doctype.hd_ticket.patches.fallback_ticket_type
+execute:frappe.delete_doc("Server Script", "Ticket Auto Set Custom Fields", ignore_missing=True)

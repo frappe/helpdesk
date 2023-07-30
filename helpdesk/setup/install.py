@@ -16,7 +16,6 @@ def after_install():
 	add_default_categories_and_articles()
 	add_default_ticket_priorities()
 	add_default_sla()
-	add_on_ticket_create_script()
 	add_default_agent_groups()
 	update_agent_role_permissions()
 	add_default_assignment_rule()
@@ -211,18 +210,6 @@ def add_default_agent_groups():
 			agent_group_doc = frappe.new_doc("HD Team")
 			agent_group_doc.team_name = agent_group
 			agent_group_doc.insert()
-
-
-def add_on_ticket_create_script():
-	if not frappe.db.exists("Server Script", "Ticket Auto Set Custom Fields"):
-		script_doc = frappe.new_doc("Server Script")
-		script_doc.name = "Ticket Auto Set Custom Fields"
-		script_doc.script_type = "DocType Event"
-		script_doc.module = "Helpdesk"
-		script_doc.reference_doctype = "HD Ticket"
-		script_doc.doctype_event = "Before Insert"
-		script_doc.script = "# Do Nothing"
-		script_doc.insert()
 
 
 def update_agent_role_permissions():

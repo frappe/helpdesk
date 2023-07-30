@@ -11,7 +11,7 @@
   "fieldname",
   "value",
   "route",
-  "is_action_field"
+  "hide_from_customer"
  ],
  "fields": [
   {
@@ -38,15 +38,15 @@
   },
   {
    "default": "0",
-   "fieldname": "is_action_field",
+   "fieldname": "hide_from_customer",
    "fieldtype": "Check",
-   "label": "Is Action Field"
+   "label": "Hide from Customer"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-11-23 00:32:56.111155",
+ "modified": "2023-07-29 13:02:53.237459",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Custom Field",
