@@ -597,7 +597,15 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def mark_seen(self):
+		self.add_view()
 		self.add_seen()
+
+	def add_view(self):
+		d = frappe.new_doc("View Log")
+		d.reference_doctype = "HD Ticket"
+		d.reference_name = self.name
+		d.viewed_by = frappe.session.user
+		d.insert(ignore_permissions=True)
 
 	@frappe.whitelist()
 	def get_assignees(self):

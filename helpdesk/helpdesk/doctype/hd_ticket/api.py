@@ -12,6 +12,7 @@ QBContact = frappe.qb.DocType("Contact")
 QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
 QBFile = frappe.qb.DocType("File")
 QBTicket = frappe.qb.DocType("HD Ticket")
+QBViewLog = frappe.qb.DocType("View Log")
 
 
 @frappe.whitelist()
@@ -99,6 +100,16 @@ def get_one(name):
 		)
 		.where(QBActivity.ticket == name)
 	)
+	views = (
+		frappe.qb.from_(QBViewLog)
+		.select(
+			QBViewLog.creation,
+			QBViewLog.name,
+			QBViewLog.viewed_by,
+		)
+		.where(QBViewLog.reference_doctype == "HD Ticket")
+		.where(QBViewLog.reference_name == name)
+	)
 	custom_fields = (
 		frappe.qb.from_(QBCustomField)
 		.select(QBCustomField.label, QBCustomField.value, QBCustomField.route)
@@ -115,6 +126,7 @@ def get_one(name):
 		"custom_fields": custom_fields,
 		"comments": comments.run(as_dict=True) if _is_agent else [],
 		"history": history.run(as_dict=True) if _is_agent else [],
+		"views": views.run(as_dict=True) if _is_agent else [],
 	}
 
 

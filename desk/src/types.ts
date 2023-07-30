@@ -38,6 +38,12 @@ export interface CustomField {
   route: string;
 }
 
+export interface ViewLog {
+  name: string;
+  viewed_by: string;
+  creation: string;
+}
+
 export interface Ticket {
   _assign: string;
   agent_group: string;
@@ -57,6 +63,7 @@ export interface Ticket {
   communications: Communication[];
   history: Activity[];
   custom_fields: CustomField[];
+  views: ViewLog[];
 }
 
 export interface Resource<A> {
