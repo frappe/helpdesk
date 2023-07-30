@@ -118,6 +118,13 @@ const tickets = createListManager({
   auto: true,
 });
 
+const statusColormap = {
+  Open: "red",
+  "Awaiting reply": "orange",
+  Resolved: "green",
+  Closed: "blue",
+};
+
 const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
 const dropdownTitle = ref("All tickets");
 const dropdownOptions = [
