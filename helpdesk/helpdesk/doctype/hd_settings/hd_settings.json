@@ -10,6 +10,9 @@
   "allow_resetting_service_level_agreement",
   "column_break_4",
   "helpdesk_name",
+  "priority_section",
+  "default_priority",
+  "column_break_nvbf",
   "ticket_type_section",
   "default_ticket_type",
   "is_ticket_type_mandatory",
@@ -158,7 +161,7 @@
   {
    "fieldname": "ticket_type_section",
    "fieldtype": "Section Break",
-   "label": "HD Ticket Type"
+   "label": "Ticket Type"
   },
   {
    "fieldname": "default_ticket_type",
@@ -230,11 +233,26 @@
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
    "label": "Prefer knowledge base"
+  },
+  {
+   "fieldname": "priority_section",
+   "fieldtype": "Section Break",
+   "label": "Priority"
+  },
+  {
+   "fieldname": "default_priority",
+   "fieldtype": "Link",
+   "label": "Default priority",
+   "options": "HD Ticket Priority"
+  },
+  {
+   "fieldname": "column_break_nvbf",
+   "fieldtype": "Column Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-07-25 11:08:34.355664",
+ "modified": "2023-07-30 21:55:54.516451",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

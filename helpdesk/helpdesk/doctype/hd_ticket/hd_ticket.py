@@ -21,7 +21,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import FALLBACK_TICKET_TYPE
+from helpdesk.consts import DEFAULT_TICKET_PRIORITY, DEFAULT_TICKET_TYPE
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
@@ -29,7 +29,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, is_agent, publish_event, get_customer
+from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
 
 
 class HDTicket(Document):
@@ -175,7 +175,7 @@ class HDTicket(Document):
 		if self.ticket_type:
 			return
 		settings = frappe.get_doc("HD Settings")
-		ticket_type = settings.default_ticket_type or FALLBACK_TICKET_TYPE
+		ticket_type = settings.default_ticket_type or DEFAULT_TICKET_TYPE
 		self.ticket_type = ticket_type
 
 	def set_raised_by(self):
@@ -200,10 +200,13 @@ class HDTicket(Document):
 		self.customer = get_customer(self.contact)
 
 	def set_priority(self):
-		if self.priority or not self.ticket_type:
+		if self.priority:
 			return
-		ticket_type = frappe.get_doc("HD Ticket Type", self.ticket_type)
-		self.priority = ticket_type.priority
+		self.priority = (
+			frappe.get_cached_value("HD Ticket Type", self.ticket_type, "priority")
+			or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
+			or DEFAULT_TICKET_PRIORITY
+		)
 
 	def validate_ticket_type(self):
 		settings = frappe.get_doc("HD Settings")

@@ -1,17 +1,17 @@
 import frappe
 
-from helpdesk.consts import FALLBACK_TICKET_TYPE
+from helpdesk.consts import DEFAULT_TICKET_TYPE
 
 DT = "HD Ticket Type"
 TICKET_TYPES = ["Question", "Bug", "Incident"]
 
 
 def create_fallback_ticket_type():
-	if frappe.db.exists(DT, FALLBACK_TICKET_TYPE):
+	if frappe.db.exists(DT, DEFAULT_TICKET_TYPE):
 		return
 
 	d = frappe.new_doc(DT)
-	d.name = FALLBACK_TICKET_TYPE
+	d.name = DEFAULT_TICKET_TYPE
 	d.is_system = True
 	d.save()
 
