@@ -66,7 +66,6 @@
             :theme="statusColormap[data.status]"
             variant="subtle"
           />
-
         </template>
         <template #creation="{ data }">
           {{ dayjs(data.creation).fromNow() }}
