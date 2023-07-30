@@ -39,12 +39,12 @@ export interface CustomField {
 }
 
 export interface Ticket {
-  _assign?: string;
-  agent_group?: string;
+  _assign: string;
+  agent_group: string;
   customer: string;
   modified: string;
   name: string;
-  priority?: string;
+  priority: string;
   raised_by: string;
   resolution_by: string;
   response_by: string;
@@ -53,7 +53,7 @@ export interface Ticket {
   ticket_type: string;
   via_customer_portal: string;
   contact: Contact;
-  comments?: Comment[];
+  comments: Comment[];
   communications: Communication[];
   history: Activity[];
   custom_fields: CustomField[];

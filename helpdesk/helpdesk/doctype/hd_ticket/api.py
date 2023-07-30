@@ -1,6 +1,8 @@
 import frappe
+from frappe import _
 from pypika import Criterion
-from helpdesk.utils import is_agent, get_customer
+
+from helpdesk.utils import get_customer, is_agent
 
 QBActivity = frappe.qb.DocType("HD Ticket Activity")
 QBComment = frappe.qb.DocType("HD Ticket Comment")
@@ -38,7 +40,11 @@ def get_one(name):
 	if not _is_agent:
 		query = query.where(get_customer_criteria())
 
-	ticket = query.run(as_dict=True)[0]
+	try:
+		ticket = query.run(as_dict=True)[0]
+	except:
+		frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
+
 	contact = (
 		frappe.qb.from_(QBContact)
 		.select(
@@ -63,7 +69,6 @@ def get_one(name):
 			QBComment.name,
 		)
 		.where(QBComment.reference_ticket == name)
-		.run(as_dict=True)
 	)
 	communications = (
 		frappe.qb.from_(QBCommunication)
@@ -85,7 +90,6 @@ def get_one(name):
 			QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
 		)
 		.where(QBActivity.ticket == name)
-		.run(as_dict=True)
 	)
 	custom_fields = (
 		frappe.qb.from_(QBCustomField)
@@ -98,11 +102,11 @@ def get_one(name):
 
 	return {
 		**ticket,
-		"comments": comments,
 		"communications": communications,
 		"contact": contact,
-		"history": history,
 		"custom_fields": custom_fields,
+		"comments": comments.run(as_dict=True) if _is_agent else [],
+		"history": history.run(as_dict=True) if _is_agent else [],
 	}
 
 
