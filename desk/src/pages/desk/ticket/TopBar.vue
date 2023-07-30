@@ -14,7 +14,7 @@
         <Icon icon="lucide:dot" />
         <Badge
           :label="data.status"
-          :theme="ticketStatusStore.statusColormapAgent[data.status]"
+          :theme="ticketStatusStore.colorMapAgent[data.status]"
           variant="subtle"
         />
       </div>

@@ -9,13 +9,13 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
       value: o,
     }))
   );
-  const statusColormapAgent = {
+  const colorMapAgent = {
     Open: "red",
     Replied: "orange",
     Resolved: "green",
     Closed: "blue",
   };
-  const statusColormapCustomer = {
+  const colorMapCustomer = {
     Open: "red",
     Replied: "orange",
     Resolved: "green",
@@ -25,7 +25,7 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
   return {
     dropdown,
     options,
-    statusColormapAgent,
-    statusColormapCustomer,
+    colorMapAgent,
+    colorMapCustomer,
   };
 });

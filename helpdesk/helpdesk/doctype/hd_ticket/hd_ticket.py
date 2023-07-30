@@ -362,6 +362,7 @@ class HDTicket(Document):
 				return agent_doc
 
 		from frappe.desk.form.assign_to import get
+
 		assignees = get({"doctype": "HD Ticket", "name": self.name})
 		if len(assignees) > 0:
 			agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)

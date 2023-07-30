@@ -10,7 +10,7 @@
           <IconDot class="h-4 w-4" />
           <Badge
             :label="ticket.data.status"
-            :theme="statusColormapCustomer[ticket.data.status]"
+            :theme="colorMapCustomer[ticket.data.status]"
             variant="subtle"
           />
         </div>
@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { createResource, debounce, Badge } from "frappe-ui";
+import { createResource, Badge } from "frappe-ui";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -99,7 +99,7 @@ const props = defineProps({
   },
 });
 
-const { statusColormapCustomer } = useTicketStatusStore();
+const { colorMapCustomer } = useTicketStatusStore();
 const textEditor = ref(null);
 const placeholder = "Type a message";
 const editorContent = ref("");
