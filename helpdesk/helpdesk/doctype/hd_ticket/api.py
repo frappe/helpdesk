@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
 from helpdesk.utils import get_customer, is_agent
@@ -9,6 +10,7 @@ QBComment = frappe.qb.DocType("HD Ticket Comment")
 QBCommunication = frappe.qb.DocType("Communication")
 QBContact = frappe.qb.DocType("Contact")
 QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
+QBFile = frappe.qb.DocType("File")
 QBTicket = frappe.qb.DocType("HD Ticket")
 
 
@@ -86,6 +88,10 @@ def get_one(name):
 		.where(QBCommunication.reference_name == name)
 		.run(as_dict=True)
 	)
+
+	for c in communications:
+		c.attachments = get_attachments("Communication", c.name)
+
 	history = (
 		frappe.qb.from_(QBActivity)
 		.select(
@@ -121,3 +127,14 @@ def get_customer_criteria():
 		QBTicket.raised_by == user,
 	]
 	return Criterion.any(conditions)
+
+
+@redis_cache()
+def get_attachments(doctype, name):
+	return (
+		frappe.qb.from_(QBFile)
+		.select(QBFile.name, QBFile.file_url, QBFile.file_name)
+		.where(QBFile.attached_to_doctype == doctype)
+		.where(QBFile.attached_to_name == name)
+		.run(as_dict=True)
+	)
