@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from pypika import Criterion
+from pypika import Criterion, Order
 
 from helpdesk.utils import get_customer, is_agent
 
@@ -68,6 +68,7 @@ def get_one(name):
 			QBComment.is_pinned,
 			QBComment.name,
 		)
+		.orderby(QBComment.creation, order=Order.asc)
 		.where(QBComment.reference_ticket == name)
 	)
 	communications = (
@@ -80,6 +81,7 @@ def get_one(name):
 			QBCommunication.name,
 			QBCommunication.sender,
 		)
+		.orderby(QBCommunication.creation, order=Order.asc)
 		.where(QBCommunication.reference_doctype == "HD Ticket")
 		.where(QBCommunication.reference_name == name)
 		.run(as_dict=True)
