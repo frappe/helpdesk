@@ -20,10 +20,10 @@
 <script setup lang="ts">
 import { isEmpty } from "lodash";
 import { computed } from "vue";
-import { useTicketStore } from "./data";
+import { useTicket } from "./data";
 import IconLayer from "~icons/lucide/layers";
 import IconLink from "~icons/lucide/external-link";
 
-const { doc } = useTicketStore();
-const fields = computed(() => doc.custom_fields);
+const ticket = useTicket();
+const fields = computed(() => ticket.value.data.custom_fields);
 </script>

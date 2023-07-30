@@ -34,7 +34,6 @@
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, toRef } from "vue";
-import { storeToRefs } from "pinia";
 import { createResource } from "frappe-ui";
 import { useClipboard } from "@vueuse/core";
 import dayjs from "dayjs";
@@ -44,11 +43,11 @@ import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import { createToast } from "@/utils/toasts";
 import TopBar from "@/components/TopBar.vue";
-import { useTicketStore } from "./data";
 import ConversationBox from "./ConversationBox.vue";
 import PinnedComments from "./PinnedComments.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
+import { useTicket } from "./data";
 
 interface P {
   ticketId: string;
@@ -56,17 +55,7 @@ interface P {
 
 const props = defineProps<P>();
 const ticketId = toRef(props, "ticketId");
-const ticketStore = useTicketStore();
-const { doc } = storeToRefs(ticketStore);
-
-const ticket = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  params: {
-    name: ticketId.value,
-  },
-  auto: true,
-  onSuccess: (data) => (doc.value = data),
-});
+const ticket = useTicket(ticketId.value);
 
 createResource({
   url: "run_doc_method",
@@ -79,15 +68,17 @@ createResource({
 });
 
 const { copy } = useClipboard();
-const date = computed(() => dayjs(ticket.data.modified).tz(dayjs.tz.guess()));
+const date = computed(() =>
+  dayjs(ticket.value.data.modified).tz(dayjs.tz.guess())
+);
 const dateLong = computed(() => date.value.format("dddd, MMMM D, YYYY h:mm A"));
 const dateShort = computed(() => date.value.fromNow());
 const textCustomerPortal = "Created via customer portal";
 const textEmail = "Created via email";
-const viaCustomerPortal = computed(() => ticket.data.via_customer_portal);
+const viaCustomerPortal = computed(() => ticket.value.data.via_customer_portal);
 
 async function copyId() {
-  await copy(ticket.data.name);
+  await copy(ticket.value.data.name);
 
   createToast({
     title: "Copied to clipboard",
@@ -96,7 +87,7 @@ async function copyId() {
   });
 }
 
-emitter.on("update:ticket", () => ticket.reload());
+emitter.on("update:ticket", () => ticket.value.reload());
 
 const events = [
   "helpdesk:new-communication",
@@ -112,12 +103,12 @@ onMounted(() =>
     socket.on(e, (d) => {
       const id = d.name || d.id;
       const shouldReload = !id || id == ticketId.value;
-      if (shouldReload) ticket.reload();
+      if (shouldReload) ticket.value.reload();
     })
   )
 );
 onBeforeUnmount(() => {
   events.forEach((e) => socket.off(e));
-  ticketStore.$reset();
+  ticket.value = null;
 });
 </script>

@@ -43,23 +43,23 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { storeToRefs } from "pinia";
 import { Button, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { orderBy } from "lodash";
 import { emitter } from "@/emitter";
 import CommunicationItem from "@/components/CommunicationItem.vue";
-import { useTicketStore } from "./data";
 import CommentItem from "./CommentItem.vue";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconReply from "~icons/lucide/reply";
 import IconReplyAll from "~icons/lucide/reply-all";
+import { useTicketStore, useTicket } from "./data";
 
 const ticketStore = useTicketStore();
-const { doc } = storeToRefs(ticketStore);
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
 const { editor } = ticketStore;
-const communications = computed(() => doc.value.communications || []);
-const comments = computed(() => doc.value.comments || []);
+const communications = computed(() => data.value.communications || []);
+const comments = computed(() => data.value.comments || []);
 const conversation = computed(() =>
   orderBy([...communications.value, ...comments.value], (c) =>
     dayjs(c.creation)

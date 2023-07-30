@@ -12,23 +12,23 @@
           />
         </div>
         <div class="my-6 flex flex-col justify-between gap-3.5">
-          <div v-if="doc.customer" class="flex justify-between">
+          <div v-if="data.customer" class="flex justify-between">
             <div class="text-gray-600">Customer:</div>
             <div class="font-medium text-gray-700">
-              {{ doc.customer }}
+              {{ data.customer }}
             </div>
           </div>
           <div class="flex justify-between">
             <div class="text-gray-600">First Response Due:</div>
             <div class="font-medium text-gray-700">
-              {{ dayjs(doc.response_by).format(dateFormat) }}
+              {{ dayjs(data.response_by).format(dateFormat) }}
             </div>
           </div>
           <div class="flex items-center justify-between">
             <div class="text-gray-600">Resolution Due:</div>
             <div class="font-medium text-gray-700">
-              <span v-if="doc.resolution_by">
-                {{ dayjs(doc.resolution_by).format(dateFormat) }}
+              <span v-if="data.resolution_by">
+                {{ dayjs(data.resolution_by).format(dateFormat) }}
               </span>
               <Badge
                 v-else
@@ -65,7 +65,7 @@
         <Autocomplete
           :options="o.store.dropdown"
           :placeholder="`Select a ${o.label}`"
-          :value="doc[o.field]"
+          :value="data[o.field]"
           @change="update(o.field, $event.value)"
         />
       </div>
@@ -83,19 +83,19 @@ import { useAgentStore } from "@/stores/agent";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useTicketStore } from "./data";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import { useUserStore } from "@/stores/user";
-import { storeToRefs } from "pinia";
+import { useTicketStore, useTicket } from "./data";
 
 const dateFormat = "MMM D, h:mm A";
 const agentStore = useAgentStore();
 const userStore = useUserStore();
 const ticketStore = useTicketStore();
-const { doc } = storeToRefs(ticketStore);
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
 
 const assignedTo = computed(() => {
-  const assignJson = JSON.parse(doc.value._assign);
+  const assignJson = JSON.parse(data.value._assign);
   const user = assignJson.slice(-1).pop();
   const name = userStore.getUser(user).full_name;
   return name;
@@ -129,7 +129,7 @@ function assignAgent(agent: string) {
     url: "run_doc_method",
     params: {
       dt: "HD Ticket",
-      dn: doc.value.name,
+      dn: data.value.name,
       method: "assign_agent",
       args: {
         agent,
@@ -152,7 +152,7 @@ function update(fieldname: string, value: string) {
     url: "frappe.client.set_value",
     params: {
       doctype: "HD Ticket",
-      name: doc.value.name,
+      name: data.value.name,
       fieldname,
       value,
     },

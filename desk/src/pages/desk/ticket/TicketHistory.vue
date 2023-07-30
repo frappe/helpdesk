@@ -11,7 +11,11 @@
     </div>
     <div class="overflow-auto px-4">
       <ol class="relative border-l border-gray-200 text-base">
-        <li v-for="event in doc.history" :key="event.name" class="mb-4 ml-4">
+        <li
+          v-for="event in ticket.data.history"
+          :key="event.name"
+          class="mb-4 ml-4"
+        >
           <Icon
             icon="lucide:dot"
             class="absolute -left-3 h-6 w-6 bg-white text-gray-500"
@@ -34,10 +38,11 @@
 import { Button, Tooltip } from "frappe-ui";
 import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
-import { useTicketStore } from "./data";
 import { useUserStore } from "@/stores/user";
+import { useTicketStore, useTicket } from "./data";
 
 const userStore = useUserStore();
-const { doc, sidebar } = useTicketStore();
+const { sidebar } = useTicketStore();
+const ticket = useTicket();
 const dateFmtLong = "dddd, MMMM D, YYYY h:mm A";
 </script>

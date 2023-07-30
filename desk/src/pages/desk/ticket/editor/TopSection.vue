@@ -4,7 +4,7 @@
       <div class="flex justify-between">
         <div class="flex items-center gap-4">
           <div class="w-6 text-gray-600">To:</div>
-          <UserBubble :name="doc.raised_by" />
+          <UserBubble :name="data.raised_by" />
         </div>
         <div class="flex gap-2">
           <div
@@ -70,10 +70,13 @@
 </template>
 
 <script setup lang="ts">
-import { useTicketStore } from "../data";
+import { computed } from "vue";
 import UserBubble from "./UserBubble.vue";
+import { useTicketStore, useTicket } from "../data";
 
-const { editor, doc } = useTicketStore();
+const { editor } = useTicketStore();
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
 
 function addToArray(array: Array<string>, el) {
   const value = el.target.value;

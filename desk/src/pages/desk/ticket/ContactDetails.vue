@@ -49,9 +49,9 @@ import { isEmpty } from "lodash";
 import { computed } from "vue";
 import { Avatar, Button } from "frappe-ui";
 import { Icon } from "@iconify/vue";
-import { useTicketStore } from "./data";
 import CustomFieldList from "./CustomFieldList.vue";
 import OpenTicketList from "./OpenTicketList.vue";
+import { useTicketStore, useTicket } from "./data";
 
 const fields = [
   {
@@ -68,8 +68,9 @@ const fields = [
   },
 ];
 
-const { doc, sidebar } = useTicketStore();
-const contact = computed(() => doc.contact || {});
+const { sidebar } = useTicketStore();
+const ticket = useTicket();
+const contact = computed(() => ticket.value.data.contact);
 const contactOptions = computed(() =>
   fields
     .map((o) => ({
