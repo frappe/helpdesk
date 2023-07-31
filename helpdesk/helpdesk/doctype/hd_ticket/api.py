@@ -45,7 +45,7 @@ def get_one(name):
 
 	try:
 		ticket = query.run(as_dict=True)[0]
-	except:
+	except Exception:
 		frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
 
 	contact = (
