@@ -12,6 +12,7 @@ QBContact = frappe.qb.DocType("Contact")
 QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
 QBFile = frappe.qb.DocType("File")
 QBTicket = frappe.qb.DocType("HD Ticket")
+QBViewLog = frappe.qb.DocType("View Log")
 
 
 @frappe.whitelist()
@@ -70,8 +71,8 @@ def get_one(name):
 			QBComment.is_pinned,
 			QBComment.name,
 		)
-		.orderby(QBComment.creation, order=Order.asc)
 		.where(QBComment.reference_ticket == name)
+		.orderby(QBComment.creation, order=Order.asc)
 	)
 	communications = (
 		frappe.qb.from_(QBCommunication)
@@ -83,9 +84,9 @@ def get_one(name):
 			QBCommunication.name,
 			QBCommunication.sender,
 		)
-		.orderby(QBCommunication.creation, order=Order.asc)
 		.where(QBCommunication.reference_doctype == "HD Ticket")
 		.where(QBCommunication.reference_name == name)
+		.orderby(QBCommunication.creation, order=Order.asc)
 		.run(as_dict=True)
 	)
 
@@ -98,6 +99,18 @@ def get_one(name):
 			QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
 		)
 		.where(QBActivity.ticket == name)
+		.orderby(QBActivity.creation, order=Order.desc)
+	)
+	views = (
+		frappe.qb.from_(QBViewLog)
+		.select(
+			QBViewLog.creation,
+			QBViewLog.name,
+			QBViewLog.viewed_by,
+		)
+		.where(QBViewLog.reference_doctype == "HD Ticket")
+		.where(QBViewLog.reference_name == name)
+		.orderby(QBViewLog.creation, order=Order.desc)
 	)
 	custom_fields = (
 		frappe.qb.from_(QBCustomField)
@@ -115,6 +128,7 @@ def get_one(name):
 		"custom_fields": custom_fields,
 		"comments": comments.run(as_dict=True) if _is_agent else [],
 		"history": history.run(as_dict=True) if _is_agent else [],
+		"views": views.run(as_dict=True) if _is_agent else [],
 	}
 
 
