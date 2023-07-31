@@ -1,46 +1,68 @@
 <template>
-  <div class="flex gap-2">
-    <div
-      v-for="f in storage"
-      :key="f.field.fieldname"
-      class="flex items-center space-x-1 text-base"
-    >
-      <div class="rounded-l bg-gray-100 px-2 py-1.5 text-gray-900">
-        {{ f.field.label }}
-      </div>
-      <Dropdown :options="getOperators(f)">
-        <div class="cursor-pointer bg-gray-100 px-2 py-1.5 text-gray-700">
-          {{ f.operator }}
-        </div>
-      </Dropdown>
-      <component :is="getValSelect(f)" />
-      <div
-        class="cursor-pointer rounded-r bg-gray-100 p-1.5 text-gray-800"
-        @click="storage.delete(f)"
-      >
-        <Icon icon="lucide:x" class="h-4 w-4" />
-      </div>
+  <div
+    v-for="f in storage"
+    :key="f.field.fieldname"
+    class="flex items-center text-base"
+  >
+    <div class="rounded-l border-y border-l px-2 py-1.5 text-gray-800">
+      {{ f.field.label }}
     </div>
-    <Dropdown :options="optionsField">
-      <template #default>
-        <Button theme="gray" variant="subtle">
-          <template #icon>
-            <Icon icon="lucide:plus" />
-          </template>
-        </Button>
-      </template>
+    <Dropdown :options="getOperators(f)">
+      <div class="cursor-pointer border-y px-2 py-1.5 text-gray-700">
+        {{ f.operator }}
+      </div>
     </Dropdown>
-    <Button
-      v-if="storage.size"
-      theme="gray"
-      variant="subtle"
-      @click="setQuery()"
+    <component :is="getValSelect(f)" class="border" />
+    <div
+      class="cursor-pointer rounded-r border-y border-r p-1.5 text-gray-800"
+      @click="storage.delete(f)"
     >
-      <template #icon>
-        <Icon icon="lucide:check" />
-      </template>
-    </Button>
+      <Icon icon="lucide:x" class="h-4 w-4" />
+    </div>
   </div>
+  <Dropdown :options="optionsField">
+    <template #default>
+      <Button
+        :label="storage.size ? 'Add more' : 'Add filter'"
+        theme="gray"
+        variant="outline"
+      >
+        <template #prefix>
+          <Icon
+            :icon="storage.size ? 'lucide:plus' : 'lucide:list-filter'"
+            class="h-4 w-4"
+          />
+        </template>
+      </Button>
+    </template>
+  </Dropdown>
+  <Button
+    v-if="storage.size"
+    label="Apply"
+    theme="gray"
+    variant="outline"
+    @click="setQuery()"
+  >
+    <template #prefix>
+      <Icon icon="lucide:check" class="h-4 w-4" />
+    </template>
+  </Button>
+  <Button
+    v-if="storage.size"
+    label="Clear"
+    theme="gray"
+    variant="outline"
+    @click="
+      () => {
+        storage.clear();
+        setQuery();
+      }
+    "
+  >
+    <template #prefix>
+      <Icon icon="lucide:x" class="h-4 w-4" />
+    </template>
+  </Button>
 </template>
 
 <script setup lang="ts">
@@ -81,7 +103,7 @@ const optionsField = computed(() =>
       storage.value.add({
         field: f,
         fieldname: f.fieldname,
-        operator: "Equals",
+        operator: "equals",
         value: getDefaultValue(f),
       }),
   }))
@@ -91,13 +113,13 @@ function getOperators(f: Filter) {
   const fieldtype = f.field.fieldtype;
   let ops = [];
   if (typeString.includes(fieldtype) || typeNumber.includes(fieldtype)) {
-    ops.push(...["Equals", "Not equals", "Like", "Not like"]);
+    ops.push(...["equals", "not equals", "Like", "not like"]);
   }
   if (typeNumber.includes(fieldtype)) {
-    ops.push(...["<", ">", "<=", ">=", "Equals", "Not equals"]);
+    ops.push(...["<", ">", "<=", ">=", "equals", "not equals"]);
   }
   if (typeSelect.includes(fieldtype) || typeLink.includes(fieldtype)) {
-    ops.push(...["Is", "Is not"]);
+    ops.push(...["is", "is not"]);
   }
   return ops.map((o) => ({
     label: o,
@@ -145,6 +167,7 @@ function getValSelect(f: Filter) {
     return h(SearchComplete, {
       doctype: options,
       class: "bg-gray-100",
+      value: f.value,
       onChange: (v) => (f.value = v.value),
     });
   }

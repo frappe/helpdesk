@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle title="Tickets">
+    <PageTitle>
+      <template #title>
+        <PresetFilters doctype="HD Ticket" />
+      </template>
       <template #right>
         <Button
           label="New ticket"
@@ -9,7 +12,7 @@
           @click="showNewDialog = !showNewDialog"
         >
           <template #prefix>
-            <IconPlus class="h-4 w-4" />
+            <Icon icon="lucide:plus" class="h-4 w-4" />
           </template>
         </Button>
       </template>
@@ -24,6 +27,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Button } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { useFilter } from "@/composables/filter";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
@@ -31,7 +35,7 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import MainTable from "./MainTable.vue";
 import NewTicketDialog from "./NewTicketDialog.vue";
 import TopSection from "./TopSection.vue";
-import IconPlus from "~icons/lucide/plus";
+import PresetFilters from "./PresetFilters.vue";
 
 const { getArgs } = useFilter();
 const showNewDialog = ref(false);
