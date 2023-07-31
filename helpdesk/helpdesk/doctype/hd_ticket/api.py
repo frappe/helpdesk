@@ -153,3 +153,12 @@ def get_attachments(doctype, name):
 		.where(QBFile.attached_to_name == name)
 		.run(as_dict=True)
 	)
+
+@frappe.whitelist()
+def update_custom_field(ticket_name, fieldname, value):
+	frappe.db.set_value(
+		"HD Ticket Custom Field",
+		{ "parent": ticket_name, "fieldname": fieldname },
+		"value",
+		value
+	)

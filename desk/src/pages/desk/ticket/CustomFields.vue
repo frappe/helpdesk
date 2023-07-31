@@ -1,6 +1,6 @@
 <template>
   <template v-if="customFieldMeta.length">
-    <div v-for="field in values" :key="field.fieldname" class="space-y-1">
+    <div v-for="field in props.values" :key="field.fieldname" class="space-y-1">
       <div class="text-xs text-gray-600">
         {{ fieldMeta[field.fieldname].label }}
       </div>
