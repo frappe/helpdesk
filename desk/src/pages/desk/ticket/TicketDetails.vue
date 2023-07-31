@@ -97,7 +97,7 @@ const data = computed(() => ticket.value.data);
 const assignedTo = computed(() => {
   const assignJson = JSON.parse(data.value._assign);
   const user = assignJson.slice(-1).pop();
-  const name = userStore.getUser(user).full_name;
+  const name = userStore.getUser(user)?.full_name || user;
   return name;
 });
 
