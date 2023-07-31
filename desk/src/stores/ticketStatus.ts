@@ -21,11 +21,15 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
     Resolved: "green",
     Closed: "blue",
   };
+  const stateActive = ["Open", "Replied"];
+  const stateInactive = ["Resolved", "Closed"];
 
   return {
     dropdown,
     options,
     colorMapAgent,
     colorMapCustomer,
+    stateActive,
+    stateInactive,
   };
 });

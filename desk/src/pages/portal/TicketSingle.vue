@@ -9,7 +9,7 @@
           <span># {{ ticket.data.name }}</span>
           <IconDot class="h-4 w-4" />
           <Badge
-            :label="ticket.data.status"
+            :label="transformStatus(ticket.data.status)"
             :theme="colorMapCustomer[ticket.data.status]"
             variant="subtle"
           />
@@ -55,6 +55,7 @@
         />
       </div>
       <TextEditor
+        v-if="stateActive.includes(ticket.data.status)"
         ref="textEditor"
         :placeholder="placeholder"
         :content="editorContent"
@@ -99,7 +100,7 @@ const props = defineProps({
   },
 });
 
-const { colorMapCustomer } = useTicketStatusStore();
+const { colorMapCustomer, stateActive } = useTicketStatusStore();
 const textEditor = ref(null);
 const placeholder = "Type a message";
 const editorContent = ref("");
@@ -156,6 +157,15 @@ const resolve = createResource({
 function clearEditor() {
   textEditor.value?.editor.commands.clearContent();
   attachments.value = [];
+}
+
+function transformStatus(status: string) {
+  switch (status) {
+    case "Replied":
+      return "Awaiting reply";
+    default:
+      return status;
+  }
 }
 
 onMounted(() => {
