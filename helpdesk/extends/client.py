@@ -8,6 +8,8 @@ import frappe
 from frappe.model.base_document import get_controller
 from frappe.query_builder.functions import Count
 
+from helpdesk.utils import check_permissions
+
 from .doc import apply_sort
 from .qb import get_query
 
@@ -93,18 +95,6 @@ def get_list_meta(
 		"start_from": start_from,
 		"end_at": end_at,
 	}
-
-
-def check_permissions(doctype, parent):
-	user = frappe.session.user
-	permissions = ("select", "read")
-	has_select_permission, has_read_permission = [
-		frappe.has_permission(doctype, perm, user=user, parent_doctype=parent)
-		for perm in permissions
-	]
-
-	if not has_select_permission and not has_read_permission:
-		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
 def apply_custom_filters(doctype: str, query):

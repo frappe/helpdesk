@@ -1,38 +1,41 @@
 <template>
-  <div class="flex justify-between">
-    <div class="flex gap-2">
-      <PresetFilters doctype="HD Ticket" />
-      <Dropdown
-        :options="byStatus"
-        :button="{
-          label: 'Status',
-          iconRight: 'chevron-down',
-          variant: 'outline',
-          size: 'sm',
-        }"
-      />
-      <Dropdown
-        :options="byPriority"
-        :button="{
-          label: 'Priority',
-          iconRight: 'chevron-down',
-          variant: 'outline',
-          size: 'sm',
-        }"
-      />
+  <div class="space-y-2">
+    <div class="flex justify-between">
+      <div class="flex gap-2">
+        <PresetFilters doctype="HD Ticket" />
+        <Dropdown
+          :options="byStatus"
+          :button="{
+            label: 'Status',
+            iconRight: 'chevron-down',
+            variant: 'outline',
+            size: 'sm',
+          }"
+        />
+        <Dropdown
+          :options="byPriority"
+          :button="{
+            label: 'Priority',
+            iconRight: 'chevron-down',
+            variant: 'outline',
+            size: 'sm',
+          }"
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <CompositeFilters />
+        <Dropdown :options="sortOptions">
+          <template #default>
+            <Button label="Sort" variant="outline" size="sm">
+              <template #prefix>
+                <IconSort class="h-3 w-3" />
+              </template>
+            </Button>
+          </template>
+        </Dropdown>
+      </div>
     </div>
-    <div class="flex items-center gap-2">
-      <CompositeFilters />
-      <Dropdown :options="sortOptions">
-        <template #default>
-          <Button label="Sort" variant="outline" size="sm">
-            <template #prefix>
-              <IconSort class="h-3 w-3" />
-            </template>
-          </Button>
-        </template>
-      </Dropdown>
-    </div>
+    <FieldFilter doctype="HD Ticket" />
   </div>
 </template>
 
@@ -44,6 +47,7 @@ import { createResource, Dropdown } from "frappe-ui";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useListFilters } from "@/composables/listFilters";
+import FieldFilter from "@/components/FieldFilter.vue";
 import CompositeFilters from "./CompositeFilters.vue";
 import PresetFilters from "./PresetFilters.vue";
 import IconSort from "~icons/lucide/arrow-down-up";
