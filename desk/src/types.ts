@@ -82,7 +82,8 @@ export interface DocField {
 }
 
 export interface Filter {
-  field: DocField;
+  field?: DocField;
+  fieldname: string;
   operator: string;
   value: boolean | number | string | string[];
 }

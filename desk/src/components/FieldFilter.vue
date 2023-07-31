@@ -39,10 +39,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, ref, toRef } from "vue";
+import { computed, h, toRef } from "vue";
 import { createResource, Button, Dropdown, FormControl } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { DocField, Filter, Resource } from "@/types";
+import { useFilter } from "@/composables/filter";
 import SearchComplete from "./SearchComplete.vue";
 
 interface P {
@@ -51,21 +52,22 @@ interface P {
 
 const props = defineProps<P>();
 const doctype = toRef(props, "doctype");
-const storage = ref(new Set<Filter>());
-
-const typeCheck = ["Check"];
-const typeLink = ["Link"];
-const typeNumber = ["Float", "Int"];
-const typeSelect = ["Select"];
-const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 
 const fields: Resource<Array<DocField>> = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   makeParams: () => ({
     doctype: doctype.value,
   }),
+  cache: ["DocField", doctype.value],
   auto: true,
 });
+
+const { storage } = useFilter(() => fields.data);
+const typeCheck = ["Check"];
+const typeLink = ["Link"];
+const typeNumber = ["Float", "Int"];
+const typeSelect = ["Select"];
+const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 
 const optionsField = computed(() =>
   fields.data?.map((f) => ({
@@ -73,6 +75,7 @@ const optionsField = computed(() =>
     onClick: () =>
       storage.value.add({
         field: f,
+        fieldname: f.fieldname,
         operator: "Equals",
         value: getDefaultValue(f),
       }),

@@ -6,7 +6,7 @@
           label="New ticket"
           theme="gray"
           variant="solid"
-          @click="isDialogVisible = !isDialogVisible"
+          @click="showNewDialog = !showNewDialog"
         >
           <template #prefix>
             <IconPlus class="h-4 w-4" />
@@ -15,19 +15,18 @@
       </template>
     </PageTitle>
     <TopSection class="mx-5 mb-3.5" />
-    <MainTable class="grow" />
+    <MainTable :tickets="tickets.list?.data" class="grow" />
     <ListNavigation v-bind="tickets" class="p-2" />
-    <NewTicketDialog
-      v-model="isDialogVisible"
-      @close="isDialogVisible = false"
-    />
+    <NewTicketDialog v-model="showNewDialog" @close="showNewDialog = false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import { Button } from "frappe-ui";
-import { useTicketListStore } from "./data";
+import { useFilter } from "@/composables/filter";
+import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import MainTable from "./MainTable.vue";
@@ -35,9 +34,20 @@ import NewTicketDialog from "./NewTicketDialog.vue";
 import TopSection from "./TopSection.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const { init, deinit, tickets } = useTicketListStore();
-const isDialogVisible = ref(false);
+const route = useRoute();
+const { getArgs } = useFilter();
+const showNewDialog = ref(false);
+const tickets = createListManager({
+  doctype: "HD Ticket",
+  pageLength: 20,
+  auto: true,
+  filters: getArgs(),
+});
 
-onMounted(init);
-onUnmounted(deinit);
+watch(route, () => {
+  tickets.update({
+    filters: getArgs(),
+  });
+  tickets.reload();
+});
 </script>
