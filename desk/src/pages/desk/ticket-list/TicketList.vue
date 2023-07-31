@@ -22,8 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { ref } from "vue";
 import { Button } from "frappe-ui";
 import { useFilter } from "@/composables/filter";
 import { createListManager } from "@/composables/listManager";
@@ -34,20 +33,13 @@ import NewTicketDialog from "./NewTicketDialog.vue";
 import TopSection from "./TopSection.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const route = useRoute();
 const { getArgs } = useFilter();
 const showNewDialog = ref(false);
 const tickets = createListManager({
   doctype: "HD Ticket",
   pageLength: 20,
-  auto: true,
   filters: getArgs(),
-});
-
-watch(route, () => {
-  tickets.update({
-    filters: getArgs(),
-  });
-  tickets.reload();
+  realtime: true,
+  auto: true,
 });
 </script>

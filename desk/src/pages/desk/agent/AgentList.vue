@@ -53,19 +53,17 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import { Avatar, Badge } from "frappe-ui";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
 import { createListManager } from "@/composables/listManager";
-import { useListFilters } from "@/composables/listFilters";
+import { useFilter } from "@/composables/filter";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const router = useRouter();
-const filters = useListFilters();
+const { setQuery, storage } = useFilter();
 const isDialogVisible = ref(false);
 const emptyMessage = "No Agents Found";
 const columns = [
@@ -99,19 +97,13 @@ const agents = createListManager({
 });
 
 function toTickets(user: string) {
-  const q = filters.toQuery([
-    {
-      fieldname: "_assign",
-      filter_type: "is",
-      value: user,
-    },
-  ]);
-
-  router.push({
+  storage.value.add({
+    fieldname: "_assign",
+    operator: "is",
+    value: user,
+  });
+  setQuery({
     name: AGENT_PORTAL_TICKET_LIST,
-    query: {
-      q,
-    },
   });
 }
 </script>

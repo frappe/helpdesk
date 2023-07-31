@@ -13,6 +13,7 @@ type ListOptions = {
   start?: number;
   cache?: boolean | string | Array<string>;
   auto?: boolean;
+  realtime?: boolean;
 };
 
 type MetaData = {
@@ -34,6 +35,7 @@ export function createListManager(options: ListOptions) {
   const start = options.start;
   const cache = options.cache;
   const auto = options.auto;
+  const realtime = options.realtime;
 
   const list = createListResource({
     type: "list",
@@ -45,6 +47,7 @@ export function createListManager(options: ListOptions) {
     pageLength,
     start,
     cache,
+    realtime,
     auto,
     onSuccess() {
       meta.submit({

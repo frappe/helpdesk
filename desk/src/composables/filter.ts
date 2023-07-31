@@ -1,5 +1,5 @@
 import { ref, watchEffect, Ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter, RouteLocationNamedRaw } from "vue-router";
 import { toValue } from "@vueuse/core";
 import { DocField, Filter } from "@/types";
 
@@ -20,6 +20,7 @@ const operatorMap = {
 
 export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
   const route = useRoute();
+  const router = useRouter();
   const storage = ref(new Set<Filter>());
 
   watchEffect(() => {
@@ -54,5 +55,20 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
     return merged;
   }
 
-  return { getArgs, storage };
+  function setQuery(r?: RouteLocationNamedRaw) {
+    r = r || route;
+    const l__ = Array.from(storage.value);
+    const q = l__
+      .map((f) => [f.fieldname, f.operator.toLowerCase(), f.value].join(":"))
+      .join(" ");
+    router.push({
+      ...r,
+      query: {
+        ...r.query,
+        q,
+      },
+    });
+  }
+
+  return { getArgs, setQuery, storage };
 }

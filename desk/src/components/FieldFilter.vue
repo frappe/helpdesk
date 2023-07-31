@@ -30,7 +30,12 @@
         </Button>
       </template>
     </Dropdown>
-    <Button v-if="storage.size" theme="gray" variant="subtle">
+    <Button
+      v-if="storage.size"
+      theme="gray"
+      variant="subtle"
+      @click="setQuery()"
+    >
       <template #icon>
         <Icon icon="lucide:check" />
       </template>
@@ -62,7 +67,7 @@ const fields: Resource<Array<DocField>> = createResource({
   auto: true,
 });
 
-const { storage } = useFilter(() => fields.data);
+const { setQuery, storage } = useFilter(() => fields.data);
 const typeCheck = ["Check"];
 const typeLink = ["Link"];
 const typeNumber = ["Float", "Int"];
