@@ -36,6 +36,7 @@ def get_one(name):
 			QBTicket.subject,
 			QBTicket.ticket_type,
 			QBTicket.via_customer_portal,
+			QBTicket.template,
 		)
 		.where(QBTicket.name == name)
 	)
@@ -114,7 +115,7 @@ def get_one(name):
 	)
 	custom_fields = (
 		frappe.qb.from_(QBCustomField)
-		.select(QBCustomField.label, QBCustomField.value, QBCustomField.route)
+		.select(QBCustomField.fieldname, QBCustomField.label, QBCustomField.value, QBCustomField.route)
 		.where(QBCustomField.parent == name)
 		.where(QBCustomField.parentfield == "custom_fields")
 		.where(QBCustomField.parenttype == "HD Ticket")

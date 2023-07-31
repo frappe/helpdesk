@@ -9,10 +9,15 @@
 </template>
 
 <script setup lang="ts">
+import { Autocomplete, createListResource } from "frappe-ui";
 import { computed, ref } from "vue";
-import { createListResource, Autocomplete } from "frappe-ui";
 
 const props = defineProps({
+  value: {
+    type: String,
+    required: false,
+    default: "",
+  },
   doctype: {
     type: String,
     required: true,
@@ -44,6 +49,11 @@ const r = createListResource({
   pageLength: props.pageLength,
   auto: true,
   fields: [props.labelField, props.searchField, props.valueField],
+  onSuccess: () => {
+    selection.value = props.value
+      ? options.value.find((o) => o.value === props.value)
+      : null;
+  },
 });
 const options = computed(
   () =>

@@ -33,6 +33,7 @@ export interface Contact {
 }
 
 export interface CustomField {
+  fieldname: string;
   label: string;
   value: string;
   route: string;
@@ -58,6 +59,7 @@ export interface Ticket {
   subject: string;
   ticket_type: string;
   via_customer_portal: string;
+  template: string;
   contact: Contact;
   comments: Comment[];
   communications: Communication[];

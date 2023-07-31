@@ -69,6 +69,7 @@
           @change="update(o.field, $event.value)"
         />
       </div>
+      <CustomFields :template="data.template" :values="data.custom_fields" />
     </div>
   </div>
 </template>
@@ -86,6 +87,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import { useUserStore } from "@/stores/user";
 import { useTicketStore, useTicket } from "./data";
+import CustomFields from "./CustomFields.vue";
 
 const dateFormat = "MMM D, h:mm A";
 const agentStore = useAgentStore();
