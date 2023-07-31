@@ -21,7 +21,7 @@ from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
 
-from helpdesk.consts import FALLBACK_TICKET_TYPE
+from helpdesk.consts import DEFAULT_TICKET_PRIORITY, DEFAULT_TICKET_TYPE
 from helpdesk.helpdesk.doctype.hd_ticket_activity.hd_ticket_activity import (
 	log_ticket_activity,
 )
@@ -29,7 +29,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, is_agent, publish_event, get_customer
+from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
 
 
 class HDTicket(Document):
@@ -175,7 +175,7 @@ class HDTicket(Document):
 		if self.ticket_type:
 			return
 		settings = frappe.get_doc("HD Settings")
-		ticket_type = settings.default_ticket_type or FALLBACK_TICKET_TYPE
+		ticket_type = settings.default_ticket_type or DEFAULT_TICKET_TYPE
 		self.ticket_type = ticket_type
 
 	def set_raised_by(self):
@@ -200,10 +200,13 @@ class HDTicket(Document):
 		self.customer = get_customer(self.contact)
 
 	def set_priority(self):
-		if self.priority or not self.ticket_type:
+		if self.priority:
 			return
-		ticket_type = frappe.get_doc("HD Ticket Type", self.ticket_type)
-		self.priority = ticket_type.priority
+		self.priority = (
+			frappe.get_cached_value("HD Ticket Type", self.ticket_type, "priority")
+			or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
+			or DEFAULT_TICKET_PRIORITY
+		)
 
 	def validate_ticket_type(self):
 		settings = frappe.get_doc("HD Settings")
@@ -362,6 +365,7 @@ class HDTicket(Document):
 				return agent_doc
 
 		from frappe.desk.form.assign_to import get
+
 		assignees = get({"doctype": "HD Ticket", "name": self.name})
 		if len(assignees) > 0:
 			agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
@@ -397,7 +401,7 @@ class HDTicket(Document):
 			)
 
 			return communication
-		except:
+		except Exception:
 			pass
 
 	def last_communication_email(self):
@@ -438,6 +442,19 @@ class HDTicket(Document):
 	def portal_uri(self):
 		root_uri = frappe.utils.get_url()
 		return f"{root_uri}/helpdesk/my-tickets/{self.name}"
+
+	@frappe.whitelist()
+	def new_comment(self, content: str):
+		if not is_agent():
+			frappe.throw(
+				_("You are not permitted to add a comment"), frappe.PermissionError
+			)
+		c = frappe.new_doc("HD Ticket Comment")
+		c.commented_by = frappe.session.user
+		c.content = content
+		c.is_pinned = False
+		c.reference_ticket = self.name
+		c.save()
 
 	@frappe.whitelist()
 	def reply_via_agent(
@@ -550,7 +567,7 @@ class HDTicket(Document):
 
 		if ticket_doc.status == "Replied":
 			ticket_doc.status = "Open"
-			log_ticket_activity(self.name, f"set status to Open")
+			log_ticket_activity(self.name, "set status to Open")
 			ticket_doc.save(ignore_permissions=True)
 
 		communication = frappe.new_doc("Communication")
@@ -580,7 +597,15 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def mark_seen(self):
+		self.add_view()
 		self.add_seen()
+
+	def add_view(self):
+		d = frappe.new_doc("View Log")
+		d.reference_doctype = "HD Ticket"
+		d.reference_name = self.name
+		d.viewed_by = frappe.session.user
+		d.insert(ignore_permissions=True)
 
 	@frappe.whitelist()
 	def get_assignees(self):
@@ -655,20 +680,6 @@ class HDTicket(Document):
 
 		return conversations
 
-	@frappe.whitelist()
-	def get_comments(self):
-		filters = {
-			"reference_ticket": self.name,
-		}
-		fields = ["name", "commented_by", "content", "creation", "is_pinned"]
-
-		l = frappe.get_list("HD Ticket Comment", filters=filters, fields=fields)
-
-		for i in l:
-			i["sender"] = frappe.get_doc("User", i.commented_by)
-
-		return l
-
 	def get_escalation_rule(self):
 		filters = [
 			{
@@ -708,7 +719,7 @@ class HDTicket(Document):
 				rule = frappe.get_last_doc("HD Escalation Rule", filters=f)
 				if rule:
 					return rule
-			except:
+			except Exception:
 				pass
 
 	@frappe.whitelist()
@@ -747,7 +758,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 	if ticket_doc.status == "Replied":
 		ticket_doc.status = "Open"
-		log_ticket_activity(ticket, f"set status to Open")
+		log_ticket_activity(ticket, "set status to Open")
 		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")

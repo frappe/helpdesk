@@ -32,10 +32,10 @@ import { isEmpty } from "lodash";
 import { computed, ref } from "vue";
 import { createListResource } from "frappe-ui";
 import { AGENT_PORTAL_TICKET } from "@/router";
-import { useTicketStore } from "./data";
 import IconWebLink from "~icons/espresso/web-link";
 import IconCaretDown from "~icons/lucide/chevron-down";
 import IconCaretUp from "~icons/lucide/chevron-up";
+import { useTicket } from "./data";
 
 class Ticket {
   constructor(public name: number, public subject: string) {}
@@ -50,15 +50,16 @@ class Ticket {
   }
 }
 
-const { ticket } = useTicketStore();
+const ticket = useTicket();
+const data = computed(() => ticket.value.data);
 const isExpanded = ref(true);
 
 const ticketRes = createListResource({
   doctype: "HD Ticket",
   fields: ["name", "subject"],
   filters: {
-    name: ["!=", ticket.doc.name],
-    contact: ticket.doc.contact,
+    name: ["!=", data.value.name],
+    contact: data.value.contact.name,
     status: "Open",
   },
   orderBy: "modified desc",

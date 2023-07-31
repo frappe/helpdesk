@@ -22,5 +22,5 @@ class HDTicketTemplate(Document):
 				field.fieldname = cleanup_page_name(field.label)
 
 			if field.fieldname == "description" and field.fieldtype != "Text Editor":
-				frappe.throw(f"field type for description field should be Text Editor")
+				frappe.throw("field type for description field should be Text Editor")
 

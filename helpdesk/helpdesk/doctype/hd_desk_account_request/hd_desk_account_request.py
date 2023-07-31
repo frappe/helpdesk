@@ -32,7 +32,7 @@ class HDDeskAccountRequest(Document):
 				args=dict(link=url),
 				now=True,
 			)
-		except:
+		except Exception:
 			frappe.throw(
 				"Either setup up Support email account or there should be a default"
 				" outgoing email account"

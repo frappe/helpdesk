@@ -1,6 +1,6 @@
 <template>
-  <Tooltip v-if="user" :text="getTooltipLabel(user.full_name)">
-    <Avatar :image="user.user_image" :label="user.full_name" size="sm" />
+  <Tooltip v-if="user" :text="getTooltipLabel(userName)">
+    <Avatar :image="userImage" :label="userName" size="sm" />
   </Tooltip>
 </template>
 
@@ -22,6 +22,8 @@ const assign = toRef(props, "assign");
 const assignJson = computed(() => JSON.parse(assign.value));
 const agent = computed(() => [...assignJson.value].pop());
 const user = computed(() => userStore.getUser(agent.value));
+const userImage = computed(() => user.value?.user_image);
+const userName = computed(() => user.value?.full_name);
 
 function getTooltipLabel(s: string) {
   return "Assigned to " + s;

@@ -16,7 +16,7 @@
             }"
             @click="sidebar.isExpanded = true"
           >
-            <component :is="item.icon" class="h-4 w-4" />
+            <Icon :icon="item.icon" class="h-4 w-4" />
           </div>
         </Tab>
       </TabList>
@@ -26,30 +26,28 @@
 
 <script setup lang="ts">
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
+import { Icon } from "@iconify/vue";
 import { useTicketStore } from "./data";
 import ContactDetails from "./ContactDetails.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
-import IconHistory from "~icons/lucide/history";
-import IconContact from "~icons/lucide/contact-2";
-import IconInfo from "~icons/lucide/info";
 
 const { sidebar } = useTicketStore();
 const items = [
   {
     name: "Ticket Details",
     component: TicketDetails,
-    icon: IconInfo,
+    icon: "lucide:info",
   },
   {
     name: "Contact Details",
     component: ContactDetails,
-    icon: IconContact,
+    icon: "lucide:contact-2",
   },
   {
     name: "Ticket History",
     component: TicketHistory,
-    icon: IconHistory,
+    icon: "lucide:history",
   },
 ];
 </script>

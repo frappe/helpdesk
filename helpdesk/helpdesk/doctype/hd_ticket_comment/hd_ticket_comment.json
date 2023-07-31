@@ -15,7 +15,7 @@
  "fields": [
   {
    "fieldname": "content",
-   "fieldtype": "Text",
+   "fieldtype": "Text Editor",
    "label": "Content"
   },
   {
@@ -45,7 +45,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-28 16:20:28.733448",
+ "modified": "2023-07-30 20:10:04.958324",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Comment",
