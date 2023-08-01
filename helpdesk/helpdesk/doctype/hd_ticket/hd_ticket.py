@@ -563,37 +563,31 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def create_communication_via_contact(self, message, attachments=[]):
-		ticket_doc = frappe.get_doc("HD Ticket", self.name)
-
-		if ticket_doc.status == "Replied":
-			ticket_doc.status = "Open"
+		if self.status == "Replied":
+			self.status = "Open"
 			log_ticket_activity(self.name, "set status to Open")
-			ticket_doc.save(ignore_permissions=True)
+			self.save(ignore_permissions=True)
 
-		communication = frappe.new_doc("Communication")
-		communication.update(
-			{
-				"communication_type": "Communication",
-				"communication_medium": "Email",
-				"sent_or_received": "Received",
-				"email_status": "Open",
-				"subject": "Re: " + ticket_doc.subject,
-				"sender": frappe.session.user,
-				"content": message,
-				"status": "Linked",
-				"reference_doctype": "HD Ticket",
-				"reference_name": ticket_doc.name,
-			}
-		)
-		communication.ignore_permissions = True
-		communication.ignore_mandatory = True
-		communication.save(ignore_permissions=True)
+		c = frappe.new_doc("Communication")
+		c.communication_type = "Communication"
+		c.communication_medium = "Email"
+		c.sent_or_received = "Received"
+		c.email_status = "Open"
+		c.subject = "Re: " + self.subject
+		c.sender = frappe.session.user
+		c.content = message
+		c.status = "Linked"
+		c.reference_doctype = "HD Ticket"
+		c.reference_name = self.name
+		c.ignore_permissions = True
+		c.ignore_mandatory = True
+		c.save(ignore_permissions=True)
 
-		for attachment in attachments:
-			file_doc = frappe.get_doc("File", attachment)
-			file_doc.attached_to_name = communication.name
-			file_doc.attached_to_doctype = "Communication"
-			file_doc.save(ignore_permissions=True)
+		QBFile = frappe.qb.DocType("File")
+		condition_name = [QBFile.name == i["name"] for i in attachments]
+		frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
+			QBFile.attached_to_doctype, "Communication"
+		).where(Criterion.any(condition_name)).run()
 
 	@frappe.whitelist()
 	def mark_seen(self):
@@ -750,41 +744,6 @@ def set_descritption_from_communication(doc, type):
 		ticket_doc = frappe.get_doc("HD Ticket", doc.reference_name)
 		if not ticket_doc.via_customer_portal:
 			ticket_doc.description = doc.content
-
-
-@frappe.whitelist()
-def create_communication_via_contact(ticket, message, attachments=[]):
-	ticket_doc = frappe.get_doc("HD Ticket", ticket)
-
-	if ticket_doc.status == "Replied":
-		ticket_doc.status = "Open"
-		log_ticket_activity(ticket, "set status to Open")
-		ticket_doc.save(ignore_permissions=True)
-
-	communication = frappe.new_doc("Communication")
-	communication.update(
-		{
-			"communication_type": "Communication",
-			"communication_medium": "Email",
-			"sent_or_received": "Received",
-			"email_status": "Open",
-			"subject": "Re: " + ticket_doc.subject,
-			"sender": ticket_doc.raised_by,
-			"content": message,
-			"status": "Linked",
-			"reference_doctype": "HD Ticket",
-			"reference_name": ticket_doc.name,
-		}
-	)
-	communication.ignore_permissions = True
-	communication.ignore_mandatory = True
-	communication.save(ignore_permissions=True)
-
-	for attachment in attachments:
-		file_doc = frappe.get_doc("File", attachment)
-		file_doc.attached_to_name = communication.name
-		file_doc.attached_to_doctype = "Communication"
-		file_doc.save(ignore_permissions=True)
 
 
 @frappe.whitelist()
@@ -977,7 +936,9 @@ def update_ticket(contact, method):
 	Called when Contact is deleted
 	"""
 	QBTicket = frappe.qb.DocType("HD Ticket")
-	QBTicket.update().set(QBTicket.contact, "").where(QBTicket.contact == contact.name)
+	QBTicket.update().set(QBTicket.contact, "").where(
+		QBTicket.contact == contact.name
+	).run()
 
 
 @frappe.whitelist()
