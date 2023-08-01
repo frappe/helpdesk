@@ -46,5 +46,5 @@ def sequence_start(doctype: str):
 
 		last_id = alphanumeric_to_int(last_id) or 0
 		return last_id + 1
-	except:
+	except Exception:
 		return 1

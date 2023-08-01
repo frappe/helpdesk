@@ -69,23 +69,29 @@
           @change="update(o.field, $event.value)"
         />
       </div>
+      <CustomFields
+        :template="data.template"
+        :values="data.custom_fields"
+        @change="updateCustomField"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { createResource, Autocomplete, Button } from "frappe-ui";
-import dayjs from "dayjs";
 import { emitter } from "@/emitter";
-import { createToast } from "@/utils/toasts";
 import { useAgentStore } from "@/stores/agent";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import { useUserStore } from "@/stores/user";
-import { useTicketStore, useTicket } from "./data";
+import { createToast } from "@/utils/toasts";
+import dayjs from "dayjs";
+import { Autocomplete, Button, createResource, call } from "frappe-ui";
+import { computed } from "vue";
+import CustomFields from "./CustomFields.vue";
+import { useTicket, useTicketStore } from "./data";
 
 const dateFormat = "MMM D, h:mm A";
 const agentStore = useAgentStore();
@@ -165,6 +171,21 @@ function update(fieldname: string, value: string) {
         iconClasses: "text-green-600",
       });
     },
+  });
+}
+
+function updateCustomField({ fieldname, value }) {
+  call("helpdesk.helpdesk.doctype.hd_ticket.api.update_custom_field", {
+    ticket_name: data.value.name,
+    fieldname,
+    value,
+  }).then(() => {
+    emitter.emit("update:ticket");
+    createToast({
+      title: "Ticket updated",
+      icon: "check",
+      iconClasses: "text-green-600",
+    });
   });
 }
 </script>

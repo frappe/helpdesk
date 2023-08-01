@@ -5,18 +5,17 @@ from pypika import Criterion, Order
 
 from helpdesk.utils import get_customer, is_agent
 
-QBActivity = frappe.qb.DocType("HD Ticket Activity")
-QBComment = frappe.qb.DocType("HD Ticket Comment")
-QBCommunication = frappe.qb.DocType("Communication")
-QBContact = frappe.qb.DocType("Contact")
-QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
-QBFile = frappe.qb.DocType("File")
-QBTicket = frappe.qb.DocType("HD Ticket")
-QBViewLog = frappe.qb.DocType("View Log")
-
 
 @frappe.whitelist()
 def get_one(name):
+	QBActivity = frappe.qb.DocType("HD Ticket Activity")
+	QBComment = frappe.qb.DocType("HD Ticket Comment")
+	QBCommunication = frappe.qb.DocType("Communication")
+	QBContact = frappe.qb.DocType("Contact")
+	QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
+	QBTicket = frappe.qb.DocType("HD Ticket")
+	QBViewLog = frappe.qb.DocType("View Log")
+
 	_is_agent = is_agent()
 
 	query = (
@@ -36,6 +35,7 @@ def get_one(name):
 			QBTicket.subject,
 			QBTicket.ticket_type,
 			QBTicket.via_customer_portal,
+			QBTicket.template,
 		)
 		.where(QBTicket.name == name)
 	)
@@ -45,7 +45,7 @@ def get_one(name):
 
 	try:
 		ticket = query.run(as_dict=True)[0]
-	except:
+	except Exception:
 		frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
 
 	contact = (
@@ -60,8 +60,11 @@ def get_one(name):
 			QBContact.phone,
 		)
 		.where(QBContact.name == ticket.contact)
-		.run(as_dict=True)[0]
+		.run(as_dict=True)
 	)
+	if contact:
+		contact = contact[0]
+
 	comments = (
 		frappe.qb.from_(QBComment)
 		.select(
@@ -114,7 +117,7 @@ def get_one(name):
 	)
 	custom_fields = (
 		frappe.qb.from_(QBCustomField)
-		.select(QBCustomField.label, QBCustomField.value, QBCustomField.route)
+		.select(QBCustomField.fieldname, QBCustomField.label, QBCustomField.value, QBCustomField.route)
 		.where(QBCustomField.parent == name)
 		.where(QBCustomField.parentfield == "custom_fields")
 		.where(QBCustomField.parenttype == "HD Ticket")
@@ -133,6 +136,8 @@ def get_one(name):
 
 
 def get_customer_criteria():
+	QBTicket = frappe.qb.DocType("HD Ticket")
+
 	user = frappe.session.user
 	customer = get_customer(user)
 	conditions = [
@@ -145,10 +150,21 @@ def get_customer_criteria():
 
 @redis_cache()
 def get_attachments(doctype, name):
+	QBFile = frappe.qb.DocType("File")
+
 	return (
 		frappe.qb.from_(QBFile)
 		.select(QBFile.name, QBFile.file_url, QBFile.file_name)
 		.where(QBFile.attached_to_doctype == doctype)
 		.where(QBFile.attached_to_name == name)
 		.run(as_dict=True)
+	)
+
+@frappe.whitelist()
+def update_custom_field(ticket_name, fieldname, value):
+	frappe.db.set_value(
+		"HD Ticket Custom Field",
+		{ "parent": ticket_name, "fieldname": fieldname },
+		"value",
+		value
 	)

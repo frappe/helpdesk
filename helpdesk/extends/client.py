@@ -135,5 +135,5 @@ def apply_hook(doctype: str, query):
 		_class = getattr(_module, doctype)
 		_function = getattr(_class, "get_list_filters")
 		return _function(query)
-	except:
+	except Exception:
 		return query

@@ -1,5 +1,5 @@
 <template>
-  <div class="px-9 py-4 text-base text-gray-700">
+  <div class="px-9 py-4 pb-8 text-base text-gray-700">
     <div class="flex flex-col gap-4">
       <div class="flex items-center gap-2 pt-4">
         <RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">

@@ -2,15 +2,16 @@ import * as lodash from "lodash";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import {
-  Badge,
-  Button,
-  Dialog,
-  Input,
-  Tooltip,
   frappeRequest,
   onOutsideClickDirective,
   resourcesPlugin,
   setConfig,
+  Badge,
+  Button,
+  Dialog,
+  FormControl,
+  Input,
+  Tooltip,
 } from "frappe-ui";
 import App from "./App.vue";
 import "./index.css";
@@ -24,6 +25,7 @@ const globalComponents = {
   Badge,
   Button,
   Dialog,
+  FormControl,
   Input,
   Tooltip,
 };

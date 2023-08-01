@@ -401,7 +401,7 @@ class HDTicket(Document):
 			)
 
 			return communication
-		except:
+		except Exception:
 			pass
 
 	def last_communication_email(self):
@@ -567,7 +567,7 @@ class HDTicket(Document):
 
 		if ticket_doc.status == "Replied":
 			ticket_doc.status = "Open"
-			log_ticket_activity(self.name, f"set status to Open")
+			log_ticket_activity(self.name, "set status to Open")
 			ticket_doc.save(ignore_permissions=True)
 
 		communication = frappe.new_doc("Communication")
@@ -719,7 +719,7 @@ class HDTicket(Document):
 				rule = frappe.get_last_doc("HD Escalation Rule", filters=f)
 				if rule:
 					return rule
-			except:
+			except Exception:
 				pass
 
 	@frappe.whitelist()
@@ -758,7 +758,7 @@ def create_communication_via_contact(ticket, message, attachments=[]):
 
 	if ticket_doc.status == "Replied":
 		ticket_doc.status = "Open"
-		log_ticket_activity(ticket, f"set status to Open")
+		log_ticket_activity(ticket, "set status to Open")
 		ticket_doc.save(ignore_permissions=True)
 
 	communication = frappe.new_doc("Communication")
