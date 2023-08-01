@@ -53,7 +53,6 @@ def get_one(name):
 		.select(
 			QBContact.company_name,
 			QBContact.email_id,
-			QBContact.full_name,
 			QBContact.image,
 			QBContact.mobile_no,
 			QBContact.name,
