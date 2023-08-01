@@ -26,7 +26,6 @@ scheduler_events = {
 		"helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.auto_close_tickets",
 		"helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.check_agreement_status",
 	],
-	"cron": {"* * * * * 0/5": ["helpdesk.overrides.pull_support_emails"]},
 }
 
 doc_events = {
