@@ -1,35 +1,42 @@
 <template>
-  <Dropdown
-    :options="options"
-    :button="{
-      label: title,
-      iconRight: 'chevron-down',
-      variant: 'outline',
-      size: 'sm',
-    }"
-  />
+  <Dropdown :options="options">
+    <template #default="{ open }">
+      <div class="flex cursor-pointer items-center gap-2">
+        <div class="text-2xl font-semibold text-gray-900">
+          {{ title }}
+        </div>
+        <Icon
+          :icon="open ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+          class="h-5 w-5"
+        />
+      </div>
+    </template>
+  </Dropdown>
 </template>
 
 <script>
 import { ref } from "vue";
 import { Dropdown } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { useConfigStore } from "@/stores/config";
-import { useListFilters } from "@/composables/listFilters";
+import { useFilter } from "@/composables/filter";
 
 export default {
   name: "PresetFilters",
   components: {
     Dropdown,
+    Icon,
   },
   setup() {
     const configStore = useConfigStore();
-    const listFilters = useListFilters();
+    const { storage, setQuery } = useFilter();
     const presetFilters = ref([]);
     const presetTitle = ref("");
 
     return {
       configStore,
-      listFilters,
+      setQuery,
+      storage,
       presetFilters,
       presetTitle,
     };
@@ -56,16 +63,18 @@ export default {
               group: group === "user" ? "My Filters" : "Global",
               hideLabel: group !== "user",
               items: data[group].map((item) => {
-                const q = this.listFilters.toQuery(item.filters);
-
-                if (q === this.currentQuery) {
-                  this.presetTitle = item.title;
-                }
-
                 return {
                   label: item.title,
                   onClick: () => {
-                    this.listFilters.applyQuery(q);
+                    this.storage.clear();
+                    item.filters.forEach((f) =>
+                      this.storage.add({
+                        fieldname: f.fieldname,
+                        operator: f.filter_type,
+                        value: f.value,
+                      })
+                    );
+                    this.setQuery();
                   },
                 };
               }),

@@ -1,3 +1,10 @@
+export interface Resource<A> {
+  auto: boolean;
+  loading: boolean;
+  data: A;
+  reload: () => void;
+}
+
 export interface Comment {
   commented_by: string;
   content: string;
@@ -68,9 +75,17 @@ export interface Ticket {
   views: ViewLog[];
 }
 
-export interface Resource<A> {
-  auto: boolean;
-  loading: boolean;
-  data: A;
-  reload: () => void;
+export interface DocField {
+  fieldname: string;
+  fieldtype: string;
+  label: string;
+  name: string;
+  options: string;
+}
+
+export interface Filter {
+  field?: DocField;
+  fieldname: string;
+  operator: string;
+  value: boolean | number | string;
 }
