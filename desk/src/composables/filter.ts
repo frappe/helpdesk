@@ -59,7 +59,7 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
     return merged;
   }
 
-  function setQuery(r?: RouteLocationNamedRaw) {
+  function apply(r?: RouteLocationNamedRaw) {
     r = r || route;
     const l__ = Array.from(storage.value);
     const q = l__
@@ -103,5 +103,5 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
     return f;
   }
 
-  return { getArgs, setQuery, storage };
+  return { apply, getArgs, storage };
 }

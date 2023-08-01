@@ -29,13 +29,13 @@ export default {
   },
   setup() {
     const configStore = useConfigStore();
-    const { storage, setQuery } = useFilter();
+    const { storage, apply } = useFilter();
     const presetFilters = ref([]);
     const presetTitle = ref("");
 
     return {
       configStore,
-      setQuery,
+      apply,
       storage,
       presetFilters,
       presetTitle,
@@ -74,7 +74,7 @@ export default {
                         value: f.value,
                       })
                     );
-                    this.setQuery();
+                    this.apply();
                   },
                 };
               }),

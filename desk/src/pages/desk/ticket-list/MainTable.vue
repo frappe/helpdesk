@@ -83,6 +83,7 @@ import { useAgentStore } from "@/stores/agent";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils/toasts";
+import { useFilter } from "@/composables/filter";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
@@ -98,6 +99,7 @@ const router = useRouter();
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
+const { storage: filters, apply: applyFilters } = useFilter();
 const selection = ref(new Set<string>());
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
