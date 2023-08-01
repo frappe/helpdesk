@@ -18,7 +18,7 @@
       @click="
         () => {
           storage.delete(f);
-          if (!storage.size) setQuery();
+          apply();
         }
       "
     >
@@ -43,24 +43,13 @@
   </Dropdown>
   <Button
     v-if="storage.size"
-    label="Apply"
-    theme="gray"
-    variant="outline"
-    @click="setQuery()"
-  >
-    <template #prefix>
-      <Icon icon="lucide:check" class="h-4 w-4" />
-    </template>
-  </Button>
-  <Button
-    v-if="storage.size"
     label="Clear"
     theme="gray"
     variant="outline"
     @click="
       () => {
         storage.clear();
-        setQuery();
+        apply();
       }
     "
   >
@@ -71,8 +60,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h } from "vue";
+import { computed, h, watch } from "vue";
 import { createResource, Button, Dropdown, FormControl } from "frappe-ui";
+import { useDebounceFn } from "@vueuse/core";
 import { Icon } from "@iconify/vue";
 import { DocField, Filter, Resource } from "@/types";
 import { useFilter } from "@/composables/filter";
@@ -97,12 +87,18 @@ const fields: Resource<Array<DocField>> = createResource({
   auto: true,
 });
 
-const { setQuery, storage } = useFilter(() => fields.data);
+const { apply, storage } = useFilter(() => fields.data);
 const typeCheck = ["Check"];
 const typeLink = ["Link"];
 const typeNumber = ["Float", "Int"];
 const typeSelect = ["Select"];
 const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
+
+watch(
+  storage,
+  useDebounceFn(() => apply(), 300),
+  { deep: true }
+);
 
 const optionsField = computed(() =>
   fields.data
@@ -123,7 +119,7 @@ function getOperators(f: Filter) {
   const fieldtype = f.field.fieldtype;
   let ops = [];
   if (typeString.includes(fieldtype) || typeNumber.includes(fieldtype)) {
-    ops.push(...["equals", "not equals", "Like", "not like"]);
+    ops.push(...["equals", "not equals", "like", "not like"]);
   }
   if (typeNumber.includes(fieldtype)) {
     ops.push(...["<", ">", "<=", ">=", "equals", "not equals"]);
@@ -176,9 +172,9 @@ function getValSelect(f: Filter) {
   }
   if (typeLink.includes(fieldtype)) {
     return h(SearchComplete, {
+      value: f.value,
       doctype: options,
       class: "bg-gray-100",
-      value: f.value,
       onChange: (v) => (f.value = v.value),
     });
   }

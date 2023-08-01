@@ -63,7 +63,7 @@ import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const { setQuery, storage } = useFilter();
+const { apply, storage } = useFilter();
 const isDialogVisible = ref(false);
 const emptyMessage = "No Agents Found";
 const columns = [
@@ -102,7 +102,7 @@ function toTickets(user: string) {
     operator: "is",
     value: user,
   });
-  setQuery({
+  apply({
     name: AGENT_PORTAL_TICKET_LIST,
   });
 }
