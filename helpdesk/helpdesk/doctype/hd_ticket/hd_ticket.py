@@ -583,6 +583,8 @@ class HDTicket(Document):
 		c.ignore_mandatory = True
 		c.save(ignore_permissions=True)
 
+		if not len(attachments):
+			return
 		QBFile = frappe.qb.DocType("File")
 		condition_name = [QBFile.name == i["name"] for i in attachments]
 		frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
