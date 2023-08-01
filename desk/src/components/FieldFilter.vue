@@ -112,7 +112,7 @@ const optionsField = computed(() =>
         storage.value.add({
           field: f,
           fieldname: f.fieldname,
-          operator: "equals",
+          operator: "is",
           value: getDefaultValue(f),
         }),
     }))
