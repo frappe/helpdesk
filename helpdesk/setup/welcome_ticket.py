@@ -38,7 +38,7 @@ def create_ticket():
 	d.contact = AUTHOR_NAME
 	d.via_customer_portal = True
 	d.insert()
-	d.create_communication_via_contact(d.name, d.description)
+	d.create_communication_via_contact(d.description)
 	add_assign(
 		{
 			"doctype": "HD Ticket",
