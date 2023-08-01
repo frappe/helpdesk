@@ -15,7 +15,12 @@
     <component :is="getValSelect(f)" class="border" />
     <div
       class="cursor-pointer rounded-r border-y border-r p-1.5 text-gray-800"
-      @click="storage.delete(f)"
+      @click="
+        () => {
+          storage.delete(f);
+          if (!storage.size) setQuery();
+        }
+      "
     >
       <Icon icon="lucide:x" class="h-4 w-4" />
     </div>
@@ -153,7 +158,8 @@ function getValSelect(f: Filter) {
     return h(FormControl, {
       type: "text",
       class: "bg-gray-100",
-      onInput: (e) => (f.value = e.target.value),
+      placeholder: f.value,
+      onChange: (e) => (f.value = e.target.value),
     });
   }
   if (typeSelect.includes(fieldtype)) {

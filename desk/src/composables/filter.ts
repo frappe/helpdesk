@@ -86,6 +86,8 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
   function transformIn(f: Filter) {
     if (f.fieldname === "_assign") {
       f.operator = f.operator === "is" ? "like" : "not like";
+    }
+    if (f.operator.includes("like")) {
       f.value = `%${f.value}%`;
     }
     return f;
