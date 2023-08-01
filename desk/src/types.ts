@@ -85,5 +85,5 @@ export interface Filter {
   field?: DocField;
   fieldname: string;
   operator: string;
-  value: boolean | number | string | string[];
+  value: boolean | number | string;
 }

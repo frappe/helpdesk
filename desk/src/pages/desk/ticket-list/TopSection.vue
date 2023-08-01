@@ -4,14 +4,14 @@
       <div class="flex flex-wrap items-center gap-2">
         <Dropdown :options="sortOptions">
           <template #default>
-            <Button label="Sort" variant="outline" size="sm">
+            <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
               <template #prefix>
                 <IconSort class="h-3 w-3" />
               </template>
             </Button>
           </template>
         </Dropdown>
-        <FieldFilter doctype="HD Ticket" />
+        <FieldFilter doctype="HD Ticket" :append-assign="true" />
       </div>
     </div>
   </div>
@@ -19,15 +19,12 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRouter } from "vue-router";
-import { useRoute } from "vue-router";
 import { createResource, Dropdown } from "frappe-ui";
+import { useOrder } from "@/composables/order";
 import FieldFilter from "@/components/FieldFilter.vue";
 import IconSort from "~icons/lucide/arrow-down-up";
 
-const router = useRouter();
-const route = useRoute();
-
+const { get: getOrder, set: setOrder } = useOrder();
 const sortOptionsRes = createResource({
   url: "helpdesk.extends.doc.sort_options",
   auto: true,
@@ -35,17 +32,10 @@ const sortOptionsRes = createResource({
     doctype: "HD Ticket",
   },
 });
-
 const sortOptions = computed(() => {
   return sortOptionsRes.data?.map((o) => ({
     label: o,
-    onClick: () =>
-      router.push({
-        query: {
-          ...route.query,
-          sort: encodeURIComponent(o.replaceAll(" ", "-")),
-        },
-      }),
+    onClick: () => setOrder(o),
   }));
 });
 </script>

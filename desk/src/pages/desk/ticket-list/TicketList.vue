@@ -29,6 +29,7 @@ import { ref } from "vue";
 import { Button } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useFilter } from "@/composables/filter";
+import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
@@ -38,11 +39,13 @@ import TopSection from "./TopSection.vue";
 import PresetFilters from "./PresetFilters.vue";
 
 const { getArgs } = useFilter();
+const { get: getOrder } = useOrder();
 const showNewDialog = ref(false);
 const tickets = createListManager({
   doctype: "HD Ticket",
   pageLength: 20,
   filters: getArgs(),
+  orderBy: getOrder(),
   realtime: true,
   auto: true,
 });

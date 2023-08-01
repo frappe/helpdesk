@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, toRef } from "vue";
+import { computed, h } from "vue";
 import { createResource, Button, Dropdown, FormControl } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { DocField, Filter, Resource } from "@/types";
@@ -75,17 +75,20 @@ import SearchComplete from "./SearchComplete.vue";
 
 interface P {
   doctype: string;
+  appendAssign?: boolean;
 }
 
-const props = defineProps<P>();
-const doctype = toRef(props, "doctype");
+const props = withDefaults(defineProps<P>(), {
+  appendAssign: false,
+});
 
 const fields: Resource<Array<DocField>> = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   makeParams: () => ({
-    doctype: doctype.value,
+    doctype: props.doctype,
+    append_assign: props.appendAssign,
   }),
-  cache: ["DocField", doctype.value],
+  cache: ["DocField", props.doctype],
   auto: true,
 });
 
@@ -97,16 +100,18 @@ const typeSelect = ["Select"];
 const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 
 const optionsField = computed(() =>
-  fields.data?.map((f) => ({
-    label: f.label,
-    onClick: () =>
-      storage.value.add({
-        field: f,
-        fieldname: f.fieldname,
-        operator: "equals",
-        value: getDefaultValue(f),
-      }),
-  }))
+  fields.data
+    ?.map((f) => ({
+      label: f.label,
+      onClick: () =>
+        storage.value.add({
+          field: f,
+          fieldname: f.fieldname,
+          operator: "equals",
+          value: getDefaultValue(f),
+        }),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label))
 );
 
 function getOperators(f: Filter) {

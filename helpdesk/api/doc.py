@@ -13,7 +13,7 @@ def delete_items(items, doctype):
 
 @frappe.whitelist()
 @redis_cache()
-def get_filterable_fields(doctype):
+def get_filterable_fields(doctype, append_assign=False):
 	check_permissions(doctype, None)
 	QBDocField = frappe.qb.DocType("DocField")
 	allowed_fieldtypes = [
@@ -41,6 +41,17 @@ def get_filterable_fields(doctype):
 		.where(QBDocField.parent == doctype)
 		.where(QBDocField.hidden == False)
 		.where(Criterion.any(conditions_fieldtype))
-		.orderby(QBDocField.label, order=Order.asc)
 	)
-	return q.run(as_dict=True)
+
+	res = q.run(as_dict=True)
+	if append_assign:
+		res.append(
+			{
+				"fieldname": "_assign",
+				"fieldtype": "Link",
+				"label": "Assigned to",
+				"name": "_assign",
+				"options": "HD Agent",
+			}
+		)
+	return res
