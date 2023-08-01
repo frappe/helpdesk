@@ -96,7 +96,9 @@ const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 
 watch(
   storage,
-  useDebounceFn(() => apply(), 300),
+  useDebounceFn(() => {
+    if (storage.value.size) apply();
+  }, 300),
   { deep: true }
 );
 
