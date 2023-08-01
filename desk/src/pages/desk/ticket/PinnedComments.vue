@@ -24,7 +24,10 @@
           :image="userStore.getUser(c.commented_by).user_image"
           size="sm"
         />
-        <div class="prose prose-sm line-clamp-1" v-html="c.content" />
+        <div
+          class="prose prose-sm line-clamp-1"
+          v-html="sanitizeHtml(c.content)"
+        />
       </div>
     </div>
   </div>
@@ -33,6 +36,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { Avatar } from "frappe-ui";
+import sanitizeHtml from "sanitize-html";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { useUserStore } from "@/stores/user";
