@@ -31,7 +31,9 @@
       <Autocomplete
         v-else-if="field.fieldtype === 'Select'"
         placeholder="Select an option"
-        :options="selectOptions(field.options)"
+        :options="
+          field.options.split('\n').map((o) => ({ label: o, value: o }))
+        "
         :value="fieldValues[field.fieldname]"
         @change="
           (v) => $emit('change', { fieldname: field.fieldname, value: v.value })
