@@ -1,16 +1,18 @@
 <template>
   <template v-if="customFieldMeta.length">
-    <div v-for="field in props.values" :key="field.fieldname" class="space-y-1">
+    <div
+      v-for="field in customFieldMeta"
+      :key="field.fieldname"
+      class="space-y-1"
+    >
       <div class="text-xs text-gray-600">
-        {{ fieldMeta[field.fieldname].label }}
+        {{ field.label }}
+        <span v-if="field.reqd" class="text-red-500">*</span>
       </div>
       <SearchComplete
-        v-if="
-          fieldMeta[field.fieldname].fieldtype == 'Link' &&
-          fieldMeta[field.fieldname].options
-        "
-        :value="field.value"
-        :doctype="fieldMeta[field.fieldname].options"
+        v-if="field.fieldtype == 'Link' && field.options"
+        :value="fieldValues[field.fieldname]"
+        :doctype="field.options"
         @change="
           (v) => $emit('change', { fieldname: field.fieldname, value: v.value })
         "
@@ -18,29 +20,28 @@
 
       <SearchComplete
         v-else-if="
-          fieldMeta[field.fieldname].fieldtype === 'Link' &&
-          fieldMeta[field.fieldname].fetch_options_from == 'DocType'
+          field.fieldtype === 'Link' && field.fetch_options_from == 'DocType'
         "
-        :value="field.value"
-        :doctype="fieldMeta[field.fieldname].doc_type"
+        :value="fieldValues[field.fieldname]"
+        :doctype="field.doc_type"
         @change="
           (v) => $emit('change', { fieldname: field.fieldname, value: v.value })
         "
       />
       <Autocomplete
-        v-else-if="fieldMeta[field.fieldname].fieldtype === 'Select'"
+        v-else-if="field.fieldtype === 'Select'"
         placeholder="Select an option"
-        :options="selectOptions(fieldMeta[field.fieldname].options)"
-        :value="field.value"
+        :options="selectOptions(field.options)"
+        :value="fieldValues[field.fieldname]"
         @change="
           (v) => $emit('change', { fieldname: field.fieldname, value: v.value })
         "
       />
       <Autocomplete
-        v-else-if="fieldMeta[field.fieldname].fetch_options_from === 'API'"
+        v-else-if="field.fetch_options_from === 'API'"
         placeholder="Select an option"
         :options="serverScriptOptions[field.fieldname]"
-        :value="field.value"
+        :value="fieldValues[field.fieldname]"
         @change="
           (v) => $emit('change', { fieldname: field.fieldname, value: v.value })
         "
@@ -68,12 +69,12 @@ const template = createDocumentResource({
     fetchOptionsFromServerScript();
   },
 });
-const fieldMeta = computed(() => {
-  const meta = {};
-  customFieldMeta.value.forEach((field) => {
-    meta[field.fieldname] = field;
+const fieldValues = computed(() => {
+  const values = {};
+  props.values.forEach((v) => {
+    values[v.fieldname] = v.value;
   });
-  return meta;
+  return values;
 });
 
 const serverScriptOptions = ref({});
