@@ -60,6 +60,7 @@ export default {
                 return {
                   label: item.title,
                   onClick: () => {
+                    this.storage.clear();
                     item.filters.forEach((f) =>
                       this.storage.add({
                         fieldname: f.fieldname,
