@@ -32,7 +32,9 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
     const q = (route.query.q as string) || "";
     q.split(" ")
       .map((f) => {
-        const [fieldname, operator, value] = f.split(":");
+        const [fieldname, operator, value] = f
+          .split(":")
+          .map(decodeURIComponent);
         const field = (f__ || []).find((f) => f.fieldname === fieldname);
         return {
           field,
@@ -62,7 +64,11 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
     const l__ = Array.from(storage.value);
     const q = l__
       .map(transformOut)
-      .map((f) => [f.fieldname, f.operator.toLowerCase(), f.value].join(":"))
+      .map((f) =>
+        [f.fieldname, f.operator.toLowerCase(), f.value]
+          .map(encodeURIComponent)
+          .join(":")
+      )
       .join(" ");
     router.push({
       ...r,
@@ -79,7 +85,7 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
    */
   function transformIn(f: Filter) {
     if (f.fieldname === "_assign") {
-      f.operator = "like";
+      f.operator = f.operator === "is" ? "like" : "not like";
       f.value = `%${f.value}%`;
     }
     return f;
