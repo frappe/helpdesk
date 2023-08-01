@@ -61,8 +61,11 @@ def get_one(name):
 			QBContact.phone,
 		)
 		.where(QBContact.name == ticket.contact)
-		.run(as_dict=True)[0]
+		.run(as_dict=True)
 	)
+	if contact:
+		contact = contact[0]
+
 	comments = (
 		frappe.qb.from_(QBComment)
 		.select(
