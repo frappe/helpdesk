@@ -14,7 +14,7 @@
 import { ref } from "vue";
 import { Dropdown } from "frappe-ui";
 import { useConfigStore } from "@/stores/config";
-import { useListFilters } from "@/composables/listFilters";
+import { useFilter } from "@/composables/filter";
 
 export default {
   name: "PresetFilters",
@@ -23,13 +23,14 @@ export default {
   },
   setup() {
     const configStore = useConfigStore();
-    const listFilters = useListFilters();
+    const { storage, setQuery } = useFilter();
     const presetFilters = ref([]);
     const presetTitle = ref("");
 
     return {
       configStore,
-      listFilters,
+      setQuery,
+      storage,
       presetFilters,
       presetTitle,
     };
@@ -56,16 +57,17 @@ export default {
               group: group === "user" ? "My Filters" : "Global",
               hideLabel: group !== "user",
               items: data[group].map((item) => {
-                const q = this.listFilters.toQuery(item.filters);
-
-                if (q === this.currentQuery) {
-                  this.presetTitle = item.title;
-                }
-
                 return {
                   label: item.title,
                   onClick: () => {
-                    this.listFilters.applyQuery(q);
+                    item.filters.forEach((f) =>
+                      this.storage.add({
+                        fieldname: f.fieldname,
+                        operator: f.filter_type,
+                        value: f.value,
+                      })
+                    );
+                    this.setQuery();
                   },
                 };
               }),
