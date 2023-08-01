@@ -1,10 +1,6 @@
 import frappe
 from frappe.website.utils import cleanup_page_name
 
-from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
-	create_communication_via_contact,
-)
-
 
 @frappe.whitelist()
 def create_new(values, template="Default", attachments=[], via_customer_portal=False):
@@ -51,11 +47,7 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 		)
 
 	ticket_doc.insert(ignore_permissions=True)
-	# TODO: remove this if condition after refactoring doctype/ticket.py logic regarding this
-	create_communication_via_contact(
-		ticket_doc.name, ticket_doc.description, attachments
-	)
-	# if not via_customer_portal:
+	ticket_doc.create_communication_via_contact(ticket_doc.description, attachments)
 
 	return ticket_doc
 
@@ -64,9 +56,12 @@ def get_contact_email(contact_name):
 	email_id = frappe.db.get_value("Contact", contact_name, "email_id")
 	if email_id:
 		return email_id
-	email_id = frappe.db.get_value("Contact Email", {"parent": contact_name}, "email_id")
+	email_id = frappe.db.get_value(
+		"Contact Email", {"parent": contact_name}, "email_id"
+	)
 	if email_id:
 		return email_id
+
 
 def create_contact_from_user(user):
 	user_doc = frappe.get_doc("User", user)
@@ -83,6 +78,7 @@ def create_contact_from_user(user):
 	)
 	new_contact_doc.insert(ignore_permissions=True)
 	return new_contact_doc.name
+
 
 def assign_ticket_to_agent(ticket_id, agent_id=None):
 	if not ticket_id:
