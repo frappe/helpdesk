@@ -5,18 +5,17 @@ from pypika import Criterion, Order
 
 from helpdesk.utils import get_customer, is_agent
 
-QBActivity = frappe.qb.DocType("HD Ticket Activity")
-QBComment = frappe.qb.DocType("HD Ticket Comment")
-QBCommunication = frappe.qb.DocType("Communication")
-QBContact = frappe.qb.DocType("Contact")
-QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
-QBFile = frappe.qb.DocType("File")
-QBTicket = frappe.qb.DocType("HD Ticket")
-QBViewLog = frappe.qb.DocType("View Log")
-
 
 @frappe.whitelist()
 def get_one(name):
+	QBActivity = frappe.qb.DocType("HD Ticket Activity")
+	QBComment = frappe.qb.DocType("HD Ticket Comment")
+	QBCommunication = frappe.qb.DocType("Communication")
+	QBContact = frappe.qb.DocType("Contact")
+	QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
+	QBTicket = frappe.qb.DocType("HD Ticket")
+	QBViewLog = frappe.qb.DocType("View Log")
+
 	_is_agent = is_agent()
 
 	query = (
@@ -137,6 +136,8 @@ def get_one(name):
 
 
 def get_customer_criteria():
+	QBTicket = frappe.qb.DocType("HD Ticket")
+
 	user = frappe.session.user
 	customer = get_customer(user)
 	conditions = [
@@ -149,6 +150,8 @@ def get_customer_criteria():
 
 @redis_cache()
 def get_attachments(doctype, name):
+	QBFile = frappe.qb.DocType("File")
+
 	return (
 		frappe.qb.from_(QBFile)
 		.select(QBFile.name, QBFile.file_url, QBFile.file_name)
