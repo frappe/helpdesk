@@ -90,10 +90,10 @@ const agents = createListManager({
   fields: [
     "name",
     "is_active",
-    "user.full_name",
-    "user.user_image",
-    "user.email",
-    "user.username",
+    // "user.full_name",
+    // "user.user_image",
+    // "user.email",
+    // "user.username",
   ],
   auto: true,
 });
