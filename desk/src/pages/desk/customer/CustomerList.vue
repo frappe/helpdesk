@@ -20,10 +20,12 @@
       :data="customers.list?.data || []"
       :empty-message="emptyMessage"
       row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="openCustomer"
+      :row-click="{
+        type: 'action',
+        fn: openCustomer,
+      }"
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">

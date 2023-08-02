@@ -35,9 +35,12 @@
       :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
+      :row-click="{
+        type: 'link',
+        fn: toArticle,
+      }"
       class="grow"
       row-key="name"
-      @row-click="toArticle"
     >
       <template #title="{ data }">
         <div class="flex items-center gap-2">
@@ -175,12 +178,12 @@ const columns = [
 ];
 
 function toArticle(articleId: string) {
-  router.push({
+  return {
     name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
     params: {
       articleId,
     },
-  });
+  };
 }
 
 function toNewArticle() {

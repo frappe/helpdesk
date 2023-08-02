@@ -17,10 +17,12 @@
       :data="accounts.list?.data || []"
       :empty-message="emptyMessage"
       row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="gotoAccount"
+      :row-click="{
+        type: 'link',
+        fn: toAccount,
+      }"
     >
       <template #email_id="{ data }">
         <div class="flex justify-between">
@@ -107,12 +109,12 @@ const accounts = createListManager({
   auto: true,
 });
 
-function gotoAccount(id: string) {
-  router.push({
+function toAccount(id: string) {
+  return {
     name: AGENT_PORTAL_EMAIL_SINGLE,
     params: {
       emailAccountId: id,
     },
-  });
+  };
 }
 </script>

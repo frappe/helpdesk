@@ -20,10 +20,12 @@
       :data="rules.list?.data || []"
       :empty-message="emptyMessage"
       row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="openDialog"
+      :row-click="{
+        type: 'action',
+        fn: openDialog,
+      }"
     >
       <template #is_enabled="{ data }">
         <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">

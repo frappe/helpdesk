@@ -3,10 +3,12 @@
     v-model:selection="selection"
     :columns="columns"
     :data="tickets"
-    :emit-row-click="true"
     :empty-message="emptyMessage"
+    :row-click="{
+      fn: toTicket,
+      type: 'link',
+    }"
     row-key="name"
-    @row-click="toTicket"
   >
     <template #subject="{ data }">
       <TicketSummary
@@ -195,12 +197,12 @@ function assignOpts(selected: Set<number>) {
 }
 
 function toTicket(ticketId: string) {
-  router.push({
+  return {
     name: AGENT_PORTAL_TICKET,
     params: {
       ticketId,
     },
-  });
+  };
 }
 </script>
 
