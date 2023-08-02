@@ -102,7 +102,8 @@ const data = computed(() => ticket.value.data);
 
 const assignedTo = computed(() => {
   const assignJson = JSON.parse(data.value._assign);
-  const user = assignJson.slice(-1).pop();
+  const arr = Array.isArray(assignJson) ? assignJson : [];
+  const user = arr.slice(-1).pop();
   const name = userStore.getUser(user)?.full_name || user;
   return name;
 });
