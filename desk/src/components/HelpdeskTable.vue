@@ -169,7 +169,7 @@ type RowKey = string;
 type SelectionKey = string | number;
 
 interface RowClick {
-  fn: ((id: RowKey) => void) | ((id: RowKey) => RouteLocationOptions);
+  fn: (id: RowKey) => RouteLocationOptions | void;
   type: "action" | "link" | "none";
 }
 
@@ -189,7 +189,7 @@ const props = withDefaults(defineProps<P>(), {
   emptyMessage: "No records",
   hideCheckbox: false,
   hideColumnSelector: false,
-  rowClick: () => ({ fn: () => true, type: "none" }),
+  rowClick: () => ({ fn: () => ({}), type: "none" }),
   selection: () => new Set(),
 });
 
