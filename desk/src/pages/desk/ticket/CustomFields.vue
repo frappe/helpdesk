@@ -55,22 +55,21 @@
 <script setup>
 import SearchComplete from "@/components/SearchComplete.vue";
 import { Autocomplete, createDocumentResource, call } from "frappe-ui";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 const props = defineProps({ template: String, values: Object });
 defineEmits(["change"]);
 
-const customFieldMeta = ref([]);
 const template = createDocumentResource({
   doctype: "HD Ticket Template",
   name: props.template,
   fields: ["fields"],
   auto: true,
   onSuccess: () => {
-    customFieldMeta.value = template.doc.fields;
     fetchOptionsFromServerScript();
   },
 });
+const customFieldMeta = computed(() => template.doc?.fields || []);
 const fieldValues = computed(() => {
   const values = {};
   props.values.forEach((v) => {
