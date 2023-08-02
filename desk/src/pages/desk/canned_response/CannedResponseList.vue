@@ -15,15 +15,15 @@
       </template>
     </PageTitle>
     <HelpdeskTable
-      class="grow"
       :columns="columns"
       :data="responses.list?.data || []"
       :empty-message="emptyMessage"
-      row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="gotoResponse"
+      :row-click="{
+        type: 'link',
+        fn: toResponse,
+      }"
     />
     <ListNavigation class="p-3" v-bind="responses" />
     <AddNewCannedResponsesDialog
@@ -34,7 +34,6 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import { AGENT_PORTAL_CANNED_RESPONSE_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
@@ -43,7 +42,6 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const router = useRouter();
 const showNewDialog = ref(false);
 const emptyMessage = "No Canned Responses Found";
 const columns = [
@@ -65,12 +63,12 @@ const responses = createListManager({
   auto: true,
 });
 
-function gotoResponse(id: string) {
-  router.push({
+function toResponse(id: string) {
+  return {
     name: AGENT_PORTAL_CANNED_RESPONSE_SINGLE,
     params: {
       id,
     },
-  });
+  };
 }
 </script>

@@ -15,15 +15,17 @@
       </template>
     </PageTitle>
     <HelpdeskTable
-      class="grow"
       :columns="columns"
       :data="teams.list?.data || []"
       :empty-message="emptyMessage"
-      row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="gotoTeam"
+      :row-click="{
+        type: 'link',
+        fn: toTeam,
+      }"
+      class="grow"
+      row-key="name"
     />
     <ListNavigation class="p-3" v-bind="teams" />
     <Dialog
@@ -121,12 +123,12 @@ const newTeam = createResource({
   },
 });
 
-function gotoTeam(id: string) {
-  router.push({
+function toTeam(id: string) {
+  return {
     name: AGENT_PORTAL_TEAM_SINGLE,
     params: {
       teamId: id,
     },
-  });
+  };
 }
 </script>

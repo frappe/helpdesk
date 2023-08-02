@@ -15,15 +15,18 @@
       </template>
     </PageTitle>
     <HelpdeskTable
-      class="grow"
       :columns="columns"
       :data="contacts.list?.data || []"
-      row-key="name"
       :emit-row-click="true"
       :empty-message="emptyMessage"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="openContact"
+      :row-click="{
+        type: 'action',
+        fn: openContact,
+      }"
+      class="grow"
+      row-key="name"
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">

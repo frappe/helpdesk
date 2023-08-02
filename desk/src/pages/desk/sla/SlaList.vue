@@ -17,10 +17,12 @@
       :data="policies.list?.data || []"
       :empty-message="emptyMessage"
       row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="gotoPolicy"
+      :row-click="{
+        type: 'link',
+        fn: toPolicy,
+      }"
     >
       <template #enabled="{ data }">
         <Badge :theme="data.enabled ? 'green' : 'gray'" variant="subtle">
@@ -37,7 +39,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useRouter } from "vue-router";
 import { Badge } from "frappe-ui";
 import { AGENT_PORTAL_SLA_NEW, AGENT_PORTAL_SLA_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
@@ -46,7 +47,6 @@ import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const router = useRouter();
 const emptyMessage = "No Support Policies Found";
 const columns = [
   {
@@ -72,12 +72,12 @@ const policies = createListManager({
   auto: true,
 });
 
-function gotoPolicy(id: string) {
-  router.push({
+function toPolicy(id: string) {
+  return {
     name: AGENT_PORTAL_SLA_SINGLE,
     params: {
       id,
     },
-  });
+  };
 }
 </script>

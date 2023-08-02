@@ -63,7 +63,8 @@
         </div>
       </div>
       <div class="divide-y overflow-y-auto px-6 text-base">
-        <div
+        <component
+          :is="getRowClickComponent(row[rowKey])"
           v-for="row in data"
           :key="row[rowKey]"
           class="group flex h-11 w-full items-center gap-2 px-3 py-2 transition"
@@ -71,9 +72,8 @@
             'bg-gray-200': selection.has(row[rowKey]),
             'hover:bg-gray-300': selection.has(row[rowKey]),
             'hover:bg-gray-100': !selection.has(row[rowKey]),
-            'cursor-pointer': emitRowClick,
+            'cursor-pointer': rowClick.type !== 'none',
           }"
-          @click="onRowClick(row)"
         >
           <Input
             v-if="!hideCheckbox"
@@ -97,7 +97,7 @@
           <div v-if="slots['row-extra']" class="ml-auto">
             <slot name="row-extra" :data="row" />
           </div>
-        </div>
+        </component>
       </div>
     </div>
     <transition
@@ -152,7 +152,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, toRefs, useSlots } from "vue";
+import { computed, h, reactive, toRefs, useSlots } from "vue";
+import { RouteLocationOptions, RouterLink } from "vue-router";
 import { FeatherIcon, Popover, Switch } from "frappe-ui";
 import { isEmpty } from "lodash";
 import IconAdd from "~icons/espresso/add";
@@ -167,23 +168,28 @@ type Column = {
 type RowKey = string;
 type SelectionKey = string | number;
 
-type P = {
+interface RowClick {
+  fn: (id: RowKey) => RouteLocationOptions | void;
+  type: "action" | "link" | "none";
+}
+
+interface P {
   columns: Column[];
   rowKey: string;
   data?: Record<string, any>[];
-  emitRowClick?: boolean;
+  rowClick?: RowClick;
   emptyMessage?: string;
   hideCheckbox?: boolean;
   hideColumnSelector?: boolean;
   selection?: Set<SelectionKey>;
-};
+}
 
 const props = withDefaults(defineProps<P>(), {
   data: () => [],
-  emitRowClick: false,
   emptyMessage: "No records",
   hideCheckbox: false,
   hideColumnSelector: false,
+  rowClick: () => ({ fn: () => ({}), type: "none" }),
   selection: () => new Set(),
 });
 
@@ -192,7 +198,7 @@ const emit = defineEmits<{
   (event: "update:selection", selection: Set<SelectionKey>): void;
 }>();
 
-const { columns, data, emitRowClick, rowKey, selection } = toRefs(props);
+const { columns, data, rowClick, rowKey, selection } = toRefs(props);
 const slots = useSlots();
 const allSelected = computed(() => selection.value.size === data.value.length);
 const togglableColumns = reactive(
@@ -208,6 +214,21 @@ const selectionText = computed(() => {
   const verb = size > 1 ? "rows" : "row";
   return `${size} ${verb} selected`;
 });
+
+function getRowClickComponent(key: RowKey) {
+  switch (rowClick.value.type) {
+    case "link":
+      return h(RouterLink, {
+        to: rowClick.value.fn(key),
+      });
+    case "action":
+      return h("div", {
+        onClick: () => rowClick.value.fn(key),
+      });
+    default:
+      return "div";
+  }
+}
 
 function isColVisible(column: Column) {
   return !column.isTogglable || togglableColumns[column.colKey];
@@ -230,10 +251,6 @@ function toggleAllRows(cond: boolean) {
 
   data.value.forEach((d) => selection.value.add(d[rowKey.value]));
   emit("update:selection", selection.value);
-}
-
-function onRowClick(row) {
-  if (emitRowClick.value) emit("row-click", row[rowKey.value]);
 }
 </script>
 

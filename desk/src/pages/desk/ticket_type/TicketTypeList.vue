@@ -17,16 +17,17 @@
       :data="ticketTypes.list?.data || []"
       :empty-message="emptyMessage"
       row-key="name"
-      :emit-row-click="true"
       :hide-checkbox="true"
       :hide-column-selector="true"
-      @row-click="gotoTeam"
+      :row-click="{
+        type: 'link',
+        fn: toType,
+      }"
     />
     <ListNavigation class="p-3" v-bind="ticketTypes" />
   </div>
 </template>
 <script setup lang="ts">
-import { useRouter } from "vue-router";
 import {
   AGENT_PORTAL_TICKET_TYPE_NEW,
   AGENT_PORTAL_TICKET_TYPE_SINGLE,
@@ -37,7 +38,6 @@ import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const router = useRouter();
 const emptyMessage = "No Ticket Types Found";
 const columns = [
   {
@@ -58,12 +58,12 @@ const ticketTypes = createListManager({
   auto: true,
 });
 
-function gotoTeam(id: string) {
-  router.push({
+function toType(id: string) {
+  return {
     name: AGENT_PORTAL_TICKET_TYPE_SINGLE,
     params: {
       id,
     },
-  });
+  };
 }
 </script>

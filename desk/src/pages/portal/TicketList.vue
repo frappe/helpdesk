@@ -38,10 +38,12 @@
         :columns="columns"
         :data="tickets.list?.data"
         row-key="name"
-        :emit-row-click="true"
         :hide-checkbox="true"
         :hide-column-selector="true"
-        @row-click="(ticketId) => handleRowClick(ticketId)"
+        :row-click="{
+          type: 'link',
+          fn: toTicket,
+        }"
       >
         <template #subject="{ data }">
           <div
@@ -160,8 +162,13 @@ function filter(title: string, filters: Record<string, any>) {
   dropdownTitle.value = title;
 }
 
-function handleRowClick(ticketId: number) {
-  router.push({ name: CUSTOMER_PORTAL_TICKET, params: { ticketId } });
+function toTicket(ticketId: number) {
+  return {
+    name: CUSTOMER_PORTAL_TICKET,
+    params: {
+      ticketId,
+    },
+  };
 }
 
 function transformStatus(status: string) {
