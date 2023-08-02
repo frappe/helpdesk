@@ -1,32 +1,24 @@
 <template>
-  <div class="px-9 py-4 pb-8 text-base text-gray-700">
+  <div class="pb-8 text-base text-gray-700">
     <div class="flex flex-col gap-4">
-      <div class="flex items-center gap-2 pt-4">
-        <RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
-          <IconCaretLeft class="h-4 w-4 cursor-pointer text-gray-700" />
-        </RouterLink>
-        <div class="text-xl font-medium text-gray-900">New Ticket</div>
-      </div>
+      <TopBar title="New ticket" :back-to="{ name: CUSTOMER_PORTAL_LANDING }" />
       <div
-        v-if="template.doc?.about"
-        class="prose prose-sm max-w-full"
-        v-html="sanitize(template.doc?.about)"
+        v-if="template.data?.about"
+        class="prose prose-sm mx-9 max-w-full"
+        v-html="sanitize(template.data.about)"
       />
-      <div class="grid grid-cols-3 gap-4">
+      <div class="mx-9 grid grid-cols-3 gap-4">
         <div
-          v-for="field in visibleCustomFields"
-          :key="field.label"
+          v-for="field in visibleFields"
+          :key="field.fieldname"
           class="space-y-2"
         >
           <div class="text-xs">{{ field.label }}</div>
-          <div
-            v-if="
-              field.fieldtype === 'Link' &&
-              field.fetch_options_from == 'DocType'
-            "
-          >
-            <SearchComplete
-              :doctype="field.doc_type"
+          <div v-if="field.url_method">
+            <Autocomplete
+              placeholder="Select an option"
+              :options="serverScriptOptions[field.fieldname]"
+              :value="customFields[field.fieldname]"
               @change="(v) => (customFields[field.fieldname] = v.value)"
             />
           </div>
@@ -44,19 +36,19 @@
               @change="(v) => (customFields[field.fieldname] = v.value)"
             />
           </div>
-          <div v-else-if="field.fetch_options_from === 'API'">
-            <Autocomplete
-              placeholder="Select an option"
-              :options="serverScriptOptions[field.fieldname]"
+          <div v-else-if="field.fieldtype === 'Data'">
+            <FormControl
+              type="text"
+              placeholder="Type something"
               :value="customFields[field.fieldname]"
-              @change="(v) => (customFields[field.fieldname] = v.value)"
+              @input="(v) => (customFields[field.fieldname] = v.value)"
             />
           </div>
         </div>
       </div>
       <div
         v-if="!isEmpty(articles.data)"
-        class="flex flex-col gap-4 rounded-lg border bg-yellow-50 p-4"
+        class="mx-9 flex flex-col gap-4 rounded-lg border bg-yellow-50 p-4"
       >
         <div class="font-medium">
           📚 Did you know? These articles might cover what you looking for!
@@ -72,32 +64,37 @@
           <div class="opacity-0 group-hover:opacity-100">&rightarrow;</div>
         </RouterLink>
       </div>
-      <Input
-        v-model="subject"
-        label="Subject"
-        placeholder="A short description"
-        @input="(v) => searchArticles(v)"
-      />
-      <TextEditor
-        ref="textEditor"
-        placeholder="Detailed explanation"
-        :content="description"
-        @change="(v) => (description = v)"
-      >
-        <template #bottom="{ editor }">
-          <TextEditorBottom v-model:attachments="attachments" :editor="editor">
-            <template #actions-right>
-              <Button
-                label="Create"
-                :disabled="isDisabled"
-                theme="gray"
-                variant="solid"
-                @click="create"
-              />
-            </template>
-          </TextEditorBottom>
-        </template>
-      </TextEditor>
+      <div class="mx-9 space-y-2">
+        <Input
+          v-model="subject"
+          label="Subject"
+          placeholder="A short description"
+          @input="(v) => searchArticles(v)"
+        />
+        <TextEditor
+          ref="textEditor"
+          placeholder="Detailed explanation"
+          :content="description"
+          @change="(v) => (description = v)"
+        >
+          <template #bottom="{ editor }">
+            <TextEditorBottom
+              v-model:attachments="attachments"
+              :editor="editor"
+            >
+              <template #actions-right>
+                <Button
+                  label="Create"
+                  :disabled="isDisabled"
+                  theme="gray"
+                  variant="solid"
+                  @click="create"
+                />
+              </template>
+            </TextEditorBottom>
+          </template>
+        </TextEditor>
+      </div>
     </div>
   </div>
 </template>
@@ -107,13 +104,11 @@ import { ref, onUnmounted, computed, reactive, onMounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import {
   createResource,
-  createDocumentResource,
   createListResource,
   debounce,
   Autocomplete,
   Button,
   Input,
-  call,
 } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
@@ -127,7 +122,7 @@ import { createToast } from "@/utils/toasts";
 import SearchComplete from "@/components/SearchComplete.vue";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
-import IconCaretLeft from "~icons/ph/caret-left";
+import TopBar from "@/components/TopBar.vue";
 
 const props = defineProps({
   templateId: {
@@ -145,11 +140,13 @@ const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const customFields = reactive({});
+const serverScriptOptions = reactive({});
 
-const template = createDocumentResource({
-  doctype: "HD Ticket Template",
-  name: props.templateId,
-  fields: ["about", "fields"],
+const template = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
+  makeParams: () => ({
+    name: props.templateId,
+  }),
   auto: true,
   onSuccess: fetchOptionsFromServerScript,
 });
@@ -161,14 +158,14 @@ const articles = createListResource({
   debounce: 500,
 });
 
-const visibleCustomFields = computed(() =>
-  template.doc?.fields?.filter((f) => !f.hide_from_customer)
+const visibleFields = computed(() =>
+  template.data?.fields.filter((f) => !f.hide_from_customer)
 );
 const r = createResource({
   url: "helpdesk.api.ticket.create_new",
   validate(params) {
-    for (const field of visibleCustomFields.value || []) {
-      if (field.reqd && isEmpty(params.values[field.fieldname])) {
+    for (const field of visibleFields.value || []) {
+      if (field.required && isEmpty(params.values[field.fieldname])) {
         return `${field.label} is required`;
       }
     }
@@ -253,16 +250,19 @@ function searchArticles(term: string) {
   articles.reload();
 }
 
-const serverScriptOptions = reactive({});
 function fetchOptionsFromServerScript() {
-  visibleCustomFields.value.forEach((field) => {
-    if (field.fetch_options_from === "API") {
-      call(field.api_method).then((data) => {
-        const options = data.map((o) => ({
-          label: o,
-          value: o,
-        }));
-        serverScriptOptions[field.fieldname] = options;
+  visibleFields.value.forEach((field) => {
+    if (field.url_method) {
+      createResource({
+        url: field.url_method,
+        auto: true,
+        onSuccess: (data) => {
+          const options = data.map((o) => ({
+            label: o,
+            value: o,
+          }));
+          serverScriptOptions[field.fieldname] = options;
+        },
       });
     }
   });

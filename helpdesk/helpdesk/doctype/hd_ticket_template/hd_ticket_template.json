@@ -28,13 +28,13 @@
   {
    "fieldname": "fields",
    "fieldtype": "Table",
-   "label": "Custom Fields",
-   "options": "HD Ticket Template DocField"
+   "label": "Fields",
+   "options": "HD Ticket Template Field"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-29 13:36:40.231397",
+ "modified": "2023-08-02 15:56:25.602767",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",
@@ -54,16 +54,29 @@
    "write": 1
   },
   {
+   "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Guest",
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
    "share": 1
   }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "template_name"
 }
