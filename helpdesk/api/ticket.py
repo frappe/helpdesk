@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import frappe
 from frappe.website.utils import cleanup_page_name
 
@@ -37,6 +39,12 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 			continue
 		if field.reqd and field.fieldname not in values:
 			frappe.throw(f"Field {field.label} is required")
+
+		route = None
+		legacy_route_template = f"/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}"
+		with suppress(Exception):
+			route = frappe.safe_eval(field.dynamic_route, None, {"value": values[field.fieldname]})
+
 		ticket_doc.append(
 			"custom_fields",
 			{
@@ -44,9 +52,7 @@ def create_new(values, template="Default", attachments=[], via_customer_portal=F
 				"fieldname": field.fieldname,
 				"value": values[field.fieldname],
 				"hide_from_customer": field.hide_from_customer,
-				"route": f"/app/{cleanup_page_name(field.options)}/{values[field.fieldname]}"
-				if field.fieldtype == "Link"
-				else "",
+				"route": route or legacy_route_template,
 			},
 		)
 

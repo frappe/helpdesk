@@ -16,7 +16,8 @@
   "fetch_options_from",
   "doc_type",
   "api_method",
-  "options"
+  "options",
+  "dynamic_route"
  ],
  "fields": [
   {
@@ -33,7 +34,7 @@
   },
   {
    "columns": 2,
-   "depends_on": "eval: !fetch_options_from",
+   "depends_on": "eval: !doc.fetch_options_from",
    "fieldname": "options",
    "fieldtype": "Small Text",
    "in_list_view": 1,
@@ -85,11 +86,17 @@
    "fieldname": "hide_from_customer",
    "fieldtype": "Check",
    "label": "Hide from Customer"
+  },
+  {
+   "fieldname": "dynamic_route",
+   "fieldtype": "Code",
+   "label": "Dynamic Route",
+   "options": "Python"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2023-07-29 14:16:41.012924",
+ "modified": "2023-08-02 13:44:05.362789",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template DocField",

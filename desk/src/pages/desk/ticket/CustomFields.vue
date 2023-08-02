@@ -69,7 +69,7 @@ const template = createDocumentResource({
     fetchOptionsFromServerScript();
   },
 });
-const customFieldMeta = computed(() => template.doc?.fields || []);
+const customFieldMeta = computed(() => template?.doc?.fields || []);
 const fieldValues = computed(() => {
   const values = {};
   props.values.forEach((v) => {
