@@ -71,12 +71,12 @@ const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
 
 const widthExpanded = {
-  "min-width": "224px",
-  "max-width": "224px",
+  "min-width": "256px",
+  "max-width": "256px",
 };
 const widthMinimised = {
-  "min-width": "52px",
-  "max-width": "52px",
+  "min-width": "58px",
+  "max-width": "58px",
 };
 const menuOptions = computed(() => [
   {
