@@ -2,7 +2,7 @@
   <HelpdeskTable
     v-model:selection="selection"
     :columns="columns"
-    :data="tickets.list.data"
+    :data="tickets"
     :emit-row-click="true"
     :empty-message="emptyMessage"
     row-key="name"
@@ -63,7 +63,7 @@
             variant="ghost"
           >
             <template #prefix>
-              <IconPlusCircle class="h-4 w-4" />
+              <Icon icon="lucide:plus-circle" class="h-4 w-4" />
             </template>
           </Button>
         </template>
@@ -73,25 +73,32 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { createResource, Badge, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
+import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils/toasts";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
-import { useTicketListStore } from "./data";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
-import IconPlusCircle from "~icons/lucide/plus-circle";
 
+interface P {
+  tickets?: any[];
+}
+
+withDefaults(defineProps<P>(), {
+  tickets: () => [],
+});
 const router = useRouter();
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
-const { selection, tickets } = useTicketListStore();
+const selection = ref(new Set<string>());
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 const dateFormat = "D/M/YYYY h:mm A";

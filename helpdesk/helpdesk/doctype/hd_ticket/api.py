@@ -3,11 +3,12 @@ from frappe import _
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
-from helpdesk.utils import get_customer, is_agent
+from helpdesk.utils import get_customer, is_agent, check_permissions
 
 
 @frappe.whitelist()
 def get_one(name):
+	check_permissions("HD Ticket", None)
 	QBActivity = frappe.qb.DocType("HD Ticket Activity")
 	QBComment = frappe.qb.DocType("HD Ticket Comment")
 	QBCommunication = frappe.qb.DocType("Communication")
@@ -38,15 +39,16 @@ def get_one(name):
 			QBTicket.template,
 		)
 		.where(QBTicket.name == name)
+		.limit(1)
 	)
 
 	if not _is_agent:
 		query = query.where(get_customer_criteria())
 
-	try:
-		ticket = query.run(as_dict=True)[0]
-	except Exception:
+	ticket = query.run(as_dict=True)
+	if not len(ticket):
 		frappe.throw(_("Ticket not found"), frappe.DoesNotExistError)
+	ticket = ticket.pop()
 
 	contact = (
 		frappe.qb.from_(QBContact)
@@ -117,7 +119,12 @@ def get_one(name):
 	)
 	custom_fields = (
 		frappe.qb.from_(QBCustomField)
-		.select(QBCustomField.fieldname, QBCustomField.label, QBCustomField.value, QBCustomField.route)
+		.select(
+			QBCustomField.fieldname,
+			QBCustomField.label,
+			QBCustomField.value,
+			QBCustomField.route,
+		)
 		.where(QBCustomField.parent == name)
 		.where(QBCustomField.parentfield == "custom_fields")
 		.where(QBCustomField.parenttype == "HD Ticket")
@@ -160,11 +167,12 @@ def get_attachments(doctype, name):
 		.run(as_dict=True)
 	)
 
+
 @frappe.whitelist()
 def update_custom_field(ticket_name, fieldname, value):
 	frappe.db.set_value(
 		"HD Ticket Custom Field",
-		{ "parent": ticket_name, "fieldname": fieldname },
+		{"parent": ticket_name, "fieldname": fieldname},
 		"value",
-		value
+		value,
 	)

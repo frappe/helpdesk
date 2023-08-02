@@ -1,8 +1,5 @@
 import frappe
 from frappe.desk.form.assign_to import add as add_assign
-from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
-	create_communication_via_contact,
-)
 
 AUTHOR_EMAIl = "sabu@frappe.io"
 AUTHOR_NAME = "Sabu Siyad"
@@ -41,8 +38,7 @@ def create_ticket():
 	d.contact = AUTHOR_NAME
 	d.via_customer_portal = True
 	d.insert()
-
-	create_communication_via_contact(d.name, d.description)
+	d.create_communication_via_contact(d.description)
 	add_assign(
 		{
 			"doctype": "HD Ticket",

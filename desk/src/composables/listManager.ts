@@ -1,7 +1,5 @@
 import { ref, watch } from "vue";
-import { useRoute } from "vue-router";
 import { createListResource, createResource } from "frappe-ui";
-import { useListFilters } from "./listFilters";
 
 const GET_LIST_METHOD = "helpdesk.extends.client.get_list";
 const GET_LIST_META_METHOD = "helpdesk.extends.client.get_list_meta";
@@ -15,6 +13,7 @@ type ListOptions = {
   start?: number;
   cache?: boolean | string | Array<string>;
   auto?: boolean;
+  realtime?: boolean;
 };
 
 type MetaData = {
@@ -28,8 +27,6 @@ type MetaData = {
 };
 
 export function createListManager(options: ListOptions) {
-  const route = useRoute();
-
   const doctype = options.doctype;
   const fields = options.fields;
   const filters = options.filters;
@@ -38,7 +35,7 @@ export function createListManager(options: ListOptions) {
   const start = options.start;
   const cache = options.cache;
   const auto = options.auto;
-  const filterManager = useListFilters();
+  const realtime = options.realtime;
 
   const list = createListResource({
     type: "list",
@@ -50,6 +47,8 @@ export function createListManager(options: ListOptions) {
     pageLength,
     start,
     cache,
+    realtime,
+    auto,
     onSuccess() {
       meta.submit({
         doctype,
@@ -83,21 +82,6 @@ export function createListManager(options: ListOptions) {
       list.endAt = data.end_at;
     },
   });
-
-  if (auto) {
-    watch(
-      route,
-      () => {
-        list.filters = {
-          ...filters,
-          ...filterManager.queryFilters(),
-        };
-        list.orderBy = filterManager.queryOrderBy();
-        list.reload();
-      },
-      { immediate: true }
-    );
-  }
 
   watch(
     () => list.list.loading,
