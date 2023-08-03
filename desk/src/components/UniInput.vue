@@ -9,7 +9,6 @@
       :placeholder="placeholder"
       :value="value"
       @change="emitUpdate(field.fieldname, $event.value)"
-      @input="emitUpdate(field.fieldname, $event.value)"
     />
   </div>
 </template>
