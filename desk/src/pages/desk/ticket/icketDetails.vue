@@ -69,21 +69,16 @@
           @change="update(o.field, $event.value)"
         />
       </div>
-      <UniInput
-        v-for="field in data.template.fields"
-        :key="field.fieldname"
-        :field="field"
-        :value="data[field.fieldname]"
-        @change="update(field.fieldname, $event.value)"
+      <CustomFields
+        :template="data.template"
+        :values="data.custom_fields"
+        @change="updateCustomField"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { Autocomplete, Button, createResource, call } from "frappe-ui";
-import dayjs from "dayjs";
 import { emitter } from "@/emitter";
 import { useAgentStore } from "@/stores/agent";
 import { useTeamStore } from "@/stores/team";
@@ -92,7 +87,10 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils/toasts";
-import UniInput from "@/components/UniInput.vue";
+import dayjs from "dayjs";
+import { Autocomplete, Button, createResource, call } from "frappe-ui";
+import { computed } from "vue";
+import CustomFields from "./CustomFields.vue";
 import { useTicket, useTicketStore } from "./data";
 
 const dateFormat = "MMM D, h:mm A";

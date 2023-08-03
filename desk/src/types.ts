@@ -66,12 +66,11 @@ export interface Ticket {
   subject: string;
   ticket_type: string;
   via_customer_portal: string;
-  template: string;
   contact: Contact;
   comments: Comment[];
   communications: Communication[];
   history: Activity[];
-  custom_fields: CustomField[];
+  template: Template;
   views: ViewLog[];
 }
 
@@ -88,4 +87,21 @@ export interface Filter {
   fieldname: string;
   operator: string;
   value: boolean | number | string;
+}
+
+export interface Field {
+  fieldname: string;
+  fieldtype: string;
+  hide_from_customer: 0 | 1;
+  label: string;
+  options: string;
+  required: 0 | 1;
+  description?: null;
+  documentation_url?: null;
+  url_method?: string;
+}
+
+export interface Template {
+  about: string;
+  fields: Field[];
 }

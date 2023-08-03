@@ -1,0 +1,83 @@
+<template>
+  <div class="space-y-2">
+    <div class="text-xs text-gray-600">
+      {{ field.label }}
+      <span v-if="field.required" class="text-red-500">*</span>
+    </div>
+    <component
+      :is="component"
+      :doctype="field.options"
+      :options="options"
+      :placeholder="placeholder"
+      :value="value"
+      @change="emitUpdate(field.fieldname, $event.value)"
+      @input="emitUpdate(field.fieldname, $event.value)"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { createResource, Autocomplete, FormControl } from "frappe-ui";
+import { Field } from "@/types";
+import SearchComplete from "./SearchComplete.vue";
+
+type Value = string | number | boolean;
+
+interface P {
+  field: Field;
+  value: Value;
+}
+
+interface R {
+  fieldname: Field["fieldname"];
+  value: Value;
+}
+
+interface E {
+  (event: "change", value: R);
+}
+
+const props = defineProps<P>();
+const emit = defineEmits<E>();
+
+const component = computed(() => {
+  if (props.field.url_method) {
+    return Autocomplete;
+  } else if (props.field.fieldtype === "Link" && props.field.options) {
+    return SearchComplete;
+  } else if (props.field.fieldtype === "Select") {
+    return Autocomplete;
+  } else {
+    return FormControl;
+  }
+});
+
+const apiOptions = createResource({
+  url: props.field.url_method,
+  auto: !!props.field.url_method,
+  transform: (data) =>
+    data.map((o) => ({
+      label: o,
+      value: o,
+    })),
+});
+
+const placeholder = computed(() => {
+  if (props.field.fieldtype === "Data") {
+    return "Type something";
+  }
+  return "Select an option";
+});
+
+const options = computed(() => {
+  if (props.field.url_method) {
+    return apiOptions.data;
+  }
+  return props.field.options.split("\n").map((o) => ({ label: o, value: o }));
+});
+
+function emitUpdate(fieldname: Field["fieldname"], value: Value) {
+  emit("change", { fieldname, value });
+}
+</script>

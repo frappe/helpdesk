@@ -8,43 +8,13 @@
         v-html="sanitize(template.data.about)"
       />
       <div class="mx-9 grid grid-cols-3 gap-4">
-        <div
+        <UniInput
           v-for="field in visibleFields"
           :key="field.fieldname"
-          class="space-y-2"
-        >
-          <div class="text-xs">{{ field.label }}</div>
-          <div v-if="field.url_method">
-            <Autocomplete
-              placeholder="Select an option"
-              :options="serverScriptOptions[field.fieldname]"
-              :value="customFields[field.fieldname]"
-              @change="(v) => (customFields[field.fieldname] = v.value)"
-            />
-          </div>
-          <div v-else-if="field.fieldtype === 'Link' && field.options">
-            <SearchComplete
-              :doctype="field.options"
-              @change="(v) => (customFields[field.fieldname] = v.value)"
-            />
-          </div>
-          <div v-else-if="field.fieldtype === 'Select'">
-            <Autocomplete
-              placeholder="Select an option"
-              :options="selectOptions(field.options)"
-              :value="customFields[field.fieldname]"
-              @change="(v) => (customFields[field.fieldname] = v.value)"
-            />
-          </div>
-          <div v-else-if="field.fieldtype === 'Data'">
-            <FormControl
-              type="text"
-              placeholder="Type something"
-              :value="customFields[field.fieldname]"
-              @input="(v) => (customFields[field.fieldname] = v.value)"
-            />
-          </div>
-        </div>
+          :field="field"
+          :value="customFields[field.fieldname]"
+          @change="customFields[field.fieldname] = $event.value"
+        />
       </div>
       <div
         v-if="!isEmpty(articles.data)"
@@ -88,7 +58,7 @@
                   :disabled="isDisabled"
                   theme="gray"
                   variant="solid"
-                  @click="create"
+                  @click="newTicket.submit()"
                 />
               </template>
             </TextEditorBottom>
@@ -102,14 +72,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted, computed, reactive, onMounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import {
-  createResource,
-  createListResource,
-  debounce,
-  Autocomplete,
-  Button,
-  Input,
-} from "frappe-ui";
+import { createResource, createListResource, Button, Input } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import {
@@ -119,10 +82,10 @@ import {
 } from "@/router";
 import { useConfigStore } from "@/stores/config";
 import { createToast } from "@/utils/toasts";
-import SearchComplete from "@/components/SearchComplete.vue";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import TopBar from "@/components/TopBar.vue";
+import UniInput from "@/components/UniInput.vue";
 
 const props = defineProps({
   templateId: {
@@ -140,7 +103,6 @@ const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const customFields = reactive({});
-const serverScriptOptions = reactive({});
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -148,7 +110,6 @@ const template = createResource({
     name: props.templateId,
   }),
   auto: true,
-  onSuccess: fetchOptionsFromServerScript,
 });
 
 const articles = createListResource({
@@ -161,17 +122,26 @@ const articles = createListResource({
 const visibleFields = computed(() =>
   template.data?.fields.filter((f) => !f.hide_from_customer)
 );
-const r = createResource({
-  url: "helpdesk.api.ticket.create_new",
+const newTicket = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
+  debounce: 300,
+  makeParams: () => ({
+    doc: {
+      description: description.value,
+      subject: subject.value,
+      template: props.templateId,
+      ...customFields,
+    },
+    attachments: attachments.value,
+  }),
   validate(params) {
-    for (const field of visibleFields.value || []) {
-      if (field.required && isEmpty(params.values[field.fieldname])) {
-        return `${field.label} is required`;
+    const fields = visibleFields.value.filter((f) => f.required);
+    const toVerify = [...fields, "subject", "description"];
+    for (const field of toVerify) {
+      if (isEmpty(params.doc[field.fieldname || field])) {
+        return `${field.label || field} is required`;
       }
     }
-
-    if (isEmpty(params.values.subject)) return "Subject is required";
-    if (isEmpty(params.values.description)) return "Description is required";
   },
   onError(error) {
     const title = error.message ? error.message : error.messages?.join("\n");
@@ -192,24 +162,11 @@ const r = createResource({
   },
 });
 
-const create = debounce(() => {
-  const values = {
-    subject: subject.value,
-    description: description.value,
-  };
-
-  Object.assign(values, customFields);
-
-  r.submit({
-    values,
-    template: props.templateId,
-    attachments: attachments.value,
-    via_customer_portal: true,
-  });
-}, 500);
-
 const isDisabled = computed(
-  () => r.loading || isEmpty(subject.value) || textEditor.value?.editor.isEmpty
+  () =>
+    newTicket.loading ||
+    isEmpty(subject.value) ||
+    textEditor.value?.editor.isEmpty
 );
 
 function sanitize(html: string) {
@@ -228,13 +185,6 @@ function getArticleLink(name: string, title: string) {
   };
 }
 
-function selectOptions(options: string) {
-  return options.split("\n").map((o) => ({
-    label: o,
-    value: o,
-  }));
-}
-
 function searchArticles(term: string) {
   if (term.length < 5) {
     delete articles.data;
@@ -248,24 +198,6 @@ function searchArticles(term: string) {
   });
 
   articles.reload();
-}
-
-function fetchOptionsFromServerScript() {
-  visibleFields.value.forEach((field) => {
-    if (field.url_method) {
-      createResource({
-        url: field.url_method,
-        auto: true,
-        onSuccess: (data) => {
-          const options = data.map((o) => ({
-            label: o,
-            value: o,
-          }));
-          serverScriptOptions[field.fieldname] = options;
-        },
-      });
-    }
-  });
 }
 
 onMounted(() => configStore.setTitle("New ticket"));
