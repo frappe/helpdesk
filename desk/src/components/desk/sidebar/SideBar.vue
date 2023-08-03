@@ -1,9 +1,9 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 px-3 py-2 text-base transition-all duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base transition-all duration-300 ease-in-out"
     :style="sidebarStore.isExpanded ? widthExpanded : widthMinimised"
   >
-    <UserMenu class="pb-2" :options="profileSettings" />
+    <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
     <div class="flex flex-col gap-1">
       <SidebarLink
         v-for="option in menuOptions"
@@ -71,12 +71,12 @@ const keymapStore = useKeymapStore();
 const sidebarStore = useSidebarStore();
 
 const widthExpanded = {
-  "min-width": "224px",
-  "max-width": "224px",
+  "min-width": "256px",
+  "max-width": "256px",
 };
 const widthMinimised = {
-  "min-width": "52px",
-  "max-width": "52px",
+  "min-width": "50px",
+  "max-width": "50px",
 };
 const menuOptions = computed(() => [
   {

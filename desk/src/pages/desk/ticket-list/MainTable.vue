@@ -208,6 +208,6 @@ function toTicket(ticketId: string) {
 
 <style scoped>
 :deep(.col-subject) {
-  width: 480px;
+  width: 450px;
 }
 </style>

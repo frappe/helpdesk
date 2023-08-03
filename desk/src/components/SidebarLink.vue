@@ -1,18 +1,18 @@
 <template>
   <div
-    class="flex h-7 cursor-pointer items-center rounded-lg pl-1.5 pr-1 text-gray-700 transition-all duration-300 ease-in-out"
+    class="flex h-7 cursor-pointer items-center rounded pl-2 pr-1 text-gray-800 transition-all duration-300 ease-in-out"
     :class="{
       'w-full': isExpanded,
-      'w-7': !isExpanded,
-      'bg-gray-200': isActive,
-      'hover:bg-gray-300': isActive,
+      'w-8': !isExpanded,
+      'shadow-sm': isActive,
+      'bg-white': isActive,
       'hover:bg-gray-100': !isActive,
     }"
     @click="handle"
   >
-    <component :is="icon" class="h-4 w-4 shrink-0"></component>
+    <component :is="icon" class="h-4 w-4 shrink-0 text-gray-700"></component>
     <div
-      class="ml-2 flex shrink-0 grow items-center justify-between text-base transition-all duration-300 ease-in-out"
+      class="ml-2 flex shrink-0 grow items-center justify-between text-sm transition-all duration-300 ease-in-out"
       :class="{
         'opacity-100': isExpanded,
         'opacity-0': !isExpanded,

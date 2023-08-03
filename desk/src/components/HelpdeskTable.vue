@@ -26,7 +26,7 @@
           />
           <div
             v-for="column in columns"
-            :key="column.title"
+            :key="column.colKey"
             :class="isColVisible(column) ? column.colClass : ''"
           >
             <div v-if="isColVisible(column)">

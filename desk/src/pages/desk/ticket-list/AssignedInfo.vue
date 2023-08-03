@@ -19,7 +19,11 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 const assign = toRef(props, "assign");
-const assignJson = computed(() => JSON.parse(assign.value));
+const assignJson = computed(() => {
+  const parsed = JSON.parse(assign.value);
+  const arr = Array.isArray(parsed) ? parsed : [];
+  return arr;
+});
 const agent = computed(() => [...assignJson.value].pop());
 const user = computed(() => userStore.getUser(agent.value));
 const userImage = computed(() => user.value?.user_image);

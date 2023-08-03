@@ -1,18 +1,16 @@
 <template>
   <div class="space-y-2">
     <div class="flex justify-between">
-      <div class="flex flex-wrap items-center gap-2">
-        <Dropdown :options="sortOptions">
-          <template #default>
-            <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
-              <template #prefix>
-                <IconSort class="h-3 w-3" />
-              </template>
-            </Button>
-          </template>
-        </Dropdown>
-        <FieldFilter doctype="HD Ticket" :append-assign="true" />
-      </div>
+      <FieldFilter doctype="HD Ticket" :append-assign="true" />
+      <Dropdown :options="sortOptions">
+        <template #default>
+          <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
+            <template #prefix>
+              <IconSort class="h-3 w-3" />
+            </template>
+          </Button>
+        </template>
+      </Dropdown>
     </div>
   </div>
 </template>
