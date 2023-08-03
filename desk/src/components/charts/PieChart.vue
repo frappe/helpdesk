@@ -19,7 +19,7 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart from "vue-echarts";
-import { min, max, sortBy } from "lodash";
+import { sortBy } from "lodash";
 import { theme } from "./theme";
 
 type InputData = {
@@ -39,11 +39,6 @@ const props = defineProps({
 });
 
 const { title, data } = toRefs(props);
-
-const values = data.value.map((d) => d.value);
-const minValue = min(values);
-const maxValue = max(values);
-const roseType = maxValue < 4 * minValue ? "area" : false;
 
 use([SVGRenderer, PieChart, TitleComponent, TooltipComponent, LegendComponent]);
 
@@ -67,7 +62,6 @@ const options = ref({
     trigger: "item",
     formatter: "{c} ({d}%)",
   },
-  roseType,
   labelLine: {
     smooth: 0.2,
     length: 10,
