@@ -97,7 +97,6 @@ export interface Field {
   options: string;
   required: 0 | 1;
   description?: null;
-  documentation_url?: null;
   url_method?: string;
 }
 

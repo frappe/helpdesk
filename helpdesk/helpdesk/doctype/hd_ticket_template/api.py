@@ -15,7 +15,7 @@ def get_one(name: str):
 	if not found:
 		frappe.throw(_("Template not found"), frappe.DoesNotExistError)
 	QBField = frappe.qb.DocType(DOCTYPE_TEMPLATE_FIELD)
-	QBDocField = frappe.qb.DocType("DocField")
+	QBDocField = frappe.qb.DocType("Custom Field")
 	fields = (
 		frappe.qb.from_(QBField)
 		.select(QBField.star)
@@ -27,7 +27,6 @@ def get_one(name: str):
 		frappe.qb.from_(fields)
 		.select(
 			QBDocField.description,
-			QBDocField.documentation_url,
 			QBDocField.fieldtype,
 			QBDocField.label,
 			QBDocField.options,
@@ -38,7 +37,7 @@ def get_one(name: str):
 		)
 		.join(QBDocField, JoinType.inner)
 		.on(QBDocField.fieldname == fields.fieldname)
-		.where(QBDocField.parent == "HD Ticket")
+		.where(QBDocField.dt == "HD Ticket")
 		.run(as_dict=True)
 	)
 
