@@ -19,5 +19,5 @@ class HDTicketTemplate(Document):
 				{"doctype": "Custom Field", "fieldname": f.fieldname, "dt": "HD Ticket"}
 			)
 			if not docfield_exits and not custom_field_exists:
-				text = _(f"Field `{f.fieldname}` does not exist in Ticket")
+				text = _("Field `{0}` does not exist in Ticket").format(f.fieldname)
 				frappe.throw(text, frappe.DoesNotExistError)
