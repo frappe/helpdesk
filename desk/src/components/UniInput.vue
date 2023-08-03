@@ -6,8 +6,6 @@
     </div>
     <component
       :is="component"
-      :doctype="field.options"
-      :options="options"
       :placeholder="placeholder"
       :value="value"
       @change="emitUpdate(field.fieldname, $event.value)"
@@ -17,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, h } from "vue";
 import { createResource, Autocomplete, FormControl } from "frappe-ui";
 import { Field } from "@/types";
 import SearchComplete from "./SearchComplete.vue";
@@ -43,11 +41,19 @@ const emit = defineEmits<E>();
 
 const component = computed(() => {
   if (props.field.url_method) {
-    return Autocomplete;
+    return h(Autocomplete, {
+      options: apiOptions.data,
+    });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    return SearchComplete;
+    return h(SearchComplete, {
+      doctype: props.field.options,
+    });
   } else if (props.field.fieldtype === "Select") {
-    return Autocomplete;
+    return h(Autocomplete, {
+      options: props.field.options
+        .split("\n")
+        .map((o) => ({ label: o, value: o })),
+    });
   } else {
     return FormControl;
   }
@@ -68,13 +74,6 @@ const placeholder = computed(() => {
     return "Type something";
   }
   return "Select an option";
-});
-
-const options = computed(() => {
-  if (props.field.url_method) {
-    return apiOptions.data;
-  }
-  return props.field.options.split("\n").map((o) => ({ label: o, value: o }));
 });
 
 function emitUpdate(fieldname: Field["fieldname"], value: Value) {
