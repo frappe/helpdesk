@@ -29,7 +29,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
-from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
+from helpdesk.utils import capture_event, get_customer, is_agent, publish_event,is_admin
 
 
 class HDTicket(Document):
@@ -75,7 +75,7 @@ class HDTicket(Document):
 				QBTicket.customer == customer,
 				QBTicket.raised_by == user,
 			]
-			if not is_agent()
+			if not is_agent() and not is_admin()
 			else []
 		)
 		query = query.where(Criterion.any(conditions))

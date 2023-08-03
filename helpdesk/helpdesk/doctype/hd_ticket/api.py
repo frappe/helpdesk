@@ -3,7 +3,7 @@ from frappe import _
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
-from helpdesk.utils import get_customer, is_agent, check_permissions
+from helpdesk.utils import get_customer, is_agent, check_permissions,is_admin
 
 
 @frappe.whitelist()
@@ -18,6 +18,7 @@ def get_one(name):
 	QBViewLog = frappe.qb.DocType("View Log")
 
 	_is_agent = is_agent()
+	_is_admin = is_admin()
 
 	query = (
 		frappe.qb.from_(QBTicket)
@@ -42,7 +43,7 @@ def get_one(name):
 		.limit(1)
 	)
 
-	if not _is_agent:
+	if not _is_agent and not _is_admin:
 		query = query.where(get_customer_criteria())
 
 	ticket = query.run(as_dict=True)

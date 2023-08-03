@@ -89,3 +89,11 @@ def alphanumeric_to_int(s: str) -> int | None:
 		return
 
 	return int(s.group(0))
+
+def is_admin() -> bool:
+    """
+    Check whether current user is an admin.
+
+    :return: Whether `user` is an admin
+    """
+    return frappe.session.user == "Administrator"
