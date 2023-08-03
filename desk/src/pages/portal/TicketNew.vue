@@ -1,9 +1,12 @@
 <template>
   <div class="pb-8 text-base text-gray-700">
     <div class="flex flex-col gap-4">
-      <TopBar title="New ticket" :back-to="{ name: CUSTOMER_PORTAL_LANDING }" />
+      <TopBar
+        title="New ticket"
+        :back-to="hideBackButton ? null : { name: CUSTOMER_PORTAL_LANDING }"
+      />
       <div
-        v-if="template.data?.about"
+        v-if="!hideAbout && template.data?.about"
         class="prose prose-sm mx-9 max-w-full"
         v-html="sanitize(template.data.about)"
       />
@@ -12,8 +15,8 @@
           v-for="field in visibleFields"
           :key="field.fieldname"
           :field="field"
-          :value="customFields[field.fieldname]"
-          @change="customFields[field.fieldname] = $event.value"
+          :value="templateFields[field.fieldname]"
+          @change="templateFields[field.fieldname] = $event.value"
         />
       </div>
       <div
@@ -35,8 +38,9 @@
         </RouterLink>
       </div>
       <div class="mx-9 space-y-2">
-        <Input
+        <FormControl
           v-model="subject"
+          type="text"
           label="Subject"
           placeholder="A short description"
           @input="(v) => searchArticles(v)"
@@ -72,7 +76,12 @@
 <script setup lang="ts">
 import { ref, onUnmounted, computed, reactive, onMounted } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { createResource, createListResource, Button, Input } from "frappe-ui";
+import {
+  createResource,
+  createListResource,
+  Button,
+  FormControl,
+} from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import {
@@ -87,22 +96,26 @@ import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import TopBar from "@/components/TopBar.vue";
 import UniInput from "@/components/UniInput.vue";
 
-const props = defineProps({
-  templateId: {
-    type: String,
-    required: false,
-    default: "Default",
-  },
-});
+interface P {
+  templateId?: string;
+  hideBackButton?: boolean;
+  hideAbout?: boolean;
+  showHiddenFields?: boolean;
+}
 
+const props = withDefaults(defineProps<P>(), {
+  templateId: "Default",
+  hideBackButton: false,
+  hideAbout: false,
+  showHiddenFields: false,
+});
 const router = useRouter();
 const configStore = useConfigStore();
 const textEditor = ref();
-
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
-const customFields = reactive({});
+const templateFields = reactive({});
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -120,7 +133,9 @@ const articles = createListResource({
 });
 
 const visibleFields = computed(() =>
-  template.data?.fields.filter((f) => !f.hide_from_customer)
+  template.data?.fields.filter(
+    (f) => props.showHiddenFields || !f.hide_from_customer
+  )
 );
 const newTicket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
@@ -130,7 +145,7 @@ const newTicket = createResource({
       description: description.value,
       subject: subject.value,
       template: props.templateId,
-      ...customFields,
+      ...templateFields,
     },
     attachments: attachments.value,
   }),

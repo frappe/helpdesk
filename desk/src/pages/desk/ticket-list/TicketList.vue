@@ -20,21 +20,29 @@
     <TopSection class="mx-5 mb-3.5" />
     <MainTable :tickets="tickets.list?.data" class="grow" />
     <ListNavigation v-bind="tickets" class="p-2" />
-    <NewTicketDialog v-model="showNewDialog" @close="showNewDialog = false" />
+    <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
+      <template #body-main>
+        <TicketNew
+          :hide-back-button="true"
+          :hide-about="true"
+          :show-hidden-fields="true"
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Button } from "frappe-ui";
+import { Button, Dialog } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import TicketNew from "@/pages/portal/TicketNew.vue";
 import MainTable from "./MainTable.vue";
-import NewTicketDialog from "./NewTicketDialog.vue";
 import TopSection from "./TopSection.vue";
 import PresetFilters from "./PresetFilters.vue";
 
