@@ -10,7 +10,7 @@
     }"
     @click="handle"
   >
-    <component :is="icon" class="h-4 w-4 shrink-0"></component>
+    <component :is="icon" class="h-4 w-4 shrink-0 text-gray-700"></component>
     <div
       class="ml-2 flex shrink-0 grow items-center justify-between text-sm transition-all duration-300 ease-in-out"
       :class="{

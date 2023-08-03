@@ -1,9 +1,9 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 px-3 py-2 text-base transition-all duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base transition-all duration-300 ease-in-out"
     :style="sidebarStore.isExpanded ? widthExpanded : widthMinimised"
   >
-    <UserMenu class="pb-2" :options="profileSettings" />
+    <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
     <div class="flex flex-col gap-1">
       <SidebarLink
         v-for="option in menuOptions"
@@ -75,8 +75,8 @@ const widthExpanded = {
   "max-width": "256px",
 };
 const widthMinimised = {
-  "min-width": "58px",
-  "max-width": "58px",
+  "min-width": "50px",
+  "max-width": "50px",
 };
 const menuOptions = computed(() => [
   {
