@@ -109,25 +109,11 @@ def get_one(name):
 		.where(QBViewLog.reference_name == name)
 		.orderby(QBViewLog.creation, order=Order.desc)
 	)
-	# custom_fields = (
-	# 	frappe.qb.from_(QBCustomField)
-	# 	.select(
-	# 		QBCustomField.fieldname,
-	# 		QBCustomField.label,
-	# 		QBCustomField.value,
-	# 		QBCustomField.route,
-	# 	)
-	# 	.where(QBCustomField.parent == name)
-	# 	.where(QBCustomField.parentfield == "custom_fields")
-	# 	.where(QBCustomField.parenttype == "HD Ticket")
-	# 	.run(as_dict=True)
-	# )
 
 	return {
 		**ticket,
 		"communications": communications,
 		"contact": contact,
-		# "custom_fields": custom_fields,
 		"template": get_template(ticket.template) if ticket.template else None,
 		"comments": comments.run(as_dict=True) if _is_agent else [],
 		"history": history.run(as_dict=True) if _is_agent else [],
@@ -158,14 +144,4 @@ def get_attachments(doctype, name):
 		.where(QBFile.attached_to_doctype == doctype)
 		.where(QBFile.attached_to_name == name)
 		.run(as_dict=True)
-	)
-
-
-@frappe.whitelist()
-def update_custom_field(ticket_name, fieldname, value):
-	frappe.db.set_value(
-		"HD Ticket Custom Field",
-		{"parent": ticket_name, "fieldname": fieldname},
-		"value",
-		value,
 	)

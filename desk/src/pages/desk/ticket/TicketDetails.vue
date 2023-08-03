@@ -176,21 +176,6 @@ function update(fieldname: string, value: string) {
     },
   });
 }
-
-function updateCustomField({ fieldname, value }) {
-  call("helpdesk.helpdesk.doctype.hd_ticket.api.update_custom_field", {
-    ticket_name: data.value.name,
-    fieldname,
-    value,
-  }).then(() => {
-    emitter.emit("update:ticket");
-    createToast({
-      title: "Ticket updated",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
-  });
-}
 </script>
 
 <style scoped>
