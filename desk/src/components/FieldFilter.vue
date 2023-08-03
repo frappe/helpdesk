@@ -1,62 +1,64 @@
 <template>
-  <div
-    v-for="f in storage"
-    :key="f.field.fieldname"
-    class="flex items-center text-base"
-  >
-    <div class="rounded-l border-y border-l px-2 py-1.5 text-gray-800">
-      {{ f.field.label }}
-    </div>
-    <Dropdown :options="getOperators(f)">
-      <div class="cursor-pointer border-y px-2 py-1.5 text-gray-700">
-        {{ f.operator }}
-      </div>
-    </Dropdown>
-    <component :is="getValSelect(f)" class="border" />
+  <div class="flex flex-wrap items-center gap-2">
     <div
-      class="cursor-pointer rounded-r border-y border-r p-1.5 text-gray-800"
+      v-for="f in storage"
+      :key="f.field.fieldname"
+      class="flex items-center text-base"
+    >
+      <div class="rounded-l border-y border-l px-2 py-1.5 text-gray-800">
+        {{ f.field.label }}
+      </div>
+      <Dropdown :options="getOperators(f)">
+        <div class="cursor-pointer border-y px-2 py-1.5 text-gray-700">
+          {{ f.operator }}
+        </div>
+      </Dropdown>
+      <component :is="getValSelect(f)" class="border" />
+      <div
+        class="cursor-pointer rounded-r border-y border-r p-1.5 text-gray-800"
+        @click="
+          () => {
+            storage.delete(f);
+            apply();
+          }
+        "
+      >
+        <Icon icon="lucide:x" class="h-4 w-4" />
+      </div>
+    </div>
+    <Dropdown :options="optionsField">
+      <template #default>
+        <Button
+          :label="storage.size ? 'Add more' : 'Add filter'"
+          theme="gray"
+          variant="outline"
+        >
+          <template #prefix>
+            <Icon
+              :icon="storage.size ? 'lucide:plus' : 'lucide:list-filter'"
+              class="h-4 w-4"
+            />
+          </template>
+        </Button>
+      </template>
+    </Dropdown>
+    <Button
+      v-if="storage.size"
+      label="Clear"
+      theme="gray"
+      variant="outline"
       @click="
         () => {
-          storage.delete(f);
+          storage.clear();
           apply();
         }
       "
     >
-      <Icon icon="lucide:x" class="h-4 w-4" />
-    </div>
+      <template #prefix>
+        <Icon icon="lucide:x" class="h-4 w-4" />
+      </template>
+    </Button>
   </div>
-  <Dropdown :options="optionsField">
-    <template #default>
-      <Button
-        :label="storage.size ? 'Add more' : 'Add filter'"
-        theme="gray"
-        variant="outline"
-      >
-        <template #prefix>
-          <Icon
-            :icon="storage.size ? 'lucide:plus' : 'lucide:list-filter'"
-            class="h-4 w-4"
-          />
-        </template>
-      </Button>
-    </template>
-  </Dropdown>
-  <Button
-    v-if="storage.size"
-    label="Clear"
-    theme="gray"
-    variant="outline"
-    @click="
-      () => {
-        storage.clear();
-        apply();
-      }
-    "
-  >
-    <template #prefix>
-      <Icon icon="lucide:x" class="h-4 w-4" />
-    </template>
-  </Button>
 </template>
 
 <script setup lang="ts">
