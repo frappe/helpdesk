@@ -18,7 +18,7 @@
     <Dialog
       v-model="showDialog"
       :options="{
-        title: props.label,
+        title: label,
         size: '4xl',
       }"
     >
@@ -58,8 +58,10 @@ const isShowable = props.url && (isText || isImage);
 const content = ref("");
 
 function toggleDialog() {
-  if (isText)
+  if (!isShowable) return;
+  if (isText) {
     fetch(props.url).then((res) => res.text().then((t) => (content.value = t)));
-  if (isShowable) showDialog.value = !showDialog.value;
+  }
+  showDialog.value = !showDialog.value;
 }
 </script>
