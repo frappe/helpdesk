@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Autocomplete, Button, createResource, call } from "frappe-ui";
+import { createResource, Autocomplete, Button } from "frappe-ui";
 import dayjs from "dayjs";
 import { emitter } from "@/emitter";
 import { useAgentStore } from "@/stores/agent";
