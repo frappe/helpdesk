@@ -13,15 +13,14 @@
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-700"
     >
       <div
-        class="border-y border-gray-200 bg-white px-6 py-1.5 text-sm text-gray-600"
+        class="border-y border-gray-200 bg-white px-5 py-1.5 text-sm text-gray-600"
       >
-        <div class="flex w-full items-center gap-2 px-3">
-          <Input
+        <div class="flex w-full items-center gap-2">
+          <FormControl
             v-if="!hideCheckbox"
+            v-model="allSelected"
             type="checkbox"
-            input-class="cursor-pointer text-gray-900"
             class="mr-1"
-            :value="allSelected"
             @click="toggleAllRows"
           />
           <div
@@ -62,12 +61,11 @@
           </div>
         </div>
       </div>
-      <div class="divide-y overflow-y-auto px-6 text-base">
-        <component
-          :is="getRowClickComponent(row[rowKey])"
+      <div class="divide-y overflow-y-auto text-base">
+        <div
           v-for="row in data"
           :key="row[rowKey]"
-          class="group flex h-11 w-full items-center gap-2 px-3 py-2 transition"
+          class="group flex h-11 items-center py-2 transition"
           :class="{
             'bg-gray-200': selection.has(row[rowKey]),
             'hover:bg-gray-300': selection.has(row[rowKey]),
@@ -75,29 +73,39 @@
             'cursor-pointer': rowClick.type !== 'none',
           }"
         >
-          <Input
-            v-if="!hideCheckbox"
-            type="checkbox"
-            input-class="cursor-pointer text-gray-900"
-            class="mr-1"
-            :value="selection.has(row[rowKey])"
-            @click="toggleRow(row[rowKey])"
-          />
-          <div
-            v-for="column in columns"
-            :key="column.colKey"
-            :class="isColVisible(column) ? column.colClass : ''"
-          >
-            <slot v-if="isColVisible(column)" :name="column.colKey" :data="row">
-              <div class="line-clamp-1">
-                {{ row[column.colKey] || "—" }}
+          <div class="flex w-full items-center gap-2 px-5">
+            <FormControl
+              v-if="!hideCheckbox"
+              type="checkbox"
+              class="mr-1"
+              :model-value="selection.has(row[rowKey])"
+              @click="toggleRow(row[rowKey])"
+            />
+            <component
+              :is="getRowClickComponent(row[rowKey])"
+              class="flex w-full items-center gap-2"
+            >
+              <div
+                v-for="column in columns"
+                :key="column.colKey"
+                :class="isColVisible(column) ? column.colClass : ''"
+              >
+                <slot
+                  v-if="isColVisible(column)"
+                  :name="column.colKey"
+                  :data="row"
+                >
+                  <div class="line-clamp-1">
+                    {{ row[column.colKey] || "—" }}
+                  </div>
+                </slot>
               </div>
-            </slot>
+            </component>
+            <div v-if="slots['row-extra']" class="ml-auto">
+              <slot name="row-extra" :data="row" />
+            </div>
           </div>
-          <div v-if="slots['row-extra']" class="ml-auto">
-            <slot name="row-extra" :data="row" />
-          </div>
-        </component>
+        </div>
       </div>
     </div>
     <transition
@@ -117,11 +125,10 @@
         >
           <div class="w-64">
             <div class="inline-block align-middle">
-              <Input
+              <FormControl
                 type="checkbox"
-                :value="true"
+                :model-value="true"
                 :disabled="true"
-                input-class="text-gray-900"
               />
             </div>
             <div class="inline-block pl-2 align-middle text-gray-900">
@@ -154,7 +161,7 @@
 <script setup lang="ts">
 import { computed, h, reactive, toRefs, useSlots } from "vue";
 import { RouteLocationOptions, RouterLink } from "vue-router";
-import { FeatherIcon, Popover, Switch } from "frappe-ui";
+import { FeatherIcon, FormControl, Popover, Switch } from "frappe-ui";
 import { isEmpty } from "lodash";
 import IconAdd from "~icons/espresso/add";
 import EmptyMessage from "./EmptyMessage.vue";
