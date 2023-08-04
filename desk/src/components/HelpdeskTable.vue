@@ -35,10 +35,12 @@
           <div v-if="!hideColumnSelector" class="ml-auto">
             <Popover>
               <template #target="{ togglePopover }">
-                <IconAdd
-                  class="h-4 w-4 cursor-pointer"
-                  @click="togglePopover"
-                />
+                <div class="h-5 w-5">
+                  <IconAdd
+                    class="m-auto h-4 w-4 cursor-pointer"
+                    @click="togglePopover"
+                  />
+                </div>
               </template>
               <template #body-main>
                 <div
