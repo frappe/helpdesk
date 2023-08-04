@@ -1,22 +1,65 @@
 <template>
-  <Button :label="label" theme="gray" variant="outline">
-    <template #prefix>
-      <IconFile class="h-4 w-4 text-gray-700" />
-    </template>
-    <template #suffix>
-      <slot name="suffix" />
-    </template>
-  </Button>
+  <span>
+    <a :href="isShowable ? null : url" target="_blank">
+      <Button
+        :label="label"
+        theme="gray"
+        variant="outline"
+        @click="toggleDialog()"
+      >
+        <template #prefix>
+          <IconFile class="h-4 w-4 text-gray-700" />
+        </template>
+        <template #suffix>
+          <slot name="suffix" />
+        </template>
+      </Button>
+    </a>
+    <Dialog
+      v-model="showDialog"
+      :options="{
+        title: props.label,
+        size: '4xl',
+      }"
+    >
+      <template #body-content>
+        <div
+          v-if="isText"
+          class="prose prose-sm max-w-none whitespace-pre-wrap"
+        >
+          {{ content }}
+        </div>
+        <img v-if="isImage" :src="url" class="m-auto rounded border" />
+      </template>
+    </Dialog>
+  </span>
 </template>
 
 <script setup lang="ts">
-import { Button } from "frappe-ui";
+import { ref } from "vue";
+import { Button, Dialog } from "frappe-ui";
+import { getType as getMime } from "mime";
 import IconFile from "~icons/lucide/file";
 
-defineProps({
-  label: {
-    type: String,
-    required: true,
-  },
+interface P {
+  label: string;
+  url?: string;
+}
+
+const props = withDefaults(defineProps<P>(), {
+  url: null,
 });
+
+const showDialog = ref(false);
+const mimeType = getMime(props.label);
+const isText = mimeType === "text/plain";
+const isImage = mimeType.startsWith("image/");
+const isShowable = props.url && (isText || isImage);
+const content = ref("");
+
+function toggleDialog() {
+  if (isText)
+    fetch(props.url).then((res) => res.text().then((t) => (content.value = t)));
+  if (isShowable) showDialog.value = !showDialog.value;
+}
 </script>
