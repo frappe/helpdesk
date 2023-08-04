@@ -14,12 +14,10 @@
       <IconCaretUp v-if="isExpanded" class="h-4 w-4 text-gray-600" />
       <IconCaretDown v-else class="h-4 w-4 text-gray-600" />
     </div>
-    <div v-if="isExpanded" class="flex flex-col gap-2 pt-4">
+    <div v-if="isExpanded" class="flex flex-col gap-4 py-4">
       <div v-for="t in tickets" :key="t.name">
         <RouterLink :to="t.to" target="_blank" class="flex items-start gap-2">
-          <div class="flex h-5 w-5 items-center justify-center">
-            <IconWebLink class="h-5 w-5 text-gray-600" />
-          </div>
+          <IconWebLink class="h-4 w-4 text-gray-600" />
           <div class="text-base text-gray-800">{{ t.subject }}</div>
         </RouterLink>
       </div>
@@ -32,9 +30,9 @@ import { isEmpty } from "lodash";
 import { computed, ref } from "vue";
 import { createListResource } from "frappe-ui";
 import { AGENT_PORTAL_TICKET } from "@/router";
-import IconWebLink from "~icons/espresso/web-link";
 import IconCaretDown from "~icons/lucide/chevron-down";
 import IconCaretUp from "~icons/lucide/chevron-up";
+import IconWebLink from "~icons/lucide/external-link";
 import { useTicket } from "./data";
 
 class Ticket {

@@ -3,7 +3,17 @@ from frappe import _
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
-from helpdesk.utils import get_customer, is_agent, check_permissions
+from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
+from helpdesk.utils import check_permissions, get_customer, is_agent
+
+
+@frappe.whitelist()
+def new(doc, attachments=[]):
+	doc["doctype"] = "HD Ticket"
+	doc["via_customer_portal"] = bool(frappe.session.user)
+	d = frappe.get_doc(doc).insert()
+	d.create_communication_via_contact(d.description, attachments)
+	return d
 
 
 @frappe.whitelist()
@@ -13,7 +23,6 @@ def get_one(name):
 	QBComment = frappe.qb.DocType("HD Ticket Comment")
 	QBCommunication = frappe.qb.DocType("Communication")
 	QBContact = frappe.qb.DocType("Contact")
-	QBCustomField = frappe.qb.DocType("HD Ticket Custom Field")
 	QBTicket = frappe.qb.DocType("HD Ticket")
 	QBViewLog = frappe.qb.DocType("View Log")
 
@@ -21,23 +30,7 @@ def get_one(name):
 
 	query = (
 		frappe.qb.from_(QBTicket)
-		.select(
-			QBTicket._assign,
-			QBTicket.agent_group,
-			QBTicket.contact,
-			QBTicket.customer,
-			QBTicket.modified,
-			QBTicket.name,
-			QBTicket.priority,
-			QBTicket.raised_by,
-			QBTicket.resolution_by,
-			QBTicket.response_by,
-			QBTicket.status,
-			QBTicket.subject,
-			QBTicket.ticket_type,
-			QBTicket.via_customer_portal,
-			QBTicket.template,
-		)
+		.select(QBTicket.star)
 		.where(QBTicket.name == name)
 		.limit(1)
 	)
@@ -116,25 +109,12 @@ def get_one(name):
 		.where(QBViewLog.reference_name == name)
 		.orderby(QBViewLog.creation, order=Order.desc)
 	)
-	custom_fields = (
-		frappe.qb.from_(QBCustomField)
-		.select(
-			QBCustomField.fieldname,
-			QBCustomField.label,
-			QBCustomField.value,
-			QBCustomField.route,
-		)
-		.where(QBCustomField.parent == name)
-		.where(QBCustomField.parentfield == "custom_fields")
-		.where(QBCustomField.parenttype == "HD Ticket")
-		.run(as_dict=True)
-	)
 
 	return {
 		**ticket,
 		"communications": communications,
 		"contact": contact,
-		"custom_fields": custom_fields,
+		"template": get_template(ticket.template) if ticket.template else None,
 		"comments": comments.run(as_dict=True) if _is_agent else [],
 		"history": history.run(as_dict=True) if _is_agent else [],
 		"views": views.run(as_dict=True) if _is_agent else [],
@@ -164,14 +144,4 @@ def get_attachments(doctype, name):
 		.where(QBFile.attached_to_doctype == doctype)
 		.where(QBFile.attached_to_name == name)
 		.run(as_dict=True)
-	)
-
-
-@frappe.whitelist()
-def update_custom_field(ticket_name, fieldname, value):
-	frappe.db.set_value(
-		"HD Ticket Custom Field",
-		{"parent": ticket_name, "fieldname": fieldname},
-		"value",
-		value,
 	)

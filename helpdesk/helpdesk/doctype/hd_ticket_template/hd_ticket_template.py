@@ -2,25 +2,31 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
-from frappe.website.utils import cleanup_page_name
+
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 
 
 class HDTicketTemplate(Document):
 	def validate(self):
-		allowed_field_types = [
-			"Link",
-			"Select",
-		]
+		self.verify_field_exists()
 
-		for field in self.fields:
-			if field.fieldtype not in allowed_field_types:
-				frappe.throw(
-					f"Type {field.fieldtype} not allowed, should be in {allowed_field_types}"
+	def on_trash(self):
+		self.prevent_default_delete()
+
+	def verify_field_exists(self):
+		for f in self.fields:
+			custom_field_exists = frappe.db.exists(
+				{"doctype": "Custom Field", "fieldname": f.fieldname, "dt": "HD Ticket"}
+			)
+			if not custom_field_exists:
+				text = _("Custom Field `{0}` does not exist in Ticket").format(
+					f.fieldname
 				)
-			if not field.fieldname:
-				field.fieldname = cleanup_page_name(field.label)
+				frappe.throw(text, frappe.DoesNotExistError)
 
-			if field.fieldname == "description" and field.fieldtype != "Text Editor":
-				frappe.throw("field type for description field should be Text Editor")
-
+	def prevent_default_delete(self):
+		if self.name == DEFAULT_TICKET_TEMPLATE:
+			text = _("Default template can not be deleted")
+			frappe.throw(text, frappe.PermissionError)

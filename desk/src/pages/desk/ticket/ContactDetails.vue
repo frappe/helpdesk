@@ -10,7 +10,10 @@
           @click="sidebar.isExpanded = false"
         />
       </div>
-      <div class="flex items-center gap-3 border-b py-6">
+      <div
+        v-if="contact.full_name"
+        class="flex items-center gap-3 border-b py-6"
+      >
         <Avatar :image="contact.image" :label="contact.full_name" size="lg" />
         <div class="flex flex-col">
           <div class="text-lg font-semibold text-gray-800">

@@ -295,21 +295,6 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  // go to article page only if the article is published
-  if (to.name === "PortalKBArticle") {
-    const articleIsPublished = await call(
-      "helpdesk.api.kb.check_if_article_is_published",
-      { article_name: to.params.articleId }
-    );
-    if (!articleIsPublished) {
-      return { name: "PortalKBHome" };
-    }
-  }
-
-  return true;
-});
-
-router.beforeEach(async (to) => {
   const isAuthRoute = AUTH_ROUTES.includes(to.name);
   const authStore = useAuthStore();
   useUserStore();

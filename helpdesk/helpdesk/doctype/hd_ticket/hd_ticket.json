@@ -20,7 +20,6 @@
   "sb_details",
   "description",
   "template",
-  "custom_fields",
   "service_level_section",
   "sla",
   "response_by",
@@ -156,12 +155,6 @@
    "fieldtype": "Link",
    "label": "Template",
    "options": "HD Ticket Template"
-  },
-  {
-   "fieldname": "custom_fields",
-   "fieldtype": "Table",
-   "label": "Custom Fields",
-   "options": "HD Ticket Custom Field"
   },
   {
    "collapsible": 1,
@@ -441,7 +434,7 @@
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-07-30 21:56:38.042283",
+ "modified": "2023-08-04 01:20:52.826111",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
