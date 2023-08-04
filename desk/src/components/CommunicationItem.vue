@@ -36,14 +36,12 @@
         <span class="prose prose-sm" v-html="sanitize(content)"></span>
       </div>
       <div class="flex flex-wrap gap-2">
-        <a
-          v-for="attachment in attachments"
-          :key="attachment.file_url"
-          :href="attachment.file_url"
-          target="_blank"
-        >
-          <AttachmentItem :label="attachment.file_name" />
-        </a>
+        <AttachmentItem
+          v-for="a in attachments"
+          :key="a.file_url"
+          :label="a.file_name"
+          :url="a.file_url"
+        />
       </div>
     </div>
   </div>
