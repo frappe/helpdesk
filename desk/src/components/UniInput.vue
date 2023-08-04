@@ -8,6 +8,8 @@
       :is="component"
       :placeholder="placeholder"
       :value="value"
+      :model-value="value"
+      @update:model-value="emitUpdate(field.fieldname, $event)"
       @change="emitUpdate(field.fieldname, $event.value || $event)"
     />
   </div>
@@ -15,7 +17,7 @@
 
 <script setup lang="ts">
 import { computed, h } from "vue";
-import { createResource, Autocomplete, Input } from "frappe-ui";
+import { createResource, Autocomplete, FormControl } from "frappe-ui";
 import { Field } from "@/types";
 import SearchComplete from "./SearchComplete.vue";
 
@@ -54,7 +56,9 @@ const component = computed(() => {
         .map((o) => ({ label: o, value: o })),
     });
   } else {
-    return Input;
+    return h(FormControl, {
+      debounce: 500,
+    });
   }
 });
 
