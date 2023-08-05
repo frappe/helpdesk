@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-2">
+  <div class="space-y-1">
     <div class="text-xs text-gray-600">
       {{ field.label }}
       <span v-if="field.required" class="text-red-500">*</span>
@@ -7,8 +7,8 @@
     <component
       :is="component"
       :placeholder="placeholder"
-      :value="value"
-      :model-value="value"
+      :value="transValue"
+      :model-value="transValue"
       @update:model-value="emitUpdate(field.fieldname, $event)"
       @change="emitUpdate(field.fieldname, $event.value || $event)"
     />
@@ -55,6 +55,19 @@ const component = computed(() => {
         .split("\n")
         .map((o) => ({ label: o, value: o })),
     });
+  } else if (props.field.fieldtype === "Check") {
+    return h(Autocomplete, {
+      options: [
+        {
+          label: "Yes",
+          value: 1,
+        },
+        {
+          label: "No",
+          value: 0,
+        },
+      ],
+    });
   } else {
     return h(FormControl, {
       debounce: 500,
@@ -72,8 +85,15 @@ const apiOptions = createResource({
     })),
 });
 
+const transValue = computed(() => {
+  if (props.field.fieldtype === "Check") {
+    return props.value ? "Yes" : "No";
+  }
+  return props.value;
+});
+
 const placeholder = computed(() => {
-  if (props.field.fieldtype === "Data") {
+  if (props.field.fieldtype === "Data" && !props.field.url_method) {
     return "Type something";
   }
   return "Select an option";
