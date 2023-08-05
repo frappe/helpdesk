@@ -16,7 +16,7 @@
               />
             </div>
             <div class="text-base text-gray-800">
-              {{ ticket.data[field.fieldname] }}
+              {{ getValue(field) }}
             </div>
           </div>
         </a>
@@ -30,6 +30,7 @@ import { computed } from "vue";
 import { isEmpty } from "lodash";
 import zod from "zod";
 import { Icon } from "@iconify/vue";
+import { Field } from "@/types";
 import { useTicket } from "./data";
 
 const ticket = useTicket();
@@ -38,5 +39,13 @@ const fields = computed(() => ticket.value.data.template.fields);
 function getUrl(url: string) {
   const isUrl = zod.string().url().safeParse(url).success;
   return isUrl ? url : null;
+}
+
+function getValue(field: Field) {
+  const v = ticket.value.data[field.fieldname];
+  if (field.fieldtype === "Check") {
+    return v ? "Yes" : "No";
+  }
+  return v;
 }
 </script>
