@@ -3,6 +3,7 @@ from frappe import _
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
+from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
 from helpdesk.utils import check_permissions, get_customer, is_agent
 
@@ -114,7 +115,7 @@ def get_one(name):
 		**ticket,
 		"communications": communications,
 		"contact": contact,
-		"template": get_template(ticket.template) if ticket.template else None,
+		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"comments": comments.run(as_dict=True) if _is_agent else [],
 		"history": history.run(as_dict=True) if _is_agent else [],
 		"views": views.run(as_dict=True) if _is_agent else [],
