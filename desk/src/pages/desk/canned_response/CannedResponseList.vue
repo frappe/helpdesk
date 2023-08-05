@@ -24,6 +24,7 @@
         type: 'link',
         fn: toResponse,
       }"
+      class="grow"
       row-key="name"
     />
     <ListNavigation class="p-3" v-bind="responses" />
