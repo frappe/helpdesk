@@ -62,10 +62,12 @@ export interface Ticket {
   raised_by: string;
   resolution_by: string;
   response_by: string;
+  satisfaction_rating: number;
   status: string;
   subject: string;
   ticket_type: string;
   via_customer_portal: string;
+  customer_feedback: string;
   contact: Contact;
   comments: Comment[];
   communications: Communication[];

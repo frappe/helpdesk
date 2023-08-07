@@ -35,7 +35,7 @@
           <div v-if="!hideColumnSelector" class="ml-auto">
             <Popover>
               <template #target="{ togglePopover }">
-                <div class="h-5 w-5">
+                <div class="flex h-5 w-5">
                   <IconAdd
                     class="m-auto h-4 w-4 cursor-pointer"
                     @click="togglePopover"
@@ -165,7 +165,7 @@ import { computed, h, reactive, toRefs, useSlots } from "vue";
 import { RouteLocationOptions, RouterLink } from "vue-router";
 import { FeatherIcon, FormControl, Popover, Switch } from "frappe-ui";
 import { isEmpty } from "lodash";
-import IconAdd from "~icons/espresso/add";
+import IconAdd from "~icons/lucide/plus";
 import EmptyMessage from "./EmptyMessage.vue";
 
 type Column = {
