@@ -57,11 +57,7 @@
   "feedback_submitted",
   "satisfaction_rating",
   "customer_feedback",
-  "feedback_status",
-  "computed_tab",
-  "dashboard_column",
-  "dashboard_uri",
-  "column_break_jwcv"
+  "feedback_status"
  ],
  "fields": [
   {
@@ -409,32 +405,12 @@
    "fieldtype": "Select",
    "label": "Feedback Status",
    "options": "\nPositive\nNeutral\nNegative"
-  },
-  {
-   "fieldname": "computed_tab",
-   "fieldtype": "Tab Break",
-   "label": "Computed"
-  },
-  {
-   "fieldname": "dashboard_column",
-   "fieldtype": "Column Break",
-   "label": "Dashboard"
-  },
-  {
-   "fieldname": "dashboard_uri",
-   "fieldtype": "Data",
-   "is_virtual": 1,
-   "label": "URI"
-  },
-  {
-   "fieldname": "column_break_jwcv",
-   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-08-04 01:20:52.826111",
+ "modified": "2023-08-07 16:01:07.818777",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
