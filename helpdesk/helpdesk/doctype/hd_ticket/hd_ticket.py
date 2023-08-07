@@ -11,12 +11,9 @@ from frappe import _
 from frappe.core.utils import get_parent_doc
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
-from frappe.email.inbox import link_communication_to_document
 from frappe.model.document import Document
-from frappe.model.mapper import get_mapped_doc
 from frappe.query_builder import Case, DocType, Order
 from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
-from frappe.utils.user import is_website_user
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -743,159 +740,6 @@ def set_descritption_from_communication(doc, type):
 			ticket_doc.description = doc.content
 
 
-@frappe.whitelist()
-def update_ticket_status_via_customer_portal(ticket, new_status):
-	ticket_doc = frappe.get_doc("HD Ticket", ticket)
-
-	ticket_doc.status = new_status
-	ticket_doc.save(ignore_permissions=True)
-
-	return ticket_doc.status
-
-
-@frappe.whitelist()
-def get_all_conversations(ticket):
-	conversations = frappe.db.get_all(
-		"Communication",
-		filters={
-			"reference_doctype": ["=", "HD Ticket"],
-			"reference_name": ["=", ticket],
-		},
-		order_by="creation asc",
-		fields=[
-			"name",
-			"content",
-			"creation",
-			"sent_or_received",
-			"sender",
-			"cc",
-			"bcc",
-		],
-	)
-
-	for conversation in conversations:
-		if frappe.db.exists("HD Agent", conversation.sender):
-			# user User details instead of Contact if the sender is an agent
-			sender = frappe.get_doc("User", conversation.sender).__dict__
-			sender["image"] = sender["user_image"]
-		else:
-			contacts = frappe.get_all(
-				"Contact Email",
-				filters=[["email_id", "like", "%{0}".format(conversation.sender)]],
-				fields=["parent"],
-				limit=1,
-			)
-			if len(contacts) > 0:
-				sender = frappe.get_doc("Contact", contacts[0].parent)
-			else:
-				sender = frappe.get_last_doc(
-					"User", filters={"email": conversation.sender}
-				)
-
-		conversation.sender = sender
-
-		attachments = frappe.get_all(
-			"File",
-			["file_name", "file_url"],
-			{
-				"attached_to_name": conversation.name,
-				"attached_to_doctype": "Communication",
-			},
-		)
-
-		conversation.attachments = attachments
-	return conversations
-
-
-@frappe.whitelist()
-def get_all_attachments(ticket):
-	attachments = frappe.get_all(
-		"File",
-		["file_name", "file_url"],
-		{"attached_to_name": ticket, "attached_to_doctype": "HD Ticket"},
-	)
-	return attachments
-
-
-def get_list_context(context=None):
-	return {
-		"title": _("Tickets"),
-		"get_list": get_ticket_list,
-		"row_template": "templates/includes/ticket_row.html",
-		"show_sidebar": True,
-		"show_search": True,
-		"no_breadcrumbs": True,
-	}
-
-
-@frappe.whitelist()
-def get_user_tickets(filters="{}", order_by="creation desc", impersonate=None):
-	filters = json.loads(filters)
-	filters["raised_by"] = ["=", frappe.session.user]
-
-	if impersonate and frappe.db.exists("HD Agent", frappe.session.user):
-		filters["raised_by"] = ["=", impersonate]
-
-	tickets = frappe.get_all(
-		"HD Ticket",
-		filters=filters,
-		order_by=order_by,
-		fields=[
-			"name",
-			"subject",
-			"description",
-			"status",
-			"creation",
-			"feedback_submitted",
-			"satisfaction_rating",
-			"customer_feedback",
-		],
-	)
-	return tickets
-
-
-def get_ticket_list(
-	doctype, txt, filters, limit_start, limit_page_length=20, order_by=None
-):
-	from frappe.www.list import get_list
-
-	user = frappe.session.user
-	contact = frappe.db.get_value("Contact", {"user": user}, "name")
-
-	ignore_permissions = False
-	if is_website_user():
-		if not filters:
-			filters = {}
-
-		if contact:
-			filters["contact"] = contact
-		else:
-			filters["raised_by"] = user
-
-		ignore_permissions = True
-
-	return get_list(
-		doctype,
-		txt,
-		filters,
-		limit_start,
-		limit_page_length,
-		ignore_permissions=ignore_permissions,
-	)
-
-
-@frappe.whitelist()
-def set_multiple_status(names, status):
-
-	for name in json.loads(names):
-		frappe.db.set_value("HD Ticket", name, "status", status)
-
-
-@frappe.whitelist()
-def set_status(name, status):
-	frappe.db.set_value("HD Ticket", name, "status", status)
-
-
 def auto_close_tickets():
 	"""Auto-close replied support tickets after 7 days"""
 	auto_close_after_days = (
@@ -936,42 +780,6 @@ def update_ticket(contact, method):
 	QBTicket.update().set(QBTicket.contact, "").where(
 		QBTicket.contact == contact.name
 	).run()
-
-
-@frappe.whitelist()
-def make_task(source_name, target_doc=None):
-	return get_mapped_doc(
-		"HD Ticket", source_name, {"HD Ticket": {"doctype": "Task"}}, target_doc
-	)
-
-
-@frappe.whitelist()
-def make_ticket_from_communication(communication, ignore_communication_links=False):
-	"""raise a ticket from email"""
-
-	doc = frappe.get_doc("Communication", communication)
-	ticket = frappe.get_doc(
-		{
-			"doctype": "HD Ticket",
-			"subject": doc.subject,
-			"communication_medium": doc.communication_medium,
-			"raised_by": doc.sender or "",
-			"raised_by_phone": doc.phone_no or "",
-		}
-	).insert(ignore_permissions=True)
-
-	link_communication_to_document(
-		doc, "HD Ticket", ticket.name, ignore_communication_links
-	)
-
-	return ticket.name
-
-
-def get_time_in_timedelta(time):
-	"""
-	Converts datetime.time(10, 36, 55, 961454) to datetime.timedelta(seconds=38215)
-	"""
-	return timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)
 
 
 def set_first_response_time(communication, method):
