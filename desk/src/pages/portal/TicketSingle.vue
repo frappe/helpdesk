@@ -103,8 +103,8 @@
               v-for="o in feedbackOptions.data"
               :key="o.name"
               :label="o.label"
-              theme="gray"
-              :variant="feedbackPreset === o.name ? 'subtle' : 'outline'"
+              :theme="feedbackPreset === o.name ? 'green' : 'gray'"
+              variant="subtle"
               @click="feedbackPreset = o.name"
             />
           </div>
