@@ -226,7 +226,7 @@ class HDTicket(Document):
 		)
 
 	def check_update_perms(self):
-		if is_agent():
+		if self.is_new() or is_agent():
 			return
 		old_doc = self.get_doc_before_save()
 		is_closed = old_doc.status == "Closed"
