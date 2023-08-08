@@ -132,6 +132,7 @@ import {
 import { Icon } from "@iconify/vue";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { socket } from "@/socket";
+import { createToast } from "@/utils/toasts";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import StarRating from "@/components/StarRating.vue";
@@ -184,6 +185,7 @@ const newCommunication = createResource({
 
 const setValue = createResource({
   url: "frappe.client.set_value",
+  debounce: 300,
   makeParams: (params) => {
     return {
       doctype: "HD Ticket",
@@ -196,7 +198,16 @@ const setValue = createResource({
     showFeedbackDialog.value = false;
     ticket.reload();
   },
-  debounce: 300,
+  onError: (err) => {
+    const messages = err.error?.messages;
+    const title = messages?.join(", ");
+
+    createToast({
+      title,
+      icon: "x",
+      iconClasses: "text-red-500",
+    });
+  },
 });
 
 const feedbackOptions = createListResource({
