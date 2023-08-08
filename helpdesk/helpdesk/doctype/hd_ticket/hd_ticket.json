@@ -54,10 +54,8 @@
   "attachment",
   "content_type",
   "customer_feedback_section",
-  "feedback_submitted",
-  "satisfaction_rating",
-  "customer_feedback",
-  "feedback_status"
+  "feedback",
+  "feedback_extra"
  ],
  "fields": [
   {
@@ -377,40 +375,26 @@
    "label": "Content Type"
   },
   {
-   "depends_on": "eval:doc.feedback_submitted",
    "fieldname": "customer_feedback_section",
    "fieldtype": "Section Break",
    "label": "Customer Feedback"
   },
   {
-   "default": "0",
-   "depends_on": "feedback_submitted",
-   "fieldname": "feedback_submitted",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Feedback Submitted"
-  },
-  {
-   "fieldname": "satisfaction_rating",
-   "fieldtype": "Rating",
-   "label": "Rating"
-  },
-  {
-   "fieldname": "customer_feedback",
+   "fieldname": "feedback_extra",
    "fieldtype": "Long Text",
-   "label": "Feedback"
+   "label": "Feedback (Extra)"
   },
   {
-   "fieldname": "feedback_status",
-   "fieldtype": "Select",
-   "label": "Feedback Status",
-   "options": "\nPositive\nNeutral\nNegative"
+   "fieldname": "feedback",
+   "fieldtype": "Link",
+   "label": "Feedback (Option)",
+   "options": "HD Ticket Feedback Option"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 7,
  "links": [],
- "modified": "2023-08-07 16:01:07.818777",
+ "modified": "2023-08-08 16:05:20.458305",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
