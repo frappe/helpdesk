@@ -98,7 +98,7 @@
       <template #body-content>
         <div class="space-y-4">
           <StarRating v-model:rating="feedbackRating" :static="false" />
-          <div class="flex flex-wrap gap-2">
+          <div v-if="feedbackOptions.data?.length" class="flex flex-wrap gap-2">
             <Button
               v-for="o in feedbackOptions.data"
               :key="o.name"
