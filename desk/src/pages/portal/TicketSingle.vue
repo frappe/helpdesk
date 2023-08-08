@@ -99,10 +99,12 @@
         <div class="space-y-4 text-base text-gray-700">
           <div class="space-y-2">
             <span> Select a rating </span>
+            <span class="text-red-500"> * </span>
             <StarRating v-model:rating="feedbackRating" :static="false" />
           </div>
           <div v-if="feedbackOptions.data?.length" class="space-y-2">
             <span> Pick an option </span>
+            <span class="text-red-500"> * </span>
             <div class="flex flex-wrap gap-2">
               <Button
                 v-for="o in feedbackOptions.data"
@@ -114,11 +116,14 @@
               />
             </div>
           </div>
-          <FormControl
-            v-model="feedbackText"
-            type="textarea"
-            placeholder="Tell us more"
-          />
+          <div class="space-y-2">
+            <span> Other </span>
+            <FormControl
+              v-model="feedbackText"
+              type="textarea"
+              placeholder="Tell us more"
+            />
+          </div>
         </div>
       </template>
     </Dialog>
