@@ -96,17 +96,23 @@
       }"
     >
       <template #body-content>
-        <div class="space-y-4">
-          <StarRating v-model:rating="feedbackRating" :static="false" />
-          <div v-if="feedbackOptions.data?.length" class="flex flex-wrap gap-2">
-            <Button
-              v-for="o in feedbackOptions.data"
-              :key="o.name"
-              :label="o.label"
-              :theme="feedbackPreset === o.name ? 'green' : 'gray'"
-              variant="subtle"
-              @click="feedbackPreset = o.name"
-            />
+        <div class="space-y-4 text-base text-gray-700">
+          <div class="space-y-2">
+            <span> Select a rating </span>
+            <StarRating v-model:rating="feedbackRating" :static="false" />
+          </div>
+          <div v-if="feedbackOptions.data?.length" class="space-y-2">
+            <span> Pick an option </span>
+            <div class="flex flex-wrap gap-2">
+              <Button
+                v-for="o in feedbackOptions.data"
+                :key="o.name"
+                :label="o.label"
+                :theme="feedbackPreset === o.name ? 'green' : 'gray'"
+                variant="subtle"
+                @click="feedbackPreset = o.name"
+              />
+            </div>
           </div>
           <FormControl
             v-model="feedbackText"
