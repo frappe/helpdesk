@@ -14,9 +14,8 @@ class HDTicketFeedbackOption(Document):
 		self.validate_bounds()
 
 	def validate_allowed_ratings(self):
-		for r in self.allowed_ratings:
-			if r not in self.allowed_ratings:
-				frappe.throw(_("Rating {0} is not allowed").format(r))
+		if self.rating not in self.allowed_ratings:
+			frappe.throw(_("Rating {0} is not allowed").format(self.rating))
 
 	def validate_bounds(self):
 		if not (0.2 <= self.rating <= 1.0):
