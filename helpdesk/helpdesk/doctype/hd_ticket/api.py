@@ -24,6 +24,7 @@ def get_one(name):
 	QBComment = frappe.qb.DocType("HD Ticket Comment")
 	QBCommunication = frappe.qb.DocType("Communication")
 	QBContact = frappe.qb.DocType("Contact")
+	QBFeedback = frappe.qb.DocType("HD Ticket Feedback Option")
 	QBTicket = frappe.qb.DocType("HD Ticket")
 	QBViewLog = frappe.qb.DocType("View Log")
 
@@ -87,6 +88,11 @@ def get_one(name):
 		.orderby(QBCommunication.creation, order=Order.asc)
 		.run(as_dict=True)
 	)
+	feedback = (
+		frappe.qb.from_(QBFeedback)
+		.select(QBFeedback.name, QBFeedback.label, QBFeedback.rating)
+		.where(QBFeedback.name == ticket.feedback)
+	)
 
 	for c in communications:
 		c.attachments = get_attachments("Communication", c.name)
@@ -113,11 +119,12 @@ def get_one(name):
 
 	return {
 		**ticket,
+		"comments": comments.run(as_dict=True) if _is_agent else [],
 		"communications": communications,
 		"contact": contact,
-		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
-		"comments": comments.run(as_dict=True) if _is_agent else [],
+		"feedback": feedback.run(as_dict=True).pop() if ticket.feedback else None,
 		"history": history.run(as_dict=True) if _is_agent else [],
+		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"views": views.run(as_dict=True) if _is_agent else [],
 	}
 

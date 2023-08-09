@@ -52,6 +52,12 @@ export interface ViewLog {
   creation: string;
 }
 
+export interface TicketFeedback {
+  name: string;
+  label: string;
+  rating: number;
+}
+
 export interface Ticket {
   _assign: string;
   agent_group: string;
@@ -62,10 +68,12 @@ export interface Ticket {
   raised_by: string;
   resolution_by: string;
   response_by: string;
+  feedback: TicketFeedback;
   status: string;
   subject: string;
   ticket_type: string;
   via_customer_portal: string;
+  feedback_extra?: string;
   contact: Contact;
   comments: Comment[];
   communications: Communication[];

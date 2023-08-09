@@ -4,6 +4,7 @@ import frappe
 from frappe.permissions import add_permission
 
 from .default_template import create_default_template
+from .ticket_feedback import create_ticket_feedback_options
 from .ticket_type import create_ootb_ticket_types, create_fallback_ticket_type
 from .welcome_ticket import create_welcome_ticket
 
@@ -24,6 +25,7 @@ def after_install():
 	create_fallback_ticket_type()
 	create_ootb_ticket_types()
 	create_welcome_ticket()
+	create_ticket_feedback_options()
 
 
 def add_support_redirect_to_tickets():

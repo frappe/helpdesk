@@ -3,6 +3,7 @@
     <TopBar />
     <div class="flex grow overflow-hidden">
       <div class="flex grow flex-col">
+        <TicketFeedback />
         <PinnedComments />
         <ConversationBox class="grow" />
         <ResponseEditor />
@@ -21,6 +22,7 @@ import ConversationBox from "./ConversationBox.vue";
 import PinnedComments from "./PinnedComments.vue";
 import ResponseEditor from "./editor/ResponseEditor.vue";
 import SideBar from "./SideBar.vue";
+import TicketFeedback from "./TicketFeedback.vue";
 import TopBar from "./TopBar.vue";
 import { useTicket } from "./data";
 

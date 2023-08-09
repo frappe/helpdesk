@@ -150,13 +150,16 @@ class HDTicket(Document):
 		return "{0}: {1}".format(_(self.status), self.subject)
 
 	def before_validate(self):
+		self.check_update_perms()
 		self.set_ticket_type()
 		self.set_raised_by()
 		self.set_contact()
 		self.set_customer()
 		self.set_priority()
+		self.apply_escalation_rule()
 
 	def validate(self):
+		self.validate_feedback()
 		self.validate_ticket_type()
 
 	def after_insert(self):
@@ -209,6 +212,28 @@ class HDTicket(Document):
 		settings = frappe.get_doc("HD Settings")
 		if settings.is_ticket_type_mandatory and not self.ticket_type:
 			frappe.throw(_("Ticket type is mandatory"))
+
+	def validate_feedback(self):
+		if (
+			self.feedback
+			or self.status != "Resolved"
+			or not self.has_value_changed("status")
+			or is_agent()
+		):
+			return
+		frappe.throw(
+			_("Ticket must be resolved with a feedback"), frappe.ValidationError
+		)
+
+	def check_update_perms(self):
+		if self.is_new() or is_agent():
+			return
+		old_doc = self.get_doc_before_save()
+		is_closed = old_doc.status == "Closed"
+		is_rated = bool(old_doc.feedback)
+		if is_closed or is_rated:
+			text = _("Closed or rated tickets cannot be updated by non-agents")
+			frappe.throw(text, frappe.PermissionError)
 
 	def handle_ticket_activity_update(self):
 		"""
@@ -710,27 +735,16 @@ class HDTicket(Document):
 			except Exception:
 				pass
 
-	@frappe.whitelist()
-	def reopen(self):
-		if self.status != "Resolved":
-			frappe.throw(_("Only resolved tickets can be reopened"))
-
-		if escalation_rule := self.get_escalation_rule():
-			self.agent_group = escalation_rule.to_team or self.agent_group
-			self.priority = escalation_rule.to_priority or self.priority
-			self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
-			self.assign_agent(escalation_rule.to_agent)
-
-		self.status = "Open"
-		self.save()
-
-	@frappe.whitelist()
-	def resolve(self):
-		if self.status == "Closed":
-			frappe.throw(_("Closed tickets cannot be resolved"))
-
-		self.status = "Resolved"
-		self.save()
+	def apply_escalation_rule(self):
+		if not self.status == "Open" or self.is_new():
+			return
+		escalation_rule = self.get_escalation_rule()
+		if not escalation_rule:
+			return
+		self.agent_group = escalation_rule.to_team or self.agent_group
+		self.priority = escalation_rule.to_priority or self.priority
+		self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
+		self.assign_agent(escalation_rule.to_agent)
 
 
 def set_descritption_from_communication(doc, type):
