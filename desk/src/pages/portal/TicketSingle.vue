@@ -80,6 +80,7 @@
         title: 'Rate this ticket',
         actions: [
           {
+            disabled: !feedbackPreset,
             label: 'Submit',
             theme: 'gray',
             variant: 'solid',
