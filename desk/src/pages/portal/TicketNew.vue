@@ -43,7 +43,7 @@
           type="text"
           label="Subject"
           placeholder="A short description"
-          @input="(v) => searchArticles(v)"
+          @input="searchArticles($event.target.value)"
         />
         <TextEditor
           ref="textEditor"
