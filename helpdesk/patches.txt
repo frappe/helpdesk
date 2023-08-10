@@ -11,3 +11,4 @@ helpdesk.patches.template_remove_default_fields
 helpdesk.helpdesk.doctype.hd_ticket.patches.fallback_ticket_type
 execute:frappe.delete_doc("Server Script", "Ticket Auto Set Custom Fields", ignore_missing=True)
 helpdesk.helpdesk.doctype.hd_ticket_feedback_option.patches.ootb
+helpdesk.helpdesk.doctype.hd_ticket_feedback_option.patches.label_as_name
