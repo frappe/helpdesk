@@ -20,7 +20,7 @@
 		"autoprefixer": "^10.4.13",
 		"dayjs": "^1.11.7",
 		"echarts": "^5.4.1",
-		"frappe-ui": "^0.1.0-alpha.10",
+		"frappe-ui": "^0.1.0-alpha.12",
 		"lodash": "^4.17.21",
 		"mime": "^3.0.0",
 		"mitt": "^3.0.1",

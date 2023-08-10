@@ -90,7 +90,7 @@ import {
   KB_PUBLIC_ARTICLE,
 } from "@/router";
 import { useConfigStore } from "@/stores/config";
-import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 import TextEditor from "@/components/text-editor/TextEditor.vue";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import TopBar from "@/components/TopBar.vue";
@@ -149,7 +149,7 @@ const newTicket = createResource({
     },
     attachments: attachments.value,
   }),
-  validate(params) {
+  validate: (params) => {
     const fields = visibleFields.value.filter((f) => f.required);
     const toVerify = [...fields, "subject", "description"];
     for (const field of toVerify) {
@@ -158,16 +158,8 @@ const newTicket = createResource({
       }
     }
   },
-  onError(error) {
-    const title = error.message ? error.message : error.messages?.join("\n");
-
-    createToast({
-      title,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
-  onSuccess(data) {
+  onError: useError().getFunc(),
+  onSuccess: (data) => {
     router.push({
       name: CUSTOMER_PORTAL_TICKET,
       params: {
