@@ -29,7 +29,7 @@ export default {
   },
   setup() {
     const configStore = useConfigStore();
-    const { storage, apply } = useFilter();
+    const { storage, apply } = useFilter("HD Ticket");
     const presetFilters = ref([]);
     const presetTitle = ref("");
 

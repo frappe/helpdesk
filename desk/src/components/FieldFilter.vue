@@ -79,17 +79,7 @@ const props = withDefaults(defineProps<P>(), {
   appendAssign: false,
 });
 
-const fields: Resource<Array<DocField>> = createResource({
-  url: "helpdesk.api.doc.get_filterable_fields",
-  makeParams: () => ({
-    doctype: props.doctype,
-    append_assign: props.appendAssign,
-  }),
-  cache: ["DocField", props.doctype],
-  auto: true,
-});
-
-const { apply, storage } = useFilter(() => fields.data);
+const { apply, fields, storage } = useFilter(props.doctype, props.appendAssign);
 const typeCheck = ["Check"];
 const typeLink = ["Link"];
 const typeNumber = ["Float", "Int"];
