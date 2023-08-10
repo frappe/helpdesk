@@ -66,6 +66,7 @@ import { createResource, Button } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
@@ -96,13 +97,7 @@ const addComment = createResource({
     emitter.emit("update:ticket");
     editor.clean();
   },
-  onError: () => {
-    createToast({
-      title: "Error adding comment",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
-  },
+  onError: useError({ title: "Error adding comment" }).getFunc(),
 });
 
 const addResponse = createResource({
@@ -123,12 +118,6 @@ const addResponse = createResource({
     emitter.emit("update:ticket");
     editor.clean();
   },
-  onError: () => {
-    createToast({
-      title: "Error replying to ticket",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
-  },
+  onError: useError({ title: "Error replying to ticket" }).getFunc(),
 });
 </script>

@@ -72,6 +72,7 @@ import {
 } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { useAuthStore } from "@/stores/auth";
+import { useError } from "@/composables/error";
 import TopBar from "@/components/TopBar.vue";
 import KnowledgeBaseArticleActionsEdit from "./KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./KnowledgeBaseArticleActionsNew.vue";
@@ -187,15 +188,7 @@ const insertRes = createResource({
       })
       .then(() => router.go(0));
   },
-  onError(error) {
-    const msg = error.message ? error.message : error.messages.join(", ");
-    createToast({
-      title: "Error renaming team",
-      text: msg,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
+  onError: useError({ title: "Error creating article" }).getFunc(),
 });
 
 const setValueRes = createResource({
@@ -208,15 +201,7 @@ const setValueRes = createResource({
       iconClasses: "text-green-500",
     });
   },
-  onError(error) {
-    const msg = error.messages.join(", ");
-    createToast({
-      title: "Error updating article",
-      text: msg,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
+  onError: useError({ title: "Error updating article" }).getFunc(),
 });
 
 const deleteRes = createResource({

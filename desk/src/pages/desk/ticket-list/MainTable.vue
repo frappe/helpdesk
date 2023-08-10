@@ -76,7 +76,6 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 import { createResource, Badge, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
@@ -85,6 +84,7 @@ import { useAgentStore } from "@/stores/agent";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import AssignedInfo from "./AssignedInfo.vue";
 import TicketSummary from "./TicketSummary.vue";
@@ -96,7 +96,6 @@ interface P {
 withDefaults(defineProps<P>(), {
   tickets: () => [],
 });
-const router = useRouter();
 const agentStore = useAgentStore();
 const ticketPriorityStore = useTicketPriorityStore();
 const ticketStatusStore = useTicketStatusStore();
@@ -176,13 +175,7 @@ const bulkAssignTicketToAgent = createResource({
       iconClasses: "text-green-500",
     });
   },
-  onError: () => {
-    createToast({
-      title: "Unable to assign tickets to agent.",
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
+  onError: useError({ title: "Unable to assign tickets to agent" }).getFunc(),
 });
 
 function assignOpts(selected: Set<number>) {

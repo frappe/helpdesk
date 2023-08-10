@@ -102,8 +102,8 @@ import {
   FormControl,
 } from "frappe-ui";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE } from "@/router";
-import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
+import { useError } from "@/composables/error";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
@@ -130,14 +130,7 @@ const subCategory = createDocumentResource({
   name: props.subCategoryId,
   auto: true,
   setValue: {
-    onError(error) {
-      createToast({
-        title: "Error creating sub category",
-        text: error.messages.join(", "),
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error creating sub category" }).getFunc(),
   },
 });
 

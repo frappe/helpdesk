@@ -62,6 +62,7 @@ import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
+import { useError } from "@/composables/error";
 import PageTitle from "@/components/PageTitle.vue";
 import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
@@ -112,15 +113,7 @@ const newTeam = createResource({
       },
     });
   },
-  onError(error) {
-    const msg = error.message ? error.message : error.messages.join(", ");
-    createToast({
-      title: "Error creating team",
-      text: msg,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
+  onError: useError({ title: "Error creating team" }).getFunc(),
 });
 
 function toTeam(id: string) {

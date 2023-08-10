@@ -120,8 +120,8 @@ import {
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
-import { createToast } from "@/utils/toasts";
 import { useAgentStore } from "@/stores/agent";
+import { useError } from "@/composables/error";
 import TopBar from "@/components/TopBar.vue";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";
@@ -144,15 +144,7 @@ const team = createDocumentResource({
   name: props.teamId,
   auto: true,
   setValue: {
-    onError(error) {
-      const msg = error.messages.join(", ");
-      createToast({
-        title: "Error updating team",
-        text: msg,
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error updating team" }).getFunc(),
   },
   delete: {
     onSuccess() {
@@ -160,15 +152,7 @@ const team = createDocumentResource({
         name: AGENT_PORTAL_TEAM_LIST,
       });
     },
-    onError(error) {
-      const msg = error.messages.join(", ");
-      createToast({
-        title: "Error deleting team",
-        text: msg,
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error deleting team" }).getFunc(),
   },
 });
 const title = computed({
@@ -240,15 +224,7 @@ function renameTeam() {
         },
       });
     },
-    onError(error) {
-      const msg = error.message ? error.message : error.messages.join(", ");
-      createToast({
-        title: "Error renaming team",
-        text: msg,
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error renaming team" }).getFunc(),
   });
 
   r.submit();

@@ -60,6 +60,7 @@ import {
 } from "frappe-ui";
 import zod from "zod";
 import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 import MultiSelect from "@/components/MultiSelect.vue";
 
 const props = defineProps({
@@ -111,14 +112,7 @@ const contact = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError(error) {
-      createToast({
-        title: "Error updating contact",
-        text: error.messages.join(", "),
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error updating contact" }).getFunc(),
   },
 });
 

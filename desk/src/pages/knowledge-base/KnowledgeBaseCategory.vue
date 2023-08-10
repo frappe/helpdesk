@@ -126,6 +126,7 @@ import { isEmpty } from "lodash";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY } from "@/router";
 import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
+import { useError } from "@/composables/error";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import KnowledgeBaseIconSelector from "./KnowledgeBaseIconSelector.vue";
@@ -157,19 +158,12 @@ const category = createDocumentResource({
   setValue: {
     onSuccess() {
       createToast({
-        title: "Article updated",
+        title: "Category updated",
         icon: "check",
         iconClasses: "text-green-500",
       });
     },
-    onError(error) {
-      createToast({
-        title: "Error creating sub category",
-        text: error.messages.join(", "),
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error updating category" }).getFunc(),
   },
 });
 
@@ -205,15 +199,7 @@ const newSubCategory = createResource({
     showNewSubCategory.value = false;
     subCategories.reload();
   },
-  onError(error) {
-    const msg = error.message ? error.message : error.messages.join(", ");
-    createToast({
-      title: "Error creating sub category",
-      text: msg,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
+  onError: useError({ title: "Error creating sub category" }).getFunc(),
 });
 
 const subCategories = createListManager({
