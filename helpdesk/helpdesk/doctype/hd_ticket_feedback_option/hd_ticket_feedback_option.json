@@ -26,7 +26,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-08 19:08:08.415113",
+ "modified": "2023-08-10 11:06:13.111118",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Feedback Option",
@@ -46,7 +46,9 @@
   }
  ],
  "quick_entry": 1,
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "label"
 }
