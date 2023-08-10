@@ -112,7 +112,7 @@ const contact = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError: useError({ title: "Error updating contact" }).getFunc(),
+    onError: useError({ title: "Error updating contact" }),
   },
 });
 

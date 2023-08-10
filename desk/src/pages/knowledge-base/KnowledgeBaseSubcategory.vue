@@ -130,7 +130,7 @@ const subCategory = createDocumentResource({
   name: props.subCategoryId,
   auto: true,
   setValue: {
-    onError: useError({ title: "Error creating sub category" }).getFunc(),
+    onError: useError({ title: "Error creating sub category" }),
   },
 });
 

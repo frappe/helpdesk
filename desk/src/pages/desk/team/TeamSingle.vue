@@ -144,7 +144,7 @@ const team = createDocumentResource({
   name: props.teamId,
   auto: true,
   setValue: {
-    onError: useError({ title: "Error updating team" }).getFunc(),
+    onError: useError({ title: "Error updating team" }),
   },
   delete: {
     onSuccess() {
@@ -152,7 +152,7 @@ const team = createDocumentResource({
         name: AGENT_PORTAL_TEAM_LIST,
       });
     },
-    onError: useError({ title: "Error deleting team" }).getFunc(),
+    onError: useError({ title: "Error deleting team" }),
   },
 });
 const title = computed({
@@ -224,7 +224,7 @@ function renameTeam() {
         },
       });
     },
-    onError: useError({ title: "Error renaming team" }).getFunc(),
+    onError: useError({ title: "Error renaming team" }),
   });
 
   r.submit();

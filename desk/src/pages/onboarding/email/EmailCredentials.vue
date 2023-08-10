@@ -88,7 +88,7 @@ const insertRes = createResource({
     next();
   },
   onError: (e) => {
-    useError().getFunc()(e);
+    useError()(e);
     capture("onboarding_email_credentials_fail");
   },
 });

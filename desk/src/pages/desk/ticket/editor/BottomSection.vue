@@ -97,7 +97,7 @@ const addComment = createResource({
     emitter.emit("update:ticket");
     editor.clean();
   },
-  onError: useError({ title: "Error adding comment" }).getFunc(),
+  onError: useError({ title: "Error adding comment" }),
 });
 
 const addResponse = createResource({
@@ -118,6 +118,6 @@ const addResponse = createResource({
     emitter.emit("update:ticket");
     editor.clean();
   },
-  onError: useError({ title: "Error replying to ticket" }).getFunc(),
+  onError: useError({ title: "Error replying to ticket" }),
 });
 </script>

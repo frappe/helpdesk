@@ -175,7 +175,7 @@ const bulkAssignTicketToAgent = createResource({
       iconClasses: "text-green-500",
     });
   },
-  onError: useError({ title: "Unable to assign tickets to agent" }).getFunc(),
+  onError: useError({ title: "Unable to assign tickets to agent" }),
 });
 
 function assignOpts(selected: Set<number>) {

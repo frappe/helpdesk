@@ -74,7 +74,7 @@ const customer = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError: useError({ title: "Error updating customer" }).getFunc(),
+    onError: useError({ title: "Error updating customer" }),
   },
 });
 

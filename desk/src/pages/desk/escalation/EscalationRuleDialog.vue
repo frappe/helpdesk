@@ -48,7 +48,7 @@ const rule = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError: useError({ title: "Error updating rule" }).getFunc(),
+    onError: useError({ title: "Error updating rule" }),
   },
   delete: {
     onSuccess() {
@@ -58,7 +58,7 @@ const rule = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError: useError({ title: "Error deleting rule" }).getFunc(),
+    onError: useError({ title: "Error deleting rule" }),
   },
 });
 
@@ -74,7 +74,7 @@ const newRule = createResource({
     rule.name = data.name;
     rule.reload();
   },
-  onError: useError({ title: "Error creating rule" }).getFunc(),
+  onError: useError({ title: "Error creating rule" }),
 });
 
 const doc = computed({

@@ -163,7 +163,7 @@ const category = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError: useError({ title: "Error updating category" }).getFunc(),
+    onError: useError({ title: "Error updating category" }),
   },
 });
 
@@ -199,7 +199,7 @@ const newSubCategory = createResource({
     showNewSubCategory.value = false;
     subCategories.reload();
   },
-  onError: useError({ title: "Error creating sub category" }).getFunc(),
+  onError: useError({ title: "Error creating sub category" }),
 });
 
 const subCategories = createListManager({

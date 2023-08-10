@@ -113,7 +113,7 @@ const newTeam = createResource({
       },
     });
   },
-  onError: useError({ title: "Error creating team" }).getFunc(),
+  onError: useError({ title: "Error creating team" }),
 });
 
 function toTeam(id: string) {

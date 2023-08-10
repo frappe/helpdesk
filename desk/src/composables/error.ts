@@ -23,20 +23,12 @@ export function useError(o?: Options) {
     return getMessage(e);
   }
 
-  function getFunc() {
-    return function (e: Error) {
-      createToast({
-        title: getTitle(e),
-        message: o?.title ? undefined : getMessage(e),
-        icon: o?.icon ?? "x",
-        iconClasses: o?.iconClass ?? "text-red-500",
-      });
-    };
-  }
-
-  return {
-    getFunc,
-    getMessage,
-    getTitle,
+  return function (e: Error) {
+    createToast({
+      title: getTitle(e),
+      message: o?.title ? undefined : getMessage(e),
+      icon: o?.icon ?? "x",
+      iconClasses: o?.iconClass ?? "text-red-500",
+    });
   };
 }

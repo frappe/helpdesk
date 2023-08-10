@@ -210,7 +210,7 @@ const setValue = createResource({
     showFeedbackDialog.value = false;
     ticket.reload();
   },
-  onError: useError().getFunc(),
+  onError: useError(),
 });
 
 const feedbackOptions = createListResource({

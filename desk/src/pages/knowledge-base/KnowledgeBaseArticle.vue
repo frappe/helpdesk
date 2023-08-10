@@ -188,7 +188,7 @@ const insertRes = createResource({
       })
       .then(() => router.go(0));
   },
-  onError: useError({ title: "Error creating article" }).getFunc(),
+  onError: useError({ title: "Error creating article" }),
 });
 
 const setValueRes = createResource({
@@ -201,7 +201,7 @@ const setValueRes = createResource({
       iconClasses: "text-green-500",
     });
   },
-  onError: useError({ title: "Error updating article" }).getFunc(),
+  onError: useError({ title: "Error updating article" }),
 });
 
 const deleteRes = createResource({
