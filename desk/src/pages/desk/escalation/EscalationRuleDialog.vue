@@ -21,6 +21,7 @@
 import { computed } from "vue";
 import { createResource, createDocumentResource, Dialog } from "frappe-ui";
 import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 import EscalationRuleDialogFieldList from "./EscalationRuleDialogFieldList.vue";
 
 const props = defineProps({
@@ -47,14 +48,7 @@ const rule = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError(error) {
-      createToast({
-        title: "Error updating rule",
-        text: error.messages.join(", "),
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error updating rule" }),
   },
   delete: {
     onSuccess() {
@@ -64,14 +58,7 @@ const rule = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError(error) {
-      createToast({
-        title: "Error deleting rule",
-        text: error.messages.join(", "),
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error deleting rule" }),
   },
 });
 
@@ -87,14 +74,7 @@ const newRule = createResource({
     rule.name = data.name;
     rule.reload();
   },
-  onError(error) {
-    createToast({
-      title: "Error creating rule",
-      text: error.messages.join(", "),
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-  },
+  onError: useError({ title: "Error creating rule" }),
 });
 
 const doc = computed({
