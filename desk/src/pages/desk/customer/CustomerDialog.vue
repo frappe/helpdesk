@@ -44,6 +44,7 @@ import {
   FileUploader,
 } from "frappe-ui";
 import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 
 const props = defineProps({
   name: {
@@ -73,14 +74,7 @@ const customer = createDocumentResource({
         iconClasses: "text-green-500",
       });
     },
-    onError(error) {
-      createToast({
-        title: "Error updating customer",
-        text: error.messages.join(", "),
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
+    onError: useError({ title: "Error updating customer" }),
   },
 });
 

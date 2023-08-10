@@ -39,7 +39,7 @@ import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { createResource, Button, Input, debounce } from "frappe-ui";
 import { capture } from "@/telemetry";
-import { createToast } from "@/utils/toasts";
+import { useError } from "@/composables/error";
 import { useOnboardingEmailStore } from "./data";
 
 const onboardingEmailStore = useOnboardingEmailStore();
@@ -87,16 +87,8 @@ const insertRes = createResource({
     capture("onboarding_email_credentials_success");
     next();
   },
-  onError: (error) => {
-    const messages = error.messages || error.error?.messages;
-    const title = messages?.join("\n") || error.message;
-
-    createToast({
-      title,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
-
+  onError: (e) => {
+    useError()(e);
     capture("onboarding_email_credentials_fail");
   },
 });

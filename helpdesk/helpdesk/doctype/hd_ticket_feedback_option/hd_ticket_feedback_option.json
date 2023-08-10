@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:label",
  "creation": "2023-08-08 12:32:07.291219",
  "default_view": "List",
  "doctype": "DocType",
@@ -21,15 +22,17 @@
    "fieldname": "label",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Label"
+   "label": "Label",
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-08 19:08:08.415113",
+ "modified": "2023-08-10 12:52:02.672843",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Feedback Option",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -43,10 +46,23 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
   }
  ],
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "label"
 }

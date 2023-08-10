@@ -49,15 +49,6 @@
         'overflow-y': 'scroll',
       }"
     >
-      <div class="flex flex-col gap-1">
-        <div class="text-xs text-gray-600">Assigned To</div>
-        <Autocomplete
-          placeholder="Select an agent"
-          :options="agentStore.dropdown"
-          :value="assignedTo"
-          @change="assignAgent($event.value)"
-        />
-      </div>
       <div v-for="o in options" :key="o.field" class="flex flex-col gap-1">
         <div class="text-xs text-gray-600">
           {{ o.label }}
@@ -85,30 +76,18 @@ import { computed } from "vue";
 import { createResource, Autocomplete, Button } from "frappe-ui";
 import dayjs from "dayjs";
 import { emitter } from "@/emitter";
-import { useAgentStore } from "@/stores/agent";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
-import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils/toasts";
 import UniInput from "@/components/UniInput.vue";
 import { useTicket, useTicketStore } from "./data";
 
 const dateFormat = "MMM D, h:mm A";
-const agentStore = useAgentStore();
-const userStore = useUserStore();
 const ticketStore = useTicketStore();
 const ticket = useTicket();
 const data = computed(() => ticket.value.data);
-
-const assignedTo = computed(() => {
-  const assignJson = JSON.parse(data.value._assign);
-  const arr = Array.isArray(assignJson) ? assignJson : [];
-  const user = arr.slice(-1).pop();
-  const name = userStore.getUser(user)?.full_name || user;
-  return name;
-});
 
 const options = computed(() => [
   {
@@ -133,29 +112,6 @@ const options = computed(() => [
   },
 ]);
 
-function assignAgent(agent: string) {
-  createResource({
-    url: "run_doc_method",
-    params: {
-      dt: "HD Ticket",
-      dn: data.value.name,
-      method: "assign_agent",
-      args: {
-        agent,
-      },
-    },
-    auto: true,
-    onSuccess: () => {
-      emitter.emit("update:ticket");
-      createToast({
-        title: `Ticket assigned to ${agent}`,
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
-    },
-  });
-}
-
 function update(fieldname: string, value: string) {
   createResource({
     url: "frappe.client.set_value",
@@ -172,6 +128,14 @@ function update(fieldname: string, value: string) {
         title: "Ticket updated",
         icon: "check",
         iconClasses: "text-green-600",
+      });
+    },
+    onError: (err) => {
+      createToast({
+        title: "Error updating ticket",
+        text: err.messages?.[0],
+        icon: "x",
+        iconClasses: "text-red-600",
       });
     },
   });

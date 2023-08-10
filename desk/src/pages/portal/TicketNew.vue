@@ -158,7 +158,7 @@ const newTicket = createResource({
       }
     }
   },
-  onError: useError().getFunc(),
+  onError: useError(),
   onSuccess: (data) => {
     router.push({
       name: CUSTOMER_PORTAL_TICKET,
