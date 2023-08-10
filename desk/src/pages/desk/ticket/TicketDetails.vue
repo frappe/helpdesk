@@ -130,6 +130,14 @@ function update(fieldname: string, value: string) {
         iconClasses: "text-green-600",
       });
     },
+    onError: (err) => {
+      createToast({
+        title: "Error updating ticket",
+        text: err.messages?.[0],
+        icon: "x",
+        iconClasses: "text-red-600",
+      });
+    },
   });
 }
 </script>
