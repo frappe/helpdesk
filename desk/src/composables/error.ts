@@ -13,8 +13,9 @@ interface Error {
 
 export function useError(o?: Options) {
   function getMessage(e: Error) {
-    if (e.message) return e.message;
-    return e.messages.join(", ");
+    if (e.messages) return e.messages.join(", ");
+    else if (e.message) return e.message;
+    else return "";
   }
 
   function getTitle(e: Error) {
@@ -28,7 +29,7 @@ export function useError(o?: Options) {
         title: getTitle(e),
         message: o?.title ? undefined : getMessage(e),
         icon: o?.icon ?? "x",
-        iconClass: o?.iconClass ?? "text-red-500",
+        iconClasses: o?.iconClass ?? "text-red-500",
       });
     };
   }
