@@ -63,7 +63,7 @@ import HelpdeskTable from "@/components/HelpdeskTable.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
-const { apply, storage } = useFilter();
+const { apply, storage } = useFilter("HD Ticket");
 const isDialogVisible = ref(false);
 const emptyMessage = "No Agents Found";
 const columns = [

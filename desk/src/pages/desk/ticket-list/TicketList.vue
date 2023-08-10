@@ -46,7 +46,7 @@ import MainTable from "./MainTable.vue";
 import TopSection from "./TopSection.vue";
 import PresetFilters from "./PresetFilters.vue";
 
-const { getArgs } = useFilter();
+const { getArgs } = useFilter("HD Ticket");
 const { get: getOrder } = useOrder();
 const showNewDialog = ref(false);
 const tickets = createListManager({

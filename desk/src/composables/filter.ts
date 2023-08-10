@@ -1,9 +1,11 @@
-import { ref, watchEffect, Ref } from "vue";
+import { watchEffect } from "vue";
 import { useRoute, useRouter, RouteLocationNamedRaw } from "vue-router";
-import { toValue } from "@vueuse/core";
-import { DocField, Filter } from "@/types";
+import { useStorage } from "@vueuse/core";
+import { createResource } from "frappe-ui";
+import { DocField, Filter, Resource } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 
+const storagePrefix = "filters_";
 const operatorMap = {
   is: "=",
   "is not": "!=",
@@ -19,23 +21,41 @@ const operatorMap = {
   "<=": "<=",
 };
 
-export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
+export function useFilter(doctype: string) {
   const route = useRoute();
   const router = useRouter();
   const { userId } = useAuthStore();
-  const storage = ref(new Set<Filter>());
+  const storage = useStorage(
+    storagePrefix + route.name.toString(),
+    new Set<Filter>()
+  );
+
+  const fields: Resource<Array<DocField>> = createResource({
+    url: "helpdesk.api.doc.get_filterable_fields",
+    makeParams: () => ({
+      doctype,
+      append_assign: true,
+    }),
+    cache: ["DocField", doctype],
+    auto: true,
+  });
 
   watchEffect(() => {
-    const f__ = toValue(fields);
-    if (fields && !f__) return;
-    storage.value = new Set();
-    const q = (route.query.q as string) || "";
-    q.split(" ")
+    if (!fields.data) return;
+    const q = route.query.q as string;
+    if (q) {
+      storage.value = new Set(fromUrl(q, fields.data));
+    }
+  });
+
+  function fromUrl(query: string, fields: DocField[]) {
+    return query
+      .split(" ")
       .map((f) => {
         const [fieldname, operator, value] = f
           .split(":")
           .map(decodeURIComponent);
-        const field = (f__ || []).find((f) => f.fieldname === fieldname);
+        const field = (fields || []).find((f) => f.fieldname === fieldname);
         return {
           field,
           fieldname,
@@ -43,10 +63,9 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
           value,
         };
       })
-      .filter((f) => !f__ || (f__ && f.field))
-      .filter((f) => operatorMap[f.operator])
-      .forEach((f) => storage.value.add(f));
-  });
+      .filter((f) => !fields || (fields && f.field))
+      .filter((f) => operatorMap[f.operator]);
+  }
 
   function getArgs(old?: Record<string, string | string[]>) {
     old = old || {};
@@ -103,5 +122,5 @@ export function useFilter(fields?: DocField[] | Ref<DocField[]>) {
     return f;
   }
 
-  return { apply, getArgs, storage };
+  return { apply, fields, getArgs, storage };
 }
