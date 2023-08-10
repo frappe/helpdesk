@@ -37,6 +37,7 @@
           <Avatar
             v-if="assignedTo"
             class="mr-2"
+            size="sm"
             :label="assignedTo?.full_name"
             :image="assignedTo?.user_image"
           />
