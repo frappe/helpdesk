@@ -11,7 +11,6 @@ from frappe.query_builder.functions import Count
 from helpdesk.utils import check_permissions
 
 from .doc import apply_sort
-from .qb import get_query
 
 
 @frappe.whitelist()
@@ -28,7 +27,7 @@ def get_list(
 ):
 	check_permissions(doctype, parent)
 
-	query = get_query(
+	query = frappe.qb.get_query(
 		table=doctype,
 		fields=fields,
 		filters=filters,
@@ -60,7 +59,7 @@ def get_list_meta(
 ):
 	check_permissions(doctype, parent)
 
-	query = get_query(
+	query = frappe.qb.get_query(
 		table=doctype,
 		filters=filters,
 		group_by=group_by,
