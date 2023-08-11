@@ -47,14 +47,15 @@
                   class="flex w-48 flex-col gap-2 p-3 text-base text-gray-800"
                 >
                   <div
-                    v-for="column in columns.filter((c) => c.isTogglable)"
-                    :key="column.colKey"
+                    v-for="c in columns"
+                    :key="c.colKey"
                     class="flex items-center justify-between"
                   >
-                    {{ column.title }}
+                    {{ c.title }}
                     <Switch
-                      v-model="togglableColumns[column.colKey]"
+                      :model-value="!hideColumns.has(c.colKey)"
                       size="md"
+                      @update:model-value="toggleColumn(c.colKey)"
                     />
                   </div>
                 </div>
@@ -161,8 +162,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, reactive, toRefs, useSlots } from "vue";
-import { RouteLocationOptions, RouterLink } from "vue-router";
+import { computed, h, toRefs, useSlots } from "vue";
+import { RouteLocationOptions, RouterLink, useRoute } from "vue-router";
+import { useStorage } from "@vueuse/core";
 import { FeatherIcon, FormControl, Popover, Switch } from "frappe-ui";
 import { isEmpty } from "lodash";
 import IconAdd from "~icons/lucide/plus";
@@ -208,14 +210,13 @@ const emit = defineEmits<{
 }>();
 
 const { columns, data, rowClick, rowKey, selection } = toRefs(props);
+const route = useRoute();
 const slots = useSlots();
 const allSelected = computed(() => selection.value.size === data.value.length);
-const togglableColumns = reactive(
-  columns.value
-    .filter((c) => c.isTogglable)
-    .map((c) => ({
-      [c.colKey]: false,
-    }))
+const hideColumnsPrefix = "hide_columns_";
+const hideColumns = useStorage(
+  hideColumnsPrefix + route.name.toString(),
+  new Set()
 );
 
 const selectionText = computed(() => {
@@ -240,7 +241,13 @@ function getRowClickComponent(key: RowKey) {
 }
 
 function isColVisible(column: Column) {
-  return !column.isTogglable || togglableColumns[column.colKey];
+  return !hideColumns.value.has(column.colKey);
+}
+
+function toggleColumn(colKey: string) {
+  if (!hideColumns.value.delete(colKey)) {
+    hideColumns.value.add(colKey);
+  }
 }
 
 function toggleRow(row: RowKey) {
