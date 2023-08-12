@@ -47,7 +47,7 @@
       {{ dayjs(data.creation).format(dateFormat) }}
     </template>
     <template #modified="{ data }">
-      {{ dayjs(data.modified).format(dateFormat) }}
+      {{ dayjs(data.modified).fromNow() }}
     </template>
     <template #via_customer_portal="{ data }">
       {{ data.via_customer_portal ? "Customer Portal" : "Email" }}
@@ -106,63 +106,53 @@ const dateFormat = "D/M/YYYY h:mm A";
 const columns = [
   {
     title: "Subject",
-    isTogglable: false,
     colKey: "subject",
     colClass: "col-subject",
   },
   {
     title: "Status",
-    isTogglable: false,
     colKey: "status",
     colClass: "w-24",
   },
   {
     title: "Priority",
-    isTogglable: false,
     colKey: "priority",
     colClass: "w-24",
   },
   {
     title: "Type",
-    isTogglable: false,
     colKey: "ticket_type",
     colClass: "w-20",
   },
   {
     title: "Contact",
-    isTogglable: false,
     colKey: "contact",
     colClass: "w-40",
   },
   {
     title: "Due in",
-    isTogglable: false,
     colKey: "resolution_by",
     colClass: "w-24",
   },
   {
     title: "Customer",
-    isTogglable: true,
     colKey: "customer",
     colClass: "w-40",
   },
   {
-    title: "Created on",
-    isTogglable: true,
-    colKey: "creation",
-    colClass: "w-36",
-  },
-  {
     title: "Last modified",
-    isTogglable: true,
     colKey: "modified",
     colClass: "w-36",
   },
   {
+    title: "Created on",
+    colKey: "creation",
+    colClass: "w-36",
+  },
+  {
     title: "Source",
-    isTogglable: true,
     colKey: "via_customer_portal",
-    colClass: "w-20",
+    colClass: "w-32",
   },
 ];
 
