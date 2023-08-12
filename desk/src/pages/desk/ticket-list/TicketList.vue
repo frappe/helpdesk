@@ -17,8 +17,8 @@
         </Button>
       </template>
     </PageTitle>
-    <TopSection class="mx-5 mb-3.5" />
-    <MainTable :tickets="tickets.list?.data" class="grow" />
+    <TopSection class="mx-5 mb-3.5" :columns="columns" />
+    <MainTable :tickets="tickets.list?.data" :columns="columns" class="grow" />
     <ListNavigation v-bind="tickets" class="p-2" />
     <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
       <template #body-main>
@@ -36,6 +36,7 @@
 import { ref } from "vue";
 import { Button, Dialog } from "frappe-ui";
 import { Icon } from "@iconify/vue";
+import { AGENT_PORTAL_TICKET } from "@/router";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
@@ -56,5 +57,88 @@ const tickets = createListManager({
   orderBy: getOrder(),
   realtime: true,
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = {
+        name: AGENT_PORTAL_TICKET,
+        params: {
+          ticketId: d.name,
+        },
+      };
+    }
+    return data;
+  },
 });
+
+const columns = [
+  {
+    label: "ID",
+    key: "name",
+    width: "w-12",
+  },
+  {
+    label: "Subject",
+    key: "subject",
+    width: "w-96",
+  },
+  {
+    label: "Status",
+    key: "status",
+    width: "w-24",
+  },
+  {
+    label: "Priority",
+    key: "priority",
+    width: "w-40",
+  },
+  {
+    label: "Assigned to",
+    icon: "lucide:user",
+    key: "_assign",
+    width: "w-8",
+    align: "m-auto",
+  },
+  {
+    label: "Count communication",
+    icon: "lucide:mail",
+    key: "count_communication",
+    width: "w-8",
+    align: "m-auto",
+  },
+  {
+    label: "Type",
+    key: "ticket_type",
+    width: "w-40",
+  },
+  {
+    label: "Contact",
+    key: "contact",
+    width: "w-40",
+  },
+  {
+    label: "Due in",
+    key: "resolution_by",
+    width: "w-40",
+  },
+  {
+    label: "Customer",
+    key: "customer",
+    width: "w-40",
+  },
+  {
+    label: "Last modified",
+    key: "modified",
+    width: "w-36",
+  },
+  {
+    label: "Created on",
+    key: "creation",
+    width: "w-36",
+  },
+  {
+    label: "Source",
+    key: "via_customer_portal",
+    width: "w-40",
+  },
+];
 </script>

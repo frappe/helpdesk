@@ -29,7 +29,7 @@
         </div>
       </template>
     </KnowledgeBaseCategoryHeader>
-    <HelpdeskTable
+    <ListView
       :columns="columns"
       :data="articles.data || []"
       :emit-row-click="true"
@@ -59,7 +59,7 @@
       <template #emptyMessage>
         <EmptyMessage message="This sub category is empty" />
       </template>
-    </HelpdeskTable>
+    </ListView>
     <ListNavigation v-bind="articles" class="p-2" />
     <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
       <template #body-content>
@@ -104,7 +104,7 @@ import {
 import { AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import EmptyMessage from "@/components/EmptyMessage.vue";
@@ -155,18 +155,18 @@ const articles = createListManager({
 const columns = [
   {
     title: "Title",
-    colKey: "title",
-    colClass: "w-1/2",
+    key: "title",
+    width: "w-1/2",
   },
   {
     title: "Views",
-    colKey: "views",
-    colClass: "w-1/4",
+    key: "views",
+    width: "w-1/4",
   },
   {
     title: "Status",
-    colKey: "status",
-    colClass: "w-1/4",
+    key: "status",
+    width: "w-1/4",
   },
 ];
 

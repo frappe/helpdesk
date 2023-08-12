@@ -14,14 +14,12 @@
         </Button>
       </template>
     </PageTitle>
-    <HelpdeskTable
-      class="grow"
+    <ListView
       :columns="columns"
-      :data="agents.list?.data || []"
+      :data="agents.list?.data"
       :empty-message="emptyMessage"
+      class="grow"
       row-key="name"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
     >
       <template #name="{ data }">
         <div class="flex items-center justify-between">
@@ -43,7 +41,7 @@
           Tickets &rightarrow;
         </div>
       </template>
-    </HelpdeskTable>
+    </ListView>
     <ListNavigation class="p-3" v-bind="agents" />
     <AddNewAgentsDialog
       :show="isDialogVisible"
@@ -59,7 +57,7 @@ import { createListManager } from "@/composables/listManager";
 import { useFilter } from "@/composables/filter";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
@@ -68,18 +66,19 @@ const isDialogVisible = ref(false);
 const emptyMessage = "No Agents Found";
 const columns = [
   {
-    title: "Name",
-    colKey: "name",
-    colClass: "w-1/3",
+    label: "Name",
+    key: "name",
+    width: "w-80",
   },
   {
-    title: "Email",
-    colKey: "email",
-    colClass: "w-1/3",
+    label: "Email",
+    key: "email",
+    width: "w-80",
   },
   {
-    title: "Username",
-    colKey: "username",
+    label: "Username",
+    key: "username",
+    width: "w-80",
   },
 ];
 
@@ -94,9 +93,16 @@ const agents = createListManager({
     "user.username",
   ],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = () => toTickets(d.name);
+    }
+    return data;
+  },
 });
 
 function toTickets(user: string) {
+  storage.value.clear();
   storage.value.add({
     fieldname: "_assign",
     operator: "is",

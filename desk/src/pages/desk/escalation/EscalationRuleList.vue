@@ -14,7 +14,7 @@
         </Button>
       </template>
     </PageTitle>
-    <HelpdeskTable
+    <ListView
       class="grow"
       :columns="columns"
       :data="rules.list?.data || []"
@@ -32,7 +32,7 @@
           {{ data.is_enabled ? "Enabled" : "Disabled" }}
         </Badge>
       </template>
-    </HelpdeskTable>
+    </ListView>
     <ListNavigation class="p-3" v-bind="rules" />
     <EscalationRuleDialog
       v-if="showDialog"
@@ -46,7 +46,7 @@ import { ref } from "vue";
 import { Badge } from "frappe-ui";
 import { socket } from "@/socket";
 import { createListManager } from "@/composables/listManager";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import EscalationRuleDialog from "./EscalationRuleDialog.vue";
@@ -58,23 +58,23 @@ const emptyMessage = "No Escalation Rules Found";
 const columns = [
   {
     title: "Priority",
-    colKey: "priority",
-    colClass: "w-1/3",
+    key: "priority",
+    width: "w-1/3",
   },
   {
     title: "Team",
-    colKey: "team",
-    colClass: "w-1/3",
+    key: "team",
+    width: "w-1/3",
   },
   {
     title: "Ticket type",
-    colKey: "ticket_type",
-    colClass: "w-1/3",
+    key: "ticket_type",
+    width: "w-1/3",
   },
   {
     title: "",
-    colKey: "is_enabled",
-    colClass: "w-20 flex justify-end",
+    key: "is_enabled",
+    width: "w-20 flex justify-end",
   },
 ];
 

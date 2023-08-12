@@ -14,16 +14,10 @@
         </Button>
       </template>
     </PageTitle>
-    <HelpdeskTable
+    <ListView
       :columns="columns"
       :data="teams.list?.data || []"
       :empty-message="emptyMessage"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
-      :row-click="{
-        type: 'link',
-        fn: toTeam,
-      }"
       class="grow"
       row-key="name"
     />
@@ -60,11 +54,10 @@ import { useRouter } from "vue-router";
 import { createResource, Dialog, FormControl } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
-import { createToast } from "@/utils/toasts";
 import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
 import PageTitle from "@/components/PageTitle.vue";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
@@ -74,14 +67,14 @@ const newTeamTitle = ref(null);
 const emptyMessage = "No Teams Found";
 const columns = [
   {
-    title: "Name",
-    colKey: "name",
-    colClass: "w-1/3",
+    label: "Name",
+    key: "name",
+    width: "w-80",
   },
   {
-    title: "Assignment rule",
-    colKey: "assignment_rule",
-    colClass: "w-1/3",
+    label: "Assignment rule",
+    key: "assignment_rule",
+    width: "w-80",
   },
 ];
 
@@ -89,6 +82,17 @@ const teams = createListManager({
   doctype: "HD Team",
   fields: ["name", "assignment_rule"],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = {
+        name: AGENT_PORTAL_TEAM_SINGLE,
+        params: {
+          teamId: d.name,
+        },
+      };
+    }
+    return data;
+  },
 });
 
 const newTeam = createResource({
@@ -115,13 +119,4 @@ const newTeam = createResource({
   },
   onError: useError({ title: "Error creating team" }),
 });
-
-function toTeam(id: string) {
-  return {
-    name: AGENT_PORTAL_TEAM_SINGLE,
-    params: {
-      teamId: id,
-    },
-  };
-}
 </script>

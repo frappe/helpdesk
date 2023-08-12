@@ -1,15 +1,9 @@
 <template>
-  <div class="m-auto rounded p-2.5">
-    <div class="text-base text-gray-700">
-      {{ message }}
-    </div>
+  <div class="m-auto w-max text-base text-gray-700">
+    {{ message }}
   </div>
 </template>
 
 <script setup lang="ts">
-interface P {
-  message: string;
-}
-
-defineProps<P>();
+defineProps<{ message: string }>();
 </script>
