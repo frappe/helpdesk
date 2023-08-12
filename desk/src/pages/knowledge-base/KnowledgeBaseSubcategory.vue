@@ -33,12 +33,6 @@
       :columns="columns"
       :data="articles.data || []"
       :emit-row-click="true"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
-      :row-click="{
-        type: 'link',
-        fn: toArticle,
-      }"
       class="grow"
       row-key="name"
     >
@@ -150,23 +144,36 @@ const articles = createListManager({
     category: props.subCategoryId,
   },
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = {
+        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+        params: {
+          articleId: d.name,
+        },
+      };
+    }
+    return data;
+  },
 });
 
 const columns = [
   {
-    title: "Title",
+    label: "Title",
     key: "title",
-    width: "w-1/2",
+    width: "w-96",
   },
   {
-    title: "Views",
+    label: "Views",
+    icon: "lucide:eye",
     key: "views",
-    width: "w-1/4",
+    width: "w-12",
+    align: "m-auto",
   },
   {
-    title: "Status",
+    label: "Status",
     key: "status",
-    width: "w-1/4",
+    width: "w-40",
   },
 ];
 
