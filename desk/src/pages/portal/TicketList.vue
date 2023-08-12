@@ -34,32 +34,14 @@
       </div>
     </div>
     <span v-if="!isEmpty(tickets.list?.data)">
-      <HelpdeskTable
-        :columns="columns"
-        :data="tickets.list?.data"
-        row-key="name"
-        :hide-checkbox="true"
-        :hide-column-selector="true"
-        :row-click="{
-          type: 'link',
-          fn: toTicket,
-        }"
-      >
+      <ListView :columns="columns" :data="tickets.list?.data" row-key="name">
         <template #subject="{ data }">
           <div
-            class="flex items-center justify-between"
             :class="{
               'font-medium': isHighlight(data),
-              'text-gray-900': isHighlight(data),
             }"
           >
-            <div class="line-clamp-1 max-w-lg">
-              {{ data.subject }}
-            </div>
-            <div class="mx-2 flex items-center gap-1 text-xs">
-              <IconHash class="h-3 w-3" />
-              {{ data.name }}
-            </div>
+            {{ data.subject }}
           </div>
         </template>
         <template #status="{ data }">
@@ -72,7 +54,7 @@
         <template #creation="{ data }">
           {{ dayjs(data.creation).fromNow() }}
         </template>
-      </HelpdeskTable>
+      </ListView>
       <ListNavigation v-bind="tickets" class="px-9 py-3" />
     </span>
     <div
@@ -86,7 +68,6 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
@@ -94,28 +75,31 @@ import { useConfigStore } from "@/stores/config";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createListManager } from "@/composables/listManager";
 import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
-import IconHash from "~icons/espresso/hash";
 
-const router = useRouter();
 const configStore = useConfigStore();
 const ticketStatusStore = useTicketStatusStore();
 const columns = [
   {
-    title: "Subject",
-    colKey: "subject",
-    colClass: "grow",
+    label: "ID",
+    key: "name",
+    width: "w-12",
   },
   {
-    title: "Status",
-    colKey: "status",
-    colClass: "w-32",
+    label: "Subject",
+    key: "subject",
+    width: "w-96",
   },
   {
-    title: "Created",
-    colKey: "creation",
-    colClass: "w-32",
+    label: "Status",
+    key: "status",
+    width: "w-32",
+  },
+  {
+    label: "Created",
+    key: "creation",
+    width: "w-32",
   },
 ];
 
@@ -124,6 +108,16 @@ const tickets = createListManager({
   pageLength: 10,
   fields: ["name", "creation", "subject", "status"],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = {
+        name: CUSTOMER_PORTAL_TICKET,
+        params: {
+          ticketId: d.name,
+        },
+      };
+    }
+  },
 });
 
 const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
@@ -160,15 +154,6 @@ function filter(title: string, filters: Record<string, any>) {
   });
   tickets.reload();
   dropdownTitle.value = title;
-}
-
-function toTicket(ticketId: number) {
-  return {
-    name: CUSTOMER_PORTAL_TICKET,
-    params: {
-      ticketId,
-    },
-  };
 }
 
 function transformStatus(status: string) {

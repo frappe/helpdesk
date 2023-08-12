@@ -14,17 +14,10 @@
         </Button>
       </template>
     </PageTitle>
-    <HelpdeskTable
+    <ListView
       :columns="columns"
       :data="contacts.list?.data || []"
-      :emit-row-click="true"
       :empty-message="emptyMessage"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
-      :row-click="{
-        type: 'action',
-        fn: openContact,
-      }"
       class="grow"
       row-key="name"
     >
@@ -34,7 +27,7 @@
           <div class="line-clamp-1">{{ data.name }}</div>
         </div>
       </template>
-    </HelpdeskTable>
+    </ListView>
     <ListNavigation class="p-3" v-bind="contacts" />
     <NewContactDialog
       v-model="isDialogVisible"
@@ -51,7 +44,7 @@ import { Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import ContactDialog from "./ContactDialog.vue";
 import IconPlus from "~icons/lucide/plus";
@@ -62,18 +55,19 @@ const selectedContact = ref(null);
 const emptyMessage = "No Contacts Found";
 const columns = [
   {
-    title: "Name",
-    colKey: "name",
-    colClass: "w-1/3",
+    label: "Name",
+    key: "name",
+    width: "w-80",
   },
   {
-    title: "Email",
-    colKey: "email_id",
-    colClass: "w-1/3",
+    label: "Email",
+    key: "email_id",
+    width: "w-80",
   },
   {
-    title: "Phone",
-    colKey: "phone",
+    label: "Phone",
+    key: "phone",
+    width: "w-80",
   },
 ];
 
@@ -81,6 +75,12 @@ const contacts = createListManager({
   doctype: "Contact",
   fields: ["name", "email_id", "image", "phone"],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = () => openContact(d.name);
+    }
+    return data;
+  },
 });
 
 function openContact(id: string) {

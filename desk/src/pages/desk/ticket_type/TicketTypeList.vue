@@ -11,18 +11,12 @@
         </RouterLink>
       </template>
     </PageTitle>
-    <HelpdeskTable
-      class="grow"
+    <ListView
       :columns="columns"
       :data="ticketTypes.list?.data || []"
       :empty-message="emptyMessage"
+      class="grow"
       row-key="name"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
-      :row-click="{
-        type: 'link',
-        fn: toType,
-      }"
     />
     <ListNavigation class="p-3" v-bind="ticketTypes" />
   </div>
@@ -34,21 +28,21 @@ import {
 } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
 const emptyMessage = "No Ticket Types Found";
 const columns = [
   {
-    title: "Name",
-    colKey: "name",
-    colClass: "grow",
+    label: "Name",
+    key: "name",
+    width: "w-80",
   },
   {
-    title: "Priority",
-    colKey: "priority",
-    colClass: "w-1/3",
+    label: "Priority",
+    key: "priority",
+    width: "w-80",
   },
 ];
 
@@ -56,14 +50,16 @@ const ticketTypes = createListManager({
   doctype: "HD Ticket Type",
   fields: ["name", "priority"],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = {
+        name: AGENT_PORTAL_TICKET_TYPE_SINGLE,
+        params: {
+          id: d.name,
+        },
+      };
+    }
+    return data;
+  },
 });
-
-function toType(id: string) {
-  return {
-    name: AGENT_PORTAL_TICKET_TYPE_SINGLE,
-    params: {
-      id,
-    },
-  };
-}
 </script>

@@ -14,18 +14,12 @@
         </Button>
       </template>
     </PageTitle>
-    <HelpdeskTable
-      class="grow"
+    <ListView
       :columns="columns"
       :data="customers.list?.data || []"
       :empty-message="emptyMessage"
+      class="grow"
       row-key="name"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
-      :row-click="{
-        type: 'action',
-        fn: openCustomer,
-      }"
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">
@@ -33,7 +27,7 @@
           <div class="line-clamp-1">{{ data.name }}</div>
         </div>
       </template>
-    </HelpdeskTable>
+    </ListView>
     <ListNavigation class="p-3" v-bind="customers" />
     <NewCustomerDialog
       v-model="isDialogVisible"
@@ -53,7 +47,7 @@ import { Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
-import HelpdeskTable from "@/components/HelpdeskTable.vue";
+import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
 import CustomerDialog from "./CustomerDialog.vue";
 import IconPlus from "~icons/lucide/plus";
@@ -64,14 +58,14 @@ const selectedCustomer = ref(null);
 const emptyMessage = "No Customers Found";
 const columns = [
   {
-    title: "Name",
-    colKey: "name",
-    colClass: "w-1/3",
+    label: "Name",
+    key: "name",
+    width: "w-80",
   },
   {
-    title: "Domain",
-    colKey: "domain",
-    colClass: "w-1/3",
+    label: "Domain",
+    key: "domain",
+    width: "w-80",
   },
 ];
 
@@ -79,6 +73,12 @@ const customers = createListManager({
   doctype: "HD Customer",
   fields: ["name", "image", "domain"],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = () => openCustomer(d.name);
+    }
+    return data;
+  },
 });
 
 function openCustomer(id: string) {

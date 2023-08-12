@@ -112,3 +112,11 @@ export interface Template {
   about: string;
   fields: Field[];
 }
+
+export type Column = {
+  key: string;
+  label: string;
+  icon: string;
+  width: string;
+  align: string;
+};
