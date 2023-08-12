@@ -84,12 +84,12 @@ const columns = [
   {
     label: "Status",
     key: "status",
-    width: "w-24",
+    width: "w-28",
   },
   {
     label: "Priority",
     key: "priority",
-    width: "w-40",
+    width: "w-32",
   },
   {
     label: "Assigned to",

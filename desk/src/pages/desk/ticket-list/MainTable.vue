@@ -12,6 +12,7 @@
         :label="data.status"
         :theme="ticketStatusStore.colorMapAgent[data.status]"
         variant="subtle"
+        size="lg"
         @click.stop.prevent="
           () => {
             storage.clear();

@@ -1,6 +1,6 @@
 <template>
   <Tooltip v-if="user" :text="getTooltipLabel(userName)">
-    <Avatar :image="userImage" :label="userName" size="sm" />
+    <Avatar :image="userImage" :label="userName" />
   </Tooltip>
 </template>
 
