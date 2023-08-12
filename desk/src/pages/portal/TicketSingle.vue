@@ -1,5 +1,5 @@
 <template>
-  <span v-if="ticket.data">
+  <div v-if="ticket.data" class="rounded bg-white shadow">
     <TopBar
       :title="ticket.data.subject"
       :back-to="{ name: CUSTOMER_PORTAL_LANDING }"
@@ -40,7 +40,7 @@
         </Button>
       </template>
     </TopBar>
-    <div class="flex flex-col gap-6 px-9 py-4 text-base text-gray-900">
+    <div class="flex flex-col gap-6 p-5 text-base text-gray-900">
       <div v-for="c in ticket.data.communications" :key="c.name">
         <CommunicationItem
           :content="c.content"
@@ -128,7 +128,7 @@
         </div>
       </template>
     </Dialog>
-  </span>
+  </div>
 </template>
 
 <script setup lang="ts">

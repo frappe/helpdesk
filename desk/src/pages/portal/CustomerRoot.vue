@@ -1,22 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <div
-      class="mx-auto py-4"
-      :style="{
-        width: '900px',
-      }"
-    >
-      <div class="mb-4 flex items-center justify-between text-base">
-        <RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
-          <img
-            v-if="configStore.brandLogo"
-            :src="configStore.brandLogo"
-            class="h-7"
-          />
-          <div v-else class="text-6xl text-gray-800">
-            {{ configStore.helpdeskName }}
-          </div>
-        </RouterLink>
+  <div class="min-h-screen bg-gray-100 p-4">
+    <div class="container mx-auto">
+      <div
+        class="mb-4 flex items-center justify-between rounded bg-white py-2 px-4 shadow"
+      >
         <Dropdown :options="options">
           <template #default="{ open }">
             <div
@@ -29,22 +16,17 @@
               />
               {{ authStore.userName }}
               <div class="text-gray-700">
-                <IconCaretUp v-if="open" />
-                <IconCaretDown v-else />
+                <Icon v-if="open" icon="lucide:chevron-up" />
+                <Icon v-else icon="lucide:chevron-down" />
               </div>
             </div>
           </template>
         </Dropdown>
+        <RouterLink :to="{ name: CUSTOMER_PORTAL_LANDING }">
+          <img :src="Logo" class="h-5" />
+        </RouterLink>
       </div>
-      <div
-        class="rounded-lg bg-white"
-        :style="{
-          'box-shadow':
-            '0px 0px 1px rgba(0, 0, 0, 0.45), 0px 1px 2px rgba(0, 0, 0, 0.1)',
-        }"
-      >
-        <RouterView />
-      </div>
+      <RouterView />
     </div>
   </div>
 </template>
@@ -52,15 +34,13 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { Avatar, Dropdown } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
-import { useConfigStore } from "@/stores/config";
 import { CUSTOMER_PORTAL_LANDING, KB_PUBLIC } from "@/router";
-import IconCaretDown from "~icons/lucide/chevron-down";
-import IconCaretUp from "~icons/lucide/chevron-up";
+import Logo from "@/assets/logos/helpdesk.svg";
 
 const router = useRouter();
 const authStore = useAuthStore();
-const configStore = useConfigStore();
 
 const options = [
   {
