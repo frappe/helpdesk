@@ -2,7 +2,7 @@
   <div class="my-4 rounded bg-gray-100 p-4 shadow">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-0.5">
-        <UserAvatar :user="sender" expand />
+        <UserAvatar :user="sender" size="lg" expand />
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dateExtended">
           <div class="text-base text-gray-600">
