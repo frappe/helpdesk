@@ -31,6 +31,7 @@ import { useTicketStore } from "./data";
 import ContactDetails from "./ContactDetails.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
+import TicketViews from "./TicketViews.vue";
 
 const { sidebar } = useTicketStore();
 const items = [
@@ -48,6 +49,11 @@ const items = [
     name: "Ticket History",
     component: TicketHistory,
     icon: "lucide:history",
+  },
+  {
+    name: "Ticket Views",
+    component: TicketViews,
+    icon: "lucide:view",
   },
 ];
 </script>
