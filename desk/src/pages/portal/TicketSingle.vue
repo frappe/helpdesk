@@ -55,22 +55,47 @@
       <TextEditor
         v-if="stateActive.includes(ticket.data.status)"
         ref="textEditor"
+        v-model="editorContent"
         :placeholder="placeholder"
-        :content="editorContent"
-        @change="(v) => (editorContent = v)"
       >
-        <template #bottom="{ editor }">
-          <TextEditorBottom v-model:attachments="attachments" :editor="editor">
-            <template #actions-right>
-              <Button
-                label="Send"
-                :disabled="editor.isEmpty"
-                theme="gray"
-                variant="solid"
-                @click="newCommunication.submit()"
-              />
+        <template #bottom-top>
+          <div class="flex flex-wrap gap-2">
+            <AttachmentItem
+              v-for="a in attachments"
+              :key="a.file_url"
+              :label="a.file_name"
+            >
+              <template #suffix>
+                <Icon
+                  icon="lucide:x"
+                  @click.stop="
+                    attachments = attachments.filter(
+                      (a__) => a__.file_url !== a.file_url
+                    )
+                  "
+                />
+              </template>
+            </AttachmentItem>
+          </div>
+        </template>
+        <template #bottom-left>
+          <FileUploader @success="(f) => attachments.push(f)">
+            <template #default="{ openFileSelector }">
+              <Button theme="gray" variant="ghost" @click="openFileSelector()">
+                <template #icon>
+                  <Icon icon="lucide:paperclip" />
+                </template>
+              </Button>
             </template>
-          </TextEditorBottom>
+          </FileUploader>
+        </template>
+        <template #bottom-right>
+          <Button
+            label="Send"
+            theme="gray"
+            variant="solid"
+            @click="newCommunication.submit()"
+          />
         </template>
       </TextEditor>
     </div>
@@ -139,6 +164,7 @@ import {
   Badge,
   Button,
   Dialog,
+  FileUploader,
   FormControl,
 } from "frappe-ui";
 import { Icon } from "@iconify/vue";
@@ -148,9 +174,8 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useError } from "@/composables/error";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import StarRating from "@/components/StarRating.vue";
-import TextEditor from "@/components/text-editor/TextEditor.vue";
-import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import TopBar from "@/components/TopBar.vue";
+import { AttachmentItem, TextEditor } from "@/components";
 
 const props = defineProps({
   ticketId: {
@@ -185,7 +210,7 @@ const newCommunication = createResource({
     method: "create_communication_via_contact",
     args: {
       message: editorContent.value,
-      attachments: Array.from(attachments.value).map((a) => a.name),
+      attachments: Array.from(attachments.value),
     },
   }),
   onSuccess: () => {
@@ -227,7 +252,7 @@ const showResolveButton = computed(() =>
 );
 
 function clearEditor() {
-  textEditor.value?.editor.commands.clearContent();
+  editorContent.value = "";
   attachments.value = [];
 }
 

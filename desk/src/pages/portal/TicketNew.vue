@@ -42,25 +42,52 @@
         />
         <TextEditor
           ref="textEditor"
+          v-model="description"
           placeholder="Detailed explanation"
-          :content="description"
-          @change="(v) => (description = v)"
         >
-          <template #bottom="{ editor }">
-            <TextEditorBottom
-              v-model:attachments="attachments"
-              :editor="editor"
-            >
-              <template #actions-right>
+          <template #bottom-top>
+            <div class="flex flex-wrap gap-2">
+              <AttachmentItem
+                v-for="a in attachments"
+                :key="a.file_url"
+                :label="a.file_name"
+              >
+                <template #suffix>
+                  <Icon
+                    icon="lucide:x"
+                    @click.stop="
+                      attachments = attachments.filter(
+                        (a__) => a__.file_url !== a.file_url
+                      )
+                    "
+                  />
+                </template>
+              </AttachmentItem>
+            </div>
+          </template>
+          <template #bottom-left>
+            <FileUploader @success="(f) => attachments.push(f)">
+              <template #default="{ openFileSelector }">
                 <Button
-                  label="Create"
-                  :disabled="isDisabled"
                   theme="gray"
-                  variant="solid"
-                  @click="newTicket.submit()"
-                />
+                  variant="ghost"
+                  @click="openFileSelector()"
+                >
+                  <template #icon>
+                    <Icon icon="lucide:paperclip" />
+                  </template>
+                </Button>
               </template>
-            </TextEditorBottom>
+            </FileUploader>
+          </template>
+          <template #bottom-right>
+            <Button
+              label="Create"
+              :disabled="isDisabled"
+              theme="gray"
+              variant="solid"
+              @click="newTicket.submit()"
+            />
           </template>
         </TextEditor>
       </div>
@@ -82,10 +109,12 @@ import {
   createResource,
   createListResource,
   Button,
+  FileUploader,
   FormControl,
 } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
+import { Icon } from "@iconify/vue";
 import {
   CUSTOMER_PORTAL_LANDING,
   CUSTOMER_PORTAL_TICKET,
@@ -93,10 +122,9 @@ import {
 } from "@/router";
 import { useConfigStore } from "@/stores/config";
 import { useError } from "@/composables/error";
-import TextEditor from "@/components/text-editor/TextEditor.vue";
-import TextEditorBottom from "@/components/text-editor/TextEditorBottom.vue";
 import TopBar from "@/components/TopBar.vue";
 import UniInput from "@/components/UniInput.vue";
+import { AttachmentItem, TextEditor } from "@/components";
 
 interface P {
   templateId?: string;
