@@ -514,12 +514,6 @@ class HDTicket(Document):
 		)
 
 		communication.insert(ignore_permissions=True)
-
-		# Mark status, unconditionally.
-		self.reload()
-		self.status = "Replied"
-		self.save()
-
 		capture_event("agent_replied")
 
 		if skip_email_workflow:
