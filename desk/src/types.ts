@@ -120,3 +120,12 @@ export type Column = {
   width: string;
   align: string;
 };
+
+export type File = {
+  file_name: string;
+  file_url: string;
+  is_private: boolean;
+  attached_to_doctype?: string;
+  attached_to_field?: string;
+  attached_to_name?: string;
+};

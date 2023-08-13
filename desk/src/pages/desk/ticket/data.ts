@@ -16,7 +16,6 @@ export function useTicket(id?: number | string) {
     });
     ticket.value = t;
   }
-
   return ticket;
 }
 
@@ -25,6 +24,7 @@ export const useTicketStore = defineStore("ticket", () => {
     isExpanded: true,
   });
   const editor = reactive({
+    type: "Comment",
     isExpanded: false,
     content: "",
     attachments: [],
@@ -34,6 +34,7 @@ export const useTicketStore = defineStore("ticket", () => {
     isBccVisible: false,
     tiptap: null,
     clean: () => {
+      editor.type = "Comment";
       editor.isExpanded = false;
       editor.content = "";
       editor.attachments = [];

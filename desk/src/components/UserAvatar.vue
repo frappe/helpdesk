@@ -6,7 +6,7 @@
       :image="user?.user_image"
       v-bind="$attrs"
     />
-    <span v-if="expand">
+    <span v-if="expand" class="text-base font-medium text-gray-900">
       {{ user?.full_name }}
     </span>
   </div>

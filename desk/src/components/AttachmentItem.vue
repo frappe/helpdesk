@@ -8,7 +8,7 @@
         @click="toggleDialog()"
       >
         <template #prefix>
-          <Icon :icon="getIcon()" class="h-4 w-4 text-gray-700" />
+          <Icon :icon="getIcon()" />
         </template>
         <template #suffix>
           <slot name="suffix" />
@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 const showDialog = ref(false);
-const mimeType = getMime(props.label);
+const mimeType = getMime(props.label) || "";
 const isImage = mimeType.startsWith("image/");
 const isPdf = mimeType === "application/pdf";
 const isSpreadsheet = mimeType.includes("spreadsheet");
