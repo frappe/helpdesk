@@ -1,8 +1,7 @@
 <template>
-  <span>
-    <div class="space-y-3 px-9 pb-4 pt-6">
-      <div class="flex items-center justify-between">
-        <div class="text-2xl font-semibold text-gray-900">My Tickets</div>
+  <div class="rounded bg-white shadow">
+    <PageTitle title="My tickets">
+      <template #right>
         <div class="flex gap-2">
           <div
             class="flex items-center justify-between text-base text-gray-700 transition"
@@ -31,8 +30,8 @@
             />
           </RouterLink>
         </div>
-      </div>
-    </div>
+      </template>
+    </PageTitle>
     <span v-if="!isEmpty(tickets.list?.data)">
       <ListView :columns="columns" :data="tickets.list?.data" row-key="name">
         <template #subject="{ data }">
@@ -63,7 +62,7 @@
     >
       📭 No tickets
     </div>
-  </span>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -77,6 +76,7 @@ import { createListManager } from "@/composables/listManager";
 import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
 import { ListView } from "@/components";
 import ListNavigation from "@/components/ListNavigation.vue";
+import PageTitle from "@/components/PageTitle.vue";
 
 const configStore = useConfigStore();
 const ticketStatusStore = useTicketStatusStore();

@@ -1,16 +1,11 @@
 <template>
-  <div class="pb-8 text-base text-gray-700">
+  <div class="mb-4 rounded bg-white pb-4 text-gray-900 shadow">
     <div class="flex flex-col gap-4">
       <TopBar
         title="New ticket"
         :back-to="hideBackButton ? null : { name: CUSTOMER_PORTAL_LANDING }"
       />
-      <div
-        v-if="!hideAbout && template.data?.about"
-        class="prose prose-sm mx-9 max-w-full"
-        v-html="sanitize(template.data.about)"
-      />
-      <div class="mx-9 grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-3 gap-4 px-5">
         <UniInput
           v-for="field in visibleFields"
           :key="field.fieldname"
@@ -21,7 +16,7 @@
       </div>
       <div
         v-if="!isEmpty(articles.data)"
-        class="mx-9 flex flex-col gap-4 rounded-lg border bg-yellow-50 p-4"
+        class="flex flex-col gap-4 rounded-lg border bg-yellow-50 p-4 px-5"
       >
         <div class="font-medium">
           📚 Did you know? These articles might cover what you looking for!
@@ -37,7 +32,7 @@
           <div class="opacity-0 group-hover:opacity-100">&rightarrow;</div>
         </RouterLink>
       </div>
-      <div class="mx-9 space-y-2">
+      <div class="space-y-4 px-5">
         <FormControl
           v-model="subject"
           type="text"
@@ -97,6 +92,13 @@
         </TextEditor>
       </div>
     </div>
+  </div>
+  <div class="rounded bg-white px-5 py-3 shadow">
+    <div
+      v-if="!hideAbout && template.data?.about"
+      class="prose prose-sm max-w-none"
+      v-html="sanitize(template.data.about)"
+    />
   </div>
 </template>
 

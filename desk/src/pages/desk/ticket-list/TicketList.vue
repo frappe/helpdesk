@@ -92,22 +92,13 @@ const columns = [
     width: "w-32",
   },
   {
-    label: "Assigned to",
-    icon: "lucide:user",
-    key: "_assign",
-    width: "w-8",
-    align: "m-auto",
-  },
-  {
-    label: "Count communication",
-    icon: "lucide:mail",
-    key: "count_communication",
-    width: "w-8",
-    align: "m-auto",
-  },
-  {
     label: "Type",
     key: "ticket_type",
+    width: "w-40",
+  },
+  {
+    label: "Team",
+    key: "agent_group",
     width: "w-40",
   },
   {
@@ -126,6 +117,25 @@ const columns = [
     width: "w-40",
   },
   {
+    label: "Source",
+    key: "via_customer_portal",
+    width: "w-40",
+  },
+  {
+    label: "Assigned to",
+    icon: "lucide:user",
+    key: "_assign",
+    width: "w-8",
+    align: "m-auto",
+  },
+  {
+    label: "Count communication",
+    icon: "lucide:mail",
+    key: "count_communication",
+    width: "w-8",
+    align: "m-auto",
+  },
+  {
     label: "Last modified",
     key: "modified",
     width: "w-36",
@@ -134,11 +144,6 @@ const columns = [
     label: "Created on",
     key: "creation",
     width: "w-36",
-  },
-  {
-    label: "Source",
-    key: "via_customer_portal",
-    width: "w-40",
   },
 ];
 </script>
