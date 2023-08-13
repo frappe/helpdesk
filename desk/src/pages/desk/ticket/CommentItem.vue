@@ -1,60 +1,44 @@
 <template>
-  <div class="group flex gap-3">
-    <div class="flex w-8 justify-end">
-      <Avatar :image="user?.user_image" :label="user?.full_name" size="sm" />
-    </div>
-    <div class="flex w-full flex-col gap-1.5">
-      <div class="flex items-start justify-between">
-        <div class="flex items-center">
-          <div class="text-base text-gray-900">
-            {{ user?.full_name }}
+  <div class="my-4 rounded bg-gray-100 p-4 shadow">
+    <div class="mb-4 flex items-center justify-between">
+      <div class="flex items-center gap-0.5">
+        <UserAvatar :user="sender" expand />
+        <Icon icon="lucide:dot" class="text-gray-500" />
+        <Tooltip :text="dateExtended">
+          <div class="text-base text-gray-600">
+            {{ dateDisplay }}
           </div>
-          <Icon icon="lucide:dot" class="text-gray-600" />
-          <Tooltip :text="dateExtended">
-            <div class="text-xs text-gray-600">
-              {{ dateDisplay }}
-            </div>
-          </Tooltip>
-          <div v-if="isPinned" class="flex items-center gap-1">
-            <Icon icon="lucide:dot" class="text-gray-600" />
-            <IconPin class="h-3 w-3 text-gray-700" />
-          </div>
-        </div>
-        <Dropdown v-if="!isEmpty(options)" :options="options">
+        </Tooltip>
+        <Icon v-if="isPinned" icon="lucide:dot" class="text-gray-500" />
+        <Badge v-if="isPinned" label="Pinned" theme="blue" variant="outline" />
+      </div>
+      <div class="flex items-center gap-1">
+        <Badge label="Comment" theme="green" variant="outline" />
+        <Dropdown :options="options">
           <template #default>
-            <FeatherIcon
-              name="more-horizontal"
-              class="h-5 w-5 cursor-pointer opacity-0 group-hover:opacity-100"
-            />
+            <Button theme="gray" variant="ghost">
+              <template #icon>
+                <Icon icon="lucide:more-horizontal" />
+              </template>
+            </Button>
           </template>
         </Dropdown>
       </div>
-      <div
-        class="prose prose-p:m-0 max-w-none rounded-lg bg-gray-100 p-2 text-base text-gray-700"
-      >
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-html="content"></span>
-      </div>
     </div>
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <span class="prose-f" v-html="content"></span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { toRefs, h, computed } from "vue";
-import {
-  createResource,
-  Avatar,
-  Dropdown,
-  FeatherIcon,
-  Tooltip,
-} from "frappe-ui";
-import { isEmpty } from "lodash";
+import { createResource, Badge, Button, Dropdown, Tooltip } from "frappe-ui";
 import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { useAuthStore } from "@/stores/auth";
-import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils/toasts";
+import { UserAvatar } from "@/components";
 
 interface P {
   content: string;
@@ -67,8 +51,6 @@ interface P {
 const props = defineProps<P>();
 const { content, date, name, sender, isPinned } = toRefs(props);
 const authStore = useAuthStore();
-const userStore = useUserStore();
-const user = userStore.getUser(sender.value);
 const dateDisplay = dayjs(date.value).fromNow();
 const dateExtended = dayjs(date.value).format("dddd, MMMM D, YYYY h:mm A");
 const IconTrash = h(Icon, { icon: "lucide:trash-2" });

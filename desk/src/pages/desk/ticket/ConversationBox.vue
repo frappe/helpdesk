@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col overflow-hidden">
     <div class="flex w-full flex-col items-center gap-4 overflow-auto">
-      <div class="content">
+      <div class="content mb-32 divide-y">
         <div v-for="c in conversation" :id="c.name" :key="c.name" class="mt-4">
           <CommentItem
             v-if="c.commented_by"
@@ -21,15 +21,11 @@
             :bcc="c.bcc || ''"
             :attachments="c.attachments"
           >
-            <template #extra="{ content, cc, bcc }">
+            <template #top-right="{ content, cc, bcc }">
               <Dropdown :options="dropdownOptions(content, cc, bcc)">
-                <Button
-                  theme="gray"
-                  variant="ouline"
-                  class="opacity-0 group-hover:opacity-100"
-                >
+                <Button theme="gray" variant="ghost">
                   <template #icon>
-                    <IconMoreHorizontal class="h-4 w-4" />
+                    <IconMoreHorizontal />
                   </template>
                 </Button>
               </Dropdown>

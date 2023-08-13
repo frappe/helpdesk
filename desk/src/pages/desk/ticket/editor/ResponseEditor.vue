@@ -109,10 +109,11 @@
       </TextEditor>
       <div
         v-else
-        class="flex h-8 w-full cursor-pointer select-none items-center rounded-lg border border-gray-300 px-2.5 text-base text-gray-500"
+        class="flex w-full cursor-pointer items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 hover:bg-gray-200"
         @click="editor.isExpanded = true"
       >
-        {{ placeholder }}
+        <UserAvatar :user="authStore.userId" size="sm" />
+        <span class="text-base text-gray-700">{{ placeholder }}</span>
       </div>
     </div>
     <ArticleResponses
@@ -131,10 +132,11 @@
 import { computed, onUnmounted, ref, watch } from "vue";
 import { createResource, Button, FileUploader, TabButtons } from "frappe-ui";
 import { useAgentStore } from "@/stores/agent";
+import { useAuthStore } from "@/stores/auth";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { useError } from "@/composables/error";
-import { AttachmentItem, TextEditor } from "@/components";
+import { AttachmentItem, TextEditor, UserAvatar } from "@/components";
 import CannedResponses from "./CannedResponses.vue";
 import ArticleResponses from "./ArticleResponses.vue";
 import TopSection from "./TopSection.vue";
@@ -145,6 +147,7 @@ const data = computed(() => ticket.value.data);
 const showArticleResponse = ref(false);
 const showCannedResponses = ref(false);
 const agentStore = useAgentStore();
+const authStore = useAuthStore();
 const { editor } = useTicketStore();
 const editorRef = ref(null);
 const placeholder = "Add a reply / comment";
