@@ -88,7 +88,7 @@
  ],
  "is_tree": 1,
  "links": [],
- "modified": "2023-07-17 18:08:33.247665",
+ "modified": "2023-08-13 14:42:34.742888",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
@@ -107,6 +107,27 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1
   },
   {
    "email": 1,
