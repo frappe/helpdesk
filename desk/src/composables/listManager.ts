@@ -13,7 +13,6 @@ type ListOptions = {
   start?: number;
   cache?: boolean | string | Array<string>;
   auto?: boolean;
-  realtime?: boolean;
   transform?: any;
 };
 
@@ -36,12 +35,12 @@ export function createListManager(options: ListOptions) {
   const start = options.start;
   const cache = options.cache;
   const auto = options.auto;
-  const realtime = options.realtime;
   const transform = options.transform;
 
   const list = createListResource({
     type: "list",
     url: GET_LIST_METHOD,
+    realtime: true,
     doctype,
     fields,
     orderBy,
@@ -49,7 +48,6 @@ export function createListManager(options: ListOptions) {
     pageLength,
     start,
     cache,
-    realtime,
     auto,
     transform,
     onSuccess() {

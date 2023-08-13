@@ -26,6 +26,7 @@
 		"mitt": "^3.0.1",
 		"pinia": "^2.0.33",
 		"sanitize-html": "^2.10.0",
+		"socket.io-client": "^4.7.2",
 		"vee-validate": "^4.8.2",
 		"vue": "^3.2.47",
 		"vue-echarts": "^6.5.4",
