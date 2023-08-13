@@ -37,6 +37,7 @@ import { ref } from "vue";
 import { Button, Dialog } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
+import { socket } from "@/socket";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
@@ -55,7 +56,6 @@ const tickets = createListManager({
   pageLength: 20,
   filters: getArgs(),
   orderBy: getOrder(),
-  realtime: true,
   auto: true,
   transform: (data) => {
     for (const d of data) {
@@ -68,6 +68,10 @@ const tickets = createListManager({
     }
     return data;
   },
+});
+
+socket.on("helpdesk:new-ticket", () => {
+  if (!tickets.hasPreviousPage) tickets.reload();
 });
 
 const columns = [

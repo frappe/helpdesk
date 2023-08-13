@@ -165,6 +165,7 @@ class HDTicket(Document):
 	def after_insert(self):
 		log_ticket_activity(self.name, "created this ticket")
 		capture_event("ticket_created")
+		publish_event("helpdesk:new-ticket", {"name": self.name})
 
 	def on_update(self):
 		self.handle_ticket_activity_update()
