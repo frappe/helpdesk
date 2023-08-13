@@ -111,6 +111,11 @@ const columns = [
     width: "w-40",
   },
   {
+    label: "Team",
+    key: "agent_group",
+    width: "w-40",
+  },
+  {
     label: "Contact",
     key: "contact",
     width: "w-40",
