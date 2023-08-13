@@ -25,7 +25,7 @@
               <Dropdown :options="dropdownOptions(content, cc, bcc)">
                 <Button theme="gray" variant="ghost">
                   <template #icon>
-                    <IconMoreHorizontal />
+                    <Icon icon="lucide:more-horizontal" />
                   </template>
                 </Button>
               </Dropdown>
@@ -42,10 +42,10 @@ import { computed } from "vue";
 import { Button, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { orderBy } from "lodash";
+import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import CommunicationItem from "@/components/CommunicationItem.vue";
 import CommentItem from "./CommentItem.vue";
-import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconReply from "~icons/lucide/reply";
 import IconReplyAll from "~icons/lucide/reply-all";
 import { useTicketStore, useTicket } from "./data";
