@@ -121,7 +121,7 @@ const columns = [
     key: "via_customer_portal",
     width: "w-40",
   },
-   {
+  {
     label: "Assigned to",
     icon: "lucide:user",
     key: "_assign",
