@@ -21,14 +21,14 @@
           <div class="flex justify-between">
             <div class="text-gray-600">First Response Due:</div>
             <div class="font-medium text-gray-700">
-              {{ dayjs(data.response_by).format(dateFormat) }}
+              {{ dayjs(data.response_by).short() }}
             </div>
           </div>
           <div class="flex items-center justify-between">
             <div class="text-gray-600">Resolution Due:</div>
             <div class="font-medium text-gray-700">
               <span v-if="data.resolution_by">
-                {{ dayjs(data.resolution_by).format(dateFormat) }}
+                {{ dayjs(data.resolution_by).short() }}
               </span>
               <Badge
                 v-else
@@ -84,7 +84,6 @@ import { createToast } from "@/utils";
 import UniInput from "@/components/UniInput.vue";
 import { useTicket, useTicketStore } from "./data";
 
-const dateFormat = "MMM D, h:mm A";
 const ticketStore = useTicketStore();
 const ticket = useTicket();
 const data = computed(() => ticket.value.data);

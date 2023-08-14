@@ -28,15 +28,16 @@
     </template>
     <template #resolution_by="{ data }">
       <div
+        v-if="data.resolution_by"
         :class="{
-          'text-red-700': Date.parse(data.resolution_by) < Date.now(),
+          'text-red-800': dayjs(data.resolution_by).isBefore(dayjs()),
         }"
       >
-        {{ data.resolution_by ? dayjs(data.resolution_by).fromNow() : "—" }}
+        {{ dayjs(data.resolution_by).fromNow() }}
       </div>
     </template>
     <template #creation="{ data }">
-      {{ dayjs(data.creation).format(dateFormat) }}
+      {{ dayjs(data.creation).fromNow() }}
     </template>
     <template #modified="{ data }">
       {{ dayjs(data.modified).fromNow() }}
@@ -86,7 +87,6 @@ const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
-const dateFormat = "D/M/YYYY h:mm A";
 
 const bulkAssignTicketToAgent = createResource({
   url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",

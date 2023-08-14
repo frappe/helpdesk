@@ -145,7 +145,7 @@ const columns = [
     width: "w-32",
   },
   {
-    label: "Created on",
+    label: "Created",
     key: "creation",
     width: "w-36",
   },
