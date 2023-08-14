@@ -3,7 +3,9 @@
     <PageTitle title="Dashboard">
       <template #right>
         <Tooltip v-if="!isEmpty(items.data)" placement="left" :text="dateInfo">
-          <IconInfo class="h-5 w-5 text-gray-800" />
+          <div class="flex h-7 w-7 items-center justify-between">
+            <IconInfo class="h-5 w-5 text-gray-700" />
+          </div>
         </Tooltip>
       </template>
     </PageTitle>

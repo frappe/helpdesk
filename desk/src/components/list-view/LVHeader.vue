@@ -1,12 +1,15 @@
 <template>
-  <div class="border-y px-5 py-1.5 text-sm text-gray-600">
+  <div class="border-y px-3 py-1.5 text-sm text-gray-600">
     <div class="flex w-full items-center space-x-2">
-      <FormControl
-        v-if="checkbox"
-        type="checkbox"
-        :model-value="data?.length === selection.storage.size"
-        @update:model-value="toggle()"
-      />
+      <div class="flex w-6">
+        <FormControl
+          v-if="checkbox"
+          type="checkbox"
+          class="mx-auto"
+          :model-value="data?.length === selection.storage.size"
+          @update:model-value="toggle()"
+        />
+      </div>
       <div v-for="c in columns" :key="c.key">
         <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
           <Icon

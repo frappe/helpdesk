@@ -1,5 +1,5 @@
 <template>
-  <div class="px-5 py-3">
+  <div class="p-3">
     <div class="flex items-center justify-between">
       <slot name="title">
         <div v-if="title" class="text-lg font-medium text-gray-900">
