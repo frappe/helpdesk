@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group flex h-10 w-full items-center space-x-2 whitespace-nowrap px-4 text-base transition"
+    class="group flex h-10 w-full items-center gap-2 whitespace-nowrap px-4 text-base transition"
     :class="{
       'bg-gray-200': selection.storage.has(data[rowKey]),
       'hover:bg-gray-300': selection.storage.has(data[rowKey]),
@@ -19,7 +19,7 @@
       :is="isObject(data.onClick) ? RouterLink : 'span'"
       as="template"
       :to="data.onClick"
-      class="flex w-full items-center space-x-2"
+      class="flex w-full items-center gap-2"
       @click.prevent="
         () => {
           if (!isObject(data.onClick)) data.onClick.call();

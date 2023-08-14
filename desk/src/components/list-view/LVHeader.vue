@@ -1,6 +1,6 @@
 <template>
   <div class="border-y px-4 py-1.5 text-sm text-gray-600">
-    <div class="flex w-full items-center space-x-2">
+    <div class="flex w-full items-center gap-2">
       <FormControl
         v-if="checkbox"
         type="checkbox"
