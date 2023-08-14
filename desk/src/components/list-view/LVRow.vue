@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group mx-2 flex h-10 w-full items-center space-x-2 whitespace-nowrap px-1 text-base transition"
+    class="group flex h-10 w-full items-center space-x-2 whitespace-nowrap px-4 text-base transition"
     :class="{
       'bg-gray-200': selection.storage.has(data[rowKey]),
       'hover:bg-gray-300': selection.storage.has(data[rowKey]),
@@ -8,21 +8,22 @@
       'cursor-pointer': !!data.onClick,
     }"
   >
-    <div class="flex w-6">
-      <FormControl
-        v-if="checkbox"
-        type="checkbox"
-        class="mx-auto"
-        :model-value="selection.storage.has(data[rowKey])"
-        @update:model-value="selection.toggle(data[rowKey])"
-      />
-    </div>
+    <FormControl
+      v-if="checkbox"
+      type="checkbox"
+      :model-value="selection.storage.has(data[rowKey])"
+      @update:model-value="selection.toggle(data[rowKey])"
+    />
     <component
       :is="isObject(data.onClick) ? RouterLink : 'span'"
       as="template"
       :to="data.onClick"
       class="flex w-full items-center space-x-2"
-      @click.prevent="data.onClick.call()"
+      @click.prevent="
+        () => {
+          if (!isObject(data.onClick)) data.onClick.call();
+        }
+      "
     >
       <div
         v-for="c in columns"

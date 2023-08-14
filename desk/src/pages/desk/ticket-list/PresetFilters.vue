@@ -1,13 +1,13 @@
 <template>
   <Dropdown :options="options">
     <template #default="{ open }">
-      <div class="flex cursor-pointer items-center gap-2">
-        <div class="text-2xl font-semibold text-gray-900">
+      <div class="flex cursor-pointer items-center gap-1">
+        <div class="text-lg font-medium text-gray-900">
           {{ title }}
         </div>
         <Icon
           :icon="open ? 'lucide:chevron-up' : 'lucide:chevron-down'"
-          class="h-5 w-5"
+          class="h-4 w-4 text-gray-700"
         />
       </div>
     </template>

@@ -17,7 +17,7 @@
         </Button>
       </template>
     </PageTitle>
-    <TopSection class="mx-3 mb-3" :columns="columns" />
+    <TopSection class="mx-4 mb-3" :columns="columns" />
     <MainTable :tickets="tickets.list?.data" :columns="columns" class="grow" />
     <ListNavigation v-bind="tickets" class="p-2" />
     <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
