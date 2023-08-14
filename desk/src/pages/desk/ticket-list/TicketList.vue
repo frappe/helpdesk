@@ -76,11 +76,6 @@ socket.on("helpdesk:new-ticket", () => {
 
 const columns = [
   {
-    label: "ID",
-    key: "name",
-    width: "w-12",
-  },
-  {
     label: "Subject",
     key: "subject",
     width: "w-96",
@@ -98,32 +93,32 @@ const columns = [
   {
     label: "Type",
     key: "ticket_type",
-    width: "w-40",
+    width: "w-36",
   },
   {
     label: "Team",
     key: "agent_group",
-    width: "w-40",
+    width: "w-36",
   },
   {
     label: "Contact",
     key: "contact",
-    width: "w-40",
+    width: "w-36",
   },
   {
     label: "Due in",
     key: "resolution_by",
-    width: "w-40",
+    width: "w-36",
   },
   {
     label: "Customer",
     key: "customer",
-    width: "w-40",
+    width: "w-36",
   },
   {
     label: "Source",
     key: "via_customer_portal",
-    width: "w-40",
+    width: "w-36",
   },
   {
     label: "Assigned to",
