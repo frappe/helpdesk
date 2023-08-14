@@ -43,7 +43,7 @@ import {
   Dialog,
   FileUploader,
 } from "frappe-ui";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 import { useError } from "@/composables/error";
 
 const props = defineProps({

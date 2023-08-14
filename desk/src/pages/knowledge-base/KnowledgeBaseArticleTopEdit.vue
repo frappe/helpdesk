@@ -50,7 +50,7 @@
 
 <script setup lang="ts">
 import { Avatar, FormControl } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
 
 interface P {

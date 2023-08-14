@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Button, Dropdown } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { orderBy } from "lodash";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";

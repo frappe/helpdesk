@@ -63,10 +63,10 @@
 
 <script setup lang="ts">
 import { computed, h, watch } from "vue";
-import { createResource, Button, Dropdown, FormControl } from "frappe-ui";
+import { Button, Dropdown, FormControl } from "frappe-ui";
 import { useDebounceFn } from "@vueuse/core";
 import { Icon } from "@iconify/vue";
-import { DocField, Filter, Resource } from "@/types";
+import { DocField, Filter } from "@/types";
 import { useFilter } from "@/composables/filter";
 import SearchComplete from "./SearchComplete.vue";
 
@@ -79,7 +79,7 @@ const props = withDefaults(defineProps<P>(), {
   appendAssign: false,
 });
 
-const { apply, fields, storage } = useFilter(props.doctype, props.appendAssign);
+const { apply, fields, storage } = useFilter(props.doctype);
 const typeCheck = ["Check"];
 const typeLink = ["Link"];
 const typeNumber = ["Float", "Int"];
@@ -95,8 +95,8 @@ watch(
 );
 
 const optionsField = computed(() =>
-  fields.data
-    ?.map((f) => ({
+  fields
+    .map((f) => ({
       label: f.label,
       onClick: () =>
         storage.value.add({

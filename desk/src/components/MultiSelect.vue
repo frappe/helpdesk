@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import { ref, toRefs } from "vue";
 import { Button, Input } from "frappe-ui";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 
 type Item = {
   label: string;

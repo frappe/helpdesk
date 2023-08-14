@@ -70,7 +70,7 @@ import {
   AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
   CUSTOMER_PORTAL_NEW_TICKET,
 } from "@/router";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
 import TopBar from "@/components/TopBar.vue";

@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { Dropdown } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { isEmpty } from "lodash";
 import { useConfigStore } from "@/stores/config";
 import { useTicketStatusStore } from "@/stores/ticketStatus";

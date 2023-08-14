@@ -3,9 +3,11 @@
     id="ticket"
     :columns="columns"
     :data="tickets"
+    doctype="HD Ticket"
     :empty-message="emptyMessage"
     row-key="name"
     checkbox
+    filter
   >
     <template #subject="{ data }">
       <div class="flex w-96 items-center justify-between">
@@ -19,17 +21,6 @@
         :theme="ticketStatusStore.colorMapAgent[data.status]"
         variant="subtle"
         size="lg"
-        @click.stop.prevent="
-          () => {
-            storage.clear();
-            storage.add({
-              fieldname: 'status',
-              operator: 'is',
-              value: data.status,
-            });
-            apply();
-          }
-        "
       />
     </template>
     <template #_assign="{ data }">
@@ -74,12 +65,11 @@
 
 <script setup lang="ts">
 import { createResource, Badge, Dropdown } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { createToast } from "@/utils/toasts";
-import { useFilter } from "@/composables/filter";
+import { createToast } from "@/utils";
 import { useError } from "@/composables/error";
 import { ListView } from "@/components";
 import AssignedInfo from "./AssignedInfo.vue";
@@ -94,7 +84,6 @@ withDefaults(defineProps<P>(), {
 });
 const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
-const { apply, storage } = useFilter("HD Ticket");
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 const dateFormat = "D/M/YYYY h:mm A";

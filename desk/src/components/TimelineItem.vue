@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { Tooltip } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
 import { useUserStore } from "@/stores/user";
 

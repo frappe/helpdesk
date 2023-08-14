@@ -32,6 +32,7 @@ export function useFilter(doctype: string) {
 
   const fields: Resource<Array<DocField>> = createResource({
     url: "helpdesk.api.doc.get_filterable_fields",
+    initialData: [],
     makeParams: () => ({
       doctype,
       append_assign: true,
@@ -78,6 +79,15 @@ export function useFilter(doctype: string) {
     return merged;
   }
 
+  function add(f: Filter) {
+    storage.value.forEach((i) => {
+      if (i.fieldname === f.fieldname) {
+        storage.value.delete(i);
+      }
+    });
+    storage.value.add(f);
+  }
+
   function apply(r?: RouteLocationNamedRaw) {
     r = r || route;
     const l__ = Array.from(storage.value);
@@ -122,5 +132,11 @@ export function useFilter(doctype: string) {
     return f;
   }
 
-  return { apply, fields, getArgs, storage };
+  return {
+    add,
+    apply,
+    fields: fields.data,
+    getArgs,
+    storage,
+  };
 }

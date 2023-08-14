@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen w-screen">
     <SideBar />
-    <router-view :key="route.fullPath" class="z-0 grow overflow-auto" />
+    <RouterView :key="route.fullPath" class="z-0 grow overflow-auto" />
   </div>
 </template>
 

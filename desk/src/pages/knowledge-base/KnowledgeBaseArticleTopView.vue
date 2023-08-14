@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { Avatar } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import {
   AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
   AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,

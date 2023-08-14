@@ -523,7 +523,6 @@ export default {
 						icon: "check",
 						iconClasses: "text-green-500",
 					})
-					this.$clearToasts()
 					this.$router.push({
 						name: "Emails",
 					})

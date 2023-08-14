@@ -56,13 +56,13 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { createResource, Autocomplete, Avatar } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
 import { emitter } from "@/emitter";
-import { copy } from "@/utils/clipboard";
-import { createToast } from "@/utils/toasts";
+import { copy } from "@/utils";
+import { createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";

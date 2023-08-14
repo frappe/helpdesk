@@ -27,6 +27,8 @@
           :checkbox="checkbox"
           :columns="columns"
           :data="row"
+          :doctype="doctype"
+          :filter="filter"
           :row-key="rowKey"
           :to="row.onClick"
         >
@@ -56,10 +58,12 @@ interface P {
   id: string;
   checkbox: boolean;
   columns: Column[];
-  rowKey: string;
   data?: Record<string, any>[];
+  doctype: string;
   emptyMessage?: string;
+  filter: boolean;
   loading?: boolean;
+  rowKey: string;
 }
 
 withDefaults(defineProps<P>(), {
