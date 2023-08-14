@@ -88,7 +88,7 @@ const columns = [
   {
     label: "Status",
     key: "status",
-    width: "w-28",
+    width: "w-20",
   },
   {
     label: "Priority",
