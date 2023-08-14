@@ -1,13 +1,12 @@
 <template>
   <div class="flex items-center gap-2">
     <Avatar
-      v-if="user"
-      :label="user?.full_name"
+      :label="user?.full_name || props.user"
       :image="user?.user_image"
       v-bind="$attrs"
     />
     <span v-if="expand" class="text-base font-medium text-gray-900">
-      {{ user?.full_name }}
+      {{ user?.full_name || props.user }}
     </span>
   </div>
 </template>
