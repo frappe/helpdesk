@@ -113,7 +113,7 @@ const columns = [
   {
     label: "Due in",
     key: "resolution_by",
-    width: "w-36",
+    width: "w-32",
   },
   {
     label: "Customer",
@@ -142,7 +142,7 @@ const columns = [
   {
     label: "Last modified",
     key: "modified",
-    width: "w-36",
+    width: "w-32",
   },
   {
     label: "Created on",
