@@ -74,13 +74,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { createResource, Autocomplete, Button } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 import UniInput from "@/components/UniInput.vue";
 import { useTicket, useTicketStore } from "./data";
 

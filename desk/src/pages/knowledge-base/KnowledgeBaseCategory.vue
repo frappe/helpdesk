@@ -124,7 +124,7 @@ import {
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY } from "@/router";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
 import KnowledgeBaseCategoryCard from "./KnowledgeBaseCategoryCard.vue";

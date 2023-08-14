@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { createResource, call } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { router, LOGIN } from "@/router";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";

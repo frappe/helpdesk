@@ -29,8 +29,8 @@
 import { toRef } from "vue";
 import { Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
-import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
+import { dayjs } from "@/dayjs";
 import { AttachmentItem, UserAvatar } from "@/components";
 
 interface Attachment {

@@ -59,7 +59,7 @@ import {
   FileUploader,
 } from "frappe-ui";
 import zod from "zod";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 import { useError } from "@/composables/error";
 import MultiSelect from "@/components/MultiSelect.vue";
 

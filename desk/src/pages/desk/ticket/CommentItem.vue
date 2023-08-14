@@ -33,11 +33,11 @@
 <script setup lang="ts">
 import { toRefs, h, computed } from "vue";
 import { createResource, Badge, Button, Dropdown, Tooltip } from "frappe-ui";
-import dayjs from "dayjs";
+import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { useAuthStore } from "@/stores/auth";
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 import { UserAvatar } from "@/components";
 
 interface P {

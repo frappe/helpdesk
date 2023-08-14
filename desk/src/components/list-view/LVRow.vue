@@ -34,7 +34,10 @@
         }"
       >
         <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
-          <div :class="['w-max', 'max-w-full', 'truncate', c.align]">
+          <div
+            :class="['w-max', 'max-w-full', 'truncate', c.align]"
+            @click="(event) => filter(event, c)"
+          >
             <slot :name="c.key" :data="data">
               {{ data[c.key] || "⸺" }}
             </slot>
@@ -50,7 +53,9 @@ import { toRef } from "vue";
 import { FormControl } from "frappe-ui";
 import { isObject } from "lodash";
 import { Column } from "@/types";
+import { getAssign } from "@/utils";
 import { useColumns } from "@/composables/columns";
+import { useFilter } from "@/composables/filter";
 import { selection } from "./selection";
 import { RouterLink } from "vue-router";
 
@@ -59,10 +64,34 @@ interface P {
   checkbox: boolean;
   columns: Column[];
   data: any;
+  doctype: string;
+  filter: boolean;
   rowKey: string;
 }
 
 const props = defineProps<P>();
 const id = toRef(props, "id");
 const { storage: hiddenColumns } = useColumns(id.value);
+const { add: addFilter, apply: applyFilter, fields } = useFilter(props.doctype);
+
+function filter(e: InputEvent, c: Column) {
+  if (!props.filter) return;
+  const supported = ["Link", "Select"];
+  const f__ = fields.find((f) => f.fieldname === c.key);
+  if (!f__ || !supported.includes(f__.fieldtype)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  let value = props.data[c.key];
+  if (f__.fieldname === "_assign") {
+    let assign = getAssign(value);
+    if (!assign) return;
+    value = assign;
+  }
+  addFilter({
+    fieldname: f__.fieldname,
+    operator: "is",
+    value: props.data[c.key],
+  });
+  applyFilter();
+}
 </script>

@@ -1,4 +1,4 @@
-import { createToast } from "@/utils/toasts";
+import { createToast } from "@/utils";
 
 interface Options {
   title?: string;
