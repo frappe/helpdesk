@@ -7,7 +7,7 @@
     <div class="mb-1 font-medium text-gray-900 first-letter:capitalize">
       {{ user?.full_name || user }} {{ action }}
     </div>
-    <Tooltip :text="dayjs(date).format(dateFmtLong)">
+    <Tooltip :text="dayjs(date).long()">
       <div class="text-gray-700 first-letter:capitalize">
         {{ dayjs(date).fromNow() }}
       </div>
@@ -32,5 +32,4 @@ const props = withDefaults(defineProps<P>(), {
 });
 const userStore = useUserStore();
 const user = userStore.getUser(props.user);
-const dateFmtLong = "dddd, MMMM D, YYYY h:mm A";
 </script>

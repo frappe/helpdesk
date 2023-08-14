@@ -4,9 +4,9 @@
       <div class="flex items-center gap-0.5">
         <UserAvatar :user="sender" size="lg" expand />
         <Icon icon="lucide:dot" class="text-gray-500" />
-        <Tooltip :text="dateExtended">
+        <Tooltip :text="dayjs(date).long()">
           <div class="text-base text-gray-600">
-            {{ dateDisplay }}
+            {{ dayjs(date).fromNow() }}
           </div>
         </Tooltip>
         <Icon v-if="isPinned" icon="lucide:dot" class="text-gray-500" />
@@ -33,8 +33,8 @@
 <script setup lang="ts">
 import { toRefs, h, computed } from "vue";
 import { createResource, Badge, Button, Dropdown, Tooltip } from "frappe-ui";
-import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
+import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { useAuthStore } from "@/stores/auth";
 import { createToast } from "@/utils";
@@ -49,10 +49,8 @@ interface P {
 }
 
 const props = defineProps<P>();
-const { content, date, name, sender, isPinned } = toRefs(props);
+const { content, name, sender, isPinned } = toRefs(props);
 const authStore = useAuthStore();
-const dateDisplay = dayjs(date.value).fromNow();
-const dateExtended = dayjs(date.value).format("dddd, MMMM D, YYYY h:mm A");
 const IconTrash = h(Icon, { icon: "lucide:trash-2" });
 const IconPin = h(Icon, { icon: "lucide:pin" });
 const IconUnpin = h(Icon, { icon: "lucide:pin-off" });

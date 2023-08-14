@@ -18,7 +18,7 @@
       </div>
       <IconDot class="h-4 w-4 text-gray-600" />
       <div class="text-xs text-gray-800">
-        {{ dayjs(creation).format(dateFormat) }}
+        {{ dayjs(creation).short() }}
       </div>
       <IconDot class="h-4 w-4 text-gray-600" />
       <Badge
@@ -116,7 +116,6 @@ const props = defineProps({
 
 const router = useRouter();
 const { categoryId, subCategoryId } = toRefs(props);
-const dateFormat = "MMMM D, YYYY";
 
 function toCategory() {
   router.push({

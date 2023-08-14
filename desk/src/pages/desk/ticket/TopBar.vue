@@ -10,7 +10,9 @@
           # {{ data.name }}
         </div>
         <Icon icon="lucide:dot" />
-        <Tooltip :text="dateLong"> Last modified {{ dateShort }} </Tooltip>
+        <Tooltip :text="dayjs(data.modified).long()">
+          Last modified {{ dayjs(data.modified).fromNow() }}
+        </Tooltip>
         <Icon icon="lucide:dot" />
         <Badge
           :label="data.status"
@@ -56,13 +58,12 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { dayjs } from "@/dayjs";
 import { createResource, Autocomplete, Avatar } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
+import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
-import { copy } from "@/utils";
-import { createToast } from "@/utils";
+import { copy, createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
@@ -74,9 +75,6 @@ const ticketStatusStore = useTicketStatusStore();
 const userStore = useUserStore();
 const ticket = useTicket();
 const data = computed(() => ticket.value.data);
-const date = computed(() => dayjs(data.value.modified).tz(dayjs.tz.guess()));
-const dateLong = computed(() => date.value.format("dddd, MMMM D, YYYY h:mm A"));
-const dateShort = computed(() => date.value.fromNow());
 const viaCustomerPortal = computed(() => data.value.via_customer_portal);
 const sourceText = computed(() =>
   viaCustomerPortal.value ? "Created via customer portal" : "Created via email"
