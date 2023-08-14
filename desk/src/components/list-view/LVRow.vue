@@ -6,6 +6,7 @@
       'hover:bg-gray-300': selection.storage.has(data[rowKey]),
       'hover:bg-gray-100': !selection.storage.has(data[rowKey]),
       'cursor-pointer': !!data.onClick,
+      ...data.class,
     }"
   >
     <FormControl

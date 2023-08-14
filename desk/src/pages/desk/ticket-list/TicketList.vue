@@ -38,6 +38,7 @@ import { Button, Dialog } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { socket } from "@/socket";
+import { useAuthStore } from "@/stores/auth";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
@@ -48,6 +49,7 @@ import MainTable from "./MainTable.vue";
 import TopSection from "./TopSection.vue";
 import PresetFilters from "./PresetFilters.vue";
 
+const { userId } = useAuthStore();
 const { getArgs } = useFilter("HD Ticket");
 const { get: getOrder } = useOrder();
 const showNewDialog = ref(false);
@@ -59,6 +61,9 @@ const tickets = createListManager({
   auto: true,
   transform: (data) => {
     for (const d of data) {
+      d.class = {
+        "font-medium": !d._seen?.includes(userId),
+      };
       d.onClick = {
         name: AGENT_PORTAL_TICKET,
         params: {
