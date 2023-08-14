@@ -56,18 +56,20 @@ import LVSelectionBar from "./LVSelectionBar.vue";
 
 interface P {
   id: string;
-  checkbox: boolean;
   columns: Column[];
-  data?: Record<string, any>[];
   doctype: string;
-  emptyMessage?: string;
-  filter: boolean;
-  loading?: boolean;
   rowKey: string;
+  checkbox?: boolean;
+  data?: Record<string, any>[];
+  emptyMessage?: string;
+  filter?: boolean;
+  loading?: boolean;
 }
 
 withDefaults(defineProps<P>(), {
+  checkbox: false,
   emptyMessage: "No records",
+  filter: false,
   loading: false,
 });
 </script>

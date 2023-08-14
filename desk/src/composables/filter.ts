@@ -38,7 +38,7 @@ export function useFilter(doctype: string) {
       append_assign: true,
     }),
     cache: ["DocField", doctype],
-    auto: true,
+    auto: !!doctype,
   });
 
   watchEffect(() => {
