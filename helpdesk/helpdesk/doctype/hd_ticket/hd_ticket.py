@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 from datetime import timedelta
 from email.utils import parseaddr
@@ -300,68 +298,6 @@ class HDTicket(Document):
 		communication.ignore_permissions = True
 		communication.ignore_mandatory = True
 		communication.save(ignore_permissions=True)
-
-	@frappe.whitelist()
-	def split_ticket(self, subject, communication_id):
-		# Bug: Pressing enter doesn't send subject
-		from copy import deepcopy
-
-		replicated_ticket = deepcopy(self)
-		replicated_ticket.subject = subject
-		replicated_ticket.ticket_split_from = self.name
-		replicated_ticket.first_response_time = 0
-		replicated_ticket.first_responded_on = None
-		replicated_ticket.creation = now_datetime()
-
-		# Reset SLA
-		if replicated_ticket.sla:
-			replicated_ticket.service_level_agreement_creation = now_datetime()
-			replicated_ticket.sla = None
-			replicated_ticket.agreement_status = "Ongoing"
-			replicated_ticket.response_by = None
-			replicated_ticket.response_by_variance = None
-			replicated_ticket.resolution_by = None
-			replicated_ticket.resolution_by_variance = None
-			replicated_ticket.reset_ticket_metrics()
-
-		frappe.get_doc(replicated_ticket).insert()
-
-		# Replicate linked Communications
-		# TODO: get all communications in timeline before this, and modify them to append them to new doc
-		comm_to_split_from = frappe.get_doc("Communication", communication_id)
-		communications = frappe.get_all(
-			"Communication",
-			filters={
-				"reference_doctype": "HD Ticket",
-				"reference_name": comm_to_split_from.reference_name,
-				"creation": (">=", comm_to_split_from.creation),
-			},
-		)
-
-		for communication in communications:
-			doc = frappe.get_doc("Communication", communication.name)
-			doc.reference_name = replicated_ticket.name
-			doc.save(ignore_permissions=True)
-
-		frappe.get_doc(
-			{
-				"doctype": "Comment",
-				"comment_type": "Info",
-				"reference_doctype": "HD Ticket",
-				"reference_name": replicated_ticket.name,
-				"content": (
-					" - Split the Ticket from <a href='/app/Form/Ticket/{0}'>{1}</a>".format(
-						self.name, frappe.bold(self.name)
-					)
-				),
-			}
-		).insert(ignore_permissions=True)
-
-		return replicated_ticket.name
-
-	def reset_ticket_metrics(self):
-		self.db_set("resolution_time", None)
-		self.db_set("user_resolution_time", None)
 
 	@frappe.whitelist()
 	def assign_agent(self, agent):
@@ -747,38 +683,6 @@ def set_descritption_from_communication(doc, type):
 		ticket_doc = frappe.get_doc("HD Ticket", doc.reference_name)
 		if not ticket_doc.via_customer_portal:
 			ticket_doc.description = doc.content
-
-
-def auto_close_tickets():
-	"""Auto-close replied support tickets after 7 days"""
-	auto_close_after_days = (
-		frappe.db.get_value("HD Settings", "HD Settings", "close_ticket_after_days")
-		or 7
-	)
-
-	tickets = frappe.db.sql(
-		""" select name from `tabHD Ticket` where status='Replied' and
-        modified<DATE_SUB(CURDATE(), INTERVAL %s DAY) """,
-		(auto_close_after_days),
-		as_dict=True,
-	)
-
-	for ticket in tickets:
-		doc = frappe.get_doc("HD Ticket", ticket.get("name"))
-		doc.status = "Closed"
-		doc.flags.ignore_permissions = True
-		doc.flags.ignore_mandatory = True
-		doc.save()
-
-
-def has_website_permission(doc, ptype, user, verbose=False):
-	# TODO: the commented code was used earilier, we dont need customers so just commented these out for now.
-	# but will need to see if some more logic needs to be added here.
-	# from erpnext.controllers.website_list_for_contact import has_website_permission
-	# permission_based_on_customer = has_website_permission(doc, ptype, user, verbose)
-
-	# return permission_based_on_customer or doc.raised_by==user
-	return doc.raised_by == user
 
 
 def update_ticket(contact, method):

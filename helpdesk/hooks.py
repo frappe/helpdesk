@@ -17,19 +17,14 @@ website_route_rules = [
 	},
 ]
 
-has_website_permission = {
-	"HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_website_permission",
-}
-
 scheduler_events = {
 	"daily": [
-		"helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.auto_close_tickets",
 		"helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.check_agreement_status",
 	],
 }
 
 doc_events = {
-	"*": {
+	"HD Ticket": {
 		"validate": "helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.apply",
 	},
 	"Communication": {
@@ -50,8 +45,5 @@ doc_events = {
 	},
 	"Assignment Rule": {
 		"on_trash": "helpdesk.overrides.on_assignment_rule_trash",
-	},
-	"HD Agent": {
-		"before_insert": "helpdesk.limits.validate_agent_count",
 	},
 }
