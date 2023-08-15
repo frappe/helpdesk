@@ -32,7 +32,6 @@ export function useFilter(doctype: string) {
 
   const fields: Resource<Array<DocField>> = createResource({
     url: "helpdesk.api.doc.get_filterable_fields",
-    initialData: [],
     makeParams: () => ({
       doctype,
       append_assign: true,

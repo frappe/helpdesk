@@ -96,7 +96,7 @@ watch(
 
 const optionsField = computed(() =>
   fields
-    .map((f) => ({
+    ?.map((f) => ({
       label: f.label,
       onClick: () =>
         storage.value.add({
