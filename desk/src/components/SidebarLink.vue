@@ -10,7 +10,7 @@
     }"
     @click="handle"
   >
-    <component :is="icon" class="h-4 w-4 shrink-0 text-gray-700"></component>
+    <Icon :icon="icon" class="h-4 w-4 shrink-0 text-gray-700"></Icon>
     <div
       class="ml-2 flex shrink-0 grow items-center justify-between text-sm transition-all duration-300 ease-in-out"
       :class="{
@@ -30,43 +30,24 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { Badge, Tooltip } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 
-const props = defineProps({
-  icon: {
-    type: Object,
-    required: true,
-  },
-  label: {
-    type: String,
-    required: true,
-  },
-  isBeta: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  to: {
-    type: String,
-    required: false,
-    default: "",
-  },
-  onClick: {
-    type: Function,
-    required: false,
-    default: () => true,
-  },
-  isExpanded: {
-    type: Boolean,
-    required: false,
-    default: true,
-  },
-  isActive: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
+interface P {
+  icon: string;
+  label: string;
+  isExpanded: boolean;
+  isActive?: boolean;
+  isBeta?: boolean;
+  onClick?: () => void;
+  to?: string;
+}
+
+const props = withDefaults(defineProps<P>(), {
+  isActive: false,
+  isBeta: false,
+  onClick: () => () => true,
+  to: "",
 });
-
 const router = useRouter();
 const betaText = "This feature is a work in progress. Use with caution";
 

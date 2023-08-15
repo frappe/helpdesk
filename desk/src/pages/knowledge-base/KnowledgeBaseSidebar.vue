@@ -22,10 +22,11 @@
       <SidebarLink
         v-for="category in categories.data"
         :key="category.label"
-        :icon="getIcon(category.icon)"
+        :icon="getIcon(category.icon, true)"
         :is-active="activeCategory === category.name"
+        :is-expanded="true"
         :label="category.category_name"
-        @click="toCategory(category.name)"
+        :on-click="() => toCategory(category.name)"
       />
     </div>
     <KnowledgeBaseCategoryNew
