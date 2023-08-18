@@ -1,10 +1,11 @@
 import frappe
+from frappe.model.document import Document
 from frappe.utils.safe_exec import get_safe_globals
 
 DOCTYPE = "HD Service Level Agreement"
 
 
-def get_sla(ticket: frappe.Document) -> frappe.Document:
+def get_sla(ticket: Document) -> Document:
 	"""
 	Get Service Level Agreement for `ticket`
 
@@ -36,7 +37,7 @@ def get_sla(ticket: frappe.Document) -> frappe.Document:
 	return res or get_default()
 
 
-def get_default() -> frappe.Document:
+def get_default() -> Document:
 	"""
 	Get default Service Level Agreement
 
@@ -51,7 +52,7 @@ def get_default() -> frappe.Document:
 	)
 
 
-def get_context(doc: frappe.Document) -> dict:
+def get_context(d: Document) -> dict:
 	"""
 	Get safe context for `safe_eval`
 
@@ -60,6 +61,6 @@ def get_context(doc: frappe.Document) -> dict:
 	"""
 	utils = get_safe_globals().get("frappe").get("utils")
 	return {
-		"doc": doc.as_dict(),
+		"doc": d.as_dict(),
 		"frappe": frappe._dict(utils=utils),
 	}

@@ -12,32 +12,53 @@
           />
         </div>
         <div class="my-6 flex flex-col justify-between gap-3.5">
-          <div v-if="data.customer" class="flex justify-between">
-            <div class="text-gray-600">Customer:</div>
-            <div class="font-medium text-gray-700">
+          <div v-if="data.customer" class="space-y-2">
+            <span class="block text-sm text-gray-700">Customer</span>
+            <span class="block break-words font-medium text-gray-900">
               {{ data.customer }}
-            </div>
+            </span>
           </div>
-          <div class="flex justify-between">
-            <div class="text-gray-600">First Response Due:</div>
-            <div class="font-medium text-gray-700">
-              {{ dayjs(data.response_by).short() }}
-            </div>
+          <div class="space-y-2">
+            <span class="block text-sm text-gray-700">First response</span>
+            <span class="mr-2 font-medium text-gray-900">
+              {{ dayjs(data.first_responded_on || data.response_by).short() }}
+            </span>
+            <Badge
+              v-if="!data.first_responded_on"
+              label="Due"
+              theme="orange"
+              variant="outline"
+            />
+            <Badge
+              v-else-if="
+                dayjs(data.first_responded_on).isBefore(dayjs(data.response_by))
+              "
+              label="Fulfilled"
+              theme="green"
+              variant="outline"
+            />
+            <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
-          <div class="flex items-center justify-between">
-            <div class="text-gray-600">Resolution Due:</div>
-            <div class="font-medium text-gray-700">
-              <span v-if="data.resolution_by">
-                {{ dayjs(data.resolution_by).short() }}
-              </span>
-              <Badge
-                v-else
-                label="Paused"
-                size="md"
-                variant="subtle"
-                theme="green"
-              />
-            </div>
+          <div class="space-y-2">
+            <span class="block text-sm text-gray-700">Resolution</span>
+            <span class="mr-2 font-medium text-gray-900">
+              {{ dayjs(data.resolution_date || data.resolution_by).short() }}
+            </span>
+            <Badge
+              v-if="!data.resolution_date"
+              label="Due"
+              theme="orange"
+              variant="outline"
+            />
+            <Badge
+              v-else-if="
+                dayjs(data.resolution_date).isBefore(data.resolution_by)
+              "
+              label="Fulfilled"
+              theme="green"
+              variant="outline"
+            />
+            <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
         </div>
       </div>

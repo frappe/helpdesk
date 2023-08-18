@@ -68,6 +68,8 @@ export interface Ticket {
   raised_by: string;
   resolution_by: string;
   response_by: string;
+  first_responded_on: string;
+  resolution_date: string;
   feedback: TicketFeedback;
   status: string;
   subject: string;

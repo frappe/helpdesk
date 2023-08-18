@@ -26,6 +26,8 @@ from helpdesk.helpdesk.utils.email import (
 )
 from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
 
+from ..hd_service_level_agreement.utils import get_sla
+
 
 class HDTicket(Document):
 	@staticmethod
@@ -155,10 +157,14 @@ class HDTicket(Document):
 		self.set_customer()
 		self.set_priority()
 		self.apply_escalation_rule()
+		self.set_sla()
 
 	def validate(self):
 		self.validate_feedback()
 		self.validate_ticket_type()
+
+	def before_save(self):
+		self.apply_sla()
 
 	def after_insert(self):
 		log_ticket_activity(self.name, "created this ticket")
@@ -676,6 +682,14 @@ class HDTicket(Document):
 		self.priority = escalation_rule.to_priority or self.priority
 		self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
 		self.assign_agent(escalation_rule.to_agent)
+
+	def set_sla(self):
+		if sla := get_sla(self):
+			self.sla = sla.name
+
+	def apply_sla(self):
+		sla = frappe.get_doc("HD Service Level Agreement", self.sla)
+		sla.apply(self)
 
 
 def set_descritption_from_communication(doc, type):

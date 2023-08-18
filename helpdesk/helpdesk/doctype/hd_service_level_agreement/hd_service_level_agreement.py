@@ -1,8 +1,9 @@
+from typing import Literal
 from datetime import datetime
 
 import frappe
 from frappe import _
-from frappe.core.utils import get_parent_doc
+from frappe.core.utils import find_all, get_parent_doc
 from frappe.model.document import Document
 from frappe.utils import (
 	add_to_date,
@@ -119,13 +120,159 @@ class HDServiceLevelAgreement(Document):
 			}
 		)
 
-	def foo(self):
-		pass
-
 	def on_trash(self):
 		if self.service_level == "Default":
 			text = _("The Default HD Service Level Agreement cannot be deleted")
 			frappe.throw(text, frappe.PermissionError)
+
+	def apply(self, doc: Document):
+		self.handle_new(doc)
+		self.handle_targets(doc)
+		self.handle_status(doc)
+		self.handle_agreement_status(doc)
+
+	def handle_new(self, doc: Document):
+		if not doc.is_new():
+			return
+		creation = doc.service_level_agreement_creation or now_datetime()
+		doc.service_level_agreement_creation = creation
+		doc.priority = doc.priority or self.default_priority
+
+	def handle_status(self, doc: Document):
+		if doc.is_new() or not doc.has_value_changed("status"):
+			return
+		self.set_first_responded_at(doc)
+		self.set_hold_time(doc)
+		self.set_resolution_date(doc)
+
+	def set_first_responded_at(self, doc: Document):
+		next_state = doc.get("status")
+		pause_on = [row.status for row in self.pause_sla_on]
+		is_paused = next_state in pause_on
+		if is_paused:
+			doc.first_responded_on = doc.first_responded_on or now_datetime()
+
+	def set_resolution_date(self, doc: Document):
+		fullfill_on = [row.status for row in self.sla_fulfilled_on]
+		prev_state = doc.get_doc_before_save().get("status")
+		next_state = doc.get("status")
+		was_fulfilled = prev_state in fullfill_on
+		is_fulfilled = next_state in fullfill_on
+		if is_fulfilled and not was_fulfilled:
+			doc.resolution_date = now_datetime()
+
+	def set_hold_time(self, doc: Document):
+		pause_on = [row.status for row in self.pause_sla_on]
+		prev_state = doc.get_doc_before_save().get("status")
+		next_state = doc.get("status")
+		was_paused = prev_state in pause_on
+		is_paused = next_state in pause_on
+		paused_since = doc.resolution_date or doc.on_hold_since
+		if is_paused and not was_paused:
+			doc.on_hold_since = now_datetime()
+			self.reset_targets(doc)
+		else:
+			doc.on_hold_since = None
+		if is_paused or not paused_since:
+			return
+		doc.on_hold_since = None
+		curr_val = time_diff_in_seconds(now_datetime(), paused_since)
+		doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
+
+	def handle_targets(self, doc: Document):
+		doc.response_by = self.calc_time(doc, "response_time")
+		doc.resolution_by = self.calc_time(doc, "resolution_time")
+
+	def reset_targets(self, doc: Document):
+		doc.response_by = doc.resolution_by if doc.first_responded_on else None
+		doc.resolution_by = doc.resolution_by if doc.resolution_date else None
+
+	def reset_resolution_metrics(self, doc: Document):
+		pause_on = [row.status for row in self.pause_sla_on]
+		fullfill_on = [row.status for row in self.sla_fulfilled_on]
+		prev_state = doc.get_doc_before_save().get("status")
+		next_state = doc.get("status")
+		was_paused = prev_state in pause_on
+		was_fulfilled = prev_state in fullfill_on
+		is_paused = next_state in pause_on
+		is_fulfilled = next_state in fullfill_on
+		is_open = not is_paused and not is_fulfilled
+		if is_open and (was_paused or was_fulfilled):
+			return
+		doc.response_date = None
+		doc.resolution_date = None
+		doc.user_resolution_time = None
+
+	def handle_agreement_status(self, doc: Document):
+		if self.apply_sla_for_resolution:
+			if not doc.get("first_responded_on"):
+				doc.agreement_status = "First Response Due"
+			elif not doc.get("resolution_date"):
+				doc.agreement_status = "Resolution Due"
+			elif get_datetime(doc.get("resolution_date")) <= get_datetime(
+				doc.get("resolution_by")
+			):
+				doc.agreement_status = "Fulfilled"
+			else:
+				doc.agreement_status = "Overdue"
+		else:
+			if not doc.get("first_responded_on"):
+				doc.agreement_status = "First Response Due"
+			elif get_datetime(doc.get("first_responded_on")) <= get_datetime(
+				doc.get("response_by")
+			):
+				doc.agreement_status = "Fulfilled"
+			else:
+				doc.agreement_status = "Overdue"
+
+	def calc_time(
+		self, doc: Document, target: Literal["response_time", "resolution_time"]
+	):
+		res = get_datetime(doc.service_level_agreement_creation or doc.creation)
+		priority = self.get_priorities()[doc.priority]
+		time_needed = priority.get(target, 0)
+		holidays = self.get_holidays()
+		weekdays = get_weekdays()
+		workdays = self.get_workdays()
+		while time_needed:
+			today = res
+			today_day = getdate(today)
+			today_weekday = weekdays[today.weekday()]
+			is_workday = today_weekday in workdays
+			is_holiday = today_day in holidays
+			if is_holiday or not is_workday:
+				res = add_to_date(res, days=1, as_datetime=True)
+				continue
+			today_workday = workdays[today_weekday]
+			start_time = today_workday.start_time
+			end_time = today_workday.end_time
+			time_left = time_diff_in_seconds(end_time, start_time)
+			time_taken = min(time_needed, time_left)
+			time_needed -= time_taken
+			res = add_to_date(res, seconds=time_taken, as_datetime=True)
+		return res
+
+	def get_holidays(self):
+		holiday_list = frappe.get_doc("HD Service Holiday List", self.holiday_list)
+		return holiday_list.holidays
+
+	def get_priorities(self):
+		"""
+		Return priorities related info as a dict. With `priority` as key
+		"""
+		res = {}
+		for row in self.priorities:
+			res[row.priority] = row
+		return res
+
+	def get_workdays(self) -> dict[str, dict]:
+		"""
+		Return workdays related info as a dict. With `workday` as key
+		"""
+		res = {}
+		for row in self.support_and_resolution:
+			res[row.workday] = row
+		return res
 
 
 # Called from hooks (schedule)
@@ -147,61 +294,6 @@ def check_agreement_status():
 			)
 
 
-# Useful, but could be improved ig
-def get_sla_for(doc):
-	if not frappe.db.get_single_value("HD Settings", "track_service_level_agreement"):
-		return
-
-	filters = [
-		["HD Service Level Agreement", "document_type", "=", doc.get("doctype")],
-		["HD Service Level Agreement", "enabled", "=", 1],
-	]
-
-	if doc.get("priority"):
-		filters.append(
-			["HD Service Level Priority", "priority", "=", doc.get("priority")]
-		)
-
-	default_service_level_agreement_filter = filters + [
-		["HD Service Level Agreement", "default_sla", "=", 1]
-	]
-	default_sla = frappe.get_all(
-		"HD Service Level Agreement",
-		filters=default_service_level_agreement_filter,
-		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
-	)
-
-	filters += [["HD Service Level Agreement", "default_sla", "=", 0]]
-	agreements = frappe.get_all(
-		"HD Service Level Agreement",
-		filters=filters,
-		fields=["name", "default_priority", "apply_sla_for_resolution", "condition"],
-	)
-
-	# check if the current document on which HD Service Level Agreement is to be applied fulfills all the conditions
-	filtered_agreements = []
-	for agreement in agreements:
-		condition = agreement.get("condition")
-		if not condition or (
-			condition and frappe.safe_eval(condition, None, get_context(doc))
-		):
-			filtered_agreements.append(agreement)
-
-	# if any default hd_service_level_agreement
-	filtered_agreements += default_sla
-
-	return filtered_agreements[0] if filtered_agreements else None
-
-
-# For safe_eval, could ship somewhere else
-def get_context(doc):
-	return {
-		"doc": doc.as_dict(),
-		"nowdate": nowdate,
-		"frappe": frappe._dict(utils=get_safe_globals().get("frappe").get("utils")),
-	}
-
-
 # Probably not needed. Could be simplified (ig)
 def get_repeated(values):
 	unique_list = []
@@ -213,486 +305,3 @@ def get_repeated(values):
 			if value not in diff:
 				diff.append(str(value))
 	return " ".join(diff)
-
-
-# Could be moved to somewhere else
-def apply(doc, method=None):
-	if (
-		frappe.flags.in_patch
-		or frappe.flags.in_migrate
-		or frappe.flags.in_install
-		or frappe.flags.in_setup_wizard
-	):
-		return
-
-	if sla := get_sla_for(doc):
-		process_sla(doc, sla)
-
-
-def process_sla(doc, sla):
-	if not doc.creation:
-		doc.creation = now_datetime()
-		if doc.meta.has_field("service_level_agreement_creation"):
-			doc.service_level_agreement_creation = now_datetime()
-
-	doc.hd_service_level_agreement = sla.name
-	doc.priority = doc.get("priority") or sla.default_priority
-
-	# Needed
-	handle_status_change(doc, sla.apply_sla_for_resolution)
-	# Does something idk
-	update_response_and_resolution_metrics(doc, sla.apply_sla_for_resolution)
-	# Same as above
-	update_agreement_status(doc, sla.apply_sla_for_resolution)
-
-
-# Refactor?
-def handle_status_change(doc, apply_sla_for_resolution):
-	now_time = now_datetime()
-	prev_status = frappe.db.get_value(doc.doctype, doc.name, "status")
-
-	hold_statuses = get_hold_statuses(doc.hd_service_level_agreement)
-	fulfillment_statuses = get_fulfillment_statuses(doc.hd_service_level_agreement)
-
-	def is_hold_status(status):
-		return status in hold_statuses
-
-	def is_fulfilled_status(status):
-		return status in fulfillment_statuses
-
-	def is_open_status(status):
-		return status not in hold_statuses and status not in fulfillment_statuses
-
-	def set_first_response():
-		if doc.meta.has_field("first_responded_on") and not doc.get(
-			"first_responded_on"
-		):
-			doc.first_responded_on = now_time
-			# if get_datetime(doc.get("first_responded_on")) > get_datetime(
-			# 	doc.get("response_by")
-			# ):
-			# 	record_assigned_users_on_failure(doc)
-
-	def calculate_hold_hours():
-		# In case ticket was closed and after few days it has been opened
-		# The hold time should be calculated from resolution_date
-		on_hold_since = doc.resolution_date or doc.on_hold_since
-		if on_hold_since:
-			current_hold_hours = time_diff_in_seconds(now_time, on_hold_since)
-			doc.total_hold_time = (doc.total_hold_time or 0) + current_hold_hours
-		doc.on_hold_since = None
-
-	if (
-		is_open_status(prev_status) and not is_open_status(doc.status)
-	) or doc.flags.on_first_reply:
-		set_first_response()
-
-	# Open to Replied
-	if is_open_status(prev_status) and is_hold_status(doc.status):
-		# Ticket is on hold -> Set on_hold_since
-		doc.on_hold_since = now_time
-		reset_expected_response_and_resolution(doc)
-
-	# Replied to Open
-	if is_hold_status(prev_status) and is_open_status(doc.status):
-		# Ticket was on hold -> Calculate Total Hold Time
-		calculate_hold_hours()
-		# Ticket is open -> reset resolution_date
-		reset_resolution_metrics(doc)
-
-	# Open to Closed
-	if is_open_status(prev_status) and is_fulfilled_status(doc.status):
-		# Ticket is closed -> Set resolution_date
-		doc.resolution_date = now_time
-		set_resolution_time(doc)
-
-	# Closed to Open
-	if is_fulfilled_status(prev_status) and is_open_status(doc.status):
-		# Ticket was closed -> Calculate Total Hold Time from resolution_date
-		calculate_hold_hours()
-		# Ticket is open -> reset resolution_date
-		reset_resolution_metrics(doc)
-
-	# Closed to Replied
-	if is_fulfilled_status(prev_status) and is_hold_status(doc.status):
-		# Ticket was closed -> Calculate Total Hold Time from resolution_date
-		calculate_hold_hours()
-		# Ticket is on hold -> Set on_hold_since
-		doc.on_hold_since = now_time
-		reset_expected_response_and_resolution(doc)
-
-	# Replied to Closed
-	if is_hold_status(prev_status) and is_fulfilled_status(doc.status):
-		# Ticket was on hold -> Calculate Total Hold Time
-		calculate_hold_hours()
-		# Ticket is closed -> Set resolution_date
-		if apply_sla_for_resolution:
-			doc.resolution_date = now_time
-			set_resolution_time(doc)
-
-
-def get_fulfillment_statuses(hd_service_level_agreement):
-	return [
-		entry.status
-		for entry in frappe.db.get_all(
-			"HD Service Level Agreement Fulfilled On Status",
-			filters={"parent": hd_service_level_agreement},
-			fields=["status"],
-		)
-	]
-
-
-def get_hold_statuses(sla):
-	return [
-		entry.status
-		for entry in frappe.db.get_all(
-			"HD Pause Service Level Agreement On Status",
-			filters={"parent": sla},
-			fields=["status"],
-		)
-	]
-
-
-def update_response_and_resolution_metrics(doc, apply_sla_for_resolution):
-	priority = get_response_and_resolution_duration(doc)
-	start_date_time = get_datetime(
-		doc.get("service_level_agreement_creation") or doc.creation
-	)
-	set_response_by(doc, start_date_time, priority)
-	if apply_sla_for_resolution and not doc.get(
-		"on_hold_since"
-	):  # resolution_by is reset if on hold
-		set_resolution_by(doc, start_date_time, priority)
-
-
-# Looks big and ugly. Have to do something here
-def get_expected_time_for(parameter, service_level, start_date_time):
-	current_date_time = start_date_time
-	expected_time = current_date_time
-	start_time = end_time = None
-	expected_time_is_set = 0
-
-	allotted_seconds = get_allotted_seconds(parameter, service_level)
-	support_days = get_support_days(service_level)
-	holidays = get_holidays(service_level.get("holiday_list"))
-	weekdays = get_weekdays()
-
-	while not expected_time_is_set:
-		current_weekday = weekdays[current_date_time.weekday()]
-
-		if (
-			not getdate(current_date_time) in holidays
-			and current_weekday in support_days
-		):
-			if (
-				getdate(current_date_time) == getdate(start_date_time)
-				and get_time_in_timedelta(current_date_time.time())
-				> support_days[current_weekday].start_time
-			):
-				start_time = current_date_time - datetime(
-					current_date_time.year,
-					current_date_time.month,
-					current_date_time.day,
-				)
-			else:
-				start_time = support_days[current_weekday].start_time
-
-			end_time = support_days[current_weekday].end_time
-			time_left_today = time_diff_in_seconds(end_time, start_time)
-			# no time left for support today
-			if time_left_today <= 0:
-				pass
-
-			elif allotted_seconds:
-				if time_left_today >= allotted_seconds:
-					expected_time = datetime.combine(
-						getdate(current_date_time), get_time(start_time)
-					)
-					expected_time = add_to_date(expected_time, seconds=allotted_seconds)
-					expected_time_is_set = 1
-				else:
-					allotted_seconds = allotted_seconds - time_left_today
-
-		if not expected_time_is_set:
-			current_date_time = add_to_date(current_date_time, days=1)
-
-	if end_time and allotted_seconds >= 86400:
-		current_date_time = datetime.combine(
-			getdate(current_date_time), get_time(end_time)
-		)
-	else:
-		current_date_time = expected_time
-
-	return current_date_time
-
-
-def get_allotted_seconds(parameter, service_level):
-	allotted_seconds = 0
-	if parameter == "response":
-		allotted_seconds = service_level.get("response_time")
-	elif parameter == "resolution":
-		allotted_seconds = service_level.get("resolution_time")
-	else:
-		frappe.throw(_("{0} parameter is invalid").format(parameter))
-
-	return allotted_seconds
-
-
-def get_support_days(service_level):
-	support_days = {}
-	for service in service_level.get("support_and_resolution"):
-		support_days[service.workday] = frappe._dict(
-			{
-				"start_time": service.start_time,
-				"end_time": service.end_time,
-			}
-		)
-	return support_days
-
-
-# Lot to do
-def set_resolution_time(doc):
-	start_date_time = get_datetime(
-		doc.get("service_level_agreement_creation") or doc.creation
-	)
-	if doc.meta.has_field("resolution_time"):
-		doc.resolution_time = time_diff_in_seconds(doc.resolution_date, start_date_time)
-
-	# total time taken by a user to close the ticket apart from wait_time
-	if not doc.meta.has_field("user_resolution_time"):
-		return
-
-	communications = frappe.get_all(
-		"Communication",
-		filters={"reference_doctype": doc.doctype, "reference_name": doc.name},
-		fields=["sent_or_received", "name", "creation"],
-		order_by="creation",
-	)
-
-	pending_time = []
-	for i in range(len(communications)):
-		if (
-			communications[i].sent_or_received == "Received"
-			and communications[i - 1].sent_or_received == "Sent"
-		):
-			wait_time = time_diff_in_seconds(
-				communications[i].creation, communications[i - 1].creation
-			)
-			if wait_time > 0:
-				pending_time.append(wait_time)
-
-	total_pending_time = sum(pending_time)
-	resolution_time_in_secs = time_diff_in_seconds(doc.resolution_date, start_date_time)
-	doc.user_resolution_time = resolution_time_in_secs - total_pending_time
-
-
-def change_hd_service_level_agreement_and_priority(self):
-	if (
-		self.hd_service_level_agreement
-		and frappe.db.exists("HD Ticket", self.name)
-		and frappe.db.get_single_value("HD Settings", "track_service_level_agreement")
-	):
-
-		if not self.priority == frappe.db.get_value("HD Ticket", self.name, "priority"):
-			self.set_response_and_resolution_time(
-				priority=self.priority,
-				hd_service_level_agreement=self.hd_service_level_agreement,
-			)
-			frappe.msgprint(
-				_("Priority has been changed to {0}.").format(self.priority)
-			)
-
-		if not self.hd_service_level_agreement == frappe.db.get_value(
-			"HD Ticket", self.name, "hd_service_level_agreement"
-		):
-			self.set_response_and_resolution_time(
-				priority=self.priority,
-				hd_service_level_agreement=self.hd_service_level_agreement,
-			)
-			frappe.msgprint(
-				_("HD Service Level Agreement has been changed to {0}.").format(
-					self.hd_service_level_agreement
-				)
-			)
-
-
-def get_response_and_resolution_duration(doc):
-	sla = frappe.get_doc("HD Service Level Agreement", doc.hd_service_level_agreement)
-	priority = sla.get_hd_service_level_agreement_priority(doc.priority)
-	priority.update(
-		{
-			"support_and_resolution": sla.support_and_resolution,
-			"holiday_list": sla.holiday_list,
-		}
-	)
-	return priority
-
-
-def reset_hd_service_level_agreement(doc, reason, user):
-	if not frappe.db.get_single_value(
-		"HD Settings", "allow_resetting_service_level_agreement"
-	):
-		frappe.throw(
-			_("Allow Resetting HD Service Level Agreement from Helpdesk Settings.")
-		)
-
-	frappe.get_doc(
-		{
-			"doctype": "Comment",
-			"comment_type": "Info",
-			"reference_doctype": doc.doctype,
-			"reference_name": doc.name,
-			"comment_email": user,
-			"content": " resetted HD Service Level Agreement - {0}".format(_(reason)),
-		}
-	).insert(ignore_permissions=True)
-
-	doc.service_level_agreement_creation = now_datetime()
-	doc.save()
-
-
-# What?
-def reset_resolution_metrics(doc):
-	if doc.meta.has_field("resolution_date"):
-		doc.resolution_date = None
-
-	if doc.meta.has_field("resolution_time"):
-		doc.resolution_time = None
-
-	if doc.meta.has_field("user_resolution_time"):
-		doc.user_resolution_time = None
-
-
-# called via hooks on communication update, could be moved to hooks/
-def on_communication_update(doc, status):
-	if doc.communication_type == "Comment":
-		return
-
-	parent = get_parent_doc(doc)
-	if not parent:
-		return
-
-	if not parent.meta.has_field("hd_service_level_agreement"):
-		return
-
-	if (
-		doc.sent_or_received == "Received"  # a reply is received
-		and parent.get("status")
-		== "Open"  # ticket status is set as open from communication.py
-		and parent.get_doc_before_save()
-		and parent.get("status")
-		!= parent._doc_before_save.get("status")  # status changed
-	):
-		# undo the status change in db
-		# since prev status is fetched from db
-		frappe.db.set_value(
-			parent.doctype,
-			parent.name,
-			"status",
-			parent._doc_before_save.get("status"),
-			update_modified=False,
-		)
-
-	elif (
-		doc.sent_or_received == "Sent"  # a reply is sent
-		and parent.get(
-			"first_responded_on"
-		)  # first_responded_on is set from communication.py
-		and parent.get_doc_before_save()
-		and not parent._doc_before_save.get(
-			"first_responded_on"
-		)  # first_responded_on was not set
-	):
-		# reset first_responded_on since it will be handled/set later on
-		parent.first_responded_on = None
-		parent.flags.on_first_reply = True
-
-	else:
-		return
-
-	for_resolution = frappe.db.get_value(
-		"HD Service Level Agreement",
-		parent.hd_service_level_agreement,
-		"apply_sla_for_resolution",
-	)
-
-	handle_status_change(parent, for_resolution)
-	update_response_and_resolution_metrics(parent, for_resolution)
-	update_agreement_status(parent, for_resolution)
-
-	parent.save()
-
-
-# What?
-def reset_expected_response_and_resolution(doc):
-	if doc.meta.has_field("first_responded_on") and not doc.get("first_responded_on"):
-		doc.response_by = None
-	if doc.meta.has_field("resolution_by") and not doc.get("resolution_date"):
-		doc.resolution_by = None
-
-
-def set_response_by(doc, start_date_time, priority):
-	if doc.meta.has_field("response_by"):
-		doc.response_by = get_expected_time_for(
-			parameter="response",
-			service_level=priority,
-			start_date_time=start_date_time,
-		)
-		if (
-			doc.meta.has_field("total_hold_time")
-			and doc.get("total_hold_time")
-			and not doc.get("first_responded_on")
-		):
-			doc.response_by = add_to_date(
-				doc.response_by, seconds=round(doc.get("total_hold_time"))
-			)
-
-
-def set_resolution_by(doc, start_date_time, priority):
-	if doc.meta.has_field("resolution_by"):
-		doc.resolution_by = get_expected_time_for(
-			parameter="resolution",
-			service_level=priority,
-			start_date_time=start_date_time,
-		)
-		if doc.meta.has_field("total_hold_time") and doc.get("total_hold_time"):
-			doc.resolution_by = add_to_date(
-				doc.resolution_by, seconds=round(doc.get("total_hold_time"))
-			)
-
-
-def update_agreement_status(doc, apply_sla_for_resolution):
-	# if doc.meta.has_field("agreement_status"):
-	# if HD Service Level Agreement is applied for resolution check
-	# for response and resolution, else only response
-	if apply_sla_for_resolution:
-		if doc.meta.has_field("first_responded_on") and not doc.get(
-			"first_responded_on"
-		):
-			doc.agreement_status = "First Response Due"
-		elif doc.meta.has_field("resolution_date") and not doc.get("resolution_date"):
-			doc.agreement_status = "Resolution Due"
-		elif get_datetime(doc.get("resolution_date")) <= get_datetime(
-			doc.get("resolution_by")
-		):
-			doc.agreement_status = "Fulfilled"
-		else:
-			doc.agreement_status = "Overdue"
-	else:
-		if doc.meta.has_field("first_responded_on") and not doc.get(
-			"first_responded_on"
-		):
-			doc.agreement_status = "First Response Due"
-		elif get_datetime(doc.get("first_responded_on")) <= get_datetime(
-			doc.get("response_by")
-		):
-			doc.agreement_status = "Fulfilled"
-		else:
-			doc.agreement_status = "Overdue"
-
-
-def get_time_in_timedelta(time):
-	"""Converts datetime.time(10, 36, 55, 961454) to datetime.timedelta(seconds=38215)."""
-	import datetime
-
-	return datetime.timedelta(hours=time.hour, minutes=time.minute, seconds=time.second)

@@ -24,9 +24,6 @@ scheduler_events = {
 }
 
 doc_events = {
-	"HD Ticket": {
-		"validate": "helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.apply",
-	},
 	"Communication": {
 		"on_update": [
 			"helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.on_communication_update",
