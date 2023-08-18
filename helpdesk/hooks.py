@@ -17,12 +17,6 @@ website_route_rules = [
 	},
 ]
 
-scheduler_events = {
-	"daily": [
-		"helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.check_agreement_status",
-	],
-}
-
 doc_events = {
 	"Communication": {
 		"after_insert": "helpdesk.helpdesk.hooks.communication.after_insert",

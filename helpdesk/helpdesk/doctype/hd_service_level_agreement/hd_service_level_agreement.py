@@ -275,26 +275,6 @@ class HDServiceLevelAgreement(Document):
 		return res
 
 
-# Called from hooks (schedule)
-def check_agreement_status():
-	sla_list = frappe.get_all(
-		"HD Service Level Agreement",
-		filters=[{"enabled": 1}, {"default_sla": 0}],
-		fields=["name"],
-	)
-
-	for sla in sla_list:
-		doc = frappe.get_doc("HD Service Level Agreement", sla.name)
-		if doc.end_date and getdate(doc.end_date) < getdate(frappe.utils.getdate()):
-			frappe.db.set_value(
-				"HD Service Level Agreement",
-				sla.name,
-				"enabled",
-				0,
-			)
-
-
-# Probably not needed. Could be simplified (ig)
 def get_repeated(values):
 	unique_list = []
 	diff = []

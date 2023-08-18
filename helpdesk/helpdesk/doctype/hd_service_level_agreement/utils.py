@@ -1,5 +1,6 @@
 import frappe
 from frappe.model.document import Document
+from frappe.utils import now_datetime
 
 from helpdesk.utils import get_context
 
@@ -13,9 +14,12 @@ def get_sla(ticket: Document) -> Document:
 	:param doc: Ticket to use
 	:return: Applicable SLA
 	"""
+	now = now_datetime()
 	filters = {
 		"enabled": True,
 		"default_sla": False,
+		"start_date": ("<=", now),
+		"end_date": (">=", now),
 	}
 
 	priority = ticket.get("priority")
@@ -30,8 +34,8 @@ def get_sla(ticket: Document) -> Document:
 
 	res = None
 	for sla in sla_list:
-		c = sla.get("condition")
-		if not c or (c and frappe.safe_eval(c, None, get_context(ticket))):
+		cond = sla.get("condition")
+		if not cond or frappe.safe_eval(cond, None, get_context(ticket)):
 			res = sla
 			break
 
