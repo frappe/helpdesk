@@ -25,6 +25,7 @@ class Contact:
 
 		return query
 
+
 def before_insert(doc, method=None):
 	if doc.email_id:
 		domain = doc.email_id.split("@")[1]
@@ -32,7 +33,7 @@ def before_insert(doc, method=None):
 			"HD Customer", filters={"domain": domain}, fields=["name"]
 		)
 		if hd_customers:
-			doc.append("links", {
-				"link_doctype": "HD Customer",
-				"link_name": hd_customers[0].name
-			})
+			doc.append(
+				"links",
+				{"link_doctype": "HD Customer", "link_name": hd_customers[0].name},
+			)

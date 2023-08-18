@@ -690,20 +690,3 @@ class HDTicket(Document):
 	def apply_sla(self):
 		sla = frappe.get_doc("HD Service Level Agreement", self.sla)
 		sla.apply(self)
-
-
-def set_descritption_from_communication(doc, type):
-	if doc.reference_doctype == "HD Ticket":
-		ticket_doc = frappe.get_doc("HD Ticket", doc.reference_name)
-		if not ticket_doc.via_customer_portal:
-			ticket_doc.description = doc.content
-
-
-def update_ticket(contact, method):
-	"""
-	Called when Contact is deleted
-	"""
-	QBTicket = frappe.qb.DocType("HD Ticket")
-	QBTicket.update().set(QBTicket.contact, "").where(
-		QBTicket.contact == contact.name
-	).run()
