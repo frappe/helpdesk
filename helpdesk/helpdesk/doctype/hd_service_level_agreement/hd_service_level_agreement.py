@@ -244,12 +244,18 @@ class HDServiceLevelAgreement(Document):
 				res = add_to_date(res, days=1, as_datetime=True)
 				continue
 			today_workday = workdays[today_weekday]
-			start_time = today_workday.start_time
-			end_time = today_workday.end_time
-			time_left = time_diff_in_seconds(end_time, start_time)
+			now_in_seconds = time_diff_in_seconds(today, today_day)
+			start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
+			till_start_time = max(start_time - now_in_seconds, 0)
+			end_time = max(today_workday.end_time.total_seconds(), now_in_seconds)
+			time_left = max(end_time - start_time, 0)
+			if not time_left:
+				res = getdate(add_to_date(res, days=1, as_datetime=True))
+				continue
 			time_taken = min(time_needed, time_left)
 			time_needed -= time_taken
-			res = add_to_date(res, seconds=time_taken, as_datetime=True)
+			time_required = till_start_time + time_taken
+			res = add_to_date(res, seconds=time_required, as_datetime=True)
 		return res
 
 	def get_holidays(self):
