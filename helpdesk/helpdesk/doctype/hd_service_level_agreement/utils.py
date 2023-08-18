@@ -1,6 +1,7 @@
 import frappe
 from frappe.model.document import Document
-from frappe.utils.safe_exec import get_safe_globals
+
+from helpdesk.utils import get_context
 
 DOCTYPE = "HD Service Level Agreement"
 
@@ -50,17 +51,3 @@ def get_default() -> Document:
 			"default_sla": True,
 		},
 	)
-
-
-def get_context(d: Document) -> dict:
-	"""
-	Get safe context for `safe_eval`
-
-	:param doc: `Document` to add in context
-	:return: Context with `doc` and safe variables
-	"""
-	utils = get_safe_globals().get("frappe").get("utils")
-	return {
-		"doc": d.as_dict(),
-		"frappe": frappe._dict(utils=utils),
-	}

@@ -1,27 +1,19 @@
 from typing import Literal
-from datetime import datetime
 
 import frappe
 from frappe import _
-from frappe.core.utils import find_all, get_parent_doc
 from frappe.model.document import Document
 from frappe.utils import (
 	add_to_date,
 	get_datetime,
-	get_datetime_str,
-	get_link_to_form,
-	get_system_timezone,
-	get_time,
 	get_weekdays,
 	getdate,
-	nowdate,
 	now_datetime,
 	time_diff_in_seconds,
 	to_timedelta,
 )
-from frappe.utils.safe_exec import get_safe_globals
 
-from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import get_holidays
+from helpdesk.utils import get_context
 
 
 class HDServiceLevelAgreement(Document):
@@ -142,8 +134,8 @@ class HDServiceLevelAgreement(Document):
 		if doc.is_new() or not doc.has_value_changed("status"):
 			return
 		self.set_first_responded_at(doc)
-		self.set_hold_time(doc)
 		self.set_resolution_date(doc)
+		self.set_hold_time(doc)
 
 	def set_first_responded_at(self, doc: Document):
 		next_state = doc.get("status")
@@ -160,6 +152,8 @@ class HDServiceLevelAgreement(Document):
 		is_fulfilled = next_state in fullfill_on
 		if is_fulfilled and not was_fulfilled:
 			doc.resolution_date = now_datetime()
+		if not is_fulfilled:
+			doc.resolution_date = None
 
 	def set_hold_time(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]

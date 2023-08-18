@@ -26,7 +26,7 @@ scheduler_events = {
 doc_events = {
 	"Communication": {
 		"on_update": [
-			"helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.on_communication_update",
+			# "helpdesk.helpdesk.doctype.hd_service_level_agreement.hd_service_level_agreement.on_communication_update",
 			"helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.set_first_response_time",
 		],
 		"after_insert": [

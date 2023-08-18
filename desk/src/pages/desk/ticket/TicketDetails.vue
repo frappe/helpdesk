@@ -39,7 +39,10 @@
             />
             <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
-          <div class="space-y-2">
+          <div
+            v-if="data.resolution_date || data.resolution_by"
+            class="space-y-2"
+          >
             <span class="block text-sm text-gray-700">Resolution</span>
             <span class="mr-2 font-medium text-gray-900">
               {{ dayjs(data.resolution_date || data.resolution_by).short() }}
