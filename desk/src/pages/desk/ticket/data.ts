@@ -47,11 +47,8 @@ export const useTicketStore = defineStore("ticket", () => {
   });
 
   function scrollTo(id: string) {
-    const cls = "animate-pulse";
     const e = document.getElementById(id);
     e.scrollIntoView({ behavior: "smooth" });
-    e.classList.add(cls);
-    setTimeout(() => e.classList.remove(cls), 2000);
   }
 
   function $reset() {
