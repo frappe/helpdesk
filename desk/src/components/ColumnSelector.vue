@@ -1,5 +1,5 @@
 <template>
-  <Popover transition="default">
+  <Popover>
     <template #target="{ togglePopover, isOpen }">
       <Button
         :active="isOpen"

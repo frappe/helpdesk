@@ -4,7 +4,7 @@
       <template #right>
         <div class="flex gap-2">
           <div
-            class="flex items-center justify-between text-base text-gray-700 transition"
+            class="flex items-center justify-between text-base text-gray-700 "
           >
             <div class="flex gap-4">
               <Dropdown :options="dropdownOptions">

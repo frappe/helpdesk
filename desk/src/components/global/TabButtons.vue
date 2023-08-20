@@ -2,7 +2,7 @@
     <div class="flex p-1 text-sm bg-gray-100 rounded-md">
       <button
         v-for="button in buttons"
-        class="px-2 py-1 leading-none transition-all rounded"
+        class="px-2 py-1 leading-none -all rounded"
         :class="
           modelValue === button.label
             ? 'bg-white shadow text-gray-900'

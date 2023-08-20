@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base transition-all duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base -all duration-300 ease-in-out"
     :style="isExpanded ? widthExpanded : widthMinimised"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
