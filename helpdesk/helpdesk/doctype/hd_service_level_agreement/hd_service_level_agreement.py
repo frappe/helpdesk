@@ -146,8 +146,7 @@ class HDServiceLevelAgreement(Document):
 		doc.first_responded_on = doc.first_responded_on or now_datetime()
 		start_at = doc.service_level_agreement_creation
 		end_at = doc.first_responded_on
-		response_time = self.calc_elapsed_time(start_at, end_at)
-		doc.response_time = doc.response_time or response_time
+		doc.first_response_time = self.calc_elapsed_time(start_at, end_at)
 
 	def set_resolution_date(self, doc: Document):
 		fullfill_on = [row.status for row in self.sla_fulfilled_on]
@@ -162,8 +161,7 @@ class HDServiceLevelAgreement(Document):
 		doc.resolution_date = now_datetime()
 		start_at = doc.service_level_agreement_creation
 		end_at = doc.resolution_date
-		resolution_time = self.calc_elapsed_time(start_at, end_at)
-		doc.resolution_time = doc.resolution_time or resolution_time
+		doc.resolution_time = self.calc_elapsed_time(start_at, end_at)
 
 	def set_hold_time(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]
@@ -173,8 +171,10 @@ class HDServiceLevelAgreement(Document):
 		is_paused = next_state in pause_on
 		paused_since = doc.resolution_date or doc.on_hold_since
 		if is_paused and not was_paused:
+			doc.response_by = doc.resolution_by if doc.first_responded_on else None
+			doc.resolution_date = None
+			doc.resolution_by = None
 			doc.on_hold_since = now_datetime()
-			self.reset_targets(doc)
 		else:
 			doc.on_hold_since = None
 		if is_paused or not paused_since:
@@ -186,10 +186,6 @@ class HDServiceLevelAgreement(Document):
 	def handle_targets(self, doc: Document):
 		doc.response_by = self.calc_time(doc, "response_time")
 		doc.resolution_by = self.calc_time(doc, "resolution_time")
-
-	def reset_targets(self, doc: Document):
-		doc.response_by = doc.resolution_by if doc.first_responded_on else None
-		doc.resolution_by = doc.resolution_by if doc.resolution_date else None
 
 	def reset_resolution_metrics(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]
