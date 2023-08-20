@@ -141,8 +141,13 @@ class HDServiceLevelAgreement(Document):
 		next_state = doc.get("status")
 		pause_on = [row.status for row in self.pause_sla_on]
 		is_paused = next_state in pause_on
-		if is_paused:
-			doc.first_responded_on = doc.first_responded_on or now_datetime()
+		if not is_paused:
+			return
+		doc.first_responded_on = doc.first_responded_on or now_datetime()
+		start_at = doc.service_level_agreement_creation
+		end_at = doc.first_responded_on
+		response_time = self.calc_elapsed_time(start_at, end_at)
+		doc.response_time = doc.response_time or response_time
 
 	def set_resolution_date(self, doc: Document):
 		fullfill_on = [row.status for row in self.sla_fulfilled_on]
@@ -150,10 +155,15 @@ class HDServiceLevelAgreement(Document):
 		next_state = doc.get("status")
 		was_fulfilled = prev_state in fullfill_on
 		is_fulfilled = next_state in fullfill_on
-		if is_fulfilled and not was_fulfilled:
-			doc.resolution_date = now_datetime()
 		if not is_fulfilled:
 			doc.resolution_date = None
+		if not is_fulfilled and was_fulfilled:
+			return
+		doc.resolution_date = now_datetime()
+		start_at = doc.service_level_agreement_creation
+		end_at = doc.resolution_date
+		resolution_time = self.calc_elapsed_time(start_at, end_at)
+		doc.resolution_time = doc.resolution_time or resolution_time
 
 	def set_hold_time(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]
@@ -251,6 +261,45 @@ class HDServiceLevelAgreement(Document):
 			time_required = till_start_time + time_taken
 			res = add_to_date(res, seconds=time_required, as_datetime=True)
 		return res
+
+	def calc_elapsed_time(self, start_at, end_at) -> float:
+		"""
+		Get took from start to end, excluding non-working hours
+
+		:param start_at: Date at which calculation starts
+		:param end_at: Date at which calculation ends
+		:return: Number of seconds
+		"""
+		time_took = 0
+		holidays = self.get_holidays()
+		weekdays = get_weekdays()
+		workdays = self.get_workdays()
+		while getdate(start_at) <= getdate(end_at):
+			today = start_at
+			today_day = getdate(today)
+			today_weekday = weekdays[today.weekday()]
+			is_workday = today_weekday in workdays
+			is_holiday = today_day in holidays
+			if is_holiday or not is_workday:
+				start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
+				continue
+			today_workday = workdays[today_weekday]
+			now_in_seconds = time_diff_in_seconds(today, today_day)
+			is_today = getdate(start_at) == getdate(end_at)
+			if not is_today:
+				working_start = today_workday.start_time
+				working_end = today_workday.end_time
+				working_time = time_diff_in_seconds(working_start, working_end)
+				time_took += working_time
+				start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
+				continue
+			start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
+			end_at_seconds = time_diff_in_seconds(getdate(end_at), end_at)
+			end_time = max(today_workday.end_time.total_seconds(), end_at_seconds)
+			time_taken = end_time - start_time
+			time_took += time_taken
+			start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
+		return time_took
 
 	def get_holidays(self):
 		holiday_list = frappe.get_doc("HD Service Holiday List", self.holiday_list)
