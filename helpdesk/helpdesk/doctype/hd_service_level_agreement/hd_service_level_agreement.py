@@ -280,7 +280,6 @@ class HDServiceLevelAgreement(Document):
 				start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
 				continue
 			today_workday = workdays[today_weekday]
-			now_in_seconds = time_diff_in_seconds(today, today_day)
 			is_today = getdate(start_at) == getdate(end_at)
 			if not is_today:
 				working_start = today_workday.start_time
@@ -289,6 +288,7 @@ class HDServiceLevelAgreement(Document):
 				time_took += working_time
 				start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
 				continue
+			now_in_seconds = time_diff_in_seconds(today, today_day)
 			start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
 			end_at_seconds = time_diff_in_seconds(getdate(end_at), end_at)
 			end_time = max(today_workday.end_time.total_seconds(), end_at_seconds)
