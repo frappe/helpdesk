@@ -4,6 +4,7 @@
 @layer components {
 	.prose-f {
 		@apply
+		break-words
 		max-w-none
 		prose
 		prose-img:border
