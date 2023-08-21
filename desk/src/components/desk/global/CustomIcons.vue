@@ -1245,7 +1245,7 @@
 		</svg>
 		<svg
 			v-if="this.name == 'chevron-down-accordion'"
-			class="w-3 transition-all duration-200 transform"
+			class="w-3 -all duration-200 transform"
 			:class="this.class"
 			:width="this.width"
 			:height="this.height"

@@ -20,7 +20,6 @@
         :label="data.status"
         :theme="ticketStatusStore.colorMapAgent[data.status]"
         variant="subtle"
-        size="lg"
       />
     </template>
     <template #_assign="{ data }">

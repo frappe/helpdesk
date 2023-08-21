@@ -78,7 +78,7 @@
           <a
             v-for="provider in authProviders.data"
             :key="provider.name"
-            class="block h-7 w-full rounded border bg-gray-900 px-3 py-1 text-center text-base text-white transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            class="block h-7 w-full rounded border bg-gray-900 px-3 py-1 text-center text-base text-white -colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
             :href="provider.auth_url"
           >
             Login via {{ provider.provider_name }}
