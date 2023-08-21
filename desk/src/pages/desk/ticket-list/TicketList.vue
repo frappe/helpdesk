@@ -6,8 +6,7 @@
       </template>
       <template #right>
         <span class="flex gap-2">
-          <ColumnSelector id="ticket" :columns="columns" />
-          <FieldFilter doctype="HD Ticket" :append-assign="true" />
+          <FilterPopover doctype="HD Ticket" />
           <Dropdown :options="sortOptions">
             <template #default>
               <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
@@ -17,6 +16,7 @@
               </Button>
             </template>
           </Dropdown>
+          <ColumnSelector id="ticket" :columns="columns" />
           <Button
             label="New ticket"
             theme="gray"
@@ -54,10 +54,9 @@ import { useAuthStore } from "@/stores/auth";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
-import FieldFilter from "@/components/FieldFilter.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
-import { ColumnSelector } from "@/components";
+import { ColumnSelector, FilterPopover } from "@/components";
 import TicketNew from "@/pages/portal/TicketNew.vue";
 import MainTable from "./MainTable.vue";
 import PresetFilters from "./PresetFilters.vue";

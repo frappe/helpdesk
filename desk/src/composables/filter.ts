@@ -32,12 +32,20 @@ export function useFilter(doctype: string) {
 
   const fields: Resource<Array<DocField>> = createResource({
     url: "helpdesk.api.doc.get_filterable_fields",
-    makeParams: () => ({
-      doctype,
-      append_assign: true,
-    }),
     cache: ["DocField", doctype],
     auto: !!doctype,
+    params: {
+      doctype,
+      append_assign: true,
+    },
+    transform: (data) => {
+      data = data.map((f) => ({
+        label: f.label,
+        value: f.fieldname,
+        ...f,
+      }));
+      return data;
+    },
   });
 
   watchEffect(() => {

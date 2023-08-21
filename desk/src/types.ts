@@ -94,6 +94,7 @@ export interface Filter {
   field?: DocField;
   fieldname: string;
   operator: string;
+  label: string;
   value: boolean | number | string;
 }
 
