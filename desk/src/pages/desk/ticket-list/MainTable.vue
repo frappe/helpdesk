@@ -25,15 +25,45 @@
     <template #_assign="{ data }">
       <AssignedInfo :assign="data._assign" />
     </template>
+    <template #response_by="{ data }">
+      <span v-if="data.response_by">
+        <Badge
+          v-if="
+            data.first_responded_on &&
+            dayjs(data.first_responded_on).isBefore(data.response_by)
+          "
+          label="Fulfilled"
+          theme="green"
+          variant="outline"
+        />
+        <Badge
+          v-else-if="dayjs(data.first_responded_on).isAfter(data.response_by)"
+          label="Failed"
+          theme="red"
+          variant="outline"
+        />
+        <span v-else>{{ dayjs(data.response_by).fromNow() }}</span>
+      </span>
+    </template>
     <template #resolution_by="{ data }">
-      <div
-        v-if="data.resolution_by"
-        :class="{
-          'text-red-800': dayjs(data.resolution_by).isBefore(dayjs()),
-        }"
-      >
-        {{ dayjs(data.resolution_by).fromNow() }}
-      </div>
+      <span v-if="data.resolution_by">
+        <Badge
+          v-if="
+            data.resolution_date &&
+            dayjs(data.resolution_date).isBefore(data.resolution_by)
+          "
+          label="Fulfilled"
+          theme="green"
+          variant="outline"
+        />
+        <Badge
+          v-else-if="dayjs(data.resolution_date).isAfter(data.resolution_by)"
+          label="Failed"
+          theme="red"
+          variant="outline"
+        />
+        <span v-else>{{ dayjs(data.resolution_by).fromNow() }}</span>
+      </span>
     </template>
     <template #creation="{ data }">
       {{ dayjs(data.creation).fromNow() }}
