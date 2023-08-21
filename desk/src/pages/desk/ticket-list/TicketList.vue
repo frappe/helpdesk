@@ -111,7 +111,12 @@ const columns = [
     width: "w-36",
   },
   {
-    label: "Due in",
+    label: "First response",
+    key: "response_by",
+    width: "w-32",
+  },
+  {
+    label: "Resolution",
     key: "resolution_by",
     width: "w-32",
   },
