@@ -6,15 +6,12 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "document_type",
   "default_priority",
   "column_break_2",
   "service_level",
   "enabled",
   "filters_section",
   "default_sla",
-  "entity_type",
-  "entity",
   "column_break_15",
   "condition",
   "agreement_details_section",
@@ -100,23 +97,6 @@
    "reqd": 1
   },
   {
-   "depends_on": "eval: !doc.default_sla",
-   "fieldname": "entity",
-   "fieldtype": "Dynamic Link",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Entity",
-   "options": "entity_type"
-  },
-  {
-   "depends_on": "eval: !doc.default_sla",
-   "fieldname": "entity_type",
-   "fieldtype": "Select",
-   "in_standard_filter": 1,
-   "label": "Entity Type",
-   "options": "\nCustomer\nCustomer Group\nTerritory"
-  },
-  {
    "default": "0",
    "fieldname": "default_sla",
    "fieldtype": "Check",
@@ -134,14 +114,6 @@
    "fieldtype": "Table",
    "label": "SLA Paused On",
    "options": "HD Pause Service Level Agreement On Status"
-  },
-  {
-   "fieldname": "document_type",
-   "fieldtype": "Link",
-   "label": "Apply On",
-   "options": "DocType",
-   "reqd": 1,
-   "set_only_once": 1
   },
   {
    "default": "1",
@@ -193,7 +165,7 @@
   }
  ],
  "links": [],
- "modified": "2023-03-27 01:01:40.067560",
+ "modified": "2023-08-19 01:20:58.422134",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 from datetime import timedelta
 from email.utils import parseaddr
@@ -27,6 +25,8 @@ from helpdesk.helpdesk.utils.email import (
 	default_ticket_outgoing_email_account,
 )
 from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
+
+from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
@@ -157,10 +157,14 @@ class HDTicket(Document):
 		self.set_customer()
 		self.set_priority()
 		self.apply_escalation_rule()
+		self.set_sla()
 
 	def validate(self):
 		self.validate_feedback()
 		self.validate_ticket_type()
+
+	def before_save(self):
+		self.apply_sla()
 
 	def after_insert(self):
 		log_ticket_activity(self.name, "created this ticket")
@@ -300,68 +304,6 @@ class HDTicket(Document):
 		communication.ignore_permissions = True
 		communication.ignore_mandatory = True
 		communication.save(ignore_permissions=True)
-
-	@frappe.whitelist()
-	def split_ticket(self, subject, communication_id):
-		# Bug: Pressing enter doesn't send subject
-		from copy import deepcopy
-
-		replicated_ticket = deepcopy(self)
-		replicated_ticket.subject = subject
-		replicated_ticket.ticket_split_from = self.name
-		replicated_ticket.first_response_time = 0
-		replicated_ticket.first_responded_on = None
-		replicated_ticket.creation = now_datetime()
-
-		# Reset SLA
-		if replicated_ticket.sla:
-			replicated_ticket.service_level_agreement_creation = now_datetime()
-			replicated_ticket.sla = None
-			replicated_ticket.agreement_status = "Ongoing"
-			replicated_ticket.response_by = None
-			replicated_ticket.response_by_variance = None
-			replicated_ticket.resolution_by = None
-			replicated_ticket.resolution_by_variance = None
-			replicated_ticket.reset_ticket_metrics()
-
-		frappe.get_doc(replicated_ticket).insert()
-
-		# Replicate linked Communications
-		# TODO: get all communications in timeline before this, and modify them to append them to new doc
-		comm_to_split_from = frappe.get_doc("Communication", communication_id)
-		communications = frappe.get_all(
-			"Communication",
-			filters={
-				"reference_doctype": "HD Ticket",
-				"reference_name": comm_to_split_from.reference_name,
-				"creation": (">=", comm_to_split_from.creation),
-			},
-		)
-
-		for communication in communications:
-			doc = frappe.get_doc("Communication", communication.name)
-			doc.reference_name = replicated_ticket.name
-			doc.save(ignore_permissions=True)
-
-		frappe.get_doc(
-			{
-				"doctype": "Comment",
-				"comment_type": "Info",
-				"reference_doctype": "HD Ticket",
-				"reference_name": replicated_ticket.name,
-				"content": (
-					" - Split the Ticket from <a href='/app/Form/Ticket/{0}'>{1}</a>".format(
-						self.name, frappe.bold(self.name)
-					)
-				),
-			}
-		).insert(ignore_permissions=True)
-
-		return replicated_ticket.name
-
-	def reset_ticket_metrics(self):
-		self.db_set("resolution_time", None)
-		self.db_set("user_resolution_time", None)
 
 	@frappe.whitelist()
 	def assign_agent(self, agent):
@@ -741,202 +683,10 @@ class HDTicket(Document):
 		self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
 		self.assign_agent(escalation_rule.to_agent)
 
+	def set_sla(self):
+		if sla := get_sla(self):
+			self.sla = sla.name
 
-def set_descritption_from_communication(doc, type):
-	if doc.reference_doctype == "HD Ticket":
-		ticket_doc = frappe.get_doc("HD Ticket", doc.reference_name)
-		if not ticket_doc.via_customer_portal:
-			ticket_doc.description = doc.content
-
-
-def auto_close_tickets():
-	"""Auto-close replied support tickets after 7 days"""
-	auto_close_after_days = (
-		frappe.db.get_value("HD Settings", "HD Settings", "close_ticket_after_days")
-		or 7
-	)
-
-	tickets = frappe.db.sql(
-		""" select name from `tabHD Ticket` where status='Replied' and
-        modified<DATE_SUB(CURDATE(), INTERVAL %s DAY) """,
-		(auto_close_after_days),
-		as_dict=True,
-	)
-
-	for ticket in tickets:
-		doc = frappe.get_doc("HD Ticket", ticket.get("name"))
-		doc.status = "Closed"
-		doc.flags.ignore_permissions = True
-		doc.flags.ignore_mandatory = True
-		doc.save()
-
-
-def has_website_permission(doc, ptype, user, verbose=False):
-	# TODO: the commented code was used earilier, we dont need customers so just commented these out for now.
-	# but will need to see if some more logic needs to be added here.
-	# from erpnext.controllers.website_list_for_contact import has_website_permission
-	# permission_based_on_customer = has_website_permission(doc, ptype, user, verbose)
-
-	# return permission_based_on_customer or doc.raised_by==user
-	return doc.raised_by == user
-
-
-def update_ticket(contact, method):
-	"""
-	Called when Contact is deleted
-	"""
-	QBTicket = frappe.qb.DocType("HD Ticket")
-	QBTicket.update().set(QBTicket.contact, "").where(
-		QBTicket.contact == contact.name
-	).run()
-
-
-def set_first_response_time(communication, method):
-	if communication.get("reference_doctype") == "HD Ticket":
-		ticket = get_parent_doc(communication)
-		if is_first_response(ticket) and ticket.sla:
-			first_response_time = calculate_first_response_time(
-				ticket, get_datetime(ticket.first_responded_on)
-			)
-			ticket.db_set("first_response_time", first_response_time)
-
-
-def is_first_response(ticket):
-	responses = frappe.get_all(
-		"Communication",
-		filters={"reference_name": ticket.name, "sent_or_received": "Sent"},
-	)
-	if len(responses) == 1:
-		return True
-	return False
-
-
-def calculate_first_response_time(ticket, first_responded_on):
-	ticket_creation_date = ticket.creation
-	ticket_creation_time = get_time_in_seconds(ticket_creation_date)
-	first_responded_on_in_seconds = get_time_in_seconds(first_responded_on)
-	support_hours = frappe.get_cached_doc(
-		"HD Service Level Agreement", ticket.sla
-	).support_and_resolution
-
-	if ticket_creation_date.day == first_responded_on.day:
-		if is_work_day(ticket_creation_date, support_hours):
-			start_time, end_time = get_working_hours(
-				ticket_creation_date, support_hours
-			)
-
-			# ticket creation and response on the same day during working hours
-			if is_during_working_hours(
-				ticket_creation_date, support_hours
-			) and is_during_working_hours(first_responded_on, support_hours):
-				return get_elapsed_time(ticket_creation_date, first_responded_on)
-
-			# ticket creation is during working hours, but first response was after working hours
-			elif is_during_working_hours(ticket_creation_date, support_hours):
-				return get_elapsed_time(ticket_creation_time, end_time)
-
-			# ticket creation was before working hours but first response is during working hours
-			elif is_during_working_hours(first_responded_on, support_hours):
-				return get_elapsed_time(start_time, first_responded_on_in_seconds)
-
-			# both ticket creation and first response were after working hours
-			else:
-				return 1.0  # this should ideally be zero, but it gets reset when the next response is sent if the value is zero
-
-		else:
-			return 1.0
-
-	else:
-		# response on the next day
-		if date_diff(first_responded_on, ticket_creation_date) == 1:
-			first_response_time = 0
-		else:
-			first_response_time = calculate_initial_frt(
-				ticket_creation_date,
-				date_diff(first_responded_on, ticket_creation_date) - 1,
-				support_hours,
-			)
-
-		# time taken on day of ticket creation
-		if is_work_day(ticket_creation_date, support_hours):
-			start_time, end_time = get_working_hours(
-				ticket_creation_date, support_hours
-			)
-
-			if is_during_working_hours(ticket_creation_date, support_hours):
-				first_response_time += get_elapsed_time(ticket_creation_time, end_time)
-			elif is_before_working_hours(ticket_creation_date, support_hours):
-				first_response_time += get_elapsed_time(start_time, end_time)
-
-		# time taken on day of first response
-		if is_work_day(first_responded_on, support_hours):
-			start_time, end_time = get_working_hours(first_responded_on, support_hours)
-
-			if is_during_working_hours(first_responded_on, support_hours):
-				first_response_time += get_elapsed_time(
-					start_time, first_responded_on_in_seconds
-				)
-			elif not is_before_working_hours(first_responded_on, support_hours):
-				first_response_time += get_elapsed_time(start_time, end_time)
-
-		if first_response_time:
-			return first_response_time
-		else:
-			return 1.0
-
-
-def get_time_in_seconds(date):
-	return timedelta(hours=date.hour, minutes=date.minute, seconds=date.second)
-
-
-def get_working_hours(date, support_hours):
-	if is_work_day(date, support_hours):
-		weekday = frappe.utils.get_weekday(date)
-		for day in support_hours:
-			if day.workday == weekday:
-				return day.start_time, day.end_time
-
-
-def is_work_day(date, support_hours):
-	weekday = frappe.utils.get_weekday(date)
-	for day in support_hours:
-		if day.workday == weekday:
-			return True
-	return False
-
-
-def is_during_working_hours(date, support_hours):
-	start_time, end_time = get_working_hours(date, support_hours)
-	time = get_time_in_seconds(date)
-	if time >= start_time and time <= end_time:
-		return True
-	return False
-
-
-def get_elapsed_time(start_time, end_time):
-	return round(time_diff_in_seconds(end_time, start_time), 2)
-
-
-def calculate_initial_frt(ticket_creation_date, days_in_between, support_hours):
-	initial_frt = 0
-	for i in range(days_in_between):
-		date = ticket_creation_date + timedelta(days=(i + 1))
-		if is_work_day(date, support_hours):
-			start_time, end_time = get_working_hours(date, support_hours)
-			initial_frt += get_elapsed_time(start_time, end_time)
-
-	return initial_frt
-
-
-def is_before_working_hours(date, support_hours):
-	start_time, end_time = get_working_hours(date, support_hours)
-	time = get_time_in_seconds(date)
-	if time < start_time:
-		return True
-	return False
-
-
-def get_holidays(holiday_list_name):
-	holiday_list = frappe.get_cached_doc("HD Service Holiday List", holiday_list_name)
-	holidays = [holiday.holiday_date for holiday in holiday_list.holidays]
-	return holidays
+	def apply_sla(self):
+		sla = frappe.get_doc("HD Service Level Agreement", self.sla)
+		sla.apply(self)

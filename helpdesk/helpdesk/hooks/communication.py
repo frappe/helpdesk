@@ -1,5 +1,6 @@
 import frappe
-from frappe.realtime import get_website_room
+
+from helpdesk.utils import publish_event
 
 
 def after_insert(c, method=None):
@@ -12,8 +13,11 @@ def after_insert(c, method=None):
 	if not c.reference_name:
 		return
 
+	t = frappe.get_last_doc("HD Ticket", {"name": c.reference_name})
+	if not t.description and not t.via_customer_portal:
+		t.description = c.content
+		t.save()
+
 	event = "helpdesk:new-communication"
 	data = {"ticket_id": c.reference_name}
-	room = get_website_room()
-
-	frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+	publish_event(event, data)

@@ -2,7 +2,9 @@ import re
 
 import frappe
 from bs4 import BeautifulSoup
+from frappe.model.document import Document
 from frappe.realtime import get_website_room
+from frappe.utils.safe_exec import get_safe_globals
 from frappe.utils.telemetry import capture as _capture
 from pypika import Criterion
 
@@ -89,3 +91,17 @@ def alphanumeric_to_int(s: str) -> int | None:
 		return
 
 	return int(s.group(0))
+
+
+def get_context(d: Document) -> dict:
+	"""
+	Get safe context for `safe_eval`
+
+	:param doc: `Document` to add in context
+	:return: Context with `doc` and safe variables
+	"""
+	utils = get_safe_globals().get("frappe").get("utils")
+	return {
+		"doc": d.as_dict(),
+		"frappe": frappe._dict(utils=utils),
+	}
