@@ -42,7 +42,9 @@
           theme="red"
           variant="outline"
         />
-        <span v-else>{{ dayjs(data.response_by).fromNow() }}</span>
+        <Tooltip v-else :text="dayjs(data.response_by).long()">
+          {{ dayjs(data.response_by).fromNow() }}
+        </Tooltip>
       </span>
     </template>
     <template #resolution_by="{ data }">
@@ -62,7 +64,9 @@
           theme="red"
           variant="outline"
         />
-        <span v-else>{{ dayjs(data.resolution_by).fromNow() }}</span>
+        <Tooltip v-else :text="dayjs(data.resolution_by).long()">
+          {{ dayjs(data.resolution_by).fromNow() }}
+        </Tooltip>
       </span>
     </template>
     <template #creation="{ data }">
@@ -94,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, Badge, Dropdown } from "frappe-ui";
+import { createResource, Badge, Dropdown, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
 import { useAgentStore } from "@/stores/agent";
