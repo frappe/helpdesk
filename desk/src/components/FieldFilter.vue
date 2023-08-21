@@ -29,15 +29,12 @@
     <Dropdown :options="optionsField">
       <template #default>
         <Button
-          :label="storage.size ? 'Add more' : 'Add filter'"
+          :label="storage.size ? 'Add more' : 'Filters'"
           theme="gray"
           variant="outline"
         >
           <template #prefix>
-            <Icon
-              :icon="storage.size ? 'lucide:plus' : 'lucide:list-filter'"
-              class="h-4 w-4"
-            />
+            <Icon :icon="storage.size ? 'lucide:plus' : 'lucide:list-filter'" />
           </template>
         </Button>
       </template>

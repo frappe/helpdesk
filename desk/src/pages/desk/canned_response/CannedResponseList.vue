@@ -21,7 +21,7 @@
       class="grow"
       row-key="name"
     />
-    <ListNavigation class="p-3" v-bind="responses" />
+    <ListNavigation :resource="responses" />
     <AddNewCannedResponsesDialog
       :show="showNewDialog"
       @close="showNewDialog = false"

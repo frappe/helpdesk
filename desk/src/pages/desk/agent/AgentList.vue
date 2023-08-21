@@ -42,7 +42,7 @@
         </div>
       </template>
     </ListView>
-    <ListNavigation class="p-3" v-bind="agents" />
+    <ListNavigation :resource="agents" />
     <AddNewAgentsDialog
       :show="isDialogVisible"
       @close="isDialogVisible = false"

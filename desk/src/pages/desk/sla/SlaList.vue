@@ -29,7 +29,7 @@
         >
       </template>
     </ListView>
-    <ListNavigation class="p-3" v-bind="policies" />
+    <ListNavigation :resource="policies" />
   </div>
 </template>
 <script setup lang="ts">

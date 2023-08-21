@@ -1,68 +1,48 @@
 <template>
-  <div v-if="totalCount" class="border-t text-base">
-    <div class="flex items-center justify-end gap-2 text-gray-600">
-      <div class="text-gray-600">
-        {{ startFrom }}
-        -
-        {{ endAt }}
-        of
-        {{ totalCount }}
-      </div>
-      <Button
-        icon="chevron-left"
-        :disabled="!hasPreviousPage"
-        class="rounded-full"
-        variant="outline"
-        @click="previous"
-      />
-      <Button
-        icon="chevron-right"
-        :disabled="!hasNextPage"
-        class="rounded-full"
-        variant="outline"
-        @click="next"
-      />
-    </div>
+  <div class="flex items-center justify-between border-t px-3 py-2">
+    <TabButtons
+      :buttons="pageLengthOptions.map((o) => ({ label: o }))"
+      :model-value="resource.pageLength"
+      @update:model-value="(val: PageLength) => {
+        resource.update({
+          pageLength: val,
+        });
+        resource.reload();
+      }"
+    />
+    <Button
+      label="Load more"
+      theme="gray"
+      variant="subtle"
+      :disabled="resource.list.loading || !resource.hasNextPage"
+      @click="resource.next()"
+    >
+      <template #prefix>
+        <Icon icon="lucide:refresh-cw" />
+      </template>
+    </Button>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps({
-  startFrom: {
-    type: Number,
-    required: true,
-  },
-  endAt: {
-    type: Number,
-    required: true,
-  },
-  currentPage: {
-    type: Number,
-    required: true,
-  },
-  totalPages: {
-    type: Number,
-    required: true,
-  },
-  totalCount: {
-    type: Number,
-    required: true,
-  },
-  hasPreviousPage: {
-    type: Boolean,
-    required: true,
-  },
-  hasNextPage: {
-    type: Boolean,
-    required: true,
-  },
-  next: {
-    type: Function,
-    required: true,
-  },
-  previous: {
-    type: Function,
-    required: true,
-  },
-});
+import { Button, TabButtons } from "frappe-ui";
+import { Icon } from "@iconify/vue";
+
+const pageLengthOptions = [20, 50, 500] as const;
+type PageLength = (typeof pageLengthOptions)[number];
+interface Resource {
+  pageLength: PageLength;
+  next: () => void;
+  reload: () => void;
+  update: (r: Record<string, string | number>) => void;
+  hasNextPage?: boolean;
+  list?: {
+    loading: boolean;
+  };
+}
+interface P {
+  resource: Resource;
+}
+
+defineProps<P>();
 </script>
