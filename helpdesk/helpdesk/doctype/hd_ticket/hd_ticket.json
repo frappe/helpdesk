@@ -23,12 +23,9 @@
   "service_level_section",
   "sla",
   "response_by",
-  "response_by_variance",
-  "reset_service_level_agreement",
   "cb",
   "agreement_status",
   "resolution_by",
-  "resolution_by_variance",
   "service_level_agreement_creation",
   "on_hold_since",
   "total_hold_time",
@@ -170,20 +167,6 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval: doc.sla && doc.status != 'Replied';",
-   "fieldname": "response_by_variance",
-   "fieldtype": "Duration",
-   "hide_seconds": 1,
-   "label": "Response By Variance",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval: doc.sla",
-   "fieldname": "reset_service_level_agreement",
-   "fieldtype": "Button",
-   "label": "Reset SLA"
-  },
-  {
    "collapsible": 1,
    "fieldname": "cb",
    "fieldtype": "Column Break",
@@ -204,14 +187,6 @@
    "fieldname": "resolution_by",
    "fieldtype": "Datetime",
    "label": "Resolution By",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval: doc.sla && doc.status != 'Replied';",
-   "fieldname": "resolution_by_variance",
-   "fieldtype": "Duration",
-   "hide_seconds": 1,
-   "label": "Resolution By Variance",
    "read_only": 1
   },
   {
@@ -392,9 +367,9 @@
   }
  ],
  "icon": "fa fa-issue",
- "idx": 7,
+ "idx": 61,
  "links": [],
- "modified": "2023-08-08 16:05:20.458305",
+ "modified": "2023-08-22 09:54:40.764043",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
