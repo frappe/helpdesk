@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import { toRef } from "vue";
+import { RouterLink } from "vue-router";
 import { FormControl } from "frappe-ui";
 import { isFunction } from "lodash";
 import { Column } from "@/types";
@@ -62,7 +63,6 @@ import { getAssign } from "@/utils";
 import { useColumns } from "@/composables/columns";
 import { useFilter } from "@/composables/filter";
 import { selection } from "./selection";
-import { RouterLink } from "vue-router";
 
 interface P {
   id: string;
