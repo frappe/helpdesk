@@ -298,8 +298,13 @@ class HDServiceLevelAgreement(Document):
 		return time_took
 
 	def get_holidays(self):
+		res = []
+		if not self.holiday_list:
+			return res
 		holiday_list = frappe.get_doc("HD Service Holiday List", self.holiday_list)
-		return holiday_list.holidays
+		for row in holiday_list.holidays:
+			res.append(row.holiday_date)
+		return res
 
 	def get_priorities(self):
 		"""
