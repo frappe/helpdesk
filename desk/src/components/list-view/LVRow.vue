@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group flex h-10 w-full items-center gap-2 whitespace-nowrap px-4 text-base "
+    class="group flex h-10 w-full items-center gap-2 whitespace-nowrap px-4 text-base"
     :class="{
       'bg-gray-200': selection.storage.has(data[rowKey]),
       'hover:bg-gray-300': selection.storage.has(data[rowKey]),
@@ -30,12 +30,14 @@
         v-for="c in columns"
         :key="c.key"
         :class="{
+          'text-gray-800': data[c.key],
           'text-gray-300': !data[c.key],
         }"
       >
         <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
           <div
-            :class="['w-max', 'max-w-full', 'truncate', c.align]"
+            class="w-max max-w-full truncate"
+            :class="[c.align, c.text]"
             @click="(event) => filter(event, c)"
           >
             <slot :name="c.key" :data="data">

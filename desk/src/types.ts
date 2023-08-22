@@ -118,9 +118,10 @@ export interface Template {
 export type Column = {
   key: string;
   label: string;
-  icon: string;
-  width: string;
-  align: string;
+  icon?: string;
+  align?: string;
+  width?: string;
+  text?: string;
 };
 
 export type File = {

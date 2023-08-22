@@ -9,12 +9,6 @@
     checkbox
     filter
   >
-    <template #subject="{ data }">
-      <div class="flex w-96 items-center justify-between">
-        <span class="truncate">{{ data.subject }}</span>
-        <span class="ml-2 text-xs text-gray-700"># {{ data.name }}</span>
-      </div>
-    </template>
     <template #status="{ data }">
       <Badge
         :label="data.status"
