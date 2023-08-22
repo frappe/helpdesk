@@ -6,17 +6,6 @@
       </template>
       <template #right>
         <span class="flex gap-2">
-          <FilterPopover doctype="HD Ticket" />
-          <Dropdown :options="sortOptions">
-            <template #default>
-              <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
-                <template #prefix>
-                  <Icon icon="lucide:arrow-down-up" />
-                </template>
-              </Button>
-            </template>
-          </Dropdown>
-          <ColumnSelector id="ticket" :columns="columns" />
           <Button
             label="New ticket"
             theme="gray"
@@ -30,6 +19,21 @@
         </span>
       </template>
     </PageTitle>
+    <div class="mb-3 flex items-center justify-between px-4">
+      <FilterPopover doctype="HD Ticket" />
+      <div class="flex items-center gap-2">
+        <Dropdown :options="sortOptions">
+          <template #default>
+            <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
+              <template #prefix>
+                <Icon icon="lucide:arrow-down-up" />
+              </template>
+            </Button>
+          </template>
+        </Dropdown>
+        <ColumnSelector id="ticket" :columns="columns" />
+      </div>
+    </div>
     <MainTable :tickets="tickets.data" :columns="columns" class="grow" />
     <ListNavigation :resource="tickets" />
     <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
