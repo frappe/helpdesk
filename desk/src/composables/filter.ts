@@ -2,6 +2,7 @@ import { watchEffect } from "vue";
 import { useRoute, useRouter, RouteLocationNamedRaw } from "vue-router";
 import { useStorage } from "@vueuse/core";
 import { createResource } from "frappe-ui";
+import { orderBy } from "lodash";
 import { DocField, Filter, Resource } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 
@@ -39,11 +40,14 @@ export function useFilter(doctype: string) {
       append_assign: true,
     },
     transform: (data) => {
-      data = data.map((f) => ({
-        label: f.label,
-        value: f.fieldname,
-        ...f,
-      }));
+      data = orderBy(
+        data.map((f) => ({
+          label: f.label,
+          value: f.fieldname,
+          ...f,
+        })),
+        "label"
+      );
       return data;
     },
   });
