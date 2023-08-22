@@ -1,9 +1,10 @@
 import frappe
 from frappe.model.document import Document
+from frappe.query_builder import JoinType
 from frappe.utils import now_datetime
 from pypika import Criterion
 
-from helpdesk.utils import get_context, check_permissions
+from helpdesk.utils import check_permissions, get_context
 
 DOCTYPE = "HD Service Level Agreement"
 
@@ -17,16 +18,24 @@ def get_sla(ticket: Document) -> Document:
 	"""
 	check_permissions(DOCTYPE, None)
 	QBSla = frappe.qb.DocType(DOCTYPE)
+	QBPriority = frappe.qb.DocType("HD Service Level Priority")
 	now = now_datetime()
-	sla_list = (
+	priority = ticket.priority
+	q = (
 		frappe.qb.from_(QBSla)
 		.select(QBSla.name, QBSla.condition)
 		.where(QBSla.enabled == True)
 		.where(QBSla.default_sla == False)
 		.where(Criterion.any([QBSla.start_date.isnull(), QBSla.start_date <= now]))
-		.where(Criterion.any([QBSla.end_date.isnull(), QBSla.start_date >= now]))
-		.run(as_dict=True)
+		.where(Criterion.any([QBSla.end_date.isnull(), QBSla.end_date >= now]))
 	)
+	if priority:
+		q = (
+			q.join(QBPriority, JoinType.inner)
+			.on(QBPriority.parent == QBSla.name)
+			.where(QBPriority.priority == priority)
+		)
+	sla_list = q.run(as_dict=True)
 	res = None
 	for sla in sla_list:
 		cond = sla.get("condition")
