@@ -1,7 +1,7 @@
 {
  "actions": [],
  "autoname": "field:service_level",
- "creation": "2022-02-08 18:13:42.690854",
+ "creation": "2023-08-22 11:14:25.683372",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -165,7 +165,7 @@
   }
  ],
  "links": [],
- "modified": "2023-08-19 01:20:58.422134",
+ "modified": "2023-08-22 11:35:27.552488",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",
@@ -192,21 +192,18 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
+   "role": "Agent",
    "share": 1,
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Agent",
-   "share": 1,
-   "write": 1
+   "role": "All",
+   "share": 1
   }
  ],
  "sort_field": "modified",
