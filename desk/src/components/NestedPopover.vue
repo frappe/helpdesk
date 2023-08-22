@@ -2,22 +2,22 @@
   <Popover v-slot="{ open }">
     <PopoverButton
       ref="reference"
-      v-slot="{ open }"
+      v-slot="{ open: o }"
       as="div"
       @click="updatePosition"
       @focusin="updatePosition"
       @keydown="updatePosition"
     >
-      <slot name="target" v-bind="{ open }" />
+      <slot name="target" :open="o" />
     </PopoverButton>
     <div v-show="open">
       <PopoverPanel
-        v-slot="{ open, close }"
+        v-slot="{ open: o, close }"
         ref="popover"
         static
         class="z-[100]"
       >
-        <slot name="body" v-bind="{ open, close }" />
+        <slot name="body" :open="o" :close="close" />
       </PopoverPanel>
     </div>
   </Popover>

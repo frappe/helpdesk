@@ -76,7 +76,7 @@
                   class="!text-gray-600"
                   variant="ghost"
                   label="Add filter"
-                  @click="togglePopover()"
+                  @click="() => togglePopover()"
                 >
                   <template #prefix>
                     <FeatherIcon name="plus" class="h-4" />
@@ -89,7 +89,7 @@
               class="!text-gray-600"
               variant="ghost"
               label="Clear all filter"
-              @click="clearfilter(close)"
+              @click="() => clearfilter(close)"
             />
           </div>
         </div>

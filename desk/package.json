@@ -10,7 +10,6 @@
 		"copy-html-entry": "cp ../helpdesk/public/desk/index.html ../helpdesk/www/helpdesk/index.html"
 	},
 	"dependencies": {
-		"@headlessui/vue": "^1.7.12",
 		"@iconify/tools": "^2.2.6",
 		"@tailwindcss/line-clamp": "^0.4.4",
 		"@tailwindcss/typography": "^0.5.9",
