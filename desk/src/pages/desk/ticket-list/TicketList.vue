@@ -5,21 +5,37 @@
         <PresetFilters doctype="HD Ticket" />
       </template>
       <template #right>
-        <Button
-          label="New ticket"
-          theme="gray"
-          variant="solid"
-          @click="showNewDialog = !showNewDialog"
-        >
-          <template #prefix>
-            <Icon icon="lucide:plus" class="h-4 w-4" />
-          </template>
-        </Button>
+        <span class="flex gap-2">
+          <Button
+            label="New ticket"
+            theme="gray"
+            variant="solid"
+            @click="showNewDialog = !showNewDialog"
+          >
+            <template #prefix>
+              <Icon icon="lucide:plus" class="h-4 w-4" />
+            </template>
+          </Button>
+        </span>
       </template>
     </PageTitle>
-    <TopSection class="mx-4 mb-3" :columns="columns" />
-    <MainTable :tickets="tickets.list?.data" :columns="columns" class="grow" />
-    <ListNavigation v-bind="tickets" class="p-2" />
+    <div class="mb-3 flex items-center justify-between px-4">
+      <FilterPopover doctype="HD Ticket" />
+      <div class="flex items-center gap-2">
+        <Dropdown :options="sortOptions">
+          <template #default>
+            <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
+              <template #prefix>
+                <Icon icon="lucide:arrow-down-up" />
+              </template>
+            </Button>
+          </template>
+        </Dropdown>
+        <ColumnSelector id="ticket" :columns="columns" />
+      </div>
+    </div>
+    <MainTable :tickets="tickets.data" :columns="columns" class="grow" />
+    <ListNavigation :resource="tickets" />
     <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
       <template #body-main>
         <TicketNew
@@ -33,8 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Button, Dialog } from "frappe-ui";
+import { computed, ref } from "vue";
+import { createResource, Button, Dialog, Dropdown } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { socket } from "@/socket";
@@ -42,20 +58,21 @@ import { useAuthStore } from "@/stores/auth";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
-import PageTitle from "@/components/PageTitle.vue";
 import ListNavigation from "@/components/ListNavigation.vue";
+import PageTitle from "@/components/PageTitle.vue";
+import { ColumnSelector, FilterPopover } from "@/components";
 import TicketNew from "@/pages/portal/TicketNew.vue";
 import MainTable from "./MainTable.vue";
-import TopSection from "./TopSection.vue";
 import PresetFilters from "./PresetFilters.vue";
 
 const { userId } = useAuthStore();
 const { getArgs } = useFilter("HD Ticket");
-const { get: getOrder } = useOrder();
+const { get: getOrder, set: setOrder } = useOrder();
 const showNewDialog = ref(false);
+const pageLength = ref(20);
 const tickets = createListManager({
   doctype: "HD Ticket",
-  pageLength: 20,
+  pageLength: pageLength.value,
   filters: getArgs(),
   orderBy: getOrder(),
   auto: true,
@@ -73,6 +90,20 @@ const tickets = createListManager({
     }
     return data;
   },
+});
+
+const sortOptionsRes = createResource({
+  url: "helpdesk.extends.doc.sort_options",
+  auto: true,
+  params: {
+    doctype: "HD Ticket",
+  },
+});
+const sortOptions = computed(() => {
+  return sortOptionsRes.data?.map((o) => ({
+    label: o,
+    onClick: () => setOrder(o),
+  }));
 });
 
 socket.on("helpdesk:new-ticket", () => {

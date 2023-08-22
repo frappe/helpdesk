@@ -21,7 +21,7 @@
       class="grow"
       row-key="name"
     />
-    <ListNavigation class="p-3" v-bind="teams" />
+    <ListNavigation :resource="teams" />
     <Dialog
       v-model="showNewDialog"
       :options="{

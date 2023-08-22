@@ -4,7 +4,7 @@
       <template #right>
         <div class="flex gap-2">
           <div
-            class="flex items-center justify-between text-base text-gray-700 "
+            class="flex items-center justify-between text-base text-gray-700"
           >
             <div class="flex gap-4">
               <Dropdown :options="dropdownOptions">
@@ -54,7 +54,7 @@
           {{ dayjs(data.creation).fromNow() }}
         </template>
       </ListView>
-      <ListNavigation v-bind="tickets" class="px-9 py-3" />
+      <ListNavigation :resource="tickets" />
     </span>
     <div
       v-else

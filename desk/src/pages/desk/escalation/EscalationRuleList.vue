@@ -33,7 +33,7 @@
         </Badge>
       </template>
     </ListView>
-    <ListNavigation class="p-3" v-bind="rules" />
+    <ListNavigation :resource="rules" />
     <EscalationRuleDialog
       v-if="showDialog"
       v-model="showDialog"

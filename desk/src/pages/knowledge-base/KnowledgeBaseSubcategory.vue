@@ -54,7 +54,7 @@
         <EmptyMessage message="This sub category is empty" />
       </template>
     </ListView>
-    <ListNavigation v-bind="articles" class="p-2" />
+    <ListNavigation :resource="articles" />
     <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
       <template #body-content>
         <form @submit.prevent="saveSubCategory">

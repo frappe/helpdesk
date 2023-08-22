@@ -18,7 +18,7 @@
       class="grow"
       row-key="name"
     />
-    <ListNavigation class="p-3" v-bind="ticketTypes" />
+    <ListNavigation :resource="ticketTypes" />
   </div>
 </template>
 <script setup lang="ts">

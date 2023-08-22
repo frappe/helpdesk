@@ -46,7 +46,7 @@
         <FormControl type="checkbox" :model-value="data.enable_outgoing" />
       </template>
     </ListView>
-    <ListNavigation class="p-3" v-bind="accounts" />
+    <ListNavigation :resource="accounts" />
   </div>
 </template>
 <script setup lang="ts">

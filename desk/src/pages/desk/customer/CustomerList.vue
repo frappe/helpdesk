@@ -28,7 +28,7 @@
         </div>
       </template>
     </ListView>
-    <ListNavigation class="p-3" v-bind="customers" />
+    <ListNavigation :resource="customers" />
     <NewCustomerDialog
       v-model="isDialogVisible"
       @close="isDialogVisible = false"
