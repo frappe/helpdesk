@@ -16,13 +16,16 @@
       @update:model-value="selection.toggle(data[rowKey])"
     />
     <component
-      :is="isObject(data.onClick) ? RouterLink : 'span'"
+      :is="isFunction(data.onClick) ? 'span' : RouterLink"
       as="template"
       :to="data.onClick"
       class="flex w-full items-center gap-2"
-      @click.prevent="
-        () => {
-          if (!isObject(data.onClick)) data.onClick.call();
+      @click="
+        (event) => {
+          if (isFunction(data.onClick)) {
+            event.preventDefault();
+            data.onClick();
+          }
         }
       "
     >
@@ -53,7 +56,7 @@
 <script setup lang="ts">
 import { toRef } from "vue";
 import { FormControl } from "frappe-ui";
-import { isObject } from "lodash";
+import { isFunction } from "lodash";
 import { Column } from "@/types";
 import { getAssign } from "@/utils";
 import { useColumns } from "@/composables/columns";
