@@ -157,6 +157,8 @@ class HDServiceLevelAgreement(Document):
 		if not is_fulfilled:
 			doc.resolution_date = None
 		if not is_fulfilled and was_fulfilled:
+			doc.resolution_date = None
+			doc.resolution_time = None
 			return
 		doc.resolution_date = now_datetime()
 		start_at = doc.service_level_agreement_creation
@@ -174,6 +176,7 @@ class HDServiceLevelAgreement(Document):
 			doc.response_by = doc.resolution_by if doc.first_responded_on else None
 			doc.resolution_date = None
 			doc.resolution_by = None
+			doc.resolution_time = None
 			doc.on_hold_since = now_datetime()
 		else:
 			doc.on_hold_since = None
