@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-3">
+  <header class="px-5 py-2.5">
     <div class="flex items-center justify-between">
       <slot name="title">
         <div v-if="title" class="text-lg font-medium text-gray-900">
@@ -8,7 +8,7 @@
       </slot>
       <slot name="right" />
     </div>
-  </div>
+  </header>
 </template>
 
 <script setup lang="ts">
