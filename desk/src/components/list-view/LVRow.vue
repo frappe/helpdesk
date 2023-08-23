@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group flex h-10 w-full items-center gap-2 whitespace-nowrap px-4 text-base"
+    class="group mx-5 flex h-10 items-center gap-2 whitespace-nowrap px-2.5 text-base"
     :class="{
       'bg-gray-200': selection.storage.has(data[rowKey]),
       'hover:bg-gray-300': selection.storage.has(data[rowKey]),

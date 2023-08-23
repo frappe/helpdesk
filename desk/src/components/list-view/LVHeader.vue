@@ -1,5 +1,5 @@
 <template>
-  <div class="border-y px-4 py-1.5 text-sm text-gray-600">
+  <div class="mx-5 rounded bg-gray-100 py-2 px-2.5 text-sm text-gray-600">
     <div class="flex w-full items-center gap-2">
       <FormControl
         v-if="checkbox"

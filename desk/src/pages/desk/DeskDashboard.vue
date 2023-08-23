@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col divide-y">
-    <PageTitle title="Dashboard">
+  <span>
+    <PageTitle title="Dashboard" class="border-b">
       <template #right>
         <Tooltip v-if="!isEmpty(items.data)" placement="left" :text="dateInfo">
           <div class="flex h-7 w-7 items-center justify-between">
@@ -16,7 +16,7 @@
       📊 Oops, looks like there are no charts to display on the dashboard right
       now.
     </div>
-    <div v-else class="space-y-3 overflow-y-scroll p-4">
+    <div v-else class="space-y-3 overflow-y-scroll p-5">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <SingleString
           v-for="i in items.data.filter((i) => !i.is_chart)"
@@ -44,7 +44,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </span>
 </template>
 
 <script setup lang="ts">

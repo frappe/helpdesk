@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle>
+    <PageTitle class="border-b">
       <template #title>
         <PresetFilters doctype="HD Ticket" />
       </template>
@@ -19,7 +19,7 @@
         </span>
       </template>
     </PageTitle>
-    <div class="mb-3 flex items-center justify-between px-4">
+    <div class="my-2.5 mx-5 flex items-center justify-between">
       <FilterPopover doctype="HD Ticket" />
       <div class="flex items-center gap-2">
         <Dropdown :options="sortOptions">
