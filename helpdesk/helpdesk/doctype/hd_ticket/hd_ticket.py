@@ -1,14 +1,17 @@
 import json
+from datetime import timedelta
 from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
 
 import frappe
 from frappe import _
+from frappe.core.utils import get_parent_doc
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.model.document import Document
 from frappe.query_builder import Case, DocType, Order
+from frappe.utils import date_diff, get_datetime, now_datetime, time_diff_in_seconds
 from pypika.functions import Count
 from pypika.queries import Query
 from pypika.terms import Criterion
@@ -135,17 +138,6 @@ class HDTicket(Document):
 			"Low to high priority": lambda q: by_priority(q, Order.desc),
 			"Last modified on": "modified",
 		}
-
-	def has_permission(self, perm):
-		has_standard_permissions = super().has_permission(perm)
-		user = frappe.session.user
-		customer = get_customer(user)
-		user_is_agent = is_agent()
-		is_customer = self.customer == customer
-		is_contact = self.contact == user
-		is_raised = self.raised_by == user
-		has_extra_permissions = user_is_agent or is_customer or is_contact or is_raised
-		return has_standard_permissions and has_extra_permissions
 
 	def publish_update(self):
 		publish_event("helpdesk:ticket-update", {"name": self.name})
