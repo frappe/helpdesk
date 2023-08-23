@@ -157,6 +157,8 @@ class HDServiceLevelAgreement(Document):
 		if not is_fulfilled:
 			doc.resolution_date = None
 		if not is_fulfilled and was_fulfilled:
+			doc.resolution_date = None
+			doc.resolution_time = None
 			return
 		doc.resolution_date = now_datetime()
 		start_at = doc.service_level_agreement_creation
@@ -174,6 +176,7 @@ class HDServiceLevelAgreement(Document):
 			doc.response_by = doc.resolution_by if doc.first_responded_on else None
 			doc.resolution_date = None
 			doc.resolution_by = None
+			doc.resolution_time = None
 			doc.on_hold_since = now_datetime()
 		else:
 			doc.on_hold_since = None
@@ -204,26 +207,29 @@ class HDServiceLevelAgreement(Document):
 		doc.user_resolution_time = None
 
 	def handle_agreement_status(self, doc: Document):
-		if self.apply_sla_for_resolution:
-			if not doc.get("first_responded_on"):
-				doc.agreement_status = "First Response Due"
-			elif not doc.get("resolution_date"):
-				doc.agreement_status = "Resolution Due"
-			elif get_datetime(doc.get("resolution_date")) <= get_datetime(
-				doc.get("resolution_by")
-			):
-				doc.agreement_status = "Fulfilled"
-			else:
-				doc.agreement_status = "Overdue"
-		else:
-			if not doc.get("first_responded_on"):
-				doc.agreement_status = "First Response Due"
-			elif get_datetime(doc.get("first_responded_on")) <= get_datetime(
-				doc.get("response_by")
-			):
-				doc.agreement_status = "Fulfilled"
-			else:
-				doc.agreement_status = "Overdue"
+		is_failed = self.is_first_response_failed(doc) or self.is_resolution_failed(doc)
+		options = {
+			"Fulfilled": True,
+			"Resolution Due": self.apply_sla_for_resolution and not doc.resolution_date,
+			"First Response Due": not doc.first_responded_on,
+			"Failed": is_failed,
+			"Paused": doc.on_hold_since,
+		}
+		for status in options:
+			if options[status]:
+				doc.agreement_status = status
+
+	def is_first_response_failed(self, doc: Document):
+		if not doc.first_responded_on:
+			return doc.response_by < now_datetime()
+		return doc.response_by < doc.first_responded_on
+
+	def is_resolution_failed(self, doc: Document):
+		if not self.apply_sla_for_resolution or not doc.resolution_by:
+			return
+		if not doc.resolution_date:
+			return doc.resolution_by < now_datetime()
+		return doc.resolution_by < doc.resolution_date
 
 	def calc_time(
 		self, doc: Document, target: Literal["response_time", "resolution_time"]
@@ -266,6 +272,8 @@ class HDServiceLevelAgreement(Document):
 		:param end_at: Date at which calculation ends
 		:return: Number of seconds
 		"""
+		start_at = getdate(start_at)
+		end_at = getdate(end_at)
 		time_took = 0
 		holidays = self.get_holidays()
 		weekdays = get_weekdays()
