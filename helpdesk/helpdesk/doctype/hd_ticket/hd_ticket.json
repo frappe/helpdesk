@@ -179,7 +179,7 @@
    "fieldname": "agreement_status",
    "fieldtype": "Select",
    "label": "SLA Status",
-   "options": "First Response Due\nResolution Due\nFulfilled\nOverdue",
+   "options": "First Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
    "read_only": 1
   },
   {
@@ -369,7 +369,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-08-22 09:54:40.764043",
+ "modified": "2023-08-23 17:09:32.958800",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
