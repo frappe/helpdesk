@@ -13,3 +13,4 @@ execute:frappe.delete_doc("Server Script", "Ticket Auto Set Custom Fields", igno
 helpdesk.helpdesk.doctype.hd_ticket_feedback_option.patches.ootb
 helpdesk.helpdesk.doctype.hd_ticket_feedback_option.patches.label_as_name
 helpdesk.helpdesk.doctype.hd_service_level_agreement.patches.missing_sla_creation
+helpdesk.helpdesk.doctype.hd_ticket.patches.replace_overdue_failed

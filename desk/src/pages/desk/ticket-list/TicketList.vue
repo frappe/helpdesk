@@ -155,7 +155,7 @@ const columns = [
     width: "w-36",
   },
   {
-    label: "Agreement Status",
+    label: "Agreement status",
     key: "agreement_status",
     width: "w-36",
   },
