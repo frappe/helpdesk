@@ -50,7 +50,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Badge, FormControl } from "frappe-ui";
+import { usePageMeta, Badge, FormControl } from "frappe-ui";
 import { AGENT_PORTAL_EMAIL_NEW, AGENT_PORTAL_EMAIL_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
@@ -110,5 +110,11 @@ const accounts = createListManager({
     }
     return data;
   },
+});
+
+usePageMeta(() => {
+  return {
+    title: "Email accounts",
+  };
 });
 </script>

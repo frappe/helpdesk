@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { createResource, Dialog, FormControl } from "frappe-ui";
+import { createResource, usePageMeta, Dialog, FormControl } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
@@ -118,5 +118,11 @@ const newTeam = createResource({
     });
   },
   onError: useError({ title: "Error creating team" }),
+});
+
+usePageMeta(() => {
+  return {
+    title: "Teams",
+  };
 });
 </script>

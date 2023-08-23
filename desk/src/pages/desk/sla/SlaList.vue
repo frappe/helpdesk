@@ -33,7 +33,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Badge } from "frappe-ui";
+import { usePageMeta, Badge } from "frappe-ui";
 import { AGENT_PORTAL_SLA_NEW, AGENT_PORTAL_SLA_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
@@ -75,5 +75,11 @@ const policies = createListManager({
     }
     return data;
   },
+});
+
+usePageMeta(() => {
+  return {
+    title: "Support policies",
+  };
 });
 </script>

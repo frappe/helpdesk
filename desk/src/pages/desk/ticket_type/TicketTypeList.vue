@@ -22,6 +22,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { usePageMeta } from "frappe-ui";
 import {
   AGENT_PORTAL_TICKET_TYPE_NEW,
   AGENT_PORTAL_TICKET_TYPE_SINGLE,
@@ -61,5 +62,11 @@ const ticketTypes = createListManager({
     }
     return data;
   },
+});
+
+usePageMeta(() => {
+  return {
+    title: "Ticket types",
+  };
 });
 </script>

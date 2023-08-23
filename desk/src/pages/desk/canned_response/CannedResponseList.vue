@@ -30,6 +30,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { usePageMeta } from "frappe-ui";
 import { AGENT_PORTAL_CANNED_RESPONSE_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
@@ -68,5 +69,11 @@ const responses = createListManager({
     }
     return data;
   },
+});
+
+usePageMeta(() => {
+  return {
+    title: "Canned responses",
+  };
 });
 </script>

@@ -43,7 +43,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { Avatar } from "frappe-ui";
+import { usePageMeta, Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
@@ -79,6 +79,12 @@ const customers = createListManager({
     }
     return data;
   },
+});
+
+usePageMeta(() => {
+  return {
+    title: "Customers",
+  };
 });
 
 function openCustomer(id: string) {

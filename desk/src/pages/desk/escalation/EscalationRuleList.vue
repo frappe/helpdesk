@@ -43,7 +43,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { Badge } from "frappe-ui";
+import { usePageMeta, Badge } from "frappe-ui";
 import { socket } from "@/socket";
 import { createListManager } from "@/composables/listManager";
 import { ListView } from "@/components";
@@ -82,6 +82,12 @@ const rules = createListManager({
   doctype: "HD Escalation Rule",
   fields: ["name", "priority", "team", "ticket_type", "is_enabled"],
   auto: true,
+});
+
+usePageMeta(() => {
+  return {
+    title: "Escalation rules",
+  };
 });
 
 function openDialog(rule: string | null) {

@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, toRef } from "vue";
-import { createResource } from "frappe-ui";
+import { createResource, usePageMeta } from "frappe-ui";
 import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import ConversationBox from "./ConversationBox.vue";
@@ -67,5 +67,11 @@ onMounted(() =>
 onBeforeUnmount(() => {
   events.forEach((e) => socket.off(e));
   ticket.value = null;
+});
+
+usePageMeta(() => {
+  return {
+    title: ticket.value.data.subject,
+  };
 });
 </script>
