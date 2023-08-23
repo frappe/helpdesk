@@ -149,6 +149,11 @@ const columns = [
     width: "w-36",
   },
   {
+    label: "Agreement Status",
+    key: "agreement_status",
+    width: "w-36",
+  },
+  {
     label: "First response",
     key: "response_by",
     width: "w-32",

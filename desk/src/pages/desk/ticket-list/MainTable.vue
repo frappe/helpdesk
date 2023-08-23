@@ -19,6 +19,13 @@
     <template #_assign="{ data }">
       <AssignedInfo :assign="data._assign" />
     </template>
+    <template #agreement_status="{ data }">
+      <Badge
+        :label="data.agreement_status"
+        :theme="slaStatusColorMap[data.agreement_status]"
+        variant="outline"
+      />
+    </template>
     <template #response_by="{ data }">
       <span v-if="data.response_by">
         <Badge
@@ -114,6 +121,13 @@ const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
 const emptyMessage =
   "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
+const slaStatusColorMap = {
+  Fulfilled: "green",
+  Failed: "red",
+  "Resolution Due": "orange",
+  "First Response Due": "orange",
+  Paused: "blue",
+};
 
 const bulkAssignTicketToAgent = createResource({
   url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
