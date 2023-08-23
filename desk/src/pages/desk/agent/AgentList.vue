@@ -51,7 +51,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { Avatar, Badge } from "frappe-ui";
+import { usePageMeta, Avatar, Badge } from "frappe-ui";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import { useFilter } from "@/composables/filter";
@@ -99,6 +99,12 @@ const agents = createListManager({
     }
     return data;
   },
+});
+
+usePageMeta(() => {
+  return {
+    title: "Agents",
+  };
 });
 
 function toTickets(user: string) {

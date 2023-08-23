@@ -1,19 +1,18 @@
 <template>
   <div class="flex h-screen w-screen">
     <SideBar />
-    <RouterView :key="route.fullPath" class="z-0 grow overflow-auto" />
+    <RouterView :key="$route.fullPath" class="z-0 grow overflow-auto" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onBeforeMount } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { CUSTOMER_PORTAL_LANDING, ONBOARDING_PAGE } from "@/router";
 import SideBar from "@/components/desk/sidebar/SideBar.vue";
 
-const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const configStore = useConfigStore();

@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, Tooltip } from "frappe-ui";
+import { createResource, usePageMeta, Tooltip } from "frappe-ui";
 import { isEmpty } from "lodash";
 import PageTitle from "@/components/PageTitle.vue";
 import LineChart from "@/components/charts/LineChart.vue";
@@ -63,4 +63,10 @@ const items = createResource({
 
 const dateInfo =
   "📊 The information displayed in these charts are derived from data collected over the past 30 days";
+
+usePageMeta(() => {
+  return {
+    title: "Dashboard",
+  };
+});
 </script>

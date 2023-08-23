@@ -50,7 +50,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { createResource, Button, Dialog, Dropdown } from "frappe-ui";
+import {
+  createResource,
+  usePageMeta,
+  Button,
+  Dialog,
+  Dropdown,
+} from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { socket } from "@/socket";
@@ -198,4 +204,10 @@ const columns = [
     width: "w-36",
   },
 ];
+
+usePageMeta(() => {
+  return {
+    title: "Tickets",
+  };
+});
 </script>
