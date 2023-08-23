@@ -210,9 +210,9 @@ class HDServiceLevelAgreement(Document):
 		is_failed = self.is_first_response_failed(doc) or self.is_resolution_failed(doc)
 		options = {
 			"Fulfilled": True,
-			"Failed": is_failed,
 			"Resolution Due": self.apply_sla_for_resolution and not doc.resolution_date,
 			"First Response Due": not doc.first_responded_on,
+			"Failed": is_failed,
 			"Paused": doc.on_hold_since,
 		}
 		for status in options:
