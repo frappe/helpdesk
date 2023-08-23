@@ -86,20 +86,13 @@ export default {
       return options;
     },
   },
-  watch: {
-    title(newTitle) {
-      this.configStore.setTitle(newTitle);
-    },
-  },
   mounted() {
-    this.configStore.setTitle(this.title);
     this.$socket.on("helpdesk:new-preset-filter", (data) => {
       if (data.reference_doctype !== "HD Ticket") return;
       this.$resources.presetFilterOptions.reload();
     });
   },
   unmounted() {
-    this.configStore.setTitle();
     this.$socket.off("helpdesk:new-preset-filter");
   },
   resources: {

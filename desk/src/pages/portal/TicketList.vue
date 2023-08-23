@@ -168,7 +168,4 @@ function transformStatus(status: string) {
 function isHighlight(ticket) {
   return ticket.status === "Replied";
 }
-
-onMounted(() => configStore.setTitle("My Tickets"));
-onUnmounted(() => configStore.setTitle());
 </script>

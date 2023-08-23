@@ -9,7 +9,6 @@
   "track_service_level_agreement",
   "allow_resetting_service_level_agreement",
   "column_break_4",
-  "helpdesk_name",
   "priority_section",
   "default_priority",
   "column_break_nvbf",
@@ -33,7 +32,6 @@
   "branding_tab",
   "images_column",
   "brand_logo",
-  "brand_favicon",
   "column_break_fsjn",
   "misc_tab",
   "toasts_column",
@@ -62,11 +60,6 @@
    "fieldname": "allow_resetting_service_level_agreement",
    "fieldtype": "Check",
    "label": "Allow Resetting SLA"
-  },
-  {
-   "fieldname": "helpdesk_name",
-   "fieldtype": "Data",
-   "label": "Helpdesk Name"
   },
   {
    "fieldname": "column_break_4",
@@ -223,12 +216,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "Image to be used as website ",
-   "fieldname": "brand_favicon",
-   "fieldtype": "Attach Image",
-   "label": "Favicon"
-  },
-  {
    "default": "0",
    "fieldname": "prefer_knowledge_base",
    "fieldtype": "Check",
@@ -252,7 +239,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-07-30 21:55:54.516451",
+ "modified": "2023-08-23 17:59:49.761375",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

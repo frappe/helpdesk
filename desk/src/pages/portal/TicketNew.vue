@@ -24,7 +24,7 @@
         <RouterLink
           v-for="article in articles.data"
           :key="article.name"
-          class="group flex cursor-pointer gap-2  hover:text-gray-900"
+          class="group flex cursor-pointer gap-2 hover:text-gray-900"
           :to="getArticleLink(article.name, article.title)"
           target="_blank"
         >
@@ -236,7 +236,4 @@ function searchArticles(term: string) {
 
   articles.reload();
 }
-
-onMounted(() => configStore.setTitle("New ticket"));
-onUnmounted(() => configStore.setTitle());
 </script>
