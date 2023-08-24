@@ -1,7 +1,7 @@
 <template>
   <div v-if="pinnedComments.length" class="border-b">
     <div
-      class="flex cursor-pointer select-none items-center justify-between px-7 py-2 hover:bg-gray-50"
+      class="flex cursor-pointer select-none items-center justify-between px-5 py-2 hover:bg-gray-50"
       @click="isExpanded = !isExpanded"
     >
       <div class="flex gap-1">

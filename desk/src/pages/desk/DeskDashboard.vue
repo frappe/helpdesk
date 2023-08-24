@@ -1,6 +1,6 @@
 <template>
   <span>
-    <PageTitle title="Dashboard" class="border-b">
+    <PageTitle title="Dashboard">
       <template #right>
         <Tooltip v-if="!isEmpty(items.data)" placement="left" :text="dateInfo">
           <div class="flex h-7 w-7 items-center justify-between">

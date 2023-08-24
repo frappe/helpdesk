@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle class="border-b">
+    <PageTitle>
       <template #title>
         <PresetFilters doctype="HD Ticket" />
       </template>

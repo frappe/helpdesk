@@ -15,7 +15,7 @@
       </template>
     </PageTitle>
     <ListView
-      class="grow"
+      class="mt-2.5 grow"
       :columns="columns"
       :data="rules.list?.data || []"
       :empty-message="emptyMessage"
