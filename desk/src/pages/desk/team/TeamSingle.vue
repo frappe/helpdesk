@@ -1,7 +1,22 @@
 <template>
   <span>
     <div class="flex flex-col">
-      <TopBar :title="teamId" :back-to="{ name: AGENT_PORTAL_TEAM_LIST }">
+      <PageTitle class="border-b">
+        <template #title>
+          <BreadCrumbs
+            :items="[
+              {
+                label: 'Teams',
+                route: {
+                  name: AGENT_PORTAL_TEAM_LIST,
+                },
+              },
+              {
+                label: teamId,
+              },
+            ]"
+          />
+        </template>
         <template #right>
           <div class="flex items-center gap-2">
             <Button
@@ -23,7 +38,7 @@
             </Dropdown>
           </div>
         </template>
-      </TopBar>
+      </PageTitle>
       <div class="my-6">
         <div class="container">
           <div class="space-y-4">
@@ -122,6 +137,7 @@ import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { useAgentStore } from "@/stores/agent";
 import { useError } from "@/composables/error";
+import { PageTitle, BreadCrumbs } from "@/components";
 import TopBar from "@/components/TopBar.vue";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";

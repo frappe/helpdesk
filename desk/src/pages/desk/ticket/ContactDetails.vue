@@ -1,15 +1,7 @@
 <template>
   <div class="flex flex-col border-l">
-    <div class="mx-4 mt-4">
-      <div class="flex items-center justify-between">
-        <div class="text-lg font-semibold text-gray-800">Contact details</div>
-        <Button
-          icon="x"
-          theme="gray"
-          variant="ghost"
-          @click="sidebar.isExpanded = false"
-        />
-      </div>
+    <span>
+      <TicketSidebarHeader title="Contact details" />
       <div
         v-if="contact.full_name"
         class="flex items-center gap-3 border-b py-6"
@@ -24,8 +16,8 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="overflow-auto px-4">
+    </span>
+    <div class="overflow-auto px-5">
       <div
         v-if="!isEmpty(contactOptions)"
         class="flex flex-col gap-3.5 border-b py-6 text-base"
@@ -50,10 +42,11 @@
 <script setup lang="ts">
 import { isEmpty } from "lodash";
 import { computed } from "vue";
-import { Avatar, Button } from "frappe-ui";
+import { Avatar } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import CustomFieldList from "./CustomFieldList.vue";
 import OpenTicketList from "./OpenTicketList.vue";
+import TicketSidebarHeader from "./TicketSidebarHeader.vue";
 import { useTicketStore, useTicket } from "./data";
 
 const fields = [

@@ -1,9 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle class="border-b">
-      <template #title>
-        <PresetFilters doctype="HD Ticket" />
-      </template>
+    <PageTitle title="Tickets">
       <template #right>
         <span class="flex gap-2">
           <Button
@@ -20,8 +17,9 @@
       </template>
     </PageTitle>
     <div class="my-2.5 mx-5 flex items-center justify-between">
-      <FilterPopover doctype="HD Ticket" />
+      <PresetFilters doctype="HD Ticket" />
       <div class="flex items-center gap-2">
+        <FilterPopover doctype="HD Ticket" />
         <Dropdown :options="sortOptions">
           <template #default>
             <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">

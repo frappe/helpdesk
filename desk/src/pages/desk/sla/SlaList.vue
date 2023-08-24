@@ -15,7 +15,7 @@
       :columns="columns"
       :data="policies.list?.data || []"
       :empty-message="emptyMessage"
-      class="grow"
+      class="mt-2.5 grow"
       row-key="name"
     >
       <template #enabled="{ data }">

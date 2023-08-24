@@ -1,17 +1,9 @@
 <template>
   <div class="flex flex-col">
     <div class="border-l">
-      <div class="m-4 text-base">
-        <div class="flex items-center justify-between">
-          <div class="text-lg font-semibold text-gray-900">Ticket details</div>
-          <Button
-            icon="x"
-            theme="gray"
-            variant="ghost"
-            @click="ticketStore.sidebar.isExpanded = false"
-          />
-        </div>
-        <div class="my-6 flex flex-col justify-between gap-3.5">
+      <span>
+        <TicketSidebarHeader title="Ticket details" />
+        <div class="mx-5 my-6 flex flex-col justify-between gap-3.5 text-base">
           <div v-if="data.customer" class="space-y-2">
             <span class="block text-sm text-gray-700">Customer</span>
             <span class="block break-words font-medium text-gray-900">
@@ -63,12 +55,22 @@
             />
             <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
+          <div v-if="data.feedback" class="space-y-2">
+            <span class="block text-sm text-gray-700">Feedback</span>
+            <StarRating :rating="data.feedback.rating" />
+            <span class="block font-medium text-gray-900">
+              {{ data.feedback.label }}
+            </span>
+            <span class="block text-gray-900">
+              {{ data.feedback_extra }}
+            </span>
+          </div>
         </div>
-      </div>
+      </span>
     </div>
     <div class="divider"></div>
     <div
-      class="flex grow flex-col gap-3 truncate border-l p-4"
+      class="flex grow flex-col gap-3 truncate border-l p-5"
       :style="{
         'overflow-y': 'scroll',
       }"
@@ -97,7 +99,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { createResource, Autocomplete, Button } from "frappe-ui";
+import { createResource, Autocomplete } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { useTeamStore } from "@/stores/team";
@@ -105,10 +107,10 @@ import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import { createToast } from "@/utils";
-import UniInput from "@/components/UniInput.vue";
-import { useTicket, useTicketStore } from "./data";
+import { StarRating, UniInput } from "@/components";
+import TicketSidebarHeader from "./TicketSidebarHeader.vue";
+import { useTicket } from "./data";
 
-const ticketStore = useTicketStore();
 const ticket = useTicket();
 const data = computed(() => ticket.value.data);
 

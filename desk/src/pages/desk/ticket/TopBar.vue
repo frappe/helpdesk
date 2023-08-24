@@ -1,5 +1,20 @@
 <template>
-  <TopBar :title="data.subject" :back-to="{ name: AGENT_PORTAL_TICKET_LIST }">
+  <PageTitle class="border-b">
+    <template #title>
+      <BreadCrumbs
+        :items="[
+          {
+            label: 'Tickets',
+            route: {
+              name: AGENT_PORTAL_TICKET_LIST,
+            },
+          },
+          {
+            label: data.subject,
+          },
+        ]"
+      />
+    </template>
     <template #bottom>
       <div class="flex items-center gap-1 text-base text-gray-600">
         <Tooltip :text="sourceText">
@@ -53,7 +68,7 @@
         </template>
       </Autocomplete>
     </template>
-  </TopBar>
+  </PageTitle>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +82,8 @@ import { copy, createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import TopBar from "@/components/TopBar.vue";
+import { useError } from "@/composables/error";
+import { BreadCrumbs, PageTitle } from "@/components";
 import { useTicket } from "./data";
 
 const agentStore = useAgentStore();
@@ -109,6 +125,7 @@ function assignAgent(agent: string) {
         iconClasses: "text-green-600",
       });
     },
+    onError: useError(),
   });
 }
 </script>
