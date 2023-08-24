@@ -55,6 +55,20 @@
             />
             <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
+          <div class="space-y-2">
+            <span class="block text-sm text-gray-700">Modified</span>
+            <Tooltip :text="dayjs(ticket.data.modified).long()">
+              <span class="block break-words font-medium text-gray-900">
+                {{ dayjs(ticket.data.modified).fromNow() }}
+              </span>
+            </Tooltip>
+          </div>
+          <div class="space-y-2">
+            <span class="block text-sm text-gray-700">Source</span>
+            <span class="block break-words font-medium text-gray-900">
+              {{ ticket.data.via_customer_portal ? "Portal" : "Mail" }}
+            </span>
+          </div>
           <div v-if="data.feedback" class="space-y-2">
             <span class="block text-sm text-gray-700">Feedback</span>
             <StarRating :rating="data.feedback.rating" />
@@ -99,7 +113,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { createResource, Autocomplete } from "frappe-ui";
+import { createResource, Autocomplete, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { useTeamStore } from "@/stores/team";

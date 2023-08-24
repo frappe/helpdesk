@@ -15,27 +15,6 @@
         ]"
       />
     </template>
-    <template #bottom>
-      <div class="flex items-center gap-1 text-base text-gray-600">
-        <Tooltip :text="sourceText">
-          <Icon :icon="sourceIcon" class="h-4 w-4" />
-        </Tooltip>
-        <Icon icon="lucide:dot" />
-        <div class="cursor-copy" @click="copy(data.name)">
-          # {{ data.name }}
-        </div>
-        <Icon icon="lucide:dot" />
-        <Tooltip :text="dayjs(data.modified).long()">
-          Last modified {{ dayjs(data.modified).fromNow() }}
-        </Tooltip>
-        <Icon icon="lucide:dot" />
-        <Badge
-          :label="data.status"
-          :theme="ticketStatusStore.colorMapAgent[data.status]"
-          variant="subtle"
-        />
-      </div>
-    </template>
     <template #right>
       <Autocomplete
         :options="agentStore.dropdown"
@@ -74,30 +53,19 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { createResource, Autocomplete, Avatar } from "frappe-ui";
-import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET_LIST } from "@/router";
-import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
-import { copy, createToast } from "@/utils";
+import { createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { useError } from "@/composables/error";
 import { BreadCrumbs, PageTitle } from "@/components";
 import { useTicket } from "./data";
 
 const agentStore = useAgentStore();
-const ticketStatusStore = useTicketStatusStore();
 const userStore = useUserStore();
 const ticket = useTicket();
 const data = computed(() => ticket.value.data);
-const viaCustomerPortal = computed(() => data.value.via_customer_portal);
-const sourceText = computed(() =>
-  viaCustomerPortal.value ? "Created via customer portal" : "Created via email"
-);
-const sourceIcon = computed(() =>
-  viaCustomerPortal.value ? "lucide:globe" : "lucide:at-sign"
-);
 const assignedTo = computed(() => {
   const assignJson = JSON.parse(data.value._assign);
   const arr = Array.isArray(assignJson) ? assignJson : [];
