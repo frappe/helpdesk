@@ -8,6 +8,7 @@ from frappe.utils import (
 	get_datetime,
 	get_weekdays,
 	getdate,
+	get_datetime,
 	now_datetime,
 	time_diff_in_seconds,
 	to_timedelta,
@@ -221,15 +222,15 @@ class HDServiceLevelAgreement(Document):
 
 	def is_first_response_failed(self, doc: Document):
 		if not doc.first_responded_on:
-			return getdate(doc.response_by) < now_datetime()
-		return getdate(doc.response_by) < getdate(doc.first_responded_on)
+			return get_datetime(doc.response_by) < now_datetime()
+		return get_datetime(doc.response_by) < get_datetime(doc.first_responded_on)
 
 	def is_resolution_failed(self, doc: Document):
 		if not self.apply_sla_for_resolution or not doc.resolution_by:
 			return
 		if not doc.resolution_date:
-			return getdate(doc.resolution_by) < now_datetime()
-		return getdate(doc.resolution_by) < getdate(doc.resolution_date)
+			return get_datetime(doc.resolution_by) < now_datetime()
+		return get_datetime(doc.resolution_by) < get_datetime(doc.resolution_date)
 
 	def calc_time(
 		self, doc: Document, target: Literal["response_time", "resolution_time"]
