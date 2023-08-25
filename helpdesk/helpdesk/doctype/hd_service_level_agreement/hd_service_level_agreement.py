@@ -221,15 +221,15 @@ class HDServiceLevelAgreement(Document):
 
 	def is_first_response_failed(self, doc: Document):
 		if not doc.first_responded_on:
-			return doc.response_by < now_datetime()
-		return doc.response_by < doc.first_responded_on
+			return getdate(doc.response_by) < now_datetime()
+		return getdate(doc.response_by) < getdate(doc.first_responded_on)
 
 	def is_resolution_failed(self, doc: Document):
 		if not self.apply_sla_for_resolution or not doc.resolution_by:
 			return
 		if not doc.resolution_date:
-			return doc.resolution_by < now_datetime()
-		return doc.resolution_by < doc.resolution_date
+			return getdate(doc.resolution_by) < now_datetime()
+		return getdate(doc.resolution_by) < getdate(doc.resolution_date)
 
 	def calc_time(
 		self, doc: Document, target: Literal["response_time", "resolution_time"]
