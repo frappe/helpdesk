@@ -3,11 +3,7 @@
     <span class="text-lg font-semibold text-gray-900">
       {{ title }}
     </span>
-    <Button
-      theme="gray"
-      variant="ghost"
-      @click="ticketStore.sidebar.isExpanded = false"
-    >
+    <Button theme="gray" variant="ghost" @click="() => $parent.$emit('close')">
       <template #icon>
         <Icon icon="lucide:x" />
       </template>
@@ -17,12 +13,10 @@
 
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { useTicketStore } from "./data";
 
 interface P {
   title: string;
 }
 
 defineProps<P>();
-const ticketStore = useTicketStore();
 </script>
