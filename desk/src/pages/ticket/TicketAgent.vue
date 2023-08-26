@@ -15,6 +15,7 @@
             v-model:attachments="attachments"
             v-model:content="content"
             v-model:expand="isExpanded"
+            :mentions="agentStore.dropdown"
             :placeholder="placeholder"
             autofocus
             @clear="() => clear()"
@@ -159,6 +160,7 @@ import {
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { socket } from "@/socket";
+import { useAgentStore } from "@/stores/agent";
 import { useError } from "@/composables/error";
 import TicketAgentActions from "./TicketAgentActions.vue";
 import TicketAgentSidebar from "./TicketAgentSidebar.vue";
@@ -179,6 +181,7 @@ enum Mode {
 }
 
 const props = defineProps<P>();
+const agentStore = useAgentStore();
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
