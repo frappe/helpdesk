@@ -105,6 +105,17 @@
                 </div>
               </div>
             </template>
+            <template #bottom-left>
+              <Button
+                theme="gray"
+                variant="ghost"
+                @click="showCannedResponses = !showCannedResponses"
+              >
+                <template #icon>
+                  <Icon icon="lucide:message-square" />
+                </template>
+              </Button>
+            </template>
             <template #bottom-right>
               <Button
                 :label="
@@ -124,6 +135,15 @@
       </div>
       <TicketAgentSidebar />
     </div>
+    <TicketCannedResponses
+      v-model="showCannedResponses"
+      @select="
+        (content) => {
+          $refs.editor.editor.commands.clearContent();
+          $refs.editor.editor.commands.insertContent(content);
+        }
+      "
+    />
   </div>
 </template>
 
@@ -136,14 +156,16 @@ import {
   FormControl,
   TabButtons,
 } from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import { useError } from "@/composables/error";
-import TicketConversation from "./TicketConversation.vue";
-import TicketPinnedComments from "./TicketPinnedComments.vue";
+import TicketAgentActions from "./TicketAgentActions.vue";
 import TicketAgentSidebar from "./TicketAgentSidebar.vue";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
-import TicketAgentActions from "./TicketAgentActions.vue";
+import TicketCannedResponses from "./TicketCannedResponses.vue";
+import TicketConversation from "./TicketConversation.vue";
+import TicketPinnedComments from "./TicketPinnedComments.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 import { ITicket } from "./symbols";
 
@@ -177,6 +199,7 @@ const showCc = ref(false);
 const showBcc = ref(false);
 const mode = ref(Mode.Comment);
 const focus = ref("");
+const showCannedResponses = ref(false);
 
 createResource({
   url: "run_doc_method",

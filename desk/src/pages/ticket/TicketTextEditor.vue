@@ -29,17 +29,20 @@
       </div>
     </template>
     <template #bottom-left>
-      <FileUploader
-        @success="(f: File) => $emit('update:attachments', [...attachments, f])"
-      >
-        <template #default="{ openFileSelector }">
-          <Button theme="gray" variant="ghost" @click="openFileSelector()">
-            <template #icon>
-              <Icon icon="lucide:paperclip" />
-            </template>
-          </Button>
-        </template>
-      </FileUploader>
+      <span class="flex">
+        <slot name="bottom-left" />
+        <FileUploader
+          @success="(f: File) => $emit('update:attachments', [...attachments, f])"
+        >
+          <template #default="{ openFileSelector }">
+            <Button theme="gray" variant="ghost" @click="openFileSelector()">
+              <template #icon>
+                <Icon icon="lucide:paperclip" />
+              </template>
+            </Button>
+          </template>
+        </FileUploader>
+      </span>
     </template>
     <template #top-right>
       <slot name="top-right" />
