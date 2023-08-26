@@ -1,6 +1,6 @@
 <template>
-  <div class="rounded bg-white shadow">
-    <PageTitle title="My tickets">
+  <div class="flex flex-col">
+    <PageTitle title="Tickets">
       <template #right>
         <div class="flex gap-2">
           <div
@@ -32,44 +32,31 @@
         </div>
       </template>
     </PageTitle>
-    <span v-if="!isEmpty(tickets.list?.data)">
-      <ListView :columns="columns" :data="tickets.list?.data" row-key="name">
-        <template #subject="{ data }">
-          <div
-            :class="{
-              'font-medium': isHighlight(data),
-            }"
-          >
-            {{ data.subject }}
-          </div>
-        </template>
-        <template #status="{ data }">
-          <Badge
-            :label="transformStatus(data.status)"
-            :theme="ticketStatusStore.colorMapCustomer[data.status]"
-            variant="subtle"
-          />
-        </template>
-        <template #creation="{ data }">
-          {{ dayjs(data.creation).fromNow() }}
-        </template>
-      </ListView>
-      <ListNavigation :resource="tickets" />
-    </span>
-    <div
-      v-else
-      class="flex h-64 items-center justify-center text-base text-gray-900"
+    <ListView
+      :columns="columns"
+      :data="tickets.data"
+      row-key="name"
+      class="mt-2.5 grow"
     >
-      📭 No tickets
-    </div>
+      <template #status="{ data }">
+        <Badge
+          :label="transformStatus(data.status)"
+          :theme="ticketStatusStore.colorMapCustomer[data.status]"
+          variant="outline"
+        />
+      </template>
+      <template #creation="{ data }">
+        {{ dayjs(data.creation).fromNow() }}
+      </template>
+    </ListView>
+    <ListNavigation :resource="tickets" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref } from "vue";
 import { Dropdown } from "frappe-ui";
 import { dayjs } from "@/dayjs";
-import { isEmpty } from "lodash";
 import { useConfigStore } from "@/stores/config";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createListManager } from "@/composables/listManager";
@@ -82,7 +69,7 @@ const configStore = useConfigStore();
 const ticketStatusStore = useTicketStatusStore();
 const columns = [
   {
-    label: "ID",
+    label: "#",
     key: "name",
     width: "w-12",
   },
@@ -105,7 +92,7 @@ const columns = [
 
 const tickets = createListManager({
   doctype: "HD Ticket",
-  pageLength: 10,
+  pageLength: 20,
   fields: ["name", "creation", "subject", "status"],
   auto: true,
   transform: (data) => {
@@ -163,9 +150,5 @@ function transformStatus(status: string) {
     default:
       return status;
   }
-}
-
-function isHighlight(ticket) {
-  return ticket.status === "Replied";
 }
 </script>

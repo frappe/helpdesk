@@ -26,15 +26,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { isEmpty } from "lodash";
 import zod from "zod";
 import { Icon } from "@iconify/vue";
 import { Field } from "@/types";
-import { useTicket } from "./data";
+import { ITicket } from "./symbols";
 
-const ticket = useTicket();
-const fields = computed(() => ticket.value.data.template.fields);
+const ticket = inject(ITicket);
+const fields = computed(() => ticket.data.template.fields);
 
 function getUrl(url: string) {
   const isUrl = zod.string().url().safeParse(url).success;

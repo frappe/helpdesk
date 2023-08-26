@@ -26,7 +26,6 @@ import { useRouter } from "vue-router";
 import { createResource } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import { WEBSITE_ROOT } from "@/router";
 import OnboardingIntro from "./OnboardingIntro.vue";
 import SetupEmail from "./email/SetupEmail.vue";
 import SetupFavicon from "./SetupFavicon.vue";
@@ -114,7 +113,7 @@ function finish() {
 }
 
 function redirect() {
-  router.replace({ name: WEBSITE_ROOT });
+  router.replace({ path: '/' });
 }
 
 onBeforeMount(() => {

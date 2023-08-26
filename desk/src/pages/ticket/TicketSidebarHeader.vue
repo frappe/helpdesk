@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center justify-between border-b px-5 py-3">
-    <div class="text-lg font-semibold text-gray-900">
+    <span class="text-lg font-semibold text-gray-900">
       {{ title }}
-    </div>
+    </span>
     <Button
       theme="gray"
       variant="ghost"

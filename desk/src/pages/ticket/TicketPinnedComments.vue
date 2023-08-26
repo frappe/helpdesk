@@ -16,14 +16,11 @@
       <div
         v-for="c in pinnedComments"
         :key="c.name"
-        class="flex cursor-pointer gap-2 p-2 text-base text-gray-900 hover:bg-gray-50"
-        @click="emitter.emit('ticket:focus', c.name)"
+        class="flex cursor-pointer items-center gap-2 p-2 text-base text-gray-900 hover:bg-gray-50"
+        @click="$emit('focus', c.name)"
       >
-        <Avatar
-          :label="userStore.getUser(c.commented_by).full_name"
-          :image="userStore.getUser(c.commented_by).user_image"
-          size="sm"
-        />
+        <UserAvatar :user="c.commented_by" expand />
+        <span class="text-gray-500">&mdash;</span>
         <div
           class="prose prose-sm line-clamp-1"
           v-html="sanitizeHtml(c.content)"
@@ -34,18 +31,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { Avatar } from "frappe-ui";
+import { computed, inject, ref } from "vue";
 import sanitizeHtml from "sanitize-html";
 import { Icon } from "@iconify/vue";
-import { emitter } from "@/emitter";
-import { useUserStore } from "@/stores/user";
-import { useTicket } from "./data";
+import { UserAvatar } from "@/components";
+import { ITicket } from "./symbols";
 
+interface E {
+  (event: "focus", focus: string): void;
+}
+
+defineEmits<E>();
 const isExpanded = ref(false);
-const userStore = useUserStore();
-const ticket = useTicket();
-const comments = computed(() => ticket.value.data.comments || []);
+const ticket = inject(ITicket);
+const comments = computed(() => ticket.data.comments || []);
 const pinnedComments = computed(() =>
   comments.value.filter((c) => c.is_pinned)
 );

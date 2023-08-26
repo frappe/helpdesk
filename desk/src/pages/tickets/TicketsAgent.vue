@@ -32,7 +32,7 @@
         <ColumnSelector id="ticket" :columns="columns" />
       </div>
     </div>
-    <MainTable :tickets="tickets.data" :columns="columns" class="grow" />
+    <TicketsAgentList :tickets="tickets.data" :columns="columns" class="grow" />
     <ListNavigation :resource="tickets" />
     <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
       <template #body-main>
@@ -66,7 +66,7 @@ import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ColumnSelector, FilterPopover } from "@/components";
 import TicketNew from "@/pages/portal/TicketNew.vue";
-import MainTable from "./MainTable.vue";
+import TicketsAgentList from "./TicketsAgentList.vue";
 import PresetFilters from "./PresetFilters.vue";
 
 const { userId } = useAuthStore();

@@ -33,21 +33,21 @@
           <div class="text-gray-900">{{ c.value }}</div>
         </div>
       </div>
-      <CustomFieldList />
-      <OpenTicketList />
+      <TicketTemplateFields />
+      <TicketContactTickets />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { isEmpty } from "lodash";
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { Avatar } from "frappe-ui";
+import { isEmpty } from "lodash";
 import { Icon } from "@iconify/vue";
-import CustomFieldList from "./CustomFieldList.vue";
-import OpenTicketList from "./OpenTicketList.vue";
+import TicketTemplateFields from "./TicketTemplateFields.vue";
+import TicketContactTickets from "./TicketContactTickets.vue";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { useTicketStore, useTicket } from "./data";
+import { ITicket } from "./symbols";
 
 const fields = [
   {
@@ -64,9 +64,8 @@ const fields = [
   },
 ];
 
-const { sidebar } = useTicketStore();
-const ticket = useTicket();
-const contact = computed(() => ticket.value.data.contact);
+const ticket = inject(ITicket);
+const contact = computed(() => ticket.data.contact);
 const contactOptions = computed(() =>
   fields
     .map((o) => ({

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { call } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { init as initTelemetry } from "./telemetry";
+import { init as initTelemetry } from "@/telemetry";
+import { CustomerPages } from "./customer";
+import { getPage } from "./utils";
 
 export const WEBSITE_ROOT = "Website Root";
 
@@ -12,8 +13,8 @@ export const VERIFY = "Verify Account";
 export const AUTH_ROUTES = [LOGIN, SIGNUP, VERIFY];
 export const ONBOARDING_PAGE = "Setup";
 
-export const CUSTOMER_PORTAL_NEW_TICKET = "DefaultNewTicket";
-export const CUSTOMER_PORTAL_TICKET = "PortalTicket";
+export const CUSTOMER_PORTAL_NEW_TICKET = "TicketNew";
+export const CUSTOMER_PORTAL_TICKET = "TicketCustomer";
 
 export const AGENT_PORTAL_AGENT_LIST = "AgentList";
 export const AGENT_PORTAL_CANNED_RESPONSE_LIST = "CannedResponses";
@@ -30,8 +31,8 @@ export const AGENT_PORTAL_SLA_NEW = "NewSlaPolicy";
 export const AGENT_PORTAL_SLA_SINGLE = "SlaPolicy";
 export const AGENT_PORTAL_TEAM_LIST = "Teams";
 export const AGENT_PORTAL_TEAM_SINGLE = "Team";
-export const AGENT_PORTAL_TICKET = "DeskTicket";
-export const AGENT_PORTAL_TICKET_LIST = "DeskTickets";
+export const AGENT_PORTAL_TICKET = "TicketAgent";
+export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
 export const AGENT_PORTAL_TICKET_TYPE_LIST = "TicketTypes";
 export const AGENT_PORTAL_TICKET_TYPE_NEW = "NewTicketType";
 export const AGENT_PORTAL_TICKET_TYPE_SINGLE = "TicketType";
@@ -40,18 +41,17 @@ export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
-export const KB_PUBLIC = "Knowledge Base";
-export const KB_PUBLIC_ARTICLE = "PortalKBArticle";
+export const KB_PUBLIC = "KBPublic";
+export const KB_PUBLIC_ARTICLE = "KBArticlePublic";
 export const KB_PUBLIC_CATEGORY = "PortalKBCategory";
 
-export const CUSTOMER_PORTAL_LANDING = "PortalTickets";
+export const CUSTOMER_PORTAL_LANDING = "TicketsCustomer";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 
 const routes = [
   {
     path: "",
-    name: WEBSITE_ROOT,
-    component: () => import("@/pages/WebsiteRoot.vue"),
+    component: () => getPage("HRoot"),
   },
   {
     path: "/login",
@@ -103,33 +103,7 @@ const routes = [
       },
     ],
   },
-  {
-    path: "/my-tickets",
-    component: () => import("@/pages/portal/CustomerRoot.vue"),
-    children: [
-      {
-        path: "",
-        name: CUSTOMER_PORTAL_LANDING,
-        component: () => import("@/pages/portal/TicketList.vue"),
-      },
-      {
-        path: ":ticketId",
-        name: CUSTOMER_PORTAL_TICKET,
-        component: () => import("@/pages/portal/TicketSingle.vue"),
-        props: true,
-      },
-      {
-        path: "new",
-        name: CUSTOMER_PORTAL_NEW_TICKET,
-        component: () => import("@/pages/portal/TicketNew.vue"),
-      },
-      {
-        path: "new/:templateId",
-        component: () => import("@/pages/portal/TicketNew.vue"),
-        props: true,
-      },
-    ],
-  },
+  CustomerPages,
   {
     path: "",
     name: "AgentRoot",
@@ -148,21 +122,8 @@ const routes = [
       {
         path: "tickets/:ticketId",
         name: AGENT_PORTAL_TICKET,
-        component: () => import("@/pages/desk/ticket/TicketSingle.vue"),
+        component: () => getPage("TicketAgent"),
         props: true,
-        meta: {
-          breadcrumbs(route) {
-            return [
-              {
-                label: "Tickets",
-                path: "/helpdesk/tickets",
-              },
-              {
-                label: route.params.ticketId,
-              },
-            ];
-          },
-        },
       },
       {
         path: "kb",

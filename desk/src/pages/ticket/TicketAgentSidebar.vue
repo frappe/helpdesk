@@ -28,7 +28,7 @@
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import { Icon } from "@iconify/vue";
 import { useTicketStore } from "./data";
-import ContactDetails from "./ContactDetails.vue";
+import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
 import TicketViews from "./TicketViews.vue";
@@ -42,7 +42,7 @@ const items = [
   },
   {
     name: "Contact Details",
-    component: ContactDetails,
+    component: TicketContact,
     icon: "lucide:contact-2",
   },
   {

@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject } from "vue";
 import { createResource, Autocomplete, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
@@ -123,10 +123,10 @@ import { useTicketTypeStore } from "@/stores/ticketType";
 import { createToast } from "@/utils";
 import { StarRating, UniInput } from "@/components";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { useTicket } from "./data";
+import { ITicket } from "./symbols";
 
-const ticket = useTicket();
-const data = computed(() => ticket.value.data);
+const ticket = inject(ITicket);
+const data = computed(() => ticket.data);
 
 const options = computed(() => [
   {

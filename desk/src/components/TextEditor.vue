@@ -32,7 +32,7 @@
                 variant="subtle"
                 @click="
                   () => {
-                    editor.commands.clearContent();
+                    editor.commands.clearContent(true);
                     $emit('clear');
                   }
                 "
