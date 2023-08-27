@@ -2,18 +2,13 @@
   <div class="flex flex-col">
     <PageTitle title="Tickets">
       <template #right>
-        <span class="flex gap-2">
-          <Button
-            label="New ticket"
-            theme="gray"
-            variant="solid"
-            @click="showNewDialog = !showNewDialog"
-          >
+        <RouterLink :to="{ name: 'TicketAgentNew' }">
+          <Button label="New ticket" theme="gray" variant="solid">
             <template #prefix>
               <Icon icon="lucide:plus" class="h-4 w-4" />
             </template>
           </Button>
-        </span>
+        </RouterLink>
       </template>
     </PageTitle>
     <div class="my-2.5 mx-5 flex items-center justify-between">
@@ -34,27 +29,12 @@
     </div>
     <TicketsAgentList :tickets="tickets.data" :columns="columns" class="grow" />
     <ListNavigation :resource="tickets" />
-    <Dialog v-model="showNewDialog" :options="{ size: '3xl' }">
-      <template #body-main>
-        <TicketNew
-          :hide-back-button="true"
-          :hide-about="true"
-          :show-hidden-fields="true"
-        />
-      </template>
-    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import {
-  createResource,
-  usePageMeta,
-  Button,
-  Dialog,
-  Dropdown,
-} from "frappe-ui";
+import { createResource, usePageMeta, Button, Dropdown } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { socket } from "@/socket";
@@ -65,14 +45,12 @@ import { createListManager } from "@/composables/listManager";
 import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ColumnSelector, FilterPopover } from "@/components";
-import TicketNew from "@/pages/portal/TicketNew.vue";
 import TicketsAgentList from "./TicketsAgentList.vue";
 import PresetFilters from "./PresetFilters.vue";
 
 const { userId } = useAuthStore();
 const { getArgs } = useFilter("HD Ticket");
 const { get: getOrder, set: setOrder } = useOrder();
-const showNewDialog = ref(false);
 const pageLength = ref(20);
 const tickets = createListManager({
   doctype: "HD Ticket",

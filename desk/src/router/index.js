@@ -108,6 +108,11 @@ const routes = [
     path: "",
     name: "AgentRoot",
     component: () => import("@/pages/desk/AgentRoot.vue"),
+    meta: {
+      auth: true,
+      agent: true,
+      admin: false,
+    },
     children: [
       {
         path: "dashboard",
@@ -117,7 +122,16 @@ const routes = [
       {
         path: "tickets",
         name: AGENT_PORTAL_TICKET_LIST,
-        component: () => import("@/pages/desk/ticket-list/TicketList.vue"),
+        component: () => getPage("TicketsAgent"),
+      },
+      {
+        path: "tickets/new/:templateId?",
+        name: "TicketAgentNew",
+        component: () => getPage("TicketNew"),
+        props: true,
+        meta: {
+          onSuccessRoute: "TicketAgent",
+        },
       },
       {
         path: "tickets/:ticketId",
