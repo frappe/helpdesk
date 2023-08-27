@@ -3,7 +3,7 @@
     <FTextEditor
       ref="e"
       v-bind="$attrs"
-      editor-class="prose max-h-64 prose-sm max-w-none overflow-auto my-4 min-h-[5rem]"
+      editor-class="prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem]"
       bubble-menu
       :content="modelValue"
       @change="$emit('update:modelValue', $event)"
@@ -32,7 +32,7 @@
                 variant="subtle"
                 @click="
                   () => {
-                    editor.commands.clearContent();
+                    editor.commands.clearContent(true);
                     $emit('clear');
                   }
                 "

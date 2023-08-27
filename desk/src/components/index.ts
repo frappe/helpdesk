@@ -2,6 +2,7 @@ export { default as AttachmentItem } from "./AttachmentItem.vue";
 export { default as BreadCrumbs } from "./BreadCrumbs.vue";
 export { default as ColumnSelector } from "./ColumnSelector.vue";
 export { default as FilterPopover } from "./FilterPopover.vue";
+export { default as HCard } from "./HCard.vue";
 export { default as ListView } from "./list-view/LV.vue";
 export { default as NestedPopover } from "./NestedPopover.vue";
 export { default as PageTitle } from "./PageTitle.vue";
