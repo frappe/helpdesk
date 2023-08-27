@@ -20,7 +20,9 @@
       <template #bottom>
         <div class="flex flex-col gap-2">
           <slot name="bottom-top" />
-          <div class="flex justify-between">
+          <div
+            class="flex flex-col space-y-1.5 overflow-auto sm:flex-row sm:justify-between"
+          >
             <div class="flex items-center gap-1">
               <TextEditorFixedMenu :buttons="fixedMenu" />
               <slot name="bottom-left" />
