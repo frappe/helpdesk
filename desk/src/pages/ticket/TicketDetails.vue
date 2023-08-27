@@ -4,13 +4,13 @@
       <span>
         <TicketSidebarHeader title="Ticket details" />
         <div class="mx-5 my-6 flex flex-col justify-between gap-3.5 text-base">
-          <div v-if="data.customer" class="space-y-2">
+          <div v-if="data.customer" class="space-y-1.5">
             <span class="block text-sm text-gray-700">Customer</span>
             <span class="block break-words font-medium text-gray-900">
               {{ data.customer }}
             </span>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">First response</span>
             <span class="mr-2 font-medium text-gray-900">
               {{ dayjs(data.first_responded_on || data.response_by).short() }}
@@ -33,7 +33,7 @@
           </div>
           <div
             v-if="data.resolution_date || data.resolution_by"
-            class="space-y-2"
+            class="space-y-1.5"
           >
             <span class="block text-sm text-gray-700">Resolution</span>
             <span class="mr-2 font-medium text-gray-900">
@@ -55,7 +55,7 @@
             />
             <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
-          <div class="space-y-2">
+          <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">Modified</span>
             <Tooltip :text="dayjs(ticket.data.modified).long()">
               <span class="block break-words font-medium text-gray-900">
@@ -63,13 +63,13 @@
               </span>
             </Tooltip>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">Source</span>
             <span class="block break-words font-medium text-gray-900">
               {{ ticket.data.via_customer_portal ? "Portal" : "Mail" }}
             </span>
           </div>
-          <div v-if="data.feedback" class="space-y-2">
+          <div v-if="data.feedback" class="space-y-1.5">
             <span class="block text-sm text-gray-700">Feedback</span>
             <StarRating :rating="data.feedback.rating" />
             <span class="block font-medium text-gray-900">
