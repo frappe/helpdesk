@@ -41,7 +41,7 @@
       <template #status="{ data }">
         <Badge
           :label="transformStatus(data.status)"
-          :theme="ticketStatusStore.colorMapCustomer[data.status]"
+          :theme="ticketStatusStore.colorMap[data.status]"
           variant="outline"
         />
       </template>

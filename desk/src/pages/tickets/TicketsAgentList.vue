@@ -12,7 +12,7 @@
     <template #status="{ data }">
       <Badge
         :label="data.status"
-        :theme="ticketStatusStore.colorMapAgent[data.status]"
+        :theme="ticketStatusStore.colorMap[data.status]"
         variant="subtle"
       />
     </template>

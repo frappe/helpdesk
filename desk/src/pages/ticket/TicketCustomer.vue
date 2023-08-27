@@ -26,6 +26,7 @@
         </Button>
       </template>
     </TicketBreadcrumbs>
+    <TicketCustomerTemplateFields />
     <TicketConversation class="grow" />
     <span class="m-5">
       <TicketTextEditor
@@ -56,10 +57,10 @@
 import { computed, provide, ref } from "vue";
 import { createResource, Button } from "frappe-ui";
 import { Icon } from "@iconify/vue";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useError } from "@/composables/error";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketConversation from "./TicketConversation.vue";
+import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
 import TicketFeedback from "./TicketFeedback.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 import { ITicket } from "./symbols";
@@ -78,7 +79,6 @@ const ticket = createResource({
   },
 });
 provide(ITicket, ticket);
-const { colorMapCustomer, stateActive } = useTicketStatusStore();
 const editor = ref(null);
 const placeholder = "Type a message";
 const editorContent = ref("");
@@ -130,13 +130,4 @@ const showReopenButton = computed(
 const showResolveButton = computed(() =>
   ["Open", "Replied"].includes(ticket.data.status)
 );
-
-function transformStatus(status: string) {
-  switch (status) {
-    case "Replied":
-      return "Awaiting reply";
-    default:
-      return status;
-  }
-}
 </script>
