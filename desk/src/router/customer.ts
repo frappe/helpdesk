@@ -19,6 +19,7 @@ export const CustomerPages = {
       props: true,
       meta: {
         onSuccessRoute: "TicketCustomer",
+        parent: "TicketsCustomer",
       },
     },
     {

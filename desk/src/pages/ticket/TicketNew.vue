@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsCustomer" title="New" />
+    <TicketBreadcrumbs :parent="route.meta.parent" title="New" />
     <div v-if="template.data?.about" class="mx-5 my-3">
       <div class="prose-f" v-html="sanitize(template.data.about)" />
     </div>

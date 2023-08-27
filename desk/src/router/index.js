@@ -90,6 +90,7 @@ const routes = [
         props: true,
         meta: {
           onSuccessRoute: "TicketAgent",
+          parent: "TicketsAgent",
         },
       },
       {
