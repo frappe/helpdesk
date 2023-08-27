@@ -2,14 +2,16 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { init as initTelemetry } from "@/telemetry";
+import { AuthPages } from "./auth";
 import { CustomerPages } from "./customer";
+import { KnowldegeBasePages } from "./knowledege-base";
 import { getPage } from "./utils";
 
 export const WEBSITE_ROOT = "Website Root";
 
-export const LOGIN = "Login";
-export const SIGNUP = "Signup";
-export const VERIFY = "Verify Account";
+export const LOGIN = "AuthLogin";
+export const SIGNUP = "AuthSignup";
+export const VERIFY = "AuthVerify";
 export const AUTH_ROUTES = [LOGIN, SIGNUP, VERIFY];
 export const ONBOARDING_PAGE = "Setup";
 
@@ -41,9 +43,9 @@ export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
-export const KB_PUBLIC = "KBPublic";
+export const KB_PUBLIC = "KBHome";
 export const KB_PUBLIC_ARTICLE = "KBArticlePublic";
-export const KB_PUBLIC_CATEGORY = "PortalKBCategory";
+export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 
 export const CUSTOMER_PORTAL_LANDING = "TicketsCustomer";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
@@ -53,57 +55,14 @@ const routes = [
     path: "",
     component: () => getPage("HRoot"),
   },
-  {
-    path: "/login",
-    name: LOGIN,
-    component: () => import("@/pages/auth/AuthLogin.vue"),
-  },
-  {
-    path: "/signup",
-    name: SIGNUP,
-    component: () => import("@/pages/auth/AuthSignup.vue"),
-  },
-  {
-    path: "/verify/:requestKey",
-    name: VERIFY,
-    component: () => import("@/pages/auth/AuthVerify.vue"),
-    props: true,
-  },
+  AuthPages,
+  CustomerPages,
+  KnowldegeBasePages,
   {
     path: "/onboarding",
     name: ONBOARDING_PAGE,
     component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
   },
-  {
-    path: "/knowledge-base",
-    component: () => import("@/pages/knowledge-base/KnowledgeBasePublic.vue"),
-    children: [
-      {
-        path: "",
-        name: KB_PUBLIC,
-        component: () =>
-          import("@/pages/knowledge-base/KnowledgeBasePublicHome.vue"),
-      },
-      {
-        path: ":categoryId",
-        name: KB_PUBLIC_CATEGORY,
-        component: () =>
-          import("@/pages/knowledge-base/KnowledgeBasePublicCategory.vue"),
-        props: true,
-      },
-      {
-        path: "articles/:articleId",
-        name: KB_PUBLIC_ARTICLE,
-        component: () =>
-          import("@/pages/knowledge-base/KnowledgeBaseArticle.vue"),
-        props: (route) => ({
-          ...route.params,
-          isPublic: true,
-        }),
-      },
-    ],
-  },
-  CustomerPages,
   {
     path: "",
     name: "AgentRoot",
