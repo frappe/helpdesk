@@ -1,5 +1,5 @@
 <template>
-  <div class="divide-y overflow-scroll px-5 pb-32">
+  <div class="divide-y overflow-auto px-5 pb-32">
     <div v-for="c in conversation" :id="c.name" :key="c.name" class="mt-4">
       <TicketComment
         v-if="c.commented_by"
