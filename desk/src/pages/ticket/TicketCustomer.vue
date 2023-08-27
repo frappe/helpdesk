@@ -53,25 +53,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, provide, ref, watch } from "vue";
-import {
-  createResource,
-  createListResource,
-  Badge,
-  Button,
-  Dialog,
-  FileUploader,
-  FormControl,
-} from "frappe-ui";
+import { computed, provide, ref } from "vue";
+import { createResource, Button } from "frappe-ui";
 import { Icon } from "@iconify/vue";
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
-import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useError } from "@/composables/error";
-import CommunicationItem from "@/components/CommunicationItem.vue";
-import StarRating from "@/components/StarRating.vue";
-import TopBar from "@/components/TopBar.vue";
-import { AttachmentItem, TextEditor } from "@/components";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketConversation from "./TicketConversation.vue";
 import TicketFeedback from "./TicketFeedback.vue";

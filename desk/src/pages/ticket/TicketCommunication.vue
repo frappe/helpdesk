@@ -10,7 +10,7 @@
           </div>
         </Tooltip>
       </div>
-      <slot name="top-right" :cc="cc" :bcc="bcc" :content="content" />
+      <slot name="top-right" v-bind="{ message: content }" />
     </div>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <span class="prose-f" v-html="sanitize(content)"></span>

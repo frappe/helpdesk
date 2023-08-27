@@ -8,7 +8,35 @@
     <div class="flex grow overflow-hidden">
       <div class="flex grow flex-col">
         <TicketPinnedComments @focus="(v) => (focus = v)" />
-        <TicketConversation class="grow" :focus="focus" />
+        <TicketConversation class="grow" :focus="focus">
+          <template #communication-top-right="{ message }">
+            <Button
+              theme="gray"
+              variant="ghost"
+              @click="
+                () => {
+                  isExpanded = true;
+                  mode = Mode.Response;
+                  $nextTick(() =>
+                    $refs.editor.editor
+                      .chain()
+                      .clearContent()
+                      .insertContent(message)
+                      .focus('all')
+                      .setBlockquote()
+                      .insertContentAt(0, { type: 'paragraph' })
+                      .focus('start')
+                      .run()
+                  );
+                }
+              "
+            >
+              <template #icon>
+                <Icon icon="lucide:reply" />
+              </template>
+            </Button>
+          </template>
+        </TicketConversation>
         <span class="m-5">
           <TicketTextEditor
             ref="editor"
@@ -149,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, provide, ref } from "vue";
+import { computed, h, onBeforeUnmount, onMounted, provide, ref } from "vue";
 import {
   createResource,
   usePageMeta,
@@ -192,7 +220,7 @@ const ticket = createResource({
 });
 provide(ITicket, ticket);
 const editor = ref(null);
-const placeholder = "Type a message";
+const placeholder = "Compose a comment / reply";
 const content = ref("");
 const attachments = ref([]);
 const isExpanded = ref(false);

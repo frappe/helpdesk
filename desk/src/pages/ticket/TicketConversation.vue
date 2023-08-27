@@ -9,7 +9,7 @@
         :sender="c.commented_by"
         :is-pinned="c.is_pinned"
       />
-      <CommunicationItem
+      <TicketCommunication
         v-else
         :content="c.content"
         :date="c.creation"
@@ -18,7 +18,11 @@
         :cc="c.cc || ''"
         :bcc="c.bcc || ''"
         :attachments="c.attachments"
-      />
+      >
+        <template #top-right="d">
+          <slot name="communication-top-right" v-bind="d" />
+        </template>
+      </TicketCommunication>
     </div>
   </div>
 </template>
@@ -28,9 +32,8 @@ import { computed, inject, nextTick, watch } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import { orderBy } from "lodash";
 import { dayjs } from "@/dayjs";
-// import { emitter } from "@/emitter";
-import CommunicationItem from "@/components/CommunicationItem.vue";
 import TicketComment from "./TicketComment.vue";
+import TicketCommunication from "./TicketCommunication.vue";
 import { ITicket } from "./symbols";
 
 interface P {
