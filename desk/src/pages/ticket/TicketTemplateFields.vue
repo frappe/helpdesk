@@ -42,7 +42,7 @@ function getUrl(url: string) {
 }
 
 function getValue(field: Field) {
-  const v = ticket.value.data[field.fieldname];
+  const v = ticket.data[field.fieldname];
   if (field.fieldtype === "Check") {
     return v ? "Yes" : "No";
   }
