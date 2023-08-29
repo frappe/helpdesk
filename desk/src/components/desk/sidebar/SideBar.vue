@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base -all duration-300 ease-in-out"
+    class="-all flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
     :style="isExpanded ? widthExpanded : widthMinimised"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
@@ -17,7 +17,7 @@
       <hr class="my-2" />
       <div class="flex flex-col gap-1">
         <SidebarLink
-          v-for="option in extraOptions"
+          v-for="option in extraOptions.filter((o) => !o.hide)"
           v-bind="option"
           :key="option.label"
           :is-expanded="isExpanded"
@@ -108,6 +108,7 @@ const extraOptions = [
     label: "Support policies",
     icon: "lucide:scroll-text",
     to: AGENT_PORTAL_SLA_LIST,
+    hide: true,
   },
   {
     label: "Teams",
@@ -124,11 +125,13 @@ const extraOptions = [
     label: "Email accounts",
     icon: "lucide:at-sign",
     to: AGENT_PORTAL_EMAIL_LIST,
+    hide: true,
   },
   {
     label: "Ticket types",
     icon: "lucide:folder-open",
     to: AGENT_PORTAL_TICKET_TYPE_LIST,
+    hide: true,
   },
   {
     label: "Canned responses",
