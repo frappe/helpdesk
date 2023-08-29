@@ -7,6 +7,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "is_enabled",
+  "column_break_hzgg",
   "button_section",
   "button_label",
   "button_icon",
@@ -56,11 +58,21 @@
    "label": "On click (Javascript)",
    "options": "Javascript",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_hzgg",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-30 03:41:52.274380",
+ "modified": "2023-08-30 03:45:51.830906",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Action",

@@ -46,6 +46,7 @@
       </template>
     </Button>
     <Dropdown
+      v-if="actions.data?.length > 1"
       :options="
         actions.data?.slice(1).map((o) => ({
           label: o.button_label,
@@ -117,6 +118,9 @@ const actions = createListResource({
   doctype: "HD Action",
   auto: true,
   cache: "Actions",
+  filters: {
+    is_enabled: true,
+  },
   fields: [
     "name",
     "button_label",
