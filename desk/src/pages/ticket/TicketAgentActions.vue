@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span class="flex gap-2">
     <Autocomplete
       :options="agentStore.dropdown"
       :value="
@@ -30,12 +30,48 @@
         />
       </template>
     </Autocomplete>
+    <Button
+      v-for="a in actions.data?.slice(0, 1)"
+      :key="a.name"
+      :label="a.button_label"
+      theme="gray"
+      variant="solid"
+      @click="() => eic.call(ticket.data, a.action)"
+    >
+      <template v-if="a.button_icon" #prefix>
+        <Icon :icon="a.button_icon" />
+      </template>
+      <template v-if="a.is_external_link" #suffix>
+        <Icon icon="lucide:external-link" />
+      </template>
+    </Button>
+    <Dropdown
+      v-if="actions.data?.length > 1"
+      :options="
+        actions.data?.slice(1).map((o) => ({
+          label: o.button_label,
+          onClick: () => eic.call(ticket.data, o.action),
+        }))
+      "
+    >
+      <Button theme="gray" variant="ghost">
+        <Icon icon="lucide:more-horizontal" />
+      </Button>
+    </Dropdown>
   </span>
 </template>
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { createResource, Autocomplete, Avatar } from "frappe-ui";
+import {
+  createResource,
+  createListResource,
+  Autocomplete,
+  Avatar,
+  Button,
+  Dropdown,
+} from "frappe-ui";
+import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
@@ -76,5 +112,38 @@ function assignAgent(agent: string) {
     },
     onError: useError(),
   });
+}
+
+const actions = createListResource({
+  doctype: "HD Action",
+  auto: true,
+  cache: "Actions",
+  filters: {
+    is_enabled: true,
+  },
+  fields: [
+    "name",
+    "button_label",
+    "button_icon",
+    "is_external_link",
+    "action",
+    "cond_hidden",
+  ],
+  transform: (data) => {
+    const res = [];
+    for (const row of data) {
+      const isHidden = eic.call(ticket.data, row.cond_hidden);
+      if (!isHidden) res.push(row);
+    }
+    return res;
+  },
+});
+
+/**
+ * Wrapper function for eval. Can be used with `.call()`. Helps in
+ * forcing context
+ */
+function eic(s: string) {
+  return eval(s);
 }
 </script>

@@ -1,0 +1,110 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-08-30 03:05:16.121736",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "is_enabled",
+  "column_break_hzgg",
+  "button_section",
+  "button_label",
+  "button_icon",
+  "is_external_link",
+  "section_break_nbjl",
+  "action",
+  "cond_hidden"
+ ],
+ "fields": [
+  {
+   "fieldname": "button_section",
+   "fieldtype": "Section Break",
+   "label": "Button"
+  },
+  {
+   "fieldname": "section_break_nbjl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "cond_hidden",
+   "fieldtype": "Code",
+   "label": "Hide condition",
+   "options": "Javascript"
+  },
+  {
+   "fieldname": "button_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label",
+   "reqd": 1
+  },
+  {
+   "fieldname": "button_icon",
+   "fieldtype": "Data",
+   "label": "Icon"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_external_link",
+   "fieldtype": "Check",
+   "label": "External link"
+  },
+  {
+   "description": "Action to perform when clicking the button. The doc will be available as `this`",
+   "fieldname": "action",
+   "fieldtype": "Code",
+   "label": "On click (Javascript)",
+   "options": "Javascript",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_hzgg",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-08-30 03:45:51.830906",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Action",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "button_label"
+}
