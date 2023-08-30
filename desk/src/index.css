@@ -7,6 +7,7 @@
 		break-words
 		max-w-none
 		prose
+		prose-code:whitespace-pre-wrap
 		prose-img:border
 		prose-img:rounded-lg
 		prose-sm
