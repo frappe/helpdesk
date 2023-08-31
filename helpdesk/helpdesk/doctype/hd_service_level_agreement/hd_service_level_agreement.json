@@ -52,7 +52,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval: doc.document_type",
    "fieldname": "agreement_details_section",
    "fieldtype": "Section Break",
    "label": "Valid From"
@@ -63,7 +62,6 @@
    "label": "Start Date"
   },
   {
-   "depends_on": "eval: !doc.default_contract",
    "fieldname": "column_break_7",
    "fieldtype": "Column Break"
   },
@@ -122,7 +120,6 @@
    "label": "Enabled"
   },
   {
-   "depends_on": "document_type",
    "fieldname": "status_details",
    "fieldtype": "Section Break",
    "label": "Status Details"
@@ -141,7 +138,6 @@
    "label": "Apply SLA for Resolution Time"
   },
   {
-   "depends_on": "document_type",
    "fieldname": "filters_section",
    "fieldtype": "Section Break",
    "label": "Assignment Conditions"
@@ -165,7 +161,7 @@
   }
  ],
  "links": [],
- "modified": "2023-08-22 11:35:27.552488",
+ "modified": "2023-08-31 13:43:18.219434",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement",
