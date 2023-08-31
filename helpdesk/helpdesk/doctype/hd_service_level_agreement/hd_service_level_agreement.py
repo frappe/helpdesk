@@ -151,20 +151,19 @@ class HDServiceLevelAgreement(Document):
 
 	def set_resolution_date(self, doc: Document):
 		fullfill_on = [row.status for row in self.sla_fulfilled_on]
-		prev_state = doc.get_doc_before_save().get("status")
 		next_state = doc.get("status")
-		was_fulfilled = prev_state in fullfill_on
 		is_fulfilled = next_state in fullfill_on
 		if not is_fulfilled:
-			doc.resolution_date = None
-		if not is_fulfilled and was_fulfilled:
 			doc.resolution_date = None
 			doc.resolution_time = None
 			return
 		doc.resolution_date = now_datetime()
 		start_at = doc.service_level_agreement_creation
 		end_at = doc.resolution_date
-		doc.resolution_time = self.calc_elapsed_time(start_at, end_at)
+		time_took = self.calc_elapsed_time(start_at, end_at)
+		time_hold = doc.total_hold_time or 0
+		time_took_effective = time_took - time_hold
+		doc.resolution_time = time_took_effective
 
 	def set_hold_time(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]
