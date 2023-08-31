@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { computed, inject, nextTick, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useElementVisibility } from "@vueuse/core";
 import { orderBy } from "lodash";
 import { dayjs } from "@/dayjs";
@@ -43,6 +44,7 @@ interface P {
 const props = withDefaults(defineProps<P>(), {
   focus: "",
 });
+const route = useRoute();
 const ticket = inject(ITicket);
 const data = computed(() => ticket.data || {});
 const communications = computed(() => data.value.communications || []);
@@ -66,7 +68,8 @@ watch(
   (id: string) => scroll(id)
 );
 nextTick(() => {
-  const id = conversation.value.slice(-1).pop()?.name;
+  const hash = route.hash.slice(1);
+  const id = hash || conversation.value.slice(-1).pop()?.name;
   if (id) setTimeout(() => scroll(id), 1000);
 });
 </script>
