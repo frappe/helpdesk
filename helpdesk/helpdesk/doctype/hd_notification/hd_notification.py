@@ -42,8 +42,6 @@ class HDNotification(Document):
 			recipients=self.user_to,
 			subject="New notification",
 			message=self.format_message(),
-			delayed=False,
-			now=True,
 			template="notification",
 			args=self.get_args(),
 		)
