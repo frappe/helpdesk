@@ -1,58 +1,75 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-08-26 15:28:06.041322",
+ "creation": "2023-08-31 00:12:12.326536",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "from_user",
-  "to_user",
-  "type",
-  "message",
-  "ticket",
-  "comment"
+  "details_section",
+  "user_from",
+  "user_to",
+  "notification_type",
+  "references_section",
+  "reference_ticket",
+  "column_break_ibly",
+  "reference_comment"
  ],
  "fields": [
   {
-   "fieldname": "from_user",
+   "fieldname": "user_from",
    "fieldtype": "Link",
-   "label": "From User",
-   "options": "User"
+   "in_list_view": 1,
+   "label": "From",
+   "options": "User",
+   "reqd": 1
   },
   {
-   "fieldname": "to_user",
+   "fieldname": "user_to",
    "fieldtype": "Link",
-   "label": "To User",
-   "options": "User"
+   "in_list_view": 1,
+   "label": "To",
+   "options": "User",
+   "reqd": 1
   },
   {
-   "fieldname": "type",
+   "fieldname": "notification_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Type",
-   "options": "Mention\nAssignment"
+   "options": "Assignment\nMention\nReaction",
+   "reqd": 1
   },
   {
-   "fieldname": "message",
-   "fieldtype": "Text",
-   "label": "Message"
-  },
-  {
-   "fieldname": "ticket",
+   "fieldname": "reference_ticket",
    "fieldtype": "Link",
-   "label": "HD Ticket",
+   "label": "Ticket",
    "options": "HD Ticket"
   },
   {
-   "fieldname": "comment",
+   "fieldname": "reference_comment",
    "fieldtype": "Link",
    "label": "Comment",
    "options": "HD Ticket Comment"
+  },
+  {
+   "fieldname": "references_section",
+   "fieldtype": "Section Break",
+   "label": "References"
+  },
+  {
+   "fieldname": "column_break_ibly",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:50:51.129825",
+ "modified": "2023-08-31 00:20:02.891526",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Notification",
