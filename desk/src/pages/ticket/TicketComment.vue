@@ -1,5 +1,5 @@
 <template>
-  <div class="my-4 rounded bg-gray-50 p-4 shadow">
+  <div class="my-4 rounded border bg-cyan-50 p-4">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-0.5">
         <UserAvatar :user="sender" size="lg" expand />
