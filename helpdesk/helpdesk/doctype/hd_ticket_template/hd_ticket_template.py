@@ -17,14 +17,30 @@ class HDTicketTemplate(Document):
 
 	def verify_field_exists(self):
 		for f in self.fields:
-			custom_field_exists = frappe.db.exists(
-				{"doctype": "Custom Field", "fieldname": f.fieldname, "dt": "HD Ticket"}
+			exists = self.docfield_exists(f.fieldname) or self.custom_field_exists(
+				f.fieldname
 			)
-			if not custom_field_exists:
-				text = _("Custom Field `{0}` does not exist in Ticket").format(
-					f.fieldname
-				)
-				frappe.throw(text, frappe.DoesNotExistError)
+			if not exists:
+				text = _("Field `{0}` does not exist in Ticket").format(f.fieldname)
+				frappe.throw(text)
+
+	def docfield_exists(self, fieldname: str):
+		return frappe.db.exists(
+			{
+				"doctype": "DocField",
+				"fieldname": fieldname,
+				"parent": "HD Ticket",
+			}
+		)
+
+	def custom_field_exists(self, fieldname: str):
+		return frappe.db.exists(
+			{
+				"doctype": "Custom Field",
+				"fieldname": fieldname,
+				"dt": "HD Ticket",
+			}
+		)
 
 	def prevent_default_delete(self):
 		if self.name == DEFAULT_TICKET_TEMPLATE:
