@@ -19,7 +19,7 @@
         class="flex cursor-pointer items-center gap-2 p-2 text-base text-gray-900 hover:bg-gray-50"
         @click="$emit('focus', c.name)"
       >
-        <UserAvatar :user="c.commented_by" expand />
+        <UserAvatar :user="c.commented_by" expand strong />
         <span class="text-gray-500">&mdash;</span>
         <div
           class="prose prose-sm line-clamp-1"
