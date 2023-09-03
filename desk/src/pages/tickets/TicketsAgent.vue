@@ -156,11 +156,9 @@ const columns = [
     width: "w-36",
   },
   {
-    label: "Assigned to",
-    icon: "lucide:user",
+    label: "Assignee",
     key: "_assign",
-    width: "w-8",
-    align: "m-auto",
+    width: "w-40",
   },
   {
     label: "Count communication",

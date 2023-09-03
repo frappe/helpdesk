@@ -11,7 +11,7 @@
       <template #top>
         <span>
           <span class="flex items-center justify-between">
-            <UserAvatar :user="authStore.userId" expand />
+            <UserAvatar :user="authStore.userId" expand strong />
             <slot name="top-right" />
           </span>
           <slot name="top-bottom" />

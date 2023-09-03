@@ -2,7 +2,7 @@
   <div class="mx-3 pt-6">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-0.5">
-        <UserAvatar :user="sender" size="lg" expand />
+        <UserAvatar :user="sender" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dayjs(date).long()">
           <div class="text-base text-gray-600">

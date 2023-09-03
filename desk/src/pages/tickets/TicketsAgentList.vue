@@ -17,7 +17,7 @@
       />
     </template>
     <template #_assign="{ data }">
-      <AssignedInfo :assign="data._assign" />
+      <UserAvatar :user="getAssign(data._assign)" expand />
     </template>
     <template #agreement_status="{ data }">
       <Badge
@@ -104,10 +104,9 @@ import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { createToast } from "@/utils";
+import { createToast, getAssign } from "@/utils";
 import { useError } from "@/composables/error";
-import { ListView } from "@/components";
-import AssignedInfo from "./AssignedInfo.vue";
+import { ListView, UserAvatar } from "@/components";
 
 interface P {
   tickets?: any[];

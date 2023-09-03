@@ -2,10 +2,17 @@
   <div class="flex items-center gap-2">
     <Avatar
       :label="user?.full_name || props.user"
-      :image="user?.user_image"
+      :image="image || user?.user_image"
       v-bind="$attrs"
     />
-    <span v-if="expand" class="text-base font-medium text-gray-900">
+    <span
+      v-if="expand"
+      class="truncate text-base"
+      :class="{
+        'text-gray-900': strong,
+        'font-medium': strong,
+      }"
+    >
       {{ user?.full_name || props.user }}
     </span>
   </div>
@@ -17,12 +24,16 @@ import { useUserStore } from "@/stores/user";
 
 interface P {
   user?: string;
+  image?: string;
   expand?: boolean;
+  strong?: boolean;
 }
 
 const props = withDefaults(defineProps<P>(), {
   user: "",
+  image: "",
   expand: false,
+  strong: false,
 });
 const { getUser } = useUserStore();
 const user = computed(() => getUser(props.user));
