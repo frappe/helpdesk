@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { createResource, Button, FormControl } from "frappe-ui";
+import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
@@ -120,4 +120,8 @@ function sanitize(html: string) {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
   });
 }
+
+usePageMeta(() => ({
+  title: "New Ticket",
+}));
 </script>
