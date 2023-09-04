@@ -30,6 +30,25 @@
         />
       </template>
     </Autocomplete>
+    <Dropdown
+      :options="
+        ticketStatusStore.options.map((o) => ({
+          label: o,
+          value: o,
+          onClick: () => setValue.submit({ field: 'status', value: o }),
+        }))
+      "
+    >
+      <Button
+        :label="ticket.data.status"
+        :theme="ticketStatusStore.colorMap[ticket.data.status]"
+        variant="subtle"
+      >
+        <template #suffix>
+          <Icon icon="lucide:chevron-down" />
+        </template>
+      </Button>
+    </Dropdown>
     <Button
       v-for="a in actions.data?.slice(0, 1)"
       :key="a.name"
@@ -75,12 +94,14 @@ import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { useError } from "@/composables/error";
 import { ITicket } from "./symbols";
 
 const ticket = inject(ITicket);
 const agentStore = useAgentStore();
+const ticketStatusStore = useTicketStatusStore();
 const userStore = useUserStore();
 const data = computed(() => ticket.data);
 const assignedTo = computed(() => {
@@ -136,6 +157,25 @@ const actions = createListResource({
       if (!isHidden) res.push(row);
     }
     return res;
+  },
+});
+
+const setValue = createResource({
+  url: "frappe.client.set_value",
+  auto: false,
+  makeParams: (params) => ({
+    doctype: "HD Ticket",
+    name: data.value.name,
+    fieldname: params.field,
+    value: params.value,
+  }),
+  onSuccess: () => {
+    emitter.emit("update:ticket");
+    createToast({
+      title: "Ticket updated",
+      icon: "check",
+      iconClasses: "text-green-600",
+    });
   },
 });
 

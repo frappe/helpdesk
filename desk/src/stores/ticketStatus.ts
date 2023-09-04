@@ -11,9 +11,9 @@ export const useTicketStatusStore = defineStore("ticketStatus", () => {
   );
   const colorMap = {
     Open: "red",
-    Replied: "orange",
+    Replied: "blue",
     Resolved: "green",
-    Closed: "blue",
+    Closed: "gray",
   };
   const stateActive = ["Open", "Replied"];
   const stateInactive = ["Resolved", "Closed"];

@@ -116,11 +116,11 @@ import { computed, inject } from "vue";
 import { createResource, Autocomplete, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
+import { createToast } from "@/utils";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useTicketTypeStore } from "@/stores/ticketType";
-import { createToast } from "@/utils";
+import { useError } from "@/composables/error";
 import { StarRating, UniInput } from "@/components";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
 import { ITicket } from "./symbols";
@@ -133,11 +133,6 @@ const options = computed(() => [
     field: "ticket_type",
     label: "Ticket type",
     store: useTicketTypeStore(),
-  },
-  {
-    field: "status",
-    label: "Status",
-    store: useTicketStatusStore(),
   },
   {
     field: "priority",
@@ -169,14 +164,7 @@ function update(fieldname: string, value: string) {
         iconClasses: "text-green-600",
       });
     },
-    onError: (err) => {
-      createToast({
-        title: "Error updating ticket",
-        text: err.messages?.[0],
-        icon: "x",
-        iconClasses: "text-red-600",
-      });
-    },
+    onError: useError(),
   });
 }
 </script>
