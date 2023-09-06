@@ -30,7 +30,7 @@ const options = [
     label: "Knowledge Base",
     icon: "book-open",
     onClick: () => {
-      const path = router.resolve({ name: "KBPublic" });
+      const path = router.resolve({ name: "KBHome" });
       window.open(path.href, "_blank");
     },
   },
