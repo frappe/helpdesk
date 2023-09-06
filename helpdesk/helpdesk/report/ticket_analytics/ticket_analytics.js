@@ -11,7 +11,7 @@ frappe.query_reports["Ticket Analytics"] = {
 			options: [
 				"Contact",
 				"HD Ticket Type",
-				"Ticket Priority",
+				"HD Ticket Priority",
 				"Assigned To",
 			],
 			default: "Contact",
@@ -60,7 +60,7 @@ frappe.query_reports["Ticket Analytics"] = {
 			fieldname: "priority",
 			label: __("Ticket Priority"),
 			fieldtype: "Link",
-			options: "Ticket Priority",
+			options: "HD Ticket Priority",
 		},
 		{
 			fieldname: "contact",

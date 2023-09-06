@@ -77,7 +77,7 @@ class TicketAnalytics(object):
 					"label": _("Ticket Priority"),
 					"fieldname": "priority",
 					"fieldtype": "Link",
-					"options": "Ticket Priority",
+					"options": "HD Ticket Priority",
 					"width": 200,
 				}
 			)
@@ -85,11 +85,21 @@ class TicketAnalytics(object):
 		for end_date in self.periodic_daterange:
 			period = self.get_period(end_date)
 			self.columns.append(
-				{"label": _(period), "fieldname": scrub(period), "fieldtype": "Int", "width": 120}
+				{
+					"label": _(period),
+					"fieldname": scrub(period),
+					"fieldtype": "Int",
+					"width": 120,
+				}
 			)
 
 		self.columns.append(
-			{"label": _("Total"), "fieldname": "total", "fieldtype": "Int", "width": 120}
+			{
+				"label": _("Total"),
+				"fieldname": "total",
+				"fieldtype": "Int",
+				"width": 120,
+			}
 		)
 
 	def get_data(self):
@@ -133,7 +143,9 @@ class TicketAnalytics(object):
 	def get_period_date_ranges(self):
 		from dateutil.relativedelta import MO, relativedelta
 
-		from_date, to_date = getdate(self.filters.from_date), getdate(self.filters.to_date)
+		from_date, to_date = getdate(self.filters.from_date), getdate(
+			self.filters.to_date
+		)
 
 		increment = {"Monthly": 1, "Quarterly": 3, "Half-Yearly": 6, "Yearly": 12}.get(
 			self.filters.range, 1
@@ -180,7 +192,10 @@ class TicketAnalytics(object):
 
 	def get_common_filters(self):
 		filters = {}
-		filters["opening_date"] = ("between", [self.filters.from_date, self.filters.to_date])
+		filters["opening_date"] = (
+			"between",
+			[self.filters.from_date, self.filters.to_date],
+		)
 
 		if self.filters.get("assigned_to"):
 			filters["_assign"] = ("like", "%" + self.filters.get("assigned_to") + "%")
@@ -225,9 +240,9 @@ class TicketAnalytics(object):
 			if self.filters.based_on == "Assigned To":
 				if d._assign:
 					for entry in json.loads(d._assign):
-						self.ticket_periodic_data.setdefault(entry, frappe._dict()).setdefault(
-							period, 0.0
-						)
+						self.ticket_periodic_data.setdefault(
+							entry, frappe._dict()
+						).setdefault(period, 0.0)
 						self.ticket_periodic_data[entry][period] += 1
 
 			else:
@@ -236,7 +251,9 @@ class TicketAnalytics(object):
 				if not value:
 					value = _("Not Specified")
 
-				self.ticket_periodic_data.setdefault(value, frappe._dict()).setdefault(period, 0.0)
+				self.ticket_periodic_data.setdefault(value, frappe._dict()).setdefault(
+					period, 0.0
+				)
 				self.ticket_periodic_data[value][period] += 1
 
 	def get_chart_data(self):
