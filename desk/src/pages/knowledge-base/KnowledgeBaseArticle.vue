@@ -72,17 +72,19 @@
             />
           </template>
         </TextEditor>
-        <div v-if="route.meta.public" class="flex flex-col gap-2 px-6">
-          <div class="text-base font-medium">Still need help?</div>
-          <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
-            <Button
-              label="Create a ticket"
-              size="md"
-              theme="gray"
-              variant="solid"
-            />
-          </RouterLink>
-        </div>
+        <RouterLink
+          v-if="route.meta.public"
+          :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+        >
+          <Button
+            label="Still need help? Create a ticket"
+            size="md"
+            theme="gray"
+            variant="solid"
+          >
+            <template #suffix> &rightarrow; </template>
+          </Button>
+        </RouterLink>
       </div>
     </div>
   </div>

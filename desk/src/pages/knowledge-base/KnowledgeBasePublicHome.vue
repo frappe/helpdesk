@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-3 gap-4 py-8">
+  <div class="container my-8 grid grid-cols-3 gap-4">
     <div v-for="category in data.data" :key="category.name" class="space-y-4">
       <div class="flex items-center gap-2 text-gray-800">
         <component :is="getIcon(category.icon)" class="h-4 w-4" />

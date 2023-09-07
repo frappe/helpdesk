@@ -1,5 +1,5 @@
 <template>
-  <div class="py-8">
+  <div class="container my-8">
     <div class="mb-8 flex items-center gap-2">
       <RouterLink :to="{ name: KB_PUBLIC }">
         <Icon icon="lucide:home" class="h-4 w-4" />
