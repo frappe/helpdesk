@@ -1,13 +1,4 @@
 <template>
-  <div class="mb-8 flex items-center gap-1.5">
-    <div class="cursor-pointer text-base text-gray-600" @click="toCategory">
-      {{ categoryName }}
-    </div>
-    <IconChevronRight class="h-3 w-3 text-gray-600" />
-    <div class="cursor-pointer text-base text-gray-800" @click="toSubCategory">
-      {{ subCategoryName }}
-    </div>
-  </div>
   <div class="mb-4.5 flex items-center justify-between">
     <div class="flex items-center gap-1">
       <div class="flex items-center gap-2">

@@ -1,11 +1,39 @@
 <template>
   <div class="flex flex-col overflow-hidden">
-    <TopBar
-      v-if="!isPublic"
-      :back-to="backTo"
-      :title="pageTitle"
-      class="sticky top-0"
-    >
+    <PageTitle v-if="!route.meta.public">
+      <template #title>
+        <BreadCrumbs
+          :items="[
+            {
+              label: article.data?.category.category_name,
+              route: article.data
+                ? {
+                    name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+                    params: {
+                      categoryId: article.data?.category.name,
+                    },
+                  }
+                : '',
+            },
+            {
+              label: article.data?.sub_category.category_name,
+              route: article.data
+                ? {
+                    name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
+                    params: {
+                      categoryId: article.data?.category.name,
+                      subCategoryId: article.data?.sub_category.name,
+                    },
+                  }
+                : '',
+            },
+            {
+              label: pageTitle,
+              route: '',
+            },
+          ]"
+        />
+      </template>
       <template #right>
         <component
           :is="actionsComponent"
@@ -19,17 +47,21 @@
           @toggle-status="toggleStatus"
         />
       </template>
-    </TopBar>
+    </PageTitle>
     <div class="overflow-auto">
-      <div class="m-auto mt-6 mb-12 rounded-xl" :style="containerStyle">
+      <div class="container m-auto my-12">
         <TextEditor
           :bubble-menu="true"
           :content="article.data?.content"
           :editable="editMode"
           :floating-menu="true"
           :placeholder="placeholder"
-          class="rounded-xl px-6 py-4"
-          editor-class="prose prose-sm prose-img:rounded prose-img:border max-w-none my-4"
+          class="rounded"
+          :class="{
+            shadow: editMode,
+            'p-4': editMode,
+          }"
+          editor-class="prose-f"
           @change="articleContent = $event"
         >
           <template #top>
@@ -40,7 +72,7 @@
             />
           </template>
         </TextEditor>
-        <div class="flex flex-col gap-2 px-6">
+        <div v-if="route.meta.public" class="flex flex-col gap-2 px-6">
           <div class="text-base font-medium">Still need help?</div>
           <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
             <Button
@@ -66,14 +98,15 @@ import {
   TextEditor,
 } from "frappe-ui";
 import {
-  AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
   AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+  AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+  AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
   CUSTOMER_PORTAL_NEW_TICKET,
 } from "@/router";
 import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
-import TopBar from "@/components/TopBar.vue";
+import { BreadCrumbs, PageTitle } from "@/components";
 import KnowledgeBaseArticleActionsEdit from "./KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./KnowledgeBaseArticleActionsNew.vue";
 import KnowledgeBaseArticleActionsView from "./KnowledgeBaseArticleActionsView.vue";
@@ -87,17 +120,12 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  isPublic: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
 });
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const isNew = props.articleId.toLowerCase() === "new";
+const isNew = props.articleId === "New";
 const editMode = ref(isNew);
 const categoryId = computed(
   () => article.data?.category.name || route.query.category
@@ -119,7 +147,7 @@ const actionsComponent = computed(() => {
 });
 
 const topComponent = computed(() => {
-  if (props.isPublic) return KnowledgeBaseArticleTopPublic;
+  if (route.meta.public) return KnowledgeBaseArticleTopPublic;
   if (isNew) return KnowledgeBaseArticleTopNew;
   if (editMode.value) return KnowledgeBaseArticleTopEdit;
   return KnowledgeBaseArticleTopView;
@@ -244,12 +272,5 @@ const backTo = computed(() => ({
     categoryId: categoryId.value,
     subCategoryId: subCategoryId.value,
   },
-}));
-
-const containerStyle = computed(() => ({
-  width: "790px",
-  "box-shadow": editMode.value
-    ? "0px 1px 2px 0px rgba(0, 0, 0, 0.1), 0px 0px 1px 0px rgba(0, 0, 0, 0.45)"
-    : "",
 }));
 </script>

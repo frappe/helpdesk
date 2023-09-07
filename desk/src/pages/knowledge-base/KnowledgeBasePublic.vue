@@ -46,7 +46,7 @@
         </div>
       </div>
     </header>
-    <RouterView :key="$route.fullPath" class="container m-auto" />
+    <RouterView :key="$route.fullPath" class="m-auto" />
     <KnowledgeBasePublicSearch v-model="showSearch" />
   </span>
 </template>

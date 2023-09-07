@@ -1,13 +1,4 @@
 <template>
-  <div class="mb-7 flex w-max items-center gap-1 rounded bg-gray-100 px-2 py-1">
-    <div class="text-base text-gray-600">
-      {{ categoryName }}
-    </div>
-    <Icon icon="lucide:chevron-right" class="h-3 w-3 text-gray-600" />
-    <div class="text-base text-gray-800">
-      {{ subCategoryName }}
-    </div>
-  </div>
   <div class="mb-4.5 flex items-center justify-between">
     <div class="flex items-center gap-2">
       <Avatar :label="authorFullname" :image="authorImage" />

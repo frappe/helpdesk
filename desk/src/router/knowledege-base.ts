@@ -19,10 +19,10 @@ export const KnowldegeBasePages = {
       path: "articles/:articleId",
       name: "KBArticlePublic",
       component: () => getPage("KBArticlePublic"),
-      props: (route) => ({
-        ...route.params,
-        isPublic: true,
-      }),
+      meta: {
+        public: true,
+      },
+      props: true,
     },
   ],
 };
