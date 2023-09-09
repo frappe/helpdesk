@@ -20,7 +20,7 @@
           :to="{
             name: 'TicketAgent',
             params: {
-              ticketid: t.name,
+              ticketId: t.name,
             },
           }"
           target="_blank"
