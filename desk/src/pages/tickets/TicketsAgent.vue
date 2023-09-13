@@ -19,7 +19,7 @@
           <template #default>
             <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
               <template #prefix>
-                <LucideArrowDownUp class="w-4" />
+                <LucideArrowDownUp class="h-4 w-4" />
               </template>
             </Button>
           </template>

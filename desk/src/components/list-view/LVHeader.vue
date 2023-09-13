@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-5 rounded bg-gray-100 py-2 px-2.5 text-sm text-gray-600">
+  <div class="mx-5 rounded bg-gray-100 px-2.5 py-2 text-sm text-gray-600">
     <div class="flex w-full items-center gap-2">
       <FormControl
         v-if="checkbox"
@@ -9,13 +9,7 @@
       />
       <div v-for="c in columns" :key="c.key">
         <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
-          <Icon
-            v-if="c.icon"
-            :icon="c.icon"
-            class="h-4 w-4"
-            :class="[c.align]"
-          />
-          <span v-else :class="[c.align]">{{ c.label }}</span>
+          <span :class="[c.align]">{{ c.label }}</span>
         </div>
       </div>
     </div>
@@ -24,7 +18,6 @@
 
 <script setup lang="ts">
 import { toRef } from "vue";
-import { Icon } from "@iconify/vue";
 import { Column } from "@/types";
 import { useColumns } from "@/composables/columns";
 import { selection } from "./selection";

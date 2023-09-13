@@ -3,7 +3,7 @@
     <template #target>
       <Button label="Filters" theme="gray" variant="outline">
         <template #prefix>
-          <LucideListFilter class="w-4" />
+          <LucideListFilter class="h-4 w-4" />
         </template>
         <template v-if="storage.size" #suffix>
           <Badge :label="storage.size" theme="gray" variant="subtle" />

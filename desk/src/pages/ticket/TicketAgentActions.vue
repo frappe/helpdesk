@@ -45,7 +45,7 @@
         variant="subtle"
       >
         <template #suffix>
-          <Icon icon="lucide:chevron-down" />
+          <LucideChevronDown class="w-4" />
         </template>
       </Button>
     </Dropdown>
@@ -61,7 +61,7 @@
         <Icon :icon="a.button_icon" />
       </template>
       <template v-if="a.is_external_link" #suffix>
-        <Icon icon="lucide:external-link" />
+        <LucideExternalLink class="w-4" />
       </template>
     </Button>
     <Dropdown
@@ -74,7 +74,7 @@
       "
     >
       <Button theme="gray" variant="ghost">
-        <Icon icon="lucide:more-horizontal" />
+        <LucideMoreHorizontal class="w-4" />
       </Button>
     </Dropdown>
   </span>
