@@ -13,12 +13,13 @@
       </Button>
     </template>
     <template #body>
-      <div class="mt-2 rounded bg-white p-1 shadow">
+      <div class="mt-2 divide-y rounded bg-white p-1 shadow">
         <Switch
           v-for="c in columns"
           :key="c.key"
           :model-value="!hidden.has(c.key)"
           :label="c.label"
+          class="rounded-none first:rounded-t last:rounded-b"
           @update:model-value="toggle(c.key)"
         />
       </div>
