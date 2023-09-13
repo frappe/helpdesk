@@ -79,7 +79,7 @@
                   @click="() => togglePopover()"
                 >
                   <template #prefix>
-                    <LucidePlus class="w-4" />
+                    <LucidePlus class="h-4 w-4" />
                   </template>
                 </Button>
               </template>

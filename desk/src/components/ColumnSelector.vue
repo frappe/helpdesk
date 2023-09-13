@@ -1,15 +1,9 @@
 <template>
-  <Popover>
-    <template #target="{ togglePopover, isOpen }">
-      <Button
-        :active="isOpen"
-        label="Columns"
-        theme="gray"
-        variant="outline"
-        @click="togglePopover()"
-      >
+  <NestedPopover>
+    <template #target>
+      <Button label="Columns" theme="gray" variant="outline">
         <template #prefix>
-          <LucideColumns class="w-4" />
+          <LucideColumns class="h-4 w-4" />
         </template>
         <template #suffix>
           <Badge theme="gray" variant="subtle">
@@ -18,25 +12,25 @@
         </template>
       </Button>
     </template>
-    <template #body-main>
-      <div class="grid grid-cols-3 gap-2 p-2">
-        <Button
+    <template #body>
+      <div class="mt-2 divide-y rounded bg-white p-1 shadow-2xl">
+        <Switch
           v-for="c in columns"
           :key="c.key"
+          :model-value="!hidden.has(c.key)"
           :label="c.label"
-          :theme="hidden.has(c.key) ? 'gray' : 'blue'"
-          class="w-full"
-          variant="subtle"
-          @click="toggle(c.key)"
+          class="rounded-none first:rounded-t last:rounded-b"
+          @update:model-value="toggle(c.key)"
         />
       </div>
     </template>
-  </Popover>
+  </NestedPopover>
 </template>
 
 <script setup lang="ts">
-import { Badge, Popover } from "frappe-ui";
+import { Badge, Switch } from "frappe-ui";
 import { useColumns } from "@/composables/columns";
+import { NestedPopover } from "@/components";
 import { Column } from "@/types";
 
 interface P {

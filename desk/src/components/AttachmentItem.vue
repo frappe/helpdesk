@@ -8,7 +8,7 @@
         @click="toggleDialog()"
       >
         <template #prefix>
-          <component :is="getIcon()" class="w-4" />
+          <component :is="getIcon()" class="h-4 w-4" />
         </template>
         <template #suffix>
           <slot name="suffix" />

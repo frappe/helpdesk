@@ -17,7 +17,7 @@
 					)
 				}}
 			</div>
-			<FeatherIcon name="external-link" class="w-4" />
+			<FeatherIcon name="external-link" class="h-4 w-4" />
 		</RouterLink>
 		<div v-if="$resources.users.data" class="flex flex-col">
 			<span class="block mb-2 text-sm leading-4 text-gray-700">

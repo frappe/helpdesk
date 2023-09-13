@@ -5,7 +5,7 @@
     </span>
     <Button theme="gray" variant="ghost" @click="() => $parent.$emit('close')">
       <template #icon>
-        <LucideX class="w-4" />
+        <LucideX class="h-4 w-4" />
       </template>
     </Button>
   </div>

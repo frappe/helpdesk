@@ -5,7 +5,7 @@
         <RouterLink :to="{ name: 'TicketAgentNew' }">
           <Button label="New ticket" theme="gray" variant="solid">
             <template #prefix>
-              <LucidePlus class="w-4" />
+              <LucidePlus class="h-4 w-4" />
             </template>
           </Button>
         </RouterLink>

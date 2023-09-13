@@ -18,7 +18,7 @@
       @click="resource.next()"
     >
       <template #prefix>
-        <LucideRefreshCw class="w-4" />
+        <LucideRefreshCw class="h-4 w-4" />
       </template>
     </Button>
   </div>
