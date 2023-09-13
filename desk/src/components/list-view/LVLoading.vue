@@ -1,5 +1,5 @@
 <template>
-  <div class="animate-pulse divide-y overflow-y-auto">
+  <div class="animate-pulse divide-y overflow-y-auto px-2.5">
     <div
       v-for="i in 20"
       :key="i"

@@ -41,7 +41,7 @@
           <div
             class="w-max max-w-full truncate"
             :class="[c.align, c.text]"
-            @click="(event) => filter(event, c)"
+            @click="(event) => filterFunc(event, c)"
           >
             <slot :name="c.key" :data="data">
               {{ data[c.key] || "⸺" }}
@@ -60,6 +60,7 @@ import { FormControl } from "frappe-ui";
 import { isFunction } from "lodash";
 import { Column } from "@/types";
 import { getAssign } from "@/utils";
+import { useFieldsStore } from "@/stores/fields";
 import { useColumns } from "@/composables/columns";
 import { useFilter } from "@/composables/filter";
 import { selection } from "./selection";
@@ -70,33 +71,39 @@ interface P {
   columns: Column[];
   data: any;
   doctype: string;
-  filter: boolean;
   rowKey: string;
 }
 
 const props = defineProps<P>();
 const id = toRef(props, "id");
 const { storage: hiddenColumns } = useColumns(id.value);
-const { add: addFilter, apply: applyFilter, fields } = useFilter(props.doctype);
+const fieldsStore = useFieldsStore();
+const filter = useFilter(props.doctype);
 
-function filter(e: InputEvent, c: Column) {
-  if (!props.filter) return;
-  const supported = ["Link", "Select"];
-  const f__ = fields.find((f) => f.fieldname === c.key);
-  if (!f__ || !supported.includes(f__.fieldtype)) return;
-  e.preventDefault();
-  e.stopPropagation();
-  let value = props.data[c.key];
-  if (f__.fieldname === "_assign") {
-    let assign = getAssign(value);
-    if (!assign) return;
-    value = assign;
-  }
-  addFilter({
-    fieldname: f__.fieldname,
-    operator: "is",
-    value: props.data[c.key],
-  });
-  applyFilter();
+async function filterFunc(event: InputEvent, c: Column) {
+  await fieldsStore.fetch(props.doctype);
+  fieldsStore
+    .get(props.doctype)
+    .filter((field) => ["Link", "Select"].includes(field.fieldtype))
+    .filter((field) => field.fieldname === c.key)
+    .map((field) => {
+      let val = props.data[c.key];
+      if (field.fieldname === "_assign") {
+        val = getAssign(val);
+      }
+      return {
+        fieldname: field.fieldname,
+        label: field.label,
+        operator: "is",
+        value: val,
+      };
+    })
+    .filter((field) => field.value)
+    .forEach((field) => {
+      event.preventDefault();
+      event.stopPropagation();
+      filter.add(field);
+      filter.apply();
+    });
 }
 </script>

@@ -7,7 +7,7 @@ from helpdesk.utils import check_permissions
 
 @frappe.whitelist()
 @redis_cache()
-def get_filterable_fields(doctype, append_assign=False):
+def get_filterable_fields(doctype):
 	check_permissions(doctype, None)
 	QBDocField = frappe.qb.DocType("DocField")
 	QBCustomField = frappe.qb.DocType("Custom Field")
@@ -59,14 +59,13 @@ def get_filterable_fields(doctype, append_assign=False):
 	res = []
 	res.extend(from_doc_fields)
 	res.extend(from_custom_fields)
-	if append_assign:
-		res.append(
-			{
-				"fieldname": "_assign",
-				"fieldtype": "Link",
-				"label": "Assigned to",
-				"name": "_assign",
-				"options": "HD Agent",
-			}
-		)
+	res.append(
+		{
+			"fieldname": "_assign",
+			"fieldtype": "Link",
+			"label": "Assigned to",
+			"name": "_assign",
+			"options": "HD Agent",
+		}
+	)
 	return res
