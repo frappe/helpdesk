@@ -16,6 +16,22 @@
         variant="subtle"
       />
     </template>
+    <template #conversation="{ data }">
+      <span class="flex items-center">
+        <span v-for="i in ['incoming', 'outgoing', 'comments']" :key="i">
+          <Tooltip v-if="data.conversation[i]" :text="capitalize(i)">
+            <span class="mr-1 flex w-8 items-center gap-1">
+              <LucideArrowDown v-if="i === 'incoming'" class="w-3" />
+              <LucideArrowUp v-else-if="i === 'outgoing'" class="w-3" />
+              <LucideMessageSquare v-else class="w-3" />
+              <span class="">
+                {{ data.conversation[i] }}
+              </span>
+            </span>
+          </Tooltip>
+        </span>
+      </span>
+    </template>
     <template #_assign="{ data }">
       <UserAvatar :user="getAssign(data._assign)" expand />
     </template>
@@ -99,9 +115,10 @@
 </template>
 
 <script setup lang="ts">
+import { capitalize } from "vue";
 import { createResource, Badge, Dropdown, Tooltip } from "frappe-ui";
-import { dayjs } from "@/dayjs";
 import { Icon } from "@iconify/vue";
+import { dayjs } from "@/dayjs";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast, getAssign } from "@/utils";
