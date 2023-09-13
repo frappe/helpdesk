@@ -1,11 +1,11 @@
 <template>
   <div class="mx-3 pt-6">
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar :user="sender" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dayjs(date).long()">
-          <div class="text-base text-gray-600">
+          <div class="text-gray-600">
             {{ dayjs(date).fromNow() }}
           </div>
         </Tooltip>

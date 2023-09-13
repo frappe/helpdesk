@@ -9,7 +9,7 @@
       @change="$emit('update:modelValue', $event)"
     >
       <template #top>
-        <span>
+        <span class="text-base">
           <span class="flex items-center justify-between">
             <UserAvatar :user="authStore.userId" expand strong />
             <slot name="top-right" />

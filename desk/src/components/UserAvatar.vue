@@ -7,7 +7,7 @@
     />
     <span
       v-if="expand"
-      class="truncate text-base"
+      class="truncate"
       :class="{
         'text-gray-900': strong,
         'font-medium': strong,
