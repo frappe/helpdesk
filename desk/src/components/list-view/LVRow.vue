@@ -81,6 +81,7 @@ const fieldsStore = useFieldsStore();
 const filter = useFilter(props.doctype);
 
 async function filterFunc(event: InputEvent, c: Column) {
+  if (!props.doctype) return;
   await fieldsStore.fetch(props.doctype);
   fieldsStore
     .get(props.doctype)
