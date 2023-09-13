@@ -21,9 +21,9 @@
         <span v-for="i in ['incoming', 'outgoing', 'comments']" :key="i">
           <Tooltip v-if="data.conversation[i]" :text="capitalize(i)">
             <span class="mr-1 flex w-8 items-center gap-1">
-              <LucideArrowDown v-if="i === 'incoming'" class="w-3" />
-              <LucideArrowUp v-else-if="i === 'outgoing'" class="w-3" />
-              <LucideMessageSquare v-else class="w-3" />
+              <LucideArrowDown v-if="i === 'incoming'" class="h-3 w-3" />
+              <LucideArrowUp v-else-if="i === 'outgoing'" class="h-3 w-3" />
+              <LucideMessageSquare v-else class="h-3 w-3" />
               <span class="">
                 {{ data.conversation[i] }}
               </span>

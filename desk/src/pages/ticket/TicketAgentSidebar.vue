@@ -32,7 +32,7 @@
             }"
             @click="isExpanded = true"
           >
-            <component :is="item.icon" class="w-4" />
+            <component :is="item.icon" class="h-4 w-4" />
           </div>
         </Tab>
       </TabList>
