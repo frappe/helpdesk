@@ -27,7 +27,7 @@
     </span>
     <div class="grow" />
     <SidebarLink
-      :icon="isExpanded ? 'lucide:chevrons-left' : 'lucide:chevrons-right'"
+      :icon="isExpanded ? LucideChevronsLeft : LucideChevronsRight"
       :is-active="false"
       :is-expanded="isExpanded"
       :label="isExpanded ? 'Collapse' : 'Expand'"
@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useKeymapStore } from "@/stores/keymap";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -56,9 +57,23 @@ import {
   AGENT_PORTAL_TICKET_TYPE_LIST,
   CUSTOMER_PORTAL_LANDING,
 } from "@/router";
+import { SidebarLink } from "@/components";
 import UserMenu from "./UserMenu.vue";
-import SidebarLink from "@/components/SidebarLink.vue";
-import { storeToRefs } from "pinia";
+import LucideArrowUpFromLine from "~icons/lucide/arrow-up-from-line";
+import LucideAtSign from "~icons/lucide/at-sign";
+import LucideBookOpen from "~icons/lucide/book-open";
+import LucideChevronsLeft from "~icons/lucide/chevrons-left";
+import LucideChevronsRight from "~icons/lucide/chevrons-right";
+import LucideCloudLightning from "~icons/lucide/cloud-lightning";
+import LucideContact2 from "~icons/lucide/contact-2";
+import LucideFolderOpen from "~icons/lucide/folder-open";
+import LucideLayoutGrid from "~icons/lucide/layout-grid";
+import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
+import LucideScrollText from "~icons/lucide/scroll-text";
+import LucideTicket from "~icons/lucide/ticket";
+import LucideUser from "~icons/lucide/user";
+import LucideUserCircle2 from "~icons/lucide/user-circle-2";
+import LucideUsers from "~icons/lucide/users";
 
 const route = useRoute();
 const router = useRouter();
@@ -77,28 +92,28 @@ const widthMinimised = {
 const menuOptions = computed(() => [
   {
     label: "Tickets",
-    icon: "lucide:ticket",
+    icon: LucideTicket,
     to: AGENT_PORTAL_TICKET_LIST,
   },
   {
     label: "Dashboard",
-    icon: "lucide:layout-grid",
+    icon: LucideLayoutGrid,
     to: AGENT_PORTAL_DASHBOARD,
   },
   {
     label: "Agents",
-    icon: "lucide:user",
+    icon: LucideUser,
     to: AGENT_PORTAL_AGENT_LIST,
   },
   {
     label: "Knowledge base",
-    icon: "lucide:book-open",
+    icon: LucideBookOpen,
     to: "DeskKBHome",
     isBeta: true,
   },
   {
     label: showExtra.value ? "Less" : "More",
-    icon: "lucide:more-horizontal",
+    icon: LucideMoreHorizontal,
     onClick: () => (showExtra.value = !showExtra.value),
   },
 ]);
@@ -106,47 +121,47 @@ const menuOptions = computed(() => [
 const extraOptions = [
   {
     label: "Support policies",
-    icon: "lucide:scroll-text",
+    icon: LucideScrollText,
     to: AGENT_PORTAL_SLA_LIST,
     hide: true,
   },
   {
     label: "Teams",
-    icon: "lucide:users",
+    icon: LucideUsers,
     to: AGENT_PORTAL_TEAM_LIST,
   },
   {
     label: "Escalation rules",
-    icon: "lucide:arrow-up-from-line",
+    icon: LucideArrowUpFromLine,
     to: AGENT_PORTAL_ESCALATION_RULE_LIST,
     isBeta: true,
   },
   {
     label: "Email accounts",
-    icon: "lucide:at-sign",
+    icon: LucideAtSign,
     to: AGENT_PORTAL_EMAIL_LIST,
     hide: true,
   },
   {
     label: "Ticket types",
-    icon: "lucide:folder-open",
+    icon: LucideFolderOpen,
     to: AGENT_PORTAL_TICKET_TYPE_LIST,
     hide: true,
   },
   {
     label: "Canned responses",
-    icon: "lucide:cloud-lightning",
+    icon: LucideCloudLightning,
     to: AGENT_PORTAL_CANNED_RESPONSE_LIST,
     isBeta: true,
   },
   {
     label: "Customers",
-    icon: "lucide:user-circle-2",
+    icon: LucideUserCircle2,
     to: AGENT_PORTAL_CUSTOMER_LIST,
   },
   {
     label: "Contacts",
-    icon: "lucide:contact-2",
+    icon: LucideContact2,
     to: AGENT_PORTAL_CONTACT_LIST,
   },
 ];

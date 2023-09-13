@@ -5,15 +5,13 @@
     </span>
     <Button theme="gray" variant="ghost" @click="() => $parent.$emit('close')">
       <template #icon>
-        <Icon icon="lucide:x" />
+        <LucideX class="w-4" />
       </template>
     </Button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
-
 interface P {
   title: string;
 }

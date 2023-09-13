@@ -8,7 +8,7 @@
         @click="toggleDialog()"
       >
         <template #prefix>
-          <Icon :icon="getIcon()" />
+          <component :is="getIcon()" class="w-4" />
         </template>
         <template #suffix>
           <slot name="suffix" />
@@ -39,7 +39,11 @@
 import { ref } from "vue";
 import { Button, Dialog } from "frappe-ui";
 import { getType as getMime } from "mime";
-import { Icon } from "@iconify/vue";
+import LucideFileType from "~icons/lucide/file-type";
+import LucideFileImage from "~icons/lucide/file-image";
+import LucideFileText from "~icons/lucide/file-text";
+import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
+import LucideFile from "~icons/lucide/file";
 
 interface P {
   label: string;
@@ -60,11 +64,11 @@ const isShowable = props.url && (isText || isImage);
 const content = ref("");
 
 function getIcon() {
-  if (isText) return "lucide:file-type";
-  else if (isImage) return "lucide:file-image";
-  else if (isPdf) return "lucide:file-text";
-  else if (isSpreadsheet) return "lucide:file-spreadsheet";
-  else return "lucide:file";
+  if (isText) return LucideFileType;
+  else if (isImage) return LucideFileImage;
+  else if (isPdf) return LucideFileText;
+  else if (isSpreadsheet) return LucideFileSpreadsheet;
+  else return LucideFile;
 }
 
 function toggleDialog() {

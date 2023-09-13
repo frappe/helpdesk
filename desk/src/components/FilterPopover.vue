@@ -3,7 +3,7 @@
     <template #target>
       <Button label="Filters" theme="gray" variant="outline">
         <template #prefix>
-          <Icon icon="lucide:list-filter" />
+          <LucideListFilter class="h-4 w-4" />
         </template>
         <template v-if="storage.size" #suffix>
           <Badge :label="storage.size" theme="gray" variant="subtle" />
@@ -79,7 +79,7 @@
                   @click="() => togglePopover()"
                 >
                   <template #prefix>
-                    <FeatherIcon name="plus" class="h-4" />
+                    <LucidePlus class="w-4" />
                   </template>
                 </Button>
               </template>
@@ -99,9 +99,8 @@
 </template>
 <script setup>
 import { h, watch } from "vue";
-import { Badge, Autocomplete, FeatherIcon, FormControl } from "frappe-ui";
+import { Badge, Autocomplete, FormControl } from "frappe-ui";
 import { useDebounceFn } from "@vueuse/core";
-import { Icon } from "@iconify/vue";
 import { useFilter } from "@/composables/filter";
 import { NestedPopover, SearchComplete } from "@/components";
 

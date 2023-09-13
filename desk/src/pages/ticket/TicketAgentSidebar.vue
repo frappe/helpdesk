@@ -32,7 +32,7 @@
             }"
             @click="isExpanded = true"
           >
-            <Icon :icon="item.icon" class="h-4 w-4" />
+            <component :is="item.icon" class="w-4" />
           </div>
         </Tab>
       </TabList>
@@ -43,33 +43,36 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
-import { Icon } from "@iconify/vue";
 import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
 import TicketViews from "./TicketViews.vue";
+import LucideInfo from "~icons/lucide/info";
+import LucideContact2 from "~icons/lucide/contact-2";
+import LucideHistory from "~icons/lucide/history";
+import LucideView from "~icons/lucide/view";
 
 const isExpanded = ref(true);
 const items = [
   {
     name: "Ticket Details",
     component: TicketDetails,
-    icon: "lucide:info",
+    icon: LucideInfo,
   },
   {
     name: "Contact Details",
     component: TicketContact,
-    icon: "lucide:contact-2",
+    icon: LucideContact2,
   },
   {
     name: "Ticket History",
     component: TicketHistory,
-    icon: "lucide:history",
+    icon: LucideHistory,
   },
   {
     name: "Ticket Views",
     component: TicketViews,
-    icon: "lucide:view",
+    icon: LucideView,
   },
 ];
 </script>

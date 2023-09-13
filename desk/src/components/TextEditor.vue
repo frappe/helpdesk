@@ -38,11 +38,7 @@
                     $emit('clear');
                   }
                 "
-              >
-                <template #prefix>
-                  <Icon icon="lucide:trash-2" />
-                </template>
-              </Button>
+              />
               <slot name="bottom-right" />
             </div>
           </div>
@@ -54,7 +50,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
 import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
-import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
 import { UserAvatar } from "@/components";
 

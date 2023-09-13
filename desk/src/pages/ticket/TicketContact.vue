@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col border-l">
     <span>
-      <TicketSidebarHeader title="Contact details" />
+      <TicketSidebarHeader title="Contact" />
       <div
         v-if="contact.full_name"
         class="flex items-center gap-3 border-b py-6"
@@ -25,15 +25,12 @@
         <div
           v-for="c in contactOptions"
           :key="c.name"
-          class="flex items-start gap-2"
+          class="flex items-center gap-2"
         >
-          <div class="h-5 w-5">
-            <Icon :icon="c.icon" class="h-4 w-4 text-gray-600" />
-          </div>
-          <div class="text-gray-900">{{ c.value }}</div>
+          <component :is="c.icon" class="w-4 text-gray-700" />
+          <span class="text-gray-900">{{ c.value }}</span>
         </div>
       </div>
-      <TicketTemplateFields />
       <TicketContactTickets />
     </div>
   </div>
@@ -43,24 +40,25 @@
 import { computed, inject } from "vue";
 import { Avatar } from "frappe-ui";
 import { isEmpty } from "lodash";
-import { Icon } from "@iconify/vue";
-import TicketTemplateFields from "./TicketTemplateFields.vue";
 import TicketContactTickets from "./TicketContactTickets.vue";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
 import { ITicket } from "./symbols";
+import LucideMail from "~icons/lucide/mail";
+import LucidePhone from "~icons/lucide/phone";
+import LucideSmartphone from "~icons/lucide/smartphone";
 
 const fields = [
   {
     field: "email_id",
-    icon: "lucide:mail",
+    icon: LucideMail,
   },
   {
     field: "phone",
-    icon: "lucide:phone",
+    icon: LucidePhone,
   },
   {
     field: "mobile_no",
-    icon: "lucide:smartphone",
+    icon: LucideSmartphone,
   },
 ];
 
