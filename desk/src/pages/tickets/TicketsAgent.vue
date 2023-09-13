@@ -11,7 +11,7 @@
         </RouterLink>
       </template>
     </PageTitle>
-    <div class="my-2.5 mx-5 flex items-center justify-between">
+    <div class="mx-5 my-2.5 flex items-center justify-between">
       <PresetFilters doctype="HD Ticket" />
       <div class="flex items-center gap-2">
         <FilterPopover doctype="HD Ticket" />
@@ -68,6 +68,11 @@ const tickets = createListManager({
         params: {
           ticketId: d.name,
         },
+      };
+      d.conversation = {
+        incoming: d.count_msg_incoming,
+        outgoing: d.count_msg_outgoing,
+        comments: d.count_comment,
       };
     }
     return data;
@@ -161,11 +166,9 @@ const columns = [
     width: "w-40",
   },
   {
-    label: "Count communication",
-    icon: "lucide:mail",
-    key: "count_communication",
-    width: "w-8",
-    align: "m-auto",
+    label: "Conversation",
+    key: "conversation",
+    width: "w-28",
   },
   {
     label: "Last modified",

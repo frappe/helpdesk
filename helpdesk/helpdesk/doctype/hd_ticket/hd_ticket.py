@@ -40,18 +40,29 @@ class HDTicket(Document):
 			.where(QBComment.reference_ticket == QBTicket.name)
 		)
 
-		count_communication = (
+		count_msg_incoming = (
 			frappe.qb.from_(QBCommunication)
 			.select(Count("*"))
-			.as_("count_communication")
+			.as_("count_msg_incoming")
 			.where(QBCommunication.reference_doctype == "HD Ticket")
 			.where(QBCommunication.reference_name == QBTicket.name)
+			.where(QBCommunication.sent_or_received == "Received")
+		)
+
+		count_msg_outgoing = (
+			frappe.qb.from_(QBCommunication)
+			.select(Count("*"))
+			.as_("count_msg_outgoing")
+			.where(QBCommunication.reference_doctype == "HD Ticket")
+			.where(QBCommunication.reference_name == QBTicket.name)
+			.where(QBCommunication.sent_or_received == "Sent")
 		)
 
 		query = (
 			query.select(QBTicket.star)
 			.select(count_comment)
-			.select(count_communication)
+			.select(count_msg_incoming)
+			.select(count_msg_outgoing)
 		)
 
 		return query
