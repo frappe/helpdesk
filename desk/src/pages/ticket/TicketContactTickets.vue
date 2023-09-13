@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="!isEmpty(tickets)"
-    class="select-none py-4"
+    class="py-4 text-base"
     :class="{
       'border-b': !isExpanded,
     }"
@@ -10,12 +10,12 @@
       class="flex cursor-pointer items-center justify-between"
       @click="isExpanded = !isExpanded"
     >
-      <div class="text-base font-medium text-gray-800">Open tickets</div>
-      <IconCaretUp v-if="isExpanded" class="h-4 w-4 text-gray-600" />
-      <IconCaretDown v-else class="h-4 w-4 text-gray-600" />
+      <div class="font-medium text-gray-800">Open tickets</div>
+      <LucideChevronUp v-if="isExpanded" class="w-4 text-gray-700" />
+      <LucideChevronDown v-else class="w-4 text-gray-700" />
     </div>
-    <div v-if="isExpanded" class="flex flex-col gap-4 py-4">
-      <div v-for="t in tickets.data" :key="t.name">
+    <ul v-if="isExpanded" class="list-inside list-disc space-y-2 py-4">
+      <li v-for="t in tickets.data" :key="t.name">
         <RouterLink
           :to="{
             name: 'TicketAgent',
@@ -24,13 +24,12 @@
             },
           }"
           target="_blank"
-          class="flex items-start gap-2"
+          class="leading-normal"
         >
-          <IconWebLink class="h-4 w-4 text-gray-600" />
-          <div class="text-base text-gray-800">{{ t.subject }}</div>
+          {{ t.subject }}
         </RouterLink>
-      </div>
-    </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -38,9 +37,6 @@
 import { inject, ref } from "vue";
 import { createListResource } from "frappe-ui";
 import { isEmpty } from "lodash";
-import IconCaretDown from "~icons/lucide/chevron-down";
-import IconCaretUp from "~icons/lucide/chevron-up";
-import IconWebLink from "~icons/lucide/external-link";
 import { ITicket } from "./symbols";
 
 const ticket = inject(ITicket);
