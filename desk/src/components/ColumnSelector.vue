@@ -9,7 +9,7 @@
         @click="togglePopover()"
       >
         <template #prefix>
-          <Icon icon="lucide:columns" />
+          <LucideColumns class="w-4" />
         </template>
         <template #suffix>
           <Badge theme="gray" variant="subtle">
@@ -28,11 +28,7 @@
           class="w-full"
           variant="subtle"
           @click="toggle(c.key)"
-        >
-          <template v-if="c.icon" #icon>
-            <Icon :icon="c.icon" />
-          </template>
-        </Button>
+        />
       </div>
     </template>
   </Popover>
@@ -40,7 +36,6 @@
 
 <script setup lang="ts">
 import { Badge, Popover } from "frappe-ui";
-import { Icon } from "@iconify/vue";
 import { useColumns } from "@/composables/columns";
 import { Column } from "@/types";
 

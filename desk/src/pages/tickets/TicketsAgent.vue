@@ -5,7 +5,7 @@
         <RouterLink :to="{ name: 'TicketAgentNew' }">
           <Button label="New ticket" theme="gray" variant="solid">
             <template #prefix>
-              <Icon icon="lucide:plus" class="h-4 w-4" />
+              <LucidePlus class="w-4" />
             </template>
           </Button>
         </RouterLink>
@@ -19,7 +19,7 @@
           <template #default>
             <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
               <template #prefix>
-                <Icon icon="lucide:arrow-down-up" />
+                <LucideArrowDownUp class="w-4" />
               </template>
             </Button>
           </template>
@@ -35,7 +35,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { createResource, usePageMeta, Button, Dropdown } from "frappe-ui";
-import { Icon } from "@iconify/vue";
 import { AGENT_PORTAL_TICKET } from "@/router";
 import { socket } from "@/socket";
 import { useAuthStore } from "@/stores/auth";
