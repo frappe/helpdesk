@@ -18,7 +18,7 @@
       @click="resource.next()"
     >
       <template #prefix>
-        <Icon icon="lucide:refresh-cw" />
+        <LucideRefreshCw class="w-4" />
       </template>
     </Button>
   </div>
@@ -26,7 +26,6 @@
 
 <script setup lang="ts">
 import { Button, TabButtons } from "frappe-ui";
-import { Icon } from "@iconify/vue";
 
 const pageLengthOptions = [20, 50, 500] as const;
 type PageLength = (typeof pageLengthOptions)[number];
