@@ -3,24 +3,31 @@
     <div
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-900"
     >
-      <LVEmpty v-if="!loading && !data?.length" :empty-message="emptyMessage" />
+      <LVEmpty
+        v-if="!resource.loading && !resource.data?.length"
+        :empty-message="emptyMessage"
+      />
       <LVHeader
         v-else
         :id="id"
         :checkbox="checkbox"
         :columns="columns"
-        :data="data"
+        :data="resource.data"
         :row-key="rowKey"
       />
-      <div class="divide-y overflow-y-auto">
+      <div
+        ref="body"
+        class="grow divide-y overflow-y-auto"
+        @scroll="() => handleScroll()"
+      >
         <LVLoading
-          v-if="loading"
+          v-if="resource.loading"
           :id="id"
           :columns="columns"
           :checkbox="checkbox"
         />
         <LVRow
-          v-for="row in data"
+          v-for="row in resource.data"
           v-else
           :id="id"
           :key="row[rowKey]"
@@ -37,8 +44,9 @@
           </template>
         </LVRow>
       </div>
+      <LVNavigation :resource="resource" />
     </div>
-    <LVSelectionBar :data="data || []" :row-key="rowKey">
+    <LVSelectionBar :data="resource.data || []" :row-key="rowKey">
       <template #actions="d">
         <slot name="actions" v-bind="d" />
       </template>
@@ -47,29 +55,39 @@
 </template>
 
 <script setup lang="ts">
-import { Column } from "@/types";
+import { ref } from "vue";
+import { Column, Resource } from "@/types";
 import LVEmpty from "./LVEmpty.vue";
 import LVHeader from "./LVHeader.vue";
 import LVLoading from "./LVLoading.vue";
+import LVNavigation from "./LVNavigation.vue";
 import LVRow from "./LVRow.vue";
 import LVSelectionBar from "./LVSelectionBar.vue";
+import { useDebounceFn } from "@vueuse/core";
 
 interface P {
   id: string;
   columns: Column[];
   doctype: string;
   rowKey: string;
+  resource: Resource<Array<Record<string, unknown>>>;
   checkbox?: boolean;
-  data?: Record<string, any>[];
   emptyMessage?: string;
   filter?: boolean;
-  loading?: boolean;
 }
 
-withDefaults(defineProps<P>(), {
+const props = withDefaults(defineProps<P>(), {
   checkbox: false,
   emptyMessage: "No records",
   filter: false,
-  loading: false,
 });
+
+const body = ref<HTMLElement | null>(null);
+const handleScroll = useDebounceFn(() => {
+  const bodyHeight = body.value.scrollHeight;
+  const bodyTop = body.value.scrollTop;
+  const containerHeight = body.value.clientHeight;
+  const scrollPercentage = (bodyTop / (bodyHeight - containerHeight)) * 100;
+  if (scrollPercentage >= 90) props.resource.next();
+}, 500);
 </script>

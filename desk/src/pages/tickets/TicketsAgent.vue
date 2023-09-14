@@ -27,8 +27,7 @@
         <ColumnSelector id="ticket" :columns="columns" />
       </div>
     </div>
-    <TicketsAgentList :tickets="tickets.data" :columns="columns" class="grow" />
-    <ListNavigation :resource="tickets" />
+    <TicketsAgentList :resource="tickets" :columns="columns" class="grow" />
   </div>
 </template>
 
@@ -41,7 +40,6 @@ import { useAuthStore } from "@/stores/auth";
 import { useFilter } from "@/composables/filter";
 import { useOrder } from "@/composables/order";
 import { createListManager } from "@/composables/listManager";
-import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ColumnSelector, FilterPopover } from "@/components";
 import TicketsAgentList from "./TicketsAgentList.vue";

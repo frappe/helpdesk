@@ -1,8 +1,16 @@
-export interface Resource<A> {
+export interface Resource<A = unknown> {
   auto: boolean;
   loading: boolean;
   data: A;
+  pageLength: number;
+  totalCount: number;
+  hasNext: boolean;
+  list: {
+    loading: boolean;
+  };
+  next: () => void;
   reload: () => void;
+  update: (r: unknown) => void;
 }
 
 export interface Comment {

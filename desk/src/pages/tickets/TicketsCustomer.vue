@@ -34,9 +34,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="tickets.data"
-      row-key="name"
+      :resource="tickets"
       class="mt-2.5 grow"
+      row-key="name"
     >
       <template #status="{ data }">
         <Badge
@@ -49,7 +49,6 @@
         {{ dayjs(data.creation).fromNow() }}
       </template>
     </ListView>
-    <ListNavigation :resource="tickets" />
   </div>
 </template>
 
@@ -62,7 +61,6 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createListManager } from "@/composables/listManager";
 import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
 
 const configStore = useConfigStore();

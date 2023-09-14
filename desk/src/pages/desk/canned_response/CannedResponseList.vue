@@ -9,19 +9,18 @@
           @click="showNewDialog = true"
         >
           <template #prefix>
-            <IconPlus class="h-4 w-4" />
+            <LucidePlus class="h-4 w-4" />
           </template>
         </Button>
       </template>
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="responses.list?.data || []"
       :empty-message="emptyMessage"
+      :resource="responses"
       class="mt-2.5 grow"
       row-key="name"
     />
-    <ListNavigation :resource="responses" />
     <AddNewCannedResponsesDialog
       :show="showNewDialog"
       @close="showNewDialog = false"
@@ -35,9 +34,7 @@ import { AGENT_PORTAL_CANNED_RESPONSE_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue";
-import IconPlus from "~icons/lucide/plus";
 
 const showNewDialog = ref(false);
 const emptyMessage = "No Canned Responses Found";

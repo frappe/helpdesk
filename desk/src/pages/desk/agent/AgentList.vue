@@ -9,15 +9,15 @@
           @click="isDialogVisible = !isDialogVisible"
         >
           <template #prefix>
-            <IconPlus class="h-4 w-4" />
+            <LucidePlus class="h-4 w-4" />
           </template>
         </Button>
       </template>
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="agents.list?.data"
       :empty-message="emptyMessage"
+      :resource="agents"
       class="mt-2.5 grow"
       row-key="name"
     >
@@ -42,7 +42,6 @@
         </div>
       </template>
     </ListView>
-    <ListNavigation :resource="agents" />
     <AddNewAgentsDialog
       :show="isDialogVisible"
       @close="isDialogVisible = false"
@@ -58,8 +57,6 @@ import { useFilter } from "@/composables/filter";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
-import IconPlus from "~icons/lucide/plus";
 
 const { apply, storage } = useFilter("HD Ticket");
 const isDialogVisible = ref(false);

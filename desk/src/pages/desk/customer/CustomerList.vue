@@ -16,8 +16,8 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="customers.list?.data || []"
       :empty-message="emptyMessage"
+      :resource="customers"
       class="mt-2.5 grow"
       row-key="name"
     >
@@ -28,7 +28,6 @@
         </div>
       </template>
     </ListView>
-    <ListNavigation :resource="customers" />
     <NewCustomerDialog
       v-model="isDialogVisible"
       @close="isDialogVisible = false"
@@ -48,7 +47,6 @@ import { createListManager } from "@/composables/listManager";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import CustomerDialog from "./CustomerDialog.vue";
 import IconPlus from "~icons/lucide/plus";
 

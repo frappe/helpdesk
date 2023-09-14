@@ -2,9 +2,9 @@
   <ListView
     id="ticket"
     :columns="columns"
-    :data="tickets"
-    doctype="HD Ticket"
     :empty-message="emptyMessage"
+    :resource="resource"
+    doctype="HD Ticket"
     row-key="name"
     checkbox
     filter
@@ -122,17 +122,16 @@ import { dayjs } from "@/dayjs";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast, getAssign } from "@/utils";
+import { Resource } from "@/types";
 import { useError } from "@/composables/error";
 import { ListView, UserAvatar } from "@/components";
 
 interface P {
-  tickets?: any[];
+  resource: Resource;
   columns: any[];
 }
 
-withDefaults(defineProps<P>(), {
-  tickets: () => [],
-});
+defineProps<P>();
 const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
 const emptyMessage =

@@ -16,12 +16,11 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="teams.list?.data || []"
       :empty-message="emptyMessage"
+      :resource="teams"
       class="mt-2.5 grow"
       row-key="name"
     />
-    <ListNavigation :resource="teams" />
     <Dialog
       v-model="showNewDialog"
       :options="{
@@ -58,7 +57,6 @@ import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import IconPlus from "~icons/lucide/plus";
 
 const router = useRouter();
