@@ -13,9 +13,7 @@
       </Button>
     </template>
     <template #body>
-      <div
-        class="mt-2 divide-y rounded bg-white p-1 shadow-2xl ring-1 ring-black ring-opacity-5"
-      >
+      <div class="popover divide-y">
         <Switch
           v-for="c in columns"
           :key="c.key"
