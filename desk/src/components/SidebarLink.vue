@@ -41,7 +41,7 @@ import { Badge, Tooltip } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 
 interface P {
-  icon: string;
+  icon: unknown;
   label: string;
   isExpanded: boolean;
   isActive?: boolean;
