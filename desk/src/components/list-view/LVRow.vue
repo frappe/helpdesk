@@ -2,9 +2,9 @@
   <div
     class="group mx-5 flex h-10 items-center gap-2 whitespace-nowrap px-2.5 text-base"
     :class="{
-      'bg-blue-100': selection.storage.has(data[rowKey]),
-      'hover:bg-blue-200': selection.storage.has(data[rowKey]),
-      'hover:bg-gray-100': !selection.storage.has(data[rowKey]),
+      'bg-blue-100': selection.storage.has(data.name),
+      'hover:bg-blue-200': selection.storage.has(data.name),
+      'hover:bg-gray-100': !selection.storage.has(data.name),
       'cursor-pointer': !!data.onClick,
       ...data.class,
     }"
@@ -12,8 +12,8 @@
     <FormControl
       v-if="checkbox"
       type="checkbox"
-      :model-value="selection.storage.has(data[rowKey])"
-      @update:model-value="selection.toggle(data[rowKey])"
+      :model-value="selection.storage.has(data.name)"
+      @update:model-value="selection.toggle(data.name)"
     />
     <component
       :is="isFunction(data.onClick) ? 'span' : RouterLink"
@@ -71,7 +71,6 @@ interface P {
   columns: Column[];
   data: any;
   doctype: string;
-  rowKey: string;
 }
 
 const props = defineProps<P>();

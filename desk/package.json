@@ -25,6 +25,7 @@
 		"mime": "^3.0.0",
 		"mitt": "^3.0.1",
 		"pinia": "^2.0.33",
+		"pluralize": "^8.0.0",
 		"sanitize-html": "^2.10.0",
 		"socket.io-client": "^4.7.2",
 		"unplugin-vue-components": "^0.25.2",

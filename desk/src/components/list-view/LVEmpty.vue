@@ -2,12 +2,16 @@
   <div
     class="flex h-full w-full items-center justify-center text-base text-gray-700"
   >
-    <EmptyMessage :message="emptyMessage" />
+    <EmptyMessage :message="message" />
   </div>
 </template>
 
 <script setup lang="ts">
 import EmptyMessage from "../EmptyMessage.vue";
 
-defineProps<{ emptyMessage: string }>();
+interface P {
+  message: string;
+}
+
+defineProps<P>();
 </script>

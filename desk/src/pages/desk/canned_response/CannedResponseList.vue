@@ -16,10 +16,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :empty-message="emptyMessage"
       :resource="responses"
-      class="mt-2.5 grow"
-      row-key="name"
+      class="mt-2.5"
+      doctype="HD Canned Response"
     />
     <AddNewCannedResponsesDialog
       :show="showNewDialog"

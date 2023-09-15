@@ -10,7 +10,7 @@
         resource.reload();
       }"
     />
-    <span class="space-x-1 text-base">
+    <span class="flex items-center gap-1 text-base">
       <LucideLoader2
         v-if="resource.list.loading"
         class="mr-1 inline h-4 w-4 animate-spin"

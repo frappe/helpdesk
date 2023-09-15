@@ -35,8 +35,8 @@
     <ListView
       :columns="columns"
       :resource="tickets"
-      class="mt-2.5 grow"
-      row-key="name"
+      class="mt-2.5"
+      doctype="HD Ticket"
     >
       <template #status="{ data }">
         <Badge

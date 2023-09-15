@@ -16,10 +16,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :empty-message="emptyMessage"
       :resource="rules"
-      class="mt-2.5 grow"
-      row-key="name"
+      class="mt-2.5"
+      doctype="HD Escalation Rule"
     >
       <template #is_enabled="{ data }">
         <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">

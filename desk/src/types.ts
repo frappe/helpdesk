@@ -4,7 +4,7 @@ export interface Resource<A = unknown> {
   data: A;
   pageLength: number;
   totalCount: number;
-  hasNext: boolean;
+  hasNextPage: boolean;
   list: {
     loading: boolean;
   };

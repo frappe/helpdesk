@@ -1,19 +1,15 @@
 <template>
-  <div class="w-full overflow-hidden overflow-x-auto">
+  <div class="flex w-full grow flex-col overflow-hidden overflow-x-auto">
     <div
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-900"
     >
-      <LVEmpty
-        v-if="!resource.loading && !resource.data?.length"
-        :empty-message="emptyMessage"
-      />
+      <LVEmpty v-if="!resource.data?.length" :message="emptyMsg" />
       <LVHeader
         v-else
         :id="id"
         :checkbox="checkbox"
         :columns="columns"
         :data="resource.data"
-        :row-key="rowKey"
       />
       <div
         ref="body"
@@ -30,13 +26,12 @@
           v-for="row in resource.data"
           v-else
           :id="id"
-          :key="row[rowKey]"
+          :key="row.name"
           :checkbox="checkbox"
           :columns="columns"
           :data="row"
           :doctype="doctype"
           :filter="filter"
-          :row-key="rowKey"
           :to="row.onClick"
         >
           <template v-for="(_, n) in $slots" #[n]="d">
@@ -44,9 +39,9 @@
           </template>
         </LVRow>
       </div>
-      <LVNavigation :resource="resource" />
     </div>
-    <LVSelectionBar :data="resource.data || []" :row-key="rowKey">
+    <LVNavigation :resource="resource" />
+    <LVSelectionBar :data="resource.data || []">
       <template #actions="d">
         <slot name="actions" v-bind="d" />
       </template>
@@ -55,7 +50,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import { useDebounceFn } from "@vueuse/core";
+import { plural } from "pluralize";
 import { Column, Resource } from "@/types";
 import LVEmpty from "./LVEmpty.vue";
 import LVHeader from "./LVHeader.vue";
@@ -63,27 +60,29 @@ import LVLoading from "./LVLoading.vue";
 import LVNavigation from "./LVNavigation.vue";
 import LVRow from "./LVRow.vue";
 import LVSelectionBar from "./LVSelectionBar.vue";
-import { useDebounceFn } from "@vueuse/core";
 
 interface P {
   id: string;
   columns: Column[];
   doctype: string;
-  rowKey: string;
   resource: Resource<Array<Record<string, unknown>>>;
   checkbox?: boolean;
-  emptyMessage?: string;
   filter?: boolean;
 }
 
 const props = withDefaults(defineProps<P>(), {
   checkbox: false,
-  emptyMessage: "No records",
   filter: false,
 });
 
 const body = ref<HTMLElement | null>(null);
+const emptyMsg = computed(() => {
+  const s = props.doctype.replace("HD", "").toLowerCase();
+  const p = plural(s);
+  return `No ${p} found`;
+});
 const handleScroll = useDebounceFn(() => {
+  if (!props.resource.hasNextPage) return;
   const bodyHeight = body.value.scrollHeight;
   const bodyTop = body.value.scrollTop;
   const containerHeight = body.value.clientHeight;

@@ -16,10 +16,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :empty-message="emptyMessage"
       :resource="contacts"
-      class="mt-2.5 grow"
-      row-key="name"
+      class="mt-2.5"
+      doctype="Contact"
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">

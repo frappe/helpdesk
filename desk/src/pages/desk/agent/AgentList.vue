@@ -16,10 +16,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :empty-message="emptyMessage"
       :resource="agents"
-      class="mt-2.5 grow"
-      row-key="name"
+      class="mt-2.5"
+      doctype="HD Agent"
     >
       <template #name="{ data }">
         <div class="flex items-center justify-between">
@@ -60,7 +59,6 @@ import { ListView } from "@/components";
 
 const { apply, storage } = useFilter("HD Ticket");
 const isDialogVisible = ref(false);
-const emptyMessage = "No Agents Found";
 const columns = [
   {
     label: "Name",

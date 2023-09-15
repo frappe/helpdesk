@@ -27,7 +27,6 @@ interface P {
   checkbox: boolean;
   columns: Column[];
   data: Array<any>;
-  rowKey: string;
 }
 
 const props = defineProps<P>();
@@ -41,6 +40,6 @@ function toggle() {
     selection.storage.clear();
     return;
   }
-  data.value.forEach((d) => selection.storage.add(d[props.rowKey]));
+  data.value.forEach((d) => selection.storage.add(d.name));
 }
 </script>
