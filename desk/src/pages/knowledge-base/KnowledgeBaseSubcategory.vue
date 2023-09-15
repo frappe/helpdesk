@@ -29,13 +29,7 @@
         </div>
       </template>
     </KnowledgeBaseCategoryHeader>
-    <ListView
-      :columns="columns"
-      :emit-row-click="true"
-      :resource="articles"
-      class="grow"
-      row-key="name"
-    >
+    <ListView :columns="columns" :resource="articles" doctype="HD Article">
       <template #title="{ data }">
         <div class="flex items-center gap-2">
           <IconFile class="h-4 w-4" />
