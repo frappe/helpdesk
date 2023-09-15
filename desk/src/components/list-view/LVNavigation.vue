@@ -3,12 +3,14 @@
     <TabButtons
       :buttons="pageLengthOptions.map((o) => ({ label: o }))"
       :model-value="resource.pageLength"
-      @update:model-value="(val: PageLength) => {
-        resource.update({
-          pageLength: val,
-        });
-        resource.reload();
-      }"
+      @update:model-value="
+        (val) => {
+          resource.update({
+            pageLength: val,
+          });
+          resource.reload();
+        }
+      "
     />
     <span class="flex items-center gap-1 text-base">
       <LucideLoader2
@@ -27,7 +29,6 @@ import { TabButtons } from "frappe-ui";
 import { Resource } from "@/types";
 
 const pageLengthOptions = [20, 50, 500] as const;
-type PageLength = (typeof pageLengthOptions)[number];
 interface P {
   resource: Resource<Array<unknown>>;
 }
