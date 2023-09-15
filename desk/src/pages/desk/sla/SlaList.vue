@@ -5,7 +5,7 @@
         <RouterLink :to="{ name: AGENT_PORTAL_SLA_NEW }">
           <Button label="New policy" theme="gray" variant="solid">
             <template #prefix>
-              <IconPlus class="h-4 w-4" />
+              <LucidePlus class="h-4 w-4" />
             </template>
           </Button>
         </RouterLink>
@@ -13,10 +13,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="policies.list?.data || []"
-      :empty-message="emptyMessage"
+      :resource="policies"
       class="mt-2.5 grow"
-      row-key="name"
+      doctype="HD Service Level Agreement"
     >
       <template #enabled="{ data }">
         <Badge :theme="data.enabled ? 'green' : 'gray'" variant="subtle">
@@ -29,7 +28,6 @@
         >
       </template>
     </ListView>
-    <ListNavigation :resource="policies" />
   </div>
 </template>
 <script setup lang="ts">
@@ -38,10 +36,7 @@ import { AGENT_PORTAL_SLA_NEW, AGENT_PORTAL_SLA_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
-import IconPlus from "~icons/lucide/plus";
 
-const emptyMessage = "No Support Policies Found";
 const columns = [
   {
     label: "Name",
