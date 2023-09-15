@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-full grow flex-col overflow-hidden overflow-x-auto">
+  <div class="mt-2 flex w-full grow flex-col overflow-hidden overflow-x-auto">
     <div
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-900"
     >
@@ -29,13 +29,13 @@
         </LVRow>
       </div>
     </div>
-    <LVNavigation :resource="resource" />
     <LVSelectionBar :data="resource.data || []">
       <template #actions="d">
         <slot name="actions" v-bind="d" />
       </template>
     </LVSelectionBar>
   </div>
+  <LVNavigation :resource="resource" />
 </template>
 
 <script setup lang="ts">

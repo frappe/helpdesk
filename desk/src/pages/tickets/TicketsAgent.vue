@@ -11,7 +11,7 @@
         </RouterLink>
       </template>
     </PageTitle>
-    <div class="mx-5 my-2.5 flex items-center justify-between">
+    <div class="mx-5 mt-2.5 flex items-center justify-between">
       <PresetFilters doctype="HD Ticket" />
       <div class="flex items-center gap-2">
         <FilterPopover doctype="HD Ticket" />
@@ -27,7 +27,7 @@
         <ColumnSelector doctype="HD Ticket" :columns="columns" />
       </div>
     </div>
-    <TicketsAgentList :resource="tickets" :columns="columns" class="grow" />
+    <TicketsAgentList :resource="tickets" :columns="columns" />
   </div>
 </template>
 
