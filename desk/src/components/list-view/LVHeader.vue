@@ -4,12 +4,14 @@
       <FormControl
         v-if="checkbox"
         type="checkbox"
-        :model-value="data?.length === selection.storage.size"
+        :model-value="resource.data?.length === selection.storage.size"
         @update:model-value="toggle()"
       />
       <div v-for="c in columns" :key="c.key">
         <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
-          <span :class="[c.align]">{{ c.label }}</span>
+          <span :class="[c.align]">
+            {{ c.label }}
+          </span>
         </div>
       </div>
     </div>
@@ -17,29 +19,22 @@
 </template>
 
 <script setup lang="ts">
-import { toRef } from "vue";
-import { Column } from "@/types";
+import { inject } from "vue";
 import { useColumns } from "@/composables/columns";
 import { selection } from "./selection";
+import { CheckboxKey, ColumnsKey, DocTypeKey, ResourceKey } from "./symbols";
 
-interface P {
-  id: string;
-  checkbox: boolean;
-  columns: Column[];
-  data: Array<any>;
-}
-
-const props = defineProps<P>();
-
-const data = toRef(props, "data");
-const id = toRef(props, "id");
-const { storage: hiddenColumns } = useColumns(id.value);
+const checkbox = inject(CheckboxKey);
+const columns = inject(ColumnsKey);
+const doctype = inject(DocTypeKey);
+const resource = inject(ResourceKey);
+const { storage: hiddenColumns } = useColumns(doctype);
 
 function toggle() {
-  if (selection.storage.size === data.value.length) {
+  if (selection.storage.size === resource.data.length) {
     selection.storage.clear();
     return;
   }
-  data.value.forEach((d) => selection.storage.add(d.name));
+  resource.data.forEach((d) => selection.storage.add(d.name));
 }
 </script>

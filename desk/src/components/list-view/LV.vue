@@ -4,24 +4,13 @@
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-900"
     >
       <LVEmpty v-if="!resource.data?.length" :message="emptyMsg" />
-      <LVHeader
-        v-else
-        :id="id"
-        :checkbox="checkbox"
-        :columns="columns"
-        :data="resource.data"
-      />
+      <LVHeader v-else />
       <div
         ref="body"
         class="grow divide-y overflow-y-auto"
         @scroll="() => handleScroll()"
       >
-        <LVLoading
-          v-if="resource.loading"
-          :id="id"
-          :columns="columns"
-          :checkbox="checkbox"
-        />
+        <LVLoading v-if="resource.loading" />
         <LVRow
           v-for="row in resource.data"
           v-else
@@ -50,10 +39,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, provide, ref } from "vue";
+import { useRoute } from "vue-router";
 import { useDebounceFn } from "@vueuse/core";
 import { plural } from "pluralize";
 import { Column, Resource } from "@/types";
+import {
+  CheckboxKey,
+  ColumnsKey,
+  DocTypeKey,
+  FilterKey,
+  IdKey,
+  ResourceKey,
+} from "./symbols";
 import LVEmpty from "./LVEmpty.vue";
 import LVHeader from "./LVHeader.vue";
 import LVLoading from "./LVLoading.vue";
@@ -62,7 +60,6 @@ import LVRow from "./LVRow.vue";
 import LVSelectionBar from "./LVSelectionBar.vue";
 
 interface P {
-  id: string;
   columns: Column[];
   doctype: string;
   resource: Resource<Array<Record<string, unknown>>>;
@@ -75,11 +72,15 @@ const props = withDefaults(defineProps<P>(), {
   filter: false,
 });
 
+const route = useRoute();
 const body = ref<HTMLElement | null>(null);
 const emptyMsg = computed(() => {
   const s = props.doctype.replace("HD", "").toLowerCase();
   const p = plural(s);
   return `No ${p} found`;
+});
+const id = computed(() => {
+  return route.path + "_" + props.doctype;
 });
 const handleScroll = useDebounceFn(() => {
   if (!props.resource.hasNextPage) return;
@@ -89,4 +90,11 @@ const handleScroll = useDebounceFn(() => {
   const scrollPercentage = (bodyTop / (bodyHeight - containerHeight)) * 100;
   if (scrollPercentage >= 90) props.resource.next();
 }, 500);
+
+provide(CheckboxKey, props.checkbox);
+provide(ColumnsKey, props.columns);
+provide(DocTypeKey, props.doctype);
+provide(FilterKey, props.filter);
+provide(IdKey, id.value);
+provide(ResourceKey, props.resource);
 </script>

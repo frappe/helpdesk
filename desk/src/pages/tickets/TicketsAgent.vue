@@ -24,7 +24,7 @@
             </Button>
           </template>
         </Dropdown>
-        <ColumnSelector id="ticket" :columns="columns" />
+        <ColumnSelector doctype="HD Ticket" :columns="columns" />
       </div>
     </div>
     <TicketsAgentList :resource="tickets" :columns="columns" class="grow" />

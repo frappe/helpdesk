@@ -25,13 +25,10 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from "vue";
 import { TabButtons } from "frappe-ui";
-import { Resource } from "@/types";
+import { ResourceKey } from "./symbols";
 
 const pageLengthOptions = [20, 50, 500] as const;
-interface P {
-  resource: Resource<Array<unknown>>;
-}
-
-defineProps<P>();
+const resource = inject(ResourceKey);
 </script>
