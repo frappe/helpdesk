@@ -1,11 +1,8 @@
 <template>
   <ListView
-    id="ticket"
     :columns="columns"
-    :empty-message="emptyMessage"
     :resource="resource"
     doctype="HD Ticket"
-    row-key="name"
     checkbox
     filter
   >
@@ -134,8 +131,6 @@ interface P {
 defineProps<P>();
 const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
-const emptyMessage =
-  "🎉 Great news! There are currently no tickets to display. Keep up the good work!";
 const slaStatusColorMap = {
   Fulfilled: "green",
   Failed: "red",

@@ -12,14 +12,16 @@
         }
       "
     />
-    <span class="flex items-center gap-1 text-base">
+    <span class="flex items-center">
       <LucideLoader2
         v-if="resource.list.loading"
-        class="mr-1 inline h-4 w-4 animate-spin"
+        class="mr-2 inline h-4 w-4 animate-spin"
       />
-      <span class="text-gray-900">{{ resource.data?.length }}</span>
-      <span class="text-gray-700">of</span>
-      <span class="text-gray-900">{{ resource.totalCount }}</span>
+      <span v-if="resource.data?.length" class="space-x-1 text-base">
+        <span class="text-gray-900">{{ resource.data?.length }}</span>
+        <span class="text-gray-700">of</span>
+        <span class="text-gray-900">{{ resource.totalCount }}</span>
+      </span>
     </span>
   </div>
 </template>
