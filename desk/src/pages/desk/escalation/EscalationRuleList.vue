@@ -9,23 +9,16 @@
           @click="openDialog(null)"
         >
           <template #prefix>
-            <IconPlus class="h-4 w-4" />
+            <LucidePlus class="h-4 w-4" />
           </template>
         </Button>
       </template>
     </PageTitle>
     <ListView
-      class="mt-2.5 grow"
       :columns="columns"
-      :data="rules.list?.data || []"
-      :empty-message="emptyMessage"
-      row-key="name"
-      :hide-checkbox="true"
-      :hide-column-selector="true"
-      :row-click="{
-        type: 'action',
-        fn: openDialog,
-      }"
+      :resource="rules"
+      class="mt-2.5"
+      doctype="HD Escalation Rule"
     >
       <template #is_enabled="{ data }">
         <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">
@@ -33,7 +26,6 @@
         </Badge>
       </template>
     </ListView>
-    <ListNavigation :resource="rules" />
     <EscalationRuleDialog
       v-if="showDialog"
       v-model="showDialog"
@@ -47,34 +39,32 @@ import { usePageMeta, Badge } from "frappe-ui";
 import { socket } from "@/socket";
 import { createListManager } from "@/composables/listManager";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import EscalationRuleDialog from "./EscalationRuleDialog.vue";
-import IconPlus from "~icons/lucide/plus";
 
 const showDialog = ref(false);
 const selectedRule = ref(null);
 const emptyMessage = "No Escalation Rules Found";
 const columns = [
   {
-    title: "Priority",
+    label: "Priority",
     key: "priority",
-    width: "w-1/3",
+    width: "w-64",
   },
   {
-    title: "Team",
+    label: "Team",
     key: "team",
-    width: "w-1/3",
+    width: "w-64",
   },
   {
-    title: "Ticket type",
+    label: "Ticket type",
     key: "ticket_type",
-    width: "w-1/3",
+    width: "w-64",
   },
   {
-    title: "",
+    label: "Status",
     key: "is_enabled",
-    width: "w-20 flex justify-end",
+    width: "w-20",
   },
 ];
 
@@ -82,6 +72,12 @@ const rules = createListManager({
   doctype: "HD Escalation Rule",
   fields: ["name", "priority", "team", "ticket_type", "is_enabled"],
   auto: true,
+  transform: (data) => {
+    for (const d of data) {
+      d.onClick = () => openDialog(d.name);
+    }
+    return data;
+  },
 });
 
 usePageMeta(() => {

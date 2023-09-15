@@ -5,7 +5,7 @@
         <RouterLink :to="{ name: AGENT_PORTAL_TICKET_TYPE_NEW }">
           <Button label="New ticket type" theme="gray" variant="solid">
             <template #prefix>
-              <IconPlus class="h-4 w-4" />
+              <LucidePlus class="h-4 w-4" />
             </template>
           </Button>
         </RouterLink>
@@ -13,12 +13,10 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="ticketTypes.list?.data || []"
-      :empty-message="emptyMessage"
-      class="mt-2.5 grow"
-      row-key="name"
+      :resource="ticketTypes"
+      class="mt-2.5"
+      doctype="HD Ticket Type"
     />
-    <ListNavigation :resource="ticketTypes" />
   </div>
 </template>
 <script setup lang="ts">
@@ -30,10 +28,7 @@ import {
 import { createListManager } from "@/composables/listManager";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
-import IconPlus from "~icons/lucide/plus";
 
-const emptyMessage = "No Ticket Types Found";
 const columns = [
   {
     label: "Name",

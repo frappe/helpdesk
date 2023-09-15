@@ -31,8 +31,8 @@
     </KnowledgeBaseCategoryHeader>
     <ListView
       :columns="columns"
-      :data="articles.data || []"
       :emit-row-click="true"
+      :resource="articles"
       class="grow"
       row-key="name"
     >
@@ -54,7 +54,6 @@
         <EmptyMessage message="This sub category is empty" />
       </template>
     </ListView>
-    <ListNavigation :resource="articles" />
     <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
       <template #body-content>
         <form @submit.prevent="saveSubCategory">
@@ -99,7 +98,6 @@ import { AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import EmptyMessage from "@/components/EmptyMessage.vue";
 import IconEdit from "~icons/lucide/edit-3";
@@ -165,10 +163,8 @@ const columns = [
   },
   {
     label: "Views",
-    icon: "lucide:eye",
     key: "views",
     width: "w-12",
-    align: "m-auto",
   },
   {
     label: "Status",
@@ -176,15 +172,6 @@ const columns = [
     width: "w-40",
   },
 ];
-
-function toArticle(articleId: string) {
-  return {
-    name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
-    params: {
-      articleId,
-    },
-  };
-}
 
 function toNewArticle() {
   router.push({

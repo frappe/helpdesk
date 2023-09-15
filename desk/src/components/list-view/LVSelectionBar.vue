@@ -35,7 +35,6 @@ import { selection } from "./selection";
 
 interface P {
   data: Array<any>;
-  rowKey: string;
   singular?: string;
   plural?: string;
 }
@@ -52,6 +51,6 @@ function toggle() {
     selection.storage.clear();
     return;
   }
-  data.value.forEach((d) => selection.storage.add(d[props.rowKey]));
+  data.value.forEach((d) => selection.storage.add(d.name));
 }
 </script>

@@ -5,7 +5,7 @@
         <RouterLink :to="{ name: AGENT_PORTAL_EMAIL_NEW }">
           <Button label="New email account" theme="gray" variant="solid">
             <template #prefix>
-              <IconPlus class="h-4 w-4" />
+              <LucidePlus class="h-4 w-4" />
             </template>
           </Button>
         </RouterLink>
@@ -13,10 +13,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="accounts.list?.data || []"
-      :empty-message="emptyMessage"
-      class="mt-2.5 grow"
-      row-key="name"
+      :resource="accounts"
+      doctype="Email Account"
+      class="mt-2.5"
     >
       <template #email_id="{ data }">
         <div class="flex justify-between">
@@ -46,19 +45,14 @@
         <FormControl type="checkbox" :model-value="data.enable_outgoing" />
       </template>
     </ListView>
-    <ListNavigation :resource="accounts" />
   </div>
 </template>
 <script setup lang="ts">
 import { usePageMeta, Badge, FormControl } from "frappe-ui";
 import { AGENT_PORTAL_EMAIL_NEW, AGENT_PORTAL_EMAIL_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
-import PageTitle from "@/components/PageTitle.vue";
-import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
-import IconPlus from "~icons/lucide/plus";
+import { ListView, PageTitle } from "@/components";
 
-const emptyMessage = "No Email Accounts Found";
 const columns = [
   {
     label: "Name",

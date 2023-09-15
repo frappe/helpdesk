@@ -34,10 +34,10 @@ import { NestedPopover } from "@/components";
 import { Column } from "@/types";
 
 interface P {
-  id: string;
+  doctype: string;
   columns: Column[];
 }
 
 const props = defineProps<P>();
-const { storage: hidden, toggle } = useColumns(props.id);
+const { storage: hidden, toggle } = useColumns(props.doctype);
 </script>

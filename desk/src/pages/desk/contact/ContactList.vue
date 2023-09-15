@@ -16,10 +16,9 @@
     </PageTitle>
     <ListView
       :columns="columns"
-      :data="contacts.list?.data || []"
-      :empty-message="emptyMessage"
-      class="mt-2.5 grow"
-      row-key="name"
+      :resource="contacts"
+      class="mt-2.5"
+      doctype="Contact"
     >
       <template #name="{ data }">
         <div class="flex items-center gap-2">
@@ -28,7 +27,6 @@
         </div>
       </template>
     </ListView>
-    <ListNavigation :resource="contacts" />
     <NewContactDialog
       v-model="isDialogVisible"
       @contact-created="isDialogVisible = false"
@@ -45,7 +43,6 @@ import { createListManager } from "@/composables/listManager";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
-import ListNavigation from "@/components/ListNavigation.vue";
 import ContactDialog from "./ContactDialog.vue";
 import IconPlus from "~icons/lucide/plus";
 

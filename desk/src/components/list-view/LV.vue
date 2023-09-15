@@ -1,35 +1,26 @@
 <template>
-  <div class="w-full overflow-hidden overflow-x-auto">
+  <div class="flex w-full grow flex-col overflow-hidden overflow-x-auto">
     <div
       class="flex h-full w-max min-w-full flex-col overflow-y-hidden text-gray-900"
     >
-      <LVEmpty v-if="!loading && !data?.length" :empty-message="emptyMessage" />
-      <LVHeader
-        v-else
-        :id="id"
-        :checkbox="checkbox"
-        :columns="columns"
-        :data="data"
-        :row-key="rowKey"
-      />
-      <div class="divide-y overflow-y-auto">
-        <LVLoading
-          v-if="loading"
-          :id="id"
-          :columns="columns"
-          :checkbox="checkbox"
-        />
+      <LVEmpty v-if="!resource.data?.length" :message="emptyMsg" />
+      <LVHeader v-else />
+      <div
+        ref="body"
+        class="grow divide-y overflow-y-auto"
+        @scroll="() => handleScroll()"
+      >
+        <LVLoading v-if="resource.loading" />
         <LVRow
-          v-for="row in data"
+          v-for="row in resource.data"
           v-else
           :id="id"
-          :key="row[rowKey]"
+          :key="row.name"
           :checkbox="checkbox"
           :columns="columns"
           :data="row"
           :doctype="doctype"
           :filter="filter"
-          :row-key="rowKey"
           :to="row.onClick"
         >
           <template v-for="(_, n) in $slots" #[n]="d">
@@ -38,7 +29,8 @@
         </LVRow>
       </div>
     </div>
-    <LVSelectionBar :data="data || []" :row-key="rowKey">
+    <LVNavigation :resource="resource" />
+    <LVSelectionBar :data="resource.data || []">
       <template #actions="d">
         <slot name="actions" v-bind="d" />
       </template>
@@ -47,29 +39,62 @@
 </template>
 
 <script setup lang="ts">
-import { Column } from "@/types";
+import { computed, provide, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useDebounceFn } from "@vueuse/core";
+import { plural } from "pluralize";
+import { Column, Resource } from "@/types";
+import {
+  CheckboxKey,
+  ColumnsKey,
+  DocTypeKey,
+  FilterKey,
+  IdKey,
+  ResourceKey,
+} from "./symbols";
 import LVEmpty from "./LVEmpty.vue";
 import LVHeader from "./LVHeader.vue";
 import LVLoading from "./LVLoading.vue";
+import LVNavigation from "./LVNavigation.vue";
 import LVRow from "./LVRow.vue";
 import LVSelectionBar from "./LVSelectionBar.vue";
 
 interface P {
-  id: string;
   columns: Column[];
   doctype: string;
-  rowKey: string;
+  resource: Resource<Array<Record<string, unknown>>>;
   checkbox?: boolean;
-  data?: Record<string, any>[];
-  emptyMessage?: string;
   filter?: boolean;
-  loading?: boolean;
 }
 
-withDefaults(defineProps<P>(), {
+const props = withDefaults(defineProps<P>(), {
   checkbox: false,
-  emptyMessage: "No records",
   filter: false,
-  loading: false,
 });
+
+const route = useRoute();
+const body = ref<HTMLElement | null>(null);
+const emptyMsg = computed(() => {
+  const s = props.doctype.replace("HD", "").toLowerCase();
+  const p = plural(s);
+  return `No ${p} found`;
+});
+const id = computed(() => {
+  return route.path + "_" + props.doctype;
+});
+const handleScroll = useDebounceFn(() => {
+  if (!props.resource.hasNextPage) return;
+  const bodyHeight = body.value.scrollHeight;
+  const bodyTop = body.value.scrollTop;
+  const containerHeight = body.value.clientHeight;
+  const scrollPercentage = (bodyTop / (bodyHeight - containerHeight)) * 100;
+  if (scrollPercentage >= 90) props.resource.next();
+}, 500);
+
+provide(CheckboxKey, props.checkbox);
+provide(ColumnsKey, props.columns);
+provide(DocTypeKey, props.doctype);
+provide(FilterKey, props.filter);
+provide(IdKey, id.value);
+provide(ResourceKey, props.resource);
 </script>

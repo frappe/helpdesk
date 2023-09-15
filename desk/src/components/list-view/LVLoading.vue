@@ -20,16 +20,12 @@
 </template>
 
 <script setup lang="ts">
-import { Column } from "@/types";
+import { inject } from "vue";
 import { useColumns } from "@/composables/columns";
+import { CheckboxKey, ColumnsKey, IdKey } from "./symbols";
 
-interface P {
-  id: string;
-  checkbox: boolean;
-  columns: Column[];
-}
-
-const props = defineProps<P>();
-
-const { storage: hiddenColumns } = useColumns(props.id);
+const checkbox = inject(CheckboxKey);
+const columns = inject(ColumnsKey);
+const id = inject(IdKey);
+const { storage: hiddenColumns } = useColumns(id);
 </script>
