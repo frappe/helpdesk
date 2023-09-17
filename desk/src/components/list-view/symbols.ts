@@ -1,4 +1,4 @@
-import { InjectionKey } from "vue";
+import { InjectionKey, Ref } from "vue";
 import { Resource, Column } from "@/types";
 
 type I = {
@@ -11,4 +11,6 @@ export const ColumnsKey: InjectionKey<Array<Column>> = Symbol("Columns");
 export const DocTypeKey: InjectionKey<string> = Symbol("DocType");
 export const FilterKey: InjectionKey<boolean> = Symbol("Filter");
 export const IdKey: InjectionKey<string> = Symbol("Id");
+export const PluralKey: InjectionKey<Ref<string>> = Symbol("Plural");
 export const ResourceKey: InjectionKey<R> = Symbol("Resource");
+export const SingluarKey: InjectionKey<Ref<string>> = Symbol("Singular");

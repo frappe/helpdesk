@@ -42,7 +42,7 @@
 import { computed, provide, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useDebounceFn } from "@vueuse/core";
-import { plural } from "pluralize";
+import { plural as pluralize } from "pluralize";
 import { Column, Resource } from "@/types";
 import {
   CheckboxKey,
@@ -50,7 +50,9 @@ import {
   DocTypeKey,
   FilterKey,
   IdKey,
+  PluralKey,
   ResourceKey,
+  SingluarKey,
 } from "./symbols";
 import LVEmpty from "./LVEmpty.vue";
 import LVHeader from "./LVHeader.vue";
@@ -74,10 +76,14 @@ const props = withDefaults(defineProps<P>(), {
 
 const route = useRoute();
 const body = ref<HTMLElement | null>(null);
+const singular = computed(() => {
+  return props.doctype.replace("HD ", "").toLowerCase().trim();
+});
+const plural = computed(() => {
+  return pluralize(singular.value);
+});
 const emptyMsg = computed(() => {
-  const s = props.doctype.replace("HD", "").toLowerCase();
-  const p = plural(s);
-  return `No ${p} found`;
+  return `No foobar found`;
 });
 const id = computed(() => {
   return route.path + "_" + props.doctype;
@@ -96,5 +102,7 @@ provide(ColumnsKey, props.columns);
 provide(DocTypeKey, props.doctype);
 provide(FilterKey, props.filter);
 provide(IdKey, id.value);
+provide(PluralKey, plural);
 provide(ResourceKey, props.resource);
+provide(SingluarKey, singular);
 </script>

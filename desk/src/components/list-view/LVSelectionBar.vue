@@ -20,7 +20,7 @@
       </span>
       <div class="text-gray-300">&#x007C;</div>
       <Button
-        :disabled="data?.length === selection.storage.size"
+        :disabled="resource.data?.length === selection.storage.size"
         label="Select all"
         variant="ghost"
         @click="toggle()"
@@ -30,27 +30,19 @@
 </template>
 
 <script setup lang="ts">
-import { toRef } from "vue";
+import { inject } from "vue";
+import { PluralKey, ResourceKey, SingluarKey } from "./symbols";
 import { selection } from "./selection";
 
-interface P {
-  data: Array<any>;
-  singular?: string;
-  plural?: string;
-}
-
-const props = withDefaults(defineProps<P>(), {
-  singular: "item",
-  plural: "items",
-});
-
-const data = toRef(props, "data");
+const resource = inject(ResourceKey);
+const singular = inject(SingluarKey);
+const plural = inject(PluralKey);
 
 function toggle() {
-  if (selection.storage.size === data.value.length) {
+  if (selection.storage.size === resource.data?.length) {
     selection.storage.clear();
     return;
   }
-  data.value.forEach((d) => selection.storage.add(d.name));
+  resource.data.forEach((d) => selection.storage.add(d.name));
 }
 </script>
