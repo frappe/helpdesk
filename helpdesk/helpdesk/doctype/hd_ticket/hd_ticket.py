@@ -164,6 +164,7 @@ class HDTicket(Document):
 		self.set_contact()
 		self.set_customer()
 		self.set_priority()
+		self.set_first_responded_on()
 		self.apply_escalation_rule()
 		self.set_sla()
 
@@ -220,6 +221,10 @@ class HDTicket(Document):
 			or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
 			or DEFAULT_TICKET_PRIORITY
 		)
+
+	def set_first_responded_on(self):
+		if self.status == "Replied" and not self.first_responded_on:
+			self.first_responded_on = frappe.utils.now_datetime()
 
 	def validate_ticket_type(self):
 		settings = frappe.get_doc("HD Settings")

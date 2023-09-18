@@ -8,7 +8,6 @@ from frappe.utils import (
 	get_datetime,
 	get_weekdays,
 	getdate,
-	get_datetime,
 	now_datetime,
 	time_diff_in_seconds,
 	to_timedelta,
@@ -134,19 +133,15 @@ class HDServiceLevelAgreement(Document):
 	def handle_status(self, doc: Document):
 		if doc.is_new() or not doc.has_value_changed("status"):
 			return
-		self.set_first_responded_at(doc)
+		self.set_first_response_time(doc)
 		self.set_resolution_date(doc)
 		self.set_hold_time(doc)
 
-	def set_first_responded_at(self, doc: Document):
-		next_state = doc.get("status")
-		pause_on = [row.status for row in self.pause_sla_on]
-		is_paused = next_state in pause_on
-		if not is_paused:
-			return
-		doc.first_responded_on = doc.first_responded_on or now_datetime()
+	def set_first_response_time(self, doc: Document):
 		start_at = doc.service_level_agreement_creation
 		end_at = doc.first_responded_on
+		if not start_at or not end_at:
+			return
 		doc.first_response_time = self.calc_elapsed_time(start_at, end_at)
 
 	def set_resolution_date(self, doc: Document):
