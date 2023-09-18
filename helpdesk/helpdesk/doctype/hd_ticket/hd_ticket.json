@@ -199,7 +199,6 @@
   {
    "fieldname": "on_hold_since",
    "fieldtype": "Datetime",
-   "hidden": 1,
    "label": "On Hold Since",
    "read_only": 1
   },
@@ -369,7 +368,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-08-23 17:09:32.958800",
+ "modified": "2023-09-18 13:04:58.499150",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

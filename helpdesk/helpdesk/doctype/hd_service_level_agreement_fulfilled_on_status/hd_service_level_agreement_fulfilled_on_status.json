@@ -13,13 +13,13 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
+   "options": "Open\nReplied\nResolved\nClosed",
    "reqd": 1
   }
  ],
  "istable": 1,
  "links": [],
- "migration_hash": "bca91b0e57956157b4326c47cbc90187",
- "modified": "2021-10-21 14:27:09.773165",
+ "modified": "2023-09-18 12:23:34.266895",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Service Level Agreement Fulfilled On Status",
@@ -28,5 +28,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }
