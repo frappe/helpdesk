@@ -119,8 +119,8 @@ class HDServiceLevelAgreement(Document):
 
 	def apply(self, doc: Document):
 		self.handle_new(doc)
-		self.handle_targets(doc)
 		self.handle_status(doc)
+		self.handle_targets(doc)
 		self.handle_agreement_status(doc)
 
 	def handle_new(self, doc: Document):
@@ -182,8 +182,21 @@ class HDServiceLevelAgreement(Document):
 		doc.total_hold_time = (doc.total_hold_time or 0) + curr_val
 
 	def handle_targets(self, doc: Document):
-		doc.response_by = self.calc_time(doc, "response_time")
-		doc.resolution_by = self.calc_time(doc, "resolution_time")
+		self.set_response_by(doc)
+		self.set_resolution_by(doc)
+
+	def set_response_by(self, doc: Document):
+		start = doc.service_level_agreement_creation
+		doc.response_by = self.calc_time(start, doc.priority, "response_time")
+
+	def set_resolution_by(self, doc: Document):
+		total_hold_time = doc.total_hold_time or 0
+		start = add_to_date(
+			doc.service_level_agreement_creation,
+			seconds=total_hold_time,
+			as_datetime=True,
+		)
+		doc.resolution_by = self.calc_time(start, doc.priority, "resolution_time")
 
 	def reset_resolution_metrics(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]
@@ -227,10 +240,13 @@ class HDServiceLevelAgreement(Document):
 		return get_datetime(doc.resolution_by) < get_datetime(doc.resolution_date)
 
 	def calc_time(
-		self, doc: Document, target: Literal["response_time", "resolution_time"]
+		self,
+		start_at: str,
+		priority: str,
+		target: Literal["response_time", "resolution_time"],
 	):
-		res = get_datetime(doc.service_level_agreement_creation or doc.creation)
-		priority = self.get_priorities()[doc.priority]
+		res = get_datetime(start_at)
+		priority = self.get_priorities()[priority]
 		time_needed = priority.get(target, 0)
 		holidays = self.get_holidays()
 		weekdays = get_weekdays()
