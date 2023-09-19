@@ -56,9 +56,11 @@
             </div>
           </span>
           <span
-            v-if="n.read"
-            class="h-1.5 w-1.5 shrink-0 self-center rounded-full bg-blue-500"
-          />
+            v-if="!n.read"
+            class="flex h-7 w-7 shrink-0 items-center justify-center self-center"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-gray-900" />
+          </span>
         </RouterLink>
       </div>
     </span>

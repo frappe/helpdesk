@@ -7,13 +7,31 @@
     }"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
-    <SidebarLink
-      label=" Notifications"
-      class="mb-4"
-      :icon="LucideInbox"
-      :on-click="() => notificationStore.toggle()"
-      :is-expanded="isExpanded"
-    />
+    <span class="mb-4">
+      <Badge
+        v-if="!isExpanded && notificationStore.unread"
+        :label="notificationStore.unread"
+        class="absolute z-20 -translate-y-3 translate-x-4"
+        theme="gray"
+        variant="solid"
+      />
+      <SidebarLink
+        class="relative"
+        label=" Notifications"
+        :icon="LucideInbox"
+        :on-click="() => notificationStore.toggle()"
+        :is-expanded="isExpanded"
+      >
+        <template #right>
+          <Badge
+            v-if="isExpanded && notificationStore.unread"
+            :label="notificationStore.unread"
+            theme="gray"
+            variant="subtle"
+          />
+        </template>
+      </SidebarLink>
+    </span>
     <div class="mb-4 flex flex-col gap-1">
       <SidebarLink
         v-for="option in menuOptions"

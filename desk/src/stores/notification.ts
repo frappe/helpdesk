@@ -12,6 +12,7 @@ export const useNotificationStore = defineStore("notification", () => {
       "creation",
       "name",
       "notification_type",
+      "read",
       "reference_comment",
       "reference_ticket",
       "user_from",
@@ -19,9 +20,8 @@ export const useNotificationStore = defineStore("notification", () => {
     ],
     orderBy: "creation asc",
     auto: true,
-    initialValue: [],
   });
-  const data = computed(() => resource.data);
+  const data = computed(() => resource.data || []);
   const unread = computed(() => data.value.filter((d) => !d.read).length);
 
   function toggle() {

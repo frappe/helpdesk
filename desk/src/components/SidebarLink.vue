@@ -28,9 +28,11 @@
       }"
     >
       {{ label }}
-      <Tooltip :text="betaText">
-        <Badge v-if="isBeta" theme="orange" variant="subtle">beta</Badge>
-      </Tooltip>
+      <slot name="right">
+        <Tooltip :text="betaText">
+          <Badge v-if="isBeta" theme="orange" variant="subtle">beta</Badge>
+        </Tooltip>
+      </slot>
     </div>
   </div>
 </template>
