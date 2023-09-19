@@ -1,10 +1,20 @@
 <template>
   <div
-    class="-all flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
-    :style="isExpanded ? widthExpanded : widthMinimised"
+    class="z-50 flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    :style="{
+      'min-width': width,
+      'max-width': width,
+    }"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
-    <div class="flex flex-col gap-1">
+    <SidebarLink
+      label=" Notifications"
+      class="mb-4"
+      :icon="LucideInbox"
+      :on-click="() => notificationStore.toggle()"
+      :is-expanded="isExpanded"
+    />
+    <div class="mb-4 flex flex-col gap-1">
       <SidebarLink
         v-for="option in menuOptions"
         v-bind="option"
@@ -13,21 +23,18 @@
         :is-active="option.to?.includes(route.name.toString())"
       />
     </div>
-    <span v-if="showExtra">
-      <hr class="my-2" />
-      <div class="flex flex-col gap-1">
-        <SidebarLink
-          v-for="option in extraOptions.filter((o) => !o.hide)"
-          v-bind="option"
-          :key="option.label"
-          :is-expanded="isExpanded"
-          :is-active="option.to?.includes(route.name?.toString())"
-        />
-      </div>
-    </span>
+    <div class="flex flex-col gap-1">
+      <SidebarLink
+        v-for="option in extraOptions.filter((o) => !o.hide)"
+        v-bind="option"
+        :key="option.label"
+        :is-expanded="isExpanded"
+        :is-active="option.to?.includes(route.name?.toString())"
+      />
+    </div>
     <div class="grow" />
     <SidebarLink
-      :icon="isExpanded ? LucideChevronsLeft : LucideChevronsRight"
+      :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"
       :is-expanded="isExpanded"
       :label="isExpanded ? 'Collapse' : 'Expand'"
@@ -37,11 +44,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useKeymapStore } from "@/stores/keymap";
+import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import {
   AGENT_PORTAL_AGENT_LIST,
@@ -60,15 +68,15 @@ import {
 import { SidebarLink } from "@/components";
 import UserMenu from "./UserMenu.vue";
 import LucideArrowUpFromLine from "~icons/lucide/arrow-up-from-line";
+import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
+import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideAtSign from "~icons/lucide/at-sign";
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideChevronsLeft from "~icons/lucide/chevrons-left";
-import LucideChevronsRight from "~icons/lucide/chevrons-right";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideFolderOpen from "~icons/lucide/folder-open";
+import LucideInbox from "~icons/lucide/inbox";
 import LucideLayoutGrid from "~icons/lucide/layout-grid";
-import LucideMoreHorizontal from "~icons/lucide/more-horizontal";
 import LucideScrollText from "~icons/lucide/scroll-text";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
@@ -79,16 +87,9 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
-const { isExpanded } = storeToRefs(useSidebarStore());
+const notificationStore = useNotificationStore();
+const { isExpanded, width } = storeToRefs(useSidebarStore());
 
-const widthExpanded = {
-  "min-width": "256px",
-  "max-width": "256px",
-};
-const widthMinimised = {
-  "min-width": "50px",
-  "max-width": "50px",
-};
 const menuOptions = computed(() => [
   {
     label: "Tickets",
@@ -110,11 +111,6 @@ const menuOptions = computed(() => [
     icon: LucideBookOpen,
     to: "DeskKBHome",
     isBeta: true,
-  },
-  {
-    label: showExtra.value ? "Less" : "More",
-    icon: LucideMoreHorizontal,
-    onClick: () => (showExtra.value = !showExtra.value),
   },
 ]);
 
@@ -186,6 +182,4 @@ const profileSettings = [
     onClick: () => authStore.logout(),
   },
 ];
-
-const showExtra = ref(!!extraOptions.find((o) => o.to === route.name));
 </script>

@@ -3,7 +3,6 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import {
   frappeRequest,
-  onOutsideClickDirective,
   resourcesPlugin,
   setConfig,
   Badge,
@@ -35,7 +34,6 @@ setConfig("resourceFetcher", frappeRequest);
 const pinia = createPinia();
 const app = createApp(App);
 
-app.directive("on-outside-click", onOutsideClickDirective);
 app.use(resourcesPlugin);
 app.use(pinia);
 app.use(router);
