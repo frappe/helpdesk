@@ -1,4 +1,5 @@
 import frappe
+
 from helpdesk.utils import extract_mentions
 
 

@@ -5,7 +5,7 @@ export { default as FilterPopover } from "./FilterPopover.vue";
 export { default as HCard } from "./HCard.vue";
 export { default as ListView } from "./list-view/LV.vue";
 export { default as NestedPopover } from "./NestedPopover.vue";
-export { default as Notifications } from "./Notifications.vue";
+export { default as Notifications } from "./notifications/Notifications.vue";
 export { default as PageTitle } from "./PageTitle.vue";
 export { default as SearchComplete } from "./SearchComplete.vue";
 export { default as SidebarLink } from "./SidebarLink.vue";
