@@ -8,10 +8,9 @@
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
     <span class="mb-4">
-      <Badge
+      <div
         v-if="!isExpanded && notificationStore.unread"
-        :label="notificationStore.unread"
-        class="absolute z-20 -translate-y-3 translate-x-4"
+        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-gray-800"
         theme="gray"
         variant="solid"
       />

@@ -5,10 +5,10 @@ import { useError } from "@/composables/error";
 import { Notification, Resource } from "@/types";
 
 export const useNotificationStore = defineStore("notification", () => {
-  const visible = ref(true);
+  const visible = ref(false);
   const resource: Resource<Array<Notification>> = createListResource({
     doctype: "HD Notification",
-    // cache: "Notifications",
+    cache: "Notifications",
     fields: [
       "creation",
       "name",
@@ -19,11 +19,11 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_from",
       "user_to",
     ],
-    orderBy: "creation desc",
     auto: true,
+    debounce: 500,
   });
   const clear = createResource({
-    url: "helpdesk.helpdesk.doctype.hd_notification.util.clear",
+    url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
     auto: false,
     onSuccess: () => resource.reload(),
     onError: useError(),

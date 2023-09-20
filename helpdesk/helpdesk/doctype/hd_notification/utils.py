@@ -6,19 +6,17 @@ def clear(user: str = None, ticket: str | int = None, comment: str = None):
 	"""
 	Mark notifications as read. No arguments will clear all notifications for `user`.
 
-	:param user: User to clear notifications for
+	:param user: User to clear notifications for. Defaults to current `user`
 	:param ticket: Ticket to clear notifications for
 	:param comment: Comment to clear notifications for
 	"""
-	QBNotification = frappe.qb.DocType("HD notification")
 	user = user or frappe.session.user
-	q = (
-		frappe.qb.update(QBNotification)
-		.where(QBNotification.user_to == user)
-		.set(QBNotification.read, True)
-	)
+	filters = {"user_to": user, "read": False}
 	if ticket:
-		q = q.where(QBNotification.reference_ticket == ticket)
+		filters["reference_ticket"] = ticket
 	if comment:
-		q = q.where(QBNotification.reference_comment == comment)
-	q.run()
+		filters["reference_comment"] = comment
+	for n in frappe.get_all("HD Notification", filters=filters):
+		d = frappe.get_doc("HD Notification", n.name)
+		d.read = True
+		d.save()
