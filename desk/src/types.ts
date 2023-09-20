@@ -141,3 +141,14 @@ export type File = {
   attached_to_field?: string;
   attached_to_name?: string;
 };
+
+export type Notification = {
+  creation: string;
+  name: string;
+  notification_type: string;
+  read: boolean;
+  reference_comment: string;
+  reference_ticket: string;
+  user_from: string;
+  user_to: string;
+};

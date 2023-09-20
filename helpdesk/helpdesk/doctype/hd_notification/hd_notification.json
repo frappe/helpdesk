@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "details_section",
+  "read",
   "user_from",
   "user_to",
   "notification_type",
@@ -65,11 +66,17 @@
    "fieldname": "details_section",
    "fieldtype": "Section Break",
    "label": "Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "read",
+   "fieldtype": "Check",
+   "label": "Read"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-31 00:20:02.891526",
+ "modified": "2023-09-19 23:49:50.165958",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Notification",

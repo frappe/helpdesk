@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import frappe
 from bs4 import BeautifulSoup
@@ -32,9 +33,25 @@ def is_agent(user: str = None) -> bool:
 	return bool(frappe.db.exists("HD Agent", {"name": user}))
 
 
-def publish_event(event: str, data: dict):
+def publish_event(event: str, data: dict, user: str = None):
+	"""
+	Publish `event` to a room with `data`
+
+	:param event: Event name. Example: "refetch_resource"
+	:param data: Data to be sent with the event
+	:param user: User to send the event to, defaults to current user
+	"""
 	room = get_website_room()
-	frappe.publish_realtime(event, message=data, room=room, after_commit=True)
+	user = user or frappe.session.user
+	frappe.publish_realtime(
+		event, message=data, room=room, after_commit=True, user=user
+	)
+
+
+def refetch_resource(key: str | List[str], user=None):
+	event = "refetch_resource"
+	data = {"cache_key": key}
+	publish_event(event, data, user=user)
 
 
 def capture_event(event: str):
