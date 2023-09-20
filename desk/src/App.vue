@@ -1,7 +1,9 @@
 <template>
-  <RouterView class="antialiased" />
-  <Toasts />
-  <KeymapDialog />
+  <span class="fixed inset-0">
+    <RouterView class="antialiased" />
+    <Toasts />
+    <KeymapDialog />
+  </span>
 </template>
 
 <script setup lang="ts">
