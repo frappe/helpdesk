@@ -22,7 +22,11 @@
       >
         <span class="text-lg font-medium">Notifications</span>
         <span>
-          <Button theme="blue" variant="ghost">
+          <Button
+            theme="blue"
+            variant="ghost"
+            @click="() => notificationStore.clear.submit()"
+          >
             <template #icon>
               <LucideCheckCheck class="h-4 w-4" />
             </template>
@@ -51,15 +55,15 @@
             <div class="mb-2 leading-5">
               <component :is="getBody(n)" v-bind="n" />
             </div>
-            <div class="text-sm text-gray-600">
-              {{ dayjs(n.creation).fromNow() }}
+            <div class="flex items-center gap-2">
+              <div class="text-sm text-gray-600">
+                {{ dayjs(n.creation).fromNow() }}
+              </div>
+              <div
+                v-if="!n.read"
+                class="h-1.5 w-1.5 rounded-full bg-gray-900"
+              />
             </div>
-          </span>
-          <span
-            v-if="!n.read"
-            class="flex h-7 w-7 shrink-0 items-center justify-center self-center"
-          >
-            <span class="h-1.5 w-1.5 rounded-full bg-gray-900" />
           </span>
         </RouterLink>
       </div>

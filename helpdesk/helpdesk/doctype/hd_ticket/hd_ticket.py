@@ -23,6 +23,7 @@ from helpdesk.helpdesk.utils.email import (
 )
 from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
 
+from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
 
 
@@ -562,6 +563,7 @@ class HDTicket(Document):
 	def mark_seen(self):
 		self.add_view()
 		self.add_seen()
+		clear_notifications(ticket=self.name)
 
 	def add_view(self):
 		d = frappe.new_doc("View Log")

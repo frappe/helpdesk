@@ -1,6 +1,7 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { createListResource } from "frappe-ui";
+import { createResource, createListResource } from "frappe-ui";
+import { useError } from "@/composables/error";
 import { Notification, Resource } from "@/types";
 
 export const useNotificationStore = defineStore("notification", () => {
@@ -18,8 +19,14 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_from",
       "user_to",
     ],
-    orderBy: "creation asc",
+    orderBy: "creation desc",
     auto: true,
+  });
+  const clear = createResource({
+    url: "helpdesk.helpdesk.doctype.hd_notification.util.clear",
+    auto: false,
+    onSuccess: () => resource.reload(),
+    onError: useError(),
   });
   const data = computed(() => resource.data || []);
   const unread = computed(() => data.value.filter((d) => !d.read).length);
@@ -29,6 +36,7 @@ export const useNotificationStore = defineStore("notification", () => {
   }
 
   return {
+    clear,
     data,
     toggle,
     unread,
