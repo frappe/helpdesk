@@ -1,5 +1,6 @@
 <template>
   <TransitionRoot
+    ref="target"
     as="div"
     class="fixed z-40 h-screen overflow-auto bg-white"
     :show="notificationStore.visible"
@@ -72,6 +73,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+import { onClickOutside } from "@vueuse/core";
 import { TransitionRoot } from "@headlessui/vue";
 import { dayjs } from "@/dayjs";
 import { Notification } from "@/types";
@@ -82,6 +85,12 @@ import NotificationsMention from "./NotificationsMention.vue";
 
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
+const target = ref(null);
+onClickOutside(target, () => {
+  if (notificationStore.visible) {
+    notificationStore.toggle();
+  }
+});
 
 function getBody(n: Notification) {
   switch (n.notification_type) {
