@@ -1,14 +1,19 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { createResource, createListResource } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
 import { Notification, Resource } from "@/types";
 
 export const useNotificationStore = defineStore("notification", () => {
+  const authStore = useAuthStore();
   const visible = ref(false);
   const resource: Resource<Array<Notification>> = createListResource({
     doctype: "HD Notification",
     cache: "Notifications",
+    filters: {
+      user_to: ["=", authStore.userId],
+    },
     fields: [
       "creation",
       "name",
