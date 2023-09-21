@@ -24,6 +24,7 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_from",
       "user_to",
     ],
+    orded_by: "creation desc",
     auto: true,
     debounce: 500,
   });
