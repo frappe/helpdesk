@@ -2,7 +2,7 @@
   <div class="my-4 rounded border bg-cyan-50 p-4">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-0.5 text-base">
-        <UserAvatar :user="sender" size="lg" expand strong />
+        <UserAvatar v-bind="user" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dayjs(date).long()">
           <div class="text-gray-600">
@@ -36,8 +36,9 @@ import { createResource, Badge, Button, Dropdown, Tooltip } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
-import { useAuthStore } from "@/stores/auth";
 import { createToast } from "@/utils";
+import { useAuthStore } from "@/stores/auth";
+import { UserInfo } from "@/types";
 import { UserAvatar } from "@/components";
 
 interface P {
@@ -45,11 +46,11 @@ interface P {
   date: string;
   isPinned: number;
   name: string;
-  sender: string;
+  user: UserInfo;
 }
 
 const props = defineProps<P>();
-const { content, name, sender, isPinned } = toRefs(props);
+const { content, name, isPinned, user } = toRefs(props);
 const authStore = useAuthStore();
 const IconTrash = h(Icon, { icon: "lucide:trash-2" });
 const IconPin = h(Icon, { icon: "lucide:pin" });
@@ -65,7 +66,7 @@ const options = computed(() =>
       label: "Delete",
       icon: IconTrash,
       onClick: () => deleteComment.submit(),
-      isHidden: sender.value !== authStore.userId,
+      isHidden: user.value.email !== authStore.userId,
     },
   ].filter((i) => !i.isHidden)
 );

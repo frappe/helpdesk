@@ -68,6 +68,7 @@ export interface TicketFeedback {
 
 export interface Ticket {
   _assign: string;
+  assignee: UserInfo;
   agent_group: string;
   customer: string;
   modified: string;
@@ -149,6 +150,12 @@ export type Notification = {
   read: boolean;
   reference_comment: string;
   reference_ticket: string;
-  user_from: string;
-  user_to: string;
+  user_from: UserInfo;
+  user_to: UserInfo;
+};
+
+export type UserInfo = {
+  email: string;
+  image: string;
+  name: string;
 };

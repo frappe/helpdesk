@@ -2,7 +2,7 @@
   <div class="mx-3 pt-6">
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
-        <UserAvatar :user="sender" size="lg" expand strong />
+        <UserAvatar v-bind="user" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dayjs(date).long()">
           <div class="text-gray-600">
@@ -30,6 +30,7 @@ import { Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { Icon } from "@iconify/vue";
 import { dayjs } from "@/dayjs";
+import { UserInfo } from "@/types";
 import { AttachmentItem, UserAvatar } from "@/components";
 
 interface Attachment {
@@ -40,7 +41,7 @@ interface Attachment {
 interface P {
   content: string;
   date: string;
-  sender: string;
+  user: UserInfo;
   cc?: string;
   bcc?: string;
   attachments?: Attachment[];

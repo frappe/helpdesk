@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils import get_user_info_for_avatar
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
@@ -20,13 +21,9 @@ def new(doc, attachments=[]):
 @frappe.whitelist()
 def get_one(name):
 	check_permissions("HD Ticket", None)
-	QBActivity = frappe.qb.DocType("HD Ticket Activity")
-	QBComment = frappe.qb.DocType("HD Ticket Comment")
-	QBCommunication = frappe.qb.DocType("Communication")
 	QBContact = frappe.qb.DocType("Contact")
 	QBFeedback = frappe.qb.DocType("HD Ticket Feedback Option")
 	QBTicket = frappe.qb.DocType("HD Ticket")
-	QBViewLog = frappe.qb.DocType("View Log")
 
 	_is_agent = is_agent()
 
@@ -61,71 +58,22 @@ def get_one(name):
 	if contact:
 		contact = contact[0]
 
-	comments = (
-		frappe.qb.from_(QBComment)
-		.select(
-			QBComment.commented_by,
-			QBComment.content,
-			QBComment.creation,
-			QBComment.is_pinned,
-			QBComment.name,
-		)
-		.where(QBComment.reference_ticket == name)
-		.orderby(QBComment.creation, order=Order.asc)
-	)
-	communications = (
-		frappe.qb.from_(QBCommunication)
-		.select(
-			QBCommunication.bcc,
-			QBCommunication.cc,
-			QBCommunication.content,
-			QBCommunication.creation,
-			QBCommunication.name,
-			QBCommunication.sender,
-		)
-		.where(QBCommunication.reference_doctype == "HD Ticket")
-		.where(QBCommunication.reference_name == name)
-		.orderby(QBCommunication.creation, order=Order.asc)
-		.run(as_dict=True)
-	)
 	feedback = (
 		frappe.qb.from_(QBFeedback)
 		.select(QBFeedback.name, QBFeedback.label, QBFeedback.rating)
 		.where(QBFeedback.name == ticket.feedback)
 	)
 
-	for c in communications:
-		c.attachments = get_attachments("Communication", c.name)
-
-	history = (
-		frappe.qb.from_(QBActivity)
-		.select(
-			QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
-		)
-		.where(QBActivity.ticket == name)
-		.orderby(QBActivity.creation, order=Order.desc)
-	)
-	views = (
-		frappe.qb.from_(QBViewLog)
-		.select(
-			QBViewLog.creation,
-			QBViewLog.name,
-			QBViewLog.viewed_by,
-		)
-		.where(QBViewLog.reference_doctype == "HD Ticket")
-		.where(QBViewLog.reference_name == name)
-		.orderby(QBViewLog.creation, order=Order.desc)
-	)
-
 	return {
 		**ticket,
-		"comments": comments.run(as_dict=True) if _is_agent else [],
-		"communications": communications,
+		"assignee": get_assignee(ticket._assign),
+		"communications": get_communications(name),
+		"comments": get_comments(name),
 		"contact": contact,
 		"feedback": feedback.run(as_dict=True).pop() if ticket.feedback else None,
-		"history": history.run(as_dict=True) if _is_agent else [],
+		"history": get_history(name),
 		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
-		"views": views.run(as_dict=True) if _is_agent else [],
+		"views": get_views(name),
 	}
 
 
@@ -140,6 +88,95 @@ def get_customer_criteria():
 		QBTicket.raised_by == user,
 	]
 	return Criterion.any(conditions)
+
+
+def get_assignee(_assign: str):
+	j = frappe.parse_json(_assign)
+	if len(j) < 1:
+		return
+	return get_user_info_for_avatar(j.pop())
+
+
+def get_communications(ticket: str):
+	QBCommunication = frappe.qb.DocType("Communication")
+	communications = (
+		frappe.qb.from_(QBCommunication)
+		.select(
+			QBCommunication.bcc,
+			QBCommunication.cc,
+			QBCommunication.content,
+			QBCommunication.creation,
+			QBCommunication.name,
+			QBCommunication.sender,
+		)
+		.where(QBCommunication.reference_doctype == "HD Ticket")
+		.where(QBCommunication.reference_name == ticket)
+		.orderby(QBCommunication.creation, order=Order.asc)
+		.run(as_dict=True)
+	)
+	for c in communications:
+		c.attachments = get_attachments("Communication", c.name)
+		c.user = get_user_info_for_avatar(c.sender)
+	return communications
+
+
+def get_comments(ticket: str):
+	if not frappe.has_permission("HD Ticket Comment", "read"):
+		return []
+	QBComment = frappe.qb.DocType("HD Ticket Comment")
+	comments = (
+		frappe.qb.from_(QBComment)
+		.select(
+			QBComment.commented_by,
+			QBComment.content,
+			QBComment.creation,
+			QBComment.is_pinned,
+			QBComment.name,
+		)
+		.where(QBComment.reference_ticket == ticket)
+		.orderby(QBComment.creation, order=Order.asc)
+		.run(as_dict=True)
+	)
+	for c in comments:
+		c.user = get_user_info_for_avatar(c.commented_by)
+	return comments
+
+
+def get_history(ticket: str):
+	if not frappe.has_permission("HD Ticket Activity", "read"):
+		return []
+	QBActivity = frappe.qb.DocType("HD Ticket Activity")
+	history = (
+		frappe.qb.from_(QBActivity)
+		.select(
+			QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
+		)
+		.where(QBActivity.ticket == ticket)
+		.orderby(QBActivity.creation, order=Order.desc)
+	)
+	history = history.run(as_dict=True)
+	for h in history:
+		h.user = get_user_info_for_avatar(h.owner)
+	return history
+
+
+def get_views(ticket: str):
+	QBViewLog = frappe.qb.DocType("View Log")
+	views = (
+		frappe.qb.from_(QBViewLog)
+		.select(
+			QBViewLog.creation,
+			QBViewLog.name,
+			QBViewLog.viewed_by,
+		)
+		.where(QBViewLog.reference_doctype == "HD Ticket")
+		.where(QBViewLog.reference_name == ticket)
+		.orderby(QBViewLog.creation, order=Order.desc)
+		.run(as_dict=True)
+	)
+	for v in views:
+		v.user = get_user_info_for_avatar(v.viewed_by)
+	return views
 
 
 @redis_cache()

@@ -1,14 +1,15 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { createResource, createListResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
+import { createListManager } from "@/composables/listManager";
 import { Notification, Resource } from "@/types";
 
 export const useNotificationStore = defineStore("notification", () => {
   const authStore = useAuthStore();
   const visible = ref(false);
-  const resource: Resource<Array<Notification>> = createListResource({
+  const resource: Resource<Array<Notification>> = createListManager({
     doctype: "HD Notification",
     cache: "Notifications",
     filters: {
@@ -24,9 +25,8 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_from",
       "user_to",
     ],
-    orded_by: "creation desc",
+    orderBy: "creation desc",
     auto: true,
-    debounce: 500,
   });
   const clear = createResource({
     url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",

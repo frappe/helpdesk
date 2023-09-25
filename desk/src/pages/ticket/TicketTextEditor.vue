@@ -59,7 +59,11 @@
     class="flex w-full cursor-pointer items-center gap-2 rounded bg-gray-100 px-3.5 py-2 hover:bg-gray-200"
     @click="() => $emit('update:expand', !expand)"
   >
-    <UserAvatar :user="authStore.userId" size="sm" />
+    <UserAvatar
+      :name="authStore.userName"
+      :image="authStore.userImage"
+      size="sm"
+    />
     <span class="text-base text-gray-700">
       {{ placeholder }}
     </span>
