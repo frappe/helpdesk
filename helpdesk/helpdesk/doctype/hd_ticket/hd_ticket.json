@@ -368,24 +368,13 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-09-18 13:04:58.499150",
+ "modified": "2023-09-27 02:51:13.078952",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
  "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Support Team",
-   "share": 1,
-   "write": 1
-  },
   {
    "create": 1,
    "delete": 1,
@@ -407,7 +396,6 @@
    "read": 1,
    "report": 1,
    "role": "Agent",
-   "select": 1,
    "share": 1,
    "write": 1
   },
