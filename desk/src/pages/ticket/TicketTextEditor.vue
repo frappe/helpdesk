@@ -32,6 +32,11 @@
       <span class="flex">
         <slot name="bottom-left" />
         <FileUploader
+          :upload-args="{
+            doctype: 'HD Ticket',
+            folder: 'Home/Helpdesk',
+            private: true,
+          }"
           @success="(f: File) => $emit('update:attachments', [...attachments, f])"
         >
           <template #default="{ openFileSelector }">
