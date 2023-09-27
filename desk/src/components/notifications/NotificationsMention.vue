@@ -1,20 +1,18 @@
 <template>
   <span class="space-x-1 text-gray-700">
-    <span class="font-medium text-gray-900">{{ user.full_name || user }}</span>
+    <span class="font-medium text-gray-900">{{ user_from.name }}</span>
     <span>mentioned you in ticket</span>
-    <span class="font-medium text-gray-900">{{ props.reference_ticket }}</span>
+    <span class="font-medium text-gray-900">{{ reference_ticket }}</span>
   </span>
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
+import { UserInfo } from "@/types";
 
 interface P {
-  user_from: string;
+  user_from: UserInfo;
   reference_ticket: string;
 }
 
-const props = defineProps<P>();
-const { getUser } = useUserStore();
-const user = getUser(props.user_from);
+defineProps<P>();
 </script>

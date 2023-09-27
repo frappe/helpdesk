@@ -6,14 +6,14 @@
         :name="c.name"
         :content="c.content"
         :date="c.creation"
-        :sender="c.commented_by"
+        :user="c.user"
         :is-pinned="c.is_pinned"
       />
       <TicketCommunication
         v-else
         :content="c.content"
         :date="c.creation"
-        :sender="c.sender"
+        :user="c.user"
         :sender-image="c.sender"
         :cc="c.cc || ''"
         :bcc="c.bcc || ''"

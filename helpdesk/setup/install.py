@@ -4,8 +4,9 @@ import frappe
 from frappe.permissions import add_permission
 
 from .default_template import create_default_template
+from .file import create_helpdesk_folder
 from .ticket_feedback import create_ticket_feedback_options
-from .ticket_type import create_ootb_ticket_types, create_fallback_ticket_type
+from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
 
 
@@ -23,6 +24,7 @@ def after_install():
 	add_system_preset_filters()
 	create_default_template()
 	create_fallback_ticket_type()
+	create_helpdesk_folder()
 	create_ootb_ticket_types()
 	create_welcome_ticket()
 	create_ticket_feedback_options()

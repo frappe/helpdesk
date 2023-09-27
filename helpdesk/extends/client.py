@@ -7,6 +7,7 @@ import math
 import frappe
 from frappe.model.base_document import get_controller
 from frappe.query_builder.functions import Count
+from frappe.utils import get_user_info_for_avatar
 
 from helpdesk.utils import check_permissions
 
@@ -43,7 +44,10 @@ def get_list(
 	if not fields:
 		query = apply_custom_select(doctype, query)
 
-	return query.run(as_dict=True, debug=debug)
+	res = query.run(as_dict=True, debug=debug)
+	res = transform_avatar(doctype, res)
+	res = transform_assign(res)
+	return res
 
 
 @frappe.whitelist()
@@ -136,3 +140,23 @@ def apply_hook(doctype: str, query):
 		return _function(query)
 	except Exception:
 		return query
+
+
+def transform_avatar(doctype: str, r):
+	m = frappe.get_meta(doctype)
+	f = [i for i in m.fields if i.fieldtype == "Link" and i.options == "User"]
+	for i in f:
+		for j in r:
+			if j.get(i.fieldname):
+				j[i.fieldname] = get_user_info_for_avatar(j[i.fieldname])
+	return r
+
+
+def transform_assign(r):
+	for row in r:
+		if assign := row.get("_assign"):
+			j = frappe.parse_json(assign)
+			if len(j) < 1:
+				continue
+			row["assignee"] = get_user_info_for_avatar(j.pop())
+	return r

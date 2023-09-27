@@ -160,7 +160,7 @@ const columns = [
   },
   {
     label: "Assignee",
-    key: "_assign",
+    key: "assignee",
     width: "w-40",
   },
   {

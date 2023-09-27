@@ -5,7 +5,12 @@
     <Dropdown :options="options">
       <template #default="{ open }">
         <div class="flex cursor-pointer items-center gap-1">
-          <UserAvatar :user="authStore.userId" expand strong />
+          <UserAvatar
+            :name="authStore.userName"
+            :image="authStore.userImage"
+            expand
+            strong
+          />
           <div class="text-gray-700">
             <Icon v-if="open" icon="lucide:chevron-up" />
             <Icon v-else icon="lucide:chevron-down" />

@@ -43,7 +43,7 @@
         :to="getRoute(n)"
         @click="() => notificationStore.toggle()"
       >
-        <UserAvatar :user="n.user_from" />
+        <UserAvatar v-bind="n.user_from" />
         <span>
           <div class="mb-2 leading-5">
             <component :is="getBody(n)" v-bind="n" />

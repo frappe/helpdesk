@@ -148,6 +148,16 @@ class HDTicket(Document):
 			"Last modified on": "modified",
 		}
 
+	def has_permission(self, perm):
+		has_standard_permissions = super().has_permission(perm)
+		user = frappe.session.user
+		customer = get_customer(user)
+		is_customer = self.customer == customer
+		is_contact = self.contact == user
+		is_raised = self.raised_by == user
+		has_extra_permissions = is_customer or is_contact or is_raised
+		return has_standard_permissions or has_extra_permissions
+
 	def publish_update(self):
 		publish_event("helpdesk:ticket-update", {"name": self.name})
 		capture_event("ticket_updated")

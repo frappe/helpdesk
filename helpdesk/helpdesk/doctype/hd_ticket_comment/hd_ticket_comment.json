@@ -45,7 +45,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-30 20:10:04.958324",
+ "modified": "2023-09-25 13:06:01.197664",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Comment",
@@ -66,6 +66,7 @@
   },
   {
    "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

@@ -8,7 +8,7 @@
           :key="event.name"
           class="mb-4 ml-4"
         >
-          <TimelineItem :user="event.viewed_by" :date="event.creation" />
+          <TimelineItem :user="event.user" :date="event.creation" />
         </li>
       </ol>
     </div>

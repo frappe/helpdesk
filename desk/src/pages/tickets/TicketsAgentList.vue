@@ -29,8 +29,8 @@
         </span>
       </span>
     </template>
-    <template #_assign="{ data }">
-      <UserAvatar :user="getAssign(data._assign)" expand />
+    <template #assignee="{ data }">
+      <UserAvatar v-bind="data.assignee" expand />
     </template>
     <template #agreement_status="{ data }">
       <Badge

@@ -9,7 +9,7 @@
           class="mb-4 ml-4"
         >
           <TimelineItem
-            :user="event.owner"
+            :user="event.user"
             :date="event.creation"
             :action="event.action"
           />

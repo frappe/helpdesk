@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { useUserStore } from "@/stores/user";
 import { init as initTelemetry } from "@/telemetry";
 import { AuthPages } from "./auth";
 import { CustomerPages } from "./customer";
@@ -232,7 +231,6 @@ export const router = createRouter({
 router.beforeEach(async (to) => {
   const isAuthRoute = AUTH_ROUTES.includes(to.name);
   const authStore = useAuthStore();
-  useUserStore();
 
   try {
     await initTelemetry();
