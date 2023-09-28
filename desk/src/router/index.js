@@ -198,22 +198,6 @@ const routes = [
         props: true,
       },
       {
-        path: "emails",
-        name: AGENT_PORTAL_EMAIL_LIST,
-        component: () => import("@/pages/desk/email/EmailList.vue"),
-      },
-      {
-        path: "emails/new",
-        name: AGENT_PORTAL_EMAIL_NEW,
-        component: () => import("@/pages/desk/email/EmailAccount.vue"),
-      },
-      {
-        path: "emails/:emailAccountId",
-        name: AGENT_PORTAL_EMAIL_SINGLE,
-        component: () => import("@/pages/desk/email/EmailAccount.vue"),
-        props: true,
-      },
-      {
         path: "escalation-rules",
         name: AGENT_PORTAL_ESCALATION_RULE_LIST,
         component: () =>

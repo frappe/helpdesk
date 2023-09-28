@@ -204,14 +204,14 @@
 <script>
 import { ref } from "vue";
 import {
+  Dropdown,
+  ErrorMessage,
   FeatherIcon,
   Input,
   LoadingText,
-  Dropdown,
-  ErrorMessage,
+  Switch,
 } from "frappe-ui";
 import TimeDurationInput from "@/components/desk/global/TimeDurationInput.vue";
-import CustomSwitch from "@/components/global/CustomSwitch.vue";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 
 export default {

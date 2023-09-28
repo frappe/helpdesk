@@ -74,7 +74,6 @@ import {
   AGENT_PORTAL_CONTACT_LIST,
   AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_DASHBOARD,
-  AGENT_PORTAL_EMAIL_LIST,
   AGENT_PORTAL_ESCALATION_RULE_LIST,
   AGENT_PORTAL_SLA_LIST,
   AGENT_PORTAL_TEAM_LIST,
@@ -87,7 +86,6 @@ import UserMenu from "./UserMenu.vue";
 import LucideArrowUpFromLine from "~icons/lucide/arrow-up-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
-import LucideAtSign from "~icons/lucide/at-sign";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
@@ -148,12 +146,6 @@ const extraOptions = [
     icon: LucideArrowUpFromLine,
     to: AGENT_PORTAL_ESCALATION_RULE_LIST,
     isBeta: true,
-  },
-  {
-    label: "Email accounts",
-    icon: LucideAtSign,
-    to: AGENT_PORTAL_EMAIL_LIST,
-    hide: true,
   },
   {
     label: "Ticket types",
