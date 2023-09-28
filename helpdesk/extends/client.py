@@ -5,9 +5,11 @@ import importlib
 import math
 
 import frappe
+from frappe import _
 from frappe.model.base_document import get_controller
 from frappe.query_builder.functions import Count
 from frappe.utils import get_user_info_for_avatar
+from frappe.utils.caching import redis_cache
 
 from helpdesk.utils import check_permissions
 
@@ -26,6 +28,7 @@ def get_list(
 	parent=None,
 	debug=False,
 ):
+	check_allowed(doctype)
 	check_permissions(doctype, parent)
 
 	query = frappe.qb.get_query(
@@ -61,6 +64,7 @@ def get_list_meta(
 	parent=None,
 	debug=False,
 ):
+	check_allowed(doctype)
 	check_permissions(doctype, parent)
 
 	query = frappe.qb.get_query(
@@ -160,3 +164,16 @@ def transform_assign(r):
 				continue
 			row["assignee"] = get_user_info_for_avatar(j.pop())
 	return r
+
+
+@redis_cache()
+def check_allowed(doctype: str):
+	"""
+	Allow only `Helpdesk` doctypes. This is to prevent users from accessing
+	other doctypes.
+
+	:param doctype: Doctype name
+	"""
+	if not frappe.get_meta(doctype).module == "Helpdesk":
+		text = _("You are not allowed to access {0}").format(doctype)
+		frappe.throw(text, frappe.PermissionError)
