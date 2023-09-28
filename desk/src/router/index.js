@@ -23,13 +23,7 @@ export const AGENT_PORTAL_CANNED_RESPONSE_SINGLE = "CannedResponse";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
 export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
-export const AGENT_PORTAL_EMAIL_LIST = "Emails";
-export const AGENT_PORTAL_EMAIL_NEW = "NewEmailAccount";
-export const AGENT_PORTAL_EMAIL_SINGLE = "EmailAccount";
 export const AGENT_PORTAL_ESCALATION_RULE_LIST = "EscalationRules";
-export const AGENT_PORTAL_SLA_LIST = "SlaPolicies";
-export const AGENT_PORTAL_SLA_NEW = "NewSlaPolicy";
-export const AGENT_PORTAL_SLA_SINGLE = "SlaPolicy";
 export const AGENT_PORTAL_TEAM_LIST = "Teams";
 export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "TicketAgent";
@@ -167,22 +161,6 @@ const routes = [
         path: "ticket-types/new",
         name: AGENT_PORTAL_TICKET_TYPE_NEW,
         component: () => import("@/pages/desk/ticket_type/TicketType.vue"),
-      },
-      {
-        path: "sla",
-        name: AGENT_PORTAL_SLA_LIST,
-        component: () => import("@/pages/desk/sla/SlaList.vue"),
-      },
-      {
-        path: "sla/new",
-        name: AGENT_PORTAL_SLA_NEW,
-        component: () => import("@/pages/desk/sla/SlaPolicy.vue"),
-      },
-      {
-        path: "sla/:id",
-        name: AGENT_PORTAL_SLA_SINGLE,
-        component: () => import("@/pages/desk/sla/SlaPolicy.vue"),
-        props: true,
       },
       {
         path: "canned-responses",

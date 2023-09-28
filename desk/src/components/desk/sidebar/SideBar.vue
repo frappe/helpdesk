@@ -75,7 +75,6 @@ import {
   AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_DASHBOARD,
   AGENT_PORTAL_ESCALATION_RULE_LIST,
-  AGENT_PORTAL_SLA_LIST,
   AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
   AGENT_PORTAL_TICKET_TYPE_LIST,
@@ -92,7 +91,6 @@ import LucideContact2 from "~icons/lucide/contact-2";
 import LucideFolderOpen from "~icons/lucide/folder-open";
 import LucideInbox from "~icons/lucide/inbox";
 import LucideLayoutGrid from "~icons/lucide/layout-grid";
-import LucideScrollText from "~icons/lucide/scroll-text";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
@@ -130,12 +128,6 @@ const menuOptions = computed(() => [
 ]);
 
 const extraOptions = [
-  {
-    label: "Support policies",
-    icon: LucideScrollText,
-    to: AGENT_PORTAL_SLA_LIST,
-    hide: true,
-  },
   {
     label: "Teams",
     icon: LucideUsers,
