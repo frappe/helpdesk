@@ -22,7 +22,8 @@ def get_preset_filters(doctype):
 			.where(
 				(
 					(
-						(fd_preset_filter.type == "User") & (fd_preset_filter.user == frappe.session.user)
+						(fd_preset_filter.type == "User")
+						& (fd_preset_filter.user == frappe.session.user)
 					)
 					| (fd_preset_filter.type.isin(["Global", "System"]))
 				)
@@ -39,94 +40,3 @@ def get_preset_filters(doctype):
 			"global" if preset_filter_doc.type in ["Global", "System"] else "user"
 		].append(preset_filter_doc)
 	return options
-
-
-@frappe.whitelist()
-def get_field_data_type(doctype, fieldname):
-	"""_summary_
-
-	Args:
-	                doctype (_type_): Doctype name
-	                fieldname (_type_): Fieldname
-
-	Returns:
-	                String: Data type of the field
-	"""
-
-	# handle special fieldnames
-	if fieldname == "name":
-		return ["Data"]
-	elif fieldname == "_assign":
-		return ["Link", "Agent"]
-	elif fieldname in ["creation", "modified"]:
-		return ["Datetime"]
-
-	field = frappe.get_meta(doctype).get_field(fieldname)
-
-	if not field:
-		return "Data"  # for custom fields, TODO: to be handled properly
-
-	return (
-		[field.fieldtype] if field.fieldtype != "Link" else [field.fieldtype, field.options]
-	)
-
-
-@frappe.whitelist()
-def get_filtered_select_field_options(doctype, fieldname, query):
-	"""_summary_
-
-	Args:
-	                doctype (_type_): Doctype name
-	                fieldname (_type_): Fieldname
-
-	Returns:
-	                List: Filtered list of options for the field
-	"""
-
-	field = frappe.get_meta(doctype).get_field(fieldname)
-	if field.fieldtype == "Select":
-		return [
-			x for x in field.options.split("\n") if query.lower() in x[0 : len(query)].lower()
-		]
-	else:
-		frappe.throw("Select options are only available for Select fields")
-
-
-@frappe.whitelist()
-def save_filter_preset(doctype, is_global, title, filters):
-	"""_summary_
-
-	Args:
-	                doctype (_type_): Doctype name
-	                name (_type_): Name of the preset filter
-	                filters (_type_): Filters
-	                sort_by (_type_): Sort by
-	                sort_order (_type_): Sort order
-
-	Returns:
-	                _type_:
-	"""
-
-	fd_preset_filter_items = []
-	for filter in filters:
-		fd_preset_filter_items.append(
-			{
-				"doctype": "HD Preset Filter Item",
-				"label": filter["label"],
-				"fieldname": filter["fieldname"],
-				"filter_type": filter["filter_type"],
-				"value": filter["value"],
-			}
-		)
-
-	preset_filter = frappe.get_doc(
-		{
-			"doctype": "HD Preset Filter",
-			"reference_doctype": doctype,
-			"type": "Global" if is_global else "User",
-			"title": title,
-			"filters": fd_preset_filter_items,
-		}
-	)
-	preset_filter.save(ignore_permissions=True)
-	return preset_filter.name
