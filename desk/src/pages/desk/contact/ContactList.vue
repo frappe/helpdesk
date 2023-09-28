@@ -9,7 +9,7 @@
           @click="isDialogVisible = !isDialogVisible"
         >
           <template #prefix>
-            <IconPlus class="h-4 w-4" />
+            <LucidePlus class="h-4 w-4" />
           </template>
         </Button>
       </template>
@@ -44,12 +44,10 @@ import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
 import ContactDialog from "./ContactDialog.vue";
-import IconPlus from "~icons/lucide/plus";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
-const emptyMessage = "No Contacts Found";
 const columns = [
   {
     label: "Name",

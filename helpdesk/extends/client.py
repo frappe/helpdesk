@@ -174,6 +174,7 @@ def check_allowed(doctype: str):
 
 	:param doctype: Doctype name
 	"""
-	if not frappe.get_meta(doctype).module == "Helpdesk":
+	allowed = ["Contact"]
+	if not (doctype in allowed or frappe.get_meta(doctype).module == "Helpdesk"):
 		text = _("You are not allowed to access {0}").format(doctype)
 		frappe.throw(text, frappe.PermissionError)
