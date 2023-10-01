@@ -38,7 +38,7 @@ function getUrl() {
   const port = window.location.port ? `:${socketio_port}` : "";
   const protocol = port ? "http" : "https";
   const fVersion = window["frappe_version"];
-  if (fVersion && fVersion.startsWith("v14")) {
+  if (fVersion && fVersion.startsWith("14")) {
     return `${protocol}://${host}${port}`;
   }
   const siteName = window["site_name"];
