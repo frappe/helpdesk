@@ -25,9 +25,10 @@
       >
         <Tab v-for="item in items" :key="item.name" v-slot="{ selected }">
           <div
-            class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-900"
+            class="flex h-7 w-7 items-center justify-center rounded-full text-gray-900 transition-all"
             :class="{
-              'bg-gray-200': isExpanded && selected,
+              shadow: isExpanded && selected,
+              'bg-gray-50': isExpanded && selected,
             }"
             @click="isExpanded = true"
           >
