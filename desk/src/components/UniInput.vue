@@ -1,9 +1,11 @@
 <template>
-  <div class="space-y-1">
-    <div class="text-xs text-gray-600">
+  <div class="space-y-1.5">
+    <span class="block text-sm text-gray-700">
       {{ field.label }}
-      <span v-if="field.required" class="text-red-500">*</span>
-    </div>
+      <span v-if="field.required" class="place-self-center text-red-500">
+        *
+      </span>
+    </span>
     <component
       :is="component"
       :placeholder="placeholder"

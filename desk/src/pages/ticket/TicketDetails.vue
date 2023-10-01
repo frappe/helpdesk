@@ -89,10 +89,10 @@
         'overflow-y': 'scroll',
       }"
     >
-      <div v-for="o in options" :key="o.field" class="flex flex-col gap-1">
-        <div class="text-xs text-gray-600">
+      <div v-for="o in options" :key="o.field" class="space-y-1.5">
+        <span class="block text-sm text-gray-700">
           {{ o.label }}
-        </div>
+        </span>
         <Autocomplete
           :options="o.store.dropdown"
           :placeholder="`Select a ${o.label}`"
