@@ -24,16 +24,18 @@
         }"
       >
         <Tab v-for="item in items" :key="item.name" v-slot="{ selected }">
-          <div
-            class="flex h-7 w-7 items-center justify-center rounded-full text-gray-900 transition-all"
-            :class="{
-              shadow: isExpanded && selected,
-              'bg-gray-50': isExpanded && selected,
-            }"
-            @click="isExpanded = true"
-          >
-            <component :is="item.icon" class="h-4 w-4" />
-          </div>
+          <Tooltip :text="item.name" placement="left">
+            <div
+              class="flex h-7 w-7 items-center justify-center rounded-full text-gray-900 transition-all"
+              :class="{
+                shadow: isExpanded && selected,
+                'bg-gray-50': isExpanded && selected,
+              }"
+              @click="isExpanded = true"
+            >
+              <component :is="item.icon" class="h-4 w-4" />
+            </div>
+          </Tooltip>
         </Tab>
       </TabList>
     </TabGroup>
@@ -42,7 +44,9 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { Tooltip } from "frappe-ui";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
+import TicketActions from "./TicketActions.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
@@ -51,26 +55,32 @@ import LucideInfo from "~icons/lucide/info";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideHistory from "~icons/lucide/history";
 import LucideView from "~icons/lucide/view";
+import LucidePointer from "~icons/lucide/pointer";
 
 const isExpanded = ref(true);
 const items = [
   {
-    name: "Ticket Details",
+    name: "Details",
     component: TicketDetails,
     icon: LucideInfo,
   },
   {
-    name: "Contact Details",
+    name: "Actions",
+    component: TicketActions,
+    icon: LucidePointer,
+  },
+  {
+    name: "Contact",
     component: TicketContact,
     icon: LucideContact2,
   },
   {
-    name: "Ticket History",
+    name: "History",
     component: TicketHistory,
     icon: LucideHistory,
   },
   {
-    name: "Ticket Views",
+    name: "Views",
     component: TicketViews,
     icon: LucideView,
   },
