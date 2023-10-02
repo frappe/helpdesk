@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <div class="border-l">
       <span>
-        <TicketSidebarHeader title="Ticket details" />
+        <TicketSidebarHeader title="Details" />
         <div class="mx-5 my-6 flex flex-col justify-between gap-3.5 text-base">
           <div v-if="data.customer" class="space-y-1.5">
             <span class="block text-sm text-gray-700">Customer</span>
