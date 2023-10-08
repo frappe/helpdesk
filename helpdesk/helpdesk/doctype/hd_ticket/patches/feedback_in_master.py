@@ -12,7 +12,6 @@ def execute():
 			continue
 		if not frappe.db.exists("HD Ticket Feedback Option", t.feedback):
 			continue
-		print(t.feedback)
 		f = frappe.get_doc("HD Ticket Feedback Option", t.feedback)
 		t.db_set("feedback_rating", f.rating)
 		t.db_set("feedback_text", f.label)
