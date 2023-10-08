@@ -51,6 +51,8 @@
   "attachment",
   "content_type",
   "customer_feedback_section",
+  "feedback_rating",
+  "feedback_text",
   "feedback",
   "feedback_extra"
  ],
@@ -363,12 +365,22 @@
    "fieldtype": "Link",
    "label": "Feedback (Option)",
    "options": "HD Ticket Feedback Option"
+  },
+  {
+   "fieldname": "feedback_rating",
+   "fieldtype": "Rating",
+   "label": "Rating"
+  },
+  {
+   "fieldname": "feedback_text",
+   "fieldtype": "Data",
+   "label": "Feedback (Text)"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-09-27 17:10:20.664187",
+ "modified": "2023-10-08 23:24:56.917977",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
