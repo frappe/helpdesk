@@ -176,6 +176,7 @@ class HDTicket(Document):
 		self.set_customer()
 		self.set_priority()
 		self.set_first_responded_on()
+		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
 
@@ -237,6 +238,13 @@ class HDTicket(Document):
 		if self.status == "Replied" and not self.first_responded_on:
 			self.first_responded_on = frappe.utils.now_datetime()
 
+	def set_feedback_values(self):
+		if not self.feedback:
+			return
+		feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
+		self.feedback_rating = feedback_option.rating
+		self.feedback_text = feedback_option.label
+
 	def validate_ticket_type(self):
 		settings = frappe.get_doc("HD Settings")
 		if settings.is_ticket_type_mandatory and not self.ticket_type:
@@ -249,9 +257,6 @@ class HDTicket(Document):
 			or not self.has_value_changed("status")
 			or is_agent()
 		):
-			feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
-			self.feedback_rating = feedback_option.rating
-			self.feedback_text = feedback_option.label
 			return
 		frappe.throw(
 			_("Ticket must be resolved with a feedback"), frappe.ValidationError
