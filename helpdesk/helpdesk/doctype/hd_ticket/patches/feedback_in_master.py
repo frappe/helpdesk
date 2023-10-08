@@ -9,9 +9,9 @@ def execute():
 	for t in frappe.get_all("HD Ticket"):
 		t = frappe.get_doc("HD Ticket", t.name)
 		if not t.feedback:
-			return
+			continue
 		if not frappe.db.exists("HD Ticket Feedback Option", t.feedback):
-			return
+			continue
 		f = frappe.get_doc("HD Ticket Feedback Option", t.feedback)
 		t.db_set("feedback_rating", f.rating)
 		t.db_set("feedback_text", f.label)
