@@ -249,6 +249,9 @@ class HDTicket(Document):
 			or not self.has_value_changed("status")
 			or is_agent()
 		):
+			feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
+			self.feedback_rating = feedback_option.rating
+			self.feedback_text = feedback_option.label
 			return
 		frappe.throw(
 			_("Ticket must be resolved with a feedback"), frappe.ValidationError

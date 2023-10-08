@@ -75,11 +75,11 @@
               {{ ticket.data.via_customer_portal ? "Portal" : "Mail" }}
             </span>
           </div>
-          <div v-if="data.feedback" class="space-y-1.5">
+          <div v-if="data.feedback_rating" class="space-y-1.5">
             <span class="block text-sm text-gray-700">Feedback</span>
-            <StarRating :rating="data.feedback.rating" />
+            <StarRating :rating="data.feedback_rating" />
             <span class="block font-medium text-gray-900">
-              {{ data.feedback.label }}
+              {{ data.feedback_text }}
             </span>
             <span class="block text-gray-900">
               {{ data.feedback_extra }}
