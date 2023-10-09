@@ -84,7 +84,7 @@ def get_customer_criteria():
 
 def get_assignee(_assign: str):
 	j = frappe.parse_json(_assign)
-	if len(j) < 1:
+	if not j or len(j) < 1:
 		return
 	return get_user_info_for_avatar(j.pop())
 
