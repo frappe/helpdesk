@@ -28,3 +28,7 @@ doc_events = {
 		"on_trash": "helpdesk.overrides.on_assignment_rule_trash",
 	},
 }
+
+has_permission = {
+	"HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+}
