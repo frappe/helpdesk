@@ -148,16 +148,6 @@ class HDTicket(Document):
 			"Last modified on": "modified",
 		}
 
-	def has_permission(self, perm):
-		has_standard_permissions = super().has_permission(perm)
-		user = frappe.session.user
-		customer = get_customer(user)
-		is_customer = self.customer == customer
-		is_contact = self.contact == user
-		is_raised = self.raised_by == user
-		has_extra_permissions = is_customer or is_contact or is_raised
-		return has_standard_permissions or has_extra_permissions
-
 	def publish_update(self):
 		publish_event("helpdesk:ticket-update", {"name": self.name})
 		capture_event("ticket_updated")
@@ -176,6 +166,7 @@ class HDTicket(Document):
 		self.set_customer()
 		self.set_priority()
 		self.set_first_responded_on()
+		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
 
@@ -236,6 +227,13 @@ class HDTicket(Document):
 	def set_first_responded_on(self):
 		if self.status == "Replied" and not self.first_responded_on:
 			self.first_responded_on = frappe.utils.now_datetime()
+
+	def set_feedback_values(self):
+		if not self.feedback:
+			return
+		feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
+		self.feedback_rating = feedback_option.rating
+		self.feedback_text = feedback_option.label
 
 	def validate_ticket_type(self):
 		settings = frappe.get_doc("HD Settings")
@@ -715,3 +713,13 @@ class HDTicket(Document):
 	def apply_sla(self):
 		sla = frappe.get_doc("HD Service Level Agreement", self.sla)
 		sla.apply(self)
+
+
+def has_permission(doc):
+	user = frappe.session.user
+	customer = get_customer(user)
+	is_customer = doc.customer == customer
+	is_contact = doc.contact == user
+	is_raised = doc.raised_by == user
+	has_extra_permissions = is_customer or is_contact or is_raised or is_agent()
+	return has_extra_permissions

@@ -22,7 +22,6 @@ def new(doc, attachments=[]):
 def get_one(name):
 	check_permissions("HD Ticket", None)
 	QBContact = frappe.qb.DocType("Contact")
-	QBFeedback = frappe.qb.DocType("HD Ticket Feedback Option")
 	QBTicket = frappe.qb.DocType("HD Ticket")
 
 	_is_agent = is_agent()
@@ -58,19 +57,12 @@ def get_one(name):
 	if contact:
 		contact = contact[0]
 
-	feedback = (
-		frappe.qb.from_(QBFeedback)
-		.select(QBFeedback.name, QBFeedback.label, QBFeedback.rating)
-		.where(QBFeedback.name == ticket.feedback)
-	)
-
 	return {
 		**ticket,
 		"assignee": get_assignee(ticket._assign),
 		"communications": get_communications(name),
 		"comments": get_comments(name),
 		"contact": contact,
-		"feedback": feedback.run(as_dict=True).pop() if ticket.feedback else None,
 		"history": get_history(name),
 		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"views": get_views(name),

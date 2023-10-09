@@ -15,3 +15,4 @@ helpdesk.helpdesk.doctype.hd_ticket_feedback_option.patches.label_as_name
 helpdesk.helpdesk.doctype.hd_service_level_agreement.patches.missing_sla_creation
 helpdesk.helpdesk.doctype.hd_ticket.patches.replace_overdue_failed
 helpdesk.patches.create_helpdesk_folder
+helpdesk.helpdesk.doctype.hd_ticket.patches.feedback_in_master
