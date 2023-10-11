@@ -3,7 +3,6 @@
     <RouterView class="antialiased" />
     <Toasts />
     <KeymapDialog />
-    <CommandPalette />
   </span>
 </template>
 
@@ -12,7 +11,6 @@ import { provide, ref, onMounted } from "vue";
 import { Toasts } from "frappe-ui";
 import { createToast } from "@/utils";
 import { useConfigStore } from "@/stores/config";
-import { CommandPalette } from "@/components";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
 
 useConfigStore();

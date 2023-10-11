@@ -13,6 +13,8 @@ from redis.commands.search.indexDefinition import IndexDefinition
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
+from helpdesk.utils import is_agent
+
 
 class Search:
 	unsafe_chars = re.compile(r"[\[\]{}<>+]")
@@ -186,6 +188,8 @@ class HelpdeskSearch(Search):
 
 @frappe.whitelist()
 def search(query):
+	if not is_agent():
+		return []
 	search = HelpdeskSearch()
 	query = search.clean_query(query)
 	query_parts = query.split(" ")
