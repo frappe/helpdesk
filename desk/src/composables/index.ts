@@ -1,1 +1,1 @@
-export { default as useCommandPalette } from "./commandPalette";
+export { useDevice } from "./device";

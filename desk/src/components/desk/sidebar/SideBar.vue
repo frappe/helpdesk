@@ -16,7 +16,7 @@
     >
       <template #right>
         <span class="flex items-center gap-0.5 font-medium text-gray-600">
-          <LucideCommand class="h-3 w-3" />
+          <component :is="device.modifierIcon" class="h-3 w-3" />
           <span>K</span>
         </span>
       </template>
@@ -94,6 +94,7 @@ import {
   AGENT_PORTAL_TICKET_TYPE_LIST,
   CUSTOMER_PORTAL_LANDING,
 } from "@/router";
+import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import UserMenu from "./UserMenu.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
@@ -117,6 +118,7 @@ const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
+const device = useDevice();
 
 const menuOptions = computed(() => [
   {
