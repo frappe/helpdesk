@@ -2,15 +2,13 @@ import { ComputedRef, ref, Ref } from "vue";
 import { defineStore } from "pinia";
 import { useMagicKeys } from "@vueuse/core";
 import { isEqual } from "lodash";
+import { useDevice } from "@/composables";
 
 type KeyCombination = Array<string>;
 type Handler = () => void;
 type Help = string;
 
-const isMac = navigator.userAgent.indexOf("Mac OS X") != -1;
-const controlKey = isMac ? "⌃" : "Ctrl";
-const altKey = isMac ? "⌥" : "Alt";
-const metaKey = isMac ? "⌘" : "Meta";
+const { isMac, controlKey, altKey, metaKey } = useDevice();
 
 class Shortcut {
   constructor(
