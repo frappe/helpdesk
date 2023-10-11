@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col overflow-hidden">
+  <div class="flex h-full flex-col overflow-hidden">
     <PageTitle v-if="!route.meta.public">
       <template #title>
         <BreadCrumbs
