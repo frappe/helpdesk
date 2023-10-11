@@ -7,16 +7,30 @@
     }"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
+    <SidebarLink
+      label="Search"
+      class="mb-1"
+      :icon="LucideSearch"
+      :on-click="() => openCommandPalette()"
+      :is-expanded="isExpanded"
+    >
+      <template #right>
+        <span class="flex items-center gap-0.5 font-medium text-gray-600">
+          <LucideCommand class="h-3 w-3" />
+          <span>K</span>
+        </span>
+      </template>
+    </SidebarLink>
     <span class="mb-4">
       <div
-        v-if="!isExpanded && notificationStore.unread"
+        v-if="notificationStore.unread"
         class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-gray-800"
         theme="gray"
         variant="solid"
       />
       <SidebarLink
         class="relative"
-        label=" Notifications"
+        label="Notifications"
         :icon="LucideInbox"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
@@ -82,15 +96,16 @@ import {
 } from "@/router";
 import { SidebarLink } from "@/components";
 import UserMenu from "./UserMenu.vue";
-import LucideArrowUpFromLine from "~icons/lucide/arrow-up-from-line";
-import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
+import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
+import LucideArrowUpFromLine from "~icons/lucide/arrow-up-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideFolderOpen from "~icons/lucide/folder-open";
 import LucideInbox from "~icons/lucide/inbox";
 import LucideLayoutGrid from "~icons/lucide/layout-grid";
+import LucideSearch from "~icons/lucide/search";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
@@ -183,4 +198,10 @@ const profileSettings = [
     onClick: () => authStore.logout(),
   },
 ];
+
+function openCommandPalette() {
+  window.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "k", metaKey: true })
+  );
+}
 </script>

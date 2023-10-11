@@ -21,6 +21,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
+from helpdesk.search import HelpdeskSearch
 from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
 
 from ..hd_notification.utils import clear as clear_notifications
@@ -186,6 +187,11 @@ class HDTicket(Document):
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
 		self.publish_update()
+		self.update_search_index()
+
+	def update_search_index(self):
+		search = HelpdeskSearch()
+		search.index_doc(self)
 
 	def set_ticket_type(self):
 		if self.ticket_type:
