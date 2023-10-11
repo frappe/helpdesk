@@ -205,3 +205,21 @@ def search(query):
 	for key in groups:
 		out.append({"title": key, "items": groups[key]})
 	return out
+
+
+def build_index():
+	frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
+	search = HelpdeskSearch()
+	search.build_index()
+	frappe.cache().set_value("helpdesk_search_indexing_in_progress", False)
+
+
+def build_index_in_background():
+	if not frappe.cache().get_value("helpdesk_search_indexing_in_progress"):
+		frappe.enqueue(build_index, queue="long")
+
+
+def build_index_if_not_exists():
+	search = HelpdeskSearch()
+	if not search.index_exists():
+		build_index()

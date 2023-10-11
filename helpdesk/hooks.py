@@ -9,6 +9,12 @@ app_license = "AGPLv3"
 
 before_install = "helpdesk.setup.install.before_install"
 after_install = "helpdesk.setup.install.after_install"
+after_migrate = "helpdesk.search.build_index_in_background"
+
+scheduler_events = {
+	"all": ["helpdesk.search.build_index_if_not_exists"],
+}
+
 
 website_route_rules = [
 	{
