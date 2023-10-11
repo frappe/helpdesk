@@ -714,6 +714,20 @@ class HDTicket(Document):
 		sla = frappe.get_doc("HD Service Level Agreement", self.sla)
 		sla.apply(self)
 
+	# `on_communication_update` is a special method exposed from `Communication` doctype.
+	# It is called when a communication is updated. Beware of changes as this effectively
+	# is an external dependency. Refer `communication.py` of Frappe framework for more.
+	# Since this is called from communication itself, `c` is the communication doc.
+	def on_communication_update(self, c):
+		# If communication is outgoing, then it is a reply from agent.
+		if c.sent_or_received == "Sent":
+			self.status = "Replied"
+		# Fetch description from communication if not set already. This might not be needed
+		# anymore as a communication is created when a ticket is created.
+		self.description = self.description or c.content
+		# Save the ticket, allowing for hooks to run.
+		self.save()
+
 
 def has_permission(doc):
 	user = frappe.session.user

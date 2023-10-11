@@ -18,9 +18,6 @@ website_route_rules = [
 ]
 
 doc_events = {
-	"Communication": {
-		"after_insert": "helpdesk.helpdesk.hooks.communication.after_insert",
-	},
 	"Contact": {
 		"before_insert": "helpdesk.helpdesk.hooks.contact.before_insert",
 	},
