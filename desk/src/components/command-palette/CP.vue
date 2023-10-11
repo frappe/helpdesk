@@ -237,7 +237,7 @@ export default {
         if (
           e.key === "k" &&
           (e.ctrlKey || e.metaKey) &&
-          !e.target.classList.contains("ProseMirror")
+          !e.target.classList?.contains("ProseMirror")
         ) {
           toggleCommandPalette();
           e.preventDefault();
