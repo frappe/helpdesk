@@ -735,11 +735,14 @@ class HDTicket(Document):
 		self.save()
 
 
-def has_permission(doc):
-	user = frappe.session.user
-	customer = get_customer(user)
-	is_customer = doc.customer == customer
-	is_contact = doc.contact == user
-	is_raised = doc.raised_by == user
-	has_extra_permissions = is_customer or is_contact or is_raised or is_agent()
-	return has_extra_permissions
+# Check if `user` has access to this specific ticket (`doc`). This implements extra
+# permission checks which is not possible with standard permission system. This function
+# is being called from hooks. `doc` is the ticket to check against
+def has_permission(doc, user=None):
+	return (
+		doc.contact == user
+		or doc.raised_by == user
+		or doc.owner == user
+		or doc.customer == get_customer(user)
+		or is_agent(user)
+	)
