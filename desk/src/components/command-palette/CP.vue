@@ -67,14 +67,14 @@ import {
   ComboboxOptions,
   ComboboxOption,
 } from "@headlessui/vue";
-import CPTicket from "./CPTicket.vue";
 import CPItem from "./CPItem.vue";
+import CPTicket from "./CPTicket.vue";
+import LucideLayoutGrid from "~icons/lucide/layout-grid";
 import LucideSearch from "~icons/lucide/file-search";
 import LucideTicket from "~icons/lucide/ticket";
-import LucideLayoutGrid from "~icons/lucide/layout-grid";
 import LucideUser from "~icons/lucide/user";
 
-let show = ref(true);
+let show = ref(false);
 
 export function showCommandPalette() {
   show.value = true;
