@@ -166,7 +166,6 @@ class HDTicket(Document):
 		self.set_contact()
 		self.set_customer()
 		self.set_priority()
-		self.set_first_responded_on()
 		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
@@ -229,10 +228,6 @@ class HDTicket(Document):
 			or frappe.get_cached_value("HD Settings", "HD Settings", "default_priority")
 			or DEFAULT_TICKET_PRIORITY
 		)
-
-	def set_first_responded_on(self):
-		if self.status == "Replied" and not self.first_responded_on:
-			self.first_responded_on = frappe.utils.now_datetime()
 
 	def set_feedback_values(self):
 		if not self.feedback:
@@ -725,9 +720,13 @@ class HDTicket(Document):
 	# is an external dependency. Refer `communication.py` of Frappe framework for more.
 	# Since this is called from communication itself, `c` is the communication doc.
 	def on_communication_update(self, c):
-		# If communication is outgoing, then it is a reply from agent.
 		if c.sent_or_received == "Sent":
+			# If communication is outgoing, then it is a reply from agent.
 			self.status = "Replied"
+			# Set first response time. This must be set only once
+			self.first_responded_on = (
+				self.first_responded_on or frappe.utils.now_datetime()
+			)
 		# Fetch description from communication if not set already. This might not be needed
 		# anymore as a communication is created when a ticket is created.
 		self.description = self.description or c.content
