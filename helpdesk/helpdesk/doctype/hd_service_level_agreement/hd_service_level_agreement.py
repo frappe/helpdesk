@@ -95,8 +95,8 @@ class HDServiceLevelAgreement(Document):
 		try:
 			temp_doc = frappe.new_doc(self.document_type)
 			frappe.safe_eval(self.condition, None, get_context(temp_doc))
-		except Exception:
-			frappe.throw(_("The Condition '{0}' is invalid").format(self.condition))
+		except Exception as e:
+			frappe.throw(_("The Condition '{0}' is invalid: {1}").format(self.condition, str(e)))
 
 	# What?
 	def get_hd_service_level_agreement_priority(self, priority):
