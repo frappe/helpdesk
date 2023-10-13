@@ -17,6 +17,8 @@ from helpdesk.utils import get_context
 
 
 class HDServiceLevelAgreement(Document):
+	doctype_ticket = "HD Ticket"
+
 	def validate(self):
 		self.validate_priorities()  # To refactor
 		self.validate_support_and_resolution()  # To refactor
@@ -93,10 +95,12 @@ class HDServiceLevelAgreement(Document):
 		if not self.condition:
 			return
 		try:
-			temp_doc = frappe.new_doc(self.document_type)
+			temp_doc = frappe.new_doc(self.doctype_ticket)
 			frappe.safe_eval(self.condition, None, get_context(temp_doc))
 		except Exception as e:
-			frappe.throw(_("The Condition '{0}' is invalid: {1}").format(self.condition, str(e)))
+			frappe.throw(
+				_("The Condition '{0}' is invalid: {1}").format(self.condition, str(e))
+			)
 
 	# What?
 	def get_hd_service_level_agreement_priority(self, priority):
