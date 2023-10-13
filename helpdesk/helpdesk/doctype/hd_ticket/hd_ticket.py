@@ -725,9 +725,10 @@ class HDTicket(Document):
 	# is an external dependency. Refer `communication.py` of Frappe framework for more.
 	# Since this is called from communication itself, `c` is the communication doc.
 	def on_communication_update(self, c):
-		# If communication is outgoing, then it is a reply from agent.
-		if c.sent_or_received == "Sent":
-			self.status = "Replied"
+		# If communication is incoming, then it is a reply from customer, and ticket must
+		# be reopened.
+		if c.sent_or_received == "Received":
+			self.status = "Open"
 		# Fetch description from communication if not set already. This might not be needed
 		# anymore as a communication is created when a ticket is created.
 		self.description = self.description or c.content
