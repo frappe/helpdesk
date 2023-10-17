@@ -53,7 +53,17 @@
               {{ dayjs(data.resolution_date || data.resolution_by).short() }}
             </span>
             <Badge
-              v-if="!data.resolution_date"
+              v-if="
+                dayjs(data.resolution_date || undefined).isAfter(
+                  data.resolution_by
+                )
+              "
+              label="Failed"
+              theme="red"
+              variant="outline"
+            />
+            <Badge
+              v-else-if="!data.resolution_date"
               label="Due"
               theme="orange"
               variant="outline"
@@ -66,7 +76,6 @@
               theme="green"
               variant="outline"
             />
-            <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
           <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">Modified</span>
