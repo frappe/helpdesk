@@ -116,11 +116,6 @@ class HDServiceLevelAgreement(Document):
 			}
 		)
 
-	def on_trash(self):
-		if self.service_level == "Default":
-			text = _("The Default HD Service Level Agreement cannot be deleted")
-			frappe.throw(text, frappe.PermissionError)
-
 	def apply(self, doc: Document):
 		self.handle_new(doc)
 		self.handle_status(doc)
