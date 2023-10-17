@@ -176,7 +176,6 @@
    "read_only": 1
   },
   {
-   "default": "First Response Due",
    "depends_on": "eval: doc.sla",
    "fieldname": "agreement_status",
    "fieldtype": "Select",
@@ -380,7 +379,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-10-08 23:24:56.917977",
+ "modified": "2023-10-17 13:34:03.649901",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
