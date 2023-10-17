@@ -718,15 +718,13 @@ class HDTicket(Document):
 		"""
 		if sla := get_sla(self):
 			self.sla = sla.name
-		self.sla = None
 
 	def apply_sla(self):
 		"""
-		Apply SLA if set. This won't check whether the SLA exists. Hence, will
-		fail/error if the SLA is deleted.
+		Apply SLA if set.
 		"""
-		if self.sla:
-			frappe.get_doc("HD Service Level Agreement", self.sla).apply(self)
+		if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
+			sla.apply(self)
 
 	# `on_communication_update` is a special method exposed from `Communication` doctype.
 	# It is called when a communication is updated. Beware of changes as this effectively
