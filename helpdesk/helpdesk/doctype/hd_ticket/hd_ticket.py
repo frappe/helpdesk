@@ -713,12 +713,18 @@ class HDTicket(Document):
 		self.assign_agent(escalation_rule.to_agent)
 
 	def set_sla(self):
+		"""
+		Find an SLA to apply to this ticket.
+		"""
 		if sla := get_sla(self):
 			self.sla = sla.name
 
 	def apply_sla(self):
-		sla = frappe.get_doc("HD Service Level Agreement", self.sla)
-		sla.apply(self)
+		"""
+		Apply SLA if set.
+		"""
+		if sla := frappe.get_last_doc("HD Service Level Agreement", {"name": self.sla}):
+			sla.apply(self)
 
 	# `on_communication_update` is a special method exposed from `Communication` doctype.
 	# It is called when a communication is updated. Beware of changes as this effectively

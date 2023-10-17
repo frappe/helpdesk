@@ -34,6 +34,7 @@
     </template>
     <template #agreement_status="{ data }">
       <Badge
+        v-if="data.agreement_status"
         :label="data.agreement_status"
         :theme="slaStatusColorMap[data.agreement_status]"
         variant="outline"

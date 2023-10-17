@@ -16,26 +16,33 @@
               {{ data.customer }}
             </span>
           </div>
-          <div class="space-y-1.5">
-            <span class="block text-sm text-gray-700">First response</span>
-            <span class="mr-2 font-medium text-gray-900">
+          <div
+            v-if="data.first_responded_on || data.response_by"
+            class="space-y-1.5"
+          >
+            <div class="text-sm text-gray-700">First response</div>
+            <div class="mr-2 inline-block font-medium text-gray-900">
               {{ dayjs(data.first_responded_on || data.response_by).short() }}
+            </div>
+            <span v-if="data.response_by">
+              <Badge
+                v-if="!data.first_responded_on"
+                label="Due"
+                theme="orange"
+                variant="outline"
+              />
+              <Badge
+                v-else-if="
+                  dayjs(data.first_responded_on).isBefore(
+                    dayjs(data.response_by)
+                  )
+                "
+                label="Fulfilled"
+                theme="green"
+                variant="outline"
+              />
+              <Badge v-else label="Failed" theme="red" variant="outline" />
             </span>
-            <Badge
-              v-if="!data.first_responded_on"
-              label="Due"
-              theme="orange"
-              variant="outline"
-            />
-            <Badge
-              v-else-if="
-                dayjs(data.first_responded_on).isBefore(dayjs(data.response_by))
-              "
-              label="Fulfilled"
-              theme="green"
-              variant="outline"
-            />
-            <Badge v-else label="Failed" theme="red" variant="outline" />
           </div>
           <div
             v-if="data.resolution_date || data.resolution_by"

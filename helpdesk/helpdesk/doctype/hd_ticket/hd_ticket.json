@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "autoname": "autoincrement",
- "creation": "2022-03-02 03:10:19.254460",
+ "creation": "2023-10-17 14:27:11.078679",
  "doctype": "DocType",
  "document_type": "Setup",
  "email_append_to": 1,
@@ -176,12 +176,11 @@
    "read_only": 1
   },
   {
-   "default": "First Response Due",
    "depends_on": "eval: doc.sla",
    "fieldname": "agreement_status",
    "fieldtype": "Select",
    "label": "SLA Status",
-   "options": "First Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
+   "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
    "read_only": 1
   },
   {
@@ -380,7 +379,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-10-08 23:24:56.917977",
+ "modified": "2023-10-17 16:20:41.301974",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

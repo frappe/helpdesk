@@ -22,6 +22,17 @@ def check_permissions(doctype, parent):
 		frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
 
 
+def is_admin(user: str = None) -> bool:
+	"""
+	Check whether `user` is an admin
+
+	:param user: User to check against, defaults to current user
+	:return: Whether `user` is an admin
+	"""
+	user = user or frappe.session.user
+	return user == "Administrator"
+
+
 def is_agent(user: str = None) -> bool:
 	"""
 	Check whether `user` is an agent
@@ -30,7 +41,7 @@ def is_agent(user: str = None) -> bool:
 	:return: Whether `user` is an agent
 	"""
 	user = user or frappe.session.user
-	return bool(frappe.db.exists("HD Agent", {"name": user}))
+	return is_admin() or bool(frappe.db.exists("HD Agent", {"name": user}))
 
 
 def publish_event(event: str, data: dict, user: str = None):
