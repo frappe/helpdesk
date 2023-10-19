@@ -17,13 +17,19 @@
         v-if="showInput"
         type="text"
         placeholder="Tag"
+        autofocus
         @keydown.enter="addTag.submit({ tag: $event.target.value })"
-      />
+        @keydown.esc="showInput = false"
+      >
+        <template #prefix>
+          <LucideTag class="h-4 w-4" />
+        </template>
+      </FormControl>
       <Button
         v-else
         theme="gray"
         variant="outline"
-        @click="() => (showInput = !showInput)"
+        @click="() => (showInput = true)"
       >
         <template #icon>
           <LucidePlus class="h-4 w-4" />
@@ -35,11 +41,9 @@
 
 <script setup lang="ts">
 import { inject, ref } from "vue";
-import { FormControl, createResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
 import { ITicket } from "./symbols";
-import LucidePlus from "~icons/lucide/plus";
-import LucideX from "~icons/lucide/x";
 
 const showInput = ref(false);
 const ticket = inject(ITicket);
