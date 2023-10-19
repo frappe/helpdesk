@@ -50,13 +50,11 @@ import TicketActions from "./TicketActions.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
-import TicketTags from "./TicketTags.vue";
 import TicketViews from "./TicketViews.vue";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideHistory from "~icons/lucide/history";
 import LucideInfo from "~icons/lucide/info";
 import LucidePointer from "~icons/lucide/pointer";
-import LucideTags from "~icons/lucide/tags";
 import LucideView from "~icons/lucide/view";
 
 const isExpanded = ref(true);
@@ -67,12 +65,7 @@ const items = [
     icon: LucideInfo,
   },
   {
-    name: "Tags",
-    component: TicketTags,
-    icon: LucideTags,
-  },
-  {
-    name: "Actions",
+    name: "Actions & Tags",
     component: TicketActions,
     icon: LucidePointer,
   },
