@@ -22,11 +22,14 @@ export const useAuthStore = defineStore("auth", () => {
   });
 
   const user__ = computed(() => userInfo.data || {});
-  const hasDeskAccess: ComputedRef<boolean> = computed(
-    () => user__.value.has_desk_access
+  const emailSignature: ComputedRef<string> = computed(
+    () => user__.value.email_signature
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
+  const hasDeskAccess: ComputedRef<boolean> = computed(
+    () => isAdmin.value || isAgent.value
+  );
   const isLoggedIn: ComputedRef<boolean> = computed(
     () => !isEmpty(user__.value)
   );
@@ -84,6 +87,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   return {
+    emailSignature,
     hasDeskAccess,
     init,
     isAdmin,
