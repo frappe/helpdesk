@@ -46,7 +46,7 @@
 import { ref } from "vue";
 import { Tooltip } from "frappe-ui";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
-import TicketActions from "./TicketActions.vue";
+import TicketActionsTags from "./TicketActionsTags.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
@@ -66,7 +66,7 @@ const items = [
   },
   {
     name: "Actions & Tags",
-    component: TicketActions,
+    component: TicketActionsTags,
     icon: LucidePointer,
   },
   {

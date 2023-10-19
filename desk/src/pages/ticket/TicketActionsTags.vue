@@ -3,7 +3,7 @@
     <TicketSidebarHeader title="Actions & Tags" />
     <span class="space-y-4 p-5">
       <div class="space-y-2">
-        <div class="text-lg font-medium">Actions</div>
+        <div class="text-base font-medium">Actions</div>
         <div class="flex flex-wrap gap-2 overflow-auto">
           <span v-if="!actions.data" class="text-base">Nothing to show</span>
           <Button
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="space-y-2">
-        <div class="text-lg font-medium">Tags</div>
+        <div class="text-base font-medium">Tags</div>
         <div class="flex flex-wrap gap-2 overflow-auto">
           <Button
             v-for="tag in ticket.data.tags"
