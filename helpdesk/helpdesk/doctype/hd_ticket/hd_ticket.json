@@ -20,6 +20,7 @@
   "sb_details",
   "description",
   "template",
+  "sla_tab",
   "service_level_section",
   "sla",
   "response_by",
@@ -29,11 +30,13 @@
   "service_level_agreement_creation",
   "on_hold_since",
   "total_hold_time",
+  "response_tab",
   "response",
   "first_response_time",
   "first_responded_on",
   "column_break_26",
   "avg_response_time",
+  "resolution_tab",
   "section_break_19",
   "resolution_details",
   "column_break1",
@@ -42,6 +45,7 @@
   "resolution_date",
   "resolution_time",
   "user_resolution_time",
+  "reference_tab",
   "additional_info",
   "contact",
   "customer",
@@ -50,11 +54,13 @@
   "via_customer_portal",
   "attachment",
   "content_type",
+  "feedback_tab",
   "customer_feedback_section",
   "feedback_rating",
   "feedback_text",
   "feedback",
-  "feedback_extra"
+  "feedback_extra",
+  "meta_tab"
  ],
  "fields": [
   {
@@ -152,8 +158,7 @@
   {
    "collapsible": 1,
    "fieldname": "service_level_section",
-   "fieldtype": "Section Break",
-   "label": "SLA Details"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "sla",
@@ -212,8 +217,7 @@
   {
    "collapsible": 1,
    "fieldname": "response",
-   "fieldtype": "Section Break",
-   "label": "Response Details"
+   "fieldtype": "Section Break"
   },
   {
    "bold": 1,
@@ -241,8 +245,7 @@
   {
    "collapsible": 1,
    "fieldname": "section_break_19",
-   "fieldtype": "Section Break",
-   "label": "Resolution Details"
+   "fieldtype": "Section Break"
   },
   {
    "depends_on": "eval:!doc.__islocal",
@@ -305,7 +308,6 @@
    "collapsible": 1,
    "fieldname": "additional_info",
    "fieldtype": "Section Break",
-   "label": "Reference",
    "options": "fa fa-pushpin",
    "read_only": 1
   },
@@ -351,8 +353,7 @@
   },
   {
    "fieldname": "customer_feedback_section",
-   "fieldtype": "Section Break",
-   "label": "Customer Feedback"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "feedback_extra",
@@ -374,12 +375,42 @@
    "fieldname": "feedback_text",
    "fieldtype": "Data",
    "label": "Feedback (Text)"
+  },
+  {
+   "fieldname": "sla_tab",
+   "fieldtype": "Tab Break",
+   "label": "SLA"
+  },
+  {
+   "fieldname": "response_tab",
+   "fieldtype": "Tab Break",
+   "label": "Response"
+  },
+  {
+   "fieldname": "resolution_tab",
+   "fieldtype": "Tab Break",
+   "label": "Resolution"
+  },
+  {
+   "fieldname": "reference_tab",
+   "fieldtype": "Tab Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "feedback_tab",
+   "fieldtype": "Tab Break",
+   "label": "Feedback"
+  },
+  {
+   "fieldname": "meta_tab",
+   "fieldtype": "Tab Break",
+   "label": "Meta"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-10-17 16:20:41.301974",
+ "modified": "2023-10-19 19:23:07.571029",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
