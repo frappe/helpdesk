@@ -60,10 +60,11 @@ def get_one(name):
 	return {
 		**ticket,
 		"assignee": get_assignee(ticket._assign),
-		"communications": get_communications(name),
 		"comments": get_comments(name),
+		"communications": get_communications(name),
 		"contact": contact,
 		"history": get_history(name),
+		"tags": get_tags(name),
 		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"views": get_views(name),
 	}
@@ -169,6 +170,22 @@ def get_views(ticket: str):
 	for v in views:
 		v.user = get_user_info_for_avatar(v.viewed_by)
 	return views
+
+
+def get_tags(ticket: str):
+	QBTag = frappe.qb.DocType("Tag Link")
+	rows = (
+		frappe.qb.from_(QBTag)
+		.select(QBTag.tag)
+		.where(QBTag.document_type == "HD Ticket")
+		.where(QBTag.document_name == ticket)
+		.orderby(QBTag.creation, order=Order.asc)
+		.run(as_dict=True)
+	)
+	res = []
+	for tag in rows:
+		res.append(tag.tag)
+	return res
 
 
 @redis_cache()

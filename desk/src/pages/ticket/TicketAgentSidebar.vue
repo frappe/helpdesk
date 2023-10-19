@@ -46,16 +46,16 @@
 import { ref } from "vue";
 import { Tooltip } from "frappe-ui";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
-import TicketActions from "./TicketActions.vue";
+import TicketActionsTags from "./TicketActionsTags.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
 import TicketViews from "./TicketViews.vue";
-import LucideInfo from "~icons/lucide/info";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideHistory from "~icons/lucide/history";
-import LucideView from "~icons/lucide/view";
+import LucideInfo from "~icons/lucide/info";
 import LucidePointer from "~icons/lucide/pointer";
+import LucideView from "~icons/lucide/view";
 
 const isExpanded = ref(true);
 const items = [
@@ -65,8 +65,8 @@ const items = [
     icon: LucideInfo,
   },
   {
-    name: "Actions",
-    component: TicketActions,
+    name: "Actions & Tags",
+    component: TicketActionsTags,
     icon: LucidePointer,
   },
   {
