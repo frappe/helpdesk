@@ -75,16 +75,17 @@ class HDTicket(Document):
 		QBTeamMember = frappe.qb.DocType("HD Team Member")
 		QBTicket = frappe.qb.DocType("HD Ticket")
 		user = frappe.session.user
-		customer = get_customer(user)
 		conditions = (
 			[
 				QBTicket.contact == user,
-				QBTicket.customer == customer,
 				QBTicket.raised_by == user,
 			]
 			if not is_agent()
 			else []
 		)
+		customer = get_customer(user)
+		for c in customer:
+			conditions.append(QBTicket.customer == c)
 		query = query.where(Criterion.any(conditions))
 
 		enable_restrictions, ignore_restrictions = frappe.get_value(
@@ -219,7 +220,9 @@ class HDTicket(Document):
 		# Skip if `Customer` is already set
 		if self.customer:
 			return
-		self.customer = get_customer(self.contact)
+		customer = get_customer(self.contact)
+		if len(customer) > 0:
+			self.customer = customer[0]
 
 	def set_priority(self):
 		if self.priority:
@@ -750,6 +753,6 @@ def has_permission(doc, user=None):
 		doc.contact == user
 		or doc.raised_by == user
 		or doc.owner == user
-		or doc.customer == get_customer(user)
 		or is_agent(user)
+		or doc.customer in get_customer(user)
 	)
