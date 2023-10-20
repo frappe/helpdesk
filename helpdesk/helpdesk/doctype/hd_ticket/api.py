@@ -72,14 +72,14 @@ def get_one(name):
 
 def get_customer_criteria():
 	QBTicket = frappe.qb.DocType("HD Ticket")
-
 	user = frappe.session.user
-	customer = get_customer(user)
 	conditions = [
 		QBTicket.contact == user,
-		QBTicket.customer == customer,
 		QBTicket.raised_by == user,
 	]
+	customer = get_customer(user)
+	for c in customer:
+		conditions.append(QBTicket.customer == c)
 	return Criterion.any(conditions)
 
 
