@@ -80,7 +80,7 @@ def get_customer(contact: str) -> tuple[str]:
 	QBContact = frappe.qb.DocType("Contact")
 	conditions = [QBDynamicLink.parent == contact, QBContact.email_id == contact]
 	return [
-		i[0][0]
+		i[0]
 		for i in (
 			frappe.qb.from_(QBDynamicLink)
 			.select(QBDynamicLink.link_name)
@@ -89,7 +89,7 @@ def get_customer(contact: str) -> tuple[str]:
 			.join(QBContact)
 			.on(QBDynamicLink.parent == QBContact.name)
 			.where(Criterion.any(conditions))
-			.run(),
+			.run()
 		)
 	]
 
