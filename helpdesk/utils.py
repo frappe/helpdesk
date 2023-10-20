@@ -79,9 +79,9 @@ def get_customer(contact: str) -> tuple[str]:
 	QBDynamicLink = frappe.qb.DocType("Dynamic Link")
 	QBContact = frappe.qb.DocType("Contact")
 	conditions = [QBDynamicLink.parent == contact, QBContact.email_id == contact]
-	return tuple(
-		map(
-			lambda x: x[0],
+	return [
+		i[0][0]
+		for i in (
 			frappe.qb.from_(QBDynamicLink)
 			.select(QBDynamicLink.link_name)
 			.where(QBDynamicLink.parentfield == "links")
@@ -91,7 +91,7 @@ def get_customer(contact: str) -> tuple[str]:
 			.where(Criterion.any(conditions))
 			.run(),
 		)
-	)
+	]
 
 
 def extract_mentions(html):
