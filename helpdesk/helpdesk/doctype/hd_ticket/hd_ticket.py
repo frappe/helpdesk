@@ -234,8 +234,10 @@ class HDTicket(Document):
 		)
 
 	def set_first_responded_on(self):
-		if self.status == "Replied" and not self.first_responded_on:
-			self.first_responded_on = frappe.utils.now_datetime()
+		if self.status == "Replied":
+			self.first_responded_on = (
+				self.first_responded_on or frappe.utils.now_datetime()
+			)
 
 	def set_feedback_values(self):
 		if not self.feedback:
@@ -684,6 +686,12 @@ class HDTicket(Document):
 		# be reopened.
 		if c.sent_or_received == "Received":
 			self.status = "Open"
+		# If communication is outgoing, it must be a reply from agent
+		if c.sent_or_received == "Sent":
+			# Set first response date if not set already
+			self.first_responded_on = (
+				self.first_responded_on or frappe.utils.now_datetime()
+			)
 		# Fetch description from communication if not set already. This might not be needed
 		# anymore as a communication is created when a ticket is created.
 		self.description = self.description or c.content
