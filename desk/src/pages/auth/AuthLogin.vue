@@ -78,7 +78,7 @@
           <a
             v-for="provider in authProviders.data"
             :key="provider.name"
-            class="block h-7 w-full rounded border bg-gray-900 px-3 py-1 text-center text-base text-white -colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            class="block h-7 w-full rounded border bg-gray-900 px-3 py-1 text-center text-base text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400"
             :href="provider.auth_url"
           >
             Login via {{ provider.provider_name }}
@@ -91,12 +91,15 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { createResource, Button, FormControl } from "frappe-ui";
 import { SIGNUP } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import Logo from "~icons/logos/helpdesk";
 
+const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
 const configStore = useConfigStore();
 const showEmailLogin = ref(false);
@@ -111,9 +114,15 @@ const authProviders = createResource({
 });
 
 function submit() {
-  authStore.login.submit({
-    usr: email.value,
-    pwd: password.value,
-  });
+  authStore.login
+    .submit({
+      usr: email.value,
+      pwd: password.value,
+    })
+    .then(() => {
+      if (route.query.redirect) {
+        router.replace({ path: route.query.redirect as string });
+      }
+    });
 }
 </script>
