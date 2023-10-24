@@ -318,26 +318,6 @@ class HDTicket(Document):
 					after_commit=True,
 				)
 
-	def create_communication(self):
-		communication = frappe.new_doc("Communication")
-		communication.update(
-			{
-				"communication_type": "Communication",
-				"communication_medium": "Email",
-				"sent_or_received": "Received",
-				"email_status": "Open",
-				"subject": self.subject,
-				"sender": self.raised_by,
-				"content": self.description,
-				"status": "Linked",
-				"reference_doctype": "HD Ticket",
-				"reference_name": self.name,
-			}
-		)
-		communication.ignore_permissions = True
-		communication.ignore_mandatory = True
-		communication.save(ignore_permissions=True)
-
 	@frappe.whitelist()
 	def assign_agent(self, agent):
 		if not agent:
