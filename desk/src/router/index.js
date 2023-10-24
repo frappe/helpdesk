@@ -203,7 +203,12 @@ router.beforeEach(async (to) => {
     }
   } catch {
     if (!isAuthRoute) {
-      router.replace({ name: LOGIN });
+      router.replace({
+        name: LOGIN,
+        query: {
+          redirect: to.path.toString(),
+        },
+      });
     }
   }
 });
