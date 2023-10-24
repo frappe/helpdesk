@@ -11,10 +11,11 @@ def execute():
 				"sent_or_received": "Sent",
 			},
 			order_by="creation asc",
+			fieldname="creation",
 		)
-		if (
-			not first_communication_creation
-			or first_communication_creation >= ticket.first_responded_on
+		if not first_communication_creation or (
+			ticket.first_responded_on
+			and first_communication_creation >= ticket.first_responded_on
 		):
 			# Already set correctly, or no communication found.
 			continue
