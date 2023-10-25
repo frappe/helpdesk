@@ -33,5 +33,6 @@ doc_events = {
 }
 
 has_permission = {
-	"HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+	"HD Ticket": "helpdesk.perms.ticket",
+	"HD Comment": "helpdesk.perms.comment",
 }
