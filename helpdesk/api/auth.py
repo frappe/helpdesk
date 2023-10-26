@@ -1,6 +1,6 @@
 import frappe
 
-from helpdesk.utils import is_admin, is_agent
+from helpdesk.utils import is_agent as _is_agent
 
 
 @frappe.whitelist()
@@ -8,7 +8,6 @@ def get_user():
 	current_user = frappe.session.user
 	filters = {"name": current_user}
 	fields = [
-		"email_signature",
 		"first_name",
 		"full_name",
 		"name",
@@ -22,15 +21,24 @@ def get_user():
 		as_dict=True,
 	)
 
+	is_agent = _is_agent()
+	is_admin = user.username == "administrator"
+	has_desk_access = is_agent or is_admin
+	user_image = user.user_image
+	user_first_name = user.first_name
+	user_name = user.full_name
+	user_id = user.name
+	username = user.username
+
 	return {
-		"email_signature": user.email_signature,
-		"is_admin": is_admin(),
-		"is_agent": is_agent(),
-		"user_first_name": user.first_name,
-		"user_id": user.name,
-		"user_image": user.user_image,
-		"user_name": user.full_name,
-		"username": user.username,
+		"has_desk_access": has_desk_access,
+		"is_admin": is_admin,
+		"is_agent": is_agent,
+		"user_id": user_id,
+		"user_image": user_image,
+		"user_first_name": user_first_name,
+		"user_name": user_name,
+		"username": username,
 	}
 
 

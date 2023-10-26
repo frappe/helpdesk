@@ -189,7 +189,6 @@ import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import { useAgentStore } from "@/stores/agent";
-import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
 import TicketAgentActions from "./TicketAgentActions.vue";
 import TicketAgentSidebar from "./TicketAgentSidebar.vue";
@@ -211,7 +210,6 @@ enum Mode {
 
 const props = defineProps<P>();
 const agentStore = useAgentStore();
-const authStore = useAuthStore();
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
@@ -267,21 +265,17 @@ const comment = createResource({
 const response = createResource({
   url: "run_doc_method",
   debounce: 300,
-  makeParams: () => {
-    editor.value.editor.commands.insertContent("<br /><br />---<br />");
-    editor.value.editor.commands.insertContent(authStore.emailSignature);
-    return {
-      dt: "HD Ticket",
-      dn: props.ticketId,
-      method: "reply_via_agent",
-      args: {
-        attachments: attachments.value.map((x) => x.name),
-        cc: cc.value,
-        bcc: bcc.value,
-        message: content.value,
-      },
-    };
-  },
+  makeParams: () => ({
+    dt: "HD Ticket",
+    dn: props.ticketId,
+    method: "reply_via_agent",
+    args: {
+      attachments: attachments.value.map((x) => x.name),
+      cc: cc.value,
+      bcc: bcc.value,
+      message: content.value,
+    },
+  }),
   onSuccess: () => {
     clear();
     emitter.emit("update:ticket");
