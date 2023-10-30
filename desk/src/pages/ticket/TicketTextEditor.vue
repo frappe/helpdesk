@@ -33,7 +33,7 @@
         <slot name="bottom-left" />
         <FileUploader
           :upload-args="{
-            doctype: 'HD Ticket',
+            doctype: 'HD Comment',
             folder: 'Home/Helpdesk',
             private: true,
           }"

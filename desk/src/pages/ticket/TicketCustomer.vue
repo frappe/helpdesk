@@ -87,17 +87,18 @@ const showFeedbackDialog = ref(false);
 const isExpanded = ref(false);
 
 const send = createResource({
-  url: "run_doc_method",
+  url: "frappe.client.insert",
   debounce: 300,
   makeParams: () => ({
-    dt: "HD Ticket",
-    dn: props.ticketId,
-    method: "create_communication_via_contact",
-    args: {
-      message: editorContent.value,
+    doc: {
+      doctype: "HD Comment",
+      content: editorContent.value,
       attachments: attachments.value,
+      reference_doctype: "HD Ticket",
+      reference_name: props.ticketId,
     },
   }),
+  auto: false,
   onSuccess: () => {
     editor.value.editor.commands.clearContent(true);
     attachments.value = [];

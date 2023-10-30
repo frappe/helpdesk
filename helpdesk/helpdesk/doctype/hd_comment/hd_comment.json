@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2023-10-25 13:05:31.915738",
+ "creation": "2023-10-25 13:14:16.664207",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -12,9 +12,17 @@
   "column_break_ehal",
   "reference_name",
   "section_break_vdrv",
-  "type",
+  "user",
+  "comment_type",
+  "is_pinned",
   "content",
-  "attachments"
+  "attachments",
+  "mail_tab",
+  "should_send_mail",
+  "mail_to",
+  "mail_cc",
+  "mail_bcc",
+  "column_break_xddd"
  ],
  "fields": [
   {
@@ -47,14 +55,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "type",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Type",
-   "options": "Public\nPrivate",
-   "reqd": 1
-  },
-  {
    "fieldname": "content",
    "fieldtype": "Long Text",
    "in_list_view": 1,
@@ -66,15 +66,80 @@
    "fieldtype": "Table MultiSelect",
    "label": "Attachments",
    "options": "HD Attachment"
+  },
+  {
+   "fieldname": "mail_tab",
+   "fieldtype": "Tab Break",
+   "label": "Mail"
+  },
+  {
+   "fieldname": "column_break_xddd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "should_send_mail",
+   "fieldtype": "Check",
+   "label": "Send mail"
+  },
+  {
+   "fieldname": "mail_to",
+   "fieldtype": "Data",
+   "label": "To",
+   "mandatory_depends_on": "doc.send_mail"
+  },
+  {
+   "fieldname": "mail_cc",
+   "fieldtype": "Data",
+   "label": "Cc"
+  },
+  {
+   "fieldname": "mail_bcc",
+   "fieldtype": "Data",
+   "label": "Bcc"
+  },
+  {
+   "fieldname": "comment_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "Public\nPrivate",
+   "reqd": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_pinned",
+   "fieldtype": "Check",
+   "label": "Pinned"
   }
  ],
  "links": [],
- "modified": "2023-10-25 13:05:31.915738",
+ "modified": "2023-10-30 01:10:13.107523",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Comment",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
