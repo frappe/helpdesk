@@ -27,14 +27,14 @@
         <div class="text-base font-medium">Tags</div>
         <div class="flex flex-wrap gap-2 overflow-auto">
           <Button
-            v-for="tag in ticket.data.tags"
-            :key="tag.name"
-            :label="tag"
+            v-for="t in tags.data"
+            :key="t.name"
+            :label="t.tag"
             theme="gray"
             variant="outline"
           >
             <template #suffix>
-              <LucideX class="h-4 w-4" @click="rmTag.submit({ tag })" />
+              <LucideX class="h-4 w-4" @click="rmTag.submit({ tag: t.tag })" />
             </template>
           </Button>
           <FormControl
@@ -69,9 +69,10 @@
 import { inject, ref } from "vue";
 import { createResource, createListResource } from "frappe-ui";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { ITicket } from "./symbols";
+import { ITicket, Id } from "./symbols";
 
 const ticket = inject(ITicket);
+const id = inject(Id);
 const actions = createListResource({
   doctype: "HD Action",
   auto: true,
@@ -97,6 +98,15 @@ const actions = createListResource({
   },
 });
 const showInput = ref(false);
+const tags = createListResource({
+  doctype: "Tag Link",
+  fields: ["name", "tag"],
+  filters: {
+    document_type: "HD Ticket",
+    document_name: id,
+  },
+  auto: true,
+});
 const addTag = createResource({
   url: "frappe.desk.doctype.tag.tag.add_tag",
   debounce: 300,
@@ -106,7 +116,7 @@ const addTag = createResource({
     dn: ticket.data.name,
   }),
   onSuccess: () => {
-    ticket.reload().then(() => (showInput.value = false));
+    tags.reload().then(() => (showInput.value = false));
   },
 });
 const rmTag = createResource({
@@ -117,7 +127,7 @@ const rmTag = createResource({
     dt: "HD Ticket",
     dn: ticket.data.name,
   }),
-  onSuccess: () => ticket.reload(),
+  onSuccess: () => tags.reload(),
 });
 
 /**

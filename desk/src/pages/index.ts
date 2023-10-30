@@ -10,7 +10,7 @@ export { default as KBHome } from "./knowledge-base/KnowledgeBasePublicHome.vue"
 export { default as KBCategoryPublic } from "./knowledge-base/KnowledgeBasePublicCategory.vue";
 export { default as KBArticlePublic } from "./knowledge-base/KnowledgeBaseArticle.vue";
 
-export { default as TicketAgent } from "./ticket/TicketAgent.vue";
+export { default as TicketAgent } from "./ticket/TicketView.vue";
 export { default as TicketCustomer } from "./ticket/TicketCustomer.vue";
 export { default as TicketNew } from "./ticket/TicketNew.vue";
 export { default as TicketsAgent } from "./tickets/TicketsAgent.vue";

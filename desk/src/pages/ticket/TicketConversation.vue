@@ -30,7 +30,7 @@
 import { inject } from "vue";
 import TicketCommentPrivate from "./TicketCommentPrivate.vue";
 import TicketCommentPublic from "./TicketCommentPublic.vue";
-import { ITicket } from "./symbols";
+import { ITicket, Comments } from "./symbols";
 import { createListManager } from "@/composables/listManager";
 
 interface P {
@@ -41,28 +41,7 @@ const props = withDefaults(defineProps<P>(), {
   focus: "",
 });
 const ticket = inject(ITicket);
-
-const comments = createListManager({
-  doctype: "HD Comment",
-  cache: "TicketComments",
-  fields: [
-    "name",
-    "comment_type",
-    "content",
-    "creation",
-    "is_pinned",
-    "user",
-    {
-      attachments: ["file.file_url", "file.file_name"],
-    },
-  ],
-  filters: {
-    reference_doctype: "HD Ticket",
-    reference_name: ticket.data.name,
-  },
-  orderBy: "creation asc",
-  auto: true,
-});
+const comments = inject(Comments);
 
 // function scroll(id: string) {
 //   const e = document.getElementById(id);

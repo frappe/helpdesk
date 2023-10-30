@@ -9,6 +9,20 @@ from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 
 
 class HDTicketTemplate(Document):
+	def as_dict(self, *args, **kwargs):
+		d = super(HDTicketTemplate, self).as_dict(*args, **kwargs)
+		for (i, v) in enumerate(self.fields):
+			d.fields[i] = v.as_dict() | self.doctype_fields.get(v.fieldname).as_dict()
+		return d
+
+	@property
+	def doctype_fields(self):
+		t = frappe.get_meta("HD Ticket")
+		f = {}
+		for i in t.fields:
+			f[i.fieldname] = i
+		return f
+
 	def validate(self):
 		self.verify_field_exists()
 

@@ -74,7 +74,7 @@ const options = computed(() =>
 const togglePin = createResource({
   url: "frappe.client.set_value",
   makeParams: () => ({
-    doctype: "HD Ticket Comment",
+    doctype: "HD Comment",
     name: name.value,
     fieldname: "is_pinned",
     value: !isPinned.value,

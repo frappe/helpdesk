@@ -19,7 +19,7 @@
         class="flex cursor-pointer items-center gap-2 p-2 text-gray-900 hover:bg-gray-50"
         @click="$emit('focus', c.name)"
       >
-        <UserAvatar :user="c.commented_by" expand strong />
+        <UserAvatar :user="c.user" expand strong />
         <span class="text-gray-500">&mdash;</span>
         <div
           class="prose prose-sm line-clamp-1"
@@ -35,7 +35,7 @@ import { computed, inject, ref } from "vue";
 import sanitizeHtml from "sanitize-html";
 import { Icon } from "@iconify/vue";
 import { UserAvatar } from "@/components";
-import { ITicket } from "./symbols";
+import { Comments } from "./symbols";
 
 interface E {
   (event: "focus", focus: string): void;
@@ -43,9 +43,6 @@ interface E {
 
 defineEmits<E>();
 const isExpanded = ref(false);
-const ticket = inject(ITicket);
-const comments = computed(() => ticket.data.comments || []);
-const pinnedComments = computed(() =>
-  comments.value.filter((c) => c.is_pinned)
-);
+const comments = inject(Comments);
+const pinnedComments = computed(() => comments.data.filter((c) => c.is_pinned));
 </script>

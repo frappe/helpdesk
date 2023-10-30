@@ -10,7 +10,7 @@
             },
           },
           {
-            label: ticket?.data?.subject || title,
+            label: title,
           },
         ]"
       />
@@ -22,17 +22,10 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
 import { BreadCrumbs, PageTitle } from "@/components";
-import { ITicket } from "./symbols";
 
-interface P {
+defineProps<{
   parent: string;
-  title?: string;
-}
-
-withDefaults(defineProps<P>(), {
-  title: "",
-});
-const ticket = inject(ITicket);
+  title: string;
+}>();
 </script>

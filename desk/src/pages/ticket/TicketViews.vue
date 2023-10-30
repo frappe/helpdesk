@@ -17,9 +17,20 @@
 
 <script setup lang="ts">
 import { inject } from "vue";
+import { createListResource } from "frappe-ui";
 import { TimelineItem } from "@/components";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { ITicket } from "./symbols";
+import { ITicket, Id } from "./symbols";
 
 const ticket = inject(ITicket);
+const id = inject(Id);
+const views = createListResource({
+  doctype: "View Log",
+  fields: ["name", "action", "viewed_by", "creation"],
+  filters: {
+    reference_doctype: "HD Ticket",
+    reference_name: id,
+  },
+  auto: true,
+});
 </script>

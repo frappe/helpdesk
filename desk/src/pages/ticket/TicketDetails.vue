@@ -7,7 +7,7 @@
           <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">ID</span>
             <span class="block break-words font-medium text-gray-900">
-              {{ data.name }}
+              {{ id }}
             </span>
           </div>
           <div v-if="data.customer" class="space-y-1.5">
@@ -79,16 +79,16 @@
           </div>
           <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">Modified</span>
-            <Tooltip :text="dayjs(ticket.data.modified).long()">
+            <Tooltip :text="dayjs(data.modified).long()">
               <span class="block break-words font-medium text-gray-900">
-                {{ dayjs(ticket.data.modified).fromNow() }}
+                {{ dayjs(data.modified).fromNow() }}
               </span>
             </Tooltip>
           </div>
           <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">Source</span>
             <span class="block break-words font-medium text-gray-900">
-              {{ ticket.data.via_customer_portal ? "Portal" : "Mail" }}
+              {{ data.via_customer_portal ? "Portal" : "Mail" }}
             </span>
           </div>
           <div v-if="data.feedback_rating" class="space-y-1.5">
@@ -119,15 +119,17 @@
           :options="o.store.dropdown"
           :placeholder="`Select a ${o.label}`"
           :value="data[o.field]"
-          @change="update(o.field, $event.value)"
+          @change="(e) => update.submit({ fieldname: o.field, value: e.value })"
         />
       </div>
       <UniInput
-        v-for="field in data.template.fields"
+        v-for="field in template.doc?.fields"
         :key="field.fieldname"
         :field="field"
         :value="data[field.fieldname]"
-        @change="update(field.fieldname, $event.value)"
+        @change="
+          (e) => update.submit({ fieldname: field.fieldname, value: e.value })
+        "
       />
     </div>
   </div>
@@ -135,7 +137,12 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { createResource, Autocomplete, Tooltip } from "frappe-ui";
+import {
+  createResource,
+  createDocumentResource,
+  Autocomplete,
+  Tooltip,
+} from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
@@ -145,11 +152,11 @@ import { useTicketTypeStore } from "@/stores/ticketType";
 import { useError } from "@/composables/error";
 import { StarRating, UniInput } from "@/components";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { ITicket } from "./symbols";
+import { Id, Ticket } from "./symbols";
 
-const ticket = inject(ITicket);
-const data = computed(() => ticket.data);
-
+const id = inject(Id);
+const ticket = inject(Ticket);
+const data = computed(() => ticket.doc);
 const options = computed(() => [
   {
     field: "ticket_type",
@@ -167,28 +174,30 @@ const options = computed(() => [
     store: useTeamStore(),
   },
 ]);
-
-function update(fieldname: string, value: string) {
-  createResource({
-    url: "frappe.client.set_value",
-    params: {
-      doctype: "HD Ticket",
-      name: data.value.name,
-      fieldname,
-      value,
-    },
-    auto: true,
-    onSuccess: () => {
-      emitter.emit("update:ticket");
-      createToast({
-        title: "Ticket updated",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
-    },
-    onError: useError(),
-  });
-}
+const template = createDocumentResource({
+  doctype: "HD Ticket Template",
+  name: ticket.doc.template,
+  auto: true,
+});
+const update = createResource({
+  url: "frappe.client.set_value",
+  makeParams: (params) => ({
+    doctype: "HD Ticket",
+    name: data.value.name,
+    fieldname: params.fieldname,
+    value: params.value,
+  }),
+  auto: false,
+  onSuccess: () => {
+    emitter.emit("update:ticket");
+    createToast({
+      title: "Ticket updated",
+      icon: "check",
+      iconClasses: "text-green-600",
+    });
+  },
+  onError: useError(),
+});
 </script>
 
 <style scoped>

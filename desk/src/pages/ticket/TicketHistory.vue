@@ -3,13 +3,9 @@
     <TicketSidebarHeader title="History" />
     <div class="overflow-auto p-5">
       <ol class="relative border-l border-gray-200 text-base">
-        <li
-          v-for="event in ticket.data.history"
-          :key="event.name"
-          class="mb-4 ml-4"
-        >
+        <li v-for="event in history.data" :key="event.name" class="mb-4 ml-4">
           <TimelineItem
-            :user="event.user"
+            :user="event.owner"
             :date="event.creation"
             :action="event.action"
           />
@@ -21,9 +17,18 @@
 
 <script setup lang="ts">
 import { inject } from "vue";
+import { createListResource } from "frappe-ui";
 import { TimelineItem } from "@/components";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { ITicket } from "./symbols";
+import { Id } from "./symbols";
 
-const ticket = inject(ITicket);
+const id = inject(Id);
+const history = createListResource({
+  doctype: "HD Ticket Activity",
+  fields: ["name", "action", "owner", "creation"],
+  filters: {
+    ticket: id,
+  },
+  auto: true,
+});
 </script>

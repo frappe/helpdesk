@@ -1,6 +1,6 @@
 <template>
   <div v-if="ticket.data" class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsAgent">
+    <TicketBreadcrumbs parent="TicketsAgent" :title="ticket__.doc?.subject">
       <template #right>
         <TicketAgentActions />
       </template>
@@ -184,12 +184,13 @@ import {
   Button,
   FormControl,
   TabButtons,
+  createDocumentResource,
 } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import { useAgentStore } from "@/stores/agent";
-import { useError } from "@/composables/error";
+import { useError, createListManager } from "@/composables";
 import TicketAgentActions from "./TicketAgentActions.vue";
 import TicketAgentSidebar from "./TicketAgentSidebar.vue";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
@@ -197,7 +198,7 @@ import TicketCannedResponses from "./TicketCannedResponses.vue";
 import TicketConversation from "./TicketConversation.vue";
 import TicketPinnedComments from "./TicketPinnedComments.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
-import { ITicket } from "./symbols";
+import { ITicket, Id, Comments, Ticket } from "./symbols";
 
 interface P {
   ticketId: string;
@@ -218,7 +219,36 @@ const ticket = createResource({
     name: props.ticketId,
   },
 });
+const ticket__ = createDocumentResource({
+  doctype: "HD Ticket",
+  name: props.ticketId,
+  auto: true,
+});
+const comments__ = createListManager({
+  doctype: "HD Comment",
+  cache: "TicketComments",
+  fields: [
+    "name",
+    "comment_type",
+    "content",
+    "creation",
+    "is_pinned",
+    "user",
+    {
+      attachments: ["file.file_url", "file.file_name"],
+    },
+  ],
+  filters: {
+    reference_doctype: "HD Ticket",
+    reference_name: props.ticketId,
+  },
+  orderBy: "creation asc",
+  auto: true,
+});
 provide(ITicket, ticket);
+provide(Id, props.ticketId);
+provide(Comments, comments__);
+provide(Ticket, ticket__);
 const editor = ref(null);
 const placeholder = "Compose a comment / reply";
 const content = ref("");
