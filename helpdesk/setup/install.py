@@ -15,6 +15,7 @@ def before_install():
 
 
 def after_install():
+	create_fallback_ticket_type()
 	add_default_categories_and_articles()
 	add_default_ticket_priorities()
 	add_default_sla()
@@ -23,7 +24,6 @@ def after_install():
 	add_default_assignment_rule()
 	add_system_preset_filters()
 	create_default_template()
-	create_fallback_ticket_type()
 	create_helpdesk_folder()
 	create_ootb_ticket_types()
 	create_welcome_ticket()
