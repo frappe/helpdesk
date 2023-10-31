@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, provide, ref } from "vue";
+import { provide, ref } from "vue";
 import {
   createResource,
   createDocumentResource,
@@ -189,6 +189,7 @@ import { emitter } from "@/emitter";
 import { useAgentStore } from "@/stores/agent";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables";
+import { trackVisit } from "@/resources";
 import { Id, Comments, Ticket } from "./symbols";
 import TicketAgentActions from "./TicketAgentActions.vue";
 import TicketCustomerActions from "./TicketCustomerActions.vue";
@@ -217,7 +218,6 @@ const ticket = createDocumentResource({
   name: props.ticketId,
   whitelistedMethods: {
     assign: "assign_agent",
-    markSeen: "mark_seen",
   },
   auto: true,
   onError: useError(),
@@ -243,6 +243,7 @@ const comments = createListResource({
   orderBy: "creation asc",
   auto: true,
   onError: useError(),
+  onSuccess: () => trackVisit.submit({ dt: "HD Ticket", dn: props.ticketId }),
 });
 provide(Id, props.ticketId);
 provide(Comments, comments);
@@ -291,8 +292,6 @@ function clear() {
   cc.value = "";
   bcc.value = "";
 }
-
-onMounted(() => ticket.markSeen.submit());
 
 usePageMeta(() => {
   return {
