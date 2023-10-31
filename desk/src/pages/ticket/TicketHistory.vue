@@ -4,11 +4,21 @@
     <div class="overflow-auto p-5">
       <ol class="relative border-l border-gray-200 text-base">
         <li v-for="event in history.data" :key="event.name" class="mb-4 ml-4">
-          <TimelineItem
-            :user="event.owner"
-            :date="event.creation"
-            :action="event.action"
-          />
+          <TimelineItem :user="event.user" :date="event.creation">
+            <template #main>
+              <span class="flex flex-wrap gap-1 text-gray-900">
+                <span class="font-medium">{{ event.user.name }}</span>
+                <span class="text-gray-700">changed</span>
+                <span class="font-medium">{{ event.value_change_field }}</span>
+                <span class="text-gray-700">from</span>
+                <span class="font-medium">{{
+                  event.value_change_initial
+                }}</span>
+                <span class="text-gray-700">to</span>
+                <span class="font-medium">{{ event.value_change_final }}</span>
+              </span>
+            </template>
+          </TimelineItem>
         </li>
       </ol>
     </div>
@@ -16,18 +26,27 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { createListResource } from "frappe-ui";
-import { TimelineItem } from "@/components";
-import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { Id } from "./symbols";
+import { inject } from 'vue';
+import { createListResource } from 'frappe-ui';
+import { TimelineItem } from '@/components';
+import { Id } from './symbols';
+import TicketSidebarHeader from './TicketSidebarHeader.vue';
 
 const id = inject(Id);
 const history = createListResource({
-  doctype: "HD Ticket Activity",
-  fields: ["name", "action", "owner", "creation"],
+  doctype: 'HD Activity',
+  fields: [
+    'name',
+    'creation',
+    'user',
+    'value_change_field',
+    'value_change_final',
+    'value_change_initial',
+  ],
   filters: {
-    ticket: id,
+    reference_doctype: 'HD Ticket',
+    reference_name: id,
+    activity_type: 'Value change',
   },
   auto: true,
 });

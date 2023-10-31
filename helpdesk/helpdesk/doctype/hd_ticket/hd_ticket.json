@@ -123,7 +123,7 @@
   {
    "fieldname": "agent_group",
    "fieldtype": "Link",
-   "label": "Agent Group",
+   "label": "Team",
    "options": "HD Team"
   },
   {
@@ -410,7 +410,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-10-19 19:23:07.571029",
+ "modified": "2023-11-01 02:27:34.168848",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

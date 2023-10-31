@@ -1,8 +1,12 @@
 <template>
   <span>
     <LucideDot class="absolute -left-3 h-6 w-6 bg-white text-gray-500" />
-    <div class="mb-1 font-medium text-gray-900 first-letter:capitalize">
-      {{ user.name }} {{ action }}
+    <div class="mb-2">
+      <slot name="main">
+        <div class="font-medium text-gray-900 first-letter:capitalize">
+          {{ user.name }} {{ action }}
+        </div>
+      </slot>
     </div>
     <Tooltip :text="dayjs(date).long()">
       <div class="text-gray-700 first-letter:capitalize">
@@ -13,9 +17,9 @@
 </template>
 
 <script setup lang="ts">
-import { Tooltip } from "frappe-ui";
-import { dayjs } from "@/dayjs";
-import { UserInfo } from "@/types";
+import { Tooltip } from 'frappe-ui';
+import { dayjs } from '@/dayjs';
+import { UserInfo } from '@/types';
 
 interface P {
   user: UserInfo;

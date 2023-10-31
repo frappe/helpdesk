@@ -1,0 +1,136 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-11-01 01:44:52.640360",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "references_section",
+  "reference_doctype",
+  "column_break_cdyp",
+  "reference_name",
+  "section_break_cxba",
+  "user",
+  "column_break_vnzi",
+  "activity_type",
+  "value_change_tab",
+  "value_change_field",
+  "value_change_final",
+  "column_break_mgim",
+  "value_change_initial"
+ ],
+ "fields": [
+  {
+   "fieldname": "references_section",
+   "fieldtype": "Section Break",
+   "label": "References"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Doctype",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_cdyp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_cxba",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vnzi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "activity_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "Value change",
+   "reqd": 1
+  },
+  {
+   "fieldname": "value_change_tab",
+   "fieldtype": "Tab Break",
+   "label": "Value change"
+  },
+  {
+   "fieldname": "value_change_field",
+   "fieldtype": "Data",
+   "label": "Field",
+   "mandatory_depends_on": "doc.activity_type === 'Value change'"
+  },
+  {
+   "fieldname": "value_change_final",
+   "fieldtype": "Data",
+   "label": "Final value"
+  },
+  {
+   "fieldname": "column_break_mgim",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "value_change_initial",
+   "fieldtype": "Data",
+   "label": "Initial value",
+   "mandatory_depends_on": "doc.activity_type === 'Value change'"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-11-01 01:44:52.640360",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Activity",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

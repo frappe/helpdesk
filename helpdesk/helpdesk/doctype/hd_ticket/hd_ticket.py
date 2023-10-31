@@ -21,6 +21,7 @@ from helpdesk.helpdesk.utils.email import (
 	default_outgoing_email_account,
 	default_ticket_outgoing_email_account,
 )
+from helpdesk.mixins.activity import HasActivity
 from helpdesk.search import HelpdeskSearch
 from helpdesk.utils import (
 	capture_event,
@@ -34,7 +35,9 @@ from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
 
 
-class HDTicket(Document):
+class HDTicket(HasActivity, Document):
+	log_fields = ["status", "priority", "agent_group", "ticket_type"]
+
 	@staticmethod
 	def get_list_select(query: Query):
 		QBTicket = frappe.qb.DocType("HD Ticket")
@@ -197,6 +200,7 @@ class HDTicket(Document):
 		self.remove_assignment_if_not_in_team()
 		self.publish_update()
 		self.update_search_index()
+		self.log_activity(custom_fields=True)
 
 	def update_search_index(self):
 		search = HelpdeskSearch()
