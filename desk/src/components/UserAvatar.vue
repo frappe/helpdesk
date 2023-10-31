@@ -14,18 +14,19 @@
   </div>
 </template>
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
+import { Avatar } from 'frappe-ui';
 
-interface P {
-  name: string;
-  image?: string;
-  expand?: boolean;
-  strong?: boolean;
-}
-
-withDefaults(defineProps<P>(), {
-  image: "",
-  expand: false,
-  strong: false,
-});
+withDefaults(
+  defineProps<{
+    name: string;
+    image?: string;
+    expand?: boolean;
+    strong?: boolean;
+  }>(),
+  {
+    image: () => '',
+    expand: () => false,
+    strong: () => false,
+  }
+);
 </script>

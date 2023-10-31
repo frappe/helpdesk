@@ -7,10 +7,11 @@
       <div class="flex gap-1">
         <div class="font-medium text-gray-900">Pinned comments</div>
         <div class="text-gray-600">
-          {{ "(" + pinnedComments.length + ")" }}
+          {{ '(' + pinnedComments.length + ')' }}
         </div>
       </div>
-      <Icon :icon="isExpanded ? 'lucide:chevron-up' : 'lucide:chevron-down'" />
+      <LucideChevronUp v-if="isExpanded" />
+      <LucideChevronDown v-else />
     </div>
     <div v-if="isExpanded" class="divide-y px-5">
       <div
@@ -19,7 +20,7 @@
         class="flex cursor-pointer items-center gap-2 p-2 text-gray-900 hover:bg-gray-50"
         @click="$emit('focus', c.name)"
       >
-        <UserAvatar :user="c.user" expand strong />
+        <UserAvatar v-bind="c.user" expand strong />
         <span class="text-gray-500">&mdash;</span>
         <div
           class="prose prose-sm line-clamp-1"
@@ -31,14 +32,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
-import sanitizeHtml from "sanitize-html";
-import { Icon } from "@iconify/vue";
-import { UserAvatar } from "@/components";
-import { Comments } from "./symbols";
+import { computed, inject, ref } from 'vue';
+import sanitizeHtml from 'sanitize-html';
+import { UserAvatar } from '@/components';
+import { Comments } from './symbols';
 
 interface E {
-  (event: "focus", focus: string): void;
+  (event: 'focus', focus: string): void;
 }
 
 defineEmits<E>();
