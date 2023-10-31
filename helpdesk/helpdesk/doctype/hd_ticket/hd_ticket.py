@@ -150,12 +150,14 @@ class HDTicket(Document):
 			"Last modified on": "modified",
 		}
 
+	def as_dict(self, *args, **kwargs):
+		d = super(HDTicket, self).as_dict(*args, **kwargs)
+		d.assignee = self.get_assigned_agent()
+		return d
+
 	def publish_update(self):
 		publish_event("helpdesk:ticket-update", {"name": self.name})
 		capture_event("ticket_updated")
-
-	def autoname(self):
-		return self.name
 
 	def get_feed(self):
 		return "{0}: {1}".format(_(self.status), self.subject)

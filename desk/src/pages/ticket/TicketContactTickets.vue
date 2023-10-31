@@ -37,17 +37,17 @@
 import { inject, ref } from "vue";
 import { createListResource } from "frappe-ui";
 import { isEmpty } from "lodash";
-import { ITicket } from "./symbols";
+import { Ticket } from "./symbols";
 
-const ticket = inject(ITicket);
+const ticket = inject(Ticket);
 const isExpanded = ref(true);
 const tickets = createListResource({
   doctype: "HD Ticket",
   auto: true,
   fields: ["name", "subject"],
   filters: {
-    name: ["!=", ticket.data.name],
-    contact: ticket.data.contact.name,
+    name: ["!=", ticket.doc.name],
+    contact: ticket.doc.contact,
     status: "Open",
   },
   orderBy: "modified desc",

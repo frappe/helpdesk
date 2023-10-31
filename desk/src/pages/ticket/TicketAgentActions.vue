@@ -3,38 +3,28 @@
     <Autocomplete
       :options="agentStore.dropdown"
       :value="
-        data.assignee
+        ticket.doc.assignee
           ? {
-              label: data.assignee.name,
-              value: data.assignee.email,
+              label: ticket.doc.assignee.agent_name,
+              value: ticket.doc.assignee.user,
             }
           : null
       "
       placeholder="Assign an agent"
-      @change="assignAgent($event.value)"
-    >
-      <template #prefix>
-        <Avatar
-          v-if="data.assignee"
-          class="mr-2"
-          size="sm"
-          :label="data.assignee.name"
-          :image="data.assignee.image"
-        />
-      </template>
-    </Autocomplete>
+      @change="(e) => ticket.assign.submit({ agent: e.value })"
+    />
     <Dropdown
       :options="
         ticketStatusStore.options.map((o) => ({
           label: o,
           value: o,
-          onClick: () => setValue.submit({ field: 'status', value: o }),
+          onClick: () => ticket.setValue.submit({ status: o }),
         }))
       "
     >
       <Button
-        :label="ticket.data.status"
-        :theme="ticketStatusStore.colorMap[ticket.data.status]"
+        :label="ticket.doc.status"
+        :theme="ticketStatusStore.colorMap[ticket.doc.status]"
         variant="subtle"
       >
         <template #suffix>
@@ -46,67 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue";
-import {
-  createResource,
-  Autocomplete,
-  Avatar,
-  Button,
-  Dropdown,
-} from "frappe-ui";
-import { emitter } from "@/emitter";
-import { createToast } from "@/utils";
+import { inject } from "vue";
+import { Autocomplete, Button, Dropdown } from "frappe-ui";
 import { useAgentStore } from "@/stores/agent";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useError } from "@/composables/error";
-import { ITicket } from "./symbols";
+import { Ticket } from "./symbols";
 
-const ticket = inject(ITicket);
+const ticket = inject(Ticket);
 const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
-const data = computed(() => ticket.data);
-
-function assignAgent(agent: string) {
-  createResource({
-    url: "run_doc_method",
-    params: {
-      dt: "HD Ticket",
-      dn: data.value.name,
-      method: "assign_agent",
-      args: {
-        agent,
-      },
-    },
-    auto: true,
-    onSuccess: () => {
-      emitter.emit("update:ticket");
-      createToast({
-        title: `Ticket assigned to ${agent}`,
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
-    },
-    onError: useError(),
-  });
-}
-
-const setValue = createResource({
-  url: "frappe.client.set_value",
-  auto: false,
-  makeParams: (params) => ({
-    doctype: "HD Ticket",
-    name: data.value.name,
-    fieldname: params.field,
-    value: params.value,
-  }),
-  onSuccess: () => {
-    emitter.emit("update:ticket");
-    createToast({
-      title: "Ticket updated",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
-  },
-  onError: useError(),
-});
 </script>

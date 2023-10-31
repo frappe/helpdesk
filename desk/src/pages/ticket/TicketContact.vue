@@ -38,11 +38,11 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { Avatar } from "frappe-ui";
+import { createDocumentResource, Avatar } from "frappe-ui";
 import { isEmpty } from "lodash";
 import TicketContactTickets from "./TicketContactTickets.vue";
 import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { ITicket } from "./symbols";
+import { Ticket } from "./symbols";
 import LucideMail from "~icons/lucide/mail";
 import LucidePhone from "~icons/lucide/phone";
 import LucideSmartphone from "~icons/lucide/smartphone";
@@ -62,13 +62,17 @@ const fields = [
   },
 ];
 
-const ticket = inject(ITicket);
-const contact = computed(() => ticket.data.contact);
+const ticket = inject(Ticket);
+const contact = createDocumentResource({
+  doctype: "Contact",
+  name: ticket.doc.contact,
+  auto: true,
+});
 const contactOptions = computed(() =>
   fields
     .map((o) => ({
       name: o.field,
-      value: contact.value[o.field],
+      value: contact.doc?.[o.field],
       icon: o.icon,
     }))
     .filter((o) => o.value)

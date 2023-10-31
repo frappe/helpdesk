@@ -222,6 +222,10 @@ const ticket = createResource({
 const ticket__ = createDocumentResource({
   doctype: "HD Ticket",
   name: props.ticketId,
+  whitelistedMethods: {
+    assign: "assign_agent",
+    markSeen: "mark_seen",
+  },
   auto: true,
 });
 const comments__ = createListManager({
@@ -261,16 +265,6 @@ const showBcc = ref(false);
 const mode = ref(Mode.Comment);
 const focus = ref("");
 const showCannedResponses = ref(false);
-
-createResource({
-  url: "run_doc_method",
-  params: {
-    dt: "HD Ticket",
-    dn: props.ticketId,
-    method: "mark_seen",
-  },
-  auto: true,
-});
 
 emitter.on("update:ticket", () => ticket.reload());
 
@@ -313,15 +307,16 @@ const events = [
   "helpdesk:ticket-assignee-update",
 ];
 
-onMounted(() =>
+onMounted(() => {
   events.forEach((e) =>
     socket.on(e, (d) => {
       const id = d.name || d.id;
       const shouldReload = !id || id == props.ticketId;
       if (shouldReload) ticket.reload();
     })
-  )
-);
+  );
+  ticket__.markSeen.submit();
+});
 onBeforeUnmount(() => events.forEach((e) => socket.off(e)));
 
 usePageMeta(() => {
