@@ -17,6 +17,7 @@
         </TabPanel>
       </TabPanels>
       <TabList
+        v-if="items.length > 1"
         class="sidebar flex flex-col gap-2 border-l"
         :style="{
           width: '50px',
@@ -43,9 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Tooltip } from "frappe-ui";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
+import { useAuthStore } from "@/stores/auth";
 import TicketActionsTags from "./TicketActionsTags.vue";
 import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
@@ -57,32 +59,38 @@ import LucideInfo from "~icons/lucide/info";
 import LucidePointer from "~icons/lucide/pointer";
 import LucideView from "~icons/lucide/view";
 
+const authStore = useAuthStore();
 const isExpanded = ref(true);
-const items = [
-  {
-    name: "Details",
-    component: TicketDetails,
-    icon: LucideInfo,
-  },
-  {
-    name: "Actions & Tags",
-    component: TicketActionsTags,
-    icon: LucidePointer,
-  },
-  {
-    name: "Contact",
-    component: TicketContact,
-    icon: LucideContact2,
-  },
-  {
-    name: "History",
-    component: TicketHistory,
-    icon: LucideHistory,
-  },
-  {
-    name: "Views",
-    component: TicketViews,
-    icon: LucideView,
-  },
-];
+const items = computed(() =>
+  [
+    {
+      name: "Details",
+      component: TicketDetails,
+      icon: LucideInfo,
+    },
+    {
+      name: "Actions & Tags",
+      component: TicketActionsTags,
+      icon: LucidePointer,
+      hidden: !authStore.isAgent,
+    },
+    {
+      name: "Contact",
+      component: TicketContact,
+      icon: LucideContact2,
+    },
+    {
+      name: "History",
+      component: TicketHistory,
+      icon: LucideHistory,
+      hidden: !authStore.isAgent,
+    },
+    {
+      name: "Views",
+      component: TicketViews,
+      icon: LucideView,
+      hidden: !authStore.isAgent,
+    },
+  ].filter((i) => !i.hidden)
+);
 </script>

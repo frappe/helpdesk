@@ -44,5 +44,7 @@ interface E {
 defineEmits<E>();
 const isExpanded = ref(false);
 const comments = inject(Comments);
-const pinnedComments = computed(() => comments.data.filter((c) => c.is_pinned));
+const pinnedComments = computed(
+  () => comments.data?.filter((c) => c.is_pinned) || []
+);
 </script>

@@ -22,7 +22,13 @@ from helpdesk.helpdesk.utils.email import (
 	default_ticket_outgoing_email_account,
 )
 from helpdesk.search import HelpdeskSearch
-from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
+from helpdesk.utils import (
+	capture_event,
+	get_customer,
+	is_agent,
+	publish_event,
+	refetch_resource,
+)
 
 from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
@@ -335,6 +341,7 @@ class HDTicket(Document):
 		clear_all_assignments("HD Ticket", self.name)
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
+		refetch_resource(["Ticket", self.name])
 
 	def get_assigned_agent(self):
 		# for some reason _assign is not set, maybe a framework bug?

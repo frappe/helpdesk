@@ -1,8 +1,9 @@
 <template>
-  <div v-if="ticket.data" class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsAgent" :title="ticket__.doc?.subject">
+  <div v-if="ticket.doc" class="flex flex-col">
+    <TicketBreadcrumbs parent="TicketsAgent" :title="ticket.doc?.subject">
       <template #right>
-        <TicketAgentActions />
+        <TicketAgentActions v-if="authStore.isAgent" />
+        <TicketCustomerActions v-else />
       </template>
     </TicketBreadcrumbs>
     <div class="flex grow overflow-hidden">
@@ -11,8 +12,9 @@
         <TicketConversation class="grow" :focus="focus">
           <template #communication-top-right="{ message }">
             <Button
+              label="Reply"
               theme="gray"
-              variant="ghost"
+              variant="outline"
               @click="
                 () => {
                   isExpanded = true;
@@ -30,11 +32,7 @@
                   );
                 }
               "
-            >
-              <template #icon>
-                <Icon icon="lucide:reply" />
-              </template>
-            </Button>
+            />
           </template>
         </TicketConversation>
         <span class="m-5">
@@ -74,7 +72,7 @@
               <div class="my-2.5 space-y-2 border-y py-2">
                 <div>
                   <span class="mr-3 text-xs text-gray-500">TO:</span>
-                  <Button :label="ticket.data.raised_by" />
+                  <Button :label="ticket.doc.raised_by" />
                 </div>
                 <div v-if="showCc">
                   <span class="inline-flex flex-wrap items-center gap-1">
@@ -141,7 +139,7 @@
                 @click="showCannedResponses = !showCannedResponses"
               >
                 <template #icon>
-                  <Icon icon="lucide:message-square" />
+                  <LucideMessageSquare class="h-4 w-4" />
                 </template>
               </Button>
             </template>
@@ -177,28 +175,29 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, provide, ref } from "vue";
+import { onMounted, provide, ref } from "vue";
 import {
   createResource,
+  createDocumentResource,
+  createListResource,
   usePageMeta,
   Button,
   FormControl,
   TabButtons,
-  createDocumentResource,
 } from "frappe-ui";
-import { Icon } from "@iconify/vue";
 import { emitter } from "@/emitter";
-import { socket } from "@/socket";
 import { useAgentStore } from "@/stores/agent";
-import { useError, createListManager } from "@/composables";
+import { useAuthStore } from "@/stores/auth";
+import { useError } from "@/composables";
+import { Id, Comments, Ticket } from "./symbols";
 import TicketAgentActions from "./TicketAgentActions.vue";
+import TicketCustomerActions from "./TicketCustomerActions.vue";
 import TicketAgentSidebar from "./TicketAgentSidebar.vue";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketCannedResponses from "./TicketCannedResponses.vue";
 import TicketConversation from "./TicketConversation.vue";
 import TicketPinnedComments from "./TicketPinnedComments.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
-import { ITicket, Id, Comments, Ticket } from "./symbols";
 
 interface P {
   ticketId: string;
@@ -211,26 +210,21 @@ enum Mode {
 
 const props = defineProps<P>();
 const agentStore = useAgentStore();
-const ticket = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
-  auto: true,
-  params: {
-    name: props.ticketId,
-  },
-});
-const ticket__ = createDocumentResource({
+const authStore = useAuthStore();
+const ticket = createDocumentResource({
   doctype: "HD Ticket",
+  cache: ["Ticket", props.ticketId],
   name: props.ticketId,
   whitelistedMethods: {
     assign: "assign_agent",
     markSeen: "mark_seen",
   },
   auto: true,
+  onError: useError(),
 });
-const comments__ = createListManager({
+const comments = createListResource({
   doctype: "HD Comment",
-  cache: "TicketComments",
+  cache: ["Comments", props.ticketId],
   fields: [
     "name",
     "comment_type",
@@ -248,11 +242,11 @@ const comments__ = createListManager({
   },
   orderBy: "creation asc",
   auto: true,
+  onError: useError(),
 });
-provide(ITicket, ticket);
 provide(Id, props.ticketId);
-provide(Comments, comments__);
-provide(Ticket, ticket__);
+provide(Comments, comments);
+provide(Ticket, ticket);
 const editor = ref(null);
 const placeholder = "Compose a comment / reply";
 const content = ref("");
@@ -298,30 +292,11 @@ function clear() {
   bcc.value = "";
 }
 
-const events = [
-  "helpdesk:new-communication",
-  "helpdesk:new-ticket-comment",
-  "helpdesk:delete-ticket-comment",
-  "helpdesk:ticket-update",
-  "helpdesk:update-ticket-assignee",
-  "helpdesk:ticket-assignee-update",
-];
-
-onMounted(() => {
-  events.forEach((e) =>
-    socket.on(e, (d) => {
-      const id = d.name || d.id;
-      const shouldReload = !id || id == props.ticketId;
-      if (shouldReload) ticket.reload();
-    })
-  );
-  ticket__.markSeen.submit();
-});
-onBeforeUnmount(() => events.forEach((e) => socket.off(e)));
+onMounted(() => ticket.markSeen.submit());
 
 usePageMeta(() => {
   return {
-    title: ticket.data?.subject,
+    title: ticket.doc?.subject,
   };
 });
 </script>

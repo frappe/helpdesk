@@ -4,14 +4,25 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import get_user_info_for_avatar
 
 from helpdesk.mixins.mentions import HasMentions
 from helpdesk.utils import is_agent, refetch_resource
 
 
 class HDComment(HasMentions, Document):
-	cache_many = "TicketComments"
 	mentions_field = "content"
+
+	def get_list_filters(query):
+		Comment = frappe.qb.DocType("HD Comment")
+		if not is_agent():
+			query = query.where(Comment.comment_type == "Public")
+		return query
+
+	def as_dict(self, *args, **kwargs):
+		d = super(HDComment, self).as_dict(*args, **kwargs)
+		d.user = get_user_info_for_avatar(d.user)
+		return d
 
 	def before_validate(self):
 		self.user = frappe.session.user
@@ -23,7 +34,6 @@ class HDComment(HasMentions, Document):
 		Fetch attachments from `File` doctype.
 		"""
 		for i in self.attachments:
-			print(type(i))
 			if isinstance(i, str):
 				continue
 			f = frappe.get_doc(
@@ -33,7 +43,6 @@ class HDComment(HasMentions, Document):
 					"file_url": i.file_url,
 				},
 			).get("name")
-			print(f)
 			i.file = f
 
 	def strip_recipients(self):
@@ -60,6 +69,13 @@ class HDComment(HasMentions, Document):
 	def after_insert(self):
 		refetch_resource(self.cache_many)
 		self.send_mail()
+
+	def on_trash(self):
+		refetch_resource(self.cache_many)
+
+	@property
+	def cache_many(self):
+		return ["Comments", self.name]
 
 	@property
 	def parent(self):

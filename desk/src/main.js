@@ -18,7 +18,16 @@ import App from "./App.vue";
 import "./index.css";
 import { router } from "./router";
 import { socket } from "./socket";
-import { createToast } from "@/utils";
+
+setConfig("resourceFetcher", frappeRequest);
+setConfig("defaultListUrl", "helpdesk.extends.client.get_list");
+
+const pinia = createPinia();
+const app = createApp(App);
+
+app.use(resourcesPlugin);
+app.use(pinia);
+app.use(router);
 
 const globalComponents = {
   Badge,
@@ -31,15 +40,6 @@ const globalComponents = {
   Tooltip,
 };
 
-setConfig("resourceFetcher", frappeRequest);
-
-const pinia = createPinia();
-const app = createApp(App);
-
-app.use(resourcesPlugin);
-app.use(pinia);
-app.use(router);
-
 for (const c in globalComponents) {
   app.component(c, globalComponents[c]);
 }
@@ -47,6 +47,5 @@ for (const c in globalComponents) {
 app.config.unwrapInjectedRef = true;
 app.config.globalProperties.$_ = lodash;
 app.config.globalProperties.$socket = socket;
-app.config.globalProperties.$toast = createToast;
 
 app.mount("#app");

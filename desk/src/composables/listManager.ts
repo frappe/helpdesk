@@ -50,6 +50,7 @@ export function createListManager(options: ListOptions) {
     cache,
     auto,
     transform,
+    initialData: [],
     onSuccess() {
       meta.submit({
         doctype,
