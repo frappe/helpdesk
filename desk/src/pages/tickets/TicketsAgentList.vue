@@ -10,7 +10,7 @@
       <Badge
         :label="data.status"
         :theme="ticketStatusStore.colorMap[data.status]"
-        variant="subtle"
+        variant="outline"
       />
     </template>
     <template #conversation="{ data }">
@@ -90,8 +90,8 @@
     <template #modified="{ data }">
       {{ dayjs(data.modified).fromNow() }}
     </template>
-    <template #via_customer_portal="{ data }">
-      {{ data.via_customer_portal ? "Customer Portal" : "Email" }}
+    <template #source="{ data }">
+      {{ data.via_customer_portal ? 'Customer Portal' : 'Email' }}
     </template>
     <template #actions="{ selection: s }">
       <Dropdown :options="assignOpts(s as Set<number>)">
@@ -113,16 +113,16 @@
 </template>
 
 <script setup lang="ts">
-import { capitalize } from "vue";
-import { createResource, Badge, Dropdown, Tooltip } from "frappe-ui";
-import { Icon } from "@iconify/vue";
-import { dayjs } from "@/dayjs";
-import { useAgentStore } from "@/stores/agent";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { createToast, getAssign } from "@/utils";
-import { Resource } from "@/types";
-import { useError } from "@/composables/error";
-import { ListView, UserAvatar } from "@/components";
+import { capitalize } from 'vue';
+import { createResource, Badge, Dropdown, Tooltip } from 'frappe-ui';
+import { Icon } from '@iconify/vue';
+import { dayjs } from '@/dayjs';
+import { useAgentStore } from '@/stores/agent';
+import { useTicketStatusStore } from '@/stores/ticketStatus';
+import { createToast, getAssign } from '@/utils';
+import { Resource } from '@/types';
+import { useError } from '@/composables/error';
+import { ListView, UserAvatar } from '@/components';
 
 interface P {
   resource: Resource;
@@ -133,23 +133,23 @@ defineProps<P>();
 const agentStore = useAgentStore();
 const ticketStatusStore = useTicketStatusStore();
 const slaStatusColorMap = {
-  Fulfilled: "green",
-  Failed: "red",
-  "Resolution Due": "orange",
-  "First Response Due": "orange",
-  Paused: "blue",
+  Fulfilled: 'green',
+  Failed: 'red',
+  'Resolution Due': 'orange',
+  'First Response Due': 'orange',
+  Paused: 'blue',
 };
 
 const bulkAssignTicketToAgent = createResource({
-  url: "helpdesk.api.ticket.bulk_assign_ticket_to_agent",
+  url: 'helpdesk.api.ticket.bulk_assign_ticket_to_agent',
   onSuccess: () => {
     createToast({
-      title: "Tickets assigned to agent",
-      icon: "check",
-      iconClasses: "text-green-500",
+      title: 'Tickets assigned to agent',
+      icon: 'check',
+      iconClasses: 'text-green-500',
     });
   },
-  onError: useError({ title: "Unable to assign tickets to agent" }),
+  onError: useError({ title: 'Unable to assign tickets to agent' }),
 });
 
 function assignOpts(selected: Set<number>) {

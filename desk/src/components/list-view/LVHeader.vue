@@ -7,8 +7,11 @@
         :model-value="resource.data?.length === selection.storage.size"
         @update:model-value="toggle()"
       />
-      <div v-for="c in columns" :key="c.key">
-        <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
+      <div
+        v-for="c in metaState[doctype]?.fields.filter((f) => f.in_list_view)"
+        :key="c.fieldname"
+      >
+        <div v-if="!hiddenColumns.has(c.fieldname)" :class="[c.width]">
           <span :class="[c.align]">
             {{ c.label }}
           </span>
@@ -19,13 +22,13 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { useColumns } from "@/composables/columns";
-import { selection } from "./selection";
-import { CheckboxKey, ColumnsKey, DocTypeKey, ResourceKey } from "./symbols";
+import { inject } from 'vue';
+import { useColumns } from '@/composables/columns';
+import { metaState } from '@/resources';
+import { selection } from './selection';
+import { CheckboxKey, DocTypeKey, ResourceKey } from './symbols';
 
 const checkbox = inject(CheckboxKey);
-const columns = inject(ColumnsKey);
 const doctype = inject(DocTypeKey);
 const resource = inject(ResourceKey);
 const { storage: hiddenColumns } = useColumns(doctype);

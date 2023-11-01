@@ -73,6 +73,7 @@
    "fieldname": "subject",
    "fieldtype": "Data",
    "in_global_search": 1,
+   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Subject",
    "reqd": 1
@@ -83,7 +84,6 @@
    "fieldname": "raised_by",
    "fieldtype": "Data",
    "in_global_search": 1,
-   "in_list_view": 1,
    "label": "Raised By (Email)",
    "oldfieldname": "raised_by",
    "oldfieldtype": "Data",
@@ -117,12 +117,14 @@
   {
    "fieldname": "ticket_type",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Ticket Type",
    "options": "HD Ticket Type"
   },
   {
    "fieldname": "agent_group",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Team",
    "options": "HD Team"
   },
@@ -170,6 +172,7 @@
    "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
    "fieldname": "response_by",
    "fieldtype": "Datetime",
+   "in_list_view": 1,
    "label": "Response By",
    "read_only": 1
   },
@@ -184,6 +187,7 @@
    "depends_on": "eval: doc.sla",
    "fieldname": "agreement_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "SLA Status",
    "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
    "read_only": 1
@@ -192,6 +196,7 @@
    "depends_on": "eval: doc.status != 'Replied' && doc.sla;",
    "fieldname": "resolution_by",
    "fieldtype": "Datetime",
+   "in_list_view": 1,
    "label": "Resolution By",
    "read_only": 1
   },
@@ -314,12 +319,14 @@
   {
    "fieldname": "contact",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Contact",
    "options": "Contact"
   },
   {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Customer",
    "options": "HD Customer"
   },
@@ -410,7 +417,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-11-01 02:27:34.168848",
+ "modified": "2023-11-01 21:11:26.791051",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

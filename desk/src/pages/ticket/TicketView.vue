@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, ref } from "vue";
+import { provide, ref } from 'vue';
 import {
   createResource,
   createDocumentResource,
@@ -184,95 +184,95 @@ import {
   Button,
   FormControl,
   TabButtons,
-} from "frappe-ui";
-import { emitter } from "@/emitter";
-import { useAgentStore } from "@/stores/agent";
-import { useAuthStore } from "@/stores/auth";
-import { useError } from "@/composables";
-import { trackVisit } from "@/resources";
-import { Id, Comments, Ticket } from "./symbols";
-import TicketAgentActions from "./TicketAgentActions.vue";
-import TicketCustomerActions from "./TicketCustomerActions.vue";
-import TicketAgentSidebar from "./TicketAgentSidebar.vue";
-import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
-import TicketCannedResponses from "./TicketCannedResponses.vue";
-import TicketConversation from "./TicketConversation.vue";
-import TicketPinnedComments from "./TicketPinnedComments.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
+} from 'frappe-ui';
+import { emitter } from '@/emitter';
+import { useAgentStore } from '@/stores/agent';
+import { useAuthStore } from '@/stores/auth';
+import { useError } from '@/composables';
+import { trackVisit } from '@/resources';
+import { Id, Comments, Ticket } from './symbols';
+import TicketAgentActions from './TicketAgentActions.vue';
+import TicketCustomerActions from './TicketCustomerActions.vue';
+import TicketAgentSidebar from './TicketAgentSidebar.vue';
+import TicketBreadcrumbs from './TicketBreadcrumbs.vue';
+import TicketCannedResponses from './TicketCannedResponses.vue';
+import TicketConversation from './TicketConversation.vue';
+import TicketPinnedComments from './TicketPinnedComments.vue';
+import TicketTextEditor from './TicketTextEditor.vue';
 
 interface P {
   ticketId: string;
 }
 
 enum Mode {
-  Comment = "Comment",
-  Response = "Response",
+  Comment = 'Comment',
+  Response = 'Response',
 }
 
 const props = defineProps<P>();
 const agentStore = useAgentStore();
 const authStore = useAuthStore();
 const ticket = createDocumentResource({
-  doctype: "HD Ticket",
-  cache: ["Ticket", props.ticketId],
+  doctype: 'HD Ticket',
+  cache: ['Ticket', props.ticketId],
   name: props.ticketId,
   whitelistedMethods: {
-    assign: "assign_agent",
+    assign: 'assign_agent',
   },
   auto: true,
   onError: useError(),
 });
 const comments = createListResource({
-  doctype: "HD Comment",
-  cache: ["Comments", props.ticketId],
+  doctype: 'HD Comment',
+  cache: ['Comments', props.ticketId],
   fields: [
-    "name",
-    "comment_type",
-    "content",
-    "creation",
-    "is_pinned",
-    "user",
+    'name',
+    'comment_type',
+    'content',
+    'creation',
+    'is_pinned',
+    'user',
     {
-      attachments: ["file.file_url", "file.file_name"],
+      attachments: ['file.file_url', 'file.file_name'],
     },
   ],
   filters: {
-    reference_doctype: "HD Ticket",
+    reference_doctype: 'HD Ticket',
     reference_name: props.ticketId,
   },
-  orderBy: "creation asc",
+  orderBy: 'creation asc',
   auto: true,
   onError: useError(),
-  onSuccess: () => trackVisit.submit({ dt: "HD Ticket", dn: props.ticketId }),
+  onSuccess: () => trackVisit.submit({ dt: 'HD Ticket', dn: props.ticketId }),
 });
 provide(Id, props.ticketId);
 provide(Comments, comments);
 provide(Ticket, ticket);
 const editor = ref(null);
-const placeholder = "Compose a comment / reply";
-const content = ref("");
+const placeholder = 'Compose a comment / reply';
+const content = ref('');
 const attachments = ref([]);
 const isExpanded = ref(false);
-const cc = ref("");
-const bcc = ref("");
+const cc = ref('');
+const bcc = ref('');
 const showCc = ref(false);
 const showBcc = ref(false);
 const mode = ref(Mode.Comment);
-const focus = ref("");
+const focus = ref('');
 const showCannedResponses = ref(false);
 
-emitter.on("update:ticket", () => ticket.reload());
+emitter.on('update:ticket', () => ticket.reload());
 
 const send = createResource({
-  url: "frappe.client.insert",
+  url: 'frappe.client.insert',
   debounce: 300,
   makeParams: () => ({
     doc: {
-      doctype: "HD Comment",
+      doctype: 'HD Comment',
       attachments: attachments.value,
-      comment_type: mode.value == Mode.Comment ? "Private" : "Public",
+      comment_type: mode.value == Mode.Comment ? 'Private' : 'Public',
       content: content.value,
-      reference_doctype: "HD Ticket",
+      reference_doctype: 'HD Ticket',
       reference_name: props.ticketId,
     },
   }),
@@ -289,8 +289,8 @@ const send = createResource({
 function clear() {
   editor.value.editor.commands.clearContent(true);
   isExpanded.value = false;
-  cc.value = "";
-  bcc.value = "";
+  cc.value = '';
+  bcc.value = '';
 }
 
 usePageMeta(() => {

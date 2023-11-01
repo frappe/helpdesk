@@ -30,21 +30,21 @@
       "
     >
       <div
-        v-for="c in columns"
-        :key="c.key"
+        v-for="c in metaState[doctype]?.fields.filter((f) => f.in_list_view)"
+        :key="c.fieldname"
         :class="{
-          'text-gray-800': data[c.key],
-          'text-gray-300': !data[c.key],
+          [c.text]: data[c.fieldname],
+          'text-gray-300': !data[c.fieldname],
         }"
       >
-        <div v-if="!hiddenColumns.has(c.key)" :class="[c.width]">
+        <div v-if="!hiddenColumns.has(c.fieldname)" :class="[c.width]">
           <div
             class="w-max max-w-full truncate"
-            :class="[c.align, c.text]"
+            :class="[c.align]"
             @click="(event) => filterFunc(event, c)"
           >
-            <slot :name="c.key" :data="data">
-              {{ data[c.key] || "⸺" }}
+            <slot :name="c.fieldname" :data="data">
+              {{ data[c.fieldname] || '⸺' }}
             </slot>
           </div>
         </div>
@@ -54,17 +54,18 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { RouterLink } from "vue-router";
-import { FormControl } from "frappe-ui";
-import { isFunction } from "lodash";
-import { Column } from "@/types";
-import { getAssign } from "@/utils";
-import { useFieldsStore } from "@/stores/fields";
-import { useColumns } from "@/composables/columns";
-import { useFilter } from "@/composables/filter";
-import { selection } from "./selection";
-import { CheckboxKey, ColumnsKey, DocTypeKey } from "./symbols";
+import { inject } from 'vue';
+import { RouterLink } from 'vue-router';
+import { FormControl } from 'frappe-ui';
+import { isFunction } from 'lodash';
+import { Column } from '@/types';
+import { getAssign } from '@/utils';
+import { useFieldsStore } from '@/stores/fields';
+import { useColumns } from '@/composables/columns';
+import { useFilter } from '@/composables/filter';
+import { metaState } from '@/resources';
+import { selection } from './selection';
+import { CheckboxKey, DocTypeKey } from './symbols';
 
 interface I {
   name: string;
@@ -78,7 +79,6 @@ interface P {
 }
 
 const checkbox = inject(CheckboxKey);
-const columns = inject(ColumnsKey);
 const doctype = inject(DocTypeKey);
 const props = defineProps<P>();
 const { storage: hiddenColumns } = useColumns(doctype);
@@ -90,17 +90,17 @@ async function filterFunc(event: InputEvent, c: Column) {
   await fieldsStore.fetch(doctype);
   fieldsStore
     .get(doctype)
-    .filter((field) => ["Link", "Select"].includes(field.fieldtype))
+    .filter((field) => ['Link', 'Select'].includes(field.fieldtype))
     .filter((field) => field.fieldname === c.key)
     .map((field) => {
       let val = props.data[c.key] as string;
-      if (field.fieldname === "_assign") {
+      if (field.fieldname === '_assign') {
         val = getAssign(val);
       }
       return {
         fieldname: field.fieldname,
         label: field.label,
-        operator: "is",
+        operator: 'is',
         value: val,
       };
     })

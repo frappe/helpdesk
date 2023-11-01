@@ -54,16 +54,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, provide, ref } from "vue";
-import { createResource, Button } from "frappe-ui";
-import { Icon } from "@iconify/vue";
-import { useError } from "@/composables/error";
-import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
-import TicketConversation from "./TicketConversation.vue";
-import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
-import TicketFeedback from "./TicketFeedback.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
-import { ITicket } from "./symbols";
+import { computed, provide, ref } from 'vue';
+import { createResource, Button } from 'frappe-ui';
+import { Icon } from '@iconify/vue';
+import { useError } from '@/composables/error';
+import TicketBreadcrumbs from './TicketBreadcrumbs.vue';
+import TicketConversation from './TicketConversation.vue';
+import TicketCustomerTemplateFields from './TicketCustomerTemplateFields.vue';
+import TicketFeedback from './TicketFeedback.vue';
+import TicketTextEditor from './TicketTextEditor.vue';
+import { ITicket } from './symbols';
 
 interface P {
   ticketId: string;
@@ -71,8 +71,8 @@ interface P {
 
 const props = defineProps<P>();
 const ticket = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
+  url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_one',
+  cache: ['Ticket', props.ticketId],
   auto: true,
   params: {
     name: props.ticketId,
@@ -80,21 +80,21 @@ const ticket = createResource({
 });
 provide(ITicket, ticket);
 const editor = ref(null);
-const placeholder = "Type a message";
-const editorContent = ref("");
+const placeholder = 'Type a message';
+const editorContent = ref('');
 const attachments = ref([]);
 const showFeedbackDialog = ref(false);
 const isExpanded = ref(false);
 
 const send = createResource({
-  url: "frappe.client.insert",
+  url: 'frappe.client.insert',
   debounce: 300,
   makeParams: () => ({
     doc: {
-      doctype: "HD Comment",
+      doctype: 'HD Comment',
       content: editorContent.value,
       attachments: attachments.value,
-      reference_doctype: "HD Ticket",
+      reference_doctype: 'HD Ticket',
       reference_name: props.ticketId,
     },
   }),
@@ -108,11 +108,11 @@ const send = createResource({
 });
 
 const setValue = createResource({
-  url: "frappe.client.set_value",
+  url: 'frappe.client.set_value',
   debounce: 300,
   makeParams: (params) => {
     return {
-      doctype: "HD Ticket",
+      doctype: 'HD Ticket',
       name: props.ticketId,
       fieldname: params.fieldname,
       value: params.value,
@@ -126,9 +126,9 @@ const setValue = createResource({
 });
 
 const showReopenButton = computed(
-  () => ticket.data.status === "Resolved" && !ticket.data.feedback
+  () => ticket.data.status === 'Resolved' && !ticket.data.feedback
 );
 const showResolveButton = computed(() =>
-  ["Open", "Replied"].includes(ticket.data.status)
+  ['Open', 'Replied'].includes(ticket.data.status)
 );
 </script>

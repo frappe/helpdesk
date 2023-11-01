@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '@/stores/auth';
 import { useKeymapStore } from '@/stores/keymap';
@@ -113,7 +113,6 @@ import LucideUserCircle2 from '~icons/lucide/user-circle-2';
 import LucideUsers from '~icons/lucide/users';
 
 const route = useRoute();
-const router = useRouter();
 const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const notificationStore = useNotificationStore();
@@ -186,14 +185,14 @@ const profileSettings = [
     icon: 'command',
     onClick: () => keymapStore.toggleVisibility(true),
   },
-  {
-    label: 'Customer portal',
-    icon: 'users',
-    onClick: () => {
-      const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
-      window.open(path.href, '_blank');
-    },
-  },
+  // {
+  //   label: 'Customer portal',
+  //   icon: 'users',
+  //   onClick: () => {
+  //     const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
+  //     window.open(path.href, '_blank');
+  //   },
+  // },
   {
     label: 'Log out',
     icon: 'log-out',

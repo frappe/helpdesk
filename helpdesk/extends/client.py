@@ -17,6 +17,12 @@ from .doc import apply_sort
 
 
 @frappe.whitelist()
+def get_meta(doctype: str, cached=True):
+	check_allowed(doctype)
+	return frappe.get_meta(doctype, cached=cached)
+
+
+@frappe.whitelist()
 def get_list(
 	doctype=None,
 	fields=None,
@@ -35,6 +41,7 @@ def get_list(
 		table=doctype,
 		fields=fields,
 		filters=filters,
+		order_by=order_by,
 		offset=start,
 		limit=limit,
 		group_by=group_by,
@@ -70,6 +77,7 @@ def get_list_meta(
 	query = frappe.qb.get_query(
 		table=doctype,
 		filters=filters,
+		order_by=order_by,
 		group_by=group_by,
 		fields=["name"],
 	)

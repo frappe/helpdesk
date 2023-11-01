@@ -1,22 +1,22 @@
-import { computed, ComputedRef } from "vue";
-import { defineStore } from "pinia";
-import { createResource, call } from "frappe-ui";
-import { isEmpty } from "lodash";
-import { router, LOGIN } from "@/router";
-import { createToast } from "@/utils";
+import { computed, ComputedRef } from 'vue';
+import { defineStore } from 'pinia';
+import { createResource, call } from 'frappe-ui';
+import { isEmpty } from 'lodash';
+import { router, LOGIN } from '@/router';
+import { createToast } from '@/utils';
 
-const URI_LOGIN = "login";
-const URI_LOGOUT = "logout";
-const URI_SIGNUP = "helpdesk.api.account.signup";
-const URI_USER_INFO = "helpdesk.api.auth.get_user";
-const URI_VERIFY = "helpdesk.api.account.verify_and_create_account";
+const URI_LOGIN = 'login';
+const URI_LOGOUT = 'logout';
+const URI_SIGNUP = 'helpdesk.api.account.signup';
+const URI_USER_INFO = 'helpdesk.api.auth.get_user';
+const URI_VERIFY = 'helpdesk.api.account.verify_and_create_account';
 
 /**
  * This is supposed to be the entry point of authentication. This will be
  * called from router itself. Hence the router instance from `useRouter()` will
  * not be available. All Authentication related logic should go in this file.
  * Some of these might contain async methods, beware. */
-export const useAuthStore = defineStore("auth", () => {
+export const useAuthStore = defineStore('auth', () => {
   const userInfo = createResource({
     url: URI_USER_INFO,
   });
@@ -43,10 +43,10 @@ export const useAuthStore = defineStore("auth", () => {
   const login = createResource({
     url: URI_LOGIN,
     onError() {
-      throw new Error("Invalid email or password");
+      throw new Error('Invalid email or password');
     },
     onSuccess() {
-      router.replace({ path: "/" });
+      router.replace({ path: '/' });
     },
   });
 
@@ -64,9 +64,9 @@ export const useAuthStore = defineStore("auth", () => {
     },
     onError() {
       createToast({
-        title: "Error verifying account",
-        icon: "x",
-        iconClasses: "text-red-500",
+        title: 'Error verifying account',
+        icon: 'x',
+        iconClasses: 'text-red-500',
       });
     },
   });

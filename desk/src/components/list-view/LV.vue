@@ -39,11 +39,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, provide, ref } from "vue";
-import { useRoute } from "vue-router";
-import { useDebounceFn } from "@vueuse/core";
-import { plural as pluralize } from "pluralize";
-import { Column, Resource } from "@/types";
+import { computed, provide, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { useDebounceFn } from '@vueuse/core';
+import { plural as pluralize } from 'pluralize';
+import { metaFetch } from '@/resources';
+import { Column, Resource } from '@/types';
 import {
   CheckboxKey,
   ColumnsKey,
@@ -53,31 +54,34 @@ import {
   PluralKey,
   ResourceKey,
   SingluarKey,
-} from "./symbols";
-import LVEmpty from "./LVEmpty.vue";
-import LVHeader from "./LVHeader.vue";
-import LVLoading from "./LVLoading.vue";
-import LVNavigation from "./LVNavigation.vue";
-import LVRow from "./LVRow.vue";
-import LVSelectionBar from "./LVSelectionBar.vue";
+} from './symbols';
+import LVEmpty from './LVEmpty.vue';
+import LVHeader from './LVHeader.vue';
+import LVLoading from './LVLoading.vue';
+import LVNavigation from './LVNavigation.vue';
+import LVRow from './LVRow.vue';
+import LVSelectionBar from './LVSelectionBar.vue';
 
-interface P {
-  columns: Column[];
-  doctype: string;
-  resource: Resource<Array<Record<string, unknown>>>;
-  checkbox?: boolean;
-  filter?: boolean;
-}
+const props = withDefaults(
+  defineProps<{
+    doctype: string;
+    resource: Resource<Array<Record<string, unknown>>>;
+    columns?: Column[];
+    checkbox?: boolean;
+    filter?: boolean;
+  }>(),
+  {
+    columns: () => [],
+    checkbox: () => false,
+    filter: () => false,
+  }
+);
 
-const props = withDefaults(defineProps<P>(), {
-  checkbox: false,
-  filter: false,
-});
-
+metaFetch.submit({ doctype: props.doctype });
 const route = useRoute();
 const body = ref<HTMLElement | null>(null);
 const singular = computed(() => {
-  return props.doctype.replace("HD ", "").toLowerCase().trim();
+  return props.doctype.replace('HD ', '').toLowerCase().trim();
 });
 const plural = computed(() => {
   return pluralize(singular.value);
@@ -86,7 +90,7 @@ const emptyMsg = computed(() => {
   return `No ${plural.value} found`;
 });
 const id = computed(() => {
-  return route.path + "_" + props.doctype;
+  return route.path + '_' + props.doctype;
 });
 const handleScroll = useDebounceFn(() => {
   if (!props.resource.hasNextPage) return;

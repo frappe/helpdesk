@@ -53,45 +53,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Dropdown } from "frappe-ui";
-import { dayjs } from "@/dayjs";
-import { useConfigStore } from "@/stores/config";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { createListManager } from "@/composables/listManager";
-import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
-import { ListView } from "@/components";
-import PageTitle from "@/components/PageTitle.vue";
+import { ref } from 'vue';
+import { Dropdown } from 'frappe-ui';
+import { dayjs } from '@/dayjs';
+import { useConfigStore } from '@/stores/config';
+import { useTicketStatusStore } from '@/stores/ticketStatus';
+import { createListManager } from '@/composables/listManager';
+import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from '@/router';
+import { ListView } from '@/components';
+import PageTitle from '@/components/PageTitle.vue';
 
 const configStore = useConfigStore();
 const ticketStatusStore = useTicketStatusStore();
 const columns = [
   {
-    label: "#",
-    key: "name",
-    width: "w-12",
+    label: '#',
+    key: 'name',
+    width: 'w-12',
   },
   {
-    label: "Subject",
-    key: "subject",
-    width: "w-96",
+    label: 'Subject',
+    key: 'subject',
+    width: 'w-96',
   },
   {
-    label: "Status",
-    key: "status",
-    width: "w-32",
+    label: 'Status',
+    key: 'status',
+    width: 'w-32',
   },
   {
-    label: "Created",
-    key: "creation",
-    width: "w-32",
+    label: 'Created',
+    key: 'creation',
+    width: 'w-32',
   },
 ];
 
 const tickets = createListManager({
-  doctype: "HD Ticket",
+  doctype: 'HD Ticket',
   pageLength: 20,
-  fields: ["name", "creation", "subject", "status"],
+  fields: ['name', 'creation', 'subject', 'status'],
   auto: true,
   transform: (data) => {
     for (const d of data) {
@@ -105,25 +105,25 @@ const tickets = createListManager({
   },
 });
 
-const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
-const dropdownTitle = ref("All tickets");
+const ACTIVE_TICKET_TYPES = ['Open', 'Replied'];
+const dropdownTitle = ref('All tickets');
 const dropdownOptions = [
   {
-    label: "All tickets",
+    label: 'All tickets',
     onClick() {
-      filter("All tickets", { status: undefined });
+      filter('All tickets', { status: undefined });
     },
   },
   {
-    label: "Open tickets",
+    label: 'Open tickets',
     onClick() {
-      filter("Open tickets", { status: ["in", ACTIVE_TICKET_TYPES] });
+      filter('Open tickets', { status: ['in', ACTIVE_TICKET_TYPES] });
     },
   },
   {
-    label: "Closed tickets",
+    label: 'Closed tickets',
     onClick() {
-      filter("Closed tickets", { status: ["not in", ACTIVE_TICKET_TYPES] });
+      filter('Closed tickets', { status: ['not in', ACTIVE_TICKET_TYPES] });
     },
   },
 ];
@@ -143,8 +143,8 @@ function filter(title: string, filters: Record<string, any>) {
 
 function transformStatus(status: string) {
   switch (status) {
-    case "Replied":
-      return "Awaiting reply";
+    case 'Replied':
+      return 'Awaiting reply';
     default:
       return status;
   }

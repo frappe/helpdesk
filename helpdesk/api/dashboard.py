@@ -1,12 +1,18 @@
 from datetime import datetime, timedelta
 
 import frappe
+from frappe import _
 from frappe.query_builder.functions import Count
 from frappe.utils.caching import redis_cache
+
+from helpdesk.utils import is_agent
 
 
 @frappe.whitelist()
 def get_all():
+	if not is_agent():
+		err = _("You are not allowed to access dashboard")
+		frappe.throw(err, frappe.PermissionError)
 	return [
 		avg_first_response_time(),
 		resolution_within_sla(),

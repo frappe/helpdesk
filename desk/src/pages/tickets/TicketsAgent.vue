@@ -24,33 +24,31 @@
             </Button>
           </template>
         </Dropdown>
-        <ColumnSelector doctype="HD Ticket" :columns="columns" />
+        <ColumnSelector doctype="HD Ticket" />
       </div>
     </div>
-    <TicketsAgentList :resource="tickets" :columns="columns" />
+    <TicketsAgentList :resource="tickets" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { createResource, usePageMeta, Button, Dropdown } from "frappe-ui";
-import { AGENT_PORTAL_TICKET } from "@/router";
-import { socket } from "@/socket";
-import { useAuthStore } from "@/stores/auth";
-import { useFilter } from "@/composables/filter";
-import { useOrder } from "@/composables/order";
-import { createListManager } from "@/composables/listManager";
-import PageTitle from "@/components/PageTitle.vue";
-import { ColumnSelector, FilterPopover } from "@/components";
-import TicketsAgentList from "./TicketsAgentList.vue";
-import PresetFilters from "./PresetFilters.vue";
+import { computed, ref } from 'vue';
+import { createResource, usePageMeta, Button, Dropdown } from 'frappe-ui';
+import { AGENT_PORTAL_TICKET } from '@/router';
+import { useAuthStore } from '@/stores/auth';
+import { useFilter } from '@/composables/filter';
+import { useOrder } from '@/composables/order';
+import { createListManager } from '@/composables/listManager';
+import { ColumnSelector, FilterPopover, PageTitle } from '@/components';
+import TicketsAgentList from './TicketsAgentList.vue';
+import PresetFilters from './PresetFilters.vue';
 
 const { userId } = useAuthStore();
-const { getArgs } = useFilter("HD Ticket");
+const { getArgs } = useFilter('HD Ticket');
 const { get: getOrder, set: setOrder } = useOrder();
 const pageLength = ref(20);
 const tickets = createListManager({
-  doctype: "HD Ticket",
+  doctype: 'HD Ticket',
   pageLength: pageLength.value,
   filters: getArgs(),
   orderBy: getOrder(),
@@ -58,7 +56,7 @@ const tickets = createListManager({
   transform: (data) => {
     for (const d of data) {
       d.class = {
-        "font-medium": !d._seen?.includes(userId),
+        'font-medium': !d._seen?.includes(userId),
       };
       d.onClick = {
         name: AGENT_PORTAL_TICKET,
@@ -71,17 +69,17 @@ const tickets = createListManager({
         outgoing: d.count_msg_outgoing,
         comments: d.count_comment,
       };
-      d.source = d.via_customer_portal ? "Customer portal" : "Email";
+      d.source = d.via_customer_portal ? 'Customer portal' : 'Email';
     }
     return data;
   },
 });
 
 const sortOptionsRes = createResource({
-  url: "helpdesk.extends.doc.sort_options",
+  url: 'helpdesk.extends.doc.sort_options',
   auto: true,
   params: {
-    doctype: "HD Ticket",
+    doctype: 'HD Ticket',
   },
 });
 const sortOptions = computed(() => {
@@ -91,98 +89,9 @@ const sortOptions = computed(() => {
   }));
 });
 
-socket.on("helpdesk:new-ticket", () => {
-  if (!tickets.hasPreviousPage) tickets.reload();
-});
-
-const columns = [
-  {
-    label: "#",
-    key: "name",
-    width: "w-10",
-    text: "text-sm",
-  },
-  {
-    label: "Subject",
-    key: "subject",
-    width: "w-96",
-    text: "text-gray-900",
-  },
-  {
-    label: "Status",
-    key: "status",
-    width: "w-20",
-  },
-  {
-    label: "Priority",
-    key: "priority",
-    width: "w-32",
-  },
-  {
-    label: "Type",
-    key: "ticket_type",
-    width: "w-36",
-  },
-  {
-    label: "Team",
-    key: "agent_group",
-    width: "w-36",
-  },
-  {
-    label: "Contact",
-    key: "contact",
-    width: "w-36",
-  },
-  {
-    label: "Agreement status",
-    key: "agreement_status",
-    width: "w-36",
-  },
-  {
-    label: "First response",
-    key: "response_by",
-    width: "w-32",
-  },
-  {
-    label: "Resolution",
-    key: "resolution_by",
-    width: "w-32",
-  },
-  {
-    label: "Customer",
-    key: "customer",
-    width: "w-36",
-  },
-  {
-    label: "Source",
-    key: "source",
-    width: "w-36",
-  },
-  {
-    label: "Assignee",
-    key: "assignee",
-    width: "w-40",
-  },
-  {
-    label: "Conversation",
-    key: "conversation",
-    width: "w-28",
-  },
-  {
-    label: "Last modified",
-    key: "modified",
-    width: "w-32",
-  },
-  {
-    label: "Created",
-    key: "creation",
-    width: "w-36",
-  },
-];
-
 usePageMeta(() => {
   return {
-    title: "Tickets",
+    title: 'Tickets',
   };
 });
 </script>

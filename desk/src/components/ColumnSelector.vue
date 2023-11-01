@@ -7,7 +7,7 @@
         </template>
         <template #suffix>
           <Badge theme="gray" variant="subtle">
-            {{ columns.filter((c) => !hidden.has(c.key)).length }}
+            {{ columns.filter((c) => !hidden.has(c.fieldname)).length }}
           </Badge>
         </template>
       </Button>
@@ -16,11 +16,11 @@
       <div class="popover divide-y">
         <Switch
           v-for="c in columns"
-          :key="c.key"
-          :model-value="!hidden.has(c.key)"
+          :key="c.fieldname"
+          :model-value="!hidden.has(c.fieldname)"
           :label="c.label"
           class="rounded-none first:rounded-t last:rounded-b"
-          @update:model-value="toggle(c.key)"
+          @update:model-value="() => toggle(c.fieldname)"
         />
       </div>
     </template>
@@ -28,16 +28,17 @@
 </template>
 
 <script setup lang="ts">
-import { Badge, Switch } from "frappe-ui";
-import { useColumns } from "@/composables/columns";
-import { NestedPopover } from "@/components";
-import { Column } from "@/types";
+import { computed } from 'vue';
+import { Switch } from 'frappe-ui';
+import { useColumns } from '@/composables/columns';
+import { NestedPopover } from '@/components';
+import { metaState } from '@/resources';
 
-interface P {
+const props = defineProps<{
   doctype: string;
-  columns: Column[];
-}
-
-const props = defineProps<P>();
+}>();
 const { storage: hidden, toggle } = useColumns(props.doctype);
+const columns = computed(
+  () => metaState[props.doctype]?.fields.filter((f) => f.in_list_view) || []
+);
 </script>

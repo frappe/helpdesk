@@ -24,15 +24,15 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { ITicket } from "./symbols";
+import { inject } from 'vue';
+import { ITicket } from './symbols';
 
 const ticket = inject(ITicket);
 
 function transformStatus(status: string) {
   switch (status) {
-    case "Replied":
-      return "Awaiting reply";
+    case 'Replied':
+      return 'Awaiting reply';
     default:
       return status;
   }

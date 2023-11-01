@@ -88,7 +88,7 @@
           <div class="space-y-1.5">
             <span class="block text-sm text-gray-700">Source</span>
             <span class="block break-words font-medium text-gray-900">
-              {{ data.via_customer_portal ? "Portal" : "Mail" }}
+              {{ data.via_customer_portal ? 'Portal' : 'Mail' }}
             </span>
           </div>
           <div v-if="data.feedback_rating" class="space-y-1.5">
@@ -104,141 +104,83 @@
         </div>
       </span>
     </div>
-    <div class="divider"></div>
-    <div
-      class="flex grow flex-col gap-3 truncate border-l p-5"
-      :style="{
-        'overflow-y': 'scroll',
-      }"
-    >
-      <div v-for="o in options" :key="o.field" class="space-y-1.5">
-        <span class="block text-sm text-gray-700">
-          {{ o.label }}
-        </span>
-        <Autocomplete
-          :options="o.store.dropdown"
-          :placeholder="`Select a ${o.label}`"
-          :value="data[o.field]"
-          @change="(e) => update.submit({ fieldname: o.field, value: e.value })"
+    <img :src="TicketDivider" />
+    <div class="grow truncate border-l p-5">
+      <div v-if="authStore.isAgent" class="flex flex-col gap-3">
+        <div v-for="o in options" :key="o.field" class="space-y-1.5">
+          <span class="block text-sm text-gray-700">
+            {{ o.label }}
+          </span>
+          <Autocomplete
+            :options="o.store.dropdown"
+            :placeholder="`Select a ${o.label}`"
+            :value="data[o.field]"
+            @change="(e) => ticket.setValue.submit({ [o.field]: e.value })"
+          />
+        </div>
+        <UniInput
+          v-for="f in template.doc?.fields"
+          :key="f.fieldname"
+          :field="f"
+          :value="data[f.fieldname]"
+          @change="(e) => ticket.setValue.submit({ [f.fieldname]: e.value })"
         />
       </div>
-      <UniInput
-        v-for="field in template.doc?.fields"
-        :key="field.fieldname"
-        :field="field"
-        :value="data[field.fieldname]"
-        @change="
-          (e) => update.submit({ fieldname: field.fieldname, value: e.value })
-        "
-      />
+      <div v-else class="flex flex-col gap-3">
+        <div
+          v-for="f in template.doc?.fields.filter((f) => !f.hide_from_customer)"
+          :key="f.fieldname"
+          class="space-y-1.5"
+        >
+          <div class="text-sm text-gray-700">
+            {{ f.label }}
+          </div>
+          <div class="break-words text-base font-medium text-gray-900">
+            {{ ticket.doc[f.fieldname] || '—' }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue";
-import {
-  createResource,
-  createDocumentResource,
-  Autocomplete,
-  Tooltip,
-} from "frappe-ui";
-import { dayjs } from "@/dayjs";
-import { emitter } from "@/emitter";
-import { createToast } from "@/utils";
-import { useTeamStore } from "@/stores/team";
-import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import { useTicketTypeStore } from "@/stores/ticketType";
-import { useError } from "@/composables/error";
-import { StarRating, UniInput } from "@/components";
-import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { Id, Ticket } from "./symbols";
+import { computed, inject } from 'vue';
+import { createDocumentResource, Autocomplete, Tooltip } from 'frappe-ui';
+import { dayjs } from '@/dayjs';
+import { useAuthStore } from '@/stores/auth';
+import { useTeamStore } from '@/stores/team';
+import { useTicketPriorityStore } from '@/stores/ticketPriority';
+import { useTicketTypeStore } from '@/stores/ticketType';
+import { StarRating, UniInput } from '@/components';
+import { Id, Ticket } from './symbols';
+import TicketSidebarHeader from './TicketSidebarHeader.vue';
+import TicketDivider from '@/assets/misc/ticket-divider.svg';
 
+const authStore = useAuthStore();
 const id = inject(Id);
 const ticket = inject(Ticket);
 const data = computed(() => ticket.doc);
-const options = computed(() => [
-  {
-    field: "ticket_type",
-    label: "Ticket type",
-    store: useTicketTypeStore(),
-  },
-  {
-    field: "priority",
-    label: "Priority",
-    store: useTicketPriorityStore(),
-  },
-  {
-    field: "agent_group",
-    label: "Team",
-    store: useTeamStore(),
-  },
-]);
 const template = createDocumentResource({
-  doctype: "HD Ticket Template",
+  doctype: 'HD Ticket Template',
   name: ticket.doc.template,
   auto: true,
 });
-const update = createResource({
-  url: "frappe.client.set_value",
-  makeParams: (params) => ({
-    doctype: "HD Ticket",
-    name: data.value.name,
-    fieldname: params.fieldname,
-    value: params.value,
-  }),
-  auto: false,
-  onSuccess: () => {
-    emitter.emit("update:ticket");
-    createToast({
-      title: "Ticket updated",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+const options = computed(() => [
+  {
+    field: 'ticket_type',
+    label: 'Ticket type',
+    store: useTicketTypeStore(),
   },
-  onError: useError(),
-});
+  {
+    field: 'priority',
+    label: 'Priority',
+    store: useTicketPriorityStore(),
+  },
+  {
+    field: 'agent_group',
+    label: 'Team',
+    store: useTeamStore(),
+  },
+]);
 </script>
-
-<style scoped>
-.divider {
-  border-bottom: 1px solid #e2e2e2;
-  border-style: dashed;
-  position: relative;
-}
-
-.divider:before {
-  position: absolute;
-  bottom: -14px;
-  left: 0;
-  height: 28px;
-  width: 14px;
-  background: white;
-  content: "";
-  border-top-right-radius: 9999px;
-  border-bottom-right-radius: 9999px;
-  border-right-width: 1px;
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-}
-
-.divider:after {
-  position: absolute;
-  bottom: -14px;
-  left: 0;
-  height: 28px;
-  width: 14px;
-  background: white;
-  content: "";
-  border-top-left-radius: 9999px;
-  border-bottom-left-radius: 9999px;
-  border-left-width: 1px;
-  border-top-width: 1px;
-  border-bottom-width: 1px;
-}
-
-.divider:after {
-  right: 0;
-  left: auto;
-}
-</style>

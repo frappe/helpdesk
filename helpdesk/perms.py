@@ -19,4 +19,6 @@ def ticket(doc, user=None):
 # Check if `user` has access to this specific comment (`doc`). This can be done by
 # checking if parent doc (ticket) is accessible by `user`.
 def comment(doc):
+	if doc.comment_type == "Private" and not is_agent():
+		return False
 	return frappe.get_doc(doc.reference_doctype, doc.reference_name).has_permission()
