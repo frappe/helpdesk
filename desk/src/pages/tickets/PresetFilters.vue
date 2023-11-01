@@ -1,111 +1,67 @@
 <template>
   <Dropdown :options="options">
     <template #default="{ open }">
-      <div class="flex cursor-pointer items-center gap-1">
-        <div class="text-lg font-medium text-gray-900">
-          {{ title }}
-        </div>
-        <Icon
-          :icon="open ? 'lucide:chevron-up' : 'lucide:chevron-down'"
-          class="h-4 w-4 text-gray-700"
-        />
-      </div>
+      <Button :label="title" theme="gray" variant="subtle">
+        <template #suffix>
+          <LucideChevronUp v-if="open" class="h-4 w-4 text-gray-700" />
+          <LucideChevronDown v-else class="h-4 w-4 text-gray-700" />
+        </template>
+      </Button>
     </template>
   </Dropdown>
 </template>
 
-<script>
-import { ref } from "vue";
-import { Dropdown } from "frappe-ui";
-import { Icon } from "@iconify/vue";
-import { useConfigStore } from "@/stores/config";
-import { useFilter } from "@/composables/filter";
+<script setup lang="ts">
+import { computed } from 'vue';
+import { createListResource, Dropdown } from 'frappe-ui';
+import { useAuthStore } from '@/stores/auth';
+import { useFilter } from '@/composables/filter';
 
-export default {
-  name: "PresetFilters",
-  components: {
-    Dropdown,
-    Icon,
-  },
-  setup() {
-    const configStore = useConfigStore();
-    const { storage, apply } = useFilter("HD Ticket");
-    const presetFilters = ref([]);
-    const presetTitle = ref("");
-
-    return {
-      configStore,
-      apply,
-      storage,
-      presetFilters,
-      presetTitle,
-    };
-  },
-  computed: {
-    currentQuery() {
-      return this.$route.query.q;
+const authStore = useAuthStore();
+const title = 'foobar';
+const _r = createListResource({
+  doctype: 'HD Preset Filter',
+  auto: true,
+  fields: [
+    'name',
+    'title',
+    'type',
+    {
+      filters: ['label', 'fieldname', 'filter_type', 'value'],
     },
-    title() {
-      if (this.presetTitle) return this.presetTitle;
-      if (this.currentQuery) return "Filtered Tickets";
-      return "All Tickets";
-    },
-    presets() {
-      return this.$resources.presetFilterOptions.data || [];
-    },
-    options() {
-      let options = [];
-      let data = this.presets;
-      if (Object.keys(data).length) {
-        Object.keys(data).forEach((group) => {
-          if (data[group].length) {
-            options.push({
-              group: group === "user" ? "My Filters" : "Global",
-              hideLabel: group !== "user",
-              items: data[group].map((item) => {
-                return {
-                  label: item.title,
-                  onClick: () => {
-                    this.storage.clear();
-                    item.filters.forEach((f) =>
-                      this.storage.add({
-                        fieldname: f.fieldname,
-                        operator: f.filter_type,
-                        value: f.value,
-                      })
-                    );
-                    this.apply();
-                  },
-                };
-              }),
-            });
-          }
-        });
+  ],
+  transform: (data) => {
+    for (const d of data) {
+      for (const f of d.filters) {
+        if (f.value === '@me') {
+          f.value = authStore.userId;
+        }
       }
-
-      return options;
-    },
+    }
+    return data;
   },
-  mounted() {
-    this.$socket.on("helpdesk:new-preset-filter", (data) => {
-      if (data.reference_doctype !== "HD Ticket") return;
-      this.$resources.presetFilterOptions.reload();
+});
+const options = computed(() => {
+  const { apply, storage } = useFilter('HD Ticket');
+  return (_r.data || []).reduce((p, c) => {
+    const _g = p.find((i) => i.group === c.type);
+    if (!_g) p.push({ group: c.type, items: [] });
+    p.find((i) => i.group === c.type).items.push({
+      label: c.title,
+      onClick: () => {
+        storage.value.clear();
+        for (const f of c.filters) {
+          storage.value.add({
+            fieldname: f.fieldname,
+            operator: f.filter_type,
+            value: f.value,
+            label: f.label,
+          });
+        }
+        apply();
+      },
     });
-  },
-  unmounted() {
-    this.$socket.off("helpdesk:new-preset-filter");
-  },
-  resources: {
-    presetFilterOptions() {
-      return {
-        url: "helpdesk.api.general.get_preset_filters",
-        params: {
-          doctype: "HD Ticket",
-        },
-        cache: ["Preset Filter", this.doctype],
-        auto: true,
-      };
-    },
-  },
-};
+    return p;
+  }, []);
+});
 </script>
