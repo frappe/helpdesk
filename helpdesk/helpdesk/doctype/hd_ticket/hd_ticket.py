@@ -83,9 +83,12 @@ class HDTicket(Document):
 			if not is_agent()
 			else []
 		)
-		customer = get_customer(user)
-		for c in customer:
-			conditions.append(QBTicket.customer == c)
+		
+		if not is_agent():
+			customer = get_customer(user)
+			for c in customer:
+				conditions.append(QBTicket.customer == c)
+
 		query = query.where(Criterion.any(conditions))
 
 		enable_restrictions, ignore_restrictions = frappe.get_value(
