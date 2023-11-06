@@ -1,25 +1,25 @@
-import { watchEffect } from "vue";
-import { useRoute, useRouter, RouteLocationNamedRaw } from "vue-router";
-import { useStorage } from "@vueuse/core";
-import { createResource } from "frappe-ui";
-import { orderBy } from "lodash";
-import { DocField, Filter, Resource } from "@/types";
-import { useAuthStore } from "@/stores/auth";
+import { watchEffect } from 'vue';
+import { useRoute, useRouter, RouteLocationNamedRaw } from 'vue-router';
+import { useStorage } from '@vueuse/core';
+import { createResource } from 'frappe-ui';
+import { orderBy } from 'lodash';
+import { DocField, Filter, Resource } from '@/types';
+import { useAuthStore } from '@/stores/auth';
 
-const storagePrefix = "filters_";
+const storagePrefix = 'filters_';
 const operatorMap = {
-  is: "=",
-  "is not": "!=",
-  equals: "=",
-  "not equals": "!=",
+  is: '=',
+  'is not': '!=',
+  equals: '=',
+  'not equals': '!=',
   yes: true,
   no: false,
-  like: "LIKE",
-  "not like": "NOT LIKE",
-  ">": ">",
-  "<": "<",
-  ">=": ">=",
-  "<=": "<=",
+  like: 'LIKE',
+  'not like': 'NOT LIKE',
+  '>': '>',
+  '<': '<',
+  '>=': '>=',
+  '<=': '<=',
 };
 
 export function useFilter(doctype: string) {
@@ -32,8 +32,8 @@ export function useFilter(doctype: string) {
   );
 
   const fields: Resource<Array<DocField>> = createResource({
-    url: "helpdesk.api.doc.get_filterable_fields",
-    cache: ["DocField", doctype],
+    url: 'helpdesk.api.doc.get_filterable_fields',
+    cache: ['DocField', doctype],
     auto: !!doctype,
     params: {
       doctype,
@@ -46,7 +46,7 @@ export function useFilter(doctype: string) {
           value: f.fieldname,
           ...f,
         })),
-        "label"
+        'label'
       );
       return data;
     },
@@ -62,10 +62,10 @@ export function useFilter(doctype: string) {
 
   function fromUrl(query: string, fields: DocField[]) {
     return query
-      .split(" ")
+      .split(' ')
       .map((f) => {
         const [fieldname, operator, value] = f
-          .split(":")
+          .split(':')
           .map(decodeURIComponent);
         const field = (fields || []).find((f) => f.fieldname === fieldname);
         return {
@@ -107,9 +107,9 @@ export function useFilter(doctype: string) {
       .map((f) =>
         [f.fieldname, f.operator.toLowerCase(), f.value]
           .map(encodeURIComponent)
-          .join(":")
+          .join(':')
       )
-      .join(" ");
+      .join(' ');
     router.push({
       ...r,
       query: {
@@ -124,10 +124,10 @@ export function useFilter(doctype: string) {
    * Can be used for APIs
    */
   function transformIn(f: Filter) {
-    if (f.fieldname === "_assign") {
-      f.operator = f.operator === "is" ? "like" : "not like";
+    if (f.fieldname === '_assign') {
+      f.operator = f.operator === 'is' ? 'like' : 'not like';
     }
-    if (f.operator.includes("like")) {
+    if (f.operator.includes('like')) {
       f.value = `%${f.value}%`;
     }
     return f;
@@ -137,7 +137,7 @@ export function useFilter(doctype: string) {
    * Used to set fields in URL query
    */
   function transformOut(f: Filter) {
-    if (f.value === "@me") {
+    if (f.value === '@me') {
       f.value = userId;
     }
     return f;

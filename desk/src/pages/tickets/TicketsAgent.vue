@@ -12,9 +12,9 @@
       </template>
     </PageTitle>
     <div class="mx-5 mt-2.5 flex items-center justify-between">
-      <PresetFilters doctype="HD Ticket" />
+      <!-- <PresetFilters doctype="HD Ticket" /> -->
       <div class="flex items-center gap-2">
-        <FilterPopover doctype="HD Ticket" />
+        <FilterPopover doctype="HD Ticket" :resource="tickets" />
         <Dropdown :options="sortOptions">
           <template #default>
             <Button :label="getOrder() || 'Sort'" variant="outline" size="sm">
@@ -50,7 +50,10 @@ const pageLength = ref(20);
 const tickets = createListManager({
   doctype: 'HD Ticket',
   pageLength: pageLength.value,
-  filters: getArgs(),
+  filters: {
+    status: 'Resolved',
+    agent_group: 'Random Team',
+  },
   orderBy: getOrder(),
   auto: true,
   transform: (data) => {

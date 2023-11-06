@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { TabButtons } from "frappe-ui";
-import { ResourceKey } from "./symbols";
+import { inject } from 'vue';
+import { TabButtons } from 'frappe-ui';
+import { ResourceKey } from './symbols';
 
 const pageLengthOptions = [20, 50, 500] as const;
 const resource = inject(ResourceKey);
