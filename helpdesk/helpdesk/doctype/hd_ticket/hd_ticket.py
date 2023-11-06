@@ -71,6 +71,7 @@ class HDTicket(Document):
 
 	@staticmethod
 	def get_list_filters(query: Query):
+		_is_agent = is_agent()
 		QBTeam = frappe.qb.DocType("HD Team")
 		QBTeamMember = frappe.qb.DocType("HD Team Member")
 		QBTicket = frappe.qb.DocType("HD Ticket")
@@ -80,12 +81,14 @@ class HDTicket(Document):
 				QBTicket.contact == user,
 				QBTicket.raised_by == user,
 			]
-			if not is_agent()
+			if not _is_agent
 			else []
 		)
-		customer = get_customer(user)
-		for c in customer:
-			conditions.append(QBTicket.customer == c)
+
+		if not _is_agent:
+			customer = get_customer(user)
+			for c in customer:
+				conditions.append(QBTicket.customer == c)
 		query = query.where(Criterion.any(conditions))
 
 		enable_restrictions, ignore_restrictions = frappe.get_value(
