@@ -161,11 +161,12 @@ class HDServiceLevelAgreement(Document):
 
 	def set_hold_time(self, doc: Document):
 		pause_on = [row.status for row in self.pause_sla_on]
-		prev_state = doc.get_doc_before_save().get("status")
+		doc_old = doc.get_doc_before_save()
+		prev_state = doc_old.get("status")
 		next_state = doc.get("status")
 		was_paused = prev_state in pause_on
 		is_paused = next_state in pause_on
-		paused_since = doc.resolution_date or doc.on_hold_since
+		paused_since = doc.on_hold_since or doc_old.get("resolution_date")
 		if is_paused and not was_paused:
 			doc.response_by = doc.resolution_by if doc.first_responded_on else None
 			doc.resolution_date = None
