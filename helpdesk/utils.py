@@ -86,6 +86,7 @@ def get_customer(contact: str) -> tuple[str]:
 			.select(QBDynamicLink.link_name)
 			.where(QBDynamicLink.parentfield == "links")
 			.where(QBDynamicLink.parenttype == "Contact")
+			.where(QBDynamicLink.link_doctype == "HD Customer")
 			.join(QBContact)
 			.on(QBDynamicLink.parent == QBContact.name)
 			.where(Criterion.any(conditions))
