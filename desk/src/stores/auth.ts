@@ -20,6 +20,8 @@ export const useAuthStore = defineStore("auth", () => {
   const userInfo = createResource({
     url: URI_USER_INFO,
   });
+  const init = userInfo.fetch;
+  const reloadUser = userInfo.reload;
 
   const user__ = computed(() => userInfo.data || {});
   const hasDeskAccess: ComputedRef<boolean> = computed(
@@ -73,14 +75,6 @@ export const useAuthStore = defineStore("auth", () => {
 
   function logout() {
     call(URI_LOGOUT).then(() => router.push({ name: LOGIN }));
-  }
-
-  function reloadUser() {
-    userInfo.reload();
-  }
-
-  async function init() {
-    await userInfo.fetch();
   }
 
   return {
