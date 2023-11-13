@@ -198,7 +198,7 @@ router.beforeEach(async (to) => {
     await initTelemetry();
     await authStore.init();
 
-    if (isAuthRoute) {
+    if ((to.meta.agent && !authStore.hasDeskAccess) || isAuthRoute) {
       router.replace({ name: WEBSITE_ROOT });
     }
   } catch {
