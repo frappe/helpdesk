@@ -44,7 +44,12 @@
             @click="(event) => filterFunc(event, c)"
           >
             <slot :name="c.fieldname" :data="data">
-              {{ data[c.fieldname] || '⸺' }}
+              <span v-if="c.type === 'timeAgo' && data[c.fieldname]">
+                <Tooltip :text="dayjs(data[c.fieldname]).long()">
+                  {{ dayjs(data[c.fieldname]).fromNow() }}
+                </Tooltip>
+              </span>
+              <span v-else>{{ data[c.fieldname] || '⸺' }}</span>
             </slot>
           </div>
         </div>
@@ -56,10 +61,11 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import { RouterLink } from 'vue-router';
-import { FormControl } from 'frappe-ui';
+import { FormControl, Tooltip } from 'frappe-ui';
 import { isFunction } from 'lodash';
 import { Column } from '@/types';
 import { getAssign } from '@/utils';
+import { dayjs } from '@/dayjs';
 import { useFieldsStore } from '@/stores/fields';
 import { useColumns } from '@/composables/columns';
 import { useFilter } from '@/composables/filter';

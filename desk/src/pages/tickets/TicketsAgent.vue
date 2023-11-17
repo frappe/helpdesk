@@ -50,10 +50,6 @@ const pageLength = ref(20);
 const tickets = createListManager({
   doctype: 'HD Ticket',
   pageLength: pageLength.value,
-  filters: {
-    status: 'Resolved',
-    agent_group: 'Random Team',
-  },
   orderBy: getOrder(),
   auto: true,
   transform: (data) => {

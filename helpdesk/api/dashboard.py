@@ -9,10 +9,9 @@ from helpdesk.utils import is_agent
 
 
 @frappe.whitelist()
-def get_all():
+def get(date_start=None, date_end=None):
 	if not is_agent():
-		err = _("You are not allowed to access dashboard")
-		frappe.throw(err, frappe.PermissionError)
+		return []
 	return [
 		avg_first_response_time(),
 		resolution_within_sla(),

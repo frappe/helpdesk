@@ -4,7 +4,7 @@
       <template #right>
         <Tooltip v-if="!isEmpty(items.data)" placement="left" :text="dateInfo">
           <div class="flex h-7 w-7 items-center justify-between">
-            <IconInfo class="h-5 w-5 text-gray-700" />
+            <LucideInfo class="h-4 w-4" />
           </div>
         </Tooltip>
       </template>
@@ -48,25 +48,24 @@
 </template>
 
 <script setup lang="ts">
-import { createResource, usePageMeta, Tooltip } from "frappe-ui";
-import { isEmpty } from "lodash";
-import PageTitle from "@/components/PageTitle.vue";
-import LineChart from "@/components/charts/LineChart.vue";
-import PieChart from "@/components/charts/PieChart.vue";
-import SingleString from "@/components/charts/SingleString.vue";
-import IconInfo from "~icons/espresso/alert-circle";
+import { createResource, usePageMeta, Tooltip } from 'frappe-ui';
+import { isEmpty } from 'lodash';
+import PageTitle from '@/components/PageTitle.vue';
+import LineChart from '@/components/charts/LineChart.vue';
+import PieChart from '@/components/charts/PieChart.vue';
+import SingleString from '@/components/charts/SingleString.vue';
 
 const items = createResource({
-  url: "helpdesk.api.dashboard.get_all",
+  url: 'helpdesk.api.dashboard.get',
   auto: true,
 });
 
 const dateInfo =
-  "📊 The information displayed in these charts are derived from data collected over the past 30 days";
+  '📊 The information displayed in these charts are derived from data collected over the past 30 days';
 
 usePageMeta(() => {
   return {
-    title: "Dashboard",
+    title: 'Dashboard',
   };
 });
 </script>

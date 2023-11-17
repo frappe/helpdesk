@@ -10,7 +10,7 @@
       <Badge
         :label="data.status"
         :theme="ticketStatusStore.colorMap[data.status]"
-        variant="outline"
+        variant="subtle"
       />
     </template>
     <template #conversation="{ data }">
@@ -37,7 +37,7 @@
         v-if="data.agreement_status"
         :label="data.agreement_status"
         :theme="slaStatusColorMap[data.agreement_status]"
-        variant="outline"
+        variant="subtle"
       />
     </template>
     <template #response_by="{ data }">
@@ -49,13 +49,13 @@
           "
           label="Fulfilled"
           theme="green"
-          variant="outline"
+          variant="subtle"
         />
         <Badge
           v-else-if="dayjs(data.first_responded_on).isAfter(data.response_by)"
           label="Failed"
           theme="red"
-          variant="outline"
+          variant="subtle"
         />
         <Tooltip v-else :text="dayjs(data.response_by).long()">
           {{ dayjs(data.response_by).fromNow() }}
@@ -71,24 +71,18 @@
           "
           label="Fulfilled"
           theme="green"
-          variant="outline"
+          variant="subtle"
         />
         <Badge
           v-else-if="dayjs(data.resolution_date).isAfter(data.resolution_by)"
           label="Failed"
           theme="red"
-          variant="outline"
+          variant="subtle"
         />
         <Tooltip v-else :text="dayjs(data.resolution_by).long()">
           {{ dayjs(data.resolution_by).fromNow() }}
         </Tooltip>
       </span>
-    </template>
-    <template #creation="{ data }">
-      {{ dayjs(data.creation).fromNow() }}
-    </template>
-    <template #modified="{ data }">
-      {{ dayjs(data.modified).fromNow() }}
     </template>
     <template #source="{ data }">
       {{ data.via_customer_portal ? 'Customer Portal' : 'Email' }}

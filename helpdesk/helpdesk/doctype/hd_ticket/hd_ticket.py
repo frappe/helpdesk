@@ -69,12 +69,14 @@ class HDTicket(HasActivity, Document):
 			.where(QBCommunication.sent_or_received == "Sent")
 		)
 
-		query = (
-			query.select(QBTicket.star)
-			.select(count_comment)
-			.select(count_msg_incoming)
-			.select(count_msg_outgoing)
-		)
+		query = query.select(QBTicket.star)
+
+		if is_agent():
+			query = (
+				query.select(count_comment)
+				.select(count_msg_incoming)
+				.select(count_msg_outgoing)
+			)
 
 		return query
 

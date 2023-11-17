@@ -50,8 +50,10 @@ export const fetch = createResource({
   onError: useError(),
   onSuccess: (data) => {
     data.fields = data.fields
-      // Remove hidden fields
-      .filter((f) => !f.hidden)
+      // Remove hide fields
+      .filter((f) => !f.hide)
+      // Sort fields by `label`
+      .sort((a, b) => a.label?.localeCompare(b.label))
       // Sort fields by `index`
       .sort((a, b) => a.index - b.index);
     state[data.name] = data;
@@ -68,29 +70,57 @@ const override = computed(() => ({
     subject: {
       width: 'w-96',
       text: 'text-gray-900',
+      index: 2,
     },
     status: {
       width: 'w-20',
+      index: 3,
+    },
+    priority: {
+      width: 'w-20',
+      index: 4,
+    },
+    ticket_type: {
+      label: 'Type',
+      index: 5,
     },
     assignee: {
       label: 'Assignee',
       width: 'w-40',
-      hidden: !authStore.isAgent,
+      index: 6,
+      hide: !authStore.isAgent,
     },
     conversation: {
       label: 'Conversation',
       width: 'w-32',
-      hidden: !authStore.isAgent,
+      index: 7,
+      hide: !authStore.isAgent,
     },
     source: {
       label: 'Source',
-      hidden: !authStore.isAgent,
+      hide: !authStore.isAgent,
     },
     creation: {
       label: 'Created',
+      type: 'timeAgo',
+      index: 100,
     },
     modified: {
       label: 'Updated',
+      type: 'timeAgo',
+      index: 101,
+    },
+    agent_group: {
+      hide: !authStore.isAgent,
+    },
+    response_by: {
+      hide: !authStore.isAgent,
+    },
+    resolution_by: {
+      hide: !authStore.isAgent,
+    },
+    agreement_status: {
+      hide: !authStore.isAgent,
     },
   },
 }));
