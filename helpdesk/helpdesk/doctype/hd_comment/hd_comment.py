@@ -37,13 +37,15 @@ class HDComment(HasMentions, Document):
 			if isinstance(i, str):
 				continue
 			f = frappe.get_doc(
-				"File",
 				{
-					# "attached_to_doctype": "HD Comment",
+					"doctype": "File",
+					"attached_to_doctype": "HD Comment",
 					"file_url": i.file_url,
 				},
-			).get("name")
-			i.file = f
+			)
+			f.attached_to_name = self.name
+			f.save()
+			i.file = f.name
 
 	def strip_recipients(self):
 		"""
