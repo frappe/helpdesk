@@ -186,11 +186,11 @@ const menuOptions = computed(() =>
 );
 
 const dropdownOptions = [
-  {
-    label: 'Shortcuts',
-    icon: 'command',
-    onClick: () => keymapStore.toggleVisibility(true),
-  },
+  // {
+  //   label: 'Shortcuts',
+  //   icon: 'command',
+  //   onClick: () => keymapStore.toggleVisibility(true),
+  // },
   {
     label: 'Logout',
     icon: 'log-out',

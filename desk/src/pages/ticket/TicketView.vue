@@ -12,9 +12,8 @@
         <TicketConversation class="grow" :focus="focus">
           <template #communication-top-right="{ message }">
             <Button
-              label="Reply"
               theme="gray"
-              variant="outline"
+              variant="ghost"
               @click="
                 () => {
                   isExpanded = true;
@@ -32,7 +31,11 @@
                   );
                 }
               "
-            />
+            >
+              <template #icon>
+                <LucideReply class="h-4 w-4" />
+              </template>
+            </Button>
           </template>
         </TicketConversation>
         <span class="m-5">

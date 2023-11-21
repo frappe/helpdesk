@@ -27,18 +27,18 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import TicketCommentPrivate from "./TicketCommentPrivate.vue";
-import TicketCommentPublic from "./TicketCommentPublic.vue";
-import { ITicket, Comments } from "./symbols";
-import { createListManager } from "@/composables/listManager";
+import { inject } from 'vue';
+import TicketCommentPrivate from './TicketCommentPrivate.vue';
+import TicketCommentPublic from './TicketCommentPublic.vue';
+import { ITicket, Comments } from './symbols';
+import { createListManager } from '@/composables/listManager';
 
 interface P {
   focus?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
-  focus: "",
+  focus: '',
 });
 const ticket = inject(ITicket);
 const comments = inject(Comments);

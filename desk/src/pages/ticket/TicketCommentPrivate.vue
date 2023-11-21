@@ -10,10 +10,20 @@
           </div>
         </Tooltip>
       </div>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center">
         <Button
-          variant="outline"
-          :label="isPinned ? 'Unpin' : 'Pin'"
+          v-if="user.email === authStore.userId"
+          label="Delete"
+          theme="red"
+          variant="ghost"
+          @click="() => comments.delete.submit(props.name)"
+        >
+          <template #icon>
+            <LucideTrash2 class="h-4 w-4" />
+          </template>
+        </Button>
+        <Button
+          variant="ghost"
           @click="
             () => {
               comments.setValue.submit({
@@ -22,14 +32,12 @@
               });
             }
           "
-        />
-        <Button
-          v-if="user.email === authStore.userId"
-          label="Delete"
-          theme="red"
-          variant="outline"
-          @click="() => comments.delete.submit(props.name)"
-        />
+        >
+          <template #icon>
+            <LucidePinOff v-if="isPinned" class="h-4 w-4 rotate-45" />
+            <LucidePin v-else class="h-4 w-4 rotate-45" />
+          </template>
+        </Button>
       </div>
     </div>
     <!-- eslint-disable-next-line vue/no-v-html -->
@@ -38,12 +46,12 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
-import { dayjs } from "@/dayjs";
-import { useAuthStore } from "@/stores/auth";
-import { UserInfo } from "@/types";
-import { UserAvatar } from "@/components";
-import { Comments } from "./symbols";
+import { inject } from 'vue';
+import { dayjs } from '@/dayjs';
+import { useAuthStore } from '@/stores/auth';
+import { UserInfo } from '@/types';
+import { UserAvatar } from '@/components';
+import { Comments } from './symbols';
 
 const props = defineProps<{
   content: string;
