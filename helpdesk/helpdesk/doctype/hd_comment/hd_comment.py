@@ -75,7 +75,7 @@ class HDComment(HasMentions, Document):
 
 	@property
 	def cache_many(self):
-		return ["Comments", self.name]
+		return ["Comments", self.parent.name]
 
 	@property
 	def parent(self):
