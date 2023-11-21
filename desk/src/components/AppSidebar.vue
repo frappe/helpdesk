@@ -1,18 +1,36 @@
 <template>
   <div
-    class="z-0 flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
-    :style="{
-      'min-width': width,
-      'max-width': width,
-    }"
+    class="z-0 flex min-w-[256px] max-w-[256px] select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
   >
-    <!-- <UserMenu class="mb-2 ml-0.5" :options="profileSettings" /> -->
+    <Dropdown :options="dropdownOptions" class="mb-2">
+      <template #default="{ open }">
+        <button
+          class="flex w-[15rem] items-center rounded-md p-2 text-left"
+          :class="open ? 'bg-white shadow-sm' : 'hover:bg-gray-200'"
+        >
+          <img :src="HelpdeskLogo" class="h-8 w-8 rounded" />
+          <div class="ml-2 flex flex-col">
+            <div class="text-base font-medium leading-none text-gray-900">
+              Helpdesk
+            </div>
+            <div
+              class="mt-1 hidden text-sm leading-none text-gray-700 sm:inline"
+            >
+              {{ authStore.userName }}
+            </div>
+          </div>
+          <FeatherIcon
+            name="chevron-down"
+            class="ml-auto h-5 w-5 text-gray-700"
+          />
+        </button>
+      </template>
+    </Dropdown>
     <SidebarLink
       label="Search"
       class="mb-1"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
-      :is-expanded="isExpanded"
     >
       <template #right>
         <span class="flex items-center gap-0.5 font-medium text-gray-600">
@@ -45,23 +63,14 @@
     <!--     </template> -->
     <!--   </SidebarLink> -->
     <!-- </span> -->
-    <div class="mb-4 flex flex-col gap-1">
+    <div class="space-y-1">
       <SidebarLink
         v-for="option in menuOptions"
         v-bind="option"
         :key="option.label"
-        :is-expanded="isExpanded"
         :is-active="option.to?.includes(route.name.toString())"
       />
     </div>
-    <div class="grow" />
-    <SidebarLink
-      :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
-      :is-active="false"
-      :is-expanded="isExpanded"
-      :label="isExpanded ? 'Collapse' : 'Expand'"
-      :on-click="() => (isExpanded = !isExpanded)"
-    />
   </div>
 </template>
 
@@ -69,6 +78,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { Dropdown } from 'frappe-ui';
 import { useAuthStore } from '@/stores/auth';
 import { useKeymapStore } from '@/stores/keymap';
 // import { useNotificationStore } from '@/stores/notification';
@@ -88,6 +98,7 @@ import {
 import { useDevice } from '@/composables';
 import { SidebarLink } from '@/components';
 // import UserMenu from './UserMenu.vue';
+import HelpdeskLogo from '@/assets/logos/helpdesk.png';
 import LucideArrowLeftFromLine from '~icons/lucide/arrow-left-from-line';
 import LucideArrowRightFromLine from '~icons/lucide/arrow-right-from-line';
 import LucideArrowUpFromLine from '~icons/lucide/arrow-up-from-line';
@@ -107,7 +118,6 @@ const route = useRoute();
 const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 // const notificationStore = useNotificationStore();
-const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 
 const menuOptions = computed(() =>
@@ -175,22 +185,14 @@ const menuOptions = computed(() =>
   ].filter((option) => !option.hide)
 );
 
-const profileSettings = [
+const dropdownOptions = [
   {
     label: 'Shortcuts',
     icon: 'command',
     onClick: () => keymapStore.toggleVisibility(true),
   },
-  // {
-  //   label: 'Customer portal',
-  //   icon: 'users',
-  //   onClick: () => {
-  //     const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
-  //     window.open(path.href, '_blank');
-  //   },
-  // },
   {
-    label: 'Log out',
+    label: 'Logout',
     icon: 'log-out',
     onClick: () => authStore.logout(),
   },

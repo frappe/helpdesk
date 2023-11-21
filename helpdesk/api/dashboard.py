@@ -2,16 +2,70 @@ from datetime import datetime, timedelta
 
 import frappe
 from frappe import _
-from frappe.query_builder.functions import Count
+from frappe.query_builder.functions import Count, Date
+from frappe.query_builder.terms import Criterion
 from frappe.utils.caching import redis_cache
 
-from helpdesk.utils import is_agent
+from helpdesk.utils import get_customer, is_agent
 
 
 @frappe.whitelist()
-def get(date_start=None, date_end=None):
-	if not is_agent():
-		return []
+def get():
+	if is_agent():
+		return for_agent()
+	return [by_date(), by_status()]
+
+
+def base_query(table, date_start=None, date_end=None):
+	user = frappe.session.user
+	or_criterion = [table.contact == user, table.raised_by == user]
+	and_criterion = []
+	if date_start:
+		and_criterion.append(table.creation >= date_start)
+	if date_end:
+		and_criterion.append(table.creation <= date_end)
+	for c in get_customer(user):
+		or_criterion.append(table.customer == c)
+	return (
+		frappe.qb.from_(table)
+		.where(Criterion.any(or_criterion))
+		.where(Criterion.all(and_criterion))
+	)
+
+
+def by_date():
+	Ticket = frappe.qb.DocType("HD Ticket")
+	return {
+		"title": _("Tickets"),
+		"is_chart": True,
+		"chart_type": "Line",
+		"data": (
+			base_query(Ticket)
+			.select(Date(Ticket.creation, "name"))
+			.select(Count(Ticket.name, "value"))
+			.groupby(Date(Ticket.creation))
+			.run(as_dict=True)
+		),
+	}
+
+
+def by_status():
+	Ticket = frappe.qb.DocType("HD Ticket")
+	return {
+		"title": _("Status"),
+		"is_chart": True,
+		"chart_type": "Pie",
+		"data": (
+			base_query(Ticket)
+			.select(Ticket.status.as_("name"))
+			.select(Count(Ticket.name, "value"))
+			.groupby(Ticket.status)
+			.run(as_dict=True)
+		),
+	}
+
+
+def for_agent():
 	return [
 		avg_first_response_time(),
 		resolution_within_sla(),
