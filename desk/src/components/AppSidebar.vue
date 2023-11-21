@@ -98,7 +98,7 @@ import {
 import { useDevice } from '@/composables';
 import { SidebarLink } from '@/components';
 // import UserMenu from './UserMenu.vue';
-import HelpdeskLogo from '@/assets/logos/helpdesk.png';
+import HelpdeskLogo from '@/assets/logos/helpdesk.svg';
 import LucideArrowLeftFromLine from '~icons/lucide/arrow-left-from-line';
 import LucideArrowRightFromLine from '~icons/lucide/arrow-right-from-line';
 import LucideArrowUpFromLine from '~icons/lucide/arrow-up-from-line';
