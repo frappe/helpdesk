@@ -1,5 +1,6 @@
 import { useClipboard } from '@vueuse/core';
-import { call, toast } from 'frappe-ui';
+import { call } from 'frappe-ui';
+import { toast } from 'vue-sonner';
 
 /**
  * Wrapper to create toasts, supplied with default options.
@@ -7,9 +8,9 @@ import { call, toast } from 'frappe-ui';
  * @param options - `Toast` options
  */
 export function createToast(options?: Record<string, string>) {
-  toast({
-    position: 'bottom-right',
-    ...options,
+  const fn = options.type ?? 'message';
+  toast[fn].call({}, options.title, {
+    description: options.message,
   });
 }
 

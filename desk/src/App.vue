@@ -2,6 +2,7 @@
   <span class="fixed inset-0">
     <RouterView class="antialiased" />
     <Toasts />
+    <Toaster position="top-right" rich-colors />
     <KeymapDialog />
   </span>
 </template>
@@ -9,6 +10,7 @@
 <script setup lang="ts">
 import { provide, ref, onMounted } from 'vue';
 import { Toasts } from 'frappe-ui';
+import { Toaster } from 'vue-sonner';
 import { createToast } from '@/utils';
 import { useConfigStore } from '@/stores/config';
 import KeymapDialog from '@/pages/KeymapDialog.vue';
@@ -25,16 +27,14 @@ onMounted(async () => {
   window.addEventListener('online', () => {
     createToast({
       title: 'You are now online',
-      icon: 'wifi',
-      iconClasses: 'stroke-green-600',
+      type: 'success',
     });
   });
 
   window.addEventListener('offline', () => {
     createToast({
       title: 'You are now offline',
-      icon: 'wifi-off',
-      iconClasses: 'stroke-red-600',
+      type: 'warning',
     });
   });
 });

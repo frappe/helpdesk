@@ -1,4 +1,4 @@
-import { createToast } from "@/utils";
+import { createToast } from '@/utils';
 
 interface Options {
   title?: string;
@@ -13,9 +13,9 @@ interface Error {
 
 export function useError(o?: Options) {
   function getMessage(e: Error) {
-    if (e.messages) return e.messages.join(", ");
+    if (e.messages) return e.messages.join(', ');
     else if (e.message) return e.message;
-    else return "";
+    else return '';
   }
 
   function getTitle(e: Error) {
@@ -27,8 +27,7 @@ export function useError(o?: Options) {
     createToast({
       title: getTitle(e),
       message: o?.title ? undefined : getMessage(e),
-      icon: o?.icon ?? "x",
-      iconClasses: o?.iconClass ?? "text-red-500",
+      type: 'error',
     });
   };
 }
