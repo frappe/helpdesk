@@ -3,7 +3,7 @@
     <!-- <SideBar /> -->
     <AppSidebar />
     <!-- <Notifications /> -->
-    <RouterView class="z-0 grow overflow-auto" />
+    <RouterView class="w-full overflow-hidden" />
     <CommandPalette />
   </div>
 </template>

@@ -15,7 +15,6 @@
       </template>
     </PageTitle>
     <ListView
-      :columns="columns"
       :resource="responses"
       class="mt-2.5"
       doctype="HD Canned Response"
@@ -27,32 +26,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta } from "frappe-ui";
-import { AGENT_PORTAL_CANNED_RESPONSE_SINGLE } from "@/router";
-import { createListManager } from "@/composables/listManager";
-import PageTitle from "@/components/PageTitle.vue";
-import { ListView } from "@/components";
-import AddNewCannedResponsesDialog from "@/components/desk/global/AddNewCannedResponsesDialog.vue";
+import { ref } from 'vue';
+import { usePageMeta } from 'frappe-ui';
+import { AGENT_PORTAL_CANNED_RESPONSE_SINGLE } from '@/router';
+import { createListManager } from '@/composables/listManager';
+import PageTitle from '@/components/PageTitle.vue';
+import { ListView } from '@/components';
+import AddNewCannedResponsesDialog from '@/components/desk/global/AddNewCannedResponsesDialog.vue';
 
 const showNewDialog = ref(false);
-const emptyMessage = "No Canned Responses Found";
-const columns = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Owner",
-    key: "owner",
-    width: "w-96",
-  },
-];
-
 const responses = createListManager({
-  doctype: "HD Canned Response",
-  fields: ["name", "title", "owner"],
+  doctype: 'HD Canned Response',
+  fields: ['name', 'title', 'owner'],
   auto: true,
   transform: (data) => {
     for (const d of data) {
@@ -69,7 +54,7 @@ const responses = createListManager({
 
 usePageMeta(() => {
   return {
-    title: "Canned responses",
+    title: 'Canned responses',
   };
 });
 </script>

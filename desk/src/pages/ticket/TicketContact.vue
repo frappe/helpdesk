@@ -37,34 +37,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue";
-import { createDocumentResource, Avatar } from "frappe-ui";
-import { isEmpty } from "lodash";
-import TicketContactTickets from "./TicketContactTickets.vue";
-import TicketSidebarHeader from "./TicketSidebarHeader.vue";
-import { Ticket } from "./symbols";
-import LucideMail from "~icons/lucide/mail";
-import LucidePhone from "~icons/lucide/phone";
-import LucideSmartphone from "~icons/lucide/smartphone";
+import { computed, inject } from 'vue';
+import { createDocumentResource, Avatar } from 'frappe-ui';
+import { isEmpty } from 'lodash';
+import TicketContactTickets from './TicketContactTickets.vue';
+import TicketSidebarHeader from './TicketSidebarHeader.vue';
+import { Ticket } from './symbols';
+import LucideMail from '~icons/lucide/mail';
+import LucidePhone from '~icons/lucide/phone';
+import LucideSmartphone from '~icons/lucide/smartphone';
 
 const fields = [
   {
-    field: "email_id",
+    field: 'email_id',
     icon: LucideMail,
   },
   {
-    field: "phone",
+    field: 'phone',
     icon: LucidePhone,
   },
   {
-    field: "mobile_no",
+    field: 'mobile_no',
     icon: LucideSmartphone,
   },
 ];
 
 const ticket = inject(Ticket);
 const contact = createDocumentResource({
-  doctype: "Contact",
+  doctype: 'Contact',
   name: ticket.doc.contact,
   auto: true,
 });

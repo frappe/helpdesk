@@ -123,4 +123,85 @@ const override = computed(() => ({
       hide: !authStore.isAgent,
     },
   },
+  Contact: {
+    name: {
+      label: 'Name',
+      width: 'w-80',
+    },
+    email_id: {
+      label: 'Email',
+      width: 'w-80',
+    },
+    phone: {
+      label: 'Phone',
+      key: 'phone',
+      width: 'w-80',
+    },
+  },
+  'HD Customer': {
+    name: {
+      label: 'Name',
+      width: 'w-80',
+    },
+    domain: {
+      label: 'Domain',
+      width: 'w-80',
+    },
+  },
+  'HD Team': {
+    name: {
+      label: 'Name',
+      width: 'w-80',
+    },
+    assignment_rule: {
+      label: 'Assignment rule',
+      width: 'w-80',
+    },
+  },
+  'HD Agent': {
+    name: {
+      label: 'name',
+      width: 'w-80',
+    },
+    email: {
+      label: 'email',
+      width: 'w-80',
+    },
+    username: {
+      label: 'username',
+      width: 'w-80',
+    },
+    is_active: {
+      hide: true,
+    },
+  },
+  'HD Escalation Rule': {
+    priority: {
+      label: 'Priority',
+      width: 'w-64',
+    },
+    team: {
+      label: 'Team',
+      width: 'w-64',
+    },
+    ticket_type: {
+      label: 'Ticket type',
+      width: 'w-64',
+    },
+    is_enabled: {
+      label: 'Status',
+      width: 'w-20',
+    },
+  },
+  'HD Canned Response': {
+    name: {
+      label: 'Name',
+      width: 'w-80',
+    },
+    owner: {
+      label: 'Owner',
+      key: 'owner',
+      width: 'w-96',
+    },
+  },
 }));

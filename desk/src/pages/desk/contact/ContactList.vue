@@ -14,12 +14,7 @@
         </Button>
       </template>
     </PageTitle>
-    <ListView
-      :columns="columns"
-      :resource="contacts"
-      class="mt-2.5"
-      doctype="Contact"
-    >
+    <ListView :resource="contacts" class="mt-2.5" doctype="Contact">
       <template #name="{ data }">
         <div class="flex items-center gap-2">
           <Avatar :label="data.name" :image="data.image" size="sm" />
@@ -37,38 +32,21 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta, Avatar } from "frappe-ui";
-import { createListManager } from "@/composables/listManager";
-import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
-import PageTitle from "@/components/PageTitle.vue";
-import { ListView } from "@/components";
-import ContactDialog from "./ContactDialog.vue";
+import { ref } from 'vue';
+import { usePageMeta, Avatar } from 'frappe-ui';
+import { createListManager } from '@/composables/listManager';
+import NewContactDialog from '@/components/desk/global/NewContactDialog.vue';
+import PageTitle from '@/components/PageTitle.vue';
+import { ListView } from '@/components';
+import ContactDialog from './ContactDialog.vue';
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
-const columns = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Email",
-    key: "email_id",
-    width: "w-80",
-  },
-  {
-    label: "Phone",
-    key: "phone",
-    width: "w-80",
-  },
-];
 
 const contacts = createListManager({
-  doctype: "Contact",
-  fields: ["name", "email_id", "image", "phone"],
+  doctype: 'Contact',
+  fields: ['name', 'email_id', 'image', 'phone'],
   auto: true,
   transform: (data) => {
     for (const d of data) {
@@ -80,7 +58,7 @@ const contacts = createListManager({
 
 usePageMeta(() => {
   return {
-    title: "Contacts",
+    title: 'Contacts',
   };
 });
 

@@ -14,12 +14,7 @@
         </Button>
       </template>
     </PageTitle>
-    <ListView
-      :columns="columns"
-      :resource="agents"
-      class="mt-2.5"
-      doctype="HD Agent"
-    >
+    <ListView :resource="agents" class="mt-2.5" doctype="HD Agent">
       <template #name="{ data }">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -48,44 +43,27 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta, Avatar, Badge } from "frappe-ui";
-import { AGENT_PORTAL_TICKET_LIST } from "@/router";
-import { createListManager } from "@/composables/listManager";
-import { useFilter } from "@/composables/filter";
-import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
-import PageTitle from "@/components/PageTitle.vue";
-import { ListView } from "@/components";
+import { ref } from 'vue';
+import { usePageMeta, Avatar, Badge } from 'frappe-ui';
+import { AGENT_PORTAL_TICKET_LIST } from '@/router';
+import { createListManager } from '@/composables/listManager';
+import { useFilter } from '@/composables/filter';
+import AddNewAgentsDialog from '@/components/desk/global/AddNewAgentsDialog.vue';
+import PageTitle from '@/components/PageTitle.vue';
+import { ListView } from '@/components';
 
-const { apply, storage } = useFilter("HD Ticket");
+const { apply, storage } = useFilter('HD Ticket');
 const isDialogVisible = ref(false);
-const columns = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Email",
-    key: "email",
-    width: "w-80",
-  },
-  {
-    label: "Username",
-    key: "username",
-    width: "w-80",
-  },
-];
 
 const agents = createListManager({
-  doctype: "HD Agent",
+  doctype: 'HD Agent',
   fields: [
-    "name",
-    "is_active",
-    "user.full_name",
-    "user.user_image",
-    "user.email",
-    "user.username",
+    'name',
+    'is_active',
+    'user.full_name',
+    'user.user_image',
+    'user.email',
+    'user.username',
   ],
   auto: true,
   transform: (data) => {
@@ -98,15 +76,15 @@ const agents = createListManager({
 
 usePageMeta(() => {
   return {
-    title: "Agents",
+    title: 'Agents',
   };
 });
 
 function toTickets(user: string) {
   storage.value.clear();
   storage.value.add({
-    fieldname: "_assign",
-    operator: "is",
+    fieldname: '_assign',
+    operator: 'is',
     value: user,
   });
   apply({

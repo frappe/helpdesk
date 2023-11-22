@@ -44,49 +44,49 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { Tooltip } from "frappe-ui";
-import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
-import { useAuthStore } from "@/stores/auth";
-import TicketActionsTags from "./TicketActionsTags.vue";
-import TicketContact from "./TicketContact.vue";
-import TicketDetails from "./TicketDetails.vue";
-import TicketHistory from "./TicketHistory.vue";
-import TicketViews from "./TicketViews.vue";
-import LucideContact2 from "~icons/lucide/contact-2";
-import LucideHistory from "~icons/lucide/history";
-import LucideInfo from "~icons/lucide/info";
-import LucidePointer from "~icons/lucide/pointer";
-import LucideView from "~icons/lucide/view";
+import { computed, ref } from 'vue';
+import { Tooltip } from 'frappe-ui';
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+import { useAuthStore } from '@/stores/auth';
+import TicketActionsTags from './TicketActionsTags.vue';
+import TicketContact from './TicketContact.vue';
+import TicketDetails from './TicketDetails.vue';
+import TicketHistory from './TicketHistory.vue';
+import TicketViews from './TicketViews.vue';
+import LucideContact2 from '~icons/lucide/contact-2';
+import LucideHistory from '~icons/lucide/history';
+import LucideInfo from '~icons/lucide/info';
+import LucidePointer from '~icons/lucide/pointer';
+import LucideView from '~icons/lucide/view';
 
 const authStore = useAuthStore();
 const isExpanded = ref(true);
 const items = computed(() =>
   [
     {
-      name: "Details",
+      name: 'Details',
       component: TicketDetails,
       icon: LucideInfo,
     },
     {
-      name: "Actions & Tags",
+      name: 'Actions & Tags',
       component: TicketActionsTags,
       icon: LucidePointer,
       hidden: !authStore.isAgent,
     },
     {
-      name: "Contact",
+      name: 'Contact',
       component: TicketContact,
       icon: LucideContact2,
     },
     {
-      name: "History",
+      name: 'History',
       component: TicketHistory,
       icon: LucideHistory,
       hidden: !authStore.isAgent,
     },
     {
-      name: "Views",
+      name: 'Views',
       component: TicketViews,
       icon: LucideView,
       hidden: !authStore.isAgent,

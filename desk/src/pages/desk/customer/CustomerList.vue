@@ -14,12 +14,7 @@
         </Button>
       </template>
     </PageTitle>
-    <ListView
-      :columns="columns"
-      :resource="customers"
-      class="mt-2.5"
-      doctype="HD Customer"
-    >
+    <ListView :resource="customers" class="mt-2.5" doctype="HD Customer">
       <template #name="{ data }">
         <div class="flex items-center gap-2">
           <Avatar :label="data.name" :image="data.image" size="sm" />
@@ -40,35 +35,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta, Avatar } from "frappe-ui";
-import { createListManager } from "@/composables/listManager";
-import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
-import PageTitle from "@/components/PageTitle.vue";
-import { ListView } from "@/components";
-import CustomerDialog from "./CustomerDialog.vue";
-import IconPlus from "~icons/lucide/plus";
+import { ref } from 'vue';
+import { usePageMeta, Avatar } from 'frappe-ui';
+import { createListManager } from '@/composables/listManager';
+import NewCustomerDialog from '@/components/desk/global/NewCustomerDialog.vue';
+import PageTitle from '@/components/PageTitle.vue';
+import { ListView } from '@/components';
+import CustomerDialog from './CustomerDialog.vue';
+import IconPlus from '~icons/lucide/plus';
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
-const emptyMessage = "No Customers Found";
-const columns = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Domain",
-    key: "domain",
-    width: "w-80",
-  },
-];
 
 const customers = createListManager({
-  doctype: "HD Customer",
-  fields: ["name", "image", "domain"],
+  doctype: 'HD Customer',
+  fields: ['name', 'image', 'domain'],
   auto: true,
   transform: (data) => {
     for (const d of data) {
@@ -80,7 +62,7 @@ const customers = createListManager({
 
 usePageMeta(() => {
   return {
-    title: "Customers",
+    title: 'Customers',
   };
 });
 

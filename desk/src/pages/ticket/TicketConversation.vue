@@ -1,37 +1,60 @@
 <template>
-  <div class="divide-y overflow-auto px-5 pb-32">
-    <div v-for="c in comments.data" :id="c.name" :key="c.name" class="mt-4">
-      <TicketCommentPrivate
-        v-if="c.comment_type == 'Private'"
-        :name="c.name"
-        :content="c.content"
-        :date="c.creation"
-        :user="c.user"
-        :is-pinned="c.is_pinned"
-      />
-      <TicketCommentPublic
-        v-else
-        :content="c.content"
-        :date="c.creation"
-        :user="c.user"
-        :cc="c.cc || ''"
-        :bcc="c.bcc || ''"
-        :attachments="c.attachments"
+  <div>
+    <div class="sticky top-0 z-50 px-5 py-3 backdrop-blur-lg">
+      <Button
+        variant="subtle"
+        label="Pinned"
+        :theme="pinned ? 'blue' : 'gray'"
+        @click="() => (pinned = !pinned)"
       >
-        <template #top-right="d">
-          <slot name="communication-top-right" v-bind="d" />
+        <template #suffix>
+          <Badge
+            :label="comments.data?.filter((c) => c.is_pinned).length"
+            theme="gray"
+            variant="outline"
+          />
         </template>
-      </TicketCommentPublic>
+      </Button>
+    </div>
+    <div class="divide-y overflow-auto pb-32">
+      <div
+        v-for="c in comments.data?.filter((c) => (pinned ? c.is_pinned : true))"
+        :id="c.name"
+        :key="c.name"
+      >
+        <TicketCommentPrivate
+          v-if="c.comment_type == 'Private'"
+          :name="c.name"
+          :content="c.content"
+          :date="c.creation"
+          :user="c.user"
+          :is-pinned="c.is_pinned"
+          :attachments="c.attachments"
+        />
+        <TicketCommentPublic
+          v-else
+          :content="c.content"
+          :date="c.creation"
+          :user="c.user"
+          :cc="c.cc || ''"
+          :bcc="c.bcc || ''"
+          :attachments="c.attachments"
+        >
+          <template #top-right="d">
+            <slot name="communication-top-right" v-bind="d" />
+          </template>
+        </TicketCommentPublic>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { inject, ref } from 'vue';
+import { Badge } from 'frappe-ui';
 import TicketCommentPrivate from './TicketCommentPrivate.vue';
 import TicketCommentPublic from './TicketCommentPublic.vue';
-import { ITicket, Comments } from './symbols';
-import { createListManager } from '@/composables/listManager';
+import { Ticket, Comments } from './symbols';
 
 interface P {
   focus?: string;
@@ -40,8 +63,9 @@ interface P {
 const props = withDefaults(defineProps<P>(), {
   focus: '',
 });
-const ticket = inject(ITicket);
+const ticket = inject(Ticket);
 const comments = inject(Comments);
+const pinned = ref(false);
 
 // function scroll(id: string) {
 //   const e = document.getElementById(id);

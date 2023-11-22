@@ -1,5 +1,5 @@
-import { useClipboard } from "@vueuse/core";
-import { toast } from "frappe-ui";
+import { useClipboard } from '@vueuse/core';
+import { call, toast } from 'frappe-ui';
 
 /**
  * Wrapper to create toasts, supplied with default options.
@@ -8,7 +8,7 @@ import { toast } from "frappe-ui";
  */
 export function createToast(options?: Record<string, string>) {
   toast({
-    position: "bottom-right",
+    position: 'bottom-right',
     ...options,
   });
 }
@@ -21,9 +21,9 @@ export async function copy(s: string) {
   const { copy: c } = useClipboard();
   c(s).then(() =>
     createToast({
-      title: "Copied to clipboard",
-      icon: "check",
-      iconClasses: "text-green-600",
+      title: 'Copied to clipboard',
+      icon: 'check',
+      iconClasses: 'text-green-600',
     })
   );
 }
@@ -38,4 +38,16 @@ export function getAssign(s: string): string | undefined {
   const assignJson = JSON.parse(s);
   const arr = Array.isArray(assignJson) ? assignJson : [];
   return arr.slice(-1).pop();
+}
+
+/**
+ * Track visit to a document.
+ * @param dt - DocType
+ * @param dn - DocName
+ */
+export function trackVisit(dt: string, dn: string) {
+  return call('helpdesk.helpdesk.doctype.hd_visit.hd_visit.track_visit', {
+    dt,
+    dn,
+  });
 }

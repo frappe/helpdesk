@@ -1,13 +1,19 @@
 @import "./assets/Inter/inter.css";
 @import "frappe-ui/src/style.css";
 
+@layer utilities {
+  .break-anywhere {
+    overflow-wrap: anywhere;
+  }
+}
+
 @layer components {
 	.prose-f {
 		@apply
-		break-all
 		max-w-none
+		break-words
+		break-anywhere
 		prose
-		prose-code:break-all
 		prose-code:whitespace-pre-wrap
 		prose-img:border
 		prose-img:rounded-lg

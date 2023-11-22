@@ -14,15 +14,10 @@
         </Button>
       </template>
     </PageTitle>
-    <ListView
-      :columns="columns"
-      :resource="rules"
-      class="mt-2.5"
-      doctype="HD Escalation Rule"
-    >
+    <ListView :resource="rules" class="mt-2.5" doctype="HD Escalation Rule">
       <template #is_enabled="{ data }">
         <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">
-          {{ data.is_enabled ? "Enabled" : "Disabled" }}
+          {{ data.is_enabled ? 'Enabled' : 'Disabled' }}
         </Badge>
       </template>
     </ListView>
@@ -34,43 +29,20 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta, Badge } from "frappe-ui";
-import { socket } from "@/socket";
-import { createListManager } from "@/composables/listManager";
-import { ListView } from "@/components";
-import PageTitle from "@/components/PageTitle.vue";
-import EscalationRuleDialog from "./EscalationRuleDialog.vue";
+import { ref } from 'vue';
+import { usePageMeta, Badge } from 'frappe-ui';
+import { socket } from '@/socket';
+import { createListManager } from '@/composables/listManager';
+import { ListView } from '@/components';
+import PageTitle from '@/components/PageTitle.vue';
+import EscalationRuleDialog from './EscalationRuleDialog.vue';
 
 const showDialog = ref(false);
 const selectedRule = ref(null);
-const emptyMessage = "No Escalation Rules Found";
-const columns = [
-  {
-    label: "Priority",
-    key: "priority",
-    width: "w-64",
-  },
-  {
-    label: "Team",
-    key: "team",
-    width: "w-64",
-  },
-  {
-    label: "Ticket type",
-    key: "ticket_type",
-    width: "w-64",
-  },
-  {
-    label: "Status",
-    key: "is_enabled",
-    width: "w-20",
-  },
-];
 
 const rules = createListManager({
-  doctype: "HD Escalation Rule",
-  fields: ["name", "priority", "team", "ticket_type", "is_enabled"],
+  doctype: 'HD Escalation Rule',
+  fields: ['name', 'priority', 'team', 'ticket_type', 'is_enabled'],
   auto: true,
   transform: (data) => {
     for (const d of data) {
@@ -82,7 +54,7 @@ const rules = createListManager({
 
 usePageMeta(() => {
   return {
-    title: "Escalation rules",
+    title: 'Escalation rules',
   };
 });
 
@@ -91,6 +63,6 @@ function openDialog(rule: string | null) {
   showDialog.value = true;
 }
 
-socket.on("helpdesk:new-escalation-rule", () => rules.reload());
-socket.on("helpdesk:delete-escalation-rule", () => rules.reload());
+socket.on('helpdesk:new-escalation-rule', () => rules.reload());
+socket.on('helpdesk:delete-escalation-rule', () => rules.reload());
 </script>

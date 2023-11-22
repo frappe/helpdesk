@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-3 pt-6">
+  <div class="px-5 py-3">
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong />
@@ -14,7 +14,7 @@
     </div>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <span class="prose-f" v-html="sanitize(content)"></span>
-    <div class="flex flex-wrap gap-2">
+    <div v-if="attachments.length" class="flex flex-wrap gap-2">
       <AttachmentItem
         v-for="a in attachments"
         :key="a.file_url"
@@ -26,35 +26,36 @@
 </template>
 
 <script setup lang="ts">
-import { Tooltip } from "frappe-ui";
-import sanitizeHtml from "sanitize-html";
-import { dayjs } from "@/dayjs";
-import { AttachmentItem, UserAvatar } from "@/components";
-import { UserInfo } from "@/types";
+import { Tooltip } from 'frappe-ui';
+import sanitizeHtml from 'sanitize-html';
+import { dayjs } from '@/dayjs';
+import { AttachmentItem, UserAvatar } from '@/components';
+import { UserInfo } from '@/types';
 
 interface Attachment {
   file_name: string;
   file_url: string;
 }
 
-interface P {
-  content: string;
-  date: string;
-  user: UserInfo;
-  cc?: string;
-  bcc?: string;
-  attachments?: Attachment[];
-}
-
-withDefaults(defineProps<P>(), {
-  cc: () => "",
-  bcc: () => "",
-  attachments: () => [],
-});
+withDefaults(
+  defineProps<{
+    content: string;
+    date: string;
+    user: UserInfo;
+    cc?: string;
+    bcc?: string;
+    attachments?: Attachment[];
+  }>(),
+  {
+    cc: () => '',
+    bcc: () => '',
+    attachments: () => [],
+  }
+);
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
   });
 }
 </script>

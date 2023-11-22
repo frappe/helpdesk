@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded p-3 shadow">
+  <div class="border-t px-5 py-3">
     <FTextEditor
       ref="e"
       v-bind="$attrs"
@@ -53,10 +53,10 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, nextTick, ref } from "vue";
-import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
-import { useAuthStore } from "@/stores/auth";
-import { UserAvatar } from "@/components";
+import { computed, nextTick, ref } from 'vue';
+import { TextEditor as FTextEditor, TextEditorFixedMenu } from 'frappe-ui';
+import { useAuthStore } from '@/stores/auth';
+import { UserAvatar } from '@/components';
 
 interface P {
   modelValue: string;
@@ -64,8 +64,8 @@ interface P {
 }
 
 interface E {
-  (event: "clear"): void;
-  (event: "update:modelValue"): string;
+  (event: 'clear'): void;
+  (event: 'update:modelValue'): string;
 }
 
 const props = withDefaults(defineProps<P>(), {
@@ -78,15 +78,15 @@ const e = ref(null);
 const editor = computed(() => e.value.editor);
 const authStore = useAuthStore();
 const fixedMenu = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5"],
-  "Bullet List",
-  "Numbered List",
-  "Image",
-  "Video",
-  "Link",
-  "Blockquote",
-  "Code",
+  'Paragraph',
+  ['Heading 2', 'Heading 3', 'Heading 4', 'Heading 5'],
+  'Bullet List',
+  'Numbered List',
+  'Image',
+  'Video',
+  'Link',
+  'Blockquote',
+  'Code',
 ];
 
 defineExpose({

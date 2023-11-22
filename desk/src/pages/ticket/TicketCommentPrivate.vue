@@ -1,5 +1,5 @@
 <template>
-  <div class="my-4 rounded border bg-cyan-50 p-4">
+  <div class="bg-cyan-50 px-5 py-3">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-0.5 text-base">
         <UserAvatar v-bind="user" size="lg" expand strong />
@@ -42,6 +42,14 @@
     </div>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <span class="prose-f" v-html="content"></span>
+    <div v-if="attachments.length" class="flex flex-wrap gap-2">
+      <AttachmentItem
+        v-for="a in attachments"
+        :key="a.file_url"
+        :label="a.file_name"
+        :url="a.file_url"
+      />
+    </div>
   </div>
 </template>
 
@@ -53,13 +61,19 @@ import { UserInfo } from '@/types';
 import { UserAvatar } from '@/components';
 import { Comments } from './symbols';
 
-const props = defineProps<{
-  content: string;
-  date: string;
-  isPinned: number;
-  name: string;
-  user: UserInfo;
-}>();
+const props = withDefaults(
+  defineProps<{
+    content: string;
+    date: string;
+    isPinned: number;
+    name: string;
+    user: UserInfo;
+    attachments?: any[];
+  }>(),
+  {
+    attachments: () => [],
+  }
+);
 const authStore = useAuthStore();
 const comments = inject(Comments);
 </script>

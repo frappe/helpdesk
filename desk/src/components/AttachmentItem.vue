@@ -4,7 +4,7 @@
       <Button
         :label="label"
         theme="gray"
-        variant="outline"
+        variant="subtle"
         @click="toggleDialog()"
       >
         <template #prefix>
@@ -36,14 +36,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Button, Dialog } from "frappe-ui";
-import { getType as getMime } from "mime";
-import LucideFileType from "~icons/lucide/file-type";
-import LucideFileImage from "~icons/lucide/file-image";
-import LucideFileText from "~icons/lucide/file-text";
-import LucideFileSpreadsheet from "~icons/lucide/file-spreadsheet";
-import LucideFile from "~icons/lucide/file";
+import { ref } from 'vue';
+import { Button, Dialog } from 'frappe-ui';
+import { getType as getMime } from 'mime';
+import LucideFileType from '~icons/lucide/file-type';
+import LucideFileImage from '~icons/lucide/file-image';
+import LucideFileText from '~icons/lucide/file-text';
+import LucideFileSpreadsheet from '~icons/lucide/file-spreadsheet';
+import LucideFile from '~icons/lucide/file';
 
 interface P {
   label: string;
@@ -55,13 +55,13 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 const showDialog = ref(false);
-const mimeType = getMime(props.label) || "";
-const isImage = mimeType.startsWith("image/");
-const isPdf = mimeType === "application/pdf";
-const isSpreadsheet = mimeType.includes("spreadsheet");
-const isText = mimeType === "text/plain";
+const mimeType = getMime(props.label) || '';
+const isImage = mimeType.startsWith('image/');
+const isPdf = mimeType === 'application/pdf';
+const isSpreadsheet = mimeType.includes('spreadsheet');
+const isText = mimeType === 'text/plain';
 const isShowable = props.url && (isText || isImage);
-const content = ref("");
+const content = ref('');
 
 function getIcon() {
   if (isText) return LucideFileType;
