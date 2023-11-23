@@ -146,7 +146,7 @@ export function useFilter(doctype: string) {
   return {
     add,
     apply,
-    fields: fields.data,
+    fields,
     getArgs,
     storage,
   };

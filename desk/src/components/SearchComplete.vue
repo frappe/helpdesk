@@ -49,6 +49,9 @@ const r = createListResource({
   pageLength: props.pageLength,
   auto: true,
   fields: [props.labelField, props.searchField, props.valueField],
+  filters: {
+    [props.searchField]: ["like", `%${props.value}%`],
+  },
   onSuccess: () => {
     selection.value = props.value
       ? options.value.find((o) => o.value === props.value)
