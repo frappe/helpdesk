@@ -1,16 +1,18 @@
 <div align="center" markdown="1">
-	<picture>
-		<source 
-			media="(prefers-color-scheme: dark)" 
-			srcset=".github/logo_dark.svg">
-		<img
-			width="260"
-			alt="Frappe Helpdesk logo" 
-			src=".github/logo_light.svg">
-	</picture>
-	Modern, Streamlined, Customer Service Software
-	</br>
-	[frappedesk.com](https://frappedesk.com)
+  <picture>
+	<source 
+	  media="(prefers-color-scheme: dark)" 
+	  srcset=".github/logo_dark.svg">
+	<img
+	  width="260"
+	  alt="Frappe Helpdesk logo" 
+	  src=".github/logo_light.svg">
+  </picture>
+  </br>
+  Modern, Streamlined, Customer Service Software
+  </br>
+  
+  [frappedesk.com](https://frappedesk.com)
 </div>
 
 ---
