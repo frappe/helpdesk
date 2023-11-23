@@ -1,9 +1,16 @@
 <div align="center" markdown="1">
-<img src="./logo.png" alt="Frappe Helpdesk logo" width="200px"/>
-
-Modern, Streamlined, Customer Service Software
-</br>
-[frappedesk.com](https://frappedesk.com)
+	<picture>
+		<source 
+			media="(prefers-color-scheme: dark)" 
+			srcset=".github/logo_dark.svg">
+		<img
+			width="260"
+			alt="Frappe Helpdesk logo" 
+			src=".github/logo_light.svg">
+	</picture>
+	Modern, Streamlined, Customer Service Software
+	</br>
+	[frappedesk.com](https://frappedesk.com)
 </div>
 
 ---
@@ -28,7 +35,7 @@ Frappe Helpdesk offers an easy setup, clean user interface, and automation tools
 	bench --site helpdesk.test install-app helpdesk
 	bench --site helpdesk.test add-to-hosts
 	```
-	
+
 	You can now access Helpdesk at `http://helpdesk.test`
 5. You can also run a development server by following theses steps, in Helpdesk
    directory (`apps/helpdesk`)
