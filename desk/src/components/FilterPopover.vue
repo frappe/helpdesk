@@ -27,7 +27,7 @@
               <div id="fieldname" class="!min-w-[140px]">
                 <Autocomplete
                   :value="f.field.fieldname"
-                  :options="fields"
+                  :options="fields.data"
                   placeholder="Filter by..."
                   @change="(e) => updateFilter(e, i)"
                 />
@@ -67,7 +67,7 @@
           <div class="flex items-center justify-between gap-2">
             <Autocomplete
               value=""
-              :options="fields"
+              :options="fields.data"
               placeholder="Filter by..."
               @change="(e) => setfilter(e)"
             >
