@@ -28,7 +28,7 @@
           <component :is="tab.component" class="grow" />
         </template>
       </Tabs>
-      <!-- <TicketDetails /> -->
+      <TicketDetails />
     </div>
   </div>
 </template>

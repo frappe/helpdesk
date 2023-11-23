@@ -1,6 +1,6 @@
 <template>
   <div class="px-5 py-3">
-    <div class="mb-4 flex items-center justify-between text-base">
+    <div class="mb-3 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong />
         <LucideDot class="h-4 w-4 text-gray-500" />
