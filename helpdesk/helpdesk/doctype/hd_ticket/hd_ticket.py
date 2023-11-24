@@ -702,9 +702,11 @@ def permission_query(user):
 	if is_agent(user):
 		return
 	customer = get_customer(user)
-	res = "`contact`={user} OR `raised_by`={user} OR `owner`={user}".format(
+	res = "`tabHD Ticket`.contact={user} OR `tabHD Ticket`.raised_by={user} OR `tabHD Ticket`.owner={user}".format(
 		user=frappe.db.escape(user)
 	)
 	for c in customer:
-		res += 'OR `customer`="{customer}"'.format(customer=frappe.db.escape(c))
+		res += 'OR `tabHD Ticket`.customer="{customer}"'.format(
+			customer=frappe.db.escape(c)
+		)
 	return res
