@@ -693,3 +693,20 @@ def has_permission(doc, user=None):
 		or is_agent(user)
 		or doc.customer in get_customer(user)
 	)
+
+
+# Custom perms for list query. Only the `WHERE` part
+# https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
+def permission_query(user):
+	user = user or frappe.session.user
+	if is_agent(user):
+		return
+	customer = get_customer(user)
+	res = "`tabHD Ticket`.contact={user} OR `tabHD Ticket`.raised_by={user} OR `tabHD Ticket`.owner={user}".format(
+		user=frappe.db.escape(user)
+	)
+	for c in customer:
+		res += ' OR `tabHD Ticket`.customer="{customer}"'.format(
+			customer=frappe.db.escape(c)
+		)
+	return res
