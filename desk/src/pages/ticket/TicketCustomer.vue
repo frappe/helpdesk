@@ -30,6 +30,7 @@
     <TicketConversation class="grow" />
     <span class="m-5">
       <TicketTextEditor
+        v-if="showEditor"
         ref="editor"
         v-model:attachments="attachments"
         v-model:content="editorContent"
@@ -128,6 +129,10 @@ const showReopenButton = computed(
   () => ticket.data.status === "Resolved" && !ticket.data.feedback
 );
 const showResolveButton = computed(() =>
+  ["Open", "Replied"].includes(ticket.data.status)
+);
+
+const showEditor = computed(() =>
   ["Open", "Replied"].includes(ticket.data.status)
 );
 </script>
