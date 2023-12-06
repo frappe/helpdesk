@@ -133,6 +133,6 @@ const showResolveButton = computed(() =>
 );
 
 const showEditor = computed(() =>
-  ["Open", "Replied"].includes(ticket.data.status)
+  ["Open", "Replied", "Resolved"].includes(ticket.data.status)
 );
 </script>
