@@ -12,7 +12,7 @@
           onClick: () =>
             setValue.submit({
               fieldname: {
-                status: 'Resolved',
+                status: 'Closed',
                 feedback: preset,
                 feedback_extra: text,
               },
