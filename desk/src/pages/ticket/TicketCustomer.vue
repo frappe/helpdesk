@@ -15,7 +15,7 @@
         </Button>
         <Button
           v-if="showResolveButton"
-          label="Resolve and Close"
+          label="Close"
           theme="gray"
           variant="solid"
           @click="showFeedbackDialog = !showFeedbackDialog"
