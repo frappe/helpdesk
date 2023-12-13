@@ -45,6 +45,50 @@
           variant="outline"
         />
       </template>
+      <template #response_by="{ data }">
+        <span v-if="data.response_by">
+          <Badge
+            v-if="
+              data.first_responded_on &&
+              dayjs(data.first_responded_on).isBefore(data.response_by)
+            "
+            label="Fulfilled"
+            theme="green"
+            variant="outline"
+          />
+          <Badge
+            v-else-if="dayjs(data.first_responded_on).isAfter(data.response_by)"
+            label="Failed"
+            theme="red"
+            variant="outline"
+          />
+          <Tooltip v-else :text="dayjs(data.response_by).long()">
+            {{ dayjs(data.response_by).fromNow() }}
+          </Tooltip>
+        </span>
+      </template>
+      <template #resolution_by="{ data }">
+        <span v-if="data.resolution_by">
+          <Badge
+            v-if="
+              data.resolution_date &&
+              dayjs(data.resolution_date).isBefore(data.resolution_by)
+            "
+            label="Fulfilled"
+            theme="green"
+            variant="outline"
+          />
+          <Badge
+            v-else-if="dayjs(data.resolution_date).isAfter(data.resolution_by)"
+            label="Failed"
+            theme="red"
+            variant="outline"
+          />
+          <Tooltip v-else :text="dayjs(data.resolution_by).long()">
+            {{ dayjs(data.resolution_by).fromNow() }}
+          </Tooltip>
+        </span>
+      </template>
       <template #creation="{ data }">
         {{ dayjs(data.creation).fromNow() }}
       </template>
@@ -54,7 +98,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dropdown } from "frappe-ui";
+import { Dropdown, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { useConfigStore } from "@/stores/config";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -82,6 +126,16 @@ const columns = [
     width: "w-32",
   },
   {
+    label: "First Response",
+    key: "response_by",
+    width: "w-32",
+  },
+  {
+    label: "Resolution",
+    key: "resolution_by",
+    width: "w-32",
+  },
+  {
     label: "Created",
     key: "creation",
     width: "w-32",
@@ -91,7 +145,16 @@ const columns = [
 const tickets = createListManager({
   doctype: "HD Ticket",
   pageLength: 20,
-  fields: ["name", "creation", "subject", "status"],
+  fields: [
+    "name",
+    "creation",
+    "subject",
+    "status",
+    "response_by",
+    "resolution_by",
+    "first_responded_on",
+    "resolution_date",
+  ],
   auto: true,
   transform: (data) => {
     for (const d of data) {
