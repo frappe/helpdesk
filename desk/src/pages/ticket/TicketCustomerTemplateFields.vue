@@ -6,19 +6,17 @@
         {{ transformStatus(ticket.data.status) }}
       </span>
     </div>
-    <div class="space-y-1.5">
-      <span class="block text-sm text-gray-700"> Response By </span>
+    <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
+      <span class="block text-sm text-gray-700">{{ data.title }}</span>
       <span class="block break-words text-base font-medium text-gray-900">
-        <Tooltip :text="dayjs(ticket.data.response_by).long()">
-          {{ dayjs(ticket.data.response_by).fromNow() }}
-        </Tooltip>
-      </span>
-    </div>
-    <div class="space-y-1.5">
-      <span class="block text-sm text-gray-700"> Resolution By </span>
-      <span class="block break-words text-base font-medium text-gray-900">
-        <Tooltip :text="dayjs(ticket.data.resolution_by).long()">
-          {{ dayjs(ticket.data.resolution_by).fromNow() }}
+        <Badge
+          v-if="data.showSla"
+          :label="data.label"
+          :theme="data.theme"
+          variant="outline"
+        />
+        <Tooltip v-else :text="dayjs(data.value).long()">
+          {{ dayjs(data.value).fromNow() }}
         </Tooltip>
       </span>
     </div>
@@ -40,11 +38,41 @@
 </template>
 
 <script setup lang="ts">
-import { inject } from "vue";
+import { inject, computed } from "vue";
 import { ITicket } from "./symbols";
 import { dayjs } from "@/dayjs";
 
 const ticket = inject(ITicket);
+
+const slaData = computed(() => {
+  const responseSla =
+    ticket.data.first_responded_on &&
+    dayjs(ticket.data.first_responded_on).isBefore(ticket.data.response_by)
+      ? "Fulfilled"
+      : "Failed";
+  const resolutionSla =
+    ticket.data.resolution_date &&
+    dayjs(ticket.data.resolution_date).isBefore(ticket.data.resolution_by)
+      ? "Fulfilled"
+      : "Failed";
+
+  return [
+    {
+      title: "First Response",
+      showSla: ticket.data.first_responded_on,
+      label: responseSla,
+      theme: responseSla === "Fulfilled" ? "green" : "red",
+      value: ticket.data.response_by,
+    },
+    {
+      title: "Resolution",
+      showSla: ticket.data.resolution_date,
+      label: resolutionSla,
+      theme: resolutionSla === "Fulfilled" ? "green" : "red",
+      value: ticket.data.resolution_by,
+    },
+  ];
+});
 
 function transformStatus(status: string) {
   switch (status) {
