@@ -45,6 +45,16 @@
           variant="outline"
         />
       </template>
+      <template #response_by="{ data }">
+        <Tooltip :text="dayjs(data.response_by).long()">
+          {{ dayjs(data.response_by).fromNow() }}
+        </Tooltip>
+      </template>
+      <template #resolution_by="{ data }">
+        <Tooltip :text="dayjs(data.resolution_by).long()">
+          {{ dayjs(data.resolution_by).fromNow() }}
+        </Tooltip>
+      </template>
       <template #creation="{ data }">
         {{ dayjs(data.creation).fromNow() }}
       </template>
@@ -54,7 +64,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dropdown } from "frappe-ui";
+import { Dropdown, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { useConfigStore } from "@/stores/config";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
@@ -82,6 +92,16 @@ const columns = [
     width: "w-32",
   },
   {
+    label: "Response by",
+    key: "response_by",
+    width: "w-32",
+  },
+  {
+    label: "Resolution by",
+    key: "resolution_by",
+    width: "w-32",
+  },
+  {
     label: "Created",
     key: "creation",
     width: "w-32",
@@ -91,7 +111,14 @@ const columns = [
 const tickets = createListManager({
   doctype: "HD Ticket",
   pageLength: 20,
-  fields: ["name", "creation", "subject", "status"],
+  fields: [
+    "name",
+    "creation",
+    "subject",
+    "status",
+    "response_by",
+    "resolution_by",
+  ],
   auto: true,
   transform: (data) => {
     for (const d of data) {

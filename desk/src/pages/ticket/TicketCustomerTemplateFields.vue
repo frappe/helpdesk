@@ -6,6 +6,22 @@
         {{ transformStatus(ticket.data.status) }}
       </span>
     </div>
+    <div class="space-y-1.5">
+      <span class="block text-sm text-gray-700"> Response By </span>
+      <span class="block break-words text-base font-medium text-gray-900">
+        <Tooltip :text="dayjs(ticket.data.response_by).long()">
+          {{ dayjs(ticket.data.response_by).fromNow() }}
+        </Tooltip>
+      </span>
+    </div>
+    <div class="space-y-1.5">
+      <span class="block text-sm text-gray-700"> Resolution By </span>
+      <span class="block break-words text-base font-medium text-gray-900">
+        <Tooltip :text="dayjs(ticket.data.resolution_by).long()">
+          {{ dayjs(ticket.data.resolution_by).fromNow() }}
+        </Tooltip>
+      </span>
+    </div>
     <div
       v-for="field in ticket.data.template.fields.filter(
         (f) => !f.hide_from_customer
@@ -26,6 +42,7 @@
 <script setup lang="ts">
 import { inject } from "vue";
 import { ITicket } from "./symbols";
+import { dayjs } from "@/dayjs";
 
 const ticket = inject(ITicket);
 
