@@ -12,6 +12,7 @@ from frappe.utils import (
 	time_diff_in_seconds,
 	to_timedelta,
 )
+from datetime import timedelta
 
 from helpdesk.utils import get_context
 
@@ -275,7 +276,25 @@ class HDServiceLevelAgreement(Document):
 			res = add_to_date(res, seconds=time_required, as_datetime=True)
 		return res
 
-	def calc_elapsed_time(self, start_at, end_at) -> float:
+	def get_working_days(self) -> dict[str, dict]:
+		workdays = []
+		for row in self.support_and_resolution:
+			workdays.append(row.workday)
+		return workdays
+
+	def get_working_hours(self) -> dict[str, dict]:
+		res = {}
+		for row in self.support_and_resolution:
+			res[row.workday] = (row.start_time, row.end_time)
+		return res
+
+	def is_working_time(self, date_time, working_hours):
+		day_of_week = get_weekdays()[date_time.weekday()]
+		start_time, end_time = working_hours.get(day_of_week, (0, 0))
+		date_time = timedelta(hours=date_time.hour, minutes=date_time.minute, seconds=date_time.second)
+		return start_time <= date_time < end_time
+
+	def calc_elapsed_time(self, start_time, end_time) -> float:
 		"""
 		Get took from start to end, excluding non-working hours
 
@@ -283,38 +302,25 @@ class HDServiceLevelAgreement(Document):
 		:param end_at: Date at which calculation ends
 		:return: Number of seconds
 		"""
-		start_at = getdate(start_at)
-		end_at = getdate(end_at)
-		time_took = 0
-		holidays = self.get_holidays()
-		weekdays = get_weekdays()
-		workdays = self.get_workdays()
-		while getdate(start_at) <= getdate(end_at):
-			today = start_at
-			today_day = getdate(today)
-			today_weekday = weekdays[today.weekday()]
-			is_workday = today_weekday in workdays
-			is_holiday = today_day in holidays
-			if is_holiday or not is_workday:
-				start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
+		start_time = get_datetime(start_time)
+		end_time = get_datetime(end_time)
+		holiday_list = []
+		working_day_list = self.get_working_days()
+		working_hours = self.get_working_hours()
+
+		total_seconds = 0
+		current_time = start_time
+
+		while current_time < end_time:
+			in_holiday_list = current_time.date() in holiday_list
+			not_in_working_day_list = get_weekdays()[current_time.weekday()] not in working_day_list
+			if in_holiday_list or not_in_working_day_list or not self.is_working_time(current_time, working_hours):
+				current_time += timedelta(seconds=1)
 				continue
-			today_workday = workdays[today_weekday]
-			is_today = getdate(start_at) == getdate(end_at)
-			if not is_today:
-				working_start = today_workday.start_time
-				working_end = today_workday.end_time
-				working_time = time_diff_in_seconds(working_start, working_end)
-				time_took += working_time
-				start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
-				continue
-			now_in_seconds = time_diff_in_seconds(today, today_day)
-			start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
-			end_at_seconds = time_diff_in_seconds(getdate(end_at), end_at)
-			end_time = max(today_workday.end_time.total_seconds(), end_at_seconds)
-			time_taken = end_time - start_time
-			time_took += time_taken
-			start_at = getdate(add_to_date(start_at, days=1, as_datetime=True))
-		return time_took
+			total_seconds += 1
+			current_time += timedelta(seconds=1)
+
+		return total_seconds
 
 	def get_holidays(self):
 		res = []
