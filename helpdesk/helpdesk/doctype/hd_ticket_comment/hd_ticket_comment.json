@@ -23,6 +23,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Reference Ticket",
+   "search_index": 1,
    "options": "HD Ticket"
   },
   {
@@ -45,7 +46,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-25 13:06:01.197664",
+ "modified": "2023-12-17 13:06:01.197664",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Comment",
