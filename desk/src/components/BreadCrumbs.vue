@@ -6,7 +6,10 @@
         :to="item.route || ''"
       >
         <slot name="prefix" :item="item" />
-        <span>{{ item.label }}</span>
+        <span v-if="i == items.length - 1" @click="clickToCopy(item.name)">{{
+          item.label
+        }}</span>
+        <span v-else>{{ item.label }}</span>
       </router-link>
       <span v-if="i != items.length - 1" class="mx-0.5 text-base text-gray-500">
         /
@@ -16,6 +19,8 @@
 </template>
 
 <script setup lang="ts">
+import { createToast } from "@/utils";
+
 interface Item {
   label: string;
   route: string;
@@ -23,6 +28,15 @@ interface Item {
 
 interface P {
   items: Item[];
+}
+
+function clickToCopy(text: string) {
+  navigator.clipboard.writeText(text);
+  createToast({
+    title: "Ticket ID copied to clipboard",
+    icon: "check",
+    iconClasses: "text-green-500",
+  });
 }
 
 defineProps<P>();
