@@ -11,6 +11,7 @@
           },
           {
             label: ticket?.data?.subject || title,
+            name: ticket?.data?.name,
           },
         ]"
       />
