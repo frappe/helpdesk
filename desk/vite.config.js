@@ -51,6 +51,7 @@ export default defineConfig({
     outDir: `../helpdesk/public/desk`,
     emptyOutDir: true,
     target: "es2021",
+    sourcemap: true,
     commonjsOptions: {
       include: [/tailwind.config.js/, /node_modules/],
     },
