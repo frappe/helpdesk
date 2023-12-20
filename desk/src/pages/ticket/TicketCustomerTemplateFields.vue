@@ -1,5 +1,5 @@
 <template>
-  <span class="grid grid-cols-1 border-b px-5 py-2.5 sm:grid-cols-3">
+  <span class="grid grid-cols-1 gap-4 border-b px-5 py-2.5 sm:grid-cols-3">
     <div class="space-y-1.5">
       <span class="block text-sm text-gray-700"> Status </span>
       <span class="block break-words text-base font-medium text-gray-900">
