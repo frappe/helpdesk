@@ -37,7 +37,7 @@ class HDNotification(Document):
 		soup = BeautifulSoup(self.message, "html.parser")
 		if soup.find("img"):
 			img = soup.find("img")
-			img['src'] = ('').join([frappe.utils.get_url(), img['src']])
+			img["src"] = ("").join([frappe.utils.get_url(), img["src"]])
 			return str(soup)
 		return str(soup)
 
