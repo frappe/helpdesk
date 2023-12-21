@@ -14,7 +14,8 @@
   "references_section",
   "reference_ticket",
   "column_break_ibly",
-  "reference_comment"
+  "reference_comment",
+  "message"
  ],
  "fields": [
   {
@@ -72,11 +73,16 @@
    "fieldname": "read",
    "fieldtype": "Check",
    "label": "Read"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Text",
+   "label": "Message"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-19 23:49:50.165958",
+ "modified": "2023-12-19 15:31:37.669662",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Notification",
