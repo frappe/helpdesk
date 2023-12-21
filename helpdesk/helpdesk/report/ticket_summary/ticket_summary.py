@@ -58,7 +58,7 @@ class TicketSummary(object):
 					"label": _("Ticket Type"),
 					"fieldname": "ticket_type",
 					"fieldtype": "Link",
-					"options": "Ticket Type",
+					"options": "HD Ticket Type",
 					"width": 200,
 				}
 			)
@@ -69,7 +69,7 @@ class TicketSummary(object):
 					"label": _("Ticket Priority"),
 					"fieldname": "priority",
 					"fieldtype": "Link",
-					"options": "Ticket Priority",
+					"options": "HD Ticket Priority",
 					"width": 200,
 				}
 			)
