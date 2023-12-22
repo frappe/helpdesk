@@ -42,7 +42,8 @@ def add_support_redirect_to_tickets():
 		{
 			"source": "support",
 			"target": "support/tickets",
-		}
+			"redirect_http_status": 301,
+		},
 	)
 	website_settings.save()
 
