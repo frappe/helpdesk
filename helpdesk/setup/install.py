@@ -31,21 +31,20 @@ def after_install():
 
 
 def add_support_redirect_to_tickets():
-	website_settings = frappe.new_doc("Website Settings")
+	website_settings = frappe.get_doc("Website Settings")
 
 	for route_redirects in website_settings.route_redirects:
 		if route_redirects.source == "support":
 			return
 
-	base_route = frappe.get_doc(
+	website_settings.append(
+		"route_redirects",
 		{
-			"doctype": "Website Route Redirect",
 			"source": "support",
 			"target": "support/tickets",
-		}
+			"redirect_http_status": 301,
+		},
 	)
-
-	website_settings.append("route_redirects", base_route)
 	website_settings.save()
 
 
