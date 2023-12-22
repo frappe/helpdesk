@@ -37,10 +37,13 @@ def add_support_redirect_to_tickets():
 		if route_redirects.source == "support":
 			return
 
-	website_settings.append("route_redirects", {
+	website_settings.append(
+		"route_redirects",
+		{
 			"source": "support",
 			"target": "support/tickets",
-		})
+		}
+	)
 	website_settings.save()
 
 
