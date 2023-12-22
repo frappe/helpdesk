@@ -19,6 +19,7 @@ class HasMentions:
 				user_from=self.owner,
 				user_to=mention.email,
 				notification_type="Mention",
+				message=self.content,
 			)
 			# Why mention oneself?
 			if values.user_from == values.user_to:

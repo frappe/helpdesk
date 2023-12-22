@@ -31,12 +31,23 @@ class HDNotification(Document):
 			res += "#" + self.reference_comment
 		return frappe.utils.get_url(res)
 
+	def parse_html(self):
+		from bs4 import BeautifulSoup
+
+		soup = BeautifulSoup(self.message, "html.parser")
+		if soup.find("img"):
+			img = soup.find("img")
+			img["src"] = ("").join([frappe.utils.get_url(), img["src"]])
+			return str(soup)
+		return str(soup)
+
 	def get_args(self):
 		if self.notification_type == "Mention":
 			return {
 				"title": self.format_message(),
 				"button_label": self.get_button_label(),
 				"callback_url": self.get_url(),
+				"comment": self.parse_html(),
 			}
 
 	def after_insert(self):
