@@ -39,3 +39,7 @@ has_permission = {
 permission_query_conditions = {
 	"HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
 }
+
+ignore_links_on_delete = [
+	"HD Notification",
+]
