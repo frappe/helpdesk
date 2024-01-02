@@ -3,6 +3,7 @@ import frappe
 
 @frappe.whitelist(allow_guest=True)
 def search_text(text):
+	text = frappe.db.escape(text)
 
 	categories = frappe.db.sql(
 		f"""
