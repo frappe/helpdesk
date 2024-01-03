@@ -32,6 +32,14 @@ const globalComponents = {
 };
 
 setConfig("resourceFetcher", frappeRequest);
+setConfig("fallbackErrorHandler", (error) => {
+  createToast({
+    title: error.exc_type || "Error",
+    text: (error.messages || []).join(", "),
+    icon: "alert-triangle",
+    iconClasses: "text-red-500",
+  });
+});
 
 const pinia = createPinia();
 const app = createApp(App);
