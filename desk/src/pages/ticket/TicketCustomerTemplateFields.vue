@@ -6,6 +6,12 @@
         {{ transformStatus(ticket.data.status) }}
       </span>
     </div>
+    <div class="space-y-1.5">
+      <span class="block text-sm text-gray-700"> Priority </span>
+      <span class="block break-words text-base font-medium text-gray-900">
+        {{ ticket.data.priority }}
+      </span>
+    </div>
     <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
       <span class="block text-sm text-gray-700">{{ data.title }}</span>
       <span class="block break-words text-base font-medium text-gray-900">
