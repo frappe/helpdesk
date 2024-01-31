@@ -13,7 +13,9 @@
       </span>
     </div>
     <div v-for="data in slaData" :key="data.label" class="space-y-1.5">
-      <span class="block text-sm text-gray-700">{{ data.title }}</span>
+      <Tooltip :text="dayjs(data.value).long()">
+          <span class="block text-sm text-gray-700">{{ data.title }}</span>
+      </Tooltip>
       <span class="block break-words text-base font-medium text-gray-900">
         <Badge
           v-if="data.showSla"
@@ -21,9 +23,9 @@
           :theme="data.theme"
           variant="outline"
         />
-        <Tooltip v-else :text="dayjs(data.value).long()">
+        <span v-else>
           {{ dayjs(data.value).fromNow() }}
-        </Tooltip>
+        </span>
       </span>
     </div>
     <div
