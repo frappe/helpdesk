@@ -280,7 +280,6 @@ const response = createResource({
     clear();
     emitter.emit("update:ticket");
   },
-  onError: useError({ title: "Error replying to ticket" }),
 });
 
 const resource = computed(() => {
