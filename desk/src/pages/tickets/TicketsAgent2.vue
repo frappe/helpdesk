@@ -23,7 +23,7 @@
   import { ref } from 'vue';
   import { createResource, Breadcrumbs } from 'frappe-ui';
   import TicketsAgentList2 from "./TicketsAgentList2.vue";
-  import { ViewControls } from '@/components';
+  import { ViewControls, LayoutHeader } from '@/components';
   
   const breadcrumbs = [{ label: 'Tickets', route: { name: 'TicketsAgent' } }];
   const showNewDialog = ref(false);

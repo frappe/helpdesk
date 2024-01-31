@@ -17,3 +17,4 @@ export { default as UniInput } from "./UniInput.vue";
 export { default as UserAvatar } from "./UserAvatar.vue";
 export { default as ViewControls } from "./ViewControls.vue";
 export { default as Filter } from "./Filter.vue";
+export { default as LayoutHeader } from "./LayoutHeader.vue";
