@@ -680,6 +680,138 @@ class HDTicket(Document):
 		self.description = self.description or c.content
 		# Save the ticket, allowing for hooks to run.
 		self.save()
+	
+	@staticmethod
+	def default_list_data():
+
+		columns = [
+			{
+				'label': '#',
+				'type': 'Int',
+				'key': 'name',
+				'width': '11rem',
+			},
+			{
+				'label': 'Subject',
+				'type': 'Data',
+				'key': 'subject',
+				'width': '9rem',
+			},
+			{
+				'label': 'Status',
+				'type': 'Select',
+				'key': 'status',
+				'width': '10rem',
+			},
+			{
+				'label': 'Priority',
+				'type': 'Link',
+				'options': 'HD Ticket Priority',
+				'key': 'priority',
+				'width': '12rem',
+			},
+			{
+				'label': 'Type',
+				'type': 'Link',
+				"options": "HD Ticket Type",
+				'key': 'ticket_type',
+				'width': '11rem',
+			},
+			{
+				'label': 'Team',
+				'type': 'Link',
+				"options": "HD Team",
+				'key': 'agent_group',
+				'width': '10rem',
+			},
+			{
+				'label': "Contact",
+				'type': 'Link',
+				'key': "contact",
+				"options": "Contact",
+				'width': '8rem',
+			},
+			{
+				'label': "Agreement status",
+				"fieldtype": "Select",
+				"key": "agreement_status",
+				"options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
+				'width': '8rem',
+			},
+			{
+				'label': "First response",
+				'type': 'Datetime',
+				'key': "response_by",
+				'width': '8rem',
+			},
+			{
+				'label': "Resolution",
+				'type': 'Datetime',
+				'key': "resolution_by",
+				'width': '8rem',
+			},
+			{
+				'label': "Customer",
+				'type': 'Link',
+				'key': "customer",
+				"options": "HD Customer",
+				'width': '8rem',
+			},
+			# {
+			# 	'label': "Source",
+			# 	'type': 'Data',
+			# 	'key': "source",
+			# 	'width': '8rem',
+			# },
+			# {
+			# 	'label': "Assignee",
+			# 	'type': 'Link',
+			# 	'key': "assignee",
+			# 	"options": "User",
+			# 	'width': '8rem',
+			# },
+			# {
+			# 	'label': "Conversation",
+			# 	'type': 'Link',
+			# 	'key': "conversation",
+			# 	"options": "Contact",
+			# 	'width': '8rem',
+			# },
+			{
+				'label': "Last modified",
+				'type': 'Datetime',
+				'key': "modified",
+				"options": "Contact",
+				'width': '8rem',
+			},
+			{
+				'label': "Created",
+				'type': 'Datetime',
+				'key': "creation",
+				"options": "Contact",
+				'width': '8rem',
+			},
+		]
+		rows = [
+			"name",
+			"subject",
+			"status",
+			"priority",
+			"ticket_type",
+			"agent_group",
+			"contact",
+			"agreement_status",
+			"response_by",
+			"resolution_by",
+			"customer",
+			# "source",
+			# "assignee",
+			# "conversation",
+			"modified",
+			"creation",
+		]
+		return {'columns': columns, 'rows': rows}
+
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra

@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
+from frappe.model import no_value_fields
+from frappe.model.document import get_controller
 
 from helpdesk.utils import check_permissions
 
@@ -69,3 +71,79 @@ def get_filterable_fields(doctype):
 		}
 	)
 	return res
+
+@frappe.whitelist()
+def get_list_data(doctype: str, filters: dict, order_by: str):
+	columns = [
+		{"label": "Name", "type": "Data", "key": "name", "width": "16rem"},
+		{"label": "Last Modified", "type": "Datetime", "key": "modified", "width": "8rem"},
+	]
+	rows = ["name"]
+
+	is_default = True
+
+	# if frappe.db.exists("HD List View Settings", doctype):
+	# 	list_view_settings = frappe.get_doc("CRM List View Settings", doctype)
+	# 	columns = frappe.parse_json(list_view_settings.columns)
+	# 	rows = frappe.parse_json(list_view_settings.rows)
+	# 	is_default = False
+	# else:
+	list = get_controller(doctype)
+
+	if hasattr(list, "default_list_data"):
+		columns = list.default_list_data().get("columns")
+		rows = list.default_list_data().get("rows")
+
+	# check if rows has all keys from columns if not add them
+	for column in columns:
+		if column.get("key") not in rows:
+			rows.append(column.get("key"))
+
+	data = frappe.get_all(
+		doctype,
+		fields=rows,
+		filters=filters,
+		order_by=order_by,
+		page_length=20,
+	) or []
+
+	fields = frappe.get_meta(doctype).fields
+	fields = [field for field in fields if field.fieldtype not in no_value_fields]
+	fields = [
+		{
+			"label": field.label,
+			"type": field.fieldtype,
+			"value": field.fieldname,
+			"options": field.options,
+		}
+		for field in fields
+		if field.label and field.fieldname
+	]
+
+	std_fields = [
+		{"label": "Name", "type": "Data", "value": "name"},
+		{"label": "Created On", "type": "Datetime", "value": "creation"},
+		{"label": "Last Modified", "type": "Datetime", "value": "modified"},
+		{
+			"label": "Modified By",
+			"type": "Link",
+			"value": "modified_by",
+			"options": "User",
+		},
+		{"label": "Assigned To", "type": "Text", "value": "_assign"},
+		{"label": "Owner", "type": "Link", "value": "owner", "options": "User"},
+	]
+
+	for field in std_fields:
+		if field.get('value') not in rows:
+			rows.append(field.get('value'))
+		if field not in fields:
+			fields.append(field)
+
+	return {
+		"data": data,
+		"columns": columns,
+		"rows": rows,
+		"fields": fields,
+		"is_default": is_default,
+	}
