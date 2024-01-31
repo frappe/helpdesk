@@ -74,7 +74,7 @@ const routes = [
       {
         path: "tickets",
         name: AGENT_PORTAL_TICKET_LIST,
-        component: () => getPage("TicketsAgent"),
+        component: () => getPage("TicketsAgent2"),
       },
       {
         path: "tickets/new/:templateId?",
