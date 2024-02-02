@@ -73,7 +73,7 @@ def get_filterable_fields(doctype):
 	return res
 
 @frappe.whitelist()
-def get_list_data(doctype: str, filters: dict, order_by: str):
+def get_list_data(doctype: str, filters: dict, order_by: str, page_length=20, page_length_count=20,):
 	columns = [
 		{"label": "Name", "type": "Data", "key": "name", "width": "16rem"},
 		{"label": "Last Modified", "type": "Datetime", "key": "modified", "width": "8rem"},
@@ -104,7 +104,7 @@ def get_list_data(doctype: str, filters: dict, order_by: str):
 		fields=rows,
 		filters=filters,
 		order_by=order_by,
-		page_length=20,
+		page_length=page_length,
 	) or []
 
 	fields = frappe.get_meta(doctype).fields
@@ -146,4 +146,7 @@ def get_list_data(doctype: str, filters: dict, order_by: str):
 		"rows": rows,
 		"fields": fields,
 		"is_default": is_default,
+		"page_length_count": page_length_count,
+		"total_count": frappe.client.get_count(doctype, filters=filters),
+		"row_count": len(data),
 	}
