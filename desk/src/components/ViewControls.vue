@@ -20,7 +20,7 @@
 
     <div class="grow"></div>
 
-    <div class="pe-2 flex-none">
+    <div class="flex-none px-1">
       <Filter
         :filters="props.filter.filters"
         :filterable-fields="props.filter.filterableFields"
@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { Filter } from "@/components";
-import { createResource, Dropdown, call, FeatherIcon } from "frappe-ui";
+import { Dropdown, FeatherIcon } from "frappe-ui";
 
 const props = defineProps({
   filter: {

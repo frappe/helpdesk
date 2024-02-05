@@ -1,11 +1,10 @@
 <template>
-  <header class="container flex justify-between items-center px-5 py-2.5 h-12">
-      <div class="">
+  <header class="flex h-12 items-center justify-between border-b py-2.5 pl-5">
+    <div class="flex items-center gap-2">
       <slot name="left-header" />
     </div>
-    <div class="">
-      <slot name="right-header" class="" />
+    <div class="flex items-center gap-2 px-5">
+      <slot name="right-header" class="flex items-center gap-2" />
     </div>
   </header>
 </template>
-  

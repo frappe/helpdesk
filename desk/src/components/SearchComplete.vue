@@ -40,7 +40,7 @@ const props = defineProps({
   pageLength: {
     type: Number,
     required: false,
-    default: 10,
+    default: 100,
   },
 });
 

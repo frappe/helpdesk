@@ -736,7 +736,7 @@ class HDTicket(Document):
 				"fieldtype": "Select",
 				"key": "agreement_status",
 				"options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
-				'width': '8rem',
+				'width': '10rem',
 			},
 			{
 				'label': "First response",
@@ -804,6 +804,7 @@ class HDTicket(Document):
 			"response_by",
 			"resolution_by",
 			"customer",
+			"first_responded_on",
 			# "source",
 			# "assignee",
 			# "conversation",
