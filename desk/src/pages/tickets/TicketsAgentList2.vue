@@ -23,7 +23,10 @@
         <ListRowItem :item="item">
           <template #prefix>
             <div v-if="column.key === 'status'">
-              <IndicatorIcon :class="item.color" />
+              <IndicatorIcon v-if="item == 'Open'" color="red" />
+              <IndicatorIcon v-else-if="item == 'Replied'" color="blue" />
+              <IndicatorIcon v-else-if="item == 'Resolved'" color="green" />
+              <IndicatorIcon v-else />
             </div>
           </template>
           <div v-if="column.key === 'response_by'">
