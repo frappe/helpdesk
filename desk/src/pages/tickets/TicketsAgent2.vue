@@ -18,7 +18,9 @@
       :filter="{ filters: filters, filterableFields: filterableFields.data }"
       @event:filter="processFilters"
     />
-    <TicketsAgentList2 class="px-5" :rows="rows" :columns="columns" />
+    <div class="px-5">
+      <TicketsAgentList2 :rows="rows" :columns="columns" />
+    </div>
   </div>
 </template>
 
@@ -49,6 +51,11 @@ const tickets = createResource({
     page_length: 100,
   },
   auto: true,
+  transform(data) {
+    data.data.forEach((row) => {
+      row.name = row.name.toString();
+    });
+  },
   onSuccess(data) {
     columns.value = data.columns;
     rows.value = data.data;
@@ -79,6 +86,11 @@ function processFilters(filterEvent) {
   } else if (filterEvent.event === "clear") {
     filters.value = [];
     for (let filter in filtersToApply) delete filtersToApply[filter];
+  } else if (filterEvent.event === "preset") {
+    filters.value = filterEvent.data.filters;
+
+    for (let filter in filtersToApply) delete filtersToApply[filter];
+    Object.assign(filtersToApply, filterEvent.data.filtersToApply);
   }
 
   storage.value.filters = filters.value;
