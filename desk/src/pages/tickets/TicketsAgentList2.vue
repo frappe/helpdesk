@@ -65,6 +65,14 @@
               {{ dayjs(item).fromNow() }}
             </Tooltip>
           </div>
+          <div v-if="column.key === 'agreement_status'">
+            <Badge
+              v-if="item"
+              :label="item"
+              :theme="slaStatusColorMap[item]"
+              variant="outline"
+            />
+          </div> 
           <div v-if="column.key === 'creation'">
             {{ dayjs(item).fromNow() }}
           </div>
@@ -98,8 +106,6 @@ import {
 } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 
-// let pageLengthCount = 20;
-
 defineProps({
   columns: {
     type: Array, //TODO custom types
@@ -110,4 +116,12 @@ defineProps({
     required: true,
   },
 });
+
+const slaStatusColorMap = {
+  Fulfilled: "green",
+  Failed: "red",
+  "Resolution Due": "orange",
+  "First Response Due": "orange",
+  Paused: "blue",
+};
 </script>
