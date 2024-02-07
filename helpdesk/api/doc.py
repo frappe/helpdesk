@@ -150,3 +150,29 @@ def get_list_data(doctype: str, filters: dict, order_by: str, page_length=20, pa
 		"total_count": frappe.client.get_count(doctype, filters=filters),
 		"row_count": len(data),
 	}
+
+@frappe.whitelist()
+def sort_options(doctype: str):
+	fields = frappe.get_meta(doctype).fields
+	fields = [field for field in fields if field.fieldtype not in no_value_fields]
+	fields = [
+		{
+			"label": field.label,
+			"value": field.fieldname,
+		}
+		for field in fields
+		if field.label and field.fieldname
+	]
+
+	standard_fields = [
+		{"label": "Name", "value": "name"},
+		{"label": "Created On", "value": "creation"},
+		{"label": "Last Modified", "value": "modified"},
+		{"label": "Modified By", "value": "modified_by"},
+		{"label": "Owner", "value": "owner"},
+	]
+
+	for field in standard_fields:
+		fields.append(field)
+
+	return fields

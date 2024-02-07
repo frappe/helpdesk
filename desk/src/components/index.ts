@@ -18,3 +18,4 @@ export { default as UserAvatar } from "./UserAvatar.vue";
 export { default as ViewControls } from "./ViewControls.vue";
 export { default as Filter } from "./Filter.vue";
 export { default as LayoutHeader } from "./LayoutHeader.vue";
+export { default as Sort } from "./Sort.vue";

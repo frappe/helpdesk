@@ -21,21 +21,25 @@
       <Filter
         :filters="props.filter.filters"
         :filterable-fields="props.filter.filterableFields"
-        @event:filter="emitToParent"
+        @event:filter="(e) => emitToParent(e, 'event:filter')"
       />
     </div>
-    <!-- <div class="flex-none pe-2">
-            <p class="text-lg">Sort</p>
-        </div>
-        <div class="flex-none pe-2">
-            <p class="text-lg">View Settings</p>
-        </div> -->
+    <div class="pe-2 flex-none">
+      <Sort
+        :sortable-fields="props.sort.sortableFields"
+        :sorts="props.sort.sorts"
+        @event:sort="(e) => emitToParent(e, 'event:sort')"
+      />
+    </div>
+    <!-- <div class="flex-none pe-2"> 
+        <p class="text-lg">View Settings</p>
+    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Filter } from "@/components";
+import { Filter, Sort } from "@/components";
 import { Dropdown, FeatherIcon } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 
@@ -47,55 +51,74 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  sort: {
+    type: Object,
+    required: true,
+  },
 });
 
 const presetFilters = [
   {
     label: "All Tickets",
     onClick: (e) => {
-      emitToParent({
-        event: "clear",
-      });
+      emitToParent(
+        {
+          event: "clear",
+        },
+        "event:filter"
+      );
     },
   },
   {
     label: "My Open Tickets",
     onClick: (e) => {
       const preset = getPresetFilters("Open");
-      emitToParent({
-        event: "preset",
-        data: preset,
-      });
+      emitToParent(
+        {
+          event: "preset",
+          data: preset,
+        },
+        "event:filter"
+      );
     },
   },
   {
     label: "My Replied Tickets",
     onClick: (e) => {
       const preset = getPresetFilters("Replied");
-      emitToParent({
-        event: "preset",
-        data: preset,
-      });
+      emitToParent(
+        {
+          event: "preset",
+          data: preset,
+        },
+        "event:filter"
+      );
     },
   },
   {
     label: "My Resolved Tickets",
     onClick: (e) => {
       const preset = getPresetFilters("Resolved");
-      emitToParent({
-        event: "preset",
-        data: preset,
-      });
+      emitToParent(
+        {
+          event: "preset",
+          data: preset,
+        },
+        "event:filter"
+      );
     },
   },
   {
     label: "My Closed Tickets",
     onClick: (e) => {
       const preset = getPresetFilters("Closed");
-      emitToParent({
-        event: "preset",
-        data: preset,
-      });
+      emitToParent(
+        {
+          event: "preset",
+          data: preset,
+        },
+        "event:filter"
+      );
     },
   },
 ];
@@ -125,14 +148,16 @@ function getPresetFilters(status) {
   };
 }
 
-const emit = defineEmits(["event:filter"]);
+const emit = defineEmits(["event:filter", "event:sort"]);
 
-function emitToParent(data) {
-  if (data.event === "clear") {
-    currentPreset.value = "All Tickets";
-  } else {
-    currentPreset.value = "Filtered Tickets";
+function emitToParent(data, event) {
+  if (event === "event:filter") {
+    if (data.event === "clear") {
+      currentPreset.value = "All Tickets";
+    } else {
+      currentPreset.value = "Filtered Tickets";
+    }
   }
-  emit("event:filter", data);
+  emit(event, data);
 }
 </script>

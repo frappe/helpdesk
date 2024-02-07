@@ -16,6 +16,8 @@
     </LayoutHeader>
     <ViewControls
       :filter="{ filters: filters, filterableFields: filterableFields.data }"
+      :sort="{ sorts: sorts, sortableFields: sortableFields.data }"
+      @event:sort="processSorts"
       @event:filter="processFilters"
     />
     <div class="px-5">
@@ -26,28 +28,34 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useStorage } from '@vueuse/core';
+import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
 import TicketsAgentList2 from "./TicketsAgentList2.vue";
 import { ViewControls, LayoutHeader } from "@/components";
 
 const breadcrumbs = [{ label: "Tickets", route: { name: "TicketsAgent2" } }];
-let storage = useStorage("filter_ticket_agent", {
+let storage = useStorage("tickets_agent", {
   filtersToApply: {},
   filters: [],
+  sorts: [],
+  sortsToApply: "modified desc",
 });
+
 let columns = ref([]);
 let rows = ref([]);
 
 let filtersToApply = storage.value.filtersToApply;
 let filters = ref(storage.value.filters);
 
+let sorts = ref(storage.value.sorts);
+let sortsToApply = storage.value.sortsToApply;
+
 const tickets = createResource({
   url: "helpdesk.api.doc.get_list_data",
   params: {
     doctype: "HD Ticket",
     filters: filtersToApply,
-    order_by: "modified desc",
+    order_by: sortsToApply,
     page_length: 100,
   },
   auto: true,
@@ -61,6 +69,36 @@ const tickets = createResource({
     rows.value = data.data;
   },
 });
+
+function processSorts(sortEvent) {
+  if (sortEvent.event === "add") {
+    sorts.value.push(sortEvent.data);
+    sortsToApply = sortEvent.data.sortToApply;
+  } else if (sortEvent.event === "remove") {
+    sorts.value.splice(sortEvent.index, 1);
+    sortsToApply = sortEvent.data.sortToApply;
+  } else if (sortEvent.event === "clear") {
+    sorts.value = [];
+    sortsToApply = "modified desc";
+  } else if (sortEvent.event === "update") {
+    sorts.value[sortEvent.data.index] = sortEvent.data;
+    sortsToApply = sortEvent.data.sortToApply;
+  }
+
+  storage.value.sorts = sorts.value;
+  storage.value.sortsToApply = sortsToApply;
+
+  tickets.update({
+    params: {
+      order_by: sortsToApply,
+      filters: filtersToApply,
+      page_length: 100,
+      doctype: "HD Ticket",
+    },
+  });
+
+  apply();
+}
 
 function processFilters(filterEvent) {
   if (filterEvent.event === "add") {
@@ -95,10 +133,11 @@ function processFilters(filterEvent) {
 
   storage.value.filters = filters.value;
   storage.value.filtersToApply = filtersToApply;
-  applyFilters();
+
+  apply();
 }
 
-function applyFilters() {
+function apply() {
   tickets.reload();
 }
 
@@ -131,6 +170,14 @@ const filterableFields = createResource({
           ...field,
         };
       });
+  },
+});
+
+const sortableFields = createResource({
+  url: "helpdesk.api.doc.sort_options",
+  auto: true,
+  params: {
+    doctype: "HD Ticket",
   },
 });
 </script>
