@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-col">
+  <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />

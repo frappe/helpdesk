@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-between p-4">
+  <div class="flex items-center justify-between px-5 pb-4 pt-3">
     <div class="flex-none">
       <Dropdown :options="presetFilters">
         <template #default="{ open }">
