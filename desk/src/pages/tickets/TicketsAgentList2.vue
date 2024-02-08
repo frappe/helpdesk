@@ -20,13 +20,19 @@
         v-slot="{ column, item }"
         :row="row"
       >
-        <ListRowItem :item="item">
+        <ListRowItem :item="item" class="text-base text-gray-700">
           <template #prefix>
             <div v-if="column.key === 'status'">
-              <IndicatorIcon v-if="item == 'Open'" color="red" />
-              <IndicatorIcon v-else-if="item == 'Replied'" color="blue" />
-              <IndicatorIcon v-else-if="item == 'Resolved'" color="green" />
-              <IndicatorIcon v-else />
+              <IndicatorIcon v-if="item == 'Open'" class="text-red-600" />
+              <IndicatorIcon
+                v-else-if="item == 'Replied'"
+                class="text-blue-600"
+              />
+              <IndicatorIcon
+                v-else-if="item == 'Resolved'"
+                class="text-green-700"
+              />
+              <IndicatorIcon v-else class="text-gray-700" />
             </div>
           </template>
           <div v-if="column.key === 'response_by'">
@@ -75,7 +81,7 @@
               :theme="slaStatusColorMap[item]"
               variant="outline"
             />
-          </div> 
+          </div>
           <div v-if="column.key === 'creation'">
             {{ dayjs(item).fromNow() }}
           </div>
