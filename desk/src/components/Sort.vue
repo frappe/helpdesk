@@ -90,7 +90,7 @@
 import { Autocomplete } from "frappe-ui";
 
 import { NestedPopover } from "@/components";
-import SortIcon from "@/components/Icons/SortIcon.vue";
+import SortIcon from "@/components/icons/SortIcon.vue";
 
 const props = defineProps({
   sortableFields: {
