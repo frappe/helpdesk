@@ -7,7 +7,8 @@
         </template>
         <template v-if="props.filters.length" #suffix>
           <div
-            class="text-2xs flex h-5 w-5 items-center justify-center rounded bg-gray-900 pt-[1px] font-medium text-white">
+            class="text-2xs flex h-5 w-5 items-center justify-center rounded bg-gray-900 pt-[1px] font-medium text-white"
+          >
             {{ props.filters.length }}
           </div>
         </template>
@@ -17,58 +18,101 @@
       <div class="my-2 rounded bg-white shadow">
         <div class="min-w-[400px] p-2">
           <div v-if="props.filters.length">
-            <div v-for="(filter, idx) in props.filters" id="filter-list" :key="idx"
-              class="mb-3 flex items-center justify-between gap-2">
+            <div
+              v-for="(filter, idx) in props.filters"
+              id="filter-list"
+              :key="idx"
+              class="mb-3 flex items-center justify-between gap-2"
+            >
               <div class="flex items-center gap-2">
                 <div class="w-13 pl-2 text-end text-base text-gray-600">
                   {{ idx == 0 ? "Where" : "And" }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">
-                  <Autocomplete :value="filter.field.fieldname" :options="props.filterableFields"
-                    placeholder="Filter by..." @change="(field) => updateFilter(idx, field)" />
+                  <Autocomplete
+                    :value="filter.field.fieldname"
+                    :options="props.filterableFields"
+                    placeholder="Filter by..."
+                    @change="(field) => updateFilter(idx, field)"
+                  />
                 </div>
                 <div id="operator">
-                  <FormControl type="select" :value="filter.operator" :options="getOperators(filter.field.fieldtype)"
-                    @change="(e) => updateFilter(idx, null, null, e.target.value)" placeholder="Operator" />
+                  <FormControl
+                    type="select"
+                    :value="filter.operator"
+                    :options="getOperators(filter.field.fieldtype)"
+                    placeholder="Operator"
+                    @change="
+                      (e) => updateFilter(idx, null, null, e.target.value)
+                    "
+                  />
                 </div>
                 <div id="value" class="!min-w-[140px]">
-                  <SearchComplete :key="filter.field.fieldname"
-                    v-if="typeLink.includes(filter.field.fieldtype)" :doctype="filter.field.options"
-                    :value="filter.value.toString()" @change="(v) => updateFilter(idx, null, v.value)" />
-                  <component v-else :value="filter.value" :is="getValSelect(filter.field.fieldtype, filter.field.options)"
-                    placeholder="Value" @change="(e) => updateFilter(idx, null, e.target.value)" />
+                  <SearchComplete
+                    v-if="typeLink.includes(filter.field.fieldtype)"
+                    :key="filter.field.fieldname"
+                    :doctype="filter.field.options"
+                    :value="filter.value.toString()"
+                    @change="(v) => updateFilter(idx, null, v.value)"
+                  />
+                  <component
+                    :is="
+                      getValSelect(filter.field.fieldtype, filter.field.options)
+                    "
+                    v-else
+                    :value="filter.value"
+                    placeholder="Value"
+                    @change="(e) => updateFilter(idx, null, e.target.value)"
+                  />
                 </div>
               </div>
               <Button variant="ghost" icon="x" @click="removeFilter(idx)" />
             </div>
           </div>
-          <div v-else class="mb-3 flex h-7 items-center px-3 text-sm text-gray-600">
+          <div
+            v-else
+            class="mb-3 flex h-7 items-center px-3 text-sm text-gray-600"
+          >
             Empty - Choose a field to filter by
           </div>
           <div class="flex items-center justify-between gap-2">
-            <Autocomplete value="" :options="props.filterableFields" placeholder="Filter by..."
-              @change="(e) => setfilter(e)">
+            <Autocomplete
+              value=""
+              :options="props.filterableFields"
+              placeholder="Filter by..."
+              @change="(e) => setfilter(e)"
+            >
               <template #target="{ togglePopover }">
-                <Button class="!text-gray-600" variant="ghost" label="Add filter" @click="() => togglePopover()">
+                <Button
+                  class="!text-gray-600"
+                  variant="ghost"
+                  label="Add filter"
+                  @click="() => togglePopover()"
+                >
                   <template #prefix>
                     <LucidePlus class="h-4 w-4" />
                   </template>
                 </Button>
               </template>
             </Autocomplete>
-            <Button v-if="props.filters.length" class="!text-gray-600" variant="ghost" label="Clear all filter"
-              @click="() => clearfilter(close)" />
+            <Button
+              v-if="props.filters.length"
+              class="!text-gray-600"
+              variant="ghost"
+              label="Clear all filter"
+              @click="() => clearfilter(close)"
+            />
           </div>
         </div>
       </div>
     </template>
   </NestedPopover>
 </template>
-  
+
 <script setup lang="ts">
-import { h, ref } from "vue";
-import { Autocomplete, FormControl } from 'frappe-ui';
-import { NestedPopover } from '@/components';
+import { h } from "vue";
+import { Autocomplete, FormControl } from "frappe-ui";
+import { NestedPopover } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { DocField } from "@/types";
 
@@ -108,7 +152,12 @@ function setfilter(data) {
   emit("event:filter", filterEvent);
 }
 
-function updateFilter(index: number, field = null, value: string = null, operator: string = null) {
+function updateFilter(
+  index: number,
+  field = null,
+  value: string = null,
+  operator: string = null
+) {
   let filter = JSON.parse(JSON.stringify(props.filters[index]));
 
   if (field) {
@@ -118,13 +167,13 @@ function updateFilter(index: number, field = null, value: string = null, operato
   if (value !== null) {
     filter["value"] = value;
   } else {
-    filter["value"] = getDefaultValue(filter["field"]);
+    filter["value"] = props.filters[index]["value"];
   }
 
-  if (operator) {
+  if (operator !== null) {
     filter["operator"] = operator;
   } else {
-    filter["operator"] = getDefaultOperator(filter["field"].fieldtype);
+    filter["operator"] = props.filters[index]["operator"];
   }
 
   emit("event:filter", {
@@ -184,7 +233,10 @@ function getFilterToApply(filter) {
 
   let value = filter.value;
 
-  if (["LIKE", "NOT LIKE"].includes(operator) && !(value.startsWith("%") || value.endsWith("%"))) {
+  if (
+    ["LIKE", "NOT LIKE"].includes(operator) &&
+    !(value.startsWith("%") || value.endsWith("%"))
+  ) {
     value = `%${value}%`;
   }
 
@@ -275,5 +327,4 @@ function getDefaultValue(field: DocField) {
   }
   return "";
 }
-
 </script>
