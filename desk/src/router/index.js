@@ -77,6 +77,27 @@ const routes = [
         component: () => getPage("TicketsAgent"),
       },
       {
+        path: "tickets2",
+        name: "TicketsAgent2",
+        component: () => getPage("TicketsAgent2"),
+      },
+      {
+        path: "tickets2/:ticketId",
+        name: "TicketAgent2",
+        component: () => getPage("TicketAgent2"),
+        props: true,
+      },
+      {
+        path: "tickets2/new/:templateId?",
+        name: "TicketAgentNew2",
+        component: () => getPage("TicketNew"),
+        props: true,
+        meta: {
+          onSuccessRoute: "TicketAgent2",
+          parent: "TicketsAgent2",
+        },
+      },
+      {
         path: "tickets/new/:templateId?",
         name: "TicketAgentNew",
         component: () => getPage("TicketNew"),

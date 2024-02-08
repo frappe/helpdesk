@@ -15,3 +15,7 @@ export { default as TextEditor } from "./TextEditor.vue";
 export { default as TimelineItem } from "./TimelineItem.vue";
 export { default as UniInput } from "./UniInput.vue";
 export { default as UserAvatar } from "./UserAvatar.vue";
+export { default as ViewControls } from "./ViewControls.vue";
+export { default as Filter } from "./Filter.vue";
+export { default as LayoutHeader } from "./LayoutHeader.vue";
+export { default as Sort } from "./Sort.vue";

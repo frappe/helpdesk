@@ -13,7 +13,7 @@ const authStore = useAuthStore();
 const configStore = useConfigStore();
 
 function getTarget() {
-  if (authStore.hasDeskAccess) return AGENT_PORTAL_LANDING;
+  if (authStore.hasDeskAccess) return "TicketsAgent2";
   else if (configStore.preferKnowledgeBase) return KB_PUBLIC;
   else return CUSTOMER_PORTAL_LANDING;
 }

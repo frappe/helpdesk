@@ -15,3 +15,6 @@ export { default as TicketCustomer } from "./ticket/TicketCustomer.vue";
 export { default as TicketNew } from "./ticket/TicketNew.vue";
 export { default as TicketsAgent } from "./tickets/TicketsAgent.vue";
 export { default as TicketsCustomer } from "./tickets/TicketsCustomer.vue";
+
+export { default as TicketsAgent2 } from "./tickets/TicketsAgent2.vue";
+export { default as TicketAgent2 } from "./ticket/TicketAgent2.vue";
