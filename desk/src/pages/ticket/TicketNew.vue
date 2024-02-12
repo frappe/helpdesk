@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col">
     <TicketBreadcrumbs :parent="route.meta.parent" title="New" />
+    <div class="text-base text-orange-800 mx-5 my-2 font-semibold">
+      Due to company offsite, there might be a slight delay in response. We will get back to you as soon as possible.
+    </div>
     <div v-if="template.data?.about" class="mx-5 my-3">
       <div class="prose-f" v-html="sanitize(template.data.about)" />
     </div>
