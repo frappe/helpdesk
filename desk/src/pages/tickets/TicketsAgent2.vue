@@ -20,9 +20,16 @@
       @event:sort="processSorts"
       @event:filter="processFilters"
     />
-    <div class="px-5">
-      <TicketsAgentList2 :rows="rows" :columns="columns" />
-    </div>
+    <TicketsAgentList2
+      :rows="rows"
+      :columns="columns"
+      :page-length-count="pageLength"
+      :options="{
+        rowCount: rowCount,
+        totalCount: totalCount,
+      }"
+      @update:page-length="updatePageLength"
+    />
   </div>
 </template>
 
@@ -43,6 +50,8 @@ let storage = useStorage("tickets_agent", {
 
 let columns = ref([]);
 let rows = ref([]);
+let rowCount = ref(0);
+let totalCount  = ref(0);
 
 let filtersToApply = storage.value.filtersToApply;
 let filters = ref(storage.value.filters);
@@ -50,13 +59,15 @@ let filters = ref(storage.value.filters);
 let sorts = ref(storage.value.sorts);
 let sortsToApply = storage.value.sortsToApply;
 
+let pageLength = ref(20);
+
 const tickets = createResource({
   url: "helpdesk.api.doc.get_list_data",
   params: {
     doctype: "HD Ticket",
     filters: filtersToApply,
     order_by: sortsToApply,
-    page_length: 100,
+    page_length: pageLength.value,
   },
   auto: true,
   transform(data) {
@@ -67,8 +78,35 @@ const tickets = createResource({
   onSuccess(data) {
     columns.value = data.columns;
     rows.value = data.data;
+    rowCount.value = data.row_count;
+    totalCount.value = data.total_count;
   },
 });
+
+function updatePageLength(value) {
+  if (value == "loadMore") {
+    tickets.update({
+      params: {
+        doctype: "HD Ticket",
+        filters: filtersToApply,
+        order_by: sortsToApply,
+        page_length: tickets.data.data.length + pageLength.value,
+      },
+    });
+  } else {
+    pageLength.value = value;
+    tickets.update({
+      params: {
+        doctype: "HD Ticket",
+        filters: filtersToApply,
+        order_by: sortsToApply,
+        page_length: pageLength.value,
+      },
+    });
+  }
+
+  tickets.reload();
+}
 
 function processSorts(sortEvent) {
   if (sortEvent.event === "add") {
