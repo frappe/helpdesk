@@ -24,11 +24,13 @@
       :rows="rows"
       :columns="columns"
       :page-length-count="pageLength"
+      :col-field-type="colFieldType"
       :options="{
         rowCount: rowCount,
         totalCount: totalCount,
       }"
       @update:page-length="updatePageLength"
+      @event:field-click="processFieldClick"
     />
   </div>
 </template>
@@ -50,8 +52,9 @@ let storage = useStorage("tickets_agent", {
 
 let columns = ref([]);
 let rows = ref([]);
+let colFieldType = ref({});
 let rowCount = ref(0);
-let totalCount  = ref(0);
+let totalCount = ref(0);
 
 let filtersToApply = storage.value.filtersToApply;
 let filters = ref(storage.value.filters);
@@ -80,6 +83,10 @@ const tickets = createResource({
     rows.value = data.data;
     rowCount.value = data.row_count;
     totalCount.value = data.total_count;
+
+    data.fields.forEach((field) => {
+      colFieldType.value[field.value] = field.type;
+    });
   },
 });
 
@@ -106,6 +113,29 @@ function updatePageLength(value) {
   }
 
   tickets.reload();
+}
+
+function processFieldClick(event) {
+  filters.value.push({
+    field: filterableFields.data.find((f) => f.fieldname === event.name),
+    operator: "is",
+    value: event.value,
+  });
+
+  filtersToApply[event.name] = ["=", event.value];
+  storage.value.filters = filters.value;
+  storage.value.filtersToApply = filtersToApply;
+
+  tickets.update({
+    params: {
+      order_by: sortsToApply,
+      filters: filtersToApply,
+      page_length: 100,
+      doctype: "HD Ticket",
+    },
+  });
+
+  apply();
 }
 
 function processSorts(sortEvent) {

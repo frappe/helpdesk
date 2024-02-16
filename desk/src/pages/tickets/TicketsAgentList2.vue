@@ -36,6 +36,15 @@
               <IndicatorIcon v-else class="text-gray-700" />
             </div>
           </template>
+          <div
+            v-if="
+              colFieldType[column.key] === 'Link' ||
+              colFieldType[column.key] === 'Select'
+            "
+            @click.prevent="foo(column.key, colFieldType[column.key], item)"
+          >
+            {{ item }}
+          </div>
           <div v-if="column.key === 'response_by'">
             <Badge
               v-if="
@@ -114,6 +123,14 @@ import {
 import { dayjs } from "@/dayjs";
 import { ref } from "vue";
 
+function foo(name: string, type: string, value) {
+  emit("event:fieldClick", {
+    name,
+    type,
+    value,
+  });
+}
+
 const props = defineProps({
   columns: {
     type: Array, //TODO custom types
@@ -121,6 +138,10 @@ const props = defineProps({
   },
   rows: {
     type: Array,
+    required: true,
+  },
+  colFieldType: {
+    type: Object,
     required: true,
   },
   pageLengthCount: {
@@ -138,7 +159,7 @@ const props = defineProps({
 });
 
 let pageLengthCount = ref(props.pageLengthCount);
-let emit = defineEmits(["update:pageLength"]);
+let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
 
 const slaStatusColorMap = {
   Fulfilled: "green",
