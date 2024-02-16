@@ -1,5 +1,6 @@
 <template>
   <ListView
+    class="px-5"
     :columns="columns"
     :rows="rows"
     :options="{
@@ -92,16 +93,13 @@
       </ListRow>
     </ListRows>
   </ListView>
-  <!-- <ListFooter
-    v-if="true"
-    class="border-t px-5 py-2"
+  <ListFooter
     v-model="pageLengthCount"
-    :options="{
-      rowCount: 20,
-      totalCount: 100,
-    }"
-    @loadMore="true"
-  /> -->
+    class="bottom-0 border-t bg-blue-50 px-5 py-2"
+    :options="{ rowCount: options.rowCount, totalCount: options.totalCount }"
+    @update:model-value="emit('update:pageLength', $event)"
+    @load-more="emit('update:pageLength', 'loadMore')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -111,11 +109,12 @@ import {
   ListRow,
   ListRowItem,
   ListHeader,
-  // ListFooter,
+  ListFooter,
 } from "frappe-ui";
 import { dayjs } from "@/dayjs";
+import { ref } from "vue";
 
-defineProps({
+const props = defineProps({
   columns: {
     type: Array, //TODO custom types
     required: true,
@@ -124,7 +123,22 @@ defineProps({
     type: Array,
     required: true,
   },
+  pageLengthCount: {
+    type: Number,
+    required: true,
+    default: 20,
+  },
+  options: {
+    type: Object,
+    default: () => ({
+      totalCount: 0,
+      rowCount: 0,
+    }),
+  },
 });
+
+let pageLengthCount = ref(props.pageLengthCount);
+let emit = defineEmits(["update:pageLength"]);
 
 const slaStatusColorMap = {
   Fulfilled: "green",

@@ -5,7 +5,7 @@
         <TicketAgentActions />
       </template>
     </TicketBreadcrumbs>
-    <div class="flex grow overflow-hidden">
+    <div class="flex grow overflow-auto">
       <div class="flex grow flex-col">
         <TicketPinnedComments @focus="(v) => (focus = v)" />
         <TicketConversation class="grow" :focus="focus">
