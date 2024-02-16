@@ -175,3 +175,28 @@ def sort_options(doctype: str):
 		fields.append(field)
 
 	return fields
+
+@frappe.whitelist()
+def search_article(search):
+	if len(search) < 5:
+		return []
+	
+	search_terms = search.split(" ")
+	search_terms = [term for term in search_terms if len(term) > 4]
+
+	if len(search_terms) == 0:
+		return []
+	
+	or_filters = []
+	
+	for i in range(len(search_terms)):
+		or_filters.append(["title", "like", "%{search}%".format(search=search_terms[i])])
+
+	data = frappe.get_all(
+		"HD Article",
+		fields=["name", "title"],
+		or_filters=or_filters,
+		page_length=5,
+		) or []
+
+	return data

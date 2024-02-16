@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { watch } from "vue";
-import { createListResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import { isEmpty } from "lodash";
 
 interface P {
@@ -44,20 +44,17 @@ interface P {
 }
 
 const props = defineProps<P>();
-const articles = createListResource({
-  doctype: "HD Article",
+const articles = createResource({
+  url: "helpdesk.api.doc.search_article",
   auto: false,
-  debounce: 500,
-  pageLength: 5,
-  fields: ["name", "title"],
 });
 watch(
   () => props.search,
   (search) => {
     if (search.length < 5) return;
     articles.update({
-      filters: {
-        title: ["like", `%${search}%`],
+      params: {
+        search,
       },
     });
     articles.reload();
