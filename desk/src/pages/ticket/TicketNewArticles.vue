@@ -4,7 +4,8 @@
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
     <div class="mb-2 font-medium">
-      Did you know? These articles might cover what you looking for!
+      Did you know? These articles might cover what you looking for
+      <a class="text-xs" href="/knowledge-base" target="_blank">(View All)</a>
     </div>
     <ul class="space-y-2">
       <li
@@ -45,16 +46,17 @@ interface P {
 
 const props = defineProps<P>();
 const articles = createResource({
-  url: "helpdesk.api.doc.search_article",
+  url: "helpdesk.api.article.search",
+  debounce: 500,
   auto: false,
 });
 watch(
   () => props.search,
   (search) => {
-    if (search.length < 5) return;
+    if (search.length < 4) return;
     articles.update({
       params: {
-        search,
+        query: search,
       },
     });
     articles.reload();
