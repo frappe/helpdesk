@@ -3,7 +3,7 @@ import frappe
 @frappe.whitelist()
 def get_users():
 	if frappe.session.user == "Guest":
-		frappe.throw("Authentication failed", exc=frappe.AuthenticationError)
+		frappe.throw(frappe._("Authentication failed"), exc=frappe.AuthenticationError)
 
 	users = frappe.qb.get_query(
 		"User",
