@@ -92,6 +92,9 @@
               variant="outline"
             />
           </div>
+          <div v-if="column.key === '_assign'">
+            <MultipleAvatar :avatars="[item]" />
+          </div>
           <div v-if="column.key === 'creation'">
             {{ dayjs(item).fromNow() }}
           </div>
@@ -120,6 +123,7 @@ import {
   ListHeader,
   ListFooter,
 } from "frappe-ui";
+import { MultipleAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { ref } from "vue";
 

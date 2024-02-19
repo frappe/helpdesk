@@ -41,6 +41,8 @@ import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
 import TicketsAgentList2 from "./TicketsAgentList2.vue";
 import { ViewControls, LayoutHeader } from "@/components";
+import { useUserStore } from "@/stores/user";
+const { getUser } = useUserStore();
 
 const breadcrumbs = [{ label: "Tickets", route: { name: "TicketsAgent2" } }];
 let storage = useStorage("tickets_agent", {
@@ -76,6 +78,13 @@ const tickets = createResource({
   transform(data) {
     data.data.forEach((row) => {
       row.name = row.name.toString();
+      let _user = getUser(JSON.parse(row._assign)[0]);
+
+      row._assign = {
+        name: _user.name,
+        label: _user.full_name,
+        image: _user.user_image,
+      };
     });
   },
   onSuccess(data) {
