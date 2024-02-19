@@ -4,7 +4,8 @@
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
     <div class="mb-2 font-medium">
-      Did you know? These articles might cover what you looking for!
+      Did you know? These articles might cover what you looking for
+      <a class="text-xs" href="/knowledge-base" target="_blank">(View All)</a>
     </div>
     <ul class="space-y-2">
       <li
@@ -36,7 +37,7 @@
 
 <script setup lang="ts">
 import { watch } from "vue";
-import { createListResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import { isEmpty } from "lodash";
 
 interface P {
@@ -44,20 +45,18 @@ interface P {
 }
 
 const props = defineProps<P>();
-const articles = createListResource({
-  doctype: "HD Article",
-  auto: false,
+const articles = createResource({
+  url: "helpdesk.api.article.search",
   debounce: 500,
-  pageLength: 5,
-  fields: ["name", "title"],
+  auto: false,
 });
 watch(
   () => props.search,
   (search) => {
-    if (search.length < 5) return;
+    if (search.length < 4) return;
     articles.update({
-      filters: {
-        title: ["like", `%${search}%`],
+      params: {
+        query: search,
       },
     });
     articles.reload();
