@@ -757,26 +757,12 @@ class HDTicket(Document):
 				"options": "HD Customer",
 				'width': '8rem',
 			},
-			# {
-			# 	'label': "Source",
-			# 	'type': 'Data',
-			# 	'key': "source",
-			# 	'width': '8rem',
-			# },
-			# {
-			# 	'label': "Assignee",
-			# 	'type': 'Link',
-			# 	'key': "assignee",
-			# 	"options": "User",
-			# 	'width': '8rem',
-			# },
-			# {
-			# 	'label': "Conversation",
-			# 	'type': 'Link',
-			# 	'key': "conversation",
-			# 	"options": "Contact",
-			# 	'width': '8rem',
-			# },
+			{
+				'label': 'Assigned To',
+				'type': 'Text',
+				'key': '_assign',
+				'width': '10rem',
+			},
 			{
 				'label': "Last modified",
 				'type': 'Datetime',
@@ -805,11 +791,9 @@ class HDTicket(Document):
 			"resolution_by",
 			"customer",
 			"first_responded_on",
-			# "source",
-			# "assignee",
-			# "conversation",
 			"modified",
 			"creation",
+			"_assign"
 		]
 		return {'columns': columns, 'rows': rows}
 

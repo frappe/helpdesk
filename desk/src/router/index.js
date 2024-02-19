@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 import { init as initTelemetry } from "@/telemetry";
 import { AuthPages } from "./auth";
 import { CustomerPages } from "./customer";
@@ -214,10 +215,12 @@ export const router = createRouter({
 router.beforeEach(async (to) => {
   const isAuthRoute = AUTH_ROUTES.includes(to.name);
   const authStore = useAuthStore();
+  const usersStore = useUserStore();
 
   try {
     await initTelemetry();
     await authStore.init();
+    await usersStore.init();
 
     if ((to.meta.agent && !authStore.hasDeskAccess) || isAuthRoute) {
       router.replace({ name: WEBSITE_ROOT });
