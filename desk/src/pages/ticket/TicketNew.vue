@@ -28,7 +28,6 @@
       <div class="relative w-full">
         <Autocomplete
           v-model="ticketType"
-          :body-classes="w - full"
           :options="ticketTypeData.store.dropdown"
           :placeholder="`Select a ${ticketTypeData.label}`"
         />
@@ -62,7 +61,13 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
+import {
+  createResource,
+  usePageMeta,
+  Button,
+  FormControl,
+  Autocomplete,
+} from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
@@ -104,12 +109,6 @@ const ticketTypeData = computed(() => {
   };
 });
 
-console.log(ticketTypeData.value.store.dropdown);
-
-function update(fieldname: string, value: string) {
-  console.log(fieldname, value);
-}
-
 const visibleFields = computed(() =>
   template.data?.fields.filter((f) => route.meta.agent || !f.hide_from_customer)
 );
@@ -121,6 +120,7 @@ const ticket = createResource({
       description: description.value,
       subject: subject.value,
       template: props.templateId,
+      ticket_type: ticketType.value ? ticketType.value.value : "",
       ...templateFields,
     },
     attachments: attachments.value,
