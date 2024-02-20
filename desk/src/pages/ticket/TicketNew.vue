@@ -21,6 +21,19 @@
         placeholder="A short description"
       />
     </div>
+    <div class="m-5 mt-0">
+      <div class="mb-2 block text-sm text-gray-600">
+        {{ ticketTypeData.label }}
+      </div>
+      <div class="relative w-full">
+        <Autocomplete
+          v-model="ticketType"
+          :body-classes="w - full"
+          :options="ticketTypeData.store.dropdown"
+          :placeholder="`Select a ${ticketTypeData.label}`"
+        />
+      </div>
+    </div>
     <TicketNewArticles :search="subject" class="mx-5 mb-5" />
     <span class="mx-5 mb-5">
       <TicketTextEditor
@@ -54,9 +67,11 @@ import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
 import { UniInput } from "@/components";
+import { useTicketTypeStore } from "@/stores/ticketType";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketNewArticles from "./TicketNewArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
+import { ITicket } from "./symbols";
 
 interface P {
   templateId?: string;
@@ -68,6 +83,7 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const subject = ref("");
+const ticketType = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
@@ -79,6 +95,20 @@ const template = createResource({
   }),
   auto: true,
 });
+
+const ticketTypeData = computed(() => {
+  return {
+    field: "ticket_type",
+    label: "Ticket type",
+    store: useTicketTypeStore(),
+  };
+});
+
+console.log(ticketTypeData.value.store.dropdown);
+
+function update(fieldname: string, value: string) {
+  console.log(fieldname, value);
+}
 
 const visibleFields = computed(() =>
   template.data?.fields.filter((f) => route.meta.agent || !f.hide_from_customer)
