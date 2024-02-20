@@ -9,7 +9,7 @@
         params: { ticketId: row.name },
       }),
       selectable: true,
-      showTooltip: true,
+      showTooltip: false,
     }"
     row-key="name"
   >
@@ -21,7 +21,11 @@
         v-slot="{ column, item }"
         :row="row"
       >
-        <ListRowItem :item="item" class="text-base text-gray-700">
+        <ListRowItem
+          :item="item"
+          class="text-base text-gray-700"
+          @click.stop="(e) => handleFieldClick(e, column.key, item)"
+        >
           <template #prefix>
             <div v-if="column.key === 'status'">
               <IndicatorIcon v-if="item == 'Open'" class="text-red-600" />
@@ -36,16 +40,15 @@
               <IndicatorIcon v-else class="text-gray-700" />
             </div>
           </template>
-          <div
-            v-if="
-              colFieldType[column.key] === 'Link' ||
-              colFieldType[column.key] === 'Select'
-            "
-            @click.prevent="foo(column.key, colFieldType[column.key], item)"
-          >
-            {{ item }}
+          <div v-if="column.key === 'agreement_status'">
+            <Badge
+              v-if="item"
+              :label="item"
+              :theme="slaStatusColorMap[item]"
+              variant="outline"
+            />
           </div>
-          <div v-if="column.key === 'response_by'">
+          <div v-else-if="column.key === 'response_by'">
             <Badge
               v-if="
                 row.first_responded_on &&
@@ -65,7 +68,7 @@
               {{ dayjs(item).fromNow() }}
             </Tooltip>
           </div>
-          <div v-if="column.key === 'resolution_by'">
+          <div v-else-if="column.key === 'resolution_by'">
             <Badge
               v-if="
                 row.resolution_date && dayjs(row.resolution_date).isBefore(item)
@@ -84,21 +87,13 @@
               {{ dayjs(item).fromNow() }}
             </Tooltip>
           </div>
-          <div v-if="column.key === 'agreement_status'">
-            <Badge
-              v-if="item"
-              :label="item"
-              :theme="slaStatusColorMap[item]"
-              variant="outline"
-            />
-          </div>
-          <div v-if="column.key === '_assign'">
+          <div v-else-if="column.key === '_assign'">
             <MultipleAvatar :avatars="[item]" />
           </div>
-          <div v-if="column.key === 'creation'">
+          <div v-else-if="column.key === 'creation'">
             {{ dayjs(item).fromNow() }}
           </div>
-          <div v-if="column.key === 'modified'">
+          <div v-else-if="column.key === 'modified'">
             {{ dayjs(item).fromNow() }}
           </div>
         </ListRowItem>
@@ -127,12 +122,22 @@ import { MultipleAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { ref } from "vue";
 
-function foo(name: string, type: string, value) {
-  emit("event:fieldClick", {
-    name,
-    type,
-    value,
-  });
+function handleFieldClick(e, name: string, value: string) {
+  if (
+    props.colFieldType[name] === "Link" ||
+    props.colFieldType[name] === "Select" ||
+    name === "_assign"
+  ) {
+    e.preventDefault();
+    if (name === "_assign") {
+      value = value.name;
+    }
+    emit("event:fieldClick", {
+      name,
+      type: props.colFieldType[name],
+      value,
+    });
+  }
 }
 
 const props = defineProps({

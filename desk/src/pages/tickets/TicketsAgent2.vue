@@ -131,7 +131,11 @@ function processFieldClick(event) {
     value: event.value,
   });
 
-  filtersToApply[event.name] = ["=", event.value];
+  if (event.name == "_assign") {
+    filtersToApply[event.name] = ["LIKE", `%${event.value}%`];
+  } else {
+    filtersToApply[event.name] = ["=", event.value];
+  }
   storage.value.filters = filters.value;
   storage.value.filtersToApply = filtersToApply;
 
@@ -139,7 +143,7 @@ function processFieldClick(event) {
     params: {
       order_by: sortsToApply,
       filters: filtersToApply,
-      page_length: 100,
+      page_length: pageLength.value,
       doctype: "HD Ticket",
     },
   });
@@ -169,7 +173,7 @@ function processSorts(sortEvent) {
     params: {
       order_by: sortsToApply,
       filters: filtersToApply,
-      page_length: 100,
+      page_length: pageLength.value,
       doctype: "HD Ticket",
     },
   });
@@ -210,6 +214,15 @@ function processFilters(filterEvent) {
 
   storage.value.filters = filters.value;
   storage.value.filtersToApply = filtersToApply;
+
+  tickets.update({
+    params: {
+      order_by: sortsToApply,
+      filters: filtersToApply,
+      page_length: pageLength.value,
+      doctype: "HD Ticket",
+    },
+  });
 
   apply();
 }
