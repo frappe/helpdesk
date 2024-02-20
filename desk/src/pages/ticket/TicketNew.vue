@@ -76,7 +76,6 @@ import { useTicketTypeStore } from "@/stores/ticketType";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketNewArticles from "./TicketNewArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
-import { ITicket } from "./symbols";
 
 interface P {
   templateId?: string;
@@ -85,6 +84,7 @@ interface P {
 const props = withDefaults(defineProps<P>(), {
   templateId: "",
 });
+
 const route = useRoute();
 const router = useRouter();
 const subject = ref("");
