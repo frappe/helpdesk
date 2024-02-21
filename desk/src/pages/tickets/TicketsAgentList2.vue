@@ -21,10 +21,17 @@
         v-slot="{ column, item }"
         :row="row"
       >
+        <div
+          v-if="column.key === '_assign'"
+          @click="(e) => handleFieldClick(e, column.key, item)"
+        >
+          <MultipleAvatar :avatars="[item]" />
+        </div>
         <ListRowItem
+          v-else
           :item="item"
           class="text-base text-gray-700"
-          @click.stop="(e) => handleFieldClick(e, column.key, item)"
+          @click="(e) => handleFieldClick(e, column.key, item)"
         >
           <template #prefix>
             <div v-if="column.key === 'status'">
@@ -86,9 +93,6 @@
             <Tooltip v-else :text="dayjs(item).long()">
               {{ dayjs(item).fromNow() }}
             </Tooltip>
-          </div>
-          <div v-else-if="column.key === '_assign'">
-            <MultipleAvatar :avatars="[item]" />
           </div>
           <div v-else-if="column.key === 'creation'">
             {{ dayjs(item).fromNow() }}
