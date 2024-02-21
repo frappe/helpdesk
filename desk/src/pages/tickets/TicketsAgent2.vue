@@ -78,13 +78,22 @@ const tickets = createResource({
   transform(data) {
     data.data.forEach((row) => {
       row.name = row.name.toString();
-      let _user = getUser(JSON.parse(row._assign)[0]);
+      let _assign = JSON.parse(row._assign);
 
-      row._assign = {
-        name: _user.name,
-        label: _user.full_name,
-        image: _user.user_image,
-      };
+      if (_assign && _assign.length) {
+        let _user = getUser(_assign[0]);
+        row._assign = {
+          name: _user.name,
+          label: _user.full_name,
+          image: _user.user_image,
+        };
+      } else {
+        row._assign = {
+          name: "",
+          label: "Unassigned",
+          image: "",
+        };
+      }
     });
   },
   onSuccess(data) {
