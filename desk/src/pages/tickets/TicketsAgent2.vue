@@ -17,11 +17,16 @@
     <ViewControls
       :filter="{ filters: filters, filterableFields: filterableFields.data }"
       :sort="{ sorts: sorts, sortableFields: sortableFields.data }"
+      :column="{
+        fields: fields,
+        columns: columns,
+      }"
       @event:sort="processSorts"
       @event:filter="processFilters"
+      @event:column="processColumns"
     />
     <TicketsAgentList2
-      :rows="rows"
+      :rows="items"
       :columns="columns"
       :page-length-count="pageLength"
       :options="{
@@ -48,10 +53,14 @@ let storage = useStorage("tickets_agent", {
   filters: [],
   sorts: [],
   sortsToApply: "modified desc",
+  columns: [],
+  rows: [],
 });
 
-let columns = ref([]);
-let rows = ref([]);
+let items = ref([]);
+let columns = ref(storage.value.columns ? storage.value.columns : []);
+let rows = ref(storage.value.rows ? storage.value.rows : []);
+let fields = ref([]);
 let rowCount = ref(0);
 let totalCount = ref(0);
 
@@ -70,6 +79,8 @@ const tickets = createResource({
     filters: filtersToApply,
     order_by: sortsToApply,
     page_length: pageLength.value,
+    columns: columns.value.length ? columns.value : undefined,
+    rows: rows.value.length ? rows.value : undefined,
   },
   auto: true,
   transform(data) {
@@ -86,7 +97,9 @@ const tickets = createResource({
   },
   onSuccess(data) {
     columns.value = data.columns;
-    rows.value = data.data;
+    rows.value = data.rows;
+    items.value = data.data;
+    fields.value = data.fields;
     rowCount.value = data.row_count;
     totalCount.value = data.total_count;
   },
@@ -115,6 +128,49 @@ function updatePageLength(value) {
   }
 
   tickets.reload();
+}
+
+function processColumns(columnEvent) {
+  if (columnEvent.event === "add") {
+    tickets.update({
+      params: {
+        order_by: sortsToApply,
+        filters: filtersToApply,
+        page_length: pageLength.value,
+        columns: [columnEvent.data, ...columns.value],
+        rows: [columnEvent.data.key, ...rows.value],
+        doctype: "HD Ticket",
+      },
+    });
+    storage.value.columns = [columnEvent.data, ...columns.value];
+    storage.value.rows = [columnEvent.data.key, ...rows.value];
+    tickets.reload();
+  } else if (columnEvent.event === "remove") {
+    tickets.update({
+      params: {
+        order_by: sortsToApply,
+        filters: filtersToApply,
+        page_length: pageLength.value,
+        columns: columns.value.filter((column) => {
+          return column.key != columnEvent.data.key;
+        }),
+        rows: rows.value.filter((row) => {
+          return row != columnEvent.data.key;
+        }),
+        doctype: "HD Ticket",
+      },
+    });
+
+    storage.value.columns = columns.value.filter((column) => {
+      return column.key != columnEvent.data.key;
+    });
+    storage.value.rows = rows.value.filter((row) => {
+      return row != columnEvent.data.key;
+    });
+    tickets.reload();
+  } else if (columnEvent.event === "update") {
+    storage.value.columns = columnEvent.data;
+  }
 }
 
 function processSorts(sortEvent) {
