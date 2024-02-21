@@ -23,7 +23,7 @@
     <TicketsAgentList2
       :rows="rows"
       :columns="columns"
-      :page-length-count="pageLength"
+      :page-length="pageLength"
       :col-field-type="colFieldType"
       :options="{
         rowCount: rowCount,
@@ -65,6 +65,7 @@ let sorts = ref(storage.value.sorts);
 let sortsToApply = storage.value.sortsToApply;
 
 let pageLength = ref(20);
+let pageLengthCount = pageLength.value;
 
 const tickets = createResource({
   url: "helpdesk.api.doc.get_list_data",
@@ -110,27 +111,13 @@ const tickets = createResource({
 
 function updatePageLength(value) {
   if (value == "loadMore") {
-    tickets.update({
-      params: {
-        doctype: "HD Ticket",
-        filters: filtersToApply,
-        order_by: sortsToApply,
-        page_length: tickets.data.data.length + pageLength.value,
-      },
-    });
+    pageLengthCount = tickets.data.data.length + pageLength.value;
   } else {
     pageLength.value = value;
-    tickets.update({
-      params: {
-        doctype: "HD Ticket",
-        filters: filtersToApply,
-        order_by: sortsToApply,
-        page_length: pageLength.value,
-      },
-    });
+    pageLengthCount = value;
   }
 
-  tickets.reload();
+  apply();
 }
 
 function processFieldClick(event) {
@@ -147,15 +134,6 @@ function processFieldClick(event) {
   }
   storage.value.filters = filters.value;
   storage.value.filtersToApply = filtersToApply;
-
-  tickets.update({
-    params: {
-      order_by: sortsToApply,
-      filters: filtersToApply,
-      page_length: pageLength.value,
-      doctype: "HD Ticket",
-    },
-  });
 
   apply();
 }
@@ -177,15 +155,6 @@ function processSorts(sortEvent) {
 
   storage.value.sorts = sorts.value;
   storage.value.sortsToApply = sortsToApply;
-
-  tickets.update({
-    params: {
-      order_by: sortsToApply,
-      filters: filtersToApply,
-      page_length: pageLength.value,
-      doctype: "HD Ticket",
-    },
-  });
 
   apply();
 }
@@ -224,19 +193,19 @@ function processFilters(filterEvent) {
   storage.value.filters = filters.value;
   storage.value.filtersToApply = filtersToApply;
 
-  tickets.update({
-    params: {
-      order_by: sortsToApply,
-      filters: filtersToApply,
-      page_length: pageLength.value,
-      doctype: "HD Ticket",
-    },
-  });
-
   apply();
 }
 
 function apply() {
+  tickets.update({
+    params: {
+      order_by: sortsToApply,
+      filters: filtersToApply,
+      page_length: pageLengthCount,
+      doctype: "HD Ticket",
+    },
+  });
+
   tickets.reload();
 }
 

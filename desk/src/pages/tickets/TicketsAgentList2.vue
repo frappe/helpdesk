@@ -105,7 +105,7 @@
     </ListRows>
   </ListView>
   <ListFooter
-    v-model="pageLengthCount"
+    v-model="pageLength"
     class="bottom-0 border-t bg-blue-50 px-5 py-2"
     :options="{ rowCount: options.rowCount, totalCount: options.totalCount }"
     @update:model-value="emit('update:pageLength', $event)"
@@ -157,7 +157,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  pageLengthCount: {
+  pageLength: {
     type: Number,
     required: true,
     default: 20,
@@ -171,7 +171,7 @@ const props = defineProps({
   },
 });
 
-let pageLengthCount = ref(props.pageLengthCount);
+let pageLength = ref(props.pageLength);
 let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
 
 const slaStatusColorMap = {
