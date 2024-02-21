@@ -23,12 +23,14 @@
     <TicketsAgentList2
       :rows="rows"
       :columns="columns"
-      :page-length-count="pageLength"
+      :page-length="pageLength"
+      :col-field-type="colFieldType"
       :options="{
         rowCount: rowCount,
         totalCount: totalCount,
       }"
       @update:page-length="updatePageLength"
+      @event:field-click="processFieldClick"
     />
   </div>
 </template>
@@ -52,6 +54,7 @@ let storage = useStorage("tickets_agent", {
 
 let columns = ref([]);
 let rows = ref([]);
+let colFieldType = ref({});
 let rowCount = ref(0);
 let totalCount = ref(0);
 
@@ -62,6 +65,7 @@ let sorts = ref(storage.value.sorts);
 let sortsToApply = storage.value.sortsToApply;
 
 let pageLength = ref(20);
+let pageLengthCount = pageLength.value;
 
 const tickets = createResource({
   url: "helpdesk.api.doc.get_list_data",
@@ -75,13 +79,22 @@ const tickets = createResource({
   transform(data) {
     data.data.forEach((row) => {
       row.name = row.name.toString();
-      let _user = getUser(JSON.parse(row._assign)[0]);
+      let _assign = JSON.parse(row._assign);
 
-      row._assign = {
-        name: _user.name,
-        label: _user.full_name,
-        image: _user.user_image,
-      };
+      if (_assign && _assign.length) {
+        let _user = getUser(_assign[0]);
+        row._assign = {
+          name: _user.name,
+          label: _user.full_name,
+          image: _user.user_image,
+        };
+      } else {
+        row._assign = {
+          name: "",
+          label: "Unassigned",
+          image: "",
+        };
+      }
     });
   },
   onSuccess(data) {
@@ -89,32 +102,40 @@ const tickets = createResource({
     rows.value = data.data;
     rowCount.value = data.row_count;
     totalCount.value = data.total_count;
+
+    data.fields.forEach((field) => {
+      colFieldType.value[field.value] = field.type;
+    });
   },
 });
 
 function updatePageLength(value) {
   if (value == "loadMore") {
-    tickets.update({
-      params: {
-        doctype: "HD Ticket",
-        filters: filtersToApply,
-        order_by: sortsToApply,
-        page_length: tickets.data.data.length + pageLength.value,
-      },
-    });
+    pageLengthCount = tickets.data.data.length + pageLength.value;
   } else {
     pageLength.value = value;
-    tickets.update({
-      params: {
-        doctype: "HD Ticket",
-        filters: filtersToApply,
-        order_by: sortsToApply,
-        page_length: pageLength.value,
-      },
-    });
+    pageLengthCount = value;
   }
 
-  tickets.reload();
+  apply();
+}
+
+function processFieldClick(event) {
+  filters.value.push({
+    field: filterableFields.data.find((f) => f.fieldname === event.name),
+    operator: "is",
+    value: event.value,
+  });
+
+  if (event.name == "_assign") {
+    filtersToApply[event.name] = ["LIKE", `%${event.value}%`];
+  } else {
+    filtersToApply[event.name] = ["=", event.value];
+  }
+  storage.value.filters = filters.value;
+  storage.value.filtersToApply = filtersToApply;
+
+  apply();
 }
 
 function processSorts(sortEvent) {
@@ -134,15 +155,6 @@ function processSorts(sortEvent) {
 
   storage.value.sorts = sorts.value;
   storage.value.sortsToApply = sortsToApply;
-
-  tickets.update({
-    params: {
-      order_by: sortsToApply,
-      filters: filtersToApply,
-      page_length: 100,
-      doctype: "HD Ticket",
-    },
-  });
 
   apply();
 }
@@ -185,6 +197,15 @@ function processFilters(filterEvent) {
 }
 
 function apply() {
+  tickets.update({
+    params: {
+      order_by: sortsToApply,
+      filters: filtersToApply,
+      page_length: pageLengthCount,
+      doctype: "HD Ticket",
+    },
+  });
+
   tickets.reload();
 }
 
