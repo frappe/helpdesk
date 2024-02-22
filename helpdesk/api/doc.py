@@ -115,6 +115,7 @@ def get_list_data(
 		if column.get("key") not in rows:
 			rows.append(column.get("key"))
 
+	rows.append("name") if "name" not in rows else rows
 	data = frappe.get_all(
 		doctype,
 		fields=rows,

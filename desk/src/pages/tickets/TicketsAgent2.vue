@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
 import TicketsAgentList2 from "./TicketsAgentList2.vue";
@@ -62,8 +62,6 @@ let storage = useStorage("tickets_agent", {
 let items = ref([]);
 let columns = ref(storage.value.columns ? storage.value.columns : []);
 let rows = ref(storage.value.rows ? storage.value.rows : []);
-let fields = ref([]);
-let colFieldType = ref({});
 let rowCount = ref(0);
 let totalCount = ref(0);
 
@@ -90,7 +88,7 @@ const tickets = createResource({
   transform(data) {
     data.data.forEach((row) => {
       row.name = row.name.toString();
-      let _assign = JSON.parse(row._assign);
+      let _assign = row._assign ? JSON.parse(row._assign) : null;
 
       if (_assign && _assign.length) {
         let _user = getUser(_assign[0]);
@@ -112,14 +110,23 @@ const tickets = createResource({
     columns.value = data.columns;
     rows.value = data.rows;
     items.value = data.data;
-    fields.value = data.fields;
     rowCount.value = data.row_count;
     totalCount.value = data.total_count;
-
-    data.fields.forEach((field) => {
-      colFieldType.value[field.value] = field.type;
-    });
   },
+});
+
+const fields = computed(() => {
+  return tickets?.data?.fields.filter((field) => {
+    return colFieldType.value[field.value] == undefined;
+  });
+});
+
+const colFieldType = computed(() => {
+  let obj = {};
+  tickets?.data?.columns.forEach((column) => {
+    obj[column.key] = column.type;
+  });
+  return obj;
 });
 
 function updatePageLength(value) {
@@ -153,45 +160,23 @@ function processFieldClick(event) {
 
 function processColumns(columnEvent) {
   if (columnEvent.event === "add") {
-    tickets.update({
-      params: {
-        order_by: sortsToApply,
-        filters: filtersToApply,
-        page_length: pageLength.value,
-        columns: [columnEvent.data, ...columns.value],
-        rows: [columnEvent.data.key, ...rows.value],
-        doctype: "HD Ticket",
-      },
-    });
-    storage.value.columns = [columnEvent.data, ...columns.value];
-    storage.value.rows = [columnEvent.data.key, ...rows.value];
-    tickets.reload();
+    columns.value = [columnEvent.data, ...columns.value];
+    rows.value = [columnEvent.data.key, ...rows.value];
   } else if (columnEvent.event === "remove") {
-    tickets.update({
-      params: {
-        order_by: sortsToApply,
-        filters: filtersToApply,
-        page_length: pageLength.value,
-        columns: columns.value.filter((column) => {
-          return column.key != columnEvent.data.key;
-        }),
-        rows: rows.value.filter((row) => {
-          return row != columnEvent.data.key;
-        }),
-        doctype: "HD Ticket",
-      },
-    });
-
-    storage.value.columns = columns.value.filter((column) => {
-      return column.key != columnEvent.data.key;
-    });
-    storage.value.rows = rows.value.filter((row) => {
+    rows.value = rows.value.filter((row) => {
       return row != columnEvent.data.key;
     });
-    tickets.reload();
-  } else if (columnEvent.event === "update") {
-    storage.value.columns = columnEvent.data;
+    columns.value = columns.value.filter((column) => {
+      return column.key != columnEvent.data.key;
+    });
+  } else if (columnEvent.event === "reset") {
+    columns.value = [];
+    rows.value = [];
   }
+  storage.value.columns = columns.value;
+  storage.value.rows = rows.value;
+
+  apply();
 }
 
 function processSorts(sortEvent) {
@@ -259,6 +244,8 @@ function apply() {
       filters: filtersToApply,
       page_length: pageLengthCount,
       doctype: "HD Ticket",
+      columns: columns.value.length ? columns.value : undefined,
+      rows: rows.value.length ? rows.value : undefined,
     },
   });
 
