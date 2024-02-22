@@ -17,11 +17,16 @@
     <ViewControls
       :filter="{ filters: filters, filterableFields: filterableFields.data }"
       :sort="{ sorts: sorts, sortableFields: sortableFields.data }"
+      :column="{
+        fields: fields,
+        columns: columns,
+      }"
       @event:sort="processSorts"
       @event:filter="processFilters"
+      @event:column="processColumns"
     />
     <TicketsAgentList2
-      :rows="rows"
+      :rows="items"
       :columns="columns"
       :page-length="pageLength"
       :col-field-type="colFieldType"
@@ -36,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
 import TicketsAgentList2 from "./TicketsAgentList2.vue";
@@ -50,11 +55,13 @@ let storage = useStorage("tickets_agent", {
   filters: [],
   sorts: [],
   sortsToApply: "modified desc",
+  columns: [],
+  rows: [],
 });
 
-let columns = ref([]);
-let rows = ref([]);
-let colFieldType = ref({});
+let items = ref([]);
+let columns = ref(storage.value.columns ? storage.value.columns : []);
+let rows = ref(storage.value.rows ? storage.value.rows : []);
 let rowCount = ref(0);
 let totalCount = ref(0);
 
@@ -74,12 +81,14 @@ const tickets = createResource({
     filters: filtersToApply,
     order_by: sortsToApply,
     page_length: pageLength.value,
+    columns: columns.value.length ? columns.value : undefined,
+    rows: rows.value.length ? rows.value : undefined,
   },
   auto: true,
   transform(data) {
     data.data.forEach((row) => {
       row.name = row.name.toString();
-      let _assign = JSON.parse(row._assign);
+      let _assign = row._assign ? JSON.parse(row._assign) : null;
 
       if (_assign && _assign.length) {
         let _user = getUser(_assign[0]);
@@ -99,14 +108,25 @@ const tickets = createResource({
   },
   onSuccess(data) {
     columns.value = data.columns;
-    rows.value = data.data;
+    rows.value = data.rows;
+    items.value = data.data;
     rowCount.value = data.row_count;
     totalCount.value = data.total_count;
-
-    data.fields.forEach((field) => {
-      colFieldType.value[field.value] = field.type;
-    });
   },
+});
+
+const fields = computed(() => {
+  return tickets?.data?.fields.filter((field) => {
+    return colFieldType.value[field.value] == undefined;
+  });
+});
+
+const colFieldType = computed(() => {
+  let obj = {};
+  tickets?.data?.columns.forEach((column) => {
+    obj[column.key] = column.type;
+  });
+  return obj;
 });
 
 function updatePageLength(value) {
@@ -134,6 +154,27 @@ function processFieldClick(event) {
   }
   storage.value.filters = filters.value;
   storage.value.filtersToApply = filtersToApply;
+
+  apply();
+}
+
+function processColumns(columnEvent) {
+  if (columnEvent.event === "add") {
+    columns.value = [columnEvent.data, ...columns.value];
+    rows.value = [columnEvent.data.key, ...rows.value];
+  } else if (columnEvent.event === "remove") {
+    rows.value = rows.value.filter((row) => {
+      return row != columnEvent.data.key;
+    });
+    columns.value = columns.value.filter((column) => {
+      return column.key != columnEvent.data.key;
+    });
+  } else if (columnEvent.event === "reset") {
+    columns.value = [];
+    rows.value = [];
+  }
+  storage.value.columns = columns.value;
+  storage.value.rows = rows.value;
 
   apply();
 }
@@ -203,6 +244,8 @@ function apply() {
       filters: filtersToApply,
       page_length: pageLengthCount,
       doctype: "HD Ticket",
+      columns: columns.value.length ? columns.value : undefined,
+      rows: rows.value.length ? rows.value : undefined,
     },
   });
 

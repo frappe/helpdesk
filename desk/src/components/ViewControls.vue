@@ -19,27 +19,31 @@
 
     <div class="flex-none px-1">
       <Filter
-        :filters="props.filter.filters"
-        :filterable-fields="props.filter.filterableFields"
+        :filters="filter.filters"
+        :filterable-fields="filter.filterableFields"
         @event:filter="(e) => emitToParent(e, 'event:filter')"
       />
     </div>
     <div class="pe-2 flex-none">
       <Sort
-        :sortable-fields="props.sort.sortableFields"
-        :sorts="props.sort.sorts"
+        :sortable-fields="sort.sortableFields"
+        :sorts="sort.sorts"
         @event:sort="(e) => emitToParent(e, 'event:sort')"
       />
     </div>
-    <!-- <div class="flex-none pe-2"> 
-        <p class="text-lg">View Settings</p>
-    </div> -->
+    <div class="flex-none px-1">
+      <ColumnSettings
+        :fields="column.fields"
+        :columns="column.columns"
+        @event:column="(e) => emitToParent(e, 'event:column')"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Filter, Sort } from "@/components";
+import { Filter, Sort, ColumnSettings } from "@/components";
 import { Dropdown, FeatherIcon } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 
@@ -52,6 +56,10 @@ const props = defineProps({
     required: true,
   },
   sort: {
+    type: Object,
+    required: true,
+  },
+  column: {
     type: Object,
     required: true,
   },
@@ -148,7 +156,7 @@ function getPresetFilters(status) {
   };
 }
 
-const emit = defineEmits(["event:filter", "event:sort"]);
+const emit = defineEmits(["event:filter", "event:sort", "event:column"]);
 
 function emitToParent(data, event) {
   if (event === "event:filter") {

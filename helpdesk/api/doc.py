@@ -73,14 +73,29 @@ def get_filterable_fields(doctype):
 	return res
 
 @frappe.whitelist()
-def get_list_data(doctype: str, filters: dict, order_by: str, page_length=20,):
-	columns = [
-		{"label": "Name", "type": "Data", "key": "name", "width": "16rem"},
-		{"label": "Last Modified", "type": "Datetime", "key": "modified", "width": "8rem"},
-	]
-	rows = ["name"]
-
+def get_list_data(
+	doctype: str, 
+	filters: dict, 
+	order_by: str, 
+	page_length=20,
+	columns=None,
+	rows=None,
+):
 	is_default = True
+
+	if columns or rows:
+		is_default = False
+		columns = frappe.parse_json(columns)
+		rows = frappe.parse_json(rows)
+
+	if not columns:
+		columns = [
+			{"label": "Name", "type": "Data", "key": "name", "width": "16rem"},
+			{"label": "Last Modified", "type": "Datetime", "key": "modified", "width": "8rem"},
+		]
+
+	if not rows:
+		rows = ["name"]
 
 	# if frappe.db.exists("HD List View Settings", doctype):
 	# 	list_view_settings = frappe.get_doc("CRM List View Settings", doctype)
@@ -90,15 +105,17 @@ def get_list_data(doctype: str, filters: dict, order_by: str, page_length=20,):
 	# else:
 	list = get_controller(doctype)
 
-	if hasattr(list, "default_list_data"):
-		columns = list.default_list_data().get("columns")
-		rows = list.default_list_data().get("rows")
+	if is_default:
+		if hasattr(list, "default_list_data"):
+			columns = list.default_list_data().get("columns")
+			rows = list.default_list_data().get("rows")
 
 	# check if rows has all keys from columns if not add them
 	for column in columns:
 		if column.get("key") not in rows:
 			rows.append(column.get("key"))
 
+	rows.append("name") if "name" not in rows else rows
 	data = frappe.get_all(
 		doctype,
 		fields=rows,
@@ -145,7 +162,6 @@ def get_list_data(doctype: str, filters: dict, order_by: str, page_length=20,):
 		"columns": columns,
 		"rows": rows,
 		"fields": fields,
-		"is_default": is_default,
 		"total_count": frappe.client.get_count(doctype, filters=filters),
 		"row_count": len(data),
 	}

@@ -20,3 +20,4 @@ export { default as Filter } from "./Filter.vue";
 export { default as LayoutHeader } from "./LayoutHeader.vue";
 export { default as Sort } from "./Sort.vue";
 export { default as MultipleAvatar } from "./MultipleAvatar.vue";
+export { default as ColumnSettings } from "./ColumnSettings.vue";
