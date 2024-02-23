@@ -124,7 +124,7 @@ const menuOptions = computed(() => [
   {
     label: "Tickets",
     icon: LucideTicket,
-    to: "TicketsAgent2",
+    to: AGENT_PORTAL_TICKET_LIST,
   },
   {
     label: "Dashboard",
