@@ -21,18 +21,6 @@
         placeholder="A short description"
       />
     </div>
-    <div class="m-5 mt-0">
-      <div class="mb-2 block text-sm text-gray-600">
-        {{ ticketTypeData.label }}
-      </div>
-      <div class="relative w-full">
-        <Autocomplete
-          v-model="ticketType"
-          :options="ticketTypeData.store.dropdown"
-          :placeholder="`Select a ${ticketTypeData.label}`"
-        />
-      </div>
-    </div>
     <TicketNewArticles :search="subject" class="mx-5 mb-5" />
     <span class="mx-5 mb-5">
       <TicketTextEditor
@@ -61,18 +49,11 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import {
-  createResource,
-  usePageMeta,
-  Button,
-  FormControl,
-  Autocomplete,
-} from "frappe-ui";
+import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
 import { UniInput } from "@/components";
-import { useTicketTypeStore } from "@/stores/ticketType";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketNewArticles from "./TicketNewArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
@@ -88,7 +69,6 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const subject = ref("");
-const ticketType = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
@@ -99,14 +79,6 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
-});
-
-const ticketTypeData = computed(() => {
-  return {
-    field: "ticket_type",
-    label: "Ticket type",
-    store: useTicketTypeStore(),
-  };
 });
 
 const visibleFields = computed(() =>
@@ -120,7 +92,6 @@ const ticket = createResource({
       description: description.value,
       subject: subject.value,
       template: props.templateId,
-      ticket_type: ticketType.value ? ticketType.value.value : "",
       ...templateFields,
     },
     attachments: attachments.value,
