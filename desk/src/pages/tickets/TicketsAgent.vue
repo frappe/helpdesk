@@ -57,6 +57,7 @@ let storage = useStorage("tickets_agent", {
   sortsToApply: "modified desc",
   columns: [],
   rows: [],
+  pageLength: 20,
 });
 
 let items = ref([]);
@@ -71,7 +72,7 @@ let filters = ref(storage.value.filters);
 let sorts = ref(storage.value.sorts);
 let sortsToApply = storage.value.sortsToApply;
 
-let pageLength = ref(20);
+let pageLength = ref(storage.value.pageLength);
 let pageLengthCount = pageLength.value;
 
 const tickets = createResource({
@@ -135,6 +136,7 @@ function updatePageLength(value) {
   } else {
     pageLength.value = value;
     pageLengthCount = value;
+    storage.value.pageLength = value;
   }
 
   apply();
