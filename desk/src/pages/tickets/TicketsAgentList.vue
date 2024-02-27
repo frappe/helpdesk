@@ -106,7 +106,7 @@
   </ListView>
   <ListFooter
     v-model="pageLength"
-    class="bottom-0 border-t bg-blue-50 px-5 py-2"
+    class="bottom-0 border-t px-5 py-2"
     :options="{ rowCount: options.rowCount, totalCount: options.totalCount }"
     @update:model-value="emit('update:pageLength', $event)"
     @load-more="emit('update:pageLength', 'loadMore')"
