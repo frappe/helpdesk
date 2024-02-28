@@ -25,14 +25,14 @@
       @event:filter="processFilters"
       @event:column="processColumns"
     />
-    <TicketsAgentList2
-      :rows="items"
+    <TicketsAgentList
+      :rows="tickets?.data?.data"
       :columns="columns"
       :page-length="pageLength"
       :col-field-type="colFieldType"
       :options="{
-        rowCount: rowCount,
-        totalCount: totalCount,
+        rowCount: tickets?.data?.row_count,
+        totalCount: tickets?.data?.total_count,
       }"
       @update:page-length="updatePageLength"
       @event:field-click="processFieldClick"
@@ -44,7 +44,7 @@
 import { ref, computed } from "vue";
 import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
-import TicketsAgentList2 from "./TicketsAgentList.vue";
+import TicketsAgentList from "./TicketsAgentList.vue";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
 const { getUser } = useUserStore();
@@ -60,11 +60,8 @@ let storage = useStorage("tickets_agent", {
   pageLength: 20,
 });
 
-let items = ref([]);
-let columns = ref(storage.value.columns ? storage.value.columns : []);
-let rows = ref(storage.value.rows ? storage.value.rows : []);
-let rowCount = ref(0);
-let totalCount = ref(0);
+let columns = storage.value.columns ? storage.value.columns : [];
+let rows = storage.value.rows ? storage.value.rows : [];
 
 let filtersToApply = storage.value.filtersToApply;
 let filters = ref(storage.value.filters);
@@ -82,8 +79,8 @@ const tickets = createResource({
     filters: filtersToApply,
     order_by: sortsToApply,
     page_length: pageLength.value,
-    columns: columns.value.length ? columns.value : undefined,
-    rows: rows.value.length ? rows.value : undefined,
+    columns: columns.length ? columns : undefined,
+    rows: rows.length ? rows : undefined,
   },
   auto: true,
   transform(data) {
@@ -108,11 +105,8 @@ const tickets = createResource({
     });
   },
   onSuccess(data) {
-    columns.value = data.columns;
-    rows.value = data.rows;
-    items.value = data.data;
-    rowCount.value = data.row_count;
-    totalCount.value = data.total_count;
+    columns = data.columns;
+    rows = data.rows;
   },
 });
 
@@ -162,21 +156,21 @@ function processFieldClick(event) {
 
 function processColumns(columnEvent) {
   if (columnEvent.event === "add") {
-    columns.value = [columnEvent.data, ...columns.value];
-    rows.value = [columnEvent.data.key, ...rows.value];
+    columns = [columnEvent.data, ...columns];
+    rows = [columnEvent.data.key, ...rows];
   } else if (columnEvent.event === "remove") {
-    rows.value = rows.value.filter((row) => {
+    rows = rows.filter((row) => {
       return row != columnEvent.data.key;
     });
-    columns.value = columns.value.filter((column) => {
+    columns = columns.filter((column) => {
       return column.key != columnEvent.data.key;
     });
   } else if (columnEvent.event === "reset") {
-    columns.value = [];
-    rows.value = [];
+    columns = [];
+    rows = [];
   }
-  storage.value.columns = columns.value;
-  storage.value.rows = rows.value;
+  storage.value.columns = columns;
+  storage.value.rows = rows;
 
   apply();
 }
@@ -246,8 +240,8 @@ function apply() {
       filters: filtersToApply,
       page_length: pageLengthCount,
       doctype: "HD Ticket",
-      columns: columns.value.length ? columns.value : undefined,
-      rows: rows.value.length ? rows.value : undefined,
+      columns: columns.length ? columns : undefined,
+      rows: rows.length ? rows : undefined,
     },
   });
 
