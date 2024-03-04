@@ -116,7 +116,7 @@ def get_list_data(
 			rows.append(column.get("key"))
 
 	rows.append("name") if "name" not in rows else rows
-	data = frappe.get_all(
+	data = frappe.get_list(
 		doctype,
 		fields=rows,
 		filters=filters,
@@ -162,7 +162,7 @@ def get_list_data(
 		"columns": columns,
 		"rows": rows,
 		"fields": fields,
-		"total_count": frappe.client.get_count(doctype, filters=filters),
+		"total_count": len(frappe.get_list(doctype, filters=filters)),
 		"row_count": len(data),
 	}
 
