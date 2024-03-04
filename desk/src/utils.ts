@@ -39,3 +39,9 @@ export function getAssign(s: string): string | undefined {
   const arr = Array.isArray(assignJson) ? assignJson : [];
   return arr.slice(-1).pop();
 }
+
+export function validateEmail(email) {
+  const regExp =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  return regExp.test(email);
+}

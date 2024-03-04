@@ -38,128 +38,19 @@
           </template>
         </TicketConversation>
         <span class="m-5">
-          <TicketTextEditor
+          <CommunicationArea
             ref="editor"
+            v-model="ticket"
             v-model:attachments="attachments"
             v-model:content="content"
             v-model:expand="isExpanded"
+            v-model:reload="reload_email"
             :mentions="agentStore.dropdown"
             :placeholder="placeholder"
             autofocus
             @clear="() => clear()"
           >
-            <template #top-right>
-              <span class="flex gap-2">
-                <Button
-                  v-if="mode === Mode.Response"
-                  label="CC"
-                  :theme="showCc ? 'blue' : 'gray'"
-                  variant="subtle"
-                  @click="() => (showCc = !showCc)"
-                />
-                <Button
-                  v-if="mode === Mode.Response"
-                  label="BCC"
-                  :theme="showBcc ? 'blue' : 'gray'"
-                  variant="subtle"
-                  @click="() => (showBcc = !showBcc)"
-                />
-                <TabButtons
-                  v-model="mode"
-                  :buttons="Object.values(Mode).map((m) => ({ label: m }))"
-                />
-              </span>
-            </template>
-            <template v-if="mode == Mode.Response" #top-bottom>
-              <div class="my-2.5 space-y-2 border-y py-2">
-                <div>
-                  <span class="mr-3 text-xs text-gray-500">TO:</span>
-                  <Button :label="ticket.data.raised_by" />
-                </div>
-                <div v-if="showCc">
-                  <span class="inline-flex flex-wrap items-center gap-1">
-                    <span class="mr-2 text-xs text-gray-500">CC:</span>
-                    <Button
-                      v-for="i in cc.split(',').filter(Boolean)"
-                      :key="i"
-                      :label="i"
-                      @click="
-                        () =>
-                          (cc = cc
-                            .split(',')
-                            .filter((s) => s !== i)
-                            .join(','))
-                      "
-                    />
-                    <FormControl
-                      type="text"
-                      placeholder="hello@example.com"
-                      @keyup.prevent.enter="
-                        (event) => {
-                          cc = [...cc.split(','), event.target.value].join(',');
-                          event.target.value = '';
-                        }
-                      "
-                    />
-                  </span>
-                </div>
-                <div v-if="showBcc">
-                  <span class="inline-flex flex-wrap items-center gap-1">
-                    <span class="mr-2 text-xs text-gray-500">BCC:</span>
-                    <Button
-                      v-for="i in bcc.split(',').filter(Boolean)"
-                      :key="i"
-                      :label="i"
-                      @click="
-                        () =>
-                          (bcc = bcc
-                            .split(',')
-                            .filter((s) => s !== i)
-                            .join(','))
-                      "
-                    />
-                    <FormControl
-                      type="text"
-                      placeholder="hello@example.com"
-                      @keyup.prevent.enter="
-                        (event) => {
-                          bcc = [...bcc.split(','), event.target.value].join(
-                            ','
-                          );
-                          event.target.value = '';
-                        }
-                      "
-                    />
-                  </span>
-                </div>
-              </div>
-            </template>
-            <template #bottom-left>
-              <Button
-                theme="gray"
-                variant="ghost"
-                @click="showCannedResponses = !showCannedResponses"
-              >
-                <template #icon>
-                  <Icon icon="lucide:message-square" />
-                </template>
-              </Button>
-            </template>
-            <template #bottom-right>
-              <Button
-                :label="
-                  {
-                    Comment: 'Comment',
-                    Response: 'Send',
-                  }[mode]
-                "
-                theme="gray"
-                variant="solid"
-                :disabled="$refs.editor.editor.isEmpty || resource.loading"
-                @click="() => resource.submit()"
-              />
-            </template>
-          </TicketTextEditor>
+          </CommunicationArea>
         </span>
       </div>
       <TicketAgentSidebar />
@@ -196,7 +87,7 @@ import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketCannedResponses from "./TicketCannedResponses.vue";
 import TicketConversation from "./TicketConversation.vue";
 import TicketPinnedComments from "./TicketPinnedComments.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
+import { CommunicationArea } from "@/components/";
 import { ITicket } from "./symbols";
 
 interface P {
@@ -207,6 +98,8 @@ enum Mode {
   Comment = "Comment",
   Response = "Response",
 }
+
+const reload_email = ref(false);
 
 const props = defineProps<P>();
 const agentStore = useAgentStore();
@@ -226,9 +119,6 @@ const attachments = ref([]);
 const isExpanded = ref(false);
 const cc = ref("");
 const bcc = ref("");
-const showCc = ref(false);
-const showBcc = ref(false);
-const mode = ref(Mode.Comment);
 const focus = ref("");
 const showCannedResponses = ref(false);
 
