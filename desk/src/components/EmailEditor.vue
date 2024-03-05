@@ -100,6 +100,7 @@ import { defineModel, ref } from "vue";
 import { FileUploader, TextEditor, TextEditorFixedMenu } from "frappe-ui";
 import { validateEmail } from "@/utils";
 import { MultiSelectInput } from "@/components";
+import AttachmentIcon from "./icons/AttachmentIcon.vue";
 
 const props = defineProps({
   placeholder: {

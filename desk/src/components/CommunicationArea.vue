@@ -23,7 +23,7 @@
         </template>
       </Button>
     </div>
-    <div v-if="showEmailBox" class="flex gap-1.5">
+    <div v-show="showEmailBox" class="flex gap-1.5">
       <Button
         label="CC"
         :class="[false ? 'bg-gray-300 hover:bg-gray-200' : '']"
@@ -35,6 +35,28 @@
         @click="toggleBCC()"
       />
     </div>
+  </div>
+  <div v-show="showCommentBox">
+    <CommentBox
+      ref="newCommentEditor"
+      v-model:content="newComment"
+      v-model="doc.data"
+      v-model:attachments="attachments"
+      :submit-button-props="{
+        variant: 'solid',
+        onClick: submitComment,
+        disabled: commentEmpty,
+      }"
+      :discard-button-props="{
+        onClick: () => {
+          showCommentBox = false;
+          newComment = '';
+        },
+      }"
+      :editable="showCommentBox"
+      :doctype="doctype"
+      placeholder="Add a comment..."
+    />
   </div>
   <div
     v-show="showEmailBox"
@@ -55,7 +77,6 @@
       :discard-button-props="{
         onClick: () => {
           showEmailBox = false;
-          // newEmailEditor.subject = subject; //TODO
           newEmailEditor.toEmails = doc.data.email ? [doc.data.email] : [];
           newEmailEditor.ccEmails = [];
           newEmailEditor.bccEmails = [];
@@ -69,13 +90,13 @@
 </template>
 
 <script setup lang="ts">
-import { call } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import EmailIcon from "@/components/icons/EmailIcon.vue";
 import CommentIcon from "@/components/icons/CommentIcon.vue";
 import { useAuthStore } from "@/stores/auth";
 import { EmailEditor } from "@/components";
 import { File } from "@/types";
-import { computed, ref, defineModel, nextTick, watch, defineProps } from "vue";
+import { computed, ref, defineModel, nextTick, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 
 const authStore = useAuthStore();
@@ -86,6 +107,7 @@ const attachments = ref([]);
 const newEmailEditor = ref(null);
 
 const newEmail = useStorage("emailBoxContent", "");
+const newComment = useStorage("commentBoxContent", "");
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -117,6 +139,10 @@ function toggleBCC() {
     });
 }
 
+const commentEmpty = computed(() => {
+  return !newComment.value || newComment.value === "<p></p>";
+});
+
 const emailEmpty = computed(() => {
   return !newEmail.value || newEmail.value === "<p></p>";
 });
@@ -132,31 +158,55 @@ const props = defineProps({
 
 const emit = defineEmits(["scroll"]);
 
-async function sendMail() {
-  let recipients = newEmailEditor.value.toEmails;
-  let subject = newEmailEditor.value.subject;
-  let cc = newEmailEditor.value.ccEmails || [];
-  let bcc = newEmailEditor.value.bccEmails || [];
-  await call("frappe.core.doctype.communication.email.make", {
-    recipients: recipients.join(", "),
-    attachments: attachments.value.map((x) => x.name),
-    cc: cc.join(", "),
-    bcc: bcc.join(", "),
-    subject: subject,
-    content: newEmail.value,
-    doctype: props.doctype,
-    name: doc.value.data.name,
-    send_email: 1,
-    sender: authStore.userId,
-    sender_full_name: authStore.userName || undefined,
-  });
-}
+const sendMail = createResource({
+  url: "run_doc_method",
+  makeParams: () => ({
+    dt: "HD Ticket",
+    dn: doc.value.data.name,
+    method: "reply_via_agent",
+    args: {
+      attachments: attachments.value.map((x) => x.name),
+      cc: (newEmailEditor.value.ccEmails || []).join(","),
+      bcc: (newEmailEditor.value.bccEmails || []).join(","),
+      message: newEmail.value,
+    },
+  }),
+  // onSuccess: () => {
+  //   clear();
+  //   emitter.emit("update:ticket");
+  // },
+});
 
 async function submitEmail() {
   if (emailEmpty.value) return;
   showEmailBox.value = false;
-  await sendMail();
+  sendMail.submit();
   newEmail.value = "";
+  reload.value = true;
+  emit("scroll");
+}
+
+async function sendComment() {
+  const comment = createResource({
+    url: "run_doc_method",
+    makeParams: () => ({
+      dt: "HD Ticket",
+      dn: doc.value.data.name,
+      method: "new_comment",
+      args: {
+        content: newComment.value,
+      },
+    }),
+  });
+
+  comment.submit();
+}
+
+async function submitComment() {
+  if (commentEmpty.value) return;
+  showCommentBox.value = false;
+  await sendComment();
+  newComment.value = "";
   reload.value = true;
   emit("scroll");
 }
