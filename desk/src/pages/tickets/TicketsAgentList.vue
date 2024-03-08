@@ -35,16 +35,7 @@
         >
           <template #prefix>
             <div v-if="column.key === 'status'">
-              <IndicatorIcon v-if="item == 'Open'" class="text-red-600" />
-              <IndicatorIcon
-                v-else-if="item == 'Replied'"
-                class="text-blue-600"
-              />
-              <IndicatorIcon
-                v-else-if="item == 'Resolved'"
-                class="text-green-700"
-              />
-              <IndicatorIcon v-else class="text-gray-700" />
+              <IndicatorIcon :class="ticketStatusStore.colorMap[item]" />
             </div>
           </template>
           <div v-if="column.key === 'agreement_status'">
@@ -114,6 +105,9 @@
 </template>
 
 <script setup lang="ts">
+import { dayjs } from "@/dayjs";
+import { ref } from "vue";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
 import {
   ListView,
   ListRows,
@@ -123,8 +117,8 @@ import {
   ListFooter,
 } from "frappe-ui";
 import { MultipleAvatar } from "@/components";
-import { dayjs } from "@/dayjs";
-import { ref } from "vue";
+
+const ticketStatusStore = useTicketStatusStore();
 
 function handleFieldClick(e, name: string, value: string) {
   if (
