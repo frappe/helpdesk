@@ -1,0 +1,96 @@
+<template>
+  <div
+    class="cursor-pointer rounded-md bg-gray-50 p-3 text-base leading-6 transition-all duration-300 ease-in-out"
+  >
+    <div class="mb-1 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <UserAvatar :name="sender.name" size="md" />
+        <span>{{ sender.full_name }}</span>
+        <span>&middot;</span>
+        <Tooltip
+          class="text-sm text-gray-600"
+          :text="dateFormat(creation, dateTooltipFormat)"
+        >
+          {{ timeAgo(creation) }}
+        </Tooltip>
+      </div>
+      <div class="flex gap-0.5">
+        <Tooltip text="Reply">
+          <Button
+            variant="ghost"
+            class="text-gray-700"
+            @click="console.log('reply')"
+          >
+            <ReplyIcon class="h-4 w-4" />
+          </Button>
+        </Tooltip>
+        <Tooltip text="Reply All">
+          <Button
+            variant="ghost"
+            class="text-gray-700"
+            @click="console.log('reply all')"
+          >
+            <ReplyAllIcon class="h-4 w-4" />
+          </Button>
+        </Tooltip>
+      </div>
+    </div>
+    <div class="text-sm leading-5 text-gray-600">
+      {{ subject }}
+    </div>
+    <div class="mb-3 text-sm leading-5 text-gray-600">
+      <span class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
+      <span> {{ to }} </span>
+      <span v-if="cc">, </span>
+      <span v-if="cc" class="text-2xs mr-1 font-bold text-gray-500"> CC: </span>
+      <span v-if="cc">{{ cc }}</span>
+      <span v-if="bcc">, </span>
+      <span v-if="bcc" class="text-2xs mr-1 font-bold text-gray-500">
+        BCC:
+      </span>
+      <span v-if="bcc">{{ bcc }}</span>
+    </div>
+    <div
+      class="email-content prose-f max-h-[500px] overflow-y-auto"
+      v-html="content"
+    />
+    <div class="flex flex-wrap gap-2">
+      <AttachmentItem
+        v-for="a in attachments"
+        :key="a.file_url"
+        :label="a.file_name"
+        :url="a.file_url"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { UserAvatar, AttachmentItem } from "@/components";
+import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
+import ReplyIcon from "./icons/ReplyIcon.vue";
+import ReplyAllIcon from "./icons/ReplyAllIcon.vue";
+
+const props = defineProps({
+  sender: {
+    type: Object,
+    required: true,
+  },
+  to: { type: String, required: true },
+  cc: { type: String, default: null },
+  bcc: { type: String, default: null },
+  creation: { type: String, required: true },
+  subject: {
+    type: String,
+    required: true,
+  },
+  attachments: {
+    type: Array,
+    default: () => [],
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+});
+</script>

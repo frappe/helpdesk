@@ -23,3 +23,4 @@ export { default as ColumnSettings } from "./ColumnSettings.vue";
 export { default as EmailEditor } from "./EmailEditor.vue";
 export { default as MultiSelectInput } from "./MultiSelectInput.vue";
 export { default as CommunicationArea } from "./CommunicationArea.vue";
+export { default as EmailBox } from "./EmailBox.vue";
