@@ -14,17 +14,20 @@
         ]"
       >
         <div
-          class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
-          :class="'mt-3 '"
+          class="z-10 mt-3 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
+          :class="{
+            'bg-white': activity.type === 'history',
+          }"
         >
           <component
-            :is="activity.type === 'email' ? EmailAtIcon : CommentIcon"
+            :is="getActivityIcon(activity.type)"
             :class="'text-gray-800'"
           />
         </div>
       </div>
       <EmailBox v-if="activity.type === 'email'" v-bind="activity" />
       <CommentBox v-if="activity.type === 'comment'" v-bind="activity" />
+      <HistoryBox v-if="activity.type === 'history'" v-bind="activity" />
     </div>
   </div>
 </template>
@@ -32,12 +35,21 @@
 <script setup lang="ts">
 import EmailAtIcon from "@/components/icons/EmailAtIcon.vue";
 import CommentIcon from "@/components/icons/CommentIcon.vue";
+import DotIcon from "./icons/DotIcon.vue";
 import { defineModel } from "vue";
-import { EmailBox, CommentBox } from "@/components";
+import { EmailBox, CommentBox, HistoryBox } from "@/components";
 
 const doc = defineModel();
 const emails = doc.value.data.communications;
 const comments = doc.value.data.comments;
+const history = doc.value.data.history;
+const views = doc.value.data.views;
+
+function getActivityIcon(type) {
+  if (type === "email") return EmailAtIcon;
+  else if (type === "comment") return CommentIcon;
+  else return DotIcon;
+}
 
 const emailProps = emails.map((email) => {
   return {
@@ -64,7 +76,19 @@ const commentProps = comments.map((comment) => {
   };
 });
 
-const activities = [...emailProps, ...commentProps];
+const historyProps = [...history, ...views].map((h) => {
+  return {
+    type: "history",
+    key: h.creation,
+    content: h.action ? h.action : "viewed this",
+    creation: h.creation,
+    user: h.user.name + " ",
+  };
+});
+
+const activities = [...emailProps, ...commentProps, ...historyProps].sort(
+  (a, b) => new Date(a.creation) - new Date(b.creation)
+);
 
 defineProps({
   title: {

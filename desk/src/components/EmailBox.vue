@@ -39,8 +39,8 @@
       {{ subject }}
     </div>
     <div class="mb-3 text-sm leading-5 text-gray-600">
-      <span class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
-      <span> {{ to }} </span>
+      <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
+      <span v-if="to"> {{ to }} </span>
       <span v-if="cc">, </span>
       <span v-if="cc" class="text-2xs mr-1 font-bold text-gray-500"> CC: </span>
       <span v-if="cc">{{ cc }}</span>
@@ -76,7 +76,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  to: { type: String, required: true },
+  to: { type: String, default: null },
   cc: { type: String, default: null },
   bcc: { type: String, default: null },
   creation: { type: String, required: true },
