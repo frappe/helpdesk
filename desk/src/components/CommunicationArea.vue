@@ -37,7 +37,7 @@
     </div>
   </div>
   <div v-show="showCommentBox">
-    <CommentBox
+    <CommentTextEditor
       ref="newCommentEditor"
       v-model:content="newComment"
       v-model="doc.data"
@@ -94,7 +94,7 @@ import { createResource } from "frappe-ui";
 import EmailIcon from "@/components/icons/EmailIcon.vue";
 import CommentIcon from "@/components/icons/CommentIcon.vue";
 import { useAuthStore } from "@/stores/auth";
-import { EmailEditor } from "@/components";
+import { EmailEditor, CommentTextEditor } from "@/components";
 import { File } from "@/types";
 import { computed, ref, defineModel, nextTick, watch } from "vue";
 import { useStorage } from "@vueuse/core";

@@ -1,6 +1,11 @@
 <template>
-  <div v-for="emailProp in emailProps" :key="emailProp.creation" class="pb-6">
-    <div class="grid grid-cols-[30px_minmax(auto,_1fr)] gap-4 px-10">
+  <div class="flex items-center justify-between px-10 py-5 text-lg font-medium">
+    <div class="flex h-7 items-center text-xl font-semibold text-gray-800">
+      {{ title }}
+    </div>
+  </div>
+  <div v-for="activity in activities" :key="activity.key">
+    <div class="flex flex-row gap-4 px-10">
       <div
         class="relative flex justify-center before:absolute before:left-[50%] before:top-0 before:-z-10 before:border-l before:border-gray-200"
         :class="[
@@ -10,51 +15,56 @@
       >
         <div
           class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
-          :class="{
-            'mt-3': [
-              'communication',
-              'incoming_call',
-              'outgoing_call',
-            ].includes('communication'),
-            'bg-white': ['added', 'removed', 'changed'].includes('added'),
-          }"
+          :class="'mt-3 '"
         >
           <component
-            :is="EmailAtIcon"
-            :class="
-              ['added', 'removed', 'changed'].includes('added')
-                ? 'text-gray-600'
-                : 'text-gray-800'
-            "
+            :is="activity.type === 'email' ? EmailAtIcon : CommentIcon"
+            :class="'text-gray-800'"
           />
         </div>
       </div>
-      <EmailBox v-bind="emailProp" />
+      <EmailBox v-if="activity.type === 'email'" v-bind="activity" />
+      <CommentBox v-if="activity.type === 'comment'" v-bind="activity" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import EmailAtIcon from "@/components/icons/EmailAtIcon.vue";
+import CommentIcon from "@/components/icons/CommentIcon.vue";
 import { defineModel } from "vue";
-import { EmailBox } from "@/components";
+import { EmailBox, CommentBox } from "@/components";
 
 const doc = defineModel();
 const emails = doc.value.data.communications;
 const comments = doc.value.data.comments;
 
 const emailProps = emails.map((email) => {
-  let obj = {};
-  obj.sender = { name: email.user.email, full_name: email.user.name };
-  obj.to = email.recipients;
-  obj.cc = email.cc;
-  obj.bcc = email.bcc;
-  obj.creation = email.creation;
-  obj.subject = email.subject;
-  obj.attachments = email.attachments;
-  obj.content = email.content;
-  return obj;
+  return {
+    type: "email",
+    key: email.creation,
+    sender: { name: email.user.email, full_name: email.user.name },
+    to: email.recipients,
+    cc: email.cc,
+    bcc: email.bcc,
+    creation: email.creation,
+    subject: email.subject,
+    attachments: email.attachments,
+    content: email.content,
+  };
 });
+
+const commentProps = comments.map((comment) => {
+  return {
+    type: "comment",
+    key: comment.creation,
+    commenter: comment.user.name,
+    creation: comment.creation,
+    content: comment.content,
+  };
+});
+
+const activities = [...emailProps, ...commentProps];
 
 defineProps({
   title: {

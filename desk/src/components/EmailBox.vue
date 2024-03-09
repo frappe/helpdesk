@@ -1,6 +1,6 @@
 <template>
   <div
-    class="cursor-pointer rounded-md bg-gray-50 p-3 text-base leading-6 transition-all duration-300 ease-in-out"
+    class="mb-6 grow cursor-pointer rounded-md border-transparent bg-gray-50 p-3 text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-1 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2">
