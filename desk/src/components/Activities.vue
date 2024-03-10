@@ -4,14 +4,11 @@
       {{ title }}
     </div>
   </div>
-  <div v-for="activity in activities" :key="activity.key">
+  <div v-for="(activity, i) in activities" :key="activity.key">
     <div class="flex flex-row gap-4 px-10">
       <div
         class="relative flex justify-center before:absolute before:left-[50%] before:top-0 before:-z-10 before:border-l before:border-gray-200"
-        :class="[
-          'before:h-full',
-          'after:translate-y-[calc(-50% - 4px)] after:absolute after:bottom-9 after:left-[50%] after:top-0 after:-z-10 after:w-8 after:rounded-bl-xl after:border-b after:border-l after:border-gray-200',
-        ]"
+        :class="[i != activities.length - 1 ? 'before:h-full' : 'before:h-4']"
       >
         <div
           class="z-10 mt-3 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
@@ -38,6 +35,13 @@ import CommentIcon from "@/components/icons/CommentIcon.vue";
 import DotIcon from "./icons/DotIcon.vue";
 import { defineModel } from "vue";
 import { EmailBox, CommentBox, HistoryBox } from "@/components";
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: "Activity",
+  },
+});
 
 const doc = defineModel();
 const emails = doc.value.data.communications;
@@ -86,14 +90,15 @@ const historyProps = [...history, ...views].map((h) => {
   };
 });
 
-const activities = [...emailProps, ...commentProps, ...historyProps].sort(
+let activities;
+
+if (props.title === "Emails") {
+  activities = emailProps;
+} else {
+  activities = [...emailProps, ...commentProps, ...historyProps];
+}
+
+activities = activities.sort(
   (a, b) => new Date(a.creation) - new Date(b.creation)
 );
-
-defineProps({
-  title: {
-    type: String,
-    default: "Activity",
-  },
-});
 </script>
