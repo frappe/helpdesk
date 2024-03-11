@@ -27,5 +27,4 @@ export { default as CommunicationArea } from "./CommunicationArea.vue";
 export { default as EmailBox } from "./EmailBox.vue";
 export { default as CommentBox } from "./CommentBox.vue";
 export { default as HistoryBox } from "./HistoryBox.vue";
-export { default as Activities } from "./Activities.vue";
 export { default as AssignmentModal } from "./AssignmentModal.vue";

@@ -30,10 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import EmailAtIcon from "@/components/icons/EmailAtIcon.vue";
-import CommentIcon from "@/components/icons/CommentIcon.vue";
-import DotIcon from "./icons/DotIcon.vue";
 import { defineModel } from "vue";
+import { DotIcon, EmailAtIcon, CommentIcon } from "@/components/icons";
 import { EmailBox, CommentBox, HistoryBox } from "@/components";
 
 const props = defineProps({

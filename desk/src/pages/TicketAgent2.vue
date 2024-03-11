@@ -34,6 +34,7 @@
       <Tabs v-slot="{ tab }" v-model="tabIndex" :tabs="tabs">
         <Activities v-model="ticket" :title="tab.label" />
       </Tabs>
+      <Sidebar />
     </div>
     <AssignmentModal
       v-if="ticket.data"
@@ -46,16 +47,10 @@
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
-import ActivityIcon from "@/components/icons/ActivityIcon.vue";
-import EmailIcon from "@/components/icons/EmailIcon.vue";
+import { ActivityIcon, EmailIcon } from "@/components/icons";
 import { Breadcrumbs, createResource, Dropdown, Tabs } from "frappe-ui";
-import {
-  LayoutHeader,
-  CustomActions,
-  MultipleAvatar,
-  AssignmentModal,
-  Activities,
-} from "@/components";
+import { Activities, Sidebar } from "@/components/ticket";
+import { LayoutHeader, MultipleAvatar, AssignmentModal } from "@/components";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import { createToast } from "@/utils";
