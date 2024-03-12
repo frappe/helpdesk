@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-4 w-full flex-col text-base">
+  <div class="mb-4 flex-col text-base">
     <div class="mb-0.5 flex justify-between py-1.5">
       <div class="text-gray-600">
         <span class="font-medium text-gray-800">

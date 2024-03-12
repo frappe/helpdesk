@@ -30,9 +30,9 @@
         </Dropdown>
       </template>
     </LayoutHeader>
-    <div v-if="ticket.data" class="flex h-full overflow-hidden">
+    <div v-if="ticket.data" class="flex h-full">
       <Tabs v-slot="{ tab }" v-model="tabIndex" :tabs="tabs">
-        <div
+        <!-- <div
           class="flex items-center justify-between px-10 py-5 text-lg font-medium"
         >
           <div
@@ -40,16 +40,17 @@
           >
             {{ tab.label }}
           </div>
+        </div> -->
+        <div v-if="tab.label === 'Customer Tickets'" class="py-2">
+          <TicketsAgentList
+            :rows="customerTickets?.data?.data"
+            :columns="customerTickets?.data?.columns"
+            :options="{
+              selectable: false,
+              pagination: false,
+            }"
+          />
         </div>
-        <TicketsAgentList
-          v-if="tab.label === 'Customer Tickets'"
-          :rows="customerTickets?.data?.data"
-          :columns="customerTickets?.data?.columns"
-          :options="{
-            selectable: false,
-            pagination: false,
-          }"
-        />
         <Activities
           v-else
           :activities="activities"
@@ -188,6 +189,10 @@ const activities = computed(() => {
     };
   });
 
+  if (tabIndex.value === 1) {
+    return emailProps;
+  }
+
   const commentProps = ticket.data.comments.map((comment) => {
     return {
       type: "comment",
@@ -201,7 +206,7 @@ const activities = computed(() => {
   const historyProps = [...ticket.data.history, ...ticket.data.views].map(
     (h) => {
       return {
-        type: h.action ? "update" : "view",
+        type: "history",
         key: h.creation,
         content: h.action ? h.action : "viewed this",
         creation: h.creation,
@@ -210,9 +215,34 @@ const activities = computed(() => {
     }
   );
 
-  return [...emailProps, ...commentProps, ...historyProps].sort(
+  const sorted = [...emailProps, ...commentProps, ...historyProps].sort(
     (a, b) => new Date(a.creation) - new Date(b.creation)
   );
+
+  let data = [];
+  let i = 0;
+
+  while (i < sorted.length) {
+    let currentActivity = sorted[i];
+    if (currentActivity.type === "history") {
+      currentActivity.relatedActivities = [];
+      for (let j = i + 1; j < sorted.length; j++) {
+        let nextActivity = sorted[j];
+        if (nextActivity.type === "history") {
+          currentActivity.relatedActivities.push(nextActivity);
+        } else {
+          data.push(currentActivity);
+          i = j - 1;
+          break;
+        }
+      }
+    } else {
+      data.push(currentActivity);
+    }
+    i++;
+  }
+
+  return data;
 });
 
 const showAssignmentModal = ref(false);
