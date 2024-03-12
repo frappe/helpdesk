@@ -5,3 +5,5 @@ export { default as ActivityIcon } from "./ActivityIcon.vue";
 export { default as DotIcon } from "./DotIcon.vue";
 export { default as EmailAtIcon } from "./EmailAtIcon.vue";
 export { default as CommentIcon } from "./CommentIcon.vue";
+export { default as IndicatorIcon } from "./IndicatorIcon.vue";
+export { default as TicketIcon } from "./TicketIcon.vue";

@@ -8,7 +8,7 @@
         name: 'TicketAgent',
         params: { ticketId: row.name },
       }),
-      selectable: true,
+      selectable: options.selectable,
       showTooltip: false,
     }"
     row-key="name"
@@ -96,6 +96,7 @@
     </ListRows>
   </ListView>
   <ListFooter
+    v-if="options.pagination"
     v-model="pageLength"
     class="bottom-0 border-t px-5 py-2"
     :options="{ rowCount: options.rowCount, totalCount: options.totalCount }"
@@ -149,11 +150,10 @@ const props = defineProps({
   },
   colFieldType: {
     type: Object,
-    required: true,
+    default: () => ({}),
   },
   pageLength: {
     type: Number,
-    required: true,
     default: 20,
   },
   options: {
@@ -161,6 +161,8 @@ const props = defineProps({
     default: () => ({
       totalCount: 0,
       rowCount: 0,
+      selectable: true,
+      pagination: true,
     }),
   },
 });

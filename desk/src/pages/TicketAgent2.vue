@@ -32,7 +32,29 @@
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <Tabs v-slot="{ tab }" v-model="tabIndex" :tabs="tabs">
-        <Activities v-model="ticket" :title="tab.label" />
+        <div
+          class="flex items-center justify-between px-10 py-5 text-lg font-medium"
+        >
+          <div
+            class="flex h-7 items-center text-xl font-semibold text-gray-800"
+          >
+            {{ tab.label }}
+          </div>
+        </div>
+        <TicketsAgentList
+          v-if="tab.label === 'Customer Tickets'"
+          :rows="customerTickets?.data?.data"
+          :columns="customerTickets?.data?.columns"
+          :options="{
+            selectable: false,
+            pagination: false,
+          }"
+        />
+        <Activities
+          v-else
+          :activities="activities"
+          :type="tab.label === 'Emails' ? 'email' : 'all'"
+        />
       </Tabs>
       <Sidebar />
     </div>
@@ -47,12 +69,16 @@
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
-import { ActivityIcon, EmailIcon } from "@/components/icons";
+import {
+  ActivityIcon,
+  EmailIcon,
+  IndicatorIcon,
+  TicketIcon,
+} from "@/components/icons";
 import { Breadcrumbs, createResource, Dropdown, Tabs } from "frappe-ui";
 import { Activities, Sidebar } from "@/components/ticket";
 import { LayoutHeader, MultipleAvatar, AssignmentModal } from "@/components";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
-import IndicatorIcon from "@/components/icons/IndicatorIcon.vue";
 import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
@@ -67,19 +93,13 @@ const tabs = [
     label: "Emails",
     icon: EmailIcon,
   },
+  {
+    label: "Customer Tickets",
+    icon: TicketIcon,
+  },
 ];
 
-const dropdownOptions = computed(() =>
-  ticketStatusStore.options.map((o) => ({
-    label: o,
-    value: o,
-    onClick: () => setValue.submit({ field: "status", value: o }),
-    icon: () =>
-      h(IndicatorIcon, {
-        class: ticketStatusStore.colorMap[o],
-      }),
-  }))
-);
+const customerTickets = ref([]);
 
 const props = defineProps({
   ticketId: {
@@ -115,6 +135,84 @@ const ticket = createResource({
     ];
     return data;
   },
+  onSuccess(data) {
+    customerTickets.value = createResource({
+      url: "helpdesk.api.doc.get_list_data",
+      params: {
+        doctype: "HD Ticket",
+        filters: {
+          customer: ["=", data.customer],
+        },
+        columns: [
+          { label: "Name", type: "Data", key: "name", width: "5rem" },
+          { label: "Subject", type: "Data", key: "subject", width: "25rem" },
+          { label: "Status", type: "Data", key: "status", width: "8rem" },
+        ],
+        rows: ["name", "subject", "status"],
+      },
+      auto: true,
+      transform(data) {
+        data.data.forEach((row) => {
+          row.name = row.name.toString();
+        });
+      },
+    });
+  },
+});
+
+const dropdownOptions = computed(() =>
+  ticketStatusStore.options.map((o) => ({
+    label: o,
+    value: o,
+    onClick: () => setValue.submit({ field: "status", value: o }),
+    icon: () =>
+      h(IndicatorIcon, {
+        class: ticketStatusStore.colorMap[o],
+      }),
+  }))
+);
+
+const activities = computed(() => {
+  const emailProps = ticket.data.communications.map((email) => {
+    return {
+      type: "email",
+      key: email.creation,
+      sender: { name: email.user.email, full_name: email.user.name },
+      to: email.recipients,
+      cc: email.cc,
+      bcc: email.bcc,
+      creation: email.creation,
+      subject: email.subject,
+      attachments: email.attachments,
+      content: email.content,
+    };
+  });
+
+  const commentProps = ticket.data.comments.map((comment) => {
+    return {
+      type: "comment",
+      key: comment.creation,
+      commenter: comment.user.name,
+      creation: comment.creation,
+      content: comment.content,
+    };
+  });
+
+  const historyProps = [...ticket.data.history, ...ticket.data.views].map(
+    (h) => {
+      return {
+        type: h.action ? "update" : "view",
+        key: h.creation,
+        content: h.action ? h.action : "viewed this",
+        creation: h.creation,
+        user: h.user.name + " ",
+      };
+    }
+  );
+
+  return [...emailProps, ...commentProps, ...historyProps].sort(
+    (a, b) => new Date(a.creation) - new Date(b.creation)
+  );
 });
 
 const showAssignmentModal = ref(false);

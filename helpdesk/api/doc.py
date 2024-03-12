@@ -76,7 +76,7 @@ def get_filterable_fields(doctype):
 def get_list_data(
 	doctype: str, 
 	filters: dict, 
-	order_by: str, 
+	order_by: str='modified desc', 
 	page_length=20,
 	columns=None,
 	rows=None,
