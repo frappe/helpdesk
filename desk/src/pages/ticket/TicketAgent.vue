@@ -158,6 +158,7 @@
                   </span>
                 </div>
               </div>
+              </div>
             </template>
             <template #bottom-left>
               <Button
