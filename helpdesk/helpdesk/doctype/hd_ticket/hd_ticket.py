@@ -207,7 +207,7 @@ class HDTicket(Document):
 			reference_ticket=self.name,
 			user_to=agent,
 			notification_type=notiification_type,
-		)).insert()
+		)).insert(ignore_permissions=True)
 
 	def update_search_index(self):
 		search = HelpdeskSearch()
