@@ -188,10 +188,26 @@ class HDTicket(Document):
 		publish_event("helpdesk:new-ticket", {"name": self.name})
 
 	def on_update(self):
+		if self.status == "Open":
+			if self.get_doc_before_save() and self.get_doc_before_save().status != "Open":
+				
+				agent = json.loads(self._assign)
+				if len(agent) > 0:
+					self.notify_agent(agent[0], "Reaction")
+		
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
 		self.publish_update()
 		self.update_search_index()
+	
+	def notify_agent(self, agent, notiification_type="Assignment"):
+		frappe.get_doc(frappe._dict(
+			doctype="HD Notification",
+			user_from=frappe.session.user,
+			reference_ticket=self.name,
+			user_to=agent,
+			notification_type=notiification_type,
+		)).insert()
 
 	def update_search_index(self):
 		search = HelpdeskSearch()
@@ -335,6 +351,7 @@ class HDTicket(Document):
 
 		clear_all_assignments("HD Ticket", self.name)
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
+		self.notify_agent(agent, "Assignment")
 		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
 	def get_assigned_agent(self):
