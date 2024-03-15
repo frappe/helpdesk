@@ -112,7 +112,7 @@
 <script setup lang="ts">
 import { h } from "vue";
 import { Autocomplete, FormControl } from "frappe-ui";
-import { NestedPopover } from "@/components";
+import { NestedPopover, SearchComplete } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { DocField } from "@/types";
 
