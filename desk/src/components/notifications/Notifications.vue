@@ -46,7 +46,23 @@
         <UserAvatar v-bind="n.user_from" />
         <span>
           <div class="mb-2 leading-5">
-            <component :is="getBody(n)" v-bind="n" />
+            <span class="space-x-1 text-gray-700">
+              <span class="font-medium text-gray-900">{{
+                n.user_from.name
+              }}</span>
+              <span v-if="n.notification_type === 'Mention'"
+                >mentioned you in ticket</span
+              >
+              <span v-if="n.notification_type === 'Assignment'"
+                >assigned you a ticket</span
+              >
+              <span v-if="n.notification_type === 'Reaction'"
+                >has reopened the ticket</span
+              >
+              <span class="font-medium text-gray-900">{{
+                n.reference_ticket
+              }}</span>
+            </span>
           </div>
           <div class="flex items-center gap-2">
             <div class="text-sm text-gray-600">
@@ -68,7 +84,6 @@ import { Notification } from "@/types";
 import { useSidebarStore } from "@/stores/sidebar";
 import { useNotificationStore } from "@/stores/notification";
 import { UserAvatar } from "@/components";
-import NotificationsMention from "./NotificationsMention.vue";
 
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
@@ -79,13 +94,6 @@ onClickOutside(target, () => {
   }
 });
 
-function getBody(n: Notification) {
-  switch (n.notification_type) {
-    case "Mention":
-      return NotificationsMention;
-  }
-}
-
 function getRoute(n: Notification) {
   switch (n.notification_type) {
     case "Mention":
@@ -95,6 +103,14 @@ function getRoute(n: Notification) {
           ticketId: n.reference_ticket,
         },
         hash: "#" + n.reference_comment,
+      };
+    case "Assignment":
+    case "Reaction":
+      return {
+        name: "TicketAgent",
+        params: {
+          ticketId: n.reference_ticket,
+        },
       };
   }
 }

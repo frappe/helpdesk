@@ -5,7 +5,15 @@
   >
     <div class="mb-2 font-medium">
       Did you know? These articles might cover what you looking for
-      <a class="text-xs" href="/knowledge-base" target="_blank">(View All)</a>
+      <RouterLink
+        class="group cursor-pointer space-x-1 hover:text-gray-900"
+        :to="{
+          name: 'KBHome',
+        }"
+        target="_blank"
+      >
+        <span class="text-xs">(View All)</span>
+      </RouterLink>
     </div>
     <ul class="space-y-2">
       <li
