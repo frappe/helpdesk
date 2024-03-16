@@ -703,7 +703,7 @@ class HDTicket(Document):
 
 		columns = [
 			{
-				'label': '#',
+				'label': 'ID',
 				'type': 'Int',
 				'key': 'name',
 				'width': '5rem',

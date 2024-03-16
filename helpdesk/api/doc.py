@@ -72,7 +72,7 @@ def get_filterable_fields(doctype):
 		{
 			"fieldname": "name",
 			"fieldtype": "Data",
-			"label": "#",
+			"label": "ID",
 			"name": "name",
 		}]
 	)
