@@ -14,9 +14,13 @@ DOCTYPE_TICKET = "HD Ticket"
 @frappe.whitelist()
 def get_one(name: str):
 	check_permissions(DOCTYPE_TEMPLATE, None)
-	found, about = frappe.get_value(DOCTYPE_TEMPLATE, name, ["name", "about"])
+	found, about = frappe.get_value(DOCTYPE_TEMPLATE, name, ["name", "about"]) or [None, None]
 	if not found:
-		frappe.throw(_("Template not found"), frappe.DoesNotExistError)
+		return {
+			"about": None,
+			"fields": []
+		}
+
 	fields = []
 	fields.extend(get_fields(name, "DocField"))
 	fields.extend(get_fields(name, "Custom Field"))
