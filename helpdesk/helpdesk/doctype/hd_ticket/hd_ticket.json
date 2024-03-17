@@ -60,7 +60,9 @@
   "feedback_text",
   "feedback",
   "feedback_extra",
-  "meta_tab"
+  "meta_tab",
+  "time_tracking_tab",
+  "time_tracking_table"
  ],
  "fields": [
   {
@@ -405,12 +407,23 @@
    "fieldname": "meta_tab",
    "fieldtype": "Tab Break",
    "label": "Meta"
+  },
+  {
+   "fieldname": "time_tracking_tab",
+   "fieldtype": "Tab Break",
+   "label": "Time Tracking"
+  },
+  {
+   "fieldname": "time_tracking_table",
+   "fieldtype": "Table",
+   "label": "Session",
+   "options": "HD Ticket Time Tracking"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2023-11-23 13:44:59.105648",
+ "modified": "2024-03-17 11:14:27.867218",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
