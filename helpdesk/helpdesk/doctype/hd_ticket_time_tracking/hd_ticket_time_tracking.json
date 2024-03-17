@@ -1,0 +1,95 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-03-17 11:07:12.836642",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ticket_id",
+  "agent",
+  "start_time",
+  "end_time",
+  "duration",
+  "status",
+  "max_duration_reached",
+  "time_sessions",
+  "billed",
+  "invoice_reference"
+ ],
+ "fields": [
+  {
+   "fieldname": "ticket_id",
+   "fieldtype": "Link",
+   "label": "Ticket ID",
+   "options": "HD Ticket"
+  },
+  {
+   "fieldname": "agent",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Agent",
+   "options": "HD Agent"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "End Time"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Duration",
+   "in_list_view": 1,
+   "label": "Duration"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "\nRunning\nPaused\nCompleted"
+  },
+  {
+   "fieldname": "max_duration_reached",
+   "fieldtype": "Duration",
+   "label": "Max Duration Reached"
+  },
+  {
+   "fieldname": "time_sessions",
+   "fieldtype": "Table",
+   "label": "Time Sessions",
+   "options": "HD Ticket Time Tracking Session"
+  },
+  {
+   "default": "0",
+   "fieldname": "billed",
+   "fieldtype": "Check",
+   "label": "Billed"
+  },
+  {
+   "fieldname": "invoice_reference",
+   "fieldtype": "Link",
+   "label": "Invoice Reference",
+   "options": "Sales Invoice"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-03-17 11:10:10.083588",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Time Tracking",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
