@@ -1,0 +1,35 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-03-17 11:05:49.691593",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "session_start",
+  "session_end"
+ ],
+ "fields": [
+  {
+   "fieldname": "session_start",
+   "fieldtype": "Datetime",
+   "label": "Session Start"
+  },
+  {
+   "fieldname": "session_end",
+   "fieldtype": "Datetime",
+   "label": "Session End"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-03-17 11:06:29.649121",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Time Tracking Session",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
