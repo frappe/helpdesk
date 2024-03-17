@@ -188,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, onMounted } from "vue";
+import { ref, computed, inject, onMounted, watch } from "vue";
 import { createResource, Autocomplete, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
@@ -289,6 +289,14 @@ const formattedElapsedTime = computed(() => {
 
 onMounted(() => {
   initializeTimer();
+});
+
+watch(timerState, (newValue) => {
+  if (newValue === "running") {
+    activeTimerStartTime.value = Date.now();
+  } else if (newValue === "paused") {
+    activeTimerStartTime.value = null;
+  }
 });
 
 function update(fieldname: string, value: string) {
