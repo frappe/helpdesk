@@ -26,7 +26,7 @@
       @event:column="processColumns"
     />
     <List
-      :rows="tickets?.data?.data"
+      :rows="tickets?.data?.data || []"
       :columns="columns"
       :page-length="pageLength"
       :col-field-type="colFieldType"

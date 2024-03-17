@@ -41,14 +41,15 @@
             {{ tab.label }}
           </div>
         </div> -->
-        <div v-if="tab.label === 'Customer Tickets'" class="py-2">
+        <div v-if="tab.label === 'Customer Tickets'" class="h-full py-2">
           <TicketsAgentList
             :rows="customerTickets?.data?.data"
             :columns="customerTickets?.data?.columns"
             :options="{
               selectable: false,
-              pagination: false,
+              openInNewTab: true,
             }"
+            :paginate="false"
           />
         </div>
         <Activities
@@ -143,6 +144,7 @@ const ticket = createResource({
         doctype: "HD Ticket",
         filters: {
           customer: ["=", data.customer],
+          name: ["!=", props.ticketId],
         },
         columns: [
           { label: "Name", type: "Data", key: "name", width: "5rem" },

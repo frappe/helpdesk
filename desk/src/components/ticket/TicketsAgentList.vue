@@ -1,13 +1,16 @@
 <template>
   <ListView
+    v-if="rows.length"
     class="px-5"
     :columns="columns"
     :rows="rows"
     :options="{
-      getRowRoute: (row) => ({
-        name: 'TicketAgent',
-        params: { ticketId: row.name },
-      }),
+      getRowRoute: options.openInNewTab
+        ? null
+        : (row) => ({
+            name: 'TicketAgent',
+            params: { ticketId: row.name },
+          }),
       selectable: options.selectable,
       showTooltip: false,
     }"
@@ -20,6 +23,7 @@
         :key="row.name"
         v-slot="{ column, item }"
         :row="row"
+        @click="options.openInNewTab ? openInNewTab(row) : null"
       >
         <div
           v-if="column.key === '_assign'"
@@ -95,8 +99,16 @@
       </ListRow>
     </ListRows>
   </ListView>
+  <div v-else class="flex h-full items-center justify-center">
+    <div
+      class="flex flex-col items-center gap-3 text-xl font-medium text-gray-500"
+    >
+      <TicketIcon class="h-10 w-10" />
+      <span>No Tickets Found</span>
+    </div>
+  </div>
   <ListFooter
-    v-if="options.pagination"
+    v-if="rows.length && paginate"
     v-model="pageLength"
     class="bottom-0 border-t px-5 py-2"
     :options="{ rowCount: options.rowCount, totalCount: options.totalCount }"
@@ -108,7 +120,9 @@
 <script setup lang="ts">
 import { dayjs } from "@/dayjs";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { TicketIcon } from "@/components/icons";
 import {
   ListView,
   ListRows,
@@ -120,6 +134,42 @@ import {
 import { MultipleAvatar } from "@/components";
 
 const ticketStatusStore = useTicketStatusStore();
+const router = useRouter();
+
+const props = defineProps({
+  columns: {
+    type: Array, //TODO custom types
+    required: true,
+  },
+  rows: {
+    type: Array,
+    required: true,
+  },
+  colFieldType: {
+    type: Object,
+    default: () => ({}),
+  },
+  pageLength: {
+    type: Number,
+    default: 20,
+  },
+  paginate: {
+    type: Boolean,
+    default: true,
+  },
+  options: {
+    type: Object,
+    default: () => ({
+      totalCount: 0,
+      rowCount: 0,
+      selectable: true,
+      openInNewTab: false,
+    }),
+  },
+});
+
+let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
+let pageLength = ref(props.pageLength);
 
 function handleFieldClick(e, name: string, value: string) {
   if (
@@ -139,37 +189,15 @@ function handleFieldClick(e, name: string, value: string) {
   }
 }
 
-const props = defineProps({
-  columns: {
-    type: Array, //TODO custom types
-    required: true,
-  },
-  rows: {
-    type: Array,
-    required: true,
-  },
-  colFieldType: {
-    type: Object,
-    default: () => ({}),
-  },
-  pageLength: {
-    type: Number,
-    default: 20,
-  },
-  options: {
-    type: Object,
-    default: () => ({
-      totalCount: 0,
-      rowCount: 0,
-      selectable: true,
-      pagination: true,
-    }),
-  },
-});
+function openInNewTab(row) {
+  const path = router.resolve({
+    name: "TicketAgent",
+    params: { ticketId: row.name },
+  });
+  window.open(path.href, "_blank");
+}
 
-let pageLength = ref(props.pageLength);
-let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
-
+//TODO: move all constants to relevant composables
 const slaStatusColorMap = {
   Fulfilled: "green",
   Failed: "red",
