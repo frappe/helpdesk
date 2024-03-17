@@ -3,6 +3,7 @@ from frappe import _
 from frappe.utils import get_user_info_for_avatar
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
+from datetime import datetime, timedelta
 
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
@@ -203,6 +204,9 @@ def get_attachments(doctype, name):
 
 @frappe.whitelist()
 def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, max_duration_reached=False):
+    if not frappe.session.user or frappe.session.user == "Guest":
+        frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
+
     if not ticket_id or not agent or not action:
         frappe.throw(_("Missing required parameters."))
 
@@ -226,6 +230,8 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
             })
 
     if time_entry:
+        if time_entry.agent != frappe.session.user:
+            frappe.throw(_("You can only modify your own time entries."))
         if action == 'pause':
             if time_entry.time_sessions:
                 latest_session = time_entry.time_sessions[-1]
@@ -255,3 +261,9 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
         frappe.db.commit()
 
     return time_entry.as_dict() if time_entry else {}
+
+
+@frappe.whitelist()
+def is_time_entry_running(time_entry_id):
+    time_entry = frappe.db.get_value("HD Ticket Time Tracking", time_entry_id, 'status')
+    return time_entry

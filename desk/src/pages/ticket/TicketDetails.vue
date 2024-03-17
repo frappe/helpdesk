@@ -112,6 +112,15 @@
                 variant="outline"
               />
               <Badge v-else label="Idle" theme="green" variant="outline" />
+              <div
+                v-if="timerState === 'running' || timerState === 'paused'"
+                class="space-y-1.5"
+              >
+                <span class="block text-sm text-gray-700">Live Duration</span>
+                <span class="block font-medium text-gray-900">{{
+                  formattedElapsedTime
+                }}</span>
+              </div>
             </div>
             <TabGroup horizontal>
               <TabList>
@@ -179,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject } from "vue";
+import { ref, computed, inject, onMounted } from "vue";
 import { createResource, Autocomplete, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
@@ -253,6 +262,35 @@ const timeritems = [
   },
 ];
 
+// Define a reactive variable to store the start time of the active timer
+const activeTimerStartTime = ref<number | null>(null);
+
+// Define a computed property to calculate the elapsed time in seconds
+const elapsedTimeInSeconds = computed(() => {
+  if (activeTimerStartTime.value === null) {
+    return 0;
+  } else {
+    const currentTime = Date.now();
+    return Math.floor((currentTime - activeTimerStartTime.value) / 1000);
+  }
+});
+
+// Define a computed property to format the elapsed time in HH:MM:SS format
+const formattedElapsedTime = computed(() => {
+  const seconds = elapsedTimeInSeconds.value % 60;
+  const minutes = Math.floor((elapsedTimeInSeconds.value / 60) % 60);
+  const hours = Math.floor(elapsedTimeInSeconds.value / 3600);
+
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+    2,
+    "0"
+  )}:${String(seconds).padStart(2, "0")}`;
+});
+
+onMounted(() => {
+  initializeTimer();
+});
+
 function update(fieldname: string, value: string) {
   createResource({
     url: "frappe.client.set_value",
@@ -276,34 +314,35 @@ function update(fieldname: string, value: string) {
 }
 
 async function startTimer() {
-  if (timerState.value !== "running") {
-    timerState.value = "running";
-    startTime.value = Date.now();
-    clearInterval(timerInterval.value);
+  currentEntryId.value = null;
+  timerState.value = "running";
+  startTime.value = Date.now();
+  elapsed.value = 0;
+  clearInterval(timerInterval.value);
 
-    try {
-      const response = await createOrUpdateTimeEntry({
-        ticket_id: data.value.name,
-        agent: userId,
-        action: "start",
-        duration: null,
-        name: currentEntryId.value,
-        max_duration_reached: false,
-      });
-      currentEntryId.value = response.name;
-      console.log("Timer State: " + timerState.value);
+  try {
+    const response = await createOrUpdateTimeEntry({
+      ticket_id: data.value.name,
+      agent: userId,
+      action: "start",
+      duration: null,
+      max_duration_reached: false,
+    });
+    currentEntryId.value = response.name;
+    console.log("Timer State: " + timerState.value);
+    storeTimerState(data.value.name, response.name, "running", 0);
 
-      timerInterval.value = setInterval(async () => {
-        let elapsedSinceStart =
-          Date.now() - startTime.value + (elapsed.value || 0);
-        if (elapsedSinceStart >= maxDuration) {
-          elapsedSinceStart = maxDuration;
-          await completeTimer(true);
-        }
-      }, 1000);
-    } catch (error) {
-      console.error("Error starting time entry:", error);
-    }
+    timerInterval.value = setInterval(() => {
+      const currentElapsed = Date.now() - startTime.value;
+      let elapsedSinceStart =
+        Date.now() - startTime.value + (elapsed.value || 0);
+      if (elapsedSinceStart >= maxDuration) {
+        elapsedSinceStart = maxDuration;
+        completeTimer(true);
+      }
+    }, 1000);
+  } catch (error) {
+    console.error("Error starting time entry:", error);
   }
 }
 
@@ -328,6 +367,7 @@ async function pauseTimer() {
       });
       console.log("Pause response:", response);
       console.log("Timer State: " + timerState.value);
+      clearTimerState();
     } catch (error) {
       console.error("Error pausing time entry:", error);
     }
@@ -357,6 +397,7 @@ async function resumeTimer() {
       });
       console.log("Resume response:", response);
       console.log("Timer State: " + timerState.value);
+      storeTimerState(data.value.name, response.name);
     } catch (error) {
       console.error("Error resuming time entry:", error);
     }
@@ -385,6 +426,7 @@ async function completeTimer(maxDurationReached = false) {
       });
       console.log("Complete response:", response);
       console.log("Timer State: " + timerState.value);
+      clearTimerState();
       elapsed.value = 0;
     } catch (error) {
       console.error("Failed to complete time entry:", error);
@@ -394,15 +436,19 @@ async function completeTimer(maxDurationReached = false) {
 
 function createOrUpdateTimeEntry(data) {
   return new Promise((resolve, reject) => {
-    fetch("/api/method/helpdesk.helpdes.doctype.hd_ticket.api.create_or_update_time_entry", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-Frappe-CSRF-Token": window.csrf_token,
-      },
-      body: JSON.stringify(data),
-    })
+    fetch(
+      "/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.create_or_update_time_entry",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-Frappe-CSRF-Token": window.csrf_token,
+        },
+        body: JSON.stringify(data),
+      }
+    )
+      .then(handleApiResponse)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -411,7 +457,6 @@ function createOrUpdateTimeEntry(data) {
       })
       .then((data) => {
         console.log("Response data:", data.message);
-        console.log("Response data:", data.message.name);
         resolve(data.message);
       })
       .catch((error) => {
@@ -433,6 +478,94 @@ function getUserIdFromCookies() {
   });
 
   return userId;
+}
+
+function storeTimerState(ticketId, timeEntryId, timerStateValue, elapsedValue) {
+  const timerInfo = {
+    ticketId,
+    timeEntryId,
+    timerState: timerStateValue,
+    elapsed: elapsedValue,
+  };
+  localStorage.setItem("runningTimer", JSON.stringify(timerInfo));
+}
+
+function getStoredTimerState() {
+  const runningTimer = localStorage.getItem("runningTimer");
+  return runningTimer ? JSON.parse(runningTimer) : null;
+}
+
+async function initializeTimer() {
+  const storedTimer = getStoredTimerState();
+  if (storedTimer && storedTimer.ticketId === data.value.name) {
+    try {
+      const timerStatus = await checkTimeEntryStatus(storedTimer.timeEntryId);
+      switch (timerStatus) {
+        case "Running":
+          timerState.value = "running";
+          break;
+        case "Paused":
+          timerState.value = "paused";
+          break;
+        default:
+          timerState.value = "idle";
+      }
+      currentEntryId.value = storedTimer.timeEntryId;
+      elapsed.value = storedTimer.elapsed;
+
+      console.log("Response was: " + timerStatus);
+      console.log("Timer state: " + timerState.value);
+    } catch (error) {
+      console.error("Error during timer initialization:", error);
+      timerState.value = "idle";
+      currentEntryId.value = null;
+    }
+  } else {
+    console.log("No stored timer info found.");
+  }
+}
+
+function clearTimerState() {
+  localStorage.removeItem("runningTimer");
+}
+
+async function checkTimeEntryStatus(timeEntryId) {
+  return new Promise((resolve, reject) => {
+    console.log(timeEntryId);
+    fetch(
+      `/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.is_time_entry_running`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Frappe-CSRF-Token": window.csrf_token,
+        },
+        body: JSON.stringify({ time_entry_id: timeEntryId }),
+      }
+    )
+      .then(handleApiResponse)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        resolve(data.message);
+      })
+      .catch((error) => {
+        console.error("Error checking time entry status:", error);
+        reject(error);
+      });
+  });
+}
+
+function handleApiResponse(response) {
+  if (response.status === 401 || response.status === 403) {
+    console.error("Unauthorized access, redirecting to login.");
+    window.location.href = "/login";
+  }
+  return response;
 }
 </script>
 
