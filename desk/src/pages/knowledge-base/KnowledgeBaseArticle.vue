@@ -127,7 +127,7 @@ const props = defineProps({
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const isNew = props.articleId === "New";
+const isNew = props.articleId === "new";
 const editMode = ref(isNew);
 const categoryId = computed(
   () => article.data?.category.name || route.query.category
@@ -198,7 +198,7 @@ const insertRes = createResource({
     return {
       doc: {
         doctype: "HD Article",
-        category: categoryId.value,
+        category: subCategoryId.value,
         title: articleTitle.value,
         content: articleContent.value,
       },

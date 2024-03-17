@@ -61,14 +61,20 @@ def get_filterable_fields(doctype):
 	res = []
 	res.extend(from_doc_fields)
 	res.extend(from_custom_fields)
-	res.append(
-		{
+	res.extend(
+		[{
 			"fieldname": "_assign",
 			"fieldtype": "Link",
 			"label": "Assigned to",
 			"name": "_assign",
 			"options": "HD Agent",
-		}
+		},
+		{
+			"fieldname": "name",
+			"fieldtype": "Data",
+			"label": "ID",
+			"name": "name",
+		}]
 	)
 	return res
 
