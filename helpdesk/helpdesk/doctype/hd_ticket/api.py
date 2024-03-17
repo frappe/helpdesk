@@ -208,13 +208,13 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 
     time_entry = None
     if name:
-        time_entry = frappe.get_doc("ITSM Time Tracking", name)
+        time_entry = frappe.get_doc("HD Ticket Time Tracking", name)
     else:
         if action == 'start':
-            time_entry = frappe.new_doc("ITSM Time Tracking")
+            time_entry = frappe.new_doc("HD Ticket Time Tracking")
             time_entry.parent = ticket_id
             time_entry.parenttype = 'HD Ticket'
-            time_entry.parentfield = 'custom_time_tracking_table'
+            time_entry.parentfield = 'time_tracking_table'
             time_entry.ticket_id = ticket_id
             time_entry.agent = agent
             time_entry.start_time = datetime.now()
