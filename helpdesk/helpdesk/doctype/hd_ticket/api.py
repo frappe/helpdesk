@@ -199,3 +199,59 @@ def get_attachments(doctype, name):
 		.where(QBFile.attached_to_name == name)
 		.run(as_dict=True)
 	)
+
+
+@frappe.whitelist()
+def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, max_duration_reached=False):
+    if not ticket_id or not agent or not action:
+        frappe.throw(_("Missing required parameters."))
+
+    time_entry = None
+    if name:
+        time_entry = frappe.get_doc("ITSM Time Tracking", name)
+    else:
+        if action == 'start':
+            time_entry = frappe.new_doc("ITSM Time Tracking")
+            time_entry.parent = ticket_id
+            time_entry.parenttype = 'HD Ticket'
+            time_entry.parentfield = 'custom_time_tracking_table'
+            time_entry.ticket_id = ticket_id
+            time_entry.agent = agent
+            time_entry.start_time = datetime.now()
+            time_entry.status = 'Running'
+            time_entry.duration = 0
+            time_entry.append('time_sessions', {
+                'session_start': datetime.now(),
+                'session_end': None
+            })
+
+    if time_entry:
+        if action == 'pause':
+            if time_entry.time_sessions:
+                latest_session = time_entry.time_sessions[-1]
+                latest_session.session_end = datetime.now()
+            time_entry.status = 'Paused'
+            total_duration = sum([(session.session_end - session.session_start).total_seconds() for session in time_entry.time_sessions if session.session_end], 0)
+            time_entry.duration = total_duration
+
+        elif action == 'resume':
+            time_entry.append('time_sessions', {
+                'session_start': datetime.now(),
+                'session_end': None
+            })
+            time_entry.status = 'Running'
+        elif action == 'complete':
+            if time_entry.time_sessions:
+                latest_session = time_entry.time_sessions[-1]
+                latest_session.session_end = datetime.now()
+            total_duration = sum([(session.session_end - session.session_start).total_seconds() for session in time_entry.time_sessions if session.session_end], 0)
+            time_entry.duration = total_duration
+            time_entry.status = 'Completed'
+            time_entry.end_time = datetime.now()
+            if max_duration_reached:
+                time_entry.max_duration_reached = True
+            
+        time_entry.save(ignore_permissions=True)
+        frappe.db.commit()
+
+    return time_entry.as_dict() if time_entry else {}
