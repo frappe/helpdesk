@@ -52,13 +52,13 @@
             :paginate="false"
           />
         </div>
-        <Activities
+        <TicketAgentActivities
           v-else
           :activities="activities"
           :type="tab.label === 'Emails' ? 'email' : 'all'"
         />
       </Tabs>
-      <Sidebar />
+      <TicketAgentSidebar :ticket="ticket.data" />
     </div>
     <AssignmentModal
       v-if="ticket.data"
@@ -78,7 +78,7 @@ import {
   TicketIcon,
 } from "@/components/icons";
 import { Breadcrumbs, createResource, Dropdown, Tabs } from "frappe-ui";
-import { Activities, Sidebar } from "@/components/ticket";
+import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import { LayoutHeader, MultipleAvatar, AssignmentModal } from "@/components";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils";

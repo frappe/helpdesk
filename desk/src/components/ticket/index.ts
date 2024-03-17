@@ -1,3 +1,3 @@
-export { default as Activities } from "./TicketAgentActivities.vue";
-export { default as Sidebar } from "./TicketAgentSidebar.vue";
-export { default as List } from "./TicketsAgentList.vue";
+export { default as TicketAgentActivities } from "./TicketAgentActivities.vue";
+export { default as TicketAgentSidebar } from "./TicketAgentSidebar.vue";
+export { default as TicketsAgentList } from "./TicketsAgentList.vue";
