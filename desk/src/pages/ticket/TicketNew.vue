@@ -138,7 +138,9 @@ const template = createResource({
 });
 
 const visibleFields = computed(() =>
-  template.data?.fields.filter((f) => route.meta.agent || !f.hide_from_customer)
+  template.data?.fields?.filter(
+    (f) => route.meta.agent || !f.hide_from_customer
+  )
 );
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
@@ -155,7 +157,7 @@ const ticket = createResource({
     attachments: attachments.value,
   }),
   validate: (params) => {
-    const fields = visibleFields.value.filter((f) => f.required);
+    const fields = visibleFields.value?.filter((f) => f.required) || [];
     const toVerify = [...fields, "subject", "description"];
     if (!selectedCustomer.value) {
       customerValidationError.value = "Selecting a customer is required.";
