@@ -275,22 +275,20 @@ function update(fieldname: string, value: string) {
   });
 }
 
-// Methods
 async function startTimer() {
   if (timerState.value !== "running") {
     timerState.value = "running";
     startTime.value = Date.now();
     clearInterval(timerInterval.value);
 
-    // Optionally, create or update a time entry in the backend indicating the start
     try {
       const response = await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
         agent: userId,
         action: "start",
         duration: null,
-        name: currentEntryId.value, // This should be managed based on whether it's a new or existing time entry
-        max_duration_reached: false, // Set based on logic in your application
+        name: currentEntryId.value,
+        max_duration_reached: false,
       });
       currentEntryId.value = response.name;
       console.log("Timer State: " + timerState.value);
@@ -300,7 +298,7 @@ async function startTimer() {
           Date.now() - startTime.value + (elapsed.value || 0);
         if (elapsedSinceStart >= maxDuration) {
           elapsedSinceStart = maxDuration;
-          await completeTimer(true); // Pass true to indicate completion due to max duration reached
+          await completeTimer(true);
         }
       }, 1000);
     } catch (error) {
@@ -319,7 +317,6 @@ async function pauseTimer() {
       elapsed.value = maxDuration;
     }
 
-    // Update the backend with the current duration and indicate pause
     try {
       const response = await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
@@ -345,11 +342,10 @@ async function resumeTimer() {
       let currentElapsed = Date.now() - startTime.value + elapsed.value;
       if (currentElapsed >= maxDuration) {
         currentElapsed = maxDuration;
-        await completeTimer(true); // Complete the timer if max duration is reached
+        await completeTimer(true);
       }
     }, 1000);
 
-    // Update the backend with the current duration and indicate running
     try {
       const response = await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
@@ -369,32 +365,26 @@ async function resumeTimer() {
 
 async function completeTimer(maxDurationReached = false) {
   if (timerState.value !== "idle") {
-    // Stop the timer
     clearInterval(timerInterval.value);
-    // Calculate the final elapsed time
     const now = Date.now();
     let finalElapsed = now - startTime.value + elapsed.value;
     if (finalElapsed > maxDuration || maxDurationReached) {
       finalElapsed = maxDuration;
     }
-    // Update the elapsed time
     elapsed.value = finalElapsed;
-    // Update the timer state
     timerState.value = "idle";
 
-    // Send an update to the backend to mark the timer as completed
     try {
       const response = await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
         agent: userId,
-        name: currentEntryId.value, // Use the ID of the current time entry
-        duration: elapsed.value, // Send the total elapsed time in milliseconds
+        name: currentEntryId.value,
+        duration: elapsed.value,
         action: "complete",
-        max_duration_reached: maxDurationReached, // Indicate if the timer was auto-completed due to max duration reached
+        max_duration_reached: maxDurationReached,
       });
       console.log("Complete response:", response);
       console.log("Timer State: " + timerState.value);
-      // Reset the elapsed time for the next timer session
       elapsed.value = 0;
     } catch (error) {
       console.error("Failed to complete time entry:", error);
@@ -404,7 +394,7 @@ async function completeTimer(maxDurationReached = false) {
 
 function createOrUpdateTimeEntry(data) {
   return new Promise((resolve, reject) => {
-    fetch("/api/method/itsm.itsm.create_or_update_time_entry", {
+    fetch("/api/method/helpdesk.helpdes.doctype.hd_ticket.api.create_or_update_time_entry", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
