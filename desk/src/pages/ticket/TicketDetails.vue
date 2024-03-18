@@ -275,20 +275,23 @@ const elapsedTimeInSeconds = computed(() => {
   }
 });
 
-// Define a computed property to format the elapsed time in HH:MM:SS format
 const formattedElapsedTime = computed(() => {
-  if (timerState.value === "running" || timerState.value === "paused") {
-    const now = Date.now();
-    const elapsedMs = now - startTime.value + elapsed.value;
-    const seconds = Math.floor((elapsedMs / 1000) % 60);
-    const minutes = Math.floor((elapsedMs / (1000 * 60)) % 60);
-    const hours = Math.floor((elapsedMs / (1000 * 60 * 60)) % 24);
+  let elapsedTimeCalculation = elapsed.value;
 
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  // No need to add now - startTime.value for paused state, only for running
+  if (timerState.value === "running") {
+    const now = Date.now();
+    elapsedTimeCalculation += now - startTime.value;
   }
-  return "00:00:00";
+
+  // Convert milliseconds into HH:MM:SS
+  const seconds = Math.floor((elapsedTimeCalculation / 1000) % 60);
+  const minutes = Math.floor((elapsedTimeCalculation / (1000 * 60)) % 60);
+  const hours = Math.floor((elapsedTimeCalculation / (1000 * 60 * 60)) % 24);
+
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 });
 
 const unwatch = watch(data, () => {
@@ -347,12 +350,16 @@ function update(fieldname: string, value: string) {
 }
 
 async function startTimer(isRestoration = false) {
-  currentEntryId.value = null;
-  timerState.value = "running";
-  startTime.value = Date.now();
-  elapsed.value = 0;
+  // Clear any existing interval to avoid duplicates
   clearInterval(timerInterval.value);
 
+  timerState.value = "running";
+  startTime.value = Date.now();
+  if (!isRestoration) {
+    elapsed.value = 0;
+  }
+  setupInterval();
+  storeTimerState();
   try {
     const response = await createOrUpdateTimeEntry({
       ticket_id: data.value.name,
@@ -384,10 +391,11 @@ async function startTimer(isRestoration = false) {
 
 async function pauseTimer() {
   if (timerState.value === "running") {
+    const now = Date.now();
+    elapsed.value += now - startTime.value;
     timerState.value = "paused";
     clearInterval(timerInterval.value);
-    updateElapsed(true);
-
+    storeTimerState();
     try {
       const response = await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
@@ -407,11 +415,10 @@ async function pauseTimer() {
 
 async function resumeTimer() {
   if (timerState.value === "paused") {
-    const now = Date.now();
-    startTime.value = now;
+    startTime.value = Date.now(); // Set startTime to now without altering elapsed
     timerState.value = "running";
-    setupInterval();
-
+    setupInterval(); // Restart the interval
+    storeTimerState(); // Update the stored state to reflect the resume
     try {
       const response = await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
@@ -422,8 +429,12 @@ async function resumeTimer() {
         max_duration_reached: false,
       });
       console.log("Resume response:", response);
-      console.log("Timer State: " + timerState.value);
-      storeTimerState(data.value.name, response.name, "running", elapsed.value);
+      storeTimerState(
+        data.value.name,
+        response.name,
+        timerState.value,
+        elapsed.value
+      );
     } catch (error) {
       console.error("Error resuming time entry:", error);
     }
@@ -436,30 +447,30 @@ async function completeTimer(
 ) {
   if (isRestoration) return;
   if (timerState.value === "running") {
-    console.log(
-      "Hit on completeTimer and timerState.value running - current value: " +
-        timerState.value
-    );
-    updateElapsed();
-    timerState.value = "idle";
-    clearInterval(timerInterval.value);
+    const now = Date.now();
+    elapsed.value += now - startTime.value;
+  }
 
-    try {
-      const response = await createOrUpdateTimeEntry({
-        ticket_id: data.value.name,
-        agent: userId,
-        name: currentEntryId.value,
-        duration: elapsed.value,
-        action: "complete",
-        max_duration_reached: maxDurationReached,
-      });
-      console.log("Complete response:", response);
-      console.log("Timer State: " + timerState.value);
-      clearTimerState();
-      elapsed.value = 0;
-    } catch (error) {
-      console.error("Failed to complete time entry:", error);
-    }
+  timerState.value = "idle";
+  clearInterval(timerInterval.value);
+  startTime.value = null;
+  elapsed.value = 0;
+  clearTimerState();
+  try {
+    const response = await createOrUpdateTimeEntry({
+      ticket_id: data.value.name,
+      agent: userId,
+      name: currentEntryId.value,
+      duration: elapsed.value,
+      action: "complete",
+      max_duration_reached: maxDurationReached,
+    });
+    console.log("Complete response:", response);
+    console.log("Timer State: " + timerState.value);
+    clearTimerState();
+    elapsed.value = 0;
+  } catch (error) {
+    console.error("Failed to complete time entry:", error);
   }
 }
 
@@ -498,8 +509,14 @@ function createOrUpdateTimeEntry(data) {
 function setupInterval() {
   clearInterval(timerInterval.value);
   timerInterval.value = setInterval(() => {
-    updateElapsed();
-  }, 1000);
+    if (timerState.value === "running") {
+      const now = Date.now();
+      elapsed.value += now - startTime.value;
+      startTime.value = now;
+
+      // Optionally, update the UI or persist state changes as needed
+    }
+  }, 1000); // Update every second
 }
 
 function updateElapsed() {
