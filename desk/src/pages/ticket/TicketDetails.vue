@@ -112,15 +112,6 @@
                 variant="outline"
               />
               <Badge v-else label="Idle" theme="green" variant="outline" />
-              <div
-                v-if="timerState === 'running' || timerState === 'paused'"
-                class="space-y-1.5"
-              >
-                <span class="block text-sm text-gray-700">Live Duration</span>
-                <span class="block font-medium text-gray-900">{{
-                  formattedElapsedTime
-                }}</span>
-              </div>
             </div>
             <TabGroup horizontal>
               <TabList>
@@ -144,6 +135,15 @@
                 </tab>
               </TabList>
             </TabGroup>
+            <div
+              v-if="timerState === 'running' || timerState === 'paused'"
+              class="space-y-1.5"
+            >
+              <span class="block text-sm text-gray-700">Live Duration</span>
+              <span class="block font-medium text-gray-900">{{
+                formattedElapsedTime
+              }}</span>
+            </div>
           </div>
           <div v-if="data.feedback_rating" class="space-y-1.5">
             <span class="block text-sm text-gray-700">Feedback</span>
@@ -188,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, onMounted, watch } from "vue";
+import { ref, computed, inject, onMounted, onUnmounted, watch } from "vue";
 import { createResource, Autocomplete, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
@@ -277,18 +277,43 @@ const elapsedTimeInSeconds = computed(() => {
 
 // Define a computed property to format the elapsed time in HH:MM:SS format
 const formattedElapsedTime = computed(() => {
-  const seconds = elapsedTimeInSeconds.value % 60;
-  const minutes = Math.floor((elapsedTimeInSeconds.value / 60) % 60);
-  const hours = Math.floor(elapsedTimeInSeconds.value / 3600);
+  if (timerState.value === "running" || timerState.value === "paused") {
+    const now = Date.now();
+    const elapsedMs = now - startTime.value + elapsed.value;
+    const seconds = Math.floor((elapsedMs / 1000) % 60);
+    const minutes = Math.floor((elapsedMs / (1000 * 60)) % 60);
+    const hours = Math.floor((elapsedMs / (1000 * 60 * 60)) % 24);
 
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0"
-  )}:${String(seconds).padStart(2, "0")}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  }
+  return "00:00:00";
 });
 
+const unwatch = watch(data, () => {
+  if (timerState.value === "running" || timerState.value === "paused") {
+    storeTimerState(
+      data.value.name,
+      currentEntryId.value,
+      timerState.value,
+      elapsed.value
+    );
+  }
+});
+
+let wasTimerRunningOnLoad = false;
+
 onMounted(() => {
+  console.log("Component mounted, initializing timer...");
   initializeTimer();
+});
+
+onUnmounted(() => {
+  console.log("Component unmounted, unwatch...");
+  console.log("Timer State: " + timerState.value);
+  clearInterval(timerInterval.value);
+  unwatch();
 });
 
 watch(timerState, (newValue) => {
@@ -321,7 +346,7 @@ function update(fieldname: string, value: string) {
   });
 }
 
-async function startTimer() {
+async function startTimer(isRestoration = false) {
   currentEntryId.value = null;
   timerState.value = "running";
   startTime.value = Date.now();
@@ -339,12 +364,15 @@ async function startTimer() {
     currentEntryId.value = response.name;
     console.log("Timer State: " + timerState.value);
     storeTimerState(data.value.name, response.name, "running", 0);
-
+    setupInterval();
     timerInterval.value = setInterval(() => {
       const currentElapsed = Date.now() - startTime.value;
       let elapsedSinceStart =
         Date.now() - startTime.value + (elapsed.value || 0);
       if (elapsedSinceStart >= maxDuration) {
+        console.log(
+          "startTimer MaxDuration has been hit: " + elapsedSinceStart
+        );
         elapsedSinceStart = maxDuration;
         completeTimer(true);
       }
@@ -356,13 +384,9 @@ async function startTimer() {
 
 async function pauseTimer() {
   if (timerState.value === "running") {
-    clearInterval(timerInterval.value);
     timerState.value = "paused";
-    elapsed.value += Date.now() - startTime.value;
-
-    if (elapsed.value > maxDuration) {
-      elapsed.value = maxDuration;
-    }
+    clearInterval(timerInterval.value);
+    updateElapsed(true);
 
     try {
       const response = await createOrUpdateTimeEntry({
@@ -371,11 +395,10 @@ async function pauseTimer() {
         name: currentEntryId.value,
         duration: elapsed.value,
         action: "pause",
-        max_duration_reached: false,
+        max_duration_reached: elapsed.value >= maxDuration,
       });
       console.log("Pause response:", response);
-      console.log("Timer State: " + timerState.value);
-      clearTimerState();
+      storeTimerState(); // Make sure this reflects the paused state accurately
     } catch (error) {
       console.error("Error pausing time entry:", error);
     }
@@ -384,15 +407,10 @@ async function pauseTimer() {
 
 async function resumeTimer() {
   if (timerState.value === "paused") {
+    const now = Date.now();
+    startTime.value = now;
     timerState.value = "running";
-    startTime.value = Date.now() - elapsed.value;
-    timerInterval.value = setInterval(async () => {
-      let currentElapsed = Date.now() - startTime.value + elapsed.value;
-      if (currentElapsed >= maxDuration) {
-        currentElapsed = maxDuration;
-        await completeTimer(true);
-      }
-    }, 1000);
+    setupInterval();
 
     try {
       const response = await createOrUpdateTimeEntry({
@@ -405,23 +423,26 @@ async function resumeTimer() {
       });
       console.log("Resume response:", response);
       console.log("Timer State: " + timerState.value);
-      storeTimerState(data.value.name, response.name);
+      storeTimerState(data.value.name, response.name, "running", elapsed.value);
     } catch (error) {
       console.error("Error resuming time entry:", error);
     }
   }
 }
 
-async function completeTimer(maxDurationReached = false) {
-  if (timerState.value !== "idle") {
-    clearInterval(timerInterval.value);
-    const now = Date.now();
-    let finalElapsed = now - startTime.value + elapsed.value;
-    if (finalElapsed > maxDuration || maxDurationReached) {
-      finalElapsed = maxDuration;
-    }
-    elapsed.value = finalElapsed;
+async function completeTimer(
+  maxDurationReached = false,
+  isRestoration = false
+) {
+  if (isRestoration) return;
+  if (timerState.value === "running") {
+    console.log(
+      "Hit on completeTimer and timerState.value running - current value: " +
+        timerState.value
+    );
+    updateElapsed();
     timerState.value = "idle";
+    clearInterval(timerInterval.value);
 
     try {
       const response = await createOrUpdateTimeEntry({
@@ -474,6 +495,31 @@ function createOrUpdateTimeEntry(data) {
   });
 }
 
+function setupInterval() {
+  clearInterval(timerInterval.value);
+  timerInterval.value = setInterval(() => {
+    updateElapsed();
+  }, 1000);
+}
+
+function updateElapsed() {
+  // If the timer is not running, immediately return without doing anything
+  if (timerState.value !== "running") return;
+
+  // Since the function continues, we know the timer is running
+  const now = Date.now();
+  if (startTime.value) {
+    const timePassed = now - startTime.value;
+    elapsed.value += timePassed;
+    startTime.value = now; // Reset startTime for the next interval calculation
+
+    if (elapsed.value >= maxDuration) {
+      elapsed.value = maxDuration;
+      completeTimer(true); // Automatically stop if max duration is reached
+    }
+  }
+}
+
 function getUserIdFromCookies() {
   const cookies = document.cookie.split(";");
   let userId = "";
@@ -488,49 +534,66 @@ function getUserIdFromCookies() {
   return userId;
 }
 
-function storeTimerState(ticketId, timeEntryId, timerStateValue, elapsedValue) {
+function storeTimerState() {
+  // Include startTime in the stored state if it's relevant for an ongoing timer
   const timerInfo = {
-    ticketId,
-    timeEntryId,
-    timerState: timerStateValue,
-    elapsed: elapsedValue,
+    ticketId: data.value.name,
+    timeEntryId: currentEntryId.value,
+    timerState: timerState.value,
+    elapsed: elapsed.value,
+    startTime: startTime.value, // Store startTime as well
   };
   localStorage.setItem("runningTimer", JSON.stringify(timerInfo));
 }
 
 function getStoredTimerState() {
   const runningTimer = localStorage.getItem("runningTimer");
-  return runningTimer ? JSON.parse(runningTimer) : null;
+  if (!runningTimer) return null;
+  return JSON.parse(runningTimer);
 }
 
 async function initializeTimer() {
   const storedTimer = getStoredTimerState();
-  if (storedTimer && storedTimer.ticketId === data.value.name) {
-    try {
-      const timerStatus = await checkTimeEntryStatus(storedTimer.timeEntryId);
-      switch (timerStatus) {
-        case "Running":
-          timerState.value = "running";
-          break;
-        case "Paused":
-          timerState.value = "paused";
-          break;
-        default:
-          timerState.value = "idle";
-      }
-      currentEntryId.value = storedTimer.timeEntryId;
-      elapsed.value = storedTimer.elapsed;
+  console.log(
+    "Stored timer state on initialization:",
+    storedTimer ? JSON.stringify(storedTimer) : "No stored state"
+  );
 
-      console.log("Response was: " + timerStatus);
-      console.log("Timer state: " + timerState.value);
-    } catch (error) {
-      console.error("Error during timer initialization:", error);
-      timerState.value = "idle";
-      currentEntryId.value = null;
+  if (storedTimer && storedTimer.ticketId === data.value.name) {
+    timerState.value = storedTimer.timerState.toLowerCase();
+    currentEntryId.value = storedTimer.timeEntryId;
+    startTime.value = storedTimer.startTime
+      ? new Date(storedTimer.startTime).getTime()
+      : null;
+    elapsed.value = storedTimer.elapsed;
+
+    // For a paused timer, do not recalculate elapsed time upon page load
+    if (timerState.value === "paused") {
+      console.log("Timer was paused. Keeping elapsed time as is.");
+    } else if (timerState.value === "running") {
+      // Recalculate elapsed time only if the timer was running
+      const now = Date.now();
+      if (startTime.value) {
+        const additionalElapsed = now - startTime.value;
+        elapsed.value += additionalElapsed;
+        // Update startTime to now to prevent further incorrect incrementation
+        startTime.value = now;
+      }
+      setupInterval();
     }
   } else {
-    console.log("No stored timer info found.");
+    console.log("No stored timer info found or does not match current ticket.");
+    resetTimer();
   }
+}
+
+function resetTimer() {
+  timerState.value = "idle";
+  currentEntryId.value = null;
+  elapsed.value = 0;
+  startTime.value = null;
+  clearInterval(timerInterval.value);
+  timerInterval.value = null;
 }
 
 function clearTimerState() {
@@ -575,6 +638,18 @@ function handleApiResponse(response) {
   }
   return response;
 }
+
+window.addEventListener("beforeunload", () => {
+  if (timerState.value === "running" || timerState.value === "paused") {
+    console.log("beforeunload has a timerState.value of: " + timerState.value);
+    storeTimerState(
+      data.value.name,
+      currentEntryId.value,
+      timerState.value,
+      elapsed.value
+    );
+  }
+});
 </script>
 
 <style scoped>
