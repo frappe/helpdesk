@@ -185,6 +185,7 @@
       />
     </div>
   </div>
+  <TimeEntryDialog ref="timeEntryDialog" @submit="handleSubmitSuccess" />
 </template>
 
 <script setup lang="ts">
@@ -204,11 +205,10 @@ import LucidePlay from "~icons/lucide/play";
 import LucidePause from "~icons/lucide/pause";
 import LucideComplete from "~icons/lucide/check";
 import { TabGroup, TabList, Tab } from "@headlessui/vue";
+import TimeEntryDialog from "@/components/desk/global/AddTicketTimeEntryDialog.vue";
 
 const ticket = inject(ITicket);
 const data = computed(() => ticket.data);
-
-// Time tracking state
 const timerState = ref("idle");
 const startTime = ref(null);
 const elapsed = ref(0);
@@ -216,6 +216,7 @@ const maxDuration = 28800000; // 8 hours in milliseconds
 const currentEntryId = ref(null); // Assuming you have a mechanism to track this ID
 const timerInterval = ref(null);
 const userId = getUserIdFromCookies();
+const timeEntryDialog = ref(null);
 
 const options = computed(() => [
   {
@@ -256,7 +257,7 @@ const timeritems = [
   },
   {
     name: "Complete",
-    click: completeTimer,
+    click: recordtimeentry,
     state: "running",
     icon: LucideComplete,
   },
@@ -469,9 +470,24 @@ async function resumeTimer() {
   }
 }
 
+const timertempState = ref({
+  maxDurationReached: false,
+  isRestoration: false,
+});
+
+async function recordtimeentry() {
+  timeEntryDialog.value.showDialog();
+}
+
+async function handleSubmitSuccess(description) {
+  const { maxDurationReached, isRestoration } = timertempState.value;
+  await completeTimer(maxDurationReached, isRestoration, description);
+}
+
 async function completeTimer(
   maxDurationReached = false,
-  isRestoration = false
+  isRestoration = false,
+  description
 ) {
   if (isRestoration) return;
   if (timerState.value === "running") {
@@ -484,6 +500,7 @@ async function completeTimer(
   startTime.value = null;
   elapsed.value = 0;
   clearTimerState();
+
   try {
     const response = await createOrUpdateTimeEntry({
       ticket_id: data.value.name,
@@ -492,6 +509,7 @@ async function completeTimer(
       duration: elapsed.value,
       action: "complete",
       max_duration_reached: maxDurationReached,
+      description: description,
     });
     console.log("Complete response:", response);
     console.log("Timer State: " + timerState.value);

@@ -3,7 +3,6 @@
  "allow_rename": 1,
  "creation": "2024-03-17 11:07:12.836642",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "ticket_id",
@@ -15,7 +14,8 @@
   "max_duration_reached",
   "time_sessions",
   "billed",
-  "invoice_reference"
+  "invoice_reference",
+  "text_aozd"
  ],
  "fields": [
   {
@@ -78,12 +78,16 @@
    "fieldtype": "Link",
    "label": "Invoice Reference",
    "options": "Sales Invoice"
+  },
+  {
+   "fieldname": "text_aozd",
+   "fieldtype": "Text"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-03-17 11:10:10.083588",
+ "modified": "2024-03-19 16:47:51.007911",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Tracking",

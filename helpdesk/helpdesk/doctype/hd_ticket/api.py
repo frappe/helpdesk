@@ -203,7 +203,7 @@ def get_attachments(doctype, name):
 
 
 @frappe.whitelist()
-def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, max_duration_reached=False):
+def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, max_duration_reached=False, description=None):
     if not frappe.session.user or frappe.session.user == "Guest":
         frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
 
@@ -253,6 +253,7 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
             total_duration = sum([(session.session_end - session.session_start).total_seconds() for session in time_entry.time_sessions if session.session_end], 0)
             time_entry.duration = total_duration
             time_entry.status = 'Completed'
+            time_entry.description = description
             time_entry.end_time = datetime.now()
             if max_duration_reached:
                 time_entry.max_duration_reached = True
@@ -275,3 +276,9 @@ def is_time_entry_running(time_entry_id):
         'is_active': is_active,
         'status': status
     }
+
+
+@frappe.whitelist()
+def get_time_entries_for_ticket(ticket_id):
+    time_entries = frappe.get_all("HD Ticket Time Tracking", filters={"parent": ticket_id}, fields=["*"])
+    return time_entries
