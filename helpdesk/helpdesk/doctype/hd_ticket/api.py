@@ -204,8 +204,6 @@ def get_attachments(doctype, name):
 
 @frappe.whitelist()
 def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, max_duration_reached=False, description=None):
-    frappe.utils.logger.set_log_level("DEBUG")
-    logger = frappe.logger("helpdesk")
 
     if not frappe.session.user or frappe.session.user == "Guest":
         frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
@@ -231,7 +229,6 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
         time_entry.status = 'Running'
         time_entry.duration = 0
         time_entry.insert()
-    logger.debug(f"Hit 1")
     if time_entry:
         if time_entry.agent != frappe.session.user:
             frappe.throw(_("You can only modify your own time entries."))
@@ -252,24 +249,19 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
                 session = frappe.get_doc("HD Ticket Time Tracking Session", latest_session_name)
                 session.session_end = datetime.now()
                 session.save()
-        logger.debug(f"Hit 2")
-        logger.debug(f"Action status: "+str(time_entry.status))
         if action == 'pause':
             time_entry.status = 'Paused'
-            logger.debug(f"Action hit PAUSE ROUTE ")
         elif action == 'complete':
             time_entry.end_time = datetime.now()
             time_entry.status = 'Completed'
             time_entry.description = description
             if max_duration_reached:
                 time_entry.max_duration_reached = True
-        logger.debug(f"Hit 3")
         # Update the total duration for the time entry
         if session:
             time_entry.save(ignore_permissions=True)
             time_entry.reload()  # Reload to ensure all linked sessions are considered
             sessions = frappe.get_all("HD Ticket Time Tracking Session", filters={"ticket_time_entry": time_entry.name}, fields=["session_start", "session_end"])
-            logger.debug(f"Hit Sessions: "+str(sessions))
             if sessions:
                 total_duration_seconds = sum(
                     [(frappe.utils.get_datetime(session["session_end"]) - frappe.utils.get_datetime(session["session_start"])).total_seconds() for session in sessions if session["session_end"]],
@@ -278,13 +270,10 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
                 # Convert total duration from seconds to hours, retaining decimal values for partial hours
                 total_duration_hours = total_duration_seconds / 3600
                 time_entry.duration = total_duration_seconds
-                logger.debug(f"Sessions total time: "+str(total_duration_seconds))
             else:
                 time_entry.duration = 0
-                logger.debug(f"Hit Sessions: Else")
         time_entry.save(ignore_permissions=True)
         frappe.db.commit()
-        logger.debug(f"Hit 4")
 
     return time_entry.as_dict() if time_entry else {}
 
