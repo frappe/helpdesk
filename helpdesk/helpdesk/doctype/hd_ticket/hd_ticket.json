@@ -414,16 +414,17 @@
    "label": "Time Tracking"
   },
   {
+   "allow_bulk_edit": 1,
    "fieldname": "time_tracking_table",
    "fieldtype": "Table",
-   "label": "Session",
+   "label": "Time Entries",
    "options": "HD Ticket Time Tracking"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2024-03-17 11:14:27.867218",
+ "modified": "2024-03-19 17:52:42.989550",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

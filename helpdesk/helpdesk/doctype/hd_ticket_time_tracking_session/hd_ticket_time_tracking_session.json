@@ -5,8 +5,10 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "ticket_time_entry",
   "session_start",
-  "session_end"
+  "session_end",
+  "column_break_kowf"
  ],
  "fields": [
   {
@@ -18,17 +20,51 @@
    "fieldname": "session_end",
    "fieldtype": "Datetime",
    "label": "Session End"
+  },
+  {
+   "fieldname": "ticket_time_entry",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Ticket Time Entry",
+   "options": "HD Ticket Time Tracking"
+  },
+  {
+   "fieldname": "column_break_kowf",
+   "fieldtype": "Column Break"
   }
  ],
- "index_web_pages_for_search": 1,
- "istable": 1,
  "links": [],
- "modified": "2024-03-17 11:06:29.649121",
+ "modified": "2024-03-19 18:17:49.688967",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Tracking Session",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent",
+   "share": 1,
+   "write": 1
+  }
+ ],
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

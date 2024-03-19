@@ -3,6 +3,7 @@
  "allow_rename": 1,
  "creation": "2024-03-17 11:07:12.836642",
  "doctype": "DocType",
+ "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "ticket_id",
@@ -12,10 +13,9 @@
   "duration",
   "status",
   "max_duration_reached",
-  "time_sessions",
   "billed",
   "invoice_reference",
-  "text_aozd"
+  "description"
  ],
  "fields": [
   {
@@ -62,12 +62,6 @@
    "label": "Max Duration Reached"
   },
   {
-   "fieldname": "time_sessions",
-   "fieldtype": "Table",
-   "label": "Time Sessions",
-   "options": "HD Ticket Time Tracking Session"
-  },
-  {
    "default": "0",
    "fieldname": "billed",
    "fieldtype": "Check",
@@ -80,14 +74,15 @@
    "options": "Sales Invoice"
   },
   {
-   "fieldname": "text_aozd",
-   "fieldtype": "Text"
+   "fieldname": "description",
+   "fieldtype": "Text",
+   "label": "Time Entry Detail"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-03-19 16:47:51.007911",
+ "modified": "2024-03-19 19:31:07.315967",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Tracking",
