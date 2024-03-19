@@ -306,10 +306,12 @@ const unwatch = watch(data, () => {
 });
 
 let wasTimerRunningOnLoad = false;
+let beforeUnloadHandlerAdded = false;
 
 onMounted(() => {
   console.log("Component mounted, initializing timer...");
   initializeTimer();
+  setupBeforeUnloadHandler();
 });
 
 onUnmounted(() => {
@@ -347,6 +349,32 @@ function update(fieldname: string, value: string) {
     },
     onError: useError(),
   });
+}
+
+function setupBeforeUnloadHandler() {
+  const handleBeforeUnload = (event) => {
+    if (timerState.value !== "idle") {
+      console.log("Storing timer state before unload:", timerState.value);
+      storeTimerState(
+        data.value.name,
+        currentEntryId.value,
+        timerState.value,
+        elapsed.value
+      );
+    } else {
+      console.log("Timer is idle, not storing state before unload.");
+    }
+  };
+
+  if (!beforeUnloadHandlerAdded) {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    beforeUnloadHandlerAdded = true;
+
+    onUnmounted(() => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      beforeUnloadHandlerAdded = false;
+    });
+  }
 }
 
 async function startTimer(isRestoration = false) {
@@ -467,8 +495,6 @@ async function completeTimer(
     });
     console.log("Complete response:", response);
     console.log("Timer State: " + timerState.value);
-    clearTimerState();
-    elapsed.value = 0;
   } catch (error) {
     console.error("Failed to complete time entry:", error);
   }
@@ -577,30 +603,66 @@ async function initializeTimer() {
   );
 
   if (storedTimer && storedTimer.ticketId === data.value.name) {
-    timerState.value = storedTimer.timerState.toLowerCase();
-    currentEntryId.value = storedTimer.timeEntryId;
-    startTime.value = storedTimer.startTime
-      ? new Date(storedTimer.startTime).getTime()
-      : null;
-    elapsed.value = storedTimer.elapsed;
+    const isActive = await isTimeEntryActive(storedTimer.timeEntryId);
+    console.log("isActive response is: " + isActive);
+    if (
+      isActive.is_active ||
+      storedTimer.timerState === "running" ||
+      storedTimer.timerState === "paused"
+    ) {
+      timerState.value = storedTimer.timerState.toLowerCase();
+      currentEntryId.value = storedTimer.timeEntryId;
+      startTime.value = storedTimer.startTime
+        ? new Date(storedTimer.startTime).getTime()
+        : null;
+      elapsed.value = storedTimer.elapsed;
 
-    // For a paused timer, do not recalculate elapsed time upon page load
-    if (timerState.value === "paused") {
-      console.log("Timer was paused. Keeping elapsed time as is.");
-    } else if (timerState.value === "running") {
-      // Recalculate elapsed time only if the timer was running
-      const now = Date.now();
-      if (startTime.value) {
-        const additionalElapsed = now - startTime.value;
-        elapsed.value += additionalElapsed;
-        // Update startTime to now to prevent further incorrect incrementation
-        startTime.value = now;
+      // For a paused timer, do not recalculate elapsed time upon page load
+      if (timerState.value === "paused") {
+        console.log("Timer was paused. Keeping elapsed time as is.");
+      } else if (timerState.value === "running") {
+        // Recalculate elapsed time only if the timer was running
+        const now = Date.now();
+        if (startTime.value) {
+          const additionalElapsed = now - startTime.value;
+          elapsed.value += additionalElapsed;
+          // Update startTime to now to prevent further incorrect incrementation
+          startTime.value = now;
+        }
+        setupInterval();
       }
-      setupInterval();
+    } else {
+      console.log("Time entry completed, setting timer to idle.");
+      resetTimer(); // This function should also clear the localStorage
     }
   } else {
     console.log("No stored timer info found or does not match current ticket.");
     resetTimer();
+  }
+}
+
+async function isTimeEntryActive(timeEntryId) {
+  try {
+    const response = await fetch(
+      `/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.is_time_entry_running`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Frappe-CSRF-Token": window.csrf_token,
+        },
+        body: JSON.stringify({ time_entry_id: timeEntryId }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok.");
+    }
+    const data = await response.json();
+    console.log("isTimeEntryActive return response: " + data.message);
+    return data.message === true; // Adjust based on your actual API response structure
+  } catch (error) {
+    console.error("Error checking time entry status:", error);
+    return false; // Assume not active if there's an error
   }
 }
 
@@ -655,18 +717,6 @@ function handleApiResponse(response) {
   }
   return response;
 }
-
-window.addEventListener("beforeunload", () => {
-  if (timerState.value === "running" || timerState.value === "paused") {
-    console.log("beforeunload has a timerState.value of: " + timerState.value);
-    storeTimerState(
-      data.value.name,
-      currentEntryId.value,
-      timerState.value,
-      elapsed.value
-    );
-  }
-});
 </script>
 
 <style scoped>

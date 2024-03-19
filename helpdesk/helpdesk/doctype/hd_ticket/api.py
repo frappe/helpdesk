@@ -265,5 +265,13 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 
 @frappe.whitelist()
 def is_time_entry_running(time_entry_id):
-    time_entry = frappe.db.get_value("HD Ticket Time Tracking", time_entry_id, 'status')
-    return time_entry
+    status = frappe.db.get_value("HD Ticket Time Tracking", time_entry_id, "status")
+    
+    # Assuming "Running" is the only status indicating active time tracking
+    is_active = status == "Running"
+    
+    # Return both the activity state and the specific status
+    return {
+        'is_active': is_active,
+        'status': status
+    }
