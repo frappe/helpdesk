@@ -13,6 +13,7 @@ import {
   FormControl,
   Input,
   Tooltip,
+  TextInput,
 } from "frappe-ui";
 import App from "./App.vue";
 import "./index.css";
@@ -29,6 +30,7 @@ const globalComponents = {
   FormControl,
   Input,
   Tooltip,
+  TextInput,
 };
 
 setConfig("resourceFetcher", frappeRequest);
