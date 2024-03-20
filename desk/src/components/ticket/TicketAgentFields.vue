@@ -1,9 +1,6 @@
 <template>
   <div
-    class="flex grow flex-col gap-1.5 truncate border-l"
-    :style="{
-      'overflow-y': 'scroll',
-    }"
+    class="flex flex-1 flex-col justify-between overflow-hidden overflow-y-auto"
   >
     <div
       v-for="o in options"

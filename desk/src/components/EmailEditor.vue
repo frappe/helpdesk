@@ -59,7 +59,7 @@
             <FileUploader
               :upload-args="{
                 doctype: doctype,
-                docname: modelValue.name,
+                docname: modelValue?.name,
                 private: true,
               }"
               @success="(f) => attachments.push(f)"
@@ -141,7 +141,7 @@ const cc = ref(false);
 const bcc = ref(false);
 const ccEmails = ref([]);
 const bccEmails = ref([]);
-const toEmails = ref(modelValue.value.email ? [modelValue.value.email] : []);
+const toEmails = ref(modelValue.value?.email ? [modelValue.value.email] : []);
 const ccInput = ref(null);
 const bccInput = ref(null);
 

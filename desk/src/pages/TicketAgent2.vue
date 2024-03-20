@@ -31,33 +31,35 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full">
-      <Tabs v-slot="{ tab }" v-model="tabIndex" :tabs="tabs">
-        <!-- <div
-          class="flex items-center justify-between px-10 py-5 text-lg font-medium"
+      <div class="flex flex-col">
+        <Tabs
+          v-slot="{ tab }"
+          v-model="tabIndex"
+          :tabs="tabs"
+          class="overflow-hidden"
         >
-          <div
-            class="flex h-7 items-center text-xl font-semibold text-gray-800"
-          >
-            {{ tab.label }}
+          <div v-if="tab.label === 'Customer Tickets'" class="py-2">
+            <TicketsAgentList
+              :rows="customerTickets?.data?.data"
+              :columns="customerTickets?.data?.columns"
+              :options="{
+                selectable: false,
+                openInNewTab: true,
+              }"
+              :paginate="false"
+            />
           </div>
-        </div> -->
-        <div v-if="tab.label === 'Customer Tickets'" class="h-full py-2">
-          <TicketsAgentList
-            :rows="customerTickets?.data?.data"
-            :columns="customerTickets?.data?.columns"
-            :options="{
-              selectable: false,
-              openInNewTab: true,
-            }"
-            :paginate="false"
+          <TicketAgentActivities
+            v-else
+            :activities="activities"
+            :type="tab.label === 'Emails' ? 'email' : 'all'"
           />
-        </div>
-        <TicketAgentActivities
-          v-else
-          :activities="activities"
-          :type="tab.label === 'Emails' ? 'email' : 'all'"
+        </Tabs>
+        <CommunicationArea
+          v-model="ticket.data"
+          v-model:reload="reload_email"
         />
-      </Tabs>
+      </div>
       <TicketAgentSidebar :ticket="ticket.data" />
     </div>
     <AssignmentModal
@@ -71,17 +73,26 @@
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
+import { Breadcrumbs, createResource, Dropdown, Tabs } from "frappe-ui";
+
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { createToast } from "@/utils";
+
+import {
+  LayoutHeader,
+  MultipleAvatar,
+  AssignmentModal,
+  CommunicationArea,
+} from "@/components";
+
+import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
+
 import {
   ActivityIcon,
   EmailIcon,
   IndicatorIcon,
   TicketIcon,
 } from "@/components/icons";
-import { Breadcrumbs, createResource, Dropdown, Tabs } from "frappe-ui";
-import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
-import { LayoutHeader, MultipleAvatar, AssignmentModal } from "@/components";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 
@@ -102,6 +113,7 @@ const tabs = [
 ];
 
 const customerTickets = ref([]);
+const reload_email = ref(false);
 
 const props = defineProps({
   ticketId: {

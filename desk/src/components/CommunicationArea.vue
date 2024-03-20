@@ -40,7 +40,7 @@
     <CommentTextEditor
       ref="newCommentEditor"
       v-model:content="newComment"
-      v-model="doc.data"
+      v-model="doc"
       v-model:attachments="attachments"
       :submit-button-props="{
         variant: 'solid',
@@ -68,7 +68,7 @@
       ref="newEmailEditor"
       v-model:content="newEmail"
       v-model:attachments="attachments"
-      v-model="doc.data"
+      v-model="doc"
       :submit-button-props="{
         variant: 'solid',
         onClick: submitEmail,
@@ -77,7 +77,7 @@
       :discard-button-props="{
         onClick: () => {
           showEmailBox = false;
-          newEmailEditor.toEmails = doc.data.email ? [doc.data.email] : [];
+          newEmailEditor.toEmails = doc.email ? [doc.email] : [];
           newEmailEditor.ccEmails = [];
           newEmailEditor.bccEmails = [];
           newEmailEditor.cc = false;
@@ -95,7 +95,6 @@ import EmailIcon from "@/components/icons/EmailIcon.vue";
 import CommentIcon from "@/components/icons/CommentIcon.vue";
 import { useAuthStore } from "@/stores/auth";
 import { EmailEditor, CommentTextEditor } from "@/components";
-import { File } from "@/types";
 import { computed, ref, defineModel, nextTick, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 
