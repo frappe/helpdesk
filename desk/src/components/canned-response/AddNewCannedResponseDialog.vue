@@ -68,6 +68,7 @@ defineProps({
     required: true,
   },
 });
+const emit = defineEmits(["close"]);
 const titleValidationError = ref("");
 const messageValidationError = ref("");
 
@@ -125,9 +126,9 @@ function textEditorMenuButtons() {
 }
 
 function close() {
-  this.title = "";
-  this.message = "";
-  this.$emit("close");
+  title.value = "";
+  message.value = "";
+  emit("close");
 }
 
 function addResponse() {
