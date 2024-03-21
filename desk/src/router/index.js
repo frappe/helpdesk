@@ -19,8 +19,6 @@ export const CUSTOMER_PORTAL_NEW_TICKET = "TicketNew";
 export const CUSTOMER_PORTAL_TICKET = "TicketCustomer";
 
 export const AGENT_PORTAL_AGENT_LIST = "AgentList";
-export const AGENT_PORTAL_CANNED_RESPONSE_LIST = "CannedResponses";
-export const AGENT_PORTAL_CANNED_RESPONSE_SINGLE = "CannedResponse";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
 export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
@@ -165,15 +163,13 @@ const routes = [
       },
       {
         path: "canned-responses",
-        name: AGENT_PORTAL_CANNED_RESPONSE_LIST,
-        component: () =>
-          import("@/pages/desk/canned_response/CannedResponseList.vue"),
+        name: "CannedResponses",
+        component: () => import("@/pages/CannedResponses.vue"),
       },
       {
         path: "canned-responses/:id",
-        name: AGENT_PORTAL_CANNED_RESPONSE_SINGLE,
-        component: () =>
-          import("@/pages/desk/canned_response/CannedResponseSingle.vue"),
+        name: "CannedResponse",
+        component: () => import("@/pages/CannedResponse.vue"),
         props: true,
       },
       {
