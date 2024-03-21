@@ -267,14 +267,14 @@ const timeritems = [
 const activeTimerStartTime = ref<number | null>(null);
 
 // Define a computed property to calculate the elapsed time in seconds
-const elapsedTimeInSeconds = computed(() => {
-  if (activeTimerStartTime.value === null) {
-    return 0;
-  } else {
-    const currentTime = Date.now();
-    return Math.floor((currentTime - activeTimerStartTime.value) / 1000);
-  }
-});
+//const elapsedTimeInSeconds = computed(() => {
+//  if (activeTimerStartTime.value === null) {
+//    return 0;
+//  } else {
+//    const currentTime = Date.now();
+//    return Math.floor((currentTime - activeTimerStartTime.value) / 1000);
+//  }
+//});
 
 const formattedElapsedTime = computed(() => {
   let elapsedTimeCalculation = elapsed.value;
@@ -306,7 +306,7 @@ const unwatch = watch(data, () => {
   }
 });
 
-let wasTimerRunningOnLoad = false;
+//let wasTimerRunningOnLoad = false;
 let beforeUnloadHandlerAdded = false;
 
 onMounted(() => {
@@ -402,7 +402,7 @@ async function startTimer(isRestoration = false) {
     storeTimerState(data.value.name, response.name, "running", 0);
     setupInterval();
     timerInterval.value = setInterval(() => {
-      const currentElapsed = Date.now() - startTime.value;
+      //const currentElapsed = Date.now() - startTime.value;
       let elapsedSinceStart =
         Date.now() - startTime.value + (elapsed.value || 0);
       if (elapsedSinceStart >= maxDuration) {
@@ -470,7 +470,7 @@ async function resumeTimer() {
   }
 }
 
-const timertempState = ref({
+const timerTempState = ref({
   maxDurationReached: false,
   isRestoration: false,
 });
@@ -480,7 +480,7 @@ async function recordtimeentry() {
 }
 
 async function handleSubmitSuccess(description) {
-  const { maxDurationReached, isRestoration } = timertempState.value;
+  const { maxDurationReached, isRestoration } = timerTempState.value;
   await completeTimer(maxDurationReached, isRestoration, description);
 }
 
@@ -563,23 +563,23 @@ function setupInterval() {
   }, 1000); // Update every second
 }
 
-function updateElapsed() {
+//function updateElapsed() {
   // If the timer is not running, immediately return without doing anything
-  if (timerState.value !== "running") return;
+//  if (timerState.value !== "running") return;
 
   // Since the function continues, we know the timer is running
-  const now = Date.now();
-  if (startTime.value) {
-    const timePassed = now - startTime.value;
-    elapsed.value += timePassed;
-    startTime.value = now; // Reset startTime for the next interval calculation
+//  const now = Date.now();
+//  if (startTime.value) {
+//    const timePassed = now - startTime.value;
+//    elapsed.value += timePassed;
+//    startTime.value = now; // Reset startTime for the next interval calculation
 
-    if (elapsed.value >= maxDuration) {
-      elapsed.value = maxDuration;
-      completeTimer(true); // Automatically stop if max duration is reached
-    }
-  }
-}
+//    if (elapsed.value >= maxDuration) {
+//      elapsed.value = maxDuration;
+//      completeTimer(true); // Automatically stop if max duration is reached
+//    }
+//  }
+//}
 
 function getUserIdFromCookies() {
   const cookies = document.cookie.split(";");
@@ -695,37 +695,6 @@ function resetTimer() {
 
 function clearTimerState() {
   localStorage.removeItem("runningTimer");
-}
-
-async function checkTimeEntryStatus(timeEntryId) {
-  return new Promise((resolve, reject) => {
-    console.log(timeEntryId);
-    fetch(
-      `/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.is_time_entry_running`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Frappe-CSRF-Token": window.csrf_token,
-        },
-        body: JSON.stringify({ time_entry_id: timeEntryId }),
-      }
-    )
-      .then(handleApiResponse)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        resolve(data.message);
-      })
-      .catch((error) => {
-        console.error("Error checking time entry status:", error);
-        reject(error);
-      });
-  });
 }
 
 function handleApiResponse(response) {
