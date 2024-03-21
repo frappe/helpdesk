@@ -1,218 +1,197 @@
 <template>
-  <div>
-    <Dialog
-      :options="{ title: 'New canned response', size: '3xl' }"
-      :show="show"
-      class="bg-white px-6 py-5 pb-1 pt-6"
-      @close="close()"
-    >
-      <template #body-content>
-        <div class="mt-6 flex flex-col">
-          <Input
-            id="searchInput"
-            v-model="title"
-            class="w-full"
-            type="text"
-            label="Title"
-            placeholder="Enter Title"
-          />
-          <ErrorMessage :message="titleValidationError" />
-        </div>
-        <div class="mb-2 mt-4 block text-sm leading-4 text-gray-700">
-          Message
-        </div>
-        <div>
-          <TextEditor
-            ref="textEditor"
-            class="bg-gray-100"
-            editor-class="min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3 max-w-full"
-            :content="message"
-            :starterkit-options="{
-              heading: { levels: [2, 3, 4, 5, 6] },
-            }"
-            @change="
-              (val) => {
-                message = val;
-              }
-            "
-          >
-            <template #top>
-              <div>
-                <TextEditorFixedMenu
-                  class="m-3 overflow-x-auto"
-                  :buttons="textEditorMenuButtons"
-                />
-              </div>
-            </template>
-          </TextEditor>
-        </div>
-        <ErrorMessage :message="messageValidationError" />
-      </template>
-      <template #actions>
-        <Button appearance="primary" class="mr-auto" @click="addResponse()"
-          >Add Response</Button
+  <Dialog
+    :options="{ title: 'New canned response', size: '3xl' }"
+    :show="show"
+    class="bg-white px-6 py-5 pb-1 pt-6"
+    @close="close()"
+  >
+    <template #body-content>
+      <div class="mt-6 flex flex-col">
+        <Input
+          id="searchInput"
+          v-model="title"
+          class="w-full"
+          type="text"
+          label="Title"
+          placeholder="Enter Title"
+        />
+        <ErrorMessage :message="titleValidationError" />
+      </div>
+      <div class="mb-2 mt-4 block text-sm leading-4 text-gray-700">Message</div>
+      <div>
+        <TextEditor
+          ref="textEditor"
+          class="bg-gray-100"
+          editor-class="min-h-[20rem] overflow-y-auto max-h-[73vh] w-full px-3 max-w-full"
+          :content="message"
+          :starterkit-options="{
+            heading: { levels: [2, 3, 4, 5, 6] },
+          }"
+          @change="
+            (val) => {
+              message = val;
+            }
+          "
         >
-      </template>
-    </Dialog>
-  </div>
+          <template #top>
+            <div>
+              <TextEditorFixedMenu
+                class="m-3 overflow-x-auto"
+                :buttons="textEditorMenuButtons"
+              />
+            </div>
+          </template>
+        </TextEditor>
+      </div>
+      <ErrorMessage :message="messageValidationError" />
+    </template>
+    <template #actions>
+      <Button appearance="primary" class="mr-auto" @click="addResponse()"
+        >Add Response</Button
+      >
+    </template>
+  </Dialog>
 </template>
 
-<script>
-import {
-  Dialog,
-  Input,
-  FeatherIcon,
-  ErrorMessage,
-  TextEditor,
-} from "frappe-ui";
-import { ref } from "vue";
+<script setup lang="ts">
+import { Dialog, Input, ErrorMessage, TextEditor } from "frappe-ui";
+import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { TextEditorFixedMenu } from "frappe-ui/src/components/TextEditor";
-export default {
-  name: "AddNewCannedResponsesDialog",
-  components: {
-    Dialog,
-    Input,
-    FeatherIcon,
-    ErrorMessage,
-    TextEditor,
-    TextEditorFixedMenu,
-  },
-  props: ["show"],
-  setup() {
-    const titleValidationError = ref("");
-    const messageValidationError = ref("");
-    return {
-      titleValidationError,
-      messageValidationError,
-    };
-  },
+import { createResource } from "frappe-ui";
 
-  data() {
-    return {
-      title: "",
-      message: "",
-    };
-  },
-  computed: {
-    textEditorMenuButtons() {
-      return [
-        "Paragraph",
-        ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-        "Separator",
-        "Bold",
-        "Italic",
-        "Separator",
-        "Bullet List",
-        "Numbered List",
-        "Separator",
-        "Align Left",
-        "Align Center",
-        "Align Right",
-        "Separator",
-        "Image",
-        "Video",
-        "Link",
-        "Blockquote",
-        "Code",
-        "Horizontal Rule",
-        [
-          "InsertTable",
-          "AddColumnBefore",
-          "AddColumnAfter",
-          "DeleteColumn",
-          "AddRowBefore",
-          "AddRowAfter",
-          "DeleteRow",
-          "MergeCells",
-          "SplitCell",
-          "ToggleHeaderColumn",
-          "ToggleHeaderRow",
-          "ToggleHeaderCell",
-          "DeleteTable",
-        ],
-        "Separator",
-        "Undo",
-        "Redo",
-      ];
-    },
-  },
+const router = useRouter();
 
-  watch: {
-    title(newValue) {
-      this.validateTitle(newValue);
-    },
-    message(newValue) {
-      this.validateMessage(newValue);
-    },
+defineProps({
+  show: {
+    type: Boolean,
+    required: true,
   },
-  methods: {
-    close() {
-      this.title = "";
-      this.message = "";
-      this.$emit("close");
-    },
-    addResponse() {
-      if (this.validateInputs()) {
-        return;
-      }
-      const inputParams = {
-        title: this.title,
-        message: this.message,
-      };
-      this.$resources.newResponse.submit({
-        doc: {
-          doctype: "HD Canned Response",
-          ...inputParams,
-        },
-      });
-    },
-    validateInputs() {
-      let error = this.validateTitle(this.title);
-      error += this.validateMessage(this.message);
+});
+const titleValidationError = ref("");
+const messageValidationError = ref("");
 
-      return error;
-    },
-    validateTitle(value) {
-      this.titleValidationError = "";
-      if (!value) {
-        this.titleValidationError = "Title is required";
-      } else if (value.trim() == "") {
-        this.titleValidationError = "Title is required";
-      }
+const title = ref("");
+const message = ref("");
 
-      return this.titleValidationError;
-    },
+watch(title, (value) => {
+  validateTitle(value);
+});
 
-    validateMessage(value) {
-      this.messageValidationError = "";
-      if (!value) {
-        this.messageValidationError = "Message is required";
-      } else if (
-        ["<p><br></p>", "<p></p>"].includes(value.replaceAll(" ", ""))
-      ) {
-        this.messageValidationError = "Message is required";
-      }
+watch(message, (value) => {
+  validateMessage(value);
+});
 
-      return this.messageValidationError;
+function textEditorMenuButtons() {
+  return [
+    "Paragraph",
+    ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
+    "Separator",
+    "Bold",
+    "Italic",
+    "Separator",
+    "Bullet List",
+    "Numbered List",
+    "Separator",
+    "Align Left",
+    "Align Center",
+    "Align Right",
+    "Separator",
+    "Image",
+    "Video",
+    "Link",
+    "Blockquote",
+    "Code",
+    "Horizontal Rule",
+    [
+      "InsertTable",
+      "AddColumnBefore",
+      "AddColumnAfter",
+      "DeleteColumn",
+      "AddRowBefore",
+      "AddRowAfter",
+      "DeleteRow",
+      "MergeCells",
+      "SplitCell",
+      "ToggleHeaderColumn",
+      "ToggleHeaderRow",
+      "ToggleHeaderCell",
+      "DeleteTable",
+    ],
+    "Separator",
+    "Undo",
+    "Redo",
+  ];
+}
+
+function close() {
+  this.title = "";
+  this.message = "";
+  this.$emit("close");
+}
+
+function addResponse() {
+  if (validateInputs()) {
+    return;
+  }
+  const inputParams = {
+    title: title.value,
+    message: message.value,
+  };
+  insert.submit({
+    doc: {
+      doctype: "HD Canned Response",
+      ...inputParams,
     },
+  });
+}
+
+function validateInputs() {
+  let error = validateTitle(title.value);
+  error += validateMessage(message.value);
+
+  return error;
+}
+
+function validateTitle(value) {
+  titleValidationError.value = "";
+  if (!value) {
+    titleValidationError.value = "Title is required";
+  } else if (value.trim() == "") {
+    titleValidationError.value = "Title is required";
+  }
+
+  return titleValidationError.value;
+}
+
+function validateMessage(value) {
+  messageValidationError.value = "";
+  if (!value) {
+    messageValidationError.value = "Message is required";
+  } else if (["<p><br></p>", "<p></p>"].includes(value.replaceAll(" ", ""))) {
+    messageValidationError.value = "Message is required";
+  }
+
+  return messageValidationError.value;
+}
+
+const insert = createResource({
+  url: "frappe.client.insert",
+  onSuccess: (doc) => {
+    router.push({
+      name: "CannedResponse",
+      params: {
+        id: doc.name,
+      },
+    });
   },
-  resources: {
-    newResponse() {
-      return {
-        url: "frappe.client.insert",
-        onSuccess: (doc) => {
-          this.$router.push(`/settings/canned_responses/${doc.name}`);
-        },
-        onError: (err) => {
-          this.$toast({
-            title: "Error while creating canned response",
-            text: err,
-            icon: "x",
-            iconClasses: "text-red-500",
-          });
-        },
-      };
-    },
+  onError: (err) => {
+    this.$toast({
+      title: "Error while creating canned response",
+      text: err,
+      icon: "x",
+      iconClasses: "text-red-500",
+    });
   },
-};
+});
 </script>
