@@ -53,3 +53,18 @@ class HDSettings(Document):
 		room = get_website_room()
 
 		frappe.publish_realtime(event, room=room, after_commit=True)
+
+
+@frappe.whitelist()
+def get_timetracking_settings():
+	settings = frappe.get_single("HD Settings")
+	enable_time_tracking = settings.enable_time_tracking
+	max_duration = settings.tt_maxduration
+
+	enable_time_tracking = True if enable_time_tracking == 1 else False
+	max_duration = int(max_duration) * 1000 if max_duration else None  # Convert to milliseconds
+
+	return {
+		'enableTimeTracking': enable_time_tracking,
+		'maxduration': max_duration
+	}

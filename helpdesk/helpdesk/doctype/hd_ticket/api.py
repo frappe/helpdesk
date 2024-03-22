@@ -1,4 +1,5 @@
 import frappe
+import math
 from frappe import _
 from frappe.utils import get_user_info_for_avatar
 from frappe.utils.caching import redis_cache
@@ -203,8 +204,7 @@ def get_attachments(doctype, name):
 
 
 @frappe.whitelist()
-def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, max_duration_reached=False, description=None):
-
+def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, maximum_duration_reached=False, description=None):
     if not frappe.session.user or frappe.session.user == "Guest":
         frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
 
@@ -255,10 +255,13 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
             time_entry.end_time = datetime.now()
             time_entry.status = 'Completed'
             time_entry.description = description
-            if max_duration_reached:
-                time_entry.max_duration_reached = True
+            if maximum_duration_reached:
+                time_entry.maximum_duration_reached = True
         # Update the total duration for the time entry
         if session:
+            rounding_increment = frappe.db.get_single_value("HD Settings", "time_entry_rounding")
+            rounding_increment = int(rounding_increment) if rounding_increment and rounding_increment.isdigit() else 60  # Default to 1 minute if not specified or invalid
+
             time_entry.save(ignore_permissions=True)
             time_entry.reload()  # Reload to ensure all linked sessions are considered
             sessions = frappe.get_all("HD Ticket Time Tracking Session", filters={"ticket_time_entry": time_entry.name}, fields=["session_start", "session_end"])
@@ -267,11 +270,18 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
                     [(frappe.utils.get_datetime(session["session_end"]) - frappe.utils.get_datetime(session["session_start"])).total_seconds() for session in sessions if session["session_end"]],
                     0
                 )
-                # Convert total duration from seconds to hours, retaining decimal values for partial hours
-                total_duration_hours = total_duration_seconds / 3600
+                # Calculate rounded duration
+                if rounding_increment > 0:  # To avoid division by zero
+                    # Here, rounding up to the nearest increment
+                    rounded_duration_seconds = math.ceil(total_duration_seconds / rounding_increment) * rounding_increment
+                else:
+                    rounded_duration_seconds = total_duration_seconds  # No rounding if increment is 0 or not set properly
+    
                 time_entry.duration = total_duration_seconds
+                time_entry.rounded_duration = rounded_duration_seconds  # Assuming 'rounded_duration' is the new field name
             else:
                 time_entry.duration = 0
+                time_entry.rounded_duration = 0
         time_entry.save(ignore_permissions=True)
         frappe.db.commit()
 

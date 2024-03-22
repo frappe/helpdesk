@@ -33,6 +33,11 @@
   "images_column",
   "brand_logo",
   "column_break_fsjn",
+  "time_tracking_tab",
+  "enable_time_tracking",
+  "column_break_teuj",
+  "tt_maxduration",
+  "time_entry_rounding",
   "misc_tab",
   "toasts_column",
   "suppress_default_email_toast",
@@ -235,11 +240,38 @@
   {
    "fieldname": "column_break_nvbf",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "time_tracking_tab",
+   "fieldtype": "Tab Break",
+   "label": "Time Tracking"
+  },
+  {
+   "description": "Do not allow time entries to exceed the time set and forces completion",
+   "fieldname": "tt_maxduration",
+   "fieldtype": "Duration",
+   "label": "Maximum Duration of Time Entries"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_time_tracking",
+   "fieldtype": "Check",
+   "label": "Enable Time Tracking"
+  },
+  {
+   "fieldname": "column_break_teuj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Rounds completed time entry duration up based on increment set",
+   "fieldname": "time_entry_rounding",
+   "fieldtype": "Duration",
+   "label": "Time Entry Rounding"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-08-23 17:59:49.761375",
+ "modified": "2024-03-22 20:44:59.385459",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

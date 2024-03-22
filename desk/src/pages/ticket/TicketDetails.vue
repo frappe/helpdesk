@@ -91,60 +91,6 @@
               {{ ticket.data.via_customer_portal ? "Portal" : "Mail" }}
             </span>
           </div>
-          <div
-            v-if="data.status !== 'Closed' && data.status !== 'Resolved'"
-            class="space-y-1.5"
-          >
-            <div class="space-y-1.5">
-              <span class="mr-2 font-medium text-gray-900">
-                Time Tracking
-              </span>
-              <Badge
-                v-if="timerState === 'running'"
-                label="Running"
-                theme="red"
-                variant="outline"
-              />
-              <Badge
-                v-else-if="timerState === 'paused'"
-                label="Paused"
-                theme="red"
-                variant="outline"
-              />
-              <Badge v-else label="Idle" theme="green" variant="outline" />
-            </div>
-            <TabGroup horizontal>
-              <TabList>
-                <tab v-for="item in timeritems" :key="item.name">
-                  <Tooltip
-                    v-if="timerState === item.state"
-                    :text="item.name"
-                    placement="left"
-                  >
-                    <div
-                      class="justify-left flex h-7 w-7 items-center rounded-full text-gray-900 transition-all"
-                      :class="{
-                        shadow: isExpanded && selected,
-                        'bg-gray-50': isExpanded && selected,
-                      }"
-                      @click="item.click"
-                    >
-                      <component :is="item.icon" class="h-4 w-4" />
-                    </div>
-                  </Tooltip>
-                </tab>
-              </TabList>
-            </TabGroup>
-            <div
-              v-if="timerState === 'running' || timerState === 'paused'"
-              class="space-y-1.5"
-            >
-              <span class="block text-sm text-gray-700">Live Duration</span>
-              <span class="block font-medium text-gray-900">{{
-                formattedElapsedTime
-              }}</span>
-            </div>
-          </div>
           <div v-if="data.feedback_rating" class="space-y-1.5">
             <span class="block text-sm text-gray-700">Feedback</span>
             <StarRating :rating="data.feedback_rating" />
@@ -154,6 +100,65 @@
             <span class="block text-gray-900">
               {{ data.feedback_extra }}
             </span>
+          </div>
+        </div>
+      </span>
+    </div>
+    <div v-if="data.status !== 'Closed' && data.status !== 'Resolved' && enableTimeTracking" class="divider"></div>
+    <div class="border-l">
+      <span>
+        <div
+          v-if="data.status !== 'Closed' && data.status !== 'Resolved' && enableTimeTracking"
+          class="mx-5 my-6 flex flex-col justify-between gap-3.5 text-base"
+        >
+          <div class="space-y-1.5">
+            <span class="mr-2 font-medium text-gray-900">
+              Time Tracking
+            </span>
+            <Badge
+              v-if="timerState === 'running'"
+              label="Running"
+              theme="red"
+              variant="outline"
+            />
+            <Badge
+              v-else-if="timerState === 'paused'"
+              label="Paused"
+              theme="red"
+              variant="outline"
+            />
+            <Badge v-else label="Idle" theme="green" variant="outline" />
+          </div>
+          <TabGroup horizontal>
+            <TabList>
+              <tab v-for="item in timeritems" :key="item.name">
+                <Tooltip
+                  v-if="timerState === item.state"
+                  :text="item.name"
+                  placement="left"
+                >
+                  <div
+                    class="justify-left flex h-7 w-7 items-center rounded-full text-gray-900 transition-all"
+                    :class="{
+                      shadow: isExpanded && selected,
+                      'bg-gray-50': isExpanded && selected,
+                    }"
+                    @click="item.click"
+                  >
+                    <component :is="item.icon" class="h-4 w-4" />
+                  </div>
+                </Tooltip>
+              </tab>
+            </TabList>
+          </TabGroup>
+          <div
+            v-if="timerState === 'running' || timerState === 'paused'"
+            class="space-y-1.5"
+          >
+            <span class="block text-sm text-gray-700">Live Duration</span>
+            <span class="block font-medium text-gray-900">{{
+              formattedElapsedTime
+            }}</span>
           </div>
         </div>
       </span>
@@ -212,11 +217,12 @@ const data = computed(() => ticket.data);
 const timerState = ref("idle");
 const startTime = ref(null);
 const elapsed = ref(0);
-const maxDuration = 28800000; // 8 hours in milliseconds
-const currentEntryId = ref(null); // Assuming you have a mechanism to track this ID
+const maxDuration = ref(0);
+const currentEntryId = ref(null);
 const timerInterval = ref(null);
 const userId = getUserIdFromCookies();
 const timeEntryDialog = ref(null);
+const maxDurationNotified = ref(false);
 
 const options = computed(() => [
   {
@@ -266,16 +272,6 @@ const timeritems = [
 // Define a reactive variable to store the start time of the active timer
 const activeTimerStartTime = ref<number | null>(null);
 
-// Define a computed property to calculate the elapsed time in seconds
-//const elapsedTimeInSeconds = computed(() => {
-//  if (activeTimerStartTime.value === null) {
-//    return 0;
-//  } else {
-//    const currentTime = Date.now();
-//    return Math.floor((currentTime - activeTimerStartTime.value) / 1000);
-//  }
-//});
-
 const formattedElapsedTime = computed(() => {
   let elapsedTimeCalculation = elapsed.value;
 
@@ -306,18 +302,21 @@ const unwatch = watch(data, () => {
   }
 });
 
-//let wasTimerRunningOnLoad = false;
 let beforeUnloadHandlerAdded = false;
+let enableTimeTracking = ref(false);
+let roundingInterval = ref(null);
 
 onMounted(() => {
-  console.log("Component mounted, initializing timer...");
-  initializeTimer();
-  setupBeforeUnloadHandler();
+  fetchTimeSettings().then(() => {
+    if (enableTimeTracking.value) {
+      // Only proceed with timer initialization if time tracking is enabled
+      initializeTimer();
+      setupBeforeUnloadHandler();
+    }
+  });
 });
 
 onUnmounted(() => {
-  console.log("Component unmounted, unwatch...");
-  console.log("Timer State: " + timerState.value);
   clearInterval(timerInterval.value);
   unwatch();
 });
@@ -329,6 +328,30 @@ watch(timerState, (newValue) => {
     activeTimerStartTime.value = null;
   }
 });
+
+async function fetchTimeSettings() {
+    try {
+        const response = await fetch("/api/method/helpdesk.helpdesk.doctype.hd_settings.hd_settings.get_timetracking_settings", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "X-Frappe-CSRF-Token": window.csrf_token,
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            if(data.message) {
+              console.log(data.message.enableTimeTracking+' - '+data.message.roundingInterval+' - '+data.message.maxDuration)
+                enableTimeTracking.value = data.message.enableTimeTracking;
+                roundingInterval.value = data.message.roundingInterval;
+                maxDuration.value = data.message.maxDuration;
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching time settings:', error);
+    }
+}
 
 function update(fieldname: string, value: string) {
   createResource({
@@ -355,15 +378,12 @@ function update(fieldname: string, value: string) {
 function setupBeforeUnloadHandler() {
   const handleBeforeUnload = (event) => {
     if (timerState.value !== "idle") {
-      console.log("Storing timer state before unload:", timerState.value);
       storeTimerState(
         data.value.name,
         currentEntryId.value,
         timerState.value,
         elapsed.value
       );
-    } else {
-      console.log("Timer is idle, not storing state before unload.");
     }
   };
 
@@ -389,16 +409,16 @@ async function startTimer(isRestoration = false) {
   }
   setupInterval();
   storeTimerState();
+  maxDurationNotified.value = false;
   try {
     const response = await createOrUpdateTimeEntry({
       ticket_id: data.value.name,
       agent: userId,
       action: "start",
       duration: null,
-      max_duration_reached: false,
+      maximum_duration_reached: false,
     });
     currentEntryId.value = response.name;
-    console.log("Timer State: " + timerState.value);
     storeTimerState(data.value.name, response.name, "running", 0);
     setupInterval();
     timerInterval.value = setInterval(() => {
@@ -406,11 +426,8 @@ async function startTimer(isRestoration = false) {
       let elapsedSinceStart =
         Date.now() - startTime.value + (elapsed.value || 0);
       if (elapsedSinceStart >= maxDuration) {
-        console.log(
-          "startTimer MaxDuration has been hit: " + elapsedSinceStart
-        );
         elapsedSinceStart = maxDuration;
-        completeTimer(true);
+        recordtimeentry(true);
       }
     }, 1000);
   } catch (error) {
@@ -422,6 +439,9 @@ async function pauseTimer() {
   if (timerState.value === "running") {
     const now = Date.now();
     elapsed.value += now - startTime.value;
+    if (maxDuration.value !== null && elapsed.value >= maxDuration.value) {
+      recordtimeentry(true); // Pass true if you need to indicate maxDurationReached
+    }
     timerState.value = "paused";
     clearInterval(timerInterval.value);
     storeTimerState();
@@ -432,9 +452,8 @@ async function pauseTimer() {
         name: currentEntryId.value,
         duration: elapsed.value,
         action: "pause",
-        max_duration_reached: elapsed.value >= maxDuration,
+        maximum_duration_reached: elapsed.value >= maxDuration,
       });
-      console.log("Pause response:", response);
       storeTimerState(); // Make sure this reflects the paused state accurately
     } catch (error) {
       console.error("Error pausing time entry:", error);
@@ -444,28 +463,33 @@ async function pauseTimer() {
 
 async function resumeTimer() {
   if (timerState.value === "paused") {
-    startTime.value = Date.now(); // Set startTime to now without altering elapsed
-    timerState.value = "running";
-    setupInterval(); // Restart the interval
-    storeTimerState(); // Update the stored state to reflect the resume
-    try {
-      const response = await createOrUpdateTimeEntry({
-        ticket_id: data.value.name,
-        agent: userId,
-        name: currentEntryId.value,
-        duration: elapsed.value,
-        action: "resume",
-        max_duration_reached: false,
-      });
-      console.log("Resume response:", response);
-      storeTimerState(
-        data.value.name,
-        response.name,
-        timerState.value,
-        elapsed.value
-      );
-    } catch (error) {
-      console.error("Error resuming time entry:", error);
+    if (maxDuration.value !== null && elapsed.value >= maxDuration.value) {
+      recordtimeentry(true); // Pass true if you need to indicate maxDurationReached
+    } else {
+      startTime.value = Date.now(); // Set startTime to now without altering elapsed
+      timerState.value = "running";
+      setupInterval(); // Restart the interval
+      storeTimerState(); // Update the stored state to reflect the resume
+      console.log('Elapsed time: '+ elapsed.value)
+      maxDurationNotified.value = false;
+      try {
+        const response = await createOrUpdateTimeEntry({
+          ticket_id: data.value.name,
+          agent: userId,
+          name: currentEntryId.value,
+          duration: elapsed.value,
+          action: "resume",
+          maximum_duration_reached: false,
+        });
+        storeTimerState(
+          data.value.name,
+          response.name,
+          timerState.value,
+          elapsed.value
+        );
+      } catch (error) {
+        console.error("Error resuming time entry:", error);
+      }
     }
   }
 }
@@ -475,8 +499,25 @@ const timerTempState = ref({
   isRestoration: false,
 });
 
-async function recordtimeentry() {
+async function recordtimeentry(maxDurationReached = false) {
+  // Calculate if the max duration has been reached.
+  let finalElapsed = elapsed.value;
+  if (timerState.value === "running") {
+    const now = Date.now();
+    finalElapsed += now - startTime.value;
+  }
+  const hasMaxDurationBeenReached = maxDuration.value !== null && finalElapsed >= maxDuration.value;
+
+  if (hasMaxDurationBeenReached) {
+    createToast({
+      title: "Max Duration reached for timer. Please complete the entry.",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+  }
   timeEntryDialog.value.showDialog();
+  clearInterval(timerInterval.value);
+  timerState.value = "paused"; // Or set to "idle", depending on your needs
 }
 
 async function handleSubmitSuccess(description) {
@@ -484,35 +525,26 @@ async function handleSubmitSuccess(description) {
   await completeTimer(maxDurationReached, isRestoration, description);
 }
 
-async function completeTimer(
-  maxDurationReached = false,
-  isRestoration = false,
-  description
-) {
+async function completeTimer(maxDurationReached = false, isRestoration = false, description) {
   if (isRestoration) return;
-  if (timerState.value === "running") {
-    const now = Date.now();
-    elapsed.value += now - startTime.value;
-  }
 
   timerState.value = "idle";
   clearInterval(timerInterval.value);
   startTime.value = null;
-  elapsed.value = 0;
+  
   clearTimerState();
-
+  maxDurationNotified.value = false;
   try {
     const response = await createOrUpdateTimeEntry({
       ticket_id: data.value.name,
       agent: userId,
       name: currentEntryId.value,
-      duration: elapsed.value,
+      duration: null,
       action: "complete",
-      max_duration_reached: maxDurationReached,
+      maximum_duration_reached: maxDurationReached,
       description: description,
     });
-    console.log("Complete response:", response);
-    console.log("Timer State: " + timerState.value);
+    elapsed.value = 0;
   } catch (error) {
     console.error("Failed to complete time entry:", error);
   }
@@ -540,7 +572,6 @@ function createOrUpdateTimeEntry(data) {
         return response.json();
       })
       .then((data) => {
-        console.log("Response data:", data.message);
         resolve(data.message);
       })
       .catch((error) => {
@@ -558,28 +589,15 @@ function setupInterval() {
       elapsed.value += now - startTime.value;
       startTime.value = now;
 
-      // Optionally, update the UI or persist state changes as needed
+      // Check if max duration has been reached
+      if (maxDuration.value !== null && elapsed.value >= maxDuration.value && !maxDurationNotified.value) {
+        maxDurationNotified.value = true;
+        clearInterval(timerInterval.value); // Stop the interval
+        recordtimeentry(true); // true indicates max duration reached
+      }
     }
   }, 1000); // Update every second
 }
-
-//function updateElapsed() {
-  // If the timer is not running, immediately return without doing anything
-//  if (timerState.value !== "running") return;
-
-  // Since the function continues, we know the timer is running
-//  const now = Date.now();
-//  if (startTime.value) {
-//    const timePassed = now - startTime.value;
-//    elapsed.value += timePassed;
-//    startTime.value = now; // Reset startTime for the next interval calculation
-
-//    if (elapsed.value >= maxDuration) {
-//      elapsed.value = maxDuration;
-//      completeTimer(true); // Automatically stop if max duration is reached
-//    }
-//  }
-//}
 
 function getUserIdFromCookies() {
   const cookies = document.cookie.split(";");
@@ -615,14 +633,9 @@ function getStoredTimerState() {
 
 async function initializeTimer() {
   const storedTimer = getStoredTimerState();
-  console.log(
-    "Stored timer state on initialization:",
-    storedTimer ? JSON.stringify(storedTimer) : "No stored state"
-  );
 
   if (storedTimer && storedTimer.ticketId === data.value.name) {
     const isActive = await isTimeEntryActive(storedTimer.timeEntryId);
-    console.log("isActive response is: " + isActive);
     if (
       isActive.is_active ||
       storedTimer.timerState === "running" ||
@@ -637,7 +650,6 @@ async function initializeTimer() {
 
       // For a paused timer, do not recalculate elapsed time upon page load
       if (timerState.value === "paused") {
-        console.log("Timer was paused. Keeping elapsed time as is.");
       } else if (timerState.value === "running") {
         // Recalculate elapsed time only if the timer was running
         const now = Date.now();
@@ -650,11 +662,9 @@ async function initializeTimer() {
         setupInterval();
       }
     } else {
-      console.log("Time entry completed, setting timer to idle.");
       resetTimer(); // This function should also clear the localStorage
     }
   } else {
-    console.log("No stored timer info found or does not match current ticket.");
     resetTimer();
   }
 }
@@ -676,7 +686,6 @@ async function isTimeEntryActive(timeEntryId) {
       throw new Error("Network response was not ok.");
     }
     const data = await response.json();
-    console.log("isTimeEntryActive return response: " + data.message);
     return data.message === true; // Adjust based on your actual API response structure
   } catch (error) {
     console.error("Error checking time entry status:", error);
