@@ -124,6 +124,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import ColumnsIcon from "@/components/icons/ColumnsIcon.vue";
+import EditIcon from "@/components/icons/EditIcon.vue";
 import NestedPopover from "@/components/NestedPopover.vue";
 import { Autocomplete } from "frappe-ui";
 import Draggable from "vuedraggable";
