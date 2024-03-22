@@ -84,7 +84,6 @@ import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import {
   AGENT_PORTAL_AGENT_LIST,
-  AGENT_PORTAL_CANNED_RESPONSE_LIST,
   AGENT_PORTAL_CONTACT_LIST,
   AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_DASHBOARD,
@@ -165,7 +164,7 @@ const extraOptions = [
   {
     label: "Canned responses",
     icon: LucideCloudLightning,
-    to: AGENT_PORTAL_CANNED_RESPONSE_LIST,
+    to: "CannedResponses",
     isBeta: true,
   },
   {
