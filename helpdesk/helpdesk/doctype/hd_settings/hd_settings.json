@@ -38,6 +38,7 @@
   "column_break_teuj",
   "tt_maxduration",
   "time_entry_rounding",
+  "paused_duration_threshold",
   "misc_tab",
   "toasts_column",
   "suppress_default_email_toast",
@@ -247,10 +248,10 @@
    "label": "Time Tracking"
   },
   {
-   "description": "Do not allow time entries to exceed the time set and forces completion",
+   "description": "Do not allow time entries to exceed the time set and forces completion.",
    "fieldname": "tt_maxduration",
    "fieldtype": "Duration",
-   "label": "Maximum Duration of Time Entries"
+   "label": "Default Maximum Duration of Time Entries"
   },
   {
    "default": "0",
@@ -263,15 +264,21 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "Rounds completed time entry duration up based on increment set",
+   "description": "Rounds completed time entry duration up based on increment set.",
    "fieldname": "time_entry_rounding",
    "fieldtype": "Duration",
-   "label": "Time Entry Rounding"
+   "label": "Default Time Entry Rounding"
+  },
+  {
+   "description": "Maximum duration of a time entry with a Paused state. If exceeded, an email is sent to the agent. Default is 1 day.",
+   "fieldname": "paused_duration_threshold",
+   "fieldtype": "Duration",
+   "label": "Paused Duration Threshold"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-03-22 20:44:59.385459",
+ "modified": "2024-03-23 13:44:20.793154",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

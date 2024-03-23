@@ -10,6 +10,10 @@
   "image",
   "customer_name",
   "domain",
+  "time_tracking_tab",
+  "tt_maxduration",
+  "time_entry_rounding",
+  "column_break_wtvj",
   "references_tab",
   "contact_html"
  ],
@@ -41,12 +45,31 @@
    "fieldname": "contact_html",
    "fieldtype": "HTML",
    "label": "Contact HTML"
+  },
+  {
+   "fieldname": "time_tracking_tab",
+   "fieldtype": "Tab Break",
+   "label": "Time Tracking"
+  },
+  {
+   "fieldname": "tt_maxduration",
+   "fieldtype": "Duration",
+   "label": "Maximum Duration of Time Entries"
+  },
+  {
+   "fieldname": "time_entry_rounding",
+   "fieldtype": "Duration",
+   "label": "Time Entry Rounding"
+  },
+  {
+   "fieldname": "column_break_wtvj",
+   "fieldtype": "Column Break"
   }
  ],
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-26 14:18:18.944543",
+ "modified": "2024-03-23 13:33:11.534916",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Customer",

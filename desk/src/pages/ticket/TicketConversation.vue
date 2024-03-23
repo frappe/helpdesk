@@ -9,6 +9,14 @@
         :user="c.user"
         :is-pinned="c.is_pinned"
       />
+      <TicketTimeEntry
+        v-else-if="c.type === 'time_entry'"
+        :name="c.name"
+        :content="c.content"
+        :date="c.start_time"
+        :user="c.user"
+        :duration= "c.duration"
+      />
       <TicketCommunication
         v-else
         :content="c.content"
@@ -35,6 +43,7 @@ import { orderBy } from "lodash";
 import { dayjs } from "@/dayjs";
 import TicketComment from "./TicketComment.vue";
 import TicketCommunication from "./TicketCommunication.vue";
+import TicketTimeEntry from "./TicketTimeEntry.vue";
 import { ITicket } from "./symbols";
 
 interface P {
@@ -49,8 +58,19 @@ const ticket = inject(ITicket);
 const data = computed(() => ticket.data || {});
 const communications = computed(() => data.value.communications || []);
 const comments = computed(() => data.value.comments || []);
+const timeEntries = computed(() => {
+  return (data.value.timeentries || []).map(entry => ({
+    ...entry,
+    creation: entry.start_time,
+    type: 'time_entry',
+    user: entry.user,
+    content: entry.description,
+    duration: entry.duration_in_minutes,
+  }));
+});
+console.log(timeEntries);
 const conversation = computed(() =>
-  orderBy([...communications.value, ...comments.value], (c) =>
+  orderBy([...communications.value, ...comments.value, ...timeEntries.value], (c) =>
     dayjs(c.creation)
   )
 );

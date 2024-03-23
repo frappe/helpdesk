@@ -86,6 +86,7 @@ export interface Ticket {
   history: Activity[];
   template: Template;
   views: ViewLog[];
+  time_entries: TimeEntry[];
 }
 
 export interface DocField {
@@ -154,3 +155,10 @@ export type UserInfo = {
   image: string;
   name: string;
 };
+
+export interface TimeEntry {
+  agent: string;
+  description: string;
+  start_time: string;
+  end_time?: string;
+}

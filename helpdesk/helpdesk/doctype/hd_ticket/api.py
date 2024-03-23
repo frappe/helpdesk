@@ -69,6 +69,7 @@ def get_one(name):
 		"tags": get_tags(name),
 		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"views": get_views(name),
+		"timeentries": get_time_entries(name),
 	}
 
 
@@ -136,6 +137,28 @@ def get_comments(ticket: str):
 		c.user = get_user_info_for_avatar(c.commented_by)
 	return comments
 
+def get_time_entries(ticket: str):
+	QBTimeEntry = frappe.qb.DocType("HD Ticket Time Tracking")
+	time_entries = (
+		frappe.qb.from_(QBTimeEntry)
+		.select(
+			QBTimeEntry.name,
+			QBTimeEntry.description,
+			QBTimeEntry.start_time,
+			QBTimeEntry.duration,
+			QBTimeEntry.agent,
+		)
+		.where(QBTimeEntry.ticket_id == ticket)
+		.orderby(QBTimeEntry.start_time, order=Order.asc)
+		.run(as_dict=True)
+	)
+
+	for entry in time_entries:
+		user_info = get_user_info_for_avatar(entry["agent"])
+		entry["user"] = user_info
+		entry["duration_in_minutes"] = math.ceil(entry["duration"] / 60)
+
+	return time_entries
 
 def get_history(ticket: str):
 	if not frappe.has_permission("HD Ticket Activity", "read"):
@@ -205,104 +228,112 @@ def get_attachments(doctype, name):
 
 @frappe.whitelist()
 def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, maximum_duration_reached=False, description=None):
-    if not frappe.session.user or frappe.session.user == "Guest":
-        frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
+	if not frappe.session.user or frappe.session.user == "Guest":
+		frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
 
-    if not ticket_id or not agent or not action:
-        frappe.throw(_("Missing required parameters."))
+	if not ticket_id or not agent or not action:
+		frappe.throw(_("Missing required parameters."))
 
-    time_entry = None
-    if name:
-        time_entry = frappe.get_doc("HD Ticket Time Tracking", name)
-    elif action == 'start':
-        existing_entry = frappe.db.exists("HD Ticket Time Tracking", {"ticket": ticket_id, "status": "Running"})
-        if existing_entry:
-            frappe.throw(_("There is already an active time entry for this ticket."))
+	time_entry = None
+	if name:
+		time_entry = frappe.get_doc("HD Ticket Time Tracking", name)
+	elif action == 'start':
+		existing_entry = frappe.db.exists("HD Ticket Time Tracking", {"ticket": ticket_id, "status": "Running"})
+		if existing_entry:
+			frappe.throw(_("There is already an active time entry for this ticket."))
+		time_entry = frappe.new_doc("HD Ticket Time Tracking")
+		time_entry.parent = ticket_id
+		time_entry.parenttype = 'HD Ticket'
+		time_entry.parentfield = 'time_tracking_table'
+		time_entry.ticket_id = ticket_id
+		time_entry.agent = agent
+		time_entry.start_time = datetime.now()
+		time_entry.status = 'Running'
+		time_entry.duration = 0
+		time_entry.insert()
+	if time_entry:
+		if time_entry.agent != frappe.session.user:
+			frappe.throw(_("You can only modify your own time entries."))
 
-        time_entry = frappe.new_doc("HD Ticket Time Tracking")
-        time_entry.parent = ticket_id
-        time_entry.parenttype = 'HD Ticket'
-        time_entry.parentfield = 'time_tracking_table'
-        time_entry.ticket_id = ticket_id
-        time_entry.agent = agent
-        time_entry.start_time = datetime.now()
-        time_entry.status = 'Running'
-        time_entry.duration = 0
-        time_entry.insert()
-    if time_entry:
-        if time_entry.agent != frappe.session.user:
-            frappe.throw(_("You can only modify your own time entries."))
+		session = None
+		if action == 'start' or action == 'resume':
+			# Create a new session for this time entry
+			session = frappe.new_doc("HD Ticket Time Tracking Session")
+			session.ticket_time_entry = time_entry.name  # Link the session to the time entry
+			session.session_start = datetime.now()
+			session.insert()
+			time_entry.status = 'Running'
 
-        session = None
-        if action == 'start' or action == 'resume':
-            # Create a new session for this time entry
-            session = frappe.new_doc("HD Ticket Time Tracking Session")
-            session.ticket_time_entry = time_entry.name  # Link the session to the time entry
-            session.session_start = datetime.now()
-            session.insert()
-            time_entry.status = 'Running'
-
-        elif action == 'pause' or action == 'complete':
-            # Find the latest session for this time entry and close it
-            latest_session_name = frappe.db.get_value("HD Ticket Time Tracking Session", {"ticket_time_entry": time_entry.name, "session_end": ["is", "null"]}, "name")
-            if latest_session_name:
-                session = frappe.get_doc("HD Ticket Time Tracking Session", latest_session_name)
-                session.session_end = datetime.now()
-                session.save()
-        if action == 'pause':
-            time_entry.status = 'Paused'
-        elif action == 'complete':
-            time_entry.end_time = datetime.now()
-            time_entry.status = 'Completed'
-            time_entry.description = description
-            if maximum_duration_reached:
-                time_entry.maximum_duration_reached = True
+		elif action == 'pause' or action == 'complete':
+			# Find the latest session for this time entry and close it
+			latest_session_name = frappe.db.get_value("HD Ticket Time Tracking Session", {"ticket_time_entry": time_entry.name, "session_end": ["is", "null"]}, "name")
+			if latest_session_name:
+				session = frappe.get_doc("HD Ticket Time Tracking Session", latest_session_name)
+				session.session_end = datetime.now()
+				session.save()
+		if action == 'pause':
+			time_entry.status = 'Paused'
+		elif action == 'complete':
+			time_entry.end_time = datetime.now()
+			time_entry.status = 'Completed'
+			time_entry.description = description
+			if maximum_duration_reached:
+				time_entry.maximum_duration_reached = True
         # Update the total duration for the time entry
-        if session:
-            rounding_increment = frappe.db.get_single_value("HD Settings", "time_entry_rounding")
-            rounding_increment = int(rounding_increment) if rounding_increment and rounding_increment.isdigit() else 60  # Default to 1 minute if not specified or invalid
+		if session:
+			time_entry.save(ignore_permissions=True)
+			time_entry.reload()  # Reload to ensure all linked sessions are considered
+			customer_id = frappe.db.get_value("HD Ticket", ticket_id, "customer")
+			rounding_increment = None
+			# Attempt to fetch the customer-specific rounding increment first
+			if customer_id:
+				customer_rounding_increment = frappe.db.get_value("HD Customer", customer_id, "time_entry_rounding")
+				if customer_rounding_increment is not None:
+					rounding_increment = customer_rounding_increment
+			# Fall back to the default rounding increment from HD Settings
+			if rounding_increment is None:
+				rounding_increment = frappe.db.get_single_value("HD Settings", "time_entry_rounding")
+				rounding_increment = int(rounding_increment) if rounding_increment and str(rounding_increment).isdigit() else 60
 
-            time_entry.save(ignore_permissions=True)
-            time_entry.reload()  # Reload to ensure all linked sessions are considered
-            sessions = frappe.get_all("HD Ticket Time Tracking Session", filters={"ticket_time_entry": time_entry.name}, fields=["session_start", "session_end"])
-            if sessions:
-                total_duration_seconds = sum(
-                    [(frappe.utils.get_datetime(session["session_end"]) - frappe.utils.get_datetime(session["session_start"])).total_seconds() for session in sessions if session["session_end"]],
-                    0
-                )
-                # Calculate rounded duration
-                if rounding_increment > 0:  # To avoid division by zero
-                    # Here, rounding up to the nearest increment
-                    rounded_duration_seconds = math.ceil(total_duration_seconds / rounding_increment) * rounding_increment
-                else:
-                    rounded_duration_seconds = total_duration_seconds  # No rounding if increment is 0 or not set properly
-    
-                time_entry.duration = total_duration_seconds
-                time_entry.rounded_duration = rounded_duration_seconds  # Assuming 'rounded_duration' is the new field name
-            else:
-                time_entry.duration = 0
-                time_entry.rounded_duration = 0
-        time_entry.save(ignore_permissions=True)
-        frappe.db.commit()
+			sessions = frappe.get_all("HD Ticket Time Tracking Session", filters={"ticket_time_entry": time_entry.name}, fields=["session_start", "session_end"])
+			if sessions:
+				total_duration_seconds = sum(
+					[(frappe.utils.get_datetime(session["session_end"]) - frappe.utils.get_datetime(session["session_start"])).total_seconds() for session in sessions if session["session_end"]],
+					0
+				)
+				# Calculate rounded duration
+				if rounding_increment > 0:  # To avoid division by zero
+					# Here, rounding up to the nearest increment
+					rounded_duration_seconds = math.ceil(total_duration_seconds / rounding_increment) * rounding_increment
+					time_entry.rounded_duration = rounded_duration_seconds
+				else:
+					rounded_duration_seconds = total_duration_seconds  # No rounding if increment is 0 or not set properly
+					time_entry.duration = total_duration_seconds
+					time_entry.rounded_duration = rounded_duration_seconds
+			else:
+				time_entry.duration = 0
+				time_entry.rounded_duration = 0
+		time_entry.save(ignore_permissions=True)
+		frappe.db.commit()
 
-    return time_entry.as_dict() if time_entry else {}
+	return time_entry.as_dict() if time_entry else {}
 
 
 @frappe.whitelist()
 def is_time_entry_running(time_entry_id):
-    status = frappe.db.get_value("HD Ticket Time Tracking", time_entry_id, "status")
-    
-    # Assuming "Running" is the only status indicating active time tracking
-    is_active = status == "Running"
-    
-    # Return both the activity state and the specific status
-    return {
-        'is_active': is_active,
-        'status': status
-    }
+	status = frappe.db.get_value("HD Ticket Time Tracking", time_entry_id, "status")
+
+	# Assuming "Running" is the only status indicating active time tracking
+	is_active = status == "Running"
+
+	# Return both the activity state and the specific status
+	return {
+		'is_active': is_active,
+		'status': status
+	}
 
 
 @frappe.whitelist()
 def get_time_entries_for_ticket(ticket_id):
-    time_entries = frappe.get_all("HD Ticket Time Tracking", filters={"parent": ticket_id}, fields=["*"])
-    return time_entries
+	time_entries = frappe.get_all("HD Ticket Time Tracking", filters={"parent": ticket_id}, fields=["*"], order_by="start_time")
+	return time_entries

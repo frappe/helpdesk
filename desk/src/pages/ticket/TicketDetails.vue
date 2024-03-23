@@ -304,7 +304,6 @@ const unwatch = watch(data, () => {
 
 let beforeUnloadHandlerAdded = false;
 let enableTimeTracking = ref(false);
-let roundingInterval = ref(null);
 
 onMounted(() => {
   fetchTimeSettings().then(() => {
@@ -331,7 +330,13 @@ watch(timerState, (newValue) => {
 
 async function fetchTimeSettings() {
     try {
-        const response = await fetch("/api/method/helpdesk.helpdesk.doctype.hd_settings.hd_settings.get_timetracking_settings", {
+        const customer = ticket.data.customer;
+        const url = new URL("/api/method/helpdesk.helpdesk.doctype.hd_settings.hd_settings.get_timetracking_settings", window.location.origin);
+        if (customer) {
+            // Append customer_id as a query parameter if it exists
+            url.searchParams.append('customer', customer);
+        }
+        const response = await fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -343,7 +348,6 @@ async function fetchTimeSettings() {
             const data = await response.json();
             if(data.message) {
               enableTimeTracking.value = data.message.enableTimeTracking;
-              roundingInterval.value = data.message.roundingInterval;
               maxDuration.value = data.message.maxDuration;
             }
         }
@@ -543,6 +547,7 @@ async function completeTimer(maxDurationReached = false, isRestoration = false, 
       description: description,
     });
     elapsed.value = 0;
+    emitter.emit("update:ticket");
   } catch (error) {
     console.error("Failed to complete time entry:", error);
   }
@@ -607,7 +612,6 @@ function getUserIdFromCookies() {
       userId = decodeURIComponent(value);
     }
   });
-
   return userId;
 }
 

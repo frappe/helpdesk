@@ -51,13 +51,11 @@ import TicketContact from "./TicketContact.vue";
 import TicketDetails from "./TicketDetails.vue";
 import TicketHistory from "./TicketHistory.vue";
 import TicketViews from "./TicketViews.vue";
-import TicketTimeTracking from "./TicketTimeTracking.vue";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideHistory from "~icons/lucide/history";
 import LucideInfo from "~icons/lucide/info";
 import LucidePointer from "~icons/lucide/pointer";
 import LucideView from "~icons/lucide/view";
-import LucideTimer from "~icons/lucide/timer";
 
 const isExpanded = ref(true);
 const items = [
@@ -85,11 +83,6 @@ const items = [
     name: "Views",
     component: TicketViews,
     icon: LucideView,
-  },
-  {
-    name: "Time Tracking",
-    component: TicketTimeTracking,
-    icon: LucideTimer,
   },
 ];
 </script>
