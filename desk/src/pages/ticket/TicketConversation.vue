@@ -68,7 +68,7 @@ const timeEntries = computed(() => {
     duration: entry.duration_in_minutes,
   }));
 });
-console.log(timeEntries);
+
 const conversation = computed(() =>
   orderBy([...communications.value, ...comments.value, ...timeEntries.value], (c) =>
     dayjs(c.creation)
