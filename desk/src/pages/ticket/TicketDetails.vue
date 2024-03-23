@@ -342,10 +342,9 @@ async function fetchTimeSettings() {
         if (response.ok) {
             const data = await response.json();
             if(data.message) {
-              console.log(data.message.enableTimeTracking+' - '+data.message.roundingInterval+' - '+data.message.maxDuration)
-                enableTimeTracking.value = data.message.enableTimeTracking;
-                roundingInterval.value = data.message.roundingInterval;
-                maxDuration.value = data.message.maxDuration;
+              enableTimeTracking.value = data.message.enableTimeTracking;
+              roundingInterval.value = data.message.roundingInterval;
+              maxDuration.value = data.message.maxDuration;
             }
         }
     } catch (error) {
@@ -376,7 +375,7 @@ function update(fieldname: string, value: string) {
 }
 
 function setupBeforeUnloadHandler() {
-  const handleBeforeUnload = (event) => {
+  const handleBeforeUnload = (_event) => {
     if (timerState.value !== "idle") {
       storeTimerState(
         data.value.name,
@@ -446,7 +445,7 @@ async function pauseTimer() {
     clearInterval(timerInterval.value);
     storeTimerState();
     try {
-      const response = await createOrUpdateTimeEntry({
+      await createOrUpdateTimeEntry({
         ticket_id: data.value.name,
         agent: userId,
         name: currentEntryId.value,
@@ -470,7 +469,6 @@ async function resumeTimer() {
       timerState.value = "running";
       setupInterval(); // Restart the interval
       storeTimerState(); // Update the stored state to reflect the resume
-      console.log('Elapsed time: '+ elapsed.value)
       maxDurationNotified.value = false;
       try {
         const response = await createOrUpdateTimeEntry({
@@ -535,7 +533,7 @@ async function completeTimer(maxDurationReached = false, isRestoration = false, 
   clearTimerState();
   maxDurationNotified.value = false;
   try {
-    const response = await createOrUpdateTimeEntry({
+    await createOrUpdateTimeEntry({
       ticket_id: data.value.name,
       agent: userId,
       name: currentEntryId.value,
@@ -636,11 +634,7 @@ async function initializeTimer() {
 
   if (storedTimer && storedTimer.ticketId === data.value.name) {
     const isActive = await isTimeEntryActive(storedTimer.timeEntryId);
-    if (
-      isActive.is_active ||
-      storedTimer.timerState === "running" ||
-      storedTimer.timerState === "paused"
-    ) {
+    if (isActive.is_active || storedTimer.timerState === "running" || storedTimer.timerState === "paused") {
       timerState.value = storedTimer.timerState.toLowerCase();
       currentEntryId.value = storedTimer.timeEntryId;
       startTime.value = storedTimer.startTime

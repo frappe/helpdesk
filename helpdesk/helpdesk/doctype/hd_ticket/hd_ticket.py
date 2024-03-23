@@ -178,7 +178,6 @@ class HDTicket(Document):
 	def validate(self):
 		self.validate_feedback()
 		self.validate_ticket_type()
-		#self.sort_time_tracking()
 
 	def before_save(self):
 		self.apply_sla()
@@ -814,13 +813,6 @@ class HDTicket(Document):
 			"_assign"
 		]
 		return {'columns': columns, 'rows': rows}
-	
-
-	#def sort_time_tracking(self):
-		# Iterate through each item in the sorted list of time-tracking items based on start_time attribute
-	#	for i, item in enumerate(sorted(self._range, key=lambda item: item.start_time), start=1):
-			# Assign a new index to the item, starting from 1
-	#		item.idx = i
 
 
 
