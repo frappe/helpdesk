@@ -2,7 +2,7 @@
   <div class="my-4 rounded border bg-gray-50 p-4">
     <div class="mb-4 flex items-center justify-between">
       <div class="flex items-center gap-0.5 text-base">
-        <UserAvatar v-bind="user.name" size="lg" expand strong />
+        <UserAvatar v-bind="user" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dayjs(date).long()">
           <div class="text-gray-600">
