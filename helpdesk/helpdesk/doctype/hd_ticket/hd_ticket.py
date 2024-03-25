@@ -448,22 +448,23 @@ class HDTicket(Document):
 		c.is_pinned = False
 		c.reference_ticket = self.name
 		c.save()
-
+		
 	@frappe.whitelist()
 	def reply_via_agent(
-		self, message: str, cc: str = None, bcc: str = None, attachments: List[str] = []
+		self, message: str, recipient: str = None, cc: str = None, bcc: str = None, attachments: List[str] = []
 	):
 		skip_email_workflow = self.skip_email_workflow()
 		medium = "" if skip_email_workflow else "Email"
 		subject = f"Re: {self.subject} (#{self.name})"
 		sender = frappe.session.user
-		recipients = self.raised_by
+		recipients = self.raised_by if recipient == None else recipient
 		sender_email = None if skip_email_workflow else self.sender_email()
 		last_communication = self.get_last_communication()
 
-		if last_communication:
-			cc = cc or last_communication.cc
-			bcc = bcc or last_communication.bcc
+		if cc == None:
+			if last_communication:
+				cc = last_communication.cc
+				bcc =  bcc or last_communication.bcc
 
 		if recipients == "Administrator":
 			admin_email = frappe.get_value("User", "Administrator", "email")
