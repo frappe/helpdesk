@@ -102,6 +102,33 @@
                       "
                     />
                 </div>
+                <div v-if="showCc">
+                  <span class="inline-flex flex-wrap items-center gap-1">
+                    <span class="mr-2 text-xs text-gray-500">CC:</span>
+                    <Button
+                      v-for="i in cc.split(',').filter(Boolean)"
+                      :key="i"
+                      :label="i"
+                      @click="
+                        () =>
+                          (cc = cc
+                            .split(',')
+                            .filter((s) => s !== i)
+                            .join(','))
+                      "
+                    />
+                    <FormControl
+                      type="text"
+                      placeholder="hello@example.com"
+                      @keyup.prevent.enter="
+                        (event) => {
+                          cc = [...cc.split(','), event.target.value].join(',');
+                          event.target.value = '';
+                        }
+                      "
+                    />
+                  </span>
+                </div>
                 <div v-if="showBcc">
                   <span class="inline-flex flex-wrap items-center gap-1">
                     <span class="mr-2 text-xs text-gray-500">BCC:</span>
