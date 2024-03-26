@@ -109,7 +109,7 @@
       <span>
         <div
           v-if="data.status !== 'Closed' && data.status !== 'Resolved' && enableTimeTracking"
-          class="mx-5 my-6 flex flex-col justify-between gap-3.5 text-base"
+          class="mx-5 my-6 flex flex-col justify-between text-base"
         >
           <div class="space-y-1.5">
             <span class="mr-2 font-medium text-gray-900">
@@ -129,28 +129,30 @@
             />
             <Badge v-else label="Idle" theme="green" variant="outline" />
           </div>
-          <TabGroup horizontal>
-            <TabList>
-              <tab v-for="item in timeritems" :key="item.name">
-                <Tooltip
-                  v-if="timerState === item.state"
-                  :text="item.name"
-                  placement="left"
-                >
-                  <div
-                    class="justify-left flex h-7 w-7 items-center rounded-full text-gray-900 transition-all"
-                    :class="{
-                      shadow: isExpanded && selected,
-                      'bg-gray-50': isExpanded && selected,
-                    }"
-                    @click="item.click"
+          <div class="space-y-1.5">
+            <TabGroup horizontal>
+              <TabList>
+                <tab v-for="item in timeritems" :key="item.name">
+                  <Tooltip
+                    v-if="timerState === item.state"
+                    :text="item.name"
+                    placement="left"
                   >
-                    <component :is="item.icon" class="h-4 w-4" />
-                  </div>
-                </Tooltip>
-              </tab>
-            </TabList>
-          </TabGroup>
+                    <div
+                      class="justify-left flex h-7 w-7 items-center rounded-full text-gray-900 transition-all"
+                      :class="{
+                        shadow: isExpanded && selected,
+                        'bg-gray-50': isExpanded && selected,
+                      }"
+                      @click="item.click"
+                    >
+                      <component :is="item.icon" class="h-4 w-4" />
+                    </div>
+                  </Tooltip>
+                </tab>
+              </TabList>
+            </TabGroup>
+          </div>
           <div
             v-if="timerState === 'running' || timerState === 'paused'"
             class="space-y-1.5"
