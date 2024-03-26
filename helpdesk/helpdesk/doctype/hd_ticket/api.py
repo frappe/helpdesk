@@ -257,40 +257,40 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 
 		session = None
 		if action == 'start' or action == 'resume':
-			# Create a new session for this time entry
 			session = frappe.new_doc("HD Ticket Time Tracking Session")
-			session.ticket_time_entry = time_entry.name  # Link the session to the time entry
+			session.ticket_time_entry = time_entry.name
 			session.session_start = datetime.now()
 			session.insert()
 			time_entry.status = 'Running'
 
 		elif action == 'pause' or action == 'complete':
-			# Find the latest session for this time entry and close it
 			latest_session_name = frappe.db.get_value("HD Ticket Time Tracking Session", {"ticket_time_entry": time_entry.name, "session_end": ["is", "null"]}, "name")
 			if latest_session_name:
 				session = frappe.get_doc("HD Ticket Time Tracking Session", latest_session_name)
 				session.session_end = datetime.now()
 				session.save()
+
 		if action == 'pause':
 			time_entry.status = 'Paused'
+
 		elif action == 'complete':
 			time_entry.end_time = datetime.now()
 			time_entry.status = 'Completed'
 			time_entry.description = description
 			if maximum_duration_reached:
 				time_entry.maximum_duration_reached = True
-        # Update the total duration for the time entry
+
 		if session:
 			time_entry.save(ignore_permissions=True)
-			time_entry.reload()  # Reload to ensure all linked sessions are considered
+			time_entry.reload()
 			customer_id = frappe.db.get_value("HD Ticket", ticket_id, "customer")
 			rounding_increment = None
-			# Attempt to fetch the customer-specific rounding increment first
+
 			if customer_id:
 				customer_rounding_increment = frappe.db.get_value("HD Customer", customer_id, "time_entry_rounding")
 				if customer_rounding_increment is not None:
 					rounding_increment = customer_rounding_increment
-			# Fall back to the default rounding increment from HD Settings
+
 			if rounding_increment is None:
 				rounding_increment = frappe.db.get_single_value("HD Settings", "time_entry_rounding")
 				rounding_increment = int(rounding_increment) if rounding_increment and str(rounding_increment).isdigit() else 60
@@ -301,13 +301,12 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 					[(frappe.utils.get_datetime(session["session_end"]) - frappe.utils.get_datetime(session["session_start"])).total_seconds() for session in sessions if session["session_end"]],
 					0
 				)
-				# Calculate rounded duration
-				if rounding_increment > 0:  # To avoid division by zero
-					# Here, rounding up to the nearest increment
+
+				if rounding_increment > 0:
 					rounded_duration_seconds = math.ceil(total_duration_seconds / rounding_increment) * rounding_increment
 					time_entry.rounded_duration = rounded_duration_seconds
 				else:
-					rounded_duration_seconds = total_duration_seconds  # No rounding if increment is 0 or not set properly
+					rounded_duration_seconds = total_duration_seconds
 					time_entry.duration = total_duration_seconds
 					time_entry.rounded_duration = rounded_duration_seconds
 			else:
@@ -322,11 +321,8 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 @frappe.whitelist()
 def is_time_entry_running(time_entry_id):
 	status = frappe.db.get_value("HD Ticket Time Tracking", time_entry_id, "status")
-
-	# Assuming "Running" is the only status indicating active time tracking
 	is_active = status == "Running"
 
-	# Return both the activity state and the specific status
 	return {
 		'is_active': is_active,
 		'status': status
