@@ -6,4 +6,11 @@ from frappe.model.document import Document
 
 
 class HDCustomer(Document):
-	pass
+	
+	def before_save(self):
+		if self.time_entry_maxduration == '':
+			self.time_entry_maxduration = None
+
+		if self.time_entry_rounding == '':
+			self.time_entry_rounding = None
+

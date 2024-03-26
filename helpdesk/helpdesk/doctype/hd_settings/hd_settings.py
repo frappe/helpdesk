@@ -53,6 +53,17 @@ class HDSettings(Document):
 		room = get_website_room()
 
 		frappe.publish_realtime(event, room=room, after_commit=True)
+	
+
+	def before_save(self):
+		if self.time_entry_maxduration == '':
+			self.time_entry_maxduration = None
+
+		if self.time_entry_rounding == '':
+			self.time_entry_rounding = None
+
+		if self.paused_duration_threshold == '':
+			self.paused_duration_threshold = None
 
 
 @frappe.whitelist()
