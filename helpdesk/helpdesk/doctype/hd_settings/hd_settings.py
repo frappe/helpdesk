@@ -59,10 +59,10 @@ class HDSettings(Document):
 def get_timetracking_settings(customer=None):
 	settings = frappe.get_single("HD Settings")
 	enable_time_tracking = settings.enable_time_tracking
-	max_duration = settings.tt_maxduration
+	max_duration = settings.time_entry_maxduration
 	# Check if a customer is provided and if specific settings exist for this customer
 	if customer:
-		customer_settings = frappe.db.get_value("HD Customer", customer, "tt_maxduration")
+		customer_settings = frappe.db.get_value("HD Customer", customer, "time_entry_maxduration")
 		if customer_settings:
 			max_duration = customer_settings  # Override max_duration with customer-specific settings
 
