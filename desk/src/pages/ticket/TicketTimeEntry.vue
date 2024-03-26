@@ -10,12 +10,12 @@
           </div>
         </Tooltip>
         <Icon icon="lucide:dot" class="text-gray-500" />
-          <div class="text-gray-600">
-            Duration: {{ duration }} minutes
-          </div>
+        <div class="text-gray-600">Duration: {{ duration }} minutes</div>
       </div>
-      <div class="flex items-center gap-1">
-        <Badge label="Time Entry" theme="blue" variant="outline" />
+      <div class="flex items-center gap-1.5 px-2">
+        <div style="min-width: max-content">
+          <Badge label="Time Entry" theme="blue" variant="outline" />
+        </div>
         <component :is="LucideTimer" class="h-4 w-4" />
       </div>
     </div>
@@ -42,5 +42,4 @@ interface P {
 
 const props = defineProps<P>();
 const { content, creation, duration, user } = toRefs(props);
-
 </script>
