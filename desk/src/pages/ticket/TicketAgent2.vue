@@ -352,21 +352,33 @@ usePageMeta(() => {
 
 function fetchDefaultRecipient() {
   return new Promise((resolve, reject) => {
-    var communication_det = "";
+    var fetch_recipient_tag = "";
     const recipient_list = [];
     
     watchEffect(() => {
-      const data = ticket.data?.communications;
-      if (data != undefined) {
+      const details = ticket.data?.communications;
+      if (details != undefined) {
+        // console.log(details);
         
-        const item = JSON.parse(JSON.stringify(data));
+        const item = JSON.parse(JSON.stringify(details));
         item.forEach(d => {
-          communication_det += d.recipients;
+          fetch_recipient_tag += d.recipients;
+          recipient_list.push(d.sender);
         });
+        var include_regular_expression = false
         const re = /[^< ]+(?=>)/g;
-        communication_det.match(re).forEach(function(email) {
-          recipient_list.push(email);
+        const matchedEmails = fetch_recipient_tag.match(re) || []; // Handle case when there are no matches
+        matchedEmails.forEach(function(email) {
+            recipient_list.push(email);
         });
+        
+        if (include_regular_expression){
+          item.forEach(d => {
+            if (!recipient_list.includes(d.recipients)){
+              recipient_list.push(d.recipients);
+            }
+        });
+        }
         const uniqueCcList = [...new Set(recipient_list)];
         resolve(uniqueCcList);
       }
