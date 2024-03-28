@@ -72,10 +72,35 @@
             </template>
             <template v-if="mode == Mode.Response" #top-bottom>
               <div class="my-2.5 space-y-2 border-y py-2">
-                <div>
-                  <span class="mr-3 text-xs text-gray-500">TO:</span>
-                  <Button :label="ticket.data.raised_by" />
-                </div>
+                <div class="inline-flex flex-wrap items-center gap-1">
+                  <span class="mr-2 text-xs text-gray-500">TO:</span>
+                  <!-- <Button :label="ticket.data.raised_by" /> -->
+                  <Button
+                      v-for="i in recipient.split(',').filter(Boolean)"
+                      :key="i"
+                      :label="i"
+                      @click="
+                        () =>
+                          (recipient = recipient
+                            .split(',')
+                            .filter((s) => s !== i)
+                            .join(','))
+                      "
+                    />
+                  <FormControl
+                      type="text"
+                      placeholder="hello@example.com"
+                      @keyup.prevent.enter="
+                        (event) => {
+                          recipient = [...recipient.split(','), event.target.value].join(
+                            ','
+                          );
+                          event.target.value = '';
+
+                        }
+                        
+                      "
+                    />
                 <div v-if="showCc">
                   <span class="inline-flex flex-wrap items-center gap-1">
                     <span class="mr-2 text-xs text-gray-500">CC:</span>
@@ -177,7 +202,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, provide, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, provide, ref, watchEffect } from "vue";
 import {
   createResource,
   usePageMeta,
@@ -224,6 +249,7 @@ const placeholder = "Compose a comment / reply";
 const content = ref("");
 const attachments = ref([]);
 const isExpanded = ref(false);
+const recipient = ref("");
 const cc = ref("");
 const bcc = ref("");
 const showCc = ref(false);
@@ -273,6 +299,7 @@ const response = createResource({
       attachments: attachments.value.map((x) => x.name),
       cc: cc.value,
       bcc: bcc.value,
+      recipient: recipient.value,
       message: content.value,
     },
   }),
@@ -321,4 +348,66 @@ usePageMeta(() => {
     title: ticket.data?.subject,
   };
 });
+
+function fetchDefaultRecipient() {
+  return new Promise((resolve, reject) => {
+    var communication_det = "";
+    const recipient_list = [];
+    
+    watchEffect(() => {
+      const data = ticket.data?.communications;
+      if (data != undefined) {
+        
+        const item = JSON.parse(JSON.stringify(data));
+        item.forEach(d => {
+          communication_det += d.recipients;
+        });
+        const re = /[^< ]+(?=>)/g;
+        communication_det.match(re).forEach(function(email) {
+          recipient_list.push(email);
+        });
+        const uniqueCcList = [...new Set(recipient_list)];
+        resolve(uniqueCcList);
+      }
+    });
+  });
+}
+
+function fetchDefaultcc() {
+  return new Promise((resolve, reject) => {
+    var communication_det = "";
+    const cc_list = [];
+    
+    watchEffect(() => {
+      const data = ticket.data?.communications;
+      if (data != undefined) {
+        
+        const item = JSON.parse(JSON.stringify(data));
+        item.forEach(d => {
+          communication_det += d.cc;
+        });
+        const re = /[^< ]+(?=>)/g;
+        communication_det.match(re).forEach(function(email) {
+          cc_list.push(email);
+        });
+        const uniqueCcList = [...new Set(cc_list)];
+        resolve(uniqueCcList);
+      }
+    });
+  });
+}
+
+onMounted(async () => {
+  try {
+    const recipient_ = await fetchDefaultRecipient() as string[]; // Type assertion
+    recipient.value = recipient_.join(',');
+    const ccList = await fetchDefaultcc() as string[]; // Type assertion
+    cc.value = ccList.join(',');
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+
 </script>
