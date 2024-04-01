@@ -8,10 +8,11 @@
             <input
               type="text"
               id="duration"
-              @blur="validateTime"
               v-model="formattedInput"
               maxlength="8"
               class="border-gray-400 placeholder-gray-500 form-input block w-half"
+              @input="handleTimeInput($event.target.value)"
+              @blur="validateTime(formattedInput)"
             />
           </div>
           <ErrorMessage :message="validationError" />
@@ -43,75 +44,72 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, computed } from "vue";
+import { ref, defineEmits } from "vue";
 import { Dialog, ErrorMessage } from "frappe-ui";
 
-const props = defineProps({
-  elapsedTimeInitial: String
-});
 const emit = defineEmits(["submit"]);
 const isVisible = ref(false);
 const description = ref("");
 const error = ref("");
-const rawInput = ref(props.elapsedTimeInitial);
 const validationError = ref('');
+const formattedInput = ref('');
+let originalElapsedTime;
 
-const showDialog = () => {
+function showDialog(elapsedTime) {
+  formattedInput.value = originalElapsedTime = convertMsToTime(elapsedTime);
   isVisible.value = true;
 };
 
-// Function to update elapsed time initial directly
-const updateElapsedTimeInitial = (newElapsedTime) => {
-  rawInput.value = newElapsedTime;
-  console.log("Updated elapsed time initial to:", newElapsedTime);
+// Convert milliseconds to HH:MM:SS format
+const convertMsToTime = (ms) => {
+  let seconds = Math.floor((ms / 1000) % 60),
+      minutes = Math.floor((ms / (1000 * 60)) % 60),
+      hours = Math.floor((ms / (1000 * 60 * 60)));
+  
+  seconds = String(seconds).padStart(2, '0');
+  minutes = String(minutes).padStart(2, '0');
+  hours = String(hours).padStart(2, '0');
+  
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+// Convert HH:MM:SS format back to milliseconds
+const convertTimeToMs = (time) => {
+  const [hours, minutes, seconds] = time.split(":").map(Number);
+  return ((hours * 3600) + (minutes * 60) + seconds) * 1000;
 };
 
 function submitdialog() {
-  console.log('rawInput.value is: '+rawInput.value)
-  emit("submit", { description: description.value, elapsedtime: rawInput.value });
-  description.value = ""; // Reset description after submit
-  isVisible.value = false;
-}
-
-const formattedInput = computed({
-  get() {
-    return rawInput.value;
-  },
-  set(value) {
-    const numbers = value.replace(/\D/g, ''); // Remove all non-digit characters
-    let formatted = '';
-
-    if (numbers.length <= 2) {
-      // Up to two digits: directly use them as hours
-      formatted = numbers;
-    } else if (numbers.length <= 4) {
-      // More than two digits, but less than or equal to four digits: insert a colon between hours and minutes
-      formatted = numbers.slice(0, 2) + ':' + numbers.slice(2, 4);
-    } else {
-      // More than four digits: insert colons between hours, minutes, and seconds
-      formatted = numbers.slice(0, 2) + ':' + numbers.slice(2, 4) + ':' + numbers.slice(4, 6);
-    }
-
-    // Update the rawInput value with the formatted string
-    rawInput.value = formatted;
+  if (validateTime(formattedInput.value)) {
+    const finalElapsedTimeMs = convertTimeToMs(formattedInput.value);
+    const hasOverride = formattedInput.value !== originalElapsedTime;
+    emit("submit", {
+      description: description.value,
+      elapsedtime: finalElapsedTimeMs,
+      override_duration: hasOverride ? finalElapsedTimeMs : undefined // Only send override if there's a change
+    });
+    description.value = ""; // Reset description after submit
+    isVisible.value = false;
   }
-});
+};
 
-function validateTime() {
-  console.log('formattedInput is: '+formattedInput.value)
+function validateTime(time) {
   const regex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/;
-  if (regex.test(formattedInput.value)) {
-    validationError.value = '';
-    // Proceed with submitting or processing the valid time
-    // For example, convert to milliseconds or any other operation
-  } else {
-    validationError.value = 'Please enter a valid time in HH:MM:SS format.';
-    // Handle invalid time format
-  }
-}
+  validationError.value = regex.test(time) ? '' : 'Please enter a valid time in HH:MM:SS format.';
+  return regex.test(time);
+};
+
+const handleTimeInput = (value) => {
+  formattedInput.value = formatTimeInput(value);
+};
+
+const formatTimeInput = (time) => {
+  const formattedTime = time.replace(/\D/g, '').replace(/(\d{2})(?=\d)/g, '$1:');
+  return formattedTime.substring(0, 8);
+};
 
 // Expose showDialog method to be called from parent
-defineExpose({ showDialog, updateElapsedTimeInitial });
+defineExpose({ showDialog });
 </script>
 
 <style>

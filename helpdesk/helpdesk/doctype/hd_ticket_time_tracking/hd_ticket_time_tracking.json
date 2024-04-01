@@ -8,13 +8,16 @@
  "field_order": [
   "ticket_id",
   "agent",
-  "status",
   "column_break_ykzd",
+  "status",
+  "section_break_aoqs",
   "start_time",
   "end_time",
+  "column_break_tctm",
   "duration",
   "rounded_duration",
   "maximum_duration_reached",
+  "duration_override_by_user",
   "section_break_utox",
   "description",
   "billing_section",
@@ -27,26 +30,30 @@
    "fieldname": "ticket_id",
    "fieldtype": "Link",
    "label": "Ticket ID",
-   "options": "HD Ticket"
+   "options": "HD Ticket",
+   "read_only": 1
   },
   {
    "fieldname": "agent",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Agent",
-   "options": "HD Agent"
+   "options": "HD Agent",
+   "read_only": 1
   },
   {
    "fieldname": "start_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Start Time"
+   "label": "Start Time",
+   "read_only": 1
   },
   {
    "fieldname": "end_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "End Time"
+   "label": "End Time",
+   "read_only": 1
   },
   {
    "fieldname": "duration",
@@ -60,7 +67,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "\nRunning\nPaused\nCompleted"
+   "options": "\nRunning\nPaused\nCompleted",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -111,12 +119,27 @@
    "fieldtype": "Check",
    "label": "Maximum Duration Reached",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_aoqs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_tctm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "duration_override_by_user",
+   "fieldtype": "Check",
+   "label": "Duration Override by User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-03-22 20:40:34.951792",
+ "modified": "2024-04-01 15:50:08.321719",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Tracking",

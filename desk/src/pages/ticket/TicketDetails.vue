@@ -192,7 +192,7 @@
       />
     </div>
   </div>
-  <TimeEntryDialog :elapsed-time-initial="overrideElapsedTimeState" ref="timeEntryDialog" @submit="handleDialogClose" />
+  <TimeEntryDialog :elapsed-time-initial="elapsed.value" ref="timeEntryDialog" @submit="handleDialogClose" />
 </template>
 
 <script setup lang="ts">
@@ -228,10 +228,6 @@ const maxDurationNotified = ref(false);
 const activeTimerStartTime = ref<number | null>(null);
 const finalElapsedBeforeDialog = ref(0);
 const maxDurationReached = ref(false); 
-const readableElapsedTime = computed(() => {
-  return formatElapsedTime(elapsed.value);
-});
-const overrideElapsedTimeState = ref(0);
 
 const options = computed(() => [
   {
@@ -331,7 +327,6 @@ watch(timerState, (newValue) => {
 });
 
 async function fetchTimeSettings() {
-  console.log('fetchTimeSettings started')
   try {
       const customer = ticket.data.customer;
       const url = new URL("/api/method/helpdesk.helpdesk.doctype.hd_settings.hd_settings.get_timetracking_settings", window.location.origin);
@@ -351,7 +346,6 @@ async function fetchTimeSettings() {
           if(data.message) {
             enableTimeTracking.value = data.message.enableTimeTracking;
             maxDuration.value = data.message.maxDuration;
-            console.log('Time tracking settings returned are - Enable Time Tracking: '+enableTimeTracking.value+' and maxDuration: '+maxDuration.value)
           }
       }
   } catch (error) {
@@ -383,7 +377,6 @@ function update(fieldname, value) {
 }
 
 function setupBeforeUnloadHandler() {
-  console.log('setupBeforeUnloadHandler started')
   const handleBeforeUnload = (_event) => {
     if (timerState.value !== "idle") {
       storeTimerState(
@@ -418,28 +411,23 @@ async function resumeTimer() {
   manageTimer("resume").catch(console.error);
 }
 
-async function completeTimer(description, overrideDuration = null) {
-  console.log('completeTimer: '+description+ ' / '+overrideDuration)
-  await manageTimer("complete", { description, overrideDuration });
+async function completeTimer(payload) {
+  const { description, elapsedtime, override_duration } = payload;
+  await manageTimer("complete", { description, elapsedtime, override_duration });
 }
 
-async function manageTimer(action, { description = "", overrideDuration = null } = {}) {
-  console.log('manageTimer - 1: '+description+ ' / '+overrideDuration)
+async function manageTimer(action, { description = "", elapsedtime = null, override_duration = null } = {}) {
   try {
     switch (action) {
       case "start":
         if (timerState.value === "idle") {
-          console.log('currentEntryId.value is: '+currentEntryId.value);
           currentEntryId.value = null;
-          console.log('currentEntryId.value is: '+currentEntryId.value);
           startTime.value = Date.now();
           elapsed.value = 0;
           timerState.value = "running";
           setupInterval();
           storeTimerState();
         }
-        console.log('hit - start - end');
-        
         break;
       case "resume":
         if (timerState.value === "paused") {
@@ -460,37 +448,28 @@ async function manageTimer(action, { description = "", overrideDuration = null }
         break;
       case "complete":
         if (timerState.value !== "idle") {
-          console.log('manageTimer - 2');
-          console.log('manageTimer - 3: '+timerState.value);
-          console.log(getStoredTimerState());
           clearInterval(timerInterval.value);
           timerState.value = "idle";
-          //console.log('hit - complete - '+data.value.name+' - '+action+' - '+userId+' - '+currentEntryId.value+' - '+elapsed.value+' - '+description+' - '+maxDurationReached.value+' - '+overrideDuration);
-          console.log('about to hit payloadData!')
           let payloadData = {
             ticketId: data.value.name,
             agent: userId,
             name: currentEntryId.value,
-            duration: elapsed.value,
+            duration: elapsedtime,
             description: description,
             maximum_duration_reached: maxDurationReached.value,
           };
           
-          if (overrideDuration !== null) {
-            payloadData.override_duration = overrideDuration;
-            console.log('Including override duration in the payload:', overrideDuration);
+          if (override_duration !== null) {
+            payloadData.override_duration = override_duration;
           }
-          console.log('payloadData is: '+payloadData)
           await debouncedCreateOrUpdateTimeEntry(action, payloadData);
           resetTimerState();
           emitter.emit("update:ticket");
         }
         return; // Early return to prevent duplicate backend call for 'complete'
     }
-    console.log('hit - pre-end');
 
     if (action !== "complete") {
-      console.log('hit - !complete - '+action+' - '+data.value.name+' - '+userId+' - '+currentEntryId.value+' - '+elapsed.value+' - '+maxDurationReached.value);
       let payloadData = {
         ticketId: data.value.name,
         agent: userId,
@@ -515,9 +494,6 @@ async function manageTimer(action, { description = "", overrideDuration = null }
 
 async function recordtimeentry(maxDurationReached) {
   pauseTimer();
-  console.log('maxDurationReached is: '+maxDurationReached)
-  console.log('maxDurationReached.value is: '+maxDurationReached.value)
-  const newElapsedTime = readableElapsedTime.value;
   if (maxDurationReached.value) {
     createToast({
       title: "Max Duration Reached",
@@ -526,38 +502,16 @@ async function recordtimeentry(maxDurationReached) {
     });
   }
   // For manual completion, show the dialog without max duration reached warning
-  console.log('recordtimeentry triggered without max duration reached');
-  console.log('readableElapsedTime is: '+readableElapsedTime.value)
-  console.log('elapsed.value is: '+elapsed.value)
-  timeEntryDialog.value.updateElapsedTimeInitial(newElapsedTime);
-  timeEntryDialog.value.showDialog();
+  timeEntryDialog.value.showDialog(elapsed.value);
 }
 
 async function handleDialogClose(payload) {
-  console.log('Existing elapsed.value time is: '+elapsed.value);
-  console.log('Existing description.value time is: '+payload.description);
-  const payloadelapsedtimeMs = parseElapsedTime(payload.elapsedtime);
-  let isOverride = false;
-  if (payloadelapsedtimeMs !== elapsed.value) {
-    console.log('Override detected');
-    isOverride = true;
-  }
-
-  if (isOverride) {
-    elapsed.value = payloadelapsedtimeMs;
-    console.log('New updated time is:', elapsed.value);
-  } else {
-        console.log('No override; using existing elapsed time');
-    }
-  await completeTimer(payload.description, isOverride ? payloadelapsedtimeMs : null);
+  await completeTimer(payload);
   maxDurationNotified.value = false;
   finalElapsedBeforeDialog.value = 0;
 }
 
 async function createOrUpdateTimeEntry(action, data) {
-  console.log('createOrUpdateTimeEntry - action: '+action);
-  console.log('createOrUpdateTimeEntry - data: ', JSON.stringify(data));
-  console.log('currentEntryId.value is: '+currentEntryId.value)
   const apiEndpoint = "/api/method/helpdesk.helpdesk.doctype.hd_ticket.api.create_or_update_time_entry";
   const payload = {
     ticket_id: data.ticketId,
@@ -567,6 +521,7 @@ async function createOrUpdateTimeEntry(action, data) {
     name: currentEntryId.value || null,
     maximum_duration_reached: maxDurationReached.value,
     description: data.description || "",
+    override_duration: data.override_duration || null
   };
   
   try {
@@ -583,11 +538,9 @@ async function createOrUpdateTimeEntry(action, data) {
       }
 
       const responseData = await response.json();
-      console.log('Returned data is: '+JSON.stringify(responseData.message))
       if (responseData.message && responseData.message.name) {
           currentEntryId.value = responseData.message.name;
       }
-      console.log('currentEntryId.value is: '+currentEntryId.value)
       return responseData;
   } catch (error) {
         console.error("Error creating or updating time entry:", error);
@@ -618,19 +571,12 @@ function setupInterval() {
 // This example assumes maxDurationReached is a ref and maxDurationNotified prevents repetitive notifications
 function checkAndHandleMaxDuration() {
   if (maxDuration.value === null) {
-    console.log('maxDuration is not set. Exiting checkAndHandleMaxDuration.');
     return;
   }
   const now = Date.now();
   const newElapsed = elapsed.value + (now - (startTime.value || now)); // Safeguard against null startTime
-  console.log('maxDurationReached 1: '+maxDurationReached)
-  console.log('maxDurationReached 2: '+maxDurationReached.value)
-  console.log('newElapsed: '+newElapsed)
-  console.log('maxDuration.value is: '+maxDuration.value)
-  console.log('maxDuration is: '+maxDuration)
   
   if (newElapsed >= maxDuration.value && !maxDurationReached.value) {
-    console.log('hit newElapse greater')
     maxDurationReached.value = true;
     maxDurationNotified.value = true;
     // Open dialog if max duration reached
@@ -676,7 +622,6 @@ function getStoredTimerState() {
 
 async function initializeTimer() {
   const storedTimer = getStoredTimerState();
-  console.log('initializeTimer started')
   if (storedTimer && storedTimer.ticketId === data.value.name) {
     const isActive = await isTimeEntryActive(storedTimer.timeEntryId);
     if (isActive.is_active || storedTimer.timerState === "running" || storedTimer.timerState === "paused") {
@@ -750,22 +695,6 @@ const debouncedCreateOrUpdateTimeEntry = debounce(async (action, data) => {
     console.error("Debounced function error:", error);
   }
 }, 300);
-
-function parseElapsedTime(timeString) {
-  console.log('timeString is: '+timeString)
-  const [hours, minutes, seconds] = timeString.split(':').map(Number);
-  return ((hours * 3600) + (minutes * 60) + seconds) * 1000;
-}
-
-function formatElapsedTime(milliseconds) {
-  let totalSeconds = Math.floor(milliseconds / 1000); // Use Math.floor to round down
-  const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-  totalSeconds %= 3600;
-  const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0'); // Use Math.floor here as well
-  const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-
-  return `${hours}:${minutes}:${seconds}`;
-}
 </script>
 
 <style scoped>

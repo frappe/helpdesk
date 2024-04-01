@@ -221,8 +221,6 @@ def my_tickets():
 
 @redis_cache(ttl=60 * 5, user=True)
 def get_user_time_entries():
-	frappe.utils.logger.set_log_level("DEBUG")
-	logger = frappe.logger("dashboard", allow_site=True, file_count=50)
 
 	end_date = getdate(today())
 	start_date = add_days(end_date, -6)  # Last 30 days, including today
@@ -243,8 +241,7 @@ def get_user_time_entries():
 		ORDER BY
 		DATE(start_time)
 		""", (user, start_date, end_date), as_dict=1)
-	logger.debug('Data is: '+str(data))
-	logger.debug('User is: '+str(user))
+	
 	start_date = getdate(start_date)
 	# Fill missing days with 0 duration
 	result = []
@@ -257,7 +254,7 @@ def get_user_time_entries():
 			'name': single_date.strftime(python_date_format),  # Formatting here for output only
 			'value': round(duration / 3600, 5)  # Convert seconds to hours
 		})
-	logger.debug('result is: '+str(result))
+
 	return {
 		"title": "Hours recorded last 7 days",
 		"is_chart": True,
