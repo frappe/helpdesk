@@ -256,7 +256,7 @@ def get_user_time_entries():
 		})
 
 	return {
-		"title": "Hours recorded last 7 days",
+		"title": "Hours recorded - last 7 days",
 		"is_chart": True,
 		"chart_type": "Line",
 		"data": result,
