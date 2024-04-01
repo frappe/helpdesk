@@ -6,7 +6,7 @@
         <Icon icon="lucide:dot" class="text-gray-500" />
         <Tooltip :text="dayjs(date).long()">
           <div class="text-gray-600">
-            {{ dayjs(creation).format("MMMM D, YYYY") }}
+            {{ dayjs(date).fromNow()}}
           </div>
         </Tooltip>
         <Icon icon="lucide:dot" class="text-gray-500" />
@@ -35,11 +35,11 @@ import LucideTimer from "~icons/lucide/timer";
 
 interface P {
   content: string;
-  creation: string;
+  date: string;
   duration: string;
   user: UserInfo;
 }
 
 const props = defineProps<P>();
-const { content, creation, duration, user } = toRefs(props);
+const { content, date, duration, user } = toRefs(props);
 </script>

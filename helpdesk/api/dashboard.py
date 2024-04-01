@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 import frappe
 from frappe.query_builder.functions import Count
 from frappe.utils.caching import redis_cache
+from frappe import _, db
+from frappe.utils import today, add_days, getdate, get_user_date_format
+from frappe.utils.data import date_diff
 
 
 @frappe.whitelist()
@@ -16,6 +19,7 @@ def get_all():
 		ticket_types(),
 		ticket_activity(),
 		ticket_priority(),
+		get_user_time_entries(),
 	]
 
 
@@ -212,4 +216,51 @@ def my_tickets():
 		"title": "My tickets",
 		"is_chart": False,
 		"data": res,
+	}
+
+
+@redis_cache(ttl=60 * 5, user=True)
+def get_user_time_entries():
+	frappe.utils.logger.set_log_level("DEBUG")
+	logger = frappe.logger("dashboard", allow_site=True, file_count=50)
+
+	end_date = getdate(today())
+	start_date = add_days(end_date, -6)  # Last 30 days, including today
+	user = frappe.session.user
+	user_date_format = get_user_date_format()
+	python_date_format = user_date_format.replace('dd', '%d').replace('mm', '%m').replace('yyyy', '%Y')
+	# Assuming "HD Ticket Time Tracking" has "agent" (user email) and "duration" (in seconds)
+	data = db.sql("""
+		SELECT
+		DATE(start_time) as date, SUM(duration) as total_duration
+		FROM
+		`tabHD Ticket Time Tracking`
+		WHERE
+		agent = %s AND
+		DATE(start_time) BETWEEN %s AND %s
+		GROUP BY
+		DATE(start_time)
+		ORDER BY
+		DATE(start_time)
+		""", (user, start_date, end_date), as_dict=1)
+	logger.debug('Data is: '+str(data))
+	logger.debug('User is: '+str(user))
+	start_date = getdate(start_date)
+	# Fill missing days with 0 duration
+	result = []
+	for n in range((end_date - start_date).days + 1):
+		single_date = start_date + timedelta(days=n)
+		formatted_date = single_date.strftime(user_date_format)
+		# Find duration for the current date or use 0 if not found
+		duration = next((item['total_duration'] for item in data if item['date'] == single_date), 0)
+		result.append({
+			'name': single_date.strftime(python_date_format),  # Formatting here for output only
+			'value': round(duration / 3600, 5)  # Convert seconds to hours
+		})
+	logger.debug('result is: '+str(result))
+	return {
+		"title": "Hours recorded last 7 days",
+		"is_chart": True,
+		"chart_type": "Line",
+		"data": result,
 	}

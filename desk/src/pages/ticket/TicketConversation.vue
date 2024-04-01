@@ -13,7 +13,7 @@
         v-else-if="c.type === 'time_entry'"
         :name="c.name"
         :content="c.content"
-        :date="c.start_time"
+        :date="c.creation"
         :user="c.user"
         :duration= "c.duration"
       />

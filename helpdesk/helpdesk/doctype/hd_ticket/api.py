@@ -227,7 +227,10 @@ def get_attachments(doctype, name):
 
 
 @frappe.whitelist()
-def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, maximum_duration_reached=False, description=None):
+def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=None, maximum_duration_reached=False, description=None, override_duration=None):
+	frappe.utils.logger.set_log_level("DEBUG")
+	logger = frappe.logger("session", allow_site=True, file_count=50)
+	logger.debug(str(ticket_id)+' - name: '+str(name)+' - passed duration: '+str(duration))
 	if not frappe.session.user or frappe.session.user == "Guest":
 		frappe.throw(_("You must be logged in to access this resource."), frappe.PermissionError)
 
@@ -235,6 +238,8 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 		frappe.throw(_("Missing required parameters."))
 
 	time_entry = None
+	if duration:
+		durationsec = duration / 1000
 	if name:
 		time_entry = frappe.get_doc("HD Ticket Time Tracking", name)
 	elif action == 'start':
@@ -257,14 +262,20 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 
 		session = None
 		if action == 'start' or action == 'resume':
+			logger.debug('hit start or resume action')
 			session = frappe.new_doc("HD Ticket Time Tracking Session")
 			session.ticket_time_entry = time_entry.name
 			session.session_start = datetime.now()
 			session.insert()
+			session.save(ignore_permissions=True)
+			session.reload()
+			logger.debug('hit start or resume action - sessionname: '+str(session.name))
 			time_entry.status = 'Running'
 
 		elif action == 'pause' or action == 'complete':
+			logger.debug('time_entry.name is: '+str(time_entry.name))
 			latest_session_name = frappe.db.get_value("HD Ticket Time Tracking Session", {"ticket_time_entry": time_entry.name, "session_end": ["is", "null"]}, "name")
+			logger.debug('latest_session_name is: '+str(latest_session_name))
 			if latest_session_name:
 				session = frappe.get_doc("HD Ticket Time Tracking Session", latest_session_name)
 				session.session_end = datetime.now()
@@ -272,6 +283,7 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 
 		if action == 'pause':
 			time_entry.status = 'Paused'
+			time_entry.duration = durationsec
 
 		elif action == 'complete':
 			time_entry.end_time = datetime.now()
@@ -280,9 +292,12 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 			if maximum_duration_reached:
 				time_entry.maximum_duration_reached = True
 
+		logger.debug('Starting Session')
+		logger.debug('Description is: '+str(description))
 		if session:
 			time_entry.save(ignore_permissions=True)
 			time_entry.reload()
+			logger.debug('Session post reload')
 			customer_id = frappe.db.get_value("HD Ticket", ticket_id, "customer")
 			rounding_increment = None
 
@@ -294,24 +309,40 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 			if rounding_increment is None:
 				rounding_increment = frappe.db.get_single_value("HD Settings", "time_entry_rounding")
 				rounding_increment = int(rounding_increment) if rounding_increment and str(rounding_increment).isdigit() else 60
-
+			logger.debug('Starting Sessions')
 			sessions = frappe.get_all("HD Ticket Time Tracking Session", filters={"ticket_time_entry": time_entry.name}, fields=["session_start", "session_end"])
 			if sessions:
 				total_duration_seconds = sum(
 					[(frappe.utils.get_datetime(session["session_end"]) - frappe.utils.get_datetime(session["session_start"])).total_seconds() for session in sessions if session["session_end"]],
 					0
 				)
-
+				logger.debug('total_duration_seconds is: '+str(total_duration_seconds))
 				if rounding_increment > 0:
-					rounded_duration_seconds = math.ceil(total_duration_seconds / rounding_increment) * rounding_increment
+					if override_duration is not None:
+						rounded_duration_seconds = math.ceil(durationsec / rounding_increment) * rounding_increment
+						time_entry.duration = durationsec
+						logger.debug('rounding_increment override is: '+str(rounded_duration_seconds))
+					else:
+						rounded_duration_seconds = math.ceil(total_duration_seconds / rounding_increment) * rounding_increment
+						time_entry.duration = total_duration_seconds
+						logger.debug('rounding_increment else is: '+str(rounded_duration_seconds))
 					time_entry.rounded_duration = rounded_duration_seconds
 				else:
-					rounded_duration_seconds = total_duration_seconds
-					time_entry.duration = total_duration_seconds
+					if override_duration is not None:
+						logger.debug('Else 1 - total_duration_seconds: '+str(durationsec))
+						rounded_duration_seconds = durationsec
+						time_entry.duration = durationsec
+					else:
+						logger.debug('Else 2 - total_duration_seconds: '+str(total_duration_seconds))
+						rounded_duration_seconds = total_duration_seconds
+						time_entry.duration = total_duration_seconds
 					time_entry.rounded_duration = rounded_duration_seconds
 			else:
 				time_entry.duration = 0
 				time_entry.rounded_duration = 0
+		
+
+		logger.debug('End of the road..')
 		time_entry.save(ignore_permissions=True)
 		frappe.db.commit()
 
@@ -331,5 +362,5 @@ def is_time_entry_running(time_entry_id):
 
 @frappe.whitelist()
 def get_time_entries_for_ticket(ticket_id):
-	time_entries = frappe.get_all("HD Ticket Time Tracking", filters={"parent": ticket_id}, fields=["*"], order_by="start_time")
+	time_entries = frappe.get_all("HD Ticket Time Tracking", filters={"parent": ticket_id, "status": "Completed"}, fields=["start_time", "user", "description", "duration_in_minutes"], order_by="start_time")
 	return time_entries
