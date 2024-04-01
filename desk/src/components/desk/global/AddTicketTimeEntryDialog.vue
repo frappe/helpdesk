@@ -3,14 +3,16 @@
     <template #body-content>
       <div class="p-2">
         <div class="space-y-1">
-          <label for="duration" class="block text-sm font-medium text-gray-700">Duration</label>
+          <label for="duration" class="block text-sm font-medium text-gray-700"
+            >Duration</label
+          >
           <div class="mt-1 flex">
             <input
-              type="text"
               id="duration"
               v-model="formattedInput"
+              type="text"
               maxlength="8"
-              class="border-gray-400 placeholder-gray-500 form-input block w-half"
+              class="form-input w-half block border-gray-400 placeholder:text-gray-500"
               @input="handleTimeInput($event.target.value)"
               @blur="validateTime(formattedInput)"
             />
@@ -20,7 +22,11 @@
       </div>
       <div class="p-2">
         <div class="space-y-1">
-          <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+          <label
+            for="description"
+            class="block text-sm font-medium text-gray-700"
+            >Description</label
+          >
           <FormControl
             v-model="description"
             type="textarea"
@@ -51,32 +57,32 @@ const emit = defineEmits(["submit"]);
 const isVisible = ref(false);
 const description = ref("");
 const error = ref("");
-const validationError = ref('');
-const formattedInput = ref('');
+const validationError = ref("");
+const formattedInput = ref("");
 let originalElapsedTime;
 
 function showDialog(elapsedTime) {
   formattedInput.value = originalElapsedTime = convertMsToTime(elapsedTime);
   isVisible.value = true;
-};
+}
 
 // Convert milliseconds to HH:MM:SS format
 const convertMsToTime = (ms) => {
   let seconds = Math.floor((ms / 1000) % 60),
-      minutes = Math.floor((ms / (1000 * 60)) % 60),
-      hours = Math.floor((ms / (1000 * 60 * 60)));
-  
-  seconds = String(seconds).padStart(2, '0');
-  minutes = String(minutes).padStart(2, '0');
-  hours = String(hours).padStart(2, '0');
-  
+    minutes = Math.floor((ms / (1000 * 60)) % 60),
+    hours = Math.floor(ms / (1000 * 60 * 60));
+
+  seconds = String(seconds).padStart(2, "0");
+  minutes = String(minutes).padStart(2, "0");
+  hours = String(hours).padStart(2, "0");
+
   return `${hours}:${minutes}:${seconds}`;
 };
 
 // Convert HH:MM:SS format back to milliseconds
 const convertTimeToMs = (time) => {
   const [hours, minutes, seconds] = time.split(":").map(Number);
-  return ((hours * 3600) + (minutes * 60) + seconds) * 1000;
+  return (hours * 3600 + minutes * 60 + seconds) * 1000;
 };
 
 function submitdialog() {
@@ -86,25 +92,37 @@ function submitdialog() {
     emit("submit", {
       description: description.value,
       elapsedtime: finalElapsedTimeMs,
-      override_duration: hasOverride ? finalElapsedTimeMs : undefined // Only send override if there's a change
+      override_duration: hasOverride ? finalElapsedTimeMs : undefined, // Only send override if there's a change
     });
     description.value = ""; // Reset description after submit
     isVisible.value = false;
   }
-};
+}
 
 function validateTime(time) {
   const regex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/;
-  validationError.value = regex.test(time) ? '' : 'Please enter a valid time in HH:MM:SS format.';
-  return regex.test(time);
-};
+  const isValidFormat = regex.test(time);
+  const isNonZeroDuration = time !== "00:00:00";
+
+  if (!isValidFormat) {
+    validationError.value = "Please enter a valid time in HH:MM:SS format.";
+  } else if (!isNonZeroDuration) {
+    validationError.value = "Duration cannot be 0 seconds.";
+  } else {
+    validationError.value = "";
+  }
+
+  return isValidFormat && isNonZeroDuration;
+}
 
 const handleTimeInput = (value) => {
   formattedInput.value = formatTimeInput(value);
 };
 
 const formatTimeInput = (time) => {
-  const formattedTime = time.replace(/\D/g, '').replace(/(\d{2})(?=\d)/g, '$1:');
+  const formattedTime = time
+    .replace(/\D/g, "")
+    .replace(/(\d{2})(?=\d)/g, "$1:");
   return formattedTime.substring(0, 8);
 };
 
