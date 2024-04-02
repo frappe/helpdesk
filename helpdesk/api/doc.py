@@ -81,8 +81,8 @@ def get_filterable_fields(doctype):
 @frappe.whitelist()
 def get_list_data(
 	doctype: str, 
-	filters: dict, 
-	order_by: str='modified desc', 
+	filters: dict={}, 
+	order_by: str="modified desc", 
 	page_length=20,
 	columns=None,
 	rows=None,
