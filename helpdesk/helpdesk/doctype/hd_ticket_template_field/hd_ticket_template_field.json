@@ -10,7 +10,8 @@
   "fieldname",
   "url_method",
   "required",
-  "hide_from_customer"
+  "hide_from_customer",
+  "placeholder"
  ],
  "fields": [
   {
@@ -38,12 +39,17 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "URL/Method"
+  },
+  {
+   "fieldname": "placeholder",
+   "fieldtype": "Data",
+   "label": "Placeholder"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-08-04 15:42:36.143195",
+ "modified": "2024-04-03 22:47:57.042918",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template Field",

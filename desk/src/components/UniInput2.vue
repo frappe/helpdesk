@@ -6,7 +6,7 @@
     </div>
     <component
       :is="component"
-      :placeholder="placeholder"
+      :placeholder="field.placeholder || `Add ${field.label}`"
       :value="transValue"
       :model-value="transValue"
       @update:model-value="emitUpdate(field.fieldname, $event)"
@@ -90,13 +90,6 @@ const transValue = computed(() => {
     return props.value ? "Yes" : "No";
   }
   return props.value;
-});
-
-const placeholder = computed(() => {
-  if (props.field.fieldtype === "Data" && !props.field.url_method) {
-    return "Type something";
-  }
-  return "Select an option";
 });
 
 function emitUpdate(fieldname: Field["fieldname"], value: Value) {
