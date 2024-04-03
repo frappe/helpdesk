@@ -7,6 +7,7 @@ from frappe.model.naming import append_number_if_name_exists
 from frappe.model.document import Document
 import frappe
 from frappe.realtime import get_website_room
+from helpdesk.utils import is_admin
 
 
 class HDSettings(Document):
@@ -77,10 +78,10 @@ def get_timetracking_settings(customer=None):
 		if customer_settings:
 			max_duration = customer_settings  # Override max_duration with customer-specific settings
 
-	enable_time_tracking = True if enable_time_tracking == 1 else False
+	enable_time_tracking = True if enable_time_tracking == 1 and not is_admin() else False
 	max_duration = int(max_duration) * 1000 if max_duration else None  # Convert to milliseconds
 
 	return {
 		'enableTimeTracking': enable_time_tracking,
-		'maxDuration': max_duration
+		'maxDuration': max_duration,
 	}

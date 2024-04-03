@@ -228,7 +228,7 @@ const timeEntryDialog = ref(null);
 const maxDurationNotified = ref(false);
 const activeTimerStartTime = ref<number | null>(null);
 const finalElapsedBeforeDialog = ref(0);
-const maxDurationReached = ref(false); 
+const maxDurationReached = ref(false);
 
 const options = computed(() => [
   {
