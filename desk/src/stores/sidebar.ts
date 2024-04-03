@@ -6,7 +6,7 @@ export const useSidebarStore = defineStore("sidebar", () => {
   const isOpen = ref(true);
   const isExpanded = useStorage("sidebar_is_expanded", true);
   const width = computed(() => {
-    return isExpanded.value ? "256px" : "50px";
+    return isExpanded.value ? "224px" : "50px";
   });
 
   function toggle(state?: boolean) {
