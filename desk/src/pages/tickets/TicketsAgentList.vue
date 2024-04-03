@@ -95,7 +95,7 @@
             </Tooltip>
           </div>
           <div v-else-if="column.key === 'creation'">
-            {{ dayjs(item).fromNow() }}
+            {{ convert_date(item) }}
           </div>
           <div v-else-if="column.key === 'modified'">
             {{ dayjs(item).fromNow() }}
@@ -181,4 +181,9 @@ const slaStatusColorMap = {
   "First Response Due": "orange",
   Paused: "blue",
 };
+function convert_date(originalTimestamp: string) {
+  const dateObj = new Date(originalTimestamp);
+  const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}:${dateObj.getSeconds().toString().padStart(2, '0')}`;
+  return formattedDate;
+}
 </script>

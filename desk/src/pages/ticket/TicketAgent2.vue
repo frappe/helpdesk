@@ -55,7 +55,7 @@
                   label="CC"
                   :theme="showCc ? 'blue' : 'gray'"
                   variant="subtle"
-                  @click="() => (showCc = !showCc)"
+                  @click="() => { showCc = !showCc; refreshCcList(); }"
                 />
                 <Button
                   v-if="mode === Mode.Response"
@@ -103,32 +103,32 @@
                     />
                 </div>
                 <div v-if="showCc">
-                  <span class="inline-flex flex-wrap items-center gap-1">
-                    <span class="mr-2 text-xs text-gray-500">CC:</span>
-                    <Button
-                      v-for="i in cc.split(',').filter(Boolean)"
-                      :key="i"
-                      :label="i"
-                      @click="
-                        () =>
-                          (cc = cc
-                            .split(',')
-                            .filter((s) => s !== i)
-                            .join(','))
-                      "
-                    />
-                    <FormControl
-                      type="text"
-                      placeholder="hello@example.com"
-                      @keyup.prevent.enter="
-                        (event) => {
-                          cc = [...cc.split(','), event.target.value].join(',');
-                          event.target.value = '';
-                        }
-                      "
-                    />
-                  </span>
-                </div>
+                <span class="inline-flex flex-wrap items-center gap-1">
+                  <span class="mr-2 text-xs text-gray-500">CC:</span>
+                  <Button
+                    v-for="i in cc.split(',').filter(Boolean)"
+                    :key="i"
+                    :label="i"
+                    @click="
+                      () =>
+                        (cc = cc
+                          .split(',')
+                          .filter((s) => s !== i)
+                          .join(','))
+                    "
+                  />
+                  <FormControl
+                    type="text"
+                    placeholder="hello@example.com"
+                    @keyup.prevent.enter="
+                      (event) => {
+                        cc = [...cc.split(','), event.target.value].join(',');
+                        event.target.value = '';
+                      }
+                    "
+                  />
+                </span>
+              </div>
                 <div v-if="showBcc">
                   <span class="inline-flex flex-wrap items-center gap-1">
                     <span class="mr-2 text-xs text-gray-500">BCC:</span>
@@ -358,10 +358,10 @@ function fetchDefaultRecipient() {
     watchEffect(() => {
       const details = ticket.data?.communications;
       if (details != undefined) {
-        // console.log(details);
         
         const item = JSON.parse(JSON.stringify(details));
         item.forEach(d => {
+          // console.log(d.recipients);
           fetch_recipient_tag += d.recipients;
           recipient_list.push(d.sender);
         });
@@ -369,18 +369,19 @@ function fetchDefaultRecipient() {
         const re = /[^< ]+(?=>)/g;
         const matchedEmails = fetch_recipient_tag.match(re) || []; // Handle case when there are no matches
         matchedEmails.forEach(function(email) {
+            include_regular_expression = true
             recipient_list.push(email);
         });
         
-        if (include_regular_expression){
+        if (!include_regular_expression){
           item.forEach(d => {
             if (!recipient_list.includes(d.recipients)){
               recipient_list.push(d.recipients);
             }
         });
         }
-        const uniqueCcList = [...new Set(recipient_list)];
-        resolve(uniqueCcList);
+        const uniqueToList = [...new Set(recipient_list)];
+        resolve(uniqueToList);
       }
     });
   });
@@ -388,27 +389,42 @@ function fetchDefaultRecipient() {
 
 function fetchDefaultcc() {
   return new Promise((resolve, reject) => {
-    var communication_det = "";
+    var fetch_cc_tag = "";
     const cc_list = [];
     
     watchEffect(() => {
-      const data = ticket.data?.communications;
-      if (data != undefined) {
+      const details = ticket.data?.communications;
+      if (details != undefined) {
         
-        const item = JSON.parse(JSON.stringify(data));
+        const item = JSON.parse(JSON.stringify(details));
         item.forEach(d => {
-          communication_det += d.cc;
+          // console.log(d.recipients);
+          fetch_cc_tag += d.cc;
+          // cc_list.push(d.cc);
         });
+        var include_regular_expression_in_cc = false
         const re = /[^< ]+(?=>)/g;
-        communication_det.match(re).forEach(function(email) {
-          cc_list.push(email);
+        const matchedcc = fetch_cc_tag.match(re) || []; // Handle case when there are no matches
+        matchedcc.forEach(function(email) {
+            include_regular_expression_in_cc = true
+            cc_list.push(email);
         });
-        const uniqueCcList = [...new Set(cc_list)];
-        resolve(uniqueCcList);
+        
+        if (!include_regular_expression_in_cc){
+          item.forEach(d => {
+            if (!cc_list.includes(d.cc)){
+              cc_list.push(d.cc);
+            }
+        });
+        }
+        // location.reload()
+        const UniqueCCList = [...new Set(cc_list)];
+        resolve(UniqueCCList);
       }
     });
   });
 }
+
 
 onMounted(async () => {
   try {
@@ -420,4 +436,13 @@ onMounted(async () => {
     console.error(error);
   }
 });
+function refreshCcList() {
+  fetchDefaultcc()
+    .then((ccList) => {
+      cc.value = ccList.join(',');
+    })
+    .catch((error) => {
+      console.error('Error fetching CC list:', error);
+    });
+}
 </script>
