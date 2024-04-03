@@ -30,31 +30,19 @@
         </Dropdown>
       </template>
     </LayoutHeader>
-    <div v-if="ticket.data" class="flex h-full">
+    <div v-if="ticket.data" class="flex h-screen overflow-hidden">
       <div class="flex flex-col">
-        <Tabs
-          v-slot="{ tab }"
-          v-model="tabIndex"
-          :tabs="tabs"
-          class="overflow-hidden"
+        <div
+          class="pr-7.5 flex items-center justify-between border-b py-1 pl-10"
         >
-          <div v-if="tab.label === 'Customer Tickets'" class="py-2">
-            <TicketsAgentList
-              :rows="customerTickets?.data?.data"
-              :columns="customerTickets?.data?.columns"
-              :options="{
-                selectable: false,
-                openInNewTab: true,
-              }"
-              :paginate="false"
-            />
-          </div>
-          <TicketAgentActivities
-            v-else
-            :activities="activities"
-            :type="tab.label === 'Emails' ? 'email' : 'all'"
+          <span class="text-lg font-semibold">Activity</span>
+          <Switch
+            v-model="showFullActivity"
+            size="sm"
+            label="Show all activity"
           />
-        </Tabs>
+        </div>
+        <TicketAgentActivities :activities="activities" />
         <CommunicationArea
           v-model="ticket.data"
           v-model:reload="reload_email"
@@ -73,7 +61,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
-import { Breadcrumbs, createResource, Dropdown, Tabs } from "frappe-ui";
+import { Breadcrumbs, createResource, Dropdown, Switch } from "frappe-ui";
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createToast } from "@/utils";
@@ -87,32 +75,12 @@ import {
 
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 
-import {
-  ActivityIcon,
-  EmailIcon,
-  IndicatorIcon,
-  TicketIcon,
-} from "@/components/icons";
+import { IndicatorIcon } from "@/components/icons";
 
 const ticketStatusStore = useTicketStatusStore();
 
-const tabIndex = ref(0);
-const tabs = [
-  {
-    label: "Activity",
-    icon: ActivityIcon,
-  },
-  {
-    label: "Emails",
-    icon: EmailIcon,
-  },
-  {
-    label: "Customer Tickets",
-    icon: TicketIcon,
-  },
-];
+const showFullActivity = ref(true);
 
-const customerTickets = ref([]);
 const reload_email = ref(false);
 
 const props = defineProps({
@@ -149,30 +117,6 @@ const ticket = createResource({
     ];
     return data;
   },
-  onSuccess(data) {
-    customerTickets.value = createResource({
-      url: "helpdesk.api.doc.get_list_data",
-      params: {
-        doctype: "HD Ticket",
-        filters: {
-          customer: ["=", data.customer],
-          name: ["!=", props.ticketId],
-        },
-        columns: [
-          { label: "Name", type: "Data", key: "name", width: "5rem" },
-          { label: "Subject", type: "Data", key: "subject", width: "25rem" },
-          { label: "Status", type: "Data", key: "status", width: "8rem" },
-        ],
-        rows: ["name", "subject", "status"],
-      },
-      auto: true,
-      transform(data) {
-        data.data.forEach((row) => {
-          row.name = row.name.toString();
-        });
-      },
-    });
-  },
 });
 
 const dropdownOptions = computed(() =>
@@ -203,10 +147,6 @@ const activities = computed(() => {
     };
   });
 
-  if (tabIndex.value === 1) {
-    return emailProps;
-  }
-
   const commentProps = ticket.data.comments.map((comment) => {
     return {
       type: "comment",
@@ -216,6 +156,12 @@ const activities = computed(() => {
       content: comment.content,
     };
   });
+
+  if (!showFullActivity.value) {
+    return [...emailProps, ...commentProps].sort(
+      (a, b) => new Date(a.creation) - new Date(b.creation)
+    );
+  }
 
   const historyProps = [...ticket.data.history, ...ticket.data.views].map(
     (h) => {

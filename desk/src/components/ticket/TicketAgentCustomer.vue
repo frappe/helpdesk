@@ -23,14 +23,19 @@
             />
           </Button>
         </Tooltip>
+        <Tooltip text="Show Customer Tickets">
+          <Button class="h-7 w-7">
+            <TicketIcon class="h-4 w-4" @click="console.log('tick')" />
+          </Button>
+        </Tooltip>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
-import { EmailIcon, LinkIcon } from "@/components/icons/";
+import { Avatar, Tooltip } from "frappe-ui";
+import { EmailIcon, LinkIcon, TicketIcon } from "@/components/icons/";
 import { errorMessage } from "@/utils";
 
 defineProps({

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-1 flex-col justify-between overflow-hidden overflow-y-auto"
+    class="flex flex-1 flex-col justify-between overflow-hidden overflow-y-auto border-b"
   >
     <div
       v-for="o in options"
@@ -15,7 +15,7 @@
       >
         <Autocomplete
           :options="o.store.dropdown"
-          :placeholder="`Select a ${o.label}`"
+          :placeholder="`Add ${o.label}`"
           :value="ticket[o.field]"
         />
       </div>
