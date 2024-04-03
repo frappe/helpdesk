@@ -197,7 +197,8 @@
 
 <script setup lang="ts">
 import { ref, computed, inject, onMounted, onUnmounted, watch } from "vue";
-import { createResource, Autocomplete, Tooltip, debounce } from "frappe-ui";
+import { Autocomplete } from "@/components";
+import { createResource, Tooltip, debounce } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
