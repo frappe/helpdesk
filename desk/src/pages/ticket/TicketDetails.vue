@@ -135,7 +135,8 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { createResource, Autocomplete, Tooltip } from "frappe-ui";
+import { Autocomplete } from "@/components";
+import { createResource, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
