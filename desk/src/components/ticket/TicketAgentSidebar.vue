@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-[352px] flex-col justify-between border-l">
+  <div class="flex w-[382px] flex-col justify-between border-l">
     <div class="h-10.5 flex items-center justify-between border-b px-5 py-2.5">
       <span class="text-lg font-semibold">About This Ticket</span>
       <span>#{{ ticket.name }}</span>
@@ -17,10 +17,25 @@
       :source="ticket.via_customer_portal ? 'Portal' : 'Mail'"
     />
     <TicketAgentFields :ticket="ticket" />
+    <div v-if="ticket.feedback_rating" class="px-6 py-3 text-gray-600">
+      <div class="flex">
+        <div class="w-[106px] pb-1.5 text-sm">Feedback</div>
+        <div class="px-1.5">
+          <StarRating :rating="ticket.feedback_rating" />
+        </div>
+      </div>
+      <div class="pb-1.5 text-base">
+        {{ ticket.feedback_text }}
+      </div>
+      <div class="pb-1.5 text-sm">
+        {{ ticket.feedback_extra }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentCustomer from "./TicketAgentCustomer.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";
