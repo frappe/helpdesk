@@ -4,11 +4,11 @@
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
-        <Tooltip :text="dayjs(date).long()">
+        <!-- <Tooltip :text="dayjs(date).long()"> -->
           <div class="text-gray-600">
-            {{ dayjs(date).fromNow() }}
+            {{ convert_date(date) }}
           </div>
-        </Tooltip>
+        <!-- </Tooltip> -->
       </div>
       <slot name="top-right" v-bind="{ message: content }" />
     </div>
@@ -58,4 +58,10 @@ function sanitize(html: string) {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
   });
 }
+function convert_date(originalTimestamp: string) {
+  const dateObj = new Date(originalTimestamp);
+  const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}:${dateObj.getSeconds().toString().padStart(2, '0')}`;
+  return formattedDate;
+}
+
 </script>
