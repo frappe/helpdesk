@@ -47,13 +47,8 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import {
-  createResource,
-  Autocomplete,
-  Avatar,
-  Button,
-  Dropdown,
-} from "frappe-ui";
+import { createResource, Avatar, Button, Dropdown } from "frappe-ui";
+import { Autocomplete } from "@/components";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
 import { useAgentStore } from "@/stores/agent";
