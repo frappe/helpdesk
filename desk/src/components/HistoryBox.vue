@@ -35,7 +35,9 @@
   </div>
   <Button
     v-if="relatedActivities.length"
-    :label="show_others ? 'Hide all Changes' : 'Show all Changes'"
+    :label="
+      show_others ? 'Hide' : `and ${relatedActivities.length} other activities`
+    "
     variant="outline"
     class="mt-2"
     @click="show_others = !show_others"
