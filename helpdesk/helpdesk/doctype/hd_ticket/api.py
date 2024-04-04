@@ -343,3 +343,9 @@ def is_time_entry_running(time_entry_id):
 def get_time_entries_for_ticket(ticket_id):
 	time_entries = frappe.get_all("HD Ticket Time Tracking", filters={"parent": ticket_id, "status": "Completed"}, fields=["start_time", "user", "description", "duration_in_minutes"], order_by="start_time")
 	return time_entries
+
+
+@frappe.whitelist()
+def check_unfinished_time_entries(ticket_id):
+	time_entries = frappe.db.get_all("HD Ticket Time Tracking", filters = [["parent", "=", ticket_id], ["status", "!=", "Completed"]])
+	return True if time_entries else False
