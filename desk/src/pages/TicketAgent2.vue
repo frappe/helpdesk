@@ -31,7 +31,7 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
-      <div class="flex flex-col">
+      <div class="flex flex-1 flex-col">
         <div
           class="pr-7.5 flex items-center justify-between border-b py-1 pl-10"
         >
