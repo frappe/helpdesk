@@ -2,11 +2,11 @@
   <div class="flex items-center justify-start gap-5 border-b p-5">
     <Avatar size="3xl" class="h-[88px] w-[88px]" :label="name" />
     <div class="flex flex-col gap-2.5">
-      <div class="text-2xl font-medium">
-        <Tooltip :text="name">
+      <Tooltip :text="name">
+        <div class="w-[242px] truncate text-2xl font-medium">
           {{ name }}
-        </Tooltip>
-      </div>
+        </div>
+      </Tooltip>
       <div class="flex gap-1.5">
         <Button class="h-7 w-7">
           <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
