@@ -54,6 +54,7 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
 			fields.hide_from_customer,
 			fields.required,
 			fields.url_method,
+			fields.mandatory_depends_on,
 		)
 		.join(QBFetch, JoinType.inner)
 		.on(QBFetch.fieldname == fields.fieldname)

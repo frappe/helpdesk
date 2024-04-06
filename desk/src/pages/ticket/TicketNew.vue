@@ -9,8 +9,8 @@
         v-for="field in visibleFields"
         :key="field.fieldname"
         :field="field"
-        :value="templateFields[field.fieldname]"
-        @change="templateFields[field.fieldname] = $event.value"
+        :value="doc[field.fieldname]"
+        @change="handleChange(field.fieldname, $event.value)"
       />
     </div>
     <div class="m-5">
@@ -71,13 +71,20 @@ const router = useRouter();
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
-const templateFields = reactive({});
+const doc = reactive({});
+let fieldMandateMappings = {};
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
   makeParams: () => ({
     name: props.templateId || "Default",
   }),
+  onSuccess: (data) => {
+    data.fields?.forEach((f) => {
+      if (f.mandatory_depends_on)
+        fieldMandateMappings[f.fieldname] = f.mandatory_depends_on;
+    });
+  },
   auto: true,
 });
 
@@ -94,7 +101,7 @@ const ticket = createResource({
       description: description.value,
       subject: subject.value,
       template: props.templateId,
-      ...templateFields,
+      ...doc,
     },
     attachments: attachments.value,
   }),
@@ -121,6 +128,19 @@ const ticket = createResource({
 function sanitize(html: string) {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+  });
+}
+
+function handleChange(fieldname, value) {
+  doc[fieldname] = value;
+  Object.keys(fieldMandateMappings).forEach((mField) => {
+    if (eval(fieldMandateMappings[mField])) {
+      let v = visibleFields.value.find((vf) => vf.fieldname === mField);
+      if (v) v.required = 1;
+    } else {
+      let v = visibleFields.value.find((vf) => vf.fieldname === mField);
+      if (v) v.required = 0;
+    }
   });
 }
 
