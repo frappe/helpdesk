@@ -9,15 +9,15 @@
           label: 'Cancel',
           variant: 'subtle',
           onClick: () => {
-            // assignees = oldAssignees
-            // show = false
+            show = false;
+            _assignees = [];
           },
         },
         {
           label: 'Update',
           variant: 'solid',
           onClick: () => {
-            // updateAssignees(),
+            emit('update', _assignees);
           },
         },
       ],
@@ -30,8 +30,7 @@
         doctype="User"
         @change="
           (option) => {
-            $refs.input.value = '';
-            addValue(option);
+            addValue(option.value);
           }
         "
       >
@@ -46,7 +45,7 @@
       </SearchComplete>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <Tooltip
-          v-for="assignee in assignees"
+          v-for="assignee in _assignees"
           :key="assignee.name"
           :text="assignee.name"
         >
@@ -75,14 +74,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineModel } from "vue";
+import { ref, defineModel, watch } from "vue";
 import { UserAvatar, SearchComplete } from "@/components";
 import { useUserStore } from "@/stores/user";
+let emit = defineEmits(["update"]);
+
+const props = defineProps({
+  assignees: {
+    type: Array,
+    default: () => [],
+  },
+});
 
 const { getUser } = useUserStore();
 
 const show = defineModel();
-const assignees = defineModel("assignees");
+const _assignees = ref([]);
+
+watch(
+  () => props.assignees,
+  (newValue) => {
+    _assignees.value = JSON.parse(JSON.stringify(newValue));
+  }
+);
 
 const error = ref("");
 
@@ -93,13 +107,13 @@ const addValue = (value) => {
     image: getUser(value).user_image,
     label: getUser(value).full_name,
   };
-  if (!assignees.value.find((assignee) => assignee.name === value)) {
-    assignees.value.push(obj);
+  if (!_assignees.value.find((assignee) => assignee.name === value)) {
+    _assignees.value.push(obj);
   }
 };
 
 const removeValue = (value) => {
-  assignees.value = assignees.value.filter(
+  _assignees.value = _assignees.value.filter(
     (assignee) => assignee.name !== value
   );
 };

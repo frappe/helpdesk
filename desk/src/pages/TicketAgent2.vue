@@ -5,9 +5,11 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <component :is="ticket.data._assignedTo.length == 1 ? 'Button' : 'div'">
+        <component
+          :is="ticketAgentStore.getAssignees().length == 1 ? 'Button' : 'div'"
+        >
           <MultipleAvatar
-            :avatars="ticket.data._assignedTo"
+            :avatars="ticketAgentStore.getAssignees()"
             @click="showAssignmentModal = true"
           />
         </component>
@@ -53,8 +55,14 @@
     <AssignmentModal
       v-if="ticket.data"
       v-model="showAssignmentModal"
-      v-model:assignees="ticket.data._assignedTo"
-      :doc="ticket.data"
+      :assignees="ticketAgentStore.getAssignees()"
+      @update="
+        (data) => {
+          ticketAgentStore.updateAssignees(data);
+          // TODO: what if error? / async
+          showAssignmentModal = false;
+        }
+      "
     />
   </div>
 </template>
@@ -64,6 +72,7 @@ import { computed, ref, h } from "vue";
 import { Breadcrumbs, createResource, Dropdown, Switch } from "frappe-ui";
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useTicketAgentStore } from "@/stores/ticketAgent";
 import { createToast } from "@/utils";
 
 import {
@@ -78,6 +87,7 @@ import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import { IndicatorIcon } from "@/components/icons";
 
 const ticketStatusStore = useTicketStatusStore();
+const ticketAgentStore = useTicketAgentStore();
 
 const showFullActivity = ref(true);
 
@@ -90,6 +100,8 @@ const props = defineProps({
   },
 });
 
+const ticket = ticketAgentStore.getTicket(props.ticketId);
+
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
@@ -98,25 +110,6 @@ const breadcrumbs = computed(() => {
   });
 
   return items;
-});
-
-const ticket = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
-  auto: true,
-  params: {
-    name: props.ticketId,
-  },
-  transform(data) {
-    data._assignedTo = [
-      {
-        name: data.assignee.email,
-        image: data.assignee.image,
-        label: data.assignee.name,
-      },
-    ];
-    return data;
-  },
 });
 
 const dropdownOptions = computed(() =>
