@@ -59,7 +59,6 @@ def get_one(name):
 
 	return {
 		**ticket,
-		"assignee": get_assignee(ticket._assign),
 		"comments": get_comments(name),
 		"communications": get_communications(name),
 		"contact": contact,

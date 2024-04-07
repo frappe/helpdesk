@@ -2,16 +2,24 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { createResource, call } from "frappe-ui";
 import { createToast } from "@/utils";
+import { useUserStore } from "./user";
 
 export const useTicketAgentStore = defineStore("ticketAgent", () => {
-  const assignees = ref([]);
+  const { getUser } = useUserStore();
+
   let _ticketId;
   let _ticket;
   const showFullActivity = ref(true);
 
-  function getAssignees() {
-    return assignees.value;
-  }
+  const _assignees = ref([]);
+  const assignees = computed({
+    get() {
+      return _assignees.value;
+    },
+    set(newValue) {
+      _assignees.value = newValue;
+    },
+  });
 
   function updateAssignees({ assigneesToRemove, newAssignees }) {
     for (const a of assigneesToRemove) {
@@ -45,13 +53,14 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
       },
       onSuccess: (data) => {
         _ticketId = ticketId;
-        assignees.value = [
-          {
-            name: data.assignee.email,
-            image: data.assignee.image,
-            label: data.assignee.name,
-          },
-        ];
+
+        assignees.value = JSON.parse(data._assign).map((assignee) => {
+          return {
+            name: assignee,
+            image: getUser(assignee).user_image,
+            label: getUser(assignee).full_name,
+          };
+        });
       },
     });
 
@@ -155,7 +164,7 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
 
   return {
     updateAssignees,
-    getAssignees,
+    assignees,
     getTicket,
     updateTicket,
     activities,
