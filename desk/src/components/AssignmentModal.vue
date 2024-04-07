@@ -10,14 +10,19 @@
           variant: 'subtle',
           onClick: () => {
             show = false;
-            _assignees = [];
+            newAssignees = [];
+            assigneesToRemove = [];
+            currentAssignees = JSON.parse(JSON.stringify(props.assignees));
           },
         },
         {
           label: 'Update',
           variant: 'solid',
           onClick: () => {
-            emit('update', _assignees);
+            emit('update', {
+              newAssignees: newAssignees.map((assignee) => assignee.name),
+              assigneesToRemove: assigneesToRemove,
+            });
           },
         },
       ],
@@ -30,7 +35,7 @@
         doctype="User"
         @change="
           (option) => {
-            addValue(option.value);
+            addAssignee(option.value);
           }
         "
       >
@@ -45,24 +50,47 @@
       </SearchComplete>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <Tooltip
-          v-for="assignee in _assignees"
-          :key="assignee.name"
-          :text="assignee.name"
+          v-for="currentAssignee in currentAssignees"
+          :key="currentAssignee.name"
+          :text="currentAssignee.name"
         >
           <Button
-            :label="getUser(assignee.name).full_name"
+            :label="getUser(currentAssignee.name).full_name"
             theme="gray"
             variant="outline"
           >
             <template #prefix>
-              <UserAvatar :name="assignee.name" size="sm" />
+              <UserAvatar :name="currentAssignee.name" size="sm" />
             </template>
             <template #suffix>
               <FeatherIcon
-                v-if="assignee.name !== owner"
+                v-if="currentAssignee.name !== owner"
                 class="h-3.5"
                 name="x"
-                @click.stop="removeValue(assignee.name)"
+                @click.stop="removeCurrentAssignee(currentAssignee.name)"
+              />
+            </template>
+          </Button>
+        </Tooltip>
+        <Tooltip
+          v-for="newAssignee in newAssignees"
+          :key="newAssignee.name"
+          :text="newAssignee.name"
+        >
+          <Button
+            :label="getUser(newAssignee.name).full_name"
+            theme="gray"
+            variant="outline"
+          >
+            <template #prefix>
+              <UserAvatar :name="newAssignee.name" size="sm" />
+            </template>
+            <template #suffix>
+              <FeatherIcon
+                v-if="newAssignee.name !== owner"
+                class="h-3.5"
+                name="x"
+                @click.stop="removeAssignee(newAssignee.name)"
               />
             </template>
           </Button>
@@ -89,32 +117,45 @@ const props = defineProps({
 const { getUser } = useUserStore();
 
 const show = defineModel();
-const _assignees = ref([]);
+const newAssignees = ref([]);
+const currentAssignees = ref([]);
+const assigneesToRemove = [];
 
 watch(
   () => props.assignees,
   (newValue) => {
-    _assignees.value = JSON.parse(JSON.stringify(newValue));
+    currentAssignees.value = JSON.parse(JSON.stringify(newValue));
   }
 );
 
 const error = ref("");
 
-const addValue = (value) => {
+const addAssignee = (value) => {
   error.value = "";
-  let obj = {
-    name: value,
-    image: getUser(value).user_image,
-    label: getUser(value).full_name,
-  };
-  if (!_assignees.value.find((assignee) => assignee.name === value)) {
-    _assignees.value.push(obj);
+  if (
+    ![...newAssignees.value, ...currentAssignees.value].find(
+      (assignee) => assignee.name === value
+    )
+  ) {
+    let obj = {
+      name: value,
+      image: getUser(value).user_image,
+      label: getUser(value).full_name,
+    };
+    newAssignees.value.push(obj);
   }
 };
 
-const removeValue = (value) => {
-  _assignees.value = _assignees.value.filter(
+const removeAssignee = (value) => {
+  newAssignees.value = newAssignees.value.filter(
     (assignee) => assignee.name !== value
   );
+};
+
+const removeCurrentAssignee = (value) => {
+  currentAssignees.value = currentAssignees.value.filter(
+    (assignee) => assignee.name !== value
+  );
+  assigneesToRemove.push(value);
 };
 </script>

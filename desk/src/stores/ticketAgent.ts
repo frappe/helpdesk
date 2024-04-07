@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { createResource } from "frappe-ui";
+import { createResource, call } from "frappe-ui";
 import { createToast } from "@/utils";
 
 export const useTicketAgentStore = defineStore("ticketAgent", () => {
@@ -12,8 +12,26 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
     return assignees.value;
   }
 
-  function updateAssignees(newAssignees) {
-    console.log("updateAssignee", newAssignees);
+  function updateAssignees({ assigneesToRemove, newAssignees }) {
+    for (const a of assigneesToRemove) {
+      call("frappe.desk.form.assign_to.remove", {
+        doctype: "HD Ticket",
+        name: _ticketId,
+        assign_to: a,
+      });
+    }
+
+    if (newAssignees.length) {
+      call("frappe.desk.form.assign_to.add", {
+        doctype: "HD Ticket",
+        name: _ticketId,
+        assign_to: newAssignees,
+      });
+    }
+
+    _ticket.reload();
+
+    //TODO: promise.all, await, multiple assignees?
   }
 
   function getTicket(ticketId) {
