@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { createResource, call } from "frappe-ui";
 import { createToast } from "@/utils";
 
@@ -7,6 +7,7 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
   const assignees = ref([]);
   let _ticketId;
   let _ticket;
+  const showFullActivity = ref(true);
 
   function getAssignees() {
     return assignees.value;
@@ -78,10 +79,86 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
     });
   }
 
+  const activities = computed(() => {
+    const emailProps = _ticket.data.communications.map((email) => {
+      return {
+        type: "email",
+        key: email.creation,
+        sender: { name: email.user.email, full_name: email.user.name },
+        to: email.recipients,
+        cc: email.cc,
+        bcc: email.bcc,
+        creation: email.creation,
+        subject: email.subject,
+        attachments: email.attachments,
+        content: email.content,
+      };
+    });
+
+    const commentProps = _ticket.data.comments.map((comment) => {
+      return {
+        type: "comment",
+        key: comment.creation,
+        commenter: comment.user.name,
+        creation: comment.creation,
+        content: comment.content,
+      };
+    });
+
+    if (!showFullActivity.value) {
+      return [...emailProps, ...commentProps].sort(
+        (a, b) => new Date(a.creation) - new Date(b.creation)
+      );
+    }
+
+    const historyProps = [..._ticket.data.history, ..._ticket.data.views].map(
+      (h) => {
+        return {
+          type: "history",
+          key: h.creation,
+          content: h.action ? h.action : "viewed this",
+          creation: h.creation,
+          user: h.user.name + " ",
+        };
+      }
+    );
+
+    const sorted = [...emailProps, ...commentProps, ...historyProps].sort(
+      (a, b) => new Date(a.creation) - new Date(b.creation)
+    );
+
+    const data = [];
+    let i = 0;
+
+    while (i < sorted.length) {
+      const currentActivity = sorted[i];
+      if (currentActivity.type === "history") {
+        currentActivity.relatedActivities = [];
+        for (let j = i + 1; j < sorted.length; j++) {
+          const nextActivity = sorted[j];
+          if (nextActivity.type === "history") {
+            currentActivity.relatedActivities.push(nextActivity);
+          } else {
+            data.push(currentActivity);
+            i = j - 1;
+            break;
+          }
+        }
+      } else {
+        data.push(currentActivity);
+      }
+      i++;
+    }
+
+    return data;
+  });
+
   return {
     updateAssignees,
     getAssignees,
     getTicket,
     updateTicket,
+    activities,
+    showFullActivity,
   };
 });
