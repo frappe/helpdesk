@@ -190,10 +190,10 @@ class HDTicket(Document):
 	def on_update(self):
 		if self.status == "Open":
 			if self.get_doc_before_save() and self.get_doc_before_save().status != "Open":
-				
-				agent = json.loads(self._assign)
-				if len(agent) > 0:
-					self.notify_agent(agent[0], "Reaction")
+
+				agent = self.get_assigned_agent()
+				if agent:
+					self.notify_agent(agent.name, "Reaction")
 		
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
