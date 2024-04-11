@@ -105,6 +105,7 @@
    "search_index": 1
   },
   {
+   "default": "Low",
    "fieldname": "priority",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -409,6 +410,7 @@
    "label": "Meta"
   },
   {
+   "depends_on": "eval:!(doc.__islocal)",
    "fieldname": "time_tracking_tab",
    "fieldtype": "Tab Break",
    "label": "Time Tracking"
@@ -425,7 +427,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2024-04-11 19:01:19.391180",
+ "modified": "2024-04-11 19:51:46.835552",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
