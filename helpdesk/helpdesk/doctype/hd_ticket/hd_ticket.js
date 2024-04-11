@@ -23,4 +23,52 @@ frappe.ui.form.on("HD Ticket", {
 
         frm.refresh_field("time_tracking_table");
     },
+
 });
+
+frappe.ui.form.on('HD Ticket Time Tracking', {
+    start_time: function(frm, cdt, cdn) {
+        var child = locals[cdt][cdn];
+        if (!child.end_time) {
+            calculate_end_time_based_on_start_and_duration(frm, child);
+        } else {
+            // If end_time is set, recalculate duration
+            calculate_duration_based_on_start_and_end(frm, child);
+        }
+    },
+
+    end_time: function(frm, cdt, cdn) {
+        var child = locals[cdt][cdn];
+        // Recalculate duration whenever end_time is changed
+        calculate_duration_based_on_start_and_end(frm, child);
+    },
+
+    duration: function(frm, cdt, cdn) {
+        var child = locals[cdt][cdn];
+        // If duration is manually changed and start_time is set, recalculate end_time
+        if (child.start_time) {
+            calculate_end_time_based_on_start_and_duration(frm, child);
+        }
+    }
+});
+
+function calculate_end_time_based_on_start_and_duration(frm, child) {
+    if (child.start_time && child.duration) {
+        var start = moment(child.start_time);
+        // Use a specific datetime format if frappe.datetime.datetime_format is not working as expected
+        var end = start.clone().add(child.duration, 'seconds');
+        var formattedEnd = end.format("YYYY-MM-DD HH:mm:ss");
+
+        frappe.model.set_value(child.doctype, child.name, 'end_time', formattedEnd);
+    }
+}
+
+function calculate_duration_based_on_start_and_end(frm, child) {
+    if (child.start_time && child.end_time) {
+        var start = moment(child.start_time);
+        var end = moment(child.end_time);
+        var duration = end.diff(start, 'seconds');
+        
+        frappe.model.set_value(child.doctype, child.name, 'duration', duration);
+    }
+}

@@ -8,16 +8,14 @@
  "field_order": [
   "ticket_id",
   "agent",
-  "column_break_ykzd",
   "status",
-  "section_break_aoqs",
+  "duration_override_by_user",
+  "maximum_duration_reached",
+  "column_break_ykzd",
   "start_time",
   "end_time",
-  "column_break_tctm",
   "duration",
   "rounded_duration",
-  "maximum_duration_reached",
-  "duration_override_by_user",
   "section_break_utox",
   "description",
   "billing_section",
@@ -29,46 +27,52 @@
   {
    "fieldname": "ticket_id",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Ticket ID",
    "options": "HD Ticket",
    "read_only": 1
   },
   {
+   "default": "User",
    "fieldname": "agent",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Agent",
    "options": "HD Agent",
-   "read_only": 1
+   "read_only_depends_on": "eval:doc.billed;"
   },
   {
+   "default": "Now",
    "fieldname": "start_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Start Time",
-   "read_only": 1
+   "read_only_depends_on": "eval:doc.billed;",
+   "reqd": 1
   },
   {
    "fieldname": "end_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "End Time",
-   "read_only": 1
+   "read_only_depends_on": "eval:doc.billed;"
   },
   {
    "fieldname": "duration",
    "fieldtype": "Duration",
    "in_list_view": 1,
    "label": "Duration",
-   "read_only": 1
+   "read_only_depends_on": "eval:doc.billed;",
+   "reqd": 1
   },
   {
+   "default": "Completed",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
    "options": "\nRunning\nPaused\nCompleted",
-   "read_only": 1
+   "read_only_depends_on": "eval:doc.billed;"
   },
   {
    "default": "0",
@@ -87,7 +91,9 @@
   {
    "fieldname": "description",
    "fieldtype": "Text",
-   "label": "Time Entry Detail"
+   "label": "Time Entry Detail",
+   "read_only_depends_on": "eval:doc.billed;",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_ykzd",
@@ -121,14 +127,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_aoqs",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_tctm",
-   "fieldtype": "Column Break"
-  },
-  {
    "default": "0",
    "fieldname": "duration_override_by_user",
    "fieldtype": "Check",
@@ -139,7 +137,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-04-01 15:50:08.321719",
+ "modified": "2024-04-11 18:08:01.181901",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Time Tracking",
