@@ -418,13 +418,14 @@
    "fieldname": "time_tracking_table",
    "fieldtype": "Table",
    "label": "Time Entries",
-   "options": "HD Ticket Time Tracking"
+   "options": "HD Ticket Time Tracking",
+   "read_only_depends_on": "eval:doc.status == ('Resolved' || 'Closed');"
   }
  ],
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2024-04-11 18:57:40.816340",
+ "modified": "2024-04-11 19:01:19.391180",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
