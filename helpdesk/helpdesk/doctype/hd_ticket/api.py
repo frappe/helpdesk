@@ -251,6 +251,7 @@ def create_or_update_time_entry(ticket_id, agent, action, duration=None, name=No
 		time_entry.agent = agent
 		time_entry.start_time = datetime.now()
 		time_entry.status = 'Running'
+		time_entry.description = 'Time Entry in progress'
 		time_entry.duration = 0
 		time_entry.insert()
 	if time_entry:
