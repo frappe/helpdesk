@@ -351,7 +351,10 @@ class HDTicket(Document):
 
 		clear_all_assignments("HD Ticket", self.name)
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
-		self.notify_agent(agent, "Assignment")
+		
+		if frappe.session.user != agent:
+			self.notify_agent(agent, "Assignment")
+		
 		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
 	def get_assigned_agent(self):
