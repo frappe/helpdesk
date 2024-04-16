@@ -58,6 +58,20 @@ const slaData = computed(() => {
     dayjs(ticket.data.first_responded_on).isBefore(ticket.data.response_by)
       ? "Fulfilled"
       : "Failed";
+
+  //TODO: no resolution date for unclassified tickets, configurable?
+  if (ticket.data.priority === "Unclassified") {
+    return [
+      {
+        title: "Expected First Response",
+        showSla: ticket.data.first_responded_on,
+        label: responseSla,
+        theme: responseSla === "Fulfilled" ? "green" : "red",
+        value: ticket.data.response_by,
+      },
+    ];
+  }
+
   const resolutionSla =
     ticket.data.resolution_date &&
     dayjs(ticket.data.resolution_date).isBefore(ticket.data.resolution_by)
@@ -66,14 +80,14 @@ const slaData = computed(() => {
 
   return [
     {
-      title: "First Response",
+      title: "Expected First Response",
       showSla: ticket.data.first_responded_on,
       label: responseSla,
       theme: responseSla === "Fulfilled" ? "green" : "red",
       value: ticket.data.response_by,
     },
     {
-      title: "Resolution",
+      title: "Expected Resolution",
       showSla: ticket.data.resolution_date,
       label: resolutionSla,
       theme: resolutionSla === "Fulfilled" ? "green" : "red",
