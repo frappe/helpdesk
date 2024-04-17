@@ -350,42 +350,54 @@ usePageMeta(() => {
   };
 });
 
+// function fetchDefaultRecipient() {
+//   return new Promise((resolve, reject) => {
+//     const recipient_list = [];
+//     watchEffect(() => {
+//       const details = ticket.data?.communications;
+//       if (details != undefined) {
+        
+//         // const item = JSON.parse(JSON.stringify(details));
+//         details.forEach(d => {
+//           recipient_list.push(d.sender);
+//           recipient_list.push(d.recipients);             
+//         });
+//         const uniqueToList = [...new Set(recipient_list)];
+//         // console.log(uniqueToList);
+        
+//         resolve(uniqueToList);
+//       }
+//     });
+//   });
+// }
 function fetchDefaultRecipient() {
   return new Promise((resolve, reject) => {
-    var fetch_recipient_tag = "";
-    const recipient_list = [];
-    
+    const recipient_set = new Set(); // Use a Set to automatically remove duplicates
     watchEffect(() => {
       const details = ticket.data?.communications;
       if (details != undefined) {
-        
-        const item = JSON.parse(JSON.stringify(details));
-        item.forEach(d => {
-          // console.log(d.recipients);
-          fetch_recipient_tag += d.recipients;
-          recipient_list.push(d.sender);
+        details.forEach(d => {
+          // Add sender to the Set
+          recipient_set.add(d.sender);
+          // If recipients is an array, spread it to add each email individually to the Set
+          if (Array.isArray(d.recipients)) {
+            d.recipients.forEach(email => {
+              recipient_set.add(email.trim()); // Trim to remove any leading/trailing spaces
+            });
+          } else if (typeof d.recipients === 'string') {
+            // If recipients is a string, split it by comma and add each email to the Set
+            d.recipients.split(',').forEach(email => {
+              recipient_set.add(email.trim()); // Trim to remove any leading/trailing spaces
+            });
+          }
         });
-        var include_regular_expression = false
-        const re = /[^< ]+(?=>)/g;
-        const matchedEmails = fetch_recipient_tag.match(re) || []; // Handle case when there are no matches
-        matchedEmails.forEach(function(email) {
-            include_regular_expression = true
-            recipient_list.push(email);
-        });
-        
-        if (!include_regular_expression){
-          item.forEach(d => {
-            if (!recipient_list.includes(d.recipients)){
-              recipient_list.push(d.recipients);
-            }
-        });
-        }
-        const uniqueToList = [...new Set(recipient_list)];
+        const uniqueToList = Array.from(recipient_set); // Convert Set back to array
         resolve(uniqueToList);
       }
     });
   });
 }
+
 
 function fetchDefaultcc() {
   return new Promise((resolve, reject) => {
@@ -418,6 +430,7 @@ function fetchDefaultcc() {
         });
         }
         // location.reload()
+        
         const UniqueCCList = [...new Set(cc_list)];
         resolve(UniqueCCList);
       }
