@@ -56,7 +56,6 @@ def get_one(name):
 	)
 	if contact:
 		contact = contact[0]
-
 	return {
 		**ticket,
 		"assignee": get_assignee(ticket._assign),
@@ -99,6 +98,7 @@ def get_communications(ticket: str):
 			QBCommunication.cc,
 			QBCommunication.content,
 			QBCommunication.creation,
+			QBCommunication.recipients,
 			QBCommunication.name,
 			QBCommunication.sender,
 		)
@@ -110,8 +110,21 @@ def get_communications(ticket: str):
 	for c in communications:
 		c.attachments = get_attachments("Communication", c.name)
 		c.user = get_user_info_for_avatar(c.sender)
+	
+	# Extract email addresses from the recipients field of each email
+	for email_data in communications:
+		recipients = email_data['recipients']
+		email_data['recipients'] = extract_emails(recipients)
+	frappe.log_error(title="communication list", message=communications)
 	return communications
 
+
+# Function to extract email addresses
+import re
+def extract_emails(recipients):
+    # Use regular expression to find email addresses
+    email_pattern = r'[\w\.-]+@[\w\.-]+'
+    return re.findall(email_pattern, recipients)
 
 def get_comments(ticket: str):
 	if not frappe.has_permission("HD Ticket Comment", "read"):
