@@ -16,7 +16,7 @@
       :resolution-by="ticket.resolution_by"
       :source="ticket.via_customer_portal ? 'Portal' : 'Mail'"
     />
-    <TicketAgentFields :ticket="ticket" />
+    <TicketAgentFields :ticket="ticket" @update="update" />
     <div v-if="ticket.feedback_rating" class="px-6 py-3 text-gray-600">
       <div class="flex">
         <div class="w-[106px] pb-1.5 text-sm">Feedback</div>
@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import { defineEmits } from "vue";
 import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentCustomer from "./TicketAgentCustomer.vue";
@@ -46,4 +47,10 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["update"]);
+
+function update(val) {
+  emit("update", val);
+}
 </script>

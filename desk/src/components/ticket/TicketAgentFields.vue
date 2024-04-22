@@ -32,13 +32,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, defineEmits } from "vue";
 import { Autocomplete } from "@/components";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketTypeStore } from "@/stores/ticketType";
-import { useTicketAgentStore } from "@/stores/ticketAgent";
 import UniInput2 from "@/components/UniInput2.vue";
+
+const emit = defineEmits(["update"]);
 
 const props = defineProps({
   ticket: {
@@ -68,12 +69,6 @@ const options = computed(() => {
 });
 
 function update(field, value) {
-  //   ticket.update(field, value);
-  useTicketAgentStore().updateTicket(field, value);
-  createToast({
-    title: "Ticket updated",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  emit("update", { field, value });
 }
 </script>
