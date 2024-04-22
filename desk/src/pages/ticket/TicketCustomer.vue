@@ -18,7 +18,7 @@
           label="Close"
           theme="gray"
           variant="solid"
-          @click="showFeedbackDialog = !showFeedbackDialog"
+          @click="handleClose()"
         >
           <template #prefix>
             <Icon icon="lucide:check" />
@@ -107,6 +107,14 @@ const send = createResource({
   },
 });
 
+function handleClose() {
+  if (showFeedback.value) {
+    showFeedbackDialog.value = true;
+  } else {
+    setValue.submit({ fieldname: "status", value: "Closed" });
+  }
+}
+
 const setValue = createResource({
   url: "frappe.client.set_value",
   debounce: 300,
@@ -135,4 +143,12 @@ const showResolveButton = computed(() =>
 const showEditor = computed(() =>
   ["Open", "Replied", "Resolved"].includes(ticket.data.status)
 );
+
+const showFeedback = computed(() => {
+  return ticket.data?.communications?.some((c) => {
+    if (c.sender !== ticket.data.raised_by) {
+      return true;
+    }
+  });
+});
 </script>

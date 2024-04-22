@@ -6,19 +6,17 @@
       avatars?.length > 1 ? 'flex-row-reverse' : 'truncate [&>div]:truncate',
     ]"
   >
-    <Tooltip
-      v-if="avatars?.length == 1"
-      :text="avatars[0].name"
-      class="flex items-center gap-2 text-base"
-    >
-      <Avatar
-        shape="circle"
-        :image="avatars[0].image"
-        :label="avatars[0].label"
-        size="sm"
-      />
-      <div class="truncate">{{ avatars[0].label }}</div>
-    </Tooltip>
+    <div v-if="avatars?.length == 1" class="flex items-center gap-2 text-base">
+      <Tooltip :text="avatars[0].name">
+        <Avatar
+          shape="circle"
+          :image="avatars[0].image"
+          :label="avatars[0].label"
+          size="sm"
+        />
+        <div class="truncate">{{ avatars[0].label }}</div>
+      </Tooltip>
+    </div>
     <Tooltip
       v-for="avatar in props.avatars"
       v-else
