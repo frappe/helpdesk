@@ -18,7 +18,7 @@
       >
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
-          v-model="toEmails"
+          v-model="toEmailsClone"
           class="flex-1"
           :validate="validateEmail"
           :error-message="(value) => `${value} is an invalid email address`"
@@ -32,7 +32,7 @@
         <span class="text-xs text-gray-500">CC:</span>
         <MultiSelectInput
           ref="ccInput"
-          v-model="ccEmails"
+          v-model="ccEmailsClone"
           class="flex-1"
           :validate="validateEmail"
           :error-message="(value) => `${value} is an invalid email address`"
@@ -42,7 +42,7 @@
         <span class="text-xs text-gray-500">BCC:</span>
         <MultiSelectInput
           ref="bccInput"
-          v-model="bccEmails"
+          v-model="bccEmailsClone"
           class="flex-1"
           :validate="validateEmail"
           :error-message="(value) => `${value} is an invalid email address`"
@@ -115,10 +115,6 @@ const props = defineProps({
     type: String,
     default: "HD Ticket",
   },
-  subject: {
-    type: String,
-    default: "Email from Issuer",
-  },
   editorProps: {
     type: Object,
     default: () => ({}),
@@ -131,17 +127,28 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  toEmails: {
+    type: Array,
+    default: () => [],
+  },
+  ccEmails: {
+    type: Array,
+    default: () => [],
+  },
+  bccEmails: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const modelValue = defineModel();
 const content = defineModel("content");
 const attachments = defineModel("attachments");
-const subject = ref(props.subject);
-const cc = ref(false);
-const bcc = ref(false);
-const ccEmails = ref([]);
-const bccEmails = ref([]);
-const toEmails = ref(modelValue.value?.email ? [modelValue.value.email] : []);
+const cc = ref(props.ccEmails.length ? true : false);
+const bcc = ref(props.bccEmails.length ? true : false);
+const toEmailsClone = ref([...props.toEmails]);
+const ccEmailsClone = ref([...props.ccEmails]);
+const bccEmailsClone = ref([...props.bccEmails]);
 const ccInput = ref(null);
 const bccInput = ref(null);
 
@@ -184,12 +191,8 @@ const textEditorMenuButtons = [
 ];
 
 defineExpose({
-  subject,
   cc,
   bcc,
-  toEmails,
-  ccEmails,
-  bccEmails,
   ccInput,
   bccInput,
 });

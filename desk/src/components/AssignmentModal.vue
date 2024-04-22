@@ -64,7 +64,6 @@
             </template>
             <template #suffix>
               <FeatherIcon
-                v-if="currentAssignee.name !== owner"
                 class="h-3.5"
                 name="x"
                 @click.stop="removeCurrentAssignee(currentAssignee.name)"
@@ -87,7 +86,6 @@
             </template>
             <template #suffix>
               <FeatherIcon
-                v-if="newAssignee.name !== owner"
                 class="h-3.5"
                 name="x"
                 @click.stop="removeAssignee(newAssignee.name)"

@@ -92,10 +92,9 @@ import {
   ComboboxOptions,
   ComboboxOption,
 } from "@headlessui/vue";
-import UserAvatar from "@/components/UserAvatar.vue";
-// import { contactsStore } from "@/stores/contacts";
+import { UserAvatar } from "@/components/";
 import { Popover, createResource } from "frappe-ui";
-import { ref, computed, nextTick, defineModel } from "vue";
+import { ref, computed, nextTick } from "vue";
 import { watchDebounced } from "@vueuse/core";
 
 const props = defineProps({
@@ -110,8 +109,6 @@ const props = defineProps({
 });
 
 const values = defineModel();
-
-// const { getContactByName } = contactsStore();
 
 const emails = ref([]);
 const search = ref(null);
@@ -150,20 +147,20 @@ const filterOptions = createResource({
     txt: text.value,
     doctype: "Contact",
   },
-//   transform: (data) => {
-//     let allData = data
-//       .filter((c) => {
-//         return getContactByName(c.value).email_id;
-//       })
-//       .map((option) => {
-//         let c = getContactByName(option.value);
-//         return {
-//           label: c.full_name || c.email_id,
-//           value: c.email_id,
-//         };
-//       });
-//     return allData;
-//   },
+  transform: (data) => {
+    let allData = data
+      .filter((c) => {
+        return c.description.split(", ")[1];
+      })
+      .map((option) => {
+        let email = option.description.split(", ")[1];
+        return {
+          label: option.label || email,
+          value: email,
+        };
+      });
+    return allData;
+  },
 });
 
 const options = computed(() => {
@@ -222,19 +219,19 @@ const removeValue = (value) => {
 const removeLastValue = () => {
   if (query.value) return;
 
-  let emailRef = emails.value[emails.value.length - 1].$el;
+  let emailRef = emails.value[emails.value.length - 1]?.$el;
   if (document.activeElement === emailRef) {
     values.value.pop();
     nextTick(() => {
       if (values.value.length) {
         emailRef = emails.value[emails.value.length - 1].$el;
-        emailRef.focus();
+        emailRef?.focus();
       } else {
         setFocus();
       }
     });
   } else {
-    emailRef.focus();
+    emailRef?.focus();
   }
 };
 

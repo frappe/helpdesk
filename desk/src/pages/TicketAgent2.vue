@@ -55,8 +55,10 @@
         </div>
         <TicketAgentActivities :activities="ticketAgentStore.activities" />
         <CommunicationArea
-          v-model="ticket.data"
-          v-model:reload="reload_email"
+          v-model:content="ticketAgentStore.emailContent"
+          :to-emails="[ticket.data.raised_by]"
+          :cc-emails="[]"
+          :bcc-emails="[]"
         />
       </div>
       <TicketAgentSidebar :ticket="ticket.data" />
@@ -78,6 +80,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
+import { useStorage } from "@vueuse/core";
 import { Breadcrumbs, Dropdown, Switch } from "frappe-ui";
 
 import {
@@ -102,14 +105,24 @@ const props = defineProps({
   },
 });
 
-const reload_email = ref(false);
+const newEmail = useStorage("emailBoxContent", "");
+const newComment = useStorage("commentBoxContent", "");
+
+const commentEmpty = computed(() => {
+  return !newComment.value || newComment.value === "<p></p>";
+});
+
+const emailEmpty = computed(() => {
+  return !newEmail.value || newEmail.value === "<p></p>";
+});
+
 const showAssignmentModal = ref(false);
-const ticket = ticketAgentStore.getTicket(props.ticketId);
+const ticket = computed(() => ticketAgentStore.getTicket(props.ticketId));
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
-    label: ticket?.data?.subject,
+    label: ticket.value?.data?.subject,
     route: { name: "TicketAgent" },
   });
 

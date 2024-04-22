@@ -162,6 +162,9 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
     return data;
   });
 
+  // Communication
+  const emailContent = ref("");
+
   return {
     updateAssignees,
     assignees,
@@ -169,5 +172,6 @@ export const useTicketAgentStore = defineStore("ticketAgent", () => {
     updateTicket,
     activities,
     showFullActivity,
+    emailContent,
   };
 });

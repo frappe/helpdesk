@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-y-auto">
+  <div class="h-screen overflow-y-auto">
     <div v-for="(activity, i) in activities" :key="activity.key">
       <div class="flex gap-4 px-10">
         <div

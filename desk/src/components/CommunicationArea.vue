@@ -66,9 +66,11 @@
   >
     <EmailEditor
       ref="newEmailEditor"
-      v-model:content="newEmail"
+      v-model:content="content"
       v-model:attachments="attachments"
-      v-model="doc"
+      :to-emails="toEmails"
+      :cc-emails="ccEmails"
+      :bcc-emails="bccEmails"
       :submit-button-props="{
         variant: 'solid',
         onClick: submitEmail,
@@ -77,12 +79,10 @@
       :discard-button-props="{
         onClick: () => {
           showEmailBox = false;
-          newEmailEditor.toEmails = doc.email ? [doc.email] : [];
           newEmailEditor.ccEmails = [];
           newEmailEditor.bccEmails = [];
           newEmailEditor.cc = false;
           newEmailEditor.bcc = false;
-          newEmail = '';
         },
       }"
     />
@@ -95,18 +95,16 @@ import EmailIcon from "@/components/icons/EmailIcon.vue";
 import CommentIcon from "@/components/icons/CommentIcon.vue";
 import { useAuthStore } from "@/stores/auth";
 import { EmailEditor, CommentTextEditor } from "@/components";
-import { computed, ref, defineModel, nextTick, watch } from "vue";
+import { computed, ref, defineModel, nextTick } from "vue";
 import { useStorage } from "@vueuse/core";
 
 const authStore = useAuthStore();
+const content = defineModel("content");
 const showEmailBox = ref(false);
 const showCommentBox = ref(false);
 const doc = defineModel();
 const attachments = ref([]);
 const newEmailEditor = ref(null);
-
-const newEmail = useStorage("emailBoxContent", "");
-const newComment = useStorage("commentBoxContent", "");
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -138,6 +136,9 @@ function toggleBCC() {
     });
 }
 
+const newEmail = useStorage("emailBoxContent", "");
+const newComment = useStorage("commentBoxContent", "");
+
 const commentEmpty = computed(() => {
   return !newComment.value || newComment.value === "<p></p>";
 });
@@ -146,12 +147,26 @@ const emailEmpty = computed(() => {
   return !newEmail.value || newEmail.value === "<p></p>";
 });
 
-const reload = defineModel("reload");
-
 const props = defineProps({
   doctype: {
     type: String,
     default: "HD Ticket",
+  },
+  toEmails: {
+    type: Array,
+    default: () => [],
+  },
+  ccEmails: {
+    type: Array,
+    default: () => [],
+  },
+  bccEmails: {
+    type: Array,
+    default: () => [],
+  },
+  content: {
+    type: String,
+    default: "",
   },
 });
 
@@ -181,7 +196,6 @@ async function submitEmail() {
   showEmailBox.value = false;
   sendMail.submit();
   newEmail.value = "";
-  reload.value = true;
   emit("scroll");
 }
 
@@ -206,7 +220,6 @@ async function submitComment() {
   showCommentBox.value = false;
   await sendComment();
   newComment.value = "";
-  reload.value = true;
   emit("scroll");
 }
 </script>
