@@ -1,6 +1,10 @@
 <template>
   <div class="h-screen overflow-y-auto">
-    <div v-for="(activity, i) in activities" :key="activity.key">
+    <div
+      v-for="(activity, i) in activities"
+      :key="activity.key"
+      class="activity"
+    >
       <div class="flex gap-4 px-10">
         <div
           class="relative flex justify-center before:absolute before:left-[50%] before:top-0 before:-z-10 before:border-l before:border-gray-200"

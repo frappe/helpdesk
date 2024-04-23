@@ -6,12 +6,12 @@
       editable &&
         'min-h-[7rem] mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
     ]"
-    :content="content"
+    :content="newComment"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="users"
-    @change="editable ? (content = $event) : null"
+    :mentions="agentStore.dropdown"
+    @change="editable ? (newComment = $event) : null"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2">
@@ -60,11 +60,25 @@
             </FileUploader>
           </div>
           <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
-            <Button v-bind="discardButtonProps || {}" label="Discard" />
+            <Button
+              label="Discard"
+              @click="
+                () => {
+                  newComment = '';
+                  emit('discard');
+                }
+              "
+            />
             <Button
               variant="solid"
-              v-bind="submitButtonProps || {}"
               label="Submit"
+              :disabled="commentEmpty"
+              @click="
+                () => {
+                  submitComment();
+                  newComment = '';
+                }
+              "
             />
           </div>
         </div>
@@ -73,11 +87,18 @@
   </TextEditor>
 </template>
 <script setup lang="ts">
-import AttachmentIcon from "@/components/icons/AttachmentIcon.vue";
-import AttachmentItem from "@/components/AttachmentItem.vue";
+import { defineModel, computed } from "vue";
+import {
+  TextEditorFixedMenu,
+  TextEditor,
+  FileUploader,
+  createResource,
+} from "frappe-ui";
+
+import { AttachmentIcon } from "@/components/icons/";
+import { AttachmentItem } from "@/components/";
 import { useAgentStore } from "@/stores/agent";
-import { TextEditorFixedMenu, TextEditor, FileUploader } from "frappe-ui";
-import { ref, computed, defineModel } from "vue";
+import { useStorage } from "@vueuse/core";
 
 const agentStore = useAgentStore();
 
@@ -92,41 +113,44 @@ const props = defineProps({
   },
   doctype: {
     type: String,
-    default: "CRM Lead",
+    default: "HD Ticket",
   },
   editorProps: {
     type: Object,
     default: () => ({}),
   },
-  submitButtonProps: {
-    type: Object,
-    default: () => ({}),
-  },
-  discardButtonProps: {
-    type: Object,
-    default: () => ({}),
-  },
 });
 
-const modelValue = defineModel();
+const doc = defineModel();
 const attachments = defineModel("attachments");
-const content = defineModel("content");
-
-const textEditor = ref(null);
-
-const editor = computed(() => {
-  return textEditor.value.editor;
+const emit = defineEmits(["submit", "discard"]);
+const newComment = useStorage("commentBoxContent", "");
+const commentEmpty = computed(() => {
+  return !newComment.value || newComment.value === "<p></p>";
 });
 
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
 }
 
-const users = computed(() => {
-  return agentStore.dropdown;
-});
+async function submitComment() {
+  const comment = createResource({
+    url: "run_doc_method",
+    makeParams: () => ({
+      dt: props.doctype,
+      dn: doc.value.name,
+      method: "new_comment",
+      args: {
+        content: newComment.value,
+      },
+    }),
+    onSuccess: () => {
+      emit("submit");
+    },
+  });
 
-defineExpose({ editor });
+  comment.submit();
+}
 
 const textEditorMenuButtons = [
   "Paragraph",

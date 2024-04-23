@@ -39,23 +39,22 @@
   <div v-show="showCommentBox">
     <CommentTextEditor
       ref="newCommentEditor"
-      v-model:content="newComment"
       v-model="doc"
       v-model:attachments="attachments"
-      :submit-button-props="{
-        variant: 'solid',
-        onClick: submitComment,
-        disabled: commentEmpty,
-      }"
-      :discard-button-props="{
-        onClick: () => {
-          showCommentBox = false;
-          newComment = '';
-        },
-      }"
       :editable="showCommentBox"
       :doctype="doctype"
       placeholder="Add a comment..."
+      @submit="
+        () => {
+          showCommentBox = false;
+          emit('update');
+        }
+      "
+      @discard="
+        () => {
+          showCommentBox = false;
+        }
+      "
     />
   </div>
   <div
@@ -105,6 +104,7 @@ const showCommentBox = ref(false);
 const doc = defineModel();
 const attachments = ref([]);
 const newEmailEditor = ref(null);
+const emit = defineEmits(["update"]);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -137,11 +137,6 @@ function toggleBCC() {
 }
 
 const newEmail = useStorage("emailBoxContent", "");
-const newComment = useStorage("commentBoxContent", "");
-
-const commentEmpty = computed(() => {
-  return !newComment.value || newComment.value === "<p></p>";
-});
 
 const emailEmpty = computed(() => {
   return !newEmail.value || newEmail.value === "<p></p>";
@@ -170,12 +165,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["scroll"]);
-
 const sendMail = createResource({
   url: "run_doc_method",
   makeParams: () => ({
-    dt: "HD Ticket",
+    dt: props.doctype,
     dn: doc.value.data.name,
     method: "reply_via_agent",
     args: {
@@ -196,30 +189,5 @@ async function submitEmail() {
   showEmailBox.value = false;
   sendMail.submit();
   newEmail.value = "";
-  emit("scroll");
-}
-
-async function sendComment() {
-  const comment = createResource({
-    url: "run_doc_method",
-    makeParams: () => ({
-      dt: "HD Ticket",
-      dn: doc.value.data.name,
-      method: "new_comment",
-      args: {
-        content: newComment.value,
-      },
-    }),
-  });
-
-  comment.submit();
-}
-
-async function submitComment() {
-  if (commentEmpty.value) return;
-  showCommentBox.value = false;
-  await sendComment();
-  newComment.value = "";
-  emit("scroll");
 }
 </script>

@@ -7,3 +7,4 @@ export { default as EmailAtIcon } from "./EmailAtIcon.vue";
 export { default as CommentIcon } from "./CommentIcon.vue";
 export { default as IndicatorIcon } from "./IndicatorIcon.vue";
 export { default as TicketIcon } from "./TicketIcon.vue";
+export { default as AttachmentIcon } from "./AttachmentIcon.vue";
