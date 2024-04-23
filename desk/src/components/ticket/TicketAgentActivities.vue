@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import { useElementVisibility } from "@vueuse/core";
 import { DotIcon, EmailAtIcon, CommentIcon } from "@/components/icons";
 import { EmailBox, CommentBox, HistoryBox } from "@/components";
 
@@ -51,4 +52,20 @@ function getActivityIcon(type) {
   else if (type === "comment") return CommentIcon;
   else return DotIcon;
 }
+
+function scrollToLatestActivity() {
+  setTimeout(() => {
+    let el;
+    let e = document.getElementsByClassName("activity");
+    el = e[e.length - 1];
+    if (el && !useElementVisibility(el).value) {
+      el.scrollIntoView({ behavior: "smooth" });
+      el.focus();
+    }
+  }, 500);
+}
+
+defineExpose({
+  scrollToLatestActivity,
+});
 </script>

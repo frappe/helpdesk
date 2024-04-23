@@ -51,7 +51,10 @@
             label="Show all activity"
           />
         </div>
-        <TicketAgentActivities :activities="activities" />
+        <TicketAgentActivities
+          ref="ticketAgentActivitiesRef"
+          :activities="activities"
+        />
         <CommunicationArea
           v-model="ticket.data"
           :to-emails="[ticket.data.raised_by]"
@@ -60,7 +63,7 @@
           @update="
             () => {
               ticket.reload();
-              scrollToLatestActivity();
+              ticketAgentActivitiesRef.scrollToLatestActivity();
             }
           "
         />
@@ -86,7 +89,6 @@
 </template>
 
 <script setup lang="ts">
-import { useElementVisibility } from "@vueuse/core";
 import { computed, ref, h } from "vue";
 import { Breadcrumbs, Dropdown, Switch, createResource, call } from "frappe-ui";
 
@@ -105,6 +107,7 @@ import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
+const ticketAgentActivitiesRef = ref(null);
 
 const props = defineProps({
   ticketId: {
@@ -270,17 +273,5 @@ function updateTicket(fieldname: string, value: string) {
       });
     },
   });
-}
-
-function scrollToLatestActivity() {
-  setTimeout(() => {
-    let el;
-    let e = document.getElementsByClassName("activity");
-    el = e[e.length - 1];
-    if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView({ behavior: "smooth" });
-      el.focus();
-    }
-  }, 500);
 }
 </script>
