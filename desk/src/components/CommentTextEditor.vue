@@ -115,10 +115,6 @@ const props = defineProps({
     type: String,
     default: "HD Ticket",
   },
-  editorProps: {
-    type: Object,
-    default: () => ({}),
-  },
 });
 
 const doc = defineModel();

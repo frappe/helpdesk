@@ -70,20 +70,17 @@
       :to-emails="toEmails"
       :cc-emails="ccEmails"
       :bcc-emails="bccEmails"
-      :submit-button-props="{
-        variant: 'solid',
-        onClick: submitEmail,
-        disabled: emailEmpty,
-      }"
-      :discard-button-props="{
-        onClick: () => {
+      @submit="
+        () => {
           showEmailBox = false;
-          newEmailEditor.ccEmails = [];
-          newEmailEditor.bccEmails = [];
-          newEmailEditor.cc = false;
-          newEmailEditor.bcc = false;
-        },
-      }"
+          emit('update');
+        }
+      "
+      @discard="
+        () => {
+          showEmailBox = false;
+        }
+      "
     />
   </div>
 </template>
@@ -94,8 +91,7 @@ import EmailIcon from "@/components/icons/EmailIcon.vue";
 import CommentIcon from "@/components/icons/CommentIcon.vue";
 import { useAuthStore } from "@/stores/auth";
 import { EmailEditor, CommentTextEditor } from "@/components";
-import { computed, ref, defineModel, nextTick } from "vue";
-import { useStorage } from "@vueuse/core";
+import { ref, defineModel, nextTick } from "vue";
 
 const authStore = useAuthStore();
 const content = defineModel("content");
@@ -136,12 +132,6 @@ function toggleBCC() {
     });
 }
 
-const newEmail = useStorage("emailBoxContent", "");
-
-const emailEmpty = computed(() => {
-  return !newEmail.value || newEmail.value === "<p></p>";
-});
-
 const props = defineProps({
   doctype: {
     type: String,
@@ -164,30 +154,4 @@ const props = defineProps({
     default: "",
   },
 });
-
-const sendMail = createResource({
-  url: "run_doc_method",
-  makeParams: () => ({
-    dt: props.doctype,
-    dn: doc.value.data.name,
-    method: "reply_via_agent",
-    args: {
-      attachments: attachments.value.map((x) => x.name),
-      cc: (newEmailEditor.value.ccEmails || []).join(","),
-      bcc: (newEmailEditor.value.bccEmails || []).join(","),
-      message: newEmail.value,
-    },
-  }),
-  // onSuccess: () => {
-  //   clear();
-  //   emitter.emit("update:ticket");
-  // },
-});
-
-async function submitEmail() {
-  if (emailEmpty.value) return;
-  showEmailBox.value = false;
-  sendMail.submit();
-  newEmail.value = "";
-}
 </script>

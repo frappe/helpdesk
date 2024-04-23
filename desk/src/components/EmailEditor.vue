@@ -83,11 +83,23 @@
           </div>
         </div>
         <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
-          <Button v-bind="discardButtonProps || {}" label="Discard" />
+          <Button
+            label="Discard"
+            @click="
+              () => {
+                ccEmailsClone = [];
+                bccEmailsClone = [];
+                cc = false;
+                bcc = false;
+                emit('discard');
+              }
+            "
+          />
           <Button
             variant="solid"
-            v-bind="submitButtonProps || {}"
+            :disabled="emailEmpty"
             label="Submit"
+            @click="() => {}"
           />
         </div>
       </div>
@@ -96,11 +108,17 @@
 </template>
 
 <script setup lang="ts">
-import { defineModel, ref } from "vue";
-import { FileUploader, TextEditor, TextEditorFixedMenu } from "frappe-ui";
+import { defineModel, ref, computed } from "vue";
+import { useStorage } from "@vueuse/core";
+import {
+  FileUploader,
+  TextEditor,
+  TextEditorFixedMenu,
+  createResource,
+} from "frappe-ui";
 import { validateEmail } from "@/utils";
 import { MultiSelectInput } from "@/components";
-import AttachmentIcon from "./icons/AttachmentIcon.vue";
+import { AttachmentIcon } from "@/components/icons";
 
 const props = defineProps({
   placeholder: {
@@ -114,10 +132,6 @@ const props = defineProps({
   doctype: {
     type: String,
     default: "HD Ticket",
-  },
-  editorProps: {
-    type: Object,
-    default: () => ({}),
   },
   submitButtonProps: {
     type: Object,
@@ -141,7 +155,15 @@ const props = defineProps({
   },
 });
 
-const modelValue = defineModel();
+const newEmail = useStorage("emailBoxContent", "");
+
+const emailEmpty = computed(() => {
+  return !newEmail.value || newEmail.value === "<p></p>";
+});
+
+const emit = defineEmits(["submit", "discard"]);
+
+const doc = defineModel();
 const content = defineModel("content");
 const attachments = defineModel("attachments");
 const cc = ref(props.ccEmails.length ? true : false);
@@ -151,6 +173,27 @@ const ccEmailsClone = ref([...props.ccEmails]);
 const bccEmailsClone = ref([...props.bccEmails]);
 const ccInput = ref(null);
 const bccInput = ref(null);
+
+function submitMail() {
+  const sendMail = createResource({
+    url: "run_doc_method",
+    makeParams: () => ({
+      dt: props.doctype,
+      dn: doc.value.data.name,
+      method: "reply_via_agent",
+      args: {
+        attachments: attachments.value.map((x) => x.name),
+        cc: ccEmailsClone,
+        bcc: bccEmailsClone,
+        message: newEmail.value,
+      },
+    }),
+    onSuccess: () => {
+      emit("submit");
+    },
+  });
+  sendMail.submit();
+}
 
 const textEditorMenuButtons = [
   "Paragraph",
@@ -189,11 +232,4 @@ const textEditorMenuButtons = [
     "DeleteTable",
   ],
 ];
-
-defineExpose({
-  cc,
-  bcc,
-  ccInput,
-  bccInput,
-});
 </script>
