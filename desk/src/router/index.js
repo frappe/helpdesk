@@ -56,6 +56,11 @@ const routes = [
     component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
   },
   {
+    path: "/:invalidpath",
+    name: "Invalid Page",
+    component: () => import("@/pages/InvalidPage.vue"),
+  },
+  {
     path: "",
     name: "AgentRoot",
     component: () => import("@/pages/desk/AgentRoot.vue"),
@@ -197,8 +202,16 @@ router.beforeEach(async (to) => {
     await authStore.init();
     await usersStore.init();
 
-    if ((to.meta.agent && !authStore.hasDeskAccess) || isAuthRoute) {
-      router.replace({ name: WEBSITE_ROOT });
+    if (isAuthRoute && authStore.isLoggedIn) {
+      if (authStore.isAgent) {
+        router.replace({ name: AGENT_PORTAL_LANDING });
+      } else {
+        router.replace({ name: CUSTOMER_PORTAL_LANDING });
+      }
+    } else if (!isAuthRoute && !authStore.isLoggedIn) {
+      router.replace({ name: "Login" });
+    } else if (to.matched.length === 0) {
+      router.replace({ name: "Invalid Page" });
     }
   } catch {
     if (!isAuthRoute) {
