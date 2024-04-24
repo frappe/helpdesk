@@ -167,13 +167,15 @@ class HDTicket(Document):
 		self.check_update_perms()
 		self.set_ticket_type()
 		self.set_raised_by()
-		self.set_contact()
-		self.set_customer()
 		self.set_priority()
 		self.set_first_responded_on()
 		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
+
+		if self.via_customer_portal:
+			self.set_contact()
+			self.set_customer()
 
 	def validate(self):
 		self.validate_feedback()
