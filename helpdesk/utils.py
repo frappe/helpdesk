@@ -68,7 +68,7 @@ def refetch_resource(key: str | List[str], user=None):
 def capture_event(event: str):
 	return _capture(event, "helpdesk")
 
-
+@frappe.whitelist()
 def get_customer(contact: str) -> tuple[str]:
 	"""
 	Get `Customer` from `Contact`

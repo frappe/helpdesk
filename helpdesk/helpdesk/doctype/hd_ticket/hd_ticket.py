@@ -167,13 +167,15 @@ class HDTicket(Document):
 		self.check_update_perms()
 		self.set_ticket_type()
 		self.set_raised_by()
-		self.set_contact()
-		self.set_customer()
 		self.set_priority()
 		self.set_first_responded_on()
 		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
+
+		if self.via_customer_portal:
+			self.set_contact()
+			self.set_customer()
 
 	def validate(self):
 		self.validate_feedback()
@@ -240,7 +242,9 @@ class HDTicket(Document):
 		if self.customer:
 			return
 		customer = get_customer(self.contact)
-		if len(customer) > 0:
+		
+		# let agent assign the customer when one contact has more than one customer
+		if len(customer) == 1:
 			self.customer = customer[0]
 
 	def set_priority(self):
