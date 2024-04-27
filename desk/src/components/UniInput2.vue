@@ -4,14 +4,16 @@
       {{ field.label }}
       <span v-if="field.required" class="text-red-500"> * </span>
     </div>
-    <component
-      :is="component"
-      :placeholder="field.placeholder || `Add ${field.label}`"
-      :value="transValue"
-      :model-value="transValue"
-      @update:model-value="emitUpdate(field.fieldname, $event)"
-      @change="emitUpdate(field.fieldname, $event.value || $event)"
-    />
+    <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
+      <component
+        :is="component"
+        :placeholder="field.placeholder || `Add ${field.label}`"
+        :value="transValue"
+        :model-value="transValue"
+        @update:model-value="emitUpdate(field.fieldname, $event)"
+        @change="emitUpdate(field.fieldname, $event.value || $event)"
+      />
+    </div>
   </div>
 </template>
 
