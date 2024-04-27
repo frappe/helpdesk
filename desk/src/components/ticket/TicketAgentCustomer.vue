@@ -38,7 +38,7 @@ import { Avatar, Tooltip } from "frappe-ui";
 import { EmailIcon, LinkIcon, TicketIcon } from "@/components/icons/";
 import { errorMessage } from "@/utils";
 
-defineProps({
+const props = defineProps({
   name: {
     type: String,
     required: true,
@@ -53,8 +53,10 @@ defineProps({
   },
 });
 
+const emit = defineEmits(["email:open"]);
+
 function openEmailBox() {
-  console.log("Open email box");
+  emit("email:open", props.email);
 }
 
 function openWebsite() {

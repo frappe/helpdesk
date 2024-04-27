@@ -8,3 +8,5 @@ export { default as CommentIcon } from "./CommentIcon.vue";
 export { default as IndicatorIcon } from "./IndicatorIcon.vue";
 export { default as TicketIcon } from "./TicketIcon.vue";
 export { default as AttachmentIcon } from "./AttachmentIcon.vue";
+export { default as ReplyIcon } from "./ReplyIcon.vue";
+export { default as ReplyAllIcon } from "./ReplyAllIcon.vue";

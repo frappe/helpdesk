@@ -5,6 +5,8 @@
       <span>#{{ ticket.name }}</span>
     </div>
     <TicketAgentCustomer
+      v-if="ticket.customer"
+      @email:open="(e) => emit('email:open', e)"
       :name="ticket.customer"
       email="abc@email.com"
       website="www.example.com"
@@ -48,7 +50,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits(["update", "email:open"]);
 
 function update(val) {
   emit("update", val);

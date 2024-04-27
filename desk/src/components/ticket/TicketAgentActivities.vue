@@ -23,7 +23,11 @@
           </div>
         </div>
         <div class="mt-4 w-full">
-          <EmailBox v-if="activity.type === 'email'" v-bind="activity" />
+          <EmailBox
+            v-if="activity.type === 'email'"
+            v-bind="activity"
+            @reply="(e) => emit('email:reply', e)"
+          />
           <CommentBox
             v-else-if="activity.type === 'comment'"
             v-bind="activity"
@@ -46,6 +50,8 @@ defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["email:reply"]);
 
 function getActivityIcon(type) {
   if (type === "email") return EmailAtIcon;

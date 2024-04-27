@@ -5,7 +5,7 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <div v-if="ticket.data.assignees.length">
+        <div v-if="ticket.data.assignees?.length">
           <component :is="ticket.data.assignees.length == 1 ? 'Button' : 'div'">
             <MultipleAvatar
               :avatars="ticket.data.assignees"
@@ -54,8 +54,14 @@
         <TicketAgentActivities
           ref="ticketAgentActivitiesRef"
           :activities="activities"
+          @email:reply="
+            (e) => {
+              communicationAreaRef.replyToEmail(e);
+            }
+          "
         />
         <CommunicationArea
+          ref="communicationAreaRef"
           v-model="ticket.data"
           :to-emails="[ticket.data.raised_by]"
           :cc-emails="[]"
@@ -71,6 +77,7 @@
       <TicketAgentSidebar
         :ticket="ticket.data"
         @update="({ field, value }) => updateTicket(field, value)"
+        @email:open="(e) => communicationAreaRef.replyToEmail(null, e)"
       />
     </div>
     <AssignmentModal
@@ -108,6 +115,7 @@ import { createToast } from "@/utils";
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 const ticketAgentActivitiesRef = ref(null);
+const communicationAreaRef = ref(null);
 
 const props = defineProps({
   ticketId: {
@@ -126,20 +134,22 @@ const ticket = createResource({
     name: props.ticketId,
   },
   transform: (data) => {
-    data.assignees = JSON.parse(data._assign).map((assignee) => {
-      return {
-        name: assignee,
-        image: getUser(assignee).user_image,
-        label: getUser(assignee).full_name,
-      };
-    });
+    if (data._assign) {
+      data.assignees = JSON.parse(data._assign).map((assignee) => {
+        return {
+          name: assignee,
+          image: getUser(assignee).user_image,
+          label: getUser(assignee).full_name,
+        };
+      });
+    }
   },
 });
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
-    label: ticket.value?.data?.subject,
+    label: ticket.data?.subject,
     route: { name: "TicketAgent" },
   });
 
@@ -270,6 +280,13 @@ function updateTicket(fieldname: string, value: string) {
         title: "Ticket updated",
         icon: "check",
         iconClasses: "text-green-600",
+      });
+    },
+    onError: () => {
+      createToast({
+        title: "Failed to update ticket",
+        icon: "x",
+        iconClasses: "text-red-600",
       });
     },
   });

@@ -15,24 +15,32 @@
         </Tooltip>
       </div>
       <div class="flex gap-0.5">
-        <Tooltip text="Reply">
-          <Button
-            variant="ghost"
-            class="text-gray-700"
-            @click="console.log('reply')"
-          >
-            <ReplyIcon class="h-4 w-4" />
-          </Button>
-        </Tooltip>
-        <Tooltip text="Reply All">
-          <Button
-            variant="ghost"
-            class="text-gray-700"
-            @click="console.log('reply all')"
-          >
-            <ReplyAllIcon class="h-4 w-4" />
-          </Button>
-        </Tooltip>
+        <Button
+          variant="ghost"
+          class="text-gray-700"
+          @click="
+            emit('reply', {
+              content: content,
+              to: sender.name,
+            })
+          "
+        >
+          <ReplyIcon class="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          class="text-gray-700"
+          @click="
+            emit('reply', {
+              content: content,
+              to: to,
+              cc: cc,
+              bcc: bcc,
+            })
+          "
+        >
+          <ReplyAllIcon class="h-4 w-4" />
+        </Button>
       </div>
     </div>
     <div class="text-sm leading-5 text-gray-600">
@@ -68,8 +76,7 @@
 <script setup lang="ts">
 import { UserAvatar, AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
-import ReplyIcon from "./icons/ReplyIcon.vue";
-import ReplyAllIcon from "./icons/ReplyAllIcon.vue";
+import { ReplyIcon, ReplyAllIcon } from "./icons/";
 
 const props = defineProps({
   sender: {
@@ -93,4 +100,6 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["reply"]);
 </script>

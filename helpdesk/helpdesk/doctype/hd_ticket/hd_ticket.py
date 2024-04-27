@@ -458,13 +458,13 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def reply_via_agent(
-		self, message: str, cc: str = None, bcc: str = None, attachments: List[str] = []
+		self, message: str, to: str = None, cc: str = None, bcc: str = None, attachments: List[str] = []
 	):
 		skip_email_workflow = self.skip_email_workflow()
 		medium = "" if skip_email_workflow else "Email"
 		subject = f"Re: {self.subject} (#{self.name})"
 		sender = frappe.session.user
-		recipients = self.raised_by
+		recipients = to or self.raised_by
 		sender_email = None if skip_email_workflow else self.sender_email()
 		last_communication = self.get_last_communication()
 

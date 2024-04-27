@@ -1,15 +1,15 @@
 <template>
   <TextEditor
-    ref="e"
+    ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
       true && 'min-h-[7rem]',
     ]"
-    :content="content"
+    :content="newEmail"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    @change="editable ? (content = $event) : null"
+    @change="editable ? (newEmail = $event) : null"
   >
     <template #top>
       <div
@@ -23,9 +23,19 @@
           :validate="validateEmail"
           :error-message="(value) => `${value} is an invalid email address`"
         />
+        <Button
+          :label="'CC'"
+          :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
+          @click="toggleCC()"
+        />
+        <Button
+          :label="'BCC'"
+          :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
+          @click="toggleBCC()"
+        />
       </div>
       <div
-        v-if="cc"
+        v-if="showCC || cc"
         class="mx-10 flex items-center gap-2 py-2.5"
         :class="bcc ? 'border-b' : ''"
       >
@@ -38,7 +48,7 @@
           :error-message="(value) => `${value} is an invalid email address`"
         />
       </div>
-      <div v-if="bcc" class="mx-10 flex items-center gap-2 py-2.5">
+      <div v-if="showBCC || bcc" class="mx-10 flex items-center gap-2 py-2.5">
         <span class="text-xs text-gray-500">BCC:</span>
         <MultiSelectInput
           ref="bccInput"
@@ -99,7 +109,11 @@
             variant="solid"
             :disabled="emailEmpty"
             label="Submit"
-            @click="() => {}"
+            @click="
+              () => {
+                submitMail();
+              }
+            "
           />
         </div>
       </div>
@@ -108,7 +122,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineModel, ref, computed } from "vue";
+import { defineModel, ref, computed, nextTick } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
@@ -119,6 +133,7 @@ import {
 import { validateEmail } from "@/utils";
 import { MultiSelectInput } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
+const editorRef = ref(null);
 
 const props = defineProps({
   placeholder: {
@@ -132,14 +147,6 @@ const props = defineProps({
   doctype: {
     type: String,
     default: "HD Ticket",
-  },
-  submitButtonProps: {
-    type: Object,
-    default: () => ({}),
-  },
-  discardButtonProps: {
-    type: Object,
-    default: () => ({}),
   },
   toEmails: {
     type: Array,
@@ -164,13 +171,14 @@ const emailEmpty = computed(() => {
 const emit = defineEmits(["submit", "discard"]);
 
 const doc = defineModel();
-const content = defineModel("content");
 const attachments = defineModel("attachments");
-const cc = ref(props.ccEmails.length ? true : false);
-const bcc = ref(props.bccEmails.length ? true : false);
 const toEmailsClone = ref([...props.toEmails]);
 const ccEmailsClone = ref([...props.ccEmails]);
 const bccEmailsClone = ref([...props.bccEmails]);
+const showCC = ref(false);
+const showBCC = ref(false);
+const cc = computed(() => (ccEmailsClone.value.length ? true : false));
+const bcc = computed(() => (bccEmailsClone.value.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
 
@@ -179,12 +187,13 @@ function submitMail() {
     url: "run_doc_method",
     makeParams: () => ({
       dt: props.doctype,
-      dn: doc.value.data.name,
+      dn: doc.value.name,
       method: "reply_via_agent",
       args: {
         attachments: attachments.value.map((x) => x.name),
-        cc: ccEmailsClone,
-        bcc: bccEmailsClone,
+        to: toEmailsClone.value.join(","),
+        cc: ccEmailsClone.value.join(","),
+        bcc: bccEmailsClone.value.join(","),
         message: newEmail.value,
       },
     }),
@@ -192,7 +201,45 @@ function submitMail() {
       emit("submit");
     },
   });
+
   sendMail.submit();
+}
+
+function toggleCC() {
+  showCC.value = !showCC.value;
+
+  showCC.value &&
+    nextTick(() => {
+      ccInput.value.setFocus();
+    });
+}
+
+function toggleBCC() {
+  showBCC.value = !showBCC.value;
+  showBCC.value &&
+    nextTick(() => {
+      bccInput.value.setFocus();
+    });
+}
+
+function addToReply(
+  body: string,
+  toEmails: string[],
+  ccEmails: string[],
+  bccEmails: string[]
+) {
+  toEmailsClone.value = toEmails;
+  ccEmailsClone.value = ccEmails;
+  bccEmailsClone.value = bccEmails;
+  editorRef.value.editor
+    .chain()
+    .clearContent()
+    .insertContent(body)
+    .focus("all")
+    .setBlockquote()
+    .insertContentAt(0, { type: "paragraph" })
+    .focus("start")
+    .run();
 }
 
 const textEditorMenuButtons = [
@@ -232,4 +279,8 @@ const textEditorMenuButtons = [
     "DeleteTable",
   ],
 ];
+
+defineExpose({
+  addToReply,
+});
 </script>

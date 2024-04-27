@@ -23,22 +23,9 @@
         </template>
       </Button>
     </div>
-    <div v-show="showEmailBox" class="flex gap-1.5">
-      <Button
-        label="CC"
-        :class="[false ? 'bg-gray-300 hover:bg-gray-200' : '']"
-        @click="toggleCC()"
-      />
-      <Button
-        label="BCC"
-        :class="[false ? 'bg-gray-300 hover:bg-gray-200' : '']"
-        @click="toggleBCC()"
-      />
-    </div>
   </div>
   <div v-show="showCommentBox">
     <CommentTextEditor
-      ref="newCommentEditor"
       v-model="doc"
       v-model:attachments="attachments"
       :editable="showCommentBox"
@@ -64,7 +51,8 @@
     @keydown.meta.enter.capture.stop="submitEmail"
   >
     <EmailEditor
-      ref="newEmailEditor"
+      ref="emailEditorRef"
+      v-model="doc"
       v-model:content="content"
       v-model:attachments="attachments"
       :to-emails="toEmails"
@@ -86,21 +74,18 @@
 </template>
 
 <script setup lang="ts">
-import { createResource } from "frappe-ui";
-import EmailIcon from "@/components/icons/EmailIcon.vue";
-import CommentIcon from "@/components/icons/CommentIcon.vue";
-import { useAuthStore } from "@/stores/auth";
-import { EmailEditor, CommentTextEditor } from "@/components";
-import { ref, defineModel, nextTick } from "vue";
+import { ref, defineModel } from "vue";
 
-const authStore = useAuthStore();
+import { EmailEditor, CommentTextEditor } from "@/components";
+import { EmailIcon, CommentIcon } from "@/components/icons/";
+
 const content = defineModel("content");
 const showEmailBox = ref(false);
 const showCommentBox = ref(false);
 const doc = defineModel();
 const attachments = ref([]);
-const newEmailEditor = ref(null);
 const emit = defineEmits(["update"]);
+const emailEditorRef = ref(null);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -116,20 +101,14 @@ function toggleCommentBox() {
   showCommentBox.value = !showCommentBox.value;
 }
 
-function toggleCC() {
-  newEmailEditor.value.cc = !newEmailEditor.value.cc;
-  newEmailEditor.value.cc &&
-    nextTick(() => {
-      newEmailEditor.value.ccInput.setFocus();
-    });
-}
-
-function toggleBCC() {
-  newEmailEditor.value.bcc = !newEmailEditor.value.bcc;
-  newEmailEditor.value.bcc &&
-    nextTick(() => {
-      newEmailEditor.value.bccInput.setFocus();
-    });
+function replyToEmail(data: object) {
+  showEmailBox.value = true;
+  emailEditorRef.value.addToReply(
+    data.content,
+    data.to?.split(","),
+    data.cc?.split(","),
+    data.bcc?.split(",")
+  );
 }
 
 const props = defineProps({
@@ -149,9 +128,9 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  content: {
-    type: String,
-    default: "",
-  },
+});
+
+defineExpose({
+  replyToEmail,
 });
 </script>
