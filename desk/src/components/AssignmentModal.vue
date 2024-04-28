@@ -33,6 +33,7 @@
         class="form-control"
         value=""
         doctype="User"
+        :reset-input="true"
         @change="
           (option) => {
             addAssignee(option.value);

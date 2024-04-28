@@ -6,7 +6,9 @@
     @update:query="(q) => onUpdateQuery(q)"
     @change="
       (v) => {
-        selection = v;
+        if (!resetInput) {
+          selection = v;
+        }
         emit('change', v);
       }
     "
@@ -49,6 +51,11 @@ const props = defineProps({
     type: Number,
     required: false,
     default: 100,
+  },
+  resetInput: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 
