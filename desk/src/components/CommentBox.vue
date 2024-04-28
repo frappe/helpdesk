@@ -20,7 +20,7 @@
       </div>
     </div>
     <div
-      class="grow cursor-pointer rounded bg-gray-50 px-4 py-3 text-base leading-6 transition-all duration-300 ease-in-out"
+      class="prose-f grow cursor-pointer rounded bg-gray-50 px-4 py-3 text-base leading-6 transition-all duration-300 ease-in-out"
       v-html="content"
     />
   </div>
