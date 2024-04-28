@@ -1,7 +1,7 @@
 <template>
   <div class="flex w-[382px] flex-col justify-between border-l">
     <div class="h-10.5 flex items-center justify-between border-b px-5 py-2.5">
-      <span class="text-lg font-semibold">About This Ticket</span>
+      <span class="text-lg font-semibold">About this Ticket</span>
       <span>#{{ ticket.name }}</span>
     </div>
     <TicketAgentCustomer

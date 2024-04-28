@@ -87,7 +87,7 @@
   </TextEditor>
 </template>
 <script setup lang="ts">
-import { defineModel, computed } from "vue";
+import { defineModel, computed, ref } from "vue";
 import {
   TextEditorFixedMenu,
   TextEditor,
@@ -118,7 +118,7 @@ const props = defineProps({
 });
 
 const doc = defineModel();
-const attachments = defineModel("attachments");
+const attachments = ref([]);
 const emit = defineEmits(["submit", "discard"]);
 const newComment = useStorage("commentBoxContent", "");
 const commentEmpty = computed(() => {

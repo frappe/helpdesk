@@ -60,6 +60,21 @@
       </div>
     </template>
     <template #bottom>
+      <div class="flex flex-wrap gap-2 px-10">
+        <AttachmentItem
+          v-for="a in attachments"
+          :key="a.file_url"
+          :label="a.file_name"
+        >
+          <template #suffix>
+            <FeatherIcon
+              class="h-3.5"
+              name="x"
+              @click.stop="removeAttachment(a)"
+            />
+          </template>
+        </AttachmentItem>
+      </div>
       <div
         class="flex justify-between gap-2 overflow-hidden border-t px-10 py-2.5"
       >
@@ -72,7 +87,11 @@
                 docname: modelValue?.name,
                 private: true,
               }"
-              @success="(f) => attachments.push(f)"
+              @success="
+                (f) => {
+                  attachments.push(f);
+                }
+              "
             >
               <template #default="{ openFileSelector }">
                 <Button variant="ghost" @click="openFileSelector()">
@@ -131,7 +150,7 @@ import {
   createResource,
 } from "frappe-ui";
 import { validateEmail } from "@/utils";
-import { MultiSelectInput } from "@/components";
+import { MultiSelectInput, AttachmentItem } from "@/components";
 import { AttachmentIcon } from "@/components/icons";
 const editorRef = ref(null);
 
@@ -171,14 +190,14 @@ const emailEmpty = computed(() => {
 const emit = defineEmits(["submit", "discard"]);
 
 const doc = defineModel();
-const attachments = defineModel("attachments");
+const attachments = ref([]);
 const toEmailsClone = ref([...props.toEmails]);
 const ccEmailsClone = ref([...props.ccEmails]);
 const bccEmailsClone = ref([...props.bccEmails]);
 const showCC = ref(false);
 const showBCC = ref(false);
-const cc = computed(() => (ccEmailsClone.value.length ? true : false));
-const bcc = computed(() => (bccEmailsClone.value.length ? true : false));
+const cc = computed(() => (ccEmailsClone.value?.length ? true : false));
+const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
 
@@ -220,6 +239,10 @@ function toggleBCC() {
     nextTick(() => {
       bccInput.value.setFocus();
     });
+}
+
+function removeAttachment(attachment) {
+  attachments.value = attachments.value.filter((a) => a !== attachment);
 }
 
 function addToReply(
