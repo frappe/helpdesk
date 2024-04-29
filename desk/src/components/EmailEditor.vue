@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
+      'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto py-3',
       true && 'min-h-[7rem]',
     ]"
     :content="newEmail"
@@ -12,10 +12,7 @@
     @change="editable ? (newEmail = $event) : null"
   >
     <template #top>
-      <div
-        class="mx-10 flex items-center gap-2 border-t py-2.5"
-        :class="[cc || bcc ? 'border-b' : '']"
-      >
+      <div class="mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -37,7 +34,7 @@
       <div
         v-if="showCC || cc"
         class="mx-10 flex items-center gap-2 py-2.5"
-        :class="bcc ? 'border-b' : ''"
+        :class="cc || showCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">CC:</span>
         <MultiSelectInput
@@ -48,7 +45,11 @@
           :error-message="(value) => `${value} is an invalid email address`"
         />
       </div>
-      <div v-if="showBCC || bcc" class="mx-10 flex items-center gap-2 py-2.5">
+      <div
+        v-if="showBCC || bcc"
+        class="mx-10 flex items-center gap-2 py-2.5"
+        :class="bcc || showBCC ? 'border-b' : ''"
+      >
         <span class="text-xs text-gray-500">BCC:</span>
         <MultiSelectInput
           ref="bccInput"
@@ -75,9 +76,7 @@
           </template>
         </AttachmentItem>
       </div>
-      <div
-        class="flex justify-between gap-2 overflow-hidden border-t px-10 py-2.5"
-      >
+      <div class="flex justify-between gap-2 overflow-hidden px-10 py-2.5">
         <div class="flex items-center overflow-x-auto">
           <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
