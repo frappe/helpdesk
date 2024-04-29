@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-4 flex-col text-base">
+  <div class="flex-col text-base">
     <div class="mb-0.5 flex justify-between py-1.5">
       <div class="text-gray-600">
         <span class="font-medium text-gray-800">
@@ -11,11 +11,10 @@
         </span>
       </div>
       <div>
-        <Tooltip
-          :text="dateFormat(creation, dateTooltipFormat)"
-          class="text-gray-600"
-        >
-          {{ timeAgo(creation) }}
+        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+          <div class="text-gray-600">
+            {{ timeAgo(creation) }}
+          </div>
         </Tooltip>
       </div>
     </div>

@@ -1,17 +1,16 @@
 <template>
   <div
-    class="mb-6 grow cursor-pointer rounded-md border-transparent bg-gray-50 p-3 text-base leading-6 transition-all duration-300 ease-in-out"
+    class="grow cursor-pointer rounded-md border-transparent bg-gray-50 text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-1 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2">
         <UserAvatar :name="sender.name" size="md" />
         <span>{{ sender.full_name }}</span>
         <span>&middot;</span>
-        <Tooltip
-          class="text-sm text-gray-600"
-          :text="dateFormat(creation, dateTooltipFormat)"
-        >
-          {{ timeAgo(creation) }}
+        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+          <div class="text-sm text-gray-600">
+            {{ timeAgo(creation) }}
+          </div>
         </Tooltip>
       </div>
       <div class="flex gap-0.5">

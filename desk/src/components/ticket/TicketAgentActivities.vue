@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen overflow-y-auto">
+  <div class="h-screen overflow-y-auto py-3.5">
     <div
       v-for="(activity, i) in activities"
       :key="activity.key"
@@ -11,16 +11,20 @@
           :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
         >
           <div
-            class="z-10 mt-3 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
-            :class="[activity.type === 'history' ? 'bg-white' : 'bg-gray-100']"
+            class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
+            :class="[
+              activity.type === 'history' ? 'bg-white' : 'bg-gray-100',
+              activity.type === 'comment' ? 'mt-0.5' : '',
+              activity.type === 'email' ? 'mt-2' : '',
+            ]"
           >
             <component
               :is="getActivityIcon(activity.type)"
-              :class="'text-gray-800'"
+              class="'text-gray-800'"
             />
           </div>
         </div>
-        <div class="mt-4 w-full">
+        <div class="mb-4 w-full">
           <EmailBox
             v-if="activity.type === 'email'"
             v-bind="activity"
