@@ -7,14 +7,12 @@
     >
       <div class="flex gap-4 px-10">
         <div
-          class="relative flex justify-center before:absolute before:left-[50%] before:top-0 before:-z-10 before:border-l before:border-gray-200"
+          class="relative flex justify-center after:absolute after:left-[50%] after:top-0 after:-z-10 after:border-l after:border-gray-200"
+          :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
         >
           <div
             class="z-10 mt-3 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
-            :class="[
-              i != activities.length - 1 ? 'before:h-full' : 'before:h-4',
-              activity.type === 'history' ? 'bg-white' : 'bg-gray-100',
-            ]"
+            :class="[activity.type === 'history' ? 'bg-white' : 'bg-gray-100']"
           >
             <component
               :is="getActivityIcon(activity.type)"
