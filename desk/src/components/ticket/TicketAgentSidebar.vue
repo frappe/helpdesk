@@ -5,11 +5,12 @@
       <span>#{{ ticket.name }}</span>
     </div>
     <TicketAgentCustomer
-      v-if="ticket.customer"
+      v-if="ticket.contact"
+      :name="
+        ticket.contact.name ? ticket.contact.name : ticket.contact.email_id
+      "
+      :email="ticket.contact.email_id"
       @email:open="(e) => emit('email:open', e)"
-      :name="ticket.customer"
-      email="abc@email.com"
-      website="www.example.com"
     />
     <TicketAgentDetails
       :first-responded-on="ticket.first_responded_on"
