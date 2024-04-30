@@ -10,12 +10,27 @@ from helpdesk.utils import check_permissions, get_customer, is_agent
 
 
 @frappe.whitelist()
-def new(doc, attachments=[]):
+def new(doc, attachments=[],email_id = None,cc = None,bcc = None):
+	if email_id:
+		contact = frappe.db.get_all("Contact",fields = ['name'],filters = {'email_id':email_id})
+		if contact:
+			doc["contact"] = contact[0]['name']
+		else:
+			username = email_id.split('@', 1)[0]
+			new_contact = frappe.new_doc("Contact")
+			new_contact.first_name = username
+			new_contact.status = 'Passive'
+			new_contact.email_id = email_id
+			new_contact.save(ignore_permissions = True)
+			new_contact.append("email_ids",{"email_id":email_id,"is_primary":1})
+			new_contact.save(ignore_permissions = True)
+			doc["contact"] = new_contact.name
 	doc["doctype"] = "HD Ticket"
 	doc["via_customer_portal"] = bool(frappe.session.user)
 	d = frappe.get_doc(doc).insert()
-	d.create_communication_via_contact(d.description, attachments)
+	d.create_communication_via_contact(d.description, attachments , cc = cc, bcc = bcc)
 	return d
+
 
 
 @frappe.whitelist()

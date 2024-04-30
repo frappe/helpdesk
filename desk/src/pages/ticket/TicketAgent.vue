@@ -74,7 +74,7 @@
               <div class="my-2.5 space-y-2 border-y py-2">
                 <div>
                   <span class="mr-3 text-xs text-gray-500">TO:</span>
-                  <Button :label="ticket.data.raised_by" />
+                  <Button :label="ticket.data.contact.email_id" />
                 </div>
                 <div v-if="showCc">
                   <span class="inline-flex flex-wrap items-center gap-1">
