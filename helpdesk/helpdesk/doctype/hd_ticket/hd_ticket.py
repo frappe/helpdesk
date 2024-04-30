@@ -172,9 +172,9 @@ class HDTicket(Document):
 		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
+		self.set_contact()
 
 		if self.via_customer_portal:
-			self.set_contact()
 			self.set_customer()
 
 	def validate(self):
