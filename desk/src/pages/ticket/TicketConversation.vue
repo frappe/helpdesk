@@ -20,18 +20,43 @@
         :attachments="c.attachments"
       >
         <template #top-right="d">
+          <Button label="To & Cc" @click="showPopup(c)" />
           <slot name="communication-top-right" v-bind="d" />
         </template>
       </TicketCommunication>
+      <Dialog v-model="showPopupDialog" :options="{ size: 'xl', position: 'top' }">
+        <template #body>
+          <div class="relative">
+            <div class="px-4.5 mb-2.5 text-base text-gray-600">
+              <div style="overflow-wrap: break-word;">
+                <!-- <b>To:</b> {{ recipientsToString(currentConversation.recipients) }}<br>
+                <b>CC:</b> {{ currentConversation.cc }} -->
+                <table>
+                  <tr>
+                  <td style="vertical-align: top;"><b>To:</b></td>
+                  <td>{{ recipientsToString(currentConversation.recipients) }}</td>
+                  </tr>
+                  <tr>
+                  <td style="vertical-align: top;"><b>CC:</b></td>
+                  <td>{{ currentConversation.cc }}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </template>
+      </Dialog>
+      <!-- <div>{{c.recipients}}</div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, watch } from "vue";
+import { computed, inject, nextTick, watch, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useElementVisibility } from "@vueuse/core";
 import { orderBy } from "lodash";
+import { Dropdown, FeatherIcon, Dialog, Button } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import TicketComment from "./TicketComment.vue";
 import TicketCommunication from "./TicketCommunication.vue";
@@ -40,6 +65,18 @@ import { ITicket } from "./symbols";
 interface P {
   focus?: string;
 }
+const showPopupDialog = ref(false);
+const currentConversation = ref(null);
+
+const showPopup = (conversation) => {
+  currentConversation.value = conversation;
+  showPopupDialog.value = true;
+};
+
+function recipientsToString(value_){
+  if (!Array.isArray(value_)) return "";
+      return value_.join(", ");
+};
 
 const props = withDefaults(defineProps<P>(), {
   focus: "",
@@ -54,6 +91,7 @@ const conversation = computed(() =>
     dayjs(c.creation)
   )
 );
+
 
 function scroll(id: string) {
   const e = document.getElementById(id);
@@ -72,4 +110,6 @@ nextTick(() => {
   const id = hash || conversation.value.slice(-1).pop()?.name;
   if (id) setTimeout(() => scroll(id), 1000);
 });
+
+
 </script>
