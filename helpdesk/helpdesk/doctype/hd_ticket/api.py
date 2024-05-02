@@ -66,6 +66,7 @@ def get_one(name):
 		"tags": get_tags(name),
 		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"views": get_views(name),
+		"ticket_recipients": ["abc"]
 	}
 
 
@@ -105,8 +106,16 @@ def get_communications(ticket: str):
 		.where(QBCommunication.reference_doctype == "HD Ticket")
 		.where(QBCommunication.reference_name == ticket)
 		.orderby(QBCommunication.creation, order=Order.asc)
+		# .limit(1)
 		.run(as_dict=True)
 	)
+	# Fetching the latest communication
+	# latest_communication = communications[-1]  # Assuming the last item is the latest
+
+	# # Fetching recipients and cc from the latest communication
+	# latest_recipients = latest_communication.get("recipients", [])
+	# latest_cc = latest_communication.get("cc", [])
+
 	for c in communications:
 		c.attachments = get_attachments("Communication", c.name)
 		c.user = get_user_info_for_avatar(c.sender)
@@ -115,16 +124,19 @@ def get_communications(ticket: str):
 	for email_data in communications:
 		recipients = email_data['recipients']
 		email_data['recipients'] = extract_emails(recipients)
-	frappe.log_error(title="communication list", message=communications)
+		# email_data['cc'] = latest_cc
 	return communications
 
 
 # Function to extract email addresses
 import re
 def extract_emails(recipients):
-    # Use regular expression to find email addresses
-    email_pattern = r'[\w\.-]+@[\w\.-]+'
-    return re.findall(email_pattern, recipients)
+	try:
+		# Use regular expression to find email addresses
+		email_pattern = r'[\w\.-]+@[\w\.-]+'
+		return re.findall(email_pattern, str(recipients))
+	except Exception:
+		frappe.log_error(title="extract Reciepient error in portal", message= frappe.get_traceback())
 
 def get_comments(ticket: str):
 	if not frappe.has_permission("HD Ticket Comment", "read"):
@@ -212,3 +224,8 @@ def get_attachments(doctype, name):
 		.where(QBFile.attached_to_name == name)
 		.run(as_dict=True)
 	)
+
+@frappe.whitelist()
+def get_recipient_list_from_tickets(filters):
+	data = frappe.db.get_all("HD Ticket", filters=filters, pluck='raised_by', group_by='raised_by')
+	return data

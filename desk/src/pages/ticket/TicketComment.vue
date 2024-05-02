@@ -4,11 +4,11 @@
       <div class="flex items-center gap-0.5 text-base">
         <UserAvatar v-bind="user" size="lg" expand strong />
         <Icon icon="lucide:dot" class="text-gray-500" />
-        <Tooltip :text="dayjs(date).long()">
+        <!-- <Tooltip :text="date"> -->
           <div class="text-gray-600">
-            {{ dayjs(date).fromNow() }}
+            {{ date }}
           </div>
-        </Tooltip>
+        <!-- </Tooltip> -->
         <Icon v-if="isPinned" icon="lucide:dot" class="text-gray-500" />
         <Badge v-if="isPinned" label="Pinned" theme="blue" variant="outline" />
       </div>

@@ -101,6 +101,47 @@
                         
                       "
                     />
+                    <Button label="Get Emails" @click="showPopup" theme='blue'/>
+                    <Dialog v-model="open" :options="{ title: 'Fetch Emails', size: 'lg' }">
+                      <template #body-content>
+                        <div class="w-full space-y-1">
+                            <div>
+                              <span class="mb-2 block text-sm leading-4 text-gray-700">
+                                Select Email
+                              </span>
+                            </div>
+                            <Autocomplete
+                              :value="selectedCustomer"
+                              :resource-options="{
+                                url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_recipient_list_from_tickets',
+                                inputMap: (query) => {
+                                  return {
+                                    filters: [['raised_by', 'like', `%${query}%`]],
+                                  };
+                                },
+                                responseMap: (res) => {
+                                  return res.map((d) => {
+                                    return {
+                                      label: d,
+                                      value: d
+                                    };
+                                  });
+                                },
+                              }"
+                              @change="
+                                (item) => {
+                                  if (!item) {
+                                    return;
+                                  }
+                                  selectedCustomer = item.value;
+                                  recipient = [...recipient.split(','), selectedCustomer].join(',');
+                                  //selectedCustomer = ''; // Clear the selected email after adding it to the recipients
+                                }
+                              "
+                            />
+                            </div>
+                        </template>
+                    </Dialog>
                 </div>
                 <div v-if="showCc">
                 <span class="inline-flex flex-wrap items-center gap-1">
@@ -225,6 +266,8 @@ import TicketPinnedComments from "./TicketPinnedComments.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 import { ITicket } from "./symbols";
 
+
+
 interface P {
   ticketId: string;
 }
@@ -258,6 +301,14 @@ const showBcc = ref(false);
 const mode = ref(Mode.Comment);
 const focus = ref("");
 const showCannedResponses = ref(false);
+
+
+const open = ref(false);
+const customer = ref("");
+
+function showPopup(){
+  open.value = true
+}
 
 createResource({
   url: "run_doc_method",
@@ -375,29 +426,28 @@ function fetchDefaultRecipient() {
     const recipient_set = new Set(); // Use a Set to automatically remove duplicates
     watchEffect(() => {
       const details = ticket.data?.communications;
-      if (details != undefined) {
-        details.forEach(d => {
-          // Add sender to the Set
-          recipient_set.add(d.sender);
+      if (details !== undefined) {
+        const result = Array.isArray(details[details.length - 1]) ? details[details.length - 1] : [details[details.length - 1]];
+
+        result.forEach(d => {
           // If recipients is an array, spread it to add each email individually to the Set
-          if (Array.isArray(d.recipients)) {
-            d.recipients.forEach(email => {
+          if (Array.isArray(d['recipients'])) {
+            d['recipients'].forEach(email => {
               recipient_set.add(email.trim()); // Trim to remove any leading/trailing spaces
             });
           } else if (typeof d.recipients === 'string') {
             // If recipients is a string, split it by comma and add each email to the Set
-            d.recipients.split(',').forEach(email => {
+            d['recipients'].split(',').forEach(email => {
               recipient_set.add(email.trim()); // Trim to remove any leading/trailing spaces
             });
           }
-        });
+        })
         const uniqueToList = Array.from(recipient_set); // Convert Set back to array
         resolve(uniqueToList);
       }
     });
   });
 }
-
 
 function fetchDefaultcc() {
   return new Promise((resolve, reject) => {
@@ -409,30 +459,35 @@ function fetchDefaultcc() {
       if (details != undefined) {
         
         const item = JSON.parse(JSON.stringify(details));
-        item.forEach(d => {
-          // console.log(d.recipients);
-          fetch_cc_tag += d.cc;
-          // cc_list.push(d.cc);
-        });
-        var include_regular_expression_in_cc = false
-        const re = /[^< ]+(?=>)/g;
-        const matchedcc = fetch_cc_tag.match(re) || []; // Handle case when there are no matches
-        matchedcc.forEach(function(email) {
-            include_regular_expression_in_cc = true
-            cc_list.push(email);
-        });
+        const result = null
+        if (item !== undefined) {
+          const result = Array.isArray(item[item.length - 1]) ? item[item.length - 1] : [item[item.length - 1]];
+          // console.log(result['cc']);
+          
+          result.forEach(x => {
+            fetch_cc_tag += x['cc']
+          })
         
-        if (!include_regular_expression_in_cc){
-          item.forEach(d => {
-            if (!cc_list.includes(d.cc)){
-              cc_list.push(d.cc);
+            var include_regular_expression_in_cc = false
+            const re = /[^< ]+(?=>)/g;
+            const matchedcc = fetch_cc_tag.match(re) || []; // Handle case when there are no matches
+            matchedcc.forEach(function(email) {
+                include_regular_expression_in_cc = true
+                cc_list.push(email);
+            });
+
+            if(!include_regular_expression_in_cc){
+              result.forEach(x => {
+                cc_list.push(x['cc']);
+              })
             }
-        });
+            const UniqueCCList = [...new Set(cc_list)];
+            resolve(UniqueCCList);
+          // });
         }
         // location.reload()
         
-        const UniqueCCList = [...new Set(cc_list)];
-        resolve(UniqueCCList);
+       
       }
     });
   });
