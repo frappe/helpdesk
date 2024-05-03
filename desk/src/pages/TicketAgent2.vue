@@ -84,11 +84,11 @@
       v-if="ticket.data"
       v-model="showAssignmentModal"
       :assignees="ticket.data.assignees"
+      :docname="ticketId"
+      doctype="HD Ticket"
       @update="
-        (data) => {
-          updateAssignees(data);
-          // TODO: what if error? / async
-          showAssignmentModal = false;
+        () => {
+          ticket.reload();
         }
       "
     />
@@ -241,28 +241,6 @@ const activities = computed(() => {
 
   return data;
 });
-
-function updateAssignees({ assigneesToRemove, newAssignees }) {
-  for (const a of assigneesToRemove) {
-    call("frappe.desk.form.assign_to.remove", {
-      doctype: "HD Ticket",
-      name: props.ticketId,
-      assign_to: a,
-    });
-  }
-
-  if (newAssignees.length) {
-    call("frappe.desk.form.assign_to.add", {
-      doctype: "HD Ticket",
-      name: props.ticketId,
-      assign_to: newAssignees,
-    });
-  }
-
-  ticket.reload();
-
-  //TODO: promise.all, await, multiple assignees?
-}
 
 function updateTicket(fieldname: string, value: string) {
   createResource({

@@ -19,10 +19,7 @@
           label: 'Update',
           variant: 'solid',
           onClick: () => {
-            emit('update', {
-              newAssignees: newAssignees.map((assignee) => assignee.name),
-              assigneesToRemove: assigneesToRemove,
-            });
+            updateAssignees();
           },
         },
       ],
@@ -102,40 +99,44 @@
 
 <script setup lang="ts">
 import { ref, defineModel, watch } from "vue";
+import { call } from "frappe-ui";
 import { UserAvatar, SearchComplete } from "@/components";
 import { useUserStore } from "@/stores/user";
-let emit = defineEmits(["update"]);
 
 const props = defineProps({
   assignees: {
     type: Array,
     default: () => [],
   },
+  doctype: {
+    type: String,
+    required: true,
+  },
+  docname: {
+    type: String,
+    required: true,
+  },
 });
+
+const emit = defineEmits(["update"]);
 
 const { getUser } = useUserStore();
 
 const show = defineModel();
 const newAssignees = ref([]);
-const currentAssignees = ref([]);
+const currentAssignees = ref([...props.assignees]);
 const assigneesToRemove = [];
-
-watch(
-  () => props.assignees,
-  (newValue) => {
-    currentAssignees.value = JSON.parse(JSON.stringify(newValue));
-  }
-);
 
 const error = ref("");
 
 const addAssignee = (value) => {
   error.value = "";
-  if (
-    ![...newAssignees.value, ...currentAssignees.value].find(
-      (assignee) => assignee.name === value
-    )
-  ) {
+  const assigneeExists = [
+    ...newAssignees.value,
+    ...currentAssignees.value,
+  ].find((assignee) => assignee.name === value);
+
+  if (!assigneeExists) {
     let obj = {
       name: value,
       image: getUser(value).user_image,
@@ -157,4 +158,36 @@ const removeCurrentAssignee = (value) => {
   );
   assigneesToRemove.push(value);
 };
+
+function updateAssignees() {
+  const promises = [];
+  for (const assigneeToRemove of assigneesToRemove) {
+    promises.push(
+      call("frappe.desk.form.assign_to.remove", {
+        doctype: props.doctype,
+        name: props.docname,
+        assign_to: assigneeToRemove,
+      })
+    );
+  }
+
+  if (newAssignees.value.length) {
+    promises.push(
+      call("frappe.desk.form.assign_to.add", {
+        doctype: props.doctype,
+        name: props.docname,
+        assign_to: newAssignees.value.map((assignee) => assignee.name),
+      })
+    );
+  }
+
+  Promise.all(promises)
+    .then(() => {
+      emit("update");
+      show.value = false;
+    })
+    .catch((e) => {
+      error.value = e.message;
+    });
+}
 </script>
