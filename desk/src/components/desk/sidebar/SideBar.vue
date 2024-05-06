@@ -139,7 +139,6 @@ const menuOptions = computed(() => [
     label: "Knowledge base",
     icon: LucideBookOpen,
     to: "DeskKBHome",
-    isBeta: true,
   },
 ]);
 
@@ -153,7 +152,6 @@ const extraOptions = [
     label: "Escalation rules",
     icon: LucideArrowUpFromLine,
     to: AGENT_PORTAL_ESCALATION_RULE_LIST,
-    isBeta: true,
   },
   {
     label: "Ticket types",
@@ -165,7 +163,6 @@ const extraOptions = [
     label: "Canned responses",
     icon: LucideCloudLightning,
     to: "CannedResponses",
-    isBeta: true,
   },
   {
     label: "Customers",
