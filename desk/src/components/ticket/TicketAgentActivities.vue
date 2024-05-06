@@ -20,7 +20,9 @@
           >
             <component
               :is="getActivityIcon(activity.type)"
-              class="'text-gray-800'"
+              :class="[
+                activity.type == 'history' ? 'text-gray-600' : 'text-gray-800',
+              ]"
             />
           </div>
         </div>

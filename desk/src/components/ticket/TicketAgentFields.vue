@@ -11,13 +11,16 @@
       <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
         <FormControl
           v-if="o.type === 'select'"
+          class="form-control"
           :type="o.type"
+          :placeholder="`Add ${o.label}`"
           :value="ticket[o.field]"
           :options="customers?.data"
           @change="update(o.field, $event.target.value)"
         />
         <Autocomplete
           v-else
+          class="form-control"
           :options="o.store.dropdown"
           :placeholder="`Add ${o.label}`"
           :value="ticket[o.field]"
@@ -96,3 +99,31 @@ function update(field, value) {
   emit("update", { field, value });
 }
 </script>
+<style scoped>
+:deep(.form-control input:not([type="checkbox"])),
+:deep(.form-control select),
+:deep(.form-control textarea),
+:deep(.form-control button) {
+  border-color: transparent;
+  background: white;
+}
+
+:deep(.form-control button) {
+  gap: 0;
+}
+:deep(.form-control [type="checkbox"]) {
+  margin-left: 9px;
+  cursor: pointer;
+}
+
+:deep(.form-control button > div) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:deep(.form-control button svg) {
+  color: white;
+  width: 0;
+}
+</style>

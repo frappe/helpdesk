@@ -7,7 +7,8 @@
     <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
       <component
         :is="component"
-        :placeholder="field.placeholder || `Add ${field.label}`"
+        class="form-control"
+        :placeholder="`Add ${field.label}`"
         :value="transValue"
         :model-value="transValue"
         @update:model-value="emitUpdate(field.fieldname, $event)"
@@ -99,3 +100,31 @@ function emitUpdate(fieldname: Field["fieldname"], value: Value) {
   emit("change", { fieldname, value });
 }
 </script>
+<style scoped>
+:deep(.form-control input:not([type="checkbox"])),
+:deep(.form-control select),
+:deep(.form-control textarea),
+:deep(.form-control button) {
+  border-color: transparent;
+  background: white;
+}
+
+:deep(.form-control button) {
+  gap: 0;
+}
+:deep(.form-control [type="checkbox"]) {
+  margin-left: 9px;
+  cursor: pointer;
+}
+
+:deep(.form-control button > div) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:deep(.form-control button svg) {
+  color: white;
+  width: 0;
+}
+</style>

@@ -11,23 +11,26 @@
         <Button class="h-7 w-7">
           <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
         </Button>
-        <Tooltip text="Go to website...">
-          <Button class="h-7 w-7">
-            <LinkIcon
-              class="h-4 w-4"
-              @click="
-                website
-                  ? openWebsite()
-                  : errorMessage('error', 'Website not available')
-              "
-            />
+        <!-- <RouterLink
+          class="group cursor-pointer space-x-1 hover:text-gray-900"
+          :to="{
+            name: 'TicketsAgent',
+          }"
+          target="_blank"
+        >
+          <Button
+            class="h-7 w-7"
+            @click="
+              () => {
+                console.log('Show Contact Tickets');
+              }
+            "
+          >
+            <Tooltip text="Show Contact Tickets">
+              <TicketIcon class="h-4 w-4" />
+            </Tooltip>
           </Button>
-        </Tooltip>
-        <Tooltip text="Show Customer Tickets">
-          <Button class="h-7 w-7">
-            <TicketIcon class="h-4 w-4" @click="console.log('tick')" />
-          </Button>
-        </Tooltip>
+        </RouterLink> -->
       </div>
     </div>
   </div>
@@ -35,8 +38,7 @@
 
 <script setup lang="ts">
 import { Avatar, Tooltip } from "frappe-ui";
-import { EmailIcon, LinkIcon, TicketIcon } from "@/components/icons/";
-import { errorMessage } from "@/utils";
+import { EmailIcon, TicketIcon } from "@/components/icons/";
 
 const props = defineProps({
   name: {
@@ -57,9 +59,5 @@ const emit = defineEmits(["email:open"]);
 
 function openEmailBox() {
   emit("email:open", props.email);
-}
-
-function openWebsite() {
-  console.log("Open website");
 }
 </script>

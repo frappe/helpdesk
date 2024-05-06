@@ -10,7 +10,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
-    :mentions="agentStore.dropdown"
+    :mentions="agents"
     @change="editable ? (newComment = $event) : null"
   >
     <template #bottom>
@@ -100,7 +100,7 @@ import { AttachmentItem } from "@/components/";
 import { useAgentStore } from "@/stores/agent";
 import { useStorage } from "@vueuse/core";
 
-const agentStore = useAgentStore();
+const { agents: agentsList } = useAgentStore();
 
 const props = defineProps({
   placeholder: {
@@ -123,6 +123,15 @@ const emit = defineEmits(["submit", "discard"]);
 const newComment = useStorage("commentBoxContent", "");
 const commentEmpty = computed(() => {
   return !newComment.value || newComment.value === "<p></p>";
+});
+
+const agents = computed(() => {
+  return (
+    agentsList.data?.map((agent) => ({
+      label: agent.agent_name.trimEnd(),
+      value: agent.name,
+    })) || []
+  );
 });
 
 function removeAttachment(attachment) {
