@@ -7,7 +7,7 @@
     }"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
-    <SidebarLink
+    <!-- <SidebarLink
       label="Search"
       class="mb-1"
       :icon="LucideSearch"
@@ -20,7 +20,7 @@
           <span>K</span>
         </span>
       </template>
-    </SidebarLink>
+    </SidebarLink> -->
     <span class="mb-4">
       <div
         v-if="notificationStore.unread"
@@ -54,15 +54,6 @@
         :is-active="option.to?.includes(route.name.toString())"
       />
     </div>
-    <div class="flex flex-col gap-1">
-      <SidebarLink
-        v-for="option in extraOptions.filter((o) => !o.hide)"
-        v-bind="option"
-        :key="option.label"
-        :is-expanded="isExpanded"
-        :is-active="option.to?.includes(route.name?.toString())"
-      />
-    </div>
     <div class="grow" />
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
@@ -86,11 +77,8 @@ import {
   AGENT_PORTAL_AGENT_LIST,
   AGENT_PORTAL_CONTACT_LIST,
   AGENT_PORTAL_CUSTOMER_LIST,
-  AGENT_PORTAL_DASHBOARD,
-  AGENT_PORTAL_ESCALATION_RULE_LIST,
   AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
-  AGENT_PORTAL_TICKET_TYPE_LIST,
   CUSTOMER_PORTAL_LANDING,
 } from "@/router";
 import { useDevice } from "@/composables";
@@ -98,14 +86,10 @@ import { SidebarLink } from "@/components";
 import UserMenu from "./UserMenu.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideArrowUpFromLine from "~icons/lucide/arrow-up-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
-import LucideFolderOpen from "~icons/lucide/folder-open";
 import LucideInbox from "~icons/lucide/inbox";
-import LucideLayoutGrid from "~icons/lucide/layout-grid";
-import LucideSearch from "~icons/lucide/search";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
@@ -117,18 +101,12 @@ const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
-const device = useDevice();
 
 const menuOptions = computed(() => [
   {
     label: "Tickets",
     icon: LucideTicket,
     to: AGENT_PORTAL_TICKET_LIST,
-  },
-  {
-    label: "Dashboard",
-    icon: LucideLayoutGrid,
-    to: AGENT_PORTAL_DASHBOARD,
   },
   {
     label: "Agents",
@@ -140,24 +118,10 @@ const menuOptions = computed(() => [
     icon: LucideBookOpen,
     to: "DeskKBHome",
   },
-]);
-
-const extraOptions = [
   {
     label: "Teams",
     icon: LucideUsers,
     to: AGENT_PORTAL_TEAM_LIST,
-  },
-  {
-    label: "Escalation rules",
-    icon: LucideArrowUpFromLine,
-    to: AGENT_PORTAL_ESCALATION_RULE_LIST,
-  },
-  {
-    label: "Ticket types",
-    icon: LucideFolderOpen,
-    to: AGENT_PORTAL_TICKET_TYPE_LIST,
-    hide: true,
   },
   {
     label: "Canned responses",
@@ -174,7 +138,7 @@ const extraOptions = [
     icon: LucideContact2,
     to: AGENT_PORTAL_CONTACT_LIST,
   },
-];
+]);
 
 const profileSettings = [
   {
@@ -197,9 +161,9 @@ const profileSettings = [
   },
 ];
 
-function openCommandPalette() {
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "k", metaKey: true })
-  );
-}
+// function openCommandPalette() {
+//   window.dispatchEvent(
+//     new KeyboardEvent("keydown", { key: "k", metaKey: true })
+//   );
+// }
 </script>
