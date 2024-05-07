@@ -107,7 +107,7 @@
                         <div class="w-full space-y-1">
                             <div>
                               <span class="mb-2 block text-sm leading-4 text-gray-700">
-                                Select Email
+                                Select To
                               </span>
                             </div>
                             <Autocomplete
@@ -135,6 +135,41 @@
                                   }
                                   selectedCustomer = item.value;
                                   recipient = [...recipient.split(','), selectedCustomer].join(',');
+                                  //selectedCustomer = ''; // Clear the selected email after adding it to the recipients
+                                }
+                              "
+                            />
+                            <!-- </div> -->
+                            <div>
+                              <span class="mb-2 block text-sm leading-4 text-gray-700">
+                                Select CC
+                              </span>
+                            </div>
+                            <Autocomplete
+                              :value="selectedCC"
+                              :resource-options="{
+                                url: 'helpdesk.helpdesk.doctype.hd_ticket.api.get_recipient_list_from_tickets',
+                                inputMap: (query) => {
+                                  return {
+                                    filters: [['raised_by', 'like', `%${query}%`]],
+                                  };
+                                },
+                                responseMap: (res) => {
+                                  return res.map((d) => {
+                                    return {
+                                      label: d,
+                                      value: d
+                                    };
+                                  });
+                                },
+                              }"
+                              @change="
+                                (item) => {
+                                  if (!item) {
+                                    return;
+                                  }
+                                  selectedCC = item.value;
+                                  cc = [...cc.split(','), selectedCC].join(',');
                                   //selectedCustomer = ''; // Clear the selected email after adding it to the recipients
                                 }
                               "
@@ -430,6 +465,7 @@ function fetchDefaultRecipient() {
         const result = Array.isArray(details[details.length - 1]) ? details[details.length - 1] : [details[details.length - 1]];
 
         result.forEach(d => {
+          recipient_set.add(d['sender'])
           // If recipients is an array, spread it to add each email individually to the Set
           if (Array.isArray(d['recipients'])) {
             d['recipients'].forEach(email => {
@@ -512,5 +548,10 @@ function refreshCcList() {
     .catch((error) => {
       console.error('Error fetching CC list:', error);
     });
+}
+
+function addSelectedToCC() {
+  cc.value = [...cc.split(','), selectedEmail].join(',');
+  selectedEmail = ''; // Clear the selected email after adding it to the CC list
 }
 </script>
