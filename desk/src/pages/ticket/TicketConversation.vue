@@ -20,9 +20,11 @@
         :attachments="c.attachments"
       >
         <template #top-right="d">
+        <div class="flex justify-end items-center space-x-2">
           <Button label="To & Cc" @click="showPopup(c)" />
           <slot name="communication-top-right" v-bind="d" />
-        </template>
+        </div>
+      </template>
       </TicketCommunication>
       <Dialog v-model="showPopupDialog" :options="{ size: 'xl', position: 'top' }">
         <template #body>
