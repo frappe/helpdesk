@@ -42,4 +42,5 @@ permission_query_conditions = {
 
 ignore_links_on_delete = [
 	"HD Notification",
+	"HD Ticket Comment",
 ]

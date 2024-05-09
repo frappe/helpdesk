@@ -38,8 +38,8 @@
                 </div>
                 <div id="operator">
                   <FormControl
+                    v-model="filter.operator"
                     type="select"
-                    :value="filter.operator"
                     :options="getOperators(filter.field.fieldtype)"
                     placeholder="Operator"
                     @change="
@@ -60,7 +60,7 @@
                       getValSelect(filter.field.fieldtype, filter.field.options)
                     "
                     v-else
-                    :value="filter.value"
+                    v-model="filter.value"
                     placeholder="Value"
                     @change="(e) => updateFilter(idx, null, e.target.value)"
                   />
@@ -111,8 +111,8 @@
 
 <script setup lang="ts">
 import { h } from "vue";
-import { Autocomplete, FormControl } from "frappe-ui";
-import { NestedPopover, SearchComplete } from "@/components";
+import { FormControl } from "frappe-ui";
+import { NestedPopover, SearchComplete, Autocomplete } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { DocField } from "@/types";
 

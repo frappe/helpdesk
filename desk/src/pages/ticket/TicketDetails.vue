@@ -115,7 +115,15 @@
         <span class="block text-sm text-gray-700">
           {{ o.label }}
         </span>
+        <FormControl
+          v-if="o.type === 'select'"
+          :type="o.type"
+          :value="data[o.field]"
+          :options="customers?.data"
+          @change="update(o.field, $event.target.value)"
+        />
         <Autocomplete
+          v-else
           :options="o.store.dropdown"
           :placeholder="`Select a ${o.label}`"
           :value="data[o.field]"
@@ -135,7 +143,8 @@
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
-import { createResource, Autocomplete, Tooltip } from "frappe-ui";
+import { Autocomplete } from "@/components";
+import { createResource, Tooltip, FormControl } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { emitter } from "@/emitter";
 import { createToast } from "@/utils";
@@ -166,7 +175,26 @@ const options = computed(() => [
     label: "Team",
     store: useTeamStore(),
   },
+  {
+    field: "customer",
+    label: "Customer",
+    type: "select",
+  },
 ]);
+
+const customers = createResource({
+  url: "helpdesk.utils.get_customer",
+  params: {
+    contact: ticket?.data?.raised_by,
+  },
+  auto: true,
+  transform: (data) => {
+    return data.map((d) => ({
+      label: d,
+      value: d,
+    }));
+  },
+});
 
 function update(fieldname: string, value: string) {
   createResource({

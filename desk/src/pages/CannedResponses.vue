@@ -26,6 +26,15 @@
           name: 'CannedResponse',
           params: { id: row.name },
         }),
+        emptyState: {
+          title: 'No canned response found',
+          description: 'Create a new canned response to get started',
+          button: {
+            label: 'New Canned Responses',
+            variant: 'solid',
+            onClick: () => (showNewDialog = true),
+          },
+        },
         selectable: true,
         showTooltip: false,
       }"

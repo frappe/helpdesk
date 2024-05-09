@@ -9,7 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { Autocomplete, createListResource } from "frappe-ui";
+import { Autocomplete } from "@/components";
+import { createListResource } from "frappe-ui";
 import { computed, ref } from "vue";
 
 const props = defineProps({

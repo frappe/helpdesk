@@ -126,7 +126,7 @@ import { ref } from "vue";
 import ColumnsIcon from "@/components/icons/ColumnsIcon.vue";
 import EditIcon from "@/components/icons/EditIcon.vue";
 import NestedPopover from "@/components/NestedPopover.vue";
-import { Autocomplete } from "frappe-ui";
+import { Autocomplete } from "@/components";
 import Draggable from "vuedraggable";
 
 let emit = defineEmits(["event:column"]);

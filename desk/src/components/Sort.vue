@@ -33,9 +33,9 @@
                 @change="(field) => updateSort(i, field)"
               />
               <FormControl
+                v-model="sort.direction"
                 class="!w-32"
                 type="select"
-                :value="sort.direction"
                 :options="[
                   { label: 'Ascending', value: 'asc' },
                   { label: 'Descending', value: 'desc' },
@@ -87,9 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { Autocomplete } from "frappe-ui";
-
-import { NestedPopover } from "@/components";
+import { NestedPopover, Autocomplete } from "@/components";
 import SortIcon from "@/components/icons/SortIcon.vue";
 
 const props = defineProps({

@@ -167,13 +167,15 @@ class HDTicket(Document):
 		self.check_update_perms()
 		self.set_ticket_type()
 		self.set_raised_by()
-		self.set_contact()
-		self.set_customer()
 		self.set_priority()
 		self.set_first_responded_on()
 		self.set_feedback_values()
 		self.apply_escalation_rule()
 		self.set_sla()
+
+		if self.via_customer_portal:
+			self.set_contact()
+			self.set_customer()
 
 	def validate(self):
 		self.validate_feedback()
@@ -190,10 +192,10 @@ class HDTicket(Document):
 	def on_update(self):
 		if self.status == "Open":
 			if self.get_doc_before_save() and self.get_doc_before_save().status != "Open":
-				
-				agent = json.loads(self._assign)
-				if len(agent) > 0:
-					self.notify_agent(agent[0], "Reaction")
+
+				agent = self.get_assigned_agent()
+				if agent:
+					self.notify_agent(agent.name, "Reaction")
 		
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
@@ -240,7 +242,9 @@ class HDTicket(Document):
 		if self.customer:
 			return
 		customer = get_customer(self.contact)
-		if len(customer) > 0:
+		
+		# let agent assign the customer when one contact has more than one customer
+		if len(customer) == 1:
 			self.customer = customer[0]
 
 	def set_priority(self):
@@ -351,7 +355,10 @@ class HDTicket(Document):
 
 		clear_all_assignments("HD Ticket", self.name)
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
-		self.notify_agent(agent, "Assignment")
+		
+		if frappe.session.user != agent:
+			self.notify_agent(agent, "Assignment")
+		
 		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
 	def get_assigned_agent(self):

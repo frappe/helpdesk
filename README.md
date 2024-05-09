@@ -1,18 +1,19 @@
 <div align="center" markdown="1">
-  <picture>
-	<source 
-	  media="(prefers-color-scheme: dark)" 
-	  srcset=".github/logo_dark.svg">
-	<img
-	  width="260"
-	  alt="Frappe Helpdesk logo" 
-	  src=".github/logo_light.svg">
-  </picture>
-  </br>
-  Modern, Streamlined, Customer Service Software
-  </br>
+	<a href="https://frappedesk.com/">
+		<img src=".github/hd-logo.svg" height="128" alt="Frappe Helpdesk Logo">
+	</a>
+	<h2>Frappe Helpdesk</h2>
+	<p align="center">
+	<p>Modern, Streamlined, Customer Service Software</p>
+	</p>
   
-  [frappedesk.com](https://frappedesk.com)
+[frappedesk.com](https://frappedesk.com)
+
+<div align="center" style="max-height: 40px;">
+	<a href="https://frappecloud.com/fdesk/signup">
+		<img src=".github/try-on-f-cloud-button.svg" height="50">
+	</a>
+</div>
 </div>
 
 ---
