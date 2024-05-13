@@ -41,6 +41,7 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
+  const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
 
   const login = createResource({
     url: URI_LOGIN,
@@ -93,5 +94,6 @@ export const useAuthStore = defineStore("auth", () => {
     userName,
     username,
     verify,
+    timezone,
   };
 });

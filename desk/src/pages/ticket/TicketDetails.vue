@@ -81,7 +81,7 @@
             <span class="block text-sm text-gray-700">Modified</span>
             <Tooltip :text="dayjs(ticket.data.modified).long()">
               <span class="block break-words font-medium text-gray-900">
-                {{ dayjs(ticket.data.modified).fromNow() }}
+                {{ dayjs.tz(ticket.data.modified).fromNow() }}
               </span>
             </Tooltip>
           </div>

@@ -63,7 +63,7 @@
             variant="outline"
           />
           <Tooltip v-else :text="dayjs(data.response_by).long()">
-            {{ dayjs(data.response_by).fromNow() }}
+            {{ dayjs.tz(data.response_by).fromNow() }}
           </Tooltip>
         </span>
       </template>
@@ -85,12 +85,12 @@
             variant="outline"
           />
           <Tooltip v-else :text="dayjs(data.resolution_by).long()">
-            {{ dayjs(data.resolution_by).fromNow() }}
+            {{ dayjs.tz(data.resolution_by).fromNow() }}
           </Tooltip>
         </span>
       </template>
       <template #creation="{ data }">
-        {{ dayjs(data.creation).fromNow() }}
+        {{ dayjs.tz(data.creation).fromNow() }}
       </template>
     </ListView>
   </div>
