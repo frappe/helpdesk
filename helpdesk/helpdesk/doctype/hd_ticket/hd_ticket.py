@@ -368,15 +368,22 @@ class HDTicket(Document):
 		if hasattr(self, "_assign") and self._assign:
 			assignees = json.loads(self._assign)
 			if len(assignees) > 0:
-				agent_doc = frappe.get_doc("HD Agent", assignees[0])
-				return agent_doc
 
+				# TODO: temporary fix, remove this when only agents can be assigned to ticket
+				exists = frappe.db.exists("HD Agent", assignees[0])
+				if exists:
+					agent_doc = frappe.get_doc("HD Agent", assignees[0])
+					return agent_doc
+		
 		from frappe.desk.form.assign_to import get
 
 		assignees = get({"doctype": "HD Ticket", "name": self.name})
 		if len(assignees) > 0:
-			agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
-			return agent_doc
+			# TODO: temporary fix, remove this when only agents can be assigned to ticket
+			exists = frappe.db.exists("HD Agent", assignees[0].owner)
+			if exists:
+				agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
+				return agent_doc
 
 		return None
 
