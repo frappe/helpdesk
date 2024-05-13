@@ -20,7 +20,7 @@
               @click.stop="
                 $emit(
                   'update:attachments',
-                  attachments.filter((a) => a.file_url !== a.file_url)
+                  attachments.filter((b) => b.file_url !== a.file_url)
                 )
               "
             />
