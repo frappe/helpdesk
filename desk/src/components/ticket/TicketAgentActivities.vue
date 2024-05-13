@@ -5,7 +5,7 @@
       :key="activity.key"
       class="activity"
     >
-      <div class="flex gap-4 px-10">
+      <div class="flex gap-4 px-6">
         <div
           class="relative flex justify-center after:absolute after:left-[50%] after:top-0 after:-z-10 after:border-l after:border-gray-200"
           :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"

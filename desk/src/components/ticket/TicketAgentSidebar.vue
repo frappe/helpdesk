@@ -4,6 +4,18 @@
       <span class="cursor-copy text-lg font-semibold" @click="copyToClipboard()"
         >#{{ ticket.name }}</span
       >
+      <RouterLink
+        :to="{
+          name: 'TicketAgent',
+        }"
+      >
+        <Button
+          :variant="'subtle'"
+          theme="gray"
+          size="sm"
+          label="Go to old view"
+        />
+      </RouterLink>
     </div>
     <TicketAgentCustomer
       v-if="ticket.contact"

@@ -41,10 +41,8 @@
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
       <div class="flex flex-1 flex-col">
-        <div
-          class="pr-7.5 flex items-center justify-between border-b py-1 pl-10"
-        >
-          <span class="text-lg font-semibold">Activity</span>
+        <div class="flex items-center justify-between border-b py-1 pr-2.5">
+          <span class="pl-6 text-lg font-semibold">Activity</span>
           <Switch
             v-model="showFullActivity"
             size="sm"

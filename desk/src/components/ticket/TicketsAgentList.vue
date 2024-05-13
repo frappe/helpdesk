@@ -5,12 +5,10 @@
     :columns="columns"
     :rows="rows"
     :options="{
-      getRowRoute: options.openInNewTab
-        ? null
-        : (row) => ({
-            name: 'TicketAgent',
-            params: { ticketId: row.name },
-          }),
+      getRowRoute: (row) => ({
+        name: 'TicketAgent2',
+        params: { ticketId: row.name },
+      }),
       selectable: options.selectable,
       showTooltip: false,
     }"
@@ -23,7 +21,6 @@
         :key="row.name"
         v-slot="{ column, item }"
         :row="row"
-        @click="options.openInNewTab ? openInNewTab(row) : null"
       >
         <div
           v-if="column.key === '_assign'"
@@ -163,7 +160,6 @@ const props = defineProps({
       totalCount: 0,
       rowCount: 0,
       selectable: true,
-      openInNewTab: false,
     }),
   },
 });
@@ -187,14 +183,6 @@ function handleFieldClick(e, name: string, value: string) {
       value,
     });
   }
-}
-
-function openInNewTab(row) {
-  const path = router.resolve({
-    name: "TicketAgent",
-    params: { ticketId: row.name },
-  });
-  window.open(path.href, "_blank");
 }
 
 //TODO: move all constants to relevant composables

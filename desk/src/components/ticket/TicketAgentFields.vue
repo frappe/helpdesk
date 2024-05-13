@@ -13,7 +13,6 @@
           v-if="o.type === 'select'"
           class="form-control"
           :type="o.type"
-          :placeholder="`Add ${o.label}`"
           :value="ticket[o.field]"
           :options="customers?.data"
           @change="update(o.field, $event.target.value)"
@@ -91,6 +90,7 @@ const options = computed(() => {
       field: "customer",
       label: "Customer",
       type: "select",
+      placeholder: "Select Customer",
     },
   ];
 });
