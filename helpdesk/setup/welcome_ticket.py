@@ -1,8 +1,8 @@
 import frappe
 from frappe.desk.form.assign_to import add as add_assign
 
-AUTHOR_EMAIl = "sabu@frappe.io"
-AUTHOR_NAME = "Sabu Siyad"
+AUTHOR_EMAIl = "sumit.b@frappe.io"
+AUTHOR_NAME = "Sumit Bhanushali"
 CONTENT = """
 <p>
 Hi 👋
@@ -18,7 +18,7 @@ https://frappedesk.com/helpdesk</a>
 <br><br>
 Best,
 <br>
-Sabu Siyad | Frappe Helpdesk.
+Sumit Bhanushali | Frappe Helpdesk.
 """
 
 
