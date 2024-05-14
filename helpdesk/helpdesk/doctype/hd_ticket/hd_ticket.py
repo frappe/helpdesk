@@ -192,10 +192,10 @@ class HDTicket(Document):
 	def on_update(self):
 		if self.status == "Open":
 			if self.get_doc_before_save() and self.get_doc_before_save().status != "Open":
-				
-				agent = json.loads(self._assign)
-				if len(agent) > 0:
-					self.notify_agent(agent[0], "Reaction")
+
+				agent = self.get_assigned_agent()
+				if agent:
+					self.notify_agent(agent.name, "Reaction")
 		
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
@@ -241,11 +241,13 @@ class HDTicket(Document):
 		# Skip if `Customer` is already set
 		if self.customer:
 			return
-		customer = get_customer(self.contact)
 		
-		# let agent assign the customer when one contact has more than one customer
-		if len(customer) == 1:
-			self.customer = customer[0]
+		if self.contact:
+			customer = get_customer(self.contact)
+			
+			# let agent assign the customer when one contact has more than one customer
+			if len(customer) == 1:
+				self.customer = customer[0]
 
 	def set_priority(self):
 		if self.priority:
@@ -366,15 +368,22 @@ class HDTicket(Document):
 		if hasattr(self, "_assign") and self._assign:
 			assignees = json.loads(self._assign)
 			if len(assignees) > 0:
-				agent_doc = frappe.get_doc("HD Agent", assignees[0])
-				return agent_doc
 
+				# TODO: temporary fix, remove this when only agents can be assigned to ticket
+				exists = frappe.db.exists("HD Agent", assignees[0])
+				if exists:
+					agent_doc = frappe.get_doc("HD Agent", assignees[0])
+					return agent_doc
+		
 		from frappe.desk.form.assign_to import get
 
 		assignees = get({"doctype": "HD Ticket", "name": self.name})
 		if len(assignees) > 0:
-			agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
-			return agent_doc
+			# TODO: temporary fix, remove this when only agents can be assigned to ticket
+			exists = frappe.db.exists("HD Agent", assignees[0].owner)
+			if exists:
+				agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
+				return agent_doc
 
 		return None
 

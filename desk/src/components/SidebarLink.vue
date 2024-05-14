@@ -28,18 +28,12 @@
       }"
     >
       {{ label }}
-      <slot name="right">
-        <Tooltip :text="betaText">
-          <Badge v-if="isBeta" theme="orange" variant="subtle">beta</Badge>
-        </Tooltip>
-      </slot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { Badge, Tooltip } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 
 interface P {
@@ -47,19 +41,16 @@ interface P {
   label: string;
   isExpanded: boolean;
   isActive?: boolean;
-  isBeta?: boolean;
   onClick?: () => void;
   to?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   isActive: false,
-  isBeta: false,
   onClick: () => () => true,
   to: "",
 });
 const router = useRouter();
-const betaText = "This feature is a work in progress. Use with caution";
 
 function handle() {
   props.onClick();

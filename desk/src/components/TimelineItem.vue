@@ -6,7 +6,7 @@
     </div>
     <Tooltip :text="dayjs(date).long()">
       <div class="text-gray-700 first-letter:capitalize">
-        {{ dayjs(date).fromNow() }}
+        {{ dayjs.tz(date).fromNow() }}
       </div>
     </Tooltip>
   </span>
