@@ -9,12 +9,12 @@
     <div class="flex items-center gap-2 text-sm text-gray-600">
       <div class="text-gray-600">Created</div>
       <div class="text-gray-800">
-        {{ dayjs(creation).fromNow() }}
+        {{ dayjs.tz(creation).fromNow() }}
       </div>
       <div class="text-base text-gray-300">|</div>
       <div class="text-gray-600">Modified</div>
       <div class="text-gray-800">
-        {{ dayjs(modified).fromNow() }}
+        {{ dayjs.tz(modified).fromNow() }}
       </div>
       <div class="text-base text-gray-300">|</div>
       <Icon icon="lucide:thumbs-up" class="h-4 w-4" />

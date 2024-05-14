@@ -1,7 +1,11 @@
 import d from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { useAuthStore } from "./stores/auth";
 
+const authStore = useAuthStore();
 declare module "dayjs" {
   interface Dayjs {
     /** Example: `Aug 15, 2:29 AM` */
@@ -21,5 +25,8 @@ d.extend(function (_, cls) {
     return this.format("LLLL");
   };
 });
+d.extend(utc);
+d.extend(timezone);
+d.tz.setDefault(authStore.timezone);
 
 export const dayjs = d;

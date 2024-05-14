@@ -72,7 +72,7 @@
               variant="outline"
             />
             <Tooltip v-else :text="dayjs(item).long()">
-              {{ dayjs(item).fromNow() }}
+              {{ dayjs.tz(item).fromNow() }}
             </Tooltip>
           </div>
           <div v-else-if="column.key === 'resolution_by'">
@@ -91,14 +91,15 @@
               variant="outline"
             />
             <Tooltip v-else :text="dayjs(item).long()">
-              {{ dayjs(item).fromNow() }}
+              {{ dayjs.tz(item).fromNow() }}
             </Tooltip>
           </div>
           <div v-else-if="column.key === 'creation'">
             {{ convert_date(item) }}
+
           </div>
           <div v-else-if="column.key === 'modified'">
-            {{ dayjs(item).fromNow() }}
+            {{ dayjs.tz(item).fromNow() }}
           </div>
         </ListRowItem>
       </ListRow>
