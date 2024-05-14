@@ -13,6 +13,7 @@ def get_user():
 		"name",
 		"user_image",
 		"username",
+		"time_zone",
 	]
 	user = frappe.get_value(
 		doctype="User",
@@ -39,6 +40,7 @@ def get_user():
 		"user_first_name": user_first_name,
 		"user_name": user_name,
 		"username": username,
+		"time_zone": user.time_zone,
 	}
 
 
