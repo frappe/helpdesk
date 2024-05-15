@@ -18,7 +18,6 @@
       </RouterLink>
     </div>
     <TicketAgentCustomer
-      v-if="ticket.contact"
       :name="
         ticket.contact.name ? ticket.contact.name : ticket.contact.email_id
       "
@@ -53,6 +52,7 @@
       :response-by="ticket.response_by"
       :resolution-date="ticket.resolution_date"
       :resolution-by="ticket.resolution_by"
+      :ticket-created-on="ticket.creation"
       :source="ticket.via_customer_portal ? 'Portal' : 'Mail'"
     />
     <TicketAgentFields :ticket="ticket" @update="update" />

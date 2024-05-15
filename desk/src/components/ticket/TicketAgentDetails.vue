@@ -7,24 +7,32 @@
     >
       <div class="w-[106px] text-sm text-gray-600">{{ s.label }}</div>
       <div class="flex items-center justify-between gap-2.5">
-        <div>{{ s.value }}</div>
-        <Badge
-          v-if="s.badgeText"
-          class="-ml-1"
-          :label="s.badgeText"
-          variant="subtle"
-          :theme="s.badgeColor"
-        />
+        <div v-if="s.value">{{ s.value }}</div>
+        <Tooltip :text="s.tooltipValue">
+          <Badge
+            v-if="s.badgeText"
+            class="-ml-1"
+            :label="s.badgeText"
+            variant="subtle"
+            :theme="s.badgeColor"
+          />
+        </Tooltip>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Badge } from "frappe-ui";
+import { Badge, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
+import { formatTime } from "@/utils";
+import { dateFormat, dateTooltipFormat } from "@/utils";
 
 const props = defineProps({
+  ticketCreatedOn: {
+    type: String,
+    required: true,
+  },
   firstRespondedOn: {
     type: String,
     required: true,
@@ -48,14 +56,16 @@ const props = defineProps({
 });
 
 let firstResponseBadge;
-if (!props.firstRespondedOn) {
+if (!props.firstRespondedOn && dayjs().isBefore(dayjs(props.responseBy))) {
   firstResponseBadge = {
-    label: "Due",
+    label: `Due in ${formatTime(dayjs(props.responseBy).diff(dayjs(), "s"))}`,
     color: "orange",
   };
 } else if (dayjs(props.firstRespondedOn).isBefore(dayjs(props.responseBy))) {
   firstResponseBadge = {
-    label: "Fulfilled",
+    label: `Fulfilled in ${formatTime(
+      dayjs(props.firstRespondedOn).diff(dayjs(props.ticketCreatedOn), "s")
+    )}`,
     color: "green",
   };
 } else {
@@ -66,9 +76,9 @@ if (!props.firstRespondedOn) {
 }
 
 let resolutionBadge;
-if (!props.resolutionDate) {
+if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
   resolutionBadge = {
-    label: "Due",
+    label: `Due in ${formatTime(dayjs(props.resolutionBy).diff(dayjs(), "s"))}`,
     color: "orange",
   };
 } else if (dayjs(props.resolutionDate).isBefore(props.resolutionBy)) {
@@ -86,13 +96,19 @@ if (!props.resolutionDate) {
 const sections = [
   {
     label: "First Response",
-    value: dayjs(props.firstRespondedOn || props.responseBy).short(),
+    tooltipValue: dateFormat(
+      props.firstRespondedOn || props.responseBy,
+      dateTooltipFormat
+    ),
     badgeText: firstResponseBadge.label,
     badgeColor: firstResponseBadge.color,
   },
   {
     label: "Resolution",
-    value: dayjs(props.resolutionDate || props.resolutionBy).short(),
+    tooltipValue: dateFormat(
+      props.resolutionDate || props.resolutionBy,
+      dateTooltipFormat
+    ),
     badgeText: resolutionBadge.label,
     badgeColor: resolutionBadge.color,
   },

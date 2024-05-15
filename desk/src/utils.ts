@@ -66,3 +66,28 @@ export function errorMessage(title, message) {
     iconClasses: "text-red-600",
   });
 }
+
+export function formatTime(seconds) {
+  const days = Math.floor(seconds / (3600 * 24));
+  const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  let formattedTime = "";
+
+  if (days > 0) {
+    formattedTime += `${days}d `;
+  }
+
+  if (hours > 0 || days > 0) {
+    formattedTime += `${hours}h `;
+  }
+
+  if (minutes > 0 || hours > 0 || days > 0) {
+    formattedTime += `${minutes}m `;
+  }
+
+  formattedTime += `${remainingSeconds}s`;
+
+  return formattedTime.trim();
+}
