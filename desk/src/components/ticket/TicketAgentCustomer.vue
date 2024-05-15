@@ -44,6 +44,7 @@ const props = defineProps({
   name: {
     type: String,
     required: true,
+    default: "Contact not found",
   },
   email: {
     type: String,
