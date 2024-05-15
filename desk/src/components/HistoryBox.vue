@@ -34,7 +34,7 @@
   <Button
     v-if="relatedActivities.length"
     :label="
-      show_others ? 'Hide' : `and ${relatedActivities.length} other activities`
+      show_others ? 'Hide' : `${relatedActivities.length} other activities`
     "
     variant="outline"
     class="mt-2"
