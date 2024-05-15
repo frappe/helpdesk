@@ -83,7 +83,9 @@ if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
   };
 } else if (dayjs(props.resolutionDate).isBefore(props.resolutionBy)) {
   resolutionBadge = {
-    label: "Fulfilled",
+    label: `Fulfilled in ${formatTime(
+      dayjs(props.resolutionDate).diff(dayjs(props.ticketCreatedOn), "s")
+    )}`,
     color: "green",
   };
 } else {
