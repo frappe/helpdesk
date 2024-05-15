@@ -156,11 +156,6 @@ const columns = [
     width: "w-96",
   },
   {
-    label: "Views",
-    key: "views",
-    width: "w-12",
-  },
-  {
     label: "Status",
     key: "status",
     width: "w-40",

@@ -87,7 +87,6 @@ const articles = createListResource({
   filters: {
     status: "Published",
   },
-  orderBy: "views desc",
   pageLength: 99999,
   debounce: 500,
   auto: false,
