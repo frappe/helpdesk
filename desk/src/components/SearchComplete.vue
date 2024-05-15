@@ -41,7 +41,7 @@ const props = defineProps({
   pageLength: {
     type: Number,
     required: false,
-    default: 100,
+    default: 1000,
   },
 });
 
