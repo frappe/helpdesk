@@ -1,12 +1,12 @@
 <template>
-  <div class="flex flex-col gap-2 border-b px-6 py-3">
+  <div class="flex flex-col gap-3 border-b px-6 py-3">
     <div
       v-for="s in sections"
       :key="s.label"
-      class="flex items-center gap-2 text-base leading-5"
+      class="flex items-center text-base leading-5"
     >
       <div class="w-[106px] text-sm text-gray-600">{{ s.label }}</div>
-      <div class="flex items-center justify-between gap-2.5">
+      <div class="flex items-center justify-between">
         <div v-if="s.value">{{ s.value }}</div>
         <Tooltip :text="s.tooltipValue">
           <Badge

@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
-import { Breadcrumbs, Dropdown, Switch, createResource, call } from "frappe-ui";
+import { Breadcrumbs, Dropdown, Switch, createResource } from "frappe-ui";
 
 import {
   LayoutHeader,
