@@ -182,8 +182,6 @@ const options__ = computed(() => ({
   categoryName:
     article.data?.category.category_name || category?.doc?.category_name,
   creation: article.data?.creation,
-  dislikes: article.data?.not_helpful,
-  likes: article.data?.helpful,
   modified: article.data?.modified,
   status: article.data?.status,
   subCategoryId: subCategoryId.value,
