@@ -89,7 +89,8 @@
   }
  ],
  "links": [],
- "modified": "2024-05-16 01:43:17.042347",
+ "make_attachments_public": 1,
+ "modified": "2024-05-16 17:24:36.902658",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",
