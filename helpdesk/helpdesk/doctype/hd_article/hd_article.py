@@ -21,7 +21,6 @@ class HDArticle(Document):
 			.select(
 				QBArticle.title,
 				QBArticle.status,
-				QBArticle.views,
 				QBArticle.author,
 				QBArticle.modified,
 			)
@@ -48,7 +47,7 @@ class HDArticle(Document):
 		if self.status == "Published" and self.idx == -1:
 			self.idx = cint(
 				frappe.db.count(
-					"HD Article", {"category": self.category}, {"status": "Published"}
+					"HD Article", {"category": self.category, "status": "Published"},
 				)
 			)
 
@@ -76,22 +75,3 @@ class HDArticle(Document):
 				{"name": current_category.name, "label": current_category.category_name}
 			)
 		return breadcrumbs[::-1]
-
-
-@frappe.whitelist(allow_guest=True)
-def add_feedback(hd_article, helpful):
-	# TODO: use a base 5 or 10 rating system instead of a boolean
-	field = "helpful" if helpful else "not_helpful"
-
-	value = cint(frappe.db.get_value("HD Article", hd_article, field))
-	frappe.db.set_value(
-		"HD Article", hd_article, field, value + 1, update_modified=False
-	)
-
-
-@frappe.whitelist(allow_guest=True)
-def increment_view(hd_article):
-	value = cint(frappe.db.get_value("HD Article", hd_article, "views"))
-	frappe.db.set_value(
-		"HD Article", hd_article, "views", value + 1, update_modified=False
-	)
