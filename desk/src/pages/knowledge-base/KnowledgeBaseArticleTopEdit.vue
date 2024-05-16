@@ -16,23 +16,11 @@
       <div class="text-gray-800">
         {{ dayjs.tz(modified).fromNow() }}
       </div>
-      <div class="text-base text-gray-300">|</div>
-      <Icon icon="lucide:thumbs-up" class="h-4 w-4" />
-      <div class="text-gray-600">Likes</div>
-      <div class="text-gray-800">
-        {{ likes }}
-      </div>
-      <div class="text-base text-gray-300">|</div>
-      <Icon icon="lucide:thumbs-down" class="h-4 w-4" />
-      <div class="text-gray-600">Dislikes</div>
-      <div class="text-gray-800">
-        {{ dislikes }}
-      </div>
     </div>
   </div>
   <div class="border-b pb-3">
     <FormControl
-      :placeholder="title"
+      :value="title"
       type="text"
       @change="emit('update:title', $event.target.value)"
     />
@@ -42,7 +30,6 @@
 <script setup lang="ts">
 import { Avatar, FormControl } from "frappe-ui";
 import { dayjs } from "@/dayjs";
-import { Icon } from "@iconify/vue";
 
 interface P {
   categoryName: string;
@@ -60,9 +47,6 @@ interface E {
   (event: "update:title", title: string): void;
 }
 
-withDefaults(defineProps<P>(), {
-  likes: 0,
-  dislikes: 0,
-});
+defineProps<P>();
 const emit = defineEmits<E>();
 </script>
