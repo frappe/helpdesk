@@ -51,10 +51,8 @@
     <div class="overflow-auto">
       <div class="container m-auto my-12">
         <TextEditor
-          :bubble-menu="true"
           :content="article.data?.content"
           :editable="editMode"
-          :floating-menu="true"
           :placeholder="placeholder"
           class="rounded"
           :class="{
@@ -69,6 +67,11 @@
               :is="topComponent"
               v-model:title="articleTitle"
               v-bind="options__"
+            />
+            <TextEditorFixedMenu
+              v-if="editMode"
+              class="-ml-1"
+              :buttons="textEditorMenuButtons"
             />
           </template>
         </TextEditor>
@@ -98,6 +101,7 @@ import {
   debounce,
   Button,
   TextEditor,
+  TextEditorFixedMenu,
 } from "frappe-ui";
 import {
   AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
@@ -160,6 +164,9 @@ const article = createResource({
   params: {
     name: props.articleId,
   },
+  onSuccess(data) {
+    articleTitle.value = data.title;
+  },
   auto: !isNew,
 });
 
@@ -182,8 +189,6 @@ const options__ = computed(() => ({
   categoryName:
     article.data?.category.category_name || category?.doc?.category_name,
   creation: article.data?.creation,
-  dislikes: article.data?.not_helpful,
-  likes: article.data?.helpful,
   modified: article.data?.modified,
   status: article.data?.status,
   subCategoryId: subCategoryId.value,
@@ -275,4 +280,42 @@ const backTo = computed(() => ({
     subCategoryId: subCategoryId.value,
   },
 }));
+
+const textEditorMenuButtons = [
+  "Paragraph",
+  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Separator",
+  "Bullet List",
+  "Numbered List",
+  "Separator",
+  "Align Left",
+  "Align Center",
+  "Align Right",
+  "FontColor",
+  "Separator",
+  "Image",
+  "Video",
+  "Link",
+  "Blockquote",
+  "Code",
+  "Horizontal Rule",
+  [
+    "InsertTable",
+    "AddColumnBefore",
+    "AddColumnAfter",
+    "DeleteColumn",
+    "AddRowBefore",
+    "AddRowAfter",
+    "DeleteRow",
+    "MergeCells",
+    "SplitCell",
+    "ToggleHeaderColumn",
+    "ToggleHeaderRow",
+    "ToggleHeaderCell",
+    "DeleteTable",
+  ],
+];
 </script>
