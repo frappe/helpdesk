@@ -35,7 +35,6 @@
 </template>
 <script setup lang="ts">
 import { Avatar, Tooltip } from "frappe-ui";
-import { computed } from "vue";
 
 const props = defineProps({
   avatars: {
