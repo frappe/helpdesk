@@ -25,7 +25,7 @@
             <Button :label="ticket.data.status">
               <template #prefix>
                 <IndicatorIcon
-                  :class="ticketStatusStore.colorMap[ticket.data.status]"
+                  :class="ticketStatusStore.textColorMap[ticket.data.status]"
                 />
               </template>
               <template #suffix>
@@ -161,7 +161,7 @@ const dropdownOptions = computed(() =>
     onClick: () => updateTicket("status", o),
     icon: () =>
       h(IndicatorIcon, {
-        class: ticketStatusStore.colorMap[o],
+        class: ticketStatusStore.textColorMap[o],
       }),
   }))
 );

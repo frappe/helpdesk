@@ -36,7 +36,7 @@
         >
           <template #prefix>
             <div v-if="column.key === 'status'">
-              <IndicatorIcon :class="ticketStatusStore.colorMap[item]" />
+              <IndicatorIcon :class="ticketStatusStore.textColorMap[item]" />
             </div>
           </template>
           <div v-if="column.key === 'agreement_status'">
