@@ -100,14 +100,14 @@
                 </Button>
               </template>
             </FileUploader>
-            <!-- <Button
+            <Button
               variant="ghost"
-              @click="showEmailTemplateSelectorModal = true"
+              @click="showCannedResponseSelectorModal = true"
             >
               <template #icon>
                 <EmailIcon class="h-4" />
               </template>
-            </Button> -->
+            </Button>
           </div>
         </div>
         <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
@@ -137,6 +137,11 @@
       </div>
     </template>
   </TextEditor>
+  <CannedResponseSelectorModal
+    v-model="showCannedResponseSelectorModal"
+    :doctype="doctype"
+    @apply="applyCannedResponse"
+  />
 </template>
 
 <script setup lang="ts">
@@ -149,9 +154,15 @@ import {
   createResource,
 } from "frappe-ui";
 import { validateEmail } from "@/utils";
-import { MultiSelectInput, AttachmentItem } from "@/components";
-import { AttachmentIcon } from "@/components/icons";
+import {
+  MultiSelectInput,
+  AttachmentItem,
+  CannedResponseSelectorModal,
+} from "@/components";
+import { AttachmentIcon, EmailIcon } from "@/components/icons";
+
 const editorRef = ref(null);
+const showCannedResponseSelectorModal = ref(false);
 
 const props = defineProps({
   placeholder: {
@@ -199,6 +210,11 @@ const cc = computed(() => (ccEmailsClone.value?.length ? true : false));
 const bcc = computed(() => (bccEmailsClone.value?.length ? true : false));
 const ccInput = ref(null);
 const bccInput = ref(null);
+
+function applyCannedResponse(template) {
+  newEmail.value = template.message;
+  showCannedResponseSelectorModal.value = false;
+}
 
 function submitMail() {
   const sendMail = createResource({
