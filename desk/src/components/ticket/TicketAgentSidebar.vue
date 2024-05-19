@@ -17,11 +17,8 @@
         />
       </RouterLink>
     </div>
-    <TicketAgentCustomer
-      :name="
-        ticket.contact.name ? ticket.contact.name : ticket.contact.email_id
-      "
-      :email="ticket.contact.email_id"
+    <TicketAgentContact
+      :contact="ticket.contact"
       @email:open="(e) => emit('email:open', e)"
     />
     <div
@@ -63,7 +60,7 @@
 import { defineEmits } from "vue";
 import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
-import TicketAgentCustomer from "./TicketAgentCustomer.vue";
+import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";
 
 const props = defineProps({
