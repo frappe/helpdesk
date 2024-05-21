@@ -1,6 +1,5 @@
-import { useClipboard } from "@vueuse/core";
+import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import { toast } from "frappe-ui";
-import { useDateFormat, useTimeAgo } from "@vueuse/core";
 
 /**
  * Wrapper to create toasts, supplied with default options.

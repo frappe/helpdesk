@@ -1,7 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "field:title",
+ "autoname": "hash",
  "creation": "2022-11-03 17:19:47.135176",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -25,11 +24,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-12 12:05:42.429658",
+ "modified": "2024-05-21 00:23:20.975019",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Canned Response",
- "naming_rule": "By fieldname",
+ "naming_rule": "Random",
  "owner": "Administrator",
  "permissions": [
   {
@@ -59,5 +58,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "title"
 }
