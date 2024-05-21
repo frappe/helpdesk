@@ -1,5 +1,6 @@
 <template>
   <TextEditor
+    v-if="agentsList.data"
     ref="textEditor"
     :editor-class="[
       'prose-sm max-w-none',
