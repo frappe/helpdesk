@@ -1,5 +1,6 @@
 <template>
   <Autocomplete
+    ref="autocompleteRef"
     placeholder="Select an option"
     :options="options"
     :value="selection"
@@ -11,7 +12,7 @@
 <script setup lang="ts">
 import { Autocomplete } from "@/components";
 import { createListResource } from "frappe-ui";
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 const props = defineProps({
   value: {
@@ -67,14 +68,66 @@ const options = computed(
     })) || []
 );
 const selection = ref(null);
+const autocompleteRef = ref(null);
 
 function onUpdateQuery(query: string) {
+  const parentTicketType = getParentTicketType();
+
+  if (
+    autocompleteRef.value &&
+    props.doctype === "HD Ticket Type" &&
+    parentTicketType
+  ) {
+    r.update({
+      filters: {
+        [props.searchField]: ["like", `%${query}%`],
+        ["parent_ticket_type"]: ["=", parentTicketType],
+      },
+    });
+  } else {
+    r.update({
+      filters: {
+        [props.searchField]: ["like", `%${query}%`],
+      },
+    });
+  }
+
+  r.reload();
+}
+
+watchEffect(() => {
+  if (autocompleteRef.value && props.doctype === "HD Ticket Type") {
+    autocompleteRef.value?.$refs?.search?.$el?.addEventListener("focus", () => {
+      UpdateQuery();
+    });
+  }
+});
+
+function UpdateQuery() {
+  const parentTicketType = getParentTicketType();
   r.update({
     filters: {
-      [props.searchField]: ["like", `%${query}%`],
+      ["parent_ticket_type"]: ["=", parentTicketType],
     },
   });
 
   r.reload();
+}
+
+function getParentTicketType() {
+  const comboboxOptions = document.getElementById(
+    "headlessui-combobox-options-4"
+  );
+
+  const selectedOption = comboboxOptions.querySelector(
+    'li[aria-selected="true"]'
+  );
+
+  if (!selectedOption) {
+    return;
+  }
+
+  const selectedValue = selectedOption.textContent.trim();
+  return selectedValue;
 }
 </script>
