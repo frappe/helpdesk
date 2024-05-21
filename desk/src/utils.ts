@@ -1,4 +1,4 @@
-import { useClipboard } from "@vueuse/core";
+import { useClipboard, useDateFormat } from "@vueuse/core";
 import { toast } from "frappe-ui";
 
 /**
@@ -39,3 +39,10 @@ export function getAssign(s: string): string | undefined {
   const arr = Array.isArray(assignJson) ? assignJson : [];
   return arr.slice(-1).pop();
 }
+
+export function dateFormat(date, format) {
+  const _format = format || "DD-MM-YYYY HH:mm:ss";
+  return useDateFormat(date, _format).value;
+}
+
+export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
