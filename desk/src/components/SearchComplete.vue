@@ -4,7 +4,14 @@
     :options="options"
     :value="selection"
     @update:query="(q) => onUpdateQuery(q)"
-    @change="(v) => (selection = v)"
+    @change="
+      (v) => {
+        if (!resetInput) {
+          selection = v;
+        }
+        emit('change', v);
+      }
+    "
   />
 </template>
 
@@ -12,6 +19,8 @@
 import { Autocomplete } from "@/components";
 import { createListResource } from "frappe-ui";
 import { computed, ref } from "vue";
+
+const emit = defineEmits(["change"]);
 
 const props = defineProps({
   value: {
@@ -42,6 +51,11 @@ const props = defineProps({
     type: Number,
     required: false,
     default: 100,
+  },
+  resetInput: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 

@@ -28,6 +28,7 @@ def after_install():
 	create_ootb_ticket_types()
 	create_welcome_ticket()
 	create_ticket_feedback_options()
+	add_property_setter()
 
 
 def add_support_redirect_to_tickets():
@@ -274,3 +275,13 @@ def add_system_preset_filters():
 	for preset in preset_filters:
 		preset_filter_doc = frappe.get_doc(preset)
 		preset_filter_doc.insert()
+
+def add_property_setter():
+	if not frappe.db.exists("Property Setter", {"name": "Contact-main-search_fields"}):
+		doc = frappe.new_doc("Property Setter")
+		doc.doctype_or_field = "DocType"
+		doc.doc_type = "Contact"
+		doc.property = "search_fields"
+		doc.property_type = "Data"
+		doc.value = "email_id"
+		doc.insert()

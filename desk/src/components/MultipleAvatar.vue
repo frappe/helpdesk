@@ -18,7 +18,7 @@
       </Tooltip>
     </div>
     <Tooltip
-      v-for="avatar in reverseAvatars"
+      v-for="avatar in props.avatars"
       v-else
       :key="avatar.name"
       :text="avatar.name"
@@ -35,17 +35,15 @@
 </template>
 <script setup lang="ts">
 import { Avatar, Tooltip } from "frappe-ui";
-import { computed } from "vue";
 
 const props = defineProps({
   avatars: {
     type: Array,
-    default: [],
+    default: () => [],
   },
   size: {
     type: String,
     default: "md",
   },
 });
-const reverseAvatars = computed(() => props.avatars.reverse());
 </script>

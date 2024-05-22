@@ -59,7 +59,6 @@ def get_one(name):
 
 	return {
 		**ticket,
-		"assignee": get_assignee(ticket._assign),
 		"comments": get_comments(name),
 		"communications": get_communications(name),
 		"contact": contact,
@@ -101,6 +100,7 @@ def get_communications(ticket: str):
 			QBCommunication.creation,
 			QBCommunication.name,
 			QBCommunication.sender,
+			QBCommunication.recipients
 		)
 		.where(QBCommunication.reference_doctype == "HD Ticket")
 		.where(QBCommunication.reference_name == ticket)

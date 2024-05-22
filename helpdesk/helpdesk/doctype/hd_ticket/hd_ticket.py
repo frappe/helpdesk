@@ -7,6 +7,7 @@ import frappe
 from frappe import _
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
+from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
 from frappe.query_builder import Case, DocType, Order
 from pypika.functions import Count
@@ -193,9 +194,10 @@ class HDTicket(Document):
 		if self.status == "Open":
 			if self.get_doc_before_save() and self.get_doc_before_save().status != "Open":
 
-				agent = self.get_assigned_agent()
-				if agent:
-					self.notify_agent(agent.name, "Reaction")
+				agents = self.get_assigned_agents()
+				if agents:
+					for agent in agents:
+						self.notify_agent(agent.name, "Reaction")
 		
 		self.handle_ticket_activity_update()
 		self.remove_assignment_if_not_in_team()
@@ -345,17 +347,6 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def assign_agent(self, agent):
-		if not agent:
-			return
-
-		if self._assign:
-			assignees = json.loads(self._assign)
-			for assignee in assignees:
-				if agent == assignee:
-					# the agent is already set as an assignee
-					return
-
-		clear_all_assignments("HD Ticket", self.name)
 		assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 		
 		if frappe.session.user != agent:
@@ -363,7 +354,14 @@ class HDTicket(Document):
 		
 		publish_event("helpdesk:ticket-assignee-update", {"name": self.name})
 
+	def get_assigned_agents(self):
+		assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
+		if len(assignees) > 0:
+			names = [assignee.owner for assignee in assignees]
+			return frappe.get_all("HD Agent", filters={"name": ["in", names]})
+
 	def get_assigned_agent(self):
+		# TODO: deprecate this
 		# for some reason _assign is not set, maybe a framework bug?
 		if hasattr(self, "_assign") and self._assign:
 			assignees = json.loads(self._assign)
@@ -374,10 +372,8 @@ class HDTicket(Document):
 				if exists:
 					agent_doc = frappe.get_doc("HD Agent", assignees[0])
 					return agent_doc
-		
-		from frappe.desk.form.assign_to import get
 
-		assignees = get({"doctype": "HD Ticket", "name": self.name})
+		assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
 		if len(assignees) > 0:
 			# TODO: temporary fix, remove this when only agents can be assigned to ticket
 			exists = frappe.db.exists("HD Agent", assignees[0].owner)
@@ -467,13 +463,13 @@ class HDTicket(Document):
 
 	@frappe.whitelist()
 	def reply_via_agent(
-		self, message: str, cc: str = None, bcc: str = None, attachments: List[str] = []
+		self, message: str, to: str = None, cc: str = None, bcc: str = None, attachments: List[str] = []
 	):
 		skip_email_workflow = self.skip_email_workflow()
 		medium = "" if skip_email_workflow else "Email"
 		subject = f"Re: {self.subject} (#{self.name})"
 		sender = frappe.session.user
-		recipients = self.raised_by
+		recipients = to or self.raised_by
 		sender_email = None if skip_email_workflow else self.sender_email()
 		last_communication = self.get_last_communication()
 
@@ -606,25 +602,6 @@ class HDTicket(Document):
 		d.reference_name = self.name
 		d.viewed_by = frappe.session.user
 		d.insert(ignore_permissions=True)
-
-	@frappe.whitelist()
-	def get_assignees(self):
-		QBUser = DocType("User")
-		assignees = frappe.parse_json(self._assign)
-
-		if not assignees:
-			return []
-
-		condition = [QBUser.name == assignee for assignee in assignees]
-
-		res = (
-			frappe.qb.from_(QBUser)
-			.select(QBUser.name, QBUser.full_name, QBUser.user_image)
-			.where(Case.any(condition))
-			.run(as_dict=True)
-		)
-
-		return res
 
 	def get_escalation_rule(self):
 		filters = [
