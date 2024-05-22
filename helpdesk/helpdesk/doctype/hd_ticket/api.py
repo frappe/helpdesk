@@ -56,6 +56,11 @@ def get_one(name):
 	)
 	if contact:
 		contact = contact[0]
+	else:
+		contact = {
+			"email_id": ticket.raised_by,
+			"name": ticket.raised_by.split("@")[0],
+		}
 
 	return {
 		**ticket,
