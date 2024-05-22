@@ -221,9 +221,9 @@ const activities = computed(() => {
     const currentActivity = sorted[i];
     if (currentActivity.type === "history") {
       currentActivity.relatedActivities = [];
-      for (let j = i + 1; j < sorted.length; j++) {
+      for (let j = i + 1; j < sorted.length + 1; j++) {
         const nextActivity = sorted[j];
-        if (nextActivity.type === "history") {
+        if (nextActivity && nextActivity.type === "history") {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
           data.push(currentActivity);
