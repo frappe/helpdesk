@@ -62,6 +62,7 @@ import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";
+import { createToast } from "@/utils";
 
 const props = defineProps({
   ticket: {
@@ -78,5 +79,11 @@ function update(val) {
 
 function copyToClipboard() {
   navigator.clipboard.writeText(`${props.ticket.name}`);
+  createToast({
+    title: "Copied to clipboard",
+    text: props.ticket.name,
+    icon: "check",
+    iconClasses: "text-green-600",
+  });
 }
 </script>
