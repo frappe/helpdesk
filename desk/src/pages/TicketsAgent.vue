@@ -26,7 +26,7 @@
       @event:column="processColumns"
     />
     <TicketsAgentList
-      :rows="tickets?.data?.data"
+      :rows="tickets?.data?.data || []"
       :columns="columns"
       :page-length="pageLength"
       :col-field-type="colFieldType"
@@ -44,7 +44,7 @@
 import { ref, computed } from "vue";
 import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
-import TicketsAgentList from "./TicketsAgentList.vue";
+import { TicketsAgentList } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
 const { getUser } = useUserStore();

@@ -56,10 +56,14 @@ def get_one(name):
 	)
 	if contact:
 		contact = contact[0]
+	else:
+		contact = {
+			"email_id": ticket.raised_by,
+			"name": ticket.raised_by.split("@")[0],
+		}
 
 	return {
 		**ticket,
-		"assignee": get_assignee(ticket._assign),
 		"comments": get_comments(name),
 		"communications": get_communications(name),
 		"contact": contact,
@@ -101,6 +105,7 @@ def get_communications(ticket: str):
 			QBCommunication.creation,
 			QBCommunication.name,
 			QBCommunication.sender,
+			QBCommunication.recipients
 		)
 		.where(QBCommunication.reference_doctype == "HD Ticket")
 		.where(QBCommunication.reference_name == ticket)

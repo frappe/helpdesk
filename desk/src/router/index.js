@@ -92,8 +92,14 @@ const routes = [
       },
       {
         path: "tickets/:ticketId",
-        name: AGENT_PORTAL_TICKET,
+        name: "TicketAgent2",
         component: () => getPage("TicketAgent2"),
+        props: true,
+      },
+      {
+        path: "tickets/old/:ticketId",
+        name: AGENT_PORTAL_TICKET,
+        component: () => getPage("TicketAgent"),
         props: true,
       },
       {

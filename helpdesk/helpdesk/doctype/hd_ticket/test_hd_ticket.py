@@ -14,6 +14,7 @@ def get_ticket_obj():
 
 non_agent = "non_agent@test.com"
 agent = "agent@test.com"
+agent2 = "agent2@test.com"
 class TestHDTicket(FrappeTestCase):
 	@classmethod
 	def setUpClass(cls):
@@ -24,6 +25,7 @@ class TestHDTicket(FrappeTestCase):
 			"first_name": "Non Agent",
 			"email": non_agent
 		}).insert()
+
 		frappe.get_doc({
 			"doctype": "User",
 			"first_name": "Agent",
@@ -32,6 +34,16 @@ class TestHDTicket(FrappeTestCase):
 		frappe.get_doc({
 			"doctype": "HD Agent",
 			"user": agent
+		}).insert()
+
+		frappe.get_doc({
+			"doctype": "User",
+			"first_name": "Agent2",
+			"email": agent2
+		}).insert()
+		frappe.get_doc({
+			"doctype": "HD Agent",
+			"user": agent2
 		}).insert()
 
 	def test_ticket_creation(self):
@@ -44,8 +56,9 @@ class TestHDTicket(FrappeTestCase):
 		ticket.insert()
 
 		ticket.assign_agent(agent)
-		notification = frappe.get_all("HD Notification", filters={"reference_ticket": ticket.name, "notification_type": "Assignment", "user_to": agent, "user_from": "Administrator"})
-		self.assertEqual(len(notification), 1)
+		ticket.assign_agent(agent2)
+		notification = frappe.get_all("HD Notification", filters={"reference_ticket": ticket.name, "notification_type": "Assignment", "user_to": ["in", [agent, agent2]], "user_from": "Administrator"})
+		self.assertEqual(len(notification), 2)
 		
 		ticket.status = "Replied"
 		ticket.save()
@@ -54,8 +67,8 @@ class TestHDTicket(FrappeTestCase):
 		ticket.save()
 		self.assertTrue(ticket)
 
-		notification = frappe.get_all("HD Notification", filters={"reference_ticket": ticket.name, "notification_type": "Reaction", "user_to": agent, "user_from": "Administrator"})
-		self.assertEqual(len(notification), 1)
+		notification = frappe.get_all("HD Notification", filters={"reference_ticket": ticket.name, "notification_type": "Reaction", "user_to": ["in", [agent, agent2]], "user_from": "Administrator"})
+		self.assertEqual(len(notification), 2)
 
 		ticket.status = "Resolved"
 		ticket.save()
