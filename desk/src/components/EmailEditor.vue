@@ -226,8 +226,8 @@ function submitMail() {
       args: {
         attachments: attachments.value.map((x) => x.name),
         to: toEmailsClone.value.join(","),
-        cc: ccEmailsClone.value.join(","),
-        bcc: bccEmailsClone.value.join(","),
+        cc: ccEmailsClone.value?.join(","),
+        bcc: bccEmailsClone.value?.join(","),
         message: newEmail.value,
       },
     }),
