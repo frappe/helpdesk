@@ -32,7 +32,7 @@
           @click="
             emit('reply', {
               content: content,
-              to: to,
+              to: to ?? sender.name,
               cc: cc,
               bcc: bcc,
             })
