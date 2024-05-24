@@ -26,7 +26,7 @@
             />
           </div>
         </div>
-        <div class="mb-4 w-full">
+        <div class="mb-4 w-full max-w-[742px]">
           <EmailBox
             v-if="activity.type === 'email'"
             v-bind="activity"
