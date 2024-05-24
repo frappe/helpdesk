@@ -127,9 +127,11 @@
           <Button
             variant="solid"
             :disabled="emailEmpty"
+            :loading="loading"
             label="Submit"
             @click="
               () => {
+                loading = true;
                 submitMail();
               }
             "
@@ -164,6 +166,7 @@ import { AttachmentIcon, EmailIcon } from "@/components/icons";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
+const loading = ref(false);
 
 const props = defineProps({
   placeholder: {
@@ -235,6 +238,7 @@ function submitMail() {
     onSuccess: () => {
       newEmail.value = "";
       emit("submit");
+      loading.value = false;
     },
   });
 
