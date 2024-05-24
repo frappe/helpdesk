@@ -119,6 +119,7 @@
                 bccEmailsClone = [];
                 cc = false;
                 bcc = false;
+                newEmail = '';
                 emit('discard');
               }
             "
@@ -232,6 +233,7 @@ function submitMail() {
       },
     }),
     onSuccess: () => {
+      newEmail.value = "";
       emit("submit");
     },
   });
