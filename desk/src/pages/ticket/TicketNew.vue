@@ -7,10 +7,11 @@
     <div class="grid grid-cols-1 gap-4 px-5 sm:grid-cols-3">
       <UniInput
         v-for="field in visibleFields"
+        v-show="!field.hide_from_customer"
         :key="field.fieldname"
         :field="field"
         :value="templateFields[field.fieldname]"
-        @change="templateFields[field.fieldname] = $event.value"
+        @change="setDisplayField(field, $event.value)"
       />
     </div>
     <div class="m-5">
@@ -122,6 +123,33 @@ function sanitize(html: string) {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
   });
+}
+
+function setDisplayField(field: any, value: any) {
+  templateFields[field.fieldname] = value;
+  template.data?.fields?.forEach((f) => {
+    if (f.depends_on) {
+      evaluate_depends_on(f.depends_on, f, value);
+    }
+  });
+}
+
+function evaluate_depends_on(expression: string, field: any, _value: any) {
+  if (expression.substr(0, 5) == "eval:") {
+    try {
+      let split_string = expression.substr(5).split("=");
+      let fieldname = split_string[0].split(".")[1];
+      let depends_on_value = split_string.pop().replace(/['"]/g, "");
+
+      if (templateFields[fieldname] == depends_on_value) {
+        field.hide_from_customer = false;
+      } else {
+        field.hide_from_customer = true;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
 }
 
 usePageMeta(() => ({

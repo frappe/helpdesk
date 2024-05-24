@@ -13,6 +13,7 @@
 import { Autocomplete } from "@/components";
 import { createListResource } from "frappe-ui";
 import { computed, ref, watchEffect } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
 const props = defineProps({
   value: {
@@ -69,6 +70,7 @@ const options = computed(
 );
 const selection = ref(null);
 const autocompleteRef = ref(null);
+const authStore = useAuthStore();
 
 function onUpdateQuery(query: string) {
   const parentTicketType = getParentTicketType();
@@ -98,17 +100,24 @@ function onUpdateQuery(query: string) {
 watchEffect(() => {
   if (autocompleteRef.value && props.doctype === "HD Ticket Type") {
     autocompleteRef.value?.$refs?.search?.$el?.addEventListener("focus", () => {
-      UpdateQuery();
+      let filters = {
+        ["parent_ticket_type"]: ["=", getParentTicketType()],
+      };
+      UpdateQuery(filters);
+    });
+  } else if (autocompleteRef.value && props.doctype === "IO DP Master") {
+    autocompleteRef.value?.$refs?.search?.$el?.addEventListener("focus", () => {
+      let filters = {
+        ["client_id"]: ["=", authStore.username],
+      };
+      UpdateQuery(filters);
     });
   }
 });
 
-function UpdateQuery() {
-  const parentTicketType = getParentTicketType();
+function UpdateQuery(filters: any) {
   r.update({
-    filters: {
-      ["parent_ticket_type"]: ["=", parentTicketType],
-    },
+    filters: filters,
   });
 
   r.reload();
