@@ -74,8 +74,10 @@
               variant="solid"
               label="Submit"
               :disabled="commentEmpty"
+              :loading="loading"
               @click="
                 () => {
+                  loading = true;
                   submitComment();
                   newComment = '';
                 }
@@ -125,6 +127,7 @@ const newComment = useStorage("commentBoxContent", "");
 const commentEmpty = computed(() => {
   return !newComment.value || newComment.value === "<p></p>";
 });
+const loading = ref(false);
 
 const agents = computed(() => {
   return (
@@ -152,6 +155,7 @@ async function submitComment() {
     }),
     onSuccess: () => {
       emit("submit");
+      loading.value = false;
     },
   });
 

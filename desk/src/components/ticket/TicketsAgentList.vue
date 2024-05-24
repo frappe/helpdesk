@@ -24,9 +24,10 @@
       >
         <div
           v-if="column.key === '_assign'"
+          class="flex items-center"
           @click="(e) => handleFieldClick(e, column.key, item)"
         >
-          <MultipleAvatar :avatars="[item]" />
+          <MultipleAvatar :avatars="item" />
         </div>
         <ListRowItem
           v-else
