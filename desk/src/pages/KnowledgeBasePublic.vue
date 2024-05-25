@@ -41,7 +41,7 @@ import { Icon } from "@iconify/vue";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useKeymapStore } from "@/stores/keymap";
 import Logo from "@/assets/logos/helpdesk.svg";
-import KnowledgeBasePublicSearch from "./KnowledgeBasePublicSearch.vue";
+import KnowledgeBasePublicSearch from "./knowledge-base/KnowledgeBasePublicSearch.vue";
 
 const keymapStore = useKeymapStore();
 const showSearch = ref(false);
