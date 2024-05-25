@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-import CLayoutNav from "./CLayoutNav.vue";
+import CLayoutNav from "./c-layout/CLayoutNav.vue";
 </script>
