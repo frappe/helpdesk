@@ -1,6 +1,5 @@
 import { io } from "socket.io-client";
 import { getCachedResource, getCachedListResource } from "frappe-ui";
-import { createToast } from "./utils";
 import { socketio_port } from "../../../../sites/common_site_config.json";
 
 function init() {
@@ -8,15 +7,6 @@ function init() {
   const socket = io(url, {
     withCredentials: true,
     reconnectionAttempts: 5,
-  });
-
-  socket.on("connect_error", (err) => {
-    createToast({
-      title: "Socket Connection Error",
-      text: err.message,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
   });
 
   socket.on("refetch_resource", (data) => {
