@@ -2,10 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { init as initTelemetry } from "@/telemetry";
-import { AuthPages } from "./auth";
-import { CustomerPages } from "./customer";
-import { KnowldegeBasePages } from "./knowledege-base";
-import { getPage } from "./utils";
 
 export const WEBSITE_ROOT = "Website Root";
 
@@ -41,11 +37,88 @@ export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 const routes = [
   {
     path: "",
-    component: () => getPage("HRoot"),
+    component: () => import("@/pages/HRoot.vue"),
   },
-  AuthPages,
-  CustomerPages,
-  KnowldegeBasePages,
+  {
+    path: "/knowledge-base",
+    component: () => import("@/pages/KnowledgeBasePublic.vue"),
+    children: [
+      {
+        path: "",
+        name: "KBHome",
+        component: () => import("@/pages/KnowledgeBasePublicHome.vue"),
+      },
+      {
+        path: ":categoryId",
+        name: "KBCategoryPublic",
+        component: () => import("@/pages/KnowledgeBasePublicCategory.vue"),
+        props: true,
+      },
+      {
+        path: "articles/:articleId",
+        name: "KBArticlePublic",
+        component: () => import("@/pages/KnowledgeBaseArticle.vue"),
+        meta: {
+          public: true,
+        },
+        props: true,
+      },
+    ],
+  },
+  {
+    path: "/my-tickets",
+    component: () => import("@/pages/CLayout.vue"),
+    meta: {
+      auth: true,
+    },
+    children: [
+      {
+        path: "",
+        name: "TicketsCustomer",
+        component: () => import("@/pages/TicketsCustomer.vue"),
+      },
+      {
+        path: "new/:templateId?",
+        name: "TicketNew",
+        component: () => import("@/pages/TicketNew.vue"),
+        props: true,
+        meta: {
+          onSuccessRoute: "TicketCustomer",
+          parent: "TicketsCustomer",
+        },
+      },
+      {
+        path: ":ticketId",
+        name: "TicketCustomer",
+        component: () => import("@/pages/TicketCustomer.vue"),
+        props: true,
+      },
+    ],
+  },
+  {
+    path: "",
+    meta: {
+      auth: false,
+    },
+    children: [
+      {
+        path: "/login",
+        name: "AuthLogin",
+        component: () => import("@/pages/AuthLogin.vue"),
+      },
+      {
+        path: "/signup",
+        name: "AuthSignup",
+        component: () => import("@/pages/AuthSignup.vue"),
+      },
+      {
+        path: "/verify/:requestKey",
+        name: "AuthVerify",
+        component: () => import("@/pages/AuthVerify.vue"),
+        props: true,
+      },
+    ],
+  },
   {
     path: "/onboarding",
     name: ONBOARDING_PAGE,
@@ -69,12 +142,12 @@ const routes = [
       {
         path: "tickets",
         name: AGENT_PORTAL_TICKET_LIST,
-        component: () => getPage("TicketsAgent"),
+        component: () => import("@/pages/TicketsAgent.vue"),
       },
       {
         path: "tickets/new/:templateId?",
         name: "TicketAgentNew",
-        component: () => getPage("TicketNew"),
+        component: () => import("@/pages/TicketNew.vue"),
         props: true,
         meta: {
           onSuccessRoute: "TicketAgent",
@@ -84,13 +157,13 @@ const routes = [
       {
         path: "tickets/:ticketId",
         name: "TicketAgent2",
-        component: () => getPage("TicketAgent2"),
+        component: () => import("@/pages/TicketAgent2.vue"),
         props: true,
       },
       {
         path: "tickets/old/:ticketId",
         name: AGENT_PORTAL_TICKET,
-        component: () => getPage("TicketAgent"),
+        component: () => import("@/pages/TicketAgent.vue"),
         props: true,
       },
       {
@@ -118,8 +191,7 @@ const routes = [
         path: "kb/articles/:articleId",
         name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
         props: true,
-        component: () =>
-          import("@/pages/knowledge-base/KnowledgeBaseArticle.vue"),
+        component: () => import("@/pages/KnowledgeBaseArticle.vue"),
       },
       {
         path: "customers",
