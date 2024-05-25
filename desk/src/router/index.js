@@ -21,15 +21,11 @@ export const CUSTOMER_PORTAL_TICKET = "TicketCustomer";
 export const AGENT_PORTAL_AGENT_LIST = "AgentList";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
-export const AGENT_PORTAL_DASHBOARD = "DeskDashboard";
 export const AGENT_PORTAL_ESCALATION_RULE_LIST = "EscalationRules";
 export const AGENT_PORTAL_TEAM_LIST = "Teams";
 export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "TicketAgent";
 export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
-export const AGENT_PORTAL_TICKET_TYPE_LIST = "TicketTypes";
-export const AGENT_PORTAL_TICKET_TYPE_NEW = "NewTicketType";
-export const AGENT_PORTAL_TICKET_TYPE_SINGLE = "TicketType";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
@@ -70,11 +66,6 @@ const routes = [
       admin: false,
     },
     children: [
-      {
-        path: "dashboard",
-        name: AGENT_PORTAL_DASHBOARD,
-        component: () => import("@/pages/desk/DeskDashboard.vue"),
-      },
       {
         path: "tickets",
         name: AGENT_PORTAL_TICKET_LIST,
@@ -157,31 +148,9 @@ const routes = [
         props: true,
       },
       {
-        path: "ticket-types",
-        name: AGENT_PORTAL_TICKET_TYPE_LIST,
-        component: () => import("@/pages/desk/ticket_type/TicketTypeList.vue"),
-      },
-      {
-        path: "ticket-types/:id",
-        name: AGENT_PORTAL_TICKET_TYPE_SINGLE,
-        component: () => import("@/pages/desk/ticket_type/TicketType.vue"),
-        props: true,
-      },
-      {
-        path: "ticket-types/new",
-        name: AGENT_PORTAL_TICKET_TYPE_NEW,
-        component: () => import("@/pages/desk/ticket_type/TicketType.vue"),
-      },
-      {
         path: "canned-responses",
         name: "CannedResponses",
         component: () => import("@/pages/CannedResponses.vue"),
-      },
-      {
-        path: "canned-responses/:id",
-        name: "CannedResponse",
-        component: () => import("@/pages/CannedResponse.vue"),
-        props: true,
       },
       {
         path: "escalation-rules",

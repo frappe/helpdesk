@@ -147,12 +147,6 @@ export default {
             route: { name: "TicketsAgent" },
           },
           {
-            title: "Dashboard",
-            icon: () => h(LucideLayoutGrid),
-            route: { name: "DeskDashboard" },
-            condition: () => true,
-          },
-          {
             title: "Agents",
             icon: () => h(LucideUser),
             route: { name: "AgentList" },
