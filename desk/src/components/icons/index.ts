@@ -10,3 +10,4 @@ export { default as TicketIcon } from "./TicketIcon.vue";
 export { default as AttachmentIcon } from "./AttachmentIcon.vue";
 export { default as ReplyIcon } from "./ReplyIcon.vue";
 export { default as ReplyAllIcon } from "./ReplyAllIcon.vue";
+export { default as RefreshIcon } from "./RefreshIcon.vue";

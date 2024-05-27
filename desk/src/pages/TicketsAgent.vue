@@ -24,6 +24,7 @@
       @event:sort="processSorts"
       @event:filter="processFilters"
       @event:column="processColumns"
+      @event:reload="apply()"
     />
     <TicketsAgentList
       :rows="tickets?.data?.data || []"
