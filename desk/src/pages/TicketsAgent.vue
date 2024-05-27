@@ -202,15 +202,34 @@ function processSorts(sortEvent) {
 
 function processFilters(filterEvent) {
   if (filterEvent.event === "add") {
+    let idx = filters.value.findIndex(
+      (filter) => filter.field.fieldname === filterEvent.data.field.fieldname
+    );
+    if (idx != -1) {
+      filterEvent.event = "update";
+      filterEvent.data.index = idx;
+    }
+  }
+
+  if (filterEvent.event === "add") {
     const key = filterEvent.data.field.fieldname;
     const { filterToApply } = filterEvent.data;
 
     filters.value.push(filterEvent.data);
     filtersToApply[key] = filterToApply[key];
   } else if (filterEvent.event === "remove") {
-    const key = filters.value[filterEvent.index].field.fieldname;
-    filters.value.splice(filterEvent.index, 1);
-    delete filtersToApply[key];
+    if (filterEvent.index) {
+      const key = filters.value[filterEvent.index].field.fieldname;
+      filters.value.splice(filterEvent.index, 1);
+      delete filtersToApply[key];
+    } else {
+      filters.value.forEach((filter, index) => {
+        if (filter.field.fieldname === filterEvent.name) {
+          filters.value.splice(index, 1);
+          delete filtersToApply[filterEvent.name];
+        }
+      });
+    }
   } else if (filterEvent.event === "update") {
     const key = filterEvent.data.field.fieldname;
     const oldKey = filters.value[filterEvent.data.index].field.fieldname;

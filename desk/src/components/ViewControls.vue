@@ -14,7 +14,26 @@
         </template>
       </Dropdown>
     </div>
+    <div class="-mr-2 h-[70%] border-l" />
+    <FadedScrollableDiv
+      class="flex flex-1 items-center overflow-x-auto px-1"
+      orientation="horizontal"
+    >
+      <div
+        v-for="quickFilter in quickFilterList"
+        :key="quickFilter.name"
+        class="min-w-36 m-1"
+      >
+        <FormControl
+          type="text"
+          :placeholder="quickFilter.label"
+          :debounce="500"
+          @change.stop="updateFilter(quickFilter, $event.target.value)"
+        />
+      </div>
+    </FadedScrollableDiv>
     <div class="grow"></div>
+    <div class="-ml-2 h-[70%] border-l" />
 
     <div class="flex items-center gap-2">
       <Button :label="'Refresh'" @click="emit('event:reload')">
@@ -42,9 +61,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Dropdown, FeatherIcon } from "frappe-ui";
-import { Filter, Sort, ColumnSettings } from "@/components";
+import { ref, computed } from "vue";
+import { Dropdown, FeatherIcon, FormControl } from "frappe-ui";
+import { Filter, Sort, ColumnSettings, FadedScrollableDiv } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { RefreshIcon } from "@/components/icons";
 
@@ -64,6 +83,12 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+});
+
+const quickFilterList = computed(() => {
+  let filters = [{ name: "name", label: "ID", fieldtype: "Data" }];
+
+  return filters;
 });
 
 const presetFilters = [
@@ -173,5 +198,37 @@ function emitToParent(data, event) {
     }
   }
   emit(event, data);
+}
+
+function updateFilter(filter, value) {
+  if (value === "") {
+    emitToParent(
+      {
+        event: "remove",
+        name: filter.name,
+      },
+      "event:filter"
+    );
+    return;
+  } else {
+    emitToParent(
+      {
+        event: "add",
+        data: {
+          field: {
+            fieldname: filter.name,
+            fieldtype: filter.fieldtype,
+            label: filter.label,
+          },
+          filterToApply: {
+            [filter.name]: ["=", value],
+          },
+          operator: "equals",
+          value: value,
+        },
+      },
+      "event:filter"
+    );
+  }
 }
 </script>
