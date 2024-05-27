@@ -1,10 +1,6 @@
 <template>
   <div v-if="ticket.data" class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsAgent">
-      <template #right>
-        <TicketAgentActions />
-      </template>
-    </TicketBreadcrumbs>
+    <TicketBreadcrumbs parent="TicketsAgent" />
     <div class="flex grow overflow-hidden">
       <div class="flex grow flex-col">
         <TicketPinnedComments @focus="(v) => (focus = v)" />
@@ -190,7 +186,6 @@ import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import { useAgentStore } from "@/stores/agent";
 import { useError } from "@/composables/error";
-import TicketAgentActions from "./TicketAgentActions.vue";
 import TicketAgentSidebar from "./TicketAgentSidebar.vue";
 import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
 import TicketCannedResponses from "./TicketCannedResponses.vue";
