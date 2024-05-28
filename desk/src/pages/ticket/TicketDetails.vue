@@ -174,12 +174,7 @@ const options = computed(() => [
     field: "agent_group",
     label: "Team",
     store: useTeamStore(),
-  },
-  {
-    field: "customer",
-    label: "Customer",
-    type: "select",
-  },
+  }
 ]);
 
 const customers = createResource({
