@@ -228,4 +228,5 @@ def get_attachments(doctype, name):
 @frappe.whitelist()
 def get_recipient_list_from_tickets(filters):
 	data = frappe.db.get_all("HD Ticket", filters=filters, pluck='raised_by', group_by='raised_by')
+	frappe.log_error(title="check raised by", message=data)
 	return data
