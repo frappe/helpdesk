@@ -168,7 +168,7 @@ const props = defineProps({
 let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
 let pageLength = ref(props.pageLength);
 
-function handleFieldClick(e, name: string, value: string) {
+function handleFieldClick(e, name: string, value: string | [string]) {
   if (
     props.colFieldType[name] === "Link" ||
     props.colFieldType[name] === "Select" ||
@@ -176,7 +176,14 @@ function handleFieldClick(e, name: string, value: string) {
   ) {
     e.preventDefault();
     if (name === "_assign") {
-      value = value.name;
+      if (value.length > 1) {
+        let target = e.target.closest(".user-avatar");
+        if (target) {
+          value = target.getAttribute("data-name");
+        }
+      } else {
+        value = value[0].name;
+      }
     }
     emit("event:fieldClick", {
       name,
