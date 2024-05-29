@@ -300,6 +300,7 @@ import TicketConversation from "./TicketConversation.vue";
 import TicketPinnedComments from "./TicketPinnedComments.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 import { ITicket } from "./symbols";
+import Autocomplete from "@/components/global/Autocomplete.vue";
 
 
 
