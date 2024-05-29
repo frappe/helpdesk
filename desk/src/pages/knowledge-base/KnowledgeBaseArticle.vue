@@ -2,7 +2,7 @@
   <div class="flex h-full flex-col overflow-hidden">
     <PageTitle v-if="!route.meta.public">
       <template #title>
-        <BreadCrumbs
+        <Breadcrumbs
           :items="[
             {
               label: article.data?.category.category_name,
@@ -102,6 +102,7 @@ import {
   Button,
   TextEditor,
   TextEditorFixedMenu,
+  Breadcrumbs,
 } from "frappe-ui";
 import {
   AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
@@ -112,7 +113,7 @@ import {
 import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
-import { BreadCrumbs, PageTitle } from "@/components";
+import { PageTitle } from "@/components";
 import KnowledgeBaseArticleActionsEdit from "./KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./KnowledgeBaseArticleActionsNew.vue";
 import KnowledgeBaseArticleActionsView from "./KnowledgeBaseArticleActionsView.vue";

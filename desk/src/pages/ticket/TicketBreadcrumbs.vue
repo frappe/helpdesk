@@ -1,7 +1,7 @@
 <template>
   <PageTitle>
     <template #title>
-      <BreadCrumbs
+      <Breadcrumbs
         :items="[
           {
             label: 'Tickets',
@@ -24,7 +24,8 @@
 
 <script setup lang="ts">
 import { inject } from "vue";
-import { BreadCrumbs, PageTitle } from "@/components";
+import { Breadcrumbs } from "frappe-ui";
+import { PageTitle } from "@/components";
 import { ITicket } from "./symbols";
 
 interface P {

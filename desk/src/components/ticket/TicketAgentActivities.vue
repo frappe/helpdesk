@@ -35,6 +35,7 @@
           <CommentBox
             v-else-if="activity.type === 'comment'"
             v-bind="activity"
+            @update="() => emit('update')"
           />
           <HistoryBox v-else v-bind="activity" />
         </div>
@@ -55,7 +56,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["email:reply"]);
+const emit = defineEmits(["email:reply", "update"]);
 
 function getActivityIcon(type) {
   if (type === "email") return EmailAtIcon;

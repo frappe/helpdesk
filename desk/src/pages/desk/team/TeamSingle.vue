@@ -3,7 +3,7 @@
     <div class="flex flex-col">
       <PageTitle class="border-b">
         <template #title>
-          <BreadCrumbs
+          <Breadcrumbs
             :items="[
               {
                 label: 'Teams',
@@ -132,13 +132,13 @@ import {
   Dropdown,
   FormControl,
   Switch,
+  Breadcrumbs,
 } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { useAgentStore } from "@/stores/agent";
 import { useError } from "@/composables/error";
-import { PageTitle, BreadCrumbs } from "@/components";
-import TopBar from "@/components/TopBar.vue";
+import { PageTitle } from "@/components";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";
 import IconX from "~icons/lucide/x";

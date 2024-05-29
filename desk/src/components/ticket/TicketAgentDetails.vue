@@ -5,7 +5,7 @@
       :key="s.label"
       class="flex items-center text-base leading-5"
     >
-      <div class="w-[106px] text-sm text-gray-600">{{ s.label }}</div>
+      <div class="w-[126px] text-sm text-gray-600">{{ s.label }}</div>
       <div class="flex items-center justify-between">
         <div v-if="s.value">{{ s.value }}</div>
         <Tooltip :text="s.tooltipValue">

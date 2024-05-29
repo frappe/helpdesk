@@ -52,6 +52,11 @@
         <TicketAgentActivities
           ref="ticketAgentActivitiesRef"
           :activities="activities"
+          @update="
+            () => {
+              ticket.reload();
+            }
+          "
           @email:reply="
             (e) => {
               communicationAreaRef.replyToEmail(e);
@@ -90,12 +95,50 @@
         }
       "
     />
+    <Dialog v-model="showSubjectDialog">
+      <template #body-title>
+        <h3>Rename</h3>
+      </template>
+      <template #body-content>
+        <FormControl
+          v-model="subjectInput"
+          :type="'text'"
+          size="sm"
+          variant="subtle"
+          :disabled="false"
+          label="New Subject"
+        />
+      </template>
+      <template #actions>
+        <Button
+          variant="solid"
+          :disabled="!subjectInput"
+          :loading="isLoading"
+          @click="
+            () => {
+              updateTicket('subject', subjectInput);
+              showSubjectDialog = false;
+            }
+          "
+        >
+          Confirm
+        </Button>
+        <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
-import { Breadcrumbs, Dropdown, Switch, createResource } from "frappe-ui";
+import {
+  Breadcrumbs,
+  Dropdown,
+  Switch,
+  createResource,
+  Dialog,
+  FormControl,
+} from "frappe-ui";
 
 import {
   LayoutHeader,
@@ -114,6 +157,8 @@ const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
+const subjectInput = ref(null);
+const isLoading = ref(false);
 
 const props = defineProps({
   ticketId: {
@@ -124,6 +169,8 @@ const props = defineProps({
 
 const showFullActivity = ref(true);
 const showAssignmentModal = ref(false);
+const showSubjectDialog = ref(false);
+
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
@@ -142,13 +189,18 @@ const ticket = createResource({
       });
     }
   },
+  onSuccess: (data) => {
+    subjectInput.value = data.subject;
+  },
 });
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
-    route: { name: "TicketAgent" },
+    onClick: () => {
+      showSubjectDialog.value = true;
+    },
   });
 
   return items;
@@ -184,9 +236,10 @@ const activities = computed(() => {
 
   const commentProps = ticket.data.comments.map((comment) => {
     return {
+      name: comment.name,
       type: "comment",
       key: comment.creation,
-      commenter: comment.user.name,
+      commenter: comment.commented_by,
       creation: comment.creation,
       content: comment.content,
     };
@@ -241,6 +294,7 @@ const activities = computed(() => {
 });
 
 function updateTicket(fieldname: string, value: string) {
+  isLoading.value = true;
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -251,6 +305,7 @@ function updateTicket(fieldname: string, value: string) {
     },
     auto: true,
     onSuccess: () => {
+      isLoading.value = false;
       ticket.reload();
       createToast({
         title: "Ticket updated",
@@ -259,6 +314,7 @@ function updateTicket(fieldname: string, value: string) {
       });
     },
     onError: () => {
+      isLoading.value = false;
       createToast({
         title: "Failed to update ticket",
         icon: "x",
