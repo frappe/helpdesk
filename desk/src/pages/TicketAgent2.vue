@@ -52,6 +52,11 @@
         <TicketAgentActivities
           ref="ticketAgentActivitiesRef"
           :activities="activities"
+          @update="
+            () => {
+              ticket.reload();
+            }
+          "
           @email:reply="
             (e) => {
               communicationAreaRef.replyToEmail(e);
@@ -184,9 +189,10 @@ const activities = computed(() => {
 
   const commentProps = ticket.data.comments.map((comment) => {
     return {
+      name: comment.name,
       type: "comment",
       key: comment.creation,
-      commenter: comment.user.name,
+      commenter: comment.commented_by,
       creation: comment.creation,
       content: comment.content,
     };
