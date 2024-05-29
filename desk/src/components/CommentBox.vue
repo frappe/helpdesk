@@ -18,9 +18,7 @@
       </div>
       <div v-if="authStore.userId === commenter" class="px-4">
         <Dropdown
-          :options="[
-            { label: 'Delete', onClick: () => deleteComment.submit() },
-          ]"
+          :options="[{ label: 'Delete', onClick: () => (showDialog = true) }]"
         >
           <Button
             icon="more-horizontal"
@@ -35,10 +33,26 @@
       v-html="content"
     />
   </div>
+  <Dialog
+    v-model="showDialog"
+    :options="{
+      title: 'Delete Comment',
+      message: 'Are you sure you want to confirm this action?',
+      actions: [
+        { label: 'Cancel', onClick: () => (showDialog = false) },
+        {
+          label: 'Delete',
+          onClick: () => deleteComment.submit(),
+          variant: 'solid',
+        },
+      ],
+    }"
+  />
 </template>
 
 <script setup lang="ts">
-import { Dropdown, createResource } from "frappe-ui";
+import { ref } from "vue";
+import { Dropdown, createResource, Dialog } from "frappe-ui";
 import { dateFormat, timeAgo, dateTooltipFormat, createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 
@@ -63,6 +77,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update"]);
+const showDialog = ref(false);
 
 const deleteComment = createResource({
   url: "frappe.client.delete",
