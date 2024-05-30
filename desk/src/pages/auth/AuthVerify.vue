@@ -6,7 +6,7 @@
         :src="configStore.brandLogo"
         class="m-auto h-8"
       />
-      <Logo v-else class="mx-auto h-8" />
+      <HDLogo v-else class="mx-auto h-8" />
       <div class="mt-6 flex items-center justify-center space-x-1.5">
         <span class="text-3xl font-semibold text-gray-900">Account Setup</span>
       </div>
@@ -50,7 +50,7 @@ import { ref } from "vue";
 import { Button, FormControl } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import Logo from "~icons/logos/helpdesk";
+import HDLogo from "@/assets/logos/HDLogo.vue";
 
 const props = defineProps({
   requestKey: {
