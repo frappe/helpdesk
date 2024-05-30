@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col overflow-y-auto">
     <TicketBreadcrumbs :parent="route.meta.parent" title="New" />
     <div v-if="template.data?.about" class="mx-5 my-3">
       <div class="prose-f" v-html="sanitize(template.data.about)" />
