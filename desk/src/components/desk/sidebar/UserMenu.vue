@@ -50,7 +50,7 @@
 import { Dropdown } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useSidebarStore } from "@/stores/sidebar";
-import HDLogo from "@/components/icons/HDLogo.vue";
+import HDLogo from "@/assets/logos/HDLogo.vue";
 
 defineProps({
   options: {
