@@ -5,11 +5,11 @@
         <template #prefix>
           <FilterIcon class="h-4" />
         </template>
-        <template v-if="props.filters.length" #suffix>
+        <template v-if="filters.length" #suffix>
           <div
             class="text-2xs flex h-5 w-5 items-center justify-center rounded bg-gray-900 pt-[1px] font-medium text-white"
           >
-            {{ props.filters.length }}
+            {{ filters.length }}
           </div>
         </template>
       </Button>
@@ -24,9 +24,9 @@
     <template #body="{ close }">
       <div class="my-2 rounded bg-white shadow">
         <div class="min-w-[400px] p-2">
-          <div v-if="props.filters.length">
+          <div v-if="filters.length">
             <div
-              v-for="(filter, idx) in props.filters"
+              v-for="(filter, idx) in filters"
               id="filter-list"
               :key="idx"
               class="mb-3 flex items-center justify-between gap-2"
@@ -38,7 +38,7 @@
                 <div id="fieldname" class="!min-w-[140px]">
                   <Autocomplete
                     :value="filter.field.fieldname"
-                    :options="props.filterableFields"
+                    :options="filterableFields"
                     placeholder="Filter by..."
                     @change="(field) => updateFilter(idx, field)"
                   />
@@ -85,7 +85,7 @@
           <div class="flex items-center justify-between gap-2">
             <Autocomplete
               value=""
-              :options="props.filterableFields"
+              :options="filterableFields"
               placeholder="Filter by..."
               @change="(e) => setfilter(e)"
             >
@@ -103,7 +103,7 @@
               </template>
             </Autocomplete>
             <Button
-              v-if="props.filters.length"
+              v-if="filters.length"
               class="!text-gray-600"
               variant="ghost"
               label="Clear all filter"

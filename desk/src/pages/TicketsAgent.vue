@@ -218,7 +218,7 @@ function processFilters(filterEvent) {
     filters.value.push(filterEvent.data);
     filtersToApply[key] = filterToApply[key];
   } else if (filterEvent.event === "remove") {
-    if (filterEvent.index) {
+    if (filterEvent.index !== undefined) {
       const key = filters.value[filterEvent.index].field.fieldname;
       filters.value.splice(filterEvent.index, 1);
       delete filtersToApply[key];
