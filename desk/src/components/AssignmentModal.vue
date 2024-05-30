@@ -10,7 +10,7 @@
       <SearchComplete
         class="form-control"
         value=""
-        doctype="User"
+        doctype="HD Agent"
         :reset-input="true"
         @change="
           (option) => {
