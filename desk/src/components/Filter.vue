@@ -1,7 +1,7 @@
 <template>
   <NestedPopover>
     <template #target>
-      <Button label="Filter">
+      <Button label="Filter" :class="filters?.length ? 'rounded-r-none' : ''">
         <template #prefix>
           <FilterIcon class="h-4" />
         </template>
@@ -13,6 +13,13 @@
           </div>
         </template>
       </Button>
+      <Tooltip v-if="filters?.length" :text="'Clear all Filter'">
+        <Button
+          class="rounded-l-none border-l"
+          icon="x"
+          @click.stop="clearfilter(undefined)"
+        />
+      </Tooltip>
     </template>
     <template #body="{ close }">
       <div class="my-2 rounded bg-white shadow">
@@ -196,7 +203,7 @@ function clearfilter(close: Function) {
   emit("event:filter", {
     event: "clear",
   });
-  close();
+  close && close();
 }
 
 function removeFilter(index: number) {
