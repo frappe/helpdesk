@@ -27,7 +27,6 @@ from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
 from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
 
-
 class HDTicket(Document):
 	@staticmethod
 	def get_list_select(query: Query):
@@ -608,6 +607,7 @@ class HDTicket(Document):
 		d.viewed_by = frappe.session.user
 		d.insert(ignore_permissions=True)
 
+
 	@frappe.whitelist()
 	def get_assignees(self):
 		QBUser = DocType("User")
@@ -811,6 +811,12 @@ class HDTicket(Document):
 				"options": "Contact",
 				'width': '8rem',
 			},
+			{
+				'label': "Seen",
+				'type': 'Data',
+				'key': "_seen",
+				'width': '3rem',
+			},
 		]
 		rows = [
 			"name",
@@ -827,7 +833,8 @@ class HDTicket(Document):
 			"first_responded_on",
 			"modified",
 			"creation",
-			"_assign"
+			"_assign",
+			"_seen"
 		]
 		return {'columns': columns, 'rows': rows}
 
