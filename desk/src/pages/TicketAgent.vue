@@ -186,13 +186,13 @@ import { emitter } from "@/emitter";
 import { socket } from "@/socket";
 import { useAgentStore } from "@/stores/agent";
 import { useError } from "@/composables/error";
-import TicketAgentSidebar from "./TicketAgentSidebar.vue";
-import TicketBreadcrumbs from "./TicketBreadcrumbs.vue";
-import TicketCannedResponses from "./TicketCannedResponses.vue";
-import TicketConversation from "./TicketConversation.vue";
-import TicketPinnedComments from "./TicketPinnedComments.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
-import { ITicket } from "./symbols";
+import TicketAgentSidebar from "./ticket/TicketAgentSidebar.vue";
+import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
+import TicketCannedResponses from "./ticket/TicketCannedResponses.vue";
+import TicketConversation from "./ticket/TicketConversation.vue";
+import TicketPinnedComments from "./ticket/TicketPinnedComments.vue";
+import TicketTextEditor from "./ticket/TicketTextEditor.vue";
+import { ITicket } from "./ticket/symbols";
 
 interface P {
   ticketId: string;

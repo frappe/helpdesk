@@ -25,7 +25,7 @@
 import { useRouter } from "vue-router";
 import { createResource } from "frappe-ui";
 import { KB_PUBLIC_CATEGORY } from "@/router";
-import { getIcon } from "./util";
+import { getIcon } from "./knowledge-base/util";
 
 const router = useRouter();
 const data = createResource({

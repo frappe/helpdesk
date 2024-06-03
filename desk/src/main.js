@@ -1,4 +1,3 @@
-import * as lodash from "lodash";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import {
@@ -54,8 +53,6 @@ for (const c in globalComponents) {
   app.component(c, globalComponents[c]);
 }
 
-app.config.unwrapInjectedRef = true;
-app.config.globalProperties.$_ = lodash;
 app.config.globalProperties.$socket = socket;
 app.config.globalProperties.$toast = createToast;
 
