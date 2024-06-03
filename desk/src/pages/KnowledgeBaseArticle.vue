@@ -114,13 +114,13 @@ import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
 import { PageTitle } from "@/components";
-import KnowledgeBaseArticleActionsEdit from "./KnowledgeBaseArticleActionsEdit.vue";
-import KnowledgeBaseArticleActionsNew from "./KnowledgeBaseArticleActionsNew.vue";
-import KnowledgeBaseArticleActionsView from "./KnowledgeBaseArticleActionsView.vue";
-import KnowledgeBaseArticleTopEdit from "./KnowledgeBaseArticleTopEdit.vue";
-import KnowledgeBaseArticleTopNew from "./KnowledgeBaseArticleTopNew.vue";
-import KnowledgeBaseArticleTopPublic from "./KnowledgeBaseArticleTopPublic.vue";
-import KnowledgeBaseArticleTopView from "./KnowledgeBaseArticleTopView.vue";
+import KnowledgeBaseArticleActionsEdit from "./knowledge-base/KnowledgeBaseArticleActionsEdit.vue";
+import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticleActionsNew.vue";
+import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArticleActionsView.vue";
+import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
+import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
+import KnowledgeBaseArticleTopPublic from "./knowledge-base/KnowledgeBaseArticleTopPublic.vue";
+import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
 
 const props = defineProps({
   articleId: {
