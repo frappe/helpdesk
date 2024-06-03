@@ -30,7 +30,7 @@
         <ListRowItem
           v-else
           :item="item"
-          class="text-base text-gray-700"
+          :class="['text-base', { 'text-3xl font-semibold text-gray-900': checkCondition(row), 'text-gray-600': !checkCondition(row) }]"
           @click="(e) => handleFieldClick(e, column.key, item)"
         >
           <template #prefix>
@@ -113,6 +113,8 @@
   />
 </template>
 
+
+
 <script setup lang="ts">
 import {
   ListView,
@@ -121,10 +123,13 @@ import {
   ListRowItem,
   ListHeader,
   ListFooter,
+  createResource
 } from "frappe-ui";
 import { MultipleAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { ref } from "vue";
+import { useUserStore } from "@/stores/user";
+const userStore = useUserStore();
 
 function handleFieldClick(e, name: string, value: string) {
   if (
@@ -143,7 +148,6 @@ function handleFieldClick(e, name: string, value: string) {
     });
   }
 }
-
 const props = defineProps({
   columns: {
     type: Array, //TODO custom types
@@ -169,7 +173,12 @@ const props = defineProps({
       rowCount: 0,
     }),
   },
+  name: {
+    type: String,
+    required: true,
+  },
 });
+const user = userStore.getUser(props.name);
 
 let pageLength = ref(props.pageLength);
 let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
@@ -185,5 +194,9 @@ function convert_date(originalTimestamp: string) {
   const dateObj = new Date(originalTimestamp);
   const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}:${dateObj.getSeconds().toString().padStart(2, '0')}`;
   return formattedDate;
+}
+
+function checkCondition(row) {  
+  return !row._seen.includes(user.email);
 }
 </script>

@@ -29,7 +29,7 @@ export const useUserStore = defineStore("user", () => {
 
   function getUser(email) {
     if (!email || email === "sessionUser") {
-      email = auth.username;
+      email = auth.userId;
     }
     if (!usersByName[email]) {
       usersByName[email] = {
