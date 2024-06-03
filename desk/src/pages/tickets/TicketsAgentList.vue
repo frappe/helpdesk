@@ -30,7 +30,7 @@
         <ListRowItem
           v-else
           :item="item"
-          :class="['text-base', { 'text-3xl font-semibold text-gray-900': checkCondition(row), 'text-gray-600': !checkCondition(row) }]"
+          :class="'text-base text-gray-600'"
           @click="(e) => handleFieldClick(e, column.key, item)"
         >
           <template #prefix>
@@ -196,7 +196,7 @@ function convert_date(originalTimestamp: string) {
   return formattedDate;
 }
 
-function checkCondition(row) {  
-  return !row._seen.includes(user.email);
-}
+// function checkCondition(row) {  
+//   return !row._seen.includes(user.email);
+// }
 </script>
