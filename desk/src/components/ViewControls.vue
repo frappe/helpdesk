@@ -1,6 +1,6 @@
 <template>
-  <div class="flex items-center justify-between px-5 pb-4 pt-3">
-    <div class="flex-none">
+  <div class="flex items-center justify-between gap-2 px-5 pb-4 pt-3">
+    <div class="flex items-center gap-2">
       <Dropdown :options="presetFilters">
         <template #default="{ open }">
           <Button :label="currentPreset">
@@ -14,24 +14,43 @@
         </template>
       </Dropdown>
     </div>
-
+    <div class="-mr-2 h-[70%] border-l" />
+    <FadedScrollableDiv
+      class="flex flex-1 items-center overflow-x-auto px-1"
+      orientation="horizontal"
+    >
+      <div
+        v-for="quickFilter in quickFilterList"
+        :key="quickFilter.name"
+        class="min-w-36 m-1"
+      >
+        <FormControl
+          type="text"
+          :placeholder="quickFilter.label"
+          :debounce="500"
+          @change.stop="updateFilter(quickFilter, $event.target.value)"
+        />
+      </div>
+    </FadedScrollableDiv>
     <div class="grow"></div>
+    <div class="-ml-2 h-[70%] border-l" />
 
-    <div class="flex-none px-1">
+    <div class="flex items-center gap-2">
+      <Button :label="'Refresh'" @click="emit('event:reload')">
+        <template #icon>
+          <RefreshIcon class="h-4 w-4" />
+        </template>
+      </Button>
       <Filter
         :filters="filter.filters"
         :filterable-fields="filter.filterableFields"
         @event:filter="(e) => emitToParent(e, 'event:filter')"
       />
-    </div>
-    <div class="pe-2 flex-none">
       <Sort
         :sortable-fields="sort.sortableFields"
         :sorts="sort.sorts"
         @event:sort="(e) => emitToParent(e, 'event:sort')"
       />
-    </div>
-    <div class="flex-none px-1">
       <ColumnSettings
         :fields="column.fields"
         :columns="column.columns"
@@ -42,10 +61,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Filter, Sort, ColumnSettings } from "@/components";
-import { Dropdown, FeatherIcon } from "frappe-ui";
+import { ref, computed } from "vue";
+import { Dropdown, FeatherIcon, FormControl } from "frappe-ui";
+import { Filter, Sort, ColumnSettings, FadedScrollableDiv } from "@/components";
 import { useAuthStore } from "@/stores/auth";
+import { RefreshIcon } from "@/components/icons";
 
 const authStore = useAuthStore();
 let currentPreset = ref("All Tickets");
@@ -63,6 +83,12 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+});
+
+const quickFilterList = computed(() => {
+  let filters = [{ name: "name", label: "ID", fieldtype: "Data" }];
+
+  return filters;
 });
 
 const presetFilters = [
@@ -156,7 +182,12 @@ function getPresetFilters(status) {
   };
 }
 
-const emit = defineEmits(["event:filter", "event:sort", "event:column"]);
+const emit = defineEmits([
+  "event:filter",
+  "event:sort",
+  "event:column",
+  "event:reload",
+]);
 
 function emitToParent(data, event) {
   if (event === "event:filter") {
@@ -167,5 +198,37 @@ function emitToParent(data, event) {
     }
   }
   emit(event, data);
+}
+
+function updateFilter(filter, value) {
+  if (value === "") {
+    emitToParent(
+      {
+        event: "remove",
+        name: filter.name,
+      },
+      "event:filter"
+    );
+    return;
+  } else {
+    emitToParent(
+      {
+        event: "add",
+        data: {
+          field: {
+            fieldname: filter.name,
+            fieldtype: filter.fieldtype,
+            label: filter.label,
+          },
+          filterToApply: {
+            [filter.name]: ["=", value],
+          },
+          operator: "equals",
+          value: value,
+        },
+      },
+      "event:filter"
+    );
+  }
 }
 </script>
