@@ -95,7 +95,7 @@
             </Tooltip>
           </div>
           <div v-else-if="column.key === 'creation'">
-            {{ convert_date(item) }}
+            {{ get_time_zone(item) }}
           </div>
           <div v-else-if="column.key === 'modified'">
             {{ dayjs.tz(item).fromNow() }}
@@ -129,7 +129,10 @@ import { MultipleAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { ref } from "vue";
 import { useUserStore } from "@/stores/user";
+import momentTimezone from "moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js";
+
 const userStore = useUserStore();
+const UserDetails = userStore.users.data
 
 function handleFieldClick(e, name: string, value: string) {
   if (
@@ -190,10 +193,20 @@ const slaStatusColorMap = {
   "First Response Due": "orange",
   Paused: "blue",
 };
-function convert_date(originalTimestamp: string) {
-  const dateObj = new Date(originalTimestamp);
-  const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}:${dateObj.getSeconds().toString().padStart(2, '0')}`;
-  return formattedDate;
+
+const DefaultTimezone = 'Asia/Riyadh';
+const momentTz = {}
+
+function get_time_zone(timeSelected: string){
+  UserDetails.forEach(d=> {
+    if(d.email == user.email){
+      momentTz['date'] = momentTimezone
+        .tz(timeSelected, 'YYYY/MM/DD HH:mm', DefaultTimezone)
+        .tz(d.time_zone)
+        .format('YYYY/MM/DD HH:mm');
+      }
+  })
+  return momentTz['date']
 }
 
 function checkCondition(row) {  
