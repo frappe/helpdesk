@@ -6,7 +6,8 @@
         <Icon icon="lucide:dot" class="text-gray-500" />
         <!-- <Tooltip :text="dayjs(date).long()"> -->
           <div class="text-gray-600">
-             {{ convert_date(date)}}
+             <!-- {{ convert_date(date)}} -->
+             {{ get_time_zone(date)}}
           </div>
         <!-- </Tooltip> -->
       </div>
@@ -32,7 +33,7 @@ import { Icon } from "@iconify/vue";
 import { dayjs } from "@/dayjs";
 import { UserInfo } from "@/types";
 import { AttachmentItem, UserAvatar } from "@/components";
-// import momentTimezone from "moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js";
+import momentTimezone from "moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js";
 import { useUserStore } from "@/stores/user";
 
 
@@ -67,25 +68,25 @@ function sanitize(html: string) {
   });
 }
 
-// const DefaultTimezone = 'Asia/Riyadh';
-// const momentTz = {}
+const DefaultTimezone = 'Asia/Riyadh';
+const momentTz = {}
 
-// function get_time_zone(timeSelected: string){
-//   UserDetails.forEach(d=> {
-//     if(d.email == user.email){
-//       momentTz['date'] = momentTimezone
-//         .tz(timeSelected, 'YYYY/MM/DD HH:mm', DefaultTimezone)
-//         .tz(d.time_zone)
-//         .format('YYYY/MM/DD HH:mm');
-//       }
-//   })
-//   return momentTz['date']
-// }
-function convert_date(originalTimestamp: string) {
-  const dateObj = new Date(originalTimestamp);
-  const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}:${dateObj.getSeconds().toString().padStart(2, '0')}`;
-  return formattedDate;
+function get_time_zone(timeSelected: string){
+  UserDetails.forEach(d=> {
+    if(d.email == user.email){
+      momentTz['date'] = momentTimezone
+        .tz(timeSelected, 'YYYY/MM/DD HH:mm', DefaultTimezone)
+        .tz(d.time_zone)
+        .format('YYYY/MM/DD HH:mm');
+      }
+  })
+  return momentTz['date']
 }
+// function convert_date(originalTimestamp: string) {
+//   const dateObj = new Date(originalTimestamp);
+//   const formattedDate = `${dateObj.getFullYear()}-${(dateObj.getMonth() + 1).toString().padStart(2, '0')}-${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}:${dateObj.getSeconds().toString().padStart(2, '0')}`;
+//   return formattedDate;
+// }
 
 
 </script>
