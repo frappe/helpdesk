@@ -11,8 +11,9 @@
         :placeholder="`Add ${field.label}`"
         :value="transValue"
         :model-value="transValue"
-        @update:model-value="emitUpdate(field.fieldname, $event)"
-        @change="emitUpdate(field.fieldname, $event.value || $event)"
+        @change="
+          emitUpdate(field.fieldname, $event.value || $event.target.value)
+        "
       />
     </div>
   </div>
@@ -73,9 +74,7 @@ const component = computed(() => {
       ],
     });
   } else {
-    return h(FormControl, {
-      debounce: 500,
-    });
+    return h(FormControl);
   }
 });
 
@@ -97,6 +96,7 @@ const transValue = computed(() => {
 });
 
 function emitUpdate(fieldname: Field["fieldname"], value: Value) {
+  console.log("Emitting", fieldname, value);
   emit("change", { fieldname, value });
 }
 </script>

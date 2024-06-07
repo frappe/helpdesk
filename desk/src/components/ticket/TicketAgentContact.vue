@@ -13,9 +13,11 @@
         </div>
       </Tooltip>
       <div class="flex gap-1.5">
-        <Button class="h-7 w-7">
-          <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
-        </Button>
+        <Tooltip :text="contact.email_id">
+          <Button class="h-7 w-7">
+            <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
+          </Button>
+        </Tooltip>
         <!-- <RouterLink
           class="group cursor-pointer space-x-1 hover:text-gray-900"
           :to="{
