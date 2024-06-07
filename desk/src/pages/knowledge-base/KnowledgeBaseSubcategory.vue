@@ -32,8 +32,10 @@
     <ListView :columns="columns" :resource="articles" doctype="HD Article">
       <template #title="{ data }">
         <div class="flex items-center gap-2">
-          <IconFile class="h-4 w-4" />
-          {{ data.title }}
+          <div><IconFile class="h-4 w-4" /></div>
+          <div class="truncate">
+            {{ data.title }}
+          </div>
         </div>
       </template>
       <template #status="{ data }">
