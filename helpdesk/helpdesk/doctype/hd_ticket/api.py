@@ -7,6 +7,7 @@ from pypika import Criterion, Order
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
 from helpdesk.utils import check_permissions, get_customer, is_agent
+from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 
 
 @frappe.whitelist()
@@ -71,6 +72,7 @@ def get_one(name):
 		"tags": get_tags(name),
 		"template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
 		"views": get_views(name),
+		"_form_script": get_form_script('HD Ticket')
 	}
 
 
