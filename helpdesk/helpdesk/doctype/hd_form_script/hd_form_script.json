@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-06-05 16:14:14.503677",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "dt",
+  "apply_to",
+  "column_break_lhfw",
+  "enabled",
+  "section_break_qhfq",
+  "script"
+ ],
+ "fields": [
+  {
+   "fieldname": "dt",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "DocType",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "default": "Form",
+   "fieldname": "apply_to",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Apply To",
+   "options": "Form\nList"
+  },
+  {
+   "fieldname": "column_break_lhfw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "section_break_qhfq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "function setupForm({ doc }) {\n    return {\n        actions: [],\n    }\n}",
+   "fieldname": "script",
+   "fieldtype": "Code",
+   "label": "Script",
+   "options": "JS"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-06-05 16:19:39.615245",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Form Script",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

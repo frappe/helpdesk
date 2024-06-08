@@ -5,6 +5,10 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
+        <CustomActions
+          v-if="ticket.data._customActions"
+          :actions="ticket.data._customActions"
+        />
         <div v-if="ticket.data.assignees?.length">
           <component :is="ticket.data.assignees.length == 1 ? 'Button' : 'div'">
             <MultipleAvatar
@@ -151,7 +155,7 @@ import { IndicatorIcon } from "@/components/icons";
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast } from "@/utils";
+import { createToast, setupCustomActions } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -191,6 +195,9 @@ const ticket = createResource({
   },
   onSuccess: (data) => {
     subjectInput.value = data.subject;
+    setupCustomActions(data, {
+      doc: data,
+    });
   },
 });
 
