@@ -1,210 +1,180 @@
 <template>
-  <div v-if="ticket.data" class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsAgent" />
-    <div class="flex grow overflow-hidden">
-      <div class="flex grow flex-col">
-        <TicketPinnedComments @focus="(v) => (focus = v)" />
-        <TicketConversation class="grow" :focus="focus">
-          <template #communication-top-right="{ message }">
-            <Button
-              theme="gray"
-              variant="ghost"
-              @click="
-                () => {
-                  isExpanded = true;
-                  mode = Mode.Response;
-                  $nextTick(() =>
-                    $refs.editor.editor
-                      .chain()
-                      .clearContent()
-                      .insertContent(message)
-                      .focus('all')
-                      .setBlockquote()
-                      .insertContentAt(0, { type: 'paragraph' })
-                      .focus('start')
-                      .run()
-                  );
-                }
-              "
-            >
-              <template #icon>
-                <Icon icon="lucide:reply" />
+  <div class="flex flex-col">
+    <LayoutHeader v-if="ticket.data">
+      <template #left-header>
+        <Breadcrumbs :items="breadcrumbs" />
+      </template>
+      <template #right-header>
+        <CustomActions
+          v-if="ticket.data._customActions"
+          :actions="ticket.data._customActions"
+        />
+        <div v-if="ticket.data.assignees?.length">
+          <component :is="ticket.data.assignees.length == 1 ? 'Button' : 'div'">
+            <MultipleAvatar
+              :avatars="ticket.data.assignees"
+              @click="showAssignmentModal = true"
+            />
+          </component>
+        </div>
+        <button
+          v-else
+          class="rounded bg-gray-100 px-2 py-1.5 text-base text-gray-800"
+          @click="showAssignmentModal = true"
+        >
+          Assign
+        </button>
+        <Dropdown :options="dropdownOptions">
+          <template #default="{ open }">
+            <Button :label="ticket.data.status">
+              <template #prefix>
+                <IndicatorIcon
+                  :class="ticketStatusStore.textColorMap[ticket.data.status]"
+                />
+              </template>
+              <template #suffix>
+                <FeatherIcon
+                  :name="open ? 'chevron-up' : 'chevron-down'"
+                  class="h-4"
+                />
               </template>
             </Button>
           </template>
-        </TicketConversation>
-        <span class="m-5">
-          <TicketTextEditor
-            ref="editor"
-            v-model:attachments="attachments"
-            v-model:content="content"
-            v-model:expand="isExpanded"
-            :mentions="agentStore.dropdown"
-            :placeholder="placeholder"
-            autofocus
-            @clear="() => clear()"
-          >
-            <template #top-right>
-              <span class="flex gap-2">
-                <Button
-                  v-if="mode === Mode.Response"
-                  label="CC"
-                  :theme="showCc ? 'blue' : 'gray'"
-                  variant="subtle"
-                  @click="() => (showCc = !showCc)"
-                />
-                <Button
-                  v-if="mode === Mode.Response"
-                  label="BCC"
-                  :theme="showBcc ? 'blue' : 'gray'"
-                  variant="subtle"
-                  @click="() => (showBcc = !showBcc)"
-                />
-                <TabButtons
-                  v-model="mode"
-                  :buttons="Object.values(Mode).map((m) => ({ label: m }))"
-                />
-              </span>
-            </template>
-            <template v-if="mode == Mode.Response" #top-bottom>
-              <div class="my-2.5 space-y-2 border-y py-2">
-                <div>
-                  <span class="mr-3 text-xs text-gray-500">TO:</span>
-                  <Button :label="ticket.data.raised_by" />
-                </div>
-                <div v-if="showCc">
-                  <span class="inline-flex flex-wrap items-center gap-1">
-                    <span class="mr-2 text-xs text-gray-500">CC:</span>
-                    <Button
-                      v-for="i in cc.split(',').filter(Boolean)"
-                      :key="i"
-                      :label="i"
-                      @click="
-                        () =>
-                          (cc = cc
-                            .split(',')
-                            .filter((s) => s !== i)
-                            .join(','))
-                      "
-                    />
-                    <FormControl
-                      type="text"
-                      placeholder="hello@example.com"
-                      @keyup.prevent.enter="
-                        (event) => {
-                          cc = [...cc.split(','), event.target.value].join(',');
-                          event.target.value = '';
-                        }
-                      "
-                    />
-                  </span>
-                </div>
-                <div v-if="showBcc">
-                  <span class="inline-flex flex-wrap items-center gap-1">
-                    <span class="mr-2 text-xs text-gray-500">BCC:</span>
-                    <Button
-                      v-for="i in bcc.split(',').filter(Boolean)"
-                      :key="i"
-                      :label="i"
-                      @click="
-                        () =>
-                          (bcc = bcc
-                            .split(',')
-                            .filter((s) => s !== i)
-                            .join(','))
-                      "
-                    />
-                    <FormControl
-                      type="text"
-                      placeholder="hello@example.com"
-                      @keyup.prevent.enter="
-                        (event) => {
-                          bcc = [...bcc.split(','), event.target.value].join(
-                            ','
-                          );
-                          event.target.value = '';
-                        }
-                      "
-                    />
-                  </span>
-                </div>
-              </div>
-            </template>
-            <template #bottom-left>
-              <Button
-                theme="gray"
-                variant="ghost"
-                @click="showCannedResponses = !showCannedResponses"
-              >
-                <template #icon>
-                  <Icon icon="lucide:message-square" />
-                </template>
-              </Button>
-            </template>
-            <template #bottom-right>
-              <Button
-                :label="
-                  {
-                    Comment: 'Comment',
-                    Response: 'Send',
-                  }[mode]
-                "
-                theme="gray"
-                variant="solid"
-                :disabled="$refs.editor.editor.isEmpty || resource.loading"
-                @click="() => resource.submit()"
-              />
-            </template>
-          </TicketTextEditor>
-        </span>
+        </Dropdown>
+      </template>
+    </LayoutHeader>
+    <div v-if="ticket.data" class="flex h-screen overflow-hidden">
+      <div class="flex flex-1 flex-col">
+        <div class="flex items-center justify-between border-b py-1 pr-2.5">
+          <span class="pl-6 text-lg font-semibold">Activity</span>
+          <Switch
+            v-model="showFullActivity"
+            size="sm"
+            label="Show all activity"
+          />
+        </div>
+        <TicketAgentActivities
+          ref="ticketAgentActivitiesRef"
+          :activities="activities"
+          @update="
+            () => {
+              ticket.reload();
+            }
+          "
+          @email:reply="
+            (e) => {
+              communicationAreaRef.replyToEmail(e);
+            }
+          "
+        />
+        <CommunicationArea
+          ref="communicationAreaRef"
+          v-model="ticket.data"
+          :to-emails="[ticket.data.raised_by]"
+          :cc-emails="[]"
+          :bcc-emails="[]"
+          @update="
+            () => {
+              ticket.reload();
+              ticketAgentActivitiesRef.scrollToLatestActivity();
+            }
+          "
+        />
       </div>
-      <TicketAgentSidebar />
+      <TicketAgentSidebar
+        :ticket="ticket.data"
+        @update="({ field, value }) => updateTicket(field, value)"
+        @email:open="(e) => communicationAreaRef.replyToEmail(null, e)"
+      />
     </div>
-    <TicketCannedResponses
-      v-model="showCannedResponses"
-      @select="
-        (content) => {
-          $refs.editor.editor.commands.clearContent();
-          $refs.editor.editor.commands.insertContent(content);
+    <AssignmentModal
+      v-if="ticket.data"
+      v-model="showAssignmentModal"
+      :assignees="ticket.data.assignees"
+      :docname="ticketId"
+      doctype="HD Ticket"
+      @update="
+        () => {
+          ticket.reload();
         }
       "
     />
+    <Dialog v-model="showSubjectDialog">
+      <template #body-title>
+        <h3>Rename</h3>
+      </template>
+      <template #body-content>
+        <FormControl
+          v-model="subjectInput"
+          :type="'text'"
+          size="sm"
+          variant="subtle"
+          :disabled="false"
+          label="New Subject"
+        />
+      </template>
+      <template #actions>
+        <Button
+          variant="solid"
+          :disabled="!subjectInput"
+          :loading="isLoading"
+          @click="
+            () => {
+              updateTicket('subject', subjectInput);
+              showSubjectDialog = false;
+            }
+          "
+        >
+          Confirm
+        </Button>
+        <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, provide, ref } from "vue";
+import { computed, ref, h } from "vue";
 import {
+  Breadcrumbs,
+  Dropdown,
+  Switch,
   createResource,
-  usePageMeta,
-  Button,
+  Dialog,
   FormControl,
-  TabButtons,
 } from "frappe-ui";
-import { Icon } from "@iconify/vue";
-import { emitter } from "@/emitter";
-import { socket } from "@/socket";
-import { useAgentStore } from "@/stores/agent";
-import { useError } from "@/composables/error";
-import TicketAgentSidebar from "./ticket/TicketAgentSidebar.vue";
-import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
-import TicketCannedResponses from "./ticket/TicketCannedResponses.vue";
-import TicketConversation from "./ticket/TicketConversation.vue";
-import TicketPinnedComments from "./ticket/TicketPinnedComments.vue";
-import TicketTextEditor from "./ticket/TicketTextEditor.vue";
-import { ITicket } from "./ticket/symbols";
 
-interface P {
-  ticketId: string;
-}
+import {
+  LayoutHeader,
+  MultipleAvatar,
+  AssignmentModal,
+  CommunicationArea,
+} from "@/components";
+import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
+import { IndicatorIcon } from "@/components/icons";
 
-enum Mode {
-  Comment = "Comment",
-  Response = "Response",
-}
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useUserStore } from "@/stores/user";
+import { createToast, setupCustomActions } from "@/utils";
 
-const props = defineProps<P>();
-const agentStore = useAgentStore();
+const ticketStatusStore = useTicketStatusStore();
+const { getUser } = useUserStore();
+const ticketAgentActivitiesRef = ref(null);
+const communicationAreaRef = ref(null);
+const subjectInput = ref(null);
+const isLoading = ref(false);
+
+const props = defineProps({
+  ticketId: {
+    type: String,
+    required: true,
+  },
+});
+
+const showFullActivity = ref(true);
+const showAssignmentModal = ref(false);
+const showSubjectDialog = ref(false);
+
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
@@ -212,108 +182,152 @@ const ticket = createResource({
   params: {
     name: props.ticketId,
   },
-});
-provide(ITicket, ticket);
-const editor = ref(null);
-const placeholder = "Compose a comment / reply";
-const content = ref("");
-const attachments = ref([]);
-const isExpanded = ref(false);
-const cc = ref("");
-const bcc = ref("");
-const showCc = ref(false);
-const showBcc = ref(false);
-const mode = ref(Mode.Comment);
-const focus = ref("");
-const showCannedResponses = ref(false);
-
-createResource({
-  url: "run_doc_method",
-  params: {
-    dt: "HD Ticket",
-    dn: props.ticketId,
-    method: "mark_seen",
+  transform: (data) => {
+    if (data._assign) {
+      data.assignees = JSON.parse(data._assign).map((assignee) => {
+        return {
+          name: assignee,
+          image: getUser(assignee).user_image,
+          label: getUser(assignee).full_name,
+        };
+      });
+    }
   },
-  auto: true,
+  onSuccess: (data) => {
+    subjectInput.value = data.subject;
+    setupCustomActions(data, {
+      doc: data,
+    });
+  },
 });
 
-emitter.on("update:ticket", () => ticket.reload());
-
-const comment = createResource({
-  url: "run_doc_method",
-  debounce: 300,
-  makeParams: () => ({
-    dt: "HD Ticket",
-    dn: props.ticketId,
-    method: "new_comment",
-    args: {
-      content: content.value,
+const breadcrumbs = computed(() => {
+  let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+  items.push({
+    label: ticket.data?.subject,
+    onClick: () => {
+      showSubjectDialog.value = true;
     },
-  }),
-  onSuccess: () => {
-    clear();
-    emitter.emit("update:ticket");
-  },
-  onError: useError({ title: "Error adding comment" }),
+  });
+
+  return items;
 });
 
-const response = createResource({
-  url: "run_doc_method",
-  debounce: 300,
-  makeParams: () => ({
-    dt: "HD Ticket",
-    dn: props.ticketId,
-    method: "reply_via_agent",
-    args: {
-      attachments: attachments.value.map((x) => x.name),
-      cc: cc.value,
-      bcc: bcc.value,
-      message: content.value,
-    },
-  }),
-  onSuccess: () => {
-    clear();
-    emitter.emit("update:ticket");
-  },
-});
-
-const resource = computed(() => {
-  return {
-    Comment: comment,
-    Response: response,
-  }[mode.value];
-});
-
-function clear() {
-  editor.value.editor.commands.clearContent(true);
-  isExpanded.value = false;
-  cc.value = "";
-  bcc.value = "";
-}
-
-const events = [
-  "helpdesk:new-communication",
-  "helpdesk:new-ticket-comment",
-  "helpdesk:delete-ticket-comment",
-  "helpdesk:ticket-update",
-  "helpdesk:update-ticket-assignee",
-  "helpdesk:ticket-assignee-update",
-];
-
-onMounted(() =>
-  events.forEach((e) =>
-    socket.on(e, (d) => {
-      const id = d.name || d.id;
-      const shouldReload = !id || id == props.ticketId;
-      if (shouldReload) ticket.reload();
-    })
-  )
+const dropdownOptions = computed(() =>
+  ticketStatusStore.options.map((o) => ({
+    label: o,
+    value: o,
+    onClick: () => updateTicket("status", o),
+    icon: () =>
+      h(IndicatorIcon, {
+        class: ticketStatusStore.textColorMap[o],
+      }),
+  }))
 );
-onBeforeUnmount(() => events.forEach((e) => socket.off(e)));
 
-usePageMeta(() => {
-  return {
-    title: ticket.data?.subject,
-  };
+const activities = computed(() => {
+  const emailProps = ticket.data.communications.map((email) => {
+    return {
+      type: "email",
+      key: email.creation,
+      sender: { name: email.user.email, full_name: email.user.name },
+      to: email.recipients,
+      cc: email.cc,
+      bcc: email.bcc,
+      creation: email.creation,
+      subject: email.subject,
+      attachments: email.attachments,
+      content: email.content,
+    };
+  });
+
+  const commentProps = ticket.data.comments.map((comment) => {
+    return {
+      name: comment.name,
+      type: "comment",
+      key: comment.creation,
+      commenter: comment.commented_by,
+      creation: comment.creation,
+      content: comment.content,
+    };
+  });
+
+  if (!showFullActivity.value) {
+    return [...emailProps, ...commentProps].sort(
+      (a, b) => new Date(a.creation) - new Date(b.creation)
+    );
+  }
+
+  const historyProps = [...ticket.data.history, ...ticket.data.views].map(
+    (h) => {
+      return {
+        type: "history",
+        key: h.creation,
+        content: h.action ? h.action : "viewed this",
+        creation: h.creation,
+        user: h.user.name + " ",
+      };
+    }
+  );
+
+  const sorted = [...emailProps, ...commentProps, ...historyProps].sort(
+    (a, b) => new Date(a.creation) - new Date(b.creation)
+  );
+
+  const data = [];
+  let i = 0;
+
+  while (i < sorted.length) {
+    const currentActivity = sorted[i];
+    if (currentActivity.type === "history") {
+      currentActivity.relatedActivities = [];
+      for (let j = i + 1; j < sorted.length + 1; j++) {
+        const nextActivity = sorted[j];
+        if (nextActivity && nextActivity.type === "history") {
+          currentActivity.relatedActivities.push(nextActivity);
+        } else {
+          data.push(currentActivity);
+          i = j - 1;
+          break;
+        }
+      }
+    } else {
+      data.push(currentActivity);
+    }
+    i++;
+  }
+
+  return data;
 });
+
+function updateTicket(fieldname: string, value: string) {
+  isLoading.value = true;
+  createResource({
+    url: "frappe.client.set_value",
+    params: {
+      doctype: "HD Ticket",
+      name: props.ticketId,
+      fieldname,
+      value,
+    },
+    auto: true,
+    onSuccess: () => {
+      isLoading.value = false;
+      ticket.reload();
+      createToast({
+        title: "Ticket updated",
+        icon: "check",
+        iconClasses: "text-green-600",
+      });
+    },
+    onError: () => {
+      isLoading.value = false;
+      createToast({
+        title: "Failed to update ticket",
+        icon: "x",
+        iconClasses: "text-red-600",
+      });
+    },
+  });
+}
 </script>
