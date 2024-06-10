@@ -156,13 +156,7 @@ const routes = [
       },
       {
         path: "tickets/:ticketId",
-        name: "TicketAgent2",
-        component: () => import("@/pages/TicketAgent2.vue"),
-        props: true,
-      },
-      {
-        path: "tickets/old/:ticketId",
-        name: AGENT_PORTAL_TICKET,
+        name: "TicketAgent",
         component: () => import("@/pages/TicketAgent.vue"),
         props: true,
       },
