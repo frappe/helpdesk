@@ -9,7 +9,6 @@ export { default as SearchComplete } from "./SearchComplete.vue";
 export { default as SidebarLink } from "./SidebarLink.vue";
 export { default as StarRating } from "./StarRating.vue";
 export { default as TextEditor } from "./TextEditor.vue";
-export { default as TimelineItem } from "./TimelineItem.vue";
 export { default as UniInput } from "./UniInput.vue";
 export { default as UserAvatar } from "./UserAvatar.vue";
 export { default as ViewControls } from "./ViewControls.vue";
