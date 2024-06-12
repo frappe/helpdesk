@@ -296,15 +296,21 @@ function getOperators(fieldtype: string) {
 }
 
 function getValSelect(fieldtype: string, options: string) {
-  if (typeSelect.includes(fieldtype) || typeCheck.includes(fieldtype)) {
-    const _options =
-      fieldtype == "Check" ? ["Yes", "No"] : getSelectOptions(options);
+  if (typeSelect.includes(fieldtype)) {
     return h(FormControl, {
       type: "select",
-      options: _options.map((o) => ({
+      options: getSelectOptions(options).map((o) => ({
         label: o,
         value: o,
       })),
+    });
+  } else if (typeCheck.includes(fieldtype)) {
+    return h(FormControl, {
+      type: "select",
+      options: [
+        { label: "Yes", value: 1 },
+        { label: "No", value: 0 },
+      ],
     });
   } else {
     return h(FormControl, { type: "text" });
@@ -330,7 +336,7 @@ function getDefaultValue(field: DocField) {
     return getSelectOptions(field.options)[0];
   }
   if (typeCheck.includes(field.fieldtype)) {
-    return "Yes";
+    return 1;
   }
   return "";
 }
