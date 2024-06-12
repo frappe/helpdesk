@@ -41,7 +41,12 @@
         :key="n.name"
         class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-gray-100"
         :to="getRoute(n)"
-        @click="() => notificationStore.toggle()"
+        @click="
+          () => {
+            notificationStore.toggle();
+            notificationStore.read(n.reference_ticket);
+          }
+        "
       >
         <UserAvatar v-bind="n.user_from" />
         <span>
