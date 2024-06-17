@@ -7,7 +7,7 @@
     }"
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
-    <!-- <SidebarLink
+    <SidebarLink
       label="Search"
       class="mb-1"
       :icon="LucideSearch"
@@ -20,7 +20,7 @@
           <span>K</span>
         </span>
       </template>
-    </SidebarLink> -->
+    </SidebarLink>
     <span class="mb-4">
       <div
         v-if="notificationStore.unread"
@@ -94,6 +94,7 @@ import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
 import LucideUsers from "~icons/lucide/users";
+import LucideSearch from "~icons/lucide/search";
 
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +102,7 @@ const authStore = useAuthStore();
 const keymapStore = useKeymapStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
+const device = useDevice();
 
 const menuOptions = computed(() => [
   {
@@ -161,9 +163,9 @@ const profileSettings = [
   },
 ];
 
-// function openCommandPalette() {
-//   window.dispatchEvent(
-//     new KeyboardEvent("keydown", { key: "k", metaKey: true })
-//   );
-// }
+function openCommandPalette() {
+  window.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "k", metaKey: true })
+  );
+}
 </script>
