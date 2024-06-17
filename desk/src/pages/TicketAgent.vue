@@ -134,7 +134,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h } from "vue";
+import { computed, ref, h, watch } from "vue";
+import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
@@ -171,7 +172,11 @@ const props = defineProps({
   },
 });
 
-const showFullActivity = ref(true);
+let storage = useStorage("ticket_agent", {
+  showAllActivity: true,
+});
+
+const showFullActivity = ref(storage.value.showAllActivity);
 const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
@@ -212,6 +217,13 @@ const breadcrumbs = computed(() => {
 
   return items;
 });
+
+watch(
+  () => showFullActivity.value,
+  (value) => {
+    storage.value.showAllActivity = value;
+  }
+);
 
 const dropdownOptions = computed(() =>
   ticketStatusStore.options.map((o) => ({
