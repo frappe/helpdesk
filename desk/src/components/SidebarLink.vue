@@ -28,6 +28,7 @@
       }"
     >
       {{ label }}
+      <slot name="right" />
     </div>
   </div>
 </template>
