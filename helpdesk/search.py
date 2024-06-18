@@ -133,13 +133,18 @@ class HelpdeskSearch(Search):
 		{"name": "creation", "sortable": True},
 	]
 
+	DOCTYPE_FIELDS = {
+		"HD Ticket": ["name", "subject", "description", "agent_group", "modified", "creation",],
+		"HD Article": ["name", "category", "title", "content", "modified", "creation", "author", "category.category_name as category"],
+	}
+
 	def __init__(self):
 		super().__init__("helpdesk_idx", "search_doc", self.schema)
 
 	def build_index(self):
 		self.drop_index()
 		self.create_index()
-		records = self.get_records()
+		records = self.get_records("HD Ticket") + self.get_records("HD Article")
 		total = len(records)
 		for i, doc in enumerate(records):
 			self.index_doc(doc)
@@ -161,6 +166,18 @@ class HelpdeskSearch(Search):
 				"subject": doc.subject,
 				"team": doc.agent_group,
 			}
+		if doc.doctype == "HD Article":
+			fields = {
+				"doctype": doc.doctype,
+				"name": doc.name,
+				"subject": doc.title,
+				"description": doc.content,
+				"modified": doc.modified,
+			}
+			payload = {
+				"author": doc.author,
+				"category": doc.category,
+			}
 		if fields and payload:
 			self.add_document(id, fields, payload)
 
@@ -168,20 +185,13 @@ class HelpdeskSearch(Search):
 		key = f"{doc.doctype}:{doc.name}"
 		self.remove_document(key)
 
-	def get_records(self):
+	def get_records(self, doctype):
 		records = []
 		for d in frappe.db.get_all(
-			"HD Ticket",
-			fields=[
-				"name",
-				"subject",
-				"description",
-				"agent_group",
-				"modified",
-				"creation",
-			],
+			doctype,
+			fields=self.DOCTYPE_FIELDS[doctype]
 		):
-			d.doctype = "HD Ticket"
+			d.doctype = doctype
 			records.append(d)
 		return records
 
@@ -205,6 +215,9 @@ def search(query):
 		r.name = name
 		if doctype == "HD Ticket":
 			groups.setdefault("Tickets", []).append(r)
+		elif doctype == "HD Article":
+			groups.setdefault("Articles", []).append(r)
+
 	out = []
 	for key in groups:
 		out.append({"title": key, "items": groups[key]})
