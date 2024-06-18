@@ -130,9 +130,10 @@ export default {
                 };
                 return item;
               });
-            } else {
+            } else if (group.title === "Articles") {
               group.component = "CPGroupResult";
               group.items = group.items.map((item) => {
+                item.subject = item.payload.category + " / " + item.subject;
                 item.route = {
                   name: "DeskKBArticle",
                   params: {

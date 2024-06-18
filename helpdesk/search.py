@@ -135,7 +135,7 @@ class HelpdeskSearch(Search):
 
 	DOCTYPE_FIELDS = {
 		"HD Ticket": ["name", "subject", "description", "agent_group", "modified", "creation",],
-		"HD Article": ["name", "category", "title", "content", "modified", "creation", "author", "category"],
+		"HD Article": ["name", "category", "title", "content", "modified", "creation", "author", "category.category_name as category"],
 	}
 
 	def __init__(self):
