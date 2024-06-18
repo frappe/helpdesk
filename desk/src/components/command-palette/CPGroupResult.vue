@@ -9,12 +9,8 @@
       class="mr-3 h-4 w-4 text-gray-700"
     />
     <span class="overflow-hidden text-ellipsis whitespace-nowrap">
-      <span class="text-sm">
-        #
-        {{ item.name }}
-      </span>
-      &nbsp;
       {{ item.subject }}
+      <span v-if="item.showName" class="text-sm">(#{{ item.name }})</span>
     </span>
     <span
       v-if="item.modified"
