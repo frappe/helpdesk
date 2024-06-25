@@ -25,8 +25,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Title",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "category",
@@ -90,7 +89,7 @@
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2024-05-16 17:24:36.902658",
+ "modified": "2024-06-25 11:58:31.475327",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",
