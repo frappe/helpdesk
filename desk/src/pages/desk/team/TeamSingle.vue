@@ -51,10 +51,9 @@
                 :disabled="team.loading"
                 theme="gray"
                 variant="outline"
-                @click="removeMember(member.user)"
               >
                 <template #suffix>
-                  <IconX class="h-3 w-3" />
+                  <IconX class="h-3 w-3" @click="removeMember(member.user)" />
                 </template>
               </Button>
             </div>
@@ -95,8 +94,20 @@
     <Dialog v-model="showAddMember" :options="addMemberDialogOptions">
       <template #body-content>
         <div class="space-y-2">
+          <div v-if="agentStore.agents.data.length === 0">
+            <p class="text-base text-gray-600">
+              No agents found, please add
+              <span
+                class="cursor-pointer underline"
+                @click="router.push('/agents')"
+                >agents</span
+              >
+              in the system.
+            </p>
+          </div>
           <div
-            v-for="agent in agentStore.options"
+            v-for="agent in agentStore.agents.data"
+            v-else
             :key="agent.name"
             class="flex items-center justify-between"
           >
