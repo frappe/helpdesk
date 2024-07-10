@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   commit-lint:
@@ -15,7 +16,7 @@ jobs:
           fetch-depth: 200
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           check-latest: true
       - name: Check commit titles
         run: |
@@ -31,7 +32,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 18
       - uses: actions/checkout@v3
       - run: npm install -g yarn
       - run: yarn install --frozen-lockfile
