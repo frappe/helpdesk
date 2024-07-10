@@ -5,7 +5,7 @@ import { createListResource } from "frappe-ui";
 export const useCustomerStore = defineStore("customer", () => {
   const customer = createListResource({
     doctype: "HD Customer",
-    fields: ["name", "customer_name", "domain", "image", "contact_html"],
+    fields: ["name", "customer_name", "domain", "image"],
     auto: true,
     pageLength: 99999,
   });
