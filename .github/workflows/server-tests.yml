@@ -140,5 +140,6 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           name: MariaDB
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
           verbose: true
