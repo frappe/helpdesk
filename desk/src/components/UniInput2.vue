@@ -1,6 +1,8 @@
 <template>
   <div class="flex items-center gap-2 px-6 pb-1 leading-5 first:mt-3">
-    <div class="w-[106px] shrink-0 text-sm text-gray-600">
+    <div
+      class="w-[106px] shrink-0 truncate text-sm text-gray-600 hover:overflow-visible"
+    >
       {{ field.label }}
       <span v-if="field.required" class="text-red-500"> * </span>
     </div>
