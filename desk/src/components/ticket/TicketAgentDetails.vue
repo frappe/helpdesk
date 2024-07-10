@@ -5,7 +5,9 @@
       :key="s.label"
       class="flex items-center text-base leading-5"
     >
-      <div class="w-[126px] text-sm text-gray-600">{{ s.label }}</div>
+      <Tooltip :text="s.label">
+        <div class="w-[126px] text-sm text-gray-600">{{ s.label }}</div>
+      </Tooltip>
       <div class="flex items-center justify-between">
         <div v-if="s.value">{{ s.value }}</div>
         <Tooltip :text="s.tooltipValue">
@@ -27,6 +29,7 @@ import { Badge, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { formatTime } from "@/utils";
 import { dateFormat, dateTooltipFormat } from "@/utils";
+import { computed } from "vue";
 
 const props = defineProps({
   ticketCreatedOn: {
@@ -55,55 +58,63 @@ const props = defineProps({
   },
 });
 
-let firstResponseBadge;
-if (!props.firstRespondedOn && dayjs().isBefore(dayjs(props.responseBy))) {
-  firstResponseBadge = {
-    label: `Due in ${formatTime(dayjs(props.responseBy).diff(dayjs(), "s"))}`,
-    color: "orange",
-  };
-} else if (dayjs(props.firstRespondedOn).isBefore(dayjs(props.responseBy))) {
-  firstResponseBadge = {
-    label: `Fulfilled in ${formatTime(
-      dayjs(props.firstRespondedOn).diff(dayjs(props.ticketCreatedOn), "s")
-    )}`,
-    color: "green",
-  };
-} else {
-  firstResponseBadge = {
-    label: "Failed",
-    color: "red",
-  };
-}
+const firstResponseBadge = computed(() => {
+  let firstResponse = null;
+  if (!props.firstRespondedOn && dayjs().isBefore(dayjs(props.responseBy))) {
+    firstResponse = {
+      label: `Due in ${formatTime(dayjs(props.responseBy).diff(dayjs(), "s"))}`,
+      color: "orange",
+    };
+  } else if (dayjs(props.firstRespondedOn).isBefore(dayjs(props.responseBy))) {
+    firstResponse = {
+      label: `Fulfilled in ${formatTime(
+        dayjs(props.firstRespondedOn).diff(dayjs(props.ticketCreatedOn), "s")
+      )}`,
+      color: "green",
+    };
+  } else {
+    firstResponse = {
+      label: "Failed",
+      color: "red",
+    };
+  }
+  return firstResponse;
+});
 
-let resolutionBadge;
-if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
-  resolutionBadge = {
-    label: `Due in ${formatTime(dayjs(props.resolutionBy).diff(dayjs(), "s"))}`,
-    color: "orange",
-  };
-} else if (dayjs(props.resolutionDate).isBefore(props.resolutionBy)) {
-  resolutionBadge = {
-    label: `Fulfilled in ${formatTime(
-      dayjs(props.resolutionDate).diff(dayjs(props.ticketCreatedOn), "s")
-    )}`,
-    color: "green",
-  };
-} else {
-  resolutionBadge = {
-    label: "Failed",
-    color: "red",
-  };
-}
+const resolutionBadge = computed(() => {
+  let resolution = null;
+  if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
+    resolution = {
+      label: `Due in ${formatTime(
+        dayjs(props.resolutionBy).diff(dayjs(), "s")
+      )}`,
+      color: "orange",
+    };
+  } else if (dayjs(props.resolutionDate).isBefore(props.resolutionBy)) {
+    resolution = {
+      label: `Fulfilled in ${formatTime(
+        dayjs(props.resolutionDate).diff(dayjs(props.ticketCreatedOn), "s")
+      )}`,
+      color: "green",
+    };
+  } else {
+    resolution = {
+      label: "Failed",
+      color: "red",
+    };
+  }
+  return resolution;
+});
 
-const sections = [
+const sections = computed(() => [
   {
     label: "First Response",
     tooltipValue: dateFormat(
       props.firstRespondedOn || props.responseBy,
       dateTooltipFormat
     ),
-    badgeText: firstResponseBadge.label,
-    badgeColor: firstResponseBadge.color,
+    badgeText: firstResponseBadge.value.label,
+    badgeColor: firstResponseBadge.value.color,
   },
   {
     label: "Resolution",
@@ -111,12 +122,12 @@ const sections = [
       props.resolutionDate || props.resolutionBy,
       dateTooltipFormat
     ),
-    badgeText: resolutionBadge.label,
-    badgeColor: resolutionBadge.color,
+    badgeText: resolutionBadge.value.label,
+    badgeColor: resolutionBadge.value.color,
   },
   {
     label: "Source",
     value: props.source,
   },
-];
+]);
 </script>

@@ -1,11 +1,11 @@
 <template>
   <div class="flex items-center gap-2 px-6 pb-1 leading-5 first:mt-3">
-    <div
-      class="w-[106px] shrink-0 truncate text-sm text-gray-600 hover:overflow-visible"
-    >
-      {{ field.label }}
-      <span v-if="field.required" class="text-red-500"> * </span>
-    </div>
+    <Tooltip :text="field.label">
+      <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
+        {{ field.label }}
+        <span v-if="field.required" class="text-red-500"> * </span>
+      </div>
+    </Tooltip>
     <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
       <component
         :is="component"
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { computed, h } from "vue";
 import { Autocomplete } from "@/components";
-import { createResource, FormControl } from "frappe-ui";
+import { createResource, FormControl, Tooltip } from "frappe-ui";
 import { Field } from "@/types";
 import SearchComplete from "./SearchComplete.vue";
 
