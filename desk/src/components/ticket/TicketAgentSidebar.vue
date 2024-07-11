@@ -45,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from "vue";
 import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentContact from "./TicketAgentContact.vue";
