@@ -9,6 +9,7 @@
     <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
       <component
         :is="component"
+        :key="transValue"
         class="form-control"
         :placeholder="`Add ${field.label}`"
         :value="transValue"
