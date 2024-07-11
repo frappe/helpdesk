@@ -87,6 +87,9 @@ const agents = createListManager({
     "user.email",
     "user.username",
   ],
+  filters: {
+    is_active: "1",
+  },
   auto: true,
   transform: (data) => {
     for (const d of data) {

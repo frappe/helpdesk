@@ -5,9 +5,11 @@
       :key="o.field"
       class="flex items-center gap-2 px-6 pb-1 leading-5 first:mt-3"
     >
-      <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
-        {{ o.label }}
-      </div>
+      <Tooltip :text="o.label">
+        <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
+          {{ o.label }}
+        </div>
+      </Tooltip>
       <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
         <FormControl
           v-if="o.type === 'select'"
@@ -38,8 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineEmits } from "vue";
-import { createResource, FormControl } from "frappe-ui";
+import { computed } from "vue";
+import { createResource, FormControl, Tooltip } from "frappe-ui";
 import { Autocomplete } from "@/components";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
