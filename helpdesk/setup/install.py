@@ -8,7 +8,7 @@ from .file import create_helpdesk_folder
 from .ticket_feedback import create_ticket_feedback_options
 from .ticket_type import create_fallback_ticket_type, create_ootb_ticket_types
 from .welcome_ticket import create_welcome_ticket
-
+from .ticket_status import create_default_ticket_status
 
 def before_install():
 	add_support_redirect_to_tickets()
@@ -28,6 +28,7 @@ def after_install():
 	create_ootb_ticket_types()
 	create_welcome_ticket()
 	create_ticket_feedback_options()
+	create_default_ticket_status()
 	add_property_setter()
 
 

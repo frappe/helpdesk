@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-07-11 15:50:22.854921",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_ticket_status",
+  "to_ticket_status",
+  "from_priority",
+  "to_priority",
+  "from_sla_status",
+  "to_sla_status",
+  "column_break_oxtm",
+  "from_date",
+  "to_date",
+  "duration"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "To Date"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Duration",
+   "in_list_view": 1,
+   "label": "Duration"
+  },
+  {
+   "fieldname": "from_priority",
+   "fieldtype": "Link",
+   "label": "From Priority",
+   "options": "HD Ticket Priority"
+  },
+  {
+   "fieldname": "to_priority",
+   "fieldtype": "Link",
+   "label": "To Priority",
+   "options": "HD Ticket Priority"
+  },
+  {
+   "fieldname": "from_sla_status",
+   "fieldtype": "Select",
+   "label": "From SLA Status",
+   "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused"
+  },
+  {
+   "fieldname": "to_sla_status",
+   "fieldtype": "Select",
+   "label": "To SLA Status",
+   "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused"
+  },
+  {
+   "fieldname": "column_break_oxtm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "from_ticket_status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "From Ticket Status",
+   "options": "HD Ticket Status"
+  },
+  {
+   "fieldname": "to_ticket_status",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "To Ticket Status",
+   "options": "HD Ticket Status"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-07-11 16:13:51.744605",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Ticket Log",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
