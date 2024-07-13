@@ -210,11 +210,8 @@ const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
-    onClick: () => {
-      showSubjectDialog.value = true;
-    },
+    route: { name: "TicketAgent" },
   });
-
   return items;
 });
 
