@@ -1,6 +1,6 @@
 <template>
   <header class="flex h-12 items-center justify-between border-b py-2.5 pl-5">
-    <div class="left-header flex max-w-[70%] items-center gap-2">
+    <div class="left-header flex max-w-[60%] items-center gap-2">
       <slot name="left-header" />
     </div>
     <div class="flex items-center gap-2 px-5">
