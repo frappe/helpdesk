@@ -33,6 +33,7 @@
       </div>
     </div>
     <TicketAgentDetails
+      :agreement-status="ticket.agreement_status"
       :first-responded-on="ticket.first_responded_on"
       :response-by="ticket.response_by"
       :resolution-date="ticket.resolution_date"

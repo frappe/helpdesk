@@ -32,6 +32,10 @@ import { dateFormat, dateTooltipFormat } from "@/utils";
 import { computed } from "vue";
 
 const props = defineProps({
+  agreementStatus: {
+    type: String,
+    required: true,
+  },
   ticketCreatedOn: {
     type: String,
     required: true,

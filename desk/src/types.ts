@@ -115,6 +115,8 @@ export interface Field {
   url_method?: string;
 }
 
+export type FieldValue = string | number | boolean;
+
 export interface Template {
   about: string;
   fields: Field[];
