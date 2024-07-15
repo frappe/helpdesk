@@ -6,14 +6,15 @@
         <span v-if="field.required" class="text-red-500"> * </span>
       </div>
     </Tooltip>
-    <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
+    <div
+      class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
+    >
       <component
         :is="component"
         :key="transValue"
         class="form-control"
         :placeholder="`Add ${field.label}`"
         :value="transValue"
-        :model-value="transValue"
         @change="
           emitUpdate(field.fieldname, $event.value || $event.target.value)
         "
@@ -26,19 +27,17 @@
 import { computed, h } from "vue";
 import { Autocomplete } from "@/components";
 import { createResource, FormControl, Tooltip } from "frappe-ui";
-import { Field } from "@/types";
+import { Field, FieldValue } from "@/types";
 import SearchComplete from "./SearchComplete.vue";
-
-type Value = string | number | boolean;
 
 interface P {
   field: Field;
-  value: Value;
+  value: FieldValue;
 }
 
 interface R {
   fieldname: Field["fieldname"];
-  value: Value;
+  value: FieldValue;
 }
 
 interface E {
@@ -98,8 +97,7 @@ const transValue = computed(() => {
   return props.value;
 });
 
-function emitUpdate(fieldname: Field["fieldname"], value: Value) {
-  console.log("Emitting", fieldname, value);
+function emitUpdate(fieldname: Field["fieldname"], value: FieldValue) {
   emit("change", { fieldname, value });
 }
 </script>
