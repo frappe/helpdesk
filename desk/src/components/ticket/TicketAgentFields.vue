@@ -44,6 +44,7 @@ import { Autocomplete } from "@/components";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketTypeStore } from "@/stores/ticketType";
+import { useCustomerStore } from "@/stores/customer";
 import UniInput2 from "@/components/UniInput2.vue";
 
 const emit = defineEmits(["update"]);
@@ -89,7 +90,7 @@ const options = computed(() => {
     {
       field: "customer",
       label: "Customer",
-      type: "select",
+      store: useCustomerStore(),
       placeholder: "Select Customer",
     },
   ];

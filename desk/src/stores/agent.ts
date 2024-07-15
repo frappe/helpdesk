@@ -2,23 +2,24 @@ import { computed } from "vue";
 import { defineStore } from "pinia";
 import { createListResource } from "frappe-ui";
 
-export const useCustomerStore = defineStore("customer", () => {
-  const customer = createListResource({
-    doctype: "HD Customer",
-    fields: ["name", "customer_name", "domain", "image", "contact_html"],
+export const useAgentStore = defineStore("agent", () => {
+  const agents = createListResource({
+    doctype: "HD Agent",
+    fields: ["name", "agent_name", "user", "user.user_image"],
+    filters: { is_active: 1 },
     auto: true,
     pageLength: 99999,
   });
 
   const dropdown = computed(() =>
-    customer.data?.map((o) => ({
-      label: o.customer_name,
+    agents.data?.map((o) => ({
+      label: o.agent_name,
       value: o.name,
     }))
   );
 
   return {
     dropdown,
-    customer,
+    agents,
   };
 });
