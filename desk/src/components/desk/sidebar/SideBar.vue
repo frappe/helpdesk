@@ -70,7 +70,6 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
-import { useKeymapStore } from "@/stores/keymap";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
 import {
@@ -99,7 +98,6 @@ import LucideSearch from "~icons/lucide/search";
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const keymapStore = useKeymapStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
@@ -144,17 +142,27 @@ const menuOptions = computed(() => [
 
 const profileSettings = [
   {
-    label: "Shortcuts",
-    icon: "command",
-    onClick: () => keymapStore.toggleVisibility(true),
+    icon: "corner-up-left",
+    label: "Switch to Desk",
+    onClick: () => window.open("/app"),
   },
   {
     label: "Customer portal",
     icon: "users",
     onClick: () => {
       const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
-      window.open(path.href, "_blank");
+      window.open(path.href);
     },
+  },
+  {
+    icon: "life-buoy",
+    label: "Support",
+    onClick: () => window.open("https://t.me/frappedesk"),
+  },
+  {
+    icon: "book-open",
+    label: "Docs",
+    onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
   {
     label: "Log out",
