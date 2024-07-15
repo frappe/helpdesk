@@ -210,11 +210,8 @@ const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
-    onClick: () => {
-      showSubjectDialog.value = true;
-    },
+    route: { name: "TicketAgent" },
   });
-
   return items;
 });
 
@@ -258,7 +255,7 @@ const activities = computed(() => {
       name: comment.name,
       type: "comment",
       key: comment.creation,
-      commenter: comment.commented_by,
+      commenter: comment.user.name,
       creation: comment.creation,
       content: comment.content,
     };

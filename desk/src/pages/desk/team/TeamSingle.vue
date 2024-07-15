@@ -13,6 +13,9 @@
               },
               {
                 label: teamId,
+                route: {
+                  name: AGENT_PORTAL_TEAM_SINGLE,
+                },
               },
             ]"
           />
