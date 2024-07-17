@@ -136,6 +136,7 @@ export type Column = {
 
 export type File = {
   file_name: string;
+  name: string;
   file_url: string;
   is_private: boolean;
   attached_to_doctype?: string;

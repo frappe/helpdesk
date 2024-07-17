@@ -12,7 +12,10 @@
           class="cursor-pointer hover:opacity-80"
         />
         <div class="flex gap-2">
-          <FileUploader @success="(file) => updateImage(file)">
+          <FileUploader
+            :validate-file="validateFile"
+            @success="(file:File) => updateImage(file)"
+          >
             <template #default="{ uploading, openFileSelector }">
               <Button
                 :label="contact.doc?.image ? 'Change photo' : 'Upload photo'"
@@ -202,5 +205,17 @@ function validatePhone(input: AutoCompleteItem): string | void {
     .max(15)
     .safeParse(input.value).success;
   if (!success) return "Invalid phone number";
+}
+
+function validateFile(file: File): string | void {
+  let extn = file.name.split(".").pop().toLowerCase();
+  if (!["png", "jpg", "jpeg"].includes(extn)) {
+    createToast({
+      title: "Invalid file type, only PNG and JPG images are allowed",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return "Invalid file type, only PNG and JPG images are allowed";
+  }
 }
 </script>
