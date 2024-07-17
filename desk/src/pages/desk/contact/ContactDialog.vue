@@ -6,7 +6,7 @@
           {{ contact.doc?.name }}
         </div>
         <Avatar
-          size="lg"
+          size="2xl"
           :label="contact.doc?.name"
           :image="contact.doc?.image"
           class="cursor-pointer hover:opacity-80"
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import {
   createDocumentResource,
   Avatar,
@@ -70,6 +70,10 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["successSetValue"]);
+
+const isDirty = ref(false);
+
 const emails = computed({
   get() {
     const l = contact.doc?.email_ids || [];
@@ -79,6 +83,17 @@ const emails = computed({
     }));
   },
   set(e) {
+    if (e.length === 0) {
+      createToast({
+        title: "At least one email is required",
+        icon: "x",
+        iconClasses: "text-red-600",
+      });
+      return;
+    }
+    if (e.length !== contact.doc.email_ids.length) {
+      isDirty.value = true;
+    }
     contact.doc.email_ids = e.map((item) => ({
       email_id: item.value,
     }));
@@ -94,6 +109,9 @@ const phones = computed({
     }));
   },
   set(e) {
+    if (e.length !== contact.doc.phone_nos.length) {
+      isDirty.value = true;
+    }
     contact.doc.phone_nos = e.map((item) => ({
       phone: item.value,
     }));
@@ -106,11 +124,7 @@ const contact = createDocumentResource({
   auto: true,
   setValue: {
     onSuccess() {
-      createToast({
-        title: "Contact updated",
-        icon: "check",
-        iconClasses: "text-green-500",
-      });
+      emit("successSetValue", isDirty.value);
     },
     onError: useError({ title: "Error updating contact" }),
   },
@@ -129,6 +143,14 @@ const options = computed(() => ({
 }));
 
 function update() {
+  if (!isDirty.value) {
+    createToast({
+      title: "No changes to save",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return;
+  }
   contact.setValue.submit({
     email_ids: emails.value.map((item) => ({
       email_id: item.value,
@@ -140,12 +162,14 @@ function update() {
       is_primary_mobile: item.value === contact.doc.phone,
     })),
   });
+  emit("successSetValue", isDirty.value);
 }
 
 function updateImage(file) {
   contact.setValue.submit({
     image: file?.file_url || null,
   });
+  isDirty.value = true;
 }
 
 function validateEmail(input) {

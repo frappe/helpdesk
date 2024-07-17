@@ -32,7 +32,11 @@
       @contact-created="handleContactCreated"
     />
     <span v-if="isContactDialogVisible">
-      <ContactDialog v-model="isContactDialogVisible" :name="selectedContact" />
+      <ContactDialog
+        v-model="isContactDialogVisible"
+        :name="selectedContact"
+        @successSetValue="(isDirty:boolean) => handleSuccess(isDirty)"
+      />
     </span>
   </div>
 </template>
@@ -44,6 +48,7 @@ import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
 import ContactDialog from "./ContactDialog.vue";
+import { createToast } from "@/utils";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
@@ -92,5 +97,16 @@ function handleContactCreated() {
 function openContact(id: string) {
   selectedContact.value = id;
   isContactDialogVisible.value = true;
+}
+
+function handleSuccess(isDirty: boolean) {
+  if (!isDirty) return;
+  createToast({
+    title: "Contact updated",
+    icon: "check",
+    iconClasses: "text-green-500",
+  });
+  isContactDialogVisible.value = false;
+  contacts.reload();
 }
 </script>
