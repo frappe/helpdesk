@@ -41,23 +41,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { useContactStore } from "@/stores/contact";
 
-import { Input, Dialog, ErrorMessage } from "frappe-ui";
-import { createResource } from "frappe-ui";
+import { Input, Dialog, ErrorMessage, createResource } from "frappe-ui";
+import zod from "zod";
 
 import Autocomplete from "@/components/Autocomplete.vue";
 import { createToast } from "@/utils";
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true,
-  },
-});
+import { AutoCompleteItem } from "@/types";
 
-const emit = defineEmits(["update:modelValue", "close", "contactCreated"]);
+interface Props {
+  modelValue: boolean;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  (event: "update:modelValue", value: boolean): void;
+  (event: "close"): void;
+  (event: "contactCreated"): void;
+}>();
 
 const contactStore = useContactStore();
 
@@ -77,7 +81,15 @@ const error = ref({
   customerValidationError: "",
 });
 
-const formFields = [
+interface FormField {
+  label: string;
+  value: string;
+  error: string;
+  type: string;
+  action?: () => void;
+}
+
+const formFields: FormField[] = [
   {
     label: "Email Id",
     value: "emailID",
@@ -97,7 +109,6 @@ const formFields = [
     value: "lastName",
     error: "lastNameValidationError",
     type: "input",
-    action: "",
   },
   {
     label: "Phone",
@@ -145,7 +156,7 @@ const customerResource = createResource({
 
 const contactResource = createResource({
   url: "frappe.client.insert",
-  onSuccess: (data) => {
+  onSuccess: () => {
     state.value = {
       emailID: "",
       firstName: "",
@@ -158,10 +169,9 @@ const contactResource = createResource({
       icon: "check",
       iconClasses: "text-green-600",
     });
-
-    emit("contactCreated", data);
+    emit("contactCreated");
   },
-  onError: (error) => {
+  onError: (error: Error) => {
     createToast({
       title: "Contact Creation Failed",
       message: error.message,
@@ -185,6 +195,7 @@ function createContact() {
         link_name: state.value.selectedCustomer,
       },
     ],
+    phone_nos: [],
   };
   if (state.value.phone) {
     doc.phone_nos = [{ phone: state.value.phone }];
@@ -193,7 +204,7 @@ function createContact() {
   contactResource.submit({ doc });
 }
 
-function handleCustomerChange(item) {
+function handleCustomerChange(item: AutoCompleteItem) {
   if (!item) return;
   state.value.selectedCustomer = item.value;
 }
@@ -206,14 +217,13 @@ function validateInputs() {
   return error;
 }
 
-function validateEmailInput(value) {
+function validateEmailInput(value: string) {
   error.value.emailValidationError = "";
-  const reg =
-    /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
+  const success = zod.string().email().safeParse(value).success;
 
   if (!value) {
     error.value.emailValidationError = "Email should not be empty";
-  } else if (!reg.test(value)) {
+  } else if (!success) {
     error.value.emailValidationError = "Enter a valid email";
   } else if (existingContactEmails(contactStore.options).includes(value)) {
     error.value.emailValidationError = "Contact with email already exists";
@@ -221,7 +231,7 @@ function validateEmailInput(value) {
   return error.value.emailValidationError;
 }
 
-function validateFirstName(value) {
+function validateFirstName(value: string) {
   error.value.firstNameValidationError = "";
   if (!value || value.trim() === "") {
     error.value.firstNameValidationError = "First name should not be empty";
@@ -229,7 +239,7 @@ function validateFirstName(value) {
   return error.value.firstNameValidationError;
 }
 
-function validatePhone(value) {
+function validatePhone(value: string) {
   error.value.phoneValidationError = "";
   const reg = /[0-9]+/;
   if (value && (!reg.test(value) || value.length < 10)) {
@@ -238,7 +248,7 @@ function validatePhone(value) {
   return error.value.phoneValidationError;
 }
 
-function validateCustomer(value) {
+function validateCustomer(value: string) {
   error.value.customerValidationError = "";
   if (!value || value.trim() === "") {
     error.value.customerValidationError = "Customer should not be empty";

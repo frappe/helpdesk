@@ -14,7 +14,7 @@
 <script setup>
 import { Button } from "frappe-ui";
 import IconX from "~icons/lucide/x";
-const props = defineProps({
+defineProps({
   label: {
     type: String,
     default: "Button",

@@ -104,6 +104,11 @@ export interface Filter {
   value: boolean | number | string;
 }
 
+export interface AutoCompleteItem {
+  label: string;
+  value: string;
+}
+
 export interface Field {
   fieldname: string;
   fieldtype: string;

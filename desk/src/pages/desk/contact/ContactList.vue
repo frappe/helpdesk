@@ -33,14 +33,15 @@
     />
     <ContactDialog
       v-if="isContactDialogVisible"
+      :key="selectedContact"
       v-model="isContactDialogVisible"
       :name="selectedContact"
-      @contact-updated="handleSuccess"
+      @contact-updated="handleContactUpdated"
     />
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
@@ -48,11 +49,13 @@ import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
 import ContactDialog from "./ContactDialog.vue";
 import { createToast } from "@/utils";
+import { Column } from "@/types";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
-const columns = [
+
+const columns: Column[] = [
   {
     label: "Name",
     key: "name",
@@ -88,23 +91,23 @@ usePageMeta(() => {
   };
 });
 
-function handleContactCreated() {
+function handleContactCreated(): void {
   isDialogVisible.value = false;
   contacts.reload();
 }
 
-function openContact(id: string) {
+function openContact(id: string): void {
   selectedContact.value = id;
   isContactDialogVisible.value = true;
 }
 
-function handleSuccess() {
+function handleContactUpdated(): void {
   createToast({
     title: "Contact updated",
     icon: "check",
     iconClasses: "text-green-500",
   });
-  isContactDialogVisible.value = false;
+  isContactDialogVisible.value = !isContactDialogVisible.value;
   contacts.reload();
 }
 </script>
