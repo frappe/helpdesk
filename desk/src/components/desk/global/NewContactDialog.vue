@@ -3,57 +3,30 @@
     <Dialog v-model="open" :options="{ title: 'Create New Contact' }">
       <template #body-content>
         <div class="space-y-4">
-          <div class="space-y-1">
+          <div
+            v-for="field in formFields"
+            :key="field.label"
+            class="flex flex-col gap-1"
+          >
+            <span class="mb-2 block text-sm leading-4 text-gray-700">
+              {{ field.label }}
+            </span>
             <Input
-              v-model="state.emailID"
-              label="Email Id"
-              type="email"
-              @blur="validateEmailInput(state.emailID)"
-            />
-            <ErrorMessage :message="error.emailValidationError" />
-          </div>
-          <div class="space-y-1">
-            <Input
-              v-model="state.firstName"
-              label="First Name"
+              v-if="field.type === 'input'"
+              v-model="state[field.value]"
               type="text"
-              @blur="validateFirstName(state.firstName)"
+              @blur="field.action"
             />
-            <ErrorMessage :message="error.firstNameValidationError" />
-          </div>
-          <div class="space-y-1">
-            <Input
-              v-model="state.lastName"
-              label="Last Name (optional)"
-              type="text"
-            />
-            <ErrorMessage :message="error.lastNameValidationError" />
-          </div>
-          <div class="space-y-1">
-            <Input
-              v-model="state.phone"
-              label="Phone (optional)"
-              type="text"
-              @blur="validatePhone(state.phone)"
-            />
-            <ErrorMessage :message="error.phoneValidationError" />
-          </div>
-          <div class="w-full space-y-1">
-            <div>
-              <span class="mb-2 block text-sm leading-4 text-gray-700">
-                Customer
-              </span>
-            </div>
             <Autocomplete
-              :value="state.selectedCustomer"
+              v-else-if="field.type === 'autocomplete'"
+              v-model="state[field.value]"
+              :value="state[field.value]"
               :options="customerResource.data"
               @change="handleCustomerChange"
-              @blur="validateCustomer(state.selectedCustomer)"
             />
-
-            <ErrorMessage :message="error.customerValidationError" />
+            <ErrorMessage :message="error[field.error]" />
           </div>
-          <div class="float-right flex space-x-2">
+          <div class="flex justify-end space-x-2">
             <Button
               label="Create"
               :loading="contactResource.loading"
@@ -104,41 +77,43 @@ const error = ref({
   customerValidationError: "",
 });
 
-// const formFields = [
-//   {
-//     label: "Email Id",
-//     value: state.value.emailID,
-//     error: error.value.emailValidationError,
-//     type: "input",
-//     action: validateEmailInput(state.value.emailID),
-//   },
-//   {
-//     label: "First Name",
-//     value: state.value.firstName,
-//     error: error.value.firstNameValidationError,
-//     type: "input",
-//     action: validateFirstName(state.value.firstName),
-//   },
-//   {
-//     label: "Last Name (optional)",
-//     value: state.value.lastName,
-//     error: error.value.lastNameValidationError,
-//     type: "input",
-//   },
-//   {
-//     label: "Phone (optional)",
-//     value: state.value.phone,
-//     error: error.value.phoneValidationError,
-//     type: "input",
-//     action: validatePhone(state.value.phone),
-//   },
-//   {
-//     label: "Customer",
-//     value: state.value.selectedCustomer,
-//     error: error.value.customerValidationError,
-//     action: validateCustomer(state.value.selectedCustomer),
-//   },
-// ];
+const formFields = [
+  {
+    label: "Email Id",
+    value: "emailID",
+    error: "emailValidationError",
+    type: "input",
+    action: () => validateEmailInput(state.value.emailID),
+  },
+  {
+    label: "First Name",
+    value: "firstName",
+    error: "firstNameValidationError",
+    type: "input",
+    action: () => validateFirstName(state.value.firstName),
+  },
+  {
+    label: "Last Name",
+    value: "lastName",
+    error: "lastNameValidationError",
+    type: "input",
+    action: "",
+  },
+  {
+    label: "Phone",
+    value: "phone",
+    error: "phoneValidationError",
+    type: "input",
+    action: () => validatePhone(state.value.phone),
+  },
+  {
+    label: "Customer",
+    value: "selectedCustomer",
+    error: "customerValidationError",
+    type: "autocomplete",
+    action: () => validateCustomer(state.value.selectedCustomer),
+  },
+];
 
 const open = computed({
   get: () => props.modelValue,
