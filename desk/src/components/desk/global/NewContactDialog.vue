@@ -18,7 +18,7 @@
               @blur="field.action"
             />
             <Autocomplete
-              v-else-if="field.type === 'autocomplete'"
+              v-else
               v-model="state[field.value]"
               :value="state[field.value]"
               :options="customerResource.data"
@@ -45,10 +45,15 @@
 import { ref, computed } from "vue";
 import { useContactStore } from "@/stores/contact";
 
-import { Input, Dialog, ErrorMessage, createResource } from "frappe-ui";
+import {
+  Input,
+  Dialog,
+  ErrorMessage,
+  createResource,
+  Autocomplete,
+} from "frappe-ui";
 import zod from "zod";
 
-import Autocomplete from "@/components/Autocomplete.vue";
 import { createToast } from "@/utils";
 import { AutoCompleteItem } from "@/types";
 
