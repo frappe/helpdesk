@@ -70,7 +70,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["successSetValue"]);
+const emit = defineEmits(["contactUpdated"]);
 
 const isDirty = ref(false);
 
@@ -121,10 +121,11 @@ const phones = computed({
 const contact = createDocumentResource({
   doctype: "Contact",
   name: props.name,
+  cache: [`contact-${props.name}`, props.name],
   auto: true,
   setValue: {
     onSuccess() {
-      emit("successSetValue", isDirty.value);
+      emit("contactUpdated");
     },
     onError: useError({ title: "Error updating contact" }),
   },
@@ -162,7 +163,7 @@ function update() {
       is_primary_mobile: item.value === contact.doc.phone,
     })),
   });
-  emit("successSetValue", isDirty.value);
+  if (!isDirty.value) return;
 }
 
 function updateImage(file) {

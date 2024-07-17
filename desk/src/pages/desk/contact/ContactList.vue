@@ -31,17 +31,16 @@
       v-model="isDialogVisible"
       @contact-created="handleContactCreated"
     />
-    <span v-if="isContactDialogVisible">
-      <ContactDialog
-        v-model="isContactDialogVisible"
-        :name="selectedContact"
-        @successSetValue="(isDirty:boolean) => handleSuccess(isDirty)"
-      />
-    </span>
+    <ContactDialog
+      v-if="isContactDialogVisible"
+      v-model="isContactDialogVisible"
+      :name="selectedContact"
+      @contact-updated="handleSuccess"
+    />
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
@@ -99,8 +98,7 @@ function openContact(id: string) {
   isContactDialogVisible.value = true;
 }
 
-function handleSuccess(isDirty: boolean) {
-  if (!isDirty) return;
+function handleSuccess() {
   createToast({
     title: "Contact updated",
     icon: "check",
