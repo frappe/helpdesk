@@ -29,11 +29,15 @@
     </ListView>
     <NewContactDialog
       v-model="isDialogVisible"
-      @contact-created="isDialogVisible = false"
+      @contact-created="handleContactCreated"
     />
-    <span v-if="isContactDialogVisible">
-      <ContactDialog v-model="isContactDialogVisible" :name="selectedContact" />
-    </span>
+    <ContactDialog
+      v-if="isContactDialogVisible"
+      :key="selectedContact"
+      v-model="isContactDialogVisible"
+      :name="selectedContact"
+      @contact-updated="handleContactUpdated"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -44,11 +48,14 @@ import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
 import ContactDialog from "./ContactDialog.vue";
+import { createToast } from "@/utils";
+import { Column } from "@/types";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
-const columns = [
+
+const columns: Column[] = [
   {
     label: "Name",
     key: "name",
@@ -84,8 +91,23 @@ usePageMeta(() => {
   };
 });
 
-function openContact(id: string) {
+function handleContactCreated(): void {
+  isDialogVisible.value = false;
+  contacts.reload();
+}
+
+function openContact(id: string): void {
   selectedContact.value = id;
   isContactDialogVisible.value = true;
+}
+
+function handleContactUpdated(): void {
+  createToast({
+    title: "Contact updated",
+    icon: "check",
+    iconClasses: "text-green-500",
+  });
+  isContactDialogVisible.value = !isContactDialogVisible.value;
+  contacts.reload();
 }
 </script>

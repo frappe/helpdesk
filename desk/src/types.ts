@@ -104,6 +104,11 @@ export interface Filter {
   value: boolean | number | string;
 }
 
+export interface AutoCompleteItem {
+  label: string;
+  value: string;
+}
+
 export interface Field {
   fieldname: string;
   fieldtype: string;
@@ -133,6 +138,7 @@ export type Column = {
 
 export type File = {
   file_name: string;
+  name: string;
   file_url: string;
   is_private: boolean;
   attached_to_doctype?: string;
