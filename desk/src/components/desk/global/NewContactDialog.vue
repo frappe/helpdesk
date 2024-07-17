@@ -20,9 +20,9 @@
             <Autocomplete
               v-else
               v-model="state[field.value]"
+              @update:modelValue="handleCustomerChange"
               :value="state[field.value]"
               :options="customerResource.data"
-              @change="handleCustomerChange"
             />
             <ErrorMessage :message="error[field.error]" />
           </div>
