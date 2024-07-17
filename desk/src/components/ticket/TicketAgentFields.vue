@@ -10,9 +10,20 @@
           {{ o.label }}
         </div>
       </Tooltip>
-      <div class="min-h-[28px] flex-1 items-center overflow-hidden text-base">
+      <div
+        class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
+      >
         <FormControl
-          v-if="o.type === 'select'"
+          v-if="o.type === 'textarea'"
+          class="form-control"
+          :type="o.type"
+          :value="ticket[o.field]"
+          variant="subtle"
+          rows="2"
+          @change="update(o.field, $event.target.value, $event)"
+        />
+        <FormControl
+          v-else-if="o.type === 'select'"
           class="form-control"
           :type="o.type"
           :value="ticket[o.field]"
@@ -47,6 +58,8 @@ import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketTypeStore } from "@/stores/ticketType";
 import UniInput2 from "@/components/UniInput2.vue";
+import { createToast } from "@/utils";
+import { Field, FieldValue } from "@/types";
 
 const emit = defineEmits(["update"]);
 
@@ -63,8 +76,8 @@ const customers = createResource({
     contact: props.ticket.raised_by,
   },
   auto: true,
-  transform: (data) => {
-    return data.map((d) => ({
+  transform: (data: Array<object>) => {
+    return data.map((d: object) => ({
       label: d,
       value: d,
     }));
@@ -94,10 +107,25 @@ const options = computed(() => {
       type: "select",
       placeholder: "Select Customer",
     },
+    {
+      field: "subject",
+      label: "Subject",
+      type: "textarea",
+      placeholder: "Problem in XYZ",
+    },
   ];
 });
 
-function update(field, value) {
+function update(field: Field["fieldname"], value: FieldValue, event = null) {
+  if (field === "subject" && value === "") {
+    createToast({
+      title: "Subject is required",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    event.target.value = props.ticket.subject;
+    return;
+  }
   emit("update", { field, value });
 }
 </script>

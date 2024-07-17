@@ -47,18 +47,13 @@
           <div class="space-y-4">
             <div class="text-lg font-medium">Members</div>
             <div v-if="!isEmpty(team.doc?.users)" class="flex flex-wrap gap-2">
-              <Button
+              <Pill
                 v-for="member in team.doc?.users"
-                :key="member.name"
+                :key="member.user"
                 :label="member.user"
                 :disabled="team.loading"
-                theme="gray"
-                variant="outline"
-              >
-                <template #suffix>
-                  <IconX class="h-3 w-3" @click="removeMember(member.user)" />
-                </template>
-              </Button>
+                @click="(user) => removeMember(user)"
+              />
             </div>
             <div v-else class="text-base text-gray-900">
               No members found in team: {{ teamId }}
@@ -155,7 +150,7 @@ import { useError } from "@/composables/error";
 import { PageTitle } from "@/components";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";
-import IconX from "~icons/lucide/x";
+import Pill from "@/components/Pill.vue";
 
 const props = defineProps({
   teamId: {

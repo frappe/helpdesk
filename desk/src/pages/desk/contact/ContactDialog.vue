@@ -6,13 +6,16 @@
           {{ contact.doc?.name }}
         </div>
         <Avatar
-          size="lg"
+          size="2xl"
           :label="contact.doc?.name"
           :image="contact.doc?.image"
           class="cursor-pointer hover:opacity-80"
         />
         <div class="flex gap-2">
-          <FileUploader @success="(file) => updateImage(file)">
+          <FileUploader
+            :validate-file="validateFile"
+            @success="(file:File) => updateImage(file)"
+          >
             <template #default="{ uploading, openFileSelector }">
               <Button
                 :label="contact.doc?.image ? 'Change photo' : 'Upload photo'"
@@ -51,7 +54,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import type { Ref } from "vue";
 import {
   createDocumentResource,
   Avatar,
@@ -62,39 +66,73 @@ import zod from "zod";
 import { createToast } from "@/utils";
 import { useError } from "@/composables/error";
 import MultiSelect from "@/components/MultiSelect.vue";
+import { File, AutoCompleteItem } from "@/types";
 
-const props = defineProps({
+interface Props {
   name: {
-    type: String,
-    required: true,
-  },
-});
+    type: string;
+    required: true;
+  };
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  (event: "contactUpdated"): void;
+}>();
+
+interface Email {
+  email_id: string;
+  is_primary?: boolean;
+}
+
+interface Phone {
+  phone: string;
+  is_primary_phone?: boolean;
+  is_primary_mobile?: boolean;
+}
+
+const isDirty: Ref<boolean> = ref(false);
 
 const emails = computed({
   get() {
-    const l = contact.doc?.email_ids || [];
-    return l.map((e) => ({
+    const emails = contact.doc?.email_ids || [];
+    return emails.map((e: Email) => ({
       label: e.email_id,
       value: e.email_id,
     }));
   },
-  set(e) {
-    contact.doc.email_ids = e.map((item) => ({
-      email_id: item.value,
+  set(newVal) {
+    if (newVal.length === 0) {
+      createToast({
+        title: "At least one email is required",
+        icon: "x",
+        iconClasses: "text-red-600",
+      });
+      return;
+    }
+    if (newVal.length !== contact.doc.email_ids.length) {
+      isDirty.value = true;
+    }
+    contact.doc.email_ids = newVal.map((email: AutoCompleteItem) => ({
+      email_id: email.value,
     }));
   },
 });
 
 const phones = computed({
   get() {
-    const l = contact.doc?.phone_nos || [];
-    return l.map((e) => ({
+    const phone_nos = contact.doc?.phone_nos || [];
+    return phone_nos.map((e: Phone) => ({
       label: e.phone,
       value: e.phone,
     }));
   },
-  set(e) {
-    contact.doc.phone_nos = e.map((item) => ({
+  set(newVal) {
+    if (newVal.length !== contact.doc.phone_nos.length) {
+      isDirty.value = true;
+    }
+    contact.doc.phone_nos = newVal.map((item: AutoCompleteItem) => ({
       phone: item.value,
     }));
   },
@@ -103,14 +141,11 @@ const phones = computed({
 const contact = createDocumentResource({
   doctype: "Contact",
   name: props.name,
+  cache: [`contact-${props.name}`, props.name],
   auto: true,
   setValue: {
     onSuccess() {
-      createToast({
-        title: "Contact updated",
-        icon: "check",
-        iconClasses: "text-green-500",
-      });
+      emit("contactUpdated");
     },
     onError: useError({ title: "Error updating contact" }),
   },
@@ -128,32 +163,41 @@ const options = computed(() => ({
   ],
 }));
 
-function update() {
+function update(): void {
+  if (!isDirty.value) {
+    createToast({
+      title: "No changes to save",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return;
+  }
   contact.setValue.submit({
-    email_ids: emails.value.map((item) => ({
-      email_id: item.value,
-      is_primary: item.value === contact.doc.email_id,
+    email_ids: emails.value.map((email: AutoCompleteItem) => ({
+      email_id: email.value,
+      is_primary: email.value === contact.doc.email_id,
     })),
-    phone_nos: phones.value.map((item) => ({
-      phone: item.value,
-      is_primary_phone: item.value === contact.doc.phone,
-      is_primary_mobile: item.value === contact.doc.phone,
+    phone_nos: phones.value.map((phoneNum: AutoCompleteItem) => ({
+      phone: phoneNum.value,
+      is_primary_phone: phoneNum.value === contact.doc.phone,
+      is_primary_mobile: phoneNum.value === contact.doc.phone,
     })),
   });
 }
 
-function updateImage(file) {
+function updateImage(file: File): void {
   contact.setValue.submit({
     image: file?.file_url || null,
   });
+  isDirty.value = true;
 }
 
-function validateEmail(input) {
+function validateEmail(input: AutoCompleteItem): string | void {
   const success = zod.string().email().safeParse(input.value).success;
   if (!success) return "Invalid email";
 }
 
-function validatePhone(input) {
+function validatePhone(input: AutoCompleteItem): string | void {
   const success = zod
     .string()
     .regex(/^\+[1-9]\d{1,14}$/)
@@ -161,5 +205,17 @@ function validatePhone(input) {
     .max(15)
     .safeParse(input.value).success;
   if (!success) return "Invalid phone number";
+}
+
+function validateFile(file: File): string | void {
+  let extn = file.name.split(".").pop().toLowerCase();
+  if (!["png", "jpg", "jpeg"].includes(extn)) {
+    createToast({
+      title: "Invalid file type, only PNG and JPG images are allowed",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return "Invalid file type, only PNG and JPG images are allowed";
+  }
 }
 </script>

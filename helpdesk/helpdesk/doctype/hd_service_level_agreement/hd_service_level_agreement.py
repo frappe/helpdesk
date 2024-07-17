@@ -11,6 +11,7 @@ from frappe.utils import (
 	now_datetime,
 	time_diff_in_seconds,
 	to_timedelta,
+	cint
 )
 from datetime import timedelta
 
@@ -45,8 +46,8 @@ class HDServiceLevelAgreement(Document):
 						)
 					)
 
-				response = priority.response_time
-				resolution = priority.resolution_time
+				response = cint(priority.response_time)
+				resolution = cint(priority.resolution_time)
 				if response > resolution:
 					frappe.throw(
 						_(

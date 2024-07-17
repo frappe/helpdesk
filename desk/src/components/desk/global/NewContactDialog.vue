@@ -3,70 +3,36 @@
     <Dialog v-model="open" :options="{ title: 'Create New Contact' }">
       <template #body-content>
         <div class="space-y-4">
-          <div class="space-y-1">
-            <Input v-model="emailId" label="Email Id" type="email" />
-            <ErrorMessage :message="emailValidationError" />
-          </div>
-          <div class="space-y-1">
-            <Input v-model="firstName" label="First Name" type="text" />
-            <ErrorMessage :message="firstNameValidationError" />
-          </div>
-          <div class="space-y-1">
+          <div
+            v-for="field in formFields"
+            :key="field.label"
+            class="flex flex-col gap-1"
+          >
+            <span class="mb-2 block text-sm leading-4 text-gray-700">
+              {{ field.label }}
+            </span>
             <Input
-              v-model="lastName"
-              label="Last Name (optional)"
+              v-if="field.type === 'input'"
+              v-model="state[field.value]"
               type="text"
+              @blur="field.action"
             />
-            <ErrorMessage :message="lastNameValidationError" />
-          </div>
-          <div class="space-y-1">
-            <Input v-model="phone" label="Phone (optional)" type="text" />
-            <ErrorMessage :message="phoneValidationError" />
-          </div>
-          <div class="w-full space-y-1">
-            <div>
-              <span class="mb-2 block text-sm leading-4 text-gray-700">
-                Customer
-              </span>
-            </div>
             <Autocomplete
-              :value="fdCustomer != null ? fdCustomer : selectedCustomer"
-              :resource-options="{
-                url: 'helpdesk.extends.client.get_list',
-                inputMap: (query) => {
-                  return {
-                    doctype: 'HD Customer',
-                    pluck: 'name',
-                    filters: [['name', 'like', `%${query}%`]],
-                  };
-                },
-                responseMap: (res) => {
-                  return res.map((d) => {
-                    return {
-                      label: d.name,
-                      value: d.name,
-                    };
-                  });
-                },
-              }"
-              @change="
-                (item) => {
-                  if (!item) {
-                    return;
-                  }
-                  selectedCustomer = item.value;
-                }
-              "
+              v-else
+              v-model="state[field.value]"
+              :options="customerResource.data"
+              :value="state[field.value]"
+              @update:model-value="handleCustomerChange"
             />
-            <ErrorMessage :message="customerValidationError" />
+            <ErrorMessage :message="error[field.error]" />
           </div>
-          <div class="float-right flex space-x-2">
+          <div class="flex justify-end space-x-2">
             <Button
               label="Create"
-              :loading="$resources.createContact.loading"
+              :loading="contactResource.loading"
               theme="gray"
               variant="solid"
-              @click="validateInputs() ? null : createContact()"
+              @click="createContact()"
             />
           </div>
         </div>
@@ -75,192 +41,229 @@
   </div>
 </template>
 
-<script>
-import { Input, Dialog, ErrorMessage } from "frappe-ui";
-import { computed, ref } from "vue";
-import Autocomplete from "@/components/global/Autocomplete.vue";
+<script setup lang="ts">
+import { ref, computed } from "vue";
 import { useContactStore } from "@/stores/contact";
-export default {
-  name: "NewContactDialog",
-  components: {
-    Input,
-    Dialog,
-    ErrorMessage,
-    Autocomplete,
-  },
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true,
-    },
-    fdCustomer: {
-      type: String,
-      default: null,
-    },
-  },
-  setup(props, { emit }) {
-    const contactStore = useContactStore();
-    const emailValidationError = ref("");
-    const firstNameValidationError = ref("");
-    const lastNameValidationError = ref("");
-    const phoneValidationError = ref("");
-    const customerValidationError = ref("");
-    const selectedCustomer = ref("");
-    let open = computed({
-      get: () => props.modelValue,
-      set: (val) => {
-        emit("update:modelValue", val);
-        if (!val) {
-          emit("close");
-        }
-      },
-    });
 
-    return {
-      open,
-      contactStore,
-      emailValidationError,
-      firstNameValidationError,
-      lastNameValidationError,
-      phoneValidationError,
-      customerValidationError,
-      selectedCustomer,
-    };
+import {
+  Input,
+  Dialog,
+  ErrorMessage,
+  createResource,
+  Autocomplete,
+} from "frappe-ui";
+import zod from "zod";
+
+import { createToast } from "@/utils";
+import { AutoCompleteItem } from "@/types";
+
+interface Props {
+  modelValue: boolean;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{
+  (event: "update:modelValue", value: boolean): void;
+  (event: "close"): void;
+  (event: "contactCreated"): void;
+}>();
+
+const contactStore = useContactStore();
+
+const state = ref({
+  emailID: "",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  selectedCustomer: "",
+});
+
+const error = ref({
+  emailValidationError: "",
+  firstNameValidationError: "",
+  lastNameValidationError: "",
+  phoneValidationError: "",
+  customerValidationError: "",
+});
+
+interface FormField {
+  label: string;
+  value: string;
+  error: string;
+  type: string;
+  action?: () => void;
+}
+
+const formFields: FormField[] = [
+  {
+    label: "Email Id",
+    value: "emailID",
+    error: "emailValidationError",
+    type: "input",
+    action: () => validateEmailInput(state.value.emailID),
   },
-  data(props) {
-    return {
+  {
+    label: "First Name",
+    value: "firstName",
+    error: "firstNameValidationError",
+    type: "input",
+    action: () => validateFirstName(state.value.firstName),
+  },
+  {
+    label: "Last Name",
+    value: "lastName",
+    error: "lastNameValidationError",
+    type: "input",
+  },
+  {
+    label: "Phone",
+    value: "phone",
+    error: "phoneValidationError",
+    type: "input",
+    action: () => validatePhone(state.value.phone),
+  },
+  {
+    label: "Customer",
+    value: "selectedCustomer",
+    error: "customerValidationError",
+    type: "autocomplete",
+    action: () => validateCustomer(state.value.selectedCustomer),
+  },
+];
+
+const open = computed({
+  get: () => props.modelValue,
+  set: (val) => {
+    emit("update:modelValue", val);
+    if (!val) {
+      emit("close");
+    }
+  },
+});
+
+const customerResource = createResource({
+  url: "helpdesk.extends.client.get_list",
+  params: {
+    doctype: "HD Customer",
+    fields: ["name", "customer_name"],
+  },
+  transform: (data) => {
+    let allData = data.map((option) => {
+      return {
+        label: option.name,
+        value: option.customer_name,
+      };
+    });
+    return allData;
+  },
+  auto: true,
+});
+
+const contactResource = createResource({
+  url: "frappe.client.insert",
+  onSuccess: () => {
+    state.value = {
+      emailID: "",
       firstName: "",
       lastName: "",
-      emailId: "",
       phone: "",
-      customer: "",
+      selectedCustomer: "",
     };
+    createToast({
+      title: "Contact Created Successfully ",
+      icon: "check",
+      iconClasses: "text-green-600",
+    });
+    emit("contactCreated");
   },
-  watch: {
-    emailId(newValue) {
-      this.validateEmailInput(newValue);
-    },
-    firstName(newValue) {
-      this.validateFirstName(newValue);
-    },
-    phone(newValue) {
-      this.validatePhone(newValue);
-    },
-    customer(newValue) {
-      this.validateCustomer(newValue);
-    },
+  onError: (error: Error) => {
+    createToast({
+      title: "Contact Creation Failed",
+      message: error.message,
+      icon: "error",
+      iconClasses: "text-red-600",
+    });
   },
-  resources: {
-    createContact() {
-      return {
-        url: "frappe.client.insert",
-        onSuccess: (data) => {
-          this.emailId = "";
-          this.firstName = "";
-          this.lastName = "";
-          this.phone = "";
-          this.customer = "";
-          this.$emit("contactCreated", data);
-        },
-      };
-    },
-    getCustomers() {
-      return {
-        url: "helpdesk.extends.client.get_list",
-        params: {
-          doctype: "HD Customer",
-          fields: ["name", "customer_name"],
-        },
-        auto: true,
-      };
-    },
-  },
-  methods: {
-    createContact() {
-      if (this.validateInputs()) {
-        return;
-      }
-      let doc = {
-        doctype: "Contact",
-        first_name: this.firstName,
-        last_name: this.lastName,
-        email_ids: [{ email_id: this.emailId, is_primary: true }],
-        links: [
-          {
-            link_doctype: "HD Customer",
-            link_name:
-              this.fdCustomer != null ? this.fdCustomer : this.selectedCustomer,
-          },
-        ],
-      };
-      if (this.phone) {
-        doc.phone_nos = [{ phone: this.phone }];
-      }
-      this.$resources.createContact.submit({
-        doc,
-      });
-    },
-    validateInputs() {
-      let error = this.validateEmailInput(this.emailId);
-      error += this.validateFirstName(this.firstName);
-      error += this.validatePhone(this.phone);
-      error += this.validateCustomer(
-        this.fdCustomer != null ? this.fdCustomer : this.selectedCustomer
-      );
-      return error;
-    },
-    validateEmailInput(value) {
-      function existingContactEmails(contacts) {
-        let list = [];
-        for (let index in contacts) {
-          list.push(contacts[index].email_id);
-        }
-        return list;
-      }
-      this.emailValidationError = "";
-      const reg =
-        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/;
-      if (!value) {
-        this.emailValidationError = "Email should not be empty";
-      } else if (!reg.test(value)) {
-        this.emailValidationError = "Enter a valid email";
-      } else if (
-        existingContactEmails(this.contactStore.options).includes(value)
-      ) {
-        this.emailValidationError = "Contact with email already exists";
-      }
-      return this.emailValidationError;
-    },
-    validateFirstName(value) {
-      this.firstNameValidationError = "";
-      if (!value) {
-        this.firstNameValidationError = "First name should not be empty";
-      } else if (value.trim() == "") {
-        this.firstNameValidationError = "First name should not be empty";
-      }
-      return this.firstNameValidationError;
-    },
-    validatePhone(value) {
-      this.phoneValidationError = "";
-      const reg = /[0-9]+/;
-      if (!value) {
-        this.phoneValidationError = "";
-      } else if (!reg.test(value) || value.length < 10) {
-        this.phoneValidationError = "Enter a valid phone number";
-      }
-      return this.phoneValidationError;
-    },
-    validateCustomer(value) {
-      this.customerValidationError = "";
-      if (!value) {
-        this.customerValidationError = "Customer should not be empty";
-      } else if (value.trim() == "") {
-        this.customerValidationError = "Customer should not be empty";
-      }
-      return this.customerValidationError;
-    },
-  },
-};
+});
+
+function createContact() {
+  if (validateInputs()) return;
+
+  let doc = {
+    doctype: "Contact",
+    first_name: state.value.firstName,
+    last_name: state.value.lastName,
+    email_ids: [{ email_id: state.value.emailID, is_primary: true }],
+    links: [
+      {
+        link_doctype: "HD Customer",
+        link_name: state.value.selectedCustomer,
+      },
+    ],
+    phone_nos: [],
+  };
+  if (state.value.phone) {
+    doc.phone_nos = [{ phone: state.value.phone }];
+  }
+
+  contactResource.submit({ doc });
+}
+
+function handleCustomerChange(item: AutoCompleteItem) {
+  if (!item) return;
+  state.value.selectedCustomer = item.value;
+}
+
+function validateInputs() {
+  let error = validateEmailInput(state.value.emailID);
+  error += validateFirstName(state.value.firstName);
+  error += validatePhone(state.value.phone);
+  error += validateCustomer(state.value.selectedCustomer);
+  return error;
+}
+
+function validateEmailInput(value: string) {
+  error.value.emailValidationError = "";
+  const success = zod.string().email().safeParse(value).success;
+
+  if (!value) {
+    error.value.emailValidationError = "Email should not be empty";
+  } else if (!success) {
+    error.value.emailValidationError = "Enter a valid email";
+  } else if (existingContactEmails(contactStore.options).includes(value)) {
+    error.value.emailValidationError = "Contact with email already exists";
+  }
+  return error.value.emailValidationError;
+}
+
+function validateFirstName(value: string) {
+  error.value.firstNameValidationError = "";
+  if (!value || value.trim() === "") {
+    error.value.firstNameValidationError = "First name should not be empty";
+  }
+  return error.value.firstNameValidationError;
+}
+
+function validatePhone(value: string) {
+  error.value.phoneValidationError = "";
+  const reg = /[0-9]+/;
+  if (value && (!reg.test(value) || value.length < 10)) {
+    error.value.phoneValidationError = "Enter a valid phone number";
+  }
+  return error.value.phoneValidationError;
+}
+
+function validateCustomer(value: string) {
+  error.value.customerValidationError = "";
+  if (!value || value.trim() === "") {
+    error.value.customerValidationError = "Customer should not be empty";
+  }
+  return error.value.customerValidationError;
+}
+
+function existingContactEmails(contacts) {
+  return contacts.map((contact) => contact.email_id);
+}
 </script>
 
 <style></style>
