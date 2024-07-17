@@ -29,7 +29,7 @@
     </ListView>
     <NewContactDialog
       v-model="isDialogVisible"
-      @contact-created="isDialogVisible = false"
+      @contact-created="handleContactCreated"
     />
     <span v-if="isContactDialogVisible">
       <ContactDialog v-model="isContactDialogVisible" :name="selectedContact" />
@@ -83,6 +83,11 @@ usePageMeta(() => {
     title: "Contacts",
   };
 });
+
+function handleContactCreated() {
+  isDialogVisible.value = false;
+  contacts.reload();
+}
 
 function openContact(id: string) {
   selectedContact.value = id;
