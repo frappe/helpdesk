@@ -168,8 +168,6 @@ const props = defineProps({
   },
 });
 
-console.log(props.columns);
-
 let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
 let pageLength = ref(props.pageLength);
 
