@@ -160,8 +160,8 @@ function processFieldClick(event) {
 
 function processColumns(columnEvent) {
   if (columnEvent.event === "add") {
-    columns = [columnEvent.data, ...columns];
-    rows = [columnEvent.data.key, ...rows];
+    columns = [...columns, columnEvent.data];
+    rows = [...rows, columnEvent.data.key];
   } else if (columnEvent.event === "remove") {
     rows = rows.filter((row) => {
       return row != columnEvent.data.key;
