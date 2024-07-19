@@ -42,7 +42,7 @@ import { Input, Dialog, createResource } from "frappe-ui";
 import { createToast } from "@/utils";
 
 const emit = defineEmits(["customerCreated"]);
-const model = defineModel();
+const model = defineModel<boolean>();
 
 const state = reactive({
   customer: "",
