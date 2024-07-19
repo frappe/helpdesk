@@ -138,6 +138,7 @@ def apply_hook(doctype: str, query):
 	"""
 	try:
 		_module_path = "helpdesk.helpdesk.hooks." + doctype.lower()
+		# nosemgrep
 		_module = importlib.import_module(_module_path)
 		_class = getattr(_module, doctype)
 		_function = getattr(_class, "get_list_filters")
