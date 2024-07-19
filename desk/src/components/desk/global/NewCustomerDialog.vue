@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, defineModel } from "vue";
+import { reactive } from "vue";
 import { Input, Dialog, createResource } from "frappe-ui";
 import { createToast } from "@/utils";
 
