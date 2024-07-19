@@ -29,12 +29,13 @@
     </ListView>
     <NewCustomerDialog
       v-model="isDialogVisible"
-      @customer-created="handleCustomerCreated"
+      @customer-created="handleCustomer"
     />
     <span v-if="isCustomerDialogVisible">
       <CustomerDialog
         v-model="isCustomerDialogVisible"
         :name="selectedCustomer"
+        @customer-updated="handleCustomer(true)"
       />
     </span>
   </div>
@@ -88,8 +89,10 @@ function openCustomer(id: string) {
   selectedCustomer.value = id;
   isCustomerDialogVisible.value = true;
 }
-function handleCustomerCreated() {
-  isDialogVisible.value = false;
+function handleCustomer(updated = false) {
+  updated
+    ? (isCustomerDialogVisible.value = false)
+    : (isDialogVisible.value = false);
   customers.reload();
 }
 </script>
