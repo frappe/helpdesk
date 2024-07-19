@@ -1,11 +1,14 @@
 <template>
   <div>
-    <Dialog v-model="open" :options="{ title: 'Add New Customer', size: 'sm' }">
+    <Dialog
+      v-model="model"
+      :options="{ title: 'Add New Customer', size: 'sm' }"
+    >
       <template #body-content>
         <div class="space-y-4">
           <div class="space-y-1">
             <Input
-              v-model="customer"
+              v-model="state.customer"
               label="Customer Name"
               type="text"
               placeholder="Tesla Inc."
@@ -13,7 +16,7 @@
           </div>
           <div class="space-y-1">
             <Input
-              v-model="domain"
+              v-model="state.domain"
               label="Domain"
               type="text"
               placeholder="eg: tesla.com, mycompany.com"
@@ -24,13 +27,7 @@
               label="Add"
               theme="gray"
               variant="solid"
-              @click="
-                () => {
-                  addCustomer();
-                  close();
-                  $router.go();
-                }
-              "
+              @click.prevent="addCustomer"
             />
           </div>
         </div>
@@ -39,69 +36,63 @@
   </div>
 </template>
 
-<script>
-import { Input, Dialog, ErrorMessage } from "frappe-ui";
-import { computed, ref, inject } from "vue";
-export default {
-  name: "NewCustomerDialog",
-  components: {
-    Dialog,
-    Input,
-  },
-  props: {
-    modelValue: {
-      type: Boolean,
-      required: true,
+<script setup lang="ts">
+import { reactive } from "vue";
+import { Input, Dialog, createResource } from "frappe-ui";
+import { createToast } from "@/utils";
+
+const emit = defineEmits(["customerCreated"]);
+const model = defineModel<boolean>();
+
+const state = reactive({
+  customer: "",
+  domain: "",
+});
+
+const customerResource = createResource({
+  url: "frappe.client.insert",
+  method: "POST",
+  data: {
+    doc: {
+      doctype: "HD Customer",
+      customer_name: state.customer,
+      domain: state.domain,
     },
   },
-  setup(props, { emit }) {
-    let open = computed({
-      get: () => props.modelValue,
-      set: (val) => {
-        emit("update:modelValue", val);
-        if (!val) {
-          emit("close");
-        }
-      },
+  onSuccess: () => {
+    state.customer = "";
+    state.domain = "";
+    createToast({
+      title: "Customer Created Successfully ",
+      icon: "check",
+      iconClasses: "text-green-600",
     });
-    return {
-      open,
-    };
+    emit("customerCreated");
   },
-  data() {
-    return {
-      customer: "",
-      domain: "",
-    };
+  onError: (err) => {
+    createToast({
+      title: err.messages[0],
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
   },
-  methods: {
-    addCustomer() {
-      const inputParams = {
-        customer_name: this.customer,
-        domain: this.domain,
-      };
-      this.$resources.newCustomer.submit({
-        doc: {
-          doctype: "HD Customer",
-          ...inputParams,
-        },
-      });
+});
+
+function addCustomer() {
+  if (!state.customer) {
+    createToast({
+      title: "Customer Name is required",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return;
+  }
+  customerResource.submit({
+    doc: {
+      doctype: "HD Customer",
+      customer_name: state.customer,
+      domain: state.domain,
     },
-    close() {
-      this.customer = "";
-      this.domain = "";
-      this.$emit("close");
-    },
-  },
-  resources: {
-    newCustomer() {
-      return {
-        url: "frappe.client.insert",
-        onSuccess: (doc) => {
-          this.$router.push(`/customers`);
-        },
-      };
-    },
-  },
-};
+  });
+}
 </script>

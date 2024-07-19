@@ -53,6 +53,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["customer-updated"]);
+
 const domain = computed({
   get() {
     return customer.doc?.domain;
@@ -90,15 +92,17 @@ const options = computed(() => ({
   ],
 }));
 
-function update() {
-  customer.setValue.submit({
+async function update() {
+  await customer.setValue.submit({
     domain: domain.value,
   });
+  emit("customer-updated");
 }
 
 function updateImage(file) {
   customer.setValue.submit({
     image: file?.file_url || null,
   });
+  emit("customer-updated");
 }
 </script>

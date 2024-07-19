@@ -29,12 +29,13 @@
     </ListView>
     <NewCustomerDialog
       v-model="isDialogVisible"
-      @close="isDialogVisible = false"
+      @customer-created="handleCustomer"
     />
     <span v-if="isCustomerDialogVisible">
       <CustomerDialog
         v-model="isCustomerDialogVisible"
         :name="selectedCustomer"
+        @customer-updated="handleCustomer(true)"
       />
     </span>
   </div>
@@ -52,7 +53,7 @@ import IconPlus from "~icons/lucide/plus";
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
-const emptyMessage = "No Customers Found";
+// const emptyMessage = "No Customers Found";
 const columns = [
   {
     label: "Name",
@@ -87,5 +88,11 @@ usePageMeta(() => {
 function openCustomer(id: string) {
   selectedCustomer.value = id;
   isCustomerDialogVisible.value = true;
+}
+function handleCustomer(updated = false) {
+  updated
+    ? (isCustomerDialogVisible.value = false)
+    : (isDialogVisible.value = false);
+  customers.reload();
 }
 </script>
