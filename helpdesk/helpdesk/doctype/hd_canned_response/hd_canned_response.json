@@ -13,8 +13,7 @@
   {
    "fieldname": "title",
    "fieldtype": "Data",
-   "label": "Title",
-   "unique": 1
+   "label": "Title"
   },
   {
    "fieldname": "message",
@@ -24,7 +23,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-21 00:23:20.975019",
+ "modified": "2024-07-19 15:04:00.844058",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Canned Response",
