@@ -1,0 +1,58 @@
+---
+name: Bug Report
+description: Report a bug encountered while using Frappe Helpdesk
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Welcome to Frappe Helpdesk issue tracker! Before creating an issue, please consider the following:
+
+        1. This tracker should only be used to report bugs and request features / enhancements to Frappe Helpdesk
+            - For questions and general support, checkout the [documentation](https://docs.frappe.io/helpdesk) or use the [forum](https://discuss.frappe.io) to get inputs from the open source community.
+            - For documentation issues, propose edit on the [documentation site](https://docs.frappe.io/helpdesk) directly.
+        2. When making a bug report, make sure you provide all required information. The easier it is for
+           maintainers to reproduce, the faster it'll be fixed.
+        3. If you think you know what the reason for the bug is, share it with us. Maybe put in a PR 😉
+
+  - type: textarea
+    id: bug-info
+    attributes:
+      label: Information about bug
+      description: Also tell us, what did you expect to happen? If applicable, add screenshots to help explain your problem.
+      placeholder: Please provide as much information as possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: exact-version
+    attributes:
+      label: Version
+      description: Share exact version number of Frappe, and Frappe Helpdesk you are using.
+      placeholder: |
+        Frappe version -
+        Frappe Helpdesk version -
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation method
+      options:
+        - docker
+        - easy-install
+        - manual install
+        - FrappeCloud
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output / Stack trace / Full Error Message.
+      description: Please copy and paste any relevant log output. This will be automatically formatted.
+      render: shell
+
+...
