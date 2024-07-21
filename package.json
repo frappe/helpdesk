@@ -5,6 +5,7 @@
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
 	},
+	"workspaces": ["desk", "frappe-ui"],
 	"dependencies": {
 		"@typescript-eslint/eslint-plugin": "^5.55.0",
 		"@typescript-eslint/parser": "^5.55.0",
