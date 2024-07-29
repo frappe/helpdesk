@@ -67,7 +67,7 @@ const props = withDefaults(defineProps<P>(), {
 });
 
 onMounted(() => {
-  capture("helpdesk_ticket_created");
+  capture("new_ticket_page");
   recordSession();
 });
 

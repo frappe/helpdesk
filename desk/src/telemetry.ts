@@ -22,9 +22,8 @@ export async function init() {
     posthog.init(telemetry.value.project_id, {
       api_host: telemetry.value.host,
       autocapture: true,
-      capture_pageview: true,
-      capture_pageleave: true,
       advanced_disable_decide: true,
+      disable_session_recording: true,
     });
     posthog.identify(SITENAME);
   } catch (e) {
