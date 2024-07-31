@@ -16,7 +16,7 @@
           </span>
         </Tooltip>
       </div>
-      <div v-if="authStore.userId === commenter" class="px-4">
+      <div v-if="authStore.userId === commentedBy" class="px-4">
         <Dropdown
           :options="[{ label: 'Delete', onClick: () => (showDialog = true) }]"
         >
@@ -71,6 +71,10 @@ const props = defineProps({
     required: true,
   },
   commenter: {
+    type: String,
+    required: true,
+  },
+  commentedBy: {
     type: String,
     required: true,
   },
