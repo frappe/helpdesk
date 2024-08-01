@@ -255,6 +255,7 @@ const activities = computed(() => {
       name: comment.name,
       type: "comment",
       key: comment.creation,
+      commentedBy: comment.commented_by,
       commenter: comment.user.name,
       creation: comment.creation,
       content: comment.content,

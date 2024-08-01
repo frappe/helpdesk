@@ -2,37 +2,7 @@
   <div class="flex h-full flex-col overflow-hidden">
     <PageTitle v-if="!route.meta.public">
       <template #title>
-        <Breadcrumbs
-          :items="[
-            {
-              label: article.data?.category.category_name,
-              route: article.data
-                ? {
-                    name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
-                    params: {
-                      categoryId: article.data?.category.name,
-                    },
-                  }
-                : '',
-            },
-            {
-              label: article.data?.sub_category.category_name,
-              route: article.data
-                ? {
-                    name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
-                    params: {
-                      categoryId: article.data?.category.name,
-                      subCategoryId: article.data?.sub_category.name,
-                    },
-                  }
-                : '',
-            },
-            {
-              label: pageTitle,
-              route: '',
-            },
-          ]"
-        />
+        <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right>
         <component
@@ -140,7 +110,42 @@ const categoryId = computed(
 const subCategoryId = computed(
   () => article.data?.sub_category.name || route.query.subCategory
 );
-const pageTitle = computed(() => article.data?.title || "New article");
+const breadcrumbs = computed(() => {
+  const items = [
+    {
+      label: options__.value.categoryName,
+      route: {
+        name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
+        params: {
+          categoryId: options__.value.categoryId,
+        },
+      },
+    },
+    {
+      label: options__.value.subCategoryName,
+      route: {
+        name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
+        params: {
+          categoryId: options__.value.categoryId,
+          subCategoryId: options__.value.subCategoryId,
+        },
+      },
+    },
+  ];
+
+  if (!isNew) {
+    items.push({
+      label: article.data?.title,
+      route: {
+        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+        params: {
+          articleId: article.data?.name,
+        },
+      },
+    });
+  }
+  return items;
+});
 const placeholder = computed(() =>
   editMode.value ? "Write something..." : "Content is empty"
 );
@@ -174,13 +179,13 @@ const article = createResource({
 const category = createDocumentResource({
   doctype: "HD Article Category",
   name: categoryId.value,
-  auto: !!route.query.category,
+  auto: true,
 });
 
 const subCategory = createDocumentResource({
   doctype: "HD Article Category",
   name: subCategoryId.value,
-  auto: !!route.query.subCategory,
+  auto: true,
 });
 
 const options__ = computed(() => ({
@@ -215,14 +220,12 @@ const insertRes = createResource({
     if (!params.doc.content) throw "Content is required";
   },
   onSuccess(data) {
-    router
-      .push({
-        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
-        params: {
-          articleId: data.name,
-        },
-      })
-      .then(() => router.go(0));
+    router.push({
+      name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+      params: {
+        articleId: data.name,
+      },
+    });
   },
   onError: useError({ title: "Error creating article" }),
 });

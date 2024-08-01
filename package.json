@@ -5,6 +5,7 @@
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
 	},
+	"workspaces": ["desk", "frappe-ui"],
 	"dependencies": {
 		"@typescript-eslint/eslint-plugin": "^5.55.0",
 		"@typescript-eslint/parser": "^5.55.0",
@@ -13,7 +14,7 @@
 		"eslint-plugin-json": "^3.1.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"eslint-plugin-tailwindcss": "^3.8.3",
-		"eslint-plugin-vue": "^9.9.0",
+		"eslint-plugin-vue": "^9.27.0",
 		"husky": "^8.0.3",
 		"lint-staged": "^13.1.2",
 		"prettier": "2.8.4",

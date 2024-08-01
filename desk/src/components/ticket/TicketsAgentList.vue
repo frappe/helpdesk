@@ -48,6 +48,9 @@
               variant="outline"
             />
           </div>
+          <div v-if="column.type === 'Rating'">
+            <StarRating :rating="item" />
+          </div>
           <div v-else-if="column.key === 'response_by'">
             <Badge
               v-if="
@@ -129,7 +132,7 @@ import {
   ListHeader,
   ListFooter,
 } from "frappe-ui";
-import { MultipleAvatar } from "@/components";
+import { MultipleAvatar, StarRating } from "@/components";
 
 const ticketStatusStore = useTicketStatusStore();
 const router = useRouter();

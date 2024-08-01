@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from "vue";
+import { ref, computed, reactive, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
@@ -57,13 +57,22 @@ import { UniInput } from "@/components";
 import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
 import TicketNewArticles from "./ticket/TicketNewArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
-
+import { capture, recordSession, stopSession } from "@/telemetry";
 interface P {
   templateId?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   templateId: "",
+});
+
+onMounted(() => {
+  capture("new_ticket_page");
+  recordSession();
+});
+
+onUnmounted(() => {
+  stopSession();
 });
 
 const route = useRoute();
