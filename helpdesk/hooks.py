@@ -44,3 +44,13 @@ ignore_links_on_delete = [
 	"HD Notification",
 	"HD Ticket Comment",
 ]
+
+# setup wizard
+# setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
+# setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
+setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
+
+
+website_route_rules = [
+    {"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
+]

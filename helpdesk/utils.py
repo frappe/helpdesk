@@ -41,7 +41,7 @@ def is_agent(user: str = None) -> bool:
 	:return: Whether `user` is an agent
 	"""
 	user = user or frappe.session.user
-	return is_admin() or bool(frappe.db.exists("HD Agent", {"name": user}))
+	return is_admin() or "Agent" in frappe.get_roles(user) or bool(frappe.db.exists("HD Agent", {"name": user}))
 
 
 def publish_event(event: str, data: dict, user: str = None):
