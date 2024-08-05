@@ -93,6 +93,7 @@
             <Tooltip v-else :text="dayjs(item).long()">
               {{ dayjs.tz(item).fromNow() }}
             {{ get_time_zone(item) }}
+            </Tooltip>
           </div>
           <div v-else-if="column.key === 'modified'">
             {{ dayjs.tz(item).fromNow() }}
