@@ -1,6 +1,6 @@
 <template>
   <div v-if="ticket.data" class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsCustomer">
+    <TicketBreadcrumbs parent="TicketsCustomer" current="TicketCustomer">
       <template #right>
         <Button
           v-if="showReopenButton"

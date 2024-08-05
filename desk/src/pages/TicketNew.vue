@@ -1,6 +1,10 @@
 <template>
   <div class="flex flex-col overflow-y-auto">
-    <TicketBreadcrumbs :parent="route.meta.parent" title="New" />
+    <TicketBreadcrumbs
+      :parent="route.meta.parent"
+      title="New"
+      :current="route.name"
+    />
     <div v-if="template.data?.about" class="mx-5 my-3">
       <div class="prose-f" v-html="sanitize(template.data.about)" />
     </div>
