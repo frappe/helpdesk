@@ -11,7 +11,9 @@
           },
           {
             label: ticket?.data?.subject || title,
-            name: ticket?.data?.name,
+            route: {
+              name: current,
+            },
           },
         ]"
       />
@@ -30,6 +32,7 @@ import { ITicket } from "./symbols";
 
 interface P {
   parent: string;
+  current: string;
   title?: string;
 }
 
