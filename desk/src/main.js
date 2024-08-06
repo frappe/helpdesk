@@ -56,4 +56,15 @@ for (const c in globalComponents) {
 app.config.globalProperties.$socket = socket;
 app.config.globalProperties.$toast = createToast;
 
-app.mount("#app");
+if (import.meta.env.DEV) {
+  frappeRequest({
+    url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
+  }).then((values) => {
+    for (let key in values) {
+      window[key] = values[key];
+    }
+    app.mount("#app");
+  });
+} else {
+  app.mount("#app");
+}

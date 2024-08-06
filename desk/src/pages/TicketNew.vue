@@ -21,14 +21,14 @@
       <FormControl
         v-model="subject"
         type="text"
-        label="Subject"
+        label="Subject*"
         placeholder="A short description"
       />
     </div>
     <TicketNewArticles :search="subject" class="mx-5 mb-5" />
-    <div class="mx-5 mb-5 h-full">
+    <div v-if="isCustomerPortal" class="mx-5 mb-5 h-full">
       <TicketTextEditor
-        v-show="subject.length > 2"
+        v-show="subject.length > 2 || description.length > 0"
         ref="editor"
         v-model:attachments="attachments"
         v-model:content="description"
@@ -48,11 +48,34 @@
         </template>
       </TicketTextEditor>
       <h4
-        v-show="subject.length <= 2"
+        v-show="subject.length <= 2 && description.length === 0"
         class="flex items-center justify-center text-lg text-gray-500"
       >
         Please enter a subject to continue
       </h4>
+    </div>
+
+    <!-- for agent portal -->
+    <div v-else class="mx-5 mb-5 h-full">
+      <TicketTextEditor
+        ref="editor"
+        v-model:attachments="attachments"
+        v-model:content="description"
+        placeholder="Detailed explanation"
+        expand
+      >
+        <template #bottom-right>
+          <Button
+            label="Submit"
+            theme="gray"
+            variant="solid"
+            :disabled="
+              $refs.editor.editor.isEmpty || ticket.loading || !subject
+            "
+            @click="() => ticket.submit()"
+          />
+        </template>
+      </TicketTextEditor>
     </div>
   </div>
 </template>
@@ -85,6 +108,8 @@ const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
+
+const isCustomerPortal = window.location.pathname.includes("/my-tickets");
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -121,6 +146,7 @@ const ticket = createResource({
     }
   },
   onSuccess: (data) => {
+    if (isCustomerPortal) return;
     capture("new_ticket_submitted", {
       data: {
         user: userID,
