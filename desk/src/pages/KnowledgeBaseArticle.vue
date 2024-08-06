@@ -65,6 +65,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { capture } from "@/telemetry";
 import {
   createResource,
   createDocumentResource,
@@ -83,6 +84,7 @@ import {
 import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
+
 import { PageTitle } from "@/components";
 import KnowledgeBaseArticleActionsEdit from "./knowledge-base/KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticleActionsNew.vue";
@@ -172,6 +174,13 @@ const article = createResource({
   },
   onSuccess(data) {
     articleTitle.value = data.title;
+    capture("article_viewed", {
+      data: {
+        user: authStore.userId,
+        article: data.name,
+        title: data.title,
+      },
+    });
   },
   auto: !isNew,
 });

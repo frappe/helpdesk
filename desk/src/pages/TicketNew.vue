@@ -61,22 +61,15 @@ import { UniInput } from "@/components";
 import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
 import TicketNewArticles from "./ticket/TicketNewArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
-import { capture, recordSession, stopSession } from "@/telemetry";
+import { useAuthStore } from "@/stores/auth";
+import { capture } from "@/telemetry";
+
 interface P {
   templateId?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   templateId: "",
-});
-
-onMounted(() => {
-  capture("new_ticket_page");
-  recordSession();
-});
-
-onUnmounted(() => {
-  stopSession();
 });
 
 const route = useRoute();
@@ -121,6 +114,15 @@ const ticket = createResource({
     }
   },
   onSuccess: (data) => {
+    capture("new_ticket_submitted", {
+      data: {
+        user: userID,
+        ticketID: data.name,
+        subject: subject.value,
+        description: description.value,
+        customFields: templateFields,
+      },
+    });
     router.push({
       name: route.meta.onSuccessRoute as string,
       params: {
@@ -140,4 +142,13 @@ function sanitize(html: string) {
 usePageMeta(() => ({
   title: "New Ticket",
 }));
+
+const { userId: userID } = useAuthStore();
+onMounted(() => {
+  capture("new_ticket_page", {
+    data: {
+      user: userID,
+    },
+  });
+});
 </script>
