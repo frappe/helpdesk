@@ -49,7 +49,7 @@
       </TicketTextEditor>
       <h4
         v-show="subject.length <= 2"
-        class="flex items-center justify-center text-xl text-gray-500"
+        class="flex items-center justify-center text-lg text-gray-500"
       >
         Please enter a subject to continue
       </h4>
