@@ -26,8 +26,9 @@
       />
     </div>
     <TicketNewArticles :search="subject" class="mx-5 mb-5" />
-    <span class="mx-5 mb-5">
+    <div class="mx-5 mb-5 h-full">
       <TicketTextEditor
+        v-show="subject.length > 2"
         ref="editor"
         v-model:attachments="attachments"
         v-model:content="description"
@@ -46,12 +47,18 @@
           />
         </template>
       </TicketTextEditor>
-    </span>
+      <h4
+        v-show="subject.length <= 2"
+        class="flex items-center justify-center text-xl text-gray-500"
+      >
+        Please enter a subject to continue
+      </h4>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted, onUnmounted } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
