@@ -7,7 +7,6 @@ def search(query):
 		return []
 	
 	queries = query.split(" ")
-	queries = [query for query in queries if len(query) > min_charecters]
 
 	if len(queries) == 0:
 		return []
