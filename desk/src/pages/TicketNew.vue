@@ -26,8 +26,9 @@
       />
     </div>
     <TicketNewArticles :search="subject" class="mx-5 mb-5" />
-    <span class="mx-5 mb-5">
+    <div class="mx-5 mb-5 h-full">
       <TicketTextEditor
+        v-show="subject.length > 2"
         ref="editor"
         v-model:attachments="attachments"
         v-model:content="description"
@@ -46,12 +47,18 @@
           />
         </template>
       </TicketTextEditor>
-    </span>
+      <h4
+        v-show="subject.length <= 2"
+        class="flex items-center justify-center text-lg text-gray-500"
+      >
+        Please enter a subject to continue
+      </h4>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted, onUnmounted } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
@@ -61,22 +68,15 @@ import { UniInput } from "@/components";
 import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
 import TicketNewArticles from "./ticket/TicketNewArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
-import { capture, recordSession, stopSession } from "@/telemetry";
+import { useAuthStore } from "@/stores/auth";
+import { capture } from "@/telemetry";
+
 interface P {
   templateId?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   templateId: "",
-});
-
-onMounted(() => {
-  capture("new_ticket_page");
-  recordSession();
-});
-
-onUnmounted(() => {
-  stopSession();
 });
 
 const route = useRoute();
@@ -121,6 +121,15 @@ const ticket = createResource({
     }
   },
   onSuccess: (data) => {
+    capture("new_ticket_submitted", {
+      data: {
+        user: userID,
+        ticketID: data.name,
+        subject: subject.value,
+        description: description.value,
+        customFields: templateFields,
+      },
+    });
     router.push({
       name: route.meta.onSuccessRoute as string,
       params: {
@@ -140,4 +149,13 @@ function sanitize(html: string) {
 usePageMeta(() => ({
   title: "New Ticket",
 }));
+
+const { userId: userID } = useAuthStore();
+onMounted(() => {
+  capture("new_ticket_page", {
+    data: {
+      user: userID,
+    },
+  });
+});
 </script>
