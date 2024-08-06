@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { init as initTelemetry } from "@/telemetry";
 
 export const WEBSITE_ROOT = "Website Root";
 
@@ -239,7 +238,6 @@ router.beforeEach(async (to) => {
   const usersStore = useUserStore();
 
   try {
-    await initTelemetry();
     await authStore.init();
     await usersStore.init();
 
