@@ -2,11 +2,12 @@ import frappe
 
 @frappe.whitelist()
 def search(query):
-	if len(query) < 4:
+	min_charecters = 2
+	if len(query) < min_charecters:
 		return []
 	
 	queries = query.split(" ")
-	queries = [query for query in queries if len(query) >= 4]
+	queries = [query for query in queries if len(query) > min_charecters]
 
 	if len(queries) == 0:
 		return []

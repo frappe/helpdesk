@@ -61,7 +61,7 @@ const articles = createResource({
 watch(
   () => props.search,
   (search) => {
-    if (search.length < 4) return;
+    if (search.length < 2) return;
     articles.update({
       params: {
         query: search,
