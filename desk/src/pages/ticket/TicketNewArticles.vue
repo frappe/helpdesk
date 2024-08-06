@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!isEmpty(articles.data)"
+    v-if="!isEmpty(articles.data) && search.length > 2"
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
     <div class="mb-2 font-medium">
@@ -61,7 +61,8 @@ const articles = createResource({
 watch(
   () => props.search,
   (search) => {
-    if (search.length < 2) return;
+    console.log(search);
+    if (search.length < 3) return;
     articles.update({
       params: {
         query: search,
