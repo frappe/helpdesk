@@ -30,7 +30,13 @@ export async function init() {
       person_profiles: "always",
       capture_pageview: true,
       capture_pageleave: true,
-      disable_session_recording: true,
+      disable_session_recording: false,
+      session_recording: {
+        maskAllInputs: false,
+        maskInputOptions: {
+          password: true,
+        },
+      },
       loaded: (posthog) => {
         window.posthog = posthog;
         window.posthog.identify(SITENAME);
@@ -60,9 +66,16 @@ async function set_credentials() {
   });
 }
 
-export function capture(event: string) {
+interface CaptureOptions {
+  data: {
+    user: string;
+    [key: string]: string | number | boolean | object;
+  };
+}
+
+export function capture(event: string, options: CaptureOptions = { data: {} }) {
   if (!telemetry.value.enabled) return;
-  window.posthog.capture(`${APP}_${event}`);
+  window.posthog.capture(`${APP}_${event}`, options);
 }
 
 export function recordSession() {

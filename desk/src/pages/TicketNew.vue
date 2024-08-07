@@ -1,6 +1,10 @@
 <template>
   <div class="flex flex-col overflow-y-auto">
-    <TicketBreadcrumbs :parent="route.meta.parent" title="New" />
+    <TicketBreadcrumbs
+      :parent="route.meta.parent"
+      title="New"
+      :current="route.name"
+    />
     <div v-if="template.data?.about" class="mx-5 my-3">
       <div class="prose-f" v-html="sanitize(template.data.about)" />
     </div>
@@ -17,12 +21,42 @@
       <FormControl
         v-model="subject"
         type="text"
-        label="Subject"
+        label="Subject*"
         placeholder="A short description"
       />
     </div>
     <TicketNewArticles :search="subject" class="mx-5 mb-5" />
-    <span class="mx-5 mb-5">
+    <div v-if="isCustomerPortal" class="mx-5 mb-5 h-full">
+      <TicketTextEditor
+        v-show="subject.length > 2 || description.length > 0"
+        ref="editor"
+        v-model:attachments="attachments"
+        v-model:content="description"
+        placeholder="Detailed explanation"
+        expand
+      >
+        <template #bottom-right>
+          <Button
+            label="Submit"
+            theme="gray"
+            variant="solid"
+            :disabled="
+              $refs.editor.editor.isEmpty || ticket.loading || !subject
+            "
+            @click="() => ticket.submit()"
+          />
+        </template>
+      </TicketTextEditor>
+      <h4
+        v-show="subject.length <= 2 && description.length === 0"
+        class="flex items-center justify-center text-lg text-gray-500"
+      >
+        Please enter a subject to continue
+      </h4>
+    </div>
+
+    <!-- for agent portal -->
+    <div v-else class="mx-5 mb-5 h-full">
       <TicketTextEditor
         ref="editor"
         v-model:attachments="attachments"
@@ -42,12 +76,12 @@
           />
         </template>
       </TicketTextEditor>
-    </span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted, onUnmounted } from "vue";
+import { ref, computed, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
@@ -57,7 +91,9 @@ import { UniInput } from "@/components";
 import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
 import TicketNewArticles from "./ticket/TicketNewArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
-import { capture, recordSession, stopSession } from "@/telemetry";
+import { useAuthStore } from "@/stores/auth";
+import { capture } from "@/telemetry";
+
 interface P {
   templateId?: string;
 }
@@ -66,21 +102,14 @@ const props = withDefaults(defineProps<P>(), {
   templateId: "",
 });
 
-onMounted(() => {
-  capture("new_ticket_page");
-  recordSession();
-});
-
-onUnmounted(() => {
-  stopSession();
-});
-
 const route = useRoute();
 const router = useRouter();
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
+
+const isCustomerPortal = window.location.pathname.includes("/my-tickets");
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -117,6 +146,16 @@ const ticket = createResource({
     }
   },
   onSuccess: (data) => {
+    if (isCustomerPortal) return;
+    capture("new_ticket_submitted", {
+      data: {
+        user: userID,
+        ticketID: data.name,
+        subject: subject.value,
+        description: description.value,
+        customFields: templateFields,
+      },
+    });
     router.push({
       name: route.meta.onSuccessRoute as string,
       params: {
@@ -136,4 +175,13 @@ function sanitize(html: string) {
 usePageMeta(() => ({
   title: "New Ticket",
 }));
+
+const { userId: userID } = useAuthStore();
+onMounted(() => {
+  capture("new_ticket_page", {
+    data: {
+      user: userID,
+    },
+  });
+});
 </script>
