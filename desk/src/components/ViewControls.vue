@@ -95,6 +95,7 @@ const presetFilters = [
   {
     label: "All Tickets",
     onClick: (e) => {
+      setTitle("Helpdesk");
       emitToParent(
         {
           event: "clear",
@@ -157,7 +158,13 @@ const presetFilters = [
   },
 ];
 
-function getPresetFilters(status) {
+function setTitle(title: string) {
+  document.title = title;
+}
+
+function getPresetFilters(status: string) {
+  setTitle(`My ${status} Tickets`);
+  document.title = `My ${status} Tickets`;
   return {
     filters: [
       {
