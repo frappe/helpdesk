@@ -12,6 +12,7 @@ from pypika import Criterion
 
 def check_permissions(doctype, parent):
 	user = frappe.session.user
+
 	permissions = ("select", "read")
 	has_select_permission, has_read_permission = [
 		frappe.has_permission(doctype, perm, user=user, parent_doctype=parent)
@@ -41,7 +42,11 @@ def is_agent(user: str = None) -> bool:
 	:return: Whether `user` is an agent
 	"""
 	user = user or frappe.session.user
-	return is_admin() or "Agent" in frappe.get_roles(user) or bool(frappe.db.exists("HD Agent", {"name": user}))
+	return (
+		is_admin()
+		or "Agent" in frappe.get_roles(user)
+		or bool(frappe.db.exists("HD Agent", {"name": user}))
+	)
 
 
 def publish_event(event: str, data: dict, user: str = None):
@@ -54,9 +59,7 @@ def publish_event(event: str, data: dict, user: str = None):
 	"""
 	room = get_website_room()
 	user = user or frappe.session.user
-	frappe.publish_realtime(
-		event, message=data, room=room, after_commit=True, user=user
-	)
+	frappe.publish_realtime(event, message=data, room=room, after_commit=True, user=user)
 
 
 def refetch_resource(key: str | List[str], user=None):
@@ -67,6 +70,7 @@ def refetch_resource(key: str | List[str], user=None):
 
 def capture_event(event: str):
 	return _capture(event, "helpdesk")
+
 
 @frappe.whitelist()
 def get_customer(contact: str) -> tuple[str]:
@@ -101,9 +105,7 @@ def extract_mentions(html):
 	soup = BeautifulSoup(html, "html.parser")
 	mentions = []
 	for d in soup.find_all("span", attrs={"data-type": "mention"}):
-		mentions.append(
-			frappe._dict(full_name=d.get("data-label"), email=d.get("data-id"))
-		)
+		mentions.append(frappe._dict(full_name=d.get("data-label"), email=d.get("data-id")))
 	return mentions
 
 
