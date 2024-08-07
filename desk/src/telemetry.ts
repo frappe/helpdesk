@@ -73,7 +73,10 @@ interface CaptureOptions {
   };
 }
 
-export function capture(event: string, options: CaptureOptions = { data: {} }) {
+export function capture(
+  event: string,
+  options: CaptureOptions = { data: { user: "" } }
+) {
   if (!telemetry.value.enabled) return;
   window.posthog.capture(`${APP}_${event}`, options);
 }

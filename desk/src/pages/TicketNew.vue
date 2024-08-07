@@ -146,7 +146,14 @@ const ticket = createResource({
     }
   },
   onSuccess: (data) => {
-    if (isCustomerPortal) return;
+    router.push({
+      name: route.meta.onSuccessRoute as string,
+      params: {
+        ticketId: data.name,
+      },
+    });
+    if (!isCustomerPortal) return;
+    // only capture telemetry for customer portal
     capture("new_ticket_submitted", {
       data: {
         user: userID,
@@ -154,12 +161,6 @@ const ticket = createResource({
         subject: subject.value,
         description: description.value,
         customFields: templateFields,
-      },
-    });
-    router.push({
-      name: route.meta.onSuccessRoute as string,
-      params: {
-        ticketId: data.name,
       },
     });
   },
