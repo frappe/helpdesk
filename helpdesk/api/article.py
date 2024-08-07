@@ -1,5 +1,6 @@
 import frappe
 
+
 @frappe.whitelist()
 def search(query):
 	min_charecters = 2
