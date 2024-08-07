@@ -84,7 +84,7 @@
       <TicketAgentSidebar
         :ticket="ticket.data"
         @update="({ field, value }) => updateTicket(field, value)"
-        @email:open="(e) => communicationAreaRef.replyToEmail(null, e)"
+        @email:open="(e) => communicationAreaRef.toggleEmailBox()"
       />
     </div>
     <AssignmentModal
@@ -134,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch } from "vue";
+import { computed, ref, h, watch, onMounted, onUnmounted } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
@@ -340,4 +340,11 @@ function updateTicket(fieldname: string, value: string) {
     },
   });
 }
+onMounted(() => {
+  document.title = props.ticketId;
+});
+
+onUnmounted(() => {
+  document.title = "Helpdesk";
+});
 </script>
