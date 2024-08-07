@@ -52,5 +52,5 @@ setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
 
 
 website_route_rules = [
-    {"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
+	{"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
 ]
