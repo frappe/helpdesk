@@ -5,6 +5,7 @@
 import frappe
 from frappe import _
 
+
 def setup_complete(args=None):
 
 	email = args.get("email") or frappe.session.user
