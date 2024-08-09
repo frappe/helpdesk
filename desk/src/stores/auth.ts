@@ -1,7 +1,7 @@
 import { computed, ComputedRef, Ref, ref } from "vue";
 import { defineStore } from "pinia";
 import { createResource, call } from "frappe-ui";
-import { router, REDIRECT_PAGE} from "@/router";
+import { router, REDIRECT_PAGE } from "@/router";
 
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
@@ -38,7 +38,7 @@ export const useAuthStore = defineStore("auth", () => {
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
 
   function sessionUser() {
-    let cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
+    const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
     let _sessionUser = cookies.get("user_id");
     if (_sessionUser === "Guest") {
       _sessionUser = null;
@@ -59,11 +59,10 @@ export const useAuthStore = defineStore("auth", () => {
     },
   });
 
-
   function logout() {
     user.value = null;
     call(URI_LOGOUT).then(() => {
-      window.location.href = REDIRECT_PAGE
+      window.location.href = REDIRECT_PAGE;
     });
   }
 

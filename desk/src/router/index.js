@@ -204,20 +204,15 @@ export const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to,_,next) => {
+router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-  const usersStore = useUserStore();
-  if (authStore.isLoggedIn){
+  if (authStore.isLoggedIn) {
     await authStore.init();
-    await usersStore.init();
   }
 
-  if (to.name === 'Login' && authStore.isLoggedIn) {
-    next({ name: AGENT_PORTAL_LANDING })
-  } else if (to.name !== 'Login' && !authStore.isLoggedIn) {
-    window.location.href = REDIRECT_PAGE
+  if (!authStore.isLoggedIn) {
+    window.location.href = REDIRECT_PAGE;
   } else {
-    next()
+    next();
   }
-})
-
+});
