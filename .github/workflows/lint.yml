@@ -1,46 +1,79 @@
 name: Lint
 
 on:
-  pull_request: { }
+  pull_request:
+    branches:
+      - main
+      - develop
 
 jobs:
   commit-lint:
-    name: 'Semantic Commits'
+    name: Semantic Commits
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 200
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
           check-latest: true
-
       - name: Check commit titles
         run: |
           npm install @commitlint/cli @commitlint/config-conventional
           npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
-  linter:
-    name: 'Frappe Linter'
+  eslint:
+    name: ESLint - Reviewdog
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - uses: actions/checkout@v3
+      - run: npm install -g yarn
+      - run: yarn install --frozen-lockfile
+      - uses: reviewdog/action-eslint@v1
+        with:
+          eslint_flags: '--ext vue --ext js --ext ts --ext json .'
+          fail_on_error: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+  black:
+    name: Black - Reviewdog
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - uses: actions/checkout@v3
+      - run: pip install black-with-tabs
+      - uses: reviewdog/action-black@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+
+  semgrep:
+    name: Semgrep Rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      - name: Install and Run Pre-commit
-        uses: pre-commit/action@v2.0.3
-
       - name: Download Semgrep rules
         run: git clone --depth 1 https://github.com/frappe/semgrep-rules.git frappe-semgrep-rules
+      
+      - name: Download semgrep
+        run: pip install semgrep
 
       - name: Run Semgrep rules
         run: semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness
