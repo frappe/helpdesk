@@ -2,10 +2,7 @@
   <div class="flex h-screen w-screen">
     <SideBar />
     <Notifications />
-    <RouterView
-      :key="$route.fullPath"
-      class="z-0 flex flex-1 flex-col overflow-auto"
-    />
+    <RouterView class="z-0 flex flex-1 flex-col overflow-auto" />
     <CommandPalette />
   </div>
 </template>
