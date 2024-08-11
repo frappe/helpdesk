@@ -193,7 +193,7 @@
     "@types/cheerio" "^0.22.31"
     "@types/node-fetch" "^2.6.2"
     "@types/tar" "^6.1.4"
-    cheerio "^1.0.0-rc.12"
+    cheerio "1.0.0-rc.12"
     extract-zip "^2.0.1"
     local-pkg "^0.4.3"
     node-fetch "^2.6.9"

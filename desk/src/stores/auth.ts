@@ -1,15 +1,11 @@
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, Ref, ref } from "vue";
 import { defineStore } from "pinia";
 import { createResource, call } from "frappe-ui";
-import { isEmpty } from "lodash";
-import { router, LOGIN } from "@/router";
-import { createToast } from "@/utils";
+import { router, REDIRECT_PAGE } from "@/router";
 
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
-const URI_SIGNUP = "helpdesk.api.account.signup";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
-const URI_VERIFY = "helpdesk.api.account.verify_and_create_account";
 
 /**
  * This is supposed to be the entry point of authentication. This will be
@@ -29,9 +25,7 @@ export const useAuthStore = defineStore("auth", () => {
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
-  const isLoggedIn: ComputedRef<boolean> = computed(
-    () => !isEmpty(user__.value)
-  );
+
   const userId: ComputedRef<string> = computed(() => user__.value.user_id);
   const userImage: ComputedRef<string> = computed(
     () => user__.value.user_image
@@ -43,39 +37,33 @@ export const useAuthStore = defineStore("auth", () => {
   const username: ComputedRef<string> = computed(() => user__.value.username);
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
 
+  function sessionUser() {
+    const cookies = new URLSearchParams(document.cookie.split("; ").join("&"));
+    let _sessionUser = cookies.get("user_id");
+    if (_sessionUser === "Guest") {
+      _sessionUser = null;
+    }
+    return _sessionUser;
+  }
+  const user: Ref<string> = ref(sessionUser());
+  const isLoggedIn: ComputedRef<boolean> = computed(() => !!user.value);
   const login = createResource({
     url: URI_LOGIN,
     onError() {
       throw new Error("Invalid email or password");
     },
     onSuccess() {
+      user.value = sessionUser();
+      login.reset();
       router.replace({ path: "/" });
     },
   });
 
-  const signup = createResource({
-    url: URI_SIGNUP,
-  });
-
-  const verify = createResource({
-    url: URI_VERIFY,
-    onSuccess() {
-      login.submit({
-        usr: verify.params.email,
-        pwd: verify.params.password,
-      });
-    },
-    onError() {
-      createToast({
-        title: "Error verifying account",
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
-  });
-
   function logout() {
-    call(URI_LOGOUT).then(() => router.push({ name: LOGIN }));
+    user.value = null;
+    call(URI_LOGOUT).then(() => {
+      window.location.href = REDIRECT_PAGE;
+    });
   }
 
   return {
@@ -85,15 +73,14 @@ export const useAuthStore = defineStore("auth", () => {
     isAgent,
     isLoggedIn,
     login,
-    logout,
     reloadUser,
-    signup,
     userFirstName,
     userId,
     userImage,
     userName,
     username,
-    verify,
     timezone,
+    user,
+    logout,
   };
 });

@@ -32,11 +32,11 @@ repos:
       - id: black
         additional_dependencies: ['click==8.0.4']
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
     hooks:
-      - id: isort
-        exclude: ".*setup.py$"
+      - id: prettier
+        types_or: [javascript, vue, scss,ts]
 
 ci:
     autoupdate_schedule: weekly

@@ -42,5 +42,8 @@
 		"vue-router": "^4.2.2",
 		"vuedraggable": "^4.1.0",
 		"zod": "^3.21.4"
+	},
+	"resolutions": {
+		"cheerio": "1.0.0-rc.12"
 	}
 }
