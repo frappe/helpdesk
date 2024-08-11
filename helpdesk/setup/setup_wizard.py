@@ -11,9 +11,10 @@ def setup_complete(args=None):
 	if not email:
 		return
 	# Create first Agent for the user
-	new_user = frappe.db.get_list("User", filters={"email": email}, limit=1, pluck="name")[
-		0
-	]
+	new_user = frappe.db.get_list("User", filters={"email": email}, limit=1, pluck="name")
+	if not new_user:
+		return
+	new_user = new_user[0]
 	new_agent = frappe.new_doc("HD Agent")
 	new_agent.user = new_user
 	new_agent.insert(ignore_if_duplicate=True)
