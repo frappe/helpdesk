@@ -7,11 +7,12 @@ import json
 import re
 
 import frappe
-from frappe.utils import cstr, update_progress_bar
+from frappe.utils import cstr, strip_html_tags, update_progress_bar
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
+from bs4 import BeautifulSoup
 
 from helpdesk.utils import is_agent
 
@@ -67,7 +68,7 @@ class Search:
 		self,
 		query,
 		start=0,
-		page_length=50,
+		page_length=20,
 		sort_by=None,
 		highlight=False,
 		with_payloads=False,
@@ -76,13 +77,15 @@ class Search:
 		query = Query(query).paging(start, page_length)
 		if highlight:
 			query = query.highlight(tags=["<mark>", "</mark>"])
-		if sort_by:
-			parts = sort_by.split(" ")
-			sort_field = parts[0]
-			direction = parts[1] if len(parts) > 1 else "asc"
-			query = query.sort_by(sort_field, asc=direction == "asc")
+		# if sort_by:
+		# parts = sort_by.split(" ")
+		# sort_field = parts[0]
+		# direction = parts[1] if len(parts) > 1 else "asc"
+		# query = query.sort_by(sort_field, asc=direction == "asc")
 		if with_payloads:
 			query = query.with_payloads()
+
+		query.summarize(fields=["description"])
 
 		try:
 			result = self.redis.ft(self.index_name).search(query)
@@ -125,17 +128,34 @@ class Search:
 
 class HelpdeskSearch(Search):
 	schema = [
-		{"name": "name", "weight": 5},
-		{"name": "subject", "weight": 2},
-		{"name": "description", "weight": 1},
+		{"name": "name", "weight": 1},
+		{"name": "subject", "weight": 5},
+		{"name": "description", "weight": 7},
+		{"name": "headings", "weight": 10},
 		{"name": "team", "type": "tag"},
 		{"name": "modified", "sortable": True},
 		{"name": "creation", "sortable": True},
 	]
 
 	DOCTYPE_FIELDS = {
-		"HD Ticket": ["name", "subject", "description", "agent_group", "modified", "creation",],
-		"HD Article": ["name", "category", "title", "content", "modified", "creation", "author", "category.category_name as category"],
+		"HD Ticket": [
+			"name",
+			"subject",
+			"description",
+			"agent_group",
+			"modified",
+			"creation",
+		],
+		"HD Article": [
+			"name",
+			"category",
+			"title",
+			"content",
+			"modified",
+			"creation",
+			"author",
+			"category.category_name as category",
+		],
 	}
 
 	def __init__(self):
@@ -160,6 +180,7 @@ class HelpdeskSearch(Search):
 				"name": doc.name,
 				"subject": doc.subject,
 				"team": doc.agent_group,
+				"headings": doc.headings,
 				"modified": doc.modified,
 			}
 			payload = {
@@ -171,7 +192,8 @@ class HelpdeskSearch(Search):
 				"doctype": doc.doctype,
 				"name": doc.name,
 				"subject": doc.title,
-				"description": doc.content,
+				"description": strip_html_tags(doc.content),
+				"headings": doc.headings,
 				"modified": doc.modified,
 			}
 			payload = {
@@ -185,19 +207,32 @@ class HelpdeskSearch(Search):
 		key = f"{doc.doctype}:{doc.name}"
 		self.remove_document(key)
 
+	def extract_headings(self, content: str | None) -> str:
+		try:
+			soup = BeautifulSoup(content, "html.parser")
+		except TypeError:
+			ret = []
+		else:
+			ret = []
+			for tag in ["h1", "h2", "h3", "h4", "h5", "h6"]:
+				for heading in soup.find_all(tag):
+					ret.append(heading.text)
+		return json.dumps(ret)
+
 	def get_records(self, doctype):
 		records = []
-		for d in frappe.db.get_all(
-			doctype,
-			fields=self.DOCTYPE_FIELDS[doctype]
-		):
+		for d in frappe.db.get_all(doctype, fields=self.DOCTYPE_FIELDS[doctype]):
 			d.doctype = doctype
+			if doctype == "HD Article":
+				d.headings = self.extract_headings(d.content)
+			elif doctype == "HD Ticket":
+				d.headings = self.extract_headings(d.description)
 			records.append(d)
 		return records
 
 
 @frappe.whitelist()
-def search(query):
+def search(query, only_articles=False):
 	if not is_agent():
 		return []
 	search = HelpdeskSearch()
