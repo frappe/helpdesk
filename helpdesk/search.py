@@ -56,9 +56,7 @@ class Search:
 			if field.name in doc:
 				mapping[field.name] = cstr(doc[field.name])
 		if self.index_exists():
-			self.redis.ft(self.index_name).add_document(
-				doc_id, payload=json.dumps(payload), replace=True, **mapping
-			)
+			self.redis.ft(self.index_name).add_document(doc_id, replace=True, **mapping)
 
 	def remove_document(self, id):
 		key = self.redis.make_key(f"{self.prefix}:{id}").decode()
@@ -237,7 +235,6 @@ class HelpdeskSearch(Search):
 					section = ""
 					heading = tag.text
 			sections.append((heading, section))
-			print(sections)
 			return sections
 
 	def scrub(self, text: str):
