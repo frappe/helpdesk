@@ -195,7 +195,6 @@
 <script setup lang="ts">
 import { dayjs } from "@/dayjs";
 import { ref, h } from "vue";
-import { useRouter } from "vue-router";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { TicketIcon } from "@/components/icons";
 import {

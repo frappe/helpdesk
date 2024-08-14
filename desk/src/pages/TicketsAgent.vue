@@ -134,14 +134,19 @@ const colFieldType = computed(() => {
 });
 
 async function exportRows(export_type, export_all, selections) {
+  let filters;
+  let page_length;
   let fields = JSON.stringify(columns.map((f) => f.key));
-  let filtersClone = { ...filtersToApply };
-  filtersClone["name"] = ["IN", selections];
-  let filters = JSON.stringify(filtersClone);
   let order_by = sortsToApply;
-  let page_length = pageLength.value;
+
   if (export_all) {
+    filters = JSON.stringify(filtersToApply);
     page_length = tickets?.data?.total_count;
+  } else {
+    let filtersClone = { ...filtersToApply };
+    filtersClone["name"] = ["IN", selections];
+    filters = JSON.stringify(filtersClone);
+    page_length = selections.length;
   }
 
   window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${filters}&order_by=${order_by}&page_length=${page_length}&start=0&view=Report&with_comment_count=1`;
