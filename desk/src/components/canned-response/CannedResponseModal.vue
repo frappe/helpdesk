@@ -47,7 +47,6 @@
 </template>
 
 <script setup>
-import { ref, defineModel } from "vue";
 import { TextEditor, call, TextInput } from "frappe-ui";
 
 const props = defineProps({

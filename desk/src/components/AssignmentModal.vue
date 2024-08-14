@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 import { createResource } from "frappe-ui";
 import { UserAvatar, SearchComplete } from "@/components";
 import { useUserStore } from "@/stores/user";
