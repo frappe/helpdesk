@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineModel } from "vue";
+import { ref } from "vue";
 
 import { EmailEditor, CommentTextEditor } from "@/components";
 import { EmailIcon, CommentIcon } from "@/components/icons/";
