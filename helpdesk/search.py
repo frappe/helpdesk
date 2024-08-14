@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from copy import deepcopy
 import json
 import re
 
@@ -12,7 +13,7 @@ from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, PageElement
 
 from helpdesk.utils import is_agent
 
@@ -86,6 +87,7 @@ class Search:
 			query = query.with_payloads()
 
 		query.summarize(fields=["description"])
+		query.scorer("BM25")
 
 		try:
 			result = self.redis.ft(self.index_name).search(query)
@@ -129,9 +131,9 @@ class Search:
 class HelpdeskSearch(Search):
 	schema = [
 		{"name": "name", "weight": 1},
-		{"name": "subject", "weight": 5},
-		{"name": "description", "weight": 7},
-		{"name": "headings", "weight": 10},
+		{"name": "subject", "weight": 3},
+		{"name": "description", "weight": 3},
+		{"name": "headings", "weight": 4},
 		{"name": "team", "type": "tag"},
 		{"name": "modified", "sortable": True},
 		{"name": "creation", "sortable": True},
@@ -153,7 +155,6 @@ class HelpdeskSearch(Search):
 			"content",
 			"modified",
 			"creation",
-			"author",
 			"category.category_name as category",
 		],
 	}
@@ -197,7 +198,6 @@ class HelpdeskSearch(Search):
 				"modified": doc.modified,
 			}
 			payload = {
-				"author": doc.author,
 				"category": doc.category,
 			}
 		if fields and payload:
@@ -219,15 +219,46 @@ class HelpdeskSearch(Search):
 					ret.append(heading.text)
 		return json.dumps(ret)
 
+	def get_sections(self, content: str) -> list[tuple[str, str]]:
+		try:
+			soup = BeautifulSoup(content, "html.parser")
+		except TypeError:
+			return []
+		else:
+			sections = []
+			tag: PageElement
+			section = ""
+			heading = ""
+			for tag in soup.find_all():
+				if tag.name in ["p", "blockquote", "code"]:
+					section += tag.text + "\n"
+				elif tag.name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
+					sections.append((heading, section))
+					section = ""
+					heading = tag.text
+			sections.append((heading, section))
+			print(sections)
+			return sections
+
+	def scrub(self, text: str):
+		# For permalink
+		return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
+
 	def get_records(self, doctype):
+		print(f"Getting records for {doctype}")
 		records = []
 		for d in frappe.db.get_all(doctype, fields=self.DOCTYPE_FIELDS[doctype]):
 			d.doctype = doctype
 			if doctype == "HD Article":
-				d.headings = self.extract_headings(d.content)
+				for heading, section in self.get_sections(d.content):
+					cd = deepcopy(d)
+					cd.name = d.name + f"#{self.scrub(heading)}"
+					cd.content = section
+					cd.headings = heading
+					records.append(cd)
 			elif doctype == "HD Ticket":
 				d.headings = self.extract_headings(d.description)
-			records.append(d)
+				records.append(d)
 		return records
 
 
@@ -239,18 +270,18 @@ def search(query, only_articles=False):
 	query = search.clean_query(query)
 	query_parts = query.split(" ")
 	if len(query_parts) == 1 and not query_parts[0].endswith("*"):
-		query = f"{query_parts[0]}*"
+		query = f"*{query_parts[0]}*"
 	if len(query_parts) > 1:
-		query = " ".join([f"%%{q}%%" for q in query_parts])
-	result = search.search(query, start=0, sort_by="modified desc", with_payloads=True)
+		query = " ".join([f"%{q}%" for q in query_parts])
+	result = search.search(query, start=0, sort_by="modified desc", highlight=True)
 	groups = {}
 	for r in result.docs:
 		doctype, name = r.id.split(":")
 		r.doctype = doctype
 		r.name = name
-		if doctype == "HD Ticket":
-			groups.setdefault("Tickets", []).append(r)
-		elif doctype == "HD Article":
+		# if doctype == "HD Ticket":
+		# 	groups.setdefault("Tickets", []).append(r)
+		if doctype == "HD Article":
 			groups.setdefault("Articles", []).append(r)
 
 	out = []
