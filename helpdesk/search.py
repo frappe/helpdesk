@@ -36,9 +36,7 @@ class Search:
 		schema = []
 		for field in self.schema:
 			kwargs = {
-				k: v
-				for k, v in field.items()
-				if k in ["weight", "sortable", "no_index", "no_stem"]
+				k: v for k, v in field.items() if k in ["weight", "sortable", "no_index", "no_stem"]
 			}
 			if field.type == "tag":
 				schema.append(TagField(field.name, **kwargs))
@@ -48,7 +46,7 @@ class Search:
 		self.redis.ft(self.index_name).create_index(schema, definition=index_def)
 		self._index_exists = True
 
-	def add_document(self, id, doc, payload=None):
+	def add_document(self, id, doc):
 		doc = frappe._dict(doc)
 		doc_id = self.redis.make_key(f"{self.prefix}:{id}").decode()
 		mapping = {}
@@ -68,21 +66,12 @@ class Search:
 		query,
 		start=0,
 		page_length=20,
-		sort_by=None,
 		highlight=False,
-		with_payloads=False,
 	):
 		query = self.clean_query(query)
 		query = Query(query).paging(start, page_length)
 		if highlight:
 			query = query.highlight(tags=["<mark>", "</mark>"])
-		# if sort_by:
-		# parts = sort_by.split(" ")
-		# sort_field = parts[0]
-		# direction = parts[1] if len(parts) > 1 else "asc"
-		# query = query.sort_by(sort_field, asc=direction == "asc")
-		if with_payloads:
-			query = query.with_payloads()
 
 		query.summarize(fields=["description"])
 		query.scorer("BM25")
@@ -168,7 +157,8 @@ class HelpdeskSearch(Search):
 		for i, doc in enumerate(records):
 			self.index_doc(doc)
 			if not hasattr(frappe.local, "request"):
-				update_progress_bar("Indexing", i, total)
+				pass
+				# update_progress_bar("Indexing", i, total)
 
 	def index_doc(self, doc):
 		id = f"{doc.doctype}:{doc.name}"
@@ -270,14 +260,14 @@ def search(query, only_articles=False):
 		query = f"*{query_parts[0]}*"
 	if len(query_parts) > 1:
 		query = " ".join([f"%{q}%" for q in query_parts])
-	result = search.search(query, start=0, sort_by="modified desc", highlight=True)
+	result = search.search(query, start=0, highlight=True)
 	groups = {}
 	for r in result.docs:
 		doctype, name = r.id.split(":")
 		r.doctype = doctype
 		r.name = name
-		# if doctype == "HD Ticket":
-		# 	groups.setdefault("Tickets", []).append(r)
+		if doctype == "HD Ticket":
+			groups.setdefault("Tickets", []).append(r)
 		if doctype == "HD Article":
 			groups.setdefault("Articles", []).append(r)
 
