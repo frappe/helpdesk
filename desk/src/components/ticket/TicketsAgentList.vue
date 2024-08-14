@@ -99,6 +99,31 @@
         </ListRowItem>
       </ListRow>
     </ListRows>
+    <ListSelectBanner>
+      <template #actions="{ selections }">
+        <Dropdown
+          :options="[
+            {
+              group: 'Options',
+              hideLabel: true,
+              items: [
+                {
+                  label: 'Export',
+                  icon: () =>
+                    h(FeatherIcon, { name: 'download', class: 'h-4 w-4' }),
+                  onClick: () => {
+                    selectedRows = selections;
+                    showExportDialog = true;
+                  },
+                },
+              ],
+            },
+          ]"
+        >
+          <Button icon="more-horizontal" variant="ghost" />
+        </Dropdown>
+      </template>
+    </ListSelectBanner>
   </ListView>
   <div v-else class="flex h-full items-center justify-center">
     <div
@@ -116,11 +141,60 @@
     @update:model-value="emit('update:pageLength', $event)"
     @load-more="emit('update:pageLength', 'loadMore')"
   />
+  <Dialog
+    v-model="showExportDialog"
+    :options="{
+      title: 'Export',
+      actions: [
+        {
+          label: 'Download',
+          variant: 'solid',
+          onClick: () => {
+            emit('event:export', {
+              export_type: export_type,
+              export_all: export_all,
+              selections: Array.from(selectedRows).join(','),
+            });
+            showExportDialog = false;
+            export_type = 'Excel';
+            export_all = false;
+          },
+        },
+      ],
+    }"
+  >
+    <template #body-content>
+      <FormControl
+        v-model="export_type"
+        variant="outline"
+        :label="'Export Type'"
+        type="select"
+        :options="[
+          {
+            label: 'Excel',
+            value: 'Excel',
+          },
+          {
+            label: 'CSV',
+            value: 'CSV',
+          },
+        ]"
+        :placeholder="'Excel'"
+      />
+      <div class="mt-3">
+        <FormControl
+          v-model="export_all"
+          type="checkbox"
+          :label="`Export All ${options.totalCount} Record(s)`"
+        />
+      </div>
+    </template>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
 import { dayjs } from "@/dayjs";
-import { ref } from "vue";
+import { ref, h } from "vue";
 import { useRouter } from "vue-router";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { TicketIcon } from "@/components/icons";
@@ -131,11 +205,17 @@ import {
   ListRowItem,
   ListHeader,
   ListFooter,
+  ListSelectBanner,
+  FeatherIcon,
+  Dropdown,
 } from "frappe-ui";
 import { MultipleAvatar, StarRating } from "@/components";
 
 const ticketStatusStore = useTicketStatusStore();
-const router = useRouter();
+const showExportDialog = ref(false);
+const export_type = ref("Excel");
+const export_all = ref(false);
+let selectedRows;
 
 const props = defineProps({
   columns: {
@@ -168,7 +248,11 @@ const props = defineProps({
   },
 });
 
-let emit = defineEmits(["update:pageLength", "event:fieldClick"]);
+let emit = defineEmits([
+  "update:pageLength",
+  "event:fieldClick",
+  "event:export",
+]);
 let pageLength = ref(props.pageLength);
 
 function handleFieldClick(e, name: string, value: string | [string]) {

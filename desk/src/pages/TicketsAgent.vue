@@ -21,16 +21,10 @@
         fields: fields,
         columns: columns,
       }"
-      :total-count="tickets?.data?.total_count"
       @event:sort="processSorts"
       @event:filter="processFilters"
       @event:column="processColumns"
       @event:reload="apply()"
-      @event:export="
-        (e) => {
-          exportRows(e.export_type, e.export_all);
-        }
-      "
     />
     <TicketsAgentList
       :rows="tickets?.data?.data || []"
@@ -43,6 +37,11 @@
       }"
       @update:page-length="updatePageLength"
       @event:field-click="processFieldClick"
+      @event:export="
+        (e) => {
+          exportRows(e.export_type, e.export_all, e.selections);
+        }
+      "
     />
   </div>
 </template>
@@ -134,9 +133,11 @@ const colFieldType = computed(() => {
   return obj;
 });
 
-async function exportRows(export_type, export_all) {
+async function exportRows(export_type, export_all, selections) {
   let fields = JSON.stringify(columns.map((f) => f.key));
-  let filters = JSON.stringify(filtersToApply);
+  let filtersClone = { ...filtersToApply };
+  filtersClone["name"] = ["IN", selections];
+  let filters = JSON.stringify(filtersClone);
   let order_by = sortsToApply;
   let page_length = pageLength.value;
   if (export_all) {
