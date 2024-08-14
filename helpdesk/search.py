@@ -36,7 +36,9 @@ class Search:
 		schema = []
 		for field in self.schema:
 			kwargs = {
-				k: v for k, v in field.items() if k in ["weight", "sortable", "no_index", "no_stem"]
+				k: v
+				for k, v in field.items()
+				if k in ["weight", "sortable", "no_index", "no_stem"]
 			}
 			if field.type == "tag":
 				schema.append(TagField(field.name, **kwargs))
