@@ -159,8 +159,7 @@ class HelpdeskSearch(Search):
 		for i, doc in enumerate(records):
 			self.index_doc(doc)
 			if not hasattr(frappe.local, "request"):
-				pass
-				# update_progress_bar("Indexing", i, total)
+				update_progress_bar("Indexing", i, total)
 
 	def index_doc(self, doc):
 		id = f"{doc.doctype}:{doc.name}"
