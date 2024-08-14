@@ -56,12 +56,80 @@
         :columns="column.columns"
         @event:column="(e) => emitToParent(e, 'event:column')"
       />
+      <Dropdown
+        :options="[
+          {
+            group: 'Options',
+            hideLabel: true,
+            items: [
+              {
+                label: 'Export',
+                icon: () =>
+                  h(FeatherIcon, { name: 'download', class: 'h-4 w-4' }),
+                onClick: () => (showExportDialog = true),
+              },
+            ],
+          },
+        ]"
+      >
+        <template #default>
+          <Button icon="more-horizontal" />
+        </template>
+      </Dropdown>
     </div>
   </div>
+  <Dialog
+    v-model="showExportDialog"
+    :options="{
+      title: 'Export',
+      actions: [
+        {
+          label: 'Download',
+          variant: 'solid',
+          onClick: () => {
+            emit('event:export', {
+              export_type: export_type,
+              export_all: export_all,
+            });
+            showExportDialog = false;
+            export_type = 'Excel';
+            export_all = false;
+          },
+        },
+      ],
+    }"
+  >
+    <template #body-content>
+      <FormControl
+        v-model="export_type"
+        variant="outline"
+        :label="'Export Type'"
+        type="select"
+        :options="[
+          {
+            label: 'Excel',
+            value: 'Excel',
+          },
+          {
+            label: 'CSV',
+            value: 'CSV',
+          },
+        ]"
+        :placeholder="'Excel'"
+      />
+      <div class="mt-3">
+        <FormControl
+          v-model="export_all"
+          type="checkbox"
+          :label="`Export All ${props.totalCount} Record(s)`"
+        />
+      </div>
+    </template>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, h } from "vue";
 import { Dropdown, FeatherIcon, FormControl } from "frappe-ui";
 import { Filter, Sort, ColumnSettings, FadedScrollableDiv } from "@/components";
 import { useAuthStore } from "@/stores/auth";
@@ -69,6 +137,9 @@ import { RefreshIcon } from "@/components/icons";
 
 const authStore = useAuthStore();
 let currentPreset = ref("All Tickets");
+const showExportDialog = ref(false);
+const export_type = ref("Excel");
+const export_all = ref(false);
 
 const props = defineProps({
   filter: {
@@ -81,6 +152,10 @@ const props = defineProps({
   },
   column: {
     type: Object,
+    required: true,
+  },
+  totalCount: {
+    type: Number,
     required: true,
   },
 });
@@ -194,6 +269,7 @@ const emit = defineEmits([
   "event:sort",
   "event:column",
   "event:reload",
+  "event:export",
 ]);
 
 function emitToParent(data, event) {
