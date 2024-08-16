@@ -330,10 +330,16 @@ function updateTicket(fieldname: string, value: string) {
         iconClasses: "text-green-600",
       });
     },
-    onError: () => {
+    onError: (e) => {
       isLoading.value = false;
+
+      const title =
+        e.messages && e.messages.length > 0
+          ? e.messages[0]
+          : "Failed to update ticket";
+
       createToast({
-        title: "Failed to update ticket",
+        title,
         icon: "x",
         iconClasses: "text-red-600",
       });
