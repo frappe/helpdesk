@@ -48,7 +48,9 @@
 </template>
 
 <script setup lang="ts">
-const showOnboardingDialog = defineModel();
+import { ModelRef } from "vue";
+
+const showOnboardingDialog: ModelRef<boolean> = defineModel();
 function openDocumentation() {
   const URL = "https://docs.frappe.io/helpdesk";
   window.open(URL, "_blank");
