@@ -88,14 +88,13 @@
     />
   </div>
   <!-- side panel -->
-  <div v-if="showSidePanel">
-    <SidePanel ref="panel" />
+  <div v-if="showOnboardingDialog">
+    <OnboardingDialog v-model="showOnboardingDialog" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-const panel = ref(null);
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
@@ -113,7 +112,7 @@ import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import { CircularProgressBar } from "@/components";
 import UserMenu from "./UserMenu.vue";
-import SidePanel from "@/components/SidePanel.vue";
+import OnboardingDialog from "@/components/OnboardingDialog.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
@@ -174,9 +173,9 @@ const menuOptions = computed(() => [
 const step = ref(3);
 const totalSteps = ref(10);
 
-const showSidePanel = ref(false);
-function openSidePanel(e: MouseEvent) {
-  showSidePanel.value = !showSidePanel.value;
+const showOnboardingDialog = ref(false);
+function openSidePanel() {
+  showOnboardingDialog.value = !showOnboardingDialog.value;
 }
 
 const profileSettings = [
