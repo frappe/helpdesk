@@ -7,7 +7,7 @@
     }"
   >
     <template #body-content>
-      <!-- section 2 -->
+      <!-- section 1 -->
       <div class="flex-1 px-4 py-2.5">
         <!-- heading and button -->
         <div class="flex items-center justify-between">
@@ -26,7 +26,7 @@
         </div>
         <div />
       </div>
-      <!-- section 3 -->
+      <!-- section 2 -->
       <div class="flex-1 px-4 py-2.5">
         <div class="flex items-center justify-between">
           <span class="text-lg font-semibold">Get Started</span>
