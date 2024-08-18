@@ -30,7 +30,7 @@
         <ListRowItem
           v-else
           :item="item"
-          :class="['text-base', { 'font-semibold text-gray-900': !isSeen(row), 'text-gray-600': isSeen(row) }]"
+          :class="['text-base', { 'text-3xl font-semibold text-gray-900': checkCondition(row), 'text-gray-600': !checkCondition(row) }]"
           @click="(e) => handleFieldClick(e, column.key, item)"
         >
           <template #prefix>
@@ -110,120 +110,6 @@
     @load-more="emit('update:pageLength', 'loadMore')"
   />
 </template>
-
-<template>
-  <ListView
-    class="px-5"
-    :columns="columns"
-    :rows="rows"
-    :options="{
-      getRowRoute: (row) => ({
-        name: 'TicketAgent',
-        params: { ticketId: row.name },
-      }),
-      selectable: true,
-      showTooltip: false,
-    }"
-    row-key="name"
-  >
-    <ListHeader />
-    <ListRows>
-      <ListRow
-        v-for="row in rows"
-        :key="row.name"
-        v-slot="{ column, item }"
-        :row="row"
-      >
-        <div
-          v-if="column.key === '_assign'"
-          @click="(e) => handleFieldClick(e, column.key, item)"
-        >
-          <MultipleAvatar :avatars="[item]" />
-        </div>
-        <ListRowItem
-          v-else
-          :item="item"
-          :class="['text-base', { 'text-3xl font-semibold text-gray-900': checkCondition(row), 'text-gray-600': !checkCondition(row) }]"
-          @click="(e) => handleFieldClick(e, column.key, item)"
-        >
-          <template #prefix>
-            <div v-if="column.key === 'status'">
-              <IndicatorIcon v-if="item == 'Open'" class="text-red-600" />
-              <IndicatorIcon
-                v-else-if="item == 'Replied'"
-                class="text-blue-600"
-              />
-              <IndicatorIcon
-                v-else-if="item == 'Resolved'"
-                class="text-green-700"
-              />
-              <IndicatorIcon v-else class="text-gray-700" />
-            </div>
-          </template>
-          <div v-if="column.key === 'agreement_status'">
-            <Badge
-              v-if="item"
-              :label="item"
-              :theme="slaStatusColorMap[item]"
-              variant="outline"
-            />
-          </div>
-          <div v-else-if="column.key === 'response_by'">
-            <Badge
-              v-if="
-                row.first_responded_on &&
-                dayjs(row.first_responded_on).isBefore(item)
-              "
-              label="Fulfilled"
-              theme="green"
-              variant="outline"
-            />
-            <Badge
-              v-else-if="dayjs(row.first_responded_on).isAfter(item)"
-              label="Failed"
-              theme="red"
-              variant="outline"
-            />
-            <Tooltip v-else :text="dayjs(item).long()">
-              {{ dayjs.tz(item).fromNow() }}
-            </Tooltip>
-          </div>
-          <div v-else-if="column.key === 'resolution_by'">
-            <Badge
-              v-if="
-                row.resolution_date && dayjs(row.resolution_date).isBefore(item)
-              "
-              label="Fulfilled"
-              theme="green"
-              variant="outline"
-            />
-            <Badge
-              v-else-if="dayjs(row.resolution_date).isAfter(item)"
-              label="Failed"
-              theme="red"
-              variant="outline"
-            />
-            <Tooltip v-else :text="dayjs(item).long()">
-              {{ dayjs.tz(item).fromNow() }}
-            {{ get_time_zone(item) }}
-            </Tooltip>
-          </div>
-          <div v-else-if="column.key === 'modified'">
-            {{ dayjs.tz(item).fromNow() }}
-          </div>
-        </ListRowItem>
-      </ListRow>
-    </ListRows>
-  </ListView>
-  <ListFooter
-    v-model="pageLength"
-    class="bottom-0 border-t px-5 py-2"
-    :options="{ rowCount: options.rowCount, totalCount: options.totalCount }"
-    @update:model-value="emit('update:pageLength', $event)"
-    @load-more="emit('update:pageLength', 'loadMore')"
-  />
-</template>
-
 
 <script setup lang="ts">
 import {
@@ -312,6 +198,10 @@ function handleFieldClick(e, name: string, value: string) {
 }
 
 const user = userStore.getUser(props.name);
+
+function checkCondition(row) {
+  return row.someCondition; // Replace with your actual condition
+}
 
 function isSeen(row) {
   return row._seen.includes(user.email);
