@@ -67,7 +67,7 @@ class Search:
 		self,
 		query,
 		start=0,
-		page_length=20,
+		page_length=5,
 		highlight=False,
 	):
 		query = self.clean_query(query)
@@ -243,8 +243,6 @@ class HelpdeskSearch(Search):
 
 @frappe.whitelist()
 def search(query, only_articles=False):
-	if not is_agent():
-		return []
 	search = HelpdeskSearch()
 	query = search.clean_query(query)
 	query_parts = query.split(" ")
@@ -258,7 +256,9 @@ def search(query, only_articles=False):
 		doctype, name = r.id.split(":")
 		r.doctype = doctype
 		r.name = name
-		if doctype == "HD Ticket":
+		if doctype == "HD Ticket" and not only_articles:
+			if not is_agent():
+				r = []
 			groups.setdefault("Tickets", []).append(r)
 		if doctype == "HD Article":
 			groups.setdefault("Articles", []).append(r)
