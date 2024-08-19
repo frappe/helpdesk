@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
+  <div class="flex h-full flex-col overflow-hidden scroll-smooth">
     <PageTitle v-if="!route.meta.public">
       <template #title>
         <Breadcrumbs :items="breadcrumbs" />
@@ -21,9 +21,10 @@
     <div class="overflow-auto">
       <div class="container m-auto my-12">
         <TextEditor
-          :content="article.data?.content"
+          :content="textEditorContentWithIDs"
           :editable="editMode"
           :placeholder="placeholder"
+          :extensions="[PreserveIds]"
           class="rounded"
           :class="{
             shadow: editMode,
@@ -93,6 +94,7 @@ import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTo
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
 import KnowledgeBaseArticleTopPublic from "./knowledge-base/KnowledgeBaseArticleTopPublic.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
+import { Extension } from "@tiptap/core";
 
 const props = defineProps({
   articleId: {
@@ -331,4 +333,44 @@ const textEditorMenuButtons = [
     "DeleteTable",
   ],
 ];
+
+// extension to preserve ids in html of headings
+const PreserveIds: Extension = Extension.create({
+  name: "preserveIds",
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["heading"],
+        attributes: {
+          id: {
+            default: null,
+            parseHTML: (element) => element.getAttribute("id"),
+            renderHTML: (attributes) => {
+              if (!attributes.id) {
+                return {};
+              }
+              return { id: attributes.id };
+            },
+          },
+        },
+      },
+    ];
+  },
+});
+
+const textEditorContentWithIDs = computed(() =>
+  addLinksToHeadings(article.data?.content)
+);
+
+function addLinksToHeadings(content: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+  const headings = doc.querySelectorAll("h2, h3, h4, h5, h6");
+  headings.forEach((heading) => {
+    const text = heading.textContent.trim();
+    const id = text.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+    heading.setAttribute("id", id);
+  });
+  return doc.body.innerHTML;
+}
 </script>
