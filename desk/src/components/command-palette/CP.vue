@@ -133,7 +133,9 @@ export default {
             } else if (group.title === "Articles") {
               group.component = "CPGroupResult";
               group.items = group.items.map((item) => {
-                item.subject = item.payload.category + " / " + item.subject;
+								if (item.headings) {
+									item.subject = item.subject + " / " + item.headings;
+								}
                 item.route = {
                   name: "DeskKBArticle",
                   params: {
