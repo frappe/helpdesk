@@ -26,8 +26,9 @@
           :to="{
             name: 'KBArticlePublic',
             params: {
-              articleId: a.id.split(':')[1],
+              articleId: a.name.split('#')[0],
             },
+            hash: `#${a.name.split('#')[1]}`,
           }"
           target="_blank"
         >
