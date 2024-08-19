@@ -163,19 +163,14 @@ class HelpdeskSearch(Search):
 
 	def index_doc(self, doc):
 		id = f"{doc.doctype}:{doc.name}"
-		fields, payload = None, None
+		fields = None
 		if doc.doctype == "HD Ticket":
 			fields = {
 				"doctype": doc.doctype,
 				"name": doc.name,
 				"subject": doc.subject,
 				"team": doc.agent_group,
-				"headings": doc.headings,
 				"modified": doc.modified,
-			}
-			payload = {
-				"subject": doc.subject,
-				"team": doc.agent_group,
 			}
 		if doc.doctype == "HD Article":
 			fields = {
@@ -186,11 +181,8 @@ class HelpdeskSearch(Search):
 				"headings": doc.headings,
 				"modified": doc.modified,
 			}
-			payload = {
-				"category": doc.category,
-			}
-		if fields and payload:
-			self.add_document(id, fields, payload)
+		if fields:
+			self.add_document(id, fields)
 
 	def remove_doc(self, doc):
 		key = f"{doc.doctype}:{doc.name}"
@@ -233,7 +225,6 @@ class HelpdeskSearch(Search):
 		return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
 
 	def get_records(self, doctype):
-		print(f"Getting records for {doctype}")
 		records = []
 		for d in frappe.db.get_all(doctype, fields=self.DOCTYPE_FIELDS[doctype]):
 			d.doctype = doctype
