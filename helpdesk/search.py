@@ -3,15 +3,17 @@
 
 from __future__ import unicode_literals
 
+from copy import deepcopy
 import json
 import re
 
 import frappe
-from frappe.utils import cstr, update_progress_bar
+from frappe.utils import cstr, strip_html_tags, update_progress_bar
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
+from bs4 import BeautifulSoup, PageElement
 
 from helpdesk.utils import is_agent
 
@@ -46,7 +48,7 @@ class Search:
 		self.redis.ft(self.index_name).create_index(schema, definition=index_def)
 		self._index_exists = True
 
-	def add_document(self, id, doc, payload=None):
+	def add_document(self, id, doc):
 		doc = frappe._dict(doc)
 		doc_id = self.redis.make_key(f"{self.prefix}:{id}").decode()
 		mapping = {}
@@ -54,9 +56,7 @@ class Search:
 			if field.name in doc:
 				mapping[field.name] = cstr(doc[field.name])
 		if self.index_exists():
-			self.redis.ft(self.index_name).add_document(
-				doc_id, payload=json.dumps(payload), replace=True, **mapping
-			)
+			self.redis.ft(self.index_name).add_document(doc_id, replace=True, **mapping)
 
 	def remove_document(self, id):
 		key = self.redis.make_key(f"{self.prefix}:{id}").decode()
@@ -67,22 +67,16 @@ class Search:
 		self,
 		query,
 		start=0,
-		page_length=50,
-		sort_by=None,
+		page_length=5,
 		highlight=False,
-		with_payloads=False,
 	):
 		query = self.clean_query(query)
 		query = Query(query).paging(start, page_length)
 		if highlight:
 			query = query.highlight(tags=["<mark>", "</mark>"])
-		if sort_by:
-			parts = sort_by.split(" ")
-			sort_field = parts[0]
-			direction = parts[1] if len(parts) > 1 else "asc"
-			query = query.sort_by(sort_field, asc=direction == "asc")
-		if with_payloads:
-			query = query.with_payloads()
+
+		query.summarize(fields=["description"])
+		query.scorer("BM25")
 
 		try:
 			result = self.redis.ft(self.index_name).search(query)
@@ -125,17 +119,33 @@ class Search:
 
 class HelpdeskSearch(Search):
 	schema = [
-		{"name": "name", "weight": 5},
-		{"name": "subject", "weight": 2},
-		{"name": "description", "weight": 1},
+		{"name": "name", "weight": 1},
+		{"name": "subject", "weight": 3},
+		{"name": "description", "weight": 3},
+		{"name": "headings", "weight": 4},
 		{"name": "team", "type": "tag"},
 		{"name": "modified", "sortable": True},
 		{"name": "creation", "sortable": True},
 	]
 
 	DOCTYPE_FIELDS = {
-		"HD Ticket": ["name", "subject", "description", "agent_group", "modified", "creation",],
-		"HD Article": ["name", "category", "title", "content", "modified", "creation", "author", "category.category_name as category"],
+		"HD Ticket": [
+			"name",
+			"subject",
+			"description",
+			"agent_group",
+			"modified",
+			"creation",
+		],
+		"HD Article": [
+			"name",
+			"category",
+			"title",
+			"content",
+			"modified",
+			"creation",
+			"category.category_name as category",
+		],
 	}
 
 	def __init__(self):
@@ -153,7 +163,7 @@ class HelpdeskSearch(Search):
 
 	def index_doc(self, doc):
 		id = f"{doc.doctype}:{doc.name}"
-		fields, payload = None, None
+		fields = None
 		if doc.doctype == "HD Ticket":
 			fields = {
 				"doctype": doc.doctype,
@@ -162,60 +172,95 @@ class HelpdeskSearch(Search):
 				"team": doc.agent_group,
 				"modified": doc.modified,
 			}
-			payload = {
-				"subject": doc.subject,
-				"team": doc.agent_group,
-			}
 		if doc.doctype == "HD Article":
 			fields = {
 				"doctype": doc.doctype,
 				"name": doc.name,
 				"subject": doc.title,
-				"description": doc.content,
+				"description": strip_html_tags(doc.content),
+				"headings": doc.headings,
 				"modified": doc.modified,
 			}
-			payload = {
-				"author": doc.author,
-				"category": doc.category,
-			}
-		if fields and payload:
-			self.add_document(id, fields, payload)
+		if fields:
+			self.add_document(id, fields)
 
 	def remove_doc(self, doc):
 		key = f"{doc.doctype}:{doc.name}"
 		self.remove_document(key)
 
+	def extract_headings(self, content: str | None) -> str:
+		try:
+			soup = BeautifulSoup(content, "html.parser")
+		except TypeError:
+			ret = []
+		else:
+			ret = []
+			for tag in ["h1", "h2", "h3", "h4", "h5", "h6"]:
+				for heading in soup.find_all(tag):
+					ret.append(heading.text)
+		return json.dumps(ret)
+
+	def get_sections(self, content: str) -> list[tuple[str, str]]:
+		try:
+			soup = BeautifulSoup(content, "html.parser")
+		except TypeError:
+			return []
+		else:
+			sections = []
+			tag: PageElement
+			section = ""
+			heading = ""
+			for tag in soup.find_all():
+				if tag.name in ["p", "blockquote", "code"]:
+					section += tag.text + "\n"
+				elif tag.name in ["h1", "h2", "h3", "h4", "h5", "h6"]:
+					sections.append((heading, section))
+					section = ""
+					heading = tag.text
+			sections.append((heading, section))
+			return sections
+
+	def scrub(self, text: str):
+		# For permalink
+		return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
+
 	def get_records(self, doctype):
 		records = []
-		for d in frappe.db.get_all(
-			doctype,
-			fields=self.DOCTYPE_FIELDS[doctype]
-		):
+		for d in frappe.db.get_all(doctype, fields=self.DOCTYPE_FIELDS[doctype]):
 			d.doctype = doctype
-			records.append(d)
+			if doctype == "HD Article":
+				for heading, section in self.get_sections(d.content):
+					cd = deepcopy(d)
+					cd.name = d.name + f"#{self.scrub(heading)}"
+					cd.content = section
+					cd.headings = heading
+					records.append(cd)
+			elif doctype == "HD Ticket":
+				d.headings = self.extract_headings(d.description)
+				records.append(d)
 		return records
 
 
 @frappe.whitelist()
-def search(query):
-	if not is_agent():
-		return []
+def search(query, only_articles=False):
 	search = HelpdeskSearch()
 	query = search.clean_query(query)
 	query_parts = query.split(" ")
 	if len(query_parts) == 1 and not query_parts[0].endswith("*"):
-		query = f"{query_parts[0]}*"
+		query = f"*{query_parts[0]}*"
 	if len(query_parts) > 1:
-		query = " ".join([f"%%{q}%%" for q in query_parts])
-	result = search.search(query, start=0, sort_by="modified desc", with_payloads=True)
+		query = " ".join([f"%{q}%" for q in query_parts])
+	result = search.search(query, start=0, highlight=True)
 	groups = {}
 	for r in result.docs:
 		doctype, name = r.id.split(":")
 		r.doctype = doctype
 		r.name = name
-		if doctype == "HD Ticket":
+		if doctype == "HD Ticket" and not only_articles:
+			if not is_agent():
+				r = []
 			groups.setdefault("Tickets", []).append(r)
-		elif doctype == "HD Article":
+		if doctype == "HD Article":
 			groups.setdefault("Articles", []).append(r)
 
 	out = []
