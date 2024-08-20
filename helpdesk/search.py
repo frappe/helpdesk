@@ -337,3 +337,13 @@ def build_index_if_not_exists():
 	search = HelpdeskSearch()
 	if not search.index_exists():
 		build_index()
+
+@filelock("helpdesk_corpus_download", timeout=60)
+def download_corpus():
+	from nltk import download, data
+	try:
+		data.find("taggers/averaged_perceptron_tagger_eng.zip")
+		data.find("tokenizers/punkt_tab.zip")
+	except LookupError:
+		download("averaged_perceptron_tagger_eng")
+		download("punkt_tab")

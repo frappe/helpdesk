@@ -1,1 +1,2 @@
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
+textblob==0.18.0.post0
