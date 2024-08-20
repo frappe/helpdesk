@@ -17,6 +17,50 @@ from bs4 import BeautifulSoup, PageElement
 
 from helpdesk.utils import is_agent
 
+STOPWORDS = [
+	"a",
+	"is",
+	"the",
+	"an",
+	"and",
+	"are",
+	"as",
+	"at",
+	"be",
+	"but",
+	"by",
+	"for",
+	"if",
+	"in",
+	"into",
+	"it",
+	"no",
+	"not",
+	"of",
+	"on",
+	"or",
+	"such",
+	"that",
+	"their",
+	"then",
+	"there",
+	"these",
+	"they",
+	"this",
+	"to",
+	"was",
+	"will",
+	"with",
+	"how",
+	"what",
+	"where",
+	"when",
+	"i",
+	"you",
+	"me",
+	"do",
+]
+
 
 class Search:
 	unsafe_chars = re.compile(r"[\[\]{}<>+]")
@@ -45,7 +89,11 @@ class Search:
 			else:
 				schema.append(TextField(field.name, **kwargs))
 
-		self.redis.ft(self.index_name).create_index(schema, definition=index_def)
+		self.redis.ft(self.index_name).create_index(
+			schema,
+			definition=index_def,
+			stopwords=STOPWORDS,
+		)
 		self._index_exists = True
 
 	def add_document(self, id, doc):
@@ -96,7 +144,7 @@ class Search:
 	def clean_query(self, query):
 		query = query.strip().replace("-*", "*")
 		query = self.unsafe_chars.sub(" ", query)
-		query = query.strip()
+		query.strip()
 		return query
 
 	def spellcheck(self, query, **kwargs):
@@ -249,7 +297,9 @@ def search(query, only_articles=False):
 	if len(query_parts) == 1 and not query_parts[0].endswith("*"):
 		query = f"*{query_parts[0]}*"
 	if len(query_parts) > 1:
-		query = " ".join([f"%{q}%" for q in query_parts])
+		query = " ".join(
+			[f"%{q}%" for q in query_parts if q not in STOPWORDS]
+		)  # for stopwords to be ignored
 	result = search.search(query, start=0, highlight=True)
 	groups = {}
 	for r in result.docs:
