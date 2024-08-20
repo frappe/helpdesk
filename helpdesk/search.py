@@ -8,6 +8,7 @@ import json
 import re
 
 import frappe
+from frappe.utils.synchronization import filelock
 from frappe.utils import cstr, strip_html_tags, update_progress_bar
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
@@ -319,6 +320,7 @@ def search(query, only_articles=False):
 	return out
 
 
+@filelock("helpdesk_search_indexing", timeout=60)
 def build_index():
 	frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
 	search = HelpdeskSearch()
