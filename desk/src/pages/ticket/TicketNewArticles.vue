@@ -4,7 +4,7 @@
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
     <div class="mb-2 font-medium">
-      These articles may already cover what you looking for
+      These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
         :to="{
@@ -33,6 +33,7 @@
           target="_blank"
         >
           <dt class="font-semibold">{{ a.subject }} - {{ a.headings }}</dt>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <dd class="font-light" v-html="a.description"></dd>
         </RouterLink>
       </div>

@@ -6,11 +6,7 @@
   >
     <template #body>
       <div>
-        <Combobox
-          v-slot="{ activeIndex }"
-          nullable
-          @update:model-value="onSelection"
-        >
+        <Combobox nullable @update:model-value="onSelection">
           <div class="relative">
             <div class="pl-4.5 absolute inset-y-0 left-0 flex items-center">
               <LucideSearch class="h-4 w-4" />
@@ -28,7 +24,7 @@
             :hold="true"
           >
             <div
-              v-for="(group, index) in groupedSearchResults"
+              v-for="group in groupedSearchResults"
               :key="group.title"
               class="mt-4.5 mb-2 first:mt-3"
             >
@@ -69,10 +65,8 @@ import {
 } from "@headlessui/vue";
 import CPGroup from "./CPGroup.vue";
 import CPGroupResult from "./CPGroupResult.vue";
-import LucideLayoutGrid from "~icons/lucide/layout-grid";
 import LucideSearch from "~icons/lucide/file-search";
 import LucideTicket from "~icons/lucide/ticket";
-import LucideUser from "~icons/lucide/user";
 import LucideBookOpen from "~icons/lucide/book-open";
 
 let show = ref(false);
@@ -133,9 +127,9 @@ export default {
             } else if (group.title === "Articles") {
               group.component = "CPGroupResult";
               group.items = group.items.map((item) => {
-								if (item.headings) {
-									item.subject = item.subject + " / " + item.headings;
-								}
+                if (item.headings) {
+                  item.subject = item.subject + " / " + item.headings;
+                }
                 item.route = {
                   name: "DeskKBArticle",
                   params: {
