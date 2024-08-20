@@ -76,7 +76,7 @@ class Search:
 
 	def create_index(self):
 		index_def = IndexDefinition(
-			prefix=[f"{self.redis.make_key(self.prefix).decode()}:"],
+			prefix=[f"{self.redis.make_key(self.prefix).decode()}:"], score=2
 		)
 		schema = []
 		for field in self.schema:
@@ -125,7 +125,7 @@ class Search:
 			query = query.highlight(tags=["<mark>", "</mark>"])
 
 		query.summarize(fields=["description"])
-		query.scorer("BM25")
+		query.scorer("DISMAX")
 
 		try:
 			result = self.redis.ft(self.index_name).search(query)
@@ -295,12 +295,9 @@ def search(query, only_articles=False):
 	search = HelpdeskSearch()
 	query = search.clean_query(query)
 	query_parts = query.split(" ")
-	if len(query_parts) == 1 and not query_parts[0].endswith("*"):
-		query = f"*{query_parts[0]}*"
-	if len(query_parts) > 1:
-		query = " ".join(
-			[f"%{q}%" for q in query_parts if q not in STOPWORDS]
-		)  # for stopwords to be ignored
+	query = " ".join(
+		[f"%{q}%" for q in query_parts if q not in STOPWORDS]
+	)  # for stopwords to be ignored
 	result = search.search(query, start=0, highlight=True)
 	groups = {}
 	for r in result.docs:
