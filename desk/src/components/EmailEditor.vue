@@ -148,7 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineModel, ref, computed, nextTick } from "vue";
+import { ref, computed, nextTick } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
