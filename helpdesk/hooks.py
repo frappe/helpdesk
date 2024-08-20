@@ -7,19 +7,25 @@ app_color = "grey"
 app_email = "hello@frappe.io"
 app_license = "AGPLv3"
 
-add_to_apps_screen = [{
-    "name": "helpdesk",
-    "logo": "/assets/helpdesk/desk/favicon.svg",
-    "title": "Helpdesk",
-    "route": "/helpdesk",
-}]
+add_to_apps_screen = [
+	{
+		"name": "helpdesk",
+		"logo": "/assets/helpdesk/desk/favicon.svg",
+		"title": "Helpdesk",
+		"route": "/helpdesk",
+	}
+]
 
 before_install = "helpdesk.setup.install.before_install"
 after_install = "helpdesk.setup.install.after_install"
-after_migrate = "helpdesk.search.build_index_in_background"
+after_migrate = [
+	"helpdesk.search.build_index_in_background",
+	"helpdesk.search.download_corpus",
+]
 
 scheduler_events = {
 	"all": ["helpdesk.search.build_index_if_not_exists"],
+	"hourly": ["helpdesk.search.download_corpus"],
 }
 
 

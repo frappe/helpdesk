@@ -8,6 +8,7 @@ import json
 import re
 
 import frappe
+from frappe.utils.synchronization import filelock
 from frappe.utils import cstr, strip_html_tags, update_progress_bar
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
@@ -75,7 +76,7 @@ class Search:
 
 	def create_index(self):
 		index_def = IndexDefinition(
-			prefix=[f"{self.redis.make_key(self.prefix).decode()}:"],
+			prefix=[f"{self.redis.make_key(self.prefix).decode()}:"], score=2
 		)
 		schema = []
 		for field in self.schema:
@@ -124,7 +125,7 @@ class Search:
 			query = query.highlight(tags=["<mark>", "</mark>"])
 
 		query.summarize(fields=["description"])
-		query.scorer("BM25")
+		query.scorer("DISMAX")
 
 		try:
 			result = self.redis.ft(self.index_name).search(query)
@@ -294,12 +295,9 @@ def search(query, only_articles=False):
 	search = HelpdeskSearch()
 	query = search.clean_query(query)
 	query_parts = query.split(" ")
-	if len(query_parts) == 1 and not query_parts[0].endswith("*"):
-		query = f"*{query_parts[0]}*"
-	if len(query_parts) > 1:
-		query = " ".join(
-			[f"%{q}%" for q in query_parts if q not in STOPWORDS]
-		)  # for stopwords to be ignored
+	query = " ".join(
+		[f"%{q}%" for q in query_parts if q not in STOPWORDS]
+	)  # for stopwords to be ignored
 	result = search.search(query, start=0, highlight=True)
 	groups = {}
 	for r in result.docs:
@@ -319,6 +317,7 @@ def search(query, only_articles=False):
 	return out
 
 
+@filelock("helpdesk_search_indexing", timeout=60)
 def build_index():
 	frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
 	search = HelpdeskSearch()
@@ -335,3 +334,13 @@ def build_index_if_not_exists():
 	search = HelpdeskSearch()
 	if not search.index_exists():
 		build_index()
+
+@filelock("helpdesk_corpus_download", timeout=60)
+def download_corpus():
+	from nltk import download, data
+	try:
+		data.find("taggers/averaged_perceptron_tagger_eng.zip")
+		data.find("tokenizers/punkt_tab.zip")
+	except LookupError:
+		download("averaged_perceptron_tagger_eng")
+		download("punkt_tab")
