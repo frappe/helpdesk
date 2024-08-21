@@ -4,7 +4,7 @@
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
     <div class="mb-2 font-medium">
-      Did you know? These articles might cover what you looking for
+      These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
         :to="{
@@ -15,31 +15,29 @@
         <span class="text-xs">(View All)</span>
       </RouterLink>
     </div>
-    <ul class="space-y-2">
-      <li
+    <dl class="space-y-2">
+      <div
         v-for="a in articles.data"
-        :key="a.name"
-        class="list-inside list-disc"
+        :key="a.id"
+        class="focus:ring-cyan-30 rounded-md border-2 border-hidden hover:bg-cyan-100 focus:outline-none focus:ring active:bg-cyan-50"
       >
         <RouterLink
           class="group cursor-pointer space-x-1 hover:text-gray-900"
           :to="{
             name: 'KBArticlePublic',
             params: {
-              articleId: a.name,
+              articleId: a.name.split('#')[0],
             },
+            hash: `#${a.name.split('#')[1]}`,
           }"
           target="_blank"
         >
-          <span class="text-gray-800">
-            {{ a.title }}
-          </span>
-          <span class="opacity-0 transition-all group-hover:opacity-100">
-            &LongRightArrow;
-          </span>
+          <dt class="font-semibold">{{ a.subject }} - {{ a.headings }}</dt>
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <dd class="font-light" v-html="a.description"></dd>
         </RouterLink>
-      </li>
-    </ul>
+      </div>
+    </dl>
   </div>
 </template>
 

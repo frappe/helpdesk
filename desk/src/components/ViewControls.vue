@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, h } from "vue";
 import { Dropdown, FeatherIcon, FormControl } from "frappe-ui";
 import { Filter, Sort, ColumnSettings, FadedScrollableDiv } from "@/components";
 import { useAuthStore } from "@/stores/auth";

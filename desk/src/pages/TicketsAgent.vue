@@ -37,6 +37,11 @@
       }"
       @update:page-length="updatePageLength"
       @event:field-click="processFieldClick"
+      @event:export="
+        (e) => {
+          exportRows(e.export_type, e.export_all, e.selections);
+        }
+      "
     />
   </div>
 </template>
@@ -127,6 +132,25 @@ const colFieldType = computed(() => {
   });
   return obj;
 });
+
+async function exportRows(export_type, export_all, selections) {
+  let filters;
+  let page_length;
+  let fields = JSON.stringify(columns.map((f) => f.key));
+  let order_by = sortsToApply;
+
+  if (export_all) {
+    filters = JSON.stringify(filtersToApply);
+    page_length = tickets?.data?.total_count;
+  } else {
+    let filtersClone = { ...filtersToApply };
+    filtersClone["name"] = ["IN", selections];
+    filters = JSON.stringify(filtersClone);
+    page_length = selections.length;
+  }
+
+  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${filters}&order_by=${order_by}&page_length=${page_length}&start=0&view=Report&with_comment_count=1`;
+}
 
 function updatePageLength(value) {
   if (value == "loadMore") {

@@ -38,6 +38,7 @@ def get_list(
 		offset=start,
 		limit=limit,
 		group_by=group_by,
+		order_by=order_by,
 	)
 
 	query = apply_custom_filters(doctype, query)
