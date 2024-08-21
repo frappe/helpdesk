@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col overflow-hidden scroll-smooth">
+  <div class="flex h-full flex-col overflow-hidden">
     <PageTitle v-if="!route.meta.public">
       <template #title>
         <Breadcrumbs :items="breadcrumbs" />
@@ -64,7 +64,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { capture } from "@/telemetry";
 import {
@@ -102,6 +102,20 @@ const props = defineProps({
     required: true,
   },
 });
+
+onMounted(() => {
+  setTimeout(() => {
+    scrollToHeading();
+  }, 100);
+});
+
+function scrollToHeading() {
+  const articleHeading = window.location.hash;
+  if (!articleHeading) return;
+  const headingElement = document.querySelector(articleHeading);
+  if (!headingElement) return;
+  headingElement.scrollIntoView({ behavior: "smooth" });
+}
 
 const route = useRoute();
 const router = useRouter();
