@@ -112,7 +112,7 @@ import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import { CircularProgressBar } from "@/components";
 import UserMenu from "./UserMenu.vue";
-import OnboardingDialog from "@/components/OnboardingDialog.vue";
+import OnboardingDialog from "@/components/onboarding/OnboardingDialog.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
