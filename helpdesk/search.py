@@ -76,7 +76,7 @@ class Search:
 
 	def create_index(self):
 		index_def = IndexDefinition(
-			prefix=[f"{self.redis.make_key(self.prefix).decode()}:"], score=2
+			prefix=[f"{self.redis.make_key(self.prefix).decode()}:"],
 		)
 		schema = []
 		for field in self.schema:
@@ -168,10 +168,10 @@ class Search:
 
 class HelpdeskSearch(Search):
 	schema = [
-		{"name": "name", "weight": 1},
-		{"name": "subject", "weight": 3},
-		{"name": "description", "weight": 3},
-		{"name": "headings", "weight": 4},
+		{"name": "name", "weight": 2},
+		{"name": "subject", "weight": 6},
+		{"name": "description", "weight": 6},
+		{"name": "headings", "weight": 8},
 		{"name": "team", "type": "tag"},
 		{"name": "modified", "sortable": True},
 		{"name": "creation", "sortable": True},
