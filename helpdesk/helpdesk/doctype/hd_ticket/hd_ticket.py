@@ -803,7 +803,8 @@ class HDTicket(Document):
 			"first_responded_on",
 			"modified",
 			"creation",
-			"_assign"
+			"_assign",
+			"resolution_date",
 		]
 		return {'columns': columns, 'rows': rows}
 
