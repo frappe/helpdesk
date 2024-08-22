@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="show" :options="{ size: '4xl' }">
+  <Dialog v-model="show" :options="{ size: '3xl' }">
     <template #body>
       <div class="flex" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-gray-50 p-2">
@@ -23,7 +23,7 @@
             </button>
           </div>
         </div>
-        <div class="flex flex-1 flex-col px-10 pt-10">
+        <div class="flex flex-1 flex-col overflow-scroll p-4">
           <component :is="activeTab.component" v-if="activeTab" />
         </div>
       </div>
@@ -31,7 +31,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { ref, markRaw } from "vue";
+import { ref } from "vue";
 import { Dialog } from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
 import MailPlus from "~icons/lucide/mail-plus";
