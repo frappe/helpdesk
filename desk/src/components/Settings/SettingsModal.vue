@@ -31,7 +31,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ModelRef, ref } from "vue";
 import { Dialog } from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
 import MailPlus from "~icons/lucide/mail-plus";
@@ -49,6 +49,6 @@ let tabs = [
     component: EmailConfiguration,
   },
 ];
-let show = defineModel();
-let activeTab = ref(tabs[0]);
+const show: ModelRef<boolean> = defineModel();
+const activeTab = ref(tabs[0]);
 </script>
