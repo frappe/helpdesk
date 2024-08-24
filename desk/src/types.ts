@@ -162,3 +162,18 @@ export type UserInfo = {
   image: string;
   name: string;
 };
+
+export interface RenderField {
+  label: string;
+  name: string;
+  type: string;
+  placeholder: string;
+}
+
+export interface EmailService {
+  name: string;
+  icon: string;
+  info: string;
+  link: string;
+  custom: boolean;
+}
