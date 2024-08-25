@@ -1,7 +1,7 @@
 <template>
-	<div class="flex flex-col gap-4">
-		<component :is="steps[step]" />
-	</div>
+  <div class="flex flex-col gap-4">
+    <component :is="steps[step]" />
+  </div>
 </template>
 
 <script setup lang="ts">

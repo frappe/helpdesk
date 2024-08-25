@@ -6,21 +6,22 @@ from frappe.model.document import Document
 
 
 class HDFormScript(Document):
-	pass
+    pass
+
 
 def get_form_script(dt, apply_to="Form"):
-	"""Returns the form script for the given doctype"""
-	FormScript = frappe.qb.DocType("HD Form Script")
-	query = (
-		frappe.qb.from_(FormScript)
-		.select("script")
-		.where(FormScript.dt == dt)
-		.where(FormScript.apply_to == apply_to)
-		.where(FormScript.enabled == 1)
-	)
+    """Returns the form script for the given doctype"""
+    FormScript = frappe.qb.DocType("HD Form Script")
+    query = (
+        frappe.qb.from_(FormScript)
+        .select("script")
+        .where(FormScript.dt == dt)
+        .where(FormScript.apply_to == apply_to)
+        .where(FormScript.enabled == 1)
+    )
 
-	doc = query.run(as_dict=True)
-	if doc:
-		return [d.script for d in doc] if len(doc) > 1 else doc[0].script
-	else:
-		return None
+    doc = query.run(as_dict=True)
+    if doc:
+        return [d.script for d in doc] if len(doc) > 1 else doc[0].script
+    else:
+        return None

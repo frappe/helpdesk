@@ -5,10 +5,10 @@
         class="flex h-12 items-center rounded-md py-2 duration-300 ease-in-out"
         :class="
           !sidebarStore.isExpanded
-            ? 'px-0 w-auto'
+            ? 'w-auto px-0'
             : open
-            ? 'bg-white shadow-sm px-2 w-52'
-            : 'hover:bg-gray-200 px-2 w-52'
+            ? 'w-52 bg-white px-2 shadow-sm'
+            : 'w-52 px-2 hover:bg-gray-200'
         "
       >
         <HDLogo class="h-8 w-8 shrink-0 rounded" />
@@ -16,8 +16,8 @@
           class="flex flex-1 flex-col text-left duration-300 ease-in-out"
           :class="
             !sidebarStore.isExpanded
-              ? 'opacity-0 ml-0 w-0 overflow-hidden'
-              : 'opacity-100 ml-2 w-auto'
+              ? 'ml-0 w-0 overflow-hidden opacity-0'
+              : 'ml-2 w-auto opacity-100'
           "
         >
           <div class="text-base font-medium leading-none text-gray-900">
@@ -31,8 +31,8 @@
           class="duration-300 ease-in-out"
           :class="
             !sidebarStore.isExpanded
-              ? 'opacity-0 ml-0 w-0 overflow-hidden'
-              : 'opacity-100 ml-2 w-auto'
+              ? 'ml-0 w-0 overflow-hidden opacity-0'
+              : 'ml-2 w-auto opacity-100'
           "
         >
           <FeatherIcon
