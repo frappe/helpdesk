@@ -179,3 +179,11 @@ export interface EmailService {
 }
 
 export type EmailStep = "email-list" | "email-add" | "email-edit";
+
+export interface EmailAccount {
+  name: string;
+  email_id: string;
+  service: string;
+  enable_incoming?: boolean;
+  enable_outgoing?: boolean;
+}

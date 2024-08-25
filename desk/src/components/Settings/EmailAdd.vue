@@ -63,7 +63,14 @@
         <ErrorMessage v-if="error" class="ml-1" :message="error" />
       </div>
     </div>
-    <div v-if="selectedService" class="mt-auto flex flex-row-reverse">
+    <div v-if="selectedService" class="mt-auto flex justify-between">
+      <Button
+        label="Back"
+        theme="gray"
+        variant="outline"
+        :disabled="insertRes.loading"
+        @click="emits('update:step', 'email-list')"
+      />
       <Button
         label="Create"
         variant="solid"
@@ -86,6 +93,8 @@ import {
   emailDefaults,
 } from "./emailConfig";
 
+const emits = defineEmits(["update:step"]);
+
 const state = reactive({
   email_account_name: "",
   email_id: "",
@@ -93,6 +102,13 @@ const state = reactive({
   api_key: "",
   api_secret: "",
 });
+
+function resetState() {
+  state.email_account_name = "";
+  state.email_id = "";
+  state.password = "";
+  state.api_key = "";
+}
 
 const selectedService = ref(null);
 const fields = computed(() =>
@@ -102,18 +118,15 @@ const fields = computed(() =>
 const insertRes = createResource({
   url: "frappe.client.insert",
   onSuccess: () => {
-    state.email_account_name = "";
-    state.email_id = "";
-    state.password = "";
-    state.api_key = "";
-    state.api_secret = "";
+    resetState();
     createToast({
       title: "Email account created successfully",
       icon: "check",
       iconClasses: "text-green-600",
     });
+    emits("update:step", "email-list");
   },
-  onError: (e) => {
+  onError: () => {
     error.value = "Failed to create email account, Invalid credentials";
   },
 });
@@ -128,6 +141,7 @@ const submit = debounce(() => {
       default_outgoing: true,
       email_sync_option: "ALL",
       initial_sync_count: 100,
+      attachment_limit: 10,
       imap_folder: [
         {
           append_to: "HD Ticket",

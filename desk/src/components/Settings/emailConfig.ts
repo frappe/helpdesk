@@ -136,3 +136,13 @@ export const emailDefaults = {
     smtp_port: 587,
   },
 };
+
+export const emailIcon = {
+  GMail: LogoGmail,
+  Outlook: LogoOutlook,
+  Sendgrid: LogoSendgrid,
+  SparkPost: LogoSparkpost,
+  Yahoo: LogoYahoo,
+  Yandex: LogoYandex,
+  FrappeMail: LogoFrappeMail,
+};

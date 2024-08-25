@@ -1,10 +1,10 @@
 <template>
   <div class="flex-1">
-    <div v-if="step === 'email-list'" class="h-full">
-      <EmailAccountList />
+    <div v-if="step === 'email-add'" class="h-full">
+      <EmailAdd @update:step="updateStep" />
     </div>
-    <div v-else-if="step === 'email-add'" class="h-full">
-      <EmailAdd />
+    <div v-else-if="step === 'email-list'" class="h-full">
+      <EmailAccountList @update:step="updateStep" />
     </div>
     <div v-else-if="step === 'email-edit'" class="h-full">
       <div>Email Edit</div>
@@ -18,7 +18,10 @@ import EmailAccountList from "./EmailAccountList.vue";
 import EmailAdd from "./EmailAdd.vue";
 import { EmailStep } from "@/types";
 
-const step: Ref<EmailStep> = ref("email-add");
+const step: Ref<EmailStep> = ref("email-list");
+function updateStep(newStep: EmailStep) {
+  step.value = newStep;
+}
 </script>
 
 <style scoped></style>
