@@ -177,3 +177,5 @@ export interface EmailService {
   link: string;
   custom: boolean;
 }
+
+export type EmailStep = "email-list" | "email-add" | "email-edit";

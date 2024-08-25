@@ -62,7 +62,7 @@
       :label="isExpanded ? 'Collapse' : 'Expand'"
       :on-click="() => (isExpanded = !isExpanded)"
     />
-    <SettingsModal v-model="showSettingsModal" />
+    <SettingsModal v-if="authStore.isAdmin" v-model="showSettingsModal" />
   </div>
 </template>
 
@@ -176,6 +176,7 @@ const profileSettings = [
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
+    condition: () => authStore.isAdmin,
   },
 ];
 
