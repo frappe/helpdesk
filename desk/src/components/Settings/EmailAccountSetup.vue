@@ -15,15 +15,11 @@
         class="min-w-3 mt-4 flex flex-col items-center gap-1"
         @click="() => (selectedService = s)"
       >
-        <div
-          class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200"
-          :class="{
-            'ring-2 ring-blue-500': s.name === selectedService?.name,
-          }"
-        >
-          <img :src="s.icon" class="h-6 w-6" />
-        </div>
-        <p class="text-center text-xs text-gray-700">{{ s.name }}</p>
+        <EmailProviderIcon
+          :service-name="s.name"
+          :logo="s.icon"
+          :selected="selectedService?.name === s?.name"
+        />
       </div>
     </div>
     <div v-if="selectedService" class="flex flex-col gap-4">
@@ -92,7 +88,7 @@ import {
   services,
   emailDefaults,
 } from "./emailConfig";
-
+import EmailProviderIcon from "./EmailProviderIcon.vue";
 const emits = defineEmits(["update:step"]);
 
 const state = reactive({

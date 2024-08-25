@@ -4,11 +4,7 @@
   >
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">
-      <div
-        class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200"
-      >
-        <img :src="emailIcon[emailAccount.service]" class="h-6 w-6" />
-      </div>
+      <EmailProviderIcon :logo="emailIcon[emailAccount.service]" />
       <p class="text-gray-700 font-semibold">{{ emailAccount.name }}</p>
     </div>
     <!-- email id -->
@@ -21,10 +17,13 @@
 <script setup lang="ts">
 import { EmailAccount } from "@/types";
 import { emailIcon } from "./emailConfig";
+import EmailProviderIcon from "./EmailProviderIcon.vue";
 
-defineProps<{
+interface Props {
   emailAccount: EmailAccount;
-}>();
+}
+
+const props = defineProps<Props>();
 </script>
 
 <style scoped></style>

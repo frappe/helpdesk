@@ -15,7 +15,7 @@
     </div>
     <div class="mt-4">
       <div v-for="emailAccount in emailAccounts.data" :key="emailAccount.name">
-        <EmailAccount
+        <EmailAccountCard
           :emailAccount="emailAccount"
           @click="emits('update:step', 'email-edit')"
         />
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { createListResource } from "frappe-ui";
-import { emailIcon } from "./emailConfig";
+import EmailAccountCard from "./EmailAccountCard.vue";
 
 const emits = defineEmits(["update:step"]);
 
