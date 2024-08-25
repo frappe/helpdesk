@@ -25,7 +25,6 @@ repos:
       - id: prettier
         additional_dependencies:
           - prettier@2.6.2
-          - prettier-plugin-tailwindcss@0.1.11
         types: [file]
         types_or: [javascript, vue, html]
 
