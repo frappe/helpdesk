@@ -25,7 +25,11 @@
         placeholder="A short description"
       />
     </div>
-    <TicketNewArticles :search="subject" class="mx-5 mb-5" />
+    <TicketNewArticles
+      v-if="isCustomerPortal"
+      :search="subject"
+      class="mx-5 mb-5"
+    />
     <div v-if="isCustomerPortal" class="mx-5 mb-5 h-full">
       <TicketTextEditor
         v-show="subject.length > 2 || description.length > 0"
