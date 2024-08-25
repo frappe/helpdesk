@@ -113,7 +113,7 @@ function finish() {
 }
 
 function redirect() {
-  router.replace({ path: '/' });
+  router.replace({ path: "/" });
 }
 
 onBeforeMount(() => {

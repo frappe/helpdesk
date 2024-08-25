@@ -3,7 +3,7 @@
     <svg
       v-for="i in [1, 0.8, 0.6, 0.4, 0.2]"
       :key="i"
-      class="peer fill-gray-300 -all"
+      class="-all peer fill-gray-300"
       :class="{
         'fill-yellow-400': i <= rating,
         'cursor-pointer': !static,

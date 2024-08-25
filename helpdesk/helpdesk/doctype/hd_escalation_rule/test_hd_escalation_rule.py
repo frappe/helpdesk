@@ -6,4 +6,4 @@ from frappe.tests.utils import FrappeTestCase
 
 
 class TestHDEscalationRule(FrappeTestCase):
-	pass
+    pass

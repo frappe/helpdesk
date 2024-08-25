@@ -8,4 +8,4 @@ from frappe.model.document import Document
 
 
 class HDSupportSearchSource(Document):
-	pass
+    pass

@@ -6,10 +6,10 @@ from frappe.model.document import Document
 
 
 class HDTicketActivity(Document):
-	pass
+    pass
 
 
 def log_ticket_activity(ticket, action):
-	return frappe.get_doc(
-		{"doctype": "HD Ticket Activity", "ticket": ticket, "action": action}
-	).insert(ignore_permissions=True)
+    return frappe.get_doc(
+        {"doctype": "HD Ticket Activity", "ticket": ticket, "action": action}
+    ).insert(ignore_permissions=True)

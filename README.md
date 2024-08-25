@@ -10,7 +10,7 @@
 [frappedesk.com](https://frappedesk.com)
 
 <div align="center" style="max-height: 40px;">
-	<a href="https://frappecloud.com/fdesk/signup">
+	<a href="https://frappecloud.com/helpdesk/signup">
 		<img src=".github/try-on-f-cloud-button.svg" height="50">
 	</a>
 </div>
