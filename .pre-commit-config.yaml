@@ -1,44 +1,41 @@
-exclude: 'node_modules|.git'
+exclude: "node_modules|.git"
 default_stages: [commit]
 fail_fast: false
 
-
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+  - repo: https://github.com/psf/black
+    rev: 22.6.0
     hooks:
-      - id: trailing-whitespace
-        files: "helpdesk.*"
-        exclude: ".*json$|.*txt$|.*csv|.*md"
-      - id: check-yaml
-      - id: no-commit-to-branch
-        args: ['--branch', 'develop']
-      - id: check-merge-conflict
-      - id: check-ast
+      - id: black
+        types_or: [python, pyi]
 
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
-        additional_dependencies: [
-          'flake8-bugbear',
-        ]
-        args: ['--config', '.github/helper/.flake8_strict']
-        exclude: ".*setup.py$"
-
-  - repo: https://github.com/adityahase/black
-    rev: 9cb0a69f4d0030cdf687eddf314468b39ed54119
-    hooks:
-      - id: black
-        additional_dependencies: ['click==8.0.4']
+        additional_dependencies:
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-simplify
+        args: ['--config', '.github/helpers/.flake8_strict']
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+    rev: v2.6.2
     hooks:
       - id: prettier
-        types_or: [javascript, vue, scss,ts]
+        additional_dependencies:
+          - prettier@2.6.2
+          - prettier-plugin-tailwindcss@0.1.11
+        types: [file]
+        types_or: [javascript, vue, html]
+
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: [--profile, black]
 
 ci:
-    autoupdate_schedule: weekly
-    skip: []
-    submodules: false
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

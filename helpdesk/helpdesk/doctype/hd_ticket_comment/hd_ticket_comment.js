@@ -2,6 +2,6 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("HD Ticket Comment", {
-	// refresh: function(frm) {
-	// }
-})
+  // refresh: function(frm) {
+  // }
+});
