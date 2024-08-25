@@ -1,12 +1,12 @@
 {% import "templates/emails/macros.html" as utils %} {% block content %}
 
 <td class="text-base leading-6 text-gray-900">
-	<div class="p-8 bg-white from-markdown">
-		<p>Hello,</p>
-		<p>Please confirm your email address by clicking the button below:</p>
-		{{ utils.button('Verify Account', link, true) }} {{ utils.separator() }}
-		{{ utils.signature() }}
-	</div>
+  <div class="from-markdown bg-white p-8">
+    <p>Hello,</p>
+    <p>Please confirm your email address by clicking the button below:</p>
+    {{ utils.button('Verify Account', link, true) }} {{ utils.separator() }} {{
+    utils.signature() }}
+  </div>
 </td>
 
 {% endblock %}

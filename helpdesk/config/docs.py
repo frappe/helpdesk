@@ -8,4 +8,4 @@ Configuration for docs
 
 
 def get_context(context):
-	context.brand_html = "Frappe Helpdesk"
+    context.brand_html = "Frappe Helpdesk"
