@@ -6,7 +6,7 @@
         label="Add Account"
         theme="gray"
         variant="solid"
-        @click="emits('update:step', 'email-add')"
+        @click="emit('update:step', 'email-add')"
       >
         <template #prefix>
           <LucidePlus class="h-4 w-4" />
@@ -17,7 +17,7 @@
       <div v-for="emailAccount in emailAccounts.data" :key="emailAccount.name">
         <EmailAccountCard
           :emailAccount="emailAccount"
-          @click="emits('update:step', 'email-edit')"
+          @click="emit('update:step', 'email-edit', emailAccount)"
         />
       </div>
     </div>
@@ -32,12 +32,22 @@
 <script setup lang="ts">
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
+import { EmailAccountResource } from "@/types";
 
-const emits = defineEmits(["update:step"]);
+const emit = defineEmits(["update:step"]);
 
 const emailAccounts = createListResource({
   doctype: "Email Account",
-  fields: ["name", "email_id", "service", "enable_incoming", "enable_outgoing"],
+  fields: [
+    "name",
+    "email_id",
+    "service",
+    "enable_incoming",
+    "enable_outgoing",
+    "api_key",
+    "api_secret",
+    "password",
+  ],
   filters: {
     email_id: ["Not Like", "%example%"],
   },

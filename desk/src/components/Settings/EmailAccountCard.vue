@@ -23,7 +23,7 @@ interface Props {
   emailAccount: EmailAccount;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 </script>
 
 <style scoped></style>

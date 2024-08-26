@@ -65,7 +65,7 @@
         theme="gray"
         variant="outline"
         :disabled="insertRes.loading"
-        @click="emits('update:step', 'email-list')"
+        @click="emit('update:step', 'email-list')"
       />
       <Button
         label="Create"
@@ -89,7 +89,13 @@ import {
   emailDefaults,
 } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
-const emits = defineEmits(["update:step"]);
+import { EmailStep } from "@/types";
+
+interface E {
+  (event: "update:step", value: EmailStep): void;
+}
+
+const emit = defineEmits<E>();
 
 const state = reactive({
   email_account_name: "",
@@ -120,7 +126,7 @@ const insertRes = createResource({
       icon: "check",
       iconClasses: "text-green-600",
     });
-    emits("update:step", "email-list");
+    emit("update:step", "email-list");
   },
   onError: () => {
     error.value = "Failed to create email account, Invalid credentials";

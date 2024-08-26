@@ -187,3 +187,14 @@ export interface EmailAccount {
   enable_incoming?: boolean;
   enable_outgoing?: boolean;
 }
+
+export interface EmailAccountResource {
+  name: string;
+  email_id: string;
+  service: string;
+  enable_incoming: boolean;
+  enable_outgoing: boolean;
+  api_key?: string;
+  api_secret?: string;
+  password?: string;
+}
