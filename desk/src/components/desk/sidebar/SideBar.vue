@@ -168,15 +168,15 @@ const profileSettings = [
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
   {
-    label: "Log out",
-    icon: "log-out",
-    onClick: () => authStore.logout(),
-  },
-  {
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
     condition: () => authStore.isAdmin,
+  },
+  {
+    label: "Log out",
+    icon: "log-out",
+    onClick: () => authStore.logout(),
   },
 ];
 
