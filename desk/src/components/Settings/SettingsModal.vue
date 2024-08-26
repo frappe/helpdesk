@@ -1,7 +1,7 @@
 <template>
   <Dialog v-model="show" :options="{ size: '3xl' }">
     <template #body>
-      <div class="flex" :style="{ height: 'calc(100vh - 8rem)' }">
+      <div class="flex" :style="{ height: 'calc(100vh - 10rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-gray-50 p-2">
           <h1 class="px-2 pt-2 text-lg font-semibold">Settings</h1>
           <div class="mt-3">

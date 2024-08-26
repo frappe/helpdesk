@@ -14,17 +14,15 @@
 
 <script setup lang="ts">
 import { Ref, ref } from "vue";
-import EmailAccountList from "./EmailAccountList.vue";
 import EmailAdd from "./EmailAdd.vue";
-import { EmailAccountResource, EmailStep } from "@/types";
+import EmailAccountList from "./EmailAccountList.vue";
 import EmailEdit from "./EmailEdit.vue";
+import { EmailAccount, EmailStep } from "@/types";
 
 const step: Ref<EmailStep> = ref("email-list");
-const accountData: Ref<EmailAccountResource> = ref(null);
-function updateStep(newStep: EmailStep, data?: any) {
+const accountData: Ref<EmailAccount> = ref(null);
+function updateStep(newStep: EmailStep, data?: EmailAccount) {
   step.value = newStep;
   accountData.value = data;
 }
 </script>
-
-<style scoped></style>

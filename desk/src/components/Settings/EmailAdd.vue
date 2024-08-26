@@ -13,7 +13,7 @@
         v-for="s in services"
         :key="s.name"
         class="min-w-3 mt-4 flex flex-col items-center gap-1"
-        @click="() => (selectedService = s)"
+        @click="handleSelect(s)"
       >
         <EmailProviderIcon
           :service-name="s.name"
@@ -24,9 +24,7 @@
     </div>
     <div v-if="selectedService" class="flex flex-col gap-4">
       <!-- email service provider info -->
-      <div
-        class="flex items-center justify-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
-      >
+      <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
         <IconAlert class="h-8 min-w-[5%] text-blue-500" />
         <div class="text-wrap text-xs text-gray-700">
           {{ selectedService.info }}
@@ -64,13 +62,13 @@
         label="Back"
         theme="gray"
         variant="outline"
-        :disabled="insertRes.loading"
+        :disabled="addEmailRes.loading"
         @click="emit('update:step', 'email-list')"
       />
       <Button
         label="Create"
         variant="solid"
-        :loading="insertRes.loading"
+        :loading="addEmailRes.loading"
         @click="createEmailAccount"
       />
     </div>
@@ -78,19 +76,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
-import { createResource, debounce } from "frappe-ui";
+import { computed, Reactive, reactive, Ref, ref } from "vue";
+import { createResource } from "frappe-ui";
 import IconAlert from "~icons/espresso/alert-circle";
-import { createToast, validateEmailWithZod } from "@/utils";
+import { createToast } from "@/utils";
 import {
   customProviderFields,
   popularProviderFields,
   services,
-  emailDefaults,
   validateInputs,
 } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
-import { EmailStep } from "@/types";
+import { EmailService, EmailState, EmailStep } from "@/types";
 
 interface E {
   (event: "update:step", value: EmailStep): void;
@@ -98,7 +95,8 @@ interface E {
 
 const emit = defineEmits<E>();
 
-const state = reactive({
+const state: Reactive<EmailState> = reactive({
+  service: "",
   email_account_name: "",
   email_id: "",
   password: "",
@@ -113,13 +111,23 @@ function resetState() {
   state.api_key = "";
 }
 
-const selectedService = ref(null);
+const selectedService: Ref<EmailService> = ref(null);
 const fields = computed(() =>
   selectedService.value.custom ? customProviderFields : popularProviderFields
 );
 
-const insertRes = createResource({
-  url: "frappe.client.insert",
+function handleSelect(service: EmailService) {
+  selectedService.value = service;
+  state.service = service.name;
+}
+
+const addEmailRes = createResource({
+  url: "helpdesk.api.settings.create_email_account",
+  makeParams: (val: EmailState) => {
+    return {
+      ...val,
+    };
+  },
   onSuccess: () => {
     resetState();
     createToast({
@@ -134,40 +142,11 @@ const insertRes = createResource({
   },
 });
 
-const submit = debounce(() => {
-  insertRes.submit({
-    doc: {
-      doctype: "Email Account",
-      enable_incoming: true,
-      enable_outgoing: true,
-      default_incoming: true,
-      default_outgoing: true,
-      email_sync_option: "ALL",
-      initial_sync_count: 100,
-      attachment_limit: 10,
-      imap_folder: [
-        {
-          append_to: "HD Ticket",
-          folder_name: "INBOX",
-        },
-      ],
-      create_contact: true,
-      track_email_status: true,
-      service: selectedService.value.name,
-      use_tls: 1,
-      use_imap: 1,
-      smtp_port: 587,
-      ...state,
-      ...emailDefaults[selectedService.value.name],
-    },
-  });
-}, 300);
-
 const error = ref("");
 function createEmailAccount() {
   error.value = validateInputs(state, selectedService.value.custom);
   if (error.value) return;
-  submit();
+  addEmailRes.submit({ ...state });
 }
 </script>
 

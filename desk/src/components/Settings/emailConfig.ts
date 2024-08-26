@@ -106,38 +106,6 @@ export const services: EmailService[] = [
   },
 ];
 
-export const emailDefaults = {
-  GMail: {
-    email_server: "imap.gmail.com",
-    use_ssl: 1,
-    smtp_server: "smtp.gmail.com",
-  },
-  Outlook: {
-    email_server: "imap-mail.outlook.com",
-    use_ssl: 1,
-    smtp_server: "smtp-mail.outlook.com",
-  },
-  Sendgrid: {
-    smtp_server: "smtp.sendgrid.net",
-    smtp_port: 587,
-  },
-  SparkPost: {
-    smtp_server: "smtp.sparkpostmail.com",
-  },
-  Yahoo: {
-    email_server: "imap.mail.yahoo.com",
-    use_ssl: 1,
-    smtp_server: "smtp.mail.yahoo.com",
-    smtp_port: 587,
-  },
-  Yandex: {
-    email_server: "imap.yandex.com",
-    use_ssl: 1,
-    smtp_server: "smtp.yandex.com",
-    smtp_port: 587,
-  },
-};
-
 export const emailIcon = {
   GMail: LogoGmail,
   Outlook: LogoOutlook,

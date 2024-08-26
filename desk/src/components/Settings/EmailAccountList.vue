@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- header -->
     <div class="flex items-center justify-between">
       <h1 class="text-lg font-semibold">Email Accounts</h1>
       <Button
@@ -13,7 +14,11 @@
         </template>
       </Button>
     </div>
-    <div class="mt-4">
+    <!-- list accounts -->
+    <div
+      v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
+      class="mt-4"
+    >
       <div v-for="emailAccount in emailAccounts.data" :key="emailAccount.name">
         <EmailAccountCard
           :emailAccount="emailAccount"
@@ -21,18 +26,16 @@
         />
       </div>
     </div>
+    <!-- fallback if no email accounts -->
+    <div v-else class="flex items-center justify-center h-64 text-gray-500">
+      Please add an email account to continue.
+    </div>
   </div>
-  <!-- <div
-    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200"
-  >
-    <img :src="emailIcon['GMail']" class="h-6 w-6" />
-  </div> -->
 </template>
 
 <script setup lang="ts">
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
-import { EmailAccountResource } from "@/types";
 
 const emit = defineEmits(["update:step"]);
 
@@ -56,5 +59,3 @@ const emailAccounts = createListResource({
   auto: true,
 });
 </script>
-
-<style scoped></style>

@@ -10,6 +10,18 @@
         :service-name="accountData.service"
       />
     </div>
+    <!-- banner for setting up email account -->
+    <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
+      <IconAlert class="h-8 min-w-[5%] text-blue-500" />
+      <div class="text-wrap text-xs text-gray-700">
+        {{ info.description }}
+        <a :href="info.link" target="_blank" class="text-blue-500 underline"
+          >here</a
+        >
+        .
+      </div>
+    </div>
+    <!-- fields -->
     <div class="flex flex-col gap-2">
       <div class="grid grid-cols-1 gap-4">
         <div
@@ -28,6 +40,7 @@
       </div>
       <ErrorMessage v-if="error" class="ml-1" :message="error" />
     </div>
+    <!-- action buttons -->
     <div class="mt-auto flex justify-between">
       <Button
         label="Back"
@@ -56,11 +69,12 @@ import {
   customProviderFields,
   validateInputs,
 } from "./emailConfig";
-import { EmailAccountResource } from "@/types";
+import { EmailAccount } from "@/types";
 import { createToast } from "@/utils";
+import IconAlert from "~icons/espresso/alert-circle";
 
 interface Props {
-  accountData: EmailAccountResource;
+  accountData: EmailAccount;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -82,6 +96,11 @@ const isCustomService = computed(() => {
   return services.find((s) => s.name === props.accountData.service).custom;
 });
 
+const info = {
+  description: "To know more about setting up email accounts, click",
+  link: "https://docs.erpnext.com/docs/user/manual/en/email-account",
+};
+
 const fields = computed(() => {
   if (isCustomService.value) {
     return customProviderFields;
@@ -100,32 +119,30 @@ async function updateAccount() {
   delete old.name;
   delete updatedEmailAccount.email_account_name;
 
-  const otherFieldChanged = isDirty.value;
+  const otherFieldsChanged = isDirty.value;
   const values = updatedEmailAccount;
 
-  if (!nameChanged && !otherFieldChanged) {
+  if (!nameChanged && !otherFieldsChanged) {
     return;
   }
 
-  let name: string;
   if (nameChanged) {
     try {
-      name = await callRenameDoc();
+      loading.value = true;
+      await callRenameDoc();
       succesHandler();
     } catch (err) {
       errorHandler();
     }
-    loading.value = true;
   }
-  if (otherFieldChanged) {
+  if (otherFieldsChanged) {
     try {
-      name = await callSetValue(values);
+      await callSetValue(values);
       succesHandler();
     } catch (err) {
       errorHandler();
     }
   }
-  loading.value = false;
 }
 
 const isDirty = computed(() => {
@@ -156,7 +173,6 @@ async function callSetValue(values) {
 }
 
 function succesHandler() {
-  loading.value = true;
   emit("update:step", "email-list");
   createToast({
     title: "Email account updated successfully",
