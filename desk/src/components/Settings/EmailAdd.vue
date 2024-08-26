@@ -87,6 +87,7 @@ import {
   popularProviderFields,
   services,
   emailDefaults,
+  validateInputs,
 } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { EmailStep } from "@/types";
@@ -164,30 +165,9 @@ const submit = debounce(() => {
 
 const error = ref("");
 function createEmailAccount() {
-  validateInputs();
+  error.value = validateInputs(state, selectedService.value.custom);
   if (error.value) return;
   submit();
-}
-
-function validateInputs() {
-  if (!state.email_account_name) {
-    error.value = "Account name is required";
-    return;
-  }
-  if (!state.email_id) {
-    error.value = "Email ID is required";
-    return;
-  }
-  const validEmail = validateEmailWithZod(state.email_id);
-  if (!validEmail) {
-    error.value = "Invalid email ID";
-    return;
-  }
-  if (!state.password) {
-    error.value = "Password is required";
-    return;
-  }
-  error.value = "";
 }
 </script>
 

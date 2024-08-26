@@ -6,6 +6,7 @@ import LogoYahoo from "@/assets/images/yahoo.png";
 import LogoYandex from "@/assets/images/yandex.png";
 import LogoFrappeMail from "@/assets/images/frappe-mail.svg";
 import { RenderField, EmailService } from "@/types";
+import { validateEmailWithZod } from "@/utils";
 const fixedFields: RenderField[] = [
   {
     label: "Account Name",
@@ -146,3 +147,28 @@ export const emailIcon = {
   Yandex: LogoYandex,
   FrappeMail: LogoFrappeMail,
 };
+
+export function validateInputs(state, isCustom: boolean) {
+  if (!state.email_account_name) {
+    return "Account name is required";
+  }
+  if (!state.email_id) {
+    return "Email ID is required";
+  }
+  const validEmail = validateEmailWithZod(state.email_id);
+  if (!validEmail) {
+    return "Invalid email ID";
+  }
+  if (!state.password) {
+    return "Password is required";
+  }
+  if (isCustom) {
+    if (!state.api_key) {
+      return "API Key is required";
+    }
+    if (!state.api_secret) {
+      return;
+    }
+  }
+  return "";
+}

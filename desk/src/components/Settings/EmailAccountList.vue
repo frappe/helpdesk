@@ -38,6 +38,7 @@ const emit = defineEmits(["update:step"]);
 
 const emailAccounts = createListResource({
   doctype: "Email Account",
+  cache: true,
   fields: [
     "name",
     "email_id",
