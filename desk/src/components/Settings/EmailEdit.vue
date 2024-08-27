@@ -63,6 +63,7 @@
         label="Back"
         theme="gray"
         variant="outline"
+        :disabled="loading"
         @click="emit('update:step', 'email-list')"
       />
       <Button

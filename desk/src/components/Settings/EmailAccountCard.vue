@@ -9,10 +9,15 @@
         {{ emailAccount.email_account_name }}
       </p>
     </div>
-    <!-- email id -->
     <div>
-      <div class="text-sm text-gray-500">{{ emailAccount.email_id }}</div>
+      <Badge
+        variant="subtle"
+        :label="badgeTitleColor[0]"
+        :theme="badgeTitleColor[1]"
+      />
     </div>
+    <!-- email id -->
+    <div class="text-sm text-gray-500">{{ emailAccount.email_id }}</div>
   </div>
 </template>
 
@@ -20,12 +25,35 @@
 import { EmailAccount } from "@/types";
 import { emailIcon } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
+import { computed } from "vue";
 
 interface Props {
   emailAccount: EmailAccount;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+
+const badgeTitleColor = computed(() => {
+  if (
+    props.emailAccount.default_incoming &&
+    props.emailAccount.default_outgoing
+  ) {
+    const color =
+      props.emailAccount.enable_incoming && props.emailAccount.enable_outgoing
+        ? "blue"
+        : "gray";
+    return ["Default Sending and Inbox", color];
+  } else if (props.emailAccount.default_incoming) {
+    const color = props.emailAccount.enable_incoming ? "blue" : "gray";
+    return ["Default Inbox", color];
+  } else if (props.emailAccount.default_outgoing) {
+    const color = props.emailAccount.enable_outgoing ? "blue" : "gray";
+    return ["Default Sending", color];
+  } else {
+    const color = props.emailAccount.enable_incoming ? "blue" : "gray";
+    return ["Inbox", color];
+  }
+});
 </script>
 
 <style scoped></style>
