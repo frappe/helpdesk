@@ -5,7 +5,9 @@
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">
       <EmailProviderIcon :logo="emailIcon[emailAccount.service]" />
-      <p class="text-gray-700 font-semibold">{{ emailAccount.name }}</p>
+      <p class="text-gray-700 font-semibold">
+        {{ emailAccount.email_account_name }}
+      </p>
     </div>
     <!-- email id -->
     <div>

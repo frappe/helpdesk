@@ -2,9 +2,9 @@ import frappe
 
 
 @frappe.whitelist()
-def create_email_account(
-    service, email_account_name, email_id, password="", api_key="", api_secret=""
-):
+def create_email_account(data):
+
+    service = data.get("service")
     service_config = email_service_config.get(service)
     if not service_config:
         return "Service not supported"
@@ -13,13 +13,13 @@ def create_email_account(
         email_doc = frappe.get_doc(
             {
                 "doctype": "Email Account",
-                "email_id": email_id,
-                "email_account_name": email_account_name,
+                "email_id": data.get("email_id"),
+                "email_account_name": data.get("email_account_name"),
                 "service": service,
-                "enable_incoming": 1,
-                "enable_outgoing": 1,
-                "default_incoming": 1,
-                "default_outgoing": 1,
+                "enable_incoming": data.get("enable_incoming"),
+                "enable_outgoing": data.get("enable_outgoing"),
+                "default_incoming": data.get("default_incoming"),
+                "default_outgoing": data.get("default_outgoing"),
                 "email_sync_option": "ALL",
                 "initial_sync_count": 100,
                 "create_contact": 1,
@@ -34,10 +34,10 @@ def create_email_account(
             "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
         )
         if service == "Frappemail":
-            email_doc.api_key = api_key
-            email_doc.api_secret = api_secret
+            email_doc.api_key = data.get("api_key")
+            email_doc.api_secret = data.get("api_secret")
         else:
-            email_doc.password = password
+            email_doc.password = data.get("password")
 
         email_doc.save()
         return "Email Account Created Successfully"

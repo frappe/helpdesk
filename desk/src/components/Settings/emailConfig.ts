@@ -22,6 +22,36 @@ const fixedFields: RenderField[] = [
   },
 ];
 
+export const incomingOutgoingFields: RenderField[] = [
+  {
+    label: "Enable Incoming",
+    name: "enable_incoming",
+    type: "checkbox",
+    description:
+      "If enabled, tickets can be created from the incoming emails on this account.",
+  },
+  {
+    label: "Enable Outgoing",
+    name: "enable_outgoing",
+    type: "checkbox",
+    description: "If enabled, outgoing emails can be sent from this account.",
+  },
+  {
+    label: "Default Incoming",
+    name: "default_incoming",
+    type: "checkbox",
+    description:
+      "If enabled, all replies to your company (eg: replies@yourcomany.com) will come to this account. Note: Only one account can be default incoming.",
+  },
+  {
+    label: "Default Outgoing",
+    name: "default_outgoing",
+    type: "checkbox",
+    description:
+      "If enabled, all outgoing emails will be sent from this account. Note: Only one account can be default outgoing.",
+  },
+];
+
 export const popularProviderFields = [
   ...fixedFields,
   {

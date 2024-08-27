@@ -25,7 +25,9 @@
     <div v-if="selectedService" class="flex flex-col gap-4">
       <!-- email service provider info -->
       <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
-        <IconAlert class="h-8 min-w-[5%] text-blue-500" />
+        <IconAlert
+          class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
+        />
         <div class="text-wrap text-xs text-gray-700">
           {{ selectedService.info }}
           <a
@@ -38,7 +40,7 @@
         </div>
       </div>
       <!-- service provider fields -->
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-4">
         <div class="grid grid-cols-1 gap-4">
           <div
             v-for="field in fields"
@@ -54,9 +56,25 @@
             />
           </div>
         </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div
+            v-for="field in incomingOutgoingFields"
+            :key="field.name"
+            class="flex flex-col gap-1"
+          >
+            <FormControl
+              v-model="state[field.name]"
+              :label="field.label"
+              :name="field.name"
+              :type="field.type"
+            />
+            <p class="text-xs text-gray-500">{{ field.description }}</p>
+          </div>
+        </div>
         <ErrorMessage v-if="error" class="ml-1" :message="error" />
       </div>
     </div>
+    <!-- action button -->
     <div v-if="selectedService" class="mt-auto flex justify-between">
       <Button
         label="Back"
@@ -85,9 +103,10 @@ import {
   popularProviderFields,
   services,
   validateInputs,
+  incomingOutgoingFields,
 } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
-import { EmailService, EmailState, EmailStep } from "@/types";
+import { EmailService, EmailAccount, EmailStep } from "@/types";
 
 interface E {
   (event: "update:step", value: EmailStep): void;
@@ -95,21 +114,18 @@ interface E {
 
 const emit = defineEmits<E>();
 
-const state: Reactive<EmailState> = reactive({
+const state: Reactive<EmailAccount> = reactive({
   service: "",
   email_account_name: "",
   email_id: "",
   password: "",
   api_key: "",
   api_secret: "",
+  enable_incoming: false,
+  enable_outgoing: false,
+  default_incoming: false,
+  default_outgoing: false,
 });
-
-function resetState() {
-  state.email_account_name = "";
-  state.email_id = "";
-  state.password = "";
-  state.api_key = "";
-}
 
 const selectedService: Ref<EmailService> = ref(null);
 const fields = computed(() =>
@@ -123,13 +139,12 @@ function handleSelect(service: EmailService) {
 
 const addEmailRes = createResource({
   url: "helpdesk.api.settings.create_email_account",
-  makeParams: (val: EmailState) => {
+  makeParams: (val: EmailAccount) => {
     return {
       ...val,
     };
   },
   onSuccess: () => {
-    resetState();
     createToast({
       title: "Email account created successfully",
       icon: "check",
@@ -146,7 +161,8 @@ const error = ref("");
 function createEmailAccount() {
   error.value = validateInputs(state, selectedService.value.custom);
   if (error.value) return;
-  addEmailRes.submit({ ...state });
+
+  addEmailRes.submit({ data: state });
 }
 </script>
 

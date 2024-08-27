@@ -12,7 +12,9 @@
     </div>
     <!-- banner for setting up email account -->
     <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
-      <IconAlert class="h-8 min-w-[5%] text-blue-500" />
+      <IconAlert
+        class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
+      />
       <div class="text-wrap text-xs text-gray-700">
         {{ info.description }}
         <a :href="info.link" target="_blank" class="text-blue-500 underline"
@@ -22,7 +24,7 @@
       </div>
     </div>
     <!-- fields -->
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-4">
       <div class="grid grid-cols-1 gap-4">
         <div
           v-for="field in fields"
@@ -36,6 +38,21 @@
             :type="field.type"
             :placeholder="field.placeholder"
           />
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div
+          v-for="field in incomingOutgoingFields"
+          :key="field.name"
+          class="flex flex-col gap-1"
+        >
+          <FormControl
+            v-model="state[field.name]"
+            :label="field.label"
+            :name="field.name"
+            :type="field.type"
+          />
+          <p class="text-xs text-gray-500">{{ field.description }}</p>
         </div>
       </div>
       <ErrorMessage v-if="error" class="ml-1" :message="error" />
@@ -68,6 +85,7 @@ import {
   popularProviderFields,
   customProviderFields,
   validateInputs,
+  incomingOutgoingFields,
 } from "./emailConfig";
 import { EmailAccount } from "@/types";
 import { createToast } from "@/utils";
@@ -84,22 +102,25 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(["update:step"]);
 
 const state = reactive({
-  email_account_name: props.accountData.name || "",
+  email_account_name: props.accountData.email_account_name || "",
   email_id: props.accountData.email_id || "",
   api_key: props.accountData?.api_key || null,
   api_secret: props.accountData?.api_secret || null,
   password: props.accountData?.password || null,
-});
-const error = ref("");
-
-const isCustomService = computed(() => {
-  return services.find((s) => s.name === props.accountData.service).custom;
+  enable_incoming: props.accountData.enable_incoming || 0,
+  enable_outgoing: props.accountData.enable_outgoing || 0,
+  default_outgoing: props.accountData.default_outgoing || 0,
+  default_incoming: props.accountData.default_incoming || 0,
 });
 
 const info = {
   description: "To know more about setting up email accounts, click",
   link: "https://docs.erpnext.com/docs/user/manual/en/email-account",
 };
+
+const isCustomService = computed(() => {
+  return services.find((s) => s.name === props.accountData.service).custom;
+});
 
 const fields = computed(() => {
   if (isCustomService.value) {
@@ -108,6 +129,7 @@ const fields = computed(() => {
   return popularProviderFields;
 });
 
+const error = ref("");
 const loading = ref(false);
 async function updateAccount() {
   error.value = validateInputs(state, isCustomService.value);
@@ -115,8 +137,9 @@ async function updateAccount() {
   const old = { ...props.accountData };
   const updatedEmailAccount = { ...state };
 
-  const nameChanged = old.name !== updatedEmailAccount.email_account_name;
-  delete old.name;
+  const nameChanged =
+    old.email_account_name !== updatedEmailAccount.email_account_name;
+  delete old.email_account_name;
   delete updatedEmailAccount.email_account_name;
 
   const otherFieldsChanged = isDirty.value;
@@ -137,6 +160,7 @@ async function updateAccount() {
   }
   if (otherFieldsChanged) {
     try {
+      loading.value = true;
       await callSetValue(values);
       succesHandler();
     } catch (err) {
@@ -150,14 +174,18 @@ const isDirty = computed(() => {
     state.email_id !== props.accountData.email_id ||
     state.api_key !== props.accountData.api_key ||
     state.api_secret !== props.accountData.api_secret ||
-    state.password !== props.accountData.password
+    state.password !== props.accountData.password ||
+    state.enable_incoming !== props.accountData.enable_incoming ||
+    state.enable_outgoing !== props.accountData.enable_outgoing ||
+    state.default_outgoing !== props.accountData.default_outgoing ||
+    state.default_incoming !== props.accountData.default_incoming
   );
 });
 
 async function callRenameDoc() {
   const d = await call("frappe.client.rename_doc", {
     doctype: "Email Account",
-    old_name: props.accountData.name,
+    old_name: props.accountData.email_account_name,
     new_name: state.email_account_name,
   });
   return d;
@@ -186,5 +214,3 @@ function errorHandler() {
   error.value = "Failed to update email account, Invalid credentials";
 }
 </script>
-
-<style scoped></style>
