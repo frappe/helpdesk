@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
+import { EmailAccount } from "@/types";
 
 const emit = defineEmits(["update:step"]);
 
@@ -59,5 +60,14 @@ const emailAccounts = createListResource({
   },
   pageLength: 10,
   auto: true,
+  onSuccess: (accounts: EmailAccount[]) => {
+    // convert 0 to false to handle boolean fields
+    accounts.forEach((account) => {
+      account.enable_incoming = Boolean(account.enable_incoming);
+      account.enable_outgoing = Boolean(account.enable_outgoing);
+      account.default_incoming = Boolean(account.default_incoming);
+      account.default_outgoing = Boolean(account.default_outgoing);
+    });
+  },
 });
 </script>

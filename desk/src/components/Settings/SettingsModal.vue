@@ -34,12 +34,19 @@
 import { ModelRef, ref } from "vue";
 import { Dialog } from "frappe-ui";
 import LucideMail from "~icons/lucide/mail";
+import ImageUp from "~icons/lucide/image-up";
 import EmailConfig from "./EmailConfig.vue";
+import Branding from "./Branding.vue";
 let tabs = [
   {
     label: "Email Accounts",
     icon: LucideMail,
     component: EmailConfig,
+  },
+  {
+    label: "Branding",
+    icon: ImageUp,
+    component: Branding,
   },
 ];
 const show: ModelRef<boolean> = defineModel();

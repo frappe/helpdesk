@@ -5,9 +5,12 @@
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">
       <EmailProviderIcon :logo="emailIcon[emailAccount.service]" />
-      <p class="text-gray-700 font-semibold">
-        {{ emailAccount.email_account_name }}
-      </p>
+      <div>
+        <p class="text-gray-700 font-semibold">
+          {{ emailAccount.email_account_name }}
+        </p>
+        <div class="text-sm text-gray-500">{{ emailAccount.email_id }}</div>
+      </div>
     </div>
     <div>
       <Badge
@@ -17,7 +20,6 @@
       />
     </div>
     <!-- email id -->
-    <div class="text-sm text-gray-500">{{ emailAccount.email_id }}</div>
   </div>
 </template>
 

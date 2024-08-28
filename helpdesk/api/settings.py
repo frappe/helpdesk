@@ -39,8 +39,10 @@ def create_email_account(data):
         else:
             email_doc.password = data.get("password")
 
+        # validate whether the credentials are correct
+        email_doc.get_incoming_server()
+        # if correct credentials, save the email account
         email_doc.save()
-        return "Email Account Created Successfully"
     except Exception as e:
         frappe.throw(str(e))
 

@@ -5,7 +5,7 @@ import LogoSparkpost from "@/assets/images/sparkpost.webp";
 import LogoYahoo from "@/assets/images/yahoo.png";
 import LogoYandex from "@/assets/images/yandex.png";
 import LogoFrappeMail from "@/assets/images/frappe-mail.svg";
-import { RenderField, EmailService } from "@/types";
+import { RenderField, EmailService, EmailAccount } from "@/types";
 import { validateEmailWithZod } from "@/utils";
 const fixedFields: RenderField[] = [
   {
@@ -146,7 +146,7 @@ export const emailIcon = {
   FrappeMail: LogoFrappeMail,
 };
 
-export function validateInputs(state, isCustom: boolean) {
+export function validateInputs(state: EmailAccount, isCustom: boolean) {
   if (!state.email_account_name) {
     return "Account name is required";
   }

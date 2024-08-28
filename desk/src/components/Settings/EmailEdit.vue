@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full flex-col gap-4">
     <!-- title and desc -->
-    <div role="heading" aria-level="1" class="flex flex-col gap-1">
+    <div role="heading" aria-level="1" class="flex gap-1 justify-between">
       <h5 class="text-lg font-semibold">Edit Email</h5>
     </div>
     <div class="w-fit">
@@ -104,14 +104,15 @@ const emit = defineEmits(["update:step"]);
 
 const state = reactive({
   email_account_name: props.accountData.email_account_name || "",
+  service: props.accountData.service || "",
   email_id: props.accountData.email_id || "",
   api_key: props.accountData?.api_key || null,
   api_secret: props.accountData?.api_secret || null,
   password: props.accountData?.password || null,
-  enable_incoming: props.accountData.enable_incoming || 0,
-  enable_outgoing: props.accountData.enable_outgoing || 0,
-  default_outgoing: props.accountData.default_outgoing || 0,
-  default_incoming: props.accountData.default_incoming || 0,
+  enable_incoming: props.accountData.enable_incoming || false,
+  enable_outgoing: props.accountData.enable_outgoing || false,
+  default_outgoing: props.accountData.default_outgoing || false,
+  default_incoming: props.accountData.default_incoming || false,
 });
 
 const info = {
@@ -171,6 +172,7 @@ async function updateAccount() {
 }
 
 const isDirty = computed(() => {
+  debugger;
   return (
     state.email_id !== props.accountData.email_id ||
     state.api_key !== props.accountData.api_key ||
