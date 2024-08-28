@@ -6,7 +6,11 @@
     <div v-for="config in brandingConfig" class="flex flex-col gap-2">
       <p class="text-sm text-gray-600">{{ config.title }}</p>
       <div class="flex gap-4 items-center">
-        <Avatar size="3xl" :image="config.image" />
+        <Avatar
+          v-if="config.image && !websiteSettings.loading"
+          size="3xl"
+          :image="config.image"
+        />
         <FileUploader
           v-if="!config.image"
           :fileTypes="['image/*']"

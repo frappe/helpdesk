@@ -51,8 +51,6 @@ const emailAccounts = createListResource({
     "enable_outgoing",
     "default_incoming",
     "default_outgoing",
-    "api_key",
-    "api_secret",
     "password",
   ],
   filters: {
