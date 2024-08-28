@@ -7,4 +7,4 @@ import unittest
 
 
 class TestHDSettings(unittest.TestCase):
-	pass
+    pass

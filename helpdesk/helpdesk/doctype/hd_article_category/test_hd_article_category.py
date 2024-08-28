@@ -6,4 +6,4 @@ import unittest
 
 
 class TestHDArticleCategory(unittest.TestCase):
-	pass
+    pass

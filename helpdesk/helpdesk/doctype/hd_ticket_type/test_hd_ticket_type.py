@@ -7,4 +7,4 @@ import unittest
 
 
 class TestHDTicketType(unittest.TestCase):
-	pass
+    pass

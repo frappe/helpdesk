@@ -8,4 +8,4 @@ from frappe.model.document import Document
 
 
 class HDTicketPriority(Document):
-	pass
+    pass
