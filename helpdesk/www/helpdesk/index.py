@@ -12,6 +12,8 @@ def get_context(context):
     context.frappe_version = frappe.__version__
     context.helpdesk_version = __version__
     context.site_name = frappe.local.site
+    # website favicon
+    context.favicon = get_favicon()
     frappe.db.commit()
 
     # telemetry
@@ -35,9 +37,17 @@ def get_boot():
             "site_name": frappe.local.site,
             "read_only_mode": frappe.flags.read_only,
             "csrf_token": frappe.sessions.get_csrf_token(),
+            "favicon": get_favicon(),
         }
     )
 
 
 def get_default_route():
     return "/helpdesk"
+
+
+def get_favicon():
+    return (
+        frappe.db.get_single_value("Website Settings", "favicon")
+        or "/assets/helpdesk/desk/favicon.svg"
+    )

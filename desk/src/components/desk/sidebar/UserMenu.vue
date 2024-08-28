@@ -11,7 +11,9 @@
             : 'w-52 px-2 hover:bg-gray-200'
         "
       >
-        <HDLogo class="h-8 w-8 shrink-0 rounded" />
+        <Avatar v-if="config.brandLogo" size="2xl" :image="config.brandLogo" />
+        <HDLogo v-else class="h-8 w-8 shrink-0 rounded" />
+
         <div
           class="flex flex-1 flex-col text-left duration-300 ease-in-out"
           :class="
@@ -47,10 +49,13 @@
 </template>
 
 <script setup lang="ts">
-import { Dropdown } from "frappe-ui";
+import { Dropdown, Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useSidebarStore } from "@/stores/sidebar";
+import { useConfigStore } from "@/stores/config";
 import HDLogo from "@/assets/logos/HDLogo.vue";
+
+const config = useConfigStore();
 
 defineProps({
   options: {

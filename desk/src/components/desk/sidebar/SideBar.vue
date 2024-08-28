@@ -62,11 +62,12 @@
       :label="isExpanded ? 'Collapse' : 'Expand'"
       :on-click="() => (isExpanded = !isExpanded)"
     />
+    <SettingsModal v-if="authStore.isAdmin" v-model="showSettingsModal" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
@@ -94,6 +95,7 @@ import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
 import LucideUsers from "~icons/lucide/users";
 import LucideSearch from "~icons/lucide/search";
+import SettingsModal from "@/components/Settings/SettingsModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +103,7 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
+const showSettingsModal = ref(false);
 
 const menuOptions = computed(() => [
   {
@@ -163,6 +166,12 @@ const profileSettings = [
     icon: "book-open",
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
+  },
+  {
+    label: "Settings",
+    icon: "settings",
+    onClick: () => (showSettingsModal.value = true),
+    condition: () => authStore.isAdmin,
   },
   {
     label: "Log out",
