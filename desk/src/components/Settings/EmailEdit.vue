@@ -88,19 +88,23 @@ import {
   validateInputs,
   incomingOutgoingFields,
 } from "./emailConfig";
-import { EmailAccount } from "@/types";
+import { EmailAccount, EmailStep } from "@/types";
 import { createToast } from "@/utils";
 import IconAlert from "~icons/espresso/alert-circle";
 
-interface Props {
+interface P {
   accountData: EmailAccount;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+interface E {
+  (event: "update:step", step: EmailStep): void;
+}
+
+const props = withDefaults(defineProps<P>(), {
   accountData: null,
 });
 
-const emit = defineEmits(["update:step"]);
+const emit = defineEmits<E>();
 
 const state = reactive({
   email_account_name: props.accountData.email_account_name || "",
@@ -172,7 +176,6 @@ async function updateAccount() {
 }
 
 const isDirty = computed(() => {
-  debugger;
   return (
     state.email_id !== props.accountData.email_id ||
     state.api_key !== props.accountData.api_key ||

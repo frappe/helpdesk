@@ -29,11 +29,11 @@ import { emailIcon } from "./emailConfig";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { computed } from "vue";
 
-interface Props {
+interface P {
   emailAccount: EmailAccount;
 }
 
-const props = defineProps<Props>();
+const props = defineProps<P>();
 
 const badgeTitleColor = computed(() => {
   if (

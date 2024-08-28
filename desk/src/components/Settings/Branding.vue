@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { FileUploader, Avatar, createResource } from "frappe-ui";
-import { computed, reactive, ref } from "vue";
+import { computed, reactive } from "vue";
 import { useConfigStore } from "@/stores/config";
 import { createToast } from "@/utils";
 

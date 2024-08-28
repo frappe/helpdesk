@@ -11,13 +11,13 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
+interface P {
   serviceName: string;
   logo?: string;
   selected?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<P>(), {
   serviceName: "",
   selected: false,
   logo: "",
