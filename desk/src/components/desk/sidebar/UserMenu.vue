@@ -56,7 +56,6 @@ import { useConfigStore } from "@/stores/config";
 import HDLogo from "@/assets/logos/HDLogo.vue";
 
 const config = useConfigStore();
-console.log(config.brandLogo);
 
 defineProps({
   options: {

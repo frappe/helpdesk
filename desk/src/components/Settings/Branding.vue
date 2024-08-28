@@ -2,55 +2,33 @@
   <div class="flex flex-col gap-4">
     <h1 class="text-lg font-semibold">Customise your Helpdesk</h1>
 
-    <!-- Brand Logo -->
-    <div>
-      <p class="text-sm text-gray-600 mb-2">Brand Logo</p>
+    <!-- Brand Logo & Favicon -->
+    <div v-for="config in brandingConfig" class="flex flex-col gap-2">
+      <p class="text-sm text-gray-600">{{ config.title }}</p>
       <div class="flex gap-4 items-center">
-        <Avatar size="3xl" :image="state.brandLogo" />
+        <Avatar size="3xl" :image="config.image" />
         <FileUploader
-          v-if="!state.brandLogo"
+          v-if="!config.image"
           :fileTypes="['image/*']"
           @success="
             (file) => {
-              update(file.file_url, 'HD Settings', 'brand_logo');
+              update(file.file_url, config.doctype, config.fieldname);
             }
           "
         >
           <template #default="{ openFileSelector }">
-            <Button @click="openFileSelector()"> Upload Image </Button>
+            <Button
+              @click="openFileSelector()"
+              iconLeft="upload"
+              label="Upload Image"
+            />
           </template>
         </FileUploader>
         <div v-else>
           <Button
             label="Remove"
-            @click="update('', 'HD Settings', 'brand_logo')"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Favicon from Website Settings -->
-    <div>
-      <p class="text-sm text-gray-600 mb-2">Brand Favicon</p>
-      <div class="flex gap-4 items-center">
-        <Avatar size="3xl" :image="state.brandFavicon" />
-        <FileUploader
-          v-if="!websiteSettings.loading && !state.brandFavicon"
-          :fileTypes="['image/*']"
-          @success="
-            (file) => {
-              update(file.file_url, 'Website Settings', 'favicon');
-            }
-          "
-        >
-          <template #default="{ openFileSelector }">
-            <Button @click="openFileSelector()"> Upload Image </Button>
-          </template>
-        </FileUploader>
-        <div v-else>
-          <Button
-            label="Remove"
-            @click="update('', 'Website Settings', 'favicon')"
+            @click="update('', config.doctype, config.fieldname)"
+            iconLeft="trash"
           />
         </div>
       </div>
@@ -60,7 +38,7 @@
 
 <script setup lang="ts">
 import { FileUploader, Avatar, createResource } from "frappe-ui";
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { useConfigStore } from "@/stores/config";
 import { createToast } from "@/utils";
 
@@ -123,7 +101,7 @@ function update(file: String, doctype: String, fieldname: String) {
   });
 }
 
-const dataObject = [
+const brandingConfig = computed(() => [
   {
     title: "Brand Logo",
     image: state.brandLogo,
@@ -136,7 +114,7 @@ const dataObject = [
     doctype: "Website Settings",
     fieldname: "favicon",
   },
-];
+]);
 </script>
 
 <style scoped></style>
