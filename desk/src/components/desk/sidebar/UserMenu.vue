@@ -11,7 +11,7 @@
             : 'w-52 px-2 hover:bg-gray-200'
         "
       >
-        <Avatar v-if="config.brandLogo" size="2xl" :image="config.brandLogo" />
+        <Avatar v-if="config.brandLogo" size="xl" :image="config.brandLogo" />
         <HDLogo v-else class="h-8 w-8 shrink-0 rounded" />
 
         <div
