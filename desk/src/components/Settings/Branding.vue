@@ -21,14 +21,17 @@
               @click="openFileSelector()"
               iconLeft="upload"
               label="Upload Image"
+              :loading="config.loading"
             />
           </template>
         </FileUploader>
+
         <div v-else>
           <Button
             label="Remove"
             @click="update('', config.doctype, config.fieldname)"
             iconLeft="trash"
+            :loading="config.loading"
           />
         </div>
       </div>
@@ -38,7 +41,7 @@
 
 <script setup lang="ts">
 import { FileUploader, Avatar, createResource } from "frappe-ui";
-import { computed, reactive } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useConfigStore } from "@/stores/config";
 import { createToast } from "@/utils";
 
@@ -48,6 +51,28 @@ const state = reactive({
   brandLogo: config.brandLogo,
   brandFavicon: "",
 });
+
+const loadingState = reactive({
+  logoLoading: false,
+  faviconLoading: false,
+});
+
+const brandingConfig = computed(() => [
+  {
+    title: "Brand Logo",
+    image: state.brandLogo,
+    doctype: "HD Settings",
+    fieldname: "brand_logo",
+    loading: loadingState.logoLoading,
+  },
+  {
+    title: "Brand Favicon",
+    image: state.brandFavicon,
+    doctype: "Website Settings",
+    fieldname: "favicon",
+    loading: loadingState.faviconLoading,
+  },
+]);
 
 const websiteSettings = createResource({
   url: "frappe.client.get_value",
@@ -62,25 +87,14 @@ const websiteSettings = createResource({
   auto: true,
 });
 
-const r = createResource({
+const settingsResource = createResource({
   url: "frappe.client.set_value",
   debounce: 1000,
   onSuccess(data) {
     if (data.doctype === "HD Settings") {
-      state.brandLogo = data.brand_logo;
-      createToast({
-        title: "Brand Logo Updated",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      handleLogoChange(data.brand_logo);
     } else {
-      state.brandFavicon = data.favicon;
-      createToast({
-        title: "Favicon Updated",
-        text: "Please refresh the page to see the changes",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      handleFaviconChange(data.favicon);
     }
   },
   onError() {
@@ -89,32 +103,45 @@ const r = createResource({
       icon: "x",
       iconClasses: "text-red-600",
     });
+    loadingState.logoLoading = false;
+    loadingState.faviconLoading = false;
   },
 });
 
-function update(file: String, doctype: String, fieldname: String) {
-  r.submit({
+function update(file: string, doctype: string, fieldname: string) {
+  settingsResource.submit({
     doctype: doctype,
     name: doctype,
     fieldname: fieldname,
     value: file,
   });
+  doctype === "HD Settings"
+    ? (loadingState.logoLoading = true)
+    : (loadingState.faviconLoading = true);
 }
 
-const brandingConfig = computed(() => [
-  {
-    title: "Brand Logo",
-    image: state.brandLogo,
-    doctype: "HD Settings",
-    fieldname: "brand_logo",
-  },
-  {
-    title: "Brand Favicon",
-    image: state.brandFavicon,
-    doctype: "Website Settings",
-    fieldname: "favicon",
-  },
-]);
+function handleLogoChange(url: string) {
+  state.brandLogo = url;
+  loadingState.logoLoading = false;
+
+  createToast({
+    title: "Brand Logo Updated",
+    icon: "check",
+    iconClasses: "text-green-600",
+  });
+}
+
+function handleFaviconChange(url: string) {
+  state.brandFavicon = url;
+  loadingState.faviconLoading = false;
+
+  createToast({
+    title: "Favicon Updated",
+    text: "Please refresh the page to see the changes",
+    icon: "check",
+    iconClasses: "text-green-600",
+  });
+}
 </script>
 
 <style scoped></style>
