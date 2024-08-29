@@ -206,8 +206,11 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
+  const userStore = useUserStore();
+
   if (authStore.isLoggedIn) {
     await authStore.init();
+    await userStore.users.fetch();
   }
 
   if (!authStore.isLoggedIn) {
