@@ -3,7 +3,6 @@ import frappe
 
 @frappe.whitelist()
 def create_email_account(data):
-
     service = data.get("service")
     service_config = email_service_config.get(service)
     if not service_config:
@@ -33,14 +32,14 @@ def create_email_account(data):
         email_doc.append(
             "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
         )
-        if service == "Frappemail":
+        if service == "Frappe Mail":
             email_doc.api_key = data.get("api_key")
             email_doc.api_secret = data.get("api_secret")
         else:
             email_doc.password = data.get("password")
+            # validate whether the credentials are correct
+            email_doc.get_incoming_server()
 
-        # validate whether the credentials are correct
-        email_doc.get_incoming_server()
         # if correct credentials, save the email account
         email_doc.save()
     except Exception as e:
@@ -48,7 +47,7 @@ def create_email_account(data):
 
 
 email_service_config = {
-    "FrappeMail": {
+    "Frappe Mail": {
         "domain": None,
         "password": None,
         "awaiting_password": 0,
