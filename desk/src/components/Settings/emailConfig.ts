@@ -80,7 +80,7 @@ export const customProviderFields = [
 
 export const services: EmailService[] = [
   {
-    name: "FrappeMail",
+    name: "Frappe Mail",
     icon: LogoFrappeMail,
     info: `Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more `,
     link: "https://yandex.com/support/id/authorization/app-passwords.html",
@@ -143,7 +143,7 @@ export const emailIcon = {
   SparkPost: LogoSparkpost,
   Yahoo: LogoYahoo,
   Yandex: LogoYandex,
-  FrappeMail: LogoFrappeMail,
+  "Frappe Mail": LogoFrappeMail,
 };
 
 export function validateInputs(state: EmailAccount, isCustom: boolean) {
@@ -157,7 +157,7 @@ export function validateInputs(state: EmailAccount, isCustom: boolean) {
   if (!validEmail) {
     return "Invalid email ID";
   }
-  if (!state.password) {
+  if (!isCustom && !state.password) {
     return "Password is required";
   }
   if (isCustom) {

@@ -152,6 +152,11 @@ async function updateAccount() {
   const values = updatedEmailAccount;
 
   if (!nameChanged && !otherFieldsChanged) {
+    createToast({
+      title: "No changes made",
+      icon: "info",
+      iconClasses: "text-blue-600",
+    });
     return;
   }
 
