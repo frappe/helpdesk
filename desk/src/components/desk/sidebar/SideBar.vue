@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, markRaw, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
@@ -96,6 +96,7 @@ import LucideUserCircle2 from "~icons/lucide/user-circle-2";
 import LucideUsers from "~icons/lucide/users";
 import LucideSearch from "~icons/lucide/search";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
+import Apps from "@/components/Apps.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -145,9 +146,7 @@ const menuOptions = computed(() => [
 
 const profileSettings = [
   {
-    icon: "corner-up-left",
-    label: "Switch to Desk",
-    onClick: () => window.open("/app"),
+    component: markRaw(Apps),
   },
   {
     label: "Customer portal",
