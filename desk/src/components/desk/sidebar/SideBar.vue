@@ -146,11 +146,6 @@ const menuOptions = computed(() => [
 
 const profileSettings = [
   {
-    icon: "corner-up-left",
-    label: "Switch to Desk",
-    onClick: () => window.open("/app"),
-  },
-  {
     component: markRaw(Apps),
   },
   {
