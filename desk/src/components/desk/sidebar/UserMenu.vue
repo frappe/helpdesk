@@ -11,9 +11,7 @@
             : 'w-52 px-2 hover:bg-gray-200'
         "
       >
-        <Avatar v-if="config.brandLogo" size="xl" :image="config.brandLogo" />
-        <HDLogo v-else class="h-8 w-8 shrink-0 rounded" />
-
+        <BrandLogo />
         <div
           class="flex flex-1 flex-col text-left duration-300 ease-in-out"
           :class="
@@ -53,7 +51,7 @@ import { Dropdown, Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { useSidebarStore } from "@/stores/sidebar";
 import { useConfigStore } from "@/stores/config";
-import HDLogo from "@/assets/logos/HDLogo.vue";
+import BrandLogo from "@/components/BrandLogo.vue";
 
 const config = useConfigStore();
 
