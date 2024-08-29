@@ -18,7 +18,7 @@
         </div>
       </template>
     </Dropdown>
-    <HDLogo class="h-8 w-8" />
+    <BrandLogo />
   </div>
 </template>
 
@@ -28,7 +28,7 @@ import { Dropdown } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
 import { UserAvatar } from "@/components";
-import HDLogo from "@/assets/logos/HDLogo.vue";
+import BrandLogo from "@/components/BrandLogo.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
