@@ -56,13 +56,13 @@
           <div class="space-y-4">
             <FormControl
               v-model="newSubCategoryName"
-              :placeholder="subCategory.doc.category_name"
+              placeholder="Name"
               label="Name"
               type="text"
             />
             <FormControl
               v-model="newSubCategoryDescription"
-              :placeholder="subCategory.doc.description"
+              placeholder="Description"
               label="Description"
               type="textarea"
             />
@@ -80,7 +80,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   createDocumentResource,
@@ -120,6 +120,13 @@ const subCategory = createDocumentResource({
   setValue: {
     onError: useError({ title: "Error creating sub category" }),
   },
+});
+
+watch(showEdit, (newValue) => {
+  if (newValue) {
+    newSubCategoryName.value = subCategory.doc?.category_name || "";
+    newSubCategoryDescription.value = subCategory.doc?.description || "";
+  }
 });
 
 const saveSubCategory = debounce(
