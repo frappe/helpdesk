@@ -1,11 +1,13 @@
 <template>
   <div class="flex h-screen w-screen">
-    <SideBar />
-    <div class="flex h-full flex-1 flex-col overflow-auto">
+    <MobileSidebar />
+    <div class="flex h-full flex-col flex-1 overflow-auto">
+      <MobileAppHeader />
       <slot />
     </div>
   </div>
 </template>
 <script setup>
-import SideBar from "./SideBar.vue";
+import MobileSidebar from "./MobileSidebar.vue";
+import MobileAppHeader from "./MobileAppHeader.vue";
 </script>

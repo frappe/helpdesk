@@ -10,6 +10,7 @@
 		"copy-html-entry": "cp ../helpdesk/public/desk/index.html ../helpdesk/www/helpdesk/index.html"
 	},
 	"dependencies": {
+		"@headlessui/vue": "^1.7.22",
 		"@iconify-json/lucide": "^1.1.99",
 		"@iconify-json/ph": "^1.1.5",
 		"@iconify/tools": "^2.2.6",
@@ -37,7 +38,7 @@
 		"unplugin-vue-components": "^0.25.2",
 		"vee-validate": "^4.8.2",
 		"vite": "^4.4.9",
-    	"vue": "^3.4.12",
+		"vue": "^3.4.12",
 		"vue-echarts": "^6.5.4",
 		"vue-router": "^4.2.2",
 		"vuedraggable": "^4.1.0",
