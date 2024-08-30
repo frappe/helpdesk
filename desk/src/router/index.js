@@ -2,8 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 
-export const WEBSITE_ROOT = "Website Root";
-
 export const ONBOARDING_PAGE = "Setup";
 
 export const CUSTOMER_PORTAL_NEW_TICKET = "TicketNew";
