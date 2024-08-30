@@ -122,21 +122,15 @@ const router = useRouter();
 const authStore = useAuthStore();
 const isNew = props.articleId === "new";
 const editMode = ref(isNew);
-const categoryId = computed(
-  () => article.data?.category.name || route.query.category
-);
-const subCategoryId = computed(
-  () => article.data?.sub_category.name || route.query.subCategory
-);
+const categoryId = computed(() => route.query.category);
+const subCategoryId = computed(() => route.query.subCategory);
 const breadcrumbs = computed(() => {
   const items = [
     {
       label: options__.value.categoryName,
       route: {
         name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
-        params: {
-          categoryId: options__.value.categoryId,
-        },
+        params: { categoryId: options__.value.categoryId },
       },
     },
     {
@@ -158,6 +152,10 @@ const breadcrumbs = computed(() => {
         name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
         params: {
           articleId: article.data?.name,
+        },
+        query: {
+          category: options__.value.categoryId,
+          subCategory: options__.value.subCategoryId,
         },
       },
     });
