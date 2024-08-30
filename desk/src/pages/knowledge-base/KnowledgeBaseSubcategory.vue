@@ -145,6 +145,10 @@ const articles = createListManager({
         params: {
           articleId: d.name,
         },
+        query: {
+          category: route.params.categoryId,
+          subCategory: route.params.subCategoryId,
+        },
       };
     }
     return data;

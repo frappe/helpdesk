@@ -122,12 +122,8 @@ const router = useRouter();
 const authStore = useAuthStore();
 const isNew = props.articleId === "new";
 const editMode = ref(isNew);
-const categoryId = computed(
-  () => article.data?.category.name || route.query.category
-);
-const subCategoryId = computed(
-  () => article.data?.sub_category.name || route.query.subCategory
-);
+const categoryId = computed(() => route.query.category);
+const subCategoryId = computed(() => route.query.subCategory);
 const breadcrumbs = computed(() => {
   const items = [
     {
