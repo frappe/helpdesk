@@ -130,9 +130,7 @@ const breadcrumbs = computed(() => {
       label: options__.value.categoryName,
       route: {
         name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
-        params: {
-          categoryId: options__.value.categoryId,
-        },
+        params: { categoryId: options__.value.categoryId },
       },
     },
     {
@@ -154,6 +152,10 @@ const breadcrumbs = computed(() => {
         name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
         params: {
           articleId: article.data?.name,
+        },
+        query: {
+          category: options__.value.categoryId,
+          subCategory: options__.value.subCategoryId,
         },
       },
     });
