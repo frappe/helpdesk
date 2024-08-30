@@ -48,9 +48,9 @@ const newCategoryDescription = ref("");
 const newCategoryIcon = ref("");
 
 const resetForm = () => {
-  newCategoryName.value = '';
-  newCategoryDescription.value = '';
-  newCategoryIcon.value = '';
+  newCategoryName.value = "";
+  newCategoryDescription.value = "";
+  newCategoryIcon.value = "";
 };
 
 const newCategoryRes = createResource({
