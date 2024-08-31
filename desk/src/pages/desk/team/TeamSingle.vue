@@ -1,8 +1,8 @@
 <template>
   <span>
     <div class="flex flex-col">
-      <PageTitle class="border-b">
-        <template #title>
+      <LayoutHeader>
+        <template #left-header>
           <Breadcrumbs
             :items="[
               {
@@ -20,8 +20,15 @@
             ]"
           />
         </template>
-        <template #right>
+        <template #right-header>
           <div class="flex items-center gap-2">
+            <Dropdown :options="docOptions">
+              <Button variant="ghost">
+                <template #icon>
+                  <IconMoreHorizontal class="h-4 w-4" />
+                </template>
+              </Button>
+            </Dropdown>
             <Button
               label="Add member"
               theme="gray"
@@ -32,17 +39,10 @@
                 <IconPlus class="h-4 w-4" />
               </template>
             </Button>
-            <Dropdown :options="docOptions">
-              <Button variant="ghost">
-                <template #icon>
-                  <IconMoreHorizontal class="h-4 w-4" />
-                </template>
-              </Button>
-            </Dropdown>
           </div>
         </template>
-      </PageTitle>
-      <div class="my-6">
+      </LayoutHeader>
+      <div class="m-2 my-4">
         <div class="container">
           <div class="space-y-4">
             <div class="text-lg font-medium">Members</div>
@@ -147,10 +147,10 @@ import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_LIST, AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { useAgentStore } from "@/stores/agent";
 import { useError } from "@/composables/error";
-import { PageTitle } from "@/components";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";
 import Pill from "@/components/Pill.vue";
+import LayoutHeader from "@/components/LayoutHeader.vue";
 
 const props = defineProps({
   teamId: {
