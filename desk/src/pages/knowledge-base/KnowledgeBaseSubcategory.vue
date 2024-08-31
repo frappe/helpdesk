@@ -125,7 +125,7 @@ const subCategory = createDocumentResource({
         icon: "check",
         iconClasses: "text-green-500",
       });
-      showEdit.value = false; 
+      showEdit.value = false;
     },
     onError: useError({ title: "Error creating sub category" }),
   },
