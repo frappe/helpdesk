@@ -2,8 +2,6 @@
   <Layout>
     <router-view class="z-0 flex flex-1 flex-col overflow-auto" />
   </Layout>
-  <CommandPalette />
-  <Notifications />
 </template>
 
 <script setup lang="ts">
@@ -12,13 +10,13 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { CUSTOMER_PORTAL_LANDING, ONBOARDING_PAGE } from "@/router";
-import { CommandPalette, Notifications } from "@/components";
+
 import { useScreenSize } from "@/composables/screen";
 const router = useRouter();
 const authStore = useAuthStore();
 const configStore = useConfigStore();
 
-const screenSize = useScreenSize();
+const { isMobileView } = useScreenSize();
 
 const MobileLayout = defineAsyncComponent(
   () => import("@/components/Layouts/MobileLayout.vue")
@@ -26,8 +24,9 @@ const MobileLayout = defineAsyncComponent(
 const DesktopLayout = defineAsyncComponent(
   () => import("@/components/Layouts/DesktopLayout.vue")
 );
+
 const Layout = computed(() => {
-  if (screenSize.width < 640) {
+  if (isMobileView.value) {
     return MobileLayout;
   } else {
     return DesktopLayout;

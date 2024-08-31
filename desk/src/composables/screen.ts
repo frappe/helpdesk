@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, reactive } from "vue";
+import { computed, onMounted, onUnmounted, reactive } from "vue";
 
 export function useScreenSize() {
   const size = reactive({
@@ -19,5 +19,11 @@ export function useScreenSize() {
     window.removeEventListener("resize", onResize);
   });
 
-  return size;
+  const mobileThreshold = 640;
+  const isMobileView = computed(() => size.width < mobileThreshold);
+
+  return {
+    size,
+    isMobileView,
+  };
 }
