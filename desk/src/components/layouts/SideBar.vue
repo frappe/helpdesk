@@ -31,7 +31,7 @@
       <SidebarLink
         class="relative"
         label="Notifications"
-        :icon="LucideInbox"
+        :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
       >
@@ -89,7 +89,7 @@ import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
-import LucideInbox from "~icons/lucide/inbox";
+import LucideBell from "~icons/lucide/bell";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";

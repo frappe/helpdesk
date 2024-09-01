@@ -21,7 +21,7 @@
               <SidebarLink
                 class="relative"
                 label="Notifications"
-                :icon="LucideInbox"
+                :icon="LucideBell"
                 :on-click="() => notificationStore.toggle()"
                 :is-expanded="true"
               >
@@ -86,7 +86,7 @@ import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
 import LucideUsers from "~icons/lucide/users";
-import LucideInbox from "~icons/lucide/inbox";
+import LucideBell from "~icons/lucide/bell";
 
 import {
   AGENT_PORTAL_AGENT_LIST,
