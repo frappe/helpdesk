@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 
+import { useScreenSize } from "@/composables/screen";
+const { isMobileView } = useScreenSize();
+
 export const ONBOARDING_PAGE = "Setup";
 
 export const CUSTOMER_PORTAL_NEW_TICKET = "TicketNew";
@@ -126,7 +129,8 @@ const routes = [
       {
         path: "tickets/:ticketId",
         name: "TicketAgent",
-        component: () => import("@/pages/TicketAgent.vue"),
+        component: () =>
+          import(`@/pages/${handleMobileView("TicketAgent")}.vue`),
         props: true,
       },
       {
@@ -196,6 +200,16 @@ const routes = [
     ],
   },
 ];
+
+const handleMobileView = (componentName) => {
+  console.log("componentName", componentName);
+  console.log("isMobileView.value", isMobileView.value);
+  console.log(
+    "return value",
+    isMobileView.value ? `Mobile${componentName}` : componentName
+  );
+  return isMobileView.value ? `Mobile${componentName}` : componentName;
+};
 
 export const router = createRouter({
   history: createWebHistory("/helpdesk/"),
