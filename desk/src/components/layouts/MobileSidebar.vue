@@ -97,6 +97,7 @@ import {
   CUSTOMER_PORTAL_LANDING,
 } from "@/router";
 import Apps from "../Apps.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
@@ -140,6 +141,8 @@ const menuOptions = computed(() => [
   },
 ]);
 
+const authStore = useAuthStore();
+
 const profileSettings = [
   {
     component: markRaw(Apps),
@@ -161,6 +164,11 @@ const profileSettings = [
     icon: "book-open",
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
+  },
+  {
+    label: "Log out",
+    icon: "log-out",
+    onClick: () => authStore.logout(),
   },
 ];
 
