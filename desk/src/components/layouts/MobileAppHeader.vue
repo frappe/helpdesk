@@ -5,7 +5,7 @@
         <FeatherIcon name="menu" class="size-4" />
       </Button>
     </div>
-    <div id="app-header" class="flex-1"></div>
+    <header id="app-header" class="w-full"></header>
   </div>
 </template>
 

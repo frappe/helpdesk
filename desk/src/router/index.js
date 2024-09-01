@@ -202,12 +202,6 @@ const routes = [
 ];
 
 const handleMobileView = (componentName) => {
-  console.log("componentName", componentName);
-  console.log("isMobileView.value", isMobileView.value);
-  console.log(
-    "return value",
-    isMobileView.value ? `Mobile${componentName}` : componentName
-  );
   return isMobileView.value ? `Mobile${componentName}` : componentName;
 };
 
