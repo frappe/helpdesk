@@ -5,23 +5,25 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <Dropdown :options="dropdownOptions">
-          <template #default="{ open }">
-            <Button :label="ticket.data.status">
-              <template #prefix>
-                <IndicatorIcon
-                  :class="ticketStatusStore.textColorMap[ticket.data.status]"
-                />
-              </template>
-              <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
-                  class="h-4"
-                />
-              </template>
-            </Button>
-          </template>
-        </Dropdown>
+        <div class="absolute right-0 pr-2">
+          <Dropdown :options="dropdownOptions">
+            <template #default="{ open }">
+              <Button :label="ticket.data.status">
+                <template #prefix>
+                  <IndicatorIcon
+                    :class="ticketStatusStore.textColorMap[ticket.data.status]"
+                  />
+                </template>
+                <template #suffix>
+                  <FeatherIcon
+                    :name="open ? 'chevron-up' : 'chevron-down'"
+                    class="h-4"
+                  />
+                </template>
+              </Button>
+            </template>
+          </Dropdown>
+        </div>
       </template>
     </LayoutHeader>
     <header
