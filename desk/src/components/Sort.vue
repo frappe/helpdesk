@@ -2,7 +2,12 @@
   <NestedPopover>
     <template #target>
       <Button ref="sortButtonRef" label="Sort">
-        <template #prefix><SortIcon class="h-4" /></template>
+        <template v-if="hideLabel">
+          <SortIcon class="h-4" />
+        </template>
+        <template v-if="!hideLabel" #prefix>
+          <SortIcon class="h-4" />
+        </template>
         <template v-if="sorts?.length" #suffix>
           <div
             class="text-2xs flex h-5 w-5 items-center justify-center rounded bg-gray-900 pt-[1px] font-medium text-white"
@@ -98,6 +103,10 @@ const props = defineProps({
   sorts: {
     type: Array,
     default: () => [],
+  },
+  hideLabel: {
+    type: Boolean,
+    default: false,
   },
 });
 

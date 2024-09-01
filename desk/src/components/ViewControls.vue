@@ -19,11 +19,13 @@
         :sortable-fields="sort.sortableFields"
         :sorts="sort.sorts"
         @event:sort="(e) => emitToParent(e, 'event:sort')"
+        :hide-label="isMobileView"
       />
       <ColumnSettings
         :fields="column.fields"
         :columns="column.columns"
         @event:column="(e) => emitToParent(e, 'event:column')"
+        :hide-label="isMobileView"
       />
     </div>
   </div>
