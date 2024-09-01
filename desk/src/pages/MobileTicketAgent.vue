@@ -25,7 +25,7 @@
       </template>
     </LayoutHeader>
     <header
-      class="flex h-10.5 items-center justify-between py-[7px] px-5 border-b"
+      class="flex h-10.5 items-center justify-between py-[7px] px-3 border-b"
       v-if="ticket.data"
     >
       <!-- left side -->
