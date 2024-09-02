@@ -20,7 +20,7 @@
       </Tooltip>
     </template>
   </LayoutHeader>
-  <div class="divide-y text-base">
+  <div v-if="notificationStore.data.length" class="divide-y text-base">
     <RouterLink
       v-for="n in notificationStore.data"
       :key="n.name"
@@ -63,6 +63,12 @@
       </span>
     </RouterLink>
   </div>
+  <div v-else class="flex flex-1 flex-col items-center gap-2">
+    <LucideBell class="h-20 w-20 text-gray-300" />
+    <div class="text-lg font-medium text-gray-500">
+      {{ "No new notifications" }}
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import { Breadcrumbs, Tooltip } from "frappe-ui";
@@ -73,7 +79,7 @@ import { onClickOutside } from "@vueuse/core";
 import { dayjs } from "@/dayjs";
 import { Notification } from "@/types";
 import { UserAvatar } from "@/components";
-
+import LucideBell from "~icons/lucide/bell";
 const notificationStore = useNotificationStore();
 const target = ref(null);
 onClickOutside(
