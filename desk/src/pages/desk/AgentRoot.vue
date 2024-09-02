@@ -19,10 +19,10 @@ const configStore = useConfigStore();
 const { isMobileView } = useScreenSize();
 
 const MobileLayout = defineAsyncComponent(
-  () => import("@/components/Layouts/MobileLayout.vue")
+  () => import("@/components/layouts/MobileLayout.vue")
 );
 const DesktopLayout = defineAsyncComponent(
-  () => import("@/components/Layouts/DesktopLayout.vue")
+  () => import("@/components/layouts/DesktopLayout.vue")
 );
 
 const Layout = computed(() => {
