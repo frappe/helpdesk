@@ -117,6 +117,11 @@ const routes = [
         component: () => import("@/pages/TicketsAgent.vue"),
       },
       {
+        path: "notifications",
+        name: "Notifications",
+        component: () => import("@/pages/MobileNotifications.vue"),
+      },
+      {
         path: "tickets/new/:templateId?",
         name: "TicketAgentNew",
         component: () => import("@/pages/TicketNew.vue"),

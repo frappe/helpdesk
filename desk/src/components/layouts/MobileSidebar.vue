@@ -24,6 +24,7 @@
                 :icon="LucideBell"
                 :on-click="() => notificationStore.toggle()"
                 :is-expanded="true"
+                to="Notifications"
               >
                 <template #right>
                   <Badge
