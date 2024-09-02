@@ -22,7 +22,7 @@
                 class="relative"
                 label="Notifications"
                 :icon="LucideBell"
-                :on-click="() => notificationStore.toggle()"
+                :on-click="() => (sidebarOpened = false)"
                 :is-expanded="true"
                 to="Notifications"
               >
