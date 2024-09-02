@@ -65,10 +65,13 @@ import TicketCustomerTemplateFields from "./ticket/TicketCustomerTemplateFields.
 import TicketFeedback from "./ticket/TicketFeedback.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { ITicket } from "./ticket/symbols";
+import { useRouter } from "vue-router";
+import { createToast } from "@/utils";
 
 interface P {
   ticketId: string;
 }
+const router = useRouter();
 
 const props = defineProps<P>();
 const ticket = createResource({
@@ -77,6 +80,14 @@ const ticket = createResource({
   auto: true,
   params: {
     name: props.ticketId,
+  },
+  onError: () => {
+    createToast({
+      title: "You are not allowed to view this ticket",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    router.replace("/my-tickets");
   },
 });
 provide(ITicket, ticket);
