@@ -137,6 +137,9 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
   border-color: transparent;
   background: white;
 }
+:deep(.form-control textarea) {
+  field-sizing: content;
+}
 
 :deep(.form-control button) {
   gap: 0;

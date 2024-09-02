@@ -31,7 +31,7 @@
       <SidebarLink
         class="relative"
         label="Notifications"
-        :icon="LucideInbox"
+        :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
       >
@@ -51,7 +51,7 @@
         v-bind="option"
         :key="option.label"
         :is-expanded="isExpanded"
-        :is-active="option.to?.includes(route.name.toString())"
+        :is-active="isActiveTab(option.to)"
       />
     </div>
     <div class="grow" />
@@ -83,13 +83,13 @@ import {
 } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
-import UserMenu from "./UserMenu.vue";
+import UserMenu from "@/components/UserMenu.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
-import LucideInbox from "~icons/lucide/inbox";
+import LucideBell from "~icons/lucide/bell";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
@@ -144,6 +144,9 @@ const menuOptions = computed(() => [
   },
 ]);
 
+function isActiveTab(to: string) {
+  return route.name === to;
+}
 const profileSettings = [
   {
     component: markRaw(Apps),

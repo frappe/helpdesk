@@ -93,11 +93,17 @@ import { UserAvatar } from "@/components";
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
 const target = ref(null);
-onClickOutside(target, () => {
-  if (notificationStore.visible) {
-    notificationStore.toggle();
+onClickOutside(
+  target,
+  () => {
+    if (notificationStore.visible) {
+      notificationStore.toggle();
+    }
+  },
+  {
+    ignore: ["#notifications-btn"],
   }
-});
+);
 
 function getRoute(n: Notification) {
   switch (n.notification_type) {

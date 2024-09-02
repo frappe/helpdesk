@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle title="Agents">
-      <template #right>
+    <LayoutHeader>
+      <template #left-header>
+        <div class="text-lg font-medium text-gray-900">Agents</div>
+      </template>
+      <template #right-header>
         <Button
           label="New agent"
           theme="gray"
@@ -13,7 +16,7 @@
           </template>
         </Button>
       </template>
-    </PageTitle>
+    </LayoutHeader>
     <ListView
       :columns="columns"
       :resource="agents"
@@ -54,8 +57,8 @@ import { AGENT_PORTAL_TICKET_LIST } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import { useFilter } from "@/composables/filter";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
-import PageTitle from "@/components/PageTitle.vue";
 import { ListView } from "@/components";
+import LayoutHeader from "@/components/LayoutHeader.vue";
 
 const { apply, storage } = useFilter("HD Ticket");
 const isDialogVisible = ref(false);

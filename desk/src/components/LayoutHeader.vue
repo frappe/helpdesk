@@ -1,24 +1,22 @@
 <template>
-  <header class="flex h-12 items-center justify-between border-b py-2.5 pl-5">
-    <div class="left-header flex max-w-[60%] items-center gap-2">
-      <slot name="left-header" />
-    </div>
-    <div class="flex items-center gap-2 px-5">
-      <slot name="right-header" class="flex items-center gap-2" />
-    </div>
-  </header>
+  <Teleport to="#app-header" v-if="showHeader">
+    <slot>
+      <header class="flex h-10.5 items-center justify-between mx-4 md:mr-0">
+        <div class="flex items-center gap-2 max-w-[50%]">
+          <slot name="left-header" />
+        </div>
+        <div class="flex items-center gap-2">
+          <slot name="right-header" class="flex items-center gap-2" />
+        </div>
+      </header>
+    </slot>
+  </Teleport>
 </template>
-
 <script setup>
-import { onMounted } from "vue";
+import { ref, nextTick } from "vue";
+const showHeader = ref(false);
 
-onMounted(() => {
-  const leftHeader = document.querySelector(".left-header");
-
-  const currentRoute = leftHeader.querySelector('[aria-current="page"]');
-  currentRoute.classList.add("truncate");
-
-  const span = currentRoute.querySelector("span");
-  span.classList.add("truncate");
+nextTick(() => {
+  showHeader.value = true;
 });
 </script>
