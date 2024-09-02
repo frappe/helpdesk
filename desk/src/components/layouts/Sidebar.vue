@@ -24,7 +24,7 @@
     <span class="mb-4">
       <div
         v-if="notificationStore.unread"
-        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-gray-800"
+        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-300"
         theme="gray"
         variant="solid"
       />
