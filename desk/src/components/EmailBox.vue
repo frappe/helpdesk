@@ -5,11 +5,11 @@
     <div class="mb-1 flex items-center justify-between gap-2">
       <!-- comment design for mobile -->
       <div v-if="isMobileView" class="flex items-center gap-2">
-        <UserAvatar :name="sender.name" size="md" />
-        <div>
+        <UserAvatar :name="sender.name" size="lg" />
+        <div class="leading-tight">
           <span>{{ sender.full_name }}</span>
           <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <div class="text-sm text-gray-600">
+            <div class="text-xs text-gray-600">
               {{ timeAgo(creation) }}
             </div>
           </Tooltip>
