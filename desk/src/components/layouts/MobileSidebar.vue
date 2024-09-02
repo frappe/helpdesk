@@ -45,6 +45,7 @@
               :key="option.label"
               :is-expanded="true"
               :is-active="isActiveTab(option.to)"
+              :on-click="() => (sidebarOpened = false)"
             />
           </div>
         </div>
