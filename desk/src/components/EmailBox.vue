@@ -3,7 +3,20 @@
     class="grow cursor-pointer rounded-md border-transparent bg-gray-50 text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-1 flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
+      <!-- comment design for mobile -->
+      <div v-if="isMobileView" class="flex items-center gap-2">
+        <UserAvatar :name="sender.name" size="md" />
+        <div>
+          <span>{{ sender.full_name }}</span>
+          <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+            <div class="text-sm text-gray-600">
+              {{ timeAgo(creation) }}
+            </div>
+          </Tooltip>
+        </div>
+      </div>
+      <!-- comment design for desktop -->
+      <div v-else class="flex items-center gap-2">
         <UserAvatar :name="sender.name" size="md" />
         <span>{{ sender.full_name }}</span>
         <span>&middot;</span>
@@ -13,6 +26,7 @@
           </div>
         </Tooltip>
       </div>
+
       <div class="flex gap-0.5">
         <Button
           variant="ghost"
@@ -76,6 +90,7 @@
 import { UserAvatar, AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
 import { ReplyIcon, ReplyAllIcon } from "./icons/";
+import { useScreenSize } from "@/composables/screen";
 
 const props = defineProps({
   sender: {
@@ -101,4 +116,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["reply"]);
+
+const { isMobileView } = useScreenSize();
 </script>
