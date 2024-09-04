@@ -13,6 +13,7 @@ add_to_apps_screen = [
         "logo": "/assets/helpdesk/desk/favicon.svg",
         "title": "Helpdesk",
         "route": "/helpdesk",
+        "has_permission": "helpdesk.api.permission.has_app_permission",
     }
 ]
 

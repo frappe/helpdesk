@@ -1,11 +1,7 @@
 <template>
-  <div class="h-screen overflow-y-auto py-3.5">
-    <div
-      v-for="(activity, i) in activities"
-      :key="activity.key"
-      class="activity"
-    >
-      <div class="flex gap-4 px-6">
+  <div class="h-screen overflow-y-auto py-3.5 comm-area w-full">
+    <div v-for="(activity, i) in activities" :key="activity.key">
+      <div class="flex gap-4 px-3 lg:px-6 w-full">
         <div
           class="relative flex justify-center after:absolute after:left-[50%] after:top-0 after:-z-10 after:border-l after:border-gray-200"
           :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
@@ -26,7 +22,7 @@
             />
           </div>
         </div>
-        <div class="mb-4 w-full max-w-[742px]">
+        <div class="mb-4 w-full">
           <EmailBox
             v-if="activity.type === 'email'"
             v-bind="activity"

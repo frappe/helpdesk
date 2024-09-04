@@ -16,6 +16,8 @@
       window.frappe_version = "{{ frappe_version }}";
       window.helpdesk_version = "{{ helpdesk_version }}";
       window.site_name = "{{ site_name }}";
+      window.favicon = "{{ favicon }}";
+      document.querySelector("link").href = window.favicon;
     </script>
   </body>
 </html>

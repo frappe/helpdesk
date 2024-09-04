@@ -46,6 +46,13 @@ const emit = defineEmits<E>();
 const newCategoryName = ref("");
 const newCategoryDescription = ref("");
 const newCategoryIcon = ref("");
+
+const resetForm = () => {
+  newCategoryName.value = "";
+  newCategoryDescription.value = "";
+  newCategoryIcon.value = "";
+};
+
 const newCategoryRes = createResource({
   url: "frappe.client.insert",
   makeParams() {
@@ -68,6 +75,7 @@ const newCategoryRes = createResource({
   },
   onSuccess(data) {
     emit("success", data.name);
+    resetForm();
   },
 });
 </script>

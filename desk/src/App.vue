@@ -1,9 +1,7 @@
 <template>
-  <span class="fixed inset-0">
-    <RouterView class="antialiased" />
-    <Toasts />
-    <KeymapDialog />
-  </span>
+  <RouterView class="antialiased" />
+  <Toasts />
+  <KeymapDialog />
 </template>
 
 <script setup lang="ts">
@@ -15,12 +13,6 @@ import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { stopSession } from "@/telemetry";
 import { init as initTelemetry } from "@/telemetry";
 useConfigStore();
-
-const viewportWidth = ref(
-  Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-);
-
-provide("viewportWidth", viewportWidth);
 
 onMounted(async () => {
   window.addEventListener("online", () => {

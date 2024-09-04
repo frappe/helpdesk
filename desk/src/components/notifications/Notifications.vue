@@ -73,7 +73,7 @@
             <div class="text-sm text-gray-600">
               {{ dayjs.tz(n.creation).fromNow() }}
             </div>
-            <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-gray-900" />
+            <div v-if="!n.read" class="h-1.5 w-1.5 rounded-full bg-blue-400" />
           </div>
         </span>
       </RouterLink>
@@ -93,11 +93,17 @@ import { UserAvatar } from "@/components";
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();
 const target = ref(null);
-onClickOutside(target, () => {
-  if (notificationStore.visible) {
-    notificationStore.toggle();
+onClickOutside(
+  target,
+  () => {
+    if (notificationStore.visible) {
+      notificationStore.toggle();
+    }
+  },
+  {
+    ignore: ["#notifications-btn"],
   }
-});
+);
 
 function getRoute(n: Notification) {
   switch (n.notification_type) {

@@ -23,10 +23,10 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto p-2">
       <div
         v-if="cannedResponses?.data?.data?.length"
-        class="grid grid-cols-4 gap-4 px-5 pb-3"
+        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 px-5 pb-3"
       >
         <div
           v-for="cannedResponse in cannedResponses.data.data"

@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle title="Teams">
-      <template #right>
+    <LayoutHeader>
+      <template #left-header>
+        <div class="text-lg font-medium text-gray-900">Teams</div>
+      </template>
+      <template #right-header>
         <Button
           label="New team"
           theme="gray"
@@ -13,7 +16,7 @@
           </template>
         </Button>
       </template>
-    </PageTitle>
+    </LayoutHeader>
     <ListView
       :columns="columns"
       :resource="teams"
@@ -54,7 +57,7 @@ import { isEmpty } from "lodash";
 import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
 import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
-import PageTitle from "@/components/PageTitle.vue";
+import LayoutHeader from "@/components/LayoutHeader.vue";
 import { ListView } from "@/components";
 import IconPlus from "~icons/lucide/plus";
 

@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle title="Contacts">
-      <template #right>
+    <LayoutHeader>
+      <template #left-header>
+        <div class="text-lg font-medium text-gray-900">Contacts</div>
+      </template>
+      <template #right-header>
         <Button
           label="New contact"
           theme="gray"
@@ -13,7 +16,7 @@
           </template>
         </Button>
       </template>
-    </PageTitle>
+    </LayoutHeader>
     <ListView
       :columns="columns"
       :resource="contacts"
@@ -45,7 +48,7 @@ import { ref } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
 import { createListManager } from "@/composables/listManager";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
-import PageTitle from "@/components/PageTitle.vue";
+import LayoutHeader from "@/components/LayoutHeader.vue";
 import { ListView } from "@/components";
 import ContactDialog from "./ContactDialog.vue";
 import { createToast } from "@/utils";

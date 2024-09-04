@@ -24,14 +24,14 @@
     <span class="mb-4">
       <div
         v-if="notificationStore.unread"
-        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-gray-800"
+        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400"
         theme="gray"
         variant="solid"
       />
       <SidebarLink
         class="relative"
         label="Notifications"
-        :icon="LucideInbox"
+        :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
       >
@@ -51,7 +51,7 @@
         v-bind="option"
         :key="option.label"
         :is-expanded="isExpanded"
-        :is-active="option.to?.includes(route.name.toString())"
+        :is-active="isActiveTab(option.to)"
       />
     </div>
     <div class="grow" />
@@ -62,11 +62,12 @@
       :label="isExpanded ? 'Collapse' : 'Expand'"
       :on-click="() => (isExpanded = !isExpanded)"
     />
+    <SettingsModal v-if="authStore.isAdmin" v-model="showSettingsModal" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, markRaw, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
@@ -82,18 +83,20 @@ import {
 } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
-import UserMenu from "./UserMenu.vue";
+import UserMenu from "@/components/UserMenu.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
-import LucideInbox from "~icons/lucide/inbox";
+import LucideBell from "~icons/lucide/bell";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
 import LucideUserCircle2 from "~icons/lucide/user-circle-2";
 import LucideUsers from "~icons/lucide/users";
 import LucideSearch from "~icons/lucide/search";
+import SettingsModal from "@/components/Settings/SettingsModal.vue";
+import Apps from "@/components/Apps.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +104,7 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
+const showSettingsModal = ref(false);
 
 const menuOptions = computed(() => [
   {
@@ -140,11 +144,12 @@ const menuOptions = computed(() => [
   },
 ]);
 
+function isActiveTab(to: string) {
+  return route.name === to;
+}
 const profileSettings = [
   {
-    icon: "corner-up-left",
-    label: "Switch to Desk",
-    onClick: () => window.open("/app"),
+    component: markRaw(Apps),
   },
   {
     label: "Customer portal",
@@ -163,6 +168,12 @@ const profileSettings = [
     icon: "book-open",
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
+  },
+  {
+    label: "Settings",
+    icon: "settings",
+    onClick: () => (showSettingsModal.value = true),
+    condition: () => authStore.isAdmin,
   },
   {
     label: "Log out",

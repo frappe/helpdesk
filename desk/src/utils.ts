@@ -1,6 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import { toast } from "frappe-ui";
-
+import zod from "zod";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -44,6 +44,11 @@ export function validateEmail(email) {
   const regExp =
     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
+}
+
+export function validateEmailWithZod(email: string) {
+  const success = zod.string().email().safeParse(email).success;
+  return success;
 }
 
 export function dateFormat(date, format) {

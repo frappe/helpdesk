@@ -1,5 +1,35 @@
 <template>
-  <div class="flex items-center justify-between gap-2 px-5 pb-4 pt-3">
+  <div
+    v-if="isMobileView"
+    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
+  >
+    <Filter
+      :filters="filter.filters"
+      :filterable-fields="filter.filterableFields"
+      @event:filter="(e) => emitToParent(e, 'event:filter')"
+    />
+    <div class="flex items-center gap-2">
+      <Button :label="'Refresh'" @click="emit('event:reload')">
+        <template #icon>
+          <RefreshIcon class="h-4 w-4" />
+        </template>
+      </Button>
+
+      <Sort
+        :sortable-fields="sort.sortableFields"
+        :sorts="sort.sorts"
+        @event:sort="(e) => emitToParent(e, 'event:sort')"
+        :hide-label="isMobileView"
+      />
+      <ColumnSettings
+        :fields="column.fields"
+        :columns="column.columns"
+        @event:column="(e) => emitToParent(e, 'event:column')"
+        :hide-label="isMobileView"
+      />
+    </div>
+  </div>
+  <div v-else class="flex items-center justify-between gap-2 px-5 pb-4 pt-3">
     <div class="flex items-center gap-2">
       <Dropdown :options="presetFilters">
         <template #default="{ open }">
@@ -66,6 +96,7 @@ import { Dropdown, FeatherIcon, FormControl } from "frappe-ui";
 import { Filter, Sort, ColumnSettings, FadedScrollableDiv } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { RefreshIcon } from "@/components/icons";
+import { useScreenSize } from "@/composables/screen";
 
 const authStore = useAuthStore();
 let currentPreset = ref("All Tickets");
@@ -84,6 +115,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const { isMobileView } = useScreenSize();
 
 const quickFilterList = computed(() => {
   let filters = [{ name: "name", label: "ID", fieldtype: "Data" }];

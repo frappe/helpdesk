@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 
-export const WEBSITE_ROOT = "Website Root";
+import { useScreenSize } from "@/composables/screen";
+const { isMobileView } = useScreenSize();
 
 export const ONBOARDING_PAGE = "Setup";
 
@@ -116,6 +117,11 @@ const routes = [
         component: () => import("@/pages/TicketsAgent.vue"),
       },
       {
+        path: "notifications",
+        name: "Notifications",
+        component: () => import("@/pages/MobileNotifications.vue"),
+      },
+      {
         path: "tickets/new/:templateId?",
         name: "TicketAgentNew",
         component: () => import("@/pages/TicketNew.vue"),
@@ -128,7 +134,8 @@ const routes = [
       {
         path: "tickets/:ticketId",
         name: "TicketAgent",
-        component: () => import("@/pages/TicketAgent.vue"),
+        component: () =>
+          import(`@/pages/${handleMobileView("TicketAgent")}.vue`),
         props: true,
       },
       {
@@ -199,6 +206,10 @@ const routes = [
   },
 ];
 
+const handleMobileView = (componentName) => {
+  return isMobileView.value ? `Mobile${componentName}` : componentName;
+};
+
 export const router = createRouter({
   history: createWebHistory("/helpdesk/"),
   routes,
@@ -206,8 +217,11 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
+  const userStore = useUserStore();
+
   if (authStore.isLoggedIn) {
     await authStore.init();
+    await userStore.users.fetch();
   }
 
   if (!authStore.isLoggedIn) {
