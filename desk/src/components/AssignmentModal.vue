@@ -9,9 +9,9 @@
     <template #body-content>
       <SearchComplete
         class="form-control"
-        value="1"
-        valueField="is_active"
+        value=""
         doctype="HD Agent"
+        :customFilters="customFilters"
         :reset-input="true"
         @change="
           (option) => {
@@ -116,5 +116,9 @@ const removeCurrentAssignee = (value) => {
       emit("update");
     },
   });
+};
+
+const customFilters = {
+  is_active: ["=", 1],
 };
 </script>

@@ -57,6 +57,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  customFilters: {
+    type: Object,
+    required: false,
+    default: () => ({}),
+  },
 });
 
 const r = createListResource({
@@ -66,6 +71,7 @@ const r = createListResource({
   fields: [props.labelField, props.searchField, props.valueField],
   filters: {
     [props.searchField]: ["like", `%${props.value}%`],
+    ...props.customFilters,
   },
   onSuccess: () => {
     selection.value = props.value
@@ -86,6 +92,7 @@ function onUpdateQuery(query: string) {
   r.update({
     filters: {
       [props.searchField]: ["like", `%${query}%`],
+      ...props.customFilters,
     },
   });
 
