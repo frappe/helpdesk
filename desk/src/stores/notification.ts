@@ -46,6 +46,10 @@ export const useNotificationStore = defineStore("notification", () => {
       onError: useError(),
     });
   };
+  const send_mail_track_sla = createResource({
+    url: "helpdesk.search.handle_send_mail_track_sla",
+    auto: true,
+  });
 
   const data = computed(() => resource.data || []);
   const unread = computed(() => data.value.filter((d) => !d.read).length);
@@ -59,6 +63,7 @@ export const useNotificationStore = defineStore("notification", () => {
     data,
     toggle,
     read,
+    send_mail_track_sla,
     unread,
     visible,
   };

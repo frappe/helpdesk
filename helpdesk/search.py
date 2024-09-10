@@ -8,6 +8,7 @@ import re
 from copy import deepcopy
 
 import frappe
+from datetime import datetime
 from bs4 import BeautifulSoup, PageElement
 from frappe.utils import cstr, strip_html_tags, update_progress_bar
 from frappe.utils.synchronization import filelock
@@ -346,3 +347,180 @@ def download_corpus():
     except LookupError:
         download("averaged_perceptron_tagger_eng")
         download("punkt_tab")
+
+@frappe.whitelist()
+def handle_send_mail_track_sla():
+    if frappe.db.get_value("HD Settings", None, "track_service_level_agreement") :
+        if 'Agent' in frappe.get_roles() :
+            
+            # lấy thông tin ngôn ngữ mà user đang sử dụng
+            
+            user_email = frappe.session.user
+            user = frappe.get_doc("User", user_email)
+            if user :
+                language = user.language if user.language else 'en'
+            else :
+                language = 'en'
+            
+            
+            # Lấy dữ liệu hai cột thiết lập thời gian gửi thông báo trong doctype Hd Setting
+            
+            time_setting_send_email = frappe.db.get_value("HD Settings", None, "time_setting_send_email")
+            select_type_time_send_email = frappe.db.get_value("HD Settings", None, "select_type_time_send_email")
+
+
+            # Xác định đơn vị thời gian
+            
+            if select_type_time_send_email == 'minutes':
+                time_unit = 'MINUTE'
+            elif select_type_time_send_email == 'hours':
+                time_unit = 'HOUR'
+            else :
+                time_unit = 'DAY'
+
+                
+            # Sql lấy dữ liệu theo thông tin người dùng nhập vào hai trường thời gian và loại thời gian trong doctype HD Setting
+            
+            query = f""" SELECT name FROM `tabHD Ticket` WHERE TIMESTAMPDIFF({time_unit}, NOW(), `resolution_by`) = %s """
+            tickets = frappe.db.sql(query, (time_setting_send_email,), as_dict=True)
+            
+            
+            # Check ngôn ngữ mà user đăng nhập đang dùng để  trả về thông báo cho hợp lý
+            if language == 'vi':
+                list_notifications = []
+                for item in tickets :
+                    ticket_id = item.get('name')
+                    list_notifications.append({'name': f"Phiếu {ticket_id} sắp đến hạn SLA"})
+                return list_notifications
+            else :
+                list_notifications = []
+                for item in tickets :
+                    ticket_id = item.get('name')
+                    list_notifications.append({'name': f"Ticket {{ {ticket_id} }} is reaching its SLA deadline"})
+                return list_notifications
+            
+@frappe.whitelist()
+def handle_send_mail_allow_resetting_sla():
+    if frappe.db.get_value("HD Settings", None, "allow_resetting_service_level_agreement") :
+        if 'Agent' in frappe.get_roles() :
+
+            current_user = frappe.session.user
+            user_info = frappe.db.get_value("User", current_user, ["full_name"])
+            
+            # Lấy ngôn ngữ của người dùng
+            user = frappe.get_doc("User", current_user)
+            language = user.language if user.language else 'en'
+        
+            get_list_ticket = frappe.get_all(
+                "HD Ticket",
+                fields=["name", "subject", "response_by", "resolution_by","_assign"],  
+            )
+            
+            for ticket in get_list_ticket :
+
+                if ticket.get('_assign') :
+                    convert_list_assign = json.loads(ticket.get('_assign'))
+                    for list_email in convert_list_assign :
+
+                        get_full_name = frappe.db.get_value("User", {"email": list_email }, "full_name")
+
+                        if language == 'vi':
+                            subject = "Nhắc nhở: Các phiếu hỗ trợ gần đến hạn SLA cần được xử lý"
+                            greeting = f"Kính gửi {get_full_name},"
+                            intro = f"Chúng tôi xin thông báo rằng hiện đang có 1 phiếu đang gần đến hạn SLA cần được xử lý. Để đảm bảo chất lượng dịch vụ và đáp ứng yêu cầu của khách hàng đúng hạn, vui lòng xem lại và xử lý các phiếu này ngay lập tức."
+                        else:  # Ngôn ngữ khác, mặc định là tiếng Anh
+                            subject = "Reminder: SLA Approaching Tickets Need Immediate Attention"
+                            greeting = f"Dear {get_full_name},"
+                            intro = f"We would like to inform you that there are currently 1 support tickets nearing their SLA deadlines and require immediate attention. To ensure service quality and meet customer expectations on time, please review and address these tickets as soon as possible."
+                        convert_time_response_by = handle_convert_datetime_to_date(str(ticket['response_by']))
+                        convert_time_resolution_by = handle_convert_datetime_to_date(str(ticket['resolution_by']))
+                        # Tạo nội dung bảng HTML
+                        table_rows = "".join(
+                            f"<tr><td>{ticket['name']}</td><td>{ticket['subject']}</td><td style='text-align:center'>{convert_time_response_by}</td><td style='text-align:center'>{convert_time_resolution_by}</td></tr>"
+                        )
+                        if language == 'vi':
+                            table = f"""
+                                <table border="1" cellpadding="5" style="width: 100%;">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tiêu đề</th>
+                                        <th>Trạng thái phản hồi</th>
+                                        <th>Trạng thái xử lý</th>
+                                    </tr>
+                                </table>
+                            """
+                        else :
+                            table = f"""
+                                <table border="1" cellpadding="5" style="width: 100%;">
+                                    <tr>
+                                        <th>Ticket ID</th>
+                                        <th>Subject</th>
+                                        <th>First Response</th>
+                                        <th>Resolution</th>
+                                    </tr>
+                                    {table_rows}
+                                </table>
+                            """
+                        message = f"""
+                            {greeting}<br><br>
+                            {intro}<br><br>
+                            {table}
+                        """
+                        # Gửi email
+                        frappe.sendmail(
+                            recipients=[list_email],
+                            subject=subject,
+                            message=message,
+                            send_after=0  # 0 để gửi ngay lập tức, có thể thiết lập thời gian nếu cần
+                        )
+                        
+def handle_convert_datetime_to_date(time) :
+    response_by_datetime = datetime.strptime(time, '%Y-%m-%d %H:%M:%S.%f')
+    return response_by_datetime.date()
+
+
+def create_dynamic_scheduler_events():
+    # SQL query lấy workday và start_time
+    query = """
+        SELECT 
+            sd.workday,
+            sd.start_time
+        FROM `tabHD Service Level Agreement` as sla
+        RIGHT JOIN `tabHD Service Day` as sd on sd.parent = sla.name
+        WHERE sla.name = 'Default';
+    """
+
+    # Thực thi SQL query để lấy workday và start_time
+    result = frappe.db.sql(query, as_dict=True)
+
+    # Mapping workday sang cron format (mapping các ngày sang số tương ứng trong cron)
+    day_to_cron = {
+        "Monday": 1,
+        "Tuesday": 2,
+        "Wednesday": 3,
+        "Thursday": 4,
+        "Friday": 5,
+        "Saturday": 6,
+        "Sunday": 0
+    }
+
+    # Tạo cron expressions
+    scheduler_events = {
+        "cron": {}
+    }
+
+    for row in result:
+        workday = row["workday"]
+        start_time = row["start_time"]
+
+        # Chuyển đổi start_time sang hour và minute
+        hour, minute, _ = str(start_time).split(":")
+        
+        # Tạo cron string cho workday và start_time
+        cron_string = f"{minute} {hour} * * {day_to_cron[workday]}"
+        
+        # Thêm vào scheduler_events với hàm cần chạy
+        scheduler_events["cron"][cron_string] = ["helpdesk.search.handle_send_mail_track_sla"]
+
+    return scheduler_events
+

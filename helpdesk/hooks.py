@@ -1,3 +1,5 @@
+from helpdesk.search import create_dynamic_scheduler_events
+
 app_name = "helpdesk"
 app_title = "Helpdesk"
 app_publisher = "Frappe Technologies"
@@ -26,8 +28,16 @@ after_migrate = [
 
 scheduler_events = {
     "all": ["helpdesk.search.build_index_if_not_exists"],
-    "hourly": ["helpdesk.search.download_corpus"],
+    "hourly":[
+            "helpdesk.search.download_corpus",
+            "helpdesk.search.handle_send_mail_track_sla",
+        ],
 }
+# Tạo dynamic scheduler từ kết quả SQL query và thêm vào scheduler_events gốc
+dynamic_schedulers = create_dynamic_scheduler_events()
+
+# Kết hợp các dynamic scheduler cron vào scheduler_events hiện có
+scheduler_events.update(dynamic_schedulers)
 
 
 website_route_rules = [
@@ -68,3 +78,4 @@ setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
 website_route_rules = [
     {"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
 ]
+

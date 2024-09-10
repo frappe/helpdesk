@@ -54,3 +54,7 @@ class HDSettings(Document):
         room = get_website_room()
 
         frappe.publish_realtime(event, room=room, after_commit=True)
+    
+    def before_save(self):
+        if self.time_setting_send_email < 0 :
+            frappe.throw("The input time message must be greater than 0")

@@ -77,6 +77,13 @@
           </div>
         </span>
       </RouterLink>
+      <div
+        v-for="item in notificationStore.send_mail_allow_resetting_sla.data"
+        :key="item.id"
+        class="flex cursor-pointer items-start gap-3.5 px-5 py-2.5 hover:bg-gray-100"
+      >
+        <p>{{ item.name }}</p>
+      </div>
     </div>
   </span>
 </template>

@@ -9,6 +9,9 @@
   "track_service_level_agreement",
   "allow_resetting_service_level_agreement",
   "column_break_4",
+  "time_setting_send_email",
+  "column_break_salr",
+  "select_type_time_send_email",
   "priority_section",
   "default_priority",
   "column_break_nvbf",
@@ -62,6 +65,7 @@
    "label": "Allow Resetting SLA"
   },
   {
+   "columns": 2,
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
   },
@@ -235,11 +239,33 @@
   {
    "fieldname": "column_break_nvbf",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_salr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "time_setting_send_email",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Time",
+   "print_hide": 1,
+   "reqd": 1
+  },
+  {
+   "default": "minutes",
+   "fieldname": "select_type_time_send_email",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "minutes\nhours\ndays",
+   "print_hide": 1,
+   "translatable": 1
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-08-23 17:59:49.761375",
+ "modified": "2024-09-05 16:50:46.001174",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
