@@ -157,7 +157,7 @@ class Search:
         with suppress(ResponseError):  # Index may not exist
             self.redis.ft(self.index_name).dropindex(delete_documents=True)
 
-    def get_records(self, doctype: str):
+    def get_records(self, doctype: str):  # noqa
         raise NotImplementedError
 
     def get_all_records(self):
