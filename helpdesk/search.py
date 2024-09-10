@@ -157,15 +157,14 @@ class Search:
         with suppress(ResponseError):  # Index may not exist
             self.redis.ft(self.index_name).dropindex(delete_documents=True)
 
-    def get_records(self, doctype: str):  # noqa
+    def get_count(self, doctype):
         raise NotImplementedError
 
-    def get_all_records(self):
+    def num_records(self) -> int:
+        num = 0
         for doctype in self.DOCTYPE_FIELDS.keys():
-            yield from self.get_records(doctype)
-
-    def num_records(self):
-        return len(list(self.get_all_records()))
+            num += self.get_count(doctype)
+        return num
 
     def index_exists(self):
         if hasattr(self, "_index_exists"):
@@ -284,6 +283,12 @@ class HelpdeskSearch(Search):
     def scrub(self, text: str):
         # For permalink
         return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
+
+    def get_count(self, doctype):
+        if doctype == "HD Ticket":
+            return frappe.db.count(doctype)
+        if doctype == "HD Article":
+            return len(self.get_records(doctype))
 
     def get_records(self, doctype):
         records = []
