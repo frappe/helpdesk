@@ -3,9 +3,11 @@
 
 from __future__ import unicode_literals
 
+from contextlib import suppress
 import json
 import re
 from copy import deepcopy
+from math import isclose
 
 import frappe
 from bs4 import BeautifulSoup, PageElement
@@ -155,14 +157,22 @@ class Search:
         if self.index_exists():
             self.redis.ft(self.index_name).dropindex(delete_documents=True)
 
+    def get_records(self, doctype: str):
+        raise NotImplementedError
+
+    def get_all_records(self):
+        for doctype in self.DOCTYPE_FIELDS.keys():
+            for record in self.get_records(doctype):
+                yield record
+
     def index_exists(self):
-        self._index_exists = getattr(self, "_index_exists", None)
-        if self._index_exists is None:
-            try:
-                self.redis.ft(self.index_name).info()
+        if hasattr(self, "_index_exists"):
+            return self._index_exists
+        self._index_exists = False
+        with suppress(ResponseError):
+            ftinfo = self.redis.ft(self.index_name).info()
+            if isclose(ftinfo["num_docs"], len(self.get_all_records()), rel_tol=0.1):
                 self._index_exists = True
-            except ResponseError:
-                self._index_exists = False
         return self._index_exists
 
 
