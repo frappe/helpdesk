@@ -3,9 +3,9 @@
 
 from __future__ import unicode_literals
 
-from contextlib import suppress
 import json
 import re
+from contextlib import suppress
 from copy import deepcopy
 from math import isclose
 
