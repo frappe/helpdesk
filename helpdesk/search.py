@@ -154,7 +154,7 @@ class Search:
         return self.redis.ft(self.index_name).spellcheck(query, **kwargs)
 
     def drop_index(self):
-        if self.index_exists():
+        with suppress(ResponseError):  # Index may not exist
             self.redis.ft(self.index_name).dropindex(delete_documents=True)
 
     def get_records(self, doctype: str):
@@ -165,13 +165,16 @@ class Search:
             for record in self.get_records(doctype):
                 yield record
 
+    def num_records(self):
+        return len(list(self.get_all_records()))
+
     def index_exists(self):
         if hasattr(self, "_index_exists"):
             return self._index_exists
         self._index_exists = False
         with suppress(ResponseError):
             ftinfo = self.redis.ft(self.index_name).info()
-            if isclose(ftinfo["num_docs"], len(self.get_all_records()), rel_tol=0.1):
+            if isclose(int(ftinfo["num_docs"]), self.num_records(), rel_tol=0.1):
                 self._index_exists = True
         return self._index_exists
 
