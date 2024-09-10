@@ -162,8 +162,7 @@ class Search:
 
     def get_all_records(self):
         for doctype in self.DOCTYPE_FIELDS.keys():
-            for record in self.get_records(doctype):
-                yield record
+            yield from self.get_records(doctype)
 
     def num_records(self):
         return len(list(self.get_all_records()))
