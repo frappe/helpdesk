@@ -62,6 +62,9 @@ STOPWORDS = [
     "you",
     "me",
     "do",
+    "has",
+    "been",
+    "urgent",
 ]
 
 
@@ -148,8 +151,7 @@ class Search:
     def clean_query(self, query):
         query = query.strip().replace("-*", "*")
         query = self.unsafe_chars.sub(" ", query)
-        query.strip()
-        return query
+        return query.strip().lower()
 
     def spellcheck(self, query, **kwargs):
         return self.redis.ft(self.index_name).spellcheck(query, **kwargs)
@@ -361,6 +363,8 @@ def download_corpus():
     try:
         data.find("taggers/averaged_perceptron_tagger_eng.zip")
         data.find("tokenizers/punkt_tab.zip")
+        data.find("corpora/brown.zip")
     except LookupError:
         download("averaged_perceptron_tagger_eng")
         download("punkt_tab")
+        download("brown")
