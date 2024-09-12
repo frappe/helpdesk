@@ -1,5 +1,6 @@
 import frappe
 from textblob import TextBlob
+from textblob.exceptions import MissingCorpusError
 
 from helpdesk.search import search as hd_search
 
@@ -14,7 +15,7 @@ def get_nouns(blob: TextBlob):
 def get_noun_phrases(blob: TextBlob):
     try:
         return blob.noun_phrases
-    except LookupError:
+    except (LookupError, MissingCorpusError):
         return []
 
 
