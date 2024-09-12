@@ -128,6 +128,7 @@ class Search:
 
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
+        query.with_scores()
 
         try:
             result = self.redis.ft(self.index_name).search(query)
@@ -313,7 +314,7 @@ def search(query, only_articles=False):
     query = search.clean_query(query)
     query_parts = query.split(" ")
     query = " ".join(
-        [f"%{q}%" for q in query_parts if q not in STOPWORDS]
+        [f"{q}*" for q in query_parts if q not in STOPWORDS]
     )  # for stopwords to be ignored
     result = search.search(query, start=0, highlight=True)
     groups = {}
