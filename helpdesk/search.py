@@ -12,6 +12,7 @@ from math import isclose
 import frappe
 from bs4 import BeautifulSoup, PageElement
 from frappe.utils import cstr, strip_html_tags, update_progress_bar
+from frappe.utils.caching import redis_cache
 from frappe.utils.synchronization import filelock
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
@@ -65,7 +66,13 @@ STOPWORDS = [
     "has",
     "been",
     "urgent",
+    "want",
 ]
+
+
+@redis_cache(3600 * 24)
+def get_stopwords():
+    return STOPWORDS + frappe.get_all("HD Stopword", {"enabled": True}, pluck="name")
 
 
 class Search:
@@ -98,7 +105,7 @@ class Search:
         self.redis.ft(self.index_name).create_index(
             schema,
             definition=index_def,
-            stopwords=STOPWORDS,
+            stopwords=get_stopwords(),
         )
         self._index_exists = True
 
@@ -316,7 +323,7 @@ def search(query, only_articles=False):
     query = search.clean_query(query)
     query_parts = query.split()
     query = " ".join(
-        [f"{q}*" for q in query_parts if q not in STOPWORDS]
+        [f"{q}*" for q in query_parts if q not in get_stopwords()]
     )  # for stopwords to be ignored
     result = search.search(query, start=0, highlight=True)
     groups = {}
