@@ -66,7 +66,7 @@ STOPWORDS = [
 
 
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+]")
+    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
@@ -312,7 +312,7 @@ class HelpdeskSearch(Search):
 def search(query, only_articles=False):
     search = HelpdeskSearch()
     query = search.clean_query(query)
-    query_parts = query.split(" ")
+    query_parts = query.split()
     query = " ".join(
         [f"{q}*" for q in query_parts if q not in STOPWORDS]
     )  # for stopwords to be ignored
