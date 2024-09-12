@@ -54,3 +54,9 @@ class HDSettings(Document):
         room = get_website_room()
 
         frappe.publish_realtime(event, room=room, after_commit=True)
+
+    @property
+    def hd_search(self):
+        from helpdesk.api.article import search
+
+        return search
