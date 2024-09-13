@@ -12,6 +12,7 @@ from math import isclose
 import frappe
 from bs4 import BeautifulSoup, PageElement
 from frappe.utils import cstr, strip_html_tags, update_progress_bar
+from frappe.utils.caching import redis_cache
 from frappe.utils.synchronization import filelock
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
@@ -62,11 +63,20 @@ STOPWORDS = [
     "you",
     "me",
     "do",
+    "has",
+    "been",
+    "urgent",
+    "want",
 ]
 
 
+@redis_cache(3600 * 24)
+def get_stopwords():
+    return STOPWORDS + frappe.get_all("HD Stopword", {"enabled": True}, pluck="name")
+
+
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+]")
+    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
@@ -95,7 +105,7 @@ class Search:
         self.redis.ft(self.index_name).create_index(
             schema,
             definition=index_def,
-            stopwords=STOPWORDS,
+            stopwords=get_stopwords(),
         )
         self._index_exists = True
 
@@ -128,6 +138,7 @@ class Search:
 
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
+        query.with_scores()
 
         try:
             result = self.redis.ft(self.index_name).search(query)
@@ -147,8 +158,7 @@ class Search:
     def clean_query(self, query):
         query = query.strip().replace("-*", "*")
         query = self.unsafe_chars.sub(" ", query)
-        query.strip()
-        return query
+        return query.strip().lower()
 
     def spellcheck(self, query, **kwargs):
         return self.redis.ft(self.index_name).spellcheck(query, **kwargs)
@@ -292,7 +302,10 @@ class HelpdeskSearch(Search):
 
     def get_records(self, doctype):
         records = []
-        for d in frappe.db.get_all(doctype, fields=self.DOCTYPE_FIELDS[doctype]):
+        filters = {"status": "Published"} if doctype == "HD Article" else {}
+        for d in frappe.db.get_all(
+            doctype, filters=filters, fields=self.DOCTYPE_FIELDS[doctype]
+        ):
             d.doctype = doctype
             if doctype == "HD Article":
                 for heading, section in self.get_sections(d.content):
@@ -311,9 +324,9 @@ class HelpdeskSearch(Search):
 def search(query, only_articles=False):
     search = HelpdeskSearch()
     query = search.clean_query(query)
-    query_parts = query.split(" ")
+    query_parts = query.split()
     query = " ".join(
-        [f"%{q}%" for q in query_parts if q not in STOPWORDS]
+        [f"{q}*" for q in query_parts if q not in get_stopwords()]
     )  # for stopwords to be ignored
     result = search.search(query, start=0, highlight=True)
     groups = {}
@@ -360,6 +373,8 @@ def download_corpus():
     try:
         data.find("taggers/averaged_perceptron_tagger_eng.zip")
         data.find("tokenizers/punkt_tab.zip")
+        data.find("corpora/brown.zip")
     except LookupError:
         download("averaged_perceptron_tagger_eng")
         download("punkt_tab")
+        download("brown")
