@@ -44,7 +44,7 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
-      <div class="flex flex-1 flex-col">
+      <div class="flex flex-1 flex-col w-[calc(100%-382px)]">
         <div class="flex items-center justify-between border-b py-1 pr-2.5">
           <span class="pl-6 text-lg font-semibold">Activity</span>
           <Switch
