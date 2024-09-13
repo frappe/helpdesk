@@ -22,7 +22,7 @@
         class="focus:ring-cyan-30 rounded-md border-2 border-hidden p-4 hover:bg-cyan-100 focus:outline-none focus:ring active:bg-cyan-50"
       >
         <RouterLink
-          class="group cursor-pointer space-x-1 hover:text-gray-900"
+          class="group cursor-pointer hover:text-gray-900"
           :to="{
             name: 'KBArticlePublic',
             params: {
