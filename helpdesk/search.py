@@ -302,7 +302,7 @@ class HelpdeskSearch(Search):
 
     def get_records(self, doctype):
         records = []
-        filters = {"published": True} if doctype == "HD Article" else {}
+        filters = {"status": "Published"} if doctype == "HD Article" else {}
         for d in frappe.db.get_all(
             doctype, filters=filters, fields=self.DOCTYPE_FIELDS[doctype]
         ):
