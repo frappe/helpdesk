@@ -21,6 +21,7 @@ def get_noun_phrases(blob: TextBlob):
 
 @frappe.whitelist()
 def search(query: str):
+    query = query.strip().lower()
     out = hd_search(query, only_articles=True)
     if not out:  # fallback
         blob = TextBlob(query)
