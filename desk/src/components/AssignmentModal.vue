@@ -9,7 +9,8 @@
     <template #body-content>
       <SearchComplete
         class="form-control"
-        value=""
+        value="1"
+        search-field="is_active"
         doctype="HD Agent"
         :reset-input="true"
         @change="
