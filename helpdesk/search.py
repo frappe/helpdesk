@@ -111,7 +111,15 @@ class Search:
             definition=index_def,
             stopwords=get_stopwords(),
         )
+        self.add_synonyms()
+
         self._index_exists = True
+
+    def add_synonyms(self):
+        for word, synonym in frappe.get_all(
+            "HD Synonym", ["parent", "name"], as_list=True
+        ):
+            self.redis.ft(self.index_name).synupdate(word, True, synonym)
 
     def add_document(self, id, doc):
         doc = frappe._dict(doc)
