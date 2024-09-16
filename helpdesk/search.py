@@ -197,7 +197,7 @@ class HelpdeskSearch(Search):
         {"name": "name", "weight": settings.name_weight or 1},
         {"name": "subject", "weight": settings.subject_weight or 6},
         {"name": "description", "weight": settings.description_weight or 5},
-        {"name": "headings", "weight": settings.heading_weight or 8},
+        {"name": "headings", "weight": settings.headings_weight or 8},
         {"name": "team", "type": "tag"},
         {"name": "modified", "sortable": True},
         {"name": "creation", "sortable": True},
