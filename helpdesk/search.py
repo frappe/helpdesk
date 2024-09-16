@@ -200,16 +200,6 @@ class Search:
 
 
 class HelpdeskSearch(Search):
-    settings: "HDSettings" = frappe.get_cached_doc("HD Settings")
-    schema = [
-        {"name": "name", "weight": settings.name_weight or 1},
-        {"name": "subject", "weight": settings.subject_weight or 6},
-        {"name": "description", "weight": settings.description_weight or 5},
-        {"name": "headings", "weight": settings.headings_weight or 8},
-        {"name": "team", "type": "tag"},
-        {"name": "modified", "sortable": True},
-        {"name": "creation", "sortable": True},
-    ]
 
     DOCTYPE_FIELDS = {
         "HD Ticket": [
@@ -232,7 +222,17 @@ class HelpdeskSearch(Search):
     }
 
     def __init__(self):
-        super().__init__("helpdesk_idx", "search_doc", self.schema)
+        settings: "HDSettings" = frappe.get_cached_doc("HD Settings")
+        schema = [
+            {"name": "name", "weight": settings.name_weight or 1},
+            {"name": "subject", "weight": settings.subject_weight or 6},
+            {"name": "description", "weight": settings.description_weight or 5},
+            {"name": "headings", "weight": settings.headings_weight or 8},
+            {"name": "team", "type": "tag"},
+            {"name": "modified", "sortable": True},
+            {"name": "creation", "sortable": True},
+        ]
+        super().__init__("helpdesk_idx", "search_doc", schema)
 
     def build_index(self):
         self.drop_index()
