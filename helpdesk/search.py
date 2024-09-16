@@ -352,6 +352,7 @@ def search(query, only_articles=False):
     return out
 
 
+@frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=60)
 def build_index():
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
