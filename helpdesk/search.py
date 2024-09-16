@@ -8,6 +8,7 @@ import re
 from contextlib import suppress
 from copy import deepcopy
 from math import isclose
+from typing import TYPE_CHECKING
 
 import frappe
 from bs4 import BeautifulSoup, PageElement
@@ -20,6 +21,9 @@ from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
 from helpdesk.utils import is_agent
+
+if TYPE_CHECKING:
+    from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
 STOPWORDS = [
     "a",
@@ -188,11 +192,12 @@ class Search:
 
 
 class HelpdeskSearch(Search):
+    settings: "HDSettings" = frappe.get_cached_doc("HD Settings")
     schema = [
-        {"name": "name", "weight": 2},
-        {"name": "subject", "weight": 6},
-        {"name": "description", "weight": 6},
-        {"name": "headings", "weight": 8},
+        {"name": "name", "weight": settings.name_weight or 1},
+        {"name": "subject", "weight": settings.subject_weight or 6},
+        {"name": "description", "weight": settings.description_weight or 5},
+        {"name": "headings", "weight": settings.heading_weight or 8},
         {"name": "team", "type": "tag"},
         {"name": "modified", "sortable": True},
         {"name": "creation", "sortable": True},
