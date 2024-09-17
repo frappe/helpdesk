@@ -8,6 +8,7 @@ import re
 from contextlib import suppress
 from copy import deepcopy
 from math import isclose
+from typing import TYPE_CHECKING
 
 import frappe
 from bs4 import BeautifulSoup, PageElement
@@ -20,6 +21,9 @@ from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
 from helpdesk.utils import is_agent
+
+if TYPE_CHECKING:
+    from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
 STOPWORDS = [
     "a",
@@ -107,7 +111,15 @@ class Search:
             definition=index_def,
             stopwords=get_stopwords(),
         )
+        self.add_synonyms()
+
         self._index_exists = True
+
+    def add_synonyms(self):
+        for word, synonym in frappe.get_all(
+            "HD Synonym", ["parent", "name"], as_list=True
+        ):
+            self.redis.ft(self.index_name).synupdate(word, True, synonym)
 
     def add_document(self, id, doc):
         doc = frappe._dict(doc)
@@ -188,15 +200,6 @@ class Search:
 
 
 class HelpdeskSearch(Search):
-    schema = [
-        {"name": "name", "weight": 2},
-        {"name": "subject", "weight": 6},
-        {"name": "description", "weight": 6},
-        {"name": "headings", "weight": 8},
-        {"name": "team", "type": "tag"},
-        {"name": "modified", "sortable": True},
-        {"name": "creation", "sortable": True},
-    ]
 
     DOCTYPE_FIELDS = {
         "HD Ticket": [
@@ -219,7 +222,17 @@ class HelpdeskSearch(Search):
     }
 
     def __init__(self):
-        super().__init__("helpdesk_idx", "search_doc", self.schema)
+        settings: "HDSettings" = frappe.get_cached_doc("HD Settings")
+        schema = [
+            {"name": "name", "weight": settings.name_weight or 1},
+            {"name": "subject", "weight": settings.subject_weight or 6},
+            {"name": "description", "weight": settings.description_weight or 5},
+            {"name": "headings", "weight": settings.headings_weight or 8},
+            {"name": "team", "type": "tag"},
+            {"name": "modified", "sortable": True},
+            {"name": "creation", "sortable": True},
+        ]
+        super().__init__("helpdesk_idx", "search_doc", schema)
 
     def build_index(self):
         self.drop_index()
@@ -347,6 +360,7 @@ def search(query, only_articles=False):
     return out
 
 
+@frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=60)
 def build_index():
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)

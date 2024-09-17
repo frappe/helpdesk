@@ -3,6 +3,13 @@
 
 frappe.ui.form.on("HD Settings", {
   refresh: function (frm) {
-    //
+    frm.add_custom_button(__("Regenerate Search Index"), () => {
+      frappe.call({
+        method: "helpdesk.search.build_index",
+        callback: function (r) {
+          frappe.msgprint(__("Search Index Regenerated"));
+        },
+      });
+    });
   },
 });
