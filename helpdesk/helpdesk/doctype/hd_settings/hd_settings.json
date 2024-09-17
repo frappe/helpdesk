@@ -248,16 +248,19 @@
    "label": "Search"
   },
   {
+   "default": "1",
    "fieldname": "name_weight",
    "fieldtype": "Int",
    "label": "Name Weight"
   },
   {
+   "default": "6",
    "fieldname": "subject_weight",
    "fieldtype": "Int",
    "label": "Subject Weight"
   },
   {
+   "default": "5",
    "fieldname": "description_weight",
    "fieldtype": "Int",
    "label": "Description Weight"
@@ -267,6 +270,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "8",
    "fieldname": "headings_weight",
    "fieldtype": "Int",
    "label": "Headings Weight"
@@ -274,7 +278,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-09-16 15:17:42.791236",
+ "modified": "2024-09-18 00:47:04.055942",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
