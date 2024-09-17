@@ -81,9 +81,10 @@ def get_stopwords():
 
 @redis_cache(3600 * 24)
 def get_synonym_words() -> list[str]:
-    return frappe.get_all("HD Synonym", ["name"], as_list=True) + frappe.get_all(
+    ret = frappe.get_all("HD Synonym", ["name"], as_list=True) + frappe.get_all(
         "HD Synonyms", ["name"], as_list=True
     )
+    return [r[0] for r in ret]
 
 
 class Search:
@@ -345,6 +346,7 @@ def search(query, only_articles=False):
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts = query.split()
+    query = ""
     for part in query_parts:
         if part in get_synonym_words():
             query += f" {part}"
