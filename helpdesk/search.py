@@ -79,6 +79,13 @@ def get_stopwords():
     return STOPWORDS + frappe.get_all("HD Stopword", {"enabled": True}, pluck="name")
 
 
+@redis_cache(3600 * 24)
+def get_synonym_words() -> list[str]:
+    return frappe.get_all("HD Synonym", ["name"], as_list=True) + frappe.get_all(
+        "HD Synonyms", ["name"], as_list=True
+    )
+
+
 class Search:
     unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
 
@@ -338,9 +345,17 @@ def search(query, only_articles=False):
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts = query.split()
-    query = " ".join(
-        [f"{q}*" for q in query_parts if q not in get_stopwords()]
-    )  # for stopwords to be ignored
+    for part in query_parts:
+        if part in get_synonym_words():
+            query += f" {part}"
+            continue
+        if part in get_stopwords():
+            continue
+        if len(part) > 3:
+            query += f" %{part}%"
+        else:
+            query += f" {part}*"
+
     result = search.search(query, start=0, highlight=True)
     groups = {}
     for r in result.docs:
