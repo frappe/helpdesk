@@ -119,7 +119,7 @@ class Search:
         for word, synonym in frappe.get_all(
             "HD Synonym", ["parent", "name"], as_list=True
         ):
-            self.redis.ft(self.index_name).synupdate(word, True, synonym)
+            self.redis.ft(self.index_name).synupdate(word, True, word, synonym)
 
     def add_document(self, id, doc):
         doc = frappe._dict(doc)
