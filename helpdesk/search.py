@@ -79,7 +79,7 @@ def get_stopwords():
     return STOPWORDS + frappe.get_all("HD Stopword", {"enabled": True}, pluck="name")
 
 
-@redis_cache(3600 * 24)
+@redis_cache(1800)
 def get_synonym_words() -> list[str]:
     ret = frappe.get_all("HD Synonym", ["name"], as_list=True) + frappe.get_all(
         "HD Synonyms", ["name"], as_list=True
