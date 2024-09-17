@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen overflow-y-auto py-3.5 comm-area w-full">
+  <div class="h-screen overflow-y-auto py-3.5 comm-area">
     <div v-for="(activity, i) in activities" :key="activity.key">
       <div class="flex gap-4 px-3 lg:px-6 w-full">
         <div

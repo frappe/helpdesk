@@ -119,3 +119,14 @@ const emit = defineEmits(["reply"]);
 
 const { isMobileView } = useScreenSize();
 </script>
+
+<style>
+.email-content {
+  max-width: 100%;
+}
+.email-content > * {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+</style>

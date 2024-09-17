@@ -40,7 +40,13 @@
   "setup_section",
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
-  "column_break_hjfh"
+  "column_break_hjfh",
+  "search_tab",
+  "name_weight",
+  "subject_weight",
+  "column_break_qoxt",
+  "description_weight",
+  "headings_weight"
  ],
  "fields": [
   {
@@ -235,11 +241,44 @@
   {
    "fieldname": "column_break_nvbf",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "search_tab",
+   "fieldtype": "Tab Break",
+   "label": "Search"
+  },
+  {
+   "default": "1",
+   "fieldname": "name_weight",
+   "fieldtype": "Int",
+   "label": "Name Weight"
+  },
+  {
+   "default": "6",
+   "fieldname": "subject_weight",
+   "fieldtype": "Int",
+   "label": "Subject Weight"
+  },
+  {
+   "default": "5",
+   "fieldname": "description_weight",
+   "fieldtype": "Int",
+   "label": "Description Weight"
+  },
+  {
+   "fieldname": "column_break_qoxt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "8",
+   "fieldname": "headings_weight",
+   "fieldtype": "Int",
+   "label": "Headings Weight"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-08-23 17:59:49.761375",
+ "modified": "2024-09-18 00:47:04.055942",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
