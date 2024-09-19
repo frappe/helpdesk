@@ -9,9 +9,8 @@
     <template #body-content>
       <SearchComplete
         class="form-control"
-        value="1"
-        search-field="is_active"
         doctype="HD Agent"
+        :custom-filters="customFilters"
         :reset-input="true"
         @change="
           (option) => {
@@ -58,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { createResource } from "frappe-ui";
 import { UserAvatar, SearchComplete } from "@/components";
 import { useUserStore } from "@/stores/user";
@@ -117,4 +116,13 @@ const removeCurrentAssignee = (value) => {
     },
   });
 };
+
+const customFilters = computed(() => {
+  const filters = {};
+  filters["is_active"] = ["=", 1];
+  if (Boolean(props.assignees?.length)) {
+    filters["name"] = ["not in", [...props.assignees.map((a) => a.name)]];
+  }
+  return filters;
+});
 </script>
