@@ -44,29 +44,32 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
-      <div class="flex flex-1 flex-col w-[calc(100%-382px)]">
-        <div class="flex items-center justify-between border-b py-1 pr-2.5">
-          <span class="pl-6 text-lg font-semibold">Activity</span>
-          <Switch
-            v-model="showFullActivity"
-            size="sm"
-            label="Show all activity"
-          />
+      <div class="flex flex-1 flex-col">
+        <!-- ticket activities -->
+        <div class="overflow-y-auto">
+          <Tabs
+            v-model="tabIndex"
+            v-slot="{ tab }"
+            :tabs="tabs"
+            class="flex flex-col flex-1"
+          >
+            <TicketAgentActivities
+              ref="ticketAgentActivitiesRef"
+              :activities="filterActivities(tab.name)"
+              :tab="tab.name"
+              @update="
+                () => {
+                  ticket.reload();
+                }
+              "
+              @email:reply="
+                (e) => {
+                  communicationAreaRef.replyToEmail(e);
+                }
+              "
+            />
+          </Tabs>
         </div>
-        <TicketAgentActivities
-          ref="ticketAgentActivitiesRef"
-          :activities="activities"
-          @update="
-            () => {
-              ticket.reload();
-            }
-          "
-          @email:reply="
-            (e) => {
-              communicationAreaRef.replyToEmail(e);
-            }
-          "
-        />
         <CommunicationArea
           ref="communicationAreaRef"
           v-model="ticket.data"
@@ -139,10 +142,10 @@ import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
-  Switch,
   createResource,
   Dialog,
   FormControl,
+  Tabs,
 } from "frappe-ui";
 
 import {
@@ -152,11 +155,16 @@ import {
   CommunicationArea,
 } from "@/components";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
-import { IndicatorIcon } from "@/components/icons";
-
+import {
+  IndicatorIcon,
+  CommentIcon,
+  ActivityIcon,
+  EmailIcon,
+} from "@/components/icons";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
+import { TabObject, TicketTab } from "@/types";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -234,6 +242,25 @@ const dropdownOptions = computed(() =>
   }))
 );
 
+const tabIndex = ref(0);
+const tabs: TabObject[] = [
+  {
+    name: "activity",
+    label: "Activity",
+    icon: ActivityIcon,
+  },
+  {
+    name: "email",
+    label: "Emails",
+    icon: EmailIcon,
+  },
+  {
+    name: "comment",
+    label: "Comments",
+    icon: CommentIcon,
+  },
+];
+
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email) => {
     return {
@@ -295,6 +322,9 @@ const activities = computed(() => {
         const nextActivity = sorted[j];
         if (nextActivity && nextActivity.type === "history") {
           currentActivity.relatedActivities.push(nextActivity);
+          if ((currentActivity.content = "created this ticket")) {
+            currentActivity.relatedActivities = [];
+          }
         } else {
           data.push(currentActivity);
           i = j - 1;
@@ -306,9 +336,15 @@ const activities = computed(() => {
     }
     i++;
   }
-
   return data;
 });
+
+function filterActivities(eventType: TicketTab) {
+  if (eventType === "activity") {
+    return activities.value;
+  }
+  return activities.value.filter((activity) => activity.type === eventType);
+}
 
 function updateTicket(fieldname: string, value: string) {
   isLoading.value = true;

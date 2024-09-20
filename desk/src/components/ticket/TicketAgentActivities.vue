@@ -1,7 +1,8 @@
 <template>
-  <div class="h-screen overflow-y-auto py-3.5 comm-area">
+  <div class="h-screen py-3.5 comm-area px-3 lg:px-6">
     <div v-for="(activity, i) in activities" :key="activity.key">
-      <div class="flex gap-4 px-3 lg:px-6 w-full">
+      <!-- single activity -->
+      <div class="flex gap-4 w-full">
         <div
           class="relative flex justify-center after:absolute after:left-[50%] after:top-0 after:-z-10 after:border-l after:border-gray-200"
           :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
@@ -49,6 +50,10 @@ defineProps({
   activities: {
     type: Array,
     required: true,
+  },
+  tab: {
+    type: String,
+    required: false,
   },
 });
 
