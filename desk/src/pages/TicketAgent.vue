@@ -73,7 +73,7 @@
         <CommunicationArea
           ref="communicationAreaRef"
           v-model="ticket.data"
-          :to-emails="[ticket.data.raised_by]"
+          :to-emails="[ticket.data?.raised_by]"
           :cc-emails="[]"
           :bcc-emails="[]"
           @update="
@@ -165,6 +165,8 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
 import { TabObject, TicketTab } from "@/types";
+import { provide } from "vue";
+import { nextTick } from "vue";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -178,6 +180,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+});
+
+onMounted(() => {
+  provide("communicationArea", communicationAreaRef.value);
 });
 
 let storage = useStorage("ticket_agent", {
@@ -264,16 +270,16 @@ const tabs: TabObject[] = [
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email) => {
     return {
-      type: "email",
-      key: email.creation,
+      subject: email.subject,
+      content: email.content,
       sender: { name: email.user.email, full_name: email.user.name },
       to: email.recipients,
+      type: "email",
+      key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
       creation: email.creation,
-      subject: email.subject,
       attachments: email.attachments,
-      content: email.content,
     };
   });
 
@@ -322,9 +328,6 @@ const activities = computed(() => {
         const nextActivity = sorted[j];
         if (nextActivity && nextActivity.type === "history") {
           currentActivity.relatedActivities.push(nextActivity);
-          if ((currentActivity.content = "created this ticket")) {
-            currentActivity.relatedActivities = [];
-          }
         } else {
           data.push(currentActivity);
           i = j - 1;

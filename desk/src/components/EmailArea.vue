@@ -34,7 +34,7 @@
           @click="
             emit('reply', {
               content: content,
-              to: sender.name,
+              to: to ?? sender.name,
             })
           "
         >
@@ -56,9 +56,9 @@
         </Button>
       </div>
     </div>
-    <div class="text-sm leading-5 text-gray-600">
+    <!-- <div class="text-sm leading-5 text-gray-600">
       {{ subject }}
-    </div>
+    </div> -->
     <div class="mb-3 text-sm leading-5 text-gray-600">
       <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
       <span v-if="to"> {{ to }} </span>
@@ -71,10 +71,11 @@
       </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
-    <div
+    <!-- <div
       class="email-content prose-f max-h-[500px] overflow-y-auto"
       v-html="content"
-    />
+    /> -->
+    <EmailContent :content="content" :emailBox="emailBox" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
         v-for="a in attachments"
@@ -89,35 +90,74 @@
 <script setup lang="ts">
 import { UserAvatar, AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
-import { ReplyIcon, ReplyAllIcon } from "./icons/";
+import { ReplyIcon, ReplyAllIcon } from "./icons";
 import { useScreenSize } from "@/composables/screen";
+import { inject } from "vue";
 
 const props = defineProps({
-  sender: {
+  activity: {
     type: Object,
-    required: true,
-  },
-  to: { type: String, default: null },
-  cc: { type: String, default: null },
-  bcc: { type: String, default: null },
-  creation: { type: String, required: true },
-  subject: {
-    type: String,
-    required: true,
-  },
-  attachments: {
-    type: Array,
-    default: () => [],
-  },
-  content: {
-    type: String,
     required: true,
   },
 });
 
+const { sender, to, cc, bcc, creation, subject, attachments, content } =
+  props.activity;
+
 const emit = defineEmits(["reply"]);
 
+let emailBox = inject("communicationArea");
 const { isMobileView } = useScreenSize();
+
+// TODO: Implement reply functionality using this way instead of emit drillup
+// function reply(email, reply_all = false) {
+//   emailBox.toggleEmailBox();
+//   let editor = emailBox.editor;
+//   let message = email.content;
+//   let recipients = sender.name;
+//   editor.toEmails = [email.sender];
+//   editor.cc = editor.bcc = false;
+//   editor.ccEmails = [];
+//   editor.bccEmails = [];
+//   console.log(recipients);
+
+//   if (!email.subject.startsWith("Re:")) {
+//     editor.subject = `Re: ${email.subject}`;
+//   } else {
+//     editor.subject = email.subject;
+//   }
+
+//   if (reply_all) {
+//     let cc = email.cc?.split(",").map((r) => r.trim());
+//     let bcc = email.bcc?.split(",").map((r) => r.trim());
+
+//     if (cc?.length) {
+//       recipients = recipients.filter((r) => !cc?.includes(r));
+//       cc.push(...recipients);
+//     } else {
+//       cc = recipients;
+//     }
+
+//     editor.cc = cc ? true : false;
+//     editor.bcc = bcc ? true : false;
+
+//     editor.ccEmails = cc;
+//     editor.bccEmails = bcc;
+//   }
+
+//   let repliedMessage = `<blockquote>${message}</blockquote>`;
+
+//   editor.editor
+//     .chain()
+//     .clearContent()
+//     .insertContent("<p>.</p>")
+//     .updateAttributes("paragraph", { class: "reply-to-content" })
+//     .insertContent(repliedMessage)
+//     .focus("all")
+//     .insertContentAt(0, { type: "paragraph" })
+//     .focus("start")
+//     .run();
+// }
 </script>
 
 <style>

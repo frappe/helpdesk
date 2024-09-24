@@ -330,7 +330,12 @@ const textEditorMenuButtons = [
   ],
 ];
 
+const editor = computed(() => {
+  return editorRef.value.editor;
+});
+
 defineExpose({
   addToReply,
+  editor,
 });
 </script>

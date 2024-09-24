@@ -21,7 +21,7 @@ export { default as EmailEditor } from "./EmailEditor.vue";
 export { default as CommentTextEditor } from "./CommentTextEditor.vue";
 export { default as MultiSelectInput } from "./MultiSelectInput.vue";
 export { default as CommunicationArea } from "./CommunicationArea.vue";
-export { default as EmailBox } from "./EmailBox.vue";
+export { default as EmailArea } from "./EmailArea.vue";
 export { default as CommentBox } from "./CommentBox.vue";
 export { default as HistoryBox } from "./HistoryBox.vue";
 export { default as AssignmentModal } from "./AssignmentModal.vue";

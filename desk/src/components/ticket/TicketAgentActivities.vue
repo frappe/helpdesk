@@ -24,17 +24,18 @@
           </div>
         </div>
         <div class="mb-4 w-full">
-          <EmailBox
+          <EmailArea
             v-if="activity.type === 'email'"
-            v-bind="activity"
+            :activity="activity"
+            class="py-2 px-3"
             @reply="(e) => emit('email:reply', e)"
           />
           <CommentBox
             v-else-if="activity.type === 'comment'"
-            v-bind="activity"
+            :activity="activity"
             @update="() => emit('update')"
           />
-          <HistoryBox v-else v-bind="activity" />
+          <HistoryBox v-else :activity="activity" />
         </div>
       </div>
     </div>
@@ -44,7 +45,7 @@
 <script setup lang="ts">
 import { useElementVisibility } from "@vueuse/core";
 import { DotIcon, EmailAtIcon, CommentIcon } from "@/components/icons";
-import { EmailBox, CommentBox, HistoryBox } from "@/components";
+import { EmailArea, CommentBox, HistoryBox } from "@/components";
 
 defineProps({
   activities: {
