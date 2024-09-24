@@ -88,6 +88,7 @@
               <TicketAgentFields
                 :ticket="ticket.data"
                 @update="({ field, value }) => updateTicket(field, value)"
+                class="!border-0"
               />
             </div>
             <!-- Rest Activities -->
