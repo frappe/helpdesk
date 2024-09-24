@@ -29,7 +29,8 @@ export default defineConfig({
         display: "standalone",
         name: "Frappe Helpdesk",
         short_name: "Frappe Helpdesk",
-        description: "Frappe Helpdesk",
+        description:
+          "Modern, Streamlined, Free and Open Source Customer Service Software",
         icons: [
           {
             src: "/assets/helpdesk/desk/manifest/manifest-icon-192.maskable.png",
