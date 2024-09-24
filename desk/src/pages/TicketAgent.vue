@@ -132,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted } from "vue";
+import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
@@ -160,8 +160,6 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
 import { TabObject, TicketTab } from "@/types";
-import { provide } from "vue";
-import { nextTick } from "vue";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();

@@ -56,43 +56,73 @@
         />
       </div>
     </header>
-    <div v-if="ticket.data" class="flex h-screen overflow-hidden">
-      <div class="flex flex-1 flex-col">
-        <div class="flex items-center justify-between border-b py-1 pr-2.5">
-          <span class="pl-6 text-lg font-semibold">Activity</span>
-          <Switch
-            v-model="showFullActivity"
-            size="sm"
-            label="Show all activity"
+    <div v-if="ticket.data" class="flex flex-1 overflow-x-hidden">
+      <div class="flex flex-1 flex-col overflow-x-hidden">
+        <div class="flex-1 flex flex-col">
+          <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
+            <div v-if="tab.name === 'details'">
+              <!-- ticket contact info -->
+              <TicketAgentContact
+                :contact="ticket.data.contact"
+                @email:open="communicationAreaRef.toggleEmailBox()"
+              />
+              <!-- feedback component -->
+              <TicketFeedback
+                v-if="ticket.data.feedback_rating"
+                class="border-b px-6 py-3 text-base text-gray-600"
+                :ticket="ticket.data"
+              />
+              <!-- SLA Section -->
+              <h3 class="px-6 pt-3 font-semibold text-base">SLA</h3>
+              <TicketAgentDetails
+                :agreement-status="ticket.data.agreement_status"
+                :first-responded-on="ticket.data.first_responded_on"
+                :response-by="ticket.data.response_by"
+                :resolution-date="ticket.data.resolution_date"
+                :resolution-by="ticket.data.resolution_by"
+                :ticket-created-on="ticket.data.creation"
+                :source="ticket.data.via_customer_portal ? 'Portal' : 'Mail'"
+              />
+              <!-- Ticket Fields -->
+              <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>
+              <TicketAgentFields
+                :ticket="ticket.data"
+                @update="({ field, value }) => updateTicket(field, value)"
+              />
+            </div>
+            <!-- Rest Activities -->
+            <TicketAgentActivities
+              v-else
+              ref="ticketAgentActivitiesRef"
+              :activities="filterActivities(tab.name)"
+              :title="tab.label"
+              @update="
+                () => {
+                  ticket.reload();
+                }
+              "
+              @email:reply="
+                (e) => {
+                  communicationAreaRef.replyToEmail(e);
+                }
+              "
+            />
+          </Tabs>
+          <CommunicationArea
+            class="sticky bottom-0 z-50 bg-white"
+            ref="communicationAreaRef"
+            v-model="ticket.data"
+            :to-emails="[ticket.data.raised_by]"
+            :cc-emails="[]"
+            :bcc-emails="[]"
+            @update="
+              () => {
+                ticket.reload();
+                ticketAgentActivitiesRef.scrollToLatestActivity();
+              }
+            "
           />
         </div>
-        <TicketAgentActivities
-          ref="ticketAgentActivitiesRef"
-          :activities="activities"
-          @update="
-            () => {
-              ticket.reload();
-            }
-          "
-          @email:reply="
-            (e) => {
-              communicationAreaRef.replyToEmail(e);
-            }
-          "
-        />
-        <CommunicationArea
-          ref="communicationAreaRef"
-          v-model="ticket.data"
-          :to-emails="[ticket.data.raised_by]"
-          :cc-emails="[]"
-          :bcc-emails="[]"
-          @update="
-            () => {
-              ticket.reload();
-              ticketAgentActivitiesRef.scrollToLatestActivity();
-            }
-          "
-        />
       </div>
     </div>
     <AssignmentModal
@@ -142,12 +172,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted } from "vue";
+import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
-  Switch,
+  Tabs,
   createResource,
   Dialog,
   FormControl,
@@ -158,10 +188,15 @@ import {
   MultipleAvatar,
   AssignmentModal,
   CommunicationArea,
-  PageTitle,
 } from "@/components";
 import { TicketAgentActivities } from "@/components/ticket";
-import { IndicatorIcon } from "@/components/icons";
+import {
+  ActivityIcon,
+  CommentIcon,
+  EmailIcon,
+  IndicatorIcon,
+  DetailsIcon,
+} from "@/components/icons";
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
@@ -170,6 +205,9 @@ import { createToast, setupCustomActions } from "@/utils";
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 import { useScreenSize } from "@/composables/screen";
+import { TabObject, TicketTab } from "@/types";
+import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
+import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const subjectInput = ref(null);
@@ -181,6 +219,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
   showAllActivity: true,
@@ -245,6 +285,31 @@ const dropdownOptions = computed(() =>
       }),
   }))
 );
+
+const tabIndex = ref(0);
+const tabs: TabObject[] = [
+  {
+    name: "details",
+    label: "Details",
+    icon: DetailsIcon,
+    condition: () => isMobileView.value,
+  },
+  {
+    name: "activity",
+    label: "Activity",
+    icon: ActivityIcon,
+  },
+  {
+    name: "email",
+    label: "Emails",
+    icon: EmailIcon,
+  },
+  {
+    name: "comment",
+    label: "Comments",
+    icon: CommentIcon,
+  },
+];
 
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email) => {
@@ -321,6 +386,13 @@ const activities = computed(() => {
 
   return data;
 });
+
+function filterActivities(eventType: TicketTab) {
+  if (eventType === "activity") {
+    return activities.value;
+  }
+  return activities.value.filter((activity) => activity.type === eventType);
+}
 
 function updateTicket(fieldname: string, value: string) {
   isLoading.value = true;
