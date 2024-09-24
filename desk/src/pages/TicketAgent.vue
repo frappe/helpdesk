@@ -74,7 +74,8 @@
           @update="
             () => {
               ticket.reload();
-              ticketAgentActivitiesRef.scrollToLatestActivity();
+              tabIndex !== 0 &&
+                ticketAgentActivitiesRef.scrollToLatestActivity();
             }
           "
         />

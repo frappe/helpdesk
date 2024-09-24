@@ -78,11 +78,7 @@
       </div>
       <div class="flex justify-between gap-2 overflow-hidden px-10 py-2.5">
         <div class="flex items-center overflow-x-auto">
-          <TextEditorFixedMenu
-            class="-ml-1"
-            :buttons="textEditorMenuButtons"
-            v-if="!isMobileView"
-          />
+          <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
             <FileUploader
               :upload-args="{
@@ -167,12 +163,10 @@ import {
   CannedResponseSelectorModal,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
-import { useScreenSize } from "@/composables/screen";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
 const loading = ref(false);
-const { isMobileView } = useScreenSize();
 
 const props = defineProps({
   placeholder: {
