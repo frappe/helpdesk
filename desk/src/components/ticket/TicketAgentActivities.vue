@@ -1,5 +1,6 @@
 <template>
   <div class="h-screen py-3.5 comm-area px-3 lg:px-6">
+    <ActivityHeader :title="title" />
     <div v-for="(activity, i) in activities" :key="activity.key">
       <!-- single activity -->
       <div class="flex gap-4 w-full">
@@ -52,9 +53,9 @@ defineProps({
     type: Array,
     required: true,
   },
-  tab: {
+  title: {
     type: String,
-    required: false,
+    required: true,
   },
 });
 

@@ -56,7 +56,7 @@
             <TicketAgentActivities
               ref="ticketAgentActivitiesRef"
               :activities="filterActivities(tab.name)"
-              :tab="tab.name"
+              :title="tab.label"
               @update="
                 () => {
                   ticket.reload();
@@ -182,9 +182,7 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {
-  provide("communicationArea", communicationAreaRef.value);
-});
+provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
   showAllActivity: true,

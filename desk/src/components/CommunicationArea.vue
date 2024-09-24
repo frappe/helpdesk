@@ -135,6 +135,7 @@ const props = defineProps({
 defineExpose({
   replyToEmail,
   toggleEmailBox,
+  toggleCommentBox,
   editor: emailEditorRef,
 });
 </script>
