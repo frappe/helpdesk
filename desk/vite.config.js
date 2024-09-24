@@ -8,6 +8,7 @@ import IconsResolver from "unplugin-icons/resolver";
 import { FileSystemIconLoader } from "unplugin-icons/loaders";
 import { SVG, cleanupSVG, parseColors } from "@iconify/tools";
 import LucideIcons from "./lucide";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
@@ -18,6 +19,44 @@ export default defineConfig({
         prefix: false,
         enabledCollections: ["lucide"],
       }),
+    }),
+    VitePWA({
+      registerType: "autoUpdate",
+      devOptions: {
+        enabled: true,
+      },
+      manifest: {
+        display: "standalone",
+        name: "Frappe Helpdesk",
+        short_name: "Frappe Helpdesk",
+        description: "Frappe Helpdesk",
+        icons: [
+          {
+            src: "/assets/helpdesk/desk/manifest/manifest-icon-192.maskable.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/assets/helpdesk/desk/manifest/manifest-icon-192.maskable.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable",
+          },
+          {
+            src: "/assets/helpdesk/desk/manifest/manifest-icon-512.maskable.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any",
+          },
+          {
+            src: "/assets/helpdesk/desk/manifest/manifest-icon-512.maskable.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
+      },
     }),
     Icons({
       compiler: "vue3",
