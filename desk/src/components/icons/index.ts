@@ -11,3 +11,4 @@ export { default as AttachmentIcon } from "./AttachmentIcon.vue";
 export { default as ReplyIcon } from "./ReplyIcon.vue";
 export { default as ReplyAllIcon } from "./ReplyAllIcon.vue";
 export { default as RefreshIcon } from "./RefreshIcon.vue";
+export { default as DetailsIcon } from "./DetailsIcon.vue";

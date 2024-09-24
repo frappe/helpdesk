@@ -1,11 +1,6 @@
 <template>
   <div class="flex items-center justify-start gap-5 border-b p-5">
-    <Avatar
-      size="3xl"
-      class="h-[88px] w-[88px]"
-      :image="contact.image"
-      :label="contact.name"
-    />
+    <Avatar size="3xl" :image="contact.image" :label="contact.name" />
     <div class="flex flex-col gap-2.5">
       <Tooltip :text="contact.name">
         <div class="w-[242px] truncate text-2xl font-medium">

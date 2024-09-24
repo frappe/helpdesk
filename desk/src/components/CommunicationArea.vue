@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col comm-area">
-    <div class="flex justify-between gap-3 border-t px-10 py-2.5">
+    <div class="flex justify-between gap-3 border-t px-4 lg:px-10 py-2.5">
       <div class="flex gap-1.5">
         <Button
           ref="sendEmailRef"
@@ -135,6 +135,8 @@ const props = defineProps({
 defineExpose({
   replyToEmail,
   toggleEmailBox,
+  toggleCommentBox,
+  editor: emailEditorRef,
 });
 </script>
 
