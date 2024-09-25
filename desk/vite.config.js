@@ -35,7 +35,6 @@ export default defineConfig({
         start_url: "/helpdesk",
         description:
           "Modern, Streamlined, Free and Open Source Customer Service Software",
-        start_url: "/helpdesk",
         icons: [
           {
             src: "/assets/helpdesk/desk/manifest/manifest-icon-192.maskable.png",
