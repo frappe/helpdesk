@@ -1,20 +1,23 @@
 <template>
-  <div>
-    <div class="flex">
-      <div class="min-w-[106px] pb-1.5">Rating</div>
-      <div class="px-1.5">
+  <div class="flex flex-col gap-3 border-b px-6 py-3">
+    <div class="flex items-center text-base leading-5">
+      <div class="min-w-[126px] text-sm">Rating</div>
+      <div class="">
         <StarRating :rating="ticket.feedback_rating" />
       </div>
     </div>
-    <div class="flex">
-      <div class="w-[106px] pb-1.5">Feedback</div>
-      <div class="px-1.5 text-gray-800">
+    <div class="flex items-center text-base leading-5">
+      <div class="min-w-[126px] text-sm">Feedback</div>
+      <div class="text-gray-800">
         {{ ticket.feedback_text }}
       </div>
     </div>
-    <div v-if="ticket.feedback_extra" class="flex">
-      <div class="min-w-[106px] pb-1.5">Comment</div>
-      <div class="px-1.5 text-gray-800">
+    <div
+      v-if="ticket.feedback_extra"
+      class="flex items-center text-base leading-5"
+    >
+      <div class="min-w-[126px] text-sm">Comment</div>
+      <div class="text-gray-800">
         {{ ticket.feedback_extra }}
       </div>
     </div>

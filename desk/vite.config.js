@@ -25,10 +25,14 @@ export default defineConfig({
       devOptions: {
         enabled: true,
       },
+      workbox: {
+        cleanupOutdatedCaches: true,
+      },
       manifest: {
         display: "standalone",
         name: "Frappe Helpdesk",
-        short_name: "Frappe Helpdesk",
+        short_name: "Helpdesk",
+        start_url: "/helpdesk",
         description:
           "Modern, Streamlined, Free and Open Source Customer Service Software",
         start_url: "/helpdesk",
