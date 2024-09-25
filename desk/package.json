@@ -46,5 +46,8 @@
 	},
 	"resolutions": {
 		"cheerio": "1.0.0-rc.12"
+	},
+	"devDependencies": {
+		"vite-plugin-pwa": "^0.20.5"
 	}
 }

@@ -44,33 +44,31 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
-      <div class="flex flex-1 flex-col w-[calc(100%-382px)]">
-        <div class="flex items-center justify-between border-b py-1 pr-2.5">
-          <span class="pl-6 text-lg font-semibold">Activity</span>
-          <Switch
-            v-model="showFullActivity"
-            size="sm"
-            label="Show all activity"
-          />
+      <div class="flex flex-1 flex-col">
+        <!-- ticket activities -->
+        <div class="overflow-y-auto flex-1">
+          <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
+            <TicketAgentActivities
+              ref="ticketAgentActivitiesRef"
+              :activities="filterActivities(tab.name)"
+              :title="tab.label"
+              @update="
+                () => {
+                  ticket.reload();
+                }
+              "
+              @email:reply="
+                (e) => {
+                  communicationAreaRef.replyToEmail(e);
+                }
+              "
+            />
+          </Tabs>
         </div>
-        <TicketAgentActivities
-          ref="ticketAgentActivitiesRef"
-          :activities="activities"
-          @update="
-            () => {
-              ticket.reload();
-            }
-          "
-          @email:reply="
-            (e) => {
-              communicationAreaRef.replyToEmail(e);
-            }
-          "
-        />
         <CommunicationArea
           ref="communicationAreaRef"
           v-model="ticket.data"
-          :to-emails="[ticket.data.raised_by]"
+          :to-emails="[ticket.data?.raised_by]"
           :cc-emails="[]"
           :bcc-emails="[]"
           @update="
@@ -134,15 +132,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted } from "vue";
+import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
-  Switch,
   createResource,
   Dialog,
   FormControl,
+  Tabs,
 } from "frappe-ui";
 
 import {
@@ -152,11 +150,16 @@ import {
   CommunicationArea,
 } from "@/components";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
-import { IndicatorIcon } from "@/components/icons";
-
+import {
+  IndicatorIcon,
+  CommentIcon,
+  ActivityIcon,
+  EmailIcon,
+} from "@/components/icons";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
+import { TabObject, TicketTab } from "@/types";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -171,6 +174,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
   showAllActivity: true,
@@ -234,19 +239,38 @@ const dropdownOptions = computed(() =>
   }))
 );
 
+const tabIndex = ref(0);
+const tabs: TabObject[] = [
+  {
+    name: "activity",
+    label: "Activity",
+    icon: ActivityIcon,
+  },
+  {
+    name: "email",
+    label: "Emails",
+    icon: EmailIcon,
+  },
+  {
+    name: "comment",
+    label: "Comments",
+    icon: CommentIcon,
+  },
+];
+
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email) => {
     return {
-      type: "email",
-      key: email.creation,
+      subject: email.subject,
+      content: email.content,
       sender: { name: email.user.email, full_name: email.user.name },
       to: email.recipients,
+      type: "email",
+      key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
       creation: email.creation,
-      subject: email.subject,
       attachments: email.attachments,
-      content: email.content,
     };
   });
 
@@ -306,9 +330,15 @@ const activities = computed(() => {
     }
     i++;
   }
-
   return data;
 });
+
+function filterActivities(eventType: TicketTab) {
+  if (eventType === "activity") {
+    return activities.value;
+  }
+  return activities.value.filter((activity) => activity.type === eventType);
+}
 
 function updateTicket(fieldname: string, value: string) {
   isLoading.value = true;

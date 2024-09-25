@@ -28,7 +28,6 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 helpdesk/docs/current
 helpdesk/public/desk

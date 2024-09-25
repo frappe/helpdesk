@@ -1,3 +1,5 @@
+import { Component } from "vue";
+
 export interface Resource<A = unknown> {
   auto: boolean;
   loading: boolean;
@@ -192,4 +194,13 @@ export interface EmailAccount {
   enable_incoming?: boolean;
   default_outgoing?: boolean;
   default_incoming?: boolean;
+}
+
+export type TicketTab = "activity" | "email" | "comment" | "details";
+
+export interface TabObject {
+  name: TicketTab;
+  label: string;
+  icon: Component;
+  condition?: () => boolean;
 }

@@ -58,27 +58,13 @@ import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-  creation: {
-    type: String,
-    required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  commenter: {
-    type: String,
-    required: true,
-  },
-  commentedBy: {
-    type: String,
+  activity: {
+    type: Object,
     required: true,
   },
 });
+
+const { name, creation, content, commenter, commentedBy } = props.activity;
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
@@ -87,7 +73,7 @@ const deleteComment = createResource({
   url: "frappe.client.delete",
   makeParams: () => ({
     doctype: "HD Ticket Comment",
-    name: props.name,
+    name: name,
   }),
   onSuccess() {
     emit("update");
