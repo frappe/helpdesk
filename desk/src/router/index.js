@@ -30,6 +30,12 @@ export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 export const CUSTOMER_PORTAL_LANDING = "TicketsCustomer";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 export const REDIRECT_PAGE = "/login?redirect-to=/helpdesk";
+
+export const CUSTOMER_PORTAL_ROUTES = [
+  "TicketsCustomer",
+  "TicketNew",
+  "TicketCustomer",
+];
 const routes = [
   {
     path: "",
@@ -63,7 +69,8 @@ const routes = [
   },
   {
     path: "/my-tickets",
-    component: () => import("@/pages/CLayout.vue"),
+    // component: () => import("@/pages/CLayout.vue"), // old customer portal
+    component: () => import("@/pages/CustomerPortalRoot.vue"), // new customer portal
     meta: {
       auth: true,
     },
