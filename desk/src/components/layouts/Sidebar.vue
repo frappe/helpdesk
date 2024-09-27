@@ -8,6 +8,7 @@
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
     <SidebarLink
+      v-if="!isCustomerPortal"
       label="Search"
       class="mb-1"
       :icon="LucideSearch"
@@ -21,7 +22,7 @@
         </span>
       </template>
     </SidebarLink>
-    <span class="mb-4">
+    <div class="mb-4">
       <div
         v-if="notificationStore.unread"
         class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400"
@@ -44,7 +45,7 @@
           />
         </template>
       </SidebarLink>
-    </span>
+    </div>
     <div class="mb-4 flex flex-col gap-1">
       <SidebarLink
         v-for="option in menuOptions"
@@ -80,6 +81,7 @@ import {
   AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
   CUSTOMER_PORTAL_LANDING,
+  CUSTOMER_PORTAL_ROUTES,
 } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
@@ -106,7 +108,11 @@ const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
 
-const menuOptions = computed(() => [
+const isCustomerPortal = computed(() =>
+  CUSTOMER_PORTAL_ROUTES.includes(route.name)
+);
+
+const agentPortalSidebarOptions = computed(() => [
   {
     label: "Tickets",
     icon: LucideTicket,
@@ -144,10 +150,34 @@ const menuOptions = computed(() => [
   },
 ]);
 
-function isActiveTab(to: string) {
-  return route.name === to;
-}
-const profileSettings = [
+const customperPortalSidebarOptions = computed(() => [
+  {
+    label: "Tickets",
+    icon: LucideTicket,
+    to: "TicketsCustomer",
+  },
+  {
+    label: "Knowledge base",
+    icon: LucideBookOpen,
+    to: "KBHome",
+  },
+]);
+
+const menuOptions = computed(() => {
+  return isCustomerPortal.value
+    ? customperPortalSidebarOptions.value
+    : agentPortalSidebarOptions.value;
+});
+
+const customerPortalDropdown = computed(() => [
+  {
+    label: "Log out",
+    icon: "log-out",
+    onClick: () => authStore.logout(),
+  },
+]);
+
+const agentPortalDropdown = computed(() => [
   {
     component: markRaw(Apps),
   },
@@ -173,14 +203,23 @@ const profileSettings = [
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
-    condition: () => authStore.isAdmin,
   },
   {
     label: "Log out",
     icon: "log-out",
     onClick: () => authStore.logout(),
   },
-];
+]);
+
+const profileSettings = computed(() => {
+  return isCustomerPortal.value
+    ? customerPortalDropdown.value
+    : agentPortalDropdown.value;
+});
+
+function isActiveTab(to: string) {
+  return route.name === to;
+}
 
 function openCommandPalette() {
   window.dispatchEvent(
