@@ -74,31 +74,20 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import {
-  AGENT_PORTAL_AGENT_LIST,
-  AGENT_PORTAL_CONTACT_LIST,
-  AGENT_PORTAL_CUSTOMER_LIST,
-  AGENT_PORTAL_TEAM_LIST,
-  AGENT_PORTAL_TICKET_LIST,
-  CUSTOMER_PORTAL_LANDING,
-  CUSTOMER_PORTAL_ROUTES,
-} from "@/router";
+import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_ROUTES } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import UserMenu from "@/components/UserMenu.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideBookOpen from "~icons/lucide/book-open";
-import LucideCloudLightning from "~icons/lucide/cloud-lightning";
-import LucideContact2 from "~icons/lucide/contact-2";
 import LucideBell from "~icons/lucide/bell";
-import LucideTicket from "~icons/lucide/ticket";
-import LucideUser from "~icons/lucide/user";
-import LucideUserCircle2 from "~icons/lucide/user-circle-2";
-import LucideUsers from "~icons/lucide/users";
 import LucideSearch from "~icons/lucide/search";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import Apps from "@/components/Apps.vue";
+import {
+  agentPortalSidebarOptions,
+  customerPortalSidebarOptions,
+} from "./layoutSettings";
 
 const route = useRoute();
 const router = useRouter();
@@ -107,66 +96,14 @@ const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
-
 const isCustomerPortal = computed(() =>
   CUSTOMER_PORTAL_ROUTES.includes(route.name)
 );
 
-const agentPortalSidebarOptions = computed(() => [
-  {
-    label: "Tickets",
-    icon: LucideTicket,
-    to: AGENT_PORTAL_TICKET_LIST,
-  },
-  {
-    label: "Agents",
-    icon: LucideUser,
-    to: AGENT_PORTAL_AGENT_LIST,
-  },
-  {
-    label: "Knowledge base",
-    icon: LucideBookOpen,
-    to: "DeskKBHome",
-  },
-  {
-    label: "Teams",
-    icon: LucideUsers,
-    to: AGENT_PORTAL_TEAM_LIST,
-  },
-  {
-    label: "Canned responses",
-    icon: LucideCloudLightning,
-    to: "CannedResponses",
-  },
-  {
-    label: "Customers",
-    icon: LucideUserCircle2,
-    to: AGENT_PORTAL_CUSTOMER_LIST,
-  },
-  {
-    label: "Contacts",
-    icon: LucideContact2,
-    to: AGENT_PORTAL_CONTACT_LIST,
-  },
-]);
-
-const customperPortalSidebarOptions = computed(() => [
-  {
-    label: "Tickets",
-    icon: LucideTicket,
-    to: "TicketsCustomer",
-  },
-  {
-    label: "Knowledge base",
-    icon: LucideBookOpen,
-    to: "KBHome",
-  },
-]);
-
 const menuOptions = computed(() => {
   return isCustomerPortal.value
-    ? customperPortalSidebarOptions.value
-    : agentPortalSidebarOptions.value;
+    ? customerPortalSidebarOptions
+    : agentPortalSidebarOptions;
 });
 
 const customerPortalDropdown = computed(() => [
