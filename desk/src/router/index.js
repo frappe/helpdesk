@@ -78,7 +78,10 @@ const routes = [
       {
         path: "",
         name: "TicketsCustomer",
-        component: () => import("@/pages/TicketsCustomer.vue"),
+        component: () => import("@/pages/TicketsAgent.vue"),
+        meta: {
+          public: true,
+        },
       },
       {
         path: "new/:templateId?",
@@ -88,6 +91,7 @@ const routes = [
         meta: {
           onSuccessRoute: "TicketCustomer",
           parent: "TicketsCustomer",
+          public: true,
         },
       },
       {
@@ -95,6 +99,9 @@ const routes = [
         name: "TicketCustomer",
         component: () => import("@/pages/TicketCustomer.vue"),
         props: true,
+        meta: {
+          public: true,
+        },
       },
     ],
   },

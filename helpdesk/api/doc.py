@@ -9,7 +9,7 @@ from helpdesk.utils import check_permissions
 
 @frappe.whitelist()
 @redis_cache()
-def get_filterable_fields(doctype):
+def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
     check_permissions(doctype, None)
     QBDocField = frappe.qb.DocType("DocField")
     QBCustomField = frappe.qb.DocType("Custom Field")
@@ -25,6 +25,15 @@ def get_filterable_fields(doctype):
         "Text Editor",
         "Text",
     ]
+    customer_portal_fields = [
+        "name",
+        "subject",
+        "status",
+        "priority",
+        "response_by",
+        "resolution_by",
+        "creation",
+    ]
 
     from_doc_fields = (
         frappe.qb.from_(QBDocField)
@@ -38,8 +47,15 @@ def get_filterable_fields(doctype):
         .where(QBDocField.parent == doctype)
         .where(QBDocField.hidden == False)
         .where(Criterion.any([QBDocField.fieldtype == i for i in allowed_fieldtypes]))
-        .run(as_dict=True)
     )
+
+    # for customer portal show only fields present in customer_portal_fields
+    if show_customer_portal_fields:
+        from_doc_fields = from_doc_fields.where(
+            QBDocField.fieldname.isin(customer_portal_fields)
+        )
+
+    from_doc_fields = from_doc_fields.run(as_dict=True)
 
     from_custom_fields = (
         frappe.qb.from_(QBCustomField)
@@ -58,26 +74,32 @@ def get_filterable_fields(doctype):
         .run(as_dict=True)
     )
 
+    # from hd ticket template get children with fieldname and hidden_from_customer
+
     res = []
     res.extend(from_doc_fields)
-    res.extend(from_custom_fields)
-    res.extend(
-        [
+    if not show_customer_portal_fields:
+        # TODO: Ritvik => till a better way we have for custom fields, dont show custom fields in customer portal
+        res.extend(from_custom_fields)
+        res.append(
             {
                 "fieldname": "_assign",
                 "fieldtype": "Link",
                 "label": "Assigned to",
                 "name": "_assign",
                 "options": "HD Agent",
-            },
-            {
-                "fieldname": "name",
-                "fieldtype": "Data",
-                "label": "ID",
-                "name": "name",
-            },
-        ]
+            }
+        )
+
+    res.append(
+        {
+            "fieldname": "name",
+            "fieldtype": "Data",
+            "label": "ID",
+            "name": "name",
+        },
     )
+
     return res
 
 
@@ -187,7 +209,7 @@ def get_list_data(
 
 
 @frappe.whitelist()
-def sort_options(doctype: str):
+def sort_options(doctype: str, show_customer_portal_fields=False):
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
     fields = [
@@ -199,6 +221,26 @@ def sort_options(doctype: str):
         if field.label and field.fieldname
     ]
 
+    if show_customer_portal_fields:
+        custom_fields = frappe.db.get_all(
+            "Custom Field", {"dt": doctype}, pluck="fieldname"
+        )
+        customer_portal_fields = [
+            "name",
+            "subject",
+            "status",
+            "priority",
+            "response_by",
+            "resolution_by",
+            "creation",
+        ]
+        fields = [
+            field
+            for field in fields
+            if field.get("value") not in custom_fields
+            and field.get("value") in customer_portal_fields
+        ]
+
     standard_fields = [
         {"label": "Name", "value": "name"},
         {"label": "Created On", "value": "creation"},
@@ -207,7 +249,6 @@ def sort_options(doctype: str):
         {"label": "Owner", "value": "owner"},
     ]
 
-    for field in standard_fields:
-        fields.append(field)
+    fields.extend(standard_fields)
 
     return fields
