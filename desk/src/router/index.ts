@@ -91,7 +91,7 @@ const routes = [
       {
         path: "",
         name: "TicketsCustomer",
-        component: () => import("@/pages/TicketsAgent.vue"),
+        component: () => import("@/pages/Tickets.vue"),
         meta: {
           public: true,
         },
@@ -141,7 +141,7 @@ const routes = [
       {
         path: "tickets",
         name: AGENT_PORTAL_TICKET_LIST,
-        component: () => import("@/pages/TicketsAgent.vue"),
+        component: () => import("@/pages/Tickets.vue"),
       },
       {
         path: "notifications",

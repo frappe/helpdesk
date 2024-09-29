@@ -83,7 +83,7 @@ const ticket = createResource({
   },
   onError: () => {
     createToast({
-      title: "You are not allowed to view this ticket",
+      title: "Ticket not found",
       icon: "x",
       iconClasses: "text-red-600",
     });

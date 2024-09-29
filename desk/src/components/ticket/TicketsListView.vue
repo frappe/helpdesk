@@ -6,7 +6,7 @@
     :rows="rows"
     :options="{
       getRowRoute: (row) => ({
-        name: 'TicketAgent',
+        name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
         params: { ticketId: row.name },
       }),
       selectable: options.selectable,

@@ -124,76 +124,82 @@ const { isMobileView } = useScreenSize();
 
 const quickFilterList = computed(() => {
   let filters = [{ name: "name", label: "ID", fieldtype: "Data" }];
-
   return filters;
 });
 
-const presetFilters = [
-  {
-    label: "All Tickets",
-    onClick: (e) => {
-      setTitle("Helpdesk");
-      emitToParent(
-        {
-          event: "clear",
-        },
-        "event:filter"
-      );
+const presetFilters = computed(() => {
+  const _presetFilters = [
+    {
+      label: "All Tickets",
+      onClick: (e) => {
+        setTitle("Helpdesk");
+        emitToParent(
+          {
+            event: "clear",
+          },
+          "event:filter"
+        );
+      },
     },
-  },
-  {
-    label: "My Open Tickets",
-    onClick: (e) => {
-      const preset = getPresetFilters("Open");
-      emitToParent(
-        {
-          event: "preset",
-          data: preset,
-        },
-        "event:filter"
-      );
+    {
+      label: "My Open Tickets",
+      onClick: (e) => {
+        const preset = getPresetFilters("Open");
+        emitToParent(
+          {
+            event: "preset",
+            data: preset,
+          },
+          "event:filter"
+        );
+      },
     },
-  },
-  {
-    label: "My Replied Tickets",
-    onClick: (e) => {
-      const preset = getPresetFilters("Replied");
-      emitToParent(
-        {
-          event: "preset",
-          data: preset,
-        },
-        "event:filter"
-      );
+    {
+      label: "My Closed Tickets",
+      onClick: (e) => {
+        const preset = getPresetFilters("Closed");
+        emitToParent(
+          {
+            event: "preset",
+            data: preset,
+          },
+          "event:filter"
+        );
+      },
     },
-  },
-  {
-    label: "My Resolved Tickets",
-    onClick: (e) => {
-      const preset = getPresetFilters("Resolved");
-      emitToParent(
-        {
-          event: "preset",
-          data: preset,
+  ];
+  if (!props.isCustomerPortal) {
+    _presetFilters.push(
+      {
+        label: "My Replied Tickets",
+        onClick: (e) => {
+          const preset = getPresetFilters("Replied");
+          emitToParent(
+            {
+              event: "preset",
+              data: preset,
+            },
+            "event:filter"
+          );
         },
-        "event:filter"
-      );
-    },
-  },
-  {
-    label: "My Closed Tickets",
-    onClick: (e) => {
-      const preset = getPresetFilters("Closed");
-      emitToParent(
-        {
-          event: "preset",
-          data: preset,
+      },
+      {
+        label: "My Resolved Tickets",
+        onClick: (e) => {
+          const preset = getPresetFilters("Resolved");
+          emitToParent(
+            {
+              event: "preset",
+              data: preset,
+            },
+            "event:filter"
+          );
         },
-        "event:filter"
-      );
-    },
-  },
-];
+      }
+    );
+  }
+  return _presetFilters;
+});
 
 function setTitle(title: string) {
   document.title = title;
