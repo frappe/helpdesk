@@ -5,7 +5,9 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <RouterLink :to="{ name: 'TicketAgentNew' }">
+        <RouterLink
+          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
+        >
           <Button label="Create" theme="gray" variant="solid">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
@@ -53,9 +55,18 @@ import { createResource, Breadcrumbs } from "frappe-ui";
 import { TicketsAgentList } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
+import { useRoute } from "vue-router";
 const { getUser } = useUserStore();
 
-const breadcrumbs = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+const route = useRoute();
+const isCustomerPortal = route.meta.public;
+
+const breadcrumbs = [
+  {
+    label: "Tickets",
+    route: { name: isCustomerPortal ? "TicketsCustomer" : "TicketsAgent" },
+  },
+];
 let storage = useStorage("tickets_agent", {
   filtersToApply: {},
   filters: [],
@@ -165,11 +176,16 @@ function updatePageLength(value) {
 }
 
 function processFieldClick(event) {
-  filters.value.push({
-    field: filterableFields.data.find((f) => f.fieldname === event.name),
-    operator: "is",
-    value: event.value,
-  });
+  const isDuplicateFilter = filters.value.find(
+    (filter) => filter.field.fieldname === event.name
+  );
+  if (!isDuplicateFilter) {
+    filters.value.push({
+      field: filterableFields.data.find((f) => f.fieldname === event.name),
+      operator: "is",
+      value: event.value,
+    });
+  }
 
   if (event.name == "_assign") {
     filtersToApply[event.name] = ["LIKE", `%${event.value}%`];
@@ -302,6 +318,7 @@ const filterableFields = createResource({
   params: {
     doctype: "HD Ticket",
     append_assign: true,
+    show_customer_portal_fields: isCustomerPortal ? true : false,
   },
   transform: (data) => {
     return data
@@ -332,6 +349,7 @@ const sortableFields = createResource({
   auto: true,
   params: {
     doctype: "HD Ticket",
+    show_customer_portal_fields: isCustomerPortal ? true : false,
   },
 });
 </script>
