@@ -133,7 +133,6 @@ import EditIcon from "@/components/icons/EditIcon.vue";
 import NestedPopover from "@/components/NestedPopover.vue";
 import { Autocomplete } from "@/components";
 import Draggable from "vuedraggable";
-import { useRoute } from "vue-router";
 
 let emit = defineEmits(["event:column"]);
 let edit = ref(false);
@@ -157,10 +156,11 @@ let props = defineProps({
     type: Boolean,
     default: false,
   },
+  isCustomerPortal: {
+    type: Boolean,
+    default: false,
+  },
 });
-
-const route = useRoute();
-const isCustomerPortal = route.meta.public ?? false;
 
 function resetToDefault(close) {
   let columnEvent = {

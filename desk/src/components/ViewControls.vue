@@ -114,6 +114,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  isCustomerPortal: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const { isMobileView } = useScreenSize();
@@ -198,27 +202,35 @@ function setTitle(title: string) {
 function getPresetFilters(status: string) {
   setTitle(`My ${status} Tickets`);
   document.title = `My ${status} Tickets`;
-  return {
-    filters: [
-      {
-        field: props.filter.filterableFields.find(
-          (f) => f.fieldname === "status"
-        ),
-        operator: "is",
-        value: status,
-      },
-      {
-        field: props.filter.filterableFields.find(
-          (f) => f.fieldname === "_assign"
-        ),
-        operator: "is",
-        value: authStore.userId,
-      },
-    ],
-    filtersToApply: {
-      status: ["=", status],
-      _assign: ["LIKE", `%${authStore.userId}%`],
+
+  const filtersToApply = {
+    status: ["=", status],
+  };
+
+  const filters = [
+    {
+      field: props.filter.filterableFields.find(
+        (f) => f.fieldname === "status"
+      ),
+      operator: "is",
+      value: status,
     },
+  ];
+
+  if (!props.isCustomerPortal) {
+    filtersToApply["_assign"] = ["LIKE", `%${authStore.userId}%`];
+    filters.push({
+      field: props.filter.filterableFields.find(
+        (f) => f.fieldname === "_assign"
+      ),
+      operator: "is",
+      value: authStore.userId,
+    });
+  }
+
+  return {
+    filters,
+    filtersToApply,
   };
 }
 

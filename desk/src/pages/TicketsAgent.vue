@@ -23,6 +23,7 @@
         fields: fields,
         columns: columns,
       }"
+      :is-customer-portal="isCustomerPortal"
       @event:sort="processSorts"
       @event:filter="processFilters"
       @event:column="processColumns"
@@ -59,7 +60,7 @@ import { useRoute } from "vue-router";
 const { getUser } = useUserStore();
 
 const route = useRoute();
-const isCustomerPortal = route.meta.public ?? false;
+const isCustomerPortal: boolean = route.meta.public ?? false;
 
 const breadcrumbs = [
   {
@@ -247,6 +248,7 @@ function processSorts(sortEvent) {
 }
 
 function processFilters(filterEvent) {
+  console.log(filterEvent);
   if (filterEvent.event === "add") {
     let idx = filters.value.findIndex(
       (filter) => filter.field.fieldname === filterEvent.data.field.fieldname

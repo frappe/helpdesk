@@ -36,6 +36,19 @@ export const CUSTOMER_PORTAL_ROUTES = [
   "TicketNew",
   "TicketCustomer",
 ];
+
+// type the meta fields
+declare module "vue-router" {
+  interface RouteMeta {
+    auth?: boolean;
+    agent?: boolean;
+    admin?: boolean;
+    public?: boolean;
+    onSuccessRoute?: string;
+    parent?: string;
+  }
+}
+
 const routes = [
   {
     path: "",
