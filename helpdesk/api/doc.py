@@ -112,6 +112,7 @@ def get_list_data(
     page_length=20,
     columns=None,
     rows=None,
+    show_customer_portal_fields=False,
 ):
     is_default = True
 
@@ -145,7 +146,7 @@ def get_list_data(
     # flake8: noqa
     if is_default:
         if hasattr(list, "default_list_data"):
-            columns = list.default_list_data().get("columns")
+            columns = list.default_list_data(show_customer_portal_fields).get("columns")
             rows = list.default_list_data().get("rows")
 
     # check if rows has all keys from columns if not add them
@@ -198,6 +199,9 @@ def get_list_data(
         if field not in fields:
             fields.append(field)
 
+    if show_customer_portal_fields:
+        fields = get_customer_portal_fields(doctype, fields)
+
     return {
         "data": data,
         "columns": columns,
@@ -222,24 +226,7 @@ def sort_options(doctype: str, show_customer_portal_fields=False):
     ]
 
     if show_customer_portal_fields:
-        custom_fields = frappe.db.get_all(
-            "Custom Field", {"dt": doctype}, pluck="fieldname"
-        )
-        customer_portal_fields = [
-            "name",
-            "subject",
-            "status",
-            "priority",
-            "response_by",
-            "resolution_by",
-            "creation",
-        ]
-        fields = [
-            field
-            for field in fields
-            if field.get("value") not in custom_fields
-            and field.get("value") in customer_portal_fields
-        ]
+        fields = get_customer_portal_fields(doctype, fields)
 
     standard_fields = [
         {"label": "Name", "value": "name"},
@@ -251,4 +238,26 @@ def sort_options(doctype: str, show_customer_portal_fields=False):
 
     fields.extend(standard_fields)
 
+    return fields
+
+
+def get_customer_portal_fields(doctype, fields):
+    custom_fields = frappe.db.get_all(
+        "Custom Field", {"dt": doctype}, pluck="fieldname"
+    )
+    customer_portal_fields = [
+        "name",
+        "subject",
+        "status",
+        "priority",
+        "response_by",
+        "resolution_by",
+        "creation",
+    ]
+    fields = [
+        field
+        for field in fields
+        if field.get("value") not in custom_fields
+        and field.get("value") in customer_portal_fields
+    ]
     return fields

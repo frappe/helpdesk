@@ -49,7 +49,9 @@
             </template>
           </Draggable>
           <div class="mt-1.5 flex flex-col gap-1 border-t pt-1.5">
+            <!-- Show Add Column Button only for Agent Side -->
             <Autocomplete
+              v-if="!isCustomerPortal"
               value=""
               :options="fields"
               @change="(e) => addColumn(e)"
@@ -131,6 +133,7 @@ import EditIcon from "@/components/icons/EditIcon.vue";
 import NestedPopover from "@/components/NestedPopover.vue";
 import { Autocomplete } from "@/components";
 import Draggable from "vuedraggable";
+import { useRoute } from "vue-router";
 
 let emit = defineEmits(["event:column"]);
 let edit = ref(false);
@@ -155,6 +158,9 @@ let props = defineProps({
     default: false,
   },
 });
+
+const route = useRoute();
+const isCustomerPortal = route.meta.public ?? false;
 
 function resetToDefault(close) {
   let columnEvent = {

@@ -59,7 +59,7 @@ import { useRoute } from "vue-router";
 const { getUser } = useUserStore();
 
 const route = useRoute();
-const isCustomerPortal = route.meta.public;
+const isCustomerPortal = route.meta.public ?? false;
 
 const breadcrumbs = [
   {
@@ -98,10 +98,16 @@ const tickets = createResource({
     page_length: pageLength.value,
     columns: columns.length ? columns : undefined,
     rows: rows.length ? rows : undefined,
+    show_customer_portal_fields: isCustomerPortal,
   },
   auto: true,
   transform(data) {
     data.data.forEach((row) => {
+      if (isCustomerPortal) {
+        if (row.status == "Replied") {
+          row.status = "Awaiting Response";
+        }
+      }
       row.name = row.name.toString();
       let _assign = row._assign ? JSON.parse(row._assign) : null;
       row._assign = [];
@@ -305,6 +311,7 @@ function apply() {
       doctype: "HD Ticket",
       columns: columns.length ? columns : undefined,
       rows: rows.length ? rows : undefined,
+      show_customer_portal_fields: isCustomerPortal,
     },
   });
 
@@ -318,7 +325,7 @@ const filterableFields = createResource({
   params: {
     doctype: "HD Ticket",
     append_assign: true,
-    show_customer_portal_fields: isCustomerPortal ? true : false,
+    show_customer_portal_fields: isCustomerPortal,
   },
   transform: (data) => {
     return data
@@ -349,7 +356,7 @@ const sortableFields = createResource({
   auto: true,
   params: {
     doctype: "HD Ticket",
-    show_customer_portal_fields: isCustomerPortal ? true : false,
+    show_customer_portal_fields: isCustomerPortal,
   },
 });
 </script>
