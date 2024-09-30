@@ -79,6 +79,8 @@ export interface Ticket {
   subject: string;
   ticket_type: string;
   via_customer_portal: string;
+  agreement_status: string;
+  creation: string;
   feedback_rating?: number;
   feedback_text?: string;
   feedback_extra?: string;
