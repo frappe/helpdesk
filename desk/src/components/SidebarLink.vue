@@ -5,7 +5,7 @@
       'w-full': isExpanded,
       'w-8': !isExpanded,
       'shadow-sm': isActive,
-      'bg-white': isActive,
+      [bgColor]: isActive,
       'hover:bg-gray-100': !isActive,
     }"
     @click="handle"
@@ -40,16 +40,18 @@ import { Icon } from "@iconify/vue";
 interface P {
   icon: unknown;
   label: string;
-  isExpanded: boolean;
+  isExpanded?: boolean;
   isActive?: boolean;
   onClick?: () => void;
   to?: string;
+  bgColor?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   isActive: false,
   onClick: () => () => true,
   to: "",
+  bgColor: "bg-white",
 });
 const router = useRouter();
 

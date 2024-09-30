@@ -60,6 +60,6 @@ export const customerPortalSidebarOptions = [
   {
     label: "Knowledge base",
     icon: LucideBookOpen,
-    to: "KBHome",
+    to: "KnowledgeBasePublicNew",
   },
 ];

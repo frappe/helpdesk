@@ -54,32 +54,7 @@ const routes = [
     path: "",
     component: () => import("@/pages/HRoot.vue"),
   },
-  {
-    path: "/knowledge-base",
-    component: () => import("@/pages/KnowledgeBasePublic.vue"),
-    children: [
-      {
-        path: "",
-        name: "KBHome",
-        component: () => import("@/pages/KnowledgeBasePublicHome.vue"),
-      },
-      {
-        path: ":categoryId",
-        name: "KBCategoryPublic",
-        component: () => import("@/pages/KnowledgeBasePublicCategory.vue"),
-        props: true,
-      },
-      {
-        path: "articles/:articleId",
-        name: "KBArticlePublic",
-        component: () => import("@/pages/KnowledgeBaseArticle.vue"),
-        meta: {
-          public: true,
-        },
-        props: true,
-      },
-    ],
-  },
+  // Customer portal routing
   {
     path: "",
     name: "CustomerRoot",
@@ -93,17 +68,11 @@ const routes = [
       // handle tickets routing
       {
         path: "my-tickets",
-        meta: {
-          auth: true,
-        },
         children: [
           {
             path: "",
             name: "TicketsCustomer",
             component: () => import("@/pages/Tickets.vue"),
-            meta: {
-              public: true,
-            },
           },
           {
             path: "new/:templateId?",
@@ -113,7 +82,6 @@ const routes = [
             meta: {
               onSuccessRoute: "TicketCustomer",
               parent: "TicketsCustomer",
-              public: true,
             },
           },
           {
@@ -121,30 +89,24 @@ const routes = [
             name: "TicketCustomer",
             component: () => import("@/pages/TicketCustomer.vue"),
             props: true,
-            meta: {
-              public: true,
-            },
           },
         ],
       },
+      // handle knowledge base routing
       {
-        path: "kb-new",
-        meta: {
-          auth: true,
-        },
+        path: "knowledge-base-public",
+        children: [
+          {
+            path: "",
+            name: "KnowledgeBasePublicNew",
+            component: () =>
+              import("@/pages/knowledge-base-v2/KnowledgeBasePublic.vue"),
+          },
+        ],
       },
     ],
   },
-  {
-    path: "/onboarding",
-    name: ONBOARDING_PAGE,
-    component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
-  },
-  {
-    path: "/:invalidpath",
-    name: "Invalid Page",
-    component: () => import("@/pages/InvalidPage.vue"),
-  },
+  // Agent Portal Routing
   {
     path: "",
     name: "AgentRoot",
@@ -247,6 +209,17 @@ const routes = [
           import("@/pages/desk/escalation/EscalationRuleList.vue"),
       },
     ],
+  },
+  // Additonal routes
+  {
+    path: "/onboarding",
+    name: ONBOARDING_PAGE,
+    component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
+  },
+  {
+    path: "/:invalidpath",
+    name: "Invalid Page",
+    component: () => import("@/pages/InvalidPage.vue"),
   },
 ];
 

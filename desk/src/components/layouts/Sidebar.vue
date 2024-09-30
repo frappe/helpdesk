@@ -96,12 +96,10 @@ const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
-const isCustomerPortal = computed(() =>
-  CUSTOMER_PORTAL_ROUTES.includes(route.name)
-);
+const isCustomerPortal = route.meta.public ?? false;
 
 const menuOptions = computed(() => {
-  return isCustomerPortal.value
+  return isCustomerPortal
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
 });
@@ -149,7 +147,7 @@ const agentPortalDropdown = computed(() => [
 ]);
 
 const profileSettings = computed(() => {
-  return isCustomerPortal.value
+  return isCustomerPortal
     ? customerPortalDropdown.value
     : agentPortalDropdown.value;
 });
