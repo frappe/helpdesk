@@ -1,5 +1,5 @@
 <template>
-  <div class="border rounded flex-1 px-3 pt-1.5 pb-2.5 bg-gray-50">
+  <div class="border rounded flex-1 px-3 pt-2.5 bg-gray-50">
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong :hide-avatar="true" />

@@ -71,6 +71,9 @@
               {{ dayjs.tz(item).fromNow() }}
             </Tooltip>
           </div>
+          <div v-else-if="column.key === 'agent_group'">
+            {{ item || "-" }}
+          </div>
           <div v-else-if="column.key === 'resolution_by'">
             <Badge
               v-if="

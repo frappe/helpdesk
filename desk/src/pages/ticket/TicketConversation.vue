@@ -76,7 +76,7 @@ watch(
 );
 nextTick(() => {
   const hash = route.hash.slice(1);
-  const id = hash || conversation.value.slice(-1).pop()?.name;
+  const id = hash || communications.value.slice(-1).pop()?.name;
   if (id) setTimeout(() => scroll(id), 1000);
 });
 </script>
