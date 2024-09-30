@@ -21,7 +21,7 @@
           </Tooltip>
           <div class="flex gap-1.5">
             <Tooltip :text="ticket.data.contact.email_id">
-              <Button class="h-7 w-7">
+              <Button class="h-7 w-7" @click="emit('open')">
                 <EmailIcon class="h-4 w-4" />
               </Button>
             </Tooltip>
@@ -82,6 +82,9 @@ import { Tooltip, Avatar } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { formatTime } from "@/utils";
 import { Field } from "@/types";
+
+const emit = defineEmits(["open"]);
+
 const ticket = inject(ITicket);
 
 const slaData = computed(() => {

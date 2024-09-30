@@ -25,7 +25,7 @@
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
         <TicketConversation class="grow" />
-        <span class="m-5">
+        <div class="m-5">
           <TicketTextEditor
             v-if="showEditor"
             ref="editor"
@@ -46,10 +46,10 @@
               />
             </template>
           </TicketTextEditor>
-        </span>
+        </div>
       </section>
       <!-- Ticket Sidebar only for desktop view-->
-      <TicketCustomerSidebar v-if="!isMobileView" />
+      <TicketCustomerSidebar v-if="!isMobileView" @open="isExpanded = true" />
     </div>
     <TicketFeedback v-model:open="showFeedbackDialog" />
   </div>
