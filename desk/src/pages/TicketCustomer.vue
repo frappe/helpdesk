@@ -61,7 +61,6 @@ import { createResource, Button, Breadcrumbs } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useError } from "@/composables/error";
 import TicketConversation from "./ticket/TicketConversation.vue";
-import TicketCustomerConversation from "@/pages/ticket/TicketCustomerConversation.vue";
 import TicketCustomerTemplateFields from "./ticket/TicketCustomerTemplateFields.vue";
 import TicketFeedback from "./ticket/TicketFeedback.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";

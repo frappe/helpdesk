@@ -62,8 +62,6 @@ const communications = computed(() => {
   return orderBy(_communications, (c) => dayjs(c.creation));
 });
 
-console.log(communications.value);
-
 function scroll(id: string) {
   const e = document.getElementById(id);
   if (!useElementVisibility(e).value) {
