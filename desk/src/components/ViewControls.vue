@@ -84,6 +84,7 @@
       <ColumnSettings
         :fields="column.fields"
         :columns="column.columns"
+        :is-customer-portal="isCustomerPortal"
         @event:column="(e) => emitToParent(e, 'event:column')"
       />
     </div>
