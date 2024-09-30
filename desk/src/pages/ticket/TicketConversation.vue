@@ -1,16 +1,7 @@
 <template>
   <div class="divide-y overflow-auto px-5 pb-32">
     <div v-for="c in conversation" :id="c.name" :key="c.name" class="mt-4">
-      <TicketComment
-        v-if="c.commented_by"
-        :name="c.name"
-        :content="c.content"
-        :date="c.creation"
-        :user="c.user"
-        :is-pinned="c.is_pinned"
-      />
       <TicketCommunication
-        v-else
         :content="c.content"
         :date="c.creation"
         :user="c.user"
@@ -48,11 +39,8 @@ const route = useRoute();
 const ticket = inject(ITicket);
 const data = computed(() => ticket.data || {});
 const communications = computed(() => data.value.communications || []);
-const comments = computed(() => data.value.comments || []);
 const conversation = computed(() =>
-  orderBy([...communications.value, ...comments.value], (c) =>
-    dayjs(c.creation)
-  )
+  orderBy([...communications.value], (c) => dayjs(c.creation))
 );
 
 function scroll(id: string) {

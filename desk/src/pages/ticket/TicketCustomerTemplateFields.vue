@@ -29,9 +29,7 @@
       </span>
     </div>
     <div
-      v-for="field in ticket.data.template.fields.filter(
-        (f) => !f.hide_from_customer
-      )"
+      v-for="field in customFields"
       :key="field.fieldname"
       class="space-y-1.5"
     >
@@ -49,6 +47,7 @@
 import { inject, computed } from "vue";
 import { ITicket } from "./symbols";
 import { dayjs } from "@/dayjs";
+import { Field } from "@/types";
 
 const ticket = inject(ITicket);
 
@@ -94,6 +93,15 @@ const slaData = computed(() => {
       value: ticket.data.resolution_by,
     },
   ];
+});
+
+const customFields = computed(() => {
+  const _custom_fields = ticket.data.template.fields
+    .filter((field: Field) => !field.hide_from_customer)
+    .filter(
+      (f: Field) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
+    );
+  return _custom_fields;
 });
 
 function transformStatus(status: string) {
