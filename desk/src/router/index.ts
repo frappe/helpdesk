@@ -81,39 +81,56 @@ const routes = [
     ],
   },
   {
-    path: "/my-tickets",
+    path: "",
+    name: "CustomerRoot",
     // component: () => import("@/pages/CLayout.vue"), // old customer portal
-    component: () => import("@/pages/CustomerPortalRoot.vue"), // new customer portal
+    component: () => import("@/pages/CustomerPortalRoot.vue"),
     meta: {
       auth: true,
+      public: true,
     },
     children: [
+      // handle tickets routing
       {
-        path: "",
-        name: "TicketsCustomer",
-        component: () => import("@/pages/Tickets.vue"),
+        path: "my-tickets",
         meta: {
-          public: true,
+          auth: true,
         },
+        children: [
+          {
+            path: "",
+            name: "TicketsCustomer",
+            component: () => import("@/pages/Tickets.vue"),
+            meta: {
+              public: true,
+            },
+          },
+          {
+            path: "new/:templateId?",
+            name: "TicketNew",
+            component: () => import("@/pages/TicketNew.vue"),
+            props: true,
+            meta: {
+              onSuccessRoute: "TicketCustomer",
+              parent: "TicketsCustomer",
+              public: true,
+            },
+          },
+          {
+            path: ":ticketId",
+            name: "TicketCustomer",
+            component: () => import("@/pages/TicketCustomer.vue"),
+            props: true,
+            meta: {
+              public: true,
+            },
+          },
+        ],
       },
       {
-        path: "new/:templateId?",
-        name: "TicketNew",
-        component: () => import("@/pages/TicketNew.vue"),
-        props: true,
+        path: "kb-new",
         meta: {
-          onSuccessRoute: "TicketCustomer",
-          parent: "TicketsCustomer",
-          public: true,
-        },
-      },
-      {
-        path: ":ticketId",
-        name: "TicketCustomer",
-        component: () => import("@/pages/TicketCustomer.vue"),
-        props: true,
-        meta: {
-          public: true,
+          auth: true,
         },
       },
     ],
