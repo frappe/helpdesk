@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import get_user_info_for_avatar
 
+# from frappe.core.utils import html2text
+
 
 @frappe.whitelist()
 def get_sub_categories_and_articles(category):
@@ -36,10 +38,10 @@ def get_sub_categories_and_articles(category):
 
     category_tree = {
         "root_category": {"category_id": category, "category_name": category_title},
-        "articles": direct_articles,
         "sub_categories": [],
         "all_articles": direct_articles,
         "author": {},
+        "children": [],
     }
     # Create a dictionary to store sub-categories by their name
     sub_categories_dict = {sub_cat["name"]: sub_cat for sub_cat in sub_categories}
@@ -71,5 +73,7 @@ def get_sub_categories_and_articles(category):
         author = article["author"]
         if author not in category_tree["author"]:
             category_tree["author"][author] = get_user_info_for_avatar(author)
+
+    category_tree["children"] = direct_articles + category_tree["sub_categories"]
 
     return category_tree
