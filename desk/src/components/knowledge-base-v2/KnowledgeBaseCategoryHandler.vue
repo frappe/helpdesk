@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col p-5 px-10">
     <h3 class="text-xl font-semibold text-gray-800">
-      {{ categoryName }}
+      {{ JSON.stringify(categoryTree, null, 4) }}
     </h3>
   </div>
 </template>
@@ -15,46 +15,30 @@ const props = defineProps<{
   categoryId: string;
 }>();
 
-const categoryName = ref("");
+const categoryTree = ref(null);
 
-const categoryResource = createResource({
-  url: "helpdesk.api.kbase.get_category",
+const categoryTreeResource = createResource({
+  url: "helpdesk.api.kbase.get_sub_categories_and_articles",
   name: props.categoryId,
   cache: ["category", props.categoryId],
   params: {
     category: props.categoryId,
   },
   onSuccess: (data) => {
-    categoryName.value = data.category_name ?? data.name;
+    categoryTree.value = data;
   },
   auto: true,
 });
 
-const subCategories = createListResource({
-  doctype: "HD Article Category",
-  name: props.categoryId,
-  cache: ["category", props.categoryId],
-  fields: ["name", "category_name", "icon", "parent_category"],
-  filters: {
-    parent_category: props.categoryId,
-  },
-  auto: true,
-});
 watch(
   () => props.categoryId,
   () => {
-    categoryResource.update({
+    categoryTreeResource.update({
       params: {
         category: props.categoryId,
       },
     });
-
-    subCategories.update({
-      params: { name: props.categoryId },
-    });
-
-    categoryResource.reload();
-    subCategories.reload();
+    categoryTreeResource.reload();
   }
 );
 </script>
