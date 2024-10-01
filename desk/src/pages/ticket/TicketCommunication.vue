@@ -1,5 +1,5 @@
 <template>
-  <div class="border rounded flex-1 px-3 pt-2.5 bg-gray-50">
+  <div class="border rounded flex-1 px-3 pt-2.5 shadow bg-white">
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong :hide-avatar="true" />
@@ -13,7 +13,7 @@
     </div>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <div class="prose-f" v-html="sanitize(content)"></div>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-2 mb-2">
       <AttachmentItem
         v-for="a in attachments"
         :key="a.file_url"
