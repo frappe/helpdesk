@@ -25,16 +25,36 @@ import { useRouter } from "vue-router";
 import { Breadcrumbs } from "frappe-ui";
 
 const router = useRouter();
-const defaultCategory = router.currentRoute.value.query.category as string;
+const defaultCategory = computed(
+  () => router.currentRoute.value.query.category as string
+);
 
 const currentCategory: Ref<string> = ref(
-  defaultCategory || "Explore All Articles"
+  defaultCategory.value || "Explore All Articles"
 );
 
 const breadcrumbs = computed(() => {
   let items = [
     { label: "Knowledge Base", route: { name: "KnowledgeBasePublicNew" } },
   ];
+  return items;
+  // TODO: Add category and subcategory to breadcrumbs
+  const { category, subCategory } = router.currentRoute.value.query as {
+    category: string;
+    subCategory: string;
+  };
+  if (category) {
+    items.push({
+      label: category,
+      route: { name: "KnowledgeBasePublicNew", query: category },
+    });
+  }
+  if (subCategory) {
+    items.push({
+      label: subCategory,
+      route: { name: "KnowledgeBasePublicNew", query: subCategory },
+    });
+  }
   return items;
 });
 

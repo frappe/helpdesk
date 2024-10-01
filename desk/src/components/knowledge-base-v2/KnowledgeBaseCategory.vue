@@ -36,6 +36,7 @@
         <div
           v-for="subCategory in category.subCategories"
           class="border rounded px-3.5 py-3 cursor-pointer max-w-[220px] min-w-[220px] hover:border-gray-500"
+          @click="handleSubCategoryClick(subCategory)"
         >
           <h5 class="truncate text-lg">{{ subCategory?.category_name }}</h5>
           <span class="text-sm text-gray-600">
@@ -76,12 +77,15 @@
 import { reactive, watch, ref, Reactive } from "vue";
 import { createResource, FormControl } from "frappe-ui";
 import ArticleCard from "@/components/knowledge-base-v2/ArticleCard.vue";
-import { Category } from "@/types";
+import { Category, SubCategory } from "@/types";
 import { Icon } from "@iconify/vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps<{
   categoryId: string;
 }>();
+
+const router = useRouter();
 
 const category: Reactive<Category> = reactive({
   categoryName: "",
@@ -113,6 +117,39 @@ function searchArticles() {
   );
   _articles.value = articles;
 }
+
+function handleSubCategoryClick(subCategory: SubCategory) {
+  categoryTreeResource.update({
+    params: {
+      category: subCategory.name,
+    },
+  });
+  categoryTreeResource.reload();
+  router.push({
+    query: {
+      category: categoryTreeResource.data.root_category.category_id,
+      subCategory: subCategory.name,
+    },
+  });
+}
+
+watch(
+  () => router.currentRoute.value.query,
+  () => {
+    const { category, subCategory } = router.currentRoute.value.query as {
+      category: string;
+      subCategory: string;
+    };
+    if (!subCategory && category) {
+      categoryTreeResource.update({
+        params: {
+          category: category,
+        },
+      });
+      categoryTreeResource.reload();
+    }
+  }
+);
 
 watch(
   async () => categoryTreeResource.data,
