@@ -184,6 +184,7 @@ const props = defineProps({
     required: true,
   },
 });
+debugger;
 
 const { isMobileView } = useScreenSize();
 
@@ -213,7 +214,7 @@ function setfilter(data) {
 function updateFilter(
   index: number,
   field = null,
-  value: string = null,
+  value: string = "",
   operator: string = null
 ) {
   let filter = JSON.parse(JSON.stringify(props.filters[index]));
