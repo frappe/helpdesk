@@ -26,7 +26,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import SidebarLink from "../SidebarLink.vue";
 import { createListResource } from "frappe-ui";
 import { getIcon } from "@/pages/knowledge-base/util";
