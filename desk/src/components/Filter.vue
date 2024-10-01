@@ -184,7 +184,6 @@ const props = defineProps({
     required: true,
   },
 });
-debugger;
 
 const { isMobileView } = useScreenSize();
 
