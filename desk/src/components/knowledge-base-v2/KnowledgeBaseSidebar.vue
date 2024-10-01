@@ -18,6 +18,7 @@
           :is-expanded="true"
           :label="category.category_name"
           :bg-color="'bg-gray-100'"
+          :hv-color="'hover:bg-gray-300'"
           @click="handleClick(category.name)"
         />
       </div>

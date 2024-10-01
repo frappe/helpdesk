@@ -206,3 +206,42 @@ export interface TabObject {
   icon: Component;
   condition?: () => boolean;
 }
+
+export interface RootCategory {
+  category_id: string;
+  category_name: string;
+}
+
+export interface Article {
+  name: string;
+  title: string;
+  category: string;
+  published_on: string;
+  author: string;
+  subtitle: string;
+  article_image: string | null;
+  _user_tags: string | null;
+}
+
+export interface SubCategory {
+  name: string;
+  category_name: string;
+  icon: string | null;
+  articles: Article[];
+}
+
+export interface Author {
+  email: string;
+  image: string | null;
+  name: string;
+}
+
+export interface Category {
+  categoryName: string;
+  subCategories: SubCategory[];
+  articles: Article[];
+  authors?: {
+    [key: string]: Author;
+  };
+  children?: (Article | SubCategory)[];
+}

@@ -6,7 +6,7 @@
       'w-8': !isExpanded,
       'shadow-sm': isActive,
       [bgColor]: isActive,
-      'hover:bg-gray-100': !isActive,
+      [hvColor]: !isActive,
     }"
     @click="handle"
   >
@@ -45,6 +45,7 @@ interface P {
   onClick?: () => void;
   to?: string;
   bgColor?: string;
+  hvColor?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
@@ -52,6 +53,7 @@ const props = withDefaults(defineProps<P>(), {
   onClick: () => () => true,
   to: "",
   bgColor: "bg-white",
+  hvColor: "hover:bg-gray-100",
 });
 const router = useRouter();
 

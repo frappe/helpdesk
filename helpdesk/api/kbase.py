@@ -21,6 +21,8 @@ def get_sub_categories_and_articles(category):
         "category",
         "published_on",
         "author",
+        "subtitle",
+        "article_image",
         "_user_tags",
     ]
 
@@ -40,7 +42,7 @@ def get_sub_categories_and_articles(category):
         "root_category": {"category_id": category, "category_name": category_title},
         "sub_categories": [],
         "all_articles": direct_articles,
-        "author": {},
+        "authors": {},
         "children": [],
     }
     # Create a dictionary to store sub-categories by their name
@@ -71,8 +73,8 @@ def get_sub_categories_and_articles(category):
     # get author details
     for article in category_tree["all_articles"]:
         author = article["author"]
-        if author not in category_tree["author"]:
-            category_tree["author"][author] = get_user_info_for_avatar(author)
+        if author not in category_tree["authors"]:
+            category_tree["authors"][author] = get_user_info_for_avatar(author)
 
     category_tree["children"] = direct_articles + category_tree["sub_categories"]
 
