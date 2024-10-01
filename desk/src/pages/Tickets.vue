@@ -248,7 +248,6 @@ function processSorts(sortEvent) {
 }
 
 function processFilters(filterEvent) {
-  console.log(filterEvent);
   if (filterEvent.event === "add") {
     let idx = filters.value.findIndex(
       (filter) => filter.field.fieldname === filterEvent.data.field.fieldname

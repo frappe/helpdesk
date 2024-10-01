@@ -28,7 +28,6 @@
       :to="getRoute(n)"
       @click="
         () => {
-          console.log(n.reference_ticket);
           notificationStore.read(n.reference_ticket);
         }
       "
