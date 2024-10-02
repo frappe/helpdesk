@@ -105,8 +105,7 @@ const routes = [
           {
             path: "articles/:articleId?",
             name: "KBArticlePublicNew",
-            component: () =>
-              import("@/pages/knowledge-base-v2/KnowledgeBaseArticle.vue"),
+            component: () => import("@/pages/KnowledgeBaseArticle.vue"),
             props: true,
           },
         ],

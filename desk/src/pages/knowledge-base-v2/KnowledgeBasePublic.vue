@@ -17,12 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, Ref } from "vue";
+import { ref, watch, computed } from "vue";
 import { LayoutHeader } from "@/components";
 import KnowledgeBaseSidebar from "@/components/knowledge-base-v2/KnowledgeBaseSidebar.vue";
 import KnowledgeBaseCategory from "@/components/knowledge-base-v2/KnowledgeBaseCategory.vue";
 import { useRouter } from "vue-router";
-import { Breadcrumbs } from "frappe-ui";
+import { Breadcrumbs, createResource, call } from "frappe-ui";
+import { reactive } from "vue";
 
 const router = useRouter();
 const defaultCategory = computed(
@@ -48,21 +49,21 @@ const breadcrumbs = computed(() => {
   // return items;
   // TODO: Add category and subcategory name to breadcrumbs
 
-  if (category) {
-    items.push({
-      label: category,
-      route: {
-        name: "KnowledgeBasePublicNew",
-        query: { category },
-      },
-    });
-  }
-  if (subCategory) {
-    items.push({
-      label: subCategory,
-      route: { name: "KnowledgeBasePublicNew", query: { subCategory } },
-    });
-  }
+  // if (category) {
+  //   items.push({
+  //     label: category,
+  //     route: {
+  //       name: "KnowledgeBasePublicNew",
+  //       query: { category },
+  //     },
+  //   });
+  // }
+  // if (subCategory) {
+  //   items.push({
+  //     label: subCategory,
+  //     route: { name: "KnowledgeBasePublicNew", query: { subCategory } },
+  //   });
+  // }
   return items;
 });
 

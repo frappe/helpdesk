@@ -14,7 +14,7 @@ def get_article(name: str):
     author = frappe.get_cached_doc("User", article["author"])
     sub_category = frappe.get_cached_doc("HD Article Category", article["category"])
     category = frappe.get_cached_doc(
-        "HD Article Category", sub_category.parent_category
+        "HD Article Category", sub_category.get("parent_category", article["category"])
     )
 
     return {
