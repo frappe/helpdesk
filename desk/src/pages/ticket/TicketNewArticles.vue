@@ -15,7 +15,7 @@
         <span class="text-xs">(View All)</span>
       </RouterLink>
     </div>
-    <dl class="space-y-2">
+    <dl>
       <div
         v-for="a in articles.data"
         :key="a.id"
