@@ -14,7 +14,7 @@ const configStore = useConfigStore();
 
 function getTarget() {
   if (authStore.hasDeskAccess) return AGENT_PORTAL_LANDING;
-  else if (configStore.preferKnowledgeBase) return KB_PUBLIC;
+  else if (configStore.preferKnowledgeBase) return "KnowledgeBasePublicNew";
   else return CUSTOMER_PORTAL_LANDING;
 }
 
