@@ -231,9 +231,9 @@ export interface SubCategory {
 }
 
 export interface Author {
-  email: string;
-  image: string | null;
   name: string;
+  image: string | null;
+  email?: string;
 }
 
 export interface Category {

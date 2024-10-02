@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col p-5 px-10 overflow-scroll w-full"
+    class="flex flex-col p-5 px-10 w-full overflow-hidden"
     v-if="
       !categoryTreeResource.isLoading &&
       (!!category.subCategories.length || !!category.articles.length)
@@ -46,9 +46,15 @@
       </div>
     </section>
     <!-- Article List View -->
-    <section class="flex flex-col gap-3" v-if="!!_articles.length">
-      <h4 class="text-lg font-semibold text-gray-900">Articles</h4>
-      <div class="flex flex-col gap-2 divide-y max-w-full">
+    <section
+      class="flex flex-col gap-3 overflow-scroll"
+      v-if="!!_articles.length"
+    >
+      <h4 class="text-lg font-semibold text-gray-900">
+        {{ showAllArticles ? "All Articles" : "Articles" }}
+      </h4>
+      <!-- Article Container -->
+      <div class="flex flex-col gap-x-2 divide-y max-w-full">
         <!-- Article Card -->
         <ArticleCard
           v-for="article in _articles"
@@ -75,17 +81,24 @@
 
 <script setup lang="ts">
 import { reactive, watch, ref, Reactive } from "vue";
-import { createResource, FormControl } from "frappe-ui";
+import { createResource, FormControl, createListResource } from "frappe-ui";
 import ArticleCard from "@/components/knowledge-base-v2/ArticleCard.vue";
-import { Category, SubCategory } from "@/types";
+import { Article, Author, Category, SubCategory } from "@/types";
 import { Icon } from "@iconify/vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 
-const props = defineProps<{
-  categoryId: string;
-}>();
+interface P {
+  categoryId?: string;
+  showAllArticles?: boolean;
+}
+const props = withDefaults(defineProps<P>(), {
+  categoryId: "",
+  showAllArticles: false,
+});
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const category: Reactive<Category> = reactive({
   categoryName: "",
@@ -104,7 +117,39 @@ const categoryTreeResource = createResource({
   params: {
     category: props.categoryId,
   },
-  auto: true,
+  auto: !props.showAllArticles,
+});
+
+const allArticles = createListResource({
+  doctype: "HD Article",
+  fields: [
+    "name",
+    "title",
+    "category",
+    "published_on",
+    "author",
+    "subtitle",
+    "article_image",
+    "_user_tags",
+  ],
+  filters: {
+    status: "Published",
+  },
+  pageLength: 100,
+  auto: props.showAllArticles,
+  onSuccess(articles: Article[]) {
+    category.articles = articles;
+    _articles.value = articles;
+    const authors = [...new Set(articles.map((article) => article.author))];
+    category.authors = authors.reduce((acc, author) => {
+      const authorInfo = userStore.getUser(author);
+      acc[author] = {
+        name: authorInfo.full_name ?? authorInfo.email,
+        image: authorInfo.user_image ?? "",
+      };
+      return acc;
+    }, {});
+  },
 });
 
 function searchArticles() {
@@ -140,7 +185,7 @@ watch(
       category: string;
       subCategory: string;
     };
-    if (!subCategory && category) {
+    if (!subCategory && category !== "Explore all articles") {
       categoryTreeResource.update({
         params: {
           category: category,

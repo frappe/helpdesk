@@ -44,8 +44,8 @@ const categories = createListResource({
   },
   transform: (data) => {
     const firstCategory = {
-      name: "Explore All Articles",
-      category_name: "Explore All Articles",
+      name: "Explore all articles",
+      category_name: "Explore all articles",
       icon: "search",
     };
     return [firstCategory, ...data];
