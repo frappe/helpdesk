@@ -1,6 +1,11 @@
 <template>
   <div class="flex items-center gap-2">
-    <Avatar :label="user.name" :image="user.user_image" v-bind="$attrs" />
+    <Avatar
+      :label="user.name"
+      :image="user.user_image"
+      v-bind="$attrs"
+      v-if="!hideAvatar"
+    />
     <span
       v-if="expand"
       class="truncate"
@@ -28,6 +33,10 @@ const props = defineProps({
     default: false,
   },
   strong: {
+    type: Boolean,
+    default: false,
+  },
+  hideAvatar: {
     type: Boolean,
     default: false,
   },

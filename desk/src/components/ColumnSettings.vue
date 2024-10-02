@@ -49,7 +49,9 @@
             </template>
           </Draggable>
           <div class="mt-1.5 flex flex-col gap-1 border-t pt-1.5">
+            <!-- Show Add Column Button only for Agent Side -->
             <Autocomplete
+              v-if="!isCustomerPortal"
               value=""
               :options="fields"
               @change="(e) => addColumn(e)"
@@ -151,6 +153,10 @@ let props = defineProps({
     required: true,
   },
   hideLabel: {
+    type: Boolean,
+    default: false,
+  },
+  isCustomerPortal: {
     type: Boolean,
     default: false,
   },

@@ -5,7 +5,9 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
-        <RouterLink :to="{ name: 'TicketAgentNew' }">
+        <RouterLink
+          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
+        >
           <Button label="Create" theme="gray" variant="solid">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
@@ -21,6 +23,7 @@
         fields: fields,
         columns: columns,
       }"
+      :is-customer-portal="isCustomerPortal"
       @event:sort="processSorts"
       @event:filter="processFilters"
       @event:column="processColumns"
@@ -53,9 +56,18 @@ import { createResource, Breadcrumbs } from "frappe-ui";
 import { TicketsAgentList } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
+import { useRoute } from "vue-router";
 const { getUser } = useUserStore();
 
-const breadcrumbs = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+const route = useRoute();
+const isCustomerPortal: boolean = route.meta.public ?? false;
+
+const breadcrumbs = [
+  {
+    label: "Tickets",
+    route: { name: isCustomerPortal ? "TicketsCustomer" : "TicketsAgent" },
+  },
+];
 let storage = useStorage("tickets_agent", {
   filtersToApply: {},
   filters: [],
@@ -87,10 +99,16 @@ const tickets = createResource({
     page_length: pageLength.value,
     columns: columns.length ? columns : undefined,
     rows: rows.length ? rows : undefined,
+    show_customer_portal_fields: isCustomerPortal,
   },
   auto: true,
   transform(data) {
     data.data.forEach((row) => {
+      if (isCustomerPortal) {
+        if (row.status == "Replied") {
+          row.status = "Awaiting Response";
+        }
+      }
       row.name = row.name.toString();
       let _assign = row._assign ? JSON.parse(row._assign) : null;
       row._assign = [];
@@ -165,11 +183,16 @@ function updatePageLength(value) {
 }
 
 function processFieldClick(event) {
-  filters.value.push({
-    field: filterableFields.data.find((f) => f.fieldname === event.name),
-    operator: "is",
-    value: event.value,
-  });
+  const isDuplicateFilter = filters.value.find(
+    (filter) => filter.field.fieldname === event.name
+  );
+  if (!isDuplicateFilter) {
+    filters.value.push({
+      field: filterableFields.data.find((f) => f.fieldname === event.name),
+      operator: "is",
+      value: event.value,
+    });
+  }
 
   if (event.name == "_assign") {
     filtersToApply[event.name] = ["LIKE", `%${event.value}%`];
@@ -289,6 +312,7 @@ function apply() {
       doctype: "HD Ticket",
       columns: columns.length ? columns : undefined,
       rows: rows.length ? rows : undefined,
+      show_customer_portal_fields: isCustomerPortal,
     },
   });
 
@@ -302,6 +326,7 @@ const filterableFields = createResource({
   params: {
     doctype: "HD Ticket",
     append_assign: true,
+    show_customer_portal_fields: isCustomerPortal,
   },
   transform: (data) => {
     return data
@@ -332,6 +357,7 @@ const sortableFields = createResource({
   auto: true,
   params: {
     doctype: "HD Ticket",
+    show_customer_portal_fields: isCustomerPortal,
   },
 });
 </script>

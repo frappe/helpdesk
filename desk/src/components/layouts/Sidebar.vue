@@ -8,6 +8,7 @@
   >
     <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
     <SidebarLink
+      v-if="!isCustomerPortal"
       label="Search"
       class="mb-1"
       :icon="LucideSearch"
@@ -21,7 +22,7 @@
         </span>
       </template>
     </SidebarLink>
-    <span class="mb-4">
+    <div class="mb-4">
       <div
         v-if="notificationStore.unread"
         class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400"
@@ -44,7 +45,7 @@
           />
         </template>
       </SidebarLink>
-    </span>
+    </div>
     <div class="mb-4 flex flex-col gap-1">
       <SidebarLink
         v-for="option in menuOptions"
@@ -73,30 +74,20 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import {
-  AGENT_PORTAL_AGENT_LIST,
-  AGENT_PORTAL_CONTACT_LIST,
-  AGENT_PORTAL_CUSTOMER_LIST,
-  AGENT_PORTAL_TEAM_LIST,
-  AGENT_PORTAL_TICKET_LIST,
-  CUSTOMER_PORTAL_LANDING,
-} from "@/router";
+import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_ROUTES } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import UserMenu from "@/components/UserMenu.vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideBookOpen from "~icons/lucide/book-open";
-import LucideCloudLightning from "~icons/lucide/cloud-lightning";
-import LucideContact2 from "~icons/lucide/contact-2";
 import LucideBell from "~icons/lucide/bell";
-import LucideTicket from "~icons/lucide/ticket";
-import LucideUser from "~icons/lucide/user";
-import LucideUserCircle2 from "~icons/lucide/user-circle-2";
-import LucideUsers from "~icons/lucide/users";
 import LucideSearch from "~icons/lucide/search";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import Apps from "@/components/Apps.vue";
+import {
+  agentPortalSidebarOptions,
+  customerPortalSidebarOptions,
+} from "./layoutSettings";
 
 const route = useRoute();
 const router = useRouter();
@@ -105,49 +96,23 @@ const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
+const isCustomerPortal = route.meta.public ?? false;
 
-const menuOptions = computed(() => [
+const menuOptions = computed(() => {
+  return isCustomerPortal
+    ? customerPortalSidebarOptions
+    : agentPortalSidebarOptions;
+});
+
+const customerPortalDropdown = computed(() => [
   {
-    label: "Tickets",
-    icon: LucideTicket,
-    to: AGENT_PORTAL_TICKET_LIST,
-  },
-  {
-    label: "Agents",
-    icon: LucideUser,
-    to: AGENT_PORTAL_AGENT_LIST,
-  },
-  {
-    label: "Knowledge base",
-    icon: LucideBookOpen,
-    to: "DeskKBHome",
-  },
-  {
-    label: "Teams",
-    icon: LucideUsers,
-    to: AGENT_PORTAL_TEAM_LIST,
-  },
-  {
-    label: "Canned responses",
-    icon: LucideCloudLightning,
-    to: "CannedResponses",
-  },
-  {
-    label: "Customers",
-    icon: LucideUserCircle2,
-    to: AGENT_PORTAL_CUSTOMER_LIST,
-  },
-  {
-    label: "Contacts",
-    icon: LucideContact2,
-    to: AGENT_PORTAL_CONTACT_LIST,
+    label: "Log out",
+    icon: "log-out",
+    onClick: () => authStore.logout(),
   },
 ]);
 
-function isActiveTab(to: string) {
-  return route.name === to;
-}
-const profileSettings = [
+const agentPortalDropdown = computed(() => [
   {
     component: markRaw(Apps),
   },
@@ -173,14 +138,23 @@ const profileSettings = [
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
-    condition: () => authStore.isAdmin,
   },
   {
     label: "Log out",
     icon: "log-out",
     onClick: () => authStore.logout(),
   },
-];
+]);
+
+const profileSettings = computed(() => {
+  return isCustomerPortal
+    ? customerPortalDropdown.value
+    : agentPortalDropdown.value;
+});
+
+function isActiveTab(to: string) {
+  return route.name === to;
+}
 
 function openCommandPalette() {
   window.dispatchEvent(

@@ -31,7 +31,6 @@
 </template>
 
 <script setup lang="ts">
-import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";

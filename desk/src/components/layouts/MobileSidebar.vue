@@ -80,72 +80,39 @@ import SidebarLink from "@/components/SidebarLink.vue";
 import { useNotificationStore } from "@/stores/notification";
 
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
-
-import LucideBookOpen from "~icons/lucide/book-open";
-import LucideCloudLightning from "~icons/lucide/cloud-lightning";
-import LucideContact2 from "~icons/lucide/contact-2";
-import LucideTicket from "~icons/lucide/ticket";
-import LucideUser from "~icons/lucide/user";
-import LucideUserCircle2 from "~icons/lucide/user-circle-2";
-import LucideUsers from "~icons/lucide/users";
 import LucideBell from "~icons/lucide/bell";
 
-import {
-  AGENT_PORTAL_AGENT_LIST,
-  AGENT_PORTAL_CONTACT_LIST,
-  AGENT_PORTAL_CUSTOMER_LIST,
-  AGENT_PORTAL_TEAM_LIST,
-  AGENT_PORTAL_TICKET_LIST,
-  CUSTOMER_PORTAL_LANDING,
-} from "@/router";
+import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_ROUTES } from "@/router";
 import Apps from "../Apps.vue";
+import {
+  agentPortalSidebarOptions,
+  customerPortalSidebarOptions,
+} from "./layoutSettings";
 import { useAuthStore } from "@/stores/auth";
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
+const isCustomerPortal = computed(() =>
+  CUSTOMER_PORTAL_ROUTES.includes(route.name)
+);
 
-const menuOptions = computed(() => [
+const menuOptions = computed(() => {
+  return isCustomerPortal.value
+    ? customerPortalSidebarOptions
+    : agentPortalSidebarOptions;
+});
+
+const customerPortalDropdown = computed(() => [
   {
-    label: "Tickets",
-    icon: LucideTicket,
-    to: AGENT_PORTAL_TICKET_LIST,
-  },
-  {
-    label: "Agents",
-    icon: LucideUser,
-    to: AGENT_PORTAL_AGENT_LIST,
-  },
-  {
-    label: "Knowledge base",
-    icon: LucideBookOpen,
-    to: "DeskKBHome",
-  },
-  {
-    label: "Teams",
-    icon: LucideUsers,
-    to: AGENT_PORTAL_TEAM_LIST,
-  },
-  {
-    label: "Canned responses",
-    icon: LucideCloudLightning,
-    to: "CannedResponses",
-  },
-  {
-    label: "Customers",
-    icon: LucideUserCircle2,
-    to: AGENT_PORTAL_CUSTOMER_LIST,
-  },
-  {
-    label: "Contacts",
-    icon: LucideContact2,
-    to: AGENT_PORTAL_CONTACT_LIST,
+    label: "Log out",
+    icon: "log-out",
+    onClick: () => authStore.logout(),
   },
 ]);
 
-const authStore = useAuthStore();
-
-const profileSettings = [
+const agentPortalDropdown = computed(() => [
   {
     component: markRaw(Apps),
   },
@@ -172,7 +139,13 @@ const profileSettings = [
     icon: "log-out",
     onClick: () => authStore.logout(),
   },
-];
+]);
+
+const profileSettings = computed(() => {
+  return isCustomerPortal.value
+    ? customerPortalDropdown.value
+    : agentPortalDropdown.value;
+});
 
 function isActiveTab(to: string) {
   return route.name === to;
