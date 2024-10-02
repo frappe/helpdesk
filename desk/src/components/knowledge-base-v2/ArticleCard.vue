@@ -52,7 +52,7 @@ const articleSubTitle = computed(
 );
 
 const articleImg = computed(
-  () => props.article.article_image || "/assets/helpdesk/desk/article.png"
+  () => props.article.article_image || "/assets/helpdesk/desk/article-2.png"
 );
 
 function handleArticleClick() {
