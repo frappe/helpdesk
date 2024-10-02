@@ -56,8 +56,9 @@ const articleImg = computed(
 );
 
 function handleArticleClick() {
-  const category = router.currentRoute.value.query.category as string;
-  const subCategory = props.article.category;
+  const routerCategory = router.currentRoute.value.query.category as string;
+  const category = routerCategory || props.article.category;
+  const subCategory = !routerCategory ? props.article.category : "";
   const articleId = props.article.name;
 
   const articleData = {

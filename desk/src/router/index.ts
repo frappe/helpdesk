@@ -102,6 +102,13 @@ const routes = [
             component: () =>
               import("@/pages/knowledge-base-v2/KnowledgeBasePublic.vue"),
           },
+          {
+            path: "articles/:articleId?",
+            name: "KBArticlePublicNew",
+            component: () =>
+              import("@/pages/knowledge-base-v2/KnowledgeBaseArticle.vue"),
+            props: true,
+          },
         ],
       },
     ],
@@ -217,7 +224,7 @@ const routes = [
     component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
   },
   {
-    path: "/:invalidpath",
+    path: "/:pathMatch(.*)*",
     name: "Invalid Page",
     component: () => import("@/pages/InvalidPage.vue"),
   },
