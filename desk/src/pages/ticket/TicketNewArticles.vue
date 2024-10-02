@@ -3,7 +3,7 @@
     v-if="!isEmpty(articles.data) && search.length > 2"
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
-    <div class="mb-2 font-medium">
+    <div class="mb-2 font-medium px-4">
       These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
