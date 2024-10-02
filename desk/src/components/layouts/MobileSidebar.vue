@@ -14,7 +14,7 @@
           class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
         >
           <!-- user dropwdown -->
-          <UserMenu class="p-2 mb-2" :options="profileSettings" />
+          <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
           <!-- notifications -->
           <div class="overflow-y-auto px-2">
             <div class="mb-3 flex flex-col">
