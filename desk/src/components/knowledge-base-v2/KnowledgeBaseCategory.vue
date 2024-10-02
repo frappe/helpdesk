@@ -157,7 +157,6 @@ function searchArticles() {
   const articles = category.articles.filter(
     (article) =>
       article.title.toLowerCase().includes(search) ||
-      article.subtitle.toLowerCase().includes(search) ||
       category.authors[article.author].name.toLowerCase().includes(search)
   );
   _articles.value = articles;
