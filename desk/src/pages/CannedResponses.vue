@@ -25,11 +25,11 @@
     </LayoutHeader>
     <div class="flex-1 overflow-y-auto p-2">
       <div
-        v-if="cannedResponses?.data?.data?.length"
+        v-if="!cannedResponses.loading"
         class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 px-5 pb-3"
       >
         <div
-          v-for="cannedResponse in cannedResponses.data.data"
+          v-for="cannedResponse in cannedResponses.data"
           :key="cannedResponse.name"
           class="group flex h-56 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-5 py-4 shadow-sm hover:bg-gray-50"
           @click="editItem(cannedResponse)"
@@ -109,7 +109,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import {
-  createResource,
+  createListResource,
   Breadcrumbs,
   Dropdown,
   TextEditor,
@@ -133,11 +133,9 @@ const message = ref(null);
 const name = ref(null);
 const showNewDialog = ref(false);
 
-const cannedResponses = createResource({
-  url: "helpdesk.api.doc.get_list_data",
-  params: {
-    doctype: "HD Canned Response",
-  },
+const cannedResponses = createListResource({
+  doctype: "HD Canned Response",
+  fields: ["name", "title", "message", "owner", "modified"],
   auto: true,
 });
 

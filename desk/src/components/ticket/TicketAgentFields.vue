@@ -117,9 +117,10 @@ const options = computed(() => {
 });
 
 const customFields = computed(() => {
-  const _custom_fields = props.ticket.template.fields
-    .filter((field: Field) => !field.hide_from_customer)
-    .filter((f) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1);
+  const _custom_fields = props.ticket.template.fields.filter(
+    (f) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
+  );
+
   return _custom_fields;
 });
 
