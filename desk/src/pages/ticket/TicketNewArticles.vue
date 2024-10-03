@@ -12,7 +12,7 @@
         }"
         target="_blank"
       >
-        <span class="text-xs">(View All)</span>
+        <span class="text-xs underline">(View All)</span>
       </RouterLink>
     </div>
     <dl>
@@ -22,7 +22,7 @@
         class="focus:ring-cyan-30 rounded-md border-2 border-hidden p-4 hover:bg-cyan-100 focus:outline-none focus:ring active:bg-cyan-50"
       >
         <RouterLink
-          class="group cursor-pointer hover:text-gray-900"
+          class="group cursor-pointer hover:text-gray-900 flex flex-col gap-2"
           :to="{
             name: 'KBArticlePublicNew',
             params: {
@@ -34,7 +34,7 @@
         >
           <dt class="font-semibold">{{ a.subject }} - {{ a.headings }}</dt>
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <dd class="font-light" v-html="a.description"></dd>
+          <dd class="font-light text-p-sm" v-html="a.description"></dd>
         </RouterLink>
       </div>
     </dl>

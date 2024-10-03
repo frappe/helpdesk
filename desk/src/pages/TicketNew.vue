@@ -5,81 +5,84 @@
       title="New"
       :current="route.name"
     />
-    <div v-if="template.data?.about" class="mx-5 my-3">
-      <div class="prose-f" v-html="sanitize(template.data.about)" />
-    </div>
-    <div class="grid grid-cols-1 gap-4 px-5 sm:grid-cols-3">
-      <UniInput
-        v-for="field in visibleFields"
-        :key="field.fieldname"
-        :field="field"
-        :value="templateFields[field.fieldname]"
-        @change="templateFields[field.fieldname] = $event.value"
-      />
-    </div>
-    <div class="m-5">
-      <FormControl
-        v-model="subject"
-        type="text"
-        label="Subject*"
-        placeholder="A short description"
-      />
-    </div>
-    <TicketNewArticles
-      v-if="isCustomerPortal"
-      :search="subject"
-      class="mx-5 mb-5"
-    />
-    <div v-if="isCustomerPortal" class="mx-5 mb-5 h-full">
-      <TicketTextEditor
-        v-show="subject.length > 2 || description.length > 0"
-        ref="editor"
-        v-model:attachments="attachments"
-        v-model:content="description"
-        placeholder="Detailed explanation"
-        expand
+    <!-- Container -->
+    <div class="max-w-screen-xl mx-5 flex flex-col gap-5 mb-5">
+      <div v-if="Boolean(template.data?.about)" class="mx-5 my-3">
+        {{ template.data.about }}
+        <div class="prose-f" v-html="sanitize(template.data.about)" />
+      </div>
+      <div
+        class="grid grid-cols-1 gap-4 sm:grid-cols-3"
+        v-if="Boolean(visibleFields)"
       >
-        <template #bottom-right>
-          <Button
-            label="Submit"
-            theme="gray"
-            variant="solid"
-            :disabled="
-              $refs.editor.editor.isEmpty || ticket.loading || !subject
-            "
-            @click="() => ticket.submit()"
-          />
-        </template>
-      </TicketTextEditor>
-      <h4
-        v-show="subject.length <= 2 && description.length === 0"
-        class="flex items-center justify-center text-lg text-gray-500"
-      >
-        Please enter a subject to continue
-      </h4>
-    </div>
+        <UniInput
+          v-for="field in visibleFields"
+          :key="field.fieldname"
+          :field="field"
+          :value="templateFields[field.fieldname]"
+          @change="templateFields[field.fieldname] = $event.value"
+        />
+      </div>
+      <div>
+        <FormControl
+          v-model="subject"
+          type="text"
+          label="Subject*"
+          placeholder="A short description"
+        />
+      </div>
+      <TicketNewArticles v-if="isCustomerPortal" :search="subject" />
+      <div v-if="isCustomerPortal">
+        <TicketTextEditor
+          v-show="subject.length > 2 || description.length > 0"
+          ref="editor"
+          v-model:attachments="attachments"
+          v-model:content="description"
+          placeholder="Detailed explanation"
+          expand
+        >
+          <template #bottom-right>
+            <Button
+              label="Submit"
+              theme="gray"
+              variant="solid"
+              :disabled="
+                $refs.editor.editor.isEmpty || ticket.loading || !subject
+              "
+              @click="() => ticket.submit()"
+            />
+          </template>
+        </TicketTextEditor>
+        <h4
+          v-show="subject.length <= 2 && description.length === 0"
+          class="text-lg text-gray-500"
+        >
+          Please enter a subject to continue
+        </h4>
+      </div>
 
-    <!-- for agent portal -->
-    <div v-else class="mx-5 mb-5 h-full">
-      <TicketTextEditor
-        ref="editor"
-        v-model:attachments="attachments"
-        v-model:content="description"
-        placeholder="Detailed explanation"
-        expand
-      >
-        <template #bottom-right>
-          <Button
-            label="Submit"
-            theme="gray"
-            variant="solid"
-            :disabled="
-              $refs.editor.editor.isEmpty || ticket.loading || !subject
-            "
-            @click="() => ticket.submit()"
-          />
-        </template>
-      </TicketTextEditor>
+      <!-- for agent portal -->
+      <div v-else>
+        <TicketTextEditor
+          ref="editor"
+          v-model:attachments="attachments"
+          v-model:content="description"
+          placeholder="Detailed explanation"
+          expand
+        >
+          <template #bottom-right>
+            <Button
+              label="Submit"
+              theme="gray"
+              variant="solid"
+              :disabled="
+                $refs.editor.editor.isEmpty || ticket.loading || !subject
+              "
+              @click="() => ticket.submit()"
+            />
+          </template>
+        </TicketTextEditor>
+      </div>
     </div>
   </div>
 </template>

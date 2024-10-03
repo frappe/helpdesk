@@ -52,7 +52,7 @@
             :name="field.name"
             :type="field.type"
           />
-          <p class="text-xs text-gray-500">{{ field.description }}</p>
+          <p class="text-p-sm text-gray-500">{{ field.description }}</p>
         </div>
       </div>
       <ErrorMessage v-if="error" class="ml-1" :message="error" />
