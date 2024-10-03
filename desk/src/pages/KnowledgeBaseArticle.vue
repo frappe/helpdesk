@@ -19,8 +19,9 @@
       </template>
     </PageTitle>
     <div class="overflow-auto">
-      <div class="container m-auto my-12">
+      <div class="mx-5 my-12">
         <TextEditor
+          v-if="textEditorContentWithIDs"
           :content="textEditorContentWithIDs"
           :editable="editMode"
           :placeholder="placeholder"
@@ -47,6 +48,9 @@
             />
           </template>
         </TextEditor>
+        <div v-else class="text-gray-500 text-2xl font-semibold mb-5">
+          Article Not Found
+        </div>
         <RouterLink
           v-if="route.meta.public"
           :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
@@ -93,7 +97,6 @@ import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticl
 import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArticleActionsView.vue";
 import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
-import KnowledgeBaseArticleTopPublic from "./knowledge-base/KnowledgeBaseArticleTopPublic.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
 import { Extension } from "@tiptap/core";
 
@@ -408,7 +411,7 @@ const PreserveIds: Extension = Extension.create({
 });
 
 const textEditorContentWithIDs = computed(() =>
-  addLinksToHeadings(article.data?.content)
+  article.data?.content ? addLinksToHeadings(article.data?.content) : null
 );
 
 function addLinksToHeadings(content: string) {
