@@ -326,12 +326,11 @@ class HDServiceLevelAgreement(Document):
                 or not_in_working_day_list
                 or not self.is_working_time(current_time, working_hours)
             ):
-                current_time += timedelta(seconds=1)
+                current_time += timedelta(minutes=1)
                 continue
             total_seconds += 1
-            current_time += timedelta(seconds=1)
-
-        return total_seconds
+            current_time += timedelta(minutes=1)
+        return total_seconds * 60
 
     def get_holidays(self):
         res = []
