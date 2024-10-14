@@ -25,6 +25,8 @@ from helpdesk.utils import is_agent
 if TYPE_CHECKING:
     from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
+NUM_RESULTS = 5
+
 STOPWORDS = [
     "a",
     "is",
@@ -148,7 +150,7 @@ class Search:
         self,
         query,
         start=0,
-        page_length=5,
+        page_length=NUM_RESULTS,
         highlight=False,
     ):
         query = self.clean_query(query)
@@ -208,7 +210,6 @@ class Search:
 
 
 class HelpdeskSearch(Search):
-
     DOCTYPE_FIELDS = {
         "HD Ticket": [
             "name",
