@@ -21,7 +21,6 @@
     <div class="overflow-auto">
       <div class="mx-5 my-12">
         <TextEditor
-          v-if="textEditorContentWithIDs"
           :content="textEditorContentWithIDs"
           :editable="editMode"
           :placeholder="placeholder"
@@ -48,9 +47,12 @@
             />
           </template>
         </TextEditor>
-        <div v-else class="text-gray-500 text-2xl font-semibold mb-5">
+        <!-- <div
+          v-else-if="!article.data && !editMode"
+          class="text-gray-500 text-2xl font-semibold mb-5"
+        >
           Article Not Found
-        </div>
+        </div> -->
         <RouterLink
           v-if="route.meta.public"
           :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"

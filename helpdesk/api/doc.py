@@ -25,6 +25,8 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
         "Text Editor",
         "Text",
     ]
+
+    visible_custom_fields = get_visible_custom_fields()
     customer_portal_fields = [
         "name",
         "subject",
@@ -49,14 +51,6 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
         .where(Criterion.any([QBDocField.fieldtype == i for i in allowed_fieldtypes]))
     )
 
-    # for customer portal show only fields present in customer_portal_fields
-    if show_customer_portal_fields:
-        from_doc_fields = from_doc_fields.where(
-            QBDocField.fieldname.isin(customer_portal_fields)
-        )
-
-    from_doc_fields = from_doc_fields.run(as_dict=True)
-
     from_custom_fields = (
         frappe.qb.from_(QBCustomField)
         .select(
@@ -71,16 +65,28 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
         .where(
             Criterion.any([QBCustomField.fieldtype == i for i in allowed_fieldtypes])
         )
-        .run(as_dict=True)
     )
+
+    # for customer portal show only fields present in customer_portal_fields
+
+    if show_customer_portal_fields:
+        from_doc_fields = from_doc_fields.where(
+            QBDocField.fieldname.isin(customer_portal_fields)
+        )
+        from_custom_fields = from_custom_fields.where(
+            QBCustomField.fieldname.isin(visible_custom_fields)
+        )
+
+    from_doc_fields = from_doc_fields.run(as_dict=True)
+    from_custom_fields = from_custom_fields.run(as_dict=True)
 
     # from hd ticket template get children with fieldname and hidden_from_customer
 
     res = []
     res.extend(from_doc_fields)
+    # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
+    res.extend(from_custom_fields)
     if not show_customer_portal_fields:
-        # TODO: Ritvik => till a better way we have for custom fields, dont show custom fields in customer portal
-        res.extend(from_custom_fields)
         res.append(
             {
                 "fieldname": "_assign",
@@ -242,9 +248,7 @@ def sort_options(doctype: str, show_customer_portal_fields=False):
 
 
 def get_customer_portal_fields(doctype, fields):
-    custom_fields = frappe.db.get_all(
-        "Custom Field", {"dt": doctype}, pluck="fieldname"
-    )
+    visible_custom_fields = get_visible_custom_fields()
     customer_portal_fields = [
         "name",
         "subject",
@@ -253,11 +257,15 @@ def get_customer_portal_fields(doctype, fields):
         "response_by",
         "resolution_by",
         "creation",
+        *visible_custom_fields,
     ]
-    fields = [
-        field
-        for field in fields
-        if field.get("value") not in custom_fields
-        and field.get("value") in customer_portal_fields
-    ]
+    fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields
+
+
+def get_visible_custom_fields():
+    return frappe.db.get_all(
+        "HD Ticket Template Field",
+        {"parent": "Default", "hide_from_customer": 0},
+        pluck="fieldname",
+    )
