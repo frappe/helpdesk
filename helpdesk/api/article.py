@@ -24,7 +24,8 @@ def search_with_enough_results(prev_res: list, query: str) -> tuple[list, bool]:
     out = hd_search(query, only_articles=True)
     if not out:
         return prev_res, len(prev_res) == NUM_RESULTS
-    items = (prev_res + out[0].get("items", []))[:NUM_RESULTS]
+    items = prev_res + out[0].get("items", [])
+    items = list({v["id"]: v for v in items}.values())[:NUM_RESULTS]  # unique results
     return items, len(items) == NUM_RESULTS
 
 
@@ -50,4 +51,5 @@ def search(query: str) -> list:
         if enough:
             return ret
         or_query = "|".join(nouns)
-        return search_with_enough_results(ret, or_query)[0]
+        ret, enough = search_with_enough_results(ret, or_query)
+    return ret
