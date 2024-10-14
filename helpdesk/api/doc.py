@@ -68,6 +68,7 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
     )
 
     # for customer portal show only fields present in customer_portal_fields
+
     if show_customer_portal_fields:
         from_doc_fields = from_doc_fields.where(
             QBDocField.fieldname.isin(customer_portal_fields)
@@ -76,10 +77,8 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
             QBCustomField.fieldname.isin(visible_custom_fields)
         )
 
-
     from_doc_fields = from_doc_fields.run(as_dict=True)
     from_custom_fields = from_custom_fields.run(as_dict=True)
-    
 
     # from hd ticket template get children with fieldname and hidden_from_customer
 
@@ -262,6 +261,7 @@ def get_customer_portal_fields(doctype, fields):
     ]
     fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields
+
 
 def get_visible_custom_fields():
     return frappe.db.get_all(
