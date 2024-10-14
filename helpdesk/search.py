@@ -343,7 +343,7 @@ class HelpdeskSearch(Search):
 
 
 @frappe.whitelist()
-def search(query, only_articles=False):
+def search(query, only_articles=False) -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
     query_parts = query.split()

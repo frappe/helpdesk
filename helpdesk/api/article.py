@@ -22,6 +22,8 @@ def get_noun_phrases(blob: TextBlob):
 
 def search_with_enough_results(prev_res: list, query: str) -> tuple[list, bool]:
     out = hd_search(query, only_articles=True)
+    if not out:
+        return prev_res, len(prev_res) == NUM_RESULTS
     items = (prev_res + out[0].get("items", []))[:NUM_RESULTS]
     return items, len(items) == NUM_RESULTS
 
@@ -30,18 +32,22 @@ def search_with_enough_results(prev_res: list, query: str) -> tuple[list, bool]:
 def search(query: str) -> list:
     query = query.strip().lower()
     ret, enough = search_with_enough_results([], query)
-    if not enough:  # fallback
-        blob = TextBlob(query)
-        if noun_phrases := get_noun_phrases(blob):
-            and_query = " ".join(noun_phrases)
-            or_query = "|".join(noun_phrases)
-            ret, enough = search_with_enough_results(ret, and_query)
-            if not enough:
-                ret, enough = search_with_enough_results(ret, or_query)
-        if not enough and (nouns := get_nouns(blob)):
-            and_query = " ".join(nouns)
-            or_query = "|".join(nouns)
-            ret = search_with_enough_results(ret, and_query)
-            if not enough:
-                ret = search_with_enough_results(ret, or_query)
-    return ret
+    if enough:
+        return ret
+    blob = TextBlob(query)  # fallback
+    if noun_phrases := get_noun_phrases(blob):
+        and_query = " ".join(noun_phrases)
+        ret, enough = search_with_enough_results(ret, and_query)
+        if enough:
+            return ret
+        or_query = "|".join(noun_phrases)
+        ret, enough = search_with_enough_results(ret, or_query)
+        if enough:
+            return ret
+    if nouns := get_nouns(blob):
+        and_query = " ".join(nouns)
+        ret, enough = search_with_enough_results(ret, and_query)
+        if enough:
+            return ret
+        or_query = "|".join(nouns)
+        return search_with_enough_results(ret, or_query)[0]
