@@ -78,9 +78,9 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
 
     res = []
     res.extend(from_doc_fields)
+    # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
+    res.extend(from_custom_fields)
     if not show_customer_portal_fields:
-        # TODO: Ritvik => till a better way we have for custom fields, dont show custom fields in customer portal
-        res.extend(from_custom_fields)
         res.append(
             {
                 "fieldname": "_assign",
@@ -178,6 +178,7 @@ def get_list_data(
         for field in fields
         if field.label and field.fieldname
     ]
+    # breakpoint()
 
     std_fields = [
         {"label": "Name", "type": "Data", "value": "name"},
@@ -253,11 +254,7 @@ def get_customer_portal_fields(doctype, fields):
         "response_by",
         "resolution_by",
         "creation",
+        *custom_fields,
     ]
-    fields = [
-        field
-        for field in fields
-        if field.get("value") not in custom_fields
-        and field.get("value") in customer_portal_fields
-    ]
+    fields = [field for field in fields if field.get("value") in customer_portal_fields]
     return fields

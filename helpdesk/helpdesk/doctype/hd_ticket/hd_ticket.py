@@ -845,12 +845,12 @@ class HDTicket(Document):
                 "key": "agent_group",
                 "width": "10rem",
             },
-            {
-                "label": "Assigned To",
-                "type": "Text",
-                "key": "_assign",
-                "width": "10rem",
-            },
+            # {
+            #     "label": "Assigned To",
+            #     "type": "Text",
+            #     "key": "_assign",
+            #     "width": "10rem",
+            # },
             {
                 "label": "Created",
                 "type": "Datetime",
