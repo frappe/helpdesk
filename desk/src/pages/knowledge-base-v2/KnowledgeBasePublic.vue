@@ -22,8 +22,7 @@ import { LayoutHeader } from "@/components";
 import KnowledgeBaseSidebar from "@/components/knowledge-base-v2/KnowledgeBaseSidebar.vue";
 import KnowledgeBaseCategory from "@/components/knowledge-base-v2/KnowledgeBaseCategory.vue";
 import { useRouter } from "vue-router";
-import { Breadcrumbs, createResource, call } from "frappe-ui";
-import { reactive } from "vue";
+import { Breadcrumbs } from "frappe-ui";
 
 const router = useRouter();
 const defaultCategory = computed(
