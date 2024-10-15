@@ -24,51 +24,50 @@
         </template>
       </FormControl>
     </section>
-    <!-- Sub categories Section -->
-    <section
-      class="flex flex-col gap-3 mb-8"
-      v-if="!!category.subCategories.length"
-    >
-      <h3 class="text-lg font-semibold text-gray-900">Sub-categories</h3>
-      <!-- sub category card container-->
-      <div class="flex gap-5 flex-wrap text-lg">
-        <!-- sub category card -->
-        <div
-          v-for="subCategory in category.subCategories"
-          class="border rounded px-3.5 py-3 cursor-pointer max-w-[220px] min-w-[220px] hover:border-gray-500"
-          @click="handleSubCategoryClick(subCategory)"
-        >
-          <h5 class="truncate text-lg">{{ subCategory?.category_name }}</h5>
-          <span class="text-sm text-gray-600">
-            {{ subCategory.articles.length }} articles
-          </span>
+    <div class="overflow-scroll">
+      <!-- Sub categories Section -->
+      <section
+        class="flex flex-col gap-3 mb-8"
+        v-if="!!category.subCategories.length"
+      >
+        <h3 class="text-lg font-semibold text-gray-900">Sub-categories</h3>
+        <!-- sub category card container-->
+        <div class="flex gap-5 flex-wrap text-lg">
+          <!-- sub category card -->
+          <div
+            v-for="subCategory in category.subCategories"
+            class="border rounded px-3.5 py-3 cursor-pointer max-w-[190px] min-w-[190px] hover:border-gray-500"
+            @click="handleSubCategoryClick(subCategory)"
+          >
+            <h5 class="truncate text-lg">{{ subCategory?.category_name }}</h5>
+            <span class="text-sm text-gray-600">
+              {{ subCategory.articles.length }} articles
+            </span>
+          </div>
         </div>
+      </section>
+      <!-- Article List View -->
+      <section class="flex flex-col gap-3" v-if="!!_articles.length">
+        <h4 class="text-lg font-semibold text-gray-900">
+          {{ showAllArticles ? "All Articles" : "Articles" }}
+        </h4>
+        <!-- Article Container -->
+        <div class="flex flex-col gap-x-2 divide-y max-w-full">
+          <!-- Article Card -->
+          <ArticleCard
+            v-for="article in _articles"
+            :article="article"
+            :author="category.authors[article.author]"
+            :key="article.name"
+          />
+        </div>
+      </section>
+      <div
+        v-else
+        class="flex items center justify-center h-[300px] w-full text-gray-600"
+      >
+        No articles found
       </div>
-    </section>
-    <!-- Article List View -->
-    <section
-      class="flex flex-col gap-3 overflow-scroll"
-      v-if="!!_articles.length"
-    >
-      <h4 class="text-lg font-semibold text-gray-900">
-        {{ showAllArticles ? "All Articles" : "Articles" }}
-      </h4>
-      <!-- Article Container -->
-      <div class="flex flex-col gap-x-2 divide-y max-w-full">
-        <!-- Article Card -->
-        <ArticleCard
-          v-for="article in _articles"
-          :article="article"
-          :author="category.authors[article.author]"
-          :key="article.name"
-        />
-      </div>
-    </section>
-    <div
-      v-else
-      class="flex items center justify-center h-[300px] w-full text-gray-600"
-    >
-      No articles found
     </div>
   </div>
   <div
