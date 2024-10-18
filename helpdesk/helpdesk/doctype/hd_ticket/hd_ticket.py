@@ -705,8 +705,7 @@ class HDTicket(Document):
         self.save()
 
     @staticmethod
-    def default_list_data():
-
+    def default_list_data(show_customer_portal_fields=False):
         columns = [
             {
                 "label": "ID",
@@ -801,6 +800,65 @@ class HDTicket(Document):
                 "width": "8rem",
             },
         ]
+        customer_portal_columns = [
+            {
+                "label": "ID",
+                "type": "Int",
+                "key": "name",
+                "width": "5rem",
+            },
+            {
+                "label": "Subject",
+                "type": "Data",
+                "key": "subject",
+                "width": "22rem",
+            },
+            {
+                "label": "Status",
+                "type": "Select",
+                "key": "status",
+                "width": "11rem",
+            },
+            {
+                "label": "Priority",
+                "type": "Link",
+                "options": "HD Ticket Priority",
+                "key": "priority",
+                "width": "10rem",
+            },
+            {
+                "label": "First response",
+                "type": "Datetime",
+                "key": "response_by",
+                "width": "8rem",
+            },
+            {
+                "label": "Resolution",
+                "type": "Datetime",
+                "key": "resolution_by",
+                "width": "8rem",
+            },
+            {
+                "label": "Team",
+                "type": "Link",
+                "options": "HD Team",
+                "key": "agent_group",
+                "width": "10rem",
+            },
+            # {
+            #     "label": "Assigned To",
+            #     "type": "Text",
+            #     "key": "_assign",
+            #     "width": "10rem",
+            # },
+            {
+                "label": "Created",
+                "type": "Datetime",
+                "key": "creation",
+                "options": "Contact",
+                "width": "8rem",
+            },
+        ]
         rows = [
             "name",
             "subject",
@@ -819,7 +877,12 @@ class HDTicket(Document):
             "_assign",
             "resolution_date",
         ]
-        return {"columns": columns, "rows": rows}
+        return {
+            "columns": customer_portal_columns
+            if show_customer_portal_fields
+            else columns,
+            "rows": rows,
+        }
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra

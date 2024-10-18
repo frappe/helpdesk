@@ -6,7 +6,7 @@
     :rows="rows"
     :options="{
       getRowRoute: (row) => ({
-        name: 'TicketAgent',
+        name: isCustomerPortal ? 'TicketCustomer' : 'TicketAgent',
         params: { ticketId: row.name },
       }),
       selectable: options.selectable,
@@ -71,6 +71,9 @@
               {{ dayjs.tz(item).fromNow() }}
             </Tooltip>
           </div>
+          <div v-else-if="column.key === 'agent_group'">
+            {{ item || "-" }}
+          </div>
           <div v-else-if="column.key === 'resolution_by'">
             <Badge
               v-if="
@@ -99,7 +102,7 @@
         </ListRowItem>
       </ListRow>
     </ListRows>
-    <ListSelectBanner>
+    <ListSelectBanner v-if="!isCustomerPortal">
       <template #actions="{ selections }">
         <Dropdown
           :options="[
@@ -209,12 +212,16 @@ import {
   Dropdown,
 } from "frappe-ui";
 import { MultipleAvatar, StarRating } from "@/components";
+import { useRoute } from "vue-router";
 
 const ticketStatusStore = useTicketStatusStore();
 const showExportDialog = ref(false);
 const export_type = ref("Excel");
 const export_all = ref(false);
 let selectedRows;
+
+const route = useRoute();
+const isCustomerPortal = route.meta.public;
 
 const props = defineProps({
   columns: {

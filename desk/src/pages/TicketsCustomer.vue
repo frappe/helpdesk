@@ -1,37 +1,19 @@
 <template>
   <div class="flex flex-col">
-    <PageTitle title="Tickets">
-      <template #right>
-        <div class="flex gap-2">
-          <div
-            class="flex items-center justify-between text-base text-gray-700"
-          >
-            <div class="flex gap-4">
-              <Dropdown :options="dropdownOptions">
-                <template #default="{ open }">
-                  <Button
-                    :label="dropdownTitle"
-                    :icon-right="open ? 'chevron-up' : 'chevron-down'"
-                    theme="gray"
-                    variant="outline"
-                  />
-                </template>
-              </Dropdown>
-            </div>
-          </div>
-          <RouterLink
-            v-if="!configStore.preferKnowledgeBase"
-            :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
-          >
-            <Button
-              class="bg-gray-900 text-white hover:bg-gray-800"
-              label="New ticket"
-              icon-right="plus"
-            />
-          </RouterLink>
-        </div>
+    <LayoutHeader>
+      <template #left-header>
+        <Breadcrumbs :items="breadcrumbs" />
       </template>
-    </PageTitle>
+      <template #right-header>
+        <RouterLink :to="{ name: 'TicketNew' }">
+          <Button label="New Ticket" theme="gray" variant="solid">
+            <template #prefix>
+              <LucidePlus class="h-4 w-4" />
+            </template>
+          </Button>
+        </RouterLink>
+      </template>
+    </LayoutHeader>
     <ListView
       :columns="columns"
       :resource="tickets"
@@ -98,20 +80,19 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dropdown, Tooltip } from "frappe-ui";
+import { Dropdown, Tooltip, Breadcrumbs } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { useConfigStore } from "@/stores/config";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { createListManager } from "@/composables/listManager";
-import { CUSTOMER_PORTAL_TICKET, CUSTOMER_PORTAL_NEW_TICKET } from "@/router";
+import { CUSTOMER_PORTAL_TICKET } from "@/router";
 import { ListView } from "@/components";
-import PageTitle from "@/components/PageTitle.vue";
-
+import { ViewControls, LayoutHeader } from "@/components";
 const configStore = useConfigStore();
 const ticketStatusStore = useTicketStatusStore();
 const columns = [
   {
-    label: "#",
+    label: "ID",
     key: "name",
     width: "w-12",
   },
@@ -173,6 +154,8 @@ const tickets = createListManager({
     }
   },
 });
+
+const breadcrumbs = [{ label: "Tickets", route: { name: "TicketsCustomer" } }];
 
 const ACTIVE_TICKET_TYPES = ["Open", "Replied"];
 const dropdownTitle = ref("All tickets");

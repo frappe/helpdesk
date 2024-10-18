@@ -1,18 +1,10 @@
 <template>
   <div v-if="ticket.data" class="flex flex-col">
-    <TicketBreadcrumbs parent="TicketsCustomer" current="TicketCustomer">
-      <template #right>
-        <Button
-          v-if="showReopenButton"
-          label="Reopen"
-          theme="gray"
-          variant="solid"
-          @click="setValue.submit({ fieldname: 'status', value: 'Open' })"
-        >
-          <template #prefix>
-            <Icon icon="lucide:repeat-2" />
-          </template>
-        </Button>
+    <LayoutHeader>
+      <template #left-header>
+        <Breadcrumbs :items="breadcrumbs" />
+      </template>
+      <template #right-header>
         <Button
           v-if="showResolveButton"
           label="Close"
@@ -25,41 +17,49 @@
           </template>
         </Button>
       </template>
-    </TicketBreadcrumbs>
-    <TicketCustomerTemplateFields />
-    <TicketConversation class="grow" />
-    <span class="m-5">
-      <TicketTextEditor
-        v-if="showEditor"
-        ref="editor"
-        v-model:attachments="attachments"
-        v-model:content="editorContent"
-        v-model:expand="isExpanded"
-        :placeholder="placeholder"
-        autofocus
-        @clear="() => (isExpanded = false)"
-      >
-        <template #bottom-right>
-          <Button
-            label="Send"
-            theme="gray"
-            variant="solid"
-            :disabled="$refs.editor.editor.isEmpty || send.loading"
-            @click="() => send.submit()"
-          />
-        </template>
-      </TicketTextEditor>
-    </span>
+    </LayoutHeader>
+    <div class="flex overflow-hidden h-full">
+      <!-- Main Ticket Comm -->
+      <section class="flex flex-col flex-1">
+        <!-- show for only mobile -->
+        <TicketCustomerTemplateFields v-if="isMobileView" />
+
+        <TicketConversation class="grow" />
+        <div class="m-5">
+          <TicketTextEditor
+            v-if="showEditor"
+            ref="editor"
+            v-model:attachments="attachments"
+            v-model:content="editorContent"
+            v-model:expand="isExpanded"
+            :placeholder="placeholder"
+            autofocus
+            @clear="() => (isExpanded = false)"
+          >
+            <template #bottom-right>
+              <Button
+                label="Send"
+                theme="gray"
+                variant="solid"
+                :disabled="$refs.editor.editor.isEmpty || send.loading"
+                @click="() => send.submit()"
+              />
+            </template>
+          </TicketTextEditor>
+        </div>
+      </section>
+      <!-- Ticket Sidebar only for desktop view-->
+      <TicketCustomerSidebar v-if="!isMobileView" @open="isExpanded = true" />
+    </div>
     <TicketFeedback v-model:open="showFeedbackDialog" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, provide, ref } from "vue";
-import { createResource, Button } from "frappe-ui";
+import { createResource, Button, Breadcrumbs } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useError } from "@/composables/error";
-import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
 import TicketConversation from "./ticket/TicketConversation.vue";
 import TicketCustomerTemplateFields from "./ticket/TicketCustomerTemplateFields.vue";
 import TicketFeedback from "./ticket/TicketFeedback.vue";
@@ -67,7 +67,9 @@ import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { ITicket } from "./ticket/symbols";
 import { useRouter } from "vue-router";
 import { createToast } from "@/utils";
-
+import { LayoutHeader } from "@/components";
+import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
+import { useScreenSize } from "@/composables/screen";
 interface P {
   ticketId: string;
 }
@@ -83,7 +85,7 @@ const ticket = createResource({
   },
   onError: () => {
     createToast({
-      title: "You are not allowed to view this ticket",
+      title: "Ticket not found",
       icon: "x",
       iconClasses: "text-red-600",
     });
@@ -97,6 +99,8 @@ const editorContent = ref("");
 const attachments = ref([]);
 const showFeedbackDialog = ref(false);
 const isExpanded = ref(false);
+
+const { isMobileView } = useScreenSize();
 
 const send = createResource({
   url: "run_doc_method",
@@ -142,6 +146,15 @@ const setValue = createResource({
     ticket.reload();
   },
   onError: useError(),
+});
+
+const breadcrumbs = computed(() => {
+  let items = [{ label: "Tickets", route: { name: "TicketsCustomer" } }];
+  items.push({
+    label: ticket.data?.subject,
+    route: { name: "TicketCustomer" },
+  });
+  return items;
 });
 
 const showReopenButton = computed(

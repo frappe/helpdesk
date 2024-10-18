@@ -154,6 +154,10 @@ let props = defineProps({
     type: Boolean,
     default: false,
   },
+  isCustomerPortal: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 function resetToDefault(close) {

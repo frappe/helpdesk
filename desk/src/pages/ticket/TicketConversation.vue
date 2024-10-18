@@ -1,28 +1,39 @@
 <template>
-  <div class="divide-y overflow-auto px-5 pb-32">
-    <div v-for="c in conversation" :id="c.name" :key="c.name" class="mt-4">
-      <TicketComment
-        v-if="c.commented_by"
-        :name="c.name"
-        :content="c.content"
-        :date="c.creation"
-        :user="c.user"
-        :is-pinned="c.is_pinned"
-      />
-      <TicketCommunication
-        v-else
-        :content="c.content"
-        :date="c.creation"
-        :user="c.user"
-        :sender-image="c.sender"
-        :cc="c.cc || ''"
-        :bcc="c.bcc || ''"
-        :attachments="c.attachments"
+  <div
+    class="md:mx-5 md:my-8 mb-4 mt-8 flex items-center justify-between h-8 text-xl font-semibold text-gray-800"
+  >
+    Activity
+  </div>
+  <div class="overflow-auto px-5 pb-20 grow">
+    <div
+      v-for="c in communications"
+      :id="c.name"
+      :key="c.name"
+      class="mt-4 flex items-between justify-center gap-4 relative"
+    >
+      <div
+        class="w-full activity grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
       >
-        <template #top-right="d">
-          <slot name="communication-top-right" v-bind="d" />
-        </template>
-      </TicketCommunication>
+        <div
+          class="relative flex justify-center after:absolute after:left-[50%] after:top-[12%] after:-z-10 after:border-l after:border-gray-200 after:h-full"
+        >
+          <Avatar
+            size="lg"
+            :label="c.user.name"
+            :image="c.user.image"
+            class="mt-1 relative"
+          />
+        </div>
+        <TicketCommunication
+          :content="c.content"
+          :date="c.creation"
+          :user="c.user"
+          :sender-image="c.sender"
+          :cc="c.cc || ''"
+          :bcc="c.bcc || ''"
+          :attachments="c.attachments"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -31,9 +42,9 @@
 import { computed, inject, nextTick, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useElementVisibility } from "@vueuse/core";
+import { Avatar } from "frappe-ui";
 import { orderBy } from "lodash";
 import { dayjs } from "@/dayjs";
-import TicketComment from "./TicketComment.vue";
 import TicketCommunication from "./TicketCommunication.vue";
 import { ITicket } from "./symbols";
 
@@ -46,14 +57,10 @@ const props = withDefaults(defineProps<P>(), {
 });
 const route = useRoute();
 const ticket = inject(ITicket);
-const data = computed(() => ticket.data || {});
-const communications = computed(() => data.value.communications || []);
-const comments = computed(() => data.value.comments || []);
-const conversation = computed(() =>
-  orderBy([...communications.value, ...comments.value], (c) =>
-    dayjs(c.creation)
-  )
-);
+const communications = computed(() => {
+  const _communications = ticket.data.communications || [];
+  return orderBy(_communications, (c) => dayjs(c.creation));
+});
 
 function scroll(id: string) {
   const e = document.getElementById(id);
@@ -69,7 +76,7 @@ watch(
 );
 nextTick(() => {
   const hash = route.hash.slice(1);
-  const id = hash || conversation.value.slice(-1).pop()?.name;
+  const id = hash || communications.value.slice(-1).pop()?.name;
   if (id) setTimeout(() => scroll(id), 1000);
 });
 </script>

@@ -30,77 +30,89 @@ export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 export const CUSTOMER_PORTAL_LANDING = "TicketsCustomer";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 export const REDIRECT_PAGE = "/login?redirect-to=/helpdesk";
+
+export const CUSTOMER_PORTAL_ROUTES = [
+  "TicketsCustomer",
+  "TicketNew",
+  "TicketCustomer",
+];
+
+// type the meta fields
+declare module "vue-router" {
+  interface RouteMeta {
+    auth?: boolean;
+    agent?: boolean;
+    admin?: boolean;
+    public?: boolean;
+    onSuccessRoute?: string;
+    parent?: string;
+  }
+}
+
 const routes = [
   {
     path: "",
     component: () => import("@/pages/HRoot.vue"),
   },
+  // Customer portal routing
   {
-    path: "/knowledge-base",
-    component: () => import("@/pages/KnowledgeBasePublic.vue"),
-    children: [
-      {
-        path: "",
-        name: "KBHome",
-        component: () => import("@/pages/KnowledgeBasePublicHome.vue"),
-      },
-      {
-        path: ":categoryId",
-        name: "KBCategoryPublic",
-        component: () => import("@/pages/KnowledgeBasePublicCategory.vue"),
-        props: true,
-      },
-      {
-        path: "articles/:articleId",
-        name: "KBArticlePublic",
-        component: () => import("@/pages/KnowledgeBaseArticle.vue"),
-        meta: {
-          public: true,
-        },
-        props: true,
-      },
-    ],
-  },
-  {
-    path: "/my-tickets",
-    component: () => import("@/pages/CLayout.vue"),
+    path: "",
+    name: "CustomerRoot",
+    // component: () => import("@/pages/CLayout.vue"), // old customer portal
+    component: () => import("@/pages/CustomerPortalRoot.vue"),
     meta: {
       auth: true,
+      public: true,
     },
     children: [
+      // handle tickets routing
       {
-        path: "",
-        name: "TicketsCustomer",
-        component: () => import("@/pages/TicketsCustomer.vue"),
+        path: "my-tickets",
+        children: [
+          {
+            path: "",
+            name: "TicketsCustomer",
+            component: () => import("@/pages/Tickets.vue"),
+          },
+          {
+            path: "new/:templateId?",
+            name: "TicketNew",
+            component: () => import("@/pages/TicketNew.vue"),
+            props: true,
+            meta: {
+              onSuccessRoute: "TicketCustomer",
+              parent: "TicketsCustomer",
+            },
+          },
+          {
+            path: ":ticketId",
+            name: "TicketCustomer",
+            component: () => import("@/pages/TicketCustomer.vue"),
+            props: true,
+          },
+        ],
       },
+      // handle knowledge base routing
       {
-        path: "new/:templateId?",
-        name: "TicketNew",
-        component: () => import("@/pages/TicketNew.vue"),
-        props: true,
-        meta: {
-          onSuccessRoute: "TicketCustomer",
-          parent: "TicketsCustomer",
-        },
-      },
-      {
-        path: ":ticketId",
-        name: "TicketCustomer",
-        component: () => import("@/pages/TicketCustomer.vue"),
-        props: true,
+        path: "knowledge-base-public",
+        children: [
+          {
+            path: "",
+            name: "KnowledgeBasePublicNew",
+            component: () =>
+              import("@/pages/knowledge-base-v2/KnowledgeBasePublic.vue"),
+          },
+          {
+            path: "articles/:articleId?",
+            name: "KBArticlePublicNew",
+            component: () => import("@/pages/KnowledgeBaseArticle.vue"),
+            props: true,
+          },
+        ],
       },
     ],
   },
-  {
-    path: "/onboarding",
-    name: ONBOARDING_PAGE,
-    component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
-  },
-  {
-    path: "/:invalidpath",
-    name: "Invalid Page",
-    component: () => import("@/pages/InvalidPage.vue"),
-  },
+  // Agent Portal Routing
   {
     path: "",
     name: "AgentRoot",
@@ -114,7 +126,7 @@ const routes = [
       {
         path: "tickets",
         name: AGENT_PORTAL_TICKET_LIST,
-        component: () => import("@/pages/TicketsAgent.vue"),
+        component: () => import("@/pages/Tickets.vue"),
       },
       {
         path: "notifications",
@@ -203,6 +215,17 @@ const routes = [
           import("@/pages/desk/escalation/EscalationRuleList.vue"),
       },
     ],
+  },
+  // Additonal routes
+  {
+    path: "/onboarding",
+    name: ONBOARDING_PAGE,
+    component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "Invalid Page",
+    component: () => import("@/pages/InvalidPage.vue"),
   },
 ];
 

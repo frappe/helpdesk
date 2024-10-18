@@ -1,10 +1,10 @@
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <PageTitle v-if="!route.meta.public">
+    <PageTitle>
       <template #title>
         <Breadcrumbs :items="breadcrumbs" />
       </template>
-      <template #right>
+      <template #right v-if="!route.meta.public">
         <component
           :is="actionsComponent"
           :status="article.data?.status"
@@ -19,7 +19,7 @@
       </template>
     </PageTitle>
     <div class="overflow-auto">
-      <div class="container m-auto my-12">
+      <div class="mx-5 my-12">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
@@ -33,12 +33,13 @@
           editor-class="prose-f"
           @change="articleContent = $event"
         >
-          <template #top>
+          <template #top v-if="!route.meta.public">
             <component
               :is="topComponent"
               v-model:title="articleTitle"
               v-bind="options__"
             />
+
             <TextEditorFixedMenu
               v-if="editMode"
               class="-ml-1"
@@ -46,6 +47,12 @@
             />
           </template>
         </TextEditor>
+        <!-- <div
+          v-else-if="!article.data && !editMode"
+          class="text-gray-500 text-2xl font-semibold mb-5"
+        >
+          Article Not Found
+        </div> -->
         <RouterLink
           v-if="route.meta.public"
           :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
@@ -92,7 +99,6 @@ import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticl
 import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArticleActionsView.vue";
 import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
-import KnowledgeBaseArticleTopPublic from "./knowledge-base/KnowledgeBaseArticleTopPublic.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
 import { Extension } from "@tiptap/core";
 
@@ -122,10 +128,15 @@ const router = useRouter();
 const authStore = useAuthStore();
 const isNew = props.articleId === "new";
 const editMode = ref(isNew);
-const categoryId = computed(() => route.query.category);
-const subCategoryId = computed(() => route.query.subCategory);
+const categoryId = computed(() => router.currentRoute.value.query.category);
+const subCategoryId = computed(
+  () => router.currentRoute.value.query.subCategory
+);
+
+const isCustomerPortal = computed(() => route.meta.public);
+
 const breadcrumbs = computed(() => {
-  const items = [
+  const agentPortalItems = [
     {
       label: options__.value.categoryName,
       route: {
@@ -133,26 +144,57 @@ const breadcrumbs = computed(() => {
         params: { categoryId: options__.value.categoryId },
       },
     },
-    {
-      label: options__.value.subCategoryName,
-      route: {
-        name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
-        params: {
-          categoryId: options__.value.categoryId,
-          subCategoryId: options__.value.subCategoryId,
-        },
+  ];
+  // if (options__.value.subCategoryId !== options__.value.categoryId) {
+  agentPortalItems.push({
+    label: options__.value.subCategoryName,
+    route: {
+      name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
+      params: {
+        categoryId: options__.value.categoryId,
+        subCategoryId:
+          options__.value.subCategoryId || options__.value.categoryId,
       },
     },
-  ];
+  });
+  // }
 
   if (!isNew) {
-    items.push({
+    agentPortalItems.push({
       label: article.data?.title,
       route: {
         name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
         params: {
           articleId: article.data?.name,
         },
+      },
+    });
+  }
+  if (!isCustomerPortal.value) {
+    return agentPortalItems;
+  }
+  const customerPortalItems = [
+    {
+      label: "Knowledge Base",
+      route: {
+        name: "KnowledgeBasePublicNew",
+      },
+    },
+  ];
+  if (options__.value.categoryId) {
+    customerPortalItems.push({
+      label: options__.value.categoryName,
+      route: {
+        name: "KnowledgeBasePublicNew",
+        query: { category: options__.value.categoryId },
+      },
+    });
+  }
+  if (options__.value.subCategoryId) {
+    customerPortalItems.push({
+      label: options__.value.subCategoryName,
+      route: {
+        name: "KnowledgeBasePublicNew",
         query: {
           category: options__.value.categoryId,
           subCategory: options__.value.subCategoryId,
@@ -160,7 +202,8 @@ const breadcrumbs = computed(() => {
       },
     });
   }
-  return items;
+
+  return customerPortalItems;
 });
 const placeholder = computed(() =>
   editMode.value ? "Write something..." : "Content is empty"
@@ -175,7 +218,6 @@ const actionsComponent = computed(() => {
 });
 
 const topComponent = computed(() => {
-  if (route.meta.public) return KnowledgeBaseArticleTopPublic;
   if (isNew) return KnowledgeBaseArticleTopNew;
   if (editMode.value) return KnowledgeBaseArticleTopEdit;
   return KnowledgeBaseArticleTopView;
@@ -208,7 +250,7 @@ const category = createDocumentResource({
 const subCategory = createDocumentResource({
   doctype: "HD Article Category",
   name: subCategoryId.value,
-  auto: true,
+  auto: subCategoryId.value !== categoryId.value ? true : false,
 });
 
 const options__ = computed(() => ({
@@ -371,7 +413,7 @@ const PreserveIds: Extension = Extension.create({
 });
 
 const textEditorContentWithIDs = computed(() =>
-  addLinksToHeadings(article.data?.content)
+  article.data?.content ? addLinksToHeadings(article.data?.content) : null
 );
 
 function addLinksToHeadings(content: string) {

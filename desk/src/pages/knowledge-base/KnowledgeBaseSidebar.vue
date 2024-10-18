@@ -27,6 +27,7 @@
         :is-expanded="true"
         :label="category.category_name"
         :on-click="() => toCategory(category.name)"
+        class="truncate"
       />
     </div>
     <KnowledgeBaseCategoryNew
