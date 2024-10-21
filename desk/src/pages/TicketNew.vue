@@ -27,7 +27,7 @@
         />
       </div>
       <!-- existing fields -->
-      <div class="flex flex-col flex-1" :class="subject.length >= 2 && 'gap-5'">
+      <div class="flex flex-col" :class="subject.length >= 2 && 'gap-5'">
         <FormControl
           v-model="subject"
           type="text"
