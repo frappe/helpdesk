@@ -916,7 +916,7 @@ def permission_query(user):
         user=frappe.db.escape(user)
     )
     for c in customer:
-        res += ' OR `tabHD Ticket`.customer="{customer}"'.format(
+        res += ' OR `tabHD Ticket`.customer={customer}'.format(
             customer=frappe.db.escape(c)
         )
     return res
