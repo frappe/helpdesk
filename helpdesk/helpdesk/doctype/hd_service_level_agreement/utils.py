@@ -16,7 +16,6 @@ def get_sla(ticket: Document) -> Document:
     :param doc: Ticket to use
     :return: Applicable SLA
     """
-    check_permissions(DOCTYPE, None)
     QBSla = frappe.qb.DocType(DOCTYPE)
     QBPriority = frappe.qb.DocType("HD Service Level Priority")
     now = now_datetime()
