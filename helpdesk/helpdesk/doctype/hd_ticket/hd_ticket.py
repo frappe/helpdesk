@@ -189,6 +189,9 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
+        # create communication if we are not hitting the new ticket creation API
+        if not self.via_customer_portal:
+            self.create_communication_via_contact(self.description)
 
     def on_update(self):
         # flake8: noqa
@@ -336,6 +339,10 @@ class HDTicket(Document):
         Removes the assignment if the agent is not in the team.
         Should be called inside on_update
         """
+        if self.is_new():
+            return
+        if not self.agent_group or not self._assign:
+            return
         if self.has_value_changed("agent_group") and self.status == "Open":
             current_assigned_agent_doc = self.get_assigned_agent()
             if (
