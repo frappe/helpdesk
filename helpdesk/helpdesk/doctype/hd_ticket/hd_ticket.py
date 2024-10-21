@@ -5,10 +5,12 @@ from typing import List
 
 import frappe
 from frappe import _
+from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
+from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import Order
 from pypika.functions import Count
 from pypika.queries import Query
@@ -916,7 +918,27 @@ def permission_query(user):
         user=frappe.db.escape(user)
     )
     for c in customer:
-        res += ' OR `tabHD Ticket`.customer={customer}'.format(
+        res += " OR `tabHD Ticket`.customer={customer}".format(
             customer=frappe.db.escape(c)
         )
     return res
+
+
+def set_guest_ticket_creation_permission():
+    doctype = "HD Ticket"
+    add_permission(doctype, "Guest", 0)
+
+    role = "Guest"
+    permlevel = 0
+    ptype = ["read", "write", "create", "if_owner"]
+
+    for p in ptype:
+        # update permissions
+        update_permission_property(doctype, role, permlevel, p, 1)
+
+
+def remove_guest_ticket_creation_permission():
+    doctype = "HD Ticket"
+    role = "Guest"
+    permlevel = 0
+    remove(doctype, role, permlevel, 1)
