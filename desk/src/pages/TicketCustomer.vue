@@ -164,10 +164,9 @@ const showResolveButton = computed(() =>
   ["Open", "Replied"].includes(ticket.data.status)
 );
 
-const showEditor = computed(() =>
-  ["Open", "Replied", "Resolved"].includes(ticket.data.status)
-);
+const showEditor = computed(() => ticket.data.status !== "Closed");
 
+// this handles whether the ticket was raised and then was closed without any reply from the agent.
 const showFeedback = computed(() => {
   return ticket.data?.communications?.some((c) => {
     if (c.sender !== ticket.data.raised_by) {

@@ -12,10 +12,6 @@
   "priority_section",
   "default_priority",
   "column_break_nvbf",
-  "ticket_type_section",
-  "default_ticket_type",
-  "is_ticket_type_mandatory",
-  "column_break_zxek",
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
@@ -25,6 +21,13 @@
   "knowledge_base_section",
   "suggest_articles_in_new_ticket_page",
   "prefer_knowledge_base",
+  "ticket_tab",
+  "ticket_type_section",
+  "default_ticket_type",
+  "is_ticket_type_mandatory",
+  "column_break_zxek",
+  "ticket_restrictions_section",
+  "allow_anyone_to_create_tickets",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -274,11 +277,28 @@
    "fieldname": "headings_weight",
    "fieldtype": "Int",
    "label": "Headings Weight"
+  },
+  {
+   "fieldname": "ticket_tab",
+   "fieldtype": "Tab Break",
+   "label": "Ticket"
+  },
+  {
+   "fieldname": "ticket_restrictions_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Restrictions"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, anyone will be able to create tickets (without any permission). \nUseful in cases where you wants users to create tickets via webforms or some external APIs without authentication.",
+   "fieldname": "allow_anyone_to_create_tickets",
+   "fieldtype": "Check",
+   "label": "Allow anyone to create tickets"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-09-18 00:47:04.055942",
+ "modified": "2024-10-22 02:14:33.360809",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
