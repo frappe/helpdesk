@@ -27,7 +27,7 @@ def get_one(name: str):
     fields.extend(get_fields(name, "Custom Field"))
     return {
         "about": about,
-        "fields": fields,
+        "fields": sorted(fields, key=lambda x: x["idx"]),
     }
 
 
