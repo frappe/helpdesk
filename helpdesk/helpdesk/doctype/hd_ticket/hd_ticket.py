@@ -5,10 +5,12 @@ from typing import List
 
 import frappe
 from frappe import _
+from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
+from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import Order
 from pypika.functions import Count
 from pypika.queries import Query
@@ -189,6 +191,9 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
+        # create communication if we are not hitting the new ticket creation API
+        if not self.via_customer_portal:
+            self.create_communication_via_contact(self.description)
 
     def on_update(self):
         # flake8: noqa
@@ -336,6 +341,10 @@ class HDTicket(Document):
         Removes the assignment if the agent is not in the team.
         Should be called inside on_update
         """
+        if self.is_new():
+            return
+        if not self.agent_group or not self._assign:
+            return
         if self.has_value_changed("agent_group") and self.status == "Open":
             current_assigned_agent_doc = self.get_assigned_agent()
             if (
@@ -909,7 +918,27 @@ def permission_query(user):
         user=frappe.db.escape(user)
     )
     for c in customer:
-        res += ' OR `tabHD Ticket`.customer="{customer}"'.format(
+        res += " OR `tabHD Ticket`.customer={customer}".format(
             customer=frappe.db.escape(c)
         )
     return res
+
+
+def set_guest_ticket_creation_permission():
+    doctype = "HD Ticket"
+    add_permission(doctype, "Guest", 0)
+
+    role = "Guest"
+    permlevel = 0
+    ptype = ["read", "write", "create", "if_owner"]
+
+    for p in ptype:
+        # update permissions
+        update_permission_property(doctype, role, permlevel, p, 1)
+
+
+def remove_guest_ticket_creation_permission():
+    doctype = "HD Ticket"
+    role = "Guest"
+    permlevel = 0
+    remove(doctype, role, permlevel, 1)
