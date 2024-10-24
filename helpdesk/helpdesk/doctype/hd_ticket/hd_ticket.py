@@ -213,14 +213,14 @@ class HDTicket(Document):
         self.publish_update()
         self.update_search_index()
 
-    def notify_agent(self, agent, notiification_type="Assignment"):
+    def notify_agent(self, agent, notification_type="Assignment"):
         frappe.get_doc(
             frappe._dict(
                 doctype="HD Notification",
                 user_from=frappe.session.user,
                 reference_ticket=self.name,
                 user_to=agent,
-                notification_type=notiification_type,
+                notification_type=notification_type,
             )
         ).insert(ignore_permissions=True)
 
@@ -343,7 +343,7 @@ class HDTicket(Document):
         """
         if self.is_new():
             return
-        if not self.agent_group or not self._assign:
+        if not self.agent_group or (hasattr(self, "_assign") and not self._assign):
             return
         if self.has_value_changed("agent_group") and self.status == "Open":
             current_assigned_agent_doc = self.get_assigned_agent()
