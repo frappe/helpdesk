@@ -7,7 +7,7 @@
     </LayoutHeader>
     <!-- Container -->
     <div
-      class="max-w-screen-lg flex flex-col gap-5 m-5 w-full h-full flex-1 self-center"
+      class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
     >
       <!-- custom fields descriptions -->
       <div v-if="Boolean(template.data?.about)" class="">

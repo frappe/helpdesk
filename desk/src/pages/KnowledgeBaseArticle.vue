@@ -19,7 +19,7 @@
       </template>
     </LayoutHeader>
     <div class="overflow-auto mx-auto w-full max-w-4xl px-5">
-      <div class="mx-5 my-12">
+      <div class="py-6">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
