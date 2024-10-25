@@ -12,21 +12,24 @@
             :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
-              class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-gray-100"
+              class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white"
               :class="[
-                activity.type === 'history' ? 'bg-white' : 'bg-gray-100',
                 activity.type === 'comment' ? 'mt-0.5' : '',
                 activity.type === 'email' ? 'mt-2' : '',
               ]"
             >
-              <component
-                :is="getActivityIcon(activity.type)"
-                :class="[
-                  activity.type == 'history'
-                    ? 'text-gray-600'
-                    : 'text-gray-800',
-                ]"
+              <Avatar
+                v-if="activity.type === 'email'"
+                size="md"
+                :label="activity.sender?.full_name"
+                :image="getUser(activity.sender?.name).user_image"
+                class="bg-white"
               />
+              <CommentIcon
+                v-else-if="activity.type === 'comment'"
+                class="text-gray-800"
+              />
+              <DotIcon v-else class="text-gray-600" />
             </div>
           </div>
           <div class="mb-4 w-full">
@@ -67,6 +70,7 @@
 </template>
 
 <script setup lang="ts">
+import { Ref, inject, h, computed, onMounted, watch } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import {
   DotIcon,
@@ -76,10 +80,8 @@ import {
   ActivityIcon,
 } from "@/components/icons";
 import { EmailArea, CommentBox, HistoryBox } from "@/components";
-import { Ref } from "vue";
-import { inject } from "vue";
-import { computed } from "vue";
-import { h } from "vue";
+import { useUserStore } from "@/stores/user";
+import { Avatar } from "frappe-ui";
 
 const props = defineProps({
   activities: {
@@ -94,6 +96,7 @@ const props = defineProps({
 
 const emit = defineEmits(["email:reply", "update"]);
 
+const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
 
 const emptyText = computed(() => {
@@ -116,12 +119,6 @@ const emptyTextIcon = computed(() => {
   return h(icon, { class: "text-gray-500" });
 });
 
-function getActivityIcon(type) {
-  if (type === "email") return EmailAtIcon;
-  else if (type === "comment") return CommentIcon;
-  else return DotIcon;
-}
-
 function scrollToLatestActivity() {
   setTimeout(() => {
     let el;
@@ -137,4 +134,15 @@ function scrollToLatestActivity() {
 defineExpose({
   scrollToLatestActivity,
 });
+
+onMounted(() => {
+  scrollToLatestActivity();
+});
+
+watch(
+  () => props.title,
+  () => {
+    scrollToLatestActivity();
+  }
+);
 </script>

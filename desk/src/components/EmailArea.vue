@@ -1,33 +1,33 @@
 <template>
   <div
-    class="grow cursor-pointer rounded-md border-transparent bg-gray-50 text-base leading-6 transition-all duration-300 ease-in-out"
+    class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-1 flex items-center justify-between gap-2">
-      <!-- comment design for mobile -->
+      <!-- email design for mobile -->
       <div v-if="isMobileView" class="flex items-center gap-2">
-        <UserAvatar :name="sender.name" size="lg" />
         <div class="leading-tight">
-          <span>{{ sender.full_name }}</span>
-          <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <div class="text-xs text-gray-600">
-              {{ timeAgo(creation) }}
-            </div>
-          </Tooltip>
+          <span>{{ sender.full_name || "No name found" }}</span>
+          <span
+            class="sm:flex hidden text-sm text-gray-600"
+            v-if="sender.name"
+            >{{ "<" + sender.name + ">" }}</span
+          >
         </div>
       </div>
-      <!-- comment design for desktop -->
+      <!-- email design for desktop -->
       <div v-else class="flex items-center gap-2">
-        <UserAvatar :name="sender.name" size="md" />
-        <span>{{ sender.full_name }}</span>
-        <span>&middot;</span>
+        <span>{{ sender.full_name || "No name found" }}</span>
+        <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">{{
+          "<" + sender.name + ">"
+        }}</span>
+      </div>
+
+      <div class="flex gap-0.5 items-center">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <div class="text-sm text-gray-600">
             {{ timeAgo(creation) }}
           </div>
         </Tooltip>
-      </div>
-
-      <div class="flex gap-0.5">
         <Button
           variant="ghost"
           class="text-gray-700"
