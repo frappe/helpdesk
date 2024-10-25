@@ -1,7 +1,7 @@
 <template>
   <div class="flex-col text-base">
     <div class="mb-1 ml-0.5 flex items-center justify-between">
-      <div class="text-gray-600 flex items-center gap-1">
+      <div class="text-gray-600 flex items-center gap-2">
         <Avatar
           size="sm"
           :label="commenter"
@@ -17,7 +17,7 @@
           </span>
         </p>
       </div>
-      <div class="flex gap-1 items-center">
+      <div class="flex items-center">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <span class="pl-0.5 text-sm text-gray-600">
             {{ timeAgo(creation) }}
