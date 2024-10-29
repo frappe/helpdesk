@@ -75,6 +75,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from "vue";
 import { FileUploader } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useAuthStore } from "@/stores/auth";
@@ -84,7 +85,6 @@ import {
   UserAvatar,
 } from "@/components";
 import { File } from "@/types";
-import { computed, ref } from "vue";
 
 interface P {
   content: string;

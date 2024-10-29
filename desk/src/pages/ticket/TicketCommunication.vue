@@ -54,7 +54,12 @@ withDefaults(defineProps<P>(), {
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "video"]),
+    allowedAttributes: {
+      a: ["href"],
+      video: ["src", "controls"],
+      img: ["src"],
+    },
   });
 }
 </script>
