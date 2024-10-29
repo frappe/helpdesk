@@ -68,23 +68,28 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
     )
 
     # for customer portal show only fields present in customer_portal_fields
-
     if show_customer_portal_fields:
         from_doc_fields = from_doc_fields.where(
             QBDocField.fieldname.isin(customer_portal_fields)
         )
-        from_custom_fields = from_custom_fields.where(
-            QBCustomField.fieldname.isin(visible_custom_fields)
-        )
+        if len(visible_custom_fields) > 0:
+            from_custom_fields = from_custom_fields.where(
+                QBCustomField.fieldname.isin(visible_custom_fields)
+            )
+            from_custom_fields = from_custom_fields.run(as_dict=True)
+        else:
+            from_custom_fields = []
+
+    if not show_customer_portal_fields:
+        from_custom_fields = from_custom_fields.run(as_dict=True)
 
     from_doc_fields = from_doc_fields.run(as_dict=True)
-    from_custom_fields = from_custom_fields.run(as_dict=True)
-
     # from hd ticket template get children with fieldname and hidden_from_customer
 
     res = []
     res.extend(from_doc_fields)
     # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
+
     res.extend(from_custom_fields)
     if not show_customer_portal_fields:
         res.append(

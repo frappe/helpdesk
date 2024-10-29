@@ -1,10 +1,10 @@
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <PageTitle>
-      <template #title>
+    <LayoutHeader>
+      <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
       </template>
-      <template #right v-if="!route.meta.public">
+      <template #right-header v-if="!isCustomerPortal">
         <component
           :is="actionsComponent"
           :status="article.data?.status"
@@ -17,9 +17,9 @@
           @toggle-status="toggleStatus"
         />
       </template>
-    </PageTitle>
-    <div class="overflow-auto">
-      <div class="mx-5 my-12">
+    </LayoutHeader>
+    <div class="overflow-auto mx-auto w-full max-w-4xl px-5">
+      <div class="py-6">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
@@ -56,12 +56,14 @@
         <RouterLink
           v-if="route.meta.public"
           :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+          class=""
         >
           <Button
             label="Still need help? Create a ticket"
             size="md"
             theme="gray"
             variant="solid"
+            class="mt-5"
           >
             <template #suffix> &rightarrow; </template>
           </Button>
@@ -93,7 +95,7 @@ import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
 
-import { PageTitle } from "@/components";
+import { LayoutHeader, PageTitle } from "@/components";
 import KnowledgeBaseArticleActionsEdit from "./knowledge-base/KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticleActionsNew.vue";
 import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArticleActionsView.vue";
