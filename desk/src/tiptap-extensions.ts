@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 
 export const PreserveVideoControls: Extension = Extension.create({
-  name: "preserveIds",
+  name: "preserveVideoControls",
   addGlobalAttributes() {
     return [
       {
