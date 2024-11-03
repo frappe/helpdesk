@@ -2,6 +2,7 @@
   <div class="rounded p-3 shadow">
     <FTextEditor
       ref="e"
+      :extensions="[PreserveVideoControls]"
       v-bind="$attrs"
       editor-class="prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem]"
       bubble-menu
@@ -57,6 +58,7 @@ import { computed, nextTick, ref } from "vue";
 import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { UserAvatar } from "@/components";
+import { PreserveVideoControls } from "@/tiptap-extensions";
 
 interface P {
   modelValue: string;
@@ -65,7 +67,7 @@ interface P {
 
 interface E {
   (event: "clear"): void;
-  (event: "update:modelValue"): string;
+  (event: "update:modelValue", any): string;
 }
 
 const props = withDefaults(defineProps<P>(), {

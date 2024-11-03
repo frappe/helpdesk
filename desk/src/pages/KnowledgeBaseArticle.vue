@@ -1,10 +1,10 @@
 <template>
   <div class="flex h-full flex-col overflow-hidden">
-    <PageTitle>
-      <template #title>
+    <LayoutHeader>
+      <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
       </template>
-      <template #right v-if="!route.meta.public">
+      <template #right-header v-if="!isCustomerPortal">
         <component
           :is="actionsComponent"
           :status="article.data?.status"
@@ -17,9 +17,9 @@
           @toggle-status="toggleStatus"
         />
       </template>
-    </PageTitle>
-    <div class="overflow-auto">
-      <div class="mx-5 my-12">
+    </LayoutHeader>
+    <div class="overflow-auto mx-auto w-full max-w-4xl px-5">
+      <div class="py-6">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
@@ -56,12 +56,14 @@
         <RouterLink
           v-if="route.meta.public"
           :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+          class=""
         >
           <Button
             label="Still need help? Create a ticket"
             size="md"
             theme="gray"
             variant="solid"
+            class="mt-5"
           >
             <template #suffix> &rightarrow; </template>
           </Button>
@@ -92,15 +94,14 @@ import {
 import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
-
-import { PageTitle } from "@/components";
+import { LayoutHeader } from "@/components";
 import KnowledgeBaseArticleActionsEdit from "./knowledge-base/KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticleActionsNew.vue";
 import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArticleActionsView.vue";
 import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
-import { Extension } from "@tiptap/core";
+import { PreserveIds } from "@/tiptap-extensions";
 
 const props = defineProps({
   articleId: {
@@ -387,30 +388,6 @@ const textEditorMenuButtons = [
     "DeleteTable",
   ],
 ];
-
-// extension to preserve ids in html of headings
-const PreserveIds: Extension = Extension.create({
-  name: "preserveIds",
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["heading"],
-        attributes: {
-          id: {
-            default: null,
-            parseHTML: (element) => element.getAttribute("id"),
-            renderHTML: (attributes) => {
-              if (!attributes.id) {
-                return {};
-              }
-              return { id: attributes.id };
-            },
-          },
-        },
-      },
-    ];
-  },
-});
 
 const textEditorContentWithIDs = computed(() =>
   article.data?.content ? addLinksToHeadings(article.data?.content) : null

@@ -1,31 +1,39 @@
 <template>
   <div class="flex-col text-base">
-    <div class="mb-0.5 flex items-center justify-between">
-      <div class="text-gray-600">
-        <span class="font-medium text-gray-800">
-          {{ commenter }}
-        </span>
-        <span> added a</span>
-        <span class="max-w-xs truncate font-medium text-gray-800">
-          comment
-        </span>
-        <span class="px-1">&middot;</span>
+    <div class="mb-1 ml-0.5 flex items-center justify-between">
+      <div class="text-gray-600 flex items-center gap-2">
+        <Avatar
+          size="sm"
+          :label="commenter"
+          :image="getUser(commentedBy).user_image"
+        />
+        <p>
+          <span class="font-medium text-gray-800">
+            {{ commenter }}
+          </span>
+          <span> added a</span>
+          <span class="max-w-xs truncate font-medium text-gray-800">
+            comment
+          </span>
+        </p>
+      </div>
+      <div class="flex items-center">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <span class="pl-0.5 text-sm">
+          <span class="pl-0.5 text-sm text-gray-600">
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>
-      </div>
-      <div v-if="authStore.userId === commentedBy" class="px-4">
-        <Dropdown
-          :options="[{ label: 'Delete', onClick: () => (showDialog = true) }]"
-        >
-          <Button
-            icon="more-horizontal"
-            class="text-gray-600"
-            variant="ghost"
-          />
-        </Dropdown>
+        <div v-if="authStore.userId === commentedBy">
+          <Dropdown
+            :options="[{ label: 'Delete', onClick: () => (showDialog = true) }]"
+          >
+            <Button
+              icon="more-horizontal"
+              class="text-gray-600"
+              variant="ghost"
+            />
+          </Dropdown>
+        </div>
       </div>
     </div>
     <div
@@ -52,9 +60,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dropdown, createResource, Dialog } from "frappe-ui";
+import { Dropdown, createResource, Dialog, Avatar } from "frappe-ui";
 import { dateFormat, timeAgo, dateTooltipFormat, createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/user";
 
 const authStore = useAuthStore();
 const props = defineProps({
@@ -63,6 +72,7 @@ const props = defineProps({
     required: true,
   },
 });
+const { getUser } = useUserStore();
 
 const { name, creation, content, commenter, commentedBy } = props.activity;
 
