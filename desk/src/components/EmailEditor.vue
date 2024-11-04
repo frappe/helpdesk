@@ -10,6 +10,7 @@
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
+    :extensions="[PreserveVideoControls]"
   >
     <template #top>
       <div class="mx-10 flex items-center gap-2 border-y py-2.5">
@@ -163,6 +164,7 @@ import {
   CannedResponseSelectorModal,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { PreserveVideoControls } from "@/tiptap-extensions";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
