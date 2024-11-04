@@ -13,6 +13,7 @@
     :editable="editable"
     :mentions="agents"
     @change="editable ? (newComment = $event) : null"
+    :extensions="[PreserveVideoControls]"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2">
@@ -102,6 +103,7 @@ import { AttachmentIcon } from "@/components/icons/";
 import { AttachmentItem } from "@/components/";
 import { useAgentStore } from "@/stores/agent";
 import { useStorage } from "@vueuse/core";
+import { PreserveVideoControls } from "@/tiptap-extensions";
 
 const { agents: agentsList } = useAgentStore();
 
