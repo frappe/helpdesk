@@ -28,12 +28,17 @@
       </div>
       <!-- existing fields -->
       <div class="flex flex-col" :class="subject.length >= 2 && 'gap-5'">
-        <FormControl
-          v-model="subject"
-          type="text"
-          label="Subject*"
-          placeholder="A short description"
-        />
+        <div class="flex flex-col gap-2">
+          <span class="block text-sm text-gray-700">
+            Subject
+            <span class="place-self-center text-red-500"> * </span>
+          </span>
+          <FormControl
+            v-model="subject"
+            type="text"
+            placeholder="A short description"
+          />
+        </div>
         <TicketNewArticles v-if="isCustomerPortal" :search="subject" />
         <div v-if="isCustomerPortal">
           <h4
