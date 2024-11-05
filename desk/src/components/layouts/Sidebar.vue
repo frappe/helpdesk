@@ -24,7 +24,7 @@
     </SidebarLink>
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
-        v-if="!notificationStore.unread"
+        v-if="notificationStore.unread"
         class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
         theme="gray"
         variant="solid"
@@ -37,7 +37,12 @@
         :is-expanded="isExpanded"
       >
         <template #right>
-          <Badge label="20" theme="gray" variant="subtle" />
+          <Badge
+            v-if="isExpanded && notificationStore.unread"
+            :label="notificationStore.unread"
+            theme="gray"
+            variant="subtle"
+          />
         </template>
       </SidebarLink>
     </div>
