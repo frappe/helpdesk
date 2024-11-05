@@ -437,6 +437,10 @@ class HDTicket(Document):
 
 		:return: `Email Account`
 		"""
+		if email_account := self.email_account:
+			frappe.errprint(self.email_account)
+			return frappe.get_doc("Email Account", self.email_account)
+
 		if email_account := self.last_communication_email():
 			return email_account
 

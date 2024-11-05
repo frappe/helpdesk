@@ -34,6 +34,9 @@
   "brand_logo",
   "column_break_fsjn",
   "misc_tab",
+  "email_section",
+  "default_sender_email",
+  "section_break_dvbx",
   "toasts_column",
   "suppress_default_email_toast",
   "column_break_qkui",
@@ -235,11 +238,26 @@
   {
    "fieldname": "column_break_nvbf",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "email_section",
+   "fieldtype": "Section Break",
+   "label": "Email"
+  },
+  {
+   "fieldname": "default_sender_email",
+   "fieldtype": "Link",
+   "label": "Default Sender Email",
+   "options": "Email Account"
+  },
+  {
+   "fieldname": "section_break_dvbx",
+   "fieldtype": "Section Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2023-08-23 17:59:49.761375",
+ "modified": "2024-11-05 10:50:45.191279",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
