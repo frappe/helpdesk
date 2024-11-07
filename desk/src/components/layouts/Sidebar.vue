@@ -25,7 +25,7 @@
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
-        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400"
+        class="absolute z-20 h-1.5 w-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
         theme="gray"
         variant="solid"
       />
