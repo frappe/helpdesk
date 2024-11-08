@@ -38,12 +38,7 @@
                 label="Discard"
                 theme="gray"
                 variant="subtle"
-                @click="
-                  () => {
-                    editor.commands.clearContent(true);
-                    $emit('clear');
-                  }
-                "
+                @click="showConfirmation = true"
               />
               <slot name="bottom-right" />
             </div>
@@ -51,6 +46,14 @@
         </div>
       </template>
     </FTextEditor>
+
+    <!-- Include the ConfirmationDialog component -->
+    <ConfirmationDialog
+      :visible="showConfirmation"
+      message="Are you sure you want to discard your changes?"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -59,6 +62,8 @@ import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import { UserAvatar } from "@/components";
 import { PreserveVideoControls } from "@/tiptap-extensions";
+import ConfirmationDialog from "@/components/ConfirmationDialog.vue"; // Import the ConfirmationDialog component
+import { useRouter } from "vue-router"; // Import the Vue Router
 
 interface P {
   modelValue: string;
@@ -74,11 +79,16 @@ const props = withDefaults(defineProps<P>(), {
   autofocus: false,
 });
 
-defineEmits<E>();
+const emit = defineEmits<{
+  (event: "clear"): void;
+  (event: "update:modelValue", value: string): void;
+}>();
 
 const e = ref(null);
 const editor = computed(() => e.value.editor);
 const authStore = useAuthStore();
+const router = useRouter(); // Create a router instance
+const showConfirmation = ref(false);
 const fixedMenu = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5"],
@@ -90,6 +100,28 @@ const fixedMenu = [
   "Blockquote",
   "Code",
 ];
+
+// Handle confirmation actions
+function handleConfirm() {
+  showConfirmation.value = false;
+  if (editor.value) {
+    editor.value.commands.clearContent(true);
+  }
+  emit("clear");
+
+  // Check if the user is in the Customer Portal
+  if (window.location.pathname.includes("/my-tickets")) {
+    // Route to the TicketsCustomer page
+    router.push({ name: "TicketsCustomer" });
+  } else {
+    // Otherwise, route to the TicketsAgent page
+    router.push({ name: "TicketsAgent" });
+  }
+}
+
+function handleCancel() {
+  showConfirmation.value = false;
+}
 
 defineExpose({
   editor,
