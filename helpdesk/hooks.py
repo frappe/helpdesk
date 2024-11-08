@@ -38,6 +38,10 @@ website_route_rules = [
 ]
 
 doc_events = {
+    "HD Ticket": {
+        "before_insert": "helpdesk.helpdesk.doctype.hd_automation.hd_automation.apply_automations",
+        "on_update": "helpdesk.helpdesk.doctype.hd_automation.hd_automation.apply_automations"
+    },
     "Contact": {
         "before_insert": "helpdesk.helpdesk.hooks.contact.before_insert",
     },
