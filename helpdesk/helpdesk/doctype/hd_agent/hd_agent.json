@@ -9,8 +9,7 @@
   "user",
   "agent_name",
   "user_image",
-  "is_active",
-  "groups"
+  "is_active"
  ],
  "fields": [
   {
@@ -36,12 +35,6 @@
    "label": "Is Active"
   },
   {
-   "fieldname": "groups",
-   "fieldtype": "Table",
-   "label": "Groups",
-   "options": "HD Team Item"
-  },
-  {
    "fetch_from": "user.user_image",
    "fieldname": "user_image",
    "fieldtype": "Data",
@@ -51,7 +44,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-24 22:31:23.178626",
+ "modified": "2024-11-11 16:46:38.302701",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Agent",
