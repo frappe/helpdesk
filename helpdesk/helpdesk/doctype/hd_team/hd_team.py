@@ -28,7 +28,6 @@ class HDTeam(Document):
         self.update_support_rotations()
 
     def on_trash(self):
-
         # Deletes the assignment rule for this group
         try:
             frappe.delete_doc("Assignment Rule", self.assignment_rule)
@@ -78,9 +77,8 @@ class HDTeam(Document):
     def update_support_rotations(self):
         """
         Update the support rotations for the hd_agent
-        # If agent removed remove from the support rule of the team
-        # If agent added add to the support rule of the team
-        # while adding remove from base Support Rotation
+        # If agent removed, remove from the support rule of the team
+        # If agent added add to the support rule of the team and also, while adding remove from base Support Rotation
         """
         assg_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
         if not assg_rule_doc:
