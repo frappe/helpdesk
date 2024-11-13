@@ -192,6 +192,7 @@ export interface EmailAccount {
   api_key?: string;
   api_secret?: string;
   password?: string;
+  frappe_mail_site?: string;
   enable_outgoing?: boolean;
   enable_incoming?: boolean;
   default_outgoing?: boolean;

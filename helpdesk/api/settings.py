@@ -35,6 +35,7 @@ def create_email_account(data):
         if service == "Frappe Mail":
             email_doc.api_key = data.get("api_key")
             email_doc.api_secret = data.get("api_secret")
+            email_doc.frappe_mail_site = data.get("frappe_mail_site")
         else:
             email_doc.password = data.get("password")
             # validate whether the credentials are correct
