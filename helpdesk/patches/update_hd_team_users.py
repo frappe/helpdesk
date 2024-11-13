@@ -13,14 +13,10 @@ def execute():
 
         for agent in existing_agents:
             is_agent_active = frappe.get_value("HD Agent", agent, "is_active")
-            if not is_agent_active:
-                continue
-
-            if is_agent_active:
-                if agent not in team_users:
-                    team_doc = (
-                        frappe.get_doc("HD Team", team)
-                        .append("users", {"user": agent})
-                        .save()
-                    )
-                    print("Agent Added")
+            if is_agent_active and agent not in team_users:
+                team_doc = (
+                    frappe.get_doc("HD Team", team)
+                    .append("users", {"user": agent})
+                    .save()
+                )
+                print("Agent Added")
