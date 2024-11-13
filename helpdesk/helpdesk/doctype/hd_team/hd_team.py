@@ -14,7 +14,7 @@ class HDTeam(Document):
     def rename_self(self, new_name: str):
         self.rename(new_name)
 
-    # nosemgrep: frappe-semgrep-rules.rules.frappe-modifying-but-not-comitting
+    # nosemgrep: frappe-semgrep-rules.rules.frappe-modifying-but-not-comitting-other-method
     def after_insert(self):
         self.create_assignment_rule()
         assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
