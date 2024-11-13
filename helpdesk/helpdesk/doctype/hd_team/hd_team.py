@@ -14,8 +14,20 @@ class HDTeam(Document):
     def rename_self(self, new_name: str):
         self.rename(new_name)
 
+    # nosemgrep: frappe-semgrep-rules.rules.frappe-modifying-but-not-comitting
     def after_insert(self):
         self.create_assignment_rule()
+        assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
+
+        for user in self.users:
+            _user = user.get("user")
+            if not _user:
+                continue
+            assignment_rule_doc.append("users", {"user": _user})
+
+        if assignment_rule_doc.disabled and assignment_rule_doc.users:
+            assignment_rule_doc.disabled = False
+        assignment_rule_doc.save()
 
     def after_rename(self, olddn, newdn, merge=False):
         # Update the condition for the linked assignment rule
@@ -29,11 +41,22 @@ class HDTeam(Document):
 
     def on_trash(self):
         # Deletes the assignment rule for this group
+        rule = self.assignment_rule
+        if not rule:
+            return
         try:
-            frappe.delete_doc("Assignment Rule", self.assignment_rule)
+            frappe.delete_doc(
+                "Assignment Rule",
+                rule,
+                ignore_permissions=True,
+                force=True,
+                ignore_on_trash=True,
+            )
+            frappe.db.commit()
         except DoesNotExistError:
-            frappe.throw(
-                _("Assignment Rule for HD Team {0} does not exist").format(self.name)
+            frappe.log_error(
+                title="Assignment Rule not found",
+                message=f"Assignment Rule {rule} not found",
             )
 
     def create_assignment_rule(self):
