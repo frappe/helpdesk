@@ -274,3 +274,22 @@ def get_visible_custom_fields():
         {"parent": "Default", "hide_from_customer": 0},
         pluck="fieldname",
     )
+
+
+# Get HD Ticket Status Options
+@frappe.whitelist()
+def get_status_options(
+    # doctype: str,
+    # filters: dict = {},
+    # order_by: str = "modified desc",
+    # page_length=20,
+    # columns=None,
+    # rows=None,
+    # show_customer_portal_fields=False,
+):
+    meta = frappe.get_meta("HD Ticket")
+    options = meta.get_field("status").options
+    options = options.split("\n")
+    return {
+        "options": options,
+    }
