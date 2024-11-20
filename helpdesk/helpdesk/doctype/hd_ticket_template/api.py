@@ -60,5 +60,6 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
         .join(QBFetch, JoinType.inner)
         .on(QBFetch.fieldname == fields.fieldname)
         .where(where_parent)
+        .orderby(fields.idx)
         .run(as_dict=True)
     )
