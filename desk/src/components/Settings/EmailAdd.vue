@@ -121,6 +121,7 @@ const state: Reactive<EmailAccount> = reactive({
   password: "",
   api_key: "",
   api_secret: "",
+  frappe_mail_site: "",
   enable_incoming: false,
   enable_outgoing: false,
   default_incoming: false,
@@ -157,7 +158,7 @@ const addEmailRes = createResource({
   },
 });
 
-const error = ref("");
+const error = ref<string | undefined>();
 function createEmailAccount() {
   error.value = validateInputs(state, selectedService.value.custom);
   if (error.value) return;

@@ -65,6 +65,12 @@ export const popularProviderFields = [
 export const customProviderFields = [
   ...fixedFields,
   {
+    label: "Frappe Mail Site",
+    name: "frappe_mail_site",
+    type: "text",
+    placeholder: "https://frappemail.com",
+  },
+  {
     label: "API Key",
     name: "api_key",
     type: "text",
