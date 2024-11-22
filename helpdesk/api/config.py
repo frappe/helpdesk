@@ -8,6 +8,7 @@ def get_config():
         "prefer_knowledge_base",
         "setup_complete",
         "skip_email_workflow",
+        "is_feedback_mandatory",
     ]
     res = frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True)
     return res

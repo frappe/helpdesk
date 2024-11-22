@@ -20,6 +20,9 @@ export const useConfigStore = defineStore("config", () => {
   const preferKnowledgeBase = computed(
     () => !!parseInt(config.value.prefer_knowledge_base)
   );
+  const isFeedbackMandatory = computed(
+    () => !!parseInt(config.value.is_feedback_mandatory)
+  );
 
   socket.on("helpdesk:settings-updated", () => configRes.reload());
 
@@ -29,5 +32,6 @@ export const useConfigStore = defineStore("config", () => {
     preferKnowledgeBase,
     isSetupComplete,
     skipEmailWorkflow,
+    isFeedbackMandatory,
   };
 });
