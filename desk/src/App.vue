@@ -2,16 +2,17 @@
   <RouterView class="antialiased" />
   <Toasts />
   <KeymapDialog />
+  <Dialogs />
 </template>
 
 <script setup lang="ts">
-import { provide, ref, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { Toasts } from "frappe-ui";
 import { createToast } from "@/utils";
 import { useConfigStore } from "@/stores/config";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
-import { stopSession } from "@/telemetry";
-import { init as initTelemetry } from "@/telemetry";
+import { init as initTelemetry, stopSession } from "@/telemetry";
+import { Dialogs } from "frappe-ui";
 useConfigStore();
 
 onMounted(async () => {
