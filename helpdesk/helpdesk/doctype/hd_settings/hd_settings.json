@@ -28,6 +28,10 @@
   "column_break_zxek",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
+  "feedback_section",
+  "is_feedback_mandatory",
+  "section_break_duow",
+  "auto_update_status",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -294,11 +298,34 @@
    "fieldname": "allow_anyone_to_create_tickets",
    "fieldtype": "Check",
    "label": "Allow anyone to create tickets"
+  },
+  {
+   "fieldname": "section_break_duow",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "description": "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n",
+   "fieldname": "auto_update_status",
+   "fieldtype": "Check",
+   "label": "Auto Update Status"
+  },
+  {
+   "fieldname": "feedback_section",
+   "fieldtype": "Section Break",
+   "label": "Feedback"
+  },
+  {
+   "default": "0",
+   "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \nNote: User can't close a ticket without giving a feedback.",
+   "fieldname": "is_feedback_mandatory",
+   "fieldtype": "Check",
+   "label": "Make Feedback Mandatory"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-10-22 02:14:33.360809",
+ "modified": "2024-11-22 17:25:40.112881",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

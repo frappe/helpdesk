@@ -63,7 +63,6 @@
       </div>
     </FadedScrollableDiv>
     <div class="grow"></div>
-    <div class="-ml-2 h-[70%] border-l" />
 
     <div class="flex items-center gap-2">
       <Button :label="'Refresh'" @click="emit('event:reload')">

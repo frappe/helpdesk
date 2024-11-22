@@ -29,13 +29,15 @@ def create_email_account(data):
                 **service_config,
             }
         )
-        email_doc.append(
-            "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
-        )
         if service == "Frappe Mail":
             email_doc.api_key = data.get("api_key")
             email_doc.api_secret = data.get("api_secret")
+            email_doc.frappe_mail_site = data.get("frappe_mail_site")
+            email_doc.append_to = "HD Ticket"
         else:
+            email_doc.append(
+                "imap_folder", {"append_to": "HD Ticket", "folder_name": "INBOX"}
+            )
             email_doc.password = data.get("password")
             # validate whether the credentials are correct
             email_doc.get_incoming_server()

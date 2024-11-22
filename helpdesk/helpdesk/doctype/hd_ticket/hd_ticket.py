@@ -191,9 +191,6 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
-        # create communication if we are not hitting the new ticket creation API
-        if not self.via_customer_portal:
-            self.create_communication_via_contact(self.description)
 
     def on_update(self):
         # flake8: noqa
@@ -346,20 +343,55 @@ class HDTicket(Document):
         if not self.agent_group or (hasattr(self, "_assign") and not self._assign):
             return
         if self.has_value_changed("agent_group") and self.status == "Open":
-            current_assigned_agent_doc = self.get_assigned_agent()
+            current_assigned_agent = self.get_assigned_agent()
+            if not current_assigned_agent:
+                return
+            is_agent_in_assigned_team = self.agent_in_assigned_team(
+                current_assigned_agent, self.agent_group
+            )
+
             if (
-                current_assigned_agent_doc
-                and not current_assigned_agent_doc.in_group(self.agent_group)
-            ) and frappe.get_doc(
-                "Assignment Rule",
-                frappe.get_doc("HD Team", self.agent_group).assignment_rule,
-            ).users:
+                not is_agent_in_assigned_team
+            ) and self.users_present_in_team_assignment_rule():
                 clear_all_assignments("HD Ticket", self.name)
                 frappe.publish_realtime(
                     "helpdesk:update-ticket-assignee",
                     {"ticket_id": self.name},
                     after_commit=True,
                 )
+
+    def agent_in_assigned_team(self, agent, team):
+        return frappe.db.exists(
+            "HD Team Member",
+            {
+                "parent": team,
+                "user": agent,
+            },
+        )
+
+    def users_present_in_team_assignment_rule(self):
+        if not self.agent_group:
+            return False
+
+        assignment_rule = frappe.db.get_value(
+            "HD Team", self.agent_group, "assignment_rule"
+        )
+        if not assignment_rule:
+            return False
+
+        is_disabled = frappe.db.get_value(
+            "Assignment Rule", assignment_rule, "disabled"
+        )
+        if is_disabled:
+            return False
+
+        users = frappe.get_all(
+            "Assignment Rule User", filters={"parent": assignment_rule}
+        )
+        if not users:
+            return False
+
+        return True
 
     @frappe.whitelist()
     def assign_agent(self, agent):
@@ -386,8 +418,7 @@ class HDTicket(Document):
                 # TODO: temporary fix, remove this when only agents can be assigned to ticket
                 exists = frappe.db.exists("HD Agent", assignees[0])
                 if exists:
-                    agent_doc = frappe.get_doc("HD Agent", assignees[0])
-                    return agent_doc
+                    return assignees[0]
 
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
@@ -707,6 +738,10 @@ class HDTicket(Document):
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
+
+            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+                self.status = "Replied"
+
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
