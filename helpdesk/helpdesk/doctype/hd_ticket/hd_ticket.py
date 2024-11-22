@@ -191,9 +191,6 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
-        # create communication if we are not hitting the new ticket creation API
-        if not self.via_customer_portal:
-            self.create_communication_via_contact(self.description)
 
     def on_update(self):
         # flake8: noqa
