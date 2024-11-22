@@ -124,7 +124,7 @@ const send = createResource({
   },
 });
 
-async function handleClose() {
+function handleClose() {
   if (showFeedback.value) {
     showFeedbackDialog.value = true;
   } else {
