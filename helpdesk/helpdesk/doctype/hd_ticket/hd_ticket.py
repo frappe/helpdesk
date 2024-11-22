@@ -738,6 +738,10 @@ class HDTicket(Document):
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
+
+            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+                self.status = "Replied"
+
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
