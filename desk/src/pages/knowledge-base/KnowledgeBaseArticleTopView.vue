@@ -11,13 +11,6 @@
       <div class="text-xs text-gray-800">
         {{ dayjs(creation).short() }}
       </div>
-      <IconDot class="h-4 w-4 text-gray-600" />
-      <Badge
-        :theme="status === 'Published' ? 'green' : 'orange'"
-        variant="subtle"
-      >
-        {{ status }}
-      </Badge>
     </div>
   </div>
   <div class="border-b pb-3">

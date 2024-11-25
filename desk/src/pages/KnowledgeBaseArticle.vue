@@ -33,13 +33,12 @@
           editor-class="prose-f"
           @change="articleContent = $event"
         >
-          <template #top v-if="!route.meta.public">
+          <template #top>
             <component
               :is="topComponent"
               v-model:title="articleTitle"
               v-bind="options__"
             />
-
             <TextEditorFixedMenu
               v-if="editMode"
               class="-ml-1"
@@ -50,7 +49,7 @@
 
         <div class="flex items-center justify-between flex-1 w-full mb-8">
           <RouterLink
-            v-if="route.meta.public"
+            v-if="isCustomerPortal"
             :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
             class=""
           >
@@ -66,7 +65,7 @@
           </RouterLink>
 
           <!-- Feedback Section -->
-          <div>
+          <div v-if="isCustomerPortal">
             <!-- was this article helpful? -->
             <div class="flex items-center gap-4 mt-5">
               <span class="text-gray-500 text-md"
@@ -269,7 +268,7 @@ const article = createResource({
   },
   onSuccess(data) {
     articleTitle.value = data.title;
-    articleFeedback.value = data.feedbacks;
+    articleFeedback.value = data.feedback;
     capture("article_viewed", {
       data: {
         user: authStore.userId,
