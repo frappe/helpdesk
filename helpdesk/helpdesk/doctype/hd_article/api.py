@@ -24,17 +24,16 @@ def get_article(name: str):
 
     feedback = {
         "user_feedback": frappe.db.get_value(
-            "HD Article Feedback", {"user": user, "parent": name}, "feedback"
+            "HD Article Feedback", {"user": user, "article": name}, "feedback"
         )
         or None,
         "total_likes": frappe.db.count(
-            "HD Article Feedback", {"parent": name, "feedback": "Like"}
+            "HD Article Feedback", {"article": name, "feedback": "Like"}
         ),
         "total_dislikes": frappe.db.count(
-            "HD Article Feedback", {"parent": name, "feedback": "Dislike"}
+            "HD Article Feedback", {"article": name, "feedback": "Dislike"}
         ),
     }
-    article["feedbacks"] = None
 
     return {
         **article,
