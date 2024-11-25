@@ -18,6 +18,7 @@
    "options": "User"
   },
   {
+   "description": "0 is no feedback, 1 is Like, 2 is Dislike",
    "fieldname": "feedback",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -33,7 +34,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-25 14:00:41.166072",
+ "modified": "2024-11-25 21:08:23.023720",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Feedback",
