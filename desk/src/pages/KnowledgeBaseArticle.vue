@@ -47,27 +47,64 @@
             />
           </template>
         </TextEditor>
-        <!-- <div
-          v-else-if="!article.data && !editMode"
-          class="text-gray-500 text-2xl font-semibold mb-5"
-        >
-          Article Not Found
-        </div> -->
-        <RouterLink
-          v-if="route.meta.public"
-          :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
-          class=""
-        >
-          <Button
-            label="Still need help? Create a ticket"
-            size="md"
-            theme="gray"
-            variant="solid"
-            class="mt-5"
+
+        <div class="flex items-center justify-between flex-1 w-full mb-8">
+          <RouterLink
+            v-if="route.meta.public"
+            :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+            class=""
           >
-            <template #suffix> &rightarrow; </template>
-          </Button>
-        </RouterLink>
+            <Button
+              label="Still need help? Create a ticket"
+              size="md"
+              theme="gray"
+              variant="solid"
+              class="mt-5"
+            >
+              <template #suffix> &rightarrow; </template>
+            </Button>
+          </RouterLink>
+
+          <!-- Feedback Section -->
+          <div>
+            <!-- was this article helpful? -->
+            <div class="flex items-center gap-4 mt-5">
+              <span class="text-gray-500 text-md"
+                >Did this article solve your issue?</span
+              >
+              <div class="flex items-center gap-3">
+                <div class="flex items-center justify-center">
+                  <Icon
+                    class="w-6 h-6 cursor-pointer"
+                    :icon="
+                      articleFeedback?.user_feedback == 'Like'
+                        ? 'prime:thumbs-up-fill'
+                        : 'prime:thumbs-up'
+                    "
+                    @click="handleFeedbackClick('Like')"
+                  />
+                  <span class="text-p-md text-gray-700">{{
+                    articleFeedback?.total_likes
+                  }}</span>
+                </div>
+                <div class="flex items-center justify-center">
+                  <Icon
+                    class="w-6 h-6 cursor-pointer"
+                    :icon="
+                      articleFeedback?.user_feedback == 'Dislike'
+                        ? 'prime:thumbs-down-fill'
+                        : 'prime:thumbs-down'
+                    "
+                    @click="handleFeedbackClick('Dislike')"
+                  />
+                  <span class="text-p-md text-gray-700">{{
+                    articleFeedback?.total_dislikes
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -102,7 +139,8 @@ import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTo
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
 import { PreserveIds } from "@/tiptap-extensions";
-
+import { Icon } from "@iconify/vue";
+import { ArticleFeedback, Feedback } from "@/types";
 const props = defineProps({
   articleId: {
     type: String,
@@ -146,7 +184,7 @@ const breadcrumbs = computed(() => {
       },
     },
   ];
-  // if (options__.value.subCategoryId !== options__.value.categoryId) {
+
   agentPortalItems.push({
     label: options__.value.subCategoryName,
     route: {
@@ -158,7 +196,6 @@ const breadcrumbs = computed(() => {
       },
     },
   });
-  // }
 
   if (!isNew) {
     agentPortalItems.push({
@@ -224,6 +261,7 @@ const topComponent = computed(() => {
   return KnowledgeBaseArticleTopView;
 });
 
+const articleFeedback = ref<ArticleFeedback>(null);
 const article = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article",
   params: {
@@ -231,6 +269,7 @@ const article = createResource({
   },
   onSuccess(data) {
     articleTitle.value = data.title;
+    articleFeedback.value = data.feedbacks;
     capture("article_viewed", {
       data: {
         user: authStore.userId,
@@ -241,6 +280,59 @@ const article = createResource({
   },
   auto: !isNew,
 });
+
+const setFeedback = createResource({
+  url: "run_doc_method",
+  debounce: 300,
+  makeParams: () => ({
+    dt: "HD Article",
+    dn: props.articleId,
+    method: "set_feedback",
+    args: {
+      value: userAction.value,
+    },
+  }),
+  onSuccess: () => {
+    article.reload();
+  },
+});
+
+const userAction = ref<Feedback>("");
+function handleFeedbackClick(action: Feedback) {
+  if (
+    articleFeedback.value.user_feedback &&
+    articleFeedback.value.user_feedback === action
+  ) {
+    articleFeedback.value.user_feedback = null;
+
+    userAction.value = "";
+  } else {
+    articleFeedback.value.user_feedback = action;
+    userAction.value = action;
+  }
+  handleOptimisticUpdate(action);
+
+  setFeedback.submit();
+}
+
+function handleOptimisticUpdate(action: Feedback) {
+  if (action === "Like" && action === articleFeedback.value.user_feedback) {
+    articleFeedback.value.total_likes++;
+    articleFeedback.value.total_dislikes > 0 &&
+      articleFeedback.value.total_dislikes--;
+  } else if (
+    action === "Dislike" &&
+    action === articleFeedback.value.user_feedback
+  ) {
+    articleFeedback.value.total_dislikes++;
+    articleFeedback.value.total_likes > 0 &&
+      articleFeedback.value.total_likes--;
+  } else if (action == "Like" && !articleFeedback.value.user_feedback) {
+    articleFeedback.value.total_likes--;
+  } else if (action == "Dislike" && !articleFeedback.value.user_feedback) {
+    articleFeedback.value.total_dislikes--;
+  }
+}
 
 const category = createDocumentResource({
   doctype: "HD Article Category",

@@ -17,9 +17,28 @@ def get_article(name: str):
         "HD Article Category", sub_category.parent_category or article["category"]
     )
 
+    user = frappe.session.user
+    # TODO: views count increment with views field in HD Article
+    # if not is_agent() and user != author.name:
+    # frappe.db.set_value("HD Article", name, "views", article["views"] + 1)
+
+    feedbacks = {
+        "user_feedback": frappe.db.get_value(
+            "HD Article Feedback", {"user": user, "parent": name}, "feedback"
+        )
+        or None,
+        "total_likes": frappe.db.count(
+            "HD Article Feedback", {"parent": name, "feedback": "Like"}
+        ),
+        "total_dislikes": frappe.db.count(
+            "HD Article Feedback", {"parent": name, "feedback": "Dislike"}
+        ),
+    }
+
     return {
         **article,
         "author": author,
         "category": category,
         "sub_category": sub_category,
+        "feedbacks": feedbacks,
     }

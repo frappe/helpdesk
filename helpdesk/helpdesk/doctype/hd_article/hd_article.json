@@ -17,7 +17,9 @@
   "subtitle",
   "article_image",
   "content_section",
-  "content"
+  "content",
+  "feedbacks_section",
+  "feedbacks"
  ],
  "fields": [
   {
@@ -97,11 +99,22 @@
    "fieldname": "subtitle",
    "fieldtype": "Small Text",
    "label": "Subtitle"
+  },
+  {
+   "fieldname": "feedbacks_section",
+   "fieldtype": "Section Break",
+   "label": "Feedbacks"
+  },
+  {
+   "fieldname": "feedbacks",
+   "fieldtype": "Table",
+   "label": "feedbacks",
+   "options": "HD Article Feedback"
   }
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2024-10-01 21:39:58.189965",
+ "modified": "2024-11-24 22:54:55.477514",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",

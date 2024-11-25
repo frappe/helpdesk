@@ -246,3 +246,11 @@ export interface Category {
   };
   children?: (Article | SubCategory)[];
 }
+
+export interface ArticleFeedback {
+  user_feedback: string;
+  total_likes: number;
+  total_dislikes: number;
+}
+
+export type Feedback = "Like" | "Dislike" | "";
