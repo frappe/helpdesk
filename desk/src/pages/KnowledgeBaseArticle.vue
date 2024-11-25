@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
+  <div class="flex h-full flex-col overflow-scroll">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
@@ -18,8 +18,8 @@
         />
       </template>
     </LayoutHeader>
-    <div class="overflow-auto mx-auto w-full max-w-4xl px-5">
-      <div class="py-6">
+    <div class="mx-auto w-full max-w-4xl px-24">
+      <div class="py-6 flex flex-col gap-5">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
@@ -30,7 +30,7 @@
             shadow: editMode,
             'p-4': editMode,
           }"
-          editor-class="prose-f mt-2"
+          editor-class="prose-f prose-h2:mt-3"
           @change="articleContent = $event"
         >
           <template #top>
@@ -47,55 +47,50 @@
           </template>
         </TextEditor>
 
-        <div class="flex items-center justify-between flex-1 w-full mb-8">
-          <RouterLink
-            v-if="isCustomerPortal"
-            :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
-            class=""
-          >
-            <Button
-              label="Still need help? Create a ticket"
-              size="md"
-              theme="gray"
-              variant="solid"
-              class="mt-5"
-            >
-              <template #suffix> &rightarrow; </template>
-            </Button>
-          </RouterLink>
-
+        <div
+          class="flex items-center justify-between mb-8 p-4 rounded-lg bg-gray-50"
+          v-if="isCustomerPortal"
+        >
           <!-- Feedback Section -->
-          <div v-if="isCustomerPortal">
+          <div>
             <!-- was this article helpful? -->
-            <div class="flex items-center gap-4 mt-5">
-              <span class="text-gray-500 text-md"
+            <div class="flex items-center gap-2">
+              <span class="text-gray-800 text-sm"
                 >Did this article solve your issue?</span
               >
-              <div class="flex items-center gap-3">
-                <div class="flex items-center justify-center">
-                  <Icon
-                    class="w-6 h-6 cursor-pointer"
-                    :icon="
-                      userFeedback === 1
-                        ? 'prime:thumbs-up-fill'
-                        : 'prime:thumbs-up'
-                    "
-                    @click="handleFeedbackClick('Like')"
-                  />
-                </div>
-                <div class="flex items-center justify-center">
-                  <Icon
-                    class="w-6 h-6 cursor-pointer"
-                    :icon="
-                      userFeedback === 2
-                        ? 'prime:thumbs-down-fill'
-                        : 'prime:thumbs-down'
-                    "
-                    @click="handleFeedbackClick('Dislike')"
-                  />
-                </div>
+              <div class="flex items-center gap-1">
+                <Icon
+                  class="w-6 h-6 cursor-pointer"
+                  :icon="
+                    userFeedback === 1
+                      ? 'prime:thumbs-up-fill'
+                      : 'prime:thumbs-up'
+                  "
+                  @click="handleFeedbackClick('Like')"
+                />
+                <Icon
+                  class="w-6 h-6 cursor-pointer"
+                  :icon="
+                    userFeedback === 2
+                      ? 'prime:thumbs-down-fill'
+                      : 'prime:thumbs-down'
+                  "
+                  @click="handleFeedbackClick('Dislike')"
+                />
               </div>
             </div>
+          </div>
+          <!-- Create a ticket CTA -->
+          <div class="flex items-center justify-center gap-2">
+            <span class="font-normal text-sm">
+              Can’t find what you’re looking for?
+            </span>
+            <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
+              <p class="underline font-bold text-sm">
+                Create a ticket &rightarrow;
+                <!-- <template #suffix> </template> -->
+              </p>
+            </RouterLink>
           </div>
         </div>
       </div>

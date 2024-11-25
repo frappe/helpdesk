@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-4.5 flex items-center justify-between">
+  <div class="mb-7 flex items-center justify-between">
     <div class="flex items-center gap-1">
       <div class="flex items-center gap-2">
         <Avatar :label="authorFullname" :image="authorImage" />
@@ -8,7 +8,7 @@
         </div>
       </div>
       <IconDot class="h-4 w-4 text-gray-600" />
-      <div class="text-xs text-gray-800">
+      <div class="text-xs text-gray-500">
         {{ dayjs(creation).short() }}
       </div>
     </div>
