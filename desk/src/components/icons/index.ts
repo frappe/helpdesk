@@ -12,3 +12,7 @@ export { default as ReplyIcon } from "./ReplyIcon.vue";
 export { default as ReplyAllIcon } from "./ReplyAllIcon.vue";
 export { default as RefreshIcon } from "./RefreshIcon.vue";
 export { default as DetailsIcon } from "./DetailsIcon.vue";
+export { default as ThumbsUpIcon } from "./ThumbsUpIcon.vue";
+export { default as ThumbsUpFilledIcon } from "./ThumbsUpFilledIcon.vue";
+export { default as ThumbsDownIcon } from "./ThumbsDownIcon.vue";
+export { default as ThumbsDownFilledIcon } from "./ThumbsDownFilledIcon.vue";

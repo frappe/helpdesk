@@ -30,7 +30,7 @@
             shadow: editMode,
             'p-4': editMode,
           }"
-          editor-class="prose-f prose-h2:mt-3"
+          editor-class="prose-f first:mt-3"
           @change="articleContent = $event"
         >
           <template #top>
@@ -59,22 +59,16 @@
                 >Did this article solve your issue?</span
               >
               <div class="flex items-center gap-1">
-                <Icon
-                  class="w-6 h-6 cursor-pointer"
-                  :icon="
-                    userFeedback === 1
-                      ? 'prime:thumbs-up-fill'
-                      : 'prime:thumbs-up'
-                  "
+                <component
+                  :is="userFeedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
+                  class="w-4 h-4 cursor-pointer"
                   @click="handleFeedbackClick('Like')"
                 />
-                <Icon
-                  class="w-6 h-6 cursor-pointer"
-                  :icon="
-                    userFeedback === 2
-                      ? 'prime:thumbs-down-fill'
-                      : 'prime:thumbs-down'
+                <component
+                  :is="
+                    userFeedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon
                   "
+                  class="w-4 h-4 cursor-pointer"
                   @click="handleFeedbackClick('Dislike')"
                 />
               </div>
@@ -126,9 +120,15 @@ import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArtic
 import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
+
 import { PreserveIds } from "@/tiptap-extensions";
-import { Icon } from "@iconify/vue";
 import { FeedbackAction } from "@/types";
+import {
+  ThumbsUpIcon,
+  ThumbsUpFilledIcon,
+  ThumbsDownIcon,
+  ThumbsDownFilledIcon,
+} from "@/components/icons";
 const props = defineProps({
   articleId: {
     type: String,
