@@ -28,7 +28,6 @@ def get_article(name: str):
         )
         or 0
     )
-    print("\n\n", user_feedback, "\n\n")
 
     return {
         **article,
