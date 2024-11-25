@@ -22,7 +22,7 @@ def get_article(name: str):
     # if not is_agent() and user != author.name:
     # frappe.db.set_value("HD Article", name, "views", article["views"] + 1)
 
-    feedbacks = {
+    feedback = {
         "user_feedback": frappe.db.get_value(
             "HD Article Feedback", {"user": user, "parent": name}, "feedback"
         )
@@ -34,11 +34,12 @@ def get_article(name: str):
             "HD Article Feedback", {"parent": name, "feedback": "Dislike"}
         ),
     }
+    article["feedbacks"] = None
 
     return {
         **article,
         "author": author,
         "category": category,
         "sub_category": sub_category,
-        "feedbacks": feedbacks,
+        "feedback": feedback,
     }
