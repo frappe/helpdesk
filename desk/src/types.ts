@@ -247,10 +247,4 @@ export interface Category {
   children?: (Article | SubCategory)[];
 }
 
-export interface ArticleFeedback {
-  user_feedback: string;
-  total_likes: number;
-  total_dislikes: number;
-}
-
-export type Feedback = "Like" | "Dislike" | "";
+export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike

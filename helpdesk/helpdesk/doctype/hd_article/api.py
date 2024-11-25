@@ -22,23 +22,18 @@ def get_article(name: str):
     # if not is_agent() and user != author.name:
     # frappe.db.set_value("HD Article", name, "views", article["views"] + 1)
 
-    feedback = {
-        "user_feedback": frappe.db.get_value(
+    user_feedback = int(
+        frappe.db.get_value(
             "HD Article Feedback", {"user": user, "article": name}, "feedback"
         )
-        or None,
-        "total_likes": frappe.db.count(
-            "HD Article Feedback", {"article": name, "feedback": "Like"}
-        ),
-        "total_dislikes": frappe.db.count(
-            "HD Article Feedback", {"article": name, "feedback": "Dislike"}
-        ),
-    }
+        or 0
+    )
+    print("\n\n", user_feedback, "\n\n")
 
     return {
         **article,
         "author": author,
         "category": category,
         "sub_category": sub_category,
-        "feedback": feedback,
+        "user_feedback": user_feedback,
     }

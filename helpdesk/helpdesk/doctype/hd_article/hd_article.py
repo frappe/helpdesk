@@ -54,6 +54,7 @@ class HDArticle(Document):
 
     @frappe.whitelist()
     def set_feedback(self, value):
+        # 0 empty, 1 like, 2 dislike
         user = frappe.session.user
         feedback = frappe.db.exists(
             "HD Article Feedback", {"user": user, "article": self.name}

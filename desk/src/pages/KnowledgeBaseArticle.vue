@@ -30,7 +30,7 @@
             shadow: editMode,
             'p-4': editMode,
           }"
-          editor-class="prose-f"
+          editor-class="prose-f mt-2"
           @change="articleContent = $event"
         >
           <template #top>
@@ -76,29 +76,23 @@
                   <Icon
                     class="w-6 h-6 cursor-pointer"
                     :icon="
-                      articleFeedback?.user_feedback == 'Like'
+                      userFeedback === 1
                         ? 'prime:thumbs-up-fill'
                         : 'prime:thumbs-up'
                     "
                     @click="handleFeedbackClick('Like')"
                   />
-                  <span class="text-p-md text-gray-700">{{
-                    articleFeedback?.total_likes
-                  }}</span>
                 </div>
                 <div class="flex items-center justify-center">
                   <Icon
                     class="w-6 h-6 cursor-pointer"
                     :icon="
-                      articleFeedback?.user_feedback == 'Dislike'
+                      userFeedback === 2
                         ? 'prime:thumbs-down-fill'
                         : 'prime:thumbs-down'
                     "
                     @click="handleFeedbackClick('Dislike')"
                   />
-                  <span class="text-p-md text-gray-700">{{
-                    articleFeedback?.total_dislikes
-                  }}</span>
                 </div>
               </div>
             </div>
@@ -139,7 +133,7 @@ import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTop
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
 import { PreserveIds } from "@/tiptap-extensions";
 import { Icon } from "@iconify/vue";
-import { ArticleFeedback, Feedback } from "@/types";
+import { FeedbackAction } from "@/types";
 const props = defineProps({
   articleId: {
     type: String,
@@ -260,7 +254,7 @@ const topComponent = computed(() => {
   return KnowledgeBaseArticleTopView;
 });
 
-const articleFeedback = ref<ArticleFeedback>(null);
+const userFeedback = ref<FeedbackAction>(null);
 const article = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article",
   params: {
@@ -268,7 +262,7 @@ const article = createResource({
   },
   onSuccess(data) {
     articleTitle.value = data.title;
-    articleFeedback.value = data.feedback;
+    userFeedback.value = data.user_feedback;
     capture("article_viewed", {
       data: {
         user: authStore.userId,
@@ -296,41 +290,17 @@ const setFeedback = createResource({
   },
 });
 
-const userAction = ref<Feedback>("");
-function handleFeedbackClick(action: Feedback) {
-  if (
-    articleFeedback.value.user_feedback &&
-    articleFeedback.value.user_feedback === action
-  ) {
-    articleFeedback.value.user_feedback = null;
+const userAction = ref();
+const feedbackMap = {
+  Remove: 0,
+  Like: 1,
+  Dislike: 2,
+};
 
-    userAction.value = "";
-  } else {
-    articleFeedback.value.user_feedback = action;
-    userAction.value = action;
-  }
-  handleOptimisticUpdate(action);
-
+function handleFeedbackClick(action: string) {
+  userAction.value = feedbackMap[action];
+  userFeedback.value = feedbackMap[action];
   setFeedback.submit();
-}
-
-function handleOptimisticUpdate(action: Feedback) {
-  if (action === "Like" && action === articleFeedback.value.user_feedback) {
-    articleFeedback.value.total_likes++;
-    articleFeedback.value.total_dislikes > 0 &&
-      articleFeedback.value.total_dislikes--;
-  } else if (
-    action === "Dislike" &&
-    action === articleFeedback.value.user_feedback
-  ) {
-    articleFeedback.value.total_dislikes++;
-    articleFeedback.value.total_likes > 0 &&
-      articleFeedback.value.total_likes--;
-  } else if (action == "Like" && !articleFeedback.value.user_feedback) {
-    articleFeedback.value.total_likes--;
-  } else if (action == "Dislike" && !articleFeedback.value.user_feedback) {
-    articleFeedback.value.total_dislikes--;
-  }
 }
 
 const category = createDocumentResource({

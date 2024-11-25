@@ -22,7 +22,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Feedback",
-   "options": "\nLike\nDislike"
+   "options": "0\n1\n2"
   },
   {
    "fieldname": "article",
@@ -33,7 +33,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-25 13:02:57.975496",
+ "modified": "2024-11-25 14:00:41.166072",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Feedback",
