@@ -11,6 +11,15 @@
       <div class="text-xs text-gray-500">
         {{ dayjs(creation).short() }}
       </div>
+      <div v-if="!isCustomerPortal" class="flex items-center justify-center">
+        <IconDot class="h-4 w-4 text-gray-600" />
+        <Badge
+          :theme="status === 'Published' ? 'green' : 'orange'"
+          variant="subtle"
+        >
+          {{ status }}
+        </Badge>
+      </div>
     </div>
   </div>
   <div class="border-b pb-3">
@@ -24,6 +33,10 @@
 import { Avatar } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import IconDot from "~icons/lucide/dot";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+const isCustomerPortal: boolean = route.meta.public ?? false;
 
 const props = defineProps({
   categoryName: {
