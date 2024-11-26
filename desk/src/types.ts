@@ -246,3 +246,5 @@ export interface Category {
   };
   children?: (Article | SubCategory)[];
 }
+
+export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike

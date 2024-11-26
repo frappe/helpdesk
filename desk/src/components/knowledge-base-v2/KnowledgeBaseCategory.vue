@@ -9,7 +9,7 @@
     <!-- Top Section -->
     <section class="flex flex-col gap-3.5 mb-5">
       <h3 class="text-2xl font-semibold text-gray-800">
-        {{ category.categoryName }}
+        {{ category.categoryName || "Getting Started" }}
       </h3>
       <FormControl
         type="text"
@@ -59,6 +59,7 @@
             :article="article"
             :author="category.authors[article.author]"
             :key="article.name"
+            class="hover:bg-gray-200 transition-all hover:rounded"
           />
         </div>
       </section>

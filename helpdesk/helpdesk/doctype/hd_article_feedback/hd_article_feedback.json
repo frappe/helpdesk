@@ -1,9 +1,8 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2022-10-18 23:01:11.913095",
+ "creation": "2024-11-24 18:33:16.603719",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "article",
@@ -12,26 +11,30 @@
  ],
  "fields": [
   {
-   "fieldname": "article",
-   "fieldtype": "Link",
-   "label": "Article",
-   "options": "HD Article"
-  },
-  {
    "fieldname": "user",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "User",
    "options": "User"
   },
   {
+   "description": "0 is no feedback, 1 is Like, 2 is Dislike",
    "fieldname": "feedback",
-   "fieldtype": "Int",
-   "label": "Feedback"
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Feedback",
+   "options": "0\n1\n2"
+  },
+  {
+   "fieldname": "article",
+   "fieldtype": "Link",
+   "label": "Article",
+   "options": "HD Article"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-26 23:06:42.029313",
+ "modified": "2024-11-25 23:01:17.163385",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Feedback",
@@ -50,9 +53,10 @@
    "write": 1
   },
   {
+   "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
-   "if_owner": 1,
    "print": 1,
    "read": 1,
    "report": 1,
@@ -61,7 +65,7 @@
    "write": 1
   }
  ],
- "sort_field": "modified",
+ "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
 }
