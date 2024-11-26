@@ -15,11 +15,40 @@ class HDAgent(Document):
 
     def set_user_roles(self):
         user = frappe.get_doc("User", self.user)
-
         for role in ["Agent"]:
             user.append("roles", {"role": role})
-
         user.save()
+
+    @staticmethod
+    def default_list_data():
+        columns = [
+            {
+                "label": "Name",
+                "key": "name",
+                "width": "w-80",
+            },
+            {
+                "label": "Email",
+                "key": "email",
+                "width": "w-80",
+            },
+            {
+                "label": "Username",
+                "key": "user.username",
+                "width": "w-80",
+            },
+        ]
+        rows = [
+            "name",
+            "is_active",
+            "user.full_name",
+            "user.user_image",
+            "user.email",
+            "user.username",
+            "modified",
+            "creation",
+        ]
+        return {"columns": columns, "rows": rows}
 
 
 @frappe.whitelist()

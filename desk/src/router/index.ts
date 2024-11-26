@@ -190,7 +190,7 @@ const routes = [
       {
         path: "agents",
         name: AGENT_PORTAL_AGENT_LIST,
-        component: () => import("@/pages/desk/agent/AgentList.vue"),
+        component: () => import("@/pages/desk/agent/Agents.vue"),
       },
       {
         path: "teams",

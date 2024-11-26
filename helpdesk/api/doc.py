@@ -157,7 +157,11 @@ def get_list_data(
     # flake8: noqa
     if is_default:
         if hasattr(list, "default_list_data"):
-            columns = list.default_list_data(show_customer_portal_fields).get("columns")
+            columns = (
+                list.default_list_data(show_customer_portal_fields).get("columns")
+                if doctype == "HD Ticket"
+                else list.default_list_data().get("columns")
+            )
             rows = list.default_list_data().get("rows")
 
     # check if rows has all keys from columns if not add them
