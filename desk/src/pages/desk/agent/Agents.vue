@@ -17,6 +17,9 @@
         </Button>
       </template>
     </LayoutHeader>
+    <div v-if="filterableFields.data">
+      {{ filterableFields.data }}
+    </div>
     <!-- <ViewControls
       :filter="{ filters: filters, filterableFields: filterableFields.data }"
       :sort="{ sorts: sorts, sortableFields: sortableFields.data }"
@@ -60,29 +63,13 @@ const filterableFields = createResource({
     append_assign: true,
   },
   transform: (data) => {
-    return data
-      .sort((fieldA, fieldB) => {
-        const labelA = fieldA.label.toUpperCase();
-        const labelB = fieldB.label.toUpperCase();
-        if (labelA < labelB) {
-          return -1;
-        }
-        if (labelA > labelB) {
-          return 1;
-        }
-
-        return 0;
-      })
-      .map((field) => {
-        return {
-          label: field.label,
-          value: field.fieldname,
-          ...field,
-        };
-      });
-  },
-  onSuccess: (response) => {
-    console.log("FIL FIELDS", response);
+    return data.map((field) => {
+      return {
+        label: field.label,
+        value: field.fieldname,
+        ...field,
+      };
+    });
   },
 });
 
