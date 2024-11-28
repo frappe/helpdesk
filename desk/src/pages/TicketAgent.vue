@@ -43,11 +43,16 @@
         </Dropdown>
       </template>
     </LayoutHeader>
-    <div v-if="ticket.data" class="flex h-screen overflow-hidden">
+    <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col">
         <!-- ticket activities -->
         <div class="overflow-y-auto flex-1">
-          <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
+          <Tabs
+            v-model="tabIndex"
+            v-slot="{ tab }"
+            :tabs="tabs"
+            class="!h-full"
+          >
             <TicketAgentActivities
               ref="ticketAgentActivitiesRef"
               :activities="filterActivities(tab.name)"
@@ -97,35 +102,33 @@
         }
       "
     />
+    <!-- Rename Subject Dialog -->
     <Dialog v-model="showSubjectDialog">
       <template #body-title>
-        <h3>Rename</h3>
+        <h3 class="text-2xl font-semibold leading-6 text-gray-900">Rename</h3>
       </template>
       <template #body-content>
-        <FormControl
-          v-model="subjectInput"
-          :type="'text'"
-          size="sm"
-          variant="subtle"
-          :disabled="false"
-          label="New Subject"
-        />
-      </template>
-      <template #actions>
-        <Button
-          variant="solid"
-          :disabled="!subjectInput"
-          :loading="isLoading"
-          @click="
-            () => {
-              updateTicket('subject', subjectInput);
-              showSubjectDialog = false;
-            }
-          "
-        >
-          Confirm
-        </Button>
-        <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
+        <div class="flex flex-col flex-1 gap-5">
+          <FormControl
+            v-model="subjectInput"
+            type="text"
+            size="sm"
+            variant="subtle"
+            :disabled="false"
+          />
+          <Button
+            variant="solid"
+            :disabled="!subjectInput"
+            :loading="isLoading"
+            label="Rename"
+            @click="
+              () => {
+                updateTicket('subject', subjectInput);
+                showSubjectDialog = false;
+              }
+            "
+          />
+        </div>
       </template>
     </Dialog>
   </div>
