@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, provide, ref } from "vue";
+import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { createResource, Button, Breadcrumbs } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useError } from "@/composables/error";
@@ -67,6 +67,7 @@ import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { ITicket } from "./ticket/symbols";
 import { useRouter } from "vue-router";
 import { createToast } from "@/utils";
+import { socket } from "@/socket";
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { useScreenSize } from "@/composables/screen";
@@ -180,5 +181,19 @@ const showFeedback = computed(() => {
     (c) => c.sender !== ticket.data.raised_by
   );
   return hasAgentCommunication && isFeedbackMandatory;
+});
+
+onMounted(() => {
+  document.title = props.ticketId;
+  socket.on("helpdesk:ticket-update", (ticketID) => {
+    if (ticketID === Number(props.ticketId)) {
+      ticket.reload();
+    }
+  });
+});
+
+onUnmounted(() => {
+  document.title = "Helpdesk";
+  socket.off("helpdesk:ticket-update");
 });
 </script>
