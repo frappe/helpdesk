@@ -75,6 +75,12 @@ const component = computed(() => {
         },
       ],
     });
+  } else if (
+    ["Long Text", "Small Text", "Text"].includes(props.field.fieldtype)
+  ) {
+    return h(FormControl, {
+      type: "textarea",
+    });
   } else {
     return h(FormControl);
   }

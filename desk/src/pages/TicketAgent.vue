@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader v-if="ticket.data">
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs" />
       </template>
       <template #right-header>
         <CustomActions
@@ -43,11 +43,16 @@
         </Dropdown>
       </template>
     </LayoutHeader>
-    <div v-if="ticket.data" class="flex h-screen overflow-hidden">
+    <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col">
         <!-- ticket activities -->
         <div class="overflow-y-auto flex-1">
-          <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
+          <Tabs
+            v-model="tabIndex"
+            v-slot="{ tab }"
+            :tabs="tabs"
+            class="!h-full"
+          >
             <TicketAgentActivities
               ref="ticketAgentActivitiesRef"
               :activities="filterActivities(tab.name)"
@@ -97,35 +102,24 @@
         }
       "
     />
-    <Dialog v-model="showSubjectDialog">
-      <template #body-title>
-        <h3>Rename</h3>
-      </template>
+    <!-- Rename Subject Dialog -->
+    <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
       <template #body-content>
-        <FormControl
-          v-model="subjectInput"
-          :type="'text'"
-          size="sm"
-          variant="subtle"
-          :disabled="false"
-          label="New Subject"
-        />
-      </template>
-      <template #actions>
-        <Button
-          variant="solid"
-          :disabled="!subjectInput"
-          :loading="isLoading"
-          @click="
-            () => {
-              updateTicket('subject', subjectInput);
-              showSubjectDialog = false;
-            }
-          "
-        >
-          Confirm
-        </Button>
-        <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
+        <div class="flex flex-col flex-1 gap-3">
+          <FormControl
+            v-model="renameSubject"
+            type="textarea"
+            size="sm"
+            variant="subtle"
+            :disabled="false"
+          />
+          <Button
+            variant="solid"
+            :loading="isLoading"
+            label="Rename"
+            @click="handleRename"
+          />
+        </div>
       </template>
     </Dialog>
   </div>
@@ -156,6 +150,7 @@ import {
   ActivityIcon,
   EmailIcon,
 } from "@/components/icons";
+import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
@@ -165,7 +160,7 @@ const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
-const subjectInput = ref(null);
+const renameSubject = ref("");
 const isLoading = ref(false);
 
 const props = defineProps({
@@ -202,9 +197,9 @@ const ticket = createResource({
         };
       });
     }
+    renameSubject.value = data.subject;
   },
   onSuccess: (data) => {
-    subjectInput.value = data.subject;
     setupCustomActions(data, {
       doc: data,
     });
@@ -215,10 +210,18 @@ const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
-    route: { name: "TicketAgent" },
+    onClick: () => {
+      showSubjectDialog.value = true;
+    },
   });
   return items;
 });
+
+const handleRename = () => {
+  if (renameSubject.value === ticket.data?.subject) return;
+  updateTicket("subject", renameSubject.value);
+  showSubjectDialog.value = false;
+};
 
 watch(
   () => showFullActivity.value,
@@ -376,11 +379,28 @@ function updateTicket(fieldname: string, value: string) {
     },
   });
 }
+
 onMounted(() => {
   document.title = props.ticketId;
+  socket.on("helpdesk:ticket-update", (ticketID) => {
+    if (ticketID === Number(props.ticketId)) {
+      ticket.reload();
+    }
+  });
 });
 
 onUnmounted(() => {
   document.title = "Helpdesk";
+  socket.off("helpdesk:ticket-update");
 });
 </script>
+
+<style>
+.breadcrumbs button {
+  background-color: inherit !important;
+  &:hover,
+  &:focus {
+    background-color: inherit !important;
+  }
+}
+</style>
