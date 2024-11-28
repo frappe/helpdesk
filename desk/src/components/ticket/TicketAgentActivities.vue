@@ -125,7 +125,7 @@ function scrollToLatestActivity() {
     let e = document.getElementsByClassName("activity");
     el = e[e.length - 1];
     if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView({ behavior: "smooth", block: "end" });
+      el.scrollIntoView({ behavior: "smooth" });
       el.focus();
     }
   }, 500);

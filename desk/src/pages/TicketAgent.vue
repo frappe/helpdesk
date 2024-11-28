@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader v-if="ticket.data">
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs" />
       </template>
       <template #right-header>
         <CustomActions
@@ -196,7 +196,6 @@ const ticket = createResource({
         };
       });
     }
-    console.log(data);
     renameSubject.value = data.subject;
   },
   onSuccess: (data) => {
@@ -387,3 +386,13 @@ onUnmounted(() => {
   document.title = "Helpdesk";
 });
 </script>
+
+<style>
+.breadcrumbs button {
+  background-color: inherit !important;
+  &:hover,
+  &:focus {
+    background-color: inherit !important;
+  }
+}
+</style>
