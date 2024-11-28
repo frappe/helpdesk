@@ -103,30 +103,21 @@
       "
     />
     <!-- Rename Subject Dialog -->
-    <Dialog v-model="showSubjectDialog">
-      <template #body-title>
-        <h3 class="text-2xl font-semibold leading-6 text-gray-900">Rename</h3>
-      </template>
+    <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
       <template #body-content>
-        <div class="flex flex-col flex-1 gap-5">
+        <div class="flex flex-col flex-1 gap-3">
           <FormControl
-            v-model="subjectInput"
-            type="text"
+            v-model="renameSubject"
+            type="textarea"
             size="sm"
             variant="subtle"
             :disabled="false"
           />
           <Button
             variant="solid"
-            :disabled="!subjectInput"
             :loading="isLoading"
             label="Rename"
-            @click="
-              () => {
-                updateTicket('subject', subjectInput);
-                showSubjectDialog = false;
-              }
-            "
+            @click="handleRename"
           />
         </div>
       </template>
@@ -168,7 +159,7 @@ const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
-const subjectInput = ref(null);
+const renameSubject = ref("");
 const isLoading = ref(false);
 
 const props = defineProps({
@@ -205,9 +196,10 @@ const ticket = createResource({
         };
       });
     }
+    console.log(data);
+    renameSubject.value = data.subject;
   },
   onSuccess: (data) => {
-    subjectInput.value = data.subject;
     setupCustomActions(data, {
       doc: data,
     });
@@ -218,10 +210,18 @@ const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
-    route: { name: "TicketAgent" },
+    onClick: () => {
+      showSubjectDialog.value = true;
+    },
   });
   return items;
 });
+
+const handleRename = () => {
+  if (renameSubject.value === ticket.data?.subject) return;
+  updateTicket("subject", renameSubject.value);
+  showSubjectDialog.value = false;
+};
 
 watch(
   () => showFullActivity.value,
