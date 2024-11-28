@@ -46,7 +46,7 @@
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
       <div class="flex flex-1 flex-col">
         <!-- ticket activities -->
-        <div class="overflow-hidden flex-1">
+        <div class="overflow-y-auto flex-1">
           <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
             <TicketAgentActivities
               ref="ticketAgentActivitiesRef"
