@@ -50,13 +50,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs } from "frappe-ui";
 import { TicketsAgentList } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
 import { useRoute } from "vue-router";
+import { socket } from "@/socket";
 const { getUser } = useUserStore();
 
 const route = useRoute();
@@ -359,5 +360,13 @@ const sortableFields = createResource({
     doctype: "HD Ticket",
     show_customer_portal_fields: isCustomerPortal,
   },
+});
+
+onMounted(() => {
+  socket.on("helpdesk:new-ticket", () => tickets.reload());
+});
+
+onUnmounted(() => {
+  socket.off("helpdesk:new-ticket");
 });
 </script>

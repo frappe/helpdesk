@@ -46,7 +46,7 @@
     <div v-if="ticket.data" class="flex h-screen overflow-hidden">
       <div class="flex flex-1 flex-col">
         <!-- ticket activities -->
-        <div class="overflow-y-auto flex-1">
+        <div class="overflow-hidden flex-1">
           <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
             <TicketAgentActivities
               ref="ticketAgentActivitiesRef"
@@ -156,6 +156,7 @@ import {
   ActivityIcon,
   EmailIcon,
 } from "@/components/icons";
+import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
@@ -376,11 +377,18 @@ function updateTicket(fieldname: string, value: string) {
     },
   });
 }
+
 onMounted(() => {
   document.title = props.ticketId;
+  socket.on("helpdesk:ticket-update", (ticketID) => {
+    if (ticketID === Number(props.ticketId)) {
+      ticket.reload();
+    }
+  });
 });
 
 onUnmounted(() => {
   document.title = "Helpdesk";
+  socket.off("helpdesk:ticket-update");
 });
 </script>
