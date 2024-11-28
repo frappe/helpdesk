@@ -1,7 +1,7 @@
 <template>
-  <div class="flex-1 flex flex-col">
-    <ActivityHeader :title="title" />
-    <div v-if="activities.length">
+  <ActivityHeader :title="title" />
+  <div class="flex flex-col flex-1 overflow-y-auto">
+    <div v-if="activities.length" class="activities flex-1 h-full mt-1">
       <div v-for="(activity, i) in activities" :key="activity.key">
         <!-- single activity -->
         <div

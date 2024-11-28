@@ -107,12 +107,6 @@ const options = computed(() => {
       type: "select",
       placeholder: "Select Customer",
     },
-    {
-      field: "subject",
-      label: "Subject",
-      type: "textarea",
-      placeholder: "Problem in XYZ",
-    },
   ];
 });
 
