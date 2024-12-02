@@ -17,17 +17,9 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div v-if="filterableFields.data">
-      {{ filterableFields.data }}
+    <div v-if="!filterableFields.loading">
+      <Filter class="w-fit" />
     </div>
-    <!-- <ViewControls
-      :filter="{ filters: filters, filterableFields: filterableFields.data }"
-      :sort="{ sorts: sorts, sortableFields: sortableFields.data }"
-      :column="{
-        fields: fields,
-        columns: columns,
-      }"
-    /> -->
     <AddNewAgentsDialog
       :show="isDialogVisible"
       @close="isDialogVisible = false"
@@ -35,25 +27,25 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta, Avatar, Badge } from "frappe-ui";
+import { reactive, ref, provide } from "vue";
+import { usePageMeta, Avatar, Badge, createResource } from "frappe-ui";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import { createResource } from "frappe-ui";
-// import ViewControls from "@/components/ViewControls.vue";
+import { Filter } from "@/components/view-controls";
 
 const isDialogVisible = ref(false);
 
 const agents = createResource({
   url: "helpdesk.api.doc.get_list_data",
-  params: {
-    doctype: "HD Agent",
+  makeParams: (params) => {
+    return {
+      doctype: "HD Agent",
+      filters: params?.filters,
+    };
   },
   auto: true,
-  onSuccess: (response) => {
-    console.log(response);
-  },
 });
+
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   cache: ["DocField", "HD Agent"],
@@ -63,13 +55,15 @@ const filterableFields = createResource({
     append_assign: true,
   },
   transform: (data) => {
-    return data.map((field) => {
+    data = data.map((field) => {
       return {
         label: field.label,
         value: field.fieldname,
         ...field,
       };
     });
+    listViewData.filterableFields = data;
+    return data;
   },
 });
 
@@ -79,10 +73,35 @@ const sortableFields = createResource({
   params: {
     doctype: "HD Agent",
   },
-  onSuccess: (response) => {
-    console.log("SORT FIELDS", response);
-  },
 });
+
+const listViewData = reactive({
+  list: agents,
+  filterableFields,
+  sortableFields,
+});
+
+provide("listViewData", listViewData);
+
+provide("listViewActions", {
+  applyFilters,
+  applySort,
+  addColumn,
+});
+
+function applyFilters(filters) {
+  console.log("APPLY FILTER", filters);
+  agents.filters = filters;
+  agents.submit({ filters });
+}
+
+function applySort(field) {
+  console.log("APPLY SORT", field);
+}
+
+function addColumn(field) {
+  console.log("ADD COLUMN", field);
+}
 
 usePageMeta(() => {
   return {
