@@ -17,8 +17,9 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div v-if="!filterableFields.loading">
+    <div v-if="!filterableFields.loading && !sortableFields.loading">
       <Filter class="w-fit" />
+      <SortBy class="w-fit" :hide-label="false" :docType="'HD Agent'" />
     </div>
     <AddNewAgentsDialog
       :show="isDialogVisible"
@@ -31,7 +32,7 @@ import { reactive, ref, provide } from "vue";
 import { usePageMeta, Avatar, Badge, createResource } from "frappe-ui";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import { Filter } from "@/components/view-controls";
+import { Filter, SortBy } from "@/components/view-controls";
 
 const isDialogVisible = ref(false);
 
@@ -40,7 +41,8 @@ const agents = createResource({
   makeParams: (params) => {
     return {
       doctype: "HD Agent",
-      filters: params?.filters,
+      filters: params?.filters || {},
+      order_by: params?.sort_by || "modified desc",
     };
   },
   auto: true,
@@ -75,9 +77,18 @@ const sortableFields = createResource({
   },
 });
 
+const quickFilters = createResource({
+  url: "helpdesk.api.doc.get_quick_filters",
+  auto: true,
+  params: {
+    doctype: "HD Agent",
+  },
+});
+
 const listViewData = reactive({
   list: agents,
   filterableFields,
+  quickFilters,
   sortableFields,
 });
 
@@ -87,6 +98,7 @@ provide("listViewActions", {
   applyFilters,
   applySort,
   addColumn,
+  applyQuickFilter,
 });
 
 function applyFilters(filters) {
@@ -95,12 +107,17 @@ function applyFilters(filters) {
   agents.submit({ filters });
 }
 
-function applySort(field) {
-  console.log("APPLY SORT", field);
+function applySort(sort_by) {
+  agents.sort_by = sort_by;
+  agents.submit({ sort_by });
 }
 
 function addColumn(field) {
   console.log("ADD COLUMN", field);
+}
+
+function applyQuickFilter(filter) {
+  console.log("APPLY QUICK FILTER", filter);
 }
 
 usePageMeta(() => {
