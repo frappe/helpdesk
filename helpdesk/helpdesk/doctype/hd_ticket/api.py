@@ -16,7 +16,6 @@ def new(doc, attachments=[]):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
     d = frappe.get_doc(doc).insert()
-    d.create_communication_via_contact(d.description, attachments)
     return d
 
 

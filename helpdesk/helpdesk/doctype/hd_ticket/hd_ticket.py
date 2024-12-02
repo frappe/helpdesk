@@ -191,7 +191,6 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
-
         if self.get("description"):
             self.create_communication_via_contact(self.description)
 
