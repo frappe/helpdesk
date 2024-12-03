@@ -227,7 +227,7 @@ const sortSortable = useSortable("#sort-list", sortValues, {
 });
 
 function getSortLabel() {
-  if (!sortValues.size) return "Sort";
+  if (!sortValues.value.size) return "Sort";
   let values = Array.from(sortValues.value);
   let label = sortOptions.data?.find(
     (option) => option.value === values[0].fieldname

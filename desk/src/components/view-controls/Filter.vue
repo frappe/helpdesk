@@ -159,7 +159,6 @@ import FilterIcon from "@/components/icons/FilterIcon.vue";
 
 import {
   FormControl,
-  createResource,
   Tooltip,
   DatePicker,
   DateTimePicker,
@@ -169,7 +168,7 @@ import {
 } from "frappe-ui";
 
 import { AutocompleteNew } from "@/components";
-import { h, computed, onMounted } from "vue";
+import { h, computed } from "vue";
 import { inject } from "vue";
 import { useScreenSize } from "@/composables/screen";
 
@@ -188,8 +187,6 @@ const props = defineProps({
     required: false,
   },
 });
-
-const emit = defineEmits(["update"]);
 
 const listViewData = inject("listViewData");
 const listViewActions = inject("listViewActions");

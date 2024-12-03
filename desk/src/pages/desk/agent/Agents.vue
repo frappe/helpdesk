@@ -17,9 +17,19 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div v-if="!filterableFields.loading && !sortableFields.loading">
+    <div
+      v-if="
+        !filterableFields.loading &&
+        !sortableFields.loading &&
+        !quickFilters.loading
+      "
+    >
       <Filter class="w-fit" />
       <SortBy class="w-fit" :hide-label="false" :docType="'HD Agent'" />
+      <QuickFilters class="w-fit" />
+    </div>
+    <div>
+      {{ agents?.data?.data }}
     </div>
     <AddNewAgentsDialog
       :show="isDialogVisible"
@@ -32,7 +42,7 @@ import { reactive, ref, provide } from "vue";
 import { usePageMeta, Avatar, Badge, createResource } from "frappe-ui";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import { Filter, SortBy } from "@/components/view-controls";
+import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
 
 const isDialogVisible = ref(false);
 
@@ -98,26 +108,18 @@ provide("listViewActions", {
   applyFilters,
   applySort,
   addColumn,
-  applyQuickFilter,
 });
 
 function applyFilters(filters) {
-  console.log("APPLY FILTER", filters);
-  agents.filters = filters;
   agents.submit({ filters });
 }
 
 function applySort(sort_by) {
-  agents.sort_by = sort_by;
   agents.submit({ sort_by });
 }
 
 function addColumn(field) {
   console.log("ADD COLUMN", field);
-}
-
-function applyQuickFilter(filter) {
-  console.log("APPLY QUICK FILTER", filter);
 }
 
 usePageMeta(() => {
