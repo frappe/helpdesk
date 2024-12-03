@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="!quickFilters.loading"
-    class="flex items-center justify-between gap-2 px-5 py-4"
-  >
+  <div v-if="!quickFilters.loading">
     <FadedScrollableDiv
       class="flex flex-1 items-center overflow-x-auto -ml-1"
       orientation="horizontal"

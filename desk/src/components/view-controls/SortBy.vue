@@ -177,10 +177,6 @@ import SortIcon from "@/components/icons/SortIcon.vue";
 import DragIcon from "@/components/icons/DragIcon.vue";
 
 const props = defineProps({
-  doctype: {
-    type: String,
-    required: true,
-  },
   hideLabel: {
     type: Boolean,
     default: false,

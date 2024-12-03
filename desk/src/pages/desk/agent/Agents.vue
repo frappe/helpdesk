@@ -17,17 +17,25 @@
         </Button>
       </template>
     </LayoutHeader>
+    <!-- View Controls -->
     <div
       v-if="
         !filterableFields.loading &&
         !sortableFields.loading &&
         !quickFilters.loading
       "
+      class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
     >
-      <Filter class="w-fit" />
-      <SortBy class="w-fit" :hide-label="false" :docType="'HD Agent'" />
-      <QuickFilters class="w-fit" />
-      <button @click="agents.reload({ ...defaultParams })">Click me</button>
+      <QuickFilters />
+      <div class="flex items-center gap-2">
+        <Button :label="'Refresh'" @click="reload()" :loading="agents.loading">
+          <template #icon>
+            <RefreshIcon class="h-4 w-4" />
+          </template>
+        </Button>
+        <Filter />
+        <SortBy :hide-label="false" />
+      </div>
     </div>
     <div>
       {{ agents?.data?.data }}
@@ -109,6 +117,7 @@ provide("listViewActions", {
   applyFilters,
   applySort,
   addColumn,
+  reload,
 });
 
 const defaultParams = {
@@ -128,6 +137,10 @@ function applySort(order_by: string) {
 
 function addColumn(field) {
   console.log("ADD COLUMN", field);
+}
+
+function reload() {
+  agents.reload({ ...defaultParams });
 }
 
 usePageMeta(() => {
