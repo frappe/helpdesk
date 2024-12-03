@@ -27,6 +27,7 @@
       <Filter class="w-fit" />
       <SortBy class="w-fit" :hide-label="false" :docType="'HD Agent'" />
       <QuickFilters class="w-fit" />
+      <button @click="agents.reload({ ...defaultParams })">Click me</button>
     </div>
     <div>
       {{ agents?.data?.data }}
@@ -52,7 +53,7 @@ const agents = createResource({
     return {
       doctype: "HD Agent",
       filters: params?.filters || {},
-      order_by: params?.sort_by || "modified desc",
+      order_by: params?.order_by || "",
     };
   },
   auto: true,
@@ -110,12 +111,19 @@ provide("listViewActions", {
   addColumn,
 });
 
+const defaultParams = {
+  filters: {},
+  order_by: "",
+};
+
 function applyFilters(filters) {
-  agents.submit({ filters });
+  defaultParams.filters = { ...filters };
+  agents.submit({ ...defaultParams, filters });
 }
 
-function applySort(sort_by) {
-  agents.submit({ sort_by });
+function applySort(order_by: string) {
+  defaultParams.order_by = order_by;
+  agents.submit({ ...defaultParams, order_by });
 }
 
 function addColumn(field) {

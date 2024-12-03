@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { createResource, FormControl, Tooltip } from "frappe-ui";
+import { FormControl, Tooltip } from "frappe-ui";
 import { Autocomplete, Link } from "@/components";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
