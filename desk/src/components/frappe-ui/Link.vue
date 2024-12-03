@@ -129,8 +129,6 @@ const options = createResource({
     filters: props.filters,
   },
   transform: (data) => {
-    console.log(data);
-    debugger;
     let allData = data.map((option) => {
       return {
         label: option.value,
