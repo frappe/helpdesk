@@ -39,13 +39,8 @@
   />
 </template>
 <script setup>
-import {
-  TextInput,
-  FormControl,
-  DatePicker,
-  DateTimePicker,
-  Link,
-} from "frappe-ui";
+import { TextInput, FormControl, DatePicker, DateTimePicker } from "frappe-ui";
+import { Link } from "@/components";
 import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps({

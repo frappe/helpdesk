@@ -29,3 +29,4 @@ export { default as Autocomplete } from "./Autocomplete.vue";
 export { default as CannedResponseSelectorModal } from "./CannedResponseSelectorModal.vue";
 export { default as FadedScrollableDiv } from "./FadedScrollableDiv.vue";
 export { default as AutocompleteNew } from "./frappe-ui/Autocomplete.vue";
+export { default as Link } from "./frappe-ui/Link.vue";

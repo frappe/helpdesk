@@ -155,22 +155,18 @@
   </NestedPopover>
 </template>
 <script setup>
-import FilterIcon from "@/components/icons/FilterIcon.vue";
-
+import { h, computed, inject } from "vue";
 import {
   FormControl,
   Tooltip,
   DatePicker,
   DateTimePicker,
   DateRangePicker,
-  Link,
   NestedPopover,
 } from "frappe-ui";
-
-import { AutocompleteNew } from "@/components";
-import { h, computed } from "vue";
-import { inject } from "vue";
+import { AutocompleteNew, Link } from "@/components";
 import { useScreenSize } from "@/composables/screen";
+import FilterIcon from "@/components/icons/FilterIcon.vue";
 
 const { isMobileView } = useScreenSize();
 
@@ -411,6 +407,9 @@ function getDefaultOperator(fieldtype) {
   }
   if (typeDate.includes(fieldtype)) {
     return "between";
+  }
+  if (typeLink.includes(fieldtype)) {
+    return "equals";
   }
   return "like";
 }
