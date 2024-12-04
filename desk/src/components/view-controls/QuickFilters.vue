@@ -28,7 +28,7 @@ const listViewActions = inject("listViewActions");
 const { list, quickFilters } = listViewData;
 
 function applyQuickFilter(filter, value) {
-  let filters = { ...list.params.filters };
+  let filters = { ...list.params?.filters };
 
   let field = filter.name;
   if (value) {

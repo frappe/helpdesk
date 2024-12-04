@@ -94,7 +94,7 @@
                   "
                 >
                   <AscendingIcon v-if="sort.direction == 'asc'" class="h-4" />
-                  <DesendingIcon v-else class="h-4" />
+                  <DescendingIcon v-else class="h-4" />
                 </Button>
                 <Autocomplete
                   class="!w-32"
@@ -166,15 +166,16 @@
 </template>
 
 <script setup>
-import { computed, inject, nextTick, onMounted } from "vue";
-import { createResource, NestedPopover } from "frappe-ui";
+import { computed, inject } from "vue";
+import { NestedPopover } from "frappe-ui";
 import { useSortable } from "@vueuse/integrations/useSortable";
-
 import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
-import AscendingIcon from "@/components/icons/AscendingIcon.vue";
-import DescendingIcon from "@/components/icons/DescendingIcon.vue";
-import SortIcon from "@/components/icons/SortIcon.vue";
-import DragIcon from "@/components/icons/DragIcon.vue";
+import {
+  AscendingIcon,
+  DescendingIcon,
+  SortIcon,
+  DragIcon,
+} from "@/components/icons";
 
 const props = defineProps({
   hideLabel: {
@@ -194,11 +195,14 @@ const sortValues = computed({
     if (!list) return new Set();
     let allSortValues = list.params?.order_by;
     if (!allSortValues || !sortOptions.data) return new Set();
-    if (allSortValues.trim() === "modified desc") return new Set();
+    // if (allSortValues.trim() === "modified desc") return new Set();
+    // allSortValues = removeDuplicateSorts();
+
     allSortValues = allSortValues.split(", ").map((sortValue) => {
       const [fieldname, direction] = sortValue.split(" ");
       return { fieldname, direction };
     });
+    // allSortValues = removeDuplicateSorts();
     return new Set(allSortValues);
   },
   set: (value) => {
@@ -208,8 +212,8 @@ const sortValues = computed({
 
 const options = computed(() => {
   if (!sortOptions.data) return [];
-  if (!sortValues.size) return sortOptions.data;
-  const selectedOptions = [...sortValues.data].map((sort) => sort.fieldname);
+  if (!sortValues.value.size) return sortOptions.data;
+  const selectedOptions = [...sortValues.value].map((sort) => sort.fieldname);
   restartSort();
   return sortOptions.data.filter((option) => {
     return !selectedOptions.includes(option.value);
