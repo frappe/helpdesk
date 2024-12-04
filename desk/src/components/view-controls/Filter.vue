@@ -51,7 +51,7 @@
               <div id="fieldname" class="w-full">
                 <AutocompleteNew
                   :value="f.field.fieldname"
-                  :options="filterableFields"
+                  :options="filterableFields.data"
                   @change="(e) => updateFilter(e, i)"
                   :placeholder="'First Name'"
                 />
@@ -82,7 +82,7 @@
                 <div id="fieldname" class="!min-w-[140px]">
                   <AutocompleteNew
                     :value="f.field.fieldname"
-                    :options="filterableFields"
+                    :options="filterableFields.data"
                     @change="(e) => updateFilter(e, i)"
                     :placeholder="'First Name'"
                   />
@@ -124,7 +124,7 @@
           <div class="flex items-center justify-between gap-2">
             <AutocompleteNew
               value=""
-              :options="filterableFields"
+              :options="filterableFields.data"
               @change="(e) => setfilter(e)"
               :placeholder="'First name'"
             >
@@ -177,13 +177,6 @@ const typeSelect = ["Select"];
 const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 const typeDate = ["Date", "Datetime"];
 
-const props = defineProps({
-  doctype: {
-    type: String,
-    required: false,
-  },
-});
-
 const listViewData = inject("listViewData");
 const listViewActions = inject("listViewActions");
 const { list, filterableFields } = listViewData;
@@ -191,14 +184,14 @@ const { list, filterableFields } = listViewData;
 const filters = computed(() => {
   if (!list) return new Set();
   let allFilters = list?.params?.filters || list.data?.params?.filters;
-  if (!allFilters || !filterableFields) return new Set();
+  if (!allFilters || !filterableFields.data) return new Set();
 
   // remove default filters
   //   if (props.default_filters) {
   //     allFilters = removeCommonFilters(props.default_filters, allFilters);
   //   }
 
-  return convertFilters(filterableFields, allFilters);
+  return convertFilters(filterableFields.data, allFilters);
 });
 
 function removeCommonFilters(commonFilters, allFilters) {
