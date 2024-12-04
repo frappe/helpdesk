@@ -157,7 +157,7 @@ class HDTicket(Document):
         }
 
     def publish_update(self):
-        publish_event("helpdesk:ticket-update", {"name": self.name})
+        publish_event("helpdesk:ticket-update", self.name)
         capture_event("ticket_updated")
 
     def autoname(self):
@@ -191,6 +191,8 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
+        if self.get("description"):
+            self.create_communication_via_contact(self.description)
 
     def on_update(self):
         # flake8: noqa

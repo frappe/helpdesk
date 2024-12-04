@@ -52,6 +52,21 @@ class HDArticle(Document):
                 )
             )
 
+    @frappe.whitelist()
+    def set_feedback(self, value):
+        # 0 empty, 1 like, 2 dislike
+        user = frappe.session.user
+        feedback = frappe.db.exists(
+            "HD Article Feedback", {"user": user, "article": self.name}
+        )
+        if feedback:
+            frappe.db.set_value("HD Article Feedback", feedback, "feedback", value)
+            return
+
+        frappe.new_doc(
+            "HD Article Feedback", user=user, article=self.name, feedback=value
+        ).insert()
+
     @property
     def title_slug(self) -> str:
         """

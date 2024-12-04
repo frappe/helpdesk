@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
+  <div class="flex h-full flex-col overflow-scroll">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
@@ -18,8 +18,8 @@
         />
       </template>
     </LayoutHeader>
-    <div class="overflow-auto mx-auto w-full max-w-4xl px-5">
-      <div class="py-6">
+    <div class="mx-auto w-full max-w-4xl px-24">
+      <div class="py-6 flex flex-col gap-5">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
@@ -30,16 +30,15 @@
             shadow: editMode,
             'p-4': editMode,
           }"
-          editor-class="prose-f"
+          editor-class="prose-f first:mt-3"
           @change="articleContent = $event"
         >
-          <template #top v-if="!route.meta.public">
+          <template #top>
             <component
               :is="topComponent"
               v-model:title="articleTitle"
               v-bind="options__"
             />
-
             <TextEditorFixedMenu
               v-if="editMode"
               class="-ml-1"
@@ -47,27 +46,47 @@
             />
           </template>
         </TextEditor>
-        <!-- <div
-          v-else-if="!article.data && !editMode"
-          class="text-gray-500 text-2xl font-semibold mb-5"
+
+        <div
+          class="flex items-center justify-between mb-8 p-4 rounded-lg bg-gray-50"
+          v-if="isCustomerPortal"
         >
-          Article Not Found
-        </div> -->
-        <RouterLink
-          v-if="route.meta.public"
-          :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
-          class=""
-        >
-          <Button
-            label="Still need help? Create a ticket"
-            size="md"
-            theme="gray"
-            variant="solid"
-            class="mt-5"
-          >
-            <template #suffix> &rightarrow; </template>
-          </Button>
-        </RouterLink>
+          <!-- Feedback Section -->
+          <div>
+            <!-- was this article helpful? -->
+            <div class="flex items-center gap-2">
+              <span class="text-gray-800 text-sm"
+                >Did this article solve your issue?</span
+              >
+              <div class="flex items-center gap-1">
+                <component
+                  :is="userFeedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
+                  class="w-4 h-4 cursor-pointer"
+                  @click="handleFeedbackClick('Like')"
+                />
+                <component
+                  :is="
+                    userFeedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon
+                  "
+                  class="w-4 h-4 cursor-pointer"
+                  @click="handleFeedbackClick('Dislike')"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Create a ticket CTA -->
+          <div class="flex items-center justify-center gap-2">
+            <span class="font-normal text-sm">
+              Can’t find what you’re looking for?
+            </span>
+            <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
+              <p class="underline font-bold text-sm">
+                Create a ticket &rightarrow;
+                <!-- <template #suffix> </template> -->
+              </p>
+            </RouterLink>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -101,8 +120,15 @@ import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArtic
 import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
-import { PreserveIds } from "@/tiptap-extensions";
 
+import { PreserveIds } from "@/tiptap-extensions";
+import { FeedbackAction } from "@/types";
+import {
+  ThumbsUpIcon,
+  ThumbsUpFilledIcon,
+  ThumbsDownIcon,
+  ThumbsDownFilledIcon,
+} from "@/components/icons";
 const props = defineProps({
   articleId: {
     type: String,
@@ -146,7 +172,7 @@ const breadcrumbs = computed(() => {
       },
     },
   ];
-  // if (options__.value.subCategoryId !== options__.value.categoryId) {
+
   agentPortalItems.push({
     label: options__.value.subCategoryName,
     route: {
@@ -158,7 +184,6 @@ const breadcrumbs = computed(() => {
       },
     },
   });
-  // }
 
   if (!isNew) {
     agentPortalItems.push({
@@ -224,6 +249,7 @@ const topComponent = computed(() => {
   return KnowledgeBaseArticleTopView;
 });
 
+const userFeedback = ref<FeedbackAction>(null);
 const article = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article",
   params: {
@@ -231,6 +257,7 @@ const article = createResource({
   },
   onSuccess(data) {
     articleTitle.value = data.title;
+    userFeedback.value = data.user_feedback;
     capture("article_viewed", {
       data: {
         user: authStore.userId,
@@ -241,6 +268,35 @@ const article = createResource({
   },
   auto: !isNew,
 });
+
+const setFeedback = createResource({
+  url: "run_doc_method",
+  debounce: 300,
+  makeParams: () => ({
+    dt: "HD Article",
+    dn: props.articleId,
+    method: "set_feedback",
+    args: {
+      value: userAction.value,
+    },
+  }),
+  onSuccess: () => {
+    article.reload();
+  },
+});
+
+const userAction = ref();
+const feedbackMap = {
+  Remove: 0,
+  Like: 1,
+  Dislike: 2,
+};
+
+function handleFeedbackClick(action: string) {
+  userAction.value = feedbackMap[action];
+  userFeedback.value = feedbackMap[action];
+  setFeedback.submit();
+}
 
 const category = createDocumentResource({
   doctype: "HD Article Category",
