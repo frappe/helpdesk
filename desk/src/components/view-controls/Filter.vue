@@ -168,6 +168,14 @@ import { AutocompleteNew, Link } from "@/components";
 import { useScreenSize } from "@/composables/screen";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 
+const props = defineProps({
+  default_filters: {
+    type: Object,
+    required: false,
+    default: {},
+  },
+});
+
 const { isMobileView } = useScreenSize();
 
 const typeCheck = ["Check"];
@@ -187,9 +195,9 @@ const filters = computed(() => {
   if (!allFilters || !filterableFields.data) return new Set();
 
   // remove default filters
-  //   if (props.default_filters) {
-  //     allFilters = removeCommonFilters(props.default_filters, allFilters);
-  //   }
+  // if (props.default_filters) {
+  //   allFilters = removeCommonFilters(props.default_filters, allFilters);
+  // }
 
   return convertFilters(filterableFields.data, allFilters);
 });
@@ -206,7 +214,6 @@ function removeCommonFilters(commonFilters, allFilters) {
 }
 
 function convertFilters(data, allFilters) {
-  //   debugger;
   let f = [];
   for (let [key, value] of Object.entries(allFilters)) {
     let field = data.find((f) => f.fieldname === key);

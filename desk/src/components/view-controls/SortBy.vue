@@ -196,7 +196,6 @@ const sortValues = computed({
     let allSortValues = list.params?.order_by;
     if (!allSortValues || !sortOptions.data) return new Set();
     // if (allSortValues.trim() === "modified desc") return new Set();
-    // allSortValues = removeDuplicateSorts();
 
     allSortValues = allSortValues.split(", ").map((sortValue) => {
       const [fieldname, direction] = sortValue.split(" ");
