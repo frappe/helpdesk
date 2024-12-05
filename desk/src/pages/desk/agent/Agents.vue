@@ -19,19 +19,10 @@
     </LayoutHeader>
 
     <ListViewBuilder
-      doctype="HD Agent"
       v-slot="{ list }"
-      :default_filters="{ is_active: ['=', '1'] }"
-    >
-      <!-- <div v-if="!list.loading">
-      </div> -->
-      <!-- {{ list?.data?.columns }}
-      <br />
-      <br />
-      <br />
-      {{ list?.data?.data }} -->
-    </ListViewBuilder>
-
+      :options="options"
+      @emptyStateAction="isDialogVisible = true"
+    />
     <AddNewAgentsDialog
       :show="isDialogVisible"
       @close="isDialogVisible = false"
@@ -39,14 +30,33 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { usePageMeta } from "frappe-ui";
+import { computed, ref, h } from "vue";
+import { usePageMeta, Avatar } from "frappe-ui";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
-import LayoutHeader from "@/components/LayoutHeader.vue";
+import { LayoutHeader } from "@/components";
 
 import ListViewBuilder from "../../../components/ListViewBuilder.vue";
 
 const isDialogVisible = ref(false);
+
+const options = computed(() => {
+  return {
+    doctype: "HD Agent",
+    default_filters: { is_active: ["=", "1"] },
+    column_config: {
+      agent_name: {
+        prefix: ({ row }) => {
+          return h(Avatar, {
+            shape: "circle",
+            image: row.user_image,
+            label: row.agent_name,
+            size: "sm",
+          });
+        },
+      },
+    },
+  };
+});
 
 usePageMeta(() => {
   return {
