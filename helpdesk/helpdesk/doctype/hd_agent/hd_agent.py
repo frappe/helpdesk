@@ -41,7 +41,7 @@ class HDAgent(Document):
                 "label": "Full Name",
                 "key": "user.full_name",
                 "width": "240px",
-            }
+            },
         ]
         rows = [
             "name",
