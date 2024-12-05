@@ -25,18 +25,23 @@ class HDAgent(Document):
             {
                 "label": "Name",
                 "key": "name",
-                "width": "w-80",
+                "width": "240px",
             },
             {
                 "label": "Email",
                 "key": "email",
-                "width": "w-80",
+                "width": "240px",
             },
             {
                 "label": "Username",
                 "key": "user.username",
-                "width": "w-80",
+                "width": "240px",
             },
+            {
+                "label": "Full Name",
+                "key": "user.full_name",
+                "width": "240px",
+            }
         ]
         rows = [
             "name",
