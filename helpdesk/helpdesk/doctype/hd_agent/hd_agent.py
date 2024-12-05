@@ -23,24 +23,19 @@ class HDAgent(Document):
     def default_list_data():
         columns = [
             {
-                "label": "Name",
-                "key": "name",
-                "width": "240px",
+                "label": "Agent Name",
+                "key": "agent_name",
+                "width": "30rem",
             },
             {
                 "label": "Email",
                 "key": "email",
-                "width": "240px",
+                "width": "30rem",
             },
             {
-                "label": "Username",
-                "key": "user.username",
-                "width": "240px",
-            },
-            {
-                "label": "Full Name",
-                "key": "user.full_name",
-                "width": "240px",
+                "label": "Created On",
+                "key": "creation",
+                "width": "20rem",
             },
         ]
         rows = [
