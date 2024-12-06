@@ -19,7 +19,6 @@
     </LayoutHeader>
 
     <ListViewBuilder
-      v-slot="{ list }"
       :options="options"
       @emptyStateAction="isDialogVisible = true"
     />

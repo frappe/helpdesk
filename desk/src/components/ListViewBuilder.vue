@@ -20,8 +20,8 @@
   <slot v-bind="{ list }">
     <ListView
       class="flex-1"
-      :columns="list.data?.columns"
-      :rows="list.data?.data"
+      :columns="columns"
+      :rows="rows"
       row-key="email"
       :options="{
         selectable: true,
@@ -153,7 +153,7 @@ const list = createResource({
   },
 });
 
-const rows = computed(() => [] || list.data?.data);
+const rows = computed(() => list.data?.data);
 const columns = computed(() => list.data?.columns);
 
 function handleFetchFromField(column) {
