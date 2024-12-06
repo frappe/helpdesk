@@ -51,10 +51,7 @@
             <div v-if="idx === 0">
               {{ item }}
             </div>
-            <div
-              v-else-if="column.type === 'Datetime'"
-              @click="console.log('Datetime clicked')"
-            >
+            <div v-else-if="column.type === 'Datetime'">
               {{ dayjs.tz(item).fromNow() }}
             </div>
             <div v-else>
