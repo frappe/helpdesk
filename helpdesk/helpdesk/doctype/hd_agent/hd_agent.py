@@ -26,16 +26,19 @@ class HDAgent(Document):
                 "label": "Agent Name",
                 "key": "agent_name",
                 "width": "30rem",
+                "type": "Data",
             },
             {
                 "label": "Email",
                 "key": "email",
                 "width": "30rem",
+                "type": "Data",
             },
             {
                 "label": "Created On",
                 "key": "creation",
                 "width": "20rem",
+                "type": "Datetime",
             },
         ]
         rows = [

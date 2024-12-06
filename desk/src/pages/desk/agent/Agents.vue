@@ -33,16 +33,16 @@
 import { computed, ref, h } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
-import { LayoutHeader } from "@/components";
-
-import ListViewBuilder from "../../../components/ListViewBuilder.vue";
+import { LayoutHeader, ListViewBuilder } from "@/components";
 
 const isDialogVisible = ref(false);
 
+// filter not on first field/ datetime
+// options mei route or click ka option
 const options = computed(() => {
   return {
     doctype: "HD Agent",
-    default_filters: { is_active: ["=", "1"] },
+    default_filters: { is_active: ["=", 1] },
     column_config: {
       agent_name: {
         prefix: ({ row }) => {
@@ -53,6 +53,15 @@ const options = computed(() => {
             size: "sm",
           });
         },
+      },
+    },
+    emptyState: {
+      title: "No Data",
+      description: "No data available",
+      button: {
+        label: "New Agent",
+        variant: "solid",
+        onClick: () => (isDialogVisible.value = true),
       },
     },
   };

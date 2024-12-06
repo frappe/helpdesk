@@ -19,7 +19,7 @@
   <!-- List View -->
   <slot v-bind="{ list }">
     <ListView
-      class="px-5 flex-1"
+      class="flex-1"
       :columns="list.data?.columns"
       :rows="list.data?.data"
       row-key="email"
@@ -28,23 +28,46 @@
         showTooltip: true,
         resizeColumn: false,
         onRowClick: () => {},
-        emptyState: {
-          title: 'No Data',
-          description: 'No data available',
-          button: {
-            label: 'New Record',
-            variant: 'solid',
-            onClick: () => emit('emptyStateAction'),
-          },
-        },
+        emptyState: props.options?.emptyState || defaultEmptyState,
       }"
-    />
+    >
+      <ListHeader class="sm:mx-5 mx-3">
+        <ListHeaderItem
+          v-for="column in columns"
+          :key="column.key"
+          :item="column"
+          @columnWidthUpdated="(width) => console.log(width)"
+        />
+      </ListHeader>
+      <ListRows class="sm:mx-5 mx-3">
+        <ListRow
+          v-for="row in rows"
+          :key="row.name"
+          v-slot="{ idx, column, item }"
+          :row="row"
+          class="truncate text-base"
+        >
+          <ListRowItem :item="item" :row="row" :column="column">
+            <div v-if="idx === 0">
+              {{ item }}
+            </div>
+            <div
+              v-else-if="column.type === 'Datetime'"
+              @click="console.log('Datetime clicked')"
+            >
+              {{ dayjs.tz(item).fromNow() }}
+            </div>
+            <div v-else>
+              {{ item }}
+            </div>
+          </ListRowItem>
+        </ListRow>
+      </ListRows>
+    </ListView>
   </slot>
 
   <!-- List Footer -->
   <div class="p-20 border-t sm:px-5 px-3 py-2">
-    <!-- filter not on first field/ datetime -->
-    <!-- options mei route or click ka option -->
     <ListFooter
       :options="{
         rowCount: list?.data?.row_count,
@@ -64,14 +87,32 @@
 
 <script setup lang="ts">
 import { reactive, provide, computed } from "vue";
-import { createResource, ListView, ListFooter } from "frappe-ui";
+import {
+  createResource,
+  ListView,
+  ListFooter,
+  ListRowItem,
+  ListRows,
+  ListRow,
+  ListHeader,
+  ListHeaderItem,
+} from "frappe-ui";
 import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
-
+import { dayjs } from "@/dayjs";
 interface P {
   options: {
     doctype: string;
     default_filters?: Record<string, any>;
     column_config?: Record<string, any>;
+    emptyState?: {
+      title: string;
+      description?: string;
+      button?: {
+        label: string;
+        variant: string;
+        onClick: () => void;
+      };
+    };
   };
 }
 
@@ -82,6 +123,11 @@ interface E {
 const props = defineProps<P>();
 
 const emit = defineEmits<E>();
+
+const defaultEmptyState = {
+  title: "No Data",
+  description: "No data available",
+};
 
 const defaultParams = reactive({
   doctype: props.options.doctype,
@@ -106,6 +152,9 @@ const list = createResource({
     list.params = defaultParams;
   },
 });
+
+const rows = computed(() => [] || list.data?.data);
+const columns = computed(() => list.data?.columns);
 
 function handleFetchFromField(column) {
   if (!column.hasOwnProperty("key")) return column;
@@ -222,5 +271,3 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 </script>
-
-<style lang="scss" scoped></style>
