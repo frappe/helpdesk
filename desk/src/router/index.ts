@@ -180,7 +180,7 @@ const routes = [
       {
         path: "customers",
         name: AGENT_PORTAL_CUSTOMER_LIST,
-        component: () => import("@/pages/desk/customer/CustomerList.vue"),
+        component: () => import("@/pages/desk/customer/Customers.vue"),
       },
       {
         path: "contacts",

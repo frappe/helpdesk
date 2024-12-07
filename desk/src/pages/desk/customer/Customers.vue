@@ -36,14 +36,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, h } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import CustomerDialog from "./CustomerDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import { computed } from "vue";
-import { h } from "vue";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
