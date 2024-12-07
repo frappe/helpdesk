@@ -54,7 +54,7 @@ const options = computed(() => {
         },
       },
     },
-    emptyState: {
+    empty_state: {
       title: "No Data",
       description: "No data available",
       button: {

@@ -51,11 +51,10 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { createResource, usePageMeta, Dialog, FormControl } from "frappe-ui";
 import { isEmpty } from "lodash";
-import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
-import { createListManager } from "@/composables/listManager";
-import { useError } from "@/composables/error";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
+import { useError } from "@/composables/error";
 
 const router = useRouter();
 const showNewDialog = ref(false);

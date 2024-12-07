@@ -28,7 +28,7 @@
         showTooltip: true,
         resizeColumn: false,
         onRowClick: (row: Object) => emit('onRowClick', row['name']),
-        emptyState: props.options?.emptyState || defaultEmptyState,
+        empty_state: props.options?.empty_state || defaultEmptyState,
       }"
     >
       <ListHeader class="sm:mx-5 mx-3">
@@ -101,7 +101,8 @@ interface P {
     doctype: string;
     default_filters?: Record<string, any>;
     column_config?: Record<string, any>;
-    emptyState?: {
+    update_list_view?: boolean;
+    empty_state?: {
       title: string;
       description?: string;
       button?: {
@@ -268,4 +269,9 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   }
   list.reload();
 }
+
+// to handle cases where the list view is updated
+defineExpose({
+  reload,
+});
 </script>

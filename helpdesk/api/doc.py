@@ -263,7 +263,7 @@ def get_quick_filters(doctype: str):
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
 
-    if doctype == "HD Agent":
+    if doctype == "HD Agent" or doctype == "HD Customer":
         quick_filters.append({"label": "ID", "value": "", "name": "name"})
 
     for field in fields:
