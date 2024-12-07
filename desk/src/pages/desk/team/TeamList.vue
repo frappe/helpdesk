@@ -18,6 +18,7 @@
       :options="{
         doctype: 'HD Team',
       }"
+      @on-row-click="handleRowClick"
     />
     <Dialog
       v-model="showNewDialog"
@@ -91,4 +92,20 @@ usePageMeta(() => {
     title: "Teams",
   };
 });
+
+function handleRowClick(rowID: string) {
+  router.push({
+    name: AGENT_PORTAL_TEAM_SINGLE,
+    params: {
+      teamId: rowID,
+    },
+  });
+}
+
+// onClick = {
+//         name: AGENT_PORTAL_TEAM_SINGLE,
+//         params: {
+//           teamId: d.name,
+//         },
+//       };
 </script>

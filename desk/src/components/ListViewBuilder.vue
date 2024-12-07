@@ -22,12 +22,12 @@
       class="flex-1"
       :columns="columns"
       :rows="rows"
-      row-key="email"
+      row-key="name"
       :options="{
         selectable: true,
         showTooltip: true,
         resizeColumn: false,
-        onRowClick: () => {},
+        onRowClick: (row: Object) => emit('onRowClick', row['name']),
         emptyState: props.options?.emptyState || defaultEmptyState,
       }"
     >
@@ -115,6 +115,7 @@ interface P {
 
 interface E {
   (event: "emptyStateAction"): void;
+  (event: "onRowClick", row: any): void;
 }
 
 const props = defineProps<P>();
