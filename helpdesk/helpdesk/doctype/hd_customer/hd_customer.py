@@ -6,4 +6,33 @@ from frappe.model.document import Document
 
 
 class HDCustomer(Document):
-    pass
+    @staticmethod
+    def default_list_data():
+        columns = [
+            {
+                "label": "Name",
+                "key": "name",
+                "width": "30rem",
+                "type": "Data",
+            },
+            {
+                "label": "Domain",
+                "key": "domain",
+                "width": "30rem",
+                "type": "Data",
+            },
+            {
+                "label": "Created On",
+                "key": "creation",
+                "width": "20rem",
+                "type": "Datetime",
+            },
+        ]
+        rows = [
+            "name",
+            "image",
+            "domain",
+            "modified",
+            "creation",
+        ]
+        return {"columns": columns, "rows": rows}

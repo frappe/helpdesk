@@ -180,7 +180,7 @@ const routes = [
       {
         path: "customers",
         name: AGENT_PORTAL_CUSTOMER_LIST,
-        component: () => import("@/pages/desk/customer/CustomerList.vue"),
+        component: () => import("@/pages/desk/customer/Customers.vue"),
       },
       {
         path: "contacts",
@@ -190,12 +190,12 @@ const routes = [
       {
         path: "agents",
         name: AGENT_PORTAL_AGENT_LIST,
-        component: () => import("@/pages/desk/agent/AgentList.vue"),
+        component: () => import("@/pages/desk/agent/Agents.vue"),
       },
       {
         path: "teams",
         name: AGENT_PORTAL_TEAM_LIST,
-        component: () => import("@/pages/desk/team/TeamList.vue"),
+        component: () => import("@/pages/desk/team/Teams.vue"),
       },
       {
         path: "teams/:teamId",

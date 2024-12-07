@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useStorage } from "@vueuse/core";
-import { createResource, Breadcrumbs } from "frappe-ui";
+import { createResource, Breadcrumbs, usePageMeta } from "frappe-ui";
 import { TicketsAgentList } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
@@ -368,5 +368,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   socket.off("helpdesk:new-ticket");
+});
+usePageMeta(() => {
+  return {
+    title: "Tickets",
+  };
 });
 </script>
