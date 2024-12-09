@@ -41,8 +41,8 @@ const isDialogVisible = ref(false);
 const options = computed(() => {
   return {
     doctype: "HD Agent",
-    default_filters: { is_active: ["=", 1] },
-    column_config: {
+    defaultFilters: { is_active: ["=", 1] },
+    columnConfig: {
       agent_name: {
         prefix: ({ row }) => {
           return h(Avatar, {
@@ -54,14 +54,8 @@ const options = computed(() => {
         },
       },
     },
-    empty_state: {
-      title: "No Data",
-      description: "No data available",
-      button: {
-        label: "New Agent",
-        variant: "solid",
-        onClick: () => (isDialogVisible.value = true),
-      },
+    emptyState: {
+      title: "No Agents Found",
     },
   };
 });

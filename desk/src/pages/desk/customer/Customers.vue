@@ -20,7 +20,8 @@
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
-      @on-row-click="openCustomer"
+      @row-click="openCustomer"
+      @emptyStateAction="isDialogVisible = true"
     />
     <NewCustomerDialog
       v-model="isDialogVisible"
@@ -42,6 +43,7 @@ import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
 import CustomerDialog from "./CustomerDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import PhoneIcon from "@/components/icons/PhoneIcon.vue";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
@@ -63,7 +65,7 @@ function handleCustomer(updated = false) {
 const options = computed(() => {
   return {
     doctype: "HD Customer",
-    column_config: {
+    columnConfig: {
       name: {
         prefix: ({ row }) => {
           return h(Avatar, {
@@ -74,6 +76,9 @@ const options = computed(() => {
           });
         },
       },
+    },
+    emptyState: {
+      title: "No Customers Found",
     },
   };
 });

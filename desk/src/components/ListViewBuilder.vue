@@ -6,7 +6,7 @@
   >
     <QuickFilters />
     <div class="flex items-center gap-2">
-      <Button :label="'Refresh'" @click="reload()" :loading="list.loading">
+      <Button label="Refresh" @click="reload()" :loading="list.loading">
         <template #icon>
           <RefreshIcon class="h-4 w-4" />
         </template>
@@ -19,6 +19,7 @@
   <!-- List View -->
   <slot v-bind="{ list }">
     <ListView
+      v-if="list.data?.data.length > 0"
       class="flex-1"
       :columns="columns"
       :rows="rows"
@@ -27,8 +28,8 @@
         selectable: true,
         showTooltip: true,
         resizeColumn: false,
-        onRowClick: (row: Object) => emit('onRowClick', row['name']),
-        empty_state: props.options?.empty_state || defaultEmptyState,
+        onRowClick: (row: Object) => emit('rowClick', row['name']),
+        emptyState,
       }"
     >
       <ListHeader class="sm:mx-5 mx-3">
@@ -48,23 +49,39 @@
           class="truncate text-base"
         >
           <ListRowItem :item="item" :row="row" :column="column">
+            <!-- TODO: filters on click of other columns -->
+            <!-- and not on first column, it should emit the event -->
             <div v-if="idx === 0">
               {{ item }}
             </div>
             <div v-else-if="column.type === 'Datetime'">
               {{ dayjs.tz(item).fromNow() }}
             </div>
-            <div v-else>
+            <div v-else class="truncate">
               {{ item }}
             </div>
           </ListRowItem>
         </ListRow>
       </ListRows>
     </ListView>
+    <!-- <div v-else class="flex h-full items-center justify-center">
+      <div
+        class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4"
+      >
+        <ContactsIcon class="h-10 w-10" />
+        <span>{{ __("No {0} Found", [__("Contacts")]) }}</span>
+        <Button :label="__('Create')" @click="showContactModal = true">
+          <template #prefix><FeatherIcon name="plus" class="h-4" /></template>
+        </Button>
+      </div>
+    </div> -->
   </slot>
 
   <!-- List Footer -->
-  <div class="p-20 border-t sm:px-5 px-3 py-2">
+  <div
+    class="p-20 border-t sm:px-5 px-3 py-2"
+    v-if="list.data?.data.length > 0"
+  >
     <ListFooter
       :options="{
         rowCount: list?.data?.row_count,
@@ -80,10 +97,24 @@
       "
     />
   </div>
+  <div v-else class="flex h-full items-center justify-center">
+    <div
+      class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4"
+    >
+      <!-- ICON -->
+      <component :is="emptyState.icon" class="h-10 w-10" />
+      <!-- title -->
+      <span>{{ emptyState.title || "No Data Found" }}</span>
+      <!-- Button which emits Empty State Action -->
+      <Button label="Create" @click="emit('emptyStateAction')" variant="subtle">
+        <template #prefix><FeatherIcon name="plus" class="h-4" /></template>
+      </Button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed } from "vue";
+import { reactive, provide, computed, h } from "vue";
 import {
   createResource,
   ListView,
@@ -96,27 +127,23 @@ import {
 } from "frappe-ui";
 import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
 import { dayjs } from "@/dayjs";
+import PhoneIcon from "./icons/PhoneIcon.vue";
+
 interface P {
   options: {
     doctype: string;
-    default_filters?: Record<string, any>;
-    column_config?: Record<string, any>;
-    update_list_view?: boolean;
-    empty_state?: {
+    defaultFilters?: Record<string, any>;
+    columnConfig?: Record<string, any>;
+    emptyState?: {
+      icon?: HTMLElement | string;
       title: string;
-      description?: string;
-      button?: {
-        label: string;
-        variant: string;
-        onClick: () => void;
-      };
     };
   };
 }
 
 interface E {
   (event: "emptyStateAction"): void;
-  (event: "onRowClick", row: any): void;
+  (event: "rowClick", row: any): void;
 }
 
 const props = defineProps<P>();
@@ -124,16 +151,20 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 
 const defaultEmptyState = {
-  title: "No Data",
-  description: "No data available",
+  icon: "",
+  title: "No Data Found",
 };
 
 const defaultParams = reactive({
   doctype: props.options.doctype,
-  filters: props.options.default_filters || {},
-  order_by: "",
+  filters: props.options.defaultFilters || {},
+  order_by: "modified desc",
   page_length: 20,
   page_length_count: 20,
+});
+
+const emptyState = computed(() => {
+  return props.options?.emptyState || defaultEmptyState;
 });
 
 const list = createResource({
@@ -163,8 +194,8 @@ function handleFetchFromField(column) {
 }
 
 function handleColumnConfig(column) {
-  if (!props.options?.column_config) return column;
-  const columnConfig = props.options.column_config;
+  if (!props.options?.columnConfig) return column;
+  const columnConfig = props.options.columnConfig;
   if (!columnConfig.hasOwnProperty(column.key)) return column;
   column.prefix = columnConfig[column.key]?.prefix;
 

@@ -185,7 +185,7 @@ const routes = [
       {
         path: "contacts",
         name: AGENT_PORTAL_CONTACT_LIST,
-        component: () => import("@/pages/desk/contact/ContactList.vue"),
+        component: () => import("@/pages/desk/contact/Contacts.vue"),
       },
       {
         path: "agents",

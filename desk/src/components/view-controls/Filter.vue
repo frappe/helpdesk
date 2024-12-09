@@ -194,24 +194,8 @@ const filters = computed(() => {
   let allFilters = list?.params?.filters || list.data?.params?.filters;
   if (!allFilters || !filterableFields.data) return new Set();
 
-  // remove default filters
-  // if (props.default_filters) {
-  //   allFilters = removeCommonFilters(props.default_filters, allFilters);
-  // }
-
   return convertFilters(filterableFields.data, allFilters);
 });
-
-function removeCommonFilters(commonFilters, allFilters) {
-  for (const key in commonFilters) {
-    if (commonFilters.hasOwnProperty(key) && allFilters.hasOwnProperty(key)) {
-      if (commonFilters[key] === allFilters[key]) {
-        delete allFilters[key];
-      }
-    }
-  }
-  return allFilters;
-}
 
 function convertFilters(data, allFilters) {
   let f = [];

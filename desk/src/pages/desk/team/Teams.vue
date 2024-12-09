@@ -17,8 +17,12 @@
     <ListViewBuilder
       :options="{
         doctype: 'HD Team',
+        emptyState: {
+          title: emptyMessage,
+        },
       }"
-      @on-row-click="handleRowClick"
+      @row-click="handleRowClick"
+      @emptyStateAction="showNewDialog = true"
     />
     <Dialog
       v-model="showNewDialog"
