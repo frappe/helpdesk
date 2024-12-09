@@ -51,7 +51,7 @@
           <ListRowItem :item="item" :row="row" :column="column">
             <!-- TODO: filters on click of other columns -->
             <!-- and not on first column, it should emit the event -->
-            <div v-if="idx === 0">
+            <div v-if="idx === 0" class="truncate">
               {{ item }}
             </div>
             <div v-else-if="column.type === 'Datetime'">
@@ -64,17 +64,6 @@
         </ListRow>
       </ListRows>
     </ListView>
-    <!-- <div v-else class="flex h-full items-center justify-center">
-      <div
-        class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4"
-      >
-        <ContactsIcon class="h-10 w-10" />
-        <span>{{ __("No {0} Found", [__("Contacts")]) }}</span>
-        <Button :label="__('Create')" @click="showContactModal = true">
-          <template #prefix><FeatherIcon name="plus" class="h-4" /></template>
-        </Button>
-      </div>
-    </div> -->
   </slot>
 
   <!-- List Footer -->
@@ -97,11 +86,12 @@
       "
     />
   </div>
+  <!-- Empty State -->
   <div v-else class="flex h-full items-center justify-center">
     <div
       class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4"
     >
-      <!-- ICON -->
+      <!-- Icon -->
       <component :is="emptyState.icon" class="h-10 w-10" />
       <!-- title -->
       <span>{{ emptyState.title || "No Data Found" }}</span>
