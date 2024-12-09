@@ -15,18 +15,18 @@ class CustomContact(Contact):
                 "label": "Email",
                 "type": "Data",
                 "key": "email_id",
-                "width": "12rem",
+                "width": "24rem",
             },
+            # {
+            #     "label": "Phone",
+            #     "type": "Data",
+            #     "key": "mobile_no",
+            #     "width": "12rem",
+            # },
             {
-                "label": "Phone",
-                "type": "Data",
-                "key": "phone",
-                "width": "12rem",
-            },
-            {
-                "label": "Last Modified",
+                "label": "Created On",
                 "type": "Datetime",
-                "key": "modified",
+                "key": "creation",
                 "width": "8rem",
             },
         ]

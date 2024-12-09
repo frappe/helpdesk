@@ -12,19 +12,19 @@ class HDCustomer(Document):
             {
                 "label": "Name",
                 "key": "name",
-                "width": "30rem",
+                "width": "17rem",
                 "type": "Data",
             },
             {
                 "label": "Domain",
                 "key": "domain",
-                "width": "30rem",
+                "width": "24rem",
                 "type": "Data",
             },
             {
                 "label": "Created On",
                 "key": "creation",
-                "width": "20rem",
+                "width": "8rem",
                 "type": "Datetime",
             },
         ]

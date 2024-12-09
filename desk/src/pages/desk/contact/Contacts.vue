@@ -39,9 +39,8 @@
 <script setup lang="ts">
 import { computed, ref, h } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
-import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import { ListViewBuilder, LayoutHeader } from "@/components";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
-import LayoutHeader from "@/components/LayoutHeader.vue";
 import ContactDialog from "./ContactDialog.vue";
 import { createToast } from "@/utils";
 import { PhoneIcon } from "@/components/icons";
@@ -55,7 +54,7 @@ const options = computed(() => {
   return {
     doctype: "Contact",
     columnConfig: {
-      name: {
+      full_name: {
         prefix: ({ row }) => {
           return h(Avatar, {
             shape: "circle",
