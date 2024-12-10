@@ -115,6 +115,7 @@ import {
   TextEditor,
   Tooltip,
   call,
+  usePageMeta,
 } from "frappe-ui";
 import { CannedResponseModal } from "@/components/canned-response/";
 import { LayoutHeader } from "@/components";
@@ -153,4 +154,10 @@ async function deleteItem(name) {
   });
   cannedResponses.reload();
 }
+
+usePageMeta(() => {
+  return {
+    title: "Canned Responses",
+  };
+});
 </script>

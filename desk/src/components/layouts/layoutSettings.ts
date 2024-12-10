@@ -3,7 +3,7 @@ import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideUser from "~icons/lucide/user";
-import LucideUserCircle2 from "~icons/lucide/user-circle-2";
+import { OrganizationsIcon } from "../icons";
 import LucideUsers from "~icons/lucide/users";
 import {
   AGENT_PORTAL_AGENT_LIST,
@@ -41,7 +41,7 @@ export const agentPortalSidebarOptions = [
   },
   {
     label: "Customers",
-    icon: LucideUserCircle2,
+    icon: OrganizationsIcon,
     to: AGENT_PORTAL_CUSTOMER_LIST,
   },
   {
