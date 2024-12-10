@@ -28,9 +28,7 @@
   "column_break_zxek",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
-  "feedback_section",
   "is_feedback_mandatory",
-  "section_break_duow",
   "auto_update_status",
   "workflow_tab",
   "skip_email_workflow",
@@ -289,19 +287,14 @@
   },
   {
    "fieldname": "ticket_restrictions_section",
-   "fieldtype": "Section Break",
-   "label": "Ticket Restrictions"
+   "fieldtype": "Section Break"
   },
   {
    "default": "0",
-   "description": "If enabled, anyone will be able to create tickets (without any permission). \nUseful in cases where you wants users to create tickets via webforms or some external APIs without authentication.",
+   "description": "If enabled, anyone will be able to create tickets (without any permission). ",
    "fieldname": "allow_anyone_to_create_tickets",
    "fieldtype": "Check",
    "label": "Allow anyone to create tickets"
-  },
-  {
-   "fieldname": "section_break_duow",
-   "fieldtype": "Section Break"
   },
   {
    "default": "1",
@@ -311,13 +304,8 @@
    "label": "Auto Update Status"
   },
   {
-   "fieldname": "feedback_section",
-   "fieldtype": "Section Break",
-   "label": "Feedback"
-  },
-  {
    "default": "1",
-   "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \nNote: User can't close a ticket without giving a feedback.",
+   "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n",
    "fieldname": "is_feedback_mandatory",
    "fieldtype": "Check",
    "label": "Make Feedback Mandatory"
@@ -325,7 +313,7 @@
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-11-22 19:47:41.543679",
+ "modified": "2024-12-10 14:38:51.619169",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
