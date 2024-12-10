@@ -22,7 +22,7 @@
         },
       }"
       @row-click="handleRowClick"
-      @emptyStateAction="showNewDialog = true"
+      @empty-state-action="showNewDialog = true"
     />
     <Dialog
       v-model="showNewDialog"

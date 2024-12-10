@@ -21,7 +21,7 @@
       ref="listViewRef"
       :options="options"
       @row-click="openCustomer"
-      @emptyStateAction="isDialogVisible = true"
+      @empty-state-action="isDialogVisible = true"
     />
     <NewCustomerDialog
       v-model="isDialogVisible"

@@ -20,7 +20,7 @@
 
     <ListViewBuilder
       :options="options"
-      @emptyStateAction="isDialogVisible = true"
+      @empty-state-action="isDialogVisible = true"
     />
     <AddNewAgentsDialog
       :show="isDialogVisible"
