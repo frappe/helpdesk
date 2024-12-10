@@ -37,6 +37,8 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 - **Assignment Rules**: Custom auto-assignment of tickets based on priority, issue type, or workload.
 
+- **Email Account Setup**: Set up email accounts to automatically create tickets from incoming emails. Choose from various Mail providers like Frappe Mail, Gmail, Outlook, Sendgrid, Sparkpost, Yahoo, Yandex, etc.
+
 - **Canned Responses**: Pre-written replies for common queries to ensure quick and consistent communication.
 
 - **Knowledge Base**: Learn how to create and manage help articles to empower users and reduce tickets.
