@@ -14,8 +14,8 @@ class HDTeam(Document):
     def rename_self(self, new_name: str):
         self.rename(new_name)
 
-    # nosemgrep: frappe-semgrep-rules.rules.frappe-modifying-but-not-comitting-other-method
     def after_insert(self):
+        # nosemgrep
         self.create_assignment_rule()
         assignment_rule_doc = frappe.get_doc("Assignment Rule", self.assignment_rule)
 
@@ -162,3 +162,34 @@ class HDTeam(Document):
             if total_users_in_assignment_rule == 0:
                 assignment_rule_doc.disabled = True
                 assignment_rule_doc.save()
+
+    @staticmethod
+    def default_list_data():
+        columns = [
+            {
+                "label": "Name",
+                "key": "name",
+                "width": "17rem",
+                "type": "Data",
+            },
+            {
+                "label": "Assignment rule",
+                "key": "assignment_rule",
+                "width": "24rem",
+                "type": "Data",
+            },
+            {
+                "label": "Created On",
+                "key": "creation",
+                "width": "8rem",
+                "type": "Datetime",
+            },
+        ]
+        rows = [
+            "name",
+            "assignment_rule",
+            "ignore_restrictions",
+            "modified",
+            "creation",
+        ]
+        return {"columns": columns, "rows": rows}

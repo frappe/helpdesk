@@ -180,22 +180,22 @@ const routes = [
       {
         path: "customers",
         name: AGENT_PORTAL_CUSTOMER_LIST,
-        component: () => import("@/pages/desk/customer/CustomerList.vue"),
+        component: () => import("@/pages/desk/customer/Customers.vue"),
       },
       {
         path: "contacts",
         name: AGENT_PORTAL_CONTACT_LIST,
-        component: () => import("@/pages/desk/contact/ContactList.vue"),
+        component: () => import("@/pages/desk/contact/Contacts.vue"),
       },
       {
         path: "agents",
         name: AGENT_PORTAL_AGENT_LIST,
-        component: () => import("@/pages/desk/agent/AgentList.vue"),
+        component: () => import("@/pages/desk/agent/Agents.vue"),
       },
       {
         path: "teams",
         name: AGENT_PORTAL_TEAM_LIST,
-        component: () => import("@/pages/desk/team/TeamList.vue"),
+        component: () => import("@/pages/desk/team/Teams.vue"),
       },
       {
         path: "teams/:teamId",

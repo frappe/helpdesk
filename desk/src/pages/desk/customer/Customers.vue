@@ -17,19 +17,12 @@
         </Button>
       </template>
     </LayoutHeader>
-    <ListView
-      :columns="columns"
-      :resource="customers"
-      class="mt-2.5"
-      doctype="HD Customer"
-    >
-      <template #name="{ data }">
-        <div class="flex items-center gap-2">
-          <Avatar :label="data.name" :image="data.image" size="sm" />
-          <div class="line-clamp-1">{{ data.name }}</div>
-        </div>
-      </template>
-    </ListView>
+    <ListViewBuilder
+      ref="listViewRef"
+      :options="options"
+      @row-click="openCustomer"
+      @empty-state-action="isDialogVisible = true"
+    />
     <NewCustomerDialog
       v-model="isDialogVisible"
       @customer-created="handleCustomer"
@@ -44,48 +37,19 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed, h } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
-import { createListManager } from "@/composables/listManager";
 import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
-import { ListView } from "@/components";
 import CustomerDialog from "./CustomerDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import PhoneIcon from "@/components/icons/PhoneIcon.vue";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
 const selectedCustomer = ref(null);
+const listViewRef = ref(null);
 // const emptyMessage = "No Customers Found";
-const columns = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Domain",
-    key: "domain",
-    width: "w-80",
-  },
-];
-
-const customers = createListManager({
-  doctype: "HD Customer",
-  fields: ["name", "image", "domain"],
-  auto: true,
-  transform: (data) => {
-    for (const d of data) {
-      d.onClick = () => openCustomer(d.name);
-    }
-    return data;
-  },
-});
-
-usePageMeta(() => {
-  return {
-    title: "Customers",
-  };
-});
 
 function openCustomer(id: string) {
   selectedCustomer.value = id;
@@ -95,6 +59,33 @@ function handleCustomer(updated = false) {
   updated
     ? (isCustomerDialogVisible.value = false)
     : (isDialogVisible.value = false);
-  customers.reload();
+  listViewRef.value?.reload();
 }
+
+const options = computed(() => {
+  return {
+    doctype: "HD Customer",
+    columnConfig: {
+      name: {
+        prefix: ({ row }) => {
+          return h(Avatar, {
+            shape: "circle",
+            image: row.image,
+            label: row.name,
+            size: "sm",
+          });
+        },
+      },
+    },
+    emptyState: {
+      title: "No Customers Found",
+    },
+  };
+});
+
+usePageMeta(() => {
+  return {
+    title: "Customers",
+  };
+});
 </script>

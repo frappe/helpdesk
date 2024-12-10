@@ -17,19 +17,12 @@
         </Button>
       </template>
     </LayoutHeader>
-    <ListView
-      :columns="columns"
-      :resource="contacts"
-      class="mt-2.5"
-      doctype="Contact"
-    >
-      <template #name="{ data }">
-        <div class="flex items-center gap-2">
-          <Avatar :label="data.name" :image="data.image" size="sm" />
-          <div class="line-clamp-1">{{ data.name }}</div>
-        </div>
-      </template>
-    </ListView>
+    <ListViewBuilder
+      ref="listViewRef"
+      :options="options"
+      @row-click="openContact"
+      @empty-state-action="isDialogVisible = true"
+    />
     <NewContactDialog
       v-model="isDialogVisible"
       @contact-created="handleContactCreated"
@@ -44,59 +37,46 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref, h } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
-import { createListManager } from "@/composables/listManager";
+import { ListViewBuilder, LayoutHeader } from "@/components";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
-import LayoutHeader from "@/components/LayoutHeader.vue";
-import { ListView } from "@/components";
 import ContactDialog from "./ContactDialog.vue";
 import { createToast } from "@/utils";
-import { Column } from "@/types";
+import { PhoneIcon } from "@/components/icons";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
 
-const columns: Column[] = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Email",
-    key: "email_id",
-    width: "w-80",
-  },
-  {
-    label: "Phone",
-    key: "phone",
-    width: "w-80",
-  },
-];
-
-const contacts = createListManager({
-  doctype: "Contact",
-  fields: ["name", "email_id", "image", "phone"],
-  auto: true,
-  transform: (data) => {
-    for (const d of data) {
-      d.onClick = () => openContact(d.name);
-    }
-    return data;
-  },
-});
-
-usePageMeta(() => {
+const listViewRef = ref(null);
+const options = computed(() => {
   return {
-    title: "Contacts",
+    doctype: "Contact",
+    columnConfig: {
+      full_name: {
+        prefix: ({ row }) => {
+          return h(Avatar, {
+            shape: "circle",
+            image: row.image,
+            label: row.name,
+            size: "sm",
+          });
+        },
+      },
+      mobile_no: {
+        prefix: PhoneIcon,
+      },
+    },
+    emptyState: {
+      title: "No Contacts Found",
+    },
   };
 });
 
 function handleContactCreated(): void {
   isDialogVisible.value = false;
-  contacts.reload();
+  listViewRef.value?.reload();
 }
 
 function openContact(id: string): void {
@@ -111,6 +91,11 @@ function handleContactUpdated(): void {
     iconClasses: "text-green-500",
   });
   isContactDialogVisible.value = !isContactDialogVisible.value;
-  contacts.reload();
+  listViewRef.value?.reload();
 }
+usePageMeta(() => {
+  return {
+    title: "Contacts",
+  };
+});
 </script>

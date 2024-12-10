@@ -42,7 +42,7 @@ doc_events = {
         "before_insert": "helpdesk.helpdesk.hooks.contact.before_insert",
     },
     "Assignment Rule": {
-        "on_trash": "helpdesk.overrides.on_assignment_rule_trash",
+        "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
     },
 }
 
@@ -52,6 +52,13 @@ has_permission = {
 
 permission_query_conditions = {
     "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+}
+
+# DocType Class
+# ---------------
+# Override standard doctype classes
+override_doctype_class = {
+    "Contact": "helpdesk.overrides.contact.CustomContact",
 }
 
 ignore_links_on_delete = [
