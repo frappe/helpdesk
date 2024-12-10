@@ -148,7 +148,7 @@ To setup the repository locally follow the steps mentioned below:
 - [Telegram Public Group](https://t.me/frappedesk)
 - [Discuss Forum](https://discuss.frappe.io/c/frappehelpdesk/69)
 - [Documentation](https://docs.frappe.io/helpdesk)
-- [YouTube](https://frappe.io)
+- [YouTube]([https://frappe.io](https://www.youtube.com/@frappetech))
 
 <h2></h2>
 <div align="center" style="padding-top: 0.75rem;">
