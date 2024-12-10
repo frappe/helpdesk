@@ -27,8 +27,6 @@ Frappe Helpdesk is an 100% open-source Ticket Management tool which helps you  s
 
 
 ## Motivation
-Building custom apps or creating structured data has been very easy with Frappe Framework. However, extracting information from these apps was not a very good experience. Users needed to know how to write SQL queries to create reports to gain valuable information from the data. So I wanted to improve the experience of building these reports and dashboards for everyone in our team.
-
 Managing issues from our customers was a big challenge for us. We were using the ERPNext support module which was not very good in UI and the UX was also not good. We wanted to have a tool that can be easily integrated with our existing system and can be customized as per our needs. So we decided to build a Helpdesk tool that can be easily integrated with our existing system and can be customized as per our needs.
 
 ## Key Features
