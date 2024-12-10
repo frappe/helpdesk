@@ -1,20 +1,24 @@
 <template>
   <!-- View Controls -->
-  <div
+  <FadedScrollableDiv
     class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
     v-if="showViewControls"
+    orientation="horizontal"
   >
-    <QuickFilters />
-    <div class="flex items-center gap-2">
-      <Button label="Refresh" @click="reload()" :loading="list.loading">
-        <template #icon>
-          <RefreshIcon class="h-4 w-4" />
-        </template>
-      </Button>
+    <QuickFilters v-if="!isMobileView" />
+    <div class="flex items-center gap-2" v-if="!isMobileView">
+      <Reload @click="reload" :loding="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
-      <SortBy :hide-label="false" />
+      <SortBy :hide-label="isMobileView" />
     </div>
-  </div>
+    <div v-else class="flex justify-between items-center w-full">
+      <Filter :default_filters="defaultParams.filters" />
+      <div class="flex items-center gap-2">
+        <Reload @click="reload" :loding="list.loading" />
+        <SortBy :hide-label="isMobileView" />
+      </div>
+    </div>
+  </FadedScrollableDiv>
 
   <!-- List View -->
   <slot v-bind="{ list }">
@@ -104,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed, h } from "vue";
+import { reactive, provide, computed } from "vue";
 import {
   createResource,
   ListView,
@@ -117,7 +121,9 @@ import {
 } from "frappe-ui";
 import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
 import { dayjs } from "@/dayjs";
-import PhoneIcon from "./icons/PhoneIcon.vue";
+import FadedScrollableDiv from "./FadedScrollableDiv.vue";
+import Reload from "./view-controls/Reload.vue";
+import { useScreenSize } from "@/composables/screen";
 
 interface P {
   options: {
@@ -139,7 +145,7 @@ interface E {
 const props = defineProps<P>();
 
 const emit = defineEmits<E>();
-
+const { isMobileView } = useScreenSize();
 const defaultEmptyState = {
   icon: "",
   title: "No Data Found",

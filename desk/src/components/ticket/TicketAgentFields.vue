@@ -70,8 +70,6 @@ const props = defineProps({
   },
 });
 
-debugger;
-
 const options = computed(() => {
   return [
     {
