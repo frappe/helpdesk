@@ -20,3 +20,4 @@ export { default as AscendingIcon } from "./AscendingIcon.vue";
 export { default as DescendingIcon } from "./DescendingIcon.vue";
 export { default as SortIcon } from "./SortIcon.vue";
 export { default as DragIcon } from "./DragIcon.vue";
+export { default as OrganizationsIcon } from "./OrganizationsIcon.vue";

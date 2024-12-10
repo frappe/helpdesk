@@ -262,7 +262,7 @@ def get_quick_filters(doctype: str):
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
-    name_filter = {"label": "ID", "value": "", "name": "name"}
+    name_filter = {"label": "ID", "name": "name", "type": "Data"}
 
     if doctype == "Contact":
         quick_filters.append(name_filter)
