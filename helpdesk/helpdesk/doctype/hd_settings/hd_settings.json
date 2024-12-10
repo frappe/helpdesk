@@ -301,19 +301,19 @@
    "description": "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n",
    "fieldname": "auto_update_status",
    "fieldtype": "Check",
-   "label": "Auto Update Status"
+   "label": "Auto update status"
   },
   {
    "default": "1",
    "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n",
    "fieldname": "is_feedback_mandatory",
    "fieldtype": "Check",
-   "label": "Make Feedback Mandatory"
+   "label": "Make feedback mandatory"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-12-10 14:38:51.619169",
+ "modified": "2024-12-10 14:46:08.764944",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
