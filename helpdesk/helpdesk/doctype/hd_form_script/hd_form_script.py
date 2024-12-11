@@ -21,7 +21,7 @@ def get_form_script(dt, apply_to="Form", is_customer_portal=False):
         .where(FormScript.apply_to_customer_portal == is_customer_portal)
     )
 
-    doc = query.run(as_dict=True, debug=True)
+    doc = query.run(as_dict=True)
     if doc:
         return [d.script for d in doc] if len(doc) > 1 else doc[0].script
     else:
