@@ -5,8 +5,6 @@ import { useUserStore } from "@/stores/user";
 import { useScreenSize } from "@/composables/screen";
 const { isMobileView } = useScreenSize();
 
-export const ONBOARDING_PAGE = "Setup";
-
 export const CUSTOMER_PORTAL_NEW_TICKET = "TicketNew";
 export const CUSTOMER_PORTAL_TICKET = "TicketCustomer";
 
@@ -217,11 +215,6 @@ const routes = [
     ],
   },
   // Additonal routes
-  {
-    path: "/onboarding",
-    name: ONBOARDING_PAGE,
-    component: () => import("@/pages/onboarding/SimpleOnboarding.vue"),
-  },
   {
     path: "/:pathMatch(.*)*",
     name: "Invalid Page",

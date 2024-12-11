@@ -11,9 +11,6 @@ export const useConfigStore = defineStore("config", () => {
 
   const config = computed(() => configRes.data || {});
   const brandLogo = computed(() => config.value.brand_logo);
-  const isSetupComplete: ComputedRef<boolean> = computed(
-    () => !!parseInt(config.value.setup_complete)
-  );
   const skipEmailWorkflow: ComputedRef<boolean> = computed(
     () => !!parseInt(config.value.skip_email_workflow)
   );
@@ -30,7 +27,6 @@ export const useConfigStore = defineStore("config", () => {
     brandLogo,
     config,
     preferKnowledgeBase,
-    isSetupComplete,
     skipEmailWorkflow,
     isFeedbackMandatory,
   };
