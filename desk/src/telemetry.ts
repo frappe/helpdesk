@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { call, createResource } from "frappe-ui";
+import { createResource } from "frappe-ui";
 import "../../../frappe/frappe/public/js/lib/posthog.js";
 
 const APP = "helpdesk";
@@ -25,9 +25,10 @@ const telemetry = ref({
   host: "",
 });
 
+let posthog: typeof window.posthog = window.posthog;
+
 let posthogSettings = createResource({
   url: "helpdesk.api.telemetry.get_posthog_settings",
-  auto: true,
   cache: "posthog_settings",
   onSuccess: (ps: PosthogSettings) => init(ps),
 });
@@ -44,28 +45,24 @@ function isTelemetryEnabled() {
 
 export async function init(ps: PosthogSettings) {
   if (!isTelemetryEnabled()) return;
-  try {
-    window.posthog.init(ps.posthog_project_id, {
-      api_host: ps.posthog_host,
-      autocapture: false,
-      person_profiles: "identified_only",
-      capture_pageview: true,
-      capture_pageleave: true,
-      disable_session_recording: false,
-      session_recording: {
-        maskAllInputs: false,
-        maskInputOptions: {
-          password: true,
-        },
+  posthog.init(ps.posthog_project_id, {
+    api_host: ps.posthog_host,
+    autocapture: false,
+    person_profiles: "identified_only",
+    capture_pageview: true,
+    capture_pageleave: true,
+    disable_session_recording: false,
+    session_recording: {
+      maskAllInputs: false,
+      maskInputOptions: {
+        password: true,
       },
-      loaded: (posthog) => {
-        window.posthog = posthog;
-        window.posthog.identify(SITENAME);
-      },
-    });
-  } catch (e) {
-    console.trace("Failed to initialize telemetry", e);
-  }
+    },
+    loaded: (ph: typeof posthog) => {
+      window.posthog = ph;
+      ph.identify(SITENAME);
+    },
+  });
 }
 
 interface CaptureOptions {
@@ -99,4 +96,9 @@ export function stopSession() {
   ) {
     window.posthog.stopSessionRecording();
   }
+}
+
+export function posthogPlugin(app: any) {
+  app.config.globalProperties.posthog = window.posthog;
+  if (!window.posthog?.length) posthogSettings.fetch();
 }
