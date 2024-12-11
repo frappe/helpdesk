@@ -91,20 +91,11 @@
     />
   </div>
   <!-- Empty State -->
-  <div v-else class="flex h-full items-center justify-center">
-    <div
-      class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4"
-    >
-      <!-- Icon -->
-      <component :is="emptyState.icon" class="h-10 w-10" />
-      <!-- title -->
-      <span>{{ emptyState.title || "No Data Found" }}</span>
-      <!-- Button which emits Empty State Action -->
-      <Button label="Create" @click="emit('emptyStateAction')" variant="subtle">
-        <template #prefix><FeatherIcon name="plus" class="h-4" /></template>
-      </Button>
-    </div>
-  </div>
+  <EmptyState
+    v-else
+    :title="emptyState.title"
+    @emptyStateAction="emit('emptyStateAction')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -124,6 +115,7 @@ import { dayjs } from "@/dayjs";
 import FadedScrollableDiv from "./FadedScrollableDiv.vue";
 import Reload from "./view-controls/Reload.vue";
 import { useScreenSize } from "@/composables/screen";
+import EmptyState from "./EmptyState.vue";
 
 interface P {
   options: {

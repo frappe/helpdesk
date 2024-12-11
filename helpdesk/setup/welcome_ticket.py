@@ -1,8 +1,8 @@
 import frappe
 from frappe.desk.form.assign_to import add as add_assign
 
-AUTHOR_EMAIl = "ritvik@frappe.io"
-AUTHOR_NAME = "Ritvik Sardana"
+AUTHOR_EMAIl = "john@example.com"
+AUTHOR_NAME = "John Doe"
 CONTENT = """
 <p>
 Hi 👋
@@ -13,8 +13,8 @@ to communicate and serve customers well.
 You can get started right away by setting up a support email. This will help you see what
 your support will look like with Helpdesk!
 <br><br>
-If you face any issues, please reach out to us via <a href="https://frappedesk.com/helpdesk">
-https://frappedesk.com/helpdesk</a>
+If you face any issues, please reach out to us via <a href="https://support.frappe.io/helpdesk">
+https://support.frappe.io/helpdesk</a>
 <br><br>
 Best,
 <br>
@@ -38,7 +38,6 @@ def create_ticket():
     d.contact = AUTHOR_NAME
     d.via_customer_portal = True
     d.insert()
-    d.create_communication_via_contact(d.description)
     add_assign(
         {
             "doctype": "HD Ticket",
