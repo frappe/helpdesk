@@ -10,18 +10,19 @@
           theme="gray"
           variant="solid"
           @click="showNewDialog = !showNewDialog"
-        >
-          <template #prefix>
-            <IconPlus class="h-4 w-4" />
-          </template>
-        </Button>
+          iconLeft="plus"
+        />
       </template>
     </LayoutHeader>
-    <ListView
-      :columns="columns"
-      :resource="teams"
-      class="mt-2.5"
-      doctype="HD Team"
+    <ListViewBuilder
+      :options="{
+        doctype: 'HD Team',
+        emptyState: {
+          title: emptyMessage,
+        },
+      }"
+      @row-click="handleRowClick"
+      @empty-state-action="showNewDialog = true"
     />
     <Dialog
       v-model="showNewDialog"
@@ -54,46 +55,15 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { createResource, usePageMeta, Dialog, FormControl } from "frappe-ui";
 import { isEmpty } from "lodash";
-import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
-import { createListManager } from "@/composables/listManager";
-import { useError } from "@/composables/error";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import { ListView } from "@/components";
-import IconPlus from "~icons/lucide/plus";
+import ListViewBuilder from "@/components/ListViewBuilder.vue";
+import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
+import { useError } from "@/composables/error";
 
 const router = useRouter();
 const showNewDialog = ref(false);
 const newTeamTitle = ref(null);
 const emptyMessage = "No Teams Found";
-const columns = [
-  {
-    label: "Name",
-    key: "name",
-    width: "w-80",
-  },
-  {
-    label: "Assignment rule",
-    key: "assignment_rule",
-    width: "w-80",
-  },
-];
-
-const teams = createListManager({
-  doctype: "HD Team",
-  fields: ["name", "assignment_rule"],
-  auto: true,
-  transform: (data) => {
-    for (const d of data) {
-      d.onClick = {
-        name: AGENT_PORTAL_TEAM_SINGLE,
-        params: {
-          teamId: d.name,
-        },
-      };
-    }
-    return data;
-  },
-});
 
 const newTeam = createResource({
   url: "frappe.client.insert",
@@ -125,4 +95,20 @@ usePageMeta(() => {
     title: "Teams",
   };
 });
+
+function handleRowClick(rowID: string) {
+  router.push({
+    name: AGENT_PORTAL_TEAM_SINGLE,
+    params: {
+      teamId: rowID,
+    },
+  });
+}
+
+// onClick = {
+//         name: AGENT_PORTAL_TEAM_SINGLE,
+//         params: {
+//           teamId: d.name,
+//         },
+//       };
 </script>

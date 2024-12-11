@@ -31,7 +31,6 @@ onMounted(async () => {
       iconClasses: "stroke-red-600",
     });
   });
-  await initTelemetry();
 });
 
 onUnmounted(() => {

@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.model import no_value_fields
 from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
@@ -157,7 +158,11 @@ def get_list_data(
     # flake8: noqa
     if is_default:
         if hasattr(list, "default_list_data"):
-            columns = list.default_list_data(show_customer_portal_fields).get("columns")
+            columns = (
+                list.default_list_data(show_customer_portal_fields).get("columns")
+                if doctype == "HD Ticket"
+                else list.default_list_data().get("columns")
+            )
             rows = list.default_list_data().get("rows")
 
     # check if rows has all keys from columns if not add them
@@ -250,6 +255,40 @@ def sort_options(doctype: str, show_customer_portal_fields=False):
     fields.extend(standard_fields)
 
     return fields
+
+
+@frappe.whitelist()
+def get_quick_filters(doctype: str):
+    meta = frappe.get_meta(doctype)
+    fields = [field for field in meta.fields if field.in_standard_filter]
+    quick_filters = []
+    name_filter = {"label": "ID", "name": "name", "type": "Data"}
+
+    if doctype == "Contact":
+        quick_filters.append(name_filter)
+        return quick_filters
+
+    if doctype == "HD Agent" or doctype == "HD Customer":
+        quick_filters.append(name_filter)
+
+    for field in fields:
+        if field.fieldtype == "Select":
+            field.options = field.options.split("\n")
+            field.options = [
+                {"label": option, "value": option} for option in field.options
+            ]
+            field.options.insert(0, {"label": "", "value": ""})
+
+        quick_filters.append(
+            {
+                "label": _(field.label),
+                "name": field.fieldname,
+                "type": field.fieldtype,
+                "options": field.options,
+            }
+        )
+
+    return quick_filters
 
 
 def get_customer_portal_fields(doctype, fields):
