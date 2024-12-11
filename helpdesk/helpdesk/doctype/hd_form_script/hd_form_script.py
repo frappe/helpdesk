@@ -9,7 +9,7 @@ class HDFormScript(Document):
     pass
 
 
-def get_form_script(dt, apply_to="Form"):
+def get_form_script(dt, apply_to="Form",is_customer_portal=False):
     """Returns the form script for the given doctype"""
     FormScript = frappe.qb.DocType("HD Form Script")
     query = (
@@ -18,9 +18,10 @@ def get_form_script(dt, apply_to="Form"):
         .where(FormScript.dt == dt)
         .where(FormScript.apply_to == apply_to)
         .where(FormScript.enabled == 1)
+        .where(FormScript.apply_to_customer_portal == is_customer_portal)
     )
 
-    doc = query.run(as_dict=True)
+    doc = query.run(as_dict=True,debug=True)
     if doc:
         return [d.script for d in doc] if len(doc) > 1 else doc[0].script
     else:
