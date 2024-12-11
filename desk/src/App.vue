@@ -1,5 +1,5 @@
 <template>
-  <RouterView class="antialiased" />
+  <RouterView class="antialiased" :key="$route.fullPath" />
   <Toasts />
   <KeymapDialog />
   <Dialogs />
@@ -11,7 +11,7 @@ import { Toasts } from "frappe-ui";
 import { createToast } from "@/utils";
 import { useConfigStore } from "@/stores/config";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
-import { init as initTelemetry, stopSession } from "@/telemetry";
+import { stopSession } from "@/telemetry";
 import { Dialogs } from "frappe-ui";
 useConfigStore();
 
