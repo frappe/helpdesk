@@ -66,7 +66,7 @@
         <Button appearance="secondary" class="mr-2" @click="close()"
           >Cancel</Button
         >
-        <div class="grow">
+        <div class="grow mt-2">
           <Button
             @click="removeAllEmailFromQueue()"
             v-if="inviteQueue.length > 1"

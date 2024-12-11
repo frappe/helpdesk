@@ -9,7 +9,7 @@ import { computed, defineAsyncComponent, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
-import { CUSTOMER_PORTAL_LANDING, ONBOARDING_PAGE } from "@/router";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 
 import { useScreenSize } from "@/composables/screen";
 const router = useRouter();
@@ -36,10 +36,6 @@ const Layout = computed(() => {
 onBeforeMount(() => {
   if (!authStore.hasDeskAccess) {
     router.replace({ name: CUSTOMER_PORTAL_LANDING });
-  }
-
-  if (!configStore.isSetupComplete) {
-    router.replace({ name: ONBOARDING_PAGE });
   }
 });
 </script>

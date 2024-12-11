@@ -347,6 +347,10 @@ const insertRes = createResource({
       params: {
         articleId: data.name,
       },
+      query: {
+        category: categoryId.value,
+        subCategory: subCategoryId.value,
+      },
     });
   },
   onError: useError({ title: "Error creating article" }),
