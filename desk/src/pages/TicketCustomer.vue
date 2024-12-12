@@ -5,6 +5,10 @@
         <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header>
+        <CustomActions
+          v-if="ticket.data._customActions"
+          :actions="ticket.data._customActions"
+        />
         <Button
           v-if="ticket.data.status !== 'Closed'"
           label="Close"
@@ -73,6 +77,7 @@ import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue
 import { useScreenSize } from "@/composables/screen";
 import { useConfigStore } from "@/stores/config";
 import { confirmDialog } from "frappe-ui";
+import { setupCustomActions } from "@/utils";
 interface P {
   ticketId: string;
 }
@@ -85,6 +90,7 @@ const ticket = createResource({
   auto: true,
   params: {
     name: props.ticketId,
+    is_customer_portal: true,
   },
   onError: () => {
     createToast({
@@ -93,6 +99,12 @@ const ticket = createResource({
       iconClasses: "text-red-600",
     });
     router.replace("/my-tickets");
+  },
+  onSuccess: (data) => {
+    setupCustomActions(data, {
+      doc: data,
+      updateField,
+    });
   },
 });
 provide(ITicket, ticket);
@@ -124,6 +136,44 @@ const send = createResource({
     ticket.reload();
   },
 });
+
+function updateField(name, value, callback = () => {}) {
+  updateTicket(name, value);
+  callback();
+}
+
+function updateTicket(fieldname: string, value: string) {
+  createResource({
+    url: "frappe.client.set_value",
+    params: {
+      doctype: "HD Ticket",
+      name: props.ticketId,
+      fieldname,
+      value,
+    },
+    auto: true,
+    onSuccess: () => {
+      ticket.reload();
+      createToast({
+        title: "Ticket updated",
+        icon: "check",
+        iconClasses: "text-green-600",
+      });
+    },
+    onError: (e) => {
+      const title =
+        e.messages && e.messages.length > 0
+          ? e.messages[0]
+          : "Failed to update ticket";
+
+      createToast({
+        title,
+        icon: "x",
+        iconClasses: "text-red-600",
+      });
+    },
+  });
+}
 
 function handleClose() {
   if (showFeedback.value) {

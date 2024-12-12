@@ -202,9 +202,14 @@ const ticket = createResource({
   onSuccess: (data) => {
     setupCustomActions(data, {
       doc: data,
+      updateField,
     });
   },
 });
+function updateField(name, value, callback = () => {}) {
+  updateTicket(name, value);
+  callback();
+}
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
