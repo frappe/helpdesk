@@ -7,6 +7,7 @@
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
 [![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
+[![unittests](https://github.com/frappe/builder/actions/workflows/server-tests.yml/badge.svg)](https://github.com/frappe/helpdesk/actions/workflows/server-tests.yml)
 
 </div>
 
