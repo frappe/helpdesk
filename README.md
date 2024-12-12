@@ -12,7 +12,7 @@
 
 
 <div align="center">
-	<img src="./screenshot.webp" alt="Hero Image" width="72%" />
+	<img src="./.github/Hero.png" alt="Hero Image" width="72%" />
 </div>
 <br />
 <div align="center">
