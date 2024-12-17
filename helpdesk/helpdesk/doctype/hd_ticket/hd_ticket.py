@@ -571,6 +571,8 @@ class HDTicket(Document):
             file_doc.attached_to_name = communication.name
             file_doc.attached_to_doctype = "Communication"
             file_doc.save(ignore_permissions=True)
+            self.attach_ticket_with_file(file_doc.content_hash, file_doc.file_url)
+
             _attachments.append({"file_url": file_doc.file_url})
 
         reply_to_email = sender_email.email_id
@@ -752,6 +754,14 @@ class HDTicket(Document):
         self.description = self.description or c.content
         # Save the ticket, allowing for hooks to run.
         self.save()
+
+    def attach_ticket_with_file(self, content_hash, file_url):
+        file_doc = frappe.new_doc("File")
+        file_doc.attached_to_name = self.name
+        file_doc.attached_to_doctype = "HD Ticket"
+        file_doc.content_hash = content_hash
+        file_doc.file_url = file_url
+        file_doc.save(ignore_permissions=True)
 
     @staticmethod
     def default_list_data(show_customer_portal_fields=False):
