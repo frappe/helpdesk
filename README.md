@@ -133,6 +133,17 @@ To setup the repository locally follow the steps mentioned below:
 1. Run `bench --site helpdesk.test install-app helpdesk`.
 1. Now open the URL `http://helpdesk.test:8000/helpdesk` in your browser, you should see the app running
 
+
+**For Frontend Development**
+1. Open a new terminal session and cd into `frappe-bench/apps/builder/desk`, and run the following commands:
+    ```
+    yarn install
+    yarn dev or yarn dev --host helpdesk.test
+    ```
+1. Now, you can access the site on vite dev server at `http://helpdesk.test:8080`
+
+**Note:** You'll find all the code related to Builder's frontend inside `frappe-bench/apps/helpdesk/desk`
+
 ## Learn and connect
 
 - [Telegram Public Group](https://t.me/frappedesk)
