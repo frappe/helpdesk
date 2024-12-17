@@ -27,10 +27,10 @@ Frappe Helpdesk is an 100% open-source Ticket Management tool which helps you  s
 
 
 
-## Motivation
+### Motivation
 Managing issues from our customers was a big challenge for us. We were using the ERPNext support module which was not very good in UI and the UX was also not good. We wanted to have a tool that can be easily integrated with our existing system and can be customized as per our needs. So we decided to build Frappe Helpdesk.
 
-## Key Features
+### Key Features
 
 - **Agent and Customer Portal Views**: Dual portals for agents and customers to simplify issue submission and management.
 
@@ -44,7 +44,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 
 
-## Under the Hood
+### Under the Hood
 
 - [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and Javascript. The framework provides a robust foundation for building web applications, including a database abstraction layer, user authentication, and a REST API.
 
@@ -141,7 +141,7 @@ To setup the repository locally follow the steps mentioned below:
 
 <h2></h2>
 <br>
-<div align="center" style="padding-top: 0.75rem;">
+<div align="center">
 	<a href="https://frappe.io" target="_blank">
 		<picture>
 			<source media="(prefers-color-scheme: dark)" srcset="https://frappe.io/files/Frappe-white.png">
