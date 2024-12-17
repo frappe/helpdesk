@@ -42,13 +42,43 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 - **Canned Responses**: Pre-written replies for common queries to ensure quick and consistent communication.
 
+<details>
+<summary>View Screenshots</summary>
+<h3></h3>
+
+![Agent List View](.github/TicketGroup1.png)
+<div align="center">
+	<sub>
+		Agent Ticket List View
+	</sub>
+</div>
+<br>
+
+**Customer Portal**
+
+![Knowledge Base](.github/KBGroup2.png)
+<div align="center">
+	<sub>
+		Upload articles and let your customer solve there queries through the Knowledge Base.
+	</sub>
+</div>
+<br>
+
+
+![Article Search](.github/KBGroup1.png)
+<div align="center">
+	<sub>
+		With advanced search, your customers will be recommended relevant articles regarding their issue.
+	</sub>
+</div>
+</details>
 
 
 ### Under the Hood
 
-- [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and Javascript. The framework provides a robust foundation for building web applications, including a database abstraction layer, user authentication, and a REST API.
+- [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and Javascript.
 
-- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface. The Frappe UI library provides a variety of components that can be used to build single-page applications on top of the Frappe Framework.
+- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface. 
 
 
 ## Production Setup
