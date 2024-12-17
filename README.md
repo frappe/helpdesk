@@ -150,7 +150,7 @@ To setup the repository locally follow the steps mentioned below:
 - [Discuss Forum](https://discuss.frappe.io/c/frappehelpdesk/69)
 - [Documentation](https://docs.frappe.io/helpdesk)
 
-<h2></h2>
+<br>
 <br>
 <div align="center">
 	<a href="https://frappe.io" target="_blank">
