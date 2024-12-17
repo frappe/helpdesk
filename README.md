@@ -42,8 +42,8 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 - **Canned Responses**: Pre-written replies for common queries to ensure quick and consistent communication.
 
-<details>
-<summary>View Screenshots</summary>
+<details open>
+<summary >View Screenshots</summary>
 <h3></h3>
 
 ![Agent List View](.github/TicketGroup1.png)
