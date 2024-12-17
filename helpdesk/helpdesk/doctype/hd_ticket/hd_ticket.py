@@ -617,6 +617,7 @@ class HDTicket(Document):
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(self, message, attachments=[]):
+
         if self.status == "Replied":
             self.status = "Open"
             log_ticket_activity(self.name, "set status to Open")
@@ -637,6 +638,7 @@ class HDTicket(Document):
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
 
+        attachments = self.get("attachments", [])
         if not len(attachments):
             return
         QBFile = frappe.qb.DocType("File")

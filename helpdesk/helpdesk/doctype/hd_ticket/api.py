@@ -15,6 +15,7 @@ from helpdesk.utils import check_permissions, get_customer, is_agent
 def new(doc, attachments=[]):
     doc["doctype"] = "HD Ticket"
     doc["via_customer_portal"] = bool(frappe.session.user)
+    doc['attachments'] = attachments
     d = frappe.get_doc(doc).insert()
     return d
 
