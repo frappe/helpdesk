@@ -639,9 +639,7 @@ class HDTicket(Document):
         c.ignore_permissions = True
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
-
-        _attachments = self.get("attachments", attachments)
-
+        _attachments = self.get("attachments") or attachments or []
         if not len(_attachments):
             return
         QBFile = frappe.qb.DocType("File")
