@@ -361,7 +361,6 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
-      ticket.reload();
       createToast({
         title: "Ticket updated",
         icon: "check",
