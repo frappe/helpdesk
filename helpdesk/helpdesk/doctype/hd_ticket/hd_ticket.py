@@ -571,7 +571,7 @@ class HDTicket(Document):
             file_doc.attached_to_name = communication.name
             file_doc.attached_to_doctype = "Communication"
             file_doc.save(ignore_permissions=True)
-            self.attach_ticket_with_file(file_doc.file_url)
+            self.attach_file_with_ticket(file_doc.file_url)
 
             _attachments.append({"file_url": file_doc.file_url})
 
@@ -653,7 +653,7 @@ class HDTicket(Document):
             "File", filters={"attached_to_name": c.name}, pluck="file_url"
         )
         for url in file_urls:
-            self.attach_ticket_with_file(url)
+            self.attach_file_with_ticket(url)
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -760,7 +760,7 @@ class HDTicket(Document):
         # Save the ticket, allowing for hooks to run.
         self.save()
 
-    def attach_ticket_with_file(self, file_url):
+    def attach_file_with_ticket(self, file_url):
         file_doc = frappe.new_doc("File")
         file_doc.attached_to_name = self.name
         file_doc.attached_to_doctype = "HD Ticket"
