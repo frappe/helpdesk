@@ -13,7 +13,7 @@
 
 
 <div align="center">
-	<img src="./.github/Hero2.png" alt="Hero Image" width="72%" />
+	<img src="./.github/Hero2.png" alt="Hero Image" width="100%" />
 </div>
 <br />
 <div align="center">
@@ -46,32 +46,28 @@ Managing issues from our customers was a big challenge for us. We were using the
 <summary >View Screenshots</summary>
 <h3></h3>
 
-![Agent List View](.github/AgentListView.png)
-<div align="center">
-	<sub>
-		Agent Ticket List View
-	</sub>
-</div>
-<br>
+<sub>
+	Agent List View
+</sub>
 
-**Customer Portal**
+![Agent List View](.github/AgentListView.png)
+
+<sub>
+	Upload articles and let your customer solve there queries through the Knowledge Base.
+</sub>
 
 ![Knowledge Base](.github/KB.png)
-<div align="center">
-	<sub>
-		Upload articles and let your customer solve there queries through the Knowledge Base.
-	</sub>
-</div>
-<br>
+
+<sub>
+	With advanced search, your customers will be recommended relevant articles regarding their issue.
+</sub>
+
+![Article Search](.github/Search2.png)
 
 
-![Article Search](.github/Search.png)
-<div align="center">
-	<sub>
-		With advanced search, your customers will be recommended relevant articles regarding their issue.
-	</sub>
-</div>
+
 </details>
+<br>
 
 
 ### Under the Hood
