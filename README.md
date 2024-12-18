@@ -46,7 +46,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 <summary >View Screenshots</summary>
 <h3></h3>
 
-![Agent List View](.github/TicketGroup1.png)
+![Agent List View](.github/AgentListView.png)
 <div align="center">
 	<sub>
 		Agent Ticket List View
@@ -56,7 +56,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 **Customer Portal**
 
-![Knowledge Base](.github/KBGroup2.png)
+![Knowledge Base](.github/KB.png)
 <div align="center">
 	<sub>
 		Upload articles and let your customer solve there queries through the Knowledge Base.
@@ -65,7 +65,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 <br>
 
 
-![Article Search](.github/KBGroup1.png)
+![Article Search](.github/Search.png)
 <div align="center">
 	<sub>
 		With advanced search, your customers will be recommended relevant articles regarding their issue.
