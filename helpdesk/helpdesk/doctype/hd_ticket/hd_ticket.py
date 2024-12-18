@@ -646,7 +646,7 @@ class HDTicket(Document):
         condition_name = [QBFile.name == i["name"] for i in _attachments]
         frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
             QBFile.attached_to_doctype, "Communication"
-        ).where(Criterion.any(condition_name)).run(debug=True)
+        ).where(Criterion.any(condition_name)).run()
 
         # attach files to ticket
         file_urls = frappe.get_all(
