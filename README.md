@@ -172,7 +172,7 @@ To setup the repository locally follow the steps mentioned below:
     ```
 1. Now, you can access the site on vite dev server at `http://helpdesk.test:8080`
 
-**Note:** You'll find all the code related to Builder's frontend inside `frappe-bench/apps/helpdesk/desk`
+**Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
 
 ## Learn and connect
 
