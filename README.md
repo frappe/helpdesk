@@ -1,13 +1,13 @@
 <div align="center" markdown="1">
 
-<img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="100"/>
+<img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="80"/>
 <h1>Frappe Helpdesk</h1>
 
 **Customer Service, Made Simple and Effective**
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
 [![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
-[![unittests](https://github.com/frappe/builder/actions/workflows/server-tests.yml/badge.svg)](https://github.com/frappe/helpdesk/actions/workflows/server-tests.yml)
+
 
 </div>
 
@@ -46,7 +46,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 <summary >View Screenshots</summary>
 <h3></h3>
 
-![Agent List View](.github/TicketGroup1.png)
+![Agent List View](.github/AgentListView.png)
 <div align="center">
 	<sub>
 		Agent Ticket List View
@@ -56,7 +56,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 **Customer Portal**
 
-![Knowledge Base](.github/KBGroup2.png)
+![Knowledge Base](.github/KB.png)
 <div align="center">
 	<sub>
 		Upload articles and let your customer solve there queries through the Knowledge Base.
@@ -65,7 +65,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 <br>
 
 
-![Article Search](.github/KBGroup1.png)
+![Article Search](.github/Search.png)
 <div align="center">
 	<sub>
 		With advanced search, your customers will be recommended relevant articles regarding their issue.
@@ -165,14 +165,14 @@ To setup the repository locally follow the steps mentioned below:
 
 
 **For Frontend Development**
-1. Open a new terminal session and cd into `frappe-bench/apps/builder/desk`, and run the following commands:
+1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
     ```
     yarn install
     yarn dev or yarn dev --host helpdesk.test
     ```
 1. Now, you can access the site on vite dev server at `http://helpdesk.test:8080`
 
-**Note:** You'll find all the code related to Builder's frontend inside `frappe-bench/apps/helpdesk/desk`
+**Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
 
 ## Learn and connect
 
