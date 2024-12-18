@@ -571,7 +571,7 @@ class HDTicket(Document):
             file_doc.attached_to_name = communication.name
             file_doc.attached_to_doctype = "Communication"
             file_doc.save(ignore_permissions=True)
-            self.attach_ticket_with_file(file_doc.content_hash, file_doc.file_url)
+            self.attach_ticket_with_file(file_doc.file_url)
 
             _attachments.append({"file_url": file_doc.file_url})
 
@@ -646,7 +646,14 @@ class HDTicket(Document):
         condition_name = [QBFile.name == i["name"] for i in _attachments]
         frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
             QBFile.attached_to_doctype, "Communication"
-        ).where(Criterion.any(condition_name)).run()
+        ).where(Criterion.any(condition_name)).run(debug=True)
+
+        # attach files to ticket
+        file_urls = frappe.get_all(
+            "File", filters={"attached_to_name": c.name}, pluck="file_url"
+        )
+        for url in file_urls:
+            self.attach_ticket_with_file(url)
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -753,11 +760,10 @@ class HDTicket(Document):
         # Save the ticket, allowing for hooks to run.
         self.save()
 
-    def attach_ticket_with_file(self, content_hash, file_url):
+    def attach_ticket_with_file(self, file_url):
         file_doc = frappe.new_doc("File")
         file_doc.attached_to_name = self.name
         file_doc.attached_to_doctype = "HD Ticket"
-        file_doc.content_hash = content_hash
         file_doc.file_url = file_url
         file_doc.save(ignore_permissions=True)
 
