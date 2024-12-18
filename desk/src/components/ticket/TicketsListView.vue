@@ -102,7 +102,7 @@
         </ListRowItem>
       </ListRow>
     </ListRows>
-    <ListSelectBanner v-if="!isCustomerPortal">
+    <ListSelectBanner>
       <template #actions="{ selections }">
         <Dropdown
           :options="[
