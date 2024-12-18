@@ -1,13 +1,13 @@
 <div align="center" markdown="1">
 
-<img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="100"/>
+<img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="80"/>
 <h1>Frappe Helpdesk</h1>
 
 **Customer Service, Made Simple and Effective**
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
 [![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
-[![unittests](https://github.com/frappe/builder/actions/workflows/server-tests.yml/badge.svg)](https://github.com/frappe/helpdesk/actions/workflows/server-tests.yml)
+
 
 </div>
 
@@ -165,7 +165,7 @@ To setup the repository locally follow the steps mentioned below:
 
 
 **For Frontend Development**
-1. Open a new terminal session and cd into `frappe-bench/apps/builder/desk`, and run the following commands:
+1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
     ```
     yarn install
     yarn dev or yarn dev --host helpdesk.test
