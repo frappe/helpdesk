@@ -46,21 +46,29 @@ Managing issues from our customers was a big challenge for us. We were using the
 <summary >View Screenshots</summary>
 <h3></h3>
 
-<sub>
-	Agent List View
-</sub>
+<div align="center">
+	<sub>
+		Agent List View
+	</sub>
+</div>
 
 ![Agent List View](.github/AgentListView.png)
 
-<sub>
-	Upload articles and let your customer solve there queries through the Knowledge Base.
-</sub>
+
+<div align="center">
+	<sub>
+		Upload articles and let your customer solve there queries through the Knowledge Base.
+	</sub>
+</div>
 
 ![Knowledge Base](.github/KB.png)
 
-<sub>
-	With advanced search, your customers will be recommended relevant articles regarding their issue.
-</sub>
+<div align="center">
+	<sub>
+		With advanced search, your customers will be recommended relevant articles regarding their issue.
+	</sub>
+</div>
+
 
 ![Article Search](.github/Search2.png)
 
