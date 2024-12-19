@@ -74,7 +74,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_ROUTES } from "@/router";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import UserMenu from "@/components/UserMenu.vue";
