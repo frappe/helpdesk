@@ -37,6 +37,14 @@
             private: true,
           }"
           @success="(f: File) => $emit('update:attachments', [...attachments, f])"
+          @failure="
+            () =>
+              createToast({
+                title: 'Error Uploading File',
+                icon: 'x',
+                iconClasses: 'text-red-600',
+              })
+          "
         >
           <template #default="{ openFileSelector }">
             <Button theme="gray" variant="ghost" @click="openFileSelector()">
@@ -85,6 +93,7 @@ import {
   UserAvatar,
 } from "@/components";
 import { File } from "@/types";
+import { createToast } from "@/utils";
 
 interface P {
   content: string;
