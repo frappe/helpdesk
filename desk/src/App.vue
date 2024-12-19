@@ -1,5 +1,5 @@
 <template>
-  <RouterView class="antialiased" :key="$route.fullPath" />
+  <RouterView class="antialiased" />
   <Toasts />
   <KeymapDialog />
   <Dialogs />

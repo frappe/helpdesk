@@ -8,7 +8,7 @@
       [bgColor]: isActive,
       [hvColor]: !isActive,
     }"
-    @click="handle"
+    @click="handleNavigation"
   >
     <span
       class="shrink-0 text-gray-700"
@@ -57,12 +57,12 @@ const props = withDefaults(defineProps<P>(), {
 });
 const router = useRouter();
 
-function handle() {
+function handleNavigation() {
   props.onClick();
-  if (props.to) {
-    router.push({
-      name: props.to,
-    });
-  }
+  if (!props.to) return;
+  if (props.to === router.currentRoute.value.name) return;
+  router.push({
+    name: props.to,
+  });
 }
 </script>
