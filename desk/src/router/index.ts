@@ -233,11 +233,9 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-  const userStore = useUserStore();
 
   if (authStore.isLoggedIn) {
     await authStore.init();
-    await userStore.users.fetch();
   }
 
   if (!authStore.isLoggedIn) {
@@ -245,4 +243,11 @@ router.beforeEach(async (to, _, next) => {
   } else {
     next();
   }
+});
+
+router.afterEach(async (to) => {
+  const isCustomerPortal = to.meta.public ?? false;
+  if (isCustomerPortal) return;
+  const userStore = useUserStore();
+  await userStore.users.fetch();
 });

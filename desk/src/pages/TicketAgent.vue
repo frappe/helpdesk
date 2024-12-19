@@ -169,7 +169,12 @@ const props = defineProps({
     required: true,
   },
 });
-
+watch(
+  () => props.ticketId,
+  () => {
+    ticket.reload();
+  }
+);
 provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
@@ -184,9 +189,9 @@ const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
   auto: true,
-  params: {
+  makeParams: () => ({
     name: props.ticketId,
-  },
+  }),
   transform: (data) => {
     if (data._assign) {
       data.assignees = JSON.parse(data._assign).map((assignee) => {
