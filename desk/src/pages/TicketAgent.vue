@@ -169,7 +169,12 @@ const props = defineProps({
     required: true,
   },
 });
-
+watch(
+  () => props.ticketId,
+  () => {
+    ticket.reload();
+  }
+);
 provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
@@ -184,9 +189,9 @@ const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
   auto: true,
-  params: {
+  makeParams: () => ({
     name: props.ticketId,
-  },
+  }),
   transform: (data) => {
     if (data._assign) {
       data.assignees = JSON.parse(data._assign).map((assignee) => {
@@ -202,9 +207,14 @@ const ticket = createResource({
   onSuccess: (data) => {
     setupCustomActions(data, {
       doc: data,
+      updateField,
     });
   },
 });
+function updateField(name, value, callback = () => {}) {
+  updateTicket(name, value);
+  callback();
+}
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
@@ -356,7 +366,6 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
-      ticket.reload();
       createToast({
         title: "Ticket updated",
         icon: "check",
