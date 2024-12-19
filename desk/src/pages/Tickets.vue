@@ -29,7 +29,7 @@
       @event:column="processColumns"
       @event:reload="apply()"
     />
-    <TicketsAgentList
+    <TicketsListView
       :rows="tickets?.data?.data || []"
       :columns="columns"
       :page-length="pageLength"
@@ -53,7 +53,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useStorage } from "@vueuse/core";
 import { createResource, Breadcrumbs, usePageMeta } from "frappe-ui";
-import { TicketsAgentList } from "@/components/ticket";
+import { TicketsListView } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
 import { useRoute } from "vue-router";
