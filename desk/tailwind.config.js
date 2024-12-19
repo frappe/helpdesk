@@ -1,6 +1,6 @@
 module.exports = {
   mode: "jit",
-  presets: [require("frappe-ui/src/utils/tailwind.config")],
+  presets: [require("frappe-ui/src/tailwind/preset")],
   content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
@@ -21,8 +21,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/line-clamp"),
-    require("@tailwindcss/typography"),
-  ],
+  plugins: [require("@tailwindcss/typography")],
 };
