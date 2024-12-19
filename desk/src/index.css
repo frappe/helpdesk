@@ -36,3 +36,8 @@
 		shadow-2xl
 	}
 }
+
+/* input tye text */
+input[type="text"] {
+	border: none;
+}
