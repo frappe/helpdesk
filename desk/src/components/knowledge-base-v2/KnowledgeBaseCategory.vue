@@ -169,7 +169,7 @@ function handleSubCategoryClick(subCategory: SubCategory) {
     },
   });
   categoryTreeResource.reload();
-  router.push({
+  router.replace({
     query: {
       category: categoryTreeResource.data.root_category.category_id,
       subCategory: subCategory.name,

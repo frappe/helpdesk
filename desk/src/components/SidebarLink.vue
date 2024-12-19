@@ -8,7 +8,7 @@
       [bgColor]: isActive,
       [hvColor]: !isActive,
     }"
-    @click="handle"
+    @click="handleNavigation"
   >
     <span
       class="shrink-0 text-gray-700"
@@ -50,19 +50,18 @@ interface P {
 
 const props = withDefaults(defineProps<P>(), {
   isActive: false,
-  onClick: () => () => true,
+  onClick: () => {},
   to: "",
   bgColor: "bg-white",
   hvColor: "hover:bg-gray-100",
 });
 const router = useRouter();
 
-function handle() {
+function handleNavigation() {
   props.onClick();
-  if (props.to) {
-    router.push({
-      name: props.to,
-    });
-  }
+  if (router.currentRoute.value.name === props.to) return;
+  router.push({
+    name: props.to,
+  });
 }
 </script>

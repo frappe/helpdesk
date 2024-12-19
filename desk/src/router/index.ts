@@ -233,16 +233,21 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-  const userStore = useUserStore();
-
   if (authStore.isLoggedIn) {
     await authStore.init();
-    await userStore.users.fetch();
   }
 
   if (!authStore.isLoggedIn) {
     window.location.href = REDIRECT_PAGE;
   } else {
     next();
+  }
+});
+
+router.afterEach(async (to) => {
+  const userStore = useUserStore();
+  const isCustomerPortal = to.meta.public ?? false;
+  if (!isCustomerPortal) {
+    await userStore.users.fetch();
   }
 });
