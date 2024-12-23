@@ -72,7 +72,7 @@
             </Tooltip>
           </div>
           <div v-else-if="column.key === 'agent_group'" class="truncate">
-            {{ item || "-" }}
+            {{ item }}
           </div>
           <div v-else-if="column.key === 'resolution_by'">
             <Badge

@@ -48,7 +48,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-07 14:03:15.382072",
+ "modified": "2024-12-23 23:02:36.015099",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Team",
@@ -90,6 +90,10 @@
    "role": "Administrator",
    "share": 1,
    "write": 1
+  },
+  {
+   "read": 1,
+   "role": "All"
   }
  ],
  "quick_entry": 1,

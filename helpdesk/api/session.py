@@ -1,8 +1,14 @@
 import frappe
+from frappe import _
+
+from helpdesk.utils import is_agent
 
 
 @frappe.whitelist()
 def get_users():
+    if not is_agent():
+        frappe.throw(_("Access denied"), exc=frappe.PermissionError)
+
     if frappe.session.user == "Guest":
         frappe.throw(frappe._("Authentication failed"), exc=frappe.AuthenticationError)
 
