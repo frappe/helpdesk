@@ -33,46 +33,6 @@ from ..hd_service_level_agreement.utils import get_sla
 
 class HDTicket(Document):
     @staticmethod
-    def get_list_select(query: Query):
-        QBTicket = frappe.qb.DocType("HD Ticket")
-        QBComment = frappe.qb.DocType("HD Ticket Comment")
-        QBCommunication = frappe.qb.DocType("Communication")
-
-        count_comment = (
-            frappe.qb.from_(QBComment)
-            .select(Count("*"))
-            .as_("count_comment")
-            .where(QBComment.reference_ticket == QBTicket.name)
-        )
-
-        count_msg_incoming = (
-            frappe.qb.from_(QBCommunication)
-            .select(Count("*"))
-            .as_("count_msg_incoming")
-            .where(QBCommunication.reference_doctype == "HD Ticket")
-            .where(QBCommunication.reference_name == QBTicket.name)
-            .where(QBCommunication.sent_or_received == "Received")
-        )
-
-        count_msg_outgoing = (
-            frappe.qb.from_(QBCommunication)
-            .select(Count("*"))
-            .as_("count_msg_outgoing")
-            .where(QBCommunication.reference_doctype == "HD Ticket")
-            .where(QBCommunication.reference_name == QBTicket.name)
-            .where(QBCommunication.sent_or_received == "Sent")
-        )
-
-        query = (
-            query.select(QBTicket.star)
-            .select(count_comment)
-            .select(count_msg_incoming)
-            .select(count_msg_outgoing)
-        )
-
-        return query
-
-    @staticmethod
     def get_list_filters(query: Query):
         _is_agent = is_agent()
         QBTeam = frappe.qb.DocType("HD Team")
