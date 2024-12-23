@@ -143,7 +143,17 @@ interface E {
   (event: "rowClick", row: any): void;
 }
 
-const props = defineProps<P>();
+const props = withDefaults(defineProps<P>(), {
+  options: () => {
+    return {
+      doctype: "",
+      hideViewControls: false,
+      selectable: true,
+    };
+  },
+});
+
+console.log(props.options.hideViewControls);
 
 const emit = defineEmits<E>();
 const { isMobileView } = useScreenSize();
@@ -213,7 +223,7 @@ function handleStatusColor(status: "Published" | "Draft"): BadgeStatus {
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   cache: ["DocField", props.options.doctype],
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
     append_assign: true,
@@ -232,7 +242,7 @@ const filterableFields = createResource({
 
 const sortableFields = createResource({
   url: "helpdesk.api.doc.sort_options",
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
   },
@@ -240,7 +250,7 @@ const sortableFields = createResource({
 
 const quickFilters = createResource({
   url: "helpdesk.api.doc.get_quick_filters",
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
   },
