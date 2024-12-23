@@ -14,18 +14,15 @@
         </Button>
       </template>
     </PageTitle>
-    <ListView
-      :columns="columns"
-      :resource="rules"
-      class="mt-2.5"
-      doctype="HD Escalation Rule"
-    >
-      <template #is_enabled="{ data }">
-        <Badge :theme="data.is_enabled ? 'green' : 'red'" variant="subtle">
-          {{ data.is_enabled ? "Enabled" : "Disabled" }}
-        </Badge>
-      </template>
-    </ListView>
+    <div class="my-2" />
+    <ListViewBuilder
+      :options="{
+        doctype: 'HD Escalation Rule',
+        hideViewControls: true,
+        selectable: false,
+      }"
+      @row-click="openDialog"
+    />
     <EscalationRuleDialog
       v-if="showDialog"
       v-model="showDialog"
@@ -41,6 +38,7 @@ import { createListManager } from "@/composables/listManager";
 import { ListView } from "@/components";
 import PageTitle from "@/components/PageTitle.vue";
 import EscalationRuleDialog from "./EscalationRuleDialog.vue";
+import ListViewBuilder from "@/components/ListViewBuilder.vue";
 
 const showDialog = ref(false);
 const selectedRule = ref(null);

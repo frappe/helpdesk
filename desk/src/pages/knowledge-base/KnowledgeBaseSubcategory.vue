@@ -146,7 +146,7 @@ const options = {
     title: "No Articles Found",
   },
   hideViewControls: true,
-  listViewSelection: false,
+  selectable: false,
 };
 
 function handleClick(id: string) {

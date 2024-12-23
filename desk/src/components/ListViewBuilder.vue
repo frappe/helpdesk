@@ -29,7 +29,7 @@
       :rows="rows"
       row-key="name"
       :options="{
-        selectable: props.options.listViewSelection ?? true ,
+        selectable: props.options.selectable ?? true ,
         showTooltip: true,
         resizeColumn: false,
         onRowClick: (row: Object) => emit('rowClick', row['name']),
@@ -133,7 +133,7 @@ interface P {
       title: string;
     };
     hideViewControls?: boolean;
-    listViewSelection?: boolean;
+    selectable?: boolean;
     statusMap?: Record<string, BadgeStatus>;
   };
 }

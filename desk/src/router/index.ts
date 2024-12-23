@@ -210,7 +210,7 @@ const routes = [
         path: "escalation-rules",
         name: AGENT_PORTAL_ESCALATION_RULE_LIST,
         component: () =>
-          import("@/pages/desk/escalation/EscalationRuleList.vue"),
+          import("@/pages/desk/escalation/EscalationRules.vue"),
       },
     ],
   },
