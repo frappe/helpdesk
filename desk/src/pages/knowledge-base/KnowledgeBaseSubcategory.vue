@@ -29,27 +29,11 @@
         </div>
       </template>
     </KnowledgeBaseCategoryHeader>
-    <ListView :columns="columns" :resource="articles" doctype="HD Article">
-      <template #title="{ data }">
-        <div class="flex items-center gap-2">
-          <div><IconFile class="h-4 w-4" /></div>
-          <div class="truncate">
-            {{ data.title }}
-          </div>
-        </div>
-      </template>
-      <template #status="{ data }">
-        <Badge
-          :theme="data.status === 'Published' ? 'green' : 'orange'"
-          variant="subtle"
-        >
-          {{ data.status }}
-        </Badge>
-      </template>
-      <template #emptyMessage>
-        <EmptyMessage message="This sub category is empty" />
-      </template>
-    </ListView>
+    <ListViewBuilder
+      :options="options"
+      @row-click="handleClick"
+      @empty-state-action="toNewArticle"
+    />
     <Dialog v-model="showEdit" :options="{ title: 'Edit' }">
       <template #body-content>
         <form @submit.prevent="saveSubCategory">
@@ -80,26 +64,24 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, h } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 import {
   createDocumentResource,
   debounce,
-  Badge,
   Button,
   Dialog,
   FormControl,
+  Avatar,
 } from "frappe-ui";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE } from "@/router";
-import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
-import { ListView } from "@/components";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
-import EmptyMessage from "@/components/EmptyMessage.vue";
 import IconEdit from "~icons/lucide/edit-3";
-import IconFile from "~icons/lucide/file-text";
 import IconPlus from "~icons/lucide/plus";
-
+import ListViewBuilder from "@/components/ListViewBuilder.vue";
+const { getUser } = useUserStore();
 const props = defineProps({
   subCategoryId: {
     type: String,
@@ -132,41 +114,53 @@ const saveSubCategory = debounce(
   500
 );
 
-const articles = createListManager({
+const options = {
   doctype: "HD Article",
-  filters: {
-    category: props.subCategoryId,
+  defaultFilters: {
+    category: ["=", props.subCategoryId],
+    status: ["!=", "Archived"],
   },
-  auto: true,
-  transform: (data) => {
-    for (const d of data) {
-      d.onClick = {
-        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
-        params: {
-          articleId: d.name,
-        },
-        query: {
-          category: route.params.categoryId,
-          subCategory: route.params.subCategoryId,
-        },
-      };
-    }
-    return data;
+  columnConfig: {
+    author: {
+      prefix: ({ row }) => {
+        return h(Avatar, {
+          shape: "circle",
+          image: getUser(row.author)?.user_image,
+          label: row.author,
+          size: "sm",
+        });
+      },
+    },
   },
-});
+  statusMap: {
+    Published: {
+      label: "Published",
+      theme: "green",
+    },
+    Draft: {
+      label: "Draft",
+      theme: "gray",
+    },
+  },
+  emptyState: {
+    title: "No Articles Found",
+  },
+  hideViewControls: true,
+  listViewSelection: false,
+};
 
-const columns = [
-  {
-    label: "Title",
-    key: "title",
-    width: "w-96",
-  },
-  {
-    label: "Status",
-    key: "status",
-    width: "w-40",
-  },
-];
+function handleClick(id: string) {
+  router.push({
+    name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+    params: {
+      articleId: id,
+    },
+    query: {
+      category: route.params.categoryId,
+      subCategory: route.params.subCategoryId,
+    },
+  });
+}
 
 function toNewArticle() {
   router.push({
