@@ -153,8 +153,6 @@ const props = withDefaults(defineProps<P>(), {
   },
 });
 
-console.log(props.options.hideViewControls);
-
 const emit = defineEmits<E>();
 const { isMobileView } = useScreenSize();
 const defaultEmptyState = {
