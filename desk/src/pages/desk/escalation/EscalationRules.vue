@@ -32,51 +32,13 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { usePageMeta, Badge } from "frappe-ui";
-import { socket } from "@/socket";
-import { createListManager } from "@/composables/listManager";
-import { ListView } from "@/components";
+import { usePageMeta } from "frappe-ui";
 import PageTitle from "@/components/PageTitle.vue";
 import EscalationRuleDialog from "./EscalationRuleDialog.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 
 const showDialog = ref(false);
 const selectedRule = ref(null);
-const emptyMessage = "No Escalation Rules Found";
-const columns = [
-  {
-    label: "Priority",
-    key: "priority",
-    width: "w-64",
-  },
-  {
-    label: "Team",
-    key: "team",
-    width: "w-64",
-  },
-  {
-    label: "Ticket type",
-    key: "ticket_type",
-    width: "w-64",
-  },
-  {
-    label: "Status",
-    key: "is_enabled",
-    width: "w-20",
-  },
-];
-
-const rules = createListManager({
-  doctype: "HD Escalation Rule",
-  fields: ["name", "priority", "team", "ticket_type", "is_enabled"],
-  auto: true,
-  transform: (data) => {
-    for (const d of data) {
-      d.onClick = () => openDialog(d.name);
-    }
-    return data;
-  },
-});
 
 usePageMeta(() => {
   return {
@@ -88,7 +50,4 @@ function openDialog(rule: string | null) {
   selectedRule.value = rule;
   showDialog.value = true;
 }
-
-socket.on("helpdesk:new-escalation-rule", () => rules.reload());
-socket.on("helpdesk:delete-escalation-rule", () => rules.reload());
 </script>
