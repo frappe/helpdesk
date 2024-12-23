@@ -206,12 +206,6 @@ const routes = [
         name: "CannedResponses",
         component: () => import("@/pages/CannedResponses.vue"),
       },
-      {
-        path: "escalation-rules",
-        name: AGENT_PORTAL_ESCALATION_RULE_LIST,
-        component: () =>
-          import("@/pages/desk/escalation/EscalationRules.vue"),
-      },
     ],
   },
   // Additonal routes
