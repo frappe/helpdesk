@@ -65,7 +65,7 @@ class HDArticle(Document):
                 "label": "Status",
                 "type": "status",
                 "key": "status",
-                "width": "24rem",
+                "width": "10rem",
             },
             {
                 "label": "Author",
