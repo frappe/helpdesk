@@ -247,4 +247,10 @@ export interface Category {
   children?: (Article | SubCategory)[];
 }
 
+// Badge
+export interface BadgeStatus {
+  label: string;
+  theme: string;
+}
+
 export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike

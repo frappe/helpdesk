@@ -32,13 +32,11 @@
         }
       "
     >
-      <UserAvatar v-bind="n.user_from" />
+      <UserAvatar :name="n.user_from" />
       <div>
         <div class="mb-2 leading-5">
           <span class="space-x-1 text-gray-700">
-            <span class="font-medium text-gray-900">{{
-              n.user_from.name
-            }}</span>
+            <span class="font-medium text-gray-900">{{ n.user_from }}</span>
             <span v-if="n.notification_type === 'Mention'"
               >mentioned you in ticket</span
             >

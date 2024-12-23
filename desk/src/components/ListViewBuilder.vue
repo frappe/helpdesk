@@ -29,7 +29,7 @@
       :rows="rows"
       row-key="name"
       :options="{
-        selectable: true,
+        selectable: props.options.selectable ?? true ,
         showTooltip: true,
         resizeColumn: false,
         onRowClick: (row: Object) => emit('rowClick', row['name']),
@@ -60,6 +60,9 @@
             </div>
             <div v-else-if="column.type === 'Datetime'">
               {{ dayjs.tz(item).fromNow() }}
+            </div>
+            <div v-else-if="column.type === 'status'">
+              <Badge v-bind="handleStatusColor(item)" />
             </div>
             <div v-else class="truncate">
               {{ item }}
@@ -109,13 +112,16 @@ import {
   ListRow,
   ListHeader,
   ListHeaderItem,
+  Badge,
 } from "frappe-ui";
+
 import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
 import { dayjs } from "@/dayjs";
 import FadedScrollableDiv from "./FadedScrollableDiv.vue";
 import Reload from "./view-controls/Reload.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
+import { BadgeStatus } from "@/types";
 
 interface P {
   options: {
@@ -126,6 +132,9 @@ interface P {
       icon?: HTMLElement | string;
       title: string;
     };
+    hideViewControls?: boolean;
+    selectable?: boolean;
+    statusMap?: Record<string, BadgeStatus>;
   };
 }
 
@@ -134,7 +143,15 @@ interface E {
   (event: "rowClick", row: any): void;
 }
 
-const props = defineProps<P>();
+const props = withDefaults(defineProps<P>(), {
+  options: () => {
+    return {
+      doctype: "",
+      hideViewControls: false,
+      selectable: true,
+    };
+  },
+});
 
 const emit = defineEmits<E>();
 const { isMobileView } = useScreenSize();
@@ -190,10 +207,21 @@ function handleColumnConfig(column) {
   return column;
 }
 
+const statusMap: Record<string, BadgeStatus> = props.options
+  .statusMap as Record<string, BadgeStatus>;
+function handleStatusColor(status: "Published" | "Draft"): BadgeStatus {
+  if (!statusMap)
+    return {
+      label: status,
+      theme: "gray",
+    };
+  return statusMap[status];
+}
+
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   cache: ["DocField", props.options.doctype],
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
     append_assign: true,
@@ -212,7 +240,7 @@ const filterableFields = createResource({
 
 const sortableFields = createResource({
   url: "helpdesk.api.doc.sort_options",
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
   },
@@ -220,7 +248,7 @@ const sortableFields = createResource({
 
 const quickFilters = createResource({
   url: "helpdesk.api.doc.get_quick_filters",
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
   },
@@ -232,7 +260,12 @@ const quickFilters = createResource({
 });
 
 const showViewControls = computed(() => {
-  return filterableFields.data && sortableFields.data && quickFilters.data;
+  return (
+    !props.options.hideViewControls &&
+    filterableFields.data &&
+    sortableFields.data &&
+    quickFilters.data
+  );
 });
 
 const listViewData = reactive({
