@@ -1,85 +1,97 @@
 <template>
   <div class="flex flex-col overflow-y-auto">
-    <TicketBreadcrumbs
-      :parent="route.meta.parent"
-      title="New"
-      :current="route.name"
-    />
-    <div v-if="template.data?.about" class="mx-5 my-3">
-      <div class="prose-f" v-html="sanitize(template.data.about)" />
-    </div>
-    <div class="grid grid-cols-1 gap-4 px-5 sm:grid-cols-3">
-      <UniInput
-        v-for="field in visibleFields"
-        :key="field.fieldname"
-        :field="field"
-        :value="templateFields[field.fieldname]"
-        @change="templateFields[field.fieldname] = $event.value"
-      />
-    </div>
-    <div class="m-5">
-      <FormControl
-        v-model="subject"
-        type="text"
-        label="Subject*"
-        placeholder="A short description"
-      />
-    </div>
-    <TicketNewArticles
-      v-if="isCustomerPortal"
-      :search="subject"
-      class="mx-5 mb-5"
-    />
-    <div v-if="isCustomerPortal" class="mx-5 mb-5 h-full">
-      <TicketTextEditor
-        v-show="subject.length > 2 || description.length > 0"
-        ref="editor"
-        v-model:attachments="attachments"
-        v-model:content="description"
-        placeholder="Detailed explanation"
-        expand
+    <LayoutHeader>
+      <template #left-header>
+        <Breadcrumbs :items="breadcrumbs" />
+      </template>
+    </LayoutHeader>
+    <!-- Container -->
+    <div
+      class="flex flex-col gap-5 py-6 h-full flex-1 self-center overflow-auto mx-auto w-full max-w-4xl px-5"
+    >
+      <!-- custom fields descriptions -->
+      <div v-if="Boolean(template.data?.about)" class="">
+        <div class="prose-f" v-html="sanitize(template.data.about)" />
+      </div>
+      <!-- custom fields -->
+      <div
+        class="grid grid-cols-1 gap-4 sm:grid-cols-3"
+        v-if="Boolean(visibleFields)"
       >
-        <template #bottom-right>
-          <Button
-            label="Submit"
-            theme="gray"
-            variant="solid"
-            :disabled="
-              $refs.editor.editor.isEmpty || ticket.loading || !subject
-            "
-            @click="() => ticket.submit()"
+        <UniInput
+          v-for="field in visibleFields"
+          :key="field.fieldname"
+          :field="field"
+          :value="templateFields[field.fieldname]"
+          @change="templateFields[field.fieldname] = $event.value"
+        />
+      </div>
+      <!-- existing fields -->
+      <div class="flex flex-col" :class="subject.length >= 2 && 'gap-5'">
+        <div class="flex flex-col gap-2">
+          <span class="block text-sm text-gray-700">
+            Subject
+            <span class="place-self-center text-red-500"> * </span>
+          </span>
+          <FormControl
+            v-model="subject"
+            type="text"
+            placeholder="A short description"
           />
-        </template>
-      </TicketTextEditor>
-      <h4
-        v-show="subject.length <= 2 && description.length === 0"
-        class="flex items-center justify-center text-lg text-gray-500"
-      >
-        Please enter a subject to continue
-      </h4>
-    </div>
+        </div>
+        <TicketNewArticles v-if="isCustomerPortal" :search="subject" />
+        <div v-if="isCustomerPortal">
+          <h4
+            v-show="subject.length <= 2 && description.length === 0"
+            class="text-p-sm text-gray-500 ml-1"
+          >
+            Please enter a subject to continue
+          </h4>
+          <TicketTextEditor
+            v-show="subject.length > 2 || description.length > 0"
+            ref="editor"
+            v-model:attachments="attachments"
+            v-model:content="description"
+            placeholder="Detailed explanation"
+            expand
+          >
+            <template #bottom-right>
+              <Button
+                label="Submit"
+                theme="gray"
+                variant="solid"
+                :disabled="
+                  $refs.editor.editor.isEmpty || ticket.loading || !subject
+                "
+                @click="() => ticket.submit()"
+              />
+            </template>
+          </TicketTextEditor>
+        </div>
+      </div>
 
-    <!-- for agent portal -->
-    <div v-else class="mx-5 mb-5 h-full">
-      <TicketTextEditor
-        ref="editor"
-        v-model:attachments="attachments"
-        v-model:content="description"
-        placeholder="Detailed explanation"
-        expand
-      >
-        <template #bottom-right>
-          <Button
-            label="Submit"
-            theme="gray"
-            variant="solid"
-            :disabled="
-              $refs.editor.editor.isEmpty || ticket.loading || !subject
-            "
-            @click="() => ticket.submit()"
-          />
-        </template>
-      </TicketTextEditor>
+      <!-- for agent portal -->
+      <div v-if="!isCustomerPortal">
+        <TicketTextEditor
+          ref="editor"
+          v-model:attachments="attachments"
+          v-model:content="description"
+          placeholder="Detailed explanation"
+          expand
+        >
+          <template #bottom-right>
+            <Button
+              label="Submit"
+              theme="gray"
+              variant="solid"
+              :disabled="
+                $refs.editor.editor.isEmpty || ticket.loading || !subject
+              "
+              @click="() => ticket.submit()"
+            />
+          </template>
+        </TicketTextEditor>
+      </div>
     </div>
   </div>
 </template>
@@ -87,11 +99,17 @@
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { createResource, usePageMeta, Button, FormControl } from "frappe-ui";
+import {
+  createResource,
+  usePageMeta,
+  Button,
+  FormControl,
+  Breadcrumbs,
+} from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
-import { UniInput } from "@/components";
+import { LayoutHeader, UniInput } from "@/components";
 import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
 import TicketNewArticles from "./ticket/TicketNewArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
@@ -176,6 +194,24 @@ function sanitize(html: string) {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
   });
 }
+
+const breadcrumbs = computed(() => {
+  const items = [
+    {
+      label: "Tickets",
+      route: {
+        name: "TicketsCustomer",
+      },
+    },
+    {
+      label: "New Ticket",
+      route: {
+        name: "TicketNew",
+      },
+    },
+  ];
+  return items;
+});
 
 usePageMeta(() => ({
   title: "New Ticket",

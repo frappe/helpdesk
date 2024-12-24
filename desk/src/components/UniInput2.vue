@@ -11,12 +11,26 @@
     >
       <component
         :is="component"
-        :key="transValue"
+        :key="field.fieldname"
         class="form-control"
         :placeholder="`Add ${field.label}`"
         :value="transValue"
-        @change="
-          emitUpdate(field.fieldname, $event.value || $event.target.value)
+        v-on="
+          textFields.includes(field.fieldtype)
+            ? {
+                blur: (event) =>
+                  emitUpdate(
+                    field.fieldname,
+                    event.value || event.target.value
+                  ),
+              }
+            : {
+                change: (event) =>
+                  emitUpdate(
+                    field.fieldname,
+                    event.value || event.target.value
+                  ),
+              }
         "
       />
     </div>
@@ -47,6 +61,8 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 
+const textFields = ["Long Text", "Small Text", "Text"];
+
 const component = computed(() => {
   if (props.field.url_method) {
     return h(Autocomplete, {
@@ -74,6 +90,10 @@ const component = computed(() => {
           value: 0,
         },
       ],
+    });
+  } else if (textFields.includes(props.field.fieldtype)) {
+    return h(FormControl, {
+      type: "textarea",
     });
   } else {
     return h(FormControl);

@@ -2,7 +2,10 @@
   <NestedPopover>
     <template #target>
       <Button label="Columns">
-        <template #prefix>
+        <template v-if="hideLabel">
+          <ColumnsIcon class="h-4" />
+        </template>
+        <template v-if="!hideLabel" #prefix>
           <ColumnsIcon class="h-4" />
         </template>
       </Button>
@@ -146,6 +149,14 @@ let props = defineProps({
   columns: {
     type: Array,
     required: true,
+  },
+  hideLabel: {
+    type: Boolean,
+    default: false,
+  },
+  isCustomerPortal: {
+    type: Boolean,
+    default: false,
   },
 });
 

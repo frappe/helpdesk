@@ -12,7 +12,7 @@
       </div>
     </Tooltip>
   </div>
-  <div v-if="show_others">
+  <div v-if="show_others && content !== 'created this ticket'">
     <div
       v-for="relatedActivity in relatedActivities"
       :key="relatedActivity.creation"
@@ -32,7 +32,7 @@
     </div>
   </div>
   <Button
-    v-if="relatedActivities.length"
+    v-if="relatedActivities.length && content !== 'created this ticket'"
     :label="
       show_others ? 'Hide' : `${relatedActivities.length} other activities`
     "
@@ -54,23 +54,13 @@ import { ref } from "vue";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
 
 const props = defineProps({
-  user: {
-    type: String,
+  activity: {
+    type: Object,
     required: true,
-  },
-  content: {
-    type: String,
-    required: true,
-  },
-  creation: {
-    type: String,
-    required: true,
-  },
-  relatedActivities: {
-    type: Array,
-    default: () => [],
   },
 });
+
+const { user, content, creation, relatedActivities } = props.activity;
 
 let show_others = ref(false);
 </script>

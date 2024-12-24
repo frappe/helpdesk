@@ -1,0 +1,56 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:word",
+ "creation": "2024-09-12 16:08:27.022111",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "word",
+  "column_break_jyol",
+  "enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "word",
+   "fieldtype": "Data",
+   "label": "Word",
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_jyol",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-09-12 16:10:05.577545",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Stopword",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

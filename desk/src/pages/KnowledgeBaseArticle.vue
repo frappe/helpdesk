@@ -1,10 +1,10 @@
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
-    <PageTitle v-if="!route.meta.public">
-      <template #title>
+  <div class="flex h-full flex-col overflow-scroll">
+    <LayoutHeader>
+      <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
       </template>
-      <template #right>
+      <template #right-header v-if="!isCustomerPortal">
         <component
           :is="actionsComponent"
           :status="article.data?.status"
@@ -17,9 +17,9 @@
           @toggle-status="toggleStatus"
         />
       </template>
-    </PageTitle>
-    <div class="overflow-auto">
-      <div class="container m-auto my-12">
+    </LayoutHeader>
+    <div class="mx-auto w-full max-w-4xl px-24">
+      <div class="py-6 flex flex-col gap-5">
         <TextEditor
           :content="textEditorContentWithIDs"
           :editable="editMode"
@@ -30,7 +30,7 @@
             shadow: editMode,
             'p-4': editMode,
           }"
-          editor-class="prose-f"
+          editor-class="prose-f first:mt-3"
           @change="articleContent = $event"
         >
           <template #top>
@@ -46,19 +46,47 @@
             />
           </template>
         </TextEditor>
-        <RouterLink
-          v-if="route.meta.public"
-          :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }"
+
+        <div
+          class="flex items-center justify-between mb-8 p-4 rounded-lg bg-gray-50"
+          v-if="isCustomerPortal"
         >
-          <Button
-            label="Still need help? Create a ticket"
-            size="md"
-            theme="gray"
-            variant="solid"
-          >
-            <template #suffix> &rightarrow; </template>
-          </Button>
-        </RouterLink>
+          <!-- Feedback Section -->
+          <div>
+            <!-- was this article helpful? -->
+            <div class="flex items-center gap-2">
+              <span class="text-gray-800 text-sm"
+                >Did this article solve your issue?</span
+              >
+              <div class="flex items-center gap-1">
+                <component
+                  :is="userFeedback === 1 ? ThumbsUpFilledIcon : ThumbsUpIcon"
+                  class="w-4 h-4 cursor-pointer"
+                  @click="handleFeedbackClick('Like')"
+                />
+                <component
+                  :is="
+                    userFeedback === 2 ? ThumbsDownFilledIcon : ThumbsDownIcon
+                  "
+                  class="w-4 h-4 cursor-pointer"
+                  @click="handleFeedbackClick('Dislike')"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Create a ticket CTA -->
+          <div class="flex items-center justify-center gap-2">
+            <span class="font-normal text-sm">
+              Can’t find what you’re looking for?
+            </span>
+            <RouterLink :to="{ name: CUSTOMER_PORTAL_NEW_TICKET }">
+              <p class="underline font-bold text-sm">
+                Create a ticket &rightarrow;
+                <!-- <template #suffix> </template> -->
+              </p>
+            </RouterLink>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -85,17 +113,22 @@ import {
 import { createToast } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
-
-import { PageTitle } from "@/components";
+import { LayoutHeader } from "@/components";
 import KnowledgeBaseArticleActionsEdit from "./knowledge-base/KnowledgeBaseArticleActionsEdit.vue";
 import KnowledgeBaseArticleActionsNew from "./knowledge-base/KnowledgeBaseArticleActionsNew.vue";
 import KnowledgeBaseArticleActionsView from "./knowledge-base/KnowledgeBaseArticleActionsView.vue";
 import KnowledgeBaseArticleTopEdit from "./knowledge-base/KnowledgeBaseArticleTopEdit.vue";
 import KnowledgeBaseArticleTopNew from "./knowledge-base/KnowledgeBaseArticleTopNew.vue";
-import KnowledgeBaseArticleTopPublic from "./knowledge-base/KnowledgeBaseArticleTopPublic.vue";
 import KnowledgeBaseArticleTopView from "./knowledge-base/KnowledgeBaseArticleTopView.vue";
-import { Extension } from "@tiptap/core";
 
+import { PreserveIds } from "@/tiptap-extensions";
+import { FeedbackAction } from "@/types";
+import {
+  ThumbsUpIcon,
+  ThumbsUpFilledIcon,
+  ThumbsDownIcon,
+  ThumbsDownFilledIcon,
+} from "@/components/icons";
 const props = defineProps({
   articleId: {
     type: String,
@@ -122,10 +155,15 @@ const router = useRouter();
 const authStore = useAuthStore();
 const isNew = props.articleId === "new";
 const editMode = ref(isNew);
-const categoryId = computed(() => route.query.category);
-const subCategoryId = computed(() => route.query.subCategory);
+const categoryId = computed(() => router.currentRoute.value.query.category);
+const subCategoryId = computed(
+  () => router.currentRoute.value.query.subCategory
+);
+
+const isCustomerPortal = computed(() => route.meta.public);
+
 const breadcrumbs = computed(() => {
-  const items = [
+  const agentPortalItems = [
     {
       label: options__.value.categoryName,
       route: {
@@ -133,26 +171,56 @@ const breadcrumbs = computed(() => {
         params: { categoryId: options__.value.categoryId },
       },
     },
-    {
-      label: options__.value.subCategoryName,
-      route: {
-        name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
-        params: {
-          categoryId: options__.value.categoryId,
-          subCategoryId: options__.value.subCategoryId,
-        },
-      },
-    },
   ];
 
+  agentPortalItems.push({
+    label: options__.value.subCategoryName,
+    route: {
+      name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
+      params: {
+        categoryId: options__.value.categoryId,
+        subCategoryId:
+          options__.value.subCategoryId || options__.value.categoryId,
+      },
+    },
+  });
+
   if (!isNew) {
-    items.push({
+    agentPortalItems.push({
       label: article.data?.title,
       route: {
         name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
         params: {
           articleId: article.data?.name,
         },
+      },
+    });
+  }
+  if (!isCustomerPortal.value) {
+    return agentPortalItems;
+  }
+  const customerPortalItems = [
+    {
+      label: "Knowledge Base",
+      route: {
+        name: "KnowledgeBasePublicNew",
+      },
+    },
+  ];
+  if (options__.value.categoryId) {
+    customerPortalItems.push({
+      label: options__.value.categoryName,
+      route: {
+        name: "KnowledgeBasePublicNew",
+        query: { category: options__.value.categoryId },
+      },
+    });
+  }
+  if (options__.value.subCategoryId) {
+    customerPortalItems.push({
+      label: options__.value.subCategoryName,
+      route: {
+        name: "KnowledgeBasePublicNew",
         query: {
           category: options__.value.categoryId,
           subCategory: options__.value.subCategoryId,
@@ -160,7 +228,8 @@ const breadcrumbs = computed(() => {
       },
     });
   }
-  return items;
+
+  return customerPortalItems;
 });
 const placeholder = computed(() =>
   editMode.value ? "Write something..." : "Content is empty"
@@ -175,12 +244,12 @@ const actionsComponent = computed(() => {
 });
 
 const topComponent = computed(() => {
-  if (route.meta.public) return KnowledgeBaseArticleTopPublic;
   if (isNew) return KnowledgeBaseArticleTopNew;
   if (editMode.value) return KnowledgeBaseArticleTopEdit;
   return KnowledgeBaseArticleTopView;
 });
 
+const userFeedback = ref<FeedbackAction>(null);
 const article = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article",
   params: {
@@ -188,6 +257,7 @@ const article = createResource({
   },
   onSuccess(data) {
     articleTitle.value = data.title;
+    userFeedback.value = data.user_feedback;
     capture("article_viewed", {
       data: {
         user: authStore.userId,
@@ -199,6 +269,35 @@ const article = createResource({
   auto: !isNew,
 });
 
+const setFeedback = createResource({
+  url: "run_doc_method",
+  debounce: 300,
+  makeParams: () => ({
+    dt: "HD Article",
+    dn: props.articleId,
+    method: "set_feedback",
+    args: {
+      value: userAction.value,
+    },
+  }),
+  onSuccess: () => {
+    article.reload();
+  },
+});
+
+const userAction = ref();
+const feedbackMap = {
+  Remove: 0,
+  Like: 1,
+  Dislike: 2,
+};
+
+function handleFeedbackClick(action: string) {
+  userAction.value = feedbackMap[action];
+  userFeedback.value = feedbackMap[action];
+  setFeedback.submit();
+}
+
 const category = createDocumentResource({
   doctype: "HD Article Category",
   name: categoryId.value,
@@ -208,7 +307,7 @@ const category = createDocumentResource({
 const subCategory = createDocumentResource({
   doctype: "HD Article Category",
   name: subCategoryId.value,
-  auto: true,
+  auto: subCategoryId.value !== categoryId.value ? true : false,
 });
 
 const options__ = computed(() => ({
@@ -247,6 +346,10 @@ const insertRes = createResource({
       name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
       params: {
         articleId: data.name,
+      },
+      query: {
+        category: categoryId.value,
+        subCategory: subCategoryId.value,
       },
     });
   },
@@ -346,32 +449,8 @@ const textEditorMenuButtons = [
   ],
 ];
 
-// extension to preserve ids in html of headings
-const PreserveIds: Extension = Extension.create({
-  name: "preserveIds",
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["heading"],
-        attributes: {
-          id: {
-            default: null,
-            parseHTML: (element) => element.getAttribute("id"),
-            renderHTML: (attributes) => {
-              if (!attributes.id) {
-                return {};
-              }
-              return { id: attributes.id };
-            },
-          },
-        },
-      },
-    ];
-  },
-});
-
 const textEditorContentWithIDs = computed(() =>
-  addLinksToHeadings(article.data?.content)
+  article.data?.content ? addLinksToHeadings(article.data?.content) : null
 );
 
 function addLinksToHeadings(content: string) {

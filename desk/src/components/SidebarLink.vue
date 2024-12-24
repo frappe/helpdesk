@@ -5,10 +5,10 @@
       'w-full': isExpanded,
       'w-8': !isExpanded,
       'shadow-sm': isActive,
-      'bg-white': isActive,
-      'hover:bg-gray-100': !isActive,
+      [bgColor]: isActive,
+      [hvColor]: !isActive,
     }"
-    @click="handle"
+    @click="handleNavigation"
   >
     <span
       class="shrink-0 text-gray-700"
@@ -40,25 +40,29 @@ import { Icon } from "@iconify/vue";
 interface P {
   icon: unknown;
   label: string;
-  isExpanded: boolean;
+  isExpanded?: boolean;
   isActive?: boolean;
   onClick?: () => void;
   to?: string;
+  bgColor?: string;
+  hvColor?: string;
 }
 
 const props = withDefaults(defineProps<P>(), {
   isActive: false,
   onClick: () => () => true,
   to: "",
+  bgColor: "bg-white",
+  hvColor: "hover:bg-gray-100",
 });
 const router = useRouter();
 
-function handle() {
+function handleNavigation() {
   props.onClick();
-  if (props.to) {
-    router.push({
-      name: props.to,
-    });
-  }
+  if (!props.to) return;
+  if (props.to === router.currentRoute.value.name) return;
+  router.push({
+    name: props.to,
+  });
 }
 </script>

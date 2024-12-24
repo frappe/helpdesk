@@ -68,7 +68,7 @@
               :name="field.name"
               :type="field.type"
             />
-            <p class="text-xs text-gray-500">{{ field.description }}</p>
+            <p class="text-gray-500 text-p-sm">{{ field.description }}</p>
           </div>
         </div>
         <ErrorMessage v-if="error" class="ml-1" :message="error" />
@@ -121,6 +121,7 @@ const state: Reactive<EmailAccount> = reactive({
   password: "",
   api_key: "",
   api_secret: "",
+  frappe_mail_site: "",
   enable_incoming: false,
   enable_outgoing: false,
   default_incoming: false,
@@ -157,7 +158,7 @@ const addEmailRes = createResource({
   },
 });
 
-const error = ref("");
+const error = ref<string | undefined>();
 function createEmailAccount() {
   error.value = validateInputs(state, selectedService.value.custom);
   if (error.value) return;

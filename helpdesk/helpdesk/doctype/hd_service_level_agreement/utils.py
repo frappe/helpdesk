@@ -4,7 +4,7 @@ from frappe.query_builder import JoinType
 from frappe.utils import now_datetime
 from pypika import Criterion
 
-from helpdesk.utils import check_permissions, get_context
+from helpdesk.utils import get_context
 
 DOCTYPE = "HD Service Level Agreement"
 
@@ -16,7 +16,6 @@ def get_sla(ticket: Document) -> Document:
     :param doc: Ticket to use
     :return: Applicable SLA
     """
-    check_permissions(DOCTYPE, None)
     QBSla = frappe.qb.DocType(DOCTYPE)
     QBPriority = frappe.qb.DocType("HD Service Level Priority")
     now = now_datetime()

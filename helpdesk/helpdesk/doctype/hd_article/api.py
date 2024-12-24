@@ -14,7 +14,19 @@ def get_article(name: str):
     author = frappe.get_cached_doc("User", article["author"])
     sub_category = frappe.get_cached_doc("HD Article Category", article["category"])
     category = frappe.get_cached_doc(
-        "HD Article Category", sub_category.parent_category
+        "HD Article Category", sub_category.parent_category or article["category"]
+    )
+
+    user = frappe.session.user
+    # TODO: views count increment with views field in HD Article
+    # if not is_agent() and user != author.name:
+    # frappe.db.set_value("HD Article", name, "views", article["views"] + 1)
+
+    user_feedback = int(
+        frappe.db.get_value(
+            "HD Article Feedback", {"user": user, "article": name}, "feedback"
+        )
+        or 0
     )
 
     return {
@@ -22,4 +34,5 @@ def get_article(name: str):
         "author": author,
         "category": category,
         "sub_category": sub_category,
+        "user_feedback": user_feedback,
     }

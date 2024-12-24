@@ -5,11 +5,15 @@ from __future__ import unicode_literals
 
 import json
 import re
+from contextlib import suppress
 from copy import deepcopy
+from math import isclose
+from typing import TYPE_CHECKING
 
 import frappe
 from bs4 import BeautifulSoup, PageElement
 from frappe.utils import cstr, strip_html_tags, update_progress_bar
+from frappe.utils.caching import redis_cache
 from frappe.utils.synchronization import filelock
 from redis.commands.search.field import TagField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition
@@ -17,6 +21,11 @@ from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
 from helpdesk.utils import is_agent
+
+if TYPE_CHECKING:
+    from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
+
+NUM_RESULTS = 5
 
 STOPWORDS = [
     "a",
@@ -60,11 +69,28 @@ STOPWORDS = [
     "you",
     "me",
     "do",
+    "has",
+    "been",
+    "urgent",
+    "want",
 ]
 
 
+@redis_cache(3600 * 24)
+def get_stopwords():
+    return STOPWORDS + frappe.get_all("HD Stopword", {"enabled": True}, pluck="name")
+
+
+@redis_cache(1800)
+def get_synonym_words() -> list[str]:
+    ret = frappe.get_all("HD Synonym", ["name"], as_list=True) + frappe.get_all(
+        "HD Synonyms", ["name"], as_list=True
+    )
+    return [r[0] for r in ret]
+
+
 class Search:
-    unsafe_chars = re.compile(r"[\[\]{}<>+]")
+    unsafe_chars = re.compile(r"[\[\]{}<>+!-]")
 
     def __init__(self, index_name, prefix, schema) -> None:
         self.redis = frappe.cache()
@@ -93,9 +119,17 @@ class Search:
         self.redis.ft(self.index_name).create_index(
             schema,
             definition=index_def,
-            stopwords=STOPWORDS,
+            stopwords=get_stopwords(),
         )
+        self.add_synonyms()
+
         self._index_exists = True
+
+    def add_synonyms(self):
+        for word, synonym in frappe.get_all(
+            "HD Synonym", ["parent", "name"], as_list=True
+        ):
+            self.redis.ft(self.index_name).synupdate(word, True, word, synonym)
 
     def add_document(self, id, doc):
         doc = frappe._dict(doc)
@@ -116,7 +150,7 @@ class Search:
         self,
         query,
         start=0,
-        page_length=5,
+        page_length=NUM_RESULTS,
         highlight=False,
     ):
         query = self.clean_query(query)
@@ -126,6 +160,7 @@ class Search:
 
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
+        query.with_scores()
 
         try:
             result = self.redis.ft(self.index_name).search(query)
@@ -145,38 +180,36 @@ class Search:
     def clean_query(self, query):
         query = query.strip().replace("-*", "*")
         query = self.unsafe_chars.sub(" ", query)
-        query.strip()
-        return query
+        return query.strip().lower()
 
     def spellcheck(self, query, **kwargs):
         return self.redis.ft(self.index_name).spellcheck(query, **kwargs)
 
     def drop_index(self):
-        if self.index_exists():
+        with suppress(ResponseError):  # Index may not exist
             self.redis.ft(self.index_name).dropindex(delete_documents=True)
 
+    def get_count(self, doctype):
+        raise NotImplementedError
+
+    def num_records(self) -> int:
+        num = 0
+        for doctype in self.DOCTYPE_FIELDS.keys():
+            num += self.get_count(doctype)
+        return num
+
     def index_exists(self):
-        self._index_exists = getattr(self, "_index_exists", None)
-        if self._index_exists is None:
-            try:
-                self.redis.ft(self.index_name).info()
+        if hasattr(self, "_index_exists"):
+            return self._index_exists
+        self._index_exists = False
+        with suppress(ResponseError):
+            ftinfo = self.redis.ft(self.index_name).info()
+            if isclose(int(ftinfo["num_docs"]), self.num_records(), rel_tol=0.1):
                 self._index_exists = True
-            except ResponseError:
-                self._index_exists = False
         return self._index_exists
 
 
 class HelpdeskSearch(Search):
-    schema = [
-        {"name": "name", "weight": 2},
-        {"name": "subject", "weight": 6},
-        {"name": "description", "weight": 6},
-        {"name": "headings", "weight": 8},
-        {"name": "team", "type": "tag"},
-        {"name": "modified", "sortable": True},
-        {"name": "creation", "sortable": True},
-    ]
-
     DOCTYPE_FIELDS = {
         "HD Ticket": [
             "name",
@@ -198,7 +231,17 @@ class HelpdeskSearch(Search):
     }
 
     def __init__(self):
-        super().__init__("helpdesk_idx", "search_doc", self.schema)
+        settings: "HDSettings" = frappe.get_cached_doc("HD Settings")
+        schema = [
+            {"name": "name", "weight": settings.name_weight or 1},
+            {"name": "subject", "weight": settings.subject_weight or 6},
+            {"name": "description", "weight": settings.description_weight or 5},
+            {"name": "headings", "weight": settings.headings_weight or 8},
+            {"name": "team", "type": "tag"},
+            {"name": "modified", "sortable": True},
+            {"name": "creation", "sortable": True},
+        ]
+        super().__init__("helpdesk_idx", "search_doc", schema)
 
     def build_index(self):
         self.drop_index()
@@ -273,9 +316,18 @@ class HelpdeskSearch(Search):
         # For permalink
         return re.sub(r"[^a-zA-Z0-9]+", "-", text).lower()
 
+    def get_count(self, doctype):
+        if doctype == "HD Ticket":
+            return frappe.db.count(doctype)
+        if doctype == "HD Article":
+            return len(self.get_records(doctype))
+
     def get_records(self, doctype):
         records = []
-        for d in frappe.db.get_all(doctype, fields=self.DOCTYPE_FIELDS[doctype]):
+        filters = {"status": "Published"} if doctype == "HD Article" else {}
+        for d in frappe.db.get_all(
+            doctype, filters=filters, fields=self.DOCTYPE_FIELDS[doctype]
+        ):
             d.doctype = doctype
             if doctype == "HD Article":
                 for heading, section in self.get_sections(d.content):
@@ -291,13 +343,22 @@ class HelpdeskSearch(Search):
 
 
 @frappe.whitelist()
-def search(query, only_articles=False):
+def search(query, only_articles=False) -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
-    query_parts = query.split(" ")
-    query = " ".join(
-        [f"%{q}%" for q in query_parts if q not in STOPWORDS]
-    )  # for stopwords to be ignored
+    query_parts = query.split()
+    query = ""
+    for part in query_parts:
+        if part in get_synonym_words():
+            query += f" {part}"
+            continue
+        if part in get_stopwords():
+            continue
+        if len(part) > 3:
+            query += f" %{part}%"
+        else:
+            query += f" {part}*"
+
     result = search.search(query, start=0, highlight=True)
     groups = {}
     for r in result.docs:
@@ -317,6 +378,7 @@ def search(query, only_articles=False):
     return out
 
 
+@frappe.whitelist()
 @filelock("helpdesk_search_indexing", timeout=60)
 def build_index():
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
@@ -343,6 +405,8 @@ def download_corpus():
     try:
         data.find("taggers/averaged_perceptron_tagger_eng.zip")
         data.find("tokenizers/punkt_tab.zip")
+        data.find("corpora/brown.zip")
     except LookupError:
         download("averaged_perceptron_tagger_eng")
         download("punkt_tab")
+        download("brown")

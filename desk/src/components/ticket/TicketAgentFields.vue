@@ -22,13 +22,13 @@
           rows="2"
           @change="update(o.field, $event.target.value, $event)"
         />
-        <FormControl
-          v-else-if="o.type === 'select'"
+        <Link
+          v-else-if="o.field === 'customer'"
           class="form-control"
-          :type="o.type"
           :value="ticket[o.field]"
-          :options="customers?.data"
-          @change="update(o.field, $event.target.value)"
+          :doctype="o.options"
+          :placeholder="o.placeholder"
+          @change="update(o.field, $event)"
         />
         <Autocomplete
           v-else
@@ -41,7 +41,7 @@
       </div>
     </div>
     <UniInput2
-      v-for="field in ticket.template.fields"
+      v-for="field in customFields"
       :key="field.fieldname"
       :field="field"
       :value="ticket[field.fieldname]"
@@ -52,8 +52,8 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { createResource, FormControl, Tooltip } from "frappe-ui";
-import { Autocomplete } from "@/components";
+import { FormControl, Tooltip } from "frappe-ui";
+import { Autocomplete, Link } from "@/components";
 import { useTeamStore } from "@/stores/team";
 import { useTicketPriorityStore } from "@/stores/ticketPriority";
 import { useTicketTypeStore } from "@/stores/ticketType";
@@ -67,20 +67,6 @@ const props = defineProps({
   ticket: {
     type: Object,
     required: true,
-  },
-});
-
-const customers = createResource({
-  url: "helpdesk.utils.get_customer",
-  params: {
-    contact: props.ticket.raised_by,
-  },
-  auto: true,
-  transform: (data: Array<object>) => {
-    return data.map((d: object) => ({
-      label: d,
-      value: d,
-    }));
   },
 });
 
@@ -104,16 +90,19 @@ const options = computed(() => {
     {
       field: "customer",
       label: "Customer",
-      type: "select",
+      type: "link",
+      options: "HD Customer",
       placeholder: "Select Customer",
     },
-    {
-      field: "subject",
-      label: "Subject",
-      type: "textarea",
-      placeholder: "Problem in XYZ",
-    },
   ];
+});
+
+const customFields = computed(() => {
+  const _custom_fields = props.ticket.template.fields.filter(
+    (f) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
+  );
+
+  return _custom_fields;
 });
 
 function update(field: Field["fieldname"], value: FieldValue, event = null) {
@@ -136,6 +125,9 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
 :deep(.form-control button) {
   border-color: transparent;
   background: white;
+}
+:deep(.form-control textarea) {
+  field-sizing: content;
 }
 
 :deep(.form-control button) {

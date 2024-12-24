@@ -12,7 +12,7 @@
     </div>
   </div>
   <div class="border-b pb-3">
-    <div class="text-3xl font-semibold text-gray-900">
+    <div class="text-2xl font-semibold text-gray-900">
       {{ title }}
     </div>
   </div>

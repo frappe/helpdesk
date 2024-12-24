@@ -5,10 +5,12 @@ from typing import List
 
 import frappe
 from frappe import _
+from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
 from frappe.desk.form.assign_to import get as get_assignees
 from frappe.model.document import Document
+from frappe.permissions import add_permission, update_permission_property
 from frappe.query_builder import Order
 from pypika.functions import Count
 from pypika.queries import Query
@@ -30,46 +32,6 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
-    @staticmethod
-    def get_list_select(query: Query):
-        QBTicket = frappe.qb.DocType("HD Ticket")
-        QBComment = frappe.qb.DocType("HD Ticket Comment")
-        QBCommunication = frappe.qb.DocType("Communication")
-
-        count_comment = (
-            frappe.qb.from_(QBComment)
-            .select(Count("*"))
-            .as_("count_comment")
-            .where(QBComment.reference_ticket == QBTicket.name)
-        )
-
-        count_msg_incoming = (
-            frappe.qb.from_(QBCommunication)
-            .select(Count("*"))
-            .as_("count_msg_incoming")
-            .where(QBCommunication.reference_doctype == "HD Ticket")
-            .where(QBCommunication.reference_name == QBTicket.name)
-            .where(QBCommunication.sent_or_received == "Received")
-        )
-
-        count_msg_outgoing = (
-            frappe.qb.from_(QBCommunication)
-            .select(Count("*"))
-            .as_("count_msg_outgoing")
-            .where(QBCommunication.reference_doctype == "HD Ticket")
-            .where(QBCommunication.reference_name == QBTicket.name)
-            .where(QBCommunication.sent_or_received == "Sent")
-        )
-
-        query = (
-            query.select(QBTicket.star)
-            .select(count_comment)
-            .select(count_msg_incoming)
-            .select(count_msg_outgoing)
-        )
-
-        return query
-
     @staticmethod
     def get_list_filters(query: Query):
         _is_agent = is_agent()
@@ -155,7 +117,7 @@ class HDTicket(Document):
         }
 
     def publish_update(self):
-        publish_event("helpdesk:ticket-update", {"name": self.name})
+        publish_event("helpdesk:ticket-update", self.name)
         capture_event("ticket_updated")
 
     def autoname(self):
@@ -189,6 +151,8 @@ class HDTicket(Document):
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
+        if self.get("description"):
+            self.create_communication_via_contact(self.description)
 
     def on_update(self):
         # flake8: noqa
@@ -208,14 +172,14 @@ class HDTicket(Document):
         self.publish_update()
         self.update_search_index()
 
-    def notify_agent(self, agent, notiification_type="Assignment"):
+    def notify_agent(self, agent, notification_type="Assignment"):
         frappe.get_doc(
             frappe._dict(
                 doctype="HD Notification",
                 user_from=frappe.session.user,
                 reference_ticket=self.name,
                 user_to=agent,
-                notification_type=notiification_type,
+                notification_type=notification_type,
             )
         ).insert(ignore_permissions=True)
 
@@ -336,21 +300,60 @@ class HDTicket(Document):
         Removes the assignment if the agent is not in the team.
         Should be called inside on_update
         """
+        if self.is_new():
+            return
+        if not self.agent_group or (hasattr(self, "_assign") and not self._assign):
+            return
         if self.has_value_changed("agent_group") and self.status == "Open":
-            current_assigned_agent_doc = self.get_assigned_agent()
+            current_assigned_agent = self.get_assigned_agent()
+            if not current_assigned_agent:
+                return
+            is_agent_in_assigned_team = self.agent_in_assigned_team(
+                current_assigned_agent, self.agent_group
+            )
+
             if (
-                current_assigned_agent_doc
-                and not current_assigned_agent_doc.in_group(self.agent_group)
-            ) and frappe.get_doc(
-                "Assignment Rule",
-                frappe.get_doc("HD Team", self.agent_group).assignment_rule,
-            ).users:
+                not is_agent_in_assigned_team
+            ) and self.users_present_in_team_assignment_rule():
                 clear_all_assignments("HD Ticket", self.name)
                 frappe.publish_realtime(
                     "helpdesk:update-ticket-assignee",
                     {"ticket_id": self.name},
                     after_commit=True,
                 )
+
+    def agent_in_assigned_team(self, agent, team):
+        return frappe.db.exists(
+            "HD Team Member",
+            {
+                "parent": team,
+                "user": agent,
+            },
+        )
+
+    def users_present_in_team_assignment_rule(self):
+        if not self.agent_group:
+            return False
+
+        assignment_rule = frappe.db.get_value(
+            "HD Team", self.agent_group, "assignment_rule"
+        )
+        if not assignment_rule:
+            return False
+
+        is_disabled = frappe.db.get_value(
+            "Assignment Rule", assignment_rule, "disabled"
+        )
+        if is_disabled:
+            return False
+
+        users = frappe.get_all(
+            "Assignment Rule User", filters={"parent": assignment_rule}
+        )
+        if not users:
+            return False
+
+        return True
 
     @frappe.whitelist()
     def assign_agent(self, agent):
@@ -377,8 +380,7 @@ class HDTicket(Document):
                 # TODO: temporary fix, remove this when only agents can be assigned to ticket
                 exists = frappe.db.exists("HD Agent", assignees[0])
                 if exists:
-                    agent_doc = frappe.get_doc("HD Agent", assignees[0])
-                    return agent_doc
+                    return assignees[0]
 
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
@@ -529,6 +531,8 @@ class HDTicket(Document):
             file_doc.attached_to_name = communication.name
             file_doc.attached_to_doctype = "Communication"
             file_doc.save(ignore_permissions=True)
+            self.attach_file_with_ticket(file_doc.file_url)
+
             _attachments.append({"file_url": file_doc.file_url})
 
         reply_to_email = sender_email.email_id
@@ -575,6 +579,7 @@ class HDTicket(Document):
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(self, message, attachments=[]):
+
         if self.status == "Replied":
             self.status = "Open"
             log_ticket_activity(self.name, "set status to Open")
@@ -594,14 +599,21 @@ class HDTicket(Document):
         c.ignore_permissions = True
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
-
-        if not len(attachments):
+        _attachments = self.get("attachments") or attachments or []
+        if not len(_attachments):
             return
         QBFile = frappe.qb.DocType("File")
-        condition_name = [QBFile.name == i["name"] for i in attachments]
+        condition_name = [QBFile.name == i["name"] for i in _attachments]
         frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
             QBFile.attached_to_doctype, "Communication"
         ).where(Criterion.any(condition_name)).run()
+
+        # attach files to ticket
+        file_urls = frappe.get_all(
+            "File", filters={"attached_to_name": c.name}, pluck="file_url"
+        )
+        for url in file_urls:
+            self.attach_file_with_ticket(url)
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -698,15 +710,25 @@ class HDTicket(Document):
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
+
+            if frappe.db.get_single_value("HD Settings", "auto_update_status"):
+                self.status = "Replied"
+
         # Fetch description from communication if not set already. This might not be needed
         # anymore as a communication is created when a ticket is created.
         self.description = self.description or c.content
         # Save the ticket, allowing for hooks to run.
         self.save()
 
-    @staticmethod
-    def default_list_data():
+    def attach_file_with_ticket(self, file_url):
+        file_doc = frappe.new_doc("File")
+        file_doc.attached_to_name = self.name
+        file_doc.attached_to_doctype = "HD Ticket"
+        file_doc.file_url = file_url
+        file_doc.save(ignore_permissions=True)
 
+    @staticmethod
+    def default_list_data(show_customer_portal_fields=False):
         columns = [
             {
                 "label": "ID",
@@ -801,6 +823,65 @@ class HDTicket(Document):
                 "width": "8rem",
             },
         ]
+        customer_portal_columns = [
+            {
+                "label": "ID",
+                "type": "Int",
+                "key": "name",
+                "width": "5rem",
+            },
+            {
+                "label": "Subject",
+                "type": "Data",
+                "key": "subject",
+                "width": "22rem",
+            },
+            {
+                "label": "Status",
+                "type": "Select",
+                "key": "status",
+                "width": "11rem",
+            },
+            {
+                "label": "Priority",
+                "type": "Link",
+                "options": "HD Ticket Priority",
+                "key": "priority",
+                "width": "10rem",
+            },
+            {
+                "label": "First response",
+                "type": "Datetime",
+                "key": "response_by",
+                "width": "8rem",
+            },
+            {
+                "label": "Resolution",
+                "type": "Datetime",
+                "key": "resolution_by",
+                "width": "8rem",
+            },
+            {
+                "label": "Team",
+                "type": "Link",
+                "options": "HD Team",
+                "key": "agent_group",
+                "width": "10rem",
+            },
+            # {
+            #     "label": "Assigned To",
+            #     "type": "Text",
+            #     "key": "_assign",
+            #     "width": "10rem",
+            # },
+            {
+                "label": "Created",
+                "type": "Datetime",
+                "key": "creation",
+                "options": "Contact",
+                "width": "8rem",
+            },
+        ]
         rows = [
             "name",
             "subject",
@@ -819,7 +900,12 @@ class HDTicket(Document):
             "_assign",
             "resolution_date",
         ]
-        return {"columns": columns, "rows": rows}
+        return {
+            "columns": customer_portal_columns
+            if show_customer_portal_fields
+            else columns,
+            "rows": rows,
+        }
 
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra
@@ -846,7 +932,27 @@ def permission_query(user):
         user=frappe.db.escape(user)
     )
     for c in customer:
-        res += ' OR `tabHD Ticket`.customer="{customer}"'.format(
+        res += " OR `tabHD Ticket`.customer={customer}".format(
             customer=frappe.db.escape(c)
         )
     return res
+
+
+def set_guest_ticket_creation_permission():
+    doctype = "HD Ticket"
+    add_permission(doctype, "Guest", 0)
+
+    role = "Guest"
+    permlevel = 0
+    ptype = ["read", "write", "create", "if_owner"]
+
+    for p in ptype:
+        # update permissions
+        update_permission_property(doctype, role, permlevel, p, 1)
+
+
+def remove_guest_ticket_creation_permission():
+    doctype = "HD Ticket"
+    role = "Guest"
+    permlevel = 0
+    remove(doctype, role, permlevel, 1)

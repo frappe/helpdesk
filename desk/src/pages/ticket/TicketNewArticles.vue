@@ -3,28 +3,28 @@
     v-if="!isEmpty(articles.data) && search.length > 2"
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
-    <div class="mb-2 font-medium">
+    <div class="mb-2 font-medium px-4">
       These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
         :to="{
-          name: 'KBHome',
+          name: 'KnowledgeBasePublicNew',
         }"
         target="_blank"
       >
-        <span class="text-xs">(View All)</span>
+        <span class="text-xs underline">(View All)</span>
       </RouterLink>
     </div>
-    <dl class="space-y-2">
+    <dl>
       <div
         v-for="a in articles.data"
         :key="a.id"
         class="focus:ring-cyan-30 rounded-md border-2 border-hidden p-4 hover:bg-cyan-100 focus:outline-none focus:ring active:bg-cyan-50"
       >
         <RouterLink
-          class="group cursor-pointer space-x-1 hover:text-gray-900"
+          class="group cursor-pointer hover:text-gray-900 flex flex-col gap-2"
           :to="{
-            name: 'KBArticlePublic',
+            name: 'KBArticlePublicNew',
             params: {
               articleId: a.name.split('#')[0],
             },
@@ -34,7 +34,7 @@
         >
           <dt class="font-semibold">{{ a.subject }} - {{ a.headings }}</dt>
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <dd class="font-light" v-html="a.description"></dd>
+          <dd class="font-light text-p-sm" v-html="a.description"></dd>
         </RouterLink>
       </div>
     </dl>

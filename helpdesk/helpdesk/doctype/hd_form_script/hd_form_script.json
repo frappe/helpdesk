@@ -9,6 +9,7 @@
   "apply_to",
   "column_break_lhfw",
   "enabled",
+  "apply_to_customer_portal",
   "section_break_qhfq",
   "script"
  ],
@@ -49,11 +50,17 @@
    "fieldtype": "Code",
    "label": "Script",
    "options": "JS"
+  },
+  {
+   "default": "0",
+   "fieldname": "apply_to_customer_portal",
+   "fieldtype": "Check",
+   "label": "Apply to customer portal"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-05 16:19:39.615245",
+ "modified": "2024-12-11 22:56:25.186577",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",

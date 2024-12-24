@@ -1,26 +1,19 @@
 <template>
-  <span class="fixed inset-0">
-    <RouterView class="antialiased" />
-    <Toasts />
-    <KeymapDialog />
-  </span>
+  <RouterView class="antialiased" />
+  <Toasts />
+  <KeymapDialog />
+  <Dialogs />
 </template>
 
 <script setup lang="ts">
-import { provide, ref, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { Toasts } from "frappe-ui";
 import { createToast } from "@/utils";
 import { useConfigStore } from "@/stores/config";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { stopSession } from "@/telemetry";
-import { init as initTelemetry } from "@/telemetry";
+import { Dialogs } from "frappe-ui";
 useConfigStore();
-
-const viewportWidth = ref(
-  Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-);
-
-provide("viewportWidth", viewportWidth);
 
 onMounted(async () => {
   window.addEventListener("online", () => {
@@ -38,7 +31,6 @@ onMounted(async () => {
       iconClasses: "stroke-red-600",
     });
   });
-  await initTelemetry();
 });
 
 onUnmounted(() => {

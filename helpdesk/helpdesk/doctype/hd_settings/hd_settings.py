@@ -9,6 +9,11 @@ from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
 
+from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
+    remove_guest_ticket_creation_permission,
+    set_guest_ticket_creation_permission,
+)
+
 
 class HDSettings(Document):
     def get_base_support_rotation(self):
@@ -49,8 +54,23 @@ class HDSettings(Document):
 
         return
 
+    def before_save(self):
+        self.update_ticket_permissions()
+
     def on_update(self):
         event = "helpdesk:settings-updated"
         room = get_website_room()
 
         frappe.publish_realtime(event, room=room, after_commit=True)
+
+    def update_ticket_permissions(self):
+        if self.allow_anyone_to_create_tickets:
+            set_guest_ticket_creation_permission()
+        if not self.allow_anyone_to_create_tickets:
+            remove_guest_ticket_creation_permission()
+
+    @property
+    def hd_search(self):
+        from helpdesk.api.article import search
+
+        return search
