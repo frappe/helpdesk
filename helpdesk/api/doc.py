@@ -165,6 +165,9 @@ def get_list_data(
             )
             rows = list.default_list_data().get("rows")
 
+    if rows is None:
+        rows = []
+
     # check if rows has all keys from columns if not add them
     for column in columns:
         if column.get("key") not in rows:
@@ -221,8 +224,7 @@ def get_list_data(
     return {
         "data": data,
         "columns": columns,
-        "rows": rows,
-        "fields": fields,
+        "fields": fields if doctype == "HD Ticket" else [],
         "total_count": len(frappe.get_list(doctype, filters=filters)),
         "row_count": len(data),
     }

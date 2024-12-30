@@ -157,7 +157,7 @@ import {
   TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
-import { validateEmail } from "@/utils";
+import { createToast, validateEmail } from "@/utils";
 import {
   MultiSelectInput,
   AttachmentItem,
@@ -165,6 +165,7 @@ import {
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { PreserveVideoControls } from "@/tiptap-extensions";
+import { useError } from "@/composables/error";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -241,6 +242,15 @@ function submitMail() {
       newEmail.value = "";
       emit("submit");
       loading.value = false;
+    },
+    onError: (err) => {
+      loading.value = false;
+      createToast({
+        title: err.exc_type,
+        text: err.messages[0],
+        icon: "x",
+        iconClasses: "text-red-500",
+      });
     },
   });
 

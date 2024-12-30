@@ -30,13 +30,4 @@ class CustomContact(Contact):
                 "width": "8rem",
             },
         ]
-        rows = [
-            "name",
-            "full_name",
-            "company_name",
-            "email_id",
-            "phone",
-            "modified",
-            "image",
-        ]
-        return {"columns": columns, "rows": rows}
+        return {"columns": columns}

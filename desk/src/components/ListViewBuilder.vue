@@ -7,7 +7,7 @@
   >
     <QuickFilters v-if="!isMobileView" />
     <div class="flex items-center gap-2" v-if="!isMobileView">
-      <Reload @click="reload" :loding="list.loading" />
+      <Reload @click="reload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
     </div>
@@ -21,57 +21,55 @@
   </FadedScrollableDiv>
 
   <!-- List View -->
-  <slot v-bind="{ list }">
-    <ListView
-      v-if="list.data?.data.length > 0"
-      class="flex-1"
-      :columns="columns"
-      :rows="rows"
-      row-key="name"
-      :options="{
-        selectable: props.options.selectable ?? true ,
-        showTooltip: true,
-        resizeColumn: false,
-        onRowClick: (row: Object) => emit('rowClick', row['name']),
-        emptyState,
-      }"
-    >
-      <ListHeader class="sm:mx-5 mx-3">
-        <ListHeaderItem
-          v-for="column in columns"
-          :key="column.key"
-          :item="column"
-          @columnWidthUpdated="(width) => console.log(width)"
-        />
-      </ListHeader>
-      <ListRows class="sm:mx-5 mx-3">
-        <ListRow
-          v-for="row in rows"
-          :key="row.name"
-          v-slot="{ idx, column, item }"
-          :row="row"
-          class="truncate text-base"
-        >
-          <ListRowItem :item="item" :row="row" :column="column">
-            <!-- TODO: filters on click of other columns -->
-            <!-- and not on first column, it should emit the event -->
-            <div v-if="idx === 0" class="truncate">
-              {{ item }}
-            </div>
-            <div v-else-if="column.type === 'Datetime'">
-              {{ dayjs.tz(item).fromNow() }}
-            </div>
-            <div v-else-if="column.type === 'status'">
-              <Badge v-bind="handleStatusColor(item)" />
-            </div>
-            <div v-else class="truncate">
-              {{ item }}
-            </div>
-          </ListRowItem>
-        </ListRow>
-      </ListRows>
-    </ListView>
-  </slot>
+  <ListView
+    v-if="list.data?.data.length > 0"
+    class="flex-1"
+    :columns="columns"
+    :rows="rows"
+    row-key="name"
+    :options="{
+      selectable: props.options.selectable ?? true ,
+      showTooltip: true,
+      resizeColumn: false,
+      onRowClick: (row: Object) => emit('rowClick', row['name']),
+      emptyState,
+    }"
+  >
+    <ListHeader class="sm:mx-5 mx-3">
+      <ListHeaderItem
+        v-for="column in columns"
+        :key="column.key"
+        :item="column"
+        @columnWidthUpdated="(width) => console.log(width)"
+      />
+    </ListHeader>
+    <ListRows class="sm:mx-5 mx-3">
+      <ListRow
+        v-for="row in rows"
+        :key="row.name"
+        v-slot="{ idx, column, item }"
+        :row="row"
+        class="truncate text-base"
+      >
+        <ListRowItem :item="item" :row="row" :column="column">
+          <!-- TODO: filters on click of other columns -->
+          <!-- and not on first column, it should emit the event -->
+          <div v-if="idx === 0" class="truncate">
+            {{ item }}
+          </div>
+          <div v-else-if="column.type === 'Datetime'">
+            {{ dayjs.tz(item).fromNow() }}
+          </div>
+          <div v-else-if="column.type === 'status'">
+            <Badge v-bind="handleStatusColor(item)" />
+          </div>
+          <div v-else class="truncate">
+            {{ item }}
+          </div>
+        </ListRowItem>
+      </ListRow>
+    </ListRows>
+  </ListView>
 
   <!-- List Footer -->
   <div
