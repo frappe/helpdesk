@@ -15,7 +15,7 @@ import { stopSession } from "@/telemetry";
 import { Dialogs } from "frappe-ui";
 useConfigStore();
 
-onMounted(async () => {
+onMounted(() => {
   window.addEventListener("online", () => {
     createToast({
       title: "You are now online",
