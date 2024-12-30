@@ -123,7 +123,7 @@ def get_list_data(
     order_by: str = "modified desc",
     page_length=20,
     columns=None,
-    rows=[],
+    rows=None,
     show_customer_portal_fields=False,
 ):
     is_default = True
@@ -163,7 +163,10 @@ def get_list_data(
                 if doctype == "HD Ticket"
                 else list.default_list_data().get("columns")
             )
-            rows = list.default_list_data().get("rows") or []
+            rows = list.default_list_data().get("rows")
+
+    if rows is None:
+        rows = []
 
     # check if rows has all keys from columns if not add them
     for column in columns:
