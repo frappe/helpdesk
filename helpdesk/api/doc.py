@@ -123,7 +123,7 @@ def get_list_data(
     order_by: str = "modified desc",
     page_length=20,
     columns=None,
-    rows=None,
+    rows=[],
     show_customer_portal_fields=False,
 ):
     is_default = True
@@ -163,7 +163,7 @@ def get_list_data(
                 if doctype == "HD Ticket"
                 else list.default_list_data().get("columns")
             )
-            rows = list.default_list_data().get("rows")
+            rows = list.default_list_data().get("rows") or []
 
     # check if rows has all keys from columns if not add them
     for column in columns:
@@ -221,8 +221,7 @@ def get_list_data(
     return {
         "data": data,
         "columns": columns,
-        "rows": rows,
-        "fields": fields,
+        "fields": fields if doctype == "HD Ticket" else [],
         "total_count": len(frappe.get_list(doctype, filters=filters)),
         "row_count": len(data),
     }

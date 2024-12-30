@@ -80,16 +80,7 @@ class HDArticle(Document):
                 "width": "8rem",
             },
         ]
-        rows = [
-            "name",
-            "title",
-            "category",
-            "status",
-            "author",
-            "published_on",
-            "modified",
-        ]
-        return {"columns": columns, "rows": rows}
+        return {"columns": columns}
 
     @frappe.whitelist()
     def set_feedback(self, value):
