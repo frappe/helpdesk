@@ -19,24 +19,3 @@ class HDArticleCategory(Document):
                     "HD Article Category", {"parent_category": self.parent_category}
                 )
             )
-
-    def archive(self):
-        self.idx = -1
-        self.status = "Archived"
-        self.save()
-
-    def unarchive(self):
-        self.status = "Published"
-        self.save()
-
-    def get_breadcrumbs(self):
-        breadcrumbs = [{"name": self.name, "label": self.category_name}]
-        current_category = self
-        while current_category.parent_category:
-            current_category = frappe.get_doc(
-                "HD Article Category", current_category.parent_category
-            )
-            breadcrumbs.append(
-                {"name": current_category.name, "label": current_category.category_name}
-            )
-        return breadcrumbs[::-1]
