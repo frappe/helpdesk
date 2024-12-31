@@ -3,6 +3,7 @@
 		"esModuleInterop": true,
 		"allowSyntheticDefaultImports": true,
 		"target": "es2021",
+		"module": "esnext",
 		"moduleResolution":"node",
 		"paths": {
 			"@/*": ["./src/*"]
@@ -10,6 +11,8 @@
 		"types": [
 			"unplugin-icons/types/vue",
 			"vite/client"
-		]
-	}
+		],
+	},
+	"include": ["src","src/*","src/**/*.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx","src/**/*.vue"],
+	"exclude": ["node_modules"]
 }

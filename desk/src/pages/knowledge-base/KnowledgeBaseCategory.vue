@@ -44,8 +44,7 @@
       >
         <template #bottom>
           <div class="text-base text-gray-600">
-            {{ c.count_article ? c.count_article : "No" }}
-            {{ c.count_article > 1 ? "articles" : "article" }}
+            {{ c.article_count + " articles" }}
           </div>
         </template>
       </HCard>
@@ -131,7 +130,6 @@ import {
 import { isEmpty } from "lodash";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY } from "@/router";
 import { createToast } from "@/utils";
-import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
 import { HCard } from "@/components";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
@@ -217,9 +215,9 @@ const newSubCategory = createResource({
   onError: useError({ title: "Error creating sub category" }),
 });
 
-const subCategories = createListManager({
-  doctype: "HD Article Category",
-  filters: {
+const subCategories = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_article_category.api.get_subcategories",
+  params: {
     parent_category: categoryId.value,
   },
   auto: true,

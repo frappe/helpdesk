@@ -10,6 +10,7 @@
     :placeholder="placeholder"
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
+    :extensions="[PreserveVideoControls]"
   >
     <template #top>
       <div class="mx-10 flex items-center gap-2 border-y py-2.5">
@@ -156,13 +157,15 @@ import {
   TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
-import { validateEmail } from "@/utils";
+import { createToast, validateEmail } from "@/utils";
 import {
   MultiSelectInput,
   AttachmentItem,
   CannedResponseSelectorModal,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { PreserveVideoControls } from "@/tiptap-extensions";
+import { useError } from "@/composables/error";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -239,6 +242,15 @@ function submitMail() {
       newEmail.value = "";
       emit("submit");
       loading.value = false;
+    },
+    onError: (err) => {
+      loading.value = false;
+      createToast({
+        title: err.exc_type,
+        text: err.messages[0],
+        icon: "x",
+        iconClasses: "text-red-500",
+      });
     },
   });
 
@@ -324,7 +336,12 @@ const textEditorMenuButtons = [
   ],
 ];
 
+const editor = computed(() => {
+  return editorRef.value.editor;
+});
+
 defineExpose({
   addToReply,
+  editor,
 });
 </script>

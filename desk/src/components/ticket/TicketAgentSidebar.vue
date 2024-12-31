@@ -9,29 +9,13 @@
       :contact="ticket.contact"
       @email:open="(e) => emit('email:open', e)"
     />
-    <div
+    <!-- feedback component -->
+    <TicketFeedback
       v-if="ticket.feedback_rating"
       class="border-b px-6 py-3 text-base text-gray-600"
-    >
-      <div class="flex">
-        <div class="min-w-[106px] pb-1.5">Rating</div>
-        <div class="px-1.5">
-          <StarRating :rating="ticket.feedback_rating" />
-        </div>
-      </div>
-      <div class="flex">
-        <div class="w-[106px] pb-1.5">Feedback</div>
-        <div class="px-1.5 text-gray-800">
-          {{ ticket.feedback_text }}
-        </div>
-      </div>
-      <div v-if="ticket.feedback_extra" class="flex">
-        <div class="min-w-[106px] pb-1.5">Comment</div>
-        <div class="px-1.5 text-gray-800">
-          {{ ticket.feedback_extra }}
-        </div>
-      </div>
-    </div>
+      :ticket="ticket"
+    />
+    <!-- ticket details -->
     <TicketAgentDetails
       :agreement-status="ticket.agreement_status"
       :first-responded-on="ticket.first_responded_on"
@@ -41,12 +25,12 @@
       :ticket-created-on="ticket.creation"
       :source="ticket.via_customer_portal ? 'Portal' : 'Mail'"
     />
+    <!-- fields -->
     <TicketAgentFields :ticket="ticket" @update="update" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { StarRating } from "@/components";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";

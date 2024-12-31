@@ -17,3 +17,4 @@ helpdesk.helpdesk.doctype.hd_ticket.patches.replace_overdue_failed
 helpdesk.patches.create_helpdesk_folder
 helpdesk.helpdesk.doctype.hd_ticket.patches.feedback_in_master
 helpdesk.helpdesk.doctype.hd_ticket.patches.first_responded_on
+helpdesk.patches.update_hd_team_users

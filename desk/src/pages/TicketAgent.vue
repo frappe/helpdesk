@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader v-if="ticket.data">
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs" />
       </template>
       <template #right-header>
         <CustomActions
@@ -43,34 +43,37 @@
         </Dropdown>
       </template>
     </LayoutHeader>
-    <div v-if="ticket.data" class="flex h-screen overflow-hidden">
+    <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col">
-        <div class="flex items-center justify-between border-b py-1 pr-2.5">
-          <span class="pl-6 text-lg font-semibold">Activity</span>
-          <Switch
-            v-model="showFullActivity"
-            size="sm"
-            label="Show all activity"
-          />
+        <!-- ticket activities -->
+        <div class="overflow-y-auto flex-1">
+          <Tabs
+            v-model="tabIndex"
+            v-slot="{ tab }"
+            :tabs="tabs"
+            class="!h-full"
+          >
+            <TicketAgentActivities
+              ref="ticketAgentActivitiesRef"
+              :activities="filterActivities(tab.name)"
+              :title="tab.label"
+              @update="
+                () => {
+                  ticket.reload();
+                }
+              "
+              @email:reply="
+                (e) => {
+                  communicationAreaRef.replyToEmail(e);
+                }
+              "
+            />
+          </Tabs>
         </div>
-        <TicketAgentActivities
-          ref="ticketAgentActivitiesRef"
-          :activities="activities"
-          @update="
-            () => {
-              ticket.reload();
-            }
-          "
-          @email:reply="
-            (e) => {
-              communicationAreaRef.replyToEmail(e);
-            }
-          "
-        />
         <CommunicationArea
           ref="communicationAreaRef"
           v-model="ticket.data"
-          :to-emails="[ticket.data.raised_by]"
+          :to-emails="[ticket.data?.raised_by]"
           :cc-emails="[]"
           :bcc-emails="[]"
           @update="
@@ -99,50 +102,39 @@
         }
       "
     />
-    <Dialog v-model="showSubjectDialog">
-      <template #body-title>
-        <h3>Rename</h3>
-      </template>
+    <!-- Rename Subject Dialog -->
+    <Dialog v-model="showSubjectDialog" :options="{ title: 'Rename Subject' }">
       <template #body-content>
-        <FormControl
-          v-model="subjectInput"
-          :type="'text'"
-          size="sm"
-          variant="subtle"
-          :disabled="false"
-          label="New Subject"
-        />
-      </template>
-      <template #actions>
-        <Button
-          variant="solid"
-          :disabled="!subjectInput"
-          :loading="isLoading"
-          @click="
-            () => {
-              updateTicket('subject', subjectInput);
-              showSubjectDialog = false;
-            }
-          "
-        >
-          Confirm
-        </Button>
-        <Button class="ml-2" @click="showSubjectDialog = false"> Close </Button>
+        <div class="flex flex-col flex-1 gap-3">
+          <FormControl
+            v-model="renameSubject"
+            type="textarea"
+            size="sm"
+            variant="subtle"
+            :disabled="false"
+          />
+          <Button
+            variant="solid"
+            :loading="isLoading"
+            label="Rename"
+            @click="handleRename"
+          />
+        </div>
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted } from "vue";
+import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
-  Switch,
   createResource,
   Dialog,
   FormControl,
+  Tabs,
 } from "frappe-ui";
 
 import {
@@ -152,17 +144,23 @@ import {
   CommunicationArea,
 } from "@/components";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
-import { IndicatorIcon } from "@/components/icons";
-
+import {
+  IndicatorIcon,
+  CommentIcon,
+  ActivityIcon,
+  EmailIcon,
+} from "@/components/icons";
+import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { createToast, setupCustomActions } from "@/utils";
+import { TabObject, TicketTab } from "@/types";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
-const subjectInput = ref(null);
+const renameSubject = ref("");
 const isLoading = ref(false);
 
 const props = defineProps({
@@ -171,6 +169,13 @@ const props = defineProps({
     required: true,
   },
 });
+watch(
+  () => props.ticketId,
+  () => {
+    ticket.reload();
+  }
+);
+provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
   showAllActivity: true,
@@ -184,9 +189,9 @@ const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
   auto: true,
-  params: {
+  makeParams: () => ({
     name: props.ticketId,
-  },
+  }),
   transform: (data) => {
     if (data._assign) {
       data.assignees = JSON.parse(data._assign).map((assignee) => {
@@ -197,23 +202,36 @@ const ticket = createResource({
         };
       });
     }
+    renameSubject.value = data.subject;
   },
   onSuccess: (data) => {
-    subjectInput.value = data.subject;
     setupCustomActions(data, {
       doc: data,
+      updateField,
     });
   },
 });
+function updateField(name, value, callback = () => {}) {
+  updateTicket(name, value);
+  callback();
+}
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
   items.push({
     label: ticket.data?.subject,
-    route: { name: "TicketAgent" },
+    onClick: () => {
+      showSubjectDialog.value = true;
+    },
   });
   return items;
 });
+
+const handleRename = () => {
+  if (renameSubject.value === ticket.data?.subject) return;
+  updateTicket("subject", renameSubject.value);
+  showSubjectDialog.value = false;
+};
 
 watch(
   () => showFullActivity.value,
@@ -234,19 +252,38 @@ const dropdownOptions = computed(() =>
   }))
 );
 
+const tabIndex = ref(0);
+const tabs: TabObject[] = [
+  {
+    name: "activity",
+    label: "Activity",
+    icon: ActivityIcon,
+  },
+  {
+    name: "email",
+    label: "Emails",
+    icon: EmailIcon,
+  },
+  {
+    name: "comment",
+    label: "Comments",
+    icon: CommentIcon,
+  },
+];
+
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email) => {
     return {
-      type: "email",
-      key: email.creation,
+      subject: email.subject,
+      content: email.content,
       sender: { name: email.user.email, full_name: email.user.name },
       to: email.recipients,
+      type: "email",
+      key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
       creation: email.creation,
-      subject: email.subject,
       attachments: email.attachments,
-      content: email.content,
     };
   });
 
@@ -306,9 +343,15 @@ const activities = computed(() => {
     }
     i++;
   }
-
   return data;
 });
+
+function filterActivities(eventType: TicketTab) {
+  if (eventType === "activity") {
+    return activities.value;
+  }
+  return activities.value.filter((activity) => activity.type === eventType);
+}
 
 function updateTicket(fieldname: string, value: string) {
   isLoading.value = true;
@@ -323,7 +366,6 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
-      ticket.reload();
       createToast({
         title: "Ticket updated",
         icon: "check",
@@ -346,11 +388,28 @@ function updateTicket(fieldname: string, value: string) {
     },
   });
 }
+
 onMounted(() => {
   document.title = props.ticketId;
+  socket.on("helpdesk:ticket-update", (ticketID) => {
+    if (ticketID === Number(props.ticketId)) {
+      ticket.reload();
+    }
+  });
 });
 
 onUnmounted(() => {
   document.title = "Helpdesk";
+  socket.off("helpdesk:ticket-update");
 });
 </script>
+
+<style>
+.breadcrumbs button {
+  background-color: inherit !important;
+  &:hover,
+  &:focus {
+    background-color: inherit !important;
+  }
+}
+</style>

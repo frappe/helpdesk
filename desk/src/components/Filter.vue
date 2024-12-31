@@ -23,15 +23,63 @@
     </template>
     <template #body="{ close }">
       <div class="my-2 rounded bg-white shadow">
-        <div class="min-w-[400px] p-2">
+        <div class="p-2" :class="!isMobileView && 'min-w-[420px]'">
           <div v-if="filters.length">
             <div
               v-for="(filter, idx) in filters"
               id="filter-list"
               :key="idx"
-              class="mb-3 flex items-center justify-between gap-2"
+              class="mb-3 flex flex-1 justify-between gap-2"
             >
-              <div class="flex items-center gap-2">
+              <div
+                v-if="isMobileView"
+                class="flex flex-1 gap-2 flex-col abcxyz"
+              >
+                <div
+                  class="pl-2 text-end text-base text-gray-600 flex justify-between flex-1 items-center"
+                >
+                  <p>{{ idx == 0 ? "Where" : "And" }}</p>
+                  <Button variant="ghost" icon="x" @click="removeFilter(idx)" />
+                </div>
+                <div id="fieldname" class="!min-w-[140px]">
+                  <Autocomplete
+                    :value="filter.field.fieldname"
+                    :options="filterableFields"
+                    placeholder="Filter by..."
+                    @change="(field) => updateFilter(idx, field)"
+                  />
+                </div>
+                <div id="operator">
+                  <FormControl
+                    v-model="filter.operator"
+                    type="select"
+                    :options="getOperators(filter.field.fieldtype)"
+                    placeholder="Operator"
+                    @change="
+                      (e) => updateFilter(idx, null, null, e.target.value)
+                    "
+                  />
+                </div>
+                <div id="value" class="!min-w-[140px]">
+                  <SearchComplete
+                    v-if="typeLink.includes(filter.field.fieldtype)"
+                    :key="filter.field.fieldname"
+                    :doctype="filter.field.options"
+                    :value="filter.value.toString()"
+                    @change="(v) => updateFilter(idx, null, v.value)"
+                  />
+                  <component
+                    :is="
+                      getValSelect(filter.field.fieldtype, filter.field.options)
+                    "
+                    v-else
+                    v-model="filter.value"
+                    placeholder="Value"
+                    @change="(e) => updateFilter(idx, null, e.target.value)"
+                  />
+                </div>
+              </div>
+              <div v-else class="flex items-center gap-2">
                 <div class="w-13 pl-2 text-end text-base text-gray-600">
                   {{ idx == 0 ? "Where" : "And" }}
                 </div>
@@ -72,8 +120,8 @@
                     @change="(e) => updateFilter(idx, null, e.target.value)"
                   />
                 </div>
+                <Button variant="ghost" icon="x" @click="removeFilter(idx)" />
               </div>
-              <Button variant="ghost" icon="x" @click="removeFilter(idx)" />
             </div>
           </div>
           <div
@@ -121,6 +169,7 @@ import { h } from "vue";
 import { FormControl } from "frappe-ui";
 import { NestedPopover, SearchComplete, Autocomplete } from "@/components";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
+import { useScreenSize } from "@/composables/screen";
 import { DocField } from "@/types";
 
 let emit = defineEmits(["event:filter"]);
@@ -135,6 +184,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const { isMobileView } = useScreenSize();
 
 function setfilter(data) {
   let filterEvent = {
@@ -162,7 +213,7 @@ function setfilter(data) {
 function updateFilter(
   index: number,
   field = null,
-  value: string = null,
+  value: string = "",
   operator: string = null
 ) {
   let filter = JSON.parse(JSON.stringify(props.filters[index]));

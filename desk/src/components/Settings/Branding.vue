@@ -7,7 +7,7 @@
       <p class="text-sm text-gray-600">{{ config.title }}</p>
       <div class="flex gap-4 items-center">
         <Avatar
-          v-if="config.image && !websiteSettings.loading"
+          v-if="config.image && !config.loading"
           size="3xl"
           :image="config.image"
         />
@@ -51,9 +51,22 @@ import { createToast } from "@/utils";
 
 const config = useConfigStore();
 
+const websiteSettings = createResource({
+  url: "frappe.client.get_value",
+  cache: true,
+  params: {
+    doctype: "Website Settings",
+    fieldname: "favicon",
+  },
+  onSuccess(data) {
+    state.brandFavicon = data.favicon;
+  },
+  auto: true,
+});
+
 const state = reactive({
   brandLogo: config.brandLogo,
-  brandFavicon: "",
+  brandFavicon: websiteSettings.data?.favicon || "",
 });
 
 const loadingState = reactive({
@@ -77,19 +90,6 @@ const brandingConfig = computed(() => [
     loading: loadingState.faviconLoading,
   },
 ]);
-
-const websiteSettings = createResource({
-  url: "frappe.client.get_value",
-  cache: true,
-  params: {
-    doctype: "Website Settings",
-    fieldname: "favicon",
-  },
-  onSuccess(data) {
-    state.brandFavicon = data.favicon;
-  },
-  auto: true,
-});
 
 const settingsResource = createResource({
   url: "frappe.client.set_value",

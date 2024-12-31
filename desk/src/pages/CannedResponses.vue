@@ -23,13 +23,13 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto p-2">
       <div
-        v-if="cannedResponses?.data?.data?.length"
-        class="grid grid-cols-4 gap-4 px-5 pb-3"
+        v-if="cannedResponses.data?.length > 0"
+        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 px-5 pb-3"
       >
         <div
-          v-for="cannedResponse in cannedResponses.data.data"
+          v-for="cannedResponse in cannedResponses.data"
           :key="cannedResponse.name"
           class="group flex h-56 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-5 py-4 shadow-sm hover:bg-gray-50"
           @click="editItem(cannedResponse)"
@@ -79,6 +79,11 @@
           </div>
         </div>
       </div>
+      <EmptyState
+        v-else
+        title="No Canned Responses Found"
+        @emptyStateAction="showNewDialog = true"
+      />
     </div>
     <CannedResponseModal
       v-model="showNewDialog"
@@ -109,18 +114,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import {
-  createResource,
+  createListResource,
   Breadcrumbs,
   Dropdown,
   TextEditor,
   Tooltip,
   call,
+  usePageMeta,
 } from "frappe-ui";
 import { CannedResponseModal } from "@/components/canned-response/";
 import { LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
 import { dateFormat, dateTooltipFormat } from "@/utils";
 import { dayjs } from "@/dayjs";
+import EmptyState from "../components/EmptyState.vue";
 
 const { getUser } = useUserStore();
 
@@ -133,11 +140,9 @@ const message = ref(null);
 const name = ref(null);
 const showNewDialog = ref(false);
 
-const cannedResponses = createResource({
-  url: "helpdesk.api.doc.get_list_data",
-  params: {
-    doctype: "HD Canned Response",
-  },
+const cannedResponses = createListResource({
+  doctype: "HD Canned Response",
+  fields: ["name", "title", "message", "owner", "modified"],
   auto: true,
 });
 
@@ -155,4 +160,10 @@ async function deleteItem(name) {
   });
   cannedResponses.reload();
 }
+
+usePageMeta(() => {
+  return {
+    title: "Canned Responses",
+  };
+});
 </script>
