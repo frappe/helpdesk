@@ -11,6 +11,7 @@ import {
   AGENT_PORTAL_CUSTOMER_LIST,
   AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
+  AGENT_PORTAL_KNOWLEDGE_BASE,
 } from "@/router";
 
 export const agentPortalSidebarOptions = [
@@ -27,7 +28,7 @@ export const agentPortalSidebarOptions = [
   {
     label: "Knowledge base",
     icon: LucideBookOpen,
-    to: "DeskKBHome",
+    to: AGENT_PORTAL_KNOWLEDGE_BASE,
   },
   {
     label: "Teams",
@@ -60,6 +61,6 @@ export const customerPortalSidebarOptions = [
   {
     label: "Knowledge base",
     icon: LucideBookOpen,
-    to: "KnowledgeBasePublicNew",
+    to: AGENT_PORTAL_KNOWLEDGE_BASE,
   },
 ];

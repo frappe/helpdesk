@@ -21,7 +21,6 @@ export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
-export const KB_PUBLIC = "KBHome";
 export const KB_PUBLIC_ARTICLE = "KBArticlePublic";
 export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 
@@ -90,23 +89,9 @@ const routes = [
           },
         ],
       },
-      // handle knowledge base routing
       {
-        path: "knowledge-base-public",
-        children: [
-          {
-            path: "",
-            name: "KnowledgeBasePublicNew",
-            component: () =>
-              import("@/pages/knowledge-base-v2/KnowledgeBasePublic.vue"),
-          },
-          {
-            path: "articles/:articleId?",
-            name: "KBArticlePublicNew",
-            component: () => import("@/pages/KnowledgeBaseArticle.vue"),
-            props: true,
-          },
-        ],
+        path: "kb",
+        name: AGENT_PORTAL_KNOWLEDGE_BASE,
       },
     ],
   },
@@ -152,28 +137,6 @@ const routes = [
         path: "kb",
         name: AGENT_PORTAL_KNOWLEDGE_BASE,
         component: () => import("@/pages/knowledge-base/KnowledgeBase.vue"),
-        children: [
-          {
-            path: ":categoryId",
-            name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
-            props: true,
-            component: () =>
-              import("@/pages/knowledge-base/KnowledgeBaseCategory.vue"),
-          },
-          {
-            path: ":categoryId/:subCategoryId",
-            name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
-            props: true,
-            component: () =>
-              import("@/pages/knowledge-base/KnowledgeBaseSubcategory.vue"),
-          },
-        ],
-      },
-      {
-        path: "kb/articles/:articleId",
-        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
-        props: true,
-        component: () => import("@/pages/KnowledgeBaseArticle.vue"),
       },
       {
         path: "customers",
