@@ -7,7 +7,7 @@
     <div class="flex p-2 gap-3 flex-1 max-w-[50%]">
       <Avatar label="JD" shape="square" size="2xl" :image="articleImg" />
       <div class="flex flex-col gap-1.5 w-full">
-        <h5 class="text-lg font-semibold text-gray-800">
+        <h5 class="text-lg font-semibold text-gray-800 truncate max-w-[70%]">
           {{ article.title }}
         </h5>
         <div class="text-sm text-gray-600 truncate max-w-[70%]">

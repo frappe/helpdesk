@@ -65,17 +65,14 @@ def get_sub_categories_and_articles(category):
         }
         category_tree["sub_categories"].append(sub_cat_tree)
 
-    # add all articles to the main tree
-
+    all_articles = []
     for sub_cat in category_tree["sub_categories"]:
-        category_tree["all_articles"].extend(sub_cat["articles"])
+        all_articles.extend(sub_cat["articles"])
 
     # get author details
-    for article in category_tree["all_articles"]:
+    for article in all_articles:
         author = article["author"]
         if author not in category_tree["authors"]:
             category_tree["authors"][author] = get_user_info_for_avatar(author)
-
-    category_tree["children"] = direct_articles + category_tree["sub_categories"]
 
     return category_tree

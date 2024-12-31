@@ -7,21 +7,11 @@
     }"
   >
     <div class="flex flex-col gap-1">
-      <div class="text-sm font-medium text-gray-600">Categories</div>
-      <div v-if="!categories.isLoading" class="flex flex-col gap-1">
-        <!-- all categories here -->
-        <SidebarLink
-          v-for="category in categories.data"
-          :key="category.label"
-          :icon="getIcon(category.icon, true)"
-          :is-active="activeCategory === category.name"
-          :is-expanded="true"
-          :label="category.category_name"
-          :bg-color="'bg-gray-100'"
-          :hv-color="'hover:bg-gray-300'"
-          @click="handleClick(category.name)"
-          class="truncate text-ellipsis"
-        />
+      <div
+        class="text-sm font-medium text-gray-600 mb-1 flex justify-between items-center"
+      >
+        <p>Categories</p>
+        <p>as</p>
       </div>
     </div>
   </div>
@@ -29,7 +19,7 @@
 
 <script setup lang="ts">
 import SidebarLink from "../SidebarLink.vue";
-import { createListResource } from "frappe-ui";
+import { createListResource, Tree } from "frappe-ui";
 import { getIcon } from "@/pages/knowledge-base/util";
 const emit = defineEmits(["category-change"]);
 
