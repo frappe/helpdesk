@@ -165,7 +165,7 @@ export default {
           {
             title: "Knowledge Base",
             icon: () => h(LucideBookOpen),
-            route: { name: "DeskKBHome" },
+            route: { name: "AgentKnowledgeBase" },
             condition: () => true,
           },
         ].filter((item) => (item.condition ? item.condition() : true)),

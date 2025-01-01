@@ -89,10 +89,10 @@ const routes = [
           },
         ],
       },
-      {
-        path: "kb",
-        name: AGENT_PORTAL_KNOWLEDGE_BASE,
-      },
+      // {
+      //   path: "kb",
+      //   name: AGENT_PORTAL_KNOWLEDGE_BASE,
+      // },
     ],
   },
   // Agent Portal Routing
@@ -135,8 +135,17 @@ const routes = [
       },
       {
         path: "kb",
-        name: AGENT_PORTAL_KNOWLEDGE_BASE,
+        name: "AgentKnowledgeBase",
         component: () => import("@/pages/knowledge-base/KnowledgeBase.vue"),
+      },
+      {
+        path: "articles/new",
+        name: "NewArticle",
+        component: () => import("@/pages/knowledge-base/NewArticle.vue"),
+      },
+      {
+        path: "articles/:articleId",
+        name: "Article",
       },
       {
         path: "customers",

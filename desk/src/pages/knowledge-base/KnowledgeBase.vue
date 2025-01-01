@@ -5,7 +5,11 @@
         <div class="text-lg font-medium text-gray-900">Knowledge base</div>
       </template>
       <template #right-header>
-        <Button label="New article" variant="solid" @click="console.log('a')">
+        <Button
+          label="New article"
+          variant="solid"
+          @click="() => $router.push('/articles/new')"
+        >
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
           </template>

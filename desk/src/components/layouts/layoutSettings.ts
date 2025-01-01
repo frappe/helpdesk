@@ -28,7 +28,7 @@ export const agentPortalSidebarOptions = [
   {
     label: "Knowledge base",
     icon: LucideBookOpen,
-    to: AGENT_PORTAL_KNOWLEDGE_BASE,
+    to: "AgentKnowledgeBase",
   },
   {
     label: "Teams",
