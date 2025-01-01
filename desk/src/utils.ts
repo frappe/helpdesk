@@ -120,3 +120,41 @@ export function setupCustomActions(data, obj) {
 
 export const isCustomerPortal = (route: RouteLocation) =>
   route.meta.public ?? false;
+
+export const textEditorMenuButtons = [
+  "Paragraph",
+  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Separator",
+  "Bullet List",
+  "Numbered List",
+  "Separator",
+  "Align Left",
+  "Align Center",
+  "Align Right",
+  "FontColor",
+  "Separator",
+  "Image",
+  "Video",
+  "Link",
+  "Blockquote",
+  "Code",
+  "Horizontal Rule",
+  [
+    "InsertTable",
+    "AddColumnBefore",
+    "AddColumnAfter",
+    "DeleteColumn",
+    "AddRowBefore",
+    "AddRowAfter",
+    "DeleteRow",
+    "MergeCells",
+    "SplitCell",
+    "ToggleHeaderColumn",
+    "ToggleHeaderRow",
+    "ToggleHeaderCell",
+    "DeleteTable",
+  ],
+];

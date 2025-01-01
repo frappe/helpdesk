@@ -110,7 +110,7 @@ import {
   AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
   CUSTOMER_PORTAL_NEW_TICKET,
 } from "@/router";
-import { createToast } from "@/utils";
+import { createToast, textEditorMenuButtons } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useError } from "@/composables/error";
 import { LayoutHeader } from "@/components";
@@ -353,7 +353,9 @@ const insertRes = createResource({
       },
     });
   },
-  onError: useError({ title: "Error creating article" }),
+  onError(err){
+    useError(err);,
+  }
 });
 
 const setValueRes = createResource({
@@ -410,44 +412,6 @@ const backTo = computed(() => ({
     subCategoryId: subCategoryId.value,
   },
 }));
-
-const textEditorMenuButtons = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-  "Separator",
-  "Bold",
-  "Italic",
-  "Separator",
-  "Bullet List",
-  "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
-  "Separator",
-  "Image",
-  "Video",
-  "Link",
-  "Blockquote",
-  "Code",
-  "Horizontal Rule",
-  [
-    "InsertTable",
-    "AddColumnBefore",
-    "AddColumnAfter",
-    "DeleteColumn",
-    "AddRowBefore",
-    "AddRowAfter",
-    "DeleteRow",
-    "MergeCells",
-    "SplitCell",
-    "ToggleHeaderColumn",
-    "ToggleHeaderRow",
-    "ToggleHeaderCell",
-    "DeleteTable",
-  ],
-];
 
 const textEditorContentWithIDs = computed(() =>
   article.data?.content ? addLinksToHeadings(article.data?.content) : null
