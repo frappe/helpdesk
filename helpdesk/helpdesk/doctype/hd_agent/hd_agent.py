@@ -41,7 +41,7 @@ class HDAgent(Document):
                 "type": "Datetime",
             },
         ]
-        rows = ["modified"]
+        rows = ["modified", "user.user_image"]
         # modified row is needed because
         # we have a link table for HD Agent to User
         # and sql gets confused which modified to take from those 2 tables
