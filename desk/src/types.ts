@@ -218,7 +218,7 @@ export interface Article {
   title: string;
   category: string;
   published_on: string;
-  author: string;
+  author: Author;
   subtitle: string;
   article_image: string | null;
   _user_tags: string | null;
@@ -234,7 +234,7 @@ export interface SubCategory {
 export interface Author {
   name: string;
   image: string | null;
-  email?: string;
+  email: string;
 }
 
 export interface Category {

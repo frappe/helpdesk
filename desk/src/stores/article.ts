@@ -1,4 +1,3 @@
-import { useError } from "@/composables/error";
 import { createResource } from "frappe-ui";
 
 export const newArticle = createResource({
@@ -12,8 +11,12 @@ export const newArticle = createResource({
       },
     };
   },
-  validate(params) {
-    if (!params.doc.title) throw "Title is required";
-    if (!params.doc.content) throw "Content is required";
+  validate({ doc }) {
+    if (!doc.title) throw "Title is required";
+    if (!doc.content) throw "Content is required";
   },
+});
+
+export const updateArticle = createResource({
+  url: "frappe.client.set_value",
 });

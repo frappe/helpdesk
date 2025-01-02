@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils import get_user_info_for_avatar
 
 from helpdesk.utils import is_agent
 
@@ -36,3 +37,24 @@ def get_article(name: str):
         "sub_category": sub_category,
         "user_feedback": user_feedback,
     }
+
+
+@frappe.whitelist(allow_guest=True)
+def get_article2(name: str):
+    article = frappe.get_doc("HD Article", name).as_dict()
+
+    if not is_agent() and article["status"] != "Published":
+        frappe.throw(_("Access denied"), frappe.PermissionError)
+
+    author = get_user_info_for_avatar(article["author"])
+
+    return {
+        "name": article.name,
+        "title": article.title,
+        "content": article.content,
+        "author": author,
+        "creation": article.creation,
+        "status": article.status,
+    }
+    print("\n\n", article, "\n\n")
+    return article

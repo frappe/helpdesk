@@ -139,13 +139,15 @@ const routes = [
         component: () => import("@/pages/knowledge-base/KnowledgeBase.vue"),
       },
       {
+        path: "kb/articles/:articleId",
+        name: "Article",
+        component: () => import("@/pages/knowledge-base/EditArticle.vue"),
+        props: true,
+      },
+      {
         path: "articles/new",
         name: "NewArticle",
         component: () => import("@/pages/knowledge-base/NewArticle.vue"),
-      },
-      {
-        path: "articles/:articleId",
-        name: "Article",
       },
       {
         path: "customers",
