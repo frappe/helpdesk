@@ -55,6 +55,7 @@ def get_article2(name: str):
         "author": author,
         "creation": article.creation,
         "status": article.status,
+        "published_on": article.published_on,
     }
 
     return article

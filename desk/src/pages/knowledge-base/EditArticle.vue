@@ -12,7 +12,13 @@
         </div>
       </template>
       <template #right-header>
-        <Button label="Edit" iconLeft="edit" />
+        <Button
+          label="Edit"
+          iconLeft="edit"
+          @click="handleEditMode"
+          v-if="!editable"
+        />
+        <Button label="Save" @click="handleSave" v-if="editable" />
         <Button
           variant="solid"
           :label="article.data?.status === 'Draft' ? 'Publish' : 'Unpublish'"
@@ -21,17 +27,86 @@
         />
       </template>
     </LayoutHeader>
-    <div class="pt-6 mx-auto w-full max-w-4xl px-5" v-if="!article.loading">
-      {{ article.data }}
+
+    <div class="pt-6 mx-auto w-full max-w-2xl px-5" v-if="!article.loading">
+      <div
+        class="flex flex-col gap-8 p-4"
+        :class="editable && 'border w-full rounded-lg  '"
+      >
+        <!-- Top Element -->
+        <div class="flex gap-1 items-center">
+          <!-- Avatar -->
+          <div class="flex gap-1 items-center justify-center">
+            <Avatar
+              :image="article.data.author.image"
+              :label="article.data.author.name"
+            />
+            <span
+              class="truncate capitalize text-base text-ink-gray-9 font-medium"
+            >
+              {{ user.full_name || user.name }}
+            </span>
+          </div>
+          <IconDot class="h-4 w-4 text-gray-600" />
+          <div class="text-xs text-gray-500">
+            {{
+              dayjs(article.data.published_on || article.data.creation).short()
+            }}
+          </div>
+        </div>
+        <!-- Title -->
+        <textarea
+          class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200"
+          v-model="title"
+          placeholder="Title"
+          rows="1"
+          wrap="soft"
+          maxlength="140"
+          autofocus
+          :disabled="!editable"
+        />
+        <!-- Article Content -->
+        <TextEditor
+          ref="editorRef"
+          :content="content"
+          @change="(event:string) => {
+			content = event;
+			isDirty = true;
+		  }"
+          placeholder="Write your article here..."
+          editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+        >
+          <template #bottom v-if="editable">
+            <TextEditorFixedMenu
+              class="-ml-1 overflow-x-auto w-full"
+              :buttons="textEditorMenuButtons"
+            />
+          </template>
+        </TextEditor>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { Breadcrumbs, debounce, createResource, Badge } from "frappe-ui";
-import LayoutHeader from "@/components/LayoutHeader.vue";
+import { computed, ref } from "vue";
+import {
+  Breadcrumbs,
+  debounce,
+  createResource,
+  Badge,
+  Avatar,
+  TextEditor,
+  TextEditorFixedMenu,
+} from "frappe-ui";
+import { dayjs } from "@/dayjs";
 import { updateArticle } from "@/stores/article";
+import { useUserStore } from "@/stores/user";
+import LayoutHeader from "@/components/LayoutHeader.vue";
+import { Resource, Article } from "@/types";
+import IconDot from "~icons/lucide/dot";
+import { createToast, textEditorMenuButtons } from "@/utils";
+
 const props = defineProps({
   articleId: {
     type: String,
@@ -39,12 +114,24 @@ const props = defineProps({
   },
 });
 
-const article = createResource({
+const userStore = useUserStore();
+const user = userStore.getUser();
+
+const editorRef = ref(null);
+const editable = ref(false);
+const content = ref("");
+const title = ref("");
+
+const article: Resource<Article> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article2",
   params: {
     name: props.articleId,
   },
   auto: true,
+  onSuccess: (data: Article) => {
+    content.value = data.content;
+    title.value = data.title;
+  },
 });
 
 const toggleStatus = debounce(() => {
@@ -63,6 +150,28 @@ const toggleStatus = debounce(() => {
     }
   );
 }, 300);
+
+function handleEditMode() {
+  editable.value = true;
+  editorRef.value.editor.chain().focus("start");
+}
+
+function handleSave() {
+  editable.value = false;
+  handleArticleUpdate();
+}
+let isDirty: Boolean = false;
+function handleArticleUpdate() {
+  if (!isDirty) return;
+  updateArticle.submit({
+    doctype: "HD Article",
+    name: article.data.name,
+    fieldname: {
+      content: content.value,
+      title: title.value,
+    },
+  });
+}
 
 const breadcrumbs = computed(() => {
   const items = [

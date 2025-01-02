@@ -8,9 +8,8 @@
     />
     <span
       v-if="expand"
-      class="truncate"
+      class="truncate capitalize text-base text-ink-gray-9 font-medium"
       :class="{
-        'text-gray-900': strong,
         'font-medium': strong,
       }"
     >

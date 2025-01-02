@@ -1,9 +1,9 @@
 import { Component } from "vue";
 
-export interface Resource<A = unknown> {
+export interface Resource<T = unknown> {
   auto: boolean;
   loading: boolean;
-  data: A;
+  data: T;
   pageLength: number;
   totalCount: number;
   hasNextPage: boolean;
@@ -222,6 +222,9 @@ export interface Article {
   subtitle: string;
   article_image: string | null;
   _user_tags: string | null;
+  status: string;
+  creation: string;
+  content: string;
 }
 
 export interface SubCategory {

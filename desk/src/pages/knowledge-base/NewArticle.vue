@@ -10,14 +10,7 @@
       <div class="flex flex-col gap-3 rounded-lg border w-full p-4">
         <div class="flex justify-between items-center mb-3">
           <!-- Author Info -->
-          <div class="flex gap-1 items-center">
-            <Avatar :image="user.user_image" :label="user.full_name" />
-            <span
-              class="truncate capitalize text-base text-ink-gray-9 font-medium"
-            >
-              {{ user.full_name || user.name }}
-            </span>
-          </div>
+          <UserAvatar :name="user.name" :expand="true" />
           <!-- Action Buttons -->
           <div class="flex gap-2">
             <Button label="Discard" @click="handleArticleDiscard" />
@@ -62,15 +55,14 @@ import { ref, computed } from "vue";
 import {
   usePageMeta,
   TextEditor,
-  Avatar,
   TextEditorFixedMenu,
   confirmDialog,
   Breadcrumbs,
 } from "frappe-ui";
 import { useRouter } from "vue-router";
-import { useUserStore } from "@/stores/user";
 import { newArticle } from "@/stores/article";
-import LayoutHeader from "@/components/LayoutHeader.vue";
+import { useUserStore } from "@/stores/user";
+import { LayoutHeader, UserAvatar } from "@/components";
 import { createToast, textEditorMenuButtons } from "@/utils";
 import { Article } from "@/types";
 
