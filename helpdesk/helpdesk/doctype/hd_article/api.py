@@ -56,5 +56,5 @@ def get_article2(name: str):
         "creation": article.creation,
         "status": article.status,
     }
-    print("\n\n", article, "\n\n")
+
     return article
