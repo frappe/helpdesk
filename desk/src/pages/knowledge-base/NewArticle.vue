@@ -2,9 +2,7 @@
   <div class="flex flex-col flex-1">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900 truncate">
-          Knowledge base / {{ title || "New article" }}
-        </div>
+        <Breadcrumbs :items="breadcrumbs" />
       </template>
       <template #right-header> </template>
     </LayoutHeader>
@@ -40,7 +38,7 @@
           maxlength="140"
           autofocus
         />
-        <!-- Article Content  -->
+        <!-- Article Content -->
         <TextEditor
           :content="content"
           @change="content = $event"
@@ -60,19 +58,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import {
   usePageMeta,
   TextEditor,
   Avatar,
   TextEditorFixedMenu,
   confirmDialog,
+  Breadcrumbs,
 } from "frappe-ui";
+import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import { newArticle } from "@/stores/article";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { createToast, textEditorMenuButtons } from "@/utils";
-import { useRouter } from "vue-router";
+import { Article } from "@/types";
 
 const userStore = useUserStore();
 const user = userStore.getUser();
@@ -85,7 +85,7 @@ function handleCreateArticle() {
   newArticle.submit(
     { title: title.value, content: content.value },
     {
-      onSuccess: (article: Object) => {
+      onSuccess: (article: Article) => {
         console.log(article.name);
         createToast({
           title: "Article created successfully",
@@ -93,6 +93,12 @@ function handleCreateArticle() {
           iconClasses: "text-green-600",
         });
         resetState();
+        router.push({
+          name: "Article",
+          params: {
+            articleId: article.name,
+          },
+        });
       },
       onError: (error: string) => {
         createToast({
@@ -122,6 +128,16 @@ function resetState() {
   title.value = "";
   content.value = "";
 }
+
+const breadcrumbs = computed(() => [
+  {
+    label: "Knowledge Base",
+    route: { name: "AgentKnowledgeBase" },
+  },
+  {
+    label: "New Article",
+  },
+]);
 
 usePageMeta(() => {
   return {
