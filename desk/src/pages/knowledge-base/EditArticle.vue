@@ -4,7 +4,7 @@
       <template #left-header>
         <div class="flex gap-1 items-center">
           <Breadcrumbs :items="breadcrumbs" />
-          <span> - </span>
+          <!-- <span> - </span> -->
           <Badge
             :label="article.data?.status"
             :theme="article.data?.status === 'Draft' ? 'red' : 'green'"
@@ -12,23 +12,35 @@
         </div>
       </template>
       <template #right-header>
-        <Button
-          label="Edit"
-          iconLeft="edit"
-          @click="handleEditMode"
-          v-if="!editable"
-        />
-        <Button label="Save" @click="handleSave" v-if="editable" />
-        <Button
-          variant="solid"
-          :label="article.data?.status === 'Draft' ? 'Publish' : 'Unpublish'"
-          :iconLeft="article.data?.status !== 'Published' && 'globe'"
-          @click="toggleStatus()"
-        />
+        <!-- Default Buttons -->
+        <div class="flex gap-2" v-if="!editable">
+          <Button label="Edit" iconLeft="edit" @click="handleEditMode" />
+          <Button
+            variant="solid"
+            :label="article.data?.status === 'Draft' ? 'Publish' : 'Unpublish'"
+            :iconLeft="article.data?.status !== 'Published' && 'globe'"
+            @click="toggleStatus()"
+          />
+        </div>
+        <!-- Edit Mode Buttons -->
+        <div class="flex gap-2" v-if="editable">
+          <Dropdown :options="options">
+            <Button variant="ghost">
+              <template #icon>
+                <IconMoreHorizontal class="h-4 w-4" />
+              </template>
+            </Button>
+          </Dropdown>
+          <Button label="Save" @click="handleSave" variant="solid" />
+        </div>
       </template>
     </LayoutHeader>
 
-    <div class="pt-6 mx-auto w-full max-w-2xl px-5" v-if="!article.loading">
+    <div
+      class="pt-6 mx-auto w-full max-w-3xl px-5 flex"
+      v-if="!article.loading"
+    >
+      <!-- article Info -->
       <div
         class="flex flex-col gap-8 p-4"
         :class="editable && 'border w-full rounded-lg  '"
@@ -64,6 +76,7 @@
           maxlength="140"
           autofocus
           :disabled="!editable"
+          v-on:change="console.log('change')"
         />
         <!-- Article Content -->
         <TextEditor
@@ -98,6 +111,8 @@ import {
   Avatar,
   TextEditor,
   TextEditorFixedMenu,
+  Dropdown,
+  Button,
 } from "frappe-ui";
 import { dayjs } from "@/dayjs";
 import { updateArticle } from "@/stores/article";
@@ -106,6 +121,8 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import { Resource, Article } from "@/types";
 import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons } from "@/utils";
+import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import { h } from "vue";
 
 const props = defineProps({
   articleId: {
@@ -172,6 +189,36 @@ function handleArticleUpdate() {
     },
   });
 }
+
+const options = [
+  {
+    label: "Move To",
+    icon: "corner-up-right",
+    onClick: () => {},
+  },
+  {
+    label: "Duplicate",
+    icon: "copy",
+    onClick: () => {},
+  },
+  {
+    group: "Danger",
+    hideLabel: true,
+    items: [
+      {
+        label: "Delete",
+        onClick: () => {},
+        component: h(Button, {
+          label: "Delete",
+          variant: "ghost",
+          iconLeft: "trash-2",
+          theme: "red",
+          style: "width: 100%; justify-content: flex-start;",
+        }),
+      },
+    ],
+  },
+];
 
 const breadcrumbs = computed(() => {
   const items = [
