@@ -7,7 +7,7 @@
   >
     <QuickFilters v-if="!isMobileView" />
     <div class="flex items-center gap-2" v-if="!isMobileView">
-      <Reload @click="reload" :loding="list.loading" />
+      <Reload @click="reload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
     </div>
@@ -21,54 +21,55 @@
   </FadedScrollableDiv>
 
   <!-- List View -->
-  <slot v-bind="{ list }">
-    <ListView
-      v-if="list.data?.data.length > 0"
-      class="flex-1"
-      :columns="columns"
-      :rows="rows"
-      row-key="name"
-      :options="{
-        selectable: true,
-        showTooltip: true,
-        resizeColumn: false,
-        onRowClick: (row: Object) => emit('rowClick', row['name']),
-        emptyState,
-      }"
-    >
-      <ListHeader class="sm:mx-5 mx-3">
-        <ListHeaderItem
-          v-for="column in columns"
-          :key="column.key"
-          :item="column"
-          @columnWidthUpdated="(width) => console.log(width)"
-        />
-      </ListHeader>
-      <ListRows class="sm:mx-5 mx-3">
-        <ListRow
-          v-for="row in rows"
-          :key="row.name"
-          v-slot="{ idx, column, item }"
-          :row="row"
-          class="truncate text-base"
-        >
-          <ListRowItem :item="item" :row="row" :column="column">
-            <!-- TODO: filters on click of other columns -->
-            <!-- and not on first column, it should emit the event -->
-            <div v-if="idx === 0" class="truncate">
-              {{ item }}
-            </div>
-            <div v-else-if="column.type === 'Datetime'">
-              {{ dayjs.tz(item).fromNow() }}
-            </div>
-            <div v-else class="truncate">
-              {{ item }}
-            </div>
-          </ListRowItem>
-        </ListRow>
-      </ListRows>
-    </ListView>
-  </slot>
+  <ListView
+    v-if="list.data?.data.length > 0"
+    class="flex-1"
+    :columns="columns"
+    :rows="rows"
+    row-key="name"
+    :options="{
+      selectable: props.options.selectable ?? true ,
+      showTooltip: true,
+      resizeColumn: false,
+      onRowClick: (row: Object) => emit('rowClick', row['name']),
+      emptyState,
+    }"
+  >
+    <ListHeader class="sm:mx-5 mx-3">
+      <ListHeaderItem
+        v-for="column in columns"
+        :key="column.key"
+        :item="column"
+        @columnWidthUpdated="(width) => console.log(width)"
+      />
+    </ListHeader>
+    <ListRows class="sm:mx-5 mx-3">
+      <ListRow
+        v-for="row in rows"
+        :key="row.name"
+        v-slot="{ idx, column, item }"
+        :row="row"
+        class="truncate text-base"
+      >
+        <ListRowItem :item="item" :row="row" :column="column">
+          <!-- TODO: filters on click of other columns -->
+          <!-- and not on first column, it should emit the event -->
+          <div v-if="idx === 0" class="truncate">
+            {{ item }}
+          </div>
+          <div v-else-if="column.type === 'Datetime'">
+            {{ dayjs.tz(item).fromNow() }}
+          </div>
+          <div v-else-if="column.type === 'status'">
+            <Badge v-bind="handleStatusColor(item)" />
+          </div>
+          <div v-else class="truncate">
+            {{ item }}
+          </div>
+        </ListRowItem>
+      </ListRow>
+    </ListRows>
+  </ListView>
 
   <!-- List Footer -->
   <div
@@ -109,13 +110,16 @@ import {
   ListRow,
   ListHeader,
   ListHeaderItem,
+  Badge,
 } from "frappe-ui";
+
 import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
 import { dayjs } from "@/dayjs";
 import FadedScrollableDiv from "./FadedScrollableDiv.vue";
 import Reload from "./view-controls/Reload.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
+import { BadgeStatus } from "@/types";
 
 interface P {
   options: {
@@ -126,6 +130,9 @@ interface P {
       icon?: HTMLElement | string;
       title: string;
     };
+    hideViewControls?: boolean;
+    selectable?: boolean;
+    statusMap?: Record<string, BadgeStatus>;
   };
 }
 
@@ -134,7 +141,15 @@ interface E {
   (event: "rowClick", row: any): void;
 }
 
-const props = defineProps<P>();
+const props = withDefaults(defineProps<P>(), {
+  options: () => {
+    return {
+      doctype: "",
+      hideViewControls: false,
+      selectable: true,
+    };
+  },
+});
 
 const emit = defineEmits<E>();
 const { isMobileView } = useScreenSize();
@@ -190,10 +205,21 @@ function handleColumnConfig(column) {
   return column;
 }
 
+const statusMap: Record<string, BadgeStatus> = props.options
+  .statusMap as Record<string, BadgeStatus>;
+function handleStatusColor(status: "Published" | "Draft"): BadgeStatus {
+  if (!statusMap)
+    return {
+      label: status,
+      theme: "gray",
+    };
+  return statusMap[status];
+}
+
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   cache: ["DocField", props.options.doctype],
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
     append_assign: true,
@@ -212,7 +238,7 @@ const filterableFields = createResource({
 
 const sortableFields = createResource({
   url: "helpdesk.api.doc.sort_options",
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
   },
@@ -220,7 +246,7 @@ const sortableFields = createResource({
 
 const quickFilters = createResource({
   url: "helpdesk.api.doc.get_quick_filters",
-  auto: true,
+  auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
   },
@@ -232,7 +258,12 @@ const quickFilters = createResource({
 });
 
 const showViewControls = computed(() => {
-  return filterableFields.data && sortableFields.data && quickFilters.data;
+  return (
+    !props.options.hideViewControls &&
+    filterableFields.data &&
+    sortableFields.data &&
+    quickFilters.data
+  );
 });
 
 const listViewData = reactive({

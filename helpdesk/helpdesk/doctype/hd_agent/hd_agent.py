@@ -30,7 +30,7 @@ class HDAgent(Document):
             },
             {
                 "label": "Email",
-                "key": "email",
+                "key": "user.email as email",
                 "width": "24rem",
                 "type": "Data",
             },
@@ -41,16 +41,11 @@ class HDAgent(Document):
                 "type": "Datetime",
             },
         ]
-        rows = [
-            "name",
-            "is_active",
-            "user.full_name",
-            "user.user_image",
-            "user.email",
-            "user.username",
-            "modified",
-            "creation",
-        ]
+        rows = ["modified", "user.user_image"]
+        # modified row is needed because
+        # we have a link table for HD Agent to User
+        # and sql gets confused which modified to take from those 2 tables
+        # hence throws ambiguous error
         return {"columns": columns, "rows": rows}
 
 

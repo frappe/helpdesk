@@ -51,6 +51,7 @@ import {
   ErrorMessage,
   createResource,
   Autocomplete,
+  createListResource,
 } from "frappe-ui";
 import zod from "zod";
 
@@ -141,20 +142,17 @@ const open = computed({
   },
 });
 
-const customerResource = createResource({
-  url: "helpdesk.extends.client.get_list",
-  params: {
-    doctype: "HD Customer",
-    fields: ["name", "customer_name"],
-  },
+const customerResource = createListResource({
+  doctype: "HD Customer",
+  fields: ["name"],
+  cache: "customers",
   transform: (data) => {
-    let allData = data.map((option) => {
+    return data.map((option) => {
       return {
         label: option.name,
-        value: option.customer_name,
+        value: option.name,
       };
     });
-    return allData;
   },
   auto: true,
 });

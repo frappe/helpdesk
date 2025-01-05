@@ -52,6 +52,36 @@ class HDArticle(Document):
                 )
             )
 
+    @staticmethod
+    def default_list_data():
+        columns = [
+            {
+                "label": "Title",
+                "type": "Data",
+                "key": "title",
+                "width": "17rem",
+            },
+            {
+                "label": "Status",
+                "type": "status",
+                "key": "status",
+                "width": "10rem",
+            },
+            {
+                "label": "Author",
+                "type": "Data",
+                "key": "author",
+                "width": "17rem",
+            },
+            {
+                "label": "Last Modified",
+                "type": "Datetime",
+                "key": "modified",
+                "width": "8rem",
+            },
+        ]
+        return {"columns": columns}
+
     @frappe.whitelist()
     def set_feedback(self, value):
         # 0 empty, 1 like, 2 dislike
