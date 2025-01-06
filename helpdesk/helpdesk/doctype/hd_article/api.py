@@ -57,6 +57,10 @@ def get_article2(name: str):
         "status": article.status,
         "published_on": article.published_on,
         "modified": article.modified,
+        "category_name": frappe.db.get_value(
+            "HD Article Category", article.category, "category_name"
+        ),
+        "category_id": article.category,
     }
 
     return article

@@ -125,8 +125,12 @@ def get_list_data(
     columns=None,
     rows=None,
     show_customer_portal_fields=False,
+    view=None,
 ):
     is_default = True
+
+    view_type = view.get("view_type") if view else None
+    group_by_field = view.get("group_by_field") if view else None
 
     if columns or rows:
         is_default = False
@@ -153,17 +157,17 @@ def get_list_data(
     # 	rows = frappe.parse_json(list_view_settings.rows)
     # 	is_default = False
     # else:
-    list = get_controller(doctype)
+    _list = get_controller(doctype)
 
     # flake8: noqa
     if is_default:
-        if hasattr(list, "default_list_data"):
+        if hasattr(_list, "default_list_data"):
             columns = (
-                list.default_list_data(show_customer_portal_fields).get("columns")
+                _list.default_list_data(show_customer_portal_fields).get("columns")
                 if doctype == "HD Ticket"
-                else list.default_list_data().get("columns")
+                else _list.default_list_data().get("columns")
             )
-            rows = list.default_list_data().get("rows")
+            rows = _list.default_list_data().get("rows")
 
     if rows is None:
         rows = []
@@ -172,6 +176,9 @@ def get_list_data(
     for column in columns:
         if column.get("key") not in rows:
             rows.append(column.get("key"))
+
+    if group_by_field and group_by_field not in rows:
+        rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
     data = (
@@ -221,12 +228,50 @@ def get_list_data(
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
 
+    if group_by_field and view_type == "group_by":
+
+        def get_options(fieldtype, options):
+            if fieldtype == "Select":
+                return [option for option in options.split("\n")]
+            else:
+                has_empty_values = any([not d.get(group_by_field) for d in data])
+                options = list(set([d.get(group_by_field) for d in data]))
+                options = [u for u in options if u]
+                options = [category_name for category_name in options if category_name]
+                if has_empty_values:
+                    options.append("")
+                print("\n\n", options, "\n\n")
+                if order_by and group_by_field in order_by:
+                    order_by_fields = order_by.split(",")
+                    order_by_fields = [
+                        (field.split(" ")[0], field.split(" ")[1])
+                        for field in order_by_fields
+                    ]
+                    if (group_by_field, "asc") in order_by_fields:
+                        options.sort()
+                    elif (group_by_field, "desc") in order_by_fields:
+                        options.sort(reverse=True)
+                else:
+                    options.sort()
+                return options
+
+        for field in fields:
+            if field.get("value") == group_by_field:
+                group_by_field = {
+                    "label": field.get("label"),
+                    "name": field.get("value"),
+                    "type": field.get("type"),
+                    "options": get_options(field.get("type"), field.get("options")),
+                }
+
     return {
         "data": data,
         "columns": columns,
         "fields": fields if doctype == "HD Ticket" else [],
         "total_count": len(frappe.get_list(doctype, filters=filters)),
         "row_count": len(data),
+        "group_by_field": group_by_field,
+        "view_type": view_type,
     }
 
 

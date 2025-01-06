@@ -16,13 +16,40 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div class="flex grow"></div>
+    <!-- ListView Grouped By Status -->
+    <!-- <KnowledgeBaseListView /> -->
+    <ListViewBuilder
+      :options="options"
+      @row-click="(row) => $router.push(`kb/articles/${row}`)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { usePageMeta } from "frappe-ui";
+import { usePageMeta, createListResource } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import ArticleCard from "@/components/knowledge-base/ArticleCard.vue";
+import { Article } from "@/types";
+import KnowledgeBaseListView from "@/components/knowledge-base/KnowledgeBaseListView.vue";
+import ListViewBuilder from "@/components/ListViewBuilder.vue";
+
+const options = {
+  doctype: "HD Article",
+  view: {
+    view_type: "group_by",
+    group_by_field: "category",
+  },
+  statusMap: {
+    Published: {
+      label: "Published",
+      theme: "green",
+    },
+    Draft: {
+      label: "Draft",
+      theme: "gray",
+    },
+  },
+};
 
 usePageMeta(() => {
   return {

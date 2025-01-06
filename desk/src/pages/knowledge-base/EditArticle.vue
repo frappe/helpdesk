@@ -303,6 +303,12 @@ const breadcrumbs = computed(() => {
       route: { name: "AgentKnowledgeBase" },
     },
   ];
+  if (article.data?.category_name) {
+    items.push({
+      label: article.data?.category_name,
+      route: { name: "AgentKnowledgeBase" },
+    });
+  }
   if (article.data?.title) {
     items.push({
       label: article.data?.title,
