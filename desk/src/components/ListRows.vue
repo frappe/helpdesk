@@ -10,13 +10,21 @@
             <div v-if="group.group.label == ''" class="text-ink-gray-4">
               {{ "Empty" }}
               <span class="text-xs text-ink-gray-6"
-                >{{ group.rows.length + " Articles" }}
+                >{{
+                  group.rows.length +
+                  " Article" +
+                  (group.rows.length > 1 ? "s" : "")
+                }}
               </span>
             </div>
             <div v-else class="flex items-center gap-1 w-full">
               <span>{{ group.group.label }}</span>
               <span class="text-xs text-ink-gray-6"
-                >{{ group.rows.length + " Articles" }}
+                >{{
+                  group.rows.length +
+                  " Article" +
+                  (group.rows.length > 1 ? "s" : "")
+                }}
               </span>
             </div>
           </div>
