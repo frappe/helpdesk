@@ -19,13 +19,13 @@
     </LayoutHeader>
 
     <div
-      class="py-6 mx-auto w-full max-w-3xl px-5 flex"
+      class="py-4 mx-auto w-full max-w-3xl px-5 flex"
       :class="editable && 'overflow-hidden'"
       v-if="!article.loading"
     >
       <!-- article Info -->
       <div
-        class="flex flex-col gap-3 p-2 w-full"
+        class="flex flex-col gap-3 p-4 w-full"
         :class="editable && 'border rounded-lg  '"
       >
         <!-- Top Element -->
@@ -59,7 +59,7 @@
             <div class="flex gap-2" v-else>
               <DiscardButton
                 :hide-dialog="!isDirty"
-                :title="`Discard changes to ${article.data.title}?`"
+                title="Discard changes?"
                 message="Are you sure you want to discard changes?"
                 @discard="handleDiscard"
               />
@@ -69,6 +69,7 @@
           </div>
           <!-- Title -->
           <textarea
+            ref="titleRef"
             class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200"
             v-model="title"
             placeholder="Title"
@@ -82,13 +83,13 @@
         <!-- Article Content -->
         <TextEditor
           ref="editorRef"
+          :editor-class="editorClass"
           :content="content"
           :editable="editable"
           @change="(event:string) => {
 			      content = event;
 		      }"
           placeholder="Write your article here..."
-          :editor-class="editorClass"
         >
           <template #bottom v-if="editable">
             <TextEditorFixedMenu
@@ -103,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, h, watch } from "vue";
 import {
   Breadcrumbs,
   debounce,
@@ -115,6 +116,7 @@ import {
   Button,
   confirmDialog,
 } from "frappe-ui";
+import { useRouter } from "vue-router";
 import { dayjs } from "@/dayjs";
 import { updateArticle, deleteArticle } from "@/stores/article";
 import { useUserStore } from "@/stores/user";
@@ -123,10 +125,7 @@ import { Resource, Article } from "@/types";
 import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
-import { h } from "vue";
 import DiscardButton from "@/components/DiscardButton.vue";
-import { watch } from "vue";
-import { useRouter } from "vue-router";
 
 const props = defineProps({
   articleId: {
@@ -144,6 +143,18 @@ const editorRef = ref(null);
 const editable = ref(false);
 const content = ref("");
 const title = ref("");
+
+const titleRef = ref(null);
+watch(
+  () => titleRef.value,
+  (newVal) => {
+    if (!newVal) return;
+    titleRef.value.style.height =
+      newVal.scrollHeight > newVal.clientHeight
+        ? newVal.scrollHeight + "px"
+        : newVal.scrollHeight + "px";
+  }
+);
 
 const article: Resource<Article> = createResource({
   url: "helpdesk.helpdesk.doctype.hd_article.api.get_article2",
@@ -259,7 +270,7 @@ const editorClass = computed(() => {
   return basicStyles;
 });
 
-const options = [
+const options = computed(() => [
   {
     label: "Edit",
     icon: "edit",
@@ -272,6 +283,11 @@ const options = [
     icon: "corner-up-right",
     onClick: () => {},
   },
+  // {
+  //   label: article.data?.status === "Draft" ? "Publish" : "Unpublish",
+  //   icon: article.data?.status !== "Published" ? "globe" : "x",
+  //   onClick: toggleStatus,
+  // },
   {
     label: "Duplicate",
     icon: "copy",
@@ -294,7 +310,7 @@ const options = [
       },
     ],
   },
-];
+]);
 
 const breadcrumbs = computed(() => {
   const items = [
