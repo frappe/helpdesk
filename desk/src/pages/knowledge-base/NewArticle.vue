@@ -31,9 +31,10 @@
           maxlength="140"
           autofocus
           @input="
-            (e) => {
-              e.target.style.height = e.target.scrollHeight + 'px';
-            }
+          (e: Event) => {
+            const target = e.target as HTMLTextAreaElement;
+            target.style.height = `${target.scrollHeight}px`;
+          }
           "
         />
         <!-- Article Content -->
@@ -65,7 +66,7 @@ import {
   Breadcrumbs,
 } from "frappe-ui";
 import { useRouter } from "vue-router";
-import { newArticle } from "@/stores/article";
+import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { LayoutHeader, UserAvatar } from "@/components";
 import { createToast, textEditorMenuButtons } from "@/utils";

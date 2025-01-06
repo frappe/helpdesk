@@ -21,6 +21,15 @@ export const updateArticle = createResource({
   url: "frappe.client.set_value",
 });
 
-export const deleteArticle = createResource({
+export const deleteRes = createResource({
   url: "frappe.client.delete",
+});
+
+export const deleteCategory = createResource({
+  url: "helpdesk.api.knowledge_base.delete_category",
+  makeParams({ name }) {
+    return {
+      name,
+    };
+  },
 });

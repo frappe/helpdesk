@@ -33,7 +33,6 @@
    "fieldname": "category",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Category",
    "options": "HD Article Category"
   },
@@ -79,6 +78,7 @@
    "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Published\nDraft\nArchived"
   },
@@ -101,7 +101,7 @@
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2024-11-25 13:02:28.644492",
+ "modified": "2025-01-07 00:59:35.927067",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",

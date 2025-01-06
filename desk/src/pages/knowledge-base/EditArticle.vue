@@ -118,7 +118,10 @@ import {
 } from "frappe-ui";
 import { useRouter } from "vue-router";
 import { dayjs } from "@/dayjs";
-import { updateArticle, deleteArticle } from "@/stores/article";
+import {
+  updateArticle,
+  deleteRes as deleteArticle,
+} from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { Resource, Article } from "@/types";
@@ -157,7 +160,7 @@ watch(
 );
 
 const article: Resource<Article> = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_article.api.get_article2",
+  url: "helpdesk.api.knowledge_base.get_article",
   params: {
     name: props.articleId,
   },
