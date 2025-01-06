@@ -26,11 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { usePageMeta, createListResource } from "frappe-ui";
+import { h } from "vue";
+import { usePageMeta, FeatherIcon } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import ArticleCard from "@/components/knowledge-base/ArticleCard.vue";
-import { Article } from "@/types";
-import KnowledgeBaseListView from "@/components/knowledge-base/KnowledgeBaseListView.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 
 const options = {
@@ -46,7 +44,17 @@ const options = {
     },
     Draft: {
       label: "Draft",
-      theme: "gray",
+      theme: "orange",
+    },
+  },
+  columnConfig: {
+    title: {
+      prefix: () => {
+        return h(FeatherIcon, {
+          name: "file",
+          class: "w-4 h-4",
+        });
+      },
     },
   },
 };

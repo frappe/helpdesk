@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed } from "vue";
+import { reactive, provide, computed, h } from "vue";
 import {
   createResource,
   ListView,
@@ -101,6 +101,7 @@ import {
   ListHeader,
   ListHeaderItem,
   Badge,
+  FeatherIcon,
 } from "frappe-ui";
 
 import {
@@ -204,10 +205,12 @@ function getGroupedByRows(listRows, groupByField) {
   groupByField.options?.forEach((option) => {
     let filteredRows = [];
 
-    if (!option) {
+    if (!option.value) {
       filteredRows = listRows.filter((row) => !row[groupByField.name]);
     } else {
-      filteredRows = listRows.filter((row) => row[groupByField.name] == option);
+      filteredRows = listRows.filter(
+        (row) => row[groupByField.name] == option.value
+      );
     }
 
     let groupDetail = {
@@ -215,6 +218,11 @@ function getGroupedByRows(listRows, groupByField) {
       group: option || " ",
       collapsed: true,
       rows: filteredRows,
+      icon: h(FeatherIcon, {
+        name: "folder",
+        class: "w-4 h-4",
+        color: "black",
+      }),
     };
     groupedRows.push(groupDetail);
   });

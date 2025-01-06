@@ -30,6 +30,11 @@
           wrap="soft"
           maxlength="140"
           autofocus
+          @input="
+            (e) => {
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }
+          "
         />
         <!-- Article Content -->
         <TextEditor

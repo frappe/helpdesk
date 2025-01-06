@@ -3,15 +3,30 @@
     <div v-for="group in reactiveRows" :key="group.group">
       <ListGroupHeader :group="group">
         <div
-          class="my-2 flex items-center gap-2 text-base font-medium text-ink-gray-8"
+          class="my-2 flex items-center gap-2 text-base font-medium text-ink-gray-8 justify-between w-full"
         >
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-2 w-full">
             <component v-if="group.icon" :is="group.icon" />
-            <div v-if="group.group == ' '" class="text-ink-gray-4">
+            <div v-if="group.group.label == ''" class="text-ink-gray-4">
               {{ "Empty" }}
+              <span class="text-xs text-ink-gray-6"
+                >{{ group.rows.length + " Articles" }}
+              </span>
             </div>
-            <div v-else>{{ group.group }}</div>
+            <div v-else class="flex items-center gap-1 w-full">
+              <span>{{ group.group.label }}</span>
+              <span class="text-xs text-ink-gray-6"
+                >{{ group.rows.length + " Articles" }}
+              </span>
+            </div>
           </div>
+          <Dropdown :options="options">
+            <Button variant="ghost">
+              <template #icon>
+                <IconMoreHorizontal class="h-4 w-4" />
+              </template>
+            </Button>
+          </Dropdown>
         </div>
       </ListGroupHeader>
       <ListGroupRows :group="group" id="list-rows">
@@ -41,10 +56,17 @@
 </template>
 
 <script setup>
-import { ListRows, ListRow, ListGroupHeader, ListGroupRows } from "frappe-ui";
+import {
+  ListRows,
+  ListRow,
+  ListGroupHeader,
+  ListGroupRows,
+  Dropdown,
+  Button,
+} from "frappe-ui";
 
-import { ref, computed, watch } from "vue";
-
+import { ref, computed, watch, h } from "vue";
+import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({
   rows: {
     type: Array,
@@ -53,6 +75,31 @@ const props = defineProps({
 });
 
 const reactiveRows = ref(props.rows);
+
+const options = [
+  {
+    label: "Edit Title",
+    icon: "edit",
+    onClick: () => {},
+  },
+  {
+    group: "Danger",
+    hideLabel: true,
+    items: [
+      {
+        label: "Delete",
+        component: h(Button, {
+          label: "Delete",
+          variant: "ghost",
+          iconLeft: "trash-2",
+          theme: "red",
+          style: "width: 100%; justify-content: flex-start;",
+          onClick: () => {},
+        }),
+      },
+    ],
+  },
+];
 
 watch(
   () => props.rows,

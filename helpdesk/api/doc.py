@@ -238,9 +238,19 @@ def get_list_data(
                 options = list(set([d.get(group_by_field) for d in data]))
                 options = [u for u in options if u]
                 options = [category_name for category_name in options if category_name]
+                options = [
+                    {
+                        "label": frappe.db.get_value(
+                            "HD Article Category", option, "category_name"
+                        ),
+                        "value": option,
+                    }
+                    for option in options
+                    if option
+                ]
                 if has_empty_values:
-                    options.append("")
-                print("\n\n", options, "\n\n")
+                    options.append({"label": "", "value": ""})
+
                 if order_by and group_by_field in order_by:
                     order_by_fields = order_by.split(",")
                     order_by_fields = [
@@ -248,11 +258,11 @@ def get_list_data(
                         for field in order_by_fields
                     ]
                     if (group_by_field, "asc") in order_by_fields:
-                        options.sort()
+                        options.sort(key=lambda x: x.get("label"))
                     elif (group_by_field, "desc") in order_by_fields:
-                        options.sort(reverse=True)
+                        options.sort(reverse=True, key=lambda x: x.get("label"))
                 else:
-                    options.sort()
+                    options.sort(key=lambda x: x.get("label"))
                 return options
 
         for field in fields:
