@@ -27,9 +27,34 @@
 
 <script setup lang="ts">
 import { h } from "vue";
-import { usePageMeta, FeatherIcon } from "frappe-ui";
+import { usePageMeta, FeatherIcon, Button } from "frappe-ui";
+
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
+
+const groupByActions = [
+  {
+    label: "Add New Article",
+    icon: "plus",
+    onClick: (groupedRow) => {
+      console.log("Add Article", groupedRow);
+    },
+  },
+  {
+    label: "Edit Title",
+    icon: "edit",
+    onClick: (groupedRow) => {
+      console.log("Edit Title", groupedRow);
+    },
+  },
+  {
+    label: "Delete",
+    icon: "trash-2",
+    onClick: (groupedRow) => {
+      console.log("Delete", groupedRow);
+    },
+  },
+];
 
 const options = {
   doctype: "HD Article",
@@ -57,6 +82,7 @@ const options = {
       },
     },
   },
+  groupByActions,
 };
 
 usePageMeta(() => {

@@ -1,9 +1,8 @@
 <template>
   <!-- View Controls -->
-  <FadedScrollableDiv
+  <div
     class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
     v-if="showViewControls"
-    orientation="horizontal"
   >
     <QuickFilters v-if="!isMobileView" />
     <div class="flex items-center gap-2" v-if="!isMobileView">
@@ -18,7 +17,7 @@
         <SortBy :hide-label="isMobileView" />
       </div>
     </div>
-  </FadedScrollableDiv>
+  </div>
 
   <!-- List View -->
   <ListView
@@ -43,7 +42,11 @@
         @columnWidthUpdated="(width) => console.log(width)"
       />
     </ListHeader>
-    <ListRows :rows="rows" v-slot="{ idx, column, item, row }">
+    <ListRows
+      :rows="rows"
+      v-slot="{ idx, column, item, row }"
+      :group-by-actions="props.options.groupByActions"
+    >
       <ListRowItem :item="item" :row="row" :column="column">
         <!-- TODO: filters on click of other columns -->
         <!-- and not on first column, it should emit the event -->
@@ -130,6 +133,7 @@ interface P {
     selectable?: boolean;
     statusMap?: Record<string, BadgeStatus>;
     view?: View;
+    groupByActions?: Array<any>;
   };
 }
 
@@ -144,12 +148,11 @@ const props = withDefaults(defineProps<P>(), {
       doctype: "",
       hideViewControls: false,
       selectable: true,
-    };
-  },
-  view: () => {
-    return {
-      view_type: "list",
-      group_by_field: "owner",
+      view: {
+        view_type: "list",
+        group_by_field: "owner",
+      },
+      groupByActions: [],
     };
   },
 });
@@ -214,7 +217,6 @@ function getGroupedByRows(listRows, groupByField) {
     }
 
     let groupDetail = {
-      label: groupByField.label,
       group: option || " ",
       collapsed: true,
       rows: filteredRows,

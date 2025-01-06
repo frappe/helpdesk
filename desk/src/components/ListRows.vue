@@ -1,14 +1,14 @@
 <template>
   <div class="mx-3 mt-2 h-full overflow-y-auto sm:mx-5" v-if="showGroupedRows">
-    <div v-for="group in reactiveRows" :key="group.group">
+    <div v-for="group in groupedRows" :key="group.group">
       <ListGroupHeader :group="group">
         <div
-          class="my-2 flex items-center gap-2 text-base font-medium text-ink-gray-8 justify-between w-full"
+          class="my-2 flex items-center gap-2 text-base font-medium text-ink-gray-8 justify-between w-full mr-1"
         >
           <div class="flex items-center gap-2 w-full">
             <component v-if="group.icon" :is="group.icon" />
-            <div v-if="group.group.label == ''" class="text-ink-gray-4">
-              {{ "Empty" }}
+            <div v-if="group.group.label == ''">
+              {{ "General" }}
               <span class="text-xs text-ink-gray-6"
                 >{{
                   group.rows.length +
@@ -28,7 +28,10 @@
               </span>
             </div>
           </div>
-          <Dropdown :options="options">
+          <Dropdown
+            :options="actions(group)"
+            v-if="groupByActions.length > 0 && group.group.label != ''"
+          >
             <Button variant="ghost">
               <template #icon>
                 <IconMoreHorizontal class="h-4 w-4" />
@@ -52,7 +55,7 @@
   </div>
   <ListRows class="mx-3 sm:mx-5" v-else id="list-rows">
     <ListRow
-      v-for="row in reactiveRows"
+      v-for="row in groupedRows"
       :key="row.name"
       v-slot="{ idx, column, item }"
       :row="row"
@@ -64,6 +67,7 @@
 </template>
 
 <script setup>
+import { ref, computed, watch } from "vue";
 import {
   ListRows,
   ListRow,
@@ -73,45 +77,33 @@ import {
   Button,
 } from "frappe-ui";
 
-import { ref, computed, watch, h } from "vue";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({
   rows: {
     type: Array,
     required: true,
   },
+  groupByActions: {
+    type: Array,
+    default: () => [],
+  },
 });
 
-const reactiveRows = ref(props.rows);
+const groupedRows = ref(props.rows);
 
-const options = [
-  {
-    label: "Edit Title",
-    icon: "edit",
-    onClick: () => {},
-  },
-  {
-    group: "Danger",
-    hideLabel: true,
-    items: [
-      {
-        label: "Delete",
-        component: h(Button, {
-          label: "Delete",
-          variant: "ghost",
-          iconLeft: "trash-2",
-          theme: "red",
-          style: "width: 100%; justify-content: flex-start;",
-          onClick: () => {},
-        }),
-      },
-    ],
-  },
-];
+const actions = (group) => {
+  const _actions = props.groupByActions.map((action) => {
+    return {
+      ...action,
+      onClick: () => action.onClick(group),
+    };
+  });
+  return _actions;
+};
 
 watch(
   () => props.rows,
-  (val) => (reactiveRows.value = val)
+  (val) => (groupedRows.value = val)
 );
 
 let showGroupedRows = computed(() => {
