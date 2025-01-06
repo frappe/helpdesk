@@ -216,7 +216,8 @@ export interface RootCategory {
 export interface Article {
   name: string;
   title: string;
-  category: string;
+  category_name: string;
+  category_id: string;
   published_on: string;
   author: Author;
   subtitle: string;
@@ -258,3 +259,8 @@ export interface BadgeStatus {
 }
 
 export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
+
+export interface View {
+  view_type: string;
+  group_by_field: string;
+}
