@@ -4,90 +4,98 @@
       <template #left-header>
         <div class="flex gap-1 items-center">
           <Breadcrumbs :items="breadcrumbs" />
-          <!-- <span> - </span> -->
-          <Badge
-            :label="article.data?.status"
-            :theme="article.data?.status === 'Draft' ? 'red' : 'green'"
-          />
         </div>
       </template>
       <template #right-header>
         <!-- Default Buttons -->
         <div class="flex gap-2" v-if="!editable">
-          <Button label="Edit" iconLeft="edit" @click="handleEditMode" />
           <Button
-            variant="solid"
             :label="article.data?.status === 'Draft' ? 'Publish' : 'Unpublish'"
             :iconLeft="article.data?.status !== 'Published' && 'globe'"
             @click="toggleStatus()"
           />
         </div>
-        <!-- Edit Mode Buttons -->
-        <div class="flex gap-2" v-if="editable">
-          <Dropdown :options="options">
-            <Button variant="ghost">
-              <template #icon>
-                <IconMoreHorizontal class="h-4 w-4" />
-              </template>
-            </Button>
-          </Dropdown>
-          <Button label="Save" @click="handleSave" variant="solid" />
-        </div>
       </template>
     </LayoutHeader>
 
     <div
-      class="pt-6 mx-auto w-full max-w-3xl px-5 flex"
+      class="py-6 mx-auto w-full max-w-3xl px-5 flex"
+      :class="editable && 'overflow-hidden'"
       v-if="!article.loading"
     >
       <!-- article Info -->
       <div
-        class="flex flex-col gap-8 p-4"
+        class="flex flex-col gap-3 p-2"
         :class="editable && 'border w-full rounded-lg  '"
       >
         <!-- Top Element -->
-        <div class="flex gap-1 items-center">
-          <!-- Avatar -->
-          <div class="flex gap-1 items-center justify-center">
-            <Avatar
-              :image="article.data.author.image"
-              :label="article.data.author.name"
-            />
-            <span
-              class="truncate capitalize text-base text-ink-gray-9 font-medium"
-            >
-              {{ user.full_name || user.name }}
-            </span>
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-1 items-center justify-between">
+            <div class="flex gap-1 items-center">
+              <!-- Avatar -->
+              <div class="flex gap-1 items-center justify-center">
+                <Avatar
+                  :image="article.data.author.image"
+                  :label="article.data.author.name"
+                />
+                <span
+                  class="truncate capitalize text-base text-ink-gray-9 font-medium"
+                >
+                  {{ user.full_name || user.name }}
+                </span>
+              </div>
+              <IconDot class="h-4 w-4 text-gray-600" />
+              <div class="text-xs text-gray-500">
+                {{ dayjs(article.data.modified).short() }}
+              </div>
+            </div>
+            <Dropdown :options="options" v-if="!editable">
+              <Button variant="ghost">
+                <template #icon>
+                  <IconMoreHorizontal class="h-4 w-4" />
+                </template>
+              </Button>
+            </Dropdown>
+            <div class="flex gap-2" v-else>
+              <DiscardButton
+                :hide-dialog="!isDirty"
+                :title="`Discard changes to ${article.data.title}?`"
+                message="Are you sure you want to discard changes?"
+                @discard="
+                  {
+                    editable = false;
+                    isDirty = false;
+                    content = article.data.content;
+                  }
+                "
+              />
+
+              <Button label="Save" @click="handleSave" variant="solid" />
+            </div>
           </div>
-          <IconDot class="h-4 w-4 text-gray-600" />
-          <div class="text-xs text-gray-500">
-            {{
-              dayjs(article.data.published_on || article.data.creation).short()
-            }}
-          </div>
+          <!-- Title -->
+          <textarea
+            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200"
+            v-model="title"
+            placeholder="Title"
+            rows="1"
+            wrap="soft"
+            maxlength="140"
+            autofocus
+            :disabled="!editable"
+            @input="console.log('input')"
+          />
         </div>
-        <!-- Title -->
-        <textarea
-          class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200"
-          v-model="title"
-          placeholder="Title"
-          rows="1"
-          wrap="soft"
-          maxlength="140"
-          autofocus
-          :disabled="!editable"
-          v-on:change="console.log('change')"
-        />
         <!-- Article Content -->
         <TextEditor
           ref="editorRef"
           :content="content"
           @change="(event:string) => {
-			content = event;
-			isDirty = true;
-		  }"
+			      content = event;
+			      isDirty = true;
+		      }"
           placeholder="Write your article here..."
-          editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
+          :editor-class="editorClass"
         >
           <template #bottom v-if="editable">
             <TextEditorFixedMenu
@@ -107,7 +115,6 @@ import {
   Breadcrumbs,
   debounce,
   createResource,
-  Badge,
   Avatar,
   TextEditor,
   TextEditorFixedMenu,
@@ -123,6 +130,7 @@ import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { h } from "vue";
+import DiscardButton from "@/components/DiscardButton.vue";
 
 const props = defineProps({
   articleId: {
@@ -170,27 +178,56 @@ const toggleStatus = debounce(() => {
 
 function handleEditMode() {
   editable.value = true;
-  editorRef.value.editor.chain().focus("start");
+  editorRef.value.editor.chain().focus("all");
 }
 
+let isDirty: Boolean = false;
 function handleSave() {
   editable.value = false;
   handleArticleUpdate();
 }
-let isDirty: Boolean = false;
+
 function handleArticleUpdate() {
   if (!isDirty) return;
-  updateArticle.submit({
-    doctype: "HD Article",
-    name: article.data.name,
-    fieldname: {
-      content: content.value,
-      title: title.value,
+  updateArticle.submit(
+    {
+      doctype: "HD Article",
+      name: article.data.name,
+      fieldname: {
+        content: content.value,
+        title: title.value,
+      },
     },
-  });
+    {
+      onSuccess: () => {
+        createToast({
+          title: "Article updated successfully",
+          icon: "check",
+          iconClasses: "text-green-600",
+        });
+        isDirty = false;
+      },
+    }
+  );
 }
 
+const editorClass = computed(() => {
+  let basicStyles =
+    "rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]";
+  if (editable.value) {
+    basicStyles += " overflow-auto";
+  }
+  return basicStyles;
+});
+
 const options = [
+  {
+    label: "Edit",
+    icon: "edit",
+    onClick: () => {
+      handleEditMode();
+    },
+  },
   {
     label: "Move To",
     icon: "corner-up-right",

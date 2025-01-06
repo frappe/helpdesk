@@ -78,7 +78,6 @@ function handleCreateArticle() {
     { title: title.value, content: content.value },
     {
       onSuccess: (article: Article) => {
-        console.log(article.name);
         createToast({
           title: "Article created successfully",
           icon: "check",

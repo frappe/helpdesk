@@ -225,6 +225,7 @@ export interface Article {
   status: string;
   creation: string;
   content: string;
+  modified: string;
 }
 
 export interface SubCategory {
