@@ -20,3 +20,7 @@ export const newArticle = createResource({
 export const updateArticle = createResource({
   url: "frappe.client.set_value",
 });
+
+export const deleteArticle = createResource({
+  url: "frappe.client.delete",
+});

@@ -25,8 +25,8 @@
     >
       <!-- article Info -->
       <div
-        class="flex flex-col gap-3 p-2"
-        :class="editable && 'border w-full rounded-lg  '"
+        class="flex flex-col gap-3 p-2 w-full"
+        :class="editable && 'border rounded-lg  '"
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-2">
@@ -61,13 +61,7 @@
                 :hide-dialog="!isDirty"
                 :title="`Discard changes to ${article.data.title}?`"
                 message="Are you sure you want to discard changes?"
-                @discard="
-                  {
-                    editable = false;
-                    isDirty = false;
-                    content = article.data.content;
-                  }
-                "
+                @discard="handleDiscard"
               />
 
               <Button label="Save" @click="handleSave" variant="solid" />
@@ -83,16 +77,15 @@
             maxlength="140"
             autofocus
             :disabled="!editable"
-            @input="console.log('input')"
           />
         </div>
         <!-- Article Content -->
         <TextEditor
           ref="editorRef"
           :content="content"
+          :editable="editable"
           @change="(event:string) => {
 			      content = event;
-			      isDirty = true;
 		      }"
           placeholder="Write your article here..."
           :editor-class="editorClass"
@@ -120,9 +113,10 @@ import {
   TextEditorFixedMenu,
   Dropdown,
   Button,
+  confirmDialog,
 } from "frappe-ui";
 import { dayjs } from "@/dayjs";
-import { updateArticle } from "@/stores/article";
+import { updateArticle, deleteArticle } from "@/stores/article";
 import { useUserStore } from "@/stores/user";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import { Resource, Article } from "@/types";
@@ -131,6 +125,8 @@ import { createToast, textEditorMenuButtons } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { h } from "vue";
 import DiscardButton from "@/components/DiscardButton.vue";
+import { watch } from "vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   articleId: {
@@ -141,6 +137,8 @@ const props = defineProps({
 
 const userStore = useUserStore();
 const user = userStore.getUser();
+
+const router = useRouter();
 
 const editorRef = ref(null);
 const editable = ref(false);
@@ -175,20 +173,27 @@ const toggleStatus = debounce(() => {
     }
   );
 }, 300);
+const isDirty = ref(false);
 
 function handleEditMode() {
   editable.value = true;
-  editorRef.value.editor.chain().focus("all");
+  editorRef.value.editor.chain().focus("start");
 }
 
-let isDirty: Boolean = false;
+function handleDiscard() {
+  editable.value = false;
+  isDirty.value = false;
+  title.value = article.data.title;
+  content.value = article.data.content;
+}
+
 function handleSave() {
   editable.value = false;
   handleArticleUpdate();
 }
 
 function handleArticleUpdate() {
-  if (!isDirty) return;
+  if (!isDirty.value) return;
   updateArticle.submit(
     {
       doctype: "HD Article",
@@ -205,11 +210,45 @@ function handleArticleUpdate() {
           icon: "check",
           iconClasses: "text-green-600",
         });
-        isDirty = false;
+        isDirty.value = false;
+        article.reload();
       },
     }
   );
 }
+
+function handleDelete() {
+  confirmDialog({
+    title: "Delete Article",
+    message: "Are you sure you want to delete this article?",
+    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+      deleteArticle.submit(
+        {
+          doctype: "HD Article",
+          name: article.data.name,
+        },
+        {
+          onSuccess: () => {
+            createToast({
+              title: "Article deleted successfully",
+              icon: "check",
+              iconClasses: "text-green-600",
+            });
+            router.push({
+              name: "AgentKnowledgeBase",
+            });
+          },
+        }
+      );
+      hideDialog();
+    },
+  });
+}
+
+watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
+  isDirty.value =
+    newContent !== article.data.content || newTitle !== article.data.title;
+});
 
 const editorClass = computed(() => {
   let basicStyles =
@@ -244,13 +283,13 @@ const options = [
     items: [
       {
         label: "Delete",
-        onClick: () => {},
         component: h(Button, {
           label: "Delete",
           variant: "ghost",
           iconLeft: "trash-2",
           theme: "red",
           style: "width: 100%; justify-content: flex-start;",
+          onClick: handleDelete,
         }),
       },
     ],
