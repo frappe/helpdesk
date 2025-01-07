@@ -34,5 +34,11 @@ def get_article(name: str):
 
 @frappe.whitelist()
 def delete_category(name: str):
-    print("\n\n", name, "\n\n")
-    pass
+    try:
+        articles = frappe.get_all("HD Article", filters={"category": name})
+        for article in articles:
+            frappe.db.set_value("HD Article", article.name, "category", None)
+
+        frappe.delete_doc("HD Article Category", name)
+    except Exception as e:
+        frappe.db.rollback()

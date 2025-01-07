@@ -119,7 +119,7 @@ import {
 import { useRouter } from "vue-router";
 import { dayjs } from "@/dayjs";
 import {
-  updateArticle,
+  updateRes as updateArticle,
   deleteRes as deleteArticle,
 } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
@@ -291,11 +291,6 @@ const options = computed(() => [
   //   icon: article.data?.status !== "Published" ? "globe" : "x",
   //   onClick: toggleStatus,
   // },
-  {
-    label: "Duplicate",
-    icon: "copy",
-    onClick: () => {},
-  },
   {
     group: "Danger",
     hideLabel: true,

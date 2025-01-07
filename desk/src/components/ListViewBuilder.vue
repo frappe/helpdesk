@@ -218,7 +218,7 @@ function getGroupedByRows(listRows, groupByField) {
 
     let groupDetail = {
       group: option || " ",
-      collapsed: true,
+      collapsed: false,
       rows: filteredRows,
       icon: h(FeatherIcon, {
         name: "folder",

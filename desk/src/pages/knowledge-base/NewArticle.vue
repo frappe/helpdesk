@@ -65,7 +65,7 @@ import {
   confirmDialog,
   Breadcrumbs,
 } from "frappe-ui";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { LayoutHeader, UserAvatar } from "@/components";
@@ -75,13 +75,17 @@ import { Article } from "@/types";
 const userStore = useUserStore();
 const user = userStore.getUser();
 const router = useRouter();
+const route = useRoute();
 
 const title = ref("");
 const content = ref("");
 
+const categoryId = computed(() => route.query.category || null);
+const categoryName = computed(() => (route.query.title as string) || "");
+
 function handleCreateArticle() {
   newArticle.submit(
-    { title: title.value, content: content.value },
+    { title: title.value, content: content.value, category: categoryId.value },
     {
       onSuccess: (article: Article) => {
         createToast({
@@ -126,15 +130,24 @@ function resetState() {
   content.value = "";
 }
 
-const breadcrumbs = computed(() => [
-  {
-    label: "Knowledge Base",
-    route: { name: "AgentKnowledgeBase" },
-  },
-  {
+const breadcrumbs = computed(() => {
+  const options: Array<{ label: string; route?: { name: string } }> = [
+    {
+      label: "Knowledge Base",
+      route: { name: "AgentKnowledgeBase" },
+    },
+  ];
+  if (categoryName.value) {
+    options.push({
+      label: categoryName.value,
+      route: { name: "AgentKnowledgeBase" },
+    });
+  }
+  options.push({
     label: "New Article",
-  },
-]);
+  });
+  return options;
+});
 
 usePageMeta(() => {
   return {
