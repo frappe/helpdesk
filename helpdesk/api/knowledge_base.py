@@ -33,6 +33,15 @@ def get_article(name: str):
 
 
 @frappe.whitelist()
+def create_category(title: str):
+    category = frappe.new_doc("HD Article Category", category_name=title).insert()
+    article = frappe.new_doc(
+        "HD Article", title="New Article", category=category.name
+    ).insert()
+    return {"article": article.name, "category": category.name}
+
+
+@frappe.whitelist()
 def delete_category(name: str):
     try:
         articles = frappe.get_all("HD Article", filters={"category": name})
@@ -42,3 +51,9 @@ def delete_category(name: str):
         frappe.delete_doc("HD Article Category", name)
     except Exception as e:
         frappe.db.rollback()
+
+
+@frappe.whitelist()
+def move_to_category(category, articles):
+    for article in articles:
+        frappe.db.set_value("HD Article", article, "category", category)

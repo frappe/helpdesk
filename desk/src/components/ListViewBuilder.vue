@@ -64,6 +64,13 @@
         </div>
       </ListRowItem>
     </ListRows>
+    <ListSelectBanner v-if="props.options.showSelectBanner">
+      <template #actions="{ selections }">
+        <Dropdown :options="selectBannerOptions(selections)">
+          <Button icon="more-horizontal" variant="ghost" />
+        </Dropdown>
+      </template>
+    </ListSelectBanner>
   </ListView>
 
   <!-- List Footer -->
@@ -103,8 +110,10 @@ import {
   ListRowItem,
   ListHeader,
   ListHeaderItem,
+  ListSelectBanner,
   Badge,
   FeatherIcon,
+  Dropdown,
 } from "frappe-ui";
 
 import {
@@ -114,7 +123,6 @@ import {
   Reload,
 } from "@/components/view-controls";
 import { dayjs } from "@/dayjs";
-import FadedScrollableDiv from "./FadedScrollableDiv.vue";
 import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
@@ -134,6 +142,8 @@ interface P {
     statusMap?: Record<string, BadgeStatus>;
     view?: View;
     groupByActions?: Array<any>;
+    showSelectBanner?: boolean;
+    selectBannerActions?: Record<string, any>;
   };
 }
 
@@ -176,6 +186,15 @@ const defaultParams = reactive({
 const emptyState = computed(() => {
   return props.options?.emptyState || defaultEmptyState;
 });
+
+function selectBannerOptions(selections: Set<string>) {
+  return props.options.selectBannerActions.map((action) => {
+    return {
+      ...action,
+      onClick: () => action.onClick(selections),
+    };
+  });
+}
 
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",

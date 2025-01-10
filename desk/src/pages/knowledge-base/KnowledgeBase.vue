@@ -21,11 +21,12 @@
     />
     <CategoryModal
       :edit="editTitle"
-      v-model="showDialog"
+      v-model="showCategoryModal"
       v-model:title="category.title"
       @update="handleCategoryUpdate"
       @create="handleCategoryCreate"
     />
+    <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
   </div>
 </template>
 
@@ -43,23 +44,28 @@ import {
   updateCategoryTitle,
   deleteCategory,
   newCategory,
+  moveToCategory,
 } from "@/stores/knowledgeBase";
 
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
+import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { createToast } from "@/utils";
 
 const router = useRouter();
 
-const showDialog = ref(false);
 const category = reactive({
   title: "",
   id: "",
 });
 const _title = ref("");
-const editTitle = ref(false);
 const listViewRef = ref(null);
+const editTitle = ref(false);
+
+// modals state
+const showCategoryModal = ref(false);
+const moveToModal = ref(false);
 
 const headerOptions = [
   {
@@ -68,7 +74,7 @@ const headerOptions = [
     onClick: () => {
       resetState();
       editTitle.value = false;
-      showDialog.value = true;
+      showCategoryModal.value = true;
     },
   },
   {
@@ -76,12 +82,6 @@ const headerOptions = [
     icon: "file",
     onClick: () => {
       router.push({ name: "NewArticle" });
-      // router.push({
-      //   name: "NewArticle",
-      //   query: {
-      //     category: "ABC",
-      //   },
-      // });
     },
   },
 ];
@@ -106,7 +106,7 @@ const groupByActions = [
     icon: "edit",
     onClick: (groupedRow) => {
       editTitle.value = true;
-      showDialog.value = true;
+      showCategoryModal.value = true;
       category.title = groupedRow.group.label;
       category.id = groupedRow.group.value;
       _title.value = groupedRow.group.label;
@@ -120,17 +120,57 @@ const groupByActions = [
     },
   },
 ];
+const listSelections = ref(new Set());
+const selectBannerActions = [
+  {
+    label: "Move To",
+    icon: "corner-up-right",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = selections;
+      moveToModal.value = true;
+    },
+  },
+];
 
-function handleCategoryCreate() {
-  console.log("Create", category.title);
-  newCategory.submit(
+function handleMoveToCategory(category: string) {
+  moveToCategory.submit(
     {
-      category_name: category.title,
+      category,
+      articles: Array.from(listSelections.value),
     },
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        showDialog.value = false;
+        moveToModal.value = false;
+        createToast({
+          title: "Articles moved successfully",
+          icon: "check",
+          iconClasses: "text-green-600",
+        });
+      },
+    }
+  );
+}
+
+function handleCategoryCreate() {
+  newCategory.submit(
+    {
+      title: category.title,
+    },
+    {
+      onSuccess: (data: any) => {
+        listViewRef.value.reload();
+        showCategoryModal.value = false;
+        router.push({
+          name: "Article",
+          params: {
+            articleId: data.article,
+          },
+          query: {
+            category: data.category,
+            title: category.title,
+          },
+        });
         createToast({
           title: "Category Created Successfully",
           icon: "check",
@@ -152,7 +192,7 @@ function handleCategoryCreate() {
 function handleCategoryUpdate() {
   // if same title do nothing
   if (category.title === _title.value) {
-    showDialog.value = false;
+    showCategoryModal.value = false;
     editTitle.value = false;
     return;
   }
@@ -166,7 +206,7 @@ function handleCategoryUpdate() {
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        showDialog.value = false;
+        showCategoryModal.value = false;
         editTitle.value = false;
         createToast({
           title: "Category Updated Successfully",
@@ -249,6 +289,8 @@ const options = {
     },
   },
   groupByActions,
+  showSelectBanner: true,
+  selectBannerActions,
 };
 
 usePageMeta(() => {

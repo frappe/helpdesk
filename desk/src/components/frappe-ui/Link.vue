@@ -131,8 +131,8 @@ const options = createResource({
   transform: (data) => {
     let allData = data.map((option) => {
       return {
-        label: option.value,
         value: option.value,
+        label: option?.label || option.value,
       };
     });
     // if (!props.hideMe && props.doctype == 'User') {
