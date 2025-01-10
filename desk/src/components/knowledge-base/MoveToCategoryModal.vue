@@ -28,7 +28,10 @@ const actions = [
   {
     label: "Move",
     variant: "solid",
-    onClick: () => emit("move", category.value),
+    onClick: () => {
+      emit("move", category.value);
+      category.value = "";
+    },
   },
 ];
 </script>

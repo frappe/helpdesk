@@ -100,6 +100,7 @@
         </TextEditor>
       </div>
     </div>
+    <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
   </div>
 </template>
 
@@ -121,14 +122,16 @@ import { dayjs } from "@/dayjs";
 import {
   updateRes as updateArticle,
   deleteRes as deleteArticle,
+  moveToCategory,
 } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import LayoutHeader from "@/components/LayoutHeader.vue";
+import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
+import DiscardButton from "@/components/DiscardButton.vue";
 import { Resource, Article } from "@/types";
 import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
-import DiscardButton from "@/components/DiscardButton.vue";
 
 const props = defineProps({
   articleId: {
@@ -188,6 +191,35 @@ const toggleStatus = debounce(() => {
   );
 }, 300);
 const isDirty = ref(false);
+
+const moveToModal = ref(false);
+
+function handleMoveToCategory(category: string) {
+  moveToCategory.submit(
+    {
+      category,
+      articles: [props.articleId],
+    },
+    {
+      onSuccess: () => {
+        article.reload();
+        moveToModal.value = false;
+        createToast({
+          title: "Articles moved successfully",
+          icon: "check",
+          iconClasses: "text-green-600",
+        });
+      },
+      onError: (error: string) => {
+        createToast({
+          title: error,
+          icon: "x",
+          iconClasses: "text-red-600",
+        });
+      },
+    }
+  );
+}
 
 function handleEditMode() {
   editable.value = true;
@@ -284,7 +316,7 @@ const options = computed(() => [
   {
     label: "Move To",
     icon: "corner-up-right",
-    onClick: () => {},
+    onClick: () => (moveToModal.value = true),
   },
   // {
   //   label: article.data?.status === "Draft" ? "Publish" : "Unpublish",

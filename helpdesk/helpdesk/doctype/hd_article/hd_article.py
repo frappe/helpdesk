@@ -59,7 +59,7 @@ class HDArticle(Document):
                 "label": "Title",
                 "type": "Data",
                 "key": "title",
-                "width": "17rem",
+                "width": "20rem",
             },
             {
                 "label": "Status",

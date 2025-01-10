@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, reactive } from "vue";
+import { h, ref, reactive, computed } from "vue";
 import {
   usePageMeta,
   FeatherIcon,
@@ -46,7 +46,6 @@ import {
   newCategory,
   moveToCategory,
 } from "@/stores/knowledgeBase";
-
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
@@ -91,7 +90,6 @@ const groupByActions = [
     label: "Add New Article",
     icon: "plus",
     onClick: (groupedRow) => {
-      console.log("Add Article", groupedRow);
       router.push({
         name: "NewArticle",
         query: {
@@ -121,6 +119,7 @@ const groupByActions = [
   },
 ];
 const listSelections = ref(new Set());
+const showSelectBanner = ref(true);
 const selectBannerActions = [
   {
     label: "Move To",
@@ -142,10 +141,18 @@ function handleMoveToCategory(category: string) {
       onSuccess: () => {
         listViewRef.value.reload();
         moveToModal.value = false;
+        listSelections.value.clear();
         createToast({
           title: "Articles moved successfully",
           icon: "check",
           iconClasses: "text-green-600",
+        });
+      },
+      onError: (error: string) => {
+        createToast({
+          title: error,
+          icon: "x",
+          iconClasses: "text-red-600",
         });
       },
     }
@@ -258,40 +265,42 @@ function resetState() {
   _title.value = "";
 }
 
-const options = {
-  doctype: "HD Article",
-  view: {
-    view_type: "group_by",
-    group_by_field: "category",
-  },
-  statusMap: {
-    Published: {
-      label: "Published",
-      theme: "green",
+const options = computed(() => {
+  return {
+    doctype: "HD Article",
+    view: {
+      view_type: "group_by",
+      group_by_field: "category",
     },
-    Draft: {
-      label: "Draft",
-      theme: "orange",
-    },
-    Archived: {
-      label: "Archived",
-      theme: "gray",
-    },
-  },
-  columnConfig: {
-    title: {
-      prefix: () => {
-        return h(FeatherIcon, {
-          name: "file",
-          class: "w-4 h-4",
-        });
+    statusMap: {
+      Published: {
+        label: "Published",
+        theme: "green",
+      },
+      Draft: {
+        label: "Draft",
+        theme: "orange",
+      },
+      Archived: {
+        label: "Archived",
+        theme: "gray",
       },
     },
-  },
-  groupByActions,
-  showSelectBanner: true,
-  selectBannerActions,
-};
+    columnConfig: {
+      title: {
+        prefix: () => {
+          return h(FeatherIcon, {
+            name: "file",
+            class: "w-4 h-4 ",
+          });
+        },
+      },
+    },
+    groupByActions,
+    showSelectBanner: showSelectBanner.value,
+    selectBannerActions,
+  };
+});
 
 usePageMeta(() => {
   return {
