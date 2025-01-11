@@ -45,6 +45,7 @@ import {
   deleteCategory,
   newCategory,
   moveToCategory,
+  deleteArticles,
 } from "@/stores/knowledgeBase";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
@@ -127,6 +128,21 @@ const selectBannerActions = [
     onClick: (selections: Set<string>) => {
       listSelections.value = selections;
       moveToModal.value = true;
+    },
+  },
+  {
+    label: "Delete",
+    icon: "trash-2",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = selections;
+      confirmDialog({
+        title: "Delete articles?",
+        message: `Are you sure you want to delete these articles?`,
+        onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+          handleDeleteArticles();
+          hideDialog();
+        },
+      });
     },
   },
 ];
@@ -257,6 +273,25 @@ function handleCategoryDelete(groupedRow) {
       hideDialog();
     },
   });
+}
+
+function handleDeleteArticles() {
+  deleteArticles.submit(
+    {
+      articles: Array.from(listSelections.value),
+    },
+    {
+      onSuccess: () => {
+        listViewRef.value.reload();
+        listSelections.value.clear();
+        createToast({
+          title: "Articles deleted successfully",
+          icon: "check",
+          iconClasses: "text-green-600",
+        });
+      },
+    }
+  );
 }
 
 function resetState() {

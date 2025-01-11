@@ -33,6 +33,12 @@ def get_article(name: str):
 
 
 @frappe.whitelist()
+def delete_articles(articles):
+    for article in articles:
+        frappe.delete_doc("HD Article", article)
+
+
+@frappe.whitelist()
 def create_category(title: str):
     category = frappe.new_doc("HD Article Category", category_name=title).insert()
     article = frappe.new_doc(
