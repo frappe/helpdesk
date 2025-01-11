@@ -1,21 +1,26 @@
 <template>
-  <Dialog v-model="showDialog" :options="{ title: dialogTitle }">
+  <Dialog
+    v-model="showDialog"
+    :options="{ title: dialogTitle, actions: getActionButton() }"
+  >
     <template #body-content>
       <div class="flex flex-col flex-1 gap-3">
-        <FormControl
+        <textarea
+          class="text-base rounded py-1.5 px-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full block"
+          ref="titleRef"
           v-model="newTitle"
+          label="Category"
           type="textarea"
           size="sm"
           variant="subtle"
-          :disabled="false"
+          :rows="1"
+          maxlength="80"
+          autofocus
+          @input="(e: Event) => {
+            const target = e.target as HTMLTextAreaElement;
+            target.style.height = `${target.scrollHeight}px`;
+          }"
         />
-        <Button
-          variant="solid"
-          label="Save"
-          @click="emit('update')"
-          v-if="edit"
-        />
-        <Button variant="solid" label="Create" @click="emit('create')" v-else />
       </div>
     </template>
   </Dialog>
@@ -24,6 +29,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Dialog } from "frappe-ui";
+import { ref } from "vue";
+import { watch } from "vue";
 
 const props = defineProps({
   title: {
@@ -44,6 +51,40 @@ const newTitle = defineModel<string>("title");
 const dialogTitle = computed(() =>
   props.edit ? "Edit Category" : "Create Category"
 );
+
+const titleRef = ref(null);
+watch(
+  () => titleRef.value,
+  (newVal) => {
+    if (!newVal) return;
+    titleRef.value.style.height =
+      newVal.scrollHeight > newVal.clientHeight
+        ? newVal.scrollHeight + "px"
+        : newVal.scrollHeight + "px";
+  }
+);
+
+function getActionButton() {
+  const action = [];
+  if (props.edit) {
+    action.push({
+      label: "Save",
+      variant: "solid",
+      onClick: () => {
+        emit("update");
+      },
+    });
+  } else {
+    action.push({
+      label: "Create",
+      variant: "solid",
+      onClick: () => {
+        emit("create");
+      },
+    });
+  }
+  return action;
+}
 </script>
 
 <style scoped></style>

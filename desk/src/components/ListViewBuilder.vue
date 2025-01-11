@@ -362,9 +362,6 @@ function reload() {
 }
 
 function handlePageLength(count: number, loadMore: boolean = false) {
-  if (count >= list.data?.total_count) {
-    return;
-  }
   defaultParams.page_length_count = count;
   if (loadMore) {
     defaultParams.page_length += count;
