@@ -46,7 +46,7 @@
           :key="row.name"
           v-slot="{ idx, column, item }"
           :row="row"
-          class="truncate text-base"
+          class="truncate text-base row"
         >
           <slot v-bind="{ idx, column, item, row }" />
         </ListRow>
@@ -112,3 +112,9 @@ let showGroupedRows = computed(() => {
   );
 });
 </script>
+
+<style>
+.row > button > span > div > :nth-child(-n + 2) > * {
+  margin-left: 20px;
+}
+</style>
