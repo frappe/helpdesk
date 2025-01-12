@@ -10,7 +10,20 @@
       <div class="flex flex-col gap-3 rounded-lg border w-full p-4">
         <div class="flex justify-between items-center mb-3">
           <!-- Author Info -->
-          <UserAvatar :name="user.name" :expand="true" />
+          <div class="flex gap-1 items-center" v-if="!categoryName">
+            <UserAvatar :name="user.name" :expand="true" />
+            <span>in</span>
+            <Link
+              class="form-control"
+              doctype="HD Article Category"
+              placeholder="Select Category"
+              v-model="categoryId"
+              :pageLength="100"
+            />
+          </div>
+          <div v-else>
+            <UserAvatar :name="user.name" :expand="true" />
+          </div>
           <!-- Action Buttons -->
           <div class="flex gap-2">
             <Button label="Discard" @click="handleArticleDiscard" />
@@ -80,7 +93,7 @@ const route = useRoute();
 const title = ref("");
 const content = ref("");
 
-const categoryId = computed(() => route.query.category || null);
+const categoryId = ref(route.query.category || null);
 const categoryName = computed(() => (route.query.title as string) || "");
 
 function handleCreateArticle() {
@@ -113,12 +126,18 @@ function handleCreateArticle() {
 }
 function handleArticleDiscard() {
   if (!title.value && !content.value) {
+    router.push({
+      name: "AgentKnowledgeBase",
+    });
     return;
   }
   confirmDialog({
     title: "Discard Article",
     message: "Are you sure you want to discard this article?",
     onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+      router.push({
+        name: "AgentKnowledgeBase",
+      });
       resetState();
       hideDialog();
     },

@@ -81,6 +81,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  pageLength: {
+    type: Number,
+    default: 10,
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "change"]);
@@ -127,6 +131,7 @@ const options = createResource({
     txt: text.value,
     doctype: props.doctype,
     filters: props.filters,
+    page_length: props.pageLength,
   },
   transform: (data) => {
     let allData = data.map((option) => {
@@ -158,6 +163,7 @@ function reload(val) {
       txt: val,
       doctype: props.doctype,
       filters: props.filters,
+      page_length: props.pageLength,
     },
   });
   options.reload();
