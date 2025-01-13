@@ -61,6 +61,6 @@ export const customerPortalSidebarOptions = [
   {
     label: "Knowledge base",
     icon: LucideBookOpen,
-    to: AGENT_PORTAL_KNOWLEDGE_BASE,
+    to: "CustomerKnowledgeBase",
   },
 ];

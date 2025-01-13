@@ -89,10 +89,24 @@ const routes = [
           },
         ],
       },
-      // {
-      //   path: "kb",
-      //   name: AGENT_PORTAL_KNOWLEDGE_BASE,
-      // },
+      {
+        path: "kb-public",
+        name: "CustomerKnowledgeBase",
+        component: () =>
+          import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
+      },
+      {
+        path: "kb-public/:categoryId",
+        name: "CustomerKnowledgeBaseArticles",
+        component: () =>
+          import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
+      },
+      {
+        path: "kb/articles/:articleId",
+        name: "Article",
+        component: () => import("@/pages/knowledge-base/Article.vue"),
+        props: true,
+      },
     ],
   },
   // Agent Portal Routing
@@ -136,7 +150,8 @@ const routes = [
       {
         path: "kb",
         name: "AgentKnowledgeBase",
-        component: () => import("@/pages/knowledge-base/KnowledgeBase.vue"),
+        component: () =>
+          import("@/pages/knowledge-base/KnowledgeBaseAgent.vue"),
       },
       {
         path: "kb/articles/:articleId",

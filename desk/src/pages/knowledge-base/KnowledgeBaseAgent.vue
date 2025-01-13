@@ -326,7 +326,7 @@ const options = computed(() => {
       title: {
         prefix: () => {
           return h(FeatherIcon, {
-            name: "file",
+            name: "file-text",
             class: "w-4 h-4 ",
           });
         },
