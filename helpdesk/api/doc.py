@@ -128,6 +128,12 @@ def get_list_data(
 ):
     is_default = True
 
+    if doctype == "Contact":
+        if not filters:
+            filters = {}
+
+        filters["user"] = ""
+
     if columns or rows:
         is_default = False
         columns = frappe.parse_json(columns)
