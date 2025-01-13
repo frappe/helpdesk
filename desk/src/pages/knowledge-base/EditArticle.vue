@@ -117,7 +117,7 @@ import {
   Button,
   confirmDialog,
 } from "frappe-ui";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { dayjs } from "@/dayjs";
 import {
   updateRes as updateArticle,
@@ -144,9 +144,11 @@ const userStore = useUserStore();
 const user = userStore.getUser();
 
 const router = useRouter();
+const route = useRoute();
 
 const editorRef = ref(null);
-const editable = ref(false);
+const editable = ref(route.query.isEdit ?? false);
+
 const content = ref("");
 const title = ref("");
 

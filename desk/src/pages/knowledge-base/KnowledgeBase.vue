@@ -192,6 +192,7 @@ function handleCategoryCreate() {
           query: {
             category: data.category,
             title: category.title,
+            isEdit: 1,
           },
         });
         createToast({
