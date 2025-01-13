@@ -8,11 +8,8 @@
         <textarea
           class="text-base rounded py-1.5 px-2 border border-[--surface-gray-2] bg-surface-gray-2 placeholder-ink-gray-4 hover:border-outline-gray-modals hover:bg-surface-gray-3 focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-8 transition-colors w-full block"
           ref="titleRef"
+          placeholder="Support Issues"
           v-model="newTitle"
-          label="Category"
-          type="textarea"
-          size="sm"
-          variant="subtle"
           :rows="1"
           maxlength="80"
           autofocus

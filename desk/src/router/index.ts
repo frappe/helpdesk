@@ -141,7 +141,7 @@ const routes = [
       {
         path: "kb/articles/:articleId",
         name: "Article",
-        component: () => import("@/pages/knowledge-base/EditArticle.vue"),
+        component: () => import("@/pages/knowledge-base/Article.vue"),
         props: true,
       },
       {

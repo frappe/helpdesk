@@ -8,6 +8,7 @@
           placeholder="Select Category"
           v-model="category"
           label="Category"
+          :page-length="100"
         />
       </div>
     </template>
