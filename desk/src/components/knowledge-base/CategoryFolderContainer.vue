@@ -10,7 +10,7 @@ import { createListResource } from "frappe-ui";
 
 const categories = createListResource({
   doctype: "HD Article Category",
-  fields: ["name", "category_name", "modified", "creation"],
+  fields: ["name", "category_name", "modified"],
   auto: true,
 });
 </script>

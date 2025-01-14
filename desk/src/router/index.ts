@@ -97,13 +97,13 @@ const routes = [
       },
       {
         path: "kb-public/:categoryId",
-        name: "CustomerKnowledgeBaseArticles",
-        component: () =>
-          import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
+        name: "Articles",
+        component: () => import("@/pages/knowledge-base/Articles.vue"),
+        props: true,
       },
       {
-        path: "kb/articles/:articleId",
-        name: "Article",
+        path: "kb-public/articles/:articleId",
+        name: "ArticlePublic",
         component: () => import("@/pages/knowledge-base/Article.vue"),
         props: true,
       },

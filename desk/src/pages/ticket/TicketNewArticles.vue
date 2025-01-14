@@ -8,7 +8,7 @@
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
         :to="{
-          name: 'KnowledgeBasePublicNew',
+          name: 'CustomerKnowledgeBase',
         }"
         target="_blank"
       >
@@ -24,7 +24,7 @@
         <RouterLink
           class="group cursor-pointer hover:text-gray-900 flex flex-col gap-2"
           :to="{
-            name: 'KBArticlePublicNew',
+            name: 'ArticlePublic',
             params: {
               articleId: a.name.split('#')[0],
             },

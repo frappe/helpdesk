@@ -1,7 +1,12 @@
 <template>
-  <div
+  <router-link
     class="flex flex-col gap-2 rounded-lg border p-3 w-[162px] sm:w-[172px] border-gray-200 cursor-pointer hover:shadow-xl"
-    @click="console.log('a')"
+    :to="{
+      name: 'Articles',
+      params: {
+        categoryId: category.name,
+      },
+    }"
   >
     <Tooltip :text="category.category_name">
       <div>
@@ -19,7 +24,7 @@
         </span>
       </div>
     </Tooltip>
-  </div>
+  </router-link>
 </template>
 
 <script setup lang="ts">
