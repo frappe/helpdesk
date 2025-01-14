@@ -130,7 +130,7 @@ import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal
 import DiscardButton from "@/components/DiscardButton.vue";
 import { Resource, Article } from "@/types";
 import IconDot from "~icons/lucide/dot";
-import { createToast, textEditorMenuButtons } from "@/utils";
+import { createToast, textEditorMenuButtons, copyToClipboard } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 
 const props = defineProps({
@@ -319,6 +319,15 @@ const options = computed(() => [
     label: "Move To",
     icon: "corner-up-right",
     onClick: () => (moveToModal.value = true),
+  },
+  {
+    label: "Copy",
+    icon: "copy",
+    onClick: () => {
+      const url = new URL(window.location.href);
+      url.pathname = `/helpdesk/kb-help/articles/${props.articleId}`;
+      copyToClipboard(url.href, article.data.title);
+    },
   },
   // {
   //   label: article.data?.status === "Draft" ? "Publish" : "Unpublish",

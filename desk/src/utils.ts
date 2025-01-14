@@ -121,6 +121,16 @@ export function setupCustomActions(data, obj) {
 export const isCustomerPortal = (route: RouteLocation) =>
   route.meta.public ?? false;
 
+export function copyToClipboard(text: string, message?: string) {
+  navigator.clipboard.writeText(text);
+  createToast({
+    title: "Copied to clipboard",
+    text: message,
+    icon: "check",
+    iconClasses: "text-green-600",
+  });
+}
+
 export const textEditorMenuButtons = [
   "Paragraph",
   ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
