@@ -78,7 +78,7 @@ def get_categories():
         )
 
     categories.sort(key=lambda c: c["article_count"], reverse=True)
-    categories = list(filter(lambda c: c["article_count"] > 0, categories))
+    categories = [c for c in categories if c["article_count"] > 0]
     return categories
 
 
