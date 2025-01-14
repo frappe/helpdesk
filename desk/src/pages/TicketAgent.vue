@@ -46,28 +46,26 @@
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col">
         <!-- ticket activities -->
-        <div class="overflow-y-auto flex-1">
-          <Tabs
-            v-model="tabIndex"
-            v-slot="{ tab }"
-            :tabs="tabs"
-            class="!h-full"
-          >
-            <TicketAgentActivities
-              ref="ticketAgentActivitiesRef"
-              :activities="filterActivities(tab.name)"
-              :title="tab.label"
-              @update="
-                () => {
-                  ticket.reload();
-                }
-              "
-              @email:reply="
-                (e) => {
-                  communicationAreaRef.replyToEmail(e);
-                }
-              "
-            />
+        <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
+          <Tabs v-model="tabIndex" :tabs="tabs">
+            <TabList />
+            <TabPanel v-slot="{ tab }" class="h-full">
+              <TicketAgentActivities
+                ref="ticketAgentActivitiesRef"
+                :activities="filterActivities(tab.name)"
+                :title="tab.label"
+                @update="
+                  () => {
+                    ticket.reload();
+                  }
+                "
+                @email:reply="
+                  (e) => {
+                    communicationAreaRef.replyToEmail(e);
+                  }
+                "
+              />
+            </TabPanel>
           </Tabs>
         </div>
         <CommunicationArea
@@ -135,6 +133,8 @@ import {
   Dialog,
   FormControl,
   Tabs,
+  TabPanel,
+  TabList,
 } from "frappe-ui";
 
 import {
