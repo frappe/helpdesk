@@ -31,7 +31,7 @@
         <div
           v-for="cannedResponse in cannedResponses.data"
           :key="cannedResponse.name"
-          class="group flex h-56 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-5 py-4 shadow-sm hover:bg-gray-50"
+          class="group flex h-60 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-5 py-4 shadow-sm hover:bg-gray-50"
           @click="editItem(cannedResponse)"
         >
           <div class="flex items-center justify-between">
@@ -59,8 +59,8 @@
             v-if="cannedResponse.message"
             :content="cannedResponse.message"
             :editable="false"
-            editor-class="!prose-sm max-w-none !text-sm text-gray-600 focus:outline-none"
-            class="flex-1 overflow-hidden"
+            editor-class="prose-sm"
+            class="flex-1 overflow-hidden response-preview"
           />
           <div class="mt-2 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
@@ -167,3 +167,9 @@ usePageMeta(() => {
   };
 });
 </script>
+
+<style>
+.response-preview :where(p, span, a) {
+  @apply !text-gray-600;
+}
+</style>

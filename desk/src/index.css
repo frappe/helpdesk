@@ -1,38 +1,3 @@
 @import "./assets/Inter/inter.css";
 @import "frappe-ui/src/style.css";
 
-@layer components {
-	.prose-f {
-		@apply
-		break-normal
-		max-w-none
-		prose
-		prose-code:break-all
-		prose-code:whitespace-pre-wrap
-		prose-img:border
-		prose-img:rounded-lg
-		prose-sm
-		prose-table:table-fixed
-		prose-td:border
-		prose-td:border-gray-300
-		prose-td:p-2
-		prose-td:relative
-		prose-th:bg-gray-100
-		prose-th:border
-		prose-th:border-gray-300
-		prose-th:p-2
-		prose-th:relative
-	}
-
-	.popover {
-		@apply
-		bg-white
-		mt-2
-		p-1
-		ring-1
-		ring-black
-		ring-opacity-5
-		rounded-lg
-		shadow-2xl
-	}
-}
