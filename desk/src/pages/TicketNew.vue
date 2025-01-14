@@ -39,7 +39,7 @@
             placeholder="A short description"
           />
         </div>
-        <TicketSearchArticles v-if="isCustomerPortal" :query="subject" />
+        <SearchArticles v-if="isCustomerPortal" :query="subject" />
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"
@@ -110,7 +110,7 @@ import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
 import { LayoutHeader, UniInput } from "@/components";
-import TicketSearchArticles from "./ticket/TicketSearchArticles.vue";
+import SearchArticles from "../components/SearchArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";

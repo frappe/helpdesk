@@ -23,7 +23,7 @@
 
       <!-- Searched Articles -->
       <div class="flex flex-col gap-3">
-        <TicketSearchArticles :query="query" :hideViewAll="true" />
+        <SearchArticles :query="query" :hideViewAll="true" />
       </div>
 
       <!-- Categories Folder -->
@@ -42,7 +42,7 @@ import { FormControl, usePageMeta } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { LayoutHeader } from "@/components";
 import CategoryFolderContainer from "@/components/knowledge-base/CategoryFolderContainer.vue";
-import TicketSearchArticles from "../ticket/TicketSearchArticles.vue";
+import SearchArticles from "../../components/SearchArticles.vue";
 const query = ref("");
 
 usePageMeta(() => {
