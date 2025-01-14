@@ -14,7 +14,7 @@
         class="w-full"
         placeholder="Ask a question..."
         size="lg"
-        v-model="search"
+        v-model="query"
       >
         <template #prefix>
           <Icon icon="lucide:search" class="h-4 w-4 text-gray-500" />
@@ -22,7 +22,9 @@
       </FormControl>
 
       <!-- Searched Articles -->
-      <div></div>
+      <div class="flex flex-col gap-3">
+        <TicketSearchArticles :query="query" :hideViewAll="true" />
+      </div>
 
       <!-- Categories Folder -->
       <section class="flex flex-col gap-3">
@@ -40,8 +42,8 @@ import { FormControl, usePageMeta } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { LayoutHeader } from "@/components";
 import CategoryFolderContainer from "@/components/knowledge-base/CategoryFolderContainer.vue";
-
-const search = ref("");
+import TicketSearchArticles from "../ticket/TicketSearchArticles.vue";
+const query = ref("");
 
 usePageMeta(() => {
   return {

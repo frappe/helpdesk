@@ -1,9 +1,9 @@
 <template>
   <div
-    v-if="!isEmpty(articles.data) && search.length > 2"
+    v-if="!isEmpty(articles.data) && query.length > 2"
     class="rounded border bg-cyan-50 px-5 py-3 text-base"
   >
-    <div class="mb-2 font-medium px-4">
+    <div class="mb-2 font-medium px-4" v-if="!hideViewAll">
       These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
@@ -47,22 +47,23 @@ import { createResource } from "frappe-ui";
 import { isEmpty } from "lodash";
 
 interface P {
-  search: string;
+  query: string;
+  hideViewAll?: boolean;
 }
 
-const props = defineProps<P>();
+const { query = "", hideViewAll = false } = defineProps<P>();
 const articles = createResource({
   url: "helpdesk.api.article.search",
   debounce: 500,
   auto: false,
 });
 watch(
-  () => props.search,
-  (search) => {
-    if (search.length < 3) return;
+  () => query,
+  (query) => {
+    if (query.length < 3) return;
     articles.update({
       params: {
-        query: search,
+        query: query,
       },
     });
     articles.reload();
