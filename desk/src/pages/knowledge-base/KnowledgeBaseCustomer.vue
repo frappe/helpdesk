@@ -5,7 +5,9 @@
         <div class="text-lg font-medium text-gray-900">Knowledge base</div>
       </template>
     </LayoutHeader>
-    <div class="max-w-4xl pt-4 sm:px-5 w-full flex flex-col gap-2">
+    <div
+      class="max-w-4xl 2xl:max-w-5xl pt-4 sm:px-5 w-full flex flex-col gap-4"
+    >
       <FormControl
         ref="searchInputRef"
         type="text"
@@ -23,13 +25,9 @@
       <div></div>
 
       <!-- Categories Folder -->
-      <section>
+      <section class="flex flex-col gap-3">
         <!-- Heading -->
-        <span
-          class="text-base text-gray-600 font-medium leading-6 pl-1 my-0 mb-1"
-        >
-          Categories
-        </span>
+        <p class="text-lg text-gray-900">Categories</p>
         <CategoryFolderContainer />
       </section>
     </div>
@@ -38,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { FormControl, usePageMeta, FeatherIcon } from "frappe-ui";
+import { FormControl, usePageMeta } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { LayoutHeader } from "@/components";
 import CategoryFolderContainer from "@/components/knowledge-base/CategoryFolderContainer.vue";

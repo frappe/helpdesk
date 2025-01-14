@@ -1,4 +1,5 @@
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
 from frappe.utils import get_user_info_for_avatar
 
@@ -63,3 +64,39 @@ def delete_category(name: str):
 def move_to_category(category, articles):
     for article in articles:
         frappe.db.set_value("HD Article", article, "category", category)
+
+
+@frappe.whitelist()
+def get_categories():
+    categories = frappe.get_all(
+        "HD Article Category",
+        fields=["name", "category_name", "modified"],
+    )
+    for c in categories:
+        c["article_count"] = frappe.db.count(
+            "HD Article", filters={"category": c.name, "status": "Published"}
+        )
+
+    categories.sort(key=lambda c: c["article_count"], reverse=True)
+    categories = list(filter(lambda c: c["article_count"] > 0, categories))
+    return categories
+
+
+@frappe.whitelist()
+def get_category_articles(category):
+    articles = frappe.get_all(
+        "HD Article",
+        filters={"category": category, "status": "Published"},
+        fields=["name", "title", "published_on", "modified", "author", "content"],
+    )
+    for article in articles:
+        article["author"] = get_user_info_for_avatar(article["author"])
+        soup = BeautifulSoup(article["content"], "html.parser")
+        article["content"] = str(soup.text)[:100]
+
+    return articles
+
+
+@frappe.whitelist()
+def get_category_title(category):
+    return frappe.db.get_value("HD Article Category", category, "category_name")

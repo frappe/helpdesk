@@ -29,7 +29,7 @@
         :class="editable && 'border rounded-lg  '"
       >
         <!-- Top Element -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-3">
           <div class="flex gap-1 items-center justify-between">
             <div class="flex gap-1 items-center">
               <!-- Avatar -->

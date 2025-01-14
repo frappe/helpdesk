@@ -84,3 +84,26 @@ export const moveToCategory = createResource({
     if (!articles) throw "Articles are required";
   },
 });
+
+export const categories = createResource({
+  url: "helpdesk.api.knowledge_base.get_categories",
+  cache: ["categories"],
+});
+
+export const articles = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_articles",
+  cache: ["articles"],
+  makeParams({ category }) {
+    return {
+      category,
+    };
+  },
+});
+
+export const categoryName = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_title",
+  cache: ["categoryName"],
+  makeParams({ category }) {
+    return { category };
+  },
+});

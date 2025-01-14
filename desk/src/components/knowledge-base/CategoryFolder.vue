@@ -1,6 +1,6 @@
 <template>
   <router-link
-    class="flex flex-col gap-2 rounded-lg border p-3 w-[162px] sm:w-[172px] border-gray-200 cursor-pointer hover:shadow-xl"
+    class="flex flex-col gap-2 rounded-lg border p-3 border-gray-200 cursor-pointer hover:shadow-xl"
     :to="{
       name: 'Articles',
       params: {
@@ -20,7 +20,7 @@
           {{ category.category_name }}
         </p>
         <span class="truncate text-sm text-gray-600">
-          {{ dayjs.tz(category.modified).fromNow() }}
+          {{ category.article_count }} articles
         </span>
       </div>
     </Tooltip>
@@ -29,7 +29,6 @@
 
 <script setup lang="ts">
 import { FeatherIcon, Tooltip } from "frappe-ui";
-import { dayjs } from "@/dayjs";
 const props = defineProps({
   category: {
     required: true,

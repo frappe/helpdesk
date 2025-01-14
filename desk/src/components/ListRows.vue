@@ -1,5 +1,5 @@
 <template>
-  <div class="mx-3 mt-2 h-full overflow-y-auto sm:mx-5" v-if="showGroupedRows">
+  <div class="mx-3 h-full overflow-y-auto sm:mx-5" v-if="showGroupedRows">
     <div v-for="group in groupedRows" :key="group.group">
       <ListGroupHeader :group="group">
         <div
@@ -40,7 +40,7 @@
           </Dropdown>
         </div>
       </ListGroupHeader>
-      <ListGroupRows :group="group" id="list-rows">
+      <ListGroupRows :group="group" id="list-rows" class="!mt-0">
         <ListRow
           v-for="row in group.rows"
           :key="row.name"
