@@ -320,7 +320,6 @@ def get_quick_filters(doctype: str):
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
     name_filter = {"label": "ID", "name": "name", "type": "Data"}
-
     if doctype == "Contact":
         quick_filters.append(name_filter)
         return quick_filters
@@ -329,19 +328,18 @@ def get_quick_filters(doctype: str):
         quick_filters.append(name_filter)
 
     for field in fields:
+        options = []
         if field.fieldtype == "Select":
-            field.options = field.options.split("\n")
-            field.options = [
-                {"label": option, "value": option} for option in field.options
-            ]
-            field.options.insert(0, {"label": "", "value": ""})
+            options = field.options.split("\n")
+            options = [{"label": option, "value": option} for option in options]
+            options.insert(0, {"label": "", "value": ""})
 
         quick_filters.append(
             {
                 "label": _(field.label),
                 "name": field.fieldname,
                 "type": field.fieldtype,
-                "options": field.options,
+                "options": options,
             }
         )
 
