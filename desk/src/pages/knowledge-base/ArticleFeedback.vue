@@ -27,7 +27,7 @@
         Can’t find what you’re looking for?
       </span>
       <router-link :to="{ name: 'TicketNew' }">
-        <p class="underline font-bold text-sm">Create a ticket &rightarrow;</p>
+        <p class="underline font-base text-sm">Create a ticket &rightarrow;</p>
       </router-link>
     </div>
   </div>
