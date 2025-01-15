@@ -227,7 +227,10 @@ export interface Article {
   creation: string;
   content: string;
   modified: string;
+  feedback: FeedbackAction;
 }
+
+export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
 export interface SubCategory {
   name: string;
@@ -257,8 +260,6 @@ export interface BadgeStatus {
   label: string;
   theme: string;
 }
-
-export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
 export interface View {
   view_type: string;

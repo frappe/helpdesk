@@ -12,7 +12,7 @@
       <div>
         <FeatherIcon
           name="folder"
-          class="fill-ink-blue-link h-8 w-8 text-blue-400 -ml-[2px]"
+          class="fill-ink-gray-2 h-8 w-8 text-gray-300 -ml-[2px]"
         />
       </div>
       <div class="gap-1 flex flex-col">

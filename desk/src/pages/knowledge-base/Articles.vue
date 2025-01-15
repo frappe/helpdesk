@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 pb-10 md:pb-0 px-10 w-full overflow-scroll items-center">
+  <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
@@ -8,7 +8,7 @@
     <div
       class="pt-4 sm:px-5 w-full flex flex-col gap-2 max-w-4xl 2xl:max-w-5xl"
     >
-      <div v-if="articles.data" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div v-if="articles.data" class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ArticleCard2
           v-for="article in articles.data"
           :article="article"

@@ -113,8 +113,4 @@ let showGroupedRows = computed(() => {
 });
 </script>
 
-<style>
-.row > button > span > div > :nth-child(-n + 2) > * {
-  margin-left: 20px;
-}
-</style>
+<style></style>
