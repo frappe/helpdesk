@@ -127,14 +127,16 @@ import {
   moveToCategory,
 } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
+import { useAuthStore } from "@/stores/auth";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import DiscardButton from "@/components/DiscardButton.vue";
+import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
 import { Resource, Article, FeedbackAction } from "@/types";
 import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons, copyToClipboard } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
-import ArticleFeedback from "./ArticleFeedback.vue";
+import { capture } from "@/telemetry";
 
 const props = defineProps({
   articleId: {
@@ -148,6 +150,7 @@ const user = userStore.getUser();
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const editorRef = ref(null);
 const editable = ref(route.query.isEdit ?? false);
@@ -178,6 +181,13 @@ const article: Resource<Article> = createResource({
     content.value = data.content;
     title.value = data.title;
     feedback.value = data.feedback;
+    capture("article_viewed", {
+      data: {
+        user: authStore.userId,
+        article: data.name,
+        title: data.title,
+      },
+    });
   },
 });
 
