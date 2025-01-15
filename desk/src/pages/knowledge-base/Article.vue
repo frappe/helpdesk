@@ -2,7 +2,7 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <div class="flex gap-1 items-center">
+        <div class="flex gap-1 items-center crumbs truncate">
           <Breadcrumbs :items="breadcrumbs" />
         </div>
       </template>
@@ -70,7 +70,7 @@
           <!-- Title -->
           <textarea
             ref="titleRef"
-            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200"
+            class="w-full resize-none border-0 text-3xl font-bold placeholder-ink-gray-3 p-0 pb-3 border-b border-gray-200 focus:ring-0 focus:border-gray-200 overflow-hidden"
             v-model="title"
             placeholder="Title"
             rows="1"
@@ -157,10 +157,10 @@ watch(
   () => titleRef.value,
   (newVal) => {
     if (!newVal) return;
-    titleRef.value.style.height =
-      newVal.scrollHeight > newVal.clientHeight
-        ? newVal.scrollHeight + "px"
-        : newVal.scrollHeight + "px";
+
+    if (newVal.scrollHeight > newVal.clientHeight) {
+      newVal.style.height = newVal.scrollHeight + "px";
+    }
   }
 );
 
