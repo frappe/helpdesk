@@ -1,5 +1,5 @@
 <template>
-  <div class="p-5 px-10 w-full overflow-scroll items-center">
+  <div class="p-5 pb-10 md:pb-0 px-10 w-full overflow-scroll items-center">
     <LayoutHeader>
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />

@@ -12,14 +12,14 @@
       <div>
         <FeatherIcon
           name="folder"
-          class="fill-ink-blue-link h-8 w-8 text-blue-400"
+          class="fill-ink-blue-link h-8 w-8 text-blue-400 -ml-[2px]"
         />
       </div>
       <div class="gap-1 flex flex-col">
         <p class="text-base font-medium text-gray-800 truncate">
           {{ category.category_name }}
         </p>
-        <span class="truncate text-sm text-gray-600">
+        <span class="truncate text-xs md:text-sm text-ink-gray-5">
           {{ category.article_count }} articles
         </span>
       </div>

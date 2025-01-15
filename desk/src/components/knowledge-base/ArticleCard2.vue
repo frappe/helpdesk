@@ -1,6 +1,6 @@
 <template>
   <router-link
-    class="flex flex-col gap-3 border border-gray-200 rounded p-4 pb-2 cursor-pointer"
+    class="flex flex-col gap-3 border border-gray-200 rounded p-4 pb-2 cursor-pointer h-56 hover:bg-surface-gray-2 transition-all"
     :to="{
       name: 'ArticlePublic',
       params: {
@@ -14,7 +14,7 @@
         <h5 class="text-lg font-semibold text-gray-800 truncate text-wrap">
           {{ article.title }}
         </h5>
-        <div class="text-sm text-gray-600 truncate">
+        <div class="text-sm text-gray-600">
           {{ article.content }}
         </div>
       </div>
