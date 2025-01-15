@@ -185,7 +185,7 @@ def get_list_data(
             doctype,
             fields=rows,
             filters=filters,
-            order_by=order_by,
+            order_by=f"`tab{doctype}`.modified_by {order_by.split(' ')[-1]}",
             page_length=page_length,
         )
         or []
