@@ -14,6 +14,14 @@ def get_article(name: str):
         frappe.throw(_("Access denied"), frappe.PermissionError)
 
     author = get_user_info_for_avatar(article["author"])
+    feedback = (
+        frappe.db.get_value(
+            "HD Article Feedback",
+            {"article": name, "user": frappe.session.user},
+            "feedback",
+        )
+        or 0
+    )
 
     return {
         "name": article.name,
@@ -28,6 +36,7 @@ def get_article(name: str):
             "HD Article Category", article.category, "category_name"
         ),
         "category_id": article.category,
+        "feedback": int(feedback),
     }
 
     return article

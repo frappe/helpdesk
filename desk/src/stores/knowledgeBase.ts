@@ -107,3 +107,17 @@ export const categoryName = createResource({
     return { category };
   },
 });
+
+//feedback
+export const setFeedback = createResource({
+  url: "run_doc_method",
+  debounce: 300,
+  makeParams: ({ articleId, action }) => ({
+    dt: "HD Article",
+    dn: articleId,
+    method: "set_feedback",
+    args: {
+      value: action,
+    },
+  }),
+});

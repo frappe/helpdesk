@@ -19,14 +19,13 @@
     </LayoutHeader>
 
     <div
-      class="py-4 mx-auto w-full max-w-3xl px-5 flex"
-      :class="editable && 'overflow-hidden'"
+      class="py-4 mx-auto w-full max-w-3xl px-5 flex flex-col"
       v-if="!article.loading"
     >
       <!-- article Info -->
       <div
         class="flex flex-col gap-3 p-4 w-full"
-        :class="editable && 'border rounded-lg  '"
+        :class="editable && 'border rounded-lg overflow-hidden'"
       >
         <!-- Top Element -->
         <div class="flex flex-col gap-3">
@@ -99,6 +98,9 @@
           </template>
         </TextEditor>
       </div>
+      <div class="p-4">
+        <ArticleFeedback :feedback="feedback" :article-id="articleId" />
+      </div>
     </div>
     <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
   </div>
@@ -128,10 +130,11 @@ import { useUserStore } from "@/stores/user";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import DiscardButton from "@/components/DiscardButton.vue";
-import { Resource, Article } from "@/types";
+import { Resource, Article, FeedbackAction } from "@/types";
 import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons, copyToClipboard } from "@/utils";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import ArticleFeedback from "./ArticleFeedback.vue";
 
 const props = defineProps({
   articleId: {
@@ -151,6 +154,7 @@ const editable = ref(route.query.isEdit ?? false);
 
 const content = ref("");
 const title = ref("");
+const feedback = ref<FeedbackAction>();
 
 const titleRef = ref(null);
 watch(
@@ -173,6 +177,7 @@ const article: Resource<Article> = createResource({
   onSuccess: (data: Article) => {
     content.value = data.content;
     title.value = data.title;
+    feedback.value = data.feedback;
   },
 });
 
@@ -299,12 +304,11 @@ watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
 });
 
 const editorClass = computed(() => {
-  let basicStyles =
-    "rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]";
-  if (editable.value) {
-    basicStyles += " overflow-auto";
-  }
-  return basicStyles;
+  return [
+    "rounded-b-lg max-w-[unset] prose-sm",
+    editable.value &&
+      "overflow-auto h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)]",
+  ];
 });
 
 const options = computed(() => [
