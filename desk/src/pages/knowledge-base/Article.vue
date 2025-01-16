@@ -83,7 +83,8 @@
         <TextEditor
           ref="editorRef"
           :editor-class="editorClass"
-          :content="content"
+          :content="textEditorContentWithIDs"
+          :extensions="[PreserveIds]"
           :editable="editable"
           @change="(event:string) => {
 			      content = event;
@@ -107,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch } from "vue";
+import { computed, ref, h, watch, onMounted } from "vue";
 import {
   Breadcrumbs,
   debounce,
@@ -133,11 +134,11 @@ import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal
 import DiscardButton from "@/components/DiscardButton.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
 import { Resource, Article, FeedbackAction } from "@/types";
-import IconDot from "~icons/lucide/dot";
 import { createToast, textEditorMenuButtons, copyToClipboard } from "@/utils";
-import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import { capture } from "@/telemetry";
-
+import { PreserveIds } from "@/tiptap-extensions";
+import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import IconDot from "~icons/lucide/dot";
 const props = defineProps({
   articleId: {
     type: String,
@@ -307,6 +308,42 @@ function handleDelete() {
     },
   });
 }
+
+const textEditorContentWithIDs = computed(() =>
+  article.data?.content ? addLinksToHeadings(article.data?.content) : null
+);
+
+function addLinksToHeadings(content: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+  const headings = doc.querySelectorAll("h2, h3, h4, h5, h6");
+  headings.forEach((heading) => {
+    const text = heading.textContent.trim();
+    const id = text.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+    heading.setAttribute("id", id);
+  });
+  return doc.body.innerHTML;
+}
+function scrollToHeading() {
+  const articleHeading = window.location.hash;
+  if (!articleHeading) return;
+  const headingElement = document.querySelector(articleHeading) as HTMLElement;
+  if (!headingElement) return;
+  headingElement.scrollIntoView({ behavior: "smooth" });
+  headingElement.classList.add("transition-all");
+  const fontSize = headingElement.style.fontSize;
+  setTimeout(() => {
+    headingElement.style.fontSize = "1.5rem";
+    setTimeout(() => {
+      headingElement.style.fontSize = fontSize;
+    }, 500);
+  }, 1000);
+}
+onMounted(() => {
+  setTimeout(() => {
+    scrollToHeading();
+  }, 100);
+});
 
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
   isDirty.value =
