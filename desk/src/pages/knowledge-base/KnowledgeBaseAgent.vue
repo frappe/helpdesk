@@ -79,7 +79,7 @@ const headerOptions = [
   },
   {
     label: "Article",
-    icon: "file",
+    icon: "file-text",
     onClick: () => {
       router.push({ name: "NewArticle" });
     },
@@ -327,7 +327,7 @@ const options = computed(() => {
         prefix: () => {
           return h(FeatherIcon, {
             name: "file-text",
-            class: "w-4 h-4 ",
+            class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
           });
         },
       },

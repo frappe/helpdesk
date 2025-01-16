@@ -19,7 +19,7 @@
             </div>
             <div v-else class="flex items-center gap-1 w-full">
               <span>{{ group.group.label }}</span>
-              <span class="text-xs text-ink-gray-6"
+              <span class="text-xs text-ink-gray-5"
                 >{{
                   group.rows.length +
                   " Article" +
