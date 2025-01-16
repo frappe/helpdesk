@@ -56,17 +56,17 @@ import { createResource, Breadcrumbs, usePageMeta } from "frappe-ui";
 import { TicketsListView } from "@/components/ticket";
 import { ViewControls, LayoutHeader } from "@/components";
 import { useUserStore } from "@/stores/user";
-import { useRoute } from "vue-router";
 import { socket } from "@/socket";
-const { getUser } = useUserStore();
+import { isCustomerPortal } from "@/utils";
 
-const route = useRoute();
-const isCustomerPortal: boolean = route.meta.public ?? false;
+const { getUser } = useUserStore();
 
 const breadcrumbs = [
   {
     label: "Tickets",
-    route: { name: isCustomerPortal ? "TicketsCustomer" : "TicketsAgent" },
+    route: {
+      name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+    },
   },
 ];
 let storage = useStorage("tickets_agent", {
@@ -100,12 +100,12 @@ const tickets = createResource({
     page_length: pageLength.value,
     columns: columns.length ? columns : undefined,
     rows: rows.length ? rows : undefined,
-    show_customer_portal_fields: isCustomerPortal,
+    show_customer_portal_fields: isCustomerPortal.value,
   },
   auto: true,
   transform(data) {
     data.data.forEach((row) => {
-      if (isCustomerPortal) {
+      if (isCustomerPortal.value) {
         if (row.status == "Replied") {
           row.status = "Awaiting Response";
         }
@@ -313,7 +313,7 @@ function apply() {
       doctype: "HD Ticket",
       columns: columns.length ? columns : undefined,
       rows: rows.length ? rows : undefined,
-      show_customer_portal_fields: isCustomerPortal,
+      show_customer_portal_fields: isCustomerPortal.value,
     },
   });
 
@@ -327,7 +327,7 @@ const filterableFields = createResource({
   params: {
     doctype: "HD Ticket",
     append_assign: true,
-    show_customer_portal_fields: isCustomerPortal,
+    show_customer_portal_fields: isCustomerPortal.value,
   },
   transform: (data) => {
     return data
@@ -358,7 +358,7 @@ const sortableFields = createResource({
   auto: true,
   params: {
     doctype: "HD Ticket",
-    show_customer_portal_fields: isCustomerPortal,
+    show_customer_portal_fields: isCustomerPortal.value,
   },
 });
 

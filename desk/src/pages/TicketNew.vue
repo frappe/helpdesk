@@ -114,6 +114,7 @@ import SearchArticles from "../components/SearchArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
+import { isCustomerPortal } from "@/utils";
 
 interface P {
   templateId?: string;
@@ -129,8 +130,6 @@ const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
-
-const isCustomerPortal = window.location.pathname.includes("/my-tickets");
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -173,7 +172,7 @@ const ticket = createResource({
         ticketId: data.name,
       },
     });
-    if (!isCustomerPortal) return;
+    if (!isCustomerPortal.value) return;
     // only capture telemetry for customer portal
     capture("new_ticket_submitted", {
       data: {

@@ -1,6 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import { toast } from "frappe-ui";
-import { RouteLocation } from "vue-router";
+import { ref } from "vue";
 import zod from "zod";
 /**
  * Wrapper to create toasts, supplied with default options.
@@ -118,8 +118,7 @@ export function setupCustomActions(data, obj) {
   data._customActions = actions;
 }
 
-export const isCustomerPortal = (route: RouteLocation) =>
-  route.meta.public ?? false;
+export const isCustomerPortal = ref(false);
 
 export function copyToClipboard(text: string, message?: string) {
   navigator.clipboard.writeText(text);

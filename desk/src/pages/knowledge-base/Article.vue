@@ -6,7 +6,7 @@
           <Breadcrumbs :items="breadcrumbs" />
         </div>
       </template>
-      <template #right-header>
+      <template #right-header v-if="!isCustomerPortal">
         <!-- Default Buttons -->
         <div class="flex gap-2" v-if="!editable">
           <Button
@@ -48,14 +48,14 @@
                 {{ dayjs(article.data.modified).short() }}
               </div>
             </div>
-            <Dropdown :options="options" v-if="!editable">
+            <Dropdown :options="options" v-if="!editable && !isCustomerPortal">
               <Button variant="ghost">
                 <template #icon>
                   <IconMoreHorizontal class="h-4 w-4" />
                 </template>
               </Button>
             </Dropdown>
-            <div class="flex gap-2" v-else>
+            <div class="flex gap-2" v-if="editable">
               <DiscardButton
                 :hide-dialog="!isDirty"
                 title="Discard changes?"
@@ -134,7 +134,12 @@ import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal
 import DiscardButton from "@/components/DiscardButton.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
 import { Resource, Article, FeedbackAction } from "@/types";
-import { createToast, textEditorMenuButtons, copyToClipboard } from "@/utils";
+import {
+  createToast,
+  textEditorMenuButtons,
+  copyToClipboard,
+  isCustomerPortal,
+} from "@/utils";
 import { capture } from "@/telemetry";
 import { PreserveIds } from "@/tiptap-extensions";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";

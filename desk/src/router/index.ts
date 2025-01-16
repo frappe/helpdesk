@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-
+import { isCustomerPortal } from "@/utils";
 import { useScreenSize } from "@/composables/screen";
 const { isMobileView } = useScreenSize();
 
@@ -118,6 +118,7 @@ const routes = [
       auth: true,
       agent: true,
       admin: false,
+      public: false,
     },
     children: [
       {
@@ -216,7 +217,7 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-
+  isCustomerPortal.value = to.meta.public;
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
@@ -229,8 +230,7 @@ router.beforeEach(async (to, _, next) => {
 });
 
 router.afterEach(async (to) => {
-  const isCustomerPortal = to.meta.public ?? false;
-  if (isCustomerPortal) return;
+  if (to.meta.public) return;
   const userStore = useUserStore();
   await userStore.users.fetch();
 });
