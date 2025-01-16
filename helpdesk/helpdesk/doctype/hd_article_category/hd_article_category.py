@@ -2,8 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
-
-# from frappe import _
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -13,11 +12,11 @@ class HDArticleCategory(Document):
 
     def validate_default_category(self):
         if self.has_value_changed("category_name"):
-            frappe.throw("General category name can't be changed")
+            frappe.throw(_("General category name can't be changed"))
 
     def on_trash(self):
         if self.category_name == "General":
-            frappe.throw("General category can't be deleted")
+            frappe.throw(_("General category can't be deleted"))
             return
 
         articles = frappe.get_all(

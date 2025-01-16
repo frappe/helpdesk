@@ -254,7 +254,7 @@ function handleCategoryUpdate() {
 function handleCategoryDelete(groupedRow) {
   confirmDialog({
     title: "Delete category?",
-    message: `All articles from this category will be uncatagorized.`,
+    message: `All articles from this category will move to General category.`,
     onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
       deleteCategory.submit(
         {
