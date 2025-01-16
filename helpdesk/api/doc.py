@@ -266,6 +266,18 @@ def get_list_data(
                         options.sort(reverse=True, key=lambda x: x.get("label"))
                 else:
                     options.sort(key=lambda x: x.get("label"))
+
+                # general category at first position
+                idx = [
+                    idx for idx, o in enumerate(options) if o.get("label") == "General"
+                ]
+                if len(idx) == 0:
+                    return
+
+                idx = idx[0]
+                default_category = options[idx]
+                options.pop(idx)
+                options.insert(0, default_category)
                 return options
 
         for field in fields:
