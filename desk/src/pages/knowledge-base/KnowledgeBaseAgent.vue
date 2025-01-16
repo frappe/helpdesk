@@ -307,6 +307,8 @@ const options = computed(() => {
     view: {
       view_type: "group_by",
       group_by_field: "category",
+      label_doc: "HD Article Category",
+      label_field: "category_name",
     },
     statusMap: {
       Published: {

@@ -128,9 +128,10 @@ def get_list_data(
     view=None,
 ):
     is_default = True
-
     view_type = view.get("view_type") if view else None
     group_by_field = view.get("group_by_field") if view else None
+    label_doc = view.get("label_doc") if view else None
+    label_field = view.get("label_field") if view else None
 
     if columns or rows:
         is_default = False
@@ -241,7 +242,9 @@ def get_list_data(
                 options = [
                     {
                         "label": frappe.db.get_value(
-                            "HD Article Category", option, "category_name"
+                            label_doc if label_doc else doctype,
+                            option,
+                            label_field if label_field else group_by_field,
                         ),
                         "value": option,
                     }
