@@ -5,22 +5,21 @@ import frappe
 
 # from frappe import _
 from frappe.model.document import Document
-from frappe.utils import cint
 
 
 class HDArticleCategory(Document):
-    def before_save(self):
-        if self.idx == -1 and self.status == "Published":
-            # index is only set if its not set already, this allows defining
-            # index at the time of creation itself if not set the index is set
-            # to the last index + 1, i.e. the category is added at the end
-            self.idx = cint(
-                frappe.db.count(
-                    "HD Article Category", {"parent_category": self.parent_category}
-                )
-            )
+    def validate(self):
+        self.validate_default_category()
+
+    def validate_default_category(self):
+        if self.has_value_changed("category_name"):
+            frappe.throw("General category name can't be changed")
 
     def on_trash(self):
+        if self.category_name == "General":
+            frappe.throw("General category can't be deleted")
+            return
+
         articles = frappe.get_all(
             "HD Article", filters={"category": self.name}, pluck="name"
         )
