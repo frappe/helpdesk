@@ -8,15 +8,10 @@
  "engine": "InnoDB",
  "field_order": [
   "category_name",
-  "icon",
   "description",
+  "column_break_iczs",
   "status",
-  "idx",
-  "lft",
-  "rgt",
-  "is_group",
-  "old_parent",
-  "parent_category"
+  "icon"
  ],
  "fields": [
   {
@@ -33,47 +28,6 @@
    "label": "Description"
   },
   {
-   "default": "-1",
-   "fieldname": "idx",
-   "fieldtype": "Int",
-   "label": "Index"
-  },
-  {
-   "fieldname": "lft",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Left",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "rgt",
-   "fieldtype": "Int",
-   "hidden": 1,
-   "label": "Right",
-   "no_copy": 1,
-   "read_only": 1
-  },
-  {
-   "default": "1",
-   "fieldname": "is_group",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Is Group"
-  },
-  {
-   "fieldname": "old_parent",
-   "fieldtype": "Link",
-   "label": "Old Parent",
-   "options": "HD Article Category"
-  },
-  {
-   "fieldname": "parent_category",
-   "fieldtype": "Link",
-   "label": "Parent Category",
-   "options": "HD Article Category"
-  },
-  {
    "default": "Published",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -84,16 +38,19 @@
    "fieldname": "icon",
    "fieldtype": "Data",
    "label": "Icon"
+  },
+  {
+   "fieldname": "column_break_iczs",
+   "fieldtype": "Column Break"
   }
  ],
- "is_tree": 1,
  "links": [],
- "modified": "2023-08-13 14:42:34.742888",
+ "modified": "2025-01-16 21:47:20.362630",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
  "naming_rule": "Random",
- "nsm_parent_field": "parent_category",
+ "nsm_parent_field": "parent_hd_article_category",
  "owner": "Administrator",
  "permissions": [
   {
@@ -143,6 +100,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "category_name",
- "track_changes": 1
+ "title_field": "category_name"
 }
