@@ -133,7 +133,7 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import DiscardButton from "@/components/DiscardButton.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
-import { Resource, Article, FeedbackAction } from "@/types";
+import { Resource, Article, FeedbackAction, Error } from "@/types";
 import {
   createToast,
   textEditorMenuButtons,
@@ -194,6 +194,13 @@ const article: Resource<Article> = createResource({
         title: data.title,
       },
     });
+  },
+  onError: (err: Error) => {
+    if (err.exc_type === "PermissionError") {
+      router.replace({
+        name: "CustomerKnowledgeBase",
+      });
+    }
   },
 });
 
@@ -344,11 +351,6 @@ function scrollToHeading() {
     }, 500);
   }, 1000);
 }
-onMounted(() => {
-  setTimeout(() => {
-    scrollToHeading();
-  }, 100);
-});
 
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
   isDirty.value =
@@ -413,13 +415,22 @@ const breadcrumbs = computed(() => {
   const items = [
     {
       label: "Knowledge Base",
-      route: { name: "AgentKnowledgeBase" },
+      route: {
+        name: isCustomerPortal.value
+          ? "CustomerKnowledgeBase"
+          : "AgentKnowledgeBase",
+      },
     },
   ];
   if (article.data?.category_name) {
     items.push({
       label: article.data?.category_name,
-      route: { name: "AgentKnowledgeBase" },
+      route: {
+        name: isCustomerPortal.value ? "Articles" : "AgentKnowledgeBase",
+        params: {
+          categoryId: article.data?.category_id,
+        },
+      },
     });
   }
   if (article.data?.title) {
@@ -429,6 +440,12 @@ const breadcrumbs = computed(() => {
     });
   }
   return items;
+});
+
+onMounted(() => {
+  setTimeout(() => {
+    scrollToHeading();
+  }, 100);
 });
 </script>
 

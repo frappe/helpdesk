@@ -11,7 +11,7 @@
           placeholder="Support Issues"
           v-model="newTitle"
           :rows="1"
-          maxlength="80"
+          maxlength="50"
           autofocus
           @input="(e: Event) => {
             const target = e.target as HTMLTextAreaElement;

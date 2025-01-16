@@ -15,6 +15,16 @@ export interface Resource<T = unknown> {
   update: (r: unknown) => void;
 }
 
+export interface Error {
+  exc_type: string;
+  exc: string;
+  response: string;
+  status: string;
+  messages: string;
+  stack: string;
+  message: string;
+}
+
 export interface Comment {
   commented_by: string;
   content: string;
