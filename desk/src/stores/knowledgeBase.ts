@@ -59,18 +59,6 @@ export const updateCategoryTitle = createResource({
   },
 });
 
-export const deleteCategory = createResource({
-  url: "helpdesk.api.knowledge_base.delete_category",
-  makeParams({ name }) {
-    return {
-      name,
-    };
-  },
-  validate({ name }) {
-    if (!name) throw "Category is required";
-  },
-});
-
 export const moveToCategory = createResource({
   url: "helpdesk.api.knowledge_base.move_to_category",
   makeParams({ category, articles }) {

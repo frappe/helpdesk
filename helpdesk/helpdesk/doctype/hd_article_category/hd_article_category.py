@@ -19,3 +19,13 @@ class HDArticleCategory(Document):
                     "HD Article Category", {"parent_category": self.parent_category}
                 )
             )
+
+    def on_trash(self):
+        articles = frappe.get_all(
+            "HD Article", filters={"category": self.name}, pluck="name"
+        )
+        try:
+            for article in articles:
+                frappe.db.set_value("HD Article", article, "category", None)
+        except Exception as e:
+            frappe.db.rollback()

@@ -42,7 +42,7 @@ import {
 import { useRouter } from "vue-router";
 import {
   updateCategoryTitle,
-  deleteCategory,
+  deleteRes as deleteCategory,
   newCategory,
   moveToCategory,
   deleteArticles,
@@ -258,6 +258,7 @@ function handleCategoryDelete(groupedRow) {
     onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
       deleteCategory.submit(
         {
+          doctype: "HD Article Category",
           name: groupedRow.group.value,
         },
         {

@@ -28,10 +28,7 @@
               </span>
             </div>
           </div>
-          <Dropdown
-            :options="actions(group)"
-            v-if="groupByActions.length > 0 && group.group.label != ''"
-          >
+          <Dropdown :options="actions(group)" v-if="groupByActions.length > 0">
             <Button variant="ghost">
               <template #icon>
                 <IconMoreHorizontal class="h-4 w-4" />
@@ -92,12 +89,15 @@ const props = defineProps({
 const groupedRows = ref(props.rows);
 
 const actions = (group) => {
-  const _actions = props.groupByActions.map((action) => {
+  let _actions = props.groupByActions.map((action) => {
     return {
       ...action,
       onClick: () => action.onClick(group),
     };
   });
+  if (group.group.label == "") {
+    _actions = _actions.filter((action) => action.label === "Add New Article");
+  }
   return _actions;
 };
 

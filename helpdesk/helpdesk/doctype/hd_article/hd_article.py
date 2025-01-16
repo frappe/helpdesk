@@ -3,31 +3,10 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.query_builder import DocType
 from frappe.utils import cint
 
 
 class HDArticle(Document):
-    @staticmethod
-    def get_list_filters(query):
-        QBArticle = DocType("HD Article")
-        QBCategory = DocType("HD Article Category")
-
-        query = (
-            query.where(QBArticle.status != "Archived")
-            .left_join(QBCategory)
-            .on(QBCategory.name == QBArticle.category)
-            .select(QBCategory.category_name)
-            .select(
-                QBArticle.title,
-                QBArticle.status,
-                QBArticle.author,
-                QBArticle.modified,
-            )
-        )
-
-        return query
-
     def before_insert(self):
         self.author = frappe.session.user
 
