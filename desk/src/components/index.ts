@@ -1,6 +1,5 @@
 export { default as AttachmentItem } from "./AttachmentItem.vue";
 export { default as CommandPalette } from "./command-palette/CP.vue";
-export { default as HCard } from "./HCard.vue";
 export { default as NestedPopover } from "./NestedPopover.vue";
 export { default as Notifications } from "./notifications/Notifications.vue";
 export { default as PageTitle } from "./PageTitle.vue";
