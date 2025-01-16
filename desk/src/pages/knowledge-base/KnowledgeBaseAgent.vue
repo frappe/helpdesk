@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge base</div>
+        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
       </template>
       <template #right-header>
         <Dropdown :options="headerOptions">
@@ -340,7 +340,7 @@ const options = computed(() => {
 
 usePageMeta(() => {
   return {
-    title: "Knowledge base",
+    title: "Knowledge Base",
   };
 });
 </script>

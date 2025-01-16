@@ -2,7 +2,7 @@
   <div class="p-5 pb-10 px-10 w-full overflow-scroll items-center">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Knowledge base</div>
+        <div class="text-lg font-medium text-gray-900">Knowledge Base</div>
       </template>
     </LayoutHeader>
     <div
@@ -47,7 +47,7 @@ const query = ref("");
 
 usePageMeta(() => {
   return {
-    title: "Knowledge base",
+    title: "Knowledge Base",
   };
 });
 </script>

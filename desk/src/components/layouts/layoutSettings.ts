@@ -26,7 +26,7 @@ export const agentPortalSidebarOptions = [
     to: AGENT_PORTAL_AGENT_LIST,
   },
   {
-    label: "Knowledge base",
+    label: "Knowledge Base",
     icon: LucideBookOpen,
     to: "AgentKnowledgeBase",
   },
@@ -59,7 +59,7 @@ export const customerPortalSidebarOptions = [
     to: "TicketsCustomer",
   },
   {
-    label: "Knowledge base",
+    label: "Knowledge Base",
     icon: LucideBookOpen,
     to: "CustomerKnowledgeBase",
   },
