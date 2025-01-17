@@ -60,7 +60,19 @@ def create_category(title: str):
 @frappe.whitelist()
 def move_to_category(category, articles):
     for article in articles:
-        frappe.db.set_value("HD Article", article, "category", category)
+        try:
+            article_category = frappe.db.get_value("HD Article", article, "category")
+            category_existing_articles = frappe.db.count(
+                "HD Article", {"category": article_category}
+            )
+            if category_existing_articles == 1:
+                frappe.throw("Category must have atleast one article")
+                return
+            else:
+                frappe.db.set_value("HD Article", article, "category", category)
+        except Exception as e:
+            frappe.db.rollback()
+            frappe.throw("Error moving article to category")
 
 
 @frappe.whitelist()
@@ -92,6 +104,13 @@ def get_category_articles(category):
         article["content"] = str(soup.text)[:100]
 
     return articles
+
+
+@frappe.whitelist()
+def get_general_category():
+    return frappe.db.get_value(
+        "HD Article Category", {"category_name": "General"}, "name"
+    )
 
 
 @frappe.whitelist()

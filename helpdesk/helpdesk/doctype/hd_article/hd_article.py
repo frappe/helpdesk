@@ -7,6 +7,11 @@ from frappe.utils import cint
 
 
 class HDArticle(Document):
+    def validate(self):
+        if self.has_value_changed("category"):
+            old_category = self.get_doc_before_save().get("category")
+            self.check_category_length(old_category)
+
     def before_insert(self):
         self.author = frappe.session.user
 
@@ -30,6 +35,17 @@ class HDArticle(Document):
                     {"category": self.category, "status": "Published"},
                 )
             )
+
+    def on_trash(self):
+        self.check_category_length()
+
+    def check_category_length(self, category=None):
+        category = category or self.get("category")
+        if not category:
+            return
+        category_articles = frappe.db.count("HD Article", {"category": category})
+        if category_articles == 1:
+            frappe.throw("Category must have atleast one article")
 
     @staticmethod
     def default_list_data():

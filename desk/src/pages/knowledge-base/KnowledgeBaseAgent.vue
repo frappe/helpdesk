@@ -38,6 +38,7 @@ import {
   Button,
   confirmDialog,
   Dropdown,
+  createResource,
 } from "frappe-ui";
 import { useRouter } from "vue-router";
 import {
@@ -52,6 +53,7 @@ import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { createToast } from "@/utils";
+import { Error } from "@/types";
 
 const router = useRouter();
 
@@ -67,6 +69,12 @@ const editTitle = ref(false);
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
 
+const generalCategory = createResource({
+  url: "helpdesk.api.knowledge_base.get_general_category",
+  auto: true,
+  cache: ["GeneralCategory"],
+});
+
 const headerOptions = [
   {
     label: "Category",
@@ -81,7 +89,15 @@ const headerOptions = [
     label: "Article",
     icon: "file-text",
     onClick: () => {
-      router.push({ name: "NewArticle" });
+      router.push({
+        name: "NewArticle",
+        params: {
+          id: generalCategory.data,
+        },
+        query: {
+          title: "General",
+        },
+      });
     },
   },
 ];
@@ -93,8 +109,10 @@ const groupByActions = [
     onClick: (groupedRow) => {
       router.push({
         name: "NewArticle",
+        params: {
+          id: groupedRow.group.value,
+        },
         query: {
-          category: groupedRow.group.value,
           title: groupedRow.group.label,
         },
       });
@@ -164,9 +182,9 @@ function handleMoveToCategory(category: string) {
           iconClasses: "text-green-600",
         });
       },
-      onError: (error: string) => {
+      onError: (error: Error) => {
         createToast({
-          title: error,
+          title: error?.messages?.[0] || error.message,
           icon: "x",
           iconClasses: "text-red-600",
         });
@@ -264,7 +282,7 @@ function handleCategoryDelete(groupedRow) {
         {
           onSuccess: () => {
             createToast({
-              title: "Article deleted successfully",
+              title: "Category deleted successfully",
               icon: "check",
               iconClasses: "text-green-600",
             });

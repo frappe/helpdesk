@@ -93,7 +93,14 @@ const route = useRoute();
 const title = ref("");
 const content = ref("");
 
-const categoryId = ref(route.query.category || null);
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
+});
+
+const categoryId = ref(props.id || null);
 const categoryName = computed(() => (route.query.title as string) || "");
 
 function handleCreateArticle() {

@@ -68,8 +68,8 @@ export const moveToCategory = createResource({
     };
   },
   validate({ category, articles }) {
-    if (!category) throw "Category is required";
-    if (!articles) throw "Articles are required";
+    if (!category) throw {message:"Category is required"};
+    if (!articles) throw {message:"Articles are required"};
   },
 });
 
@@ -77,8 +77,6 @@ export const categories = createResource({
   url: "helpdesk.api.knowledge_base.get_categories",
   cache: ["categories"],
 });
-
-
 
 export const categoryName = createResource({
   url: "helpdesk.api.knowledge_base.get_category_title",

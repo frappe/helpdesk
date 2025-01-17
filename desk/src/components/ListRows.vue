@@ -7,17 +7,10 @@
         >
           <div class="flex items-center gap-2 w-full">
             <component v-if="group.icon" :is="group.icon" />
-            <div v-if="group.group.label == ''">
-              {{ "General" }}
-              <span class="text-xs text-ink-gray-6"
-                >{{
-                  group.rows.length +
-                  " Article" +
-                  (group.rows.length > 1 ? "s" : "")
-                }}
-              </span>
-            </div>
-            <div v-else class="flex items-center gap-1 w-full">
+            <div
+              v-if="group.group.label != ''"
+              class="flex items-center gap-1 w-full"
+            >
               <span>{{ group.group.label }}</span>
               <span class="text-xs text-ink-gray-5"
                 >{{

@@ -161,9 +161,10 @@ const routes = [
         props: true,
       },
       {
-        path: "articles/new",
+        path: "articles/new/:id",
         name: "NewArticle",
         component: () => import("@/pages/knowledge-base/NewArticle.vue"),
+        props: true,
       },
       {
         path: "customers",
