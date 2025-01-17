@@ -104,18 +104,3 @@ class HDArticle(Document):
         :return: Generated slug
         """
         return self.title.lower().replace(" ", "-")
-
-    def get_breadcrumbs(self):
-        breadcrumbs = [{"name": self.name, "label": self.title}]
-        current_category = frappe.get_doc("Category", self.category)
-        breadcrumbs.append(
-            {"name": current_category.name, "label": current_category.category_name}
-        )
-        while current_category.parent_category:
-            current_category = frappe.get_doc(
-                "Category", current_category.parent_category
-            )
-            breadcrumbs.append(
-                {"name": current_category.name, "label": current_category.category_name}
-            )
-        return breadcrumbs[::-1]
