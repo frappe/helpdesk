@@ -8,7 +8,10 @@ from frappe.utils import cint
 
 class HDArticle(Document):
     def validate(self):
-        if self.has_value_changed("category"):
+        self.validate_article_category()
+
+    def validate_article_category(self):
+        if self.has_value_changed("category") and not self.is_new():
             old_category = self.get_doc_before_save().get("category")
             self.check_category_length(old_category)
 

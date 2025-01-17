@@ -188,6 +188,7 @@ function handleMoveToCategory(category: string) {
           icon: "x",
           iconClasses: "text-red-600",
         });
+        moveToModal.value = false;
       },
     }
   );
