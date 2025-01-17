@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
@@ -48,7 +49,7 @@ class HDArticle(Document):
             return
         category_articles = frappe.db.count("HD Article", {"category": category})
         if category_articles == 1:
-            frappe.throw("Category must have atleast one article")
+            frappe.throw(_("Category must have atleast one article"))
 
     @staticmethod
     def default_list_data():

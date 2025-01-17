@@ -66,13 +66,13 @@ def move_to_category(category, articles):
                 "HD Article", {"category": article_category}
             )
             if category_existing_articles == 1:
-                frappe.throw("Category must have atleast one article")
+                frappe.throw(_("Category must have atleast one article"))
                 return
             else:
                 frappe.db.set_value("HD Article", article, "category", category)
         except Exception as e:
             frappe.db.rollback()
-            frappe.throw("Error moving article to category")
+            frappe.throw(_("Error moving article to category"))
 
 
 @frappe.whitelist()
