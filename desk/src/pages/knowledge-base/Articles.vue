@@ -21,10 +21,11 @@
 
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
-import { articles, categoryName } from "@/stores/knowledgeBase";
-import { Breadcrumbs } from "frappe-ui";
+import { categoryName } from "@/stores/knowledgeBase";
+import { Breadcrumbs, createResource } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleCard2 from "@/components/knowledge-base/ArticleCard2.vue";
+
 const props = defineProps({
   categoryId: {
     required: true,
@@ -32,8 +33,16 @@ const props = defineProps({
   },
 });
 
+const articles = createResource({
+  url: "helpdesk.api.knowledge_base.get_category_articles",
+  cache: ["articles", props.categoryId],
+  params: {
+    category: props.categoryId,
+  },
+  auto: true,
+});
+
 onMounted(() => {
-  articles.fetch({ category: props.categoryId });
   categoryName.fetch({
     category: props.categoryId,
   });

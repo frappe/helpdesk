@@ -78,15 +78,7 @@ export const categories = createResource({
   cache: ["categories"],
 });
 
-export const articles = createResource({
-  url: "helpdesk.api.knowledge_base.get_category_articles",
-  cache: ["articles"],
-  makeParams({ category }) {
-    return {
-      category,
-    };
-  },
-});
+
 
 export const categoryName = createResource({
   url: "helpdesk.api.knowledge_base.get_category_title",

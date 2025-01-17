@@ -28,7 +28,7 @@
         }}</span>
       </div>
       <span class="text-sm text-gray-600">{{
-        dayjs.tz(article.published_on).format("DD, MMM YYYY")
+        dayjs.tz(article.modified).fromNow()
       }}</span>
     </div>
   </router-link>
