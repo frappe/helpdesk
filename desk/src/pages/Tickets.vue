@@ -311,8 +311,8 @@ function apply() {
       filters: filtersToApply,
       page_length: pageLengthCount,
       doctype: "HD Ticket",
-      columns: columns.length ? columns : undefined,
-      rows: rows.length ? rows : undefined,
+      columns: columns?.length ? columns : undefined,
+      rows: rows?.length ? rows : undefined,
       show_customer_portal_fields: isCustomerPortal.value,
     },
   });
