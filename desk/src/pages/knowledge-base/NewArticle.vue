@@ -12,7 +12,6 @@
           <!-- Author Info -->
           <div
             class="flex gap-1 items-center flex-1 mr-7 max-w-fit overflow-hidden"
-            v-if="!categoryName"
           >
             <UserAvatar :name="user.name" :expand="true" />
             <span>in</span>
@@ -22,10 +21,8 @@
               placeholder="Select Category"
               v-model="categoryId"
               :pageLength="100"
+              :hide-clear-button="true"
             />
-          </div>
-          <div v-else>
-            <UserAvatar :name="user.name" :expand="true" />
           </div>
           <!-- Action Buttons -->
           <div class="flex gap-2">

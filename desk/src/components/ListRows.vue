@@ -95,7 +95,7 @@ const actions = (group) => {
       onClick: () => action.onClick(group),
     };
   });
-  if (group.group.label == "") {
+  if (group.group.label == "General") {
     _actions = _actions.filter((action) => action.label === "Add New Article");
   }
   return _actions;

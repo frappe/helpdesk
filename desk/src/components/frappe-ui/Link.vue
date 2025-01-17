@@ -28,7 +28,7 @@
         <slot name="item-label" v-bind="{ active, selected, option }" />
       </template>
 
-      <template #footer="{ value, close }">
+      <template #footer="{ value, close }" v-if="!hideClearButton">
         <div v-if="attrs.onCreate">
           <Button
             variant="ghost"
@@ -84,6 +84,10 @@ const props = defineProps({
   pageLength: {
     type: Number,
     default: 10,
+  },
+  hideClearButton: {
+    type: Boolean,
+    default: false,
   },
 });
 
