@@ -40,13 +40,13 @@
           <div class="space-y-4">
             <FormControl
               v-model="newSubCategoryName"
-              :placeholder="subCategory.doc.category_name"
+              placeholder="Name"
               label="Name"
               type="text"
             />
             <FormControl
               v-model="newSubCategoryDescription"
-              :placeholder="subCategory.doc.description"
+              placeholder="Description"
               label="Description"
               type="textarea"
             />
@@ -64,7 +64,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, h } from "vue";
+import { ref, watch, h } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import {
@@ -76,6 +76,8 @@ import {
   Avatar,
 } from "frappe-ui";
 import { AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE } from "@/router";
+import { createToast } from "@/utils";
+import { createListManager } from "@/composables/listManager";
 import { useError } from "@/composables/error";
 import KnowledgeBaseCategoryHeader from "./KnowledgeBaseCategoryHeader.vue";
 import IconEdit from "~icons/lucide/edit-3";
@@ -100,8 +102,23 @@ const subCategory = createDocumentResource({
   name: props.subCategoryId,
   auto: true,
   setValue: {
+    onSuccess() {
+      createToast({
+        title: "Subcategory updated",
+        icon: "check",
+        iconClasses: "text-green-500",
+      });
+      showEdit.value = false;
+    },
     onError: useError({ title: "Error creating sub category" }),
   },
+});
+
+watch(showEdit, (newValue) => {
+  if (newValue) {
+    newSubCategoryName.value = subCategory.doc?.category_name || "";
+    newSubCategoryDescription.value = subCategory.doc?.description || "";
+  }
 });
 
 const saveSubCategory = debounce(
