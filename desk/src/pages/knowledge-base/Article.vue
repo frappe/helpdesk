@@ -187,13 +187,15 @@ const article: Resource<Article> = createResource({
     content.value = data.content;
     title.value = data.title;
     feedback.value = data.feedback;
-    capture("article_viewed", {
-      data: {
-        user: authStore.userId,
-        article: data.name,
-        title: data.title,
-      },
-    });
+    if (isCustomerPortal.value) {
+      capture("article_viewed", {
+        data: {
+          user: authStore.userId,
+          article: data.name,
+          title: data.title,
+        },
+      });
+    }
   },
   onError: (err: Error) => {
     if (err.exc_type === "PermissionError") {
@@ -281,6 +283,11 @@ function handleArticleUpdate() {
     },
     {
       onSuccess: () => {
+        capture("article_updated", {
+          data: {
+            category: props.articleId,
+          },
+        });
         createToast({
           title: "Article updated successfully",
           icon: "check",

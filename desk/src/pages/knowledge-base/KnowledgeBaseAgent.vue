@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, reactive, computed } from "vue";
+import { h, ref, reactive, computed, onMounted } from "vue";
 import {
   usePageMeta,
   FeatherIcon,
@@ -55,6 +55,7 @@ import {
   deleteArticles,
   mergeCategory,
 } from "@/stores/knowledgeBase";
+import { capture } from "@/telemetry";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
@@ -240,6 +241,11 @@ function handleCategoryCreate() {
           icon: "check",
           iconClasses: "text-green-600",
         });
+        capture("category_created", {
+          data: {
+            category: category.title,
+          },
+        });
         resetState();
       },
       onError: (error: string) => {
@@ -407,6 +413,10 @@ const options = computed(() => {
     showSelectBanner: showSelectBanner.value,
     selectBannerActions,
   };
+});
+
+onMounted(() => {
+  capture("kb_agent_page_viewed");
 });
 
 usePageMeta(() => {

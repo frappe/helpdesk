@@ -6,6 +6,8 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint
 
+from helpdesk.utils import capture_event
+
 
 class HDArticle(Document):
     def validate(self):
@@ -20,6 +22,7 @@ class HDArticle(Document):
         self.author = frappe.session.user
 
     def before_save(self):
+        self.capture_telemetry()
         # set published date of the hd_article
         if self.status == "Published" and not self.published_on:
             self.published_on = frappe.utils.now()
@@ -39,6 +42,10 @@ class HDArticle(Document):
                     {"category": self.category, "status": "Published"},
                 )
             )
+
+    def capture_telemetry(self):
+        if self.is_new():
+            capture_event("article_created")
 
     def on_trash(self):
         self.check_category_length()

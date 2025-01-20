@@ -39,7 +39,11 @@
             placeholder="A short description"
           />
         </div>
-        <SearchArticles v-if="isCustomerPortal" :query="subject" />
+        <SearchArticles
+          v-if="isCustomerPortal"
+          :query="subject"
+          class="shadow"
+        />
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"

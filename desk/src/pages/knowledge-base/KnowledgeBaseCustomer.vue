@@ -45,7 +45,7 @@
             <SearchArticles
               :query="query"
               :hideViewAll="true"
-              class="rounded border p-3 py-2"
+              class="p-3 py-2 border-0 pt-2"
             />
           </div>
         </template>
@@ -62,15 +62,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { FormControl, usePageMeta, Popover } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { LayoutHeader } from "@/components";
 import CategoryFolderContainer from "@/components/knowledge-base/CategoryFolderContainer.vue";
 import SearchArticles from "../../components/SearchArticles.vue";
+import { capture } from "@/telemetry";
 
 const query = ref("");
 const searchInputRef = ref(null);
+
+onMounted(() => {
+  capture("kb_customer_page_viewed");
+});
 usePageMeta(() => {
   return {
     title: "Knowledge Base",

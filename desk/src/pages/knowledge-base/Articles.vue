@@ -28,6 +28,7 @@ import { categoryName } from "@/stores/knowledgeBase";
 import { Breadcrumbs, createResource } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleCard from "@/components/knowledge-base/ArticleCard.vue";
+import { capture } from "@/telemetry";
 
 const props = defineProps({
   categoryId: {
@@ -48,6 +49,11 @@ const articles = createResource({
 onMounted(() => {
   categoryName.fetch({
     category: props.categoryId,
+  });
+  capture("kb_customer_page_articles", {
+    data: {
+      category: props.categoryId,
+    },
   });
 });
 

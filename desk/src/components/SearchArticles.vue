@@ -33,6 +33,7 @@
             },
             hash: `#${a.name.split('#')[1]}`,
           }"
+          @click="handleSearchArticleClick(a)"
           target="_blank"
         >
           <dt class="font-base">{{ a.subject }} - {{ a.headings }}</dt>
@@ -78,7 +79,7 @@ import { watch } from "vue";
 import { createResource } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { Icon } from "@iconify/vue";
-
+import { capture } from "@/telemetry";
 interface P {
   query: string;
   hideViewAll?: boolean;
@@ -102,4 +103,12 @@ watch(
     articles.reload();
   }
 );
+
+function handleSearchArticleClick(article) {
+  capture("kb_customer_search_article_clicked", {
+    data: {
+      article: article.subject,
+    },
+  });
+}
 </script>
