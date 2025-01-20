@@ -10,9 +10,9 @@
     >
       <div
         v-if="articles.data"
-        class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6"
+        class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5"
       >
-        <ArticleCard2
+        <ArticleCard
           v-for="article in articles.data"
           :article="article"
           :key="article.name"
@@ -27,7 +27,7 @@ import { onMounted, computed } from "vue";
 import { categoryName } from "@/stores/knowledgeBase";
 import { Breadcrumbs, createResource } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import ArticleCard2 from "@/components/knowledge-base/ArticleCard2.vue";
+import ArticleCard from "@/components/knowledge-base/ArticleCard.vue";
 
 const props = defineProps({
   categoryId: {
