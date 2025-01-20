@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="!isEmpty(articles.data) && query.length > 2"
-    class="rounded border bg-cyan-50 px-5 py-3 text-base"
+    class="rounded border p-4 text-base"
   >
-    <div class="mb-2 font-medium px-4" v-if="!hideViewAll">
+    <div class="mb-2 font-medium pl-2" v-if="!hideViewAll">
       These articles may already cover what you are looking for
       <RouterLink
         class="group cursor-pointer space-x-1 hover:text-gray-900"
@@ -15,14 +15,20 @@
         <span class="text-xs underline">(View All)</span>
       </RouterLink>
     </div>
-    <dl>
+    <span class="text-p-sm pl-2">
+      <span class="font-medium">Search Results</span>
+    </span>
+    <dl
+      class="mx-auto w-full flex flex-col gap-2"
+      v-if="articles.data.length > 0"
+    >
       <div
         v-for="a in articles.data"
         :key="a.id"
-        class="focus:ring-cyan-30 rounded-md border-2 border-hidden p-4 hover:bg-cyan-100 focus:outline-none focus:ring active:bg-cyan-50"
+        class="rounded-md border-2 p-2 border-hidden hover:bg-surface-gray-2"
       >
         <RouterLink
-          class="group cursor-pointer hover:text-gray-900 flex flex-col gap-2"
+          class="group cursor-pointer hover:text-gray-900 flex flex-col gap-1"
           :to="{
             name: 'ArticlePublic',
             params: {
@@ -32,12 +38,41 @@
           }"
           target="_blank"
         >
-          <dt class="font-semibold">{{ a.subject }} - {{ a.headings }}</dt>
+          <dt class="font-base">{{ a.subject }} - {{ a.headings }}</dt>
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <dd class="font-light text-p-sm" v-html="a.description"></dd>
+          <dd
+            class="font-base text-p-sm text-gray-600 line-clamp-2"
+            v-html="a.description"
+          ></dd>
         </RouterLink>
       </div>
     </dl>
+  </div>
+  <div
+    v-else-if="
+      !articles.loading && articles.data?.length === 0 && query.length > 2
+    "
+    class="flex flex-col items-center justify-center h-[240px] gap-2 rounded border"
+  >
+    <Icon icon="heroicons-outline:search" class="h-8 w-8 text-gray-400" />
+    <div class="flex items-center flex-col justify-center">
+      <p class="font-base">No answers found</p>
+      <span class="font-base text-p-sm text-gray-600 text-center"
+        >Rephrase the question and try again with some keywords</span
+      >
+    </div>
+  </div>
+  <div
+    v-else-if="articles.loading"
+    class="flex flex-col items-center justify-center h-[240px] gap-2 rounded border"
+  >
+    <Icon icon="heroicons-outline:search" class="h-8 w-8 text-gray-400" />
+    <div class="flex items-center flex-col justify-center">
+      <p class="font-base">Searching...</p>
+      <span class="font-base text-p-sm text-gray-600 text-center"
+        >Please wait while we search for the answers</span
+      >
+    </div>
   </div>
 </template>
 
@@ -45,6 +80,7 @@
 import { watch } from "vue";
 import { createResource } from "frappe-ui";
 import { isEmpty } from "lodash";
+import { Icon } from "@iconify/vue";
 
 interface P {
   query: string;

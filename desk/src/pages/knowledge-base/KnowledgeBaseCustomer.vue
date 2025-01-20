@@ -8,23 +8,46 @@
     <div
       class="max-w-4xl 2xl:max-w-5xl pt-4 sm:px-5 w-full flex flex-col gap-4"
     >
-      <FormControl
-        ref="searchInputRef"
-        type="text"
-        class="w-full"
-        placeholder="Ask a question..."
-        size="lg"
-        v-model="query"
+      <Popover
+        :popover-class="[' max-w-[310px] md:max-w-[842px] !top-1 ']"
+        class="flex w-full [&>div:first-child]:w-full"
       >
-        <template #prefix>
-          <Icon icon="lucide:search" class="h-4 w-4 text-gray-500" />
+        <template #target="{ open, close }">
+          <FormControl
+            ref="searchInputRef"
+            type="text"
+            class="w-full focus:outline-none outline-none border-inherit shadow-none"
+            placeholder="Ask a question..."
+            size="md"
+            v-model="query"
+            @update:model-value="
+              (e:string) => {
+                if (e.length >= 3) {
+                  open();
+                } else {
+                  close();
+                }
+              }
+            "
+          >
+            <template #prefix>
+              <Icon icon="lucide:search" class="h-4 w-4 text-gray-500" />
+            </template>
+          </FormControl>
         </template>
-      </FormControl>
-
-      <!-- Searched Articles -->
-      <div class="flex flex-col gap-3">
-        <SearchArticles :query="query" :hideViewAll="true" />
-      </div>
+        <template #body-main>
+          <!-- Searched Articles -->
+          <div
+            class="max-h-[320px] md:max-h-[420px] overflow-scroll flex flex-col"
+          >
+            <SearchArticles
+              :query="query"
+              :hideViewAll="true"
+              class="rounded border p-3"
+            />
+          </div>
+        </template>
+      </Popover>
 
       <!-- Categories Folder -->
       <section class="flex flex-col gap-3">
@@ -38,13 +61,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { FormControl, usePageMeta } from "frappe-ui";
+import { FormControl, usePageMeta, Popover } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { LayoutHeader } from "@/components";
 import CategoryFolderContainer from "@/components/knowledge-base/CategoryFolderContainer.vue";
 import SearchArticles from "../../components/SearchArticles.vue";
-const query = ref("");
 
+const query = ref("");
+const searchInputRef = ref(null);
 usePageMeta(() => {
   return {
     title: "Knowledge Base",

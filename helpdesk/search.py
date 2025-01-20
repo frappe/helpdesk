@@ -156,7 +156,9 @@ class Search:
         query = self.clean_query(query)
         query = Query(query).paging(start, page_length)
         if highlight:
-            query = query.highlight(tags=["<mark>", "</mark>"])
+            query = query.highlight(
+                tags=["<mark style='background: #FFFF8F!important'>", "</mark>"]
+            )
 
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
