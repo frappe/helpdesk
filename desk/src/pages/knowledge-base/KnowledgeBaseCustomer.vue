@@ -19,6 +19,8 @@
             class="w-full focus:outline-none outline-none border-inherit shadow-none"
             placeholder="Ask a question..."
             size="md"
+            autofocus
+            autocomplete="off"
             v-model="query"
             @update:model-value="
               (e:string) => {
@@ -43,7 +45,7 @@
             <SearchArticles
               :query="query"
               :hideViewAll="true"
-              class="rounded border p-3"
+              class="rounded border p-3 py-2"
             />
           </div>
         </template>

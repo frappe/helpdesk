@@ -15,9 +15,6 @@
         <span class="text-xs underline">(View All)</span>
       </RouterLink>
     </div>
-    <span class="text-p-sm pl-2">
-      <span class="font-medium">Search Results</span>
-    </span>
     <dl
       class="mx-auto w-full flex flex-col gap-2"
       v-if="articles.data.length > 0"
@@ -41,7 +38,7 @@
           <dt class="font-base">{{ a.subject }} - {{ a.headings }}</dt>
           <!-- eslint-disable-next-line vue/no-v-html -->
           <dd
-            class="font-base text-p-sm text-gray-600 line-clamp-2"
+            class="font-base text-p-sm text-gray-600 line-clamp-1"
             v-html="a.description"
           ></dd>
         </RouterLink>
