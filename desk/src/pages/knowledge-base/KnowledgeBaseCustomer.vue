@@ -77,5 +77,3 @@ usePageMeta(() => {
   };
 });
 </script>
-
-<style scoped></style>

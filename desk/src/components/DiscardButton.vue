@@ -36,5 +36,3 @@ function handleDiscard() {
   });
 }
 </script>
-
-<style scoped></style>

@@ -70,5 +70,3 @@ const breadcrumbs = computed(() => {
   ];
 });
 </script>
-
-<style scoped></style>

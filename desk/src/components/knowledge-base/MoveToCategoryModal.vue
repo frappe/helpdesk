@@ -36,5 +36,3 @@ const actions = [
   },
 ];
 </script>
-
-<style scoped></style>

@@ -16,5 +16,3 @@ onMounted(() => {
   categories.fetch();
 });
 </script>
-
-<style scoped></style>

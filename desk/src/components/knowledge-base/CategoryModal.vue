@@ -83,5 +83,3 @@ function getActionButton() {
   return action;
 }
 </script>
-
-<style scoped></style>

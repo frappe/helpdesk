@@ -43,5 +43,3 @@ const props = defineProps<{
   article: Article;
 }>();
 </script>
-
-<style scoped></style>
