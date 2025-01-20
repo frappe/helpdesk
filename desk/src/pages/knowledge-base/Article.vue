@@ -133,7 +133,7 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import DiscardButton from "@/components/DiscardButton.vue";
 import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
-import { Resource, Article, FeedbackAction, Error } from "@/types";
+import { Resource, Article, FeedbackAction, Error, Breadcrumb } from "@/types";
 import {
   createToast,
   textEditorMenuButtons,
@@ -349,7 +349,7 @@ function scrollToHeading() {
     setTimeout(() => {
       headingElement.style.fontSize = fontSize;
     }, 500);
-  }, 1000);
+  }, 500);
 }
 
 watch([() => content.value, () => title.value], ([newContent, newTitle]) => {
@@ -412,7 +412,7 @@ const options = computed(() => [
 ]);
 
 const breadcrumbs = computed(() => {
-  const items = [
+  const items: Breadcrumb[] = [
     {
       label: "Knowledge Base",
       route: {

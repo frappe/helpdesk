@@ -275,3 +275,11 @@ export interface View {
   view_type: string;
   group_by_field: string;
 }
+
+export interface Breadcrumb {
+  label: string;
+  route: {
+    name: string;
+    params?: Record<string, string>;
+  };
+}
