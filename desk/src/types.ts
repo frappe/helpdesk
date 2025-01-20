@@ -242,13 +242,6 @@ export interface Article {
 
 export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
-export interface SubCategory {
-  name: string;
-  category_name: string;
-  icon: string | null;
-  articles: Article[];
-}
-
 export interface Author {
   name: string;
   image: string | null;
@@ -257,12 +250,11 @@ export interface Author {
 
 export interface Category {
   categoryName: string;
-  subCategories: SubCategory[];
   articles: Article[];
   authors?: {
     [key: string]: Author;
   };
-  children?: (Article | SubCategory)[];
+  children?: Article[];
 }
 
 // Badge

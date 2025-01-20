@@ -18,7 +18,6 @@ export const AGENT_PORTAL_TICKET = "TicketAgent";
 export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
-export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
 export const KB_PUBLIC_ARTICLE = "KBArticlePublic";
