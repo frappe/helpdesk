@@ -57,7 +57,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 <div align="center">
 	<sub>
-		Upload articles and let your customer solve there queries through the Knowledge Base.
+		Upload articles and let your customer solve their queries through the Knowledge Base.
 	</sub>
 </div>
 
