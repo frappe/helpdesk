@@ -27,6 +27,12 @@
       @create="handleCategoryCreate"
     />
     <MoveToCategoryModal v-model="moveToModal" @move="handleMoveToCategory" />
+    <MergeCategoryModal
+      :categoryTitle="category.title"
+      :category-id="category.id"
+      v-model="mergeModal"
+      @merge="handleMergeCategory"
+    />
   </div>
 </template>
 
@@ -47,6 +53,7 @@ import {
   newCategory,
   moveToCategory,
   deleteArticles,
+  mergeCategory,
 } from "@/stores/knowledgeBase";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
@@ -54,6 +61,8 @@ import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { createToast } from "@/utils";
 import { Error } from "@/types";
+import LucideMerge from "~icons/lucide/merge";
+import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
 
 const router = useRouter();
 
@@ -68,6 +77,7 @@ const editTitle = ref(false);
 // modals state
 const showCategoryModal = ref(false);
 const moveToModal = ref(false);
+const mergeModal = ref(false);
 
 const generalCategory = createResource({
   url: "helpdesk.api.knowledge_base.get_general_category",
@@ -130,6 +140,16 @@ const groupByActions = [
     },
   },
   {
+    label: "Merge",
+    icon: LucideMerge,
+    onClick: (groupedRow) => {
+      console.log(groupedRow);
+      mergeModal.value = true;
+      category.title = groupedRow.group.label;
+      category.id = groupedRow.group.value;
+    },
+  },
+  {
     label: "Delete",
     icon: "trash-2",
     onClick: (groupedRow) => {
@@ -137,6 +157,7 @@ const groupByActions = [
     },
   },
 ];
+
 const listSelections = ref(new Set());
 const showSelectBanner = ref(true);
 const selectBannerActions = [
@@ -309,6 +330,34 @@ function handleDeleteArticles() {
           title: "Articles deleted successfully",
           icon: "check",
           iconClasses: "text-green-600",
+        });
+      },
+    }
+  );
+}
+
+function handleMergeCategory(source: string, target: string) {
+  mergeCategory.submit(
+    {
+      source,
+      target,
+    },
+    {
+      onSuccess: () => {
+        listViewRef.value.reload();
+        createToast({
+          title: "Category merged successfully",
+          icon: "check",
+          iconClasses: "text-green-600",
+        });
+        mergeModal.value = false;
+        resetState();
+      },
+      onError: (error: Error) => {
+        createToast({
+          title: error?.messages?.[0] || error.message,
+          icon: "x",
+          iconClasses: "text-red-600",
         });
       },
     }

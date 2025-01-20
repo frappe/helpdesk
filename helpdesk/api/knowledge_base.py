@@ -107,6 +107,24 @@ def get_category_articles(category):
 
 
 @frappe.whitelist()
+def merge_category(source, target):
+    if source == target:
+        frappe.throw(_("Source and target category cannot be same"))
+    general_category = get_general_category()
+    if source == general_category:
+        frappe.throw(_("Cannot merge General category"))
+    source_articles = frappe.get_all(
+        "HD Article",
+        filters={"category": source},
+        pluck="name",
+    )
+    for article in source_articles:
+        frappe.db.set_value("HD Article", article, "category", target)
+
+    frappe.delete_doc("HD Article Category", source)
+
+
+@frappe.whitelist()
 def get_general_category():
     return frappe.db.get_value(
         "HD Article Category", {"category_name": "General"}, "name"

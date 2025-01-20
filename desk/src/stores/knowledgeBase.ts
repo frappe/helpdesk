@@ -1,4 +1,5 @@
 import { createResource } from "frappe-ui";
+import { url } from "../../../node_modules/frappe-ui/node_modules/tailwindcss/src/util/dataTypes";
 
 // Title
 export const newArticle = createResource({
@@ -68,8 +69,22 @@ export const moveToCategory = createResource({
     };
   },
   validate({ category, articles }) {
-    if (!category) throw {message:"Category is required"};
-    if (!articles) throw {message:"Articles are required"};
+    if (!category) throw { message: "Category is required" };
+    if (!articles) throw { message: "Articles are required" };
+  },
+});
+
+export const mergeCategory = createResource({
+  url: "helpdesk.api.knowledge_base.merge_category",
+  makeParams({ source, target }) {
+    return {
+      source,
+      target,
+    };
+  },
+  validate({ source, target }) {
+    if (!source) throw { message: "Category is required" };
+    if (!target) throw { message: "Target is required" };
   },
 });
 
