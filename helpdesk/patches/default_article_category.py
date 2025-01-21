@@ -20,7 +20,7 @@ def execute():
     # create one default article for general category
     if len(articles) == 0:
         frappe.new_doc(
-            "HD Article", {"title": "New Article", "category": default_category}
+            "HD Article", title="New Article", category=default_category
         ).insert()
     else:
         for article in articles:
