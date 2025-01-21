@@ -60,7 +60,7 @@ import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import { createToast } from "@/utils";
+import { createToast, copyToClipboard } from "@/utils";
 import { Error } from "@/types";
 import LucideMerge from "~icons/lucide/merge";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
@@ -148,6 +148,16 @@ const groupByActions = [
       mergeModal.value = true;
       category.title = groupedRow.group.label;
       category.id = groupedRow.group.value;
+    },
+  },
+  {
+    label: "Share",
+    icon: "link",
+    onClick: async ({ group }) => {
+      const { label, value } = group;
+      const url = new URL(window.location.href);
+      url.pathname = `/helpdesk/kb-public/${value}`;
+      await copyToClipboard(url.href, label);
     },
   },
   {

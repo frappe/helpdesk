@@ -120,8 +120,18 @@ export function setupCustomActions(data, obj) {
 
 export const isCustomerPortal = ref(false);
 
-export function copyToClipboard(text: string, message?: string) {
-  navigator.clipboard.writeText(text);
+export async function copyToClipboard(text: string, message?: string) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    let input = document.createElement("input");
+    let body = document.querySelector("body");
+    body.appendChild(input);
+    input.value = text;
+    input.select();
+    document.execCommand("copy");
+    input.remove();
+  }
   createToast({
     title: "Copied to clipboard",
     text: message,

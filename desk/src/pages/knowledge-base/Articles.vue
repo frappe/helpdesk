@@ -6,7 +6,7 @@
       </template>
     </LayoutHeader>
     <div
-      class="pt-0 md:pt-3 sm:px-5 w-full flex flex-col gap-2 max-w-4xl 2xl:max-w-5xl"
+      class="pt-0 sm:px-5 w-full flex flex-col gap-2 max-w-4xl 2xl:max-w-5xl"
     >
       <div
         v-if="articles.data"

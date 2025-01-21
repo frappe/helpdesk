@@ -48,7 +48,10 @@
                 {{ dayjs(article.data.modified).short() }}
               </div>
             </div>
-            <Dropdown :options="options" v-if="!editable && !isCustomerPortal">
+            <Dropdown
+              :options="articleActions"
+              v-if="!editable && !isCustomerPortal"
+            >
               <Button variant="ghost">
                 <template #icon>
                   <IconMoreHorizontal class="h-4 w-4" />
@@ -380,7 +383,7 @@ const editorClass = computed(() => {
   ];
 });
 
-const options = computed(() => [
+const articleActions = computed(() => [
   {
     label: "Edit",
     icon: "edit",
@@ -394,11 +397,11 @@ const options = computed(() => [
     onClick: () => (moveToModal.value = true),
   },
   {
-    label: "Copy",
-    icon: "copy",
+    label: "Share",
+    icon: "link",
     onClick: () => {
       const url = new URL(window.location.href);
-      url.pathname = `/helpdesk/kb-help/articles/${props.articleId}`;
+      url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
       copyToClipboard(url.href, article.data.title);
     },
   },
