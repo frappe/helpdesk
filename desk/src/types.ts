@@ -270,7 +270,7 @@ export interface View {
 
 export interface Breadcrumb {
   label: string;
-  route: {
+  route?: {
     name: string;
     params?: Record<string, string>;
   };

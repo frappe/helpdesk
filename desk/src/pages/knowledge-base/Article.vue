@@ -441,15 +441,22 @@ const breadcrumbs = computed(() => {
     },
   ];
   if (article.data?.category_name) {
-    items.push({
+    let item = {
       label: article.data?.category_name,
-      route: {
-        name: isCustomerPortal.value ? "Articles" : "AgentKnowledgeBase",
+    };
+    if (isCustomerPortal.value) {
+      item["route"] = {
+        name: "Articles",
         params: {
           categoryId: article.data?.category_id,
         },
-      },
-    });
+      };
+    } else {
+      item["route"] = {
+        name: "AgentKnowledgeBase",
+      };
+    }
+    items.push(item);
   }
   if (article.data?.title) {
     items.push({
