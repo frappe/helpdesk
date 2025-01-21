@@ -9,8 +9,8 @@
       class="max-w-4xl 2xl:max-w-5xl pt-4 sm:px-5 w-full flex flex-col gap-4"
     >
       <Popover
-        :popover-class="[' max-w-[310px] md:max-w-[842px] !top-1 ']"
-        class="flex w-full [&>div:first-child]:w-full"
+        :popover-class="['max-w-[310px] md:max-w-[842px] !top-1 ']"
+        class="flex w-full"
       >
         <template #target="{ open, close }">
           <FormControl

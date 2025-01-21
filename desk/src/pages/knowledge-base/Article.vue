@@ -258,12 +258,13 @@ function handleMoveToCategory(category: string) {
           iconClasses: "text-green-600",
         });
       },
-      onError: (error: string) => {
+      onError: (error: Error) => {
         createToast({
-          title: error,
+          title: error?.messages?.[0] || error.message,
           icon: "x",
           iconClasses: "text-red-600",
         });
+        moveToModal.value = false;
       },
     }
   );
