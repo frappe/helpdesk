@@ -4,6 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.rate_limiter import rate_limit
 from frappe.utils import cint
 
 from helpdesk.utils import capture_event
@@ -89,6 +90,7 @@ class HDArticle(Document):
         return {"columns": columns}
 
     @frappe.whitelist()
+    @rate_limit(key="name")
     def set_feedback(self, value):
         # 0 empty, 1 like, 2 dislike
         user = frappe.session.user
