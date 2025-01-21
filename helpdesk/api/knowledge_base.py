@@ -1,6 +1,7 @@
 import frappe
 from bs4 import BeautifulSoup
 from frappe import _
+from frappe.rate_limiter import rate_limit
 from frappe.utils import get_user_info_for_avatar
 
 from helpdesk.utils import is_agent
@@ -134,3 +135,11 @@ def get_general_category():
 @frappe.whitelist()
 def get_category_title(category):
     return frappe.db.get_value("HD Article Category", category, "category_name")
+
+
+@frappe.whitelist()
+@rate_limit(key="article", seconds=60 * 60)
+def increment_views(article):
+    views = frappe.db.get_value("HD Article", article, "views") or 0
+    views += 1
+    frappe.db.set_value("HD Article", article, "views", views, update_modified=False)

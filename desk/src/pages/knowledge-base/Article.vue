@@ -126,6 +126,7 @@ import {
   updateRes as updateArticle,
   deleteRes as deleteArticle,
   moveToCategory,
+  incrementView,
 } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { useAuthStore } from "@/stores/auth";
@@ -195,6 +196,7 @@ const article: Resource<Article> = createResource({
           title: data.title,
         },
       });
+      incrementArticleViews(data.name);
     }
   },
   onError: (err: Error) => {
@@ -205,6 +207,12 @@ const article: Resource<Article> = createResource({
     }
   },
 });
+
+function incrementArticleViews(articleId: string) {
+  incrementView.submit({
+    article: articleId,
+  });
+}
 
 const toggleStatus = debounce(() => {
   const status = article.data?.status === "Published" ? "Draft" : "Published";

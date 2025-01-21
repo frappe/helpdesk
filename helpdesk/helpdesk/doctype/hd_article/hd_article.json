@@ -7,15 +7,13 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
-  "category",
   "status",
   "published_on",
-  "title_slug",
+  "views",
   "column_break_7",
+  "category",
   "author",
-  "idx",
-  "subtitle",
-  "article_image",
+  "title_slug",
   "content_section",
   "content"
  ],
@@ -68,13 +66,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "-1",
-   "description": "Position of article in ascending order",
-   "fieldname": "idx",
-   "fieldtype": "Int",
-   "label": "Index"
-  },
-  {
    "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
@@ -89,19 +80,16 @@
    "label": "Title Slug"
   },
   {
-   "fieldname": "article_image",
-   "fieldtype": "Attach Image",
-   "label": "Article Image"
-  },
-  {
-   "fieldname": "subtitle",
-   "fieldtype": "Small Text",
-   "label": "Subtitle"
+   "default": "0",
+   "fieldname": "views",
+   "fieldtype": "Int",
+   "label": "Views",
+   "read_only": 1
   }
  ],
  "links": [],
  "make_attachments_public": 1,
- "modified": "2025-01-07 00:59:35.927067",
+ "modified": "2025-01-21 11:16:35.335812",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article",
