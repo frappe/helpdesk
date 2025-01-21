@@ -56,11 +56,11 @@
             <div class="text-xs text-gray-700">Title</div>
             <div class="flex items-center gap-2">
               <KnowledgeBaseIconSelector
-                :icon="newCategoryIcon || category.doc?.icon"
+                :icon="newCategoryIcon"
                 @select="(icon) => (newCategoryIcon = icon)"
               />
               <FormControl
-                v-model="category.doc.category_name"
+                v-model="newCategoryName"
                 placeholder="A brief guide"
                 type="text"
               />
@@ -69,7 +69,7 @@
           <div class="space-y-2">
             <div class="text-xs text-gray-700">Description</div>
             <FormControl
-              v-model="category.doc.description"
+              v-model="newCategoryDescription"
               placeholder="A short description"
               type="textarea"
             />
@@ -117,7 +117,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, toRef } from "vue";
+import { ref, toRef, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   createResource,
@@ -166,9 +166,18 @@ const category = createDocumentResource({
         icon: "check",
         iconClasses: "text-green-500",
       });
+      showEdit.value = false;
     },
     onError: useError({ title: "Error updating category" }),
   },
+});
+
+watch(showEdit, (newValue) => {
+  if (newValue) {
+    newCategoryName.value = category.doc.category_name || "";
+    newCategoryDescription.value = category.doc.description || "";
+    newCategoryIcon.value = category.doc.icon || "";
+  }
 });
 
 const saveCategory = debounce(
