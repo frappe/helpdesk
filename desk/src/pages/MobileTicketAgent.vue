@@ -59,55 +59,59 @@
     <div v-if="ticket.data" class="flex flex-1 overflow-x-hidden">
       <div class="flex flex-1 flex-col overflow-x-hidden">
         <div class="flex-1 flex flex-col">
-          <Tabs v-model="tabIndex" v-slot="{ tab }" :tabs="tabs" class="h-full">
-            <div v-if="tab.name === 'details'">
-              <!-- ticket contact info -->
-              <TicketAgentContact
-                :contact="ticket.data.contact"
-                @email:open="communicationAreaRef.toggleEmailBox()"
+          <Tabs v-model="tabIndex" :tabs="tabs">
+            <TabList />
+            <TabPanel v-slot="{ tab }" class="h-full">
+              <div v-if="tab.name === 'details'">
+                <!-- ticket contact info -->
+                <TicketAgentContact
+                  :contact="ticket.data.contact"
+                  @email:open="communicationAreaRef.toggleEmailBox()"
+                />
+                <!-- feedback component -->
+                <TicketFeedback
+                  v-if="ticket.data.feedback_rating"
+                  class="border-b px-6 py-3 text-base text-gray-600"
+                  :ticket="ticket.data"
+                />
+                <!-- SLA Section -->
+                <h3 class="px-6 pt-3 font-semibold text-base">SLA</h3>
+                <TicketAgentDetails
+                  :agreement-status="ticket.data.agreement_status"
+                  :first-responded-on="ticket.data.first_responded_on"
+                  :response-by="ticket.data.response_by"
+                  :resolution-date="ticket.data.resolution_date"
+                  :resolution-by="ticket.data.resolution_by"
+                  :ticket-created-on="ticket.data.creation"
+                  :source="ticket.data.via_customer_portal ? 'Portal' : 'Mail'"
+                />
+                <!-- Ticket Fields -->
+                <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>
+                <TicketAgentFields
+                  :ticket="ticket.data"
+                  @update="({ field, value }) => updateTicket(field, value)"
+                  class="!border-0"
+                />
+              </div>
+
+              <!-- Rest Activities -->
+              <TicketAgentActivities
+                v-else
+                ref="ticketAgentActivitiesRef"
+                :activities="filterActivities(tab.name)"
+                :title="tab.label"
+                @update="
+                  () => {
+                    ticket.reload();
+                  }
+                "
+                @email:reply="
+                  (e) => {
+                    communicationAreaRef.replyToEmail(e);
+                  }
+                "
               />
-              <!-- feedback component -->
-              <TicketFeedback
-                v-if="ticket.data.feedback_rating"
-                class="border-b px-6 py-3 text-base text-gray-600"
-                :ticket="ticket.data"
-              />
-              <!-- SLA Section -->
-              <h3 class="px-6 pt-3 font-semibold text-base">SLA</h3>
-              <TicketAgentDetails
-                :agreement-status="ticket.data.agreement_status"
-                :first-responded-on="ticket.data.first_responded_on"
-                :response-by="ticket.data.response_by"
-                :resolution-date="ticket.data.resolution_date"
-                :resolution-by="ticket.data.resolution_by"
-                :ticket-created-on="ticket.data.creation"
-                :source="ticket.data.via_customer_portal ? 'Portal' : 'Mail'"
-              />
-              <!-- Ticket Fields -->
-              <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>
-              <TicketAgentFields
-                :ticket="ticket.data"
-                @update="({ field, value }) => updateTicket(field, value)"
-                class="!border-0"
-              />
-            </div>
-            <!-- Rest Activities -->
-            <TicketAgentActivities
-              v-else
-              ref="ticketAgentActivitiesRef"
-              :activities="filterActivities(tab.name)"
-              :title="tab.label"
-              @update="
-                () => {
-                  ticket.reload();
-                }
-              "
-              @email:reply="
-                (e) => {
-                  communicationAreaRef.replyToEmail(e);
-                }
-              "
-            />
+            </TabPanel>
           </Tabs>
           <CommunicationArea
             class="sticky bottom-0 z-50 bg-white"
@@ -180,6 +184,8 @@ import {
   Breadcrumbs,
   Dropdown,
   Tabs,
+  TabPanel,
+  TabList,
   createResource,
   Dialog,
   FormControl,
