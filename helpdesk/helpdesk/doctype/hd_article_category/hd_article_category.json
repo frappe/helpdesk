@@ -10,7 +10,6 @@
   "category_name",
   "description",
   "column_break_iczs",
-  "status",
   "icon"
  ],
  "fields": [
@@ -28,13 +27,6 @@
    "label": "Description"
   },
   {
-   "default": "Published",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Published\nDraft\nArchived"
-  },
-  {
    "fieldname": "icon",
    "fieldtype": "Data",
    "label": "Icon"
@@ -45,7 +37,7 @@
   }
  ],
  "links": [],
- "modified": "2025-01-16 21:47:20.362630",
+ "modified": "2025-01-21 19:52:51.131313",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Article Category",
