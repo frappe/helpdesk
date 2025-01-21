@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-
+import { isCustomerPortal } from "@/utils";
 import { useScreenSize } from "@/composables/screen";
 const { isMobileView } = useScreenSize();
 
@@ -18,10 +18,8 @@ export const AGENT_PORTAL_TICKET = "TicketAgent";
 export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
-export const AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY = "DeskKBSubcategory";
 export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
 
-export const KB_PUBLIC = "KBHome";
 export const KB_PUBLIC_ARTICLE = "KBArticlePublic";
 export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 
@@ -90,23 +88,23 @@ const routes = [
           },
         ],
       },
-      // handle knowledge base routing
       {
-        path: "knowledge-base-public",
-        children: [
-          {
-            path: "",
-            name: "KnowledgeBasePublicNew",
-            component: () =>
-              import("@/pages/knowledge-base-v2/KnowledgeBasePublic.vue"),
-          },
-          {
-            path: "articles/:articleId?",
-            name: "KBArticlePublicNew",
-            component: () => import("@/pages/KnowledgeBaseArticle.vue"),
-            props: true,
-          },
-        ],
+        path: "kb-public",
+        name: "CustomerKnowledgeBase",
+        component: () =>
+          import("@/pages/knowledge-base/KnowledgeBaseCustomer.vue"),
+      },
+      {
+        path: "kb-public/:categoryId",
+        name: "Articles",
+        component: () => import("@/pages/knowledge-base/Articles.vue"),
+        props: true,
+      },
+      {
+        path: "kb-public/articles/:articleId",
+        name: "ArticlePublic",
+        component: () => import("@/pages/knowledge-base/Article.vue"),
+        props: true,
       },
     ],
   },
@@ -119,6 +117,7 @@ const routes = [
       auth: true,
       agent: true,
       admin: false,
+      public: false,
     },
     children: [
       {
@@ -150,30 +149,21 @@ const routes = [
       },
       {
         path: "kb",
-        name: AGENT_PORTAL_KNOWLEDGE_BASE,
-        component: () => import("@/pages/knowledge-base/KnowledgeBase.vue"),
-        children: [
-          {
-            path: ":categoryId",
-            name: AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY,
-            props: true,
-            component: () =>
-              import("@/pages/knowledge-base/KnowledgeBaseCategory.vue"),
-          },
-          {
-            path: ":categoryId/:subCategoryId",
-            name: AGENT_PORTAL_KNOWLEDGE_BASE_SUB_CATEGORY,
-            props: true,
-            component: () =>
-              import("@/pages/knowledge-base/KnowledgeBaseSubcategory.vue"),
-          },
-        ],
+        name: "AgentKnowledgeBase",
+        component: () =>
+          import("@/pages/knowledge-base/KnowledgeBaseAgent.vue"),
       },
       {
         path: "kb/articles/:articleId",
-        name: AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE,
+        name: "Article",
+        component: () => import("@/pages/knowledge-base/Article.vue"),
         props: true,
-        component: () => import("@/pages/KnowledgeBaseArticle.vue"),
+      },
+      {
+        path: "articles/new/:id",
+        name: "NewArticle",
+        component: () => import("@/pages/knowledge-base/NewArticle.vue"),
+        props: true,
       },
       {
         path: "customers",
@@ -227,7 +217,7 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-
+  isCustomerPortal.value = to.meta.public;
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
@@ -240,8 +230,7 @@ router.beforeEach(async (to, _, next) => {
 });
 
 router.afterEach(async (to) => {
-  const isCustomerPortal = to.meta.public ?? false;
-  if (isCustomerPortal) return;
+  if (to.meta.public) return;
   const userStore = useUserStore();
   await userStore.users.fetch();
 });

@@ -125,8 +125,13 @@ def get_list_data(
     columns=None,
     rows=None,
     show_customer_portal_fields=False,
+    view=None,
 ):
     is_default = True
+    view_type = view.get("view_type") if view else None
+    group_by_field = view.get("group_by_field") if view else None
+    label_doc = view.get("label_doc") if view else None
+    label_field = view.get("label_field") if view else None
 
     if columns or rows:
         is_default = False
@@ -153,17 +158,17 @@ def get_list_data(
     # 	rows = frappe.parse_json(list_view_settings.rows)
     # 	is_default = False
     # else:
-    list = get_controller(doctype)
+    _list = get_controller(doctype)
 
     # flake8: noqa
     if is_default:
-        if hasattr(list, "default_list_data"):
+        if hasattr(_list, "default_list_data"):
             columns = (
-                list.default_list_data(show_customer_portal_fields).get("columns")
+                _list.default_list_data(show_customer_portal_fields).get("columns")
                 if doctype == "HD Ticket"
-                else list.default_list_data().get("columns")
+                else _list.default_list_data().get("columns")
             )
-            rows = list.default_list_data().get("rows")
+            rows = _list.default_list_data().get("rows")
 
     if rows is None:
         rows = []
@@ -172,6 +177,9 @@ def get_list_data(
     for column in columns:
         if column.get("key") not in rows:
             rows.append(column.get("key"))
+
+    if group_by_field and group_by_field not in rows:
+        rows.append(group_by_field)
 
     rows.append("name") if "name" not in rows else rows
     data = (
@@ -221,12 +229,75 @@ def get_list_data(
     if show_customer_portal_fields:
         fields = get_customer_portal_fields(doctype, fields)
 
+    if group_by_field and view_type == "group_by":
+
+        def get_options(fieldtype, options):
+            if fieldtype == "Select":
+                return [option for option in options.split("\n")]
+            else:
+                has_empty_values = any([not d.get(group_by_field) for d in data])
+                options = list(set([d.get(group_by_field) for d in data]))
+                options = [u for u in options if u]
+                options = [category_name for category_name in options if category_name]
+                options = [
+                    {
+                        "label": frappe.db.get_value(
+                            label_doc if label_doc else doctype,
+                            option,
+                            label_field if label_field else group_by_field,
+                        ),
+                        "value": option,
+                    }
+                    for option in options
+                    if option
+                ]
+                if has_empty_values:
+                    options.append({"label": "", "value": ""})
+
+                if order_by and group_by_field in order_by:
+                    order_by_fields = order_by.split(",")
+                    order_by_fields = [
+                        (field.split(" ")[0], field.split(" ")[1])
+                        for field in order_by_fields
+                    ]
+                    if (group_by_field, "asc") in order_by_fields:
+                        options.sort(key=lambda x: x.get("label"))
+                    elif (group_by_field, "desc") in order_by_fields:
+                        options.sort(reverse=True, key=lambda x: x.get("label"))
+                else:
+                    options.sort(key=lambda x: x.get("label"))
+
+                # general category at first position
+                idx = [
+                    idx for idx, o in enumerate(options) if o.get("label") == "General"
+                ]
+                if len(idx) == 0:
+                    return options
+
+                idx = idx[0]
+                default_category = options[idx]
+                options.pop(idx)
+                options.insert(0, default_category)
+                return options
+
+        for field in fields:
+            if field.get("value") == group_by_field:
+                options = get_options(field.get("type"), field.get("options"))
+                group_by_field = {
+                    "label": field.get("label"),
+                    "name": field.get("value"),
+                    "type": field.get("type"),
+                    "options": options,
+                }
+
     return {
         "data": data,
         "columns": columns,
         "fields": fields if doctype == "HD Ticket" else [],
         "total_count": len(frappe.get_list(doctype, filters=filters)),
         "row_count": len(data),
+        "group_by_field": group_by_field,
+        "view_type": view_type,
     }
 
 
@@ -265,7 +336,6 @@ def get_quick_filters(doctype: str):
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
     name_filter = {"label": "ID", "name": "name", "type": "Data"}
-
     if doctype == "Contact":
         quick_filters.append(name_filter)
         return quick_filters
@@ -274,19 +344,18 @@ def get_quick_filters(doctype: str):
         quick_filters.append(name_filter)
 
     for field in fields:
+        options = []
         if field.fieldtype == "Select":
-            field.options = field.options.split("\n")
-            field.options = [
-                {"label": option, "value": option} for option in field.options
-            ]
-            field.options.insert(0, {"label": "", "value": ""})
+            options = field.options.split("\n")
+            options = [{"label": option, "value": option} for option in options]
+            options.insert(0, {"label": "", "value": ""})
 
         quick_filters.append(
             {
                 "label": _(field.label),
                 "name": field.fieldname,
                 "type": field.fieldtype,
-                "options": field.options,
+                "options": options,
             }
         )
 

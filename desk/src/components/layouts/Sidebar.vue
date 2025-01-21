@@ -74,7 +74,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_ROUTES } from "@/router";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import UserMenu from "@/components/UserMenu.vue";
@@ -84,6 +84,7 @@ import LucideBell from "~icons/lucide/bell";
 import LucideSearch from "~icons/lucide/search";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import Apps from "@/components/Apps.vue";
+import { isCustomerPortal } from "@/utils";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
@@ -96,10 +97,9 @@ const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
-const isCustomerPortal = route.meta.public ?? false;
 
 const menuOptions = computed(() => {
-  return isCustomerPortal
+  return isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
 });
@@ -148,7 +148,7 @@ const agentPortalDropdown = computed(() => [
 ]);
 
 const profileSettings = computed(() => {
-  return isCustomerPortal
+  return isCustomerPortal.value
     ? customerPortalDropdown.value
     : agentPortalDropdown.value;
 });

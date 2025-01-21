@@ -39,7 +39,11 @@
             placeholder="A short description"
           />
         </div>
-        <TicketNewArticles v-if="isCustomerPortal" :search="subject" />
+        <SearchArticles
+          v-if="isCustomerPortal"
+          :query="subject"
+          class="shadow"
+        />
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"
@@ -110,11 +114,11 @@ import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import { useError } from "@/composables/error";
 import { LayoutHeader, UniInput } from "@/components";
-import TicketBreadcrumbs from "./ticket/TicketBreadcrumbs.vue";
-import TicketNewArticles from "./ticket/TicketNewArticles.vue";
+import SearchArticles from "../components/SearchArticles.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
+import { isCustomerPortal } from "@/utils";
 
 interface P {
   templateId?: string;
@@ -130,8 +134,6 @@ const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
-
-const isCustomerPortal = window.location.pathname.includes("/my-tickets");
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -174,7 +176,7 @@ const ticket = createResource({
         ticketId: data.name,
       },
     });
-    if (!isCustomerPortal) return;
+    if (!isCustomerPortal.value) return;
     // only capture telemetry for customer portal
     capture("new_ticket_submitted", {
       data: {

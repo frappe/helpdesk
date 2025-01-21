@@ -67,7 +67,7 @@ export async function init(ps: PosthogSettings) {
 
 interface CaptureOptions {
   data: {
-    user: string;
+    user?: string;
     [key: string]: string | number | boolean | object;
   };
 }

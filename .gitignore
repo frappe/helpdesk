@@ -8,6 +8,7 @@ __pycache__/
 *.log
 tags
 node_modules
+.vscode
 
 # Distribution / packaging
 .Python

@@ -1,9 +1,9 @@
 import { Component } from "vue";
 
-export interface Resource<A = unknown> {
+export interface Resource<T = unknown> {
   auto: boolean;
   loading: boolean;
-  data: A;
+  data: T;
   pageLength: number;
   totalCount: number;
   hasNextPage: boolean;
@@ -13,6 +13,16 @@ export interface Resource<A = unknown> {
   next: () => void;
   reload: () => void;
   update: (r: unknown) => void;
+}
+
+export interface Error {
+  exc_type: string;
+  exc: string;
+  response: string;
+  status: string;
+  messages: string;
+  stack: string;
+  message: string;
 }
 
 export interface Comment {
@@ -216,35 +226,35 @@ export interface RootCategory {
 export interface Article {
   name: string;
   title: string;
-  category: string;
+  category_name: string;
+  category_id: string;
   published_on: string;
-  author: string;
+  author: Author;
   subtitle: string;
   article_image: string | null;
   _user_tags: string | null;
+  status: string;
+  creation: string;
+  content: string;
+  modified: string;
+  feedback: FeedbackAction;
 }
 
-export interface SubCategory {
-  name: string;
-  category_name: string;
-  icon: string | null;
-  articles: Article[];
-}
+export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
 
 export interface Author {
   name: string;
   image: string | null;
-  email?: string;
+  email: string;
 }
 
 export interface Category {
   categoryName: string;
-  subCategories: SubCategory[];
   articles: Article[];
   authors?: {
     [key: string]: Author;
   };
-  children?: (Article | SubCategory)[];
+  children?: Article[];
 }
 
 // Badge
@@ -253,4 +263,15 @@ export interface BadgeStatus {
   theme: string;
 }
 
-export type FeedbackAction = 0 | 1 | 2; // 0: neutral, 1: like, 2: dislike
+export interface View {
+  view_type: string;
+  group_by_field: string;
+}
+
+export interface Breadcrumb {
+  label: string;
+  route?: {
+    name: string;
+    params?: Record<string, string>;
+  };
+}

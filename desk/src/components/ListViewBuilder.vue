@@ -1,9 +1,8 @@
 <template>
   <!-- View Controls -->
-  <FadedScrollableDiv
+  <div
     class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
     v-if="showViewControls"
-    orientation="horizontal"
   >
     <QuickFilters v-if="!isMobileView" />
     <div class="flex items-center gap-2" v-if="!isMobileView">
@@ -18,7 +17,7 @@
         <SortBy :hide-label="isMobileView" />
       </div>
     </div>
-  </FadedScrollableDiv>
+  </div>
 
   <!-- List View -->
   <ListView
@@ -43,32 +42,35 @@
         @columnWidthUpdated="(width) => console.log(width)"
       />
     </ListHeader>
-    <ListRows class="sm:mx-5 mx-3">
-      <ListRow
-        v-for="row in rows"
-        :key="row.name"
-        v-slot="{ idx, column, item }"
-        :row="row"
-        class="truncate text-base"
-      >
-        <ListRowItem :item="item" :row="row" :column="column">
-          <!-- TODO: filters on click of other columns -->
-          <!-- and not on first column, it should emit the event -->
-          <div v-if="idx === 0" class="truncate">
-            {{ item }}
-          </div>
-          <div v-else-if="column.type === 'Datetime'">
-            {{ dayjs.tz(item).fromNow() }}
-          </div>
-          <div v-else-if="column.type === 'status'">
-            <Badge v-bind="handleStatusColor(item)" />
-          </div>
-          <div v-else class="truncate">
-            {{ item }}
-          </div>
-        </ListRowItem>
-      </ListRow>
+    <ListRows
+      :rows="rows"
+      v-slot="{ idx, column, item, row }"
+      :group-by-actions="props.options.groupByActions"
+    >
+      <ListRowItem :item="item" :row="row" :column="column">
+        <!-- TODO: filters on click of other columns -->
+        <!-- and not on first column, it should emit the event -->
+        <div v-if="idx === 0" class="truncate">
+          {{ item }}
+        </div>
+        <div v-else-if="column.type === 'Datetime'">
+          {{ dayjs.tz(item).fromNow() }}
+        </div>
+        <div v-else-if="column.type === 'status'">
+          <Badge v-bind="handleStatusColor(item)" />
+        </div>
+        <div v-else class="truncate">
+          {{ item }}
+        </div>
+      </ListRowItem>
     </ListRows>
+    <ListSelectBanner v-if="props.options.showSelectBanner">
+      <template #actions="{ selections }">
+        <Dropdown :options="selectBannerOptions(selections)">
+          <Button icon="more-horizontal" variant="ghost" />
+        </Dropdown>
+      </template>
+    </ListSelectBanner>
   </ListView>
 
   <!-- List Footer -->
@@ -100,26 +102,31 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed } from "vue";
+import { reactive, provide, computed, h } from "vue";
 import {
   createResource,
   ListView,
   ListFooter,
   ListRowItem,
-  ListRows,
-  ListRow,
   ListHeader,
   ListHeaderItem,
+  ListSelectBanner,
   Badge,
+  FeatherIcon,
+  Dropdown,
 } from "frappe-ui";
 
-import { Filter, SortBy, QuickFilters } from "@/components/view-controls";
+import {
+  Filter,
+  SortBy,
+  QuickFilters,
+  Reload,
+} from "@/components/view-controls";
 import { dayjs } from "@/dayjs";
-import FadedScrollableDiv from "./FadedScrollableDiv.vue";
-import Reload from "./view-controls/Reload.vue";
+import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
-import { BadgeStatus } from "@/types";
+import { BadgeStatus, View } from "@/types";
 
 interface P {
   options: {
@@ -133,6 +140,11 @@ interface P {
     hideViewControls?: boolean;
     selectable?: boolean;
     statusMap?: Record<string, BadgeStatus>;
+    view?: View;
+    groupByActions?: Array<any>;
+    showSelectBanner?: boolean;
+    selectBannerActions?: Record<string, any>;
+    default_page_length?: number;
   };
 }
 
@@ -147,6 +159,12 @@ const props = withDefaults(defineProps<P>(), {
       doctype: "",
       hideViewControls: false,
       selectable: true,
+      view: {
+        view_type: "list",
+        group_by_field: "owner",
+      },
+      groupByActions: [],
+      default_page_length: 20,
     };
   },
 });
@@ -162,13 +180,23 @@ const defaultParams = reactive({
   doctype: props.options.doctype,
   filters: props.options.defaultFilters || {},
   order_by: "modified desc",
-  page_length: 20,
-  page_length_count: 20,
+  page_length: props.options.default_page_length,
+  page_length_count: props.options.default_page_length,
+  view: props.options.view,
 });
 
 const emptyState = computed(() => {
   return props.options?.emptyState || defaultEmptyState;
 });
+
+function selectBannerOptions(selections: Set<string>) {
+  return props.options.selectBannerActions.map((action) => {
+    return {
+      ...action,
+      onClick: () => action.onClick(selections),
+    };
+  });
+}
 
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",
@@ -186,8 +214,42 @@ const list = createResource({
   },
 });
 
-const rows = computed(() => list.data?.data);
+const rows = computed(() => {
+  if (!list.data?.data) return [];
+  if (list.data.view_type === "group_by") {
+    if (!list.data?.group_by_field?.name) return [];
+    return getGroupedByRows(list.data.data, list.data.group_by_field);
+  }
+  return list.data?.data;
+});
 const columns = computed(() => list.data?.columns);
+
+function getGroupedByRows(listRows, groupByField) {
+  let groupedRows = [];
+  groupByField.options?.forEach((option) => {
+    let filteredRows = [];
+
+    if (!option.value) {
+      filteredRows = listRows.filter((row) => !row[groupByField.name]);
+    } else {
+      filteredRows = listRows.filter(
+        (row) => row[groupByField.name] == option.value
+      );
+    }
+
+    let groupDetail = {
+      group: option || " ",
+      collapsed: false,
+      rows: filteredRows,
+      icon: h(FeatherIcon, {
+        name: "folder",
+        class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
+      }),
+    };
+    groupedRows.push(groupDetail);
+  });
+  return groupedRows || listRows;
+}
 
 function handleFetchFromField(column) {
   if (!column.hasOwnProperty("key")) return column;
@@ -301,9 +363,6 @@ function reload() {
 }
 
 function handlePageLength(count: number, loadMore: boolean = false) {
-  if (count >= list.data?.total_count) {
-    return;
-  }
   defaultParams.page_length_count = count;
   if (loadMore) {
     defaultParams.page_length += count;

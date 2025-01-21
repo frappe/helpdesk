@@ -82,21 +82,19 @@ import { useNotificationStore } from "@/stores/notification";
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import LucideBell from "~icons/lucide/bell";
 
-import { CUSTOMER_PORTAL_LANDING, CUSTOMER_PORTAL_ROUTES } from "@/router";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import Apps from "../Apps.vue";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 import { useAuthStore } from "@/stores/auth";
+import { isCustomerPortal } from "@/utils";
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const isCustomerPortal = computed(() =>
-  CUSTOMER_PORTAL_ROUTES.includes(route.name)
-);
 
 const menuOptions = computed(() => {
   return isCustomerPortal.value

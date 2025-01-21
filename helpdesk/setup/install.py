@@ -3,6 +3,8 @@ from datetime import datetime
 import frappe
 from frappe.permissions import add_permission
 
+from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
+
 from .default_template import create_default_template
 from .file import create_helpdesk_folder
 from .ticket_feedback import create_ticket_feedback_options
@@ -53,11 +55,10 @@ def add_default_categories_and_articles():
     category = frappe.get_doc(
         {
             "doctype": "HD Article Category",
-            "category_name": "Getting Started",
-            "description": "Content for your Category",
+            "category_name": DEFAULT_ARTICLE_CATEGORY,
         }
     ).insert()
-
+    # TODO: create 4 articles sharing information about helpdesk
     frappe.get_doc(
         {
             "doctype": "HD Article",
