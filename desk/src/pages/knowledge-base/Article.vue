@@ -102,7 +102,7 @@
           </template>
         </TextEditor>
       </div>
-      <div class="p-4">
+      <div class="p-4" v-if="isCustomerPortal">
         <ArticleFeedback :feedback="feedback" :article-id="articleId" />
       </div>
     </div>

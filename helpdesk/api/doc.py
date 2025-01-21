@@ -272,7 +272,7 @@ def get_list_data(
                     idx for idx, o in enumerate(options) if o.get("label") == "General"
                 ]
                 if len(idx) == 0:
-                    return
+                    return options
 
                 idx = idx[0]
                 default_category = options[idx]
@@ -282,11 +282,12 @@ def get_list_data(
 
         for field in fields:
             if field.get("value") == group_by_field:
+                options = get_options(field.get("type"), field.get("options"))
                 group_by_field = {
                     "label": field.get("label"),
                     "name": field.get("value"),
                     "type": field.get("type"),
-                    "options": get_options(field.get("type"), field.get("options")),
+                    "options": options,
                 }
 
     return {
