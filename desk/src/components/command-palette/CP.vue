@@ -68,6 +68,7 @@ import CPGroupResult from "./CPGroupResult.vue";
 import LucideSearch from "~icons/lucide/file-search";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideBookOpen from "~icons/lucide/book-open";
+import { isCustomerPortal } from "@/utils";
 
 let show = ref(false);
 
@@ -117,7 +118,9 @@ export default {
               group.items = group.items.map((item) => {
                 item.showName = true;
                 item.route = {
-                  name: "TicketAgent",
+                  name: isCustomerPortal.value
+                    ? "TicketCustomer"
+                    : "TicketAgent",
                   params: {
                     ticketId: item.name,
                   },
@@ -131,10 +134,11 @@ export default {
                   item.subject = item.subject + " / " + item.headings;
                 }
                 item.route = {
-                  name: "DeskKBArticle",
+                  name: "ArticlePublic",
                   params: {
-                    articleId: item.name,
+                    articleId: item.name.split("#")[0],
                   },
+                  hash: `#${item.name.split("#")[1]}`,
                 };
                 return item;
               });
@@ -165,7 +169,11 @@ export default {
           {
             title: "Knowledge Base",
             icon: () => h(LucideBookOpen),
-            route: { name: "AgentKnowledgeBase" },
+            route: {
+              name: isCustomerPortal.value
+                ? "CustomerKnowledgeBase"
+                : "AgentKnowledgeBase",
+            },
             condition: () => true,
           },
         ].filter((item) => (item.condition ? item.condition() : true)),
