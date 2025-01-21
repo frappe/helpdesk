@@ -70,7 +70,9 @@ def move_to_category(category, articles):
                 frappe.throw(_("Category must have atleast one article"))
                 return
             else:
-                frappe.db.set_value("HD Article", article, "category", category)
+                frappe.db.set_value(
+                    "HD Article", article, "category", category, update_modified=False
+                )
         except Exception as e:
             frappe.db.rollback()
             frappe.throw(_("Error moving article to category"))
@@ -120,7 +122,9 @@ def merge_category(source, target):
         pluck="name",
     )
     for article in source_articles:
-        frappe.db.set_value("HD Article", article, "category", target)
+        frappe.db.set_value(
+            "HD Article", article, "category", target, update_modified=False
+        )
 
     frappe.delete_doc("HD Article Category", source)
 

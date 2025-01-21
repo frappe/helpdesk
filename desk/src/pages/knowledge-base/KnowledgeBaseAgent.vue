@@ -422,6 +422,7 @@ const options = computed(() => {
     groupByActions,
     showSelectBanner: showSelectBanner.value,
     selectBannerActions,
+    default_page_length: 100,
   };
 });
 

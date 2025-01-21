@@ -144,6 +144,7 @@ interface P {
     groupByActions?: Array<any>;
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
+    default_page_length?: number;
   };
 }
 
@@ -163,6 +164,7 @@ const props = withDefaults(defineProps<P>(), {
         group_by_field: "owner",
       },
       groupByActions: [],
+      default_page_length: 20,
     };
   },
 });
@@ -178,8 +180,8 @@ const defaultParams = reactive({
   doctype: props.options.doctype,
   filters: props.options.defaultFilters || {},
   order_by: "modified desc",
-  page_length: 20,
-  page_length_count: 20,
+  page_length: props.options.default_page_length,
+  page_length_count: props.options.default_page_length,
   view: props.options.view,
 });
 
