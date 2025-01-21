@@ -40,7 +40,7 @@
                 <span
                   class="truncate capitalize text-base text-ink-gray-9 font-medium"
                 >
-                  {{ user.full_name || user.name }}
+                  {{ article.data.author.name }}
                 </span>
               </div>
               <IconDot class="h-4 w-4 text-gray-600" />
@@ -131,7 +131,6 @@ import {
   moveToCategory,
   incrementView,
 } from "@/stores/knowledgeBase";
-import { useUserStore } from "@/stores/user";
 import { useAuthStore } from "@/stores/auth";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
@@ -154,9 +153,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const userStore = useUserStore();
-const user = userStore.getUser();
 
 const router = useRouter();
 const route = useRoute();
@@ -212,9 +208,18 @@ const article: Resource<Article> = createResource({
 });
 
 function incrementArticleViews(articleId: string) {
-  incrementView.submit({
-    article: articleId,
-  });
+  incrementView.submit(
+    {
+      article: articleId,
+    },
+    {
+      onError: (err: Error) => {
+        if (err.exc_type === "RateLimitExceededError") {
+          return;
+        }
+      },
+    }
+  );
 }
 
 const toggleStatus = debounce(() => {
@@ -405,11 +410,6 @@ const articleActions = computed(() => [
       copyToClipboard(url.href, article.data.title);
     },
   },
-  // {
-  //   label: article.data?.status === "Draft" ? "Publish" : "Unpublish",
-  //   icon: article.data?.status !== "Published" ? "globe" : "x",
-  //   onClick: toggleStatus,
-  // },
   {
     group: "Danger",
     hideLabel: true,
