@@ -28,11 +28,4 @@ class HDCustomer(Document):
                 "type": "Datetime",
             },
         ]
-        rows = [
-            "name",
-            "image",
-            "domain",
-            "modified",
-            "creation",
-        ]
-        return {"columns": columns, "rows": rows}
+        return {"columns": columns}

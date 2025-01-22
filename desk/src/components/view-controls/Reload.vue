@@ -1,5 +1,5 @@
 <template>
-  <Button label="Refresh" @click="reload()" :loading="loading">
+  <Button label="Refresh" :loading="loading">
     <template #icon>
       <RefreshIcon class="h-4 w-4" />
     </template>

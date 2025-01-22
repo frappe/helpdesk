@@ -23,16 +23,4 @@
 		prose-th:p-2
 		prose-th:relative
 	}
-
-	.popover {
-		@apply
-		bg-white
-		mt-2
-		p-1
-		ring-1
-		ring-black
-		ring-opacity-5
-		rounded-lg
-		shadow-2xl
-	}
 }

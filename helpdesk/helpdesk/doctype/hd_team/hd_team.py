@@ -185,11 +185,4 @@ class HDTeam(Document):
                 "type": "Datetime",
             },
         ]
-        rows = [
-            "name",
-            "assignment_rule",
-            "ignore_restrictions",
-            "modified",
-            "creation",
-        ]
-        return {"columns": columns, "rows": rows}
+        return {"columns": columns}

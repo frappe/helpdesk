@@ -33,46 +33,6 @@ from ..hd_service_level_agreement.utils import get_sla
 
 class HDTicket(Document):
     @staticmethod
-    def get_list_select(query: Query):
-        QBTicket = frappe.qb.DocType("HD Ticket")
-        QBComment = frappe.qb.DocType("HD Ticket Comment")
-        QBCommunication = frappe.qb.DocType("Communication")
-
-        count_comment = (
-            frappe.qb.from_(QBComment)
-            .select(Count("*"))
-            .as_("count_comment")
-            .where(QBComment.reference_ticket == QBTicket.name)
-        )
-
-        count_msg_incoming = (
-            frappe.qb.from_(QBCommunication)
-            .select(Count("*"))
-            .as_("count_msg_incoming")
-            .where(QBCommunication.reference_doctype == "HD Ticket")
-            .where(QBCommunication.reference_name == QBTicket.name)
-            .where(QBCommunication.sent_or_received == "Received")
-        )
-
-        count_msg_outgoing = (
-            frappe.qb.from_(QBCommunication)
-            .select(Count("*"))
-            .as_("count_msg_outgoing")
-            .where(QBCommunication.reference_doctype == "HD Ticket")
-            .where(QBCommunication.reference_name == QBTicket.name)
-            .where(QBCommunication.sent_or_received == "Sent")
-        )
-
-        query = (
-            query.select(QBTicket.star)
-            .select(count_comment)
-            .select(count_msg_incoming)
-            .select(count_msg_outgoing)
-        )
-
-        return query
-
-    @staticmethod
     def get_list_filters(query: Query):
         _is_agent = is_agent()
         QBTeam = frappe.qb.DocType("HD Team")
@@ -571,6 +531,8 @@ class HDTicket(Document):
             file_doc.attached_to_name = communication.name
             file_doc.attached_to_doctype = "Communication"
             file_doc.save(ignore_permissions=True)
+            self.attach_file_with_ticket(file_doc.file_url)
+
             _attachments.append({"file_url": file_doc.file_url})
 
         reply_to_email = sender_email.email_id
@@ -617,6 +579,7 @@ class HDTicket(Document):
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(self, message, attachments=[]):
+
         if self.status == "Replied":
             self.status = "Open"
             log_ticket_activity(self.name, "set status to Open")
@@ -636,14 +599,21 @@ class HDTicket(Document):
         c.ignore_permissions = True
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
-
-        if not len(attachments):
+        _attachments = self.get("attachments") or attachments or []
+        if not len(_attachments):
             return
         QBFile = frappe.qb.DocType("File")
-        condition_name = [QBFile.name == i["name"] for i in attachments]
+        condition_name = [QBFile.name == i["name"] for i in _attachments]
         frappe.qb.update(QBFile).set(QBFile.attached_to_name, c.name).set(
             QBFile.attached_to_doctype, "Communication"
         ).where(Criterion.any(condition_name)).run()
+
+        # attach files to ticket
+        file_urls = frappe.get_all(
+            "File", filters={"attached_to_name": c.name}, pluck="file_url"
+        )
+        for url in file_urls:
+            self.attach_file_with_ticket(url)
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -749,6 +719,13 @@ class HDTicket(Document):
         self.description = self.description or c.content
         # Save the ticket, allowing for hooks to run.
         self.save()
+
+    def attach_file_with_ticket(self, file_url):
+        file_doc = frappe.new_doc("File")
+        file_doc.attached_to_name = self.name
+        file_doc.attached_to_doctype = "HD Ticket"
+        file_doc.file_url = file_url
+        file_doc.save(ignore_permissions=True)
 
     @staticmethod
     def default_list_data(show_customer_portal_fields=False):

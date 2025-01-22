@@ -72,7 +72,7 @@
             </Tooltip>
           </div>
           <div v-else-if="column.key === 'agent_group'" class="truncate">
-            {{ item || "-" }}
+            {{ item }}
           </div>
           <div v-else-if="column.key === 'resolution_by'">
             <Badge
@@ -102,7 +102,7 @@
         </ListRowItem>
       </ListRow>
     </ListRows>
-    <ListSelectBanner v-if="!isCustomerPortal">
+    <ListSelectBanner>
       <template #actions="{ selections }">
         <Dropdown
           :options="[
@@ -212,16 +212,13 @@ import {
   Dropdown,
 } from "frappe-ui";
 import { MultipleAvatar, StarRating } from "@/components";
-import { useRoute } from "vue-router";
+import { isCustomerPortal } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const showExportDialog = ref(false);
 const export_type = ref("Excel");
 const export_all = ref(false);
 let selectedRows;
-
-const route = useRoute();
-const isCustomerPortal = route.meta.public;
 
 const props = defineProps({
   columns: {

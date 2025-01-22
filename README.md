@@ -1,19 +1,21 @@
 <div align="center" markdown="1">
 
-<img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="100"/>
+<img src=".github/hd-logo.svg" alt="Frappe Helpdesk logo" width="80"/>
 <h1>Frappe Helpdesk</h1>
 
 **Customer Service, Made Simple and Effective**
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
 [![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
-[![unittests](https://github.com/frappe/builder/actions/workflows/server-tests.yml/badge.svg)](https://github.com/frappe/helpdesk/actions/workflows/server-tests.yml)
+
+<a href="https://trendshift.io/repositories/12764" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12764" alt="teableio%2Fteable | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
 
 </div>
 
 
 <div align="center">
-	<img src="./.github/Hero.png" alt="Hero Image" width="72%" />
+	<img src="./.github/Hero2.png" alt="Hero Image" width="100%" />
 </div>
 <br />
 <div align="center">
@@ -27,10 +29,10 @@ Frappe Helpdesk is an 100% open-source Ticket Management tool which helps you  s
 
 
 
-## Motivation
+### Motivation
 Managing issues from our customers was a big challenge for us. We were using the ERPNext support module which was not very good in UI and the UX was also not good. We wanted to have a tool that can be easily integrated with our existing system and can be customized as per our needs. So we decided to build Frappe Helpdesk.
 
-## Key Features
+### Key Features
 
 - **Agent and Customer Portal Views**: Dual portals for agents and customers to simplify issue submission and management.
 
@@ -42,13 +44,47 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 - **Canned Responses**: Pre-written replies for common queries to ensure quick and consistent communication.
 
+<details open>
+<summary >View Screenshots</summary>
+<h3></h3>
+
+<div align="center">
+	<sub>
+		Agent List View
+	</sub>
+</div>
+
+![Agent List View](.github/AgentListView.png)
 
 
-## Under the Hood
+<div align="center">
+	<sub>
+		Upload articles and let your customer solve their queries through the Knowledge Base.
+	</sub>
+</div>
 
-- [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and Javascript. The framework provides a robust foundation for building web applications, including a database abstraction layer, user authentication, and a REST API.
+![Knowledge Base](.github/KB.png)
 
-- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface. The Frappe UI library provides a variety of components that can be used to build single-page applications on top of the Frappe Framework.
+<div align="center">
+	<sub>
+		With advanced search, your customers will be recommended relevant articles regarding their issue.
+	</sub>
+</div>
+
+
+![Article Search](.github/Search2.png)
+
+
+
+</details>
+<br>
+
+
+### Under the Hood
+
+- [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and Javascript.
+
+- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface. 
 
 
 ## Production Setup
@@ -133,15 +169,26 @@ To setup the repository locally follow the steps mentioned below:
 1. Run `bench --site helpdesk.test install-app helpdesk`.
 1. Now open the URL `http://helpdesk.test:8000/helpdesk` in your browser, you should see the app running
 
+
+**For Frontend Development**
+1. Open a new terminal session and cd into `frappe-bench/apps/helpdesk/desk`, and run the following commands:
+    ```
+    yarn install
+    yarn dev or yarn dev --host helpdesk.test
+    ```
+1. Now, you can access the site on vite dev server at `http://helpdesk.test:8080`
+
+**Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
+
 ## Learn and connect
 
 - [Telegram Public Group](https://t.me/frappedesk)
 - [Discuss Forum](https://discuss.frappe.io/c/frappehelpdesk/69)
 - [Documentation](https://docs.frappe.io/helpdesk)
 
-<h2></h2>
 <br>
-<div align="center" style="padding-top: 0.75rem;">
+<br>
+<div align="center">
 	<a href="https://frappe.io" target="_blank">
 		<picture>
 			<source media="(prefers-color-scheme: dark)" srcset="https://frappe.io/files/Frappe-white.png">

@@ -46,28 +46,26 @@
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col">
         <!-- ticket activities -->
-        <div class="overflow-y-auto flex-1">
-          <Tabs
-            v-model="tabIndex"
-            v-slot="{ tab }"
-            :tabs="tabs"
-            class="!h-full"
-          >
-            <TicketAgentActivities
-              ref="ticketAgentActivitiesRef"
-              :activities="filterActivities(tab.name)"
-              :title="tab.label"
-              @update="
-                () => {
-                  ticket.reload();
-                }
-              "
-              @email:reply="
-                (e) => {
-                  communicationAreaRef.replyToEmail(e);
-                }
-              "
-            />
+        <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
+          <Tabs v-model="tabIndex" :tabs="tabs">
+            <TabList />
+            <TabPanel v-slot="{ tab }" class="h-full">
+              <TicketAgentActivities
+                ref="ticketAgentActivitiesRef"
+                :activities="filterActivities(tab.name)"
+                :title="tab.label"
+                @update="
+                  () => {
+                    ticket.reload();
+                  }
+                "
+                @email:reply="
+                  (e) => {
+                    communicationAreaRef.replyToEmail(e);
+                  }
+                "
+              />
+            </TabPanel>
           </Tabs>
         </div>
         <CommunicationArea
@@ -135,6 +133,8 @@ import {
   Dialog,
   FormControl,
   Tabs,
+  TabPanel,
+  TabList,
 } from "frappe-ui";
 
 import {
@@ -169,7 +169,12 @@ const props = defineProps({
     required: true,
   },
 });
-
+watch(
+  () => props.ticketId,
+  () => {
+    ticket.reload();
+  }
+);
 provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
@@ -184,9 +189,9 @@ const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
   cache: ["Ticket", props.ticketId],
   auto: true,
-  params: {
+  makeParams: () => ({
     name: props.ticketId,
-  },
+  }),
   transform: (data) => {
     if (data._assign) {
       data.assignees = JSON.parse(data._assign).map((assignee) => {
@@ -361,7 +366,6 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
-      ticket.reload();
       createToast({
         title: "Ticket updated",
         icon: "check",
