@@ -143,6 +143,7 @@ def get_comments(ticket: str):
     )
     for c in comments:
         c.user = get_user_info_for_avatar(c.commented_by)
+        c.attachments = get_attachments("HD Ticket Comment", c.name)
     return comments
 
 

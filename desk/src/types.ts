@@ -276,6 +276,7 @@ export interface Breadcrumb {
   };
 }
 
+// Activity Types
 interface BaseActivity {
   type: string;
   key: string;
@@ -289,9 +290,9 @@ interface HistoryActivity extends BaseActivity {
   relatedActivities: HistoryActivity[];
 }
 
-interface EmailActivity extends BaseActivity {
+export interface EmailActivity extends BaseActivity {
   type: "email";
-  attachments: Array<{ key: string; name: any }>;
+  attachments: FileAttachment;
   bcc: string;
   cc: string;
   sender: { full_name: string; name: string };
@@ -304,6 +305,13 @@ export interface CommentActivity extends BaseActivity {
   name: string;
   commenter: string;
   commentedBy: string;
+  attachments: FileAttachment[];
 }
 
 export type TicketActivity = HistoryActivity | EmailActivity | CommentActivity;
+
+interface FileAttachment {
+  name: string;
+  file_name: string;
+  file_url: string;
+}

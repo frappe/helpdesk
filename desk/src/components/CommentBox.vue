@@ -63,6 +63,14 @@
           </div>
         </template>
       </TextEditor>
+      <div class="flex flex-wrap gap-2">
+        <AttachmentItem
+          v-for="a in attachments"
+          :key="a.file_url"
+          :label="a.file_name"
+          :url="a.file_url"
+        />
+      </div>
     </div>
   </div>
   <Dialog
@@ -83,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, PropType } from "vue";
+import { ref, PropType, onMounted } from "vue";
 import {
   Dropdown,
   createResource,
@@ -99,10 +107,10 @@ import {
   textEditorMenuButtons,
   isContentEmpty,
 } from "@/utils";
+import { AttachmentItem } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
-import { onMounted } from "vue";
 import { updateRes as updateComment } from "@/stores/knowledgeBase";
 const authStore = useAuthStore();
 const props = defineProps({
@@ -113,7 +121,8 @@ const props = defineProps({
 });
 const { getUser } = useUserStore();
 
-const { name, creation, content, commenter, commentedBy } = props.activity;
+const { name, creation, content, commenter, commentedBy, attachments } =
+  props.activity;
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
