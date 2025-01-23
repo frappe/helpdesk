@@ -17,7 +17,7 @@
           </span>
         </p>
       </div>
-      <div class="flex items-center">
+      <div class="flex items-center gap-1">
         <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <span class="pl-0.5 text-sm text-gray-600">
             {{ timeAgo(creation) }}
@@ -25,7 +25,18 @@
         </Tooltip>
         <div v-if="authStore.userId === commentedBy">
           <Dropdown
-            :options="[{ label: 'Delete', onClick: () => (showDialog = true) }]"
+            :options="[
+              {
+                label: 'Edit',
+                onClick: () => (editable = true),
+                icon: 'edit-2',
+              },
+              {
+                label: 'Delete',
+                onClick: () => (showDialog = true),
+                icon: 'trash-2',
+              },
+            ]"
           >
             <Button
               icon="more-horizontal"
@@ -36,33 +47,23 @@
         </div>
       </div>
     </div>
-    <TextEditor
-      ref="editorRef"
-      :editor-class="'prose-f shrink rounded bg-gray-50 px-4 py-3 text-p-sm transition-all duration-300 ease-in-out block w-full '"
-      :content="content"
-      :editable="false"
-      @change="(event:string) => {content = event}"
-    >
-      <template #bottom v-if="false">
-        <TextEditorFixedMenu
-          class="-ml-1 overflow-x-auto w-full"
-          :buttons="textEditorMenuButtons"
-        />
-      </template>
-    </TextEditor>
-    <!-- <div
-      class="prose-f grow cursor-pointer rounded bg-gray-50 px-4 py-3 text-base leading-6 transition-all duration-300 ease-in-out"
-    >
-      <iframe :srcdoc="content" class="prose-f block w-full h-fit" />
-    </div> -->
-    <!-- <div class="flex flex-wrap gap-2">
-      <AttachmentItem
-        v-for="a in attachments"
-        :key="a.file_url"
-        :label="a.file_name"
-        :url="a.file_url"
-      />
-    </div> -->
+    <div class="rounded bg-gray-50 px-4 py-3">
+      <TextEditor
+        ref="editorRef"
+        :editor-class="'prose-f shrink  text-p-sm transition-all duration-300 ease-in-out block w-full content'"
+        :content="_content"
+        :editable="editable"
+        :bubble-menu="textEditorMenuButtons"
+        @change="(event:string) => {_content = event}"
+      >
+        <template #bottom v-if="editable">
+          <div class="flex flex-row-reverse gap-2">
+            <Button label="Save" @click="handleSave" variant="solid" />
+            <Button label="Discard" @click="handleDiscard" />
+          </div>
+        </template>
+      </TextEditor>
+    </div>
   </div>
   <Dialog
     v-model="showDialog"
@@ -89,20 +90,20 @@ import {
   Dialog,
   Avatar,
   TextEditor,
-  TextEditorFixedMenu,
 } from "frappe-ui";
-// import { EmailContent } from "@/components/EmailContent.vue";
 import {
   dateFormat,
   timeAgo,
   dateTooltipFormat,
   createToast,
   textEditorMenuButtons,
+  isContentEmpty,
 } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
 import { onMounted } from "vue";
+import { updateRes as updateComment } from "@/stores/knowledgeBase";
 const authStore = useAuthStore();
 const props = defineProps({
   activity: {
@@ -117,10 +118,8 @@ const { name, creation, content, commenter, commentedBy } = props.activity;
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
 const commentBoxRef = ref(null);
-
-onMounted(() => {
-  commentBoxRef.value.style.width = "0px";
-});
+const editable = ref(false);
+const _content = ref(content);
 
 const deleteComment = createResource({
   url: "frappe.client.delete",
@@ -136,5 +135,49 @@ const deleteComment = createResource({
       iconClasses: "text-green-500",
     });
   },
+});
+
+function handleDiscard() {
+  _content.value = content;
+  editable.value = false;
+}
+
+function handleSave() {
+  if (content === _content.value) {
+    editable.value = false;
+    return;
+  }
+  if (isContentEmpty(_content.value)) {
+    createToast({
+      title: "Comment cannot be empty",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return;
+  }
+
+  updateComment.submit(
+    {
+      doctype: "HD Ticket Comment",
+      name: name,
+      fieldname: "content",
+      value: _content.value,
+    },
+    {
+      onSuccess: () => {
+        editable.value = false;
+        emit("update");
+        createToast({
+          title: "Comment updated",
+          icon: "check",
+          iconClasses: "text-green-500",
+        });
+      },
+    }
+  );
+}
+
+onMounted(() => {
+  commentBoxRef.value.style.width = "0px";
 });
 </script>
