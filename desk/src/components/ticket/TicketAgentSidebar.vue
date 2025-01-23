@@ -1,6 +1,6 @@
 <template>
   <div class="flex w-[382px] flex-col justify-between border-l">
-    <div class="h-10.5 flex items-center justify-between border-b px-5 py-2.5">
+    <div class="h-[2.83rem] flex items-center justify-between border-b px-5">
       <span
         class="cursor-copy text-lg font-semibold"
         @click="copyToClipboard(ticket.name, ticket.name)"

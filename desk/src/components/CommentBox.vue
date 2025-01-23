@@ -58,7 +58,7 @@
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">
-            <Button label="Save" @click="handleSave" variant="solid" />
+            <Button label="Save" @click="handleSaveComment" variant="solid" />
             <Button label="Discard" @click="handleDiscard" />
           </div>
         </template>
@@ -124,6 +124,16 @@ const _content = ref(content);
 const commentBoxRef = ref(null);
 const editorRef = ref(null);
 
+function handleEditMode() {
+  editable.value = true;
+  editorRef.value.editor.chain().focus("start");
+}
+
+function handleDiscard() {
+  _content.value = content;
+  editable.value = false;
+}
+
 const deleteComment = createResource({
   url: "frappe.client.delete",
   makeParams: () => ({
@@ -140,17 +150,7 @@ const deleteComment = createResource({
   },
 });
 
-function handleEditMode() {
-  editable.value = true;
-  editorRef.value.editor.chain().focus("start");
-}
-
-function handleDiscard() {
-  _content.value = content;
-  editable.value = false;
-}
-
-function handleSave() {
+function handleSaveComment() {
   if (content === _content.value) {
     editable.value = false;
     return;
