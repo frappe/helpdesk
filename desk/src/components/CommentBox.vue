@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-col text-base">
+  <div class="flex-col text-base flex-1" ref="commentBoxRef">
     <div class="mb-1 ml-0.5 flex items-center justify-between">
       <div class="text-gray-600 flex items-center gap-2">
         <Avatar
@@ -36,10 +36,33 @@
         </div>
       </div>
     </div>
-    <div
+    <TextEditor
+      ref="editorRef"
+      :editor-class="'prose-f shrink rounded bg-gray-50 px-4 py-3 text-p-sm transition-all duration-300 ease-in-out block w-full '"
+      :content="content"
+      :editable="false"
+      @change="(event:string) => {content = event}"
+    >
+      <template #bottom v-if="false">
+        <TextEditorFixedMenu
+          class="-ml-1 overflow-x-auto w-full"
+          :buttons="textEditorMenuButtons"
+        />
+      </template>
+    </TextEditor>
+    <!-- <div
       class="prose-f grow cursor-pointer rounded bg-gray-50 px-4 py-3 text-base leading-6 transition-all duration-300 ease-in-out"
-      v-html="content"
-    />
+    >
+      <iframe :srcdoc="content" class="prose-f block w-full h-fit" />
+    </div> -->
+    <!-- <div class="flex flex-wrap gap-2">
+      <AttachmentItem
+        v-for="a in attachments"
+        :key="a.file_url"
+        :label="a.file_name"
+        :url="a.file_url"
+      />
+    </div> -->
   </div>
   <Dialog
     v-model="showDialog"
@@ -59,16 +82,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Dropdown, createResource, Dialog, Avatar } from "frappe-ui";
-import { dateFormat, timeAgo, dateTooltipFormat, createToast } from "@/utils";
+import { ref, PropType } from "vue";
+import {
+  Dropdown,
+  createResource,
+  Dialog,
+  Avatar,
+  TextEditor,
+  TextEditorFixedMenu,
+} from "frappe-ui";
+// import { EmailContent } from "@/components/EmailContent.vue";
+import {
+  dateFormat,
+  timeAgo,
+  dateTooltipFormat,
+  createToast,
+  textEditorMenuButtons,
+} from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-
+import { CommentActivity } from "@/types";
+import { onMounted } from "vue";
 const authStore = useAuthStore();
 const props = defineProps({
   activity: {
-    type: Object,
+    type: Object as PropType<CommentActivity>,
     required: true,
   },
 });
@@ -78,6 +116,11 @@ const { name, creation, content, commenter, commentedBy } = props.activity;
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
+const commentBoxRef = ref(null);
+
+onMounted(() => {
+  commentBoxRef.value.style.width = "0px";
+});
 
 const deleteComment = createResource({
   url: "frappe.client.delete",
