@@ -275,3 +275,35 @@ export interface Breadcrumb {
     params?: Record<string, string>;
   };
 }
+
+interface BaseActivity {
+  type: string;
+  key: string;
+  creation: string;
+  content: string;
+}
+
+interface HistoryActivity extends BaseActivity {
+  type: "history";
+  user: string;
+  relatedActivities: HistoryActivity[];
+}
+
+interface EmailActivity extends BaseActivity {
+  type: "email";
+  attachments: Array<{ key: string; name: any }>;
+  bcc: string;
+  cc: string;
+  sender: { full_name: string; name: string };
+  subject: string;
+  to: string;
+}
+
+export interface CommentActivity extends BaseActivity {
+  type: "comment";
+  name: string;
+  commenter: string;
+  commentedBy: string;
+}
+
+export type TicketActivity = HistoryActivity | EmailActivity | CommentActivity;

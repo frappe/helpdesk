@@ -71,11 +71,7 @@
       </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
-    <!-- <div
-      class="email-content prose-f max-h-[500px] overflow-y-auto"
-      v-html="content"
-    /> -->
-    <EmailContent :content="content" :emailBox="emailBox" />
+    <EmailContent :content="content" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
         v-for="a in attachments"

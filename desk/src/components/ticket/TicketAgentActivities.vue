@@ -36,7 +36,7 @@
               <DotIcon v-else class="text-gray-600" />
             </div>
           </div>
-          <div class="mb-4 w-full">
+          <div class="mb-4 flex flex-1">
             <EmailArea
               v-if="activity.type === 'email'"
               :activity="activity"
@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, inject, h, computed, onMounted, watch } from "vue";
+import { Ref, inject, h, computed, onMounted, watch, PropType } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import {
   DotIcon,
@@ -86,10 +86,10 @@ import {
 import { EmailArea, CommentBox, HistoryBox } from "@/components";
 import { useUserStore } from "@/stores/user";
 import { Avatar } from "frappe-ui";
-
+import { TicketActivity } from "@/types";
 const props = defineProps({
   activities: {
-    type: Array,
+    type: Array as PropType<TicketActivity[]>,
     required: true,
   },
   title: {
