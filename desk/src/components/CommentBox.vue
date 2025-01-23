@@ -23,12 +23,12 @@
             {{ timeAgo(creation) }}
           </span>
         </Tooltip>
-        <div v-if="authStore.userId === commentedBy">
+        <div v-if="authStore.userId === commentedBy && !editable">
           <Dropdown
             :options="[
               {
                 label: 'Edit',
-                onClick: () => (editable = true),
+                onClick: () => handleEditMode(),
                 icon: 'edit-2',
               },
               {
@@ -117,9 +117,12 @@ const { name, creation, content, commenter, commentedBy } = props.activity;
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
-const commentBoxRef = ref(null);
 const editable = ref(false);
 const _content = ref(content);
+
+// HTML refs
+const commentBoxRef = ref(null);
+const editorRef = ref(null);
 
 const deleteComment = createResource({
   url: "frappe.client.delete",
@@ -136,6 +139,11 @@ const deleteComment = createResource({
     });
   },
 });
+
+function handleEditMode() {
+  editable.value = true;
+  editorRef.value.editor.chain().focus("start");
+}
 
 function handleDiscard() {
   _content.value = content;
