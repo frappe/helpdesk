@@ -102,7 +102,6 @@ const { sender, to, cc, bcc, creation, subject, attachments, content } =
 
 const emit = defineEmits(["reply"]);
 
-let emailBox = inject("communicationArea");
 const { isMobileView } = useScreenSize();
 
 // TODO: Implement reply functionality using this way instead of emit drillup
