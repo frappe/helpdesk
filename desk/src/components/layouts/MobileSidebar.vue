@@ -16,7 +16,7 @@
           <!-- user dropwdown -->
           <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
           <!-- notifications -->
-          <div class="overflow-y-auto px-2">
+          <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
             <div class="mb-3 flex flex-col">
               <SidebarLink
                 class="relative"
