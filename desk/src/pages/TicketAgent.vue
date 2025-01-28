@@ -296,6 +296,7 @@ const activities = computed(() => {
       commenter: comment.user.name,
       creation: comment.creation,
       content: comment.content,
+      attachments: comment.attachments,
     };
   });
 

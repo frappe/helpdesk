@@ -39,7 +39,9 @@
         <template #right>
           <Badge
             v-if="isExpanded && notificationStore.unread"
-            :label="notificationStore.unread"
+            :label="
+              notificationStore.unread > 9 ? '9+' : notificationStore.unread
+            "
             theme="gray"
             variant="subtle"
           />

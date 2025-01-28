@@ -154,10 +154,14 @@ async function submitComment() {
       method: "new_comment",
       args: {
         content: newComment.value,
+        attachments: attachments.value,
       },
     }),
     onSuccess: () => {
       emit("submit");
+      loading.value = false;
+    },
+    onError: () => {
       loading.value = false;
     },
   });

@@ -177,3 +177,9 @@ export const textEditorMenuButtons = [
     "DeleteTable",
   ],
 ];
+
+export function isContentEmpty(content: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+  return doc.body.textContent === "";
+}

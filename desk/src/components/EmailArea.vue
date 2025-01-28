@@ -71,11 +71,7 @@
       </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
-    <!-- <div
-      class="email-content prose-f max-h-[500px] overflow-y-auto"
-      v-html="content"
-    /> -->
-    <EmailContent :content="content" :emailBox="emailBox" />
+    <EmailContent :content="content" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
         v-for="a in attachments"
@@ -88,11 +84,10 @@
 </template>
 
 <script setup lang="ts">
-import { UserAvatar, AttachmentItem } from "@/components";
+import { AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
 import { ReplyIcon, ReplyAllIcon } from "./icons";
 import { useScreenSize } from "@/composables/screen";
-import { inject } from "vue";
 
 const props = defineProps({
   activity: {
@@ -106,7 +101,6 @@ const { sender, to, cc, bcc, creation, subject, attachments, content } =
 
 const emit = defineEmits(["reply"]);
 
-let emailBox = inject("communicationArea");
 const { isMobileView } = useScreenSize();
 
 // TODO: Implement reply functionality using this way instead of emit drillup

@@ -458,7 +458,7 @@ class HDTicket(Document):
         return f"{root_uri}/helpdesk/my-tickets/{self.name}"
 
     @frappe.whitelist()
-    def new_comment(self, content: str):
+    def new_comment(self, content: str, attachments: List[str] = []):
         if not is_agent():
             frappe.throw(
                 _("You are not permitted to add a comment"), frappe.PermissionError
@@ -469,6 +469,10 @@ class HDTicket(Document):
         c.is_pinned = False
         c.reference_ticket = self.name
         c.save()
+        for attachment in attachments:
+            self.attach_file_with_doc(
+                "HD Ticket Comment", c.name, attachment.get("file_url")
+            )
 
     @frappe.whitelist()
     def reply_via_agent(
@@ -531,7 +535,7 @@ class HDTicket(Document):
             file_doc.attached_to_name = communication.name
             file_doc.attached_to_doctype = "Communication"
             file_doc.save(ignore_permissions=True)
-            self.attach_file_with_ticket(file_doc.file_url)
+            self.attach_file_with_doc("HD Ticket", self.name, file_doc.file_url)
 
             _attachments.append({"file_url": file_doc.file_url})
 
@@ -613,7 +617,7 @@ class HDTicket(Document):
             "File", filters={"attached_to_name": c.name}, pluck="file_url"
         )
         for url in file_urls:
-            self.attach_file_with_ticket(url)
+            self.attach_file_with_doc("HD Ticket", self.name, url)
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -720,10 +724,10 @@ class HDTicket(Document):
         # Save the ticket, allowing for hooks to run.
         self.save()
 
-    def attach_file_with_ticket(self, file_url):
+    def attach_file_with_doc(self, doctype, docname, file_url):
         file_doc = frappe.new_doc("File")
-        file_doc.attached_to_name = self.name
-        file_doc.attached_to_doctype = "HD Ticket"
+        file_doc.attached_to_doctype = doctype
+        file_doc.attached_to_name = docname
         file_doc.file_url = file_url
         file_doc.save(ignore_permissions=True)
 
