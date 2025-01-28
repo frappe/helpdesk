@@ -28,7 +28,7 @@
         <slot name="item-label" v-bind="{ active, selected, option }" />
       </template>
 
-      <template #footer="{ value, close }">
+      <template #footer="{ value, close }" v-if="!hideClearButton">
         <div v-if="attrs.onCreate">
           <Button
             variant="ghost"
@@ -81,6 +81,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  pageLength: {
+    type: Number,
+    default: 10,
+  },
+  hideClearButton: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "change"]);
@@ -127,12 +135,13 @@ const options = createResource({
     txt: text.value,
     doctype: props.doctype,
     filters: props.filters,
+    page_length: props.pageLength,
   },
   transform: (data) => {
     let allData = data.map((option) => {
       return {
-        label: option.value,
         value: option.value,
+        label: option?.label || option.value,
       };
     });
     // if (!props.hideMe && props.doctype == 'User') {
@@ -158,6 +167,7 @@ function reload(val) {
       txt: val,
       doctype: props.doctype,
       filters: props.filters,
+      page_length: props.pageLength,
     },
   });
   options.reload();

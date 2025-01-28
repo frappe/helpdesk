@@ -8,6 +8,8 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/frappe/helpdesk)
 [![codecov](https://codecov.io/github/frappe/helpdesk/branch/develop/graph/badge.svg?token=8ZXHCY4G9U)](https://codecov.io/github/frappe/helpdesk)
 
+<a href="https://trendshift.io/repositories/12764" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12764" alt="teableio%2Fteable | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
 
 </div>
 
@@ -57,7 +59,7 @@ Managing issues from our customers was a big challenge for us. We were using the
 
 <div align="center">
 	<sub>
-		Upload articles and let your customer solve there queries through the Knowledge Base.
+		Upload articles and let your customer solve their queries through the Knowledge Base.
 	</sub>
 </div>
 

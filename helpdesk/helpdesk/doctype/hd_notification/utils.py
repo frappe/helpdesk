@@ -16,7 +16,7 @@ def clear(user: str = None, ticket: str | int = None, comment: str = None):
         filters["reference_ticket"] = ticket
     if comment:
         filters["reference_comment"] = comment
-    for n in frappe.get_all("HD Notification", filters=filters):
-        d = frappe.get_doc("HD Notification", n.name)
-        d.read = True
-        d.save()
+    for notification in frappe.get_all(
+        "HD Notification", filters=filters, pluck="name"
+    ):
+        frappe.db.set_value("HD Notification", notification, "read", 1)

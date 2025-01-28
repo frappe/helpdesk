@@ -104,6 +104,7 @@ import { AttachmentItem } from "@/components/";
 import { useAgentStore } from "@/stores/agent";
 import { useStorage } from "@vueuse/core";
 import { PreserveVideoControls } from "@/tiptap-extensions";
+import { textEditorMenuButtons } from "@/utils";
 
 const { agents: agentsList } = useAgentStore();
 
@@ -153,52 +154,18 @@ async function submitComment() {
       method: "new_comment",
       args: {
         content: newComment.value,
+        attachments: attachments.value,
       },
     }),
     onSuccess: () => {
       emit("submit");
       loading.value = false;
     },
+    onError: () => {
+      loading.value = false;
+    },
   });
 
   comment.submit();
 }
-
-const textEditorMenuButtons = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-  "Separator",
-  "Bold",
-  "Italic",
-  "Separator",
-  "Bullet List",
-  "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
-  "Separator",
-  "Image",
-  "Video",
-  "Link",
-  "Blockquote",
-  "Code",
-  "Horizontal Rule",
-  [
-    "InsertTable",
-    "AddColumnBefore",
-    "AddColumnAfter",
-    "DeleteColumn",
-    "AddRowBefore",
-    "AddRowAfter",
-    "DeleteRow",
-    "MergeCells",
-    "SplitCell",
-    "ToggleHeaderColumn",
-    "ToggleHeaderRow",
-    "ToggleHeaderCell",
-    "DeleteTable",
-  ],
-];
 </script>

@@ -157,7 +157,7 @@ import {
   TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
-import { createToast, validateEmail } from "@/utils";
+import { createToast, validateEmail, textEditorMenuButtons } from "@/utils";
 import {
   MultiSelectInput,
   AttachmentItem,
@@ -165,7 +165,6 @@ import {
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { useError } from "@/composables/error";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -297,44 +296,6 @@ function addToReply(
     .focus("start")
     .run();
 }
-
-const textEditorMenuButtons = [
-  "Paragraph",
-  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
-  "Separator",
-  "Bold",
-  "Italic",
-  "Separator",
-  "Bullet List",
-  "Numbered List",
-  "Separator",
-  "Align Left",
-  "Align Center",
-  "Align Right",
-  "FontColor",
-  "Separator",
-  "Image",
-  "Video",
-  "Link",
-  "Blockquote",
-  "Code",
-  "Horizontal Rule",
-  [
-    "InsertTable",
-    "AddColumnBefore",
-    "AddColumnAfter",
-    "DeleteColumn",
-    "AddRowBefore",
-    "AddRowAfter",
-    "DeleteRow",
-    "MergeCells",
-    "SplitCell",
-    "ToggleHeaderColumn",
-    "ToggleHeaderRow",
-    "ToggleHeaderCell",
-    "DeleteTable",
-  ],
-];
 
 const editor = computed(() => {
   return editorRef.value.editor;

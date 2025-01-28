@@ -1,5 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import { toast } from "frappe-ui";
+import { ref } from "vue";
 import zod from "zod";
 /**
  * Wrapper to create toasts, supplied with default options.
@@ -115,4 +116,70 @@ export function setupCustomActions(data, obj) {
   }
 
   data._customActions = actions;
+}
+
+export const isCustomerPortal = ref(false);
+
+export async function copyToClipboard(text: string, message?: string) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    let input = document.createElement("input");
+    let body = document.querySelector("body");
+    body.appendChild(input);
+    input.value = text;
+    input.select();
+    document.execCommand("copy");
+    input.remove();
+  }
+  createToast({
+    title: "Copied to clipboard",
+    text: message,
+    icon: "check",
+    iconClasses: "text-green-600",
+  });
+}
+
+export const textEditorMenuButtons = [
+  "Paragraph",
+  ["Heading 2", "Heading 3", "Heading 4", "Heading 5", "Heading 6"],
+  "Separator",
+  "Bold",
+  "Italic",
+  "Separator",
+  "Bullet List",
+  "Numbered List",
+  "Separator",
+  "Align Left",
+  "Align Center",
+  "Align Right",
+  "FontColor",
+  "Separator",
+  "Image",
+  "Video",
+  "Link",
+  "Blockquote",
+  "Code",
+  "Horizontal Rule",
+  [
+    "InsertTable",
+    "AddColumnBefore",
+    "AddColumnAfter",
+    "DeleteColumn",
+    "AddRowBefore",
+    "AddRowAfter",
+    "DeleteRow",
+    "MergeCells",
+    "SplitCell",
+    "ToggleHeaderColumn",
+    "ToggleHeaderRow",
+    "ToggleHeaderCell",
+    "DeleteTable",
+  ],
+];
+
+export function isContentEmpty(content: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+  return doc.body.textContent === "";
 }
