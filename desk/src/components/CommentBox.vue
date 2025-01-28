@@ -63,7 +63,7 @@
           </div>
         </template>
       </TextEditor>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap gap-2" v-if="!editable">
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"
