@@ -165,7 +165,6 @@ import {
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { useError } from "@/composables/error";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);

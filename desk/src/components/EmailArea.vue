@@ -84,11 +84,10 @@
 </template>
 
 <script setup lang="ts">
-import { UserAvatar, AttachmentItem } from "@/components";
+import { AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
 import { ReplyIcon, ReplyAllIcon } from "./icons";
 import { useScreenSize } from "@/composables/screen";
-import { inject } from "vue";
 
 const props = defineProps({
   activity: {
