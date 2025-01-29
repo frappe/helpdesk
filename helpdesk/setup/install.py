@@ -162,14 +162,11 @@ def add_default_holiday_list():
         }
     ).insert()
 
-    # frappe.db.commit()
-
 
 def enable_track_service_level_agreement_in_support_settings():
     support_settings = frappe.get_doc("HD Settings")
     support_settings.track_service_level_agreement = True
     support_settings.save()
-    # frappe.db.commit()
 
 
 def add_default_ticket_priorities():
