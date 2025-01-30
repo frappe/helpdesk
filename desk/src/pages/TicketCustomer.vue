@@ -29,7 +29,11 @@
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
         <TicketConversation class="grow" />
-        <div class="m-5">
+        <div
+          class="m-5"
+          @keydown.ctrl.enter.capture.stop="sendEmail"
+          @keydown.meta.enter.capture.stop="sendEmail"
+        >
           <TicketTextEditor
             v-if="showEditor"
             ref="editor"
@@ -46,7 +50,8 @@
                 theme="gray"
                 variant="solid"
                 :disabled="$refs.editor.editor.isEmpty || send.loading"
-                @click="() => send.submit()"
+                :loading="send.loading"
+                @click="sendEmail"
               />
             </template>
           </TicketTextEditor>
@@ -61,7 +66,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";
-import { createResource, Button, Breadcrumbs } from "frappe-ui";
+import { createResource, Button, Breadcrumbs, confirmDialog } from "frappe-ui";
 import { Icon } from "@iconify/vue";
 import { useError } from "@/composables/error";
 import TicketConversation from "./ticket/TicketConversation.vue";
@@ -70,14 +75,12 @@ import TicketFeedback from "./ticket/TicketFeedback.vue";
 import TicketTextEditor from "./ticket/TicketTextEditor.vue";
 import { ITicket } from "./ticket/symbols";
 import { useRouter } from "vue-router";
-import { createToast } from "@/utils";
+import { createToast, isContentEmpty, setupCustomActions } from "@/utils";
 import { socket } from "@/socket";
 import { LayoutHeader } from "@/components";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { useScreenSize } from "@/composables/screen";
 import { useConfigStore } from "@/stores/config";
-import { confirmDialog } from "frappe-ui";
-import { setupCustomActions } from "@/utils";
 interface P {
   ticketId: string;
 }
@@ -140,6 +143,13 @@ const send = createResource({
 function updateField(name, value, callback = () => {}) {
   updateTicket(name, value);
   callback();
+}
+
+function sendEmail() {
+  if (isContentEmpty(editorContent.value) || send.loading) {
+    return;
+  }
+  send.submit();
 }
 
 function updateTicket(fieldname: string, value: string) {
