@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import {
   createDocumentResource,
@@ -162,7 +162,6 @@ import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import IconPlus from "~icons/lucide/plus";
 import Pill from "@/components/Pill.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
-import { onMounted } from "vue";
 
 const props = defineProps({
   teamId: {
