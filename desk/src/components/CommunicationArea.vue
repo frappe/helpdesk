@@ -27,8 +27,13 @@
         </Button>
       </div>
     </div>
-    <div v-show="showCommentBox">
+    <div
+      v-show="showCommentBox"
+      @keydown.ctrl.enter.capture.stop="submitComment"
+      @keydown.meta.enter.capture.stop="submitComment"
+    >
       <CommentTextEditor
+        ref="commentTextEditorRef"
         v-model="doc"
         v-model:attachments="attachments"
         :editable="showCommentBox"
@@ -83,13 +88,16 @@ import { ref } from "vue";
 import { EmailEditor, CommentTextEditor } from "@/components";
 import { EmailIcon, CommentIcon } from "@/components/icons/";
 
+const emit = defineEmits(["update"]);
 const content = defineModel("content");
+const doc = defineModel();
+
 const showEmailBox = ref(false);
 const showCommentBox = ref(false);
-const doc = defineModel();
 const attachments = ref([]);
-const emit = defineEmits(["update"]);
+
 const emailEditorRef = ref(null);
+const commentTextEditorRef = ref(null);
 
 function toggleEmailBox() {
   if (showCommentBox.value) {
@@ -103,6 +111,16 @@ function toggleCommentBox() {
     showEmailBox.value = false;
   }
   showCommentBox.value = !showCommentBox.value;
+}
+
+function submitEmail() {
+  emit("update");
+  emailEditorRef.value.submitMail();
+}
+
+function submitComment() {
+  commentTextEditorRef.value.submitComment();
+  emit("update");
 }
 
 function replyToEmail(data: object) {

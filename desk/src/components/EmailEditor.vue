@@ -304,5 +304,6 @@ const editor = computed(() => {
 defineExpose({
   addToReply,
   editor,
+  submitMail,
 });
 </script>
