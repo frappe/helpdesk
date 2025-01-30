@@ -317,8 +317,8 @@ function addToReply(
 }
 
 function resetState() {
-  newEmail.value = "";
-  attachments.value = [];
+  newEmail.value = null;
+  attachments.value = null;
   loading.value = false;
 }
 

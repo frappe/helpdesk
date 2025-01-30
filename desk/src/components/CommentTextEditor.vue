@@ -94,7 +94,7 @@
   </TextEditor>
 </template>
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import {
   TextEditorFixedMenu,
   TextEditor,
@@ -110,7 +110,9 @@ import { PreserveVideoControls } from "@/tiptap-extensions";
 import { isContentEmpty, textEditorMenuButtons } from "@/utils";
 
 const { agents: agentsList } = useAgentStore();
-
+onMounted(() => {
+  agentsList.fetch();
+});
 const props = defineProps({
   placeholder: {
     type: String,
@@ -131,7 +133,7 @@ const doc = defineModel();
 const attachments = useStorage("commentBoxAttachments" + doc.value.name, []);
 const newComment = useStorage("commentBoxContent" + doc.value.name, "");
 const commentEmpty = computed(() => {
-  return !newComment.value || newComment.value === "<p></p>";
+  return isContentEmpty(newComment.value);
 });
 const loading = ref(false);
 
@@ -166,8 +168,8 @@ async function submitComment() {
     onSuccess: () => {
       emit("submit");
       loading.value = false;
-      attachments.value = [];
-      newComment.value = "";
+      attachments.value = null;
+      newComment.value = null;
     },
     onError: () => {
       loading.value = false;
