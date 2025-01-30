@@ -91,8 +91,14 @@
     <Dialog v-model="showDelete" :options="deleteDialogOptions" />
     <Dialog v-model="showAddMember" :options="addMemberDialogOptions">
       <template #body-content>
-        <div class="space-y-2">
-          <div v-if="agentStore.agents.data.length === 0">
+        <div class="space-y-4">
+          <FormControl
+            type="text"
+            v-model="query"
+            placeholder="Search agents"
+            @input="searchMembers()"
+          />
+          <div v-if="_agents.length === 0">
             <p class="text-base text-gray-600">
               No agents found, please add
               <span
@@ -103,25 +109,30 @@
               in the system.
             </p>
           </div>
-          <div
-            v-for="agent in agentStore.agents.data"
-            v-else
-            :key="agent.name"
-            class="flex items-center justify-between"
-          >
-            <div class="flex items-center gap-2">
-              <Avatar :label="agent.agent_name" :image="agent.user_image" />
-              <div class="text-base">
-                {{ agent.agent_name }}
+          <div v-else class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+              <div
+                v-for="agent in _agents"
+                :key="agent.name"
+                class="flex items-center justify-between"
+              >
+                <div class="flex items-center gap-2">
+                  <Avatar :label="agent.agent_name" :image="agent.user_image" />
+                  <div class="text-base">
+                    {{ agent.agent_name }}
+                  </div>
+                </div>
+                <Button
+                  :disabled="
+                    !!team.doc?.users.find((u) => u.user === agent.user)
+                  "
+                  label="Add"
+                  theme="gray"
+                  variant="outline"
+                  @click="addMember(agent.user)"
+                />
               </div>
             </div>
-            <Button
-              :disabled="!!team.doc?.users.find((u) => u.user === agent.user)"
-              label="Add"
-              theme="gray"
-              variant="outline"
-              @click="addMember(agent.user)"
-            />
           </div>
         </div>
       </template>
@@ -130,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import {
   createDocumentResource,
@@ -261,6 +272,23 @@ function addMember(user: string) {
     users,
   });
 }
+
+// Search members
+const query = ref("");
+const searchedAgents = ref([]);
+const _agents = computed(() => {
+  return searchedAgents.value.length || query.value.length
+    ? searchedAgents.value
+    : agentStore.agents.data;
+});
+function searchMembers() {
+  const filteredAgents = agentStore.searchAgents(query.value);
+  searchedAgents.value = filteredAgents;
+}
+
+onMounted(() => {
+  agentStore.agents.reload();
+});
 
 function removeMember(member: string) {
   const users = team.doc.users.filter((u) => u.user !== member);
