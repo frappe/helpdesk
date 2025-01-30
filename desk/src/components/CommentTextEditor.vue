@@ -55,7 +55,10 @@
                   @click="openFileSelector()"
                 >
                   <template #icon>
-                    <AttachmentIcon class="h-4" />
+                    <AttachmentIcon
+                      class="h-4"
+                      style="color: #000000; stroke-width: 1.5 !important"
+                    />
                   </template>
                 </Button>
               </template>
@@ -164,6 +167,7 @@ async function submitComment() {
       emit("submit");
       loading.value = false;
       attachments.value = [];
+      newComment.value = "";
     },
     onError: () => {
       loading.value = false;

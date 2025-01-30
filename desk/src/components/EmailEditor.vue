@@ -96,7 +96,10 @@
               <template #default="{ openFileSelector }">
                 <Button variant="ghost" @click="openFileSelector()">
                   <template #icon>
-                    <AttachmentIcon class="h-4" />
+                    <AttachmentIcon
+                      class="h-4"
+                      style="color: #000000; stroke-width: 1.5 !important"
+                    />
                   </template>
                 </Button>
               </template>
@@ -106,7 +109,10 @@
               @click="showCannedResponseSelectorModal = true"
             >
               <template #icon>
-                <EmailIcon class="h-4" />
+                <EmailIcon
+                  class="h-4"
+                  style="color: #000000; stroke-width: 1.2"
+                />
               </template>
             </Button>
           </div>
