@@ -157,7 +157,12 @@ import {
   TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
-import { createToast, validateEmail, textEditorMenuButtons } from "@/utils";
+import {
+  createToast,
+  validateEmail,
+  textEditorMenuButtons,
+  isContentEmpty,
+} from "@/utils";
 import {
   MultiSelectInput,
   AttachmentItem,
@@ -196,17 +201,15 @@ const props = defineProps({
     default: () => [],
   },
 });
+const emit = defineEmits(["submit", "discard"]);
+const doc = defineModel();
 
-const newEmail = useStorage("emailBoxContent", "");
-
+const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
+const attachments = useStorage("emailBoxAttachments" + doc.value.name, []);
 const emailEmpty = computed(() => {
-  return !newEmail.value || newEmail.value === "<p></p>";
+  return isContentEmpty(newEmail.value);
 });
 
-const emit = defineEmits(["submit", "discard"]);
-
-const doc = defineModel();
-const attachments = ref([]);
 const toEmailsClone = ref([...props.toEmails]);
 const ccEmailsClone = ref([...props.ccEmails]);
 const bccEmailsClone = ref([...props.bccEmails]);
@@ -223,6 +226,17 @@ function applyCannedResponse(template) {
 }
 
 function submitMail() {
+  if (isContentEmpty(newEmail.value)) {
+    return;
+  }
+  if (!toEmailsClone.value.length) {
+    createToast({
+      text: "Please enter a recipient email address",
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+    return;
+  }
   const sendMail = createResource({
     url: "run_doc_method",
     makeParams: () => ({
@@ -238,9 +252,8 @@ function submitMail() {
       },
     }),
     onSuccess: () => {
-      newEmail.value = "";
+      resetState();
       emit("submit");
-      loading.value = false;
     },
     onError: (err) => {
       loading.value = false;
@@ -295,6 +308,12 @@ function addToReply(
     .insertContentAt(0, { type: "paragraph" })
     .focus("start")
     .run();
+}
+
+function resetState() {
+  newEmail.value = "";
+  attachments.value = [];
+  loading.value = false;
 }
 
 const editor = computed(() => {

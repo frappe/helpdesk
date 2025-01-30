@@ -114,8 +114,8 @@ function toggleCommentBox() {
 }
 
 function submitEmail() {
-  emit("update");
   emailEditorRef.value.submitMail();
+  emit("update");
 }
 
 function submitComment() {
