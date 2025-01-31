@@ -340,8 +340,8 @@ def get_quick_filters(doctype: str):
     if doctype == "Contact":
         quick_filters.append(name_filter)
         return quick_filters
-
-    if doctype == "HD Agent" or doctype == "HD Customer":
+    name_filter_doctypes = ["HD Agent", "HD Customer", "HD Ticket"]
+    if doctype in name_filter_doctypes:
         quick_filters.append(name_filter)
 
     for field in fields:

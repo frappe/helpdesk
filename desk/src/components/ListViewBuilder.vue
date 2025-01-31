@@ -28,7 +28,7 @@
     row-key="name"
     :options="{
       selectable: props.options.selectable ?? true ,
-      showTooltip: true,
+      showTooltip: false,
       resizeColumn: false,
       onRowClick: (row: Object) => emit('rowClick', row['name']),
       emptyState,
@@ -47,28 +47,15 @@
       v-slot="{ idx, column, item, row }"
       :group-by-actions="props.options.groupByActions"
     >
-      <ListRowItem :item="item" :row="row" :column="column">
-        <!-- TODO: filters on click of other columns -->
-        <!-- and not on first column, it should emit the event -->
-        <div v-if="idx === 0" class="truncate">
-          {{ item }}
-        </div>
-        <div v-else-if="column.type === 'Datetime'">
-          {{ dayjs.tz(item).fromNow() }}
-        </div>
-        <div v-else-if="column.type === 'status'">
-          <Badge v-bind="handleStatusColor(item)" />
-        </div>
-        <div v-else class="truncate">
-          {{ item }}
-        </div>
+      <ListRowItem :item="item" :column="column" :row="row">
+        <component :is="listCell(column, row, item, idx)" :key="column.key" />
       </ListRowItem>
     </ListRows>
     <ListSelectBanner v-if="props.options.showSelectBanner">
       <template #actions="{ selections }">
         <Dropdown :options="selectBannerOptions(selections)">
-          <Button icon="more-horizontal" variant="ghost" />
-        </Dropdown>
+          <Button icon="more-horizontal" variant="ghost"
+        /></Dropdown>
       </template>
     </ListSelectBanner>
   </ListView>
@@ -122,6 +109,7 @@ import {
   QuickFilters,
   Reload,
 } from "@/components/view-controls";
+import { MultipleAvatar, StarRating } from "@/components";
 import { dayjs } from "@/dayjs";
 import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
@@ -305,6 +293,46 @@ const sortableFields = createResource({
     doctype: props.options.doctype,
   },
 });
+
+function listCell(column: any, row: any, item: string, idx: number) {
+  const columnConfig = props.options.columnConfig;
+  if (!columnConfig) return;
+  const customColumn = columnConfig[column.key] || {};
+  if (customColumn.hasOwnProperty("custom")) {
+    return customColumn.custom({ column, row, item, idx });
+  }
+  if (idx === 0) {
+    return h("span", {
+      class: "truncate text-base text-ink-gray-6",
+      innerHTML: item,
+    });
+  }
+  if (column.type === "Datetime") {
+    return h("span", {
+      class: "truncate",
+      innerHTML: dayjs.tz(item).fromNow(),
+    });
+  }
+  if (column.type === "MultipleAvatar") {
+    return h(MultipleAvatar, {
+      avatars: item,
+      class: "flex items-center",
+    });
+  }
+  if (column.type === "Rating") {
+    return h(StarRating, {
+      rating: item || 0,
+      class: "truncate",
+    });
+  }
+  if (column.type === "status") {
+    return h(Badge, handleStatusColor(item));
+  }
+  return h("span", {
+    class: "truncate",
+    innerHTML: item,
+  });
+}
 
 const quickFilters = createResource({
   url: "helpdesk.api.doc.get_quick_filters",
