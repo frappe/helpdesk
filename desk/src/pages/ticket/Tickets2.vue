@@ -78,6 +78,13 @@ const options = {
 };
 
 function handle_response_by_field(row: any, item: string) {
+  if (!row.first_responded_on) {
+    return h(Badge, {
+      label: "Response Due",
+      theme: "orange",
+      variant: "outline",
+    });
+  }
   if (row.first_responded_on && dayjs(row.first_responded_on).isBefore(item)) {
     return h(Badge, {
       label: "Fulfilled",

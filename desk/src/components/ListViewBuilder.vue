@@ -294,7 +294,7 @@ const sortableFields = createResource({
   },
 });
 
-function listCell(column: any, row: any, item: string, idx: number) {
+function listCell(column: any, row: any, item: any, idx: number) {
   const columnConfig = props.options.columnConfig;
   if (!columnConfig) return;
   const customColumn = columnConfig[column.key] || {};
