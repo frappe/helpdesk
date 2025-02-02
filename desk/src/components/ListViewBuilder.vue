@@ -27,12 +27,12 @@
     :rows="rows"
     row-key="name"
     :options="{
-      selectable: props.options.selectable ?? true ,
-      showTooltip: false,
-      resizeColumn: false,
-      onRowClick: (row: Object) => emit('rowClick', row['name']),
-      emptyState,
-    }"
+    selectable: props.options.selectable ?? true,
+    showTooltip: false,
+    resizeColumn: false,
+    onRowClick: (row: Object) => emit('rowClick', row['name']),
+    emptyState,
+  }"
   >
     <ListHeader class="sm:mx-5 mx-3">
       <ListHeaderItem
@@ -54,8 +54,8 @@
     <ListSelectBanner v-if="props.options.showSelectBanner">
       <template #actions="{ selections }">
         <Dropdown :options="selectBannerOptions(selections)">
-          <Button icon="more-horizontal" variant="ghost"
-        /></Dropdown>
+          <Button icon="more-horizontal" variant="ghost" />
+        </Dropdown>
       </template>
     </ListSelectBanner>
   </ListView>
@@ -309,7 +309,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "truncate",
+      class: "truncate text-base",
       innerHTML: dayjs.tz(item).fromNow(),
     });
   }
