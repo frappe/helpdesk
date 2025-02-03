@@ -257,12 +257,6 @@ export interface Category {
   children?: Article[];
 }
 
-// Badge
-export interface BadgeStatus {
-  label: string;
-  theme: string;
-}
-
 export interface View {
   view_type: string;
   group_by_field: string;

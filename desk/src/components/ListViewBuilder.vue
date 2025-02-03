@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed, h } from "vue";
+import { reactive, provide, computed, h, ref } from "vue";
 import {
   createResource,
   ListView,
@@ -102,7 +102,6 @@ import {
   ListHeader,
   ListHeaderItem,
   ListSelectBanner,
-  Badge,
   FeatherIcon,
   Dropdown,
 } from "frappe-ui";
@@ -118,7 +117,7 @@ import { dayjs } from "@/dayjs";
 import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
-import { BadgeStatus, View } from "@/types";
+import { View } from "@/types";
 
 interface P {
   options: {
@@ -200,8 +199,9 @@ const list = createResource({
     });
     return data;
   },
-  onSuccess: () => {
+  onSuccess: (data) => {
     list.params = defaultParams;
+    columns.value = data.columns;
   },
 });
 
@@ -213,7 +213,7 @@ const rows = computed(() => {
   }
   return list.data?.data;
 });
-const columns = computed(() => list.data?.columns);
+const columns = ref([]);
 
 function getGroupedByRows(listRows, groupByField) {
   let groupedRows = [];
@@ -382,20 +382,6 @@ provide("listViewActions", {
   addColumn,
   reload,
 });
-
-function toggleFilter(filter) {
-  const currentFilterColumns = Object.keys(defaultParams.filters);
-  const selectedFilter = Object.keys(filter)[0];
-  const isFilterApplied = currentFilterColumns.includes(selectedFilter);
-  if (!isFilterApplied) {
-    applyFilters(filter);
-  } else {
-    // remove filter
-    const newFilters = { ...defaultParams.filters };
-    delete newFilters[selectedFilter];
-    applyFilters(newFilters);
-  }
-}
 
 function applyFilters(filters) {
   defaultParams.filters = { ...filters };
