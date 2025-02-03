@@ -107,7 +107,7 @@
                     #target="{ togglePopover, selectedValue, displayValue }"
                   >
                     <Button
-                      class="flex w-full items-center justify-between rounded-l-none !text-gray-600"
+                      class="flex w-full items-center justify-between rounded-l-none !text-gray-600 text-xs"
                       size="md"
                       @click="togglePopover()"
                     >
