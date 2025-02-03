@@ -131,7 +131,6 @@ interface P {
     };
     hideViewControls?: boolean;
     selectable?: boolean;
-    statusMap?: Record<string, BadgeStatus>;
     view?: View;
     groupByActions?: Array<any>;
     showSelectBanner?: boolean;
@@ -259,17 +258,6 @@ function handleColumnConfig(column) {
   return column;
 }
 
-const statusMap: Record<string, BadgeStatus> = props.options
-  .statusMap as Record<string, BadgeStatus>;
-function handleStatusColor(status: "Published" | "Draft"): BadgeStatus {
-  if (!statusMap)
-    return {
-      label: status,
-      theme: "gray",
-    };
-  return statusMap[status];
-}
-
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   cache: ["DocField", props.options.doctype],
@@ -340,11 +328,6 @@ function listCell(column: any, row: any, item: any, idx: number) {
     return h(StarRating, {
       rating: item || 0,
       class: "truncate",
-    });
-  }
-  if (column.type === "status") {
-    return h(Badge, {
-      ...handleStatusColor(item),
     });
   }
   return h("span", {

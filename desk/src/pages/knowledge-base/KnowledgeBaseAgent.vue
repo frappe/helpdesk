@@ -45,6 +45,7 @@ import {
   confirmDialog,
   Dropdown,
   createResource,
+  Badge,
 } from "frappe-ui";
 import { useRouter } from "vue-router";
 import {
@@ -395,26 +396,19 @@ const options = computed(() => {
       label_doc: "HD Article Category",
       label_field: "category_name",
     },
-    statusMap: {
-      Published: {
-        label: "Published",
-        theme: "green",
-      },
-      Draft: {
-        label: "Draft",
-        theme: "orange",
-      },
-      Archived: {
-        label: "Archived",
-        theme: "gray",
-      },
-    },
     columnConfig: {
       title: {
         prefix: () => {
           return h(FeatherIcon, {
             name: "file-text",
             class: "h-4 w-4 flex-shrink-0 text-ink-gray-6",
+          });
+        },
+      },
+      status: {
+        custom: ({ item }) => {
+          return h(Badge, {
+            ...statusMap[item],
           });
         },
       },
@@ -425,6 +419,21 @@ const options = computed(() => {
     default_page_length: 100,
   };
 });
+
+const statusMap = {
+  Published: {
+    label: "Published",
+    theme: "green",
+  },
+  Draft: {
+    label: "Draft",
+    theme: "orange",
+  },
+  Archived: {
+    label: "Archived",
+    theme: "gray",
+  },
+};
 
 onMounted(() => {
   capture("kb_agent_page_viewed");
