@@ -78,10 +78,10 @@ const options = {
 };
 
 function handle_response_by_field(row: any, item: string) {
-  if (!row.first_responded_on) {
+  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
     return h(Badge, {
-      label: "Response Due",
-      theme: "orange",
+      label: "Failed",
+      theme: "red",
       variant: "outline",
     });
   }
@@ -140,5 +140,3 @@ const slaStatusColorMap = {
   Paused: "blue",
 };
 </script>
-
-<style scoped></style>

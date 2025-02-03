@@ -27,12 +27,12 @@
     :rows="rows"
     row-key="name"
     :options="{
-    selectable: props.options.selectable ?? true,
-    showTooltip: false,
-    resizeColumn: false,
-    onRowClick: (row: Object) => emit('rowClick', row['name']),
-    emptyState,
-  }"
+      selectable: props.options.selectable ?? true,
+      showTooltip: false,
+      resizeColumn: false,
+      onRowClick: () => {},
+      emptyState,
+    }"
   >
     <ListHeader class="sm:mx-5 mx-3">
       <ListHeaderItem
@@ -48,7 +48,11 @@
       :group-by-actions="props.options.groupByActions"
     >
       <ListRowItem :item="item" :column="column" :row="row">
-        <component :is="listCell(column, row, item, idx)" :key="column.key" />
+        <component
+          :is="listCell(column, row, item, idx)"
+          :key="column.key"
+          @click="(e) => handleFieldClick(e, column, row, item)"
+        />
       </ListRowItem>
     </ListRows>
     <ListSelectBanner v-if="props.options.showSelectBanner">
@@ -294,6 +298,19 @@ const sortableFields = createResource({
   },
 });
 
+const quickFilters = createResource({
+  url: "helpdesk.api.doc.get_quick_filters",
+  auto: !props.options.hideViewControls,
+  params: {
+    doctype: props.options.doctype,
+  },
+  transform: (data) => {
+    if (Boolean(data.length)) return;
+    data = [{ name: "name", label: "Name", fieldtype: "Data" }];
+    return data;
+  },
+});
+
 function listCell(column: any, row: any, item: any, idx: number) {
   const columnConfig = props.options.columnConfig;
   if (!columnConfig) return;
@@ -326,7 +343,9 @@ function listCell(column: any, row: any, item: any, idx: number) {
     });
   }
   if (column.type === "status") {
-    return h(Badge, handleStatusColor(item));
+    return h(Badge, {
+      ...handleStatusColor(item),
+    });
   }
   return h("span", {
     class: "truncate",
@@ -334,18 +353,27 @@ function listCell(column: any, row: any, item: any, idx: number) {
   });
 }
 
-const quickFilters = createResource({
-  url: "helpdesk.api.doc.get_quick_filters",
-  auto: !props.options.hideViewControls,
-  params: {
-    doctype: props.options.doctype,
-  },
-  transform: (data) => {
-    if (Boolean(data.length)) return;
-    data = [{ name: "name", label: "Name", fieldtype: "Data" }];
-    return data;
-  },
-});
+function handleFieldClick(e: MouseEvent, column, row, item) {
+  const noFilterFields = ["Data", "Datetime", "Rating", "Int", "Float"];
+  if (noFilterFields.includes(column.type)) {
+    emit("rowClick", row.name);
+    return;
+  }
+  if (column.type === "MultipleAvatar") {
+    if (item.length > 1) {
+      let target = e.target as HTMLElement;
+      target = target.closest(".user-avatar");
+      if (target) {
+        item = target.getAttribute("data-name");
+      }
+    } else {
+      item = item[0].name;
+    }
+    applyFilters({ ...defaultParams.filters, [column.key]: item });
+    return;
+  }
+  applyFilters({ ...defaultParams.filters, [column.key]: item });
+}
 
 const showViewControls = computed(() => {
   return (
@@ -372,9 +400,23 @@ provide("listViewActions", {
   reload,
 });
 
+function toggleFilter(filter) {
+  const currentFilterColumns = Object.keys(defaultParams.filters);
+  const selectedFilter = Object.keys(filter)[0];
+  const isFilterApplied = currentFilterColumns.includes(selectedFilter);
+  if (!isFilterApplied) {
+    applyFilters(filter);
+  } else {
+    // remove filter
+    const newFilters = { ...defaultParams.filters };
+    delete newFilters[selectedFilter];
+    applyFilters(newFilters);
+  }
+}
+
 function applyFilters(filters) {
   defaultParams.filters = { ...filters };
-  list.submit({ ...defaultParams, filters });
+  list.submit({ ...defaultParams });
 }
 
 function applySort(order_by: string) {
