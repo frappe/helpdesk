@@ -301,10 +301,8 @@ const quickFilters = createResource({
 
 function listCell(column: any, row: any, item: any, idx: number) {
   const columnConfig = props.options.columnConfig;
-  if (!columnConfig) return;
-  const customColumn = columnConfig[column.key] || {};
-  if (customColumn.hasOwnProperty("custom")) {
-    return customColumn.custom({ column, row, item, idx });
+  if (columnConfig && columnConfig[column.key]?.custom) {
+    return columnConfig[column.key]?.custom({ column, row, item, idx });
   }
   if (idx === 0) {
     return h("span", {
@@ -314,7 +312,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "truncate text-base",
+      class: "text-base",
       innerHTML: dayjs.tz(item).fromNow(),
     });
   }
