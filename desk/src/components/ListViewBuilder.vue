@@ -9,6 +9,7 @@
       <Reload @click="reload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
+      <ColumnSettings :hide-label="isMobileView" />
     </div>
     <div v-else class="flex justify-between items-center w-full">
       <Filter :default_filters="defaultParams.filters" />
@@ -111,6 +112,7 @@ import {
   SortBy,
   QuickFilters,
   Reload,
+  ColumnSettings,
 } from "@/components/view-controls";
 import { MultipleAvatar, StarRating } from "@/components";
 import { dayjs } from "@/dayjs";
@@ -118,6 +120,7 @@ import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
 import { View } from "@/types";
+import { watch } from "vue";
 
 interface P {
   options: {
@@ -173,6 +176,8 @@ const defaultParams = reactive({
   page_length: props.options.default_page_length,
   page_length_count: props.options.default_page_length,
   view: props.options.view,
+  columns: [],
+  rows: [],
 });
 
 const emptyState = computed(() => {
@@ -377,7 +382,7 @@ provide("listViewData", listViewData);
 provide("listViewActions", {
   applyFilters,
   applySort,
-  addColumn,
+  updateColumns,
   reload,
 });
 
@@ -391,8 +396,19 @@ function applySort(order_by: string) {
   list.submit({ ...defaultParams, order_by });
 }
 
-function addColumn(field) {
-  console.log("ADD COLUMN", field);
+function updateColumns(obj) {
+  const { columns: _columns, isDefault, reload, reset } = obj;
+  _columns?.forEach((column) => {
+    handleFetchFromField(column);
+    handleColumnConfig(column);
+    return column;
+  });
+  columns.value = _columns;
+  list.data.columns = _columns;
+  defaultParams.columns = _columns;
+  if (reload) {
+    list.reload({ ...defaultParams });
+  }
 }
 
 function reload() {
@@ -416,7 +432,7 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 
-// to handle cases where the list view is updated
+// to handle cases where the list view is updated from the parent component
 defineExpose({
   reload,
 });
