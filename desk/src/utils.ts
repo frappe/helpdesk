@@ -183,3 +183,7 @@ export function isContentEmpty(content: string) {
   const doc = parser.parseFromString(content, "text/html");
   return doc.body.textContent === "";
 }
+
+export function isTouchScreenDevice() {
+  return "ontouchstart" in document.documentElement;
+}

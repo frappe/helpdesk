@@ -9,6 +9,7 @@
       <Reload @click="reload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
+      <ColumnSettings :hide-label="isMobileView" />
     </div>
     <div v-else class="flex justify-between items-center w-full">
       <Filter :default_filters="defaultParams.filters" />
@@ -27,10 +28,10 @@
     :rows="rows"
     row-key="name"
     :options="{
-      selectable: props.options.selectable ?? true ,
-      showTooltip: true,
+      selectable: props.options.selectable ?? true,
+      showTooltip: false,
       resizeColumn: false,
-      onRowClick: (row: Object) => emit('rowClick', row['name']),
+      onRowClick: () => {},
       emptyState,
     }"
   >
@@ -47,21 +48,12 @@
       v-slot="{ idx, column, item, row }"
       :group-by-actions="props.options.groupByActions"
     >
-      <ListRowItem :item="item" :row="row" :column="column">
-        <!-- TODO: filters on click of other columns -->
-        <!-- and not on first column, it should emit the event -->
-        <div v-if="idx === 0" class="truncate">
-          {{ item }}
-        </div>
-        <div v-else-if="column.type === 'Datetime'">
-          {{ dayjs.tz(item).fromNow() }}
-        </div>
-        <div v-else-if="column.type === 'status'">
-          <Badge v-bind="handleStatusColor(item)" />
-        </div>
-        <div v-else class="truncate">
-          {{ item }}
-        </div>
+      <ListRowItem :item="item" :column="column" :row="row">
+        <component
+          :is="listCell(column, row, item, idx)"
+          :key="column.key"
+          @click="(e) => handleFieldClick(e, column, row, item)"
+        />
       </ListRowItem>
     </ListRows>
     <ListSelectBanner v-if="props.options.showSelectBanner">
@@ -102,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed, h } from "vue";
+import { reactive, provide, computed, h, ref } from "vue";
 import {
   createResource,
   ListView,
@@ -111,7 +103,6 @@ import {
   ListHeader,
   ListHeaderItem,
   ListSelectBanner,
-  Badge,
   FeatherIcon,
   Dropdown,
 } from "frappe-ui";
@@ -121,12 +112,15 @@ import {
   SortBy,
   QuickFilters,
   Reload,
+  ColumnSettings,
 } from "@/components/view-controls";
+import { MultipleAvatar, StarRating } from "@/components";
 import { dayjs } from "@/dayjs";
 import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
-import { BadgeStatus, View } from "@/types";
+import { View } from "@/types";
+import { watch } from "vue";
 
 interface P {
   options: {
@@ -139,7 +133,6 @@ interface P {
     };
     hideViewControls?: boolean;
     selectable?: boolean;
-    statusMap?: Record<string, BadgeStatus>;
     view?: View;
     groupByActions?: Array<any>;
     showSelectBanner?: boolean;
@@ -183,6 +176,8 @@ const defaultParams = reactive({
   page_length: props.options.default_page_length,
   page_length_count: props.options.default_page_length,
   view: props.options.view,
+  columns: [],
+  rows: [],
 });
 
 const emptyState = computed(() => {
@@ -209,8 +204,9 @@ const list = createResource({
     });
     return data;
   },
-  onSuccess: () => {
+  onSuccess: (data) => {
     list.params = defaultParams;
+    columns.value = data.columns;
   },
 });
 
@@ -222,7 +218,7 @@ const rows = computed(() => {
   }
   return list.data?.data;
 });
-const columns = computed(() => list.data?.columns);
+const columns = ref([]);
 
 function getGroupedByRows(listRows, groupByField) {
   let groupedRows = [];
@@ -267,17 +263,6 @@ function handleColumnConfig(column) {
   return column;
 }
 
-const statusMap: Record<string, BadgeStatus> = props.options
-  .statusMap as Record<string, BadgeStatus>;
-function handleStatusColor(status: "Published" | "Draft"): BadgeStatus {
-  if (!statusMap)
-    return {
-      label: status,
-      theme: "gray",
-    };
-  return statusMap[status];
-}
-
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
   cache: ["DocField", props.options.doctype],
@@ -319,6 +304,63 @@ const quickFilters = createResource({
   },
 });
 
+function listCell(column: any, row: any, item: any, idx: number) {
+  const columnConfig = props.options.columnConfig;
+  if (columnConfig && columnConfig[column.key]?.custom) {
+    return columnConfig[column.key]?.custom({ column, row, item, idx });
+  }
+  if (idx === 0) {
+    return h("span", {
+      class: "truncate text-base text-ink-gray-6",
+      innerHTML: item,
+    });
+  }
+  if (column.type === "Datetime") {
+    return h("span", {
+      class: "text-base",
+      innerHTML: dayjs.tz(item).fromNow(),
+    });
+  }
+  if (column.type === "MultipleAvatar") {
+    return h(MultipleAvatar, {
+      avatars: item,
+      class: "flex items-center",
+    });
+  }
+  if (column.type === "Rating") {
+    return h(StarRating, {
+      rating: item || 0,
+      class: "truncate",
+    });
+  }
+  return h("span", {
+    class: "truncate",
+    innerHTML: item,
+  });
+}
+
+function handleFieldClick(e: MouseEvent, column, row, item) {
+  const noFilterFields = ["Data", "Datetime", "Rating", "Int", "Float"];
+  if (noFilterFields.includes(column.type)) {
+    emit("rowClick", row.name);
+    return;
+  }
+  if (column.type === "MultipleAvatar") {
+    if (item.length > 1) {
+      let target = e.target as HTMLElement;
+      target = target.closest(".user-avatar");
+      if (target) {
+        item = target.getAttribute("data-name");
+      }
+    } else {
+      item = item[0].name;
+    }
+    applyFilters({ ...defaultParams.filters, [column.key]: item });
+    return;
+  }
+  applyFilters({ ...defaultParams.filters, [column.key]: item });
+}
+
 const showViewControls = computed(() => {
   return (
     !props.options.hideViewControls &&
@@ -340,13 +382,13 @@ provide("listViewData", listViewData);
 provide("listViewActions", {
   applyFilters,
   applySort,
-  addColumn,
+  updateColumns,
   reload,
 });
 
 function applyFilters(filters) {
   defaultParams.filters = { ...filters };
-  list.submit({ ...defaultParams, filters });
+  list.submit({ ...defaultParams });
 }
 
 function applySort(order_by: string) {
@@ -354,8 +396,20 @@ function applySort(order_by: string) {
   list.submit({ ...defaultParams, order_by });
 }
 
-function addColumn(field) {
-  console.log("ADD COLUMN", field);
+function updateColumns(obj) {
+  const { columns: _columns, isDefault, reload, reset } = obj;
+  _columns?.forEach((column) => {
+    handleFetchFromField(column);
+    handleColumnConfig(column);
+    return column;
+  });
+  columns.value =
+    list.data.columns =
+    defaultParams.columns =
+      isDefault ? "" : obj.columns;
+  if (reload) {
+    list.reload({ ...defaultParams });
+  }
 }
 
 function reload() {
@@ -379,7 +433,7 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 
-// to handle cases where the list view is updated
+// to handle cases where the list view is updated from the parent component
 defineExpose({
   reload,
 });

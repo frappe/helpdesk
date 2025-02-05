@@ -126,6 +126,11 @@ const routes = [
         component: () => import("@/pages/Tickets.vue"),
       },
       {
+        path: "tickets2",
+        name: "Tickets2",
+        component: () => import("@/pages/ticket/Tickets2.vue"),
+      },
+      {
         path: "notifications",
         name: "Notifications",
         component: () => import("@/pages/MobileNotifications.vue"),
