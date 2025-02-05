@@ -171,7 +171,7 @@ const groupByActions = [
 ];
 
 const listSelections = ref(new Set());
-const showSelectBanner = ref(true);
+const showSelectBanner = true;
 const selectBannerActions = [
   {
     label: "Move To",
@@ -414,7 +414,7 @@ const options = computed(() => {
       },
     },
     groupByActions,
-    showSelectBanner: showSelectBanner.value,
+    showSelectBanner: showSelectBanner,
     selectBannerActions,
     default_page_length: 100,
   };

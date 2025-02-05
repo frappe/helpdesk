@@ -25,6 +25,7 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
         "Small Text",
         "Text Editor",
         "Text",
+        "Rating",
     ]
 
     visible_custom_fields = get_visible_custom_fields()

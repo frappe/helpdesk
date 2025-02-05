@@ -815,7 +815,7 @@ class HDTicket(Document):
             {
                 "label": "Rating",
                 "type": "Rating",
-                "key": "rating",
+                "key": "feedback_rating",
                 "width": "10rem",
             },
             {

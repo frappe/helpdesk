@@ -75,6 +75,7 @@ const options = {
       custom: ({ row, item }) => handle_resolution_by_field(row, item),
     },
   },
+  isCustomerPortal: isCustomerPortal.value,
 };
 
 function handle_response_by_field(row: any, item: string) {

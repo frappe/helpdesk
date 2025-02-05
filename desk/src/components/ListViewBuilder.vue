@@ -48,12 +48,13 @@
       v-slot="{ idx, column, item, row }"
       :group-by-actions="props.options.groupByActions"
     >
-      <ListRowItem :item="item" :column="column" :row="row">
-        <component
-          :is="listCell(column, row, item, idx)"
-          :key="column.key"
-          @click="(e) => handleFieldClick(e, column, row, item)"
-        />
+      <ListRowItem
+        :item="item"
+        :column="column"
+        :row="row"
+        @click="(e) => handleFieldClick(e, column, row, item)"
+      >
+        <component :is="listCell(column, row, item, idx)" :key="column.key" />
       </ListRowItem>
     </ListRows>
     <ListSelectBanner v-if="props.options.showSelectBanner">
@@ -120,7 +121,6 @@ import ListRows from "./ListRows.vue";
 import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
 import { View } from "@/types";
-import { watch } from "vue";
 
 interface P {
   options: {
@@ -138,6 +138,7 @@ interface P {
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;
     default_page_length?: number;
+    isCustomerPortal?: boolean;
   };
 }
 
@@ -158,6 +159,7 @@ const props = withDefaults(defineProps<P>(), {
       },
       groupByActions: [],
       default_page_length: 20,
+      isCustomerPortal: false,
     };
   },
 });
@@ -177,7 +179,7 @@ const defaultParams = reactive({
   page_length_count: props.options.default_page_length,
   view: props.options.view,
   columns: [],
-  rows: [],
+  show_customer_portal_fields: props.options.isCustomerPortal,
 });
 
 const emptyState = computed(() => {
@@ -202,6 +204,16 @@ const list = createResource({
       handleFetchFromField(column);
       handleColumnConfig(column);
     });
+    if (props.options.doctype === "HD Ticket") {
+      data.data.forEach((row) => {
+        if (
+          defaultParams.show_customer_portal_fields &&
+          row.status === "Replied"
+        ) {
+          row.status = "Awaiting Response";
+        }
+      });
+    }
     return data;
   },
   onSuccess: (data) => {
@@ -270,6 +282,7 @@ const filterableFields = createResource({
   params: {
     doctype: props.options.doctype,
     append_assign: true,
+    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     data = data.map((field) => {
@@ -288,6 +301,7 @@ const sortableFields = createResource({
   auto: !props.options.hideViewControls,
   params: {
     doctype: props.options.doctype,
+    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
 });
 
@@ -340,6 +354,9 @@ function listCell(column: any, row: any, item: any, idx: number) {
 }
 
 function handleFieldClick(e: MouseEvent, column, row, item) {
+  if (item == "Awaiting Response") {
+    item = "Replied";
+  }
   const noFilterFields = ["Data", "Datetime", "Rating", "Int", "Float"];
   if (noFilterFields.includes(column.type)) {
     emit("rowClick", row.name);

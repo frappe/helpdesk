@@ -68,7 +68,7 @@ const routes = [
           {
             path: "",
             name: "TicketsCustomer",
-            component: () => import("@/pages/Tickets.vue"),
+            component: () => import("@/pages/ticket/Tickets2.vue"),
           },
           {
             path: "new/:templateId?",
