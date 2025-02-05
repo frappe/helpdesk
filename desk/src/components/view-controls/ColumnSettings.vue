@@ -296,7 +296,7 @@ watchOnce(
     if (!val) return;
     oldValues.value.columns = JSON.parse(JSON.stringify(val.columns));
     oldValues.value.rows = JSON.parse(JSON.stringify(val.data));
-    oldValues.value.isDefault = val.is_default;
+    oldValues.value.isDefault = val.is_default ?? false;
   }
 );
 </script>

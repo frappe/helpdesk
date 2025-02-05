@@ -403,9 +403,10 @@ function updateColumns(obj) {
     handleColumnConfig(column);
     return column;
   });
-  columns.value = _columns;
-  list.data.columns = _columns;
-  defaultParams.columns = _columns;
+  columns.value =
+    list.data.columns =
+    defaultParams.columns =
+      isDefault ? "" : obj.columns;
   if (reload) {
     list.reload({ ...defaultParams });
   }

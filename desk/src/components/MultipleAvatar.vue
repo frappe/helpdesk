@@ -57,9 +57,9 @@ const _avatars = computed(() => {
     result = props.avatars;
   }
   if (!result) return;
-  // if (typeof result === "object") {
-  //   return;
-  // }
+  if (result[0].hasOwnProperty("name")) {
+    return result;
+  }
   result = result.map((a: string) => {
     let _user = getUser(a);
     return {
