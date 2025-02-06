@@ -139,6 +139,7 @@ const options = {
     },
   },
   isCustomerPortal: isCustomerPortal.value,
+  selectable: true,
   showSelectBanner: true,
   selectBannerActions,
   emptyState: {
@@ -147,6 +148,7 @@ const options = {
       class: "h-10 w-10",
     }),
   },
+  hideColumnSetting: false,
 };
 
 function handle_response_by_field(row: any, item: string) {

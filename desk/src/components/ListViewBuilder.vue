@@ -9,7 +9,10 @@
       <Reload @click="reload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
-      <ColumnSettings :hide-label="isMobileView" />
+      <ColumnSettings
+        :hide-label="isMobileView"
+        v-if="!options.hideColumnSetting"
+      />
     </div>
     <div v-else class="flex justify-between items-center w-full">
       <Filter :default_filters="defaultParams.filters" />
@@ -28,7 +31,7 @@
     :rows="rows"
     row-key="name"
     :options="{
-      selectable: props.options.selectable ?? true,
+      selectable: options.selectable,
       showTooltip: false,
       resizeColumn: false,
       onRowClick: () => {},
@@ -46,7 +49,7 @@
     <ListRows
       :rows="rows"
       v-slot="{ idx, column, item, row }"
-      :group-by-actions="props.options.groupByActions"
+      :group-by-actions="options.groupByActions"
     >
       <ListRowItem
         :item="item"
@@ -57,7 +60,7 @@
         <component :is="listCell(column, row, item, idx)" :key="column.key" />
       </ListRowItem>
     </ListRows>
-    <ListSelectBanner v-if="props.options.showSelectBanner">
+    <ListSelectBanner v-if="options.showSelectBanner">
       <template #actions="{ selections, unselectAll }">
         <Dropdown :options="selectBannerOptions(selections, unselectAll)">
           <Button icon="more-horizontal" variant="ghost" />
@@ -134,6 +137,7 @@ interface P {
       title: string;
     };
     hideViewControls?: boolean;
+    hideColumnSetting?: boolean;
     selectable?: boolean;
     view?: View;
     groupByActions?: Array<any>;
@@ -149,43 +153,51 @@ interface E {
   (event: "rowClick", row: any): void;
 }
 
-const props = withDefaults(defineProps<P>(), {
-  options: () => {
-    return {
-      doctype: "",
-      hideViewControls: false,
-      selectable: true,
-      view: {
-        view_type: "list",
-        group_by_field: "owner",
-      },
-      groupByActions: [],
-      default_page_length: 20,
-      isCustomerPortal: false,
-    };
+const defaultOptions = {
+  doctype: "",
+  hideViewControls: false,
+  selectable: false,
+  view: {
+    view_type: "list",
+    group_by_field: "owner",
   },
-});
+  groupByActions: [],
+  default_page_length: 20,
+  isCustomerPortal: false,
+  hideColumnSetting: true,
+};
+
+const props = defineProps<P>();
 
 const emit = defineEmits<E>();
+
+const options = computed(() => {
+  return {
+    ...defaultOptions,
+    ...props.options,
+  };
+});
+
 const { isMobileView } = useScreenSize();
+
 const defaultEmptyState = {
   icon: "",
   title: "No Data Found",
 };
 
 const defaultParams = reactive({
-  doctype: props.options.doctype,
-  filters: props.options.defaultFilters || {},
+  doctype: options.value.doctype,
+  filters: options.value.defaultFilters || {},
   order_by: "modified desc",
-  page_length: props.options.default_page_length,
-  page_length_count: props.options.default_page_length,
-  view: props.options.view,
+  page_length: options.value.default_page_length,
+  page_length_count: options.value.default_page_length,
+  view: options.value.view,
   columns: [],
-  show_customer_portal_fields: props.options.isCustomerPortal,
+  show_customer_portal_fields: options.value.isCustomerPortal,
 });
 
 const emptyState = computed(() => {
-  return props.options?.emptyState || defaultEmptyState;
+  return options.value?.emptyState || defaultEmptyState;
 });
 
 const list = createResource({
@@ -197,7 +209,7 @@ const list = createResource({
       handleFetchFromField(column);
       handleColumnConfig(column);
     });
-    if (props.options.doctype === "HD Ticket") {
+    if (options.value.doctype === "HD Ticket") {
       data.data.forEach((row) => {
         if (
           defaultParams.show_customer_portal_fields &&
@@ -221,7 +233,7 @@ const exposeFunctions = {
 };
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
   exposeFunctions["unselectAll"] = unselectAll;
-  return props.options.selectBannerActions.map((action) => {
+  return options.value.selectBannerActions.map((action) => {
     return {
       ...action,
       onClick: () => action.onClick(selections),
@@ -274,8 +286,8 @@ function handleFetchFromField(column) {
 }
 
 function handleColumnConfig(column) {
-  if (!props.options?.columnConfig) return column;
-  const columnConfig = props.options.columnConfig;
+  if (!options.value?.columnConfig) return column;
+  const columnConfig = options.value.columnConfig;
   if (!columnConfig.hasOwnProperty(column.key)) return column;
   column.prefix = columnConfig[column.key]?.prefix;
 
@@ -284,10 +296,10 @@ function handleColumnConfig(column) {
 
 const filterableFields = createResource({
   url: "helpdesk.api.doc.get_filterable_fields",
-  cache: ["DocField", props.options.doctype],
-  auto: !props.options.hideViewControls,
+  cache: ["DocField", options.value.doctype],
+  auto: !options.value.hideViewControls,
   params: {
-    doctype: props.options.doctype,
+    doctype: options.value.doctype,
     append_assign: true,
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
@@ -305,18 +317,18 @@ const filterableFields = createResource({
 
 const sortableFields = createResource({
   url: "helpdesk.api.doc.sort_options",
-  auto: !props.options.hideViewControls,
+  auto: !options.value.hideViewControls,
   params: {
-    doctype: props.options.doctype,
+    doctype: options.value.doctype,
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
 });
 
 const quickFilters = createResource({
   url: "helpdesk.api.doc.get_quick_filters",
-  auto: !props.options.hideViewControls,
+  auto: !options.value.hideViewControls,
   params: {
-    doctype: props.options.doctype,
+    doctype: options.value.doctype,
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
@@ -326,7 +338,7 @@ const quickFilters = createResource({
 });
 
 function listCell(column: any, row: any, item: any, idx: number) {
-  const columnConfig = props.options.columnConfig;
+  const columnConfig = options.value.columnConfig;
   if (columnConfig && columnConfig[column.key]?.custom) {
     return columnConfig[column.key]?.custom({ column, row, item, idx });
   }
@@ -387,7 +399,7 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
 
 const showViewControls = computed(() => {
   return (
-    !props.options.hideViewControls &&
+    !options.value.hideViewControls &&
     filterableFields.data &&
     sortableFields.data &&
     quickFilters.data

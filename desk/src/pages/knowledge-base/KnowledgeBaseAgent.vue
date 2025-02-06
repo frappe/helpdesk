@@ -390,6 +390,7 @@ function resetState() {
 const options = computed(() => {
   return {
     doctype: "HD Article",
+    selectable: true,
     view: {
       view_type: "group_by",
       group_by_field: "category",
