@@ -228,6 +228,9 @@ function addColumn(c) {
 }
 
 function removeColumn(c) {
+  if (columns.value.length === 1) {
+    return;
+  }
   columns.value = columns.value.filter((column) => column.key !== c.key);
   if (c.key !== "name") {
     rows.value = rows.value.filter((row) => row !== c.key);
