@@ -100,6 +100,7 @@ export interface Ticket {
   history: Activity[];
   template: Template;
   views: ViewLog[];
+  _customActions: Function[];
 }
 
 export interface DocField {
