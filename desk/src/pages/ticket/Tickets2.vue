@@ -19,6 +19,12 @@
     <ListViewBuilder
       ref="listViewRef"
       :options="options"
+      @empty-state-action="
+        () =>
+          $router.push({
+            name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
+          })
+      "
       @row-click="
         (row) =>
           $router.push({
@@ -29,7 +35,7 @@
     />
     <ExportModal
       v-model="showExportModal"
-      :rowCount="$refs.listViewRef?.list?.data?.total_count"
+      :rowCount="$refs.listViewRef?.list?.data?.total_count ?? 0"
       @update="
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
@@ -47,6 +53,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { dayjs } from "@/dayjs";
 import { createToast, isCustomerPortal } from "@/utils";
 import { capture } from "@/telemetry";
+import { TicketIcon } from "@/components/icons";
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -134,6 +141,12 @@ const options = {
   isCustomerPortal: isCustomerPortal.value,
   showSelectBanner: true,
   selectBannerActions,
+  emptyState: {
+    title: "No Tickets Found",
+    icon: h(TicketIcon, {
+      class: "h-10 w-10",
+    }),
+  },
 };
 
 function handle_response_by_field(row: any, item: string) {

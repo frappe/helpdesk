@@ -90,12 +90,13 @@
   <EmptyState
     v-else
     :title="emptyState.title"
+    :icon="emptyState.icon"
     @emptyStateAction="emit('emptyStateAction')"
   />
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed, h, ref } from "vue";
+import { reactive, provide, computed, h, ref, VNode } from "vue";
 import {
   createResource,
   ListView,
@@ -128,7 +129,8 @@ interface P {
     defaultFilters?: Record<string, any>;
     columnConfig?: Record<string, any>;
     emptyState?: {
-      icon?: HTMLElement | string;
+      // type of a h componnt
+      icon?: string | VNode;
       title: string;
     };
     hideViewControls?: boolean;
