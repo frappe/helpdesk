@@ -58,8 +58,8 @@
       </ListRowItem>
     </ListRows>
     <ListSelectBanner v-if="props.options.showSelectBanner">
-      <template #actions="{ selections }">
-        <Dropdown :options="selectBannerOptions(selections)">
+      <template #actions="{ selections, unselectAll }">
+        <Dropdown :options="selectBannerOptions(selections, unselectAll)">
           <Button icon="more-horizontal" variant="ghost" />
         </Dropdown>
       </template>
@@ -186,15 +186,6 @@ const emptyState = computed(() => {
   return props.options?.emptyState || defaultEmptyState;
 });
 
-function selectBannerOptions(selections: Set<string>) {
-  return props.options.selectBannerActions.map((action) => {
-    return {
-      ...action,
-      onClick: () => action.onClick(selections),
-    };
-  });
-}
-
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",
   params: defaultParams,
@@ -221,6 +212,20 @@ const list = createResource({
     columns.value = data.columns;
   },
 });
+
+const exposeFunctions = {
+  list,
+  reload,
+};
+function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
+  exposeFunctions["unselectAll"] = unselectAll;
+  return props.options.selectBannerActions.map((action) => {
+    return {
+      ...action,
+      onClick: () => action.onClick(selections),
+    };
+  });
+}
 
 const rows = computed(() => {
   if (!list.data?.data) return [];
@@ -451,7 +456,5 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 // to handle cases where the list view is updated from the parent component
-defineExpose({
-  reload,
-});
+defineExpose(exposeFunctions);
 </script>

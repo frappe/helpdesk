@@ -145,7 +145,6 @@ const groupByActions = [
     label: "Merge",
     icon: LucideMerge,
     onClick: (groupedRow) => {
-      console.log(groupedRow);
       mergeModal.value = true;
       category.title = groupedRow.group.label;
       category.id = groupedRow.group.value;
@@ -171,13 +170,12 @@ const groupByActions = [
 ];
 
 const listSelections = ref(new Set());
-const showSelectBanner = true;
 const selectBannerActions = [
   {
     label: "Move To",
     icon: "corner-up-right",
     onClick: (selections: Set<string>) => {
-      listSelections.value = selections;
+      listSelections.value = new Set(selections);
       moveToModal.value = true;
     },
   },
@@ -206,8 +204,9 @@ function handleMoveToCategory(category: string) {
     },
     {
       onSuccess: () => {
-        listViewRef.value.reload();
         moveToModal.value = false;
+        listViewRef.value.reload();
+        listViewRef.value?.unselectAll();
         listSelections.value.clear();
         createToast({
           title: "Articles moved successfully",
@@ -342,6 +341,7 @@ function handleDeleteArticles() {
     {
       onSuccess: () => {
         listViewRef.value.reload();
+        listViewRef.value?.unselectAll();
         listSelections.value.clear();
         createToast({
           title: "Articles deleted successfully",
@@ -414,7 +414,7 @@ const options = computed(() => {
       },
     },
     groupByActions,
-    showSelectBanner: showSelectBanner,
+    showSelectBanner: true,
     selectBannerActions,
     default_page_length: 100,
   };

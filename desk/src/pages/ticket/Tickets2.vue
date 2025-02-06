@@ -17,6 +17,7 @@
       </template>
     </LayoutHeader>
     <ListViewBuilder
+      ref="listViewRef"
       :options="options"
       @row-click="
         (row) =>
@@ -26,17 +27,29 @@
           })
       "
     />
+    <ExportModal
+      v-model="showExportModal"
+      :rowCount="$refs.listViewRef?.list?.data?.total_count"
+      @update="
+        ({ export_type, export_all }) => exportRows(export_type, export_all)
+      "
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { h } from "vue";
-import { Breadcrumbs, Badge, Tooltip } from "frappe-ui";
-import { dayjs } from "@/dayjs";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { LayoutHeader, ListViewBuilder } from "@/components";
+import { h, ref } from "vue";
+import { Breadcrumbs, Badge, Tooltip, confirmDialog, call } from "frappe-ui";
 import { IndicatorIcon } from "@/components/icons";
-import { isCustomerPortal } from "@/utils";
+import { LayoutHeader, ListViewBuilder } from "@/components";
+import ExportModal from "@/components/ticket/ExportModal.vue";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { dayjs } from "@/dayjs";
+import { createToast, isCustomerPortal } from "@/utils";
+import { capture } from "@/telemetry";
+
+const listViewRef = ref(null);
+const showExportModal = ref(false);
 
 const { textColorMap } = useTicketStatusStore();
 
@@ -48,6 +61,49 @@ const breadcrumbs = [
     },
   },
 ];
+const listSelections = ref(new Set());
+const selectBannerActions = [
+  {
+    label: "Export",
+    icon: "download",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showExportModal.value = true;
+    },
+  },
+  {
+    label: "Delete",
+    icon: "trash-2",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      confirmDialog({
+        title: "Delete Ticket(s)?",
+        message: `Are you sure you want to delete these these?`,
+        onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+          hideDialog();
+          handleTicketDelete(hideDialog);
+        },
+      });
+    },
+    condition: () => !isCustomerPortal.value,
+  },
+];
+
+function handleTicketDelete(hide: Function) {
+  capture("bulk_delete");
+  call("frappe.desk.reportview.delete_items", {
+    items: JSON.stringify(Array.from(listSelections.value)),
+    doctype: "HD Ticket",
+  }).then(() => {
+    createToast({
+      title: "Deleted successfully",
+      icon: "check",
+      iconClasses: "text-ink-green-3",
+    });
+    hide();
+    reset(true);
+  });
+}
 
 const options = {
   doctype: "HD Ticket",
@@ -76,6 +132,8 @@ const options = {
     },
   },
   isCustomerPortal: isCustomerPortal.value,
+  showSelectBanner: true,
+  selectBannerActions,
 };
 
 function handle_response_by_field(row: any, item: string) {
@@ -131,6 +189,39 @@ function handle_resolution_by_field(row: any, item: string) {
       () => dayjs.tz(item).fromNow()
     );
   }
+}
+
+async function exportRows(
+  export_type: "CSV" | "Excel" = "Excel",
+  export_all: boolean = false
+) {
+  const list = listViewRef.value?.list;
+  if (!list) return;
+
+  const fields = JSON.stringify(list.data.columns.map((f) => f.key));
+  const order_by = list.params.order_by;
+
+  let filters = list.params.filters;
+  let pageLength: number;
+
+  if (export_all) {
+    filters = JSON.stringify(filters);
+    pageLength = list.data.total_count;
+  } else {
+    pageLength = listSelections.value.size;
+    filters["name"] = ["in", Array.from(listSelections.value)];
+    filters = JSON.stringify(filters);
+  }
+
+  window.location.href = `/api/method/frappe.desk.reportview.export_query?file_format_type=${export_type}&title=HD Ticket&doctype=HD Ticket&fields=${fields}&filters=${filters}&order_by=${order_by}&page_length=${pageLength}&start=0&view=Report&with_comment_count=1`;
+  reset();
+  showExportModal.value = false;
+}
+
+function reset(reload = false) {
+  listViewRef.value?.unselectAll();
+  listSelections.value?.clear();
+  if (reload) listViewRef.value.reload();
 }
 
 const slaStatusColorMap = {
