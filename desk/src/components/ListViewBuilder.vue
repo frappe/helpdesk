@@ -111,7 +111,6 @@ import {
   FeatherIcon,
   Dropdown,
 } from "frappe-ui";
-
 import {
   Filter,
   SortBy,
@@ -120,10 +119,10 @@ import {
   ColumnSettings,
 } from "@/components/view-controls";
 import { MultipleAvatar, StarRating } from "@/components";
-import { dayjs } from "@/dayjs";
 import ListRows from "./ListRows.vue";
-import { useScreenSize } from "@/composables/screen";
 import EmptyState from "./EmptyState.vue";
+import { useScreenSize } from "@/composables/screen";
+import { dayjs } from "@/dayjs";
 import { View } from "@/types";
 
 interface P {
@@ -152,6 +151,8 @@ interface E {
   (event: "emptyStateAction"): void;
   (event: "rowClick", row: any): void;
 }
+const props = defineProps<P>();
+const emit = defineEmits<E>();
 
 const defaultOptions = {
   doctype: "",
@@ -166,10 +167,6 @@ const defaultOptions = {
   isCustomerPortal: false,
   hideColumnSetting: true,
 };
-
-const props = defineProps<P>();
-
-const emit = defineEmits<E>();
 
 const options = computed(() => {
   return {
@@ -437,15 +434,12 @@ function updateColumns(obj) {
   _columns?.forEach((column) => {
     handleFetchFromField(column);
     handleColumnConfig(column);
-    return column;
   });
   columns.value =
     list.data.columns =
     defaultParams.columns =
-      isDefault ? "" : obj.columns;
-  if (reload) {
-    list.reload({ ...defaultParams });
-  }
+      isDefault ? "" : _columns;
+  list.reload({ ...defaultParams });
 }
 
 function reload() {
@@ -469,6 +463,5 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 
-// to handle cases where the list view is updated from the parent component
 defineExpose(exposeFunctions);
 </script>

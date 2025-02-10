@@ -196,15 +196,16 @@ const columns = computed({
 });
 
 const rows = computed({
-  get: () => list.data?.data,
+  get: () => list.data?.rows,
   set: (val) => {
-    list.data.data = val;
+    list.data.rows = val;
   },
 });
 
 const fields = computed(() => {
   let allFields = list.data?.fields;
   if (!allFields) return [];
+  if (columns.value === "") return allFields;
   return allFields.filter((field) => {
     return !columns.value.find((column) => column.key === field.value);
   });
@@ -269,7 +270,7 @@ function reset(close) {
 }
 
 function resetToDefault(close) {
-  apply(true, true);
+  apply(true, true, true);
   close();
 }
 
@@ -284,13 +285,7 @@ function apply(reload = false, isDefault = false, reset = false) {
     reset,
   };
   listViewActions.updateColumns(obj);
-
-  if (reload) {
-    setTimeout(() => {
-      is_default.value = reset ? oldValues.value.isDefault : isDefault;
-      columnsUpdated.value = !reset;
-    }, 100);
-  }
+  columnsUpdated.value = !reset;
 }
 
 watchOnce(
@@ -298,7 +293,7 @@ watchOnce(
   (val) => {
     if (!val) return;
     oldValues.value.columns = JSON.parse(JSON.stringify(val.columns));
-    oldValues.value.rows = JSON.parse(JSON.stringify(val.data));
+    oldValues.value.rows = JSON.parse(JSON.stringify(val.rows));
     oldValues.value.isDefault = val.is_default ?? false;
   }
 );

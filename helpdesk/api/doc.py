@@ -129,6 +129,9 @@ def get_list_data(
     view=None,
 ):
     is_default = True
+    rows = frappe.parse_json(rows or "[]")
+    columns = frappe.parse_json(columns or "[]")
+
     view_type = view.get("view_type") if view else None
     group_by_field = view.get("group_by_field") if view else None
     label_doc = view.get("label_doc") if view else None
@@ -136,8 +139,8 @@ def get_list_data(
 
     if columns or rows:
         is_default = False
-        columns = frappe.parse_json(columns)
-        rows = frappe.parse_json(rows)
+        columns = frappe.parse_json(columns or "[]")
+        rows = frappe.parse_json(rows or "[]")
 
     if not columns:
         columns = [
@@ -293,6 +296,7 @@ def get_list_data(
     return {
         "data": data,
         "columns": columns,
+        "rows": rows,
         "fields": fields if doctype == "HD Ticket" else [],
         "total_count": frappe.get_list(
             doctype, filters=filters, fields="count(*) as count"

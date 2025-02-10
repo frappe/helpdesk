@@ -216,7 +216,7 @@ async function exportRows(
   const fields = JSON.stringify(list.data.columns.map((f) => f.key));
   const order_by = list.params.order_by;
 
-  let filters = list.params.filters;
+  let filters = { ...list.params.filters };
   let pageLength: number;
 
   if (export_all) {
