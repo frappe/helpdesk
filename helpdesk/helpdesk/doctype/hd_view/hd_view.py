@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class HDViewSettings(Document):
+class HDView(Document):
     pass

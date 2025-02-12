@@ -259,6 +259,23 @@ export interface Category {
 }
 
 export interface View {
+  dt: string;
+  type: string;
+  filters: string;
+  order_by: string;
+  columns: string;
+  rows: string;
+  route_name: string;
+  user?: string;
+  icon?: string;
+  label?: string;
+  is_default?: boolean;
+  pinned?: boolean;
+  public?: boolean;
+  group_by_field?: string;
+}
+
+export interface ViewType {
   view_type: string;
   group_by_field: string;
 }

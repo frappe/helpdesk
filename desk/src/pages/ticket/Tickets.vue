@@ -2,7 +2,12 @@
   <div>
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <ViewBreadcrumbs
+          :options="dropdownOptions"
+          :route-name="isCustomerPortal ? 'TicketsCustomer ' : 'TicketsAgent'"
+          label="Tickets"
+          :current-view="currentView"
+        />
       </template>
       <template #right-header>
         <RouterLink
@@ -49,11 +54,14 @@ import { Breadcrumbs, Badge, Tooltip, confirmDialog, call } from "frappe-ui";
 import { IndicatorIcon } from "@/components/icons";
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import ExportModal from "@/components/ticket/ExportModal.vue";
+import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { dayjs } from "@/dayjs";
 import { createToast, isCustomerPortal } from "@/utils";
 import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
+import useView from "@/composables/useView";
+import { View } from "@/types";
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -246,4 +254,49 @@ const slaStatusColorMap = {
   "First Response Due": "orange",
   Paused: "blue",
 };
+
+const currentView = ref({
+  label: "List View",
+  icon: "lucide:align-justify",
+});
+
+const { getViews, createView } = useView("HD Ticket");
+
+const dropdownOptions = [
+  // {
+  //   group: "Default Views",
+  //   hideLabel: true,
+  //   items: [
+  //     {
+  //       label: "List View",
+  //       icon: "user",
+  //     },
+  //   ],
+  // },
+  {
+    label: "Create View",
+    icon: "plus",
+    onClick: () => {
+      const view: View = {
+        dt: "HD Ticket",
+        type: "list",
+        label: "List View",
+        route_name: "TicketsAgent",
+        order_by: listViewRef.value?.list?.params.order_by,
+        filters: JSON.stringify(listViewRef.value?.list?.params.filters),
+        columns: JSON.stringify(listViewRef.value?.list?.params.columns),
+        rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
+      };
+      createView(view);
+    },
+  },
+  {
+    label: "Get View",
+    icon: "plus",
+    onClick: async () => {
+      const views = await getViews();
+      console.log(views);
+    },
+  },
+];
 </script>

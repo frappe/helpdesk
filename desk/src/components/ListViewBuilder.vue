@@ -123,7 +123,7 @@ import ListRows from "./ListRows.vue";
 import EmptyState from "./EmptyState.vue";
 import { useScreenSize } from "@/composables/screen";
 import { dayjs } from "@/dayjs";
-import { View } from "@/types";
+import { ViewType } from "@/types";
 
 interface P {
   options: {
@@ -138,7 +138,7 @@ interface P {
     hideViewControls?: boolean;
     hideColumnSetting?: boolean;
     selectable?: boolean;
-    view?: View;
+    view?: ViewType;
     groupByActions?: Array<any>;
     showSelectBanner?: boolean;
     selectBannerActions?: Record<string, any>;

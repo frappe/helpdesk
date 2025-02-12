@@ -11,18 +11,18 @@ EXTRA_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
-class UnitTestHDViewSettings(UnitTestCase):
+class UnitTestHDView(UnitTestCase):
     """
-    Unit tests for HDViewSettings.
+    Unit tests for HDView.
     Use this class for testing individual functions and methods.
     """
 
     pass
 
 
-class IntegrationTestHDViewSettings(IntegrationTestCase):
+class IntegrationTestHDView(IntegrationTestCase):
     """
-    Integration tests for HDViewSettings.
+    Integration tests for HDView.
     Use this class for testing interactions between multiple components.
     """
 
