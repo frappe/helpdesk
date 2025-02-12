@@ -1,36 +1,38 @@
-import { ref, computed, watch } from "vue";
-import { useRoute } from "vue-router";
+import { computed } from "vue";
 import { createResource, createListResource } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
+
 const auth = useAuthStore();
 
 export default function useView(dt: string) {
   const views = createListResource({
     doctype: "HD View",
     fields: ["*"],
-    cache: [`HD View-${dt}`],
     filters: {
       user: auth.userId.value,
       dt,
       type: "list",
     },
+    auto: true,
   });
 
-  async function getViews() {
-    if (views.data.length === 0 && !views.loading) {
-      await views.fetch();
-    }
-    return views.data;
-  }
+  const getViews = computed(() =>
+    views.data
+      ?.filter((view: View) => !view.is_default)
+      .map((view: View) => {
+        return {
+          label: view.label,
+          value: view.name,
+        };
+      })
+  );
 
   async function createView(
     view: View,
     successCB: Function = () => {},
     errorCB: Function = () => {}
   ) {
-    // return;
-
     createResource({
       url: "frappe.client.insert",
       params: {
@@ -53,6 +55,21 @@ export default function useView(dt: string) {
     });
   }
 
+  function findView(viewName: string) {
+    return computed(() => views.data?.find((v: View) => v.name === viewName));
+  }
+
+  const getPublicViews = computed(() =>
+    views.data
+      ?.filter((view: View) => view.public)
+      .map((view: View) => {
+        return {
+          label: view.label,
+          value: view.name,
+        };
+      })
+  );
+
   function updateView() {}
 
   function deleteView() {}
@@ -61,7 +78,9 @@ export default function useView(dt: string) {
 
   return {
     views,
+    findView,
     getViews,
+    getPublicViews,
     createView,
     updateView,
     deleteView,

@@ -273,6 +273,7 @@ export interface View {
   pinned?: boolean;
   public?: boolean;
   group_by_field?: string;
+  name?: string;
 }
 
 export interface ViewType {

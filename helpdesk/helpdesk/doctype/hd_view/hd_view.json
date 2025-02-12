@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "autoincrement",
+ "autoname": "format:VIEW-{dt}-{###}",
  "creation": "2025-02-11 16:05:11.457844",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -147,11 +147,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-12 18:46:58.574413",
+ "modified": "2025-02-12 21:01:26.983071",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD View",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

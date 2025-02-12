@@ -4,7 +4,7 @@
       <template #left-header>
         <ViewBreadcrumbs
           :options="dropdownOptions"
-          :route-name="isCustomerPortal ? 'TicketsCustomer ' : 'TicketsAgent'"
+          :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
           label="Tickets"
           :current-view="currentView"
         />
@@ -49,8 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref } from "vue";
-import { Breadcrumbs, Badge, Tooltip, confirmDialog, call } from "frappe-ui";
+import { h, ref, computed } from "vue";
+import { Badge, Tooltip, confirmDialog, call, usePageMeta } from "frappe-ui";
 import { IndicatorIcon } from "@/components/icons";
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import ExportModal from "@/components/ticket/ExportModal.vue";
@@ -68,14 +68,6 @@ const showExportModal = ref(false);
 
 const { textColorMap } = useTicketStatusStore();
 
-const breadcrumbs = [
-  {
-    label: "Tickets",
-    route: {
-      name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-    },
-  },
-];
 const listSelections = ref(new Set());
 const selectBannerActions = [
   {
@@ -260,43 +252,52 @@ const currentView = ref({
   icon: "lucide:align-justify",
 });
 
-const { getViews, createView } = useView("HD Ticket");
+const { getViews, createView, findView } = useView("HD Ticket");
 
-const dropdownOptions = [
-  // {
-  //   group: "Default Views",
-  //   hideLabel: true,
-  //   items: [
-  //     {
-  //       label: "List View",
-  //       icon: "user",
-  //     },
-  //   ],
-  // },
-  {
+const dropdownOptions = computed(() => {
+  const items = [];
+  // Saved Views
+  if (getViews.value?.length !== 0) {
+    items.push({
+      group: "Saved Views",
+      items: getViews.value,
+    });
+  }
+
+  items.push({
     label: "Create View",
     icon: "plus",
-    onClick: () => {
-      const view: View = {
-        dt: "HD Ticket",
-        type: "list",
-        label: "List View",
-        route_name: "TicketsAgent",
-        order_by: listViewRef.value?.list?.params.order_by,
-        filters: JSON.stringify(listViewRef.value?.list?.params.filters),
-        columns: JSON.stringify(listViewRef.value?.list?.params.columns),
-        rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
-      };
-      createView(view);
-    },
-  },
-  {
+    onClick: handleCreateView,
+  });
+
+  items.push({
     label: "Get View",
-    icon: "plus",
-    onClick: async () => {
-      const views = await getViews();
-      console.log(views);
+    icon: "user",
+    onClick: () => {
+      let x = findView("VIEW-HD Ticket-001");
+      console.log(x.value);
     },
-  },
-];
+  });
+  return items;
+});
+
+function handleCreateView() {
+  const view: View = {
+    dt: "HD Ticket",
+    type: "list",
+    label: "List View",
+    route_name: "TicketsAgent",
+    order_by: listViewRef.value?.list?.params.order_by,
+    filters: JSON.stringify(listViewRef.value?.list?.params.filters),
+    columns: JSON.stringify(listViewRef.value?.list?.params.columns),
+    rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
+  };
+  createView(view);
+}
+
+usePageMeta(() => {
+  return {
+    title: "Tickets",
+  };
+});
 </script>
