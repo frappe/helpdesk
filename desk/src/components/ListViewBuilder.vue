@@ -435,10 +435,7 @@ function updateColumns(obj) {
     handleFetchFromField(column);
     handleColumnConfig(column);
   });
-  columns.value =
-    list.data.columns =
-    defaultParams.columns =
-      isDefault ? "" : _columns;
+  columns.value = defaultParams.columns = isDefault ? "" : _columns;
   list.reload({ ...defaultParams });
 }
 
