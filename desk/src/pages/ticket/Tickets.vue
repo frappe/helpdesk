@@ -45,7 +45,10 @@
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
     />
-    <ViewModal v-model="viewDialog" />
+    <ViewModal
+      v-model="viewDialog"
+      @update="(view) => console.log('clicked', view)"
+    />
   </div>
 </template>
 

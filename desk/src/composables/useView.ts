@@ -2,17 +2,20 @@ import { computed } from "vue";
 import { createResource, createListResource } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
 
 const auth = useAuthStore();
 
 export default function useView(dt: string) {
+  const router = useRouter();
+
   const views = createListResource({
     doctype: "HD View",
     fields: ["*"],
     filters: {
-      user: auth.userId.value,
       dt,
       type: "list",
+      user: auth.userId,
     },
     auto: true,
   });
@@ -67,6 +70,14 @@ export default function useView(dt: string) {
       label: view.label,
       value: view.name,
       icon: view.icon || "align-justify",
+      onClick: () => {
+        router.push({
+          name: view.route_name,
+          query: {
+            view: view.name,
+          },
+        });
+      },
     };
   }
 

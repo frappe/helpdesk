@@ -3,13 +3,6 @@
     v-model="show"
     :options="{
       title: 'Create View',
-      actions: [
-        {
-          label: 'Create',
-          variant: 'solid',
-          onClick: emit('create'),
-        },
-      ],
     }"
   >
     <template #body-content>
@@ -32,6 +25,14 @@
         />
       </div>
     </template>
+    <template #actions>
+      <Button
+        label="Create"
+        variant="solid"
+        @click="emit('update', view)"
+        class="w-full"
+      />
+    </template>
   </Dialog>
 </template>
 
@@ -47,5 +48,5 @@ const view = ref({
   icon: "",
 });
 
-const emit = defineEmits(["create"]);
+const emit = defineEmits(["update"]);
 </script>
