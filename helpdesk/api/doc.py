@@ -26,6 +26,9 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
         "Text Editor",
         "Text",
         "Rating",
+        "Duration",
+        "Date",
+        "Datetime",
     ]
 
     visible_custom_fields = get_visible_custom_fields()
@@ -85,7 +88,7 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
     if not show_customer_portal_fields:
         from_custom_fields = from_custom_fields.run(as_dict=True)
 
-    from_doc_fields = from_doc_fields.run(as_dict=True)
+    from_doc_fields = from_doc_fields.run(as_dict=True, debug=True)
     # from hd ticket template get children with fieldname and hidden_from_customer
 
     res = []
@@ -93,7 +96,7 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
     # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
 
     res.extend(from_custom_fields)
-    if not show_customer_portal_fields:
+    if not show_customer_portal_fields and doctype == "HD Ticket":
         res.append(
             {
                 "fieldname": "_assign",
@@ -104,15 +107,26 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
             }
         )
 
-    res.append(
+    standard_fields = [
+        {"fieldname": "name", "fieldtype": "Link", "label": "ID", "options": doctype},
         {
-            "fieldname": "name",
-            "fieldtype": "Data",
-            "label": "ID",
-            "name": "name",
+            "fieldname": "owner",
+            "fieldtype": "Link",
+            "label": "Created By",
+            "options": "User",
         },
-    )
-
+        {
+            "fieldname": "modified_by",
+            "fieldtype": "Link",
+            "label": "Last Updated By",
+            "options": "User",
+        },
+        {"fieldname": "creation", "fieldtype": "Datetime", "label": "Created On"},
+        {"fieldname": "modified", "fieldtype": "Datetime", "label": "Last Updated On"},
+    ]
+    for field in standard_fields:
+        if field.get("fieldname") not in [r.get("fieldname") for r in res]:
+            res.append(field)
     return res
 
 

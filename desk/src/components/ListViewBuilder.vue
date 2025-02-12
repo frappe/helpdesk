@@ -99,7 +99,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed, h, ref, VNode } from "vue";
+import { reactive, provide, computed, h, ref, watch, VNode } from "vue";
+import { useRoute } from "vue-router";
 import {
   createResource,
   ListView,
@@ -124,6 +125,7 @@ import EmptyState from "./EmptyState.vue";
 import { useScreenSize } from "@/composables/screen";
 import { dayjs } from "@/dayjs";
 import { ViewType } from "@/types";
+import useView from "@/composables/useView";
 
 interface P {
   options: {
@@ -153,6 +155,7 @@ interface E {
 }
 const props = defineProps<P>();
 const emit = defineEmits<E>();
+const route = useRoute();
 
 const defaultOptions = {
   doctype: "",
@@ -459,6 +462,17 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   }
   list.reload();
 }
+
+const { findView } = useView(options.value.doctype);
+
+watch(
+  () => route.query.view,
+  (val: string) => {
+    const v = findView(val);
+    console.log(v.value);
+  },
+  { immediate: true }
+);
 
 defineExpose(exposeFunctions);
 </script>
