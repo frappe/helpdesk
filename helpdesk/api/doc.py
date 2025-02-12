@@ -88,7 +88,7 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
     if not show_customer_portal_fields:
         from_custom_fields = from_custom_fields.run(as_dict=True)
 
-    from_doc_fields = from_doc_fields.run(as_dict=True, debug=True)
+    from_doc_fields = from_doc_fields.run(as_dict=True)
     # from hd ticket template get children with fieldname and hidden_from_customer
 
     res = []
