@@ -15,19 +15,19 @@
     <template #body-content>
       <div class="mb-1.5 block text-base text-ink-gray-5">View Name</div>
       <div class="flex gap-2">
-        <!-- <IconPicker v-model="view.icon" v-slot="{ togglePopover }">
+        <IconPicker v-model="view.icon" v-slot="{ togglePopover }">
           <Button
             size="md"
             class="flex size-8 text-2xl leading-none"
             :label="view.icon"
             @click="togglePopover"
           />
-        </IconPicker> -->
+        </IconPicker>
         <FormControl
           class="flex-1"
           size="md"
           type="text"
-          :placeholder="__('My Open Deals')"
+          placeholder="My Open Tickets"
           v-model="view.label"
         />
       </div>
@@ -38,6 +38,7 @@
 <script setup>
 import { ref } from "vue";
 import { Dialog } from "frappe-ui";
+import IconPicker from "@/components/IconPicker.vue";
 
 const show = defineModel();
 

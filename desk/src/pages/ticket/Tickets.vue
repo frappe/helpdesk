@@ -45,6 +45,7 @@
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
     />
+    <ViewModal v-model="viewDialog" />
   </div>
 </template>
 
@@ -55,6 +56,7 @@ import { IndicatorIcon } from "@/components/icons";
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
+import ViewModal from "@/components/ViewModal.vue";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { dayjs } from "@/dayjs";
 import { createToast, isCustomerPortal } from "@/utils";
@@ -268,7 +270,9 @@ const dropdownOptions = computed(() => {
   items.push({
     label: "Create View",
     icon: "plus",
-    onClick: handleCreateView,
+    onClick: () => {
+      viewDialog.value = true;
+    },
   });
 
   items.push({
