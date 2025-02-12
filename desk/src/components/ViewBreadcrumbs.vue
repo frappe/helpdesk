@@ -25,6 +25,7 @@
           </template>
         </Button>
       </template>
+      <template #body></template>
     </Dropdown>
   </div>
 </template>

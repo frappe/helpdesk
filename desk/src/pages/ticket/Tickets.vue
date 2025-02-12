@@ -46,8 +46,9 @@
       "
     />
     <ViewModal
+      v-if="viewDialog"
       v-model="viewDialog"
-      @update="(view) => console.log('clicked', view)"
+      @update="(view) => handleCreateView(view)"
     />
   </div>
 </template>
@@ -289,18 +290,28 @@ const dropdownOptions = computed(() => {
   return items;
 });
 
-function handleCreateView() {
+function handleCreateView(viewInfo) {
   const view: View = {
     dt: "HD Ticket",
     type: "list",
-    label: "List View",
+    label: viewInfo.label ?? "List View",
+    icon: viewInfo.icon ?? "",
     route_name: "TicketsAgent",
     order_by: listViewRef.value?.list?.params.order_by,
     filters: JSON.stringify(listViewRef.value?.list?.params.filters),
     columns: JSON.stringify(listViewRef.value?.list?.params.columns),
     rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
   };
-  createView(view);
+  createView(view, handleSuccess);
+}
+
+function handleSuccess() {
+  createToast({
+    title: "View created successfully",
+    icon: "check",
+    iconClasses: "text-green-600",
+  });
+  viewDialog.value = false;
 }
 
 usePageMeta(() => {

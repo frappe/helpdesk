@@ -3,6 +3,7 @@ import { createResource, createListResource } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { getIcon } from "@/utils";
 
 const auth = useAuthStore();
 
@@ -69,7 +70,7 @@ export default function useView(dt: string) {
     return {
       label: view.label,
       value: view.name,
-      icon: view.icon || "align-justify",
+      icon: getIcon(view.icon),
       onClick: () => {
         router.push({
           name: view.route_name,
