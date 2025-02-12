@@ -18,14 +18,7 @@ export default function useView(dt: string) {
   });
 
   const getViews = computed(() =>
-    views.data
-      ?.filter((view: View) => !view.is_default)
-      .map((view: View) => {
-        return {
-          label: view.label,
-          value: view.name,
-        };
-      })
+    views.data?.filter((view: View) => !view.is_default).map(parseView)
   );
 
   async function createView(
@@ -60,14 +53,7 @@ export default function useView(dt: string) {
   }
 
   const getPublicViews = computed(() =>
-    views.data
-      ?.filter((view: View) => view.public)
-      .map((view: View) => {
-        return {
-          label: view.label,
-          value: view.name,
-        };
-      })
+    views.data?.filter((view: View) => view.public).map(parseView)
   );
 
   function updateView() {}
@@ -76,11 +62,19 @@ export default function useView(dt: string) {
 
   function createOrUpdateDefaultView() {}
 
+  function parseView(view: View) {
+    return {
+      label: view.label,
+      value: view.name,
+      icon: view.icon || "align-justify",
+    };
+  }
+
   return {
     views,
-    findView,
     getViews,
     getPublicViews,
+    findView,
     createView,
     updateView,
     deleteView,

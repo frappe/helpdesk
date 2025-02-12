@@ -252,6 +252,7 @@ const currentView = ref({
   icon: "lucide:align-justify",
 });
 
+const viewDialog = ref(false);
 const { getViews, createView, findView } = useView("HD Ticket");
 
 const dropdownOptions = computed(() => {
