@@ -126,6 +126,7 @@ import { useScreenSize } from "@/composables/screen";
 import { dayjs } from "@/dayjs";
 import { ViewType } from "@/types";
 import useView from "@/composables/useView";
+import { onMounted } from "vue";
 
 interface P {
   options: {
@@ -157,19 +158,20 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 const route = useRoute();
 
-const defaultOptions = {
+const defaultOptions = reactive({
   doctype: "",
   hideViewControls: false,
   selectable: false,
   view: {
     view_type: "list",
     group_by_field: "owner",
+    name: route.query.view,
   },
   groupByActions: [],
   default_page_length: 20,
   isCustomerPortal: false,
   hideColumnSetting: true,
-};
+});
 
 const options = computed(() => {
   return {
@@ -193,6 +195,7 @@ const defaultParams = reactive({
   page_length_count: options.value.default_page_length,
   view: options.value.view,
   columns: [],
+  rows: [],
   show_customer_portal_fields: options.value.isCustomerPortal,
 });
 
@@ -203,7 +206,6 @@ const emptyState = computed(() => {
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",
   params: defaultParams,
-  auto: true,
   transform: (data) => {
     data.columns.forEach((column) => {
       handleFetchFromField(column);
@@ -433,12 +435,13 @@ function applySort(order_by: string) {
 }
 
 function updateColumns(obj) {
-  const { columns: _columns, isDefault, reload, reset } = obj;
+  const { columns: _columns, isDefault, reload, reset, rows } = obj;
   _columns?.forEach((column) => {
     handleFetchFromField(column);
     handleColumnConfig(column);
   });
   columns.value = defaultParams.columns = isDefault ? "" : _columns;
+  defaultParams.rows = isDefault ? "" : rows;
   list.reload({ ...defaultParams });
 }
 
@@ -463,16 +466,35 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 
-const { findView } = useView(options.value.doctype);
+function handleViewUpdate() {
+  const currentView = findView(route.query.view as string);
+  if (!currentView.value) return;
+  defaultParams.filters = currentView.value.filters;
+  defaultParams.order_by = currentView.value.order_by || "modified desc";
+  defaultParams.columns = currentView.value.columns;
+  defaultParams.rows = currentView.value.rows;
+  list.submit({ ...defaultParams });
+}
+
+const { findView, views } = useView(options.value.doctype);
 
 watch(
   () => route.query.view,
   (val: string) => {
-    const v = findView(val);
-    console.log(v.value);
+    defaultParams.view.name = val;
+    handleViewUpdate();
+
+    list.submit({ ...defaultParams });
   },
   { immediate: true }
 );
+onMounted(async () => {
+  list.fetch();
+  if (route.query.view) {
+    await views.reload();
+    handleViewUpdate();
+  }
+});
 
 defineExpose(exposeFunctions);
 </script>

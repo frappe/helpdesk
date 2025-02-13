@@ -279,6 +279,7 @@ export interface View {
 export interface ViewType {
   view_type: string;
   group_by_field: string;
+  name: string;
 }
 
 export interface Breadcrumb {

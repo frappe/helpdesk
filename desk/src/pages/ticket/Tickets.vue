@@ -56,6 +56,7 @@
 <script setup lang="ts">
 import { h, ref, computed } from "vue";
 import { Badge, Tooltip, confirmDialog, call, usePageMeta } from "frappe-ui";
+import { useRouter } from "vue-router";
 import { IndicatorIcon } from "@/components/icons";
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import ExportModal from "@/components/ticket/ExportModal.vue";
@@ -68,6 +69,8 @@ import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import useView from "@/composables/useView";
 import { View } from "@/types";
+
+const router = useRouter();
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -279,14 +282,6 @@ const dropdownOptions = computed(() => {
     },
   });
 
-  items.push({
-    label: "Get View",
-    icon: "user",
-    onClick: () => {
-      let x = findView("VIEW-HD Ticket-001");
-      console.log(x.value);
-    },
-  });
   return items;
 });
 
@@ -299,7 +294,7 @@ function handleCreateView(viewInfo) {
     route_name: "TicketsAgent",
     order_by: listViewRef.value?.list?.params.order_by,
     filters: JSON.stringify(listViewRef.value?.list?.params.filters),
-    columns: JSON.stringify(listViewRef.value?.list?.params.columns),
+    columns: JSON.stringify(listViewRef.value?.list?.data.columns),
     rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
   };
   createView(view, handleSuccess);

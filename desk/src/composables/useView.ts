@@ -18,6 +18,13 @@ export default function useView(dt: string) {
       type: "list",
       user: auth.userId,
     },
+    transform: (data: any) => {
+      data.forEach((view: View) => {
+        view.filters = JSON.parse(view.filters) || {};
+        view.columns = JSON.parse(view.columns) || [];
+        view.rows = JSON.parse(view.rows) || [];
+      });
+    },
     auto: true,
   });
 

@@ -134,7 +134,7 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
 def get_list_data(
     doctype: str,
     # flake8: noqa
-    filters: dict = {},
+    filters={},
     order_by: str = "modified desc",
     page_length=20,
     columns=None,
@@ -142,19 +142,31 @@ def get_list_data(
     show_customer_portal_fields=False,
     view=None,
 ):
+    print("\n\n", filters, "\n\n")
     is_default = True
+    is_custom = False
+
     rows = frappe.parse_json(rows or "[]")
     columns = frappe.parse_json(columns or "[]")
+    filters = frappe.parse_json(filters or "[]")
 
     view_type = view.get("view_type") if view else None
+    view_name = view.get("name") if view else None
+
     group_by_field = view.get("group_by_field") if view else None
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
 
+    _list = get_controller(doctype)
+    default_rows = []
+    if hasattr(_list, "default_list_data"):
+        default_rows = _list.default_list_data().get("rows")
+
     if columns or rows:
         is_default = False
-        columns = frappe.parse_json(columns or "[]")
-        rows = frappe.parse_json(rows or "[]")
+        is_custom = True
+        columns = frappe.parse_json(columns)
+        rows = frappe.parse_json(rows)
 
     if not columns:
         columns = [
@@ -170,14 +182,6 @@ def get_list_data(
     if not rows:
         rows = ["name"]
 
-    # if frappe.db.exists("HD List View Settings", doctype):
-    # 	list_view_settings = frappe.get_doc("CRM List View Settings", doctype)
-    # 	columns = frappe.parse_json(list_view_settings.columns)
-    # 	rows = frappe.parse_json(list_view_settings.rows)
-    # 	is_default = False
-    # else:
-    _list = get_controller(doctype)
-
     # flake8: noqa
     if is_default:
         if hasattr(_list, "default_list_data"):
@@ -186,7 +190,7 @@ def get_list_data(
                 if doctype == "HD Ticket"
                 else _list.default_list_data().get("columns")
             )
-            rows = _list.default_list_data().get("rows")
+            rows = default_rows
 
     if rows is None:
         rows = []
