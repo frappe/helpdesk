@@ -67,7 +67,7 @@ import { dayjs } from "@/dayjs";
 import { createToast, isCustomerPortal } from "@/utils";
 import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
-import useView from "@/composables/useView";
+import { useView, views } from "@/composables/useView";
 import { View } from "@/types";
 
 const router = useRouter();
@@ -265,7 +265,24 @@ const viewDialog = ref(false);
 const { getViews, createView } = useView("HD Ticket");
 
 const dropdownOptions = computed(() => {
-  const items = [];
+  const items = [
+    {
+      group: "Default Views",
+      items: [
+        {
+          label: "List View",
+          icon: "align-justify",
+          onClick: () => {
+            router.push({
+              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+            });
+            listViewRef.value?.reload(true);
+          },
+        },
+      ],
+    },
+  ];
+
   // Saved Views
   if (getViews.value?.length !== 0) {
     items.push({

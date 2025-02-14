@@ -130,7 +130,7 @@ import EmptyState from "./EmptyState.vue";
 import { useScreenSize } from "@/composables/screen";
 import { dayjs } from "@/dayjs";
 import { ViewType } from "@/types";
-import useView from "@/composables/useView";
+import { useView, views } from "@/composables/useView";
 import { onMounted } from "vue";
 
 interface P {
@@ -455,7 +455,15 @@ function updateColumns(obj) {
   list.reload({ ...defaultParams });
 }
 
-function reload() {
+function reload(reset: boolean = false) {
+  if (reset) {
+    defaultParams.filters = {};
+    defaultParams.order_by = "modified desc";
+    defaultParams.page_length = options.value.default_page_length;
+    defaultParams.page_length_count = options.value.default_page_length;
+    defaultParams.columns = [];
+    defaultParams.rows = [];
+  }
   list.reload({ ...defaultParams });
 }
 
@@ -476,16 +484,6 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 
-function handleViewChanges() {
-  const currentView = findView(route.query.view as string);
-  if (!currentView.value) return;
-  defaultParams.filters = currentView.value.filters;
-  defaultParams.order_by = currentView.value.order_by || "modified desc";
-  defaultParams.columns = currentView.value.columns;
-  defaultParams.rows = currentView.value.rows;
-  list.submit({ ...defaultParams });
-}
-
 function handleViewUpdate() {
   updateView(
     {
@@ -501,7 +499,17 @@ function handleViewUpdate() {
   );
 }
 
-const { views, findView, updateView } = useView(options.value.doctype);
+const { findView, updateView } = useView(options.value.doctype);
+
+function handleViewChanges() {
+  const currentView = findView(route.query.view as string);
+  if (!currentView.value) return;
+  defaultParams.filters = currentView.value.filters;
+  defaultParams.order_by = currentView.value.order_by || "modified desc";
+  defaultParams.columns = currentView.value.columns;
+  defaultParams.rows = currentView.value.rows;
+  list.submit({ ...defaultParams });
+}
 
 watch(
   () => route.query.view,
@@ -511,10 +519,17 @@ watch(
   }
 );
 onMounted(async () => {
-  list.fetch();
   if (route.query.view) {
-    await views.reload();
-    handleViewChanges();
+    // check for filters
+    debugger;
+    if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
+      handleViewChanges();
+    } else {
+      await views.reload();
+      handleViewChanges();
+    }
+  } else {
+    list.fetch();
   }
 });
 

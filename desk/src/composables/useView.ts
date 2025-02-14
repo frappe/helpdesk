@@ -7,26 +7,38 @@ import { getIcon } from "@/utils";
 
 const auth = useAuthStore();
 
-export default function useView(dt: string) {
+export const views = createListResource({
+  doctype: "HD View",
+  fields: ["*"],
+  transform: (data: any) => {
+    data.forEach((view: View) => {
+      view.filters = JSON.parse(view.filters) || {};
+      view.columns = JSON.parse(view.columns) || [];
+      view.rows = JSON.parse(view.rows) || [];
+    });
+  },
+});
+
+export function useView(dt: string = null) {
   const router = useRouter();
 
-  const views = createListResource({
-    doctype: "HD View",
-    fields: ["*"],
-    filters: {
-      dt,
-      type: "list",
-      user: auth.userId,
-    },
-    transform: (data: any) => {
-      data.forEach((view: View) => {
-        view.filters = JSON.parse(view.filters) || {};
-        view.columns = JSON.parse(view.columns) || [];
-        view.rows = JSON.parse(view.rows) || [];
-      });
-    },
-    auto: true,
-  });
+  function callGetViews() {
+    if (
+      (views.filters?.dt === dt && views.data?.length > 0) ||
+      views.list?.promise
+    ) {
+      return;
+    }
+    views.update({
+      filters: {
+        dt,
+        type: "list",
+        user: auth.userId,
+      },
+    });
+    views.fetch();
+  }
+  callGetViews();
 
   const getViews = computed(() =>
     views.data?.filter((view: View) => !view.is_default).map(parseView)
@@ -63,8 +75,8 @@ export default function useView(dt: string) {
     return computed(() => views.data?.find((v: View) => v.name === viewName));
   }
 
-  const getPublicViews = computed(() =>
-    views.data?.filter((view: View) => view.public).map(parseView)
+  const pinnedViews = computed(() =>
+    views.data?.filter((view: View) => view.pinned).map(parseView)
   );
 
   function updateView(view: View, successCB: Function = () => {}) {
@@ -107,7 +119,7 @@ export default function useView(dt: string) {
   return {
     views,
     getViews,
-    getPublicViews,
+    pinnedViews,
     findView,
     createView,
     updateView,
