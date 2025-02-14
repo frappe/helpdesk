@@ -1,8 +1,9 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import { toast } from "frappe-ui";
-import { ref, h } from "vue";
+import { ref, h, markRaw } from "vue";
 import zod from "zod";
 import { gemoji } from "gemoji";
+import TicketIcon from "./components/icons/TicketIcon.vue";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -198,5 +199,5 @@ export function getIcon(icon) {
   if (isEmoji(icon)) {
     return h("div", icon);
   }
-  return icon || "align-justify";
+  return icon || markRaw(TicketIcon);
 }

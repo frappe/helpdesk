@@ -69,6 +69,7 @@ import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, views } from "@/composables/useView";
 import { View } from "@/types";
+import { watch } from "vue";
 
 const router = useRouter();
 
@@ -278,6 +279,10 @@ const dropdownOptions = computed(() => {
               name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
             });
             listViewRef.value?.reload(true);
+            currentView.value = {
+              label: "List View",
+              icon: "lucide:align-justify",
+            };
           },
         },
       ],
@@ -288,19 +293,19 @@ const dropdownOptions = computed(() => {
   if (getCurrentUserViews.value?.length !== 0) {
     items.push({
       group: "Saved Views",
-      items: getCurrentUserViews.value,
+      items: parseViews(getCurrentUserViews.value),
     });
   }
   if (pinnedViews.value?.length !== 0) {
     items.push({
       group: "Pinned Views",
-      items: pinnedViews.value,
+      items: parseViews(pinnedViews.value),
     });
   }
   if (publicViews.value?.length !== 0) {
     items.push({
       group: "Public Views",
-      items: publicViews.value,
+      items: parseViews(publicViews.value),
     });
   }
 
@@ -314,6 +319,26 @@ const dropdownOptions = computed(() => {
 
   return items;
 });
+
+function parseViews(views: View[]) {
+  return views?.map((view) => {
+    return {
+      ...view,
+      onClick: () => {
+        currentView.value = {
+          label: view.label,
+          icon: view.icon,
+        };
+        router.push({
+          name: view.route_name,
+          query: {
+            view: view.value,
+          },
+        });
+      },
+    };
+  });
+}
 
 function handleCreateView(viewInfo) {
   const view: View = {
@@ -345,4 +370,11 @@ usePageMeta(() => {
     title: "Tickets",
   };
 });
+
+// watch(
+//   () => [getCurrentUserViews.value],
+//   (newVal) => {
+//     console.log(newVal);
+//   }
+// );
 </script>

@@ -222,7 +222,6 @@ function addColumn(c) {
     width: "10rem",
     align,
   };
-  //   debugger;
   columns.value.push(_column);
   rows.value.push(c.value);
   apply(true);

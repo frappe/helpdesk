@@ -43,7 +43,7 @@ interface P {
   isExpanded?: boolean;
   isActive?: boolean;
   onClick?: () => void;
-  to?: string;
+  to?: string | object;
   bgColor?: string;
   hvColor?: string;
 }
@@ -60,9 +60,17 @@ const router = useRouter();
 function handleNavigation() {
   props.onClick();
   if (!props.to) return;
-  if (props.to === router.currentRoute.value.name) return;
-  router.push({
-    name: props.to,
-  });
+  if (
+    props.to === router.currentRoute.value.name &&
+    !router.currentRoute.value.query.view
+  )
+    return;
+  if (typeof props.to === "string") {
+    router.push({
+      name: props.to,
+    });
+    return;
+  }
+  router.push(props.to);
 }
 </script>

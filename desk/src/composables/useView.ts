@@ -125,6 +125,7 @@ export function useView(dt: string = null) {
       label: view.label,
       value: view.name,
       icon: getIcon(view.icon),
+      route_name: view.route_name,
       onClick: () => {
         router.push({
           name: view.route_name,

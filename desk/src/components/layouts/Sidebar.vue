@@ -48,14 +48,48 @@
         </template>
       </SidebarLink>
     </div>
-    <div class="mb-4 flex flex-col gap-1">
-      <SidebarLink
-        v-for="option in menuOptions"
-        v-bind="option"
-        :key="option.label"
-        :is-expanded="isExpanded"
-        :is-active="isActiveTab(option.to)"
+    <div v-for="view in allViews" :key="view.label">
+      <div
+        v-if="!view.hideLabel && !isExpanded && view.views?.length"
+        class="mx-2 my-2 h-1 border-b"
       />
+      <Section
+        :label="view.label"
+        :hideLabel="view.hideLabel"
+        :opened="view.opened"
+      >
+        <template #header="{ opened, hide, toggle }">
+          <div
+            v-if="!hide"
+            class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+            :class="
+              !isExpanded
+                ? 'ml-0 h-0 overflow-hidden opacity-0'
+                : 'ml-2 mt-4 h-7 w-auto opacity-100'
+            "
+            @click="toggle()"
+          >
+            <FeatherIcon
+              name="chevron-right"
+              class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+              :class="{ 'rotate-90': opened }"
+            />
+            <span>{{ view.label }}</span>
+          </div>
+        </template>
+        <nav class="flex flex-col">
+          <SidebarLink
+            v-for="link in view.views"
+            :icon="link.icon"
+            :label="link.label"
+            :to="link.to"
+            :key="link.label"
+            :is-expanded="isExpanded"
+            :is-active="isActiveTab(link.to)"
+            class="my-0.5"
+          />
+        </nav>
+      </Section>
     </div>
     <div class="grow" />
     <SidebarLink
@@ -91,6 +125,10 @@ import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
+import { Section } from "@/components";
+import { useView } from "@/composables/useView";
+import { TicketIcon } from "../icons";
+import { LocationQueryRaw } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -100,11 +138,52 @@ const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
 
-const menuOptions = computed(() => {
-  return isCustomerPortal.value
+const { pinnedViews, publicViews } = useView("HD Ticket");
+
+const allViews = computed(() => {
+  const items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  const options = [
+    {
+      label: "All Views",
+      hideLabel: true,
+      opened: true,
+      views: items,
+    },
+  ];
+  if (publicViews.value?.length && !isCustomerPortal.value) {
+    options.push({
+      label: "Public Views",
+      opened: true,
+      hideLabel: false,
+      views: parseViews(publicViews.value),
+    });
+  }
+  if (pinnedViews.value?.length) {
+    options.push({
+      label: "Pinned Views",
+      opened: true,
+      hideLabel: false,
+      views: parseViews(pinnedViews.value),
+    });
+  }
+  return options;
 });
+
+function parseViews(views) {
+  return views.map((view) => {
+    return {
+      label: view.label,
+      icon: view.icon,
+      to: {
+        name: view.route_name,
+        query: { view: view.value },
+      },
+    };
+  });
+}
 
 const customerPortalDropdown = computed(() => [
   {
@@ -156,6 +235,9 @@ const profileSettings = computed(() => {
 });
 
 function isActiveTab(to: string) {
+  if (route.query.view) {
+    return route.query.view == to?.query?.view;
+  }
   return route.name === to;
 }
 

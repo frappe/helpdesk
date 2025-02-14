@@ -527,7 +527,7 @@ onMounted(async () => {
       handleViewChanges();
     }
   } else {
-    list.fetch();
+    reload(true);
   }
 });
 
