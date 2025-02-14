@@ -1,9 +1,10 @@
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { createResource, createListResource, call } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { getIcon } from "@/utils";
+import { isCustomerPortal } from "@/utils";
 
 const auth = useAuthStore();
 
@@ -25,23 +26,35 @@ export function useView(dt: string = null) {
   function callGetViews() {
     if (
       (views.filters?.dt === dt && views.data?.length > 0) ||
-      views.list?.promise
+      views.list?.promise ||
+      views.isCustomerPortal === isCustomerPortal.value
     ) {
       return;
     }
-    views.update({
-      filters: {
-        dt,
-        type: "list",
-        user: auth.userId,
-      },
-    });
+
+    const filters = {
+      dt,
+      is_customer_portal: isCustomerPortal.value,
+    };
+    if (isCustomerPortal.value) {
+      filters["user"] = auth.userId;
+    }
+    views.isCustomerPortal = isCustomerPortal.value;
+    views.update({ filters });
     views.fetch();
   }
   callGetViews();
 
-  const getViews = computed(() =>
-    views.data?.filter((view: View) => !view.is_default).map(parseView)
+  const getCurrentUserViews = computed(() =>
+    views.data
+      ?.filter(
+        (view: View) =>
+          !view.is_default &&
+          view.user === auth.userId &&
+          !view.public &&
+          !view.pinned
+      )
+      .map(parseView)
   );
 
   async function createView(
@@ -71,12 +84,19 @@ export function useView(dt: string = null) {
     });
   }
 
+  //TODO: implement findView with view name and API call, and above instead of * in fields use only label, name, icon, public, pinned,is_default,iscustomerportal
   function findView(viewName: string) {
     return computed(() => views.data?.find((v: View) => v.name === viewName));
   }
 
   const pinnedViews = computed(() =>
-    views.data?.filter((view: View) => view.pinned).map(parseView)
+    views.data
+      ?.filter((view: View) => view.pinned && view.user === auth.userId)
+      .map(parseView)
+  );
+
+  const publicViews = computed(() =>
+    views.data?.filter((view: View) => view.public).map(parseView)
   );
 
   function updateView(view: View, successCB: Function = () => {}) {
@@ -116,10 +136,19 @@ export function useView(dt: string = null) {
     };
   }
 
+  watch(
+    () => isCustomerPortal.value,
+    (newVal) => {
+      views.isCustomerPortal = newVal;
+      callGetViews();
+    }
+  );
+
   return {
     views,
-    getViews,
+    getCurrentUserViews,
     pinnedViews,
+    publicViews,
     findView,
     createView,
     updateView,

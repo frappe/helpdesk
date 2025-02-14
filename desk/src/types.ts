@@ -274,6 +274,7 @@ export interface View {
   public?: boolean;
   group_by_field?: string;
   name?: string;
+  is_customer_portal?: boolean;
 }
 
 export interface ViewType {

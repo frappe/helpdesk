@@ -262,7 +262,8 @@ const currentView = ref({
 });
 
 const viewDialog = ref(false);
-const { getViews, createView } = useView("HD Ticket");
+const { getCurrentUserViews, createView, publicViews, pinnedViews } =
+  useView("HD Ticket");
 
 const dropdownOptions = computed(() => {
   const items = [
@@ -284,10 +285,22 @@ const dropdownOptions = computed(() => {
   ];
 
   // Saved Views
-  if (getViews.value?.length !== 0) {
+  if (getCurrentUserViews.value?.length !== 0) {
     items.push({
       group: "Saved Views",
-      items: getViews.value,
+      items: getCurrentUserViews.value,
+    });
+  }
+  if (pinnedViews.value?.length !== 0) {
+    items.push({
+      group: "Pinned Views",
+      items: pinnedViews.value,
+    });
+  }
+  if (publicViews.value?.length !== 0) {
+    items.push({
+      group: "Public Views",
+      items: publicViews.value,
     });
   }
 
@@ -308,11 +321,12 @@ function handleCreateView(viewInfo) {
     type: "list",
     label: viewInfo.label ?? "List View",
     icon: viewInfo.icon ?? "",
-    route_name: "TicketsAgent",
+    route_name: router.currentRoute.value.name as string,
     order_by: listViewRef.value?.list?.params.order_by,
     filters: JSON.stringify(listViewRef.value?.list?.params.filters),
     columns: JSON.stringify(listViewRef.value?.list?.data.columns),
     rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
+    is_customer_portal: isCustomerPortal.value,
   };
   createView(view, handleSuccess);
 }

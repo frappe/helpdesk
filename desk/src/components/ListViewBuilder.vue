@@ -520,8 +520,6 @@ watch(
 );
 onMounted(async () => {
   if (route.query.view) {
-    // check for filters
-    debugger;
     if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
       handleViewChanges();
     } else {
