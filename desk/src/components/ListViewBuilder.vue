@@ -6,6 +6,11 @@
   >
     <QuickFilters v-if="!isMobileView" />
     <div class="flex items-center gap-2" v-if="!isMobileView">
+      <Button
+        label="Save Changes"
+        v-if="isViewUpdated"
+        @click="handleViewUpdate"
+      />
       <Reload @click="reload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
@@ -202,6 +207,8 @@ const defaultParams = reactive({
 const emptyState = computed(() => {
   return options.value?.emptyState || defaultEmptyState;
 });
+
+const isViewUpdated = ref(false);
 
 const list = createResource({
   url: "helpdesk.api.doc.get_list_data",
@@ -425,17 +432,20 @@ provide("listViewActions", {
 });
 
 function applyFilters(filters) {
+  isViewUpdated.value = true;
   defaultParams.filters = { ...filters };
   list.submit({ ...defaultParams });
 }
 
 function applySort(order_by: string) {
+  isViewUpdated.value = true;
   defaultParams.order_by = order_by;
   list.submit({ ...defaultParams, order_by });
 }
 
 function updateColumns(obj) {
-  const { columns: _columns, isDefault, reload, reset, rows } = obj;
+  isViewUpdated.value = true;
+  const { columns: _columns, isDefault, rows } = obj;
   _columns?.forEach((column) => {
     handleFetchFromField(column);
     handleColumnConfig(column);
@@ -466,7 +476,7 @@ function handlePageLength(count: number, loadMore: boolean = false) {
   list.reload();
 }
 
-function handleViewUpdate() {
+function handleViewChanges() {
   const currentView = findView(route.query.view as string);
   if (!currentView.value) return;
   defaultParams.filters = currentView.value.filters;
@@ -476,23 +486,35 @@ function handleViewUpdate() {
   list.submit({ ...defaultParams });
 }
 
-const { findView, views } = useView(options.value.doctype);
+function handleViewUpdate() {
+  updateView(
+    {
+      filters: JSON.stringify(defaultParams.filters),
+      columns: JSON.stringify(defaultParams.columns),
+      rows: JSON.stringify(defaultParams.rows),
+      order_by: defaultParams.order_by,
+      name: (route.query.view as string) || null,
+    },
+    () => {
+      isViewUpdated.value = false;
+    }
+  );
+}
+
+const { views, findView, updateView } = useView(options.value.doctype);
 
 watch(
   () => route.query.view,
   (val: string) => {
     defaultParams.view.name = val;
-    handleViewUpdate();
-
-    list.submit({ ...defaultParams });
-  },
-  { immediate: true }
+    handleViewChanges();
+  }
 );
 onMounted(async () => {
   list.fetch();
   if (route.query.view) {
     await views.reload();
-    handleViewUpdate();
+    handleViewChanges();
   }
 });
 

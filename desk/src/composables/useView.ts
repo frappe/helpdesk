@@ -1,5 +1,5 @@
 import { computed } from "vue";
-import { createResource, createListResource } from "frappe-ui";
+import { createResource, createListResource, call } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
@@ -67,7 +67,22 @@ export default function useView(dt: string) {
     views.data?.filter((view: View) => view.public).map(parseView)
   );
 
-  function updateView() {}
+  function updateView(view: View, successCB: Function = () => {}) {
+    if (view.name) {
+      // handle custom view
+      console.log("custom");
+      call("frappe.client.set_value", {
+        doctype: "HD View",
+        name: view.name,
+        fieldname: view,
+      }).then(() => {
+        successCB();
+      });
+    } else {
+      // handle default view
+      console.log("default");
+    }
+  }
 
   function deleteView() {}
 

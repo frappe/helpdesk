@@ -142,7 +142,6 @@ def get_list_data(
     show_customer_portal_fields=False,
     view=None,
 ):
-    print("\n\n", filters, "\n\n")
     is_default = True
     is_custom = False
 

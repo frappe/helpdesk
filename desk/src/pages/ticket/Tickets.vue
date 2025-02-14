@@ -262,7 +262,7 @@ const currentView = ref({
 });
 
 const viewDialog = ref(false);
-const { getViews, createView, findView } = useView("HD Ticket");
+const { getViews, createView } = useView("HD Ticket");
 
 const dropdownOptions = computed(() => {
   const items = [];

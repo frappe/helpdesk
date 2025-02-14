@@ -259,13 +259,13 @@ export interface Category {
 }
 
 export interface View {
-  dt: string;
-  type: string;
   filters: string;
   order_by: string;
   columns: string;
   rows: string;
-  route_name: string;
+  dt?: string;
+  type?: string;
+  route_name?: string;
   user?: string;
   icon?: string;
   label?: string;
