@@ -67,9 +67,8 @@ import { dayjs } from "@/dayjs";
 import { createToast, isCustomerPortal } from "@/utils";
 import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
-import { useView, views } from "@/composables/useView";
+import { useView, currentView } from "@/composables/useView";
 import { View } from "@/types";
-import { watch } from "vue";
 
 const router = useRouter();
 
@@ -256,11 +255,6 @@ const slaStatusColorMap = {
   "First Response Due": "orange",
   Paused: "blue",
 };
-
-const currentView = ref({
-  label: "List View",
-  icon: "lucide:align-justify",
-});
 
 const viewDialog = ref(false);
 const { getCurrentUserViews, createView, publicViews, pinnedViews } =

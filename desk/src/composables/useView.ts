@@ -1,4 +1,4 @@
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { createResource, createListResource, call } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
@@ -18,6 +18,11 @@ export const views = createListResource({
       view.rows = JSON.parse(view.rows) || [];
     });
   },
+});
+
+export const currentView = ref({
+  label: "List",
+  icon: "lucide:align-justify",
 });
 
 export function useView(dt: string = null) {
@@ -84,7 +89,6 @@ export function useView(dt: string = null) {
     });
   }
 
-  //TODO: implement findView with view name and API call, and above instead of * in fields use only label, name, icon, public, pinned,is_default,iscustomerportal
   function findView(viewName: string) {
     return computed(() => views.data?.find((v: View) => v.name === viewName));
   }

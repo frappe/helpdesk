@@ -87,6 +87,7 @@
             :is-expanded="isExpanded"
             :is-active="isActiveTab(link.to)"
             class="my-0.5"
+            :onClick="link.onClick"
           />
         </nav>
       </Section>
@@ -126,9 +127,7 @@ import {
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 import { Section } from "@/components";
-import { useView } from "@/composables/useView";
-import { TicketIcon } from "../icons";
-import { LocationQueryRaw } from "vue-router";
+import { useView, currentView } from "@/composables/useView";
 
 const route = useRoute();
 const router = useRouter();
@@ -180,6 +179,12 @@ function parseViews(views) {
       to: {
         name: view.route_name,
         query: { view: view.value },
+      },
+      onClick: () => {
+        currentView.value = {
+          label: view.label,
+          icon: view.icon,
+        };
       },
     };
   });
