@@ -3,8 +3,7 @@ import { createResource, createListResource, call } from "frappe-ui";
 import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import { getIcon } from "@/utils";
-import { isCustomerPortal } from "@/utils";
+import { getIcon, isCustomerPortal } from "@/utils";
 
 const auth = useAuthStore();
 
@@ -57,15 +56,15 @@ export function useView(dt: string = null) {
           !view.is_default &&
           view.user === auth.userId &&
           !view.public &&
-          !view.pinned
+          !view.pinned,
       )
-      .map(parseView)
+      .map(parseView),
   );
 
   async function createView(
     view: View,
     successCB: Function = () => {},
-    errorCB: Function = () => {}
+    errorCB: Function = () => {},
   ) {
     createResource({
       url: "frappe.client.insert",
@@ -96,11 +95,11 @@ export function useView(dt: string = null) {
   const pinnedViews = computed(() =>
     views.data
       ?.filter((view: View) => view.pinned && view.user === auth.userId)
-      .map(parseView)
+      .map(parseView),
   );
 
   const publicViews = computed(() =>
-    views.data?.filter((view: View) => view.public).map(parseView)
+    views.data?.filter((view: View) => view.public).map(parseView),
   );
 
   function updateView(view: View, successCB: Function = () => {}) {
@@ -127,7 +126,7 @@ export function useView(dt: string = null) {
   function parseView(view: View) {
     return {
       label: view.label,
-      value: view.name,
+      name: view.name,
       icon: getIcon(view.icon),
       route_name: view.route_name,
       onClick: () => {
@@ -146,7 +145,7 @@ export function useView(dt: string = null) {
     (newVal) => {
       views.isCustomerPortal = newVal;
       callGetViews();
-    }
+    },
   );
 
   return {

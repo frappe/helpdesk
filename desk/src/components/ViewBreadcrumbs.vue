@@ -34,14 +34,59 @@
           </template>
         </Button>
       </template>
-      <template #body></template>
+      <template #item="{ item, active }">
+        <button
+          class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
+          :class="{ 'bg-surface-gray-3': active }"
+          @click="item.onClick"
+        >
+          <div class="flex items-center">
+            <FeatherIcon
+              v-if="item.icon && typeof item.icon === 'string'"
+              :name="item.icon"
+              class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
+              aria-hidden="true"
+            />
+            <component
+              class="mr-2 h-4 w-4 flex-shrink-0 text-ink-gray-7"
+              v-else-if="item.icon"
+              :is="item.icon"
+            />
+            <span class="whitespace-nowrap">
+              {{ item.label }}
+            </span>
+          </div>
+          <div class="flex flex-row-reverse gap-2 items-center min-w-11">
+            <Dropdown
+              :class="active ? 'block' : 'hidden'"
+              placement="right-start"
+              :options="dropdownActions(item)"
+            >
+              <template #default="{ togglePopover }">
+                <Button
+                  variant="ghost"
+                  class="!size-5"
+                  icon="more-horizontal"
+                  @click.stop="togglePopover()"
+                />
+              </template>
+            </Dropdown>
+            <FeatherIcon
+              v-if="isCurrentView(item)"
+              name="check"
+              class="size-4 text-ink-gray-7"
+            />
+          </div>
+        </button>
+      </template>
     </Dropdown>
   </div>
 </template>
 
 <script setup>
-import { Dropdown } from "frappe-ui";
 import { Icon } from "@iconify/vue";
+import Dropdown from "@/components/frappe-ui/Dropdown.vue";
+import { useRoute } from "vue-router";
 const props = defineProps({
   routeName: {
     type: String,
@@ -55,9 +100,22 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  dropdownActions: {
+    type: Function,
+    required: true,
+  },
   currentView: {
     type: Object,
     required: true,
   },
 });
+
+function getItem(item, active) {
+  console.log("item", item);
+  console.log("active", active);
+}
+
+const route = useRoute();
+
+const isCurrentView = (item) => item.name === route.query.view;
 </script>

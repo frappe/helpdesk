@@ -178,7 +178,7 @@ function parseViews(views) {
       icon: view.icon,
       to: {
         name: view.route_name,
-        query: { view: view.value },
+        query: { view: view.name },
       },
       onClick: () => {
         currentView.value = {
@@ -239,7 +239,7 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
-function isActiveTab(to: string) {
+function isActiveTab(to: any) {
   if (route.query.view) {
     return route.query.view == to?.query?.view;
   }

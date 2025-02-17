@@ -3,9 +3,10 @@
     <LayoutHeader>
       <template #left-header>
         <ViewBreadcrumbs
-          :options="dropdownOptions"
-          :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
           label="Tickets"
+          :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
+          :options="dropdownOptions"
+          :dropdown-actions="viewActions"
           :current-view="currentView"
         />
       </template>
@@ -55,7 +56,14 @@
 
 <script setup lang="ts">
 import { h, ref, computed } from "vue";
-import { Badge, Tooltip, confirmDialog, call, usePageMeta } from "frappe-ui";
+import {
+  Badge,
+  Tooltip,
+  confirmDialog,
+  call,
+  usePageMeta,
+  FeatherIcon,
+} from "frappe-ui";
 import { useRouter } from "vue-router";
 import { IndicatorIcon } from "@/components/icons";
 import { LayoutHeader, ListViewBuilder } from "@/components";
@@ -274,7 +282,7 @@ const dropdownOptions = computed(() => {
             });
             listViewRef.value?.reload(true);
             currentView.value = {
-              label: "List View",
+              label: "List",
               icon: "lucide:align-justify",
             };
           },
@@ -314,6 +322,31 @@ const dropdownOptions = computed(() => {
   return items;
 });
 
+const viewActions = (view) => {
+  let isDefault = typeof view.name === "string";
+
+  let actions = [
+    {
+      group: "Default Views",
+      hideLabel: true,
+      items: [
+        {
+          label: "Edit",
+          icon: h(FeatherIcon, { name: "edit" }),
+          onClick: () => console.log(view),
+        },
+      ],
+    },
+  ];
+  actions[0].items.push({
+    label: "Edit",
+    icon: h(FeatherIcon, { name: "edit" }),
+    onClick: () => console.log(view),
+  });
+
+  return actions;
+};
+
 function parseViews(views: View[]) {
   return views?.map((view) => {
     return {
@@ -326,7 +359,7 @@ function parseViews(views: View[]) {
         router.push({
           name: view.route_name,
           query: {
-            view: view.value,
+            view: view.name,
           },
         });
       },
@@ -338,7 +371,7 @@ function handleCreateView(viewInfo) {
   const view: View = {
     dt: "HD Ticket",
     type: "list",
-    label: viewInfo.label ?? "List View",
+    label: viewInfo.label ?? "List",
     icon: viewInfo.icon ?? "",
     route_name: router.currentRoute.value.name as string,
     order_by: listViewRef.value?.list?.params.order_by,
