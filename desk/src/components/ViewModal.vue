@@ -1,8 +1,8 @@
 <template>
   <Dialog
-    v-model="show"
+    v-model="viewDialog.show"
     :options="{
-      title: 'Create View',
+      title: modalInfo.modalTitle,
     }"
   >
     <template #body-content>
@@ -27,9 +27,9 @@
     </template>
     <template #actions>
       <Button
-        label="Create"
+        :label="modalInfo.buttonLabel"
         variant="solid"
-        @click="emit('update', view)"
+        @click="emit('update', view, modalInfo.action)"
         class="w-full"
       />
     </template>
@@ -40,12 +40,37 @@
 import { ref } from "vue";
 import { Dialog } from "frappe-ui";
 import IconPicker from "@/components/IconPicker.vue";
+import { computed } from "vue";
 
-const show = defineModel();
+const viewDialog = defineModel();
 
 const view = ref({
-  label: "",
-  icon: "",
+  label: viewDialog.value.view.label || "",
+  icon: viewDialog.value.view.icon || "",
+  name: viewDialog.value.view.name || "",
+});
+
+const modalInfo = computed(() => {
+  return {
+    modalTitle:
+      viewDialog.value.mode === "edit"
+        ? "Edit View"
+        : viewDialog.value.mode === "duplicate"
+        ? "Duplicate View"
+        : "Create View",
+    buttonLabel:
+      viewDialog.value.mode === "edit"
+        ? "Update"
+        : viewDialog.value.mode === "duplicate"
+        ? "Duplicate"
+        : "Create",
+    action:
+      viewDialog.value.mode === "edit"
+        ? "update"
+        : viewDialog.value.mode === "duplicate"
+        ? "duplicate"
+        : "create",
+  };
 });
 
 const emit = defineEmits(["update"]);

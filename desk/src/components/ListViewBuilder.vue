@@ -132,6 +132,7 @@ import { dayjs } from "@/dayjs";
 import { ViewType } from "@/types";
 import { useView, views } from "@/composables/useView";
 import { onMounted } from "vue";
+import { router } from "@/router";
 
 interface P {
   options: {
@@ -503,7 +504,11 @@ const { findView, updateView } = useView(options.value.doctype);
 
 function handleViewChanges() {
   const currentView = findView(route.query.view as string);
-  if (!currentView.value) return;
+  if (!currentView.value) {
+    router.push({ name: route.name });
+    reload(true);
+    return;
+  }
   defaultParams.filters = currentView.value.filters;
   defaultParams.order_by = currentView.value.order_by || "modified desc";
   defaultParams.columns = currentView.value.columns;

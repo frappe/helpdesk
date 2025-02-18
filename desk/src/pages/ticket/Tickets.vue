@@ -47,15 +47,15 @@
       "
     />
     <ViewModal
-      v-if="viewDialog"
+      v-if="viewDialog.show"
       v-model="viewDialog"
-      @update="(view) => handleCreateView(view)"
+      @update="(view, action) => handleView(view, action)"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { h, ref, computed } from "vue";
+import { h, ref, computed, reactive } from "vue";
 import {
   Badge,
   Tooltip,
@@ -64,8 +64,13 @@ import {
   usePageMeta,
   FeatherIcon,
 } from "frappe-ui";
-import { useRouter } from "vue-router";
-import { IndicatorIcon } from "@/components/icons";
+import { useRouter, useRoute } from "vue-router";
+import {
+  EditIcon,
+  IndicatorIcon,
+  PinIcon,
+  UnpinIcon,
+} from "@/components/icons";
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
@@ -77,8 +82,20 @@ import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, currentView } from "@/composables/useView";
 import { View } from "@/types";
+import { updateRes } from "@/stores/knowledgeBase";
 
 const router = useRouter();
+const route = useRoute();
+
+const {
+  getCurrentUserViews,
+  createView,
+  publicViews,
+  pinnedViews,
+  findView,
+  updateView,
+  deleteView,
+} = useView("HD Ticket");
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -264,9 +281,15 @@ const slaStatusColorMap = {
   Paused: "blue",
 };
 
-const viewDialog = ref(false);
-const { getCurrentUserViews, createView, publicViews, pinnedViews } =
-  useView("HD Ticket");
+const viewDialog = reactive({
+  show: false,
+  view: {
+    label: "",
+    icon: "",
+    name: "",
+  },
+  mode: "create",
+});
 
 const dropdownOptions = computed(() => {
   const items = [
@@ -312,18 +335,25 @@ const dropdownOptions = computed(() => {
   }
 
   items.push({
-    label: "Create View",
-    icon: "plus",
-    onClick: () => {
-      viewDialog.value = true;
-    },
+    group: "Create View",
+    hideLabel: true,
+    items: [
+      {
+        label: "Create View",
+        icon: "plus",
+        onClick: () => {
+          resetState();
+          viewDialog.show = true;
+        },
+      },
+    ],
   });
 
   return items;
 });
 
 const viewActions = (view) => {
-  let isDefault = typeof view.name === "string";
+  const _view = findView(view.name).value;
 
   let actions = [
     {
@@ -331,17 +361,77 @@ const viewActions = (view) => {
       hideLabel: true,
       items: [
         {
-          label: "Edit",
-          icon: h(FeatherIcon, { name: "edit" }),
-          onClick: () => console.log(view),
+          label: "Duplicate",
+          icon: h(FeatherIcon, { name: "copy" }),
+          onClick: () => {
+            viewDialog.view.label = _view.label + " (New)";
+            viewDialog.view.icon = _view.icon;
+            viewDialog.view.name = "";
+            viewDialog.mode = "duplicate";
+            viewDialog.show = true;
+          },
         },
       ],
     },
   ];
   actions[0].items.push({
     label: "Edit",
-    icon: h(FeatherIcon, { name: "edit" }),
-    onClick: () => console.log(view),
+    icon: h(EditIcon, { class: "h-4 w-4" }),
+    onClick: () => {
+      viewDialog.view.label = _view.label;
+      viewDialog.view.icon = _view.icon;
+      viewDialog.view.name = _view.name;
+      viewDialog.mode = "edit";
+      viewDialog.show = true;
+    },
+  });
+
+  actions[0].items.push({
+    label: _view?.pinned ? "Unpin View" : "Pin View",
+    icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
+    onClick: () => {
+      const newView = {
+        name: _view.name,
+      };
+      newView["pinned"] = !_view.pinned;
+      updateView(newView);
+    },
+  });
+
+  actions[0].items.push({
+    label: _view?.public ? "Make Private" : "Make Public",
+    icon: h(FeatherIcon, {
+      name: _view?.public ? "lock" : "unlock",
+      class: "h-4 w-4",
+    }),
+    onClick: () => {
+      const newView = {
+        name: _view.name,
+      };
+      newView["public"] = !_view.public;
+      updateView(newView);
+    },
+  });
+
+  actions.push({
+    group: "Delete View",
+    hideLabel: true,
+    items: [
+      {
+        label: "Delete",
+        icon: "trash-2",
+        onClick: () => {
+          if (route.query.view === _view.name) {
+            router.push({
+              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+            });
+            listViewRef.value?.reload(true);
+          }
+          deleteView(_view.name);
+          handleSuccess("deleted");
+        },
+      },
+    ],
   });
 
   return actions;
@@ -367,7 +457,13 @@ function parseViews(views: View[]) {
   });
 }
 
-function handleCreateView(viewInfo) {
+function handleView(viewInfo, action) {
+  if (action === "update") {
+    updateView(viewInfo);
+    handleSuccess("updated");
+    return;
+  }
+  // createView
   const view: View = {
     dt: "HD Ticket",
     type: "list",
@@ -383,13 +479,20 @@ function handleCreateView(viewInfo) {
   createView(view, handleSuccess);
 }
 
-function handleSuccess() {
+function handleSuccess(msg = "created") {
   createToast({
-    title: "View created successfully",
+    title: `View ${msg} successfully`,
     icon: "check",
     iconClasses: "text-green-600",
   });
-  viewDialog.value = false;
+  resetState();
+}
+function resetState() {
+  viewDialog.show = false;
+  viewDialog.view.label = "";
+  viewDialog.view.icon = "";
+  viewDialog.view.name = "";
+  viewDialog.mode = null;
 }
 
 usePageMeta(() => {
@@ -397,11 +500,4 @@ usePageMeta(() => {
     title: "Tickets",
   };
 });
-
-// watch(
-//   () => [getCurrentUserViews.value],
-//   (newVal) => {
-//     console.log(newVal);
-//   }
-// );
 </script>

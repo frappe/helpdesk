@@ -76,10 +76,10 @@ export function useView(dt: string = null) {
         },
       },
       auto: true,
-      onSuccess: (d) => {
+      onSuccess: () => {
         console.log("success");
         views.reload();
-        successCB(d);
+        successCB();
       },
       onError: (e) => {
         console.log("error", e);
@@ -102,7 +102,7 @@ export function useView(dt: string = null) {
     views.data?.filter((view: View) => view.public).map(parseView),
   );
 
-  function updateView(view: View, successCB: Function = () => {}) {
+  function updateView(view: any, successCB: Function = () => {}) {
     if (view.name) {
       // handle custom view
       console.log("custom");
@@ -112,6 +112,7 @@ export function useView(dt: string = null) {
         fieldname: view,
       }).then(() => {
         successCB();
+        views.reload();
       });
     } else {
       // handle default view
@@ -119,7 +120,14 @@ export function useView(dt: string = null) {
     }
   }
 
-  function deleteView() {}
+  function deleteView(viewName: string) {
+    call("frappe.client.delete", {
+      doctype: "HD View",
+      name: viewName,
+    }).then(() => {
+      views.reload();
+    });
+  }
 
   function createOrUpdateDefaultView() {}
 

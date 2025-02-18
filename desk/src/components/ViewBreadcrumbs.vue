@@ -58,6 +58,7 @@
           </div>
           <div class="flex flex-row-reverse gap-2 items-center min-w-11">
             <Dropdown
+              v-if="item.name"
               :class="active ? 'block' : 'hidden'"
               placement="right-start"
               :options="dropdownActions(item)"
@@ -117,5 +118,8 @@ function getItem(item, active) {
 
 const route = useRoute();
 
-const isCurrentView = (item) => item.name === route.query.view;
+const isCurrentView = (item) => {
+  if (!route.query.view) return false;
+  return item.name === route.query.view;
+};
 </script>
