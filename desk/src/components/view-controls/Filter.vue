@@ -406,7 +406,10 @@ function getDefaultValue(field) {
   return "";
 }
 
-function getDefaultOperator(fieldtype) {
+function getDefaultOperator(fieldtype, fieldname = null) {
+  if (fieldname === "_assign") {
+    return "like";
+  }
   if (typeSelect.includes(fieldtype)) {
     return "equals";
   }
@@ -439,7 +442,7 @@ function setfilter(data) {
       options: data.options,
     },
     fieldname: data.value,
-    operator: getDefaultOperator(data.fieldtype),
+    operator: getDefaultOperator(data.fieldtype, data.fieldname),
     value: getDefaultValue(data),
   });
   apply();

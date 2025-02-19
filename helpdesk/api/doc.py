@@ -35,6 +35,8 @@ def get_list_data(
     label_doc = view.get("label_doc") if view else None
     label_field = view.get("label_field") if view else None
 
+    handle_at_me_support(filters)
+
     _list = get_controller(doctype)
     default_rows = []
     if hasattr(_list, "default_list_data"):
@@ -75,8 +77,8 @@ def get_list_data(
             [columns, rows] = handle_default_view(
                 doctype, _list, show_customer_portal_fields
             )
-            if default_filters:
-                filters.update(default_filters)
+            if default_filters and not filters:
+                filters.append(default_filters)
 
     if rows is None:
         rows = []
@@ -430,7 +432,7 @@ def default_view_exists(doctype):
 
 
 def handle_default_view(doctype, _list, show_customer_portal_fields):
-    [columns, rows, filters, order_by] = frappe.get_value(
+    [columns, rows] = frappe.get_value(
         "HD View",
         {
             "is_default": 1,
@@ -441,7 +443,6 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     )
     columns = frappe.parse_json(columns)
     rows = frappe.parse_json(rows)
-    filters = frappe.parse_json(filters)
 
     if not columns:
         columns = (
@@ -453,3 +454,20 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
         rows = _list.default_list_data().get("rows")
 
     return [columns, rows]
+
+
+def handle_at_me_support(filters):
+    # Converts @me in filters to current user
+    for key in filters:
+        value = filters[key]
+        if isinstance(value, list):
+            if "@me" in value:
+                value[value.index("@me")] = frappe.session.user
+            elif "%@me%" in value:
+                index = [i for i, v in enumerate(value) if v == "%@me%"]
+                for i in index:
+                    value[i] = "%" + frappe.session.user + "%"
+        elif value == "@me":
+            filters[key] = frappe.session.user
+
+    return filters

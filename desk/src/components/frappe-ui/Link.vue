@@ -144,12 +144,16 @@ const options = createResource({
         label: option?.label || option.value,
       };
     });
-    // if (!props.hideMe && props.doctype == 'User') {
-    //   allData.unshift({
-    //     label: '@me',
-    //     value: '@me',
-    //   })
-    // }
+
+    if (
+      !props.hideMe &&
+      (props.doctype == "User" || props.doctype == "HD Agent")
+    ) {
+      allData.unshift({
+        label: "@me",
+        value: "@me",
+      });
+    }
     return allData;
   },
 });

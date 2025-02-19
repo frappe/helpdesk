@@ -104,8 +104,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, provide, computed, h, ref, watch, VNode } from "vue";
-import { useRoute } from "vue-router";
+import {
+  reactive,
+  provide,
+  computed,
+  h,
+  ref,
+  watch,
+  VNode,
+  onMounted,
+} from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   createResource,
   ListView,
@@ -130,9 +139,12 @@ import EmptyState from "./EmptyState.vue";
 import { useScreenSize } from "@/composables/screen";
 import { dayjs } from "@/dayjs";
 import { View, ViewType } from "@/types";
-import { useView, views } from "@/composables/useView";
-import { onMounted } from "vue";
-import { router } from "@/router";
+import {
+  useView,
+  views,
+  currentView as headerView,
+} from "@/composables/useView";
+import { getIcon } from "@/utils";
 
 interface P {
   options: {
@@ -163,6 +175,7 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 const route = useRoute();
+const router = useRouter();
 
 const defaultOptions = reactive({
   doctype: "",
@@ -509,14 +522,7 @@ function handleViewUpdate() {
 const { findView, updateView, defaultView } = useView(options.value.doctype);
 
 function handleViewChanges() {
-  let currentView: View;
-  if (route.query.view) {
-    currentView = findView(route.query.view as string).value;
-    defaultParams.is_default = false;
-  } else if (defaultView.value) {
-    currentView = defaultView.value;
-    defaultParams.is_default = true;
-  }
+  let currentView: View = findCurrentView();
   if (!currentView) {
     router.push({ name: route.name });
     reload(true);
@@ -528,6 +534,18 @@ function handleViewChanges() {
   defaultParams.rows = currentView.rows;
 
   list.submit({ ...defaultParams });
+}
+
+function findCurrentView() {
+  let currentView: View;
+  if (route.query.view) {
+    currentView = findView(route.query.view as string).value;
+    defaultParams.is_default = false;
+  } else if (defaultView.value) {
+    currentView = defaultView.value;
+    defaultParams.is_default = true;
+  }
+  return currentView;
 }
 
 watch(
@@ -545,6 +563,12 @@ onMounted(async () => {
     handleViewChanges();
   }
   if (route.query.view || defaultView.value) {
+    if (route.query.view) {
+      const currentView = findCurrentView();
+      headerView.value.label = currentView.label || "List";
+      headerView.value.icon = getIcon(currentView.icon);
+    }
+
     return;
   }
   reload(true);
