@@ -8,7 +8,7 @@
     <div class="flex items-center gap-2" v-if="!isMobileView">
       <Button
         label="Save Changes"
-        v-if="isViewUpdated"
+        v-if="isViewUpdated && canSaveView"
         @click="handleViewUpdate"
       />
       <Reload @click="reload" :loading="list.loading" />
@@ -145,6 +145,7 @@ import {
   currentView as headerView,
 } from "@/composables/useView";
 import { getIcon } from "@/utils";
+import { useAuthStore } from "@/stores/auth";
 
 interface P {
   options: {
@@ -176,6 +177,7 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 const route = useRoute();
 const router = useRouter();
+const { isManager } = useAuthStore();
 
 const defaultOptions = reactive({
   doctype: "",
@@ -468,7 +470,6 @@ function updateColumns(obj) {
   });
   columns.value = defaultParams.columns = isDefault ? "" : _columns;
   defaultParams.rows = isDefault ? "" : rows;
-  console.log(isDefault, columns.value);
   list.reload({ ...defaultParams });
 }
 
@@ -522,6 +523,15 @@ function handleViewUpdate() {
 
 const { findView, updateView, defaultView } = useView(options.value.doctype);
 
+const canSaveView = computed(() => {
+  let currentView: View = findView(route.query.view as string).value;
+  if (!currentView || !currentView.public) return true;
+  if (currentView.public && isManager) {
+    return true;
+  }
+  return false;
+});
+
 function handleViewChanges() {
   let currentView: View = findCurrentView();
   if (!currentView) {
@@ -554,6 +564,10 @@ watch(
   (val: string) => {
     defaultParams.view.name = val;
     handleViewChanges();
+    if (!val) {
+      headerView.value.label = "List";
+      headerView.value.icon = "lucide:align-justify";
+    }
   }
 );
 onMounted(async () => {
@@ -566,12 +580,12 @@ onMounted(async () => {
   if (route.query.view || defaultView.value) {
     if (route.query.view) {
       const currentView = findCurrentView();
+      if (!currentView) return;
       headerView.value.label = currentView.label || "List";
       headerView.value.icon = getIcon(currentView.icon);
     }
     return;
   }
-  // reload(true);
 });
 
 defineExpose(exposeFunctions);

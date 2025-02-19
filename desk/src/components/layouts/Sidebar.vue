@@ -100,7 +100,7 @@
       :label="isExpanded ? 'Collapse' : 'Expand'"
       :on-click="() => (isExpanded = !isExpanded)"
     />
-    <SettingsModal v-if="authStore.isAdmin" v-model="showSettingsModal" />
+    <SettingsModal v-model="showSettingsModal" />
   </div>
 </template>
 
@@ -224,7 +224,7 @@ const agentPortalDropdown = computed(() => [
     label: "Settings",
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
-    condition: () => authStore.isAdmin,
+    condition: () => authStore.isAdmin || authStore.isManager,
   },
   {
     label: "Log out",

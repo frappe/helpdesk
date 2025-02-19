@@ -42,7 +42,7 @@ import { Dialog } from "frappe-ui";
 import IconPicker from "@/components/IconPicker.vue";
 import { computed } from "vue";
 
-const viewDialog = defineModel();
+let viewDialog = defineModel();
 
 const view = ref({
   label: viewDialog.value.view.label || "",

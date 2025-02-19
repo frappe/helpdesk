@@ -83,6 +83,7 @@ import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, currentView } from "@/composables/useView";
 import { View } from "@/types";
+import { onMounted } from "vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -301,15 +302,10 @@ const dropdownOptions = computed(() => {
         {
           label: "List View",
           icon: "align-justify",
-          onClick: () => {
+          onClick: () =>
             router.push({
               name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            });
-            currentView.value = {
-              label: "List",
-              icon: "lucide:align-justify",
-            };
-          },
+            }),
         },
       ],
     },
@@ -516,6 +512,14 @@ function resetState() {
   viewDialog.mode = null;
 }
 
+onMounted(() => {
+  if (!route.query.view) {
+    currentView.value = {
+      label: "List",
+      icon: "lucide:align-justify",
+    };
+  }
+});
 usePageMeta(() => {
   return {
     title: "Tickets",
