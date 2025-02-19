@@ -29,7 +29,7 @@ export function useView(dt: string = null) {
   function callGetViews() {
     if (
       (views.filters?.dt === dt && views.data?.length > 0) ||
-      (views.list?.promise && views.filters?.dt === dt)
+      views.list?.promise
       // views.isCustomerPortal === isCustomerPortal.value
     ) {
       return;
@@ -77,9 +77,9 @@ export function useView(dt: string = null) {
         },
       },
       auto: true,
-      onSuccess: () => {
+      onSuccess: (d) => {
         views.reload();
-        successCB();
+        successCB(d);
       },
       onError: (e) => {
         console.log("error", e);
@@ -137,8 +137,10 @@ export function useView(dt: string = null) {
 
   function createOrUpdateDefaultView(view: View) {
     const defaultView = views.data?.find((view: View) => view.is_default);
+    view.is_customer_portal = isCustomerPortal.value;
     if (defaultView) {
       delete view["name"];
+
       call("frappe.client.set_value", {
         doctype: "HD View",
         name: defaultView.name,

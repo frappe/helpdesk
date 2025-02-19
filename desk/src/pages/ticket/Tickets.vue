@@ -78,7 +78,7 @@ import ViewModal from "@/components/ViewModal.vue";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useAuthStore } from "@/stores/auth";
 import { dayjs } from "@/dayjs";
-import { createToast, isCustomerPortal } from "@/utils";
+import { createToast, getIcon, isCustomerPortal } from "@/utils";
 import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, currentView } from "@/composables/useView";
@@ -355,7 +355,6 @@ const dropdownOptions = computed(() => {
 
 const viewActions = (view) => {
   const _view = findView(view.name).value;
-  console.log(isManager);
   let actions = [
     {
       group: "Default Views",
@@ -485,7 +484,20 @@ function handleView(viewInfo, action) {
     rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
     is_customer_portal: isCustomerPortal.value,
   };
-  createView(view, handleSuccess);
+  createView(view, (d) => {
+    currentView.value = {
+      label: d.label || "List",
+      icon: getIcon(d.icon),
+    };
+    router.push({
+      name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+      query: {
+        view: d.name,
+      },
+    });
+
+    handleSuccess();
+  });
 }
 
 function handleSuccess(msg = "created") {

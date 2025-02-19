@@ -512,6 +512,7 @@ function handleViewUpdate() {
       name: (route.query.view as string) || "default",
       dt: options.value.doctype,
       route_name: route.name,
+      is_customer_portal: options.value.isCustomerPortal,
     },
     () => {
       isViewUpdated.value = false;
@@ -559,7 +560,7 @@ onMounted(async () => {
   if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
     handleViewChanges();
   } else {
-    await views.reload();
+    await views.list.promise;
     handleViewChanges();
   }
   if (route.query.view || defaultView.value) {
@@ -568,10 +569,9 @@ onMounted(async () => {
       headerView.value.label = currentView.label || "List";
       headerView.value.icon = getIcon(currentView.icon);
     }
-
     return;
   }
-  reload(true);
+  // reload(true);
 });
 
 defineExpose(exposeFunctions);
