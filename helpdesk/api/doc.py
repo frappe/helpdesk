@@ -61,7 +61,6 @@ def get_list_data(
         rows = ["name"]
 
     # flake8: noqa
-    print("\n\n", "IS DEFAULT", is_default, "\n\n")
     if is_default:
         default_view = default_view_exists(doctype)
         if not default_view:
@@ -73,13 +72,12 @@ def get_list_data(
                 )
                 rows = default_rows
         else:
-            [columns, rows, _, _] = handle_default_view(
+            [columns, rows] = handle_default_view(
                 doctype, _list, show_customer_portal_fields
             )
             if default_filters:
                 filters.update(default_filters)
 
-    print("\n\n", "end", columns, "\n\n")
     if rows is None:
         rows = []
 
@@ -439,12 +437,12 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
             "user": frappe.session.user,
             "dt": doctype,
         },
-        ["columns", "rows", "filters", "order_by"],
+        ["columns", "rows"],
     )
     columns = frappe.parse_json(columns)
     rows = frappe.parse_json(rows)
     filters = frappe.parse_json(filters)
-    print("\n\n", "getting", columns, "\n\n")
+
     if not columns:
         columns = (
             _list.default_list_data(show_customer_portal_fields).get("columns")
@@ -454,6 +452,4 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     if not rows:
         rows = _list.default_list_data().get("rows")
 
-    print("\n\n", columns, "\n\n")
-
-    return [columns, rows, filters, order_by]
+    return [columns, rows]
