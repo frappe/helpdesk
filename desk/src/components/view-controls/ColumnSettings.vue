@@ -70,7 +70,7 @@
                 </Button>
               </template>
             </Autocomplete>
-            <Button
+            <!-- <Button
               v-if="columnsUpdated"
               class="w-full !justify-start !text-ink-gray-5"
               variant="ghost"
@@ -80,7 +80,7 @@
               <template #prefix>
                 <ReloadIcon class="h-4" />
               </template>
-            </Button>
+            </Button> -->
             <Button
               v-if="!is_default"
               class="w-full !justify-start !text-ink-gray-5"
@@ -283,6 +283,7 @@ function apply(reload = false, isDefault = false, reset = false) {
     reload,
     reset,
   };
+  debugger;
   listViewActions.updateColumns(obj);
   columnsUpdated.value = !reset;
 }
@@ -293,7 +294,7 @@ watchOnce(
     if (!val) return;
     oldValues.value.columns = JSON.parse(JSON.stringify(val.columns));
     oldValues.value.rows = JSON.parse(JSON.stringify(val.rows));
-    oldValues.value.isDefault = val.is_default ?? false;
+    oldValues.value.isDefault = val.is_default;
   }
 );
 </script>

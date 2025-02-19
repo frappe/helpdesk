@@ -9,140 +9,19 @@ from helpdesk.utils import check_permissions
 
 
 @frappe.whitelist()
-@redis_cache()
-def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
-    check_permissions(doctype, None)
-    QBDocField = frappe.qb.DocType("DocField")
-    QBCustomField = frappe.qb.DocType("Custom Field")
-    allowed_fieldtypes = [
-        "Check",
-        "Data",
-        "Float",
-        "Int",
-        "Link",
-        "Long Text",
-        "Select",
-        "Small Text",
-        "Text Editor",
-        "Text",
-        "Rating",
-        "Duration",
-        "Date",
-        "Datetime",
-    ]
-
-    visible_custom_fields = get_visible_custom_fields()
-    customer_portal_fields = [
-        "name",
-        "subject",
-        "status",
-        "priority",
-        "response_by",
-        "resolution_by",
-        "creation",
-    ]
-
-    from_doc_fields = (
-        frappe.qb.from_(QBDocField)
-        .select(
-            QBDocField.fieldname,
-            QBDocField.fieldtype,
-            QBDocField.label,
-            QBDocField.name,
-            QBDocField.options,
-        )
-        .where(QBDocField.parent == doctype)
-        .where(QBDocField.hidden == False)
-        .where(Criterion.any([QBDocField.fieldtype == i for i in allowed_fieldtypes]))
-    )
-
-    from_custom_fields = (
-        frappe.qb.from_(QBCustomField)
-        .select(
-            QBCustomField.fieldname,
-            QBCustomField.fieldtype,
-            QBCustomField.label,
-            QBCustomField.name,
-            QBCustomField.options,
-        )
-        .where(QBCustomField.dt == doctype)
-        .where(QBCustomField.hidden == False)
-        .where(
-            Criterion.any([QBCustomField.fieldtype == i for i in allowed_fieldtypes])
-        )
-    )
-
-    # for customer portal show only fields present in customer_portal_fields
-    if show_customer_portal_fields:
-        from_doc_fields = from_doc_fields.where(
-            QBDocField.fieldname.isin(customer_portal_fields)
-        )
-        if len(visible_custom_fields) > 0:
-            from_custom_fields = from_custom_fields.where(
-                QBCustomField.fieldname.isin(visible_custom_fields)
-            )
-            from_custom_fields = from_custom_fields.run(as_dict=True)
-        else:
-            from_custom_fields = []
-
-    if not show_customer_portal_fields:
-        from_custom_fields = from_custom_fields.run(as_dict=True)
-
-    from_doc_fields = from_doc_fields.run(as_dict=True)
-    # from hd ticket template get children with fieldname and hidden_from_customer
-
-    res = []
-    res.extend(from_doc_fields)
-    # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
-
-    res.extend(from_custom_fields)
-    if not show_customer_portal_fields and doctype == "HD Ticket":
-        res.append(
-            {
-                "fieldname": "_assign",
-                "fieldtype": "Link",
-                "label": "Assigned to",
-                "name": "_assign",
-                "options": "HD Agent",
-            }
-        )
-
-    standard_fields = [
-        {"fieldname": "name", "fieldtype": "Link", "label": "ID", "options": doctype},
-        {
-            "fieldname": "owner",
-            "fieldtype": "Link",
-            "label": "Created By",
-            "options": "User",
-        },
-        {
-            "fieldname": "modified_by",
-            "fieldtype": "Link",
-            "label": "Last Updated By",
-            "options": "User",
-        },
-        {"fieldname": "creation", "fieldtype": "Datetime", "label": "Created On"},
-        {"fieldname": "modified", "fieldtype": "Datetime", "label": "Last Updated On"},
-    ]
-    for field in standard_fields:
-        if field.get("fieldname") not in [r.get("fieldname") for r in res]:
-            res.append(field)
-    return res
-
-
-@frappe.whitelist()
 def get_list_data(
     doctype: str,
     # flake8: noqa
     filters={},
+    default_filters={},
     order_by: str = "modified desc",
     page_length=20,
     columns=None,
     rows=None,
     show_customer_portal_fields=False,
     view=None,
+    is_default=False,
 ):
-    is_default = True
     is_custom = False
 
     rows = frappe.parse_json(rows or "[]")
@@ -182,15 +61,25 @@ def get_list_data(
         rows = ["name"]
 
     # flake8: noqa
+    print("\n\n", "IS DEFAULT", is_default, "\n\n")
     if is_default:
-        if hasattr(_list, "default_list_data"):
-            columns = (
-                _list.default_list_data(show_customer_portal_fields).get("columns")
-                if doctype == "HD Ticket"
-                else _list.default_list_data().get("columns")
+        default_view = default_view_exists(doctype)
+        if not default_view:
+            if hasattr(_list, "default_list_data"):
+                columns = (
+                    _list.default_list_data(show_customer_portal_fields).get("columns")
+                    if doctype == "HD Ticket"
+                    else _list.default_list_data().get("columns")
+                )
+                rows = default_rows
+        else:
+            [columns, rows, _, _] = handle_default_view(
+                doctype, _list, show_customer_portal_fields
             )
-            rows = default_rows
+            if default_filters:
+                filters.update(default_filters)
 
+    print("\n\n", "end", columns, "\n\n")
     if rows is None:
         rows = []
 
@@ -325,6 +214,128 @@ def get_list_data(
 
 
 @frappe.whitelist()
+@redis_cache()
+def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
+    check_permissions(doctype, None)
+    QBDocField = frappe.qb.DocType("DocField")
+    QBCustomField = frappe.qb.DocType("Custom Field")
+    allowed_fieldtypes = [
+        "Check",
+        "Data",
+        "Float",
+        "Int",
+        "Link",
+        "Long Text",
+        "Select",
+        "Small Text",
+        "Text Editor",
+        "Text",
+        "Rating",
+        "Duration",
+        "Date",
+        "Datetime",
+    ]
+
+    visible_custom_fields = get_visible_custom_fields()
+    customer_portal_fields = [
+        "name",
+        "subject",
+        "status",
+        "priority",
+        "response_by",
+        "resolution_by",
+        "creation",
+    ]
+
+    from_doc_fields = (
+        frappe.qb.from_(QBDocField)
+        .select(
+            QBDocField.fieldname,
+            QBDocField.fieldtype,
+            QBDocField.label,
+            QBDocField.name,
+            QBDocField.options,
+        )
+        .where(QBDocField.parent == doctype)
+        .where(QBDocField.hidden == False)
+        .where(Criterion.any([QBDocField.fieldtype == i for i in allowed_fieldtypes]))
+    )
+
+    from_custom_fields = (
+        frappe.qb.from_(QBCustomField)
+        .select(
+            QBCustomField.fieldname,
+            QBCustomField.fieldtype,
+            QBCustomField.label,
+            QBCustomField.name,
+            QBCustomField.options,
+        )
+        .where(QBCustomField.dt == doctype)
+        .where(QBCustomField.hidden == False)
+        .where(
+            Criterion.any([QBCustomField.fieldtype == i for i in allowed_fieldtypes])
+        )
+    )
+
+    # for customer portal show only fields present in customer_portal_fields
+    if show_customer_portal_fields:
+        from_doc_fields = from_doc_fields.where(
+            QBDocField.fieldname.isin(customer_portal_fields)
+        )
+        if len(visible_custom_fields) > 0:
+            from_custom_fields = from_custom_fields.where(
+                QBCustomField.fieldname.isin(visible_custom_fields)
+            )
+            from_custom_fields = from_custom_fields.run(as_dict=True)
+        else:
+            from_custom_fields = []
+
+    if not show_customer_portal_fields:
+        from_custom_fields = from_custom_fields.run(as_dict=True)
+
+    from_doc_fields = from_doc_fields.run(as_dict=True)
+    # from hd ticket template get children with fieldname and hidden_from_customer
+
+    res = []
+    res.extend(from_doc_fields)
+    # TODO: Ritvik => till a better way we have for custom fields, just show custom fields
+
+    res.extend(from_custom_fields)
+    if not show_customer_portal_fields and doctype == "HD Ticket":
+        res.append(
+            {
+                "fieldname": "_assign",
+                "fieldtype": "Link",
+                "label": "Assigned to",
+                "name": "_assign",
+                "options": "HD Agent",
+            }
+        )
+
+    standard_fields = [
+        {"fieldname": "name", "fieldtype": "Link", "label": "ID", "options": doctype},
+        {
+            "fieldname": "owner",
+            "fieldtype": "Link",
+            "label": "Created By",
+            "options": "User",
+        },
+        {
+            "fieldname": "modified_by",
+            "fieldtype": "Link",
+            "label": "Last Updated By",
+            "options": "User",
+        },
+        {"fieldname": "creation", "fieldtype": "Datetime", "label": "Created On"},
+        {"fieldname": "modified", "fieldtype": "Datetime", "label": "Last Updated On"},
+    ]
+    for field in standard_fields:
+        if field.get("fieldname") not in [r.get("fieldname") for r in res]:
+            res.append(field)
+    return res
+
+
+@frappe.whitelist()
 def sort_options(doctype: str, show_customer_portal_fields=False):
     fields = frappe.get_meta(doctype).fields
     fields = [field for field in fields if field.fieldtype not in no_value_fields]
@@ -407,3 +418,42 @@ def get_visible_custom_fields():
         {"parent": "Default", "hide_from_customer": 0},
         pluck="fieldname",
     )
+
+
+def default_view_exists(doctype):
+    return frappe.db.exists(
+        "HD View",
+        {
+            "is_default": 1,
+            "user": frappe.session.user,
+            "dt": doctype,
+        },
+    )
+
+
+def handle_default_view(doctype, _list, show_customer_portal_fields):
+    [columns, rows, filters, order_by] = frappe.get_value(
+        "HD View",
+        {
+            "is_default": 1,
+            "user": frappe.session.user,
+            "dt": doctype,
+        },
+        ["columns", "rows", "filters", "order_by"],
+    )
+    columns = frappe.parse_json(columns)
+    rows = frappe.parse_json(rows)
+    filters = frappe.parse_json(filters)
+    print("\n\n", "getting", columns, "\n\n")
+    if not columns:
+        columns = (
+            _list.default_list_data(show_customer_portal_fields).get("columns")
+            if doctype == "HD Ticket"
+            else _list.default_list_data().get("columns")
+        )
+    if not rows:
+        rows = _list.default_list_data().get("rows")
+
+    print("\n\n", columns, "\n\n")
+
+    return [columns, rows, filters, order_by]

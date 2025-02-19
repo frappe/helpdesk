@@ -26,20 +26,21 @@ export const currentView = ref({
 
 export function useView(dt: string = null) {
   const router = useRouter();
-
   function callGetViews() {
     if (
       (views.filters?.dt === dt && views.data?.length > 0) ||
-      views.list?.promise ||
-      views.isCustomerPortal === isCustomerPortal.value
+      (views.list?.promise && views.filters?.dt === dt)
+      // views.isCustomerPortal === isCustomerPortal.value
     ) {
       return;
     }
 
     const filters = {
-      dt,
       is_customer_portal: isCustomerPortal.value,
     };
+    if (dt) {
+      filters["dt"] = dt;
+    }
     if (isCustomerPortal.value) {
       filters["user"] = auth.userId;
     }
@@ -77,7 +78,6 @@ export function useView(dt: string = null) {
       },
       auto: true,
       onSuccess: () => {
-        console.log("success");
         views.reload();
         successCB();
       },
@@ -102,8 +102,14 @@ export function useView(dt: string = null) {
     views.data?.filter((view: View) => view.public).map(parseView),
   );
 
+  const defaultView = computed(() =>
+    views.data?.find(
+      (v: View) => v.is_default && v.user === auth.userId && v.dt === dt,
+    ),
+  );
+
   function updateView(view: any, successCB: Function = () => {}) {
-    if (view.name) {
+    if (view.name !== "default") {
       // handle custom view
       console.log("custom");
       call("frappe.client.set_value", {
@@ -111,12 +117,14 @@ export function useView(dt: string = null) {
         name: view.name,
         fieldname: view,
       }).then(() => {
+        debugger;
         successCB();
         views.reload();
       });
     } else {
       // handle default view
-      console.log("default");
+      createOrUpdateDefaultView(view);
+      successCB();
     }
   }
 
@@ -129,7 +137,28 @@ export function useView(dt: string = null) {
     });
   }
 
-  function createOrUpdateDefaultView() {}
+  function createOrUpdateDefaultView(view: View) {
+    const defaultView = views.data?.find((view: View) => view.is_default);
+    if (defaultView) {
+      delete view["name"];
+      call("frappe.client.set_value", {
+        doctype: "HD View",
+        name: defaultView.name,
+        fieldname: {
+          ...view,
+        },
+      }).then(() => {
+        views.reload();
+      });
+    } else {
+      view["doctype"] = "HD View";
+      // create default view
+      createView({
+        ...view,
+        is_default: true,
+      });
+    }
+  }
 
   function parseView(view: View) {
     return {
@@ -161,6 +190,7 @@ export function useView(dt: string = null) {
     getCurrentUserViews,
     pinnedViews,
     publicViews,
+    defaultView,
     findView,
     createView,
     updateView,

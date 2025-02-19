@@ -137,7 +137,7 @@ const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
 
-const { pinnedViews, publicViews } = useView("HD Ticket");
+const { pinnedViews, publicViews } = useView();
 
 const allViews = computed(() => {
   const items = isCustomerPortal.value

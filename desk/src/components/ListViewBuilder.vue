@@ -129,7 +129,7 @@ import ListRows from "./ListRows.vue";
 import EmptyState from "./EmptyState.vue";
 import { useScreenSize } from "@/composables/screen";
 import { dayjs } from "@/dayjs";
-import { ViewType } from "@/types";
+import { View, ViewType } from "@/types";
 import { useView, views } from "@/composables/useView";
 import { onMounted } from "vue";
 import { router } from "@/router";
@@ -195,7 +195,8 @@ const defaultEmptyState = {
 
 const defaultParams = reactive({
   doctype: options.value.doctype,
-  filters: options.value.defaultFilters || {},
+  filters: {},
+  default_filters: options.value.defaultFilters,
   order_by: "modified desc",
   page_length: options.value.default_page_length,
   page_length_count: options.value.default_page_length,
@@ -203,6 +204,7 @@ const defaultParams = reactive({
   columns: [],
   rows: [],
   show_customer_portal_fields: options.value.isCustomerPortal,
+  is_default: false,
 });
 
 const emptyState = computed(() => {
@@ -453,17 +455,19 @@ function updateColumns(obj) {
   });
   columns.value = defaultParams.columns = isDefault ? "" : _columns;
   defaultParams.rows = isDefault ? "" : rows;
+  console.log(isDefault, columns.value);
   list.reload({ ...defaultParams });
 }
 
 function reload(reset: boolean = false) {
   if (reset) {
-    defaultParams.filters = {};
+    defaultParams.filters = options.value.defaultFilters || {};
     defaultParams.order_by = "modified desc";
     defaultParams.page_length = options.value.default_page_length;
     defaultParams.page_length_count = options.value.default_page_length;
     defaultParams.columns = [];
     defaultParams.rows = [];
+    defaultParams.is_default = true;
   }
   list.reload({ ...defaultParams });
 }
@@ -492,7 +496,9 @@ function handleViewUpdate() {
       columns: JSON.stringify(defaultParams.columns),
       rows: JSON.stringify(defaultParams.rows),
       order_by: defaultParams.order_by,
-      name: (route.query.view as string) || null,
+      name: (route.query.view as string) || "default",
+      dt: options.value.doctype,
+      route_name: route.name,
     },
     () => {
       isViewUpdated.value = false;
@@ -500,19 +506,27 @@ function handleViewUpdate() {
   );
 }
 
-const { findView, updateView } = useView(options.value.doctype);
+const { findView, updateView, defaultView } = useView(options.value.doctype);
 
 function handleViewChanges() {
-  const currentView = findView(route.query.view as string);
-  if (!currentView.value) {
+  let currentView: View;
+  if (route.query.view) {
+    currentView = findView(route.query.view as string).value;
+    defaultParams.is_default = false;
+  } else if (defaultView.value) {
+    currentView = defaultView.value;
+    defaultParams.is_default = true;
+  }
+  if (!currentView) {
     router.push({ name: route.name });
     reload(true);
     return;
   }
-  defaultParams.filters = currentView.value.filters;
-  defaultParams.order_by = currentView.value.order_by || "modified desc";
-  defaultParams.columns = currentView.value.columns;
-  defaultParams.rows = currentView.value.rows;
+  defaultParams.filters = currentView.filters;
+  defaultParams.order_by = currentView.order_by || "modified desc";
+  defaultParams.columns = currentView.columns;
+  defaultParams.rows = currentView.rows;
+
   list.submit({ ...defaultParams });
 }
 
@@ -524,16 +538,16 @@ watch(
   }
 );
 onMounted(async () => {
-  if (route.query.view) {
-    if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
-      handleViewChanges();
-    } else {
-      await views.reload();
-      handleViewChanges();
-    }
+  if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
+    handleViewChanges();
   } else {
-    reload(true);
+    await views.reload();
+    handleViewChanges();
   }
+  if (route.query.view || defaultView.value) {
+    return;
+  }
+  reload(true);
 });
 
 defineExpose(exposeFunctions);

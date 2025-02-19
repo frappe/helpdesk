@@ -303,7 +303,6 @@ const dropdownOptions = computed(() => {
             router.push({
               name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
             });
-            listViewRef.value?.reload(true);
             currentView.value = {
               label: "List",
               icon: "lucide:align-justify",
