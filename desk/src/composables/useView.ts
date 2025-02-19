@@ -111,13 +111,11 @@ export function useView(dt: string = null) {
   function updateView(view: any, successCB: Function = () => {}) {
     if (view.name !== "default") {
       // handle custom view
-      console.log("custom");
       call("frappe.client.set_value", {
         doctype: "HD View",
         name: view.name,
         fieldname: view,
       }).then(() => {
-        debugger;
         successCB();
         views.reload();
       });

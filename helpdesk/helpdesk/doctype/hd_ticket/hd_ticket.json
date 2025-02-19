@@ -408,7 +408,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-02-11 14:39:05.073263",
+ "modified": "2025-02-19 17:47:45.194359",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -447,6 +447,18 @@
    "read": 1,
    "report": 1,
    "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Agent Manager",
    "share": 1,
    "write": 1
   }

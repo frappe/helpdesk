@@ -76,13 +76,13 @@ import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useAuthStore } from "@/stores/auth";
 import { dayjs } from "@/dayjs";
 import { createToast, isCustomerPortal } from "@/utils";
 import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, currentView } from "@/composables/useView";
 import { View } from "@/types";
-import { updateRes } from "@/stores/knowledgeBase";
 
 const router = useRouter();
 const route = useRoute();
@@ -96,6 +96,8 @@ const {
   updateView,
   deleteView,
 } = useView("HD Ticket");
+
+const { isManager } = useAuthStore();
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -353,7 +355,7 @@ const dropdownOptions = computed(() => {
 
 const viewActions = (view) => {
   const _view = findView(view.name).value;
-
+  console.log(isManager);
   let actions = [
     {
       group: "Default Views",
@@ -373,65 +375,73 @@ const viewActions = (view) => {
       ],
     },
   ];
-  actions[0].items.push({
-    label: "Edit",
-    icon: h(EditIcon, { class: "h-4 w-4" }),
-    onClick: () => {
-      viewDialog.view.label = _view.label;
-      viewDialog.view.icon = _view.icon;
-      viewDialog.view.name = _view.name;
-      viewDialog.mode = "edit";
-      viewDialog.show = true;
-    },
-  });
-
-  actions[0].items.push({
-    label: _view?.pinned ? "Unpin View" : "Pin View",
-    icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
-    onClick: () => {
-      const newView = {
-        name: _view.name,
-      };
-      newView["pinned"] = !_view.pinned;
-      updateView(newView);
-    },
-  });
-
-  actions[0].items.push({
-    label: _view?.public ? "Make Private" : "Make Public",
-    icon: h(FeatherIcon, {
-      name: _view?.public ? "lock" : "unlock",
-      class: "h-4 w-4",
-    }),
-    onClick: () => {
-      const newView = {
-        name: _view.name,
-      };
-      newView["public"] = !_view.public;
-      updateView(newView);
-    },
-  });
-
-  actions.push({
-    group: "Delete View",
-    hideLabel: true,
-    items: [
-      {
-        label: "Delete",
-        icon: "trash-2",
-        onClick: () => {
-          if (route.query.view === _view.name) {
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            });
-            listViewRef.value?.reload(true);
-          }
-          deleteView(_view.name);
-          handleSuccess("deleted");
-        },
+  if (!_view.public || isManager) {
+    actions[0].items.push({
+      label: "Edit",
+      icon: h(EditIcon, { class: "h-4 w-4" }),
+      onClick: () => {
+        viewDialog.view.label = _view.label;
+        viewDialog.view.icon = _view.icon;
+        viewDialog.view.name = _view.name;
+        viewDialog.mode = "edit";
+        viewDialog.show = true;
       },
-    ],
-  });
+    });
+    if (!_view.public) {
+      actions[0].items.push({
+        label: _view?.pinned ? "Unpin View" : "Pin View",
+        icon: h(_view?.pinned ? UnpinIcon : PinIcon, { class: "h-4 w-4" }),
+        onClick: () => {
+          const newView = {
+            name: _view.name,
+          };
+          newView["pinned"] = !_view.pinned;
+          updateView(newView);
+        },
+      });
+    }
+    if (isManager) {
+      actions[0].items.push({
+        label: _view?.public ? "Make Private" : "Make Public",
+        icon: h(FeatherIcon, {
+          name: _view?.public ? "lock" : "unlock",
+          class: "h-4 w-4",
+        }),
+        onClick: () => {
+          const newView = {
+            name: _view.name,
+            public: !_view.public,
+          };
+          if (!_view.public) {
+            newView["user"] = null;
+          }
+          updateView(newView);
+        },
+      });
+    }
+    actions.push({
+      group: "Delete View",
+      hideLabel: true,
+      items: [
+        {
+          label: "Delete",
+          icon: "trash-2",
+          onClick: () => {
+            if (route.query.view === _view.name) {
+              router.push({
+                name: isCustomerPortal.value
+                  ? "TicketsCustomer"
+                  : "TicketsAgent",
+              });
+              listViewRef.value?.reload(true);
+            }
+            deleteView(_view.name);
+            handleSuccess("deleted");
+          },
+        },
+      ],
+    });
+  }
 
   return actions;
 };

@@ -283,7 +283,6 @@ function apply(reload = false, isDefault = false, reset = false) {
     reload,
     reset,
   };
-  debugger;
   listViewActions.updateColumns(obj);
   columnsUpdated.value = !reset;
 }

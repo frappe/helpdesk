@@ -154,13 +154,25 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-15 00:58:00.608269",
+ "modified": "2025-02-19 17:48:02.310187",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD View",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
   {
    "create": 1,
    "delete": 1,
@@ -193,7 +205,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Administrator",
+   "role": "Agent Manager",
    "share": 1,
    "write": 1
   }
