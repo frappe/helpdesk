@@ -906,7 +906,6 @@ class HDTicket(Document):
 
     @staticmethod
     def filter_standard_fields(fields):
-        print("\n\n", fields, "\n\n")
         for f in fields:
             if f["name"] in customer_not_allowed_fields:
                 fields.remove(f)
