@@ -14,6 +14,7 @@
       class="shrink-0 text-gray-700"
       :class="{
         'text-gray-900': !isExpanded,
+        'icon-emoji': isMobileView,
       }"
     >
       <Icon v-if="typeof icon === 'string'" :icon="icon" class="h-4 w-4" />
@@ -36,6 +37,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { Icon } from "@iconify/vue";
+import { useScreenSize } from "@/composables/screen";
 
 interface P {
   icon: unknown;
@@ -56,6 +58,7 @@ const props = withDefaults(defineProps<P>(), {
   hvColor: "hover:bg-gray-100",
 });
 const router = useRouter();
+const { isMobileView } = useScreenSize();
 
 function handleNavigation() {
   props.onClick();
@@ -74,3 +77,9 @@ function handleNavigation() {
   router.push(props.to);
 }
 </script>
+
+<style>
+.icon-emoji > div {
+  @apply flex items-center justify-center;
+}
+</style>

@@ -51,7 +51,7 @@
     <div v-for="view in allViews" :key="view.label">
       <div
         v-if="!view.hideLabel && !isExpanded && view.views?.length"
-        class="mx-2 my-2 h-1 border-b"
+        class="mx-2 my-2 h-1"
       />
       <Section
         :label="view.label"
@@ -86,7 +86,7 @@
             :key="link.label"
             :is-expanded="isExpanded"
             :is-active="isActiveTab(link.to)"
-            class="my-0.5"
+            class="my-0.5 emoji"
             :onClick="link.onClick"
           />
         </nav>

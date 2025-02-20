@@ -4,7 +4,7 @@
     class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
     v-if="showViewControls"
   >
-    <QuickFilters v-if="!isMobileView" />
+    <QuickFilters v-if="!isMobileView" class="flex-1 overflow-y-scroll" />
     <div class="flex items-center gap-2" v-if="!isMobileView">
       <Button
         label="Save Changes"
@@ -506,7 +506,6 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 function handleViewUpdate() {
-  debugger;
   updateView(
     {
       filters: JSON.stringify(defaultParams.filters),
