@@ -31,7 +31,7 @@
         <div
           v-for="cannedResponse in cannedResponses.data"
           :key="cannedResponse.name"
-          class="group flex h-60 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-5 py-4 shadow-sm hover:bg-gray-50"
+          class="group flex h-60 cursor-pointer flex-col justify-between gap-2 rounded-lg border px-4 py-3 pt-2 shadow-sm hover:bg-gray-50"
           @click="editItem(cannedResponse)"
         >
           <div class="flex items-center justify-between">
