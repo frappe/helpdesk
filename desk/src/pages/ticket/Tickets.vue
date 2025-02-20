@@ -410,9 +410,6 @@ const viewActions = (view) => {
             name: _view.name,
             public: !_view.public,
           };
-          if (!_view.public) {
-            newView["user"] = null;
-          }
           updateView(newView);
         },
       });
