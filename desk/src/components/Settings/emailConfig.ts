@@ -89,7 +89,7 @@ export const services: EmailService[] = [
     name: "Frappe Mail",
     icon: LogoFrappeMail,
     info: `Setting up Frappe Mail requires you to have an API key and API Secret of your email account. Read more `,
-    link: "https://yandex.com/support/id/authorization/app-passwords.html",
+    link: "https://github.com/frappe/mail",
     custom: true,
   },
   {
