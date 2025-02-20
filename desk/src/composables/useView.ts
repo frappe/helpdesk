@@ -72,8 +72,8 @@ export function useView(dt: string = null) {
       params: {
         doc: {
           doctype: "HD View",
-          user: auth.userId,
           ...view,
+          user: auth.userId,
         },
       },
       auto: true,

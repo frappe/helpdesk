@@ -111,11 +111,6 @@ const props = defineProps({
   },
 });
 
-function getItem(item, active) {
-  console.log("item", item);
-  console.log("active", active);
-}
-
 const route = useRoute();
 
 const isCurrentView = (item) => {

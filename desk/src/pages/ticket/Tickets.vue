@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, computed, reactive } from "vue";
+import { h, ref, computed, reactive, onMounted } from "vue";
 import {
   Badge,
   Tooltip,
@@ -83,7 +83,6 @@ import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, currentView } from "@/composables/useView";
 import { View } from "@/types";
-import { onMounted } from "vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -122,7 +121,7 @@ const selectBannerActions = [
       listSelections.value = new Set(selections);
       confirmDialog({
         title: "Delete Ticket(s)?",
-        message: `Are you sure you want to delete these these?`,
+        message: `Are you sure you want to delete these ticket(s)?`,
         onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
           hideDialog();
           handleTicketDelete(hideDialog);
@@ -349,8 +348,11 @@ const dropdownOptions = computed(() => {
   return items;
 });
 
+let selectedView: View | null = null;
+
 const viewActions = (view) => {
   const _view = findView(view.name).value;
+
   let actions = [
     {
       group: "Default Views",
@@ -362,8 +364,9 @@ const viewActions = (view) => {
           onClick: () => {
             viewDialog.view.label = _view.label + " (New)";
             viewDialog.view.icon = _view.icon;
-            viewDialog.view.name = "";
+            viewDialog.view.name = _view.name;
             viewDialog.mode = "duplicate";
+            selectedView = _view;
             viewDialog.show = true;
           },
         },
@@ -422,16 +425,27 @@ const viewActions = (view) => {
           label: "Delete",
           icon: "trash-2",
           onClick: () => {
-            if (route.query.view === _view.name) {
-              router.push({
-                name: isCustomerPortal.value
-                  ? "TicketsCustomer"
-                  : "TicketsAgent",
-              });
-              listViewRef.value?.reload(true);
-            }
-            deleteView(_view.name);
-            handleSuccess("deleted");
+            confirmDialog({
+              title: `Delete ${_view.label}?`,
+              message: `Are you sure you want to delete this view?
+              ${
+                _view.public
+                  ? "This view is public, and will be removed for all users."
+                  : ""
+              }`,
+              onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+                if (route.query.view === _view.name) {
+                  router.push({
+                    name: isCustomerPortal.value
+                      ? "TicketsCustomer"
+                      : "TicketsAgent",
+                  });
+                }
+                deleteView(_view.name);
+                handleSuccess("deleted");
+                hideDialog();
+              },
+            });
           },
         },
       ],
@@ -462,24 +476,38 @@ function parseViews(views: View[]) {
 }
 
 function handleView(viewInfo, action) {
+  let view: View;
   if (action === "update") {
     updateView(viewInfo);
     handleSuccess("updated");
     return;
+  } else if (action === "duplicate") {
+    view = {
+      ...selectedView,
+      filters: JSON.stringify(selectedView.filters),
+      columns: JSON.stringify(selectedView.columns),
+      rows: JSON.stringify(selectedView.rows),
+      label: viewInfo.label,
+      icon: viewInfo.icon,
+      public: false,
+      pinned: false,
+    };
+  } else {
+    view = {
+      dt: "HD Ticket",
+      type: "list",
+      label: viewInfo.label ?? "List",
+      icon: viewInfo.icon ?? "",
+      route_name: router.currentRoute.value.name as string,
+      order_by: listViewRef.value?.list?.params.order_by,
+      filters: JSON.stringify(listViewRef.value?.list?.params.filters),
+      columns: JSON.stringify(listViewRef.value?.list?.data.columns),
+      rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
+      is_customer_portal: isCustomerPortal.value,
+    };
   }
+
   // createView
-  const view: View = {
-    dt: "HD Ticket",
-    type: "list",
-    label: viewInfo.label ?? "List",
-    icon: viewInfo.icon ?? "",
-    route_name: router.currentRoute.value.name as string,
-    order_by: listViewRef.value?.list?.params.order_by,
-    filters: JSON.stringify(listViewRef.value?.list?.params.filters),
-    columns: JSON.stringify(listViewRef.value?.list?.data.columns),
-    rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
-    is_customer_portal: isCustomerPortal.value,
-  };
   createView(view, (d) => {
     currentView.value = {
       label: d.label || "List",
@@ -510,6 +538,7 @@ function resetState() {
   viewDialog.view.icon = "";
   viewDialog.view.name = "";
   viewDialog.mode = null;
+  selectedView = null;
 }
 
 onMounted(() => {
