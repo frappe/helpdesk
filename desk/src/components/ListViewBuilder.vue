@@ -506,6 +506,7 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 function handleViewUpdate() {
+  debugger;
   updateView(
     {
       filters: JSON.stringify(defaultParams.filters),

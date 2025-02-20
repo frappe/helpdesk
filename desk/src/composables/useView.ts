@@ -136,7 +136,9 @@ export function useView(dt: string = null) {
   }
 
   function createOrUpdateDefaultView(view: View) {
-    const defaultView = views.data?.find((view: View) => view.is_default);
+    const defaultView = views.data?.find(
+      (v: View) => v.is_default && v.user === auth.userId && v.dt === view.dt,
+    );
     view.is_customer_portal = isCustomerPortal.value;
     if (defaultView) {
       delete view["name"];

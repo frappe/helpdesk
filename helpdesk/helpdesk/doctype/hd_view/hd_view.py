@@ -28,3 +28,13 @@ class HDView(Document):
             frappe.throw(
                 _("Only one default view is allowed per user for {0}").format(self.dt)
             )
+
+    def before_save(self):
+        self.toggle_pinned_public_view()
+
+    def toggle_pinned_public_view(self):
+        if self.pinned and self.public:
+            if self.has_value_changed("pinned"):
+                self.public = 0
+            if self.has_value_changed("public"):
+                self.pinned = 0
