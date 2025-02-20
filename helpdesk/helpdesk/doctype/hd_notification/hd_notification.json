@@ -82,7 +82,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-30 02:16:06.186898",
+ "modified": "2025-02-20 12:18:20.219347",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Notification",
@@ -110,10 +110,6 @@
    "role": "Agent",
    "share": 1,
    "write": 1
-  },
-  {
-   "read": 1,
-   "role": "Guest"
   }
  ],
  "sort_field": "modified",

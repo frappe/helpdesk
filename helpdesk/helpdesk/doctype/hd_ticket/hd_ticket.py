@@ -753,6 +753,38 @@ class HDTicket(Document):
                 "width": "8rem",
             },
             {
+                "label": "First response",
+                "type": "Datetime",
+                "key": "response_by",
+                "width": "8rem",
+            },
+            {
+                "label": "Resolution",
+                "type": "Datetime",
+                "key": "resolution_by",
+                "width": "8rem",
+            },
+            {
+                "label": "Agreement status",
+                "fieldtype": "Select",
+                "key": "agreement_status",
+                "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
+                "width": "10rem",
+            },
+            {
+                "label": "Assigned To",
+                "type": "MultipleAvatar",
+                "key": "_assign",
+                "width": "10rem",
+            },
+            {
+                "label": "Customer",
+                "type": "Link",
+                "key": "customer",
+                "options": "HD Customer",
+                "width": "8rem",
+            },
+            {
                 "label": "Priority",
                 "type": "Link",
                 "options": "HD Ticket Priority",
@@ -781,49 +813,10 @@ class HDTicket(Document):
                 "width": "8rem",
             },
             {
-                "label": "Agreement status",
-                "fieldtype": "Select",
-                "key": "agreement_status",
-                "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
-                "width": "10rem",
-            },
-            {
-                "label": "First response",
-                "type": "Datetime",
-                "key": "response_by",
-                "width": "8rem",
-            },
-            {
-                "label": "Resolution",
-                "type": "Datetime",
-                "key": "resolution_by",
-                "width": "8rem",
-            },
-            {
-                "label": "Customer",
-                "type": "Link",
-                "key": "customer",
-                "options": "HD Customer",
-                "width": "8rem",
-            },
-            {
-                "label": "Assigned To",
-                "type": "MultipleAvatar",
-                "key": "_assign",
-                "width": "10rem",
-            },
-            {
                 "label": "Rating",
                 "type": "Rating",
                 "key": "feedback_rating",
                 "width": "10rem",
-            },
-            {
-                "label": "Last modified",
-                "type": "Datetime",
-                "key": "modified",
-                "options": "Contact",
-                "width": "8rem",
             },
             {
                 "label": "Created",
@@ -911,6 +904,14 @@ class HDTicket(Document):
             "rows": rows,
         }
 
+    @staticmethod
+    def filter_standard_fields(fields):
+        print("\n\n", fields, "\n\n")
+        for f in fields:
+            if f["name"] in customer_not_allowed_fields:
+                fields.remove(f)
+        return fields
+
 
 # Check if `user` has access to this specific ticket (`doc`). This implements extra
 # permission checks which is not possible with standard permission system. This function
@@ -960,3 +961,6 @@ def remove_guest_ticket_creation_permission():
     role = "Guest"
     permlevel = 0
     remove(doctype, role, permlevel, 1)
+
+
+customer_not_allowed_fields = ["customer"]

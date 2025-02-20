@@ -144,7 +144,7 @@ import {
   views,
   currentView as headerView,
 } from "@/composables/useView";
-import { getIcon } from "@/utils";
+import { getIcon, formatTimeShort } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
 
 interface P {
@@ -356,6 +356,7 @@ const quickFilters = createResource({
   auto: !options.value.hideViewControls,
   params: {
     doctype: options.value.doctype,
+    show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
@@ -377,13 +378,14 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   if (column.type === "Datetime") {
     return h("span", {
-      class: "text-base",
-      innerHTML: dayjs.tz(item).fromNow(),
+      class: "text-p-xs",
+      innerHTML: formatTimeShort(item),
     });
   }
   if (column.type === "MultipleAvatar") {
     return h(MultipleAvatar, {
       avatars: item,
+      hideName: true,
       class: "flex items-center",
     });
   }

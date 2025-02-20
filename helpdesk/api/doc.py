@@ -365,7 +365,7 @@ def sort_options(doctype: str, show_customer_portal_fields=False):
 
 
 @frappe.whitelist()
-def get_quick_filters(doctype: str):
+def get_quick_filters(doctype: str, show_customer_portal_fields=False):
     meta = frappe.get_meta(doctype)
     fields = [field for field in meta.fields if field.in_standard_filter]
     quick_filters = []
@@ -384,6 +384,9 @@ def get_quick_filters(doctype: str):
             options = [{"label": option, "value": option} for option in options]
             options.insert(0, {"label": "", "value": ""})
 
+        if field.fieldtype == "Link":
+            options = field.options
+
         quick_filters.append(
             {
                 "label": _(field.label),
@@ -392,6 +395,14 @@ def get_quick_filters(doctype: str):
                 "options": options,
             }
         )
+
+    if doctype != "HD Ticket":
+        return quick_filters
+
+    _list = get_controller(doctype)
+    if hasattr(_list, "filter_standard_fields") and show_customer_portal_fields:
+        # to filter out more fields from customer remember to update customer_not_allowed_fields in hd_ticket.py
+        quick_filters = _list.filter_standard_fields(quick_filters)
 
     return quick_filters
 

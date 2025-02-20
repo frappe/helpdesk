@@ -14,7 +14,7 @@
           :label="_avatars[0].label"
           size="sm"
         />
-        <div class="truncate">{{ _avatars[0].label }}</div>
+        <div class="truncate" v-if="!hideName">{{ _avatars[0].label }}</div>
       </Tooltip>
     </div>
     <Tooltip
@@ -46,6 +46,10 @@ const props = defineProps({
   size: {
     type: String,
     default: "md",
+  },
+  hideName: {
+    type: Boolean,
+    default: false,
   },
 });
 const { getUser } = useUserStore();

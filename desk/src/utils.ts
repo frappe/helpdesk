@@ -4,6 +4,7 @@ import { ref, h, markRaw } from "vue";
 import zod from "zod";
 import { gemoji } from "gemoji";
 import TicketIcon from "./components/icons/TicketIcon.vue";
+import dayjs from "dayjs";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -27,7 +28,7 @@ export async function copy(s: string) {
       title: "Copied to clipboard",
       icon: "check",
       iconClasses: "text-green-600",
-    })
+    }),
   );
 }
 
@@ -200,4 +201,23 @@ export function getIcon(icon) {
     return h("div", icon);
   }
   return icon || markRaw(TicketIcon);
+}
+export function formatTimeShort(date: string) {
+  const now = dayjs();
+  const inputDate = dayjs.tz(date);
+  const diffSeconds = now.diff(inputDate, "second");
+  const diffMinutes = now.diff(inputDate, "minute");
+  const diffHours = now.diff(inputDate, "hour");
+  const diffDays = now.diff(inputDate, "day");
+  const diffWeeks = now.diff(inputDate, "week");
+  const diffMonths = now.diff(inputDate, "month");
+  const diffYears = now.diff(inputDate, "year");
+
+  if (diffSeconds < 60) return `${diffSeconds} s`;
+  if (diffMinutes < 60) return `${diffMinutes} m`;
+  if (diffHours < 24) return `${diffHours} h`;
+  if (diffDays < 7) return `${diffDays} d`;
+  if (diffWeeks < 4) return `${diffWeeks} w`;
+  if (diffMonths < 12) return `${diffMonths} M`;
+  return `${diffYears}Y`;
 }

@@ -318,6 +318,7 @@
   {
    "fieldname": "customer",
    "fieldtype": "Link",
+   "in_standard_filter": 1,
    "label": "Customer",
    "options": "HD Customer"
   },
@@ -408,7 +409,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-02-19 17:47:45.194359",
+ "modified": "2025-02-20 12:00:20.604270",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
