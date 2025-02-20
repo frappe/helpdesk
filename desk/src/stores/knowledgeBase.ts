@@ -1,5 +1,4 @@
 import { createResource } from "frappe-ui";
-import { url } from "../../../node_modules/frappe-ui/node_modules/tailwindcss/src/util/dataTypes";
 
 // Title
 export const newArticle = createResource({
@@ -117,8 +116,8 @@ export const setFeedback = createResource({
 
 // view count
 export const incrementView = createResource({
-  url:"helpdesk.api.knowledge_base.increment_views",
+  url: "helpdesk.api.knowledge_base.increment_views",
   makeParams: ({ article }) => ({
     article,
   }),
-})
+});

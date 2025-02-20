@@ -38,15 +38,45 @@
             </div>
           </div>
 
-          <div class="mb-4 flex flex-col gap-1 px-2">
-            <SidebarLink
-              v-for="option in menuOptions"
-              v-bind="option"
-              :key="option.label"
-              :is-expanded="true"
-              :is-active="isActiveTab(option.to)"
-              :on-click="() => (sidebarOpened = false)"
+          <div v-for="view in allViews" :key="view.label">
+            <div
+              v-if="!view.hideLabel && view.views?.length"
+              class="mx-2 my-2 h-1"
             />
+            <Section
+              :label="view.label"
+              :hideLabel="view.hideLabel"
+              :opened="view.opened"
+            >
+              <template #header="{ opened, hide, toggle }">
+                <div
+                  v-if="!hide"
+                  class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+                  :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
+                  @click="toggle()"
+                >
+                  <FeatherIcon
+                    name="chevron-right"
+                    class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                    :class="{ 'rotate-90': opened }"
+                  />
+                  <span>{{ view.label }}</span>
+                </div>
+              </template>
+              <nav class="flex flex-col ml-2 mr-1">
+                <SidebarLink
+                  v-for="link in view.views"
+                  :icon="link.icon"
+                  :label="link.label"
+                  :to="link.to"
+                  :key="link.label"
+                  :is-expanded="true"
+                  :is-active="isActiveTab(link.to)"
+                  class="my-0.5"
+                  :onClick="link.onClick"
+                />
+              </nav>
+            </Section>
           </div>
         </div>
       </TransitionChild>
@@ -77,9 +107,12 @@ import { useRouter, useRoute } from "vue-router";
 
 import UserMenu from "@/components/UserMenu.vue";
 import SidebarLink from "@/components/SidebarLink.vue";
+import { Section } from "@/components";
 import { useNotificationStore } from "@/stores/notification";
 
+import { useView, currentView } from "@/composables/useView";
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
+
 import LucideBell from "~icons/lucide/bell";
 
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
@@ -89,6 +122,7 @@ import {
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 import { useAuthStore } from "@/stores/auth";
+const { pinnedViews, publicViews } = useView();
 import { isCustomerPortal } from "@/utils";
 
 const notificationStore = useNotificationStore();
@@ -96,11 +130,55 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 
-const menuOptions = computed(() => {
-  return isCustomerPortal.value
+const allViews = computed(() => {
+  const items = isCustomerPortal.value
     ? customerPortalSidebarOptions
     : agentPortalSidebarOptions;
+
+  const options = [
+    {
+      label: "All Views",
+      hideLabel: true,
+      opened: true,
+      views: items,
+    },
+  ];
+  if (publicViews.value?.length && !isCustomerPortal.value) {
+    options.push({
+      label: "Public Views",
+      opened: true,
+      hideLabel: false,
+      views: parseViews(publicViews.value),
+    });
+  }
+  if (pinnedViews.value?.length) {
+    options.push({
+      label: "Pinned Views",
+      opened: true,
+      hideLabel: false,
+      views: parseViews(pinnedViews.value),
+    });
+  }
+  return options;
 });
+function parseViews(views) {
+  return views.map((view) => {
+    return {
+      label: view.label,
+      icon: view.icon,
+      to: {
+        name: view.route_name,
+        query: { view: view.name },
+      },
+      onClick: () => {
+        currentView.value = {
+          label: view.label,
+          icon: view.icon,
+        };
+      },
+    };
+  });
+}
 
 const customerPortalDropdown = computed(() => [
   {
@@ -146,6 +224,9 @@ const profileSettings = computed(() => {
 });
 
 function isActiveTab(to: string) {
+  if (route.query.view) {
+    return route.query.view == to?.query?.view;
+  }
   return route.name === to;
 }
 </script>
