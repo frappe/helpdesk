@@ -18,7 +18,7 @@
             :class="{ 'rotate-90': opened }"
           />
           <span>
-            {{ __(label) || __("Untitled") }}
+            {{ label || "Untitled" }}
           </span>
           <FeatherIcon
             v-if="collapsible && collapseIconPosition === 'right'"

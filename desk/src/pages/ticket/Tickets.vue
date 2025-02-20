@@ -128,7 +128,7 @@ const selectBannerActions = [
         },
       });
     },
-    condition: () => !isCustomerPortal.value,
+    condition: () => !isCustomerPortal.value && isManager,
   },
 ];
 
@@ -477,6 +477,10 @@ function handleView(viewInfo, action) {
   if (action === "update") {
     updateView(viewInfo);
     handleSuccess("updated");
+    currentView.value = {
+      label: viewInfo.label,
+      icon: getIcon(viewInfo.icon),
+    };
     return;
   } else if (action === "duplicate") {
     view = {
