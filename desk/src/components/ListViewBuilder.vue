@@ -420,7 +420,7 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     } else {
       item = item[0].name;
     }
-    applyFilters({ ...defaultParams.filters, [column.key]: item });
+    applyFilters({ ...defaultParams.filters, [column.key]: ["LIKE", item] });
     return;
   }
   applyFilters({ ...defaultParams.filters, [column.key]: item });
