@@ -65,7 +65,7 @@
             :class="
               !isExpanded
                 ? 'ml-0 h-0 overflow-hidden opacity-0'
-                : 'ml-2 mt-4 h-7 w-auto opacity-100'
+                : 'mt-4 h-7 w-auto opacity-100'
             "
             @click="toggle()"
           >

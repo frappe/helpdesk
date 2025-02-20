@@ -2,9 +2,9 @@
   <div class="flex items-center">
     <router-link
       :to="{ name: routeName }"
-      class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7"
+      class="px-0.5 py-1 text-lg font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-outline-gray-3 text-ink-gray-5 hover:text-ink-gray-7 flex items-center justify-center"
     >
-      {{ label }}
+      {{ isMobileView ? "..." : label }}
     </router-link>
     <span class="mx-0.5 text-base text-ink-gray-4" aria-hidden="true"> / </span>
     <Dropdown :options="options">
@@ -88,6 +88,8 @@
 import { Icon } from "@iconify/vue";
 import Dropdown from "@/components/frappe-ui/Dropdown.vue";
 import { useRoute } from "vue-router";
+import { useScreenSize } from "@/composables/screen";
+
 const props = defineProps({
   routeName: {
     type: String,
@@ -112,7 +114,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
-
+const { isMobileView } = useScreenSize();
 const isCurrentView = (item) => {
   if (!route.query.view) return false;
   return item.name === route.query.view;
