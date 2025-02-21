@@ -414,6 +414,10 @@ const options = computed(() => {
         },
       },
     },
+    rowRoute: {
+      name: "Article",
+      prop: "articleId",
+    },
     groupByActions,
     showSelectBanner: true,
     selectBannerActions,

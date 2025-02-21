@@ -184,6 +184,10 @@ const options = {
       class: "h-10 w-10",
     }),
   },
+  rowRoute: {
+    name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
+    prop: "ticketId",
+  },
   hideColumnSetting: false,
 };
 
@@ -319,7 +323,7 @@ const dropdownOptions = computed(() => {
   }
   if (pinnedViews.value?.length !== 0) {
     items.push({
-      group: "Pinned Views",
+      group: "Private Views",
       items: parseViews(pinnedViews.value),
     });
   }
