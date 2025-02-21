@@ -25,11 +25,12 @@
                   ),
               }
             : {
-                change: (event) =>
+                change: (event) => {
                   emitUpdate(
                     field.fieldname,
-                    event.value || event.target.value
-                  ),
+                    event?.value || event.target?.value || event
+                  );
+                },
               }
         "
       />
