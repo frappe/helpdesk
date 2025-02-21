@@ -159,7 +159,6 @@ import {
 } from "@/composables/useView";
 import { getIcon, formatTimeShort } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
-import { get } from "@vueuse/core";
 
 interface P {
   options: {
