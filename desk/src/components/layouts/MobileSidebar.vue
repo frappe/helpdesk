@@ -153,7 +153,7 @@ const allViews = computed(() => {
   }
   if (pinnedViews.value?.length) {
     options.push({
-      label: "Pinned Views",
+      label: "Private Views",
       opened: true,
       hideLabel: false,
       views: parseViews(pinnedViews.value),

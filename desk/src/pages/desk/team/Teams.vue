@@ -20,6 +20,10 @@
         emptyState: {
           title: emptyMessage,
         },
+        rowRoute: {
+          name: 'Team',
+          prop: 'teamId',
+        },
       }"
       @row-click="handleRowClick"
       @empty-state-action="showNewDialog = true"
