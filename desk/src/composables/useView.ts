@@ -17,6 +17,7 @@ export const views = createListResource({
       view.rows = JSON.parse(view.rows) || [];
     });
   },
+  limit:1000
 });
 
 export const currentView = ref({
