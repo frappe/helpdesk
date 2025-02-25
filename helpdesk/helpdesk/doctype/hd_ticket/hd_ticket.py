@@ -765,17 +765,10 @@ class HDTicket(Document):
                 "width": "8rem",
             },
             {
-                "label": "Agreement status",
-                "fieldtype": "Select",
-                "key": "agreement_status",
-                "options": "\nFirst Response Due\nResolution Due\nFailed\nFulfilled\nPaused",
-                "width": "10rem",
-            },
-            {
                 "label": "Assigned To",
                 "type": "MultipleAvatar",
                 "key": "_assign",
-                "width": "10rem",
+                "width": "5em",
             },
             {
                 "label": "Customer",
