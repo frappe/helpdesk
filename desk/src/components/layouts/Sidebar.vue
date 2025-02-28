@@ -132,6 +132,8 @@ import { Section } from "@/components";
 import { useView, currentView } from "@/composables/useView";
 import { FrappeCloudIcon } from "@/components/icons";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
+import { useScreenSize } from "@/composables/screen";
+const { isMobileView } = useScreenSize();
 
 const route = useRoute();
 const router = useRouter();
@@ -228,7 +230,7 @@ const agentPortalDropdown = computed(() => [
     label: "Login to Frappe Cloud",
     icon: h(FrappeCloudIcon),
     onClick: () => confirmLoginToFrappeCloud(),
-    condition: () => window.is_fc_site,
+    condition: () => isMobileView.value && window.is_fc_site,
   },
   {
     label: "Settings",
