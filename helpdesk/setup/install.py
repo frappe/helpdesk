@@ -56,7 +56,8 @@ def add_default_sla():
     add_default_ticket_priorities()
     add_default_holiday_list()
     enable_track_service_level_agreement_in_support_settings()
-
+    if frappe.db.exists("HD Service Level Agreement", "Default"):
+        return
     sla_doc = frappe.new_doc("HD Service Level Agreement")
 
     sla_doc.service_level = "Default"
