@@ -2,15 +2,11 @@ import frappe
 from frappe import _
 from frappe.utils.telemetry import capture
 
-from helpdesk import __version__
-
 no_cache = 1
 
 
 def get_context(context):
     context.csrf_token = frappe.sessions.get_csrf_token()
-    context.frappe_version = frappe.__version__
-    context.helpdesk_version = __version__
     context.site_name = frappe.local.site
     # website favicon
     context.favicon = get_favicon()
@@ -32,7 +28,6 @@ def get_context_for_dev():
 def get_boot():
     return frappe._dict(
         {
-            "frappe_version": frappe.__version__,
             "default_route": get_default_route(),
             "site_name": frappe.local.site,
             "read_only_mode": frappe.flags.read_only,

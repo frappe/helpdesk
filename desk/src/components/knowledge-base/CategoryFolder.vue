@@ -9,10 +9,7 @@
     }"
   >
     <div>
-      <FeatherIcon
-        name="folder"
-        class="fill-ink-gray-3 h-8 w-8 text-gray-400 -ml-[2px]"
-      />
+      <FeatherIcon name="folder" class="h-6 w-6 text-ink-gray-4 -ml-[2px]" />
     </div>
     <div class="gap-1 flex flex-col">
       <p class="text-base font-medium text-gray-800 truncate">

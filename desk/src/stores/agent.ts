@@ -7,7 +7,6 @@ export const useAgentStore = defineStore("agent", () => {
     doctype: "HD Agent",
     fields: ["name", "agent_name", "user", "user.user_image"],
     filters: { is_active: 1 },
-    auto: true,
     pageLength: 99999,
   });
 
@@ -18,8 +17,15 @@ export const useAgentStore = defineStore("agent", () => {
     }))
   );
 
+  function searchAgents(query: string) {
+    return agents.data.filter((a) =>
+      a.user?.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+
   return {
     dropdown,
     agents,
+    searchAgents,
   };
 });

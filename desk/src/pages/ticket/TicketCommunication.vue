@@ -11,8 +11,8 @@
         </Tooltip>
       </div>
     </div>
-    <!-- eslint-disable-next-line vue/no-v-html -->
-    <div class="prose-f" v-html="sanitize(content)"></div>
+
+    <EmailContent :content="sanitize(content)" />
     <div class="flex flex-wrap gap-2 mb-2">
       <AttachmentItem
         v-for="a in attachments"

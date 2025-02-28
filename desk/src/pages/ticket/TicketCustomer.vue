@@ -29,7 +29,11 @@
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
         <TicketConversation class="grow" />
-        <div class="m-5">
+        <div
+          class="m-5"
+          @keydown.ctrl.enter.capture.stop="sendEmail"
+          @keydown.meta.enter.capture.stop="sendEmail"
+        >
           <TicketTextEditor
             v-if="showEditor"
             ref="editor"
@@ -46,7 +50,8 @@
                 theme="gray"
                 variant="solid"
                 :disabled="$refs.editor.editor.isEmpty || send.loading"
-                @click="() => send.submit()"
+                :loading="send.loading"
+                @click="sendEmail"
               />
             </template>
           </TicketTextEditor>
@@ -61,52 +66,47 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";
-import { createResource, Button, Breadcrumbs } from "frappe-ui";
+import { createResource, Button, Breadcrumbs, confirmDialog } from "frappe-ui";
+import { useConfigStore } from "@/stores/config";
 import { Icon } from "@iconify/vue";
 import { useError } from "@/composables/error";
-import TicketConversation from "./ticket/TicketConversation.vue";
-import TicketCustomerTemplateFields from "./ticket/TicketCustomerTemplateFields.vue";
-import TicketFeedback from "./ticket/TicketFeedback.vue";
-import TicketTextEditor from "./ticket/TicketTextEditor.vue";
-import { ITicket } from "./ticket/symbols";
+import { ITicket } from "./symbols";
 import { useRouter } from "vue-router";
-import { createToast } from "@/utils";
+import { createToast, isContentEmpty, setupCustomActions } from "@/utils";
 import { socket } from "@/socket";
 import { LayoutHeader } from "@/components";
-import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { useScreenSize } from "@/composables/screen";
-import { useConfigStore } from "@/stores/config";
-import { confirmDialog } from "frappe-ui";
-import { setupCustomActions } from "@/utils";
+import TicketConversation from "./TicketConversation.vue";
+import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
+import TicketTextEditor from "./TicketTextEditor.vue";
+import TicketFeedback from "./TicketFeedback.vue";
+import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
+import { useTicket } from "./data";
 interface P {
   ticketId: string;
 }
 const router = useRouter();
 
 const props = defineProps<P>();
-const ticket = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
-  auto: true,
-  params: {
-    name: props.ticketId,
-    is_customer_portal: true,
+const ticket = useTicket(
+  props.ticketId,
+  true,
+  null,
+  (data) => {
+    setupCustomActions(data, {
+      doc: data,
+      updateField,
+    });
   },
-  onError: () => {
+  () => {
     createToast({
       title: "Ticket not found",
       icon: "x",
       iconClasses: "text-red-600",
     });
     router.replace("/my-tickets");
-  },
-  onSuccess: (data) => {
-    setupCustomActions(data, {
-      doc: data,
-      updateField,
-    });
-  },
-});
+  }
+);
 provide(ITicket, ticket);
 const editor = ref(null);
 const placeholder = "Type a message";
@@ -140,6 +140,13 @@ const send = createResource({
 function updateField(name, value, callback = () => {}) {
   updateTicket(name, value);
   callback();
+}
+
+function sendEmail() {
+  if (isContentEmpty(editorContent.value) || send.loading) {
+    return;
+  }
+  send.submit();
 }
 
 function updateTicket(fieldname: string, value: string) {

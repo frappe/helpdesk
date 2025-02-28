@@ -25,11 +25,12 @@
                   ),
               }
             : {
-                change: (event) =>
+                change: (event) => {
                   emitUpdate(
                     field.fieldname,
-                    event.value || event.target.value
-                  ),
+                    event?.value || event.target?.value || event
+                  );
+                },
               }
         "
       />
@@ -39,10 +40,9 @@
 
 <script setup lang="ts">
 import { computed, h } from "vue";
-import { Autocomplete } from "@/components";
+import { Autocomplete, Link } from "@/components";
 import { createResource, FormControl, Tooltip } from "frappe-ui";
 import { Field, FieldValue } from "@/types";
-import SearchComplete from "./SearchComplete.vue";
 
 interface P {
   field: Field;
@@ -69,8 +69,9 @@ const component = computed(() => {
       options: apiOptions.data,
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    return h(SearchComplete, {
+    return h(Link, {
       doctype: props.field.options,
+      hideMe: true,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
