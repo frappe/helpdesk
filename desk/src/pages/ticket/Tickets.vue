@@ -402,7 +402,7 @@ const viewActions = (view) => {
         },
       });
     }
-    if (isManager) {
+    if (isManager && !isCustomerPortal.value) {
       actions[0].items.push({
         label: _view?.public ? "Make Private" : "Make Public",
         icon: h(FeatherIcon, {
@@ -414,7 +414,18 @@ const viewActions = (view) => {
             name: _view.name,
             public: !_view.public,
           };
-          updateView(newView);
+
+          if (_view.public) {
+            confirmDialog({
+              title: `Make ${_view.label} private?`,
+              message:
+                "This view is currently public. Changing it to private will hide it for all the users.",
+              onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
+                hideDialog();
+                updateView(newView);
+              },
+            });
+          }
         },
       });
     }

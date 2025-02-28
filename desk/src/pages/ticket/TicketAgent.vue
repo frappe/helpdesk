@@ -2,7 +2,15 @@
   <div class="flex flex-col">
     <LayoutHeader v-if="ticket.data">
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="breadcrumbs">
+          <template #prefix="{ item }">
+            <Icon
+              v-if="item.icon"
+              :icon="item.icon"
+              class="mr-1 h-4 flex items-center justify-center self-center"
+            />
+          </template>
+        </Breadcrumbs>
       </template>
       <template #right-header>
         <CustomActions
@@ -125,6 +133,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
+import { useRoute } from "vue-router";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
@@ -142,6 +151,7 @@ import {
   MultipleAvatar,
   AssignmentModal,
   CommunicationArea,
+  Icon,
 } from "@/components";
 import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import {
@@ -153,8 +163,10 @@ import {
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, setupCustomActions } from "@/utils";
-import { TabObject, TicketTab } from "@/types";
+import { createToast, getIcon, setupCustomActions } from "@/utils";
+import { TabObject, TicketTab, View } from "@/types";
+import { useView } from "@/composables/useView";
+import { ComputedRef } from "vue";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -175,6 +187,9 @@ watch(
     ticket.reload();
   }
 );
+const route = useRoute();
+const { findView } = useView("HD Ticket");
+
 provide("communicationArea", communicationAreaRef);
 
 let storage = useStorage("ticket_agent", {
@@ -218,6 +233,16 @@ function updateField(name, value, callback = () => {}) {
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
+  if (route.query.view) {
+    const currView: ComputedRef<View> = findView(route.query.view as string);
+    if (currView) {
+      items.push({
+        label: currView.value.label,
+        icon: getIcon(currView.value.icon),
+        route: { name: "TicketsAgent", query: { view: currView.value.name } },
+      });
+    }
+  }
   items.push({
     label: ticket.data?.subject,
     onClick: () => {

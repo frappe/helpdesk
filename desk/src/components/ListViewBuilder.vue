@@ -14,15 +14,7 @@
         v-if="isViewUpdated && canSaveView"
         @click="handleViewUpdate"
       />
-      <Reload
-        @click="
-          () => {
-            handleViewChanges();
-            isViewUpdated = false;
-          }
-        "
-        :loading="list.loading"
-      />
+      <Reload @click="handleReload" :loading="list.loading" />
       <Filter :default_filters="defaultParams.filters" />
       <SortBy :hide-label="isMobileView" />
       <ColumnSettings
@@ -33,7 +25,7 @@
     <div v-else class="flex justify-between items-center w-full">
       <Filter :default_filters="defaultParams.filters" />
       <div class="flex items-center gap-2">
-        <Reload @click="reload" :loding="list.loading" />
+        <Reload @click="handleReload" :loading="list.loading" />
         <SortBy :hide-label="isMobileView" />
       </div>
     </div>
@@ -53,6 +45,7 @@
       getRowRoute: (row) => ({
         name: options.rowRoute?.name,
         params: { [options.rowRoute?.prop]: row.name },
+        query: { view: route.query?.view },
       }),
       emptyState,
     }"
@@ -138,6 +131,7 @@ import {
   ListSelectBanner,
   FeatherIcon,
   Dropdown,
+  confirmDialog,
 } from "frappe-ui";
 import {
   Filter,
@@ -404,7 +398,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
     return h(MultipleAvatar, {
       avatars: item,
       hideName: true,
-      class: "flex items-center",
+      class: "flex items-center truncate",
     });
   }
   if (column.type === "Rating") {
@@ -530,21 +524,19 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 function handleViewUpdate() {
-  updateView(
-    {
-      filters: JSON.stringify(defaultParams.filters),
-      columns: JSON.stringify(defaultParams.columns),
-      rows: JSON.stringify(defaultParams.rows),
-      order_by: defaultParams.order_by,
-      name: (route.query.view as string) || "default",
-      dt: options.value.doctype,
-      route_name: route.name,
-      is_customer_portal: options.value.isCustomerPortal,
-    },
-    () => {
-      isViewUpdated.value = false;
-    }
-  );
+  const view = {
+    filters: JSON.stringify(defaultParams.filters),
+    columns: JSON.stringify(defaultParams.columns),
+    rows: JSON.stringify(defaultParams.rows),
+    order_by: defaultParams.order_by,
+    name: (route.query.view as string) || "default",
+    dt: options.value.doctype,
+    route_name: route.name,
+    is_customer_portal: options.value.isCustomerPortal,
+  };
+  updateView(view, () => {
+    isViewUpdated.value = false;
+  });
 }
 
 const { findView, updateView, defaultView } = useView(options.value.doctype);
@@ -557,6 +549,11 @@ const canSaveView = computed(() => {
   }
   return false;
 });
+
+function handleReload() {
+  handleViewChanges();
+  isViewUpdated.value = false;
+}
 
 function handleViewChanges() {
   let currentView: View = findCurrentView();
