@@ -93,6 +93,7 @@
       </Section>
     </div>
     <div class="grow" />
+    <TrialBanner v-if="isFCSite" />
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"
@@ -105,8 +106,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, ref } from "vue";
+import { computed, markRaw, ref, h } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { TrialBanner } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
@@ -128,6 +130,8 @@ import {
 } from "./layoutSettings";
 import { Section } from "@/components";
 import { useView, currentView } from "@/composables/useView";
+import { FrappeCloudIcon } from "@/components/icons";
+import { confirmLoginToFrappeCloud } from "@/composables/fc";
 
 const route = useRoute();
 const router = useRouter();
@@ -136,7 +140,7 @@ const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
 const showSettingsModal = ref(false);
-
+const isFCSite = ref(window.is_fc_site);
 const { pinnedViews, publicViews } = useView();
 
 const allViews = computed(() => {
@@ -219,6 +223,12 @@ const agentPortalDropdown = computed(() => [
     icon: "book-open",
     label: "Docs",
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
+  },
+  {
+    label: "Login to Frappe Cloud",
+    icon: h(FrappeCloudIcon),
+    onClick: () => confirmLoginToFrappeCloud(),
+    condition: () => window.is_fc_site,
   },
   {
     label: "Settings",
