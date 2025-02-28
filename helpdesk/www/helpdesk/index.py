@@ -1,5 +1,7 @@
 import frappe
 from frappe import _
+from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
+from frappe.utils import cint
 from frappe.utils.telemetry import capture
 
 no_cache = 1
@@ -33,6 +35,8 @@ def get_boot():
             "read_only_mode": frappe.flags.read_only,
             "csrf_token": frappe.sessions.get_csrf_token(),
             "favicon": get_favicon(),
+            "setup_complete": cint(frappe.get_system_settings("setup_complete")),
+            "is_fc_site": is_fc_site(),
         }
     )
 
