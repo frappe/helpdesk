@@ -768,7 +768,7 @@ class HDTicket(Document):
                 "label": "Assigned To",
                 "type": "MultipleAvatar",
                 "key": "_assign",
-                "width": "5em",
+                "width": "8rem",
             },
             {
                 "label": "Customer",

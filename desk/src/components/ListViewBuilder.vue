@@ -45,6 +45,7 @@
       getRowRoute: (row) => ({
         name: options.rowRoute?.name,
         params: { [options.rowRoute?.prop]: row.name },
+        query: { view: route.query?.view },
       }),
       emptyState,
     }"
@@ -397,7 +398,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
     return h(MultipleAvatar, {
       avatars: item,
       hideName: true,
-      class: "flex items-center",
+      class: "flex items-center truncate",
     });
   }
   if (column.type === "Rating") {
@@ -523,7 +524,6 @@ function handlePageLength(count: number, loadMore: boolean = false) {
 }
 
 function handleViewUpdate() {
-  const isPublicView = findCurrentView()?.public;
   const view = {
     filters: JSON.stringify(defaultParams.filters),
     columns: JSON.stringify(defaultParams.columns),
@@ -534,21 +534,8 @@ function handleViewUpdate() {
     route_name: route.name,
     is_customer_portal: options.value.isCustomerPortal,
   };
-  if (!isPublicView) {
-    updateView(view, () => {
-      isViewUpdated.value = false;
-    });
-    return;
-  }
-  confirmDialog({
-    title: "Update Public View?",
-    message: `Updating public view will change the view for all users. Do you want to continue?`,
-    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      hideDialog();
-      updateView(view, () => {
-        isViewUpdated.value = false;
-      });
-    },
+  updateView(view, () => {
+    isViewUpdated.value = false;
   });
 }
 
