@@ -3817,6 +3817,7 @@ frappe-ui@0.1.111:
     tippy.js "^6.3.7"
     typescript "^5.0.2"
 
+
 fs-extra@^10.1.0:
   version "10.1.0"
   resolved "https://registry.npmjs.org/fs-extra/-/fs-extra-10.1.0.tgz"
