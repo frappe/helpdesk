@@ -425,6 +425,8 @@ const viewActions = (view) => {
                 updateView(newView);
               },
             });
+          } else {
+            updateView(newView);
           }
         },
       });
