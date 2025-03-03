@@ -517,6 +517,11 @@ def handle_team_restrictions(filters):
         return
 
     team_names = [t.get("team_name") for t in teams]
+
     if show_tickets_without_team:
         team_names = team_names + [""]
-    filters.append({"agent_group": ["in", team_names]})
+
+    if not filters:
+        filters.append({"agent_group": ["in", team_names]})
+    else:
+        filters["agent_group"] = ["in", team_names]
