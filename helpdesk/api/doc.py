@@ -37,6 +37,9 @@ def get_list_data(
 
     handle_at_me_support(filters)
 
+    if doctype == "HD Ticket":
+        handle_team_restrictions(filters)
+
     _list = get_controller(doctype)
     default_rows = []
     if hasattr(_list, "default_list_data"):
@@ -482,3 +485,38 @@ def handle_at_me_support(filters):
             filters[key] = frappe.session.user
 
     return filters
+
+
+# filters out tickets based on team restrictions
+def handle_team_restrictions(filters):
+    enable_restrictions, show_tickets_without_team = frappe.get_value(
+        doctype="HD Settings",
+        fieldname=[
+            "restrict_tickets_by_agent_group",
+            "do_not_restrict_tickets_without_an_agent_group",
+        ],
+    )
+    enable_restrictions = bool(int(enable_restrictions))
+    show_tickets_without_team = bool(int(show_tickets_without_team))
+    if not enable_restrictions:
+        return
+
+    QBTeam = frappe.qb.DocType("HD Team")
+    QBTeamMember = frappe.qb.DocType("HD Team Member")
+
+    teams = (
+        frappe.qb.from_(QBTeamMember)
+        .where(QBTeamMember.user == frappe.session.user)
+        .join(QBTeam)
+        .on(QBTeam.name == QBTeamMember.parent)
+        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
+        .run(as_dict=True)
+    )
+
+    if any([team.get("ignore_restrictions") for team in teams]):
+        return
+
+    team_names = [t.get("team_name") for t in teams]
+    if show_tickets_without_team:
+        team_names = team_names + [""]
+    filters.append({"agent_group": ["in", team_names]})
