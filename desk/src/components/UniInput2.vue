@@ -25,12 +25,11 @@
                   ),
               }
             : {
-                change: (event) => {
+                change: (event) =>
                   emitUpdate(
                     field.fieldname,
-                    event?.value || event.target?.value || event
-                  );
-                },
+                    event?.value || event?.target?.value || event
+                  ),
               }
         "
       />
@@ -71,7 +70,6 @@ const component = computed(() => {
   } else if (props.field.fieldtype === "Link" && props.field.options) {
     return h(Link, {
       doctype: props.field.options,
-      hideMe: true,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
