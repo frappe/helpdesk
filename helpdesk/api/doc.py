@@ -315,6 +315,14 @@ def get_filterable_fields(doctype: str, show_customer_portal_fields=False):
             }
         )
 
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
+    )
+    # breakpoint()
+    if enable_restrictions and doctype == "HD Ticket":
+        print("\n\n", "here", "\n\n")
+        res = [r for r in res if r.get("fieldname") != "agent_group"]
+
     standard_fields = [
         {"fieldname": "name", "fieldtype": "Link", "label": "ID", "options": doctype},
         {
