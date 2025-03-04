@@ -10,7 +10,20 @@
     }"
     @click="handleNavigation"
   >
+    <Tooltip :text="label" v-if="!isExpanded">
+      <span
+        class="shrink-0 text-gray-700"
+        :class="{
+          'text-gray-900': !isExpanded,
+          'icon-emoji': isMobileView,
+        }"
+      >
+        <Icon v-if="typeof icon === 'string'" :icon="icon" class="h-4 w-4" />
+        <component :is="icon" v-else class="h-4 w-4" />
+      </span>
+    </Tooltip>
     <span
+      v-else
       class="shrink-0 text-gray-700"
       :class="{
         'text-gray-900': !isExpanded,
@@ -20,6 +33,7 @@
       <Icon v-if="typeof icon === 'string'" :icon="icon" class="h-4 w-4" />
       <component :is="icon" v-else class="h-4 w-4" />
     </span>
+
     <div
       class="-all ml-2 flex shrink-0 grow items-center justify-between text-sm duration-300 ease-in-out"
       :class="{
