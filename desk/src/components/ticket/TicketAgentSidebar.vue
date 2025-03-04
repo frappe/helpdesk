@@ -48,6 +48,9 @@ const props = defineProps({
 const emit = defineEmits(["update", "email:open"]);
 
 function update(val) {
+  if (typeof val.value === "object") {
+    val.value = val.value.target?.value || null;
+  }
   emit("update", val);
 }
 </script>
