@@ -495,17 +495,14 @@ def handle_at_me_support(filters):
 
 # filters out tickets based on team restrictions
 def handle_team_restrictions(filters):
-    enable_restrictions, show_tickets_without_team = frappe.get_value(
-        doctype="HD Settings",
-        fieldname=[
-            "restrict_tickets_by_agent_group",
-            "do_not_restrict_tickets_without_an_agent_group",
-        ],
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
     )
-    enable_restrictions = bool(int(enable_restrictions))
-    show_tickets_without_team = bool(int(show_tickets_without_team))
     if not enable_restrictions:
         return
+    show_tickets_without_team = frappe.db.get_single_value(
+        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+    )
 
     QBTeam = frappe.qb.DocType("HD Team")
     QBTeamMember = frappe.qb.DocType("HD Team Member")
