@@ -21,15 +21,16 @@
                 blur: (event) =>
                   emitUpdate(
                     field.fieldname,
-                    event.value || event.target.value
+                    event.target.value || event.value
                   ),
               }
             : {
-                change: (event) =>
+                change: (event) => {
                   emitUpdate(
                     field.fieldname,
                     event?.value || event?.target?.value || event
-                  ),
+                  );
+                },
               }
         "
       />
