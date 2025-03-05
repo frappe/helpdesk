@@ -379,6 +379,7 @@ function filterActivities(eventType: TicketTab) {
   return activities.value.filter((activity) => activity.type === eventType);
 }
 
+const errorTriggered = ref(false);
 function updateTicket(fieldname: string, value: string) {
   isLoading.value = true;
   createResource({
@@ -397,6 +398,7 @@ function updateTicket(fieldname: string, value: string) {
         icon: "check",
         iconClasses: "text-green-600",
       });
+      errorTriggered.value = false;
     },
     onError: (e) => {
       isLoading.value = false;
@@ -405,12 +407,13 @@ function updateTicket(fieldname: string, value: string) {
         e.messages && e.messages.length > 0
           ? e.messages[0]
           : "Failed to update ticket";
-
+      if (errorTriggered.value) return;
       createToast({
         title,
         icon: "x",
         iconClasses: "text-red-600",
       });
+      errorTriggered.value = true;
     },
   });
 }
