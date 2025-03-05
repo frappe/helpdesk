@@ -1,26 +1,11 @@
 {
 	"private": true,
 	"scripts": {
-		"postinstall": "husky install && cd desk && yarn install",
+		"postinstall": "cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
 		"build": "cd desk && yarn build"
 	},
 	"workspaces": ["desk", "frappe-ui"],
-	"dependencies": {
-		"@typescript-eslint/eslint-plugin": "^5.55.0",
-		"@typescript-eslint/parser": "^5.55.0",
-		"eslint": "^8.36.0",
-		"eslint-config-prettier": "^8.6.0",
-		"eslint-plugin-json": "^3.1.0",
-		"eslint-plugin-prettier": "^4.2.1",
-		"eslint-plugin-tailwindcss": "^3.8.3",
-		"eslint-plugin-vue": "^9.27.0",
-		"husky": "^8.0.3",
-		"lint-staged": "^13.1.2",
-		"prettier": "2.8.4",
-		"tailwindcss": "^3.2.6",
-		"typescript": "^5.0.2"
-	},
 	"resolutions": {
 		"cheerio": "1.0.0-rc.12"
 	}
