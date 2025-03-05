@@ -1,0 +1,13 @@
+[project]
+name = "helpdesk"
+authors = [
+    { name = "Frappe Technologies Pvt Ltd", email = "hello@frappe.io"}
+]
+description = "Open Source Customer Service Software"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    # Core dependencies
+    "textblob==0.18.0.post0",
+]
