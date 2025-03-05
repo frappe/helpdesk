@@ -215,6 +215,7 @@ def update_agent_role_permissions():
         add_permission("File", "Agent", 0)
         add_permission("Contact", "Agent", 0)
         add_permission("Email Account", "Agent", 0)
+        add_permission("Communication", "Agent", 0)
 
 
 def add_default_assignment_rule():
