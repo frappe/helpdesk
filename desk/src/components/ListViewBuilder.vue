@@ -5,10 +5,7 @@
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" class="flex-1" />
-    <div
-      class="flex items-start gap-2 flex-1 justify-end h-full"
-      v-if="!isMobileView"
-    >
+    <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
         label="Save Changes"
         v-if="isViewUpdated && canSaveView"
