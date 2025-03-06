@@ -28,7 +28,7 @@ export async function copy(s: string) {
       title: "Copied to clipboard",
       icon: "check",
       iconClasses: "text-green-600",
-    }),
+    })
   );
 }
 
@@ -220,4 +220,9 @@ export function formatTimeShort(date: string) {
   if (diffWeeks < 4) return `${diffWeeks} w`;
   if (diffMonths < 12) return `${diffMonths} M`;
   return `${diffYears}Y`;
+}
+
+export function hasArabicContent(content: string) {
+  const arabicRegex = /[\u0600-\u06FF]/;
+  return arabicRegex.test(content);
 }
