@@ -4,6 +4,7 @@
     :editor-class="[
       'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto py-3',
       true && 'min-h-[7rem]',
+      getFontFamily(newEmail),
     ]"
     :content="newEmail"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
@@ -169,6 +170,7 @@ import {
   validateEmail,
   textEditorMenuButtons,
   isContentEmpty,
+  getFontFamily,
 } from "@/utils";
 import {
   MultiSelectInput,
