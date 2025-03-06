@@ -134,7 +134,6 @@
 <script setup lang="ts">
 import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
 import { useRoute } from "vue-router";
-import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
@@ -192,11 +191,6 @@ const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
 
-let storage = useStorage("ticket_agent", {
-  showAllActivity: true,
-});
-
-const showFullActivity = ref(storage.value.showAllActivity);
 const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
@@ -258,13 +252,6 @@ const handleRename = () => {
   showSubjectDialog.value = false;
 };
 
-watch(
-  () => showFullActivity.value,
-  (value) => {
-    storage.value.showAllActivity = value;
-  }
-);
-
 const dropdownOptions = computed(() =>
   ticketStatusStore.options.map((o) => ({
     label: o,
@@ -324,12 +311,6 @@ const activities = computed(() => {
       attachments: comment.attachments,
     };
   });
-
-  if (!showFullActivity.value) {
-    return [...emailProps, ...commentProps].sort(
-      (a, b) => new Date(a.creation) - new Date(b.creation)
-    );
-  }
 
   const historyProps = [...ticket.data.history, ...ticket.data.views].map(
     (h) => {

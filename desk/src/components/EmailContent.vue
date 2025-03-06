@@ -8,6 +8,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import { getFontFamily } from "@/utils";
 
 const props = defineProps({
   content: {
@@ -230,7 +231,7 @@ watch(iframeRef, (iframe) => {
       const emailContent =
         iframe.contentWindow.document.querySelector(".email-content");
       let parent = emailContent.closest("html");
-
+      emailContent.classList.add(getFontFamily(_content.value));
       iframe.style.height = parent.offsetHeight + 1 + "px";
 
       let replyCollapsers = emailContent.querySelectorAll(".replyCollapser");
