@@ -22,7 +22,9 @@ class HDSettings(Document):
 
     def validate_auto_close_days(self):
         if self.auto_close_tickets and self.auto_close_after_days <= 0:
-            frappe.throw(_("Auto Close Days cannot be negative or zero"))
+            frappe.throw(
+                _("Day count for auto closing tickets cannot be negative or zero")
+            )
 
     def get_base_support_rotation(self):
         """Returns the base support rotation rule if it exists, else creats once and returns it"""

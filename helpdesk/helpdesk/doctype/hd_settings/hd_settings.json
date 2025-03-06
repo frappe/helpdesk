@@ -321,9 +321,10 @@
    "default": "0",
    "fieldname": "auto_close_tickets",
    "fieldtype": "Check",
-   "label": "Enable auto closing tickets"
+   "label": "Automatically Close Tickets"
   },
   {
+   "default": "14",
    "depends_on": "auto_close_tickets",
    "fieldname": "auto_close_after_days",
    "fieldtype": "Int",
@@ -334,7 +335,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-03-06 17:37:01.084240",
+ "modified": "2025-03-06 21:32:47.307901",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
