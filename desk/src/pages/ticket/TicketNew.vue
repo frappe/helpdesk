@@ -188,6 +188,7 @@ const ticket = createResource({
       },
     });
   },
+  onError: useError(),
 });
 
 function sanitize(html: string) {
