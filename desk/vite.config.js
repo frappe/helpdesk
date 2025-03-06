@@ -101,6 +101,11 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["feather-icons", "showdown", "tailwind.config.js"],
+    include: [
+      "feather-icons",
+      "showdown",
+      "tailwind.config.js",
+      "prosemirror-state",
+    ],
   },
 });
