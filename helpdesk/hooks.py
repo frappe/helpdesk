@@ -23,7 +23,13 @@ after_migrate = [
 ]
 
 scheduler_events = {
-    "all": ["helpdesk.search.build_index_if_not_exists"],
+    "all": [
+        "helpdesk.search.build_index_if_not_exists",
+        "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days",
+    ],
+    "daily": [
+        "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
+    ],
 }
 
 
