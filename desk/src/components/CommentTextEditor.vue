@@ -6,6 +6,7 @@
       'prose-sm max-w-none',
       editable &&
         'min-h-[7rem] mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
+      getFontFamily(newComment),
     ]"
     :content="newComment"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
@@ -107,7 +108,7 @@ import { AttachmentItem } from "@/components/";
 import { useAgentStore } from "@/stores/agent";
 import { useStorage } from "@vueuse/core";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { isContentEmpty, textEditorMenuButtons } from "@/utils";
+import { isContentEmpty, textEditorMenuButtons, getFontFamily } from "@/utils";
 
 const { agents: agentsList } = useAgentStore();
 onMounted(() => {

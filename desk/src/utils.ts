@@ -222,7 +222,19 @@ export function formatTimeShort(date: string) {
   return `${diffYears}Y`;
 }
 
-export function hasArabicContent(content: string) {
+function hasArabicContent(content: string) {
   const arabicRegex = /[\u0600-\u06FF]/;
   return arabicRegex.test(content);
+}
+
+export function getFontFamily(content: string) {
+  const langMap = {
+    default: "!font-[InterVar]",
+    arabic: "!font-[system-ui]",
+  };
+  let lang = "default";
+  if (hasArabicContent(content)) {
+    lang = "arabic";
+  }
+  return langMap[lang];
 }
