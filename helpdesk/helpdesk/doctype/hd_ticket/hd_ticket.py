@@ -872,3 +872,29 @@ def remove_guest_ticket_creation_permission():
 
 
 customer_not_allowed_fields = ["customer"]
+
+
+def close_tickets_after_n_days():
+    if frappe.db.get_single_value("HD Settings", "auto_close_tickets") == 0:
+        return
+
+    days_threshold = frappe.db.get_single_value("HD Settings", "auto_close_after_days")
+
+    tickets_to_close = frappe.get_list(
+        "HD Ticket",
+        filters=[
+            ["status", "=", "Replied"],
+            [
+                "modified",
+                "<",
+                frappe.utils.add_days(frappe.utils.now_datetime(), -days_threshold),
+            ],
+        ],
+        pluck="name",
+    )
+
+    # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
+    for ticket in tickets_to_close:
+        doc = frappe.get_doc("HD Ticket", ticket)
+        doc.status = "Closed"
+        doc.save(ignore_permissions=True)
