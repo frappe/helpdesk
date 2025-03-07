@@ -360,6 +360,7 @@ function filterActivities(eventType: TicketTab) {
 }
 
 function updateTicket(fieldname: string, value: string) {
+  if (value === ticket.data[fieldname]) return;
   isLoading.value = true;
   createResource({
     url: "frappe.client.set_value",
@@ -369,6 +370,7 @@ function updateTicket(fieldname: string, value: string) {
       fieldname,
       value,
     },
+    debounce: 500,
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
