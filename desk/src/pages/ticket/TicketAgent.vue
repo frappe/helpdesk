@@ -196,7 +196,6 @@ const showSubjectDialog = ref(false);
 
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
   auto: true,
   makeParams: () => ({
     name: props.ticketId,
