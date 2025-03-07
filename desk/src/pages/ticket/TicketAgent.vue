@@ -196,7 +196,6 @@ const showSubjectDialog = ref(false);
 
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
   auto: true,
   makeParams: () => ({
     name: props.ticketId,
@@ -231,9 +230,9 @@ const breadcrumbs = computed(() => {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
       items.push({
-        label: currView.value.label,
-        icon: getIcon(currView.value.icon),
-        route: { name: "TicketsAgent", query: { view: currView.value.name } },
+        label: currView.value?.label,
+        icon: getIcon(currView.value?.icon),
+        route: { name: "TicketsAgent", query: { view: currView.value?.name } },
       });
     }
   }
@@ -361,6 +360,7 @@ function filterActivities(eventType: TicketTab) {
 }
 
 function updateTicket(fieldname: string, value: string) {
+  if (value === ticket.data[fieldname]) return;
   isLoading.value = true;
   createResource({
     url: "frappe.client.set_value",
@@ -370,6 +370,7 @@ function updateTicket(fieldname: string, value: string) {
       fieldname,
       value,
     },
+    debounce: 500,
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
