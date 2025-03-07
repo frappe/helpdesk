@@ -231,9 +231,9 @@ const breadcrumbs = computed(() => {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
       items.push({
-        label: currView.value.label,
-        icon: getIcon(currView.value.icon),
-        route: { name: "TicketsAgent", query: { view: currView.value.name } },
+        label: currView.value?.label,
+        icon: getIcon(currView.value?.icon),
+        route: { name: "TicketsAgent", query: { view: currView.value?.name } },
       });
     }
   }
