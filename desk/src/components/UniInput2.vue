@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-2 px-6 pb-1 leading-5 first:mt-3">
+  <div class="flex gap-2 px-6 pb-1 leading-5 first:mt-3 items-baseline">
     <Tooltip :text="field.label">
       <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
         {{ field.label }}
@@ -15,14 +15,13 @@
         class="form-control"
         :placeholder="`Add ${field.label}`"
         :value="transValue"
+        autocomplete="off"
         v-on="
           textFields.includes(field.fieldtype)
             ? {
-                blur: (event) =>
-                  emitUpdate(
-                    field.fieldname,
-                    event.target.value || event.value
-                  ),
+                blur: (event) => {
+                  emitUpdate(field.fieldname, event.target.value);
+                },
               }
             : {
                 change: (event) => {
@@ -61,7 +60,7 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 
-const textFields = ["Long Text", "Small Text", "Text"];
+const textFields = ["Long Text", "Small Text", "Text", "Text Editor"];
 
 const component = computed(() => {
   if (props.field.url_method) {
