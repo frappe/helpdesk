@@ -535,6 +535,8 @@ function parseFilters(filters) {
     if (["equals", "="].includes(c.operator)) {
       p[c.fieldname] =
         c.value == "Yes" ? true : c.value == "No" ? false : c.value;
+    } else if (c.operator === "in" || c.operator === "not in") {
+      p[c.fieldname] = [operatorMap[c.operator], c.value.split(",")];
     } else {
       p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], c.value];
     }
