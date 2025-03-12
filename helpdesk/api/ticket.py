@@ -103,8 +103,6 @@ def method2(ticket_id, emails, comments):
     detailed_notes = first_pass_completion.choices[0].message.content
 
     print("SECOND METHOD")
-    print("\n\n", "First Pass")
-    print(detailed_notes, "\n\n")
 
     second_pass_msg = f"Based on these detailed notes from ticket {ticket_id}, create a final concise summary: {detailed_notes}"
 

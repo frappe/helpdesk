@@ -1,5 +1,5 @@
 <template>
-  <ActivityHeader :title="title" />
+  <ActivityHeader :title="title" @new="generateSummary" />
   <div class="flex flex-col flex-1 overflow-y-auto">
     <div v-if="activities.length" class="activities flex-1 h-full mt-1">
       <div
@@ -85,7 +85,7 @@ import {
 } from "@/components/icons";
 import { EmailArea, CommentBox, HistoryBox } from "@/components";
 import { useUserStore } from "@/stores/user";
-import { Avatar } from "frappe-ui";
+import { Avatar, createResource } from "frappe-ui";
 import { TicketActivity } from "@/types";
 const props = defineProps({
   activities: {
@@ -93,6 +93,10 @@ const props = defineProps({
     required: true,
   },
   title: {
+    type: String,
+    required: true,
+  },
+  ticketId: {
     type: String,
     required: true,
   },
@@ -122,6 +126,19 @@ const emptyTextIcon = computed(() => {
   }
   return h(icon, { class: "text-gray-500" });
 });
+
+function generateSummary() {
+  createResource({
+    url: "helpdesk.api.ticket.summarise_ticket",
+    params: {
+      ticket_id: props.ticketId,
+    },
+    auto: true,
+    onSuccess: (d) => {
+      console.log(d);
+    },
+  });
+}
 
 function scrollToLatestActivity() {
   setTimeout(() => {

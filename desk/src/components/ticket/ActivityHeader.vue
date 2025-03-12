@@ -25,11 +25,7 @@
       </template>
       <span>{{ "New Comment" }}</span>
     </Button>
-    <Button
-      v-else-if="title == 'Summary'"
-      variant="solid"
-      @click="console.log('Summary')"
-    >
+    <Button v-else-if="title == 'Summary'" variant="solid" @click="emit('new')">
       <template #prefix>
         <FeatherIcon name="plus" class="h-4 w-4" />
       </template>
@@ -67,6 +63,8 @@ defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["new"]);
 
 const communicationAreaRef: Ref = inject("communicationArea");
 
