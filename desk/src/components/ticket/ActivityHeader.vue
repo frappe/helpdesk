@@ -25,6 +25,16 @@
       </template>
       <span>{{ "New Comment" }}</span>
     </Button>
+    <Button
+      v-else-if="title == 'Summary'"
+      variant="solid"
+      @click="console.log('Summary')"
+    >
+      <template #prefix>
+        <FeatherIcon name="plus" class="h-4 w-4" />
+      </template>
+      <span>{{ "Generate Summary" }}</span>
+    </Button>
     <Dropdown v-else :options="defaultActions" @click.stop>
       <template v-slot="{ open }">
         <Button variant="solid" class="flex items-center gap-1">

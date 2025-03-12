@@ -281,6 +281,11 @@ const tabs: TabObject[] = [
     label: "Comments",
     icon: CommentIcon,
   },
+  {
+    name: "summary",
+    label: "Summary",
+    icon: ActivityIcon,
+  },
 ];
 
 const activities = computed(() => {
