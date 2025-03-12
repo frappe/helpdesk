@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 from frappe.query_builder.functions import Count
 from openai import OpenAI
 
-OPENAI_KEY = frappe.conf.get("openai_key")
-
 
 def get_tickets_with_big_threads():
 
@@ -41,15 +39,12 @@ def get_tickets_with_big_threads():
 
         emails = ", ".join(emails)
         comments = ", ".join(comments)
-        # breakpoint()
-        # I have \n in email and comments how do I print a new line in the console?
 
         data[t] = {
             "name": t,
             "emails": f"{emails}",
             "comments": f"{comments}",
         }
-        # print('\n\n',data[t],'\n\n')
         content.append(data)
 
 
@@ -79,4 +74,5 @@ def strip_tags(html_content):
 
 
 def get_openai_client():
+    OPENAI_KEY = frappe.conf.get("openai_key")
     return OpenAI(api_key=OPENAI_KEY)
