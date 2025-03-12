@@ -1,7 +1,10 @@
 <template>
   <ActivityHeader :title="title" @new="generateSummary" />
   <div class="flex flex-col flex-1 overflow-y-auto">
-    <div v-if="activities.length" class="activities flex-1 h-full mt-1">
+    <div
+      v-if="activities.length && title !== 'Summary'"
+      class="activities flex-1 h-full mt-1"
+    >
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
@@ -54,11 +57,18 @@
       </div>
     </div>
     <div
+      v-else-if="title == 'Summary' && activities.length"
+      class="flex flex-col items-center w-full px-8"
+    >
+      <Summary :summary="activities[0]" />
+    </div>
+    <div
       v-else
       class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
-      <component :is="emptyTextIcon" class="h-10 w-10" />
-      <span>{{ emptyText }}</span>
+      <component :is="emptyTextIcon" class="h-10 w-10" v-if="!loading" />
+      <span v-if="!loading">{{ emptyText }}</span>
+      <Button v-if="loading" :loading="loading" label="Generating Summary" />
       <Button
         v-if="title == 'Emails'"
         label="New Email"
@@ -78,15 +88,16 @@ import { Ref, inject, h, computed, onMounted, watch, PropType } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import {
   DotIcon,
-  EmailAtIcon,
   CommentIcon,
   EmailIcon,
   ActivityIcon,
 } from "@/components/icons";
-import { EmailArea, CommentBox, HistoryBox } from "@/components";
+import WandSparkles from "~icons/lucide/wand-sparkles";
+import { EmailArea, CommentBox, HistoryBox, Summary } from "@/components";
 import { useUserStore } from "@/stores/user";
 import { Avatar, createResource } from "frappe-ui";
 import { TicketActivity } from "@/types";
+import { ref } from "vue";
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,
@@ -107,14 +118,18 @@ const emit = defineEmits(["email:reply", "update"]);
 const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
 
+const loading = ref(false);
+
 const emptyText = computed(() => {
   let text = "No Activities";
   if (props.title == "Emails") {
     text = "No Email Communications";
   } else if (props.title == "Comments") {
     text = "No Comments";
-    return text;
+  } else if (props.title == "Summary") {
+    text = "No Summary Found. Generate Summary";
   }
+  return text;
 });
 
 const emptyTextIcon = computed(() => {
@@ -123,11 +138,14 @@ const emptyTextIcon = computed(() => {
     icon = EmailIcon;
   } else if (props.title == "Comments") {
     icon = CommentIcon;
+  } else if (props.title == "Summary") {
+    icon = WandSparkles;
   }
   return h(icon, { class: "text-gray-500" });
 });
 
 function generateSummary() {
+  loading.value = true;
   createResource({
     url: "helpdesk.api.ticket.summarise_ticket",
     params: {
@@ -135,7 +153,8 @@ function generateSummary() {
     },
     auto: true,
     onSuccess: (d) => {
-      console.log(d);
+      emit("update");
+      loading.value = false;
     },
   });
 }

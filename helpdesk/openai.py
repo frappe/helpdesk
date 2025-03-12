@@ -23,7 +23,7 @@ def get_tickets_with_big_threads():
         .groupby(Emails.reference_name)
         .where(Emails.creation > "2025-01-01")
         .having(Count(Emails.name) + Count(Comments.name) > ticket_emails_threshold)
-    ).run(pluck="reference_name", debug=True)
+    ).run(pluck="reference_name")
 
     content = []
     for t in tickets:

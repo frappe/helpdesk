@@ -329,7 +329,17 @@ export interface CommentActivity extends BaseActivity {
   attachments: FileAttachment[];
 }
 
-export type TicketActivity = HistoryActivity | EmailActivity | CommentActivity;
+export interface SummaryActivity {
+  type: "summary";
+  name: string;
+  content: string;
+}
+
+export type TicketActivity =
+  | HistoryActivity
+  | EmailActivity
+  | CommentActivity
+  | SummaryActivity;
 
 interface FileAttachment {
   name: string;

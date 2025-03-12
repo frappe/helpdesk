@@ -51,18 +51,23 @@ def summarise_ticket(ticket_id):
     comments = ", ".join(comments)
 
     method1(ticket_id, emails, comments)
-    method2(ticket_id, emails, comments)
+    # method2(ticket_id, emails, comments)
 
 
 def method1(ticket_id, emails, comments):
     content = """
     You are a text summarizer. Your job is to summarize the support ticket in a concise, actionable format. Extract:
-        1. Key issue or request: This can be a bit longer to provide context. Explain why the issue is caused or what the request is. How it has been tried to solve.
+        1. Key issue or request: This can be a bit longer to provide context. Explain why the issue is caused or what the request is. How it has been tried to solve using comments or emails. Try to break into atleast 2 bullet points.
         2. Relevant context (product, version, environment)
-        3. Customer's goal or desired outcome
-        4. Any blockers or urgency indicators
+        3. Any blockers or urgency indicators
         Limit summary to max of 600 characters. Focus on facts, not sentiment. Give a clear, concise summary such that any agent reading it can understand the ticket and take action.
-     Format should be markdown with bullet points,headings mentioned should be bold. Should be easy to read and understand for the agents.
+     Format should be HTML, headings mentioned should be bold, each heading should have bullet points not paragraph. Should be easy to read and understand for the agents. Only show these 3 points. Between each point, there should be a new line.
+     FORMAT:
+        <b>Heading from these2</b>
+        <ul>
+        <li>Bullet points</li>
+        </ul>
+        </br>
     """
     msg = f"The ticket {ticket_id} has the following emails: {emails} and comments: {comments}. Please summarise the ticket."
     completion = client.chat.completions.create(
@@ -72,8 +77,9 @@ def method1(ticket_id, emails, comments):
             {"role": "user", "content": msg},
         ],
     )
-    print("FIRST METHOD")
-    print("\n\n", completion.choices[0].message.content, "\n\n")
+    frappe.db.set_value(
+        "HD Ticket", ticket_id, "summary", completion.choices[0].message.content
+    )
 
 
 def method2(ticket_id, emails, comments):
@@ -110,8 +116,7 @@ def method2(ticket_id, emails, comments):
     You are a text summarizer. Your job is to summarize the support ticket in a concise, actionable format. Extract:
     1. Key issue or request: This can be a bit longer to provide context. Explain why the issue is caused or what the request is. How it has been tried to solve.
     2. Relevant context (product, version, environment)
-    3. Customer's goal or desired outcome
-    4. Any blockers or urgency indicators
+    3. Any blockers or urgency indicators
     
     Limit summary to max of 600 characters. Focus on facts, not sentiment. Give a clear, concise summary such that any agent reading it can understand the ticket and take action.
     Format should be markdown with bullet points, headings mentioned should be bold. Should be easy to read and understand for the agents.
@@ -126,3 +131,7 @@ def method2(ticket_id, emails, comments):
     )
     print("\n\n", "Final Summary M2")
     print(final_summary_completion.choices[0].message.content, "\n\n")
+
+
+def regenerate_summary(ticket_id):
+    pass

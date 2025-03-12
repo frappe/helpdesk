@@ -62,6 +62,7 @@
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
+                :ticket-id="ticketId"
                 @update="
                   () => {
                     ticket.reload();
@@ -160,10 +161,16 @@ import {
   ActivityIcon,
   EmailIcon,
 } from "@/components/icons";
+import WandSparkles from "~icons/lucide/wand-sparkles";
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, getIcon, setupCustomActions } from "@/utils";
+import {
+  createToast,
+  getIcon,
+  setupCustomActions,
+  isContentEmpty,
+} from "@/utils";
 import { TabObject, TicketTab, View } from "@/types";
 import { useView } from "@/composables/useView";
 import { ComputedRef } from "vue";
@@ -284,7 +291,7 @@ const tabs: TabObject[] = [
   {
     name: "summary",
     label: "Summary",
-    icon: ActivityIcon,
+    icon: WandSparkles,
   },
 ];
 
@@ -355,12 +362,24 @@ const activities = computed(() => {
     }
     i++;
   }
+  if (ticket.data.summary && !isContentEmpty(ticket.data.summary)) {
+    const summary = {
+      type: "summary",
+      key: "summary",
+      content: ticket.data.summary,
+    };
+    data.push(summary);
+  }
   return data;
 });
 
+const notShownInActivity = ["summary"];
+
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
-    return activities.value;
+    return activities.value.filter(
+      (activity) => !notShownInActivity.includes(activity.type)
+    );
   }
   return activities.value.filter((activity) => activity.type === eventType);
 }
