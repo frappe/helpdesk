@@ -486,7 +486,7 @@ def handle_at_me_support(filters):
             elif "%@me%" in value:
                 index = [i for i, v in enumerate(value) if v == "%@me%"]
                 for i in index:
-                    value[i] = "%" + frappe.session.user + "%"
+                    value[i] = frappe.session.user
         elif value == "@me":
             filters[key] = frappe.session.user
 
