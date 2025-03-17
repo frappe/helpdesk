@@ -39,18 +39,18 @@ def summarise_ticket(ticket_id):
 
     emails = frappe.get_all(
         "Communication",
-        pluck="content",
+        fields=["content", "sender"],
         filters={"reference_doctype": "HD Ticket", "reference_name": ticket_id},
     )
     comments = frappe.get_all(
-        "HD Ticket Comment", pluck="content", filters={"reference_ticket": ticket_id}
+        "HD Ticket Comment",
+        fields=["content", "commented_by"],
+        filters={"reference_ticket": ticket_id},
     )
     emails, comments = parse_email_comments(emails, comments)
 
-    emails = ", ".join(emails)
-    comments = ", ".join(comments)
-
-    method1(ticket_id, emails, comments)
+    # method1(ticket_id, emails, comments)
+    method3(ticket_id, emails, comments)
     # method2(ticket_id, emails, comments)
 
 
@@ -69,6 +69,7 @@ def method1(ticket_id, emails, comments):
         </ul>
         </br>
     """
+
     msg = f"The ticket {ticket_id} has the following emails: {emails} and comments: {comments}. Please summarise the ticket."
     completion = client.chat.completions.create(
         model="gpt-4o",
@@ -132,6 +133,49 @@ def method2(ticket_id, emails, comments):
     )
     print("\n\n", "Final Summary M2")
     print(final_summary_completion.choices[0].message.content, "\n\n")
+
+
+def method3(ticket_id, emails, comments):
+    content = """
+    Summarize the following email conversation between a customer and a support agent. Capture the key points, including the customer's issue, the agent’s responses, any troubleshooting steps taken, and the final resolution (if any). The summary should be concise yet informative, avoiding unnecessary details while preserving the core context of the conversation. Use bullet points to highlight key information and ensure readability. Follow the format below:
+
+    Issue: 
+    
+    <brief description in bullet points (no more than 3)>
+    
+    Resolution (if any):
+
+    <one line resolution>
+    """
+
+    ticket = frappe.get_doc("HD Ticket", ticket_id)
+
+    agents = frappe.db.get_all("HD Agent", pluck="user", filters={"is_active": 1})
+
+    emails = "\n\n".join(emails)
+
+    agent_emails = ", ".join(agents)
+
+    user = f"""
+        Ticket ID: {ticket.name}
+        Ticket Subject: {ticket.subject}
+        Customer: {ticket.raised_by}
+        Agents: {agent_emails}
+        
+        Emails: {emails}
+        Comments: {comments}
+    """
+
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": content},
+            {"role": "user", "content": user},
+        ],
+    )
+
+    summary = frappe.utils.md_to_html(completion.choices[0].message.content)
+    frappe.db.set_value("HD Ticket", ticket_id, "summary", summary)
 
 
 def regenerate_summary(ticket_id):

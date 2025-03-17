@@ -173,7 +173,7 @@ function scrollToLatestActivity() {
     let e = document.getElementsByClassName("activity");
     el = e[e.length - 1];
     if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView({ behavior: "smooth" });
+      el.scrollIntoView();
       el.focus();
     }
   }, 500);

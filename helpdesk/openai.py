@@ -52,12 +52,16 @@ def parse_email_comments(emails, comments):
     parsed_emails = []
     parsed_comments = []
     for email in emails:
-        stripped_content = strip_tags(email)
-        parsed_emails.append(stripped_content)
+        author = email.sender
+        content = email.content
+        stripped_content = strip_tags(content)
+        parsed_emails.append(f"{author}: {stripped_content}")
 
     for comment in comments:
-        stripped_content = strip_tags(comment)
-        parsed_comments.append(stripped_content)
+        author = comment.commented_by
+        content = comment.content
+        stripped_content = strip_tags(content)
+        parsed_comments.append(f"{author}: {stripped_content}")
 
     return parsed_emails, parsed_comments
 

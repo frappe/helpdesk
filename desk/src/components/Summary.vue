@@ -31,10 +31,10 @@
 
 <script setup lang="ts">
 import { PropType, ref } from "vue";
-import { computed } from "vue";
 import { TicketActivity } from "@/types";
 import { textEditorMenuButtons, getFontFamily } from "@/utils";
 import { TextEditor } from "frappe-ui";
+import { watch } from "vue";
 
 const props = defineProps({
   summary: {
@@ -42,6 +42,13 @@ const props = defineProps({
     required: true,
   },
 });
+
+watch(
+  () => props.summary.content,
+  (newVal) => {
+    _content.value = newVal;
+  }
+);
 
 const _content = ref(props.summary.content);
 const editable = ref(false);
