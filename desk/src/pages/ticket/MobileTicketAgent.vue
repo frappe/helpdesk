@@ -120,6 +120,7 @@
             :to-emails="[ticket.data.raised_by]"
             :cc-emails="[]"
             :bcc-emails="[]"
+            :key="ticket.data?.name"
             @update="
               () => {
                 ticket.reload();
