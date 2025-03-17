@@ -58,12 +58,12 @@ def method1(ticket_id, emails, comments):
     content = """
     You are a text summarizer. Your job is to summarize the support ticket in a concise, actionable format. Extract:
         1. Key issue or request: This can be a bit longer to provide context. Explain why the issue is caused or what the request is. How it has been tried to solve using comments or emails. Try to break into atleast 2 bullet points.
-        2. Relevant context (product, version, environment)
-        3. Any blockers or urgency indicators
+        
+        2. Resolution or RCA: If the issue is resolved, mention the resolution and the RCA else dont add the second point.
         Limit summary to max of 600 characters. Focus on facts, not sentiment. Give a clear, concise summary such that any agent reading it can understand the ticket and take action.
-     Format should be HTML, headings mentioned should be bold, each heading should have bullet points not paragraph. Should be easy to read and understand for the agents. Only show these 3 points. Between each point, there should be a new line.
-     FORMAT:
-        <b>Heading from these2</b>
+        Format should be HTML, headings mentioned should be bold, each heading should have bullet points not paragraph. Should be easy to read and understand for the agents. Only show these 3 points. Between each point, there should be a new line.
+        FORMAT:
+        <b>Heading from these 3 points</b>
         <ul>
         <li>Bullet points</li>
         </ul>
@@ -126,6 +126,7 @@ def method2(ticket_id, emails, comments):
         model="gpt-4o",
         messages=[
             {"role": "system", "content": second_pass_prompt},
+            # add assistant role
             {"role": "user", "content": second_pass_msg},
         ],
     )
