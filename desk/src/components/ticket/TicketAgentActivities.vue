@@ -58,7 +58,7 @@
     </div>
     <div
       v-else-if="title == 'Summary' && activities.length"
-      class="flex flex-col items-center w-full px-8"
+      class="flex flex-col w-full px-8"
     >
       <Summary :summary="activities[0]" />
     </div>
