@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
 
     paths-ignore:
       - '**.js'
@@ -120,11 +121,6 @@ jobs:
           CI_BUILD_ID: ${{ github.run_id }}
           ORCHESTRATOR_URL: http://test-orchestrator.frappe.io
 
-      - name: Upload coverage data
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage
-          path: /home/runner/frappe-bench/sites/coverage.xml
 
   coverage:
     name: Coverage
