@@ -16,11 +16,6 @@ export default defineConfig({
       frappeProxy: true,
       lucideIcons: true,
       jinjaBootData: true,
-      buildConfig: {
-        outDir: "../helpdesk/public/desk",
-        indexHtmlPath: "../helpdesk/www/helpdesk/index.html",
-        emptyOutDir: true,
-      },
     }),
     vue(),
     Components({
@@ -94,6 +89,15 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    outDir: `../helpdesk/public/desk`,
+    emptyOutDir: true,
+    target: "es2021",
+    sourcemap: true,
+    commonjsOptions: {
+      include: [/tailwind.config.js/, /node_modules/],
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
