@@ -7,11 +7,6 @@ const SITENAME = window.location.hostname;
 
 // extend window object to add posthog
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare global {
-  interface Window {
-    posthog: any;
-  }
-}
 type PosthogSettings = {
   posthog_project_id: string;
   posthog_host: string;

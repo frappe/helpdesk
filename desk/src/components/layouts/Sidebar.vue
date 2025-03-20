@@ -93,7 +93,7 @@
       </Section>
     </div>
     <div class="grow" />
-    <TrialBanner v-if="isFCSite" />
+    <TrialBanner v-if="isFCSite" :isSidebarCollapsed="!isExpanded" />
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"
@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { computed, markRaw, ref, h } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { TrialBanner } from "frappe-ui";
+import { TrialBanner } from "frappe-ui/frappe";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
@@ -144,6 +144,12 @@ const device = useDevice();
 const showSettingsModal = ref(false);
 const isFCSite = ref(window.is_fc_site);
 const { pinnedViews, publicViews } = useView();
+
+declare global {
+  interface Window {
+    is_fc_site: boolean;
+  }
+}
 
 const allViews = computed(() => {
   const items = isCustomerPortal.value
@@ -228,9 +234,9 @@ const agentPortalDropdown = computed(() => [
   },
   {
     label: "Login to Frappe Cloud",
-    icon: h(FrappeCloudIcon),
+    icon: FrappeCloudIcon,
     onClick: () => confirmLoginToFrappeCloud(),
-    condition: () => isMobileView.value && window.is_fc_site,
+    condition: () => !isMobileView.value && window.is_fc_site,
   },
   {
     label: "Settings",
