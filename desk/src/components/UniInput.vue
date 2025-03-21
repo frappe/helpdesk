@@ -54,7 +54,6 @@ const component = computed(() => {
     } catch (error) {
       filters = null;
     }
-    console.log(filters);
     return h(Link, {
       doctype: props.field.options,
       filters,
