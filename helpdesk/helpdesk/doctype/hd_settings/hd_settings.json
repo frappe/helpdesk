@@ -321,7 +321,7 @@
    "default": "0",
    "fieldname": "auto_close_tickets",
    "fieldtype": "Check",
-   "label": "Automatically Close Tickets"
+   "label": "Automatically Close Replied Tickets"
   },
   {
    "default": "14",
@@ -335,7 +335,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-03-06 21:32:47.307901",
+ "modified": "2025-03-21 17:13:09.867555",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
