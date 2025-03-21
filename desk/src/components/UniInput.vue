@@ -19,10 +19,9 @@
 
 <script setup lang="ts">
 import { computed, h } from "vue";
-import { Autocomplete } from "@/components";
+import { Autocomplete, Link } from "@/components";
 import { createResource, FormControl } from "frappe-ui";
 import { Field } from "@/types";
-import SearchComplete from "./SearchComplete.vue";
 
 type Value = string | number | boolean;
 
@@ -49,8 +48,15 @@ const component = computed(() => {
       options: apiOptions.data,
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    return h(SearchComplete, {
+    let filters = null;
+    try {
+      filters = JSON.parse(props.field.link_filters);
+    } catch (error) {
+      filters = null;
+    }
+    return h(Link, {
       doctype: props.field.options,
+      filters,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {

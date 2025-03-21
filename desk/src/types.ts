@@ -133,6 +133,7 @@ export interface Field {
   required: 0 | 1;
   description?: null;
   url_method?: string;
+  link_filters?: string;
 }
 
 export type FieldValue = string | number | boolean;
