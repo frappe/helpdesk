@@ -1,5 +1,11 @@
 <template>
-  <Dialog v-model="show" :options="{ title: 'Canned Responses', size: '4xl' }">
+  <Dialog
+    v-model="show"
+    :options="{
+      title: 'Canned Responses',
+      size: '4xl',
+    }"
+  >
     <template #body-content>
       <TextInput
         ref="searchInput"
@@ -39,6 +45,17 @@
             {{ "No templates found" }}
           </div>
         </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <Button
+          label="New Canned Response"
+          @click="
+            () => {
+              $router.push('/canned-responses#new');
+              templates.data = null;
+            }
+          "
+        />
       </div>
     </template>
   </Dialog>

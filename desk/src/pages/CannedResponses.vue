@@ -113,6 +113,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRoute } from "vue-router";
 import {
   createListResource,
   Breadcrumbs,
@@ -134,16 +135,19 @@ const { getUser } = useUserStore();
 const breadcrumbs = [
   { label: "Canned Responses", route: { name: "CannedResponses" } },
 ];
+const route = useRoute();
 
 const title = ref(null);
 const message = ref(null);
 const name = ref(null);
-const showNewDialog = ref(false);
+const isNew = route.hash.split("#")[1] === "new";
+const showNewDialog = ref(isNew || false);
 
 const cannedResponses = createListResource({
   doctype: "HD Canned Response",
   fields: ["name", "title", "message", "owner", "modified"],
   auto: true,
+  orderBy: "modified desc",
 });
 
 function editItem(cannedResponse) {
