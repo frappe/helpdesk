@@ -29,6 +29,7 @@
           :doctype="o.options"
           :placeholder="o.placeholder"
           @change="update(o.field, $event)"
+          :filters="{ domain: ['!=', 'iftas.io'] }"
         />
         <Autocomplete
           v-else

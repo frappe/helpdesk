@@ -19,10 +19,9 @@
 
 <script setup lang="ts">
 import { computed, h } from "vue";
-import { Autocomplete } from "@/components";
+import { Autocomplete, Link } from "@/components";
 import { createResource, FormControl } from "frappe-ui";
 import { Field } from "@/types";
-import SearchComplete from "./SearchComplete.vue";
 
 type Value = string | number | boolean;
 
@@ -44,13 +43,29 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 
 const component = computed(() => {
+  if (props.field.fieldname === "priority") {
+    debugger;
+  }
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    return h(SearchComplete, {
+    console.log(props.field.fieldname);
+    debugger;
+    let filters = null;
+
+    if (!props.field.link_filters) {
+      filters = null;
+    }
+    try {
+      filters = JSON.parse(props.field.link_filters);
+    } catch (error) {
+      filters = null;
+    }
+    return h(Link, {
       doctype: props.field.options,
+      filters,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
