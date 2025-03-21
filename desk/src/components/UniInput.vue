@@ -43,18 +43,12 @@ const props = defineProps<P>();
 const emit = defineEmits<E>();
 
 const component = computed(() => {
-  if (props.field.fieldname === "priority") {
-    debugger;
-  }
   if (props.field.url_method) {
     return h(Autocomplete, {
       options: apiOptions.data,
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    console.log(props.field.fieldname);
-    debugger;
     let filters = null;
-
     if (!props.field.link_filters) {
       filters = null;
     }
