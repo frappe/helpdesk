@@ -1,6 +1,6 @@
 <template>
   <div
-    class="md:mx-10 md:my-4 flex items-center justify-between text-lg font-medium mx-5 mb-4 mt-8"
+    class="md:mx-8 md:my-4 flex items-center justify-between text-lg font-medium mx-5 mb-4 mt-8"
   >
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
@@ -24,6 +24,12 @@
         <FeatherIcon name="plus" class="h-4 w-4" />
       </template>
       <span>{{ "New Comment" }}</span>
+    </Button>
+    <Button v-else-if="title == 'Summary'" variant="solid" @click="emit('new')">
+      <template #prefix>
+        <FeatherIcon name="plus" class="h-4 w-4" />
+      </template>
+      <span>{{ "Generate Summary" }}</span>
     </Button>
     <Dropdown v-else :options="defaultActions" @click.stop>
       <template v-slot="{ open }">
@@ -57,6 +63,8 @@ defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["new"]);
 
 const communicationAreaRef: Ref = inject("communicationArea");
 

@@ -27,3 +27,4 @@ export { default as Link } from "./frappe-ui/Link.vue";
 export { default as ListViewBuilder } from "./ListViewBuilder.vue";
 export { default as Section } from "./Section.vue";
 export { default as Icon } from "./Icon.vue";
+export { default as Summary } from "./Summary.vue";

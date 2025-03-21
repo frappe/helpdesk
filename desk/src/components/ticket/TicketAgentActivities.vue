@@ -1,7 +1,10 @@
 <template>
-  <ActivityHeader :title="title" />
-  <div class="flex flex-col flex-1 overflow-y-auto">
-    <div v-if="activities.length" class="activities flex-1 h-full mt-1">
+  <ActivityHeader :title="title" @new="generateSummary" />
+  <div class="flex flex-col flex-1 overflow-y-auto" v-if="!loading">
+    <div
+      v-if="activities.length && title !== 'Summary'"
+      class="activities flex-1 h-full mt-1"
+    >
       <div
         v-for="(activity, i) in activities"
         :key="activity.key"
@@ -54,11 +57,18 @@
       </div>
     </div>
     <div
+      v-else-if="title == 'Summary' && activities.length"
+      class="flex flex-col w-full px-8"
+    >
+      <Summary :summary="activities[0]" />
+    </div>
+    <div
       v-else
       class="h-full flex flex-col items-center justify-center gap-3 text-xl font-medium text-gray-500"
     >
       <component :is="emptyTextIcon" class="h-10 w-10" />
       <span>{{ emptyText }}</span>
+
       <Button
         v-if="title == 'Emails'"
         label="New Email"
@@ -71,6 +81,14 @@
       />
     </div>
   </div>
+  <Button
+    v-if="loading"
+    :loading="loading"
+    label="Generating Summary"
+    variant="ghost"
+    size="xl"
+    class="flex flex-col flex-1 overflow-y-auto h-8"
+  />
 </template>
 
 <script setup lang="ts">
@@ -78,21 +96,26 @@ import { Ref, inject, h, computed, onMounted, watch, PropType } from "vue";
 import { useElementVisibility } from "@vueuse/core";
 import {
   DotIcon,
-  EmailAtIcon,
   CommentIcon,
   EmailIcon,
   ActivityIcon,
 } from "@/components/icons";
-import { EmailArea, CommentBox, HistoryBox } from "@/components";
+import WandSparkles from "~icons/lucide/wand-sparkles";
+import { EmailArea, CommentBox, HistoryBox, Summary } from "@/components";
 import { useUserStore } from "@/stores/user";
-import { Avatar } from "frappe-ui";
+import { Avatar, createResource } from "frappe-ui";
 import { TicketActivity } from "@/types";
+import { ref } from "vue";
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,
     required: true,
   },
   title: {
+    type: String,
+    required: true,
+  },
+  ticketId: {
     type: String,
     required: true,
   },
@@ -103,14 +126,18 @@ const emit = defineEmits(["email:reply", "update"]);
 const { getUser } = useUserStore();
 const communicationAreaRef: Ref = inject("communicationArea");
 
+const loading = ref(false);
+
 const emptyText = computed(() => {
   let text = "No Activities";
   if (props.title == "Emails") {
     text = "No Email Communications";
   } else if (props.title == "Comments") {
     text = "No Comments";
-    return text;
+  } else if (props.title == "Summary") {
+    text = "No Summary Found. Generate Summary";
   }
+  return text;
 });
 
 const emptyTextIcon = computed(() => {
@@ -119,9 +146,26 @@ const emptyTextIcon = computed(() => {
     icon = EmailIcon;
   } else if (props.title == "Comments") {
     icon = CommentIcon;
+  } else if (props.title == "Summary") {
+    icon = WandSparkles;
   }
   return h(icon, { class: "text-gray-500" });
 });
+
+function generateSummary() {
+  loading.value = true;
+  createResource({
+    url: "helpdesk.api.ticket.summarise_ticket",
+    params: {
+      ticket_id: props.ticketId,
+    },
+    auto: true,
+    onSuccess: (d) => {
+      emit("update");
+      loading.value = false;
+    },
+  });
+}
 
 function scrollToLatestActivity() {
   setTimeout(() => {
@@ -129,7 +173,7 @@ function scrollToLatestActivity() {
     let e = document.getElementsByClassName("activity");
     el = e[e.length - 1];
     if (el && !useElementVisibility(el).value) {
-      el.scrollIntoView({ behavior: "smooth" });
+      el.scrollIntoView();
       el.focus();
     }
   }, 500);
