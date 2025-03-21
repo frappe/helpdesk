@@ -171,7 +171,7 @@ const ticket = createResource({
   },
   onSuccess: (data) => {
     router.push({
-      name: route.meta.onSuccessRoute as string,
+      name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
       params: {
         ticketId: data.name,
       },
