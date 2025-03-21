@@ -50,7 +50,10 @@
     <div class="rounded bg-gray-50 px-4 py-3">
       <TextEditor
         ref="editorRef"
-        :editor-class="'prose-f shrink  text-p-sm transition-all duration-300 ease-in-out block w-full content'"
+        :editor-class="[
+          'prose-f shrink  text-p-sm transition-all duration-300 ease-in-out block w-full content',
+          getFontFamily(_content),
+        ]"
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
@@ -106,6 +109,7 @@ import {
   createToast,
   textEditorMenuButtons,
   isContentEmpty,
+  getFontFamily,
 } from "@/utils";
 import { AttachmentItem } from "@/components";
 import { useAuthStore } from "@/stores/auth";

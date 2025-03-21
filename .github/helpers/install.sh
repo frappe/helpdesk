@@ -50,5 +50,5 @@ bench setup requirements --dev
 wait $wkpid
 
 bench start &> bench_run_logs.txt &
-CI=Yes bench build --app frappe &
+CI=Yes bench build &
 bench --site test_site reinstall --yes

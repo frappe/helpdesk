@@ -32,90 +32,6 @@ from ..hd_service_level_agreement.utils import get_sla
 
 
 class HDTicket(Document):
-    @staticmethod
-    def get_list_filters(query: Query):
-        _is_agent = is_agent()
-        QBTeam = frappe.qb.DocType("HD Team")
-        QBTeamMember = frappe.qb.DocType("HD Team Member")
-        QBTicket = frappe.qb.DocType("HD Ticket")
-        user = frappe.session.user
-        conditions = (
-            [
-                QBTicket.contact == user,
-                QBTicket.raised_by == user,
-            ]
-            if not _is_agent
-            else []
-        )
-
-        if not _is_agent:
-            customer = get_customer(user)
-            for c in customer:
-                conditions.append(QBTicket.customer == c)
-        query = query.where(Criterion.any(conditions))
-
-        enable_restrictions, ignore_restrictions = frappe.get_value(
-            doctype="HD Settings",
-            fieldname=[
-                "restrict_tickets_by_agent_group",
-                "do_not_restrict_tickets_without_an_agent_group",
-            ],
-        )
-        enable_restrictions = bool(int(enable_restrictions))
-        ignore_restrictions = bool(int(ignore_restrictions))
-
-        if not enable_restrictions:
-            return query
-
-        teams = (
-            frappe.qb.from_(QBTeamMember)
-            .where(QBTeamMember.user == user)
-            .join(QBTeam)
-            .on(QBTeam.name == QBTeamMember.parent)
-            .select(QBTeam.team_name, QBTeam.ignore_restrictions)
-            .run(as_dict=True)
-        )
-
-        can_ignore_restrictions = (
-            len(list(filter(lambda x: x.ignore_restrictions, teams))) > 0
-        )
-
-        if can_ignore_restrictions:
-            return query
-
-        conditions = [QBTicket.agent_group == team.team_name for team in teams]
-
-        # Consider tickets without any assigned agent group
-        if ignore_restrictions:
-            conditions.append(QBTicket.agent_group.isnull())
-
-        query = query.where(Criterion.any(conditions))
-        return query
-
-    @staticmethod
-    @lru_cache
-    def sort_options():
-        def by_priority(query: Query, direction: Order):
-            QBTicket = frappe.qb.DocType("HD Ticket")
-            QBPriority = frappe.qb.DocType("HD Ticket Priority")
-
-            query = (
-                query.left_join(QBPriority)
-                .on(QBPriority.name == QBTicket.priority)
-                .orderby(QBPriority.integer_value, order=direction)
-                .orderby(QBTicket.resolution_by, order=Order.desc)
-            )
-
-            return query
-
-        return {
-            "Due date": ("resolution_by", Order.asc),
-            "Created on": ("creation", Order.asc),
-            "High to low priority": lambda q: by_priority(q, Order.asc),
-            "Low to high priority": lambda q: by_priority(q, Order.desc),
-            "Last modified on": "modified",
-        }
-
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
         capture_event("ticket_updated")
@@ -956,3 +872,29 @@ def remove_guest_ticket_creation_permission():
 
 
 customer_not_allowed_fields = ["customer"]
+
+
+def close_tickets_after_n_days():
+    if frappe.db.get_single_value("HD Settings", "auto_close_tickets") == 0:
+        return
+
+    days_threshold = frappe.db.get_single_value("HD Settings", "auto_close_after_days")
+
+    tickets_to_close = frappe.get_list(
+        "HD Ticket",
+        filters=[
+            ["status", "=", "Replied"],
+            [
+                "modified",
+                "<",
+                frappe.utils.add_days(frappe.utils.now_datetime(), -days_threshold),
+            ],
+        ],
+        pluck="name",
+    )
+
+    # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
+    for ticket in tickets_to_close:
+        doc = frappe.get_doc("HD Ticket", ticket)
+        doc.status = "Closed"
+        doc.save(ignore_permissions=True, ignore_validations=True)

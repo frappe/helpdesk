@@ -44,13 +44,14 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
     where_parent = QBFetch.parent == DOCTYPE_TICKET
     if fetch == "Custom Field":
         where_parent = QBFetch.dt == DOCTYPE_TICKET
-    return (
+    result = (
         frappe.qb.from_(fields)
         .select(
             QBFetch.description,
             QBFetch.fieldtype,
             QBFetch.label,
             QBFetch.options,
+            QBFetch.link_filters,
             fields.fieldname,
             fields.hide_from_customer,
             fields.required,
@@ -63,3 +64,14 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
         .orderby(fields.idx)
         .run(as_dict=True)
     )
+    docfields = ["link_filters"]
+
+    for df in docfields:
+        for field in result:
+            property_setter_id = "HD Ticket" + "-" + field.fieldname + "-" + df
+            if frappe.db.exists("Property Setter", property_setter_id):
+                field[df] = frappe.get_value(
+                    "Property Setter", property_setter_id, "value"
+                )
+
+    return result

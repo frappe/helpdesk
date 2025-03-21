@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 from frappe.realtime import get_website_room
@@ -16,6 +17,15 @@ from helpdesk.helpdesk.doctype.hd_ticket.hd_ticket import (
 
 
 class HDSettings(Document):
+    def validate(self):
+        self.validate_auto_close_days()
+
+    def validate_auto_close_days(self):
+        if self.auto_close_tickets and self.auto_close_after_days <= 0:
+            frappe.throw(
+                _("Day count for auto closing tickets cannot be negative or zero")
+            )
+
     def get_base_support_rotation(self):
         """Returns the base support rotation rule if it exists, else creats once and returns it"""
 

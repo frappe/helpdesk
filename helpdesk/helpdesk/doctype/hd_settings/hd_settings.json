@@ -30,6 +30,9 @@
   "allow_anyone_to_create_tickets",
   "is_feedback_mandatory",
   "auto_update_status",
+  "column_break_iarl",
+  "auto_close_tickets",
+  "auto_close_after_days",
   "workflow_tab",
   "skip_email_workflow",
   "instantly_send_email",
@@ -309,11 +312,30 @@
    "fieldname": "is_feedback_mandatory",
    "fieldtype": "Check",
    "label": "Make feedback mandatory"
+  },
+  {
+   "fieldname": "column_break_iarl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_close_tickets",
+   "fieldtype": "Check",
+   "label": "Automatically Close Replied Tickets"
+  },
+  {
+   "default": "14",
+   "depends_on": "auto_close_tickets",
+   "fieldname": "auto_close_after_days",
+   "fieldtype": "Int",
+   "label": "Auto-close after (Days)",
+   "mandatory_depends_on": "auto_close_tickets"
   }
  ],
+ "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2024-12-10 14:46:08.764944",
+ "modified": "2025-03-21 17:13:09.867555",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
@@ -338,6 +360,7 @@
   }
  ],
  "quick_entry": 1,
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

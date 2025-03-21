@@ -82,6 +82,7 @@
           :to-emails="[ticket.data?.raised_by]"
           :cc-emails="[]"
           :bcc-emails="[]"
+          :key="ticket.data?.name"
           @update="
             () => {
               ticket.reload();
@@ -134,7 +135,6 @@
 <script setup lang="ts">
 import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
 import { useRoute } from "vue-router";
-import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
   Dropdown,
@@ -192,17 +192,11 @@ const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
 
-let storage = useStorage("ticket_agent", {
-  showAllActivity: true,
-});
-
-const showFullActivity = ref(storage.value.showAllActivity);
 const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_one",
-  cache: ["Ticket", props.ticketId],
   auto: true,
   makeParams: () => ({
     name: props.ticketId,
@@ -237,9 +231,9 @@ const breadcrumbs = computed(() => {
     const currView: ComputedRef<View> = findView(route.query.view as string);
     if (currView) {
       items.push({
-        label: currView.value.label,
-        icon: getIcon(currView.value.icon),
-        route: { name: "TicketsAgent", query: { view: currView.value.name } },
+        label: currView.value?.label,
+        icon: getIcon(currView.value?.icon),
+        route: { name: "TicketsAgent", query: { view: currView.value?.name } },
       });
     }
   }
@@ -257,13 +251,6 @@ const handleRename = () => {
   updateTicket("subject", renameSubject.value);
   showSubjectDialog.value = false;
 };
-
-watch(
-  () => showFullActivity.value,
-  (value) => {
-    storage.value.showAllActivity = value;
-  }
-);
 
 const dropdownOptions = computed(() =>
   ticketStatusStore.options.map((o) => ({
@@ -325,12 +312,6 @@ const activities = computed(() => {
     };
   });
 
-  if (!showFullActivity.value) {
-    return [...emailProps, ...commentProps].sort(
-      (a, b) => new Date(a.creation) - new Date(b.creation)
-    );
-  }
-
   const historyProps = [...ticket.data.history, ...ticket.data.views].map(
     (h) => {
       return {
@@ -380,6 +361,7 @@ function filterActivities(eventType: TicketTab) {
 }
 
 function updateTicket(fieldname: string, value: string) {
+  if (value === ticket.data[fieldname]) return;
   isLoading.value = true;
   createResource({
     url: "frappe.client.set_value",
@@ -389,6 +371,7 @@ function updateTicket(fieldname: string, value: string) {
       fieldname,
       value,
     },
+    debounce: 500,
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
@@ -396,20 +379,6 @@ function updateTicket(fieldname: string, value: string) {
         title: "Ticket updated",
         icon: "check",
         iconClasses: "text-green-600",
-      });
-    },
-    onError: (e) => {
-      isLoading.value = false;
-
-      const title =
-        e.messages && e.messages.length > 0
-          ? e.messages[0]
-          : "Failed to update ticket";
-
-      createToast({
-        title,
-        icon: "x",
-        iconClasses: "text-red-600",
       });
     },
   });

@@ -5,10 +5,7 @@
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" class="flex-1" />
-    <div
-      class="flex items-start gap-2 flex-1 justify-end h-full"
-      v-if="!isMobileView"
-    >
+    <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
         label="Save Changes"
         v-if="isViewUpdated && canSaveView"
@@ -62,6 +59,8 @@
       :rows="rows"
       v-slot="{ idx, column, item, row }"
       :group-by-actions="options.groupByActions"
+      @scrollend="handleListScroll"
+      class="list-rows"
     >
       <ListRowItem :item="item" :column="column" :row="row">
         <component
@@ -131,7 +130,6 @@ import {
   ListSelectBanner,
   FeatherIcon,
   Dropdown,
-  confirmDialog,
 } from "frappe-ui";
 import {
   Filter,
@@ -153,6 +151,7 @@ import {
 } from "@/composables/useView";
 import { getIcon, formatTimeShort } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
+import { useStorage } from "@vueuse/core";
 
 interface P {
   options: {
@@ -593,7 +592,25 @@ watch(
     }
   }
 );
+
+const listScrollPosition = useStorage(
+  `list_position+${props.options.doctype}`,
+  0
+);
+function handleListScroll(e) {
+  listScrollPosition.value = e.target.scrollTop;
+}
+function handleScrollPosition() {
+  setTimeout(() => {
+    const listContainer = document.querySelector(".list-rows");
+    if (!listContainer) return;
+    listContainer.scrollTop = listScrollPosition.value;
+  }, 200);
+}
+
 onMounted(async () => {
+  handleScrollPosition();
+
   if (views.data?.length > 0 && views.filters?.dt === options.value.doctype) {
     handleViewChanges();
   } else {
