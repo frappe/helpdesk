@@ -287,7 +287,7 @@ const slaStatusColorMap = {
   Paused: "blue",
 };
 
-const viewDialog = reactive({
+let viewDialog = reactive({
   show: false,
   view: {
     label: "",

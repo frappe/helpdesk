@@ -12,7 +12,16 @@ import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
-    frappeui(),
+    frappeui({
+      frappeProxy: true,
+      lucideIcons: true,
+      jinjaBootData: true,
+      buildConfig: {
+        outDir: `../helpdesk/public/desk`,
+        emptyOutDir: true,
+        indexHtmlPath: "../helpdesk/www/helpdesk/index.html",
+      },
+    }),
     vue(),
     Components({
       resolvers: IconsResolver({
@@ -89,15 +98,6 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src"),
       "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
-    },
-  },
-  build: {
-    outDir: `../helpdesk/public/desk`,
-    emptyOutDir: true,
-    target: "es2021",
-    sourcemap: true,
-    commonjsOptions: {
-      include: [/tailwind.config.js/, /node_modules/],
     },
   },
   optimizeDeps: {

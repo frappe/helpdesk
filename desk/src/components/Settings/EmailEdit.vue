@@ -12,7 +12,7 @@
     </div>
     <!-- banner for setting up email account -->
     <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
-      <IconAlert
+      <CircleAlert
         class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
       />
       <div class="text-wrap text-xs text-gray-700">
@@ -90,7 +90,7 @@ import {
 } from "./emailConfig";
 import { EmailAccount, EmailStep } from "@/types";
 import { createToast } from "@/utils";
-import IconAlert from "~icons/espresso/alert-circle";
+import CircleAlert from "~icons/lucide/circle-alert";
 
 interface P {
   accountData: EmailAccount;

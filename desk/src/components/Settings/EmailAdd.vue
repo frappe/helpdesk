@@ -25,7 +25,7 @@
     <div v-if="selectedService" class="flex flex-col gap-4">
       <!-- email service provider info -->
       <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
-        <IconAlert
+        <CircleAlert
           class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
         />
         <div class="text-wrap text-xs text-gray-700">
@@ -96,7 +96,7 @@
 <script setup lang="ts">
 import { computed, Reactive, reactive, Ref, ref } from "vue";
 import { createResource } from "frappe-ui";
-import IconAlert from "~icons/espresso/alert-circle";
+import CircleAlert from "~icons/lucide/circle-alert";
 import { createToast } from "@/utils";
 import {
   customProviderFields,
