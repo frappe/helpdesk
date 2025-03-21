@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/assets/helpdesk/desk/ && yarn copy-html-entry",
+    "build": "vite build --base=/assets/helpdesk/frontend/ && yarn copy-html-entry",
     "serve": "vite preview",
     "copy-html-entry": "cp ../helpdesk/public/frontend/index.html ../helpdesk/www/helpdesk/index.html"
   },
