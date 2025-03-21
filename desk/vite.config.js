@@ -17,9 +17,9 @@ export default defineConfig({
       lucideIcons: true,
       jinjaBootData: true,
       buildConfig: {
+        outDir: `../helpdesk/public/desk`,
         emptyOutDir: true,
         indexHtmlPath: "../helpdesk/www/helpdesk/index.html",
-        outDir: `../helpdesk/public/frontend`,
       },
     }),
     vue(),
