@@ -2,12 +2,9 @@
   <div class="flex w-[382px] flex-col justify-between border-l">
     <div
       class="flex h-10.5 cursor-copy items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9"
+      @click="copyToClipboard(ticket.name, ticket.name)"
     >
-      <span
-        class="cursor-copy text-lg font-semibold"
-        @click="copyToClipboard(ticket.name, ticket.name)"
-        >#{{ ticket.name }}</span
-      >
+      #{{ ticket.name }}
     </div>
     <TicketAgentContact
       :contact="ticket.contact"
