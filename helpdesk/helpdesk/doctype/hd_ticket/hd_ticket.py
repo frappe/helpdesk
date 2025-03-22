@@ -897,4 +897,6 @@ def close_tickets_after_n_days():
     for ticket in tickets_to_close:
         doc = frappe.get_doc("HD Ticket", ticket)
         doc.status = "Closed"
-        doc.save(ignore_permissions=True, ignore_validations=True)
+        doc.flags.ignore_validate = True
+        doc.save(ignore_permissions=True)
+        doc.flags.ignore_validate = False
