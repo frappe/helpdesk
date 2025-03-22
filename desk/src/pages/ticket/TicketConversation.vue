@@ -41,7 +41,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, watch } from "vue";
 import { useRoute } from "vue-router";
-import { useElementVisibility } from "@vueuse/core";
 import { Avatar } from "frappe-ui";
 import { orderBy } from "lodash";
 import { dayjs } from "@/dayjs";
@@ -62,17 +61,27 @@ const communications = computed(() => {
   return orderBy(_communications, (c) => dayjs(c.creation));
 });
 
+function isElementInViewport(el: HTMLElement) {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= window.innerHeight &&
+    rect.right <= window.innerWidth
+  );
+}
+
 function scroll(id: string) {
   const e = document.getElementById(id);
-  if (!useElementVisibility(e).value) {
-    e.scrollIntoView({ behavior: "smooth" });
-    e.focus();
+  console.log(isElementInViewport(e));
+  if (!isElementInViewport(e)) {
+    e.scrollIntoView();
   }
 }
 
 watch(
   () => props.focus,
-  (id: string) => scroll(id)
+  (id: string) => console.log(id)
 );
 nextTick(() => {
   const hash = route.hash.slice(1);

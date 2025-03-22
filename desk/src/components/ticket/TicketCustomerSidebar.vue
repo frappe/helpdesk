@@ -58,7 +58,7 @@
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.data.feedback_rating"
-      class="border-b px-6 py-3 text-base text-gray-600"
+      class="border-b text-base text-gray-600"
       :ticket="ticket.data"
     />
     <div class="flex flex-col gap-4 pt-0 px-5 py-3">
@@ -143,7 +143,12 @@ function firstResponseData() {
 
 function resolutionData() {
   let resolution = null;
-  if (
+  if (ticket.data.agreement_status === "Paused") {
+    resolution = {
+      label: "Paused",
+      color: "blue",
+    };
+  } else if (
     !ticket.data.resolution_date &&
     dayjs().isBefore(ticket.data.resolution_by)
   ) {

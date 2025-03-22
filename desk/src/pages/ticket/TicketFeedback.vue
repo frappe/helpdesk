@@ -103,7 +103,6 @@ const setValue = createResource({
     emit("update:open", false);
     ticket.reload();
   },
-  onError: useError(),
 });
 watch(rating, (r) => {
   preset.value = null;
