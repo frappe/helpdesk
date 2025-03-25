@@ -75,7 +75,11 @@ const firstResponseBadge = computed(() => {
 
 const resolutionBadge = computed(() => {
   let resolution = null;
-  if (props.ticket.status === "Replied" && props.ticket.on_hold_since) {
+  if (
+    props.ticket.status === "Replied" &&
+    props.ticket.on_hold_since &&
+    dayjs(props.ticket.resolution_by).isAfter(dayjs(props.ticket.on_hold_since))
+  ) {
     let time_left = formatTime(
       dayjs(props.ticket.resolution_by).diff(
         dayjs(props.ticket.on_hold_since),
