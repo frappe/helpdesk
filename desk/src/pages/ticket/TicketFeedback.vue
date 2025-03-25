@@ -86,7 +86,6 @@ const options = createListResource({
   doctype: "HD Ticket Feedback Option",
   fields: ["name", "label"],
   pageLength: 99999,
-  onError: useError(),
 });
 const setValue = createResource({
   url: "frappe.client.set_value",
