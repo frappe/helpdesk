@@ -217,7 +217,6 @@ const setValue = createResource({
     showFeedbackDialog.value = false;
     ticket.reload();
   },
-  onError: useError(),
 });
 
 const breadcrumbs = computed(() => {
