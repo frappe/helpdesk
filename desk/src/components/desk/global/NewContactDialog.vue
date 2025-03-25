@@ -174,14 +174,6 @@ const contactResource = createResource({
     });
     emit("contactCreated");
   },
-  onError: (error: Error) => {
-    createToast({
-      title: "Contact Creation Failed",
-      message: error.message,
-      icon: "error",
-      iconClasses: "text-red-600",
-    });
-  },
 });
 
 function createContact() {

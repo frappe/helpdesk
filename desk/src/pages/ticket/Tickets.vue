@@ -223,7 +223,13 @@ function handle_response_by_field(row: any, item: string) {
 }
 
 function handle_resolution_by_field(row: any, item: string) {
-  if (row.resolution_date && dayjs(row.resolution_date).isBefore(item)) {
+  if (row.status === "Replied") {
+    return h(Badge, {
+      label: "Paused",
+      theme: "blue",
+      variant: "outline",
+    });
+  } else if (row.resolution_date && dayjs(row.resolution_date).isBefore(item)) {
     return h(Badge, {
       label: "Fulfilled",
       theme: "green",

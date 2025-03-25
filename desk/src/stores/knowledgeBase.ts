@@ -47,7 +47,7 @@ export const newCategory = createResource({
       title,
     };
   },
-  validate(title: string) {
+  validate({ title }) {
     if (!title) throw "Title is required";
   },
 });

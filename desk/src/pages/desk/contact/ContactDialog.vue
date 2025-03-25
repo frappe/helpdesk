@@ -147,9 +147,6 @@ const contact = createDocumentResource({
     onSuccess() {
       emit("contactUpdated");
     },
-    onError() {
-      useError({ title: "Error updating contact" });
-    },
   },
 });
 

@@ -76,15 +76,7 @@
                 />
                 <!-- SLA Section -->
                 <h3 class="px-6 pt-3 font-semibold text-base">SLA</h3>
-                <TicketAgentDetails
-                  :agreement-status="ticket.data.agreement_status"
-                  :first-responded-on="ticket.data.first_responded_on"
-                  :response-by="ticket.data.response_by"
-                  :resolution-date="ticket.data.resolution_date"
-                  :resolution-by="ticket.data.resolution_by"
-                  :ticket-created-on="ticket.data.creation"
-                  :source="ticket.data.via_customer_portal ? 'Portal' : 'Mail'"
-                />
+                <TicketAgentDetails :ticket="ticket.data" />
                 <!-- Ticket Fields -->
                 <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>
                 <TicketAgentFields
@@ -421,20 +413,6 @@ function updateTicket(fieldname: string, value: string) {
         title: "Ticket updated",
         icon: "check",
         iconClasses: "text-green-600",
-      });
-    },
-    onError: (e) => {
-      isLoading.value = false;
-
-      const title =
-        e.messages && e.messages.length > 0
-          ? e.messages[0]
-          : "Failed to update ticket";
-
-      createToast({
-        title,
-        icon: "x",
-        iconClasses: "text-red-600",
       });
     },
   });

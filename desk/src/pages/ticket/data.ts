@@ -23,6 +23,7 @@ export function useTicket(
       successCB && successCB(data);
     },
     onError: (err) => {
+      console.log("here");
       errorCB && errorCB(err);
     },
   });

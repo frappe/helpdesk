@@ -62,11 +62,21 @@ const communications = computed(() => {
   return orderBy(_communications, (c) => dayjs(c.creation));
 });
 
+function isElementInViewport(el: HTMLElement) {
+  if (!el) return false;
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= window.innerHeight &&
+    rect.right <= window.innerWidth
+  );
+}
+
 function scroll(id: string) {
   const e = document.getElementById(id);
-  if (!useElementVisibility(e).value) {
-    e.scrollIntoView({ behavior: "smooth" });
-    e.focus();
+  if (!isElementInViewport(e)) {
+    e.scrollIntoView();
   }
 }
 

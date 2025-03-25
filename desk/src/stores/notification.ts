@@ -33,7 +33,6 @@ export const useNotificationStore = defineStore("notification", () => {
     url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",
     auto: false,
     onSuccess: () => resource.reload(),
-    onError: useError(),
   });
 
   const read = (ticket) => {
@@ -44,7 +43,6 @@ export const useNotificationStore = defineStore("notification", () => {
         ticket: ticket,
       },
       onSuccess: () => resource.reload(),
-      onError: useError(),
     });
   };
 
