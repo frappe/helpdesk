@@ -134,7 +134,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   Breadcrumbs,
   Dropdown,
@@ -144,6 +144,7 @@ import {
   Tabs,
   TabPanel,
   TabList,
+  call,
 } from "frappe-ui";
 
 import {
@@ -168,6 +169,9 @@ import { TabObject, TicketTab, View } from "@/types";
 import { useView } from "@/composables/useView";
 import { ComputedRef } from "vue";
 
+const route = useRoute();
+const router = useRouter();
+
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
 const ticketAgentActivitiesRef = ref(null);
@@ -187,7 +191,7 @@ watch(
     ticket.reload();
   }
 );
-const route = useRoute();
+
 const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
@@ -217,6 +221,8 @@ const ticket = createResource({
     setupCustomizations(data, {
       doc: data,
       updateField,
+      call,
+      router,
     });
   },
 });

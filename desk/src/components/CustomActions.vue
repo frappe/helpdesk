@@ -1,5 +1,5 @@
 <template>
-  <div v-if="normalActions.length">
+  <div v-if="normalActions.length" class="flex gap-2">
     <Button
       v-for="action in normalActions"
       :key="action.label"
