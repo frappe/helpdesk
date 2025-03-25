@@ -362,6 +362,7 @@ function filterActivities(eventType: TicketTab) {
 
 function updateTicket(fieldname: string, value: string) {
   if (value === ticket.data[fieldname]) return;
+  updateOptimistic(fieldname, value);
   isLoading.value = true;
   createResource({
     url: "frappe.client.set_value",
@@ -375,12 +376,17 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
-      createToast({
-        title: "Ticket updated",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      ticket.reload();
     },
+  });
+}
+
+function updateOptimistic(fieldname: string, value: string) {
+  ticket.data[fieldname] = value;
+  createToast({
+    title: "Ticket updated",
+    icon: "check",
+    iconClasses: "text-green-600",
   });
 }
 
