@@ -1,8 +1,6 @@
 import frappe
 from frappe.model.document import Document
 
-from helpdesk.utils import refetch_resource
-
 
 class HDNotification(Document):
     def format_message(self):
@@ -59,6 +57,3 @@ class HDNotification(Document):
                 template="notification",
                 args=self.get_args(),
             )
-
-    def on_update(self):
-        refetch_resource("Notifications")
