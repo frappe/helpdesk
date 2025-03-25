@@ -71,7 +71,7 @@ import { useConfigStore } from "@/stores/config";
 import { Icon } from "@iconify/vue";
 import { ITicket } from "./symbols";
 import { useRouter } from "vue-router";
-import { createToast, isContentEmpty, setupCustomActions } from "@/utils";
+import { createToast, isContentEmpty, setupCustomizations } from "@/utils";
 import { socket } from "@/socket";
 import { LayoutHeader } from "@/components";
 import { useScreenSize } from "@/composables/screen";
@@ -92,7 +92,7 @@ const ticket = useTicket(
   true,
   null,
   (data) => {
-    setupCustomActions(data, {
+    setupCustomizations(data, {
       doc: data,
       updateField,
     });

@@ -163,7 +163,7 @@ import {
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, getIcon, setupCustomActions } from "@/utils";
+import { createToast, getIcon, setupCustomizations } from "@/utils";
 import { TabObject, TicketTab, View } from "@/types";
 import { useView } from "@/composables/useView";
 import { ComputedRef } from "vue";
@@ -214,7 +214,7 @@ const ticket = createResource({
     renameSubject.value = data.subject;
   },
   onSuccess: (data) => {
-    setupCustomActions(data, {
+    setupCustomizations(data, {
       doc: data,
       updateField,
     });

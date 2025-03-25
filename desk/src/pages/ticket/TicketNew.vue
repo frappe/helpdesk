@@ -23,7 +23,14 @@
           :key="field.fieldname"
           :field="field"
           :value="templateFields[field.fieldname]"
-          @change="templateFields[field.fieldname] = $event.value"
+          @change="
+            (e) => {
+              templateFields[field.fieldname] = e.value;
+              const fn = templateFields?.['customOnChange']?.[field.fieldname];
+              console.log(fn, field.fieldname);
+              console.log(templateFields.customOnChange);
+            }
+          "
         />
       </div>
       <!-- existing fields -->
@@ -98,6 +105,10 @@
       </div>
     </div>
   </div>
+
+  <h3 v-if="template.data?.customOnChange">
+    {{ template.data.customOnChange }}
+  </h3>
 </template>
 
 <script setup lang="ts">
@@ -112,7 +123,7 @@ import {
 } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
-import { useError } from "@/composables/error";
+import { setupCustomizations } from "@/utils";
 import { LayoutHeader, UniInput } from "@/components";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
@@ -141,6 +152,14 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
+  transform: (data) => {
+    setupCustomizations(data, {
+      doc: data,
+    });
+  },
+  onSuccess: (data) => {
+    console.log(data);
+  },
 });
 
 const visibleFields = computed(() =>
@@ -148,6 +167,7 @@ const visibleFields = computed(() =>
     (f) => route.meta.agent || !f.hide_from_customer
   )
 );
+
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
   debounce: 300,

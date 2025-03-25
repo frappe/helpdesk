@@ -201,7 +201,7 @@ import {
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, setupCustomActions } from "@/utils";
+import { createToast, setupCustomizations } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -253,7 +253,7 @@ const ticket = createResource({
   },
   onSuccess: (data) => {
     subjectInput.value = data.subject;
-    setupCustomActions(data, {
+    setupCustomizations(data, {
       doc: data,
     });
   },

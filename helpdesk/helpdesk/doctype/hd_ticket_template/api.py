@@ -5,6 +5,7 @@ import frappe
 # from frappe import _
 from pypika import JoinType
 
+from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.utils import check_permissions
 
 DOCTYPE_TEMPLATE = "HD Ticket Template"
@@ -25,9 +26,13 @@ def get_one(name: str):
     fields = []
     fields.extend(get_fields(name, "DocField"))
     fields.extend(get_fields(name, "Custom Field"))
+    print("\n\n", "here", "\n\n")
     return {
         "about": about,
         "fields": fields,
+        "_form_script": get_form_script(
+            "HD Ticket", apply_on_new_page=True, is_customer_portal=False
+        ),
     }
 
 

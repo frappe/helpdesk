@@ -100,25 +100,34 @@ export function formatTime(seconds) {
   return formattedTime.trim();
 }
 
-function getActionsFromScript(script, obj) {
+function parseScript(script, obj) {
   const scriptFn = new Function(script + "\nreturn setupForm")();
   const formScript = scriptFn(obj);
-  return formScript?.actions || [];
+  return {
+    actions: formScript?.actions || [],
+    onChange: formScript?.onChange || null,
+  };
 }
 
-export function setupCustomActions(data, obj) {
+export function setupCustomizations(data, obj) {
   if (!data._form_script) return [];
-
   let actions = [];
+  let onChange = null;
+  debugger;
   if (Array.isArray(data._form_script)) {
     data._form_script.forEach((script) => {
-      actions = actions.concat(getActionsFromScript(script, obj));
+      const parsed = parseScript(script, obj);
+      actions = actions.concat(parsed.actions);
+      onChange = parsed.onChange;
     });
   } else {
-    actions = getActionsFromScript(data._form_script, obj);
+    const parsed = parseScript(data._form_script, obj);
+    actions = parsed.actions;
+    onChange = parsed.onChange;
   }
 
   data._customActions = actions;
+  data.customOnChange = onChange;
 }
 
 export const isCustomerPortal = ref(false);
