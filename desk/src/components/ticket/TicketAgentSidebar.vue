@@ -20,16 +20,7 @@
       :ticket="ticket"
     />
     <!-- ticket details -->
-    <TicketAgentDetails
-      :agreement-status="ticket.agreement_status"
-      :first-responded-on="ticket.first_responded_on"
-      :response-by="ticket.response_by"
-      :resolution-date="ticket.resolution_date"
-      :resolution-by="ticket.resolution_by"
-      :ticket-created-on="ticket.creation"
-      :source="ticket.via_customer_portal ? 'Portal' : 'Mail'"
-      :status="ticket.status"
-    />
+    <TicketAgentDetails :ticket="ticket" />
     <!-- fields -->
     <TicketAgentFields :ticket="ticket" @update="update" />
   </div>

@@ -76,16 +76,7 @@
                 />
                 <!-- SLA Section -->
                 <h3 class="px-6 pt-3 font-semibold text-base">SLA</h3>
-                <TicketAgentDetails
-                  :agreement-status="ticket.data.agreement_status"
-                  :first-responded-on="ticket.data.first_responded_on"
-                  :response-by="ticket.data.response_by"
-                  :resolution-date="ticket.data.resolution_date"
-                  :resolution-by="ticket.data.resolution_by"
-                  :ticket-created-on="ticket.data.creation"
-                  :source="ticket.data.via_customer_portal ? 'Portal' : 'Mail'"
-                  :status="ticket.data.status"
-                />
+                <TicketAgentDetails :ticket="ticket.data" />
                 <!-- Ticket Fields -->
                 <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>
                 <TicketAgentFields
