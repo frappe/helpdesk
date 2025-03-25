@@ -26,7 +26,6 @@ def get_one(name: str):
     fields = []
     fields.extend(get_fields(name, "DocField"))
     fields.extend(get_fields(name, "Custom Field"))
-    print("\n\n", "here", "\n\n")
     return {
         "about": about,
         "fields": fields,
