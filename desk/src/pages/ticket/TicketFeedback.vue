@@ -64,7 +64,6 @@
 <script setup lang="ts">
 import { inject, ref, watch } from "vue";
 import { createResource, createListResource } from "frappe-ui";
-import { useError } from "@/composables/error";
 import { StarRating } from "@/components";
 import { ITicket } from "./symbols";
 
@@ -102,7 +101,6 @@ const setValue = createResource({
     emit("update:open", false);
     ticket.reload();
   },
-  onError: useError(),
 });
 watch(rating, (r) => {
   preset.value = null;

@@ -69,7 +69,6 @@ import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { createResource, Button, Breadcrumbs, confirmDialog } from "frappe-ui";
 import { useConfigStore } from "@/stores/config";
 import { Icon } from "@iconify/vue";
-import { useError } from "@/composables/error";
 import { ITicket } from "./symbols";
 import { useRouter } from "vue-router";
 import { createToast, isContentEmpty, setupCustomActions } from "@/utils";
@@ -165,18 +164,6 @@ function updateTicket(fieldname: string, value: string) {
         title: "Ticket updated",
         icon: "check",
         iconClasses: "text-green-600",
-      });
-    },
-    onError: (e) => {
-      const title =
-        e.messages && e.messages.length > 0
-          ? e.messages[0]
-          : "Failed to update ticket";
-
-      createToast({
-        title,
-        icon: "x",
-        iconClasses: "text-red-600",
       });
     },
   });

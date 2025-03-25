@@ -91,7 +91,6 @@ const newTeam = createResource({
       },
     });
   },
-  onError: useError({ title: "Error creating team" }),
 });
 
 usePageMeta(() => {
