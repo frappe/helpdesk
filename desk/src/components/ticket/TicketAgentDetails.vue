@@ -87,7 +87,12 @@ const firstResponseBadge = computed(() => {
 
 const resolutionBadge = computed(() => {
   let resolution = null;
-  if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
+  if (props.agreementStatus === "Paused") {
+    resolution = {
+      label: "Paused",
+      color: "blue",
+    };
+  } else if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
     resolution = {
       label: `Due in ${formatTime(
         dayjs(props.resolutionBy).diff(dayjs(), "s")

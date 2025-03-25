@@ -17,6 +17,7 @@
   "ticket_type",
   "agent_group",
   "ticket_split_from",
+  "summary",
   "sb_details",
   "description",
   "template",
@@ -404,12 +405,18 @@
    "fieldname": "meta_tab",
    "fieldtype": "Tab Break",
    "label": "Meta"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Text Editor",
+   "label": "Summary"
   }
  ],
+ "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-02-20 12:00:20.604270",
+ "modified": "2025-03-13 01:54:22.633982",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -465,6 +472,7 @@
   }
  ],
  "quick_entry": 1,
+ "row_format": "Dynamic",
  "search_fields": "status,subject,raised_by",
  "sender_field": "raised_by",
  "sort_field": "modified",
