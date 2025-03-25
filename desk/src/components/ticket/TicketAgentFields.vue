@@ -24,7 +24,7 @@
         />
         <Link
           v-else-if="o.field === 'customer'"
-          class="form-control"
+          class="form-control p-[3px]"
           :value="ticket[o.field]"
           :doctype="o.options"
           :placeholder="o.placeholder"

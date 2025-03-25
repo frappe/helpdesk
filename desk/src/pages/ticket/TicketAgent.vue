@@ -217,9 +217,9 @@ const ticket = createResource({
     }
     renameSubject.value = data.subject;
   },
-  onSuccess: (data) => {
-    setupCustomizations(data, {
-      doc: data,
+  onSuccess: (ticket) => {
+    setupCustomizations(ticket, {
+      doc: ticket,
       updateField,
       call,
       router,

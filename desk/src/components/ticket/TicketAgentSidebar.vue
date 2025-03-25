@@ -16,7 +16,7 @@
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.feedback_rating"
-      class="border-b px-6 py-3 text-base text-gray-600"
+      class="py-3 !px-6 !gap-3 text-base text-gray-600"
       :ticket="ticket"
     />
     <!-- ticket details -->
