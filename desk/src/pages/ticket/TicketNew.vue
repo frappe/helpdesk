@@ -26,9 +26,8 @@
           @change="
             (e) => {
               templateFields[field.fieldname] = e.value;
-              const fn = templateFields?.['customOnChange']?.[field.fieldname];
-              console.log(fn, field.fieldname);
-              console.log(templateFields.customOnChange);
+              const fn = customOnChange[field.fieldname];
+              if (fn) fn(e.value, field.fieldtype);
             }
           "
         />
@@ -105,10 +104,6 @@
       </div>
     </div>
   </div>
-
-  <h3 v-if="template.data?.customOnChange">
-    {{ template.data.customOnChange }}
-  </h3>
 </template>
 
 <script setup lang="ts">
@@ -157,10 +152,9 @@ const template = createResource({
       doc: data,
     });
   },
-  onSuccess: (data) => {
-    console.log(data);
-  },
 });
+
+const customOnChange = computed(() => template.data?._customOnChange);
 
 const visibleFields = computed(() =>
   template.data?.fields?.filter(

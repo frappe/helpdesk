@@ -113,7 +113,6 @@ export function setupCustomizations(data, obj) {
   if (!data._form_script) return [];
   let actions = [];
   let onChange = null;
-  debugger;
   if (Array.isArray(data._form_script)) {
     data._form_script.forEach((script) => {
       const parsed = parseScript(script, obj);
@@ -125,9 +124,8 @@ export function setupCustomizations(data, obj) {
     actions = parsed.actions;
     onChange = parsed.onChange;
   }
-
   data._customActions = actions;
-  data.customOnChange = onChange;
+  data._customOnChange = onChange;
 }
 
 export const isCustomerPortal = ref(false);
