@@ -29,7 +29,6 @@ def get_form_script(
     )
 
     doc = query.run(as_dict=True)
-    print("\n\n", doc, "\n\n")
     if doc:
         return [d.script for d in doc] if len(doc) > 1 else doc[0].script
     else:
