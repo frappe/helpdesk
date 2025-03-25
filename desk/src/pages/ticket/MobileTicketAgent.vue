@@ -84,6 +84,7 @@
                   :resolution-by="ticket.data.resolution_by"
                   :ticket-created-on="ticket.data.creation"
                   :source="ticket.data.via_customer_portal ? 'Portal' : 'Mail'"
+                  :status="ticket.data.status"
                 />
                 <!-- Ticket Fields -->
                 <h3 class="px-6 pt-3 font-semibold text-base">Details</h3>

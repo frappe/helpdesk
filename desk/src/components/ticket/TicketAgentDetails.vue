@@ -60,6 +60,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  status: {
+    type: String,
+    required: false,
+  },
 });
 
 const firstResponseBadge = computed(() => {
@@ -87,7 +91,12 @@ const firstResponseBadge = computed(() => {
 
 const resolutionBadge = computed(() => {
   let resolution = null;
-  if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
+  if (props.status === "Replied") {
+    resolution = {
+      label: "Paused",
+      color: "blue",
+    };
+  } else if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
     resolution = {
       label: `Due in ${formatTime(
         dayjs(props.resolutionBy).diff(dayjs(), "s")
