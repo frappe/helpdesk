@@ -150,17 +150,33 @@ const template = createResource({
   transform: (data) => {
     setupCustomizations(data, {
       doc: data,
+      updateOptions,
     });
+  },
+  onSuccess: (data) => {
+    oldFields = window.structuredClone(data.fields || []);
   },
 });
 
+let oldFields = [];
+
+function updateOptions(fieldname: string, newOptions: any) {
+  const f = template.data.fields.find((f) => f.fieldname === fieldname);
+  if (!f) return;
+  if (!newOptions) {
+    f.options = oldFields.find((f) => f.fieldname === fieldname).options;
+    return;
+  }
+  f.options = newOptions.join("\n");
+}
+
 const customOnChange = computed(() => template.data?._customOnChange);
 
-const visibleFields = computed(() =>
-  template.data?.fields?.filter(
+const visibleFields = computed(() => {
+  return template.data?.fields?.filter(
     (f) => route.meta.agent || !f.hide_from_customer
-  )
-);
+  );
+});
 
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
