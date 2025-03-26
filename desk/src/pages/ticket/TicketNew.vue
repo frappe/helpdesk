@@ -121,7 +121,7 @@ import TicketTextEditor from "./TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
-import { AutoCompleteItem } from "@/types";
+import { Field } from "@/types";
 
 interface P {
   templateId?: string;
@@ -144,13 +144,12 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
-  transform: (data) => {
-    setupCustomizations(data, {
-      doc: data,
-      updateOptions,
+  transform: (doc) => {
+    setupCustomizations(doc, {
+      doc,
+      applyFilters,
     });
-    setupTemplateFields(data.fields);
-    console.log(templateFields);
+    setupTemplateFields(doc.fields);
   },
   onSuccess: (data) => {
     oldFields = window.structuredClone(data.fields || []);
@@ -158,21 +157,40 @@ const template = createResource({
 });
 
 function setupTemplateFields(fields) {
-  fields.forEach((field) => {
+  fields.forEach((field: Field) => {
     templateFields[field.fieldname] = "";
   });
 }
 
 let oldFields = [];
 
-function updateOptions(fieldname: string, newOptions: any) {
-  const f = template.data.fields.find((f) => f.fieldname === fieldname);
+function applyFilters(fieldname: string, filters: any) {
+  const f: Field = template.data.fields.find((f) => f.fieldname === fieldname);
   if (!f) return;
-  if (!newOptions) {
+  if (f.fieldtype === "Select") {
+    handleSelectFieldUpdate(f, fieldname, filters);
+  } else if (f.fieldtype === "Link") {
+    handleLinkFieldUpdate(f, fieldname, filters);
+  }
+}
+
+function handleSelectFieldUpdate(f: Field, fieldname: string, filters: any) {
+  if (!filters) {
     f.options = oldFields.find((f) => f.fieldname === fieldname).options;
   } else {
-    f.options = newOptions.join("\n");
+    f.options = filters.join("\n");
   }
+  templateFields[fieldname] = "";
+}
+function handleLinkFieldUpdate(f: Field, fieldname: string, filters: any) {
+  if (!filters) {
+    f.link_filters = oldFields.find(
+      (f) => f.fieldname === fieldname
+    ).link_filters;
+    return;
+  }
+  f.link_filters = JSON.stringify([[f.options, "name", "in", filters]]);
+  console.log(f.link_filters);
   templateFields[fieldname] = "";
 }
 
@@ -194,6 +212,7 @@ function parseField(field) {
       field.required ||
       (field.mandatory_depends_on &&
         evaluateDependsOnValue(field.mandatory_depends_on)),
+    filters: field.link_filters && JSON.parse(field.link_filters),
   };
 }
 

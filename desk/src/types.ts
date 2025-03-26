@@ -134,6 +134,7 @@ export interface Field {
   description?: null;
   url_method?: string;
   link_filters?: string;
+  filters?: string;
   display_via_depends_on?: string;
   mandatory_via_depends_on?: string;
 }

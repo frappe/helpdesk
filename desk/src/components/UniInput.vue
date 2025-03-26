@@ -53,15 +53,9 @@ const component = computed(() => {
       options: apiOptions.data,
     });
   } else if (props.field.fieldtype === "Link" && props.field.options) {
-    let filters = null;
-    try {
-      filters = JSON.parse(props.field.link_filters);
-    } catch (error) {
-      filters = null;
-    }
     return h(Link, {
       doctype: props.field.options,
-      filters,
+      filters: props.field.filters,
     });
   } else if (props.field.fieldtype === "Select") {
     return h(Autocomplete, {
