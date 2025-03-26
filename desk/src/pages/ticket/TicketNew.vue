@@ -152,11 +152,18 @@ const template = createResource({
       doc: data,
       updateOptions,
     });
+    setupTemplateFields(data.fields);
   },
   onSuccess: (data) => {
     oldFields = window.structuredClone(data.fields || []);
   },
 });
+
+function setupTemplateFields(fields) {
+  fields.forEach((field) => {
+    templateFields[field.fieldname] = "";
+  });
+}
 
 let oldFields = [];
 
@@ -165,9 +172,10 @@ function updateOptions(fieldname: string, newOptions: any) {
   if (!f) return;
   if (!newOptions) {
     f.options = oldFields.find((f) => f.fieldname === fieldname).options;
-    return;
+  } else {
+    f.options = newOptions.join("\n");
   }
-  f.options = newOptions.join("\n");
+  templateFields[fieldname] = "";
 }
 
 const customOnChange = computed(() => template.data?._customOnChange);

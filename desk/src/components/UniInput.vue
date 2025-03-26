@@ -12,7 +12,12 @@
       :value="transValue"
       :model-value="transValue"
       @update:model-value="emitUpdate(field.fieldname, $event)"
-      @change="emitUpdate(field.fieldname, $event.value || $event)"
+      @change="
+        emitUpdate(
+          field.fieldname,
+          $event.target?.value || $event.value || $event
+        )
+      "
     />
   </div>
 </template>
