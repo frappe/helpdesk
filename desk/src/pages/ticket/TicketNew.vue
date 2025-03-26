@@ -173,10 +173,48 @@ function updateOptions(fieldname: string, newOptions: any) {
 const customOnChange = computed(() => template.data?._customOnChange);
 
 const visibleFields = computed(() => {
-  return template.data?.fields?.filter(
+  let _fields = template.data?.fields?.filter(
     (f) => route.meta.agent || !f.hide_from_customer
   );
+  if (!_fields) return [];
+  return _fields.map((field) => parseField(field));
 });
+
+function parseField(field) {
+  return {
+    display_via_depends_on: evaluateDependsOnValue(field?.depends_on),
+    ...field,
+  };
+}
+
+function evaluateDependsOnValue(expression) {
+  if (!expression) return true;
+  let out = null;
+
+  if (expression.substr(0, 5) == "eval:") {
+    try {
+      out = _eval(expression.substr(5), { doc: templateFields });
+    } catch (e) {
+      out = true;
+    }
+  } else {
+    out = false;
+  }
+  return out;
+}
+function _eval(code, context = {}) {
+  let variable_names = Object.keys(context);
+  let variables = Object.values(context);
+  code = `let out = ${code}; return out`;
+  try {
+    let expression_function = new Function(...variable_names, code);
+    return expression_function(...variables);
+  } catch (error) {
+    console.log("Error evaluating the following expression:");
+    console.error(code);
+    throw error;
+  }
+}
 
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
