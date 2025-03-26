@@ -32,47 +32,35 @@ import { dateFormat, dateTooltipFormat } from "@/utils";
 import { computed } from "vue";
 
 const props = defineProps({
-  agreementStatus: {
-    type: String,
-    required: true,
-  },
-  ticketCreatedOn: {
-    type: String,
-    required: true,
-  },
-  firstRespondedOn: {
-    type: String,
-    required: true,
-  },
-  responseBy: {
-    type: String,
-    required: true,
-  },
-  resolutionDate: {
-    type: String,
-    required: true,
-  },
-  resolutionBy: {
-    type: String,
-    required: true,
-  },
-  source: {
-    type: String,
+  ticket: {
+    type: Object,
     required: true,
   },
 });
 
 const firstResponseBadge = computed(() => {
   let firstResponse = null;
-  if (!props.firstRespondedOn && dayjs().isBefore(dayjs(props.responseBy))) {
+  if (
+    !props.ticket.first_responded_on &&
+    dayjs().isBefore(dayjs(props.ticket.response_by))
+  ) {
     firstResponse = {
-      label: `Due in ${formatTime(dayjs(props.responseBy).diff(dayjs(), "s"))}`,
+      label: `Due in ${formatTime(
+        dayjs(props.ticket.response_by).diff(dayjs(), "s")
+      )}`,
       color: "orange",
     };
-  } else if (dayjs(props.firstRespondedOn).isBefore(dayjs(props.responseBy))) {
+  } else if (
+    dayjs(props.ticket.first_responded_on).isBefore(
+      dayjs(props.ticket.response_by)
+    )
+  ) {
     firstResponse = {
       label: `Fulfilled in ${formatTime(
-        dayjs(props.firstRespondedOn).diff(dayjs(props.ticketCreatedOn), "s")
+        dayjs(props.ticket.first_responded_on).diff(
+          dayjs(props.ticket.creation),
+          "s"
+        )
       )}`,
       color: "green",
     };
@@ -87,17 +75,40 @@ const firstResponseBadge = computed(() => {
 
 const resolutionBadge = computed(() => {
   let resolution = null;
-  if (!props.resolutionDate && dayjs().isBefore(props.resolutionBy)) {
+  if (
+    props.ticket.status === "Replied" &&
+    props.ticket.on_hold_since &&
+    dayjs(props.ticket.resolution_by).isAfter(dayjs(props.ticket.on_hold_since))
+  ) {
+    let time_left = formatTime(
+      dayjs(props.ticket.resolution_by).diff(
+        dayjs(props.ticket.on_hold_since),
+        "s"
+      )
+    );
+    resolution = {
+      label: `${time_left} left (On Hold)`,
+      color: "blue",
+    };
+  } else if (
+    !props.ticket.resolution_date &&
+    dayjs().isBefore(props.ticket.resolution_by)
+  ) {
     resolution = {
       label: `Due in ${formatTime(
-        dayjs(props.resolutionBy).diff(dayjs(), "s")
+        dayjs(props.ticket.resolution_by).diff(dayjs(), "s")
       )}`,
       color: "orange",
     };
-  } else if (dayjs(props.resolutionDate).isBefore(props.resolutionBy)) {
+  } else if (
+    dayjs(props.ticket.resolution_date).isBefore(props.ticket.resolution_by)
+  ) {
     resolution = {
       label: `Fulfilled in ${formatTime(
-        dayjs(props.resolutionDate).diff(dayjs(props.ticketCreatedOn), "s")
+        dayjs(props.ticket.resolution_date).diff(
+          dayjs(props.ticket.creation),
+          "s"
+        )
       )}`,
       color: "green",
     };
@@ -114,7 +125,7 @@ const sections = computed(() => [
   {
     label: "First Response",
     tooltipValue: dateFormat(
-      props.firstRespondedOn || props.responseBy,
+      props.ticket.first_responded_on || props.ticket.response_by,
       dateTooltipFormat
     ),
     badgeText: firstResponseBadge.value.label,
@@ -123,7 +134,7 @@ const sections = computed(() => [
   {
     label: "Resolution",
     tooltipValue: dateFormat(
-      props.resolutionDate || props.resolutionBy,
+      props.ticket.resolution_date || props.ticket.resolution_by,
       dateTooltipFormat
     ),
     badgeText: resolutionBadge.value.label,
@@ -131,7 +142,7 @@ const sections = computed(() => [
   },
   {
     label: "Source",
-    value: props.source,
+    value: props.ticket.via_customer_portal ? "Portal" : "Mail",
   },
 ]);
 </script>

@@ -93,7 +93,10 @@
       </Section>
     </div>
     <div class="grow" />
-    <TrialBanner v-if="isFCSite" :isSidebarCollapsed="!isExpanded" />
+    <TrialBanner
+      v-if="isFCSite && !isCustomerPortal"
+      :isSidebarCollapsed="!isExpanded"
+    />
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"

@@ -880,21 +880,25 @@ def close_tickets_after_n_days():
 
     days_threshold = frappe.db.get_single_value("HD Settings", "auto_close_after_days")
 
-    tickets_to_close = frappe.get_list(
-        "HD Ticket",
-        filters=[
-            ["status", "=", "Replied"],
-            [
-                "modified",
-                "<",
-                frappe.utils.add_days(frappe.utils.now_datetime(), -days_threshold),
-            ],
-        ],
-        pluck="name",
+    tickets_to_close = (
+        frappe.db.sql(
+            """ 
+                SELECT t.name 
+                FROM `tabHD Ticket` t
+                INNER JOIN `tabCommunication` c ON t.name = c.reference_name
+                WHERE t.status = 'Replied'
+                AND c.communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
+            """,
+            {"days_threshold": days_threshold},
+            pluck="t.name",
+        )
+        or []
     )
 
     # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
     for ticket in tickets_to_close:
         doc = frappe.get_doc("HD Ticket", ticket)
         doc.status = "Closed"
-        doc.save(ignore_permissions=True, ignore_validations=True)
+        doc.flags.ignore_validate = True
+        doc.save(ignore_permissions=True)
+        doc.flags.ignore_validate = False

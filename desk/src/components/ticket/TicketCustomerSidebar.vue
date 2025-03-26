@@ -58,7 +58,7 @@
     <!-- feedback component -->
     <TicketFeedback
       v-if="ticket.data.feedback_rating"
-      class="border-b px-6 py-3 text-base text-gray-600"
+      class="border-b text-base text-gray-600"
       :ticket="ticket.data"
     />
     <div class="flex flex-col gap-4 pt-0 px-5 py-3">

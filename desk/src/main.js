@@ -35,9 +35,12 @@ const globalComponents = {
 
 setConfig("resourceFetcher", frappeRequest);
 setConfig("fallbackErrorHandler", (error) => {
+  const text = error.exc_type
+    ? (error.messages || error.message || []).join(", ")
+    : error.message;
   createToast({
     title: error.exc_type || "Error",
-    text: (error.messages || []).join(", "),
+    text,
     icon: "alert-triangle",
     iconClasses: "text-red-500",
   });
