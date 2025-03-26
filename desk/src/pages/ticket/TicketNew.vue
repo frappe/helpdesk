@@ -24,11 +24,7 @@
           :field="field"
           :value="templateFields[field.fieldname]"
           @change="
-            (e) => {
-              templateFields[field.fieldname] = e.value;
-              const fn = customOnChange[field.fieldname];
-              if (fn) fn(e.value, field.fieldtype);
-            }
+            (e) => handleOnFieldChange(e, field.fieldname, field.fieldtype)
           "
         />
       </div>
@@ -125,6 +121,7 @@ import TicketTextEditor from "./TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
+import { AutoCompleteItem } from "@/types";
 
 interface P {
   templateId?: string;
@@ -153,6 +150,7 @@ const template = createResource({
       updateOptions,
     });
     setupTemplateFields(data.fields);
+    console.log(templateFields);
   },
   onSuccess: (data) => {
     oldFields = window.structuredClone(data.fields || []);
@@ -202,15 +200,21 @@ function parseField(field) {
 function evaluateDependsOnValue(expression) {
   if (!expression) return true;
   let out = null;
-
   if (expression.substr(0, 5) == "eval:") {
     try {
       out = _eval(expression.substr(5), { doc: templateFields });
     } catch (e) {
       out = true;
     }
+  } else if (expression.substr(0, 4) == "doc.") {
+    out = templateFields[expression.substr(4)];
   } else {
-    out = false;
+    let value = templateFields[expression];
+    if (Array.isArray(value)) {
+      out = !!value.length;
+    } else {
+      out = !!value;
+    }
   }
   return out;
 }
@@ -226,6 +230,12 @@ function _eval(code, context = {}) {
     console.error(code);
     throw error;
   }
+}
+
+function handleOnFieldChange(e: any, fieldname: string, fieldtype: string) {
+  templateFields[fieldname] = e.value;
+  const fn = customOnChange.value?.[fieldname];
+  if (fn) fn(e.value, fieldtype);
 }
 
 const ticket = createResource({
