@@ -23,9 +23,8 @@ def get_one(name: str):
     if not found:
         return {"about": None, "fields": []}
 
-    fields = []
-    fields.extend(get_fields(name, "DocField"))
-    fields.extend(get_fields(name, "Custom Field"))
+    fields = get_fields_meta(name)
+
     return {
         "about": about,
         "fields": fields,
@@ -33,6 +32,12 @@ def get_one(name: str):
             "HD Ticket", apply_on_new_page=True, is_customer_portal=False
         ),
     }
+
+
+def get_fields_meta(template: str):
+    fields = get_fields(template, "DocField")
+    fields.extend(get_fields(template, "Custom Field"))
+    return fields
 
 
 def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
@@ -79,5 +84,4 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
                 field[df] = frappe.get_value(
                     "Property Setter", property_setter_id, "value"
                 )
-
     return result
