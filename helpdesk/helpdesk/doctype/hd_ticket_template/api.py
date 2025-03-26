@@ -57,6 +57,7 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
             QBFetch.options,
             QBFetch.link_filters,
             QBFetch.depends_on,
+            QBFetch.mandatory_depends_on,
             fields.fieldname,
             fields.hide_from_customer,
             fields.required,

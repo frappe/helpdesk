@@ -184,6 +184,10 @@ function parseField(field) {
   return {
     display_via_depends_on: evaluateDependsOnValue(field?.depends_on),
     ...field,
+    required:
+      field.required ||
+      (field.mandatory_depends_on &&
+        evaluateDependsOnValue(field.mandatory_depends_on)),
   };
 }
 
