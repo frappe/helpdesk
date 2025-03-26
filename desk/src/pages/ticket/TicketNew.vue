@@ -190,7 +190,6 @@ function handleLinkFieldUpdate(f: Field, fieldname: string, filters: any) {
     return;
   }
   f.link_filters = JSON.stringify([[f.options, "name", "in", filters]]);
-  console.log(f.link_filters);
   templateFields[fieldname] = "";
 }
 

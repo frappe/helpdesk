@@ -46,7 +46,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "default": "function setupForm({ doc }) {\n    return {\n        actions: [],\n    }\n}",
+   "default": "function setupForm({doc, updateField, call, router, applyFilters}) {\n    return {\n        actions: [],\n        onChange:{}\n    }\n}",
    "fieldname": "script",
    "fieldtype": "Code",
    "label": "Script",
@@ -70,7 +70,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-25 17:54:50.743172",
+ "modified": "2025-03-27 02:02:08.017704",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",

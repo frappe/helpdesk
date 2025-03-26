@@ -112,12 +112,12 @@ function parseScript(script, obj) {
 export function setupCustomizations(data, obj) {
   if (!data._form_script) return [];
   let actions = [];
-  let onChange = null;
+  let onChange = {};
   if (Array.isArray(data._form_script)) {
     data._form_script.forEach((script) => {
       const parsed = parseScript(script, obj);
       actions = actions.concat(parsed.actions);
-      onChange = parsed.onChange;
+      onChange = { ...onChange, ...parsed.onChange };
     });
   } else {
     const parsed = parseScript(data._form_script, obj);
