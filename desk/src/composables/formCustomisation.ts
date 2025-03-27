@@ -8,7 +8,9 @@ export function setupCustomizations(data, obj) {
     data._form_script.forEach((script) => {
       const parsed = parseScript(script, obj);
       actions = actions.concat(parsed.actions);
-      parseOnChangeFn(onChangeFieldMap, parsed.onChange);
+      if (parsed.onChange) {
+        parseOnChangeFn(onChangeFieldMap, parsed.onChange);
+      }
     });
   } else {
     const parsed = parseScript(data._form_script, obj);
@@ -16,7 +18,9 @@ export function setupCustomizations(data, obj) {
     onChangeFieldMap = parsed.onChange;
   }
   data._customActions = actions;
-  data._customOnChange = onChangeFieldMap;
+  if (Object.keys(onChangeFieldMap).length) {
+    data._customOnChange = onChangeFieldMap;
+  }
 }
 
 function parseOnChangeFn(fieldMap: object, currentField: object) {
