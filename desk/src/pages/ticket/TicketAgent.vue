@@ -230,7 +230,7 @@ const ticket = createResource({
     });
   },
 });
-function updateField(name, value, callback = () => {}) {
+function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);
   callback();
 }

@@ -172,6 +172,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
+import { useRouter } from "vue-router";
 import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
@@ -182,6 +183,7 @@ import {
   createResource,
   Dialog,
   FormControl,
+  call,
 } from "frappe-ui";
 
 import {
@@ -201,7 +203,9 @@ import {
 
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, setupCustomizations } from "@/utils";
+import { globalStore } from "@/stores/globalStore";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -209,6 +213,8 @@ import { useScreenSize } from "@/composables/screen";
 import { TabObject, TicketTab } from "@/types";
 import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
 import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
+
+const router = useRouter();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const subjectInput = ref(null);
@@ -223,13 +229,9 @@ const props = defineProps({
 
 provide("communicationArea", communicationAreaRef);
 
-let storage = useStorage("ticket_agent", {
-  showAllActivity: true,
-});
-
 const { isMobileView } = useScreenSize();
+const { $dialog } = globalStore();
 
-const showFullActivity = ref(storage.value.showAllActivity);
 const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
@@ -251,13 +253,22 @@ const ticket = createResource({
       });
     }
   },
-  onSuccess: (data) => {
-    subjectInput.value = data.subject;
-    setupCustomizations(data, {
-      doc: data,
+  onSuccess: (ticket) => {
+    subjectInput.value = ticket.subject;
+    setupCustomizations(ticket, {
+      doc: ticket,
+      call,
+      router,
+      $dialog,
+      updateField,
     });
   },
 });
+
+function updateField(name: string, value: string, callback = () => {}) {
+  updateTicket(name, value);
+  callback();
+}
 
 const breadcrumbs = computed(() => {
   let items = [{ label: "Tickets", route: { name: "TicketsAgent" } }];
@@ -267,13 +278,6 @@ const breadcrumbs = computed(() => {
   });
   return items;
 });
-
-watch(
-  () => showFullActivity.value,
-  (value) => {
-    storage.value.showAllActivity = value;
-  }
-);
 
 const dropdownOptions = computed(() =>
   ticketStatusStore.options.map((o) => ({
@@ -339,12 +343,6 @@ const activities = computed(() => {
       content: comment.content,
     };
   });
-
-  if (!showFullActivity.value) {
-    return [...emailProps, ...commentProps].sort(
-      (a, b) => new Date(a.creation) - new Date(b.creation)
-    );
-  }
 
   const historyProps = [...ticket.data.history, ...ticket.data.views].map(
     (h) => {

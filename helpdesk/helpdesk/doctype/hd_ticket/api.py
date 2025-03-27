@@ -93,10 +93,8 @@ def get_meta(template: str):
         .run(as_dict=True)
     )
     meta_fields = get_fields_meta(template)
-    # TODO: improve this filteration
-    meta_fields = list(
-        filter(lambda x: x["fieldname"] not in default_fields, meta_fields)
-    )
+    meta_fields = [f for f in meta_fields if f["fieldname"] not in default_fields]
+
     fields.extend(meta_fields)
     return fields
 

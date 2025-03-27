@@ -100,34 +100,6 @@ export function formatTime(seconds) {
   return formattedTime.trim();
 }
 
-function parseScript(script, obj) {
-  const scriptFn = new Function(script + "\nreturn setupForm")();
-  const formScript = scriptFn(obj);
-  return {
-    actions: formScript?.actions || [],
-    onChange: formScript?.onChange || null,
-  };
-}
-
-export function setupCustomizations(data, obj) {
-  if (!data._form_script) return [];
-  let actions = [];
-  let onChange = {};
-  if (Array.isArray(data._form_script)) {
-    data._form_script.forEach((script) => {
-      const parsed = parseScript(script, obj);
-      actions = actions.concat(parsed.actions);
-      onChange = { ...onChange, ...parsed.onChange };
-    });
-  } else {
-    const parsed = parseScript(data._form_script, obj);
-    actions = parsed.actions;
-    onChange = parsed.onChange;
-  }
-  data._customActions = actions;
-  data._customOnChange = onChange;
-}
-
 export const isCustomerPortal = ref(false);
 
 export async function copyToClipboard(text: string, message?: string) {
