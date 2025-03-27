@@ -164,6 +164,7 @@ import {
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
+import { globalStore } from "@/stores/globalStore";
 import { createToast, getIcon } from "@/utils";
 import { setupCustomizations } from "@/composables/formCustomisation";
 import { TabObject, TicketTab, View } from "@/types";
@@ -175,6 +176,7 @@ const router = useRouter();
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
+const { $dialog } = globalStore();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const renameSubject = ref("");
@@ -224,6 +226,7 @@ const ticket = createResource({
       updateField,
       call,
       router,
+      $dialog: $dialog,
     });
   },
 });

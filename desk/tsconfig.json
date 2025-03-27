@@ -5,6 +5,7 @@
 		"target": "es2021",
 		"module": "esnext",
 		"moduleResolution":"node",
+		"jsx": "preserve",
 		"paths": {
 			"@/*": ["./src/*"]
 		},

@@ -75,18 +75,19 @@ import {
   usePageMeta,
   TextEditor,
   TextEditorFixedMenu,
-  confirmDialog,
   Breadcrumbs,
 } from "frappe-ui";
 import { useRouter, useRoute } from "vue-router";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
+import { globalStore } from "@/stores/globalStore";
 import { LayoutHeader, UserAvatar } from "@/components";
 import { createToast, textEditorMenuButtons } from "@/utils";
 import { Article } from "@/types";
 
 const userStore = useUserStore();
 const user = userStore.getUser();
+const { $dialog } = globalStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -138,16 +139,22 @@ function handleArticleDiscard() {
     });
     return;
   }
-  confirmDialog({
+  $dialog({
     title: "Discard Article",
     message: "Are you sure you want to discard this article?",
-    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      router.push({
-        name: "AgentKnowledgeBase",
-      });
-      resetState();
-      hideDialog();
-    },
+    actions: [
+      {
+        label: "Confirm",
+        variant: "solid",
+        onClick(close: Function) {
+          router.push({
+            name: "AgentKnowledgeBase",
+          });
+          resetState();
+          close();
+        },
+      },
+    ],
   });
 }
 

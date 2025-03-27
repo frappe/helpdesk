@@ -20,6 +20,7 @@ import { router } from "./router";
 import { socket } from "./socket";
 import { createToast } from "@/utils";
 import { posthogPlugin } from "./telemetry";
+import { createDialog } from "./components/dialogs";
 
 const globalComponents = {
   Badge,
@@ -59,6 +60,7 @@ for (const c in globalComponents) {
 
 app.config.globalProperties.$socket = socket;
 app.config.globalProperties.$toast = createToast;
+app.config.globalProperties.$dialog = createDialog;
 
 if (import.meta.env.DEV) {
   frappeRequest({

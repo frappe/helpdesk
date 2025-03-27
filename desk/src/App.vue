@@ -12,7 +12,8 @@ import { createToast } from "@/utils";
 import { useConfigStore } from "@/stores/config";
 import KeymapDialog from "@/pages/KeymapDialog.vue";
 import { stopSession } from "@/telemetry";
-import { Dialogs } from "frappe-ui";
+import { Dialogs } from "@/components/dialogs";
+
 useConfigStore();
 
 onMounted(() => {
