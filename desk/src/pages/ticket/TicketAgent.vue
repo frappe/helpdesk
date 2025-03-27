@@ -164,7 +164,8 @@ import {
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, getIcon, setupCustomizations } from "@/utils";
+import { createToast, getIcon } from "@/utils";
+import { setupCustomizations } from "@/composables/formCustomisation";
 import { TabObject, TicketTab, View } from "@/types";
 import { useView } from "@/composables/useView";
 import { ComputedRef } from "vue";

@@ -114,7 +114,12 @@ import {
 } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
-import { setupCustomizations } from "@/utils";
+import {
+  setupCustomizations,
+  handleSelectFieldUpdate,
+  handleLinkFieldUpdate,
+  parseField,
+} from "@/composables/formCustomisation";
 import { LayoutHeader, UniInput } from "@/components";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
@@ -164,33 +169,14 @@ function setupTemplateFields(fields) {
 
 let oldFields = [];
 
-function applyFilters(fieldname: string, filters: any) {
+function applyFilters(fieldname: string, filters: any = null) {
   const f: Field = template.data.fields.find((f) => f.fieldname === fieldname);
   if (!f) return;
   if (f.fieldtype === "Select") {
-    handleSelectFieldUpdate(f, fieldname, filters);
+    handleSelectFieldUpdate(f, fieldname, filters, templateFields, oldFields);
   } else if (f.fieldtype === "Link") {
-    handleLinkFieldUpdate(f, fieldname, filters);
+    handleLinkFieldUpdate(f, fieldname, filters, templateFields, oldFields);
   }
-}
-
-function handleSelectFieldUpdate(f: Field, fieldname: string, filters: any) {
-  if (!filters) {
-    f.options = oldFields.find((f) => f.fieldname === fieldname).options;
-  } else {
-    f.options = filters.join("\n");
-  }
-  templateFields[fieldname] = "";
-}
-function handleLinkFieldUpdate(f: Field, fieldname: string, filters: any) {
-  if (!filters) {
-    f.link_filters = oldFields.find(
-      (f) => f.fieldname === fieldname
-    ).link_filters;
-    return;
-  }
-  f.link_filters = JSON.stringify([[f.options, "name", "in", filters]]);
-  templateFields[fieldname] = "";
 }
 
 const customOnChange = computed(() => template.data?._customOnChange);
@@ -200,60 +186,17 @@ const visibleFields = computed(() => {
     (f) => route.meta.agent || !f.hide_from_customer
   );
   if (!_fields) return [];
-  return _fields.map((field) => parseField(field));
+  return _fields.map((field) => parseField(field, templateFields));
 });
-
-function parseField(field) {
-  return {
-    display_via_depends_on: evaluateDependsOnValue(field?.depends_on),
-    ...field,
-    required:
-      field.required ||
-      (field.mandatory_depends_on &&
-        evaluateDependsOnValue(field.mandatory_depends_on)),
-    filters: field.link_filters && JSON.parse(field.link_filters),
-  };
-}
-
-function evaluateDependsOnValue(expression) {
-  if (!expression) return true;
-  let out = null;
-  if (expression.substr(0, 5) == "eval:") {
-    try {
-      out = _eval(expression.substr(5), { doc: templateFields });
-    } catch (e) {
-      out = true;
-    }
-  } else if (expression.substr(0, 4) == "doc.") {
-    out = templateFields[expression.substr(4)];
-  } else {
-    let value = templateFields[expression];
-    if (Array.isArray(value)) {
-      out = !!value.length;
-    } else {
-      out = !!value;
-    }
-  }
-  return out;
-}
-function _eval(code, context = {}) {
-  let variable_names = Object.keys(context);
-  let variables = Object.values(context);
-  code = `let out = ${code}; return out`;
-  try {
-    let expression_function = new Function(...variable_names, code);
-    return expression_function(...variables);
-  } catch (error) {
-    console.log("Error evaluating the following expression:");
-    console.error(code);
-    throw error;
-  }
-}
 
 function handleOnFieldChange(e: any, fieldname: string, fieldtype: string) {
   templateFields[fieldname] = e.value;
-  const fn = customOnChange.value?.[fieldname];
-  if (fn) fn(e.value, fieldtype);
+  const fnsToRun = customOnChange.value?.[fieldname];
+  if (fnsToRun) {
+    fnsToRun.forEach((fn) => {
+      fn(e.value, fieldtype);
+    });
+  }
 }
 
 const ticket = createResource({

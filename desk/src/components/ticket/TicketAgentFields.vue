@@ -7,24 +7,14 @@
       :value="ticket[field.fieldname]"
       @change="(data) => update(data.fieldname, data.value)"
     />
-    <UniInput
-      v-for="field in fields"
-      :key="field.fieldname"
-      :field="field"
-      :value="ticket[field.fieldname]"
-      @change="(data) => update(data.fieldname, data.value)"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
 import UniInput2 from "../UniInput2.vue";
-import { UniInput } from "@/components";
 import { createToast } from "@/utils";
 import { Field, FieldValue } from "@/types";
-console.log(UniInput);
-console.log(UniInput2);
 const emit = defineEmits(["update"]);
 
 const props = defineProps({
