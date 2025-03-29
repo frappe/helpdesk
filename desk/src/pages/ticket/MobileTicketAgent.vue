@@ -261,6 +261,7 @@ const ticket = createResource({
       router,
       $dialog,
       updateField,
+      createToast,
     });
   },
 });
