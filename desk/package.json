@@ -40,14 +40,14 @@
     "vue-router": "^4.2.2",
     "vuedraggable": "^4.1.0",
     "gemoji": "^8.1.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "@vitejs/plugin-vue": "^4.2.3"
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12"
   },
   "devDependencies": {
     "vite": "^4.4.9",
-    "@vitejs/plugin-vue": "^4.2.3",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "vite-plugin-pwa": "^0.20.5",
     "typescript": "^5.0.2",
