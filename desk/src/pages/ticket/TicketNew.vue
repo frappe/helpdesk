@@ -4,6 +4,12 @@
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
       </template>
+      <template #right-header>
+        <CustomActions
+          v-if="template.data?._customActions"
+          :actions="template.data?._customActions"
+        />
+      </template>
     </LayoutHeader>
     <!-- Container -->
     <div
@@ -111,7 +117,9 @@ import {
   Button,
   FormControl,
   Breadcrumbs,
+  call,
 } from "frappe-ui";
+import { globalStore } from "@/stores/globalStore";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
 import {
@@ -138,6 +146,8 @@ const props = withDefaults(defineProps<P>(), {
 
 const route = useRoute();
 const router = useRouter();
+const { $dialog } = globalStore();
+
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
@@ -151,7 +161,10 @@ const template = createResource({
   auto: true,
   transform: (doc) => {
     setupCustomizations(doc, {
-      doc,
+      doc: templateFields,
+      call,
+      router,
+      $dialog,
       applyFilters,
     });
     setupTemplateFields(doc.fields);

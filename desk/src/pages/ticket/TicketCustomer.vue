@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";
-import { createResource, Button, Breadcrumbs } from "frappe-ui";
+import { createResource, Button, Breadcrumbs, call } from "frappe-ui";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { Icon } from "@iconify/vue";
@@ -97,6 +97,9 @@ const ticket = useTicket(
   (data) => {
     setupCustomizations(data, {
       doc: data,
+      call,
+      router,
+      $dialog,
       updateField,
     });
   },

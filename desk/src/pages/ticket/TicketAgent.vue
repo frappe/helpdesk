@@ -223,10 +223,10 @@ const ticket = createResource({
   onSuccess: (ticket) => {
     setupCustomizations(ticket, {
       doc: ticket,
-      updateField,
       call,
       router,
-      $dialog: $dialog,
+      $dialog,
+      updateField,
     });
   },
 });
