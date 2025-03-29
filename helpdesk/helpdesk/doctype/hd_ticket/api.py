@@ -6,6 +6,7 @@ from pypika import Criterion, Order
 
 from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
+from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
 from helpdesk.utils import check_permissions, get_customer, is_agent
 
@@ -63,7 +64,7 @@ def get_one(name, is_customer_portal=False):
             "email_id": ticket.raised_by,
             "name": ticket.raised_by.split("@")[0],
         }
-
+    template = ticket.template or DEFAULT_TICKET_TEMPLATE
     return {
         **ticket,
         "comments": get_comments(name),
@@ -71,12 +72,31 @@ def get_one(name, is_customer_portal=False):
         "contact": contact,
         "history": get_history(name),
         "tags": get_tags(name),
-        "template": get_template(ticket.template or DEFAULT_TICKET_TEMPLATE),
+        "template": get_template(template),
         "views": get_views(name),
         "_form_script": get_form_script(
             "HD Ticket", is_customer_portal=is_customer_portal
         ),
+        "fields": get_meta(template),
     }
+
+
+def get_meta(template: str):
+    default_fields = ["ticket_type", "agent_group", "priority", "customer"]
+    DocField = frappe.qb.DocType("DocField")
+
+    fields = (
+        frappe.qb.from_(DocField)
+        .select(DocField.star)
+        .where(DocField.parent == "HD Ticket")
+        .where(DocField.fieldname.isin(default_fields))
+        .run(as_dict=True)
+    )
+    meta_fields = get_fields_meta(template)
+    meta_fields = [f for f in meta_fields if f["fieldname"] not in default_fields]
+
+    fields.extend(meta_fields)
+    return fields
 
 
 def get_customer_criteria():

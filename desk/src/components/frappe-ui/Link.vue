@@ -63,6 +63,7 @@ import { useAttrs, computed, ref } from "vue";
 import { createResource } from "frappe-ui";
 import Autocomplete from "./Autocomplete.vue";
 import { watchDebounced } from "@vueuse/core";
+import { watch } from "vue";
 
 const props = defineProps({
   doctype: {
@@ -125,6 +126,22 @@ watchDebounced(
   () => props.doctype,
   () => reload(""),
   { debounce: 300, immediate: true }
+);
+
+watch(
+  () => props?.filters,
+  (newVal) => {
+    options.update({
+      params: {
+        txt: text.value,
+        doctype: props.doctype,
+        filters: newVal,
+        page_length: props.pageLength,
+      },
+    });
+    options.reload();
+  },
+  { deep: true }
 );
 
 const options = createResource({

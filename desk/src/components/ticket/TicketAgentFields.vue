@@ -1,47 +1,7 @@
 <template>
   <div class="flex flex-1 flex-col overflow-hidden overflow-y-auto border-b">
-    <div
-      v-for="o in options"
-      :key="o.field"
-      class="flex items-center gap-2 px-6 pb-1 leading-5 first:mt-3"
-    >
-      <Tooltip :text="o.label">
-        <div class="w-[106px] shrink-0 truncate text-sm text-gray-600">
-          {{ o.label }}
-        </div>
-      </Tooltip>
-      <div
-        class="-m-0.5 min-h-[28px] flex-1 items-center overflow-hidden p-0.5 text-base"
-      >
-        <FormControl
-          v-if="o.type === 'textarea'"
-          class="form-control"
-          :type="o.type"
-          :value="ticket[o.field]"
-          variant="subtle"
-          rows="2"
-          @change="update(o.field, $event.target.value, $event)"
-        />
-        <Link
-          v-else-if="o.field === 'customer'"
-          class="form-control"
-          :value="ticket[o.field]"
-          :doctype="o.options"
-          :placeholder="o.placeholder"
-          @change="update(o.field, $event)"
-        />
-        <Autocomplete
-          v-else
-          class="form-control"
-          :options="o.store.dropdown"
-          :placeholder="`Add ${o.label}`"
-          :value="ticket[o.field]"
-          @change="update(o.field, $event.value)"
-        />
-      </div>
-    </div>
     <UniInput2
-      v-for="field in customFields"
+      v-for="field in fields"
       :key="field.fieldname"
       :field="field"
       :value="ticket[field.fieldname]"
@@ -52,15 +12,9 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { FormControl, Tooltip } from "frappe-ui";
-import { Autocomplete, Link } from "@/components";
-import { useTeamStore } from "@/stores/team";
-import { useTicketPriorityStore } from "@/stores/ticketPriority";
-import { useTicketTypeStore } from "@/stores/ticketType";
-import UniInput2 from "@/components/UniInput2.vue";
+import UniInput2 from "../UniInput2.vue";
 import { createToast } from "@/utils";
 import { Field, FieldValue } from "@/types";
-
 const emit = defineEmits(["update"]);
 
 const props = defineProps({
@@ -70,39 +24,8 @@ const props = defineProps({
   },
 });
 
-const options = computed(() => {
-  return [
-    {
-      field: "ticket_type",
-      label: "Ticket type",
-      store: useTicketTypeStore(),
-    },
-    {
-      field: "priority",
-      label: "Priority",
-      store: useTicketPriorityStore(),
-    },
-    {
-      field: "agent_group",
-      label: "Team",
-      store: useTeamStore(),
-    },
-    {
-      field: "customer",
-      label: "Customer",
-      type: "link",
-      options: "HD Customer",
-      placeholder: "Select Customer",
-    },
-  ];
-});
-
-const customFields = computed(() => {
-  const _custom_fields = props.ticket.template.fields.filter(
-    (f) => ["subject", "team", "priority"].indexOf(f.fieldname) === -1
-  );
-
-  return _custom_fields;
+const fields = computed(() => {
+  return props.ticket.fields;
 });
 
 function update(field: Field["fieldname"], value: FieldValue, event = null) {

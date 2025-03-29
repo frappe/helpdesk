@@ -121,7 +121,6 @@ import {
   TextEditorFixedMenu,
   Dropdown,
   Button,
-  confirmDialog,
 } from "frappe-ui";
 import { useRouter, useRoute } from "vue-router";
 import { dayjs } from "@/dayjs";
@@ -132,6 +131,7 @@ import {
   incrementView,
 } from "@/stores/knowledgeBase";
 import { useAuthStore } from "@/stores/auth";
+import { globalStore } from "@/stores/globalStore";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import DiscardButton from "@/components/DiscardButton.vue";
@@ -153,6 +153,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const { $dialog } = globalStore();
 
 const router = useRouter();
 const route = useRoute();
@@ -318,30 +320,36 @@ function handleArticleUpdate() {
 }
 
 function handleDelete() {
-  confirmDialog({
+  $dialog({
     title: "Delete Article",
     message: "Are you sure you want to delete this article?",
-    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      deleteArticle.submit(
-        {
-          doctype: "HD Article",
-          name: article.data.name,
+    actions: [
+      {
+        label: "Confirm",
+        variant: "solid",
+        onClick(close: Function) {
+          deleteArticle.submit(
+            {
+              doctype: "HD Article",
+              name: article.data.name,
+            },
+            {
+              onSuccess: () => {
+                createToast({
+                  title: "Article deleted successfully",
+                  icon: "check",
+                  iconClasses: "text-green-600",
+                });
+                router.push({
+                  name: "AgentKnowledgeBase",
+                });
+              },
+            }
+          );
+          close();
         },
-        {
-          onSuccess: () => {
-            createToast({
-              title: "Article deleted successfully",
-              icon: "check",
-              iconClasses: "text-green-600",
-            });
-            router.push({
-              name: "AgentKnowledgeBase",
-            });
-          },
-        }
-      );
-      hideDialog();
-    },
+      },
+    ],
   });
 }
 

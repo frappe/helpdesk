@@ -56,14 +56,7 @@
 
 <script setup lang="ts">
 import { h, ref, computed, reactive, onMounted } from "vue";
-import {
-  Badge,
-  Tooltip,
-  confirmDialog,
-  call,
-  usePageMeta,
-  FeatherIcon,
-} from "frappe-ui";
+import { Badge, Tooltip, call, usePageMeta, FeatherIcon } from "frappe-ui";
 import { useRouter, useRoute } from "vue-router";
 import {
   EditIcon,
@@ -83,6 +76,7 @@ import { capture } from "@/telemetry";
 import { TicketIcon } from "@/components/icons";
 import { useView, currentView } from "@/composables/useView";
 import { View } from "@/types";
+import { globalStore } from "@/stores/globalStore";
 
 const router = useRouter();
 const route = useRoute();
@@ -97,6 +91,7 @@ const {
   deleteView,
 } = useView("HD Ticket");
 
+const { $dialog } = globalStore();
 const { isManager } = useAuthStore();
 
 const listViewRef = ref(null);
@@ -119,13 +114,19 @@ const selectBannerActions = [
     icon: "trash-2",
     onClick: (selections: Set<string>) => {
       listSelections.value = new Set(selections);
-      confirmDialog({
+      $dialog({
         title: "Delete Ticket(s)?",
         message: `Are you sure you want to delete these ticket(s)?`,
-        onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-          hideDialog();
-          handleTicketDelete(hideDialog);
-        },
+        actions: [
+          {
+            label: "Confirm",
+            variant: "solid",
+            onClick(close: Function) {
+              handleTicketDelete(close);
+              close();
+            },
+          },
+        ],
       });
     },
     condition: () => !isCustomerPortal.value && isManager,
@@ -422,14 +423,20 @@ const viewActions = (view) => {
           };
 
           if (_view.public) {
-            confirmDialog({
+            $dialog({
               title: `Make ${_view.label} private?`,
               message:
                 "This view is currently public. Changing it to private will hide it for all the users.",
-              onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-                hideDialog();
-                updateView(newView);
-              },
+              actions: [
+                {
+                  label: "Confirm",
+                  variant: "solid",
+                  onClick(close: Function) {
+                    close();
+                    updateView(newView);
+                  },
+                },
+              ],
             });
           } else {
             updateView(newView);
@@ -445,7 +452,7 @@ const viewActions = (view) => {
           label: "Delete",
           icon: "trash-2",
           onClick: () => {
-            confirmDialog({
+            $dialog({
               title: `Delete ${_view.label}?`,
               message: `Are you sure you want to delete this view?
               ${
@@ -453,18 +460,24 @@ const viewActions = (view) => {
                   ? "This view is public, and will be removed for all users."
                   : ""
               }`,
-              onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-                if (route.query.view === _view.name) {
-                  router.push({
-                    name: isCustomerPortal.value
-                      ? "TicketsCustomer"
-                      : "TicketsAgent",
-                  });
-                }
-                deleteView(_view.name);
-                handleSuccess("deleted");
-                hideDialog();
-              },
+              actions: [
+                {
+                  label: "Confirm",
+                  variant: "solid",
+                  onClick(close: Function) {
+                    if (route.query.view === _view.name) {
+                      router.push({
+                        name: isCustomerPortal.value
+                          ? "TicketsCustomer"
+                          : "TicketsAgent",
+                      });
+                    }
+                    deleteView(_view.name);
+                    handleSuccess("deleted");
+                    close();
+                  },
+                },
+              ],
             });
           },
         },

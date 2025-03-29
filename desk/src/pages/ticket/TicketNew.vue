@@ -4,6 +4,12 @@
       <template #left-header>
         <Breadcrumbs :items="breadcrumbs" />
       </template>
+      <template #right-header>
+        <CustomActions
+          v-if="template.data?._customActions"
+          :actions="template.data?._customActions"
+        />
+      </template>
     </LayoutHeader>
     <!-- Container -->
     <div
@@ -23,7 +29,9 @@
           :key="field.fieldname"
           :field="field"
           :value="templateFields[field.fieldname]"
-          @change="templateFields[field.fieldname] = $event.value"
+          @change="
+            (e) => handleOnFieldChange(e, field.fieldname, field.fieldtype)
+          "
         />
       </div>
       <!-- existing fields -->
@@ -109,16 +117,24 @@ import {
   Button,
   FormControl,
   Breadcrumbs,
+  call,
 } from "frappe-ui";
+import { globalStore } from "@/stores/globalStore";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
-import { useError } from "@/composables/error";
+import {
+  setupCustomizations,
+  handleSelectFieldUpdate,
+  handleLinkFieldUpdate,
+  parseField,
+} from "@/composables/formCustomisation";
 import { LayoutHeader, UniInput } from "@/components";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
+import { Field } from "@/types";
 
 interface P {
   templateId?: string;
@@ -130,6 +146,8 @@ const props = withDefaults(defineProps<P>(), {
 
 const route = useRoute();
 const router = useRouter();
+const { $dialog } = globalStore();
+
 const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
@@ -141,13 +159,59 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
+  transform: (doc) => {
+    setupCustomizations(doc, {
+      doc: templateFields,
+      call,
+      router,
+      $dialog,
+      applyFilters,
+    });
+    setupTemplateFields(doc.fields);
+  },
+  onSuccess: (data) => {
+    oldFields = window.structuredClone(data.fields || []);
+  },
 });
 
-const visibleFields = computed(() =>
-  template.data?.fields?.filter(
+function setupTemplateFields(fields) {
+  fields.forEach((field: Field) => {
+    templateFields[field.fieldname] = "";
+  });
+}
+
+let oldFields = [];
+
+function applyFilters(fieldname: string, filters: any = null) {
+  const f: Field = template.data.fields.find((f) => f.fieldname === fieldname);
+  if (!f) return;
+  if (f.fieldtype === "Select") {
+    handleSelectFieldUpdate(f, fieldname, filters, templateFields, oldFields);
+  } else if (f.fieldtype === "Link") {
+    handleLinkFieldUpdate(f, fieldname, filters, templateFields, oldFields);
+  }
+}
+
+const customOnChange = computed(() => template.data?._customOnChange);
+
+const visibleFields = computed(() => {
+  let _fields = template.data?.fields?.filter(
     (f) => route.meta.agent || !f.hide_from_customer
-  )
-);
+  );
+  if (!_fields) return [];
+  return _fields.map((field) => parseField(field, templateFields));
+});
+
+function handleOnFieldChange(e: any, fieldname: string, fieldtype: string) {
+  templateFields[fieldname] = e.value;
+  const fieldDependentFns = customOnChange.value?.[fieldname];
+  if (fieldDependentFns) {
+    fieldDependentFns.forEach((fn: Function) => {
+      fn(e.value, fieldtype);
+    });
+  }
+}
+
 const ticket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.new",
   debounce: 300,

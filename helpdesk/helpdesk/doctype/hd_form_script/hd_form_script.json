@@ -7,14 +7,16 @@
  "field_order": [
   "dt",
   "apply_to",
-  "column_break_lhfw",
   "enabled",
+  "column_break_lhfw",
   "apply_to_customer_portal",
+  "apply_on_new_page",
   "section_break_qhfq",
   "script"
  ],
  "fields": [
   {
+   "default": "HD Ticket",
    "fieldname": "dt",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -45,7 +47,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "default": "function setupForm({ doc }) {\n    return {\n        actions: [],\n    }\n}",
+   "default": "function setupForm({doc, updateField, call, router, $dialog, createToast ,applyFilters}) {\n    return {\n        actions: [],\n        onChange:{\n//          works only for new ticket page\n            \"fieldname\":(newVal)=>console.log(newVal)\n        }\n    }\n}",
    "fieldname": "script",
    "fieldtype": "Code",
    "label": "Script",
@@ -53,14 +55,23 @@
   },
   {
    "default": "0",
+   "depends_on": "eval: doc.apply_on_new_page===0",
    "fieldname": "apply_to_customer_portal",
    "fieldtype": "Check",
    "label": "Apply to customer portal"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.apply_to_customer_portal===0",
+   "fieldname": "apply_on_new_page",
+   "fieldtype": "Check",
+   "label": "Apply on new page"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-12-11 22:56:25.186577",
+ "modified": "2025-03-29 22:37:58.943106",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
@@ -79,6 +90,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

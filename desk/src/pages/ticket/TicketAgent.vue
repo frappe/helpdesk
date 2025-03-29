@@ -134,7 +134,7 @@
 
 <script setup lang="ts">
 import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import {
   Breadcrumbs,
   Dropdown,
@@ -144,6 +144,7 @@ import {
   Tabs,
   TabPanel,
   TabList,
+  call,
 } from "frappe-ui";
 
 import {
@@ -163,13 +164,19 @@ import {
 import { socket } from "@/socket";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { createToast, getIcon, setupCustomActions } from "@/utils";
+import { globalStore } from "@/stores/globalStore";
+import { createToast, getIcon } from "@/utils";
+import { setupCustomizations } from "@/composables/formCustomisation";
 import { TabObject, TicketTab, View } from "@/types";
 import { useView } from "@/composables/useView";
 import { ComputedRef } from "vue";
 
+const route = useRoute();
+const router = useRouter();
+
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
+const { $dialog } = globalStore();
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const renameSubject = ref("");
@@ -187,7 +194,7 @@ watch(
     ticket.reload();
   }
 );
-const route = useRoute();
+
 const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
@@ -213,14 +220,18 @@ const ticket = createResource({
     }
     renameSubject.value = data.subject;
   },
-  onSuccess: (data) => {
-    setupCustomActions(data, {
-      doc: data,
+  onSuccess: (ticket) => {
+    setupCustomizations(ticket, {
+      doc: ticket,
+      call,
+      router,
+      $dialog,
       updateField,
+      createToast,
     });
   },
 });
-function updateField(name, value, callback = () => {}) {
+function updateField(name: string, value: string, callback = () => {}) {
   updateTicket(name, value);
   callback();
 }
