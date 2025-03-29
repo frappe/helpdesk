@@ -15,7 +15,9 @@ export function setupCustomizations(data, obj) {
   } else {
     const parsed = parseScript(data._form_script, obj);
     actions = parsed.actions;
-    onChangeFieldMap = parsed.onChange;
+    if (parsed.onChange) {
+      parseOnChangeFn(onChangeFieldMap, parsed.onChange);
+    }
   }
   data._customActions = actions;
   if (Object.keys(onChangeFieldMap).length) {

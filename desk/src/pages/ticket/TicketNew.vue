@@ -204,9 +204,9 @@ const visibleFields = computed(() => {
 
 function handleOnFieldChange(e: any, fieldname: string, fieldtype: string) {
   templateFields[fieldname] = e.value;
-  const fnsToRun = customOnChange.value?.[fieldname];
-  if (fnsToRun) {
-    fnsToRun.forEach((fn) => {
+  const fieldDependentFns = customOnChange.value?.[fieldname];
+  if (fieldDependentFns) {
+    fieldDependentFns.forEach((fn: Function) => {
       fn(e.value, fieldtype);
     });
   }
