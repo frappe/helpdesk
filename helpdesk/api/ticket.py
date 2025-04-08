@@ -1,4 +1,7 @@
 import frappe
+from frappe import _
+
+from helpdesk.utils import agent_only
 
 
 def assign_ticket_to_agent(ticket_id, agent_id=None):
@@ -12,13 +15,14 @@ def assign_ticket_to_agent(ticket_id, agent_id=None):
         agent_id = frappe.session.user
 
     if not frappe.db.exists("HD Agent", agent_id):
-        frappe.throw("Tickets can only assigned to agents")
+        frappe.throw(_("Tickets can only be assigned to agents"))
 
     ticket_doc.assign_agent(agent_id)
     return ticket_doc
 
 
 @frappe.whitelist()
+@agent_only
 def bulk_assign_ticket_to_agent(ticket_ids, agent_id=None):
     if ticket_ids:
         ticket_docs = []

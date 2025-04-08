@@ -3,6 +3,8 @@ import frappe
 
 @frappe.whitelist()
 def create_email_account(data):
+    frappe.has_permission("Email Account", "create", throw=True)
+
     service = data.get("service")
     service_config = email_service_config.get(service)
     if not service_config:
