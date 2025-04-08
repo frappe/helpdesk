@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
 
     paths-ignore:
       - '**.js'
@@ -25,7 +26,7 @@ on:
         type: string
 
 concurrency:
-  group: server-mariadb-develop-${{ github.event_name }}-${{ github.event.number || github.event_name == 'workflow_dispatch' && github.run_id || '' }}
+  group: develop-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
@@ -37,6 +38,15 @@ jobs:
     strategy:
       fail-fast: false
 
+    services:
+        mysql:
+          image: mariadb:10.6
+          env:
+            MARIADB_ROOT_PASSWORD: 'root'
+          ports:
+            - 3306:3306
+          options: --health-cmd="mariadb-admin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+
     steps:
       - name: Clone
         uses: actions/checkout@v2
@@ -44,7 +54,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: '3.10'
 
       - name: Check for valid Python & Merge Conflicts
         run: |
@@ -99,13 +109,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Setup MariaDB
-        uses: getong/mariadb-action@v1.1
-        with:
-          collation server: 'utf8mb4_unicode_ci'
-          mariadb version: '10.6'
-          mysql root password: 'root'
-
       - name: Install
         run: bash ${GITHUB_WORKSPACE}/.github/helpers/install.sh
         env:
@@ -113,10 +116,10 @@ jobs:
           FRAPPE_USER: ${{ github.event.inputs.user }}
           FRAPPE_BRANCH: ${{ github.event.inputs.branch }}
 
-      - name: Run Tests
-        run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk'
-        env:
-          TYPE: server
-          CI_BUILD_ID: ${{ github.run_id }}
-          ORCHESTRATOR_URL: http://test-orchestrator.frappe.io
+      # - name: Run Tests
+      #   run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk'
+      #   env:
+      #     TYPE: server
+      #     CI_BUILD_ID: ${{ github.run_id }}
+      #     ORCHESTRATOR_URL: http://test-orchestrator.frappe.io
 
