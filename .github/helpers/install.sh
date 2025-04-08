@@ -6,7 +6,7 @@ cd ~ || ex
 
 sudo apt update
 sudo apt remove mysql-server mysql-client
-sudo apt install libcups2-dev redis-server mariadb-client-10.6
+sudo apt install libcups2-dev redis-server mariadb-client libmariadb-dev
 
 pip install frappe-bench
 
@@ -46,6 +46,7 @@ sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 bench get-app helpdesk "${GITHUB_WORKSPACE}"
 bench setup requirements --dev
+bench set-config -g use_mysqlclient 1
 
 wait $wkpid
 
