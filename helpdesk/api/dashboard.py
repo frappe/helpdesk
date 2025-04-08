@@ -19,7 +19,7 @@ def get_all():
     ]
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def ticket_statuses():
     thirty_days_ago = datetime.now() - timedelta(days=30)
     filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -39,7 +39,7 @@ def ticket_statuses():
     }
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def avg_first_response_time():
     average_resolution_time = float(0.0)
     thirty_days_ago = datetime.now() - timedelta(days=30)
@@ -70,7 +70,7 @@ def avg_first_response_time():
     }
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def ticket_types():
     thirty_days_ago = datetime.now() - timedelta(days=30)
     filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -90,7 +90,7 @@ def ticket_types():
     }
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def new_tickets():
     thirty_days_ago = datetime.now() - timedelta(days=30)
     filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -111,7 +111,7 @@ def new_tickets():
     }
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def resolution_within_sla():
     thirty_days_ago = datetime.now() - timedelta(days=30)
     filters = {
@@ -146,7 +146,7 @@ def resolution_within_sla():
     }
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def ticket_activity():
     thirty_days_ago = datetime.now() - timedelta(days=30)
     filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
@@ -167,7 +167,7 @@ def ticket_activity():
     }
 
 
-@redis_cache(ttl=60 * 5)
+@redis_cache(ttl=60 * 5, user=True)
 def ticket_priority():
     thirty_days_ago = datetime.now() - timedelta(days=30)
     filters = {"creation": [">=", thirty_days_ago.strftime("%Y-%m-%d")]}
