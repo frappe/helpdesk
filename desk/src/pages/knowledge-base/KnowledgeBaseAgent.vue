@@ -42,7 +42,6 @@ import {
   usePageMeta,
   FeatherIcon,
   Button,
-  confirmDialog,
   Dropdown,
   createResource,
   Badge,
@@ -56,6 +55,7 @@ import {
   deleteArticles,
   mergeCategory,
 } from "@/stores/knowledgeBase";
+import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
@@ -67,11 +67,13 @@ import LucideMerge from "~icons/lucide/merge";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
 
 const router = useRouter();
+const { $dialog } = globalStore();
 
 const category = reactive({
   title: "",
   id: "",
 });
+
 const _title = ref("");
 const listViewRef = ref(null);
 const editTitle = ref(false);
@@ -184,13 +186,19 @@ const selectBannerActions = [
     icon: "trash-2",
     onClick: (selections: Set<string>) => {
       listSelections.value = selections;
-      confirmDialog({
+      $dialog({
         title: "Delete articles?",
         message: `Are you sure you want to delete these articles?`,
-        onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-          handleDeleteArticles();
-          hideDialog();
-        },
+        actions: [
+          {
+            label: "Confirm",
+            variant: "solid",
+            onClick(close: Function) {
+              handleDeleteArticles();
+              close();
+            },
+          },
+        ],
       });
     },
   },
@@ -205,7 +213,7 @@ function handleMoveToCategory(category: string) {
     {
       onSuccess: () => {
         moveToModal.value = false;
-        listViewRef.value.reload();
+        listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value.clear();
         createToast({
@@ -308,28 +316,34 @@ function handleCategoryUpdate() {
 }
 
 function handleCategoryDelete(groupedRow) {
-  confirmDialog({
+  $dialog({
     title: "Delete category?",
     message: `All articles from this category will move to General category.`,
-    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      deleteCategory.submit(
-        {
-          doctype: "HD Article Category",
-          name: groupedRow.group.value,
+    actions: [
+      {
+        label: "Confirm",
+        variant: "solid",
+        onClick(close: Function) {
+          deleteCategory.submit(
+            {
+              doctype: "HD Article Category",
+              name: groupedRow.group.value,
+            },
+            {
+              onSuccess: () => {
+                createToast({
+                  title: "Category deleted successfully",
+                  icon: "check",
+                  iconClasses: "text-green-600",
+                });
+                listViewRef.value.reload();
+              },
+            }
+          );
+          close();
         },
-        {
-          onSuccess: () => {
-            createToast({
-              title: "Category deleted successfully",
-              icon: "check",
-              iconClasses: "text-green-600",
-            });
-            listViewRef.value.reload();
-          },
-        }
-      );
-      hideDialog();
-    },
+      },
+    ],
   });
 }
 
@@ -340,9 +354,9 @@ function handleDeleteArticles() {
     },
     {
       onSuccess: () => {
-        listViewRef.value.reload();
+        listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
-        listSelections.value.clear();
+        listSelections.value?.clear();
         createToast({
           title: "Articles deleted successfully",
           icon: "check",

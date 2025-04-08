@@ -49,7 +49,7 @@
                 label="Send"
                 theme="gray"
                 variant="solid"
-                :disabled="$refs.editor.editor.isEmpty || send.loading"
+                :disabled="$refs.editor?.editor.isEmpty || send.loading"
                 :loading="send.loading"
                 @click="sendEmail"
               />
@@ -66,12 +66,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";
-import { createResource, Button, Breadcrumbs, confirmDialog } from "frappe-ui";
+import { createResource, Button, Breadcrumbs, call } from "frappe-ui";
 import { useConfigStore } from "@/stores/config";
+import { globalStore } from "@/stores/globalStore";
 import { Icon } from "@iconify/vue";
 import { ITicket } from "./symbols";
 import { useRouter } from "vue-router";
-import { createToast, isContentEmpty, setupCustomActions } from "@/utils";
+import { createToast, isContentEmpty } from "@/utils";
+import { setupCustomizations } from "@/composables/formCustomisation";
 import { socket } from "@/socket";
 import { LayoutHeader } from "@/components";
 import { useScreenSize } from "@/composables/screen";
@@ -81,6 +83,7 @@ import TicketTextEditor from "./TicketTextEditor.vue";
 import TicketFeedback from "./TicketFeedback.vue";
 import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
 import { useTicket } from "./data";
+
 interface P {
   ticketId: string;
 }
@@ -92,9 +95,13 @@ const ticket = useTicket(
   true,
   null,
   (data) => {
-    setupCustomActions(data, {
+    setupCustomizations(data, {
       doc: data,
+      call,
+      router,
+      $dialog,
       updateField,
+      createToast,
     });
   },
   () => {
@@ -115,6 +122,7 @@ const showFeedbackDialog = ref(false);
 const isExpanded = ref(false);
 
 const { isMobileView } = useScreenSize();
+const { $dialog } = globalStore();
 
 const send = createResource({
   url: "run_doc_method",
@@ -178,14 +186,32 @@ function handleClose() {
 }
 
 function showConfirmationDialog() {
-  confirmDialog({
+  $dialog({
     title: "Close Ticket",
     message: "Are you sure you want to close this ticket?",
-    onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      ticket.data.status = "Closed";
-      setValue.submit({ fieldname: "status", value: "Closed" });
-      hideDialog();
-    },
+    actions: [
+      {
+        label: "Confirm",
+        variant: "solid",
+        onClick(close: Function) {
+          ticket.data.status = "Closed";
+          setValue.submit(
+            { fieldname: "status", value: "Closed" },
+            {
+              onSuccess: () => {
+                createToast({
+                  title: "Ticket closed successfully",
+                  icon: "check",
+                  iconClasses: "text-green-600",
+                  position: "top-right",
+                });
+              },
+            }
+          );
+          close();
+        },
+      },
+    ],
   });
 }
 

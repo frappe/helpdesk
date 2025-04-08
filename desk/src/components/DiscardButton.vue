@@ -3,8 +3,8 @@
 </template>
 
 <script setup lang="ts">
-import { confirmDialog } from "frappe-ui";
-
+import { globalStore } from "@/stores/globalStore";
+const { $dialog } = globalStore();
 const emit = defineEmits<{
   (event: "discard"): void;
 }>();
@@ -26,13 +26,22 @@ function handleDiscard() {
     emit("discard");
     return;
   }
-  confirmDialog({
+  $dialog({
     title: title,
     message: message,
     onConfirm: ({ hideDialog }: { hideDialog: Function }) => {
-      emit("discard");
       hideDialog();
     },
+    actions: [
+      {
+        label: "Confirm",
+        variant: "solid",
+        onClick(close: Function) {
+          emit("discard");
+          close();
+        },
+      },
+    ],
   });
 }
 </script>

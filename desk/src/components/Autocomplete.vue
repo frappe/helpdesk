@@ -3,7 +3,7 @@
     <Popover v-model:show="showOptions" class="w-full">
       <template #target="{ open: openPopover, togglePopover }">
         <slot name="target" v-bind="{ open: openPopover, togglePopover }">
-          <div class="w-full">
+          <div class="w-full -ml-0.5">
             <button
               class="flex w-full items-center justify-between focus:outline-none"
               :class="inputClasses"
