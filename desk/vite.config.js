@@ -108,6 +108,7 @@ export default defineConfig({
       "showdown",
       "tailwind.config.js",
       "prosemirror-state",
+      "prosemirror-view",
       "lowlight",
     ],
   },
