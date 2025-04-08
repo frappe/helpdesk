@@ -599,7 +599,9 @@ class HDTicket(Document):
         self.agent_group = escalation_rule.to_team or self.agent_group
         self.priority = escalation_rule.to_priority or self.priority
         self.ticket_type = escalation_rule.to_ticket_type or self.ticket_type
-        self.assign_agent(escalation_rule.to_agent)
+
+        if escalation_rule.to_agent:
+            self.assign_agent(escalation_rule.to_agent)
 
     def set_sla(self):
         """
