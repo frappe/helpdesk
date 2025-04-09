@@ -12,8 +12,9 @@
         :options="[
           {
             label: 'Merge Ticket',
-            onClick: () => handleTicketMerge(),
+            onClick: () => (showMergeModal = true),
             icon: LucideMerge,
+            condition: () => !ticket.is_merged,
           },
         ]"
       >
@@ -34,28 +35,32 @@
     <TicketAgentDetails :ticket="ticket" />
     <!-- fields -->
     <TicketAgentFields :ticket="ticket" @update="update" />
+    <TicketMergeModal
+      :ticket="ticket"
+      v-if="showMergeModal"
+      v-model="showMergeModal"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+import { createResource } from "frappe-ui";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";
+import TicketMergeModal from "./TicketMergeModal.vue";
 import LucideMerge from "~icons/lucide/merge";
 import { copyToClipboard } from "@/utils";
-import { globalStore } from "@/stores/globalStore";
-import { createResource } from "frappe-ui";
+import { Ticket } from "@/types";
 
-const props = defineProps({
-  ticket: {
-    type: Object,
-    required: true,
-  },
-});
+interface Props {
+  ticket: Ticket;
+}
+
+const props = defineProps<Props>();
 
 const emit = defineEmits(["update", "email:open"]);
-
-const { $dialog } = globalStore();
 
 function update(val) {
   if (typeof val.value === "object") {
@@ -63,6 +68,8 @@ function update(val) {
   }
   emit("update", val);
 }
+
+const showMergeModal = ref(false);
 
 const resource = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket",
@@ -74,21 +81,4 @@ const resource = createResource({
     console.log("Ticket merged successfully", data);
   },
 });
-
-function handleTicketMerge() {
-  $dialog({
-    title: "Merge Ticket",
-    message: "Are you sure you want to merge this ticket?",
-    actions: [
-      {
-        label: "Confirm",
-        variant: "solid",
-        onClick(close) {
-          resource.fetch();
-          // close();
-        },
-      },
-    ],
-  });
-}
 </script>

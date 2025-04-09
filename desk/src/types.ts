@@ -101,6 +101,7 @@ export interface Ticket {
   template: Template;
   views: ViewLog[];
   _customActions: Function[];
+  is_merged?: boolean;
 }
 
 export interface DocField {
