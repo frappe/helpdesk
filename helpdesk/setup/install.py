@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import frappe
-from frappe.permissions import add_permission
+from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
 
@@ -18,6 +18,7 @@ def after_install():
     add_default_sla()
     add_default_agent_groups()
     update_agent_role_permissions()
+    add_agent_manager_permissions()
     add_default_assignment_rule()
     add_system_preset_filters()
     create_default_template()
@@ -216,6 +217,20 @@ def update_agent_role_permissions():
         add_permission("Contact", "Agent", 0)
         add_permission("Email Account", "Agent", 0)
         add_permission("Communication", "Agent", 0)
+
+
+def add_agent_manager_permissions():
+    if not frappe.db.exists("Role", "Agent Manager"):
+        return
+
+    ptype = ["create", "delete", "write"]
+    doctypes = ["Email Account", "File", "Contact", "Communication"]
+    for dt in doctypes:
+        # this adds read permission to the role
+        add_permission(dt, "Agent Manager")
+        for p in ptype:
+            # now we update the above role to have all permissions from the ptype
+            update_permission_property(dt, "Agent Manager", 0, p, 1)
 
 
 def add_default_assignment_rule():

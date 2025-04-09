@@ -43,8 +43,7 @@
         :to="getRoute(n)"
         @click="
           () => {
-            notificationStore.toggle();
-            notificationStore.read(n.reference_ticket);
+            handleNotificationClick(n);
           }
         "
       >
@@ -102,6 +101,12 @@ onClickOutside(
     ignore: ["#notifications-btn"],
   }
 );
+
+function handleNotificationClick(n: Notification) {
+  notificationStore.toggle();
+  if (n.read) return;
+  notificationStore.read(n.reference_ticket);
+}
 
 function getRoute(n: Notification) {
   switch (n.notification_type) {
