@@ -53,6 +53,21 @@
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
       <div class="flex flex-1 flex-col">
+
+         <!-- Section to display relevant tickets -->
+        <section v-if="relevantTickets.length" class="p-5">
+          <h2 class="text-lg font-bold mb-3">Relevant Tickets</h2>
+          <ul>
+            <li v-for="relevantTicket in relevantTickets" :key="relevantTicket.name" class="mb-2">
+              <div class="p-3 border rounded-lg">
+                <h3 class="text-md font-semibold">{{ relevantTicket.subject }}</h3>
+                <p>Status: {{ relevantTicket.status }}</p>
+                <p>Created on: {{ new Date(relevantTicket.creation).toLocaleDateString() }}</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
         <!-- ticket activities -->
         <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
           <Tabs v-model="tabIndex" :tabs="tabs">
@@ -170,6 +185,25 @@ import { setupCustomizations } from "@/composables/formCustomisation";
 import { TabObject, TicketTab, View } from "@/types";
 import { useView } from "@/composables/useView";
 import { ComputedRef } from "vue";
+
+const relevantTickets = ref([]);
+const loadingRelevantTickets = ref(false);
+
+const fetchRelevantTickets = async () => {
+  loadingRelevantTickets.value = true;
+  try {
+    const response = await call('helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.get_relevant_tickets', {
+      contact: ticket.data.contact,
+      company: ticket.data.company,
+      subject: ticket.data.subject,
+    });
+    relevantTickets.value = response.message || [];
+  } catch (error) {
+    console.error('Error fetching relevant tickets:', error);
+  } finally {
+    loadingRelevantTickets.value = false;
+  }
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -408,6 +442,8 @@ onMounted(() => {
       ticket.reload();
     }
   });
+  
+  fetchRelevantTickets();
 });
 
 onUnmounted(() => {
