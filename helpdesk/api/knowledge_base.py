@@ -60,6 +60,8 @@ def create_category(title: str):
 
 @frappe.whitelist()
 def move_to_category(category, articles):
+    frappe.has_permission("HD Article", "write", throw=True)
+
     for article in articles:
         try:
             article_category = frappe.db.get_value("HD Article", article, "category")
@@ -111,6 +113,8 @@ def get_category_articles(category):
 
 @frappe.whitelist()
 def merge_category(source, target):
+    frappe.has_permission("HD Article Category", "delete", throw=True)
+
     if source == target:
         frappe.throw(_("Source and target category cannot be same"))
     general_category = get_general_category()

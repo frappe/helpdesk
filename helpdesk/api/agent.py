@@ -1,7 +1,10 @@
 import frappe
 
+from helpdesk.utils import agent_only
+
 
 @frappe.whitelist()
+@agent_only
 def sent_invites(emails, send_welcome_mail_to_user=True):
     for email in emails:
         if frappe.db.exists("User", email):
