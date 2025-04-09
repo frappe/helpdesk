@@ -313,6 +313,12 @@ class HDTicket(Document):
         for activity in activities:
             frappe.db.delete("HD Ticket Activity", activity)
 
+        comments = frappe.db.get_all(
+            "HD Ticket Comment", {"reference_ticket": self.name}
+        )
+        for comment in comments:
+            frappe.db.delete("HD Ticket Comment", comment)
+
     def skip_email_workflow(self):
         skip: str = frappe.get_value("HD Settings", None, "skip_email_workflow") or "0"
 

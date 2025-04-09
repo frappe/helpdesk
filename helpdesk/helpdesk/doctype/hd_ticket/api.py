@@ -8,7 +8,7 @@ from helpdesk.consts import DEFAULT_TICKET_TEMPLATE
 from helpdesk.helpdesk.doctype.hd_form_script.hd_form_script import get_form_script
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_fields_meta
 from helpdesk.helpdesk.doctype.hd_ticket_template.api import get_one as get_template
-from helpdesk.utils import check_permissions, get_customer, is_agent
+from helpdesk.utils import agent_only, check_permissions, get_customer, is_agent
 
 
 @frappe.whitelist()
@@ -231,3 +231,74 @@ def get_attachments(doctype, name):
         .where(QBFile.attached_to_name == name)
         .run(as_dict=True)
     )
+
+
+@frappe.whitelist()
+@agent_only
+def merge_ticket(source: int, target: int):
+    # check if source and target exists
+    if not frappe.db.exists("HD Ticket", source):
+        frappe.throw(_("Source ticket does not exist"))
+    if not frappe.db.exists("HD Ticket", target):
+        frappe.throw(_("Target ticket does not exist"))
+    if source == target:
+        frappe.throw(_("Source and target ticket cannot be same"))
+
+    source_comments = frappe.db.get_list(
+        "HD Ticket Comment", filters={"reference_ticket": source}, pluck="name"
+    )
+    duplicate_list_retain_timestamp("HD Ticket Comment", source_comments, target)
+
+    source_communications = frappe.db.get_list(
+        "Communication",
+        filters={"reference_doctype": "HD Ticket", "reference_name": source},
+        pluck="name",
+    )
+    duplicate_list_retain_timestamp("Communication", source_communications, target)
+
+    source_attachments = frappe.db.get_list(
+        "File", filters={"attached_to_doctype": "HD Ticket", "attached_to_name": source}
+    )
+    duplicate_list_retain_timestamp(source_attachments, target)
+
+    frappe.db.set_value(
+        "HD Ticket",
+        source,
+        {
+            "status": "Closed",
+            "is_merged": 1,
+            "merged_with": target,
+        },
+    )
+    # create comment on target ticket that source ticket is merged with target ticket
+    # create communication on target ticket that source ticket is merged with target ticket
+
+    return _("Ticket {0} merged with {1}", source, target)
+
+
+def duplicate_list_retain_timestamp(doctype, activities: list, target: int):
+    for activity in activities:
+        original_doc = frappe.get_doc(doctype, activity)
+
+        duplicate_doc = frappe.copy_doc(original_doc)
+
+        if doctype == "Communication":
+            duplicate_doc.reference_name = target
+        elif doctype == "HD Ticket Comment":
+            duplicate_doc.reference_ticket = target
+        elif doctype == "File":
+            duplicate_doc.attached_to_name = target
+
+        duplicate_doc.insert(ignore_permissions=True)
+
+        frappe.db.set_value(
+            duplicate_doc.doctype,
+            duplicate_doc.name,
+            {
+                "creation": original_doc.creation,
+                "modified": original_doc.modified,
+                "owner": original_doc.owner,
+                "modified_by": original_doc.modified_by,
+            },
+            update_modified=False,
+        )

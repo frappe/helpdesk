@@ -16,7 +16,7 @@
   "cb00",
   "ticket_type",
   "agent_group",
-  "ticket_split_from",
+  "summary",
   "sb_details",
   "description",
   "template",
@@ -54,6 +54,10 @@
   "via_customer_portal",
   "attachment",
   "content_type",
+  "split_and_merge_section",
+  "is_merged",
+  "merged_with",
+  "ticket_split_from",
   "feedback_tab",
   "customer_feedback_section",
   "feedback_rating",
@@ -404,12 +408,37 @@
    "fieldname": "meta_tab",
    "fieldtype": "Tab Break",
    "label": "Meta"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Text Editor",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "split_and_merge_section",
+   "fieldtype": "Section Break",
+   "label": "Split and Merge"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_merged",
+   "fieldtype": "Check",
+   "label": "Ticket Merged"
+  },
+  {
+   "depends_on": "eval:doc.is_merged",
+   "fieldname": "merged_with",
+   "fieldtype": "Link",
+   "label": "Merged With",
+   "options": "HD Ticket",
+   "read_only": 1
   }
  ],
+ "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-02-20 12:00:20.604270",
+ "modified": "2025-04-09 20:44:24.252633",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
@@ -465,6 +494,7 @@
   }
  ],
  "quick_entry": 1,
+ "row_format": "Dynamic",
  "search_fields": "status,subject,raised_by",
  "sender_field": "raised_by",
  "sort_field": "modified",
