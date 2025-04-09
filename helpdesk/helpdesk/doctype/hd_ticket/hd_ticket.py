@@ -33,28 +33,20 @@ from ..hd_service_level_agreement.utils import get_sla
 
 class HDTicket(Document):
     @frappe.whitelist()
-    def get_recent_tickets_by_contact(contact):
-        return frappe.get_all('HD Ticket',
-                                filters={'contact': contact},
-                                fields=['name', 'subject', 'status', 'creation'],
-                                order_by='creation desc',
-                                limit_page_length=5)
+    def get_relevant_tickets(contact=None, company=None, subject=None):
+        filters = {}
+        if contact:
+            filters['contact'] = contact
+        if company:
+            filters['company'] = company
+        if subject:
+            filters['subject'] = ['like', f'%{subject}%']
 
-    @frappe.whitelist()
-    def get_tickets_by_company(company):
         return frappe.get_all('HD Ticket',
-                                filters={'company': company},
-                                fields=['name', 'subject', 'status', 'creation'],
-                                order_by='creation desc',
-                                limit_page_length=5)
-
-    @frappe.whitelist()
-    def get_similar_tickets(subject):
-        return frappe.get_all('HD Ticket',
-                                filters={'subject': ['like', f'%{subject}%']},
-                                fields=['name', 'subject', 'status', 'creation'],
-                                order_by='creation desc',
-                                limit_page_length=5)
+                            filters=filters,
+                            fields=['name', 'subject', 'status', 'creation'],
+                            order_by='creation desc',
+                            limit_page_length=5)
 
     def publish_update(self):
         publish_event("helpdesk:ticket-update", self.name)
