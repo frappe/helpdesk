@@ -95,6 +95,7 @@
         :ticket="ticket.data"
         @update="({ field, value }) => updateTicket(field, value)"
         @email:open="(e) => communicationAreaRef.toggleEmailBox()"
+        @reload="ticket.reload()"
       />
     </div>
     <AssignmentModal

@@ -4,31 +4,56 @@
     v-model="showDialog"
   >
     <template #body-content>
-      <p class="text-p-base text-ink-gray-8 mb-4">
-        This will merge all comments and emails of the ticket
-        <span class="whitespace-nowrap font-semibold">#{{ ticket.name }}</span>
-        with the selected ticket. This change is irreversible!
-      </p>
-      <Link
-        class="form-control"
-        doctype="HD Ticket"
-        placeholder="Select Ticket"
-        :filters="getDefaultFilters()"
-        label="Ticket"
-        :page-length="10"
-        :value="targetTicket"
-        :show-description="true"
-        @change="targetTicket = String($event)"
-      >
-      </Link>
+      <div class="flex flex-col gap-4">
+        <p class="text-p-base text-ink-gray-8">
+          All comments and emails of the ticket
+          <span class="whitespace-nowrap font-semibold"
+            >#{{ ticket.name }}</span
+          >
+          will be moved to the selected ticket.
+        </p>
+        <Link
+          class="form-control"
+          doctype="HD Ticket"
+          placeholder="Select Ticket"
+          :filters="getDefaultFilters()"
+          label="Ticket"
+          :page-length="10"
+          :value="targetTicket"
+          :show-description="true"
+          @change="targetTicket = String($event)"
+        />
+        <!-- banner -->
+        <div
+          class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
+        >
+          <TriangleAlert
+            class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-yellow-500"
+          />
+
+          <div class="text-wrap text-sm text-gray-700">
+            This action is irreversible.
+          </div>
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <Button
+        class="w-full"
+        variant="solid"
+        label="Merge"
+        @click="handleTicketMerge"
+      />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dialog } from "frappe-ui";
+import { Dialog, createResource } from "frappe-ui";
 import { Ticket } from "@/types";
+import TriangleAlert from "~icons/lucide/triangle-alert";
+import { createToast } from "@/utils";
 
 // interface P
 interface Props {
@@ -44,14 +69,14 @@ const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
 
-const targetTicket = ref("");
+const targetTicket = ref(null);
 
 interface Filter {
   status: [string, string[] | string];
   is_merged: number;
   name: string[];
   customer?: any;
-  contact?: string;
+  raised_by?: [string, string[] | string];
 }
 
 function getDefaultFilters() {
@@ -63,13 +88,43 @@ function getDefaultFilters() {
   // if part of an organization show all tickets of the organization
   if (props.ticket.customer) {
     filters.customer = props.ticket.customer;
-    return filters;
   }
-  // otherwise show all tickets of the contact who created the ticket
-  if (props.ticket.contact?.name) {
-    filters["contact"] = props.ticket.contact.name;
+  //  show all tickets of the person who raised the ticket
+  if (props.ticket.raised_by) {
+    filters.raised_by = ["like", `%${props.ticket.raised_by}%`];
   }
   return filters;
+}
+
+const mergeTicket = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket",
+  makeParams({ source, target }) {
+    return {
+      source,
+      target,
+    };
+  },
+  validate({ source, target }) {
+    if (!source) throw { message: "Category is required" };
+    if (!target) throw { message: "Ticket to merged with is required" };
+  },
+  onSuccess: () => {
+    createToast({
+      title: "Ticket merged successfully",
+      icon: "check",
+      iconClasses: "text-green-600",
+    });
+    emit("update");
+    targetTicket.value = null;
+    showDialog.value = false;
+  },
+});
+
+function handleTicketMerge() {
+  mergeTicket.submit({
+    source: props.ticket.name,
+    target: targetTicket.value,
+  });
 }
 </script>
 

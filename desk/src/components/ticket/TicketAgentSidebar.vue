@@ -39,13 +39,13 @@
       :ticket="ticket"
       v-if="showMergeModal"
       v-model="showMergeModal"
+      @update="emit('reload')"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { createResource } from "frappe-ui";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";
@@ -58,11 +58,11 @@ interface Props {
   ticket: Ticket;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
-const emit = defineEmits(["update", "email:open"]);
+const emit = defineEmits(["update", "email:open", "reload"]);
 
-function update(val) {
+function update(val = null) {
   if (typeof val.value === "object") {
     val.value = val.value.target?.value || null;
   }
@@ -70,15 +70,4 @@ function update(val) {
 }
 
 const showMergeModal = ref(false);
-
-const resource = createResource({
-  url: "helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket",
-  params: {
-    source: props.ticket.name,
-    target: 5461,
-  },
-  onSuccess: (data) => {
-    console.log("Ticket merged successfully", data);
-  },
-});
 </script>

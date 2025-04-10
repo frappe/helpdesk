@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.model.document import get_controller
 from frappe.utils import get_user_info_for_avatar
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
@@ -257,39 +258,61 @@ def merge_ticket(source: int, target: int):
     duplicate_list_retain_timestamp("Communication", source_communications, target)
 
     source_attachments = frappe.db.get_list(
-        "File", filters={"attached_to_doctype": "HD Ticket", "attached_to_name": source}
+        "File",
+        filters={"attached_to_doctype": "HD Ticket", "attached_to_name": source},
+        pluck="name",
     )
-    duplicate_list_retain_timestamp(source_attachments, target)
+    duplicate_list_retain_timestamp("File", source_attachments, target)
 
-    frappe.db.set_value(
-        "HD Ticket",
-        source,
-        {
-            "status": "Closed",
-            "is_merged": 1,
-            "merged_with": target,
-        },
-    )
+    frappe.get_doc("HD Ticket", source)
+    doc.status = "Closed"
+    doc.is_merged = 1
+    doc.merged_with = target
+    doc.save()
+
     # create comment on target ticket that source ticket is merged with target ticket
-    # create communication on target ticket that source ticket is merged with target ticket
-
-    return _("Ticket {0} merged with {1}", source, target)
+    # create communication on source ticket that source ticket is merged with target ticket
 
 
 def duplicate_list_retain_timestamp(doctype, activities: list, target: int):
     for activity in activities:
+        attachments = get_attachments(
+            "HD Ticket Comment",
+            activity,
+        )
+
         original_doc = frappe.get_doc(doctype, activity)
 
         duplicate_doc = frappe.copy_doc(original_doc)
 
         if doctype == "Communication":
             duplicate_doc.reference_name = target
+            attachments = get_attachments(
+                "Communication",
+                activity,
+            )
+
         elif doctype == "HD Ticket Comment":
             duplicate_doc.reference_ticket = target
+
         elif doctype == "File":
             duplicate_doc.attached_to_name = target
 
         duplicate_doc.insert(ignore_permissions=True)
+
+        if doctype == "File":
+            return
+
+        controller = get_controller("HD Ticket")
+
+        attachments = get_attachments(
+            doctype,
+            activity,
+        )
+        for attachment in attachments:
+            controller.attach_file_with_doc(
+                duplicate_doc, doctype, duplicate_doc.name, attachment["file_url"]
+            )
 
         frappe.db.set_value(
             duplicate_doc.doctype,
