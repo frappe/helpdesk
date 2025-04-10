@@ -264,7 +264,7 @@ def merge_ticket(source: int, target: int):
     )
     duplicate_list_retain_timestamp("File", source_attachments, target)
 
-    frappe.get_doc("HD Ticket", source)
+    doc = frappe.get_doc("HD Ticket", source)
     doc.status = "Closed"
     doc.is_merged = 1
     doc.merged_with = target
