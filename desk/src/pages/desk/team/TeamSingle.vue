@@ -4,6 +4,7 @@
       <LayoutHeader>
         <template #left-header>
           <Breadcrumbs
+            class="-ml-0.5"
             :items="[
               {
                 label: 'Teams',

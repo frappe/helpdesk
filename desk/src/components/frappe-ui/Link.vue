@@ -25,7 +25,22 @@
       </template>
 
       <template #item-label="{ active, selected, option }">
-        <slot name="item-label" v-bind="{ active, selected, option }" />
+        <slot name="item-label" v-bind="{ active, selected, option }">
+          <div
+            v-if="option.description && showDescription"
+            class="flex flex-col gap-1"
+          >
+            <div class="flex-1 font-semibold truncate text-ink-gray-7">
+              {{ option.label }}
+            </div>
+            <div class="flex-1 text-sm truncate text-ink-gray-5">
+              {{ option.description }}
+            </div>
+          </div>
+          <div v-else class="flex-1 truncate text-ink-gray-7">
+            {{ option.label }}
+          </div>
+        </slot>
       </template>
 
       <template #footer="{ value, close }" v-if="!hideClearButton">
@@ -71,8 +86,8 @@ const props = defineProps({
     required: true,
   },
   filters: {
-    type: Array,
-    default: () => [],
+    type: Object,
+    default: null,
   },
   modelValue: {
     type: String,
@@ -87,6 +102,10 @@ const props = defineProps({
     default: 10,
   },
   hideClearButton: {
+    type: Boolean,
+    default: false,
+  },
+  showDescription: {
     type: Boolean,
     default: false,
   },
@@ -159,6 +178,7 @@ const options = createResource({
       return {
         value: option.value,
         label: option?.label || option.value,
+        description: option?.description,
       };
     });
 

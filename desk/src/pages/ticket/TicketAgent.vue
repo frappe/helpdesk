@@ -95,6 +95,7 @@
         :ticket="ticket.data"
         @update="({ field, value }) => updateTicket(field, value)"
         @email:open="(e) => communicationAreaRef.toggleEmailBox()"
+        @reload="ticket.reload()"
       />
     </div>
     <AssignmentModal
@@ -221,6 +222,7 @@ const ticket = createResource({
     renameSubject.value = data.subject;
   },
   onSuccess: (ticket) => {
+    document.title = ticket.subject;
     setupCustomizations(ticket, {
       doc: ticket,
       call,
@@ -307,6 +309,7 @@ const activities = computed(() => {
       bcc: email.bcc,
       creation: email.creation,
       attachments: email.attachments,
+      name: email.name,
     };
   });
 
@@ -402,7 +405,6 @@ function updateOptimistic(fieldname: string, value: string) {
 }
 
 onMounted(() => {
-  document.title = props.ticketId;
   socket.on("helpdesk:ticket-update", (ticketID) => {
     if (ticketID === Number(props.ticketId)) {
       ticket.reload();
