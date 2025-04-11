@@ -23,6 +23,13 @@
           :show-description="true"
           @change="targetTicket = String($event)"
         />
+        <FormControl
+          v-if="targetTicket"
+          label="Ticket Subject"
+          type="text"
+          v-model="subject"
+          :disabled="true"
+        />
         <!-- banner -->
         <div
           class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200"
@@ -53,10 +60,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Dialog, createResource } from "frappe-ui";
+import { Dialog, createResource, createListResource } from "frappe-ui";
 import { Ticket } from "@/types";
 import TriangleAlert from "~icons/lucide/triangle-alert";
 import { createToast } from "@/utils";
+import { watch } from "vue";
 
 // interface P
 interface Props {
@@ -98,6 +106,7 @@ function getDefaultFilters() {
 }
 
 const targetTicket = ref(null);
+const subject = ref(null);
 
 const mergeTicket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket",
@@ -128,6 +137,33 @@ const mergeTicket = createResource({
     targetTicket.value = null;
   },
 });
+
+const getTicketSubject = createListResource({
+  doctype: "HD Ticket",
+  filters: {
+    name: ["=", targetTicket],
+  },
+  fields: ["subject"],
+  onSuccess: (data: any) => {
+    if (data.length > 0) {
+      subject.value = data[0].subject;
+    }
+  },
+});
+
+watch(
+  () => targetTicket.value,
+  (newValue) => {
+    if (newValue) {
+      getTicketSubject.update({
+        filters: {
+          name: ["=", newValue],
+        },
+      });
+      getTicketSubject.reload();
+    }
+  }
+);
 
 function handleTicketMerge() {
   mergeTicket.submit({
