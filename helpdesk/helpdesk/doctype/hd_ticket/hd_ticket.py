@@ -148,7 +148,15 @@ class HDTicket(Document):
         )
 
     def set_first_responded_on(self):
-        if self.status == "Replied":
+        old_status = (
+            self.get_doc_before_save().status if self.get_doc_before_save() else None
+        )
+        is_closed_or_resoled = old_status == "Open" and self.status in [
+            "Resolved",
+            "Closed",
+        ]
+
+        if self.status == "Replied" or is_closed_or_resoled:
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
