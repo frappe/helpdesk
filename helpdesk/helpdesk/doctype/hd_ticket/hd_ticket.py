@@ -64,6 +64,8 @@ class HDTicket(Document):
         self.apply_sla()
 
     def after_insert(self):
+        if self.ticket_split_from:
+            return
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
@@ -413,8 +415,6 @@ class HDTicket(Document):
         bcc: str = None,
         attachments: List[str] = [],
     ):
-        print("\n\n", to, "\n\n")
-        print("\n\n", self.raised_by, "\n\n")
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject} (#{self.name})"

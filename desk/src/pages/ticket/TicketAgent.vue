@@ -309,6 +309,7 @@ const activities = computed(() => {
       bcc: email.bcc,
       creation: email.creation,
       attachments: email.attachments,
+      name: email.name,
     };
   });
 

@@ -315,6 +315,7 @@ export interface EmailActivity extends BaseActivity {
   attachments: FileAttachment;
   bcc: string;
   cc: string;
+  name: string;
   sender: { full_name: string; name: string };
   subject: string;
   to: string;

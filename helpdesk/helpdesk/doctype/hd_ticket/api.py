@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import get_controller
-from frappe.utils import get_user_info_for_avatar
+from frappe.utils import get_user_info_for_avatar, now_datetime
 from frappe.utils.caching import redis_cache
 from pypika import Criterion, Order
 
@@ -278,7 +278,7 @@ def merge_ticket(source: int, target: int):
     doc.save()
     controller.reply_via_agent(
         doc,
-        message=_("The ticket <b>#{0}</b> has been merged with <b>#{1}</b>").format(
+        message=_("Ticket <b>#{0}</b> has been merged with ticket <b>#{1}</b>.").format(
             source, target
         ),
     )
@@ -290,7 +290,7 @@ def merge_ticket(source: int, target: int):
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))
     target_link = frappe.utils.get_url("/helpdesk/tickets/" + str(target))
     c.content = _(
-        f"<p> The ticket <a href={source_link}> #{source}</a>  has been merged with ticket <a href={target_link}> #{target} </a> </p>"
+        f"<p> Ticket <a href={source_link}> #{source}</a>  has been merged with ticket <a href={target_link}> #{target} </a>.</p>"
     )
     c.save()
 
@@ -351,3 +351,110 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: int, cont
             },
             update_modified=False,
         )
+
+
+@frappe.whitelist()
+@agent_only
+def split_ticket(subject: str, communication_id: str):
+
+    communicaton_creation_time = frappe.db.get_value(
+        "Communication", communication_id, "creation"
+    )
+
+    ticket_id = frappe.db.get_value("Communication", communication_id, "reference_name")
+    ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
+    new_ticket = duplicate_ticket(ticket_doc, subject)
+
+    # update emails
+    frappe.db.set_value(
+        "Communication",
+        {
+            "reference_doctype": "HD Ticket",
+            "reference_name": ticket_id,
+            "creation": [">=", communicaton_creation_time],
+        },
+        "reference_name",
+        new_ticket,
+        update_modified=False,
+    )
+
+    # update comments
+    frappe.db.set_value(
+        "HD Ticket Comment",
+        {
+            "reference_ticket": ticket_id,
+            "creation": [">=", communicaton_creation_time],
+        },
+        "reference_ticket",
+        new_ticket,
+        update_modified=False,
+    )
+
+    # update activities
+    frappe.db.set_value(
+        "HD Ticket Activity",
+        {
+            "ticket": ticket_id,
+            "creation": [">=", communicaton_creation_time],
+        },
+        "ticket",
+        new_ticket,
+        update_modified=False,
+    )
+
+    # update attachments
+    frappe.db.set_value(
+        "File",
+        {
+            "attached_to_doctype": "HD Ticket",
+            "attached_to_name": ticket_id,
+            "creation": [">=", communicaton_creation_time],
+        },
+        "attached_to_name",
+        new_ticket,
+        update_modified=False,
+    )
+
+    controller = get_controller("HD Ticket")
+    controller.reply_via_agent(
+        ticket_doc,
+        message=_(
+            "This ticket has been split to a new ticket. Please follow up on ticket <b>#{0}</b>."
+        ).format(new_ticket),
+    )
+
+    # Email on the old ticket that it has been split to new_ticket
+    return new_ticket
+
+
+def duplicate_ticket(ticket_doc, subject):
+    from copy import deepcopy
+
+    new_ticket = deepcopy(ticket_doc)
+    new_ticket.subject = subject
+    new_ticket.status = "Open"
+    new_ticket.ticket_split_from = ticket_doc.name
+    new_ticket.description = None
+    new_ticket.first_response_time = 0
+    new_ticket.first_responded_on = None
+
+    new_ticket.creation = now_datetime()
+    new_ticket.opening_date = frappe.utils.nowdate()
+    new_ticket.opening_time = frappe.utils.nowtime()
+
+    if new_ticket.sla:
+        new_ticket.sla = None
+        new_ticket.agreement_status = "First Response Due"
+        new_ticket.resolution_by = None
+        new_ticket.service_level_agreement_creation = now_datetime()
+        new_ticket.on_hold_since = None
+        new_ticket.total_hold_time = None
+        new_ticket.response_by = None
+        new_ticket.response_date = None
+        new_ticket.resolution_date = None
+        new_ticket.resolution_time = None
+        new_ticket.user_resolution_time = None
+
+    new_ticket.insert(ignore_permissions=True)
+
+    return new_ticket.name

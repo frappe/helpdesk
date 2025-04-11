@@ -1,5 +1,6 @@
 <template>
   <div
+    v-bind="$attrs"
     class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-1 flex items-center justify-between gap-2">
@@ -54,6 +55,22 @@
         >
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
+        <Dropdown
+          v-if="showMergeOption"
+          :options="[
+            {
+              label: 'Split Ticket',
+              icon: LucideSplit,
+              onClick: () => (showSplitModal = true),
+            },
+          ]"
+        >
+          <Button
+            icon="more-horizontal"
+            class="text-gray-600"
+            variant="ghost"
+          />
+        </Dropdown>
       </div>
     </div>
     <!-- <div class="text-sm leading-5 text-gray-600">
@@ -81,27 +98,41 @@
       />
     </div>
   </div>
+  <TicketSplitModal
+    v-model="showSplitModal"
+    :ticket_id="name"
+    :communication_id="name"
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
 import { ReplyIcon, ReplyAllIcon } from "./icons";
+import LucideSplit from "~icons/lucide/split";
 import { useScreenSize } from "@/composables/screen";
+import TicketSplitModal from "./ticket/TicketSplitModal.vue";
 
 const props = defineProps({
   activity: {
     type: Object,
     required: true,
   },
+  showMergeOption: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const { sender, to, cc, bcc, creation, subject, attachments, content } =
+const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
   props.activity;
 
 const emit = defineEmits(["reply"]);
 
 const { isMobileView } = useScreenSize();
+
+const showSplitModal = ref(false);
 
 // TODO: Implement reply functionality using this way instead of emit drillup
 // function reply(email, reply_all = false) {
