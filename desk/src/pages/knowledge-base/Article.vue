@@ -3,7 +3,7 @@
     <LayoutHeader>
       <template #left-header>
         <div class="flex gap-1 items-center crumbs truncate">
-          <Breadcrumbs :items="breadcrumbs" />
+          <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
         </div>
       </template>
       <template #right-header v-if="!isCustomerPortal">
