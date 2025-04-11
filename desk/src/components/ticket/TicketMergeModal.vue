@@ -41,7 +41,10 @@
       <Button
         class="w-full"
         variant="solid"
-        label="Merge"
+        :label="
+          targetTicket ? `Merge with ticket #${targetTicket} ` : 'Select Ticket'
+        "
+        :loading="mergeTicket.loading"
         @click="handleTicketMerge"
       />
     </template>
@@ -69,8 +72,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<E>();
 const showDialog = defineModel<boolean>();
 
-const targetTicket = ref(null);
-
 interface Filter {
   status: [string, string[] | string];
   is_merged: number;
@@ -96,6 +97,8 @@ function getDefaultFilters() {
   return filters;
 }
 
+const targetTicket = ref(null);
+
 const mergeTicket = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket.api.merge_ticket",
   makeParams({ source, target }) {
@@ -115,8 +118,14 @@ const mergeTicket = createResource({
       iconClasses: "text-green-600",
     });
     emit("update");
-    targetTicket.value = null;
+
     showDialog.value = false;
+    // open the target Ticket
+    window.open(
+      window.location.origin + "/helpdesk/tickets/" + targetTicket.value,
+      "_blank"
+    );
+    targetTicket.value = null;
   },
 });
 

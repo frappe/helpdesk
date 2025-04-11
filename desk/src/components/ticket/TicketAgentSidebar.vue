@@ -9,6 +9,7 @@
         >#{{ ticket.name }}
       </span>
       <Dropdown
+        v-if="!ticket.is_merged"
         :options="[
           {
             label: 'Merge Ticket',

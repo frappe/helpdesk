@@ -245,36 +245,60 @@ def merge_ticket(source: int, target: int):
     if source == target:
         frappe.throw(_("Source and target ticket cannot be same"))
 
+    controller = get_controller("HD Ticket")
+
     source_comments = frappe.db.get_list(
         "HD Ticket Comment", filters={"reference_ticket": source}, pluck="name"
     )
-    duplicate_list_retain_timestamp("HD Ticket Comment", source_comments, target)
+    duplicate_list_retain_timestamp(
+        "HD Ticket Comment", source_comments, target, controller
+    )
 
     source_communications = frappe.db.get_list(
         "Communication",
         filters={"reference_doctype": "HD Ticket", "reference_name": source},
         pluck="name",
     )
-    duplicate_list_retain_timestamp("Communication", source_communications, target)
+    duplicate_list_retain_timestamp(
+        "Communication", source_communications, target, controller
+    )
 
     source_attachments = frappe.db.get_list(
         "File",
         filters={"attached_to_doctype": "HD Ticket", "attached_to_name": source},
         pluck="name",
     )
-    duplicate_list_retain_timestamp("File", source_attachments, target)
+    duplicate_list_retain_timestamp("File", source_attachments, target, controller)
 
     doc = frappe.get_doc("HD Ticket", source)
+
     doc.status = "Closed"
     doc.is_merged = 1
     doc.merged_with = target
     doc.save()
+    controller.reply_via_agent(
+        doc,
+        message=_("The ticket <b>#{0}</b> has been merged with <b>#{1}</b>").format(
+            source, target
+        ),
+    )
+
+    # comment in target ticket that
+    c = frappe.new_doc("HD Ticket Comment")
+    c.commented_by = frappe.session.user
+    c.reference_ticket = target
+    source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))
+    target_link = frappe.utils.get_url("/helpdesk/tickets/" + str(target))
+    c.content = _(
+        f"<p> The ticket <a href={source_link}> #{source}</a>  has been merged with ticket <a href={target_link}> #{target} </a> </p>"
+    )
+    c.save()
 
     # create comment on target ticket that source ticket is merged with target ticket
     # create communication on source ticket that source ticket is merged with target ticket
 
 
-def duplicate_list_retain_timestamp(doctype, activities: list, target: int):
+def duplicate_list_retain_timestamp(doctype, activities: list, target: int, controller):
     for activity in activities:
         attachments = get_attachments(
             "HD Ticket Comment",
@@ -294,6 +318,10 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: int):
 
         elif doctype == "HD Ticket Comment":
             duplicate_doc.reference_ticket = target
+            attachments = get_attachments(
+                "Communication",
+                activity,
+            )
 
         elif doctype == "File":
             duplicate_doc.attached_to_name = target
@@ -302,8 +330,6 @@ def duplicate_list_retain_timestamp(doctype, activities: list, target: int):
 
         if doctype == "File":
             return
-
-        controller = get_controller("HD Ticket")
 
         attachments = get_attachments(
             doctype,

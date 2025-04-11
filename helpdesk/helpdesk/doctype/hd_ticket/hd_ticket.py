@@ -413,6 +413,8 @@ class HDTicket(Document):
         bcc: str = None,
         attachments: List[str] = [],
     ):
+        print("\n\n", to, "\n\n")
+        print("\n\n", self.raised_by, "\n\n")
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re: {self.subject} (#{self.name})"
