@@ -64,12 +64,12 @@ const defaultActions = computed(() => {
   let actions = [
     {
       icon: h(EmailIcon, { class: "h-4 w-4" }),
-      label: "New Email",
+      label: "Email",
       onClick: () => communicationAreaRef.value.toggleEmailBox(),
     },
     {
       icon: h(CommentIcon, { class: "h-4 w-4" }),
-      label: "New Comment",
+      label: "Comment",
       onClick: () => communicationAreaRef.value.toggleCommentBox(),
     },
   ];
