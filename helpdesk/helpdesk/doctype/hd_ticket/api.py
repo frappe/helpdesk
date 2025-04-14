@@ -278,7 +278,7 @@ def merge_ticket(source: int, target: int):
     doc.save()
 
     message = _(
-        "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a> ."
+        "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a>."
     ).format(source, target)
     controller.reply_via_agent(
         doc,
@@ -292,7 +292,7 @@ def merge_ticket(source: int, target: int):
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))
     target_link = frappe.utils.get_url("/helpdesk/tickets/" + str(target))
     c.content = _(
-        f"Ticket <a href={source_link}> #{source}</a>  has been merged with ticket <a href={target_link}> #{target}</a> ."
+        f"Ticket <a href={source_link}> #{source}</a>  has been merged with ticket #{target}."
     )
     c.save()
 
@@ -420,7 +420,7 @@ def split_ticket(subject: str, communication_id: str):
     controller.reply_via_agent(
         ticket_doc,
         message=_(
-            "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a> ."
+            "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a>."
         ).format(new_ticket_link, new_ticket),
     )
 
@@ -442,6 +442,9 @@ def duplicate_ticket(ticket_doc, subject):
     new_ticket.creation = now_datetime()
     new_ticket.opening_date = frappe.utils.nowdate()
     new_ticket.opening_time = frappe.utils.nowtime()
+
+    new_ticket.is_merged = 0
+    new_ticket.merged_with = None
 
     if new_ticket.sla:
         new_ticket.sla = None
