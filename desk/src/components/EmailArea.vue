@@ -133,7 +133,6 @@ const props = defineProps({
 
 const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
   props.activity;
-console.log(sender);
 
 const emit = defineEmits(["reply"]);
 
