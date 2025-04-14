@@ -64,6 +64,13 @@ class HDTicket(Document):
         self.apply_sla()
 
     def after_insert(self):
+        if self.ticket_split_from:
+            log_ticket_activity(
+                self.name,
+                "split the ticket from #{0}".format(self.ticket_split_from),
+            )
+            capture_event("ticket_split")
+            return
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
@@ -148,7 +155,15 @@ class HDTicket(Document):
         )
 
     def set_first_responded_on(self):
-        if self.status == "Replied":
+        old_status = (
+            self.get_doc_before_save().status if self.get_doc_before_save() else None
+        )
+        is_closed_or_resoled = old_status == "Open" and self.status in [
+            "Resolved",
+            "Closed",
+        ]
+
+        if self.status == "Replied" or is_closed_or_resoled:
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
@@ -312,6 +327,12 @@ class HDTicket(Document):
         activities = frappe.db.get_all("HD Ticket Activity", {"ticket": self.name})
         for activity in activities:
             frappe.db.delete("HD Ticket Activity", activity)
+
+        comments = frappe.db.get_all(
+            "HD Ticket Comment", {"reference_ticket": self.name}
+        )
+        for comment in comments:
+            frappe.db.delete("HD Ticket Comment", comment)
 
     def skip_email_workflow(self):
         skip: str = frappe.get_value("HD Settings", None, "skip_email_workflow") or "0"

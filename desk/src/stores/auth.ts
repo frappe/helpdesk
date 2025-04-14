@@ -1,7 +1,7 @@
 import { computed, ComputedRef, Ref, ref } from "vue";
 import { defineStore } from "pinia";
 import { createResource, call } from "frappe-ui";
-import { router, REDIRECT_PAGE } from "@/router";
+import { router, LOGIN_PAGE } from "@/router";
 
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
@@ -21,20 +21,20 @@ export const useAuthStore = defineStore("auth", () => {
 
   const user__ = computed(() => userInfo.data || {});
   const hasDeskAccess: ComputedRef<boolean> = computed(
-    () => user__.value.has_desk_access,
+    () => user__.value.has_desk_access
   );
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
   const isManager: ComputedRef<boolean> = computed(
-    () => user__.value.is_manager,
+    () => user__.value.is_manager
   );
 
   const userId: ComputedRef<string> = computed(() => user__.value.user_id);
   const userImage: ComputedRef<string> = computed(
-    () => user__.value.user_image,
+    () => user__.value.user_image
   );
   const userFirstName: ComputedRef<string> = computed(
-    () => user__.value.user_first_name,
+    () => user__.value.user_first_name
   );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
@@ -65,7 +65,7 @@ export const useAuthStore = defineStore("auth", () => {
   function logout() {
     user.value = null;
     call(URI_LOGOUT).then(() => {
-      window.location.href = REDIRECT_PAGE;
+      window.location.href = LOGIN_PAGE;
     });
   }
 

@@ -3,7 +3,7 @@
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto py-3',
-      true && 'min-h-[7rem]',
+      'min-h-[7rem]',
       getFontFamily(newEmail),
     ]"
     :content="newEmail"
@@ -14,7 +14,7 @@
     :extensions="[PreserveVideoControls]"
   >
     <template #top>
-      <div class="mx-10 flex ml-6 items-center gap-2 border-y py-2.5">
+      <div class="mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -35,7 +35,7 @@
       </div>
       <div
         v-if="showCC || cc"
-        class="mx-10 flex ml-6 items-center gap-2 py-2.5"
+        class="mx-10 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">CC:</span>
@@ -49,7 +49,7 @@
       </div>
       <div
         v-if="showBCC || bcc"
-        class="mx-10 flex ml-6 items-center gap-2 py-2.5"
+        class="mx-10 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">BCC:</span>
@@ -119,28 +119,14 @@
           </div>
         </div>
         <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
-          <Button
-            label="Discard"
-            @click="
-              () => {
-                ccEmailsClone = [];
-                bccEmailsClone = [];
-                cc = false;
-                bcc = false;
-                newEmail = null;
-                attachments = null;
-                emit('discard');
-              }
-            "
-          />
+          <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
             :disabled="emailEmpty"
-            :loading="loading"
-            label="Submit"
+            :loading="sendMail.loading"
+            label="Send"
             @click="
               () => {
-                loading = true;
                 submitMail();
               }
             "
@@ -182,7 +168,6 @@ import { PreserveVideoControls } from "@/tiptap-extensions";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
-const loading = ref(false);
 
 const props = defineProps({
   placeholder: {
@@ -214,7 +199,7 @@ const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
-const attachments = useStorage("emailBoxAttachments" + doc.value.name, []);
+const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
 });
@@ -234,6 +219,27 @@ function applyCannedResponse(template) {
   showCannedResponseSelectorModal.value = false;
 }
 
+const sendMail = createResource({
+  url: "run_doc_method",
+  makeParams: () => ({
+    dt: props.doctype,
+    dn: doc.value.name,
+    method: "reply_via_agent",
+    args: {
+      attachments: attachments.value.map((x) => x.name),
+      to: toEmailsClone.value.join(","),
+      cc: ccEmailsClone.value?.join(","),
+      bcc: bccEmailsClone.value?.join(","),
+      message: newEmail.value,
+    },
+  }),
+  onSuccess: () => {
+    resetState();
+    emit("submit");
+  },
+  debounce: 300,
+});
+
 function submitMail() {
   if (isContentEmpty(newEmail.value)) {
     return;
@@ -246,34 +252,6 @@ function submitMail() {
     });
     return;
   }
-  const sendMail = createResource({
-    url: "run_doc_method",
-    makeParams: () => ({
-      dt: props.doctype,
-      dn: doc.value.name,
-      method: "reply_via_agent",
-      args: {
-        attachments: attachments.value.map((x) => x.name),
-        to: toEmailsClone.value.join(","),
-        cc: ccEmailsClone.value?.join(","),
-        bcc: bccEmailsClone.value?.join(","),
-        message: newEmail.value,
-      },
-    }),
-    onSuccess: () => {
-      resetState();
-      emit("submit");
-    },
-    onError: (err) => {
-      loading.value = false;
-      createToast({
-        title: err.exc_type,
-        text: err.messages[0],
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
-  });
 
   sendMail.submit();
 }
@@ -321,8 +299,20 @@ function addToReply(
 
 function resetState() {
   newEmail.value = null;
-  attachments.value = null;
-  loading.value = false;
+  attachments.value = [];
+}
+
+function handleDiscard() {
+  attachments.value = [];
+  newEmail.value = null;
+
+  ccEmailsClone.value = [];
+  bccEmailsClone.value = [];
+  ccEmailsClone.value = [];
+  showCC.value = false;
+  showBCC.value = false;
+
+  emit("discard");
 }
 
 const editor = computed(() => {

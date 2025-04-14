@@ -25,7 +25,7 @@ export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 
 export const CUSTOMER_PORTAL_LANDING = "TicketsCustomer";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
-export const REDIRECT_PAGE = "/login?redirect-to=/helpdesk";
+export const LOGIN_PAGE = "/login?redirect-to=/helpdesk";
 
 export const CUSTOMER_PORTAL_ROUTES = [
   "TicketsCustomer",
@@ -223,7 +223,13 @@ router.beforeEach(async (to, _, next) => {
   }
 
   if (!authStore.isLoggedIn) {
-    window.location.href = REDIRECT_PAGE;
+    window.location.href = LOGIN_PAGE;
+  } else if (to.name === "TicketAgent" && !authStore.isAgent) {
+    const ticketId = to.params.ticketId;
+    next({
+      name: "TicketCustomer",
+      params: { ticketId },
+    });
   } else {
     next();
   }

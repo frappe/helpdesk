@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col comm-area">
     <div
-      class="flex justify-between gap-3 border-t px-4 lg:px-6 py-4 md:py-2.5"
+      class="flex justify-between gap-3 border-t px-4 lg:px-10 py-4 md:py-2.5"
     >
       <div class="flex gap-1.5">
         <Button
@@ -35,10 +35,9 @@
       <CommentTextEditor
         ref="commentTextEditorRef"
         v-model="doc"
-        v-model:attachments="attachments"
         :editable="showCommentBox"
         :doctype="doctype"
-        placeholder="Add a comment..."
+        placeholder="@John could you please look into this?"
         @submit="
           () => {
             showCommentBox = false;
@@ -62,7 +61,7 @@
         ref="emailEditorRef"
         v-model="doc"
         v-model:content="content"
-        v-model:attachments="attachments"
+        placeholder="Hi John, we are looking into this issue."
         :to-emails="toEmails"
         :cc-emails="ccEmails"
         :bcc-emails="bccEmails"
@@ -94,7 +93,6 @@ const doc = defineModel();
 
 const showEmailBox = ref(false);
 const showCommentBox = ref(false);
-const attachments = ref([]);
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);

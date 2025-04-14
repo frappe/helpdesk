@@ -62,6 +62,7 @@
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
+                :ticket-status="ticket.data?.status"
                 @update="
                   () => {
                     ticket.reload();
@@ -95,6 +96,7 @@
         :ticket="ticket.data"
         @update="({ field, value }) => updateTicket(field, value)"
         @email:open="(e) => communicationAreaRef.toggleEmailBox()"
+        @reload="ticket.reload()"
       />
     </div>
     <AssignmentModal
@@ -221,6 +223,7 @@ const ticket = createResource({
     renameSubject.value = data.subject;
   },
   onSuccess: (ticket) => {
+    document.title = ticket.subject;
     setupCustomizations(ticket, {
       doc: ticket,
       call,
@@ -295,7 +298,7 @@ const tabs: TabObject[] = [
 ];
 
 const activities = computed(() => {
-  const emailProps = ticket.data.communications.map((email) => {
+  const emailProps = ticket.data.communications.map((email, idx: number) => {
     return {
       subject: email.subject,
       content: email.content,
@@ -307,6 +310,8 @@ const activities = computed(() => {
       bcc: email.bcc,
       creation: email.creation,
       attachments: email.attachments,
+      name: email.name,
+      isFirstEmail: idx === 0,
     };
   });
 
@@ -402,7 +407,6 @@ function updateOptimistic(fieldname: string, value: string) {
 }
 
 onMounted(() => {
-  document.title = props.ticketId;
   socket.on("helpdesk:ticket-update", (ticketID) => {
     if (ticketID === Number(props.ticketId)) {
       ticket.reload();
