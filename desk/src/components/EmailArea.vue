@@ -5,14 +5,17 @@
   >
     <div class="mb-1 flex items-center justify-between gap-2">
       <!-- email design for mobile -->
-      <div v-if="isMobileView" class="flex items-center gap-2">
+      <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
-          <span>{{ sender.full_name || "No name found" }}</span>
-          <span
-            class="sm:flex hidden text-sm text-gray-600"
-            v-if="sender.name"
-            >{{ "<" + sender.name + ">" }}</span
-          >
+          <p>{{ sender.full_name || "No name found" }}</p>
+          <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+            <p class="text-xs md:text-sm text-gray-600">
+              {{ timeAgo(creation) }}
+            </p>
+          </Tooltip>
+          <p class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
+            {{ "<" + sender.name + ">" }}
+          </p>
         </div>
       </div>
       <!-- email design for desktop -->
@@ -24,10 +27,13 @@
       </div>
 
       <div class="flex gap-0.5 items-center">
-        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <div class="text-sm text-gray-600">
+        <Tooltip
+          :text="dateFormat(creation, dateTooltipFormat)"
+          v-if="!isMobileView"
+        >
+          <p class="text-xs md:text-sm text-gray-600">
             {{ timeAgo(creation) }}
-          </div>
+          </p>
         </Tooltip>
         <Button
           variant="ghost"
@@ -56,7 +62,7 @@
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
         <Dropdown
-          v-if="showMergeOption"
+          v-if="showSplitOption"
           :options="[
             {
               label: 'Split Ticket',
@@ -119,7 +125,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  showMergeOption: {
+  showSplitOption: {
     type: Boolean,
     default: false,
   },
@@ -127,6 +133,7 @@ const props = defineProps({
 
 const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
   props.activity;
+console.log(sender);
 
 const emit = defineEmits(["reply"]);
 

@@ -5,7 +5,7 @@
         <p class="text-p-base text-ink-gray-8">
           All
           <span class="underline">emails/ comments</span>
-          after this email will be moved to new ticket.
+          from this email onwards will be moved to new ticket.
         </p>
         <FormControl
           label="New Ticket Subject"

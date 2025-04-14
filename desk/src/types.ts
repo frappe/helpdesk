@@ -319,6 +319,7 @@ export interface EmailActivity extends BaseActivity {
   sender: { full_name: string; name: string };
   subject: string;
   to: string;
+  isFirstEmail: boolean;
 }
 
 export interface CommentActivity extends BaseActivity {

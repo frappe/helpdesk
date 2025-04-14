@@ -9,7 +9,7 @@
         >#{{ ticket.name }}
       </span>
       <Dropdown
-        v-if="!ticket.is_merged"
+        v-if="showMergeOption"
         :options="[
           {
             label: 'Merge Ticket',
@@ -54,12 +54,13 @@ import TicketMergeModal from "./TicketMergeModal.vue";
 import LucideMerge from "~icons/lucide/merge";
 import { copyToClipboard } from "@/utils";
 import { Ticket } from "@/types";
+import { computed } from "vue";
 
 interface Props {
   ticket: Ticket;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emit = defineEmits(["update", "email:open", "reload"]);
 
@@ -71,4 +72,10 @@ function update(val = null) {
 }
 
 const showMergeModal = ref(false);
+
+const showMergeOption = computed(() => {
+  return (
+    !props.ticket.is_merged && ["Open", "Replied"].includes(props.ticket.status)
+  );
+});
 </script>

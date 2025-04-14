@@ -136,11 +136,10 @@
           <Button
             variant="solid"
             :disabled="emailEmpty"
-            :loading="loading"
+            :loading="sendMail.loading"
             label="Submit"
             @click="
               () => {
-                loading = true;
                 submitMail();
               }
             "
@@ -182,7 +181,6 @@ import { PreserveVideoControls } from "@/tiptap-extensions";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
-const loading = ref(false);
 
 const props = defineProps({
   placeholder: {
@@ -234,6 +232,27 @@ function applyCannedResponse(template) {
   showCannedResponseSelectorModal.value = false;
 }
 
+const sendMail = createResource({
+  url: "run_doc_method",
+  makeParams: () => ({
+    dt: props.doctype,
+    dn: doc.value.name,
+    method: "reply_via_agent",
+    args: {
+      attachments: attachments.value.map((x) => x.name),
+      to: toEmailsClone.value.join(","),
+      cc: ccEmailsClone.value?.join(","),
+      bcc: bccEmailsClone.value?.join(","),
+      message: newEmail.value,
+    },
+  }),
+  onSuccess: () => {
+    resetState();
+    emit("submit");
+  },
+  debounce: 300,
+});
+
 function submitMail() {
   if (isContentEmpty(newEmail.value)) {
     return;
@@ -246,34 +265,6 @@ function submitMail() {
     });
     return;
   }
-  const sendMail = createResource({
-    url: "run_doc_method",
-    makeParams: () => ({
-      dt: props.doctype,
-      dn: doc.value.name,
-      method: "reply_via_agent",
-      args: {
-        attachments: attachments.value.map((x) => x.name),
-        to: toEmailsClone.value.join(","),
-        cc: ccEmailsClone.value?.join(","),
-        bcc: bccEmailsClone.value?.join(","),
-        message: newEmail.value,
-      },
-    }),
-    onSuccess: () => {
-      resetState();
-      emit("submit");
-    },
-    onError: (err) => {
-      loading.value = false;
-      createToast({
-        title: err.exc_type,
-        text: err.messages[0],
-        icon: "x",
-        iconClasses: "text-red-500",
-      });
-    },
-  });
 
   sendMail.submit();
 }
@@ -322,7 +313,6 @@ function addToReply(
 function resetState() {
   newEmail.value = null;
   attachments.value = null;
-  loading.value = false;
 }
 
 const editor = computed(() => {

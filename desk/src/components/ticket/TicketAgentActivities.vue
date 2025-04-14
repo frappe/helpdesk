@@ -40,7 +40,9 @@
             <EmailArea
               v-if="activity.type === 'email'"
               :activity="activity"
-              :show-merge-option="i !== 0"
+              :show-split-option="
+                !activity.isFirstEmail && ticketStatus !== 'Closed'
+              "
               class="py-2 px-3"
               @reply="(e) => emit('email:reply', e)"
             />
@@ -96,6 +98,10 @@ const props = defineProps({
   title: {
     type: String,
     required: true,
+  },
+  ticketStatus: {
+    type: String,
+    default: "",
   },
 });
 

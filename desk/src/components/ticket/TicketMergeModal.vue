@@ -52,6 +52,7 @@
           targetTicket ? `Merge with ticket #${targetTicket} ` : 'Select Ticket'
         "
         :loading="mergeTicket.loading"
+        :icon-left="targetTicket && LucideMerge"
         @click="handleTicketMerge"
       />
     </template>
@@ -65,7 +66,7 @@ import { Ticket } from "@/types";
 import TriangleAlert from "~icons/lucide/triangle-alert";
 import { createToast } from "@/utils";
 import { watch } from "vue";
-
+import LucideMerge from "~icons/lucide/merge";
 // interface P
 interface Props {
   ticket: Ticket;

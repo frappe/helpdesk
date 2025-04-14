@@ -276,11 +276,13 @@ def merge_ticket(source: int, target: int):
     doc.is_merged = 1
     doc.merged_with = target
     doc.save()
+
+    message = _(
+        "This ticket (#{0}) has been merged with ticket <a href = '/helpdesk/tickets/{1}'>#{1}</a> ."
+    ).format(source, target)
     controller.reply_via_agent(
         doc,
-        message=_("Ticket <b>#{0}</b> has been merged with ticket <b>#{1}</b>.").format(
-            source, target
-        ),
+        message=message,
     )
 
     # comment in target ticket that
@@ -290,12 +292,9 @@ def merge_ticket(source: int, target: int):
     source_link = frappe.utils.get_url("/helpdesk/tickets/" + str(source))
     target_link = frappe.utils.get_url("/helpdesk/tickets/" + str(target))
     c.content = _(
-        f"<p> Ticket <a href={source_link}> #{source}</a>  has been merged with ticket <a href={target_link}> #{target} </a>.</p>"
+        f"Ticket <a href={source_link}> #{source}</a>  has been merged with ticket <a href={target_link}> #{target}</a> ."
     )
     c.save()
-
-    # create comment on target ticket that source ticket is merged with target ticket
-    # create communication on source ticket that source ticket is merged with target ticket
 
 
 def duplicate_list_retain_timestamp(doctype, activities: list, target: int, controller):
@@ -415,12 +414,14 @@ def split_ticket(subject: str, communication_id: str):
         update_modified=False,
     )
 
+    new_ticket_link = frappe.utils.get_url("/helpdesk/tickets/" + str(new_ticket))
+
     controller = get_controller("HD Ticket")
     controller.reply_via_agent(
         ticket_doc,
         message=_(
-            "This ticket has been split to a new ticket. Please follow up on ticket <b>#{0}</b>."
-        ).format(new_ticket),
+            "This ticket has been split to a new ticket. Please follow up on ticket <a href={0}>#{1}</a> ."
+        ).format(new_ticket_link, new_ticket),
     )
 
     # Email on the old ticket that it has been split to new_ticket
