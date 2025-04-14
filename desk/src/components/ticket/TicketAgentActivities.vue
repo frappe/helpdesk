@@ -1,6 +1,6 @@
 <template>
   <ActivityHeader :title="title" />
-  <div class="flex flex-col flex-1 overflow-y-auto">
+  <FadedScrollableDiv class="flex flex-col flex-1 overflow-y-auto">
     <div v-if="activities.length" class="activities flex-1 h-full mt-1">
       <div
         v-for="(activity, i) in activities"
@@ -73,7 +73,7 @@
         @click="communicationAreaRef.toggleCommentBox()"
       />
     </div>
-  </div>
+  </FadedScrollableDiv>
 </template>
 
 <script setup lang="ts">
@@ -90,6 +90,7 @@ import { EmailArea, CommentBox, HistoryBox } from "@/components";
 import { useUserStore } from "@/stores/user";
 import { Avatar } from "frappe-ui";
 import { TicketActivity } from "@/types";
+import { FadedScrollableDiv } from "@/components";
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,

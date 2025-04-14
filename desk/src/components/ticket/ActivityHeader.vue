@@ -1,6 +1,6 @@
 <template>
   <div
-    class="md:mx-8 md:my-4 flex items-center justify-between text-lg font-medium !mx-10 mb-4 mt-8"
+    class="md:mx-8 md:my-4 flex items-center justify-between text-lg font-medium !mx-10 mb-4 !mt-8"
   >
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
