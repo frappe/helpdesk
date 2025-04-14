@@ -130,7 +130,6 @@ const { name, creation, content, commenter, commentedBy, attachments } =
   props.activity;
 
 const isTicketMergedComment = computed(() => {
-  // regex to check if the content includes "has been merged with ticket #number"
   const regex = /has been merged with ticket #\d+/;
   return regex.test(content);
 });
