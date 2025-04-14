@@ -119,20 +119,7 @@
           </div>
         </div>
         <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
-          <Button
-            label="Discard"
-            @click="
-              () => {
-                ccEmailsClone = [];
-                bccEmailsClone = [];
-                cc = false;
-                bcc = false;
-                newEmail = null;
-                attachments = null;
-                emit('discard');
-              }
-            "
-          />
+          <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
             :disabled="emailEmpty"
@@ -212,7 +199,7 @@ const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
-const attachments = useStorage("emailBoxAttachments" + doc.value.name, []);
+const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
 });
@@ -312,7 +299,20 @@ function addToReply(
 
 function resetState() {
   newEmail.value = null;
-  attachments.value = null;
+  attachments.value = [];
+}
+
+function handleDiscard() {
+  attachments.value = [];
+  newEmail.value = null;
+
+  ccEmailsClone.value = [];
+  bccEmailsClone.value = [];
+  ccEmailsClone.value = [];
+  showCC.value = false;
+  showBCC.value = false;
+
+  emit("discard");
 }
 
 const editor = computed(() => {

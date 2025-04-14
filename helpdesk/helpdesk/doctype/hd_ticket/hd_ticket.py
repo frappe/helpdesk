@@ -65,6 +65,11 @@ class HDTicket(Document):
 
     def after_insert(self):
         if self.ticket_split_from:
+            log_ticket_activity(
+                self.name,
+                "split the ticket from #{0}".format(self.ticket_split_from),
+            )
+            capture_event("ticket_split")
             return
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")

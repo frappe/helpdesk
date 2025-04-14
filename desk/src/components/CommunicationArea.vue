@@ -35,7 +35,6 @@
       <CommentTextEditor
         ref="commentTextEditorRef"
         v-model="doc"
-        v-model:attachments="attachments"
         :editable="showCommentBox"
         :doctype="doctype"
         placeholder="@John could you please look into this?"
@@ -62,7 +61,6 @@
         ref="emailEditorRef"
         v-model="doc"
         v-model:content="content"
-        v-model:attachments="attachments"
         placeholder="Hi John, we are looking into this issue."
         :to-emails="toEmails"
         :cc-emails="ccEmails"
@@ -95,7 +93,6 @@ const doc = defineModel();
 
 const showEmailBox = ref(false);
 const showCommentBox = ref(false);
-const attachments = ref([]);
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
