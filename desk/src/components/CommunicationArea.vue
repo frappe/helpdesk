@@ -38,7 +38,7 @@
         v-model:attachments="attachments"
         :editable="showCommentBox"
         :doctype="doctype"
-        placeholder="Add a comment..."
+        placeholder="@John could you please look into this?"
         @submit="
           () => {
             showCommentBox = false;
@@ -63,6 +63,7 @@
         v-model="doc"
         v-model:content="content"
         v-model:attachments="attachments"
+        placeholder="Hi John, we are looking into this issue."
         :to-emails="toEmails"
         :cc-emails="ccEmails"
         :bcc-emails="bccEmails"

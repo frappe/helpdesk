@@ -5,7 +5,7 @@
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
-        'min-h-[7rem] mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
+        'min-h-[7rem] mx-6 max-h-[50vh] overflow-y-auto border-t py-3',
       getFontFamily(newComment),
     ]"
     :content="newComment"
@@ -77,7 +77,7 @@
             />
             <Button
               variant="solid"
-              label="Submit"
+              label="Comment"
               :disabled="commentEmpty"
               :loading="loading"
               @click="
