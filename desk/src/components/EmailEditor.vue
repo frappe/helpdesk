@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-6 max-h-[50vh] overflow-y-auto py-3',
+      'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
     ]"
@@ -14,7 +14,7 @@
     :extensions="[PreserveVideoControls]"
   >
     <template #top>
-      <div class="mx-10 flex mx-6 items-center gap-2 border-y py-2.5">
+      <div class="mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -35,7 +35,7 @@
       </div>
       <div
         v-if="showCC || cc"
-        class="mx-10 flex mx-6 items-center gap-2 py-2.5"
+        class="mx-10 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">CC:</span>
@@ -49,7 +49,7 @@
       </div>
       <div
         v-if="showBCC || bcc"
-        class="mx-10 flex mx-6 items-center gap-2 py-2.5"
+        class="mx-10 flex items-center gap-2 py-2.5"
         :class="bcc || showBCC ? 'border-b' : ''"
       >
         <span class="text-xs text-gray-500">BCC:</span>
