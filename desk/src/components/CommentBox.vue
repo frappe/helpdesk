@@ -30,6 +30,7 @@
                 label: 'Edit',
                 onClick: () => handleEditMode(),
                 icon: 'edit-2',
+                condition: () => !isTicketMergedComment,
               },
               {
                 label: 'Delete',
@@ -94,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, PropType, onMounted } from "vue";
+import { ref, PropType, onMounted, computed } from "vue";
 import {
   Dropdown,
   createResource,
@@ -127,6 +128,12 @@ const { getUser } = useUserStore();
 
 const { name, creation, content, commenter, commentedBy, attachments } =
   props.activity;
+
+const isTicketMergedComment = computed(() => {
+  // regex to check if the content includes "has been merged with ticket #number"
+  const regex = /has been merged with ticket #\d+/;
+  return regex.test(content);
+});
 
 const emit = defineEmits(["update"]);
 const showDialog = ref(false);
