@@ -11,15 +11,13 @@
           class="w-full focus:outline-none outline-none border-inherit shadow-none"
           v-bind="$attrs"
           v-model="query"
-          @update:model-value="
-				(e:string) => {
-				  if (e.length >= 3) {
-					open();
-				  } else {
-					close();
-				  }
-				}
-			  "
+          @update:model-value="(e:string)=>{
+            if (e.length >= 3) {
+              open();
+            } else {
+            close();
+            }
+          }"
         >
           <template #prefix>
             <Icon icon="lucide:search" class="h-4 w-4 text-gray-500" />
