@@ -1,0 +1,14 @@
+<div>
+  <p>Hello,</p>
+  <p>You have a new reply on the ticket <strong>#{{ ticket_id }}</strong>.</p>
+  <p><strong>Subject:</strong> {{ticket_subject}}</p>
+  <p><strong>Raised By:</strong> {{raised_by}}</p>
+  <p><strong>Priority:</strong> {{priority}}</p>
+
+  <br />
+  <p>
+    You can view and respond to this ticket by
+    <a href="{{ ticket_url }}">clicking here</a>.
+  </p>
+  <p>Regards,<br />Support Team</p>
+</div>
