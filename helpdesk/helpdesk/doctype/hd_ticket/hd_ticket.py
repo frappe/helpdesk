@@ -541,6 +541,7 @@ class HDTicket(Document):
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
 
+        # send email to assigned agents
         self.send_email_to_agent(message)
 
         _attachments = self.get("attachments") or attachments or []
@@ -558,8 +559,6 @@ class HDTicket(Document):
         )
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
-
-        # send email to assigned agents
 
     def send_email_to_agent(self, message):
         assigned_agents = self.get_assigned_agents()

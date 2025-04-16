@@ -173,7 +173,6 @@ const template = createResource({
     setupTemplateFields(doc.fields);
   },
   onSuccess: (data) => {
-    console.log(data);
     description.value = data.description_template || "";
     oldFields = window.structuredClone(data.fields || []);
   },
