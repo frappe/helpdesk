@@ -540,6 +540,9 @@ class HDTicket(Document):
         c.ignore_permissions = True
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
+
+        self.send_email_to_agent(message)
+
         _attachments = self.get("attachments") or attachments or []
         if not len(_attachments):
             return
@@ -555,6 +558,38 @@ class HDTicket(Document):
         )
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
+
+        # send email to assigned agents
+
+    def send_email_to_agent(self, message):
+        assigned_agents = self.get_assigned_agents()
+        if not assigned_agents:
+            return
+
+        recipients = [a.get("name") for a in self.get_assigned_agents()]
+
+        args = {
+            "ticket_id": self.name,
+            "ticket_subject": self.subject,
+            "message": message,
+            "priority": self.priority,
+            "raised_by": self.raised_by,
+            "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
+        }
+
+        try:
+            frappe.sendmail(
+                recipients=recipients,
+                subject="Re: " + self.subject,
+                message=message,
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                template="new_reply_to_agent",
+                args=args,
+                now=True,
+            )
+        except Exception as e:
+            frappe.throw(_(e))
 
     @frappe.whitelist()
     def mark_seen(self):
