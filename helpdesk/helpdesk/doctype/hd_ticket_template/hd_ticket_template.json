@@ -10,7 +10,8 @@
  "field_order": [
   "template_name",
   "about",
-  "fields"
+  "fields",
+  "description_template"
  ],
  "fields": [
   {
@@ -22,7 +23,7 @@
   {
    "fieldname": "about",
    "fieldtype": "Code",
-   "label": "About",
+   "label": "Additional Information",
    "options": "HTML"
   },
   {
@@ -30,11 +31,17 @@
    "fieldtype": "Table",
    "label": "Fields",
    "options": "HD Ticket Template Field"
+  },
+  {
+   "fieldname": "description_template",
+   "fieldtype": "Text Editor",
+   "label": "Description Template"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-02 15:56:25.602767",
+ "modified": "2025-04-16 13:05:11.916581",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket Template",
@@ -75,6 +82,7 @@
    "share": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
