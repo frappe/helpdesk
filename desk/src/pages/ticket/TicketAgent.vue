@@ -62,6 +62,7 @@
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
+                :ticket-status="ticket.data?.status"
                 @update="
                   () => {
                     ticket.reload();
@@ -95,6 +96,7 @@
         :ticket="ticket.data"
         @update="({ field, value }) => updateTicket(field, value)"
         @email:open="(e) => communicationAreaRef.toggleEmailBox()"
+        @reload="ticket.reload()"
       />
     </div>
     <AssignmentModal
@@ -221,6 +223,7 @@ const ticket = createResource({
     renameSubject.value = data.subject;
   },
   onSuccess: (ticket) => {
+    document.title = ticket.subject;
     setupCustomizations(ticket, {
       doc: ticket,
       call,
@@ -295,7 +298,7 @@ const tabs: TabObject[] = [
 ];
 
 const activities = computed(() => {
-  const emailProps = ticket.data.communications.map((email) => {
+  const emailProps = ticket.data.communications.map((email, idx: number) => {
     return {
       subject: email.subject,
       content: email.content,
@@ -307,6 +310,8 @@ const activities = computed(() => {
       bcc: email.bcc,
       creation: email.creation,
       attachments: email.attachments,
+      name: email.name,
+      isFirstEmail: idx === 0,
     };
   });
 
@@ -370,11 +375,11 @@ function filterActivities(eventType: TicketTab) {
   }
   return activities.value.filter((activity) => activity.type === eventType);
 }
-
+const isErrorTriggered = ref(false);
 function updateTicket(fieldname: string, value: string) {
   if (value === ticket.data[fieldname]) return;
   updateOptimistic(fieldname, value);
-  isLoading.value = true;
+
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -387,6 +392,13 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
+      isErrorTriggered.value = false;
+      ticket.reload();
+    },
+    onError: () => {
+      if (isErrorTriggered.value) return;
+      isErrorTriggered.value = true;
+
       ticket.reload();
     },
   });
@@ -402,7 +414,6 @@ function updateOptimistic(fieldname: string, value: string) {
 }
 
 onMounted(() => {
-  document.title = props.ticketId;
   socket.on("helpdesk:ticket-update", (ticketID) => {
     if (ticketID === Number(props.ticketId)) {
       ticket.reload();

@@ -64,11 +64,18 @@ class HDTicket(Document):
         self.apply_sla()
 
     def after_insert(self):
+        if self.ticket_split_from:
+            log_ticket_activity(
+                self.name,
+                "split the ticket from #{0}".format(self.ticket_split_from),
+            )
+            capture_event("ticket_split")
+            return
         log_ticket_activity(self.name, "created this ticket")
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
-            self.create_communication_via_contact(self.description)
+            self.create_communication_via_contact(self.description, new_ticket=True)
 
     def on_update(self):
         # flake8: noqa
@@ -148,7 +155,15 @@ class HDTicket(Document):
         )
 
     def set_first_responded_on(self):
-        if self.status == "Replied":
+        old_status = (
+            self.get_doc_before_save().status if self.get_doc_before_save() else None
+        )
+        is_closed_or_resoled = old_status == "Open" and self.status in [
+            "Resolved",
+            "Closed",
+        ]
+
+        if self.status == "Replied" or is_closed_or_resoled:
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
@@ -312,6 +327,12 @@ class HDTicket(Document):
         activities = frappe.db.get_all("HD Ticket Activity", {"ticket": self.name})
         for activity in activities:
             frappe.db.delete("HD Ticket Activity", activity)
+
+        comments = frappe.db.get_all(
+            "HD Ticket Comment", {"reference_ticket": self.name}
+        )
+        for comment in comments:
+            frappe.db.delete("HD Ticket Comment", comment)
 
     def skip_email_workflow(self):
         skip: str = frappe.get_value("HD Settings", None, "skip_email_workflow") or "0"
@@ -498,7 +519,13 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     # flake8: noqa
-    def create_communication_via_contact(self, message, attachments=[]):
+    def create_communication_via_contact(
+        self, message, attachments=[], new_ticket=False
+    ):
+
+        if not new_ticket:
+            # send email to assigned agents
+            self.send_reopen_email_to_agent(message)
 
         if self.status == "Replied":
             self.status = "Open"
@@ -519,6 +546,7 @@ class HDTicket(Document):
         c.ignore_permissions = True
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
+
         _attachments = self.get("attachments") or attachments or []
         if not len(_attachments):
             return
@@ -534,6 +562,36 @@ class HDTicket(Document):
         )
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
+
+    def send_reopen_email_to_agent(self, message):
+        assigned_agents = self.get_assigned_agents()
+        if not assigned_agents:
+            return
+
+        recipients = [a.get("name") for a in self.get_assigned_agents()]
+
+        args = {
+            "ticket_id": self.name,
+            "ticket_subject": self.subject,
+            "message": message,
+            "priority": self.priority,
+            "raised_by": self.raised_by,
+            "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
+        }
+
+        try:
+            frappe.sendmail(
+                recipients=recipients,
+                subject="Re: " + self.subject,
+                message=message,
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                template="new_reply_to_agent",
+                args=args,
+                now=True,
+            )
+        except Exception as e:
+            frappe.throw(_(e))
 
     @frappe.whitelist()
     def mark_seen(self):

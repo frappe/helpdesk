@@ -35,7 +35,10 @@
         />
       </div>
       <!-- existing fields -->
-      <div class="flex flex-col" :class="subject.length >= 2 && 'gap-5'">
+      <div
+        class="flex flex-col"
+        :class="(subject.length >= 2 || description.length) && 'gap-5'"
+      >
         <div class="flex flex-col gap-2">
           <span class="block text-sm text-gray-700">
             Subject
@@ -170,6 +173,7 @@ const template = createResource({
     setupTemplateFields(doc.fields);
   },
   onSuccess: (data) => {
+    description.value = data.description_template || "";
     oldFields = window.structuredClone(data.fields || []);
   },
 });

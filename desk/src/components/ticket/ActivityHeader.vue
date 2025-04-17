@@ -1,6 +1,6 @@
 <template>
   <div
-    class="md:mx-8 md:my-4 flex items-center justify-between text-lg font-medium mx-5 mb-4 mt-8"
+    class="md:mx-8 md:my-4 flex items-center justify-between text-lg font-medium !mx-10 mb-4 !mt-8"
   >
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
@@ -64,12 +64,12 @@ const defaultActions = computed(() => {
   let actions = [
     {
       icon: h(EmailIcon, { class: "h-4 w-4" }),
-      label: "New Email",
+      label: "Email",
       onClick: () => communicationAreaRef.value.toggleEmailBox(),
     },
     {
       icon: h(CommentIcon, { class: "h-4 w-4" }),
-      label: "New Comment",
+      label: "Comment",
       onClick: () => communicationAreaRef.value.toggleCommentBox(),
     },
   ];

@@ -1,17 +1,21 @@
 <template>
   <div
+    v-bind="$attrs"
     class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
     <div class="mb-1 flex items-center justify-between gap-2">
       <!-- email design for mobile -->
-      <div v-if="isMobileView" class="flex items-center gap-2">
+      <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
-          <span>{{ sender.full_name || "No name found" }}</span>
-          <span
-            class="sm:flex hidden text-sm text-gray-600"
-            v-if="sender.name"
-            >{{ "<" + sender.name + ">" }}</span
-          >
+          <p>{{ sender.full_name || "No name found" }}</p>
+          <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
+            <p class="text-xs md:text-sm text-gray-600">
+              {{ timeAgo(creation) }}
+            </p>
+          </Tooltip>
+          <p class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
+            {{ "<" + sender.name + ">" }}
+          </p>
         </div>
       </div>
       <!-- email design for desktop -->
@@ -23,10 +27,13 @@
       </div>
 
       <div class="flex gap-0.5 items-center">
-        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-          <div class="text-sm text-gray-600">
+        <Tooltip
+          :text="dateFormat(creation, dateTooltipFormat)"
+          v-if="!isMobileView"
+        >
+          <p class="text-xs md:text-sm text-gray-600">
             {{ timeAgo(creation) }}
-          </div>
+          </p>
         </Tooltip>
         <Button
           variant="ghost"
@@ -54,6 +61,22 @@
         >
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
+        <Dropdown
+          v-if="showSplitOption"
+          :options="[
+            {
+              label: 'Split Ticket',
+              icon: LucideSplit,
+              onClick: () => (showSplitModal = true),
+            },
+          ]"
+        >
+          <Button
+            icon="more-horizontal"
+            class="text-gray-600"
+            variant="ghost"
+          />
+        </Dropdown>
       </div>
     </div>
     <!-- <div class="text-sm leading-5 text-gray-600">
@@ -81,27 +104,41 @@
       />
     </div>
   </div>
+  <TicketSplitModal
+    v-model="showSplitModal"
+    :ticket_id="name"
+    :communication_id="name"
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
 import { ReplyIcon, ReplyAllIcon } from "./icons";
+import LucideSplit from "~icons/lucide/split";
 import { useScreenSize } from "@/composables/screen";
+import TicketSplitModal from "./ticket/TicketSplitModal.vue";
 
 const props = defineProps({
   activity: {
     type: Object,
     required: true,
   },
+  showSplitOption: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const { sender, to, cc, bcc, creation, subject, attachments, content } =
+const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
   props.activity;
 
 const emit = defineEmits(["reply"]);
 
 const { isMobileView } = useScreenSize();
+
+const showSplitModal = ref(false);
 
 // TODO: Implement reply functionality using this way instead of emit drillup
 // function reply(email, reply_all = false) {

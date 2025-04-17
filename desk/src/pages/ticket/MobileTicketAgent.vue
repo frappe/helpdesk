@@ -92,6 +92,7 @@
                 ref="ticketAgentActivitiesRef"
                 :activities="filterActivities(tab.name)"
                 :title="tab.label"
+                :ticket-status="ticket.data?.status"
                 @update="
                   () => {
                     ticket.reload();
@@ -318,7 +319,7 @@ const tabs: TabObject[] = [
 ];
 
 const activities = computed(() => {
-  const emailProps = ticket.data.communications.map((email) => {
+  const emailProps = ticket.data.communications.map((email, idx: number) => {
     return {
       type: "email",
       key: email.creation,
@@ -330,6 +331,7 @@ const activities = computed(() => {
       subject: email.subject,
       attachments: email.attachments,
       content: email.content,
+      isFirstEmail: idx === 0,
     };
   });
 

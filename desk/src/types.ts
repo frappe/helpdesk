@@ -101,6 +101,7 @@ export interface Ticket {
   template: Template;
   views: ViewLog[];
   _customActions: Function[];
+  is_merged?: boolean;
 }
 
 export interface DocField {
@@ -314,9 +315,11 @@ export interface EmailActivity extends BaseActivity {
   attachments: FileAttachment;
   bcc: string;
   cc: string;
+  name: string;
   sender: { full_name: string; name: string };
   subject: string;
   to: string;
+  isFirstEmail: boolean;
 }
 
 export interface CommentActivity extends BaseActivity {

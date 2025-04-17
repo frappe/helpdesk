@@ -1,8 +1,10 @@
+import functools
 import re
 from typing import List
 
 import frappe
 from bs4 import BeautifulSoup
+from frappe import _
 from frappe.model.document import Document
 from frappe.realtime import get_website_room
 from frappe.utils.safe_exec import get_safe_globals
@@ -44,6 +46,7 @@ def is_agent(user: str = None) -> bool:
     user = user or frappe.session.user
     return (
         is_admin()
+        or "Agent Manager" in frappe.get_roles(user)
         or "Agent" in frappe.get_roles(user)
         or bool(frappe.db.exists("HD Agent", {"name": user}))
     )
@@ -74,7 +77,6 @@ def capture_event(event: str):
     return _capture(event, "helpdesk")
 
 
-@frappe.whitelist()
 def get_customer(contact: str) -> tuple[str]:
     """
     Get `Customer` from `Contact`
@@ -142,3 +144,20 @@ def get_context(d: Document) -> dict:
         "doc": d.as_dict(),
         "frappe": frappe._dict(utils=utils),
     }
+
+
+def agent_only(fn):
+    """Decorator to validate if user is an agent."""
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not is_agent():
+            frappe.throw(
+                msg=_("You are not permitted to access this resource."),
+                title=_("Not Allowed"),
+                exc=frappe.PermissionError,
+            )
+
+        return fn(*args, **kwargs)
+
+    return wrapper

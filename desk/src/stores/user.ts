@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { createResource } from "frappe-ui";
 import { useAuthStore } from "./auth";
 import { reactive } from "vue";
-import { REDIRECT_PAGE } from "@/router";
+import { LOGIN_PAGE } from "@/router";
 
 export const useUserStore = defineStore("user", () => {
   const auth = useAuthStore();
@@ -20,7 +20,7 @@ export const useUserStore = defineStore("user", () => {
     },
     onError(error) {
       if (error && error.exc_type === "AuthenticationError") {
-        window.location.href = REDIRECT_PAGE;
+        window.location.href = LOGIN_PAGE;
       }
     },
   });

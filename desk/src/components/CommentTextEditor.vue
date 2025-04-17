@@ -71,13 +71,14 @@
               @click="
                 () => {
                   newComment = '';
+                  attachments = [];
                   emit('discard');
                 }
               "
             />
             <Button
               variant="solid"
-              label="Submit"
+              label="Comment"
               :disabled="commentEmpty"
               :loading="loading"
               @click="
@@ -131,8 +132,8 @@ const props = defineProps({
 
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
-const attachments = useStorage("commentBoxAttachments" + doc.value.name, []);
 const newComment = useStorage("commentBoxContent" + doc.value.name, "");
+const attachments = ref([]);
 const commentEmpty = computed(() => {
   return isContentEmpty(newComment.value);
 });
@@ -169,7 +170,7 @@ async function submitComment() {
     onSuccess: () => {
       emit("submit");
       loading.value = false;
-      attachments.value = null;
+      attachments.value = [];
       newComment.value = null;
     },
     onError: () => {
