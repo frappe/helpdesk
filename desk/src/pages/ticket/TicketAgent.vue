@@ -375,11 +375,11 @@ function filterActivities(eventType: TicketTab) {
   }
   return activities.value.filter((activity) => activity.type === eventType);
 }
-
+const isErrorTriggered = ref(false);
 function updateTicket(fieldname: string, value: string) {
   if (value === ticket.data[fieldname]) return;
   updateOptimistic(fieldname, value);
-  isLoading.value = true;
+
   createResource({
     url: "frappe.client.set_value",
     params: {
@@ -392,6 +392,13 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       isLoading.value = false;
+      isErrorTriggered.value = false;
+      ticket.reload();
+    },
+    onError: () => {
+      if (isErrorTriggered.value) return;
+      isErrorTriggered.value = true;
+
       ticket.reload();
     },
   });
