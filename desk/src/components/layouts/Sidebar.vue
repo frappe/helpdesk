@@ -48,49 +48,51 @@
         </template>
       </SidebarLink>
     </div>
-    <div v-for="view in allViews" :key="view.label">
-      <div
-        v-if="!view.hideLabel && !isExpanded && view.views?.length"
-        class="mx-2 my-2 h-1"
-      />
-      <Section
-        :label="view.label"
-        :hideLabel="view.hideLabel"
-        :opened="view.opened"
-      >
-        <template #header="{ opened, hide, toggle }">
-          <div
-            v-if="!hide"
-            class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
-            :class="
-              !isExpanded
-                ? 'ml-0 h-0 overflow-hidden opacity-0'
-                : 'mt-4 h-7 w-auto opacity-100'
-            "
-            @click="toggle()"
-          >
-            <FeatherIcon
-              name="chevron-right"
-              class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-              :class="{ 'rotate-90': opened }"
+    <div class="overflow-y-auto">
+      <div v-for="view in allViews" :key="view.label">
+        <div
+          v-if="!view.hideLabel && !isExpanded && view.views?.length"
+          class="mx-2 my-2 h-1"
+        />
+        <Section
+          :label="view.label"
+          :hideLabel="view.hideLabel"
+          :opened="view.opened"
+        >
+          <template #header="{ opened, hide, toggle }">
+            <div
+              v-if="!hide"
+              class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+              :class="
+                !isExpanded
+                  ? 'ml-0 h-0 overflow-hidden opacity-0'
+                  : 'mt-4 h-7 w-auto opacity-100'
+              "
+              @click="toggle()"
+            >
+              <FeatherIcon
+                name="chevron-right"
+                class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                :class="{ 'rotate-90': opened }"
+              />
+              <span>{{ view.label }}</span>
+            </div>
+          </template>
+          <nav class="flex flex-col">
+            <SidebarLink
+              v-for="link in view.views"
+              :icon="link.icon"
+              :label="link.label"
+              :to="link.to"
+              :key="link.label"
+              :is-expanded="isExpanded"
+              :is-active="isActiveTab(link.to)"
+              class="my-0.5 emoji"
+              :onClick="link.onClick"
             />
-            <span>{{ view.label }}</span>
-          </div>
-        </template>
-        <nav class="flex flex-col">
-          <SidebarLink
-            v-for="link in view.views"
-            :icon="link.icon"
-            :label="link.label"
-            :to="link.to"
-            :key="link.label"
-            :is-expanded="isExpanded"
-            :is-active="isActiveTab(link.to)"
-            class="my-0.5 emoji"
-            :onClick="link.onClick"
-          />
-        </nav>
-      </Section>
+          </nav>
+        </Section>
+      </div>
     </div>
     <div class="grow" />
     <TrialBanner

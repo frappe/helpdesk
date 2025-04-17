@@ -75,7 +75,7 @@ class HDTicket(Document):
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
-            self.create_communication_via_contact(self.description)
+            self.create_communication_via_contact(self.description, new_ticket=True)
 
     def on_update(self):
         # flake8: noqa
@@ -519,7 +519,13 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     # flake8: noqa
-    def create_communication_via_contact(self, message, attachments=[]):
+    def create_communication_via_contact(
+        self, message, attachments=[], new_ticket=False
+    ):
+
+        if not new_ticket:
+            # send email to assigned agents
+            self.send_reopen_email_to_agent(message)
 
         if self.status == "Replied":
             self.status = "Open"
@@ -541,9 +547,6 @@ class HDTicket(Document):
         c.ignore_mandatory = True
         c.save(ignore_permissions=True)
 
-        # send email to assigned agents
-        self.send_email_to_agent(message)
-
         _attachments = self.get("attachments") or attachments or []
         if not len(_attachments):
             return
@@ -560,7 +563,7 @@ class HDTicket(Document):
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
 
-    def send_email_to_agent(self, message):
+    def send_reopen_email_to_agent(self, message):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return

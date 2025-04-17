@@ -472,6 +472,11 @@ function applyFilters(filters) {
   isViewUpdated.value = true;
   defaultParams.filters = { ...filters };
   list.submit({ ...defaultParams });
+
+  // automatically update filters for default view
+  if (!defaultParams.is_default) return;
+  handleViewUpdate();
+  isViewUpdated.value = false;
 }
 
 function applySort(order_by: string) {
