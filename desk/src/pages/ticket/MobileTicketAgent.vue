@@ -103,6 +103,11 @@
                     communicationAreaRef.replyToEmail(e);
                   }
                 "
+                @email:forward="
+                  (e) => {
+                    communicationAreaRef.forwardEmail(e);
+                  }
+                "
               />
             </TabPanel>
           </Tabs>
