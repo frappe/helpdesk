@@ -62,13 +62,12 @@
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
         <Dropdown
-          v-if="showSplitOption"
           :options="[
-            {
+            ...(showSplitOption ? [{
               label: 'Split Ticket',
               icon: LucideSplit,
               onClick: () => (showSplitModal = true),
-            },
+            }] : []),
             {
               label: 'Forward',
               icon: ForwardIcon,
