@@ -377,6 +377,7 @@ function filterActivities(eventType: TicketTab) {
 }
 const isErrorTriggered = ref(false);
 function updateTicket(fieldname: string, value: string) {
+  isErrorTriggered.value = false;
   if (value === ticket.data[fieldname]) return;
   updateOptimistic(fieldname, value);
 
@@ -395,9 +396,19 @@ function updateTicket(fieldname: string, value: string) {
       isErrorTriggered.value = false;
       ticket.reload();
     },
-    onError: () => {
+    onError: (error) => {
       if (isErrorTriggered.value) return;
       isErrorTriggered.value = true;
+
+      const text = error.exc_type
+        ? (error.messages || error.message || []).join(", ")
+        : error.message;
+      createToast({
+        title: error.exc_type || "Error",
+        text,
+        icon: "alert-triangle",
+        iconClasses: "text-red-500",
+      });
 
       ticket.reload();
     },
