@@ -1,19 +1,19 @@
 import { Field } from "@/types";
 
-export function setupCustomizations(data, obj) {
+export async function setupCustomizations(data, obj) {
   if (!data._form_script) return [];
   let actions = [];
   let onChangeFieldMap = {};
   if (Array.isArray(data._form_script)) {
-    data._form_script.forEach((script) => {
-      const parsed = parseScript(script, obj);
+    for (const script of data._form_script) {
+      const parsed = await parseScript(script, obj);
       actions = actions.concat(parsed.actions);
       if (parsed.onChange) {
         parseOnChangeFn(onChangeFieldMap, parsed.onChange);
       }
-    });
+    }
   } else {
-    const parsed = parseScript(data._form_script, obj);
+    const parsed = await parseScript(data._form_script, obj);
     actions = parsed.actions;
     if (parsed.onChange) {
       parseOnChangeFn(onChangeFieldMap, parsed.onChange);
@@ -34,9 +34,9 @@ function parseOnChangeFn(fieldMap: object, currentField: object) {
   }
 }
 
-function parseScript(script, obj) {
+async function parseScript(script, obj) {
   const scriptFn = new Function(script + "\nreturn setupForm")();
-  const formScript = scriptFn(obj);
+  const formScript = await scriptFn(obj);
   return {
     actions: formScript?.actions || [],
     onChange: formScript?.onChange || null,
