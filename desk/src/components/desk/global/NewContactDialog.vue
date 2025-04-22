@@ -10,7 +10,12 @@
           >
             <span class="mb-2 block text-sm leading-4 text-gray-700">
               {{ field.label }}
-              <span v-if="field.required" class="place-self-center text-red-500"> * </span>
+              <span
+                v-if="field.required"
+                class="place-self-center text-red-500"
+              >
+                *
+              </span>
             </span>
             <Input
               v-if="field.type === 'input'"
@@ -196,11 +201,11 @@ function createContact() {
     doc.phone_nos = [{ phone: state.value.phone }];
   }
   if (state.value.selectedCustomer) {
-     doc.links.push({
-       link_doctype: "HD Customer",
-       link_name: state.value.selectedCustomer,
-     });
-   }
+    doc.links.push({
+      link_doctype: "HD Customer",
+      link_name: state.value.selectedCustomer,
+    });
+  }
 
   contactResource.submit({ doc });
 }

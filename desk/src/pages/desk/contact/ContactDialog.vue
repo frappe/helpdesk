@@ -74,7 +74,7 @@ import {
 } from "frappe-ui";
 import zod from "zod";
 import { createToast } from "@/utils";
-import { useError } from "@/composables/error";
+
 import MultiSelect from "@/components/MultiSelect.vue";
 import { File, AutoCompleteItem } from "@/types";
 
