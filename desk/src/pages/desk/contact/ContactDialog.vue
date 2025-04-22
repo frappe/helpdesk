@@ -3,11 +3,11 @@
     <template #body-main>
       <div class="flex flex-col items-center gap-4 p-6">
         <div class="text-xl font-medium text-gray-900">
-          {{ contact.doc?.name }}
+          {{ contact.doc?.full_name }}
         </div>
         <Avatar
           size="2xl"
-          :label="contact.doc?.name"
+          :label="contact.doc?.full_name"
           :image="contact.doc?.image"
           class="cursor-pointer hover:opacity-80"
         />
@@ -47,6 +47,14 @@
               :validate="validatePhone"
             />
           </div>
+          <div class="space-y-1">
+            <div class="text-xs">Customer</div>
+            <Autocomplete
+              v-model="selectedCustomer"
+              :options="customerResource.data"
+              @update:model-value="handleCustomerChange"
+            />
+          </div>
         </div>
       </div>
     </template>
@@ -61,6 +69,8 @@ import {
   Avatar,
   Dialog,
   FileUploader,
+  Autocomplete,
+  createListResource,
 } from "frappe-ui";
 import zod from "zod";
 import { createToast } from "@/utils";
@@ -138,6 +148,62 @@ const phones = computed({
   },
 });
 
+const selectedCustomer = computed({
+  get() {
+    const customerLink = contact.doc?.links?.find(
+      (link) => link.link_doctype === "HD Customer"
+    );
+    return customerLink?.link_name || null;
+  },
+  set(value) {
+    const currentCustomer = contact.doc?.links?.find(
+      (link) => link.link_doctype === "HD Customer"
+    )?.link_name;
+
+    if (value !== currentCustomer) {
+      if (value) {
+        const existingCustomerLinkIndex = contact.doc.links?.findIndex(
+          (link) => link.link_doctype === "HD Customer"
+        );
+        if (existingCustomerLinkIndex !== -1) {
+          contact.doc.links[existingCustomerLinkIndex].link_name = value;
+        } else {
+          contact.doc.links.push({
+            link_doctype: "HD Customer",
+            link_name: value,
+          });
+        }
+      } else {
+        contact.doc.links = contact.doc.links?.filter(
+          (link) => link.link_doctype !== "HD Customer"
+        );
+      }
+      isDirty.value = true;
+    }
+  },
+});
+
+const customerResource = createListResource({
+  doctype: "HD Customer",
+  fields: ["name"],
+  cache: "customers",
+  transform: (data) => {
+    return data.map((option) => ({
+      label: option.name,
+      value: option.name,
+    }));
+  },
+  auto: true,
+});
+
+function handleCustomerChange(item: AutoCompleteItem | null) {
+  if (!item || item.label === "No label") {
+    selectedCustomer.value = null;
+  } else {
+    selectedCustomer.value = item.value;
+  }
+}
+
 const contact = createDocumentResource({
   doctype: "Contact",
   name: props.name,
@@ -181,6 +247,7 @@ function update(): void {
       is_primary_phone: phoneNum.value === contact.doc.phone,
       is_primary_mobile: phoneNum.value === contact.doc.phone,
     })),
+    links: contact.doc.links,
   });
 }
 
