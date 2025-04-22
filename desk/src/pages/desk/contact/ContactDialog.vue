@@ -29,6 +29,12 @@
             label="Remove photo"
             @click="updateImage(null)"
           />
+          <Button
+            v-if="!contact.doc?.user"
+            label="Invite as user"
+            @click="inviteContact"
+            :loading="isLoading"
+          />
         </div>
         <div class="w-full space-y-2 text-sm text-gray-700">
           <div class="space-y-1">
@@ -71,6 +77,7 @@ import {
   FileUploader,
   Autocomplete,
   createListResource,
+  call,
 } from "frappe-ui";
 import zod from "zod";
 import { createToast } from "@/utils";
@@ -207,7 +214,6 @@ function handleCustomerChange(item: AutoCompleteItem | null) {
 const contact = createDocumentResource({
   doctype: "Contact",
   name: props.name,
-  cache: [`contact-${props.name}`, props.name],
   auto: true,
   setValue: {
     onSuccess() {
@@ -282,6 +288,42 @@ function validateFile(file: File): string | void {
       iconClasses: "text-red-600",
     });
     return "Invalid file type, only PNG and JPG images are allowed";
+  }
+}
+
+const isLoading = ref(false);
+async function inviteContact(): Promise<void> {
+  try {
+    isLoading.value = true;
+    const user = await call(
+      "frappe.contacts.doctype.contact.contact.invite_user",
+      {
+        contact: contact.doc.name,
+      }
+    );
+    createToast({
+      title: "Contact invited successfully",
+      icon: "user-plus",
+      iconClasses: "text-green-600",
+    });
+    await contact.setValue.submit({
+      user: user,
+    });
+  } catch (error) {
+    isLoading.value = false;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(
+      error.messages?.[0] || error.message,
+      "text/html"
+    );
+    const errMsg = doc.body.innerText;
+    createToast({
+      title: errMsg,
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>
