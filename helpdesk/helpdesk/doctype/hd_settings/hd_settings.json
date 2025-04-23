@@ -5,10 +5,6 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "sb_00",
-  "track_service_level_agreement",
-  "allow_resetting_service_level_agreement",
-  "column_break_4",
   "priority_section",
   "default_priority",
   "column_break_nvbf",
@@ -19,7 +15,6 @@
   "assignment_rules_section",
   "base_support_rotation",
   "knowledge_base_section",
-  "suggest_articles_in_new_ticket_page",
   "prefer_knowledge_base",
   "ticket_tab",
   "ticket_type_section",
@@ -42,9 +37,6 @@
   "brand_logo",
   "column_break_fsjn",
   "misc_tab",
-  "toasts_column",
-  "suppress_default_email_toast",
-  "column_break_qkui",
   "setup_section",
   "setup_complete",
   "initial_helpdesk_name_setup_skipped",
@@ -58,35 +50,15 @@
  ],
  "fields": [
   {
-   "fieldname": "sb_00",
-   "fieldtype": "Section Break",
-   "label": "SLAs"
-  },
-  {
-   "default": "1",
-   "fieldname": "track_service_level_agreement",
-   "fieldtype": "Check",
-   "label": "Track SLA"
-  },
-  {
-   "default": "0",
-   "depends_on": "eval:doc.track_service_level_agreement;",
-   "fieldname": "allow_resetting_service_level_agreement",
-   "fieldtype": "Check",
-   "label": "Allow Resetting SLA"
-  },
-  {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "assignment_rules_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Assignment Rules"
   },
   {
    "fieldname": "base_support_rotation",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Base Support Rotation",
    "options": "Assignment Rule",
    "read_only": 1
@@ -95,12 +67,6 @@
    "fieldname": "knowledge_base_section",
    "fieldtype": "Section Break",
    "label": "Knowledge Base"
-  },
-  {
-   "default": "0",
-   "fieldname": "suggest_articles_in_new_ticket_page",
-   "fieldtype": "Check",
-   "label": "Suggest Articles in New TIcket Page"
   },
   {
    "fieldname": "agent_groups_section",
@@ -128,21 +94,6 @@
    "fieldname": "misc_tab",
    "fieldtype": "Tab Break",
    "label": "Misc"
-  },
-  {
-   "fieldname": "toasts_column",
-   "fieldtype": "Column Break",
-   "label": "Toasts"
-  },
-  {
-   "default": "1",
-   "fieldname": "suppress_default_email_toast",
-   "fieldtype": "Check",
-   "label": "Suppress default email toast"
-  },
-  {
-   "fieldname": "column_break_qkui",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "setup_section",
@@ -300,7 +251,7 @@
    "label": "Allow anyone to create tickets"
   },
   {
-   "default": "1",
+   "default": "0",
    "description": "When enabled, the ticket status will automatically change to \"Replied\" whenever the agent responds to a ticket.\n",
    "fieldname": "auto_update_status",
    "fieldtype": "Check",
@@ -335,7 +286,7 @@
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-03-21 17:13:09.867555",
+ "modified": "2025-04-23 20:17:23.058689",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
