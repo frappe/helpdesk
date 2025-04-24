@@ -5,33 +5,18 @@ import { isCustomerPortal } from "@/utils";
 import { useScreenSize } from "@/composables/screen";
 const { isMobileView } = useScreenSize();
 
-export const CUSTOMER_PORTAL_NEW_TICKET = "TicketNew";
-export const CUSTOMER_PORTAL_TICKET = "TicketCustomer";
-
 export const AGENT_PORTAL_AGENT_LIST = "AgentList";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
-export const AGENT_PORTAL_ESCALATION_RULE_LIST = "EscalationRules";
 export const AGENT_PORTAL_TEAM_LIST = "Teams";
 export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "TicketAgent";
 export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
-export const AGENT_PORTAL_KNOWLEDGE_BASE_CATEGORY = "DeskKBCategory";
-export const AGENT_PORTAL_KNOWLEDGE_BASE_ARTICLE = "DeskKBArticle";
-
-export const KB_PUBLIC_ARTICLE = "KBArticlePublic";
-export const KB_PUBLIC_CATEGORY = "KBCategoryPublic";
 
 export const CUSTOMER_PORTAL_LANDING = "TicketsCustomer";
 export const AGENT_PORTAL_LANDING = AGENT_PORTAL_TICKET_LIST;
 export const LOGIN_PAGE = "/login?redirect-to=/helpdesk";
-
-export const CUSTOMER_PORTAL_ROUTES = [
-  "TicketsCustomer",
-  "TicketNew",
-  "TicketCustomer",
-];
 
 // type the meta fields
 declare module "vue-router" {
