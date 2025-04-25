@@ -348,7 +348,10 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     def get_last_communication(self):
-        filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", str(self.name)]}
+        filters = {
+            "reference_doctype": "HD Ticket",
+            "reference_name": ["=", str(self.name)],
+        }
 
         try:
             communication = frappe.get_last_doc(
