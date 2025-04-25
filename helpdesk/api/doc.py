@@ -37,7 +37,7 @@ def get_list_data(
 
     handle_at_me_support(filters)
 
-    if doctype == "HD Ticket":
+    if doctype == "HD Ticket" and not show_customer_portal_fields:
         handle_team_restrictions(filters)
 
     _list = get_controller(doctype)
