@@ -348,7 +348,7 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     def get_last_communication(self):
-        filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", self.name]}
+        filters = {"reference_doctype": "HD Ticket", "reference_name": ["=", str(self.name)]}
 
         try:
             communication = frappe.get_last_doc(
@@ -942,8 +942,8 @@ def close_tickets_after_n_days():
 
     tickets_to_close = (
         frappe.db.sql(
-            """ 
-                SELECT t.name 
+            """
+                SELECT t.name
                 FROM `tabHD Ticket` t
                 INNER JOIN `tabCommunication` c ON t.name = c.reference_name
                 WHERE t.status = 'Replied'
