@@ -162,19 +162,17 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
-  transform: (doc) => {
-    setupCustomizations(doc, {
+  onSuccess: (data) => {
+    description.value = data.description_template || "";
+    oldFields = window.structuredClone(data.fields || []);
+    setupCustomizations(template, {
       doc: templateFields,
       call,
       router,
       $dialog,
       applyFilters,
     });
-    setupTemplateFields(doc.fields);
-  },
-  onSuccess: (data) => {
-    description.value = data.description_template || "";
-    oldFields = window.structuredClone(data.fields || []);
+    setupTemplateFields(data.fields);
   },
 });
 
