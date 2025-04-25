@@ -222,16 +222,17 @@ const ticket = createResource({
     }
     renameSubject.value = data.subject;
   },
-  onSuccess: (ticket) => {
-    document.title = ticket.subject;
+  onSuccess: (data) => {
+    document.title = data.subject;
     setupCustomizations(ticket, {
-      doc: ticket,
+      doc: data,
       call,
       router,
       $dialog,
       updateField,
       createToast,
     });
+    // console.log(ticket._customActions);
   },
 });
 function updateField(name: string, value: string, callback = () => {}) {
@@ -277,6 +278,15 @@ const dropdownOptions = computed(() =>
       }),
   }))
 );
+
+// watch(
+//   () => ticket.data,
+//   (val) => {
+//     console.log("CUSTOM ACTIONSSS");
+//     // console.log(val._customActions);
+//   },
+//   { deep: true }
+// );
 
 const tabIndex = ref(0);
 const tabs: TabObject[] = [
