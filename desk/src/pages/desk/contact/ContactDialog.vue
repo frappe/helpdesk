@@ -3,11 +3,11 @@
     <template #body-main>
       <div class="flex flex-col items-center gap-4 p-6">
         <div class="text-xl font-medium text-gray-900">
-          {{ contact.doc?.name }}
+          {{ contact.doc?.full_name }}
         </div>
         <Avatar
           size="2xl"
-          :label="contact.doc?.name"
+          :label="contact.doc?.full_name"
           :image="contact.doc?.image"
           class="cursor-pointer hover:opacity-80"
         />
@@ -29,6 +29,12 @@
             label="Remove photo"
             @click="updateImage(null)"
           />
+          <Button
+            v-if="!contact.doc?.user"
+            label="Invite as user"
+            @click="inviteContact"
+            :loading="isLoading"
+          />
         </div>
         <div class="w-full space-y-2 text-sm text-gray-700">
           <div class="space-y-1">
@@ -47,6 +53,14 @@
               :validate="validatePhone"
             />
           </div>
+          <div class="space-y-1">
+            <div class="text-xs">Customer</div>
+            <Autocomplete
+              v-model="selectedCustomer"
+              :options="customerResource.data"
+              @update:model-value="handleCustomerChange"
+            />
+          </div>
         </div>
       </div>
     </template>
@@ -61,10 +75,13 @@ import {
   Avatar,
   Dialog,
   FileUploader,
+  Autocomplete,
+  createListResource,
+  call,
 } from "frappe-ui";
 import zod from "zod";
 import { createToast } from "@/utils";
-import { useError } from "@/composables/error";
+
 import MultiSelect from "@/components/MultiSelect.vue";
 import { File, AutoCompleteItem } from "@/types";
 
@@ -138,10 +155,65 @@ const phones = computed({
   },
 });
 
+const selectedCustomer = computed({
+  get() {
+    const customerLink = contact.doc?.links?.find(
+      (link) => link.link_doctype === "HD Customer"
+    );
+    return customerLink?.link_name || null;
+  },
+  set(value) {
+    const currentCustomer = contact.doc?.links?.find(
+      (link) => link.link_doctype === "HD Customer"
+    )?.link_name;
+
+    if (value !== currentCustomer) {
+      if (value) {
+        const existingCustomerLinkIndex = contact.doc.links?.findIndex(
+          (link) => link.link_doctype === "HD Customer"
+        );
+        if (existingCustomerLinkIndex !== -1) {
+          contact.doc.links[existingCustomerLinkIndex].link_name = value;
+        } else {
+          contact.doc.links.push({
+            link_doctype: "HD Customer",
+            link_name: value,
+          });
+        }
+      } else {
+        contact.doc.links = contact.doc.links?.filter(
+          (link) => link.link_doctype !== "HD Customer"
+        );
+      }
+      isDirty.value = true;
+    }
+  },
+});
+
+const customerResource = createListResource({
+  doctype: "HD Customer",
+  fields: ["name"],
+  cache: "customers",
+  transform: (data) => {
+    return data.map((option) => ({
+      label: option.name,
+      value: option.name,
+    }));
+  },
+  auto: true,
+});
+
+function handleCustomerChange(item: AutoCompleteItem | null) {
+  if (!item || item.label === "No label") {
+    selectedCustomer.value = null;
+  } else {
+    selectedCustomer.value = item.value;
+  }
+}
+
 const contact = createDocumentResource({
   doctype: "Contact",
   name: props.name,
-  cache: [`contact-${props.name}`, props.name],
   auto: true,
   setValue: {
     onSuccess() {
@@ -181,6 +253,7 @@ function update(): void {
       is_primary_phone: phoneNum.value === contact.doc.phone,
       is_primary_mobile: phoneNum.value === contact.doc.phone,
     })),
+    links: contact.doc.links,
   });
 }
 
@@ -215,6 +288,42 @@ function validateFile(file: File): string | void {
       iconClasses: "text-red-600",
     });
     return "Invalid file type, only PNG and JPG images are allowed";
+  }
+}
+
+const isLoading = ref(false);
+async function inviteContact(): Promise<void> {
+  try {
+    isLoading.value = true;
+    const user = await call(
+      "frappe.contacts.doctype.contact.contact.invite_user",
+      {
+        contact: contact.doc.name,
+      }
+    );
+    createToast({
+      title: "Contact invited successfully",
+      icon: "user-plus",
+      iconClasses: "text-green-600",
+    });
+    await contact.setValue.submit({
+      user: user,
+    });
+  } catch (error) {
+    isLoading.value = false;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(
+      error.messages?.[0] || error.message,
+      "text/html"
+    );
+    const errMsg = doc.body.innerText;
+    createToast({
+      title: errMsg,
+      icon: "x",
+      iconClasses: "text-red-600",
+    });
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>

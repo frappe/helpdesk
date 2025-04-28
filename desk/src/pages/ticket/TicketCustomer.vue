@@ -95,7 +95,7 @@ const ticket = useTicket(
   true,
   null,
   (data) => {
-    setupCustomizations(data, {
+    setupCustomizations(ticket, {
       doc: data,
       call,
       router,
