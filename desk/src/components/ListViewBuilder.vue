@@ -1,7 +1,7 @@
 <template>
   <!-- View Controls -->
   <div
-    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3"
+    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
     v-if="showViewControls"
   >
     <QuickFilters v-if="!isMobileView" class="flex-1" />

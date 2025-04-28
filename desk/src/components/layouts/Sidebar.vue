@@ -1,6 +1,6 @@
 <template>
   <div
-    class="z-0 flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -99,6 +99,27 @@
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
     />
+    <GettingStartedBanner
+      v-if="!isOnboardingStepsCompleted"
+      :isSidebarCollapsed="!isExpanded"
+      appName="helpdesk"
+    />
+    <SidebarLink
+      v-if="isOnboardingStepsCompleted"
+      :icon="LucideArrowLeftFromLine"
+      label="Help"
+      :isCollapsed="!isExpanded"
+      @click="
+        () => {
+          showHelpModal = minimize ? true : !showHelpModal;
+          minimize = !showHelpModal;
+        }
+      "
+    >
+      <template #icon>
+        <HelpIcon class="h-4 w-4" />
+      </template>
+    </SidebarLink>
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"
@@ -107,13 +128,39 @@
       :on-click="() => (isExpanded = !isExpanded)"
     />
     <SettingsModal v-model="showSettingsModal" />
+    <HelpModal
+      v-if="showHelpModal"
+      v-model="showHelpModal"
+      v-model:articles="articles"
+      appName="helpdesk"
+      title="Frappe Helpdesk"
+      :logo="logo"
+      docsLink="https://docs.frappe.io/helpdesk"
+      :afterSkip="(step) => capture('onboarding_step_skipped_' + step)"
+      :afterSkipAll="() => capture('onboarding_steps_skipped')"
+      :afterReset="(step) => capture('onboarding_step_reset_' + step)"
+      :afterResetAll="() => capture('onboarding_steps_reset')"
+    />
+    <IntermediateStepModal
+      v-model="showIntermediateModal"
+      :currentStep="currentStep"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, markRaw, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { TrialBanner } from "frappe-ui/frappe";
+import {
+  TrialBanner,
+  HelpModal,
+  GettingStartedBanner,
+  useOnboarding,
+  showHelpModal,
+  minimize,
+  IntermediateStepModal,
+} from "frappe-ui/frappe";
+import HDLogo from "@/assets/logos/HDLogo.vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
@@ -138,6 +185,10 @@ import { useView, currentView } from "@/composables/useView";
 import { FrappeCloudIcon } from "@/components/icons";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
+import { capture } from "@/telemetry";
+import { onMounted } from "vue";
+import { reactive } from "vue";
+import { h } from "vue";
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -275,4 +326,44 @@ function openCommandPalette() {
     new KeyboardEvent("keydown", { key: "k", metaKey: true })
   );
 }
+
+const logo = h(
+  HDLogo,
+  {
+    class: "h-12 w-12",
+  },
+  null
+);
+
+const steps = reactive([
+  {
+    name: "creat_first_ticket",
+    title: "Create your first ticket",
+    completed: false,
+    icon: markRaw(LucideBell),
+    onClick: () => {
+      minimize.value = true;
+      router.push({ name: "TicketsCustomer" });
+    },
+  },
+]);
+
+const articles = ref([
+  {
+    title: "Introduction",
+    opened: false,
+    subArticles: [
+      { name: "introduction", title: "Introduction" },
+      { name: "setting-up", title: "Setting p" },
+    ],
+  },
+]);
+
+const showIntermediateModal = ref(false);
+const currentStep = ref({});
+
+const { isOnboardingStepsCompleted, setUp } = useOnboarding("helpdesk");
+onMounted(() => {
+  setUp(steps);
+});
 </script>
