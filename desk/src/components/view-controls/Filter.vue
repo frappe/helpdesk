@@ -4,18 +4,18 @@
       <div class="flex items-center w-fit">
         <Button
           :label="'Filter'"
-          :class="filters?.size ? 'rounded-r-none' : ''"
+          :class="filters?.length? 'rounded-r-none' : ''"
         >
           <template #prefix><FilterIcon class="h-4" /></template>
-          <template v-if="filters?.size" #suffix>
+          <template v-if="filters?.length" #suffix>
             <span
               class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
             >
-              {{ filters.size }}
+              {{ filters.length}}
             </span>
           </template>
         </Button>
-        <Tooltip v-if="filters?.size" :text="'Clear all Filter'">
+        <Tooltip v-if="filters?.length" :text="'Clear all Filter'">
           <div>
             <Button
               class="rounded-l-none border-l"
@@ -30,9 +30,8 @@
       <div class="my-2 rounded-lg border border-gray-100 bg-white shadow-xl">
         <div class="min-w-72 p-2 sm:min-w-[400px]">
           <div
-            v-if="filters?.size"
+            v-if="filters?.length"
             v-for="(f, i) in filters"
-            :key="i"
             id="filter-list"
             class="mb-4 sm:mb-3"
           >
@@ -142,7 +141,7 @@
               </template>
             </AutocompleteNew>
             <Button
-              v-if="filters?.size"
+              v-if="filters?.length"
               class="!text-gray-600"
               variant="ghost"
               :label="'Clear all Filter'"
@@ -191,16 +190,19 @@ const listViewActions = inject("listViewActions");
 const { list, filterableFields } = listViewData;
 
 const filters = computed(() => {
-  if (!list) return new Set();
+  if (!list) return new Array();
   let allFilters = list?.params?.filters || list.data?.params?.filters;
-  if (!allFilters || !filterableFields.data) return new Set();
-
+  if (!allFilters || !filterableFields.data) return new Array();
   return convertFilters(filterableFields.data, allFilters);
 });
 
 function convertFilters(data, allFilters) {
   let f = [];
-  for (let [key, value] of Object.entries(allFilters)) {
+  console.log(allFilters)
+  for (let i of allFilters) {
+    let key = i[0]
+    let value = i.length === 3 ? [i[1], i[2]] : i[1]
+
     let field = data.find((f) => f.fieldname === key);
     if (typeof value !== "object" || !value) {
       value = ["=", value];
@@ -218,7 +220,7 @@ function convertFilters(data, allFilters) {
       });
     }
   }
-  return new Set(f);
+  return f;
 }
 
 function getOperators(fieldtype, fieldname) {
@@ -434,7 +436,7 @@ function getSelectOptions(options) {
 
 function setfilter(data) {
   if (!data) return;
-  filters.value.add({
+  filters.value.push({
     field: {
       label: data.label,
       fieldname: data.value,
@@ -449,8 +451,7 @@ function setfilter(data) {
 }
 
 function updateFilter(data, index) {
-  filters.value.delete(Array.from(filters.value)[index]);
-  filters.value.add({
+  const updatedFilter = {
     fieldname: data.value,
     operator: getDefaultOperator(data.fieldtype),
     value: getDefaultValue(data),
@@ -460,17 +461,18 @@ function updateFilter(data, index) {
       fieldtype: data.fieldtype,
       options: data.options,
     },
-  });
+  };
+  filters.value.splice(index, 1, updatedFilter)
   apply();
 }
 
 function removeFilter(index) {
-  filters.value.delete(Array.from(filters.value)[index]);
+  filters.value.splice(index, 1);
   apply();
 }
 
 function clearfilter(close) {
-  filters.value.clear();
+  filters.value.splice(0, filters.value.length);
   apply();
   close && close();
 }
@@ -530,17 +532,16 @@ function apply() {
 }
 
 function parseFilters(filters) {
-  const filtersArray = Array.from(filters);
-  const obj = filtersArray.map(transformIn).reduce((p, c) => {
+  const filtersArray = filters;
+  const obj = filtersArray.map(transformIn).map((c) => {
     if (["equals", "="].includes(c.operator)) {
-      p[c.fieldname] =
-        c.value == "Yes" ? true : c.value == "No" ? false : c.value;
+        let field_name = c.value == "Yes" ? true : c.value == "No" ? false : c.value;
+        return [c.fieldname, field_name]
     } else {
-      p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], c.value];
+        return [c.fieldname, operatorMap[c.operator.toLowerCase()], c.value];
     }
-    return p;
-  }, {});
-  const merged = { ...obj };
+  });
+  const merged = obj;
   return merged;
 }
 

@@ -12,7 +12,7 @@ from helpdesk.utils import check_permissions
 def get_list_data(
     doctype: str,
     # flake8: noqa
-    filters={},
+    filters=[],
     default_filters={},
     order_by: str = "modified desc",
     page_length=20,
@@ -23,10 +23,8 @@ def get_list_data(
     is_default=False,
 ):
     is_custom = False
-
     rows = frappe.parse_json(rows or "[]")
     columns = frappe.parse_json(columns or "[]")
-    filters = frappe.parse_json(filters or "[]")
 
     view_type = view.get("view_type") if view else None
     view_name = view.get("name") if view else None
@@ -478,8 +476,7 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
 
 def handle_at_me_support(filters):
     # Converts @me in filters to current user
-    for key in filters:
-        value = filters[key]
+    for idx, value in enumerate(filters):
         if isinstance(value, list):
             if "@me" in value:
                 value[value.index("@me")] = frappe.session.user
@@ -488,7 +485,7 @@ def handle_at_me_support(filters):
                 for i in index:
                     value[i] = "%" + frappe.session.user + "%"
         elif value == "@me":
-            filters[key] = frappe.session.user
+            filters[idx] = frappe.session.user
 
     return filters
 
