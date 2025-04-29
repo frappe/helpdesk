@@ -41,7 +41,7 @@ const isDialogVisible = ref(false);
 const options = computed(() => {
   return {
     doctype: "HD Agent",
-    defaultFilters: { is_active: ["=", 1] },
+    defaultFilters: [["is_active", "=", 1]],
     columnConfig: {
       agent_name: {
         prefix: ({ row }) => {

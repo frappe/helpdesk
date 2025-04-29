@@ -4,14 +4,14 @@
       <div class="flex items-center w-fit">
         <Button
           :label="'Filter'"
-          :class="filters?.length? 'rounded-r-none' : ''"
+          :class="filters?.length ? 'rounded-r-none' : ''"
         >
           <template #prefix><FilterIcon class="h-4" /></template>
           <template v-if="filters?.length" #suffix>
             <span
               class="flex h-5 w-5 items-center justify-center rounded-[5px] bg-surface-white pt-px text-xs font-medium text-ink-gray-8 shadow-sm"
             >
-              {{ filters.length}}
+              {{ filters.length }}
             </span>
           </template>
         </Button>
@@ -198,10 +198,9 @@ const filters = computed(() => {
 
 function convertFilters(data, allFilters) {
   let f = [];
-  console.log(allFilters)
   for (let i of allFilters) {
-    let key = i[0]
-    let value = i.length === 3 ? [i[1], i[2]] : i[1]
+    let key = i[0];
+    let value = i.length === 3 ? [i[1], i[2]] : i[1];
 
     let field = data.find((f) => f.fieldname === key);
     if (typeof value !== "object" || !value) {
@@ -462,7 +461,7 @@ function updateFilter(data, index) {
       options: data.options,
     },
   };
-  filters.value.splice(index, 1, updatedFilter)
+  filters.value.splice(index, 1, updatedFilter);
   apply();
 }
 
@@ -535,10 +534,11 @@ function parseFilters(filters) {
   const filtersArray = filters;
   const obj = filtersArray.map(transformIn).map((c) => {
     if (["equals", "="].includes(c.operator)) {
-        let field_name = c.value == "Yes" ? true : c.value == "No" ? false : c.value;
-        return [c.fieldname, field_name]
+      let field_name =
+        c.value == "Yes" ? true : c.value == "No" ? false : c.value;
+      return [c.fieldname, field_name];
     } else {
-        return [c.fieldname, operatorMap[c.operator.toLowerCase()], c.value];
+      return [c.fieldname, operatorMap[c.operator.toLowerCase()], c.value];
     }
   });
   const merged = obj;

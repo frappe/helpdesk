@@ -413,7 +413,6 @@ function listCell(column: any, row: any, item: any, idx: number) {
 }
 
 function handleFieldClick(e: MouseEvent, column, row, item) {
-  console.log(item, column.type)
   const noFilterFields = ["Data", "Datetime", "Rating", "Int", "Float"];
   if (noFilterFields.includes(column.type)) {
     if (options.value.rowRoute?.name !== "") {
@@ -440,19 +439,20 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
       item = item[0].name;
     }
     newFilter = [column.key, "LIKE", item];
-  }
-  else {
+  } else {
     newFilter = [column.key, item];
   }
-  const stringifyedFilters = defaultParams.filters.map((i) => JSON.stringify(i))
-  const stringifyedNewFilter = JSON.stringify(newFilter)
+  const stringifyedFilters = defaultParams.filters.map((i) =>
+    JSON.stringify(i)
+  );
+  const stringifyedNewFilter = JSON.stringify(newFilter);
   if (stringifyedFilters.includes(stringifyedNewFilter)) {
     const index = stringifyedFilters.indexOf(stringifyedNewFilter);
-    defaultParams.filters.splice(index, 1)
+    defaultParams.filters.splice(index, 1);
   } else {
-    defaultParams.filters.push(newFilter)
+    defaultParams.filters.push(newFilter);
   }
-  applyFilters([...defaultParams.filters])
+  applyFilters([...defaultParams.filters]);
 }
 
 const showViewControls = computed(() => {

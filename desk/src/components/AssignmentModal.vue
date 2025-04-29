@@ -119,7 +119,7 @@ const removeCurrentAssignee = (value) => {
 
 const customFilters = computed(() => {
   const filters = {};
-  filters["is_active"] = ["=", 1];
+  filters.value.push(["is_active", "=", 1]);
   if (Boolean(props.assignees?.length)) {
     filters["name"] = ["not in", [...props.assignees.map((a) => a.name)]];
   }
