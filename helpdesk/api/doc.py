@@ -25,8 +25,7 @@ def get_list_data(
     is_custom = False
     rows = frappe.parse_json(rows or "[]")
     columns = frappe.parse_json(columns or "[]")
-
-    print(filters)
+    
     view_type = view.get("view_type") if view else None
     view_name = view.get("name") if view else None
 
