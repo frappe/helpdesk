@@ -957,6 +957,7 @@ def close_tickets_after_n_days():
         )
         or []
     )
+    tickets_to_close = list(set(tickets_to_close))
 
     # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
     for ticket in tickets_to_close:

@@ -125,6 +125,7 @@ import {
 import { globalStore } from "@/stores/globalStore";
 import sanitizeHtml from "sanitize-html";
 import { isEmpty } from "lodash";
+import { useOnboarding } from "frappe-ui/frappe";
 import {
   setupCustomizations,
   handleSelectFieldUpdate,
@@ -150,6 +151,7 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const { $dialog } = globalStore();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const subject = ref("");
 const description = ref("");
@@ -244,6 +246,7 @@ const ticket = createResource({
     });
     if (!isCustomerPortal.value) return;
     // only capture telemetry for customer portal
+    updateOnboardingStep("create_first_ticket");
     capture("new_ticket_submitted", {
       data: {
         user: userID,

@@ -37,18 +37,32 @@ import LucideMail from "~icons/lucide/mail";
 import ImageUp from "~icons/lucide/image-up";
 import EmailConfig from "./EmailConfig.vue";
 import Branding from "./Branding.vue";
+import { computed } from "vue";
+import { markRaw } from "vue";
+import { shallowRef } from "vue";
+
+const props = withDefaults(
+  defineProps<{
+    defaultTab?: number;
+  }>(),
+  {
+    defaultTab: 0,
+  }
+);
+
 let tabs = [
   {
     label: "Email Accounts",
-    icon: LucideMail,
-    component: EmailConfig,
+    icon: markRaw(LucideMail),
+    component: shallowRef(EmailConfig),
   },
   {
     label: "Branding",
-    icon: ImageUp,
-    component: Branding,
+    icon: markRaw(ImageUp),
+    component: shallowRef(Branding),
   },
 ];
 const show: ModelRef<boolean> = defineModel();
-const activeTab = ref(tabs[0]);
+// tabs[props.defaultTab
+const activeTab = ref(tabs[props.defaultTab]);
 </script>

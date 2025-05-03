@@ -103,15 +103,19 @@ import {
   FileUploader,
   createResource,
 } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
 
 import { AttachmentIcon } from "@/components/icons/";
 import { AttachmentItem } from "@/components/";
 import { useAgentStore } from "@/stores/agent";
+
 import { useStorage } from "@vueuse/core";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import { isContentEmpty, textEditorMenuButtons, getFontFamily } from "@/utils";
 
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList } = useAgentStore();
+
 onMounted(() => {
   agentsList.fetch();
 });
@@ -172,6 +176,7 @@ async function submitComment() {
       loading.value = false;
       attachments.value = [];
       newComment.value = null;
+      updateOnboardingStep("comment_on_ticket");
     },
     onError: () => {
       loading.value = false;

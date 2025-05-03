@@ -127,7 +127,10 @@
       :label="isExpanded ? 'Collapse' : 'Expand'"
       :on-click="() => (isExpanded = !isExpanded)"
     />
-    <SettingsModal v-model="showSettingsModal" />
+    <SettingsModal
+      v-model="showSettingsModal"
+      :default-tab="defaultSettingsTab"
+    />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -149,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, ref } from "vue";
+import { computed, markRaw, ref, onMounted, reactive, h } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   TrialBanner,
@@ -169,10 +172,6 @@ import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useDevice } from "@/composables";
 import { SidebarLink } from "@/components";
 import UserMenu from "@/components/UserMenu.vue";
-import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
-import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideBell from "~icons/lucide/bell";
-import LucideSearch from "~icons/lucide/search";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import Apps from "@/components/Apps.vue";
 import { isCustomerPortal } from "@/utils";
@@ -186,9 +185,22 @@ import { FrappeCloudIcon } from "@/components/icons";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
 import { capture } from "@/telemetry";
-import { onMounted } from "vue";
-import { reactive } from "vue";
-import { h } from "vue";
+
+import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
+import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
+import LucideBell from "~icons/lucide/bell";
+import LucideSearch from "~icons/lucide/search";
+import LucideMail from "~icons/lucide/mail";
+import LucideUserPlus from "~icons/lucide/user-plus";
+import Timer from "~icons/lucide/timer";
+import UserPen from "~icons/lucide/user-pen";
+import MailOpen from "~icons/lucide/mail-open";
+import MessageCircle from "~icons/lucide/message-circle";
+import FileText from "~icons/lucide/file-text";
+import Ticket from "~icons/lucide/ticket";
+import Globe from "~icons/lucide/globe";
+import { InviteCustomer } from "@/components/icons";
+
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -335,18 +347,118 @@ const logo = h(
   null
 );
 
-const steps = reactive([
+const defaultSettingsTab = ref(0);
+const steps = [
   {
-    name: "creat_first_ticket",
-    title: "Create your first ticket",
+    // done
+    name: "setup_email_account",
+    title: "Connect your support email",
     completed: false,
-    icon: markRaw(LucideBell),
+    icon: markRaw(LucideMail),
     onClick: () => {
       minimize.value = true;
-      router.push({ name: "TicketsCustomer" });
+      showSettingsModal.value = true;
+      defaultSettingsTab.value = 0;
     },
   },
-]);
+  {
+    // done
+    name: "invite_agents",
+    title: "Invite agents",
+    completed: false,
+    icon: markRaw(LucideUserPlus),
+    onClick: () => {
+      minimize.value = true;
+      router.push({ name: "AgentList", query: { invite: 1 } });
+    },
+  },
+  {
+    // left
+    name: "setup_sla",
+    title: "Set your first SLA",
+    completed: false,
+    icon: markRaw(Timer),
+    onClick: () => {
+      console.log("clicked");
+      const url = "/app/hd-service-level-agreement";
+      window.open(url, "_blank");
+    },
+  },
+  {
+    // done
+    // remaining is get created ticket and
+    name: "create_first_ticket",
+    title: "Create your first ticket",
+    completed: false,
+    icon: markRaw(Ticket),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+  {
+    // done
+    // remaining is get created ticket and
+    name: "assign_to_agent",
+    title: "Assign a ticket to an agent",
+    completed: false,
+    icon: markRaw(UserPen),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+  {
+    // done
+    // remaining is get created ticket and
+    name: "reply_on_ticket",
+    title: "Reply on a ticket",
+    completed: false,
+    icon: markRaw(MailOpen),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+  {
+    // done
+    // remaining is get created ticket and
+    name: "comment_on_ticket",
+    title: "Add a comment on a ticket",
+    completed: false,
+    icon: markRaw(MessageCircle),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+  {
+    // done
+    name: "first_article",
+    title: "Create your first article",
+    completed: false,
+    icon: markRaw(FileText),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+  {
+    // left
+    name: "add_invite_contact",
+    title: "Add & invite a contact",
+    completed: false,
+    icon: markRaw(InviteCustomer),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+  {
+    // left
+    name: "explore_customer_portal",
+    title: "Explore customer portal",
+    completed: false,
+    icon: markRaw(Globe),
+    onClick: () => {
+      console.log("clicked");
+    },
+  },
+];
 
 const articles = ref([
   {
@@ -363,7 +475,17 @@ const showIntermediateModal = ref(false);
 const currentStep = ref({});
 
 const { isOnboardingStepsCompleted, setUp } = useOnboarding("helpdesk");
+
 onMounted(() => {
   setUp(steps);
+  // find completedSteps
+  let storedSteps = JSON.parse(localStorage.getItem("onboardingStatus"));
+  if (!storedSteps) return;
+
+  storedSteps = storedSteps.helpdesk_onboarding_status;
+  let completedSteps = storedSteps.filter((step) => step.completed);
+  console.log(completedSteps);
+  // find APIs to call
+  // localStorage.getItem
 });
 </script>

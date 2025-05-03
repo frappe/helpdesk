@@ -105,6 +105,7 @@ import {
   validateInputs,
   incomingOutgoingFields,
 } from "./emailConfig";
+import { useOnboarding } from "frappe-ui/frappe";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import { EmailService, EmailAccount, EmailStep } from "@/types";
 
@@ -113,6 +114,8 @@ interface E {
 }
 
 const emit = defineEmits<E>();
+
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const state: Reactive<EmailAccount> = reactive({
   service: "",
@@ -152,6 +155,7 @@ const addEmailRes = createResource({
       iconClasses: "text-green-600",
     });
     emit("update:step", "email-list");
+    updateOnboardingStep("setup_email_account");
   },
   onError: () => {
     error.value = "Failed to create email account, Invalid credentials";
