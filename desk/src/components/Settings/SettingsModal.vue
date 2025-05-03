@@ -31,16 +31,12 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-import { ModelRef, ref } from "vue";
 import { Dialog } from "frappe-ui";
-import LucideMail from "~icons/lucide/mail";
+import { markRaw, ModelRef, ref } from "vue";
 import ImageUp from "~icons/lucide/image-up";
-import EmailConfig from "./EmailConfig.vue";
+import LucideMail from "~icons/lucide/mail";
 import Branding from "./Branding.vue";
-import { computed } from "vue";
-import { markRaw } from "vue";
-import { shallowRef } from "vue";
-
+import EmailConfig from "./EmailConfig.vue";
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
@@ -54,12 +50,12 @@ let tabs = [
   {
     label: "Email Accounts",
     icon: markRaw(LucideMail),
-    component: shallowRef(EmailConfig),
+    component: markRaw(EmailConfig),
   },
   {
     label: "Branding",
     icon: markRaw(ImageUp),
-    component: shallowRef(Branding),
+    component: markRaw(Branding),
   },
 ];
 const show: ModelRef<boolean> = defineModel();
