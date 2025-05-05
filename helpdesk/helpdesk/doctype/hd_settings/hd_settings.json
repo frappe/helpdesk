@@ -16,6 +16,7 @@
   "base_support_rotation",
   "knowledge_base_section",
   "prefer_knowledge_base",
+  "hide_suggested_articles",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -281,12 +282,18 @@
    "fieldtype": "Int",
    "label": "Auto-close after (Days)",
    "mandatory_depends_on": "auto_close_tickets"
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_suggested_articles",
+   "fieldtype": "Check",
+   "label": "Hide suggested articles on ticket form"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-04-23 20:17:23.058689",
+ "modified": "2025-05-05 13:28:08.085962",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

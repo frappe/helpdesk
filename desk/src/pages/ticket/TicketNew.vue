@@ -51,7 +51,7 @@
           />
         </div>
         <SearchArticles
-          v-if="isCustomerPortal"
+          v-if="isCustomerPortal && !hideSuggestedArticles"
           :query="subject"
           class="shadow"
         />
@@ -135,6 +135,7 @@ import { LayoutHeader, UniInput } from "@/components";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
 import { Field } from "@/types";
@@ -150,6 +151,7 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const { $dialog } = globalStore();
+const { hideSuggestedArticles } = useConfigStore();
 
 const subject = ref("");
 const description = ref("");

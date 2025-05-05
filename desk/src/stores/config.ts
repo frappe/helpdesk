@@ -20,6 +20,9 @@ export const useConfigStore = defineStore("config", () => {
   const isFeedbackMandatory = computed(
     () => !!parseInt(config.value.is_feedback_mandatory)
   );
+  const hideSuggestedArticles = computed(
+    () => !!parseInt(config.value.hide_suggested_articles)
+  );
 
   socket.on("helpdesk:settings-updated", () => configRes.reload());
 
@@ -29,5 +32,6 @@ export const useConfigStore = defineStore("config", () => {
     preferKnowledgeBase,
     skipEmailWorkflow,
     isFeedbackMandatory,
+    hideSuggestedArticles,
   };
 });
