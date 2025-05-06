@@ -5,6 +5,7 @@ from typing import List
 
 import frappe
 from frappe import _
+from frappe.core.doctype.communication.email import make as make_email
 from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
@@ -438,6 +439,23 @@ class HDTicket(Document):
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
             recipients = admin_email
+
+        if not self.via_customer_portal:
+            make_email(
+                recipients=recipients,
+                attachments=attachments,
+                bcc=bcc,
+                cc=cc,
+                subject=subject,
+                content=message,
+                doctype="HD Ticket",
+                name=self.name,
+                send_email=True,
+                sender=sender,
+                has_attachments=1 if attachments else 0,
+            )
+            capture_event("agent_replied_to_email_ticket")
+            return
 
         communication = frappe.get_doc(
             {
