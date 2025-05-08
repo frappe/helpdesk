@@ -23,10 +23,10 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div class="flex-1 overflow-y-auto p-2">
+    <div class="flex-1 overflow-y-auto">
       <div
         v-if="cannedResponses.data?.length > 0"
-        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 px-5 pb-3"
+        class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4"
       >
         <div
           v-for="cannedResponse in cannedResponses.data"
@@ -112,22 +112,22 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { LayoutHeader } from "@/components";
+import { CannedResponseModal } from "@/components/canned-response/";
+import { dayjs } from "@/dayjs";
+import { useUserStore } from "@/stores/user";
+import { dateFormat, dateTooltipFormat } from "@/utils";
 import {
-  createListResource,
   Breadcrumbs,
   Dropdown,
   TextEditor,
   Tooltip,
   call,
+  createListResource,
   usePageMeta,
 } from "frappe-ui";
-import { CannedResponseModal } from "@/components/canned-response/";
-import { LayoutHeader } from "@/components";
-import { useUserStore } from "@/stores/user";
-import { dateFormat, dateTooltipFormat } from "@/utils";
-import { dayjs } from "@/dayjs";
+import { ref } from "vue";
+import { useRoute } from "vue-router";
 import EmptyState from "../components/EmptyState.vue";
 
 const { getUser } = useUserStore();
