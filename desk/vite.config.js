@@ -1,14 +1,10 @@
-import path from "path";
-import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import frappeui from "frappe-ui/vite";
-import Icons from "unplugin-icons/vite";
-import Components from "unplugin-vue-components/vite";
+import path from "path";
 import IconsResolver from "unplugin-icons/resolver";
-import { FileSystemIconLoader } from "unplugin-icons/loaders";
-import { SVG, cleanupSVG, parseColors } from "@iconify/tools";
-import LucideIcons from "./lucide";
+import Components from "unplugin-vue-components/vite";
+import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
@@ -38,6 +34,7 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
       manifest: {
         display: "standalone",
@@ -72,27 +69,6 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
-      },
-    }),
-    Icons({
-      compiler: "vue3",
-      customCollections: {
-        lucide: LucideIcons,
-        espresso: FileSystemIconLoader("./src/assets/icons", async (svg) => {
-          const r = new SVG(svg);
-
-          await cleanupSVG(r);
-          await parseColors(r, {
-            callback: () => "currentColor",
-          });
-
-          return r.toMinifiedString();
-        }),
-        logos: FileSystemIconLoader("./src/assets/logos", async (svg) => {
-          const r = new SVG(svg);
-          await cleanupSVG(r);
-          return r.toMinifiedString();
-        }),
       },
     }),
   ],

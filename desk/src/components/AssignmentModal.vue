@@ -61,6 +61,7 @@ import { ref, computed } from "vue";
 import { createResource } from "frappe-ui";
 import { UserAvatar, SearchComplete } from "@/components";
 import { useUserStore } from "@/stores/user";
+import { useOnboarding } from "frappe-ui/frappe";
 
 const props = defineProps({
   assignees: {
@@ -82,6 +83,7 @@ const show = defineModel();
 const emit = defineEmits(["update"]);
 
 const { getUser } = useUserStore();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const error = ref("");
 
@@ -97,6 +99,7 @@ const addAssignee = (value) => {
     },
     onSuccess: () => {
       emit("update");
+      updateOnboardingStep("assign_to_agent");
     },
   });
   emit("update");

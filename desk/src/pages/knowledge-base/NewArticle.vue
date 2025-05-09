@@ -77,6 +77,8 @@ import {
   TextEditorFixedMenu,
   Breadcrumbs,
 } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+
 import { useRouter, useRoute } from "vue-router";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
@@ -90,6 +92,7 @@ const user = userStore.getUser();
 const { $dialog } = globalStore();
 const router = useRouter();
 const route = useRoute();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 const title = ref("");
 const content = ref("");
@@ -114,6 +117,7 @@ function handleCreateArticle() {
           icon: "check",
           iconClasses: "text-green-600",
         });
+        updateOnboardingStep("first_article");
         resetState();
         router.push({
           name: "Article",

@@ -151,6 +151,7 @@ import {
   TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
 import {
   createToast,
   validateEmail,
@@ -199,6 +200,8 @@ const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+
 const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
@@ -236,6 +239,7 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
+    updateOnboardingStep("reply_on_ticket");
   },
   debounce: 300,
 });

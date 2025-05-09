@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 interface P {
-  serviceName: string;
+  serviceName?: string;
   logo?: string;
   selected?: boolean;
 }
