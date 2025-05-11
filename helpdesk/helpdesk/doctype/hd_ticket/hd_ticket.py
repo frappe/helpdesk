@@ -906,13 +906,33 @@ class HDTicket(Document):
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
 def has_permission(doc, user=None):
-    return bool(
-        doc.contact == user
-        or doc.raised_by == user
-        or doc.owner == user
-        or is_agent(user)
-        or doc.customer in get_customer(user)
+    from helpdesk.utils import get_agents_team
+
+    if not user:
+        user = frappe.session.user
+
+    if doc.contact == user or doc.raised_by == user or doc.owner == user:
+        return True
+
+    if not is_agent(user):
+        return False
+
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
     )
+    if not enable_restrictions or user == "Administrator":
+        return True
+    show_tickets_without_team = frappe.db.get_single_value(
+        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+    )
+    if show_tickets_without_team and not doc.get("agent_group"):
+        return True
+
+    teams = get_agents_team()
+    if any([team.get("ignore_restrictions") for team in teams]):
+        return True
+
+    return False
 
 
 # Custom perms for list query. Only the `WHERE` part
