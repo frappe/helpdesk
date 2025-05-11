@@ -131,6 +131,15 @@ function replyToEmail(data: object) {
   );
 }
 
+function forwardEmail(data: object) {
+  showEmailBox.value = true;
+  emailEditorRef.value.addToForward(
+    data.content,
+    data.subject,
+    data.attachments
+  );
+}
+
 const props = defineProps({
   doctype: {
     type: String,
@@ -152,6 +161,7 @@ const props = defineProps({
 
 defineExpose({
   replyToEmail,
+  forwardEmail,
   toggleEmailBox,
   toggleCommentBox,
   editor: emailEditorRef,

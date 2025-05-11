@@ -62,12 +62,23 @@
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
         <Dropdown
-          v-if="showSplitOption"
           :options="[
-            {
+            ...(showSplitOption ? [{
               label: 'Split Ticket',
               icon: LucideSplit,
               onClick: () => (showSplitModal = true),
+            }] : []),
+            {
+              label: 'Forward',
+              icon: ForwardIcon,
+              onClick: () => emit('forward', {
+                content: content,
+                attachments: attachments,
+                subject: subject,
+                to: sender?.name ?? to,
+                cc: cc,
+                bcc: bcc,
+              }),
             },
           ]"
         >
@@ -115,8 +126,8 @@
 import { ref } from "vue";
 import { AttachmentItem } from "@/components";
 import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
-import { ReplyIcon, ReplyAllIcon } from "./icons";
 import LucideSplit from "~icons/lucide/split";
+import { ReplyIcon, ReplyAllIcon, ForwardIcon } from "./icons";
 import { useScreenSize } from "@/composables/screen";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
 
@@ -134,7 +145,7 @@ const props = defineProps({
 const { sender, to, cc, bcc, creation, subject, attachments, content, name } =
   props.activity;
 
-const emit = defineEmits(["reply"]);
+const emit = defineEmits(["reply","forward"]);
 
 const { isMobileView } = useScreenSize();
 
