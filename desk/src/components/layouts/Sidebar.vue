@@ -100,7 +100,7 @@
       :isSidebarCollapsed="!isExpanded"
     />
     <GettingStartedBanner
-      v-if="!isOnboardingStepsCompleted && !isCustomerPortal"
+      v-if="showOnboardingBanner"
       :isSidebarCollapsed="!isExpanded"
       appName="helpdesk"
     />
@@ -356,6 +356,14 @@ const onboardingStepsDesk = reactive({
   slaCreated: false,
 });
 
+const showOnboardingBanner = computed(() => {
+  return (
+    !isCustomerPortal.value &&
+    !isOnboardingStepsCompleted.value &&
+    authStore.isManager
+  );
+});
+
 const steps = computed(() => [
   {
     // done
@@ -544,9 +552,11 @@ async function getGeneralCategory() {
   return generalCategory;
 }
 
-onMounted(() => {
+function setUpOnboarding() {
+  if (!authStore.isManager) return;
+
   setUp(steps.value);
-  // find completedSteps
+
   let storedSteps = JSON.parse(localStorage.getItem("onboardingStatus"));
   if (!storedSteps || storedSteps.helpdesk_onboarding_status == null) return;
 
@@ -554,7 +564,7 @@ onMounted(() => {
   let completedSteps = storedSteps
     .filter((step) => step.completed)
     .map((s) => s.name);
-  console.log(completedSteps);
+
   if (completedSteps.includes("setup_sla")) {
     onboardingStepsDesk.slaCreated = true;
   }
@@ -563,5 +573,9 @@ onMounted(() => {
       updateOnboardingStep("setup_sla", res);
     });
   }
+}
+
+onMounted(() => {
+  setUpOnboarding();
 });
 </script>
