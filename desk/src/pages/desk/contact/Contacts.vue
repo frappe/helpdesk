@@ -37,13 +37,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, h } from "vue";
-import { usePageMeta, Avatar } from "frappe-ui";
-import { ListViewBuilder, LayoutHeader } from "@/components";
+import { LayoutHeader, ListViewBuilder } from "@/components";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
-import ContactDialog from "./ContactDialog.vue";
-import { createToast } from "@/utils";
 import { PhoneIcon } from "@/components/icons";
+import { createToast } from "@/utils";
+import { Avatar, usePageMeta } from "frappe-ui";
+import { computed, h, ref } from "vue";
+import ContactDialog from "./ContactDialog.vue";
 
 const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
@@ -53,6 +53,8 @@ const listViewRef = ref(null);
 const options = computed(() => {
   return {
     doctype: "Contact",
+    selectable: true,
+    showSelectBanner: true,
     columnConfig: {
       full_name: {
         prefix: ({ row }) => {

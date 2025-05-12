@@ -55,28 +55,27 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, computed, reactive, onMounted } from "vue";
-import { Badge, Tooltip, call, usePageMeta, FeatherIcon } from "frappe-ui";
-import { useRouter, useRoute } from "vue-router";
+import { LayoutHeader, ListViewBuilder } from "@/components";
 import {
   EditIcon,
   IndicatorIcon,
   PinIcon,
+  TicketIcon,
   UnpinIcon,
 } from "@/components/icons";
-import { LayoutHeader, ListViewBuilder } from "@/components";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
 import ViewModal from "@/components/ViewModal.vue";
-import { useTicketStatusStore } from "@/stores/ticketStatus";
-import { useAuthStore } from "@/stores/auth";
+import { currentView, useView } from "@/composables/useView";
 import { dayjs } from "@/dayjs";
-import { createToast, getIcon, isCustomerPortal } from "@/utils";
-import { capture } from "@/telemetry";
-import { TicketIcon } from "@/components/icons";
-import { useView, currentView } from "@/composables/useView";
-import { View } from "@/types";
+import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
+import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { View } from "@/types";
+import { createToast, getIcon, isCustomerPortal } from "@/utils";
+import { Badge, FeatherIcon, Tooltip, usePageMeta } from "frappe-ui";
+import { computed, h, onMounted, reactive, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
@@ -109,45 +108,7 @@ const selectBannerActions = [
       showExportModal.value = true;
     },
   },
-  {
-    label: "Delete",
-    icon: "trash-2",
-    onClick: (selections: Set<string>) => {
-      listSelections.value = new Set(selections);
-      $dialog({
-        title: "Delete Ticket(s)?",
-        message: `Are you sure you want to delete these ticket(s)?`,
-        actions: [
-          {
-            label: "Confirm",
-            variant: "solid",
-            onClick(close: Function) {
-              handleTicketDelete(close);
-              close();
-            },
-          },
-        ],
-      });
-    },
-    condition: () => !isCustomerPortal.value && isManager,
-  },
 ];
-
-function handleTicketDelete(hide: Function) {
-  capture("bulk_delete");
-  call("frappe.desk.reportview.delete_items", {
-    items: JSON.stringify(Array.from(listSelections.value)),
-    doctype: "HD Ticket",
-  }).then(() => {
-    createToast({
-      title: "Deleted successfully",
-      icon: "check",
-      iconClasses: "text-ink-green-3",
-    });
-    hide();
-    reset(true);
-  });
-}
 
 const options = {
   doctype: "HD Ticket",

@@ -109,49 +109,52 @@
 </template>
 
 <script setup lang="ts">
+import { MultipleAvatar, StarRating } from "@/components";
 import {
-  reactive,
-  provide,
-  computed,
-  h,
-  ref,
-  watch,
-  VNode,
-  onMounted,
-} from "vue";
-import { useRoute, useRouter } from "vue-router";
-import {
-  createResource,
-  ListView,
-  ListFooter,
-  ListRowItem,
-  ListHeader,
-  ListHeaderItem,
-  ListSelectBanner,
-  FeatherIcon,
-  Dropdown,
-} from "frappe-ui";
-import {
+  ColumnSettings,
   Filter,
-  SortBy,
   QuickFilters,
   Reload,
-  ColumnSettings,
+  SortBy,
 } from "@/components/view-controls";
-import { MultipleAvatar, StarRating } from "@/components";
-import ListRows from "./ListRows.vue";
-import EmptyState from "./EmptyState.vue";
 import { useScreenSize } from "@/composables/screen";
-import { dayjs } from "@/dayjs";
-import { View, ViewType } from "@/types";
 import {
+  currentView as headerView,
   useView,
   views,
-  currentView as headerView,
 } from "@/composables/useView";
-import { getIcon, formatTimeShort } from "@/utils";
 import { useAuthStore } from "@/stores/auth";
+import { globalStore } from "@/stores/globalStore";
+import { capture } from "@/telemetry";
+import { View, ViewType } from "@/types";
+import { createToast, formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
+
+import {
+  call,
+  createResource,
+  Dropdown,
+  FeatherIcon,
+  ListFooter,
+  ListHeader,
+  ListHeaderItem,
+  ListRowItem,
+  ListSelectBanner,
+  ListView,
+} from "frappe-ui";
+import {
+  computed,
+  h,
+  onMounted,
+  provide,
+  reactive,
+  ref,
+  VNode,
+  watch,
+} from "vue";
+import { useRoute, useRouter } from "vue-router";
+import EmptyState from "./EmptyState.vue";
+import ListRows from "./ListRows.vue";
 
 interface P {
   options: {
@@ -185,7 +188,9 @@ const emit = defineEmits<E>();
 const route = useRoute();
 const router = useRouter();
 const { isManager } = useAuthStore();
+const { $dialog } = globalStore();
 
+const listSelections = ref(new Set());
 const defaultOptions = reactive({
   doctype: "",
   hideViewControls: false,
@@ -203,7 +208,54 @@ const defaultOptions = reactive({
     name: "",
     prop: "",
   },
+  selectBannerActions: [
+    {
+      label: "Delete",
+      icon: "trash-2",
+      onClick: (selections) => {
+        // Handle delete action
+        listSelections.value = new Set(selections);
+        $dialog({
+          title: "Delete",
+          message: `Are you sure you want to delete these item(s)?`,
+          actions: [
+            {
+              label: "Confirm",
+              variant: "solid",
+              onClick(close: Function) {
+                handleBulkDelete(close);
+                close();
+              },
+            },
+          ],
+        });
+      },
+      condition: () => !options.value.isCustomerPortal && isManager,
+    },
+  ],
 });
+
+function handleBulkDelete(hide: Function) {
+  capture("bulk_delete" + props.options.doctype);
+  call("frappe.desk.reportview.delete_items", {
+    items: JSON.stringify(Array.from(listSelections.value)),
+    doctype: props.options.doctype,
+  }).then(() => {
+    createToast({
+      title: "Item(s) deleted successfully",
+      icon: "check",
+      iconClasses: "text-ink-green-3",
+    });
+    hide();
+    reset();
+  });
+}
+
+function reset() {
+  exposeFunctions.reload();
+  exposeFunctions.unselectAll();
+  listSelections.value?.clear();
+}
 
 const options = computed(() => {
   return {
@@ -268,15 +320,34 @@ const list = createResource({
 const exposeFunctions = {
   list,
   reload,
+  unselectAll: () => {},
 };
+
 function selectBannerOptions(selections: Set<string>, unselectAll = () => {}) {
   exposeFunctions["unselectAll"] = unselectAll;
-  return options.value.selectBannerActions.map((action) => {
-    return {
+
+  // Get the user-provided actions
+  const userActions = options.value.selectBannerActions.map((action) => ({
+    ...action,
+    onClick: () => action.onClick?.(selections),
+  }));
+
+  // Get the default actions
+  // overwrite the default actions if user provided actions with same label
+  const defaultActions = defaultOptions.selectBannerActions
+    .filter(
+      (action) =>
+        !userActions.some(
+          (defaultAction) => defaultAction.label === action.label
+        )
+    )
+    .map((action) => ({
       ...action,
-      onClick: () => action.onClick(selections),
-    };
-  });
+      onClick: () => action.onClick?.(selections),
+    }));
+
+  // Return combined actions
+  return [...userActions, ...defaultActions];
 }
 
 const rows = computed(() => {

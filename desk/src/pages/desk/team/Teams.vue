@@ -17,6 +17,8 @@
     <ListViewBuilder
       :options="{
         doctype: 'HD Team',
+        selectable: true,
+        showSelectBanner: true,
         emptyState: {
           title: emptyMessage,
         },
@@ -55,14 +57,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { createResource, usePageMeta, Dialog, FormControl } from "frappe-ui";
-import { isEmpty } from "lodash";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import { AGENT_PORTAL_TEAM_SINGLE } from "@/router";
-import { useError } from "@/composables/error";
+import { createResource, Dialog, FormControl, usePageMeta } from "frappe-ui";
+import { isEmpty } from "lodash";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const showNewDialog = ref(false);
