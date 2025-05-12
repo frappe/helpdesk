@@ -259,7 +259,7 @@ class HDTicket(Document):
             "HD Team Member",
             {
                 "parent": team,
-                "user": agent,
+                "user": agent.user,
             },
         )
 
