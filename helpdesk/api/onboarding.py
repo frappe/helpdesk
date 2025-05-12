@@ -3,7 +3,7 @@ import frappe
 
 @frappe.whitelist()
 def get_first_sla():
-    """Get SLA created by the current user apart from default SLA"""
+    """Get SLA created by the current user except the default SLA"""
     sla = frappe.get_all(
         "HD Service Level Agreement",
         filters={"name": ["!=", "Default"], "owner": ["=", frappe.session.user]},
@@ -11,15 +11,18 @@ def get_first_sla():
         order_by="creation asc",
         limit=1,
     )
-    return sla[0].name if sla else None
+    return bool(sla)
 
 
 @frappe.whitelist()
 def get_first_ticket():
-    """Get first ticket created apart from default ticket"""
+    """Get first ticket created except the default ticket"""
     ticket = frappe.get_all(
         "HD Ticket",
-        filters={"subject": ["!=", "Welcome to Helpdesk"]},
+        filters={
+            "subject": ["!=", "Welcome to Helpdesk"],
+            "owner": ["=", frappe.session.user],
+        },
         fields=["name"],
         order_by="creation asc",
         limit=1,

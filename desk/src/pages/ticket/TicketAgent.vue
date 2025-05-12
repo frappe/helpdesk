@@ -135,44 +135,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import {
   Breadcrumbs,
-  Dropdown,
-  createResource,
   Dialog,
+  Dropdown,
   FormControl,
-  Tabs,
-  TabPanel,
   TabList,
+  TabPanel,
+  Tabs,
   call,
+  createResource,
 } from "frappe-ui";
+import { computed, h, onMounted, onUnmounted, provide, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 import {
-  LayoutHeader,
-  MultipleAvatar,
   AssignmentModal,
   CommunicationArea,
   Icon,
+  LayoutHeader,
+  MultipleAvatar,
 } from "@/components";
-import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import {
-  IndicatorIcon,
-  CommentIcon,
   ActivityIcon,
+  CommentIcon,
   EmailIcon,
+  IndicatorIcon,
 } from "@/components/icons";
+import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { useView } from "@/composables/useView";
 import { socket } from "@/socket";
+import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { globalStore } from "@/stores/globalStore";
-import { createToast, getIcon } from "@/utils";
-import { setupCustomizations } from "@/composables/formCustomisation";
 import { TabObject, TicketTab, View } from "@/types";
-import { useView } from "@/composables/useView";
+import { createToast, getIcon } from "@/utils";
 import { ComputedRef } from "vue";
-
+import { showAssignmentModal } from "./modalStates";
 const route = useRoute();
 const router = useRouter();
 
@@ -201,7 +201,6 @@ const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
 
-const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
 const ticket = createResource({

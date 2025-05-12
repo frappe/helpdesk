@@ -152,55 +152,60 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, ref, onMounted, reactive, h } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import {
-  TrialBanner,
-  HelpModal,
-  GettingStartedBanner,
-  useOnboarding,
-  showHelpModal,
-  minimize,
-  IntermediateStepModal,
-} from "frappe-ui/frappe";
 import HDLogo from "@/assets/logos/HDLogo.vue";
-import { storeToRefs } from "pinia";
+import { Section, SidebarLink } from "@/components";
+import Apps from "@/components/Apps.vue";
+import { FrappeCloudIcon } from "@/components/icons";
+import SettingsModal from "@/components/Settings/SettingsModal.vue";
+import UserMenu from "@/components/UserMenu.vue";
+import { useDevice } from "@/composables";
+import { confirmLoginToFrappeCloud } from "@/composables/fc";
+import { useScreenSize } from "@/composables/screen";
+import { currentView, useView } from "@/composables/useView";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
-import { useDevice } from "@/composables";
-import { SidebarLink } from "@/components";
-import UserMenu from "@/components/UserMenu.vue";
-import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import Apps from "@/components/Apps.vue";
+import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
+import { call } from "frappe-ui";
+import {
+  GettingStartedBanner,
+  HelpModal,
+  IntermediateStepModal,
+  minimize,
+  showHelpModal,
+  TrialBanner,
+  useOnboarding,
+} from "frappe-ui/frappe";
+import { storeToRefs } from "pinia";
+import { computed, h, markRaw, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
-import { Section } from "@/components";
-import { useView, currentView } from "@/composables/useView";
-import { FrappeCloudIcon } from "@/components/icons";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
-import { useScreenSize } from "@/composables/screen";
-import { capture } from "@/telemetry";
 
+import { InviteCustomer } from "@/components/icons";
+import {
+  showAssignmentModal,
+  showCommentBox,
+  showEmailBox,
+} from "@/pages/ticket/modalStates";
+import { reactive } from "vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
-import LucideSearch from "~icons/lucide/search";
+import FileText from "~icons/lucide/file-text";
+import Globe from "~icons/lucide/globe";
 import LucideMail from "~icons/lucide/mail";
-import LucideUserPlus from "~icons/lucide/user-plus";
-import Timer from "~icons/lucide/timer";
-import UserPen from "~icons/lucide/user-pen";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
-import FileText from "~icons/lucide/file-text";
+import LucideSearch from "~icons/lucide/search";
 import Ticket from "~icons/lucide/ticket";
-import Globe from "~icons/lucide/globe";
-import { InviteCustomer } from "@/components/icons";
-
+import Timer from "~icons/lucide/timer";
+import UserPen from "~icons/lucide/user-pen";
+import LucideUserPlus from "~icons/lucide/user-plus";
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -212,7 +217,6 @@ const device = useDevice();
 const showSettingsModal = ref(false);
 
 const { pinnedViews, publicViews } = useView();
-
 declare global {
   interface Window {
     is_fc_site: boolean;
@@ -348,7 +352,11 @@ const logo = h(
 );
 
 const defaultSettingsTab = ref(0);
-const steps = [
+const onboardingStepsDesk = reactive({
+  slaCreated: false,
+});
+
+const steps = computed(() => [
   {
     // done
     name: "setup_email_account",
@@ -376,7 +384,7 @@ const steps = [
     // left
     name: "setup_sla",
     title: "Set your first SLA",
-    completed: false,
+    completed: onboardingStepsDesk.slaCreated,
     icon: markRaw(Timer),
     onClick: () => {
       console.log("clicked");
@@ -392,7 +400,8 @@ const steps = [
     completed: false,
     icon: markRaw(Ticket),
     onClick: () => {
-      console.log("clicked");
+      router.push({ name: "TicketAgentNew" });
+      minimize.value = true;
     },
   },
   {
@@ -402,8 +411,10 @@ const steps = [
     title: "Assign a ticket to an agent",
     completed: false,
     icon: markRaw(UserPen),
-    onClick: () => {
-      console.log("clicked");
+    onClick: async () => {
+      await handleFirstTicketNavigation();
+      showAssignmentModal.value = true;
+      minimize.value = true;
     },
   },
   {
@@ -413,8 +424,11 @@ const steps = [
     title: "Reply on a ticket",
     completed: false,
     icon: markRaw(MailOpen),
-    onClick: () => {
-      console.log("clicked");
+    onClick: async () => {
+      await handleFirstTicketNavigation();
+      showEmailBox.value = true;
+      showCommentBox.value = false;
+      minimize.value = true;
     },
   },
   {
@@ -424,8 +438,11 @@ const steps = [
     title: "Add a comment on a ticket",
     completed: false,
     icon: markRaw(MessageCircle),
-    onClick: () => {
-      console.log("clicked");
+    onClick: async () => {
+      await handleFirstTicketNavigation();
+      showCommentBox.value = true;
+      showEmailBox.value = false;
+      minimize.value = true;
     },
   },
   {
@@ -458,7 +475,7 @@ const steps = [
       console.log("clicked");
     },
   },
-];
+]);
 
 const articles = ref([
   {
@@ -474,18 +491,46 @@ const articles = ref([
 const showIntermediateModal = ref(false);
 const currentStep = ref({});
 
-const { isOnboardingStepsCompleted, setUp } = useOnboarding("helpdesk");
+const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
+  useOnboarding("helpdesk");
+
+async function handleFirstTicketNavigation() {
+  const ticket = await getFirstTicket();
+
+  if (ticket) {
+    router.push({
+      name: "TicketAgent",
+      params: { ticketId: ticket },
+    });
+  } else {
+    router.push({ name: "TicketAgentNew" });
+  }
+}
+
+async function getFirstTicket() {
+  let ticket = localStorage.getItem("firstTicket");
+  if (ticket) return ticket;
+  return await call("helpdesk.api.onboarding.get_first_ticket");
+}
 
 onMounted(() => {
-  setUp(steps);
+  setUp(steps.value);
   // find completedSteps
   let storedSteps = JSON.parse(localStorage.getItem("onboardingStatus"));
-  if (!storedSteps) return;
+  if (!storedSteps || storedSteps.helpdesk_onboarding_status == null) return;
 
   storedSteps = storedSteps.helpdesk_onboarding_status;
-  let completedSteps = storedSteps.filter((step) => step.completed);
+  let completedSteps = storedSteps
+    .filter((step) => step.completed)
+    .map((s) => s.name);
   console.log(completedSteps);
-  // find APIs to call
-  // localStorage.getItem
+  if (completedSteps.includes("setup_sla")) {
+    onboardingStepsDesk.slaCreated = true;
+  }
+  if (!completedSteps.includes("setup_sla")) {
+    call("helpdesk.api.onboarding.get_first_sla").then((res: boolean) => {
+      updateOnboardingStep("setup_sla", res);
+    });
+  }
 });
 </script>

@@ -96,22 +96,22 @@
   </TextEditor>
 </template>
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
 import {
-  TextEditorFixedMenu,
-  TextEditor,
   FileUploader,
+  TextEditor,
+  TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
+import { computed, onMounted, ref } from "vue";
 
-import { AttachmentIcon } from "@/components/icons/";
 import { AttachmentItem } from "@/components/";
+import { AttachmentIcon } from "@/components/icons/";
 import { useAgentStore } from "@/stores/agent";
 
-import { useStorage } from "@vueuse/core";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { isContentEmpty, textEditorMenuButtons, getFontFamily } from "@/utils";
+import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
+import { useStorage } from "@vueuse/core";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList } = useAgentStore();
@@ -172,11 +172,11 @@ async function submitComment() {
       },
     }),
     onSuccess: () => {
+      updateOnboardingStep("comment_on_ticket");
       emit("submit");
       loading.value = false;
       attachments.value = [];
       newComment.value = null;
-      updateOnboardingStep("comment_on_ticket");
     },
     onError: () => {
       loading.value = false;

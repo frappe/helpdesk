@@ -143,7 +143,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
+import {
+  AttachmentItem,
+  CannedResponseSelectorModal,
+  MultiSelectInput,
+} from "@/components";
+import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { PreserveVideoControls } from "@/tiptap-extensions";
+import {
+  createToast,
+  getFontFamily,
+  isContentEmpty,
+  textEditorMenuButtons,
+  validateEmail,
+} from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
@@ -152,20 +165,7 @@ import {
   createResource,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import {
-  createToast,
-  validateEmail,
-  textEditorMenuButtons,
-  isContentEmpty,
-  getFontFamily,
-} from "@/utils";
-import {
-  MultiSelectInput,
-  AttachmentItem,
-  CannedResponseSelectorModal,
-} from "@/components";
-import { AttachmentIcon, EmailIcon } from "@/components/icons";
-import { PreserveVideoControls } from "@/tiptap-extensions";
+import { computed, nextTick, ref } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
