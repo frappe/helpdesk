@@ -9,7 +9,7 @@
           label="New contact"
           theme="gray"
           variant="solid"
-          @click="isDialogVisible = !isDialogVisible"
+          @click="showNewContactModal = !showNewContactModal"
         >
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
@@ -21,10 +21,10 @@
       ref="listViewRef"
       :options="options"
       @row-click="openContact"
-      @empty-state-action="isDialogVisible = true"
+      @empty-state-action="showNewContactModal = true"
     />
     <NewContactDialog
-      v-model="isDialogVisible"
+      v-model="showNewContactModal"
       @contact-created="handleContactCreated"
     />
     <ContactDialog
@@ -44,8 +44,8 @@ import { createToast } from "@/utils";
 import { Avatar, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import ContactDialog from "./ContactDialog.vue";
+import { showNewContactModal } from "./dialogState";
 
-const isDialogVisible = ref(false);
 const isContactDialogVisible = ref(false);
 const selectedContact = ref(null);
 
@@ -77,7 +77,7 @@ const options = computed(() => {
 });
 
 function handleContactCreated(): void {
-  isDialogVisible.value = false;
+  showNewContactModal.value = false;
   listViewRef.value?.reload();
 }
 

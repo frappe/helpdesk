@@ -28,3 +28,16 @@ def get_first_ticket():
         limit=1,
     )
     return ticket[0].name if ticket else None
+
+
+@frappe.whitelist()
+def get_general_category_id():
+    """Get the id of the general category"""
+    category = frappe.get_all(
+        "HD Article Category",
+        filters={"category_name": ["=", "General"]},
+        pluck="name",
+        order_by="creation asc",
+        limit=1,
+    )
+    return category[0] if category else None

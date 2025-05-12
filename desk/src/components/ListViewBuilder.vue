@@ -212,19 +212,16 @@ const defaultOptions = reactive({
     {
       label: "Delete",
       icon: "trash-2",
-      onClick: (selections) => {
-        // Handle delete action
-        listSelections.value = new Set(selections);
+      onClick: (selections: Set<string>) => {
         $dialog({
           title: "Delete",
-          message: `Are you sure you want to delete these item(s)?`,
+          message: `Are you sure you want to delete ${selections.size} item(s)?`,
           actions: [
             {
               label: "Confirm",
               variant: "solid",
               onClick(close: Function) {
-                handleBulkDelete(close);
-                close();
+                handleBulkDelete(close, selections);
               },
             },
           ],
@@ -235,10 +232,10 @@ const defaultOptions = reactive({
   ],
 });
 
-function handleBulkDelete(hide: Function) {
+function handleBulkDelete(hide: Function, selections: Set<string>) {
   capture("bulk_delete" + props.options.doctype);
   call("frappe.desk.reportview.delete_items", {
-    items: JSON.stringify(Array.from(listSelections.value)),
+    items: JSON.stringify(Array.from(selections)),
     doctype: props.options.doctype,
   }).then(() => {
     createToast({
@@ -254,7 +251,6 @@ function handleBulkDelete(hide: Function) {
 function reset() {
   exposeFunctions.reload();
   exposeFunctions.unselectAll();
-  listSelections.value?.clear();
 }
 
 const options = computed(() => {

@@ -100,26 +100,23 @@
       :isSidebarCollapsed="!isExpanded"
     />
     <GettingStartedBanner
-      v-if="!isOnboardingStepsCompleted"
+      v-if="!isOnboardingStepsCompleted && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
       appName="helpdesk"
     />
     <SidebarLink
-      v-if="isOnboardingStepsCompleted"
-      :icon="LucideArrowLeftFromLine"
-      label="Help"
-      :isCollapsed="!isExpanded"
+      v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+      :icon="HelpIcon"
+      :label="'Help'"
+      :is-expanded="isExpanded"
       @click="
         () => {
           showHelpModal = minimize ? true : !showHelpModal;
           minimize = !showHelpModal;
         }
       "
-    >
-      <template #icon>
-        <HelpIcon class="h-4 w-4" />
-      </template>
-    </SidebarLink>
+    />
+
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"
@@ -178,6 +175,7 @@ import {
   TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
+import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -187,11 +185,13 @@ import {
 } from "./layoutSettings";
 
 import { InviteCustomer } from "@/components/icons";
+import { showNewContactModal } from "@/pages/desk/contact/dialogState";
 import {
   showAssignmentModal,
   showCommentBox,
   showEmailBox,
 } from "@/pages/ticket/modalStates";
+
 import { reactive } from "vue";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
@@ -406,7 +406,6 @@ const steps = computed(() => [
   },
   {
     // done
-    // remaining is get created ticket and
     name: "assign_to_agent",
     title: "Assign a ticket to an agent",
     completed: false,
@@ -419,7 +418,6 @@ const steps = computed(() => [
   },
   {
     // done
-    // remaining is get created ticket and
     name: "reply_on_ticket",
     title: "Reply on a ticket",
     completed: false,
@@ -433,7 +431,6 @@ const steps = computed(() => [
   },
   {
     // done
-    // remaining is get created ticket and
     name: "comment_on_ticket",
     title: "Add a comment on a ticket",
     completed: false,
@@ -451,18 +448,38 @@ const steps = computed(() => [
     title: "Create your first article",
     completed: false,
     icon: markRaw(FileText),
-    onClick: () => {
-      console.log("clicked");
+    onClick: async () => {
+      const generalCategory = await getGeneralCategory();
+      router.push({
+        name: "NewArticle",
+        query: {
+          title: "General",
+        },
+        params: { id: generalCategory },
+      });
+      minimize.value = true;
     },
   },
   {
     // left
     name: "add_invite_contact",
-    title: "Add & invite a contact",
+    title: "Create & invite a contact",
     completed: false,
     icon: markRaw(InviteCustomer),
     onClick: () => {
       console.log("clicked");
+      minimize.value = true;
+      currentStep.value = {
+        title: "Create & invite a contact",
+        buttonLabel: "Create",
+        // videoURL: "/assets/helpdesk/desk/videos/changeDealStatus.mov",
+        onClick: async () => {
+          showIntermediateModal.value = false;
+          router.push({ name: "ContactList" });
+          showNewContactModal.value = true;
+        },
+      };
+      showIntermediateModal.value = true;
     },
   },
   {
@@ -472,7 +489,9 @@ const steps = computed(() => [
     completed: false,
     icon: markRaw(Globe),
     onClick: () => {
-      console.log("clicked");
+      window.open("/helpdesk/my-tickets", "_blank");
+      updateOnboardingStep("explore_customer_portal");
+      minimize.value = true;
     },
   },
 ]);
@@ -511,6 +530,18 @@ async function getFirstTicket() {
   let ticket = localStorage.getItem("firstTicket");
   if (ticket) return ticket;
   return await call("helpdesk.api.onboarding.get_first_ticket");
+}
+
+async function getGeneralCategory() {
+  let generalCategory = localStorage.getItem("generalCategoryId");
+  if (!generalCategory) {
+    generalCategory = await call(
+      "helpdesk.api.onboarding.get_general_category_id"
+    );
+    if (!generalCategory) return;
+    localStorage.setItem("generalCategoryId", generalCategory);
+  }
+  return generalCategory;
 }
 
 onMounted(() => {
