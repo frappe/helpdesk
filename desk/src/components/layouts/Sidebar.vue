@@ -366,7 +366,6 @@ const showOnboardingBanner = computed(() => {
 
 const steps = computed(() => [
   {
-    // done
     name: "setup_email_account",
     title: "Connect your support email",
     completed: false,
@@ -378,7 +377,6 @@ const steps = computed(() => [
     },
   },
   {
-    // done
     name: "invite_agents",
     title: "Invite agents",
     completed: false,
@@ -401,8 +399,6 @@ const steps = computed(() => [
     },
   },
   {
-    // done
-    // remaining is get created ticket and
     name: "create_first_ticket",
     title: "Create your first ticket",
     completed: false,
@@ -413,7 +409,6 @@ const steps = computed(() => [
     },
   },
   {
-    // done
     name: "assign_to_agent",
     title: "Assign a ticket to an agent",
     completed: false,
@@ -425,7 +420,6 @@ const steps = computed(() => [
     },
   },
   {
-    // done
     name: "reply_on_ticket",
     title: "Reply on a ticket",
     completed: false,
@@ -438,7 +432,6 @@ const steps = computed(() => [
     },
   },
   {
-    // done
     name: "comment_on_ticket",
     title: "Add a comment on a ticket",
     completed: false,
@@ -451,7 +444,6 @@ const steps = computed(() => [
     },
   },
   {
-    // done
     name: "first_article",
     title: "Create your first article",
     completed: false,
@@ -469,7 +461,6 @@ const steps = computed(() => [
     },
   },
   {
-    // left
     name: "add_invite_contact",
     title: "Create & invite a contact",
     completed: false,
@@ -491,7 +482,6 @@ const steps = computed(() => [
     },
   },
   {
-    // left
     name: "explore_customer_portal",
     title: "Explore customer portal",
     completed: false,
