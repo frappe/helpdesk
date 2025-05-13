@@ -15,7 +15,7 @@ from frappe.utils import (
     to_timedelta,
 )
 
-from helpdesk.utils import get_context
+from helpdesk.utils import get_context, publish_event
 
 
 class HDServiceLevelAgreement(Document):
@@ -358,6 +358,33 @@ class HDServiceLevelAgreement(Document):
         for row in self.support_and_resolution:
             res[row.workday] = row
         return res
+
+    # temporary, will remove once sla goes to frontend
+    def before_insert(self):
+        user = frappe.session.user
+        user_onboarding_status = frappe.get_value("User", user, "onboarding_status")
+        if not user_onboarding_status:
+            return
+
+        user_onboarding_status = frappe.parse_json(user_onboarding_status)
+        if not user_onboarding_status:
+            return
+        hd_onboarding_steps = user_onboarding_status.get("helpdesk_onboarding_status")
+        if not hd_onboarding_steps:
+            return
+
+        sla_onboarding_status = {}
+        for step in hd_onboarding_steps:
+            if step.get("name") == "setup_sla":
+                sla_onboarding_status = step
+                break
+
+        if not sla_onboarding_status:
+            return
+        if sla_onboarding_status.get("completed"):
+            return
+
+        publish_event("update_sla_status_" + user, {})
 
 
 def get_repeated(values):

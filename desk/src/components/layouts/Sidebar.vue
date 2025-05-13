@@ -192,7 +192,7 @@ import {
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 
-import { reactive } from "vue";
+import { globalStore } from "@/stores/globalStore";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
@@ -214,6 +214,8 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
+const { $socket } = globalStore();
+
 const showSettingsModal = ref(false);
 
 const { pinnedViews, publicViews } = useView();
@@ -352,9 +354,6 @@ const logo = h(
 );
 
 const defaultSettingsTab = ref(0);
-const onboardingStepsDesk = reactive({
-  slaCreated: false,
-});
 
 const showOnboardingBanner = computed(() => {
   return (
@@ -364,7 +363,7 @@ const showOnboardingBanner = computed(() => {
   );
 });
 
-const steps = computed(() => [
+const steps = [
   {
     name: "setup_email_account",
     title: "Connect your support email",
@@ -390,7 +389,7 @@ const steps = computed(() => [
     // left
     name: "setup_sla",
     title: "Set your first SLA",
-    completed: onboardingStepsDesk.slaCreated,
+    completed: false,
     icon: markRaw(Timer),
     onClick: () => {
       console.log("clicked");
@@ -492,7 +491,7 @@ const steps = computed(() => [
       minimize.value = true;
     },
   },
-]);
+];
 
 const articles = ref([
   {
@@ -611,27 +610,14 @@ async function getGeneralCategory() {
 function setUpOnboarding() {
   if (!authStore.isManager) return;
 
-  setUp(steps.value);
-
-  let storedSteps = JSON.parse(localStorage.getItem("onboardingStatus"));
-  if (!storedSteps || storedSteps.helpdesk_onboarding_status == null) return;
-
-  storedSteps = storedSteps.helpdesk_onboarding_status;
-  let completedSteps = storedSteps
-    .filter((step) => step.completed)
-    .map((s) => s.name);
-
-  if (completedSteps.includes("setup_sla")) {
-    onboardingStepsDesk.slaCreated = true;
-  }
-  if (!completedSteps.includes("setup_sla")) {
-    call("helpdesk.api.onboarding.get_first_sla").then((res: boolean) => {
-      updateOnboardingStep("setup_sla", res);
-    });
-  }
+  setUp(steps);
 }
 
 onMounted(() => {
   setUpOnboarding();
+
+  $socket.on("update_sla_status_" + authStore.user.email, () => {
+    updateOnboardingStep("setup_sla");
+  });
 });
 </script>
