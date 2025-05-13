@@ -500,7 +500,73 @@ const articles = ref([
     opened: false,
     subArticles: [
       { name: "introduction", title: "Introduction" },
-      { name: "setting-up", title: "Setting p" },
+      { name: "setting-up", title: "Setting up" },
+    ],
+  },
+  {
+    title: "Getting Started",
+    opened: false,
+    subArticles: [
+      {
+        name: "lesson-1-your-first-ticket",
+        title: "Creating your first ticket",
+      },
+      {
+        name: "lesson-2understanding-ticket-view",
+        title: "Understanding ticket view",
+      },
+      {
+        name: "lesson-3-agents-teams",
+        title: "Agents & Teams",
+      },
+      {
+        name: "customers-contacts",
+        title: "Customers & Contacts",
+      },
+      {
+        name: "lesson-4-knowledge-base",
+        title: "Knowledge Base",
+      },
+      {
+        name: "customer-portal",
+        title: "Customer Portal",
+      },
+    ],
+  },
+  {
+    title: "Masters",
+    opened: false,
+    subArticles: [
+      { name: "ticket", title: "Ticket" },
+      { name: "agent", title: "Agent" },
+      { name: "team", title: "Team" },
+      { name: "contact", title: "Contact" },
+      { name: "customer", title: "Customer" },
+      { name: "knowledge-base", title: "Knowledge Base" },
+      { name: "canned-response", title: "Canned Responses" },
+      { name: "service-level-agreement", title: "Service Level Agreement" },
+      { name: "ticket-type", title: "Ticket Type" },
+      { name: "ticket-priority", title: "Ticket Priority" },
+    ],
+  },
+  {
+    title: "Customizations",
+    opened: false,
+    subArticles: [
+      { name: "custom-actions", title: "Custom Actions" },
+      { name: "field-dependency", title: "Field Dependency" },
+      { name: "custom-views", title: "Custom Views" },
+      {
+        name: "settings",
+        title: "Settings",
+      },
+    ],
+  },
+  {
+    title: "Frappe Helpdesk Mobile",
+    opened: false,
+    subArticles: [
+      { name: "pwa-installation", title: "Mobile App Installation" },
     ],
   },
 ]);
