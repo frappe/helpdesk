@@ -23,7 +23,6 @@ function init() {
       }
     }
   });
-  window.$socket = socket;
 
   return socket;
 }

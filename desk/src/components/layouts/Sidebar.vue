@@ -177,7 +177,7 @@ import {
 } from "frappe-ui/frappe";
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
-import { computed, h, markRaw, onMounted, ref } from "vue";
+import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   agentPortalSidebarOptions,
@@ -615,10 +615,13 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
-  let event = "update_sla_status_" + authStore.userId;
 
-  $socket.on(event, () => {
+  $socket.on("update_sla_status", () => {
     updateOnboardingStep("setup_sla");
   });
+});
+
+onUnmounted(() => {
+  $socket.off("update_sla_status");
 });
 </script>

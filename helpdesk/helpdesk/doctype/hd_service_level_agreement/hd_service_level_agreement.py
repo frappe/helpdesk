@@ -384,8 +384,7 @@ class HDServiceLevelAgreement(Document):
         if sla_onboarding_status.get("completed"):
             return
 
-        event = "update_sla_status_" + frappe.session.user
-        frappe.publish_realtime(event)
+        frappe.publish_realtime("update_sla_status", user=frappe.session.user)
 
 
 def get_repeated(values):
