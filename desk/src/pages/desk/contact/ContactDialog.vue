@@ -68,22 +68,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import type { Ref } from "vue";
+import { createToast } from "@/utils";
 import {
-  createDocumentResource,
+  Autocomplete,
   Avatar,
+  call,
+  createDocumentResource,
+  createListResource,
   Dialog,
   FileUploader,
-  Autocomplete,
-  createListResource,
-  call,
 } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+import type { Ref } from "vue";
+import { computed, ref } from "vue";
 import zod from "zod";
-import { createToast } from "@/utils";
 
 import MultiSelect from "@/components/MultiSelect.vue";
-import { File, AutoCompleteItem } from "@/types";
+import { AutoCompleteItem, File } from "@/types";
 
 interface Props {
   name: {
@@ -211,6 +212,8 @@ function handleCustomerChange(item: AutoCompleteItem | null) {
   }
 }
 
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+
 const contact = createDocumentResource({
   doctype: "Contact",
   name: props.name,
@@ -309,6 +312,7 @@ async function inviteContact(): Promise<void> {
     await contact.setValue.submit({
       user: user,
     });
+    updateOnboardingStep("add_invite_contact");
   } catch (error) {
     isLoading.value = false;
     const parser = new DOMParser();

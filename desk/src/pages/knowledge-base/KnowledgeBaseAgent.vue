@@ -37,34 +37,34 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, reactive, computed, onMounted } from "vue";
-import {
-  usePageMeta,
-  FeatherIcon,
-  Button,
-  Dropdown,
-  createResource,
-  Badge,
-} from "frappe-ui";
-import { useRouter } from "vue-router";
-import {
-  updateCategoryTitle,
-  deleteRes as deleteCategory,
-  newCategory,
-  moveToCategory,
-  deleteArticles,
-  mergeCategory,
-} from "@/stores/knowledgeBase";
-import { globalStore } from "@/stores/globalStore";
-import { capture } from "@/telemetry";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
-import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import { createToast, copyToClipboard } from "@/utils";
-import { Error } from "@/types";
-import LucideMerge from "~icons/lucide/merge";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
+import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
+import { globalStore } from "@/stores/globalStore";
+import {
+  deleteArticles,
+  deleteRes as deleteCategory,
+  mergeCategory,
+  moveToCategory,
+  newCategory,
+  updateCategoryTitle,
+} from "@/stores/knowledgeBase";
+import { capture } from "@/telemetry";
+import { Error } from "@/types";
+import { copyToClipboard, createToast } from "@/utils";
+import {
+  Badge,
+  Button,
+  Dropdown,
+  FeatherIcon,
+  createResource,
+  usePageMeta,
+} from "frappe-ui";
+import { computed, h, onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import LucideMerge from "~icons/lucide/merge";
 
 const router = useRouter();
 const { $dialog } = globalStore();

@@ -33,8 +33,21 @@ import { computed, ref, h } from "vue";
 import { usePageMeta, Avatar } from "frappe-ui";
 import AddNewAgentsDialog from "@/components/desk/global/AddNewAgentsDialog.vue";
 import { LayoutHeader, ListViewBuilder } from "@/components";
+import { useRoute } from "vue-router";
+import { watch } from "vue";
 
 const isDialogVisible = ref(false);
+const route = useRoute();
+
+watch(
+  () => route.query.invite,
+  (newValue: string) => {
+    if (parseInt(newValue)) {
+      isDialogVisible.value = true;
+    }
+  },
+  { immediate: true }
+);
 
 // filter not on first field/ datetime
 // options mei route or click ka option

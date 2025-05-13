@@ -27,3 +27,4 @@ export { default as OrganizationsIcon } from "./OrganizationsIcon.vue";
 export { default as UnpinIcon } from "./UnpinIcon.vue";
 export { default as PinIcon } from "./PinIcon.vue";
 export { default as FrappeCloudIcon } from "./FrappeCloudIcon.vue";
+export { default as InviteCustomer } from "./InviteCustomer.vue";
