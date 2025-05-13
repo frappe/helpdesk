@@ -615,8 +615,9 @@ function setUpOnboarding() {
 
 onMounted(() => {
   setUpOnboarding();
+  let event = "update_sla_status_" + authStore.userId;
 
-  $socket.on("update_sla_status_" + authStore.user.email, () => {
+  $socket.on(event, () => {
     updateOnboardingStep("setup_sla");
   });
 });
