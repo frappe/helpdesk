@@ -59,6 +59,6 @@ let tabs = [
   },
 ];
 const show: ModelRef<boolean> = defineModel();
-// tabs[props.defaultTab
+
 const activeTab = ref(tabs[props.defaultTab]);
 </script>
