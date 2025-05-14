@@ -110,6 +110,7 @@ const showForm = ref(false);
 const agents = createListResource({
   doctype: "HD Agent",
   fields: ["name", "user_image", "agent_name"],
+  cache: ["hd_agent_list"],
   filters: {
     is_active: ["=", 1],
   },
