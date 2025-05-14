@@ -80,8 +80,8 @@
 </template>
 
 <script>
-import { Dialog, Input, FeatherIcon } from "frappe-ui";
 import { ref } from "@vue/reactivity";
+import { Dialog, FeatherIcon, Input } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 
 export default {

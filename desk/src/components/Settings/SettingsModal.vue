@@ -23,7 +23,9 @@
             </button>
           </div>
         </div>
-        <div class="flex flex-1 flex-col overflow-scroll p-4">
+        <div
+          class="flex flex-1 flex-col overflow-scroll px-10 py-8 bg-surface-modal"
+        >
           <component :is="activeTab.component" v-if="activeTab" />
         </div>
       </div>
@@ -31,10 +33,14 @@
   </Dialog>
 </template>
 <script setup lang="ts">
+import Teams from "@/pages/desk/team/Teams.vue";
 import { Dialog } from "frappe-ui";
 import { markRaw, ModelRef, ref } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
+import LucideUser from "~icons/lucide/user";
+import LucideUsers from "~icons/lucide/users";
+import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 const props = withDefaults(
@@ -56,6 +62,16 @@ let tabs = [
     label: "Branding",
     icon: markRaw(ImageUp),
     component: markRaw(Branding),
+  },
+  {
+    label: "Agents",
+    icon: markRaw(LucideUser),
+    component: markRaw(Agents),
+  },
+  {
+    label: "Teams",
+    icon: markRaw(LucideUsers),
+    component: markRaw(Teams),
   },
 ];
 const show: ModelRef<boolean> = defineModel();
