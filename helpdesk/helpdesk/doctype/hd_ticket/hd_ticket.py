@@ -72,7 +72,7 @@ class HDTicket(Document):
             )
             capture_event("ticket_split")
             return
-        log_ticket_activity(self.name, "created this ticket")
+
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
