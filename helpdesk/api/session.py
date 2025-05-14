@@ -14,6 +14,13 @@ def get_users():
     ).run(as_dict=1)
 
     for user in users:
+        roles = frappe.get_roles(user.name)
+        if "Agent Manager" in roles:
+            user.role = "Manager"
+        elif "Agent" in roles:
+            user.role = "Agent"
+        elif "Guest" in roles:
+            user.role = "Guest"
         if frappe.session.user == user.name:
             user.session_user = True
 

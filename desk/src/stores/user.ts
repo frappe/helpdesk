@@ -1,12 +1,13 @@
-import { defineStore } from "pinia";
-import { createResource } from "frappe-ui";
-import { useAuthStore } from "./auth";
-import { reactive } from "vue";
 import { LOGIN_PAGE } from "@/router";
+import { createResource } from "frappe-ui";
+import { defineStore } from "pinia";
+import { reactive, ref } from "vue";
+import { useAuthStore } from "./auth";
 
 export const useUserStore = defineStore("user", () => {
   const auth = useAuthStore();
   const usersByName = reactive({});
+  const userRoles = ref<Record<string, string>>({});
 
   const users = createResource({
     url: "helpdesk.api.session.get_users",
@@ -43,9 +44,28 @@ export const useUserStore = defineStore("user", () => {
     return usersByName[email];
   }
 
+  function getUserRole(email: string) {
+    if (!email || email === "sessionUser") {
+      email = auth.username;
+    }
+    if (userRoles.value[email]) {
+      return userRoles.value[email];
+    }
+    const user = getUser(email);
+    const calculatedRole = user.role;
+    userRoles.value[email] = calculatedRole;
+    return calculatedRole;
+  }
+
+  function updateUserRoleCache(user: string, role: string) {
+    userRoles.value[user] = role;
+  }
+
   return {
     users,
     init,
     getUser,
+    getUserRole,
+    updateUserRoleCache,
   };
 });

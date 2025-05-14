@@ -392,6 +392,7 @@ const steps = [
     icon: markRaw(LucideUserPlus),
     onClick: () => {
       minimize.value = true;
+      //TODO: open invite agent modal
       router.push({ name: "AgentList", query: { invite: 1 } });
     },
   },
