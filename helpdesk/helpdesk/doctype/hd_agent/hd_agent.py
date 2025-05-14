@@ -47,3 +47,21 @@ class HDAgent(Document):
         # and sql gets confused which modified to take from those 2 tables
         # hence throws ambiguous error
         return {"columns": columns, "rows": rows}
+
+
+@frappe.whitelist()
+def update_agent_role(user, new_role):
+    """
+    Update the role of the user to Agent
+    """
+
+    user_doc = frappe.get_doc("User", user)
+
+    if new_role == "Manager":
+        user_doc.append_roles("Agent Manager", "System Manager")
+    if new_role == "Agent":
+        user_doc.append_roles("Agent")
+        if "Agent Manager" in frappe.get_roles(user_doc.name):
+            user_doc.remove_roles("Agent Manager", "System Manager")
+
+    user_doc.save()

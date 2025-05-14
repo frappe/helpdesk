@@ -161,11 +161,6 @@ const routes = [
         component: () => import("@/pages/desk/contact/Contacts.vue"),
       },
       {
-        path: "agents",
-        name: AGENT_PORTAL_AGENT_LIST,
-        component: () => import("@/pages/desk/agent/Agents.vue"),
-      },
-      {
         path: "teams",
         name: AGENT_PORTAL_TEAM_LIST,
         component: () => import("@/pages/desk/team/Teams.vue"),
