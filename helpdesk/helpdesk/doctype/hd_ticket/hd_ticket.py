@@ -63,6 +63,8 @@ class HDTicket(Document):
 
     def before_save(self):
         self.apply_sla()
+        if not self.is_new():
+            self.handle_ticket_activity_update()
 
     def after_insert(self):
         if self.ticket_split_from:
@@ -72,7 +74,7 @@ class HDTicket(Document):
             )
             capture_event("ticket_split")
             return
-        log_ticket_activity(self.name, "created this ticket")
+
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
@@ -91,7 +93,6 @@ class HDTicket(Document):
                     for agent in agents:
                         self.notify_agent(agent.name, "Reaction")
 
-        self.handle_ticket_activity_update()
         self.remove_assignment_if_not_in_team()
         self.publish_update()
         self.update_search_index()

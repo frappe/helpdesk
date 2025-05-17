@@ -1,0 +1,65 @@
+<template>
+  <Dialog
+    v-model="show"
+    :options="{
+      title: 'New team',
+    }"
+  >
+    <template #body-content>
+      <form class="space-y-2" @submit.prevent="newTeam.submit">
+        <FormControl
+          v-model="newTeamTitle"
+          label="Title"
+          placeholder="Product experts"
+          type="text"
+        />
+        <Button
+          :disabled="isEmpty(newTeamTitle)"
+          class="w-full"
+          label="Create"
+          theme="gray"
+          variant="solid"
+        />
+      </form>
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { createToast } from "@/utils";
+import { createResource } from "frappe-ui";
+import { isEmpty } from "lodash";
+import { ref } from "vue";
+
+const emit = defineEmits(["create"]);
+const show = defineModel();
+
+const newTeamTitle = ref(null);
+const newTeam = createResource({
+  url: "frappe.client.insert",
+  makeParams() {
+    return {
+      doc: {
+        doctype: "HD Team",
+        team_name: newTeamTitle.value,
+      },
+    };
+  },
+  validate(params) {
+    if (isEmpty(params.doc.team_name)) return "Title is required";
+  },
+  auto: false,
+  onSuccess() {
+    createToast({
+      title: "Team created successfully",
+      icon: "check",
+      iconClasses: "text-green-600",
+    });
+    newTeamTitle.value = null;
+    show.value = false;
+    emit("create");
+  },
+});
+</script>
+
+<style scoped></style>

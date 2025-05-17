@@ -55,24 +55,17 @@
         </div>
       </template>
       <template #actions v-if="inviteQueue.length">
-        <Button
-          :disabled="inviteQueue.length == 0"
-          appearance="primary"
-          @click="sentInvites()"
-          class="mr-2"
-          :loading="$resources.sentInvites.loading"
-          >Send Invites</Button
-        >
-        <Button appearance="secondary" class="mr-2" @click="close()"
-          >Cancel</Button
-        >
-        <div class="grow mt-2">
+        <div class="flex justify-end items-center">
           <Button
-            @click="removeAllEmailFromQueue()"
-            v-if="inviteQueue.length > 1"
-          >
-            Clear All
+            :disabled="inviteQueue.length == 0"
+            appearance="primary"
+            @click="sentInvites()"
+            class="mr-2"
+            variant="solid"
+            :loading="$resources.sentInvites.loading"
+            >Send Invites
           </Button>
+          <Button @click="removeAllEmailFromQueue()"> Clear All </Button>
         </div>
       </template>
     </Dialog>
@@ -80,8 +73,8 @@
 </template>
 
 <script>
-import { Dialog, Input, FeatherIcon } from "frappe-ui";
 import { ref } from "@vue/reactivity";
+import { Dialog, FeatherIcon, Input } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 
 export default {

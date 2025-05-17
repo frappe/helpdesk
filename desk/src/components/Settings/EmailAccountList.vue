@@ -17,7 +17,7 @@
     <!-- list accounts -->
     <div
       v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
-      class="mt-4"
+      class="mt-4 divide-y"
     >
       <div v-for="emailAccount in emailAccounts.data" :key="emailAccount.name">
         <EmailAccountCard
@@ -34,15 +34,15 @@
 </template>
 
 <script setup lang="ts">
+import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
-import { EmailAccount } from "@/types";
 
 const emit = defineEmits(["update:step"]);
 
 const emailAccounts = createListResource({
   doctype: "Email Account",
-  cache: true,
+  cache: ["Email Accounts"],
   fields: ["*"],
   filters: {
     email_id: ["Not Like", "%example%"],
