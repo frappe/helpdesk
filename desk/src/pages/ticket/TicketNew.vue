@@ -244,13 +244,14 @@ const ticket = createResource({
         ticketId: data.name,
       },
     });
-    updateOnboardingStep("create_first_ticket", true, false, () =>
-      localStorage.setItem("firstTicket", data.name)
-    );
 
+    if (!isCustomerPortal.value) {
+      updateOnboardingStep("create_first_ticket", true, false, () =>
+        localStorage.setItem("firstTicket", data.name)
+      );
+      return;
+    }
     // only capture telemetry for customer portal
-    if (!isCustomerPortal.value) return;
-
     capture("new_ticket_submitted", {
       data: {
         user: userID,
