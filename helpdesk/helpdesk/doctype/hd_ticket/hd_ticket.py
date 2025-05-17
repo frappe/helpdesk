@@ -44,7 +44,6 @@ class HDTicket(Document):
         return "{0}: {1}".format(_(self.status), self.subject)
 
     def before_validate(self):
-        self.reply_subject = f"Re:[## {self.name} ##] {self.subject}"
         self.check_update_perms()
         self.set_ticket_type()
         self.set_raised_by()
@@ -426,7 +425,7 @@ class HDTicket(Document):
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
-        subject = self.reply_subject
+        subject = f"Re:[## {self.name} ##] {self.subject}"
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
@@ -558,7 +557,7 @@ class HDTicket(Document):
         c.communication_medium = "Email"
         c.sent_or_received = "Received"
         c.email_status = "Open"
-        c.subject = self.reply_subject
+        c.subject = f"Re:[## {self.name} ##] {self.subject}"
         c.sender = frappe.session.user
         c.content = message
         c.status = "Linked"
@@ -603,7 +602,7 @@ class HDTicket(Document):
         try:
             frappe.sendmail(
                 recipients=recipients,
-                subject=self.reply_subject,
+                subject=f"Re:[## {self.name} ##] {self.subject}",
                 message=message,
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
