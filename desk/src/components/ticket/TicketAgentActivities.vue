@@ -24,7 +24,7 @@
             >
               <Avatar
                 v-if="activity.type === 'email'"
-                size="md"
+                size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
                 class="bg-white"
@@ -77,20 +77,23 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, inject, h, computed, onMounted, watch, PropType } from "vue";
-import { useElementVisibility } from "@vueuse/core";
 import {
-  DotIcon,
-  EmailAtIcon,
-  CommentIcon,
-  EmailIcon,
+  CommentBox,
+  EmailArea,
+  FadedScrollableDiv,
+  HistoryBox,
+} from "@/components";
+import {
   ActivityIcon,
+  CommentIcon,
+  DotIcon,
+  EmailIcon,
 } from "@/components/icons";
-import { EmailArea, CommentBox, HistoryBox } from "@/components";
 import { useUserStore } from "@/stores/user";
-import { Avatar } from "frappe-ui";
 import { TicketActivity } from "@/types";
-import { FadedScrollableDiv } from "@/components";
+import { useElementVisibility } from "@vueuse/core";
+import { Avatar } from "frappe-ui";
+import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,
