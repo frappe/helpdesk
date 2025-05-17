@@ -1,6 +1,5 @@
 import frappeUIPreset from "frappe-ui/src/tailwind/preset";
 
-
 export default {
   mode: "jit",
   presets: [frappeUIPreset],
@@ -26,4 +25,18 @@ export default {
       },
     },
   },
+  plugins: [
+    require("@tailwindcss/typography"),
+    function ({ addUtilities }) {
+      addUtilities({
+        ".hide-scrollbar": {
+          "scrollbar-width": "none",
+          "-ms-overflow-style": "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+      });
+    },
+  ],
 };

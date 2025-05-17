@@ -23,17 +23,18 @@
             </button>
           </div>
         </div>
-        <div
-          class="flex flex-1 flex-col overflow-scroll px-10 py-8 bg-surface-modal"
-        >
-          <component :is="activeTab.component" v-if="activeTab" />
+        <div class="flex flex-1 flex-col px-10 py-8 bg-surface-modal">
+          <component
+            :is="activeTab.component"
+            v-if="activeTab"
+            class="h-full flex flex-col w-full"
+          />
         </div>
       </div>
     </template>
   </Dialog>
 </template>
 <script setup lang="ts">
-import Teams from "@/pages/desk/team/Teams.vue";
 import { Dialog } from "frappe-ui";
 import { markRaw, ModelRef, ref } from "vue";
 import ImageUp from "~icons/lucide/image-up";
@@ -43,6 +44,7 @@ import LucideUsers from "~icons/lucide/users";
 import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
+import Teams from "./Teams.vue";
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;

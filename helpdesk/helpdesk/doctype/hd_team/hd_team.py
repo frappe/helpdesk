@@ -8,6 +8,8 @@ from frappe.exceptions import DoesNotExistError
 from frappe.model.document import Document
 from frappe.model.naming import append_number_if_name_exists
 
+from helpdesk.utils import agent_only
+
 
 class HDTeam(Document):
     @frappe.whitelist()
@@ -186,3 +188,19 @@ class HDTeam(Document):
             },
         ]
         return {"columns": columns}
+
+
+@frappe.whitelist()
+@agent_only
+def get_teams():
+    """
+    Returns the teams for the current user
+    """
+    teams = frappe.get_all("HD Team", fields=["name"])
+
+    for team in teams:
+        team["members"] = frappe.get_all(
+            "HD Team Member", filters={"parent": team.name}, fields=["user"]
+        )
+
+    return teams

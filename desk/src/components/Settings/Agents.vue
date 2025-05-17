@@ -1,92 +1,104 @@
 <template>
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-lg font-semibold">Agents</h1>
-    <div class="flex item-center space-x-2">
-      <FormControl
-        v-model="search"
-        :placeholder="'Search'"
-        type="text"
-        :debounce="300"
-      >
-        <template #prefix>
-          <LucideSearch class="h-4 w-4 text-gray-500" />
-        </template>
-      </FormControl>
-      <Button @click="() => (showForm = !showForm)" label="New ">
-        <template #prefix>
-          <LucidePlus class="h-4 w-4 stroke-1.5" />
-        </template>
-      </Button>
+  <div v-bind:class="$attrs.class">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-lg font-semibold">Agents</h1>
+      <div class="flex item-center space-x-2">
+        <FormControl
+          v-model="search"
+          :placeholder="'Search'"
+          type="text"
+          :debounce="300"
+        >
+          <template #prefix>
+            <LucideSearch class="h-4 w-4 text-gray-500" />
+          </template>
+        </FormControl>
+        <Button
+          @click="() => (showForm = !showForm)"
+          label="New"
+          variant="solid"
+        >
+          <template #prefix>
+            <LucidePlus class="h-4 w-4 stroke-1.5" />
+          </template>
+        </Button>
+      </div>
     </div>
-  </div>
 
-  <!-- loading state -->
-  <div v-if="agents.loading" class="flex mt-28 justify-between w-full h-full">
-    <Button
-      :loading="agents.loading"
-      variant="ghost"
-      class="w-full"
-      size="2xl"
-    />
-  </div>
-  <!-- Empty State -->
-  <div
-    v-if="!agents.loading && !agents.data?.length"
-    class="flex mt-28 justify-between w-full h-full"
-  >
-    <p class="text-sm text-gray-500 w-full flex justify-center">
-      No agents found
-    </p>
-  </div>
-  <!-- Agent List -->
-  <div class="divide-y" v-if="!agents.loading && Boolean(agents.data?.length)">
-    <div v-for="agent in agents.data">
-      <div class="flex items-center justify-between py-3">
-        <div class="flex items-center space-x-3 w-4/5">
-          <Avatar
-            :image="agent.user_image"
-            :label="agent.agent_name"
-            size="lg"
-          />
-          <div>
-            <div class="text-base font-semibold text-ink-gray-8">
-              {{ agent.agent_name }}
-            </div>
-            <div class="text-base text-ink-gray-6 mt-1">
-              {{ agent.name }}
+    <!-- loading state -->
+    <div v-if="agents.loading" class="flex mt-28 justify-between w-full h-full">
+      <Button
+        :loading="agents.loading"
+        variant="ghost"
+        class="w-full"
+        size="2xl"
+      />
+    </div>
+    <!-- Empty State -->
+    <div
+      v-if="!agents.loading && !agents.data?.length"
+      class="flex mt-28 justify-between w-full h-full"
+    >
+      <p class="text-sm text-gray-500 w-full flex justify-center">
+        No agents found
+      </p>
+    </div>
+    <!-- Agent List -->
+    <div
+      class="overflow-y-auto w-full hide-scrollbar"
+      v-if="!agents.loading && Boolean(agents.data?.length)"
+    >
+      <div v-for="(agent, idx) in agents.data" :key="agent.agent_name">
+        <div
+          class="flex items-center justify-between py-3"
+          :class="idx !== agents.data.length - 1 && 'border-b '"
+        >
+          <div class="flex items-center space-x-3 w-4/5">
+            <Avatar
+              :image="agent.user_image"
+              :label="agent.agent_name"
+              size="lg"
+            />
+            <div>
+              <div class="text-base font-semibold text-ink-gray-8">
+                {{ agent.agent_name }}
+              </div>
+              <div class="text-base text-ink-gray-6 mt-1">
+                {{ agent.name }}
+              </div>
             </div>
           </div>
-        </div>
-        <p v-if="!isManager" class="text-sm text-ink-gray-6 w-1/5 text-left">
-          {{ getUserRole(agent.name) }}
-        </p>
+          <p v-if="!isManager" class="text-sm text-ink-gray-6 w-1/5 text-right">
+            {{ getUserRole(agent.name) }}
+          </p>
 
-        <Dropdown
-          v-if="isManager"
-          class="w-1/5"
-          :options="getRoles(agent.name)"
-          :label="getUserRole(agent.name)"
-          :button="{
-            label: getUserRole(agent.name),
-            iconRight: 'chevron-down',
-            variant: 'ghost',
-          }"
-          placement="right"
+          <Dropdown
+            v-if="isManager"
+            class="w-1/5 flex justify-end items-center"
+            :options="getRoles(agent.name)"
+            :label="getUserRole(agent.name)"
+            :button="{
+              label: getUserRole(agent.name),
+              iconRight: 'chevron-down',
+              variant: 'ghost',
+            }"
+            placement="right"
+          />
+        </div>
+      </div>
+      <!-- Load More Button -->
+      <div class="flex justify-center">
+        <Button
+          v-if="!agents.loading && agents.hasNextPage"
+          class="mt-3.5 p-2"
+          @click="() => agents.next()"
+          :loading="agents.loading"
+          label="Load More"
+          icon-left="refresh-cw"
         />
       </div>
     </div>
-  </div>
-  <!-- Load More Button -->
-  <div class="flex justify-center">
-    <Button
-      v-if="!agents.loading && agents.hasNextPage"
-      class="my-5 p-2"
-      @click="() => agents.next()"
-      :loading="agents.loading"
-      label="Load More"
-      icon-left="refresh-cw"
-    />
   </div>
   <AddNewAgentsDialog
     :show="showForm"
@@ -126,6 +138,13 @@ watch(search, (newValue) => {
     is_active: ["=", 1],
     agent_name: ["like", `%${newValue}%`],
   };
+  if (!newValue) {
+    agents.filters = {
+      is_active: ["=", 1],
+    };
+    agents.start = 0;
+    agents.pageLength = 10;
+  }
   agents.reload();
 });
 
