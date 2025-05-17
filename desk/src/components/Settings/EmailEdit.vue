@@ -66,31 +66,40 @@
         :disabled="loading"
         @click="emit('update:step', 'email-list')"
       />
-      <Button
-        label="Update Account"
-        variant="solid"
-        @click="updateAccount"
-        :loading="loading"
-      />
+      <div class="flex gap-2">
+        <Button
+          label="Update Account"
+          variant="solid"
+          @click="updateAccount"
+          :loading="loading"
+        />
+        <Button
+          label="Pull Emails"
+          variant="subtle"
+          @click="pullEmails"
+          :loading="loadingPull"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
-import { call } from "frappe-ui";
-import EmailProviderIcon from "./EmailProviderIcon.vue";
-import {
-  emailIcon,
-  services,
-  popularProviderFields,
-  customProviderFields,
-  validateInputs,
-  incomingOutgoingFields,
-} from "./emailConfig";
 import { EmailAccount, EmailStep } from "@/types";
 import { createToast } from "@/utils";
+import { useStorage } from "@vueuse/core";
+import { call } from "frappe-ui";
+import { computed, reactive, ref } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
+import EmailProviderIcon from "./EmailProviderIcon.vue";
+import {
+  customProviderFields,
+  emailIcon,
+  incomingOutgoingFields,
+  popularProviderFields,
+  services,
+  validateInputs,
+} from "./emailConfig";
 
 interface P {
   accountData: EmailAccount;
@@ -138,6 +147,10 @@ const fields = computed(() => {
 
 const error = ref<string | undefined>();
 const loading = ref(false);
+const loadingPull = useStorage(
+  `loading-emails-${state.email_account_name}`,
+  false
+);
 async function updateAccount() {
   error.value = validateInputs(state, isCustomService.value);
   if (error.value) return;
@@ -179,6 +192,34 @@ async function updateAccount() {
       errorHandler();
     }
   }
+}
+
+function pullEmails() {
+  loadingPull.value = true;
+  createToast({
+    title: "Pulling emails...",
+    text: "This may take a few minutes, please wait.",
+    icon: "info",
+    iconClasses: "text-blue-600",
+  });
+
+  call("frappe.email.doctype.email_account.email_account.pull_emails", {
+    email_account: state.email_account_name,
+  })
+    .then(() => {
+      localStorage.removeItem(`loading-emails-${state.email_account_name}`);
+      loadingPull.value = null;
+      createToast({
+        title: "Emails pulled successfully",
+        icon: "check",
+        iconClasses: "text-green-600",
+      });
+    })
+    .catch(() => {
+      localStorage.removeItem(`loading-emails-${state.email_account_name}`);
+      loadingPull.value = null;
+      error.value = "Failed to pull emails";
+    });
 }
 
 const isDirty = computed(() => {

@@ -44,6 +44,7 @@ class HDTicket(Document):
         return "{0}: {1}".format(_(self.status), self.subject)
 
     def before_validate(self):
+        self.reply_subject = f"Re:[## {self.name} ##] {self.subject}"
         self.check_update_perms()
         self.set_ticket_type()
         self.set_raised_by()
@@ -53,9 +54,8 @@ class HDTicket(Document):
         self.apply_escalation_rule()
         self.set_sla()
 
-        if self.via_customer_portal:
-            self.set_contact()
-            self.set_customer()
+        self.set_contact()
+        self.set_customer()
 
     def validate(self):
         self.validate_feedback()
@@ -426,7 +426,7 @@ class HDTicket(Document):
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
-        subject = f"Re: {self.subject} (#{self.name})"
+        subject = self.reply_subject
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
@@ -546,7 +546,7 @@ class HDTicket(Document):
 
         if not new_ticket:
             # send email to assigned agents
-            self.send_reopen_email_to_agent(message)
+            self.send_reply_email_to_agent(message)
 
         if self.status == "Replied":
             self.status = "Open"
@@ -558,7 +558,7 @@ class HDTicket(Document):
         c.communication_medium = "Email"
         c.sent_or_received = "Received"
         c.email_status = "Open"
-        c.subject = "Re: " + self.subject
+        c.subject = self.reply_subject
         c.sender = frappe.session.user
         c.content = message
         c.status = "Linked"
@@ -584,7 +584,7 @@ class HDTicket(Document):
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
 
-    def send_reopen_email_to_agent(self, message):
+    def send_reply_email_to_agent(self, message):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return
@@ -603,7 +603,7 @@ class HDTicket(Document):
         try:
             frappe.sendmail(
                 recipients=recipients,
-                subject="Re: " + self.subject,
+                subject=self.reply_subject,
                 message=message,
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
