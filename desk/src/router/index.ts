@@ -221,7 +221,6 @@ router.beforeEach(async (to, _, next) => {
 });
 
 router.afterEach(async (to) => {
-  console.log(to.meta);
   if (to.meta.public) return;
   const userStore = useUserStore();
   await userStore.users.fetch();
