@@ -426,6 +426,7 @@ class HDTicket(Document):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re:[## {self.name} ##] {self.subject}"
+        # subject = self.subject
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
@@ -439,22 +440,30 @@ class HDTicket(Document):
             admin_email = frappe.get_value("User", "Administrator", "email")
             recipients = admin_email
 
-        if not self.via_customer_portal:
-            make_email(
-                recipients=recipients,
-                attachments=attachments,
-                bcc=bcc,
-                cc=cc,
-                subject=subject,
-                content=message,
-                doctype="HD Ticket",
-                name=self.name,
-                send_email=True,
-                sender=sender,
-                has_attachments=1 if attachments else 0,
-            )
-            capture_event("agent_replied_to_email_ticket")
-            return
+        # if not self.via_customer_portal:
+        #     frappe.sendmail(
+        #         recipients=recipients,
+        #         subject=subject,
+        #         message=message,
+        #         reference_doctype="HD Ticket",
+        #         reference_name=self.name,
+        #     )
+        #     make_email(
+        #         recipients=recipients,
+        #         attachments=attachments,
+        #         bcc=bcc,
+        #         cc=cc,
+        #         subject=subject,
+        #         content=message,
+        #         doctype="HD Ticket",
+        #         name=self.name,
+        #         send_email=True,
+        #         sender=sender,
+        #         has_attachments=1 if attachments else 0,
+        #         message_id=last_communication.name
+        #     )
+        #     capture_event("agent_replied_to_email_ticket")
+        #     return
 
         communication = frappe.get_doc(
             {
@@ -533,6 +542,7 @@ class HDTicket(Document):
                 subject=subject,
                 template=template,
                 with_container=False,
+                message_id=last_communication.name,
             )
         except Exception as e:
             frappe.throw(_(e))
