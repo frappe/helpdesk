@@ -77,6 +77,9 @@ class HDTicket(Document):
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
 
+        if not self.via_customer_portal:
+            self.send_acknowledgement_email()
+
     def on_update(self):
         # flake8: noqa
         if self.status == "Open":
@@ -535,7 +538,8 @@ class HDTicket(Document):
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=message,
+                message=communication.content,
+                as_markdown=True,
                 now=send_now,
                 recipients=recipients,
                 reference_doctype="HD Ticket",
@@ -612,7 +616,7 @@ class HDTicket(Document):
             "raised_by": self.raised_by,
             "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
         }
-
+        last_communication = self.get_last_communication()
         try:
             frappe.sendmail(
                 recipients=recipients,
@@ -626,6 +630,32 @@ class HDTicket(Document):
             )
         except Exception as e:
             frappe.throw(_(e))
+
+    def send_acknowledgement_email(self):
+
+        message = f"""
+            <p>Hello,</p>
+            <br />
+            <p>Thank you for reaching out to us.</p>
+            <p>
+            We are writing to confirm that we have received your request. A support ticket has been created with the following ID: <strong>{self.name}</strong>, and the subject: <strong>{self.subject}</strong>.
+            Please reference this ID in any future correspondence related to this matter.
+            </p>
+            <p>
+            One of our support agents is currently reviewing your issue and will get back to you as soon as possible with an update or resolution.
+            </p>
+            <br />
+            <p>Best regards,<br />Support Team</p>
+        """
+
+        frappe.sendmail(
+            recipients=[self.raised_by],
+            subject=f"[## {self.name} ##] Your Ticket has been created",
+            message=message,
+            reference_doctype="HD Ticket",
+            reference_name=self.name,
+            now=True,
+        )
 
     @frappe.whitelist()
     def mark_seen(self):
