@@ -101,6 +101,11 @@ const routes = [
     name: "CannedResponses",
     component: () => import("@/pages/CannedResponses.vue"),
   },
+  {
+    path: "dashboard",
+    name: "Dashboard",
+    component: () => import("@/pages/dashboard/Dashboard.vue"),
+  },
 
   // Customer Portal Routes
   {
