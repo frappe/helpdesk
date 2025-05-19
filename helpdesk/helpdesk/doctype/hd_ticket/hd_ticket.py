@@ -427,7 +427,7 @@ class HDTicket(Document):
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
-        subject = f"Re:[## {self.name} ##] {self.subject}"
+        subject = f"Re: {self.subject}"
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
@@ -548,7 +548,7 @@ class HDTicket(Document):
         c.communication_medium = "Email"
         c.sent_or_received = "Received"
         c.email_status = "Open"
-        c.subject = f"Re:[## {self.name} ##] {self.subject}"
+        c.subject = f"Re: {self.subject}"
         c.sender = frappe.session.user
         c.content = message
         c.status = "Linked"
@@ -593,7 +593,7 @@ class HDTicket(Document):
         try:
             frappe.sendmail(
                 recipients=recipients,
-                subject=f"Re:[## {self.name} ##] {self.subject}",
+                subject=f"Re: {self.subject} - #{self.name}",
                 message=message,
                 reference_doctype="HD Ticket",
                 reference_name=self.name,

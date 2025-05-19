@@ -74,10 +74,12 @@
           :loading="loading"
         />
         <Button
+          v-if="accountData.enable_incoming"
           label="Pull Emails"
           variant="subtle"
           @click="pullEmails"
           :loading="loadingPull"
+          :disabled="loading"
         />
       </div>
     </div>
