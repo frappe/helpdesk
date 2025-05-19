@@ -5,7 +5,6 @@ from typing import List
 
 import frappe
 from frappe import _
-from frappe.core.doctype.communication.email import make as make_email
 from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
@@ -429,7 +428,6 @@ class HDTicket(Document):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
         subject = f"Re:[## {self.name} ##] {self.subject}"
-        # subject = self.subject
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
@@ -442,31 +440,6 @@ class HDTicket(Document):
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
             recipients = admin_email
-
-        # if not self.via_customer_portal:
-        #     frappe.sendmail(
-        #         recipients=recipients,
-        #         subject=subject,
-        #         message=message,
-        #         reference_doctype="HD Ticket",
-        #         reference_name=self.name,
-        #     )
-        #     make_email(
-        #         recipients=recipients,
-        #         attachments=attachments,
-        #         bcc=bcc,
-        #         cc=cc,
-        #         subject=subject,
-        #         content=message,
-        #         doctype="HD Ticket",
-        #         name=self.name,
-        #         send_email=True,
-        #         sender=sender,
-        #         has_attachments=1 if attachments else 0,
-        #         message_id=last_communication.name
-        #     )
-        #     capture_event("agent_replied_to_email_ticket")
-        #     return
 
         communication = frappe.get_doc(
             {
@@ -634,27 +607,28 @@ class HDTicket(Document):
     def send_acknowledgement_email(self):
 
         message = f"""
-            <p>Hello,</p>
+            <p>Hi,</p>
             <br />
-            <p>Thank you for reaching out to us.</p>
+            <p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
             <p>
-            We are writing to confirm that we have received your request. A support ticket has been created with the following ID: <strong>{self.name}</strong>, and the subject: <strong>{self.subject}</strong>.
-            Please reference this ID in any future correspondence related to this matter.
+            <strong>Ticket ID:</strong> {self.name}<br />
+            <strong>Subject:</strong> {self.subject}<br />
             </p>
             <p>
-            One of our support agents is currently reviewing your issue and will get back to you as soon as possible with an update or resolution.
+            Our team is reviewing it and will get back to you shortly.
             </p>
             <br />
-            <p>Best regards,<br />Support Team</p>
+            <p>Best,<br />Support Team</p>
         """
 
         frappe.sendmail(
             recipients=[self.raised_by],
-            subject=f"[## {self.name} ##] Your Ticket has been created",
+            subject=f"Ticket #{self.name}: We've received your request",
             message=message,
             reference_doctype="HD Ticket",
             reference_name=self.name,
             now=True,
+            expose_recipients="header",
         )
 
     @frappe.whitelist()

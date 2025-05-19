@@ -90,7 +90,7 @@ const {
   deleteView,
 } = useView("HD Ticket");
 
-const { $dialog } = globalStore();
+const { $dialog, $socket } = globalStore();
 const { isManager } = useAuthStore();
 
 const listViewRef = ref(null);
@@ -546,6 +546,9 @@ onMounted(() => {
       icon: "lucide:align-justify",
     };
   }
+  $socket.on("helpdesk:new-ticket", () => {
+    listViewRef.value?.reload();
+  });
 });
 usePageMeta(() => {
   return {
