@@ -196,7 +196,7 @@ def get_teams():
     """
     Returns the teams for the current user
     """
-    teams = frappe.get_all("HD Team", fields=["name"])
+    teams = frappe.get_all("HD Team", fields=["name"], order_by="creation desc")
 
     for team in teams:
         team["members"] = frappe.get_all(

@@ -111,42 +111,17 @@
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils";
-import { Avatar, call, createListResource, FormControl } from "frappe-ui";
-import { h, ref, watch } from "vue";
+import { Avatar, call, FormControl } from "frappe-ui";
+import { h, ref } from "vue";
 import LucideCheck from "~icons/lucide/check";
+import { useAgents } from "./agents";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
 const showForm = ref(false);
 
-const agents = createListResource({
-  doctype: "HD Agent",
-  fields: ["name", "user_image", "agent_name"],
-  cache: ["hd_agent_list"],
-  filters: {
-    is_active: ["=", 1],
-  },
-  start: 0,
-  pageLength: 10,
-  orderBy: "creation desc",
-  auto: true,
-});
-
 const search = ref("");
-watch(search, (newValue) => {
-  agents.filters = {
-    is_active: ["=", 1],
-    agent_name: ["like", `%${newValue}%`],
-  };
-  if (!newValue) {
-    agents.filters = {
-      is_active: ["=", 1],
-    };
-    agents.start = 0;
-    agents.pageLength = 10;
-  }
-  agents.reload();
-});
+const { agents } = useAgents(search);
 
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
