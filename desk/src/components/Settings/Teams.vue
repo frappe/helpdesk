@@ -75,13 +75,16 @@
     </div>
   </div>
   <NewTeamModal v-model="showForm" @create="() => teams.reload()" />
+  <AddMemberModal
+    v-model="addMemberModal"
+    :team="teamDocuments[selectedTeam]"
+  />
 </template>
 
 <script setup lang="ts">
 import { globalStore } from "@/stores/globalStore";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils";
-import { useStorage } from "@vueuse/core";
 import {
   Avatar,
   Button,
@@ -91,15 +94,15 @@ import {
   FormControl,
 } from "frappe-ui";
 import { computed, ref } from "vue";
-import NewTeamModal from "../NewTeamModal.vue";
+import AddMemberModal from "./AddMemberModal.vue";
+import NewTeamModal from "./NewTeamModal.vue";
+import { teamDocuments } from "./teams";
 const { $dialog } = globalStore();
-
 const { getUser } = useUserStore();
 
 const showForm = ref(false);
+const addMemberModal = ref(false);
 const search = ref("");
-
-const teamDocuments = useStorage("team-documents", {});
 
 const teams = createResource({
   url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_teams",
@@ -117,6 +120,8 @@ const teams = createResource({
   },
 });
 
+const selectedTeam = ref(null);
+
 function getDropdownOptions(teamName: string) {
   return [
     {
@@ -124,6 +129,8 @@ function getDropdownOptions(teamName: string) {
       icon: "plus",
       onClick: () => {
         showForm.value = true;
+        selectedTeam.value = teamName;
+        addMemberModal.value = true;
       },
     },
     {
@@ -161,7 +168,7 @@ const filteredTeams = computed(() => {
 async function removeMemberFromTeam(teamName: string, member: string) {
   const team = teamDocuments.value[teamName];
   if (!team) return;
-  const users = team?.doc?.users.filter((u) => u.user !== member);
+  const users = team.doc?.users?.filter((u) => u.user !== member);
   await team.setValue.submit({
     users,
   });
