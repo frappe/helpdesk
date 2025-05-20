@@ -143,7 +143,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
+import {
+  AttachmentItem,
+  CannedResponseSelectorModal,
+  MultiSelectInput,
+} from "@/components";
+import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { PreserveVideoControls } from "@/tiptap-extensions";
+import {
+  createToast,
+  getFontFamily,
+  isContentEmpty,
+  textEditorMenuButtons,
+  validateEmail,
+} from "@/utils";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
@@ -151,20 +164,8 @@ import {
   TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
-import {
-  createToast,
-  validateEmail,
-  textEditorMenuButtons,
-  isContentEmpty,
-  getFontFamily,
-} from "@/utils";
-import {
-  MultiSelectInput,
-  AttachmentItem,
-  CannedResponseSelectorModal,
-} from "@/components";
-import { AttachmentIcon, EmailIcon } from "@/components/icons";
-import { PreserveVideoControls } from "@/tiptap-extensions";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, nextTick, ref } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -199,6 +200,8 @@ const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+
 const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
@@ -236,6 +239,7 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
+    updateOnboardingStep("reply_on_ticket");
   },
   debounce: 300,
 });

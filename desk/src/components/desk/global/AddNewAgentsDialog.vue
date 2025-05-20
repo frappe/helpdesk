@@ -82,6 +82,7 @@
 <script>
 import { Dialog, Input, FeatherIcon } from "frappe-ui";
 import { ref } from "@vue/reactivity";
+import { useOnboarding } from "frappe-ui/frappe";
 
 export default {
   name: "AddNewAgentsDialog",
@@ -96,11 +97,12 @@ export default {
     const inviteQueue = ref([]);
 
     const currentInputIsValidEmail = ref(false);
-
+    const { updateOnboardingStep } = useOnboarding("helpdesk");
     return {
       searchInput,
       inviteQueue,
       currentInputIsValidEmail,
+      updateOnboardingStep,
     };
   },
   methods: {
@@ -176,6 +178,7 @@ export default {
           this.currentInputIsValidEmail = false;
           this.searchInput = "";
           this.inviteQueue = [];
+          this.updateOnboardingStep("invite_agents");
 
           this.$toast({
             title: "Invites Sent Successfully!",

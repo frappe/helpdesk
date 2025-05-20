@@ -37,13 +37,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, h } from "vue";
-import { usePageMeta, Avatar } from "frappe-ui";
-import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
-import CustomerDialog from "./CustomerDialog.vue";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
-import PhoneIcon from "@/components/icons/PhoneIcon.vue";
+import NewCustomerDialog from "@/components/desk/global/NewCustomerDialog.vue";
+import { Avatar, usePageMeta } from "frappe-ui";
+import { computed, h, ref } from "vue";
+import CustomerDialog from "./CustomerDialog.vue";
 
 const isDialogVisible = ref(false);
 const isCustomerDialogVisible = ref(false);
@@ -65,6 +64,8 @@ function handleCustomer(updated = false) {
 const options = computed(() => {
   return {
     doctype: "HD Customer",
+    selectable: true,
+    showSelectBanner: true,
     columnConfig: {
       name: {
         prefix: ({ row }) => {

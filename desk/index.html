@@ -207,6 +207,7 @@
     <script type="module" src="/src/main.js"></script>
     <script>
       window.favicon = "{{ favicon }}";
+      window.site_name = "{{ site_name }}";
 
       document.querySelectorAll("link[rel='icon']").forEach((link) => {
         link.href = window.favicon;

@@ -84,15 +84,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-import { EmailEditor, CommentTextEditor } from "@/components";
-import { EmailIcon, CommentIcon } from "@/components/icons/";
+import { CommentTextEditor, EmailEditor } from "@/components";
+import { CommentIcon, EmailIcon } from "@/components/icons/";
+import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
 const doc = defineModel();
-
-const showEmailBox = ref(false);
-const showCommentBox = ref(false);
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);

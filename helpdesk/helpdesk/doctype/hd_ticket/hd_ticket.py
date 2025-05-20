@@ -5,7 +5,6 @@ from typing import List
 
 import frappe
 from frappe import _
-from frappe.core.doctype.communication.email import make as make_email
 from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
 from frappe.desk.form.assign_to import clear as clear_all_assignments
@@ -53,9 +52,8 @@ class HDTicket(Document):
         self.apply_escalation_rule()
         self.set_sla()
 
-        if self.via_customer_portal:
-            self.set_contact()
-            self.set_customer()
+        self.set_contact()
+        self.set_customer()
 
     def validate(self):
         self.validate_feedback()
@@ -77,6 +75,9 @@ class HDTicket(Document):
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
+
+        if not self.via_customer_portal:
+            self.send_acknowledgement_email()
 
     def on_update(self):
         # flake8: noqa
@@ -426,7 +427,7 @@ class HDTicket(Document):
     ):
         skip_email_workflow = self.skip_email_workflow()
         medium = "" if skip_email_workflow else "Email"
-        subject = f"Re: {self.subject} (#{self.name})"
+        subject = f"Re: {self.subject}"
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
@@ -439,23 +440,6 @@ class HDTicket(Document):
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
             recipients = admin_email
-
-        if not self.via_customer_portal:
-            make_email(
-                recipients=recipients,
-                attachments=attachments,
-                bcc=bcc,
-                cc=cc,
-                subject=subject,
-                content=message,
-                doctype="HD Ticket",
-                name=self.name,
-                send_email=True,
-                sender=sender,
-                has_attachments=1 if attachments else 0,
-            )
-            capture_event("agent_replied_to_email_ticket")
-            return
 
         communication = frappe.get_doc(
             {
@@ -476,6 +460,9 @@ class HDTicket(Document):
                 "subject": subject,
             }
         )
+        if last_communication and last_communication.message_id:
+            communication.in_reply_to = last_communication.name
+            communication.message_id = last_communication.message_id
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -524,7 +511,8 @@ class HDTicket(Document):
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=message,
+                message=communication.content,
+                as_markdown=True,
                 now=send_now,
                 recipients=recipients,
                 reference_doctype="HD Ticket",
@@ -534,6 +522,8 @@ class HDTicket(Document):
                 subject=subject,
                 template=template,
                 with_container=False,
+                in_reply_to=last_communication.name,
+                message_id=last_communication.message_id,
             )
         except Exception as e:
             frappe.throw(_(e))
@@ -546,7 +536,7 @@ class HDTicket(Document):
 
         if not new_ticket:
             # send email to assigned agents
-            self.send_reopen_email_to_agent(message)
+            self.send_reply_email_to_agent(message)
 
         if self.status == "Replied":
             self.status = "Open"
@@ -558,7 +548,7 @@ class HDTicket(Document):
         c.communication_medium = "Email"
         c.sent_or_received = "Received"
         c.email_status = "Open"
-        c.subject = "Re: " + self.subject
+        c.subject = f"Re: {self.subject}"
         c.sender = frappe.session.user
         c.content = message
         c.status = "Linked"
@@ -584,7 +574,7 @@ class HDTicket(Document):
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
 
-    def send_reopen_email_to_agent(self, message):
+    def send_reply_email_to_agent(self, message):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return
@@ -599,11 +589,11 @@ class HDTicket(Document):
             "raised_by": self.raised_by,
             "ticket_url": frappe.utils.get_url("/helpdesk/tickets/" + str(self.name)),
         }
-
+        last_communication = self.get_last_communication()
         try:
             frappe.sendmail(
                 recipients=recipients,
-                subject="Re: " + self.subject,
+                subject=f"Re: {self.subject} - #{self.name}",
                 message=message,
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
@@ -613,6 +603,33 @@ class HDTicket(Document):
             )
         except Exception as e:
             frappe.throw(_(e))
+
+    def send_acknowledgement_email(self):
+
+        message = f"""
+            <p>Hi,</p>
+            <br />
+            <p>Thank you for reaching out to us. We've received your request and created a support ticket.</p>
+            <p>
+            <strong>Ticket ID:</strong> {self.name}<br />
+            <strong>Subject:</strong> {self.subject}<br />
+            </p>
+            <p>
+            Our team is reviewing it and will get back to you shortly.
+            </p>
+            <br />
+            <p>Best,<br />Support Team</p>
+        """
+
+        frappe.sendmail(
+            recipients=[self.raised_by],
+            subject=f"Ticket #{self.name}: We've received your request",
+            message=message,
+            reference_doctype="HD Ticket",
+            reference_name=self.name,
+            now=True,
+            expose_recipients="header",
+        )
 
     @frappe.whitelist()
     def mark_seen(self):
@@ -975,6 +992,7 @@ def close_tickets_after_n_days():
         )
         or []
     )
+    tickets_to_close = list(set(tickets_to_close))
 
     # cant do set_value because SLA will not be applied as setting directly to db and doc is not running.
     for ticket in tickets_to_close:

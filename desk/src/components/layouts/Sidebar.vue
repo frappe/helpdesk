@@ -1,6 +1,6 @@
 <template>
   <div
-    class="z-0 flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
@@ -99,6 +99,24 @@
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
     />
+    <GettingStartedBanner
+      v-if="showOnboardingBanner"
+      :isSidebarCollapsed="!isExpanded"
+      appName="helpdesk"
+    />
+    <SidebarLink
+      v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+      :icon="HelpIcon"
+      :label="'Help'"
+      :is-expanded="isExpanded"
+      @click="
+        () => {
+          showHelpModal = minimize ? true : !showHelpModal;
+          minimize = !showHelpModal;
+        }
+      "
+    />
+
     <SidebarLink
       :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
       :is-active="false"
@@ -106,38 +124,88 @@
       :label="isExpanded ? 'Collapse' : 'Expand'"
       :on-click="() => (isExpanded = !isExpanded)"
     />
-    <SettingsModal v-model="showSettingsModal" />
+    <SettingsModal
+      v-model="showSettingsModal"
+      :default-tab="defaultSettingsTab"
+    />
+    <HelpModal
+      v-if="showHelpModal"
+      v-model="showHelpModal"
+      v-model:articles="articles"
+      appName="helpdesk"
+      title="Frappe Helpdesk"
+      :logo="logo"
+      docsLink="https://docs.frappe.io/helpdesk"
+      :afterSkip="(step) => capture('onboarding_step_skipped_' + step)"
+      :afterSkipAll="() => capture('onboarding_steps_skipped')"
+      :afterReset="(step) => capture('onboarding_step_reset_' + step)"
+      :afterResetAll="() => capture('onboarding_steps_reset')"
+    />
+    <IntermediateStepModal
+      v-model="showIntermediateModal"
+      :currentStep="currentStep"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { TrialBanner } from "frappe-ui/frappe";
-import { storeToRefs } from "pinia";
+import HDLogo from "@/assets/logos/HDLogo.vue";
+import { Section, SidebarLink } from "@/components";
+import Apps from "@/components/Apps.vue";
+import { FrappeCloudIcon } from "@/components/icons";
+import SettingsModal from "@/components/Settings/SettingsModal.vue";
+import UserMenu from "@/components/UserMenu.vue";
+import { useDevice } from "@/composables";
+import { confirmLoginToFrappeCloud } from "@/composables/fc";
+import { useScreenSize } from "@/composables/screen";
+import { currentView, useView } from "@/composables/useView";
+import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
-import { useDevice } from "@/composables";
-import { SidebarLink } from "@/components";
-import UserMenu from "@/components/UserMenu.vue";
-import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
-import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideBell from "~icons/lucide/bell";
-import LucideSearch from "~icons/lucide/search";
-import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import Apps from "@/components/Apps.vue";
+import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
+import { call } from "frappe-ui";
+import {
+  GettingStartedBanner,
+  HelpModal,
+  IntermediateStepModal,
+  minimize,
+  showHelpModal,
+  TrialBanner,
+  useOnboarding,
+} from "frappe-ui/frappe";
+import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
+import { storeToRefs } from "pinia";
+import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
-import { Section } from "@/components";
-import { useView, currentView } from "@/composables/useView";
-import { FrappeCloudIcon } from "@/components/icons";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
-import { useScreenSize } from "@/composables/screen";
+
+import { InviteCustomer } from "@/components/icons";
+import { showNewContactModal } from "@/pages/desk/contact/dialogState";
+import {
+  showAssignmentModal,
+  showCommentBox,
+  showEmailBox,
+} from "@/pages/ticket/modalStates";
+
+import { globalStore } from "@/stores/globalStore";
+import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
+import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
+import LucideBell from "~icons/lucide/bell";
+import FileText from "~icons/lucide/file-text";
+import Globe from "~icons/lucide/globe";
+import LucideMail from "~icons/lucide/mail";
+import MailOpen from "~icons/lucide/mail-open";
+import MessageCircle from "~icons/lucide/message-circle";
+import LucideSearch from "~icons/lucide/search";
+import Ticket from "~icons/lucide/ticket";
+import Timer from "~icons/lucide/timer";
+import UserPen from "~icons/lucide/user-pen";
+import LucideUserPlus from "~icons/lucide/user-plus";
 const { isMobileView } = useScreenSize();
 
 const route = useRoute();
@@ -146,10 +214,11 @@ const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
 const { isExpanded, width } = storeToRefs(useSidebarStore());
 const device = useDevice();
+const { $socket } = globalStore();
+
 const showSettingsModal = ref(false);
 
 const { pinnedViews, publicViews } = useView();
-
 declare global {
   interface Window {
     is_fc_site: boolean;
@@ -275,4 +344,284 @@ function openCommandPalette() {
     new KeyboardEvent("keydown", { key: "k", metaKey: true })
   );
 }
+
+const logo = h(
+  HDLogo,
+  {
+    class: "h-12 w-12",
+  },
+  null
+);
+
+const defaultSettingsTab = ref(0);
+
+const showOnboardingBanner = computed(() => {
+  return (
+    !isCustomerPortal.value &&
+    !isOnboardingStepsCompleted.value &&
+    authStore.isManager
+  );
+});
+
+const steps = [
+  {
+    name: "setup_email_account",
+    title: "Connect your support email",
+    completed: false,
+    icon: markRaw(LucideMail),
+    onClick: () => {
+      minimize.value = true;
+      showSettingsModal.value = true;
+      defaultSettingsTab.value = 0;
+    },
+  },
+  {
+    name: "invite_agents",
+    title: "Invite agents",
+    completed: false,
+    icon: markRaw(LucideUserPlus),
+    onClick: () => {
+      minimize.value = true;
+      router.push({ name: "AgentList", query: { invite: 1 } });
+    },
+  },
+  {
+    // left
+    name: "setup_sla",
+    title: "Set your first SLA",
+    completed: false,
+    icon: markRaw(Timer),
+    onClick: () => {
+      console.log("clicked");
+      const url = "/app/hd-service-level-agreement";
+      window.open(url, "_blank");
+    },
+  },
+  {
+    name: "create_first_ticket",
+    title: "Create your first ticket",
+    completed: false,
+    icon: markRaw(Ticket),
+    onClick: () => {
+      router.push({ name: "TicketAgentNew" });
+      minimize.value = true;
+    },
+  },
+  {
+    name: "assign_to_agent",
+    title: "Assign a ticket to an agent",
+    completed: false,
+    icon: markRaw(UserPen),
+    onClick: async () => {
+      await handleFirstTicketNavigation();
+      showAssignmentModal.value = true;
+      minimize.value = true;
+    },
+  },
+  {
+    name: "reply_on_ticket",
+    title: "Reply on a ticket",
+    completed: false,
+    icon: markRaw(MailOpen),
+    onClick: async () => {
+      await handleFirstTicketNavigation();
+      showEmailBox.value = true;
+      showCommentBox.value = false;
+      minimize.value = true;
+    },
+  },
+  {
+    name: "comment_on_ticket",
+    title: "Add a comment on a ticket",
+    completed: false,
+    icon: markRaw(MessageCircle),
+    onClick: async () => {
+      await handleFirstTicketNavigation();
+      showCommentBox.value = true;
+      showEmailBox.value = false;
+      minimize.value = true;
+    },
+  },
+  {
+    name: "first_article",
+    title: "Create your first article",
+    completed: false,
+    icon: markRaw(FileText),
+    onClick: async () => {
+      const generalCategory = await getGeneralCategory();
+      router.push({
+        name: "NewArticle",
+        query: {
+          title: "General",
+        },
+        params: { id: generalCategory },
+      });
+      minimize.value = true;
+    },
+  },
+  {
+    name: "add_invite_contact",
+    title: "Create & invite a contact",
+    completed: false,
+    icon: markRaw(InviteCustomer),
+    onClick: () => {
+      console.log("clicked");
+      minimize.value = true;
+      currentStep.value = {
+        title: "Create & invite a contact",
+        buttonLabel: "Create",
+        videoURL: "/assets/helpdesk/desk/videos/createInviteContact.mp4",
+        onClick: async () => {
+          showIntermediateModal.value = false;
+          router.push({ name: "ContactList" });
+          showNewContactModal.value = true;
+        },
+      };
+      showIntermediateModal.value = true;
+    },
+  },
+  {
+    name: "explore_customer_portal",
+    title: "Explore customer portal",
+    completed: false,
+    icon: markRaw(Globe),
+    onClick: () => {
+      window.open("/helpdesk/my-tickets", "_blank");
+      updateOnboardingStep("explore_customer_portal");
+      minimize.value = true;
+    },
+  },
+];
+
+const articles = ref([
+  {
+    title: "Introduction",
+    opened: false,
+    subArticles: [
+      { name: "introduction", title: "Introduction" },
+      { name: "setting-up", title: "Setting up" },
+    ],
+  },
+  {
+    title: "Getting Started",
+    opened: false,
+    subArticles: [
+      {
+        name: "lesson-1-your-first-ticket",
+        title: "Creating your first ticket",
+      },
+      {
+        name: "lesson-2understanding-ticket-view",
+        title: "Understanding ticket view",
+      },
+      {
+        name: "lesson-3-agents-teams",
+        title: "Agents & Teams",
+      },
+      {
+        name: "customers-contacts",
+        title: "Customers & Contacts",
+      },
+      {
+        name: "lesson-4-knowledge-base",
+        title: "Knowledge Base",
+      },
+      {
+        name: "customer-portal",
+        title: "Customer Portal",
+      },
+    ],
+  },
+  {
+    title: "Masters",
+    opened: false,
+    subArticles: [
+      { name: "ticket", title: "Ticket" },
+      { name: "agent", title: "Agent" },
+      { name: "team", title: "Team" },
+      { name: "contact", title: "Contact" },
+      { name: "customer", title: "Customer" },
+      { name: "knowledge-base", title: "Knowledge Base" },
+      { name: "canned-response", title: "Canned Responses" },
+      { name: "service-level-agreement", title: "Service Level Agreement" },
+      { name: "ticket-type", title: "Ticket Type" },
+      { name: "ticket-priority", title: "Ticket Priority" },
+    ],
+  },
+  {
+    title: "Customizations",
+    opened: false,
+    subArticles: [
+      { name: "custom-actions", title: "Custom Actions" },
+      { name: "field-dependency", title: "Field Dependency" },
+      { name: "custom-views", title: "Custom Views" },
+      {
+        name: "settings",
+        title: "Settings",
+      },
+    ],
+  },
+  {
+    title: "Frappe Helpdesk Mobile",
+    opened: false,
+    subArticles: [
+      { name: "pwa-installation", title: "Mobile App Installation" },
+    ],
+  },
+]);
+
+const showIntermediateModal = ref(false);
+const currentStep = ref({});
+
+const { isOnboardingStepsCompleted, setUp, updateOnboardingStep } =
+  useOnboarding("helpdesk");
+
+async function handleFirstTicketNavigation() {
+  const ticket = await getFirstTicket();
+
+  if (ticket) {
+    router.push({
+      name: "TicketAgent",
+      params: { ticketId: ticket },
+    });
+  } else {
+    router.push({ name: "TicketAgentNew" });
+  }
+}
+
+async function getFirstTicket() {
+  let ticket = localStorage.getItem("firstTicket");
+  if (ticket) return ticket;
+  return await call("helpdesk.api.onboarding.get_first_ticket");
+}
+
+async function getGeneralCategory() {
+  let generalCategory = localStorage.getItem("generalCategoryId");
+  if (!generalCategory) {
+    generalCategory = await call(
+      "helpdesk.api.onboarding.get_general_category_id"
+    );
+    if (!generalCategory) return;
+    localStorage.setItem("generalCategoryId", generalCategory);
+  }
+  return generalCategory;
+}
+
+function setUpOnboarding() {
+  if (!authStore.isManager) return;
+
+  setUp(steps);
+}
+
+onMounted(() => {
+  setUpOnboarding();
+
+  $socket.on("update_sla_status", () => {
+    updateOnboardingStep("setup_sla");
+  });
+});
+
+onUnmounted(() => {
+  $socket.off("update_sla_status");
+});
 </script>

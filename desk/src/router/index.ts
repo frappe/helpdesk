@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { useScreenSize } from "@/composables/screen";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
-import { useScreenSize } from "@/composables/screen";
+import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
 export const AGENT_PORTAL_AGENT_LIST = "AgentList";
