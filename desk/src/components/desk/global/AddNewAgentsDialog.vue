@@ -1,6 +1,11 @@
 <template>
   <div>
-    <Dialog :options="{ title: 'Add Agents' }" :show="show" @close="close()">
+    <Dialog
+      :options="{ title: 'Add Agents' }"
+      :model-value="show"
+      @update:modelValue="$emit('update:modelValue', $event)"
+      @close="close()"
+    >
       <template #body-content>
         <div class="space-y-3">
           <form
@@ -81,6 +86,7 @@ import { useOnboarding } from "frappe-ui/frappe";
 export default {
   name: "AddNewAgentsDialog",
   props: ["show"],
+  emits: ["close", "update:modelValue"],
   components: {
     Dialog,
     Input,

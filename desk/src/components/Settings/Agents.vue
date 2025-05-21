@@ -15,7 +15,7 @@
           </template>
         </FormControl>
         <Button
-          @click="() => (showForm = !showForm)"
+          @click="() => (showNewAgentsDialog = !showNewAgentsDialog)"
           label="New"
           variant="solid"
         >
@@ -91,9 +91,10 @@
     </div>
   </div>
   <AddNewAgentsDialog
-    :show="showForm"
-    @close="showForm = false"
-    :modelValue="showForm"
+    @close="showNewAgentsDialog = false"
+    :modelValue="showNewAgentsDialog"
+    :show="showNewAgentsDialog"
+    @update:modelValue="showNewAgentsDialog = $event"
   />
 </template>
 
@@ -105,11 +106,10 @@ import { call, FormControl } from "frappe-ui";
 import { h, ref } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import AgentCard from "./AgentCard.vue";
-import { useAgents } from "./agents";
+import { showNewAgentsDialog, useAgents } from "./agents";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
-const showForm = ref(false);
 
 const search = ref("");
 const { agents } = useAgents(search);
