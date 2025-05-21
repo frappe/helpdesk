@@ -162,6 +162,19 @@ const routes = [
         name: "CannedResponses",
         component: () => import("@/pages/CannedResponses.vue"),
       },
+      // Redirects
+      {
+        path: "teams",
+        redirect: "/tickets",
+      },
+      {
+        path: "teams/:teamId",
+        redirect: "/tickets",
+      },
+      {
+        path: "agents",
+        redirect: "/tickets",
+      },
     ],
   },
   // Additonal routes
