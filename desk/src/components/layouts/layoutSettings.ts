@@ -1,14 +1,12 @@
 import {
   AGENT_PORTAL_CONTACT_LIST,
   AGENT_PORTAL_CUSTOMER_LIST,
-  AGENT_PORTAL_TEAM_LIST,
   AGENT_PORTAL_TICKET_LIST,
 } from "@/router";
 import LucideBookOpen from "~icons/lucide/book-open";
 import LucideCloudLightning from "~icons/lucide/cloud-lightning";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
-import LucideUsers from "~icons/lucide/users";
 import { OrganizationsIcon } from "../icons";
 
 export const agentPortalSidebarOptions = [
@@ -21,11 +19,6 @@ export const agentPortalSidebarOptions = [
     label: "Knowledge Base",
     icon: LucideBookOpen,
     to: "AgentKnowledgeBase",
-  },
-  {
-    label: "Teams",
-    icon: LucideUsers,
-    to: AGENT_PORTAL_TEAM_LIST,
   },
   {
     label: "Canned responses",

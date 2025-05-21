@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full flex flex-col">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-7">
+    <div class="flex items-center justify-between mb-4">
       <h1 class="text-lg font-semibold">Teams</h1>
       <div class="flex item-center space-x-2">
         <FormControl
@@ -43,6 +43,24 @@
         </div>
       </div>
     </div>
+    <!-- Loading State -->
+    <div v-if="teams.loading" class="flex mt-28 justify-between w-full h-full">
+      <Button
+        :loading="teams.loading"
+        variant="ghost"
+        class="w-full"
+        size="2xl"
+      />
+    </div>
+    <!-- Empty State -->
+    <div
+      v-if="!teams.data?.length"
+      class="flex mt-28 justify-between w-full h-full"
+    >
+      <p class="text-sm text-gray-500 w-full flex justify-center">
+        No teams found
+      </p>
+    </div>
   </div>
   <NewTeamModal
     v-model="showForm"
@@ -55,8 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { FormControl, createListResource } from "frappe-ui";
-import Avatar from "frappe-ui/src/components/Avatar.vue";
+import { Avatar, FormControl, createListResource } from "frappe-ui";
 import { ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
 

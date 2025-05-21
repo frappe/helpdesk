@@ -44,7 +44,6 @@ import LucideUsers from "~icons/lucide/users";
 import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
-import Teams from "./Teams.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 const props = withDefaults(
   defineProps<{
@@ -73,11 +72,6 @@ let tabs = [
   },
   {
     label: "Teams",
-    icon: markRaw(LucideUsers),
-    component: markRaw(Teams),
-  },
-  {
-    label: "Teams2",
     icon: markRaw(LucideUsers),
     component: markRaw(TeamsConfig),
   },
