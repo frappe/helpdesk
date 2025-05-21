@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col gap-4">
-    <h1 class="text-lg font-semibold">Customise your Helpdesk</h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-lg font-semibold py-[5px]">Customise your Helpdesk</h1>
+    </div>
 
     <!-- Brand Logo & Favicon -->
     <div v-for="config in brandingConfig" class="flex flex-col gap-2">
@@ -44,10 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import { FileUploader, Avatar, createResource } from "frappe-ui";
-import { computed, reactive } from "vue";
 import { useConfigStore } from "@/stores/config";
 import { createToast } from "@/utils";
+import { Avatar, createResource, FileUploader } from "frappe-ui";
+import { computed, reactive } from "vue";
 
 const config = useConfigStore();
 
