@@ -15,6 +15,7 @@ export const useUserStore = defineStore("user", () => {
     initialData: [],
     transform(users) {
       for (const user of users) {
+        user.full_name = formatFullName(user.email);
         usersByName[user.name] = user;
       }
       return users;
@@ -36,12 +37,17 @@ export const useUserStore = defineStore("user", () => {
       usersByName[email] = {
         name: email,
         email: email,
-        full_name: email.split("@")[0],
+        full_name: formatFullName(email),
         user_image: null,
         role: null,
       };
     }
     return usersByName[email];
+  }
+  function formatFullName(email) {
+    let name = email.split("@")[0];
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    return name;
   }
 
   function getUserRole(email: string) {

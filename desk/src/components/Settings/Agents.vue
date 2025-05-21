@@ -50,42 +50,32 @@
       v-if="!agents.loading && Boolean(agents.data?.length)"
     >
       <div v-for="(agent, idx) in agents.data" :key="agent.agent_name">
-        <div
-          class="flex items-center justify-between py-3"
+        <AgentCard
+          :agent="agent"
           :class="idx !== agents.data.length - 1 && 'border-b '"
         >
-          <div class="flex items-center space-x-3 w-4/5">
-            <Avatar
-              :image="agent.user_image"
-              :label="agent.agent_name"
-              size="lg"
-            />
-            <div>
-              <div class="text-base font-semibold text-ink-gray-8">
-                {{ agent.agent_name }}
-              </div>
-              <div class="text-base text-ink-gray-6 mt-1">
-                {{ agent.name }}
-              </div>
-            </div>
-          </div>
-          <p v-if="!isManager" class="text-sm text-ink-gray-6 w-1/5 text-right">
-            {{ getUserRole(agent.name) }}
-          </p>
+          <template #right>
+            <p
+              v-if="!isManager"
+              class="text-sm text-ink-gray-6 w-1/5 text-right"
+            >
+              {{ getUserRole(agent.name) }}
+            </p>
 
-          <Dropdown
-            v-if="isManager"
-            class="w-1/5 flex justify-end items-center"
-            :options="getRoles(agent.name)"
-            :label="getUserRole(agent.name)"
-            :button="{
-              label: getUserRole(agent.name),
-              iconRight: 'chevron-down',
-              variant: 'ghost',
-            }"
-            placement="right"
-          />
-        </div>
+            <Dropdown
+              v-if="isManager"
+              class="w-1/5 flex justify-end items-center"
+              :options="getRoles(agent.name)"
+              :label="getUserRole(agent.name)"
+              :button="{
+                label: getUserRole(agent.name),
+                iconRight: 'chevron-down',
+                variant: 'ghost',
+              }"
+              placement="right"
+            />
+          </template>
+        </AgentCard>
       </div>
       <!-- Load More Button -->
       <div class="flex justify-center">
@@ -111,9 +101,10 @@
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils";
-import { Avatar, call, FormControl } from "frappe-ui";
+import { call, FormControl } from "frappe-ui";
 import { h, ref } from "vue";
 import LucideCheck from "~icons/lucide/check";
+import AgentCard from "./AgentCard.vue";
 import { useAgents } from "./agents";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();

@@ -1,7 +1,7 @@
 import { createListResource } from "frappe-ui";
 import { Ref, watch } from "vue";
 
-const agents = createListResource({
+export const agents = createListResource({
   doctype: "HD Agent",
   fields: ["name", "user_image", "agent_name"],
   cache: ["hd_agent_list"],

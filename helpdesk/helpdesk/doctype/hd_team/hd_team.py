@@ -174,18 +174,6 @@ class HDTeam(Document):
                 "width": "17rem",
                 "type": "Data",
             },
-            {
-                "label": "Assignment rule",
-                "key": "assignment_rule",
-                "width": "24rem",
-                "type": "Data",
-            },
-            {
-                "label": "Created On",
-                "key": "creation",
-                "width": "8rem",
-                "type": "Datetime",
-            },
         ]
         return {"columns": columns}
 

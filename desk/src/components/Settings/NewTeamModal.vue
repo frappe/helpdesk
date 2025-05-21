@@ -3,6 +3,13 @@
     v-model="show"
     :options="{
       title: 'New team',
+      actions: [
+        {
+          label: 'Close',
+          variant: 'solid',
+          onClick: () => (show = false),
+        },
+      ],
     }"
   >
     <template #body-content>
@@ -12,13 +19,6 @@
           label="Title"
           placeholder="Product experts"
           type="text"
-        />
-        <Button
-          :disabled="isEmpty(newTeamTitle)"
-          class="w-full"
-          label="Create"
-          theme="gray"
-          variant="solid"
         />
       </form>
     </template>
