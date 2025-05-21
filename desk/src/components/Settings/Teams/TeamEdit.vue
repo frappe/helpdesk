@@ -101,6 +101,7 @@
 
 <script setup lang="ts">
 import Link from "@/components/frappe-ui/Link.vue";
+import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils";
 import {
@@ -127,6 +128,7 @@ interface E {
 const emit = defineEmits<E>();
 
 const { getUser } = useUserStore();
+const { teamRestrictionApplied } = useConfigStore();
 const _teamName = ref(props.teamName);
 const team = createDocumentResource({
   doctype: "HD Team",
@@ -264,66 +266,75 @@ const deleteDialogOptions = {
   ],
 };
 
-const docOptions = computed(() => [
-  {
-    label: "Rename",
-    icon: "edit-3",
-    onClick: () => (showRename.value = !showRename.value),
-  },
-  {
-    label: team.doc?.ignore_restrictions
-      ? "Disable Bypass Restrictions"
-      : "Enable Bypass Restrictions",
-    component: () =>
-      h(
-        Tooltip,
-        {
-          text: ignoreRestrictions.value
-            ? "Members of this team will see the tickets assigned to this team only"
-            : "Members of this team will be able to see the tickets assigned to all the teams",
-        },
-        {
-          default: () => [
-            //create a div with 2 columns, one for icon and one for label
-            h(
-              "div",
-              {
-                class:
-                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded",
-                onClick: () =>
-                  (ignoreRestrictions.value = !ignoreRestrictions.value),
-              },
-              [
-                h(team.doc?.ignore_restrictions ? LucideLock : LucideUnlock, {
-                  class: "h-4 w-4 text-gray-700",
-                  stroke: "currentColor",
-                  "aria-hidden": "true",
-                }),
-                h(
-                  "span",
-                  {
-                    class: "whitespace-nowrap text-ink-gray-7 text-p-base",
-                  },
-                  [
-                    team.doc?.ignore_restrictions
-                      ? "Access only this team's tickets"
-                      : "Access all team tickets",
-                  ]
-                ),
-              ]
-            ),
-          ],
-        }
-      ),
-  },
-  {
-    label: "Delete",
-    icon: "trash-2",
-    onClick: () => {
-      showDelete.value = !showDelete.value;
+const docOptions = computed(() => {
+  let options = [
+    {
+      label: "Rename",
+      icon: "edit-3",
+      onClick: () => (showRename.value = !showRename.value),
     },
-  },
-]);
+    {
+      label: "Delete",
+      icon: "trash-2",
+      onClick: () => {
+        showDelete.value = !showDelete.value;
+      },
+    },
+  ];
+
+  if (teamRestrictionApplied) {
+    // in options push at 1st index
+
+    let ignoreRestrictions = {
+      label: team.doc?.ignore_restrictions
+        ? "Disable Bypass Restrictions"
+        : "Enable Bypass Restrictions",
+      component: () =>
+        h(
+          Tooltip,
+          {
+            text: ignoreRestrictions.value
+              ? "Members of this team will see the tickets assigned to this team only"
+              : "Members of this team will be able to see the tickets assigned to all the teams",
+          },
+          {
+            default: () => [
+              //create a div with 2 columns, one for icon and one for label
+              h(
+                "div",
+                {
+                  class:
+                    "flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded",
+                  onClick: () =>
+                    (ignoreRestrictions.value = !ignoreRestrictions.value),
+                },
+                [
+                  h(team.doc?.ignore_restrictions ? LucideLock : LucideUnlock, {
+                    class: "h-4 w-4 text-gray-700",
+                    stroke: "currentColor",
+                    "aria-hidden": "true",
+                  }),
+                  h(
+                    "span",
+                    {
+                      class: "whitespace-nowrap text-ink-gray-7 text-p-base",
+                    },
+                    [
+                      team.doc?.ignore_restrictions
+                        ? "Access only this team's tickets"
+                        : "Access all team tickets",
+                    ]
+                  ),
+                ]
+              ),
+            ],
+          }
+        ),
+    };
+    options = [options[0], ignoreRestrictions, ...options.slice(1)];
+  }
+  return options;
+});
 </script>
 
 <style scoped></style>
