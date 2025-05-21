@@ -1,11 +1,9 @@
 <template>
-  <div class="flex-1">
-    <div v-if="step === 'team-list'" class="h-full">
-      <TeamsList @update:step="updateStep" />
-    </div>
-    <div v-else-if="step === 'team-edit'" class="h-full">
-      <TeamEdit @update:step="updateStep" :team-name="teamName" />
-    </div>
+  <div v-if="step === 'team-list'" class="h-full">
+    <TeamsList @update:step="updateStep" />
+  </div>
+  <div v-else-if="step === 'team-edit'" class="h-full">
+    <TeamEdit @update:step="updateStep" :team-name="teamName" />
   </div>
 </template>
 

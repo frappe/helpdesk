@@ -5,9 +5,11 @@
       title: 'New team',
       actions: [
         {
-          label: 'Close',
+          label: 'Create',
           variant: 'solid',
-          onClick: () => (show = false),
+          onClick: () => {
+            newTeam.submit();
+          },
         },
       ],
     }"

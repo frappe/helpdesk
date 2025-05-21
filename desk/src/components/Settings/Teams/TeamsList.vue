@@ -28,10 +28,10 @@
     <!-- List -->
     <div
       v-if="!teams.loading && teams.data?.length > 0"
-      class="divide-y w-full"
+      class="divide-y w-full h-full hide-scrollbar overflow-y-scroll"
     >
       <div
-        v-for="(team, idx) in teams.data"
+        v-for="team in teams.data"
         class="flex items-center gap-2 py-2 group justify-between cursor-pointer"
         @click="() => emit('update:step', 'team-edit', team.name)"
       >
@@ -51,13 +51,20 @@
       </div>
     </div>
   </div>
-  <NewTeamModal v-model="showForm" @create="() => listViewRef.reload()" />
+  <NewTeamModal
+    v-model="showForm"
+    @create="
+      () => {
+        teams.reload();
+      }
+    "
+  />
 </template>
 
 <script setup lang="ts">
 import { FormControl, createListResource } from "frappe-ui";
 import Avatar from "frappe-ui/src/components/Avatar.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import NewTeamModal from "../NewTeamModal.vue";
 
 interface E {
@@ -71,11 +78,22 @@ const teams = createListResource({
   cache: ["Teams"],
   fields: ["name"],
   auto: true,
+  orderBy: "creation desc",
 });
 
 const search = ref("");
 const showForm = ref(false);
-const listViewRef = ref(null);
+
+watch(search, (newValue) => {
+  teams.filters = {
+    name: ["like", `%${newValue}%`],
+  };
+  if (!newValue) {
+    teams.start = 0;
+    teams.pageLength = 10;
+  }
+  teams.reload();
+});
 </script>
 
 <style scoped></style>
