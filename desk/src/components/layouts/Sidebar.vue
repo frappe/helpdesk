@@ -161,13 +161,20 @@
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
 import Apps from "@/components/Apps.vue";
-import { FrappeCloudIcon } from "@/components/icons";
+import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import { showNewAgentsDialog } from "@/components/Settings/agents";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
 import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
 import { currentView, useView } from "@/composables/useView";
+import { showNewContactModal } from "@/pages/desk/contact/dialogState";
+import {
+  showAssignmentModal,
+  showCommentBox,
+  showEmailBox,
+} from "@/pages/ticket/modalStates";
 import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
@@ -192,14 +199,6 @@ import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
-
-import { InviteCustomer } from "@/components/icons";
-import { showNewContactModal } from "@/pages/desk/contact/dialogState";
-import {
-  showAssignmentModal,
-  showCommentBox,
-  showEmailBox,
-} from "@/pages/ticket/modalStates";
 
 import { globalStore } from "@/stores/globalStore";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
@@ -392,12 +391,14 @@ const steps = [
     icon: markRaw(LucideUserPlus),
     onClick: () => {
       minimize.value = true;
-      //TODO: open invite agent modal
-      router.push({ name: "AgentList", query: { invite: 1 } });
+      showSettingsModal.value = true;
+      defaultSettingsTab.value = 2;
+      setTimeout(() => {
+        showNewAgentsDialog.value = true;
+      }, 300);
     },
   },
   {
-    // left
     name: "setup_sla",
     title: "Set your first SLA",
     completed: false,

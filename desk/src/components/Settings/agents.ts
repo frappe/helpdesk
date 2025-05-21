@@ -1,5 +1,5 @@
 import { createListResource } from "frappe-ui";
-import { Ref, watch } from "vue";
+import { ref, Ref, watch } from "vue";
 
 export const agents = createListResource({
   doctype: "HD Agent",
@@ -38,3 +38,5 @@ export const useAgents = (
     agents,
   };
 };
+
+export const showNewAgentsDialog = ref(false);
