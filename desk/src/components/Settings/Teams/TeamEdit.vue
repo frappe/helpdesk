@@ -1,7 +1,7 @@
 <template>
   <div class="w-full h-full flex flex-col">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-7">
+    <div class="flex items-center justify-between mb-4">
       <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
       <Dropdown placement="right" :options="docOptions">
         <Button variant="ghost">

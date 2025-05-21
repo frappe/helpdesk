@@ -5,11 +5,8 @@ import { isCustomerPortal } from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
-export const AGENT_PORTAL_AGENT_LIST = "AgentList";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
-export const AGENT_PORTAL_TEAM_LIST = "Teams";
-export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "TicketAgent";
 export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
@@ -159,17 +156,6 @@ const routes = [
         path: "contacts",
         name: AGENT_PORTAL_CONTACT_LIST,
         component: () => import("@/pages/desk/contact/Contacts.vue"),
-      },
-      {
-        path: "teams",
-        name: AGENT_PORTAL_TEAM_LIST,
-        component: () => import("@/pages/desk/team/Teams.vue"),
-      },
-      {
-        path: "teams/:teamId",
-        name: AGENT_PORTAL_TEAM_SINGLE,
-        component: () => import("@/pages/desk/team/TeamSingle.vue"),
-        props: true,
       },
       {
         path: "canned-responses",
