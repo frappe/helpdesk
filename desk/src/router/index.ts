@@ -166,7 +166,20 @@ const routes = [
         path: "dashboard",
         name: "Dashboard",
         component: () => import("@/pages/dashboard/Dashboard.vue"),
-      }
+      },
+      // Redirects
+      {
+        path: "teams",
+        redirect: "/tickets",
+      },
+      {
+        path: "teams/:teamId",
+        redirect: "/tickets",
+      },
+      {
+        path: "agents",
+        redirect: "/tickets",
+      },
     ],
   },
   // Additonal routes
