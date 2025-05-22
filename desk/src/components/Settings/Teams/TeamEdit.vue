@@ -285,7 +285,7 @@ const docOptions = computed(() => {
   if (teamRestrictionApplied) {
     // in options push at 1st index
 
-    let ignoreRestrictions = {
+    let ignoreRestrictionsOption = {
       label: team.doc?.ignore_restrictions
         ? "Disable Bypass Restrictions"
         : "Enable Bypass Restrictions",
@@ -331,7 +331,7 @@ const docOptions = computed(() => {
           }
         ),
     };
-    options = [options[0], ignoreRestrictions, ...options.slice(1)];
+    options = [options[0], ignoreRestrictionsOption, ...options.slice(1)];
   }
   return options;
 });
