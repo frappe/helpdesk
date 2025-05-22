@@ -317,7 +317,7 @@ const activities = computed(() => {
       key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
-      creation: email.creation,
+      creation: email.communication_date || email.creation,
       attachments: email.attachments,
       name: email.name,
       isFirstEmail: idx === 0,

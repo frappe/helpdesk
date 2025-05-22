@@ -327,7 +327,7 @@ const activities = computed(() => {
       to: email.recipients,
       cc: email.cc,
       bcc: email.bcc,
-      creation: email.creation,
+      creation: email.communication_date || email.creation,
       subject: email.subject,
       attachments: email.attachments,
       content: email.content,

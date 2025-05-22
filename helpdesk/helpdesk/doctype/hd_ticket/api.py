@@ -129,6 +129,7 @@ def get_communications(ticket: str):
             QBCommunication.cc,
             QBCommunication.content,
             QBCommunication.creation,
+            QBCommunication.communication_date,
             QBCommunication.name,
             QBCommunication.sender,
             QBCommunication.recipients,
