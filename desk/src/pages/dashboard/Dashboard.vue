@@ -8,6 +8,48 @@
     </LayoutHeader>
 
     <div class="p-5 w-full overflow-y-scroll">
+      <div class="mb-4 flex items-center gap-4">
+        <DateRangePicker
+          v-model="selectedPeriod"
+          variant="outline"
+          placeholder="Period"
+          :formatter="(date: string) => {
+            const dateObj = new Date(date);
+            return dateObj.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: dateObj.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
+            });
+          }"
+        />
+        <Autocomplete
+          v-model="selectedAgent"
+          :options="agentOptions"
+          placeholder="Agent"
+        >
+          <template #target="{ togglePopover }">
+            <TextInput
+              readonly
+              type="text"
+              icon-left="user"
+              placeholder="Agent"
+              class="w-full"
+              variant="outline"
+              @focus="togglePopover()"
+            />
+          </template>
+          <template #prefix>
+            <img
+              v-if="selectedAgent"
+              :src="selectedAgent.image"
+              class="mr-2 h-4 w-4 rounded-full"
+            />
+          </template>
+          <template #item-prefix="{ option }">
+            <img :src="option.image" class="h-4 w-4 mr-2 rounded-full" />
+          </template>
+        </Autocomplete>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <NumberChart
           v-for="(config, index) in numberCards"
@@ -41,7 +83,44 @@
 </template>
 
 <script setup lang="ts">
-import { AxisChart, DonutChart, NumberChart, usePageMeta } from "frappe-ui";
+import { AxisChart, DateRangePicker, DonutChart, NumberChart, usePageMeta } from "frappe-ui";
+import { ref } from "vue";
+
+const selectedPeriod = ref('');
+const selectedAgent = ref(null);
+
+const agentOptions = [
+  {
+    label: 'John Doe',
+    value: 'john-doe',
+    image: 'https://randomuser.me/api/portraits/men/59.jpg',
+  },
+  {
+    label: 'Jane Doe',
+    value: 'jane-doe',
+    image: 'https://randomuser.me/api/portraits/women/58.jpg',
+  },
+  {
+    label: 'John Smith',
+    value: 'john-smith',
+    image: 'https://randomuser.me/api/portraits/men/59.jpg',
+  },
+  {
+    label: 'Jane Smith',
+    value: 'jane-smith',
+    image: 'https://randomuser.me/api/portraits/women/59.jpg',
+  },
+  {
+    label: 'John Wayne',
+    value: 'john-wayne',
+    image: 'https://randomuser.me/api/portraits/men/57.jpg',
+  },
+  {
+    label: 'Jane Wayne',
+    value: 'jane-wayne',
+    image: 'https://randomuser.me/api/portraits/women/51.jpg',
+  },
+]
 
 const numberCards = [
   {
