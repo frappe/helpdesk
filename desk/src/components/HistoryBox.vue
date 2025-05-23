@@ -35,7 +35,7 @@
         </div>
       </Tooltip>
     </div>
-    <div v-if="show_others && content !== 'created this ticket'">
+    <div v-if="show_others">
       <div
         v-for="relatedActivity in relatedActivities"
         :key="relatedActivity.creation"
