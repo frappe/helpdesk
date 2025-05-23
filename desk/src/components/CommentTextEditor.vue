@@ -18,6 +18,7 @@
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2">
+        <!-- Attachments -->
         <div class="flex flex-wrap gap-2 px-10">
           <AttachmentItem
             v-for="a in attachments"
@@ -33,10 +34,11 @@
             </template>
           </AttachmentItem>
         </div>
+        <!-- Fixed Menu -->
         <div
           class="flex justify-between gap-2 overflow-hidden border-t px-10 py-2.5"
         >
-          <div class="flex items-center overflow-x-auto">
+          <div class="flex items-center overflow-x-auto w-4/6">
             <TextEditorFixedMenu
               class="-ml-1"
               :buttons="textEditorMenuButtons"
@@ -65,7 +67,9 @@
               </template>
             </FileUploader>
           </div>
-          <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
+          <div
+            class="mt-2 flex items-center justify-end space-x-2 sm:mt-0 w-2/6"
+          >
             <Button
               label="Discard"
               @click="
@@ -78,7 +82,7 @@
             />
             <Button
               variant="solid"
-              label="Comment"
+              :label="label"
               :disabled="commentEmpty"
               :loading="loading"
               @click="
@@ -129,6 +133,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  label: {
+    type: String,
+    default: "Comment",
+  },
   editable: {
     type: Boolean,
     default: true,
@@ -163,7 +171,7 @@ function removeAttachment(attachment) {
 
 async function submitComment() {
   if (isContentEmpty(newComment.value)) {
-    return;
+    return false;
   }
   const comment = createResource({
     url: "run_doc_method",

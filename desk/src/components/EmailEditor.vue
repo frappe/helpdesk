@@ -64,6 +64,7 @@
       </div>
     </template>
     <template #bottom>
+      <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
         <AttachmentItem
           v-for="a in attachments"
@@ -79,8 +80,9 @@
           </template>
         </AttachmentItem>
       </div>
+      <!-- TextEditor Fixed Menu -->
       <div class="flex justify-between gap-2 overflow-hidden px-10 py-2.5">
-        <div class="flex items-center overflow-x-auto">
+        <div class="flex items-center overflow-x-auto w-4/6">
           <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
             <FileUploader
@@ -119,13 +121,13 @@
             </Button>
           </div>
         </div>
-        <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
+        <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0 w-2/6">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
             :disabled="emailEmpty"
             :loading="sendMail.loading"
-            label="Send"
+            :label="label"
             @click="
               () => {
                 submitMail();
@@ -176,6 +178,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: null,
+  },
+  label: {
+    type: String,
+    default: "Send",
   },
   editable: {
     type: Boolean,
@@ -252,7 +258,7 @@ const sendMail = createResource({
 
 function submitMail() {
   if (isContentEmpty(newEmail.value)) {
-    return;
+    return false;
   }
   if (!toEmailsClone.value.length) {
     createToast({
@@ -260,7 +266,7 @@ function submitMail() {
       icon: "x",
       iconClasses: "text-red-600",
     });
-    return;
+    return false;
   }
 
   sendMail.submit();
