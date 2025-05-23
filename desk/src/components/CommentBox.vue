@@ -3,7 +3,7 @@
     <div class="mb-1 ml-0.5 flex items-center justify-between">
       <div class="text-gray-600 flex items-center gap-2">
         <Avatar
-          size="sm"
+          size="md"
           :label="commenter"
           :image="getUser(commentedBy).user_image"
         />
@@ -25,6 +25,7 @@
         </Tooltip>
         <div v-if="authStore.userId === commentedBy && !editable">
           <Dropdown
+            :placement="'right'"
             :options="[
               {
                 label: 'Edit',
@@ -95,28 +96,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, PropType, onMounted, computed } from "vue";
-import {
-  Dropdown,
-  createResource,
-  Dialog,
-  Avatar,
-  TextEditor,
-} from "frappe-ui";
-import {
-  dateFormat,
-  timeAgo,
-  dateTooltipFormat,
-  createToast,
-  textEditorMenuButtons,
-  isContentEmpty,
-  getFontFamily,
-} from "@/utils";
 import { AttachmentItem } from "@/components";
 import { useAuthStore } from "@/stores/auth";
+import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
-import { updateRes as updateComment } from "@/stores/knowledgeBase";
+import {
+  createToast,
+  dateFormat,
+  dateTooltipFormat,
+  getFontFamily,
+  isContentEmpty,
+  textEditorMenuButtons,
+  timeAgo,
+} from "@/utils";
+import {
+  Avatar,
+  Dialog,
+  Dropdown,
+  TextEditor,
+  createResource,
+} from "frappe-ui";
+import { PropType, computed, onMounted, ref } from "vue";
 const authStore = useAuthStore();
 const props = defineProps({
   activity: {

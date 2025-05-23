@@ -30,7 +30,7 @@
             @click="updateImage(null)"
           />
           <Button
-            v-if="!contact.doc?.user"
+            v-if="!contact.doc?.user && isManager"
             label="Invite as user"
             @click="inviteContact"
             :loading="isLoading"
@@ -84,6 +84,7 @@ import { computed, ref } from "vue";
 import zod from "zod";
 
 import MultiSelect from "@/components/MultiSelect.vue";
+import { useAuthStore } from "@/stores/auth";
 import { AutoCompleteItem, File } from "@/types";
 
 interface Props {
@@ -213,6 +214,7 @@ function handleCustomerChange(item: AutoCompleteItem | null) {
 }
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
 
 const contact = createDocumentResource({
   doctype: "Contact",

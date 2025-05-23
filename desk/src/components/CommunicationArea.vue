@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col comm-area">
     <div
-      class="flex justify-between gap-3 border-t px-4 lg:px-10 py-4 md:py-2.5"
+      class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
     >
       <div class="flex gap-1.5">
         <Button
@@ -34,6 +34,7 @@
     >
       <CommentTextEditor
         ref="commentTextEditorRef"
+        :label="isMac ? 'Comment (⌘ + ⏎)' : 'Comment (Ctrl + ⏎)'"
         v-model="doc"
         :editable="showCommentBox"
         :doctype="doctype"
@@ -59,6 +60,7 @@
     >
       <EmailEditor
         ref="emailEditorRef"
+        :label="isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'"
         v-model="doc"
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
@@ -82,15 +84,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
 import { CommentTextEditor, EmailEditor } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
+import { useDevice } from "@/composables";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
+import { ref, watch } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
 const doc = defineModel();
+const { isMac } = useDevice();
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
@@ -110,13 +113,15 @@ function toggleCommentBox() {
 }
 
 function submitEmail() {
-  emailEditorRef.value.submitMail();
-  emit("update");
+  if (emailEditorRef.value.submitMail()) {
+    emit("update");
+  }
 }
 
 function submitComment() {
-  commentTextEditorRef.value.submitComment();
-  emit("update");
+  if (commentTextEditorRef.value.submitComment()) {
+    emit("update");
+  }
 }
 
 function replyToEmail(data: object) {
@@ -147,6 +152,24 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+watch(
+  () => showEmailBox.value,
+  (value) => {
+    if (value) {
+      emailEditorRef.value?.editor?.commands?.focus();
+    }
+  }
+);
+
+watch(
+  () => showCommentBox.value,
+  (value) => {
+    if (value) {
+      commentTextEditorRef.value?.editor?.commands?.focus();
+    }
+  }
+);
 
 defineExpose({
   replyToEmail,

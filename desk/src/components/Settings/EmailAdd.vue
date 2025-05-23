@@ -94,20 +94,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, Reactive, reactive, Ref, ref } from "vue";
-import { createResource } from "frappe-ui";
-import CircleAlert from "~icons/lucide/circle-alert";
+import { EmailAccount, EmailService, EmailStep } from "@/types";
 import { createToast } from "@/utils";
+import { createResource } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, Reactive, reactive, Ref, ref } from "vue";
+import CircleAlert from "~icons/lucide/circle-alert";
 import {
   customProviderFields,
+  incomingOutgoingFields,
   popularProviderFields,
   services,
   validateInputs,
-  incomingOutgoingFields,
 } from "./emailConfig";
-import { useOnboarding } from "frappe-ui/frappe";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
-import { EmailService, EmailAccount, EmailStep } from "@/types";
 
 interface E {
   (event: "update:step", value: EmailStep): void;
