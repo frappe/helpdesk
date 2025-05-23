@@ -619,16 +619,14 @@ async function getGeneralCategory() {
 
 function setUpOnboarding() {
   if (!authStore.isManager) return;
-
+  $socket.on("update_sla_status", () => {
+    updateOnboardingStep("setup_sla");
+  });
   setUp(steps);
 }
 
 onMounted(() => {
   setUpOnboarding();
-
-  $socket.on("update_sla_status", () => {
-    updateOnboardingStep("setup_sla");
-  });
 });
 
 onUnmounted(() => {

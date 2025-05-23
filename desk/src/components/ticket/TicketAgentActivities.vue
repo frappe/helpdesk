@@ -19,7 +19,8 @@
               class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white"
               :class="[
                 activity.type === 'comment' ? 'mt-0.5' : '',
-                activity.type === 'history' ? 'mt-1' : '',
+                activity.type === 'history' ? 'mt-0.5' : '',
+                activity.type === 'email' ? 'mt-2' : '',
               ]"
             >
               <Avatar
@@ -36,7 +37,10 @@
               <DotIcon v-else class="text-gray-600" />
             </div>
           </div>
-          <div class="mb-4 flex flex-1">
+          <div
+            class="mb-4 flex flex-1"
+            :class="[i == activities.length - 1 && 'mb-5']"
+          >
             <EmailArea
               v-if="activity.type === 'email'"
               :activity="activity"
@@ -77,20 +81,23 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, inject, h, computed, onMounted, watch, PropType } from "vue";
-import { useElementVisibility } from "@vueuse/core";
 import {
-  DotIcon,
-  EmailAtIcon,
-  CommentIcon,
-  EmailIcon,
+  CommentBox,
+  EmailArea,
+  FadedScrollableDiv,
+  HistoryBox,
+} from "@/components";
+import {
   ActivityIcon,
+  CommentIcon,
+  DotIcon,
+  EmailIcon,
 } from "@/components/icons";
-import { EmailArea, CommentBox, HistoryBox } from "@/components";
 import { useUserStore } from "@/stores/user";
-import { Avatar } from "frappe-ui";
 import { TicketActivity } from "@/types";
-import { FadedScrollableDiv } from "@/components";
+import { useElementVisibility } from "@vueuse/core";
+import { Avatar } from "frappe-ui";
+import { PropType, Ref, computed, h, inject, onMounted, watch } from "vue";
 const props = defineProps({
   activities: {
     type: Array as PropType<TicketActivity[]>,

@@ -45,12 +45,9 @@
 </template>
 
 <script setup lang="ts">
-import { h } from "vue";
-import { computed } from "vue";
-import { EmailIcon, CommentIcon } from "@/components/icons";
+import { CommentIcon, EmailIcon } from "@/components/icons";
 import { Dropdown } from "frappe-ui";
-import { inject } from "vue";
-import { Ref } from "vue";
+import { computed, h, inject, Ref } from "vue";
 defineProps({
   title: {
     type: String,
