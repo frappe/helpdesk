@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto py-3',
+      'prose-sm max-w-none mx-10 max-h-[50vh]  py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
     ]"
@@ -61,6 +61,15 @@
           :error-message="(value) => `${value} is an invalid email address`"
         />
       </div>
+    </template>
+    <template v-slot:editor="{ editor }">
+      <EditorContent
+        autofocus
+        :class="[
+          editable && ' max-h-[35vh] overflow-y-auto  py-3 hide-scrollbar',
+        ]"
+        :editor="editor"
+      />
     </template>
     <template #bottom>
       <div class="flex flex-wrap gap-2 px-10">
@@ -149,6 +158,7 @@ import {
   MultiSelectInput,
 } from "@/components";
 import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   createToast,
@@ -157,6 +167,7 @@ import {
   textEditorMenuButtons,
   validateEmail,
 } from "@/utils";
+import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
@@ -201,6 +212,7 @@ const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
 const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
 
 const attachments = ref([]);
 const emailEmpty = computed(() => {
@@ -239,7 +251,10 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
-    updateOnboardingStep("reply_on_ticket");
+
+    if (isManager) {
+      updateOnboardingStep("reply_on_ticket");
+    }
   },
   debounce: 300,
 });

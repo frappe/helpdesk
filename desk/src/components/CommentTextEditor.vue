@@ -109,15 +109,20 @@ import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
 import { useAgentStore } from "@/stores/agent";
 
+import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList } = useAgentStore();
+const { isManager } = useAuthStore();
 
 onMounted(() => {
-  agentsList.fetch();
+  //TODO: check this out
+  if (!agentsList.fetched) {
+    agentsList.fetch();
+  }
 });
 const props = defineProps({
   placeholder: {
@@ -172,7 +177,9 @@ async function submitComment() {
       },
     }),
     onSuccess: () => {
-      updateOnboardingStep("comment_on_ticket");
+      if (isManager) {
+        updateOnboardingStep("comment_on_ticket");
+      }
       emit("submit");
       loading.value = false;
       attachments.value = [];
