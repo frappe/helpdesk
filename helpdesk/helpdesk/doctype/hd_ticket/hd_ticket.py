@@ -462,7 +462,6 @@ class HDTicket(Document):
         )
         if last_communication and last_communication.message_id:
             communication.in_reply_to = last_communication.name
-            communication.message_id = last_communication.message_id
 
         communication.insert(ignore_permissions=True)
         capture_event("agent_replied")
@@ -523,7 +522,6 @@ class HDTicket(Document):
                 template=template,
                 with_container=False,
                 in_reply_to=last_communication.name,
-                message_id=last_communication.message_id,
             )
         except Exception as e:
             frappe.throw(_(e))
