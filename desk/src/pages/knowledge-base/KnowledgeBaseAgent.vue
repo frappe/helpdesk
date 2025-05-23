@@ -193,7 +193,7 @@ const selectBannerActions = [
           {
             label: "Confirm",
             variant: "solid",
-            onClick(close: Function) {
+            onClick({ close }) {
               handleDeleteArticles();
               close();
             },
