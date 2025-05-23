@@ -320,16 +320,17 @@ const tabs: TabObject[] = [
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {
     return {
-      type: "email",
-      key: email.creation,
+      subject: email.subject,
+      content: email.content,
       sender: { name: email.user.email, full_name: email.user.name },
       to: email.recipients,
+      type: "email",
+      key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
       creation: email.communication_date || email.creation,
-      subject: email.subject,
       attachments: email.attachments,
-      content: email.content,
+      name: email.name,
       isFirstEmail: idx === 0,
     };
   });
@@ -343,6 +344,7 @@ const activities = computed(() => {
       commenter: comment.user.name,
       creation: comment.creation,
       content: comment.content,
+      attachments: comment.attachments,
     };
   });
 
@@ -368,10 +370,11 @@ const activities = computed(() => {
   while (i < sorted.length) {
     const currentActivity = sorted[i];
     if (currentActivity.type === "history") {
-      currentActivity.relatedActivities = [];
+      currentActivity.relatedActivities = [currentActivity];
       for (let j = i + 1; j < sorted.length + 1; j++) {
         const nextActivity = sorted[j];
-        if (nextActivity && nextActivity.type === "history") {
+
+        if (nextActivity && nextActivity.user === currentActivity.user) {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
           data.push(currentActivity);
@@ -384,7 +387,6 @@ const activities = computed(() => {
     }
     i++;
   }
-
   return data;
 });
 
