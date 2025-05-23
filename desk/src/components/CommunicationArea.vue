@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 import { CommentTextEditor, EmailEditor } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
@@ -147,6 +147,24 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+watch(
+  () => showEmailBox.value,
+  (value) => {
+    if (value) {
+      emailEditorRef.value?.editor?.commands?.focus();
+    }
+  }
+);
+
+watch(
+  () => showCommentBox.value,
+  (value) => {
+    if (value) {
+      commentTextEditorRef.value?.editor?.commands?.focus();
+    }
+  }
+);
 
 defineExpose({
   replyToEmail,

@@ -1,7 +1,7 @@
 <template>
   <TextEditor
     v-if="agentsList.data"
-    ref="textEditor"
+    ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
@@ -192,7 +192,12 @@ async function submitComment() {
 
   comment.submit();
 }
+
+const editorRef = ref(null);
+const editor = computed(() => editorRef.value?.editor);
+
 defineExpose({
   submitComment,
+  editor,
 });
 </script>

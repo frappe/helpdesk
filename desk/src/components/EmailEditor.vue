@@ -5,7 +5,7 @@
       'prose-sm max-w-none mx-6 md:mx-10 max-h-[50vh] py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
-      editable && ' max-h-[35vh] overflow-y-auto  py-3 ',
+      editable && '!max-h-[35vh] overflow-y-auto',
     ]"
     :content="newEmail"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
