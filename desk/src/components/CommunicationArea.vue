@@ -34,6 +34,7 @@
     >
       <CommentTextEditor
         ref="commentTextEditorRef"
+        :label="isMac ? 'Comment (⌘ + ⏎)' : 'Comment (Ctrl + ⏎)'"
         v-model="doc"
         :editable="showCommentBox"
         :doctype="doctype"
@@ -59,6 +60,7 @@
     >
       <EmailEditor
         ref="emailEditorRef"
+        :label="isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'"
         v-model="doc"
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
@@ -82,15 +84,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-
 import { CommentTextEditor, EmailEditor } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
+import { useDevice } from "@/composables";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
+import { ref, watch } from "vue";
 
 const emit = defineEmits(["update"]);
 const content = defineModel("content");
 const doc = defineModel();
+const { isMac } = useDevice();
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
@@ -110,13 +113,15 @@ function toggleCommentBox() {
 }
 
 function submitEmail() {
-  emailEditorRef.value.submitMail();
-  emit("update");
+  if (emailEditorRef.value.submitMail()) {
+    emit("update");
+  }
 }
 
 function submitComment() {
-  commentTextEditorRef.value.submitComment();
-  emit("update");
+  if (commentTextEditorRef.value.submitComment()) {
+    emit("update");
+  }
 }
 
 function replyToEmail(data: object) {
