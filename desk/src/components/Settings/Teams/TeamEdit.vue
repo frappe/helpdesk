@@ -253,7 +253,7 @@ function renameTeam(close) {
 const showDelete = ref(false);
 const deleteDialogOptions = {
   title: "Delete team",
-  message: `Are you sure you want to delete the team ${team.doc?.name}? This action cannot be reversed!`,
+  message: `Are you sure you want to delete this team? This action cannot be reversed!`,
   actions: [
     {
       label: "Confirm",
