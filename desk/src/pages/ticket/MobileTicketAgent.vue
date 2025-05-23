@@ -172,48 +172,47 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
-import { useRouter } from "vue-router";
-import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
-  Dropdown,
-  Tabs,
-  TabPanel,
-  TabList,
-  createResource,
   Dialog,
+  Dropdown,
   FormControl,
+  TabList,
+  TabPanel,
+  Tabs,
   call,
+  createResource,
 } from "frappe-ui";
+import { computed, h, onMounted, onUnmounted, provide, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import {
-  LayoutHeader,
-  MultipleAvatar,
   AssignmentModal,
   CommunicationArea,
+  LayoutHeader,
+  MultipleAvatar,
 } from "@/components";
-import { TicketAgentActivities } from "@/components/ticket";
 import {
   ActivityIcon,
   CommentIcon,
+  DetailsIcon,
   EmailIcon,
   IndicatorIcon,
-  DetailsIcon,
 } from "@/components/icons";
+import { TicketAgentActivities } from "@/components/ticket";
 
+import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
+import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { useScreenSize } from "@/composables/screen";
+import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { globalStore } from "@/stores/globalStore";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import { TabObject, TicketTab } from "@/types";
 import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
-import { useScreenSize } from "@/composables/screen";
-import { TabObject, TicketTab } from "@/types";
-import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
-import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 
 const router = useRouter();
 const ticketAgentActivitiesRef = ref(null);
@@ -254,10 +253,10 @@ const ticket = createResource({
       });
     }
   },
-  onSuccess: (ticket) => {
+  onSuccess: (data) => {
     subjectInput.value = ticket.subject;
     setupCustomizations(ticket, {
-      doc: ticket,
+      doc: data,
       call,
       router,
       $dialog,
