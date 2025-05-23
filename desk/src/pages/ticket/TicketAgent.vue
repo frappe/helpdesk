@@ -231,7 +231,6 @@ const ticket = createResource({
       updateField,
       createToast,
     });
-    // console.log(ticket._customActions);
   },
 });
 function updateField(name: string, value: string, callback = () => {}) {

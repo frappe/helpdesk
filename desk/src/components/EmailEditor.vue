@@ -2,9 +2,10 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-10 max-h-[50vh]  py-3',
+      'prose-sm max-w-none mx-6 md:mx-10 max-h-[50vh] py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
+      editable && ' max-h-[35vh] overflow-y-auto  py-3 ',
     ]"
     :content="newEmail"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
@@ -14,7 +15,7 @@
     :extensions="[PreserveVideoControls]"
   >
     <template #top>
-      <div class="mx-10 flex items-center gap-2 border-y py-2.5">
+      <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -61,15 +62,6 @@
           :error-message="(value) => `${value} is an invalid email address`"
         />
       </div>
-    </template>
-    <template v-slot:editor="{ editor }">
-      <EditorContent
-        autofocus
-        :class="[
-          editable && ' max-h-[35vh] overflow-y-auto  py-3 hide-scrollbar',
-        ]"
-        :editor="editor"
-      />
     </template>
     <template #bottom>
       <div class="flex flex-wrap gap-2 px-10">
@@ -167,7 +159,6 @@ import {
   textEditorMenuButtons,
   validateEmail,
 } from "@/utils";
-import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
