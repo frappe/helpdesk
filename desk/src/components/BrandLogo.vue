@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar } from "frappe-ui";
 import HDLogo from "@/assets/logos/HDLogo.vue";
 
 import { useConfigStore } from "@/stores/config";

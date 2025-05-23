@@ -162,27 +162,3 @@ class HDTeam(Document):
             if total_users_in_assignment_rule == 0:
                 assignment_rule_doc.disabled = True
                 assignment_rule_doc.save()
-
-    @staticmethod
-    def default_list_data():
-        columns = [
-            {
-                "label": "Name",
-                "key": "name",
-                "width": "17rem",
-                "type": "Data",
-            },
-            {
-                "label": "Assignment rule",
-                "key": "assignment_rule",
-                "width": "24rem",
-                "type": "Data",
-            },
-            {
-                "label": "Created On",
-                "key": "creation",
-                "width": "8rem",
-                "type": "Datetime",
-            },
-        ]
-        return {"columns": columns}

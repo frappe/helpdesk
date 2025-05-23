@@ -23,8 +23,12 @@
             </button>
           </div>
         </div>
-        <div class="flex flex-1 flex-col overflow-scroll p-4">
-          <component :is="activeTab.component" v-if="activeTab" />
+        <div class="flex flex-1 flex-col px-10 py-8 bg-surface-modal">
+          <component
+            :is="activeTab.component"
+            v-if="activeTab"
+            class="h-full flex flex-col w-full"
+          />
         </div>
       </div>
     </template>
@@ -32,11 +36,15 @@
 </template>
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
-import { markRaw, ModelRef, ref } from "vue";
+import { markRaw, ModelRef, ref, watch } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
+import LucideUser from "~icons/lucide/user";
+import LucideUsers from "~icons/lucide/users";
+import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
+import TeamsConfig from "./Teams/TeamsConfig.vue";
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
@@ -57,8 +65,25 @@ let tabs = [
     icon: markRaw(ImageUp),
     component: markRaw(Branding),
   },
+  {
+    label: "Agents",
+    icon: markRaw(LucideUser),
+    component: markRaw(Agents),
+  },
+  {
+    label: "Teams",
+    icon: markRaw(LucideUsers),
+    component: markRaw(TeamsConfig),
+  },
 ];
 const show: ModelRef<boolean> = defineModel();
 
 const activeTab = ref(tabs[props.defaultTab]);
+
+watch(
+  () => props.defaultTab,
+  (val) => {
+    activeTab.value = tabs[val];
+  }
+);
 </script>

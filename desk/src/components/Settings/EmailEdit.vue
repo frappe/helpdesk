@@ -1,7 +1,11 @@
 <template>
   <div class="flex h-full flex-col gap-4">
     <!-- title and desc -->
-    <div role="heading" aria-level="1" class="flex gap-1 justify-between">
+    <div
+      role="heading"
+      aria-level="1"
+      class="flex gap-1 justify-between pt-[5px]"
+    >
       <h5 class="text-lg font-semibold">Edit Email</h5>
     </div>
     <div class="w-fit">
