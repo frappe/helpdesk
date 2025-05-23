@@ -220,7 +220,7 @@ const defaultOptions = reactive({
             {
               label: "Confirm",
               variant: "solid",
-              onClick(close: Function) {
+              onClick({ close }) {
                 handleBulkDelete(close, selections);
               },
             },
