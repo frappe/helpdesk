@@ -257,6 +257,7 @@ function submitMail() {
     return;
   }
 
+  console.log(toEmailsClone.value.join(","));
   sendMail.submit();
 }
 
