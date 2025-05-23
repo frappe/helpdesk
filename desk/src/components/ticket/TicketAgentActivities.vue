@@ -25,7 +25,7 @@
             >
               <Avatar
                 v-if="activity.type === 'email'"
-                size="md"
+                size="lg"
                 :label="activity.sender?.full_name"
                 :image="getUser(activity.sender?.name).user_image"
                 class="bg-white absolute left-[1px]"
