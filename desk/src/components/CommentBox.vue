@@ -25,6 +25,7 @@
         </Tooltip>
         <div v-if="authStore.userId === commentedBy && !editable">
           <Dropdown
+            :placement="'right'"
             :options="[
               {
                 label: 'Edit',
