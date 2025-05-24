@@ -164,6 +164,19 @@ const numberCards = [
   },
 ];
 
+const colors = [
+  '#318AD8',
+	'#F683AE',
+	'#48BB74',
+	'#F56B6B',
+	'#FACF7A',
+	'#44427B',
+	'#5FD8C4',
+	'#F8814F',
+	'#15CCEF',
+	'#A6B1B9',
+]
+
 const ticketTrendConfig = {
   data: [
     { date: new Date("2024-05-01"), open: 6, closed: 122, sla_fulfilled: 78 },
@@ -186,6 +199,7 @@ const ticketTrendConfig = {
   ],
   title: "Tickets Trend",
   subtitle: "Average tickets per day is around 124",
+  colors: colors,
   xAxis: {
     key: "date",
     type: "time",
@@ -230,6 +244,7 @@ const feedbackTrendConfig = {
   ],
   title: "Feedback Trend",
   subtitle: "Average feedback rating per day is around 4.8",
+  colors: colors,
   xAxis: {
     key: "date",
     type: "time",
@@ -246,7 +261,7 @@ const feedbackTrendConfig = {
   },
   series: [
     { name: "rated_tickets", type: "bar" },
-    { name: "rating", type: "line", showDataPoints: true, axis: 'y2' },
+    { name: "rating", type: "line", showDataPoints: true, axis: 'y2', color: colors[2] },
   ],
 };
 
@@ -258,6 +273,7 @@ const ticketsByPriority = {
   ],
   title: "Tickets by Priority",
   subtitle: "Total tickets by priority",
+  colors: colors,
   categoryColumn: "priority",
   valueColumn: "count",
 };
@@ -271,6 +287,7 @@ const ticketsByTeam = {
   ],
   title: "Tickets by Team",
   subtitle: "Total tickets by team",
+  colors: colors,
   categoryColumn: "team",
   valueColumn: "count",
 };
@@ -283,6 +300,7 @@ const ticketsByType = {
   ],
   title: "Tickets by Type",
   subtitle: "Total tickets by type",
+  colors: colors,
   categoryColumn: "type",
   valueColumn: "count",
 };
@@ -294,6 +312,7 @@ const ticketsByChannel = {
   ],
   title: "Tickets by Channel",
   subtitle: "Total tickets by channel",
+  colors: colors,
   categoryColumn: "channel",
   valueColumn: "count",
 }
