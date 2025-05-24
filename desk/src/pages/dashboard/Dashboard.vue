@@ -31,19 +31,21 @@
             <TextInput
               readonly
               type="text"
-              icon-left="user"
+              :value="selectedAgent ? selectedAgent.label : ''"
               placeholder="Agent"
               class="w-full"
               variant="outline"
               @focus="togglePopover()"
-            />
-          </template>
-          <template #prefix>
-            <img
-              v-if="selectedAgent"
-              :src="selectedAgent.image"
-              class="mr-2 h-4 w-4 rounded-full"
-            />
+            >
+              <template #prefix>
+                <LucideUser v-if="!selectedAgent" class="size-4 text-ink-gray-5" />
+                 <img
+                    v-else-if="selectedAgent"
+                    :src="selectedAgent.image"
+                    class="size-4 rounded-full"
+                  />
+              </template>
+          </TextInput>
           </template>
           <template #item-prefix="{ option }">
             <img :src="option.image" class="h-4 w-4 mr-2 rounded-full" />
@@ -85,6 +87,7 @@
 <script setup lang="ts">
 import { AxisChart, DateRangePicker, DonutChart, NumberChart, usePageMeta } from "frappe-ui";
 import { ref } from "vue";
+import LucideUser from "~icons/lucide/user";
 
 const selectedPeriod = ref('');
 const selectedAgent = ref(null);
