@@ -1,6 +1,7 @@
 {
   "name": "helpdesk-ui",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
@@ -22,7 +23,7 @@
     "autoprefixer": "^10.4.13",
     "dayjs": "^1.11.7",
     "echarts": "^5.4.1",
-    "frappe-ui": "0.1.122",
+    "frappe-ui": "0.1.143",
     "lodash": "^4.17.21",
     "lucide-static": "^0.276.0",
     "mime": "^3.0.0",

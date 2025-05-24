@@ -1,5 +1,6 @@
 {
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"postinstall": "cd desk && yarn install",
 		"dev": "cd desk && yarn dev",
