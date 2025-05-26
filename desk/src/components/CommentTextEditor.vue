@@ -123,11 +123,16 @@ const { agents: agentsList } = useAgentStore();
 const { isManager } = useAuthStore();
 
 onMounted(() => {
-  //TODO: check this out
-  if (!agentsList.fetched) {
-    agentsList.fetch();
+  if (
+    agentsList.loading ||
+    agentsList.data?.length ||
+    agentsList.list.promise
+  ) {
+    return;
   }
+  agentsList.fetch();
 });
+
 const props = defineProps({
   placeholder: {
     type: String,
