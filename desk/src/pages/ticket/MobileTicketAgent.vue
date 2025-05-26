@@ -172,48 +172,47 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
-import { useRouter } from "vue-router";
-import { useStorage } from "@vueuse/core";
 import {
   Breadcrumbs,
-  Dropdown,
-  Tabs,
-  TabPanel,
-  TabList,
-  createResource,
   Dialog,
+  Dropdown,
   FormControl,
+  TabList,
+  TabPanel,
+  Tabs,
   call,
+  createResource,
 } from "frappe-ui";
+import { computed, h, onMounted, onUnmounted, provide, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import {
-  LayoutHeader,
-  MultipleAvatar,
   AssignmentModal,
   CommunicationArea,
+  LayoutHeader,
+  MultipleAvatar,
 } from "@/components";
-import { TicketAgentActivities } from "@/components/ticket";
 import {
   ActivityIcon,
   CommentIcon,
+  DetailsIcon,
   EmailIcon,
   IndicatorIcon,
-  DetailsIcon,
 } from "@/components/icons";
+import { TicketAgentActivities } from "@/components/ticket";
 
+import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
+import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { useScreenSize } from "@/composables/screen";
+import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { globalStore } from "@/stores/globalStore";
-import { setupCustomizations } from "@/composables/formCustomisation";
+import { TabObject, TicketTab } from "@/types";
 import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
-import { useScreenSize } from "@/composables/screen";
-import { TabObject, TicketTab } from "@/types";
-import TicketAgentDetails from "@/components/ticket/TicketAgentDetails.vue";
-import TicketAgentFields from "@/components/ticket/TicketAgentFields.vue";
 
 const router = useRouter();
 const ticketAgentActivitiesRef = ref(null);
@@ -254,10 +253,10 @@ const ticket = createResource({
       });
     }
   },
-  onSuccess: (ticket) => {
+  onSuccess: (data) => {
     subjectInput.value = ticket.subject;
     setupCustomizations(ticket, {
-      doc: ticket,
+      doc: data,
       call,
       router,
       $dialog,
@@ -321,16 +320,17 @@ const tabs: TabObject[] = [
 const activities = computed(() => {
   const emailProps = ticket.data.communications.map((email, idx: number) => {
     return {
-      type: "email",
-      key: email.creation,
+      subject: email.subject,
+      content: email.content,
       sender: { name: email.user.email, full_name: email.user.name },
       to: email.recipients,
+      type: "email",
+      key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
-      creation: email.creation,
-      subject: email.subject,
+      creation: email.communication_date || email.creation,
       attachments: email.attachments,
-      content: email.content,
+      name: email.name,
       isFirstEmail: idx === 0,
     };
   });
@@ -344,6 +344,7 @@ const activities = computed(() => {
       commenter: comment.user.name,
       creation: comment.creation,
       content: comment.content,
+      attachments: comment.attachments,
     };
   });
 
@@ -369,10 +370,11 @@ const activities = computed(() => {
   while (i < sorted.length) {
     const currentActivity = sorted[i];
     if (currentActivity.type === "history") {
-      currentActivity.relatedActivities = [];
+      currentActivity.relatedActivities = [currentActivity];
       for (let j = i + 1; j < sorted.length + 1; j++) {
         const nextActivity = sorted[j];
-        if (nextActivity && nextActivity.type === "history") {
+
+        if (nextActivity && nextActivity.user === currentActivity.user) {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
           data.push(currentActivity);
@@ -385,7 +387,6 @@ const activities = computed(() => {
     }
     i++;
   }
-
   return data;
 });
 

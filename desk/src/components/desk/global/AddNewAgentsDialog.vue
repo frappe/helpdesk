@@ -80,8 +80,9 @@
 </template>
 
 <script>
-import { Dialog, Input, FeatherIcon } from "frappe-ui";
+import { useAuthStore } from "@/stores/auth";
 import { ref } from "@vue/reactivity";
+import { Dialog, FeatherIcon, Input } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 
 export default {
@@ -98,11 +99,13 @@ export default {
 
     const currentInputIsValidEmail = ref(false);
     const { updateOnboardingStep } = useOnboarding("helpdesk");
+    const { isManager } = useAuthStore();
     return {
       searchInput,
       inviteQueue,
       currentInputIsValidEmail,
       updateOnboardingStep,
+      isManager,
     };
   },
   methods: {
@@ -178,7 +181,9 @@ export default {
           this.currentInputIsValidEmail = false;
           this.searchInput = "";
           this.inviteQueue = [];
-          this.updateOnboardingStep("invite_agents");
+          if (this.isManager) {
+            this.updateOnboardingStep("invite_agents");
+          }
 
           this.$toast({
             title: "Invites Sent Successfully!",

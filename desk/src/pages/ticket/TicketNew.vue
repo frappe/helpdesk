@@ -152,6 +152,7 @@ const route = useRoute();
 const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager, userId: userID } = useAuthStore();
 
 const subject = ref("");
 const description = ref("");
@@ -244,23 +245,23 @@ const ticket = createResource({
         ticketId: data.name,
       },
     });
-
-    if (!isCustomerPortal.value) {
+    if (isManager) {
       updateOnboardingStep("create_first_ticket", true, false, () =>
         localStorage.setItem("firstTicket", data.name)
       );
-      return;
     }
     // only capture telemetry for customer portal
-    capture("new_ticket_submitted", {
-      data: {
-        user: userID,
-        ticketID: data.name,
-        subject: subject.value,
-        description: description.value,
-        customFields: templateFields,
-      },
-    });
+    if (isCustomerPortal.value) {
+      capture("new_ticket_submitted", {
+        data: {
+          user: userID,
+          ticketID: data.name,
+          subject: subject.value,
+          description: description.value,
+          customFields: templateFields,
+        },
+      });
+    }
   },
 });
 
@@ -292,7 +293,6 @@ usePageMeta(() => ({
   title: "New Ticket",
 }));
 
-const { userId: userID } = useAuthStore();
 onMounted(() => {
   capture("new_ticket_page", {
     data: {

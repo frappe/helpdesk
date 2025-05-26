@@ -231,7 +231,6 @@ const ticket = createResource({
       updateField,
       createToast,
     });
-    // console.log(ticket._customActions);
   },
 });
 function updateField(name: string, value: string, callback = () => {}) {
@@ -317,7 +316,7 @@ const activities = computed(() => {
       key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
-      creation: email.creation,
+      creation: email.communication_date || email.creation,
       attachments: email.attachments,
       name: email.name,
       isFirstEmail: idx === 0,
@@ -359,10 +358,11 @@ const activities = computed(() => {
   while (i < sorted.length) {
     const currentActivity = sorted[i];
     if (currentActivity.type === "history") {
-      currentActivity.relatedActivities = [];
+      currentActivity.relatedActivities = [currentActivity];
       for (let j = i + 1; j < sorted.length + 1; j++) {
         const nextActivity = sorted[j];
-        if (nextActivity && nextActivity.type === "history") {
+
+        if (nextActivity && nextActivity.user === currentActivity.user) {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
           data.push(currentActivity);

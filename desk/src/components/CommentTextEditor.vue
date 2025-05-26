@@ -1,7 +1,7 @@
 <template>
   <TextEditor
     v-if="agentsList.data"
-    ref="textEditor"
+    ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
@@ -18,6 +18,7 @@
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2">
+        <!-- Attachments -->
         <div class="flex flex-wrap gap-2 px-10">
           <AttachmentItem
             v-for="a in attachments"
@@ -33,10 +34,11 @@
             </template>
           </AttachmentItem>
         </div>
+        <!-- Fixed Menu -->
         <div
           class="flex justify-between gap-2 overflow-hidden border-t px-10 py-2.5"
         >
-          <div class="flex items-center overflow-x-auto">
+          <div class="flex items-center overflow-x-auto w-4/6">
             <TextEditorFixedMenu
               class="-ml-1"
               :buttons="textEditorMenuButtons"
@@ -65,7 +67,9 @@
               </template>
             </FileUploader>
           </div>
-          <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
+          <div
+            class="mt-2 flex items-center justify-end space-x-2 sm:mt-0 w-2/6"
+          >
             <Button
               label="Discard"
               @click="
@@ -78,7 +82,7 @@
             />
             <Button
               variant="solid"
-              label="Comment"
+              :label="label"
               :disabled="commentEmpty"
               :loading="loading"
               @click="
@@ -109,20 +113,34 @@ import { AttachmentItem } from "@/components/";
 import { AttachmentIcon } from "@/components/icons/";
 import { useAgentStore } from "@/stores/agent";
 
+import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList } = useAgentStore();
+const { isManager } = useAuthStore();
 
 onMounted(() => {
+  if (
+    agentsList.loading ||
+    agentsList.data?.length ||
+    agentsList.list.promise
+  ) {
+    return;
+  }
   agentsList.fetch();
 });
+
 const props = defineProps({
   placeholder: {
     type: String,
     default: null,
+  },
+  label: {
+    type: String,
+    default: "Comment",
   },
   editable: {
     type: Boolean,
@@ -158,7 +176,7 @@ function removeAttachment(attachment) {
 
 async function submitComment() {
   if (isContentEmpty(newComment.value)) {
-    return;
+    return false;
   }
   const comment = createResource({
     url: "run_doc_method",
@@ -172,7 +190,9 @@ async function submitComment() {
       },
     }),
     onSuccess: () => {
-      updateOnboardingStep("comment_on_ticket");
+      if (isManager) {
+        updateOnboardingStep("comment_on_ticket");
+      }
       emit("submit");
       loading.value = false;
       attachments.value = [];
@@ -185,7 +205,12 @@ async function submitComment() {
 
   comment.submit();
 }
+
+const editorRef = ref(null);
+const editor = computed(() => editorRef.value?.editor);
+
 defineExpose({
   submitComment,
+  editor,
 });
 </script>
