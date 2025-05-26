@@ -1,5 +1,5 @@
 <template>
-  <div class="border rounded flex-1 px-3 pt-2.5 shadow bg-white">
+  <div class="border rounded flex-1 px-3 pt-2.5 bg-white mb-4">
     <div class="mb-4 flex items-center justify-between text-base">
       <div class="flex items-center gap-0.5">
         <UserAvatar v-bind="user" size="lg" expand strong :hide-avatar="true" />
@@ -25,12 +25,12 @@
 </template>
 
 <script setup lang="ts">
-import { Tooltip } from "frappe-ui";
-import sanitizeHtml from "sanitize-html";
-import { Icon } from "@iconify/vue";
+import { AttachmentItem, UserAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { UserInfo } from "@/types";
-import { AttachmentItem, UserAvatar } from "@/components";
+import { Icon } from "@iconify/vue";
+import { Tooltip } from "frappe-ui";
+import sanitizeHtml from "sanitize-html";
 
 interface Attachment {
   file_name: string;
