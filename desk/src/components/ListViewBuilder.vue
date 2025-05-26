@@ -457,7 +457,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (column.type === "Datetime") {
     return h("span", {
       class: "text-p-xs",
-      innerHTML: formatTimeShort(item),
+      textContent: formatTimeShort(item),
     });
   }
   if (column.type === "MultipleAvatar") {
@@ -474,7 +474,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
     });
   }
   return h("span", {
-    class: "truncate",
+    class: "truncate flex-1",
     textContent: item,
   });
 }
