@@ -451,7 +451,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (idx === 0) {
     return h("span", {
       class: "truncate text-base text-ink-gray-6",
-      innerHTML: item,
+      textContent: item,
     });
   }
   if (column.type === "Datetime") {
@@ -464,7 +464,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
     return h(MultipleAvatar, {
       avatars: item,
       hideName: true,
-      class: "flex items-center truncate",
+      class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
     });
   }
   if (column.type === "Rating") {
@@ -475,7 +475,7 @@ function listCell(column: any, row: any, item: any, idx: number) {
   }
   return h("span", {
     class: "truncate",
-    innerHTML: item,
+    textContent: item,
   });
 }
 
