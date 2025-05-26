@@ -1,27 +1,31 @@
 <template>
   <div
-    class="md:mx-5 md:my-8 mb-4 mt-8 flex items-center justify-between h-8 text-xl font-semibold text-gray-800"
+    class="mx-6 md:mx-10 md:my-2 flex items-center justify-between text-lg font-medium mb-4 !mt-8"
   >
     Activity
   </div>
-  <div class="overflow-auto px-5 pb-20 grow">
+  <div class="overflow-auto px-6 md:px-10 grow">
     <div
-      v-for="c in communications"
+      v-for="(c, i) in communications"
       :id="c.name"
       :key="c.name"
-      class="mt-4 flex items-between justify-center gap-4 relative"
+      class="flex items-between justify-center gap-4 relative"
+      :class="i === 0 && 'mt-4'"
     >
       <div
-        class="w-full activity grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
+        class="w-full activity grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4 h-full"
       >
         <div
-          class="relative flex justify-center after:absolute after:left-[50%] after:top-[12%] after:-z-10 after:border-l after:border-gray-200 after:h-full"
+          class="relative flex justify-center after:absolute after:left-[50%] after:top-3 after:-z-10 after:border-l after:border-gray-200"
+          :class="[
+            i != communications.length - 1 ? 'after:h-full' : 'after:h-5',
+          ]"
         >
           <Avatar
             size="lg"
             :label="c.user.name"
             :image="c.user.image"
-            class="mt-1 relative"
+            class="mt-1.5 relative"
           />
         </div>
         <TicketCommunication
@@ -39,12 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, watch } from "vue";
-import { useRoute } from "vue-router";
-import { useElementVisibility } from "@vueuse/core";
+import { dayjs } from "@/dayjs";
 import { Avatar } from "frappe-ui";
 import { orderBy } from "lodash";
-import { dayjs } from "@/dayjs";
+import { computed, inject, nextTick, watch } from "vue";
+import { useRoute } from "vue-router";
 import TicketCommunication from "./TicketCommunication.vue";
 import { ITicket } from "./symbols";
 

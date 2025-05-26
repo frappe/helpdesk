@@ -451,20 +451,20 @@ function listCell(column: any, row: any, item: any, idx: number) {
   if (idx === 0) {
     return h("span", {
       class: "truncate text-base text-ink-gray-6",
-      innerHTML: item,
+      textContent: item,
     });
   }
   if (column.type === "Datetime") {
     return h("span", {
       class: "text-p-xs",
-      innerHTML: formatTimeShort(item),
+      textContent: formatTimeShort(item),
     });
   }
   if (column.type === "MultipleAvatar") {
     return h(MultipleAvatar, {
       avatars: item,
       hideName: true,
-      class: "flex items-center truncate",
+      class: "flex items-center truncate flex-1 flex-row-reverse justify-end",
     });
   }
   if (column.type === "Rating") {
@@ -474,8 +474,8 @@ function listCell(column: any, row: any, item: any, idx: number) {
     });
   }
   return h("span", {
-    class: "truncate",
-    innerHTML: item,
+    class: "truncate flex-1",
+    textContent: item,
   });
 }
 
