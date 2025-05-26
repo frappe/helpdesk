@@ -6,7 +6,7 @@
   </div>
   <div class="overflow-auto px-5 pb-20 grow">
     <div
-      v-for="c in communications"
+      v-for="(c, i) in communications"
       :id="c.name"
       :key="c.name"
       class="mt-4 flex items-between justify-center gap-4 relative"
@@ -15,7 +15,10 @@
         class="w-full activity grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
       >
         <div
-          class="relative flex justify-center after:absolute after:left-[50%] after:top-[12%] after:-z-10 after:border-l after:border-gray-200 after:h-full"
+          class="relative flex justify-center after:absolute after:left-[50%] after:top-1 after:-z-10 after:border-l after:border-gray-200"
+          :class="[
+            i != communications.length - 1 ? 'after:h-full' : 'after:h-5',
+          ]"
         >
           <Avatar
             size="lg"
@@ -39,12 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, watch } from "vue";
-import { useRoute } from "vue-router";
-import { useElementVisibility } from "@vueuse/core";
+import { dayjs } from "@/dayjs";
 import { Avatar } from "frappe-ui";
 import { orderBy } from "lodash";
-import { dayjs } from "@/dayjs";
+import { computed, inject, nextTick, watch } from "vue";
+import { useRoute } from "vue-router";
 import TicketCommunication from "./TicketCommunication.vue";
 import { ITicket } from "./symbols";
 
