@@ -1,6 +1,6 @@
 <template>
   <div
-    class="md:mx-8 md:my-4 flex items-center justify-between text-lg font-medium !mx-10 mb-4 !mt-8"
+    class="md:mx-10 md:my-4 flex items-center justify-between text-lg font-medium mx-6 mb-4 !mt-8"
   >
     <div class="flex h-8 items-center text-xl font-semibold text-gray-800">
       {{ title }}
@@ -45,12 +45,9 @@
 </template>
 
 <script setup lang="ts">
-import { h } from "vue";
-import { computed } from "vue";
-import { EmailIcon, CommentIcon } from "@/components/icons";
+import { CommentIcon, EmailIcon } from "@/components/icons";
 import { Dropdown } from "frappe-ui";
-import { inject } from "vue";
-import { Ref } from "vue";
+import { computed, h, inject, Ref } from "vue";
 defineProps({
   title: {
     type: String,
