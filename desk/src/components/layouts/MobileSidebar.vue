@@ -96,34 +96,33 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw } from "vue";
 import {
-  TransitionRoot,
-  TransitionChild,
   Dialog,
   DialogOverlay,
+  TransitionChild,
+  TransitionRoot,
 } from "@headlessui/vue";
-import { useRouter, useRoute } from "vue-router";
+import { computed, markRaw } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-import UserMenu from "@/components/UserMenu.vue";
-import SidebarLink from "@/components/SidebarLink.vue";
 import { Section } from "@/components";
+import SidebarLink from "@/components/SidebarLink.vue";
+import UserMenu from "@/components/UserMenu.vue";
 import { useNotificationStore } from "@/stores/notification";
 
-import { useView, currentView } from "@/composables/useView";
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
+import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
 
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
+import { useAuthStore } from "@/stores/auth";
+import { isCustomerPortal } from "@/utils";
 import Apps from "../Apps.vue";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
-import { useAuthStore } from "@/stores/auth";
 const { pinnedViews, publicViews } = useView();
-import { isCustomerPortal } from "@/utils";
 
 const notificationStore = useNotificationStore();
 const route = useRoute();
@@ -196,7 +195,7 @@ const agentPortalDropdown = computed(() => [
     label: "Customer portal",
     icon: "users",
     onClick: () => {
-      const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
+      const path = router.resolve({ name: "TicketsCustomer" });
       window.open(path.href);
     },
   },

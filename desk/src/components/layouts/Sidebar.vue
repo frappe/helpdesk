@@ -175,7 +175,6 @@ import {
   showCommentBox,
   showEmailBox,
 } from "@/pages/ticket/modalStates";
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -302,7 +301,7 @@ const agentPortalDropdown = computed(() => [
     label: "Customer portal",
     icon: "users",
     onClick: () => {
-      const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
+      const path = router.resolve({ name: "TicketsCustomer" });
       window.open(path.href);
     },
   },
