@@ -5,7 +5,7 @@
   >
     <img :src="logo" class="h-6 w-6" />
   </div>
-  <p v-if="serviceName" class="text-center text-xs text-gray-700">
+  <p v-if="serviceName" class="text-center text-p-xs text-gray-700">
     {{ serviceName }}
   </p>
 </template>

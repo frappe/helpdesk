@@ -5,11 +5,8 @@ import { isCustomerPortal } from "@/utils";
 import { createRouter, createWebHistory } from "vue-router";
 const { isMobileView } = useScreenSize();
 
-export const AGENT_PORTAL_AGENT_LIST = "AgentList";
 export const AGENT_PORTAL_CONTACT_LIST = "ContactList";
 export const AGENT_PORTAL_CUSTOMER_LIST = "CustomerList";
-export const AGENT_PORTAL_TEAM_LIST = "Teams";
-export const AGENT_PORTAL_TEAM_SINGLE = "Team";
 export const AGENT_PORTAL_TICKET = "TicketAgent";
 export const AGENT_PORTAL_TICKET_LIST = "TicketsAgent";
 export const AGENT_PORTAL_KNOWLEDGE_BASE = "DeskKBHome";
@@ -161,25 +158,22 @@ const routes = [
         component: () => import("@/pages/desk/contact/Contacts.vue"),
       },
       {
-        path: "agents",
-        name: AGENT_PORTAL_AGENT_LIST,
-        component: () => import("@/pages/desk/agent/Agents.vue"),
-      },
-      {
-        path: "teams",
-        name: AGENT_PORTAL_TEAM_LIST,
-        component: () => import("@/pages/desk/team/Teams.vue"),
-      },
-      {
-        path: "teams/:teamId",
-        name: AGENT_PORTAL_TEAM_SINGLE,
-        component: () => import("@/pages/desk/team/TeamSingle.vue"),
-        props: true,
-      },
-      {
         path: "canned-responses",
         name: "CannedResponses",
         component: () => import("@/pages/CannedResponses.vue"),
+      },
+      // Redirects
+      {
+        path: "teams",
+        redirect: "/tickets",
+      },
+      {
+        path: "teams/:teamId",
+        redirect: "/tickets",
+      },
+      {
+        path: "agents",
+        redirect: "/tickets",
       },
     ],
   },
@@ -222,6 +216,8 @@ router.beforeEach(async (to, _, next) => {
 
 router.afterEach(async (to) => {
   if (to.meta.public) return;
-  const userStore = useUserStore();
-  await userStore.users.fetch();
+  const { users } = useUserStore();
+  if (!users?.fetched) {
+    await users.fetch();
+  }
 });
