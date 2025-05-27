@@ -269,7 +269,7 @@ const defaultEmptyState = {
 
 const defaultParams = reactive({
   doctype: options.value.doctype,
-  filters: {},
+  filters: [],
   default_filters: options.value.defaultFilters,
   order_by: "modified desc",
   page_length: options.value.default_page_length,
@@ -494,6 +494,7 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     item = "Replied";
   }
 
+  let newFilter = [];
   if (column.type === "MultipleAvatar") {
     if (item.length > 1) {
       let target = e.target as HTMLElement;
@@ -504,10 +505,21 @@ function handleFieldClick(e: MouseEvent, column, row, item) {
     } else {
       item = item[0].name;
     }
-    applyFilters({ ...defaultParams.filters, [column.key]: ["LIKE", item] });
-    return;
+    newFilter = [column.key, "LIKE", item];
+  } else {
+    newFilter = [column.key, item];
   }
-  applyFilters({ ...defaultParams.filters, [column.key]: item });
+  const stringifyedFilters = defaultParams.filters.map((i) =>
+    JSON.stringify(i)
+  );
+  const stringifyedNewFilter = JSON.stringify(newFilter);
+  if (stringifyedFilters.includes(stringifyedNewFilter)) {
+    const index = stringifyedFilters.indexOf(stringifyedNewFilter);
+    defaultParams.filters.splice(index, 1);
+  } else {
+    defaultParams.filters.push(newFilter);
+  }
+  applyFilters([...defaultParams.filters]);
 }
 
 const showViewControls = computed(() => {
@@ -537,7 +549,7 @@ provide("listViewActions", {
 
 function applyFilters(filters) {
   isViewUpdated.value = true;
-  defaultParams.filters = { ...filters };
+  defaultParams.filters = filters;
   list.submit({ ...defaultParams });
 
   // automatically update filters for default view
@@ -566,7 +578,7 @@ function updateColumns(obj) {
 
 function reload(reset: boolean = false) {
   if (reset) {
-    defaultParams.filters = options.value.defaultFilters || {};
+    defaultParams.filters = options.value.defaultFilters || [];
     defaultParams.order_by = "modified desc";
     defaultParams.page_length = options.value.default_page_length;
     defaultParams.page_length_count = options.value.default_page_length;
