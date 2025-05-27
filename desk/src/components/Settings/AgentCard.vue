@@ -8,9 +8,12 @@
             {{ agent.agent_name }}
           </p>
           <Badge
-            v-if="showStatus && !agent.is_active"
+            v-if="showStatus"
             :label="'Inactive'"
             :theme="'gray'"
+            :class="
+              showStatus && !agent.is_active ? 'opacity-100' : 'opacity-0'
+            "
             variant="subtle"
           />
         </div>
