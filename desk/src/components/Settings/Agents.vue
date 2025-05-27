@@ -101,7 +101,11 @@
               }"
               placement="right"
             />
-            <Dropdown :options="getOptions(agent)" placement="right">
+            <Dropdown
+              :options="getOptions(agent)"
+              placement="right"
+              :key="agent"
+            >
               <Button variant="ghost">
                 <template #icon>
                   <IconMoreHorizontal class="h-4 w-4" />
@@ -137,11 +141,11 @@ import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils";
 import { call, FormControl } from "frappe-ui";
-import { h, ref } from "vue";
+import { h } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import AgentCard from "./AgentCard.vue";
-import { showNewAgentsDialog, useAgents } from "./agents";
+import { activeFilter, showNewAgentsDialog, useAgents } from "./agents";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
@@ -149,8 +153,6 @@ const { isManager } = useAuthStore();
 const agentStore = useAgents();
 const search = agentStore.search;
 const agents = agentStore.agents;
-
-// {is_active: ["=", 1]}
 
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
@@ -226,23 +228,25 @@ function updateRole(agent: string, newRole: string) {
   });
 }
 
-const activeFilter = ref("Active");
-
 function getOptions(agent) {
+  let filters = agentStore.filters;
   return [
     {
       label: "Disable Agent",
       icon: "x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
+
+        agents.reload({ ...filters, search: search.value });
       },
       condition: () => agent.is_active,
     },
     {
       label: "Enable Agent",
       icon: "check-circle",
-      onClick: () => {
-        agentStore.filters["is_active"] = ["=", 1];
+      onClick: async () => {
+        await agentStore.updateAgent(agent.name, 1);
+        agents.reload({ ...filters, search: search.value });
       },
       condition: () => !agent.is_active,
     },

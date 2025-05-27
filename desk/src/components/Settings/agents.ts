@@ -7,9 +7,12 @@ export const agents = createListResource({
   cache: ["hd_agent_list"],
   start: 0,
   pageLength: 10,
-  orderBy: "modified desc",
+  orderBy: "creation desc",
   auto: true,
 });
+
+export const activeFilter = ref("Active");
+export const showNewAgentsDialog = ref(false);
 
 export const useAgents = () => {
   const search = ref("");
@@ -41,6 +44,31 @@ export const useAgents = () => {
     },
     { deep: true }
   );
+  watch(
+    activeFilter,
+    (newVal) => {
+      if (newVal === "Active") {
+        agents.filters = {
+          ...agents.filters,
+          is_active: 1,
+        };
+      } else if (newVal === "Inactive") {
+        agents.filters = {
+          ...agents.filters,
+          is_active: 0,
+        };
+      } else {
+        agents.filters = {
+          ...agents.filters,
+          is_active: ["in", [0, 1]],
+        };
+      }
+      agents.start = 0;
+      agents.pageLength = 10;
+      agents.reload();
+    },
+    { immediate: true }
+  );
 
   async function updateAgent(agent: string, isActive: boolean | number) {
     const res = createResource({
@@ -62,5 +90,3 @@ export const useAgents = () => {
     updateAgent,
   };
 };
-
-export const showNewAgentsDialog = ref(false);

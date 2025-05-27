@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <!-- slot her -->
+    <!-- slot here -->
     <slot name="right" />
   </div>
 </template>
