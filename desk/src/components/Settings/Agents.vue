@@ -236,7 +236,6 @@ function getOptions(agent) {
       icon: "x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
-
         agents.reload({ ...filters, search: search.value });
       },
       condition: () => agent.is_active,

@@ -390,7 +390,7 @@ const steps = [
   },
   {
     name: "setup_sla",
-    title: "Set your first SLA",
+    title: "Setup SLA",
     completed: false,
     icon: markRaw(Timer),
     onClick: () => {
@@ -401,7 +401,7 @@ const steps = [
   },
   {
     name: "create_first_ticket",
-    title: "Create your first ticket",
+    title: "Create a ticket",
     completed: false,
     icon: markRaw(Ticket),
     onClick: () => {
@@ -446,7 +446,7 @@ const steps = [
   },
   {
     name: "first_article",
-    title: "Create your first article",
+    title: "Create an article",
     completed: false,
     icon: markRaw(FileText),
     onClick: async () => {
@@ -510,7 +510,7 @@ const articles = ref([
     subArticles: [
       {
         name: "lesson-1-your-first-ticket",
-        title: "Creating your first ticket",
+        title: "Creating a ticket",
       },
       {
         name: "lesson-2understanding-ticket-view",
