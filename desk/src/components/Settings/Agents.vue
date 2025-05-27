@@ -97,7 +97,7 @@
               :button="{
                 label: getUserRole(agent.name),
                 iconRight: 'chevron-down',
-                variant: 'ghost',
+                variant: 'subtle',
               }"
               placement="right"
             />
