@@ -105,6 +105,7 @@
               :options="getOptions(agent)"
               placement="right"
               :key="agent"
+              class="ml-2"
             >
               <Button variant="ghost">
                 <template #icon>
