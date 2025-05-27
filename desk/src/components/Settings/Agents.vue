@@ -192,8 +192,8 @@ function RoleOption({ active, role, onClick, selected }) {
     "button",
     {
       class: [
-        active ? "bg-surface-gray-2" : "text-ink-gray-9",
-        "group flex w-full justify-between items-center rounded-md px-2 py-2 text-sm",
+        active ? "bg-surface-gray-2" : "text-ink-gray-7",
+        "group flex w-full justify-between items-center rounded-md px-2 py-2 text-base",
       ],
       onClick: !selected ? onClick : null,
     },
