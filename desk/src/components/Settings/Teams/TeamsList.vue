@@ -35,7 +35,7 @@
         class="flex items-center gap-2 py-2 group justify-between cursor-pointer"
         @click="() => emit('update:step', 'team-edit', team.name)"
       >
-        <div class="flex items-center gap-2 py-[4px]">
+        <div class="flex items-center gap-2">
           <Avatar :label="team.name" size="sm" />
           <p :key="team.name" class="text-p-base text-gray-700">
             {{ team.name }}

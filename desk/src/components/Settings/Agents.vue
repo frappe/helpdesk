@@ -14,6 +14,39 @@
             <LucideSearch class="h-4 w-4 text-gray-500" />
           </template>
         </FormControl>
+        <Dropdown :options="dropdownOptions" placement="right">
+          <template #default="{ open }">
+            <Button
+              :label="activeFilter"
+              class="flex items-center justify-between w-[90px]"
+            >
+              <template #suffix>
+                <FeatherIcon
+                  :name="open ? 'chevron-up' : 'chevron-down'"
+                  class="h-4"
+                />
+              </template>
+            </Button>
+          </template>
+          <template #item="{ item, active }">
+            <button
+              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
+              :class="{ 'bg-surface-gray-3': active }"
+              @click="item.onClick"
+            >
+              <div class="flex items-center justify-between flex-1">
+                <span class="whitespace-nowrap">
+                  {{ item.label }}
+                </span>
+                <FeatherIcon
+                  v-if="activeFilter === item.label"
+                  name="check"
+                  class="size-4 text-ink-gray-7"
+                />
+              </div>
+            </button>
+          </template>
+        </Dropdown>
         <Button
           @click="() => (showNewAgentsDialog = !showNewAgentsDialog)"
           label="New"
@@ -52,16 +85,10 @@
       <div v-for="(agent, idx) in agents.data" :key="agent.agent_name">
         <AgentCard
           :agent="agent"
+          :show-status="true"
           :class="idx !== agents.data.length - 1 && 'border-b '"
         >
           <template #right>
-            <p
-              v-if="!isManager"
-              class="text-sm text-ink-gray-6 w-1/5 text-right"
-            >
-              {{ getUserRole(agent.name) }}
-            </p>
-
             <Dropdown
               v-if="isManager"
               class="w-1/5 flex justify-end items-center"
@@ -74,6 +101,13 @@
               }"
               placement="right"
             />
+            <Dropdown :options="getOptions(agent)" placement="right">
+              <Button variant="ghost">
+                <template #icon>
+                  <IconMoreHorizontal class="h-4 w-4" />
+                </template>
+              </Button>
+            </Dropdown>
           </template>
         </AgentCard>
       </div>
@@ -105,14 +139,18 @@ import { createToast } from "@/utils";
 import { call, FormControl } from "frappe-ui";
 import { h, ref } from "vue";
 import LucideCheck from "~icons/lucide/check";
+import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import AgentCard from "./AgentCard.vue";
 import { showNewAgentsDialog, useAgents } from "./agents";
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();
 
-const search = ref("");
-const { agents } = useAgents(search);
+const agentStore = useAgents();
+const search = agentStore.search;
+const agents = agentStore.agents;
+
+// {is_active: ["=", 1]}
 
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
@@ -187,6 +225,53 @@ function updateRole(agent: string, newRole: string) {
     });
   });
 }
+
+const activeFilter = ref("Active");
+
+function getOptions(agent) {
+  return [
+    {
+      label: "Disable Agent",
+      icon: "x-circle",
+      onClick: async () => {
+        await agentStore.updateAgent(agent.name, 0);
+      },
+      condition: () => agent.is_active,
+    },
+    {
+      label: "Enable Agent",
+      icon: "check-circle",
+      onClick: () => {
+        agentStore.filters["is_active"] = ["=", 1];
+      },
+      condition: () => !agent.is_active,
+    },
+  ];
+}
+
+const dropdownOptions = [
+  {
+    label: "All",
+    onClick: () => {
+      agentStore.filters["is_active"] = ["in", [0, 1]];
+      activeFilter.value = "All";
+    },
+  },
+  {
+    label: "Active",
+    onClick: () => {
+      agentStore.filters["is_active"] = ["=", 1];
+      activeFilter.value = "Active";
+    },
+  },
+  {
+    label: "Inactive",
+    onClick: () => {
+      agentStore.filters["is_active"] = ["=", 0];
+      activeFilter.value = "Inactive";
+    },
+  },
+];
 </script>
 
 <style scoped></style>

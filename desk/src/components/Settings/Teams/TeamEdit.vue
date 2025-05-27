@@ -2,8 +2,17 @@
   <div class="w-full h-full flex flex-col">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
-      <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
-      <Dropdown placement="right" :options="docOptions">
+      <div class="flex items-center gap-1 justify-center -ml-[16px]">
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="teamName"
+          size="md"
+          @click="() => emit('update:step', 'team-list')"
+          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5"
+        />
+      </div>
+      <Dropdown placement="right" :options="options">
         <Button variant="ghost">
           <template #icon>
             <LucideMoreHorizontal class="h-4 w-4" />
@@ -18,7 +27,7 @@
         <Link
           doctype="HD Agent"
           class="form-control flex-1"
-          placeholder="Add members"
+          placeholder="Search members"
           v-model="search"
           label="Members"
           :hide-me="true"
@@ -71,6 +80,7 @@
               <Button
                 variant="ghost"
                 @click.stop="() => removeMemberFromTeam(member.name)"
+                theme="red"
                 class="opacity-0 group-hover:opacity-100"
                 :disabled="team.loading"
               >
@@ -87,7 +97,26 @@
       </div>
     </div>
   </div>
-  <Dialog v-model="showDelete" :options="deleteDialogOptions" />
+  <Dialog v-model="showDelete" :options="{ title: 'Delete team' }">
+    <template #body-content>
+      <p class="text-p-base text-ink-gray-7">
+        Are you sure you want to delete this team? This action cannot be
+        reversed!
+      </p>
+      <Button
+        variant="solid"
+        class="mt-4 float-right"
+        label="Confirm"
+        theme="red"
+        @click="
+          () => {
+            team.delete.submit();
+            showDelete = false;
+          }
+        "
+      />
+    </template>
+  </Dialog>
   <Dialog v-model="showRename" :options="renameDialogOptions">
     <template #body-content>
       <FormControl
@@ -105,7 +134,7 @@ import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import { createToast } from "@/utils";
 import {
-  Breadcrumbs,
+  Button,
   createDocumentResource,
   createResource,
   Dialog,
@@ -175,18 +204,6 @@ const agentFilters = computed(() => {
   return {
     name: ["not in", teamMembers.value.map((user) => user.name)],
   };
-});
-
-const breadcrumbs = computed(() => {
-  return [
-    {
-      label: "Teams",
-      onClick: () => {
-        emit("update:step", "team-list");
-      },
-    },
-    { label: props.teamName },
-  ];
 });
 
 function removeMemberFromTeam(member: string) {
@@ -266,75 +283,73 @@ const deleteDialogOptions = {
   ],
 };
 
-const docOptions = computed(() => {
-  let options = [
-    {
-      label: "Rename",
-      icon: "edit-3",
-      onClick: () => (showRename.value = !showRename.value),
-    },
-    {
+const options = [
+  {
+    label: "Rename",
+    icon: "edit-3",
+    onClick: () => (showRename.value = !showRename.value),
+  },
+  {
+    condition: () => teamRestrictionApplied,
+    label: team.doc?.ignore_restrictions
+      ? "Disable Bypass Restrictions"
+      : "Enable Bypass Restrictions",
+    component: () =>
+      h(
+        Tooltip,
+        {
+          text: ignoreRestrictions.value
+            ? "Members of this team will see the tickets assigned to this team only"
+            : "Members of this team will be able to see the tickets assigned to all the teams",
+        },
+        {
+          default: () => [
+            //create a div with 2 columns, one for icon and one for label
+            h(
+              "div",
+              {
+                class:
+                  "flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded",
+                onClick: () =>
+                  (ignoreRestrictions.value = !ignoreRestrictions.value),
+              },
+              [
+                h(team.doc?.ignore_restrictions ? LucideLock : LucideUnlock, {
+                  class: "h-4 w-4 text-gray-700",
+                  stroke: "currentColor",
+                  "aria-hidden": "true",
+                }),
+                h(
+                  "span",
+                  {
+                    class: "whitespace-nowrap text-ink-gray-7 text-p-base",
+                  },
+                  [
+                    team.doc?.ignore_restrictions
+                      ? "Access only this team's tickets"
+                      : "Access all team tickets",
+                  ]
+                ),
+              ]
+            ),
+          ],
+        }
+      ),
+  },
+  {
+    label: "Delete",
+    component: h(Button, {
       label: "Delete",
-      icon: "trash-2",
+      variant: "ghost",
+      iconLeft: "trash-2",
+      theme: "red",
+      style: "width: 100%; justify-content: flex-start;",
       onClick: () => {
         showDelete.value = !showDelete.value;
       },
-    },
-  ];
-
-  if (teamRestrictionApplied) {
-    // in options push at 1st index
-
-    let ignoreRestrictionsOption = {
-      label: team.doc?.ignore_restrictions
-        ? "Disable Bypass Restrictions"
-        : "Enable Bypass Restrictions",
-      component: () =>
-        h(
-          Tooltip,
-          {
-            text: ignoreRestrictions.value
-              ? "Members of this team will see the tickets assigned to this team only"
-              : "Members of this team will be able to see the tickets assigned to all the teams",
-          },
-          {
-            default: () => [
-              //create a div with 2 columns, one for icon and one for label
-              h(
-                "div",
-                {
-                  class:
-                    "flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 rounded",
-                  onClick: () =>
-                    (ignoreRestrictions.value = !ignoreRestrictions.value),
-                },
-                [
-                  h(team.doc?.ignore_restrictions ? LucideLock : LucideUnlock, {
-                    class: "h-4 w-4 text-gray-700",
-                    stroke: "currentColor",
-                    "aria-hidden": "true",
-                  }),
-                  h(
-                    "span",
-                    {
-                      class: "whitespace-nowrap text-ink-gray-7 text-p-base",
-                    },
-                    [
-                      team.doc?.ignore_restrictions
-                        ? "Access only this team's tickets"
-                        : "Access all team tickets",
-                    ]
-                  ),
-                ]
-              ),
-            ],
-          }
-        ),
-    };
-    options = [options[0], ignoreRestrictionsOption, ...options.slice(1)];
-  }
-  return options;
-});
+    }),
+  },
+];
 </script>
 
 <style scoped></style>
