@@ -32,6 +32,7 @@
     >
       <div
         v-for="team in teams.data"
+        :key="team.name"
         class="flex items-center gap-2 py-2 group justify-between cursor-pointer"
         @click="() => emit('update:step', 'team-edit', team.name)"
       >
