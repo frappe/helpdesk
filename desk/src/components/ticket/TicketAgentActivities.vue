@@ -17,10 +17,7 @@
           >
             <div
               class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[
-                activity.type === 'comment' ? 'mt-0.5' : '',
-                activity.type === 'email' ? 'mt-2' : '',
-              ]"
+              :class="[activity.type === 'email' && 'mt-2']"
             >
               <Avatar
                 v-if="activity.type === 'email'"
