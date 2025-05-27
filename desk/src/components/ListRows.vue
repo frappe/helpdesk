@@ -9,7 +9,7 @@
             <component v-if="group.icon" :is="group.icon" />
             <div
               v-if="group.group.label != ''"
-              class="flex items-center gap-1 w-full"
+              class="flex items-end gap-1 w-full"
             >
               <span>{{ group.group.label }}</span>
               <span class="text-xs text-ink-gray-5"
@@ -57,15 +57,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
 import {
-  ListRows,
-  ListRow,
+  Button,
+  Dropdown,
   ListGroupHeader,
   ListGroupRows,
-  Dropdown,
-  Button,
+  ListRow,
+  ListRows,
 } from "frappe-ui";
+import { computed, ref, watch } from "vue";
 
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({
