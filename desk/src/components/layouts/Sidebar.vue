@@ -329,9 +329,15 @@ const agentPortalDropdown = computed(() => [
     condition: () => authStore.isAdmin || authStore.isManager,
   },
   {
-    label: "Log out",
-    icon: "log-out",
-    onClick: () => authStore.logout(),
+    group: "Danger",
+    hideLabel: true,
+    items: [
+      {
+        label: "Log out",
+        icon: "log-out",
+        onClick: () => authStore.logout(),
+      },
+    ],
   },
 ]);
 
