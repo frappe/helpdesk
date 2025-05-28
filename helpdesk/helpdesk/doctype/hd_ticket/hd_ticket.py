@@ -539,7 +539,6 @@ class HDTicket(Document):
 
         if self.status == "Replied":
             self.status = "Open"
-            log_ticket_activity(self.name, "set status to Open")
             self.save(ignore_permissions=True)
 
         c = frappe.new_doc("Communication")
