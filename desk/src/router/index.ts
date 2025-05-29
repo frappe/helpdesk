@@ -183,7 +183,7 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
-  isCustomerPortal.value = to.meta.public;
+  isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {
     await authStore.init();
   }
