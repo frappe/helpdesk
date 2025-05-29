@@ -23,6 +23,9 @@ export const useConfigStore = defineStore("config", () => {
   const isFeedbackMandatory = computed(
     () => !!parseInt(config.value.is_feedback_mandatory)
   );
+  const showSuggestedArticles = computed(
+    () => !!parseInt(config.value.show_suggested_articles)
+  );
 
   socket.on("helpdesk:settings-updated", () => configRes.reload());
 
@@ -33,5 +36,6 @@ export const useConfigStore = defineStore("config", () => {
     skipEmailWorkflow,
     isFeedbackMandatory,
     teamRestrictionApplied,
+    showSuggestedArticles,
   };
 });

@@ -16,6 +16,7 @@
   "base_support_rotation",
   "knowledge_base_section",
   "prefer_knowledge_base",
+  "show_suggested_articles",
   "ticket_tab",
   "ticket_type_section",
   "default_ticket_type",
@@ -281,12 +282,19 @@
    "fieldtype": "Int",
    "label": "Auto-close after (Days)",
    "mandatory_depends_on": "auto_close_tickets"
+  },
+  {
+   "default": "1",
+   "description": "Relevant articles from the knowledge base will be shown in the ticket creation form when entering the subject.",
+   "fieldname": "show_suggested_articles",
+   "fieldtype": "Check",
+   "label": "Suggest articles on ticket creation form"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-04-23 20:17:23.058689",
+ "modified": "2025-05-29 17:26:41.231319",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

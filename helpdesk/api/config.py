@@ -10,6 +10,7 @@ def get_config():
         "skip_email_workflow",
         "is_feedback_mandatory",
         "restrict_tickets_by_agent_group",
+        "show_suggested_articles",
     ]
     res = frappe.get_value(doctype="HD Settings", fieldname=fields, as_dict=True)
     return res
