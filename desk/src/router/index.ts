@@ -84,18 +84,17 @@ const routes = [
   {
     path: "/agents",
     name: "AgentList",
-    component: () => import("@/pages/desk/agent/Agents.vue"),
+    redirect: "/tickets",
   },
   {
     path: "/teams",
     name: "Teams",
-    component: () => import("@/pages/desk/team/Teams.vue"),
+    redirect: "/tickets",
   },
   {
     path: "/teams/:teamId",
     name: "Team",
-    component: () => import("@/pages/desk/team/TeamSingle.vue"),
-    props: true,
+    redirect: "/tickets",
   },
   {
     path: "/canned-responses",
