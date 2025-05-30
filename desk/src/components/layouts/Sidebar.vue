@@ -52,7 +52,7 @@
       <div v-for="view in allViews" :key="view.label">
         <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
-          class="mx-2 my-2 h-1"
+          class="mx-2 my-2 h-1 border-b"
         />
         <Section
           :label="view.label"
@@ -95,34 +95,40 @@
       </div>
     </div>
     <div class="grow" />
+    <div class="flex flex-col gap-1">
+      <TrialBanner
+        v-if="isFCSite && !isCustomerPortal"
+        :isSidebarCollapsed="!isExpanded"
+      />
+      <GettingStartedBanner
+        v-if="showOnboardingBanner"
+        :isSidebarCollapsed="!isExpanded"
+        appName="helpdesk"
+      />
+      <SidebarLink
+        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        :icon="HelpIcon"
+        :label="'Help'"
+        :is-expanded="isExpanded"
+        @click="
+          () => {
+            showHelpModal = minimize ? true : !showHelpModal;
+            minimize = !showHelpModal;
+          }
+        "
+      />
+
+      <SidebarLink
+        :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
+        :is-active="false"
+        :is-expanded="isExpanded"
+        :label="isExpanded ? 'Collapse' : 'Expand'"
+        :on-click="() => (isExpanded = !isExpanded)"
+      />
+    </div>
     <TrialBanner
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
-    />
-    <GettingStartedBanner
-      v-if="showOnboardingBanner"
-      :isSidebarCollapsed="!isExpanded"
-      appName="helpdesk"
-    />
-    <SidebarLink
-      v-if="isOnboardingStepsCompleted && !isCustomerPortal"
-      :icon="HelpIcon"
-      :label="'Help'"
-      :is-expanded="isExpanded"
-      @click="
-        () => {
-          showHelpModal = minimize ? true : !showHelpModal;
-          minimize = !showHelpModal;
-        }
-      "
-    />
-
-    <SidebarLink
-      :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
-      :is-active="false"
-      :is-expanded="isExpanded"
-      :label="isExpanded ? 'Collapse' : 'Expand'"
-      :on-click="() => (isExpanded = !isExpanded)"
     />
     <SettingsModal
       v-model="showSettingsModal"

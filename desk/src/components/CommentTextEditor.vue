@@ -5,7 +5,7 @@
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
-        'min-h-[7rem] mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
+        'min-h-[7rem] mx-6 md:10 max-h-[50vh] overflow-y-auto border-t py-3',
       getFontFamily(newComment),
     ]"
     :content="newComment"
@@ -17,9 +17,9 @@
     :extensions="[PreserveVideoControls]"
   >
     <template #bottom>
-      <div v-if="editable" class="flex flex-col gap-2">
+      <div v-if="editable" class="flex flex-col gap-2 px-6 md:px-10">
         <!-- Attachments -->
-        <div class="flex flex-wrap gap-2 px-10">
+        <div class="flex flex-wrap gap-2">
           <AttachmentItem
             v-for="a in attachments"
             :key="a.file_url"
@@ -35,9 +35,7 @@
           </AttachmentItem>
         </div>
         <!-- Fixed Menu -->
-        <div
-          class="flex justify-between gap-2 overflow-hidden border-t px-10 py-2.5"
-        >
+        <div class="flex justify-between gap-2 overflow-hidden border-t py-2.5">
           <div class="flex items-center overflow-x-auto w-4/6">
             <TextEditorFixedMenu
               class="-ml-1"
@@ -67,9 +65,7 @@
               </template>
             </FileUploader>
           </div>
-          <div
-            class="mt-2 flex items-center justify-end space-x-2 sm:mt-0 w-2/6"
-          >
+          <div class="flex items-center justify-end space-x-2 sm:mt-0 w-2/6">
             <Button
               label="Discard"
               @click="

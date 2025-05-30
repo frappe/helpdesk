@@ -81,7 +81,9 @@
         </AttachmentItem>
       </div>
       <!-- TextEditor Fixed Menu -->
-      <div class="flex justify-between gap-2 overflow-hidden px-10 py-2.5">
+      <div
+        class="flex justify-between gap-2 overflow-hidden px-10 py-2.5 items-center"
+      >
         <div class="flex items-center overflow-x-auto w-4/6">
           <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
@@ -121,7 +123,7 @@
             </Button>
           </div>
         </div>
-        <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0 w-2/6">
+        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-2/6">
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
