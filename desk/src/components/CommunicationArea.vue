@@ -34,7 +34,13 @@
     >
       <CommentTextEditor
         ref="commentTextEditorRef"
-        :label="isMac ? 'Comment (⌘ + ⏎)' : 'Comment (Ctrl + ⏎)'"
+        :label="
+          isMobileView
+            ? 'Comment'
+            : isMac
+            ? 'Comment (⌘ + ⏎)'
+            : 'Comment (Ctrl + ⏎)'
+        "
         v-model="doc"
         :editable="showCommentBox"
         :doctype="doctype"
@@ -60,7 +66,9 @@
     >
       <EmailEditor
         ref="emailEditorRef"
-        :label="isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'"
+        :label="
+          isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
+        "
         v-model="doc"
         v-model:content="content"
         placeholder="Hi John, we are looking into this issue."
@@ -87,6 +95,7 @@
 import { CommentTextEditor, EmailEditor } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";
+import { useScreenSize } from "@/composables/screen";
 import { showCommentBox, showEmailBox } from "@/pages/ticket/modalStates";
 import { ref, watch } from "vue";
 
@@ -94,6 +103,7 @@ const emit = defineEmits(["update"]);
 const content = defineModel("content");
 const doc = defineModel();
 const { isMac } = useDevice();
+const { isMobileView } = useScreenSize();
 
 const emailEditorRef = ref(null);
 const commentTextEditorRef = ref(null);
