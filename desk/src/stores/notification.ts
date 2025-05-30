@@ -1,9 +1,8 @@
-import { computed, ref } from "vue";
-import { defineStore } from "pinia";
-import { createResource, createListResource } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
-import { useError } from "@/composables/error";
 import { Notification, Resource } from "@/types";
+import { createListResource, createResource } from "frappe-ui";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
 
 import { isCustomerPortal } from "@/utils";
 
