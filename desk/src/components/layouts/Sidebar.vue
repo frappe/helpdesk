@@ -6,7 +6,7 @@
       'max-width': width,
     }"
   >
-    <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
+    <UserMenu class="mb-2" :options="profileSettings" />
     <SidebarLink
       v-if="!isCustomerPortal"
       label="Search"
@@ -48,7 +48,7 @@
         </template>
       </SidebarLink>
     </div>
-    <div class="overflow-y-auto">
+    <div class="overflow-y-auto overflow-x-hidden">
       <div v-for="view in allViews" :key="view.label">
         <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
