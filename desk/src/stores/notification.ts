@@ -4,8 +4,6 @@ import { createListResource, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
-import { isCustomerPortal } from "@/utils";
-
 export const useNotificationStore = defineStore("notification", () => {
   const authStore = useAuthStore();
   const visible = ref(false);
@@ -26,7 +24,7 @@ export const useNotificationStore = defineStore("notification", () => {
       "user_to",
     ],
     orderBy: "creation desc",
-    auto: !isCustomerPortal.value,
+    auto: authStore.hasDeskAccess,
   });
   const clear = createResource({
     url: "helpdesk.helpdesk.doctype.hd_notification.utils.clear",

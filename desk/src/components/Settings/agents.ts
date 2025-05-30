@@ -1,3 +1,4 @@
+import { isCustomerPortal } from "@/utils";
 import { createListResource, createResource } from "frappe-ui";
 import { reactive, ref, watch } from "vue";
 
@@ -8,7 +9,7 @@ export const agents = createListResource({
   start: 0,
   pageLength: 10,
   orderBy: "creation desc",
-  auto: true,
+  auto: !isCustomerPortal.value,
 });
 
 export const activeFilter = ref("Active");
