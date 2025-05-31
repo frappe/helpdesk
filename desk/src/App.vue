@@ -47,7 +47,7 @@ const CustomerPortalRoot = defineAsyncComponent(
 
 const PortalRoot = computed(() => {
   const authStore = useAuthStore();
-  if (authStore.hasDeskAccess) {
+  if (authStore.hasDeskAccess && authStore.isAgent) {
     return AgentPortalRoot;
   } else {
     return CustomerPortalRoot;
