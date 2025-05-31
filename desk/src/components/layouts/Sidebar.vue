@@ -6,7 +6,7 @@
       'max-width': width,
     }"
   >
-    <UserMenu class="mb-2 ml-0.5" :options="profileSettings" />
+    <UserMenu class="mb-2" :options="profileSettings" />
     <SidebarLink
       v-if="!isCustomerPortal"
       label="Search"
@@ -48,11 +48,11 @@
         </template>
       </SidebarLink>
     </div>
-    <div class="overflow-y-auto">
+    <div class="overflow-y-auto overflow-x-hidden">
       <div v-for="view in allViews" :key="view.label">
         <div
           v-if="!view.hideLabel && !isExpanded && view.views?.length"
-          class="mx-2 my-2 h-1"
+          class="mx-2 my-2 h-1 border-b"
         />
         <Section
           :label="view.label"
@@ -95,34 +95,40 @@
       </div>
     </div>
     <div class="grow" />
+    <div class="flex flex-col gap-1">
+      <TrialBanner
+        v-if="isFCSite && !isCustomerPortal"
+        :isSidebarCollapsed="!isExpanded"
+      />
+      <GettingStartedBanner
+        v-if="showOnboardingBanner"
+        :isSidebarCollapsed="!isExpanded"
+        appName="helpdesk"
+      />
+      <SidebarLink
+        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        :icon="HelpIcon"
+        :label="'Help'"
+        :is-expanded="isExpanded"
+        @click="
+          () => {
+            showHelpModal = minimize ? true : !showHelpModal;
+            minimize = !showHelpModal;
+          }
+        "
+      />
+
+      <SidebarLink
+        :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
+        :is-active="false"
+        :is-expanded="isExpanded"
+        :label="isExpanded ? 'Collapse' : 'Expand'"
+        :on-click="() => (isExpanded = !isExpanded)"
+      />
+    </div>
     <TrialBanner
       v-if="isFCSite && !isCustomerPortal"
       :isSidebarCollapsed="!isExpanded"
-    />
-    <GettingStartedBanner
-      v-if="showOnboardingBanner"
-      :isSidebarCollapsed="!isExpanded"
-      appName="helpdesk"
-    />
-    <SidebarLink
-      v-if="isOnboardingStepsCompleted && !isCustomerPortal"
-      :icon="HelpIcon"
-      :label="'Help'"
-      :is-expanded="isExpanded"
-      @click="
-        () => {
-          showHelpModal = minimize ? true : !showHelpModal;
-          minimize = !showHelpModal;
-        }
-      "
-    />
-
-    <SidebarLink
-      :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
-      :is-active="false"
-      :is-expanded="isExpanded"
-      :label="isExpanded ? 'Collapse' : 'Expand'"
-      :on-click="() => (isExpanded = !isExpanded)"
     />
     <SettingsModal
       v-model="showSettingsModal"
@@ -166,7 +172,6 @@ import {
   showCommentBox,
   showEmailBox,
 } from "@/pages/ticket/modalStates";
-import { CUSTOMER_PORTAL_LANDING } from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
@@ -292,7 +297,7 @@ const agentPortalDropdown = computed(() => [
     label: "Customer portal",
     icon: "users",
     onClick: () => {
-      const path = router.resolve({ name: CUSTOMER_PORTAL_LANDING });
+      const path = router.resolve({ name: "TicketsCustomer" });
       window.open(path.href);
     },
   },

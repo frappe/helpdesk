@@ -16,7 +16,10 @@ export const useAuthStore = defineStore("auth", () => {
   const userInfo = createResource({
     url: URI_USER_INFO,
   });
-  const init = userInfo.fetch;
+  const init = async () => {
+    if (userInfo.fetched) return;
+    await userInfo.fetch();
+  };
   const reloadUser = userInfo.reload;
 
   const user__ = computed(() => userInfo.data || {});
