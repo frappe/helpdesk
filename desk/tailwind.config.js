@@ -1,7 +1,6 @@
 import frappeUIPreset from "frappe-ui/src/tailwind/preset";
 
 export default {
-  mode: "jit",
   presets: [frappeUIPreset],
   content: [
     "./index.html",
@@ -11,6 +10,7 @@ export default {
     "./node_modules/frappe-ui/frappe/**/*.{vue,js,ts,jsx,tsx}",
     "../node_modules/frappe-ui/frappe/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  safelist: [{ pattern: /!(text|bg)-/, variants: ["hover", "active"] }],
   theme: {
     extend: {
       height: {

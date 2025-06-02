@@ -159,7 +159,7 @@ const groupByActions = [
       const { label, value } = group;
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/${value}`;
-      await copyToClipboard(url.href, label);
+      await copyToClipboard();
     },
   },
   {
