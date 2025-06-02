@@ -1,20 +1,17 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
-import { toast } from "frappe-ui";
-import { ref, h, markRaw } from "vue";
-import zod from "zod";
-import { gemoji } from "gemoji";
-import TicketIcon from "./components/icons/TicketIcon.vue";
 import dayjs from "dayjs";
+import { toast } from "frappe-ui";
+import { gemoji } from "gemoji";
+import { h, markRaw, ref } from "vue";
+import zod from "zod";
+import TicketIcon from "./components/icons/TicketIcon.vue";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
  * @param options - `Toast` options
  */
 export function createToast(options?: Record<string, string>) {
-  toast({
-    position: "bottom-right",
-    ...options,
-  });
+  toast.create(...options);
 }
 
 /**
@@ -23,13 +20,7 @@ export function createToast(options?: Record<string, string>) {
  */
 export async function copy(s: string) {
   const { copy: c } = useClipboard();
-  c(s).then(() =>
-    createToast({
-      title: "Copied to clipboard",
-      icon: "check",
-      iconClasses: "text-green-600",
-    })
-  );
+  c(s).then(() => toast.success("Copied to clipboard"));
 }
 
 /**
@@ -102,7 +93,8 @@ export function formatTime(seconds) {
 
 export const isCustomerPortal = ref(false);
 
-export async function copyToClipboard(text: string, message?: string) {
+export async function copyToClipboard() {
+  let text = "Copied to clipboard";
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(text);
   } else {
@@ -114,12 +106,8 @@ export async function copyToClipboard(text: string, message?: string) {
     document.execCommand("copy");
     input.remove();
   }
-  createToast({
-    title: "Copied to clipboard",
-    text: message,
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+
+  toast.success(text);
 }
 
 export const textEditorMenuButtons = [

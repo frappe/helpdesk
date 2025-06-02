@@ -416,7 +416,7 @@ const articleActions = computed(() => [
     onClick: () => {
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.href, article.data.title);
+      copyToClipboard();
     },
   },
   {
