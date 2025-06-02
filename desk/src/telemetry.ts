@@ -49,13 +49,8 @@ export async function init(ps: PosthogSettings) {
     api_host: ps.posthog_host,
     autocapture: false,
     person_profiles: "identified_only",
-    disable_session_recording: false,
-    session_recording: {
-      maskAllInputs: false,
-      maskInputOptions: {
-        password: true,
-      },
-    },
+    disable_session_recording: true,
+    advanced_disable_decide: true,
     loaded: (ph: typeof posthog) => {
       window.posthog = ph;
       ph.identify(SITENAME);
