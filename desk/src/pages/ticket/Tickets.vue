@@ -72,8 +72,8 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { View } from "@/types";
-import { createToast, getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, Tooltip, usePageMeta } from "frappe-ui";
+import { getIcon, isCustomerPortal } from "@/utils";
+import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -523,11 +523,7 @@ function handleView(viewInfo, action) {
 }
 
 function handleSuccess(msg = "created") {
-  createToast({
-    title: `View ${msg} successfully`,
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success(`View ${msg}`);
   resetState();
 }
 function resetState() {

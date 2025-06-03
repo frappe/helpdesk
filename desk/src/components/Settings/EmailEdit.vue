@@ -17,11 +17,11 @@
     <!-- banner for setting up email account -->
     <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
       <CircleAlert
-        class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
+        class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
       />
       <div class="text-wrap text-xs text-gray-700">
         {{ info.description }}
-        <a :href="info.link" target="_blank" class="text-blue-500 underline"
+        <a :href="info.link" target="_blank" class="text-ink-blue-2 underline"
           >here</a
         >
         .
@@ -92,10 +92,9 @@
 
 <script setup lang="ts">
 import { EmailAccount, EmailStep } from "@/types";
-import { createToast } from "@/utils";
 import { useStorage } from "@vueuse/core";
-import { call } from "frappe-ui";
-import { computed, reactive, ref } from "vue";
+import { call, toast } from "frappe-ui";
+import { computed, h, reactive, ref } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import {
@@ -172,10 +171,9 @@ async function updateAccount() {
   const values = updatedEmailAccount;
 
   if (!nameChanged && !otherFieldsChanged) {
-    createToast({
-      title: "No changes made",
-      icon: "info",
-      iconClasses: "text-blue-600",
+    toast.create({
+      message: "No changes made",
+      icon: h(CircleAlert, { class: "text-ink-blue-2" }),
     });
     return;
   }
@@ -202,11 +200,10 @@ async function updateAccount() {
 
 function pullEmails() {
   loadingPull.value = true;
-  createToast({
-    title: "Pulling emails...",
-    text: "This may take a few minutes, please wait.",
-    icon: "info",
-    iconClasses: "text-blue-600",
+
+  toast.create({
+    message: "Pulling emails, this may take a few minutes.",
+    icon: h(CircleAlert, { class: "text-blue-500" }),
   });
 
   call("frappe.email.doctype.email_account.email_account.pull_emails", {
@@ -215,11 +212,7 @@ function pullEmails() {
     .then(() => {
       localStorage.removeItem(`loading-emails-${state.email_account_name}`);
       loadingPull.value = null;
-      createToast({
-        title: "Emails pulled successfully",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      toast.success("Emails pulled successfully");
     })
     .catch(() => {
       localStorage.removeItem(`loading-emails-${state.email_account_name}`);
@@ -262,11 +255,7 @@ async function callSetValue(values) {
 
 function succesHandler() {
   emit("update:step", "email-list");
-  createToast({
-    title: "Email account updated successfully",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success("Email account updated successfully");
 }
 
 function errorHandler() {

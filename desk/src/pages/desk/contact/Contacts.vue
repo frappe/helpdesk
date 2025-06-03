@@ -40,8 +40,7 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import NewContactDialog from "@/components/desk/global/NewContactDialog.vue";
 import { PhoneIcon } from "@/components/icons";
-import { createToast } from "@/utils";
-import { Avatar, usePageMeta } from "frappe-ui";
+import { Avatar, toast, usePageMeta } from "frappe-ui";
 import { computed, h, ref } from "vue";
 import ContactDialog from "./ContactDialog.vue";
 import { showNewContactModal } from "./dialogState";
@@ -87,11 +86,7 @@ function openContact(id: string): void {
 }
 
 function handleContactUpdated(): void {
-  createToast({
-    title: "Contact updated",
-    icon: "check",
-    iconClasses: "text-green-500",
-  });
+  toast.success("Contact updated");
   isContactDialogVisible.value = !isContactDialogVisible.value;
   listViewRef.value?.reload();
 }

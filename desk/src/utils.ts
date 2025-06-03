@@ -10,9 +10,6 @@ import TicketIcon from "./components/icons/TicketIcon.vue";
  * https://frappeui.com/components/toast.html
  * @param options - `Toast` options
  */
-export function createToast(options?: Record<string, string>) {
-  toast.create(...options);
-}
 
 /**
  * Copy a string to clipboard, and create a toast
@@ -58,12 +55,7 @@ export function timeAgo(date) {
 export const dateTooltipFormat = "ddd, MMM D, YYYY h:mm A";
 
 export function errorMessage(title, message) {
-  createToast({
-    title: title || "Error",
-    text: message,
-    icon: "x",
-    iconClasses: "text-red-600",
-  });
+  toast.error(message);
 }
 
 export function formatTime(seconds) {

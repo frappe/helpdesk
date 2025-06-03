@@ -68,7 +68,6 @@
 </template>
 
 <script setup lang="ts">
-import { createToast } from "@/utils";
 import {
   Autocomplete,
   Avatar,
@@ -77,6 +76,7 @@ import {
   createListResource,
   Dialog,
   FileUploader,
+  toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import type { Ref } from "vue";
@@ -123,11 +123,7 @@ const emails = computed({
   },
   set(newVal) {
     if (newVal.length === 0) {
-      createToast({
-        title: "At least one email is required",
-        icon: "x",
-        iconClasses: "text-red-600",
-      });
+      toast.error("At least one email is required");
       return;
     }
     if (newVal.length !== contact.doc.email_ids.length) {
@@ -241,11 +237,7 @@ const options = computed(() => ({
 
 function update(): void {
   if (!isDirty.value) {
-    createToast({
-      title: "No changes to save",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("No changes to save");
     return;
   }
   contact.setValue.submit({
@@ -287,11 +279,7 @@ function validatePhone(input: AutoCompleteItem): string | void {
 function validateFile(file: File): string | void {
   let extn = file.name.split(".").pop().toLowerCase();
   if (!["png", "jpg", "jpeg"].includes(extn)) {
-    createToast({
-      title: "Invalid file type, only PNG and JPG images are allowed",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Invalid file type, only PNG and JPG images are allowed");
     return "Invalid file type, only PNG and JPG images are allowed";
   }
 }
@@ -306,11 +294,7 @@ async function inviteContact(): Promise<void> {
         contact: contact.doc.name,
       }
     );
-    createToast({
-      title: "Contact invited successfully",
-      icon: "user-plus",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Contact invited successfully");
     await contact.setValue.submit({
       user: user,
     });
@@ -322,12 +306,9 @@ async function inviteContact(): Promise<void> {
       error.messages?.[0] || error.message,
       "text/html"
     );
+
     const errMsg = doc.body.innerText;
-    createToast({
-      title: errMsg,
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error(errMsg);
   } finally {
     isLoading.value = false;
   }

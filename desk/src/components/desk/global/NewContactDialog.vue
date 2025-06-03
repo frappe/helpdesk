@@ -47,20 +47,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import { useContactStore } from "@/stores/contact";
+import { computed, ref } from "vue";
 
 import {
-  Input,
+  Autocomplete,
   Dialog,
   ErrorMessage,
-  createResource,
-  Autocomplete,
+  Input,
   createListResource,
+  createResource,
+  toast,
 } from "frappe-ui";
 import zod from "zod";
 
-import { createToast } from "@/utils";
 import { AutoCompleteItem } from "@/types";
 
 interface Props {
@@ -177,11 +177,7 @@ const contactResource = createResource({
       phone: "",
       selectedCustomer: null,
     };
-    createToast({
-      title: "Contact Created Successfully ",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Contact created");
     emit("contactCreated");
   },
 });

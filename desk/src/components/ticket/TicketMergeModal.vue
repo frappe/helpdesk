@@ -60,13 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Dialog, createResource, createListResource } from "frappe-ui";
 import { Ticket } from "@/types";
-import TriangleAlert from "~icons/lucide/triangle-alert";
-import { createToast } from "@/utils";
-import { watch } from "vue";
+import { Dialog, createListResource, createResource, toast } from "frappe-ui";
+import { ref, watch } from "vue";
 import LucideMerge from "~icons/lucide/merge";
+import TriangleAlert from "~icons/lucide/triangle-alert";
 // interface P
 interface Props {
   ticket: Ticket;
@@ -122,11 +120,7 @@ const mergeTicket = createResource({
     if (!target) throw { message: "Ticket to merged with is required" };
   },
   onSuccess: () => {
-    createToast({
-      title: "Ticket merged successfully",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Ticket merged successfully");
     emit("update");
 
     showDialog.value = false;
