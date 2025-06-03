@@ -187,7 +187,8 @@ function reload(val) {
 const addValue = (value) => {
   error.value = null;
   if (value) {
-    const splitValues = value.split(",");
+    const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/; // Split base on commas not within quotes
+    const splitValues = value.split(regex);
     splitValues.forEach((value) => {
       value = value.trim();
       if (value) {
