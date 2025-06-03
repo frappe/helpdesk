@@ -28,8 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { createToast } from "@/utils";
-import { createResource } from "frappe-ui";
+import { createResource, toast } from "frappe-ui";
 import { isEmpty } from "lodash";
 import { ref } from "vue";
 
@@ -52,11 +51,7 @@ const newTeam = createResource({
   },
   auto: false,
   onSuccess() {
-    createToast({
-      title: "Team created successfully",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Team created");
     newTeamTitle.value = null;
     show.value = false;
     emit("create");

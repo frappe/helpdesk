@@ -95,8 +95,7 @@
 
 <script setup lang="ts">
 import { EmailAccount, EmailService, EmailStep } from "@/types";
-import { createToast } from "@/utils";
-import { createResource } from "frappe-ui";
+import { createResource, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, Reactive, reactive, Ref, ref } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
@@ -149,11 +148,7 @@ const addEmailRes = createResource({
     };
   },
   onSuccess: () => {
-    createToast({
-      title: "Email account created successfully",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Email account created");
     emit("update:step", "email-list");
     updateOnboardingStep("setup_email_account");
   },

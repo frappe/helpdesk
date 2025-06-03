@@ -17,9 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { Input, toast } from "frappe-ui";
 import { ref, toRefs } from "vue";
-import { Input } from "frappe-ui";
-import { createToast } from "@/utils";
 import Pill from "./Pill.vue";
 
 type Item = {
@@ -56,11 +55,7 @@ function add(item: Item) {
   const err = props.validate(item);
 
   if (err) {
-    createToast({
-      title: err,
-      icon: "x",
-      iconClasses: "text-red-500",
-    });
+    toast.error(err);
 
     return;
   }

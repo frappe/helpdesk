@@ -11,10 +11,10 @@
 </template>
 
 <script setup lang="ts">
+import { Field, FieldValue } from "@/types";
+import { toast } from "frappe-ui";
 import { computed } from "vue";
 import UniInput2 from "../UniInput2.vue";
-import { createToast } from "@/utils";
-import { Field, FieldValue } from "@/types";
 const emit = defineEmits(["update"]);
 
 const props = defineProps({
@@ -30,11 +30,7 @@ const fields = computed(() => {
 
 function update(field: Field["fieldname"], value: FieldValue, event = null) {
   if (field === "subject" && value === "") {
-    createToast({
-      title: "Subject is required",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Subject is required");
     event.target.value = props.ticket.subject;
     return;
   }

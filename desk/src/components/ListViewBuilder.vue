@@ -127,7 +127,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { View, ViewType } from "@/types";
-import { createToast, formatTimeShort, getIcon } from "@/utils";
+import { formatTimeShort, getIcon } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 import {
@@ -141,6 +141,7 @@ import {
   ListRowItem,
   ListSelectBanner,
   ListView,
+  toast,
 } from "frappe-ui";
 import {
   computed,
@@ -238,11 +239,7 @@ function handleBulkDelete(hide: Function, selections: Set<string>) {
     items: JSON.stringify(Array.from(selections)),
     doctype: props.options.doctype,
   }).then(() => {
-    createToast({
-      title: "Item(s) deleted successfully",
-      icon: "check",
-      iconClasses: "text-ink-green-3",
-    });
+    toast.success("Item(s) deleted successfully");
     hide();
     reset();
   });

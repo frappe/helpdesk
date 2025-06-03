@@ -140,8 +140,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
-import { createToast } from "@/utils";
-import { call, FormControl } from "frappe-ui";
+import { call, FormControl, toast } from "frappe-ui";
 import { h } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
@@ -220,12 +219,7 @@ function updateRole(agent: string, newRole: string) {
     new_role: newRole,
   }).then(() => {
     updateUserRoleCache(agent, newRole);
-    createToast({
-      title: "Role Updated Successfully",
-      text: `${agent} role updated to ${newRole}`,
-      icon: "check",
-      iconClasses: "text-ink-green-3",
-    });
+    toast.success(`Role updated to ${newRole}`);
   });
 }
 

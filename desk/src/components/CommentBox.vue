@@ -102,7 +102,6 @@ import { updateRes as updateComment } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { CommentActivity } from "@/types";
 import {
-  createToast,
   dateFormat,
   dateTooltipFormat,
   getFontFamily,
@@ -116,6 +115,7 @@ import {
   Dropdown,
   TextEditor,
   createResource,
+  toast,
 } from "frappe-ui";
 import { PropType, computed, onMounted, ref } from "vue";
 const authStore = useAuthStore();
@@ -162,11 +162,7 @@ const deleteComment = createResource({
   }),
   onSuccess() {
     emit("update");
-    createToast({
-      title: "Comment deleted",
-      icon: "check",
-      iconClasses: "text-green-500",
-    });
+    toast.success("Comment deleted");
   },
 });
 
@@ -176,11 +172,7 @@ function handleSaveComment() {
     return;
   }
   if (isContentEmpty(_content.value)) {
-    createToast({
-      title: "Comment cannot be empty",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Comment cannot be empty");
     return;
   }
 
@@ -195,11 +187,7 @@ function handleSaveComment() {
       onSuccess: () => {
         editable.value = false;
         emit("update");
-        createToast({
-          title: "Comment updated",
-          icon: "check",
-          iconClasses: "text-green-500",
-        });
+        toast.success("Comment updated");
       },
     }
   );

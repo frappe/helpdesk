@@ -157,7 +157,6 @@ import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
-  createToast,
   getFontFamily,
   isContentEmpty,
   textEditorMenuButtons,
@@ -169,6 +168,7 @@ import {
   TextEditor,
   TextEditorFixedMenu,
   createResource,
+  toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, ref } from "vue";
@@ -263,11 +263,9 @@ function submitMail() {
     return false;
   }
   if (!toEmailsClone.value.length) {
-    createToast({
-      text: "Please enter a recipient email address",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.warning(
+      "Email has no recipients. Please add at least one email address in the 'TO' field."
+    );
     return false;
   }
 

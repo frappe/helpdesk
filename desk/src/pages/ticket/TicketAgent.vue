@@ -145,6 +145,7 @@ import {
   Tabs,
   call,
   createResource,
+  toast,
 } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -170,7 +171,7 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { TabObject, TicketTab, View } from "@/types";
-import { createToast, getIcon } from "@/utils";
+import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
 import { showAssignmentModal } from "./modalStates";
 const route = useRoute();
@@ -227,9 +228,10 @@ const ticket = createResource({
       doc: data,
       call,
       router,
+      toast,
       $dialog,
       updateField,
-      createToast,
+      createToast: toast.create,
     });
   },
 });
@@ -391,7 +393,7 @@ function updateTicket(fieldname: string, value: string) {
   updateOptimistic(fieldname, value);
 
   createResource({
-    url: "frappe.client.set_value",
+    url: "frappe.client.set_values",
     params: {
       doctype: "HD Ticket",
       name: props.ticketId,
@@ -412,12 +414,7 @@ function updateTicket(fieldname: string, value: string) {
       const text = error.exc_type
         ? (error.messages || error.message || []).join(", ")
         : error.message;
-      createToast({
-        title: error.exc_type || "Error",
-        text,
-        icon: "alert-triangle",
-        iconClasses: "text-red-500",
-      });
+      toast.error(text);
 
       ticket.reload();
     },
@@ -426,11 +423,7 @@ function updateTicket(fieldname: string, value: string) {
 
 function updateOptimistic(fieldname: string, value: string) {
   ticket.data[fieldname] = value;
-  createToast({
-    title: "Ticket updated",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success("Ticket updated");
 }
 
 onMounted(() => {

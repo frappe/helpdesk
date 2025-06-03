@@ -3,9 +3,7 @@
     <div
       class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9 justify-between"
     >
-      <span
-        class="cursor-copy text-lg font-semibold"
-        @click="copyToClipboard(ticket.name, ticket.name)"
+      <span class="cursor-copy text-lg font-semibold" @click="copyToClipboard()"
         >#{{ ticket.name }}
       </span>
       <Dropdown

@@ -65,24 +65,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, provide, ref } from "vue";
-import { createResource, Button, Breadcrumbs, call } from "frappe-ui";
+import { LayoutHeader } from "@/components";
+import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { useScreenSize } from "@/composables/screen";
+import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
+import { isContentEmpty } from "@/utils";
 import { Icon } from "@iconify/vue";
-import { ITicket } from "./symbols";
+import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
+import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { useRouter } from "vue-router";
-import { createToast, isContentEmpty } from "@/utils";
-import { setupCustomizations } from "@/composables/formCustomisation";
-import { socket } from "@/socket";
-import { LayoutHeader } from "@/components";
-import { useScreenSize } from "@/composables/screen";
+import { useTicket } from "./data";
+import { ITicket } from "./symbols";
 import TicketConversation from "./TicketConversation.vue";
 import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
 import TicketFeedback from "./TicketFeedback.vue";
-import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
-import { useTicket } from "./data";
+import TicketTextEditor from "./TicketTextEditor.vue";
 
 interface P {
   ticketId: string;
@@ -99,17 +99,14 @@ const ticket = useTicket(
       doc: data,
       call,
       router,
+      toast,
       $dialog,
       updateField,
-      createToast,
+      createToast: toast.create,
     });
   },
   () => {
-    createToast({
-      title: "Ticket not found",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Ticket not found");
     router.replace("/my-tickets");
   }
 );
@@ -168,11 +165,7 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       ticket.reload();
-      createToast({
-        title: "Ticket updated",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      toast.success("Ticket updated");
     },
   });
 }
@@ -199,12 +192,7 @@ function showConfirmationDialog() {
             { fieldname: "status", value: "Closed" },
             {
               onSuccess: () => {
-                createToast({
-                  title: "Ticket closed successfully",
-                  icon: "check",
-                  iconClasses: "text-green-600",
-                  position: "top-right",
-                });
+                toast.success("Ticket closed");
               },
             }
           );

@@ -74,6 +74,7 @@ import {
   Breadcrumbs,
   TextEditor,
   TextEditorFixedMenu,
+  toast,
   usePageMeta,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
@@ -85,7 +86,7 @@ import { globalStore } from "@/stores/globalStore";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { Article } from "@/types";
-import { createToast, textEditorMenuButtons } from "@/utils";
+import { textEditorMenuButtons } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();
@@ -114,11 +115,7 @@ function handleCreateArticle() {
     { title: title.value, content: content.value, category: categoryId.value },
     {
       onSuccess: (article: Article) => {
-        createToast({
-          title: "Article created successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Article created");
         if (isManager) {
           updateOnboardingStep("first_article");
         }
@@ -131,11 +128,7 @@ function handleCreateArticle() {
         });
       },
       onError: (error: string) => {
-        createToast({
-          title: error,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        toast.error(error);
       },
     }
   );
