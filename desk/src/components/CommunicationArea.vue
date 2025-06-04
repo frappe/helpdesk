@@ -28,6 +28,36 @@
       </div>
     </div>
     <div
+      v-show="showEmailBox"
+      class="flex gap-1.5 flex-1"
+      @keydown.ctrl.enter.capture.stop="submitEmail"
+      @keydown.meta.enter.capture.stop="submitEmail"
+    >
+      <EmailEditor
+        ref="emailEditorRef"
+        :label="
+          isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
+        "
+        v-model="doc"
+        v-model:content="content"
+        placeholder="Hi John, we are looking into this issue."
+        :to-emails="toEmails"
+        :cc-emails="ccEmails"
+        :bcc-emails="bccEmails"
+        @submit="
+          () => {
+            showEmailBox = false;
+            emit('update');
+          }
+        "
+        @discard="
+          () => {
+            showEmailBox = false;
+          }
+        "
+      />
+    </div>
+    <div
       v-show="showCommentBox"
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
@@ -54,36 +84,6 @@
         @discard="
           () => {
             showCommentBox = false;
-          }
-        "
-      />
-    </div>
-    <div
-      v-show="showEmailBox"
-      class="flex gap-1.5"
-      @keydown.ctrl.enter.capture.stop="submitEmail"
-      @keydown.meta.enter.capture.stop="submitEmail"
-    >
-      <EmailEditor
-        ref="emailEditorRef"
-        :label="
-          isMobileView ? 'Send' : isMac ? 'Send (⌘ + ⏎)' : 'Send (Ctrl + ⏎)'
-        "
-        v-model="doc"
-        v-model:content="content"
-        placeholder="Hi John, we are looking into this issue."
-        :to-emails="toEmails"
-        :cc-emails="ccEmails"
-        :bcc-emails="bccEmails"
-        @submit="
-          () => {
-            showEmailBox = false;
-            emit('update');
-          }
-        "
-        @discard="
-          () => {
-            showEmailBox = false;
           }
         "
       />
@@ -194,5 +194,8 @@ defineExpose({
   .comm-area {
     width: 100vw;
   }
+}
+.comm-area {
+  width: 100%;
 }
 </style>

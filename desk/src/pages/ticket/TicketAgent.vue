@@ -393,7 +393,7 @@ function updateTicket(fieldname: string, value: string) {
   updateOptimistic(fieldname, value);
 
   createResource({
-    url: "frappe.client.set_values",
+    url: "frappe.client.set_value",
     params: {
       doctype: "HD Ticket",
       name: props.ticketId,

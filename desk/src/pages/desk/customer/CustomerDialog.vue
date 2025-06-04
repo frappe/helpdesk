@@ -71,7 +71,9 @@ const customer = createDocumentResource({
     onSuccess() {
       toast.success("Customer updated");
     },
-    onError: toast.error("Error updating customer"),
+    onError() {
+      toast.error("Error updating customer");
+    },
   },
 });
 
