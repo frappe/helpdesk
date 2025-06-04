@@ -13,6 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
+    :upload-function="uploadFunction"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -63,12 +64,12 @@
         />
       </div>
     </template>
-    <template v-slot:editor="{ editor }">
+    <!-- <template v-slot:editor="{ _editor }">
       <EditorContent
         :class="[editable && 'max-h-[35vh] overflow-y-auto']"
-        :editor="editor"
+        :editor="_editor"
       />
-    </template>
+    </template> -->
     <template #bottom>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
@@ -168,9 +169,10 @@ import {
   getFontFamily,
   isContentEmpty,
   textEditorMenuButtons,
+  uploadFunction,
   validateEmail,
 } from "@/utils";
-import { EditorContent } from "@tiptap/vue-3";
+// import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,

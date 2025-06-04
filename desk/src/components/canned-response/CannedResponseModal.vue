@@ -39,6 +39,7 @@
             :content="message"
             :placeholder="'Your query has been resolved. Thank you for reaching out.'"
             @change="(val) => (message = val)"
+            :upload-function="uploadFunction"
           />
         </div>
       </div>
@@ -47,6 +48,7 @@
 </template>
 
 <script setup>
+import { uploadFunction } from "@/utils";
 import { TextEditor, call, TextInput } from "frappe-ui";
 
 const props = defineProps({

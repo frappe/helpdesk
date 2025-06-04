@@ -93,6 +93,7 @@
 			      content = event;
 		      }"
           placeholder="Write your article here..."
+          :upload-function="uploadFunction"
         >
           <template #bottom v-if="editable">
             <TextEditorFixedMenu
@@ -131,6 +132,7 @@ import {
   copyToClipboard,
   isCustomerPortal,
   textEditorMenuButtons,
+  uploadFunction,
 } from "@/utils";
 import {
   Avatar,

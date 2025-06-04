@@ -1,16 +1,17 @@
 <template>
-  <div class="rounded p-3 shadow">
+  <div class="rounded p-3 shadow w-full">
     <FTextEditor
       ref="e"
       :extensions="[PreserveVideoControls]"
       v-bind="$attrs"
       :editor-class="[
-        'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem',
+        'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-5rem',
         getFontFamily(modelValue),
       ]"
       bubble-menu
       :content="modelValue"
       @change="$emit('update:modelValue', $event)"
+      :upload-function="uploadFunction"
     >
       <template #top>
         <span class="text-base">
@@ -57,12 +58,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, nextTick, ref } from "vue";
-import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
-import { useAuthStore } from "@/stores/auth";
 import { UserAvatar } from "@/components";
+import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { getFontFamily } from "@/utils";
+import { getFontFamily, uploadFunction } from "@/utils";
+import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
+import { computed, nextTick, ref } from "vue";
 
 interface P {
   modelValue: string;
