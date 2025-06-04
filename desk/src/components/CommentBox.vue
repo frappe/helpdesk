@@ -53,13 +53,14 @@
       <TextEditor
         ref="editorRef"
         :editor-class="[
-          'prose-f shrink  text-p-sm transition-all duration-300 ease-in-out block w-full content',
+          'prose-f shrink text-p-sm transition-all duration-300 ease-in-out block w-full content',
           getFontFamily(_content),
         ]"
         :content="_content"
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
         @change="(event:string) => {_content = event}"
+        :upload-function="uploadFunction"
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">
@@ -108,6 +109,7 @@ import {
   isContentEmpty,
   textEditorMenuButtons,
   timeAgo,
+  uploadFunction,
 } from "@/utils";
 import {
   Avatar,

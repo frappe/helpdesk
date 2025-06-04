@@ -22,15 +22,15 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div class="flex overflow-hidden h-full">
+    <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
-      <section class="flex flex-col flex-1">
+      <section class="flex flex-col flex-1 max-w-[calc(100%-382px)]">
         <!-- show for only mobile -->
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
         <TicketConversation class="grow" />
         <div
-          class="m-5"
+          class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
         >
@@ -40,7 +40,7 @@
             v-model:attachments="attachments"
             v-model:content="editorContent"
             v-model:expand="isExpanded"
-            :placeholder="placeholder"
+            placeholder="Type a message"
             autofocus
             @clear="() => (isExpanded = false)"
           >
@@ -112,7 +112,6 @@ const ticket = useTicket(
 );
 provide(ITicket, ticket);
 const editor = ref(null);
-const placeholder = "Type a message";
 const editorContent = ref("");
 const attachments = ref([]);
 const showFeedbackDialog = ref(false);
