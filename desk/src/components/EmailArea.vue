@@ -95,7 +95,7 @@
       </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
-    <div class="border-0 border-t mt-3 mb-1 border-outline-gray-modals" />
+    <div class="border-0 border-t my-3 border-outline-gray-modals" />
     <EmailContent :content="content" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
