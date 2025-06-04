@@ -52,7 +52,7 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
-      <div class="flex flex-1 flex-col">
+      <div class="flex flex-1 flex-col max-w-[calc(100%-382px)]">
         <!-- ticket activities -->
         <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
           <Tabs v-model="tabIndex" :tabs="tabs">
