@@ -11,7 +11,6 @@
       bubble-menu
       :content="modelValue"
       @change="$emit('update:modelValue', $event)"
-      :upload-function="uploadFunction"
     >
       <template #top>
         <span class="text-base">
@@ -61,7 +60,7 @@
 import { UserAvatar } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { getFontFamily, uploadFunction } from "@/utils";
+import { getFontFamily } from "@/utils";
 import { TextEditor as FTextEditor, TextEditorFixedMenu } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
 

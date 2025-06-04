@@ -56,7 +56,6 @@
           @change="content = $event"
           placeholder="Write your article here..."
           editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
-          :upload-function="uploadFunction"
         >
           <template #bottom>
             <TextEditorFixedMenu
@@ -87,7 +86,7 @@ import { globalStore } from "@/stores/globalStore";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
 import { Article } from "@/types";
-import { textEditorMenuButtons, uploadFunction } from "@/utils";
+import { textEditorMenuButtons } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();

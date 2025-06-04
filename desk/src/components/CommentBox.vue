@@ -60,7 +60,6 @@
         :editable="editable"
         :bubble-menu="textEditorMenuButtons"
         @change="(event:string) => {_content = event}"
-        :upload-function="uploadFunction"
       >
         <template #bottom v-if="editable">
           <div class="flex flex-row-reverse gap-2">

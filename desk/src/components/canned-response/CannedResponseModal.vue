@@ -39,7 +39,6 @@
             :content="message"
             :placeholder="'Your query has been resolved. Thank you for reaching out.'"
             @change="(val) => (message = val)"
-            :upload-function="uploadFunction"
           />
         </div>
       </div>
