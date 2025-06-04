@@ -133,6 +133,7 @@ import Link from "@/components/frappe-ui/Link.vue";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
 import {
+  Avatar,
   Button,
   createDocumentResource,
   createResource,
@@ -141,7 +142,6 @@ import {
   toast,
   Tooltip,
 } from "frappe-ui";
-import Avatar from "frappe-ui/src/components/Avatar.vue";
 import { computed, h, ref } from "vue";
 import LucideLock from "~icons/lucide/lock";
 import LucideUnlock from "~icons/lucide/unlock";

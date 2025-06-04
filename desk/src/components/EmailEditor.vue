@@ -13,7 +13,6 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :upload-function="uploadFunction"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -169,7 +168,6 @@ import {
   getFontFamily,
   isContentEmpty,
   textEditorMenuButtons,
-  uploadFunction,
   validateEmail,
 } from "@/utils";
 // import { EditorContent } from "@tiptap/vue-3";

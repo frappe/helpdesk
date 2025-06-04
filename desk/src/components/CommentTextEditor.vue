@@ -15,7 +15,6 @@
     :mentions="agents"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
-    :upload-function="uploadFunction"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
@@ -112,12 +111,7 @@ import { useAgentStore } from "@/stores/agent";
 
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import {
-  getFontFamily,
-  isContentEmpty,
-  textEditorMenuButtons,
-  uploadFunction,
-} from "@/utils";
+import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
