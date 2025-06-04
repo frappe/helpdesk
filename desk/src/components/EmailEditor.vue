@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-6 md:mx-10 max-h-[50vh] py-3',
+      'prose-sm max-w-full mx-6 md:mx-10 max-h-[50vh] py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
       editable && '!max-h-[35vh] overflow-y-auto',
@@ -63,6 +63,12 @@
         />
       </div>
     </template>
+    <template v-slot:editor="{ editor }">
+      <EditorContent
+        :class="[editable && 'max-h-[35vh] overflow-y-auto']"
+        :editor="editor"
+      />
+    </template>
     <template #bottom>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
@@ -82,9 +88,9 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between gap-2 overflow-hidden px-10 py-2.5 items-center"
+        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
       >
-        <div class="flex items-center overflow-x-auto w-4/6">
+        <div class="flex items-center overflow-x-auto w-[70%]">
           <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
             <FileUploader
@@ -123,7 +129,9 @@
             </Button>
           </div>
         </div>
-        <div class="flex items-center justify-end space-x-2 sm:mt-0 w-2/6">
+        <div
+          class="flex items-center justify-end space-x-2 sm:mt-0 w-[30%] mr-9"
+        >
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
@@ -162,6 +170,7 @@ import {
   textEditorMenuButtons,
   validateEmail,
 } from "@/utils";
+import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,

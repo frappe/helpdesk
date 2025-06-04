@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-[382px] flex-col justify-between border-l">
+  <div class="flex !w-[382px] flex-col justify-between border-l">
     <div
       class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9 justify-between"
     >
@@ -44,15 +44,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import TicketAgentDetails from "./TicketAgentDetails.vue";
+import { Ticket } from "@/types";
+import { copyToClipboard } from "@/utils";
+import { computed, ref } from "vue";
+import LucideMerge from "~icons/lucide/merge";
 import TicketAgentContact from "./TicketAgentContact.vue";
+import TicketAgentDetails from "./TicketAgentDetails.vue";
 import TicketAgentFields from "./TicketAgentFields.vue";
 import TicketMergeModal from "./TicketMergeModal.vue";
-import LucideMerge from "~icons/lucide/merge";
-import { copyToClipboard } from "@/utils";
-import { Ticket } from "@/types";
-import { computed } from "vue";
 
 interface Props {
   ticket: Ticket;
