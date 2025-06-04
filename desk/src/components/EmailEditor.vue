@@ -90,7 +90,7 @@
       <div
         class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
       >
-        <div class="flex items-center overflow-x-auto w-[70%]">
+        <div class="flex items-center overflow-x-auto w-[60%]">
           <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
             <FileUploader
@@ -130,7 +130,7 @@
           </div>
         </div>
         <div
-          class="flex items-center justify-end space-x-2 sm:mt-0 w-[30%] mr-9"
+          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
         >
           <Button label="Discard" @click="handleDiscard" />
           <Button
@@ -215,6 +215,11 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+const label = computed(() => {
+  return sendMail.loading ? "Sending..." : props.label;
+});
+
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 

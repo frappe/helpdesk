@@ -157,6 +157,10 @@ const commentEmpty = computed(() => {
 });
 const loading = ref(false);
 
+const label = computed(() => {
+  return loading ? "Sending..." : props.label;
+});
+
 const agents = computed(() => {
   return (
     agentsList.data?.map((agent) => ({
