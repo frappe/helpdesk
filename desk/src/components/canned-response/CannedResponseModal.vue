@@ -47,7 +47,6 @@
 </template>
 
 <script setup>
-import { uploadFunction } from "@/utils";
 import { TextEditor, call, TextInput } from "frappe-ui";
 
 const props = defineProps({
