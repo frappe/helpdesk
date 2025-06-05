@@ -319,10 +319,7 @@ class HDTicket(Document):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
             # TODO: temporary fix, remove this when only agents can be assigned to ticket
-            exists = frappe.db.exists("HD Agent", assignees[0].owner)
-            if exists:
-                agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
-                return agent_doc
+            return frappe.db.exists("HD Agent", assignees[0].owner)
 
         return None
 
