@@ -129,7 +129,6 @@ import { PreserveIds } from "@/tiptap-extensions";
 import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
 import {
   copyToClipboard,
-  createToast,
   isCustomerPortal,
   textEditorMenuButtons,
 } from "@/utils";
@@ -142,6 +141,7 @@ import {
   Dropdown,
   TextEditor,
   TextEditorFixedMenu,
+  toast,
 } from "frappe-ui";
 import { computed, h, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -254,18 +254,11 @@ function handleMoveToCategory(category: string) {
       onSuccess: () => {
         article.reload();
         moveToModal.value = false;
-        createToast({
-          title: "Articles moved successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Article moved");
       },
       onError: (error: Error) => {
-        createToast({
-          title: error?.messages?.[0] || error.message,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        let msg = error?.messages?.[0] || error.message;
+        toast.error(msg);
         moveToModal.value = false;
       },
     }
@@ -307,11 +300,7 @@ function handleArticleUpdate() {
             category: props.articleId,
           },
         });
-        createToast({
-          title: "Article updated successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Article updated");
         isDirty.value = false;
         article.reload();
       },
@@ -335,11 +324,7 @@ function handleDelete() {
             },
             {
               onSuccess: () => {
-                createToast({
-                  title: "Article deleted successfully",
-                  icon: "check",
-                  iconClasses: "text-green-600",
-                });
+                toast.success("Article deleted");
                 router.push({
                   name: "AgentKnowledgeBase",
                 });
@@ -416,7 +401,7 @@ const articleActions = computed(() => [
     onClick: () => {
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.href, article.data.title);
+      copyToClipboard();
     },
   },
   {

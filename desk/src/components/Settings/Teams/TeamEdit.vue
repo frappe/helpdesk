@@ -132,16 +132,16 @@
 import Link from "@/components/frappe-ui/Link.vue";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
-import { createToast } from "@/utils";
 import {
+  Avatar,
   Button,
   createDocumentResource,
   createResource,
   Dialog,
   Dropdown,
+  toast,
   Tooltip,
 } from "frappe-ui";
-import Avatar from "frappe-ui/src/components/Avatar.vue";
 import { computed, h, ref } from "vue";
 import LucideLock from "~icons/lucide/lock";
 import LucideUnlock from "~icons/lucide/unlock";
@@ -165,11 +165,7 @@ const team = createDocumentResource({
   auto: true,
   delete: {
     onSuccess() {
-      createToast({
-        title: "Team deleted successfully",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      toast.success("Team deleted");
       emit("update:step", "team-list");
     },
   },
@@ -254,11 +250,7 @@ function renameTeam(close) {
         return "New and old title cannot be same";
     },
     onSuccess() {
-      createToast({
-        title: "Team renamed successfully",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      toast.success("Team renamed");
       close();
       emit("update:step", "team-list");
     },

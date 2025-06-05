@@ -40,9 +40,8 @@
 </template>
 
 <script setup lang="ts">
+import { Dialog, createResource, toast } from "frappe-ui";
 import { ref } from "vue";
-import { Dialog, createResource } from "frappe-ui";
-import { createToast } from "@/utils";
 import LucideSplit from "~icons/lucide/split";
 import TriangleAlert from "~icons/lucide/triangle-alert";
 
@@ -75,11 +74,7 @@ const splitTicket = createResource({
     if (!communication_id) throw { message: "Communication ID is required" };
   },
   onSuccess: (newTicket: string) => {
-    createToast({
-      title: "Ticket split successfully",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Ticket split successfully");
     showDialog.value = false;
     window.open(
       window.location.origin + "/helpdesk/tickets/" + newTicket,
