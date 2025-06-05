@@ -1,11 +1,9 @@
-import { computed, ref, watch } from "vue";
-import { createResource, createListResource, call } from "frappe-ui";
-import { View } from "@/types";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
-
-const auth = useAuthStore();
+import { call, createListResource, createResource } from "frappe-ui";
+import { computed, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 export const views = createListResource({
   doctype: "HD View",
@@ -26,6 +24,7 @@ export const currentView = ref({
 });
 
 export function useView(dt: string = null) {
+  const auth = useAuthStore();
   const router = useRouter();
   function callGetViews() {
     if (
@@ -35,7 +34,6 @@ export function useView(dt: string = null) {
     ) {
       return;
     }
-
     const filters = {
       is_customer_portal: isCustomerPortal.value,
     };

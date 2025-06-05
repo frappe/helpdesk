@@ -12,16 +12,12 @@
           class="w-full px-6 md:px-10 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
-            class="relative flex justify-center after:absolute after:left-[50%] after:top-1 after:-z-10 after:border-l after:border-gray-200"
+            class="relative flex justify-center after:absolute after:left-[50%] after:top-2 after:-z-10 after:border-l after:border-gray-200"
             :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
               class="z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white"
-              :class="[
-                activity.type === 'comment' ? 'mt-0.5' : '',
-                activity.type === 'history' ? 'mt-0.5' : '',
-                activity.type === 'email' ? 'mt-2' : '',
-              ]"
+              :class="[activity.type === 'email' && 'mt-2']"
             >
               <Avatar
                 v-if="activity.type === 'email'"

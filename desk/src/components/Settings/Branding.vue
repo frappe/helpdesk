@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col gap-4">
-    <h1 class="text-lg font-semibold">Customise your Helpdesk</h1>
+    <div class="flex items-center justify-between">
+      <h1 class="text-lg font-semibold py-[5px]">Customise your Helpdesk</h1>
+    </div>
 
     <!-- Brand Logo & Favicon -->
     <div v-for="config in brandingConfig" class="flex flex-col gap-2">
@@ -44,10 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { FileUploader, Avatar, createResource } from "frappe-ui";
-import { computed, reactive } from "vue";
 import { useConfigStore } from "@/stores/config";
-import { createToast } from "@/utils";
+import { Avatar, createResource, FileUploader, toast } from "frappe-ui";
+import { computed, reactive } from "vue";
 
 const config = useConfigStore();
 
@@ -102,11 +103,7 @@ const settingsResource = createResource({
     }
   },
   onError() {
-    createToast({
-      title: "Failed to update, please try again",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Failed to update, please try again");
     loadingState.logoLoading = false;
     loadingState.faviconLoading = false;
   },
@@ -128,23 +125,13 @@ function handleLogoChange(url: string) {
   state.brandLogo = url;
   loadingState.logoLoading = false;
 
-  createToast({
-    title: "Brand Logo Updated",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success("Brand logo updated");
 }
 
 function handleFaviconChange(url: string) {
   state.brandFavicon = url;
   loadingState.faviconLoading = false;
-
-  createToast({
-    title: "Favicon Updated",
-    text: "Please refresh the page to see the changes",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success("Favicon updated, please refresh the page to see the changes");
 }
 </script>
 

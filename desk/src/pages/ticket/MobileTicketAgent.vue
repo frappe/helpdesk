@@ -182,6 +182,7 @@ import {
   Tabs,
   call,
   createResource,
+  toast,
 } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, provide, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -209,7 +210,6 @@ import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
 import { TabObject, TicketTab } from "@/types";
-import { createToast } from "@/utils";
 
 const ticketStatusStore = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -259,9 +259,10 @@ const ticket = createResource({
       doc: data,
       call,
       router,
+      toast,
       $dialog,
       updateField,
-      createToast,
+      createToast: toast.create,
     });
   },
 });
@@ -411,11 +412,7 @@ function updateTicket(fieldname: string, value: string) {
     onSuccess: () => {
       isLoading.value = false;
       ticket.reload();
-      createToast({
-        title: "Ticket updated",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      toast.success("Ticket updated");
     },
   });
 }

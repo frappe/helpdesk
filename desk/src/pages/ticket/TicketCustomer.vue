@@ -22,15 +22,15 @@
         </Button>
       </template>
     </LayoutHeader>
-    <div class="flex overflow-hidden h-full">
+    <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
-      <section class="flex flex-col flex-1">
+      <section class="flex flex-col flex-1 max-w-[calc(100%-382px)]">
         <!-- show for only mobile -->
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
         <TicketConversation class="grow" />
         <div
-          class="m-5"
+          class="w-full p-5"
           @keydown.ctrl.enter.capture.stop="sendEmail"
           @keydown.meta.enter.capture.stop="sendEmail"
         >
@@ -40,7 +40,7 @@
             v-model:attachments="attachments"
             v-model:content="editorContent"
             v-model:expand="isExpanded"
-            :placeholder="placeholder"
+            placeholder="Type a message"
             autofocus
             @clear="() => (isExpanded = false)"
           >
@@ -65,24 +65,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, provide, ref } from "vue";
-import { createResource, Button, Breadcrumbs, call } from "frappe-ui";
+import { LayoutHeader } from "@/components";
+import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { useScreenSize } from "@/composables/screen";
+import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
+import { isContentEmpty } from "@/utils";
 import { Icon } from "@iconify/vue";
-import { ITicket } from "./symbols";
+import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
+import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { useRouter } from "vue-router";
-import { createToast, isContentEmpty } from "@/utils";
-import { setupCustomizations } from "@/composables/formCustomisation";
-import { socket } from "@/socket";
-import { LayoutHeader } from "@/components";
-import { useScreenSize } from "@/composables/screen";
+import { useTicket } from "./data";
+import { ITicket } from "./symbols";
 import TicketConversation from "./TicketConversation.vue";
 import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
-import TicketTextEditor from "./TicketTextEditor.vue";
 import TicketFeedback from "./TicketFeedback.vue";
-import TicketCustomerSidebar from "@/components/ticket/TicketCustomerSidebar.vue";
-import { useTicket } from "./data";
+import TicketTextEditor from "./TicketTextEditor.vue";
 
 interface P {
   ticketId: string;
@@ -99,23 +99,19 @@ const ticket = useTicket(
       doc: data,
       call,
       router,
+      toast,
       $dialog,
       updateField,
-      createToast,
+      createToast: toast.create,
     });
   },
   () => {
-    createToast({
-      title: "Ticket not found",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Ticket not found");
     router.replace("/my-tickets");
   }
 );
 provide(ITicket, ticket);
 const editor = ref(null);
-const placeholder = "Type a message";
 const editorContent = ref("");
 const attachments = ref([]);
 const showFeedbackDialog = ref(false);
@@ -168,11 +164,7 @@ function updateTicket(fieldname: string, value: string) {
     auto: true,
     onSuccess: () => {
       ticket.reload();
-      createToast({
-        title: "Ticket updated",
-        icon: "check",
-        iconClasses: "text-green-600",
-      });
+      toast.success("Ticket updated");
     },
   });
 }
@@ -199,12 +191,7 @@ function showConfirmationDialog() {
             { fieldname: "status", value: "Closed" },
             {
               onSuccess: () => {
-                createToast({
-                  title: "Ticket closed successfully",
-                  icon: "check",
-                  iconClasses: "text-green-600",
-                  position: "top-right",
-                });
+                toast.success("Ticket closed");
               },
             }
           );

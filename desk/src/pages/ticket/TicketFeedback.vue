@@ -62,9 +62,9 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watch } from "vue";
-import { createResource, createListResource } from "frappe-ui";
 import { StarRating } from "@/components";
+import { createListResource, createResource } from "frappe-ui";
+import { inject, ref, watch } from "vue";
 import { ITicket } from "./symbols";
 
 interface P {

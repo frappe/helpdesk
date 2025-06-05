@@ -2,7 +2,7 @@
   <div class="flex h-full flex-col gap-4">
     <!-- title and desc -->
     <div role="heading" aria-level="1" class="flex flex-col gap-1">
-      <h5 class="text-lg font-semibold">Setup Email</h5>
+      <h5 class="text-lg font-semibold pt-[5px]">Setup Email</h5>
       <p class="text-sm text-gray-600">
         Choose the email service provider you want to configure.
       </p>
@@ -12,7 +12,7 @@
       <div
         v-for="s in services"
         :key="s.name"
-        class="min-w-3 mt-4 flex flex-col items-center gap-1"
+        class="min-w-3 flex flex-col items-center gap-1"
         @click="handleSelect(s)"
       >
         <EmailProviderIcon
@@ -95,8 +95,7 @@
 
 <script setup lang="ts">
 import { EmailAccount, EmailService, EmailStep } from "@/types";
-import { createToast } from "@/utils";
-import { createResource } from "frappe-ui";
+import { createResource, toast } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, Reactive, reactive, Ref, ref } from "vue";
 import CircleAlert from "~icons/lucide/circle-alert";
@@ -149,11 +148,7 @@ const addEmailRes = createResource({
     };
   },
   onSuccess: () => {
-    createToast({
-      title: "Email account created successfully",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Email account created");
     emit("update:step", "email-list");
     updateOnboardingStep("setup_email_account");
   },

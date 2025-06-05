@@ -37,9 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import { Dialog, Input, createResource, toast } from "frappe-ui";
 import { reactive } from "vue";
-import { Input, Dialog, createResource } from "frappe-ui";
-import { createToast } from "@/utils";
 
 const emit = defineEmits(["customerCreated"]);
 const model = defineModel<boolean>();
@@ -62,29 +61,17 @@ const customerResource = createResource({
   onSuccess: () => {
     state.customer = "";
     state.domain = "";
-    createToast({
-      title: "Customer Created Successfully ",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Customer created");
     emit("customerCreated");
   },
   onError: (err) => {
-    createToast({
-      title: err.messages[0],
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error(err.messages[0]);
   },
 });
 
 function addCustomer() {
   if (!state.customer) {
-    createToast({
-      title: "Customer Name is required",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.error("Customer name is required");
     return;
   }
   customerResource.submit({

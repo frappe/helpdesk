@@ -37,14 +37,7 @@
             private: true,
           }"
           @success="(f: File) => $emit('update:attachments', [...attachments, f])"
-          @failure="
-            () =>
-              createToast({
-                title: 'Error Uploading File',
-                icon: 'x',
-                iconClasses: 'text-red-600',
-              })
-          "
+          @failure="() => toast.error('Error uploading file')"
         >
           <template #default="{ openFileSelector }">
             <Button theme="gray" variant="ghost" @click="openFileSelector()">
@@ -83,17 +76,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { FileUploader } from "frappe-ui";
-import { Icon } from "@iconify/vue";
-import { useAuthStore } from "@/stores/auth";
 import {
   AttachmentItem,
   TextEditor as HTextEditor,
   UserAvatar,
 } from "@/components";
+import { useAuthStore } from "@/stores/auth";
 import { File } from "@/types";
-import { createToast } from "@/utils";
+import { Icon } from "@iconify/vue";
+import { FileUploader, toast } from "frappe-ui";
+import { computed, ref } from "vue";
 
 interface P {
   content: string;

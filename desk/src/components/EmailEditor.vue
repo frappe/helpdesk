@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-6 md:mx-10 max-h-[50vh] py-3',
+      'prose-sm max-w-full mx-6 md:mx-10 max-h-[50vh] py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
       editable && '!max-h-[35vh] overflow-y-auto',
@@ -63,6 +63,12 @@
         />
       </div>
     </template>
+    <!-- <template v-slot:editor="{ _editor }">
+      <EditorContent
+        :class="[editable && 'max-h-[35vh] overflow-y-auto']"
+        :editor="_editor"
+      />
+    </template> -->
     <template #bottom>
       <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
@@ -81,8 +87,10 @@
         </AttachmentItem>
       </div>
       <!-- TextEditor Fixed Menu -->
-      <div class="flex justify-between gap-2 overflow-hidden px-10 py-2.5">
-        <div class="flex items-center overflow-x-auto w-4/6">
+      <div
+        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
+      >
+        <div class="flex items-center overflow-x-auto w-[60%]">
           <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
             <FileUploader
@@ -121,7 +129,9 @@
             </Button>
           </div>
         </div>
-        <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0 w-2/6">
+        <div
+          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
+        >
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
@@ -155,18 +165,19 @@ import { AttachmentIcon, EmailIcon } from "@/components/icons";
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
-  createToast,
   getFontFamily,
   isContentEmpty,
   textEditorMenuButtons,
   validateEmail,
 } from "@/utils";
+// import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
   TextEditor,
   TextEditorFixedMenu,
   createResource,
+  toast,
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, ref } from "vue";
@@ -204,6 +215,11 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+const label = computed(() => {
+  return sendMail.loading ? "Sending..." : props.label;
+});
+
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
@@ -261,11 +277,9 @@ function submitMail() {
     return false;
   }
   if (!toEmailsClone.value.length) {
-    createToast({
-      text: "Please enter a recipient email address",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
+    toast.warning(
+      "Email has no recipients. Please add at least one email address in the 'TO' field."
+    );
     return false;
   }
 

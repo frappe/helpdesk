@@ -1,11 +1,5 @@
 <template>
-  <div
-    v-if="_avatars?.length"
-    class="mr-1.5 flex cursor-pointer items-center"
-    :class="[
-      _avatars?.length > 1 ? 'flex-row-reverse' : 'truncate [&>div]:truncate',
-    ]"
-  >
+  <div v-if="_avatars?.length" class="mr-1.5 flex cursor-pointer items-center">
     <div v-if="_avatars?.length == 1" class="flex items-center gap-2 text-base">
       <Tooltip :text="_avatars[0].name">
         <Avatar
@@ -35,9 +29,9 @@
   </div>
 </template>
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
 import { Avatar, Tooltip } from "frappe-ui";
 import { computed } from "vue";
-import { useUserStore } from "@/stores/user";
 
 const props = defineProps({
   avatars: {

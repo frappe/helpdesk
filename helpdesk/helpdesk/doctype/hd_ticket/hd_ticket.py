@@ -72,7 +72,7 @@ class HDTicket(Document):
             )
             capture_event("ticket_split")
             return
-        log_ticket_activity(self.name, "created this ticket")
+
         capture_event("ticket_created")
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
@@ -319,10 +319,7 @@ class HDTicket(Document):
         assignees = get_assignees({"doctype": "HD Ticket", "name": self.name})
         if len(assignees) > 0:
             # TODO: temporary fix, remove this when only agents can be assigned to ticket
-            exists = frappe.db.exists("HD Agent", assignees[0].owner)
-            if exists:
-                agent_doc = frappe.get_doc("HD Agent", assignees[0].owner)
-                return agent_doc
+            return frappe.db.exists("HD Agent", assignees[0].owner)
 
         return None
 
@@ -539,7 +536,6 @@ class HDTicket(Document):
 
         if self.status == "Replied":
             self.status = "Open"
-            log_ticket_activity(self.name, "set status to Open")
             self.save(ignore_permissions=True)
 
         c = frappe.new_doc("Communication")
