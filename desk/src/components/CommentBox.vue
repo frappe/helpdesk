@@ -108,7 +108,6 @@ import {
   isContentEmpty,
   textEditorMenuButtons,
   timeAgo,
-  uploadFunction,
 } from "@/utils";
 import {
   Avatar,

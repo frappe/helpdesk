@@ -5,7 +5,7 @@
       :extensions="[PreserveVideoControls]"
       v-bind="$attrs"
       :editor-class="[
-        'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-5rem',
+        'prose-f max-h-64 max-w-none  overflow-auto my-4 min-h-[5rem]',
         getFontFamily(modelValue),
       ]"
       bubble-menu
