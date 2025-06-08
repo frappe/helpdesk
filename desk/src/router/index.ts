@@ -102,7 +102,7 @@ const routes = [
     component: () => import("@/pages/CannedResponses.vue"),
   },
   {
-    path: "dashboard",
+    path: "/dashboard",
     name: "Dashboard",
     component: () => import("@/pages/dashboard/Dashboard.vue"),
   },
