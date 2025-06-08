@@ -1,7 +1,7 @@
 <template>
   <div v-if="!quickFilters.loading">
     <FadedScrollableDiv
-      class="flex flex-1 items-center -ml-1 flex-wrap gap-1 gap-y-2"
+      class="flex flex-1 items-center -ml-1 flex-wrap gap-2"
       orientation="horizontal"
     >
       <div

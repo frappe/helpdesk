@@ -35,7 +35,7 @@
         </Button>
       </span>
     </div>
-    <div class="divide-y text-base">
+    <div class="divide-y text-base" v-if="notificationStore.data.length > 0">
       <RouterLink
         v-for="n in notificationStore.data"
         :key="n.name"
@@ -75,17 +75,24 @@
         </span>
       </RouterLink>
     </div>
+    <div
+      v-if="notificationStore.data.length === 0"
+      class="p-5 text-center text-p-sm text-gray-600 flex justify-center items-center gap-2"
+    >
+      <LucideBellOff class="h-4 w-4" />
+      <p>No notifications</p>
+    </div>
   </span>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { onClickOutside } from "@vueuse/core";
-import { dayjs } from "@/dayjs";
-import { Notification } from "@/types";
-import { useSidebarStore } from "@/stores/sidebar";
-import { useNotificationStore } from "@/stores/notification";
 import { UserAvatar } from "@/components";
+import { dayjs } from "@/dayjs";
+import { useNotificationStore } from "@/stores/notification";
+import { useSidebarStore } from "@/stores/sidebar";
+import { Notification } from "@/types";
+import { onClickOutside } from "@vueuse/core";
+import { ref } from "vue";
 
 const notificationStore = useNotificationStore();
 const sidebarStore = useSidebarStore();

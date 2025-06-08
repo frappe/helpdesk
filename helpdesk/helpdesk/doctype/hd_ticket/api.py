@@ -463,3 +463,14 @@ def duplicate_ticket(ticket_doc, subject):
     new_ticket.insert(ignore_permissions=True)
 
     return new_ticket.name
+
+
+@frappe.whitelist()
+def get_ticket_statuses():
+    meta = frappe.get_meta("HD Ticket")
+    status_df = meta.get_field("status")
+    if not status_df or not status_df.options:
+        return ["Open", "Replied", "Resolved", "Closed"]
+    statuses = status_df.options.split("\n")
+    print("\n\n", statuses, "\n\n")
+    return statuses

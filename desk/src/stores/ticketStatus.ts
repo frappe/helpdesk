@@ -1,10 +1,15 @@
-import { computed, ref } from "vue";
+import { createResource } from "frappe-ui";
 import { defineStore } from "pinia";
+import { computed } from "vue";
 
 export const useTicketStatusStore = defineStore("ticketStatus", () => {
-  const options = ref(["Open", "Replied", "Resolved", "Closed"]);
+  const options = createResource({
+    url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_ticket_statuses",
+    auto: true,
+    cache: ["ticket_statuses"],
+  });
   const dropdown = computed(() =>
-    options.value.map((o) => ({
+    options.data?.map((o) => ({
       label: o,
       value: o,
     }))
