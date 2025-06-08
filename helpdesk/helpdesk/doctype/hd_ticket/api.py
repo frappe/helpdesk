@@ -472,5 +472,4 @@ def get_ticket_statuses():
     if not status_df or not status_df.options:
         return ["Open", "Replied", "Resolved", "Closed"]
     statuses = status_df.options.split("\n")
-    print("\n\n", statuses, "\n\n")
     return statuses
