@@ -86,7 +86,7 @@ def get_ticket_count(from_date, to_date):
 					WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s 
 					THEN name
 					ELSE NULL
-				END)
+				END) as prev_month_count
 		FROM `tabHD Ticket`
     """,
         {
