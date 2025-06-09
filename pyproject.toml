@@ -10,6 +10,7 @@ dynamic = ["version"]
 dependencies = [
     # Core dependencies
     "textblob==0.18.0.post0",
+    "redis~=6.2.0",
 ]
 [build-system]
 requires = ["flit_core >=3.4,<4"]
