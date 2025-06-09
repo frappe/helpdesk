@@ -91,7 +91,6 @@
         class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
-          <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
           <div class="flex gap-1">
             <FileUploader
               :upload-args="{
@@ -128,6 +127,7 @@
               </template>
             </Button>
           </div>
+          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
         </div>
         <div
           class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
