@@ -181,7 +181,7 @@ const colors = [
 
 const ticketTrendConfig = {
   data: [
-    { date: new Date("2024-05-01"), open: 6, closed: 122, sla_fulfilled: 78 },
+    { date: "2024-05-01", open: 6, closed: 122, sla_fulfilled: 78 },
     { date: new Date("2024-05-02"), open: 8, closed: 163, sla_fulfilled: 82 },
     { date: new Date("2024-05-03"), open: 3, closed: 119, sla_fulfilled: 85 },
     { date: new Date("2024-05-04"), open: 7, closed: 161, sla_fulfilled: 80 },
