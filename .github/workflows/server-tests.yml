@@ -115,6 +115,7 @@ jobs:
           TYPE: server
           FRAPPE_USER: ${{ github.event.inputs.user }}
           FRAPPE_BRANCH: ${{ github.event.inputs.branch }}
+          HD_BRANCH: ${{ github.base_ref || github.ref_name }}
 
       # - name: Run Tests
       #   run: 'cd ~/frappe-bench/ && bench --site test_site run-tests --app helpdesk'
