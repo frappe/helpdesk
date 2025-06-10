@@ -9,7 +9,7 @@ sudo apt remove mysql-server mysql-client
 sudo apt install libcups2-dev redis-server mariadb-client libmariadb-dev
 
 pip install frappe-bench
-HD_BRANCH=${HELPDESK_BRANCH:-"develop"}
+HD_BRANCH=${HD_BRANCH:-"develop"}
 FRAPPE_BRANCH=${FRAPPE_BRANCH:-"develop"}
 # if HD BRANCH IS Develop, then FRAPPE_BRANCH should also be develop
 if [ "${HD_BRANCH}" = "develop" ]; then
