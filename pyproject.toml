@@ -10,8 +10,10 @@ dynamic = ["version"]
 dependencies = [
     # Core dependencies
     "textblob==0.18.0.post0",
-    "redis~=6.2.0",
 ]
 [build-system]
 requires = ["flit_core >=3.4,<4"]
 build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=15.40.4,<16.0.0"
