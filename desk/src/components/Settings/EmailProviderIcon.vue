@@ -5,14 +5,14 @@
   >
     <img :src="logo" class="h-6 w-6" />
   </div>
-  <p v-if="serviceName" class="text-center text-xs text-gray-700">
+  <p v-if="serviceName" class="text-center text-p-xs text-gray-700">
     {{ serviceName }}
   </p>
 </template>
 
 <script setup lang="ts">
 interface P {
-  serviceName: string;
+  serviceName?: string;
   logo?: string;
   selected?: boolean;
 }

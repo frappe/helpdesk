@@ -1,11 +1,11 @@
 <template>
   <TextEditor
     v-if="agentsList.data"
-    ref="textEditor"
+    ref="editorRef"
     :editor-class="[
       'prose-sm max-w-none',
       editable &&
-        'min-h-[7rem] mx-10 max-h-[50vh] overflow-y-auto border-t py-3',
+        'min-h-[7rem] mx-6 md:ml-10 md:mr-9 max-h-[50vh] overflow-y-auto border-t py-3',
       getFontFamily(newComment),
     ]"
     :content="newComment"
@@ -17,8 +17,9 @@
     :extensions="[PreserveVideoControls]"
   >
     <template #bottom>
-      <div v-if="editable" class="flex flex-col gap-2">
-        <div class="flex flex-wrap gap-2 px-10">
+      <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
+        <!-- Attachments -->
+        <div class="flex flex-wrap gap-2">
           <AttachmentItem
             v-for="a in attachments"
             :key="a.file_url"
@@ -33,10 +34,9 @@
             </template>
           </AttachmentItem>
         </div>
-        <div
-          class="flex justify-between gap-2 overflow-hidden border-t px-10 py-2.5"
-        >
-          <div class="flex items-center overflow-x-auto">
+        <!-- Fixed Menu -->
+        <div class="flex justify-between overflow-hidden border-t py-2.5">
+          <div class="flex items-center overflow-x-auto w-[60%]">
             <TextEditorFixedMenu
               class="-ml-1"
               :buttons="textEditorMenuButtons"
@@ -65,7 +65,7 @@
               </template>
             </FileUploader>
           </div>
-          <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
+          <div class="flex items-center justify-end space-x-2 w-[40%]">
             <Button
               label="Discard"
               @click="
@@ -78,7 +78,7 @@
             />
             <Button
               variant="solid"
-              label="Comment"
+              :label="label"
               :disabled="commentEmpty"
               :loading="loading"
               @click="
@@ -96,29 +96,47 @@
   </TextEditor>
 </template>
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
 import {
-  TextEditorFixedMenu,
-  TextEditor,
   FileUploader,
+  TextEditor,
+  TextEditorFixedMenu,
   createResource,
 } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, onMounted, ref } from "vue";
 
-import { AttachmentIcon } from "@/components/icons/";
 import { AttachmentItem } from "@/components/";
+import { AttachmentIcon } from "@/components/icons/";
 import { useAgentStore } from "@/stores/agent";
-import { useStorage } from "@vueuse/core";
-import { PreserveVideoControls } from "@/tiptap-extensions";
-import { isContentEmpty, textEditorMenuButtons, getFontFamily } from "@/utils";
 
+import { useAuthStore } from "@/stores/auth";
+import { PreserveVideoControls } from "@/tiptap-extensions";
+import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
+import { useStorage } from "@vueuse/core";
+
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { agents: agentsList } = useAgentStore();
+const { isManager } = useAuthStore();
+
 onMounted(() => {
+  if (
+    agentsList.loading ||
+    agentsList.data?.length ||
+    agentsList.list.promise
+  ) {
+    return;
+  }
   agentsList.fetch();
 });
+
 const props = defineProps({
   placeholder: {
     type: String,
     default: null,
+  },
+  label: {
+    type: String,
+    default: "Comment",
   },
   editable: {
     type: Boolean,
@@ -139,6 +157,10 @@ const commentEmpty = computed(() => {
 });
 const loading = ref(false);
 
+const label = computed(() => {
+  return loading.value ? "Sending..." : props.label;
+});
+
 const agents = computed(() => {
   return (
     agentsList.data?.map((agent) => ({
@@ -154,7 +176,7 @@ function removeAttachment(attachment) {
 
 async function submitComment() {
   if (isContentEmpty(newComment.value)) {
-    return;
+    return false;
   }
   const comment = createResource({
     url: "run_doc_method",
@@ -168,6 +190,9 @@ async function submitComment() {
       },
     }),
     onSuccess: () => {
+      if (isManager) {
+        updateOnboardingStep("comment_on_ticket");
+      }
       emit("submit");
       loading.value = false;
       attachments.value = [];
@@ -180,7 +205,12 @@ async function submitComment() {
 
   comment.submit();
 }
+
+const editorRef = ref(null);
+const editor = computed(() => editorRef.value?.editor);
+
 defineExpose({
   submitComment,
+  editor,
 });
 </script>

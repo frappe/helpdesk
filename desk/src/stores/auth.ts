@@ -1,7 +1,7 @@
-import { computed, ComputedRef, Ref, ref } from "vue";
+import { LOGIN_PAGE, router } from "@/router";
+import { call, createResource } from "frappe-ui";
 import { defineStore } from "pinia";
-import { createResource, call } from "frappe-ui";
-import { router, LOGIN_PAGE } from "@/router";
+import { computed, ComputedRef, Ref, ref } from "vue";
 
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
@@ -16,7 +16,10 @@ export const useAuthStore = defineStore("auth", () => {
   const userInfo = createResource({
     url: URI_USER_INFO,
   });
-  const init = userInfo.fetch;
+  const init = async () => {
+    if (userInfo.fetched) return;
+    await userInfo.fetch();
+  };
   const reloadUser = userInfo.reload;
 
   const user__ = computed(() => userInfo.data || {});
@@ -26,7 +29,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isAdmin: ComputedRef<boolean> = computed(() => user__.value.is_admin);
   const isAgent: ComputedRef<boolean> = computed(() => user__.value.is_agent);
   const isManager: ComputedRef<boolean> = computed(
-    () => user__.value.is_manager
+    () => user__.value.is_manager || user__.value.is_admin
   );
 
   const userId: ComputedRef<string> = computed(() => user__.value.user_id);

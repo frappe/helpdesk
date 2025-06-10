@@ -10,7 +10,9 @@
       <div class="flex gap-1.5">
         <Tooltip :text="contact.email_id">
           <Button class="h-7 w-7">
-            <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
+            <template #icon>
+              <EmailIcon class="h-4 w-4" @click="openEmailBox()" />
+            </template>
           </Button>
         </Tooltip>
         <!-- <RouterLink
@@ -39,8 +41,8 @@
 </template>
 
 <script setup lang="ts">
-import { Tooltip, Avatar } from "frappe-ui";
-import { EmailIcon, TicketIcon } from "@/components/icons/";
+import { EmailIcon } from "@/components/icons/";
+import { Avatar, Tooltip } from "frappe-ui";
 
 const props = defineProps({
   contact: {

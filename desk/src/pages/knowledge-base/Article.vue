@@ -111,42 +111,42 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted } from "vue";
-import {
-  Breadcrumbs,
-  debounce,
-  createResource,
-  Avatar,
-  TextEditor,
-  TextEditorFixedMenu,
-  Dropdown,
-  Button,
-} from "frappe-ui";
-import { useRouter, useRoute } from "vue-router";
+import DiscardButton from "@/components/DiscardButton.vue";
+import LayoutHeader from "@/components/LayoutHeader.vue";
+import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
+import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
 import { dayjs } from "@/dayjs";
-import {
-  updateRes as updateArticle,
-  deleteRes as deleteArticle,
-  moveToCategory,
-  incrementView,
-} from "@/stores/knowledgeBase";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
-import LayoutHeader from "@/components/LayoutHeader.vue";
-import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import DiscardButton from "@/components/DiscardButton.vue";
-import ArticleFeedback from "@/components/knowledge-base/ArticleFeedback.vue";
-import { Resource, Article, FeedbackAction, Error, Breadcrumb } from "@/types";
 import {
-  createToast,
-  textEditorMenuButtons,
-  copyToClipboard,
-  isCustomerPortal,
-} from "@/utils";
+  deleteRes as deleteArticle,
+  incrementView,
+  moveToCategory,
+  updateRes as updateArticle,
+} from "@/stores/knowledgeBase";
 import { capture } from "@/telemetry";
 import { PreserveIds } from "@/tiptap-extensions";
-import IconMoreHorizontal from "~icons/lucide/more-horizontal";
+import { Article, Breadcrumb, Error, FeedbackAction, Resource } from "@/types";
+import {
+  copyToClipboard,
+  isCustomerPortal,
+  textEditorMenuButtons,
+} from "@/utils";
+import {
+  Avatar,
+  Breadcrumbs,
+  Button,
+  createResource,
+  debounce,
+  Dropdown,
+  TextEditor,
+  TextEditorFixedMenu,
+  toast,
+} from "frappe-ui";
+import { computed, h, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import IconDot from "~icons/lucide/dot";
+import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 const props = defineProps({
   articleId: {
     type: String,
@@ -254,18 +254,11 @@ function handleMoveToCategory(category: string) {
       onSuccess: () => {
         article.reload();
         moveToModal.value = false;
-        createToast({
-          title: "Articles moved successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Article moved");
       },
       onError: (error: Error) => {
-        createToast({
-          title: error?.messages?.[0] || error.message,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        let msg = error?.messages?.[0] || error.message;
+        toast.error(msg);
         moveToModal.value = false;
       },
     }
@@ -307,11 +300,7 @@ function handleArticleUpdate() {
             category: props.articleId,
           },
         });
-        createToast({
-          title: "Article updated successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Article updated");
         isDirty.value = false;
         article.reload();
       },
@@ -327,7 +316,7 @@ function handleDelete() {
       {
         label: "Confirm",
         variant: "solid",
-        onClick(close: Function) {
+        onClick({ close }) {
           deleteArticle.submit(
             {
               doctype: "HD Article",
@@ -335,11 +324,7 @@ function handleDelete() {
             },
             {
               onSuccess: () => {
-                createToast({
-                  title: "Article deleted successfully",
-                  icon: "check",
-                  iconClasses: "text-green-600",
-                });
+                toast.success("Article deleted");
                 router.push({
                   name: "AgentKnowledgeBase",
                 });
@@ -416,7 +401,7 @@ const articleActions = computed(() => [
     onClick: () => {
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/articles/${props.articleId}`;
-      copyToClipboard(url.href, article.data.title);
+      copyToClipboard();
     },
   },
   {

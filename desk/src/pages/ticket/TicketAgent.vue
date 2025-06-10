@@ -52,7 +52,7 @@
       </template>
     </LayoutHeader>
     <div v-if="ticket.data" class="flex h-full overflow-hidden">
-      <div class="flex flex-1 flex-col">
+      <div class="flex flex-1 flex-col max-w-[calc(100%-382px)]">
         <!-- ticket activities -->
         <div class="overflow-y-hidden flex flex-1 !h-full flex-col">
           <Tabs v-model="tabIndex" :tabs="tabs">
@@ -140,44 +140,45 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, h, watch, onMounted, onUnmounted, provide } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import {
   Breadcrumbs,
-  Dropdown,
-  createResource,
   Dialog,
+  Dropdown,
   FormControl,
-  Tabs,
-  TabPanel,
   TabList,
+  TabPanel,
+  Tabs,
   call,
+  createResource,
+  toast,
 } from "frappe-ui";
+import { computed, h, onMounted, onUnmounted, provide, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 import {
-  LayoutHeader,
-  MultipleAvatar,
   AssignmentModal,
   CommunicationArea,
   Icon,
+  LayoutHeader,
+  MultipleAvatar,
 } from "@/components";
-import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
 import {
-  IndicatorIcon,
-  CommentIcon,
   ActivityIcon,
+  CommentIcon,
   EmailIcon,
+  IndicatorIcon,
 } from "@/components/icons";
+import { TicketAgentActivities, TicketAgentSidebar } from "@/components/ticket";
+import { setupCustomizations } from "@/composables/formCustomisation";
+import { useView } from "@/composables/useView";
 import { socket } from "@/socket";
+import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { useUserStore } from "@/stores/user";
-import { globalStore } from "@/stores/globalStore";
-import { createToast, getIcon } from "@/utils";
-import { setupCustomizations } from "@/composables/formCustomisation";
 import { TabObject, TicketTab, View } from "@/types";
-import { useView } from "@/composables/useView";
+import { getIcon } from "@/utils";
 import { ComputedRef } from "vue";
-
+import { showAssignmentModal } from "./modalStates";
 const route = useRoute();
 const router = useRouter();
 
@@ -206,7 +207,6 @@ const { findView } = useView("HD Ticket");
 
 provide("communicationArea", communicationAreaRef);
 
-const showAssignmentModal = ref(false);
 const showSubjectDialog = ref(false);
 
 const ticket = createResource({
@@ -227,15 +227,16 @@ const ticket = createResource({
     }
     renameSubject.value = data.subject;
   },
-  onSuccess: (ticket) => {
-    document.title = ticket.subject;
+  onSuccess: (data) => {
+    document.title = data.subject;
     setupCustomizations(ticket, {
-      doc: ticket,
+      doc: data,
       call,
       router,
+      toast,
       $dialog,
       updateField,
-      createToast,
+      createToast: toast.create,
     });
   },
 });
@@ -283,6 +284,15 @@ const dropdownOptions = computed(() =>
   }))
 );
 
+// watch(
+//   () => ticket.data,
+//   (val) => {
+//     console.log("CUSTOM ACTIONSSS");
+//     // console.log(val._customActions);
+//   },
+//   { deep: true }
+// );
+
 const tabIndex = ref(0);
 const tabs: TabObject[] = [
   {
@@ -313,7 +323,7 @@ const activities = computed(() => {
       key: email.creation,
       cc: email.cc,
       bcc: email.bcc,
-      creation: email.creation,
+      creation: email.communication_date || email.creation,
       attachments: email.attachments,
       name: email.name,
       isFirstEmail: idx === 0,
@@ -355,10 +365,11 @@ const activities = computed(() => {
   while (i < sorted.length) {
     const currentActivity = sorted[i];
     if (currentActivity.type === "history") {
-      currentActivity.relatedActivities = [];
+      currentActivity.relatedActivities = [currentActivity];
       for (let j = i + 1; j < sorted.length + 1; j++) {
         const nextActivity = sorted[j];
-        if (nextActivity && nextActivity.type === "history") {
+
+        if (nextActivity && nextActivity.user === currentActivity.user) {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
           data.push(currentActivity);
@@ -382,6 +393,7 @@ function filterActivities(eventType: TicketTab) {
 }
 const isErrorTriggered = ref(false);
 function updateTicket(fieldname: string, value: string) {
+  isErrorTriggered.value = false;
   if (value === ticket.data[fieldname]) return;
   updateOptimistic(fieldname, value);
 
@@ -400,9 +412,14 @@ function updateTicket(fieldname: string, value: string) {
       isErrorTriggered.value = false;
       ticket.reload();
     },
-    onError: () => {
+    onError: (error) => {
       if (isErrorTriggered.value) return;
       isErrorTriggered.value = true;
+
+      const text = error.exc_type
+        ? (error.messages || error.message || []).join(", ")
+        : error.message;
+      toast.error(text);
 
       ticket.reload();
     },
@@ -411,11 +428,7 @@ function updateTicket(fieldname: string, value: string) {
 
 function updateOptimistic(fieldname: string, value: string) {
   ticket.data[fieldname] = value;
-  createToast({
-    title: "Ticket updated",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success("Ticket updated");
 }
 
 onMounted(() => {

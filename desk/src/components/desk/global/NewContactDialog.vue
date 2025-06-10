@@ -10,6 +10,12 @@
           >
             <span class="mb-2 block text-sm leading-4 text-gray-700">
               {{ field.label }}
+              <span
+                v-if="field.required"
+                class="place-self-center text-red-500"
+              >
+                *
+              </span>
             </span>
             <Input
               v-if="field.type === 'input'"
@@ -21,7 +27,6 @@
               v-else
               v-model="state[field.value]"
               :options="customerResource.data"
-              :value="state[field.value]"
               @update:model-value="handleCustomerChange"
             />
             <ErrorMessage :message="error[field.error]" />
@@ -42,20 +47,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import { useContactStore } from "@/stores/contact";
+import { computed, ref } from "vue";
 
 import {
-  Input,
+  Autocomplete,
   Dialog,
   ErrorMessage,
-  createResource,
-  Autocomplete,
+  Input,
   createListResource,
+  createResource,
+  toast,
 } from "frappe-ui";
 import zod from "zod";
 
-import { createToast } from "@/utils";
 import { AutoCompleteItem } from "@/types";
 
 interface Props {
@@ -76,7 +81,7 @@ const state = ref({
   firstName: "",
   lastName: "",
   phone: "",
-  selectedCustomer: "",
+  selectedCustomer: null,
 });
 
 const error = ref({
@@ -92,6 +97,7 @@ interface FormField {
   value: string;
   error: string;
   type: string;
+  required: boolean;
   action?: () => void;
 }
 
@@ -101,6 +107,7 @@ const formFields: FormField[] = [
     value: "emailID",
     error: "emailValidationError",
     type: "input",
+    required: true,
     action: () => validateEmailInput(state.value.emailID),
   },
   {
@@ -108,6 +115,7 @@ const formFields: FormField[] = [
     value: "firstName",
     error: "firstNameValidationError",
     type: "input",
+    required: true,
     action: () => validateFirstName(state.value.firstName),
   },
   {
@@ -115,12 +123,14 @@ const formFields: FormField[] = [
     value: "lastName",
     error: "lastNameValidationError",
     type: "input",
+    required: false,
   },
   {
     label: "Phone",
     value: "phone",
     error: "phoneValidationError",
     type: "input",
+    required: false,
     action: () => validatePhone(state.value.phone),
   },
   {
@@ -128,7 +138,7 @@ const formFields: FormField[] = [
     value: "selectedCustomer",
     error: "customerValidationError",
     type: "autocomplete",
-    action: () => validateCustomer(state.value.selectedCustomer),
+    required: false,
   },
 ];
 
@@ -165,13 +175,9 @@ const contactResource = createResource({
       firstName: "",
       lastName: "",
       phone: "",
-      selectedCustomer: "",
+      selectedCustomer: null,
     };
-    createToast({
-      title: "Contact Created Successfully ",
-      icon: "check",
-      iconClasses: "text-green-600",
-    });
+    toast.success("Contact created");
     emit("contactCreated");
   },
 });
@@ -184,31 +190,34 @@ function createContact() {
     first_name: state.value.firstName,
     last_name: state.value.lastName,
     email_ids: [{ email_id: state.value.emailID, is_primary: true }],
-    links: [
-      {
-        link_doctype: "HD Customer",
-        link_name: state.value.selectedCustomer,
-      },
-    ],
+    links: [],
     phone_nos: [],
   };
   if (state.value.phone) {
     doc.phone_nos = [{ phone: state.value.phone }];
   }
+  if (state.value.selectedCustomer) {
+    doc.links.push({
+      link_doctype: "HD Customer",
+      link_name: state.value.selectedCustomer,
+    });
+  }
 
   contactResource.submit({ doc });
 }
 
-function handleCustomerChange(item: AutoCompleteItem) {
-  if (!item) return;
-  state.value.selectedCustomer = item.value;
+function handleCustomerChange(item: AutoCompleteItem | null) {
+  if (!item || item.label === "No label") {
+    state.value.selectedCustomer = null;
+  } else {
+    state.value.selectedCustomer = item.value;
+  }
 }
 
 function validateInputs() {
   let error = validateEmailInput(state.value.emailID);
   error += validateFirstName(state.value.firstName);
   error += validatePhone(state.value.phone);
-  error += validateCustomer(state.value.selectedCustomer);
   return error;
 }
 
@@ -241,14 +250,6 @@ function validatePhone(value: string) {
     error.value.phoneValidationError = "Enter a valid phone number";
   }
   return error.value.phoneValidationError;
-}
-
-function validateCustomer(value: string) {
-  error.value.customerValidationError = "";
-  if (!value || value.trim() === "") {
-    error.value.customerValidationError = "Customer should not be empty";
-  }
-  return error.value.customerValidationError;
 }
 
 function existingContactEmails(contacts) {

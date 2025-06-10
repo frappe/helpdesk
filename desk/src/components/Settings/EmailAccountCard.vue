@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-between items-center border-b border-gray-200 p-2 cursor-pointer"
+    class="flex justify-between items-center border-gray-200 p-2 pl-0 cursor-pointer"
   >
     <!-- avatar and name -->
     <div class="flex justify-between items-center gap-2">

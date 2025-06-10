@@ -37,34 +37,35 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref, reactive, computed, onMounted } from "vue";
-import {
-  usePageMeta,
-  FeatherIcon,
-  Button,
-  Dropdown,
-  createResource,
-  Badge,
-} from "frappe-ui";
-import { useRouter } from "vue-router";
-import {
-  updateCategoryTitle,
-  deleteRes as deleteCategory,
-  newCategory,
-  moveToCategory,
-  deleteArticles,
-  mergeCategory,
-} from "@/stores/knowledgeBase";
-import { globalStore } from "@/stores/globalStore";
-import { capture } from "@/telemetry";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ListViewBuilder from "@/components/ListViewBuilder.vue";
 import CategoryModal from "@/components/knowledge-base/CategoryModal.vue";
-import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
-import { createToast, copyToClipboard } from "@/utils";
-import { Error } from "@/types";
-import LucideMerge from "~icons/lucide/merge";
 import MergeCategoryModal from "@/components/knowledge-base/MergeCategoryModal.vue";
+import MoveToCategoryModal from "@/components/knowledge-base/MoveToCategoryModal.vue";
+import { globalStore } from "@/stores/globalStore";
+import {
+  deleteArticles,
+  deleteRes as deleteCategory,
+  mergeCategory,
+  moveToCategory,
+  newCategory,
+  updateCategoryTitle,
+} from "@/stores/knowledgeBase";
+import { capture } from "@/telemetry";
+import { Error } from "@/types";
+import { copyToClipboard } from "@/utils";
+import {
+  Badge,
+  Button,
+  Dropdown,
+  FeatherIcon,
+  createResource,
+  toast,
+  usePageMeta,
+} from "frappe-ui";
+import { computed, h, onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import LucideMerge from "~icons/lucide/merge";
 
 const router = useRouter();
 const { $dialog } = globalStore();
@@ -159,7 +160,7 @@ const groupByActions = [
       const { label, value } = group;
       const url = new URL(window.location.href);
       url.pathname = `/helpdesk/kb-public/${value}`;
-      await copyToClipboard(url.href, label);
+      await copyToClipboard();
     },
   },
   {
@@ -193,7 +194,7 @@ const selectBannerActions = [
           {
             label: "Confirm",
             variant: "solid",
-            onClick(close: Function) {
+            onClick({ close }) {
               handleDeleteArticles();
               close();
             },
@@ -216,18 +217,11 @@ function handleMoveToCategory(category: string) {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value.clear();
-        createToast({
-          title: "Articles moved successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Articles moved");
       },
       onError: (error: Error) => {
-        createToast({
-          title: error?.messages?.[0] || error.message,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        const title = error?.messages?.[0] || error.message;
+        toast.error(title);
         moveToModal.value = false;
       },
     }
@@ -254,11 +248,7 @@ function handleCategoryCreate() {
             isEdit: 1,
           },
         });
-        createToast({
-          title: "Category Created Successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Category created");
         capture("category_created", {
           data: {
             category: category.title,
@@ -267,11 +257,7 @@ function handleCategoryCreate() {
         resetState();
       },
       onError: (error: string) => {
-        createToast({
-          title: error,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        toast.error(error);
       },
     }
   );
@@ -296,20 +282,12 @@ function handleCategoryUpdate() {
         listViewRef.value.reload();
         showCategoryModal.value = false;
         editTitle.value = false;
-        createToast({
-          title: "Category Updated Successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
 
+        toast.success("Category updated");
         resetState();
       },
       onError: (error: string) => {
-        createToast({
-          title: error,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        toast.error(error);
       },
     }
   );
@@ -331,11 +309,7 @@ function handleCategoryDelete(groupedRow) {
             },
             {
               onSuccess: () => {
-                createToast({
-                  title: "Category deleted successfully",
-                  icon: "check",
-                  iconClasses: "text-green-600",
-                });
+                toast.success("Category deleted");
                 listViewRef.value.reload();
               },
             }
@@ -357,11 +331,7 @@ function handleDeleteArticles() {
         listViewRef.value?.reload();
         listViewRef.value?.unselectAll();
         listSelections.value?.clear();
-        createToast({
-          title: "Articles deleted successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Articles deleted");
       },
     }
   );
@@ -376,20 +346,13 @@ function handleMergeCategory(source: string, target: string) {
     {
       onSuccess: () => {
         listViewRef.value.reload();
-        createToast({
-          title: "Category merged successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Category merged");
         mergeModal.value = false;
         resetState();
       },
       onError: (error: Error) => {
-        createToast({
-          title: error?.messages?.[0] || error.message,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        const title = error?.messages?.[0] || error.message;
+        toast.error(title);
       },
     }
   );

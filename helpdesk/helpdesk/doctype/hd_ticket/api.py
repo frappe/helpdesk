@@ -129,6 +129,7 @@ def get_communications(ticket: str):
             QBCommunication.cc,
             QBCommunication.content,
             QBCommunication.creation,
+            QBCommunication.communication_date,
             QBCommunication.name,
             QBCommunication.sender,
             QBCommunication.recipients,
@@ -177,7 +178,7 @@ def get_history(ticket: str):
         .select(
             QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
         )
-        .where(QBActivity.ticket == ticket)
+        .where(QBActivity.ticket == str(ticket))
         .orderby(QBActivity.creation, order=Order.desc)
     )
     history = history.run(as_dict=True)

@@ -19,31 +19,20 @@ class HDAgent(Document):
             user.append("roles", {"role": role})
         user.save()
 
-    @staticmethod
-    def default_list_data():
-        columns = [
-            {
-                "label": "Agent Name",
-                "key": "agent_name",
-                "width": "17rem",
-                "type": "Data",
-            },
-            {
-                "label": "Email",
-                "key": "user.email as email",
-                "width": "24rem",
-                "type": "Data",
-            },
-            {
-                "label": "Created On",
-                "key": "creation",
-                "width": "8rem",
-                "type": "Datetime",
-            },
-        ]
-        rows = ["modified", "user.user_image"]
-        # modified row is needed because
-        # we have a link table for HD Agent to User
-        # and sql gets confused which modified to take from those 2 tables
-        # hence throws ambiguous error
-        return {"columns": columns, "rows": rows}
+
+@frappe.whitelist()
+def update_agent_role(user, new_role):
+    """
+    Update the role of the user to Agent
+    """
+
+    user_doc = frappe.get_doc("User", user)
+
+    if new_role == "Manager":
+        user_doc.append_roles("Agent Manager", "System Manager")
+    if new_role == "Agent":
+        user_doc.append_roles("Agent")
+        if "Agent Manager" in frappe.get_roles(user_doc.name):
+            user_doc.remove_roles("Agent Manager", "System Manager")
+
+    user_doc.save()

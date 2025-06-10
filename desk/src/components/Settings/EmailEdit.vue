@@ -1,7 +1,11 @@
 <template>
   <div class="flex h-full flex-col gap-4">
     <!-- title and desc -->
-    <div role="heading" aria-level="1" class="flex gap-1 justify-between">
+    <div
+      role="heading"
+      aria-level="1"
+      class="flex gap-1 justify-between pt-[5px]"
+    >
       <h5 class="text-lg font-semibold">Edit Email</h5>
     </div>
     <div class="w-fit">
@@ -13,11 +17,11 @@
     <!-- banner for setting up email account -->
     <div class="flex items-center gap-2 rounded-md p-2 ring-1 ring-gray-200">
       <CircleAlert
-        class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-blue-500"
+        class="h-6 w-5 w-min-5 w-max-5 min-h-5 max-w-5 text-ink-blue-2"
       />
       <div class="text-wrap text-xs text-gray-700">
         {{ info.description }}
-        <a :href="info.link" target="_blank" class="text-blue-500 underline"
+        <a :href="info.link" target="_blank" class="text-ink-blue-2 underline"
           >here</a
         >
         .
@@ -66,31 +70,41 @@
         :disabled="loading"
         @click="emit('update:step', 'email-list')"
       />
-      <Button
-        label="Update Account"
-        variant="solid"
-        @click="updateAccount"
-        :loading="loading"
-      />
+      <div class="flex gap-2">
+        <Button
+          label="Update Account"
+          variant="solid"
+          @click="updateAccount"
+          :loading="loading"
+        />
+        <Button
+          v-if="accountData.enable_incoming"
+          label="Pull Emails"
+          variant="subtle"
+          @click="pullEmails"
+          :loading="loadingPull"
+          :disabled="loading"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
-import { call } from "frappe-ui";
+import { EmailAccount, EmailStep } from "@/types";
+import { useStorage } from "@vueuse/core";
+import { call, toast } from "frappe-ui";
+import { computed, h, reactive, ref } from "vue";
+import CircleAlert from "~icons/lucide/circle-alert";
 import EmailProviderIcon from "./EmailProviderIcon.vue";
 import {
-  emailIcon,
-  services,
-  popularProviderFields,
   customProviderFields,
-  validateInputs,
+  emailIcon,
   incomingOutgoingFields,
+  popularProviderFields,
+  services,
+  validateInputs,
 } from "./emailConfig";
-import { EmailAccount, EmailStep } from "@/types";
-import { createToast } from "@/utils";
-import CircleAlert from "~icons/lucide/circle-alert";
 
 interface P {
   accountData: EmailAccount;
@@ -138,6 +152,10 @@ const fields = computed(() => {
 
 const error = ref<string | undefined>();
 const loading = ref(false);
+const loadingPull = useStorage(
+  `loading-emails-${state.email_account_name}`,
+  false
+);
 async function updateAccount() {
   error.value = validateInputs(state, isCustomService.value);
   if (error.value) return;
@@ -153,10 +171,9 @@ async function updateAccount() {
   const values = updatedEmailAccount;
 
   if (!nameChanged && !otherFieldsChanged) {
-    createToast({
-      title: "No changes made",
-      icon: "info",
-      iconClasses: "text-blue-600",
+    toast.create({
+      message: "No changes made",
+      icon: h(CircleAlert, { class: "text-ink-blue-2" }),
     });
     return;
   }
@@ -179,6 +196,29 @@ async function updateAccount() {
       errorHandler();
     }
   }
+}
+
+function pullEmails() {
+  loadingPull.value = true;
+
+  toast.create({
+    message: "Pulling emails, this may take a few minutes.",
+    icon: h(CircleAlert, { class: "text-blue-500" }),
+  });
+
+  call("frappe.email.doctype.email_account.email_account.pull_emails", {
+    email_account: state.email_account_name,
+  })
+    .then(() => {
+      localStorage.removeItem(`loading-emails-${state.email_account_name}`);
+      loadingPull.value = null;
+      toast.success("Emails pulled successfully");
+    })
+    .catch(() => {
+      localStorage.removeItem(`loading-emails-${state.email_account_name}`);
+      loadingPull.value = null;
+      error.value = "Failed to pull emails";
+    });
 }
 
 const isDirty = computed(() => {
@@ -215,11 +255,7 @@ async function callSetValue(values) {
 
 function succesHandler() {
   emit("update:step", "email-list");
-  createToast({
-    title: "Email account updated successfully",
-    icon: "check",
-    iconClasses: "text-green-600",
-  });
+  toast.success("Email account updated successfully");
 }
 
 function errorHandler() {

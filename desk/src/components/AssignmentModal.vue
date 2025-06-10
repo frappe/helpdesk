@@ -57,10 +57,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { createResource } from "frappe-ui";
-import { UserAvatar, SearchComplete } from "@/components";
+import { SearchComplete, UserAvatar } from "@/components";
+import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
+import { createResource } from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, ref } from "vue";
 
 const props = defineProps({
   assignees: {
@@ -82,6 +84,8 @@ const show = defineModel();
 const emit = defineEmits(["update"]);
 
 const { getUser } = useUserStore();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
 
 const error = ref("");
 
@@ -97,6 +101,9 @@ const addAssignee = (value) => {
     },
     onSuccess: () => {
       emit("update");
+      if (isManager) {
+        updateOnboardingStep("assign_to_agent");
+      }
     },
   });
   emit("update");

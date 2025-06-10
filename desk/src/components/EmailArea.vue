@@ -3,7 +3,7 @@
     v-bind="$attrs"
     class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
   >
-    <div class="mb-1 flex items-center justify-between gap-2">
+    <div class="flex items-center justify-between gap-2">
       <!-- email design for mobile -->
       <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
         <div class="leading-tight">
@@ -19,7 +19,7 @@
         </div>
       </div>
       <!-- email design for desktop -->
-      <div v-else class="flex items-center gap-2">
+      <div v-else class="flex items-center gap-1">
         <span>{{ sender.full_name || "No name found" }}</span>
         <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">{{
           "<" + sender.name + ">"
@@ -62,6 +62,8 @@
           <ReplyAllIcon class="h-4 w-4" />
         </Button>
         <Dropdown
+          v-if="showSplitOption"
+          :placement="'right'"
           :options="[
             ...(showSplitOption ? [{
               label: 'Split Ticket',
@@ -93,7 +95,7 @@
     <!-- <div class="text-sm leading-5 text-gray-600">
       {{ subject }}
     </div> -->
-    <div class="mb-3 text-sm leading-5 text-gray-600">
+    <div class="text-sm leading-5 text-gray-600">
       <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
       <span v-if="to"> {{ to }} </span>
       <span v-if="cc">, </span>
@@ -105,6 +107,7 @@
       </span>
       <span v-if="bcc">{{ bcc }}</span>
     </div>
+    <div class="border-0 border-t my-3 border-outline-gray-modals" />
     <EmailContent :content="content" />
     <div class="flex flex-wrap gap-2">
       <AttachmentItem
@@ -123,14 +126,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { AttachmentItem } from "@/components";
-import { dateFormat, timeAgo, dateTooltipFormat } from "@/utils";
-import LucideSplit from "~icons/lucide/split";
-import { ReplyIcon, ReplyAllIcon, ForwardIcon } from "./icons";
 import { useScreenSize } from "@/composables/screen";
+import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
+import { Dropdown } from "frappe-ui";
+import { ref } from "vue";
+import LucideSplit from "~icons/lucide/split";
+import { ReplyAllIcon, ReplyIcon, ForwardIcon } from "./icons";
 import TicketSplitModal from "./ticket/TicketSplitModal.vue";
-
 const props = defineProps({
   activity: {
     type: Object,

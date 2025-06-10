@@ -70,26 +70,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import {
-  usePageMeta,
+  Breadcrumbs,
   TextEditor,
   TextEditorFixedMenu,
-  Breadcrumbs,
+  toast,
+  usePageMeta,
 } from "frappe-ui";
-import { useRouter, useRoute } from "vue-router";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, ref } from "vue";
+
+import { LayoutHeader, UserAvatar } from "@/components";
+import { useAuthStore } from "@/stores/auth";
+import { globalStore } from "@/stores/globalStore";
 import { newArticle } from "@/stores/knowledgeBase";
 import { useUserStore } from "@/stores/user";
-import { globalStore } from "@/stores/globalStore";
-import { LayoutHeader, UserAvatar } from "@/components";
-import { createToast, textEditorMenuButtons } from "@/utils";
 import { Article } from "@/types";
+import { textEditorMenuButtons } from "@/utils";
+import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const user = userStore.getUser();
 const { $dialog } = globalStore();
 const router = useRouter();
 const route = useRoute();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
 
 const title = ref("");
 const content = ref("");
@@ -109,11 +115,10 @@ function handleCreateArticle() {
     { title: title.value, content: content.value, category: categoryId.value },
     {
       onSuccess: (article: Article) => {
-        createToast({
-          title: "Article created successfully",
-          icon: "check",
-          iconClasses: "text-green-600",
-        });
+        toast.success("Article created");
+        if (isManager) {
+          updateOnboardingStep("first_article");
+        }
         resetState();
         router.push({
           name: "Article",
@@ -123,11 +128,7 @@ function handleCreateArticle() {
         });
       },
       onError: (error: string) => {
-        createToast({
-          title: error,
-          icon: "x",
-          iconClasses: "text-red-600",
-        });
+        toast.error(error);
       },
     }
   );

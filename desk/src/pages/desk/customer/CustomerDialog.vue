@@ -36,15 +36,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import {
-  createDocumentResource,
   Avatar,
+  createDocumentResource,
   Dialog,
   FileUploader,
+  toast,
 } from "frappe-ui";
-import { createToast } from "@/utils";
-import { useError } from "@/composables/error";
+import { computed } from "vue";
 
 const props = defineProps({
   name: {
@@ -70,13 +69,11 @@ const customer = createDocumentResource({
   auto: true,
   setValue: {
     onSuccess() {
-      createToast({
-        title: "Customer updated",
-        icon: "check",
-        iconClasses: "text-green-500",
-      });
+      toast.success("Customer updated");
     },
-    onError: useError({ title: "Error updating customer" }),
+    onError() {
+      toast.error("Error updating customer");
+    },
   },
 });
 

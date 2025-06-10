@@ -49,12 +49,12 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import { Icon } from "@iconify/vue";
 import { useScreenSize } from "@/composables/screen";
+import { Icon } from "@iconify/vue";
+import { useRouter } from "vue-router";
 
 interface P {
-  icon: unknown;
+  icon?: unknown;
   label: string;
   isExpanded?: boolean;
   isActive?: boolean;

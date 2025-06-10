@@ -112,32 +112,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import {
-  createResource,
-  usePageMeta,
-  Button,
-  FormControl,
-  Breadcrumbs,
-  call,
-} from "frappe-ui";
-import { globalStore } from "@/stores/globalStore";
-import sanitizeHtml from "sanitize-html";
-import { isEmpty } from "lodash";
-import {
-  setupCustomizations,
-  handleSelectFieldUpdate,
-  handleLinkFieldUpdate,
-  parseField,
-} from "@/composables/formCustomisation";
 import { LayoutHeader, UniInput } from "@/components";
+import {
+  handleLinkFieldUpdate,
+  handleSelectFieldUpdate,
+  parseField,
+  setupCustomizations,
+} from "@/composables/formCustomisation";
+import { useAuthStore } from "@/stores/auth";
+import { globalStore } from "@/stores/globalStore";
+import { capture } from "@/telemetry";
+import { Field } from "@/types";
+import { isCustomerPortal } from "@/utils";
+import {
+  Breadcrumbs,
+  Button,
+  call,
+  createResource,
+  FormControl,
+  usePageMeta,
+} from "frappe-ui";
+import { useOnboarding } from "frappe-ui/frappe";
+import { isEmpty } from "lodash";
+import sanitizeHtml from "sanitize-html";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
-import { useAuthStore } from "@/stores/auth";
-import { capture } from "@/telemetry";
-import { isCustomerPortal } from "@/utils";
-import { Field } from "@/types";
 
 interface P {
   templateId?: string;
@@ -150,6 +151,8 @@ const props = withDefaults(defineProps<P>(), {
 const route = useRoute();
 const router = useRouter();
 const { $dialog } = globalStore();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager, userId: userID } = useAuthStore();
 
 const subject = ref("");
 const description = ref("");
@@ -162,19 +165,17 @@ const template = createResource({
     name: props.templateId || "Default",
   }),
   auto: true,
-  transform: (doc) => {
-    setupCustomizations(doc, {
+  onSuccess: (data) => {
+    description.value = data.description_template || "";
+    oldFields = window.structuredClone(data.fields || []);
+    setupCustomizations(template, {
       doc: templateFields,
       call,
       router,
       $dialog,
       applyFilters,
     });
-    setupTemplateFields(doc.fields);
-  },
-  onSuccess: (data) => {
-    description.value = data.description_template || "";
-    oldFields = window.structuredClone(data.fields || []);
+    setupTemplateFields(data.fields);
   },
 });
 
@@ -244,17 +245,23 @@ const ticket = createResource({
         ticketId: data.name,
       },
     });
-    if (!isCustomerPortal.value) return;
+    if (isManager) {
+      updateOnboardingStep("create_first_ticket", true, false, () =>
+        localStorage.setItem("firstTicket", data.name)
+      );
+    }
     // only capture telemetry for customer portal
-    capture("new_ticket_submitted", {
-      data: {
-        user: userID,
-        ticketID: data.name,
-        subject: subject.value,
-        description: description.value,
-        customFields: templateFields,
-      },
-    });
+    if (isCustomerPortal.value) {
+      capture("new_ticket_submitted", {
+        data: {
+          user: userID,
+          ticketID: data.name,
+          subject: subject.value,
+          description: description.value,
+          customFields: templateFields,
+        },
+      });
+    }
   },
 });
 
@@ -286,7 +293,6 @@ usePageMeta(() => ({
   title: "New Ticket",
 }));
 
-const { userId: userID } = useAuthStore();
 onMounted(() => {
   capture("new_ticket_page", {
     data: {

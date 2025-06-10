@@ -2,9 +2,10 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-none mx-10 max-h-[50vh] overflow-y-auto py-3',
+      'prose-sm max-w-full mx-6 md:mx-10 max-h-[50vh] py-3',
       'min-h-[7rem]',
       getFontFamily(newEmail),
+      editable && '!max-h-[35vh] overflow-y-auto',
     ]"
     :content="newEmail"
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
@@ -14,7 +15,7 @@
     :extensions="[PreserveVideoControls]"
   >
     <template #top>
-      <div class="mx-10 flex items-center gap-2 border-y py-2.5">
+      <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -62,7 +63,14 @@
         />
       </div>
     </template>
+    <!-- <template v-slot:editor="{ _editor }">
+      <EditorContent
+        :class="[editable && 'max-h-[35vh] overflow-y-auto']"
+        :editor="_editor"
+      />
+    </template> -->
     <template #bottom>
+      <!-- Attachments -->
       <div class="flex flex-wrap gap-2 px-10">
         <AttachmentItem
           v-for="a in attachments"
@@ -78,9 +86,11 @@
           </template>
         </AttachmentItem>
       </div>
-      <div class="flex justify-between gap-2 overflow-hidden px-10 py-2.5">
-        <div class="flex items-center overflow-x-auto">
-          <TextEditorFixedMenu class="-ml-1" :buttons="textEditorMenuButtons" />
+      <!-- TextEditor Fixed Menu -->
+      <div
+        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
+      >
+        <div class="flex items-center overflow-x-auto w-[60%]">
           <div class="flex gap-1">
             <FileUploader
               :upload-args="{
@@ -117,14 +127,17 @@
               </template>
             </Button>
           </div>
+          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
         </div>
-        <div class="mt-2 flex items-center justify-end space-x-2 sm:mt-0">
+        <div
+          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
+        >
           <Button label="Discard" @click="handleDiscard" />
           <Button
             variant="solid"
             :disabled="emailEmpty"
             :loading="sendMail.loading"
-            label="Send"
+            :label="label"
             @click="
               () => {
                 submitMail();
@@ -143,28 +156,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
+import {
+  AttachmentItem,
+  CannedResponseSelectorModal,
+  MultiSelectInput,
+} from "@/components";
+import { AttachmentIcon, EmailIcon } from "@/components/icons";
+import { useAuthStore } from "@/stores/auth";
+import { PreserveVideoControls } from "@/tiptap-extensions";
+import {
+  getFontFamily,
+  isContentEmpty,
+  textEditorMenuButtons,
+  validateEmail,
+} from "@/utils";
+// import { EditorContent } from "@tiptap/vue-3";
 import { useStorage } from "@vueuse/core";
 import {
   FileUploader,
   TextEditor,
   TextEditorFixedMenu,
   createResource,
+  toast,
 } from "frappe-ui";
-import {
-  createToast,
-  validateEmail,
-  textEditorMenuButtons,
-  isContentEmpty,
-  getFontFamily,
-} from "@/utils";
-import {
-  MultiSelectInput,
-  AttachmentItem,
-  CannedResponseSelectorModal,
-} from "@/components";
-import { AttachmentIcon, EmailIcon } from "@/components/icons";
-import { PreserveVideoControls } from "@/tiptap-extensions";
+import { useOnboarding } from "frappe-ui/frappe";
+import { computed, nextTick, ref } from "vue";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
@@ -173,6 +189,10 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: null,
+  },
+  label: {
+    type: String,
+    default: "Send",
   },
   editable: {
     type: Boolean,
@@ -195,10 +215,18 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+const label = computed(() => {
+  return sendMail.loading ? "Sending..." : props.label;
+});
+
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
 
 const newEmail = useStorage("emailBoxContent" + doc.value.name, "");
+const { updateOnboardingStep } = useOnboarding("helpdesk");
+const { isManager } = useAuthStore();
+
 const attachments = ref([]);
 const emailEmpty = computed(() => {
   return isContentEmpty(newEmail.value);
@@ -236,21 +264,23 @@ const sendMail = createResource({
   onSuccess: () => {
     resetState();
     emit("submit");
+
+    if (isManager) {
+      updateOnboardingStep("reply_on_ticket");
+    }
   },
   debounce: 300,
 });
 
 function submitMail() {
   if (isContentEmpty(newEmail.value)) {
-    return;
+    return false;
   }
   if (!toEmailsClone.value.length) {
-    createToast({
-      text: "Please enter a recipient email address",
-      icon: "x",
-      iconClasses: "text-red-600",
-    });
-    return;
+    toast.warning(
+      "Email has no recipients. Please add at least one email address in the 'TO' field."
+    );
+    return false;
   }
 
   sendMail.submit();

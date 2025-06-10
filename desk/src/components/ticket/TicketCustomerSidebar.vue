@@ -22,7 +22,9 @@
           <div class="flex gap-1.5" v-if="!ticket.data.feedback_rating">
             <Tooltip :text="ticket.data.contact.email_id">
               <Button class="h-7 w-7" @click="emit('open')">
-                <EmailIcon class="h-4 w-4" />
+                <template #icon>
+                  <EmailIcon class="h-4 w-4" />
+                </template>
               </Button>
             </Tooltip>
           </div>
@@ -76,12 +78,12 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed } from "vue";
-import { ITicket } from "@/pages/ticket/symbols";
-import { Tooltip, Avatar } from "frappe-ui";
 import { dayjs } from "@/dayjs";
-import { formatTime } from "@/utils";
+import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
+import { formatTime } from "@/utils";
+import { Avatar, Tooltip } from "frappe-ui";
+import { computed, inject } from "vue";
 
 const emit = defineEmits(["open"]);
 
