@@ -9,8 +9,12 @@ sudo apt remove mysql-server mysql-client
 sudo apt install libcups2-dev redis-server mariadb-client libmariadb-dev
 
 pip install frappe-bench
+FRAPPE_BRANCH=${FRAPPE_BRANCH:-"develop"}
+HD_BRANCH=${HELPDESK_BRANCH:-"develop"}
 
-git clone "https://github.com/frappe/frappe" --branch "${FRAPPE_BRANCH}" --depth 1 
+echo "Installing Frappe Framework"
+echo "Branch: ${FRAPPE_BRANCH}"
+git clone "https://github.com/frappe/frappe" --branch ${FRAPPE_BRANCH} --depth 1 
 bench init --skip-assets --frappe-path ~/frappe --python "$(which python)" frappe-bench
 
 mkdir ~/frappe-bench/sites/test_site
@@ -41,7 +45,9 @@ sed -i 's/schedule:/# schedule:/g' Procfile
 sed -i 's/socketio:/# socketio:/g' Procfile
 sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
-bench get-app helpdesk "${GITHUB_WORKSPACE}"
+echo "Installing Helpdesk App"
+echo "Branch: ${HD_BRANCH}"
+bench get-app helpdesk "${GITHUB_WORKSPACE}" --branch "${HD_BRANCH}" 
 bench setup requirements --dev
 
 
