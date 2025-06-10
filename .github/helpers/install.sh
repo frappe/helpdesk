@@ -53,7 +53,9 @@ sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 echo "Installing Helpdesk App"
 echo "Branch: ${HD_BRANCH}"
-bench get-app helpdesk "${GITHUB_WORKSPACE}" --branch "${HD_BRANCH}" 
+echo "Installing from ${GITHUB_WORKSPACE}"
+
+bench get-app helpdesk --branch "${HD_BRANCH}" 
 bench setup requirements --dev
 
 
