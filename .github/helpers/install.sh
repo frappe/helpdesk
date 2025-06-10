@@ -17,6 +17,7 @@ if [ "${HD_BRANCH}" = "develop" ]; then
 # if HD BRANCH is Main, then FRAPPE_BRANCH should also be main
 elif [ "${HD_BRANCH}" = "main" ]; then
     FRAPPE_BRANCH="version-15"
+fi
 echo "Installing Frappe Framework"
 echo "Branch: ${FRAPPE_BRANCH}"
 git clone "https://github.com/frappe/frappe" --branch ${FRAPPE_BRANCH} --depth 1 
