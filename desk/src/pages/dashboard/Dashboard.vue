@@ -137,45 +137,6 @@ const agentOptions = [
   },
 ];
 
-// const numberCards = [
-//   {
-//     title: "Tickets",
-//     value: 452,
-//     delta: -2,
-//     deltaSuffix: "%",
-//     negativeIsBetter: true,
-//   },
-//   {
-//     title: "% Resolved",
-//     value: 92,
-//     suffix: "%",
-//     delta: -3,
-//     deltaSuffix: "%",
-//   },
-//   {
-//     title: "% SLA Fulfilled",
-//     value: 86,
-//     suffix: "%",
-//     delta: -2,
-//     deltaSuffix: "%",
-//   },
-//   {
-//     title: "Avg. Resolution Time",
-//     value: 4,
-//     suffix: " days",
-//     delta: -0.2,
-//     deltaSuffix: " days",
-//     negativeIsBetter: true,
-//   },
-//   {
-//     title: "Avg. Feedback Rating",
-//     value: 4.5,
-//     suffix: "/5",
-//     delta: 0.2,
-//     deltaSuffix: " stars",
-//   },
-// ];
-
 const colors = [
   "#318AD8",
   "#F683AE",
@@ -208,20 +169,6 @@ const ticketTrendConfig = {
     { date: new Date("2024-05-15"), open: 12, closed: 67, sla_fulfilled: 97 },
     { date: new Date("2024-05-16"), open: 16, closed: 62, sla_fulfilled: 98 },
     { date: new Date("2024-05-17"), open: 24, closed: 56, sla_fulfilled: 78 },
-    // make till 30 with random data
-    { date: new Date("2024-05-18"), open: 10, closed: 50, sla_fulfilled: 80 },
-    { date: new Date("2024-05-19"), open: 15, closed: 45, sla_fulfilled: 85 },
-    { date: new Date("2024-05-20"), open: 20, closed: 40, sla_fulfilled: 90 },
-    { date: new Date("2024-05-21"), open: 25, closed: 35, sla_fulfilled: 95 },
-    { date: new Date("2024-05-22"), open: 30, closed: 30, sla_fulfilled: 100 },
-    { date: new Date("2024-05-23"), open: 35, closed: 25, sla_fulfilled: 85 },
-    { date: new Date("2024-05-24"), open: 40, closed: 20, sla_fulfilled: 90 },
-    { date: new Date("2024-05-25"), open: 45, closed: 15, sla_fulfilled: 95 },
-    { date: new Date("2024-05-26"), open: 50, closed: 10, sla_fulfilled: 100 },
-    { date: new Date("2024-05-27"), open: 55, closed: 5, sla_fulfilled: 85 },
-    { date: new Date("2024-05-28"), open: 60, closed: 0, sla_fulfilled: 90 },
-    { date: new Date("2024-05-29"), open: 65, closed: -5, sla_fulfilled: 95 },
-    { date: new Date("2024-05-30"), open: 70, closed: -10, sla_fulfilled: 100 },
     //
   ],
   title: "Tickets Trend",
@@ -316,6 +263,14 @@ const ticketsByTeam = {
     { team: "Support", count: 300 },
     { team: "Development", count: 150 },
     { team: "Sales", count: 50 },
+    { team: "Sales2", count: 50 },
+    { team: "Sale3", count: 50 },
+    { team: "Sales4", count: 50 },
+    { team: "Sales5", count: 50 },
+    { team: "Sales6", count: 50 },
+    { team: "Sales7", count: 50 },
+    { team: "Sales8", count: 50 },
+    { team: "Sales9", count: 50 },
   ],
   title: "Tickets by Team",
   subtitle: "Percentage of Total Tickets by Team",
@@ -353,6 +308,16 @@ const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   params: {
     type: "number_card",
+  },
+  auto: true,
+  onSuccess: (data) => {
+    console.log(data);
+  },
+});
+const masterData = createResource({
+  url: "helpdesk.api.dashboard.get_dashboard_data",
+  params: {
+    type: "master",
   },
   auto: true,
   onSuccess: (data) => {
