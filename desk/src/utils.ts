@@ -85,8 +85,8 @@ export function formatTime(seconds) {
 
 export const isCustomerPortal = ref(false);
 
-export async function copyToClipboard() {
-  let text = "Copied to clipboard";
+export async function copyToClipboard(msg: string = "") {
+  let text = msg || "Copied to clipboard";
   if (navigator.clipboard && window.isSecureContext) {
     await navigator.clipboard.writeText(text);
   } else {
