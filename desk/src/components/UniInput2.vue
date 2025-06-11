@@ -14,7 +14,6 @@
         :key="field.fieldname"
         class="form-control"
         :placeholder="`Add ${field.label}`"
-        :value="transValue"
         :model-value="transValue"
         autocomplete="off"
         v-on="
@@ -25,7 +24,7 @@
                 },
               }
             : {
-                change: (event) => {
+                'update:model-value': (event) => {
                   emitUpdate(
                     field.fieldname,
                     event?.value || event?.target?.value || event
