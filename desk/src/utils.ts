@@ -85,21 +85,23 @@ export function formatTime(seconds) {
 
 export const isCustomerPortal = ref(false);
 
-export async function copyToClipboard(msg: string = "") {
-  let text = msg || "Copied to clipboard";
+export async function copyToClipboard(
+  msg: string = "",
+  toastMessage: string = "Copied to clipboard"
+) {
   if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(msg);
   } else {
     let input = document.createElement("input");
     let body = document.querySelector("body");
     body.appendChild(input);
-    input.value = text;
+    input.value = msg;
     input.select();
     document.execCommand("copy");
     input.remove();
   }
 
-  toast.success(text);
+  toast.success(toastMessage);
 }
 
 export const textEditorMenuButtons = [
