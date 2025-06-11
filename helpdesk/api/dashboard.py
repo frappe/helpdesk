@@ -23,9 +23,8 @@ def get_dashboard_data(type, filters=None):
         return get_number_card_data(from_date, to_date, team, agent)
     elif type == "master":
         return get_master_dashboard_data(from_date, to_date)
-        print("Master Dashboard Data")
     elif type == "trend":
-        print("\n\n", "TREND", "\n\n")
+        return get_trend_data(from_date, to_date, team, agent)
 
 
 def get_number_card_data(from_date, to_date, team=None, agent=None):
@@ -55,8 +54,6 @@ def get_ticket_count(from_date, to_date):
     """
     Get ticket data for the dashboard.
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
     result = frappe.db.sql(
         """
 		SELECT
@@ -190,8 +187,6 @@ def get_avg_resolution_time(from_date, to_date):
     """
     Get average resolution time for the dashboard.
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
     result = frappe.db.sql(
         """
         SELECT 
@@ -234,8 +229,6 @@ def get_avg_feedback_score(from_date, to_date):
     """
     Get average feedback score for the dashboard.
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
     result = frappe.db.sql(
         """
         SELECT 
@@ -266,7 +259,6 @@ def get_avg_feedback_score(from_date, to_date):
     prev_month_avg = result[0].prev_month_avg or 0
 
     delta = current_month_avg - prev_month_avg
-    print("\n\n", result, "\n\n")
 
     return {
         "title": "Avg. Feedback Rating",
@@ -277,11 +269,7 @@ def get_avg_feedback_score(from_date, to_date):
     }
 
 
-def get_master_dashboard_data(from_date, to_date):
-    doctypes = ["HD Team", "HD Ticket Type", "HD Ticket Priority"]
-
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
+def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
 
     team_data = get_team_chart_data(from_date, to_date)
     ticket_type_data = get_ticket_type_chart_data(from_date, to_date)
@@ -303,8 +291,11 @@ def get_team_chart_data(from_date, to_date):
         },
         group_by="agent_group",
     )
-    # based on length show different chart, if len greater than 5 then show pie chart else bar chart
-    if len(result) < 5:
+    for r in result:
+        if not r.team:
+            r.team = "No Team"
+
+    if len(result) < 7:
         return get_pie_chart_config(
             result,
             "Tickets by Team",
@@ -313,7 +304,14 @@ def get_team_chart_data(from_date, to_date):
             "count",
         )
     else:
-        return get_bar_chart_config(result)
+        return get_bar_chart_config(
+            result,
+            "Tickets by Team",
+            "Total Tickets by Team",
+            {"key": "team", "type": "category", "title": "Team", "timeGrain": "day"},
+            "Tickets",
+            [{"name": "count", "type": "bar"}],
+        )
 
 
 def get_ticket_type_chart_data(from_date, to_date):
@@ -329,7 +327,7 @@ def get_ticket_type_chart_data(from_date, to_date):
         group_by="ticket_type",
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
-    if len(result) < 5:
+    if len(result) < 7:
         return get_pie_chart_config(
             result,
             "Tickets by Type",
@@ -338,7 +336,14 @@ def get_ticket_type_chart_data(from_date, to_date):
             "count",
         )
     else:
-        return get_bar_chart_config(result)
+        return get_bar_chart_config(
+            result,
+            "Tickets by Type",
+            "Total Tickets by Type",
+            {"key": "type", "type": "category", "title": "Type", "timeGrain": "day"},
+            "Tickets",
+            [{"name": "count", "type": "bar"}],
+        )
 
 
 def get_ticket_priority_chart_data(from_date, to_date):
@@ -354,7 +359,7 @@ def get_ticket_priority_chart_data(from_date, to_date):
         group_by="priority",
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
-    if len(result) < 5:
+    if len(result) < 7:
         return get_pie_chart_config(
             result,
             "Tickets by Priority",
@@ -363,7 +368,19 @@ def get_ticket_priority_chart_data(from_date, to_date):
             "count",
         )
     else:
-        return get_bar_chart_config(result)
+        return get_bar_chart_config(
+            result,
+            "Tickets by Priority",
+            "Total Tickets by Priority",
+            {
+                "key": "priority",
+                "type": "category",
+                "title": "Priority",
+                "timeGrain": "day",
+            },
+            "Tickets",
+            [{"name": "count", "type": "bar"}],
+        )
 
 
 def get_ticket_channel_chart_data(from_date, to_date):
@@ -378,7 +395,6 @@ def get_ticket_channel_chart_data(from_date, to_date):
         },
         group_by="via_customer_portal",
         order_by="via_customer_portal desc",
-        debug=1,
     )
 
     for row in result:
@@ -393,6 +409,134 @@ def get_ticket_channel_chart_data(from_date, to_date):
     )
 
 
+def get_trend_data(from_date, to_date, team=None, agent=None):
+    """
+    Get trend data for the dashboard.
+    """
+    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = frappe.utils.nowdate()
+    # Remove from and to date after testing
+
+    ticket_trend_data = get_ticket_trend_data(from_date, to_date)
+    feedback_trend_data = get_feedback_trend_data(from_date, to_date)
+
+    return [
+        ticket_trend_data,
+        feedback_trend_data,
+    ]
+
+
+def get_ticket_trend_data(from_date, to_date):
+    """
+    Get ticket trend data for the dashboard.
+    data:[
+        { date: "2024-05-01", open: 6, closed: 122, sla_fulfilled: 78 },
+    ]
+    # agreement_status = 'Fulfilled'
+    """
+    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = frappe.utils.nowdate()
+    result = frappe.db.sql(
+        """
+        SELECT 
+            DATE(creation) as date,
+            COUNT(CASE WHEN status = 'Open' THEN name END) as open,
+            COUNT(CASE WHEN status IN ('Resolved', 'Closed') THEN name END) as closed,
+            COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as sla_fulfilled
+        FROM `tabHD Ticket`
+        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        GROUP BY DATE(creation)
+        ORDER BY DATE(creation)
+    """,
+        {
+            "from_date": from_date,
+            "to_date": to_date,
+        },
+        as_dict=1,
+    )
+    avg_tickets = get_avg_tickets_per_day(from_date, to_date)
+    subtitle = f"Average tickets per day is around {avg_tickets:.0f}"
+    return get_bar_chart_config(
+        result,
+        "Ticket Trend",
+        subtitle,
+        {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
+        "Tickets",
+        [
+            {"name": "closed", "type": "bar"},
+            {"name": "open", "type": "bar"},
+            {
+                "name": "sla_fulfilled",
+                "type": "line",
+                "showDataPoints": True,
+                "axis": "y2",
+            },
+        ],
+        stacked=True,
+        y2Axis={
+            "title": "% SLA",
+            "yMin": 0,
+            "yMax": 100,
+        },
+    )
+
+
+def get_feedback_trend_data(from_date, to_date):
+    """
+    Get feedback trend data for the dashboard.
+    """
+    # conditions = "and agent_group='Test'"
+    conditions = ""
+    result = frappe.db.sql(
+        f"""
+        SELECT 
+            DATE(creation) as date,
+            AVG(CASE WHEN feedback_rating IS NOT NULL THEN feedback_rating END) * 5 as rating,
+            COUNT(CASE WHEN feedback_rating IS NOT NULL THEN name END) as rated_tickets
+        FROM `tabHD Ticket`
+        WHERE 
+            creation BETWEEN %(from_date)s AND %(to_date)s
+            {conditions}
+        GROUP BY DATE(creation)
+        ORDER BY DATE(creation)
+    """,
+        {
+            "from_date": from_date,
+            "to_date": to_date,
+        },
+        as_dict=1,
+    )
+
+    total_ratings = sum(row.rating for row in result) * 5
+
+    avg_rating = total_ratings / len(result) if result else 0  # Avoid division by zero
+
+    subtitle = f"Average feedback rating per day is around {avg_rating:.1f} stars"
+
+    return get_bar_chart_config(
+        result,
+        "Feedback Trend",
+        subtitle,
+        {"key": "date", "type": "time", "title": "Date", "timeGrain": "day"},
+        "Rated Tickets",
+        [
+            {"name": "rated_tickets", "type": "bar"},
+            {
+                "name": "rating",
+                "type": "line",
+                "showDataPoints": True,
+                "axis": "y2",
+                "color": "#48BB74",
+            },
+        ],
+        y2Axis={
+            "title": "Rating",
+            "yMin": 0,
+            "yMax": 5,
+        },
+    )
+
+
 def get_pie_chart_config(data, title, subtitle, categoryColumn, valueColumn):
     return {
         "type": "pie",
@@ -404,5 +548,61 @@ def get_pie_chart_config(data, title, subtitle, categoryColumn, valueColumn):
     }
 
 
-def get_bar_chart_config(data):
-    pass
+def get_bar_chart_config(
+    data, title, subtitle, xAxisConfig, yAxisTitle, series, **kwargs
+):
+    return {
+        "type": "axis",
+        "data": data,
+        "title": title,
+        "subtitle": subtitle,
+        "xAxis": xAxisConfig,
+        "yAxis": {"title": yAxisTitle},
+        "series": series,
+        **kwargs,
+    }
+
+
+def get_conditions_from_filters(filters):
+    """
+    Get conditions from filters.
+    """
+    conditions = [
+        f" AND creation between '{filters['from_date']}' and '{filters['to_date']}'"
+    ]
+
+    if filters.get("team"):
+        conditions.append(f"agent_group = '{filters['team']}'")
+    if filters.get("agent"):
+        conditions.append(f"owner = '{filters['agent']}'")
+
+    return " AND ".join(conditions) if conditions else ""
+
+
+def get_avg_tickets_per_day(from_date, to_date):
+    """
+    Get average tickets per day for the dashboard.
+    """
+    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
+    to_date = frappe.utils.nowdate()
+    result = frappe.db.sql(
+        """
+        SELECT 
+            COUNT(name) as total_tickets,
+            DATEDIFF(%(to_date)s, %(from_date)s) as days
+        FROM `tabHD Ticket`
+        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+    """,
+        {
+            "from_date": from_date,
+            "to_date": to_date,
+        },
+        as_dict=1,
+    )
+
+    total_tickets = result[0].total_tickets or 0
+    days = result[0].days or 1  # Avoid division by zero
+
+    avg_tickets_per_day = total_tickets / days
+
+    return avg_tickets_per_day
