@@ -5,7 +5,9 @@
     >
       <span
         class="cursor-copy text-lg font-semibold"
-        @click="copyToClipboard(`'${ticket.name}' copied to clipboard`)"
+        @click="
+          copyToClipboard(ticket.name, `'${ticket.name}' copied to clipboard`)
+        "
         >#{{ ticket.name }}
       </span>
       <Dropdown
