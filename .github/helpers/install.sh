@@ -55,7 +55,11 @@ echo "Installing Helpdesk App"
 echo "Branch: ${HD_BRANCH}"
 echo "Installing from ${GITHUB_WORKSPACE}"
 
-bench get-app helpdesk --branch "${HD_BRANCH}" 
+# bench get-app helpdesk --branch "${HD_BRANCH}" 
+bench get-app helpdesk "${GITHUB_WORKSPACE}"
+cd ~/frappe-bench/apps/helpdesk || exit
+# run the command git branch --show-current
+echo "Current branch: $(git branch --show-current)"
 bench setup requirements --dev
 
 
