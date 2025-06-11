@@ -8,9 +8,10 @@
     </LayoutHeader>
 
     <div class="p-5 w-full overflow-y-scroll">
+      <!-- Filters -->
       <div class="mb-4 flex items-center gap-4">
         <DateRangePicker
-          v-model="selectedPeriod"
+          v-model="filters.period"
           variant="outline"
           placeholder="Period"
           :formatter="(date: string) => {
@@ -22,39 +23,33 @@
             });
           }"
         />
-        <Autocomplete
-          v-model="selectedAgent"
-          :options="agentOptions"
-          placeholder="Agent"
+        <Link
+          class="form-control w-52"
+          doctype="HD Team"
+          placeholder="Team"
+          v-model="filters.team"
+          :page-length="5"
+          :hide-me="true"
         >
-          <template #target="{ togglePopover }">
-            <TextInput
-              readonly
-              type="text"
-              :value="selectedAgent ? selectedAgent.label : ''"
-              placeholder="Agent"
-              class="w-full"
-              variant="outline"
-              @focus="togglePopover()"
-            >
-              <template #prefix>
-                <LucideUser
-                  v-if="!selectedAgent"
-                  class="size-4 text-ink-gray-5"
-                />
-                <img
-                  v-else-if="selectedAgent"
-                  :src="selectedAgent.image"
-                  class="size-4 rounded-full"
-                />
-              </template>
-            </TextInput>
+          <template #prefix>
+            <LucideUsers class="size-4 text-ink-gray-5 mr-2" />
           </template>
-          <template #item-prefix="{ option }">
-            <img :src="option.image" class="h-4 w-4 mr-2 rounded-full" />
+        </Link>
+        <Link
+          class="form-control w-52"
+          doctype="HD Agent"
+          placeholder="Agent"
+          v-model="filters.agent"
+          :page-length="5"
+          :hide-me="true"
+        >
+          <template #prefix>
+            <LucideUser class="size-4 text-ink-gray-5 mr-2" />
           </template>
-        </Autocomplete>
+        </Link>
       </div>
+
+      <!-- Number Cards -->
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
         v-if="!numberCards.loading"
@@ -66,24 +61,30 @@
           :config="config"
         />
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-        <div class="border rounded-md min-h-80">
-          <AxisChart :config="ticketTrendConfig" />
+      <!-- Trend Charts -->
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
+        v-if="!trendData.loading"
+      >
+        <div
+          class="border rounded-md min-h-80"
+          v-for="(chart, index) in trendData.data"
+          :key="index"
+        >
+          <component :is="getChartType(chart)" />
         </div>
-        <div class="border rounded-md min-h-80">
-          <AxisChart :config="feedbackTrendConfig" />
-        </div>
-        <div class="border rounded-md">
-          <DonutChart :config="ticketsByTeam" />
-        </div>
-        <div class="border rounded-md">
-          <DonutChart :config="ticketsByType" />
-        </div>
-        <div class="border rounded-md">
-          <DonutChart :config="ticketsByPriority" />
-        </div>
-        <div class="border rounded-md">
-          <DonutChart :config="ticketsByChannel" />
+      </div>
+      <!-- Master Data Charts -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+        v-if="!masterData.loading"
+      >
+        <div
+          class="border rounded-md"
+          v-for="(chart, index) in masterData.data"
+          :key="index"
+        >
+          <component :is="getChartType(chart)" />
         </div>
       </div>
     </div>
@@ -91,6 +92,7 @@
 </template>
 
 <script setup lang="ts">
+import { Link } from "@/components";
 import {
   AxisChart,
   createResource,
@@ -99,10 +101,13 @@ import {
   NumberChart,
   usePageMeta,
 } from "frappe-ui";
-import { ref } from "vue";
+import { h, reactive, watch } from "vue";
 
-const selectedPeriod = ref("");
-const selectedAgent = ref(null);
+const filters = reactive({
+  period: null,
+  agent: null,
+  team: null,
+});
 
 const agentOptions = [
   {
@@ -150,180 +155,53 @@ const colors = [
   "#A6B1B9",
 ];
 
-const ticketTrendConfig = {
-  data: [
-    { date: "2024-05-01", open: 6, closed: 122, sla_fulfilled: 78 },
-    { date: new Date("2024-05-02"), open: 8, closed: 163, sla_fulfilled: 82 },
-    { date: new Date("2024-05-03"), open: 3, closed: 119, sla_fulfilled: 85 },
-    { date: new Date("2024-05-04"), open: 7, closed: 161, sla_fulfilled: 80 },
-    { date: new Date("2024-05-05"), open: 2, closed: 138, sla_fulfilled: 90 },
-    { date: new Date("2024-05-06"), open: 8, closed: 113, sla_fulfilled: 88 },
-    { date: new Date("2024-05-07"), open: 3, closed: 107, sla_fulfilled: 92 },
-    { date: new Date("2024-05-08"), open: 9, closed: 102, sla_fulfilled: 95 },
-    { date: new Date("2024-05-09"), open: 5, closed: 96, sla_fulfilled: 89 },
-    { date: new Date("2024-05-10"), open: 9, closed: 92, sla_fulfilled: 91 },
-    { date: new Date("2024-05-11"), open: 6, closed: 88, sla_fulfilled: 87 },
-    { date: new Date("2024-05-12"), open: 8, closed: 83, sla_fulfilled: 93 },
-    { date: new Date("2024-05-13"), open: 7, closed: 77, sla_fulfilled: 94 },
-    { date: new Date("2024-05-14"), open: 7, closed: 72, sla_fulfilled: 96 },
-    { date: new Date("2024-05-15"), open: 12, closed: 67, sla_fulfilled: 97 },
-    { date: new Date("2024-05-16"), open: 16, closed: 62, sla_fulfilled: 98 },
-    { date: new Date("2024-05-17"), open: 24, closed: 56, sla_fulfilled: 78 },
-    //
-  ],
-  title: "Tickets Trend",
-  subtitle: "Average tickets per day is around 124",
-  colors: colors,
-  xAxis: {
-    key: "date",
-    type: "time",
-    title: "Date",
-    timeGrain: "day",
-  },
-  yAxis: {
-    title: "Tickets",
-  },
-  y2Axis: {
-    title: "% SLA",
-    yMin: 0,
-    yMax: 100,
-  },
-  stacked: true,
-  series: [
-    { name: "closed", type: "bar" },
-    { name: "open", type: "bar" },
-    { name: "sla_fulfilled", type: "line", showDataPoints: true, axis: "y2" },
-  ],
-};
-
-const feedbackTrendConfig = {
-  data: [
-    { date: new Date("2024-05-01"), rating: 4.5, rated_tickets: 67 },
-    { date: new Date("2024-05-02"), rating: 4.6, rated_tickets: 89 },
-    { date: new Date("2024-05-03"), rating: 4.7, rated_tickets: 95 },
-    { date: new Date("2024-05-04"), rating: 4.8, rated_tickets: 120 },
-    { date: new Date("2024-05-05"), rating: 4.9, rated_tickets: 79 },
-    { date: new Date("2024-05-06"), rating: 5.0, rated_tickets: 59 },
-    { date: new Date("2024-05-07"), rating: 4.8, rated_tickets: 82 },
-    { date: new Date("2024-05-08"), rating: 4.7, rated_tickets: 91 },
-    { date: new Date("2024-05-09"), rating: 4.6, rated_tickets: 103 },
-    { date: new Date("2024-05-10"), rating: 4.5, rated_tickets: 87 },
-    { date: new Date("2024-05-11"), rating: 4.6, rated_tickets: 93 },
-    { date: new Date("2024-05-12"), rating: 4.7, rated_tickets: 73 },
-    { date: new Date("2024-05-13"), rating: 4.8, rated_tickets: 79 },
-    { date: new Date("2024-05-14"), rating: 4.9, rated_tickets: 80 },
-    { date: new Date("2024-05-15"), rating: 4.6, rated_tickets: 92 },
-    { date: new Date("2024-05-16"), rating: 4.3, rated_tickets: 112 },
-    { date: new Date("2024-05-17"), rating: 4.7, rated_tickets: 95 },
-  ],
-  title: "Feedback Trend",
-  subtitle: "Average feedback rating per day is around 4.8",
-  colors: colors,
-  xAxis: {
-    key: "date",
-    type: "time",
-    title: "Date",
-    timeGrain: "day",
-  },
-  yAxis: {
-    title: "Rated Tickets",
-  },
-  y2Axis: {
-    title: "Rating",
-    yMin: 0,
-    yMax: 5,
-  },
-  series: [
-    { name: "rated_tickets", type: "bar" },
-    {
-      name: "rating",
-      type: "line",
-      showDataPoints: true,
-      axis: "y2",
-      color: colors[2],
-    },
-  ],
-};
-
-const ticketsByPriority = {
-  data: [
-    { priority: "High", count: 120 },
-    { priority: "Medium", count: 200 },
-    { priority: "Low", count: 80 },
-  ],
-  title: "Tickets by Priority",
-  subtitle: "Percentage of Total Tickets by Priority",
-  colors: colors,
-  categoryColumn: "priority",
-  valueColumn: "count",
-};
-
-const ticketsByTeam = {
-  data: [
-    { team: "Support", count: 300 },
-    { team: "Development", count: 150 },
-    { team: "Sales", count: 50 },
-    { team: "Sales2", count: 50 },
-    { team: "Sale3", count: 50 },
-    { team: "Sales4", count: 50 },
-    { team: "Sales5", count: 50 },
-    { team: "Sales6", count: 50 },
-    { team: "Sales7", count: 50 },
-    { team: "Sales8", count: 50 },
-    { team: "Sales9", count: 50 },
-  ],
-  title: "Tickets by Team",
-  subtitle: "Percentage of Total Tickets by Team",
-  colors: colors,
-  categoryColumn: "team",
-  valueColumn: "count",
-};
-
-const ticketsByType = {
-  data: [
-    { type: "Bug", count: 200 },
-    { type: "Feature", count: 23 },
-    { type: "Task", count: 83 },
-  ],
-  title: "Tickets by Type",
-  subtitle: "Percentage of Total Tickets by Type",
-  colors: colors,
-  categoryColumn: "type",
-  valueColumn: "count",
-};
-
-const ticketsByChannel = {
-  data: [
-    { channel: "Email", count: 12 },
-    { channel: "Portal", count: 223 },
-  ],
-  title: "Tickets by Channel",
-  subtitle: "Percentage of Total Tickets by Channel",
-  colors: colors,
-  categoryColumn: "channel",
-  valueColumn: "count",
-};
-
 const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
+  cache: ["Analytics", "NumberCards"],
   params: {
     type: "number_card",
   },
   auto: true,
-  onSuccess: (data) => {
-    console.log(data);
-  },
 });
+
 const masterData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
+  cache: ["Analytics", "MasterCharts"],
   params: {
     type: "master",
   },
   auto: true,
-  onSuccess: (data) => {
-    console.log(data);
-  },
 });
+
+const trendData = createResource({
+  url: "helpdesk.api.dashboard.get_dashboard_data",
+  cache: ["Analytics", "TrendCharts"],
+  params: {
+    type: "trend",
+  },
+  auto: true,
+});
+
+function getChartType(chart: any) {
+  chart.colors = colors;
+  if (chart["type"] === "axis") {
+    return h(AxisChart, {
+      config: chart,
+    });
+  }
+  if (chart["type"] === "pie") {
+    return h(DonutChart, {
+      config: chart,
+    });
+  }
+}
+
+watch(
+  () => filters.period,
+  (newVal) => {
+    console.log(newVal);
+  }
+);
 
 usePageMeta(() => {
   return {
@@ -331,3 +209,14 @@ usePageMeta(() => {
   };
 });
 </script>
+
+<style scoped>
+:deep(.form-control button) {
+  @apply text-base rounded h-7 py-1.5 border border-outline-gray-2 bg-surface-white placeholder-ink-gray-4 hover:border-outline-gray-3 hover:shadow-sm focus:bg-surface-white focus:border-outline-gray-4 focus:shadow-sm focus:ring-0 focus-visible:ring-0 text-ink-gray-8 transition-colors w-full dark:[color-scheme:dark];
+}
+:deep(.form-control button > div) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>
