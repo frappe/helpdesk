@@ -60,7 +60,7 @@ interface E {
 const props = defineProps<P>();
 const emit = defineEmits<E>();
 
-const textFields = ["Long Text", "Small Text", "Text", "Text Editor"];
+const textFields = ["Long Text", "Small Text", "Text", "Text Editor", "Data"];
 
 const component = computed(() => {
   if (props.field.url_method) {
