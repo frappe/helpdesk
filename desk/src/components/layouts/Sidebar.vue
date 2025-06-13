@@ -22,6 +22,15 @@
         </span>
       </template>
     </SidebarLink>
+    <SidebarLink
+      v-if="!isCustomerPortal"
+      class="relative"
+      label="Dashboard"
+      :icon="LucideLayoutDashboard"
+      :to="'Dashboard'"
+      :is-active="isActiveTab('Dashboard')"
+      :is-expanded="isExpanded"
+    />
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
@@ -202,6 +211,7 @@ import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
