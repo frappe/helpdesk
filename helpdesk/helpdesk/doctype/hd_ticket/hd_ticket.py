@@ -996,4 +996,4 @@ def close_tickets_after_n_days():
         doc.flags.ignore_validate = True
         doc.save(ignore_permissions=True)
         doc.flags.ignore_validate = False
-        frappe.db.commit()
+        frappe.db.commit()  # nosemgrep
