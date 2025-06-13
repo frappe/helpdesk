@@ -495,6 +495,8 @@ def handle_at_me_support(filters):
 
 # filters out tickets based on team restrictions
 def handle_team_restrictions(filters):
+    from helpdesk.utils import get_agents_team
+
     enable_restrictions = frappe.db.get_single_value(
         "HD Settings", "restrict_tickets_by_agent_group"
     )
@@ -504,17 +506,7 @@ def handle_team_restrictions(filters):
         "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
     )
 
-    QBTeam = frappe.qb.DocType("HD Team")
-    QBTeamMember = frappe.qb.DocType("HD Team Member")
-
-    teams = (
-        frappe.qb.from_(QBTeamMember)
-        .where(QBTeamMember.user == frappe.session.user)
-        .join(QBTeam)
-        .on(QBTeam.name == QBTeamMember.parent)
-        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
-        .run(as_dict=True)
-    )
+    teams = get_agents_team()
 
     if any([team.get("ignore_restrictions") for team in teams]):
         return
