@@ -268,7 +268,7 @@ const handleRename = () => {
 };
 
 const dropdownOptions = computed(() =>
-  ticketStatusStore.options.map((o) => ({
+  ticketStatusStore.options?.data?.map((o) => ({
     label: o,
     value: o,
     onClick: () => updateTicket("status", o),
