@@ -11,6 +11,7 @@
       <!-- Filters -->
       <div class="mb-4 flex items-center gap-4">
         <DateRangePicker
+          class="!w-48"
           v-model="filters.period"
           variant="outline"
           placeholder="Period"
@@ -24,7 +25,7 @@
           }"
         />
         <Link
-          class="form-control w-52"
+          class="form-control w-48"
           doctype="HD Team"
           placeholder="Team"
           v-model="filters.team"
@@ -36,7 +37,7 @@
           </template>
         </Link>
         <Link
-          class="form-control w-52"
+          class="form-control w-48"
           doctype="HD Agent"
           placeholder="Agent"
           v-model="filters.agent"
@@ -48,44 +49,52 @@
           </template>
         </Link>
       </div>
-
-      <!-- Number Cards -->
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
-        v-if="!numberCards.loading"
-      >
-        <NumberChart
-          v-for="(config, index) in numberCards.data"
-          :key="index"
-          class="border rounded-md"
-          :config="config"
-        />
-      </div>
-      <!-- Trend Charts -->
-      <div
-        class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
-        v-if="!trendData.loading"
-      >
+      <div v-if="!loading">
+        <!-- Number Cards -->
         <div
-          class="border rounded-md min-h-80"
-          v-for="(chart, index) in trendData.data"
-          :key="index"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
+          v-if="!numberCards.loading"
         >
-          <component :is="getChartType(chart)" />
+          <NumberChart
+            v-for="(config, index) in numberCards.data"
+            :key="index"
+            class="border rounded-md"
+            :config="config"
+          />
+        </div>
+        <!-- Trend Charts -->
+        <div
+          class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4"
+          v-if="!trendData.loading"
+        >
+          <div
+            class="border rounded-md min-h-80"
+            v-for="(chart, index) in trendData.data"
+            :key="index"
+          >
+            <component :is="getChartType(chart)" />
+          </div>
+        </div>
+        <!-- Master Data Charts -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
+          v-if="!masterData.loading"
+        >
+          <div
+            class="border rounded-md"
+            v-for="(chart, index) in masterData.data"
+            :key="index"
+          >
+            <component :is="getChartType(chart)" />
+          </div>
         </div>
       </div>
-      <!-- Master Data Charts -->
+      <!-- Loading State -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-4"
-        v-if="!masterData.loading"
+        v-else
+        class="flex items-center justify-center h-[240px] gap-2 rounded"
       >
-        <div
-          class="border rounded-md"
-          v-for="(chart, index) in masterData.data"
-          :key="index"
-        >
-          <component :is="getChartType(chart)" />
-        </div>
+        <Button :loading="true" size="2xl" variant="ghost" />
       </div>
     </div>
   </div>
@@ -101,46 +110,13 @@ import {
   NumberChart,
   usePageMeta,
 } from "frappe-ui";
-import { h, reactive, watch } from "vue";
+import { computed, h, reactive, watch } from "vue";
 
 const filters = reactive({
   period: null,
   agent: null,
   team: null,
 });
-
-const agentOptions = [
-  {
-    label: "John Doe",
-    value: "john-doe",
-    image: "https://randomuser.me/api/portraits/men/59.jpg",
-  },
-  {
-    label: "Jane Doe",
-    value: "jane-doe",
-    image: "https://randomuser.me/api/portraits/women/58.jpg",
-  },
-  {
-    label: "John Smith",
-    value: "john-smith",
-    image: "https://randomuser.me/api/portraits/men/59.jpg",
-  },
-  {
-    label: "Jane Smith",
-    value: "jane-smith",
-    image: "https://randomuser.me/api/portraits/women/59.jpg",
-  },
-  {
-    label: "John Wayne",
-    value: "john-wayne",
-    image: "https://randomuser.me/api/portraits/men/57.jpg",
-  },
-  {
-    label: "Jane Wayne",
-    value: "jane-wayne",
-    image: "https://randomuser.me/api/portraits/women/51.jpg",
-  },
-];
 
 const colors = [
   "#318AD8",
@@ -182,6 +158,10 @@ const trendData = createResource({
   auto: true,
 });
 
+const loading = computed(() => {
+  return numberCards.loading || masterData.loading || trendData.loading;
+});
+
 function getChartType(chart: any) {
   chart.colors = colors;
   if (chart["type"] === "axis") {
@@ -197,10 +177,37 @@ function getChartType(chart: any) {
 }
 
 watch(
-  () => filters.period,
+  () => filters,
   (newVal) => {
-    console.log(newVal);
-  }
+    const filters = {
+      from_date: newVal.period?.split(",")[0] || null,
+      to_date: newVal.period?.split(",")[1] || null,
+      agent: newVal.agent || null,
+      team: newVal.team || null,
+    };
+    numberCards.update({
+      params: {
+        type: "number_card",
+        filters: filters,
+      },
+    });
+    numberCards.reload();
+    masterData.update({
+      params: {
+        type: "master",
+        filters: filters,
+      },
+    });
+    masterData.reload();
+    trendData.update({
+      params: {
+        type: "trend",
+        filters: filters,
+      },
+    });
+    trendData.reload();
+  },
+  { deep: true }
 );
 
 usePageMeta(() => {
