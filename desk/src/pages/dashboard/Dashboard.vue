@@ -42,7 +42,6 @@
           placeholder="Agent"
           v-model="filters.agent"
           :page-length="5"
-          :hide-me="true"
         >
           <template #prefix>
             <LucideUser class="size-4 text-ink-gray-5 mr-2" />
@@ -106,6 +105,7 @@ import {
   AxisChart,
   createResource,
   DateRangePicker,
+  dayjs,
   DonutChart,
   NumberChart,
   usePageMeta,
@@ -113,7 +113,8 @@ import {
 import { computed, h, reactive, watch } from "vue";
 
 const filters = reactive({
-  period: null,
+  period: getLastXDays(),
+  // period: null,
   agent: null,
   team: null,
 });
@@ -174,6 +175,16 @@ function getChartType(chart: any) {
       config: chart,
     });
   }
+}
+
+function getLastXDays(range: number = 30): string {
+  const today = new Date();
+  const last30Days = new Date(today);
+  last30Days.setDate(today.getDate() - range);
+
+  return `${dayjs(last30Days).format("YYYY-MM-DD")},${dayjs(today).format(
+    "YYYY-MM-DD"
+  )}`;
 }
 
 watch(
