@@ -69,6 +69,8 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
     """
     Get ticket data for the dashboard.
     """
+    diff = frappe.utils.date_diff(to_date, from_date)
+
     result = frappe.db.sql(
         f"""
 		SELECT
@@ -90,7 +92,7 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
         {
             "from_date": from_date,
             "to_date": to_date,
-            "prev_from_date": frappe.utils.add_months(from_date, -1),
+            "prev_from_date": frappe.utils.add_days(from_date, -diff),
         },
         as_dict=1,
     )
@@ -122,6 +124,7 @@ def get_resolved_tickets(from_date, to_date, conds=""):
     Get the ticket count for the current month also get tickets resolved or closed in the current month
     same for the previous month.
     """
+    diff = frappe.utils.date_diff(to_date, from_date)
 
     result = frappe.db.sql(
         f"""
@@ -143,7 +146,7 @@ def get_resolved_tickets(from_date, to_date, conds=""):
         {
             "from_date": from_date,
             "to_date": to_date,
-            "prev_from_date": frappe.utils.add_months(from_date, -1),
+            "prev_from_date": frappe.utils.add_days(from_date, -diff),
         },
         as_dict=1,
     )
@@ -181,6 +184,8 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
     """
     Get the percent of SLA tickets fulfilled for the dashboard.
     """
+    diff = frappe.utils.date_diff(to_date, from_date)
+
     result = frappe.db.sql(
         f"""
         SELECT 
@@ -201,7 +206,7 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
         {
             "from_date": from_date,
             "to_date": to_date,
-            "prev_from_date": frappe.utils.add_months(from_date, -1),
+            "prev_from_date": frappe.utils.add_days(from_date, -diff),
         },
         as_dict=1,
     )
@@ -238,6 +243,8 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
     """
     Get average resolution time for the dashboard.
     """
+    diff = frappe.utils.date_diff(to_date, from_date)
+
     result = frappe.db.sql(
         f"""
         SELECT 
@@ -258,7 +265,7 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
         {
             "from_date": from_date,
             "to_date": to_date,
-            "prev_from_date": frappe.utils.add_months(from_date, -1),
+            "prev_from_date": frappe.utils.add_days(from_date, -diff),
         },
         as_dict=1,
     )
@@ -280,6 +287,7 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
     """
     Get average feedback score for the dashboard.
     """
+    diff = frappe.utils.date_diff(to_date, from_date)
     result = frappe.db.sql(
         f"""
         SELECT 
@@ -303,7 +311,7 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
         {
             "from_date": from_date,
             "to_date": to_date,
-            "prev_from_date": frappe.utils.add_months(from_date, -1),
+            "prev_from_date": frappe.utils.add_days(from_date, -diff),
         },
         as_dict=1,
     )
