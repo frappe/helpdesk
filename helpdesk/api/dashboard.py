@@ -14,32 +14,47 @@ def get_dashboard_data(type, filters=None):
     team = filters.get("team") if filters else None
     agent = filters.get("agent") if filters else None
 
+    if agent == "@me":
+        agent = frappe.session.user
+
     if not from_date:
         from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
     if not to_date:
         to_date = frappe.utils.nowdate()
 
+    _filters = frappe._dict(
+        from_date=from_date,
+        to_date=to_date,
+        team=team,
+        agent=agent,
+    )
+    conds = ""
+    if _filters.team:
+        conds += f" AND agent_group='{_filters.team}'"
+
+    if _filters.agent:
+        conds += f" AND JSON_SEARCH(_assign, 'one', '{_filters.agent}') IS NOT NULL"
+
     if type == "number_card":
-        return get_number_card_data(from_date, to_date, team, agent)
+        return get_number_card_data(from_date, to_date, conds)
     elif type == "master":
-        return get_master_dashboard_data(from_date, to_date)
+        return get_master_dashboard_data(
+            from_date, to_date, _filters.team, _filters.agent
+        )
     elif type == "trend":
-        return get_trend_data(from_date, to_date, team, agent)
+        return get_trend_data(from_date, to_date, conds)
 
 
-def get_number_card_data(from_date, to_date, team=None, agent=None):
+def get_number_card_data(from_date, to_date, conds=""):
     """
     Get number card data for the dashboard.
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
-    # Remove from and to date after testing
 
-    ticket_chart_data = get_ticket_count(from_date, to_date)
-    resolved_tickets = get_resolved_tickets(from_date, to_date)
-    sla_fulfilled_count = get_sla_fulfilled_count(from_date, to_date)
-    avg_resolution_time = get_avg_resolution_time(from_date, to_date)
-    avg_feedback_score = get_avg_feedback_score(from_date, to_date)
+    ticket_chart_data = get_ticket_count(from_date, to_date, conds)
+    resolved_tickets = get_resolved_tickets(from_date, to_date, conds)
+    sla_fulfilled_count = get_sla_fulfilled_count(from_date, to_date, conds)
+    avg_resolution_time = get_avg_resolution_time(from_date, to_date, conds)
+    avg_feedback_score = get_avg_feedback_score(from_date, to_date, conds)
 
     return [
         ticket_chart_data,
@@ -50,21 +65,23 @@ def get_number_card_data(from_date, to_date, team=None, agent=None):
     ]
 
 
-def get_ticket_count(from_date, to_date):
+def get_ticket_count(from_date, to_date, conds=""):
     """
     Get ticket data for the dashboard.
     """
     result = frappe.db.sql(
-        """
+        f"""
 		SELECT
 				COUNT(CASE
 					WHEN creation >= %(from_date)s AND creation <= %(to_date)s 
+                    {conds}
 					THEN name
 					ELSE NULL
 				END) as current_month_tickets,
 
 				COUNT(CASE
 					WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s 
+                    {conds}
 					THEN name
 					ELSE NULL
 				END) as prev_month_tickets
@@ -95,20 +112,22 @@ def get_ticket_count(from_date, to_date):
     }
 
 
-def get_resolved_tickets(from_date, to_date):
+def get_resolved_tickets(from_date, to_date, conds=""):
     """
     Get resolved tickets for the dashboard.
     """
     result = frappe.db.sql(
-        """
+        f"""
         SELECT 
             COUNT(CASE 
                 WHEN creation >= %(from_date)s AND creation <= %(to_date)s AND status IN ('Resolved', 'Closed')
+                {conds}
                 THEN name 
                 ELSE NULL
             END) as current_month_resolved,
             COUNT(CASE 
                 WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s AND status IN ('Resolved', 'Closed')
+                {conds}
                 THEN name 
                 ELSE NULL
             END) as prev_month_resolved
@@ -138,22 +157,22 @@ def get_resolved_tickets(from_date, to_date):
     }
 
 
-def get_sla_fulfilled_count(from_date, to_date):
-    #    "fieldname": "agreement_status",
-    # value:"Fulfilled"
+def get_sla_fulfilled_count(from_date, to_date, conds=""):
     """
     Get the percent of SLA tickets fulfilled for the dashboard.
     """
     result = frappe.db.sql(
-        """
+        f"""
         SELECT 
             COUNT(CASE 
                 WHEN creation >= %(from_date)s AND creation <= %(to_date)s AND agreement_status = 'Fulfilled'
+                {conds}
                 THEN name 
                 ELSE NULL
             END) as current_month_fulfilled,
             COUNT(CASE 
                 WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s AND agreement_status = 'Fulfilled'
+                {conds}
                 THEN name 
                 ELSE NULL
             END) as prev_month_fulfilled
@@ -183,26 +202,26 @@ def get_sla_fulfilled_count(from_date, to_date):
     }
 
 
-def get_avg_resolution_time(from_date, to_date):
+def get_avg_resolution_time(from_date, to_date, conds=""):
     """
     Get average resolution time for the dashboard.
     """
     result = frappe.db.sql(
-        """
+        f"""
         SELECT 
             AVG(CASE 
-                WHEN status = 'Resolved' AND creation >= %(from_date)s AND creation <= %(to_date)s
+                WHEN status in ('Resolved', 'Closed') AND creation >= %(from_date)s AND creation <= %(to_date)s
+                {conds}
                 THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
-                WHEN status = 'Resolved' AND creation >= %(prev_from_date)s AND creation < %(from_date)s
+                When status in ('Resolved', 'Closed') AND creation >= %(prev_from_date)s AND creation < %(from_date)s
+                {conds}
                 THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
                 ELSE NULL
             END) as prev_month_avg
         FROM `tabHD Ticket`
-        WHERE 
-            (creation >= %(prev_from_date)s AND creation <= %(to_date)s)
     """,
         {
             "from_date": from_date,
@@ -225,20 +244,22 @@ def get_avg_resolution_time(from_date, to_date):
     }
 
 
-def get_avg_feedback_score(from_date, to_date):
+def get_avg_feedback_score(from_date, to_date, conds=""):
     """
     Get average feedback score for the dashboard.
     """
     result = frappe.db.sql(
-        """
+        f"""
         SELECT 
             AVG(CASE 
                 WHEN creation >= %(from_date)s AND creation <= %(to_date)s  AND feedback_rating != ''
+                {conds}
                 THEN feedback_rating 
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
                 WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s AND feedback_rating != ''
+                {conds}
                 THEN feedback_rating 
                 ELSE NULL
             END) as prev_month_avg
@@ -270,25 +291,29 @@ def get_avg_feedback_score(from_date, to_date):
 
 
 def get_master_dashboard_data(from_date, to_date, team=None, agent=None):
-
-    team_data = get_team_chart_data(from_date, to_date)
-    ticket_type_data = get_ticket_type_chart_data(from_date, to_date)
-    ticket_priority_data = get_ticket_priority_chart_data(from_date, to_date)
-    ticket_channel_data = get_ticket_channel_chart_data(from_date, to_date)
+    filters = {
+        "creation": ["between", [from_date, to_date]],
+    }
+    if team:
+        filters["agent_group"] = team
+    if agent:
+        filters["_assign"] = ["like", f"%{agent}%"]
+    team_data = get_team_chart_data(from_date, to_date, filters)
+    ticket_type_data = get_ticket_type_chart_data(from_date, to_date, filters)
+    ticket_priority_data = get_ticket_priority_chart_data(from_date, to_date, filters)
+    ticket_channel_data = get_ticket_channel_chart_data(from_date, to_date, filters)
 
     return [team_data, ticket_type_data, ticket_priority_data, ticket_channel_data]
 
 
-def get_team_chart_data(from_date, to_date):
+def get_team_chart_data(from_date, to_date, filters=None):
     """
     Get team chart data for the dashboard.
     """
     result = frappe.get_all(
         "HD Ticket",
         fields=["agent_group as team", "count(name) as count"],
-        filters={
-            "creation": ["between", [from_date, to_date]],
-        },
+        filters=filters,
         group_by="agent_group",
     )
     for r in result:
@@ -314,16 +339,14 @@ def get_team_chart_data(from_date, to_date):
         )
 
 
-def get_ticket_type_chart_data(from_date, to_date):
+def get_ticket_type_chart_data(from_date, to_date, filters=None):
     """
     Get ticket type chart data for the dashboard.
     """
     result = frappe.get_all(
         "HD Ticket",
         fields=["ticket_type as type", "count(name) as count"],
-        filters={
-            "creation": ["between", [from_date, to_date]],
-        },
+        filters=filters,
         group_by="ticket_type",
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
@@ -346,16 +369,14 @@ def get_ticket_type_chart_data(from_date, to_date):
         )
 
 
-def get_ticket_priority_chart_data(from_date, to_date):
+def get_ticket_priority_chart_data(from_date, to_date, filters=None):
     """
     Get ticket priority chart data for the dashboard.
     """
     result = frappe.get_all(
         "HD Ticket",
         fields=["priority as priority", "count(name) as count"],
-        filters={
-            "creation": ["between", [from_date, to_date]],
-        },
+        filters=filters,
         group_by="priority",
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
@@ -383,16 +404,14 @@ def get_ticket_priority_chart_data(from_date, to_date):
         )
 
 
-def get_ticket_channel_chart_data(from_date, to_date):
+def get_ticket_channel_chart_data(from_date, to_date, filters=None):
     """
     Get ticket channel chart data for the dashboard.
     """
     result = frappe.get_all(
         "HD Ticket",
         fields=["via_customer_portal as channel ", "count(name) as count"],
-        filters={
-            "creation": ["between", [from_date, to_date]],
-        },
+        filters=filters,
         group_by="via_customer_portal",
         order_by="via_customer_portal desc",
     )
@@ -409,16 +428,13 @@ def get_ticket_channel_chart_data(from_date, to_date):
     )
 
 
-def get_trend_data(from_date, to_date, team=None, agent=None):
+def get_trend_data(from_date, to_date, conds=""):
     """
     Get trend data for the dashboard.
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
-    # Remove from and to date after testing
 
-    ticket_trend_data = get_ticket_trend_data(from_date, to_date)
-    feedback_trend_data = get_feedback_trend_data(from_date, to_date)
+    ticket_trend_data = get_ticket_trend_data(from_date, to_date, conds)
+    feedback_trend_data = get_feedback_trend_data(from_date, to_date, conds)
 
     return [
         ticket_trend_data,
@@ -426,18 +442,12 @@ def get_trend_data(from_date, to_date, team=None, agent=None):
     ]
 
 
-def get_ticket_trend_data(from_date, to_date):
+def get_ticket_trend_data(from_date, to_date, conds=""):
     """
-    Get ticket trend data for the dashboard.
-    data:[
-        { date: "2024-05-01", open: 6, closed: 122, sla_fulfilled: 78 },
-    ]
-    # agreement_status = 'Fulfilled'
+    Trend data for tickets in the dashboard. Ticket treand +SLA fulfilled
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
     result = frappe.db.sql(
-        """
+        f"""
         SELECT 
             DATE(creation) as date,
             COUNT(CASE WHEN status = 'Open' THEN name END) as open,
@@ -445,6 +455,7 @@ def get_ticket_trend_data(from_date, to_date):
             COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as sla_fulfilled
         FROM `tabHD Ticket`
         WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        {conds}
         GROUP BY DATE(creation)
         ORDER BY DATE(creation)
     """,
@@ -454,7 +465,7 @@ def get_ticket_trend_data(from_date, to_date):
         },
         as_dict=1,
     )
-    avg_tickets = get_avg_tickets_per_day(from_date, to_date)
+    avg_tickets = get_avg_tickets_per_day(from_date, to_date, conds)
     subtitle = f"Average tickets per day is around {avg_tickets:.0f}"
     return get_bar_chart_config(
         result,
@@ -481,12 +492,10 @@ def get_ticket_trend_data(from_date, to_date):
     )
 
 
-def get_feedback_trend_data(from_date, to_date):
+def get_feedback_trend_data(from_date, to_date, conds=""):
     """
     Get feedback trend data for the dashboard.
     """
-    # conditions = "and agent_group='Test'"
-    conditions = ""
     result = frappe.db.sql(
         f"""
         SELECT 
@@ -496,7 +505,7 @@ def get_feedback_trend_data(from_date, to_date):
         FROM `tabHD Ticket`
         WHERE 
             creation BETWEEN %(from_date)s AND %(to_date)s
-            {conditions}
+            {conds}
         GROUP BY DATE(creation)
         ORDER BY DATE(creation)
     """,
@@ -579,19 +588,18 @@ def get_conditions_from_filters(filters):
     return " AND ".join(conditions) if conditions else ""
 
 
-def get_avg_tickets_per_day(from_date, to_date):
+def get_avg_tickets_per_day(from_date, to_date, conds=""):
     """
     Get average tickets per day for the dashboard.
     """
-    from_date = frappe.utils.add_days(frappe.utils.nowdate(), -30)
-    to_date = frappe.utils.nowdate()
     result = frappe.db.sql(
-        """
+        f"""
         SELECT 
             COUNT(name) as total_tickets,
             DATEDIFF(%(to_date)s, %(from_date)s) as days
         FROM `tabHD Ticket`
         WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        {conds}
     """,
         {
             "from_date": from_date,
