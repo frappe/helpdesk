@@ -65,7 +65,7 @@ def get_number_card_data(from_date, to_date, conds=""):
     ]
 
 
-def get_ticket_count(from_date, to_date, conds=""):
+def get_ticket_count(from_date, to_date, conds="", return_result=False):
     """
     Get ticket data for the dashboard.
     """
@@ -95,8 +95,12 @@ def get_ticket_count(from_date, to_date, conds=""):
         as_dict=1,
     )
 
+    if return_result:
+        return result
+
     current_month_tickets = result[0].current_month_tickets or 0
     prev_month_tickets = result[0].prev_month_tickets or 0
+
     delta_in_percentage = (
         (current_month_tickets - prev_month_tickets) / prev_month_tickets * 100
         if prev_month_tickets
@@ -115,7 +119,10 @@ def get_ticket_count(from_date, to_date, conds=""):
 def get_resolved_tickets(from_date, to_date, conds=""):
     """
     Get resolved tickets for the dashboard.
+    Get the ticket count for the current month also get tickets resolved or closed in the current month
+    same for the previous month.
     """
+
     result = frappe.db.sql(
         f"""
         SELECT 
@@ -140,17 +147,30 @@ def get_resolved_tickets(from_date, to_date, conds=""):
         },
         as_dict=1,
     )
+
     current_month_resolved = result[0].current_month_resolved or 0
     prev_month_resolved = result[0].prev_month_resolved or 0
+    ticket_count = (
+        get_ticket_count(from_date, to_date, conds, True)[0] if len(result) > 0 else 1
+    )
+
+    current_month_resolved_percentage = (
+        current_month_resolved / ticket_count.current_month_tickets * 100
+        if ticket_count.current_month_tickets
+        else 0
+    )
+    prev_month_resolved_percentage = (
+        prev_month_resolved / ticket_count.prev_month_tickets * 100
+        if ticket_count.prev_month_tickets
+        else 0
+    )
 
     delta_in_percentage = (
-        (current_month_resolved - prev_month_resolved) / prev_month_resolved * 100
-        if prev_month_resolved
-        else 0
+        current_month_resolved_percentage - prev_month_resolved_percentage
     )
     return {
         "title": "% Resolved",
-        "value": current_month_resolved,
+        "value": current_month_resolved_percentage,
         "suffix": "%",
         "delta": delta_in_percentage,
         "deltaSuffix": "%",
@@ -185,17 +205,29 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
         },
         as_dict=1,
     )
+
     current_month_fulfilled = result[0].current_month_fulfilled or 0
     prev_month_fulfilled = result[0].prev_month_fulfilled or 0
+    ticket_count = (
+        get_ticket_count(from_date, to_date, conds, True)[0] if len(result) > 0 else 1
+    )
 
-    delta_in_percentage = (
-        (current_month_fulfilled - prev_month_fulfilled) / prev_month_fulfilled * 100
-        if prev_month_fulfilled
+    current_month_fulfilled_percentage = (
+        current_month_fulfilled / ticket_count.current_month_tickets * 100
+        if ticket_count.current_month_tickets
         else 0
+    )
+    prev_month_fulfilled_percentage = (
+        prev_month_fulfilled / ticket_count.prev_month_tickets * 100
+        if ticket_count.prev_month_tickets
+        else 0
+    )
+    delta_in_percentage = (
+        current_month_fulfilled_percentage - prev_month_fulfilled_percentage
     )
     return {
         "title": "% SLA Fulfilled",
-        "value": current_month_fulfilled,
+        "value": current_month_fulfilled_percentage,
         "suffix": "%",
         "delta": delta_in_percentage,
         "deltaSuffix": "%",
