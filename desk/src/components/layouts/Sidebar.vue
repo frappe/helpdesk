@@ -10,7 +10,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       label="Search"
-      class="mb-1"
+      class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
@@ -24,7 +24,7 @@
     </SidebarLink>
     <SidebarLink
       v-if="!isCustomerPortal"
-      class="relative"
+      class="relative my-0.5"
       label="Dashboard"
       :icon="LucideLayoutDashboard"
       :to="'Dashboard'"
@@ -39,7 +39,7 @@
         variant="solid"
       />
       <SidebarLink
-        class="relative"
+        class="relative my-0.5"
         label="Notifications"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"

@@ -9,7 +9,7 @@
 
     <div class="p-5 w-full overflow-y-scroll">
       <!-- Filters -->
-      <div class="mb-4 flex items-center gap-4">
+      <div class="mb-4 flex items-center gap-4 overflow-x-auto">
         <Dropdown
           v-show="!showDatePicker"
           :options="options"
@@ -38,7 +38,7 @@
           variant="outline"
           placeholder="Period"
           @update:model-value="
-            (e) => {
+            (e:string) => {
               showDatePicker = false;
               filters.range = formatter(e);
             }
@@ -73,6 +73,7 @@
           </template>
         </Link>
       </div>
+      <!-- Charts -->
       <div v-if="!loading">
         <!-- Number Cards -->
         <div
@@ -299,8 +300,9 @@ watch(
   (newVal) => {
     if (!newVal) return;
     nextTick(() => {
+      // TODO: Focus the date picker input when it opens, unable to do with below code
       // datePickerRef.value.inputRef.el.focus();
-      datePickerRef.value.openPopover();
+      // datePickerRef.value.openPopover();
     });
   }
 );
