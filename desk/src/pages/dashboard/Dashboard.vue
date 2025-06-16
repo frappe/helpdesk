@@ -10,20 +10,45 @@
     <div class="p-5 w-full overflow-y-scroll">
       <!-- Filters -->
       <div class="mb-4 flex items-center gap-4">
+        <Dropdown
+          v-show="!showDatePicker"
+          :options="options"
+          class="form-control !w-48"
+          v-model="filters.range"
+          placeholder="Select Range"
+          @change="filters.period = filters.range"
+          :button="{
+            label,
+            class:
+              '!w-full justify-start [&>span]:mr-auto [&>svg]:text-ink-gray-5 ',
+            variant: 'ghost',
+            iconRight: 'chevron-down',
+            iconLeft: 'calendar',
+          }"
+        >
+          <template #prefix>
+            <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+          </template>
+        </Dropdown>
         <DateRangePicker
+          v-if="showDatePicker"
           class="!w-48"
+          ref="datePickerRef"
           v-model="filters.period"
           variant="outline"
           placeholder="Period"
-          :formatter="(date: string) => {
-            const dateObj = new Date(date);
-            return dateObj.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: dateObj.getFullYear() === new Date().getFullYear() ? undefined : 'numeric',
-            });
-          }"
-        />
+          @update:model-value="
+            (e) => {
+              showDatePicker = false;
+              filters.range = formatter(e);
+            }
+          "
+          :formatter="formatRange"
+        >
+          <template #prefix>
+            <LucideCalendar class="size-4 text-ink-gray-5 mr-2" />
+          </template>
+        </DateRangePicker>
         <Link
           class="form-control w-48"
           doctype="HD Team"
@@ -107,17 +132,22 @@ import {
   DateRangePicker,
   dayjs,
   DonutChart,
+  Dropdown,
   NumberChart,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, reactive, watch } from "vue";
+import { computed, h, nextTick, reactive, ref, watch } from "vue";
 
 const filters = reactive({
   period: getLastXDays(),
   // period: null,
   agent: null,
   team: null,
+  range: "Last 30 Days",
 });
+
+const showDatePicker = ref(false);
+const datePickerRef = ref(null);
 
 const colors = [
   "#318AD8",
@@ -187,9 +217,100 @@ function getLastXDays(range: number = 30): string {
   )}`;
 }
 
+const options = computed(() => [
+  {
+    group: "Presets",
+    hideLabel: true,
+    items: [
+      {
+        label: "Today",
+        onClick: () => {
+          filters.range = "Today";
+          filters.period = getLastXDays(0);
+        },
+      },
+      {
+        label: "Last 7 Days",
+        onClick: () => {
+          filters.range = "Last 7 Days";
+          filters.period = getLastXDays(7);
+        },
+      },
+      {
+        label: "Last 30 Days",
+        onClick: () => {
+          filters.range = "Last 30 Days";
+          filters.period = getLastXDays(30);
+        },
+      },
+      {
+        label: "Last 60 Days",
+        onClick: () => {
+          filters.range = "Last 60 Days";
+          filters.period = getLastXDays(60);
+        },
+      },
+      {
+        label: "Last 90 Days",
+        onClick: () => {
+          filters.range = "Last 90 Days";
+          filters.period = getLastXDays(90);
+        },
+      },
+    ],
+  },
+  {
+    label: "Custom Range",
+    onClick: () => {
+      showDatePicker.value = true;
+      filters.range = "Custom Range";
+    },
+  },
+]);
+
+const label = computed(() => {
+  return filters.range;
+});
+
+function formatter(range: string) {
+  if (!range) {
+    filters.period = getLastXDays();
+    filters.range = "Last 30 Days";
+    return filters.range;
+  }
+  let [from, to] = range.split(",");
+  return `${formatRange(from)} to ${formatRange(to)}`;
+}
+
+function formatRange(date: string) {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year:
+      dateObj.getFullYear() === new Date().getFullYear()
+        ? undefined
+        : "numeric",
+  });
+}
+
+watch(
+  () => showDatePicker.value,
+  (newVal) => {
+    if (!newVal) return;
+    nextTick(() => {
+      // datePickerRef.value.inputRef.el.focus();
+      datePickerRef.value.openPopover();
+    });
+  }
+);
+
 watch(
   () => filters,
   (newVal) => {
+    if (newVal.range === "Custom Range") {
+      return;
+    }
     const filters = {
       from_date: newVal.period?.split(",")[0] || null,
       to_date: newVal.period?.split(",")[1] || null,
@@ -236,5 +357,10 @@ usePageMeta(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+:deep(.form-control div) {
+  width: 100%;
+  display: flex;
 }
 </style>
