@@ -375,7 +375,7 @@ watch(
 onMounted(() => {
   if (!isManager) {
     // when filters are updated, resources are reloaded coz of the watcher
-    filters.agent = userId; //
+    filters.agent = userId;
     return;
   }
   // If not managers call the resources
