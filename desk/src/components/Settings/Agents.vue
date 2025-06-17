@@ -97,7 +97,6 @@
               :button="{
                 label: getUserRole(agent.name),
                 iconRight: 'chevron-down',
-                variant: 'subtle',
               }"
               placement="right"
             />
@@ -107,7 +106,7 @@
               :key="agent"
               class="ml-2"
             >
-              <Button variant="ghost">
+              <Button>
                 <template #icon>
                   <IconMoreHorizontal class="h-4 w-4" />
                 </template>
