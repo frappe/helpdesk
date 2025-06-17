@@ -1,14 +1,25 @@
 import frappe
+from frappe import _
 
 from helpdesk.utils import agent_only
 
 
 @frappe.whitelist()
 @agent_only
-def get_dashboard_data(type, filters=None):
+def get_dashboard_data(dashboard_type, filters=None):
     """
     Get dashboard data based on the type and date range.
     """
+    user = frappe.session.user
+    is_manager = "Agent Manager" in frappe.get_roles(user)
+
+    if not is_manager and (filters.get("agent") != user or filters.get("team")):
+        frappe.throw(
+            _("You are not allowed to view this dashboard data."),
+            frappe.PermissionError,
+        )
+        return
+
     from_date = filters.get("from_date") if filters else None
     to_date = filters.get("to_date") if filters else None
     team = filters.get("team") if filters else None
@@ -35,13 +46,13 @@ def get_dashboard_data(type, filters=None):
     if _filters.agent:
         conds += f" AND JSON_SEARCH(_assign, 'one', '{_filters.agent}') IS NOT NULL"
 
-    if type == "number_card":
+    if dashboard_type == "number_card":
         return get_number_card_data(from_date, to_date, conds)
-    elif type == "master":
+    elif dashboard_type == "master":
         return get_master_dashboard_data(
             from_date, to_date, _filters.team, _filters.agent
         )
-    elif type == "trend":
+    elif dashboard_type == "trend":
         return get_trend_data(from_date, to_date, conds)
 
 
