@@ -567,9 +567,22 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
         as_dict=1,
     )
 
-    total_ratings = sum(row.rating for row in result) * 5
-
-    avg_rating = total_ratings / len(result) if result else 0  # Avoid division by zero
+    avg_rating_result = frappe.db.sql(
+        f"""
+        SELECT 
+            AVG(feedback_rating) * 5 as avg_rating
+        FROM `tabHD Ticket`
+        WHERE 
+            creation BETWEEN %(from_date)s AND %(to_date)s
+            {conds}
+    """,
+        {
+            "from_date": from_date,
+            "to_date": to_date,
+        },
+        pluck=True,
+    )
+    avg_rating = avg_rating_result[0] if avg_rating_result[0] else 0
 
     subtitle = f"Average feedback rating per day is around {avg_rating:.1f} stars"
 
