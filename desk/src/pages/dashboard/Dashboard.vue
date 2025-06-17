@@ -143,7 +143,6 @@ import { computed, h, reactive, ref, watch } from "vue";
 
 const filters = reactive({
   period: getLastXDays(),
-  // period: null,
   agent: null,
   team: null,
   range: "Last 30 Days",
