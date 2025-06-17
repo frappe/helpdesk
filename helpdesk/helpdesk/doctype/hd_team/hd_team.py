@@ -162,3 +162,12 @@ class HDTeam(Document):
             if total_users_in_assignment_rule == 0:
                 assignment_rule_doc.disabled = True
                 assignment_rule_doc.save()
+
+
+@frappe.whitelist()
+def get_team_members(team: str):
+    """
+    Returns the team members for the given team name
+    """
+    members = frappe.get_all("HD Team Member", filters={"parent": team}, pluck="user")
+    return members

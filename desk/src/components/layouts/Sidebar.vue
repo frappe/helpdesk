@@ -10,7 +10,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       label="Search"
-      class="mb-1"
+      class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
       :is-expanded="isExpanded"
@@ -22,6 +22,15 @@
         </span>
       </template>
     </SidebarLink>
+    <SidebarLink
+      v-if="!isCustomerPortal"
+      class="relative my-0.5 min-h-7"
+      label="Dashboard"
+      :icon="LucideLayoutDashboard"
+      :to="'Dashboard'"
+      :is-active="isActiveTab('Dashboard')"
+      :is-expanded="isExpanded"
+    />
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
@@ -30,7 +39,7 @@
         variant="solid"
       />
       <SidebarLink
-        class="relative"
+        class="relative my-0.5"
         label="Notifications"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
@@ -202,6 +211,7 @@ import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
