@@ -14,11 +14,11 @@
           v-if="!showDatePicker"
           :options="options"
           class="form-control !w-48"
-          v-model="filters.range"
+          v-model="preset"
           placeholder="Select Range"
-          @change="filters.period = filters.range"
+          @change="filters.period = preset"
           :button="{
-            label,
+            label: preset,
             class:
               '!w-full justify-start [&>span]:mr-auto [&>svg]:text-ink-gray-5 ',
             variant: 'ghost',
@@ -40,7 +40,7 @@
           @update:model-value="
             (e:string) => {
               showDatePicker = false;
-              filters.range = formatter(e);
+              preset = formatter(e);
             }
           "
           :formatter="formatRange"
@@ -50,6 +50,7 @@
           </template>
         </DateRangePicker>
         <Link
+          v-if="isManager"
           class="form-control w-48"
           doctype="HD Team"
           placeholder="Team"
@@ -62,6 +63,7 @@
           </template>
         </Link>
         <Link
+          v-if="isManager"
           class="form-control w-48"
           doctype="HD Agent"
           placeholder="Agent"
@@ -76,7 +78,7 @@
         </Link>
       </div>
       <!-- Charts -->
-      <div v-if="!loading">
+      <div v-if="!loading" class="transition-all animate-fade-in duration-300">
         <!-- Number Cards -->
         <div
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
@@ -119,7 +121,7 @@
       <!-- Loading State -->
       <div
         v-else
-        class="flex items-center justify-center h-[240px] gap-2 rounded"
+        class="flex items-center justify-center h-[240px] gap-2 rounded transition-all animate-fade-in"
       >
         <Button :loading="true" size="2xl" variant="ghost" />
       </div>
@@ -129,6 +131,7 @@
 
 <script setup lang="ts">
 import { Link } from "@/components";
+import { useAuthStore } from "@/stores/auth";
 import {
   AxisChart,
   createResource,
@@ -139,13 +142,14 @@ import {
   NumberChart,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, reactive, ref, watch } from "vue";
+import { computed, h, onMounted, reactive, ref, watch } from "vue";
+
+const { isManager, userId } = useAuthStore();
 
 const filters = reactive({
   period: getLastXDays(),
   agent: null,
   team: null,
-  range: "Last 30 Days",
 });
 
 const colors = [
@@ -165,27 +169,27 @@ const numberCards = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "NumberCards"],
   params: {
-    type: "number_card",
+    dashboard_type: "number_card",
+    filters,
   },
-  auto: true,
 });
 
 const masterData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "MasterCharts"],
   params: {
-    type: "master",
+    dashboard_type: "master",
+    filters,
   },
-  auto: true,
 });
 
 const trendData = createResource({
   url: "helpdesk.api.dashboard.get_dashboard_data",
   cache: ["Analytics", "TrendCharts"],
   params: {
-    type: "trend",
+    dashboard_type: "trend",
+    filters,
   },
-  auto: true,
 });
 
 const agentFilter = ref(null);
@@ -249,6 +253,7 @@ function getLastXDays(range: number = 30): string {
 
 const showDatePicker = ref(false);
 const datePickerRef = ref(null);
+const preset = ref("Last 30 Days");
 
 const options = computed(() => [
   {
@@ -258,35 +263,35 @@ const options = computed(() => [
       {
         label: "Today",
         onClick: () => {
-          filters.range = "Today";
+          preset.value = "Today";
           filters.period = getLastXDays(0);
         },
       },
       {
         label: "Last 7 Days",
         onClick: () => {
-          filters.range = "Last 7 Days";
+          preset.value = "Last 7 Days";
           filters.period = getLastXDays(7);
         },
       },
       {
         label: "Last 30 Days",
         onClick: () => {
-          filters.range = "Last 30 Days";
+          preset.value = "Last 30 Days";
           filters.period = getLastXDays(30);
         },
       },
       {
         label: "Last 60 Days",
         onClick: () => {
-          filters.range = "Last 60 Days";
+          preset.value = "Last 60 Days";
           filters.period = getLastXDays(60);
         },
       },
       {
         label: "Last 90 Days",
         onClick: () => {
-          filters.range = "Last 90 Days";
+          preset.value = "Last 90 Days";
           filters.period = getLastXDays(90);
         },
       },
@@ -299,21 +304,17 @@ const options = computed(() => [
       setTimeout(() => {
         datePickerRef.value?.open();
       }, 0);
-      filters.range = "Custom Range";
+      preset.value = "Custom Range";
       filters.period = null; // Reset period to allow custom date selection
     },
   },
 ]);
 
-const label = computed(() => {
-  return filters.range;
-});
-
 function formatter(range: string) {
   if (!range) {
     filters.period = getLastXDays();
-    filters.range = "Last 30 Days";
-    return filters.range;
+    preset.value = "Last 30 Days";
+    return preset.value;
   }
   let [from, to] = range.split(",");
   return `${formatRange(from)} to ${formatRange(to)}`;
@@ -346,7 +347,7 @@ watch(
 
     numberCards.update({
       params: {
-        type: "number_card",
+        dashboard_type: "number_card",
         filters: filters,
       },
     });
@@ -354,7 +355,7 @@ watch(
 
     masterData.update({
       params: {
-        type: "master",
+        dashboard_type: "master",
         filters: filters,
       },
     });
@@ -362,7 +363,7 @@ watch(
 
     trendData.update({
       params: {
-        type: "trend",
+        dashboard_type: "trend",
         filters: filters,
       },
     });
@@ -370,6 +371,18 @@ watch(
   },
   { deep: true }
 );
+
+onMounted(() => {
+  if (!isManager) {
+    // when filters are updated, resources are reloaded coz of the watcher
+    filters.agent = userId; // Reset team if not a manager
+    return;
+  }
+  // If not managers call the resources
+  numberCards.reload();
+  masterData.reload();
+  trendData.reload();
+});
 
 usePageMeta(() => {
   return {
