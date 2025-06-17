@@ -24,7 +24,7 @@
     </SidebarLink>
     <SidebarLink
       v-if="!isCustomerPortal"
-      class="relative my-0.5"
+      class="relative my-0.5 min-h-7"
       label="Dashboard"
       :icon="LucideLayoutDashboard"
       :to="'Dashboard'"
