@@ -11,7 +11,7 @@
       <!-- Filters -->
       <div class="mb-4 flex items-center gap-4 overflow-x-auto">
         <Dropdown
-          v-show="!showDatePicker"
+          v-if="!showDatePicker"
           :options="options"
           class="form-control !w-48"
           v-model="filters.range"
@@ -31,7 +31,7 @@
           </template>
         </Dropdown>
         <DateRangePicker
-          v-if="showDatePicker"
+          v-else
           class="!w-48"
           ref="datePickerRef"
           v-model="filters.period"
@@ -67,6 +67,8 @@
           placeholder="Agent"
           v-model="filters.agent"
           :page-length="5"
+          :filters="agentFilter"
+          :hide-me="true"
         >
           <template #prefix>
             <LucideUser class="size-4 text-ink-gray-5 mr-2" />
@@ -137,7 +139,7 @@ import {
   NumberChart,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, nextTick, reactive, ref, watch } from "vue";
+import { computed, h, reactive, ref, watch } from "vue";
 
 const filters = reactive({
   period: getLastXDays(),
@@ -146,9 +148,6 @@ const filters = reactive({
   team: null,
   range: "Last 30 Days",
 });
-
-const showDatePicker = ref(false);
-const datePickerRef = ref(null);
 
 const colors = [
   "#318AD8",
@@ -190,6 +189,37 @@ const trendData = createResource({
   auto: true,
 });
 
+const agentFilter = ref(null);
+const teamMembers = createResource({
+  url: "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
+  cache: ["Analytics", "TeamMembers"],
+  params: {
+    team: filters.team,
+  },
+  onSuccess: (data) => {
+    // Set Agent Filters
+    agentFilter.value = { name: ["in", data] };
+  },
+});
+
+watch(
+  () => filters.team,
+  (newVal) => {
+    filters.agent = null; // Reset agent when team is selected
+    if (newVal) {
+      teamMembers.update({
+        params: {
+          team: newVal,
+        },
+      });
+      teamMembers.reload();
+    }
+    if (!newVal) {
+      agentFilter.value = null; // Reset agent filter if no team is selected
+    }
+  }
+);
+
 const loading = computed(() => {
   return numberCards.loading || masterData.loading || trendData.loading;
 });
@@ -210,13 +240,16 @@ function getChartType(chart: any) {
 
 function getLastXDays(range: number = 30): string {
   const today = new Date();
-  const last30Days = new Date(today);
-  last30Days.setDate(today.getDate() - range);
+  const lastXDate = new Date(today);
+  lastXDate.setDate(today.getDate() - range);
 
-  return `${dayjs(last30Days).format("YYYY-MM-DD")},${dayjs(today).format(
+  return `${dayjs(lastXDate).format("YYYY-MM-DD")},${dayjs(today).format(
     "YYYY-MM-DD"
   )}`;
 }
+
+const showDatePicker = ref(false);
+const datePickerRef = ref(null);
 
 const options = computed(() => [
   {
@@ -264,7 +297,11 @@ const options = computed(() => [
     label: "Custom Range",
     onClick: () => {
       showDatePicker.value = true;
+      setTimeout(() => {
+        datePickerRef.value?.open();
+      }, 0);
       filters.range = "Custom Range";
+      filters.period = null; // Reset period to allow custom date selection
     },
   },
 ]);
@@ -296,21 +333,9 @@ function formatRange(date: string) {
 }
 
 watch(
-  () => showDatePicker.value,
-  (newVal) => {
-    if (!newVal) return;
-    nextTick(() => {
-      // TODO: Focus the date picker input when it opens, unable to do with below code
-      // datePickerRef.value.inputRef.el.focus();
-      // datePickerRef.value.openPopover();
-    });
-  }
-);
-
-watch(
   () => filters,
   (newVal) => {
-    if (newVal.range === "Custom Range") {
+    if (showDatePicker.value) {
       return;
     }
     const filters = {
@@ -319,6 +344,7 @@ watch(
       agent: newVal.agent || null,
       team: newVal.team || null,
     };
+
     numberCards.update({
       params: {
         type: "number_card",
@@ -326,6 +352,7 @@ watch(
       },
     });
     numberCards.reload();
+
     masterData.update({
       params: {
         type: "master",
@@ -333,6 +360,7 @@ watch(
       },
     });
     masterData.reload();
+
     trendData.update({
       params: {
         type: "trend",
