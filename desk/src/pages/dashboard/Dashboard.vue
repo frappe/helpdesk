@@ -84,12 +84,16 @@
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4"
           v-if="!numberCards.loading"
         >
-          <NumberChart
+          <Tooltip
             v-for="(config, index) in numberCards.data"
-            :key="index"
-            class="border rounded-md"
-            :config="config"
-          />
+            :text="config.tooltip"
+          >
+            <NumberChart
+              :key="index"
+              class="border rounded-md"
+              :config="config"
+            />
+          </Tooltip>
         </div>
         <!-- Trend Charts -->
         <div
@@ -140,6 +144,7 @@ import {
   DonutChart,
   Dropdown,
   NumberChart,
+  Tooltip,
   usePageMeta,
 } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";

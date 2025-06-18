@@ -7,6 +7,8 @@ from helpdesk.utils import agent_only
 @frappe.whitelist()
 @agent_only
 def get_dashboard_data(dashboard_type, filters=None):
+    # TODO:
+    #   3. Tooltip
     """
     Get dashboard data based on the type and date range.
     """
@@ -62,15 +64,15 @@ def get_number_card_data(from_date, to_date, conds=""):
     """
 
     ticket_chart_data = get_ticket_count(from_date, to_date, conds)
-    resolved_tickets = get_resolved_tickets(from_date, to_date, conds)
     sla_fulfilled_count = get_sla_fulfilled_count(from_date, to_date, conds)
+    avg_first_response_time = get_avg_first_response_time(from_date, to_date, conds)
     avg_resolution_time = get_avg_resolution_time(from_date, to_date, conds)
     avg_feedback_score = get_avg_feedback_score(from_date, to_date, conds)
 
     return [
         ticket_chart_data,
-        resolved_tickets,
         sla_fulfilled_count,
+        avg_first_response_time,
         avg_resolution_time,
         avg_feedback_score,
     ]
@@ -85,19 +87,19 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
     result = frappe.db.sql(
         f"""
 		SELECT
-				COUNT(CASE
-					WHEN creation >= %(from_date)s AND creation <= %(to_date)s 
-                    {conds}
-					THEN name
-					ELSE NULL
-				END) as current_month_tickets,
+            COUNT(CASE
+                WHEN creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+                {conds}
+                THEN name
+                ELSE NULL
+            END) as current_month_tickets,
 
-				COUNT(CASE
-					WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s 
-                    {conds}
-					THEN name
-					ELSE NULL
-				END) as prev_month_tickets
+            COUNT(CASE
+                WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s 
+                {conds}
+                THEN name
+                ELSE NULL
+            END) as prev_month_tickets
 		FROM `tabHD Ticket`
     """,
         {
@@ -126,68 +128,7 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
         "delta": delta_in_percentage,
         "deltaSuffix": "%",
         "negativeIsBetter": True,
-    }
-
-
-def get_resolved_tickets(from_date, to_date, conds=""):
-    """
-    Get resolved tickets for the dashboard.
-    Get the ticket count for the current month also get tickets resolved or closed in the current month
-    same for the previous month.
-    """
-    diff = frappe.utils.date_diff(to_date, from_date)
-
-    result = frappe.db.sql(
-        f"""
-        SELECT 
-            COUNT(CASE 
-                WHEN creation >= %(from_date)s AND creation <= %(to_date)s AND status IN ('Resolved', 'Closed')
-                {conds}
-                THEN name 
-                ELSE NULL
-            END) as current_month_resolved,
-            COUNT(CASE 
-                WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s AND status IN ('Resolved', 'Closed')
-                {conds}
-                THEN name 
-                ELSE NULL
-            END) as prev_month_resolved
-        FROM `tabHD Ticket`
-    """,
-        {
-            "from_date": from_date,
-            "to_date": to_date,
-            "prev_from_date": frappe.utils.add_days(from_date, -diff),
-        },
-        as_dict=1,
-    )
-
-    current_month_resolved = result[0].current_month_resolved or 0
-    prev_month_resolved = result[0].prev_month_resolved or 0
-    ticket_count = (
-        get_ticket_count(from_date, to_date, conds, True)[0] if len(result) > 0 else 1
-    )
-
-    current_month_resolved_percentage = (
-        current_month_resolved / ticket_count.current_month_tickets * 100
-        if ticket_count.current_month_tickets
-        else 0
-    )
-    prev_month_resolved_percentage = (
-        prev_month_resolved / ticket_count.prev_month_tickets * 100
-        if ticket_count.prev_month_tickets
-        else 0
-    )
-
-    delta_in_percentage = (
-        current_month_resolved_percentage - prev_month_resolved_percentage
-    )
-    return {
-        "title": "% Resolved",
-        "value": current_month_resolved_percentage,
-        "suffix": "%",
-        "delta": delta_in_percentage,
-        "deltaSuffix": "%",
+        "tooltip": "Total number of tickets created",
     }
 
 
@@ -201,9 +142,9 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
         f"""
         SELECT 
             COUNT(CASE 
-                WHEN creation >= %(from_date)s AND creation <= %(to_date)s AND agreement_status = 'Fulfilled'
+                WHEN creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY) AND agreement_status = 'Fulfilled'
                 {conds}
-                THEN name 
+                THEN name
                 ELSE NULL
             END) as current_month_fulfilled,
             COUNT(CASE 
@@ -224,6 +165,10 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
 
     current_month_fulfilled = result[0].current_month_fulfilled or 0
     prev_month_fulfilled = result[0].prev_month_fulfilled or 0
+
+    # Only these tickets should be counted
+    conds += " AND status in ('Resolved', 'Closed')"
+
     ticket_count = (
         get_ticket_count(from_date, to_date, conds, True)[0] if len(result) > 0 else 1
     )
@@ -247,6 +192,61 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
         "suffix": "%",
         "delta": delta_in_percentage,
         "deltaSuffix": "%",
+        "tooltip": "% of tickets created that were resolved within SLA",
+    }
+
+
+def get_avg_first_response_time(from_date, to_date, conds=""):
+    """
+    first_response_time is the time taken to first respond to a ticket.
+    Get average first response time for the dashboard.
+    """
+    diff = frappe.utils.date_diff(to_date, from_date)
+
+    result = frappe.db.sql(
+        f"""
+        SELECT 
+            AVG(CASE 
+                WHEN creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY) AND first_responded_on IS NOT NULL
+                {conds}
+                THEN TIMESTAMPDIFF(SECOND, creation, first_responded_on)
+                ELSE NULL
+            END) as current_month_avg,
+            AVG(CASE 
+                When creation >= %(prev_from_date)s AND creation < %(from_date)s AND first_responded_on IS NOT NULL
+                {conds}
+                THEN TIMESTAMPDIFF(SECOND, creation, first_responded_on)
+                ELSE NULL
+            END) as prev_month_avg
+        FROM `tabHD Ticket`
+    """,
+        {
+            "from_date": from_date,
+            "to_date": to_date,
+            "prev_from_date": frappe.utils.add_days(from_date, -diff),
+        },
+        as_dict=1,
+    )
+    seconds_to_hours = 3600
+    current_month_avg = (
+        result[0].current_month_avg / seconds_to_hours
+        if result[0].current_month_avg
+        else 0
+    )
+    prev_month_avg = (
+        result[0].prev_month_avg / seconds_to_hours if result[0].prev_month_avg else 0
+    )
+
+    delta = current_month_avg - prev_month_avg if prev_month_avg else 0
+
+    return {
+        "title": "Avg. First Response",
+        "value": current_month_avg,
+        "suffix": " hrs",
+        "delta": delta,
+        "deltaSuffix": " hrs",
+        "negativeIsBetter": True,
+        "tooltip": "Avg. time taken to first respond to a ticket",
     }
 
 
@@ -260,7 +260,7 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
         f"""
         SELECT 
             AVG(CASE 
-                WHEN status in ('Resolved', 'Closed') AND creation >= %(from_date)s AND creation <= %(to_date)s
+                WHEN status in ('Resolved', 'Closed') AND creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
                 {conds}
                 THEN TIMESTAMPDIFF(DAY, creation, resolution_date)
                 ELSE NULL
@@ -285,12 +285,13 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
 
     delta = current_month_avg - prev_month_avg if prev_month_avg else 0
     return {
-        "title": "Avg. Resolution Time",
+        "title": "Avg. Resolution",
         "value": current_month_avg,
         "suffix": " days",
         "delta": delta,
         "deltaSuffix": " days",
         "negativeIsBetter": True,
+        "tooltip": "Avg. time taken to resolve a ticket",
     }
 
 
@@ -303,21 +304,18 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
         f"""
         SELECT 
             AVG(CASE 
-                WHEN creation >= %(from_date)s AND creation <= %(to_date)s  AND feedback_rating != ''
+                WHEN creation >= %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY) AND feedback_rating > 0
                 {conds}
                 THEN feedback_rating 
                 ELSE NULL
             END) as current_month_avg,
             AVG(CASE 
-                WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s AND feedback_rating != ''
+                WHEN creation >= %(prev_from_date)s AND creation < %(from_date)s AND feedback_rating > 0 
                 {conds}
                 THEN feedback_rating 
                 ELSE NULL
             END) as prev_month_avg
         FROM `tabHD Ticket`
-        WHERE 
-            (creation >= %(prev_from_date)s AND creation <= %(to_date)s)
-            AND feedback_rating IS NOT NULL
     """,
         {
             "from_date": from_date,
@@ -338,6 +336,7 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
         "suffix": "/5",
         "delta": delta * 5,
         "deltaSuffix": " stars",
+        "tooltip": "Avg. feedback rating for the tickets resolved",
     }
 
 
@@ -503,9 +502,9 @@ def get_ticket_trend_data(from_date, to_date, conds=""):
             DATE(creation) as date,
             COUNT(CASE WHEN status = 'Open' THEN name END) as open,
             COUNT(CASE WHEN status IN ('Resolved', 'Closed') THEN name END) as closed,
-            COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as sla_fulfilled
+            COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
         FROM `tabHD Ticket`
-        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
+        WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
         {conds}
         GROUP BY DATE(creation)
         ORDER BY DATE(creation)
@@ -528,7 +527,7 @@ def get_ticket_trend_data(from_date, to_date, conds=""):
             {"name": "closed", "type": "bar"},
             {"name": "open", "type": "bar"},
             {
-                "name": "sla_fulfilled",
+                "name": "SLA_fulfilled",
                 "type": "line",
                 "showDataPoints": True,
                 "axis": "y2",
@@ -551,11 +550,11 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
         f"""
         SELECT 
             DATE(creation) as date,
-            AVG(CASE WHEN feedback_rating IS NOT NULL THEN feedback_rating END) * 5 as rating,
-            COUNT(CASE WHEN feedback_rating IS NOT NULL THEN name END) as rated_tickets
+            AVG(CASE WHEN feedback_rating > 0 THEN feedback_rating END) * 5 as rating,
+            COUNT(CASE WHEN feedback_rating > 0 THEN name END) as rated_tickets
         FROM `tabHD Ticket`
         WHERE 
-            creation BETWEEN %(from_date)s AND %(to_date)s
+            creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
         GROUP BY DATE(creation)
         ORDER BY DATE(creation)
@@ -573,8 +572,9 @@ def get_feedback_trend_data(from_date, to_date, conds=""):
             AVG(feedback_rating) * 5 as avg_rating
         FROM `tabHD Ticket`
         WHERE 
-            creation BETWEEN %(from_date)s AND %(to_date)s
+            creation BETWEEN %(from_date)s AND DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
             {conds}
+            AND feedback_rating > 0
     """,
         {
             "from_date": from_date,
@@ -658,13 +658,13 @@ def get_avg_tickets_per_day(from_date, to_date, conds=""):
     """
     result = frappe.db.sql(
         f"""
-        SELECT 
-            COUNT(name) as total_tickets,
-            DATEDIFF(%(to_date)s, %(from_date)s) as days
-        FROM `tabHD Ticket`
-        WHERE creation BETWEEN %(from_date)s AND %(to_date)s
-        {conds}
-    """,
+            SELECT 
+                COUNT(name) as total_tickets,
+                DATEDIFF(DATE_ADD(%(to_date)s, INTERVAL 1 DAY), %(from_date)s) as days
+            FROM `tabHD Ticket`
+            WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+            {conds}
+        """,
         {
             "from_date": from_date,
             "to_date": to_date,
