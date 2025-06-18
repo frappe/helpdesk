@@ -81,6 +81,8 @@ def get_ticket_count(from_date, to_date, conds="", return_result=False):
     Get ticket data for the dashboard.
     """
     diff = frappe.utils.date_diff(to_date, from_date)
+    if diff == 0:
+        diff = 1
 
     result = frappe.db.sql(
         f"""
@@ -135,6 +137,8 @@ def get_sla_fulfilled_count(from_date, to_date, conds=""):
     Get the percent of SLA tickets fulfilled for the dashboard.
     """
     diff = frappe.utils.date_diff(to_date, from_date)
+    if diff == 0:
+        diff = 1
 
     result = frappe.db.sql(
         f"""
@@ -200,6 +204,8 @@ def get_avg_first_response_time(from_date, to_date, conds=""):
     Get average first response time for the dashboard.
     """
     diff = frappe.utils.date_diff(to_date, from_date)
+    if diff == 0:
+        diff = 1
 
     result = frappe.db.sql(
         f"""
@@ -253,6 +259,8 @@ def get_avg_resolution_time(from_date, to_date, conds=""):
     Get average resolution time for the dashboard.
     """
     diff = frappe.utils.date_diff(to_date, from_date)
+    if diff == 0:
+        diff = 1
 
     result = frappe.db.sql(
         f"""
@@ -298,6 +306,9 @@ def get_avg_feedback_score(from_date, to_date, conds=""):
     Get average feedback score for the dashboard.
     """
     diff = frappe.utils.date_diff(to_date, from_date)
+    if diff == 0:
+        diff = 1
+
     result = frappe.db.sql(
         f"""
         SELECT 
