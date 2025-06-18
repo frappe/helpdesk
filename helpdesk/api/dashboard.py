@@ -7,8 +7,6 @@ from helpdesk.utils import agent_only
 @frappe.whitelist()
 @agent_only
 def get_dashboard_data(dashboard_type, filters=None):
-    # TODO:
-    #   3. Tooltip
     """
     Get dashboard data based on the type and date range.
     """
@@ -498,17 +496,17 @@ def get_ticket_trend_data(from_date, to_date, conds=""):
     """
     result = frappe.db.sql(
         f"""
-        SELECT 
-            DATE(creation) as date,
-            COUNT(CASE WHEN status = 'Open' THEN name END) as open,
-            COUNT(CASE WHEN status IN ('Resolved', 'Closed') THEN name END) as closed,
-            COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
-        FROM `tabHD Ticket`
-        WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
-        {conds}
-        GROUP BY DATE(creation)
-        ORDER BY DATE(creation)
-    """,
+            SELECT 
+                DATE(creation) as date,
+                COUNT(CASE WHEN status = 'Open' THEN name END) as open,
+                COUNT(CASE WHEN status IN ('Resolved', 'Closed') THEN name END) as closed,
+                COUNT(CASE WHEN agreement_status = 'Fulfilled' THEN name END) as SLA_fulfilled
+            FROM `tabHD Ticket`
+            WHERE creation > %(from_date)s AND creation < DATE_ADD(%(to_date)s, INTERVAL 1 DAY)
+            {conds}
+            GROUP BY DATE(creation)
+            ORDER BY DATE(creation)
+        """,
         {
             "from_date": from_date,
             "to_date": to_date,
