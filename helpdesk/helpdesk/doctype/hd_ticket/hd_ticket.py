@@ -161,12 +161,12 @@ class HDTicket(Document):
         old_status = (
             self.get_doc_before_save().status if self.get_doc_before_save() else None
         )
-        is_closed_or_resoled = old_status == "Open" and self.status in [
+        is_closed_or_resolved = old_status == "Open" and self.status in [
             "Resolved",
             "Closed",
         ]
 
-        if self.status == "Replied" or is_closed_or_resoled:
+        if self.status == "Replied" or is_closed_or_resolved:
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
@@ -519,7 +519,9 @@ class HDTicket(Document):
                 subject=subject,
                 template=template,
                 with_container=False,
-                in_reply_to=last_communication.name,
+                in_reply_to=last_communication.name
+                if last_communication.name
+                else None,
             )
         except Exception as e:
             frappe.throw(_(e))
