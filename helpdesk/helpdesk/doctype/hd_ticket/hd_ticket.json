@@ -13,6 +13,10 @@
   "raised_by",
   "status",
   "priority",
+  "custom_app",
+  "custom_is_enterprise",
+  "custom_is_premium_server",
+  "custom_is_security_issue",
   "cb00",
   "ticket_type",
   "agent_group",
@@ -432,13 +436,36 @@
    "label": "Merged With",
    "options": "HD Ticket",
    "read_only": 1
+  },
+  {
+   "fieldname": "custom_app",
+   "fieldtype": "Data",
+   "label": "custom_app"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_is_enterprise",
+   "fieldtype": "Check",
+   "label": "custom_is_enterprise"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_is_premium_server",
+   "fieldtype": "Check",
+   "label": "custom_is_premium_server"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_is_security_issue",
+   "fieldtype": "Check",
+   "label": "custom_is_security_issue"
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-06-12 17:53:46.793081",
+ "modified": "2025-06-17 14:30:27.184376",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
