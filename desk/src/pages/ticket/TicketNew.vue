@@ -51,7 +51,7 @@
           />
         </div>
         <SearchArticles
-          v-if="isCustomerPortal"
+          v-if="isCustomerPortal && showSuggestedArticles"
           :query="subject"
           class="shadow"
         />
@@ -139,6 +139,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SearchArticles from "../../components/SearchArticles.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
+import { useConfigStore } from "@/stores/config";
 
 interface P {
   templateId?: string;
@@ -153,6 +154,7 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
+const { showSuggestedArticles } = useConfigStore();
 
 const subject = ref("");
 const description = ref("");
