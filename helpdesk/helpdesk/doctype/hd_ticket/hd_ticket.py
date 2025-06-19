@@ -78,7 +78,7 @@ class HDTicket(Document):
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
 
-        if not self.via_customer_portal:
+        if not self.via_customer_portal and not frappe.flags.initial_sync:
             self.send_acknowledgement_email()
 
     def on_update(self):
