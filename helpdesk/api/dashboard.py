@@ -363,6 +363,7 @@ def get_team_chart_data(from_date, to_date, filters=None):
         fields=["agent_group as team", "count(name) as count"],
         filters=filters,
         group_by="agent_group",
+        order_by="count desc",
     )
     for r in result:
         if not r.team:
@@ -396,6 +397,7 @@ def get_ticket_type_chart_data(from_date, to_date, filters=None):
         fields=["ticket_type as type", "count(name) as count"],
         filters=filters,
         group_by="ticket_type",
+        order_by="count desc",
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
     if len(result) < 7:
@@ -426,6 +428,7 @@ def get_ticket_priority_chart_data(from_date, to_date, filters=None):
         fields=["priority as priority", "count(name) as count"],
         filters=filters,
         group_by="priority",
+        order_by="count desc",
     )
     # based on length show different chart, if len greater than 5 then show pie chart else bar chart
     if len(result) < 7:
