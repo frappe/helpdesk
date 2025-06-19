@@ -78,7 +78,14 @@ class HDTicket(Document):
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
 
-        if not self.via_customer_portal and not frappe.flags.initial_sync:
+        send_ack_email = frappe.db.get_single_value(
+            "HD Settings", "send_acknowledgement_email"
+        )
+        if (
+            not self.via_customer_portal
+            and not frappe.flags.initial_sync
+            and send_ack_email
+        ):
             self.send_acknowledgement_email()
 
     def on_update(self):
