@@ -17,7 +17,7 @@
           <div><UserMenu class="p-2 mb-2" :options="profileSettings" /></div>
           <!-- notifications -->
           <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
-            <div class="mb-3 flex flex-col">
+            <div class="mb-3 flex flex-col gap-1">
               <SidebarLink
                 class="relative"
                 label="Notifications"
@@ -35,6 +35,15 @@
                   />
                 </template>
               </SidebarLink>
+              <SidebarLink
+                v-if="!isCustomerPortal"
+                class="relative"
+                label="Dashboard"
+                :icon="LucideLayoutDashboard"
+                :to="'Dashboard'"
+                :is-active="isActiveTab('Dashboard')"
+                :is-expanded="true"
+              />
             </div>
           </div>
 
@@ -114,6 +123,7 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
