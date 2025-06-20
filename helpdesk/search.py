@@ -161,12 +161,9 @@ class Search:
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
         query.with_scores()
+        query.dialect(None)
 
-        try:
-            result = self.redis.ft(self.index_name).search(query)
-        except ResponseError as e:
-            print(e)
-            return frappe._dict({"total": 0, "docs": [], "duration": 0})
+        result = self.redis.ft(self.index_name).search(query)
 
         out = frappe._dict(docs=[], total=result.total, duration=result.duration)
         for doc in result.docs:
@@ -379,7 +376,7 @@ def search(query, only_articles=False) -> list[dict[str, list[dict]]]:
 
 
 @frappe.whitelist()
-@filelock("helpdesk_search_indexing", timeout=60)
+@filelock("helpdesk_search_indexing", timeout=1)
 def build_index():
     frappe.cache().set_value("helpdesk_search_indexing_in_progress", True)
     search = HelpdeskSearch()
@@ -398,7 +395,7 @@ def build_index_if_not_exists():
         build_index()
 
 
-@filelock("helpdesk_corpus_download", timeout=60)
+@filelock("helpdesk_corpus_download", timeout=1, is_global=True)
 def download_corpus():
     from nltk import data, download
 
