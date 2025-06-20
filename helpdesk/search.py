@@ -161,12 +161,9 @@ class Search:
         query.summarize(fields=["description"])
         query.scorer("DISMAX")
         query.with_scores()
+        query.dialect()
 
-        try:
-            result = self.redis.ft(self.index_name).search(query)
-        except ResponseError as e:
-            print(e)
-            return frappe._dict({"total": 0, "docs": [], "duration": 0})
+        result = self.redis.ft(self.index_name).search(query)
 
         out = frappe._dict(docs=[], total=result.total, duration=result.duration)
         for doc in result.docs:
