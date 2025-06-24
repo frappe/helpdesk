@@ -106,20 +106,6 @@ class HDServiceLevelAgreement(Document):
                 _("The Condition '{0}' is invalid: {1}").format(self.condition, str(e))
             )
 
-    # What?
-    def get_hd_service_level_agreement_priority(self, priority):
-        priority = frappe.get_doc(
-            "HD Service Level Priority", {"priority": priority, "parent": self.name}
-        )
-
-        return frappe._dict(
-            {
-                "priority": priority.priority,
-                "response_time": priority.response_time,
-                "resolution_time": priority.resolution_time,
-            }
-        )
-
     def apply(self, doc: Document):
         self.handle_new(doc)
         self.handle_status(doc)
@@ -250,7 +236,14 @@ class HDServiceLevelAgreement(Document):
         target: Literal["response_time", "resolution_time"],
     ):
         res = get_datetime(start_at)
-        priority = self.get_priorities()[priority]
+        priorities = self.get_priorities()
+
+        if priority not in priorities:
+            frappe.throw(
+                _("Please add {0} priority in {1} SLA").format(priority, self.name)
+            )
+        priority = priorities[priority]
+
         time_needed = priority.get(target, 0)
         holidays = self.get_holidays()
         weekdays = get_weekdays()
