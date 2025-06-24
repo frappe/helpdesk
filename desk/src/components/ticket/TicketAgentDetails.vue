@@ -25,10 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { Badge, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
-import { formatTime } from "@/utils";
-import { dateFormat, dateTooltipFormat } from "@/utils";
+import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
+import { Badge, Tooltip } from "frappe-ui";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -80,24 +79,25 @@ const resolutionBadge = computed(() => {
     props.ticket.on_hold_since &&
     dayjs(props.ticket.resolution_by).isAfter(dayjs(props.ticket.on_hold_since))
   ) {
-    let time_left = formatTime(
+    let timeLeft = formatTime(
       dayjs(props.ticket.resolution_by).diff(
         dayjs(props.ticket.on_hold_since),
         "s"
       )
     );
     resolution = {
-      label: `${time_left} left (On Hold)`,
+      label: `${timeLeft} left (On Hold)`,
       color: "blue",
     };
   } else if (
     !props.ticket.resolution_date &&
     dayjs().isBefore(props.ticket.resolution_by)
   ) {
+    let resolutionBy = getCalculatedResolution();
+    console.log(resolutionBy);
+
     resolution = {
-      label: `Due in ${formatTime(
-        dayjs(props.ticket.resolution_by).diff(dayjs(), "s")
-      )}`,
+      label: `Due in ${resolutionBy}`,
       color: "orange",
     };
   } else if (
@@ -120,6 +120,16 @@ const resolutionBadge = computed(() => {
   }
   return resolution;
 });
+
+function getCalculatedResolution() {
+  let resolution = dayjs(props.ticket.resolution_by).add(
+    props.ticket.total_hold_time,
+    "s"
+  );
+  // let now = new Date()
+  resolution = dayjs(resolution).diff(dayjs(), "s");
+  return formatTime(resolution);
+}
 
 const sections = computed(() => [
   {
