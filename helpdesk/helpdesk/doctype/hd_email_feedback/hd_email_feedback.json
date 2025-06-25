@@ -1,0 +1,55 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-24 17:00:21.771050",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "e",
+  "feedback_rating",
+  "feedback_extra"
+ ],
+ "fields": [
+  {
+   "fieldname": "e",
+   "fieldtype": "Data",
+   "label": "Encrypted Ticket Name"
+  },
+  {
+   "fieldname": "feedback_rating",
+   "fieldtype": "Rating",
+   "label": "Feedback Rating"
+  },
+  {
+   "fieldname": "feedback_extra",
+   "fieldtype": "Long Text",
+   "label": "Feedback Extra"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-06-24 17:05:25.640131",
+ "modified_by": "Administrator",
+ "module": "Helpdesk",
+ "name": "HD Email Feedback",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

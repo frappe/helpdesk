@@ -20,6 +20,7 @@
   "sb_details",
   "description",
   "template",
+  "encrypted_name",
   "sla_tab",
   "service_level_section",
   "sla",
@@ -432,13 +433,20 @@
    "label": "Merged With",
    "options": "HD Ticket",
    "read_only": 1
+  },
+  {
+   "fieldname": "encrypted_name",
+   "fieldtype": "Data",
+   "label": "Encrypted Name",
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-06-12 17:53:46.793081",
+ "modified": "2025-06-24 17:06:58.156938",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
