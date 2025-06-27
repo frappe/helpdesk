@@ -69,7 +69,7 @@
                 <component
                   :is="getValueControl(f)"
                   v-model="f.value"
-                  @change.stop="(v) => updateValue(v, f)"
+                  @change="(v) => updateValue(v, f)"
                   :placeholder="'John Doe'"
                 />
               </div>
@@ -155,18 +155,18 @@
   </NestedPopover>
 </template>
 <script setup>
-import { h, computed, inject } from "vue";
-import {
-  FormControl,
-  Tooltip,
-  DatePicker,
-  DateTimePicker,
-  DateRangePicker,
-  NestedPopover,
-} from "frappe-ui";
 import { AutocompleteNew, Link, StarRating } from "@/components";
-import { useScreenSize } from "@/composables/screen";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
+import { useScreenSize } from "@/composables/screen";
+import {
+  DatePicker,
+  DateRangePicker,
+  DateTimePicker,
+  FormControl,
+  NestedPopover,
+  Tooltip,
+} from "frappe-ui";
+import { computed, h, inject } from "vue";
 
 const props = defineProps({
   default_filters: {
@@ -208,7 +208,9 @@ function convertFilters(data, allFilters) {
         value = ["equals", value[1] ? "Yes" : "No"];
       }
     }
-
+    if (typeof value[1] === "number") {
+      value[1] = value[1].toString();
+    }
     if (field) {
       f.push({
         field,

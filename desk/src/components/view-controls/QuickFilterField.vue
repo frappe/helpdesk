@@ -5,10 +5,11 @@
     type="checkbox"
     v-model="filter.value"
     @change.stop="updateFilter(filter, $event.target.checked)"
+    class="w-44"
   />
   <FormControl
     v-else-if="filter.type === 'Select'"
-    class="form-control cursor-pointer [&_select]:cursor-pointer"
+    class="form-control cursor-pointer [&_select]:cursor-pointer w-44"
     type="select"
     v-model="filter.value"
     :options="filter.options"
@@ -21,10 +22,11 @@
     :doctype="filter.options"
     :placeholder="filter.label"
     @change="(data) => updateFilter(filter, data)"
+    class="w-44"
   />
   <component
     v-else-if="['Date', 'Datetime'].includes(filter.type)"
-    class="border-none"
+    class="border-none w-44"
     :is="filter.type === 'Date' ? DatePicker : DateTimePicker"
     :value="filter.value"
     @change="(v) => updateFilter(filter, v)"
@@ -39,9 +41,9 @@
   />
 </template>
 <script setup>
-import { TextInput, FormControl, DatePicker, DateTimePicker } from "frappe-ui";
 import { Link } from "@/components";
 import { useDebounceFn } from "@vueuse/core";
+import { DatePicker, DateTimePicker, FormControl, TextInput } from "frappe-ui";
 
 const props = defineProps({
   filter: {

@@ -2,7 +2,7 @@
   "name": "helpdesk-ui",
   "private": true,
   "version": "0.0.0",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -18,12 +18,14 @@
     "@tailwindcss/typography": "^0.5.9",
     "@tiptap/core": "^2.2.4",
     "@vee-validate/zod": "^4.8.2",
+    "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/core": "^10.0.2",
     "@vueuse/integrations": "^12.0.0",
     "autoprefixer": "^10.4.13",
     "dayjs": "^1.11.7",
     "echarts": "^5.4.1",
-    "frappe-ui": "0.1.150",
+    "frappe-ui": "^0.1.160",
+    "gemoji": "^8.1.0",
     "lodash": "^4.17.21",
     "lucide-static": "^0.276.0",
     "mime": "^3.0.0",
@@ -39,18 +41,16 @@
     "vue-echarts": "^6.5.4",
     "vue-router": "^4.2.2",
     "vuedraggable": "^4.1.0",
-    "gemoji": "^8.1.0",
-    "zod": "^3.21.4",
-    "@vitejs/plugin-vue": "^4.2.3"
+    "zod": "^3.21.4"
   },
   "resolutions": {
     "cheerio": "1.0.0-rc.12"
   },
   "devDependencies": {
-    "vite": "^4.4.9",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
-    "vite-plugin-pwa": "^0.20.5",
+    "prettier": "2.8.4",
     "typescript": "^5.0.2",
-    "prettier": "2.8.4"
+    "vite": "^4.4.9",
+    "vite-plugin-pwa": "^0.20.5"
   }
 }

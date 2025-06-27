@@ -78,7 +78,14 @@ class HDTicket(Document):
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
 
-        if not self.via_customer_portal:
+        send_ack_email = frappe.db.get_single_value(
+            "HD Settings", "send_acknowledgement_email"
+        )
+        if (
+            not self.via_customer_portal
+            and not frappe.flags.initial_sync
+            and send_ack_email
+        ):
             self.send_acknowledgement_email()
 
     def on_update(self):
@@ -161,12 +168,12 @@ class HDTicket(Document):
         old_status = (
             self.get_doc_before_save().status if self.get_doc_before_save() else None
         )
-        is_closed_or_resoled = old_status == "Open" and self.status in [
+        is_closed_or_resolved = old_status == "Open" and self.status in [
             "Resolved",
             "Closed",
         ]
 
-        if self.status == "Replied" or is_closed_or_resoled:
+        if self.status == "Replied" or is_closed_or_resolved:
             self.first_responded_on = (
                 self.first_responded_on or frappe.utils.now_datetime()
             )
@@ -519,7 +526,9 @@ class HDTicket(Document):
                 subject=subject,
                 template=template,
                 with_container=False,
-                in_reply_to=last_communication.name,
+                in_reply_to=last_communication.name
+                if last_communication.name
+                else None,
             )
         except Exception as e:
             frappe.throw(_(e))
@@ -996,3 +1005,4 @@ def close_tickets_after_n_days():
         doc.flags.ignore_validate = True
         doc.save(ignore_permissions=True)
         doc.flags.ignore_validate = False
+        frappe.db.commit()  # nosemgrep
