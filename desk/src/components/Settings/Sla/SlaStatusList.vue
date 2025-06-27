@@ -1,0 +1,109 @@
+<template>
+  <div class="rounded-md border p-1 border-gray-300 text-sm">
+    <div
+      class="grid p-2 items-center"
+      :style="{
+        gridTemplateColumns: getGridTemplateColumnsForTable(columns),
+      }"
+    >
+      <div
+        v-for="column in columns"
+        :key="column.key"
+        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+      >
+        {{ column.label }}
+        <span v-if="column.isRequired" class="text-red-500">*</span>
+      </div>
+    </div>
+    <hr class="my-0.5" />
+    <SlaStatusListItem
+      v-for="(row, index) in statusList"
+      :key="index + row.status + row.id"
+      :row="row"
+      :columns="columns"
+      :isLast="index === statusList.length - 1"
+      :statusList="statusList"
+    />
+    <div v-if="statusList?.length === 0" class="text-center p-4 text-gray-600">
+      No items in the list
+    </div>
+  </div>
+  <div class="flex items-center justify-between">
+    <Button
+      variant="subtle"
+      label="Add row"
+      class="mt-4"
+      @click="addRow"
+      icon-left="plus"
+    />
+    <div v-if="slaDataErrors.statuses" class="text-red-500 text-xs mt-2">
+      {{ slaDataErrors.statuses }}
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { Button, toast } from "frappe-ui";
+import SlaStatusListItem from "./SlaStatusListItem.vue";
+import { slaDataErrors, validateSlaData } from "./sla";
+import { watchDebounced } from "@vueuse/core";
+import { getGridTemplateColumnsForTable } from "@/utils";
+
+const props = defineProps({
+  statusList: {
+    type: Array<any>,
+    required: true,
+  },
+});
+
+const statusOptions = ["Open", "Resolved", "Closed", "Replied"];
+
+const addRow = () => {
+  const existingStatuses = props.statusList.map((s) => s?.status);
+
+  const availableStatuses = statusOptions.filter(
+    (status) => !existingStatuses.includes(status)
+  );
+
+  if (availableStatuses.length === 0) {
+    toast.error("All available statuses have already been added");
+    return;
+  }
+
+  const newStatus = availableStatuses[0];
+
+  if (!newStatus) {
+    toast.error("No valid status available to add");
+    return;
+  }
+
+  const newStatusItem = {
+    status: newStatus,
+    sla_behavior: "Fulfilled",
+    id: Math.random().toString(36).substring(2, 9),
+  };
+
+  props.statusList.push(newStatusItem);
+};
+
+const columns = [
+  {
+    label: "Status",
+    key: "status",
+    isRequired: true,
+  },
+  {
+    label: "SLA behavior",
+    key: "sla_behavior",
+    isRequired: true,
+  },
+];
+
+watchDebounced(
+  () => [...props.statusList],
+  () => {
+    validateSlaData();
+  },
+  { deep: true, debounce: 300 }
+);
+</script>
