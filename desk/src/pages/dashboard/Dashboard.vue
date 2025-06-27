@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <LayoutHeader>
       <template #left-header>
-        <div class="text-lg font-medium text-gray-900">Dashboard</div>
+        <div class="text-lg font-medium text-gray-900">{{ __("Dashboard") }}</div>
       </template>
       <template #right-header> </template>
     </LayoutHeader>
@@ -15,7 +15,7 @@
           :options="options"
           class="form-control !w-48"
           v-model="preset"
-          placeholder="Select Range"
+          :placeholder="__('Select Range')"
           @change="filters.period = preset"
           :button="{
             label: preset,
@@ -36,7 +36,7 @@
           ref="datePickerRef"
           v-model="filters.period"
           variant="outline"
-          placeholder="Period"
+          :placeholder="__('Period')"
           @update:model-value="
             (e:string) => {
               showDatePicker = false;
@@ -53,7 +53,7 @@
           v-if="isManager"
           class="form-control w-48"
           doctype="HD Team"
-          placeholder="Team"
+          :placeholder="__('Team')"
           v-model="filters.team"
           :page-length="5"
           :hide-me="true"
@@ -66,7 +66,7 @@
           v-if="isManager"
           class="form-control w-48"
           doctype="HD Agent"
-          placeholder="Agent"
+          :placeholder="__('Agent')"
           v-model="filters.agent"
           :page-length="5"
           :filters="agentFilter"
@@ -147,9 +147,11 @@ import {
   Tooltip,
   usePageMeta,
 } from "frappe-ui";
-import { computed, h, onMounted, reactive, ref, watch } from "vue";
+import { computed, h, inject, onMounted, reactive, ref, watch } from "vue";
 
 const { isManager, userId } = useAuthStore();
+
+const __ = inject("$translate");
 
 const filters = reactive({
   period: getLastXDays(),
@@ -258,58 +260,58 @@ function getLastXDays(range: number = 30): string {
 
 const showDatePicker = ref(false);
 const datePickerRef = ref(null);
-const preset = ref("Last 30 Days");
+const preset = ref(__("Last 30 Days"));
 
 const options = computed(() => [
   {
-    group: "Presets",
+    group: __("Presets"),
     hideLabel: true,
     items: [
       {
-        label: "Today",
+        label: __("Today"),
         onClick: () => {
-          preset.value = "Today";
+          preset.value = __("Today");
           filters.period = getLastXDays(0);
         },
       },
       {
-        label: "Last 7 Days",
+        label: __("Last 7 Days"),
         onClick: () => {
-          preset.value = "Last 7 Days";
+          preset.value = __("Last 7 Days");
           filters.period = getLastXDays(7);
         },
       },
       {
-        label: "Last 30 Days",
+        label: __("Last 30 Days"),
         onClick: () => {
-          preset.value = "Last 30 Days";
+          preset.value = __("Last 30 Days");
           filters.period = getLastXDays(30);
         },
       },
       {
-        label: "Last 60 Days",
+        label: __("Last 60 Days"),
         onClick: () => {
-          preset.value = "Last 60 Days";
+          preset.value = __("Last 60 Days");
           filters.period = getLastXDays(60);
         },
       },
       {
-        label: "Last 90 Days",
+        label: __("Last 90 Days"),
         onClick: () => {
-          preset.value = "Last 90 Days";
+          preset.value = __("Last 90 Days");
           filters.period = getLastXDays(90);
         },
       },
     ],
   },
   {
-    label: "Custom Range",
+    label: __("Custom Range"),
     onClick: () => {
       showDatePicker.value = true;
       setTimeout(() => {
         datePickerRef.value?.open();
       }, 0);
-      preset.value = "Custom Range";
+      preset.value = __("Custom Range");
       filters.period = null; // Reset period to allow custom date selection
     },
   },
@@ -318,11 +320,11 @@ const options = computed(() => [
 function formatter(range: string) {
   if (!range) {
     filters.period = getLastXDays();
-    preset.value = "Last 30 Days";
+    preset.value = __("Last 30 Days");
     return preset.value;
   }
   let [from, to] = range.split(",");
-  return `${formatRange(from)} to ${formatRange(to)}`;
+  return `${formatRange(from)} ${__("to")} ${formatRange(to)}`;
 }
 
 function formatRange(date: string) {
@@ -391,7 +393,7 @@ onMounted(() => {
 
 usePageMeta(() => {
   return {
-    title: "Dashboard",
+    title: __("Dashboard"),
   };
 });
 </script>

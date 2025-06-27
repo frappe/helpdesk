@@ -209,6 +209,11 @@
       window.favicon = "{{ favicon }}";
       window.site_name = "{{ site_name }}";
 
+      // Set up frappe object and boot data
+      if (!window.frappe) window.frappe = {};
+      window.frappe.boot = {{ boot | safe }};
+      window.csrf_token = "{{ csrf_token }}";
+
       document.querySelectorAll("link[rel='icon']").forEach((link) => {
         link.href = window.favicon;
       });

@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.boot import load_translations
 from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 from frappe.utils import cint
 from frappe.utils.telemetry import capture
@@ -8,7 +9,10 @@ no_cache = 1
 
 
 def get_context(context):
+    csrf_token = frappe.sessions.get_csrf_token()
     frappe.db.commit()
+    context = frappe._dict()
+    context.csrf_token = csrf_token
     context.boot = get_boot()
 
     # telemetry
@@ -25,18 +29,21 @@ def get_context_for_dev():
 
 
 def get_boot():
-    return frappe._dict(
+    bootinfo = frappe._dict(
         {
             "default_route": get_default_route(),
             "site_name": frappe.local.site,
             "read_only_mode": frappe.flags.read_only,
-            "csrf_token": frappe.sessions.get_csrf_token(),
             "favicon": get_favicon(),
             "setup_complete": cint(frappe.get_system_settings("setup_complete")),
             "is_fc_site": is_fc_site(),
         }
     )
+    
+    bootinfo.lang = frappe.local.lang
+    load_translations(bootinfo)
 
+    return frappe.as_json(bootinfo, indent=None, separators=(",", ":"))
 
 def get_default_route():
     return "/helpdesk"

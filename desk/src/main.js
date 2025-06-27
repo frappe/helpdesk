@@ -21,6 +21,7 @@ import "./index.css";
 import { router } from "./router";
 import { socket } from "./socket";
 import { posthogPlugin } from "./telemetry";
+import { translationsPlugin } from "./plugins/translationsPlugin";
 
 const globalComponents = {
   Badge,
@@ -46,6 +47,7 @@ const pinia = createPinia();
 const app = createApp(App);
 
 app.use(resourcesPlugin);
+app.use(translationsPlugin);
 app.use(pinia);
 app.use(router);
 app.use(posthogPlugin);
@@ -60,9 +62,8 @@ if (import.meta.env.DEV) {
   frappeRequest({
     url: "/api/method/helpdesk.www.helpdesk.index.get_context_for_dev",
   }).then((values) => {
-    for (let key in values) {
-      window[key] = values[key];
-    }
+    if (!window.frappe) window.frappe = {};
+    window.frappe.boot = values;
     app.mount("#app");
   });
 } else {
