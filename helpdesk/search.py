@@ -16,7 +16,12 @@ from frappe.utils import cstr, strip_html_tags, update_progress_bar
 from frappe.utils.caching import redis_cache
 from frappe.utils.synchronization import filelock
 from redis.commands.search.field import TagField, TextField
-from redis.commands.search.index_definition import IndexDefinition
+
+try:
+    from redis.commands.search.index_definition import IndexDefinition
+except ImportError:
+    from redis.commands.search.indexDefinition import IndexDefinition
+
 from redis.commands.search.query import Query
 from redis.exceptions import ResponseError
 
