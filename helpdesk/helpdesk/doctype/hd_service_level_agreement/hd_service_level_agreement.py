@@ -22,15 +22,24 @@ class HDServiceLevelAgreement(Document):
     doctype_ticket = "HD Ticket"
 
     def validate(self):
-        self.validate_priorities()  # To refactor
+        self.validate_priorities()
         self.validate_support_and_resolution()  # To refactor
         self.validate_condition()  # Looks okay but check again
 
     def validate_priorities(self):
-        priorities = []
+        self.validate_priority_defaults()
+        self.validate_response_and_resolution_time()
+        self.validate_unique_priorities()
+        self.validate_all_priorities()
 
+    # check if we have more than one default priority
+    def validate_priority_defaults(self):
+        if sum(d.default_priority for d in self.priorities) > 1:
+            frappe.throw(_("You cannot set more than one Default Priority."))
+
+    # Check if response and resolution time is set for every priority
+    def validate_response_and_resolution_time(self):
         for priority in self.priorities:
-            # Check if response and resolution time is set for every priority
             if not priority.response_time:
                 frappe.throw(
                     _("Set Response Time for Priority {0} in row {1}.").format(
@@ -41,7 +50,7 @@ class HDServiceLevelAgreement(Document):
             if self.apply_sla_for_resolution:
                 if not priority.resolution_time:
                     frappe.throw(
-                        _("Set Response Time for Priority {0} in row {1}.").format(
+                        _("Set Resolution Time for Priority {0} in row {1}.").format(
                             priority.priority, priority.idx
                         )
                     )
@@ -56,38 +65,38 @@ class HDServiceLevelAgreement(Document):
                         ).format(priority.priority, priority.idx)
                     )
 
-            priorities.append(priority.priority)
-
-        # Check if repeated priority
-        # flake8: noqa
-        if not len(set(priorities)) == len(priorities):
+    def validate_unique_priorities(self):
+        priorities = [d.priority for d in self.priorities]
+        if len(priorities) != len(set(priorities)):
             repeated_priority = get_repeated(priorities)
             frappe.throw(_("Priority {0} has been repeated.").format(repeated_priority))
 
-        # set default priority from priorities
-        try:
-            self.default_priority = next(
-                d.priority for d in self.priorities if d.default_priority
-            )
-        except Exception:
-            frappe.throw(_("Select a Default Priority."))
+    def validate_all_priorities(self):
+        all_priorities = frappe.get_all("HD Ticket Priority", pluck="name")
+        sla_priorities = [p.priority for p in self.priorities]
+
+        for priority in all_priorities:
+            if priority not in sla_priorities:
+                frappe.msgprint(
+                    _("Priority <u>{0}</u> must be included in SLA.").format(priority)
+                )
 
     def validate_support_and_resolution(self):
         week = get_weekdays()
         support_days = []
 
         for support_and_resolution in self.support_and_resolution:
-            support_days.append(support_and_resolution.workday)
-            support_and_resolution.idx = week.index(support_and_resolution.workday) + 1
 
             if to_timedelta(support_and_resolution.start_time) >= to_timedelta(
                 support_and_resolution.end_time
             ):
                 frappe.throw(
                     _(
-                        "Start Time can't be greater than or equal to End Time for {0}."
-                    ).format(support_and_resolution.workday)
+                        "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
+                    ).format(support_and_resolution.idx)
                 )
+
+            support_days.append(support_and_resolution.workday)
 
         # Check for repeated workday
         # flake8: noqa
@@ -105,6 +114,15 @@ class HDServiceLevelAgreement(Document):
             frappe.throw(
                 _("The Condition '{0}' is invalid: {1}").format(self.condition, str(e))
             )
+
+    def before_save(self):
+        # set default priority
+        try:
+            self.default_priority = next(
+                d.priority for d in self.priorities if d.default_priority
+            )
+        except Exception:
+            frappe.throw(_("Select a Default Priority."))
 
     def apply(self, doc: Document):
         self.handle_new(doc)
