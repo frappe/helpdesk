@@ -53,6 +53,7 @@
 import { getFormat } from "@/utils";
 import { Dialog, FormControl, Button, FormLabel, toast } from "frappe-ui";
 import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
+import { getDateValue } from "frappe-ui/src/components/DatePicker/utils";
 import { ref } from "vue";
 
 const dialog = defineModel<boolean>();
@@ -105,7 +106,9 @@ const onSave = () => {
   }
 
   const index = props.holidays.findIndex(
-    (h) => h.holiday_date === holidayData.value.holiday_date
+    (h) =>
+      getDateValue(h.holiday_date) ===
+      getDateValue(holidayData.value.holiday_date)
   );
 
   if (index !== -1) {
