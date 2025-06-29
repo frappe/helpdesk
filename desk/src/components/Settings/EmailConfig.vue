@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1">
+  <div class="flex-1 px-10 py-8">
     <div v-if="step === 'email-add'" class="h-full">
       <EmailAdd @update:step="updateStep" />
     </div>

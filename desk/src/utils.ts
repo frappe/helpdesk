@@ -1,6 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
-import { toast } from "frappe-ui";
+import { FeatherIcon, toast } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -198,4 +198,85 @@ export function getFontFamily(content: string) {
     lang = "arabic";
   }
   return langMap[lang];
+}
+
+/**
+ * Parses HTML string and returns the text content with preserved line breaks
+ * @param html - HTML string to parse
+ * @returns Plain text content with preserved line breaks
+ */
+export function htmlToText(html: string): string {
+  if (!html) return "";
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const lineBreaks = doc.querySelectorAll("br, p, div, li");
+  lineBreaks.forEach((el) => {
+    el.after("\n");
+  });
+
+  let text = doc.body.textContent || "";
+
+  text = text.replace(/\s+/g, " ");
+
+  text = text.replace(/\n\s*\n/g, "\n");
+
+  return text.trim();
+}
+
+/**
+ * Format a date according to the user's system settings
+ * @param {Date|string} date - Date object or ISO date string
+ * @returns {string} Formatted date string in the user's locale and preferences
+ */
+export function getFormat(date) {
+  if (!date) return "";
+
+  const dateObj = date instanceof Date ? date : new Date(date);
+  if (isNaN(dateObj.getTime())) return "";
+
+  // Use the browser's default locale and options
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(dateObj);
+}
+
+export function TemplateOption({ active, option, variant, icon, onClick }) {
+  return h(
+    "button",
+    {
+      class: [
+        active ? "bg-surface-gray-2" : "text-ink-gray-8",
+        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base",
+        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
+      ],
+      onClick: onClick,
+    },
+    [
+      icon
+        ? h(FeatherIcon, {
+            name: icon,
+            class: ["h-4 w-4 shrink-0"],
+            "aria-hidden": true,
+          })
+        : null,
+      h("span", { class: "whitespace-nowrap" }, option),
+    ]
+  );
+}
+
+export function getGridTemplateColumnsForTable(columns) {
+  let columnsWidth = columns
+    .map((col) => {
+      let width = col.width || 1;
+      if (typeof width === "number") {
+        return width + "fr";
+      }
+      return width;
+    })
+    .join(" ");
+  return columnsWidth + " 22px";
 }
