@@ -2281,7 +2281,7 @@ cheerio-select@^2.1.0:
     domhandler "^5.0.3"
     domutils "^3.0.1"
 
-cheerio@1.0.0-rc.12:
+cheerio@1.0.0-rc.12, cheerio@^1.0.0-rc.12:
   version "1.0.0-rc.12"
   resolved "https://registry.yarnpkg.com/cheerio/-/cheerio-1.0.0-rc.12.tgz#788bf7466506b1c6bf5fae51d24a2c4d62e47683"
   integrity sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==
@@ -2379,11 +2379,6 @@ commander@^7.2.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
   integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
-
-commander@^9.0.0:
-  version "9.5.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-9.5.0.tgz#bc08d1eb5cedf7ccb797a96199d41c7bc3e60d30"
-  integrity sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==
 
 common-tags@^1.8.0:
   version "1.8.2"
@@ -3024,10 +3019,10 @@ fraction.js@^4.2.0:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.2.0.tgz#448e5109a313a3527f5a3ab2119ec4cf0e0e2950"
   integrity sha512-MhLuK+2gUcnZe8ZHlaaINnQLl0xRIGRfcGk2yl8xoQAfHrSsL3rYu6FCmBdkdbhc9EPlwyGHewaRsvwRMJtAlA==
 
-frappe-ui@^0.1.160:
-  version "0.1.161"
-  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.1.161.tgz#4f1e2d670183159bf15fa0d5b961b72fbe79e866"
-  integrity sha512-gfzi7tu3kglofK8m3OhRFMuWB87nE6bUHh5B4ErO80yMheDEYQziOu+EBokwluQbdUw2N6P+UV2d2sLWw2WGNQ==
+frappe-ui@^0.1.164:
+  version "0.1.164"
+  resolved "https://registry.yarnpkg.com/frappe-ui/-/frappe-ui-0.1.164.tgz#86b9d7f8ad6fa88c867d3fe924d31abda0ad2fb1"
+  integrity sha512-c0J6HY9q1/CnD6zCgQMn5zuE9pchTOQGgItRrjZOcdQelohbcoX79PSSVQKvmgIcQ1KvaVuDvJxvPKOL7mAaVQ==
   dependencies:
     "@floating-ui/vue" "^1.1.6"
     "@headlessui/vue" "^1.7.14"
@@ -3063,6 +3058,7 @@ frappe-ui@^0.1.160:
     idb-keyval "^6.2.0"
     lowlight "^3.3.0"
     lucide-static "^0.479.0"
+    marked "^15.0.12"
     ora "5.4.1"
     prettier "^3.3.2"
     prosemirror-model "^1.25.1"
@@ -3070,7 +3066,6 @@ frappe-ui@^0.1.160:
     prosemirror-view "^1.39.2"
     radix-vue "^1.5.3"
     reka-ui "^2.0.2"
-    showdown "^2.1.0"
     socket.io-client "^4.5.1"
     tippy.js "^6.3.7"
     typescript "^5.0.2"
@@ -3826,6 +3821,11 @@ markdown-it@^13.0.1:
     linkify-it "^4.0.1"
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
+
+marked@^15.0.12:
+  version "15.0.12"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-15.0.12.tgz#30722c7346e12d0a2d0207ab9b0c4f0102d86c4e"
+  integrity sha512-8dD6FusOQSrpv9Z1rdNMdlSgQOIP880DHqnohobOmYLElGEqAL/JvxvuxZO16r4HtjTlfPRDC1hbvxC9dPN2nA==
 
 math-intrinsics@^1.1.0:
   version "1.1.0"
@@ -4857,13 +4857,6 @@ shebang-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
-
-showdown@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/showdown/-/showdown-2.1.0.tgz#1251f5ed8f773f0c0c7bfc8e6fd23581f9e545c5"
-  integrity sha512-/6NVYu4U819R2pUIk79n67SYgJHWCce0a5xTP979WbNp0FL9MN1I1QK662IDU1b6JzKTvmhgI7T7JYIxBi3kMQ==
-  dependencies:
-    commander "^9.0.0"
 
 side-channel-list@^1.0.0:
   version "1.0.0"
