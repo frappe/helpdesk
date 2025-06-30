@@ -22,8 +22,9 @@ class HDServiceLevelAgreement(Document):
     doctype_ticket = "HD Ticket"
 
     def validate(self):
+        self.validate_default_sla()
         self.validate_priorities()
-        self.validate_support_and_resolution()  # To refactor
+        self.validate_support_and_resolution()
         self.validate_condition()  # Looks okay but check again
 
     def validate_priorities(self):
@@ -103,6 +104,30 @@ class HDServiceLevelAgreement(Document):
         if not len(set(support_days)) == len(support_days):
             repeated_days = get_repeated(support_days)
             frappe.throw(_("Workday {0} has been repeated.").format(repeated_days))
+
+    def validate_default_sla(self):
+        default_sla_exists = frappe.db.exists(
+            self.doctype,
+            {
+                "default_sla": True,
+                "name": ["!=", self.name],
+            },
+        )
+
+        if default_sla_exists and self.default_sla:
+            frappe.db.set_value(self.doctype, default_sla_exists, "default_sla", False)
+            frappe.msgprint(
+                _(
+                    "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
+                ).format(self.name, default_sla_exists)
+            )
+
+        if not self.default_sla and not default_sla_exists:
+            frappe.throw(
+                _(
+                    "You must set one SLA as Default. Please check the Default SLA option."
+                )
+            )
 
     def validate_condition(self):
         if not self.condition:
