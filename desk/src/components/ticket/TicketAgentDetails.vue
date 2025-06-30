@@ -14,7 +14,6 @@
           <Badge
             v-if="s.badgeText"
             class="-ml-1"
-            :class="s.class || null"
             :label="s.badgeText"
             variant="subtle"
             :theme="s.badgeColor"
@@ -27,7 +26,12 @@
 
 <script setup lang="ts">
 import { dayjs } from "@/dayjs";
-import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
+import {
+  dateFormat,
+  dateTooltipFormat,
+  formatTime,
+  getTimeInSeconds,
+} from "@/utils";
 import { Badge, Tooltip } from "frappe-ui";
 import { computed, onUnmounted, ref, watch } from "vue";
 
@@ -60,7 +64,7 @@ const firstResponseBadge = computed(() => {
     }
     handleFirstResponseInterval(responseBy);
     firstResponse = {
-      label: `Due in ${responseBy}`,
+      label: `Due in ${formatTime(firstResponseSeconds.value)}`,
       color: "orange",
     };
   } else if (
@@ -111,7 +115,7 @@ const resolutionBadge = computed(() => {
     handleResolutionInterval(resolutionBy);
 
     resolution = {
-      label: `Due in ${resolutionBy}`,
+      label: `Due in ${formatTime(resolutionSeconds.value)}`,
       color: "orange",
     };
   } else if (
@@ -154,7 +158,6 @@ const sections = computed(() => [
     ),
     badgeText: firstResponseBadge.value.label,
     badgeColor: firstResponseBadge.value.color,
-    class: "first-response",
   },
   {
     label: "Resolution",
@@ -164,7 +167,6 @@ const sections = computed(() => [
     ),
     badgeText: resolutionBadge.value.label,
     badgeColor: resolutionBadge.value.color,
-    class: "resolution",
   },
   {
     label: "Source",
@@ -195,17 +197,13 @@ function handleFirstResponseInterval(time: string) {
   if (props.ticket.status !== "Open") {
     return;
   }
-  let seconds = getTimeInSeconds(time);
+  firstResponseSeconds.value = getTimeInSeconds(time);
   firstResponseInterval = setInterval(() => {
-    if (seconds <= 0) {
+    if (firstResponseSeconds.value <= 0) {
       clearInterval(firstResponseInterval);
       return;
     }
-    seconds--;
-    const firstResponseEl = document.querySelector(".first-response");
-    if (firstResponseEl) {
-      firstResponseEl.textContent = `Due in ${formatTime(seconds)}`;
-    }
+    firstResponseSeconds.value--;
   }, 1000);
 }
 
@@ -215,35 +213,14 @@ function handleResolutionInterval(time: string) {
     return;
   }
 
-  let seconds = getTimeInSeconds(time);
+  resolutionSeconds.value = getTimeInSeconds(time);
   resolutionInterval = setInterval(() => {
-    if (seconds <= 0) {
+    if (resolutionSeconds.value <= 0) {
       clearInterval(resolutionInterval);
       return;
     }
-    seconds--;
-    const resolutionEl = document.querySelector(".resolution");
-    if (resolutionEl) {
-      resolutionEl.textContent = `Due in ${formatTime(seconds)}`;
-    }
+    resolutionSeconds.value--;
   }, 1000);
-}
-
-function getTimeInSeconds(time: string) {
-  let timeParts = time.split(" ");
-  let seconds = 0;
-  timeParts.forEach((part) => {
-    if (part.endsWith("d")) {
-      seconds += parseInt(part) * 24 * 60 * 60; // days
-    } else if (part.endsWith("h")) {
-      seconds += parseInt(part) * 60 * 60; // hours
-    } else if (part.endsWith("m")) {
-      seconds += parseInt(part) * 60; // minutes
-    } else if (part.endsWith("s")) {
-      seconds += parseInt(part); // seconds
-    }
-  });
-  return seconds;
 }
 
 onUnmounted(() => {
