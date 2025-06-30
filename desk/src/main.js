@@ -35,6 +35,12 @@ const globalComponents = {
 };
 
 setConfig("resourceFetcher", frappeRequest);
+setConfig("serverMessagesHandler", (msgs) => {
+  msgs.forEach((msg) => {
+    msg = JSON.parse(msg);
+    toast.warning(msg.message);
+  });
+});
 setConfig("fallbackErrorHandler", (error) => {
   const msg = error.exc_type
     ? (error.messages || error.message || []).join(", ")

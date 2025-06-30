@@ -79,7 +79,9 @@ class HDServiceLevelAgreement(Document):
         for priority in all_priorities:
             if priority not in sla_priorities:
                 frappe.msgprint(
-                    _("Priority <u>{0}</u> must be included in SLA.").format(priority)
+                    _("Priority <u>{0}</u> must be included in the SLA {1}.").format(
+                        priority, self.name
+                    )
                 )
 
     def validate_support_and_resolution(self):
@@ -154,6 +156,7 @@ class HDServiceLevelAgreement(Document):
         self.handle_status(doc)
         self.handle_targets(doc)
         self.handle_agreement_status(doc)
+        self.validate_all_priorities()
 
     def handle_new(self, doc: Document):
         if not doc.is_new():

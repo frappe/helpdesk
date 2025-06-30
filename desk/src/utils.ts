@@ -79,7 +79,7 @@ export function formatTime(seconds) {
   }
 
   formattedTime += `${
-    remainingSeconds > 10 ? remainingSeconds : "0" + remainingSeconds
+    remainingSeconds >= 10 ? remainingSeconds : "0" + remainingSeconds
   }s`;
 
   return formattedTime.trim();
