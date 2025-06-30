@@ -5,9 +5,8 @@ import { reactive, ref, watch } from "vue";
 export const agents = createListResource({
   doctype: "HD Agent",
   fields: ["name", "user_image", "agent_name", "is_active"],
-  cache: ["hd_agent_list"],
   start: 0,
-  pageLength: 10,
+  pageLength: 25,
   orderBy: "creation desc",
   auto: !isCustomerPortal.value,
 });
