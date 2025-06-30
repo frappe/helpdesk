@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="grid grid-cols-6 items-center gap-4 text-sm text-gray-600">
+    <div class="grid grid-cols-6 items-center gap-3 text-sm text-gray-600 ml-2">
       <div class="col-span-5">Policy Name</div>
       <div class="col-span-1">Enabled</div>
     </div>
