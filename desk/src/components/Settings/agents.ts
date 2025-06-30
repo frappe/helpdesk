@@ -6,7 +6,7 @@ export const agents = createListResource({
   doctype: "HD Agent",
   fields: ["name", "user_image", "agent_name", "is_active"],
   start: 0,
-  pageLength: 25,
+  pageLength: 20,
   orderBy: "creation desc",
   auto: !isCustomerPortal.value,
 });
