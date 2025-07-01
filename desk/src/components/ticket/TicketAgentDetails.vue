@@ -45,7 +45,6 @@ const props = defineProps({
 let firstResponseInterval = null;
 let resolutionInterval = null;
 
-// Reactive variables for countdown times
 const firstResponseSeconds = ref(0);
 const resolutionSeconds = ref(0);
 
