@@ -55,10 +55,12 @@
           </div>
           <div class="space-y-1">
             <div class="text-xs">Customer</div>
-            <Autocomplete
+            <Link
+              doctype="HD Customer"
+              class="form-control flex-1"
+              placeholder="Link to a customer"
               v-model="selectedCustomer"
-              :options="customerResource.data"
-              @update:model-value="handleCustomerChange"
+              :hide-me="true"
             />
           </div>
         </div>
@@ -69,7 +71,6 @@
 
 <script setup lang="ts">
 import {
-  Autocomplete,
   Avatar,
   call,
   createDocumentResource,
@@ -83,6 +84,7 @@ import type { Ref } from "vue";
 import { computed, ref } from "vue";
 import zod from "zod";
 
+import Link from "@/components/frappe-ui/Link.vue";
 import MultiSelect from "@/components/MultiSelect.vue";
 import { useAuthStore } from "@/stores/auth";
 import { AutoCompleteItem, File } from "@/types";
@@ -252,6 +254,8 @@ function update(): void {
     })),
     links: contact.doc.links,
   });
+  isDirty.value = false;
+  emit("contactUpdated");
 }
 
 function updateImage(file: File): void {

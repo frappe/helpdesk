@@ -25,11 +25,15 @@
 </template>
 
 <script setup lang="ts">
-import { Badge, Tooltip } from "frappe-ui";
 import { dayjs } from "@/dayjs";
-import { formatTime } from "@/utils";
-import { dateFormat, dateTooltipFormat } from "@/utils";
-import { computed } from "vue";
+import {
+  dateFormat,
+  dateTooltipFormat,
+  formatTime,
+  getTimeInSeconds,
+} from "@/utils";
+import { Badge, Tooltip } from "frappe-ui";
+import { computed, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps({
   ticket: {
@@ -38,16 +42,28 @@ const props = defineProps({
   },
 });
 
+let firstResponseInterval = null;
+let resolutionInterval = null;
+
+const firstResponseSeconds = ref(0);
+const resolutionSeconds = ref(0);
+
 const firstResponseBadge = computed(() => {
   let firstResponse = null;
   if (
     !props.ticket.first_responded_on &&
     dayjs().isBefore(dayjs(props.ticket.response_by))
   ) {
+    let responseBy = formatTime(
+      dayjs(props.ticket.response_by).diff(dayjs(), "s")
+    );
+    if (firstResponseInterval) {
+      clearInterval(firstResponseInterval);
+      firstResponseInterval = null;
+    }
+    handleFirstResponseInterval(responseBy);
     firstResponse = {
-      label: `Due in ${formatTime(
-        dayjs(props.ticket.response_by).diff(dayjs(), "s")
-      )}`,
+      label: `Due in ${formatTime(firstResponseSeconds.value)}`,
       color: "orange",
     };
   } else if (
@@ -75,29 +91,30 @@ const firstResponseBadge = computed(() => {
 
 const resolutionBadge = computed(() => {
   let resolution = null;
+  if (resolutionInterval) {
+    clearInterval(resolutionInterval);
+  }
   if (
     props.ticket.status === "Replied" &&
     props.ticket.on_hold_since &&
     dayjs(props.ticket.resolution_by).isAfter(dayjs(props.ticket.on_hold_since))
   ) {
-    let time_left = formatTime(
-      dayjs(props.ticket.resolution_by).diff(
-        dayjs(props.ticket.on_hold_since),
-        "s"
-      )
-    );
+    let timeLeft = dayjs(props.ticket.resolution_by)
+      .add(props.ticket.total_hold_time, "s")
+      .diff(dayjs(props.ticket.on_hold_since), "s");
     resolution = {
-      label: `${time_left} left (On Hold)`,
+      label: `${formatTime(timeLeft)} left (On Hold)`,
       color: "blue",
     };
   } else if (
     !props.ticket.resolution_date &&
     dayjs().isBefore(props.ticket.resolution_by)
   ) {
+    let resolutionBy = getCalculatedResolution();
+    handleResolutionInterval(resolutionBy);
+
     resolution = {
-      label: `Due in ${formatTime(
-        dayjs(props.ticket.resolution_by).diff(dayjs(), "s")
-      )}`,
+      label: `Due in ${formatTime(resolutionSeconds.value)}`,
       color: "orange",
     };
   } else if (
@@ -120,6 +137,16 @@ const resolutionBadge = computed(() => {
   }
   return resolution;
 });
+
+function getCalculatedResolution() {
+  let resolution = dayjs(props.ticket.resolution_by).add(
+    props.ticket.total_hold_time,
+    "s"
+  );
+  // let now = new Date()
+  resolution = dayjs(resolution).diff(dayjs(), "s");
+  return formatTime(resolution);
+}
 
 const sections = computed(() => [
   {
@@ -145,4 +172,64 @@ const sections = computed(() => [
     value: props.ticket.via_customer_portal ? "Portal" : "Mail",
   },
 ]);
+
+// Watch for status changes and clear intervals
+watch(
+  () => props.ticket.status,
+  (newStatus: string) => {
+    if (newStatus !== "Open") {
+      if (firstResponseInterval) {
+        clearInterval(firstResponseInterval);
+        firstResponseInterval = null;
+      }
+      if (resolutionInterval) {
+        clearInterval(resolutionInterval);
+        resolutionInterval = null;
+      }
+    }
+  },
+  { deep: true, immediate: true }
+);
+
+function handleFirstResponseInterval(time: string) {
+  if (!time) return;
+  if (props.ticket.status !== "Open") {
+    return;
+  }
+  firstResponseSeconds.value = getTimeInSeconds(time);
+  firstResponseInterval = setInterval(() => {
+    if (firstResponseSeconds.value <= 0) {
+      clearInterval(firstResponseInterval);
+      return;
+    }
+    firstResponseSeconds.value--;
+  }, 1000);
+}
+
+function handleResolutionInterval(time: string) {
+  if (!time) return;
+  if (props.ticket.status !== "Open") {
+    return;
+  }
+
+  resolutionSeconds.value = getTimeInSeconds(time);
+  resolutionInterval = setInterval(() => {
+    if (resolutionSeconds.value <= 0) {
+      clearInterval(resolutionInterval);
+      return;
+    }
+    resolutionSeconds.value--;
+  }, 1000);
+}
+
+onUnmounted(() => {
+  if (firstResponseInterval) {
+    clearInterval(firstResponseInterval);
+  }
+  if (resolutionInterval) {
+    clearInterval(resolutionInterval);
+  }
+  firstResponseInterval = null;
+  resolutionInterval = null;
+});
 </script>
