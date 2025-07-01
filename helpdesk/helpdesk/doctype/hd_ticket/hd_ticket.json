@@ -20,7 +20,7 @@
   "sb_details",
   "description",
   "template",
-  "encrypted_name",
+  "key",
   "sla_tab",
   "service_level_section",
   "sla",
@@ -435,9 +435,9 @@
    "read_only": 1
   },
   {
-   "fieldname": "encrypted_name",
+   "fieldname": "key",
    "fieldtype": "Data",
-   "label": "Encrypted Name",
+   "label": "Key",
    "read_only": 1,
    "set_only_once": 1
   }
@@ -446,7 +446,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-06-24 17:06:58.156938",
+ "modified": "2025-07-01 16:00:43.872080",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

@@ -241,10 +241,7 @@ class HDTicket(Document):
                 )
 
     def create_encrypted_name(self):
-        # uuid use here
-        # sha =
-        self.encrypted_name = uuid.uuid4()
-        pass
+        self.key = uuid.uuid4()
 
     def remove_assignment_if_not_in_team(self):
         """
