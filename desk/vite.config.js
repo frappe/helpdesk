@@ -12,7 +12,7 @@ export default defineConfig({
     frappeui({
       frappeProxy: true,
       lucideIcons: true,
-      jinjaBootData: true,
+      jinjaBootData: false,
       buildConfig: {
         outDir: `../helpdesk/public/desk`,
         emptyOutDir: true,

@@ -9,7 +9,7 @@
     <UserMenu class="mb-2" :options="profileSettings" />
     <SidebarLink
       v-if="!isCustomerPortal"
-      label="Search"
+      :label="__('Search')"
       class="my-0.5"
       :icon="LucideSearch"
       :on-click="() => openCommandPalette()"
@@ -25,7 +25,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       class="relative my-0.5 min-h-7"
-      label="Dashboard"
+      :label="__('Dashboard')"
       :icon="LucideLayoutDashboard"
       :to="'Dashboard'"
       :is-active="isActiveTab('Dashboard')"
@@ -40,7 +40,7 @@
       />
       <SidebarLink
         class="relative my-0.5"
-        label="Notifications"
+        :label="__('Notifications')"
         :icon="LucideBell"
         :on-click="() => notificationStore.toggle()"
         :is-expanded="isExpanded"
@@ -117,7 +117,7 @@
       <SidebarLink
         v-if="isOnboardingStepsCompleted && !isCustomerPortal"
         :icon="HelpIcon"
-        :label="'Help'"
+        :label="__('Help')"
         :is-expanded="isExpanded"
         @click="
           () => {
@@ -131,7 +131,7 @@
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
         :is-active="false"
         :is-expanded="isExpanded"
-        :label="isExpanded ? 'Collapse' : 'Expand'"
+        :label="isExpanded ? __('Collapse') : __('Expand')"
         :on-click="() => (isExpanded = !isExpanded)"
       />
     </div>
@@ -176,6 +176,9 @@ import { confirmLoginToFrappeCloud } from "@/composables/fc";
 import { useScreenSize } from "@/composables/screen";
 import { currentView, useView } from "@/composables/useView";
 import { showNewContactModal } from "@/pages/desk/contact/dialogState";
+
+// Get translation function
+const __ = (window as any).__ || ((text: string) => text);
 import {
   showAssignmentModal,
   showCommentBox,
@@ -293,7 +296,7 @@ function parseViews(views) {
 
 const customerPortalDropdown = computed(() => [
   {
-    label: "Log out",
+    label: __("Log out"),
     icon: "log-out",
     onClick: () => authStore.logout(),
   },
@@ -304,7 +307,7 @@ const agentPortalDropdown = computed(() => [
     component: markRaw(Apps),
   },
   {
-    label: "Customer portal",
+    label: __("Customer portal"),
     icon: "users",
     onClick: () => {
       const path = router.resolve({ name: "TicketsCustomer" });
@@ -313,22 +316,22 @@ const agentPortalDropdown = computed(() => [
   },
   {
     icon: "life-buoy",
-    label: "Support",
+    label: __("Support"),
     onClick: () => window.open("https://t.me/frappedesk"),
   },
   {
     icon: "book-open",
-    label: "Docs",
+    label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
   {
-    label: "Login to Frappe Cloud",
+    label: __("Login to Frappe Cloud"),
     icon: FrappeCloudIcon,
     onClick: () => confirmLoginToFrappeCloud(),
     condition: () => !isMobileView.value && window.is_fc_site,
   },
   {
-    label: "Settings",
+    label: __("Settings"),
     icon: "settings",
     onClick: () => (showSettingsModal.value = true),
     condition: () => authStore.isAdmin || authStore.isManager,
@@ -338,7 +341,7 @@ const agentPortalDropdown = computed(() => [
     hideLabel: true,
     items: [
       {
-        label: "Log out",
+        label: __("Log out"),
         icon: "log-out",
         onClick: () => authStore.logout(),
       },
