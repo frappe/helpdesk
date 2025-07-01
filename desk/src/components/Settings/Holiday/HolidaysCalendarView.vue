@@ -3,6 +3,10 @@
     <div class="mb-6 flex justify-between items-center">
       <div class="ml-2">
         <YearsList
+          v-if="
+            dayjs(holidayData.from_date || new Date()).year() !==
+            dayjs(holidayData.to_date || new Date()).year()
+          "
           v-model="currentYear"
           :startYear="dayjs(holidayData.from_date || new Date()).year()"
           :endYear="dayjs(holidayData.to_date || new Date()).year()"
@@ -18,6 +22,12 @@
             </div>
           </template>
         </YearsList>
+        <div
+          v-else
+          class="flex items-center gap-2 font-semibold text-xl select-none"
+        >
+          {{ dayjs(holidayData.from_date || new Date()).year() }}
+        </div>
       </div>
       <div class="flex gap-2 items-center">
         <Button
@@ -26,11 +36,7 @@
           :disabled="visibleMonths === 'first-half'"
           @click="visibleMonths = 'first-half'"
         />
-        <Button
-          variant="ghost"
-          label="Today"
-          @click="currentYear = new Date().getFullYear()"
-        />
+        <Button variant="ghost" label="Today" @click="goToToday()" />
         <Button
           variant="ghost"
           icon="chevron-right"
@@ -98,4 +104,10 @@ const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const currentYear = ref(new Date().getFullYear());
 const dialog = ref(false);
+
+const goToToday = () => {
+  const today = new Date();
+  currentYear.value = today.getFullYear();
+  visibleMonths.value = today.getMonth() >= 6 ? "second-half" : "first-half";
+};
 </script>

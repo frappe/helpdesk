@@ -1,8 +1,10 @@
 <template>
   <div class="flex flex-col gap-2">
-    <div class="text-lg font-medium">Work schedule and holidays</div>
+    <div class="text-lg font-semibold text-ink-gray-7">
+      Work schedule and holidays
+    </div>
     <div class="flex justify-between">
-      <div class="text-sm text-gray-600 max-w-lg">
+      <div class="text-sm text-ink-gray-6 max-w-lg">
         Set working days, hours, and holidays by selecting a predefined schedule
         or creating a new one.
       </div>
@@ -124,7 +126,7 @@ const holidayListData = createResource({
 watchDebounced(
   props.workDaysList,
   () => {
-    validateSlaData();
+    validateSlaData("support_and_resolution");
   },
   { debounce: 300 }
 );

@@ -233,15 +233,15 @@ export function htmlToText(html: string): string {
 export function getFormat(date) {
   if (!date) return "";
 
-  const dateObj = date instanceof Date ? date : new Date(date);
-  if (isNaN(dateObj.getTime())) return "";
+  const dateObj = dayjs(date);
+  if (!dateObj.isValid()) return "";
 
-  // Use the browser's default locale and options
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).format(dateObj);
+  return dateObj.format(
+    window.sysdefaults.date_format
+      .replace("mm", "MM")
+      .replace("yyyy", "YYYY")
+      .replace("dd", "DD") || "YYYY-MM-DD"
+  );
 }
 
 export function TemplateOption({ active, option, variant, icon, onClick }) {

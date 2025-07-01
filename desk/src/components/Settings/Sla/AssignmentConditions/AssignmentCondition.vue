@@ -41,6 +41,14 @@
         </div>
         <div id="operator">
           <FormControl
+            v-if="!props.condition.field"
+            disabled
+            type="text"
+            :placeholder="'operator'"
+            class="w-[100px]"
+          />
+          <FormControl
+            v-else
             :disabled="!props.condition.field"
             type="select"
             v-model="props.condition.operator"
