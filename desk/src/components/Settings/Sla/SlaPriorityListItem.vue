@@ -23,7 +23,10 @@
       >
         <Popover>
           <template #target="{ togglePopover }">
-            <div @click="togglePopover()" class="min-h-4 w-full">
+            <div
+              @click="togglePopover()"
+              class="min-h-4 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-gray-200 rounded"
+            >
               {{ formatTimeHMS(props.row[column.key]) }}
             </div>
           </template>
@@ -36,7 +39,7 @@
       </div>
       <div v-else>
         <Select
-          class="w-max bg-transparent -ml-2 hover:bg-transparent border-0 focus-visible:!ring-0 bg-none"
+          class="w-full bg-transparent cursor-pointer border-0 focus-visible:!ring-0 bg-none"
           :options="priorityOptions"
           v-model="props.row[column.key]"
         />
@@ -201,26 +204,11 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  priorityOptions: {
+    type: Array<any>,
+    required: true,
+  },
 });
-
-const priorityOptions = [
-  {
-    label: "Low",
-    value: "Low",
-  },
-  {
-    label: "Medium",
-    value: "Medium",
-  },
-  {
-    label: "High",
-    value: "High",
-  },
-  {
-    label: "Urgent",
-    value: "Urgent",
-  },
-];
 
 const isConfirmingDelete = ref(false);
 const dialog = ref(false);
@@ -312,19 +300,19 @@ function formatTimeHMS(seconds) {
   let formattedTime = "";
 
   if (days > 0) {
-    formattedTime += `${days}d `;
+    formattedTime += `${days} days `;
   }
 
   if (hours > 0) {
-    formattedTime += `${hours}h `;
+    formattedTime += `${hours} hours `;
   }
 
   if (minutes > 0) {
-    formattedTime += `${minutes}m `;
+    formattedTime += `${minutes} minutes `;
   }
 
   if (remainingSeconds > 0) {
-    formattedTime += `${remainingSeconds}s`;
+    formattedTime += `${remainingSeconds} seconds`;
   }
 
   return formattedTime.trim();

@@ -1,6 +1,6 @@
 <template>
   <div v-if="slaData.loading" class="flex items-center h-full justify-center">
-    <Spinner class="w-8" />
+    <LoadingIndicator class="w-4" />
   </div>
   <div
     v-if="!slaData.loading"
@@ -15,7 +15,7 @@
             :label="slaData.service_level || 'New SLA Policy'"
             size="md"
             @click="goBack()"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5"
+            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl"
           />
           <Badge
             :variant="'subtle'"
@@ -25,7 +25,22 @@
           />
         </div>
       </div>
-      <Button label="Save" theme="gray" variant="solid" @click="saveSla()" />
+      <div class="flex gap-2 items-center">
+        <Badge
+          :variant="'subtle'"
+          :theme="'orange'"
+          size="sm"
+          label="Unsaved changes"
+          v-if="isDirty"
+        />
+        <Button
+          label="Save"
+          theme="gray"
+          variant="solid"
+          @click="saveSla()"
+          :disabled="Boolean(!isDirty && slaActiveScreen.data)"
+        />
+      </div>
     </div>
   </div>
   <div v-if="!slaData.loading" class="overflow-y-auto px-10 pb-10">
@@ -33,11 +48,11 @@
       class="flex items-center justify-between gap-2"
       @click="slaData.enabled = !slaData.enabled"
     >
-      <span class="text-sm"> Enable Policy </span>
+      <span class="text-sm text-ink-gray-7"> Enable Policy </span>
       <Switch size="sm" :model-value="slaData.enabled" />
     </div>
     <hr class="mb-6 mt-3" />
-    <div class="grid grid-cols-2 gap-2">
+    <div class="grid grid-cols-2 gap-5">
       <div>
         <FormControl
           :type="'text'"
@@ -47,7 +62,8 @@
           label="Name"
           v-model="slaData.service_level"
           required
-          @change="debouncedValidateSlaData()"
+          @change="debouncedValidateSlaData('service_level')"
+          :disabled="slaActiveScreen.data"
         />
         <span v-if="slaDataErrors.service_level" class="text-red-500 text-xs">
           {{ slaDataErrors.service_level }}
@@ -65,8 +81,10 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-medium">Assignment conditions</span>
-        <span class="text-sm text-gray-600">
+        <span class="text-lg font-semibold text-ink-gray-7"
+          >Assignment conditions</span
+        >
+        <span class="text-sm text-ink-gray-6">
           Choose which tickets are affected by this policy.
         </span>
       </div>
@@ -74,6 +92,7 @@
         <Checkbox
           label="Apply default SLA conditions"
           v-model="slaData.default_sla"
+          class="text-ink-gray-6 text-base font-medium"
         />
         <div class="mt-4" v-if="!slaData.default_sla">
           <SlaAssignmentConditions :conditions="slaData.condition" />
@@ -83,12 +102,12 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-3">
-        <span class="text-lg font-medium">Valid from</span>
-        <span class="text-sm text-gray-600">
+        <span class="text-lg font-semibold text-ink-gray-7">Valid from</span>
+        <span class="text-sm text-ink-gray-6">
           Choose how long this SLA policy will be active.
         </span>
       </div>
-      <div class="mt-4 flex gap-2">
+      <div class="mt-4 flex gap-5">
         <div class="w-full space-y-1.5">
           <label for="from_date" class="text-sm text-gray-600">From date</label>
           <DatePicker
@@ -97,7 +116,7 @@
             placeholder="From date"
             class="w-full"
             id="from_date"
-            @change="debouncedValidateSlaData()"
+            @change="debouncedValidateSlaData('start_date')"
             :formatter="(date) => getFormat(date)"
           />
           <span v-if="slaDataErrors.start_date" class="text-red-500 text-xs">
@@ -112,7 +131,7 @@
             placeholder="To date"
             class="w-full"
             id="to_date"
-            @change="debouncedValidateSlaData()"
+            @change="debouncedValidateSlaData('end_date')"
             :formatter="(date) => getFormat(date)"
           />
           <span v-if="slaDataErrors.end_date" class="text-red-500 text-xs">
@@ -124,30 +143,32 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-medium">Response and resolution</span>
-        <span class="text-sm text-gray-600">
+        <span class="text-lg font-semibold text-ink-gray-7"
+          >Response and resolution</span
+        >
+        <span class="text-sm text-ink-gray-6">
           Add time targets around support milestones like first reply and
           resolution times
         </span>
       </div>
       <div class="mt-4">
         <Checkbox
-          label="Apply SLA for resolution time"
+          label="Apply SLA for resolution time also"
           v-model="slaData.apply_sla_for_resolution"
+          class="text-ink-gray-6 text-base font-medium"
         />
         <div class="mt-4">
-          <SlaPriorityList
-            :priorityList="slaData.priorities"
-            :applySlaForResolution="slaData.apply_sla_for_resolution"
-          />
+          <SlaPriorityList />
         </div>
       </div>
     </div>
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-medium">Status details</span>
-        <span class="text-sm text-gray-600">
+        <span class="text-lg font-semibold text-ink-gray-7"
+          >Status details</span
+        >
+        <span class="text-sm text-ink-gray-6">
           The SLA status updates with ticket progress—fulfilled when conditions
           are met, paused when awaiting external action.
         </span>
@@ -180,9 +201,11 @@ import {
   Checkbox,
   DatePicker,
   toast,
-  Spinner,
+  LoadingIndicator,
+  Badge,
+  Button,
 } from "frappe-ui";
-import { onUnmounted } from "vue";
+import { onUnmounted, ref, watch } from "vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 import SlaHolidays from "./SlaHolidays.vue";
@@ -190,8 +213,11 @@ import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import { useDebounceFn } from "@vueuse/core";
 import { getFormat } from "@/utils";
 
-const debouncedValidateSlaData = useDebounceFn(() => {
-  validateSlaData();
+const isDirty = ref(false);
+const initialData = ref(null);
+
+const debouncedValidateSlaData = useDebounceFn((key: string) => {
+  validateSlaData(key);
 }, 300);
 
 const getSlaData = createResource({
@@ -217,12 +243,14 @@ const getSlaData = createResource({
 
     const conditions = JSON.parse(data.condition || "[]");
 
-    slaData.value = {
+    const newData = {
       ...data,
       statuses: [...pauseOn, ...fulfilledOn],
       loading: false,
       condition: data.condition?.length > 0 ? conditions : [],
     };
+    slaData.value = newData;
+    initialData.value = JSON.parse(JSON.stringify(newData));
   },
 });
 
@@ -232,6 +260,15 @@ if (slaActiveScreen.value.data && slaActiveScreen.value.fetchData) {
 }
 
 const goBack = () => {
+  if (isDirty.value) {
+    if (
+      !confirm(
+        "Unsaved changes will be lost. Are you sure you want to go back?"
+      )
+    ) {
+      return;
+    }
+  }
   slaActiveScreen.value = {
     screen: "list",
     data: null,
@@ -355,6 +392,17 @@ const updateSla = () => {
     },
   });
 };
+
+watch(
+  slaData,
+  (newVal) => {
+    if (!initialData.value) return;
+    isDirty.value =
+      JSON.stringify(Object.assign({}, newVal)) !=
+      JSON.stringify(Object.assign({}, initialData.value));
+  },
+  { deep: true }
+);
 
 onUnmounted(() => {
   slaDataErrors.value = {

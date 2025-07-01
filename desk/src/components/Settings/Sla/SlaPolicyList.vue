@@ -8,9 +8,9 @@
     <div>
       <div
         class="flex items-center justify-center mt-12"
-        v-if="slaPolicyListData.loading"
+        v-if="slaPolicyListData.loading && !slaPolicyListData.data"
       >
-        <Spinner class="w-6" />
+        <LoadingIndicator class="w-4" />
       </div>
       <div v-else v-for="sla in slaPolicyListData.data" :key="sla.name">
         <SlaPolicyListItem :data="sla" />
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { Spinner } from "frappe-ui";
+import { LoadingIndicator } from "frappe-ui";
 import SlaPolicyListItem from "./SlaPolicyListItem.vue";
 import { slaPolicyListData } from "./sla";
 </script>

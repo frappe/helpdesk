@@ -7,9 +7,9 @@
     <div>
       <div
         class="flex items-center justify-center mt-12"
-        v-if="holidayListData.loading"
+        v-if="holidayListData.loading && !holidayListData.data"
       >
-        <Spinner class="w-6" />
+        <LoadingIndicator class="w-4" />
       </div>
       <div v-else v-for="holiday in holidayListData.data" :key="holiday.name">
         <HolidayListItem :data="holiday" />
@@ -22,5 +22,5 @@
 <script setup lang="ts">
 import HolidayListItem from "./HolidayListItem.vue";
 import { holidayListData } from "./holidayList";
-import { Spinner } from "frappe-ui";
+import { LoadingIndicator } from "frappe-ui";
 </script>

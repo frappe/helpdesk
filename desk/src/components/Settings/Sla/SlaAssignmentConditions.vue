@@ -101,7 +101,7 @@ const addCondition = () => {
 watchDebounced(
   () => [...props.conditions],
   () => {
-    validateSlaData();
+    validateSlaData("condition");
   },
   { deep: true, debounce: 300 }
 );

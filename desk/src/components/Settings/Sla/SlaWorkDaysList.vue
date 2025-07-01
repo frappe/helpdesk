@@ -5,17 +5,21 @@
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
+      v-if="workDaysList?.length !== 0"
     >
       <div
         v-for="column in columns"
         :key="column.key"
         class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        :class="{
+          'ml-2': column.key === 'workday',
+        }"
       >
         {{ column.label }}
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" />
+    <hr class="my-0.5" v-if="workDaysList?.length !== 0" />
     <SlaWorkDaysListItem
       v-for="(row, index) in workDaysList"
       :key="index + row.workday + row.id"
@@ -28,11 +32,12 @@
       v-if="workDaysList?.length === 0"
       class="text-center p-4 text-gray-600"
     >
-      No workdays added
+      No items in the list
     </div>
   </div>
   <div class="flex items-center justify-between">
     <Button
+      v-if="slaData.support_and_resolution.length < 7"
       variant="subtle"
       label="Add row"
       class="mt-4"
@@ -51,26 +56,49 @@
 <script setup lang="ts">
 import { Button } from "frappe-ui";
 import SlaWorkDaysListItem from "./SlaWorkDaysListItem.vue";
-import { slaDataErrors } from "./sla";
+import { slaData, slaDataErrors } from "./sla";
 import { getGridTemplateColumnsForTable } from "@/utils";
 
-const props = defineProps({
-  workDaysList: {
-    type: Array<any>,
-    required: true,
-  },
-});
+interface WorkDay {
+  id: string;
+  workday: string;
+  start_time: string;
+  end_time: string;
+}
+
+interface Column {
+  key: string;
+  label: string;
+  isRequired?: boolean;
+}
+
+const props = defineProps<{
+  workDaysList: WorkDay[];
+}>();
+
+const allDays = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 
 const addWorkDay = () => {
+  const usedDays = new Set(props.workDaysList.map((day) => day.workday));
+  const nextDay = allDays.find((day) => !usedDays.has(day)) || allDays[0];
+
   props.workDaysList.push({
-    workday: "Monday",
+    workday: nextDay,
     start_time: "09:00:00",
     end_time: "17:00:00",
     id: Math.random().toString(36).substring(2, 9),
   });
 };
 
-const columns = [
+const columns: Column[] = [
   {
     label: "Day",
     key: "workday",

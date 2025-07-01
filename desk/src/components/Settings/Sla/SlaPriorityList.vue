@@ -5,41 +5,51 @@
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
+      v-if="slaData.priorities?.length !== 0"
     >
       <div
         v-for="column in columns"
         :key="column.key"
         class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        :class="{
+          'ml-2':
+            column.key === 'priority' ||
+            column.key === 'response_time' ||
+            column.key === 'resolution_time',
+        }"
       >
         {{ column.label }}
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" />
+    <hr class="my-0.5" v-if="slaData.priorities?.length !== 0" />
     <SlaPriorityListItem
-      v-for="(row, index) in props.priorityList"
-      :key="row.name"
+      v-for="(row, index) in slaData.priorities"
+      :key="row.priority"
       :row="row"
       :columns="columns"
-      :isLast="index === props.priorityList.length - 1"
-      :priorityList="props.priorityList"
+      :isLast="index === slaData.priorities.length - 1"
+      :priorityList="slaData.priorities"
+      :priorityOptions="priorityOptions"
     />
     <div
-      v-if="props.priorityList?.length === 0"
+      v-if="slaData.priorities?.length === 0"
       class="text-center p-4 text-gray-600"
     >
       No items in the list
     </div>
   </div>
-  <div class="flex items-center justify-between">
-    <Button
-      variant="subtle"
-      label="Add row"
-      class="mt-4"
-      @click="addRow"
-      icon-left="plus"
-    />
-    <div class="mt-2">
+  <div class="flex items-center justify-between mt-4">
+    <div>
+      <Button
+        v-if="slaData.priorities.length !== priorityOptions.length"
+        variant="subtle"
+        label="Add row"
+        @click="addRow"
+        icon-left="plus"
+      />
+    </div>
+    <div>
       <div v-if="slaDataErrors.default_priority" class="text-red-500 text-xs">
         {{ slaDataErrors.default_priority }}
       </div>
@@ -51,30 +61,38 @@
 </template>
 
 <script setup lang="ts">
-import { Button, toast } from "frappe-ui";
+import { Button, createResource, toast } from "frappe-ui";
 import SlaPriorityListItem from "./SlaPriorityListItem.vue";
-import { computed } from "vue";
-import { slaDataErrors, validateSlaData } from "./sla";
+import { computed, reactive } from "vue";
+import { slaData, slaDataErrors, validateSlaData } from "./sla";
 import { watchDebounced } from "@vueuse/core";
 import { getGridTemplateColumnsForTable } from "@/utils";
 
-const props = defineProps({
-  priorityList: {
-    type: Array<any>,
-    required: true,
+const priorityOptionsData = createResource({
+  url: "frappe.client.get_list",
+  params: {
+    doctype: "HD Ticket Priority",
+    fields: ["*"],
   },
-  applySlaForResolution: {
-    type: Boolean,
-    required: true,
+  auto: true,
+  onSuccess(data) {
+    priorityOptions.push(
+      ...data.map((p) => {
+        return {
+          label: p.name,
+          value: p.name,
+        };
+      })
+    );
   },
 });
 
-const priorityOptions = ["Low", "Medium", "High", "Urgent"];
+const priorityOptions = reactive([]);
 
 const addRow = () => {
-  const existingPriorities = props.priorityList.map((p) => p.priority);
+  const existingPriorities = slaData.value.priorities.map((p) => p.priority);
   const availablePriorities = priorityOptions.filter(
-    (p) => !existingPriorities.includes(p)
+    (p) => !existingPriorities.includes(p.value)
   );
 
   if (availablePriorities.length === 0) {
@@ -82,13 +100,13 @@ const addRow = () => {
     return;
   }
 
-  const newPriority = availablePriorities[0] || "Low";
+  const newPriority = availablePriorities[0].value;
 
-  props.priorityList.push({
+  slaData.value.priorities.push({
     priority: newPriority,
     resolution_time: 60 * 60,
     response_time: 60 * 60,
-    default_priority: props.priorityList.length === 0,
+    default_priority: slaData.value.priorities.length === 0,
   });
 };
 
@@ -116,9 +134,9 @@ const columns = computed(() => [
 ]);
 
 watchDebounced(
-  () => [...props.priorityList],
+  () => [...slaData.value.priorities],
   () => {
-    validateSlaData();
+    validateSlaData("priorities");
   },
   { deep: true, debounce: 300 }
 );

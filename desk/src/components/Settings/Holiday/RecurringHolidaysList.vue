@@ -5,6 +5,7 @@
       :style="{
         gridTemplateColumns: '1fr 4fr 22px',
       }"
+      v-if="holidays?.length !== 0"
     >
       <div
         v-for="column in columns"
@@ -14,7 +15,7 @@
         {{ column.label }}
       </div>
     </div>
-    <hr class="my-0.5" />
+    <hr class="my-0.5" v-if="holidays?.length !== 0" />
     <div v-for="(holiday, index) in holidays" :key="holiday.day">
       <div
         class="grid gap-2 px-2 items-center"
@@ -89,37 +90,9 @@
         <div class="flex flex-col gap-1.5">
           <FormLabel label="Day" required />
           <Select
-            :options="[
-              {
-                label: 'Monday',
-                value: 'Monday',
-              },
-              {
-                label: 'Tuesday',
-                value: 'Tuesday',
-              },
-              {
-                label: 'Wednesday',
-                value: 'Wednesday',
-              },
-              {
-                label: 'Thursday',
-                value: 'Thursday',
-              },
-              {
-                label: 'Friday',
-                value: 'Friday',
-              },
-              {
-                label: 'Saturday',
-                value: 'Saturday',
-              },
-              {
-                label: 'Sunday',
-                value: 'Sunday',
-              },
-            ]"
+            :options="availableWorkDays"
             v-model="recurringHolidayData.day"
+            :disabled="availableWorkDays.length === 0"
           />
         </div>
         <div class="flex flex-col gap-1.5">
@@ -180,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Select, FormLabel, Checkbox, toast, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
@@ -228,6 +201,42 @@ const columns = [
     key: "repetition",
   },
 ];
+
+const workDays = ref([
+  {
+    label: "Monday",
+    value: "Monday",
+  },
+  {
+    label: "Tuesday",
+    value: "Tuesday",
+  },
+  {
+    label: "Wednesday",
+    value: "Wednesday",
+  },
+  {
+    label: "Thursday",
+    value: "Thursday",
+  },
+  {
+    label: "Friday",
+    value: "Friday",
+  },
+  {
+    label: "Saturday",
+    value: "Saturday",
+  },
+  {
+    label: "Sunday",
+    value: "Sunday",
+  },
+]);
+
+const availableWorkDays = computed(() => {
+  const usedDays = new Set(props.holidays.map((h) => h.day));
+  return workDays.value.filter((day) => !usedDays.has(day.value));
+});
 
 const isConfirmingDelete = ref(false);
 

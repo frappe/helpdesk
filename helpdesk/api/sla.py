@@ -4,19 +4,10 @@ import json
 
 
 @frappe.whitelist()
-def duplicate_sla(docname):
+def duplicate_sla(docname, new_name):
     doc = frappe.get_doc("HD Service Level Agreement", docname)
     doc.name = ""
-    doc.service_level = f"{doc.service_level} (Duplicate)"
-    doc.insert()
-    return "success"
-
-
-@frappe.whitelist()
-def duplicate_priority(docname):
-    doc = frappe.get_doc("HD Service Level Priority", docname)
-    doc.name = ""
-    doc.default_priority = 0
+    doc.service_level = new_name
     doc.insert()
     return "success"
 

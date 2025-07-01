@@ -48,36 +48,75 @@ export const resetHolidayData = () => {
   };
 };
 
-export const validateHoliday = () => {
+type HolidayField = keyof HolidayErrors;
+
+export const validateHoliday = (key?: HolidayField) => {
   holidayDataErrors.value = {};
-  let isValid = true;
 
-  if (!holidayData.value.holiday_list_name?.trim()) {
-    holidayDataErrors.value.holiday_list_name = "Holiday list name is required";
-    isValid = false;
-  }
+  const validateField = (field: HolidayField) => {
+    if (key && field !== key) return;
 
-  if (!holidayData.value.from_date) {
-    holidayDataErrors.value.from_date = "Start date is required";
-    isValid = false;
-  }
+    switch (field) {
+      case "holiday_list_name":
+        if (!holidayData.value.holiday_list_name?.trim()) {
+          holidayDataErrors.value.holiday_list_name =
+            "Holiday list name is required";
+        } else {
+          holidayDataErrors.value.holiday_list_name = "";
+        }
+        break;
+      case "from_date":
+        if (!holidayData.value.from_date) {
+          holidayDataErrors.value.from_date = "Start date is required";
+        } else {
+          holidayDataErrors.value.from_date = "";
+        }
 
-  if (!holidayData.value.to_date) {
-    holidayDataErrors.value.end_date = "End date is required";
-    isValid = false;
-  }
+        if (holidayData.value.to_date) {
+          const startDate = new Date(holidayData.value.from_date);
+          const endDate = new Date(holidayData.value.to_date);
 
-  if (holidayData.value.from_date && holidayData.value.to_date) {
-    const startDate = new Date(holidayData.value.from_date);
-    const endDate = new Date(holidayData.value.to_date);
+          if (startDate > endDate) {
+            holidayDataErrors.value.dateRange =
+              "Start date cannot be after end date";
+          } else {
+            holidayDataErrors.value.dateRange = "";
+          }
+        }
+        break;
+      case "to_date":
+        if (!holidayData.value.to_date) {
+          holidayDataErrors.value.to_date = "End date is required";
+        } else {
+          holidayDataErrors.value.to_date = "";
+        }
 
-    if (startDate > endDate) {
-      holidayDataErrors.value.dateRange = "Start date cannot be after end date";
-      isValid = false;
+        if (holidayData.value.from_date) {
+          const startDate = new Date(holidayData.value.from_date);
+          const endDate = new Date(holidayData.value.to_date);
+
+          if (startDate > endDate) {
+            holidayDataErrors.value.dateRange =
+              "Start date cannot be after end date";
+          } else {
+            holidayDataErrors.value.dateRange = "";
+          }
+        }
+        break;
+      default:
+        break;
     }
+  };
+
+  if (key) {
+    validateField(key);
+  } else {
+    (Object.keys(holidayDataErrors.value) as HolidayField[]).forEach(
+      validateField
+    );
   }
 
-  return isValid;
+  return holidayDataErrors.value;
 };
 
 export function updateWeeklyOffDates() {

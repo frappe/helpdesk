@@ -129,7 +129,7 @@
                 getDateValue(date) === dateValue && isDateInRange(date),
               'opacity-50 cursor-not-allowed': !isDateInRange(date),
             }"
-            @dblclick="isDateInRange(date) ? addHoliday(date) : null"
+            @click="isDateInRange(date) ? addHoliday(date) : null"
           >
             {{ date.getDate() }}
           </div>
@@ -236,6 +236,7 @@ const handleMouseLeave = (date, callback) => {
 
 const addHoliday = (date) => {
   editHolidayData.value.holiday_date = date.toLocaleDateString();
+  editHolidayData.value.description = "";
   dialog.value = true;
 };
 

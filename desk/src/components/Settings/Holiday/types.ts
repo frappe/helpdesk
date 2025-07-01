@@ -19,7 +19,7 @@ export interface RepetitionPattern {
 export interface HolidayErrors {
   holiday_list_name?: string;
   from_date?: string;
-  end_date?: string;
+  to_date?: string;
   dateRange?: string;
   holidays?: string;
 }

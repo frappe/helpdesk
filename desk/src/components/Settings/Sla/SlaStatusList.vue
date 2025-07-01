@@ -5,17 +5,18 @@
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
+      v-if="statusList?.length !== 0"
     >
       <div
         v-for="column in columns"
         :key="column.key"
-        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis"
+        class="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis ml-2"
       >
         {{ column.label }}
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" />
+    <hr class="my-0.5" v-if="statusList?.length !== 0" />
     <SlaStatusListItem
       v-for="(row, index) in statusList"
       :key="index + row.status + row.id"
@@ -28,16 +29,20 @@
       No items in the list
     </div>
   </div>
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between mt-4">
     <Button
+      v-if="slaData.statuses.length < 4"
       variant="subtle"
       label="Add row"
-      class="mt-4"
       @click="addRow"
       icon-left="plus"
     />
-    <div v-if="slaDataErrors.statuses" class="text-red-500 text-xs mt-2">
+    <div
+      v-if="slaDataErrors.statuses || slaDataErrors.statuses_conflict"
+      class="text-red-500 text-xs"
+    >
       {{ slaDataErrors.statuses }}
+      {{ slaDataErrors.statuses_conflict }}
     </div>
   </div>
 </template>
@@ -45,7 +50,7 @@
 <script setup lang="ts">
 import { Button, toast } from "frappe-ui";
 import SlaStatusListItem from "./SlaStatusListItem.vue";
-import { slaDataErrors, validateSlaData } from "./sla";
+import { slaData, slaDataErrors, validateSlaData } from "./sla";
 import { watchDebounced } from "@vueuse/core";
 import { getGridTemplateColumnsForTable } from "@/utils";
 
@@ -102,7 +107,7 @@ const columns = [
 watchDebounced(
   () => [...props.statusList],
   () => {
-    validateSlaData();
+    validateSlaData("statuses");
   },
   { deep: true, debounce: 300 }
 );

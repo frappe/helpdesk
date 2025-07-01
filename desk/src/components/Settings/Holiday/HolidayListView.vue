@@ -3,7 +3,7 @@
     v-if="holidayData.loading"
     class="flex items-center h-full justify-center"
   >
-    <Spinner class="w-8" />
+    <LoadingIndicator class="w-4" />
   </div>
   <div
     v-if="!holidayData.loading"
@@ -17,11 +17,26 @@
           :label="holidayData?.holiday_list_name || 'New Business Holiday'"
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl"
         />
       </div>
     </div>
-    <Button label="Save" theme="gray" variant="solid" @click="saveHoliday()" />
+    <div class="flex gap-2 items-center">
+      <Badge
+        :variant="'subtle'"
+        :theme="'orange'"
+        size="sm"
+        label="Unsaved changes"
+        v-if="isDirty"
+      />
+      <Button
+        label="Save"
+        theme="gray"
+        variant="solid"
+        @click="saveHoliday()"
+        :disabled="Boolean(!isDirty && holidayListActiveScreen.data)"
+      />
+    </div>
   </div>
   <div v-if="!holidayData.loading" class="px-10 pb-8 overflow-y-scroll h-full">
     <div class="flex items-center gap-2 mt-2">
@@ -31,7 +46,7 @@
       >
     </div>
     <hr class="mb-6 mt-3" />
-    <div class="grid grid-cols-2 gap-2">
+    <div class="grid grid-cols-2 gap-5">
       <div>
         <FormControl
           :type="'text'"
@@ -41,7 +56,7 @@
           label="Name"
           v-model="holidayData.holiday_list_name"
           required
-          @change="debouncedValidateHoliday()"
+          @change="debouncedValidateHoliday('holiday_list_name')"
         />
         <div
           v-if="holidayDataErrors.holiday_list_name"
@@ -62,12 +77,12 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <span class="text-lg font-medium">Valid from</span>
-        <span class="text-sm text-gray-600">
+        <span class="text-lg font-semibold text-ink-gray-7">Valid from</span>
+        <span class="text-sm text-ink-gray-6">
           Choose the duration of this holiday list.
         </span>
       </div>
-      <div class="mt-4 flex gap-2">
+      <div class="mt-4 flex gap-5">
         <div class="w-full space-y-1.5">
           <FormLabel label="From date" for="from_date" required />
           <DatePicker
@@ -77,7 +92,7 @@
             class="w-full"
             id="from_date"
             :formatter="(date) => getFormat(date)"
-            @change="debouncedUpdateDuration()"
+            @change="debouncedUpdateDuration('from_date')"
           />
           <div
             v-if="holidayDataErrors.from_date"
@@ -101,13 +116,13 @@
             class="w-full"
             id="to_date"
             :formatter="(date) => getFormat(date)"
-            @change="debouncedUpdateDuration()"
+            @change="debouncedUpdateDuration('to_date')"
           />
           <div
-            v-if="holidayDataErrors.end_date"
+            v-if="holidayDataErrors.to_date"
             class="text-red-500 text-xs mt-1"
           >
-            {{ holidayDataErrors.end_date }}
+            {{ holidayDataErrors.to_date }}
           </div>
         </div>
       </div>
@@ -115,8 +130,10 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-2">
-        <div class="text-lg font-medium">Recurring holidays</div>
-        <div class="text-sm text-gray-600">
+        <div class="text-lg font-semibold text-ink-gray-7">
+          Recurring holidays
+        </div>
+        <div class="text-sm text-ink-gray-6">
           Add recurring holidays such as weekends.
         </div>
       </div>
@@ -130,21 +147,21 @@
     <hr class="my-6" />
     <div>
       <div class="flex flex-col gap-1">
-        <span class="text-lg font-medium">Holidays</span>
+        <span class="text-lg font-semibold text-ink-gray-7">Holidays</span>
         <div class="flex items-center justify-between">
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-ink-gray-6">
             Add holidays here to make sure they’re excluded from SLA
             calculations.
           </div>
           <TabButtons
             :buttons="[
               {
-                value: 'list',
-                icon: 'list',
-              },
-              {
                 value: 'calendar',
                 icon: 'calendar',
+              },
+              {
+                value: 'list',
+                icon: 'list',
               },
             ]"
             v-model="holidayListView"
@@ -192,9 +209,9 @@ import {
   Button,
   FormControl,
   toast,
-  Spinner,
+  LoadingIndicator,
 } from "frappe-ui";
-import { onUnmounted, ref } from "vue";
+import { onUnmounted, ref, watch } from "vue";
 import HolidaysListView from "./HolidaysListView.vue";
 import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
@@ -209,7 +226,9 @@ import { slaActiveScreen } from "../Sla/sla";
 
 const dialog = ref(false);
 
-const holidayListView = ref("list");
+const isDirty = ref(false);
+const initialData = ref(null);
+const holidayListView = ref("calendar");
 
 const getHolidayData = createResource({
   url: "helpdesk.api.holiday_list.get_holiday_list",
@@ -218,6 +237,7 @@ const getHolidayData = createResource({
   },
   onSuccess(data) {
     holidayData.value = data;
+    initialData.value = JSON.parse(JSON.stringify(data));
   },
   transform(data) {
     for (let holiday of data.holidays) {
@@ -226,6 +246,16 @@ const getHolidayData = createResource({
     data.recurring_holidays = JSON.parse(data.recurring_holidays || "[]");
     return data;
   },
+  onError(error) {
+    if (error.exc_type === "DoesNotExistError") {
+      holidayListActiveScreen.value = {
+        screen: "list",
+        data: null,
+      };
+      return;
+    }
+    toast.error("Failed to fetch holiday list");
+  },
 });
 
 if (holidayListActiveScreen.value.data?.name) {
@@ -233,10 +263,13 @@ if (holidayListActiveScreen.value.data?.name) {
   getHolidayData.fetch();
 }
 
-const debouncedValidateHoliday = useDebounceFn(() => validateHoliday(), 300);
+const debouncedValidateHoliday = useDebounceFn(
+  (key) => validateHoliday(key),
+  300
+);
 
-const updateDuration = () => {
-  validateHoliday();
+const updateDuration = (key) => {
+  validateHoliday(key);
   if (
     !holidayDataErrors.value.dateRange ||
     holidayDataErrors.value.dateRange === ""
@@ -245,9 +278,21 @@ const updateDuration = () => {
   }
 };
 
-const debouncedUpdateDuration = useDebounceFn(() => updateDuration(), 300);
+const debouncedUpdateDuration = useDebounceFn(
+  (key) => updateDuration(key),
+  300
+);
 
 const goBack = () => {
+  if (isDirty.value) {
+    if (
+      !confirm(
+        "Unsaved changes will be lost. Are you sure you want to go back?"
+      )
+    ) {
+      return;
+    }
+  }
   if (holidayListActiveScreen.value.previousScreen) {
     activeTab.value = tabs[4];
 
@@ -321,11 +366,10 @@ const updateHoliday = () => {
     };
   });
   createResource({
-    url: "frappe.client.set_value",
+    url: "helpdesk.api.holiday_list.update_holiday_list",
     params: {
-      doctype: "HD Service Holiday List",
-      name: holidayListActiveScreen.value.data.name,
-      fieldname: {
+      docname: holidayListActiveScreen.value.data.name,
+      doc: {
         holiday_list_name: holidayData.value.holiday_list_name,
         description: holidayData.value.description,
         from_date: holidayData.value.from_date,
@@ -337,14 +381,29 @@ const updateHoliday = () => {
       },
     },
     auto: true,
-    onSuccess() {
+    onSuccess(data) {
+      holidayListActiveScreen.value.data = data;
+      getHolidayData.submit({
+        docname: data.name,
+      });
       toast.success("Holiday updated successfully");
     },
   });
 };
 
+watch(
+  holidayData,
+  (newVal) => {
+    if (!initialData.value) return;
+    isDirty.value =
+      JSON.stringify(Object.assign({}, newVal)) !=
+      JSON.stringify(Object.assign({}, initialData.value));
+  },
+  { deep: true }
+);
+
 onUnmounted(() => {
-  resetHolidayData();
+  holidayDataErrors.value = {};
 });
 </script>
 

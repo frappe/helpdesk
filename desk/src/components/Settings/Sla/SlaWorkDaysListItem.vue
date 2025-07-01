@@ -15,7 +15,7 @@
       </div>
       <div v-else>
         <Select
-          class="bg-transparent w-max -ml-2 hover:bg-transparent border-0 focus-visible:!ring-0 bg-none"
+          class="bg-transparent cursor-pointer border-0 focus-visible:!ring-0 bg-none"
           :options="workDayOptions"
           v-model="props.row[column.key]"
         />
@@ -61,24 +61,35 @@ import { Button, Select } from "frappe-ui";
 import WorkDayModal from "./WorkDayModal.vue";
 import { getGridTemplateColumnsForTable, TemplateOption } from "@/utils";
 
-const props = defineProps({
-  columns: {
-    type: Array<any>,
-    required: true,
-  },
-  row: {
-    type: Object,
-    required: true,
-  },
-  isLast: {
-    type: Boolean,
-    default: false,
-  },
-  workDaysList: {
-    type: Array<any>,
-    required: true,
-  },
-});
+interface Column {
+  key: string;
+  label: string;
+  isRequired?: boolean;
+}
+
+interface WorkDay {
+  id: string;
+  workday: string;
+  start_time: string;
+  end_time: string;
+}
+
+const props = defineProps<{
+  columns: Column[];
+  row: WorkDay;
+  isLast?: boolean;
+  workDaysList: WorkDay[];
+}>();
+
+const workDayOptions = [
+  { label: "Monday", value: "Monday" },
+  { label: "Tuesday", value: "Tuesday" },
+  { label: "Wednesday", value: "Wednesday" },
+  { label: "Thursday", value: "Thursday" },
+  { label: "Friday", value: "Friday" },
+  { label: "Saturday", value: "Saturday" },
+  { label: "Sunday", value: "Sunday" },
+];
 
 const dialog = ref({
   show: false,
@@ -86,36 +97,6 @@ const dialog = ref({
   data: {},
 });
 
-const workDayOptions = [
-  {
-    label: "Monday",
-    value: "Monday",
-  },
-  {
-    label: "Tuesday",
-    value: "Tuesday",
-  },
-  {
-    label: "Wednesday",
-    value: "Wednesday",
-  },
-  {
-    label: "Thursday",
-    value: "Thursday",
-  },
-  {
-    label: "Friday",
-    value: "Friday",
-  },
-  {
-    label: "Saturday",
-    value: "Saturday",
-  },
-  {
-    label: "Sunday",
-    value: "Sunday",
-  },
-];
 const isConfirmingDelete = ref(false);
 
 const deleteWorkDay = (event) => {
@@ -125,9 +106,7 @@ const deleteWorkDay = (event) => {
     return;
   }
 
-  const item = props.workDaysList.findIndex(
-    (item) => item.workday === props.row.workday
-  );
+  const item = props.workDaysList.indexOf(props.row);
   if (item !== -1) {
     props.workDaysList.splice(item, 1);
   }
