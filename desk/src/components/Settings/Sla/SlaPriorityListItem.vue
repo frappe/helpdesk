@@ -25,7 +25,7 @@
           <template #target="{ togglePopover }">
             <div
               @click="togglePopover()"
-              class="min-h-4 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-gray-200 rounded"
+              class="min-h-7 w-full cursor-pointer select-none leading-5 p-1 px-2 hover:bg-gray-200 rounded"
             >
               {{ formatTimeHMS(props.row[column.key]) }}
             </div>

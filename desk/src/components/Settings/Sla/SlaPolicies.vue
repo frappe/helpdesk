@@ -17,7 +17,7 @@
         </p>
       </div>
       <Button
-        label="Create new"
+        label="New"
         theme="gray"
         variant="solid"
         @click="goToNew()"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { slaPolicyListData, slaActiveScreen, resetSlaData } from "./sla";
+import { slaPolicyListData, slaActiveScreen, resetSlaData } from "@/stores/sla";
 import SlaPolicyList from "./SlaPolicyList.vue";
 import { onMounted } from "vue";
 import { Button } from "frappe-ui";

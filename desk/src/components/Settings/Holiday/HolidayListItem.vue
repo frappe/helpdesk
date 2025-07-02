@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { Button, Dropdown, createResource, toast } from "frappe-ui";
 import { ref } from "vue";
-import { holidayListActiveScreen, holidayListData } from "./holidayList";
+import { holidayListActiveScreen, holidayListData } from "@/stores/holidayList";
 import { TemplateOption } from "@/utils";
 
 const props = defineProps({
@@ -99,16 +99,17 @@ const duplicate = () => {
       docname: props.data.name,
       new_name: duplicateDialog.value.name,
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       holidayListData.reload();
       toast.success("Holiday list duplicated");
       duplicateDialog.value = {
         show: false,
         name: "",
       };
-    },
-    onError: () => {
-      toast.error("Failed to duplicate holiday list");
+      holidayListActiveScreen.value = {
+        screen: "view",
+        data: data,
+      };
     },
     auto: true,
   });
@@ -118,9 +119,6 @@ const deleteHolidayList = (event) => {
   event.preventDefault();
   if (!isConfirmingDelete.value) {
     isConfirmingDelete.value = true;
-    setTimeout(() => {
-      isConfirmingDelete.value = false;
-    }, 3000);
     return;
   }
 
@@ -133,9 +131,7 @@ const deleteHolidayList = (event) => {
     onSuccess: () => {
       holidayListData.reload();
       isConfirmingDelete.value = false;
-    },
-    onError: (error) => {
-      toast.error(error.messages[0]);
+      toast.success("Holiday list deleted");
     },
     auto: true,
   });

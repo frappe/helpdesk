@@ -66,7 +66,11 @@
 <script setup lang="ts">
 import AssignmentConditions from "./AssignmentConditions/AssignmentConditions.vue";
 import { Button, Dropdown, FeatherIcon } from "frappe-ui";
-import { slaDataErrors, validateConditions, validateSlaData } from "./sla";
+import {
+  slaDataErrors,
+  validateConditions,
+  validateSlaData,
+} from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 
 type Conditions = {

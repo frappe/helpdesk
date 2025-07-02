@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="flex items-center" v-for="(week, i) in datesAsWeeks" :key="i">
-        <div v-for="date in week" :key="getDateValue(date)">
+        <div v-for="date in week" :key="getFormattedDate(date)">
           <Popover v-if="isHoliday(date)">
             <template #target="{ open, close }">
               <div
@@ -22,17 +22,27 @@
                 :class="{
                   '!text-ink-gray-4 !bg-gray-100': isWeekOff(date),
                 }"
-                @mouseover="handleMouseEnter(getDateValue(date), open)"
-                @mouseleave="handleMouseLeave(getDateValue(date), close)"
+                @mouseover="handleMouseEnter(getFormattedDate(date), open)"
+                @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
+                @click="
+                  () => {
+                    close();
+                    editHoliday(date);
+                  }
+                "
               >
                 {{ date.getDate() }}
               </div>
             </template>
             <template #body-main="{ close: closePopover, open: openPopover }">
               <div
-                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-gray-200 rounded-md"
-                @mouseover="handleMouseEnter(getDateValue(date), openPopover)"
-                @mouseleave="handleMouseLeave(getDateValue(date), closePopover)"
+                class="p-3 flex gap-2.5 text-ink-gray-9 w-80 border border-gray-100 rounded-md"
+                @mouseover="
+                  handleMouseEnter(getFormattedDate(date), openPopover)
+                "
+                @mouseleave="
+                  handleMouseLeave(getFormattedDate(date), closePopover)
+                "
               >
                 <div class="w-[5%]">
                   <div class="size-3.5 bg-orange-500 rounded-sm mt-1" />
@@ -55,7 +65,10 @@
                       variant="ghost"
                       @click="open"
                       @mouseleave="
-                        handleMouseLeave(getDateValue(date) + 'dropdown', close)
+                        handleMouseLeave(
+                          getFormattedDate(date) + 'dropdown',
+                          close
+                        )
                       "
                     />
                   </template>
@@ -63,18 +76,18 @@
                     #body-main="{ close: closeDropdown, open: openDropdown }"
                   >
                     <div
-                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-gray-200 rounded-md"
+                      class="p-2 flex flex-col gap-1 w-40 text-ink-gray-9 border border-gray-100 rounded-md"
                       @mouseover="
-                        handleMouseEnter(getDateValue(date), openPopover);
+                        handleMouseEnter(getFormattedDate(date), openPopover);
                         handleMouseEnter(
-                          getDateValue(date) + 'dropdown',
+                          getFormattedDate(date) + 'dropdown',
                           openDropdown
                         );
                       "
                       @mouseleave="
-                        handleMouseLeave(getDateValue(date), closePopover);
+                        handleMouseLeave(getFormattedDate(date), closePopover);
                         handleMouseLeave(
-                          getDateValue(date) + 'dropdown',
+                          getFormattedDate(date) + 'dropdown',
                           closeDropdown
                         );
                       "
@@ -121,12 +134,13 @@
             :class="{
               'cursor-pointer hover:bg-surface-gray-2': isDateInRange(date),
               'text-ink-gray-3':
+                // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
               'text-ink-gray-9':
-                getDateValue(date) === getDateValue(today) &&
+                getFormattedDate(date) === getFormattedDate(today) &&
                 isDateInRange(date),
               'bg-black text-ink-white hover:!bg-black/80 hover:text-ink-white':
-                getDateValue(date) === dateValue && isDateInRange(date),
+                getFormattedDate(date) === dateValue && isDateInRange(date),
               'opacity-50 cursor-not-allowed': !isDateInRange(date),
             }"
             @click="isDateInRange(date) ? addHoliday(date) : null"
@@ -151,7 +165,7 @@
             v-model="editHolidayData.holiday_date"
             variant="subtle"
             placeholder="Date"
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
             class="w-full"
             id="holiday_date"
             required
@@ -181,12 +195,11 @@
 </template>
 
 <script setup lang="ts">
-import { getFormat, htmlToText, TemplateOption } from "@/utils";
-import { toast, DatePicker, FormLabel, Popover, Dropdown } from "frappe-ui";
+import { getFormattedDate, htmlToText } from "@/utils";
+import { toast, DatePicker, FormLabel, Popover } from "frappe-ui";
 import { useDatePicker } from "frappe-ui/src/components/DatePicker/useDatePicker";
-import { getDateValue } from "frappe-ui/src/components/DatePicker/utils";
 import { ref, watch } from "vue";
-import { holidayData } from "./holidayList";
+import { holidayData } from "@/stores/holidayList";
 
 const dialog = ref(false);
 const editHolidayData = ref({
@@ -194,8 +207,15 @@ const editHolidayData = ref({
   description: "",
   isEditing: false,
 });
-const { currentYear, currentMonth, today, datesAsWeeks, formattedMonth } =
-  useDatePicker();
+const {
+  currentYear,
+  currentMonth,
+  today,
+  datesAsWeeks: daw,
+  formattedMonth,
+} = useDatePicker();
+// Workaround to fix type errors
+const datesAsWeeks = daw as unknown as Date[][];
 const isConfirmingDelete = ref(false);
 const popoverTimeouts = ref({});
 
@@ -214,7 +234,7 @@ const props = defineProps({
   },
 });
 
-const dateValue = ref(getDateValue(today.value));
+const dateValue = ref(getFormattedDate(today.value));
 
 const handleMouseEnter = (date, callback) => {
   if (popoverTimeouts.value[date]) {
@@ -286,8 +306,8 @@ const isWeekOff = (date: Date): boolean => {
 const editHoliday = (date) => {
   dialog.value = true;
   const holiday = props.holidays.find((h) => {
-    const holidayDate = getDateValue(h.holiday_date);
-    const editDate = getDateValue(date);
+    const holidayDate = getFormattedDate(h.holiday_date);
+    const editDate = getFormattedDate(date);
     return holidayDate === editDate;
   });
   editHolidayData.value = { ...holiday, isEditing: true };
@@ -301,13 +321,13 @@ const deleteHoliday = (event, date, callback) => {
     return;
   }
   const holidayToDelete = props.holidays.find((h) => {
-    const holidayDate = getDateValue(h.holiday_date);
-    const editDate = getDateValue(date);
+    const holidayDate = getFormattedDate(h.holiday_date);
+    const editDate = getFormattedDate(date);
     return holidayDate === editDate;
   });
   const index = props.holidays.findIndex((h) => {
-    const holidayDate = getDateValue(h.holiday_date);
-    const editDate = getDateValue(holidayToDelete.holiday_date);
+    const holidayDate = getFormattedDate(h.holiday_date);
+    const editDate = getFormattedDate(holidayToDelete.holiday_date);
     return holidayDate === editDate;
   });
 
@@ -332,8 +352,8 @@ const saveHoliday = () => {
 
   const existingHoliday = props.holidays.find(
     (h) =>
-      getDateValue(h.holiday_date) ===
-      getDateValue(editHolidayData.value.holiday_date)
+      getFormattedDate(h.holiday_date) ===
+      getFormattedDate(editHolidayData.value.holiday_date)
   );
 
   if (existingHoliday && !editHolidayData.value.isEditing) {
@@ -347,8 +367,8 @@ const saveHoliday = () => {
 
   const index = props.holidays.findIndex(
     (h) =>
-      getDateValue(h.holiday_date) ===
-      getDateValue(editHolidayData.value.holiday_date)
+      getFormattedDate(h.holiday_date) ===
+      getFormattedDate(editHolidayData.value.holiday_date)
   );
 
   if (index === -1 && !editHolidayData.value.isEditing) {
@@ -378,8 +398,8 @@ const saveHoliday = () => {
 
 const getHolidayDescription = (date: Date): string => {
   const holiday = props.holidays.find((h) => {
-    const holidayDate = getDateValue(h.holiday_date);
-    const editDate = getDateValue(date);
+    const holidayDate = getFormattedDate(h.holiday_date);
+    const editDate = getFormattedDate(date);
     return holidayDate === editDate;
   });
 

@@ -87,7 +87,7 @@
             class="w-full"
             id="holiday_date"
             required
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
           />
         </div>
         <FormControl
@@ -116,9 +116,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { Dropdown, DatePicker, FormControl, FormLabel } from "frappe-ui";
-import { getDateValue } from "frappe-ui/src/components/DatePicker/utils";
 import dayjs from "dayjs";
-import { getFormat, TemplateOption } from "@/utils";
+import { getFormattedDate, TemplateOption } from "@/utils";
 
 const isConfirmingDelete = ref(false);
 
@@ -173,8 +172,8 @@ const saveHoliday = () => {
 
   const index = props.holidayData.holidays.findIndex(
     (h: Holiday) =>
-      getDateValue(h.holiday_date) ===
-      getDateValue(editHolidayData.value.holiday_date)
+      getFormattedDate(h.holiday_date) ===
+      getFormattedDate(editHolidayData.value.holiday_date)
   );
 
   if (index !== -1) {
@@ -195,8 +194,8 @@ const deleteHoliday = (event, holidayToDelete?: Holiday) => {
     return;
   }
   const index = props.holidayData.holidays.findIndex((h: Holiday) => {
-    const holidayDate = getDateValue(h.holiday_date);
-    const editDate = getDateValue(holidayToDelete.holiday_date);
+    const holidayDate = getFormattedDate(h.holiday_date);
+    const editDate = getFormattedDate(holidayToDelete.holiday_date);
     return holidayDate === editDate;
   });
 

@@ -1,13 +1,18 @@
+import {
+  Holiday,
+  HolidayErrors,
+  RepetitionPattern,
+} from "@/components/Settings/Holiday/types";
 import dayjs, { Dayjs } from "dayjs";
 import { createResource } from "frappe-ui";
 import { ref } from "vue";
-import { Holiday, HolidayErrors, RepetitionPattern } from "./types";
 
 export const holidayListData = createResource({
   url: "frappe.client.get_list",
   params: {
     doctype: "HD Service Holiday List",
     fields: ["*"],
+    order_by: "modified desc",
   },
 });
 

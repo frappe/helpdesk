@@ -8,7 +8,7 @@ def duplicate_holiday_list(docname, new_name):
     doc.name = ""
     doc.holiday_list_name = new_name
     doc.insert()
-    return "success"
+    return doc
 
 
 @frappe.whitelist()

@@ -64,7 +64,12 @@
 import { Button, createResource, toast } from "frappe-ui";
 import SlaPriorityListItem from "./SlaPriorityListItem.vue";
 import { computed, reactive } from "vue";
-import { slaData, slaDataErrors, validateSlaData } from "./sla";
+import {
+  slaActiveScreen,
+  slaData,
+  slaDataErrors,
+  validateSlaData,
+} from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 import { getGridTemplateColumnsForTable } from "@/utils";
 
@@ -84,6 +89,16 @@ const priorityOptionsData = createResource({
         };
       })
     );
+    if (!slaActiveScreen.value.data) {
+      slaData.value.priorities = priorityOptions.map((p, index) => {
+        return {
+          priority: p.value,
+          resolution_time: 60 * 60,
+          response_time: 60 * 60,
+          default_priority: index === 0,
+        };
+      });
+    }
   },
 });
 
@@ -129,7 +144,7 @@ const columns = computed(() => [
   {
     label: "Resolution time",
     key: "resolution_time",
-    isRequired: true,
+    isRequired: Boolean(slaData.value.apply_sla_for_resolution),
   },
 ]);
 
