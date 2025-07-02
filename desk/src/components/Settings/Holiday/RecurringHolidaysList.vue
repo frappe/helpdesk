@@ -18,7 +18,7 @@
     <hr class="my-0.5" v-if="holidays?.length !== 0" />
     <div v-for="(holiday, index) in holidays" :key="holiday.day">
       <div
-        class="grid gap-2 px-2 items-center"
+        class="grid gap-2 px-2 py-2 items-center"
         :style="{ gridTemplateColumns: '1fr 4fr 22px' }"
       >
         <div
