@@ -239,7 +239,7 @@ declare global {
     is_fc_site: boolean;
   }
 }
-const isFCSite = ref(true);
+const isFCSite = ref(window.is_fc_site);
 
 const allViews = computed(() => {
   const items = isCustomerPortal.value
