@@ -425,6 +425,28 @@ class HDServiceLevelAgreement(Document):
 
         frappe.publish_realtime("update_sla_status", user=frappe.session.user)
 
+    def on_trash(self):
+        self.handle_default_sla_deletion()
+
+    def handle_default_sla_deletion(self):
+        if not self.default_sla:
+            return
+        default_sla_exists = frappe.db.exists(
+            self.doctype,
+            {
+                "default_sla": True,
+                "name": ["!=", self.name],
+            },
+        )
+        if default_sla_exists:
+            return
+        else:
+            frappe.throw(
+                _(
+                    "Cannot delete the default SLA. At least one SLA must be marked as default."
+                )
+            )
+
 
 def get_repeated(values):
     unique_list = []
