@@ -98,7 +98,7 @@ import { ref } from "vue";
 import HLCalender from "./HLCalender.vue";
 import YearsList from "./YearsList.vue";
 import dayjs from "dayjs";
-import { holidayData } from "./holidayList";
+import { holidayData } from "@/stores/holidayList";
 
 const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);

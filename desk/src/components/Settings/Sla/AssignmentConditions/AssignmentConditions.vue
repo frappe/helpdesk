@@ -29,7 +29,7 @@
 import { computed } from "vue";
 import { Button, Dropdown } from "frappe-ui";
 import AssignmentCondition from "./AssignmentCondition.vue";
-import { slaDataErrors } from "../sla";
+import { slaDataErrors } from "@/stores/sla";
 
 const props = defineProps({
   conditions: {

@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { slaActiveScreen, slaPolicyListData } from "./sla";
+import { slaActiveScreen, slaPolicyListData } from "@/stores/sla";
 import SlaPolicies from "./SlaPolicies.vue";
 import SlaPolicyView from "./SlaPolicyView.vue";
 import { onMounted } from "vue";

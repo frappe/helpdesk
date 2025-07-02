@@ -90,7 +90,7 @@
       </div>
       <div class="mt-4">
         <Checkbox
-          label="Apply default SLA conditions"
+          label="Set as default SLA"
           v-model="slaData.default_sla"
           class="text-ink-gray-6 text-base font-medium"
         />
@@ -117,7 +117,7 @@
             class="w-full"
             id="from_date"
             @change="debouncedValidateSlaData('start_date')"
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
           />
           <span v-if="slaDataErrors.start_date" class="text-red-500 text-xs">
             {{ slaDataErrors.start_date }}
@@ -132,7 +132,7 @@
             class="w-full"
             id="to_date"
             @change="debouncedValidateSlaData('end_date')"
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
           />
           <span v-if="slaDataErrors.end_date" class="text-red-500 text-xs">
             {{ slaDataErrors.end_date }}
@@ -156,6 +156,7 @@
           label="Apply SLA for resolution time also"
           v-model="slaData.apply_sla_for_resolution"
           class="text-ink-gray-6 text-base font-medium"
+          @change="debouncedValidateSlaData('priorities')"
         />
         <div class="mt-4">
           <SlaPriorityList />
@@ -186,6 +187,13 @@
       :slaData="slaData"
     />
   </div>
+  <ConfirmDialog
+    v-model="showConfirmDialog"
+    title="Unsaved changes"
+    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :onConfirm="goBack"
+    :onCancel="() => (showConfirmDialog = false)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -194,7 +202,7 @@ import {
   slaData,
   slaDataErrors,
   validateSlaData,
-} from "./sla";
+} from "@/stores/sla";
 import {
   createResource,
   Switch,
@@ -205,14 +213,16 @@ import {
   Badge,
   Button,
 } from "frappe-ui";
-import { onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 import SlaHolidays from "./SlaHolidays.vue";
 import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import { useDebounceFn } from "@vueuse/core";
-import { getFormat } from "@/utils";
+import { getFormattedDate } from "@/utils";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
+const showConfirmDialog = ref(false);
 const isDirty = ref(false);
 const initialData = ref(null);
 
@@ -260,14 +270,13 @@ if (slaActiveScreen.value.data && slaActiveScreen.value.fetchData) {
 }
 
 const goBack = () => {
-  if (isDirty.value) {
-    if (
-      !confirm(
-        "Unsaved changes will be lost. Are you sure you want to go back?"
-      )
-    ) {
-      return;
-    }
+  if (isDirty.value && !showConfirmDialog.value) {
+    showConfirmDialog.value = true;
+    return;
+  }
+  if (!slaActiveScreen.value.data && !showConfirmDialog.value) {
+    showConfirmDialog.value = true;
+    return;
   }
   slaActiveScreen.value = {
     screen: "list",
@@ -339,15 +348,12 @@ const createSla = () => {
     },
     auto: true,
     onSuccess(data) {
-      toast.success("SLA policy created successfully");
+      toast.success("SLA policy created");
       slaActiveScreen.value.data = data;
       slaActiveScreen.value.screen = "view";
       getSlaData.submit({
         docname: data.name,
       });
-    },
-    onError(error) {
-      toast.error(`SLA policy creation failed: ${error}`);
     },
   });
 };
@@ -385,10 +391,7 @@ const updateSla = () => {
     auto: true,
     onSuccess() {
       getSlaData.submit();
-      toast.success("SLA policy updated successfully");
-    },
-    onError(error) {
-      toast.error(`SLA policy update failed: ${error}`);
+      toast.success("SLA policy updated");
     },
   });
 };
@@ -404,7 +407,18 @@ watch(
   { deep: true }
 );
 
+const beforeUnloadHandler = (event) => {
+  if (!isDirty.value) return;
+  event.preventDefault();
+  event.returnValue = true;
+};
+
+onMounted(() => {
+  addEventListener("beforeunload", beforeUnloadHandler);
+});
+
 onUnmounted(() => {
+  removeEventListener("beforeunload", beforeUnloadHandler);
   slaDataErrors.value = {
     service_level: "",
     description: "",

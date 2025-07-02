@@ -1,12 +1,13 @@
 import { ref } from "vue";
 import { createResource } from "frappe-ui";
-import { SlaValidationErrors } from "./types";
+import { SlaValidationErrors } from "@/components/Settings/Sla/types";
 
 export const slaPolicyListData = createResource({
   url: "frappe.client.get_list",
   params: {
     doctype: "HD Service Level Agreement",
     fields: ["*"],
+    order_by: "modified desc",
   },
 });
 
@@ -16,32 +17,7 @@ export const slaData = ref({
   enabled: false,
   default_sla: false,
   apply_sla_for_resolution: false,
-  priorities: [
-    {
-      priority: "Low",
-      response_time: 60 * 60,
-      resolution_time: 60 * 60,
-      default_priority: true,
-    },
-    {
-      priority: "Medium",
-      response_time: 60 * 60,
-      resolution_time: 60 * 60,
-      default_priority: false,
-    },
-    {
-      priority: "High",
-      response_time: 60 * 60,
-      resolution_time: 60 * 60,
-      default_priority: false,
-    },
-    {
-      priority: "Urgent",
-      response_time: 60 * 60,
-      resolution_time: 60 * 60,
-      default_priority: false,
-    },
-  ],
+  priorities: [],
   statuses: [],
   holiday_list: "Default",
   default_priority: "",
@@ -60,7 +36,20 @@ export const resetSlaData = () => {
     default_sla: false,
     apply_sla_for_resolution: false,
     priorities: [],
-    statuses: [],
+    statuses: [
+      {
+        status: "Replied",
+        sla_behavior: "Paused",
+      },
+      {
+        status: "Closed",
+        sla_behavior: "Fulfilled",
+      },
+      {
+        status: "Resolved",
+        sla_behavior: "Fulfilled",
+      },
+    ],
     holiday_list: "Default",
     default_priority: "",
     start_date: "",
@@ -148,12 +137,16 @@ export function validateSlaData(key?: SlaField): SlaValidationErrors {
             }
             if (Boolean(slaData.value.apply_sla_for_resolution)) {
               if (priority.resolution_time == 0) {
+                console.log("Resolution time is required");
                 prioritiesError.push(
                   `Priority ${priorityNum}: Resolution time is required`
                 );
               }
             }
-            if (priority.response_time > priority.resolution_time) {
+            if (
+              priority.response_time > priority.resolution_time &&
+              Boolean(slaData.value.apply_sla_for_resolution)
+            ) {
               prioritiesError.push(
                 `Priority ${priorityNum}: Response time cannot be greater than resolution time`
               );

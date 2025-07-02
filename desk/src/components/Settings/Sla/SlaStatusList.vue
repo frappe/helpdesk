@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { Button, toast } from "frappe-ui";
 import SlaStatusListItem from "./SlaStatusListItem.vue";
-import { slaData, slaDataErrors, validateSlaData } from "./sla";
+import { slaData, slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 import { getGridTemplateColumnsForTable } from "@/utils";
 

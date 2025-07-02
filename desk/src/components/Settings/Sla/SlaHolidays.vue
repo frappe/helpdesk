@@ -72,9 +72,9 @@
 import { createResource, NestedPopover, Button } from "frappe-ui";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
 import { activeTab, tabs } from "../settingsModal";
-import { holidayListActiveScreen } from "../Holiday/holidayList";
+import { holidayListActiveScreen } from "@/stores/holidayList";
 import { watchDebounced } from "@vueuse/core";
-import { validateSlaData } from "./sla";
+import { validateSlaData } from "@/stores/sla";
 
 const holidayList = defineModel<string>();
 

@@ -9,7 +9,7 @@ def duplicate_sla(docname, new_name):
     doc.name = ""
     doc.service_level = new_name
     doc.insert()
-    return "success"
+    return doc
 
 
 @frappe.whitelist()

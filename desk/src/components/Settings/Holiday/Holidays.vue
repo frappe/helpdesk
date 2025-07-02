@@ -2,16 +2,14 @@
   <div class="px-10 py-8 overflow-y-auto h-full">
     <div class="flex items-start justify-between">
       <div class="flex flex-col gap-2">
-        <h1 class="text-lg font-semibold text-ink-gray-8">
-          Work schedule and holidays
-        </h1>
+        <h1 class="text-lg font-semibold text-ink-gray-8">Business Holidays</h1>
         <p class="text-sm max-w-lg leading-5 text-ink-gray-6">
           Set your team’s working days, hours, and holidays using a template or
           custom schedule.
         </p>
       </div>
       <Button
-        label="Create new"
+        label="New"
         theme="gray"
         variant="solid"
         @click="goToNew()"
@@ -29,7 +27,7 @@ import {
   holidayListData,
   holidayListActiveScreen,
   resetHolidayData,
-} from "./holidayList";
+} from "@/stores/holidayList";
 import HolidayList from "./HolidayList.vue";
 import { onMounted } from "vue";
 

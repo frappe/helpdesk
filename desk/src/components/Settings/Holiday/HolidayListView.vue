@@ -91,7 +91,7 @@
             placeholder="From date"
             class="w-full"
             id="from_date"
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
             @change="debouncedUpdateDuration('from_date')"
           />
           <div
@@ -115,7 +115,7 @@
             placeholder="To date"
             class="w-full"
             id="to_date"
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
             @change="debouncedUpdateDuration('to_date')"
           />
           <div
@@ -191,6 +191,13 @@
       </div>
     </div>
   </div>
+  <ConfirmDialog
+    v-model="showConfirmDialog"
+    title="Unsaved changes"
+    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :onConfirm="goBack"
+    :onCancel="() => (showConfirmDialog = false)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -198,10 +205,9 @@ import {
   holidayData,
   holidayDataErrors,
   holidayListActiveScreen,
-  resetHolidayData,
   updateWeeklyOffDates,
   validateHoliday,
-} from "./holidayList";
+} from "@/stores/holidayList";
 import {
   createResource,
   TabButtons,
@@ -211,24 +217,27 @@ import {
   toast,
   LoadingIndicator,
 } from "frappe-ui";
-import { onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import HolidaysListView from "./HolidaysListView.vue";
 import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
 import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./AddHolidayModal.vue";
-import { getFormat, htmlToText } from "@/utils";
+import { getFormattedDate, htmlToText } from "@/utils";
 import FormLabel from "frappe-ui/src/components/FormLabel.vue";
 import { useDebounceFn } from "@vueuse/core";
 import dayjs from "dayjs";
 import { activeTab, tabs } from "../settingsModal";
-import { slaActiveScreen } from "../Sla/sla";
+import { slaActiveScreen } from "@/stores/sla";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 const dialog = ref(false);
 
 const isDirty = ref(false);
 const initialData = ref(null);
 const holidayListView = ref("calendar");
+
+const showConfirmDialog = ref(false);
 
 const getHolidayData = createResource({
   url: "helpdesk.api.holiday_list.get_holiday_list",
@@ -245,16 +254,6 @@ const getHolidayData = createResource({
     }
     data.recurring_holidays = JSON.parse(data.recurring_holidays || "[]");
     return data;
-  },
-  onError(error) {
-    if (error.exc_type === "DoesNotExistError") {
-      holidayListActiveScreen.value = {
-        screen: "list",
-        data: null,
-      };
-      return;
-    }
-    toast.error("Failed to fetch holiday list");
   },
 });
 
@@ -284,14 +283,13 @@ const debouncedUpdateDuration = useDebounceFn(
 );
 
 const goBack = () => {
-  if (isDirty.value) {
-    if (
-      !confirm(
-        "Unsaved changes will be lost. Are you sure you want to go back?"
-      )
-    ) {
-      return;
-    }
+  if (isDirty.value && !showConfirmDialog.value) {
+    showConfirmDialog.value = true;
+    return;
+  }
+  if (!holidayListActiveScreen.value.data && !showConfirmDialog.value) {
+    showConfirmDialog.value = true;
+    return;
   }
   if (holidayListActiveScreen.value.previousScreen) {
     activeTab.value = tabs[4];
@@ -348,7 +346,7 @@ const createHoliday = () => {
     },
     auto: true,
     onSuccess(data) {
-      toast.success("Holiday created successfully");
+      toast.success("Holiday created");
       holidayListActiveScreen.value.data = data;
       holidayListActiveScreen.value.screen = "view";
       getHolidayData.submit({
@@ -386,7 +384,7 @@ const updateHoliday = () => {
       getHolidayData.submit({
         docname: data.name,
       });
-      toast.success("Holiday updated successfully");
+      toast.success("Holiday updated");
     },
   });
 };
@@ -402,7 +400,18 @@ watch(
   { deep: true }
 );
 
+const beforeUnloadHandler = (event) => {
+  if (!isDirty.value) return;
+  event.preventDefault();
+  event.returnValue = true;
+};
+
+onMounted(() => {
+  addEventListener("beforeunload", beforeUnloadHandler);
+});
+
 onUnmounted(() => {
+  removeEventListener("beforeunload", beforeUnloadHandler);
   holidayDataErrors.value = {};
 });
 </script>

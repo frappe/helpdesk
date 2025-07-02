@@ -230,18 +230,13 @@ export function htmlToText(html: string): string {
  * @param {Date|string} date - Date object or ISO date string
  * @returns {string} Formatted date string in the user's locale and preferences
  */
-export function getFormat(date) {
+export function getFormattedDate(date) {
   if (!date) return "";
 
   const dateObj = dayjs(date);
   if (!dateObj.isValid()) return "";
 
-  return dateObj.format(
-    window.sysdefaults.date_format
-      .replace("mm", "MM")
-      .replace("yyyy", "YYYY")
-      .replace("dd", "DD") || "YYYY-MM-DD"
-  );
+  return dateObj.format("DD-MM-YYYY");
 }
 
 export function TemplateOption({ active, option, variant, icon, onClick }) {

@@ -158,7 +158,7 @@ import { Select, FormLabel, Checkbox, toast, Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-import { updateWeeklyOffDates } from "./holidayList";
+import { updateWeeklyOffDates } from "@/stores/holidayList";
 import { TemplateOption } from "@/utils";
 
 dayjs.extend(weekday);

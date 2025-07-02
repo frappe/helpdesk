@@ -9,7 +9,7 @@
           <FormLabel label="Date" required />
           <DatePicker
             v-model="holidayData.holiday_date"
-            :formatter="(date) => getFormat(date)"
+            :formatter="(date) => getFormattedDate(date)"
             variant="subtle"
             placeholder="Date"
             class="w-full"
@@ -50,10 +50,9 @@
 </template>
 
 <script setup lang="ts">
-import { getFormat } from "@/utils";
+import { getFormattedDate } from "@/utils";
 import { Dialog, FormControl, Button, FormLabel, toast } from "frappe-ui";
 import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
-import { getDateValue } from "frappe-ui/src/components/DatePicker/utils";
 import { ref } from "vue";
 
 const dialog = defineModel<boolean>();
@@ -107,8 +106,8 @@ const onSave = () => {
 
   const index = props.holidays.findIndex(
     (h) =>
-      getDateValue(h.holiday_date) ===
-      getDateValue(holidayData.value.holiday_date)
+      getFormattedDate(h.holiday_date) ===
+      getFormattedDate(holidayData.value.holiday_date)
   );
 
   if (index !== -1) {
