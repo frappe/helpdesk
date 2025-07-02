@@ -193,10 +193,10 @@ import {
   IntermediateStepModal,
   minimize,
   showHelpModal,
+  TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
 
-import TrialBanner from "frappe-ui/frappe/Billing/TrialBanner.vue";
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
