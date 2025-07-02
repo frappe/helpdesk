@@ -27,6 +27,7 @@
           <component
             :is="activeTab.component"
             v-if="activeTab"
+            @switchToInviteAgentTab="switchToInviteAgentTab"
             class="h-full flex flex-col w-full"
           />
         </div>
@@ -40,8 +41,10 @@ import { markRaw, ModelRef, ref, watch } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
+import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import Agents from "./Agents.vue";
+import InviteAgent from "./InviteAgent";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
@@ -53,6 +56,16 @@ const props = withDefaults(
     defaultTab: 0,
   }
 );
+
+const InviteAgentTab = {
+  label: "Invite Agent",
+  icon: markRaw(LucideUserPlus),
+  component: markRaw(InviteAgent),
+};
+
+const switchToInviteAgentTab = () => {
+  activeTab.value = InviteAgentTab;
+};
 
 let tabs = [
   {
@@ -70,6 +83,7 @@ let tabs = [
     icon: markRaw(LucideUser),
     component: markRaw(Agents),
   },
+  InviteAgentTab,
   {
     label: "Teams",
     icon: markRaw(LucideUsers),

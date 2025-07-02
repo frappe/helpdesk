@@ -47,15 +47,26 @@
             </button>
           </template>
         </Dropdown>
-        <Button
-          @click="() => (showNewAgentsDialog = !showNewAgentsDialog)"
-          label="New"
-          variant="solid"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4 stroke-1.5" />
-          </template>
-        </Button>
+        <Dropdown
+          :options="[
+            {
+              label: 'Add Existing Agent',
+              onClick: () => {},
+            },
+            {
+              label: 'Invite New Agent',
+              onClick: () => {
+                emits('switchToInviteAgentTab');
+              },
+            },
+          ]"
+          :button="{
+            label: 'New',
+            iconLeft: 'plus',
+            variant: 'solid',
+          }"
+          placement="right"
+        />
       </div>
     </div>
 
@@ -145,6 +156,8 @@ import LucideCheck from "~icons/lucide/check";
 import IconMoreHorizontal from "~icons/lucide/more-horizontal";
 import AgentCard from "./AgentCard.vue";
 import { activeFilter, showNewAgentsDialog, useAgents } from "./agents";
+
+const emits = defineEmits<{ switchToInviteAgentTab: [] }>();
 
 const { getUserRole, updateUserRoleCache } = useUserStore();
 const { isManager } = useAuthStore();

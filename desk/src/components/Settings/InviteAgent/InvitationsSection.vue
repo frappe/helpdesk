@@ -1,0 +1,211 @@
+<template>
+  <div class="h-full flex flex-col gap-6 text-ink-gray-8">
+    <!-- Header -->
+    <div class="flex justify-between">
+      <div class="flex flex-col gap-1 w-9/12">
+        <component
+          :is="`h${props.titleHeadingLvl}`"
+          class="text-lg font-semibold leading-none"
+        >
+          {{ props.title }}
+        </component>
+        <p class="text-sm text-ink-gray-6">
+          {{ props.description }}
+        </p>
+      </div>
+      <div class="flex item-center justify-end">
+        <Button
+          :label="props.sendInvitesBtnLabel"
+          variant="solid"
+          :disabled="invitees.length === 0"
+          @click="() => props.inviteByEmailResource.submit()"
+          :loading="props.inviteByEmailResource.loading"
+        />
+      </div>
+    </div>
+    <!-- Main content -->
+    <div class="flex flex-col gap-8 overflow-y-auto">
+      <div>
+        <label
+          :for="inviteByEmailInputId"
+          class="block text-xs text-ink-gray-5 mb-1.5"
+        >
+          Invite by email
+        </label>
+        <MultiSelect
+          :inputId="inviteByEmailInputId"
+          variant="subtle"
+          noOptionsFoundMsg="Type an email address to invite"
+          inputClass="!bg-surface-gray-2 hover:!bg-surface-gray-3 group-hover:!bg-surface-gray-3"
+          :values="props.invitees"
+          @update:values="(values) => emits('update:invitees', values)"
+          :isValidValue="validateEmail"
+          :getValidationErrorMsg="
+            (email) => `${email} is an invalid email address`
+          "
+          :getDuplicateValueMsg="() => 'email already exists'"
+          class="p-2 group bg-surface-gray-2 hover:bg-surface-gray-3 rounded"
+          :options="[]"
+          placeholder="john@doe.com"
+        >
+          <template #option="{ option }">
+            <UserAvatar class="mr-2" :name="option.value" size="lg" />
+            <div class="flex flex-col gap-1 p-1 text-ink-gray-8">
+              <div class="text-base font-medium">
+                {{ option.label }}
+              </div>
+              <div class="text-sm text-ink-gray-5">
+                {{ option.value }}
+              </div>
+            </div>
+          </template>
+        </MultiSelect>
+        <div v-if="emailInputErrorMsg" class="text-xs text-ink-red-3 mt-1.5">
+          {{ emailInputErrorMsg }}
+        </div>
+        <FormControl
+          type="select"
+          class="mt-4"
+          :value="props.selectedRole"
+          @change="(e) => emits('update:selectedRole', e.target.value)"
+          :label="props.inviteAsInputLabel"
+          :options="
+            props.roles.map((role) => ({
+              value: role.value,
+              label: role.label,
+            }))
+          "
+          :description="roleValueToDescription[props.selectedRole]"
+        />
+      </div>
+      <template
+        v-if="
+          props.pendingInvitesResource.data?.length && invitees.length === 0
+        "
+      >
+        <section class="flex flex-col gap-4">
+          <component
+            :is="`h${props.titleHeadingLvl + 1}`"
+            class="flex text-base font-semibold"
+          >
+            {{ props.pendingInvitesSectionTitle }}
+          </component>
+          <ul class="flex flex-col gap-1">
+            <li
+              class="flex items-center justify-between px-2 py-1 rounded-lg bg-surface-gray-2"
+              v-for="pendingInvite in props.pendingInvitesResource.data"
+              :key="pendingInvite.name"
+            >
+              <div class="text-base">
+                <span class="text-ink-gray-8">
+                  {{ pendingInvite.email }}
+                </span>
+                <span class="text-ink-gray-5">
+                  ({{ props.roleMap[pendingInvite.role as TRole] }})
+                </span>
+              </div>
+              <div>
+                <Tooltip :text="props.deleteInvitationTooltipText">
+                  <div>
+                    <Button
+                      icon="x"
+                      variant="ghost"
+                      :loading="
+                        props.pendingInvitesResource.delete.loading &&
+                        props.pendingInvitesResource.delete.params.name ===
+                          pendingInvite.name
+                      "
+                      @click="
+                        props.pendingInvitesResource.delete.submit(
+                          pendingInvite.name
+                        )
+                      "
+                    />
+                  </div>
+                </Tooltip>
+              </div>
+            </li>
+          </ul>
+        </section>
+      </template>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts" generic="TRole extends string">
+import { computed } from "vue";
+import { Button, FormControl, Tooltip } from "frappe-ui";
+import MultiSelect from "./MultiSelectInput.vue";
+import { validateEmail } from "@/utils";
+
+type RoleProp = { value: TRole; description: string; label: string };
+
+const inviteByEmailInputId = String(Math.random());
+
+const props = defineProps<{
+  title: string;
+  titleHeadingLvl: 1 | 2 | 3 | 4 | 5;
+  description: string;
+  sendInvitesBtnLabel: string;
+  inviteByEmailResource: any;
+  inviteByEmailInputLabel: string;
+  inviteAsInputLabel: string;
+  existingEmails: readonly string[];
+  existingEmailInviteesMsg: (
+    existingEmailInvitees: readonly string[]
+  ) => string;
+  pendingInviteesMsg: (pendingInvitees: readonly string[]) => string;
+  roles: readonly [RoleProp, ...RoleProp[]];
+  pendingInvitesSectionTitle: string;
+  deleteInvitationTooltipText: string;
+  roleMap: Record<TRole, string>;
+  selectedRole: TRole;
+  invitees: string[];
+  pendingInvitesResource: any;
+}>();
+
+const emits = defineEmits<{
+  "update:selectedRole": [TRole];
+  "update:invitees": [string[]];
+}>();
+
+const getInviteesInList = (lst: readonly string[]) => {
+  if (props.invitees.length === 0 || lst.length === 0) {
+    return [];
+  }
+  const inviteesSet = new Set(props.invitees);
+  const inviteesInList: string[] = [];
+  for (const lstItem of lst) {
+    if (inviteesSet.has(lstItem)) {
+      inviteesInList.push(lstItem);
+    }
+  }
+  return inviteesInList;
+};
+const existingEmailInviteesMsg = computed(() => {
+  const existingEmailInvitees = getInviteesInList(props.existingEmails);
+  return existingEmailInvitees.length > 0
+    ? props.existingEmailInviteesMsg(existingEmailInvitees)
+    : null;
+});
+const pendingInviteesMsg = computed(() => {
+  const pendingInviteesEmail = getInviteesInList(
+    (props.pendingInvitesResource.data ?? []).map(
+      (invitee: { email: string }) => invitee.email
+    )
+  );
+  return pendingInviteesEmail.length > 0
+    ? props.pendingInviteesMsg(pendingInviteesEmail)
+    : null;
+});
+const emailInputErrorMsg = computed(
+  () => existingEmailInviteesMsg.value || pendingInviteesMsg.value
+);
+const roleValueToDescription = computed(() => {
+  const res: Record<string, string> = {};
+  for (const { value, description } of props.roles) {
+    res[value] = description;
+  }
+  return res;
+});
+</script>
