@@ -312,9 +312,12 @@ const goBack = () => {
 };
 
 const saveHoliday = () => {
-  if (!validateHoliday()) {
+  const validationErrors = validateHoliday();
+  if (Object.values(validationErrors).some((error) => error)) {
+    toast.error("Please provide all required fields");
     return;
   }
+
   if (holidayListActiveScreen.value.data) {
     updateHoliday();
   } else {
@@ -412,7 +415,11 @@ onMounted(() => {
 
 onUnmounted(() => {
   removeEventListener("beforeunload", beforeUnloadHandler);
-  holidayDataErrors.value = {};
+  holidayDataErrors.value = {
+    holiday_list_name: "",
+    from_date: "",
+    to_date: "",
+  };
 });
 </script>
 

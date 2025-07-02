@@ -25,7 +25,11 @@ export const holidayListActiveScreen = ref<{
   };
 }>({ screen: "list", data: null });
 
-export const holidayDataErrors = ref<HolidayErrors>({});
+export const holidayDataErrors = ref<HolidayErrors>({
+  holiday_list_name: "",
+  from_date: "",
+  to_date: "",
+});
 
 export const holidayData = ref({
   holiday_list_name: "",
@@ -56,8 +60,6 @@ export const resetHolidayData = () => {
 type HolidayField = keyof HolidayErrors;
 
 export const validateHoliday = (key?: HolidayField) => {
-  holidayDataErrors.value = {};
-
   const validateField = (field: HolidayField) => {
     if (key && field !== key) return;
 
