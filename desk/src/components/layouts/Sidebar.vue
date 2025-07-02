@@ -193,9 +193,10 @@ import {
   IntermediateStepModal,
   minimize,
   showHelpModal,
-  TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
+
+import TrialBanner from "frappe-ui/frappe/Billing/TrialBanner.vue";
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";
@@ -238,7 +239,7 @@ declare global {
     is_fc_site: boolean;
   }
 }
-const isFCSite = ref(window.is_fc_site);
+const isFCSite = ref(true);
 
 const allViews = computed(() => {
   const items = isCustomerPortal.value
