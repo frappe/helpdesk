@@ -1,6 +1,7 @@
+import { defineStore } from "pinia";
 import { getCurrentInstance } from "vue";
 
-export const globalStore = () => {
+export const globalStore = defineStore("hd-global", () => {
   const app = getCurrentInstance();
   const { $dialog, $socket } = app.appContext.config.globalProperties;
 
@@ -8,4 +9,4 @@ export const globalStore = () => {
     $dialog,
     $socket,
   };
-};
+});

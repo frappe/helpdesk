@@ -6,8 +6,8 @@ import {
   FeatherIcon,
   FormControl,
   frappeRequest,
+  FrappeUI,
   Input,
-  resourcesPlugin,
   setConfig,
   TextInput,
   toast,
@@ -51,7 +51,7 @@ setConfig("fallbackErrorHandler", (error) => {
 const pinia = createPinia();
 const app = createApp(App);
 
-app.use(resourcesPlugin);
+app.use(FrappeUI);
 app.use(pinia);
 app.use(router);
 app.use(posthogPlugin);
