@@ -1,4 +1,5 @@
 import json
+import uuid
 from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
@@ -63,6 +64,9 @@ class HDTicket(Document):
         self.apply_sla()
         if not self.is_new():
             self.handle_ticket_activity_update()
+
+    def before_insert(self):
+        self.create_encrypted_name()
 
     def after_insert(self):
         if self.ticket_split_from:
@@ -183,7 +187,6 @@ class HDTicket(Document):
             return
         feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
         self.feedback_rating = feedback_option.rating
-        self.feedback_text = feedback_option.label
 
     def validate_ticket_type(self):
         settings = frappe.get_doc("HD Settings")
@@ -235,6 +238,9 @@ class HDTicket(Document):
                 log_ticket_activity(
                     self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
                 )
+
+    def create_encrypted_name(self):
+        self.key = uuid.uuid4()
 
     def remove_assignment_if_not_in_team(self):
         """

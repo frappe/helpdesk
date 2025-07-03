@@ -103,11 +103,13 @@ const component = computed(() => {
 const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
-  transform: (data) =>
-    data.map((o) => ({
+  transform: (data) => {
+    if (!data.length) return [];
+    return data.map((o) => ({
       label: o,
       value: o,
-    })),
+    }));
+  },
 });
 
 const transValue = computed(() => {

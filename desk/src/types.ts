@@ -92,7 +92,6 @@ export interface Ticket {
   agreement_status: string;
   creation: string;
   feedback_rating?: number;
-  feedback_text?: string;
   feedback_extra?: string;
   contact: Contact;
   comments: Comment[];
