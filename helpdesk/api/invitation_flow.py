@@ -11,10 +11,11 @@ def accept_invitation(key: str | None = None):
     invitation = frappe.get_doc("HD Invitation", result[0])
     invitation.accept()
     invitation.reload()
+    user = frappe.get_doc("User", invitation.email)
+    needs_password_setup = user and not user.last_password_reset_date
     if invitation.status == "Accepted":
-        frappe.local.login_manager.login_as(invitation.email)
         frappe.local.response["type"] = "redirect"
-        frappe.local.response["location"] = "/helpdesk"
+        frappe.local.response["location"] = "/helpdesk" if not needs_password_setup else f"{invitation.get_update_password_url()}"
 
 @frappe.whitelist()
 def invite_by_email(emails: str, role: str):

@@ -63,3 +63,17 @@ class HDInvitation(Document):
 		else:
 			user = frappe.get_doc("User", self.email)
 		return user
+
+	def get_update_password_url(self):
+		return password_link(frappe.get_doc("User", self.email))
+
+def password_link(user, password_expired=False):
+	from frappe.utils import now_datetime, sha256_hash
+
+	key = frappe.generate_hash()
+	hashed_key = sha256_hash(key)
+	user.reset_password_key = hashed_key
+	user.last_reset_password_key_generated_on = now_datetime()
+	user.save(ignore_permissions=True)
+	frappe.db.commit()
+	return f"/update-password?key={key}&redirect-to=/helpdesk{'&password_expired=true' if password_expired else ''}"
