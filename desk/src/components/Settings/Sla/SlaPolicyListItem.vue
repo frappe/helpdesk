@@ -6,7 +6,14 @@
       @click="slaActiveScreen = { screen: 'view', data: data, fetchData: true }"
       class="w-full py-3 pl-2 col-span-5"
     >
-      <div class="text-base text-ink-gray-7 font-medium">{{ data.name }}</div>
+      <div
+        class="text-base text-ink-gray-7 font-medium flex items-center gap-2"
+      >
+        {{ data.name }}
+        <Badge v-if="data.default_sla" color="gray" size="sm"
+          >Default SLA</Badge
+        >
+      </div>
       <div
         v-if="data.description && data.description.length > 0"
         class="text-sm w-full text-ink-gray-5 mt-1 whitespace-nowrap overflow-ellipsis overflow-hidden"
@@ -91,6 +98,7 @@ import {
   createResource,
   toast,
   Dialog,
+  Badge,
 } from "frappe-ui";
 import { ref } from "vue";
 import { slaActiveScreen, slaPolicyListData } from "@/stores/sla";

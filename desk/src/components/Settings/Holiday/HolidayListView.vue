@@ -349,7 +349,7 @@ const createHoliday = () => {
     },
     auto: true,
     onSuccess(data) {
-      toast.success("Holiday created");
+      toast.success("Holiday list created");
       holidayListActiveScreen.value.data = data;
       holidayListActiveScreen.value.screen = "view";
       getHolidayData.submit({
@@ -387,7 +387,7 @@ const updateHoliday = () => {
       getHolidayData.submit({
         docname: data.name,
       });
-      toast.success("Holiday updated");
+      toast.success("Holiday list updated");
     },
   });
 };

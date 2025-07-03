@@ -3,13 +3,10 @@
     <div class="mb-6 flex justify-between items-center">
       <div class="ml-2">
         <YearsList
-          v-if="
-            dayjs(holidayData.from_date || new Date()).year() !==
-            dayjs(holidayData.to_date || new Date()).year()
-          "
+          v-if="startYear !== endYear"
           v-model="currentYear"
-          :startYear="dayjs(holidayData.from_date || new Date()).year()"
-          :endYear="dayjs(holidayData.to_date || new Date()).year()"
+          :startYear="startYear"
+          :endYear="endYear"
           @update:modelValue="visibleMonths = 'first-half'"
         >
           <template #trigger="{ toggle, selectedYear }">
@@ -26,7 +23,7 @@
           v-else
           class="flex items-center gap-2 font-semibold text-xl select-none"
         >
-          {{ dayjs(holidayData.from_date || new Date()).year() }}
+          {{ startYear }}
         </div>
       </div>
       <div class="flex gap-2 items-center">
@@ -94,7 +91,7 @@
   />
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import HLCalender from "./HLCalender.vue";
 import YearsList from "./YearsList.vue";
 import dayjs from "dayjs";
@@ -102,12 +99,27 @@ import { holidayData } from "@/stores/holidayList";
 
 const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-const currentYear = ref(new Date().getFullYear());
+const currentYear = ref(dayjs().year());
 const dialog = ref(false);
+const startYear = ref(dayjs(holidayData.value.from_date || dayjs()).year());
+const endYear = ref(dayjs(holidayData.value.to_date || dayjs()).year());
 
 const goToToday = () => {
-  const today = new Date();
-  currentYear.value = today.getFullYear();
-  visibleMonths.value = today.getMonth() >= 6 ? "second-half" : "first-half";
+  const today = dayjs();
+  currentYear.value = today.year();
+  visibleMonths.value = today.month() >= 6 ? "second-half" : "first-half";
 };
+
+watch(
+  holidayData,
+  (newHolidayData) => {
+    const fromDate = dayjs(newHolidayData.from_date || dayjs());
+    const toDate = dayjs(newHolidayData.to_date || dayjs());
+    startYear.value = fromDate.year();
+    endYear.value = toDate.year();
+    currentYear.value = fromDate.year();
+    visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
+  },
+  { deep: true }
+);
 </script>

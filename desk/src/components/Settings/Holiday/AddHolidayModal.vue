@@ -1,5 +1,5 @@
 <template>
-  <Dialog v-model="dialog" :options="{ size: 'sm' }">
+  <Dialog v-model="dialog" :options="{ size: 'sm' }" @after-leave="resetForm">
     <template #body-title>
       <h3 class="text-2xl font-semibold">Add new holiday</h3>
     </template>
@@ -15,17 +15,27 @@
             class="w-full"
             id="holiday_date"
             required
+            @change="errors.holiday_date = ''"
           />
+          <div v-if="errors.holiday_date" class="text-red-500 text-xs mt-1">
+            {{ errors.holiday_date }}
+          </div>
         </div>
-        <FormControl
-          :type="'textarea'"
-          size="sm"
-          variant="subtle"
-          placeholder="Description"
-          label="Description"
-          v-model="holidayData.description"
-          required
-        />
+        <div class="flex flex-col gap-1.5">
+          <FormControl
+            :type="'textarea'"
+            size="sm"
+            variant="subtle"
+            placeholder="Description"
+            label="Description"
+            v-model="holidayData.description"
+            required
+            @change="errors.description = ''"
+          />
+          <div v-if="errors.description" class="text-red-500 text-xs mt-1">
+            {{ errors.description }}
+          </div>
+        </div>
       </div>
     </template>
     <template #actions>
@@ -54,8 +64,14 @@ import { getFormattedDate } from "@/utils";
 import { Dialog, FormControl, Button, FormLabel, toast } from "frappe-ui";
 import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { ref } from "vue";
+import dayjs from "dayjs";
 
 const dialog = defineModel<boolean>();
+
+const errors = ref({
+  holiday_date: "",
+  description: "",
+});
 
 const props = defineProps({
   holidays: {
@@ -77,29 +93,38 @@ const holidayData = ref({
   description: "",
 });
 
+const resetForm = () => {
+  holidayData.value = {
+    holiday_date: null,
+    description: "",
+  };
+  errors.value = {
+    holiday_date: "",
+    description: "",
+  };
+};
+
 const onSave = () => {
-  if (!holidayData.value.description) {
-    toast.error("Please enter a description");
-    return;
+  if (holidayData.value.description?.trim() === "") {
+    errors.value.description = "Please enter a description";
   }
-
   if (!holidayData.value.holiday_date) {
-    toast.error("Please select a date for the holiday");
+    errors.value.holiday_date = "Please enter a valid date";
+  }
+
+  if (errors.value.holiday_date || errors.value.description) {
     return;
   }
 
-  const holidayDate = new Date(holidayData.value.holiday_date);
-  const fromDate = new Date(props.from_date);
-  const toDate = new Date(props.to_date);
+  const holidayDate = dayjs(holidayData.value.holiday_date).startOf("day");
+  const fromDate = dayjs(props.from_date).startOf("day");
+  const toDate = dayjs(props.to_date).startOf("day");
 
-  // Set time to midnight for accurate date comparison
-  holidayDate.setHours(0, 0, 0, 0);
-  fromDate.setHours(0, 0, 0, 0);
-  toDate.setHours(0, 0, 0, 0);
-
-  if (holidayDate < fromDate || holidayDate > toDate) {
+  if (holidayDate.isBefore(fromDate) || holidayDate.isAfter(toDate)) {
     toast.error(
-      `Holiday date must be between ${props.from_date} and ${props.to_date}`
+      `Holiday date must be between ${getFormattedDate(
+        props.from_date
+      )} and ${getFormattedDate(props.to_date)}`
     );
     return;
   }
@@ -115,11 +140,7 @@ const onSave = () => {
     return;
   }
   props.holidays.push({ ...holidayData.value, weekly_off: 0 });
-
-  holidayData.value = {
-    holiday_date: null,
-    description: "",
-  };
+  resetForm();
   dialog.value = false;
 };
 </script>
