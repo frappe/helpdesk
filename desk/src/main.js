@@ -6,8 +6,8 @@ import {
   FeatherIcon,
   FormControl,
   frappeRequest,
+  FrappeUI,
   Input,
-  resourcesPlugin,
   setConfig,
   TextInput,
   toast,
@@ -35,6 +35,12 @@ const globalComponents = {
 };
 
 setConfig("resourceFetcher", frappeRequest);
+setConfig("serverMessagesHandler", (msgs) => {
+  msgs.forEach((msg) => {
+    msg = JSON.parse(msg);
+    toast.warning(msg.message);
+  });
+});
 setConfig("fallbackErrorHandler", (error) => {
   const msg = error.exc_type
     ? (error.messages || error.message || []).join(", ")
@@ -45,7 +51,7 @@ setConfig("fallbackErrorHandler", (error) => {
 const pinia = createPinia();
 const app = createApp(App);
 
-app.use(resourcesPlugin);
+app.use(FrappeUI);
 app.use(pinia);
 app.use(router);
 app.use(posthogPlugin);

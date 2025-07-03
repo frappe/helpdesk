@@ -24,7 +24,7 @@
     </LayoutHeader>
     <div class="flex overflow-hidden h-full w-full">
       <!-- Main Ticket Comm -->
-      <section class="flex flex-col flex-1 max-w-[calc(100%-382px)]">
+      <section class="flex flex-col flex-1 w-full md:max-w-[calc(100%-382px)]">
         <!-- show for only mobile -->
         <TicketCustomerTemplateFields v-if="isMobileView" />
 
@@ -79,8 +79,8 @@ import { computed, onMounted, onUnmounted, provide, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useTicket } from "./data";
 import { ITicket } from "./symbols";
-import TicketConversation from "./TicketConversation.vue";
 import TicketCustomerTemplateFields from "./TicketCustomerTemplateFields.vue";
+import TicketConversation from "./TicketConversation.vue";
 import TicketFeedback from "./TicketFeedback.vue";
 import TicketTextEditor from "./TicketTextEditor.vue";
 

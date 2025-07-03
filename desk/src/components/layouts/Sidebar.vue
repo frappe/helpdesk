@@ -196,6 +196,7 @@ import {
   TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
+
 import HelpIcon from "frappe-ui/frappe/Icons/HelpIcon.vue";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, onUnmounted, ref } from "vue";

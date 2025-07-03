@@ -987,12 +987,17 @@ def close_tickets_after_n_days():
             """
                 SELECT t.name
                 FROM `tabHD Ticket` t
-                INNER JOIN `tabCommunication` c ON t.name = c.reference_name
+                INNER JOIN (
+                    SELECT reference_name, MAX(communication_date) as last_communication_date
+                    FROM `tabCommunication` 
+                    WHERE reference_doctype = 'HD Ticket'
+                    GROUP BY reference_name
+                ) latest_comm ON t.name = latest_comm.reference_name
                 WHERE t.status = 'Replied'
-                AND c.communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
+                AND latest_comm.last_communication_date < DATE_SUB(NOW(), INTERVAL %(days_threshold)s DAY)
             """,
             {"days_threshold": days_threshold},
-            pluck="t.name",
+            pluck="name",
         )
         or []
     )
@@ -1004,5 +1009,4 @@ def close_tickets_after_n_days():
         doc.status = "Closed"
         doc.flags.ignore_validate = True
         doc.save(ignore_permissions=True)
-        doc.flags.ignore_validate = False
         frappe.db.commit()  # nosemgrep
