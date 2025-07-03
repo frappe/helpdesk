@@ -33,7 +33,14 @@ class HDInvitation(Document):
 		if self.status == "Expired":
 			frappe.throw("Invalid or expired key")
 		user = self.create_user_if_not_exists()
-		user.append_roles(self.role)
+		if self.role == "Agent":
+			user.append_roles("Agent")
+		elif self.role == "Agent Manager":
+			user.append_roles("Agent", "Agent Manager")
+		elif self.role == "System Manager":
+			user.append_roles("Agent", "Agent Manager", "System Manager")
+		else:
+			user.append_roles(self.role)
 		if self.role == "Agent" or self.role == "Agent Manager":
 			self.restrict_modules(user, "Helpdesk")
 		user.save(ignore_permissions=True)
