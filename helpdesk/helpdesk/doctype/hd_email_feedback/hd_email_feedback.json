@@ -5,16 +5,11 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "e",
+  "key",
   "feedback_rating",
   "feedback_extra"
  ],
  "fields": [
-  {
-   "fieldname": "e",
-   "fieldtype": "Data",
-   "label": "Encrypted Ticket Name"
-  },
   {
    "fieldname": "feedback_rating",
    "fieldtype": "Rating",
@@ -22,14 +17,19 @@
   },
   {
    "fieldname": "feedback_extra",
-   "fieldtype": "Long Text",
-   "label": "Feedback Extra"
+   "fieldtype": "Small Text",
+   "label": "Feedback "
+  },
+  {
+   "fieldname": "key",
+   "fieldtype": "Data",
+   "label": "Key"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-24 17:05:25.640131",
+ "modified": "2025-07-03 15:23:39.684308",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Email Feedback",
