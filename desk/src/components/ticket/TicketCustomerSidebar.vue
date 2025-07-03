@@ -37,8 +37,11 @@
         v-for="field in ticketBasicInfo"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
-        <span class="text-base text-gray-800 flex-1">
-          {{ field.value }}
+        <span
+          class="text-base text-gray-800 flex-1"
+          :class="!field.value && 'text-ink-gray-4'"
+        >
+          {{ field.value || "—" }}
         </span>
       </div>
 
@@ -69,8 +72,11 @@
         v-for="field in ticketAdditionalInfo"
       >
         <span class="w-[126px] text-sm text-gray-600">{{ field.label }}</span>
-        <span class="text-base text-gray-800 flex-1">
-          {{ field.value }}
+        <span
+          class="text-base text-gray-800 flex-1"
+          :class="!field.value && 'text-ink-gray-4'"
+        >
+          {{ field.value || "—" }}
         </span>
       </div>
     </div>

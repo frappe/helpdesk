@@ -78,9 +78,29 @@ export function formatTime(seconds) {
     formattedTime += `${minutes}m `;
   }
 
-  formattedTime += `${remainingSeconds}s`;
+  formattedTime += `${
+    remainingSeconds >= 10 ? remainingSeconds : "0" + remainingSeconds
+  }s`;
 
   return formattedTime.trim();
+}
+
+export function getTimeInSeconds(time: string) {
+  // time in the format 1h 2m 3s
+  let timeParts = time.split(" ");
+  let seconds = 0;
+  timeParts.forEach((part) => {
+    if (part.endsWith("d")) {
+      seconds += parseInt(part) * 24 * 60 * 60; // days
+    } else if (part.endsWith("h")) {
+      seconds += parseInt(part) * 60 * 60; // hours
+    } else if (part.endsWith("m")) {
+      seconds += parseInt(part) * 60; // minutes
+    } else if (part.endsWith("s")) {
+      seconds += parseInt(part); // seconds
+    }
+  });
+  return seconds;
 }
 
 export const isCustomerPortal = ref(false);

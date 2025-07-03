@@ -22,15 +22,25 @@ class HDServiceLevelAgreement(Document):
     doctype_ticket = "HD Ticket"
 
     def validate(self):
-        self.validate_priorities()  # To refactor
-        self.validate_support_and_resolution()  # To refactor
+        self.validate_default_sla()
+        self.validate_priorities()
+        self.validate_support_and_resolution()
         self.validate_condition()  # Looks okay but check again
 
     def validate_priorities(self):
-        priorities = []
+        self.validate_priority_defaults()
+        self.validate_response_and_resolution_time()
+        self.validate_unique_priorities()
+        self.validate_all_priorities()
 
+    # check if we have more than one default priority
+    def validate_priority_defaults(self):
+        if sum(d.default_priority for d in self.priorities) > 1:
+            frappe.throw(_("You cannot set more than one Default Priority."))
+
+    # Check if response and resolution time is set for every priority
+    def validate_response_and_resolution_time(self):
         for priority in self.priorities:
-            # Check if response and resolution time is set for every priority
             if not priority.response_time:
                 frappe.throw(
                     _("Set Response Time for Priority {0} in row {1}.").format(
@@ -41,7 +51,7 @@ class HDServiceLevelAgreement(Document):
             if self.apply_sla_for_resolution:
                 if not priority.resolution_time:
                     frappe.throw(
-                        _("Set Response Time for Priority {0} in row {1}.").format(
+                        _("Set Resolution Time for Priority {0} in row {1}.").format(
                             priority.priority, priority.idx
                         )
                     )
@@ -56,44 +66,70 @@ class HDServiceLevelAgreement(Document):
                         ).format(priority.priority, priority.idx)
                     )
 
-            priorities.append(priority.priority)
-
-        # Check if repeated priority
-        # flake8: noqa
-        if not len(set(priorities)) == len(priorities):
+    def validate_unique_priorities(self):
+        priorities = [d.priority for d in self.priorities]
+        if len(priorities) != len(set(priorities)):
             repeated_priority = get_repeated(priorities)
             frappe.throw(_("Priority {0} has been repeated.").format(repeated_priority))
 
-        # set default priority from priorities
-        try:
-            self.default_priority = next(
-                d.priority for d in self.priorities if d.default_priority
-            )
-        except Exception:
-            frappe.throw(_("Select a Default Priority."))
+    def validate_all_priorities(self):
+        all_priorities = frappe.get_all("HD Ticket Priority", pluck="name")
+        sla_priorities = [p.priority for p in self.priorities]
+
+        for priority in all_priorities:
+            if priority not in sla_priorities:
+                frappe.msgprint(
+                    _("Priority <u>{0}</u> must be included in the SLA {1}.").format(
+                        priority, self.name
+                    )
+                )
 
     def validate_support_and_resolution(self):
         week = get_weekdays()
         support_days = []
 
         for support_and_resolution in self.support_and_resolution:
-            support_days.append(support_and_resolution.workday)
-            support_and_resolution.idx = week.index(support_and_resolution.workday) + 1
 
             if to_timedelta(support_and_resolution.start_time) >= to_timedelta(
                 support_and_resolution.end_time
             ):
                 frappe.throw(
                     _(
-                        "Start Time can't be greater than or equal to End Time for {0}."
-                    ).format(support_and_resolution.workday)
+                        "Start Time can't be greater than or equal to End Time in row <u>{0}</u>."
+                    ).format(support_and_resolution.idx)
                 )
+
+            support_days.append(support_and_resolution.workday)
 
         # Check for repeated workday
         # flake8: noqa
         if not len(set(support_days)) == len(support_days):
             repeated_days = get_repeated(support_days)
             frappe.throw(_("Workday {0} has been repeated.").format(repeated_days))
+
+    def validate_default_sla(self):
+        default_sla_exists = frappe.db.exists(
+            self.doctype,
+            {
+                "default_sla": True,
+                "name": ["!=", self.name],
+            },
+        )
+
+        if default_sla_exists and self.default_sla:
+            frappe.db.set_value(self.doctype, default_sla_exists, "default_sla", False)
+            frappe.msgprint(
+                _(
+                    "Setting <strong>{0}</strong> as the default SLA removes <strong>{1}</strong> as the default SLA. You’ll need to add a condition in <strong>{1}</strong> for the SLA to work."
+                ).format(self.name, default_sla_exists)
+            )
+
+        if not self.default_sla and not default_sla_exists:
+            frappe.throw(
+                _(
+                    "You must set one SLA as Default. Please check the Default SLA option."
+                )
+            )
 
     def validate_condition(self):
         if not self.condition:
@@ -106,25 +142,21 @@ class HDServiceLevelAgreement(Document):
                 _("The Condition '{0}' is invalid: {1}").format(self.condition, str(e))
             )
 
-    # What?
-    def get_hd_service_level_agreement_priority(self, priority):
-        priority = frappe.get_doc(
-            "HD Service Level Priority", {"priority": priority, "parent": self.name}
-        )
-
-        return frappe._dict(
-            {
-                "priority": priority.priority,
-                "response_time": priority.response_time,
-                "resolution_time": priority.resolution_time,
-            }
-        )
+    def before_save(self):
+        # set default priority
+        try:
+            self.default_priority = next(
+                d.priority for d in self.priorities if d.default_priority
+            )
+        except Exception:
+            frappe.throw(_("Select a Default Priority."))
 
     def apply(self, doc: Document):
         self.handle_new(doc)
         self.handle_status(doc)
         self.handle_targets(doc)
         self.handle_agreement_status(doc)
+        self.validate_all_priorities()
 
     def handle_new(self, doc: Document):
         if not doc.is_new():
@@ -250,7 +282,14 @@ class HDServiceLevelAgreement(Document):
         target: Literal["response_time", "resolution_time"],
     ):
         res = get_datetime(start_at)
-        priority = self.get_priorities()[priority]
+        priorities = self.get_priorities()
+
+        if priority not in priorities:
+            frappe.throw(
+                _("Please add {0} priority in {1} SLA").format(priority, self.name)
+            )
+        priority = priorities[priority]
+
         time_needed = priority.get(target, 0)
         holidays = self.get_holidays()
         weekdays = get_weekdays()
@@ -385,6 +424,28 @@ class HDServiceLevelAgreement(Document):
             return
 
         frappe.publish_realtime("update_sla_status", user=frappe.session.user)
+
+    def on_trash(self):
+        self.handle_default_sla_deletion()
+
+    def handle_default_sla_deletion(self):
+        if not self.default_sla:
+            return
+        default_sla_exists = frappe.db.exists(
+            self.doctype,
+            {
+                "default_sla": True,
+                "name": ["!=", self.name],
+            },
+        )
+        if default_sla_exists:
+            return
+        else:
+            frappe.throw(
+                _(
+                    "Cannot delete the default SLA. At least one SLA must be marked as default."
+                )
+            )
 
 
 def get_repeated(values):
