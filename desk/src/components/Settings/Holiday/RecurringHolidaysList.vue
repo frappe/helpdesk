@@ -176,6 +176,7 @@ const recurringHolidayData = ref({
     fifth: false,
   },
   isEditing: false,
+  editIndex: -1,
 });
 
 const props = defineProps({
@@ -234,7 +235,20 @@ const workDays = ref([
 ]);
 
 const availableWorkDays = computed(() => {
-  const usedDays = new Set(props.holidays.map((h) => h.day));
+  const usedDays = new Set(
+    props.holidays
+      .filter(
+        (_, index) =>
+          !recurringHolidayData.value.isEditing ||
+          index !== recurringHolidayData.value.editIndex
+      )
+      .map((h) => h.day)
+  );
+
+  if (recurringHolidayData.value.isEditing && recurringHolidayData.value.day) {
+    usedDays.delete(recurringHolidayData.value.day);
+  }
+
   return workDays.value.filter((day) => !usedDays.has(day.value));
 });
 
@@ -278,13 +292,18 @@ const addHoliday = () => {
       fifth: false,
     },
     isEditing: false,
+    editIndex: -1,
   };
   dialog.value = true;
 };
 
 const editHoliday = (holiday: any) => {
-  recurringHolidayData.value = holiday;
-  recurringHolidayData.value.isEditing = true;
+  const index = props.holidays.findIndex((h) => h.day === holiday.day);
+  recurringHolidayData.value = {
+    ...JSON.parse(JSON.stringify(holiday)),
+    isEditing: true,
+    editIndex: index,
+  };
   dialog.value = true;
 };
 
@@ -301,22 +320,32 @@ const saveHoliday = () => {
     return;
   }
 
-  const index = props.holidays.findIndex((h: any) => {
-    return h.day === recurringHolidayData.value.day;
-  });
+  const holidayData = { ...recurringHolidayData.value };
 
-  if (recurringHolidayData.value.isEditing) {
-    props.holidays.splice(index, 1, {
-      ...recurringHolidayData.value,
-    });
-    updateWeeklyOffDates();
-  } else {
-    if (index !== -1) {
-      toast.error("Holiday already exists");
+  if (holidayData.isEditing) {
+    if (holidayData.editIndex !== undefined && holidayData.editIndex >= 0) {
+      props.holidays[holidayData.editIndex] = { ...holidayData };
+      updateWeeklyOffDates();
+    } else {
+      toast.error("Error: Unable to find the holiday to update");
       return;
     }
+  } else {
+    const isDuplicate = props.holidays.some(
+      (holiday) =>
+        holiday.day === holidayData.day &&
+        JSON.stringify(holiday.repetition) ===
+          JSON.stringify(holidayData.repetition)
+    );
+
+    if (isDuplicate) {
+      toast.error("Holiday with the same day and repetition already exists");
+      return;
+    }
+
     props.holidays.push({
-      ...recurringHolidayData.value,
+      ...holidayData,
+      isEditing: false,
     });
     updateWeeklyOffDates();
   }
