@@ -51,11 +51,12 @@ const dropdownOptions = computed(() => {
     {
       label: "Add condition",
       onClick: () => {
+        const conjunction = props.conditions[0]?.conjunction;
         props.conditions.push({
           field: null,
           operator: "equals",
           value: "",
-          conjunction: "and",
+          conjunction: conjunction,
         });
       },
     },
@@ -64,6 +65,7 @@ const dropdownOptions = computed(() => {
     options.push({
       label: "Add condition group",
       onClick: () => {
+        const conjunction = props.conditions[0]?.conjunction;
         props.conditions.push({
           field: "group",
           operator: "equals",
@@ -75,7 +77,7 @@ const dropdownOptions = computed(() => {
               conjunction: "and",
             },
           ],
-          conjunction: "and",
+          conjunction: conjunction,
         });
       },
     });

@@ -34,7 +34,11 @@
         {
           label: 'Add condition group',
           onClick: () => {
-            conditions.push({
+            const conjunction =
+              props.conditions.length > 1
+                ? props.conditions[1]?.conjunction
+                : 'and';
+            props.conditions.push({
               field: 'group',
               operator: 'equals',
               value: [
@@ -45,7 +49,7 @@
                   conjunction: 'and',
                 },
               ],
-              conjunction: 'and',
+              conjunction: conjunction,
             });
           },
         },
@@ -93,12 +97,14 @@ const addCondition = () => {
   if (!isValid) {
     return;
   }
-
+  const conjunction =
+    props.conditions.length > 1 ? props.conditions[1]?.conjunction : "and";
+  console.log("conjunction", conjunction);
   props.conditions.push({
     field: null,
     operator: "equals",
     value: "",
-    conjunction: "and",
+    conjunction: conjunction,
   });
 };
 
