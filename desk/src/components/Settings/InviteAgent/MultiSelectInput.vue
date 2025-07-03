@@ -39,6 +39,7 @@
                 ]"
                 :placeholder="props.placeholder"
                 :value="query"
+                :aria-describedby="queryInputErrorMsgId"
                 autocomplete="off"
                 @change="onQueryInputChange"
                 @focus="togglePopover"
@@ -83,13 +84,11 @@
         </Combobox>
       </div>
     </div>
-    <ErrorMessage class="mt-2 pl-2" v-if="errorMsg" :message="errorMsg" />
-    <p
-      v-if="duplicateValueMsg"
-      class="whitespace-pre-line text-sm text-ink-blue-3 mt-2 pl-2"
-    >
-      {{ duplicateValueMsg }}
-    </p>
+    <ErrorMessage
+      :id="queryInputErrorMsgId"
+      class="mt-2 pl-2"
+      :message="errorMsg"
+    />
   </div>
 </template>
 
@@ -102,6 +101,7 @@ import {
 } from "@headlessui/vue";
 import { Button, Popover, ErrorMessage } from "frappe-ui";
 import { computed, nextTick, ref } from "vue";
+import { getId } from "./helpers";
 
 const props = withDefaults(
   defineProps<{
@@ -109,7 +109,6 @@ const props = withDefaults(
     variant?: string;
     isValidValue?: (value: string) => boolean;
     getValidationErrorMsg?: (value: string) => string;
-    getDuplicateValueMsg: (value: string) => string;
     options: readonly Record<"label" | "value", string>[];
     noOptionsFoundMsg: string;
     inputClass?: string;
@@ -130,8 +129,9 @@ const query = ref("");
 const emailBtnRefs = ref<InstanceType<typeof Button>[]>([]);
 const showOptions = ref(false);
 const errorMsg = ref("");
-const duplicateValueMsg = ref("");
 const queryInput = ref<InstanceType<typeof ComboboxInput> | null>(null);
+
+const queryInputErrorMsgId = getId();
 
 const selectedOptionValue = computed<string | null>({
   get() {
@@ -140,14 +140,11 @@ const selectedOptionValue = computed<string | null>({
   set(newEnteredValue) {
     showOptions.value = false;
     errorMsg.value = "";
-    duplicateValueMsg.value = "";
     if (newEnteredValue === null) {
       query.value = "";
       return;
     }
     if (props.values.includes(newEnteredValue)) {
-      duplicateValueMsg.value =
-        props.getDuplicateValueMsg?.(newEnteredValue) ?? "";
       query.value = "";
       return;
     }
