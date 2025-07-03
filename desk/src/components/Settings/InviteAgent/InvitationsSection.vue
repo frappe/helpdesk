@@ -7,7 +7,7 @@
           :is="`h${props.titleHeadingLvl}`"
           class="text-lg font-semibold leading-none"
         >
-          {{ props.title }}
+          Send invites to
         </component>
         <p class="text-sm text-ink-gray-6">
           {{ props.description }}
@@ -15,7 +15,7 @@
       </div>
       <div class="flex item-center justify-end">
         <Button
-          :label="props.sendInvitesBtnLabel"
+          label="Send invites"
           variant="solid"
           :disabled="invitees.length === 0"
           @click="() => props.inviteByEmailResource.submit()"
@@ -67,8 +67,8 @@
           type="select"
           class="mt-4"
           :value="props.selectedRole"
-          @change="(e) => emits('update:selectedRole', e.target.value)"
-          :label="props.inviteAsInputLabel"
+          @change="(e: any) => emits('update:selectedRole', e.target.value)"
+          label="Invite as"
           :options="
             props.roles.map((role) => ({
               value: role.value,
@@ -88,7 +88,7 @@
             :is="`h${props.titleHeadingLvl + 1}`"
             class="flex text-base font-semibold"
           >
-            {{ props.pendingInvitesSectionTitle }}
+            Pending Invites
           </component>
           <ul class="flex flex-col gap-1">
             <li
@@ -105,7 +105,7 @@
                 </span>
               </div>
               <div>
-                <Tooltip :text="props.deleteInvitationTooltipText">
+                <Tooltip text="Delete Invitation">
                   <div>
                     <Button
                       icon="x"
@@ -143,21 +143,11 @@ type RoleProp = { value: TRole; description: string; label: string };
 const inviteByEmailInputId = String(Math.random());
 
 const props = defineProps<{
-  title: string;
   titleHeadingLvl: 1 | 2 | 3 | 4 | 5;
   description: string;
-  sendInvitesBtnLabel: string;
   inviteByEmailResource: any;
-  inviteByEmailInputLabel: string;
-  inviteAsInputLabel: string;
   existingEmails: readonly string[];
-  existingEmailInviteesMsg: (
-    existingEmailInvitees: readonly string[]
-  ) => string;
-  pendingInviteesMsg: (pendingInvitees: readonly string[]) => string;
   roles: readonly [RoleProp, ...RoleProp[]];
-  pendingInvitesSectionTitle: string;
-  deleteInvitationTooltipText: string;
   roleMap: Record<TRole, string>;
   selectedRole: TRole;
   invitees: string[];
@@ -185,7 +175,9 @@ const getInviteesInList = (lst: readonly string[]) => {
 const existingEmailInviteesMsg = computed(() => {
   const existingEmailInvitees = getInviteesInList(props.existingEmails);
   return existingEmailInvitees.length > 0
-    ? props.existingEmailInviteesMsg(existingEmailInvitees)
+    ? `User${
+        existingEmailInvitees.length > 1 ? "s" : ""
+      } with email ${existingEmailInvitees.join(", ")} already exists`
     : null;
 });
 const pendingInviteesMsg = computed(() => {
@@ -195,7 +187,9 @@ const pendingInviteesMsg = computed(() => {
     )
   );
   return pendingInviteesEmail.length > 0
-    ? props.pendingInviteesMsg(pendingInviteesEmail)
+    ? `User${
+        pendingInviteesEmail.length > 1 ? "s" : ""
+      } with email ${pendingInviteesEmail.join(", ")} already invited`
     : null;
 });
 const emailInputErrorMsg = computed(

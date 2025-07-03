@@ -1,37 +1,10 @@
 <template>
-  <!--
-    titleHeadingLvl
-    description
-    invitees
-    existingEmails
-    roles
-    roleMap
-    selectedRole
-  -->
   <InvitationsSection
-    title="Send invites to"
     :titleHeadingLvl="1"
     description="Invite users to access Helpdesk. Specify their roles to control access and permissions"
-    sendInvitesBtnLabel="Send invites"
     v-model:invitees="invitees"
-    inviteByEmailInputLabel="Invite by email"
     :existingEmails="(users.data ?? []).map((user: Record<'email', string>) => user.email)"
-    :existingEmailInviteesMsg="
-      (emails) =>
-        `User${emails.length > 0 ? 's' : ''} with email ${emails.join(
-          ', '
-        )} already exists`
-    "
-    :pendingInviteesMsg="
-      (emails) =>
-        `User${emails.length > 0 ? 's' : ''} with email ${emails.join(
-          ', '
-        )} already invited`
-    "
-    inviteAsInputLabel="Invite as"
     :roles="roles"
-    pendingInvitesSectionTitle="Pending Invites"
-    deleteInvitationTooltipText="Delete Invitation"
     :roleMap="{
       Agent: 'Agent',
       'Agent Manager': 'Agent Manager',
