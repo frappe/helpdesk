@@ -34,9 +34,12 @@ class HDEmailFeedback(Document):
         self.attach_feedback_to_ticket()
 
     def attach_feedback_to_ticket(self):
-        ticket = frappe.db.get_value("HD Ticket", {"key": self.key}, "name")
-        frappe.db.set_value(
-            "HD Ticket", ticket, "feedback_rating", self.feedback_rating
-        )
-        frappe.db.set_value("HD Ticket", ticket, "feedback_extra", self.feedback_extra)
-        frappe.db.set_value("HD Ticket", ticket, "status", "Closed")
+        ticket_doc = frappe.get_doc("HD Ticket", {"key": self.key})
+        if not ticket_doc:
+            frappe.throw(
+                _("Ticket not found for the provided key."), title=_("Ticket Not Found")
+            )
+        ticket_doc.feedback_rating = self.feedback_rating
+        ticket_doc.feedback_extra = self.feedback_extra
+        ticket_doc.status = "Closed"
+        ticket_doc.save()
