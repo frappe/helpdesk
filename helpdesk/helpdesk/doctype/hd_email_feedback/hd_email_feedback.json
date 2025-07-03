@@ -13,6 +13,7 @@
   {
    "fieldname": "feedback_rating",
    "fieldtype": "Rating",
+   "in_list_view": 1,
    "label": "Feedback Rating"
   },
   {
@@ -23,13 +24,14 @@
   {
    "fieldname": "key",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Key"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-03 15:23:39.684308",
+ "modified": "2025-07-03 17:09:49.556717",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Email Feedback",
