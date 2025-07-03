@@ -9,6 +9,7 @@
     v-model:selectedRole="selectedRole"
     :inviteByEmailResource="inviteByEmail"
     :pendingInvitesResource="pendingInvites"
+    :errorMsg="errorMsg"
   />
 </template>
 
@@ -18,9 +19,14 @@ import { createResource, createListResource } from "frappe-ui";
 import InvitationsSection from "./InvitationsSection.vue";
 import { useUserStore } from "@/stores/user";
 import { useAuthStore } from "@/stores/auth";
+// @ts-expect-error: missing module declaration file
+import { useOnboarding } from "frappe-ui/frappe";
+import { z } from "zod";
+import { getEmailsErrorMsg } from "./helpers";
 
 const { users } = useUserStore();
 const { isManager, isAdmin } = useAuthStore();
+const { updateOnboardingStep } = useOnboarding("helpdesk");
 
 type Role = "Agent" | "Agent Manager" | "System Manager";
 
@@ -63,6 +69,13 @@ if (isAdmin) {
 
 const selectedRole = ref(roleOptions[0].value);
 const invitees = ref<string[]>([]);
+const errorMsg = ref<string | null>(null);
+const ErrorMessageSchema = z.object({ messages: z.array(z.string()) });
+const EmailsSchema = z.array(z.string());
+const InviteByEmailSuccessSchema = z.object({
+  existing_invites: EmailsSchema,
+  existing_members: EmailsSchema,
+});
 
 const pendingInvites = createListResource({
   type: "list",
@@ -80,10 +93,34 @@ const inviteByEmail = createResource({
       role: selectedRole.value,
     };
   },
-  onSuccess() {
+  onSuccess(data: unknown) {
+    const res = InviteByEmailSuccessSchema.safeParse(data);
+    if (
+      res.success &&
+      (res.data.existing_invites.length > 0 ||
+        res.data.existing_members.length > 0)
+    ) {
+      const errorMsgs: string[] = [];
+      if (res.data.existing_invites.length > 0) {
+        errorMsgs.push(getEmailsErrorMsg(res.data.existing_invites, "invited"));
+      }
+      if (res.data.existing_members.length > 0) {
+        errorMsgs.push(getEmailsErrorMsg(res.data.existing_members, "present"));
+      }
+      errorMsg.value = errorMsgs.join("\n");
+    }
     invitees.value = [];
     selectedRole.value = roleOptions[0].value;
     pendingInvites.reload();
+    updateOnboardingStep("invite_your_team");
+  },
+  onError(error: unknown) {
+    const res = ErrorMessageSchema.safeParse(error);
+    if (res.success && res.data.messages.length > 0) {
+      errorMsg.value = res.data.messages[0];
+      return;
+    }
+    console.error(error);
   },
 });
 </script>

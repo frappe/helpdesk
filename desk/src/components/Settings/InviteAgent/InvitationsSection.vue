@@ -129,6 +129,7 @@
         </section>
       </template>
     </div>
+    <ErrorMessage :message="props.errorMsg" />
   </div>
 </template>
 
@@ -137,6 +138,7 @@ import { computed } from "vue";
 import { Button, FormControl, Tooltip } from "frappe-ui";
 import MultiSelect from "./MultiSelectInput.vue";
 import { validateEmail } from "@/utils";
+import { getEmailsErrorMsg } from "./helpers";
 
 type RoleProp = { value: TRole; description: string };
 
@@ -152,6 +154,7 @@ const props = defineProps<{
   selectedRole: TRole;
   invitees: string[];
   pendingInvitesResource: any;
+  errorMsg?: string | null;
 }>();
 
 const emits = defineEmits<{
@@ -175,9 +178,7 @@ const getInviteesInList = (lst: readonly string[]) => {
 const existingEmailInviteesMsg = computed(() => {
   const existingEmailInvitees = getInviteesInList(props.existingEmails);
   return existingEmailInvitees.length > 0
-    ? `User${
-        existingEmailInvitees.length > 1 ? "s" : ""
-      } with email ${existingEmailInvitees.join(", ")} already exists`
+    ? getEmailsErrorMsg(existingEmailInvitees, "present")
     : null;
 });
 const pendingInviteesMsg = computed(() => {
@@ -187,9 +188,7 @@ const pendingInviteesMsg = computed(() => {
     )
   );
   return pendingInviteesEmail.length > 0
-    ? `User${
-        pendingInviteesEmail.length > 1 ? "s" : ""
-      } with email ${pendingInviteesEmail.join(", ")} already invited`
+    ? getEmailsErrorMsg(pendingInviteesEmail, "invited")
     : null;
 });
 const emailInputErrorMsg = computed(
