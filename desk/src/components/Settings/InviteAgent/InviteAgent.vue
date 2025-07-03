@@ -48,13 +48,29 @@ import { ref } from "vue";
 import { createResource, createListResource } from "frappe-ui";
 import InvitationsSection from "./InvitationsSection.vue";
 import { useUserStore } from "@/stores/user";
+import { useAuthStore } from "@/stores/auth";
 
 const { users } = useUserStore();
+const { isManager, isAdmin } = useAuthStore();
 
 type Role = {
   value: "Agent" | "Agent Manager" | "System Manager";
   label: string;
   description: string;
+};
+
+const agentManagerRole = {
+  value: "Agent Manager" as const,
+  label: "Agent Manager",
+  description:
+    "Can manage and invite new users, and create public & private views (reports).",
+};
+
+const systemManagerRole = {
+  value: "System Manager" as const,
+  label: "System Manager",
+  description:
+    "Can manage all aspects of Helpdesk, including user management, customizations and settings.",
 };
 
 const roles: [Role, ...Role[]] = [
@@ -64,19 +80,13 @@ const roles: [Role, ...Role[]] = [
     description:
       "Can work with leads and deals and create private views (reports).",
   },
-  {
-    value: "Agent Manager",
-    label: "Agent Manager",
-    description:
-      "Can manage and invite new users, and create public & private views (reports).",
-  },
-  {
-    value: "System Manager",
-    label: "System Manager",
-    description:
-      "Can manage all aspects of Helpdesk, including user management, customizations and settings.",
-  },
-] as const;
+];
+
+if (isAdmin) {
+  roles.push(agentManagerRole, systemManagerRole);
+} else if (isManager) {
+  roles.push(agentManagerRole);
+}
 
 const selectedRole = ref(roles[0].value);
 const invitees = ref<string[]>([]);
