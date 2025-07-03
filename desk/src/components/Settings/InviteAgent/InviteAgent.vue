@@ -68,7 +68,7 @@ const agentManagerRole = {
 
 const systemManagerRole = {
   value: "System Manager" as const,
-  label: "System Manager",
+  label: "Admin",
   description:
     "Can manage all aspects of Helpdesk, including user management, customizations and settings.",
 };
