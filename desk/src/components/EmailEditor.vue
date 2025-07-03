@@ -327,6 +327,20 @@ function addToReply(
     .run();
 }
 
+function addToForward(body: string, subject: string, _attachments: any[]) {
+  newEmail.value = body;
+  attachments.value = _attachments;
+  editorRef.value.editor
+    .chain()
+    .clearContent()
+    .insertContent(body)
+    .focus("all")
+    // .setBlockquote()
+    .insertContentAt(0, { type: "paragraph" })
+    .focus("start")
+    .run();
+}
+
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
@@ -351,6 +365,7 @@ const editor = computed(() => {
 
 defineExpose({
   addToReply,
+  addToForward,
   editor,
   submitMail,
 });
