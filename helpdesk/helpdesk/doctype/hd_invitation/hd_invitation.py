@@ -24,7 +24,12 @@ class HDInvitation(Document):
 			recipients=self.email,
 			subject=f"You have been invited to join {title}",
 			template=template,
-			args={"title": title, "invite_link": invite_link},
+			args={
+				"title": title,
+				"invite_link": invite_link,
+				"invited_by": self.invited_by,
+				"invited_as": self.role
+			},
 			now=True,
 		)
 		self.db_set("email_sent_at", frappe.utils.now())
