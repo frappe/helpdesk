@@ -70,12 +70,12 @@
           @change="(e: any) => emits('update:selectedRole', e.target.value)"
           label="Invite as"
           :options="
-            props.roles.map((role) => ({
+            props.roleOptions.map((role) => ({
               value: role.value,
-              label: role.label,
+              label: props.roleToLabel[role.value],
             }))
           "
-          :description="roleValueToDescription[props.selectedRole]"
+          :description="roleToDescription[props.selectedRole]"
         />
       </div>
       <template
@@ -101,7 +101,7 @@
                   {{ pendingInvite.email }}
                 </span>
                 <span class="text-ink-gray-5">
-                  ({{ props.roleMap[pendingInvite.role as TRole] }})
+                  ({{ props.roleToLabel[pendingInvite.role as TRole] }})
                 </span>
               </div>
               <div>
@@ -138,7 +138,7 @@ import { Button, FormControl, Tooltip } from "frappe-ui";
 import MultiSelect from "./MultiSelectInput.vue";
 import { validateEmail } from "@/utils";
 
-type RoleProp = { value: TRole; description: string; label: string };
+type RoleProp = { value: TRole; description: string };
 
 const inviteByEmailInputId = String(Math.random());
 
@@ -147,8 +147,8 @@ const props = defineProps<{
   description: string;
   inviteByEmailResource: any;
   existingEmails: readonly string[];
-  roles: readonly [RoleProp, ...RoleProp[]];
-  roleMap: Record<TRole, string>;
+  roleOptions: readonly [RoleProp, ...RoleProp[]];
+  roleToLabel: Record<TRole, string>;
   selectedRole: TRole;
   invitees: string[];
   pendingInvitesResource: any;
@@ -195,9 +195,9 @@ const pendingInviteesMsg = computed(() => {
 const emailInputErrorMsg = computed(
   () => existingEmailInviteesMsg.value || pendingInviteesMsg.value
 );
-const roleValueToDescription = computed(() => {
+const roleToDescription = computed(() => {
   const res: Record<string, string> = {};
-  for (const { value, description } of props.roles) {
+  for (const { value, description } of props.roleOptions) {
     res[value] = description;
   }
   return res;

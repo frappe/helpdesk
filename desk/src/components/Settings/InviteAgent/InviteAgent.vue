@@ -4,12 +4,8 @@
     description="Invite users to access Helpdesk. Specify their roles to control access and permissions"
     v-model:invitees="invitees"
     :existingEmails="(users.data ?? []).map((user: Record<'email', string>) => user.email)"
-    :roles="roles"
-    :roleMap="{
-      Agent: 'Agent',
-      'Agent Manager': 'Agent Manager',
-      'System Manager': 'System Manager',
-    }"
+    :roleOptions="roleOptions"
+    :roleToLabel="roleToLabel"
     v-model:selectedRole="selectedRole"
     :inviteByEmailResource="inviteByEmail"
     :pendingInvitesResource="pendingInvites"
@@ -26,42 +22,46 @@ import { useAuthStore } from "@/stores/auth";
 const { users } = useUserStore();
 const { isManager, isAdmin } = useAuthStore();
 
-type Role = {
-  value: "Agent" | "Agent Manager" | "System Manager";
-  label: string;
+type Role = "Agent" | "Agent Manager" | "System Manager";
+
+type RoleOption = {
+  value: Role;
   description: string;
 };
 
-const agentManagerRole = {
+const roleToLabel: Record<Role, string> = {
+  Agent: "Agent",
+  "Agent Manager": "Agent Manager",
+  "System Manager": "Admin",
+};
+
+const agentManagerRoleOption = {
   value: "Agent Manager" as const,
-  label: "Agent Manager",
   description:
     "Can manage and invite new users, and create public & private views (reports).",
 };
 
-const systemManagerRole = {
+const systemManagerRoleOption = {
   value: "System Manager" as const,
-  label: "Admin",
   description:
     "Can manage all aspects of Helpdesk, including user management, customizations and settings.",
 };
 
-const roles: [Role, ...Role[]] = [
+const roleOptions: [RoleOption, ...RoleOption[]] = [
   {
     value: "Agent",
-    label: "Agent",
     description:
       "Can work with leads and deals and create private views (reports).",
   },
 ];
 
 if (isAdmin) {
-  roles.push(agentManagerRole, systemManagerRole);
+  roleOptions.push(agentManagerRoleOption, systemManagerRoleOption);
 } else if (isManager) {
-  roles.push(agentManagerRole);
+  roleOptions.push(agentManagerRoleOption);
 }
 
-const selectedRole = ref(roles[0].value);
+const selectedRole = ref(roleOptions[0].value);
 const invitees = ref<string[]>([]);
 
 const pendingInvites = createListResource({
@@ -82,7 +82,7 @@ const inviteByEmail = createResource({
   },
   onSuccess() {
     invitees.value = [];
-    selectedRole.value = roles[0].value;
+    selectedRole.value = roleOptions[0].value;
     pendingInvites.reload();
   },
 });
