@@ -37,6 +37,7 @@ class HDInvitation(Document):
 		if self.role == "Agent" or self.role == "Agent Manager":
 			self.restrict_modules(user, "Helpdesk")
 		user.save(ignore_permissions=True)
+		create_agent_if_not_exists(user)
 		self.status = "Accepted"
 		self.accepted_at = frappe.utils.now()
 		self.save(ignore_permissions=True)
@@ -66,6 +67,15 @@ class HDInvitation(Document):
 
 	def get_update_password_url(self):
 		return password_link(frappe.get_doc("User", self.email))
+
+def create_agent_if_not_exists(user):
+	if not frappe.db.exists("HD Agent", {"user": user.email}):
+		frappe.get_doc(
+			doctype="HD Agent",
+			user=user.email,
+			agent_name=user.first_name,
+			is_active=True
+		).insert(ignore_permissions=True)
 
 def password_link(user, password_expired=False):
 	from frappe.utils import now_datetime, sha256_hash
