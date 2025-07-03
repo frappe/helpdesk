@@ -26,6 +26,7 @@
                 @mouseleave="handleMouseLeave(getFormattedDate(date), close)"
                 @click="
                   () => {
+                    if (isWeekOff(date)) return;
                     close();
                     editHoliday(date);
                   }
@@ -151,7 +152,7 @@
       </div>
     </div>
   </div>
-  <Dialog v-model="dialog" :options="{ size: 'sm' }">
+  <Dialog v-model="dialog" :options="{ size: 'sm' }" @after-leave="resetErrors">
     <template #body-title>
       <h3 class="text-2xl font-semibold">
         {{ editHolidayData.isEditing ? "Edit" : "Add" }} Holiday
@@ -169,17 +170,33 @@
             class="w-full"
             id="holiday_date"
             required
+            @change="addHolidayErrors.holiday_date = ''"
           />
+          <div
+            v-if="addHolidayErrors.holiday_date"
+            class="text-red-500 text-xs mt-1"
+          >
+            {{ addHolidayErrors.holiday_date }}
+          </div>
         </div>
-        <FormControl
-          :type="'textarea'"
-          size="sm"
-          variant="subtle"
-          placeholder="Description"
-          label="Description"
-          v-model="editHolidayData.description"
-          required
-        />
+        <div class="flex flex-col gap-1.5">
+          <FormControl
+            :type="'textarea'"
+            size="sm"
+            variant="subtle"
+            placeholder="Description"
+            label="Description"
+            v-model="editHolidayData.description"
+            required
+            @change="addHolidayErrors.description = ''"
+          />
+          <div
+            v-if="addHolidayErrors.description"
+            class="text-red-500 text-xs mt-1"
+          >
+            {{ addHolidayErrors.description }}
+          </div>
+        </div>
       </div>
     </template>
     <template #actions>
@@ -200,6 +217,12 @@ import { toast, DatePicker, FormLabel, Popover } from "frappe-ui";
 import { useDatePicker } from "frappe-ui/src/components/DatePicker/useDatePicker";
 import { ref, watch } from "vue";
 import { holidayData } from "@/stores/holidayList";
+import dayjs from "dayjs";
+
+const addHolidayErrors = ref({
+  holiday_date: "",
+  description: "",
+});
 
 const dialog = ref(false);
 const editHolidayData = ref({
@@ -254,52 +277,49 @@ const handleMouseLeave = (date, callback) => {
   }, 350);
 };
 
+const resetErrors = () => {
+  addHolidayErrors.value = {
+    holiday_date: "",
+    description: "",
+  };
+};
+
 const addHoliday = (date) => {
-  editHolidayData.value.holiday_date = date.toLocaleDateString();
+  editHolidayData.value.holiday_date = dayjs(date);
   editHolidayData.value.description = "";
   dialog.value = true;
 };
 
 const isDateInRange = (date: Date): boolean => {
-  if (!holidayData.value.from_date || !holidayData.value.to_date) return true;
+  if (!holidayData.value.from_date || !holidayData.value.to_date) return false;
 
-  const checkDate = new Date(date);
-  checkDate.setHours(0, 0, 0, 0);
+  const checkDate = dayjs(date).startOf("day");
+  const from = dayjs(holidayData.value.from_date).startOf("day");
+  const to = dayjs(holidayData.value.to_date).endOf("day");
 
-  const from = new Date(holidayData.value.from_date);
-  from.setHours(0, 0, 0, 0);
-
-  const to = new Date(holidayData.value.to_date);
-  to.setHours(23, 59, 59, 999);
-
-  return checkDate >= from && checkDate <= to;
+  return (
+    (checkDate.isAfter(from) || checkDate.isSame(from, "day")) &&
+    (checkDate.isBefore(to) || checkDate.isSame(to, "day"))
+  );
 };
 
 const isHoliday = (date: Date): boolean => {
   if (!props.holidays?.length) return false;
-  const inputDate = new Date(date);
-  inputDate.setHours(0, 0, 0, 0);
+  const inputDate = dayjs(date).startOf("day");
 
   return props.holidays.some((holiday) => {
-    const holidayDate = new Date(holiday.holiday_date);
-    holidayDate.setHours(0, 0, 0, 0);
-
-    return holidayDate.getTime() === inputDate.getTime();
+    const holidayDate = dayjs(holiday.holiday_date).startOf("day");
+    return holidayDate.isSame(inputDate);
   });
 };
 
 const isWeekOff = (date: Date): boolean => {
   if (!props.holidays?.length) return false;
 
-  const inputDate = new Date(date);
-  inputDate.setHours(0, 0, 0, 0);
+  const inputDate = dayjs(date).startOf("day");
   return props.holidays.some((holiday) => {
-    const holidayDate = new Date(holiday.holiday_date);
-    holidayDate.setHours(0, 0, 0, 0);
-
-    return (
-      holidayDate.getTime() === inputDate.getTime() && holiday.weekly_off == 1
-    );
+    const holidayDate = dayjs(holiday.holiday_date).startOf("day");
+    return holidayDate.isSame(inputDate) && holiday.weekly_off == 1;
   });
 };
 
@@ -343,10 +363,28 @@ const deleteHoliday = (event, date, callback) => {
 };
 
 const saveHoliday = () => {
+  if (!editHolidayData.value.holiday_date) {
+    addHolidayErrors.value.holiday_date =
+      "Please select a date for the holiday";
+  }
+
+  if (editHolidayData.value.description?.trim() === "") {
+    addHolidayErrors.value.description = "Please enter a description";
+  }
+
   if (
-    !editHolidayData.value.holiday_date ||
-    !editHolidayData.value.description
+    addHolidayErrors.value.holiday_date ||
+    addHolidayErrors.value.description
   ) {
+    return;
+  }
+
+  if (!isDateInRange(editHolidayData.value.holiday_date)) {
+    toast.error(
+      `Holiday date is not between ${getFormattedDate(
+        holidayData.value.from_date
+      )} and ${getFormattedDate(holidayData.value.to_date)}`
+    );
     return;
   }
 
@@ -358,7 +396,7 @@ const saveHoliday = () => {
 
   if (existingHoliday && !editHolidayData.value.isEditing) {
     toast.error(
-      `A holiday already exists for ${new Date(
+      `Holiday already exists for ${new Date(
         editHolidayData.value.holiday_date
       ).toLocaleDateString()}`
     );
