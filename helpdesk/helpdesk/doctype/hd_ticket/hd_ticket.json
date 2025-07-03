@@ -62,7 +62,6 @@
   "feedback_tab",
   "customer_feedback_section",
   "feedback_rating",
-  "feedback_text",
   "feedback",
   "feedback_extra",
   "meta_tab"
@@ -376,11 +375,6 @@
    "label": "Rating"
   },
   {
-   "fieldname": "feedback_text",
-   "fieldtype": "Data",
-   "label": "Feedback (Text)"
-  },
-  {
    "fieldname": "sla_tab",
    "fieldtype": "Tab Break",
    "label": "SLA"
@@ -446,7 +440,7 @@
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-07-01 16:00:43.872080",
+ "modified": "2025-07-03 15:18:55.359950",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",

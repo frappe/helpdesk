@@ -9,7 +9,7 @@
     <div class="flex items-start text-base leading-5">
       <div class="min-w-[126px] text-sm">Feedback</div>
       <div class="text-gray-800">
-        {{ ticket.feedback_text }}
+        {{ ticket.feedback }}
       </div>
     </div>
     <div

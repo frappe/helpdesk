@@ -187,7 +187,6 @@ class HDTicket(Document):
             return
         feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
         self.feedback_rating = feedback_option.rating
-        self.feedback_text = feedback_option.label
 
     def validate_ticket_type(self):
         settings = frappe.get_doc("HD Settings")
