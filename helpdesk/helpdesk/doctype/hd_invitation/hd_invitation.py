@@ -28,6 +28,21 @@ class HDInvitation(Document):
 			now=True,
 		)
 
+	def on_update(self):
+		if self.get_doc_before_save().status != "Expired" and self.status == "Expired":
+			title = "Frappe Helpdesk"
+			frappe.sendmail(
+				recipients=self.email,
+				subject=f"Invitation to join {title} expired",
+				template="hd_invitation_expired",
+				args={
+					"title": title,
+					"invited_by": self.invited_by,
+					"invited_as": self.role
+				},
+				now=True,
+			)
+
 	def invite_via_email(self):
 		invite_link = frappe.utils.get_url(f"/api/method/helpdesk.api.invitation_flow.accept_invitation?key={self.key}")
 		if frappe.local.dev_server:
@@ -113,3 +128,15 @@ def password_link(user, password_expired=False):
 	user.save(ignore_permissions=True)
 	frappe.db.commit()
 	return f"/update-password?key={key}&redirect-to=/helpdesk{'&password_expired=true' if password_expired else ''}"
+
+def mark_expired_invitations():
+	from frappe.utils import add_days, now
+
+	days = 3
+	invitations_to_expire = frappe.db.get_all(
+		"HD Invitation", filters={"status": "Pending", "creation": ["<", add_days(now(), -days)]}
+	)
+	for invitation in invitations_to_expire:
+		invitation = frappe.get_doc("HD Invitation", invitation.name)
+		invitation.status = "Expired"
+		invitation.save(ignore_permissions=True)
