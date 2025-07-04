@@ -27,6 +27,7 @@ scheduler_events = {
     "all": [
         "helpdesk.search.build_index_if_not_exists",
         "helpdesk.search.download_corpus",
+        "helpdesk.helpdesk.doctype.hd_invitation.hd_invitation.mark_expired_invitations",
     ],
     "daily": [
         "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.close_tickets_after_n_days"
