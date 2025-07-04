@@ -44,10 +44,7 @@
     </div>
   </div>
   <div v-if="!slaData.loading" class="overflow-y-auto px-10 pb-10">
-    <div
-      class="flex items-center justify-between gap-2"
-      @click="slaData.enabled = !slaData.enabled"
-    >
+    <div class="flex items-center justify-between gap-2" @click="toggleEnabled">
       <span class="text-sm text-ink-gray-7"> Enable Policy </span>
       <Switch size="sm" :model-value="slaData.enabled" />
     </div>
@@ -91,7 +88,8 @@
       <div class="mt-4">
         <Checkbox
           label="Set as default SLA"
-          v-model="slaData.default_sla"
+          :model-value="slaData.default_sla"
+          @update:model-value="toggleDefaultSla"
           class="text-ink-gray-6 text-base font-medium"
         />
         <div class="mt-4" v-if="!slaData.default_sla">
@@ -394,6 +392,21 @@ const updateSla = () => {
       toast.success("SLA policy updated");
     },
   });
+};
+
+const toggleEnabled = () => {
+  if (slaData.value.default_sla) {
+    toast.error("SLA set as default cannot be disabled");
+    return;
+  }
+  slaData.value.enabled = !slaData.value.enabled;
+};
+
+const toggleDefaultSla = () => {
+  slaData.value.default_sla = !slaData.value.default_sla;
+  if (slaData.value.default_sla) {
+    slaData.value.enabled = true;
+  }
 };
 
 watch(
