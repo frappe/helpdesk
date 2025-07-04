@@ -14,6 +14,20 @@ class HDInvitation(Document):
 	def after_insert(self):
 		self.invite_via_email()
 
+	def after_delete(self):
+		title = "Frappe Helpdesk"
+		frappe.sendmail(
+			recipients=self.email,
+			subject=f"Cancellation of invitation to join {title}",
+			template="hd_invitation_cancelled",
+			args={
+				"title": title,
+				"invited_by": self.invited_by,
+				"invited_as": self.role
+			},
+			now=True,
+		)
+
 	def invite_via_email(self):
 		invite_link = frappe.utils.get_url(f"/api/method/helpdesk.api.invitation_flow.accept_invitation?key={self.key}")
 		if frappe.local.dev_server:
