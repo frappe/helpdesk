@@ -10,9 +10,7 @@
         class="text-base text-ink-gray-7 font-medium flex items-center gap-2"
       >
         {{ data.name }}
-        <Badge v-if="data.default_sla" color="gray" size="sm"
-          >Default SLA</Badge
-        >
+        <Badge v-if="data.default_sla" color="gray" size="sm">Default</Badge>
       </div>
       <div
         v-if="data.description && data.description.length > 0"
