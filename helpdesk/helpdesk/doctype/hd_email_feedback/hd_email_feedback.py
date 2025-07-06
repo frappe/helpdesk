@@ -42,4 +42,4 @@ class HDEmailFeedback(Document):
         ticket_doc.feedback_rating = self.feedback_rating
         ticket_doc.feedback_extra = self.feedback_extra
         ticket_doc.status = "Closed"
-        ticket_doc.save()
+        ticket_doc.save(ignore_permissions=True)
