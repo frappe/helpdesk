@@ -3,7 +3,6 @@ export interface Holiday {
   holiday_date: string | Date;
   weekly_off?: number;
   idx?: number;
-  [key: string]: any;
 }
 
 export interface RepetitionPattern {
@@ -13,7 +12,6 @@ export interface RepetitionPattern {
   third: boolean;
   fourth: boolean;
   fifth: boolean;
-  [key: string]: boolean;
 }
 
 export interface HolidayErrors {

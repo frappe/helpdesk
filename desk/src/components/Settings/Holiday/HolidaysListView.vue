@@ -72,10 +72,7 @@
       No items in the list
     </div>
   </div>
-  <Dialog v-model="dialog" :options="{ size: 'sm' }">
-    <template #body-title>
-      <h3 class="text-2xl font-semibold">Edit Holiday</h3>
-    </template>
+  <Dialog v-model="dialog" :options="{ size: 'sm', title: 'Edit Holiday' }">
     <template #body-content>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">
@@ -118,15 +115,9 @@ import { computed, ref } from "vue";
 import { Dropdown, DatePicker, FormControl, FormLabel } from "frappe-ui";
 import dayjs from "dayjs";
 import { getFormattedDate, TemplateOption } from "@/utils";
+import { holidayData } from "@/stores/holidayList";
 
 const isConfirmingDelete = ref(false);
-
-const props = defineProps({
-  holidayData: {
-    type: Object,
-    required: true,
-  },
-});
 
 interface Holiday {
   holiday_date: string | null;
@@ -141,7 +132,7 @@ const editHolidayData = ref<Holiday>({
 });
 
 const holidays = computed(() => {
-  return props.holidayData.holidays.filter((item) => {
+  return holidayData.value.holidays.filter((item) => {
     return item.weekly_off == 0;
   });
 });
@@ -170,14 +161,14 @@ const saveHoliday = () => {
     return;
   }
 
-  const index = props.holidayData.holidays.findIndex(
+  const index = holidayData.value.holidays.findIndex(
     (h: Holiday) =>
       getFormattedDate(h.holiday_date) ===
       getFormattedDate(editHolidayData.value.holiday_date)
   );
 
   if (index !== -1) {
-    props.holidayData.holidays.splice(index, 1, {
+    holidayData.value.holidays.splice(index, 1, {
       ...editHolidayData.value,
       weekly_off: 0,
     });
@@ -193,13 +184,13 @@ const deleteHoliday = (event, holidayToDelete?: Holiday) => {
     isConfirmingDelete.value = true;
     return;
   }
-  const index = props.holidayData.holidays.findIndex((h: Holiday) => {
+  const index = holidayData.value.holidays.findIndex((h: Holiday) => {
     const holidayDate = getFormattedDate(h.holiday_date);
     const editDate = getFormattedDate(holidayToDelete.holiday_date);
     return holidayDate === editDate;
   });
 
-  props.holidayData.holidays.splice(index, 1);
+  holidayData.value.holidays.splice(index, 1);
   dialog.value = false;
   editHolidayData.value = { holiday_date: null, description: "" };
   isConfirmingDelete.value = false;

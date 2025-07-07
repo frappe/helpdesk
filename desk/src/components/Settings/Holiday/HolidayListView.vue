@@ -169,11 +169,8 @@
         </div>
       </div>
       <div class="mt-4">
-        <HolidaysListView
-          v-if="holidayListView === 'list'"
-          :holidayData="holidayData"
-        />
-        <HolidaysCalendarView :holidayData="holidayData" v-else />
+        <HolidaysListView v-if="holidayListView === 'list'" />
+        <HolidaysCalendarView v-else />
       </div>
       <div class="mt-4">
         <Button
@@ -182,12 +179,7 @@
           @click="dialog = true"
           icon-left="plus"
         />
-        <AddHolidayModal
-          v-model="dialog"
-          :holidays="holidayData.holidays"
-          :from_date="holidayData.from_date"
-          :to_date="holidayData.to_date"
-        />
+        <AddHolidayModal v-model="dialog" />
       </div>
     </div>
   </div>
@@ -299,11 +291,6 @@ const goBack = () => {
       data: { name: holidayListActiveScreen.value.previousScreen.data },
       fetchData: false,
     };
-    holidayListActiveScreen.value = {
-      screen: "list",
-      data: null,
-    };
-    return;
   }
   holidayListActiveScreen.value = {
     screen: "list",

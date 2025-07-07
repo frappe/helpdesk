@@ -74,12 +74,15 @@
     label="Add Recurring Holiday"
     icon-left="plus"
   />
-  <Dialog v-model="dialog" :options="{ size: 'md' }">
-    <template #body-title>
-      <h3 class="text-2xl font-semibold">
-        {{ recurringHolidayData.isEditing ? "Edit" : "Add" }} Recurring Holiday
-      </h3>
-    </template>
+  <Dialog
+    v-model="dialog"
+    :options="{
+      size: 'md',
+      title: recurringHolidayData.isEditing
+        ? 'Edit Recurring Holiday'
+        : 'Add Recurring Holiday',
+    }"
+  >
     <template #body-content>
       <div v-if="!props.holidayData.from_date || !props.holidayData.to_date">
         <div class="text-center p-4 text-gray-600">

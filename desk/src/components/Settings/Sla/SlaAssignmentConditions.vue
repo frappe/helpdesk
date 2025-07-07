@@ -99,7 +99,7 @@ const addCondition = () => {
   }
   const conjunction =
     props.conditions.length > 1 ? props.conditions[1]?.conjunction : "and";
-  console.log("conjunction", conjunction);
+
   props.conditions.push({
     field: null,
     operator: "equals",
