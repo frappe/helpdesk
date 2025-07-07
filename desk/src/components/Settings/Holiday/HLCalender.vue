@@ -137,9 +137,6 @@
               'text-ink-gray-3':
                 // @ts-ignore
                 date.getMonth() !== currentMonth - 1 || !isDateInRange(date),
-              'text-ink-gray-9':
-                getFormattedDate(date) === getFormattedDate(today) &&
-                isDateInRange(date),
               'bg-black text-ink-white hover:!bg-black/80 hover:text-ink-white':
                 getFormattedDate(date) === dateValue && isDateInRange(date),
               'opacity-50 cursor-not-allowed': !isDateInRange(date),
@@ -152,12 +149,14 @@
       </div>
     </div>
   </div>
-  <Dialog v-model="dialog" :options="{ size: 'sm' }" @after-leave="resetErrors">
-    <template #body-title>
-      <h3 class="text-2xl font-semibold">
-        {{ editHolidayData.isEditing ? "Edit" : "Add" }} Holiday
-      </h3>
-    </template>
+  <Dialog
+    v-model="dialog"
+    :options="{
+      size: 'sm',
+      title: editHolidayData.isEditing ? 'Edit Holiday' : 'Add Holiday',
+    }"
+    @after-leave="resetErrors"
+  >
     <template #body-content>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-1.5">

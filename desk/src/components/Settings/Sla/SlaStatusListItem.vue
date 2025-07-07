@@ -56,10 +56,13 @@
     </div>
   </div>
   <hr class="my-0.5" v-if="!props.isLast" />
-  <Dialog v-model="dialog" @after-leave="isConfirmingDelete = false">
-    <template #body-title>
-      <h3 class="text-2xl font-semibold">Edit Status</h3>
-    </template>
+  <Dialog
+    v-model="dialog"
+    @after-leave="isConfirmingDelete = false"
+    :options="{
+      title: 'Edit Status',
+    }"
+  >
     <template #body-content>
       <div class="flex flex-col gap-4">
         <FormControl
@@ -110,15 +113,8 @@
 </template>
 
 <script setup lang="ts">
-import { h, ref } from "vue";
-import {
-  Button,
-  Select,
-  Dropdown,
-  FeatherIcon,
-  Dialog,
-  toast,
-} from "frappe-ui";
+import { ref } from "vue";
+import { Button, Select, Dropdown, Dialog, toast } from "frappe-ui";
 import { getGridTemplateColumnsForTable, TemplateOption } from "@/utils";
 
 const props = defineProps({

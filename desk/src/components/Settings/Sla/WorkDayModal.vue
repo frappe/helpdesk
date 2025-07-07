@@ -1,10 +1,9 @@
 <template>
-  <Dialog v-model="dialog.show" @after-leave="resetForm">
-    <template #body-title>
-      <h3 class="text-2xl font-semibold">
-        {{ dialog.isEditing ? "Edit" : "Add" }} workday
-      </h3>
-    </template>
+  <Dialog
+    v-model="dialog.show"
+    @after-leave="resetForm"
+    :options="{ title: dialog.isEditing ? 'Edit workday' : 'Add workday' }"
+  >
     <template #body-content>
       <div class="flex flex-col gap-4">
         <div>

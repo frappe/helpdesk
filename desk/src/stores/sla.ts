@@ -104,6 +104,23 @@ export function validateConditions(conditions: any[]): boolean {
 type SlaField = keyof SlaValidationErrors;
 
 export function validateSlaData(key?: SlaField): SlaValidationErrors {
+  // Reset all errors
+  slaDataErrors.value = {
+    service_level: "",
+    description: "",
+    enabled: "",
+    default_sla: "",
+    apply_sla_for_resolution: "",
+    priorities: "",
+    statuses: "",
+    holiday_list: "",
+    default_priority: "",
+    start_date: "",
+    end_date: "",
+    support_and_resolution: "",
+    condition: "",
+  };
+
   const validateField = (field: SlaField) => {
     if (key && field !== key) return;
 

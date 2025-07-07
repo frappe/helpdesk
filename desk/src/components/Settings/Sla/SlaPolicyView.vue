@@ -45,7 +45,7 @@
   </div>
   <div v-if="!slaData.loading" class="overflow-y-auto px-10 pb-10">
     <div class="flex items-center justify-between gap-2" @click="toggleEnabled">
-      <span class="text-sm text-ink-gray-7"> Enable Policy </span>
+      <span class="text-sm text-ink-gray-7">Enable Policy</span>
       <Switch size="sm" :model-value="slaData.enabled" />
     </div>
     <hr class="mb-6 mt-3" />
@@ -284,23 +284,6 @@ const goBack = () => {
 };
 
 const saveSla = () => {
-  // Reset all errors
-  slaDataErrors.value = {
-    service_level: "",
-    description: "",
-    enabled: "",
-    default_sla: "",
-    apply_sla_for_resolution: "",
-    priorities: "",
-    statuses: "",
-    holiday_list: "",
-    default_priority: "",
-    start_date: "",
-    end_date: "",
-    support_and_resolution: "",
-    condition: "",
-  };
-
   const validationErrors = validateSlaData();
 
   if (Object.values(validationErrors).some((error) => error)) {

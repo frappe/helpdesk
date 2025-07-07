@@ -346,7 +346,6 @@ function getOperators() {
     );
   }
   if (fieldname === "_assign") {
-    // TODO: make equals and not equals work
     options = [
       { label: "Like", value: "like" },
       { label: "Not Like", value: "not like" },

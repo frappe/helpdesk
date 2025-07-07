@@ -76,10 +76,12 @@
     </div>
   </div>
   <hr class="my-0.5" v-if="!props.isLast" />
-  <Dialog v-model="dialog">
-    <template #body-title>
-      <h3 class="text-2xl font-semibold">Edit response and resolution</h3>
-    </template>
+  <Dialog
+    v-model="dialog"
+    :options="{
+      title: 'Edit response and resolution',
+    }"
+  >
     <template #body-content>
       <div class="flex flex-col gap-4">
         <FormControl

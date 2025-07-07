@@ -7,7 +7,6 @@
           v-model="currentYear"
           :startYear="startYear"
           :endYear="endYear"
-          @update:modelValue="visibleMonths = 'first-half'"
         >
           <template #trigger="{ toggle, selectedYear }">
             <div
@@ -83,12 +82,7 @@
       />
     </div>
   </div>
-  <AddHolidayModal
-    v-model="dialog"
-    :holidays="holidayData.holidays"
-    :from_date="holidayData.from_date"
-    :to_date="holidayData.to_date"
-  />
+  <AddHolidayModal v-model="dialog" />
 </template>
 <script setup lang="ts">
 import { ref, watch } from "vue";
@@ -111,15 +105,14 @@ const goToToday = () => {
 };
 
 watch(
-  holidayData,
-  (newHolidayData) => {
-    const fromDate = dayjs(newHolidayData.from_date || dayjs());
-    const toDate = dayjs(newHolidayData.to_date || dayjs());
+  () => [holidayData.value.from_date, holidayData.value.to_date],
+  ([fromDate, toDate]) => {
+    fromDate = dayjs(fromDate);
+    toDate = dayjs(toDate);
     startYear.value = fromDate.year();
     endYear.value = toDate.year();
     currentYear.value = fromDate.year();
     visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
-  },
-  { deep: true }
+  }
 );
 </script>
