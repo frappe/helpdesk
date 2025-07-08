@@ -89,10 +89,10 @@ class HDTicket(Document):
 
         last_communication = self.get_last_communication()
 
-        url = f"{frappe.utils.get_url()}/email-feedback/new?key={self.key}"
+        url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
         template = f"""
             <p>Hello,</p>
-            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience <strong>(#{self.name})</strong>.</p>
+            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{self.name}.</p>
             <a href="{url}" class="btn btn-primary">Share Feedback</a>
             
             <p>Thank you!<br>Support Team</p>
