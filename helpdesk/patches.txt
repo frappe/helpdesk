@@ -22,4 +22,3 @@ helpdesk.patches.default_article_category #v2
 helpdesk.patches.communication_read_perm_agent
 helpdesk.patches.agent_manager_perms
 helpdesk.patches.remove_agents_teams_default_views 
-helpdesk.patches.add_communication_custom_field 

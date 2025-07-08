@@ -18,7 +18,7 @@ class HDEmailFeedback(Document):
         ticket_exists = frappe.db.exists("HD Ticket", {"key": self.key})
         if not ticket_exists:
             frappe.throw(
-                _("Ticket with the provided key does not exist."),
+                _("Ticket does not exist."),
                 title=_("Tampered Access"),
             )
 

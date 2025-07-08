@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import frappe
-from frappe.custom.doctype.custom_field.custom_field import create_custom_fields
 from frappe.permissions import add_permission, update_permission_property
 
 from helpdesk.consts import DEFAULT_ARTICLE_CATEGORY
@@ -29,7 +28,6 @@ def after_install():
     create_welcome_ticket()
     create_ticket_feedback_options()
     add_property_setter()
-    create_custom_fields(get_custom_fields())
 
 
 def add_default_categories_and_articles():
@@ -279,19 +277,3 @@ def add_property_setter():
         doc.property_type = "Data"
         doc.value = "email_id"
         doc.insert()
-
-
-def get_custom_fields():
-    """Helpdesk specific custom fields that needs to be added to the Core DocTypes."""
-    return {
-        "Communication": [
-            {
-                "default": "0",
-                "fieldname": "is_auto_generated",
-                "fieldtype": "Check",
-                "label": "Is Auto Generated",
-                "insert_after": "read_by_recipient_on",
-                "read_only": 1,
-            }
-        ]
-    }
