@@ -38,7 +38,7 @@ setConfig("resourceFetcher", frappeRequest);
 setConfig("serverMessagesHandler", (msgs) => {
   msgs.forEach((msg) => {
     msg = JSON.parse(msg);
-    if (msg && msg.message == "Feedback email has been sent to the customer.") {
+    if (msg && msg.message == "Feedback email has been sent to the customer") {
       toast.success(msg.message);
       return;
     }
