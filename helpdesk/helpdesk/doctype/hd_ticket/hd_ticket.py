@@ -88,27 +88,13 @@ class HDTicket(Document):
 
         last_communication = self.get_last_communication()
 
-        # get base URL
         url = f"{frappe.utils.get_url()}/email-feedback/new?key={self.key}"
         template = f"""
             <p>Hello,</p>
-            <p>
-            We hope this message finds you well. We wanted to follow up on your recent ticket with us (<strong>#{self.name}</strong>) and kindly ask for your feedback.
-            </p>
-            <p>
-            Your input is invaluable in helping us improve our services and ensure we meet your expectations. If you could take a moment to share your thoughts, we would greatly appreciate it.
-            </p>
-            <p>
-            You can provide your feedback by clicking the link below:<br>
-            <a href="{url}" style="color: #007bff; text-decoration: underline;">Give Feedback</a>
-            </p>
-            <p>
-            Thank you for your time!
-            </p>
-            <p>
-            Best regards,<br>
-            Support Team
-            </p>
+            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience <strong>(#{self.name})</strong>.</p>
+            <a href="{url}" class="btn btn-primary">Share Feedback</a>
+            
+            <p>Thank you!<br>Support Team</p>
         """
         try:
             frappe.sendmail(
