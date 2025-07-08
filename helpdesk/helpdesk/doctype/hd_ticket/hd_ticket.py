@@ -74,6 +74,7 @@ class HDTicket(Document):
             or self.via_customer_portal
             or self.feedback_rating
             or not self.has_value_changed("status")
+            or not self.key
         ):
             return
 
@@ -107,12 +108,12 @@ class HDTicket(Document):
                 in_reply_to=last_communication.name if last_communication else None,
                 email_headers={"X-Auto-Generated": "hd-email-feedback"},
             )
-            frappe.msgprint(_("Feedback email has been sent to the customer."))
+            frappe.msgprint(_("Feedback email has been sent to the customer"))
         except Exception as e:
             frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
 
     def before_insert(self):
-        self.create_encrypted_name()
+        self.generate_key()
 
     def after_insert(self):
         if self.ticket_split_from:
@@ -285,7 +286,7 @@ class HDTicket(Document):
                     self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
                 )
 
-    def create_encrypted_name(self):
+    def generate_key(self):
         self.key = uuid.uuid4()
 
     def remove_assignment_if_not_in_team(self):

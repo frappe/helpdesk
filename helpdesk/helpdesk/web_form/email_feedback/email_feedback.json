@@ -21,7 +21,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 0,
- "modified": "2025-07-03 17:09:42.539202",
+ "modified": "2025-07-08 12:29:09.852835",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "email-feedback",
@@ -31,7 +31,7 @@
  "show_attachments": 0,
  "show_list": 0,
  "show_sidebar": 0,
- "title": "Email Feedback",
+ "title": "Feedback",
  "web_form_fields": [
   {
    "allow_read_on_all_link_options": 0,
