@@ -77,7 +77,7 @@ class HDTicket(Document):
         ):
             return
 
-        [is_email_feedback_enabled, email_feedback_status] = frappe.db.get_value(
+        [is_email_feedback_enabled, email_feedback_status] = frappe.get_cached_value(
             "HD Settings",
             "HD Settings",
             ["enable_email_ticket_feedback", "send_email_feedback_on_status"],
