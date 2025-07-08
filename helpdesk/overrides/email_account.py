@@ -15,6 +15,7 @@ class CustomEmailAccount(EmailAccount):
             for index, message in enumerate(messages.get("latest_messages", [])):
                 _msg = message_from_string(message.decode())
                 _append_to = append_to
+                # Important: If the email is auto-generated, we do not create a ticket
                 if _msg.get("X-Auto-Generated"):
                     _append_to = None
 
