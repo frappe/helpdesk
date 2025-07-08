@@ -1,33 +1,14 @@
-from frappe.contacts.doctype.contact.contact import Contact
+import frappe
 
 
-class CustomContact(Contact):
-    @staticmethod
-    def default_list_data():
-        columns = [
-            {
-                "label": "Name",
-                "type": "Data",
-                "key": "full_name",
-                "width": "17rem",
-            },
-            {
-                "label": "Email",
-                "type": "Data",
-                "key": "email_id",
-                "width": "24rem",
-            },
-            # {
-            #     "label": "Phone",
-            #     "type": "Data",
-            #     "key": "mobile_no",
-            #     "width": "12rem",
-            # },
-            {
-                "label": "Created On",
-                "type": "Datetime",
-                "key": "creation",
-                "width": "8rem",
-            },
-        ]
-        return {"columns": columns}
+def before_insert(doc, method=None):
+    if doc.email_id:
+        domain = doc.email_id.split("@")[1]
+        hd_customers = frappe.get_all(
+            "HD Customer", filters={"domain": domain}, fields=["name"]
+        )
+        if hd_customers:
+            doc.append(
+                "links",
+                {"link_doctype": "HD Customer", "link_name": hd_customers[0].name},
+            )

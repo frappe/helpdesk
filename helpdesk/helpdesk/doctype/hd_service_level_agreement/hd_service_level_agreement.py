@@ -131,6 +131,9 @@ class HDServiceLevelAgreement(Document):
                 )
             )
 
+        if self.has_value_changed("enabled") and not self.enabled and self.default_sla:
+            frappe.throw(_("You cannot disable the default SLA."))
+
     def validate_condition(self):
         if not self.condition:
             return

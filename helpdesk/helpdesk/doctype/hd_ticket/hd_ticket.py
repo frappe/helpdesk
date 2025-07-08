@@ -1,4 +1,5 @@
 import json
+import uuid
 from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
@@ -63,6 +64,56 @@ class HDTicket(Document):
         self.apply_sla()
         if not self.is_new():
             self.handle_ticket_activity_update()
+
+        self.handle_email_feedback()
+
+    def handle_email_feedback(self):
+
+        if (
+            self.is_new()
+            or self.via_customer_portal
+            or self.feedback_rating
+            or not self.has_value_changed("status")
+            or not self.key
+        ):
+            return
+
+        [is_email_feedback_enabled, email_feedback_status] = frappe.get_cached_value(
+            "HD Settings",
+            "HD Settings",
+            ["enable_email_ticket_feedback", "send_email_feedback_on_status"],
+        )
+
+        if not int(is_email_feedback_enabled) or email_feedback_status != self.status:
+            return
+
+        last_communication = self.get_last_communication()
+
+        url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
+        template = f"""
+            <p>Hello,</p>
+            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{self.name}.</p>
+            <a href="{url}" class="btn btn-primary">Share Feedback</a>
+            
+            <p>Thank you!<br>Support Team</p>
+        """
+        try:
+            frappe.sendmail(
+                recipients=[self.raised_by],
+                subject=f"Re: {self.subject}",
+                message=template,
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                now=True,
+                in_reply_to=last_communication.name if last_communication else None,
+                email_headers={"X-Auto-Generated": "hd-email-feedback"},
+            )
+            frappe.msgprint(_("Feedback email has been sent to the customer"))
+        except Exception as e:
+            frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
+
+    def before_insert(self):
+        self.generate_key()
 
     def after_insert(self):
         if self.ticket_split_from:
@@ -183,7 +234,6 @@ class HDTicket(Document):
             return
         feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
         self.feedback_rating = feedback_option.rating
-        self.feedback_text = feedback_option.label
 
     def validate_ticket_type(self):
         settings = frappe.get_doc("HD Settings")
@@ -235,6 +285,9 @@ class HDTicket(Document):
                 log_ticket_activity(
                     self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
                 )
+
+    def generate_key(self):
+        self.key = uuid.uuid4()
 
     def remove_assignment_if_not_in_team(self):
         """
@@ -368,7 +421,7 @@ class HDTicket(Document):
 
             return communication
         except Exception:
-            pass
+            return None
 
     def last_communication_email(self):
         if not (communication := self.get_last_communication()):
@@ -633,6 +686,7 @@ class HDTicket(Document):
             reference_name=self.name,
             now=True,
             expose_recipients="header",
+            email_headers={"X-Auto-Generated": "hd-acknowledgement"},
         )
 
     @frappe.whitelist()

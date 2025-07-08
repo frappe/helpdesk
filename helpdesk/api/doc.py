@@ -5,7 +5,7 @@ from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
-from helpdesk.utils import check_permissions
+from helpdesk.utils import check_permissions, contact_default_columns
 
 
 @frappe.whitelist()
@@ -69,7 +69,9 @@ def get_list_data(
     if is_default:
         default_view = default_view_exists(doctype)
         if not default_view:
-            if hasattr(_list, "default_list_data"):
+            if doctype == "Contact":
+                columns = contact_default_columns
+            elif hasattr(_list, "default_list_data"):
                 columns = (
                     _list.default_list_data(show_customer_portal_fields).get("columns")
                     if doctype == "HD Ticket"
