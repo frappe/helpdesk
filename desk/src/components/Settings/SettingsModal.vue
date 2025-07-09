@@ -36,6 +36,7 @@
 </template>
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
+<<<<<<< HEAD
 import { markRaw, ModelRef, ref, watch } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
@@ -45,6 +46,17 @@ import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
+=======
+import { ModelRef, watch } from "vue";
+import {
+  activeTab,
+  disableSettingModalOutsideClick,
+  tabs,
+} from "./settingsModal";
+
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import { FieldDependencyIcon } from "@/components/icons";
+>>>>>>> cc6f1a1b (feat: init field dependency)
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
