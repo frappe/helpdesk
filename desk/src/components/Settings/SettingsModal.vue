@@ -47,6 +47,8 @@ import {
   tabs,
 } from "./settingsModal";
 
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import { FieldDependencyIcon } from "@/components/icons";
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
