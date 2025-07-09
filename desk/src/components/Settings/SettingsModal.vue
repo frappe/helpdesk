@@ -40,12 +40,24 @@
 </template>
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
-import { ModelRef, watch } from "vue";
+import { markRaw, ModelRef, ref, watch } from "vue";
+import ImageUp from "~icons/lucide/image-up";
+import LucideMail from "~icons/lucide/mail";
+import LucideUser from "~icons/lucide/user";
+import LucideUsers from "~icons/lucide/users";
+import Agents from "./Agents.vue";
+import Branding from "./Branding.vue";
+import EmailConfig from "./EmailConfig.vue";
+import TeamsConfig from "./Teams/TeamsConfig.vue";
+
 import {
   activeTab,
   disableSettingModalOutsideClick,
   tabs,
 } from "./settingsModal";
+
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import { FieldDependencyIcon } from "@/components/icons";
 
 const props = withDefaults(
   defineProps<{
