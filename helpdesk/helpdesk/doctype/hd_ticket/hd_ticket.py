@@ -641,11 +641,10 @@ class HDTicket(Document):
         for tag in soup.find_all(["img", "video"]):
             if tag.has_attr("src"):
                 src = tag["src"]
-                # this is an inline media, we need to add it to the attachments
                 files.append(src)
 
         for f in files:
-            last_doc = frappe.get_last_doc(
+            last_doc = frappe.get_doc(
                 "File", {"file_url": f, "attached_to_doctype": ["!=", "Null"]}
             )
             if last_doc:
