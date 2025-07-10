@@ -993,7 +993,7 @@ class HDTicket(Document):
 
     def parse_content(self, content):
         """
-        Finds 'src' attribute of img/video and 'replaces' it  with embed attribute
+        Finds 'src' attribute of img/video and replaces it  with 'embed' attribute
         embed tag is important because framework replaces it with <img src="cid:content_id">
         this in turn is displayed as an image in the mail sent to the customer
         """

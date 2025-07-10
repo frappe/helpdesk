@@ -25,6 +25,7 @@
             v-for="a in attachments"
             :key="a.file_url"
             :label="a.file_name"
+            :url="a.file_url"
           >
             <template #suffix>
               <FeatherIcon
