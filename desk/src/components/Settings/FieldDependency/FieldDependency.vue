@@ -109,7 +109,35 @@
               </template>
             </FormControl>
             <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
-              {{ state.childFieldValues }}
+              <template v-if="state.currentParentSelection">
+                <ul>
+                  <li
+                    v-for="value in state.childFieldValues"
+                    :key="value"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
+                    :class="{
+                      'bg-surface-gray-2 hover:bg-surface-gray-3':
+                        isChildValueSelected(value),
+                    }"
+                    @click="handleChildValueClick(value)"
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="isChildValueSelected(value)"
+                      readonly
+                      class="mr-2"
+                    />
+                    <span class="text-base text-ink-gray-6">{{ value }}</span>
+                  </li>
+                </ul>
+              </template>
+              <template v-else>
+                <div
+                  class="flex flex-col items-center justify-center h-full text-ink-gray-4 text-sm"
+                >
+                  Please select a parent value first
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -133,7 +161,7 @@ const state = reactive({
   childFieldValues: [],
 
   currentParentSelection: "",
-  currentChildSelection: new Set(),
+  childSelections: {}, // Initial value is a Set
 
   parentSearch: "",
   childSearch: "",
@@ -185,6 +213,9 @@ async function handleFieldValues(fieldname, isParentField) {
   if (isParentField) {
     state.selectedChildField = ""; // Reset child field when parent changes
     state.childFields = state.parentFields.filter((f) => f.value !== fieldname);
+    state.childFieldValues = [];
+    state.currentParentSelection = ""; // Reset current parent selection
+    state.childSelections = {}; // Reset child selections for new parent
   }
 
   if (field.type === "Select") {
@@ -201,6 +232,27 @@ async function handleFieldValues(fieldname, isParentField) {
 
 function handleParentValueClick(value) {
   state.currentParentSelection = value;
+}
+
+function handleChildValueClick(childValue) {
+  const parent = state.currentParentSelection;
+  if (!parent) return;
+  if (!(state.childSelections[parent] instanceof Set)) {
+    state.childSelections[parent] = new Set();
+  }
+  if (state.childSelections[parent].has(childValue)) {
+    state.childSelections[parent].delete(childValue);
+  } else {
+    state.childSelections[parent].add(childValue);
+  }
+}
+
+function isChildValueSelected(childValue) {
+  const parent = state.currentParentSelection;
+  return (
+    state.childSelections[parent] instanceof Set &&
+    state.childSelections[parent].has(childValue)
+  );
 }
 
 function handleSubmit() {
