@@ -41,7 +41,10 @@
         />
       </div>
     </div>
-    <div class="grid grid-cols-3 gap-5" v-if="visibleMonths === 'first-half'">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      v-if="visibleMonths === 'first-half'"
+    >
       <HLCalender
         v-for="month in months.slice(0, 6)"
         :key="month"
@@ -50,7 +53,10 @@
         :holidays="holidayData.holidays"
       />
     </div>
-    <div class="grid grid-cols-3 gap-5" v-else>
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between gap-5"
+      v-else
+    >
       <HLCalender
         v-for="month in months.slice(6, 12)"
         :key="month"

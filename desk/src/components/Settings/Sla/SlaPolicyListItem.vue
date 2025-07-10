@@ -163,6 +163,10 @@ const deleteSla = (event) => {
 };
 
 const onToggle = () => {
+  if (props.data.default_sla) {
+    toast.error("SLA set as default cannot be disabled");
+    return;
+  }
   createResource({
     url: "frappe.client.set_value",
     params: {

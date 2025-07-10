@@ -15,7 +15,7 @@
             :label="slaData.service_level || 'New SLA Policy'"
             size="md"
             @click="goBack()"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl"
+            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70"
           />
           <Badge
             :variant="'subtle'"
@@ -49,7 +49,7 @@
       <Switch size="sm" :model-value="slaData.enabled" />
     </div>
     <hr class="mb-6 mt-3" />
-    <div class="grid grid-cols-2 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div>
         <FormControl
           :type="'text'"
@@ -105,7 +105,7 @@
           Choose how long this SLA policy will be active.
         </span>
       </div>
-      <div class="mt-4 flex gap-5">
+      <div class="mt-4 flex gap-5 flex-col md:flex-row">
         <div class="w-full space-y-1.5">
           <label for="from_date" class="text-sm text-gray-600">From date</label>
           <DatePicker

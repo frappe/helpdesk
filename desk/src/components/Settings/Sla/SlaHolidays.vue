@@ -72,7 +72,10 @@
 import { createResource, NestedPopover, Button } from "frappe-ui";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
 import { activeTab, tabs } from "../settingsModal";
-import { holidayListActiveScreen } from "@/stores/holidayList";
+import {
+  holidayListActiveScreen,
+  resetHolidayData,
+} from "@/stores/holidayList";
 import { watchDebounced } from "@vueuse/core";
 import { validateSlaData } from "@/stores/sla";
 
@@ -99,6 +102,7 @@ const createNewHolidayList = () => {
       data: props.slaData.name,
     },
   };
+  resetHolidayData();
 };
 
 const editHolidayList = (data: any) => {
