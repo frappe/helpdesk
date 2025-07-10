@@ -21,9 +21,13 @@
   "default_ticket_type",
   "is_ticket_type_mandatory",
   "column_break_zxek",
+  "feedback_section",
+  "is_feedback_mandatory",
+  "column_break_kegb",
+  "enable_email_ticket_feedback",
+  "send_email_feedback_on_status",
   "ticket_restrictions_section",
   "allow_anyone_to_create_tickets",
-  "is_feedback_mandatory",
   "auto_update_status",
   "column_break_iarl",
   "auto_close_tickets",
@@ -263,7 +267,7 @@
    "description": "If enabled, the feedback dialog will be shown, when a user tries to close a ticket. \n",
    "fieldname": "is_feedback_mandatory",
    "fieldtype": "Check",
-   "label": "Make feedback mandatory"
+   "label": "Enable feedback for Customer Portal"
   },
   {
    "fieldname": "column_break_iarl",
@@ -288,12 +292,37 @@
    "fieldname": "send_acknowledgement_email",
    "fieldtype": "Check",
    "label": "Send Acknowledgement Email"
+  },
+  {
+   "fieldname": "feedback_section",
+   "fieldtype": "Section Break",
+   "label": "Feedback"
+  },
+  {
+   "fieldname": "column_break_kegb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Closed",
+   "depends_on": "eval:doc.enable_email_ticket_feedback",
+   "fieldname": "send_email_feedback_on_status",
+   "fieldtype": "Select",
+   "label": "Send feedback when",
+   "mandatory_depends_on": "eval:doc.enable_email_ticket_feedback",
+   "options": "Resolved\nClosed"
+  },
+  {
+   "default": "1",
+   "description": "If enabled, feedback email will be sent to the customer when you mark a ticket as Resolved/Closed.\n",
+   "fieldname": "enable_email_ticket_feedback",
+   "fieldtype": "Check",
+   "label": "Enable feedback for Email Tickets"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-06-19 16:09:26.779792",
+ "modified": "2025-07-08 13:46:21.260686",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

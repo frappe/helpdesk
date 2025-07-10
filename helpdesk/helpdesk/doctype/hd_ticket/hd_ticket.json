@@ -20,6 +20,7 @@
   "sb_details",
   "description",
   "template",
+  "key",
   "sla_tab",
   "service_level_section",
   "sla",
@@ -61,7 +62,6 @@
   "feedback_tab",
   "customer_feedback_section",
   "feedback_rating",
-  "feedback_text",
   "feedback",
   "feedback_extra",
   "meta_tab"
@@ -375,11 +375,6 @@
    "label": "Rating"
   },
   {
-   "fieldname": "feedback_text",
-   "fieldtype": "Data",
-   "label": "Feedback (Text)"
-  },
-  {
    "fieldname": "sla_tab",
    "fieldtype": "Tab Break",
    "label": "SLA"
@@ -432,13 +427,20 @@
    "label": "Merged With",
    "options": "HD Ticket",
    "read_only": 1
+  },
+  {
+   "fieldname": "key",
+   "fieldtype": "Data",
+   "label": "Key",
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-06-12 17:53:46.793081",
+ "modified": "2025-07-03 15:18:55.359950",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
