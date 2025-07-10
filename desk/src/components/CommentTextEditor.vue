@@ -25,7 +25,7 @@
             v-for="a in attachments"
             :key="a.file_url"
             :label="a.file_name"
-            :url="a.file_url"
+            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
           >
             <template #suffix>
               <FeatherIcon
@@ -116,6 +116,7 @@ import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
+  removeAttachmentFromServer,
   textEditorMenuButtons,
   uploadFunction,
 } from "@/utils";
@@ -179,6 +180,7 @@ const agents = computed(() => {
 
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
+  removeAttachmentFromServer(attachment.name);
 }
 
 async function submitComment() {
