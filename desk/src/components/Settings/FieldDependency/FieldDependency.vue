@@ -78,11 +78,12 @@
                 <li
                   v-for="value in state.parentFieldValues"
                   :key="value"
-                  class="py-2 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1 transition-colors"
+                  class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1"
                   :class="{
-                    'bg-surface-gray-2': state.currentParentSelection === value,
+                    'bg-surface-gray-2 hover:bg-surface-gray-3':
+                      state.currentParentSelection === value,
                   }"
-                  @click="state.currentParentSelection = value"
+                  @click="handleParentValueClick(value)"
                 >
                   <span class="text-base text-ink-gray-6">{{ value }}</span>
                   <LucideChevronRight class="h-4 w-4 text-ink-gray-6" />
@@ -132,9 +133,7 @@ const state = reactive({
   childFieldValues: [],
 
   currentParentSelection: "",
-  currentChildSelection: {
-    parentValue: ["selections"],
-  },
+  currentChildSelection: new Set(),
 
   parentSearch: "",
   childSearch: "",
@@ -198,6 +197,10 @@ async function handleFieldValues(fieldname, isParentField) {
     });
     return options.map((o) => o.name);
   }
+}
+
+function handleParentValueClick(value) {
+  state.currentParentSelection = value;
 }
 
 function handleSubmit() {
