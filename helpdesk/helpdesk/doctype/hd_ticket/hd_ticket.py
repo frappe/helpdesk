@@ -5,6 +5,7 @@ from functools import lru_cache
 from typing import List
 
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
 from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
@@ -128,6 +129,7 @@ class HDTicket(Document):
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
+            self.handle_inline_media_new_ticket()
 
         send_ack_email = frappe.db.get_single_value(
             "HD Settings", "send_acknowledgement_email"
@@ -541,6 +543,8 @@ class HDTicket(Document):
 
             _attachments.append({"file_url": file_doc.file_url})
 
+        message = self.parse_content(message)
+
         reply_to_email = sender_email.email_id
         template = (
             "new_reply_on_customer_portal_notification"
@@ -568,7 +572,7 @@ class HDTicket(Document):
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=communication.content,
+                message=message,
                 as_markdown=True,
                 now=send_now,
                 recipients=recipients,
@@ -630,6 +634,24 @@ class HDTicket(Document):
         )
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
+
+    def handle_inline_media_new_ticket(self):
+        soup = BeautifulSoup(self.description, "html.parser")
+        files = []
+        for tag in soup.find_all(["img", "video"]):
+            if tag.has_attr("src"):
+                src = tag["src"]
+                # this is an inline media, we need to add it to the attachments
+                files.append(src)
+
+        for f in files:
+            last_doc = frappe.get_last_doc(
+                "File", {"file_url": f, "attached_to_doctype": ["!=", "Null"]}
+            )
+            if last_doc:
+                last_doc.attached_to_doctype = "HD Ticket"
+                last_doc.attached_to_name = self.name
+                last_doc.save()
 
     def send_reply_email_to_agent(self, message):
         assigned_agents = self.get_assigned_agents()
@@ -968,6 +990,29 @@ class HDTicket(Document):
             else columns,
             "rows": rows,
         }
+
+    def parse_content(self, content):
+        """
+        Finds 'src' attribute of img/video and 'replaces' it  with embed attribute
+        embed tag is important because framework replaces it with <img src="cid:content_id">
+        this in turn is displayed as an image in the mail sent to the customer
+        """
+        if not content:
+            return ""
+
+        soup = BeautifulSoup(content, "html.parser")
+
+        for tag in soup.find_all(["img", "video"]):
+            if tag.name == "img":
+                tag["embed"] = tag.get("src")
+                tag["width"] = "80%"
+                tag["height"] = "80%"
+                del tag["src"]
+            elif tag.name == "video":
+                tag["embed"] = tag.get("src")
+                del tag["src"]
+
+        return str(soup)
 
     @staticmethod
     def filter_standard_fields(fields):
