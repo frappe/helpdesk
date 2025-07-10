@@ -77,7 +77,7 @@
               <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
                 <ul>
                   <li
-                    v-for="value in state.parentFieldValues"
+                    v-for="value in filteredParentFieldValues"
                     :key="value"
                     class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1"
                     :class="{
@@ -121,35 +121,26 @@
                 </template>
               </FormControl>
               <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
-                <template v-if="state.currentParentSelection">
-                  <ul>
-                    <li
-                      v-for="value in state.childFieldValues"
-                      :key="value"
-                      class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
-                      :class="{
-                        'bg-surface-gray-2 hover:bg-surface-gray-3':
-                          isChildValueSelected(value),
-                      }"
-                      @click="handleChildValueClick(value)"
-                    >
-                      <input
-                        type="checkbox"
-                        :checked="isChildValueSelected(value)"
-                        readonly
-                        class="mr-2"
-                      />
-                      <span class="text-base text-ink-gray-6">{{ value }}</span>
-                    </li>
-                  </ul>
-                </template>
-                <template v-else>
-                  <div
-                    class="flex flex-col items-center justify-center h-full text-ink-gray-4 text-sm"
+                <ul>
+                  <li
+                    v-for="value in filteredChildFieldValues"
+                    :key="value"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
+                    :class="{
+                      'bg-surface-gray-2 hover:bg-surface-gray-3':
+                        isChildValueSelected(value),
+                    }"
+                    @click="handleChildValueClick(value)"
                   >
-                    Please select a parent value first
-                  </div>
-                </template>
+                    <input
+                      type="checkbox"
+                      :checked="isChildValueSelected(value)"
+                      readonly
+                      class="mr-2"
+                    />
+                    <span class="text-base text-ink-gray-6">{{ value }}</span>
+                  </li>
+                </ul>
               </div>
             </template>
             <template v-else-if="!state.selectedChildField">
@@ -176,7 +167,7 @@
 <script setup>
 import { call, createResource } from "frappe-ui";
 import FormControl from "frappe-ui/src/components/FormControl/FormControl.vue";
-import { reactive, watch } from "vue";
+import { reactive, watch, computed } from "vue";
 
 const state = reactive({
   selectedParentField: "",
@@ -282,11 +273,23 @@ function isChildValueSelected(childValue) {
   );
 }
 
+const filteredParentFieldValues = computed(() => {
+  if (!state.parentSearch) return state.parentFieldValues;
+  return state.parentFieldValues.filter((v) =>
+    v.toLowerCase().includes(state.parentSearch.toLowerCase())
+  );
+});
+
+const filteredChildFieldValues = computed(() => {
+  if (!state.childSearch) return state.childFieldValues;
+  return state.childFieldValues.filter((v) =>
+    v.toLowerCase().includes(state.childSearch.toLowerCase())
+  );
+});
+
 function handleSubmit() {
   // Handle form submission
   console.log("Parent Field:", state.selectedParentField);
   console.log("Child Field:", state.selectedChildField);
 }
 </script>
-
-<style scoped></style>
