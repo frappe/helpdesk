@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-max mx-auto">
     <div class="text-base font-medium mb-2 text-gray-800 ml-2.5">
       {{ formattedMonth }}
     </div>
