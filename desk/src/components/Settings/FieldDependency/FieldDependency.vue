@@ -132,10 +132,9 @@
                     }"
                     @click="handleChildValueClick(value)"
                   >
-                    <input
+                    <FormControl
                       type="checkbox"
-                      :checked="isChildValueSelected(value)"
-                      readonly
+                      :model-value="isChildValueSelected(value)"
                       class="mr-2"
                     />
                     <span class="text-base text-ink-gray-6">{{ value }}</span>
@@ -165,8 +164,7 @@
 </template>
 
 <script setup>
-import { call, createResource } from "frappe-ui";
-import FormControl from "frappe-ui/src/components/FormControl/FormControl.vue";
+import { call, createResource, FormControl } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
 
 const state = reactive({
