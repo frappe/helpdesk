@@ -63,33 +63,42 @@
           <div
             class="border flex-1 border-r-0 rounded-l p-2 flex flex-col gap-2"
           >
-            <FormControl
-              v-model="state.parentSearch"
-              placeholder="Search values"
-              type="text"
-              class="w-full"
-            >
-              <template #prefix>
-                <LucideSearch class="h-4 w-4 text-gray-500" />
-              </template>
-            </FormControl>
-            <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
-              <ul>
-                <li
-                  v-for="value in state.parentFieldValues"
-                  :key="value"
-                  class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1"
-                  :class="{
-                    'bg-surface-gray-2 hover:bg-surface-gray-3':
-                      state.currentParentSelection === value,
-                  }"
-                  @click="handleParentValueClick(value)"
-                >
-                  <span class="text-base text-ink-gray-6">{{ value }}</span>
-                  <LucideChevronRight class="h-4 w-4 text-ink-gray-6" />
-                </li>
-              </ul>
-            </div>
+            <template v-if="state.selectedParentField">
+              <FormControl
+                v-model="state.parentSearch"
+                placeholder="Search values"
+                type="text"
+                class="w-full"
+              >
+                <template #prefix>
+                  <LucideSearch class="h-4 w-4 text-gray-500" />
+                </template>
+              </FormControl>
+              <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+                <ul>
+                  <li
+                    v-for="value in state.parentFieldValues"
+                    :key="value"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1"
+                    :class="{
+                      'bg-surface-gray-2 hover:bg-surface-gray-3':
+                        state.currentParentSelection === value,
+                    }"
+                    @click="handleParentValueClick(value)"
+                  >
+                    <span class="text-base text-ink-gray-6">{{ value }}</span>
+                    <LucideChevronRight class="h-4 w-4 text-ink-gray-6" />
+                  </li>
+                </ul>
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+              >
+                Please select a parent field first
+              </div>
+            </template>
           </div>
         </div>
         <!-- right box -->
@@ -98,47 +107,65 @@
             Select child field value
           </span>
           <div class="border flex-1 rounded-r p-2 flex flex-col gap-2">
-            <FormControl
-              v-model="state.childSearch"
-              placeholder="Search values"
-              type="text"
-              class="w-full"
+            <template
+              v-if="state.selectedChildField && state.currentParentSelection"
             >
-              <template #prefix>
-                <LucideSearch class="h-4 w-4 text-gray-500" />
-              </template>
-            </FormControl>
-            <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
-              <template v-if="state.currentParentSelection">
-                <ul>
-                  <li
-                    v-for="value in state.childFieldValues"
-                    :key="value"
-                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
-                    :class="{
-                      'bg-surface-gray-2 hover:bg-surface-gray-3':
-                        isChildValueSelected(value),
-                    }"
-                    @click="handleChildValueClick(value)"
+              <FormControl
+                v-model="state.childSearch"
+                placeholder="Search values"
+                type="text"
+                class="w-full"
+              >
+                <template #prefix>
+                  <LucideSearch class="h-4 w-4 text-gray-500" />
+                </template>
+              </FormControl>
+              <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+                <template v-if="state.currentParentSelection">
+                  <ul>
+                    <li
+                      v-for="value in state.childFieldValues"
+                      :key="value"
+                      class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
+                      :class="{
+                        'bg-surface-gray-2 hover:bg-surface-gray-3':
+                          isChildValueSelected(value),
+                      }"
+                      @click="handleChildValueClick(value)"
+                    >
+                      <input
+                        type="checkbox"
+                        :checked="isChildValueSelected(value)"
+                        readonly
+                        class="mr-2"
+                      />
+                      <span class="text-base text-ink-gray-6">{{ value }}</span>
+                    </li>
+                  </ul>
+                </template>
+                <template v-else>
+                  <div
+                    class="flex flex-col items-center justify-center h-full text-ink-gray-4 text-sm"
                   >
-                    <input
-                      type="checkbox"
-                      :checked="isChildValueSelected(value)"
-                      readonly
-                      class="mr-2"
-                    />
-                    <span class="text-base text-ink-gray-6">{{ value }}</span>
-                  </li>
-                </ul>
-              </template>
-              <template v-else>
-                <div
-                  class="flex flex-col items-center justify-center h-full text-ink-gray-4 text-sm"
-                >
-                  Please select a parent value first
-                </div>
-              </template>
-            </div>
+                    Please select a parent value first
+                  </div>
+                </template>
+              </div>
+            </template>
+            <template v-else-if="!state.selectedChildField">
+              <div
+                class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+              >
+                Please select a child field first
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+              >
+                Please select a parent value first
+              </div>
+            </template>
           </div>
         </div>
       </div>
