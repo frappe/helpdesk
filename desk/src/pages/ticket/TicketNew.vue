@@ -69,6 +69,7 @@
             v-model:content="description"
             placeholder="Detailed explanation"
             expand
+            :uploadFunction="(file:any)=>uploadFunction(file)"
           >
             <template #bottom-right>
               <Button
@@ -123,7 +124,7 @@ import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { Field } from "@/types";
-import { isCustomerPortal } from "@/utils";
+import { isCustomerPortal, uploadFunction } from "@/utils";
 import {
   Breadcrumbs,
   Button,

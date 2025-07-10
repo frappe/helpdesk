@@ -15,6 +15,7 @@
     :mentions="agents"
     @change="editable ? (newComment = $event) : null"
     :extensions="[PreserveVideoControls]"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
   >
     <template #bottom>
       <div v-if="editable" class="flex flex-col gap-2 px-6 md:pl-10 md:pr-9">
@@ -24,6 +25,7 @@
             v-for="a in attachments"
             :key="a.file_url"
             :label="a.file_name"
+            :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
           >
             <template #suffix>
               <FeatherIcon
@@ -111,7 +113,13 @@ import { useAgentStore } from "@/stores/agent";
 
 import { useAuthStore } from "@/stores/auth";
 import { PreserveVideoControls } from "@/tiptap-extensions";
-import { getFontFamily, isContentEmpty, textEditorMenuButtons } from "@/utils";
+import {
+  getFontFamily,
+  isContentEmpty,
+  removeAttachmentFromServer,
+  textEditorMenuButtons,
+  uploadFunction,
+} from "@/utils";
 import { useStorage } from "@vueuse/core";
 
 const { updateOnboardingStep } = useOnboarding("helpdesk");
@@ -172,6 +180,7 @@ const agents = computed(() => {
 
 function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
+  removeAttachmentFromServer(attachment.name);
 }
 
 async function submitComment() {

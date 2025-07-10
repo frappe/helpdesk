@@ -1,6 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
-import { toast } from "frappe-ui";
+import { call, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -218,4 +218,24 @@ export function getFontFamily(content: string) {
     lang = "arabic";
   }
   return langMap[lang];
+}
+
+export function uploadFunction(
+  file: File,
+  doctype: string = null,
+  docname: string = null
+) {
+  let fileUpload = useFileUpload();
+  return fileUpload.upload(file, {
+    private: true,
+    doctype: doctype,
+    docname: docname,
+  });
+}
+
+export async function removeAttachmentFromServer(attachment: string) {
+  await call("frappe.client.delete", {
+    doctype: "File",
+    name: attachment,
+  });
 }
