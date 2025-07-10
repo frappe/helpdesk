@@ -17,7 +17,12 @@
         <div></div>
         <!-- Actions -->
         <div class="flex gap-1">
-          <Button label="Save" variant="solid" size="sm" />
+          <Button
+            label="Save"
+            variant="solid"
+            size="sm"
+            :disabled="!state.selectedParentField"
+          />
         </div>
       </div>
     </header>
@@ -29,23 +34,23 @@
       <!-- Field Selection -->
       <div class="flex gap-3 w-full justify-between">
         <FormControl
-          v-model="state.parentField"
+          v-model="state.selectedParentField"
           label="Parent Field"
           placeholder="Select Parent Field"
           required
           class="flex-1"
           type="select"
-          :options="state.parentFieldOptions"
+          :options="state.parentFields"
         />
         <FormControl
-          v-model="state.childField"
+          v-model="state.selectedChildField"
           label="Child Field"
           placeholder="Select Child Field"
           required
           class="flex-1"
-          :disabled="!state.parentField"
+          :disabled="!state.selectedParentField"
           type="select"
-          :options="state.childFieldOptions"
+          :options="state.childFields"
         />
       </div>
       <!-- Value Selection -->
@@ -55,18 +60,35 @@
           <span class="block text-xs text-ink-gray-5">
             Select parent field value
           </span>
-          <div class="border flex-1 border-r-0 rounded-l p-2">
+          <div
+            class="border flex-1 border-r-0 rounded-l p-2 flex flex-col gap-2"
+          >
             <FormControl
               v-model="state.parentSearch"
               placeholder="Search values"
               type="text"
-              class="w-full mb-2"
+              class="w-full"
             >
               <template #prefix>
                 <LucideSearch class="h-4 w-4 text-gray-500" />
               </template>
             </FormControl>
-            {{ childFieldComponent }}
+            <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+              <ul>
+                <li
+                  v-for="value in state.parentFieldValues"
+                  :key="value"
+                  class="py-2 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1 transition-colors"
+                  :class="{
+                    'bg-surface-gray-2': state.currentParentSelection === value,
+                  }"
+                  @click="state.currentParentSelection = value"
+                >
+                  <span class="text-base text-ink-gray-6">{{ value }}</span>
+                  <LucideChevronRight class="h-4 w-4 text-ink-gray-6" />
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
         <!-- right box -->
@@ -74,17 +96,20 @@
           <span class="block text-xs text-ink-gray-5 pl-1.5">
             Select child field value
           </span>
-          <div class="border flex-1 rounded-r p-2">
+          <div class="border flex-1 rounded-r p-2 flex flex-col gap-2">
             <FormControl
               v-model="state.childSearch"
               placeholder="Search values"
               type="text"
-              class="w-full mb-2"
+              class="w-full"
             >
               <template #prefix>
                 <LucideSearch class="h-4 w-4 text-gray-500" />
               </template>
             </FormControl>
+            <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+              {{ state.childFieldValues }}
+            </div>
           </div>
         </div>
       </div>
@@ -92,32 +117,39 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { createResource } from "frappe-ui";
+<script setup>
+import { call, createResource } from "frappe-ui";
 import FormControl from "frappe-ui/src/components/FormControl/FormControl.vue";
-import { computed, reactive } from "vue";
+import { reactive, watch } from "vue";
 
 const state = reactive({
-  parentField: "",
-  childField: "",
-  parentFieldOptions: [],
-  childFieldOptions: [],
+  selectedParentField: "",
+  selectedChildField: "",
+  parentFields: [],
+  childFields: [],
+
+  parentFieldValues: [],
+  childFieldValues: [],
+
+  currentParentSelection: "",
+  currentChildSelection: {
+    parentValue: ["selections"],
+  },
+
   parentSearch: "",
   childSearch: "",
-  currentParentSelection: "",
-  currentChildSelection: [],
 });
 
 const fields = createResource({
   url: "helpdesk.api.ticket_meta.get_fields_meta",
   auto: true,
-  cache: ["dsdf", "sdfdsf"],
   params: {
     doctype: "HD Ticket",
     fieldtypes: ["Select", "Link"],
   },
-  onData: (data) => {
-    state.parentFieldOptions = data.map((field) => ({
+  //   cache: ["Fields", "field_dependency"],
+  transform: (data) => {
+    state.parentFields = data.map((field) => ({
       label: field.label,
       value: field.fieldname,
       options: field.options || [],
@@ -125,35 +157,53 @@ const fields = createResource({
     }));
     return data;
   },
-  //   onSuccess: (data) => {
-  //     state.parentFieldOptions = data.map((field) => ({
-  //       label: field.label,
-  //       value: field.fieldname,
-  //       options: field.options || [],
-  //       type: field.fieldtype,
-  //     }));
-  //     return data;
-  //   },
 });
 
-const childFieldComponent = computed(() => {
-  const field = state.parentFieldOptions.find(
-    (f) => f.value === state.parentField
-  );
-  if (!field) return null;
-  state.childFieldOptions = state.parentFieldOptions.filter(
-    (o) => o.value != state.parentField
-  );
-  //   if (field.type === "Select") {
-  //     let options = field.options.split("\n");
-  //     state.childFieldOptions = options;
-  //   }
-});
+// parent field watcher
+watch(
+  () => state.selectedParentField,
+  async (newParentField) => {
+    state.parentFieldValues = await handleFieldValues(newParentField, true);
+  }
+);
+
+// child field watcher
+watch(
+  () => state.selectedChildField,
+  async (newChildField) => {
+    state.childFieldValues = await handleFieldValues(newChildField, false);
+  }
+);
+
+async function handleFieldValues(fieldname, isParentField) {
+  if (!fieldname) return [];
+
+  const field = isParentField
+    ? state.parentFields.find((f) => f.value === fieldname)
+    : state.childFields.find((f) => f.value === fieldname);
+  if (!field) return [];
+
+  if (isParentField) {
+    state.selectedChildField = ""; // Reset child field when parent changes
+    state.childFields = state.parentFields.filter((f) => f.value !== fieldname);
+  }
+
+  if (field.type === "Select") {
+    return field.options.split("\n");
+  } else if (field.type === "Link") {
+    let options = await call("frappe.client.get_list", {
+      doctype: field.options,
+      fields: ["name"],
+      limit_page_length: 999,
+    });
+    return options.map((o) => o.name);
+  }
+}
 
 function handleSubmit() {
   // Handle form submission
-  console.log("Parent Field:", state.parentField);
-  console.log("Child Field:", state.childField);
+  console.log("Parent Field:", state.selectedParentField);
+  console.log("Child Field:", state.selectedChildField);
 }
 </script>
 
