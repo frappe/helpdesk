@@ -82,7 +82,7 @@ let tabs = [
     component: markRaw(TeamsConfig),
   },
   {
-    label: "Field dependency",
+    label: "Field Dependencies",
     icon: markRaw(FieldDependencyIcon),
     component: markRaw(FieldDependencyConfig),
   },
