@@ -40,6 +40,7 @@
 </template>
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
+<<<<<<< HEAD
 import { ModelRef, watch } from "vue";
 
 import {
@@ -47,6 +48,19 @@ import {
   disableSettingModalOutsideClick,
   tabs,
 } from "./settingsModal";
+=======
+import { markRaw, ModelRef, ref, watch } from "vue";
+import ImageUp from "~icons/lucide/image-up";
+import LucideMail from "~icons/lucide/mail";
+import LucideUser from "~icons/lucide/user";
+import LucideUserPlus from "~icons/lucide/user-plus";
+import LucideUsers from "~icons/lucide/users";
+import Agents from "./Agents.vue";
+import Branding from "./Branding.vue";
+import EmailConfig from "./EmailConfig.vue";
+import TeamsConfig from "./Teams/TeamsConfig.vue";
+import InviteAgent from "./InviteAgent.vue";
+>>>>>>> c02aeece (feat: add new user invitation flow)
 
 const props = withDefaults(
   defineProps<{
@@ -57,6 +71,36 @@ const props = withDefaults(
   }
 );
 
+<<<<<<< HEAD
+=======
+let tabs = [
+  {
+    label: "Email Accounts",
+    icon: markRaw(LucideMail),
+    component: markRaw(EmailConfig),
+  },
+  {
+    label: "Branding",
+    icon: markRaw(ImageUp),
+    component: markRaw(Branding),
+  },
+  {
+    label: "Agents",
+    icon: markRaw(LucideUser),
+    component: markRaw(Agents),
+  },
+  {
+    label: "Invite Agent",
+    icon: markRaw(LucideUserPlus),
+    component: markRaw(InviteAgent),
+  },
+  {
+    label: "Teams",
+    icon: markRaw(LucideUsers),
+    component: markRaw(TeamsConfig),
+  },
+];
+>>>>>>> c02aeece (feat: add new user invitation flow)
 const show: ModelRef<boolean> = defineModel();
 
 watch(
