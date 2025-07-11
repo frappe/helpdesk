@@ -141,7 +141,7 @@ function handleSelect(service: EmailService) {
 }
 
 const addEmailRes = createResource({
-  url: "helpdesk.api.settings.create_email_account",
+  url: "helpdesk.api.settings.email.create_email_account",
   makeParams: (val: EmailAccount) => {
     return {
       ...val,
