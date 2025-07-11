@@ -11,7 +11,7 @@ def on_update(invitation: frappe.model.document.Document, event: typing.Any) -> 
         agent_manager_role = "Agent Manager"
         if "System Manager" in current_roles:
             user.append_roles(agent_role, agent_manager_role)
-        elif agent_manager_role:
+        elif agent_manager_role in current_roles:
             user.append_roles(agent_role)
         block_modules = frappe.get_all(
             "Module Def",
