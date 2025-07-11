@@ -141,7 +141,7 @@
                 >
                   <FormControl
                     type="checkbox"
-                    :model-value="state.toggleAllChildValues"
+                    :model-value="toggleAllChildValues"
                     @update:model-value="handleSelectAllChildValues"
                     class="mr-2"
                   />
@@ -187,7 +187,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { call, createResource, FormControl } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
 
@@ -205,8 +205,6 @@ const state = reactive({
 
   parentSearch: "",
   childSearch: "",
-
-  toggleAllChildValues: false,
 });
 
 const filteredParentFieldValues = computed(() => {
@@ -303,31 +301,48 @@ function isChildValueSelected(childValue) {
   );
 }
 
+const toggleAllChildValues = computed({
+  get() {
+    const parent = state.currentParentSelection;
+    if (!parent) return false;
+    // If no child values are selected, return false
+    if (!(state.childSelections[parent] instanceof Set)) {
+      return false;
+    }
+    // If all filtered child values are selected, return true
+    return (
+      state.childSelections[parent].size ===
+      filteredChildFieldValues.value.length
+    );
+  },
+  set(value) {
+    handleSelectAllChildValues(value);
+  },
+});
+
 const toggleCheckboxLabel = computed(() => {
   const parent = state.currentParentSelection;
   if (!parent) return "Select All";
   const selectedCount = getSelectedChildValueCount(parent);
   if (selectedCount === 0) return "Select All";
-  if (selectedCount === filteredChildFieldValues.value.length) {
-    return "Unselect All";
-  }
   return `${selectedCount} values selected`;
 });
 
 function handleSelectAllChildValues(value) {
-  state.toggleAllChildValues = value;
   const parent = state.currentParentSelection;
   if (!parent) return;
-  // handle filtered state as well as the selected state
+
   if (!(state.childSelections[parent] instanceof Set)) {
     state.childSelections[parent] = new Set();
   }
-  if (state.toggleAllChildValues) {
-    // If "Select All" is checked, add all filtered child values
-    filteredChildFieldValues.value.forEach((v) =>
-      state.childSelections[parent].add(v)
-    );
+
+  if (value) {
+    // Select all child values
+    filteredChildFieldValues.value.forEach((childValue) => {
+      state.childSelections[parent].add(childValue);
+    });
   } else {
+    // Deselect all child values
     state.childSelections[parent].clear();
   }
 }
@@ -345,6 +360,13 @@ watch(
   () => state.selectedChildField,
   async (newChildField) => {
     state.childFieldValues = await handleFieldValues(newChildField, false);
+  }
+);
+
+watch(
+  () => state.currentParentSelection,
+  () => {
+    state.childSearch = ""; // Reset child search when parent selection changes
   }
 );
 </script>
