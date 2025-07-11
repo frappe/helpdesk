@@ -230,7 +230,7 @@ function getSelectedChildValueCount(parent) {
 }
 
 const fields = createResource({
-  url: "helpdesk.api.ticket_meta.get_fields_meta",
+  url: "helpdesk.helpdesk.doctype.hd_ticket.api.get_fields_meta",
   auto: true,
   params: {
     doctype: "HD Ticket",
