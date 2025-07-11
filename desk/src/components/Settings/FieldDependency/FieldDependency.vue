@@ -22,6 +22,7 @@
             variant="solid"
             size="sm"
             :disabled="!state.selectedParentField"
+            @click="handleSubmit"
           />
         </div>
       </div>
@@ -121,15 +122,25 @@
                 </template>
               </FormControl>
               <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+                <!-- Master Check box -->
+                <li
+                  class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
+                >
+                  <FormControl
+                    type="checkbox"
+                    :model-value="toggleAllChildValues"
+                    @update:model-value="handleMasterCheckboxUpdate"
+                    class="mr-2"
+                  />
+                  <span class="text-base text-ink-gray-8 font-medium">
+                    {{ masterCheckboxLabel }}
+                  </span>
+                </li>
                 <ul>
                   <li
                     v-for="value in filteredChildFieldValues"
                     :key="value"
                     class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
-                    :class="{
-                      'bg-surface-gray-2 hover:bg-surface-gray-3':
-                        isChildValueSelected(value),
-                    }"
                     @click="handleChildValueClick(value)"
                   >
                     <FormControl
@@ -182,6 +193,57 @@ const state = reactive({
   parentSearch: "",
   childSearch: "",
 });
+
+const filteredParentFieldValues = computed(() => {
+  if (!state.parentSearch) return state.parentFieldValues;
+  return state.parentFieldValues.filter((v) =>
+    v.toLowerCase().includes(state.parentSearch.toLowerCase())
+  );
+});
+
+const filteredChildFieldValues = computed(() => {
+  if (!state.childSearch) return state.childFieldValues;
+  return state.childFieldValues.filter((v) =>
+    v.toLowerCase().includes(state.childSearch.toLowerCase())
+  );
+});
+
+const toggleAllChildValues = computed({
+  get() {
+    const parent = state.currentParentSelection;
+    if (!parent || !state.childFieldValues.length) return false;
+    const selectedSet = state.childSelections[parent];
+    return (
+      selectedSet instanceof Set &&
+      state.childFieldValues.every((val) => selectedSet.has(val))
+    );
+  },
+  set(value) {
+    handleMasterCheckboxUpdate(value);
+  },
+});
+
+const masterCheckboxLabel = computed(() => {
+  // check the length of items selected and if selected show "4 items selected"
+  // if no item is selected show "Select All"
+  const parent = state.currentParentSelection;
+  if (!parent) return "Select All";
+  const selectedCount = getSelectedChildValueCound(parent);
+  if (selectedCount > 0) {
+    return `${selectedCount} item${selectedCount > 1 ? "s" : ""} selected`;
+  }
+  if (state.childFieldValues.length > 0) {
+    return "Select All";
+  }
+});
+
+function getSelectedChildValueCound(parent) {
+  const selectedCount =
+    state.childSelections[parent] instanceof Set
+      ? state.childSelections[parent].size
+      : 0;
+  return selectedCount;
+}
 
 const fields = createResource({
   url: "helpdesk.api.ticket_meta.get_fields_meta",
@@ -262,6 +324,21 @@ function handleChildValueClick(childValue) {
     state.childSelections[parent].add(childValue);
   }
 }
+function handleMasterCheckboxUpdate(value) {
+  const parent = state.currentParentSelection;
+  if (!parent) return;
+  if (!value) {
+    state.childSelections[parent] = new Set();
+    return;
+  }
+  const selectedChildValues = Array.from(state.childSelections[parent]);
+  const valuesToSelect = state.childFieldValues.filter(
+    (val) => !selectedChildValues.includes(val)
+  );
+  valuesToSelect.forEach((val) => {
+    handleChildValueClick(val);
+  });
+}
 
 function isChildValueSelected(childValue) {
   const parent = state.currentParentSelection;
@@ -271,23 +348,7 @@ function isChildValueSelected(childValue) {
   );
 }
 
-const filteredParentFieldValues = computed(() => {
-  if (!state.parentSearch) return state.parentFieldValues;
-  return state.parentFieldValues.filter((v) =>
-    v.toLowerCase().includes(state.parentSearch.toLowerCase())
-  );
-});
-
-const filteredChildFieldValues = computed(() => {
-  if (!state.childSearch) return state.childFieldValues;
-  return state.childFieldValues.filter((v) =>
-    v.toLowerCase().includes(state.childSearch.toLowerCase())
-  );
-});
-
-function handleSubmit() {
-  // Handle form submission
-  console.log("Parent Field:", state.selectedParentField);
-  console.log("Child Field:", state.selectedChildField);
-}
+// function handleSubmit() {
+//   state.reset2();
+// }
 </script>
