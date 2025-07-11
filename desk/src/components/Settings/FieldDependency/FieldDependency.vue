@@ -88,7 +88,20 @@
                     @click="handleParentValueClick(value)"
                   >
                     <span class="text-base text-ink-gray-6">{{ value }}</span>
-                    <LucideChevronRight class="h-4 w-4 text-ink-gray-6" />
+                    <LucideChevronRight
+                      class="h-4 w-4 text-ink-gray-6"
+                      v-if="
+                        getSelectedChildValueCount(value) === 0 ||
+                        state.currentParentSelection === value
+                      "
+                    />
+                    <Badge
+                      v-else
+                      :label="getSelectedChildValueCount(value)"
+                      :theme="'gray'"
+                      variant="subtle"
+                      class="!h-4"
+                    />
                   </li>
                 </ul>
               </div>
@@ -128,12 +141,12 @@
                 >
                   <FormControl
                     type="checkbox"
-                    :model-value="toggleAllChildValues"
-                    @update:model-value="handleMasterCheckboxUpdate"
+                    :model-value="state.toggleAllChildValues"
+                    @update:model-value="handleSelectAllChildValues"
                     class="mr-2"
                   />
                   <span class="text-base text-ink-gray-8 font-medium">
-                    {{ masterCheckboxLabel }}
+                    {{ toggleCheckboxLabel }}
                   </span>
                 </li>
                 <ul>
@@ -174,7 +187,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { call, createResource, FormControl } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
 
@@ -192,6 +205,8 @@ const state = reactive({
 
   parentSearch: "",
   childSearch: "",
+
+  toggleAllChildValues: false,
 });
 
 const filteredParentFieldValues = computed(() => {
@@ -208,36 +223,7 @@ const filteredChildFieldValues = computed(() => {
   );
 });
 
-const toggleAllChildValues = computed({
-  get() {
-    const parent = state.currentParentSelection;
-    if (!parent || !state.childFieldValues.length) return false;
-    const selectedSet = state.childSelections[parent];
-    return (
-      selectedSet instanceof Set &&
-      state.childFieldValues.every((val) => selectedSet.has(val))
-    );
-  },
-  set(value) {
-    handleMasterCheckboxUpdate(value);
-  },
-});
-
-const masterCheckboxLabel = computed(() => {
-  // check the length of items selected and if selected show "4 items selected"
-  // if no item is selected show "Select All"
-  const parent = state.currentParentSelection;
-  if (!parent) return "Select All";
-  const selectedCount = getSelectedChildValueCound(parent);
-  if (selectedCount > 0) {
-    return `${selectedCount} item${selectedCount > 1 ? "s" : ""} selected`;
-  }
-  if (state.childFieldValues.length > 0) {
-    return "Select All";
-  }
-});
-
-function getSelectedChildValueCound(parent) {
+function getSelectedChildValueCount(parent) {
   const selectedCount =
     state.childSelections[parent] instanceof Set
       ? state.childSelections[parent].size
@@ -263,22 +249,6 @@ const fields = createResource({
     return data;
   },
 });
-
-// parent field watcher
-watch(
-  () => state.selectedParentField,
-  async (newParentField) => {
-    state.parentFieldValues = await handleFieldValues(newParentField, true);
-  }
-);
-
-// child field watcher
-watch(
-  () => state.selectedChildField,
-  async (newChildField) => {
-    state.childFieldValues = await handleFieldValues(newChildField, false);
-  }
-);
 
 async function handleFieldValues(fieldname, isParentField) {
   if (!fieldname) return [];
@@ -324,21 +294,6 @@ function handleChildValueClick(childValue) {
     state.childSelections[parent].add(childValue);
   }
 }
-function handleMasterCheckboxUpdate(value) {
-  const parent = state.currentParentSelection;
-  if (!parent) return;
-  if (!value) {
-    state.childSelections[parent] = new Set();
-    return;
-  }
-  const selectedChildValues = Array.from(state.childSelections[parent]);
-  const valuesToSelect = state.childFieldValues.filter(
-    (val) => !selectedChildValues.includes(val)
-  );
-  valuesToSelect.forEach((val) => {
-    handleChildValueClick(val);
-  });
-}
 
 function isChildValueSelected(childValue) {
   const parent = state.currentParentSelection;
@@ -348,7 +303,48 @@ function isChildValueSelected(childValue) {
   );
 }
 
-// function handleSubmit() {
-//   state.reset2();
-// }
+const toggleCheckboxLabel = computed(() => {
+  const parent = state.currentParentSelection;
+  if (!parent) return "Select All";
+  const selectedCount = getSelectedChildValueCount(parent);
+  if (selectedCount === 0) return "Select All";
+  if (selectedCount === filteredChildFieldValues.value.length) {
+    return "Unselect All";
+  }
+  return `${selectedCount} values selected`;
+});
+
+function handleSelectAllChildValues(value) {
+  state.toggleAllChildValues = value;
+  const parent = state.currentParentSelection;
+  if (!parent) return;
+  // handle filtered state as well as the selected state
+  if (!(state.childSelections[parent] instanceof Set)) {
+    state.childSelections[parent] = new Set();
+  }
+  if (state.toggleAllChildValues) {
+    // If "Select All" is checked, add all filtered child values
+    filteredChildFieldValues.value.forEach((v) =>
+      state.childSelections[parent].add(v)
+    );
+  } else {
+    state.childSelections[parent].clear();
+  }
+}
+
+// parent field watcher
+watch(
+  () => state.selectedParentField,
+  async (newParentField) => {
+    state.parentFieldValues = await handleFieldValues(newParentField, true);
+  }
+);
+
+// child field watcher
+watch(
+  () => state.selectedChildField,
+  async (newChildField) => {
+    state.childFieldValues = await handleFieldValues(newChildField, false);
+  }
+);
 </script>
