@@ -138,11 +138,11 @@
                 <!-- Master Check box -->
                 <li
                   class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
+                  @click="handleSelectAllChildValues(!toggleAllChildValues)"
                 >
                   <FormControl
                     type="checkbox"
                     :model-value="toggleAllChildValues"
-                    @update:model-value="handleSelectAllChildValues"
                     class="mr-2"
                   />
                   <span class="text-base text-ink-gray-8 font-medium">
