@@ -41,12 +41,17 @@ website_route_rules = [
     },
 ]
 
+allowed_user_invitation_roles = ["System Manager", "Agent", "Agent Manager"]
+
 doc_events = {
     "Contact": {
         "before_insert": "helpdesk.helpdesk.hooks.contact.before_insert",
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
+    },
+    "User Invitation": {
+        "on_update": "helpdesk.helpdesk.hooks.user_invitation.on_update",
     },
 }
 

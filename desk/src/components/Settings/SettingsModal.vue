@@ -40,11 +40,14 @@ import { markRaw, ModelRef, ref, watch } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
+import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
+import InviteAgent from "./InviteAgent.vue";
+
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
@@ -69,6 +72,11 @@ let tabs = [
     label: "Agents",
     icon: markRaw(LucideUser),
     component: markRaw(Agents),
+  },
+  {
+    label: "Invite Agent",
+    icon: markRaw(LucideUserPlus),
+    component: markRaw(InviteAgent),
   },
   {
     label: "Teams",
