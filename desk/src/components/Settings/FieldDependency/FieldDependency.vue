@@ -21,7 +21,11 @@
             label="Save"
             variant="solid"
             size="sm"
-            :disabled="!state.selectedParentField"
+            :disabled="
+              !state.selectedParentField ||
+              !state.selectedChildField ||
+              Object.keys(state.childSelections).length === 0
+            "
             @click="handleSubmit"
           />
         </div>
@@ -248,6 +252,24 @@ const fields = createResource({
   },
 });
 
+const createFieldDependency = createResource({
+  url: "helpdesk.api.settings.field_dependency.create_field_dependency",
+  auto: false,
+  makeParams: () => ({
+    parent_field: state.selectedParentField,
+    child_field: state.selectedChildField,
+    parent_child_mapping: stringifyParentChildMapping(),
+  }),
+});
+
+function stringifyParentChildMapping() {
+  const mapping = {};
+  Object.keys(state.childSelections).forEach((parent) => {
+    mapping[parent] = Array.from(state.childSelections[parent]);
+  });
+  return JSON.stringify(mapping);
+}
+
 async function handleFieldValues(fieldname, isParentField) {
   if (!fieldname) return [];
 
@@ -345,6 +367,11 @@ function handleSelectAllChildValues(value) {
     // Deselect all child values
     state.childSelections[parent].clear();
   }
+}
+
+function handleSubmit() {
+  debugger;
+  createFieldDependency.submit();
 }
 
 // parent field watcher
