@@ -315,3 +315,168 @@ export async function removeAttachmentFromServer(attachment: string) {
     name: attachment,
   });
 }
+export const convertToConditions = ({
+  conditions,
+  isNested = false,
+  fieldPrefix,
+}: {
+  conditions: any;
+  isNested?: boolean;
+  fieldPrefix?: string;
+}): string => {
+  if (!conditions) {
+    return "";
+  }
+
+  if (!Array.isArray(conditions)) {
+    conditions = [conditions];
+  }
+
+  const conditionsStr: string[] = [];
+
+  for (const condition of conditions) {
+    const field = condition.field;
+    let operator = (condition.operator || "==").toLowerCase();
+    const value = condition.value;
+
+    // Handle nested conditions
+    if (field === "group" && Array.isArray(value)) {
+      const nestedCondition = convertToConditions({
+        conditions: value,
+        isNested: true,
+        fieldPrefix,
+      });
+      conditionsStr.push(`(${nestedCondition})`);
+      continue;
+    }
+
+    // Skip if field is not properly defined
+    if (typeof field !== "object" || !field.fieldname) {
+      continue;
+    }
+
+    const fieldname = field.fieldname;
+    const fieldtype = field.fieldtype || "";
+    const fieldAccess = fieldPrefix ? `${fieldPrefix}.${fieldname}` : fieldname;
+
+    // Operator mapping
+    const operatorMap: Record<string, string> = {
+      equals: "==",
+      "=": "==",
+      "!=": "!=",
+      "not equals": "!=",
+      "<": "<",
+      "<=": "<=",
+      ">": ">",
+      ">=": ">=",
+      in: "in",
+      "not in": "not in",
+      like: "like",
+      "not like": "not like",
+      is: "is",
+      "is not": "is not",
+      between: "between",
+      timespan: "timespan",
+    };
+    let op = operatorMap[operator] || operator;
+
+    let valueStr = "";
+    let conditionStr = "";
+    if (typeof value === "string") {
+      if (fieldtype === "Check") {
+        if (["yes", "true", "1"].includes(value.toLowerCase())) {
+          valueStr = "1";
+        } else {
+          valueStr = "0";
+        }
+        if (op === "==" && valueStr === "1") {
+          conditionsStr.push(fieldAccess);
+          continue;
+        } else if (op === "==" && valueStr === "0") {
+          conditionsStr.push(`not ${fieldAccess}`);
+          continue;
+        }
+      } else if (op === "timespan") {
+        conditionsStr.push(`# Timespan: ${value} not implemented`);
+        continue;
+      } else if (op === "between" && value.includes(",")) {
+        const [start, end] = value.split(",").map((v: string) => v.trim());
+        conditionsStr.push(
+          `(${fieldAccess} >= '${start}' and ${fieldAccess} <= '${end}')`
+        );
+        continue;
+      } else if ((op === "in" || op === "not in") && value.includes(",")) {
+        const items = value.split(",").map((v: string) => `'${v.trim()}'`);
+        valueStr = `[${items.join(", ")}]`;
+        conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+      } else if (op === "like") {
+        conditionStr = `'${value}' in ${fieldAccess}`;
+      } else if (op === "not like") {
+        conditionStr = `'${value}' not in ${fieldAccess}`;
+      } else if (op === "is" && value.toLowerCase() === "set") {
+        conditionStr = fieldAccess;
+      } else if (op === "is" && value.toLowerCase() === "not set") {
+        conditionStr = `not ${fieldAccess}`;
+      } else {
+        valueStr = `'${value}'`;
+        conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+      }
+    } else if (typeof value === "number" || typeof value === "boolean") {
+      valueStr =
+        typeof value === "boolean"
+          ? String(value).toLowerCase()
+          : String(value);
+      conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+    } else if (value === null || value === undefined) {
+      valueStr = "None";
+      conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+    } else {
+      valueStr = String(value);
+      conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+    }
+
+    if (
+      fieldtype === "Check" &&
+      op === "==" &&
+      (valueStr === "0" || valueStr === "1")
+    ) {
+      if (valueStr === "1") {
+        conditionStr = fieldAccess;
+      } else {
+        conditionStr = `not ${fieldAccess}`;
+      }
+    }
+
+    conditionsStr.push(conditionStr);
+  }
+
+  if (conditionsStr.length === 0) {
+    return "";
+  }
+
+  // Use conjunction from the last processed condition (default to 'and')
+  const conjunction = (conditions[0]?.conjunction || "and").toLowerCase();
+  let result = conditionsStr.join(` ${conjunction} `);
+
+  if (
+    !isNested &&
+    conditions.length === 1 &&
+    !result.includes("(") &&
+    !result.includes(")")
+  ) {
+    return result;
+  }
+
+  result = result.replace(/  +/g, " ").replace(/  +/g, " ").trim();
+
+  if (isNested && conditions.length > 1) {
+    result = `(${result})`;
+  }
+
+  // Remove any double parentheses
+  while (result.includes("((") && result.includes("))")) {
+    result = result.replace("((", "(").replace("))", ")");
+  }
+
+  return result;
+};

@@ -28,32 +28,7 @@
         />
       </div>
       <div>
-        <Dropdown
-          placement="right"
-          :options="[
-            {
-              label: 'Duplicate',
-              onClick: () => {
-                duplicateDialog = {
-                  show: true,
-                  name: props.data.name + ' (Copy)',
-                };
-              },
-              icon: 'copy',
-            },
-            {
-              label: 'Confirm Delete',
-              component: (props) =>
-                TemplateOption({
-                  option: isConfirmingDelete ? 'Confirm Delete' : 'Delete',
-                  icon: 'trash-2',
-                  active: props.active,
-                  variant: isConfirmingDelete ? 'danger' : 'gray',
-                  onClick: (event) => deleteSla(event),
-                }),
-            },
-          ]"
-        >
+        <Dropdown placement="right" :options="dropdownOptions">
           <Button
             icon="more-horizontal"
             variant="ghost"
@@ -98,9 +73,11 @@ import {
   Dialog,
   Badge,
 } from "frappe-ui";
-import { ref } from "vue";
-import { slaActiveScreen, slaPolicyListData } from "@/stores/sla";
+import { ref, inject } from "vue";
+import { slaActiveScreen } from "@/stores/sla";
 import { TemplateOption } from "@/utils";
+
+const slaPolicyList = inject<any>("slaPolicyList");
 
 const duplicateDialog = ref({
   show: false,
@@ -116,6 +93,43 @@ const props = defineProps({
 
 const isConfirmingDelete = ref(false);
 
+const dropdownOptions = [
+  {
+    label: "Duplicate",
+    onClick: () => {
+      duplicateDialog.value = {
+        show: true,
+        name: props.data.name + " (Copy)",
+      };
+    },
+    icon: "copy",
+  },
+  {
+    label: "Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "gray",
+        onClick: (event) => deleteSla(event),
+      }),
+    condition: () => !isConfirmingDelete.value,
+  },
+  {
+    label: "Confirm Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Confirm Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "danger",
+        onClick: (event) => deleteSla(event),
+      }),
+    condition: () => isConfirmingDelete.value,
+  },
+];
+
 const duplicate = () => {
   createResource({
     url: "helpdesk.api.sla.duplicate_sla",
@@ -124,7 +138,7 @@ const duplicate = () => {
       new_name: duplicateDialog.value.name,
     },
     onSuccess: (data) => {
-      slaPolicyListData.reload();
+      slaPolicyList.reload();
       toast.success("SLA policy duplicated");
       duplicateDialog.value = {
         show: false,
@@ -147,18 +161,13 @@ const deleteSla = (event) => {
     return;
   }
 
-  createResource({
-    url: "frappe.client.delete",
-    params: {
-      doctype: "HD Service Level Agreement",
-      name: props.data.name,
-    },
+  slaPolicyList.delete.submit(props.data.name, {
     onSuccess: () => {
-      slaPolicyListData.reload();
-      isConfirmingDelete.value = false;
       toast.success("SLA policy deleted");
     },
-    auto: true,
+    onError: (error) => {
+      toast.error(error.messages[0] || "Failed to delete SLA policy");
+    },
   });
 };
 
@@ -167,19 +176,19 @@ const onToggle = () => {
     toast.error("SLA set as default cannot be disabled");
     return;
   }
-  createResource({
-    url: "frappe.client.set_value",
-    params: {
-      doctype: "HD Service Level Agreement",
+  slaPolicyList.setValue.submit(
+    {
       name: props.data.name,
-      fieldname: "enabled",
-      value: !props.data.enabled,
+      enabled: !props.data.enabled,
     },
-    onSuccess: () => {
-      slaPolicyListData.reload();
-      toast.success("SLA policy status updated");
-    },
-    auto: true,
-  });
+    {
+      onSuccess: () => {
+        toast.success("SLA policy status updated");
+      },
+      onError: (error) => {
+        toast.error(error.messages[0] || "Failed to update SLA policy");
+      },
+    }
+  );
 };
 </script>

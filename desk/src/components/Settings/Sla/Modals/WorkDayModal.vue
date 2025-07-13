@@ -47,9 +47,7 @@
             :class="{ 'border-red-500': errors.workday }"
             @blur="validateField('workday')"
           />
-          <span v-if="errors.workday" class="text-red-500 text-xs">
-            {{ errors.workday }}
-          </span>
+          <ErrorMessage :message="errors.workday" />
         </div>
 
         <div>
@@ -63,9 +61,7 @@
             :class="{ 'border-red-500': errors.start_time }"
             @blur="validateField('start_time')"
           />
-          <span v-if="errors.start_time" class="text-red-500 text-xs">
-            {{ errors.start_time }}
-          </span>
+          <ErrorMessage :message="errors.start_time" />
         </div>
 
         <div>
@@ -79,9 +75,7 @@
             :class="{ 'border-red-500': errors.end_time }"
             @blur="validateTimeRange"
           />
-          <span v-if="errors.end_time" class="text-red-500 text-xs">
-            {{ errors.end_time }}
-          </span>
+          <ErrorMessage :message="errors.end_time" />
         </div>
       </div>
     </template>

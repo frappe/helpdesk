@@ -37,27 +37,7 @@
           </div>
         </div>
         <div class="flex justify-end">
-          <Dropdown
-            placement="right"
-            :options="[
-              {
-                label: 'Edit',
-                onClick: () => editHoliday(holiday),
-                icon: 'edit',
-              },
-              {
-                label: 'Confirm Delete',
-                component: (props) =>
-                  TemplateOption({
-                    option: isConfirmingDelete ? 'Confirm Delete' : 'Delete',
-                    icon: 'trash-2',
-                    active: props.active,
-                    variant: isConfirmingDelete ? 'danger' : 'gray',
-                    onClick: (event) => deleteHoliday(event, holiday),
-                  }),
-              },
-            ]"
-          >
+          <Dropdown placement="right" :options="dropdownOptions(holiday)">
             <Button
               icon="more-horizontal"
               variant="ghost"
@@ -72,50 +52,16 @@
       No items in the list
     </div>
   </div>
-  <Dialog v-model="dialog" :options="{ size: 'sm', title: 'Edit Holiday' }">
-    <template #body-content>
-      <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-1.5">
-          <FormLabel label="Date" required />
-          <DatePicker
-            v-model="editHolidayData.holiday_date"
-            variant="subtle"
-            placeholder="Date"
-            class="w-full"
-            id="holiday_date"
-            required
-            :formatter="(date) => getFormattedDate(date)"
-          />
-        </div>
-        <FormControl
-          :type="'textarea'"
-          size="sm"
-          variant="subtle"
-          placeholder="Description"
-          label="Description"
-          v-model="editHolidayData.description"
-          required
-        />
-      </div>
-    </template>
-    <template #actions>
-      <Button
-        variant="solid"
-        @click="saveHoliday"
-        class="w-full"
-        label="Update Holiday"
-        icon-left="edit-2"
-      />
-    </template>
-  </Dialog>
+  <AddHolidayModal v-model="dialog" />
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Dropdown, DatePicker, FormControl, FormLabel } from "frappe-ui";
+import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { getFormattedDate, TemplateOption } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
+import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
 const isConfirmingDelete = ref(false);
 
@@ -125,10 +71,43 @@ interface Holiday {
   weekly_off?: number;
 }
 
-const dialog = ref(false);
-const editHolidayData = ref<Holiday>({
+const dropdownOptions = (holiday: Holiday) => [
+  {
+    label: "Edit",
+    onClick: () => editHoliday(holiday),
+    icon: "edit",
+  },
+  {
+    label: "Confirm Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Confirm Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "danger",
+        onClick: (event) => deleteHoliday(event, holiday),
+      }),
+    condition: () => isConfirmingDelete.value,
+  },
+  {
+    label: "Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "grey",
+        onClick: (event) => deleteHoliday(event, holiday),
+      }),
+    condition: () => !isConfirmingDelete.value,
+  },
+];
+
+const dialog = ref({
+  show: false,
   holiday_date: null,
   description: "",
+  isEditing: false,
 });
 
 const holidays = computed(() => {
@@ -149,32 +128,12 @@ const columns = [
 ];
 
 const editHoliday = (holiday: Holiday) => {
-  dialog.value = true;
-  editHolidayData.value = { ...holiday };
-};
-
-const saveHoliday = () => {
-  if (
-    !editHolidayData.value.holiday_date ||
-    !editHolidayData.value.description
-  ) {
-    return;
-  }
-
-  const index = holidayData.value.holidays.findIndex(
-    (h: Holiday) =>
-      getFormattedDate(h.holiday_date) ===
-      getFormattedDate(editHolidayData.value.holiday_date)
-  );
-
-  if (index !== -1) {
-    holidayData.value.holidays.splice(index, 1, {
-      ...editHolidayData.value,
-      weekly_off: 0,
-    });
-    dialog.value = false;
-    editHolidayData.value = { holiday_date: null, description: "" };
-  }
+  dialog.value = {
+    show: true,
+    holiday_date: holiday.holiday_date,
+    description: holiday.description,
+    isEditing: true,
+  };
 };
 
 const deleteHoliday = (event, holidayToDelete?: Holiday) => {
@@ -191,8 +150,6 @@ const deleteHoliday = (event, holidayToDelete?: Holiday) => {
   });
 
   holidayData.value.holidays.splice(index, 1);
-  dialog.value = false;
-  editHolidayData.value = { holiday_date: null, description: "" };
   isConfirmingDelete.value = false;
 };
 </script>

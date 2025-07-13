@@ -22,27 +22,7 @@
       </div>
     </div>
     <div class="flex justify-end">
-      <Dropdown
-        placement="right"
-        :options="[
-          {
-            label: 'Edit',
-            onClick: () => editWorkDay(),
-            icon: 'edit',
-          },
-          {
-            label: 'Confirm Delete',
-            component: (props) =>
-              TemplateOption({
-                option: isConfirmingDelete ? 'Confirm Delete' : 'Delete',
-                icon: 'trash-2',
-                active: props.active,
-                variant: isConfirmingDelete ? 'danger' : 'gray',
-                onClick: (event) => deleteWorkDay(event),
-              }),
-          },
-        ]"
-      >
+      <Dropdown placement="right" :options="dropdownOptions">
         <Button
           icon="more-horizontal"
           variant="ghost"
@@ -52,14 +32,18 @@
     </div>
   </div>
   <hr class="my-0.5" v-if="!props.isLast" />
-  <WorkDayModal v-model="dialog" :workDaysList="props.workDaysList" />
+  <WorkDayModal
+    v-model="dialog"
+    :workDaysList="slaData.support_and_resolution"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
 import { Button, Select } from "frappe-ui";
-import WorkDayModal from "./WorkDayModal.vue";
+import WorkDayModal from "./Modals/WorkDayModal.vue";
 import { getGridTemplateColumnsForTable, TemplateOption } from "@/utils";
+import { slaData } from "@/stores/sla";
 
 interface Column {
   key: string;
@@ -78,7 +62,6 @@ const props = defineProps<{
   columns: Column[];
   row: WorkDay;
   isLast?: boolean;
-  workDaysList: WorkDay[];
 }>();
 
 const workDayOptions = [
@@ -99,6 +82,38 @@ const dialog = ref({
 
 const isConfirmingDelete = ref(false);
 
+const dropdownOptions = [
+  {
+    label: "Edit",
+    onClick: () => editWorkDay(),
+    icon: "edit",
+  },
+  {
+    label: "Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "gray",
+        onClick: (event) => deleteWorkDay(event),
+      }),
+    condition: () => !isConfirmingDelete.value,
+  },
+  {
+    label: "Confirm Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Confirm Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "danger",
+        onClick: (event) => deleteWorkDay(event),
+      }),
+    condition: () => isConfirmingDelete.value,
+  },
+];
+
 const deleteWorkDay = (event) => {
   event.preventDefault();
   if (!isConfirmingDelete.value) {
@@ -106,9 +121,9 @@ const deleteWorkDay = (event) => {
     return;
   }
 
-  const item = props.workDaysList.indexOf(props.row);
+  const item = slaData.value.support_and_resolution.indexOf(props.row);
   if (item !== -1) {
-    props.workDaysList.splice(item, 1);
+    slaData.value.support_and_resolution.splice(item, 1);
   }
 };
 

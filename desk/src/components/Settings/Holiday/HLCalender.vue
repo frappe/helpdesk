@@ -149,86 +149,25 @@
       </div>
     </div>
   </div>
-  <Dialog
-    v-model="dialog"
-    :options="{
-      size: 'sm',
-      title: editHolidayData.isEditing ? 'Edit Holiday' : 'Add Holiday',
-    }"
-    @after-leave="resetErrors"
-  >
-    <template #body-content>
-      <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-1.5">
-          <FormLabel label="Date" required />
-          <DatePicker
-            v-model="editHolidayData.holiday_date"
-            variant="subtle"
-            placeholder="Date"
-            :formatter="(date) => getFormattedDate(date)"
-            class="w-full"
-            id="holiday_date"
-            required
-            @change="addHolidayErrors.holiday_date = ''"
-          />
-          <div
-            v-if="addHolidayErrors.holiday_date"
-            class="text-red-500 text-xs mt-1"
-          >
-            {{ addHolidayErrors.holiday_date }}
-          </div>
-        </div>
-        <div class="flex flex-col gap-1.5">
-          <FormControl
-            :type="'textarea'"
-            size="sm"
-            variant="subtle"
-            placeholder="Description"
-            label="Description"
-            v-model="editHolidayData.description"
-            required
-            @change="addHolidayErrors.description = ''"
-          />
-          <div
-            v-if="addHolidayErrors.description"
-            class="text-red-500 text-xs mt-1"
-          >
-            {{ addHolidayErrors.description }}
-          </div>
-        </div>
-      </div>
-    </template>
-    <template #actions>
-      <Button
-        variant="solid"
-        @click="saveHoliday"
-        class="w-full"
-        :icon-left="editHolidayData.isEditing ? 'edit-2' : 'plus'"
-        :label="editHolidayData.isEditing ? 'Update Holiday' : 'Add Holiday'"
-      />
-    </template>
-  </Dialog>
+  <AddHolidayModal v-model="dialog" />
 </template>
 
 <script setup lang="ts">
 import { getFormattedDate, htmlToText } from "@/utils";
-import { toast, DatePicker, FormLabel, Popover } from "frappe-ui";
+import { Popover } from "frappe-ui";
 import { useDatePicker } from "frappe-ui/src/components/DatePicker/useDatePicker";
 import { ref, watch } from "vue";
 import { holidayData } from "@/stores/holidayList";
 import dayjs from "dayjs";
+import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
-const addHolidayErrors = ref({
-  holiday_date: "",
-  description: "",
-});
-
-const dialog = ref(false);
-const editHolidayData = ref({
+const dialog = ref({
+  show: false,
   holiday_date: null,
   description: "",
   isEditing: false,
 });
+
 const {
   currentYear,
   currentMonth,
@@ -276,17 +215,13 @@ const handleMouseLeave = (date, callback) => {
   }, 350);
 };
 
-const resetErrors = () => {
-  addHolidayErrors.value = {
-    holiday_date: "",
-    description: "",
-  };
-};
-
 const addHoliday = (date) => {
-  editHolidayData.value.holiday_date = dayjs(date);
-  editHolidayData.value.description = "";
-  dialog.value = true;
+  dialog.value = {
+    holiday_date: dayjs(date),
+    description: "",
+    show: true,
+    isEditing: false,
+  };
 };
 
 const isDateInRange = (date: Date): boolean => {
@@ -323,13 +258,17 @@ const isWeekOff = (date: Date): boolean => {
 };
 
 const editHoliday = (date) => {
-  dialog.value = true;
   const holiday = props.holidays.find((h) => {
     const holidayDate = getFormattedDate(h.holiday_date);
     const editDate = getFormattedDate(date);
     return holidayDate === editDate;
   });
-  editHolidayData.value = { ...holiday, isEditing: true };
+  dialog.value = {
+    show: true,
+    holiday_date: dayjs(holiday.holiday_date),
+    description: holiday.description,
+    isEditing: true,
+  };
 };
 
 const deleteHoliday = (event, date, callback) => {
@@ -351,86 +290,14 @@ const deleteHoliday = (event, date, callback) => {
   });
 
   props.holidays.splice(index, 1);
-  dialog.value = false;
-  editHolidayData.value = {
+  dialog.value = {
+    show: false,
     holiday_date: null,
     description: "",
     isEditing: false,
   };
   isConfirmingDelete.value = false;
   callback();
-};
-
-const saveHoliday = () => {
-  if (!editHolidayData.value.holiday_date) {
-    addHolidayErrors.value.holiday_date =
-      "Please select a date for the holiday";
-  }
-
-  if (editHolidayData.value.description?.trim() === "") {
-    addHolidayErrors.value.description = "Please enter a description";
-  }
-
-  if (
-    addHolidayErrors.value.holiday_date ||
-    addHolidayErrors.value.description
-  ) {
-    return;
-  }
-
-  if (!isDateInRange(editHolidayData.value.holiday_date)) {
-    toast.error(
-      `Holiday date is not between ${getFormattedDate(
-        holidayData.value.from_date
-      )} and ${getFormattedDate(holidayData.value.to_date)}`
-    );
-    return;
-  }
-
-  const existingHoliday = props.holidays.find(
-    (h) =>
-      getFormattedDate(h.holiday_date) ===
-      getFormattedDate(editHolidayData.value.holiday_date)
-  );
-
-  if (existingHoliday && !editHolidayData.value.isEditing) {
-    toast.error(
-      `Holiday already exists for ${new Date(
-        editHolidayData.value.holiday_date
-      ).toLocaleDateString()}`
-    );
-    return;
-  }
-
-  const index = props.holidays.findIndex(
-    (h) =>
-      getFormattedDate(h.holiday_date) ===
-      getFormattedDate(editHolidayData.value.holiday_date)
-  );
-
-  if (index === -1 && !editHolidayData.value.isEditing) {
-    props.holidays.push({
-      ...editHolidayData.value,
-      weekly_off: 0,
-    });
-    dialog.value = false;
-    editHolidayData.value = {
-      holiday_date: null,
-      description: "",
-      isEditing: false,
-    };
-  } else {
-    props.holidays.splice(index, 1, {
-      ...editHolidayData.value,
-      weekly_off: 0,
-    });
-    dialog.value = false;
-    editHolidayData.value = {
-      holiday_date: null,
-      description: "",
-      isEditing: false,
-    };
-  }
 };
 
 const getHolidayDescription = (date: Date): string => {

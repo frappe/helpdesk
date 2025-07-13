@@ -6,6 +6,7 @@ export interface SlaValidationErrors {
   apply_sla_for_resolution: string;
   priorities: string;
   statuses: string;
+  statuses_conflict: string;
   holiday_list: string;
   default_priority: string;
   start_date: string;

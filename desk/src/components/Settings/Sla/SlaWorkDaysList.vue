@@ -5,7 +5,7 @@
       :style="{
         gridTemplateColumns: getGridTemplateColumnsForTable(columns),
       }"
-      v-if="workDaysList?.length !== 0"
+      v-if="slaData.support_and_resolution?.length !== 0"
     >
       <div
         v-for="column in columns"
@@ -19,17 +19,16 @@
         <span v-if="column.isRequired" class="text-red-500">*</span>
       </div>
     </div>
-    <hr class="my-0.5" v-if="workDaysList?.length !== 0" />
+    <hr class="my-0.5" v-if="slaData.support_and_resolution?.length !== 0" />
     <SlaWorkDaysListItem
-      v-for="(row, index) in workDaysList"
+      v-for="(row, index) in slaData.support_and_resolution"
       :key="index + row.workday + row.id"
       :row="row"
       :columns="columns"
-      :isLast="index === workDaysList.length - 1"
-      :workDaysList="workDaysList"
+      :isLast="index === slaData.support_and_resolution.length - 1"
     />
     <div
-      v-if="workDaysList?.length === 0"
+      v-if="slaData.support_and_resolution?.length === 0"
       class="text-center p-4 text-gray-600"
     >
       No items in the list
@@ -44,12 +43,7 @@
       @click="addWorkDay"
       icon-left="plus"
     />
-    <div
-      v-if="slaDataErrors.support_and_resolution"
-      class="text-red-500 text-xs mt-2"
-    >
-      {{ slaDataErrors.support_and_resolution }}
-    </div>
+    <ErrorMessage :message="slaDataErrors.support_and_resolution" />
   </div>
 </template>
 
@@ -59,22 +53,11 @@ import SlaWorkDaysListItem from "./SlaWorkDaysListItem.vue";
 import { slaData, slaDataErrors } from "@/stores/sla";
 import { getGridTemplateColumnsForTable } from "@/utils";
 
-interface WorkDay {
-  id: string;
-  workday: string;
-  start_time: string;
-  end_time: string;
-}
-
 interface Column {
   key: string;
   label: string;
   isRequired?: boolean;
 }
-
-const props = defineProps<{
-  workDaysList: WorkDay[];
-}>();
 
 const allDays = [
   "Monday",
@@ -87,10 +70,12 @@ const allDays = [
 ];
 
 const addWorkDay = () => {
-  const usedDays = new Set(props.workDaysList.map((day) => day.workday));
+  const usedDays = new Set(
+    slaData.value.support_and_resolution.map((day) => day.workday)
+  );
   const nextDay = allDays.find((day) => !usedDays.has(day)) || allDays[0];
 
-  props.workDaysList.push({
+  slaData.value.support_and_resolution.push({
     workday: nextDay,
     start_time: "09:00:00",
     end_time: "17:00:00",

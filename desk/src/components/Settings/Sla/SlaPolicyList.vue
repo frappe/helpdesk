@@ -1,13 +1,13 @@
 <template>
   <div
-    v-if="slaPolicyListData.loading && !slaPolicyListData.data"
+    v-if="slaPolicyList.list.loading && !slaPolicyList.list.data"
     class="flex items-center justify-center mt-12"
   >
     <LoadingIndicator class="w-4" />
   </div>
   <div v-else>
     <div
-      v-if="slaPolicyListData.data?.length === 0"
+      v-if="slaPolicyList.list.data?.length === 0"
       class="flex items-center justify-center rounded-md border border-gray-200 p-4"
     >
       <div class="text-sm text-ink-gray-7">No items in the list</div>
@@ -20,7 +20,7 @@
         <div class="col-span-1">Enabled</div>
       </div>
       <hr class="mt-2 mx-2" />
-      <div v-for="sla in slaPolicyListData.data" :key="sla.name">
+      <div v-for="sla in slaPolicyList.list.data" :key="sla.name">
         <SlaPolicyListItem :data="sla" />
         <hr class="mx-2" />
       </div>
@@ -31,5 +31,7 @@
 <script setup lang="ts">
 import { LoadingIndicator } from "frappe-ui";
 import SlaPolicyListItem from "./SlaPolicyListItem.vue";
-import { slaPolicyListData } from "@/stores/sla";
+import { inject } from "vue";
+
+const slaPolicyList = inject<any>("slaPolicyList");
 </script>

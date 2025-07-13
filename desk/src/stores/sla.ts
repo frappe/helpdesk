@@ -1,17 +1,8 @@
-import { ref } from "vue";
-import { createResource } from "frappe-ui";
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
-
-export const slaPolicyListData = createResource({
-  url: "frappe.client.get_list",
-  params: {
-    doctype: "HD Service Level Agreement",
-    fields: ["*"],
-    order_by: "modified desc",
-  },
-});
+import { ref } from "vue";
 
 export const slaData = ref({
+  name: "",
   service_level: "",
   description: "",
   enabled: false,
@@ -26,10 +17,12 @@ export const slaData = ref({
   loading: false,
   support_and_resolution: [],
   condition: [],
+  condition_json: [],
 });
 
 export const resetSlaData = () => {
   slaData.value = {
+    name: "",
     service_level: "",
     description: "",
     enabled: false,
@@ -57,6 +50,7 @@ export const resetSlaData = () => {
     loading: false,
     support_and_resolution: [],
     condition: [],
+    condition_json: [],
   };
 };
 
@@ -83,6 +77,25 @@ export const slaDataErrors = ref<SlaValidationErrors>({
   condition: "",
 });
 
+export const resetSlaDataErrors = () => {
+  slaDataErrors.value = {
+    service_level: "",
+    description: "",
+    enabled: "",
+    default_sla: "",
+    apply_sla_for_resolution: "",
+    priorities: "",
+    statuses: "",
+    statuses_conflict: "",
+    holiday_list: "",
+    default_priority: "",
+    start_date: "",
+    end_date: "",
+    support_and_resolution: "",
+    condition: "",
+  };
+};
+
 export function validateConditions(conditions: any[]): boolean {
   if (!Array.isArray(conditions)) return false;
 
@@ -105,21 +118,7 @@ type SlaField = keyof SlaValidationErrors;
 
 export function validateSlaData(key?: SlaField): SlaValidationErrors {
   // Reset all errors
-  slaDataErrors.value = {
-    service_level: "",
-    description: "",
-    enabled: "",
-    default_sla: "",
-    apply_sla_for_resolution: "",
-    priorities: "",
-    statuses: "",
-    holiday_list: "",
-    default_priority: "",
-    start_date: "",
-    end_date: "",
-    support_and_resolution: "",
-    condition: "",
-  };
+  resetSlaDataErrors();
 
   const validateField = (field: SlaField) => {
     if (key && field !== key) return;
@@ -304,8 +303,8 @@ export function validateSlaData(key?: SlaField): SlaValidationErrors {
         break;
       case "condition":
         if (
-          slaData.value.condition &&
-          !validateConditions(slaData.value.condition)
+          slaData.value.condition_json &&
+          !validateConditions(slaData.value.condition_json)
         ) {
           slaDataErrors.value.condition = "Valid conditions are required";
         } else {

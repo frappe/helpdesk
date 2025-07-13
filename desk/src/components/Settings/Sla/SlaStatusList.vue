@@ -37,13 +37,8 @@
       @click="addRow"
       icon-left="plus"
     />
-    <div
-      v-if="slaDataErrors.statuses || slaDataErrors.statuses_conflict"
-      class="text-red-500 text-xs"
-    >
-      {{ slaDataErrors.statuses }}
-      {{ slaDataErrors.statuses_conflict }}
-    </div>
+    <ErrorMessage :message="slaDataErrors.statuses" />
+    <ErrorMessage :message="slaDataErrors.statuses_conflict" />
   </div>
 </template>
 

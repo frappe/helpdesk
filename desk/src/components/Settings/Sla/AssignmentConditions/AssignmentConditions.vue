@@ -26,10 +26,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { Button, Dropdown } from "frappe-ui";
-import AssignmentCondition from "./AssignmentCondition.vue";
 import { slaDataErrors } from "@/stores/sla";
+import { Button, Dropdown } from "frappe-ui";
+import { computed, onMounted } from "vue";
+import { filterableFields } from "../utils";
+import AssignmentCondition from "./AssignmentCondition.vue";
 
 const props = defineProps({
   conditions: {
@@ -115,4 +116,9 @@ function updateConjunction(level) {
 
   updateConjunctions(props.conditions, level);
 }
+onMounted(() => {
+  if (!filterableFields.fetched) {
+    filterableFields.submit();
+  }
+});
 </script>

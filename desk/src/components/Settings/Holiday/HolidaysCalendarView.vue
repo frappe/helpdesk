@@ -2,25 +2,40 @@
   <div class="p-3 rounded-md border border-gray-300">
     <div class="mb-6 flex justify-between items-center">
       <div class="ml-2">
-        <YearsList
-          v-if="startYear !== endYear"
-          v-model="currentYear"
-          :startYear="startYear"
-          :endYear="endYear"
-        >
-          <template #trigger="{ toggle, selectedYear }">
-            <div
+        <Popover v-if="startYear !== endYear">
+          <template #target="{ togglePopover }">
+            <Button
               class="flex items-center gap-2 font-semibold text-xl cursor-pointer select-none"
-              @click="toggle"
-            >
-              {{ selectedYear }}
-              <FeatherIcon name="chevron-down" class="size-4" />
+              variant="ghost"
+              @click="onYearChange(togglePopover, currentYear)"
+              :label="currentYear + ''"
+              icon-right="chevron-down"
+            />
+          </template>
+          <template #body-main="{ togglePopover }">
+            <div class="w-24">
+              <div ref="yearsContainer" class="max-h-60 overflow-y-auto py-1">
+                <div
+                  v-for="year in yearsList"
+                  :key="year"
+                  ref="yearItems"
+                  class="cursor-pointer px-3 py-1.5 text-sm hover:bg-gray-100 flex items-center justify-between"
+                  @click="onYearChange(togglePopover, year)"
+                >
+                  {{ year }}
+                  <FeatherIcon
+                    name="check"
+                    class="size-4"
+                    v-if="year === currentYear"
+                  />
+                </div>
+              </div>
             </div>
           </template>
-        </YearsList>
+        </Popover>
         <div
           v-else
-          class="flex items-center gap-2 font-semibold text-xl select-none"
+          class="flex items-center gap-2 px-2 font-semibold text-xl select-none"
         >
           {{ startYear }}
         </div>
@@ -88,21 +103,33 @@
       />
     </div>
   </div>
-  <AddHolidayModal v-model="dialog" />
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import HLCalender from "./HLCalender.vue";
-import YearsList from "./YearsList.vue";
 import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
+import { Button, Popover } from "frappe-ui";
 
 const visibleMonths = ref<"first-half" | "second-half">("first-half");
 const months = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
 const currentYear = ref(dayjs().year());
-const dialog = ref(false);
+
 const startYear = ref(dayjs(holidayData.value.from_date || dayjs()).year());
 const endYear = ref(dayjs(holidayData.value.to_date || dayjs()).year());
+
+const yearsList = computed(() => {
+  const yearList = [];
+  for (let year = startYear.value; year <= endYear.value; year++) {
+    yearList.push(year);
+  }
+  return yearList;
+});
+
+const onYearChange = (togglePopover: () => void, year: number) => {
+  currentYear.value = year;
+  togglePopover();
+};
 
 const goToToday = () => {
   const today = dayjs();
