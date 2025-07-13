@@ -161,3 +161,25 @@ def agent_only(fn):
         return fn(*args, **kwargs)
 
     return wrapper
+
+
+contact_default_columns = [
+    {
+        "label": "Name",
+        "type": "Data",
+        "key": "full_name",
+        "width": "17rem",
+    },
+    {
+        "label": "Email",
+        "type": "Data",
+        "key": "email_id",
+        "width": "24rem",
+    },
+    {
+        "label": "Created On",
+        "type": "Datetime",
+        "key": "creation",
+        "width": "8rem",
+    },
+]

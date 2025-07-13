@@ -24,7 +24,7 @@
     "autoprefixer": "^10.4.13",
     "dayjs": "^1.11.7",
     "echarts": "^5.4.1",
-    "frappe-ui": "^0.1.165",
+    "frappe-ui": "^0.1.168",
     "gemoji": "^8.1.0",
     "lodash": "^4.17.21",
     "lucide-static": "^0.276.0",

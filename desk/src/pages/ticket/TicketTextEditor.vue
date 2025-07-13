@@ -13,15 +13,19 @@
           v-for="a in attachments"
           :key="a.file_url"
           :label="a.file_name"
+          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
             <Icon
               icon="lucide:x"
               @click.stop="
-                $emit(
-                  'update:attachments',
-                  attachments.filter((b) => b.file_url !== a.file_url)
-                )
+                () => {
+                  $emit(
+                    'update:attachments',
+                    attachments.filter((b) => b.file_url !== a.file_url)
+                  );
+                  removeAttachmentFromServer(a.name);
+                }
               "
             />
           </template>
@@ -83,6 +87,7 @@ import {
 } from "@/components";
 import { useAuthStore } from "@/stores/auth";
 import { File } from "@/types";
+import { removeAttachmentFromServer } from "@/utils";
 import { Icon } from "@iconify/vue";
 import { FileUploader, toast } from "frappe-ui";
 import { computed, ref } from "vue";
