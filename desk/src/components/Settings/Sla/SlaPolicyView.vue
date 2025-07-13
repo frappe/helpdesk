@@ -59,12 +59,10 @@
           label="Name"
           v-model="slaData.service_level"
           required
-          @change="debouncedValidateSlaData('service_level')"
+          @change="validateSlaData('service_level')"
           :disabled="slaActiveScreen.data"
         />
-        <span v-if="slaDataErrors.service_level" class="text-red-500 text-xs">
-          {{ slaDataErrors.service_level }}
-        </span>
+        <ErrorMessage :message="slaDataErrors.service_level" />
       </div>
       <FormControl
         :type="'textarea'"
@@ -93,7 +91,7 @@
           class="text-ink-gray-6 text-base font-medium"
         />
         <div class="mt-4" v-if="!slaData.default_sla">
-          <SlaAssignmentConditions :conditions="slaData.condition" />
+          <SlaAssignmentConditions :conditions="slaData.condition_json" />
         </div>
       </div>
     </div>
@@ -114,12 +112,10 @@
             placeholder="From date"
             class="w-full"
             id="from_date"
-            @change="debouncedValidateSlaData('start_date')"
+            @change="validateSlaData('start_date')"
             :formatter="(date) => getFormattedDate(date)"
           />
-          <span v-if="slaDataErrors.start_date" class="text-red-500 text-xs">
-            {{ slaDataErrors.start_date }}
-          </span>
+          <ErrorMessage :message="slaDataErrors.start_date" />
         </div>
         <div class="w-full space-y-1.5">
           <label for="to_date" class="text-sm text-gray-600">To date</label>
@@ -129,12 +125,10 @@
             placeholder="To date"
             class="w-full"
             id="to_date"
-            @change="debouncedValidateSlaData('end_date')"
+            @change="validateSlaData('end_date')"
             :formatter="(date) => getFormattedDate(date)"
           />
-          <span v-if="slaDataErrors.end_date" class="text-red-500 text-xs">
-            {{ slaDataErrors.end_date }}
-          </span>
+          <ErrorMessage :message="slaDataErrors.end_date" />
         </div>
       </div>
     </div>
@@ -154,7 +148,7 @@
           label="Apply SLA for resolution time also"
           v-model="slaData.apply_sla_for_resolution"
           class="text-ink-gray-6 text-base font-medium"
-          @change="debouncedValidateSlaData('priorities')"
+          @change="validateSlaData('priorities')"
         />
         <div class="mt-4">
           <SlaPriorityList />
@@ -179,11 +173,7 @@
       </div>
     </div>
     <hr class="my-6" />
-    <SlaHolidays
-      :workDaysList="slaData.support_and_resolution"
-      v-model="slaData.holiday_list"
-      :slaData="slaData"
-    />
+    <SlaHolidays />
   </div>
   <ConfirmDialog
     v-model="showConfirmDialog"
@@ -195,38 +185,35 @@
 </template>
 
 <script setup lang="ts">
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import {
+  resetSlaDataErrors,
   slaActiveScreen,
   slaData,
   slaDataErrors,
   validateSlaData,
 } from "@/stores/sla";
+import { convertToConditions, getFormattedDate } from "@/utils";
 import {
-  createResource,
-  Switch,
-  Checkbox,
-  DatePicker,
-  toast,
-  LoadingIndicator,
   Badge,
   Button,
+  Checkbox,
+  createResource,
+  DatePicker,
+  ErrorMessage,
+  LoadingIndicator,
+  Switch,
+  toast,
 } from "frappe-ui";
 import { onMounted, onUnmounted, ref, watch } from "vue";
+import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
+import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
-import SlaHolidays from "./SlaHolidays.vue";
-import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
-import { useDebounceFn } from "@vueuse/core";
-import { getFormattedDate } from "@/utils";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 const showConfirmDialog = ref(false);
 const isDirty = ref(false);
 const initialData = ref(null);
-
-const debouncedValidateSlaData = useDebounceFn((key: string) => {
-  validateSlaData(key);
-}, 300);
 
 const getSlaData = createResource({
   url: "helpdesk.api.sla.get_sla",
@@ -249,16 +236,16 @@ const getSlaData = createResource({
         };
       }) || [];
 
-    const conditions = JSON.parse(data.condition || "[]");
+    const condition_json = JSON.parse(data.condition_json || "[]");
 
     const newData = {
       ...data,
       statuses: [...pauseOn, ...fulfilledOn],
       loading: false,
-      condition: data.condition?.length > 0 ? conditions : [],
+      condition_json: condition_json,
     };
     slaData.value = newData;
-    initialData.value = JSON.parse(JSON.stringify(newData));
+    initialData.value = JSON.stringify(newData);
   },
 });
 
@@ -306,26 +293,19 @@ const createSla = () => {
     (status) => status.sla_behavior === "Paused"
   );
   createResource({
-    url: "helpdesk.api.sla.save_sla",
+    url: "frappe.client.insert",
     params: {
       doc: {
+        ...slaData.value,
         doctype: "HD Service Level Agreement",
-        enabled: slaData.value.enabled,
-        description: slaData.value.description,
-        service_level: slaData.value.service_level,
-        default_sla: slaData.value.default_sla,
-        apply_sla_for_resolution: slaData.value.apply_sla_for_resolution,
-        priorities: slaData.value.priorities,
         sla_fulfilled_on: fulfilledOn,
         pause_sla_on: pauseOn,
-        holiday_list: slaData.value.holiday_list,
-        default_priority: slaData.value.default_priority,
-        start_date: slaData.value.start_date,
-        end_date: slaData.value.end_date,
-        support_and_resolution: slaData.value.support_and_resolution,
-        condition: slaData.value.condition,
+        condition: convertToConditions({
+          conditions: slaData.value.condition_json,
+          fieldPrefix: "doc",
+        }),
+        condition_json: JSON.stringify(slaData.value.condition_json),
       },
-      is_new: true,
     },
     auto: true,
     onSuccess(data) {
@@ -347,27 +327,21 @@ const updateSla = () => {
     (status) => status.sla_behavior === "Paused"
   );
   createResource({
-    url: "helpdesk.api.sla.save_sla",
+    url: "frappe.client.set_value",
     params: {
-      doc: {
-        doctype: "HD Service Level Agreement",
+      doctype: "HD Service Level Agreement",
+      name: slaActiveScreen.value.data.name,
+      fieldname: {
+        ...slaData.value,
         name: slaActiveScreen.value.data.name,
-        enabled: slaData.value.enabled,
-        description: slaData.value.description,
-        service_level: slaData.value.service_level,
-        default_sla: slaData.value.default_sla,
-        apply_sla_for_resolution: slaData.value.apply_sla_for_resolution,
-        priorities: slaData.value.priorities,
         sla_fulfilled_on: fulfilledOn,
         pause_sla_on: pauseOn,
-        holiday_list: slaData.value.holiday_list,
-        default_priority: slaData.value.default_priority,
-        start_date: slaData.value.start_date,
-        end_date: slaData.value.end_date,
-        support_and_resolution: slaData.value.support_and_resolution,
-        condition: slaData.value.condition,
+        condition: convertToConditions({
+          conditions: slaData.value.condition_json,
+          fieldPrefix: "doc",
+        }),
+        condition_json: JSON.stringify(slaData.value.condition_json),
       },
-      is_new: false,
     },
     auto: true,
     onSuccess() {
@@ -396,9 +370,7 @@ watch(
   slaData,
   (newVal) => {
     if (!initialData.value) return;
-    isDirty.value =
-      JSON.stringify(Object.assign({}, newVal)) !=
-      JSON.stringify(Object.assign({}, initialData.value));
+    isDirty.value = JSON.stringify(newVal) != initialData.value;
   },
   { deep: true }
 );
@@ -415,20 +387,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   removeEventListener("beforeunload", beforeUnloadHandler);
-  slaDataErrors.value = {
-    service_level: "",
-    description: "",
-    enabled: "",
-    default_sla: "",
-    apply_sla_for_resolution: "",
-    priorities: "",
-    statuses: "",
-    holiday_list: "",
-    default_priority: "",
-    start_date: "",
-    end_date: "",
-    support_and_resolution: "",
-    condition: "",
-  };
+  resetSlaDataErrors();
 });
 </script>

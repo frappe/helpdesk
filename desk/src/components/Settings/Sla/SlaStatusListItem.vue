@@ -26,27 +26,7 @@
       </div>
     </div>
     <div class="flex justify-end">
-      <Dropdown
-        placement="right"
-        :options="[
-          {
-            label: 'Edit',
-            onClick: () => editItem(),
-            icon: 'edit',
-          },
-          {
-            label: 'Confirm Delete',
-            component: (props) =>
-              TemplateOption({
-                option: isConfirmingDelete ? 'Confirm Delete' : 'Delete',
-                icon: 'trash-2',
-                active: props.active,
-                variant: isConfirmingDelete ? 'danger' : 'gray',
-                onClick: (event) => deleteItem(event),
-              }),
-          },
-        ]"
-      >
+      <Dropdown placement="right" :options="dropdownOptions">
         <Button
           icon="more-horizontal"
           variant="ghost"
@@ -142,6 +122,7 @@ const statusData = ref({
   status: props.row.status,
   sla_behavior: props.row.sla_behavior,
 });
+
 const statusOptions = [
   {
     label: "Open",
@@ -169,6 +150,38 @@ const slaBehaviorOptions = [
   {
     label: "Paused",
     value: "Paused",
+  },
+];
+
+const dropdownOptions = [
+  {
+    label: "Edit",
+    onClick: () => editItem(),
+    icon: "edit",
+  },
+  {
+    label: "Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "gray",
+        onClick: (event) => deleteItem(event),
+      }),
+    condition: () => !isConfirmingDelete.value,
+  },
+  {
+    label: "Confirm Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Confirm Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "danger",
+        onClick: (event) => deleteItem(event),
+      }),
+    condition: () => isConfirmingDelete.value,
   },
 ];
 

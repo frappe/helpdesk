@@ -38,6 +38,7 @@
       />
     </div>
   </div>
+
   <div v-if="!holidayData.loading" class="px-10 pb-8 overflow-y-scroll h-full">
     <div class="flex items-center gap-2 mt-2">
       <span class="text-sm">
@@ -56,14 +57,9 @@
           label="Name"
           v-model="holidayData.holiday_list_name"
           required
-          @change="debouncedValidateHoliday('holiday_list_name')"
+          @change="validateHoliday('holiday_list_name')"
         />
-        <div
-          v-if="holidayDataErrors.holiday_list_name"
-          class="text-red-500 text-xs mt-1"
-        >
-          {{ holidayDataErrors.holiday_list_name }}
-        </div>
+        <ErrorMessage :message="holidayDataErrors.holiday_list_name" />
       </div>
       <FormControl
         :type="'textarea'"
@@ -92,20 +88,11 @@
             class="w-full"
             id="from_date"
             :formatter="(date) => getFormattedDate(date)"
-            @change="debouncedUpdateDuration('from_date')"
+            :debounce="300"
+            @update:model-value="updateDuration('from_date')"
           />
-          <div
-            v-if="holidayDataErrors.from_date"
-            class="text-red-500 text-xs mt-1"
-          >
-            {{ holidayDataErrors.from_date }}
-          </div>
-          <div
-            v-if="holidayDataErrors.dateRange"
-            class="text-red-500 text-xs mt-1"
-          >
-            {{ holidayDataErrors.dateRange }}
-          </div>
+          <ErrorMessage :message="holidayDataErrors.from_date" />
+          <ErrorMessage :message="holidayDataErrors.dateRange" />
         </div>
         <div class="w-full space-y-1.5">
           <FormLabel label="To date" for="to_date" required />
@@ -116,14 +103,10 @@
             class="w-full"
             id="to_date"
             :formatter="(date) => getFormattedDate(date)"
-            @change="debouncedUpdateDuration('to_date')"
+            :debounce="300"
+            @update:model-value="updateDuration('to_date')"
           />
-          <div
-            v-if="holidayDataErrors.to_date"
-            class="text-red-500 text-xs mt-1"
-          >
-            {{ holidayDataErrors.to_date }}
-          </div>
+          <ErrorMessage :message="holidayDataErrors.to_date" />
         </div>
       </div>
     </div>
@@ -169,14 +152,14 @@
         </div>
       </div>
       <div class="mt-4">
-        <HolidaysListView v-if="holidayListView === 'list'" />
+        <HolidaysTableView v-if="holidayListView === 'list'" />
         <HolidaysCalendarView v-else />
       </div>
       <div class="mt-4">
         <Button
           variant="subtle"
           label="Add Holiday"
-          @click="dialog = true"
+          @click="dialog.show = true"
           icon-left="plus"
         />
         <AddHolidayModal v-model="dialog" />
@@ -201,29 +184,33 @@ import {
   validateHoliday,
 } from "@/stores/holidayList";
 import {
-  createResource,
-  TabButtons,
-  DatePicker,
   Button,
+  createResource,
+  DatePicker,
   FormControl,
-  toast,
   LoadingIndicator,
+  TabButtons,
+  toast,
 } from "frappe-ui";
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import HolidaysListView from "./HolidaysListView.vue";
+import HolidaysTableView from "./HolidaysTableView.vue";
 import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
-import HolidaysCalendarView from "./HolidaysCalendarView.vue";
-import AddHolidayModal from "./AddHolidayModal.vue";
-import { getFormattedDate, htmlToText } from "@/utils";
-import FormLabel from "frappe-ui/src/components/FormLabel.vue";
-import { useDebounceFn } from "@vueuse/core";
-import dayjs from "dayjs";
-import { activeTab, tabs } from "../settingsModal";
-import { slaActiveScreen } from "@/stores/sla";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { slaActiveScreen } from "@/stores/sla";
+import { getFormattedDate, htmlToText } from "@/utils";
+import dayjs from "dayjs";
+import FormLabel from "frappe-ui/src/components/FormLabel.vue";
+import { activeTab, tabs } from "../settingsModal";
+import HolidaysCalendarView from "./HolidaysCalendarView.vue";
+import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
-const dialog = ref(false);
+const dialog = ref({
+  show: false,
+  holiday_date: null,
+  description: "",
+  isEditing: false,
+});
 
 const isDirty = ref(false);
 const initialData = ref(null);
@@ -238,7 +225,7 @@ const getHolidayData = createResource({
   },
   onSuccess(data) {
     holidayData.value = data;
-    initialData.value = JSON.parse(JSON.stringify(data));
+    initialData.value = JSON.stringify(data);
   },
   transform(data) {
     for (let holiday of data.holidays) {
@@ -254,11 +241,6 @@ if (holidayListActiveScreen.value.data?.name) {
   getHolidayData.fetch();
 }
 
-const debouncedValidateHoliday = useDebounceFn(
-  (key) => validateHoliday(key),
-  300
-);
-
 const updateDuration = (key) => {
   validateHoliday(key);
   if (
@@ -268,11 +250,6 @@ const updateDuration = (key) => {
     updateWeeklyOffDates();
   }
 };
-
-const debouncedUpdateDuration = useDebounceFn(
-  (key) => updateDuration(key),
-  300
-);
 
 const goBack = () => {
   if (isDirty.value && !showConfirmDialog.value) {
@@ -383,9 +360,7 @@ watch(
   holidayData,
   (newVal) => {
     if (!initialData.value) return;
-    isDirty.value =
-      JSON.stringify(Object.assign({}, newVal)) !=
-      JSON.stringify(Object.assign({}, initialData.value));
+    isDirty.value = JSON.stringify(newVal) != initialData.value;
   },
   { deep: true }
 );

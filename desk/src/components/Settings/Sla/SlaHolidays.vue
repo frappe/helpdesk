@@ -13,10 +13,10 @@
           <Button
             class="text-sm"
             :icon-right="open ? 'chevron-up' : 'chevron-down'"
-            :label="holidayList"
+            :label="slaData.holiday_list"
           />
         </template>
-        <template #body="{ close }">
+        <template #body>
           <div
             class="my-2 p-1 min-w-40 rounded-lg bg-surface-modal shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
           >
@@ -28,11 +28,11 @@
               >
                 <div
                   class="flex items-center gap-2 cursor-pointer"
-                  @click="holidayList = holiday.name"
+                  @click="slaData.holiday_list = holiday.name"
                 >
                   <input
                     name="holiday_list"
-                    :checked="holiday.name === holidayList"
+                    :checked="holiday.name === slaData.holiday_list"
                     type="radio"
                   />
                   <div>{{ holiday.holiday_list_name }}</div>
@@ -63,13 +63,13 @@
       </NestedPopover>
     </div>
     <div class="mt-4">
-      <SlaWorkDaysList :workDaysList="props.workDaysList" />
+      <SlaWorkDaysList />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { createResource, NestedPopover, Button } from "frappe-ui";
+import { NestedPopover, Button, createListResource } from "frappe-ui";
 import SlaWorkDaysList from "./SlaWorkDaysList.vue";
 import { activeTab, tabs } from "../settingsModal";
 import {
@@ -77,20 +77,7 @@ import {
   resetHolidayData,
 } from "@/stores/holidayList";
 import { watchDebounced } from "@vueuse/core";
-import { validateSlaData } from "@/stores/sla";
-
-const holidayList = defineModel<string>();
-
-const props = defineProps({
-  workDaysList: {
-    type: Array<any>,
-    required: true,
-  },
-  slaData: {
-    type: Object,
-    required: true,
-  },
-});
+import { slaData, validateSlaData } from "@/stores/sla";
 
 const createNewHolidayList = () => {
   activeTab.value = tabs[5];
@@ -99,7 +86,7 @@ const createNewHolidayList = () => {
     data: null,
     previousScreen: {
       screen: "view",
-      data: props.slaData.name,
+      data: slaData.value.name,
     },
   };
   resetHolidayData();
@@ -112,23 +99,19 @@ const editHolidayList = (data: any) => {
     data: data,
     previousScreen: {
       screen: "view",
-      data: props.slaData.name,
+      data: slaData.value.name,
     },
   };
 };
 
-const holidayListData = createResource({
-  url: "frappe.client.get_list",
-  params: {
-    doctype: "HD Service Holiday List",
-    fields: ["*"],
-    parent: "HD Service Level Agreement",
-  },
+const holidayListData = createListResource({
+  doctype: "HD Service Holiday List",
+  fields: ["*"],
   auto: true,
 });
 
 watchDebounced(
-  props.workDaysList,
+  slaData.value.support_and_resolution,
   () => {
     validateSlaData("support_and_resolution");
   },

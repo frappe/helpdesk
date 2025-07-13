@@ -32,27 +32,7 @@
           <div v-else>{{ holiday[column.key] }}</div>
         </div>
         <div class="flex justify-end">
-          <Dropdown
-            placement="right"
-            :options="[
-              {
-                label: 'Edit',
-                onClick: () => editHoliday(holiday),
-                icon: 'edit',
-              },
-              {
-                label: 'Confirm Delete',
-                component: (props) =>
-                  TemplateOption({
-                    option: isConfirmingDelete ? 'Confirm Delete' : 'Delete',
-                    icon: 'trash-2',
-                    active: props.active,
-                    variant: isConfirmingDelete ? 'danger' : 'gray',
-                    onClick: (event) => deleteHoliday(event, holiday),
-                  }),
-              },
-            ]"
-          >
+          <Dropdown placement="right" :options="dropdownOptions(holiday)">
             <Button
               icon="more-horizontal"
               variant="ghost"
@@ -156,13 +136,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { Select, FormLabel, Checkbox, toast, Dropdown } from "frappe-ui";
-import dayjs from "dayjs";
-import weekday from "dayjs/plugin/weekday";
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { updateWeeklyOffDates } from "@/stores/holidayList";
 import { TemplateOption } from "@/utils";
+import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import weekday from "dayjs/plugin/weekday";
+import { Checkbox, Dropdown, FormLabel, Select, toast } from "frappe-ui";
+import { computed, ref } from "vue";
+import { getRepetitionText } from "./utils";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -237,6 +218,38 @@ const workDays = ref([
   },
 ]);
 
+const dropdownOptions = (holiday: any) => [
+  {
+    label: "Edit",
+    onClick: () => editHoliday(holiday),
+    icon: "edit",
+  },
+  {
+    label: "Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "gray",
+        onClick: (event) => deleteHoliday(event, holiday),
+      }),
+    condition: () => !isConfirmingDelete.value,
+  },
+  {
+    label: "Confirm Delete",
+    component: (props) =>
+      TemplateOption({
+        option: "Confirm Delete",
+        icon: "trash-2",
+        active: props.active,
+        variant: "danger",
+        onClick: (event) => deleteHoliday(event, holiday),
+      }),
+    condition: () => isConfirmingDelete.value,
+  },
+];
+
 const availableWorkDays = computed(() => {
   const usedDays = new Set(
     props.holidays
@@ -256,32 +269,6 @@ const availableWorkDays = computed(() => {
 });
 
 const isConfirmingDelete = ref(false);
-
-const getRepetitionText = (repetition: any) => {
-  const parts: string[] = [];
-
-  if (repetition.all) {
-    parts.push("week");
-  } else {
-    if (repetition.first) parts.push("first");
-    if (repetition.second) parts.push("second");
-    if (repetition.third) parts.push("third");
-    if (repetition.fourth) parts.push("fourth");
-    if (repetition.fifth) parts.push("fifth");
-
-    if (parts.length === 0) return "";
-
-    if (parts.length > 1) {
-      const last = parts.pop();
-      parts[parts.length - 1] = `${parts[parts.length - 1]} and ${last}`;
-    }
-
-    parts[0] = parts[0].charAt(0) + parts[0].slice(1);
-    return `Every ${parts.join(", ")} week`;
-  }
-
-  return parts[0] ? `Every ${parts[0]}` : "";
-};
 
 const addHoliday = () => {
   recurringHolidayData.value = {

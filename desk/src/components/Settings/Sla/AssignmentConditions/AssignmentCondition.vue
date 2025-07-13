@@ -36,7 +36,8 @@
           <AutocompleteNew
             :options="filterableFields.data"
             v-model="props.condition.field"
-            :placeholder="'First Name'"
+            :placeholder="'Field'"
+            @update:modelValue="resetConditionValue"
           />
         </div>
         <div id="operator">
@@ -112,22 +113,22 @@
 </template>
 
 <script setup lang="ts">
+import { AutocompleteNew, Link, StarRating } from "@/components";
+import { TemplateOption } from "@/utils";
 import {
-  FormControl,
-  DatePicker,
-  DateTimePicker,
-  DateRangePicker,
-  createResource,
   Button,
+  DatePicker,
+  DateRangePicker,
+  DateTimePicker,
   Dialog,
   Dropdown,
+  FormControl,
 } from "frappe-ui";
-import { AutocompleteNew, Link, StarRating } from "@/components";
+import { computed, defineEmits, h, ref } from "vue";
 import GroupIcon from "~icons/lucide/group";
 import UnGroupIcon from "~icons/lucide/ungroup";
-import { h, defineEmits, ref, onMounted, computed } from "vue";
+import { filterableFields } from "../utils";
 import AssignmentConditions from "./AssignmentConditions.vue";
-import { TemplateOption } from "@/utils";
 
 const show = ref(false);
 const emit = defineEmits(["remove", "unGroupConditions", "updateConjunction"]);
@@ -217,28 +218,13 @@ const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 const typeDate = ["Date", "Datetime"];
 const typeRating = ["Rating"];
 
-const filterableFields = createResource({
-  url: "helpdesk.api.doc.get_filterable_fields",
-  cache: ["DocField", props.doctype],
-  auto: true,
-  params: {
-    doctype: props.doctype,
-  },
-  transform: (data) => {
-    data = data.map((field) => {
-      return {
-        label: field.label,
-        value: field.fieldname,
-        ...field,
-      };
-    });
-    return data;
-  },
-});
-
 function updateConjunction() {
   emit("updateConjunction");
 }
+
+const resetConditionValue = () => {
+  props.condition.value = "";
+};
 
 function getValueControl() {
   const { field, operator } = props.condition;
@@ -325,6 +311,7 @@ function updateOperator(event) {
   if (!isSameTypeOperator(oldOperatorValue, newOperatorValue)) {
     props.condition.value = getDefaultValue(props.condition.field);
   }
+  resetConditionValue();
 }
 
 function getOperators() {
@@ -549,8 +536,4 @@ const timespanOptions = [
     value: "next year",
   },
 ];
-
-onMounted(() => {
-  filterableFields.submit();
-});
 </script>

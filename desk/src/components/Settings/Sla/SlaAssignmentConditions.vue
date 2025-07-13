@@ -24,36 +24,7 @@
       v-if="props.conditions.length > 0"
       class="mt-2"
       v-slot="{ open }"
-      :options="[
-        {
-          label: 'Add condition',
-          onClick: () => {
-            addCondition();
-          },
-        },
-        {
-          label: 'Add condition group',
-          onClick: () => {
-            const conjunction =
-              props.conditions.length > 1
-                ? props.conditions[1]?.conjunction
-                : 'and';
-            props.conditions.push({
-              field: 'group',
-              operator: 'equals',
-              value: [
-                {
-                  field: null,
-                  operator: 'equals',
-                  value: '',
-                  conjunction: 'and',
-                },
-              ],
-              conjunction: conjunction,
-            });
-          },
-        },
-      ]"
+      :options="dropdownOptions"
     >
       <Button
         :disabled="slaDataErrors.condition !== ''"
@@ -61,15 +32,13 @@
         label="Add condition"
       />
     </Dropdown>
-    <div v-if="slaDataErrors.condition" class="text-red-500 text-xs mt-2">
-      {{ slaDataErrors.condition }}
-    </div>
+    <ErrorMessage :message="slaDataErrors.condition" />
   </div>
 </template>
 
 <script setup lang="ts">
 import AssignmentConditions from "./AssignmentConditions/AssignmentConditions.vue";
-import { Button, Dropdown, FeatherIcon } from "frappe-ui";
+import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
 import {
   slaDataErrors,
   validateConditions,
@@ -90,6 +59,35 @@ const props = defineProps({
     required: true,
   },
 });
+
+const dropdownOptions = [
+  {
+    label: "Add condition",
+    onClick: () => {
+      addCondition();
+    },
+  },
+  {
+    label: "Add condition group",
+    onClick: () => {
+      const conjunction =
+        props.conditions.length > 1 ? props.conditions[1]?.conjunction : "and";
+      props.conditions.push({
+        field: "group",
+        operator: "equals",
+        value: [
+          {
+            field: null,
+            operator: "equals",
+            value: "",
+            conjunction: "and",
+          },
+        ],
+        conjunction: conjunction,
+      });
+    },
+  },
+];
 
 const addCondition = () => {
   const isValid = validateConditions(props.conditions);

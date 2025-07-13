@@ -4,17 +4,7 @@ import {
   RepetitionPattern,
 } from "@/components/Settings/Holiday/types";
 import dayjs, { Dayjs } from "dayjs";
-import { createResource } from "frappe-ui";
 import { ref } from "vue";
-
-export const holidayListData = createResource({
-  url: "frappe.client.get_list",
-  params: {
-    doctype: "HD Service Holiday List",
-    fields: ["*"],
-    order_by: "modified desc",
-  },
-});
 
 export const holidayListActiveScreen = ref<{
   screen: "list" | "view";
