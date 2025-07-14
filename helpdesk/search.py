@@ -8,7 +8,7 @@ import re
 from contextlib import suppress
 from copy import deepcopy
 from math import isclose
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import frappe
 from bs4 import BeautifulSoup, PageElement
@@ -340,22 +340,26 @@ class HelpdeskSearch(Search):
 
 
 @frappe.whitelist()
-def search(query, only_articles=False) -> list[dict[str, list[dict]]]:
+def search(
+    query, only_articles=False, qtype: Literal["and", "or"] = "and"
+) -> list[dict[str, list[dict]]]:
     search = HelpdeskSearch()
     query = search.clean_query(query)
-    query_parts = query.split()
+    query_parts: list[str] = query.split()
     query = ""
-    for part in query_parts:
+    sep = " " if qtype == "and" else "|"
+    for part in enumerate(query_parts):
         if part in get_synonym_words():
-            query += f" {part}"
+            query += f"{sep}{part}"
             continue
         if part in get_stopwords():
             continue
         if len(part) > 3:
-            query += f" %{part}%"
+            query += f"{sep}%{part}%"
         else:
-            query += f" {part}*"
+            query += f"{sep}{part}*"
 
+    query = query.lstrip(sep)  # Remove leading separator (| at beginning is invalid)
     result = search.search(query, start=0, highlight=True)
     groups = {}
     for r in result.docs:
