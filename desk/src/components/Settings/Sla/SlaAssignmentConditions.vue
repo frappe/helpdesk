@@ -32,7 +32,7 @@
         label="Add condition"
       />
     </Dropdown>
-    <ErrorMessage :message="slaDataErrors.condition" />
+    <ErrorMessage :message="slaDataErrors.condition" class="mt-2" />
   </div>
 </template>
 

@@ -59,7 +59,10 @@
           required
           @change="validateHoliday('holiday_list_name')"
         />
-        <ErrorMessage :message="holidayDataErrors.holiday_list_name" />
+        <ErrorMessage
+          :message="holidayDataErrors.holiday_list_name"
+          class="mt-2"
+        />
       </div>
       <FormControl
         :type="'textarea'"
