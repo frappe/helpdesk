@@ -165,8 +165,6 @@ const resetInputValues = () => {
 
 const emailsToStr = (emails: readonly string[]) => emails.join(", ");
 
-let onErrorCalledOn = Date.now();
-
 const inviteByEmailResource = createResource({
   url: "frappe.core.api.user_invitation.invite_by_email",
   makeParams: () => ({
@@ -197,34 +195,13 @@ const inviteByEmailResource = createResource({
     pendingInvitesResource.reload();
     updateOnboardingStep("invite_your_team");
   },
-  onError(error: unknown) {
-    // time comparison is used to prevent the logic from executing multiple times
-    // todo: fix this bug in frappe-ui and remove this time-based hack
-    const now = Date.now();
-    if (now - onErrorCalledOn < 300) {
-      onErrorCalledOn = now;
-      return;
-    }
-    onErrorCalledOn = now;
-    toast.error(
-      error instanceof Error
-        ? error.message.includes("InvalidEmailAddressError")
-          ? "Invalid email format"
-          : error.message
-        : "Something went wrong"
-    );
-  },
 });
 
 const pendingInvitesResource = createListResource({
   doctype: "User Invitation",
   filters: { status: "Pending" },
   fields: ["name", "email", "role"],
-  auto: false,
-});
-
-onMounted(() => {
-  pendingInvitesResource.fetch();
+  auto: true,
 });
 
 const roleToLabel = (role: string) =>
