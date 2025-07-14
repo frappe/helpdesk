@@ -37,8 +37,8 @@
       @click="addRow"
       icon-left="plus"
     />
-    <ErrorMessage :message="slaDataErrors.statuses" />
-    <ErrorMessage :message="slaDataErrors.statuses_conflict" />
+    <ErrorMessage :message="slaDataErrors.statuses" class="mt-2" />
+    <ErrorMessage :message="slaDataErrors.statuses_conflict" class="mt-2" />
   </div>
 </template>
 

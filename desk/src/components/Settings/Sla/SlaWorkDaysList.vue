@@ -43,7 +43,10 @@
       @click="addWorkDay"
       icon-left="plus"
     />
-    <ErrorMessage :message="slaDataErrors.support_and_resolution" />
+    <ErrorMessage
+      :message="slaDataErrors.support_and_resolution"
+      class="mt-2"
+    />
   </div>
 </template>
 

@@ -47,7 +47,7 @@
             :class="{ 'border-red-500': errors.workday }"
             @blur="validateField('workday')"
           />
-          <ErrorMessage :message="errors.workday" />
+          <ErrorMessage :message="errors.workday" class="mt-2" />
         </div>
 
         <div>
@@ -61,7 +61,7 @@
             :class="{ 'border-red-500': errors.start_time }"
             @blur="validateField('start_time')"
           />
-          <ErrorMessage :message="errors.start_time" />
+          <ErrorMessage :message="errors.start_time" class="mt-2" />
         </div>
 
         <div>
@@ -75,7 +75,7 @@
             :class="{ 'border-red-500': errors.end_time }"
             @blur="validateTimeRange"
           />
-          <ErrorMessage :message="errors.end_time" />
+          <ErrorMessage :message="errors.end_time" class="mt-2" />
         </div>
       </div>
     </template>

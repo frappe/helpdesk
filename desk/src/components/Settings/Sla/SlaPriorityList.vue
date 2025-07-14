@@ -47,7 +47,7 @@
         icon-left="plus"
       />
     </div>
-    <div>
+    <div class="mt-2">
       <ErrorMessage :message="slaDataErrors.default_priority" />
       <ErrorMessage :message="slaDataErrors.priorities" />
     </div>

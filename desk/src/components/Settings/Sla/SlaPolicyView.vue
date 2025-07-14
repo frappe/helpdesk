@@ -62,7 +62,7 @@
           @change="validateSlaData('service_level')"
           :disabled="slaActiveScreen.data"
         />
-        <ErrorMessage :message="slaDataErrors.service_level" />
+        <ErrorMessage :message="slaDataErrors.service_level" class="mt-2" />
       </div>
       <FormControl
         :type="'textarea'"
