@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-8">
+  <div class="px-10 py-8 overflow-y-auto">
     <div class="flex items-start justify-between">
       <div class="flex flex-col gap-2">
         <h1 class="text-lg font-semibold text-ink-gray-8">Assignment rules</h1>
