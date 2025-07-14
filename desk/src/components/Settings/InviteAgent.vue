@@ -118,27 +118,25 @@ const { updateOnboardingStep } = useOnboarding("helpdesk");
 const emails = ref("");
 
 type RoleOption = Record<"label" | "value" | "description", string>;
-// todo: change role descriptions
 const roleOptions: [RoleOption, ...RoleOption[]] = [
   {
     label: "Agent",
     value: "Agent",
     description:
-      "Can work with leads and deals and create private views (reports).",
+      "Can work on tickets, create custom views and manage private views.",
   },
 ];
 const managerRoleOption: RoleOption = {
   label: "Manager",
   value: "Agent Manager",
   description:
-    "Can manage and invite new users, and create public & private views (reports).",
+    "Can invite new agents, manage tickets, create custom views and manage public views.",
 };
 if (isAdmin) {
   roleOptions.push(managerRoleOption, {
     label: "Admin",
     value: "System Manager",
-    description:
-      "Can manage all aspects of the CRM, including user management, customizations and settings.",
+    description: "Can manage all aspects of Helpdesk.",
   });
 } else if (isManager) {
   roleOptions.push(managerRoleOption);
