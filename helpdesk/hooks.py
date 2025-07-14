@@ -43,7 +43,7 @@ website_route_rules = [
 
 user_invitation = {
     "allowed_invite_roles": ["System Manager", "Agent", "Agent Manager"],
-    "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept"
+    "after_accept": "helpdesk.helpdesk.hooks.user_invitation.after_accept",
 }
 
 doc_events = {
@@ -52,7 +52,7 @@ doc_events = {
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
-    }
+    },
 }
 
 has_permission = {

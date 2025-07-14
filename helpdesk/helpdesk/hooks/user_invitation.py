@@ -1,5 +1,6 @@
 import frappe
 
+
 def after_accept(invitation: frappe.model.document.Document) -> None:
     user = frappe.get_doc("User", invitation.email)
     current_roles = {data.role for data in user.get("roles")}
