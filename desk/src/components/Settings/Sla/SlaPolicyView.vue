@@ -91,7 +91,26 @@
           class="text-ink-gray-6 text-base font-medium"
         />
         <div class="mt-4" v-if="!slaData.default_sla">
-          <SlaAssignmentConditions :conditions="slaData.condition_json" />
+          <div
+            class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
+            v-if="!useNewUI"
+          >
+            <span>
+              Conditions for this SLA were created from desk which are not
+              compatible with this UI, you will need to recreate the conditions
+              here if you want to manage and add new conditions from this UI.
+            </span>
+            <Button
+              label="I understand, add conditions"
+              variant="subtle"
+              theme="gray"
+              @click="useNewUI = true"
+            />
+          </div>
+          <SlaAssignmentConditions
+            :conditions="slaData.condition_json"
+            v-if="useNewUI"
+          />
         </div>
       </div>
     </div>
@@ -215,6 +234,8 @@ const showConfirmDialog = ref(false);
 const isDirty = ref(false);
 const initialData = ref(null);
 
+const useNewUI = ref(true);
+
 const getSlaData = createResource({
   url: "helpdesk.api.sla.get_sla",
   params: {
@@ -246,6 +267,13 @@ const getSlaData = createResource({
     };
     slaData.value = newData;
     initialData.value = JSON.stringify(newData);
+    const conditionsAvailable = slaData.value.condition.length > 0;
+    const conditionsJsonAvailable = slaData.value.condition_json.length > 0;
+    if (conditionsAvailable && !conditionsJsonAvailable) {
+      useNewUI.value = false;
+    } else {
+      useNewUI.value = true;
+    }
   },
 });
 
@@ -336,11 +364,15 @@ const updateSla = () => {
         name: slaActiveScreen.value.data.name,
         sla_fulfilled_on: fulfilledOn,
         pause_sla_on: pauseOn,
-        condition: convertToConditions({
-          conditions: slaData.value.condition_json,
-          fieldPrefix: "doc",
-        }),
-        condition_json: JSON.stringify(slaData.value.condition_json),
+        condition: useNewUI.value
+          ? convertToConditions({
+              conditions: slaData.value.condition_json,
+              fieldPrefix: "doc",
+            })
+          : slaData.value.condition,
+        condition_json: useNewUI.value
+          ? JSON.stringify(slaData.value.condition_json)
+          : null,
       },
     },
     auto: true,
