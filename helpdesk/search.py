@@ -348,7 +348,7 @@ def search(
     query_parts: list[str] = query.split()
     query = ""
     sep = " " if qtype == "and" else "|"
-    for part in enumerate(query_parts):
+    for part in query_parts:
         if part in get_synonym_words():
             query += f"{sep}{part}"
             continue
