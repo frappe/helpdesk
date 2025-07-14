@@ -84,12 +84,31 @@
         </span>
       </div>
       <div class="mt-4">
-        <Checkbox
-          label="Set as default SLA"
-          :model-value="slaData.default_sla"
-          @update:model-value="toggleDefaultSla"
-          class="text-ink-gray-6 text-base font-medium"
-        />
+        <div class="flex items-center justify-between">
+          <Checkbox
+            label="Set as default SLA"
+            :model-value="slaData.default_sla"
+            @update:model-value="toggleDefaultSla"
+            class="text-ink-gray-6 text-base font-medium"
+          />
+          <div v-if="isOldSla && slaActiveScreen.data">
+            <Popover trigger="hover" hoverDelay="0.25" placement="top-end">
+              <template #target>
+                <div class="text-sm text-ink-gray-6 flex gap-1 cursor-default">
+                  Old Conditions
+                  <FeatherIcon name="info" class="size-4" />
+                </div>
+              </template>
+              <template #body-main>
+                <div
+                  class="text-sm text-ink-gray-6 p-2 bg-white rounded-md max-w-96 text-wrap whitespace-pre-wrap leading-5"
+                >
+                  <code>{{ slaData.condition }}</code>
+                </div>
+              </template>
+            </Popover>
+          </div>
+        </div>
         <div class="mt-4" v-if="!slaData.default_sla">
           <div
             class="flex flex-col gap-3 items-center text-center text-ink-gray-7 text-sm mb-2 border border-gray-300 rounded-md p-3 py-4"
@@ -195,11 +214,11 @@
     <SlaHolidays />
   </div>
   <ConfirmDialog
-    v-model="showConfirmDialog"
-    title="Unsaved changes"
-    message="Are you sure you want to go back? Unsaved changes will be lost."
-    :onConfirm="goBack"
-    :onCancel="() => (showConfirmDialog = false)"
+    v-model="showConfirmDialog.show"
+    :title="showConfirmDialog.title"
+    :message="showConfirmDialog.message"
+    :onConfirm="showConfirmDialog.onConfirm"
+    :onCancel="() => (showConfirmDialog.show = false)"
   />
 </template>
 
@@ -221,6 +240,7 @@ import {
   DatePicker,
   ErrorMessage,
   LoadingIndicator,
+  Popover,
   Switch,
   toast,
 } from "frappe-ui";
@@ -230,11 +250,17 @@ import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
 
-const showConfirmDialog = ref(false);
+const showConfirmDialog = ref({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
 const isDirty = ref(false);
 const initialData = ref(null);
 
 const useNewUI = ref(true);
+const isOldSla = ref(false);
 
 const getSlaData = createResource({
   url: "helpdesk.api.sla.get_sla",
@@ -267,12 +293,14 @@ const getSlaData = createResource({
     };
     slaData.value = newData;
     initialData.value = JSON.stringify(newData);
-    const conditionsAvailable = slaData.value.condition.length > 0;
-    const conditionsJsonAvailable = slaData.value.condition_json.length > 0;
+    const conditionsAvailable = slaData.value.condition?.length > 0;
+    const conditionsJsonAvailable = slaData.value.condition_json?.length > 0;
     if (conditionsAvailable && !conditionsJsonAvailable) {
       useNewUI.value = false;
+      isOldSla.value = true;
     } else {
       useNewUI.value = true;
+      isOldSla.value = false;
     }
   },
 });
@@ -283,12 +311,18 @@ if (slaActiveScreen.value.data && slaActiveScreen.value.fetchData) {
 }
 
 const goBack = () => {
-  if (isDirty.value && !showConfirmDialog.value) {
-    showConfirmDialog.value = true;
+  const confirmDialogInfo = {
+    show: true,
+    title: "Unsaved changes",
+    message: "Are you sure you want to go back? Unsaved changes will be lost.",
+    onConfirm: goBack,
+  };
+  if (isDirty.value && !showConfirmDialog.value.show) {
+    showConfirmDialog.value = confirmDialogInfo;
     return;
   }
-  if (!slaActiveScreen.value.data && !showConfirmDialog.value) {
-    showConfirmDialog.value = true;
+  if (!slaActiveScreen.value.data && !showConfirmDialog.value.show) {
+    showConfirmDialog.value = confirmDialogInfo;
     return;
   }
   slaActiveScreen.value = {
@@ -307,6 +341,19 @@ const saveSla = () => {
   }
 
   if (slaActiveScreen.value.data) {
+    if (isOldSla.value && useNewUI.value) {
+      showConfirmDialog.value = {
+        show: true,
+        title: "Confirm overwrite",
+        message:
+          "Your old conditions will be overwritten. Are you sure you want to save?",
+        onConfirm: () => {
+          updateSla();
+          showConfirmDialog.value.show = false;
+        },
+      };
+      return;
+    }
     updateSla();
   } else {
     createSla();
@@ -354,6 +401,7 @@ const updateSla = () => {
   const pauseOn = slaData.value.statuses.filter(
     (status) => status.sla_behavior === "Paused"
   );
+
   createResource({
     url: "frappe.client.set_value",
     params: {
