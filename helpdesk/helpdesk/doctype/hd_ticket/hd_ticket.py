@@ -643,15 +643,16 @@ class HDTicket(Document):
                 src = tag["src"]
                 files.append(src)
         for f in files:
-            doc = frappe.get_doc(
+            file = frappe.db.exists(
                 "File",
                 {
                     "file_url": f,
-                    "attached_to_doctype": ["!=", "Null"],
+                    "attached_to_doctype": ["is", "Not Set"],
                     "owner": frappe.session.user,
                 },
             )
-            if doc:
+            if file:
+                doc = frappe.get_doc("File", file)
                 doc.attached_to_doctype = "HD Ticket"
                 doc.attached_to_name = self.name
                 doc.save()
