@@ -74,18 +74,13 @@
                   pendingInvitesResource.delete.loading &&
                   pendingInvitesResource.delete.params.name === invite.name
                 "
-                :class="
-                  pendingInvitesResource.delete.loading &&
-                  pendingInvitesResource.delete.params.name !== invite.name
-                    ? 'opacity-25'
-                    : ''
-                "
                 v-bind="{
-                  ...{
-                    'aria-disabled':
-                      pendingInvitesResource.delete.loading &&
-                      pendingInvitesResource.delete.params.name !== invite.name,
-                  },
+                  ...((pendingInvitesResource.delete.loading &&
+                    pendingInvitesResource.delete.params.name !==
+                      invite.name) ||
+                  inviteByEmailResource.loading
+                    ? { 'aria-disabled': true, class: 'opacity-25' }
+                    : {}),
                 }"
               />
             </div>
