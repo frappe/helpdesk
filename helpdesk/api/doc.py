@@ -5,7 +5,7 @@ from frappe.model.document import get_controller
 from frappe.utils.caching import redis_cache
 from pypika import Criterion
 
-from helpdesk.utils import check_permissions, contact_default_columns, get_agents_team
+from helpdesk.utils import check_permissions, contact_default_columns
 
 
 @frappe.whitelist()
