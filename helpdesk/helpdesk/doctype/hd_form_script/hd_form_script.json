@@ -47,7 +47,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "default": "function setupForm({doc, updateField, call, router, toast, $dialog, createToast ,applyFilters}) {\n    return {\n        actions: [],\n        onChange:{\n//          works only for new ticket page\n            \"fieldname\":(newVal)=>console.log(newVal)\n        }\n    }\n}",
+   "default": "function setupForm({doc, updateField, call, router, toast, $dialog, createToast ,applyFilters}) {\n    return {\n        actions: [],\n        onChange:{\n            \"fieldname\":(newVal)=>console.log(newVal)\n        }\n    }\n}",
    "fieldname": "script",
    "fieldtype": "Code",
    "label": "Script",
@@ -71,7 +71,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-11 18:41:14.620204",
+ "modified": "2025-07-15 16:52:12.130266",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
