@@ -24,7 +24,7 @@ def new(doc, attachments=[]):
 
 @frappe.whitelist()
 def get_one(name, is_customer_portal=False):
-    check_permissions("HD Ticket", None)
+    check_permissions("HD Ticket", None, doc=name)
     QBContact = frappe.qb.DocType("Contact")
     QBTicket = frappe.qb.DocType("HD Ticket")
 
