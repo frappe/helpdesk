@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "prompt",
  "creation": "2024-06-05 16:14:14.503677",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -80,10 +81,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-16 12:13:17.933473",
+ "modified": "2025-07-16 19:20:42.097768",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
+ "naming_rule": "Set by user",
  "owner": "Administrator",
  "permissions": [
   {
