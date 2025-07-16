@@ -35,6 +35,11 @@
         variant="solid"
         @click="saveHoliday()"
         :disabled="Boolean(!isDirty && holidayListActiveScreen.data)"
+        :loading="
+          holidayList.loading ||
+          updateHolidayResource.loading ||
+          getHolidayData.loading
+        "
       />
     </div>
   </div>
@@ -94,8 +99,11 @@
             :debounce="300"
             @update:model-value="updateDuration('from_date')"
           />
-          <ErrorMessage :message="holidayDataErrors.from_date" />
-          <ErrorMessage :message="holidayDataErrors.dateRange" />
+          <ErrorMessage
+            :message="
+              holidayDataErrors.from_date || holidayDataErrors.dateRange
+            "
+          />
         </div>
         <div class="w-full space-y-1.5">
           <FormLabel label="To date" for="to_date" required />
@@ -195,7 +203,7 @@ import {
   TabButtons,
   toast,
 } from "frappe-ui";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { inject, onMounted, onUnmounted, ref, watch } from "vue";
 import HolidaysTableView from "./HolidaysTableView.vue";
 import RecurringHolidaysList from "./RecurringHolidaysList.vue";
 
@@ -220,6 +228,8 @@ const initialData = ref(null);
 const holidayListView = ref("calendar");
 
 const showConfirmDialog = ref(false);
+
+const holidayList = inject<any>("holidayList");
 
 const getHolidayData = createResource({
   url: "helpdesk.api.holiday_list.get_holiday_list",
@@ -299,32 +309,38 @@ const createHoliday = () => {
       holiday_date: dayjs(holiday.holiday_date).format("YYYY-MM-DD"),
     };
   });
-  createResource({
-    url: "frappe.client.insert",
-    params: {
-      doc: {
-        doctype: "HD Service Holiday List",
-        holiday_list_name: holidayData.value.holiday_list_name,
-        description: holidayData.value.description,
-        from_date: holidayData.value.from_date,
-        to_date: holidayData.value.to_date,
-        holidays: holidays,
-        recurring_holidays: JSON.stringify(
-          holidayData.value.recurring_holidays
-        ),
+  holidayList.insert.submit(
+    {
+      holiday_list_name: holidayData.value.holiday_list_name,
+      description: holidayData.value.description,
+      from_date: holidayData.value.from_date,
+      to_date: holidayData.value.to_date,
+      holidays: holidays,
+      recurring_holidays: JSON.stringify(holidayData.value.recurring_holidays),
+    },
+    {
+      onSuccess(data) {
+        toast.success("Holiday list created");
+        holidayListActiveScreen.value.data = data;
+        holidayListActiveScreen.value.screen = "view";
+        getHolidayData.submit({
+          docname: data.name,
+        });
       },
-    },
-    auto: true,
-    onSuccess(data) {
-      toast.success("Holiday list created");
-      holidayListActiveScreen.value.data = data;
-      holidayListActiveScreen.value.screen = "view";
-      getHolidayData.submit({
-        docname: data.name,
-      });
-    },
-  });
+    }
+  );
 };
+
+const updateHolidayResource = createResource({
+  url: "helpdesk.api.holiday_list.update_holiday_list",
+  onSuccess(data) {
+    holidayListActiveScreen.value.data = data;
+    getHolidayData.submit({
+      docname: data.name,
+    });
+    toast.success("Holiday list updated");
+  },
+});
 
 const updateHoliday = () => {
   const holidays = holidayData.value.holidays.map((holiday) => {
@@ -333,28 +349,16 @@ const updateHoliday = () => {
       holiday_date: dayjs(holiday.holiday_date).format("YYYY-MM-DD"),
     };
   });
-  createResource({
-    url: "helpdesk.api.holiday_list.update_holiday_list",
-    params: {
-      docname: holidayListActiveScreen.value.data.name,
-      doc: {
-        holiday_list_name: holidayData.value.holiday_list_name,
-        description: holidayData.value.description,
-        from_date: holidayData.value.from_date,
-        to_date: holidayData.value.to_date,
-        holidays: holidays,
-        recurring_holidays: JSON.stringify(
-          holidayData.value.recurring_holidays
-        ),
-      },
-    },
-    auto: true,
-    onSuccess(data) {
-      holidayListActiveScreen.value.data = data;
-      getHolidayData.submit({
-        docname: data.name,
-      });
-      toast.success("Holiday list updated");
+
+  updateHolidayResource.submit({
+    docname: holidayListActiveScreen.value.data.name,
+    doc: {
+      holiday_list_name: holidayData.value.holiday_list_name,
+      description: holidayData.value.description,
+      from_date: holidayData.value.from_date,
+      to_date: holidayData.value.to_date,
+      holidays: holidays,
+      recurring_holidays: JSON.stringify(holidayData.value.recurring_holidays),
     },
   });
 };

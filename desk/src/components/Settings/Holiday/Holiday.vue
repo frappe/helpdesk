@@ -9,4 +9,17 @@
 import { holidayListActiveScreen } from "@/stores/holidayList";
 import Holidays from "./Holidays.vue";
 import HolidayView from "./HolidayView.vue";
+import { createListResource } from "frappe-ui";
+import { provide } from "vue";
+
+const holidayListData = createListResource({
+  doctype: "HD Service Holiday List",
+  fields: ["*"],
+  orderBy: "creation desc",
+  start: 0,
+  pageLength: 999,
+  auto: true,
+});
+
+provide("holidayList", holidayListData);
 </script>

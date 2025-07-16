@@ -1,6 +1,4 @@
 import frappe
-import ast
-import json
 
 
 @frappe.whitelist()
