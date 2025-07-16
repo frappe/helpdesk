@@ -5,6 +5,20 @@ from frappe import _
 
 
 @frappe.whitelist()
+def get_fields_meta(doctype="HD Ticket", fieldtypes=None):
+    """
+    Returns the metadata for the given doctype.
+    """
+
+    all_fields = frappe.get_meta(doctype).fields
+    fields = []
+    for field in all_fields:
+        if field.fieldtype in fieldtypes:
+            fields.append(field)
+    return fields
+
+
+@frappe.whitelist()
 def create_field_dependency(parent_field, child_field, parent_child_mapping):
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:
@@ -18,13 +32,22 @@ def create_field_dependency(parent_field, child_field, parent_child_mapping):
         child_field=child_field,
     )
 
-    script_doc = frappe.new_doc("HD Form Script")
+    script_doc = get_or_create_standard_form_script()
     script_doc.script = add_function_to_script(
         script_doc.script, func, parent_field, child_field
     )
-    print("\n\n", script_doc.script, "\n\n")
 
     script_doc.save()
+
+
+def get_or_create_standard_form_script():
+    if existing_doc := frappe.db.exists("HD Form Script", {"is_standard": 1}):
+        return frappe.get_doc("HD Form Script", existing_doc)
+    else:
+        doc = frappe.new_doc("HD Form Script")
+        doc.is_standard = 1
+        doc.enabled = 1
+        return doc
 
 
 def generate_on_change_function(parent_child_mapping, parent_field, child_field):
@@ -46,69 +69,54 @@ def add_function_to_script(script, func, parent_field, child_field):
     match = re.search(r"return\s*{", script)
     if match:
         insert_position = match.start()
-        # take everything before the position, add function, take everything after the position
         script = (
             script[:insert_position] + "\n    " + func + "\n" + script[insert_position:]
         )
 
-    # Check if script has the default return statement with actions: []
-    default_return_statement = re.search(r"actions:\s*\[\s*\]", script)
+    # Check if the script value is default (true for new_doc)
+    if re.search(r"actions:\s*\[\s*\]", script):
+        script = handle_new_doc_script(script, parent_field, child_field)
+    else:
+        script = handle_existing_doc_script(script, parent_field, child_field)
+    return script
 
-    if default_return_statement:
-        # Find the return statement block and replace it entirely
-        return_match = re.search(r"return\s*{", script)
-        if return_match:
-            start_pos = return_match.start()
-            # Find the closing brace of the return statement
-            pos = return_match.end() - 1  # Start from the opening brace
-            ending_pos = find_closing_brace_position(script, pos)
 
-            if ending_pos:
-                ending_pos += 1  # Include the closing brace
-
-            if ending_pos:
-                new_return_block = f"""return {{
+def handle_new_doc_script(script, parent_field, child_field):
+    return_match = re.search(r"return\s*{", script)
+    if return_match:
+        start_pos = return_match.start()
+        pos = return_match.end() - 1
+        ending_pos = find_closing_brace_position(script, pos)
+        if ending_pos:
+            ending_pos += 1
+            new_return_block = f"""return {{
         onChange: {{
             {parent_field}: (newVal) => update_{child_field}(newVal),
         }}
     }}"""
-                script = script[:start_pos] + new_return_block + script[ending_pos:]
+            script = script[:start_pos] + new_return_block + script[ending_pos:]
+    return script
+
+
+def handle_existing_doc_script(script, parent_field, child_field):
+    onChange_match = re.search(r"onChange\s*:\s*{", script)
+    if not onChange_match:
+        return script
+
+    pos = onChange_match.end() - 1
+    ending_pos = find_closing_brace_position(script, pos)
+    if not ending_pos:
+        return script
+
+    onChange_content = script[onChange_match.end() : ending_pos]
+    if onChange_content.strip():
+        new_field = (
+            f"\n            {parent_field}: (newVal) => update_{child_field}(newVal),"
+        )
+        script = script[:ending_pos] + new_field + "\n        " + script[ending_pos:]
     else:
-        onChange_match = re.search(r"onChange\s*:\s*{", script)
-        if onChange_match:
-            pos = onChange_match.end() - 1  # Start from the opening brace
-            ending_pos = find_closing_brace_position(script, pos)
-
-            if ending_pos:
-                # Check if there's already content in onChange block
-                onChange_content = script[onChange_match.end() : ending_pos]
-                if onChange_content.strip():
-                    # Add comma and new field
-                    new_field = f"\n            {parent_field}: (newVal) => update_{child_field}(newVal),"
-                    script = (
-                        script[:ending_pos]
-                        + new_field
-                        + "\n        "
-                        + script[ending_pos:]
-                    )
-                else:
-                    # Empty onChange block, just add the field
-                    new_field = f"\n            {parent_field}: (newVal) => update_{child_field}(newVal),\n        "
-                    script = script[:ending_pos] + new_field + script[ending_pos:]
-        else:
-            # No onChange block exists, need to add it to the return statement
-            return_match = re.search(r"return\s*{", script)
-            if return_match:
-                # Find the closing brace of the return statement
-                pos = return_match.end() - 1
-                ending_pos = find_closing_brace_position(script, pos)
-
-                if ending_pos:
-                    # Add onChange block before the closing brace
-                    new_onChange_block = f",\n        onChange: {{\n            {parent_field}: (newVal) => update_{child_field}(newVal),\n        }}\n    "
-                    script = (
-                        script[:ending_pos] + new_onChange_block + script[ending_pos:]
-                    )
+        new_field = f"\n            {parent_field}: (newVal) => update_{child_field}(newVal),\n        "
+        script = script[:ending_pos] + new_field + script[ending_pos:]
 
     return script
 
