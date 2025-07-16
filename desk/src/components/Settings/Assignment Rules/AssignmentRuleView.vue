@@ -433,10 +433,11 @@ const saveAssignmentRule = () => {
 
 const createAssignmentRule = () => {
   createResource({
-    url: "helpdesk.api.assignment_rule.save_assignment_rule",
+    url: "frappe.client.insert",
     params: {
       doc: {
         ...assignmentRuleData.value,
+        name: assignmentRuleData.value.assignment_rule_name,
         doctype: "Assignment Rule",
         document_type: "HD Ticket",
         assign_condition: convertToConditions({
@@ -452,7 +453,6 @@ const createAssignmentRule = () => {
           assignmentRuleData.value.unassign_condition_json
         ),
       },
-      is_new: true,
     },
     auto: true,
     onSuccess(data) {
@@ -501,7 +501,6 @@ const updateAssignmentRule = async () => {
           ? JSON.stringify(assignmentRuleData.value.unassign_condition_json)
           : null,
       },
-      is_new: false,
     },
     auto: true,
     onSuccess(data) {

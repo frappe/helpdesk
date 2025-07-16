@@ -1,6 +1,6 @@
 <template>
   <Combobox :multiple="true">
-    <Popover :hideOnBlur="true" placement="bottom-end">
+    <Popover placement="bottom-end">
       <template #target="{ togglePopover }">
         <Button
           variant="solid"

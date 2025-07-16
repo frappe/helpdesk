@@ -151,11 +151,17 @@ const duplicate = () => {
         name: duplicateDialog.value.name,
       },
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       assignmentRulesList.reload();
       toast.success("Assignment rule duplicated");
       duplicateDialog.value.show = false;
       duplicateDialog.value.name = "";
+      assignmentRulesActiveScreen.value = {
+        screen: "view",
+        data: {
+          name: data.name,
+        },
+      };
     },
     auto: true,
   });
@@ -183,20 +189,7 @@ const deleteAssignmentRule = (event) => {
 };
 
 const onPriorityChange = () => {
-  createResource({
-    url: "frappe.client.set_value",
-    params: {
-      doctype: "Assignment Rule",
-      name: props.data.name,
-      fieldname: "priority",
-      value: props.data.priority,
-    },
-    onSuccess: () => {
-      assignmentRulesList.reload();
-      toast.success("Assignment rule priority updated");
-    },
-    auto: true,
-  });
+  setAssignmentRuleValue("priority", props.data.priority);
 };
 
 const onToggle = () => {
@@ -204,17 +197,21 @@ const onToggle = () => {
     toast.error("Cannot enable rule without adding users in it");
     return;
   }
+  setAssignmentRuleValue("disabled", !props.data.disabled, "status");
+};
+
+const setAssignmentRuleValue = (key, value, fieldName = undefined) => {
   createResource({
     url: "frappe.client.set_value",
     params: {
       doctype: "Assignment Rule",
       name: props.data.name,
-      fieldname: "disabled",
-      value: !props.data.disabled,
+      fieldname: key,
+      value: value,
     },
     onSuccess: () => {
       assignmentRulesList.reload();
-      toast.success("Assignment rule status updated");
+      toast.success(`Assignment rule ${fieldName || key} updated`);
     },
     auto: true,
   });
