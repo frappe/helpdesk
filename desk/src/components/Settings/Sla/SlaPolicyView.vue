@@ -39,6 +39,7 @@
           variant="solid"
           @click="saveSla()"
           :disabled="Boolean(!isDirty && slaActiveScreen.data)"
+          :loading="slaData.loading || slaPolicyList.loading"
         />
       </div>
     </div>
@@ -244,7 +245,7 @@ import {
   Switch,
   toast,
 } from "frappe-ui";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { inject, onMounted, onUnmounted, ref, watch } from "vue";
 import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
@@ -261,6 +262,8 @@ const initialData = ref(null);
 
 const useNewUI = ref(true);
 const isOldSla = ref(false);
+
+const slaPolicyList = inject<any>("slaPolicyList");
 
 const getSlaData = createResource({
   url: "helpdesk.api.sla.get_sla",
@@ -367,31 +370,28 @@ const createSla = () => {
   const pauseOn = slaData.value.statuses.filter(
     (status) => status.sla_behavior === "Paused"
   );
-  createResource({
-    url: "frappe.client.insert",
-    params: {
-      doc: {
-        ...slaData.value,
-        doctype: "HD Service Level Agreement",
-        sla_fulfilled_on: fulfilledOn,
-        pause_sla_on: pauseOn,
-        condition: convertToConditions({
-          conditions: slaData.value.condition_json,
-          fieldPrefix: "doc",
-        }),
-        condition_json: JSON.stringify(slaData.value.condition_json),
+  slaPolicyList.insert.submit(
+    {
+      ...slaData.value,
+      sla_fulfilled_on: fulfilledOn,
+      pause_sla_on: pauseOn,
+      condition: convertToConditions({
+        conditions: slaData.value.condition_json,
+        fieldPrefix: "doc",
+      }),
+      condition_json: JSON.stringify(slaData.value.condition_json),
+    },
+    {
+      onSuccess(data) {
+        toast.success("SLA policy created");
+        slaActiveScreen.value.data = data;
+        slaActiveScreen.value.screen = "view";
+        getSlaData.submit({
+          docname: data.name,
+        });
       },
-    },
-    auto: true,
-    onSuccess(data) {
-      toast.success("SLA policy created");
-      slaActiveScreen.value.data = data;
-      slaActiveScreen.value.screen = "view";
-      getSlaData.submit({
-        docname: data.name,
-      });
-    },
-  });
+    }
+  );
 };
 
 const updateSla = () => {
@@ -402,33 +402,30 @@ const updateSla = () => {
     (status) => status.sla_behavior === "Paused"
   );
 
-  createResource({
-    url: "frappe.client.set_value",
-    params: {
-      doctype: "HD Service Level Agreement",
+  slaPolicyList.setValue.submit(
+    {
+      ...slaData.value,
       name: slaActiveScreen.value.data.name,
-      fieldname: {
-        ...slaData.value,
-        name: slaActiveScreen.value.data.name,
-        sla_fulfilled_on: fulfilledOn,
-        pause_sla_on: pauseOn,
-        condition: useNewUI.value
-          ? convertToConditions({
-              conditions: slaData.value.condition_json,
-              fieldPrefix: "doc",
-            })
-          : slaData.value.condition,
-        condition_json: useNewUI.value
-          ? JSON.stringify(slaData.value.condition_json)
-          : null,
+      sla_fulfilled_on: fulfilledOn,
+      pause_sla_on: pauseOn,
+      condition: useNewUI.value
+        ? convertToConditions({
+            conditions: slaData.value.condition_json,
+            fieldPrefix: "doc",
+          })
+        : slaData.value.condition,
+      condition_json: useNewUI.value
+        ? JSON.stringify(slaData.value.condition_json)
+        : null,
+    },
+    {
+      onSuccess() {
+        getSlaData.submit();
+        toast.success("SLA policy updated");
+        slaPolicyList.reload();
       },
-    },
-    auto: true,
-    onSuccess() {
-      getSlaData.submit();
-      toast.success("SLA policy updated");
-    },
-  });
+    }
+  );
 };
 
 const toggleEnabled = () => {

@@ -10,7 +10,7 @@ import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
-import HolidayList from "./Holiday/index.vue";
+import HolidayList from "./Holiday/Holiday.vue";
 
 export const tabs = [
   {

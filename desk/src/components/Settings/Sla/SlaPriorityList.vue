@@ -48,8 +48,9 @@
       />
     </div>
     <div class="mt-2">
-      <ErrorMessage :message="slaDataErrors.default_priority" />
-      <ErrorMessage :message="slaDataErrors.priorities" />
+      <ErrorMessage
+        :message="slaDataErrors.default_priority || slaDataErrors.priorities"
+      />
     </div>
   </div>
 </template>
