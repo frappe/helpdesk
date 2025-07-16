@@ -8,6 +8,7 @@
   "dt",
   "apply_to",
   "enabled",
+  "is_standard",
   "column_break_lhfw",
   "apply_to_customer_portal",
   "apply_on_new_page",
@@ -66,12 +67,20 @@
    "fieldname": "apply_on_new_page",
    "fieldtype": "Check",
    "label": "Apply on new page"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:frappe.boot.developer_mode",
+   "fieldname": "is_standard",
+   "fieldtype": "Check",
+   "label": "Is Standard",
+   "no_copy": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-15 16:52:12.130266",
+ "modified": "2025-07-16 12:13:17.933473",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Form Script",
