@@ -1,5 +1,5 @@
 <template>
-  <div v-bind:class="$attrs.class">
+  <div v-bind:class="$attrs.class" class="px-10 py-8">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-lg font-semibold">Agents</h1>
@@ -129,6 +129,7 @@
     </div>
   </div>
   <AddNewAgentsDialog
+    title="Add Agents"
     @close="showNewAgentsDialog = false"
     :modelValue="showNewAgentsDialog"
     :show="showNewAgentsDialog"

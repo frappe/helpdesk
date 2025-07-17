@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4 px-10 py-8">
     <div class="flex items-center justify-between">
       <h1 class="text-lg font-semibold py-[5px]">Customise your Helpdesk</h1>
     </div>

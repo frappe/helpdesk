@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    :options="{ title: 'Add Agents' }"
+    :options="{ title: props.title }"
     :model-value="show"
     @update:modelValue="$emit('update:modelValue', $event)"
     @close="close()"
@@ -83,9 +83,10 @@ import { ref } from "vue";
 
 const props = defineProps({
   show: Boolean,
+  title: String,
 });
 
-const emit = defineEmits(["close", "update:modelValue"]);
+const emit = defineEmits(["close", "update:modelValue", "onAgentsInvited"]);
 
 // State
 const searchInput = ref("");
@@ -167,6 +168,7 @@ const close = () => {
 const sentInvitesResource = createResource({
   url: "helpdesk.api.agent.sent_invites",
   onSuccess: (res) => {
+    emit("onAgentsInvited", inviteQueue.value);
     currentInputIsValidEmail.value = false;
     searchInput.value = "";
     inviteQueue.value = [];

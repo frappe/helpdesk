@@ -1,6 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
-import { call, toast, useFileUpload } from "frappe-ui";
+import { call, FeatherIcon, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -239,3 +239,249 @@ export async function removeAttachmentFromServer(attachment: string) {
     name: attachment,
   });
 }
+/**
+ * Parses HTML string and returns the text content with preserved line breaks
+ * @param html - HTML string to parse
+ * @returns Plain text content with preserved line breaks
+ */
+export function htmlToText(html: string): string {
+  if (!html) return "";
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const lineBreaks = doc.querySelectorAll("br, p, div, li");
+  lineBreaks.forEach((el) => {
+    el.after("\n");
+  });
+
+  let text = doc.body.textContent || "";
+
+  text = text.replace(/\s+/g, " ");
+
+  text = text.replace(/\n\s*\n/g, "\n");
+
+  return text.trim();
+}
+
+/**
+ * Format a date according to the user's system settings
+ * @param {Date|string} date - Date object or ISO date string
+ * @returns {string} Formatted date string in the user's locale and preferences
+ */
+export function getFormat(date) {
+  if (!date) return "";
+
+  const dateObj = date instanceof Date ? date : new Date(date);
+  if (isNaN(dateObj.getTime())) return "";
+
+  // Use the browser's default locale and options
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }).format(dateObj);
+}
+
+export function TemplateOption({ active, option, variant, icon, onClick }) {
+  return h(
+    "button",
+    {
+      class: [
+        active ? "bg-surface-gray-2" : "text-ink-gray-8",
+        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base",
+        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
+      ],
+      onClick: onClick,
+    },
+    [
+      icon
+        ? h(FeatherIcon, {
+            name: icon,
+            class: ["h-4 w-4 shrink-0"],
+            "aria-hidden": true,
+          })
+        : null,
+      h("span", { class: "whitespace-nowrap" }, option),
+    ]
+  );
+}
+
+export function getGridTemplateColumnsForTable(columns) {
+  let columnsWidth = columns
+    .map((col) => {
+      let width = col.width || 1;
+      if (typeof width === "number") {
+        return width + "fr";
+      }
+      return width;
+    })
+    .join(" ");
+  return columnsWidth + " 22px";
+}
+
+export const convertToConditions = ({
+  conditions,
+  isNested = false,
+  fieldPrefix,
+}: {
+  conditions: any;
+  isNested?: boolean;
+  fieldPrefix?: string;
+}): string => {
+  if (!conditions) {
+    return "";
+  }
+
+  if (!Array.isArray(conditions)) {
+    conditions = [conditions];
+  }
+
+  const conditionsStr: string[] = [];
+
+  for (const condition of conditions) {
+    const field = condition.field;
+    let operator = (condition.operator || "==").toLowerCase();
+    const value = condition.value;
+
+    // Handle nested conditions
+    if (field === "group" && Array.isArray(value)) {
+      const nestedCondition = convertToConditions({
+        conditions: value,
+        isNested: true,
+        fieldPrefix,
+      });
+      conditionsStr.push(`(${nestedCondition})`);
+      continue;
+    }
+
+    // Skip if field is not properly defined
+    if (typeof field !== "object" || !field.fieldname) {
+      continue;
+    }
+
+    const fieldname = field.fieldname;
+    const fieldtype = field.fieldtype || "";
+    const fieldAccess = fieldPrefix ? `${fieldPrefix}.${fieldname}` : fieldname;
+
+    // Operator mapping
+    const operatorMap: Record<string, string> = {
+      equals: "==",
+      "=": "==",
+      "!=": "!=",
+      "not equals": "!=",
+      "<": "<",
+      "<=": "<=",
+      ">": ">",
+      ">=": ">=",
+      in: "in",
+      "not in": "not in",
+      like: "like",
+      "not like": "not like",
+      is: "is",
+      "is not": "is not",
+      between: "between",
+      timespan: "timespan",
+    };
+    let op = operatorMap[operator] || operator;
+
+    let valueStr = "";
+    let conditionStr = "";
+    if (typeof value === "string") {
+      if (fieldtype === "Check") {
+        if (["yes", "true", "1"].includes(value.toLowerCase())) {
+          valueStr = "1";
+        } else {
+          valueStr = "0";
+        }
+        if (op === "==" && valueStr === "1") {
+          conditionsStr.push(fieldAccess);
+          continue;
+        } else if (op === "==" && valueStr === "0") {
+          conditionsStr.push(`not ${fieldAccess}`);
+          continue;
+        }
+      } else if (op === "timespan") {
+        conditionsStr.push(`# Timespan: ${value} not implemented`);
+        continue;
+      } else if (op === "between" && value.includes(",")) {
+        const [start, end] = value.split(",").map((v: string) => v.trim());
+        conditionsStr.push(
+          `(${fieldAccess} >= '${start}' and ${fieldAccess} <= '${end}')`
+        );
+        continue;
+      } else if ((op === "in" || op === "not in") && value.includes(",")) {
+        const items = value.split(",").map((v: string) => `'${v.trim()}'`);
+        valueStr = `[${items.join(", ")}]`;
+        conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+      } else if (op === "like") {
+        conditionStr = `'${value}' in ${fieldAccess}`;
+      } else if (op === "not like") {
+        conditionStr = `'${value}' not in ${fieldAccess}`;
+      } else if (op === "is" && value.toLowerCase() === "set") {
+        conditionStr = fieldAccess;
+      } else if (op === "is" && value.toLowerCase() === "not set") {
+        conditionStr = `not ${fieldAccess}`;
+      } else {
+        valueStr = `'${value}'`;
+        conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+      }
+    } else if (typeof value === "number" || typeof value === "boolean") {
+      valueStr =
+        typeof value === "boolean"
+          ? String(value).toLowerCase()
+          : String(value);
+      conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+    } else if (value === null || value === undefined) {
+      valueStr = "None";
+      conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+    } else {
+      valueStr = String(value);
+      conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+    }
+
+    if (
+      fieldtype === "Check" &&
+      op === "==" &&
+      (valueStr === "0" || valueStr === "1")
+    ) {
+      if (valueStr === "1") {
+        conditionStr = fieldAccess;
+      } else {
+        conditionStr = `not ${fieldAccess}`;
+      }
+    }
+
+    conditionsStr.push(conditionStr);
+  }
+
+  if (conditionsStr.length === 0) {
+    return "";
+  }
+
+  // Use conjunction from the last processed condition (default to 'and')
+  const conjunction = (conditions[0]?.conjunction || "and").toLowerCase();
+  let result = conditionsStr.join(` ${conjunction} `);
+
+  if (
+    !isNested &&
+    conditions.length === 1 &&
+    !result.includes("(") &&
+    !result.includes(")")
+  ) {
+    return result;
+  }
+
+  result = result.replace(/  +/g, " ").replace(/  +/g, " ").trim();
+
+  if (isNested && conditions.length > 1) {
+    result = `(${result})`;
+  }
+
+  // Remove any double parentheses
+  while (result.includes("((") && result.includes("))")) {
+    result = result.replace("((", "(").replace("))", ")");
+  }
+
+  return result;
+};
