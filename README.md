@@ -167,6 +167,7 @@ To setup the repository locally follow the steps mentioned below:
 1. Map your site to localhost with the command `bench --site helpdesk.test add-to-hosts`
 1. Get the Helpdesk app. Run `bench get-app https://github.com/frappe/helpdesk`
 1. Run `bench --site helpdesk.test install-app helpdesk`.
+1. Run `bench build --app helpdesk`
 1. Now open the URL `http://helpdesk.test:8000/helpdesk` in your browser, you should see the app running
 
 
