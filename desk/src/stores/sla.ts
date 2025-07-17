@@ -48,7 +48,38 @@ export const resetSlaData = () => {
     start_date: "",
     end_date: "",
     loading: false,
-    support_and_resolution: [],
+    support_and_resolution: [
+      {
+        workday: "Monday",
+        start_time: "09:00:00",
+        end_time: "17:00:00",
+        id: Math.random().toString(36).substring(2, 9),
+      },
+      {
+        workday: "Tuesday",
+        start_time: "09:00:00",
+        end_time: "17:00:00",
+        id: Math.random().toString(36).substring(2, 9),
+      },
+      {
+        workday: "Wednesday",
+        start_time: "09:00:00",
+        end_time: "17:00:00",
+        id: Math.random().toString(36).substring(2, 9),
+      },
+      {
+        workday: "Thursday",
+        start_time: "09:00:00",
+        end_time: "17:00:00",
+        id: Math.random().toString(36).substring(2, 9),
+      },
+      {
+        workday: "Friday",
+        start_time: "09:00:00",
+        end_time: "17:00:00",
+        id: Math.random().toString(36).substring(2, 9),
+      },
+    ],
     condition: [],
     condition_json: [],
   };

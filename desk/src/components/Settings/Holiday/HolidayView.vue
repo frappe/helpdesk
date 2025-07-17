@@ -212,7 +212,11 @@ import { slaActiveScreen } from "@/stores/sla";
 import { getFormattedDate, htmlToText } from "@/utils";
 import dayjs from "dayjs";
 import FormLabel from "frappe-ui/src/components/FormLabel.vue";
-import { activeTab, tabs } from "../settingsModal";
+import {
+  activeTab,
+  disableSettingModalOutsideClick,
+  tabs,
+} from "../settingsModal";
 import HolidaysCalendarView from "./HolidaysCalendarView.vue";
 import AddHolidayModal from "./Modals/AddHolidayModal.vue";
 
@@ -282,10 +286,14 @@ const goBack = () => {
       fetchData: false,
     };
   }
-  holidayListActiveScreen.value = {
-    screen: "list",
-    data: null,
-  };
+  showConfirmDialog.value = false;
+  // Workaround fix for settings modal not closing after going back
+  setTimeout(() => {
+    holidayListActiveScreen.value = {
+      screen: "list",
+      data: null,
+    };
+  }, 250);
 };
 
 const saveHoliday = () => {
@@ -368,6 +376,11 @@ watch(
   (newVal) => {
     if (!initialData.value) return;
     isDirty.value = JSON.stringify(newVal) != initialData.value;
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
   },
   { deep: true }
 );
@@ -389,6 +402,7 @@ onUnmounted(() => {
     from_date: "",
     to_date: "",
   };
+  disableSettingModalOutsideClick.value = false;
 });
 </script>
 

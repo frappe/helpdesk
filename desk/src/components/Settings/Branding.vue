@@ -1,8 +1,9 @@
 <template>
   <div class="flex flex-col gap-4 px-10 py-8">
-    <div class="flex items-center justify-between">
-      <h1 class="text-lg font-semibold py-[5px]">Customise your Helpdesk</h1>
-    </div>
+    <SettingsLayoutHeader
+      title="Customise your Helpdesk"
+      description="Customise Helpdesk with your own branding."
+    />
 
     <!-- Brand Logo & Favicon -->
     <div v-for="config in brandingConfig" class="flex flex-col gap-2">
@@ -49,6 +50,7 @@
 import { useConfigStore } from "@/stores/config";
 import { Avatar, createResource, FileUploader, toast } from "frappe-ui";
 import { computed, reactive } from "vue";
+import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
 
 const config = useConfigStore();
 

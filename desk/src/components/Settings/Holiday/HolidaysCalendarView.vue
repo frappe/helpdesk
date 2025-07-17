@@ -7,7 +7,7 @@
             <Button
               class="flex items-center gap-2 font-semibold text-xl cursor-pointer select-none"
               variant="ghost"
-              @click="onYearChange(togglePopover, currentYear)"
+              @click="togglePopover"
               :label="currentYear + ''"
               icon-right="chevron-down"
             />
@@ -105,7 +105,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import HLCalender from "./HLCalender.vue";
 import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
@@ -128,6 +128,17 @@ const yearsList = computed(() => {
 
 const onYearChange = (togglePopover: () => void, year: number) => {
   currentYear.value = year;
+  if (year === dayjs(holidayData.value.from_date).year()) {
+    if (dayjs(holidayData.value.from_date).month() >= 6) {
+      visibleMonths.value = "second-half";
+    }
+  } else if (year === dayjs(holidayData.value.to_date).year()) {
+    if (dayjs(holidayData.value.to_date).month() >= 6) {
+      visibleMonths.value = "first-half";
+    }
+  } else {
+    visibleMonths.value = "first-half";
+  }
   togglePopover();
 };
 
@@ -148,4 +159,9 @@ watch(
     visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
   }
 );
+
+onMounted(() => {
+  const fromDate = dayjs(holidayData.value.from_date || dayjs());
+  visibleMonths.value = fromDate.month() >= 6 ? "second-half" : "first-half";
+});
 </script>

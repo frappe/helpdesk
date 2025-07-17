@@ -19,10 +19,9 @@
     <FeatherIcon name="plus" class="h-4" />
     Add a custom condition
   </div>
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between mt-2">
     <Dropdown
       v-if="props.conditions.length > 0"
-      class="mt-2"
       v-slot="{ open }"
       :options="dropdownOptions"
     >
@@ -32,7 +31,7 @@
         label="Add condition"
       />
     </Dropdown>
-    <ErrorMessage :message="slaDataErrors.condition" class="mt-2" />
+    <ErrorMessage :message="slaDataErrors.condition" />
   </div>
 </template>
 

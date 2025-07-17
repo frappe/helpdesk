@@ -61,7 +61,7 @@
           v-model="slaData.service_level"
           required
           @change="validateSlaData('service_level')"
-          :disabled="slaActiveScreen.data"
+          :disabled="Boolean(slaActiveScreen.data)"
         />
         <ErrorMessage :message="slaDataErrors.service_level" class="mt-2" />
       </div>
@@ -250,6 +250,7 @@ import SlaAssignmentConditions from "./SlaAssignmentConditions.vue";
 import SlaHolidays from "./SlaHolidays.vue";
 import SlaPriorityList from "./SlaPriorityList.vue";
 import SlaStatusList from "./SlaStatusList.vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
 const showConfirmDialog = ref({
   show: false,
@@ -328,11 +329,15 @@ const goBack = () => {
     showConfirmDialog.value = confirmDialogInfo;
     return;
   }
-  slaActiveScreen.value = {
-    screen: "list",
-    data: null,
-    fetchData: true,
-  };
+  // Workaround fix for settings modal not closing after going back
+  setTimeout(() => {
+    slaActiveScreen.value = {
+      screen: "list",
+      data: null,
+      fetchData: true,
+    };
+  }, 250);
+  showConfirmDialog.value.show = false;
 };
 
 const saveSla = () => {
@@ -448,6 +453,11 @@ watch(
   (newVal) => {
     if (!initialData.value) return;
     isDirty.value = JSON.stringify(newVal) != initialData.value;
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
   },
   { deep: true }
 );
@@ -465,5 +475,6 @@ onMounted(() => {
 onUnmounted(() => {
   removeEventListener("beforeunload", beforeUnloadHandler);
   resetSlaDataErrors();
+  disableSettingModalOutsideClick.value = false;
 });
 </script>

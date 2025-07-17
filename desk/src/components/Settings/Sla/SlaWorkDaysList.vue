@@ -31,22 +31,18 @@
       v-if="slaData.support_and_resolution?.length === 0"
       class="text-center p-4 text-gray-600"
     >
-      No items in the list
+      No workdays in the list
     </div>
   </div>
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between mt-4">
     <Button
       v-if="slaData.support_and_resolution.length < 7"
       variant="subtle"
       label="Add row"
-      class="mt-4"
       @click="addWorkDay"
       icon-left="plus"
     />
-    <ErrorMessage
-      :message="slaDataErrors.support_and_resolution"
-      class="mt-2"
-    />
+    <ErrorMessage :message="slaDataErrors.support_and_resolution" />
   </div>
 </template>
 

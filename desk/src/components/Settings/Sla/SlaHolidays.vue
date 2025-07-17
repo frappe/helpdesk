@@ -24,23 +24,21 @@
               <div
                 v-for="holiday in holidayListData.data"
                 :key="holiday.name"
-                class="flex items-center justify-between gap-6 rounded px-2 py-1.5 text-base text-ink-gray-8 hover:bg-surface-gray-2"
+                class="flex items-center justify-between gap-4 rounded px-2 py-1.5 text-base text-ink-gray-8 cursor-pointer hover:bg-surface-gray-2"
+                @click="slaData.holiday_list = holiday.name"
               >
-                <div
-                  class="flex items-center gap-2 cursor-pointer"
-                  @click="slaData.holiday_list = holiday.name"
-                >
+                <div class="flex items-center gap-2 w-full">
                   <input
                     name="holiday_list"
                     :checked="holiday.name === slaData.holiday_list"
                     type="radio"
                   />
-                  <div>{{ holiday.holiday_list_name }}</div>
+                  <div class="select-none">{{ holiday.holiday_list_name }}</div>
                 </div>
                 <div class="flex cursor-pointer items-center gap-1">
                   <Button
                     variant="ghost"
-                    @click="editHolidayList(holiday)"
+                    @click.stop="editHolidayList(holiday)"
                     class="!h-5 w-5 !p-1"
                     icon-left="edit"
                   />
@@ -106,7 +104,7 @@ const editHolidayList = (data: any) => {
 
 const holidayListData = createListResource({
   doctype: "HD Service Holiday List",
-  fields: ["*"],
+  fields: ["name", "holiday_list_name"],
   auto: true,
 });
 
