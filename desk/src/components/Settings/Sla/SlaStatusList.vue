@@ -26,7 +26,7 @@
       :statusList="statusList"
     />
     <div v-if="statusList?.length === 0" class="text-center p-4 text-gray-600">
-      No items in the list
+      No status in the list
     </div>
   </div>
   <div class="flex items-center justify-between mt-4">
@@ -37,8 +37,9 @@
       @click="addRow"
       icon-left="plus"
     />
-    <ErrorMessage :message="slaDataErrors.statuses" class="mt-2" />
-    <ErrorMessage :message="slaDataErrors.statuses_conflict" class="mt-2" />
+    <ErrorMessage
+      :message="slaDataErrors.statuses || slaDataErrors.statuses_conflict"
+    />
   </div>
 </template>
 

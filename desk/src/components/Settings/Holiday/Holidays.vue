@@ -1,21 +1,19 @@
 <template>
   <div class="px-10 py-8 overflow-y-auto h-full">
-    <div class="flex items-start justify-between">
-      <div class="flex flex-col gap-2">
-        <h1 class="text-lg font-semibold text-ink-gray-8">Business Holidays</h1>
-        <p class="text-sm max-w-lg leading-5 text-ink-gray-6">
-          Set your team’s working days, hours, and holidays using a template or
-          custom schedule.
-        </p>
-      </div>
-      <Button
-        label="New"
-        theme="gray"
-        variant="solid"
-        @click="goToNew()"
-        icon-left="plus"
-      />
-    </div>
+    <SettingsLayoutHeader
+      title="Business Holidays"
+      description="Set your team’s working days, hours, and holidays using a template or custom schedule."
+    >
+      <template #actions>
+        <Button
+          label="New"
+          theme="gray"
+          variant="solid"
+          @click="goToNew()"
+          icon-left="plus"
+        />
+      </template>
+    </SettingsLayoutHeader>
     <div class="mt-6">
       <HolidayList />
     </div>
@@ -28,6 +26,7 @@ import {
   resetHolidayData,
 } from "@/stores/holidayList";
 import HolidayList from "./HolidayList.vue";
+import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
 const goToNew = () => {
   resetHolidayData();

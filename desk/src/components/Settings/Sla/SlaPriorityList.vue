@@ -34,7 +34,7 @@
       v-if="slaData.priorities?.length === 0"
       class="text-center p-4 text-gray-600"
     >
-      No items in the list
+      No priorities in the list
     </div>
   </div>
   <div class="flex items-center justify-between mt-4">
@@ -72,7 +72,8 @@ createResource({
   url: "frappe.client.get_list",
   params: {
     doctype: "HD Ticket Priority",
-    fields: ["*"],
+    fields: ["name"],
+    order_by: "integer_value desc",
   },
   auto: true,
   onSuccess(data) {

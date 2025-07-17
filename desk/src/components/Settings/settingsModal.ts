@@ -46,3 +46,5 @@ export const tabs = [
 ];
 
 export const activeTab = ref(tabs[0]);
+
+export const disableSettingModalOutsideClick = ref(false);
