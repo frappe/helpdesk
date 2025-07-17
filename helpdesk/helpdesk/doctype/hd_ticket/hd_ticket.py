@@ -27,7 +27,14 @@ from helpdesk.helpdesk.utils.email import (
     default_ticket_outgoing_email_account,
 )
 from helpdesk.search import HelpdeskSearch
-from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
+from helpdesk.utils import (
+    capture_event,
+    get_agents_team,
+    get_customer,
+    is_admin,
+    is_agent,
+    publish_event,
+)
 
 from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
@@ -1030,30 +1037,110 @@ class HDTicket(Document):
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
 def has_permission(doc, user=None):
-    return bool(
+
+    if not user:
+        user = frappe.session.user
+
+    if (
         doc.contact == user
         or doc.raised_by == user
         or doc.owner == user
-        or is_agent(user)
+        or is_admin(user)
         or doc.customer in get_customer(user)
+    ):
+        return True
+
+    if not is_agent(user):
+        return False
+
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
     )
+    if not enable_restrictions:
+        return True
+    show_tickets_without_team = frappe.db.get_single_value(
+        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+    )
+    if show_tickets_without_team and not doc.get("agent_group"):
+        return True
+
+    teams = get_agents_team()
+    if any([team.get("ignore_restrictions") for team in teams]):
+        return True
+
+    team_names = [t.team_name for t in teams]
+    exists = frappe.db.exists(
+        "HD Team Member", {"parent": ["in", team_names], "user": frappe.session.user}
+    )
+    if exists and doc.get("agent_group") in team_names:
+        return True
+
+    return False
 
 
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
 def permission_query(user):
-    user = user or frappe.session.user
-    if is_agent(user):
+
+    if not user:
+        user = frappe.session.user
+    if is_admin(user):
         return
+
+    #  To handle the case for normal users i.e. not agents
     customer = get_customer(user)
-    res = "`tabHD Ticket`.contact={user} OR `tabHD Ticket`.raised_by={user} OR `tabHD Ticket`.owner={user}".format(
+    query = "(`tabHD Ticket`.owner = {user} OR `tabHD Ticket`.contact = {user} OR `tabHD Ticket`.raised_by = {user})".format(
         user=frappe.db.escape(user)
     )
     for c in customer:
-        res += " OR `tabHD Ticket`.customer={customer}".format(
+        query += " OR `tabHD Ticket`.customer={customer}".format(
             customer=frappe.db.escape(c)
         )
-    return res
+
+    if not is_agent(user):
+        return query
+
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
+    )
+    if not enable_restrictions:
+        return  # If not enabled, return all tickets
+
+    show_tickets_without_team = frappe.db.get_single_value(
+        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+    )
+
+    teams = get_agents_team()
+
+    if show_tickets_without_team:
+        query += " OR (`tabHD Ticket`.agent_group is null)"
+
+    # If agent belongs to the team which has ignore_permission set to 1.
+    # that means this team can see all the tickets without any restriction,
+    # Event the other team's tickets.
+    if any(team.get("ignore_restrictions") for team in teams):
+        all_teams = frappe.get_all("HD Team", pluck="name")
+        if not all_teams:
+            return query
+        all_teams = ", ".join(f"'{team}'" for team in all_teams)
+        query += f" OR (`tabHD Ticket`.agent_group in ({all_teams}))".format(
+            all_teams=all_teams
+        )
+        if not show_tickets_without_team:
+            query += " OR (`tabHD Ticket`.agent_group is null)"
+        return query
+
+    team_names = [t.get("team_name") for t in teams]
+
+    if not team_names:
+        return query
+
+    # Here we will apply the restriction based on the teams the agent belongs to.
+    team_names = ", ".join(f"'{team}'" for team in team_names)
+    query += f" OR (`tabHD Ticket`.agent_group in ({team_names}))".format(
+        team_names=team_names
+    )
+    return query
 
 
 def set_guest_ticket_creation_permission():
