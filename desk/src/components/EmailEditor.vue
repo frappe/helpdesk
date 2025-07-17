@@ -13,6 +13,7 @@
     :editable="editable"
     @change="editable ? (newEmail = $event) : null"
     :extensions="[PreserveVideoControls]"
+    :uploadFunction="(file:any)=>uploadFunction(file, doctype, modelValue?.name)"
   >
     <template #top>
       <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
@@ -76,12 +77,13 @@
           v-for="a in attachments"
           :key="a.file_url"
           :label="a.file_name"
+          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
         >
           <template #suffix>
             <FeatherIcon
               class="h-3.5"
               name="x"
-              @click.stop="removeAttachment(a)"
+              @click.self.stop="removeAttachment(a)"
             />
           </template>
         </AttachmentItem>
@@ -167,7 +169,9 @@ import { PreserveVideoControls } from "@/tiptap-extensions";
 import {
   getFontFamily,
   isContentEmpty,
+  removeAttachmentFromServer,
   textEditorMenuButtons,
+  uploadFunction,
   validateEmail,
 } from "@/utils";
 // import { EditorContent } from "@tiptap/vue-3";
@@ -303,8 +307,9 @@ function toggleBCC() {
     });
 }
 
-function removeAttachment(attachment) {
+async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
+  await removeAttachmentFromServer(attachment.name);
 }
 
 function addToReply(

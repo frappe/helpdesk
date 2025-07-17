@@ -467,11 +467,14 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     rows = frappe.parse_json(rows)
 
     if not columns:
-        columns = (
-            _list.default_list_data(show_customer_portal_fields).get("columns")
-            if doctype == "HD Ticket"
-            else _list.default_list_data().get("columns")
-        )
+        if doctype == "Contact":
+            columns = contact_default_columns
+        else:
+            columns = (
+                _list.default_list_data(show_customer_portal_fields).get("columns")
+                if doctype == "HD Ticket"
+                else _list.default_list_data().get("columns")
+            )
     if not rows:
         rows = _list.default_list_data().get("rows")
 

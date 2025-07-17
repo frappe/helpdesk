@@ -106,6 +106,7 @@ def get_customer_criteria():
     conditions = [
         QBTicket.contact == user,
         QBTicket.raised_by == user,
+        QBTicket.owner == user,
     ]
     customer = get_customer(user)
     for c in customer:
