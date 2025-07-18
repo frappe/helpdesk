@@ -32,12 +32,11 @@
       <div v-if="!list.loading && list.data?.length > 0">
         <!-- Each row -->
         <div
-          class="w-full flex items-center border-b cursor-pointer"
+          class="w-full flex flex-col items-center cursor-pointer group hover:rounded border-b transition hover:bg-surface-gray-2"
+          :class="`hover:rowitem-${idx} rowitem`"
           v-for="(row, idx) in list.data"
         >
-          <div
-            class="w-full rounded hover:bg-surface-gray-2 flex items-center p-2"
-          >
+          <div class="w-full flex items-center p-2">
             <!-- Parent to Child -->
             <div class="flex gap-2 w-7/12 text-base text-ink-gray-7 pr-3">
               <span>{{ rowName(row.name) }}</span>
@@ -79,7 +78,10 @@ const list = createListResource({
   filters: { is_standard: 1, name: ["like", "%Field Dependency%"] },
   fields: ["name", "enabled", "owner"],
   auto: true,
-  cache: ["FD", "List"],
+  // cache: ["FD", "List"],
+  transform: (data) => {
+    return data.concat(data);
+  },
 });
 
 const options = [
@@ -98,4 +100,14 @@ function rowName(name: string) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.rowitem {
+  /* row item is like  */
+  /* if it is not last and first */
+  /* take that item and uskei upar jo hai uska border-bottom as 0px and that item should add border-top as 1px */
+  &:not(:first-child):not(:last-child) {
+    border-bottom: 0px;
+    border-top: 1px solid var(--border-color);
+  }
+}
+</style>
