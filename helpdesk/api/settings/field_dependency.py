@@ -9,6 +9,8 @@ def get_fields_meta(doctype="HD Ticket", fieldtypes=None):
     """
 
     all_fields = frappe.get_meta(doctype).fields
+    if not fieldtypes:
+        return all_fields
     fields = []
     for field in all_fields:
         if field.fieldtype in fieldtypes:
@@ -43,14 +45,14 @@ def create_field_dependency(parent_field, child_field, parent_child_mapping):
 def get_or_create_standard_form_script(parent_field, child_field):
     if existing_doc := frappe.db.exists(
         "HD Form Script",
-        {"name": ["like", f"FieldDependency-{parent_field}-{child_field}"]},
+        {"name": ["like", f"Field Dependency-{parent_field}-{child_field}"]},
     ):
         return frappe.get_doc("HD Form Script", existing_doc)
     else:
         doc = frappe.new_doc("HD Form Script")
         doc.is_standard = 1
         doc.enabled = 1
-        doc.name = f"FieldDependency-{parent_field}-{child_field}"
+        doc.name = f"Field Dependency-{parent_field}-{child_field}"
         return doc
 
 

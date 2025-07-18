@@ -22,27 +22,80 @@
     <div class="w-full">
       <!-- table heading -->
       <div class="flex w-full p-2 border-b">
-        <p class="w-4/12 text-p-sm text-ink-gray-5">Name</p>
-        <p class="w-4/12 text-p-sm text-ink-gray-5">Created By</p>
-        <p class="w-3/12 text-p-sm text-ink-gray-5">Enabled</p>
+        <p class="w-7/12 text-p-sm text-ink-gray-5">Name</p>
+        <p class="w-3/12 text-p-sm text-ink-gray-5">Created By</p>
+        <p class="w-1/12 text-p-sm text-ink-gray-5">Enabled</p>
         <p class="w-1/12 text-p-sm text-ink-gray-5"></p>
       </div>
 
       <!-- Table content -->
+      <div v-if="!list.loading && list.data?.length > 0">
+        <!-- Each row -->
+        <div
+          class="w-full flex items-center border-b cursor-pointer"
+          v-for="(row, idx) in list.data"
+        >
+          <div
+            class="w-full rounded hover:bg-surface-gray-2 flex items-center p-2"
+          >
+            <!-- Parent to Child -->
+            <div class="flex gap-2 w-7/12 text-base text-ink-gray-7 pr-3">
+              <span>{{ rowName(row.name) }}</span>
+            </div>
+            <!-- Owner -->
+            <p class="w-3/12 flex items-center gap-2 pr-3">
+              <Avatar size="sm" :image="row.owner" :label="row.owner" />
+              <span class="text-base text-ink-gray-7 truncate">{{
+                row.owner
+              }}</span>
+            </p>
+            <!-- Enabled -->
+            <p class="w-1/12 flex items-center">
+              <Switch v-model="row.enabled" />
+            </p>
+            <!-- More Options -->
+            <p class="w-1/12 flex items-center justify-end">
+              <Dropdown placement="right" :options="options">
+                <Button variant="ghost">
+                  <template #icon>
+                    <LucideMoreHorizontal class="h-4 w-4" />
+                  </template>
+                </Button>
+              </Dropdown>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { createListResource } from "frappe-ui";
+import { createListResource, Avatar, Switch } from "frappe-ui";
+import { getMeta } from "@/stores/meta";
 
 const list = createListResource({
   doctype: "HD Form Script",
-  filters: { is_standard: 1 },
+  filters: { is_standard: 1, name: ["like", "%Field Dependency%"] },
   fields: ["name", "enabled", "owner"],
   auto: true,
   cache: ["FD", "List"],
 });
+
+const options = [
+  {
+    label: "Delete",
+    icon: "trash",
+  },
+];
+const { getField } = getMeta("HD Ticket");
+
+function rowName(name: string) {
+  let [_, parent, child] = name.split("-");
+  parent = getField(parent)?.label || parent;
+  child = getField(child)?.label || child;
+  return `${parent} → ${child}`;
+}
 </script>
 
 <style scoped></style>
