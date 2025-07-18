@@ -144,11 +144,13 @@ const duplicate = () => {
         show: false,
         name: "",
       };
-      slaActiveScreen.value = {
-        screen: "view",
-        data: data,
-        fetchData: true,
-      };
+      setTimeout(() => {
+        slaActiveScreen.value = {
+          screen: "view",
+          data: data,
+          fetchData: true,
+        };
+      }, 250);
     },
     auto: true,
   });

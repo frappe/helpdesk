@@ -120,10 +120,12 @@ const duplicate = () => {
         show: false,
         name: "",
       };
-      holidayListActiveScreen.value = {
-        screen: "view",
-        data: data,
-      };
+      setTimeout(() => {
+        holidayListActiveScreen.value = {
+          screen: "view",
+          data: data,
+        };
+      }, 250);
     },
     auto: true,
   });

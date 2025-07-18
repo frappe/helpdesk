@@ -256,6 +256,8 @@ const getHolidayData = createResource({
 if (holidayListActiveScreen.value.data?.name) {
   holidayData.value.loading = true;
   getHolidayData.fetch();
+} else {
+  disableSettingModalOutsideClick.value = true;
 }
 
 const updateDuration = (key) => {

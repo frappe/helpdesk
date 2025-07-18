@@ -405,14 +405,18 @@ export const convertToConditions = ({
           `(${fieldAccess} >= '${start}' and ${fieldAccess} <= '${end}')`
         );
         continue;
-      } else if ((op === "in" || op === "not in") && value.includes(",")) {
-        const items = value.split(",").map((v: string) => `'${v.trim()}'`);
-        valueStr = `[${items.join(", ")}]`;
-        conditionStr = `${fieldAccess} ${op} ${valueStr}`;
+      } else if (op === "in" || op === "not in") {
+        if (value.includes(",")) {
+          const items = value.split(",").map((v: string) => `'${v.trim()}'`);
+          valueStr = `[${items.join(", ")}]`;
+        } else {
+          valueStr = `'${value}'`;
+        }
+        conditionStr = `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
       } else if (op === "like") {
-        conditionStr = `'${value}' in ${fieldAccess}`;
+        conditionStr = `${fieldAccess} and '${value}' in ${fieldAccess}`;
       } else if (op === "not like") {
-        conditionStr = `'${value}' not in ${fieldAccess}`;
+        conditionStr = `${fieldAccess} and '${value}' not in ${fieldAccess}`;
       } else if (op === "is" && value.toLowerCase() === "set") {
         conditionStr = fieldAccess;
       } else if (op === "is" && value.toLowerCase() === "not set") {

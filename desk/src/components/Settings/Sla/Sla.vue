@@ -14,7 +14,7 @@ import { provide } from "vue";
 
 const slaPolicyListData = createListResource({
   doctype: "HD Service Level Agreement",
-  fields: ["*"],
+  fields: ["name", "default_sla", "enabled", "description"],
   orderBy: "creation desc",
   start: 0,
   pageLength: 999,
