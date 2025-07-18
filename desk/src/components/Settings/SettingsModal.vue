@@ -1,5 +1,9 @@
 <template>
-  <Dialog v-model="show" :options="{ size: '4xl' }">
+  <Dialog
+    v-model="show"
+    :options="{ size: '5xl' }"
+    :disableOutsideClickToClose="true"
+  >
     <template #body>
       <div class="flex" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-gray-50 p-2">
@@ -45,6 +49,8 @@ import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import { FieldDependencyIcon } from "@/components/icons";
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
@@ -74,6 +80,11 @@ let tabs = [
     label: "Teams",
     icon: markRaw(LucideUsers),
     component: markRaw(TeamsConfig),
+  },
+  {
+    label: "Field Dependencies",
+    icon: markRaw(FieldDependencyIcon),
+    component: markRaw(FieldDependencyConfig),
   },
 ];
 const show: ModelRef<boolean> = defineModel();

@@ -1,0 +1,398 @@
+<template>
+  <div class="h-full flex flex-col">
+    <header
+      class="flex justify-between mb-8 sticky top-0 z-10 bg-surface-modal"
+    >
+      <Button
+        variant="ghost"
+        icon-left="chevron-left"
+        label="New Field Dependency"
+        size="md"
+        @click="() => $emit('update:step', 'fd-list')"
+        class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px]"
+      />
+
+      <div class="flex gap-2">
+        <!-- Switch -->
+        <div></div>
+        <!-- Actions -->
+        <div class="flex gap-1">
+          <Button
+            label="Save"
+            variant="solid"
+            size="sm"
+            :disabled="
+              !state.selectedParentField ||
+              !state.selectedChildField ||
+              Object.keys(state.childSelections).length === 0
+            "
+            @click="handleSubmit"
+          />
+        </div>
+      </div>
+    </header>
+    <!-- Form -->
+    <form
+      @submit.prevent="handleSubmit"
+      class="w-full flex-1 flex flex-col gap-8 h-full"
+    >
+      <!-- Field Selection -->
+      <div class="flex gap-3 w-full justify-between">
+        <FormControl
+          v-model="state.selectedParentField"
+          label="Parent Field"
+          placeholder="Select Parent Field"
+          required
+          class="flex-1"
+          type="select"
+          :options="parentFields"
+        />
+        <FormControl
+          v-model="state.selectedChildField"
+          label="Child Field"
+          placeholder="Select Child Field"
+          required
+          class="flex-1"
+          :disabled="!state.selectedParentField"
+          type="select"
+          :options="state.childFields"
+        />
+      </div>
+      <!-- Value Selection -->
+      <div class="flex w-full flex-1 justify-between h-full">
+        <!-- left box -->
+        <div class="flex-1 flex flex-col gap-1.5">
+          <span class="block text-xs text-ink-gray-5">
+            Select parent field value
+          </span>
+          <div
+            class="border flex-1 border-r-0 rounded-l p-2 flex flex-col gap-2"
+          >
+            <template v-if="state.selectedParentField">
+              <FormControl
+                v-model="state.parentSearch"
+                placeholder="Search values"
+                type="text"
+                class="w-full"
+              >
+                <template #prefix>
+                  <LucideSearch class="h-4 w-4 text-gray-500" />
+                </template>
+              </FormControl>
+              <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+                <ul>
+                  <li
+                    v-for="value in filteredParentFieldValues"
+                    :key="value"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1"
+                    :class="{
+                      'bg-surface-gray-2 hover:bg-surface-gray-3':
+                        state.currentParentSelection === value,
+                    }"
+                    @click="handleParentValueClick(value)"
+                  >
+                    <span class="text-base text-ink-gray-6">{{ value }}</span>
+                    <LucideChevronRight
+                      class="h-4 w-4 text-ink-gray-6"
+                      v-if="
+                        getSelectedChildValueCount(value) === 0 ||
+                        state.currentParentSelection === value
+                      "
+                    />
+                    <Badge
+                      v-else
+                      :label="getSelectedChildValueCount(value)"
+                      :theme="'gray'"
+                      variant="subtle"
+                      class="!h-4"
+                    />
+                  </li>
+                </ul>
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+              >
+                Please select a parent field first
+              </div>
+            </template>
+          </div>
+        </div>
+        <!-- right box -->
+        <div class="flex-1 flex flex-col gap-1.5">
+          <span class="block text-xs text-ink-gray-5 pl-1.5">
+            Select child field value
+          </span>
+          <div class="border flex-1 rounded-r p-2 flex flex-col gap-2">
+            <template
+              v-if="state.selectedChildField && state.currentParentSelection"
+            >
+              <FormControl
+                v-model="state.childSearch"
+                placeholder="Search values"
+                type="text"
+                class="w-full"
+              >
+                <template #prefix>
+                  <LucideSearch class="h-4 w-4 text-gray-500" />
+                </template>
+              </FormControl>
+              <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
+                <!-- Master Check box -->
+                <li
+                  class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center bg-surface-gray-1 hover:bg-surface-gray-2"
+                  @click="handleSelectAllChildValues(!toggleAllChildValues)"
+                >
+                  <FormControl
+                    type="checkbox"
+                    :model-value="toggleAllChildValues"
+                    class="mr-2"
+                  />
+                  <span class="text-base text-ink-gray-8 font-medium">
+                    {{ toggleCheckboxLabel }}
+                  </span>
+                </li>
+                <ul>
+                  <li
+                    v-for="value in filteredChildFieldValues"
+                    :key="value"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
+                    @click="handleChildValueClick(value)"
+                  >
+                    <FormControl
+                      type="checkbox"
+                      :model-value="isChildValueSelected(value)"
+                      class="mr-2"
+                    />
+                    <span class="text-base text-ink-gray-6">{{ value }}</span>
+                  </li>
+                </ul>
+              </div>
+            </template>
+            <template v-else-if="!state.selectedChildField">
+              <div
+                class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+              >
+                Please select a child field first
+              </div>
+            </template>
+            <template v-else>
+              <div
+                class="flex flex-col items-center mt-20 h-full text-ink-gray-4 text-sm"
+              >
+                Please select a parent value first
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { getMeta } from "@/stores/meta";
+import { call, createResource, FormControl } from "frappe-ui";
+import { reactive, watch, computed } from "vue";
+
+const { getFields } = getMeta("HD Ticket");
+
+const parentFields = computed(() => {
+  let _fields = getFields();
+
+  if (!_fields || _fields.length === 0) {
+    return [];
+  }
+  _fields = _fields.filter(
+    (f) => f.fieldtype === "Select" || f.fieldtype === "Link"
+  );
+  return _fields.map((f) => ({
+    label: f.label,
+    value: f.fieldname,
+    options: f.options || [],
+    type: f.fieldtype,
+  }));
+});
+
+const state = reactive({
+  selectedParentField: "",
+  selectedChildField: "",
+  childFields: [],
+
+  parentFieldValues: [],
+  childFieldValues: [],
+
+  currentParentSelection: "",
+  childSelections: {}, // Initial value is a Set
+
+  parentSearch: "",
+  childSearch: "",
+});
+
+const filteredParentFieldValues = computed(() => {
+  if (!state.parentSearch) return state.parentFieldValues;
+  return state.parentFieldValues.filter((v) =>
+    v.toLowerCase().includes(state.parentSearch.toLowerCase())
+  );
+});
+
+const filteredChildFieldValues = computed(() => {
+  if (!state.childSearch) return state.childFieldValues;
+  return state.childFieldValues.filter((v) =>
+    v.toLowerCase().includes(state.childSearch.toLowerCase())
+  );
+});
+
+function getSelectedChildValueCount(parent) {
+  const selectedCount =
+    state.childSelections[parent] instanceof Set
+      ? state.childSelections[parent].size
+      : 0;
+  return selectedCount;
+}
+
+const createFieldDependency = createResource({
+  url: "helpdesk.api.settings.field_dependency.create_field_dependency",
+  auto: false,
+  makeParams: () => ({
+    parent_field: state.selectedParentField,
+    child_field: state.selectedChildField,
+    parent_child_mapping: stringifyParentChildMapping(),
+  }),
+});
+
+function stringifyParentChildMapping() {
+  const mapping = {};
+  Object.keys(state.childSelections).forEach((parent) => {
+    mapping[parent] = Array.from(state.childSelections[parent]);
+  });
+  return JSON.stringify(mapping);
+}
+
+async function handleFieldValues(fieldname, isParentField) {
+  if (!fieldname) return [];
+
+  const field = isParentField
+    ? parentFields.value.find((f) => f.value === fieldname)
+    : state.childFields.find((f) => f.value === fieldname);
+  if (!field) return [];
+
+  if (isParentField) {
+    state.selectedChildField = ""; // Reset child field when parent changes
+    state.childFields = parentFields.value.filter((f) => f.value !== fieldname);
+    state.childFieldValues = [];
+    state.currentParentSelection = ""; // Reset current parent selection
+    state.childSelections = {}; // Reset child selections for new parent
+  }
+
+  if (field.type === "Select") {
+    return field.options.split("\n");
+  } else if (field.type === "Link") {
+    let options = await call("frappe.client.get_list", {
+      doctype: field.options,
+      fields: ["name"],
+      limit_page_length: 999,
+    });
+    return options.map((o) => o.name);
+  }
+}
+
+function handleParentValueClick(value) {
+  state.currentParentSelection = value;
+}
+
+function handleChildValueClick(childValue) {
+  const parent = state.currentParentSelection;
+  if (!parent) return;
+  if (!(state.childSelections[parent] instanceof Set)) {
+    state.childSelections[parent] = new Set();
+  }
+  if (state.childSelections[parent].has(childValue)) {
+    state.childSelections[parent].delete(childValue);
+  } else {
+    state.childSelections[parent].add(childValue);
+  }
+}
+
+function isChildValueSelected(childValue) {
+  const parent = state.currentParentSelection;
+  return (
+    state.childSelections[parent] instanceof Set &&
+    state.childSelections[parent].has(childValue)
+  );
+}
+
+const toggleAllChildValues = computed({
+  get() {
+    const parent = state.currentParentSelection;
+    if (!parent) return false;
+    // If no child values are selected, return false
+    if (!(state.childSelections[parent] instanceof Set)) {
+      return false;
+    }
+    // If all filtered child values are selected, return true
+    return (
+      state.childSelections[parent].size ===
+      filteredChildFieldValues.value.length
+    );
+  },
+  set(value) {
+    handleSelectAllChildValues(value);
+  },
+});
+
+const toggleCheckboxLabel = computed(() => {
+  const parent = state.currentParentSelection;
+  if (!parent) return "Select All";
+  const selectedCount = getSelectedChildValueCount(parent);
+  if (selectedCount === 0) return "Select All";
+  return `${selectedCount} values selected`;
+});
+
+function handleSelectAllChildValues(value) {
+  const parent = state.currentParentSelection;
+  if (!parent) return;
+
+  if (!(state.childSelections[parent] instanceof Set)) {
+    state.childSelections[parent] = new Set();
+  }
+
+  if (value) {
+    // Select all child values
+    filteredChildFieldValues.value.forEach((childValue) => {
+      state.childSelections[parent].add(childValue);
+    });
+  } else {
+    // Deselect all child values
+    state.childSelections[parent].clear();
+  }
+}
+
+function handleSubmit() {
+  createFieldDependency.submit();
+}
+
+// parent field watcher
+watch(
+  () => state.selectedParentField,
+  async (newParentField) => {
+    state.parentFieldValues = await handleFieldValues(newParentField, true);
+  }
+);
+
+// child field watcher
+watch(
+  () => state.selectedChildField,
+  async (newChildField) => {
+    state.childFieldValues = await handleFieldValues(newChildField, false);
+  }
+);
+
+watch(
+  () => state.currentParentSelection,
+  () => {
+    state.childSearch = ""; // Reset child search when parent selection changes
+  }
+);
+</script>
