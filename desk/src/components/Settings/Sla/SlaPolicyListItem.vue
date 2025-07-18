@@ -167,9 +167,6 @@ const deleteSla = (event) => {
     onSuccess: () => {
       toast.success("SLA policy deleted");
     },
-    onError: (error) => {
-      toast.error(error.messages[0] || "Failed to delete SLA policy");
-    },
   });
 };
 
@@ -186,9 +183,6 @@ const onToggle = () => {
     {
       onSuccess: () => {
         toast.success("SLA policy status updated");
-      },
-      onError: (error) => {
-        toast.error(error.messages[0] || "Failed to update SLA policy");
       },
     }
   );
