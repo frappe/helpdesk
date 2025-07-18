@@ -312,6 +312,8 @@ const getSlaData = createResource({
 if (slaActiveScreen.value.data && slaActiveScreen.value.fetchData) {
   slaData.value.loading = true;
   getSlaData.submit();
+} else {
+  disableSettingModalOutsideClick.value = true;
 }
 
 const goBack = () => {

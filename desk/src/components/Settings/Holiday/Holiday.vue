@@ -14,7 +14,7 @@ import { provide } from "vue";
 
 const holidayListData = createListResource({
   doctype: "HD Service Holiday List",
-  fields: ["*"],
+  fields: ["name", "description"],
   orderBy: "creation desc",
   start: 0,
   pageLength: 999,
