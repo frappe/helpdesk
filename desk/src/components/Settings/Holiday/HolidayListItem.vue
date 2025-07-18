@@ -142,9 +142,6 @@ const deleteHolidayList = (event) => {
     onSuccess: () => {
       toast.success("Holiday list deleted");
     },
-    onError: (error) => {
-      toast.error(error.messages[0] || "Failed to delete holiday list");
-    },
   });
 };
 </script>
