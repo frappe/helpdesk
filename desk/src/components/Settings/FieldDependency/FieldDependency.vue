@@ -45,7 +45,7 @@
           required
           class="flex-1"
           type="select"
-          :options="state.parentFields"
+          :options="parentFields"
         />
         <FormControl
           v-model="state.selectedChildField"
@@ -191,14 +191,33 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { getMeta } from "@/stores/meta";
 import { call, createResource, FormControl } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
+
+const { getFields } = getMeta("HD Ticket");
+
+const parentFields = computed(() => {
+  let _fields = getFields();
+
+  if (!_fields || _fields.length === 0) {
+    return [];
+  }
+  _fields = _fields.filter(
+    (f) => f.fieldtype === "Select" || f.fieldtype === "Link"
+  );
+  return _fields.map((f) => ({
+    label: f.label,
+    value: f.fieldname,
+    options: f.options || [],
+    type: f.fieldtype,
+  }));
+});
 
 const state = reactive({
   selectedParentField: "",
   selectedChildField: "",
-  parentFields: [],
   childFields: [],
 
   parentFieldValues: [],
@@ -233,25 +252,6 @@ function getSelectedChildValueCount(parent) {
   return selectedCount;
 }
 
-const fields = createResource({
-  url: "helpdesk.api.settings.field_dependency.get_fields_meta",
-  auto: true,
-  params: {
-    doctype: "HD Ticket",
-    fieldtypes: ["Select", "Link"],
-  },
-  //   cache: ["Fields", "field_dependency"],
-  transform: (data) => {
-    state.parentFields = data.map((field) => ({
-      label: field.label,
-      value: field.fieldname,
-      options: field.options || [],
-      type: field.fieldtype,
-    }));
-    return data;
-  },
-});
-
 const createFieldDependency = createResource({
   url: "helpdesk.api.settings.field_dependency.create_field_dependency",
   auto: false,
@@ -274,13 +274,13 @@ async function handleFieldValues(fieldname, isParentField) {
   if (!fieldname) return [];
 
   const field = isParentField
-    ? state.parentFields.find((f) => f.value === fieldname)
+    ? parentFields.value.find((f) => f.value === fieldname)
     : state.childFields.find((f) => f.value === fieldname);
   if (!field) return [];
 
   if (isParentField) {
     state.selectedChildField = ""; // Reset child field when parent changes
-    state.childFields = state.parentFields.filter((f) => f.value !== fieldname);
+    state.childFields = parentFields.value.filter((f) => f.value !== fieldname);
     state.childFieldValues = [];
     state.currentParentSelection = ""; // Reset current parent selection
     state.childSelections = {}; // Reset child selections for new parent
@@ -370,7 +370,6 @@ function handleSelectAllChildValues(value) {
 }
 
 function handleSubmit() {
-  debugger;
   createFieldDependency.submit();
 }
 
