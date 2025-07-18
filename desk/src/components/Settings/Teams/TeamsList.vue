@@ -1,34 +1,37 @@
 <template>
   <div class="w-full h-full flex flex-col">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-lg font-semibold">Teams</h1>
-      <div class="flex item-center space-x-2">
+    <SettingsLayoutHeader
+      title="Teams"
+      description="Create and manage teams and assign agents to specific teams."
+    >
+      <template #actions>
+        <Button
+          label="New"
+          theme="gray"
+          variant="solid"
+          @click="() => (showForm = !showForm)"
+          icon-left="plus"
+        />
+      </template>
+      <template #bottom-section>
         <FormControl
           v-model="search"
           :placeholder="'Search'"
           type="text"
           :debounce="300"
+          class="w-60"
         >
           <template #prefix>
             <LucideSearch class="h-4 w-4 text-gray-500" />
           </template>
         </FormControl>
-        <Button
-          @click="() => (showForm = !showForm)"
-          label="New"
-          variant="solid"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4 stroke-1.5" />
-          </template>
-        </Button>
-      </div>
-    </div>
+      </template>
+    </SettingsLayoutHeader>
     <!-- List -->
     <div
       v-if="!teams.loading && teams.data?.length > 0"
-      class="divide-y w-full h-full hide-scrollbar overflow-y-scroll"
+      class="divide-y w-full h-full hide-scrollbar overflow-y-scroll mt-4"
     >
       <div
         v-for="team in teams.data"

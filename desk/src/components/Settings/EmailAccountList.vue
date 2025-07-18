@@ -1,19 +1,20 @@
 <template>
   <div>
     <!-- header -->
-    <div class="flex items-center justify-between">
-      <h1 class="text-lg font-semibold">Email Accounts</h1>
-      <Button
-        label="Add Account"
-        theme="gray"
-        variant="solid"
-        @click="emit('update:step', 'email-add')"
-      >
-        <template #prefix>
-          <LucidePlus class="h-4 w-4" />
-        </template>
-      </Button>
-    </div>
+    <SettingsLayoutHeader
+      title="Email Accounts"
+      description="Manage your email accounts and configure incoming and outgoing settings."
+    >
+      <template #actions>
+        <Button
+          label="Add Account"
+          theme="gray"
+          variant="solid"
+          @click="emit('update:step', 'email-add')"
+          icon-left="plus"
+        />
+      </template>
+    </SettingsLayoutHeader>
     <!-- list accounts -->
     <div
       v-if="!emailAccounts.loading && Boolean(emailAccounts.data?.length)"
@@ -37,6 +38,7 @@
 import { EmailAccount } from "@/types";
 import { createListResource } from "frappe-ui";
 import EmailAccountCard from "./EmailAccountCard.vue";
+import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
 
 const emit = defineEmits(["update:step"]);
 
