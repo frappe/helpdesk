@@ -19,7 +19,29 @@ def get_fields_meta(doctype="HD Ticket", fieldtypes=None):
 
 
 @frappe.whitelist()
-def create_field_dependency(parent_field, child_field, parent_child_mapping):
+def get_field_dependency(name):
+    """
+    Returns the field dependency for the given name.
+    """
+    if not name:
+        return None
+
+    doc = frappe.get_doc("HD Form Script", name)
+
+    res = frappe._dict()
+    res["name"] = doc.name
+    res["parent_field"] = doc.name.split("-")[1]
+    res["child_field"] = doc.name.split("-")[2]
+    res["enabled"] = doc.enabled
+    res["parent_child_mapping"] = frappe.parse_json(doc.script.split("//JSON: ")[-1])
+
+    return res
+
+
+@frappe.whitelist()
+def create_update_field_dependency(
+    parent_field, child_field, parent_child_mapping, enabled
+):
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:
         frappe.throw(
@@ -38,6 +60,7 @@ def create_field_dependency(parent_field, child_field, parent_child_mapping):
         child_field,
         func,
     )
+    script_doc.enabled = enabled
 
     # add JSON for UI
     script += "\n"
@@ -57,7 +80,6 @@ def get_or_create_standard_form_script(parent_field, child_field):
     else:
         doc = frappe.new_doc("HD Form Script")
         doc.is_standard = 1
-        doc.enabled = 1
         doc.name = f"Field Dependency-{parent_field}-{child_field}"
         return doc
 
