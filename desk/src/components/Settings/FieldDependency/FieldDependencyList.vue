@@ -29,11 +29,16 @@
       </div>
 
       <!-- Table content -->
-      <div v-if="!list.loading && list.data?.length > 0">
+      <div
+        v-if="
+          !fieldDependenciesList.loading &&
+          fieldDependenciesList.data?.length > 0
+        "
+      >
         <!-- Each row -->
         <div
           class="w-full flex flex-col items-center cursor-pointer group hover:rounded border-b transition hover:bg-surface-gray-2"
-          v-for="(row, idx) in list.data"
+          v-for="(row, idx) in fieldDependenciesList.data"
           @click.stop="$emit('update:step', 'fd', row.name)"
         >
           <div class="w-full flex items-center p-2">
@@ -55,7 +60,7 @@
             <!-- More Options -->
             <p class="w-1/12 flex items-center justify-end">
               <Dropdown placement="right" :options="options">
-                <Button variant="ghost">
+                <Button variant="ghost" @click.stop>
                   <template #icon>
                     <LucideMoreHorizontal class="h-4 w-4" />
                   </template>
@@ -66,7 +71,7 @@
           <!-- Separator -->
           <!-- <div
             class="mx-3 h-px border-t border-outline-gray-modals transition-opacity group-hover:opacity-0 w-full"
-            v-if="idx < list.data?.length - 1"
+            v-if="idx < fieldDependenciesList.data?.length - 1"
           /> -->
         </div>
       </div>
@@ -75,15 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import { createListResource, Avatar, Switch } from "frappe-ui";
+import { Avatar, Switch } from "frappe-ui";
 import { getFieldDependencyLabel } from "@/utils";
+import { onMounted } from "vue";
+import { fieldDependenciesList } from "./fieldDependency";
 
-const list = createListResource({
-  doctype: "HD Form Script",
-  filters: { is_standard: 1, name: ["like", "%Field Dependency%"] },
-  fields: ["name", "enabled", "owner"],
-  auto: true,
-  cache: ["FD", "List"],
+onMounted(() => {
+  fieldDependenciesList.reload();
 });
 
 const options = [

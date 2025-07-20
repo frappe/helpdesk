@@ -199,8 +199,8 @@
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { call, createResource, FormControl, toast, Switch } from "frappe-ui";
-
 import { reactive, watch, computed } from "vue";
+import { hiddenChildFields } from "./fieldDependency";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -323,12 +323,22 @@ async function handleFieldValues(fieldname: string, isParentField: boolean) {
   if (!field) return [];
 
   if (isParentField) {
-    state.childFields = parentFields.value.filter((f) => f.value !== fieldname);
+    // if new field dependency, reset child fields
     if (isNew.value) {
       state.selectedChildField = ""; // Reset child field when parent changes
       state.childFieldValues = [];
       state.currentParentSelection = ""; // Reset current parent selection
       state.childSelections = {}; // Reset child selections for new parent
+
+      // filter out hidden already madeup field dependencies in the child fields
+      let fieldsToHide = [fieldname, ...hiddenChildFields.value];
+      state.childFields = parentFields.value.filter(
+        (f) => !fieldsToHide.includes(f.value)
+      );
+    }
+    // show the selected child field if editing
+    else {
+      state.childFields = [state.selectedChildField];
     }
   }
 
