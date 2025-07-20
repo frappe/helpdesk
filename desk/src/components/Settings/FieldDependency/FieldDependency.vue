@@ -1,20 +1,23 @@
 <template>
   <div class="h-full flex flex-col">
     <header
-      class="flex justify-between mb-8 sticky top-0 z-10 bg-surface-modal"
+      class="flex justify-between mb-8 sticky top-0 z-10 bg-surface-modal items-center"
     >
       <Button
         variant="ghost"
         icon-left="chevron-left"
-        label="New Field Dependency"
+        :label="label"
         size="md"
         @click="() => $emit('update:step', 'fd-list')"
         class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px]"
       />
 
-      <div class="flex gap-2">
+      <div class="flex gap-4">
         <!-- Switch -->
-        <div></div>
+        <div class="flex gap-2 items-center">
+          <Switch v-model="state.enabled" class="!w-fit" />
+          <span class="text-p-base text-ink-gray-6">Enabled</span>
+        </div>
         <!-- Actions -->
         <div class="flex gap-1">
           <Button
@@ -46,6 +49,7 @@
           class="flex-1"
           type="select"
           :options="parentFields"
+          :disabled="!isNew"
         />
         <FormControl
           v-model="state.selectedChildField"
@@ -53,7 +57,7 @@
           placeholder="Select Child Field"
           required
           class="flex-1"
-          :disabled="!state.selectedParentField"
+          :disabled="!state.selectedParentField || !isNew"
           type="select"
           :options="state.childFields"
         />
@@ -193,8 +197,24 @@
 
 <script setup lang="ts">
 import { getMeta } from "@/stores/meta";
-import { call, createResource, FormControl } from "frappe-ui";
+import { getFieldDependencyLabel } from "@/utils";
+import { call, createResource, FormControl, toast, Switch } from "frappe-ui";
+
 import { reactive, watch, computed } from "vue";
+
+const props = defineProps({
+  fieldDependencyName: {
+    type: String,
+    default: "",
+  },
+});
+
+const isNew = computed(() => !props.fieldDependencyName);
+
+const label = computed(() => {
+  if (isNew.value) return "New Field Dependency";
+  return getFieldDependencyLabel(props.fieldDependencyName);
+});
 
 const { getFields } = getMeta("HD Ticket");
 
@@ -228,6 +248,8 @@ const state = reactive({
 
   parentSearch: "",
   childSearch: "",
+
+  enabled: true,
 });
 
 const filteredParentFieldValues = computed(() => {
@@ -252,25 +274,47 @@ function getSelectedChildValueCount(parent) {
   return selectedCount;
 }
 
-const createFieldDependency = createResource({
-  url: "helpdesk.api.settings.field_dependency.create_field_dependency",
+const createUpdateFieldDependency = createResource({
+  url: "helpdesk.api.settings.field_dependency.create_update_field_dependency",
   auto: false,
   makeParams: () => ({
     parent_field: state.selectedParentField,
     child_field: state.selectedChildField,
     parent_child_mapping: stringifyParentChildMapping(),
+    enabled: state.enabled,
   }),
+});
+
+const fieldDependency = createResource({
+  url: "helpdesk.api.settings.field_dependency.get_field_dependency",
+  params: {
+    name: props.fieldDependencyName,
+  },
+  auto: !isNew.value,
+  onSuccess: (data) => {
+    state.selectedParentField = data.parent_field;
+    state.selectedChildField = data.child_field;
+    state.enabled = data.enabled;
+    const mapping = JSON.parse(data.parent_child_mapping || "{}");
+    Object.keys(mapping).forEach((parent) => {
+      state.childSelections[parent] = new Set(mapping[parent]);
+    });
+    state.currentParentSelection = Object.keys(mapping)[0] || "";
+  },
 });
 
 function stringifyParentChildMapping() {
   const mapping = {};
   Object.keys(state.childSelections).forEach((parent) => {
-    mapping[parent] = Array.from(state.childSelections[parent]);
+    let selections = Array.from(state.childSelections[parent]);
+    if (selections.length) {
+      mapping[parent] = Array.from(state.childSelections[parent]);
+    }
   });
   return JSON.stringify(mapping);
 }
 
-async function handleFieldValues(fieldname, isParentField) {
+async function handleFieldValues(fieldname: string, isParentField: boolean) {
   if (!fieldname) return [];
 
   const field = isParentField
@@ -279,11 +323,13 @@ async function handleFieldValues(fieldname, isParentField) {
   if (!field) return [];
 
   if (isParentField) {
-    state.selectedChildField = ""; // Reset child field when parent changes
     state.childFields = parentFields.value.filter((f) => f.value !== fieldname);
-    state.childFieldValues = [];
-    state.currentParentSelection = ""; // Reset current parent selection
-    state.childSelections = {}; // Reset child selections for new parent
+    if (isNew.value) {
+      state.selectedChildField = ""; // Reset child field when parent changes
+      state.childFieldValues = [];
+      state.currentParentSelection = ""; // Reset current parent selection
+      state.childSelections = {}; // Reset child selections for new parent
+    }
   }
 
   if (field.type === "Select") {
@@ -370,7 +416,11 @@ function handleSelectAllChildValues(value) {
 }
 
 function handleSubmit() {
-  createFieldDependency.submit();
+  createUpdateFieldDependency.submit();
+  let successMessage = isNew.value
+    ? "Field Dependency created successfully"
+    : "Field Dependency updated successfully";
+  toast.success(successMessage);
 }
 
 // parent field watcher

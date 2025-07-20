@@ -5,6 +5,7 @@ import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
 import TicketIcon from "./components/icons/TicketIcon.vue";
+import { getMeta } from "./stores/meta";
 /**
  * Wrapper to create toasts, supplied with default options.
  * https://frappeui.com/components/toast.html
@@ -239,3 +240,19 @@ export async function removeAttachmentFromServer(attachment: string) {
     name: attachment,
   });
 }
+<<<<<<< HEAD
+=======
+
+function getParentChildField(name: string) {
+  let [_, parent, child] = name.split("-");
+  return [parent, child];
+}
+
+export function getFieldDependencyLabel(name: string) {
+  const { getField } = getMeta("HD Ticket");
+  let [parent, child] = getParentChildField(name);
+  parent = getField(parent)?.label || parent;
+  child = getField(child)?.label || child;
+  return `${parent} → ${child}`;
+}
+>>>>>>> 43efe7f8 (fix: update field dependency script)
