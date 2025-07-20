@@ -33,13 +33,13 @@
         <!-- Each row -->
         <div
           class="w-full flex flex-col items-center cursor-pointer group hover:rounded border-b transition hover:bg-surface-gray-2"
-          :class="`hover:rowitem-${idx} rowitem`"
           v-for="(row, idx) in list.data"
+          @click.stop="$emit('update:step', 'fd', row.name)"
         >
           <div class="w-full flex items-center p-2">
             <!-- Parent to Child -->
             <div class="flex gap-2 w-7/12 text-base text-ink-gray-7 pr-3">
-              <span>{{ rowName(row.name) }}</span>
+              <span>{{ getFieldDependencyLabel(row.name) }}</span>
             </div>
             <!-- Owner -->
             <p class="w-3/12 flex items-center gap-2 pr-3">
@@ -50,7 +50,7 @@
             </p>
             <!-- Enabled -->
             <p class="w-1/12 flex items-center">
-              <Switch v-model="row.enabled" />
+              <Switch v-model="row.enabled" @click.stop />
             </p>
             <!-- More Options -->
             <p class="w-1/12 flex items-center justify-end">
@@ -63,6 +63,11 @@
               </Dropdown>
             </p>
           </div>
+          <!-- Separator -->
+          <!-- <div
+            class="mx-3 h-px border-t border-outline-gray-modals transition-opacity group-hover:opacity-0 w-full"
+            v-if="idx < list.data?.length - 1"
+          /> -->
         </div>
       </div>
     </div>
@@ -71,17 +76,14 @@
 
 <script setup lang="ts">
 import { createListResource, Avatar, Switch } from "frappe-ui";
-import { getMeta } from "@/stores/meta";
+import { getFieldDependencyLabel } from "@/utils";
 
 const list = createListResource({
   doctype: "HD Form Script",
   filters: { is_standard: 1, name: ["like", "%Field Dependency%"] },
   fields: ["name", "enabled", "owner"],
   auto: true,
-  // cache: ["FD", "List"],
-  transform: (data) => {
-    return data.concat(data);
-  },
+  cache: ["FD", "List"],
 });
 
 const options = [
@@ -90,24 +92,4 @@ const options = [
     icon: "trash",
   },
 ];
-const { getField } = getMeta("HD Ticket");
-
-function rowName(name: string) {
-  let [_, parent, child] = name.split("-");
-  parent = getField(parent)?.label || parent;
-  child = getField(child)?.label || child;
-  return `${parent} → ${child}`;
-}
 </script>
-
-<style scoped>
-.rowitem {
-  /* row item is like  */
-  /* if it is not last and first */
-  /* take that item and uskei upar jo hai uska border-bottom as 0px and that item should add border-top as 1px */
-  &:not(:first-child):not(:last-child) {
-    border-bottom: 0px;
-    border-top: 1px solid var(--border-color);
-  }
-}
-</style>
