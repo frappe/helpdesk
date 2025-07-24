@@ -106,8 +106,11 @@
                 }
               "
             >
-              <template #default="{ openFileSelector }">
-                <Button variant="ghost" @click="openFileSelector()">
+              <template #default="{ openFileSelector, uploading }">
+                <Button variant="ghost" 
+                  @click="openFileSelector()"
+                  :disabled="uploading" 
+                  :loading="uploading">
                   <template #icon>
                     <AttachmentIcon
                       class="h-4"
@@ -185,6 +188,7 @@ import {
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, ref } from "vue";
+import func from "../../../vue-temp/vue-editor-bridge";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
