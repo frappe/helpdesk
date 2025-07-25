@@ -188,7 +188,6 @@ import {
 } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, nextTick, ref } from "vue";
-import func from "../../../vue-temp/vue-editor-bridge";
 
 const editorRef = ref(null);
 const showCannedResponseSelectorModal = ref(false);
