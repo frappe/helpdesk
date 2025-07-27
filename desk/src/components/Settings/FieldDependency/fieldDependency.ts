@@ -1,5 +1,5 @@
-import { createListResource } from "frappe-ui";
-import { computed } from "vue";
+import { call, createListResource } from "frappe-ui";
+import { computed, reactive } from "vue";
 
 export const fieldDependenciesList = createListResource({
   doctype: "HD Form Script",
@@ -20,3 +20,24 @@ export const hiddenChildFields = computed(() => {
   });
   return _fields;
 });
+
+const optionsMap = reactive({});
+
+export async function getFieldOptions(field: any): Promise<string[]> {
+  if (optionsMap[field.value]) {
+    return optionsMap[field.value];
+  }
+
+  if (field.type === "Select") {
+    optionsMap[field.value] = field.options.split("\n");
+    return optionsMap[field.value];
+  } else if (field.type === "Link") {
+    let options = await call("frappe.client.get_list", {
+      doctype: field.options,
+      fields: ["name"],
+      limit_page_length: 999,
+    });
+    optionsMap[field.value] = options.map((o) => o.name);
+    return optionsMap[field.value];
+  }
+}
