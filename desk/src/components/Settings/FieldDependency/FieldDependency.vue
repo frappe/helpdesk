@@ -161,7 +161,7 @@
                   <li
                     v-for="value in filteredChildFieldValues"
                     :key="value"
-                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex items-center hover:bg-surface-gray-1 max-w-full truncate"
                     @click="handleChildValueClick(value)"
                   >
                     <FormControl
@@ -200,7 +200,7 @@ import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { call, createResource, FormControl, toast, Switch } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
-import { hiddenChildFields } from "./fieldDependency";
+import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -317,11 +317,6 @@ function stringifyParentChildMapping() {
 async function handleFieldValues(fieldname: string, isParentField: boolean) {
   if (!fieldname) return [];
 
-  const field = isParentField
-    ? parentFields.value.find((f) => f.value === fieldname)
-    : state.childFields.find((f) => f.value === fieldname);
-  if (!field) return [];
-
   if (isParentField) {
     // if new field dependency, reset child fields
     if (isNew.value) {
@@ -335,23 +330,21 @@ async function handleFieldValues(fieldname: string, isParentField: boolean) {
       state.childFields = parentFields.value.filter(
         (f) => !fieldsToHide.includes(f.value)
       );
+    } else {
+      state.childFields = parentFields.value.filter(
+        (f) => f.value === state.selectedChildField
+      );
     }
     // show the selected child field if editing
-    else {
-      state.childFields = [state.selectedChildField];
-    }
   }
 
-  if (field.type === "Select") {
-    return field.options.split("\n");
-  } else if (field.type === "Link") {
-    let options = await call("frappe.client.get_list", {
-      doctype: field.options,
-      fields: ["name"],
-      limit_page_length: 999,
-    });
-    return options.map((o) => o.name);
-  }
+  const field = isParentField
+    ? parentFields.value.find((f) => f.value === fieldname)
+    : state.childFields.find((f) => f.value === fieldname);
+  if (!field) return [];
+  let options = await getFieldOptions(field);
+
+  return options;
 }
 
 function handleParentValueClick(value) {
