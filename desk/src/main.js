@@ -21,6 +21,7 @@ import "./index.css";
 import { router } from "./router";
 import { socket } from "./socket";
 import { posthogPlugin } from "./telemetry";
+import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
 
 const globalComponents = {
@@ -37,6 +38,9 @@ const globalComponents = {
 
 setConfig("resourceFetcher", frappeRequest);
 setConfig("serverMessagesHandler", (msgs) => {
+  if (isCustomerPortal.value) {
+    return;
+  }
   msgs.forEach((msg) => {
     msg = JSON.parse(msg);
     if (msg && msg.message == "Feedback email has been sent to the customer") {
