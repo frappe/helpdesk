@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-8 overflow-y-auto">
+  <div class="px-10 py-8 sticky top-0">
     <div class="flex items-start justify-between">
       <div class="flex flex-col gap-2">
         <h1 class="text-lg font-semibold text-ink-gray-8">Assignment rules</h1>
@@ -16,9 +16,9 @@
         icon-left="plus"
       />
     </div>
-    <div class="mt-6">
-      <AssignmentRulesListView />
-    </div>
+  </div>
+  <div class="overflow-y-auto px-10 pb-8">
+    <AssignmentRulesListView />
   </div>
 </template>
 
