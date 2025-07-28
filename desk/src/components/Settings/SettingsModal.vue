@@ -59,8 +59,12 @@ import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
+<<<<<<< HEAD
 import InviteAgent from "./InviteAgent.vue";
 >>>>>>> c02aeece (feat: add new user invitation flow)
+=======
+import InviteAgents from "./InviteAgents.vue";
+>>>>>>> ef77b71a (refactor(user-invitation): modify frontend to work with updated backend)
 
 const props = withDefaults(
   defineProps<{
@@ -90,9 +94,9 @@ let tabs = [
     component: markRaw(Agents),
   },
   {
-    label: "Invite Agent",
+    label: "Invite Agents",
     icon: markRaw(LucideUserPlus),
-    component: markRaw(InviteAgent),
+    component: markRaw(InviteAgents),
   },
   {
     label: "Teams",
