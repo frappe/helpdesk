@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-8 overflow-y-auto h-full">
+  <div class="px-10 py-8">
     <SettingsLayoutHeader
       title="Business Holidays"
       description="Set your team’s working days, hours, and holidays using a template or custom schedule."
@@ -14,9 +14,9 @@
         />
       </template>
     </SettingsLayoutHeader>
-    <div class="mt-6">
-      <HolidayList />
-    </div>
+  </div>
+  <div class="overflow-y-auto pb-8 px-10">
+    <HolidayList />
   </div>
 </template>
 
