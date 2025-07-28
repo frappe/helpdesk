@@ -46,7 +46,7 @@ import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
-import InviteAgent from "./InviteAgent.vue";
+import InviteAgents from "./InviteAgents.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -74,9 +74,9 @@ let tabs = [
     component: markRaw(Agents),
   },
   {
-    label: "Invite Agent",
+    label: "Invite Agents",
     icon: markRaw(LucideUserPlus),
-    component: markRaw(InviteAgent),
+    component: markRaw(InviteAgents),
   },
   {
     label: "Teams",
