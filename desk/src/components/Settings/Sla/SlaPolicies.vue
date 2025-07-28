@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-8 overflow-y-auto h-full">
+  <div class="px-10 py-8">
     <SettingsLayoutHeader>
       <template #title>
         <h1 class="text-lg font-semibold text-ink-gray-8">
@@ -28,9 +28,9 @@
         />
       </template>
     </SettingsLayoutHeader>
-    <div class="mt-6">
-      <SlaPolicyList />
-    </div>
+  </div>
+  <div class="px-10 pb-8 overflow-y-auto">
+    <SlaPolicyList />
   </div>
 </template>
 
