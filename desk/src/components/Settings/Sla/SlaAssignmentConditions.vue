@@ -7,14 +7,7 @@
   <div
     v-if="props.conditions.length == 0"
     class="flex p-4 items-center cursor-pointer justify-center gap-2 text-sm border border-gray-300 text-gray-600 rounded-md"
-    @click="
-      props.conditions.push({
-        field: null,
-        operator: 'equals',
-        value: '',
-        conjunction: 'and',
-      })
-    "
+    @click="props.conditions.push(['', '', ''])"
   >
     <FeatherIcon name="plus" class="h-4" />
     Add a custom condition
@@ -45,19 +38,22 @@ import {
 } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
 
-type Conditions = {
-  field: string | object | null;
-  operator: string;
-  value: string | number | boolean | Array<any>;
-  conjunction?: string;
-};
-
 const props = defineProps({
   conditions: {
-    type: Array<Conditions>,
+    type: Array<any>,
     required: true,
   },
 });
+
+const getConjunction = () => {
+  let conjunction = "and";
+  props.conditions.forEach((condition) => {
+    if (typeof condition == "string") {
+      conjunction = condition;
+    }
+  });
+  return conjunction;
+};
 
 const dropdownOptions = [
   {
@@ -69,21 +65,8 @@ const dropdownOptions = [
   {
     label: "Add condition group",
     onClick: () => {
-      const conjunction =
-        props.conditions.length > 1 ? props.conditions[1]?.conjunction : "and";
-      props.conditions.push({
-        field: "group",
-        operator: "equals",
-        value: [
-          {
-            field: null,
-            operator: "equals",
-            value: "",
-            conjunction: "and",
-          },
-        ],
-        conjunction: conjunction,
-      });
+      const conjunction = getConjunction();
+      props.conditions.push(conjunction, [[]]);
     },
   },
 ];
@@ -94,15 +77,9 @@ const addCondition = () => {
   if (!isValid) {
     return;
   }
-  const conjunction =
-    props.conditions.length > 1 ? props.conditions[1]?.conjunction : "and";
+  const conjunction = getConjunction();
 
-  props.conditions.push({
-    field: null,
-    operator: "equals",
-    value: "",
-    conjunction: conjunction,
-  });
+  props.conditions.push(conjunction, ["", "", ""]);
 };
 
 watchDebounced(
@@ -110,6 +87,6 @@ watchDebounced(
   () => {
     validateSlaData("condition");
   },
-  { deep: true, debounce: 300 }
+  { deep: true, debounce: 100 }
 );
 </script>
