@@ -28,5 +28,9 @@ helpdesk.patches.remove_agents_teams_default_views
 helpdesk.patches.add_fields_in_assignment_rule
 =======
 helpdesk.patches.agent_manager_perms #v2
+<<<<<<< HEAD
 helpdesk.patches.remove_agents_teams_default_views  
 >>>>>>> ef77b71a (refactor(user-invitation): modify frontend to work with updated backend)
+=======
+helpdesk.patches.remove_agents_teams_default_views
+>>>>>>> 55db39cd (fix: remove unwanted space from patch dot path)
