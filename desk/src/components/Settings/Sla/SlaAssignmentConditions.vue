@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import AssignmentConditions from "./AssignmentConditions/AssignmentConditions.vue";
-import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
+import { Button, ErrorMessage, FeatherIcon } from "frappe-ui";
 import {
   slaDataErrors,
   validateConditions,

@@ -141,7 +141,7 @@ import { TemplateOption } from "@/utils";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import weekday from "dayjs/plugin/weekday";
-import { Checkbox, Dropdown, FormLabel, Select, toast } from "frappe-ui";
+import { Checkbox, FormLabel, Select, toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import { getRepetitionText } from "./utils";
 

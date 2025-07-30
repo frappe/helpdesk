@@ -57,7 +57,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Dropdown } from "frappe-ui";
 import dayjs from "dayjs";
 import { getFormattedDate, TemplateOption } from "@/utils";
 import { holidayData } from "@/stores/holidayList";
@@ -107,7 +106,7 @@ const dialog = ref({
   show: false,
   holiday_date: null,
   description: "",
-  isEditing: false,
+  editing: null,
 });
 
 const holidays = computed(() => {
@@ -132,7 +131,7 @@ const editHoliday = (holiday: Holiday) => {
     show: true,
     holiday_date: holiday.holiday_date,
     description: holiday.description,
-    isEditing: true,
+    editing: holiday,
   };
 };
 

@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { slaDataErrors } from "@/stores/sla";
-import { Button, Dropdown } from "frappe-ui";
+import { Button } from "frappe-ui";
 import { computed, onMounted } from "vue";
 import { filterableFields } from "../utils";
 import AssignmentCondition from "./AssignmentCondition.vue";
