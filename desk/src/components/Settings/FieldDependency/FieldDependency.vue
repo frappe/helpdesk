@@ -3,14 +3,17 @@
     <header
       class="flex justify-between mb-8 sticky top-0 z-10 bg-surface-modal items-center"
     >
-      <Button
-        variant="ghost"
-        icon-left="chevron-left"
-        :label="dependencyLabel"
-        size="md"
-        @click="() => $emit('update:step', 'fd-list')"
-        class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px]"
-      />
+      <div class="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="dependencyLabel"
+          size="md"
+          @click="handleBackNavigation"
+          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px] pr-0"
+        />
+        <Badge v-if="isDirty" theme="orange"> Unsaved Changes </Badge>
+      </div>
 
       <div class="flex gap-4">
         <!-- Switch -->
@@ -198,9 +201,10 @@
 <script setup lang="ts">
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
-import { createResource, FormControl, toast, Switch } from "frappe-ui";
+import { createResource, FormControl, toast, Switch, Badge } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
+import { globalStore } from "@/stores/globalStore";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -208,6 +212,9 @@ const props = defineProps({
     default: "",
   },
 });
+const emit = defineEmits(["update:step"]);
+
+const { $dialog } = globalStore();
 
 const isNew = computed(() => !props.fieldDependencyName);
 
@@ -256,12 +263,25 @@ const state = reactive({
   childFieldValues: [],
 
   currentParentSelection: "",
-  childSelections: {}, // Initial value is a Set
 
+  childSelections: {}, // Initial value is a Set
+  initialChildSelections: {},
   parentSearch: "",
   childSearch: "",
 
   enabled: true,
+});
+
+const isDirty = computed(() => {
+  if (isNew.value) {
+    return state.enabled !== true || state.selectedParentField !== "";
+  }
+  if (fieldDependency.loading) return false;
+  return (
+    Boolean(fieldDependency.data?.enabled) !== Boolean(state.enabled) ||
+    JSON.stringify(state.childSelections) !==
+      JSON.stringify(state.initialChildSelections)
+  );
 });
 
 const filteredParentFieldValues = computed(() => {
@@ -295,6 +315,13 @@ const createUpdateFieldDependency = createResource({
     parent_child_mapping: stringifyParentChildMapping(),
     enabled: state.enabled,
   }),
+  onSuccess: () => {
+    if (!isNew.value) {
+      fieldDependency.reload();
+      return;
+    }
+    emit("update:step", "fd-list");
+  },
 });
 
 const fieldDependency = createResource({
@@ -310,8 +337,12 @@ const fieldDependency = createResource({
     const mapping = JSON.parse(data.parent_child_mapping || "{}");
     Object.keys(mapping).forEach((parent) => {
       state.childSelections[parent] = new Set(mapping[parent]);
+      // for checking dirty state
+      state.initialChildSelections[parent] = new Set(mapping[parent]);
     });
-    state.currentParentSelection = Object.keys(mapping)[0] || "";
+    if (!state.currentParentSelection) {
+      state.currentParentSelection = Object.keys(mapping)[0] || "";
+    }
   },
 });
 
@@ -430,7 +461,30 @@ function handleSelectAllChildValues(value) {
   }
 }
 
+function handleBackNavigation() {
+  if (isDirty.value) {
+    $dialog({
+      title: "Unsaved Changes",
+      message:
+        "Are you sure you want to go back? Unsaved changes will be lost.",
+      actions: [
+        {
+          label: "Confirm",
+          variant: "solid",
+          onClick({ close }) {
+            close();
+            emit("update:step", "fd-list");
+          },
+        },
+      ],
+    });
+    return;
+  }
+  emit("update:step", "fd-list");
+}
+
 function handleSubmit() {
+  if (!isDirty.value) return;
   createUpdateFieldDependency.submit();
   let successMessage = isNew.value
     ? "Field Dependency created successfully"
