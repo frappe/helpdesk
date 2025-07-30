@@ -6,7 +6,7 @@
       <Button
         variant="ghost"
         icon-left="chevron-left"
-        :label="label"
+        :label="dependencyLabel"
         size="md"
         @click="() => $emit('update:step', 'fd-list')"
         class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px]"
@@ -75,7 +75,7 @@
             <template v-if="state.selectedParentField">
               <FormControl
                 v-model="state.parentSearch"
-                placeholder="Search values"
+                :placeholder="parentPlaceholder"
                 type="text"
                 class="w-full"
               >
@@ -134,7 +134,7 @@
             >
               <FormControl
                 v-model="state.childSearch"
-                placeholder="Search values"
+                :placeholder="childPlaceholder"
                 type="text"
                 class="w-full"
               >
@@ -198,7 +198,7 @@
 <script setup lang="ts">
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
-import { call, createResource, FormControl, toast, Switch } from "frappe-ui";
+import { createResource, FormControl, toast, Switch } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 
@@ -211,9 +211,21 @@ const props = defineProps({
 
 const isNew = computed(() => !props.fieldDependencyName);
 
-const label = computed(() => {
+const dependencyLabel = computed(() => {
   if (isNew.value) return "New Field Dependency";
   return getFieldDependencyLabel(props.fieldDependencyName);
+});
+
+const parentPlaceholder = computed(() => {
+  if (!state.selectedParentField) return "Search values";
+  let label = parentFields.value.find(
+    (f) => f.value === state.selectedParentField
+  )?.label;
+  return `Search ${label} values`;
+});
+const childPlaceholder = computed(() => {
+  if (!state.currentParentSelection) return "Search values";
+  return `Search ${state.currentParentSelection} values`;
 });
 
 const { getFields } = getMeta("HD Ticket");
