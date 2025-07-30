@@ -59,8 +59,9 @@
         <!-- Each row -->
         <div
           class="w-full flex flex-col items-center cursor-pointer group hover:rounded border-b transition hover:bg-surface-gray-2"
-          v-for="(row, idx) in fieldDependenciesList.data"
+          v-for="row in fieldDependenciesList.data"
           @click.stop="$emit('update:step', 'fd', row.name)"
+          :key="row.name"
         >
           <div class="w-full flex items-center p-2">
             <!-- Parent to Child -->
@@ -76,7 +77,11 @@
             </p>
             <!-- Enabled -->
             <p class="w-1/12 flex items-center">
-              <Switch v-model="row.enabled" @click.stop />
+              <Switch
+                :model-value="row.enabled"
+                @update:modelValue="(e) => handleSwitchToggle(row.name, e)"
+                @click.stop
+              />
             </p>
             <!-- More Options -->
             <p class="w-1/12 flex items-center justify-end">
@@ -116,4 +121,18 @@ const options = [
     icon: "trash",
   },
 ];
+
+function handleSwitchToggle(rowName: string, value: boolean) {
+  fieldDependenciesList.setValue.submit(
+    {
+      name: rowName,
+      enabled: value,
+    },
+    {
+      onSuccess: () => {
+        fieldDependenciesList.reload();
+      },
+    }
+  );
+}
 </script>
