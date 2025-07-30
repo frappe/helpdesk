@@ -1,6 +1,54 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
 import { ref } from "vue";
 
+const defaultStatus = [
+  {
+    status: "Replied",
+    sla_behavior: "Paused",
+  },
+  {
+    status: "Closed",
+    sla_behavior: "Fulfilled",
+  },
+  {
+    status: "Resolved",
+    sla_behavior: "Fulfilled",
+  },
+];
+
+const defaultSupportAndResolution = [
+  {
+    workday: "Monday",
+    start_time: "09:00:00",
+    end_time: "17:00:00",
+    id: Math.random().toString(36).substring(2, 9),
+  },
+  {
+    workday: "Tuesday",
+    start_time: "09:00:00",
+    end_time: "17:00:00",
+    id: Math.random().toString(36).substring(2, 9),
+  },
+  {
+    workday: "Wednesday",
+    start_time: "09:00:00",
+    end_time: "17:00:00",
+    id: Math.random().toString(36).substring(2, 9),
+  },
+  {
+    workday: "Thursday",
+    start_time: "09:00:00",
+    end_time: "17:00:00",
+    id: Math.random().toString(36).substring(2, 9),
+  },
+  {
+    workday: "Friday",
+    start_time: "09:00:00",
+    end_time: "17:00:00",
+    id: Math.random().toString(36).substring(2, 9),
+  },
+];
+
 export const slaData = ref({
   name: "",
   service_level: "",
@@ -9,13 +57,13 @@ export const slaData = ref({
   default_sla: false,
   apply_sla_for_resolution: false,
   priorities: [],
-  statuses: [],
+  statuses: defaultStatus,
   holiday_list: "Default",
   default_priority: "",
   start_date: "",
   end_date: "",
   loading: false,
-  support_and_resolution: [],
+  support_and_resolution: defaultSupportAndResolution,
   condition: [],
   condition_json: [],
 });
@@ -29,57 +77,13 @@ export const resetSlaData = () => {
     default_sla: false,
     apply_sla_for_resolution: false,
     priorities: [],
-    statuses: [
-      {
-        status: "Replied",
-        sla_behavior: "Paused",
-      },
-      {
-        status: "Closed",
-        sla_behavior: "Fulfilled",
-      },
-      {
-        status: "Resolved",
-        sla_behavior: "Fulfilled",
-      },
-    ],
+    statuses: defaultStatus,
     holiday_list: "Default",
     default_priority: "",
     start_date: "",
     end_date: "",
     loading: false,
-    support_and_resolution: [
-      {
-        workday: "Monday",
-        start_time: "09:00:00",
-        end_time: "17:00:00",
-        id: Math.random().toString(36).substring(2, 9),
-      },
-      {
-        workday: "Tuesday",
-        start_time: "09:00:00",
-        end_time: "17:00:00",
-        id: Math.random().toString(36).substring(2, 9),
-      },
-      {
-        workday: "Wednesday",
-        start_time: "09:00:00",
-        end_time: "17:00:00",
-        id: Math.random().toString(36).substring(2, 9),
-      },
-      {
-        workday: "Thursday",
-        start_time: "09:00:00",
-        end_time: "17:00:00",
-        id: Math.random().toString(36).substring(2, 9),
-      },
-      {
-        workday: "Friday",
-        start_time: "09:00:00",
-        end_time: "17:00:00",
-        id: Math.random().toString(36).substring(2, 9),
-      },
-    ],
+    support_and_resolution: defaultSupportAndResolution,
     condition: [],
     condition_json: [],
   };
@@ -129,23 +133,29 @@ export const resetSlaDataErrors = () => {
 
 export function validateConditions(conditions: any[]): boolean {
   if (!Array.isArray(conditions)) return false;
-  
+
   // Handle simple condition [field, operator, value]
-  if (conditions.length === 3 && 
-      typeof conditions[0] === 'string' && 
-      typeof conditions[1] === 'string') {
+  if (
+    conditions.length === 3 &&
+    typeof conditions[0] === "string" &&
+    typeof conditions[1] === "string"
+  ) {
     return conditions[0] !== "" && conditions[1] !== "" && conditions[2] !== "";
   }
 
   // Iterate through conditions and logical operators
   for (let i = 0; i < conditions.length; i++) {
     const item = conditions[i];
-    
+
     // Skip logical operators (they will be validated by their position)
-    if (item === 'and' || item === 'or') {
+    if (item === "and" || item === "or") {
       // Ensure logical operators are not at start/end and not consecutive
-      if (i === 0 || i === conditions.length - 1 || 
-          conditions[i-1] === 'and' || conditions[i-1] === 'or') {
+      if (
+        i === 0 ||
+        i === conditions.length - 1 ||
+        conditions[i - 1] === "and" ||
+        conditions[i - 1] === "or"
+      ) {
         return false;
       }
       continue;
@@ -161,7 +171,7 @@ export function validateConditions(conditions: any[]): boolean {
       return false;
     }
   }
-  
+
   return conditions.length > 0;
 }
 
@@ -365,7 +375,6 @@ export function validateSlaData(key?: SlaField): SlaValidationErrors {
       case "support_and_resolution":
         const validWorkdays = slaData.value.support_and_resolution?.filter(
           (day) =>
-            !day.is_holiday &&
             day.workday &&
             day.workday.trim() !== "" &&
             day.start_time &&

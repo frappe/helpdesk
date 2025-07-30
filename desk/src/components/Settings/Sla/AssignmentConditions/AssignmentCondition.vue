@@ -16,7 +16,9 @@
       ]"
     >
       <div :class="'text-end text-base text-gray-600'">
-        <div v-if="props.itemIndex == 0" class="min-w-16 text-start">Where</div>
+        <div v-if="props.itemIndex == 0" class="min-w-[66px] text-start">
+          Where
+        </div>
         <div v-else class="min-w-[66px] flex items-start">
           <Button
             variant="subtle"
@@ -30,7 +32,7 @@
       </div>
       <div v-if="!props.isGroup" class="flex items-center gap-2 w-full">
         <div id="fieldname" class="w-full">
-          <AutocompleteNew
+          <Autocomplete
             :options="filterableFields.data"
             v-model="props.condition[0]"
             :placeholder="'Field'"
@@ -104,15 +106,15 @@
 </template>
 
 <script setup lang="ts">
-import { AutocompleteNew, Link, StarRating } from "@/components";
+import { Link, StarRating } from "@/components";
 import { TemplateOption } from "@/utils";
 import {
+  Autocomplete,
   Button,
   DatePicker,
   DateRangePicker,
   DateTimePicker,
   Dialog,
-  Dropdown,
   FormControl,
 } from "frappe-ui";
 import { computed, defineEmits, h, ref } from "vue";

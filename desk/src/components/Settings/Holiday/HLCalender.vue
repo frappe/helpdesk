@@ -165,7 +165,7 @@ const dialog = ref({
   show: false,
   holiday_date: null,
   description: "",
-  isEditing: false,
+  editing: null,
 });
 
 const {
@@ -217,10 +217,10 @@ const handleMouseLeave = (date, callback) => {
 
 const addHoliday = (date) => {
   dialog.value = {
-    holiday_date: dayjs(date),
+    holiday_date: date,
     description: "",
     show: true,
-    isEditing: false,
+    editing: null,
   };
 };
 
@@ -265,9 +265,9 @@ const editHoliday = (date) => {
   });
   dialog.value = {
     show: true,
-    holiday_date: dayjs(holiday.holiday_date),
+    holiday_date: holiday.holiday_date,
     description: holiday.description,
-    isEditing: true,
+    editing: holiday,
   };
 };
 
@@ -294,7 +294,7 @@ const deleteHoliday = (event, date, callback) => {
     show: false,
     holiday_date: null,
     description: "",
-    isEditing: false,
+    editing: null,
   };
   isConfirmingDelete.value = false;
   callback();

@@ -224,7 +224,7 @@ const dialog = ref({
   show: false,
   holiday_date: null,
   description: "",
-  isEditing: false,
+  editing: null,
 });
 
 const isDirty = ref(false);

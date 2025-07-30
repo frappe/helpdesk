@@ -3,7 +3,7 @@
     v-model="dialog.show"
     :options="{
       size: 'sm',
-      title: dialog.isEditing ? 'Edit Holiday' : 'Add Holiday',
+      title: dialog.editing ? 'Edit Holiday' : 'Add Holiday',
     }"
     @after-leave="resetForm"
   >
@@ -66,8 +66,8 @@ import {
   FormLabel,
   toast,
   ErrorMessage,
+  DatePicker,
 } from "frappe-ui";
-import DatePicker from "frappe-ui/src/components/DatePicker/DatePicker.vue";
 import { ref } from "vue";
 import dayjs from "dayjs";
 import { holidayData } from "@/stores/holidayList";
@@ -76,7 +76,7 @@ interface ModelType {
   show: boolean;
   holiday_date: null | string;
   description: string;
-  isEditing: boolean;
+  editing: null | any;
 }
 
 const dialog = defineModel<ModelType>();
@@ -126,18 +126,21 @@ const onSave = () => {
       getFormattedDate(dialog.value.holiday_date)
   );
 
-  if (index !== -1 && !dialog.value.isEditing) {
+  if (index !== -1 && !dialog.value.editing) {
     toast.error("Holiday already exists");
     return;
   }
 
-  if (index === -1 && !dialog.value.isEditing) {
+  if (index === -1 && !dialog.value.editing) {
     holidayData.value.holidays.push({
       ...dialog.value,
       weekly_off: 0,
     });
   } else {
-    holidayData.value.holidays.splice(index, 1, {
+    const holidayIndex = holidayData.value.holidays.indexOf(
+      dialog.value.editing
+    );
+    holidayData.value.holidays.splice(holidayIndex, 1, {
       ...dialog.value,
       weekly_off: 0,
     });
@@ -147,7 +150,7 @@ const onSave = () => {
     show: false,
     holiday_date: null,
     description: "",
-    isEditing: false,
+    editing: null,
   };
 };
 </script>

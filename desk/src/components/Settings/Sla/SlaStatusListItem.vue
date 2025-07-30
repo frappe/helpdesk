@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Button, Select, Dropdown, Dialog, toast } from "frappe-ui";
+import { Button, Select, Dialog, toast } from "frappe-ui";
 import { getGridTemplateColumnsForTable, TemplateOption } from "@/utils";
 
 const props = defineProps({
