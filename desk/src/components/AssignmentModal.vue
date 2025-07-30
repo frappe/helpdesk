@@ -8,7 +8,7 @@
   >
     <template #body-content>
       <AutocompleteNew
-        v-if="teamRestrictionApplied && assignWithinTeam"
+        v-if="showRestrictedMembers"
         placeholder="Search agents"
         :model-value="search"
         :options="members"
@@ -189,8 +189,12 @@ async function getMembers() {
   });
 }
 
+const showRestrictedMembers = computed(() => {
+  return teamRestrictionApplied && assignWithinTeam && props.team;
+});
+
 onMounted(() => {
-  if (teamRestrictionApplied && assignWithinTeam) {
+  if (showRestrictedMembers.value) {
     getMembers();
   }
 });
