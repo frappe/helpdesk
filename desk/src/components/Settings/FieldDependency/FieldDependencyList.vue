@@ -19,7 +19,33 @@
       </Button>
     </header>
 
-    <div class="w-full">
+    <!-- Loading State -->
+    <div
+      v-if="fieldDependenciesList.loading"
+      class="flex items-center justify-center py-4"
+    >
+      <LoadingIndicator :scale="5" />
+    </div>
+
+    <!-- Empty State -->
+    <div
+      v-if="
+        !fieldDependenciesList.loading &&
+        fieldDependenciesList.data?.length === 0
+      "
+      class="flex mt-28 justify-between w-full h-full"
+    >
+      <p class="text-sm text-gray-500 w-full flex justify-center">
+        No field dependencies found.
+      </p>
+    </div>
+
+    <div
+      class="w-full"
+      v-if="
+        !fieldDependenciesList.loading && fieldDependenciesList.data?.length > 0
+      "
+    >
       <!-- table heading -->
       <div class="flex w-full p-2 border-b">
         <p class="w-7/12 text-p-sm text-ink-gray-5">Name</p>
@@ -29,12 +55,7 @@
       </div>
 
       <!-- Table content -->
-      <div
-        v-if="
-          !fieldDependenciesList.loading &&
-          fieldDependenciesList.data?.length > 0
-        "
-      >
+      <div>
         <!-- Each row -->
         <div
           class="w-full flex flex-col items-center cursor-pointer group hover:rounded border-b transition hover:bg-surface-gray-2"
@@ -80,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, Switch } from "frappe-ui";
+import { Avatar, LoadingIndicator, Switch } from "frappe-ui";
 import { getFieldDependencyLabel } from "@/utils";
 import { onMounted } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
