@@ -14,6 +14,9 @@ export const useConfigStore = defineStore("config", () => {
   const teamRestrictionApplied = computed(
     () => !!parseInt(config.value.restrict_tickets_by_agent_group)
   );
+  const assignWithinTeam = computed(
+    () => !!parseInt(config.value.assign_within_team)
+  );
   const skipEmailWorkflow: ComputedRef<boolean> = computed(
     () => !!parseInt(config.value.skip_email_workflow)
   );
@@ -33,5 +36,6 @@ export const useConfigStore = defineStore("config", () => {
     skipEmailWorkflow,
     isFeedbackMandatory,
     teamRestrictionApplied,
+    assignWithinTeam,
   };
 });
