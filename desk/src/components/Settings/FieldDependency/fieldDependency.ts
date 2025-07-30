@@ -7,6 +7,7 @@ export const fieldDependenciesList = createListResource({
   fields: ["name", "enabled", "owner"],
   auto: true,
   cache: ["FD", "List"],
+  orderBy: "modified desc",
 });
 
 export const hiddenChildFields = computed(() => {
