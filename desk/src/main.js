@@ -23,8 +23,6 @@ import { socket } from "./socket";
 import { posthogPlugin } from "./telemetry";
 import { isCustomerPortal } from "@/utils";
 import { translationPlugin } from "./translation";
-import { isCustomerPortal } from "@/utils";
-import { translationPlugin } from "./translation";
 
 const globalComponents = {
   Badge,
