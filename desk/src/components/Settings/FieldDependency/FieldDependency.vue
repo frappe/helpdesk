@@ -279,8 +279,8 @@ const isDirty = computed(() => {
   if (fieldDependency.loading) return false;
   return (
     Boolean(fieldDependency.data?.enabled) !== Boolean(state.enabled) ||
-    JSON.stringify(state.childSelections) !==
-      JSON.stringify(state.initialChildSelections)
+    stringifyParentChildMapping(state.childSelections) !==
+      stringifyParentChildMapping(state.initialChildSelections)
   );
 });
 
@@ -334,24 +334,32 @@ const fieldDependency = createResource({
     state.selectedParentField = data.parent_field;
     state.selectedChildField = data.child_field;
     state.enabled = data.enabled;
+
     const mapping = JSON.parse(data.parent_child_mapping || "{}");
+    let selections = {};
     Object.keys(mapping).forEach((parent) => {
-      state.childSelections[parent] = new Set(mapping[parent]);
-      // for checking dirty state
-      state.initialChildSelections[parent] = new Set(mapping[parent]);
+      selections[parent] = new Set(mapping[parent]);
     });
+    state.childSelections = selections;
+    // for checking dirty state
+    state.initialChildSelections = structuredClone(selections);
+
     if (!state.currentParentSelection) {
       state.currentParentSelection = Object.keys(mapping)[0] || "";
     }
   },
 });
 
-function stringifyParentChildMapping() {
+function stringifyParentChildMapping(selections = null) {
+  const _selections =
+    selections && Object.keys(selections).length > 0
+      ? selections
+      : state.childSelections;
   const mapping = {};
-  Object.keys(state.childSelections).forEach((parent) => {
-    let selections = Array.from(state.childSelections[parent]);
+  Object.keys(_selections).forEach((parent) => {
+    let selections = Array.from(_selections[parent]);
     if (selections.length) {
-      mapping[parent] = Array.from(state.childSelections[parent]);
+      mapping[parent] = Array.from(_selections[parent]);
     }
   });
   return JSON.stringify(mapping);
@@ -439,7 +447,9 @@ const toggleCheckboxLabel = computed(() => {
   if (!parent) return "Select All";
   const selectedCount = getSelectedChildValueCount(parent);
   if (selectedCount === 0) return "Select All";
-  return `${selectedCount} values selected`;
+  return `${selectedCount} ${
+    selectedCount === 1 ? "value" : "values"
+  } selected`;
 });
 
 function handleSelectAllChildValues(value) {
