@@ -21,4 +21,4 @@ helpdesk.patches.update_hd_team_users
 helpdesk.patches.default_article_category #v2
 helpdesk.patches.communication_read_perm_agent
 helpdesk.patches.agent_manager_perms #v2
-helpdesk.patches.remove_agents_teams_default_views  
+helpdesk.patches.remove_agents_teams_default_views
