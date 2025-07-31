@@ -8,31 +8,32 @@
   >
     <div class="flex items-center justify-between w-full">
       <div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-4">
           <Button
             variant="ghost"
             icon-left="chevron-left"
             :label="slaData.service_level || 'New SLA Policy'"
             size="md"
             @click="goBack()"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70"
+            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
           />
           <Badge
             :variant="'subtle'"
-            :theme="slaData.enabled ? 'blue' : 'gray'"
+            :theme="'orange'"
             size="sm"
-            :label="slaData.enabled ? 'Enabled' : 'Disabled'"
+            label="Unsaved changes"
+            v-if="isDirty"
           />
         </div>
       </div>
-      <div class="flex gap-2 items-center">
-        <Badge
-          :variant="'subtle'"
-          :theme="'orange'"
-          size="sm"
-          label="Unsaved changes"
-          v-if="isDirty"
-        />
+      <div class="flex gap-4 items-center">
+        <div
+          class="flex items-center justify-between gap-2 cursor-pointer"
+          @click="toggleEnabled"
+        >
+          <Switch size="sm" :model-value="slaData.enabled" />
+          <span class="text-sm text-ink-gray-7 font-medium">Enabled</span>
+        </div>
         <Button
           label="Save"
           theme="gray"
@@ -45,11 +46,6 @@
     </div>
   </div>
   <div v-if="!slaData.loading" class="overflow-y-auto px-10 pb-10">
-    <div class="flex items-center justify-between gap-2" @click="toggleEnabled">
-      <span class="text-sm text-ink-gray-7">Enable Policy</span>
-      <Switch size="sm" :model-value="slaData.enabled" />
-    </div>
-    <hr class="mb-6 mt-3" />
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
       <div>
         <FormControl

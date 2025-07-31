@@ -10,25 +10,25 @@
     class="flex items-center justify-between sticky top-0 z-10 bg-white px-10 pt-8 pb-4"
   >
     <div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-4">
         <Button
           variant="ghost"
           icon-left="chevron-left"
           :label="holidayData?.holiday_list_name || 'New Business Holiday'"
           size="md"
           @click="goBack()"
-          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-ink-gray-7 text-xl hover:opacity-70 !pr-0"
+        />
+        <Badge
+          :variant="'subtle'"
+          :theme="'orange'"
+          size="sm"
+          label="Unsaved changes"
+          v-if="isDirty"
         />
       </div>
     </div>
     <div class="flex gap-2 items-center">
-      <Badge
-        :variant="'subtle'"
-        :theme="'orange'"
-        size="sm"
-        label="Unsaved changes"
-        v-if="isDirty"
-      />
       <Button
         label="Save"
         theme="gray"
