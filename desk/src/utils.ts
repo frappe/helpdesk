@@ -1,6 +1,6 @@
 import { useClipboard, useDateFormat, useTimeAgo } from "@vueuse/core";
 import dayjs from "dayjs";
-import { call, toast, useFileUpload } from "frappe-ui";
+import { FeatherIcon, call, toast, useFileUpload } from "frappe-ui";
 import { gemoji } from "gemoji";
 import { h, markRaw, ref } from "vue";
 import zod from "zod";
@@ -220,6 +220,82 @@ export function getFontFamily(content: string) {
   return langMap[lang];
 }
 
+/**
+ * Parses HTML string and returns the text content with preserved line breaks
+ * @param html - HTML string to parse
+ * @returns Plain text content with preserved line breaks
+ */
+export function htmlToText(html: string): string {
+  if (!html) return "";
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const lineBreaks = doc.querySelectorAll("br, p, div, li");
+  lineBreaks.forEach((el) => {
+    el.after("\n");
+  });
+
+  let text = doc.body.textContent || "";
+
+  text = text.replace(/\s+/g, " ");
+
+  text = text.replace(/\n\s*\n/g, "\n");
+
+  return text.trim();
+}
+
+/**
+ * Format a date according to the user's system settings
+ * @param {Date|string} date - Date object or ISO date string
+ * @returns {string} Formatted date string in the user's locale and preferences
+ */
+export function getFormattedDate(date) {
+  if (!date) return "";
+
+  const dateObj = dayjs(date);
+  if (!dateObj.isValid()) return "";
+
+  return dateObj.format("DD-MM-YYYY");
+}
+
+export function TemplateOption({ active, option, variant, icon, onClick }) {
+  return h(
+    "button",
+    {
+      class: [
+        active ? "bg-surface-gray-2" : "text-ink-gray-8",
+        "group flex w-full gap-2 items-center rounded-md px-2 py-2 text-base",
+        variant == "danger" ? "text-ink-red-3 hover:bg-ink-red-1" : "",
+      ],
+      onClick: onClick,
+    },
+    [
+      icon
+        ? h(FeatherIcon, {
+            name: icon,
+            class: ["h-4 w-4 shrink-0"],
+            "aria-hidden": true,
+          })
+        : null,
+      h("span", { class: "whitespace-nowrap" }, option),
+    ]
+  );
+}
+
+export function getGridTemplateColumnsForTable(columns) {
+  let columnsWidth = columns
+    .map((col) => {
+      let width = col.width || 1;
+      if (typeof width === "number") {
+        return width + "fr";
+      }
+      return width;
+    })
+    .join(" ");
+  return columnsWidth + " 22px";
+}
+
 export function uploadFunction(
   file: File,
   doctype: string = null,
@@ -239,3 +315,126 @@ export async function removeAttachmentFromServer(attachment: string) {
     name: attachment,
   });
 }
+
+export const convertToConditions = ({
+  conditions,
+  fieldPrefix,
+}: {
+  conditions: any[];
+  fieldPrefix?: string;
+}): string => {
+  if (!conditions || conditions.length === 0) {
+    return "";
+  }
+
+  const processCondition = (condition: any): string => {
+    if (typeof condition === "string") {
+      return condition.toLowerCase();
+    }
+
+    if (Array.isArray(condition)) {
+      // Nested condition group
+      if (Array.isArray(condition[0])) {
+        const nestedStr = convertToConditions({
+          conditions: condition,
+          fieldPrefix,
+        });
+        return `(${nestedStr})`;
+      }
+
+      // Simple condition: [fieldname, operator, value]
+      const [field, operator, value] = condition;
+      const fieldAccess = fieldPrefix ? `${fieldPrefix}.${field}` : field;
+
+      const operatorMap: Record<string, string> = {
+        equals: "==",
+        "=": "==",
+        "==": "==",
+        "!=": "!=",
+        "not equals": "!=",
+        "<": "<",
+        "<=": "<=",
+        ">": ">",
+        ">=": ">=",
+        in: "in",
+        "not in": "not in",
+        like: "like",
+        "not like": "not like",
+        is: "is",
+        "is not": "is not",
+        between: "between",
+      };
+
+      let op = operatorMap[operator.toLowerCase()] || operator;
+
+      if (
+        (op === "==" || op === "!=") &&
+        (String(value).toLowerCase() === "yes" ||
+          String(value).toLowerCase() === "no")
+      ) {
+        let checkVal = String(value).toLowerCase() === "yes";
+        if (op === "!=") {
+          checkVal = !checkVal;
+        }
+        return checkVal ? fieldAccess : `not ${fieldAccess}`;
+      }
+
+      if (op === "is" && String(value).toLowerCase() === "set") {
+        return fieldAccess;
+      }
+      if (
+        (op === "is" && String(value).toLowerCase() === "not set") ||
+        (op === "is not" && String(value).toLowerCase() === "set")
+      ) {
+        return `not ${fieldAccess}`;
+      }
+
+      if (op === "like") {
+        return `${fieldAccess} and "${value}" in ${fieldAccess}`;
+      }
+      if (op === "not like") {
+        return `${fieldAccess} and "${value}" not in ${fieldAccess}`;
+      }
+
+      if (
+        op === "between" &&
+        typeof value === "string" &&
+        value.includes(",")
+      ) {
+        const [start, end] = value.split(",").map((v: string) => v.trim());
+        return `(${fieldAccess} >= "${start}" and ${fieldAccess} <= "${end}")`;
+      }
+
+      let valueStr = "";
+      if (op === "in" || op === "not in") {
+        let items: string[];
+        if (Array.isArray(value)) {
+          items = value.map((v) => `"${String(v).trim()}"`);
+        } else if (typeof value === "string") {
+          items = value.split(",").map((v) => `"${v.trim()}"`);
+        } else {
+          items = [`"${String(value).trim()}"`];
+        }
+        valueStr = `[${items.join(", ")}]`;
+        return `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
+      }
+
+      if (typeof value === "string") {
+        valueStr = `"${value.replace(/"/g, '\\"')}"`;
+      } else if (typeof value === "number" || typeof value === "boolean") {
+        valueStr = String(value);
+      } else if (value === null || value === undefined) {
+        return op === "==" || op === "is" ? `not ${fieldAccess}` : fieldAccess;
+      } else {
+        valueStr = `"${String(value).replace(/"/g, '\\"')}"`;
+      }
+
+      return `${fieldAccess} ${op} ${valueStr}`;
+    }
+
+    return "";
+  };
+
+  const parts = conditions.map(processCondition);
+  return parts.join(" ");
+};
