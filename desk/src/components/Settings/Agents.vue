@@ -2,7 +2,7 @@
   <div v-bind:class="$attrs.class">
     <!-- Header -->
     <div class="flex items-center justify-between mb-4">
-      <h1 class="text-lg font-semibold">Agents</h1>
+      <h1 class="text-lg font-semibold">{{ __("Agents") }}</h1>
       <div class="flex item-center space-x-2">
         <FormControl
           v-model="search"

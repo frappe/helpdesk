@@ -130,6 +130,7 @@
       v-model="showAssignmentModal"
       :assignees="ticket.data.assignees"
       :docname="ticketId"
+      :team="ticket.data?.agent_group"
       doctype="HD Ticket"
       @update="
         () => {

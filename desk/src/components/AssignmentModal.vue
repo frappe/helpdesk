@@ -7,7 +7,29 @@
     }"
   >
     <template #body-content>
+      <AutocompleteNew
+        v-if="showRestrictedMembers"
+        placeholder="Search agents"
+        :model-value="search"
+        :options="members"
+        @update:model-value="
+          ({ _, value }) => {
+            addAssignee(value);
+          }
+        "
+      >
+        <template #item-prefix="{ option }">
+          <UserAvatar class="mr-2" :name="option.value" size="sm" />
+        </template>
+        <template #item-label="{ option }">
+          <Tooltip :text="option.value">
+            {{ getUser(option.value).full_name }}
+          </Tooltip>
+        </template>
+      </AutocompleteNew>
+
       <SearchComplete
+        v-else
         class="form-control"
         doctype="HD Agent"
         :custom-filters="customFilters"
@@ -27,6 +49,7 @@
           </Tooltip>
         </template>
       </SearchComplete>
+
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <Tooltip
           v-for="currentAssignee in assignees"
@@ -57,18 +80,15 @@
 </template>
 
 <script setup lang="ts">
-import { SearchComplete, UserAvatar } from "@/components";
+import { AutocompleteNew, SearchComplete, UserAvatar } from "@/components";
 import { useAuthStore } from "@/stores/auth";
+import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
-import { createResource } from "frappe-ui";
+import { call, createResource } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 const props = defineProps({
-  assignees: {
-    type: Array,
-    required: true,
-  },
   doctype: {
     type: String,
     required: true,
@@ -76,6 +96,14 @@ const props = defineProps({
   docname: {
     type: String,
     required: true,
+  },
+  assignees: {
+    type: Array,
+    required: true,
+  },
+  team: {
+    type: String,
+    default: "",
   },
 });
 
@@ -86,6 +114,7 @@ const emit = defineEmits(["update"]);
 const { getUser } = useUserStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
+const { teamRestrictionApplied, assignWithinTeam } = useConfigStore();
 
 const error = ref("");
 
@@ -104,6 +133,7 @@ const addAssignee = (value) => {
       if (isManager) {
         updateOnboardingStep("assign_to_agent");
       }
+      members.value = members.value.filter((m) => m.value !== value);
     },
   });
   emit("update");
@@ -120,6 +150,10 @@ const removeCurrentAssignee = (value) => {
     },
     onSuccess: () => {
       emit("update");
+      members.value.push({
+        label: value,
+        value: value,
+      });
     },
   });
 };
@@ -131,5 +165,37 @@ const customFilters = computed(() => {
     filters["name"] = ["not in", [...props.assignees.map((a) => a.name)]];
   }
   return filters;
+});
+
+const search = ref("");
+const members = ref([]);
+async function getMembers() {
+  let teamMembers = await call(
+    "helpdesk.helpdesk.doctype.hd_team.hd_team.get_team_members",
+    {
+      team: props.team,
+    }
+  );
+  let assignedMembers = props.assignees.map((a) => a.name);
+  teamMembers = teamMembers.filter((member: string) => {
+    return !assignedMembers.includes(member);
+  });
+
+  members.value = teamMembers.map((member: string) => {
+    return {
+      label: member,
+      value: member,
+    };
+  });
+}
+
+const showRestrictedMembers = computed(() => {
+  return teamRestrictionApplied && assignWithinTeam && props.team;
+});
+
+onMounted(() => {
+  if (showRestrictedMembers.value) {
+    getMembers();
+  }
 });
 </script>

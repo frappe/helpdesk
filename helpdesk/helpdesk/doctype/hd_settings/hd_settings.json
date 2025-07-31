@@ -11,6 +11,7 @@
   "agent_groups_section",
   "restrict_tickets_by_agent_group",
   "do_not_restrict_tickets_without_an_agent_group",
+  "assign_within_team",
   "column_break_dxlq",
   "assignment_rules_section",
   "base_support_rotation",
@@ -317,12 +318,19 @@
    "fieldname": "enable_email_ticket_feedback",
    "fieldtype": "Check",
    "label": "Enable feedback for Email Tickets"
+  },
+  {
+   "default": "0",
+   "depends_on": "restrict_tickets_by_agent_group",
+   "fieldname": "assign_within_team",
+   "fieldtype": "Check",
+   "label": "Restrict agent assignment to selected Team"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-08 13:46:21.260686",
+ "modified": "2025-07-30 21:45:58.873574",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",
