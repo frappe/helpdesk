@@ -92,13 +92,17 @@
           <DatePicker
             v-model="holidayData.from_date"
             variant="subtle"
-            placeholder="From date"
+            placeholder="11/01/2025"
             class="w-full"
             id="from_date"
             :formatter="(date) => getFormattedDate(date)"
             :debounce="300"
             @update:model-value="updateDuration('from_date')"
-          />
+          >
+            <template #prefix>
+              <LucideCalendar class="size-4" />
+            </template>
+          </DatePicker>
           <ErrorMessage
             :message="
               holidayDataErrors.from_date || holidayDataErrors.dateRange
@@ -110,13 +114,17 @@
           <DatePicker
             v-model="holidayData.to_date"
             variant="subtle"
-            placeholder="To date"
+            placeholder="25/12/2025"
             class="w-full"
             id="to_date"
             :formatter="(date) => getFormattedDate(date)"
             :debounce="300"
             @update:model-value="updateDuration('to_date')"
-          />
+          >
+            <template #prefix>
+              <LucideCalendar class="size-4" />
+            </template>
+          </DatePicker>
           <ErrorMessage :message="holidayDataErrors.to_date" />
         </div>
       </div>
@@ -301,7 +309,9 @@ const goBack = () => {
 const saveHoliday = () => {
   const validationErrors = validateHoliday();
   if (Object.values(validationErrors).some((error) => error)) {
-    toast.error("Please provide all required fields");
+    toast.error(
+      "Invalid fields, check if all are filled in and values are correct."
+    );
     return;
   }
 

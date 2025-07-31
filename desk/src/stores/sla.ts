@@ -177,7 +177,10 @@ export function validateConditions(conditions: any[]): boolean {
 
 type SlaField = keyof SlaValidationErrors;
 
-export function validateSlaData(key?: SlaField): SlaValidationErrors {
+export function validateSlaData(
+  key?: SlaField,
+  skipConditionCheck = false
+): SlaValidationErrors {
   // Reset all errors
   resetSlaDataErrors();
 
@@ -363,11 +366,13 @@ export function validateSlaData(key?: SlaField): SlaValidationErrors {
         }
         break;
       case "condition":
-        if (
-          slaData.value.condition_json &&
-          !validateConditions(slaData.value.condition_json)
-        ) {
-          slaDataErrors.value.condition = "Valid conditions are required";
+        if (!skipConditionCheck) {
+          if (
+            slaData.value.condition_json &&
+            !validateConditions(slaData.value.condition_json)
+          ) {
+            slaDataErrors.value.condition = "Valid conditions are required";
+          }
         } else {
           slaDataErrors.value.condition = "";
         }
