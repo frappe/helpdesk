@@ -466,6 +466,7 @@ def handle_default_view(doctype, _list, show_customer_portal_fields):
     if not columns:
         if doctype == "Contact":
             columns = contact_default_columns
+            rows = ["name", "email_id", "creation"]
         else:
             columns = (
                 _list.default_list_data(show_customer_portal_fields).get("columns")
