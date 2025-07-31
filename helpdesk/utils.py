@@ -12,17 +12,19 @@ from frappe.utils.telemetry import capture as _capture
 from pypika import Criterion
 
 
-def check_permissions(doctype, parent):
+def check_permissions(doctype, parent, doc=None):
     user = frappe.session.user
 
     permissions = ("select", "read")
     has_select_permission, has_read_permission = [
-        frappe.has_permission(doctype, perm, user=user, parent_doctype=parent)
+        frappe.has_permission(doctype, perm, user=user, doc=doc, parent_doctype=parent)
         for perm in permissions
     ]
 
     if not has_select_permission and not has_read_permission:
-        frappe.throw(f"Insufficient Permission for {doctype}", frappe.PermissionError)
+        frappe.throw(
+            _("Insufficient Permission for {0}").format(doctype), frappe.PermissionError
+        )
 
 
 def is_admin(user: str = None) -> bool:
@@ -161,6 +163,21 @@ def agent_only(fn):
         return fn(*args, **kwargs)
 
     return wrapper
+
+
+def get_agents_team():
+    QBTeam = frappe.qb.DocType("HD Team")
+    QBTeamMember = frappe.qb.DocType("HD Team Member")
+
+    teams = (
+        frappe.qb.from_(QBTeamMember)
+        .where(QBTeamMember.user == frappe.session.user)
+        .join(QBTeam)
+        .on(QBTeam.name == QBTeamMember.parent)
+        .select(QBTeam.team_name, QBTeam.ignore_restrictions)
+        .run(as_dict=True)
+    )
+    return teams
 
 
 contact_default_columns = [
