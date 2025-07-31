@@ -20,6 +20,7 @@
   "sb_details",
   "description",
   "template",
+  "key",
   "sla_tab",
   "service_level_section",
   "sla",
@@ -61,7 +62,6 @@
   "feedback_tab",
   "customer_feedback_section",
   "feedback_rating",
-  "feedback_text",
   "feedback",
   "feedback_extra",
   "meta_tab"
@@ -429,16 +429,18 @@
    "read_only": 1
   },
   {
-   "fieldname": "feedback_text",
+   "fieldname": "key",
    "fieldtype": "Data",
-   "label": "Feedback (Text)"
+   "label": "Key",
+   "read_only": 1,
+   "set_only_once": 1
   }
  ],
  "grid_page_length": 50,
  "icon": "fa fa-issue",
  "idx": 61,
  "links": [],
- "modified": "2025-07-13 22:57:07.492754",
+ "modified": "2025-07-31 23:00:50.969299",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Ticket",
