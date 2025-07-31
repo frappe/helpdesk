@@ -277,7 +277,7 @@ const breadcrumbs = computed(() => {
     {
       label: "Tickets",
       route: {
-        name: "TicketsCustomer",
+        name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
       },
     },
     {
