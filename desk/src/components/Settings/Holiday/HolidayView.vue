@@ -10,7 +10,7 @@
     class="flex items-center justify-between sticky top-0 z-10 bg-white px-10 pt-8 pb-4"
   >
     <div>
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
         <Button
           variant="ghost"
           icon-left="chevron-left"

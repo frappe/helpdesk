@@ -8,7 +8,7 @@
   >
     <div class="flex items-center justify-between w-full">
       <div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
           <Button
             variant="ghost"
             icon-left="chevron-left"
