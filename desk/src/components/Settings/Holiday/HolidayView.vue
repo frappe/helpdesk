@@ -174,17 +174,31 @@
         <HolidaysTableView v-if="holidayListView === 'list'" />
         <HolidaysCalendarView v-else />
       </div>
-      <div class="mt-4">
+      <div class="mt-4 flex justify-between items-center">
         <Button
           variant="subtle"
           label="Add Holiday"
           @click="dialog.show = true"
           icon-left="plus"
         />
-        <AddHolidayModal v-model="dialog" />
+        <!-- Indicators -->
+        <div class="flex gap-4">
+          <div class="gap-1 flex items-center">
+            <!--  -->
+            <span class="bg-yellow-100 size-4 rounded-sm" />
+            <span class="text-sm text-ink-gray-6"
+              >Manually created holidays</span
+            >
+          </div>
+          <div class="gap-1 flex items-center">
+            <span class="bg-gray-100 size-4 rounded-sm" />
+            <span class="text-sm text-ink-gray-6">Recurring holidays</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  <AddHolidayModal v-model="dialog" />
   <ConfirmDialog
     v-model="showConfirmDialog"
     title="Unsaved changes"
