@@ -12,7 +12,8 @@
         <div class="flex flex-col gap-1.5">
           <FormLabel label="Date" required />
           <DatePicker
-            v-model="dialog.holiday_date"
+            :value="dayjs(dialog.holiday_date).format('MM-DD-YYYY')"
+            @update:model-value="dialog.holiday_date = $event"
             :formatter="(date) => getFormattedDate(date)"
             variant="subtle"
             placeholder="Date"
@@ -120,27 +121,40 @@ const onSave = () => {
     return;
   }
 
-  const index = holidayData.value.holidays.findIndex(
-    (h) =>
-      getFormattedDate(h.holiday_date) ===
-      getFormattedDate(dialog.value.holiday_date)
-  );
+  if (dialog.value.editing) {
+    const holidayExists = holidayData.value.holidays.find(
+      (h) =>
+        getFormattedDate(h.holiday_date) ===
+        getFormattedDate(dialog.value.holiday_date)
+    );
 
-  if (index !== -1 && !dialog.value.editing) {
-    toast.error("Holiday already exists");
-    return;
-  }
-
-  if (index === -1 && !dialog.value.editing) {
-    holidayData.value.holidays.push({
-      ...dialog.value,
-      weekly_off: 0,
-    });
-  } else {
+    // If the holiday exists and user is trying to add a new holiday on the same date, show error
+    if (
+      holidayExists &&
+      getFormattedDate(holidayExists.holiday_date) !==
+        getFormattedDate(dialog.value.editing.holiday_date)
+    ) {
+      toast.error("Holiday already exists");
+      return;
+    }
     const holidayIndex = holidayData.value.holidays.indexOf(
       dialog.value.editing
     );
     holidayData.value.holidays.splice(holidayIndex, 1, {
+      ...dialog.value,
+      weekly_off: 0,
+    });
+  } else {
+    const index = holidayData.value.holidays.findIndex(
+      (h) =>
+        getFormattedDate(h.holiday_date) ===
+        getFormattedDate(dialog.value.holiday_date)
+    );
+    if (index !== -1) {
+      toast.error("Holiday already exists");
+      return;
+    }
+    holidayData.value.holidays.push({
       ...dialog.value,
       weekly_off: 0,
     });

@@ -144,12 +144,16 @@
           <DatePicker
             v-model="slaData.start_date"
             variant="subtle"
-            placeholder="From date"
+            placeholder="11/01/2025"
             class="w-full"
             id="from_date"
             @change="validateSlaData('start_date')"
             :formatter="(date) => getFormattedDate(date)"
-          />
+          >
+            <template #prefix>
+              <LucideCalendar class="size-4" />
+            </template>
+          </DatePicker>
           <ErrorMessage :message="slaDataErrors.start_date" />
         </div>
         <div class="w-full space-y-1.5">
@@ -157,12 +161,16 @@
           <DatePicker
             v-model="slaData.end_date"
             variant="subtle"
-            placeholder="To date"
+            placeholder="25/12/2025"
             class="w-full"
             id="to_date"
             @change="validateSlaData('end_date')"
             :formatter="(date) => getFormattedDate(date)"
-          />
+          >
+            <template #prefix>
+              <LucideCalendar class="size-4" />
+            </template>
+          </DatePicker>
           <ErrorMessage :message="slaDataErrors.end_date" />
         </div>
       </div>
@@ -339,10 +347,15 @@ const goBack = () => {
 };
 
 const saveSla = () => {
-  const validationErrors = validateSlaData();
+  const validationErrors = validateSlaData(
+    undefined,
+    !(isOldSla.value && useNewUI.value)
+  );
 
   if (Object.values(validationErrors).some((error) => error)) {
-    toast.error("Please provide all required fields");
+    toast.error(
+      "Invalid fields, check if all are filled in and values are correct."
+    );
     return;
   }
 
