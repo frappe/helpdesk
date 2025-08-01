@@ -47,7 +47,6 @@ def create_update_field_dependency(
         frappe.throw(
             _("Parent field, child field, and parent-child mapping are required.")
         )
-
     func = generate_on_change_function(
         parent_child_mapping=frappe.parse_json(parent_child_mapping),
         parent_field=parent_field,
@@ -86,14 +85,23 @@ def get_or_create_standard_form_script(parent_field, child_field):
 
 def generate_on_change_function(parent_child_mapping, parent_field, child_field):
     script = f"function update_{child_field}(value){{\n"
+    first = True
     for parent, children in parent_child_mapping.items():
-        # replace '' with ""
         options = ",".join([f'"{child}"' for child in children])
-        script += f'        if(value=="{parent}"){{\n'
+        if first:
+            script += f'        if(value=="{parent}") {{\n'
+            first = False
+        else:
+            script += f'        else if(value=="{parent}") {{\n'
+
         script += f"            options = [{options}]\n"
         script += f'            applyFilters("{child_field}",options)\n'
         script += "        }\n"
         script += "\n"
+    script += "        else {\n"
+    script += f'            applyFilters("{child_field}",[])\n'
+    script += "        }\n"
+
     script += "    }\n"
     script += "\n"
     return script
@@ -118,7 +126,6 @@ def add_function_to_script(parent_field, child_field, func):
     """
     script += "\n"
     script += "}"
-    print("\n\n", script, "\n\n")
     return script
 
 

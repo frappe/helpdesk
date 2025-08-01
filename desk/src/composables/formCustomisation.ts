@@ -52,12 +52,13 @@ export function handleSelectFieldUpdate(
   doc: any,
   oldDoc: any
 ) {
-  if (!filters) {
+  if (!filters || !filters.length) {
     f.options = oldDoc.find((f) => f.fieldname === fieldname).options;
+    f.disabled = true;
   } else {
     f.options = filters.join("\n");
+    f.disabled = false;
   }
-
   // reset dependent field
   doc[fieldname] = "";
 }
@@ -71,9 +72,11 @@ export function handleLinkFieldUpdate(
 ) {
   if (!filters) {
     f.link_filters = oldDoc.find((f) => f.fieldname === fieldname).link_filters;
+    f.disabled = true;
     return;
   }
   f.link_filters = JSON.stringify([[f.options, "name", "in", filters]]);
+  f.disabled = false;
 
   // reset dependent field
   doc[fieldname] = "";
@@ -89,6 +92,7 @@ export function parseField(field, doc) {
       (field.mandatory_depends_on &&
         evaluateDependsOnValue(field.mandatory_depends_on, doc)),
     filters: field.link_filters && JSON.parse(field.link_filters),
+    disabled: field.disabled,
   };
 }
 function evaluateDependsOnValue(expression, doc) {

@@ -10,6 +10,7 @@
       :is="component"
       :placeholder="placeholder"
       :value="transValue"
+      :disabled="field.disabled"
       :model-value="transValue"
       @update:model-value="emitUpdate(field.fieldname, $event)"
       @change="
