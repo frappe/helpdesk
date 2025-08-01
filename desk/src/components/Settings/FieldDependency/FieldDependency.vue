@@ -1,44 +1,45 @@
 <template>
-  <div class="h-full flex flex-col">
-    <header
-      class="flex justify-between mb-8 sticky top-0 z-10 bg-surface-modal items-center"
-    >
-      <div class="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          icon-left="chevron-left"
-          :label="dependencyLabel"
-          size="md"
-          @click="handleBackNavigation"
-          class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px] pr-0"
-        />
-        <Badge v-if="isDirty" theme="orange"> Unsaved Changes </Badge>
-      </div>
-
-      <div class="flex gap-4">
-        <!-- Switch -->
-        <div class="flex gap-2 items-center">
-          <Switch v-model="state.enabled" class="!w-fit" />
-          <span class="text-p-base text-ink-gray-6">Enabled</span>
-        </div>
-        <!-- Actions -->
-        <div class="flex gap-1">
+  <div class="h-full flex flex-col px-10 gap-8 py-8 overflow-y-auto">
+    <SettingsLayoutHeader>
+      <template #title>
+        <div class="flex items-center gap-2">
           <Button
-            label="Save"
-            variant="solid"
-            size="sm"
-            :disabled="
-              !state.selectedParentField ||
-              !state.selectedChildField ||
-              Object.keys(state.childSelections).length === 0
-            "
-            @click="handleSubmit"
+            variant="ghost"
+            icon-left="chevron-left"
+            :label="dependencyLabel"
+            size="md"
+            @click="handleBackNavigation"
+            class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px] pr-0"
           />
+          <Badge v-if="isDirty" theme="orange"> Unsaved Changes </Badge>
         </div>
-      </div>
-    </header>
+      </template>
+      <template #actions>
+        <div class="flex gap-4">
+          <!-- Switch -->
+          <div class="flex gap-2 items-center">
+            <Switch v-model="state.enabled" class="!w-fit" />
+            <span class="text-p-base text-ink-gray-6">Enabled</span>
+          </div>
+          <!-- Actions -->
+          <div class="flex gap-1">
+            <Button
+              label="Save"
+              variant="solid"
+              size="sm"
+              :disabled="
+                !state.selectedParentField ||
+                !state.selectedChildField ||
+                Object.keys(state.childSelections).length === 0
+              "
+              @click="handleSubmit"
+            />
+          </div>
+        </div>
+      </template>
+    </SettingsLayoutHeader>
     <!-- Form -->
-    <form
+    <div
       @submit.prevent="handleSubmit"
       class="w-full flex-1 flex flex-col gap-8 h-full"
     >
@@ -194,7 +195,7 @@
           </div>
         </div>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -205,6 +206,7 @@ import { createResource, FormControl, toast, Switch, Badge } from "frappe-ui";
 import { reactive, watch, computed } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import { globalStore } from "@/stores/globalStore";
+import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
 const props = defineProps({
   fieldDependencyName: {

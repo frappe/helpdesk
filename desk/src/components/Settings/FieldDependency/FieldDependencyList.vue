@@ -1,24 +1,29 @@
 <template>
-  <div>
-    <header class="flex justify-between mb-4">
-      <div>
-        <h1 class="text-lg font-semibold mb-1">Field Dependencies</h1>
-        <p class="text-ink-gray-6 text-base">
-          Dynamically control field options based on selection
+  <div class="px-10 py-8">
+    <SettingsLayoutHeader>
+      <template #title>
+        <h1 class="text-lg font-semibold text-ink-gray-8">
+          Field Dependencies
+        </h1>
+      </template>
+      <template #description>
+        <p class="text-sm max-w-md leading-5 text-ink-gray-6">
+          Create dependencies between fields to dynamically control options
+          based on user selections.
         </p>
-      </div>
-      <Button
-        label="New"
-        variant="solid"
-        size="sm"
-        @click="$emit('update:step', 'fd')"
-      >
-        <template #prefix>
-          <LucidePlus class="h-4 w-4 stroke-1.5" />
-        </template>
-      </Button>
-    </header>
-
+      </template>
+      <template #actions>
+        <Button
+          label="New"
+          theme="gray"
+          variant="solid"
+          @click="$emit('update:step', 'fd')"
+          icon-left="plus"
+        />
+      </template>
+    </SettingsLayoutHeader>
+  </div>
+  <div class="px-10 pb-8">
     <!-- Loading State -->
     <div
       v-if="fieldDependenciesList.loading"
@@ -96,9 +101,9 @@
           </div>
           <!-- Separator -->
           <!-- <div
-            class="mx-3 h-px border-t border-outline-gray-modals transition-opacity group-hover:opacity-0 w-full"
-            v-if="idx < fieldDependenciesList.data?.length - 1"
-          /> -->
+              class="mx-3 h-px border-t border-outline-gray-modals transition-opacity group-hover:opacity-0 w-full"
+              v-if="idx < fieldDependenciesList.data?.length - 1"
+            /> -->
         </div>
       </div>
     </div>
@@ -110,6 +115,7 @@ import { Avatar, LoadingIndicator, Switch } from "frappe-ui";
 import { getFieldDependencyLabel } from "@/utils";
 import { onMounted } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
+import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
 onMounted(() => {
   fieldDependenciesList.reload();
