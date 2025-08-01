@@ -3,7 +3,6 @@
     v-if="props.conditions.length > 0"
     :conditions="props.conditions"
     :level="0"
-    :doctype="'HD Ticket'"
     :disableAddCondition="props.errors !== ''"
   />
   <div
