@@ -11,6 +11,8 @@ import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
+import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
+import { FieldDependencyIcon } from "@/components/icons";
 
 export const tabs = [
   {
@@ -42,6 +44,11 @@ export const tabs = [
     label: "Business Holidays",
     icon: markRaw(Briefcase),
     component: markRaw(HolidayList),
+  },
+  {
+    label: "Field Dependency",
+    icon: markRaw(FieldDependencyIcon),
+    component: markRaw(FieldDependencyConfig),
   },
 ];
 

@@ -310,6 +310,129 @@ export function uploadFunction(
   });
 }
 
+export const convertToConditions = ({
+  conditions,
+  fieldPrefix,
+}: {
+  conditions: any[];
+  fieldPrefix?: string;
+}): string => {
+  if (!conditions || conditions.length === 0) {
+    return "";
+  }
+
+  const processCondition = (condition: any): string => {
+    if (typeof condition === "string") {
+      return condition.toLowerCase();
+    }
+
+    if (Array.isArray(condition)) {
+      // Nested condition group
+      if (Array.isArray(condition[0])) {
+        const nestedStr = convertToConditions({
+          conditions: condition,
+          fieldPrefix,
+        });
+        return `(${nestedStr})`;
+      }
+
+      // Simple condition: [fieldname, operator, value]
+      const [field, operator, value] = condition;
+      const fieldAccess = fieldPrefix ? `${fieldPrefix}.${field}` : field;
+
+      const operatorMap: Record<string, string> = {
+        equals: "==",
+        "=": "==",
+        "==": "==",
+        "!=": "!=",
+        "not equals": "!=",
+        "<": "<",
+        "<=": "<=",
+        ">": ">",
+        ">=": ">=",
+        in: "in",
+        "not in": "not in",
+        like: "like",
+        "not like": "not like",
+        is: "is",
+        "is not": "is not",
+        between: "between",
+      };
+
+      let op = operatorMap[operator.toLowerCase()] || operator;
+
+      if (
+        (op === "==" || op === "!=") &&
+        (String(value).toLowerCase() === "yes" ||
+          String(value).toLowerCase() === "no")
+      ) {
+        let checkVal = String(value).toLowerCase() === "yes";
+        if (op === "!=") {
+          checkVal = !checkVal;
+        }
+        return checkVal ? fieldAccess : `not ${fieldAccess}`;
+      }
+
+      if (op === "is" && String(value).toLowerCase() === "set") {
+        return fieldAccess;
+      }
+      if (
+        (op === "is" && String(value).toLowerCase() === "not set") ||
+        (op === "is not" && String(value).toLowerCase() === "set")
+      ) {
+        return `not ${fieldAccess}`;
+      }
+
+      if (op === "like") {
+        return `${fieldAccess} and "${value}" in ${fieldAccess}`;
+      }
+      if (op === "not like") {
+        return `${fieldAccess} and "${value}" not in ${fieldAccess}`;
+      }
+
+      if (
+        op === "between" &&
+        typeof value === "string" &&
+        value.includes(",")
+      ) {
+        const [start, end] = value.split(",").map((v: string) => v.trim());
+        return `(${fieldAccess} >= "${start}" and ${fieldAccess} <= "${end}")`;
+      }
+
+      let valueStr = "";
+      if (op === "in" || op === "not in") {
+        let items: string[];
+        if (Array.isArray(value)) {
+          items = value.map((v) => `"${String(v).trim()}"`);
+        } else if (typeof value === "string") {
+          items = value.split(",").map((v) => `"${v.trim()}"`);
+        } else {
+          items = [`"${String(value).trim()}"`];
+        }
+        valueStr = `[${items.join(", ")}]`;
+        return `${fieldAccess} and ${fieldAccess} ${op} ${valueStr}`;
+      }
+
+      if (typeof value === "string") {
+        valueStr = `"${value.replace(/"/g, '\\"')}"`;
+      } else if (typeof value === "number" || typeof value === "boolean") {
+        valueStr = String(value);
+      } else if (value === null || value === undefined) {
+        return op === "==" || op === "is" ? `not ${fieldAccess}` : fieldAccess;
+      } else {
+        valueStr = `"${String(value).replace(/"/g, '\\"')}"`;
+      }
+
+      return `${fieldAccess} ${op} ${valueStr}`;
+    }
+
+    return "";
+  };
+
+  const parts = conditions.map(processCondition);
+  return parts.join(" ");
+};
+
 export async function removeAttachmentFromServer(attachment: string) {
   await call("frappe.client.delete", {
     doctype: "File",
