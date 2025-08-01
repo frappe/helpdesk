@@ -88,18 +88,21 @@
                 </template>
               </FormControl>
               <div class="flex-1 overflow-y-auto hide-scrollbar basis-0">
-                <ul>
+                <ul class="max-w-[350px] overflow-y-auto">
                   <li
                     v-for="value in filteredParentFieldValues"
                     :key="value"
-                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1"
+                    class="py-2 mb-1 px-2.5 cursor-pointer rounded flex justify-between items-center hover:bg-surface-gray-1 overflow-hidden max-w-full"
                     :class="{
                       'bg-surface-gray-2 hover:bg-surface-gray-3':
                         state.currentParentSelection === value,
                     }"
                     @click="handleParentValueClick(value)"
                   >
-                    <span class="text-base text-ink-gray-6">{{ value }}</span>
+                    <span
+                      class="text-base text-ink-gray-6 max-w-[90%] truncate"
+                      >{{ value }}</span
+                    >
                     <LucideChevronRight
                       class="h-4 w-4 text-ink-gray-6"
                       v-if="
@@ -161,7 +164,7 @@
                     {{ toggleCheckboxLabel }}
                   </span>
                 </li>
-                <ul>
+                <ul class="max-w-[350px] overflow-y-auto">
                   <li
                     v-for="value in filteredChildFieldValues"
                     :key="value"
@@ -197,16 +200,24 @@
       </div>
     </div>
   </div>
+  <ConfirmDialog
+    v-model="showConfirmDialog"
+    title="Unsaved changes"
+    message="Are you sure you want to go back? Unsaved changes will be lost."
+    :onConfirm="() => $emit('update:step', 'fd-list')"
+    :onCancel="() => (showConfirmDialog = false)"
+  />
 </template>
 
 <script setup lang="ts">
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
 import { createResource, FormControl, toast, Switch, Badge } from "frappe-ui";
-import { reactive, watch, computed } from "vue";
+import { reactive, watch, computed, ref } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import { globalStore } from "@/stores/globalStore";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -473,23 +484,11 @@ function handleSelectAllChildValues(value) {
   }
 }
 
+const showConfirmDialog = ref(false);
 function handleBackNavigation() {
   if (isDirty.value) {
-    $dialog({
-      title: "Unsaved Changes",
-      message:
-        "Are you sure you want to go back? Unsaved changes will be lost.",
-      actions: [
-        {
-          label: "Confirm",
-          variant: "solid",
-          onClick({ close }) {
-            close();
-            emit("update:step", "fd-list");
-          },
-        },
-      ],
-    });
+    showConfirmDialog.value = true;
+
     return;
   }
   emit("update:step", "fd-list");
