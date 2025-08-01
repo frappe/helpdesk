@@ -198,6 +198,8 @@
           </div>
         </div>
       </div>
+      <!-- Permission selection
+      <div>heyll</div> -->
     </div>
   </div>
   <ConfirmDialog
@@ -215,9 +217,9 @@ import { getFieldDependencyLabel } from "@/utils";
 import { createResource, FormControl, toast, Switch, Badge } from "frappe-ui";
 import { reactive, watch, computed, ref } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
-import { globalStore } from "@/stores/globalStore";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -226,8 +228,6 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(["update:step"]);
-
-const { $dialog } = globalStore();
 
 const isNew = computed(() => !props.fieldDependencyName);
 
@@ -283,18 +283,6 @@ const state = reactive({
   childSearch: "",
 
   enabled: true,
-});
-
-const isDirty = computed(() => {
-  if (isNew.value) {
-    return state.enabled !== true || state.selectedParentField !== "";
-  }
-  if (fieldDependency.loading) return false;
-  return (
-    Boolean(fieldDependency.data?.enabled) !== Boolean(state.enabled) ||
-    stringifyParentChildMapping(state.childSelections) !==
-      stringifyParentChildMapping(state.initialChildSelections)
-  );
 });
 
 const filteredParentFieldValues = computed(() => {
@@ -362,6 +350,25 @@ const fieldDependency = createResource({
     }
   },
 });
+
+const isDirty = computed(() => {
+  if (isNew.value) {
+    return state.enabled !== true || state.selectedParentField !== "";
+  }
+  if (fieldDependency.loading) return false;
+  return (
+    Boolean(fieldDependency.data?.enabled) !== Boolean(state.enabled) ||
+    stringifyParentChildMapping(state.childSelections) !==
+      stringifyParentChildMapping(state.initialChildSelections)
+  );
+});
+
+watch(
+  () => isDirty.value,
+  (val) => {
+    disableSettingModalOutsideClick.value = val;
+  }
+);
 
 function stringifyParentChildMapping(selections = null) {
   const _selections =
