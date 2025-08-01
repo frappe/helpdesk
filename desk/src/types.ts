@@ -137,6 +137,7 @@ export interface Field {
   filters?: string;
   display_via_depends_on?: string;
   mandatory_via_depends_on?: string;
+  disabled?: boolean;
 }
 
 export type FieldValue = string | number | boolean;
