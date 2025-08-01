@@ -140,26 +140,17 @@ watchDebounced(
 );
 
 const filterOptions = createResource({
-  url: "frappe.desk.search.search_link",
-  method: "POST",
-  cache: [text.value, "Contact"],
+  url: "helpdesk.api.contact.search_contacts",
+  method: "GET",
+  cache: ["Contact", text.value],
   params: {
     txt: text.value,
-    doctype: "Contact",
   },
-  transform: (data) => {
-    let allData = data
-      .filter((c) => {
-        return c.description.split(", ")[1];
-      })
-      .map((option) => {
-        let email = option.description.split(", ")[1];
-        return {
-          label: option.label || email,
-          value: email,
-        };
-      });
-    return allData;
+  transform: (data: Record<"full_name" | "name" | "email_id", string>[]) => {
+    return data.map((option) => ({
+      label: option.full_name,
+      value: option.email_id,
+    }));
   },
 });
 
@@ -178,7 +169,6 @@ function reload(val) {
   filterOptions.update({
     params: {
       txt: val,
-      doctype: "Contact",
     },
   });
   filterOptions.reload();
