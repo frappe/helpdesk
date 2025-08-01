@@ -1,47 +1,47 @@
 <template>
   <div
+    class="flex gap-2"
     :class="[
-      'flex gap-2',
       {
-        'items-center': props.condition.field != 'group',
+        'items-center': !props.isGroup,
       },
     ]"
   >
     <div
+      class="flex gap-2 w-full"
       :class="[
-        'flex gap-2 w-full',
         {
-          'items-center justify-between': props.condition.field != 'group',
+          'items-center justify-between': !props.isGroup,
         },
       ]"
     >
       <div :class="'text-end text-base text-gray-600'">
-        <div v-if="props.itemIndex == 0" class="min-w-16 text-start">Where</div>
-        <div v-else class="min-w-16 flex items-start">
+        <div v-if="props.itemIndex == 0" class="min-w-[66px] text-start">
+          Where
+        </div>
+        <div v-else class="min-w-[66px] flex items-start">
           <Button
             variant="subtle"
             class="w-max"
-            @click="updateConjunction"
-            :disabled="props.itemIndex > 1"
+            @click="toggleConjunction"
             icon-right="refresh-cw"
-            :label="props.condition.conjunction"
+            :disabled="props.itemIndex > 2"
+            :label="conjunction"
           />
         </div>
       </div>
-      <div
-        v-if="props.condition.field != 'group'"
-        class="flex items-center gap-2 w-full"
-      >
+      <div v-if="!props.isGroup" class="flex items-center gap-2 w-full">
         <div id="fieldname" class="w-full">
-          <AutocompleteNew
+          <Autocomplete
             :options="filterableFields.data"
-            v-model="props.condition.field"
-            :placeholder="'First Name'"
+            v-model="props.condition[0]"
+            :placeholder="'Field'"
+            @update:modelValue="updateField"
           />
         </div>
         <div id="operator">
           <FormControl
-            v-if="!props.condition.field"
+            v-if="!props.condition[0]"
             disabled
             type="text"
             :placeholder="'operator'"
@@ -49,18 +49,17 @@
           />
           <FormControl
             v-else
-            :disabled="!props.condition.field"
+            :disabled="!props.condition[0]"
             type="select"
-            v-model="props.condition.operator"
+            v-model="props.condition[1]"
             @change="updateOperator"
             :options="getOperators()"
-            :placeholder="'Equals'"
             class="w-max min-w-[100px]"
           />
         </div>
         <div id="value" class="w-full">
           <FormControl
-            v-if="!props.condition.field"
+            v-if="!props.condition[0]"
             disabled
             type="text"
             :placeholder="'condition'"
@@ -69,27 +68,22 @@
           <component
             v-else
             :is="getValueControl()"
-            v-model="props.condition.value"
+            v-model="props.condition[2]"
             @change="updateValue"
             :placeholder="'condition'"
           />
         </div>
       </div>
-      <AssignmentConditions
-        v-if="
-          props.condition.field == 'group' &&
-          !(props.level == 2 || props.level == 4)
-        "
-        :conditions="props.condition.value"
+      <CFConditions
+        v-if="props.isGroup && !(props.level == 2 || props.level == 4)"
+        :conditions="props.condition"
         :isChild="true"
         :level="props.level"
+        :disableAddCondition="props.disableAddCondition"
       />
       <Button
         variant="outline"
-        v-if="
-          props.condition.field == 'group' &&
-          (props.level == 2 || props.level == 4)
-        "
+        v-if="props.isGroup && (props.level == 2 || props.level == 4)"
         @click="show = true"
         label="Open nested conditions"
       />
@@ -102,42 +96,46 @@
   </div>
   <Dialog v-model="show" :options="{ size: '3xl', title: 'Nested conditions' }">
     <template #body-content>
-      <AssignmentConditions
-        :conditions="props.condition.value"
+      <CFConditions
+        :conditions="props.condition"
         :isChild="true"
         :level="props.level"
+        :disableAddCondition="props.disableAddCondition"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
+import { Link, StarRating } from "@/components";
+import { TemplateOption } from "@/utils";
 import {
-  FormControl,
-  DatePicker,
-  DateTimePicker,
-  DateRangePicker,
+  Autocomplete,
   Button,
+  DatePicker,
+  DateRangePicker,
+  DateTimePicker,
   Dialog,
   Dropdown,
+  FormControl,
 } from "frappe-ui";
-import { AutocompleteNew, Link, StarRating } from "@/components";
+import { computed, defineEmits, h, inject, provide, ref } from "vue";
 import GroupIcon from "~icons/lucide/group";
 import UnGroupIcon from "~icons/lucide/ungroup";
-import { h, defineEmits, ref, computed } from "vue";
-import { TemplateOption } from "@/utils";
-import AssignmentConditions from "./AssignmentConditions.vue";
-import { filterableFields } from "@/stores/assignmentRules";
+import CFConditions from "./CFConditions.vue";
+import { filterableFields } from "./filterableFields";
 
 const show = ref(false);
-const emit = defineEmits(["remove", "unGroupConditions", "updateConjunction"]);
+const emit = defineEmits([
+  "remove",
+  "unGroupConditions",
+  "toggleConjunction",
+  "turnIntoGroup",
+]);
+
 const props = defineProps({
   condition: {
-    type: Object,
-    required: true,
-  },
-  doctype: {
-    type: String,
+    type: Array<any>,
     required: true,
   },
   isChild: {
@@ -151,22 +149,33 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  isGroup: {
+    type: Boolean,
+    default: false,
+  },
+  conjunction: {
+    type: String,
+  },
+  disableAddCondition: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const dropdownOptions = computed(() => {
   const options = [];
 
-  if (props.condition.field != "group" && props.level < 4) {
+  if (!props.isGroup && props.level < 4) {
     options.push({
       label: "Turn into a group",
       icon: () => h(GroupIcon),
       onClick: () => {
-        turnIntoGroup();
+        emit("turnIntoGroup");
       },
     });
   }
 
-  if (props.condition.field == "group") {
+  if (props.isGroup) {
     options.push({
       label: "Ungroup conditions",
       icon: () => h(UnGroupIcon),
@@ -188,7 +197,7 @@ const dropdownOptions = computed(() => {
           emit("remove");
         },
       }),
-    condition: () => props.condition.field != "group",
+    condition: () => !props.isGroup,
   });
 
   options.push({
@@ -203,7 +212,7 @@ const dropdownOptions = computed(() => {
           emit("remove");
         },
       }),
-    condition: () => props.condition.field == "group",
+    condition: () => props.isGroup,
   });
 
   return options;
@@ -217,14 +226,25 @@ const typeString = ["Data", "Long Text", "Small Text", "Text Editor", "Text"];
 const typeDate = ["Date", "Datetime"];
 const typeRating = ["Rating"];
 
-function updateConjunction() {
-  emit("updateConjunction");
+function toggleConjunction() {
+  emit("toggleConjunction", props.conjunction);
 }
 
+const updateField = (field) => {
+  props.condition[0] = field?.fieldname;
+  resetConditionValue();
+};
+
+const resetConditionValue = () => {
+  props.condition[2] = "";
+};
+
 function getValueControl() {
-  const { field, operator } = props.condition;
+  const [field, operator] = props.condition;
   if (!field) return null;
-  const { fieldtype, options } = field;
+  const fieldData = filterableFields.data?.find((f) => f.fieldname == field);
+  if (!fieldData) return null;
+  const { fieldtype, options } = fieldData;
   if (operator == "is") {
     return h(FormControl, {
       type: "select",
@@ -238,11 +258,6 @@ function getValueControl() {
           value: "not set",
         },
       ],
-    });
-  } else if (operator == "timespan") {
-    return h(FormControl, {
-      type: "select",
-      options: timespanOptions,
     });
   } else if (["like", "not like", "in", "not in"].includes(operator)) {
     return h(FormControl, { type: "text" });
@@ -263,20 +278,20 @@ function getValueControl() {
     return h(Link, {
       class: "form-control",
       doctype: options,
-      value: props.condition.value,
+      value: props.condition[2],
     });
   } else if (typeNumber.includes(fieldtype)) {
     return h(FormControl, { type: "number" });
   } else if (typeDate.includes(fieldtype) && operator == "between") {
-    return h(DateRangePicker, { value: props.condition.value, iconLeft: "" });
+    return h(DateRangePicker, { value: props.condition[2], iconLeft: "" });
   } else if (typeDate.includes(fieldtype)) {
     return h(fieldtype == "Date" ? DatePicker : DateTimePicker, {
-      value: props.condition.value,
+      value: props.condition[2],
       iconLeft: "",
     });
   } else if (typeRating.includes(fieldtype)) {
     return h(StarRating, {
-      rating: props.condition.value || 0,
+      rating: props.condition[2] || 0,
       static: false,
       class: "truncate",
       "onUpdate:modelValue": (v) => updateValue(v),
@@ -288,10 +303,10 @@ function getValueControl() {
 
 function updateValue(value) {
   value = value.target ? value.target.value : value;
-  if (props.condition.operator === "between") {
-    props.condition.value = [value.split(",")[0], value.split(",")[1]];
+  if (props.condition[1] === "between") {
+    props.condition[2] = [value.split(",")[0], value.split(",")[1]];
   } else {
-    props.condition.value = value;
+    props.condition[2] = value + "";
   }
 }
 
@@ -302,22 +317,30 @@ function getSelectOptions(options) {
 function updateOperator(event) {
   let oldOperatorValue = event.target._value;
   let newOperatorValue = event.target.value;
-  props.condition.operator = event.target.value;
+  props.condition[1] = event.target.value;
   if (!isSameTypeOperator(oldOperatorValue, newOperatorValue)) {
-    props.condition.value = getDefaultValue(props.condition.field);
+    props.condition[2] = getDefaultValue(props.condition[0]);
   }
+  resetConditionValue();
 }
 
 function getOperators() {
-  let options = [];
-  const { field } = props.condition;
+  let options = [
+    {
+      label: "Select",
+      value: "",
+    },
+  ];
+  const field = props.condition[0];
   if (!field) return options;
-  const { fieldtype, fieldname } = field;
+  const fieldData = filterableFields.data?.find((f) => f.fieldname == field);
+  if (!fieldData) return options;
+  const { fieldtype, fieldname } = fieldData;
   if (typeString.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
+        { label: "Equals", value: "==" },
+        { label: "Not Equals", value: "!=" },
         { label: "Like", value: "like" },
         { label: "Not Like", value: "not like" },
         { label: "In", value: "in" },
@@ -327,7 +350,6 @@ function getOperators() {
     );
   }
   if (fieldname === "_assign") {
-    // TODO: make equals and not equals work
     options = [
       { label: "Like", value: "like" },
       { label: "Not Like", value: "not like" },
@@ -337,8 +359,8 @@ function getOperators() {
   if (typeNumber.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
+        { label: "Equals", value: "==" },
+        { label: "Not Equals", value: "!=" },
         { label: "Like", value: "like" },
         { label: "Not Like", value: "not like" },
         { label: "In", value: "in" },
@@ -354,8 +376,8 @@ function getOperators() {
   if (typeSelect.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
+        { label: "Equals", value: "==" },
+        { label: "Not Equals", value: "!=" },
         { label: "In", value: "in" },
         { label: "Not In", value: "not in" },
         { label: "Is", value: "is" },
@@ -365,8 +387,8 @@ function getOperators() {
   if (typeLink.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
+        { label: "Equals", value: "==" },
+        { label: "Not Equals", value: "!=" },
         { label: "Like", value: "like" },
         { label: "Not Like", value: "not like" },
         { label: "In", value: "in" },
@@ -376,7 +398,7 @@ function getOperators() {
     );
   }
   if (typeCheck.includes(fieldtype)) {
-    options.push(...[{ label: "Equals", value: "equals" }]);
+    options.push(...[{ label: "Equals", value: "==" }]);
   }
   if (["Duration"].includes(fieldtype)) {
     options.push(
@@ -392,23 +414,22 @@ function getOperators() {
   if (typeDate.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
+        { label: "Equals", value: "==" },
+        { label: "Not Equals", value: "!=" },
         { label: "Is", value: "is" },
         { label: ">", value: ">" },
         { label: "<", value: "<" },
         { label: ">=", value: ">=" },
         { label: "<=", value: "<=" },
         { label: "Between", value: "between" },
-        { label: "Timespan", value: "timespan" },
       ]
     );
   }
   if (typeRating.includes(fieldtype)) {
     options.push(
       ...[
-        { label: "Equals", value: "equals" },
-        { label: "Not Equals", value: "not equals" },
+        { label: "Equals", value: "==" },
+        { label: "Not Equals", value: "!=" },
         { label: "Is", value: "is" },
         { label: ">", value: ">" },
         { label: "<", value: "<" },
@@ -437,16 +458,7 @@ function getDefaultValue(field) {
 }
 
 function isSameTypeOperator(oldOperator, newOperator) {
-  let textOperators = [
-    "equals",
-    "not equals",
-    "in",
-    "not in",
-    ">",
-    "<",
-    ">=",
-    "<=",
-  ];
+  let textOperators = ["==", "!=", "in", "not in", ">", "<", ">=", "<="];
   if (
     textOperators.includes(oldOperator) &&
     textOperators.includes(newOperator)
@@ -454,81 +466,4 @@ function isSameTypeOperator(oldOperator, newOperator) {
     return true;
   return false;
 }
-
-const turnIntoGroup = () => {
-  const obj = Object.assign({}, props.condition);
-  props.condition.field = "group";
-  props.condition.value = [obj];
-};
-
-const timespanOptions = [
-  {
-    label: "Last Week",
-    value: "last week",
-  },
-  {
-    label: "Last Month",
-    value: "last month",
-  },
-  {
-    label: "Last Quarter",
-    value: "last quarter",
-  },
-  {
-    label: "Last 6 Months",
-    value: "last 6 months",
-  },
-  {
-    label: "Last Year",
-    value: "last year",
-  },
-  {
-    label: "Yesterday",
-    value: "yesterday",
-  },
-  {
-    label: "Today",
-    value: "today",
-  },
-  {
-    label: "Tomorrow",
-    value: "tomorrow",
-  },
-  {
-    label: "This Week",
-    value: "this week",
-  },
-  {
-    label: "This Month",
-    value: "this month",
-  },
-  {
-    label: "This Quarter",
-    value: "this quarter",
-  },
-  {
-    label: "This Year",
-    value: "this year",
-  },
-  {
-    label: "Next Week",
-    value: "next week",
-  },
-  {
-    label: "Next Month",
-    value: "next month",
-  },
-  {
-    label: "Next Quarter",
-    value: "next quarter",
-  },
-  {
-    label: "Next 6 Months",
-    value: "next 6 months",
-  },
-  {
-    label: "Next Year",
-    value: "next year",
-  },
-];
 </script>
