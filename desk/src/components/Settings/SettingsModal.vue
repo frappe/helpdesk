@@ -1,5 +1,9 @@
 <template>
-  <Dialog v-model="show" :options="{ size: '5xl' }">
+  <Dialog
+    v-model="show"
+    :options="{ size: '5xl' }"
+    :disableOutsideClickToClose="disableSettingModalOutsideClick"
+  >
     <template #body>
       <div class="flex" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-gray-50 p-2">
@@ -37,7 +41,12 @@
 <script setup lang="ts">
 import { Dialog } from "frappe-ui";
 import { ModelRef, watch } from "vue";
-import { activeTab, tabs } from "./settingsModal";
+import {
+  activeTab,
+  disableSettingModalOutsideClick,
+  tabs,
+} from "./settingsModal";
+
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
@@ -46,6 +55,7 @@ const props = withDefaults(
     defaultTab: 0,
   }
 );
+
 const show: ModelRef<boolean> = defineModel();
 
 watch(

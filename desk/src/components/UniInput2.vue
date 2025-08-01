@@ -104,11 +104,13 @@ const apiOptions = createResource({
   url: props.field.url_method,
   auto: !!props.field.url_method,
   transform: (data) => {
-    if (!data.length) return [];
-    return data.map((o) => ({
-      label: o,
-      value: o,
-    }));
+    if (!data?.length) return [];
+    return (
+      data?.map((o) => ({
+        label: o,
+        value: o,
+      })) || []
+    );
   },
 });
 

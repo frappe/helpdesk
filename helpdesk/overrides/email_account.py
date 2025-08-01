@@ -14,17 +14,16 @@ class CustomEmailAccount(EmailAccount):
         def process_mail(messages, append_to=None):
             for index, message in enumerate(messages.get("latest_messages", [])):
                 _msg = message_from_string(message.decode())
-                _append_to = append_to
                 # Important: If the email is auto-generated, we do not create a ticket
                 if _msg.get("X-Auto-Generated"):
-                    _append_to = None
+                    continue
 
                 uid = messages["uid_list"][index] if messages.get("uid_list") else None
                 seen_status = messages.get("seen_status", {}).get(uid)
                 if self.email_sync_option != "UNSEEN" or seen_status != "SEEN":
                     # only append the emails with status != 'SEEN' if sync option is set to 'UNSEEN'
                     _inbound_mail = InboundMail(
-                        message, self, frappe.safe_decode(uid), seen_status, _append_to
+                        message, self, frappe.safe_decode(uid), seen_status, append_to
                     )
                     mails.append(_inbound_mail)
 

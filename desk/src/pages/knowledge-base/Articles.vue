@@ -2,7 +2,7 @@
   <div class="p-5 pb-5 md:pb-10 px-10 w-full overflow-scroll items-center">
     <LayoutHeader>
       <template #left-header>
-        <Breadcrumbs :items="breadcrumbs" />
+        <Breadcrumbs :items="breadcrumbs" class="-ml-0.5" />
       </template>
     </LayoutHeader>
     <div

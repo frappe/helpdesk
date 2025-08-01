@@ -11,6 +11,8 @@ import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
+import Sla from "./Sla/Sla.vue";
+import HolidayList from "./Holiday/Holiday.vue";
 
 export const tabs = [
   {
@@ -34,6 +36,16 @@ export const tabs = [
     component: markRaw(TeamsConfig),
   },
   {
+    label: "SLA Policies",
+    icon: markRaw(ShieldCheck),
+    component: markRaw(Sla),
+  },
+  {
+    label: "Business Holidays",
+    icon: markRaw(Briefcase),
+    component: markRaw(HolidayList),
+  },
+  {
     label: "Assignment Rules",
     icon: markRaw(h(Settings, { class: "rotate-90" })),
     component: markRaw(AssignmentRules),
@@ -41,3 +53,5 @@ export const tabs = [
 ];
 
 export const activeTab = ref(tabs[0]);
+
+export const disableSettingModalOutsideClick = ref(false);
