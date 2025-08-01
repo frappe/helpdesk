@@ -53,7 +53,7 @@ export const tabs = [
     component: markRaw(HolidayList),
   },
   {
-    label: "Field Dependency",
+    label: "Field Dependencies",
     icon: markRaw(FieldDependencyIcon),
     component: markRaw(FieldDependencyConfig),
   },
