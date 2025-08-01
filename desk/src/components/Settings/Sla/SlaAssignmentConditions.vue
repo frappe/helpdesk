@@ -1,8 +1,9 @@
 <template>
-  <AssignmentConditions
+  <CFConditions
     v-if="props.conditions.length > 0"
     :conditions="props.conditions"
     :level="0"
+    :disableAddCondition="slaDataErrors.condition != ''"
   />
   <div
     v-if="props.conditions.length == 0"
@@ -19,7 +20,7 @@
       :options="dropdownOptions"
     >
       <Button
-        :disabled="slaDataErrors.condition !== ''"
+        :disabled="slaDataErrors.condition != ''"
         :icon-right="open ? 'chevron-up' : 'chevron-down'"
         label="Add condition"
       />
@@ -29,14 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import AssignmentConditions from "./AssignmentConditions/AssignmentConditions.vue";
-import { Button, ErrorMessage, FeatherIcon } from "frappe-ui";
-import {
-  slaDataErrors,
-  validateConditions,
-  validateSlaData,
-} from "@/stores/sla";
+import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
+import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
+import CFConditions from "@/components/conditions-filter/CFConditions.vue";
+import { validateConditions } from "@/utils";
 
 const props = defineProps({
   conditions: {

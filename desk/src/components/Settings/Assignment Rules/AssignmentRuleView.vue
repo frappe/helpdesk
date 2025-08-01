@@ -10,27 +10,17 @@
     class="sticky top-0 z-10 bg-white pb-6 px-10 py-8"
   >
     <div class="flex items-center justify-between w-full">
-      <div>
-        <div class="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            icon-left="chevron-left"
-            :label="
-              assignmentRuleData.assignment_rule_name || 'New Assignment Rule'
-            "
-            size="md"
-            @click="goBack()"
-            class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl"
-          />
-          <Badge
-            :variant="'subtle'"
-            :theme="assignmentRuleData.disabled ? 'gray' : 'blue'"
-            size="sm"
-            :label="assignmentRuleData.disabled ? 'Disabled' : 'Enabled'"
-          />
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          icon-left="chevron-left"
+          :label="
+            assignmentRuleData.assignment_rule_name || 'New Assignment Rule'
+          "
+          size="md"
+          @click="goBack()"
+          class="cursor-pointer -ml-4 hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 font-semibold text-xl !pr-0"
+        />
         <Badge
           :variant="'subtle'"
           :theme="'orange'"
@@ -38,6 +28,15 @@
           label="Unsaved changes"
           v-if="isDirty"
         />
+      </div>
+      <div class="flex items-center gap-4">
+        <div
+          class="flex items-center justify-between gap-2"
+          @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
+        >
+          <Switch size="sm" :model-value="!assignmentRuleData.disabled" />
+          <span class="text-sm text-ink-gray-7">Enabled</span>
+        </div>
         <Button
           :disabled="Boolean(!isDirty && assignmentRulesActiveScreen.data)"
           label="Save"
@@ -49,14 +48,6 @@
     </div>
   </div>
   <div v-if="!assignmentRuleData.loading" class="overflow-y-auto px-10 pb-8">
-    <div
-      class="flex items-center justify-between gap-2"
-      @click="assignmentRuleData.disabled = !assignmentRuleData.disabled"
-    >
-      <span class="text-sm text-ink-gray-7"> Enable Assignment Rule </span>
-      <Switch size="sm" :model-value="!assignmentRuleData.disabled" />
-    </div>
-    <hr class="mb-6 mt-3" />
     <div class="grid grid-cols-2 gap-5">
       <div>
         <FormControl
@@ -150,7 +141,7 @@
             >
           </span>
           <div v-if="isOldSla && assignmentRulesActiveScreen.data">
-            <Popover trigger="hover" hoverDelay="0.25" placement="top-end">
+            <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
               <template #target>
                 <div
                   class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
@@ -176,9 +167,11 @@
           v-if="!useNewUI && assignmentRuleData.assign_condition"
         >
           <span>
-            Conditions for this rule were created from desk which are not
-            compatible with this UI, you will need to recreate the conditions
-            here if you want to manage and add new conditions from this UI.
+            Conditions for this rule were created from
+            <a :href="deskUrl" target="_blank" class="underline">desk</a> which
+            are not compatible with this UI, you will need to recreate the
+            conditions here if you want to manage and add new conditions from
+            this UI.
           </span>
           <Button
             label="I understand, add conditions"
@@ -222,7 +215,7 @@
               assignmentRuleData.unassign_condition
             "
           >
-            <Popover trigger="hover" hoverDelay="0.25" placement="top-end">
+            <Popover trigger="hover" :hoverDelay="0.25" placement="top-end">
               <template #target>
                 <div
                   class="text-sm text-ink-gray-6 flex gap-1 cursor-default text-nowrap"
@@ -248,9 +241,11 @@
           v-if="!useNewUI && assignmentRuleData.unassign_condition"
         >
           <span>
-            Conditions for this rule were created from desk which are not
-            compatible with this UI, you will need to recreate the conditions
-            here if you want to manage and add new conditions from this UI.
+            Conditions for this rule were created from
+            <a :href="deskUrl" target="_blank" class="underline">desk</a> which
+            are not compatible with this UI, you will need to recreate the
+            conditions here if you want to manage and add new conditions from
+            this UI.
           </span>
           <Button
             label="I understand, add conditions"
@@ -320,6 +315,7 @@ import AssigneeRules from "./AssigneeRules.vue";
 import AssignmentRulesSection from "./AssignmentRulesSection.vue";
 import AssignmentSchedule from "./AssignmentSchedule.vue";
 import { convertToConditions } from "@/utils";
+import { disableSettingModalOutsideClick } from "../settingsModal";
 
 const isDirty = ref(false);
 const initialData = ref(null);
@@ -332,6 +328,7 @@ const showConfirmDialog = ref({
 });
 const useNewUI = ref(true);
 const isOldSla = ref(false);
+const deskUrl = `${window.location.origin}/app/assignment-rule/${assignmentRulesActiveScreen.value.data?.name}`;
 
 const getAssignmentRuleData = createResource({
   url: "helpdesk.api.assignment_rule.get_assignment_rule",
@@ -377,6 +374,8 @@ const getAssignmentRuleData = createResource({
 if (assignmentRulesActiveScreen.value.data) {
   assignmentRuleData.value.loading = true;
   getAssignmentRuleData.submit();
+} else {
+  disableSettingModalOutsideClick.value = true;
 }
 
 const goBack = () => {
@@ -404,7 +403,7 @@ const goBack = () => {
 };
 
 const saveAssignmentRule = () => {
-  const validationErrors = validateAssignmentRule();
+  const validationErrors = validateAssignmentRule(undefined, !useNewUI.value);
 
   if (Object.values(validationErrors).some((error) => error)) {
     toast.error("Please provide all required fields");
@@ -517,6 +516,11 @@ watch(
   (newVal) => {
     if (!initialData.value) return;
     isDirty.value = JSON.stringify(newVal) != initialData.value;
+    if (isDirty.value) {
+      disableSettingModalOutsideClick.value = true;
+    } else {
+      disableSettingModalOutsideClick.value = false;
+    }
   },
   { deep: true }
 );
@@ -535,5 +539,6 @@ onUnmounted(() => {
   resetAssignmentRuleErrors();
   resetAssignmentRuleData();
   removeEventListener("beforeunload", beforeUnloadHandler);
+  disableSettingModalOutsideClick.value = false;
 });
 </script>

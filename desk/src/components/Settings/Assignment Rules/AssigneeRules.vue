@@ -82,7 +82,7 @@
         <div
           class="text-xs size-4 flex items-center justify-center rounded-full bg-white text-ink-gray-7"
         >
-          {{ user.ticketCount }}
+          {{ user.ticketCount || 0 }}
         </div>
         <Tooltip
           v-if="user.user == assignmentRuleData.last_user"

@@ -1,4 +1,4 @@
-import { createResource } from "frappe-ui";
+import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
 const defaultAssignmentDays = [
@@ -64,25 +64,10 @@ export const assignmentRulesActiveScreen = ref<{
   data: Record<string, any> | null;
 }>({ screen: "list", data: null });
 
-export function validateConditions(conditions: any[]): boolean {
-  if (!Array.isArray(conditions)) return false;
-
-  return conditions.every((condition) => {
-    if (!condition) return false;
-
-    if (condition.field === "group" && Array.isArray(condition.value)) {
-      return validateConditions(condition.value);
-    }
-    return (
-      condition.field !== null &&
-      condition.field !== "" &&
-      condition.operator !== "" &&
-      condition.value !== ""
-    );
-  });
-}
-
-export const validateAssignmentRule = (key?: string) => {
+export const validateAssignmentRule = (
+  key?: string,
+  skipConditionCheck = false
+) => {
   const validateField = (field: string) => {
     if (key && field !== key) return;
 
@@ -100,6 +85,9 @@ export const validateAssignmentRule = (key?: string) => {
             : "Description is required";
         break;
       case "assign_condition":
+        if (skipConditionCheck) {
+          break;
+        }
         assignmentRulesErrors.value.assign_condition =
           assignmentRuleData.value.assign_condition_json?.length > 0
             ? ""
@@ -116,6 +104,9 @@ export const validateAssignmentRule = (key?: string) => {
 
         break;
       case "unassign_condition":
+        if (skipConditionCheck) {
+          break;
+        }
         if (
           !validateConditions(assignmentRuleData.value.unassign_condition_json)
         ) {
@@ -168,21 +159,3 @@ export const resetAssignmentRuleErrors = () => {
     assignmentRulesErrors.value[key] = "";
   });
 };
-
-export const filterableFields = createResource({
-  url: "helpdesk.api.doc.get_filterable_fields",
-  cache: ["DocField", "HD Ticket"],
-  params: {
-    doctype: "HD Ticket",
-  },
-  transform: (data) => {
-    data = data.map((field) => {
-      return {
-        label: field.label,
-        value: field.fieldname,
-        ...field,
-      };
-    });
-    return data;
-  },
-});
