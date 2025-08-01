@@ -406,7 +406,9 @@ const saveAssignmentRule = () => {
   const validationErrors = validateAssignmentRule(undefined, !useNewUI.value);
 
   if (Object.values(validationErrors).some((error) => error)) {
-    toast.error("Please provide all required fields");
+    toast.error(
+      "Invalid fields, check if all are filled in and values are correct."
+    );
     return;
   }
 

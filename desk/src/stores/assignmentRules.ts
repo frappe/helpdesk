@@ -108,6 +108,7 @@ export const validateAssignmentRule = (
           break;
         }
         if (
+          assignmentRuleData.value.unassign_condition_json?.length > 0 &&
           !validateConditions(assignmentRuleData.value.unassign_condition_json)
         ) {
           assignmentRulesErrors.value.unassign_condition_error =
