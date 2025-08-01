@@ -147,9 +147,9 @@ const filterOptions = createResource({
     txt: text.value,
   },
   transform: (data: Record<"full_name" | "name" | "email_id", string>[]) => {
-    return data.map((option) => ({
-      label: option.full_name,
-      value: option.email_id,
+    return data.map(({ full_name, email_id, name }) => ({
+      label: full_name || name || email_id,
+      value: email_id,
     }));
   },
 });
