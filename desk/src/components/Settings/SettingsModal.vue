@@ -54,9 +54,12 @@ import {
   tabs,
 } from "./settingsModal";
 
+<<<<<<< HEAD
 import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
 import { FieldDependencyIcon } from "@/components/icons";
 >>>>>>> cc6f1a1b (feat: init field dependency)
+=======
+>>>>>>> 26d11ed1 (fix: merging with sla in dialog)
 const props = withDefaults(
   defineProps<{
     defaultTab?: number;
