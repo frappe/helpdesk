@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar, LoadingIndicator, Switch } from "frappe-ui";
+import { Avatar, LoadingIndicator, Switch, toast } from "frappe-ui";
 import { getFieldDependencyLabel } from "@/utils";
 import { onMounted } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
@@ -136,7 +136,7 @@ function handleSwitchToggle(rowName: string, value: boolean) {
     },
     {
       onSuccess: () => {
-        fieldDependenciesList.reload();
+        toast.success("Field dependency updated successfully.");
       },
     }
   );
