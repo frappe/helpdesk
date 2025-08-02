@@ -198,8 +198,45 @@
           </div>
         </div>
       </div>
-      <!-- Permission selection
-      <div>heyll</div> -->
+
+      <!-- Permission selection -->
+      <div class="flex justify-between items-start">
+        <span class="text-sm text-ink-gray-5"
+          >Set visibility and required criteria for child field:</span
+        >
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2 justify-start">
+            <Switch v-model="fieldsCriteriaState.display.enabled" />
+            <span class="text-sm text-ink-gray-5"
+              >Show child if parent field is set to</span
+            >
+            <MultiSelectCombobox
+              :disabled="!fieldsCriteriaState.display.enabled"
+              class="min-w-[120px] max-w-[120px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
+              :options="fieldCriteriaOptions"
+              :model-value="fieldsCriteriaState.display.value"
+              @update:model-value="handleCriteriaSelection($event, 'display')"
+              :multiple="true"
+              placeholder="Select Child Field values"
+            />
+          </div>
+          <div class="flex items-center gap-2 justify-start">
+            <Switch v-model="fieldsCriteriaState.required.enabled" />
+            <span class="text-sm text-ink-gray-5"
+              >Make child required if parent is set to</span
+            >
+            <MultiSelectCombobox
+              :disabled="!fieldsCriteriaState.required.enabled"
+              class="min-w-[97px] max-w-[97px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
+              :options="fieldCriteriaOptions"
+              :model-value="fieldsCriteriaState.required.value"
+              @update:model-value="handleCriteriaSelection($event, 'required')"
+              :multiple="true"
+              placeholder="Select Child Field values"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <ConfirmDialog
@@ -214,12 +251,20 @@
 <script setup lang="ts">
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
-import { createResource, FormControl, toast, Switch, Badge } from "frappe-ui";
+import {
+  createResource,
+  FormControl,
+  toast,
+  Switch,
+  Badge,
+  Combobox,
+} from "frappe-ui";
 import { reactive, watch, computed, ref } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
+import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -285,6 +330,51 @@ const state = reactive({
   enabled: true,
 });
 
+const fieldsCriteriaState = reactive({
+  display: {
+    enabled: true,
+    value: [{ label: "Any", value: "Any" }],
+  },
+  required: {
+    enabled: true,
+    value: [{ label: "Any", value: "Any" }],
+  },
+});
+
+const fieldCriteriaOptions = computed(() => {
+  const _options = [{ label: "Any", value: "Any" }];
+  state.childFieldValues.forEach((value) => {
+    if (!_options.some((o) => o.value === value)) {
+      _options.push({ label: value, value });
+    }
+  });
+  return _options;
+});
+
+function handleCriteriaSelection(
+  values: { label: string; value: string }[],
+  stateKey: "display" | "required"
+) {
+  const _values = values.map((v) => v.value);
+
+  if (_values.length > 1) {
+    fieldsCriteriaState[stateKey].value = _values
+      .filter((v) => v !== "Any")
+      .map((value) => ({
+        label: value,
+        value,
+      }));
+  } else if (_values.length === 0) {
+    fieldsCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
+  } else if (_values.includes("Any") && _values.length === 1) {
+    fieldsCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
+  } else if (_values.length === 1) {
+    fieldsCriteriaState[stateKey].value = [
+      { label: _values[0], value: _values[0] },
+    ];
+  }
+}
+
 const filteredParentFieldValues = computed(() => {
   if (!state.parentSearch) return state.parentFieldValues;
   return state.parentFieldValues.filter((v) =>
@@ -315,6 +405,7 @@ const createUpdateFieldDependency = createResource({
     child_field: state.selectedChildField,
     parent_child_mapping: stringifyParentChildMapping(),
     enabled: state.enabled,
+    fields_criteria: JSON.stringify(fieldsCriteriaState),
   }),
   onSuccess: () => {
     if (!isNew.value) {
@@ -335,21 +426,38 @@ const fieldDependency = createResource({
     state.selectedParentField = data.parent_field;
     state.selectedChildField = data.child_field;
     state.enabled = data.enabled;
-
-    const mapping = JSON.parse(data.parent_child_mapping || "{}");
-    let selections = {};
-    Object.keys(mapping).forEach((parent) => {
-      selections[parent] = new Set(mapping[parent]);
-    });
-    state.childSelections = selections;
-    // for checking dirty state
-    state.initialChildSelections = structuredClone(selections);
-
-    if (!state.currentParentSelection) {
-      state.currentParentSelection = Object.keys(mapping)[0] || "";
-    }
+    parseMapping(data.parent_child_mapping);
+    parseFieldCriteria(data.fields_criteria);
   },
 });
+function parseMapping(data: string) {
+  const mapping = JSON.parse(data || "{}");
+  let selections = {};
+  Object.keys(mapping).forEach((parent) => {
+    selections[parent] = new Set(mapping[parent]);
+  });
+  state.childSelections = selections;
+
+  // for checking dirty state
+  state.initialChildSelections = structuredClone(selections);
+
+  if (!state.currentParentSelection) {
+    state.currentParentSelection = Object.keys(mapping)[0] || "";
+  }
+}
+
+function parseFieldCriteria(data: string) {
+  const criteria = JSON.parse(data || "{}");
+  console.log(criteria);
+  fieldsCriteriaState.display = criteria.display || {
+    enabled: true,
+    value: [{ label: "Any", value: "Any" }],
+  };
+  fieldsCriteriaState.required = criteria.required || {
+    enabled: true,
+    value: [{ label: "Any", value: "Any" }],
+  };
+}
 
 const isDirty = computed(() => {
   if (isNew.value) {
