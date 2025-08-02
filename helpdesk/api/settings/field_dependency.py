@@ -1,3 +1,5 @@
+import re
+
 import frappe
 from frappe import _
 
@@ -34,13 +36,22 @@ def get_field_dependency(name):
     res["child_field"] = doc.name.split("-")[2]
     res["enabled"] = doc.enabled
     res["parent_child_mapping"] = frappe.parse_json(doc.script.split("//JSON: ")[-1])
-
+    res["fields_criteria"] = get_fields_criteria(doc.script)
+    get_fields_criteria(doc.script)
     return res
+
+
+def get_fields_criteria(script):
+    match = re.search(r"//FieldsCriteria: (.+)", script)
+    if not match:
+        return None
+    fields_criteria_str = match.group(1)
+    return frappe.parse_json(fields_criteria_str)
 
 
 @frappe.whitelist()
 def create_update_field_dependency(
-    parent_field, child_field, parent_child_mapping, enabled
+    parent_field, child_field, parent_child_mapping, enabled, fields_criteria
 ):
     frappe.has_permission("HD Form Script", "create", throw=True)
     if not parent_field or not child_field or not parent_child_mapping:
@@ -64,6 +75,7 @@ def create_update_field_dependency(
     # add JSON for UI
     script += "\n"
     script += "// This JSON is to render the field dependency in the UI.\n"
+    script += "//FieldsCriteria: " + frappe.as_json(fields_criteria) + "\n"
     script += "//JSON: " + frappe.as_json(parent_child_mapping) + "\n"
 
     script_doc.script = script
