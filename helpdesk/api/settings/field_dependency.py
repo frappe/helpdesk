@@ -37,7 +37,7 @@ def get_field_dependency(name):
     res["enabled"] = doc.enabled
     res["parent_child_mapping"] = frappe.parse_json(doc.script.split("//JSON: ")[-1])
     res["fields_criteria"] = get_fields_criteria(doc.script)
-    get_fields_criteria(doc.script)
+
     return res
 
 
@@ -65,12 +65,15 @@ def create_update_field_dependency(
     )
 
     script_doc = get_or_create_standard_form_script(parent_field, child_field)
+    script_doc.enabled = enabled
+    script_doc.apply_on_new_page = 1
     script = add_function_to_script(
         parent_field,
         child_field,
         func,
     )
-    script_doc.enabled = enabled
+
+    old_fields_criteria = get_fields_criteria(script_doc.script)
 
     # add JSON for UI
     script += "\n"
@@ -80,6 +83,11 @@ def create_update_field_dependency(
 
     script_doc.script = script
     script_doc.save()
+
+    handle_fields_criteria(
+        parent_field, child_field, fields_criteria, old_fields_criteria
+    )
+    frappe.response["_server_messages"] = None
 
 
 def get_or_create_standard_form_script(parent_field, child_field):
@@ -141,17 +149,55 @@ def add_function_to_script(parent_field, child_field, func):
     return script
 
 
-def find_closing_brace_position(script, start_pos):
-    """
-    Find the position of the closing brace that matches the opening brace at start_pos
-    Returns the position of the closing brace, or None if not found
-    """
-    brace_count = 0
-    for i in range(start_pos, len(script)):
-        if script[i] == "{":
-            brace_count += 1
-        elif script[i] == "}":
-            brace_count -= 1
-            if brace_count == 0:
-                return i
-    return None
+def handle_fields_criteria(
+    parent_field, child_field, fields_criteria, old_fields_criteria
+):
+
+    if frappe.as_json(fields_criteria) == frappe.as_json(old_fields_criteria):
+        return
+
+    fields_criteria = frappe.parse_json(fields_criteria)
+    display_depends_on = fields_criteria.get("display", "")
+    mandatory_depends_on = fields_criteria.get("mandatory", False)
+
+    if not display_depends_on and not mandatory_depends_on:
+        return
+
+    display_expression = get_df_expression(
+        parent_field, child_field, display_depends_on
+    )
+    mandatory_expression = get_df_expression(
+        parent_field, child_field, mandatory_depends_on
+    )
+
+    handle_form_customization(child_field, display_expression, mandatory_expression)
+
+
+def handle_form_customization(field, display_expression, mandatory_expression):
+    cf = frappe.get_doc("Customize Form")
+    cf.doc_type = "HD Ticket"
+    cf.fetch_to_customize()
+    for f in cf.fields:
+        if f.fieldname == field:
+
+            f.depends_on = display_expression
+            f.mandatory_depends_on = mandatory_expression
+
+    cf.save_customization()
+
+
+def get_df_expression(parent_field, child_field, criteria):
+    if not criteria.get("enabled", False):
+        return None
+    values = criteria.get("value", [])
+
+    values = [v.get("value") for v in values]
+    if len(values) == 0:
+        return None
+    expression = ""
+    if values[0] == "Any":
+        expression = f"eval:doc.{parent_field} != ''"
+    else:
+        expression = f"eval:{values}.includes(doc.{parent_field})"
+
+    return expression

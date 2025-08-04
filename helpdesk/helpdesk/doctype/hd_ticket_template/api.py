@@ -75,7 +75,7 @@ def get_fields(template: str, fetch: Literal["Custom Field", "DocField"]):
         .orderby(fields.idx)
         .run(as_dict=True)
     )
-    docfields = ["link_filters"]
+    docfields = ["link_filters", "depends_on", "mandatory_depends_on"]
 
     for df in docfields:
         for field in result:
