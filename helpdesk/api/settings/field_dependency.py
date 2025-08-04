@@ -179,7 +179,6 @@ def handle_form_customization(field, display_expression, mandatory_expression):
     cf.fetch_to_customize()
     for f in cf.fields:
         if f.fieldname == field:
-
             f.depends_on = display_expression
             f.mandatory_depends_on = mandatory_expression
 
