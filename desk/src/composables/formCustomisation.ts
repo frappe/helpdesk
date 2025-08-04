@@ -70,7 +70,7 @@ export function handleLinkFieldUpdate(
   doc: any,
   oldDoc: any
 ) {
-  if (!filters) {
+  if (!filters || !filters.length) {
     f.link_filters = oldDoc.find((f) => f.fieldname === fieldname).link_filters;
     f.disabled = true;
     return;
