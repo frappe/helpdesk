@@ -90,10 +90,14 @@
             </p>
             <!-- More Options -->
             <p class="w-1/12 flex items-center justify-end">
-              <Dropdown placement="right" :options="options">
+              <Dropdown placement="right" :options="getOptions(row.name)">
                 <Button
                   variant="ghost"
-                  @click.stop="isConfirmingDelete = false"
+                  @click.stop="
+                    () => {
+                      isConfirmingDelete = false;
+                    }
+                  "
                 >
                   <template #icon>
                     <LucideMoreHorizontal class="h-4 w-4" />
@@ -115,7 +119,7 @@
 
 <script setup lang="ts">
 import { Avatar, LoadingIndicator, Switch, toast } from "frappe-ui";
-import { getFieldDependencyLabel, TemplateOption } from "@/utils";
+import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
 import { computed, onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
@@ -125,43 +129,22 @@ onMounted(() => {
 });
 
 const isConfirmingDelete = ref(false);
-const options = computed(() => [
-  {
-    label: "Delete",
-    component: (properties) =>
-      TemplateOption({
-        option: "Delete",
-        icon: "trash-2",
-        active: properties.active,
-        variant: "grey",
-        onClick: (event) => {
-          event.preventDefault();
-          if (!isConfirmingDelete.value) {
-            isConfirmingDelete.value = true;
-            return;
-          }
+
+function getOptions(rowName: string) {
+  return ConfirmDelete({
+    isConfirmingDelete,
+    onConfirmDelete: () => {
+      console.log(`Deleting dependency: ${rowName}`);
+
+      fieldDependenciesList.delete.submit(rowName, {
+        onSuccess: () => {
+          toast.success("Field dependency deleted successfully");
+          fieldDependenciesList.reload();
         },
-      }),
-    condition: () => !isConfirmingDelete.value,
-  },
-  {
-    label: "Confirm Delete",
-    component: (properties) =>
-      TemplateOption({
-        option: "Confirm Delete",
-        icon: "trash-2",
-        active: properties.active,
-        variant: "danger",
-        onClick: (event) => {
-          if (!isConfirmingDelete.value) {
-            isConfirmingDelete.value = true;
-            return;
-          }
-        },
-      }),
-    condition: () => isConfirmingDelete.value,
-  },
-]);
+      });
+    },
+  });
+}
 
 function handleSwitchToggle(rowName: string, value: boolean) {
   fieldDependenciesList.setValue.submit(
