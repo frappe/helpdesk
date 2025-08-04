@@ -452,3 +452,46 @@ export function getFieldDependencyLabel(name: string) {
   child = getField(child)?.label || child;
   return `${parent} → ${child}`;
 }
+
+/**
+ * Creates a pair of delete/confirm delete options for dropdowns
+ * @param {Object} config - Configuration object
+ * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
+ * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
+ * @returns {Array} Array of option objects for use in dropdowns
+ */
+export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
+  return [
+    {
+      label: "Delete",
+      component: (props) =>
+        TemplateOption({
+          option: "Delete",
+          icon: "trash-2",
+          active: props.active,
+          variant: "grey",
+          onClick: (event) => {
+            event.preventDefault();
+            isConfirmingDelete.value = true;
+          },
+        }),
+      condition: () => !isConfirmingDelete.value,
+    },
+    {
+      label: "Confirm Delete",
+      component: (props) =>
+        TemplateOption({
+          option: "Confirm Delete",
+          icon: "trash-2",
+          active: props.active,
+          variant: "danger",
+          onClick: () => {
+            onConfirmDelete();
+            // Reset state after confirming
+            isConfirmingDelete.value = false;
+          },
+        }),
+      condition: () => isConfirmingDelete.value,
+    },
+  ];
+}
