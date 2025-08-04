@@ -448,7 +448,6 @@ function parseMapping(data: string) {
 
 function parseFieldCriteria(data: string) {
   const criteria = JSON.parse(data || "{}");
-  console.log(criteria);
   fieldCriteriaState.display = criteria.display || {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
