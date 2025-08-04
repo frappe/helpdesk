@@ -11,7 +11,7 @@
             @click="handleBackNavigation"
             class="cursor-pointer hover:bg-transparent focus:bg-transparent focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:none active:bg-transparent active:outline-none active:ring-0 active:ring-offset-0 active:text-ink-gray-5 pl-0 -ml-[5px] pr-0"
           />
-          <Badge v-if="isDirty" theme="orange"> Unsaved Changes </Badge>
+          <Badge v-if="isDirty" theme="orange"> Unsaved </Badge>
         </div>
       </template>
       <template #actions>
@@ -32,6 +32,7 @@
                 !state.selectedChildField ||
                 Object.keys(state.childSelections).length === 0
               "
+              :loading="createUpdateFieldDependency.loading"
               @click="handleSubmit"
             />
           </div>
@@ -206,31 +207,31 @@
         >
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2 justify-start">
-            <Switch v-model="fieldsCriteriaState.display.enabled" />
+            <Switch v-model="fieldCriteriaState.display.enabled" />
             <span class="text-sm text-ink-gray-5"
               >Show child if parent field is set to</span
             >
             <MultiSelectCombobox
-              :disabled="!fieldsCriteriaState.display.enabled"
+              :disabled="!fieldCriteriaState.display.enabled"
               class="min-w-[120px] max-w-[120px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
               :options="fieldCriteriaOptions"
-              :model-value="fieldsCriteriaState.display.value"
+              :model-value="fieldCriteriaState.display.value"
               @update:model-value="handleCriteriaSelection($event, 'display')"
               :multiple="true"
               placeholder="Select Child Field values"
             />
           </div>
           <div class="flex items-center gap-2 justify-start">
-            <Switch v-model="fieldsCriteriaState.required.enabled" />
+            <Switch v-model="fieldCriteriaState.mandatory.enabled" />
             <span class="text-sm text-ink-gray-5"
               >Make child required if parent is set to</span
             >
             <MultiSelectCombobox
-              :disabled="!fieldsCriteriaState.required.enabled"
+              :disabled="!fieldCriteriaState.mandatory.enabled"
               class="min-w-[97px] max-w-[97px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
               :options="fieldCriteriaOptions"
-              :model-value="fieldsCriteriaState.required.value"
-              @update:model-value="handleCriteriaSelection($event, 'required')"
+              :model-value="fieldCriteriaState.mandatory.value"
+              @update:model-value="handleCriteriaSelection($event, 'mandatory')"
               :multiple="true"
               placeholder="Select Child Field values"
             />
@@ -256,7 +257,6 @@ import {
   FormControl,
   toast,
   Switch,
-  Badge,
   Combobox,
 } from "frappe-ui";
 import { reactive, watch, computed, ref } from "vue";
@@ -330,12 +330,12 @@ const state = reactive({
   enabled: true,
 });
 
-const fieldsCriteriaState = reactive({
+const fieldCriteriaState = reactive({
   display: {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   },
-  required: {
+  mandatory: {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   },
@@ -343,7 +343,7 @@ const fieldsCriteriaState = reactive({
 
 const fieldCriteriaOptions = computed(() => {
   const _options = [{ label: "Any", value: "Any" }];
-  state.childFieldValues.forEach((value) => {
+  state.parentFieldValues.forEach((value) => {
     if (!_options.some((o) => o.value === value)) {
       _options.push({ label: value, value });
     }
@@ -353,23 +353,23 @@ const fieldCriteriaOptions = computed(() => {
 
 function handleCriteriaSelection(
   values: { label: string; value: string }[],
-  stateKey: "display" | "required"
+  stateKey: "display" | "mandatory"
 ) {
   const _values = values.map((v) => v.value);
 
   if (_values.length > 1) {
-    fieldsCriteriaState[stateKey].value = _values
+    fieldCriteriaState[stateKey].value = _values
       .filter((v) => v !== "Any")
       .map((value) => ({
         label: value,
         value,
       }));
   } else if (_values.length === 0) {
-    fieldsCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
+    fieldCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
   } else if (_values.includes("Any") && _values.length === 1) {
-    fieldsCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
+    fieldCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
   } else if (_values.length === 1) {
-    fieldsCriteriaState[stateKey].value = [
+    fieldCriteriaState[stateKey].value = [
       { label: _values[0], value: _values[0] },
     ];
   }
@@ -405,7 +405,7 @@ const createUpdateFieldDependency = createResource({
     child_field: state.selectedChildField,
     parent_child_mapping: stringifyParentChildMapping(),
     enabled: state.enabled,
-    fields_criteria: JSON.stringify(fieldsCriteriaState),
+    fields_criteria: JSON.stringify(fieldCriteriaState),
   }),
   onSuccess: () => {
     if (!isNew.value) {
@@ -449,11 +449,11 @@ function parseMapping(data: string) {
 function parseFieldCriteria(data: string) {
   const criteria = JSON.parse(data || "{}");
   console.log(criteria);
-  fieldsCriteriaState.display = criteria.display || {
+  fieldCriteriaState.display = criteria.display || {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   };
-  fieldsCriteriaState.required = criteria.required || {
+  fieldCriteriaState.mandatory = criteria.mandatory || {
     enabled: true,
     value: [{ label: "Any", value: "Any" }],
   };
@@ -467,7 +467,8 @@ const isDirty = computed(() => {
   return (
     Boolean(fieldDependency.data?.enabled) !== Boolean(state.enabled) ||
     stringifyParentChildMapping(state.childSelections) !==
-      stringifyParentChildMapping(state.initialChildSelections)
+      stringifyParentChildMapping(state.initialChildSelections) ||
+    JSON.stringify(fieldCriteriaState) !== fieldDependency.data?.fields_criteria
   );
 });
 
@@ -601,6 +602,7 @@ function handleSelectAllChildValues(value) {
 
 const showConfirmDialog = ref(false);
 function handleBackNavigation() {
+  if (createUpdateFieldDependency.loading) return;
   if (isDirty.value) {
     showConfirmDialog.value = true;
 
