@@ -8,10 +8,10 @@ from helpdesk.api.settings.field_dependency import handle_form_customization
 
 
 class HDFormScript(Document):
-    # ON TRASH
     def on_trash(self):
-        # check if the name has "Field Dependency" in it
         if "Field Dependency" not in self.name:
+            return
+        if not self.is_standard:
             return
         child_field = self.name.split("-")[-1]
         if not child_field:
