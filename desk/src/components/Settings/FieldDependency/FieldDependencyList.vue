@@ -91,7 +91,10 @@
             <!-- More Options -->
             <p class="w-1/12 flex items-center justify-end">
               <Dropdown placement="right" :options="options">
-                <Button variant="ghost" @click.stop>
+                <Button
+                  variant="ghost"
+                  @click.stop="isConfirmingDelete = false"
+                >
                   <template #icon>
                     <LucideMoreHorizontal class="h-4 w-4" />
                   </template>
@@ -112,8 +115,8 @@
 
 <script setup lang="ts">
 import { Avatar, LoadingIndicator, Switch, toast } from "frappe-ui";
-import { getFieldDependencyLabel } from "@/utils";
-import { onMounted } from "vue";
+import { getFieldDependencyLabel, TemplateOption } from "@/utils";
+import { computed, onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 
@@ -121,12 +124,44 @@ onMounted(() => {
   fieldDependenciesList.reload();
 });
 
-const options = [
+const isConfirmingDelete = ref(false);
+const options = computed(() => [
   {
     label: "Delete",
-    icon: "trash",
+    component: (properties) =>
+      TemplateOption({
+        option: "Delete",
+        icon: "trash-2",
+        active: properties.active,
+        variant: "grey",
+        onClick: (event) => {
+          event.preventDefault();
+          if (!isConfirmingDelete.value) {
+            isConfirmingDelete.value = true;
+            return;
+          }
+        },
+      }),
+    condition: () => !isConfirmingDelete.value,
   },
-];
+  {
+    label: "Confirm Delete",
+    component: (properties) =>
+      TemplateOption({
+        option: "Confirm Delete",
+        icon: "trash-2",
+        active: properties.active,
+        variant: "danger",
+        onClick: (event) => {
+          if (!isConfirmingDelete.value) {
+            isConfirmingDelete.value = true;
+            return;
+          }
+        },
+      }),
+    condition: () => isConfirmingDelete.value,
+  },
+]);
 
 function handleSwitchToggle(rowName: string, value: boolean) {
   fieldDependenciesList.setValue.submit(
