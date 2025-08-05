@@ -39,13 +39,10 @@
         </div>
       </template>
     </SettingsLayoutHeader>
-    <!-- Form -->
-    <div
-      @submit.prevent="handleSubmit"
-      class="w-full flex-1 flex flex-col gap-8 h-full"
-    >
+    <!-- Body -->
+    <div class="w-full flex-1 flex flex-col gap-8 h-full">
       <!-- Field Selection -->
-      <FieldDependencyFields
+      <FieldDependencyFieldsSelection
         v-model="state"
         :is-new="isNew"
         :parent-fields="parentFields"
@@ -83,7 +80,7 @@ import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
 import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
-import FieldDependencyFields from "./FieldDependencyFields.vue";
+import FieldDependencyFieldsSelection from "./FieldDependencyFieldsSelection.vue";
 import FieldDependencyValueSelection from "./FieldDependencyValueSelection.vue";
 
 const props = defineProps({
