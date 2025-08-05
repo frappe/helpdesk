@@ -79,9 +79,9 @@ def create_update_field_dependency(
     script += "//FieldsCriteria: " + frappe.as_json(fields_criteria) + "\n"
     script += "//JSON: " + frappe.as_json(parent_child_mapping) + "\n"
 
-    script_doc.script = script
-
     old_fields_criteria = get_fields_criteria(script_doc.script)
+
+    script_doc.script = script
     script_doc.save()
 
     handle_fields_criteria(
@@ -153,6 +153,7 @@ def add_function_to_script(parent_field, child_field, func):
 def handle_fields_criteria(
     parent_field, child_field, fields_criteria, old_fields_criteria
 ):
+
     if frappe.as_json(fields_criteria) == frappe.as_json(old_fields_criteria):
         return
 
@@ -169,6 +170,8 @@ def handle_fields_criteria(
     mandatory_expression = get_df_expression(
         parent_field, child_field, mandatory_depends_on
     )
+    print("\n\n", "Display Expression:", display_expression, "\n\n")
+    print("\n\n", "Mandatory Expression:", mandatory_expression, "\n\n")
 
     handle_form_customization(child_field, display_expression, mandatory_expression)
 
@@ -200,3 +203,4 @@ def handle_form_customization(field, display_expression, mandatory_expression):
             f.mandatory_depends_on = mandatory_expression
 
     cf.save_customization()
+    frappe.clear_cache("HD Ticket")
