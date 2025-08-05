@@ -99,6 +99,13 @@
       "
     />
   </div>
+  <!-- Loading State -->
+  <div
+    v-else-if="list.loading"
+    class="w-full h-full flex items-center justify-center -mt-48"
+  >
+    <LoadingIndicator :scale="10" />
+  </div>
   <!-- Empty State -->
   <EmptyState
     v-else
@@ -141,6 +148,7 @@ import {
   ListRowItem,
   ListSelectBanner,
   ListView,
+  LoadingIndicator,
   toast,
 } from "frappe-ui";
 import {
@@ -512,7 +520,8 @@ const showViewControls = computed(() => {
     !options.value.hideViewControls &&
     filterableFields.data &&
     sortableFields.data &&
-    quickFilters.data
+    quickFilters.data &&
+    list.data?.data.length > 0
   );
 });
 
