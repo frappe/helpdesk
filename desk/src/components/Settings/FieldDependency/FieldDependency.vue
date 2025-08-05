@@ -202,10 +202,10 @@
 
       <!-- Permission selection -->
       <div class="flex justify-between items-start">
-        <span class="text-sm text-ink-gray-5"
+        <span class="text-sm text-ink-gray-5 pt-1"
           >Set visibility and required criteria for child field:</span
         >
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-3">
           <div class="flex items-center gap-2 justify-start">
             <Switch v-model="fieldCriteriaState.display.enabled" />
             <span class="text-sm text-ink-gray-5"
