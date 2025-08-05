@@ -8,13 +8,30 @@ from helpdesk.api.settings.field_dependency import handle_form_customization
 
 
 class HDFormScript(Document):
-    def on_trash(self):
-        if "Field Dependency" not in self.name:
+    def before_save(self):
+        if not self.has_value_changed("enabled") and not self.is_standard:
             return
+        if not self.enabled:
+            child_field = self.get_child_field()
+            handle_form_customization(child_field, None, None)
+
+    def get_child_field(self):
+        """Returns the child field from the name of the document"""
+        if not self.name:
+            return None
+        if "Field Dependency" not in self.name:
+            return None
+
+        # Assuming the name is in the format "Field Dependency-{parent_field}-{child_field}"
+        parts = self.name.split("-")
+        if len(parts) < 2:
+            return None
+        return parts[-1]
+
+    def on_trash(self):
         if not self.is_standard:
             return
-        child_field = self.name.split("-")[-1]
-        if not child_field:
+        if child_field := self.get_child_field():
             return
         handle_form_customization(child_field, None, None)
 
