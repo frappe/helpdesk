@@ -170,8 +170,6 @@ def handle_fields_criteria(
     mandatory_expression = get_df_expression(
         parent_field, child_field, mandatory_depends_on
     )
-    print("\n\n", "Display Expression:", display_expression, "\n\n")
-    print("\n\n", "Mandatory Expression:", mandatory_expression, "\n\n")
 
     handle_form_customization(child_field, display_expression, mandatory_expression)
 
