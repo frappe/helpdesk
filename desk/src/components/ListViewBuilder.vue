@@ -521,7 +521,7 @@ const showViewControls = computed(() => {
     filterableFields.data &&
     sortableFields.data &&
     quickFilters.data &&
-    list.data?.data.length > 0
+    list.data?.data?.length > 0
   );
 });
 
