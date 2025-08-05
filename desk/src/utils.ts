@@ -383,7 +383,6 @@ export function getFieldDependencyLabel(name: string) {
 =======
 
 /**
- * Creates a pair of delete/confirm delete options for dropdowns
  * @param {Object} config - Configuration object
  * @param {Ref<boolean>} config.isConfirmingDelete - Ref to track confirmation state
  * @param {Function} config.onConfirmDelete - Callback when delete is confirmed
