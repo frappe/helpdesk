@@ -45,28 +45,12 @@
       class="w-full flex-1 flex flex-col gap-8 h-full"
     >
       <!-- Field Selection -->
-      <div class="flex gap-3 w-full justify-between">
-        <FormControl
-          v-model="state.selectedParentField"
-          label="Parent Field"
-          placeholder="Select Parent Field"
-          required
-          class="flex-1"
-          type="select"
-          :options="parentFields"
-          :disabled="!isNew"
-        />
-        <FormControl
-          v-model="state.selectedChildField"
-          label="Child Field"
-          placeholder="Select Child Field"
-          required
-          class="flex-1"
-          :disabled="!state.selectedParentField || !isNew"
-          type="select"
-          :options="state.childFields"
-        />
-      </div>
+      <FieldDependencyFields
+        v-model="state"
+        :is-new="isNew"
+        :parent-fields="parentFields"
+        class="w-full"
+      />
       <!-- Value Selection -->
       <div class="flex w-full flex-1 justify-between h-full">
         <!-- left box -->
@@ -200,44 +184,12 @@
         </div>
       </div>
 
-      <!-- Permission selection -->
-      <div class="flex justify-between items-start">
-        <span class="text-sm text-ink-gray-5 pt-1"
-          >Set visibility and required criteria for child field:</span
-        >
-        <div class="flex flex-col gap-3">
-          <div class="flex items-center gap-2 justify-start">
-            <Switch v-model="fieldCriteriaState.display.enabled" />
-            <span class="text-sm text-ink-gray-5"
-              >Show child if parent field is set to</span
-            >
-            <MultiSelectCombobox
-              :disabled="!fieldCriteriaState.display.enabled"
-              class="min-w-[120px] max-w-[120px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
-              :options="fieldCriteriaOptions"
-              :model-value="fieldCriteriaState.display.value"
-              @update:model-value="handleCriteriaSelection($event, 'display')"
-              :multiple="true"
-              placeholder="Select Child Field values"
-            />
-          </div>
-          <div class="flex items-center gap-2 justify-start">
-            <Switch v-model="fieldCriteriaState.mandatory.enabled" />
-            <span class="text-sm text-ink-gray-5"
-              >Make child required if parent is set to</span
-            >
-            <MultiSelectCombobox
-              :disabled="!fieldCriteriaState.mandatory.enabled"
-              class="min-w-[97px] max-w-[97px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
-              :options="fieldCriteriaOptions"
-              :model-value="fieldCriteriaState.mandatory.value"
-              @update:model-value="handleCriteriaSelection($event, 'mandatory')"
-              :multiple="true"
-              placeholder="Select Child Field values"
-            />
-          </div>
-        </div>
-      </div>
+      <!-- Criteria selection -->
+      <FieldDependencyCriteria
+        :parent-field-values="state.parentFieldValues"
+        v-model="fieldCriteriaState"
+        class="w-full"
+      />
     </div>
   </div>
   <ConfirmDialog
@@ -252,19 +204,14 @@
 <script setup lang="ts">
 import { getMeta } from "@/stores/meta";
 import { getFieldDependencyLabel } from "@/utils";
-import {
-  createResource,
-  FormControl,
-  toast,
-  Switch,
-  Combobox,
-} from "frappe-ui";
+import { createResource, FormControl, toast, Switch } from "frappe-ui";
 import { reactive, watch, computed, ref } from "vue";
 import { getFieldOptions, hiddenChildFields } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
-import MultiSelectCombobox from "@/components/frappe-ui/MultiSelectCombobox.vue";
+import FieldDependencyCriteria from "./FieldDependencyCriteria.vue";
+import FieldDependencyFields from "./FieldDependencyFields.vue";
 
 const props = defineProps({
   fieldDependencyName: {
@@ -340,40 +287,6 @@ const fieldCriteriaState = reactive({
     value: [{ label: "Any", value: "Any" }],
   },
 });
-
-const fieldCriteriaOptions = computed(() => {
-  const _options = [{ label: "Any", value: "Any" }];
-  state.parentFieldValues.forEach((value) => {
-    if (!_options.some((o) => o.value === value)) {
-      _options.push({ label: value, value });
-    }
-  });
-  return _options;
-});
-
-function handleCriteriaSelection(
-  values: { label: string; value: string }[],
-  stateKey: "display" | "mandatory"
-) {
-  const _values = values.map((v) => v.value);
-
-  if (_values.length > 1) {
-    fieldCriteriaState[stateKey].value = _values
-      .filter((v) => v !== "Any")
-      .map((value) => ({
-        label: value,
-        value,
-      }));
-  } else if (_values.length === 0) {
-    fieldCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
-  } else if (_values.includes("Any") && _values.length === 1) {
-    fieldCriteriaState[stateKey].value = [{ label: "Any", value: "Any" }];
-  } else if (_values.length === 1) {
-    fieldCriteriaState[stateKey].value = [
-      { label: _values[0], value: _values[0] },
-    ];
-  }
-}
 
 const filteredParentFieldValues = computed(() => {
   if (!state.parentSearch) return state.parentFieldValues;
