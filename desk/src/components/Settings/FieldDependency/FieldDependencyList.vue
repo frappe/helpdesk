@@ -120,7 +120,7 @@
 <script setup lang="ts">
 import { Avatar, LoadingIndicator, Switch, toast } from "frappe-ui";
 import { getFieldDependencyLabel, ConfirmDelete } from "@/utils";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { fieldDependenciesList } from "./fieldDependency";
 import SettingsLayoutHeader from "../SettingsLayoutHeader.vue";
 

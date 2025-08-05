@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-between items-start">
-    <span class="text-sm text-ink-gray-5 pt-1"
-      >Set visibility and required criteria for child field:</span
+    <span class="text-sm text-ink-gray-5 pt-[5px]"
+      >Set visibility and mandatory criteria for child field:</span
     >
     <div class="flex flex-col gap-3">
       <div class="flex items-center gap-2 justify-start">
@@ -22,7 +22,7 @@
       <div class="flex items-center gap-2 justify-start">
         <Switch v-model="fieldCriteriaState.mandatory.enabled" />
         <span class="text-sm text-ink-gray-5"
-          >Make child required if parent is set to</span
+          >Make child mandatory if parent is set to</span
         >
         <MultiSelectCombobox
           :disabled="!fieldCriteriaState.mandatory.enabled"
