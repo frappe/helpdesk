@@ -75,7 +75,7 @@
               </div>
             </div>
             <div v-else class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-1">
                 <div class="w-13 pl-2 text-end text-base text-gray-600">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
@@ -98,7 +98,7 @@
                     :placeholder="'Equals'"
                   />
                 </div>
-                <div id="value" class="!min-w-[140px]">
+                <div id="value" class="!min-w-[140px] flex-1">
                   <component
                     :is="getValueControl(f)"
                     v-model="f.value"
