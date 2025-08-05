@@ -337,3 +337,35 @@ interface FileAttachment {
   file_name: string;
   file_url: string;
 }
+
+// const state = reactive({
+//   selectedParentField: "",
+//   selectedChildField: "",
+//   childFields: [],
+
+//   parentFieldValues: [],
+//   childFieldValues: [],
+
+//   currentParentSelection: "",
+
+//   childSelections: {}, // Initial value is a Set
+//   initialChildSelections: {},
+//   parentSearch: "",
+//   childSearch: "",
+
+//   enabled: true,
+// });
+
+export interface FieldCriteriaState {
+  selectedParentField: string;
+  selectedChildField: string;
+  childFields: any[];
+  parentFieldValues: any[];
+  childFieldValues: any[];
+  currentParentSelection: string;
+  childSelections: any;
+  initialChildSelections: any;
+  parentSearch: string;
+  childSearch: string;
+  enabled: boolean;
+}
