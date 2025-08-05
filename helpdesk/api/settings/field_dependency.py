@@ -58,23 +58,21 @@ def create_update_field_dependency(
         frappe.throw(
             _("Parent field, child field, and parent-child mapping are required.")
         )
+
+    script_doc = get_or_create_standard_form_script(parent_field, child_field)
+    script_doc.enabled = enabled
+    script_doc.apply_on_new_page = 1
+
     func = generate_on_change_function(
         parent_child_mapping=frappe.parse_json(parent_child_mapping),
         parent_field=parent_field,
         child_field=child_field,
     )
-
-    script_doc = get_or_create_standard_form_script(parent_field, child_field)
-    script_doc.enabled = enabled
-    script_doc.apply_on_new_page = 1
     script = add_function_to_script(
         parent_field,
         child_field,
         func,
     )
-
-    old_fields_criteria = get_fields_criteria(script_doc.script)
-
     # add JSON for UI
     script += "\n"
     script += "// This JSON is to render the field dependency in the UI.\n"
@@ -82,6 +80,8 @@ def create_update_field_dependency(
     script += "//JSON: " + frappe.as_json(parent_child_mapping) + "\n"
 
     script_doc.script = script
+
+    old_fields_criteria = get_fields_criteria(script_doc.script)
     script_doc.save()
 
     handle_fields_criteria(
@@ -153,7 +153,6 @@ def add_function_to_script(parent_field, child_field, func):
 def handle_fields_criteria(
     parent_field, child_field, fields_criteria, old_fields_criteria
 ):
-
     if frappe.as_json(fields_criteria) == frappe.as_json(old_fields_criteria):
         return
 
@@ -174,18 +173,6 @@ def handle_fields_criteria(
     handle_form_customization(child_field, display_expression, mandatory_expression)
 
 
-def handle_form_customization(field, display_expression, mandatory_expression):
-    cf = frappe.get_doc("Customize Form")
-    cf.doc_type = "HD Ticket"
-    cf.fetch_to_customize()
-    for f in cf.fields:
-        if f.fieldname == field:
-            f.depends_on = display_expression
-            f.mandatory_depends_on = mandatory_expression
-
-    cf.save_customization()
-
-
 def get_df_expression(parent_field, child_field, criteria):
     if not criteria.get("enabled", False):
         return None
@@ -201,3 +188,15 @@ def get_df_expression(parent_field, child_field, criteria):
         expression = f"eval:{values}.includes(doc.{parent_field})"
 
     return expression
+
+
+def handle_form_customization(field, display_expression, mandatory_expression):
+    cf = frappe.get_doc("Customize Form")
+    cf.doc_type = "HD Ticket"
+    cf.fetch_to_customize()
+    for f in cf.fields:
+        if f.fieldname == field:
+            f.depends_on = display_expression
+            f.mandatory_depends_on = mandatory_expression
+
+    cf.save_customization()
