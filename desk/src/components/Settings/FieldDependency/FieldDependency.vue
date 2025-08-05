@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full flex flex-col px-10 gap-8 py-8 overflow-y-auto">
+  <div class="flex flex-col px-10 gap-8 py-8">
     <SettingsLayoutHeader>
       <template #title>
         <div class="flex items-center gap-2">
@@ -40,7 +40,7 @@
       </template>
     </SettingsLayoutHeader>
     <!-- Body -->
-    <div class="w-full flex-1 flex flex-col gap-8 h-full">
+    <div class="w-full flex-1 flex flex-col gap-8 overflow-y-scroll">
       <!-- Field Selection -->
       <FieldDependencyFieldsSelection
         v-model="state"
@@ -145,28 +145,6 @@ const fieldCriteriaState = reactive({
     value: [{ label: "Any", value: "Any" }],
   },
 });
-
-const filteredParentFieldValues = computed(() => {
-  if (!state.parentSearch) return state.parentFieldValues;
-  return state.parentFieldValues.filter((v) =>
-    v.toLowerCase().includes(state.parentSearch.toLowerCase())
-  );
-});
-
-const filteredChildFieldValues = computed(() => {
-  if (!state.childSearch) return state.childFieldValues;
-  return state.childFieldValues.filter((v) =>
-    v.toLowerCase().includes(state.childSearch.toLowerCase())
-  );
-});
-
-function getSelectedChildValueCount(parent) {
-  const selectedCount =
-    state.childSelections[parent] instanceof Set
-      ? state.childSelections[parent].size
-      : 0;
-  return selectedCount;
-}
 
 const createUpdateFieldDependency = createResource({
   url: "helpdesk.api.settings.field_dependency.create_update_field_dependency",
