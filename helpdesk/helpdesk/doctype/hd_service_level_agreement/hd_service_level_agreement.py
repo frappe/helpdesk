@@ -226,12 +226,12 @@ class HDServiceLevelAgreement(Document):
 
     def set_response_by(self, doc: Document):
         start = doc.service_level_agreement_creation
-        doc.response_by = self.calc_time(start, doc.priority, "response_time")
-        print("RESPONSE 1:", doc.response_by)
-        calc2 = self.calc_time2(
+        res1 = self.calc_time(start, doc.priority, "response_time")
+        print("RESPONSE 1:", res1)
+        doc.response_by = self.calc_time2(
             doc.service_level_agreement_creation, doc.priority, "response_time"
         )
-        print("RESPONSE 2:", calc2)
+        print("RESPONSE 2:", doc.response_by)
 
     def set_resolution_by(self, doc: Document):
         total_hold_time = doc.total_hold_time or 0
@@ -240,15 +240,15 @@ class HDServiceLevelAgreement(Document):
             seconds=total_hold_time,
             as_datetime=True,
         )
-        doc.resolution_by = self.calc_time(start, doc.priority, "resolution_time")
-        print("RESOLUTION 1:", doc.resolution_by)
-        calc2 = self.calc_time2(
+        res1 = self.calc_time(start, doc.priority, "resolution_time")
+        print("RESOLUTION 1:", res1)
+        doc.resolution_by = self.calc_time2(
             doc.service_level_agreement_creation,
             doc.priority,
             "resolution_time",
             total_hold_time,
         )
-        print("RESOLUTION 2:", calc2)
+        print("RESOLUTION 2:", doc.resolution_by)
 
     def reset_resolution_metrics(self, doc: Document):
         pause_on = [row.status for row in self.pause_sla_on]
@@ -308,62 +308,88 @@ class HDServiceLevelAgreement(Document):
         Returns:
             - DateTime when the target is expected to be met
         """
-        res = get_datetime(start_at)
+        result = get_datetime(start_at)
         priorities = self.get_priorities()
         if priority not in priorities:
             frappe.throw(
                 _("Please add {0} priority in {1} SLA").format(priority, self.name)
             )
         priority = priorities[priority]
-        time_needed = priority.get(target, 0)
-        holidays = self.get_holidays()
-        weekdays = get_weekdays()
-        workdays = self.get_workdays()
+        remaining_target_time = priority.get(
+            target, 0
+        )  # time for response or resolution in seconds
+        holidays = (
+            self.get_holidays()
+        )  # From Holiday List, returns a list of holiday dates
+        days_list = get_weekdays()  # list of weekdays, ["Monday", "Tuesday", ...]
+        working_days = (
+            self.get_workdays()
+        )  # From Working hours table, returns a dict with weekday names as keys and workday objects as values
+
         if target == "resolution_time":
-            time_needed += hold_time
-        while time_needed:
-            today = res
-            today_day = getdate(today)
-            today_weekday = weekdays[today.weekday()]
-            is_workday = today_weekday in workdays
-            is_holiday = today_day in holidays
-            if is_holiday or not is_workday:
-                res = add_to_date(
-                    res,
+            # add hold time to remaining target time
+            remaining_target_time += hold_time
+
+        while remaining_target_time:
+            current_datetime = result
+            current_date = getdate(current_datetime)
+            current_day = days_list[
+                current_datetime.weekday()
+            ]  # Returns the current weekday name like Monday or Tuesday etc.
+
+            is_current_day_working = current_day in working_days
+            is_holiday = current_date in holidays
+
+            if is_holiday or not is_current_day_working:
+                next_date = add_to_date(
+                    result,
                     days=1,
                     as_datetime=True,
                 )
-                # get res day and find start time and add to res
-                res_day = getdate(res).weekday()
-                res_day = weekdays[res_day]
+                print("\n\n", "NEXT DATE: ", next_date.weekday(), "\n\n")
 
-                if workdays.get(res_day, None):
-                    res_start_time = workdays[res_day].start_time
+                next_day_index = next_date.weekday()
+                next_day = days_list[next_day_index]
+
+                if working_days.get(next_day, None):
+                    # set the next date to the start time of the next workday
+                    res_start_time = working_days[next_day].start_time
                     hours = int(res_start_time.total_seconds() // 3600)
                     minutes = int((res_start_time.total_seconds() % 3600) // 60)
-                    res = getdate(res)
-                    res = add_to_date(
-                        res,
+                    next_date = getdate(next_date)
+                    next_date = add_to_date(
+                        next_date,
                         hours=hours,
                         minutes=minutes,
                         as_datetime=True,
                     )
 
+                result = next_date
                 continue
-            today_workday = workdays[today_weekday]
-            now_in_seconds = time_diff_in_seconds(today, today_day)
-            start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
-            till_start_time = max(start_time - now_in_seconds, 0)
-            end_time = max(today_workday.end_time.total_seconds(), now_in_seconds)
+
+            current_workday_doc = working_days[
+                current_day
+            ]  # Get the workday object for the current day
+            current_time_in_seconds = time_diff_in_seconds(
+                current_datetime, current_date
+            )
+
+            start_time = max(
+                current_workday_doc.start_time.total_seconds(), current_time_in_seconds
+            )
+            till_start_time = max(start_time - current_time_in_seconds, 0)
+            end_time = max(
+                current_workday_doc.end_time.total_seconds(), current_time_in_seconds
+            )
             time_left = max(end_time - start_time, 0)
             if not time_left:
-                res = getdate(add_to_date(res, days=1, as_datetime=True))
+                result = getdate(add_to_date(result, days=1, as_datetime=True))
                 continue
-            time_taken = min(time_needed, time_left)
-            time_needed -= time_taken
+            time_taken = min(remaining_target_time, time_left)
+            remaining_target_time -= time_taken
             time_required = till_start_time + time_taken
-            res = add_to_date(res, seconds=time_required, as_datetime=True)
-        return res
+            result = add_to_date(result, seconds=time_required, as_datetime=True)
+        return result
 
     def get_next_working_date(self, date_time, working_days, holidays):
         """
