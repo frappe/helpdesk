@@ -3,6 +3,7 @@ import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
 import LucideUsers from "~icons/lucide/users";
+import LucideMailOpen from "~icons/lucide/mail-open";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
 import Agents from "./Agents.vue";
@@ -11,12 +12,18 @@ import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
+import { EmailCustomizations } from "./EmailCustomizations";
 
 export const tabs = [
   {
     label: "Email Accounts",
     icon: markRaw(LucideMail),
     component: markRaw(EmailConfig),
+  },
+  {
+    label: "Email Customizations",
+    icon: markRaw(LucideMailOpen),
+    component: markRaw(EmailCustomizations)
   },
   {
     label: "Branding",

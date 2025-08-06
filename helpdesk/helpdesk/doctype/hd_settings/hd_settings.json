@@ -52,7 +52,9 @@
   "subject_weight",
   "column_break_qoxt",
   "description_weight",
-  "headings_weight"
+  "headings_weight",
+  "email_customisations_tab",
+  "share_feedback_email_content"
  ],
  "fields": [
   {
@@ -325,12 +327,22 @@
    "fieldname": "assign_within_team",
    "fieldtype": "Check",
    "label": "Restrict agent assignment to selected Team"
+  },
+  {
+   "fieldname": "email_customisations_tab",
+   "fieldtype": "Tab Break",
+   "label": "Email Customisations"
+  },
+  {
+   "fieldname": "share_feedback_email_content",
+   "fieldtype": "Text",
+   "label": "Share Feedback Email Content"
   }
  ],
  "grid_page_length": 50,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-30 21:45:58.873574",
+ "modified": "2025-08-06 12:03:49.163577",
  "modified_by": "Administrator",
  "module": "Helpdesk",
  "name": "HD Settings",

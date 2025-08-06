@@ -1,0 +1,160 @@
+<template>
+  <form @submit.prevent="onSubmit" class="flex-grow flex flex-col isolate">
+    <!-- Header -->
+    <div
+      class="flex justify-between items-center gap-2 pb-8 sticky top-0 z-10 bg-white pt-8"
+    >
+      <div class="flex items-center gap-x-1">
+        <div class="flex items-center gap-x-1">
+          <button
+            @click="props.onBack"
+            class="relative text-ink-gray-7 active:text-ink-gray-5 -ml-4"
+          >
+            <span class="sr-only">{{
+              __("back to email customization list")
+            }}</span>
+            <LucideChevronLeft />
+          </button>
+          <h1 class="font-semibold text-ink-gray-7 text-xl">
+            {{ __("Share Feedback") }}
+          </h1>
+        </div>
+        <Badge
+          v-if="unsavedChanges"
+          :variant="'subtle'"
+          :theme="'red'"
+          size="sm"
+          :label="__('Not Saved')"
+        />
+      </div>
+      <div
+        :inert="getEmailEventData.loading"
+        class="flex items-center gap-x-2"
+        :class="{ invisible: getEmailEventData.loading }"
+      >
+        <Switch
+          size="sm"
+          :label="__('Enabled')"
+          v-model="enabled"
+          @update:model-value="setUnsavedChanges"
+          class="flex-row-reverse gap-x-2 text-sm text-ink-gray-7 font-medium pl-0 hover:bg-transparent active:bg-transparent"
+        />
+        <Button
+          type="submit"
+          :label="__('Save')"
+          theme="gray"
+          variant="solid"
+          :disabled="!unsavedChanges"
+          :loading="setEmailEventData.loading"
+        />
+      </div>
+    </div>
+    <!-- Body -->
+    <div
+      class="flex flex-col gap-8 flex-grow pb-8"
+      :class="{
+        'items-center justify-center': getEmailEventData.loading,
+      }"
+    >
+      <template v-if="!getEmailEventData.loading">
+        <FormControl
+          type="select"
+          size="sm"
+          :label="__('Ticket State')"
+          :options="
+            ticketStateOptions.map((option) => ({
+              label: __(option),
+              value: option,
+            }))
+          "
+          :required="true"
+          v-model="ticketState"
+          :onchange="setUnsavedChanges"
+        />
+        <FormControl
+          type="textarea"
+          size="sm"
+          :label="__('Content')"
+          :required="true"
+          :rows="10"
+          v-model="content"
+          :oninput="setUnsavedChanges"
+        />
+      </template>
+      <LoadingIndicator v-else class="w-4" />
+    </div>
+  </form>
+</template>
+
+<script setup lang="ts">
+import {
+  Badge,
+  FormControl,
+  LoadingIndicator,
+  Switch,
+  createResource,
+} from "frappe-ui";
+import LucideChevronLeft from "~icons/lucide/chevron-left";
+import type { EmailType } from "./types";
+import { ref } from "vue";
+
+const props = defineProps<{
+  onBack: () => void;
+  emailType: EmailType;
+}>();
+
+const unsavedChanges = ref(false);
+const enabled = ref(false);
+const content = ref("");
+
+const ticketStateOptions = ["Closed", "Resolved"] as const;
+type TicketState = typeof ticketStateOptions[number];
+const ticketState = ref<TicketState>(ticketStateOptions[0]);
+
+type EmailEventData = {
+  send_email_feedback_on_status: typeof ticketStateOptions[number];
+  enable_email_ticket_feedback: boolean;
+  share_feedback_email_content: string;
+};
+
+const getEmailEventData = createResource({
+  url: "helpdesk.api.email_customisations.get_email_event_data",
+  method: "GET",
+  params: {
+    email_event: "share_feedback",
+  },
+  auto: true,
+  onSuccess(data: EmailEventData) {
+    ticketState.value = data.send_email_feedback_on_status;
+    enabled.value = data.enable_email_ticket_feedback;
+    content.value = data.share_feedback_email_content;
+  },
+});
+
+const setEmailEventData = createResource({
+  url: "helpdesk.api.email_customisations.set_email_event_data",
+  method: "PUT",
+  auto: false,
+  onSuccess(data: EmailEventData) {
+    ticketState.value = data.send_email_feedback_on_status;
+    enabled.value = data.enable_email_ticket_feedback;
+    content.value = data.share_feedback_email_content;
+    unsavedChanges.value = false;
+  },
+});
+
+function setUnsavedChanges() {
+  unsavedChanges.value = true;
+}
+
+function onSubmit() {
+  return setEmailEventData.submit({
+    email_event: "share_feedback",
+    send_email_feedback_on_status: ticketState.value,
+    enable_email_ticket_feedback: enabled.value,
+    share_feedback_email_content: content.value,
+  });
+}
+</script>
+
+<style lang="scss" scoped></style>
