@@ -1,37 +1,43 @@
 <template>
-  <div class="flex justify-between items-start">
+  <div class="flex justify-between items-start flex-col gap-4">
     <span class="text-sm text-ink-gray-5 pt-[5px]"
       >Set visibility and mandatory criteria for child field:</span
     >
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-2 justify-start">
-        <Switch v-model="fieldCriteriaState.display.enabled" />
-        <span class="text-sm text-ink-gray-5"
-          >Show child if parent field is set to</span
-        >
+    <div class="flex flex-col gap-3 w-full pb-2">
+      <div class="flex items-center gap-2 justify-between">
+        <div class="flex gap-2">
+          <Switch v-model="fieldCriteriaState.display.enabled" />
+          <span class="text-sm text-ink-gray-5">
+            Show child if parent field is set to
+          </span>
+        </div>
         <MultiSelectCombobox
           :disabled="!fieldCriteriaState.display.enabled"
-          class="min-w-[120px] max-w-[120px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
+          class="min-w-[120px] max-w-[120px]"
           :options="fieldCriteriaOptions"
           :model-value="fieldCriteriaState.display.value"
           @update:model-value="handleCriteriaSelection($event, 'display')"
           :multiple="true"
           placeholder="Select Child Field values"
+          placement="top"
         />
       </div>
-      <div class="flex items-center gap-2 justify-start">
-        <Switch v-model="fieldCriteriaState.mandatory.enabled" />
-        <span class="text-sm text-ink-gray-5"
-          >Make child mandatory if parent is set to</span
-        >
+      <div class="flex items-center gap-2 justify-between w-full">
+        <div class="flex gap-2">
+          <Switch v-model="fieldCriteriaState.mandatory.enabled" />
+          <span class="text-sm text-ink-gray-5"
+            >Make child mandatory if parent is set to</span
+          >
+        </div>
         <MultiSelectCombobox
           :disabled="!fieldCriteriaState.mandatory.enabled"
-          class="min-w-[97px] max-w-[97px] [&>div>button]:!h-[22px] [&>div>button]:!rounded-[6px]"
+          class="min-w-[120px] max-w-[120px]"
           :options="fieldCriteriaOptions"
           :model-value="fieldCriteriaState.mandatory.value"
           @update:model-value="handleCriteriaSelection($event, 'mandatory')"
           :multiple="true"
           placeholder="Select Child Field values"
+          placement="top"
         />
       </div>
     </div>
