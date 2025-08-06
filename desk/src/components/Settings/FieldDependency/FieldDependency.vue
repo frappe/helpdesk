@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col px-10 gap-8 py-8">
+  <div class="flex flex-col py-8 gap-8 overflow-y-hidden">
     <SettingsLayoutHeader>
       <template #title>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 pl-10">
           <Button
             variant="ghost"
             icon-left="chevron-left"
@@ -15,7 +15,7 @@
         </div>
       </template>
       <template #actions>
-        <div class="flex gap-4">
+        <div class="flex gap-4 pr-10">
           <!-- Switch -->
           <div class="flex gap-2 items-center">
             <Switch v-model="state.enabled" class="!w-fit" />
@@ -40,7 +40,7 @@
       </template>
     </SettingsLayoutHeader>
     <!-- Body -->
-    <div class="w-full flex-1 flex flex-col gap-8 overflow-y-scroll">
+    <div class="w-full flex-1 flex flex-col gap-8 overflow-y-scroll px-10">
       <!-- Field Selection -->
       <FieldDependencyFieldsSelection
         v-model="state"
