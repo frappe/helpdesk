@@ -58,22 +58,22 @@
         <FormControl
           type="select"
           size="sm"
-          :label="__('Ticket State')"
+          :label="__('On Ticket Status')"
           :options="
-            ticketStateOptions.map((option) => ({
+            ticketStatusOptions.map((option) => ({
               label: __(option),
               value: option,
             }))
           "
           :required="true"
-          v-model="ticketState"
+          v-model="ticketStatus"
           :onchange="setUnsavedChanges"
         />
         <div class="flex flex-col gap-2">
           <FormControl
             type="textarea"
             size="sm"
-            :label="__('Content')"
+            :label="__('Email Content')"
             :required="true"
             :rows="10"
             v-model="content"
@@ -118,12 +118,12 @@ const enabled = ref(false);
 const content = ref("");
 const defaultContent = ref("");
 
-const ticketStateOptions = ["Closed", "Resolved"] as const;
-type TicketState = typeof ticketStateOptions[number];
-const ticketState = ref<TicketState>(ticketStateOptions[0]);
+const ticketStatusOptions = ["Closed", "Resolved"] as const;
+type TicketStatus = (typeof ticketStatusOptions)[number];
+const ticketStatus = ref<TicketStatus>(ticketStatusOptions[0]);
 
 type EmailEventData = {
-  send_email_feedback_on_status: typeof ticketStateOptions[number];
+  send_email_feedback_on_status: (typeof ticketStatusOptions)[number];
   enable_email_ticket_feedback: boolean;
   share_feedback_email_content: string;
 };
@@ -138,7 +138,7 @@ const getEmailEventData = createResource({
   onSuccess(
     data: EmailEventData & { default_share_feedback_email_content: string }
   ) {
-    ticketState.value = data.send_email_feedback_on_status;
+    ticketStatus.value = data.send_email_feedback_on_status;
     enabled.value = data.enable_email_ticket_feedback;
     content.value = data.share_feedback_email_content;
     defaultContent.value = data.default_share_feedback_email_content;
@@ -150,7 +150,7 @@ const setEmailEventData = createResource({
   method: "PUT",
   auto: false,
   onSuccess(data: EmailEventData) {
-    ticketState.value = data.send_email_feedback_on_status;
+    ticketStatus.value = data.send_email_feedback_on_status;
     enabled.value = data.enable_email_ticket_feedback;
     content.value = data.share_feedback_email_content;
     unsavedChanges.value = false;
@@ -164,7 +164,7 @@ function setUnsavedChanges() {
 function onSubmit() {
   return setEmailEventData.submit({
     email_event: "share_feedback",
-    send_email_feedback_on_status: ticketState.value,
+    send_email_feedback_on_status: ticketStatus.value,
     enable_email_ticket_feedback: enabled.value,
     share_feedback_email_content: content.value,
   });
