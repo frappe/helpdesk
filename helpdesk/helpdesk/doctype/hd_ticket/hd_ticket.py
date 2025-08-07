@@ -98,18 +98,27 @@ class HDTicket(Document):
         last_communication = self.get_last_communication()
 
         url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
-        template = f"""
-            <p>Hello,</p>
-            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{self.name}.</p>
-            <a href="{url}" class="btn btn-primary">Share Feedback</a>
-            
-            <p>Thank you!<br>Support Team</p>
-        """
+        share_feedback_email_content = frappe.db.get_single_value(
+            "HD Settings", "feedback_email_content"
+        )
+        default_share_feedback_email_content = frappe.db.get_single_value(
+            "HD Settings", "default_feedback_email_content"
+        )
+        rendered_template = frappe.render_template(
+            default_share_feedback_email_content
+            if share_feedback_email_content is None
+            or share_feedback_email_content.strip() == ""
+            else share_feedback_email_content,
+            {
+                "url": url,
+                "doc": self.as_dict(),
+            },
+        )
         try:
             frappe.sendmail(
                 recipients=[self.raised_by],
                 subject=f"Re: {self.subject}",
-                message=template,
+                message=rendered_template,
                 reference_doctype="HD Ticket",
                 reference_name=self.name,
                 now=True,
