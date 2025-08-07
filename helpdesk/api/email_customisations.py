@@ -1,6 +1,7 @@
 from typing import Literal
 
 import frappe
+from frappe import _
 
 from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
@@ -30,7 +31,7 @@ def get_email_event_data(email_event: str):
             "default_share_feedback_email_content": default_share_feedback_email_content,
         }
     else:
-        frappe.throw("Invalid email event")
+        frappe.throw(_("Invalid email event"))
 
 
 @frappe.whitelist(methods=["PUT"])
@@ -69,4 +70,4 @@ def set_email_event_data(
             # "rendered_template": rendered_template,
         }
     else:
-        frappe.throw("Invalid email event")
+        frappe.throw(_("Invalid email event"))
