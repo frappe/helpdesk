@@ -23,4 +23,4 @@ class TestHDServiceLevelAgreement(IntegrationTestCase):
 
     def test_default_sla_assignment(self):
         ticket = make_ticket(priority="Low")
-        self.assertEqual(ticket.sla, "Default")
+        self.assertEqual(ticket.sla, SLA_PRIORITY_NAME)
