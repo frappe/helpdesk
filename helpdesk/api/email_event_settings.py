@@ -7,7 +7,7 @@ from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
 
 
 @frappe.whitelist(methods=["GET"])
-def get_email_event_data(email_event: str):
+def get_event_data(email_event: str):
     frappe.only_for(["Agent Manager", "System Manager"])
     if email_event == "share_feedback":
         send_email_feedback_on_status = frappe.db.get_single_value(
@@ -35,7 +35,7 @@ def get_email_event_data(email_event: str):
 
 
 @frappe.whitelist(methods=["PUT"])
-def set_email_event_data(
+def set_event_data(
     email_event: str,
     send_email_feedback_on_status: Literal["Closed", "Resolved"],
     enable_email_ticket_feedback: bool,

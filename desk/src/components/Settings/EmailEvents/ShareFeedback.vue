@@ -10,9 +10,7 @@
             @click="props.onBack"
             class="relative text-ink-gray-7 active:text-ink-gray-5 -ml-4"
           >
-            <span class="sr-only">{{
-              __("back to email customization list")
-            }}</span>
+            <span class="sr-only">{{ __("back to email event list") }}</span>
             <LucideChevronLeft />
           </button>
           <h1 class="font-semibold text-ink-gray-7 text-xl">
@@ -95,12 +93,12 @@ import {
   createResource,
 } from "frappe-ui";
 import LucideChevronLeft from "~icons/lucide/chevron-left";
-import type { EmailType } from "./types";
+import type { EmailEvent } from "./types";
 import { ref } from "vue";
 
 const props = defineProps<{
   onBack: () => void;
-  emailType: EmailType;
+  emailEvent: EmailEvent;
 }>();
 
 const unsavedChanges = ref(false);
@@ -108,17 +106,17 @@ const enabled = ref(false);
 const content = ref("");
 
 const ticketStateOptions = ["Closed", "Resolved"] as const;
-type TicketState = typeof ticketStateOptions[number];
+type TicketState = (typeof ticketStateOptions)[number];
 const ticketState = ref<TicketState>(ticketStateOptions[0]);
 
 type EmailEventData = {
-  send_email_feedback_on_status: typeof ticketStateOptions[number];
+  send_email_feedback_on_status: (typeof ticketStateOptions)[number];
   enable_email_ticket_feedback: boolean;
   share_feedback_email_content: string;
 };
 
 const getEmailEventData = createResource({
-  url: "helpdesk.api.email_customisations.get_email_event_data",
+  url: "helpdesk.api.email_event_settings.get_event_data",
   method: "GET",
   params: {
     email_event: "share_feedback",
@@ -132,7 +130,7 @@ const getEmailEventData = createResource({
 });
 
 const setEmailEventData = createResource({
-  url: "helpdesk.api.email_customisations.set_email_event_data",
+  url: "helpdesk.api.email_event_settings.set_event_data",
   method: "PUT",
   auto: false,
   onSuccess(data: EmailEventData) {

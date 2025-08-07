@@ -12,7 +12,7 @@ import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
-import { EmailCustomizations } from "./EmailCustomizations";
+import { EmailEvents } from "./EmailEvents";
 
 export const tabs = [
   {
@@ -21,9 +21,9 @@ export const tabs = [
     component: markRaw(EmailConfig),
   },
   {
-    label: "Email Customizations",
+    label: "Email Events",
     icon: markRaw(LucideMailOpen),
-    component: markRaw(EmailCustomizations)
+    component: markRaw(EmailEvents)
   },
   {
     label: "Branding",
