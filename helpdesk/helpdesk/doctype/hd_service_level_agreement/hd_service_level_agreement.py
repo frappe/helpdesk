@@ -341,29 +341,7 @@ class HDServiceLevelAgreement(Document):
             is_holiday = current_date in holidays
 
             if is_holiday or not is_current_day_working:
-                next_date = add_to_date(
-                    result,
-                    days=1,
-                    as_datetime=True,
-                )
-                print("\n\n", "NEXT DATE: ", next_date.weekday(), "\n\n")
-
-                next_day_index = next_date.weekday()
-                next_day = days_list[next_day_index]
-
-                if working_days.get(next_day, None):
-                    # set the next date to the start time of the next workday
-                    res_start_time = working_days[next_day].start_time
-                    hours = int(res_start_time.total_seconds() // 3600)
-                    minutes = int((res_start_time.total_seconds() % 3600) // 60)
-                    next_date = getdate(next_date)
-                    next_date = add_to_date(
-                        next_date,
-                        hours=hours,
-                        minutes=minutes,
-                        as_datetime=True,
-                    )
-
+                next_date = getdate(add_to_date(result, days=1, as_datetime=True))
                 result = next_date
                 continue
 
@@ -373,7 +351,6 @@ class HDServiceLevelAgreement(Document):
             current_time_in_seconds = time_diff_in_seconds(
                 current_datetime, current_date
             )
-
             start_time = max(
                 current_workday_doc.start_time.total_seconds(), current_time_in_seconds
             )
@@ -383,28 +360,14 @@ class HDServiceLevelAgreement(Document):
             )
             time_left = max(end_time - start_time, 0)
             if not time_left:
-                result = getdate(add_to_date(result, days=1, as_datetime=True))
+                next_date = getdate(add_to_date(result, days=1, as_datetime=True))
+                result = next_date
                 continue
             time_taken = min(remaining_target_time, time_left)
             remaining_target_time -= time_taken
             time_required = till_start_time + time_taken
             result = add_to_date(result, seconds=time_required, as_datetime=True)
         return result
-
-    def get_next_working_date(self, date_time, working_days, holidays):
-        """
-        Get the next working date after the given date_time, considering holidays and workdays.
-        Returns:
-            - DateTime of the next working date
-        """
-        weekdays = get_weekdays()
-        while True:
-            date_time = add_to_date(date_time, days=1, as_datetime=True)
-            if date_time.date() in holidays:
-                continue
-            if weekdays[date_time.weekday()] not in working_days:
-                continue
-            return date_time
 
     def calc_time(
         self,
