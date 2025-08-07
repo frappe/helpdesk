@@ -43,6 +43,7 @@
             placeholder="Type a message"
             autofocus
             @clear="() => (isExpanded = false)"
+            :uploadFunction="(file:any)=>uploadFunction(file, 'HD Ticket', props.ticketId)"
           >
             <template #bottom-right>
               <Button
@@ -72,7 +73,7 @@ import { useScreenSize } from "@/composables/screen";
 import { socket } from "@/socket";
 import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
-import { isContentEmpty } from "@/utils";
+import { isContentEmpty, uploadFunction } from "@/utils";
 import { Icon } from "@iconify/vue";
 import { Breadcrumbs, Button, call, createResource, toast } from "frappe-ui";
 import { computed, onMounted, onUnmounted, provide, ref } from "vue";

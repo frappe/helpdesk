@@ -1,9 +1,11 @@
 import json
+import uuid
 from email.utils import parseaddr
 from functools import lru_cache
 from typing import List
 
 import frappe
+from bs4 import BeautifulSoup
 from frappe import _
 from frappe.core.page.permission_manager.permission_manager import remove
 from frappe.desk.form.assign_to import add as assign
@@ -25,7 +27,14 @@ from helpdesk.helpdesk.utils.email import (
     default_ticket_outgoing_email_account,
 )
 from helpdesk.search import HelpdeskSearch
-from helpdesk.utils import capture_event, get_customer, is_agent, publish_event
+from helpdesk.utils import (
+    capture_event,
+    get_agents_team,
+    get_customer,
+    is_admin,
+    is_agent,
+    publish_event,
+)
 
 from ..hd_notification.utils import clear as clear_notifications
 from ..hd_service_level_agreement.utils import get_sla
@@ -64,6 +73,56 @@ class HDTicket(Document):
         if not self.is_new():
             self.handle_ticket_activity_update()
 
+        self.handle_email_feedback()
+
+    def handle_email_feedback(self):
+
+        if (
+            self.is_new()
+            or self.via_customer_portal
+            or self.feedback_rating
+            or not self.has_value_changed("status")
+            or not self.key
+        ):
+            return
+
+        [is_email_feedback_enabled, email_feedback_status] = frappe.get_cached_value(
+            "HD Settings",
+            "HD Settings",
+            ["enable_email_ticket_feedback", "send_email_feedback_on_status"],
+        )
+
+        if not int(is_email_feedback_enabled) or email_feedback_status != self.status:
+            return
+
+        last_communication = self.get_last_communication()
+
+        url = f"{frappe.utils.get_url()}/ticket-feedback/new?key={self.key}"
+        template = f"""
+            <p>Hello,</p>
+            <p>Thanks for reaching out to us. We’d love your feedback on your recent support experience with ticket #{self.name}.</p>
+            <a href="{url}" class="btn btn-primary">Share Feedback</a>
+            
+            <p>Thank you!<br>Support Team</p>
+        """
+        try:
+            frappe.sendmail(
+                recipients=[self.raised_by],
+                subject=f"Re: {self.subject}",
+                message=template,
+                reference_doctype="HD Ticket",
+                reference_name=self.name,
+                now=True,
+                in_reply_to=last_communication.name if last_communication else None,
+                email_headers={"X-Auto-Generated": "hd-email-feedback"},
+            )
+            frappe.msgprint(_("Feedback email has been sent to the customer"))
+        except Exception as e:
+            frappe.throw(_("Could not send feedback email,due to: {0}").format(e))
+
+    def before_insert(self):
+        self.generate_key()
+
     def after_insert(self):
         if self.ticket_split_from:
             log_ticket_activity(
@@ -77,6 +136,7 @@ class HDTicket(Document):
         publish_event("helpdesk:new-ticket", {"name": self.name})
         if self.get("description"):
             self.create_communication_via_contact(self.description, new_ticket=True)
+            self.handle_inline_media_new_ticket()
 
         send_ack_email = frappe.db.get_single_value(
             "HD Settings", "send_acknowledgement_email"
@@ -183,7 +243,6 @@ class HDTicket(Document):
             return
         feedback_option = frappe.get_doc("HD Ticket Feedback Option", self.feedback)
         self.feedback_rating = feedback_option.rating
-        self.feedback_text = feedback_option.label
 
     def validate_ticket_type(self):
         settings = frappe.get_doc("HD Settings")
@@ -235,6 +294,9 @@ class HDTicket(Document):
                 log_ticket_activity(
                     self.name, f"set {field_maps[field]} to {self.as_dict()[field]}"
                 )
+
+    def generate_key(self):
+        self.key = uuid.uuid4()
 
     def remove_assignment_if_not_in_team(self):
         """
@@ -368,7 +430,7 @@ class HDTicket(Document):
 
             return communication
         except Exception:
-            pass
+            return None
 
     def last_communication_email(self):
         if not (communication := self.get_last_communication()):
@@ -488,6 +550,8 @@ class HDTicket(Document):
 
             _attachments.append({"file_url": file_doc.file_url})
 
+        message = self.parse_content(message)
+
         reply_to_email = sender_email.email_id
         template = (
             "new_reply_on_customer_portal_notification"
@@ -515,7 +579,7 @@ class HDTicket(Document):
                 communication=communication.name,
                 delayed=send_delayed,
                 expose_recipients="header",
-                message=communication.content,
+                message=message,
                 as_markdown=True,
                 now=send_now,
                 recipients=recipients,
@@ -578,6 +642,28 @@ class HDTicket(Document):
         for url in file_urls:
             self.attach_file_with_doc("HD Ticket", self.name, url)
 
+    def handle_inline_media_new_ticket(self):
+        soup = BeautifulSoup(self.description, "html.parser")
+        files = []  # List of file URLs
+        for tag in soup.find_all(["img", "video"]):
+            if tag.has_attr("src"):
+                src = tag["src"]
+                files.append(src)
+        for f in files:
+            file = frappe.db.exists(
+                "File",
+                {
+                    "file_url": f,
+                    "attached_to_doctype": ["is", "Not Set"],
+                    "owner": frappe.session.user,
+                },
+            )
+            if file:
+                doc = frappe.get_doc("File", file)
+                doc.attached_to_doctype = "HD Ticket"
+                doc.attached_to_name = self.name
+                doc.save()
+
     def send_reply_email_to_agent(self, message):
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
@@ -633,6 +719,7 @@ class HDTicket(Document):
             reference_name=self.name,
             now=True,
             expose_recipients="header",
+            email_headers={"X-Auto-Generated": "hd-acknowledgement"},
         )
 
     @frappe.whitelist()
@@ -915,6 +1002,29 @@ class HDTicket(Document):
             "rows": rows,
         }
 
+    def parse_content(self, content):
+        """
+        Finds 'src' attribute of img/video and replaces it  with 'embed' attribute
+        embed tag is important because framework replaces it with <img src="cid:content_id">
+        this in turn is displayed as an image in the mail sent to the customer
+        """
+        if not content:
+            return ""
+
+        soup = BeautifulSoup(content, "html.parser")
+
+        for tag in soup.find_all(["img", "video"]):
+            if tag.name == "img":
+                tag["embed"] = tag.get("src")
+                tag["width"] = "80%"
+                tag["height"] = "80%"
+                del tag["src"]
+            elif tag.name == "video":
+                tag["embed"] = tag.get("src")
+                del tag["src"]
+
+        return str(soup)
+
     @staticmethod
     def filter_standard_fields(fields):
         for f in fields:
@@ -927,30 +1037,110 @@ class HDTicket(Document):
 # permission checks which is not possible with standard permission system. This function
 # is being called from hooks. `doc` is the ticket to check against
 def has_permission(doc, user=None):
-    return bool(
+
+    if not user:
+        user = frappe.session.user
+
+    if (
         doc.contact == user
         or doc.raised_by == user
         or doc.owner == user
-        or is_agent(user)
+        or is_admin(user)
         or doc.customer in get_customer(user)
+    ):
+        return True
+
+    if not is_agent(user):
+        return False
+
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
     )
+    if not enable_restrictions:
+        return True
+    show_tickets_without_team = frappe.db.get_single_value(
+        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+    )
+    if show_tickets_without_team and not doc.get("agent_group"):
+        return True
+
+    teams = get_agents_team()
+    if any([team.get("ignore_restrictions") for team in teams]):
+        return True
+
+    team_names = [t.team_name for t in teams]
+    exists = frappe.db.exists(
+        "HD Team Member", {"parent": ["in", team_names], "user": frappe.session.user}
+    )
+    if exists and doc.get("agent_group") in team_names:
+        return True
+
+    return False
 
 
 # Custom perms for list query. Only the `WHERE` part
 # https://frappeframework.com/docs/user/en/python-api/hooks#modify-list-query
 def permission_query(user):
-    user = user or frappe.session.user
-    if is_agent(user):
+
+    if not user:
+        user = frappe.session.user
+    if is_admin(user):
         return
+
+    #  To handle the case for normal users i.e. not agents
     customer = get_customer(user)
-    res = "`tabHD Ticket`.contact={user} OR `tabHD Ticket`.raised_by={user} OR `tabHD Ticket`.owner={user}".format(
+    query = "(`tabHD Ticket`.owner = {user} OR `tabHD Ticket`.contact = {user} OR `tabHD Ticket`.raised_by = {user})".format(
         user=frappe.db.escape(user)
     )
     for c in customer:
-        res += " OR `tabHD Ticket`.customer={customer}".format(
+        query += " OR `tabHD Ticket`.customer={customer}".format(
             customer=frappe.db.escape(c)
         )
-    return res
+
+    if not is_agent(user):
+        return query
+
+    enable_restrictions = frappe.db.get_single_value(
+        "HD Settings", "restrict_tickets_by_agent_group"
+    )
+    if not enable_restrictions:
+        return  # If not enabled, return all tickets
+
+    show_tickets_without_team = frappe.db.get_single_value(
+        "HD Settings", "do_not_restrict_tickets_without_an_agent_group"
+    )
+
+    teams = get_agents_team()
+
+    if show_tickets_without_team:
+        query += " OR (`tabHD Ticket`.agent_group is null)"
+
+    # If agent belongs to the team which has ignore_permission set to 1.
+    # that means this team can see all the tickets without any restriction,
+    # Event the other team's tickets.
+    if any(team.get("ignore_restrictions") for team in teams):
+        all_teams = frappe.get_all("HD Team", pluck="name")
+        if not all_teams:
+            return query
+        all_teams = ", ".join(f"'{team}'" for team in all_teams)
+        query += f" OR (`tabHD Ticket`.agent_group in ({all_teams}))".format(
+            all_teams=all_teams
+        )
+        if not show_tickets_without_team:
+            query += " OR (`tabHD Ticket`.agent_group is null)"
+        return query
+
+    team_names = [t.get("team_name") for t in teams]
+
+    if not team_names:
+        return query
+
+    # Here we will apply the restriction based on the teams the agent belongs to.
+    team_names = ", ".join(f"'{team}'" for team in team_names)
+    query += f" OR (`tabHD Ticket`.agent_group in ({team_names}))".format(
+        team_names=team_names
+    )
+    return query
 
 
 def set_guest_ticket_creation_permission():

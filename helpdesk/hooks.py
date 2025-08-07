@@ -49,7 +49,7 @@ user_invitation = {
 
 doc_events = {
     "Contact": {
-        "before_insert": "helpdesk.helpdesk.hooks.contact.before_insert",
+        "before_insert": "helpdesk.overrides.contact.before_insert",
     },
     "Assignment Rule": {
         "on_trash": "helpdesk.extends.assignment_rule.on_assignment_rule_trash",
@@ -68,7 +68,7 @@ permission_query_conditions = {
 # ---------------
 # Override standard doctype classes
 override_doctype_class = {
-    "Contact": "helpdesk.overrides.contact.CustomContact",
+    "Email Account": "helpdesk.overrides.email_account.CustomEmailAccount",
 }
 
 ignore_links_on_delete = [
@@ -80,8 +80,3 @@ ignore_links_on_delete = [
 # setup_wizard_requires = "assets/helpdesk/js/setup_wizard.js"
 # setup_wizard_stages = "helpdesk.setup.setup_wizard.get_setup_stages"
 setup_wizard_complete = "helpdesk.setup.setup_wizard.setup_complete"
-
-
-website_route_rules = [
-    {"from_route": "/helpdesk/<path:app_path>", "to_route": "helpdesk"},
-]

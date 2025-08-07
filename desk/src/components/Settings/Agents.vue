@@ -1,52 +1,11 @@
 <template>
-  <div v-bind:class="$attrs.class">
+  <div v-bind:class="$attrs.class" class="px-10 py-8">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-lg font-semibold">Agents</h1>
-      <div class="flex item-center space-x-2">
-        <FormControl
-          v-model="search"
-          :placeholder="'Search'"
-          type="text"
-          :debounce="300"
-        >
-          <template #prefix>
-            <LucideSearch class="h-4 w-4 text-gray-500" />
-          </template>
-        </FormControl>
-        <Dropdown :options="dropdownOptions" placement="right">
-          <template #default="{ open }">
-            <Button
-              :label="activeFilter"
-              class="flex items-center justify-between w-[90px]"
-            >
-              <template #suffix>
-                <FeatherIcon
-                  :name="open ? 'chevron-up' : 'chevron-down'"
-                  class="h-4"
-                />
-              </template>
-            </Button>
-          </template>
-          <template #item="{ item, active }">
-            <button
-              class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
-              :class="{ 'bg-surface-gray-3': active }"
-              @click="item.onClick"
-            >
-              <div class="flex items-center justify-between flex-1">
-                <span class="whitespace-nowrap">
-                  {{ item.label }}
-                </span>
-                <FeatherIcon
-                  v-if="activeFilter === item.label"
-                  name="check"
-                  class="size-4 text-ink-gray-7"
-                />
-              </div>
-            </button>
-          </template>
-        </Dropdown>
+    <SettingsLayoutHeader
+      :title="__('Agents')"
+      :description="__('Add, manage agents and assign roles to them.')"
+    >
+      <template #actions>
         <Button
           @click="() => (showNewAgentsDialog = !showNewAgentsDialog)"
           label="New"
@@ -56,8 +15,56 @@
             <LucidePlus class="h-4 w-4 stroke-1.5" />
           </template>
         </Button>
-      </div>
-    </div>
+      </template>
+      <template #bottom-section>
+        <div class="flex items-center gap-2">
+          <FormControl
+            v-model="search"
+            :placeholder="'Search'"
+            type="text"
+            :debounce="300"
+            class="w-60"
+          >
+            <template #prefix>
+              <LucideSearch class="h-4 w-4 text-gray-500" />
+            </template>
+          </FormControl>
+          <Dropdown :options="dropdownOptions" placement="right">
+            <template #default="{ open }">
+              <Button
+                :label="activeFilter"
+                class="flex items-center justify-between w-[90px]"
+              >
+                <template #suffix>
+                  <FeatherIcon
+                    :name="open ? 'chevron-up' : 'chevron-down'"
+                    class="h-4"
+                  />
+                </template>
+              </Button>
+            </template>
+            <template #item="{ item, active }">
+              <button
+                class="group flex text-ink-gray-6 gap-4 h-7 w-full justify-between items-center rounded px-2 text-base"
+                :class="{ 'bg-surface-gray-3': active }"
+                @click="item.onClick"
+              >
+                <div class="flex items-center justify-between flex-1">
+                  <span class="whitespace-nowrap">
+                    {{ item.label }}
+                  </span>
+                  <FeatherIcon
+                    v-if="activeFilter === item.label"
+                    name="check"
+                    class="size-4 text-ink-gray-7"
+                  />
+                </div>
+              </button>
+            </template>
+          </Dropdown>
+        </div>
+      </template>
+    </SettingsLayoutHeader>
 
     <!-- loading state -->
     <div v-if="agents.loading" class="flex mt-28 justify-between w-full h-full">
@@ -79,7 +86,7 @@
     </div>
     <!-- Agent List -->
     <div
-      class="overflow-y-auto w-full hide-scrollbar"
+      class="overflow-y-auto w-full hide-scrollbar mt-4"
       v-if="!agents.loading && Boolean(agents.data?.length)"
     >
       <div v-for="(agent, idx) in agents.data" :key="agent.agent_name">

@@ -75,7 +75,7 @@
               </div>
             </div>
             <div v-else class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-1">
                 <div class="w-13 pl-2 text-end text-base text-gray-600">
                   {{ i == 0 ? "Where" : "And" }}
                 </div>
@@ -98,7 +98,7 @@
                     :placeholder="'Equals'"
                   />
                 </div>
-                <div id="value" class="!min-w-[140px]">
+                <div id="value" class="!min-w-[140px] flex-1">
                   <component
                     :is="getValueControl(f)"
                     v-model="f.value"
@@ -520,30 +520,32 @@ function isSameTypeOperator(oldOperator, newOperator) {
 }
 
 function apply() {
-  let _filters = [];
+  const _filters = [];
   filters.value.forEach((f) => {
     _filters.push({
       fieldname: f.fieldname,
       operator: f.operator,
       value: f.value,
+      toBoolean: f.field.fieldtype === "Check",
     });
   });
   listViewActions.applyFilters(parseFilters(_filters));
 }
 
 function parseFilters(filters) {
-  const filtersArray = Array.from(filters);
-  const obj = filtersArray.map(transformIn).reduce((p, c) => {
+  return filters.map(transformIn).reduce((p, c) => {
     if (["equals", "="].includes(c.operator)) {
-      p[c.fieldname] =
-        c.value == "Yes" ? true : c.value == "No" ? false : c.value;
+      if (c.toBoolean) {
+        p[c.fieldname] =
+          c.value === "Yes" ? true : c.value === "No" ? false : c.value;
+      } else {
+        p[c.fieldname] = c.value;
+      }
     } else {
       p[c.fieldname] = [operatorMap[c.operator.toLowerCase()], c.value];
     }
     return p;
   }, {});
-  const merged = { ...obj };
-  return merged;
 }
 
 function transformIn(f) {
