@@ -1,17 +1,20 @@
 <template>
-  <div>
+  <div class="px-10 pb-8 h-full overflow-y-auto">
     <form @submit.prevent="onSubmit" class="flex flex-col gap-5">
-      <div class="flex flex-col gap-4">
-        <h1 class="text-lg font-semibold py-[5px]">Invite Agents</h1>
-        <FormControl
-          type="textarea"
-          label="Invite by email"
-          placeholder="user1@example.com, user2@example.com, ..."
-          v-model="emails"
-          :debounce="100"
-          description="Comma separated emails to invite"
+      <div class="sticky top-0 z-10 bg-white pt-8 pb-1">
+        <SettingsLayoutHeader
+          title="Invite Agents"
+          description="Easily invite new agents, managers, or admins"
         />
       </div>
+      <FormControl
+        type="textarea"
+        label="Invite by email"
+        placeholder="user1@example.com, user2@example.com, ..."
+        v-model="emails"
+        :debounce="100"
+        description="Comma separated emails to invite"
+      />
       <FormControl
         label="Role"
         type="select"
@@ -96,6 +99,7 @@ import { FormControl, Button, Tooltip, createResource, toast } from "frappe-ui";
 import { computed, onMounted, ref } from "vue";
 // @ts-expect-error: no declaration file
 import { useOnboarding } from "frappe-ui/frappe";
+import SettingsLayoutHeader from "./SettingsLayoutHeader.vue";
 
 const authStore: Record<"isAdmin" | "isManager", boolean> = useAuthStore();
 const { isAdmin, isManager } = authStore;
