@@ -2,6 +2,8 @@ from typing import Literal
 
 import frappe
 
+from helpdesk.helpdesk.doctype.hd_settings.hd_settings import HDSettings
+
 
 @frappe.whitelist(methods=["GET"])
 def get_email_event_data(email_event: str):
@@ -14,12 +16,18 @@ def get_email_event_data(email_event: str):
             frappe.db.get_single_value("HD Settings", "enable_email_ticket_feedback")
         )
         share_feedback_email_content = frappe.db.get_single_value(
-            "HD Settings", "share_feedback_email_content"
+            "HD Settings", "feedback_email_content"
+        )
+        default_share_feedback_email_content = frappe.db.get_single_value(
+            "HD Settings", "default_feedback_email_content"
         )
         return {
             "send_email_feedback_on_status": send_email_feedback_on_status,
             "enable_email_ticket_feedback": enable_email_ticket_feedback,
-            "share_feedback_email_content": share_feedback_email_content,
+            "share_feedback_email_content": default_share_feedback_email_content
+            if HDSettings.is_email_content_empty(share_feedback_email_content)
+            else share_feedback_email_content,
+            "default_share_feedback_email_content": default_share_feedback_email_content,
         }
     else:
         frappe.throw("Invalid email event")
@@ -52,7 +60,7 @@ def set_email_event_data(
             int(enable_email_ticket_feedback),
         )
         frappe.db.set_single_value(
-            "HD Settings", "share_feedback_email_content", share_feedback_email_content
+            "HD Settings", "feedback_email_content", share_feedback_email_content
         )
         return {
             "send_email_feedback_on_status": send_email_feedback_on_status,
