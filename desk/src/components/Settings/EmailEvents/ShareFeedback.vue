@@ -69,15 +69,26 @@
           v-model="ticketState"
           :onchange="setUnsavedChanges"
         />
-        <FormControl
-          type="textarea"
-          size="sm"
-          :label="__('Content')"
-          :required="true"
-          :rows="10"
-          v-model="content"
-          :oninput="setUnsavedChanges"
-        />
+        <div class="flex flex-col gap-2">
+          <FormControl
+            type="textarea"
+            size="sm"
+            :label="__('Content')"
+            :required="true"
+            :rows="10"
+            v-model="content"
+            :oninput="setUnsavedChanges"
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="subtle"
+            @click="resetContent"
+            class="w-fit"
+          >
+            {{ __("Reset Content") }}
+          </Button>
+        </div>
       </template>
       <LoadingIndicator v-else class="w-4" />
     </div>
@@ -88,6 +99,7 @@
 import {
   Badge,
   FormControl,
+  Button,
   LoadingIndicator,
   Switch,
   createResource,
@@ -104,13 +116,14 @@ const props = defineProps<{
 const unsavedChanges = ref(false);
 const enabled = ref(false);
 const content = ref("");
+const defaultContent = ref("");
 
 const ticketStateOptions = ["Closed", "Resolved"] as const;
-type TicketState = (typeof ticketStateOptions)[number];
+type TicketState = typeof ticketStateOptions[number];
 const ticketState = ref<TicketState>(ticketStateOptions[0]);
 
 type EmailEventData = {
-  send_email_feedback_on_status: (typeof ticketStateOptions)[number];
+  send_email_feedback_on_status: typeof ticketStateOptions[number];
   enable_email_ticket_feedback: boolean;
   share_feedback_email_content: string;
 };
@@ -122,10 +135,13 @@ const getEmailEventData = createResource({
     email_event: "share_feedback",
   },
   auto: true,
-  onSuccess(data: EmailEventData) {
+  onSuccess(
+    data: EmailEventData & { default_share_feedback_email_content: string }
+  ) {
     ticketState.value = data.send_email_feedback_on_status;
     enabled.value = data.enable_email_ticket_feedback;
     content.value = data.share_feedback_email_content;
+    defaultContent.value = data.default_share_feedback_email_content;
   },
 });
 
@@ -152,6 +168,14 @@ function onSubmit() {
     enable_email_ticket_feedback: enabled.value,
     share_feedback_email_content: content.value,
   });
+}
+
+function resetContent() {
+  if (content.value === defaultContent.value) {
+    return;
+  }
+  content.value = defaultContent.value;
+  setUnsavedChanges();
 }
 </script>
 
