@@ -9,6 +9,7 @@
       </div>
       <FormControl
         type="textarea"
+        :required="true"
         label="Invite by email"
         placeholder="user1@example.com, user2@example.com, ..."
         v-model="emails"
@@ -18,6 +19,7 @@
       <FormControl
         label="Role"
         type="select"
+        :required="true"
         :options="roleOptions"
         v-model="role"
         :description="roleDescription"
