@@ -119,11 +119,11 @@ const content = ref("");
 const defaultContent = ref("");
 
 const ticketStatusOptions = ["Closed", "Resolved"] as const;
-type TicketStatus = (typeof ticketStatusOptions)[number];
+type TicketStatus = typeof ticketStatusOptions[number];
 const ticketStatus = ref<TicketStatus>(ticketStatusOptions[0]);
 
 type EmailEventData = {
-  send_email_feedback_on_status: (typeof ticketStatusOptions)[number];
+  send_email_feedback_on_status: typeof ticketStatusOptions[number];
   enable_email_ticket_feedback: boolean;
   share_feedback_email_content: string;
 };
