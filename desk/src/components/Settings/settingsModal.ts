@@ -2,6 +2,7 @@ import { h, markRaw, ref } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
+import LucideUserPlus from "~icons/lucide/user-plus";
 import LucideUsers from "~icons/lucide/users";
 import ShieldCheck from "~icons/lucide/shield-check";
 import Briefcase from "~icons/lucide/briefcase";
@@ -11,10 +12,14 @@ import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
+<<<<<<< HEAD
 import FieldDependencyConfig from "./FieldDependency/FieldDependencyConfig.vue";
 import { FieldDependencyIcon } from "@/components/icons";
 import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
 import Settings from "~icons/lucide/settings-2";
+=======
+import InviteAgents from "./InviteAgents.vue";
+>>>>>>> 282068b3 (refactor(user-invitation): use the new settings modal)
 
 export const tabs = [
   {
@@ -31,6 +36,12 @@ export const tabs = [
     label: "Agents",
     icon: markRaw(LucideUser),
     component: markRaw(Agents),
+  },
+  {
+    label: "Invite Agents",
+    icon: markRaw(LucideUserPlus),
+    component: markRaw(InviteAgents),
+
   },
   {
     label: "Teams",
