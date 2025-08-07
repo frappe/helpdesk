@@ -2,7 +2,7 @@
 # See license.txt
 
 import frappe
-from frappe.tests.utils import FrappeTestCase
+from frappe.tests import IntegrationTestCase
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.test_utils import (
@@ -30,7 +30,7 @@ agent = "agent@test.com"
 agent2 = "agent2@test.com"
 
 
-class TestHDTicket(FrappeTestCase):
+class TestHDTicket(IntegrationTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -336,8 +336,8 @@ class TestHDTicket(FrappeTestCase):
         ticket.reload()
         ticket.total_hold_time = 3600  # 1 hour hold time
         ticket.save()
-        ticket = ticket.reload()
 
+        ticket = ticket.reload()
         new_expected_resolution_by = add_to_date(expected_resolution_by, hours=1)
 
         self.assertEqual(new_expected_resolution_by, ticket.resolution_by)

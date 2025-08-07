@@ -226,12 +226,9 @@ class HDServiceLevelAgreement(Document):
 
     def set_response_by(self, doc: Document):
         start = doc.service_level_agreement_creation
-        res1 = self.calc_time(start, doc.priority, "response_time")
-        print("RESPONSE 1:", res1)
-        doc.response_by = self.calc_time2(
+        doc.response_by = self.calc_time(
             doc.service_level_agreement_creation, doc.priority, "response_time"
         )
-        print("RESPONSE 2:", doc.response_by)
 
     def set_resolution_by(self, doc: Document):
         total_hold_time = doc.total_hold_time or 0
@@ -240,15 +237,12 @@ class HDServiceLevelAgreement(Document):
             seconds=total_hold_time,
             as_datetime=True,
         )
-        res1 = self.calc_time(start, doc.priority, "resolution_time")
-        print("RESOLUTION 1:", res1)
-        doc.resolution_by = self.calc_time2(
+        doc.resolution_by = self.calc_time(
             doc.service_level_agreement_creation,
             doc.priority,
             "resolution_time",
-            total_hold_time,
+            hold_time=total_hold_time,
         )
-        print("RESOLUTION 2:", doc.resolution_by)
 
     def reset_resolution_metrics(self, doc: Document):
         pause_on = [row.status for row in self.pause_sla_on]
@@ -291,7 +285,7 @@ class HDServiceLevelAgreement(Document):
             return get_datetime(doc.resolution_by) < now_datetime()
         return get_datetime(doc.resolution_by) < get_datetime(doc.resolution_date)
 
-    def calc_time2(
+    def calc_time(
         self,
         start_at: str,
         priority: str,
@@ -368,49 +362,6 @@ class HDServiceLevelAgreement(Document):
             time_required = till_start_time + time_taken
             result = add_to_date(result, seconds=time_required, as_datetime=True)
         return result
-
-    def calc_time(
-        self,
-        start_at: str,
-        priority: str,
-        target: Literal["response_time", "resolution_time"],
-    ):
-        res = get_datetime(start_at)
-        priorities = self.get_priorities()
-
-        if priority not in priorities:
-            frappe.throw(
-                _("Please add {0} priority in {1} SLA").format(priority, self.name)
-            )
-        priority = priorities[priority]
-
-        time_needed = priority.get(target, 0)
-        holidays = self.get_holidays()
-        weekdays = get_weekdays()
-        workdays = self.get_workdays()
-        while time_needed:
-            today = res
-            today_day = getdate(today)
-            today_weekday = weekdays[today.weekday()]
-            is_workday = today_weekday in workdays
-            is_holiday = today_day in holidays
-            if is_holiday or not is_workday:
-                res = add_to_date(res, days=1, as_datetime=True)
-                continue
-            today_workday = workdays[today_weekday]
-            now_in_seconds = time_diff_in_seconds(today, today_day)
-            start_time = max(today_workday.start_time.total_seconds(), now_in_seconds)
-            till_start_time = max(start_time - now_in_seconds, 0)
-            end_time = max(today_workday.end_time.total_seconds(), now_in_seconds)
-            time_left = max(end_time - start_time, 0)
-            if not time_left:
-                res = getdate(add_to_date(res, days=1, as_datetime=True))
-                continue
-            time_taken = min(time_needed, time_left)
-            time_needed -= time_taken
-            time_required = till_start_time + time_taken
-            res = add_to_date(res, seconds=time_required, as_datetime=True)
-        return res
 
     def get_working_days(self) -> dict[str, dict]:
         workdays = []

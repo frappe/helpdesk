@@ -1,7 +1,7 @@
 import frappe
 from frappe.utils import add_to_date, getdate
 
-SLA_PRIORITY_NAME = "Test SLA Priority"
+SLA_PRIORITY_NAME = "SLA Priority"
 
 
 def before_tests():
@@ -14,7 +14,7 @@ def before_tests():
 
 def make_new_sla():
     condition = "doc.priority in ['High', 'Urgent', 'Low']"
-    sla_doc = make_sla("SLA Priority", condition)
+    sla_doc = make_sla(SLA_PRIORITY_NAME, condition)
     sla_doc = sla_doc.reload()
 
     sla_doc.support_and_resolution = []
