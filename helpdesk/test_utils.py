@@ -5,8 +5,10 @@ SLA_PRIORITY_NAME = "SLA Priority"
 
 
 def before_tests():
-    frappe.db.set_value("HD Settings", None, "skip_email_workflow", 0)
-    frappe.db.set_value("HD Settings", None, "enable_email_ticket_feedback", 0)
+    frappe.db.set_value("HD Settings", None, "skip_email_workflow", 0)  # nosemgrep
+    frappe.db.set_value(
+        "HD Settings", None, "enable_email_ticket_feedback", 0
+    )  # nosemgrep
     # frappe.flags.mute_emails = True
     make_new_sla()
     frappe.db.commit()
