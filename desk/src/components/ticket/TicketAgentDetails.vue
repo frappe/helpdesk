@@ -99,9 +99,7 @@ const resolutionBadge = computed(() => {
     props.ticket.on_hold_since &&
     dayjs(props.ticket.resolution_by).isAfter(dayjs(props.ticket.on_hold_since))
   ) {
-    let timeLeft = dayjs(props.ticket.resolution_by)
-      .add(props.ticket.total_hold_time, "s")
-      .diff(dayjs(props.ticket.on_hold_since), "s");
+    let timeLeft = dayjs(props.ticket.resolution_by);
     resolution = {
       label: `${formatTime(timeLeft)} left (On Hold)`,
       color: "blue",
@@ -110,7 +108,9 @@ const resolutionBadge = computed(() => {
     !props.ticket.resolution_date &&
     dayjs().isBefore(props.ticket.resolution_by)
   ) {
-    let resolutionBy = getCalculatedResolution();
+    let resolutionBy = formatTime(
+      dayjs(props.ticket.resolution_by).diff(dayjs(), "s")
+    );
     handleResolutionInterval(resolutionBy);
 
     resolution = {
