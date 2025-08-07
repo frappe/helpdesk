@@ -99,7 +99,6 @@ class HDServiceHolidayList(Document):
             )
             for ticket in linked_tickets:
                 ticket_doc = frappe.get_doc("HD Ticket", ticket).save()
-        print("\n\n", linked_sla, "\n\n")
 
     @frappe.whitelist()
     def clear_table(self):
