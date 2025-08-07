@@ -80,6 +80,27 @@ class HDServiceHolidayList(Document):
 
         return date_list
 
+    def on_update(self):
+        self.recalculate_sla()
+
+    def recalculate_sla(self):
+        if self.is_new():
+            return
+        linked_sla = frappe.get_all(
+            "HD Service Level Agreement",
+            filters={"holiday_list": self.name},
+            pluck="name",
+        )
+        for sla in linked_sla:
+            linked_tickets = frappe.get_all(
+                "HD Ticket",
+                filters={"sla": sla, "status": ["in", ["Open"]]},
+                pluck="name",
+            )
+            for ticket in linked_tickets:
+                ticket_doc = frappe.get_doc("HD Ticket", ticket).save()
+        print("\n\n", linked_sla, "\n\n")
+
     @frappe.whitelist()
     def clear_table(self):
         self.set("holidays", [])
