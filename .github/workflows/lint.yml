@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - main-hotfix
       - develop
 
 jobs:
