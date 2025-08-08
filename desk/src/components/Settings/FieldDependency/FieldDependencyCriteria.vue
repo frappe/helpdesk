@@ -1,11 +1,11 @@
 <template>
-  <div class="flex justify-between items-start flex-col gap-4">
-    <span class="text-sm text-ink-gray-5 pt-[5px]"
+  <div class="flex justify-between items-start flex-col gap-6">
+    <span class="text-sm text-ink-gray-5 pt-4 w-full"
       >Set visibility and mandatory criteria for child field:</span
     >
-    <div class="flex flex-col gap-3 w-full pb-2">
-      <div class="flex items-center gap-2 justify-between">
-        <div class="flex gap-2">
+    <div class="flex flex-col gap-4 w-full pb-2">
+      <div class="flex items-center gap-3 justify-between">
+        <div class="flex gap-3 items-center">
           <Switch v-model="fieldCriteriaState.display.enabled" />
           <span class="text-sm text-ink-gray-5">
             Show child if parent field is set to
@@ -22,8 +22,8 @@
           placement="top"
         />
       </div>
-      <div class="flex items-center gap-2 justify-between w-full">
-        <div class="flex gap-2">
+      <div class="flex items-center gap-3 justify-between w-full">
+        <div class="flex gap-3 items-center">
           <Switch v-model="fieldCriteriaState.mandatory.enabled" />
           <span class="text-sm text-ink-gray-5"
             >Make child mandatory if parent is set to</span

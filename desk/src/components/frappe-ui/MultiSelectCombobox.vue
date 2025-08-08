@@ -49,14 +49,14 @@
                 <slot name="suffix" />
               </div>
               <FeatherIcon
-                v-show="!$props.loading"
+                v-show="!loading"
                 name="chevron-down"
                 class="h-4 w-4 text-gray-600"
                 aria-hidden="true"
               />
               <LoadingIndicator
                 class="h-4 w-4 text-gray-600"
-                v-show="$props.loading"
+                v-show="loading"
               />
             </button>
           </div>
