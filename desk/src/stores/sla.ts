@@ -1,4 +1,5 @@
 import { SlaValidationErrors } from "@/components/Settings/Sla/types";
+import { validateConditions } from "@/utils";
 import { ref } from "vue";
 
 const defaultStatus = [
@@ -130,50 +131,6 @@ export const resetSlaDataErrors = () => {
     condition: "",
   };
 };
-
-export function validateConditions(conditions: any[]): boolean {
-  if (!Array.isArray(conditions)) return false;
-
-  // Handle simple condition [field, operator, value]
-  if (
-    conditions.length === 3 &&
-    typeof conditions[0] === "string" &&
-    typeof conditions[1] === "string"
-  ) {
-    return conditions[0] !== "" && conditions[1] !== "" && conditions[2] !== "";
-  }
-
-  // Iterate through conditions and logical operators
-  for (let i = 0; i < conditions.length; i++) {
-    const item = conditions[i];
-
-    // Skip logical operators (they will be validated by their position)
-    if (item === "and" || item === "or") {
-      // Ensure logical operators are not at start/end and not consecutive
-      if (
-        i === 0 ||
-        i === conditions.length - 1 ||
-        conditions[i - 1] === "and" ||
-        conditions[i - 1] === "or"
-      ) {
-        return false;
-      }
-      continue;
-    }
-
-    // Handle nested conditions (arrays)
-    if (Array.isArray(item)) {
-      if (!validateConditions(item)) {
-        return false;
-      }
-    } else if (item !== undefined && item !== null) {
-      // Invalid item in conditions array
-      return false;
-    }
-  }
-
-  return conditions.length > 0;
-}
 
 type SlaField = keyof SlaValidationErrors;
 
@@ -366,13 +323,14 @@ export function validateSlaData(
         }
         break;
       case "condition":
-        if (!skipConditionCheck) {
-          if (
-            slaData.value.condition_json &&
-            !validateConditions(slaData.value.condition_json)
-          ) {
-            slaDataErrors.value.condition = "Valid conditions are required";
-          }
+        if (skipConditionCheck) {
+          break;
+        }
+        if (
+          slaData.value.condition_json.length > 0 &&
+          !validateConditions(slaData.value.condition_json)
+        ) {
+          slaDataErrors.value.condition = "Valid conditions are required";
         } else {
           slaDataErrors.value.condition = "";
         }

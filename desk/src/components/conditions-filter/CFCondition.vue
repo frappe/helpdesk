@@ -54,7 +54,6 @@
             v-model="props.condition[1]"
             @change="updateOperator"
             :options="getOperators()"
-            :placeholder="'Equals'"
             class="w-max min-w-[100px]"
           />
         </div>
@@ -75,11 +74,12 @@
           />
         </div>
       </div>
-      <AssignmentConditions
+      <CFConditions
         v-if="props.isGroup && !(props.level == 2 || props.level == 4)"
         :conditions="props.condition"
         :isChild="true"
         :level="props.level"
+        :disableAddCondition="props.disableAddCondition"
       />
       <Button
         variant="outline"
@@ -96,10 +96,11 @@
   </div>
   <Dialog v-model="show" :options="{ size: '3xl', title: 'Nested conditions' }">
     <template #body-content>
-      <AssignmentConditions
+      <CFConditions
         :conditions="props.condition"
         :isChild="true"
         :level="props.level"
+        :disableAddCondition="props.disableAddCondition"
       />
     </template>
   </Dialog>
@@ -115,13 +116,14 @@ import {
   DateRangePicker,
   DateTimePicker,
   Dialog,
+  Dropdown,
   FormControl,
 } from "frappe-ui";
 import { computed, defineEmits, h, ref } from "vue";
 import GroupIcon from "~icons/lucide/group";
 import UnGroupIcon from "~icons/lucide/ungroup";
-import { filterableFields } from "../utils";
-import AssignmentConditions from "./AssignmentConditions.vue";
+import CFConditions from "./CFConditions.vue";
+import { filterableFields } from "./filterableFields";
 
 const show = ref(false);
 const emit = defineEmits([
@@ -130,13 +132,10 @@ const emit = defineEmits([
   "toggleConjunction",
   "turnIntoGroup",
 ]);
+
 const props = defineProps({
   condition: {
     type: Array<any>,
-    required: true,
-  },
-  doctype: {
-    type: String,
     required: true,
   },
   isChild: {
@@ -156,6 +155,10 @@ const props = defineProps({
   },
   conjunction: {
     type: String,
+  },
+  disableAddCondition: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -430,6 +433,8 @@ function getOperators() {
       ]
     );
   }
+  const op = options.find((o) => o.value == props.condition[1]);
+  props.condition[1] = op?.value || options[0].value;
   return options;
 }
 

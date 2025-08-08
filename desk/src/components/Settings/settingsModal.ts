@@ -1,4 +1,4 @@
-import { markRaw, ref } from "vue";
+import { h, markRaw, ref } from "vue";
 import ImageUp from "~icons/lucide/image-up";
 import LucideMail from "~icons/lucide/mail";
 import LucideUser from "~icons/lucide/user";
@@ -10,6 +10,8 @@ import Agents from "./Agents.vue";
 import Branding from "./Branding.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
+import AssignmentRules from "./Assignment Rules/AssignmentRules.vue";
+import Settings from "~icons/lucide/settings-2";
 import Sla from "./Sla/Sla.vue";
 import HolidayList from "./Holiday/Holiday.vue";
 import InviteAgents from "./InviteAgents.vue";
@@ -50,6 +52,11 @@ export const tabs = [
     label: "Business Holidays",
     icon: markRaw(Briefcase),
     component: markRaw(HolidayList),
+  },
+  {
+    label: "Assignment Rules",
+    icon: markRaw(h(Settings, { class: "rotate-90" })),
+    component: markRaw(AssignmentRules),
   },
 ];
 
