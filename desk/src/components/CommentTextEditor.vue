@@ -158,7 +158,7 @@ const props = defineProps({
 
 const emit = defineEmits(["submit", "discard"]);
 const doc = defineModel();
-const newComment = useStorage("commentBoxContent" + doc.value.name, "");
+const newComment = useStorage("commentBoxContent" + doc.value.name, null);
 const attachments = ref([]);
 const commentEmpty = computed(() => {
   return isContentEmpty(newComment.value);
