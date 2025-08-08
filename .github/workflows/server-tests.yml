@@ -13,21 +13,9 @@ on:
       - '**.md'
       - '**.html'
       - '**.csv'
-  workflow_dispatch:
-    inputs:
-      user:
-        description: 'Frappe Framework repository user (add your username for forks)'
-        required: true
-        default: 'frappe'
-        type: string
-      branch:
-        description: 'Frappe Framework branch'
-        default: 'develop'
-        required: false
-        type: string
 
 concurrency:
-  group: develop-${{ github.event.number }}
+  group: develop-helpdesk-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
@@ -55,11 +43,12 @@ jobs:
           python-version: '3.10'
 
       - name: Check for valid Python & Merge Conflicts
+        if: github.event.pull_request.base.ref == 'develop'
         run: |
           python -m compileall -f "${GITHUB_WORKSPACE}"
           if grep -lr --exclude-dir=node_modules "^<<<<<<< " "${GITHUB_WORKSPACE}"
-              then echo "Found merge conflicts"
-              exit 1
+          then echo "Found merge conflicts"
+          exit 1
           fi
 
       - name: Setup Node
