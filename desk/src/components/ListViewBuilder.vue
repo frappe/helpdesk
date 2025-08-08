@@ -520,8 +520,7 @@ const showViewControls = computed(() => {
     !options.value.hideViewControls &&
     filterableFields.data &&
     sortableFields.data &&
-    quickFilters.data &&
-    list.data?.data?.length > 0
+    quickFilters.data
   );
 });
 
