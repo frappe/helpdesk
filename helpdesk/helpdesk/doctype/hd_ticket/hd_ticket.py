@@ -498,11 +498,6 @@ class HDTicket(Document):
         sender = frappe.session.user
         recipients = to or self.raised_by
         sender_email = None if skip_email_workflow else self.sender_email()
-        last_communication = self.get_last_communication()
-
-        if last_communication:
-            cc = cc or last_communication.cc
-            bcc = bcc or last_communication.bcc
 
         if recipients == "Administrator":
             admin_email = frappe.get_value("User", "Administrator", "email")
@@ -527,6 +522,8 @@ class HDTicket(Document):
                 "subject": subject,
             }
         )
+
+        last_communication = self.get_last_communication()
         if last_communication and last_communication.message_id:
             communication.in_reply_to = last_communication.name
 
